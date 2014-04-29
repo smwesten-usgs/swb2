@@ -10,9 +10,10 @@ module data_catalog_entry
   integer (kind=c_int), public, parameter :: NETCDF_FILE_OPEN = 27
   integer (kind=c_int), public, parameter :: NETCDF_FILE_CLOSED = 42
 
-  type, public :: CATALOG_ENTRY_T
+  type, public :: DATA_CATALOG_ENTRY_T
     character (len=:), allocatable :: sKeyword
-    type (CATALOG_ENTRY_T), pointer :: next => null()
+    type (DATA_CATALOG_ENTRY_T), pointer :: previous => null()
+    type (DATA_CATALOG_ENTRY_T), pointer :: next     => null()
 
     integer (kind=c_int)  :: iSourceDataForm    ! constant, static grid, dynamic grid
     integer (kind=c_int)  :: iSourceDataType = DATATYPE_NA  ! real, short, integer, etc.
@@ -153,23 +154,7 @@ module data_catalog_entry
     procedure, public :: calc_project_boundaries => calc_project_boundaries
     procedure, public :: test_for_need_to_pad_values => test_for_need_to_pad_values
 
-  end type CATALOG_ENTRY_T
-
-  type (CATALOG_ENTRY_T), dimension(12), public, target :: DAT
-  type (CATALOG_ENTRY_T), dimension(:), public, target, allocatable :: DAT_EXTRA
-
-  integer (kind=c_int), parameter, public :: LANDUSE_DATA = 1
-  integer (kind=c_int), parameter, public :: AWC_DATA = 2
-  integer (kind=c_int), parameter, public :: SOILS_GROUP_DATA = 3
-  integer (kind=c_int), parameter, public :: FLOWDIR_DATA = 4
-  integer (kind=c_int), parameter, public :: ROUTING_FRAC_DATA = 5
-  integer (kind=c_int), parameter, public :: PRECIP_DATA = 6
-  integer (kind=c_int), parameter, public :: TMIN_DATA = 7
-  integer (kind=c_int), parameter, public :: TMAX_DATA = 8
-  integer (kind=c_int), parameter, public :: REL_HUM_DATA = 9
-  integer (kind=c_int), parameter, public :: SOL_RAD_DATA = 10
-  integer (kind=c_int), parameter, public :: WIND_VEL_DATA = 11
-  integer (kind=c_int), parameter, public :: MASK_DATA = 12
+  end type DATA_CATALOG_ENTRY_T
 
   integer (kind=c_int), parameter, public :: MISSING_VALUES_ZERO_OUT = 0
   integer (kind=c_int), parameter, public :: MISSING_VALUES_REPLACE_WITH_MEAN = 1
@@ -178,8 +163,8 @@ contains
 
   subroutine set_keyword_sub(this, sKeyword)
     
-    class (CATALOG_ENTRY_T)         :: this
-    character (len=*), intent(in)   :: sKeyword
+    class (DATA_CATALOG_ENTRY_T)         :: this
+    character (len=*), intent(in)        :: sKeyword
 
     this%sKeyword = sKeyword
 
@@ -190,7 +175,7 @@ contains
      sDescription, &
      rConstant )
 
-     class (CATALOG_ENTRY_T) :: this
+     class (DATA_CATALOG_ENTRY_T) :: this
      character (len=*) :: sDescription
      real (kind=c_float), intent(in) :: rConstant
 
@@ -212,7 +197,7 @@ contains
     sDescription, &
     iConstant )
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
     character (len=*) :: sDescription
     integer (kind=c_int), intent(in) :: iConstant
 
@@ -238,7 +223,7 @@ subroutine initialize_gridded_data_object_sub( this, &
    sFilenameTemplate, &
    sPROJ4)
 
-   class (CATALOG_ENTRY_T) :: this
+   class (DATA_CATALOG_ENTRY_T) :: this
    type ( T_GENERAL_GRID ),pointer :: pGrd
    character (len=*) :: sDescription
    character (len=*) :: sFileType
@@ -311,7 +296,7 @@ subroutine initialize_netcdf_data_object_sub( this, &
    sFilenameTemplate, &
    sPROJ4)
 
-   class (CATALOG_ENTRY_T) :: this
+   class (DATA_CATALOG_ENTRY_T) :: this
    character (len=*) :: sDescription
    integer (kind=c_int) :: iDataType
    type ( T_GENERAL_GRID ),pointer :: pGrdBase
@@ -364,7 +349,7 @@ end subroutine initialize_netcdf_data_object_sub
   subroutine getvalues_sub( this, pGrdBase, iMonth, iDay, iYear, iJulianDay, &
     iValues, rValues)
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
     type ( T_GENERAL_GRID ), pointer :: pGrdBase
     integer (kind=c_int), intent(in), optional :: iMonth, iDay, iYear, iJulianDay
     integer (kind=c_int), dimension(:,:), optional :: iValues
@@ -420,7 +405,7 @@ end subroutine initialize_netcdf_data_object_sub
 
 subroutine getvalues_constant_sub( this, pGrdBase )
 
-  class (CATALOG_ENTRY_T) :: this
+  class (DATA_CATALOG_ENTRY_T) :: this
   type ( T_GENERAL_GRID ), pointer :: pGrdBase
 
   select case (this%iSourceDataType)
@@ -460,7 +445,7 @@ subroutine getvalues_constant_sub( this, pGrdBase )
 
   subroutine dump_data_structure_sub(this)
 
-  class (CATALOG_ENTRY_T) :: this
+  class (DATA_CATALOG_ENTRY_T) :: this
 
   call echolog("---------------------------------------------------")
   call echolog("DATA STRUCTURE DETAILS:")
@@ -483,7 +468,7 @@ subroutine getvalues_constant_sub( this, pGrdBase )
 
   subroutine getvalues_gridded_sub( this, pGrdBase, iMonth, iDay, iYear)
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
     type ( T_GENERAL_GRID ), pointer :: pGrdBase
     integer (kind=c_int), optional :: iMonth
     integer (kind=c_int), optional :: iDay
@@ -582,7 +567,7 @@ subroutine getvalues_constant_sub( this, pGrdBase )
 
 subroutine transform_grid_to_grid(this, pGrdBase)
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
     type ( T_GENERAL_GRID ), pointer :: pGrdBase
 
     if( len_trim( this%sSourcePROJ4_string ) > 0 ) then
@@ -660,7 +645,7 @@ end subroutine transform_grid_to_grid
 
 subroutine set_constant_value_int( this, iValue )
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
     integer (kind=c_int) :: iValue
 
     this%iConstantValue = iValue
@@ -671,7 +656,7 @@ end subroutine set_constant_value_int
 
 subroutine set_constant_value_real( this, rValue )
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
     real (kind=c_float) :: rValue
 
     this%rConstantValue = rValue
@@ -682,7 +667,7 @@ end subroutine set_constant_value_real
 
   subroutine set_filecount( this, iValue, iYear)
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
     integer (kind=c_int) :: iValue
     integer (kind=c_int), optional :: iYear
 
@@ -696,7 +681,7 @@ end subroutine set_constant_value_real
 
   subroutine increment_filecount( this )
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
 
     this%iFileCount = this%iFileCount + 1
 
@@ -706,7 +691,7 @@ end subroutine set_constant_value_real
 
   subroutine reset_filecount( this )
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
 
     this%iFileCount = 0
 
@@ -716,7 +701,7 @@ end subroutine set_constant_value_real
 
   subroutine reset_at_yearend_filecount( this, iYear )
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
     integer (kind=c_int) :: iYear
 
     if (iYear /= this%iFileCountYear )  then
@@ -730,7 +715,7 @@ end subroutine set_constant_value_real
 
   subroutine make_filename_from_template( this, iMonth, iDay, iYear )
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
     integer (kind=c_int), optional :: iMonth, iDay, iYear
 
     ! [ LOCALS ]
@@ -846,7 +831,7 @@ end subroutine set_constant_value_real
   function test_for_need_to_pad_values(this, iMonth, iDay, iYear ) &
                                             result(lNeedToPadData)
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
     integer (kind=c_int) :: iMonth, iDay, iYear
 
     ! [ LOCALS ]
@@ -923,7 +908,7 @@ end subroutine set_constant_value_real
   subroutine getvalues_dynamic_netcdf_sub( this, pGrdBase, &
      iMonth, iDay, iYear, iJulianDay)
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
     type ( T_GENERAL_GRID ), pointer :: pGrdBase
     integer (kind=c_int) :: iMonth, iDay, iYear, iJulianDay
 
@@ -1129,7 +1114,7 @@ end subroutine set_constant_value_real
 
   subroutine put_values_to_local_NetCDF_sub(this, iMonth, iDay, iYear)
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
     integer (kind=c_int) :: iMonth
     integer (kind=c_int) :: iDay
     integer (kind=c_int) :: iYear
@@ -1174,7 +1159,7 @@ end subroutine set_constant_value_real
 
   function get_source_filetype_fn(this)  result(iFileType)
 
-     class (CATALOG_ENTRY_T) :: this
+     class (DATA_CATALOG_ENTRY_T) :: this
      integer (kind=c_int) :: iFileType
 
      if (str_compare(this%sSourceFileType, "ARC_GRID") ) then
@@ -1204,7 +1189,7 @@ end subroutine set_constant_value_real
 
   subroutine set_PROJ4_string_sub(this, sPROJ4_string)
 
-     class (CATALOG_ENTRY_T) :: this
+     class (DATA_CATALOG_ENTRY_T) :: this
      character (len=*), optional :: sPROJ4_string
 
      this%sSourcePROJ4_string = sPROJ4_string
@@ -1215,7 +1200,7 @@ end subroutine set_constant_value_real
 
   subroutine set_grid_flip_horizontal_sub(this)
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
 
     this%lFlipHorizontal = lTRUE
 
@@ -1225,7 +1210,7 @@ end subroutine set_constant_value_real
 
   subroutine set_grid_flip_vertical_sub(this)
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
 
     this%lFlipVertical = lTRUE
 
@@ -1235,7 +1220,7 @@ end subroutine set_constant_value_real
 
   subroutine set_variable_order_sub(this, sVariableOrder)
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
     character (len=*) :: sVariableOrder
 
     this%sVariableOrder = sVariableOrder
@@ -1246,7 +1231,7 @@ end subroutine set_constant_value_real
 
 subroutine set_scale_sub(this, rScaleFactor)
 
-   class (CATALOG_ENTRY_T) :: this
+   class (DATA_CATALOG_ENTRY_T) :: this
    real (kind=c_float) :: rScaleFactor
 
    this%rScaleFactor = rScaleFactor
@@ -1258,7 +1243,7 @@ end subroutine set_scale_sub
 
 subroutine set_conversion_factor_sub(this, rConversionFactor)
 
-   class (CATALOG_ENTRY_T) :: this
+   class (DATA_CATALOG_ENTRY_T) :: this
    real (kind=c_float) :: rConversionFactor
 
    this%rConversionFactor = rConversionFactor
@@ -1269,7 +1254,7 @@ end subroutine set_conversion_factor_sub
 
 subroutine set_archive_local_sub(this, lValue)
 
-   class (CATALOG_ENTRY_T) :: this
+   class (DATA_CATALOG_ENTRY_T) :: this
    logical (kind=c_bool) :: lValue
 
    this%lCreateLocalNetCDFArchive = lValue
@@ -1280,7 +1265,7 @@ end subroutine set_archive_local_sub
 
 subroutine set_offset_sub(this, rAddOffset)
 
-   class (CATALOG_ENTRY_T) :: this
+   class (DATA_CATALOG_ENTRY_T) :: this
    real (kind=c_float) :: rAddOffset
 
    this%rAddOffset = rAddOffset
@@ -1292,7 +1277,7 @@ end subroutine set_offset_sub
 
 subroutine set_missing_value_int_sub(this, iMissingVal)
 
-  class (CATALOG_ENTRY_T) :: this
+  class (DATA_CATALOG_ENTRY_T) :: this
   integer (kind=c_int) :: iMissingVal
 
   this%iMissingValuesCode = iMissingVal
@@ -1303,7 +1288,7 @@ end subroutine set_missing_value_int_sub
 
 subroutine set_missing_value_real_sub(this, rMissingVal)
 
-  class (CATALOG_ENTRY_T) :: this
+  class (DATA_CATALOG_ENTRY_T) :: this
   integer (kind=c_int) :: rMissingVal
 
   this%rMissingValuesCode = rMissingVal
@@ -1314,7 +1299,7 @@ end subroutine set_missing_value_real_sub
 
 subroutine set_minimum_allowable_value_int_sub(this, iMinVal)
 
-  class (CATALOG_ENTRY_T) :: this
+  class (DATA_CATALOG_ENTRY_T) :: this
   integer (kind=c_int) :: iMinVal
 
   this%iMinAllowedValue = iMinVal
@@ -1325,7 +1310,7 @@ end subroutine set_minimum_allowable_value_int_sub
 
 subroutine set_maximum_allowable_value_int_sub(this, iMaxVal)
 
-  class (CATALOG_ENTRY_T) :: this
+  class (DATA_CATALOG_ENTRY_T) :: this
   integer (kind=c_int) :: iMaxVal
 
   this%iMaxAllowedValue = iMaxVal
@@ -1336,7 +1321,7 @@ end subroutine set_maximum_allowable_value_int_sub
 
 subroutine set_minimum_allowable_value_real_sub(this, rMinVal)
 
-  class (CATALOG_ENTRY_T) :: this
+  class (DATA_CATALOG_ENTRY_T) :: this
   real (kind=c_float) :: rMinVal
 
   this%rMinAllowedValue = rMinVal
@@ -1347,7 +1332,7 @@ end subroutine set_minimum_allowable_value_real_sub
 
 subroutine set_maximum_allowable_value_real_sub(this, rMaxVal)
 
-  class (CATALOG_ENTRY_T) :: this
+  class (DATA_CATALOG_ENTRY_T) :: this
   real (kind=c_float) :: rMaxVal
 
   this%rMaxAllowedValue = rMaxVal
@@ -1358,7 +1343,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
   subroutine calc_project_boundaries(this, pGrdBase)
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
     type ( T_GENERAL_GRID ), pointer :: pGrdBase
 
     ! [ LOCALS ]
@@ -1422,7 +1407,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
   subroutine data_GridEnforceLimits_int(this, iValues)
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
     integer (kind=c_int), dimension(:,:) :: iValues
 
     ! [ LOCALS ]
@@ -1440,7 +1425,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
   subroutine data_GridEnforceLimits_real(this, rValues)
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
     real (kind=c_float), dimension(:,:) :: rValues
 
     ! [ LOCALS ]
@@ -1458,7 +1443,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
   subroutine data_GridHandleMissingData_real(this, rValues)
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
     real (kind=c_float), dimension(:,:), intent(inout) :: rValues
 
     ! [ LOCALS ]
@@ -1549,7 +1534,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
   subroutine data_GridHandleMissingData_int(this, iValues)
 
-    class (CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T) :: this
     integer (kind=c_int), dimension(:,:), intent(inout) :: iValues
 
     ! [ LOCALS ]

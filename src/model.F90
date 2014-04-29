@@ -9,7 +9,8 @@ module model
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double, c_long_long
   use types
-  use data_factory
+  use data_catalog
+  use data_catalog_entry
   use datetime
   use swb_grid
   use stats
