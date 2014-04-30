@@ -1,6 +1,7 @@
 module data_catalog
 
   use iso_c_binding, only : c_int, c_float, c_bool, c_double
+  use data_catalog_entry
   implicit none
 
   private
@@ -44,8 +45,10 @@ contains
         this%last  => null()
         this%first => data
         data%next      => null()
-        data%previous  => null() 
+        data%previous  => null()
         count = 1
+
+      endif
 
     else if( associated(data) ) then
 
@@ -57,7 +60,9 @@ contains
 
       count = count + 1
 
-    endif  
+    endif
+
+
 
   end subroutine catalog_add_entry_sub
 
@@ -88,13 +93,13 @@ contains
         deallocate( current )
         current => null()
 
-        count = count - 1 
+        count = count - 1
 
       endif
 
-    endif 
+    endif
 
-  subroutine catalog_delete_entry_sub
+  end subroutine catalog_delete_entry_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -125,7 +130,7 @@ contains
 
     class (DATA_CATALOG_T)           :: this
 
-      
+
     type (DATA_CATALOG_ENTRY_T), pointer :: current
 
     if (associated( this%first ) ) then
@@ -133,14 +138,14 @@ contains
       current => this%first
 
       do while ( associated(current) )
-  
+
         call current%print()
 
         current => current%next
 
-      enddo  
+      enddo
 
-    endif  
+    endif
 
   end subroutine catalog_print_sub
 

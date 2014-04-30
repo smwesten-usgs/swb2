@@ -3,7 +3,8 @@ if(TARGET__SWB_EXECUTABLE)
 
   add_executable(swb
             control.F90
-            data_factory.F90
+            data_catalog.F90
+			data_catalog_entry.F90
 			datetime.F90
             et_FAO56_crop_coefficients.F90
             et_blaney_criddle.F90
@@ -204,7 +205,8 @@ if(TARGET__SWB_LIBRARY)
 
   add_library(swblib STATIC
             control.F90
-            data_factory.F90
+            data_catalog.F90
+			data_catalog_entry.F90
 #            datetime.F90
             et_FAO56_crop_coefficients.F90
             et_blaney_criddle.F90
@@ -214,7 +216,6 @@ if(TARGET__SWB_LIBRARY)
             et_turc.F90
             graph.F90
             grid.F90
-#			interpolators.F90
             irrigation.F90
             main.F90
             meteorological_functions.F90
