@@ -5,7 +5,6 @@ module data_catalog_entry
   use netcdf4_support
   use iso_c_binding, only : c_int, c_bool, c_float, c_double
   implicit none
-  private
 
   integer (kind=c_int), public, parameter :: NETCDF_FILE_OPEN = 27
   integer (kind=c_int), public, parameter :: NETCDF_FILE_CLOSED = 42
@@ -155,6 +154,27 @@ module data_catalog_entry
     procedure, public :: test_for_need_to_pad_values => test_for_need_to_pad_values
 
   end type DATA_CATALOG_ENTRY_T
+
+  type (DATA_CATALOG_ENTRY_T), pointer :: PRCP => null()
+  type (DATA_CATALOG_ENTRY_T), pointer :: TMAX => null()
+  type (DATA_CATALOG_ENTRY_T), pointer :: TMIN => null()
+  type (DATA_CATALOG_ENTRY_T), pointer :: RELHUM => null()
+  type (DATA_CATALOG_ENTRY_T), pointer :: WINDSPD => null()
+  type (DATA_CATALOG_ENTRY_T), pointer :: PCT_POSS_SUN => null()
+  type (DATA_CATALOG_ENTRY_T), pointer :: SOLRAD => null()
+  type (DATA_CATALOG_ENTRY_T), pointer :: LULC => null()
+  type (DATA_CATALOG_ENTRY_T), pointer :: AWC => null()
+  type (DATA_CATALOG_ENTRY_T), pointer :: HSG => null()
+  type (DATA_CATALOG_ENTRY_T), pointer :: FLOWDIR => null()
+  type (DATA_CATALOG_ENTRY_T), pointer :: MASK => null()
+  type (DATA_CATALOG_ENTRY_T), pointer :: BASIN_MASK => null()
+  type (DATA_CATALOG_ENTRY_T), pointer :: REF_ET => null()
+  type (DATA_CATALOG_ENTRY_T), pointer :: FOG_ZONE_NUM => null()
+  type (DATA_CATALOG_ENTRY_T), pointer :: FOG_ELEV_ZONE_NUM => null()
+  type (DATA_CATALOG_ENTRY_T), pointer :: PRCP_GRID_NUM => null()
+  type (DATA_CATALOG_ENTRY_T), pointer :: PAN_EVAP_ZONE_NUM => null()
+  type (DATA_CATALOG_ENTRY_T), pointer :: RUNOFF_ZONE_NUM => null()  
+  type (DATA_CATALOG_ENTRY_T), pointer :: ROUTING_FRAC => null()
 
   integer (kind=c_int), parameter, public :: MISSING_VALUES_ZERO_OUT = 0
   integer (kind=c_int), parameter, public :: MISSING_VALUES_REPLACE_WITH_MEAN = 1

@@ -6,25 +6,27 @@
 !>  This module contains all time and date-related routines as well as the @ref T_DATETIME class.
 module datetime
 
-  use iso_c_binding, only : c_short, c_int, c_float, c_double
-  use types
+  use iso_c_binding, only : c_short, c_int, c_float, c_double, c_bool
+  use types_new
+  use strings
+  use constants_and_conversions
 
   implicit none
   private
 
   type, public :: T_DATETIME
 
-    integer (kind=c_int) :: iMonth = 1
-    integer (kind=c_int) :: iDay = 1
-    integer (kind=c_int) :: iYear = 1
-    integer (kind=c_int) :: iHour = 0
-    integer (kind=c_int) :: iMinute = 0
-    integer (kind=c_int) :: iSecond = 0
-    integer (kind=c_int) :: iWaterYearHigh
-    integer (kind=c_int) :: iWaterYearLow
-    logical (kind=c_bool) :: lIsLeapYear = lFALSE
-    integer (kind=c_int) :: iJulianDay
-    real (kind=c_float) :: rFractionOfDay = rZERO
+    integer (kind=c_short)  :: iMonth = 1
+    integer (kind=c_short)  :: iDay = 1
+    integer (kind=c_int)    :: iYear = 1
+    integer (kind=c_short)  :: iHour = 0
+    integer (kind=c_short)  :: iMinute = 0
+    integer (kind=c_short)  :: iSecond = 0
+    integer (kind=c_int)    :: iWaterYearHigh
+    integer (kind=c_int)    :: iWaterYearLow
+    logical (kind=c_bool)   :: lIsLeapYear = lFALSE
+    integer (kind=c_int)    :: iJulianDay
+    real (kind=c_float)     :: rFractionOfDay = rZERO
 
   contains
 
@@ -76,27 +78,6 @@ module datetime
 
   end type T_DATETIME
 
-  type T_DATERANGE
-
-    type (T_DATETIME) :: tStartDate
-    type (T_DATETIME) :: tEndDate
-
-  contains
-
-    procedure, public :: new_daterange_fm_text_sub, new_daterange_fm_datetime_sub
-    generic :: new => new_daterange_fm_text_sub, new_daterange_fm_datetime_sub
-    procedure, public :: newFmText => new_daterange_fm_text_sub
-    procedure, public :: newFmDT => new_daterange_fm_datetime_sub
-
-  end type T_DATERANGE
-
-  type, extends (T_DATETIME) :: T_MODEL_SIM
-    type (T_DATETIME) :: tStartDate
-    type (T_DATETIME) :: tEndDate
-
-  end type T_MODEL_SIM
-
-
   ! the following values are determined by the date format string; defaults to MM/DD/YYYY
   character (len=14), private :: sDATE_FORMAT = "MM/DD/YYYY"
   character (len=14), public  :: sDEFAULT_DATE_FORMAT = "MM/DD/YYYY"
@@ -117,8 +98,6 @@ module datetime
   integer (kind=c_int), private :: iScanMin2 = 5
   integer (kind=c_int), private :: iScanSec1 = 7
   integer (kind=c_int), private :: iScanSec2 = 8
-
-  type (T_MODEL_SIM), public :: MODEL_SIM
 
 contains
 
@@ -484,118 +463,114 @@ end subroutine calc_gregorian_date_sub
 !
 ! SOURCE
 
-! subroutine gregorian_date(iJD, iYear, iMonth, iDay, iOrigin)
+subroutine gregorian_date(iJD, iYear, iMonth, iDay, iOrigin)
+
+!! COMPUTES THE GREGORIAN CALENDAR DATE (YEAR,MONTH,DAY)
+!! GIVEN THE JULIAN DATE (JD).
+
+  ! [ ARGUMENTS ]
+  integer (kind=c_int) :: iJD
+  integer (kind=c_int), intent(inout) :: iYear, iMonth, iDay
+  integer (kind=c_int), optional :: iOrigin
+  ! [ LOCALS ]
+  integer (kind=c_int) iI,iJ,iK,iL,iN
+  integer (kind=c_int) :: iOffset
+
+  if(present(iOrigin)) then
+    iOffset = iOrigin
+  else
+    iOffset = 0
+  endif
+
+  ! allow for an alternate "origin" to be specified... technically,
+  ! this is no longer a "Julian" day, but alas... This modification
+  ! was required in order to process the "time" variables from global
+  ! climate models, which seem to be defined as something like this:
+  ! time:units = "days since 1960-01-01 00:00:00"
+  !
+  ! for the above example, JD = 2436935 on the first day; the NetCDF "time"
+  ! variable will be equal to 0.  Thus, in order to get the conversion
+  ! right, we must add 0 + 2436935 to yield a true Julian Day.
+
+  iJD = iJD + iOffset
+
+  iL= iJD + 68569_c_int
+  iN= 4*iL / 146097_c_int
+  iL= iL - (146097_c_int * iN + 3_c_int)/4_c_int
+  iI= 4000_c_int * (iL + 1_c_int) / 1461001_c_int
+  iL= iL - 1461_c_int * iI / 4_c_int + 31_c_int
+  iJ= 80_c_int * iL / 2447_c_int
+  iK= iL - 2447_c_int * iJ / 80_c_int
+  iL= iJ / 11_c_int
+  iJ= iJ + 2_c_int - 12_c_int * iL
+  iI= 100_c_int * (iN - 49_c_int) + iI + iL
+
+  iYear = iI
+  iMonth = iJ
+  iDay = iK
+
+end subroutine gregorian_date
+
+
+!--------------------------------------------------------------------------
+!!****f* types/julian_day
+! NAME
+!   julian_day - Convert from a Gregorian calendar date to a Julian day number.
 !
-! !! COMPUTES THE GREGORIAN CALENDAR DATE (YEAR,MONTH,DAY)
-! !! GIVEN THE JULIAN DATE (JD).
+! SYNOPSIS
+!   Conversion from a Gregorian calendar date to a Julian day number.
+!   Valid for any Gregorian calendar date producing a Julian day
+!   greater than zero.
 !
-!   ! [ ARGUMENTS ]
-!   integer (kind=c_int) :: iJD
-!   integer (kind=c_int), intent(inout) :: iYear, iMonth, iDay
-!   integer (kind=c_int), optional :: iOrigin
-!   ! [ LOCALS ]
-!   integer (kind=c_int) iI,iJ,iK,iL,iN
-!   integer (kind=c_int) :: iOffset
+! INPUTS
+!   iYear   4-digit year
+!   iMonth  2-digit month (1-12)
+!   iDay    2-digit day (1-31)
 !
-!   if(present(iOrigin)) then
-!     iOffset = iOrigin
-!   else
-!     iOffset = 0
-!   endif
+! OUTPUTS
+!   iJD     integer number of days that have elapsed since noon
+!           Greenwich Mean Time (UT or TT) Monday, January 1, 4713 BC
 !
-!   ! allow for an alternate "origin" to be specified... technically,
-!   ! this is no longer a "Julian" day, but alas... This modification
-!   ! was required in order to process the "time" variables from global
-!   ! climate models, which seem to be defined as something like this:
-!   ! time:units = "days since 1960-01-01 00:00:00"
-!   !
-!   ! for the above example, JD = 2436935 on the first day; the NetCDF "time"
-!   ! variable will be equal to 0.  Thus, in order to get the conversion
-!   ! right, we must add 0 + 2436935 to yield a true Julian Day.
-!
-!   iJD = iJD + iOffset
-!
-!   iL= iJD + 68569_c_int
-!   iN= 4*iL / 146097_c_int
-!   iL= iL - (146097_c_int * iN + 3_c_int)/4_c_int
-!   iI= 4000_c_int * (iL + 1_c_int) / 1461001_c_int
-!   iL= iL - 1461_c_int * iI / 4_c_int + 31_c_int
-!   iJ= 80_c_int * iL / 2447_c_int
-!   iK= iL - 2447_c_int * iJ / 80_c_int
-!   iL= iJ / 11_c_int
-!   iJ= iJ + 2_c_int - 12_c_int * iL
-!   iI= 100_c_int * (iN - 49_c_int) + iI + iL
-!
-!   iYear = iI
-!   iMonth = iJ
-!   iDay = iK
-!
-!   return
-!
-! end subroutine gregorian_date
-!
-!
-! !--------------------------------------------------------------------------
-! !!****f* types/julian_day
-! ! NAME
-! !   julian_day - Convert from a Gregorian calendar date to a Julian day number.
-! !
-! ! SYNOPSIS
-! !   Conversion from a Gregorian calendar date to a Julian day number.
-! !   Valid for any Gregorian calendar date producing a Julian day
-! !   greater than zero.
-! !
-! ! INPUTS
-! !   iYear   4-digit year
-! !   iMonth  2-digit month (1-12)
-! !   iDay    2-digit day (1-31)
-! !
-! ! OUTPUTS
-! !   iJD     integer number of days that have elapsed since noon
-! !           Greenwich Mean Time (UT or TT) Monday, January 1, 4713 BC
-! !
-! ! SOURCE
-!
-! function julian_day ( iYear, iMonth, iDay, iOrigin ) result(iJD)
-!
-!   ! [ ARGUMENTS ]
-!   integer (kind=c_int), intent(in) :: iYear, iMonth, iDay
-!   integer (kind=c_int), optional :: iOrigin
-!
-!   ! [ LOCALS ]
-!   integer (kind=c_int) i,j,k
-!   integer (kind=c_int) :: iOffset
-!   character (len=256) :: sBuf
-!
-!   ! [ RETURN VALUE ]
-!   integer (kind=c_int) :: iJD
-!
-!   i= iYear
-!   j= iMonth
-!   k= iDay
-!
-!   if(.not. (iMonth >= 1 .and. iMonth <= 12)) then
-!     write(sBuf,fmt="('Illegal month value given: ',i4)") iMonth
-!     call Assert( lFALSE, trim(sBuf), TRIM(__FILE__), __LINE__)
-!   elseif(.not. (iDay >= 1 .and. iDay <= 31)) then
-!     write(sBuf,fmt="('Illegal day value given: ',i4)") iDay
-!     call Assert( lFALSE, trim(sBuf), TRIM(__FILE__), __LINE__)
-!   endif
-!
-!   if(present(iOrigin)) then
-!     iOffset = iOrigin
-!   else
-!     iOffset = 0
-!   endif
-!
-!   iJD= ( k-32075_c_int + 1461_c_int * (i + 4800_c_int + (j - 14_c_int) / 12_c_int) &
-!         /4_c_int + 367_c_int * (j - 2_c_int - (j - 14_c_int)/ 12_c_int * 12_c_int) &
-!         /12_c_int - 3_c_int *((i + 4900_c_int + (j - 14_c_int) &
-!         /12_c_int)/100_c_int)/4_c_int ) - iOffset
-!
-!   return
-!
-! end function julian_day
+! SOURCE
+
+function julian_day ( iYear, iMonth, iDay, iOrigin ) result(iJD)
+
+  ! [ ARGUMENTS ]
+  integer (kind=c_int), intent(in) :: iYear, iMonth, iDay
+  integer (kind=c_int), optional :: iOrigin
+
+  ! [ LOCALS ]
+  integer (kind=c_int) i,j,k
+  integer (kind=c_int) :: iOffset
+  character (len=256) :: sBuf
+
+  ! [ RETURN VALUE ]
+  integer (kind=c_int) :: iJD
+
+  i= iYear
+  j= iMonth
+  k= iDay
+
+  if(.not. (iMonth >= 1 .and. iMonth <= 12)) then
+    write(sBuf,fmt="('Illegal month value given: ',i4)") iMonth
+    call Assert( lFALSE, trim(sBuf), TRIM(__FILE__), __LINE__)
+  elseif(.not. (iDay >= 1 .and. iDay <= 31)) then
+    write(sBuf,fmt="('Illegal day value given: ',i4)") iDay
+    call Assert( lFALSE, trim(sBuf), TRIM(__FILE__), __LINE__)
+  endif
+
+  if(present(iOrigin)) then
+    iOffset = iOrigin
+  else
+    iOffset = 0
+  endif
+
+  iJD= ( k-32075_c_int + 1461_c_int * (i + 4800_c_int + (j - 14_c_int) / 12_c_int) &
+        /4_c_int + 367_c_int * (j - 2_c_int - (j - 14_c_int)/ 12_c_int * 12_c_int) &
+        /12_c_int - 3_c_int *((i + 4900_c_int + (j - 14_c_int) &
+        /12_c_int)/100_c_int)/4_c_int ) - iOffset
+
+end function julian_day
 
 !------------------------------------------------------------------------------
 
@@ -864,54 +839,6 @@ subroutine system_time_to_date_sub(this)
 
 end subroutine system_time_to_date_sub
 
-!------------------------------------------------------------------------------
-
-subroutine new_daterange_fm_text_sub(this, sStartDate, sStartTime, sEndDate, sEndTime, &
-     sDateFormat)
-
-  class (T_DATERANGE) :: this
-  character (len=*), intent(in) :: sStartDate
-  character (len=*), intent(in) :: sStartTime
-  character (len=*), intent(in) :: sEndDate
-  character (len=*), intent(in) :: sEndTime
-  character (len=*), intent(in), optional :: sDateFormat
-
-  ! [ LOCALS ]
-  character (len=14) :: sDateFormatText
-
-  if(present(sDateFormat)) then
-    sDateFormatText = trim(sDateFormat)
-  else
-    sDateFormatText = "MM/DD/YYYY"
-  endif
-
-  call this%tStartDate%setDateFormat(sDateFormatText)
-
-  call this%tStartDate%parseDate(sStartDate)
-  call this%tStartDate%parseTime(sStartTime)
-  call this%tStartDate%calcJulianDay()
-
-  call this%tEndDate%parseDate(sEndDate)
-  call this%tEndDate%parseTime(sEndTime)
-  call this%tEndDate%calcJulianDay()
-
-end subroutine new_daterange_fm_text_sub
-
-!--------------------------------------------------------------------------
-
-subroutine new_daterange_fm_datetime_sub(this, tStartDate, tEndDate )
-
-  class (T_DATERANGE) :: this
-  type (T_DATETIME), intent(in) :: tStartDate
-  type (T_DATETIME), intent(in) :: tEndDate
-
-  ! [ LOCALS ]
-
-  this%tStartDate = tStartDate
-  this%tEndDate = tEndDate
-
-end subroutine new_daterange_fm_datetime_sub
-
 
 !--------------------------------------------------------------------------
 
@@ -1069,6 +996,126 @@ subroutine is_leap_year(this)
                  ( mod(this%iYear, 400) == 0 .and. this%iYear /= 0 )
 
 end subroutine is_leap_year
+
+!------------------------------------------------------------------------------
+
+function mmddyyyy2julian(sMMDDYYYY)  result(iJD)
+
+  character (len=*) :: sMMDDYYYY
+  integer (kind=c_int) :: iJD
+
+  ! [ LOCALS ]
+  integer (kind=c_int) :: iMonth
+  integer (kind=c_int) :: iDay
+  integer (kind=c_int) :: iYear
+  character (len=256) :: sItem, sBuf
+  integer (kind=c_int) :: iStat
+
+  sItem = sMMDDYYYY
+
+  ! parse month value
+  call chomp(sItem, sBuf, "/")
+  read(sBuf,*,iostat = iStat) iMonth
+  call Assert(iStat==0, "Problem reading month value from string "//TRIM(sMMDDYYYY), &
+    TRIM(__FILE__),__LINE__)
+
+  ! parse day value
+  call chomp(sItem, sBuf, "/")
+  read(sBuf,*,iostat=iStat) iDay
+  call Assert(iStat==0, "Problem reading day value from string "//TRIM(sMMDDYYYY), &
+    TRIM(__FILE__),__LINE__)
+
+  ! parse year value
+  call chomp(sItem, sBuf, "/")
+  read(sBuf,*,iostat=iStat) iYear
+  call Assert(iStat==0, "Problem reading year value from string "//TRIM(sMMDDYYYY), &
+    TRIM(__FILE__),__LINE__)
+
+  iJD = julian_day ( iYear, iMonth, iDay)
+
+end function mmddyyyy2julian
+
+!------------------------------------------------------------------------------
+
+function mmdd2doy(sMMDD)  result(iDOY)
+
+  character (len=*) :: sMMDD
+  integer (kind=c_int) :: iDOY
+
+  ! [ LOCALS ]
+  integer (kind=c_int) :: iMonth
+  integer (kind=c_int) :: iDay
+  integer (kind=c_int) :: iYear
+  character (len=256) :: sItem, sBuf
+  integer (kind=c_int) :: iStat
+  integer (kind=c_int) :: iJD
+  integer (kind=c_int) :: iStartingJD
+
+  sItem = sMMDD
+
+  ! parse month value
+  call chomp(sItem, sBuf, "/")
+  read(sBuf,*,iostat = iStat) iMonth
+  call Assert(iStat==0, "Problem reading month value from string "//TRIM(sMMDD), &
+    TRIM(__FILE__),__LINE__)
+
+  ! parse day value
+  call chomp(sItem, sBuf, "/")
+  read(sBuf,*,iostat=iStat) iDay
+  call Assert(iStat==0, "Problem reading day value from string "//TRIM(sMMDD), &
+    TRIM(__FILE__),__LINE__)
+
+
+  iStartingJD = julian_day ( 1999, 1, 1)
+  iJD = julian_day ( 1999, iMonth, iDay)
+
+  iDOY = iJD - iStartingJD + 1
+
+end function mmdd2doy
+
+!------------------------------------------------------------------------------
+
+function mmddyyyy2doy(sMMDDYYYY)  result(iDOY)
+
+  character (len=*) :: sMMDDYYYY
+  integer (kind=c_int) :: iDOY
+
+  ! [ LOCALS ]
+  integer (kind=c_int) :: iMonth
+  integer (kind=c_int) :: iDay
+  integer (kind=c_int) :: iYear
+  character (len=256) :: sItem, sBuf
+  integer (kind=c_int) :: iStat
+  integer (kind=c_int) :: iJD
+  integer (kind=c_int) :: iStartingJD
+
+  sItem = sMMDDYYYY
+
+  ! parse month value
+  call chomp(sItem, sBuf, "/")
+  read(sBuf,*,iostat = iStat) iMonth
+  call assert(iStat==0, "Problem reading month value from string "//TRIM(sMMDDYYYY), &
+    TRIM(__FILE__),__LINE__)
+
+  ! parse day value
+  call chomp(sItem, sBuf, "/")
+  read(sBuf,*,iostat=iStat) iDay
+  call assert(iStat==0, "Problem reading day value from string "//TRIM(sMMDDYYYY), &
+    TRIM(__FILE__),__LINE__)
+
+  ! parse year value
+  call chomp(sItem, sBuf, "/")
+  read(sBuf,*,iostat=iStat) iYear
+  call assert(iStat==0, "Problem reading year value from string "//TRIM(sMMDDYYYY), &
+    TRIM(__FILE__),__LINE__)
+
+  iStartingJD = julian_day ( iYear, 1, 1)
+  iJD = julian_day ( iYear, iMonth, iDay)
+
+  iDOY = iJD - iStartingJD + 1
+
+end function mmddyyyy2doy
+
 
 
 end module datetime

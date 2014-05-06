@@ -156,10 +156,10 @@ module types
       real (kind=c_float) :: rSoilWaterCapInput = rZERO   ! Soil water capacity from grid file
       real (kind=c_float) :: rSoilWaterCap = rZERO        ! Soil water capacity adjusted for LU/LC
       real (kind=c_float) :: rSoilMoisture = rZERO        ! Soil moisture in inches of water
-			real (kind=c_float) :: rCurrentRootingDepth = 0.2   ! Current rooting depth for use w FAO56 calculations
-			real (kind=c_float) :: rKcb = rZERO                 ! crop coefficient for this cell
-			real (kind=c_float) :: rTotalAvailableWater = rZERO
-			real (kind=c_float) :: rReadilyAvailableWater = rZERO
+      real (kind=c_float) :: rCurrentRootingDepth = 0.2   ! Current rooting depth for use w FAO56 calculations
+      real (kind=c_float) :: rKcb = rZERO                 ! crop coefficient for this cell
+      real (kind=c_float) :: rTotalAvailableWater = rZERO
+      real (kind=c_float) :: rReadilyAvailableWater = rZERO
 
       real (kind=c_float) :: rSoilMoisturePct = rZERO        ! Soil moisture as percentage of water capacity
       real (kind=c_float) :: rSM_AccumPotentWatLoss = rZERO  ! Accumulated potential water loss
@@ -308,19 +308,19 @@ module types
 
     !> Land use type; values are expected to correspond to those provided
     !> by the user in the input landuse grid.
-	integer (kind=c_int) :: iLandUseType
+  integer (kind=c_int) :: iLandUseType
 
     !> Land use description
     character (len=256) :: sLandUseDescription
 
     !> Assumed percent imperviousness (not used in any calculations)
-	character (len=256) :: sAssumedPercentImperviousness
+  character (len=256) :: sAssumedPercentImperviousness
 
     !> Interception value (inches per day) during growing season
-	real (kind=c_float) :: rIntercept_GrowingSeason
+  real (kind=c_float) :: rIntercept_GrowingSeason
 
     !> Interception value (inches per day) outside of growing season
-	real (kind=c_float) :: rIntercept_NonGrowingSeason
+  real (kind=c_float) :: rIntercept_NonGrowingSeason
 
   end type T_LANDUSE_LOOKUP
 
@@ -332,7 +332,7 @@ module types
   type T_IRRIGATION_LOOKUP
 
     !> Landuse code corresponding to the codes specified in landuse grid
- 	integer (kind=c_int) :: iLandUseType
+  integer (kind=c_int) :: iLandUseType
 
     !> Land use description
     character (len=256) :: sLandUseDescription
@@ -446,10 +446,10 @@ module types
   type T_MONTH
     ! Container for calendar lookup information
     character (len=3) :: sName          ! Abbreviated name
-	character (len=9) :: sFullName      ! Full month name
+  character (len=9) :: sFullName      ! Full month name
     integer (kind=c_int) :: iStart      ! Starting (Julian) date
     integer (kind=c_int) :: iEnd        ! Ending (Julian) date
-	integer (kind=c_int) :: iMonth      ! Month number (1-12)
+  integer (kind=c_int) :: iMonth      ! Month number (1-12)
     integer (kind=c_int) :: iNumDays    ! Max number of days in month
   end type T_MONTH
 
@@ -911,8 +911,8 @@ module types
       !> Is an EOJ statement present?
       logical (kind=c_bool) :: lEOJ_IsPresent = lFALSE
 
-			!> Enable irrigation calculations?
-			logical (kind=c_bool) ::lEnableIrrigation = lFALSE
+      !> Enable irrigation calculations?
+      logical (kind=c_bool) ::lEnableIrrigation = lFALSE
 
       !> Option to write extra files when using PEST
       logical (kind=c_bool) :: lWriteExtraPestFiles = lFALSE
@@ -1084,16 +1084,16 @@ module types
       integer(kind=c_int) :: iOPEN_WATER_LU = iNO_DATA_NCDC
 
       ! define southern and northern latitude values bounding the grid
-  	  real (kind=c_float) :: rSouthernLatitude = rNO_DATA_NCDC
- 	    real (kind=c_float) :: rNorthernLatitude = rNO_DATA_NCDC
+      real (kind=c_float) :: rSouthernLatitude = rNO_DATA_NCDC
+      real (kind=c_float) :: rNorthernLatitude = rNO_DATA_NCDC
 
 #ifdef STREAM_INTERACTIONS
- 	    ! Data for the elevation corrections on temperature
- 	    logical (kind=c_bool) :: lElevAdjustment
- 	    real (kind=c_float) :: rElevStationElevation
- 	    real (kind=c_float) :: rElevDryFactor
- 	    real (kind=c_float) :: rElevHumidFactor
- 	    real (kind=c_float) :: rElevHumidityThreshold
+      ! Data for the elevation corrections on temperature
+      logical (kind=c_bool) :: lElevAdjustment
+      real (kind=c_float) :: rElevStationElevation
+      real (kind=c_float) :: rElevDryFactor
+      real (kind=c_float) :: rElevHumidFactor
+      real (kind=c_float) :: rElevHumidityThreshold
 #endif
 
        ! data structure to hold information about which cells we
@@ -1101,10 +1101,10 @@ module types
        type (T_SSF_FILES), dimension(:), pointer :: SSF_FILES
 
 #ifdef STREAM_INTERACTIONS
- 	  !! Added by Vic Kelson, February 2008
+    !! Added by Vic Kelson, February 2008
      !!
- 	  !! These arrays manage the "Stream Interactions" option. This option uses
- 	  !! special Curve Number values to remove water from the grid, e.g. to a
+    !! These arrays manage the "Stream Interactions" option. This option uses
+    !! special Curve Number values to remove water from the grid, e.g. to a
      !! surface stream or to a fracture network. A grid of "stream" information
      !! is read; non-zero entries in the grid capture water based on the index
      !! number in the cell. For example, if the grid cell stream value is 3,
@@ -1125,10 +1125,10 @@ module types
      !! values allow the modeler to set the maximum amount that a fracture can
      !! capture.
      !!
- 	  !! The constant STREAM_INTERACTIONS_MAX is the maximum number of curve
- 	  !! number entries allowed for the fracture recharge option.
-	  real (kind=c_float), dimension(STREAM_INTERACTIONS_MAX) :: rStreamMaxInflow
- 	  real (kind=c_float), dimension(STREAM_INTERACTIONS_MAX) :: rStreamMaxCapture
+    !! The constant STREAM_INTERACTIONS_MAX is the maximum number of curve
+    !! number entries allowed for the fracture recharge option.
+    real (kind=c_float), dimension(STREAM_INTERACTIONS_MAX) :: rStreamMaxInflow
+    real (kind=c_float), dimension(STREAM_INTERACTIONS_MAX) :: rStreamMaxCapture
 #endif
 
   end type T_MODEL_CONFIGURATION
@@ -1168,7 +1168,7 @@ module types
     character(len=256) :: cPAPER_SIZE = "USAP"
     character(len=256) :: cTITLE = "NO TITLE"
     character(len=256) :: cZ_AXIS_TITLE = "Z-AXIS TITLE"
-    character(len=256) :: cX_AXIS_TITLE	= "X-AXIS TITLE"
+    character(len=256) :: cX_AXIS_TITLE = "X-AXIS TITLE"
     character(len=256) :: cY_AXIS_TITLE = "Y-AXIS TITLE"
     character(len=256) :: cFONT_NAME = "HELVE"
     character(len=256) :: cCOLOR_TABLE = "SPEC"
@@ -1671,17 +1671,17 @@ end subroutine Chomp_default_sub
 
    if(iR==0) then
      sItem = trim(sRecord)      ! no tab found; return entirety of sRecord
- 	sRecord = ""			   ! as sItem
+  sRecord = ""         ! as sItem
    else
      sItem = trim(sRecord(1:iR-1))
- 	sRecord = trim(sRecord(iR+1:))
+  sRecord = trim(sRecord(iR+1:))
      do iR=1,len_trim(sRecord)
- 	  if (sRecord(iR:iR) == " " ) then
+    if (sRecord(iR:iR) == " " ) then
          cycle
- 	  else
- 	    exit
- 	  end if
- 	end do
+    else
+      exit
+    end if
+  end do
      sRecord = sRecord(iR:)
    end if
 
@@ -1722,18 +1722,18 @@ subroutine Chomp_slash(sRecord, sItem)
 
   if(iR==0) then
     sItem = trim(sRecord)  ! no slash found; return entirety of sRecord
-	 sRecord = ""			   ! as sItem
+   sRecord = ""        ! as sItem
   else
     sItem = trim(sRecord(1:iR-1))
     sRecord = trim(sRecord(iR+1:))
 
     do iR=1,len_trim(sRecord)
-	   if (sRecord(iR:iR) == " " ) then
+     if (sRecord(iR:iR) == " " ) then
         cycle
-	   else
-	     exit
+     else
+       exit
       end if
-	 end do
+   end do
     sRecord = sRecord(iR:)
   end if
 

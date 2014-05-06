@@ -93,9 +93,6 @@ subroutine calculate_water_balance ( pGrd, pConfig, &
                   + cel%rIrrigationAmount &
                   + cel%rInFlow &
                   - cel%rOutFlow &
-#ifdef STREAM_INTERACTIONS
-                  - cel%rStreamCapture &
-#endif
                   - cel%rFlowOutOfGrid)
 
         ! calculate net inflow to cell
@@ -103,9 +100,6 @@ subroutine calculate_water_balance ( pGrd, pConfig, &
                     cel%rNetRainfall &
                   + cel%rSnowMelt &
                   + cel%rIrrigationAmount &
-!#ifdef STREAM_INTERACTIONS
-!                  - cel%rStreamCapture &   ! "Net Inflow" is really just
-!#endif                                     ! a diagnostic internal variable
                   + cel%rInFlow )           ! Supposed to be the sum of all
                                             ! water sources to a grid cell
                                             ! *BEFORE* any routing has occurred

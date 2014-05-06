@@ -90,10 +90,9 @@ find_library(LIBCURL
         NO_CMAKE_SYSTEM_PATH )
 
 find_library(LIBDISLIN
-        NAMES dismg libdismg libdismg.a disgf libdisgf libdisgf.a dislin.10 dislin dislin.10.dylib
+        NAMES dismg libdismg libdismg.a disgf libdisgf libdisgf.a dislin.10 dislin dislin.10.dylib libdislin.10.dylib
         PATHS
         /usr/local/lib
-        /usr/local/dislin/lib
         /usr/local/dislin
         ${SWB_LIBPATH} )
 

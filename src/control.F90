@@ -10,7 +10,8 @@ module control
   use model
   use swb_grid
   use stats
-  use data_factory
+  use data_catalog
+  use data_catalog_entry
   use datetime
 
   contains
@@ -117,10 +118,6 @@ subroutine control_setModelOptions(sControlFile)
   write (UNIT=LU_LOG,FMT=*) "Running ",trim(sControlFile)
 
   ! Initialize the module variables - set default program options
-
-  DAT(PRECIP_DATA)%sVariableName_z = "prcp"
-  DAT(TMIN_DATA)%sVariableName_z = "tmin"
-  DAT(TMAX_DATA)%sVariableName_z = "tmax"
 
   pConfig%sTimeSeriesFilename = ""
   pConfig%sLanduseLookupFilename = ""
@@ -249,14 +246,14 @@ subroutine control_setModelOptions(sControlFile)
       pConfig%rGridCellSize = pGrd%rGridCellSize
       pGrd%sFilename = "[none: base grid]"
       pGrd%sPROJ4_string = ""
-      DAT(:)%sSourcePROJ4_string = ""
+      call DAT%set_PROJ4("")
 
     else if (sItem == "BASE_PROJECTION_DEFINITION") then
       pConfig%sBase_PROJ4 = trim(sRecord)
       call Assert(associated(pGrd), "The project grid must be specified " &
         //"before the base grid projection information can be specified.")
       pGrd%sPROJ4_string = trim(sRecord)
-      DAT(:)%sSourcePROJ4_string=trim(sRecord)
+      call DAT%set_PROJ4( trim(sRecord) )
 
       iRetVal = pj_init_and_transform(pGrd%sPROJ4_string//C_NULL_CHAR, &
                 trim(sPROJ4_LatLon)//C_NULL_CHAR, &
@@ -314,16 +311,24 @@ subroutine control_setModelOptions(sControlFile)
       call Chomp ( sRecord, sOption )
       call Uppercase ( sOption )
       call Chomp ( sRecord, sArgument )
+
+      if (.not. associated(PRCP))  allocate(PRCP, stat=iStat)
+      call assert(iStat==0, "Problem allocating memory for the precipitation (PRCP) data structure",   &
+        __FILE__, __LINE__)
+
+      PRCP%sVariableName_z = "prcp"
+
+
       if ( str_compare(sOption,"SINGLE_STATION") ) then
         write(UNIT=LU_LOG,FMT=*) "  Precip data will be read for a single station"
         pConfig%lGriddedData = lFALSE
         pConfig%iConfigurePrecip = CONFIG_PRECIP_SINGLE_STATION
-        call DAT(PRECIP_DATA)%initialize(sDescription=trim(sItem), &
+        call PRCP%initialize(sDescription=trim(sItem), &
            rConstant=0.0 )
 
       elseif(str_compare(sOption,"ARC_GRID") ) then
         pConfig%iConfigurePrecip = CONFIG_PRECIP_ARC_GRID
-        call DAT(PRECIP_DATA)%initialize(sDescription=trim(sItem), &
+        call PRCP%initialize(sDescription=trim(sItem), &
           sFileType=trim(sOption), &
           sFilenameTemplate=trim(sArgument), &
           iDataType=DATATYPE_REAL )
@@ -331,7 +336,7 @@ subroutine control_setModelOptions(sControlFile)
 
       elseif(str_compare(sOption,"SURFER") ) then
         pConfig%iConfigurePrecip = CONFIG_PRECIP_SURFER
-        call DAT(PRECIP_DATA)%initialize(sDescription=trim(sItem), &
+        call PRCP%initialize(sDescription=trim(sItem), &
           sFileType=trim(sOption), &
           sFilenameTemplate=trim(sArgument), &
           iDataType=DATATYPE_REAL )
@@ -340,7 +345,7 @@ subroutine control_setModelOptions(sControlFile)
       else if( str_compare(sOption,"NETCDF") ) then
         pConfig%iConfigurePrecip = CONFIG_PRECIP_NETCDF
         ! initialize DAT object for precip data
-        call DAT(PRECIP_DATA)%initialize_netcdf( &
+        call PRCP%initialize_netcdf( &
           sDescription=trim(sItem), &
             sFilenameTemplate = trim(sArgument), &
             iDataType=DATATYPE_REAL, &
@@ -353,70 +358,70 @@ subroutine control_setModelOptions(sControlFile)
 
     else if ( str_compare(sItem,"PRECIPITATION_SCALE") ) then
       call Chomp ( sRecord, sArgument )
-      call DAT(PRECIP_DATA)%set_scale(asReal(sArgument))
+      call PRCP%set_scale(asReal(sArgument))
 
     else if ( str_compare(sItem,"PRECIPITATION_OFFSET") ) then
       call Chomp ( sRecord, sArgument )
-      call DAT(PRECIP_DATA)%set_offset(asReal(sArgument))
+      call PRCP%set_offset(asReal(sArgument))
 
     else if ( str_compare(sItem,"PRECIPITATION_CONVERSION_FACTOR") ) then
       call Chomp ( sRecord, sArgument )
-      call DAT(PRECIP_DATA)%set_conversion_factor(asReal(sArgument))
+      call PRCP%set_conversion_factor(asReal(sArgument))
 
     else if ( str_compare(sItem,"NETCDF_PRECIP_X_VAR") ) then
       call Chomp ( sRecord, sArgument )
-      DAT(PRECIP_DATA)%sVariableName_x = trim(sArgument)
+      PRCP%sVariableName_x = trim(sArgument)
 
     else if ( str_compare(sItem,"NETCDF_PRECIP_Y_VAR") ) then
       call Chomp ( sRecord, sArgument )
-      DAT(PRECIP_DATA)%sVariableName_y = trim(sArgument)
+      PRCP%sVariableName_y = trim(sArgument)
 
     else if ( str_compare(sItem,"NETCDF_PRECIP_Z_VAR") ) then
       call Chomp ( sRecord, sArgument )
-      DAT(PRECIP_DATA)%sVariableName_z = trim(sArgument)
+      PRCP%sVariableName_z = trim(sArgument)
 
     else if ( str_compare(sItem,"NETCDF_PRECIP_TIME_VAR") ) then
       call Chomp ( sRecord, sArgument )
-      DAT(PRECIP_DATA)%sVariableName_time = trim(sArgument)
+      PRCP%sVariableName_time = trim(sArgument)
 
     else if ( str_compare(sItem,"NETCDF_PRECIP_VARIABLE_ORDER") ) then
       call Chomp ( sRecord, sArgument )
-      call DAT(PRECIP_DATA)%set_variable_order(lowercase_fn(trim(sArgument)))
+      call PRCP%set_variable_order(lowercase_fn(trim(sArgument)))
 
     else if ( str_compare(sItem,"NETCDF_PRECIP_FLIP_VERTICAL") ) then
-      call DAT(PRECIP_DATA)%set_grid_flip_vertical()
+      call PRCP%set_grid_flip_vertical()
 
     else if ( str_compare(sItem,"NETCDF_PRECIP_FLIP_HORIZONTAL") ) then
-      call DAT(PRECIP_DATA)%set_grid_flip_horizontal()
+      call PRCP%set_grid_flip_horizontal()
 
     elseif (str_compare(sItem, "NETCDF_PRECIP_MAKE_LOCAL_ARCHIVE") ) then
-      call DAT(PRECIP_DATA)%set_make_local_archive(lTRUE)
+      call PRCP%set_make_local_archive(lTRUE)
 
     else if (sItem == "PRECIPITATION_GRID_PROJECTION_DEFINITION") then
-      call DAT(PRECIP_DATA)%set_PROJ4( trim(sRecord) )
+      call PRCP%set_PROJ4( trim(sRecord) )
 
     elseif (sItem == "PRECIPITATION_MINIMUM_ALLOWED_VALUE") then
       call Chomp ( sRecord, sArgument )
-      DAT(PRECIP_DATA)%rMinAllowedValue = asReal(sArgument)
+      PRCP%rMinAllowedValue = asReal(sArgument)
 
     elseif (sItem == "PRECIPITATION_MAXIMUM_ALLOWED_VALUE") then
       call Chomp ( sRecord, sArgument )
-      DAT(PRECIP_DATA)%rMaxAllowedValue = asReal(sArgument)
+      PRCP%rMaxAllowedValue = asReal(sArgument)
 
     elseif (sItem == "PRECIPITATION_MISSING_VALUES_CODE") then
       call Chomp ( sRecord, sArgument )
-      DAT(PRECIP_DATA)%rMissingValuesCode = asReal(sArgument)
+      PRCP%rMissingValuesCode = asReal(sArgument)
 
     elseif (sItem == "PRECIPITATION_MISSING_VALUES_OPERATOR") then
       call Chomp ( sRecord, sArgument )
-      DAT(PRECIP_DATA)%sMissingValuesOperator = trim(sArgument)
+      PRCP%sMissingValuesOperator = trim(sArgument)
 
     elseif (sItem == "PRECIPITATION_MISSING_VALUES_ACTION") then
       call Chomp ( sRecord, sArgument )
       if (sArgument == "ZERO") then
-        DAT(PRECIP_DATA)%iMissingValuesAction = MISSING_VALUES_ZERO_OUT
+        PRCP%iMissingValuesAction = MISSING_VALUES_ZERO_OUT
       elseif (sArgument == "MEAN" ) then
-        DAT(PRECIP_DATA)%iMissingValuesAction = MISSING_VALUES_REPLACE_WITH_MEAN
+        PRCP%iMissingValuesAction = MISSING_VALUES_REPLACE_WITH_MEAN
       else
         call assert(lFALSE, "Unknown missing value action supplied for" &
           //" precipitation data: "//dquote(sArgument) )
@@ -427,12 +432,24 @@ subroutine control_setModelOptions(sControlFile)
       call Chomp ( sRecord, sOption )
       call Uppercase ( sOption )
       call Chomp ( sRecord, sArgument )
+
+      if (.not. associated(TMAX))  allocate(TMAX, stat=iStat)
+      call assert(iStat==0, "Problem allocating memory for the maximum air temp (TMAX) data structure",   &
+        __FILE__, __LINE__)
+
+      if (.not. associated(TMIN))  allocate(TMIN, stat=iStat)
+      call assert(iStat==0, "Problem allocating memory for the minimum air temp (TMIN) data structure",   &
+        __FILE__, __LINE__)
+
+      TMIN%sVariableName_z = "tmin"
+      TMAX%sVariableName_z = "tmax"
+
       if ( trim(sOption) == "SINGLE_STATION" ) then
         pConfig%iConfigureTemperature = CONFIG_TEMPERATURE_SINGLE_STATION
         write(UNIT=LU_LOG,FMT=*) "  Temperature data will be read for a single station"
-        call DAT(TMIN_DATA)%initialize(sDescription=trim(sItem), &
+        call TMIN%initialize(sDescription=trim(sItem), &
            rConstant=65.0 )
-        call DAT(TMAX_DATA)%initialize(sDescription=trim(sItem), &
+        call TMAX%initialize(sDescription=trim(sItem), &
            rConstant=65.0 )
       else
 
@@ -440,14 +457,14 @@ subroutine control_setModelOptions(sControlFile)
 
           pConfig%iConfigureTemperature = CONFIG_TEMPERATURE_ARC_GRID
 
-          call DAT(TMAX_DATA)%initialize(sDescription=trim(sItem), &
+          call TMAX%initialize(sDescription=trim(sItem), &
             sFileType=trim(sOption), &
             sFilenameTemplate=trim(sArgument), &
             iDataType=DATATYPE_REAL )
 
           call Chomp ( sRecord, sArgument )
 
-          call DAT(TMIN_DATA)%initialize(sDescription=trim(sItem), &
+          call TMIN%initialize(sDescription=trim(sItem), &
             sFileType=trim(sOption), &
             sFilenameTemplate=trim(sArgument), &
             iDataType=DATATYPE_REAL )
@@ -458,14 +475,14 @@ subroutine control_setModelOptions(sControlFile)
 
           pConfig%iConfigureTemperature = CONFIG_TEMPERATURE_SURFER
 
-          call DAT(TMAX_DATA)%initialize(sDescription=trim(sItem), &
+          call TMAX%initialize(sDescription=trim(sItem), &
             sFileType=trim(sOption), &
             sFilenameTemplate=trim(sArgument), &
             iDataType=DATATYPE_REAL )
 
           call Chomp ( sRecord, sArgument )
 
-          call DAT(TMIN_DATA)%initialize(sDescription=trim(sItem), &
+          call TMIN%initialize(sDescription=trim(sItem), &
             sFileType=trim(sOption), &
             sFilenameTemplate=trim(sArgument), &
             iDataType=DATATYPE_REAL )
@@ -476,7 +493,7 @@ subroutine control_setModelOptions(sControlFile)
 
           pConfig%iConfigureTemperature = CONFIG_TEMPERATURE_NETCDF
 
-          call DAT(TMAX_DATA)%initialize_netcdf( &
+          call TMAX%initialize_netcdf( &
             sDescription=trim(sItem), &
             sFilenameTemplate = trim(sArgument), &
             iDataType=DATATYPE_REAL, &
@@ -485,7 +502,7 @@ subroutine control_setModelOptions(sControlFile)
           ! read in the NetCDF variable that corresponds to TMIN
           call Chomp ( sRecord, sArgument )
 
-          call DAT(TMIN_DATA)%initialize_netcdf( &
+          call TMIN%initialize_netcdf( &
             sDescription=trim(sItem), &
             sFilenameTemplate = trim(sArgument), &
             iDataType=DATATYPE_REAL, &
@@ -499,146 +516,146 @@ subroutine control_setModelOptions(sControlFile)
       flush(UNIT=LU_LOG)
 
     else if (sItem == "TEMPERATURE_GRID_PROJECTION_DEFINITION") then
-      call DAT(TMAX_DATA)%set_PROJ4( trim(sRecord) )
-      call DAT(TMIN_DATA)%set_PROJ4( trim(sRecord) )
+      call TMAX%set_PROJ4( trim(sRecord) )
+      call TMIN%set_PROJ4( trim(sRecord) )
 
     else if ( str_compare(sItem,"NETCDF_TMAX_X_VAR") ) then
       call Chomp ( sRecord, sArgument )
-      DAT(TMAX_DATA)%sVariableName_x = trim(sArgument)
+      TMAX%sVariableName_x = trim(sArgument)
 
     else if ( str_compare(sItem,"NETCDF_TMAX_Y_VAR") ) then
       call Chomp ( sRecord, sArgument )
-      DAT(TMAX_DATA)%sVariableName_y = trim(sArgument)
+      TMAX%sVariableName_y = trim(sArgument)
 
     else if ( str_compare(sItem,"NETCDF_TMAX_Z_VAR") ) then
       call Chomp ( sRecord, sArgument )
-      DAT(TMAX_DATA)%sVariableName_z = trim(sArgument)
+      TMAX%sVariableName_z = trim(sArgument)
 
     else if ( str_compare(sItem,"NETCDF_TMAX_TIME_VAR") ) then
       call Chomp ( sRecord, sArgument )
-      DAT(TMAX_DATA)%sVariableName_time = trim(sArgument)
+      TMAX%sVariableName_time = trim(sArgument)
 
     else if ( str_compare(sItem,"NETCDF_TMIN_X_VAR") ) then
       call Chomp ( sRecord, sArgument )
-      DAT(TMIN_DATA)%sVariableName_x = trim(sArgument)
+      TMIN%sVariableName_x = trim(sArgument)
 
     else if ( str_compare(sItem,"NETCDF_TMIN_Y_VAR") ) then
       call Chomp ( sRecord, sArgument )
-      DAT(TMIN_DATA)%sVariableName_y = trim(sArgument)
+      TMIN%sVariableName_y = trim(sArgument)
 
     else if ( str_compare(sItem,"NETCDF_TMIN_Z_VAR") ) then
       call Chomp ( sRecord, sArgument )
-      DAT(TMIN_DATA)%sVariableName_z = trim(sArgument)
+      TMIN%sVariableName_z = trim(sArgument)
 
     else if ( str_compare(sItem,"NETCDF_TMIN_TIME_VAR") ) then
       call Chomp ( sRecord, sArgument )
-      DAT(TMIN_DATA)%sVariableName_time = trim(sArgument)
+      TMIN%sVariableName_time = trim(sArgument)
 
     else if ( str_compare(sItem,"NETCDF_TMIN_VARIABLE_ORDER") ) then
       call Chomp ( sRecord, sArgument )
-      call DAT(TMIN_DATA)%set_variable_order(lowercase_fn(trim(sArgument)))
+      call TMIN%set_variable_order(lowercase_fn(trim(sArgument)))
 
     else if ( str_compare(sItem,"NETCDF_TMAX_VARIABLE_ORDER") ) then
       call Chomp ( sRecord, sArgument )
-      call DAT(TMAX_DATA)%set_variable_order(lowercase_fn(trim(sArgument)))
+      call TMAX%set_variable_order(lowercase_fn(trim(sArgument)))
 
     else if ( str_compare(sItem,"NETCDF_TMAX_FLIP_VERTICAL") ) then
-      call DAT(TMAX_DATA)%set_grid_flip_vertical()
+      call TMAX%set_grid_flip_vertical()
 
     else if ( str_compare(sItem,"NETCDF_TMAX_FLIP_HORIZONTAL") ) then
-      call DAT(TMAX_DATA)%set_grid_flip_horizontal()
+      call TMAX%set_grid_flip_horizontal()
 
     else if ( str_compare(sItem,"NETCDF_TMIN_FLIP_VERTICAL") ) then
-      call DAT(TMIN_DATA)%set_grid_flip_vertical()
+      call TMIN%set_grid_flip_vertical()
 
     else if ( str_compare(sItem,"NETCDF_TMIN_FLIP_HORIZONTAL") ) then
-      call DAT(TMIN_DATA)%set_grid_flip_horizontal()
+      call TMIN%set_grid_flip_horizontal()
 
     elseif (str_compare(sItem, "NETCDF_TMAX_MAKE_LOCAL_ARCHIVE") ) then
-      call DAT(TMAX_DATA)%set_make_local_archive(lTRUE)
+      call TMAX%set_make_local_archive(lTRUE)
 
     elseif (str_compare(sItem, "NETCDF_TMIN_MAKE_LOCAL_ARCHIVE") ) then
-      call DAT(TMIN_DATA)%set_make_local_archive(lTRUE)
+      call TMIN%set_make_local_archive(lTRUE)
 
     else if (sItem == "TMAX_GRID_PROJECTION_DEFINITION") then
-      call DAT(TMAX_DATA)%set_PROJ4( trim(sRecord) )
+      call TMAX%set_PROJ4( trim(sRecord) )
 
     else if ( str_compare(sItem,"TMAX_SCALE") ) then
       call Chomp ( sRecord, sArgument )
-      call DAT(TMAX_DATA)%set_scale(asReal(sArgument))
+      call TMAX%set_scale(asReal(sArgument))
 
     else if ( str_compare(sItem,"TMAX_OFFSET") ) then
       call Chomp ( sRecord, sArgument )
-      call DAT(TMAX_DATA)%set_offset(asReal(sArgument))
+      call TMAX%set_offset(asReal(sArgument))
 
     else if ( str_compare(sItem,"TMAX_CONVERSION_FACTOR") ) then
       call Chomp ( sRecord, sArgument )
-      call DAT(TMAX_DATA)%set_conversion_factor(asReal(sArgument))
+      call TMAX%set_conversion_factor(asReal(sArgument))
 
     elseif (sItem == "TMAX_MINIMUM_ALLOWED_VALUE") then
       call Chomp ( sRecord, sArgument )
-      DAT(TMAX_DATA)%rMinAllowedValue = asReal(sArgument)
+      TMAX%rMinAllowedValue = asReal(sArgument)
 
     elseif (sItem == "TMAX_MAXIMUM_ALLOWED_VALUE") then
       call Chomp ( sRecord, sArgument )
-      DAT(TMAX_DATA)%rMaxAllowedValue = asReal(sArgument)
+      TMAX%rMaxAllowedValue = asReal(sArgument)
 
     elseif (sItem == "TMAX_MISSING_VALUES_CODE") then
       call Chomp ( sRecord, sArgument )
-      DAT(TMAX_DATA)%rMissingValuesCode = asReal(sArgument)
+      TMAX%rMissingValuesCode = asReal(sArgument)
 
     elseif (sItem == "TMAX_MISSING_VALUES_OPERATOR") then
       call Chomp ( sRecord, sArgument )
-      DAT(TMAX_DATA)%sMissingValuesOperator = trim(sArgument)
+      TMAX%sMissingValuesOperator = trim(sArgument)
 
     elseif (sItem == "TMAX_MISSING_VALUES_ACTION") then
       call Chomp ( sRecord, sArgument )
       if (sArgument == "ZERO") then
-        DAT(TMAX_DATA)%iMissingValuesAction = MISSING_VALUES_ZERO_OUT
+        TMAX%iMissingValuesAction = MISSING_VALUES_ZERO_OUT
       elseif (sArgument == "MEAN" ) then
-        DAT(TMAX_DATA)%iMissingValuesAction = MISSING_VALUES_REPLACE_WITH_MEAN
+        TMAX%iMissingValuesAction = MISSING_VALUES_REPLACE_WITH_MEAN
       else
         call assert(lFALSE, "Unknown missing value action supplied for" &
           //" TMAX data: "//dquote(sArgument) )
       endif
 
     else if (sItem == "TMIN_GRID_PROJECTION_DEFINITION") then
-      call DAT(TMIN_DATA)%set_PROJ4( trim(sRecord) )
+      call TMIN%set_PROJ4( trim(sRecord) )
 
     else if ( str_compare(sItem,"TMIN_SCALE") ) then
       call Chomp ( sRecord, sArgument )
-      call DAT(TMIN_DATA)%set_scale(asReal(sArgument))
+      call TMIN%set_scale(asReal(sArgument))
 
     else if ( str_compare(sItem,"TMIN_OFFSET") ) then
       call Chomp ( sRecord, sArgument )
-      call DAT(TMIN_DATA)%set_offset(asReal(sArgument))
+      call TMIN%set_offset(asReal(sArgument))
 
     else if ( str_compare(sItem,"TMIN_CONVERSION_FACTOR") ) then
       call Chomp ( sRecord, sArgument )
-      call DAT(TMIN_DATA)%set_conversion_factor(asReal(sArgument))
+      call TMIN%set_conversion_factor(asReal(sArgument))
 
     elseif (sItem == "TMIN_MINIMUM_ALLOWED_VALUE") then
       call Chomp ( sRecord, sArgument )
-      DAT(TMIN_DATA)%rMinAllowedValue = asReal(sArgument)
+      TMIN%rMinAllowedValue = asReal(sArgument)
 
     elseif (sItem == "TMIN_MAXIMUM_ALLOWED_VALUE") then
       call Chomp ( sRecord, sArgument )
-      DAT(TMIN_DATA)%rMaxAllowedValue = asReal(sArgument)
+      TMIN%rMaxAllowedValue = asReal(sArgument)
 
     elseif (sItem == "TMIN_MISSING_VALUES_CODE") then
       call Chomp ( sRecord, sArgument )
-      DAT(TMIN_DATA)%rMissingValuesCode = asReal(sArgument)
+      TMIN%rMissingValuesCode = asReal(sArgument)
 
     elseif (sItem == "TMIN_MISSING_VALUES_OPERATOR") then
       call Chomp ( sRecord, sArgument )
-      DAT(TMIN_DATA)%sMissingValuesOperator = trim(sArgument)
+      TMIN%sMissingValuesOperator = trim(sArgument)
 
     elseif (sItem == "TMIN_MISSING_VALUES_ACTION") then
       call Chomp ( sRecord, sArgument )
       if (sArgument == "ZERO") then
-        DAT(TMIN_DATA)%iMissingValuesAction = MISSING_VALUES_ZERO_OUT
+        TMIN%iMissingValuesAction = MISSING_VALUES_ZERO_OUT
       elseif (sArgument == "MEAN" ) then
-        DAT(TMIN_DATA)%iMissingValuesAction = MISSING_VALUES_REPLACE_WITH_MEAN
+        TMIN%iMissingValuesAction = MISSING_VALUES_REPLACE_WITH_MEAN
       else
         call assert(lFALSE, "Unknown missing value action supplied for" &
           //" TMIN data: "//dquote(sArgument) )
@@ -650,6 +667,11 @@ subroutine control_setModelOptions(sControlFile)
       call Chomp ( sRecord, sOption )
       call Uppercase ( sOption )
       call Chomp ( sRecord, sArgument )
+
+      if (.not. associated(LULC))  allocate(LULC, stat=iStat)
+      call assert(iStat==0, "Problem allocating memory for the landuse/land cover (LULC) data structure",   &
+        __FILE__, __LINE__)
+
       if ( trim(sOption) == "CONSTANT" ) then
 !        pConfig%iConfigureLanduse = CONFIG_LANDUSE_CONSTANT
         read ( unit=sArgument, fmt=*, iostat=iStat ) iValue
@@ -659,7 +681,7 @@ subroutine control_setModelOptions(sControlFile)
 !        pLandUseGrid%iData = iValue
 !        pLandUseGrid%sFilename = "Constant-value grid"
 
-        call DAT(LANDUSE_DATA)%initialize(sDescription=sItem, &
+        call LULC%initialize(sDescription=sItem, &
            iConstant=iValue )
 
       elseif(trim(sOption) == "DYNAMIC" ) then
@@ -668,7 +690,7 @@ subroutine control_setModelOptions(sControlFile)
         call Uppercase( sOption )
         call Chomp ( sRecord, sArgument )
 
-        call DAT(LANDUSE_DATA)%initialize(sDescription=sItem, &
+        call LULC%initialize(sDescription=sItem, &
         sFileType=trim(sOption), &
         sFilenameTemplate=trim(sArgument), &
         iDataType=DATATYPE_INT )
@@ -676,7 +698,7 @@ subroutine control_setModelOptions(sControlFile)
       elseif( trim(sOption) == "ARC_GRID" &
          .or. trim(sOption) == "SURFER" ) then   ! read in a static gridded landuse file
 
-        call DAT(LANDUSE_DATA)%initialize(sDescription=sItem, &
+        call LULC%initialize(sDescription=sItem, &
         sFileType=trim(sOption), &
         sFilename=trim(sArgument), &
         iDataType=DATATYPE_INT )
@@ -688,19 +710,24 @@ subroutine control_setModelOptions(sControlFile)
       flush(UNIT=LU_LOG)
 
     else if (sItem == "LANDUSE_PROJECTION_DEFINITION") then
-      call DAT(LANDUSE_DATA)%set_PROJ4( trim(sRecord) )
+      call LULC%set_PROJ4( trim(sRecord) )
 
     elseif (sItem == "LANDUSE_SET_MINIMUM_ALLOWED" ) then
-      call DAT(LANDUSE_DATA)%set_valid_minimum(asInt(sRecord))
+      call LULC%set_valid_minimum(asInt(sRecord))
 
     elseif (sItem == "LANDUSE_SET_MAXIMUM_ALLOWED" ) then
-      call DAT(LANDUSE_DATA)%set_valid_maximum(asInt(sRecord))
+      call LULC%set_valid_maximum(asInt(sRecord))
 
     else if ( sItem == "FLOW_DIRECTION" ) then
       write(UNIT=LU_LOG,FMT=*) "Populating flow direction grid"
       call Chomp ( sRecord, sOption )
       call Uppercase ( sOption )
       call Chomp ( sRecord, sArgument )
+
+      if (.not. associated(FLOWDIR))  allocate(FLOWDIR, stat=iStat)
+      call assert(iStat==0, "Problem allocating memory for the flow direction (FLOWDIR) data structure",   &
+        __FILE__, __LINE__)
+
       if ( trim(sOption) == "CONSTANT" ) then
         read ( unit=sArgument, fmt=*, iostat=iStat ) iValue
         call Assert( iStat == 0, "Cannot read integer data value" )
@@ -709,13 +736,13 @@ subroutine control_setModelOptions(sControlFile)
 !        pFlowDirGrid%iData = iValue
 !        pFlowDirGrid%sFilename = "Constant-value grid"
 
-        call DAT(FLOWDIR_DATA)%initialize(sDescription=trim(sItem), &
+        call FLOWDIR%initialize(sDescription=trim(sItem), &
            iConstant=iValue )
 
       else
 !        pFlowDirGrid => grid_Read( sArgument, sOption, DATATYPE_INT )
 !        pFlowDirGrid%sFilename = trim(sArgument)
-        call DAT(FLOWDIR_DATA)%initialize(sDescription=trim(sItem), &
+        call FLOWDIR%initialize(sDescription=trim(sItem), &
           sFileType=trim(sOption), &
           sFilename=trim(sArgument), &
           iDataType=DATATYPE_INT )
@@ -724,13 +751,13 @@ subroutine control_setModelOptions(sControlFile)
       flush(UNIT=LU_LOG)
 
     else if (sItem == "FLOW_DIRECTION_PROJECTION_DEFINITION") then
-      call DAT(FLOWDIR_DATA)%set_PROJ4( trim(sRecord) )
+      call FLOWDIR%set_PROJ4( trim(sRecord) )
 
     elseif (sItem == "FLOW_DIRECTION_SET_MINIMUM_ALLOWED" ) then
-      call DAT(FLOWDIR_DATA)%set_valid_minimum(asInt(sRecord))
+      call FLOWDIR%set_valid_minimum(asInt(sRecord))
 
     elseif (sItem == "FLOW_DIRECTION_SET_MAXIMUM_ALLOWED" ) then
-      call DAT(FLOWDIR_DATA)%set_valid_maximum(asInt(sRecord))
+      call FLOWDIR%set_valid_maximum(asInt(sRecord))
 
 
     else if ( sItem == "ROUTING_FRACTION" ) then
@@ -738,16 +765,21 @@ subroutine control_setModelOptions(sControlFile)
       call Chomp ( sRecord, sOption )
       call Uppercase ( sOption )
       call Chomp ( sRecord, sArgument )
+
+      if (.not. associated(ROUTING_FRAC))  allocate(ROUTING_FRAC, stat=iStat)
+      call assert(iStat==0, "Problem allocating memory for the routing fraction (ROUTING_FRAC) data structure",   &
+        __FILE__, __LINE__)
+
       if ( trim(sOption) == "CONSTANT" ) then
         read ( unit=sArgument, fmt=*, iostat=iStat ) rValue
         call Assert( iStat == 0, "Cannot read real data value" )
 
-        call DAT(ROUTING_FRAC_DATA)%initialize(sDescription=trim(sItem), &
+        call ROUTING_FRAC%initialize(sDescription=trim(sItem), &
            rConstant=rValue )
 
       else
 
-        call DAT(ROUTING_FRAC_DATA)%initialize(sDescription=trim(sItem), &
+        call ROUTING_FRAC%initialize(sDescription=trim(sItem), &
           sFileType=trim(sOption), &
           sFilename=trim(sArgument), &
           iDataType=DATATYPE_REAL )
@@ -755,13 +787,13 @@ subroutine control_setModelOptions(sControlFile)
       endif
 
     else if (sItem == "ROUTING_FRACTION_PROJECTION_DEFINITION") then
-      call DAT(ROUTING_FRAC_DATA)%set_PROJ4( trim(sRecord) )
+      call ROUTING_FRAC%set_PROJ4( trim(sRecord) )
 
     elseif (sItem == "ROUTING_FRACTION_SET_MINIMUM_ALLOWED" ) then
-      call DAT(ROUTING_FRAC_DATA)%set_valid_minimum(asReal(sRecord))
+      call ROUTING_FRAC%set_valid_minimum(asReal(sRecord))
 
     elseif (sItem == "ROUTING_FRACTION_SET_MAXIMUM_ALLOWED" ) then
-      call DAT(ROUTING_FRAC_DATA)%set_valid_maximum(asReal(sRecord))
+      call ROUTING_FRAC%set_valid_maximum(asReal(sRecord))
 
     else if ( sItem == "INITIAL_FROZEN_GROUND_INDEX" ) then
       write(UNIT=LU_LOG,FMT=*) "Initializing continuous frozen ground index"
@@ -1216,6 +1248,11 @@ subroutine control_setModelOptions(sControlFile)
       call Chomp ( sRecord, sOption )
       call Uppercase ( sOption )
       call Chomp ( sRecord, sArgument )
+
+      if (.not. associated(HSG))  allocate(HSG, stat=iStat)
+      call assert(iStat==0, "Problem allocating memory for the hydrologic soils group (HSG) data structure",   &
+        __FILE__, __LINE__)
+
       if ( trim(sOption) == "CONSTANT" ) then
         read ( unit=sArgument, fmt=*, iostat=iStat ) iValue
         call Assert( iStat == 0, &
@@ -1226,14 +1263,14 @@ subroutine control_setModelOptions(sControlFile)
 !        pSoilGroupGrid%sFilename = "Constant-value grid"
         !pGrd%Cells%iSoilGroup = iValue
 
-        call DAT(SOILS_GROUP_DATA)%initialize(sDescription=trim(sItem), &
+        call HSG%initialize(sDescription=trim(sItem), &
            iConstant=iValue )
 
       else
 !        pSoilGroupGrid => grid_Read( sArgument, sOption, DATATYPE_INT )
 !        pSoilGroupGrid%sFilename = trim(sArgument)
 
-        call DAT(SOILS_GROUP_DATA)%initialize(sDescription=trim(sItem), &
+        call HSG%initialize(sDescription=trim(sItem), &
           sFileType=trim(sOption), &
           sFilename=trim(sArgument), &
           iDataType=DATATYPE_INT )
@@ -1243,13 +1280,13 @@ subroutine control_setModelOptions(sControlFile)
 
     else if (sItem == "SOIL_GROUP_PROJECTION_DEFINITION") then
 !      pConfig%sSoilGroup_PROJ4 = trim(sRecord)
-      call DAT(SOILS_GROUP_DATA)%set_PROJ4( trim(sRecord) )
+      call HSG%set_PROJ4( trim(sRecord) )
 
     elseif (sItem == "SOIL_GROUP_SET_MINIMUM_ALLOWED" ) then
-      call DAT(SOILS_GROUP_DATA)%set_valid_minimum(asInt(sRecord))
+      call HSG%set_valid_minimum(asInt(sRecord))
 
     elseif (sItem == "SOIL_GROUP_SET_MAXIMUM_ALLOWED" ) then
-      call DAT(SOILS_GROUP_DATA)%set_valid_maximum(asInt(sRecord))
+      call HSG%set_valid_maximum(asInt(sRecord))
 
 
     else if ( sItem == "LAND_USE_LOOKUP_TABLE" ) then
@@ -1277,16 +1314,21 @@ subroutine control_setModelOptions(sControlFile)
       call Chomp ( sRecord, sOption )
       call Uppercase ( sOption )
       call Chomp ( sRecord, sArgument )
+
+      if (.not. associated(BASIN_MASK))  allocate(BASIN_MASK, stat=iStat)
+      call assert(iStat==0, "Problem allocating memory for the basin mask (BASIN_MASK) data structure",   &
+        __FILE__, __LINE__)
+
       if ( trim(sOption) == "CONSTANT" ) then
         read ( unit=sArgument, fmt=*, iostat=iStat ) iValue
         call Assert( iStat == 0, "Cannot read integer data value" )
 
-        call DAT(MASK_DATA)%initialize(sDescription=trim(sItem), &
+        call BASIN_MASK%initialize(sDescription=trim(sItem), &
            iConstant=iValue )
 
       else
 
-        call DAT(MASK_DATA)%initialize(sDescription=trim(sItem), &
+        call BASIN_MASK%initialize(sDescription=trim(sItem), &
           sFileType=trim(sOption), &
           sFilename=trim(sArgument), &
           iDataType=DATATYPE_INT )
@@ -1305,72 +1347,35 @@ subroutine control_setModelOptions(sControlFile)
 
     else if (sItem == "BASIN_MASK_PROJECTION_DEFINITION") then
       write(UNIT=LU_LOG,FMT=*) "Reading basin mask projection definition"
-      if (DAT(MASK_DATA)%iSourceDataType /= DATATYPE_NA) then
-        call DAT(MASK_DATA)%set_PROJ4( trim(sRecord) )
+      if (MASK%iSourceDataType /= DATATYPE_NA) then
+        call MASK%set_PROJ4( trim(sRecord) )
       endif
       pConfig%sBasinMaskPROJ4String = trim( sRecord )
       if ( len_trim(pConfig%sBasinMaskPROJ4String) == 0 ) then
         call Assert( lFALSE, "No basin mask projection definition specified" )
       end if
 
-    else if ( sItem == "ADJUSTED_WATER_CAPACITY" ) then
-      write(UNIT=LU_LOG,FMT=*) "Populating adjusted water capacity grid"
-      call Chomp ( sRecord, sOption )
-      call Uppercase ( sOption )
-      call Chomp ( sRecord, sArgument )
-      if ( trim(sOption) == "CONSTANT" ) then
-        pConfig%iConfigureSMCapacity = CONFIG_SM_CAPACITY_CONSTANT
-        read ( unit=sArgument, fmt=*, iostat=iStat ) rValue
-        call Assert( iStat == 0, "Cannot read real data value" )
-        pGrd%Cells%rSoilWaterCap = rValue
-        write(UNIT=LU_LOG,FMT=*)  "using a constant value for the maximum soil water capacity"
-        write(UNIT=LU_LOG,FMT=*)  "NOTE: any option specified with the 'WATER_CAPACITY' option will be ignored"
-      else
-        pConfig%iConfigureSMCapacity = CONFIG_SM_CAPACITY_FM_TABLE
-        input_grd => grid_Read( sArgument, sOption, DATATYPE_REAL )
-        call Assert( grid_Conform( pGrd, input_grd ), &
-                      "Non-conforming grid" )
-        pGrd%Cells%rSoilWaterCap = input_grd%rData
-        call grid_Destroy( input_grd )
-        write(UNIT=LU_LOG,FMT=*)  "reading an ASCII grid to obtain the maximum soil water capacity"
-        write(UNIT=LU_LOG,FMT=*)  "NOTE: any option specified with the 'WATER_CAPACITY' option will be ignored"
-      end if
-
-      write(UNIT=LU_LOG,FMT=*)  "Total water capacity grid MINIMUM VALUE:", &
-         minval(pGrd%Cells%rSoilWaterCap)
-      write(UNIT=LU_LOG,FMT=*)  "Total water capacity grid MAXIMUM VALUE:", &
-         maxval(pGrd%Cells%rSoilWaterCap)
-
-      call Assert(maxval(pGrd%Cells%rSoilWaterCap) < 25.0 &
-         .and. minval(pGrd%Cells%rSoilWaterCap) >= 0., &
-         "Total water capacity must be in the range" &
-         //" from 0 to 17.5 inches [of water].",TRIM(__FILE__),__LINE__)
-      flush(UNIT=LU_LOG)
-
     else if ( sItem == "WATER_CAPACITY" .or. sItem == "AVAILABLE_WATER_CAPACITY") then
       write(UNIT=LU_LOG,FMT=*) "Populating available water capacity grid"
       call Chomp ( sRecord, sOption )
       call Uppercase ( sOption )
       call Chomp ( sRecord, sArgument )
-!      allocate(pSoilAWCGrid, stat=iStat)
-!      call assert(iStat==0,"Problem allocating memory for the " &
-!        //"Soil Available Water Capacity data object", &
-!        trim(__FILE__), __LINE__)
+
+      if (.not. associated(AWC))  allocate(AWC, stat=iStat)
+      call assert(iStat==0, "Problem allocating memory for the available water capacity (AWC) data structure",   &
+        __FILE__, __LINE__)
 
       if ( trim(sOption) == "CONSTANT" ) then
 
         read ( unit=sArgument, fmt=*, iostat=iStat ) rValue
         call Assert( iStat == 0, "Cannot read real data value" )
-!        pSoilAWCGrid => grid_Create ( pGrd%iNX, pGrd%iNY, pGrd%rX0, pGrd%rY0, &
-!          pGrd%rX1, pGrd%rY1, DATATYPE_REAL )
-!        pSoilAWCGrid%rData = rValue
 
-        call DAT(AWC_DATA)%initialize(sDescription=trim(sItem), &
+        call AWC%initialize(sDescription=trim(sItem), &
            rConstant=rValue )
 
       else
 
-        call DAT(AWC_DATA)%initialize(sDescription=trim(sItem), &
+        call AWC%initialize(sDescription=trim(sItem), &
           sFileType=trim(sOption), &
           sFilename=trim(sArgument), &
           iDataType=DATATYPE_REAL )
@@ -1378,13 +1383,13 @@ subroutine control_setModelOptions(sControlFile)
       end if
 
     else if (sItem == "WATER_CAPACITY_PROJECTION_DEFINITION") then
-      call DAT(AWC_DATA)%set_PROJ4( trim(sRecord) )
+      call AWC%set_PROJ4( trim(sRecord) )
 
     elseif (sItem == "WATER_CAPACITY_SET_MINIMUM_ALLOWED" ) then
-      call DAT(AWC_DATA)%set_valid_minimum(asReal(sRecord))
+      call AWC%set_valid_minimum(asReal(sRecord))
 
     elseif (sItem == "WATER_CAPACITY_SET_MAXIMUM_ALLOWED" ) then
-      call DAT(AWC_DATA)%set_valid_maximum(asReal(sRecord))
+      call AWC%set_valid_maximum(asReal(sRecord))
 
 
     else if ( sItem == "INITIAL_SOIL_MOISTURE" ) then
@@ -1412,39 +1417,6 @@ subroutine control_setModelOptions(sControlFile)
          //" initial soil moisture grid.")
 
       flush(UNIT=LU_LOG)
-
-#ifdef STREAM_INTERACTIONS
-
-    else if ( sItem == "ELEVATION_ADJUSTMENT" ) then
-      !! This expects to read four real values:
-      !!
-      !! rStationElevation -- The elevation of the weather station
-      !! rDryFactor -- The factor (per foot of difference between the station and ground
-      !!               surface for temperature adjustment when conditions are "dry"
-      !! rHumidFactor -- The factor (per foot of difference between the station and ground
-      !!               surface for temperature adjustment when conditions are "humid"
-      !! rHumidityThreshold -- the minimum relative humidity for "humid" conditions.
-      !!                If this value is 9999, the "dry" factor is always used (this is
-      !!                useful for simulations where humidity data are not available)
-      call Chomp( sRecord, sArgument )
-      read(unit=sArgument, fmt=*, iostat=iStat) pconfig%rElevStationElevation
-      call Assert( logical(iStat==0, kind=c_bool), &
-        "Failed to read station elevation " // sArgument )
-      call Chomp( sRecord, sArgument )
-      read(unit=sArgument, fmt=*, iostat=iStat) pconfig%rElevDryFactor
-      call Assert( logical(iStat==0, kind=c_bool), &
-        "Failed to read dry elevation factor " // sArgument )
-      call Chomp( sRecord, sArgument )
-      read(unit=sArgument, fmt=*, iostat=iStat) pconfig%rElevHumidFactor
-      call Assert( logical(iStat==0, kind=c_bool), &
-        "Failed to read humid elevation factor " // sArgument )
-      call Chomp( sRecord, sArgument )
-      read(unit=sArgument, fmt=*, iostat=iStat) pconfig%rElevHumidityThreshold
-      call Assert( logical(iStat==0, kind=c_bool), &
-        "Failed to read humidity threshold " // sArgument )
-      pconfig%lElevAdjustment = .true.
-
-#endif
 
     else if ( sItem == "RLE_MULTIPLIER" ) then
       call Chomp ( sRecord, sArgument )
@@ -1953,8 +1925,8 @@ subroutine control_setModelOptions(sControlFile)
       call gregorian_date(pConfig%iStartJulianDay, pConfig%iYear, &
          pConfig%iMonth, pConfig%iDay)
 
-      DAT(:)%iStartYear = pConfig%iStartYear
-      DAT(:)%iEndYear = pConfig%iEndYear
+      call DAT%set_StartYear( pConfig%iStartYear )
+      call DAT%set_EndYear( pConfig%iEndYear )
 
       !> ** THIS IS ESSENTIALLY THE TIME CONTROL LOOP FOR USE
       !>    WITH GRIDDED DATA
