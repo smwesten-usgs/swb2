@@ -9,6 +9,7 @@ module datetime
   use iso_c_binding, only : c_short, c_int, c_float, c_double, c_bool
   use types_new
   use strings
+  use exceptions
   use constants_and_conversions
 
   implicit none
@@ -73,6 +74,7 @@ module datetime
     procedure, public :: listtime => write_list_time_fn
     procedure, public :: systime => system_time_to_date_sub
     procedure, public :: getJulianDay => get_julian_day_fn
+    procedure, public :: setJulianDate => set_julian_date_sub
     procedure, public :: getFractionOfDay => get_fraction_of_day_fn
 
   end type T_DATETIME
@@ -915,6 +917,19 @@ end subroutine system_time_to_date_sub
 !  return
 !
 !end function solstice
+
+!------------------------------------------------------------------------------
+
+subroutine set_julian_date_sub(this, dValue)
+
+  class (T_DATETIME)    :: this
+  real (kind=c_double)  :: dValue
+
+  this%dJulianDate = dValue
+
+  call this%calcGregorianDate()
+
+end subroutine set_julian_date_sub
 
 !------------------------------------------------------------------------------
 

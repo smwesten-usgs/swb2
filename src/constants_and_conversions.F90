@@ -10,8 +10,6 @@ module constants_and_conversions
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
   implicit none
 
-  private
-
   ! [ common mathematical constants ]
   public :: PI, TWOPI, HALFPI
   real (kind=c_double), parameter    :: PI = 3.1415926535897932384626433_c_double
@@ -46,6 +44,7 @@ module constants_and_conversions
   character (len=1), parameter :: sFORWARDSLASH = achar(47)
   character (len=1), parameter :: sRETURN = achar(13)
   character (len=3), parameter :: sCOMMENT_CHARS = "#!%"
+  character (len=1), parameter :: sDOUBLE_QUOTE = achar(34)
 
   ! [ select conversion factors ]
   real (kind=c_double), parameter :: C_PER_F = 5_c_double / 9_c_double
@@ -88,12 +87,19 @@ module constants_and_conversions
     module procedure rad_to_deg_dbl_fn
   end interface rad_to_deg
 
-  public :: asReal
-  interface asReal
+  public :: asFloat
+  interface asFloat
     module procedure char2real
     module procedure int2real
     module procedure dbl2real
-  end interface asReal
+  end interface asFloat
+
+  public :: asDouble
+  interface asDouble
+    module procedure char2dbl
+    module procedure int2dbl
+    module procedure real2dbl
+  end interface asDouble
 
   public asInt
   interface asInt
@@ -392,6 +398,42 @@ function dbl2real(dpValue)  result(rValue)
   rValue = real(dpValue, kind=c_float)
 
 end function dbl2real
+
+!--------------------------------------------------------------------------------------------------
+
+!> Convert a character value into a double
+function char2dbl(sValue)  result(dValue)
+
+  character (len=*)    :: sValue
+  real (kind=c_double) :: dValue
+
+  read(UNIT=sValue,FMT=*) dValue
+
+end function char2dbl
+
+!--------------------------------------------------------------------------------------------------
+
+!> Convert an int value into a double
+function int2dbl(iValue)  result(dValue)
+
+  integer (kind=c_int) :: iValue
+  real (kind=c_double) :: dValue
+
+  dValue = real(iValue, kind=c_double)
+
+end function int2dbl
+
+!--------------------------------------------------------------------------------------------------
+
+!> Convert a real value into a double
+function real2dbl(fValue)  result(dValue)
+
+  real (kind=c_float) :: fValue
+  real (kind=c_double) :: dValue
+
+  dValue = real(fValue, kind=c_double)
+
+end function real2dbl
 
 !--------------------------------------------------------------------------------------------------
 

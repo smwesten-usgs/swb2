@@ -361,37 +361,37 @@ end subroutine char_to_lowercase_sub
 !--------------------------------------------------------------------------
 
 
-  !> Strip delimiters from a text string.
+  !> Strip offending characters from a text string.
   !!
-  !! Remove delimiting characters from a test string. The delimiters may optionally be supplied.
+  !! Remove unwanted characters from a text string. The target characters may optionally be supplied.
   !! @param[in] sTextIn
-  function clean(sText1, sDelimiters)            result(sText)
+  function clean(sText1, sTargetCharacters)            result(sText)
 
     ! ARGUMENTS
     character (len=*), intent(inout)           :: sText1
-    character (len=*), intent(in), optional    :: sDelimiters
+    character (len=*), intent(in), optional    :: sTargetCharacters
     character (len=:), allocatable :: sText
 
     ! LOCALS
-    character (len=256)            :: sBuf
+    character (len=512)            :: sBuf
     integer (kind=c_int)           :: iR                 ! Index in sRecord
     integer (kind=c_int)           :: iIndex1, iIndex2
-    character (len=:), allocatable :: sDelimiters_
+    character (len=:), allocatable :: sTargetCharacters_
 
     ! eliminate any leading spaces
     sText1 = adjustl(sText1)
     sBuf = ""
     iIndex2 = 0
 
-    if (present(sDelimiters) ) then
-      sDelimiters_ = sDelimiters
+    if (present(sTargetCharacters) ) then
+      sTargetCharacters_ = sTargetCharacters
     else  
-      sDelimiters_ = ":/;,"
+      sTargetCharacters_ = ":/;,"
     endif
 
     do iIndex1 = 1,len_trim(sText1)
 
-      iR = SCAN(sText1(iIndex1:iIndex1), sDelimiters_)
+      iR = SCAN(sText1(iIndex1:iIndex1), sTargetCharacters_)
   
       if(iR==0) then
         iIndex2 = iIndex2 + 1
@@ -471,7 +471,7 @@ end subroutine char_to_lowercase_sub
   subroutine split_and_return_text_sub(sText1, sText2, sDelimiters)
 
     character (len=*), intent(inout)                     :: sText1
-    character ( len=len_trim( sText1 ) ), intent(out)    :: sText2
+    character (len=*), intent(inout)                     :: sText2
     character (len=*), intent(in), optional              :: sDelimiters
 
     ! [ LOCALS ]
@@ -512,7 +512,7 @@ end subroutine char_to_lowercase_sub
 
     if ( len(sText1) > 0 ) then
 
-      do iIndex = 1, len(sText1)
+      do iIndex = 1, len_trim(sText1)
 
         if ( sText1(iIndex:iIndex) .eq. sFind)    sText1(iIndex:iIndex) = sReplace
 
@@ -532,7 +532,7 @@ end subroutine char_to_lowercase_sub
   character (len=:), allocatable             :: sText1
 
   ! LOCALS
-  character ( len=len(sText) ) :: sTemp
+  character ( len=len_trim(sText) ) :: sTemp
   integer (kind=c_int) :: iR                 ! Index in sRecord
   integer (kind=c_int) :: i, j
 

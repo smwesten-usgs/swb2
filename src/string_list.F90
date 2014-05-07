@@ -25,19 +25,20 @@ module string_list
 
   contains
 
-    procedure :: list_append_char_sub
+    procedure :: list_append_string_sub
     procedure :: list_append_int_sub
     procedure :: list_get_value_at_index_fn
     procedure :: list_print_sub
-    procedure :: list_return_position_of_matching_char_fn
-    procedure :: list_return_count_of_matching_strings_fn
+    procedure :: list_return_position_of_matching_string_fn
+    procedure :: list_return_count_of_matching_string_fn
     procedure :: list_items_deallocate_all_sub
 
-    generic :: append => list_append_char_sub, &
+    generic :: append => list_append_string_sub, &
                          list_append_int_sub
     generic :: get => list_get_value_at_index_fn
     generic :: print => list_print_sub
-    generic :: which => list_return_position_of_matching_char_fn
+    generic :: which => list_return_position_of_matching_string_fn
+    generic :: countmatching => list_return_count_of_matching_string_fn
     generic :: deallocate => list_items_deallocate_all_sub
 
   end type STRING_LIST_T
@@ -52,13 +53,13 @@ contains
     class (STRING_LIST_T), intent(inout)   :: this
     integer (kind=c_int), intent(in)       :: iValue
 
-    call this%list_append_char_sub( asCharacter(iValue) )
+    call this%list_append_string_sub( asCharacter(iValue) )
 
   end subroutine list_append_int_sub
 
 
 
-  subroutine list_append_char_sub( this, sText )
+  subroutine list_append_string_sub( this, sText )
 
     class (STRING_LIST_T), intent(inout)   :: this
     character (len=*), intent(in)          :: sText
@@ -88,7 +89,7 @@ contains
 
     this%count = this%count + 1
 
-  end subroutine list_append_char_sub
+  end subroutine list_append_string_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -186,7 +187,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function list_return_position_of_matching_char_fn(this, sChar)     result(iResult)
+  function list_return_position_of_matching_string_fn(this, sChar)     result(iResult)
 
     class (STRING_LIST_T), intent(in)                    :: this
     character (len=*), intent(in)                        :: sChar
@@ -233,7 +234,49 @@ contains
 
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
 
-  end function list_return_position_of_matching_char_fn
+  end function list_return_position_of_matching_string_fn
+
+
+
+  function list_return_count_of_matching_string_fn(this, sChar)     result(iCount)
+
+    class (STRING_LIST_T), intent(in)                    :: this
+    character (len=*), intent(in)                        :: sChar
+    integer (kind=c_int)                                 :: iCount
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iIndex
+    integer (kind=c_int) :: iStat
+    integer (kind=c_int) :: iRetVal
+    integer (kind=c_int), dimension(this%count) :: iTempResult
+    type (STRING_LIST_ELEMENT_T), pointer   :: current => null()
+
+    iCount = 0
+
+    current => this%first
+
+    do while ( associated(current) )
+      iRetval = index(string = current%s, &
+                      substring = sChar)
+
+      if (iRetval /= 0)  then
+
+        iCount = iCount + 1
+        iTempResult(iCount) = iIndex
+
+      endif
+
+      current => current%next
+
+    enddo  
+
+  end function list_return_count_of_matching_string_fn
+
+
+
+
+
+
 
 
   subroutine list_items_deallocate_all_sub(this)

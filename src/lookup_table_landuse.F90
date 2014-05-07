@@ -2,9 +2,12 @@ module lookup_table_landuse
 
   use iso_c_binding, only : c_int, c_bool, c_short, c_float, c_double
   use data_file
+  use data_column
   use data_frame
+  use constants_and_conversions, only : sTAB
   use strings
   use string_list
+  use types_new
   implicit none
 
   private
@@ -30,31 +33,65 @@ module lookup_table_landuse
     procedure :: map_columns_to_fields_sub
     generic :: map => map_columns_to_fields_sub
 
-  end type LOOKUP_TABLE_LANDUSE_T
+  end type TABLE_RECORD_LANDUSE_T
 
-  type (T_DATA_FRAME) :: LU
+  type (DATA_FRAME_T) :: LU_DF
+  type (DATA_FILE_T) :: LU_FILE
+
+  public :: LU  
+  type (TABLE_RECORD_LANDUSE_T) :: LU
 
 contains
 
   subroutine initialize_column_headings_sub(this, iNumRecords)
 
-    type (TABLE_RECORD_LANDUSE_T)     :: this 
-    integer (kind=c_int), intent(in)  :: iNumRecords 
+    class (TABLE_RECORD_LANDUSE_T)     :: this 
+    integer (kind=c_int), intent(in)   :: iNumRecords 
 
      ! [ LOCALS ]
      type (STRING_LIST_T)   :: stl
 
-     slt%append("LU_type")
-     stl%append("LU_description")
-     stl%append("LU_pct_imperviousness")
-     stl%append("LU_interception_grow")
-     stl%append("LU_interception_nongrow")
+     call stl%append("LU_type")
+     call stl%append("LU_description")
+     call stl%append("LU_pct_imperviousness")
+     call stl%append("LU_interception_grow")
+     call stl%append("LU_interception_nongrow")
 
-     call LU%initialize( stColNames=stl, &
+     call LU_DF%initialize( slColNames=stl, &
         iDataTypes = [ INTEGER_DATA, STRING_DATA, STRING_DATA, FLOAT_DATA, FLOAT_DATA ], &
         iRecordCount = iNumRecords )
 
 
   end subroutine initialize_column_headings_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine read_landuse_lookup_table_sub(this, sFilename)
+
+    class (TABLE_RECORD_LANDUSE_T) :: this
+    character (len=*), intent(in)  :: sFilename
+    
+    call LU_FILE%open(sFilename = sFilename,    &
+                      sCommentChars = "#",      &
+                      sDelimiters = sTAB )
+
+    LU_FILE%slColNames = LU_FILE%readHeader()
+
+
+    call LU_FILE%slColNames%print()
+
+
+  end subroutine read_landuse_lookup_table_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine map_columns_to_fields_sub(this)
+
+    class (TABLE_RECORD_LANDUSE_T)  :: this
+
+    
+
+
+  end subroutine map_columns_to_fields_sub  
 
 end module lookup_table_landuse

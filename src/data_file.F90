@@ -3,6 +3,7 @@ module data_file
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
   use iso_fortran_env, only : IOSTAT_END
   use types_new
+  use exceptions
   use constants_and_conversions
   use strings
   use string_list
@@ -10,47 +11,51 @@ module data_file
 
   private
 
-  character (len=8192) :: sBuf
-
-  type, public :: T_DATA_FILE
+  integer (kind=c_int), parameter :: MAX_STR_LEN = 256
+  
+  type, public :: DATA_FILE_T
 
     character (len=:), allocatable  :: sFilename
     character (len=:), allocatable  :: sDelimiters
     character (len=:), allocatable  :: sCommentChars
+    type (STRING_LIST_T)            :: slColNames
     integer (kind=c_int)            :: iCurrentLinenum = 0
     integer (kind=c_int)            :: iNumberOfLines = 0
     integer (kind=c_int)            :: iNumberOfRecords = 0
     logical (kind=c_bool)           :: lIsOpen = lFALSE
     integer (kind=c_int)            :: iUnitNum
     integer (kind=c_int)            :: iStat
+    character (len=MAX_STR_LEN)     :: sBuf
     character (len=:), allocatable  :: stMissingValue
 
   contains
 
-    !procedure, private :: open_file_char_sub
-    procedure, public :: open => open_file_char_sub
+    procedure, private :: open_file_char_sub
+    generic :: open => open_file_char_sub
 
-    !procedure, private :: close_file_sub
-    procedure, public :: close => close_file_sub
+    procedure, private :: close_file_sub
+    generic :: close => close_file_sub
 
     procedure, private :: is_file_open_fn
-    generic, public :: isOpen => is_file_open_fn
+    generic :: isOpen => is_file_open_fn
 
     procedure, private :: does_file_exist_fn
-    generic, public    :: exists => does_file_exist_fn
+    generic :: exists => does_file_exist_fn
 
+    procedure, private :: is_current_line_a_comment_fn
+    generic :: isComment => is_current_line_a_comment_fn
 
     procedure, private :: count_number_of_lines_sub
-    generic, public    :: countLines => count_number_of_lines_sub
+    generic :: countLines => count_number_of_lines_sub
 
     procedure, private :: return_num_lines_fn
-    generic, public    :: numLines => return_num_lines_fn
+    generic :: numLines => return_num_lines_fn
 
     procedure, private :: return_num_records_fn
-    generic, public    :: numRecords => return_num_records_fn
+    generic :: numRecords => return_num_records_fn
 
     procedure, private :: return_current_linenum_fn
-    generic, public    :: currentLineNum => return_current_linenum_fn
+    generic :: currentLineNum => return_current_linenum_fn
 
 ! procedure :: readHeaderMultiline => read_multiline_header_sub
 ! procedure :: numRows => return_num_rows_fn
@@ -67,14 +72,14 @@ module data_file
 ! procedure :: putRow => put_row_of_data_sub
 ! procedure :: getNext => get_next_data_item_fn
 
-  end type T_DATA_FILE
+  end type DATA_FILE_T
 
 
 contains
 
   function return_num_lines_fn(this)    result(iNumLines)
 
-    class (T_DATA_FILE)   :: this
+    class (DATA_FILE_T)   :: this
     integer (kind=c_int) :: iNumLines
 
     iNumLines = this%iNumberOfLines
@@ -84,7 +89,7 @@ contains
 
   function return_num_records_fn(this)    result(iNumRecords)
 
-    class (T_DATA_FILE)   :: this
+    class (DATA_FILE_T)   :: this
     integer (kind=c_int) :: iNumRecords
 
     iNumRecords = this%iNumberOfRecords
@@ -94,18 +99,46 @@ contains
 
   function return_current_linenum_fn(this)    result(iCurrentLinenum)
 
-    class (T_DATA_FILE)   :: this
+    class (DATA_FILE_T)   :: this
     integer (kind=c_int) :: iCurrentLinenum
 
     iCurrentLinenum = this%iCurrentLinenum
 
   end function return_current_linenum_fn
 
+  function is_current_line_a_comment_fn(this)      result(lIsComment)
+
+    class (DATA_FILE_T)     :: this
+    logical (kind=c_bool)   :: lIsComment
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iIndex
+    integer (kind=c_int) :: iLen
+    integer (kind=c_int) :: iLeadingSpace
+    character (len=32)   :: sBufTemp
+
+    iLen = len_trim( this%sBuf ) 
+
+    if ( iLen < 32 ) then
+      sBufTemp = this%sBuf(1:iLen)
+    else
+      sBufTemp = this%sBuf(1:32)  
+    endif  
+    
+    iIndex = scan( adjustl(sBufTemp) , this%sCommentChars )
+    
+    lIsComment = lFALSE
+
+    if (iIndex == 1 ) lIsComment = lTRUE
+        
+  end function is_current_line_a_comment_fn  
+
+
 
 
   subroutine open_file_char_sub(this, sFilename, sCommentChars, sDelimiters)
 
-    class (T_DATA_FILE), intent(inout) :: this
+    class (DATA_FILE_T), intent(inout) :: this
     character (len=*), intent(in) :: sFilename
     character (len=*), intent(in), optional :: sCommentChars
     character (len=*), intent(in), optional :: sDelimiters
@@ -138,7 +171,9 @@ contains
 
       if (this%iStat == 0) this%lIsOpen = lTRUE
 
-      write(*, fmt="(a, i8, a)") "Opened file. ", this%numlines(), " records present."
+      write(*, fmt="(/,10x, a)") "Opened file "//dquote(sFilename)
+      write(*, fmt="(a50, i8)") "Number of lines in file: ", this%numLines()
+      write(*, fmt="(a50, i8)") "Number of lines excluding blanks and comments: ", this%numRecords()
 
     else
 
@@ -151,7 +186,7 @@ contains
 
   subroutine close_file_sub(this)
 
-    class (T_DATA_FILE) :: this
+    class (DATA_FILE_T) :: this
 
     close(unit=this%iUnitNum, iostat=this%iStat)
     this%lIsOpen = lFALSE
@@ -162,7 +197,7 @@ contains
 
   function does_file_exist_fn(this, sFilename) result(lExists)
 
-    class (T_DATA_FILE)              :: this
+    class (DATA_FILE_T)              :: this
     character (len=*), intent(in)    :: sFilename
     logical(kind=c_bool)             :: lExists
 
@@ -174,7 +209,7 @@ contains
 
   function is_file_open_fn(this) result(lIsOpen)
 
-    class (T_DATA_FILE) :: this
+    class (DATA_FILE_T) :: this
     logical(kind=c_bool) :: lIsOpen
 
     lIsOpen = this%lIsOpen
@@ -184,14 +219,13 @@ contains
 
   subroutine count_number_of_lines_sub(this)
 
-    class (T_DATA_FILE), intent(inout) :: this
+    class (DATA_FILE_T), intent(inout) :: this
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iStat
     integer (kind=c_int) :: iNumLines
     integer (kind=c_int) :: iNumRecords
-    integer (kind=c_int) :: iIndex
-    character (len=16)   :: sBuf
+    integer (kind=c_int) :: iIndex    
 
     iNumLines = 0
     iNumRecords = 0
@@ -201,17 +235,14 @@ contains
 
       do
 
-        read (unit = this%iUnitNum, fmt=*, iostat = iStat)  sBuf
+        read (unit = this%iUnitNum, fmt="(a)", iostat = iStat)  this%sBuf
+
+        print *, this%iUnitNum, iNumLines, iStat
+        print *, dquote( trim(this%sBuf) ) 
+
         iNumLines = iNumLines + 1
 
-        iIndex = scan(string=adjustl(sBuf), &
-                      set=this%sCommentChars )
-
-        ! if there are valid characters and first character
-        ! is not in the list of comment characters, count as a
-        ! valid record
-        if (len_trim(sBuf) /= 0 .and. iIndex /= 1) &
-          iNumRecords = iNumRecords + 1
+        if ( .not. this%isComment() )   iNumRecords = iNumRecords + 1
 
         if (iStat == IOSTAT_END) exit
 
@@ -230,23 +261,33 @@ contains
 
   function read_header_fn(this) result (stList)
 
-    class (T_DATA_FILE), intent(inout) :: this
+    class (DATA_FILE_T), intent(inout) :: this
     type (STRING_LIST_T) :: stList
 
     ! [ LOCALS ]
-    character (len=:), allocatable :: sString 
-    character (len=:), allocatable :: sSubString
-    sString = this%readline()
+    character (len=MAX_STR_LEN)           :: sString 
+    character (len=MAX_STR_LEN)           :: sSubString
+    character (len=:), allocatable        :: sSubStringClean
+    logical (kind=c_bool)                 :: lIsComment
+    
+    lIsComment = lTRUE
 
-    this%iCurrentLinenum = this%iCurrentLinenum + 1
+    do while( lIsComment )
 
-    do while ( len_trim(sString) > 0)
+      this%sBuf = this%readline()
+      this%iCurrentLinenum = this%iCurrentLinenum + 1
+      lIsComment = this%isComment()
 
-      call chomp( sString, sSubString, ",")
+    enddo
+
+    do while ( len_trim( this%sBuf ) > 0)
+
+      call chomp( this%sBuf, sSubString, this%sDelimiters )
+
       call replace(sSubString, " ", "_")
       call replace(sSubString, ".", "_")
-      call stList%append(sSubString)
-
+      sSubStringClean = trim( clean( sSubString, sDOUBLE_QUOTE ) )
+      call stList%append( trim( adjustl( sSubStringClean ) ) )
     enddo
 
   end function read_header_fn
@@ -256,7 +297,7 @@ contains
 
   function read_line_of_data_fn(this) result(sText)
 
-    class (T_DATA_FILE), intent(inout) :: this
+    class (DATA_FILE_T), intent(inout) :: this
     character (len=:), allocatable     :: sText
 
     ! [ LOCALS ]
@@ -264,8 +305,8 @@ contains
 
     if (this%isOpen() ) then
 
-      read (unit = this%iUnitNum, fmt = "(a)", iostat = iStat) sBuf
-      sText = trim(sBuf)
+      read (unit = this%iUnitNum, fmt = "(a)", iostat = iStat) this%sBuf
+      sText = trim(this%sBuf)
 
       this%iCurrentLinenum = this%iCurrentLinenum + 1
 

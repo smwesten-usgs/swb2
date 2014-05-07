@@ -1,65 +1,65 @@
 module data_frame
 
-use iso_c_binding, only : c_int, c_float, c_double, c_bool
-use iso_fortran_env, only : IOSTAT_END
-use constants_and_conversions, only : lFALSE, lTRUE
-use exceptions
-use strings
-use string_list
-use data_column
-use datetime
-use types_new
-implicit none
+  use iso_c_binding, only : c_int, c_float, c_double, c_bool
+  use iso_fortran_env, only : IOSTAT_END
+  use constants_and_conversions
+  use exceptions
+  use strings
+  use string_list
+  use data_column
+  use datetime
+  use types_new
+  implicit none
 
-private
+  private
 
-public :: DATA_FRAME_T
+  public :: DATA_FRAME_T
 
 
-type DATA_FRAME_T
+  type DATA_FRAME_T
 
-  integer (kind=c_int), allocatable        :: iDataTypes(:)
-  type (STRING_LIST_T)                     :: stColNames
-  logical (kind=c_bool), dimension(:), allocatable, public :: lMask
-  class (T_DATA_COLUMN_PTR), allocatable   :: Columns(:)
-  logical (kind=c_bool)                    :: lHasDate = lFALSE
+    integer (kind=c_int), allocatable                        :: iDataTypes(:)
+    type (STRING_LIST_T)                                     :: slColNames
+    logical (kind=c_bool), dimension(:), allocatable         :: lMask
+    type (T_DATA_COLUMN_PTR), allocatable                    :: columns(:)
+    logical (kind=c_bool)                                    :: lHasDate = lFALSE
 
-contains
+  contains
 
-  ! procedure :: makeUnique => make_unique_identifier_sub
-  !> take contents of serveral columns and concatenate them to
-  !> create a unique ID (think METALICUS)
+    ! procedure :: makeUnique => make_unique_identifier_sub
+    !> take contents of serveral columns and concatenate them to
+    !> create a unique ID (think METALICUS)
 
-  procedure, private :: initialize_data_frame_sub
-  generic, public    :: initialize => initialize_data_frame_sub
+    procedure :: initialize_data_frame_sub
+    generic   :: initialize => initialize_data_frame_sub
 
-  procedure, private :: populate_data_frame_by_row_sub
-  generic, public    :: putrow => populate_data_frame_by_row_sub
+    procedure :: populate_data_frame_by_row_sub
+    generic   :: putrow => populate_data_frame_by_row_sub
 
-  procedure, private :: summarize_data_frame_sub
-  generic, public    :: summarize => summarize_data_frame_sub
+    procedure :: summarize_data_frame_sub
+    generic   :: summarize => summarize_data_frame_sub
 
-  procedure, private :: find_column_by_name_fn
-  generic, public    :: findcol => find_column_by_name_fn
+    procedure :: find_column_by_name_fn
+    generic   :: findcol => find_column_by_name_fn
 
-  procedure, private :: select_rows_from_column_int_sub
-  procedure, private :: select_rows_from_column_float_sub
-  procedure, private :: select_rows_from_column_double_sub
-  procedure, private :: select_rows_from_column_datetime_sub
-  procedure, private :: select_rows_from_column_string_sub
+    procedure :: select_rows_from_column_int_sub
+    procedure :: select_rows_from_column_float_sub
+    procedure :: select_rows_from_column_double_sub
+    procedure :: select_rows_from_column_datetime_sub
+    procedure :: select_rows_from_column_string_sub
 
-  generic, public    :: select => select_rows_from_column_int_sub, &
-                                  select_rows_from_column_float_sub, &
-                                  select_rows_from_column_double_sub, &
-                                  select_rows_from_column_datetime_sub, &
-                                  select_rows_from_column_string_sub
+    generic   :: select => select_rows_from_column_int_sub, &
+                                    select_rows_from_column_float_sub, &
+                                    select_rows_from_column_double_sub, &
+                                    select_rows_from_column_datetime_sub, &
+                                    select_rows_from_column_string_sub
 
-  procedure, private :: get_column_pointer_byindex_fn
-  procedure, private :: get_column_pointer_byname_fn
-  generic, public    :: getcol => get_column_pointer_byindex_fn, &
-                                  get_column_pointer_byname_fn
+    procedure :: get_column_pointer_byindex_fn
+    procedure :: get_column_pointer_byname_fn
+    generic   :: getcol => get_column_pointer_byindex_fn, &
+                                    get_column_pointer_byname_fn
 
-end type DATA_FRAME_T
+  end type DATA_FRAME_T
 
 
 contains
@@ -211,7 +211,7 @@ contains
     pColumn => this%getcol( sColname )
     if ( associated(pColumn) ) then
 
-      if (present(stValue2) ) then
+      if (present(sValue2) ) then
 
         call pColumn%select( sValue1, iComparison, sValue2 )
 
@@ -236,12 +236,12 @@ contains
 
     pColumn => null()
 
-    if (allocated(this%Columns)) then
+    if (allocated(this%columns)) then
 
-      if (iColNum >= lbound(this%Columns,1) &
-         .and. iColNum <= ubound(this%Columns,1) ) then
+      if (iColNum >= lbound(this%columns,1) &
+         .and. iColNum <= ubound(this%columns,1) ) then
 
-        pColumn => this%Columns(iColNum)%pColumn
+        pColumn => this%columns(iColNum)%pColumn
 
       endif
 
@@ -281,21 +281,21 @@ contains
 
 
 
-  function find_column_by_name_fn( this, sChar )   result( iColNum )
+  function find_column_by_name_fn( this, sColName )   result( iColNum )
 
     class (DATA_FRAME_T), intent(in)   :: this
-    character (len=*), intent(in)      :: sChar
+    character (len=*), intent(in)      :: sColName
     integer (kind=c_int), allocatable  :: iColNum(:)
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iCount
 
-    iCount = this%stColNames%countMatches(sChar)
+    iCount = this%slColNames%countmatching(sColName)
 
     if (iCount > 0) then
 
 !      allocate(iColNum(iCount))
-      iColNum = this%stColNames%which(sChar)
+      iColNum = this%slColNames%which(sColName)
 
     else
 
@@ -308,38 +308,38 @@ contains
 
 
 
-  subroutine initialize_data_frame_sub( this, stColNames, iDataTypes, iRecordCount )
+  subroutine initialize_data_frame_sub( this, slColNames, iDataTypes, iRecordCount )
 
     class (DATA_FRAME_T), intent(inout) :: this
-    type (T_STRING_LIST), intent(in) :: stColNames
+    type (STRING_LIST_T), intent(in) :: slColNames
     integer (kind=c_int), dimension(:), intent(in) :: iDataTypes
     integer (kind=c_int), intent(in) :: iRecordCount
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iStat
     integer (kind=c_int) :: iIndex
-    character (len=64) :: sChar
-    type (T_STRING) :: stString
+    character (len=64) :: sText
+    character (len=:), allocatable  :: sString
 
-    this%stColNames = stColNames
+    this%slColNames = slColNames
     this%iDataTypes = iDataTypes
 
     !> allocate space for the required number of class T_DATA_COLUMN_PTR
-    allocate( this%Columns(this%stColNames%count() ), stat=iStat )
+    allocate( this%columns( this%slColNames%count ), stat=iStat )
 
     call assert(iStat==0, "Failed to allocate memory for data frame", __FILE__, __LINE__)
 
-    do iIndex = 1, ubound(this%Columns,1)
+    do iIndex = 1, ubound(this%columns,1)
 
-      allocate( T_DATA_COLUMN :: this%Columns(iIndex)%pColumn, stat=iStat )
+      allocate( T_DATA_COLUMN :: this%columns(iIndex)%pColumn, stat=iStat )
 
-      associate ( col => this%Columns(iIndex)%pColumn )
+      associate ( col => this%columns(iIndex)%pColumn )
 
         call col%new( iDataType = iDataTypes(iIndex), iCount = iRecordCount )
 
-        stString = this%stColNames%value(iIndex)
+        sString = this%slColNames%get(iIndex)
 
-        print *, " Creating new column for "//asCharacter(stString) &
+        print *, " Creating new column for "//sString                          &
                  //" with room for "//asCharacter(iRecordCount)//" values."
 
       end associate
@@ -354,61 +354,68 @@ contains
 
 
 
-  subroutine populate_data_frame_by_row_sub( this, stString, sDelimiters )
+  subroutine populate_data_frame_by_row_sub( this, sString, sDelimiters )
 
     class (DATA_FRAME_T), intent(inout) :: this
-    type (T_STRING), intent(inout) :: stString
+    character (len=*), intent(inout) :: sString
     character (len=*), intent(in) :: sDelimiters
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iIndex
     integer (kind=c_int) :: iColNum, iRowNum
-    type (T_STRING) :: stSubString
+    character (len=len(sString))  :: sSubString
     integer (kind=c_int) :: iRecnum
+
+    integer (kind=c_int) :: iValue
+    real (kind=c_float)  :: fValue
+    real (kind=c_double) :: dValue
 
     iIndex = 0
 
-    do while (stString%length() > 0)
+    do while ( len_trim(sString) > 0)
 
-      call stString%chomp(stSubString, sDelimiters)
+      call chomp(sString, sSubString, sDelimiters)
 
       iIndex = iIndex + 1
 
       !iRowNum = this%Columns(iIndex)%pColumn%incrementRecnum()
 
-      if (iIndex > ubound(this%Columns,1))  stop ("Too many columns read in.")
+      if (iIndex > ubound(this%columns,1))  stop ("Too many columns read in.")
 
-      associate (col => this%Columns(iIndex)%pColumn )
+      associate (col => this%columns(iIndex)%pColumn )
 
         select case ( col%datatype() )
 
           case (INTEGER_DATA)
 
-            iRecnum = col%putval( stSubString%asInt() )
+            iValue = asInt(sSubString)
+            iRecnum = col%putval( iValue )
 
           case (FLOAT_DATA)
 
-            iRecnum = col%putval( stSubString%asFloat() )
+            fValue = asFloat(sSubString)
+            iRecnum = col%putval( fValue )
 
           case (DOUBLE_DATA)
 
-            iRecnum = col%putval( stSubString%asDouble() )
+            dValue = asDouble(sSubString)
+            iRecnum = col%putval( dValue )
 
-          case (T_STRING_DATA)
+          case (STRING_DATA)
 
-            iRecnum = col%putval( stSubString )
+            iRecnum = col%putval( sSubString )
 
-          case (T_DATETIME_DATA)
+          case (DATETIME_DATA)
 
-            iRecnum = col%putdatetime( stSubstring )
+            iRecnum = col%putdatetime( sSubstring )
 
-          case (T_DATE_DATA)
+          case (DATE_DATA)
 
-            iRecNum = col%putdate( stSubstring )
+            iRecNum = col%putdate( sSubstring )
 
-          case (T_TIME_DATA)
+          case (TIME_DATA)
 
-            iRecNum = col%puttime( stSubString )
+            iRecNum = col%puttime( sSubString )
 
           case default
 
@@ -432,37 +439,33 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int) :: iIndex
     integer (kind=c_int) :: iColNum, iRowNum
-    type (T_STRING) :: stSubString
 
     ! [ LOCALS ]
-    type (T_STRING) :: stString
     real (kind=c_double) :: dValue
     type (T_DATETIME) :: DT
 
     do iIndex = 1, ubound(this%Columns,1)
 
-      stString = this%stColNames%value(iIndex)
+      write(*, "(/,a)") "Variable name: "//this%slColNames%get(iIndex)
+      write (*, fmt="(5x, a, i8)") "Count: ", int( this%columns(iIndex)%pColumn%count( this%lMask ) )
 
-      write(*, "(/,a)") "Variable name: "//asCharacter(stString)
-      write (*, fmt="(5x, a, i8)") "Count: ", int( this%Columns(iIndex)%pColumn%count( this%lMask ) )
-
-      select case ( this%Columns(iIndex)%pColumn%datatype() )
+      select case ( this%columns(iIndex)%pColumn%datatype() )
 
         case (INTEGER_DATA, FLOAT_DATA, DOUBLE_DATA)
 
-          write (*, fmt="(7x, a, g15.5)") "Min: ", this%Columns(iIndex)%pColumn%min( this%lMask )
-          write (*, fmt="(7x, a, g15.5)") "Max: ", this%Columns(iIndex)%pColumn%max( this%lMask )
-          write (*, fmt="(7x, a, g15.5)") "Sum: ", this%Columns(iIndex)%pColumn%sum( this%lMask )
-          write (*, fmt="(7x, a, g15.5)") "Mean: ", this%Columns(iIndex)%pColumn%mean( this%lMask )
+          write (*, fmt="(7x, a, g15.5)") "Min: ", this%columns(iIndex)%pColumn%min( this%lMask )
+          write (*, fmt="(7x, a, g15.5)") "Max: ", this%columns(iIndex)%pColumn%max( this%lMask )
+          write (*, fmt="(7x, a, g15.5)") "Sum: ", this%columns(iIndex)%pColumn%sum( this%lMask )
+          write (*, fmt="(7x, a, g15.5)") "Mean: ", this%columns(iIndex)%pColumn%mean( this%lMask )
 
-        case (T_DATETIME_DATA, T_DATE_DATA)
+        case (DATETIME_DATA, DATE_DATA)
 
-          dValue = this%Columns(iIndex)%pColumn%min( this%lMask )
-          call DT%setJulianDay(dValue)
+          dValue = this%columns(iIndex)%pColumn%min( this%lMask )
+          call DT%setJulianDate(dValue)
           write(*, fmt="(7x,a,a)") "Min: ", DT%prettydate()
 
-          dValue = this%Columns(iIndex)%pColumn%max( this%lMask )
-          call DT%setJulianDay(dValue)
+          dValue = this%columns(iIndex)%pColumn%max( this%lMask )
+          call DT%setJulianDate(dValue)
           write(*, fmt="(7x,a,a)") "Max: ", DT%prettydate()
 
       end select
