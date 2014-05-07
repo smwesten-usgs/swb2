@@ -24,9 +24,7 @@ module datetime
     integer (kind=c_short)  :: iSecond = 0
     integer (kind=c_int)    :: iWaterYearHigh
     integer (kind=c_int)    :: iWaterYearLow
-    logical (kind=c_bool)   :: lIsLeapYear = lFALSE
-    integer (kind=c_int)    :: iJulianDay
-    real (kind=c_float)     :: rFractionOfDay = rZERO
+    real (kind=c_double)    :: dJulianDate
 
   contains
 
@@ -42,7 +40,7 @@ module datetime
     procedure, public :: calcWaterYear => calc_water_year_sub
     procedure, public :: parseDate => parse_text_to_date_sub
     procedure, public :: parseTime => parse_text_to_time_sub
-    procedure, public :: isLeapYear => is_leap_year
+    procedure, public :: isLeapYear => is_leap_year_fn
 
     procedure, public :: setTimeFormat => set_time_format_indices
     procedure, public :: setDateFormat => set_Date_format_indices
@@ -74,7 +72,8 @@ module datetime
     procedure, public :: listdate => write_list_date_fn
     procedure, public :: listtime => write_list_time_fn
     procedure, public :: systime => system_time_to_date_sub
-    procedure, public :: getJulianDay => get_julian_day_float_fn
+    procedure, public :: getJulianDay => get_julian_day_fn
+    procedure, public :: getFractionOfDay => get_fraction_of_day_fn
 
   end type T_DATETIME
 
@@ -387,12 +386,12 @@ subroutine calc_julian_day_sub(this, iMonth, iDay, iYear, &
   if(present(iMinute) ) this%iMinute = iMinute
   if(present(iSecond) ) this%iSecond = iSecond
 
-  this%iJulianDay = julian_day( int(this%iYear, kind=c_int), &
-                                int(this%iMonth, kind=c_int), &
-                                int(this%iDay, kind=c_int))
-  this%rFractionOfDay = real(this%iHour, kind=c_double) / 24_c_double + &
-                   real(this%iMinute, kind=c_double) / 1440_c_double + &
-                   real(this%iSecond, kind=c_double) / 86400_c_double
+  this%dJulianDate = real( julian_day( int(this%iYear, kind=c_int), &
+                          int(this%iMonth, kind=c_int), &
+                          int(this%iDay, kind=c_int) ), kind=c_double) + &
+                          real(this%iHour, kind=c_double) / 24_c_double + &
+                          real(this%iMinute, kind=c_double) / 1440_c_double + &
+                          real(this%iSecond, kind=c_double) / 86400_c_double
 
 !  this%rJulianDay = real(iJulianDay, kind=c_double) + rFractionOfDay ! - 2400000.5_c_double
 
@@ -414,13 +413,13 @@ subroutine calc_gregorian_date_sub(this)
 
   real(kind=c_float) :: rHour, rMinute, rSecond
 
-  call gregorian_date(this%iJulianDay, iYear, iMonth, iDay)
+  call gregorian_date(this%getJulianDay(), iYear, iMonth, iDay)
 
   this%iYear = iYear
   this%iMonth = iMonth
   this%iDay = iDay
 
-  rHour = this%rFractionOfDay * 24_c_double
+  rHour = this%getFractionOfDay() * 24_c_double
   iHour = iHour
 
   rMinute = (rHour - real(iHour, kind=c_float) ) * 1440_c_double
@@ -591,7 +590,7 @@ function is_date_greater_than(date1, date2)   result(lResult)
 !    lResult = lTRUE
 !  endif
 
-  if( date1%getJulianDay() > date2%getJulianDay() )  lResult = lTRUE
+  if( date1%dJulianDate > date2%dJulianDate )  lResult = lTRUE
 
 end function is_date_greater_than
 
@@ -614,7 +613,7 @@ function is_date_less_than(date1, date2)   result(lResult)
 !    lResult = lTRUE
 !  endif
 
-  if( date1%getJulianDay() < date2%getJulianDay() )  lResult = lTRUE
+  if( date1%dJulianDate < date2%dJulianDate )  lResult = lTRUE
 
 end function is_date_less_than
 
@@ -630,7 +629,7 @@ function is_date_LT_or_equal_to(date1, date2)   result(lResult)
 
   lResult = lFALSE
 
-  if( date1%getJulianDay() <= date2%getJulianDay() )  lResult = lTRUE
+  if( date1%dJulianDate <= date2%dJulianDate )  lResult = lTRUE
 
 end function is_date_LT_or_equal_to
 
@@ -646,7 +645,7 @@ function is_date_GT_or_equal_to(date1, date2)   result(lResult)
 
   lResult = lFALSE
 
-  if( date1%getJulianDay() >= date2%getJulianDay() )  lResult = lTRUE
+  if( date1%dJulianDate >= date2%dJulianDate )  lResult = lTRUE
 
 end function is_date_GT_or_equal_to
 
@@ -662,7 +661,7 @@ function is_date_equal_to(date1, date2)   result(lResult)
 
   lResult = lFALSE
 
-  if( date1%iJulianDay == date2%iJulianDay .and. &
+  if( date1%getJulianDay() == date2%getJulianDay() .and. &
              date1%iHour == date2%iHour .and. &
              date1%iMinute == date2%iMinute .and. &
              date1%iSecond == date2%iSecond) then
@@ -681,7 +680,7 @@ function date_minus_date_fn(date1, date2)  result(rDelta)
   class(T_DATETIME), intent(in) :: date2
   real (kind=c_double) :: rDelta
 
-  rDelta = date1%getJulianDay() - date2%getJulianDay()
+  rDelta = date1%dJulianDate - date2%dJulianDate
 
 end function date_minus_date_fn
 
@@ -831,7 +830,7 @@ subroutine system_time_to_date_sub(this)
   call this%parseDate(sDateText)
   call this%parseTime(sTimeText)
   call this%calcJulianDay()
-  this%rFractionOfDay = this%rFractionOfDay + &
+  this%dJulianDate = this%dJulianDate + &
       (real(iValues(8), kind=c_double) / 86400_c_double / 1000_c_double) ! milliseconds
 
   call this%setDateFormat()
@@ -919,18 +918,29 @@ end subroutine system_time_to_date_sub
 
 !------------------------------------------------------------------------------
 
-function get_julian_day_float_fn(this)                   result(rJulianDay)
+function get_julian_day_fn(this)                   result(iJulianDay)
 
-  class(T_DATETIME) :: this
-  real (kind=c_double) :: rJulianDay
+  class(T_DATETIME)    :: this
+  integer (kind=c_int) :: iJulianDay
 
-  rJulianDay = real(this%iJulianDay, kind=c_double) + real(this%rFractionOfDay,kind=c_double)
+  iJulianDay = int(this%dJulianDate, kind=c_int)
 
-end function get_julian_day_float_fn
+end function get_julian_day_fn
 
 !------------------------------------------------------------------------------
 
-function get_days_in_month_fn(this)  result(iDaysInMonth)
+function get_fraction_of_day_fn(this)           result(dFractionOfDay)
+
+  class(T_DATETIME)      :: this
+  real (kind=c_double)   :: dFractionOfDay
+
+  dFractionOfDay = this%dJulianDate - real( int(this%dJulianDate, kind=c_int ), kind=c_double)
+
+end function get_fraction_of_day_fn  
+
+!------------------------------------------------------------------------------
+
+function get_days_in_month_fn(this)          result(iDaysInMonth)
 
   class(T_DATETIME) :: this
   integer (kind=c_int) :: iDaysInMonth
@@ -941,7 +951,7 @@ function get_days_in_month_fn(this)  result(iDaysInMonth)
 
   iDaysInMonth = iNumberOfDaysInMonth(this%iMonth)
 
-  if (this%lIsLeapYear) then
+  if (this%isLeapYear() ) then
     iDaysInMonth = max(iDaysInMonth, 29)
   endif
 
@@ -954,7 +964,7 @@ function get_days_in_year_fn(this)  result(iDaysInYear)
   class(T_DATETIME) :: this
   integer (kind=c_int) :: iDaysInYear
 
-  if (this%lIsLeapYear) then
+  if (this%isLeapYear() ) then
     iDaysInYear = 366
   else
     iDaysInYear = 365
@@ -968,9 +978,8 @@ subroutine date_plus_day_sub(this)
 
   class(T_DATETIME) :: this
 
-  this%iJulianDay = this%iJulianDay + 1
+  this%dJulianDate = this%dJulianDate + 1_c_double
   call this%calcGregorianDate()
-  call this%isLeapYear()
 
 end subroutine date_plus_day_sub
 
@@ -980,22 +989,22 @@ subroutine date_minus_day_sub(this)
 
   class(T_DATETIME) :: this
 
-  this%iJulianDay = this%iJulianDay - 1
+  this%dJulianDate = this%dJulianDate - 1_c_double
   call this%calcGregorianDate()
-  call this%isLeapYear()
 
 end subroutine date_minus_day_sub
 
 !------------------------------------------------------------------------------
 
-subroutine is_leap_year(this)
+function is_leap_year_fn(this)   result(lIsLeapYear)
 
-  class(T_DATETIME) :: this
+  class(T_DATETIME)       :: this
+  logical (kind=c_bool)   :: lIsLeapYear
 
-  this%lIsLeapYear = ( mod(this%iYear, 4) == 0 .and. mod(this%iYear, 100) /= 0 ) .or. &
+  lIsLeapYear = ( mod(this%iYear, 4) == 0 .and. mod(this%iYear, 100) /= 0 ) .or. &
                  ( mod(this%iYear, 400) == 0 .and. this%iYear /= 0 )
 
-end subroutine is_leap_year
+end function is_leap_year_fn
 
 !------------------------------------------------------------------------------
 

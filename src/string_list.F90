@@ -30,6 +30,7 @@ module string_list
     procedure :: list_get_value_at_index_fn
     procedure :: list_print_sub
     procedure :: list_return_position_of_matching_char_fn
+    procedure :: list_return_count_of_matching_strings_fn
     procedure :: list_items_deallocate_all_sub
 
     generic :: append => list_append_char_sub, &

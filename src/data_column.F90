@@ -736,9 +736,9 @@ contains
       case (DATETIME_DATA, DATE_DATA)
 
         if (present (lMask) ) then
-          dMin = minval(this%pDatetime%getJulianDay(), lMask)
+          dMin = minval(this%pDatetime%dJulianDate, lMask)
         else
-          dMin = minval(this%pDatetime%getJulianDay(), this%lMask)
+          dMin = minval(this%pDatetime%dJulianDate, this%lMask)
         endif  
 
       case default
@@ -786,9 +786,9 @@ contains
       case (DATETIME_DATA, DATE_DATA)
 
         if (present (lMask) ) then
-          dMax = maxval(this%pDatetime%getJulianDay(), lMask)
+          dMax = maxval(this%pDatetime%dJulianDate, lMask)
         else
-          dMax = maxval(this%pDatetime%getJulianDay(), this%lMask)
+          dMax = maxval(this%pDatetime%dJulianDate, this%lMask)
         endif  
 
       case default

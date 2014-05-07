@@ -2,6 +2,7 @@ module data_frame
 
 use iso_c_binding, only : c_int, c_float, c_double, c_bool
 use iso_fortran_env, only : IOSTAT_END
+use constants_and_conversions, only : lFALSE, lTRUE
 use exceptions
 use strings
 use string_list
@@ -18,7 +19,7 @@ public :: DATA_FRAME_T
 type DATA_FRAME_T
 
   integer (kind=c_int), allocatable        :: iDataTypes(:)
-  type (T_STRING_LIST)                     :: stColNames
+  type (STRING_LIST_T)                     :: stColNames
   logical (kind=c_bool), dimension(:), allocatable, public :: lMask
   class (T_DATA_COLUMN_PTR), allocatable   :: Columns(:)
   logical (kind=c_bool)                    :: lHasDate = lFALSE
@@ -46,14 +47,12 @@ contains
   procedure, private :: select_rows_from_column_double_sub
   procedure, private :: select_rows_from_column_datetime_sub
   procedure, private :: select_rows_from_column_string_sub
-  procedure, private :: select_rows_from_column_char_sub
 
   generic, public    :: select => select_rows_from_column_int_sub, &
                                   select_rows_from_column_float_sub, &
                                   select_rows_from_column_double_sub, &
                                   select_rows_from_column_datetime_sub, &
-                                  select_rows_from_column_string_sub, &
-                                  select_rows_from_column_char_sub
+                                  select_rows_from_column_string_sub
 
   procedure, private :: get_column_pointer_byindex_fn
   procedure, private :: get_column_pointer_byname_fn
@@ -76,7 +75,6 @@ contains
 
     ! [ LOCALS ]
     class (T_DATA_COLUMN), pointer :: pColumn
-    type (T_STRING) :: stString
 
     pColumn => this%getcol( sColname )
 
@@ -199,28 +197,27 @@ contains
 
 
 
-  subroutine select_rows_from_column_string_sub( this, sColname, iComparison, stValue1, stValue2)
+  subroutine select_rows_from_column_string_sub( this, sColname, iComparison, sValue1, sValue2)
 
     class (DATA_FRAME_T), intent(inout)            :: this
     character (len=*), intent(in)                  :: sColname
     integer (kind=c_int), intent(in)               :: iComparison
-    type (T_STRING), intent(in)                    :: stValue1
-    type (T_STRING), intent(in), optional          :: stValue2
+    character (len=*), intent(in)                  :: sValue1
+    character (len=*), intent(in), optional        :: sValue2
 
     ! [ LOCALS ]
     class (T_DATA_COLUMN), pointer :: pColumn
-    type (T_STRING) :: stString
 
     pColumn => this%getcol( sColname )
     if ( associated(pColumn) ) then
 
       if (present(stValue2) ) then
 
-        call pColumn%select( stValue1, iComparison, stValue2 )
+        call pColumn%select( sValue1, iComparison, sValue2 )
 
       else
 
-        call pColumn%select( stValue1, iComparison )
+        call pColumn%select( sValue1, iComparison )
 
       endif
 
@@ -229,40 +226,6 @@ contains
     endif
 
   end subroutine select_rows_from_column_string_sub
-
-
-  subroutine select_rows_from_column_char_sub( this, sColname, iComparison, cValue1, cValue2)
-
-    class (DATA_FRAME_T), intent(inout)            :: this
-    character (len=*), intent(in)                  :: sColname
-    integer (kind=c_int), intent(in)               :: iComparison
-    character (len=*), intent(in)                  :: cValue1
-    character (len=*), intent(in), optional        :: cValue2
-
-    ! [ LOCALS ]
-    class (T_DATA_COLUMN), pointer :: pColumn
-    type (T_STRING) :: stString
-
-    pColumn => this%getcol( sColname )
-
-    if ( associated(pColumn) ) then
-
-      if (present(cValue2) ) then
-
-        call pColumn%select( cValue1, iComparison, cValue2 )
-
-      else
-
-        call pColumn%select( cValue1, iComparison )
-
-      endif
-
-      this%lMask = pColumn%lMask
-
-    endif
-
-  end subroutine select_rows_from_column_char_sub
-
 
 
   function get_column_pointer_byindex_fn( this, iColNum )    result( pColumn )
