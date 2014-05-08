@@ -5,15 +5,13 @@ program test_landuse_table
   use data_file
   use data_column
   use data_frame
+  use strings
   use lookup_table_landuse
+  use types_new
   implicit none
+
 
   call LU%readfile(sFilename = "LU_lookup_NLCD.txt")
   
-
-
-
-
-
 
 end program test_landuse_table

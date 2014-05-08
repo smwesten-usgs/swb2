@@ -14,13 +14,15 @@ module lookup_table_landuse
 
   type, public :: TABLE_RECORD_LANDUSE_T
 
-  	integer (kind=c_int)                :: iLandUseType
+  	integer (kind=c_short)              :: iLandUseType
+    integer (kind=c_short)              :: iSoilsGroup
     character (len=:), allocatable      :: sLandUseDescription
   	character (len=:), allocatable      :: sAssumedPercentImperviousness
+    real (kind=c_float)                 :: rCN_base
+    real (kind=c_float)                 :: rRootingDepth
+    real (kind=c_float)                 :: rMaxInfiltration
   	real (kind=c_float)                 :: rIntercept_GrowingSeason
   	real (kind=c_float)                 :: rIntercept_NonGrowingSeason
-
-
 
   contains
 
@@ -71,14 +73,31 @@ contains
     class (TABLE_RECORD_LANDUSE_T) :: this
     character (len=*), intent(in)  :: sFilename
     
+    ! [ LOCALS ]
+    character (len=MAX_STR_LEN) :: sBuf
+    integer (kind=c_int)        :: iCount
+
     call LU_FILE%open(sFilename = sFilename,    &
                       sCommentChars = "#",      &
                       sDelimiters = sTAB )
 
     LU_FILE%slColNames = LU_FILE%readHeader()
 
+    iCount = LU_FILE%slColNames%count
 
-    call LU_FILE%slColNames%print()
+    call LU_DF%initialize( slColNames=LU_FILE%slColNames, &
+        iRecordCount = LU_FILE%iNumberOfRecords )
+
+    do while (LU_FILE%isOpen() )
+
+      sBuf = LU_FILE%readLine()
+
+      call LU_DF%putrow( sBuf, sTAB )
+
+    enddo
+
+
+    call LU_DF%summarize()
 
 
   end subroutine read_landuse_lookup_table_sub

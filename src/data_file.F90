@@ -10,8 +10,6 @@ module data_file
   implicit none
 
   private
-
-  integer (kind=c_int), parameter :: MAX_STR_LEN = 256
   
   type, public :: DATA_FILE_T
 
@@ -30,8 +28,10 @@ module data_file
 
   contains
 
-    procedure, private :: open_file_char_sub
-    generic :: open => open_file_char_sub
+    procedure, private :: open_file_read_access_sub
+    procedure, private :: open_file_write_access_sub
+    generic :: open => open_file_read_access_sub, &
+                       open_file_write_access_sub
 
     procedure, private :: close_file_sub
     generic :: close => close_file_sub
@@ -136,40 +136,24 @@ contains
 
 
 
-  subroutine open_file_char_sub(this, sFilename, sCommentChars, sDelimiters)
+  subroutine open_file_read_access_sub(this, sFilename, sCommentChars, sDelimiters)
 
     class (DATA_FILE_T), intent(inout) :: this
     character (len=*), intent(in) :: sFilename
-    character (len=*), intent(in), optional :: sCommentChars
-    character (len=*), intent(in), optional :: sDelimiters
+    character (len=*), intent(in) :: sCommentChars
+    character (len=*), intent(in) :: sDelimiters
 
-    if (present(sCommentChars)) then
-      this%sCommentChars = sCommentChars
-    else
-      this%sCommentChars = sCOMMENT_CHARS
-    endif
-
-    if (present(sDelimiters)) then
-      this%sDelimiters = sDelimiters
-    else
-      this%sDelimiters = sWHITESPACE
-    endif
+    this%sCommentChars = sCommentChars
+    this%sDelimiters = sDelimiters
 
     if (.not. this%isOpen() ) then
 
-      this%lIsOpen = lFALSE
-
-      open(newunit=this%iUnitNum, file=sFilename, iostat=this%iStat)
-      call assert(this%iStat == 0, "Failed to open file.", __FILE__, __LINE__)
+      open(newunit=this%iUnitNum, file=sFilename, iostat=this%iStat, action='READ')
+      call assert(this%iStat == 0, "Failed to open file "//dquote(sFilename)//".", __FILE__, __LINE__)
 
       if (this%iStat == 0) this%lIsOpen = lTRUE
 
       call this%countLines()
-
-      open(newunit=this%iUnitNum, file=sFilename, iostat=this%iStat)
-      call assert(this%iStat == 0, "Failed to open file.", __FILE__, __LINE__)
-
-      if (this%iStat == 0) this%lIsOpen = lTRUE
 
       write(*, fmt="(/,10x, a)") "Opened file "//dquote(sFilename)
       write(*, fmt="(a50, i8)") "Number of lines in file: ", this%numLines()
@@ -177,11 +161,35 @@ contains
 
     else
 
-      print *, "Failed to open file "//dquote(sFilename)
+      print *, "Failed to open file "//dquote(sFilename)//" with read access"
 
     endif
 
-  end subroutine open_file_char_sub
+  end subroutine open_file_read_access_sub
+
+
+  subroutine open_file_write_access_sub(this, sFilename)
+
+    class (DATA_FILE_T), intent(inout) :: this
+    character (len=*), intent(in) :: sFilename
+
+    if (.not. this%isOpen() ) then
+
+      open(newunit=this%iUnitNum, file=sFilename, iostat=this%iStat, action='WRITE')
+      call assert(this%iStat == 0, "Failed to open file "//dquote(sFilename)//".", __FILE__, __LINE__)
+
+      if (this%iStat == 0) this%lIsOpen = lTRUE
+
+      write(*, fmt="(/,10x, a)") "Opened file "//dquote(sFilename)
+   
+    else
+
+      print *, "Failed to open file "//dquote(sFilename)//" with WRITE access"
+
+    endif
+
+  end subroutine open_file_write_access_sub
+
 
 
   subroutine close_file_sub(this)
@@ -233,6 +241,8 @@ contains
 
     if ( this%isOpen() ) then
 
+      rewind( unit = this%iUnitNum )
+
       do
 
         read (unit = this%iUnitNum, fmt="(a)", iostat = iStat)  this%sBuf
@@ -248,7 +258,7 @@ contains
 
       enddo
 
-      call this%close()
+      rewind( unit = this%iUnitNum )
 
       this%iNumberOfLines= iNumLines
       this%iNumberOfRecords = iNumRecords

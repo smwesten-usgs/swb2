@@ -308,40 +308,50 @@ contains
 
 
 
-  subroutine initialize_data_frame_sub( this, slColNames, iDataTypes, iRecordCount )
+  subroutine initialize_data_frame_sub( this, slColNames, iRecordCount, iDataTypes )
 
-    class (DATA_FRAME_T), intent(inout) :: this
-    type (STRING_LIST_T), intent(in) :: slColNames
-    integer (kind=c_int), dimension(:), intent(in) :: iDataTypes
-    integer (kind=c_int), intent(in) :: iRecordCount
+    class (DATA_FRAME_T), intent(inout)          :: this
+    type (STRING_LIST_T), intent(in)             :: slColNames
+    integer (kind=c_int), intent(in)             :: iRecordCount
+    integer (kind=c_int), intent(in), optional   :: iDataTypes(:)
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iStat
-    integer (kind=c_int) :: iIndex
-    character (len=64) :: sText
-    character (len=:), allocatable  :: sString
+    integer (kind=c_int)              :: iStat
+    integer (kind=c_int)              :: iIndex
+    integer (kind=c_int), allocatable :: iDataTypes_(:)
+    character (len=64)                :: sText
+    character (len=:), allocatable    :: sString
+    integer (kind=c_int)              :: iNumberOfColumns
 
     this%slColNames = slColNames
-    this%iDataTypes = iDataTypes
+    iNumberOfColumns = this%slColNames%count
+
+    !> if iDataTypes is supplied, use it; otherwise assume all columns will be 
+    !> of type STRING_DATA
+    if ( present(iDataTypes) ) then
+      iDataTypes_ = iDataTypes
+      this%iDataTypes = iDataTypes
+     else
+       allocate(iDatatypes_( iNumberOfColumns ), stat=iStat)
+       call assert(iStat==0, "Failed to allocate memory for data types array", __FILE__, __LINE__)
+       iDataTypes_ = STRING_DATA
+       this%iDataTypes = iDataTypes_
+     endif   
 
     !> allocate space for the required number of class T_DATA_COLUMN_PTR
-    allocate( this%columns( this%slColNames%count ), stat=iStat )
+    allocate( this%columns( iNumberOfColumns ), stat=iStat )
 
     call assert(iStat==0, "Failed to allocate memory for data frame", __FILE__, __LINE__)
 
-    do iIndex = 1, ubound(this%columns,1)
+    do iIndex = 1, iNumberOfColumns
 
       allocate( T_DATA_COLUMN :: this%columns(iIndex)%pColumn, stat=iStat )
-
+      
       associate ( col => this%columns(iIndex)%pColumn )
-
-        call col%new( iDataType = iDataTypes(iIndex), iCount = iRecordCount )
-
+        call col%new( iDataType = iDataTypes_(iIndex), iCount = iRecordCount )
         sString = this%slColNames%get(iIndex)
-
         print *, " Creating new column for "//sString                          &
                  //" with room for "//asCharacter(iRecordCount)//" values."
-
       end associate
 
     enddo
@@ -380,7 +390,7 @@ contains
 
       !iRowNum = this%Columns(iIndex)%pColumn%incrementRecnum()
 
-      if (iIndex > ubound(this%columns,1))  stop ("Too many columns read in.")
+      if (iIndex > ubound(this%columns,1))  call die ("Too many columns read in.")
 
       associate (col => this%columns(iIndex)%pColumn )
 
