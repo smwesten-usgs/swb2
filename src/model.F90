@@ -175,14 +175,14 @@ subroutine model_Solve( pGrd, pConfig, pGraph)
   ! initialize (or re-initialize) landuse-associated variables;
   ! must be done whenever a new landuse grid is provided
 
-  call DAT(LANDUSE_DATA)%getvalues( pGrdBase=pGrd, iMonth=pConfig%iMonth, &
+  call LULC%getvalues( pGrdBase=pGrd, iMonth=pConfig%iMonth, &
     iDay=pConfig%iDay, iYear=pConfig%iYear )
 
   ! if a new landuse grid is found, then we need to perform a basic reinitialization
   ! of active/inactive cells, total soil water capacity, etc.
-  if ( DAT(LANDUSE_DATA)%lGridHasChanged ) then
+  if ( LULC%lGridHasChanged ) then
     pGrd%Cells%iLandUse = pGrd%iData
-    DAT(LANDUSE_DATA)%lGridHasChanged = lFALSE
+    LULC%lGridHasChanged = lFALSE
 
     pGenericGrd_int%iData = pGrd%Cells%iLandUse
     pGenericGrd_int%iMask = pGrd%iMask
@@ -494,6 +494,7 @@ subroutine model_EndOfRun(pGrd, pConfig, pGraph)
 
   ![LOCALS]
   integer (kind=c_int) :: iIndex
+  type (DATA_CATALOG_ENTRY_T), pointer :: current
 
   ! clean up
   close ( unit=LU_TS )
@@ -520,11 +521,14 @@ subroutine model_EndOfRun(pGrd, pConfig, pGraph)
   call grid_Destroy(pGenericGrd_int)
   call grid_Destroy(pGenericGrd_sgl)
 
-  do iIndex=1,size(DAT, 1)
-    if (DAT(iIndex)%iNC_ARCHIVE_STATUS == NETCDF_FILE_OPEN ) then
-      call netcdf_close_file(NCFILE=DAT(iIndex)%NCFILE_ARCHIVE)
-      call netcdf_deallocate_data_struct(NCFILE=DAT(iIndex)%NCFILE_ARCHIVE)
-    endif
+  do iIndex=1,DAT%count
+    current => DAT%get(iIndex)
+    if (associated(current) ) then
+      if (current%iNC_ARCHIVE_STATUS == NETCDF_FILE_OPEN ) then
+        call netcdf_close_file(NCFILE=current%NCFILE_ARCHIVE)
+        call netcdf_deallocate_data_struct(NCFILE=current%NCFILE_ARCHIVE)
+      endif
+    endif  
   enddo
 
   ! how long did all this take, anyway?
@@ -582,9 +586,9 @@ subroutine model_GetDailyPrecipValue( pGrd, pConfig, rPrecip, iMonth, iDay, iYea
   character (len=256) sBuf
 
 
-  call DAT(PRECIP_DATA)%set_constant(rPrecip)
+  call PRCP%set_constant(rPrecip)
 
-  call DAT(PRECIP_DATA)%getvalues( pGrdBase=pGrd, &
+  call PRCP%getvalues( pGrdBase=pGrd, &
       iMonth=iMonth, iDay=iDay, iYear=iYear, &
       iJulianDay=iJulianDay, &
       rValues=pGrd%Cells%rGrossPrecip)
@@ -688,18 +692,18 @@ subroutine model_GetDailyPrecipAndTemperatureValue( pGrd, pConfig, rPrecip, &
 
 !$OMP PARALLEL SECTIONS PRIVATE(pGrd)
 !$OMP SECTION
-  call DAT(TMAX_DATA)%set_constant(rMaxT)
-  call DAT(TMAX_DATA)%getvalues( pGrdBase=pGrd, &
+  call TMAX%set_constant(rMaxT)
+  call TMAX%getvalues( pGrdBase=pGrd, &
       iMonth=iMonth, iDay=iDay, iYear=iYear, &
       iJulianDay=iJulianDay, rValues=pGrd%Cells%rTMax)
 !$OMP SECTION
-  call DAT(TMIN_DATA)%set_constant(rMinT)
-  call DAT(TMIN_DATA)%getvalues( pGrdBase=pGrd, &
+  call TMIN%set_constant(rMinT)
+  call TMIN%getvalues( pGrdBase=pGrd, &
       iMonth=iMonth, iDay=iDay, iYear=iYear, &
       iJulianDay=iJulianDay, rValues=pGrd%Cells%rTMin)
 !$OMP SECTION
-  call DAT(PRECIP_DATA)%set_constant(rPrecip)
-  call DAT(PRECIP_DATA)%getvalues( pGrdBase=pGrd, &
+  call PRCP%set_constant(rPrecip)
+  call PRCP%getvalues( pGrdBase=pGrd, &
       iMonth=iMonth, iDay=iDay, iYear=iYear, &
       iJulianDay=iJulianDay, &
       rValues=pGrd%Cells%rGrossPrecip)
@@ -797,13 +801,13 @@ subroutine model_GetDailyTemperatureValue( pGrd, pConfig, rAvgT, rMinT, &
 
 !!!   *$OMP PARALLEL SECTIONS
 !!!   *$OMP SECTION
-  call DAT(TMAX_DATA)%set_constant(rMaxT)
-  call DAT(TMAX_DATA)%getvalues( pGrdBase=pGrd, &
+  call TMAX%set_constant(rMaxT)
+  call TMAX%getvalues( pGrdBase=pGrd, &
       iMonth=iMonth, iDay=iDay, iYear=iYear, &
       iJulianDay=iJulianDay, rValues=pGrd%Cells%rTMax)
 !OMP SECTION
-  call DAT(TMIN_DATA)%set_constant(rMinT)
-  call DAT(TMIN_DATA)%getvalues( pGrdBase=pGrd, &
+  call TMIN%set_constant(rMinT)
+  call TMIN%getvalues( pGrdBase=pGrd, &
       iMonth=iMonth, iDay=iDay, iYear=iYear, &
       iJulianDay=iJulianDay, rValues=pGrd%Cells%rTMin)
 !!!   *$OMP END PARALLEL SECTIONS
@@ -3264,22 +3268,22 @@ subroutine model_CheckConfigurationSettings( pGrd, pConfig )
   type (T_MODEL_CONFIGURATION), pointer :: pConfig      ! pointer to data structure that contains
 
 
-  call assert(DAT(FLOWDIR_DATA)%iSourceDataType /= DATATYPE_NA, &
+  call assert(FLOWDIR%iSourceDataType /= DATATYPE_NA, &
     "No flow direction information has been specified. If you are not" &
     //"~routing flow, add a directive such as 'FLOW_DIRECTION CONSTANT 1'" &
     //" to your ~control file." )
 
-  call assert(DAT(LANDUSE_DATA)%iSourceDataType /= DATATYPE_NA, &
+  call assert(LULC%iSourceDataType /= DATATYPE_NA, &
     "No landuse data grid has been specified. If you have only" &
     //"~a single landuse type, add a directive such as 'LANDUSE CONSTANT 21'" &
     //"~to your control file." )
 
-  call assert(DAT(AWC_DATA)%iSourceDataType /= DATATYPE_NA, &
+  call assert(AWC%iSourceDataType /= DATATYPE_NA, &
     "No available water capacity grid has been specified. If you do not presently" &
     //"~have an AWC grid, you may add a directive such as 'WATER_CAPACITY CONSTANT 2.6'" &
     //"~to your control file in order to run SWB." )
 
-  call assert(DAT(SOILS_GROUP_DATA)%iSourceDataType /= DATATYPE_NA, &
+  call assert(HSG%iSourceDataType /= DATATYPE_NA, &
     "No hydrologic soils group grid has been specified. If you do not presently" &
     //"~have an HSG grid, you may add a directive such as 'HYDROLOGIC_SOIL_GROUP CONSTANT 1'" &
     //"~to your control file in order to run SWB." )
@@ -3342,7 +3346,7 @@ subroutine model_InitializeDataStructures( pGrd, pConfig )
   type ( T_GENERAL_GRID ),pointer :: pGrd               ! pointer to model grid
   type (T_MODEL_CONFIGURATION), pointer :: pConfig      ! pointer to data structure that contains
 
-  call DAT(FLOWDIR_DATA)%getvalues( pGrdBase=pGrd)
+  call FLOWDIR%getvalues( pGrdBase=pGrd)
   pGrd%Cells%iFlowDir = pGrd%iData
 
   pGenericGrd_int%iData = pGrd%Cells%iFlowDir
@@ -3361,7 +3365,7 @@ subroutine model_InitializeDataStructures( pGrd, pConfig )
      sTitleTxt="D8 Flow Direction Grid", &
      sAxisTxt="Flow Direction" )
 
-  call DAT(SOILS_GROUP_DATA)%getvalues( pGrdBase=pGrd)
+  call HSG%getvalues( pGrdBase=pGrd)
   pGrd%Cells%iSoilGroup = pGrd%iData
 
   where(pGenericGrd_int%iData< 0)
@@ -3379,7 +3383,7 @@ subroutine model_InitializeDataStructures( pGrd, pConfig )
       sTitleTxt="Hydrologic Soils Group", &
       sAxisTxt="HSG" )
 
-  call DAT(AWC_DATA)%getvalues( pGrdBase=pGrd)
+  call AWC%getvalues( pGrdBase=pGrd)
   pGrd%Cells%rSoilWaterCapInput = pGrd%rData
 
   write(LU_LOG, fmt="(a, f14.3)") "  Minimum AWC: ", minval(pGrd%Cells%rSoilWaterCapInput)
@@ -3401,9 +3405,11 @@ subroutine model_InitializeDataStructures( pGrd, pConfig )
      sTitleTxt="Available Water Capacity", &
      sAxisTxt="AWC (inches per foot)" )
 
-  if (DAT(ROUTING_FRAC_DATA)%iSourceDataType /= DATATYPE_NA) then
+  if (.not. associated(ROUTING_FRAC) ) then
 
-    call DAT(ROUTING_FRAC_DATA)%getvalues( pGrdBase=pGrd)
+  elseif (ROUTING_FRAC%iSourceDataType /= DATATYPE_NA) then
+
+    call ROUTING_FRAC%getvalues( pGrdBase=pGrd)
     pGrd%Cells%rRouteFraction = pGrd%rData
 
     write(LU_LOG, fmt="(a, f14.3)") "  Minimum routing fraction: ", minval(pGrd%Cells%rRouteFraction)
@@ -3427,9 +3433,11 @@ subroutine model_InitializeDataStructures( pGrd, pConfig )
 
   endif
 
-  if (DAT(MASK_DATA)%iSourceDataType /= DATATYPE_NA) then
+  if (.not. associated(MASK)) then
 
-    call DAT(MASK_DATA)%getvalues( pGrdBase=pGrd)
+  elseif (MASK%iSourceDataType /= DATATYPE_NA) then
+
+    call MASK%getvalues( pGrdBase=pGrd)
 
     where ( pGrd%iData > 0 )
       pGrd%iMask = iACTIVE_CELL

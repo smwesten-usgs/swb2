@@ -16,7 +16,7 @@ endif()
 # define which portions of swb to build (i.e. swbstats? as library?)
 set( TARGET__SWB_EXECUTABLE "TRUE" )
 set( TARGET__SWB_LIBRARY "FALSE" )
-set( TARGET__SWBSTATS "TRUE" )
+set( TARGET__SWBSTATS "FALSE" )
 
 # define which conditional compilation statements to include
 set( OPTION__GRAPHICS_SUPPORT "TRUE" )

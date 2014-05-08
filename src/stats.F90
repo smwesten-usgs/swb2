@@ -16,7 +16,8 @@ module stats
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double
   use types
-  use data_factory
+  use data_catalog_entry
+  use data_catalog
   use swb_grid
   use graph
   use RLE
@@ -1069,7 +1070,7 @@ subroutine stats_CalcBasinStats(pGrd, pConfig, pGraph)
 
   ![LOCALS]
   type ( T_LANDUSE_LOOKUP ),pointer :: pLU  ! pointer to landuse data structure
-  type (T_DATA_GRID) :: TEMP_DAT
+  type (DATA_CATALOG_ENTRY_T) :: TEMP_DAT
 
   type ( T_GENERAL_GRID ),pointer :: pTmpGrd
 

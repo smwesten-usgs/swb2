@@ -230,23 +230,6 @@ subroutine output_to_SWB_binary(pGrd, pConfig, cel, iRow, iCol, iTime, &
           cel%rIrrigationFromSW, pConfig%iRLE_MULT, &
           pConfig%rRLE_OFFSET, pGrd%iNumGridCells, iIRRIGATION_FROM_SW)
 
-      ! NOTE to Vic: the following code block needs to be present in order
-      !              that the StreamCapture results will be available
-      !              at the end of the run
-      !
-      ! Thought process behind this gobbledy-gook was that we could minimize the
-      ! number of elements within the T_CELL structure by using a temp variable
-      ! within this module, writing the values to disk, and then moving on to
-      ! the next grid cell.
-      !
-      ! Unless rStreamCapture is operated on by other modules, it could be
-      ! converted to a local module variable
-
-        case(iSTREAM_CAPTURE)
-          call RLE_writeByte(STAT_INFO(iSTREAM_CAPTURE)%iLU, &
-            REAL(cel%rStreamCapture,kind=c_float), pConfig%iRLE_MULT, &
-            pConfig%rRLE_OFFSET, pGrd%iNumGridCells, iSTREAM_CAPTURE)
-
         case default
           call Assert(lFALSE, "Internal programming error in " &
             //"select case structure",TRIM(__FILE__),__LINE__)
@@ -419,9 +402,6 @@ subroutine output_to_SSF(pGrd, pConfig, cel, iRow, iCol, &
             call stats_write_to_SSF_file(pConfig, iIndex, iMonth, iDay, &
               iYear, cel%rIrrigationFromSW)
 
-          case(iSTREAM_CAPTURE)
-            call stats_write_to_SSF_file(pConfig, iIndex, iMonth, iDay, &
-              iYear, cel%rStreamCapture)
           case default
             call Assert(lFALSE, "Internal programming error in " &
               //"select case structure",TRIM(__FILE__),__LINE__)
@@ -528,13 +508,6 @@ subroutine output_update_accumulators(cel, iMonth, &
   call stats_UpdateAllAccumulatorsByCell(REAL(cel%rOutFlow,kind=c_double), &
        iOUTFLOW,iMonth,iZERO)
 
-#ifdef STREAM_INTERACTIONS
-
-  call stats_UpdateAllAccumulatorsByCell(REAL(cel%rStreamCapture,kind=c_double), &
-       iSTREAM_CAPTURE,iMonth,iZERO)
-
-#endif
-
   call stats_UpdateAllAccumulatorsByCell(REAL(cel%rGDD,kind=c_double), &
        iGDD,iMonth,iZERO)
 
@@ -608,13 +581,6 @@ subroutine output_finalize_accumulators(cel, iMonth, iNumGridCells, &
   call stats_UpdateAllAccumulatorsByCell(dpZERO, iNET_INFLOW,iMonth,iNumGridCells)
   call stats_UpdateAllAccumulatorsByCell(dpZERO, iINFLOW,iMonth,iNumGridCells)
   call stats_UpdateAllAccumulatorsByCell(dpZERO, iOUTFLOW,iMonth,iNumGridCells)
-
-#ifdef STREAM_INTERACTIONS
-
-  call stats_UpdateAllAccumulatorsByCell(dpZERO, iSTREAM_CAPTURE, &
-      iMonth,iNumGridCells)
-
-#endif
 
   call stats_UpdateAllAccumulatorsByCell(dpZERO, iGDD, &
       iMonth,iNumGridCells)
