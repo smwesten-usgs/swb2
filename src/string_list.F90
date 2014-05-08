@@ -1,6 +1,7 @@
 module string_list
 
-  use iso_c_binding, only : c_int
+  use iso_c_binding, only : c_int, c_float
+  use constants_and_conversions, only : asInt, asFloat
   use strings
   use exceptions
   implicit none
@@ -32,6 +33,8 @@ module string_list
     procedure :: list_return_position_of_matching_string_fn
     procedure :: list_return_count_of_matching_string_fn
     procedure :: list_items_deallocate_all_sub
+    procedure :: list_return_all_as_float_fn
+    procedure :: list_return_all_as_int_fn
 
     generic :: append => list_append_string_sub, &
                          list_append_int_sub
@@ -40,6 +43,8 @@ module string_list
     generic :: which => list_return_position_of_matching_string_fn
     generic :: countmatching => list_return_count_of_matching_string_fn
     generic :: deallocate => list_items_deallocate_all_sub
+    generic :: asFloat => list_return_all_as_float_fn
+    generic :: asInt => list_return_all_as_int_fn
 
   end type STRING_LIST_T
 
@@ -163,6 +168,65 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  function list_return_all_as_float_fn(this)    result(rValues)
+
+    class (STRING_LIST_T), intent(in)     :: this
+    real (kind=c_float), allocatable      :: rValues(:)
+
+    ! [ LOCALS ]
+    class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
+    integer (kind=c_int)                      :: iStat
+    integer (kind=c_int)                      :: iIndex
+
+    allocate( rValues(this%count ), stat=iStat )
+    if (iStat /= 0)  call die("Failed to allocate memory for list conversion", __FILE__, __LINE__)
+
+    current => this%first
+    iIndex = 0
+
+    do while ( associated( current ) .and. iIndex < ubound(rValues,1) )
+
+      iIndex = iIndex + 1
+      rValues(iIndex) = asFloat( current%s )
+
+      current => current%next
+
+    enddo
+
+  end function list_return_all_as_float_fn
+
+!--------------------------------------------------------------------------------------------------
+
+  function list_return_all_as_int_fn(this)    result(iValues)
+
+    class (STRING_LIST_T), intent(in)     :: this
+    integer (kind=c_int), allocatable     :: iValues(:)
+
+    ! [ LOCALS ]
+    class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
+    integer (kind=c_int)                      :: iStat
+    integer (kind=c_int)                      :: iIndex
+
+    allocate( iValues(this%count ), stat=iStat )
+    if (iStat /= 0)  call die("Failed to allocate memory for list conversion", __FILE__, __LINE__)
+
+    current => this%first
+    iIndex = 0
+
+    do while ( associated( current ) .and. iIndex < ubound(iValues,1) )
+
+      iIndex = iIndex + 1
+
+      iValues(iIndex) = asInt( current%s )
+      
+      current => current%next
+
+    enddo
+
+  end function list_return_all_as_int_fn
+
+!--------------------------------------------------------------------------------------------------
+
   function break_string_into_list_fn(sText1)    result( newList )
 
     character (len=*), intent(inout)  :: sText1
@@ -201,19 +265,17 @@ contains
     integer (kind=c_int), dimension(this%count) :: iTempResult
     type (STRING_LIST_ELEMENT_T), pointer   :: current => null()
 
-    iCount = 0
+    iIndex = 0
 
     current => this%first
 
     do while ( associated(current) )
-      iRetval = index(string = current%s, &
-                      substring = sChar)
 
-      if (iRetval /= 0)  then
+      iIndex = iIndex + 1
 
+      if ( current%s .strequal. sChar ) then
         iCount = iCount + 1
         iTempResult(iCount) = iIndex
-
       endif
 
       current => current%next
@@ -223,17 +285,19 @@ contains
     if (iCount == 0) then
 
       allocate(iResult(1), stat=iStat)
+      if (iStat /= 0)   call die("Problem allocating memory", __FILE__, __LINE__)
+
       iResult(1) = -9999
 
     else
     
       allocate(iResult(iCount), stat=iStat)
+      if (iStat /= 0)   call die("Problem allocating memory", __FILE__, __LINE__)
+
       iResult(1:iCount) = iTempResult(1:iCount)
 
     endif  
-
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
-
+   
   end function list_return_position_of_matching_string_fn
 
 
@@ -256,11 +320,8 @@ contains
     current => this%first
 
     do while ( associated(current) )
-      iRetval = index(string = current%s, &
-                      substring = sChar)
-
-      if (iRetval /= 0)  then
-
+    
+      if ( current%s .strequal. sChar ) then
         iCount = iCount + 1
         iTempResult(iCount) = iIndex
 

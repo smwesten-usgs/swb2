@@ -89,6 +89,7 @@
     <Folder name="Header Files" sorted="Yes" />
     <Folder name="Resource Files" sorted="Yes" />
     <Folder name="Source Files" sorted="Yes">
+        <File>..\src\constants_and_conversions.F90</File>
         <File>..\src\control.F90</File>
         <File>..\src\data_catalog.F90</File>
         <File>..\src\data_catalog_entry.F90</File>
@@ -99,9 +100,12 @@
         <File>..\src\et_jensen_haise.F90</File>
         <File>..\src\et_thornthwaite_mather.F90</File>
         <File>..\src\et_turc.F90</File>
+        <File>..\src\exceptions.F90</File>
         <File>..\src\graph.F90</File>
         <File>..\src\grid.F90</File>
         <File>..\src\irrigation.F90</File>
+        <File>..\src\logfiles.F90</File>
+        <File>..\src\lookup_table_landuse.F90</File>
         <File>..\src\main.F90</File>
         <File>..\src\meteorological_functions.F90</File>
         <File>..\src\model.F90</File>
@@ -113,9 +117,13 @@
         <File>..\src\sm_thornthwaite_mather.F90</File>
         <File>..\src\snow.F90</File>
         <File>..\src\stats.F90</File>
+        <File>..\src\string_list.F90</File>
+        <File>..\src\strings.F90</File>
         <File>..\src\swb_python_interface.F90</File>
         <File>..\src\swbstats.F90</File>
+        <File>..\src\test_landuse_table.F90</File>
         <File>..\src\types.F90</File>
+        <File>..\src\types_new.F90</File>
         <File>..\src\water_balance.F90</File>
     </Folder>
 </Project>

@@ -1,17 +1,15 @@
 program test_landuse_table
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
-  
-  use data_file
-  use data_column
+  use constants_and_conversions, only : sTAB
   use data_frame
-  use strings
   use lookup_table_landuse
-  use types_new
   implicit none
 
+  type (LOOKUP_TABLE_T) :: LU
 
-  call LU%readfile(sFilename = "LU_lookup_NLCD.txt")
+  call LU%readfile(sFilename = "LU_lookup_NLCD.txt", sCommentChars = "#", sDelimiters= sTAB)
+  call LU%map()
+
   
-
 end program test_landuse_table

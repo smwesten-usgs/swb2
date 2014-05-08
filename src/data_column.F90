@@ -14,14 +14,14 @@ private
 
 type, public :: T_DATA_COLUMN
 
-  integer (kind=c_int), private :: iCurrentRecord = 0
-  integer (kind=c_int), private :: iOrder
-  integer (kind=c_int), private :: iDataType
+  integer (kind=c_int) :: iCurrentRecord = 0
+  integer (kind=c_int) :: iOrder
+  integer (kind=c_int) :: iDataType
   integer (kind=c_int) :: iCount
   logical (kind=c_bool), dimension(:), allocatable, public :: lMask
-  integer (kind=c_int), dimension(:), allocatable, private :: iData
-  real (kind=c_float), dimension(:), allocatable, private  :: fData
-  real (kind=c_double), dimension(:), allocatable, private :: dData
+  integer (kind=c_int), dimension(:), allocatable          :: iData
+  real (kind=c_float), dimension(:), allocatable           :: fData
+  real (kind=c_double), dimension(:), allocatable          :: dData
   type (STRING_LIST_T), public                             :: stData
   type (T_DATETIME), dimension(:), pointer, public         :: pDatetime => null()
 
@@ -105,6 +105,11 @@ contains
   generic, public    :: mean => mean_of_column_elements_fn
 
   procedure, public :: getval => get_date_value_at_index_fn
+
+  procedure, public :: getColumnFloatVals => get_all_column_values_as_float_fn
+  
+  procedure, private :: get_all_column_values_as_int_fn
+  generic, public    :: getColumnIntVals => get_all_column_values_as_int_fn
 
 end type T_DATA_COLUMN
 
@@ -872,6 +877,45 @@ contains
         __FILE__, __LINE__)
 
   end subroutine create_new_column_sub
+
+  function get_all_column_values_as_float_fn(this)  result(rValues)
+
+    class (T_DATA_COLUMN)                   :: this
+    real (kind=c_float), allocatable        :: rValues(:)
+
+    if ( this%iDataType == STRING_DATA ) then
+
+      rValues = this%stData%asFloat()
+
+    else
+
+      call warn("Function that was called only works with string data columns", &
+        __FILE__, __LINE__)
+
+    endif  
+
+
+  end function get_all_column_values_as_float_fn
+
+  function get_all_column_values_as_int_fn(this)  result(iValues)
+
+    class (T_DATA_COLUMN)                   :: this
+    real (kind=c_float), allocatable        :: iValues(:)
+
+    if ( this%iDataType == STRING_DATA ) then
+
+      iValues = this%stData%asInt()
+
+    else
+
+      call warn("Function that was called only works with string data columns", &
+        __FILE__, __LINE__)
+
+    endif  
+
+
+  end function get_all_column_values_as_int_fn
+
 
 
 end module data_column

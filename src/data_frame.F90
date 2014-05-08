@@ -243,11 +243,15 @@ contains
 
         pColumn => this%columns(iColNum)%pColumn
 
+        if (.not. associated(pColumn) ) &
+          call warn("Null pointer returned when attempting to return pointer to a specific column", &
+               __FILE__, __LINE__)
+
       endif
 
     else
 
-      call warn("'Columns' member has not been allocated yet.", __FILE__, __LINE__)
+      call warn("'columns' member has not been allocated yet.", __FILE__, __LINE__)
 
     endif
 
@@ -290,19 +294,23 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int) :: iCount
 
-    iCount = this%slColNames%countmatching(sColName)
+!    iCount = this%slColNames%countmatching(sColName)
 
-    if (iCount > 0) then
 
-!      allocate(iColNum(iCount))
+
       iColNum = this%slColNames%which(sColName)
 
-    else
+ !   if (iCount > 0) then
 
-      allocate(iColNum(1))
-      iColNum = 0
+!       allocate(iColNum(iCount))
+!       iColNum = this%slColNames%which(sColName)
 
-    endif
+!     else
+
+!       allocate(iColNum(1))
+!       iColNum = 0
+
+!     endif
 
   end function find_column_by_name_fn
 

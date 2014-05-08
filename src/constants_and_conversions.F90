@@ -23,13 +23,17 @@ module constants_and_conversions
  
   ! [ common 'magic' numbers and logicals ]
   public :: lTRUE, lFALSE
-  public :: rBIGVAL, iBIGVAL
+  public :: rBIGVAL, iBIGVAL, dBIGVAL, iTINYVAL, rTINYVAL, dTINYVAL
   public :: rFREEZING, dFREEZING
   public :: rZERO
   logical (kind=c_bool), parameter   :: lTRUE = .true._c_bool
   logical (kind=c_bool), parameter   :: lFALSE = .false._c_bool
   real (kind=c_float), parameter     :: rBIGVAL = HUGE(0_c_float)
+  real (kind=c_double), parameter    :: dBIGVAL = HUGE(0_c_double)
   integer(kind=c_int), parameter     :: iBIGVAL = HUGE(0_c_int)
+  real (kind=c_float), parameter     :: rTINYVAL = -(HUGE(0_c_float) - 1)
+  real (kind=c_double), parameter    :: dTINYVAL = -(HUGE(0_c_double) - 1)  
+  integer(kind=c_int), parameter     :: iTINYVAL = -(HUGE(0_c_int) - 1)
   real (kind=c_float), parameter     :: rFREEZING = 32_c_float
   real (kind=c_double), parameter    :: dFREEZING = 32_c_double
   real (kind=c_float), parameter  :: fZERO = 0.0_c_float
@@ -335,7 +339,12 @@ function char2int(sValue)  result(iValue)
   character (len=*) :: sValue
   integer (kind=c_int) :: iValue
 
-  read(UNIT=sValue,FMT=*) iValue
+  ! [ LOCALS ]
+  integer (kind=c_int) :: iStat
+
+  read(UNIT=sValue,FMT=*, iostat=iStat) iValue
+
+  if (iStat /= 0)  iValue = iTINYVAL
 
 end function char2int
 
