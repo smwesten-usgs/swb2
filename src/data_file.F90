@@ -20,6 +20,7 @@ module data_file
     integer (kind=c_int)            :: iCurrentLinenum = 0
     integer (kind=c_int)            :: iNumberOfLines = 0
     integer (kind=c_int)            :: iNumberOfRecords = 0
+    integer (kind=c_int)            :: iNumberOfHeaderLines = 1
     logical (kind=c_bool)           :: lIsOpen = lFALSE
     integer (kind=c_int)            :: iUnitNum
     integer (kind=c_int)            :: iStat
@@ -124,12 +125,12 @@ contains
     else
       sBufTemp = this%sBuf(1:32)  
     endif  
-    
-    iIndex = scan( adjustl(sBufTemp) , this%sCommentChars )
+
+    iIndex = index( adjustl(sBufTemp) , this%sCommentChars )
     
     lIsComment = lFALSE
 
-    if (iIndex == 1 ) lIsComment = lTRUE
+    if ( iIndex == 1 .or. len_trim(this%sBuf) == 0 ) lIsComment = lTRUE
         
   end function is_current_line_a_comment_fn  
 
@@ -155,9 +156,9 @@ contains
 
       call this%countLines()
 
-      write(*, fmt="(/,10x, a)") "Opened file "//dquote(sFilename)
-      write(*, fmt="(a50, i8)") "Number of lines in file: ", this%numLines()
-      write(*, fmt="(a50, i8)") "Number of lines excluding blanks and comments: ", this%numRecords()
+      write(*, fmt="(/,15x, a)") "Opened file "//dquote(sFilename)
+      write(*, fmt="(a60, i8)") "Number of lines in file: ", this%numLines()
+      write(*, fmt="(a60, i8)") "Number of lines excluding blanks, headers and comments: ", this%numRecords()
 
     else
 
@@ -247,21 +248,18 @@ contains
 
         read (unit = this%iUnitNum, fmt="(a)", iostat = iStat)  this%sBuf
 
-        print *, this%iUnitNum, iNumLines, iStat
-        print *, dquote( trim(this%sBuf) ) 
+        if (iStat == IOSTAT_END) exit
 
         iNumLines = iNumLines + 1
 
         if ( .not. this%isComment() )   iNumRecords = iNumRecords + 1
-
-        if (iStat == IOSTAT_END) exit
 
       enddo
 
       rewind( unit = this%iUnitNum )
 
       this%iNumberOfLines= iNumLines
-      this%iNumberOfRecords = iNumRecords
+      this%iNumberOfRecords = iNumRecords - this%iNumberOfHeaderLines
 
     endif
 

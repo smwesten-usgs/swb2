@@ -14,7 +14,7 @@ module exceptions
      module procedure :: assert_1bit
   end interface assert
 
-
+  integer (kind=c_int) :: NUMBER_OF_FATAL_WARNINGS = 0
 
 contains
 
@@ -49,13 +49,26 @@ contains
  
   end subroutine die
 
+  subroutine check_warnings()
 
-   subroutine warn(sMessage, sModule, iLine, sHints)
+    ! [ LOCALS ]
+    character (len=3) :: sNumWarnings
+
+    if ( NUMBER_OF_FATAL_WARNINGS > 0 ) &
+      write(unit=sNumWarnings, fmt="(i3)") NUMBER_OF_FATAL_WARNINGS
+      call die( sMessage=sNumWarnings//" warnings were issued and will "  &
+        //"cause serious problems later in the run.", &
+        sHints="Please address the warnings and try again.")
+
+  end subroutine check_warnings  
+
+   subroutine warn(sMessage, sModule, iLine, sHints, lFatal)
 
     character (len=*), intent(in)               :: sMessage
     character (len=*), intent(in), optional     :: sModule
     integer (kind=c_int), intent(in), optional  :: iLine 
     character (len=*), intent(in), optional     :: sHints
+    logical (kind=c_bool), intent(in), optional :: lFatal
 !    integer (kind=c_int), intent(in), optional  :: iLU
     
     ! [ LOCALS ]
@@ -76,6 +89,10 @@ contains
       write (unit=iLU, fmt="(/,t5,'==> ',a)") sHints
 
     write (unit=iLU, fmt="(/)")
+
+    if (present(lFatal)) then
+      if (lFatal)  NUMBER_OF_FATAL_WARNINGS = NUMBER_OF_FATAL_WARNINGS + 1
+    endif  
  
   end subroutine warn
 

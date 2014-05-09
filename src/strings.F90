@@ -28,6 +28,11 @@ module strings
 !     procedure :: is_logical1_equal_to_logical4_fn
    end interface operator(.strequal.)
 
+    public :: operator(.contains.)
+    interface operator(.contains.)
+      procedure :: is_string2_present_in_string1_fn
+    end interface operator(.contains.)  
+
     public :: asCharacter
     interface asCharacter
       procedure :: int_to_char_fn
@@ -83,6 +88,27 @@ module strings
     end interface toLowercase  
 
 contains
+
+  function is_string2_present_in_string1_fn(sText1, sText2)   result(lBool)
+
+    character (len=*), intent(in)      :: sText1
+    character (len=*), intent(in)      :: sText2    
+    logical (kind=c_bool)              :: lBool
+
+    ! [ LOCALS ]
+    character (len=len_trim(sText1))  :: sTemp1
+    character (len=len_trim(sText2))  :: sTemp2
+
+    lBool = lFALSE
+
+    sTemp1 = asUppercase(sText1)
+    sTemp2 = asUppercase(sText2)
+
+    if ( index(sText1, sText2) /= 0 ) lBool = lTRUE
+
+  end function is_string2_present_in_string1_fn    
+
+!--------------------------------------------------------------------------------------------------
 
   function is_char_equal_to_char_fn(sText1, sText2)   result(lBool)
 

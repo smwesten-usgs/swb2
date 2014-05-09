@@ -268,7 +268,14 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int), allocatable :: iColNum(:)
 
+    pColumn => null()
+
     iColNum = this%findcol(sColName)
+print *, "#####1  iColNum = ", iColNum
+    iColNum = this%slColNames%which(sColName)
+
+
+    print *, "#####2  iColNum = ", iColNum
 
     if (ubound(iColNum,1) > 0) then
 
@@ -299,6 +306,9 @@ contains
 
 
       iColNum = this%slColNames%which(sColName)
+
+      print *, __FILE__, " : ", __LINE__
+      print *, "   =>  ", iColNum
 
  !   if (iCount > 0) then
 
