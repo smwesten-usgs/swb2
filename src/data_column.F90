@@ -106,10 +106,10 @@ contains
 
   procedure, public :: getval => get_date_value_at_index_fn
 
-  procedure, public :: getColumnFloatVals => get_all_column_values_as_float_fn
+  procedure, public :: asFloat => get_all_column_values_as_float_fn
   
   procedure, private :: get_all_column_values_as_int_fn
-  generic, public    :: getColumnIntVals => get_all_column_values_as_int_fn
+  generic, public    :: asInt => get_all_column_values_as_int_fn
 
 end type T_DATA_COLUMN
 

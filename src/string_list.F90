@@ -201,8 +201,6 @@ contains
     allocate( rValues( 1:this%count ), stat=iStat )
     if (iStat /= 0)  call die("Failed to allocate memory for list conversion", __FILE__, __LINE__)
 
-    print *, __FILE__, " : ", __LINE__, "sizeof rvalues: ", size(rValues), "this%count: ", this%count
-
     current => this%first
     iIndex = 0
 
@@ -214,8 +212,6 @@ contains
       current => current%next
 
     enddo
-
-    print *, __FILE__, ": ", __LINE__, "    returning ",iIndex, " values."
 
   end function list_return_all_as_float_fn
 

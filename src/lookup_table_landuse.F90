@@ -73,25 +73,17 @@ contains
 
     FILE%slColNames = FILE%readHeader()
 
-    print *, __FILE__, ": ", __LINE__
-
-
     iCount = FILE%slColNames%count
-
-
-    print *, "  => FILE%slColNames%count = ", FILE%slColNames%count
 
     call DF%initialize( slColNames=FILE%slColNames, &
         iRecordCount = FILE%iNumberOfRecords )
 
 
-    print *, "  => FILE%iNumberOfRecords = ", FILE%iNumberOfRecords
-
-    do while ( FILE%isOpen() )
+    do while ( .not. FILE%isEOF() )
 
       sBuf = FILE%readLine()
 
-      call DF%putrow( sBuf, sDelimiters )
+      if (len_trim(sBuf) > 0 )  call DF%putrow( sBuf, sDelimiters )
 
     enddo
 
@@ -162,8 +154,6 @@ contains
     allocate( fCN( iNumberOfRecords, iNumberOfSoilGroups), stat=iStat)
     if( iStat /= 0)  call die("Failed to allocate memory for data table.", __FILE__, __LINE__)
 
-    print *, "Initial allocation: ", iNumberOfRecords, iNumberOfSoilGroups
-
     do iSoilsIndex = 1, iNumberOfSoilGroups
 
       sText = "CN_"//asCharacter(iSoilsIndex)
@@ -172,13 +162,10 @@ contains
       if (associated(pCOL) ) then
 
         iCount = pCol%count()
-!        fCN(:, iSoilsIndex) = pCOL%getColumnFloatVals()
+        fCN(:, iSoilsIndex) = pCOL%getColumnFloatVals()
 
-         print *, iNumberOfRecords, size(rValues), iCount
-         rValues = pCOL%getColumnFloatVals()
-!         fCN(:, iSoilsIndex) = rValues
-
-         print *, size(rValues)
+        rValues = pCOL%getColumnFloatVals()
+        fCN(:, iSoilsIndex) = rValues
 
         print *, "CN VALUES FOR: "//sText
         print *, rValues
@@ -188,28 +175,48 @@ contains
     enddo
 
 
-!     allocate( fRZ( iNumberOfRecords, iNumberOfSoilGroups), stat=iStat)
-!     if( iStat /= 0)  call die("Failed to allocate memory for data table.", __FILE__, __LINE__)
+    allocate( fRZ( iNumberOfRecords, iNumberOfSoilGroups), stat=iStat)
+    if( iStat /= 0)  call die("Failed to allocate memory for data table.", __FILE__, __LINE__)
 
-!     do iSoilsIndex = 1, iNumberOfSoilGroups
+    do iSoilsIndex = 1, iNumberOfSoilGroups
 
-!       sText = "RZ_"//asCharacter(iSoilsIndex)
-!       pCOL => DF%getcol( sText )
+      sText = "RZ_"//asCharacter(iSoilsIndex)
+      pCOL => DF%getcol( sText )
 
-!       if (associated(pCOL) ) then
+      if (associated(pCOL) ) then
 
-!         iCount = pCol%count()
-!         !rValues = pCOL%getColumnFloatVals()
-!         fRZ(:, iSoilsIndex) = pCOL%getColumnFloatVals()
+        iCount = pCol%count()
 
-!         print *, "RZ VALUES FOR: "//sText
-!         print *, fRZ
+        fRZ(:, iSoilsIndex) = pCOL%getColumnFloatVals()
 
-!       endif  
+        print *, "RZ VALUES FOR: "//sText
+        print *, fRZ(:, iSoilsIndex)
 
-!     enddo
+      endif  
+
+    enddo
 
 
+    allocate( fMaxRecharge( iNumberOfRecords, iNumberOfSoilGroups), stat=iStat)
+    if( iStat /= 0)  call die("Failed to allocate memory for data table.", __FILE__, __LINE__)
+
+    do iSoilsIndex = 1, iNumberOfSoilGroups
+
+      sText = "Max_Recharge_"//asCharacter(iSoilsIndex)
+      pCOL => DF%getcol( sText )
+
+      if (associated(pCOL) ) then
+
+        iCount = pCol%count()
+
+        fMaxRecharge(:, iSoilsIndex) = pCOL%getColumnFloatVals()
+
+        print *, "MAXIMUM RECHARGE VALUES FOR: "//sText
+        print *, fMaxRecharge(:, iSoilsIndex)
+
+      endif  
+
+    enddo
 
   end subroutine map_columns_to_fields_sub  
 
