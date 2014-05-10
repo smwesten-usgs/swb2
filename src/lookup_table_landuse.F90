@@ -1,5 +1,11 @@
+
+!> Type controlling how the landuse table is read in, parsed, checked for basic
+!! range violations, and ultimately used to populate the data structure used to 
+!! run SWB. Note that the design is such that it should be possible to run the 
+!! basic checks separately from the actual SWB program execution. It would be
+!! nice to generalize this code somehow. 
 module table_record_landuse
-  
+
   use iso_c_binding, only : c_short, c_float
   implicit none
 
@@ -120,6 +126,8 @@ contains
     character (len=:), allocatable        :: sText
 
 
+
+
     iNumberOfRecords = FILE%iNumberOfRecords
 
     !> First task: figure out how many soil groups are in the table
@@ -217,6 +225,23 @@ contains
       endif  
 
     enddo
+
+
+    !> OK, now we have all of the data in place. Time to map it from the data frame to the 
+    !! data structure.
+
+    iCount = 0
+
+    do iIndex=1, iNumberOfRecords
+
+      do iSoilsIndex=1, iNumberOfSoilGroups
+
+        iCount = iCount + 1
+
+        associate( lu => this%data(iCount) )
+          
+          pCol => DF%getcol("LU_Code")
+          lu%iLandUseType = iIndex
 
   end subroutine map_columns_to_fields_sub  
 
