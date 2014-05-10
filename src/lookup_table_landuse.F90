@@ -122,11 +122,14 @@ contains
     integer (kind=c_int)                  :: iNumberOfMaxRechargeColumns
     real (kind=c_float), allocatable      :: fRZ(:,:)
     real (kind=c_float), allocatable      :: fCN(:,:)
-    real (kind=c_float), allocatable      :: fMaxRecharge(:,:)        
+    real (kind=c_float), allocatable      :: fMaxRecharge(:,:)  
     character (len=:), allocatable        :: sText
 
-
-
+    character (len=64), allocatable :: sLandUseDescription(:)
+    character (len=16), allocatable :: sAssumedPercentImperviousness(:)
+    real (kind=c_float), allocatable :: rMaxInfiltration(:)
+    real (kind=c_float), allocatable :: rIntercept_GrowingSeason(:)
+    real (kind=c_float), allocatable :: rIntercept_NonGrowingSeason(:)
 
     iNumberOfRecords = FILE%iNumberOfRecords
 
