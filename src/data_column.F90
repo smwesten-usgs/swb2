@@ -1,6 +1,6 @@
 module data_column
 
-use iso_c_binding, only : c_int, c_float, c_double, c_bool
+use iso_c_binding, only : c_int, c_float, c_double, c_bool, c_short
 use iso_fortran_env, only : IOSTAT_END
 use constants_and_conversions
 use strings
@@ -12,7 +12,7 @@ implicit none
 
 private
 
-type, public :: T_DATA_COLUMN
+type, public :: DATA_COLUMN_T
 
   integer (kind=c_int) :: iCurrentRecord = 0
   integer (kind=c_int) :: iOrder
@@ -29,26 +29,22 @@ contains
 
   private
 
-   procedure, private :: put_next_integer_value_fn
-   procedure, private :: put_next_float_value_fn
-   procedure, private :: put_next_double_value_fn
-   procedure, private :: put_next_string_value_fn
-   generic, public    :: putval => put_next_integer_value_fn, &
-                                   put_next_float_value_fn, &
-                                   put_next_double_value_fn, &
-                                   put_next_string_value_fn
+  !> DOXYGEN_IMPL data_dolumn::put_next_integer_value_sub
+  procedure, private :: put_next_integer_value_sub
+  !> DOXYGEN_IMPL data_dolumn::put_next_float_value_sub
+  procedure, private :: put_next_float_value_sub
+  !> DOXYGEN_IMPL data_dolumn::put_next_double_value_sub   
+  procedure, private :: put_next_double_value_sub
+  !> DOXYGEN_IMPL data_dolumn::put_next_datetime_or_string_value_sub
+  procedure, private :: put_next_datetime_or_string_value_sub
 
-  procedure, private :: put_next_datetime_value_fn
-  generic, public    :: putdatetime => put_next_datetime_value_fn                                 
+  generic, public    :: put => put_next_integer_value_sub, &
+                               put_next_float_value_sub, &
+                               put_next_double_value_sub, &
+                               put_next_datetime_or_string_value_sub
 
-  procedure, private :: put_next_date_value_fn
-  generic, public    :: putdate => put_next_date_value_fn                                 
-
-  procedure, private :: put_next_time_value_fn
-  generic, public    :: puttime => put_next_time_value_fn                                 
-
-  !> DOXYGEN_IMPL data_dolumn::set_mask_int_sub
-  procedure, private :: set_mask_int_sub
+  !> DOXYGEN_IMPL data_dolumn::set_mask_integer_sub
+  procedure, private :: set_mask_integer_sub
   !> DOXYGEN_IMPL data_column::set_mask_float_sub
   procedure, private :: set_mask_float_sub
   !> DOXYGEN_IMPL data_column::set_mask_double_sub
@@ -58,7 +54,7 @@ contains
   !> DOXYGEN_IMPL data_column::set_mask_string_sub
   procedure, private :: set_mask_string_sub
 
-  generic, public    :: select => set_mask_int_sub, &
+  generic, public    :: select => set_mask_integer_sub, &
                                   set_mask_float_sub, &
                                   set_mask_double_sub, &
                                   set_mask_datetime_sub, &
@@ -104,22 +100,37 @@ contains
   procedure, private :: mean_of_column_elements_fn
   generic, public    :: mean => mean_of_column_elements_fn
 
-  procedure, public :: getval => get_date_value_at_index_fn
+  !> DOXYGEN_IMPL data_column::get_integer_value_at_index_sub
+  procedure, private  :: get_integer_value_at_index_sub
+  !> DOXYGEN_IMPL data_column::get_datetime_value_at_index_sub  
+  procedure, private  :: get_datetime_value_at_index_sub
+  !> DOXYGEN_IMPL data_column::get_short_value_at_index_sub  
+  procedure, private  :: get_short_value_at_index_sub
+  !> DOXYGEN_IMPL data_column::get_float_value_at_index_sub  
+  procedure, private  :: get_float_value_at_index_sub
+  !> DOXYGEN_IMPL data_column::get_string_value_at_index_sub  
+  procedure, private  :: get_string_value_at_index_sub
+  generic, public     :: get => get_short_value_at_index_sub, &
+                                get_integer_value_at_index_sub, &
+                                get_float_value_at_index_sub, &
+                                get_string_value_at_index_sub, &
+                                get_datetime_value_at_index_sub
 
-  procedure, public :: getColumnFloatVals => get_all_column_values_as_float_fn
+  procedure, private :: get_all_column_values_as_float_fn
+  generic, public    :: asFloat => get_all_column_values_as_float_fn
   
   procedure, private :: get_all_column_values_as_int_fn
-  generic, public    :: getColumnIntVals => get_all_column_values_as_int_fn
+  generic, public    :: asInt => get_all_column_values_as_int_fn
 
-end type T_DATA_COLUMN
+end type DATA_COLUMN_T
 
 !------
 
-type, public :: T_DATA_COLUMN_PTR
+type, public :: DATA_COLUMN_T_PTR
   
-  class (T_DATA_COLUMN), pointer :: pColumn
+  class (DATA_COLUMN_T), pointer :: pColumn
 
-end type T_DATA_COLUMN_PTR
+end type DATA_COLUMN_T_PTR
 
 
   integer (kind=c_int), parameter, public :: GT = 1
@@ -132,9 +143,9 @@ end type T_DATA_COLUMN_PTR
       
 contains
 
-  subroutine set_mask_int_sub(this, iValue1, iComparison, iValue2)
+  subroutine set_mask_integer_sub(this, iValue1, iComparison, iValue2)
 
-    class (T_DATA_COLUMN), intent(inout) :: this
+    class (DATA_COLUMN_T), intent(inout) :: this
     integer (kind=c_int), intent(in)             :: iValue1
     integer (kind=c_int), intent(in)             :: iComparison
     integer (kind=c_int), intent(in), optional   :: iValue2
@@ -181,13 +192,13 @@ contains
 
     end select  
 
-  end subroutine set_mask_int_sub
+  end subroutine set_mask_integer_sub
 
 
 
   subroutine set_mask_float_sub(this, fValue1, iComparison, fValue2)
 
-    class (T_DATA_COLUMN), intent(inout) :: this
+    class (DATA_COLUMN_T), intent(inout) :: this
     real (kind=c_float), intent(in)              :: fValue1
     integer (kind=c_int), intent(in)             :: iComparison
     real (kind=c_float), intent(in), optional    :: fValue2
@@ -242,7 +253,7 @@ contains
 
   subroutine set_mask_double_sub(this, dValue1, iComparison, dValue2)
 
-    class (T_DATA_COLUMN), intent(inout)          :: this
+    class (DATA_COLUMN_T), intent(inout)          :: this
     real (kind=c_double), intent(in)              :: dValue1
     integer (kind=c_int), intent(in)              :: iComparison
     real (kind=c_double), intent(in), optional    :: dValue2
@@ -296,7 +307,7 @@ contains
 
   subroutine set_mask_datetime_sub(this, dtValue1, iComparison, dtValue2)
 
-    class (T_DATA_COLUMN), intent(inout)       :: this
+    class (DATA_COLUMN_T), intent(inout)       :: this
     type (T_DATETIME), intent(in)              :: dtValue1
     integer (kind=c_int), intent(in)           :: iComparison
     type (T_DATETIME), intent(in), optional    :: dtValue2
@@ -367,7 +378,7 @@ contains
 
   subroutine set_mask_string_sub(this, sText1, iComparison, sText2)
 
-    class (T_DATA_COLUMN), intent(inout)       :: this
+    class (DATA_COLUMN_T), intent(inout)       :: this
     character (len=*), intent(in)              :: sText1
     integer (kind=c_int), intent(in)           :: iComparison
     character (len=*), intent(in), optional    :: sText2
@@ -423,11 +434,152 @@ contains
 
 
 
+  subroutine get_float_value_at_index_sub(this, iIndex, fValue)
+
+    class (DATA_COLUMN_T), intent(in) :: this
+    integer (kind=c_int), intent(in)  :: iIndex
+    real (kind=c_float), intent(out)  :: fValue
+
+    select case ( this%iDataType )
+
+      case (INTEGER_DATA)
+
+        if (iIndex >= lbound(this%iData,1) &
+            .and. iIndex <= ubound(this%iData,1)) then
+
+          fValue = asFloat( this%iData(iIndex) )
+
+        else 
+        
+          fValue = fTINYVAL  
+      
+        endif    
+
+      case (STRING_DATA)
+
+        fValue = asFloat( this%stData%get(iIndex) )
+
+      case default  
+
+        call die("Internal programming error: method called for wrong datatype", __FILE__, __LINE__)
+
+    end select  
+
+  end subroutine get_float_value_at_index_sub
 
 
-  function get_date_value_at_index_fn(this, iIndex)   result(pDatetime)
 
-    class (T_DATA_COLUMN), intent(in) :: this
+
+
+  subroutine get_integer_value_at_index_sub(this, iIndex, iValue)
+
+    class (DATA_COLUMN_T), intent(in) :: this
+    integer (kind=c_int), intent(in)  :: iIndex
+    integer (kind=c_int), intent(out) :: iValue
+
+    select case ( this%iDataType )
+
+      case (INTEGER_DATA)
+
+        if (iIndex >= lbound(this%iData,1) &
+            .and. iIndex <= ubound(this%iData,1)) then
+
+          iValue = this%iData(iIndex)
+
+        else 
+        
+          iValue = iTINYVAL  
+      
+        endif    
+
+      case (STRING_DATA)
+
+        iValue = asInt( this%stData%get(iIndex) )
+
+      case default  
+
+        call die("Internal programming error: method called for wrong datatype", __FILE__, __LINE__)
+
+    end select  
+
+  end subroutine get_integer_value_at_index_sub
+  
+
+  subroutine get_short_value_at_index_sub(this, iIndex, iValue)
+
+    class (DATA_COLUMN_T), intent(in)   :: this
+    integer (kind=c_int), intent(in)    :: iIndex
+    integer (kind=c_short), intent(out) :: iValue
+
+    select case ( this%iDataType )
+
+      case (INTEGER_DATA)
+
+        if (iIndex >= lbound(this%iData,1) &
+            .and. iIndex <= ubound(this%iData,1)) then
+
+          iValue = this%iData(iIndex)
+
+        else 
+        
+          iValue = -( HUGE(iValue) - 1)  
+      
+        endif    
+
+      case (STRING_DATA)
+
+        iValue = asInt( this%stData%get(iIndex) )
+
+      case default  
+
+        call die("Internal programming error: method called for wrong datatype", __FILE__, __LINE__)
+
+    end select  
+
+  end subroutine get_short_value_at_index_sub
+
+
+
+  subroutine get_string_value_at_index_sub(this, iIndex, sString)
+
+    class (DATA_COLUMN_T), intent(in)           :: this
+    integer (kind=c_int), intent(in)            :: iIndex
+    character (len=:), allocatable, intent(out) :: sString
+
+    select case ( this%iDataType )
+
+      case (INTEGER_DATA)
+
+        if (iIndex >= lbound(this%iData,1) &
+            .and. iIndex <= ubound(this%iData,1)) then
+
+          sString = asCharacter( this%iData(iIndex) )
+
+        else 
+        
+          sString = "NA"  
+      
+        endif    
+
+      case (STRING_DATA)
+
+        sString = this%stData%get(iIndex)
+
+      case default  
+
+        call die("Internal programming error: method called for wrong datatype", __FILE__, __LINE__)
+
+    end select  
+
+  end subroutine get_string_value_at_index_sub
+
+
+
+
+
+  subroutine get_datetime_value_at_index_sub(this, iIndex, pDatetime)
+
+    class (DATA_COLUMN_T), intent(in) :: this
     integer (kind=c_int), intent(in)       :: iIndex
     class (T_DATETIME), pointer            :: pDatetime
 
@@ -442,134 +594,133 @@ contains
 
             pDatetime => this%pDatetime(iIndex)
 
+          else
+
+            pDatetime => null()
+
           endif
       
         endif    
 
       case default  
 
-        pDatetime => null()
+        call die("Internal programming error: method called for wrong datatype", __FILE__, __LINE__)
 
       end select  
 
-  end function get_date_value_at_index_fn
+  end subroutine get_datetime_value_at_index_sub
   
 !--------------------------------------------------------------------
 
-  function put_next_integer_value_fn(this, iValue)   result(iRecNum)
+  subroutine put_next_integer_value_sub(this, iValue)
 
-    class (T_DATA_COLUMN), intent(inout)   :: this
+    class (DATA_COLUMN_T), intent(inout)   :: this
     integer (kind=c_int), intent(in)       :: iValue
+
+    ! [ LOCALS ]
     integer (kind=c_int)                   :: iRecNum
 
-    !iRecNum = this%currentRecnum()
     iRecNum = this%incrementRecnum()
     this%iData(iRecNum) = iValue
 
-  end function put_next_integer_value_fn
+  end subroutine put_next_integer_value_sub
 
 !--------------------------------------------------------------------
 
-  function put_next_float_value_fn(this, fValue)   result(iRecNum)
+  subroutine put_next_float_value_sub(this, fValue)
 
-    class (T_DATA_COLUMN), intent(inout)   :: this
+    class (DATA_COLUMN_T), intent(inout)   :: this
     real (kind=c_float), intent(in)        :: fValue
+
+    ! [ LOCALS ]
     integer (kind=c_int)                   :: iRecNum
 
-    !iRecNum = this%currentRecnum()
     iRecNum = this%incrementRecnum()
     this%fData(iRecNum) = fValue
-    !iRecNum = this%incrementRecnum()
 
-  end function put_next_float_value_fn
+  end subroutine put_next_float_value_sub
 
 !--------------------------------------------------------------------
 
-  function put_next_double_value_fn(this, dValue)   result(iRecNum)
+  subroutine put_next_double_value_sub(this, dValue)
 
-    class (T_DATA_COLUMN), intent(inout)   :: this
+    class (DATA_COLUMN_T), intent(inout)   :: this
     real (kind=c_double), intent(in)       :: dValue
+
+    ! [ LOCALS ]
     integer (kind=c_int)                   :: iRecNum
 
     !iRecNum = this%currentRecnum()
     iRecNum = this%incrementRecnum()
     this%dData(iRecNum) = dValue
 
-  end function put_next_double_value_fn
+  end subroutine put_next_double_value_sub 
 
 !--------------------------------------------------------------------
 
-  function put_next_datetime_value_fn(this, sDatetime)   result(iRecNum)
+  subroutine put_next_datetime_or_string_value_sub(this, sString)   
 
-    class (T_DATA_COLUMN), intent(inout)            :: this
-    character (len=*), intent(in)                   :: sDatetime
-    integer (kind=c_int)                            :: iRecNum
+    class (DATA_COLUMN_T), intent(inout)            :: this
+    character (len=*), intent(in)                   :: sString
 
     ! [ LOCALS ]
+    integer (kind=c_int)                   :: iRecNum
     type (T_DATETIME), pointer :: pDT
 
-!    iRecNum = this%currentRecnum()
     iRecNum = this%incrementRecnum()
-    pDT => this%pDatetime(iRecNum)
-    call pDT%parseDate( sDatetime ) 
-!    iRecNum = this%incrementRecnum()
 
-  end function put_next_datetime_value_fn
+    select case (this%iDataType)
 
-!--------------------------------------------------------------------
+      case (DATETIME_DATA)
 
-  function put_next_date_value_fn(this, sDate)   result(iRecNum)
+        pDT => this%pDatetime(iRecNum)
+        call pDT%parseDate( sString ) 
 
-    class (T_DATA_COLUMN), intent(inout)        :: this
-    character (len=*), intent(in)               :: sDate
-    integer (kind=c_int)                        :: iRecNum
+      case (DATE_DATA)
 
-    ! [ LOCALS ]
-    type (T_DATETIME), pointer :: pDate
+        pDT => this%pDatetime(iRecNum)
+        call pDT%parseDate( sString ) 
 
- !   iRecNum = this%currentRecnum()
-    iRecNum = this%incrementRecnum()
-    pDate => this%pDatetime(iRecNum)
-    call pDate%parseDate( sDate ) 
+      case (TIME_DATA)
 
-  end function put_next_date_value_fn
+        pDT => this%pDatetime(iRecNum)
+        call pDT%parseTime( sString ) 
 
-!--------------------------------------------------------------------
+      case (STRING_DATA)
+      
+        !> unlike all of the other data types, the string list isn't dependent on the value of iRecNum
+        iRecNum = this%incrementRecnum()
+        call this%stData%append( sString )   
 
-  function put_next_time_value_fn(this, sTime)   result(iRecNum)
+      case default
 
-    class (T_DATA_COLUMN), intent(inout)        :: this
-    character (len=*), intent(in)               :: sTime
-    integer (kind=c_int)                        :: iRecNum
+        call die("Internal error: unhandled option in case select statement", __FILE__, __LINE__)
 
-    ! [ LOCALS ]
-    type (T_DATETIME), pointer :: pTime
+    end select  
 
-    iRecNum = this%currentRecnum()
-    pTime => this%pDatetime(iRecNum)
-    call pTime%parseTime( sTime ) 
-
-  end function put_next_time_value_fn
+  end subroutine put_next_datetime_or_string_value_sub
 
 !--------------------------------------------------------------------
 
-  function put_next_string_value_fn(this, sString)   result(iRecNum)
+  subroutine put_next_string_value_sub(this, sString)
 
-    class (T_DATA_COLUMN), intent(inout)   :: this
+    class (DATA_COLUMN_T), intent(inout)   :: this
     character (len=*)                      :: sString
+
+    ! [ LOCALS ]
     integer (kind=c_int)                   :: iRecNum
 
-    iRecNum = this%currentRecnum()
-    call this%stData%append(sString)
+    !> unlike all of the other data types, the string list isn't dependent on the value of iRecNum
     iRecNum = this%incrementRecnum()
+    call this%stData%append(sString)
 
-  end function put_next_string_value_fn
+  end subroutine put_next_string_value_sub
 
 !--------------------------------------------------------------------
 
   function return_current_record_number_fn(this)     result(iRecNum)
 
-    class (T_DATA_COLUMN), intent(in)   :: this
+    class (DATA_COLUMN_T), intent(in)   :: this
     integer (kind=c_int)                :: iRecNum
 
     iRecNum = this%iCurrentRecord
@@ -580,7 +731,7 @@ contains
 
   function increment_current_record_number_fn(this, iIncrementAmt)  result(iRecNum)
 
-    class (T_DATA_COLUMN), intent(inout)   :: this
+    class (DATA_COLUMN_T), intent(inout)   :: this
     integer (kind=c_int), optional         :: iIncrementAmt
     integer (kind=c_int)                   :: iRecNum
 
@@ -602,7 +753,7 @@ contains
 
   subroutine set_data_type_sub(this, iDataType)
 
-    class (T_DATA_COLUMN), intent(inout) :: this
+    class (DATA_COLUMN_T), intent(inout) :: this
     integer (kind=c_int), intent(in)     :: iDataType 
 
     this%iDataType = iDataType
@@ -613,7 +764,7 @@ contains
 
   function return_data_type_fn(this)    result(iDataType)
 
-    class (T_DATA_COLUMN), intent(in) :: this
+    class (DATA_COLUMN_T), intent(in) :: this
     integer (kind=c_int)              :: iDataType
 
     iDataType = this%iDataType
@@ -624,7 +775,7 @@ contains
 
   function sum_of_column_elements_fn(this, lMask) result(dSum)
 
-    class(T_DATA_COLUMN), intent(in) :: this
+    class(DATA_COLUMN_T), intent(in) :: this
     logical (kind=c_bool), intent(in), optional :: lMask(:)    
     real (kind=c_double) :: dSum
 
@@ -666,7 +817,7 @@ contains
 
   function mean_of_column_elements_fn(this, lMask) result(dMean)
 
-    class(T_DATA_COLUMN), intent(in) :: this
+    class(DATA_COLUMN_T), intent(in) :: this
     logical (kind=c_bool), intent(in), optional :: lMask(:)    
     real (kind=c_double) :: dMean
 
@@ -708,7 +859,7 @@ contains
 
   function min_of_column_elements_fn(this, lMask) result(dMin)
 
-    class(T_DATA_COLUMN), intent(in) :: this
+    class(DATA_COLUMN_T), intent(in) :: this
     logical (kind=c_bool), intent(in), optional :: lMask(:)    
     real (kind=c_double) :: dMin
 
@@ -758,7 +909,7 @@ contains
 
   function max_of_column_elements_fn(this, lMask) result(dMax)
 
-    class(T_DATA_COLUMN), intent(in) :: this
+    class(DATA_COLUMN_T), intent(in) :: this
     logical (kind=c_bool), intent(in), optional :: lMask(:)
     real (kind=c_double) :: dMax
 
@@ -808,7 +959,7 @@ contains
 
   function count_of_column_elements_fn(this, lMask) result(dCount)
 
-    class(T_DATA_COLUMN), intent(in) :: this
+    class(DATA_COLUMN_T), intent(in) :: this
     logical (kind=c_bool), intent(in), optional :: lMask(:)
     real (kind=c_double) :: dCount  
 
@@ -829,7 +980,7 @@ contains
 
   subroutine create_new_column_sub(this, iDataType, iCount)
 
-    class (T_DATA_COLUMN) :: this
+    class (DATA_COLUMN_T) :: this
     integer (kind=c_int), intent(in) :: iDataType
     integer (kind=c_int),intent(in)  :: iCount
 
@@ -880,7 +1031,7 @@ contains
 
   function get_all_column_values_as_float_fn(this)  result(rValues)
 
-    class (T_DATA_COLUMN)                   :: this
+    class (DATA_COLUMN_T)                   :: this
     real (kind=c_float), allocatable        :: rValues(:)
 
     if ( this%iDataType == STRING_DATA ) then
@@ -899,7 +1050,7 @@ contains
 
   function get_all_column_values_as_int_fn(this)  result(iValues)
 
-    class (T_DATA_COLUMN)                   :: this
+    class (DATA_COLUMN_T)                   :: this
     real (kind=c_float), allocatable        :: iValues(:)
 
     if ( this%iDataType == STRING_DATA ) then

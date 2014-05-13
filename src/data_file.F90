@@ -20,7 +20,9 @@ module data_file
     integer (kind=c_int)            :: iCurrentLinenum = 0
     integer (kind=c_int)            :: iNumberOfLines = 0
     integer (kind=c_int)            :: iNumberOfRecords = 0
+    integer (kind=c_int)            :: iNumberOfHeaderLines = 1
     logical (kind=c_bool)           :: lIsOpen = lFALSE
+    logical (kind=c_bool)           :: lEOF = lFALSE
     integer (kind=c_int)            :: iUnitNum
     integer (kind=c_int)            :: iStat
     character (len=MAX_STR_LEN)     :: sBuf
@@ -38,6 +40,9 @@ module data_file
 
     procedure, private :: is_file_open_fn
     generic :: isOpen => is_file_open_fn
+
+    procedure, private :: have_we_reached_the_EOF_fn
+    generic :: isEOF => have_we_reached_the_EOF_fn
 
     procedure, private :: does_file_exist_fn
     generic :: exists => does_file_exist_fn
@@ -87,7 +92,7 @@ contains
   end function return_num_lines_fn
 
 
-  function return_num_records_fn(this)    result(iNumRecords)
+  function return_num_records_fn(this)                 result(iNumRecords)
 
     class (DATA_FILE_T)   :: this
     integer (kind=c_int) :: iNumRecords
@@ -97,7 +102,7 @@ contains
   end function return_num_records_fn
 
 
-  function return_current_linenum_fn(this)    result(iCurrentLinenum)
+  function return_current_linenum_fn(this)          result(iCurrentLinenum)
 
     class (DATA_FILE_T)   :: this
     integer (kind=c_int) :: iCurrentLinenum
@@ -106,7 +111,17 @@ contains
 
   end function return_current_linenum_fn
 
-  function is_current_line_a_comment_fn(this)      result(lIsComment)
+  function have_we_reached_the_EOF_fn(this)           result(lIsEOF)
+
+    class (DATA_FILE_T)     :: this
+    logical (kind=c_bool)   :: lIsEOF
+
+    lIsEOF = this%lEOF
+
+  end function have_we_reached_the_EOF_fn  
+
+
+  function is_current_line_a_comment_fn(this)         result(lIsComment)
 
     class (DATA_FILE_T)     :: this
     logical (kind=c_bool)   :: lIsComment
@@ -124,12 +139,12 @@ contains
     else
       sBufTemp = this%sBuf(1:32)  
     endif  
-    
-    iIndex = scan( adjustl(sBufTemp) , this%sCommentChars )
+
+    iIndex = index( adjustl(sBufTemp) , this%sCommentChars )
     
     lIsComment = lFALSE
 
-    if (iIndex == 1 ) lIsComment = lTRUE
+    if ( iIndex == 1 .or. len_trim(this%sBuf) == 0 ) lIsComment = lTRUE
         
   end function is_current_line_a_comment_fn  
 
@@ -152,12 +167,13 @@ contains
       call assert(this%iStat == 0, "Failed to open file "//dquote(sFilename)//".", __FILE__, __LINE__)
 
       if (this%iStat == 0) this%lIsOpen = lTRUE
+      this%lEOF = lFALSE
 
       call this%countLines()
 
-      write(*, fmt="(/,10x, a)") "Opened file "//dquote(sFilename)
-      write(*, fmt="(a50, i8)") "Number of lines in file: ", this%numLines()
-      write(*, fmt="(a50, i8)") "Number of lines excluding blanks and comments: ", this%numRecords()
+      write(*, fmt="(/,15x, a)") "Opened file "//dquote(sFilename)
+      write(*, fmt="(a60, i8)") "Number of lines in file: ", this%numLines()
+      write(*, fmt="(a60, i8)") "Number of lines excluding blanks, headers and comments: ", this%numRecords()
 
     else
 
@@ -179,6 +195,8 @@ contains
       call assert(this%iStat == 0, "Failed to open file "//dquote(sFilename)//".", __FILE__, __LINE__)
 
       if (this%iStat == 0) this%lIsOpen = lTRUE
+
+      this%lEOF = lFALSE
 
       write(*, fmt="(/,10x, a)") "Opened file "//dquote(sFilename)
    
@@ -247,21 +265,18 @@ contains
 
         read (unit = this%iUnitNum, fmt="(a)", iostat = iStat)  this%sBuf
 
-        print *, this%iUnitNum, iNumLines, iStat
-        print *, dquote( trim(this%sBuf) ) 
+        if (iStat == IOSTAT_END) exit
 
         iNumLines = iNumLines + 1
 
         if ( .not. this%isComment() )   iNumRecords = iNumRecords + 1
-
-        if (iStat == IOSTAT_END) exit
 
       enddo
 
       rewind( unit = this%iUnitNum )
 
       this%iNumberOfLines= iNumLines
-      this%iNumberOfRecords = iNumRecords
+      this%iNumberOfRecords = iNumRecords - this%iNumberOfHeaderLines
 
     endif
 
@@ -285,7 +300,6 @@ contains
     do while( lIsComment )
 
       this%sBuf = this%readline()
-      this%iCurrentLinenum = this%iCurrentLinenum + 1
       lIsComment = this%isComment()
 
     enddo
@@ -316,12 +330,14 @@ contains
     if (this%isOpen() ) then
 
       read (unit = this%iUnitNum, fmt = "(a)", iostat = iStat) this%sBuf
-      sText = trim(this%sBuf)
-
-      this%iCurrentLinenum = this%iCurrentLinenum + 1
 
       if (iStat == IOSTAT_END) then
+        this%lEOF = lTRUE
+        sText = ""
         call this%close()
+      else
+        sText = trim(this%sBuf)
+        this%iCurrentLinenum = this%iCurrentLinenum + 1
       endif
 
     endif

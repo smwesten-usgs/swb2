@@ -33,6 +33,7 @@ module constants_and_conversions
   integer(kind=c_int), parameter     :: iBIGVAL = HUGE(0_c_int)
   real (kind=c_float), parameter     :: rTINYVAL = -(HUGE(0_c_float) - 1)
   real (kind=c_double), parameter    :: dTINYVAL = -(HUGE(0_c_double) - 1)  
+  real (kind=c_float), parameter     :: fTINYVAL = -(HUGE(0_c_float) - 1)
   integer(kind=c_int), parameter     :: iTINYVAL = -(HUGE(0_c_int) - 1)
   real (kind=c_float), parameter     :: rFREEZING = 32_c_float
   real (kind=c_double), parameter    :: dFREEZING = 32_c_double
@@ -341,8 +342,24 @@ function char2int(sValue)  result(iValue)
 
   ! [ LOCALS ]
   integer (kind=c_int) :: iStat
+  character (len=len_trim(sValue)) :: sTempVal 
+  real (kind=c_float)  :: rValue
 
-  read(UNIT=sValue,FMT=*, iostat=iStat) iValue
+  sTempVal = keepnumeric(sValue)  
+
+  ! if the cleaned up string appears to be a real value, 
+  ! attempt to read as real and convert to int
+  if ( scan(sTempVal, ".") /= 0 ) then
+
+    read(unit=sTempVal, fmt=*, iostat=iStat) rValue
+
+    if (iStat == 0)  iValue = int(rValue, kind=c_int)
+
+  else  
+
+    read(unit=sTempVal, fmt=*, iostat=iStat) iValue
+
+  endif
 
   if (iStat /= 0)  iValue = iTINYVAL
 
@@ -380,7 +397,12 @@ function char2real(sValue)  result(rValue)
   character (len=*) :: sValue
   real (kind=c_float) :: rValue
 
-  read(UNIT=sValue,FMT=*) rValue
+  ! [ LOCALS ]
+  integer (kind=c_int) :: iStat
+
+  read(unit=sValue, fmt=*, iostat=iStat) rValue
+
+  if (iStat /= 0) rValue = rTINYVAL
 
 end function char2real
 
@@ -416,7 +438,12 @@ function char2dbl(sValue)  result(dValue)
   character (len=*)    :: sValue
   real (kind=c_double) :: dValue
 
-  read(UNIT=sValue,FMT=*) dValue
+  ! [ LOCALS ]
+  integer (kind=c_int) :: iStat
+
+  read(unit=sValue, fmt=*, iostat=iStat) dValue
+
+  if (iStat /= 0)  dValue = dTINYVAL
 
 end function char2dbl
 
@@ -516,6 +543,47 @@ elemental function fortran_to_c_string( sText )  result(cCharacterString)
   endif
 
 end function fortran_to_c_string
+
+  !> Strip everything except numeric characters from a text string.
+  !!
+  !! Keep only the numeric characters in a text string.
+  !! @param[in] sTextIn
+  function keepnumeric(sText1)            result(sText)
+
+    ! ARGUMENTS
+    character (len=*), intent(inout)           :: sText1
+    character (len=:), allocatable :: sText
+
+    ! LOCALS
+    character (len=512)            :: sBuf
+    integer (kind=c_int)           :: iR                 ! Index in sRecord
+    integer (kind=c_int)           :: iIndex1, iIndex2
+    character (len=:), allocatable :: sTargetCharacters_
+
+    ! TargetCharacter omits the period ("."): don't want a real value returned
+    ! as a funky integer (e.g. string "3.141" returned as integer 3141 )
+    sTargetCharacters_ = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM" &
+      //"!@#$%^&*()_+-={}[]|\:;'<,>?/~`'"//sDOUBLE_QUOTE
+
+    ! eliminate any leading spaces
+    sText1 = adjustl(sText1)
+    sBuf = ""
+    iIndex2 = 0
+
+    do iIndex1 = 1,len_trim(sText1)
+
+      iR = SCAN(sText1(iIndex1:iIndex1), sTargetCharacters_)
+  
+      if(iR==0) then
+        iIndex2 = iIndex2 + 1
+        sBuf(iIndex2:iIndex2) = sText1(iIndex1:iIndex1)
+      end if
+
+    enddo
+
+    sText = trim(sBuf)
+
+  end function keepnumeric
 
 
 end module constants_and_conversions

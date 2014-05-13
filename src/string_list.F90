@@ -35,11 +35,13 @@ module string_list
     procedure :: list_items_deallocate_all_sub
     procedure :: list_return_all_as_float_fn
     procedure :: list_return_all_as_int_fn
+    procedure :: list_subset_partial_matches_fn
 
     generic :: append => list_append_string_sub, &
                          list_append_int_sub
     generic :: get => list_get_value_at_index_fn
     generic :: print => list_print_sub
+    generic :: grep => list_subset_partial_matches_fn
     generic :: which => list_return_position_of_matching_string_fn
     generic :: countmatching => list_return_count_of_matching_string_fn
     generic :: deallocate => list_items_deallocate_all_sub
@@ -71,19 +73,25 @@ contains
 
     ! [ LOCALS ] 
     class (STRING_LIST_ELEMENT_T), pointer   :: pNewElement => null()
+    class (STRING_LIST_ELEMENT_T), pointer   :: pOldLastElement => null()
     integer (kind=c_int)                     :: iStat
 
     allocate(pNewElement, stat=iStat)  
     call assert(iStat == 0, "There was a problem allocating memory for a new string list element", &
       __FILE__, __LINE__)
 
-    pNewElement%s    = sText
+    pNewElement%s    = trim(sText)
     pNewElement%next => null()
 
-    if (associated( this%last ) ) then
+    if (associated( this%first ) ) then
 
-      this%last%next => pNewElement
+      if (this%count == 0)  call die("Internal logic error: count should *not* be zero in this block", &
+             __FILE__, __LINE__)
+
+      pOldLastElement => this%last
+      pOldLastElement%next => pNewElement
       this%last      => pNewElement
+      this%last%next => null()
 
     else
     
@@ -114,7 +122,7 @@ contains
 
     if (iIndex > 0 .and. iIndex <= this%count .and. associated( current ) ) then
 
-      do while ( associated( current%next) )
+      do while ( associated( current ) .and. iCount < this%count )
 
         iCount = iCount + 1
 
@@ -124,11 +132,19 @@ contains
 
       enddo
     
-      sText = current%s
+      if (associated(current) ) then
+        sText = current%s
+      else
+        sText = "<NA>"
+        call warn("Internal logic error: should never be able to execute this part of block", &
+          __FILE__, __LINE__ )
+      endif  
 
     else
 
       sText = "<NA>"
+      call warn("Internal logic error: Index out of bounds or unassociated pointer", &
+          __FILE__, __LINE__ )
 
     endif  
 
@@ -147,6 +163,7 @@ contains
     ! [ LOCALS ]
     class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
     integer (kind=c_int)                      :: iLU_
+    integer (kind=c_int)                      :: iCount
 
     if (present(iLU) ) then
       iLU_ = iLU
@@ -155,8 +172,11 @@ contains
     endif
       
     current => this%first
+    iCount = 0
 
-    do while ( associated( current ) )
+    do while ( associated( current ) .and. iCount < this%count )
+
+      iCount = iCount + 1
 
       write(iLU_, fmt="(a)") current%s
 
@@ -178,7 +198,7 @@ contains
     integer (kind=c_int)                      :: iStat
     integer (kind=c_int)                      :: iIndex
 
-    allocate( rValues(this%count ), stat=iStat )
+    allocate( rValues( 1:this%count ), stat=iStat )
     if (iStat /= 0)  call die("Failed to allocate memory for list conversion", __FILE__, __LINE__)
 
     current => this%first
@@ -251,7 +271,42 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function list_return_position_of_matching_string_fn(this, sChar)     result(iResult)
+  function list_return_count_of_matching_string_fn(this, sChar) result(iCount)
+
+    class (STRING_LIST_T), intent(in) :: this
+    character (len=*), intent(in) :: sChar
+    integer (kind=c_int) :: iCount
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iIndex
+    integer (kind=c_int) :: iStat
+    integer (kind=c_int) :: iRetVal
+    integer (kind=c_int), dimension(this%count) :: iTempResult
+    type (STRING_LIST_ELEMENT_T), pointer :: current => null()
+
+    iCount = 0
+    iIndex = 0
+
+    current => this%first
+
+    do while ( associated(current) .and. iCount < this%count )
+
+      iIndex = iIndex + 1
+
+      if ( (current%s .strequal. sChar) .or. index(current%s, sChar) /=0 ) then
+        iCount = iCount + 1
+        iTempResult(iCount) = iIndex
+      endif
+
+      current => current%next
+
+    enddo
+
+  end function list_return_count_of_matching_string_fn
+
+!--------------------------------------------------------------------------------------------------
+
+ function list_return_position_of_matching_string_fn(this, sChar)     result(iResult)
 
     class (STRING_LIST_T), intent(in)                    :: this
     character (len=*), intent(in)                        :: sChar
@@ -266,14 +321,15 @@ contains
     type (STRING_LIST_ELEMENT_T), pointer   :: current => null()
 
     iIndex = 0
+    iCount = 0
 
     current => this%first
 
-    do while ( associated(current) )
+    do while ( associated(current) .and. iIndex < this%count )
 
       iIndex = iIndex + 1
 
-      if ( current%s .strequal. sChar ) then
+      if ( (current%s .strequal. sChar) .or. index(current%s, sChar) /=0 ) then
         iCount = iCount + 1
         iTempResult(iCount) = iIndex
       endif
@@ -302,16 +358,20 @@ contains
 
 
 
-  function list_return_count_of_matching_string_fn(this, sChar)     result(iCount)
+
+
+
+  function list_subset_partial_matches_fn(this, sChar)     result(newList)
 
     class (STRING_LIST_T), intent(in)                    :: this
     character (len=*), intent(in)                        :: sChar
-    integer (kind=c_int)                                 :: iCount
+    type (STRING_LIST_T)                                 :: newList
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iIndex
     integer (kind=c_int) :: iStat
     integer (kind=c_int) :: iRetVal
+    integer (kind=c_int) :: iCount
     integer (kind=c_int), dimension(this%count) :: iTempResult
     type (STRING_LIST_ELEMENT_T), pointer   :: current => null()
 
@@ -319,11 +379,12 @@ contains
 
     current => this%first
 
-    do while ( associated(current) )
+    do while ( associated(current) .and. iCount < this%count )
     
-      if ( current%s .strequal. sChar ) then
+      if ( (current%s .strequal. sChar) .or. (current%s .contains. sChar) ) then
+
         iCount = iCount + 1
-        iTempResult(iCount) = iIndex
+        call newList%append(current%s)
 
       endif
 
@@ -331,12 +392,7 @@ contains
 
     enddo  
 
-  end function list_return_count_of_matching_string_fn
-
-
-
-
-
+  end function list_subset_partial_matches_fn
 
 
 

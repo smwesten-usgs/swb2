@@ -18,16 +18,17 @@ module data_frame
 
   type DATA_FRAME_T
 
+    character (len=:), allocatable                           :: s
     integer (kind=c_int), allocatable                        :: iDataTypes(:)
     type (STRING_LIST_T)                                     :: slColNames
     logical (kind=c_bool), dimension(:), allocatable         :: lMask
-    type (T_DATA_COLUMN_PTR), allocatable                    :: columns(:)
+    type (DATA_COLUMN_T_PTR), allocatable                    :: columns(:)
     logical (kind=c_bool)                                    :: lHasDate = lFALSE
 
   contains
 
     ! procedure :: makeUnique => make_unique_identifier_sub
-    !> take contents of serveral columns and concatenate them to
+    !> take contents of several columns and concatenate them to
     !> create a unique ID (think METALICUS)
 
     procedure :: initialize_data_frame_sub
@@ -74,7 +75,7 @@ contains
     integer (kind=c_int), intent(in), optional     :: iValue2
 
     ! [ LOCALS ]
-    class (T_DATA_COLUMN), pointer :: pColumn
+    class (DATA_COLUMN_T), pointer :: pColumn
 
     pColumn => this%getcol( sColname )
 
@@ -108,7 +109,7 @@ contains
     real (kind=c_float), intent(in), optional      :: fValue2
 
     ! [ LOCALS ]
-    class (T_DATA_COLUMN), pointer :: pColumn
+    class (DATA_COLUMN_T), pointer :: pColumn
 
     pColumn => this%getcol( sColname )
 
@@ -141,7 +142,7 @@ contains
     real (kind=c_double), intent(in), optional     :: dValue2
 
     ! [ LOCALS ]
-    class (T_DATA_COLUMN), pointer :: pColumn
+    class (DATA_COLUMN_T), pointer :: pColumn
    
     pColumn => this%getcol( sColname )
 
@@ -173,7 +174,7 @@ contains
     type (T_DATETIME), intent(in), optional        :: dtValue2
 
     ! [ LOCALS ]
-    class (T_DATA_COLUMN), pointer :: pColumn
+    class (DATA_COLUMN_T), pointer :: pColumn
   
     pColumn => this%getcol( sColname )
 
@@ -206,7 +207,7 @@ contains
     character (len=*), intent(in), optional        :: sValue2
 
     ! [ LOCALS ]
-    class (T_DATA_COLUMN), pointer :: pColumn
+    class (DATA_COLUMN_T), pointer :: pColumn
 
     pColumn => this%getcol( sColname )
     if ( associated(pColumn) ) then
@@ -232,7 +233,7 @@ contains
 
     class (DATA_FRAME_T), intent(in)         :: this
     integer (kind=c_int)                     :: iColNum
-    class (T_DATA_COLUMN), pointer           :: pColumn
+    class (DATA_COLUMN_T), pointer           :: pColumn
 
     pColumn => null()
 
@@ -263,12 +264,14 @@ contains
 
     class (DATA_FRAME_T), intent(in)         :: this
     character (len=*), intent(in)            :: sColName
-    class (T_DATA_COLUMN), pointer           :: pColumn
+    class (DATA_COLUMN_T), pointer           :: pColumn
 
     ! [ LOCALS ]
     integer (kind=c_int), allocatable :: iColNum(:)
 
-    iColNum = this%findcol(sColName)
+    pColumn => null()
+
+    iColNum = this%slColNames%which(sColName)
 
     if (ubound(iColNum,1) > 0) then
 
@@ -294,23 +297,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int) :: iCount
 
-!    iCount = this%slColNames%countmatching(sColName)
-
-
-
-      iColNum = this%slColNames%which(sColName)
-
- !   if (iCount > 0) then
-
-!       allocate(iColNum(iCount))
-!       iColNum = this%slColNames%which(sColName)
-
-!     else
-
-!       allocate(iColNum(1))
-!       iColNum = 0
-
-!     endif
+    iColNum = this%slColNames%which(sColName)
 
   end function find_column_by_name_fn
 
@@ -346,14 +333,14 @@ contains
        this%iDataTypes = iDataTypes_
      endif   
 
-    !> allocate space for the required number of class T_DATA_COLUMN_PTR
+    !> allocate space for the required number of class DATA_COLUMN_T_PTR
     allocate( this%columns( iNumberOfColumns ), stat=iStat )
 
     call assert(iStat==0, "Failed to allocate memory for data frame", __FILE__, __LINE__)
 
     do iIndex = 1, iNumberOfColumns
 
-      allocate( T_DATA_COLUMN :: this%columns(iIndex)%pColumn, stat=iStat )
+      allocate( DATA_COLUMN_T :: this%columns(iIndex)%pColumn, stat=iStat )
       
       associate ( col => this%columns(iIndex)%pColumn )
         call col%new( iDataType = iDataTypes_(iIndex), iCount = iRecordCount )
@@ -407,33 +394,21 @@ contains
           case (INTEGER_DATA)
 
             iValue = asInt(sSubString)
-            iRecnum = col%putval( iValue )
+            call col%put( iValue )
 
           case (FLOAT_DATA)
 
             fValue = asFloat(sSubString)
-            iRecnum = col%putval( fValue )
+            call col%put( fValue )
 
           case (DOUBLE_DATA)
 
             dValue = asDouble(sSubString)
-            iRecnum = col%putval( dValue )
+            call col%put( dValue )
 
-          case (STRING_DATA)
+          case (STRING_DATA, DATETIME_DATA, DATE_DATA, TIME_DATA)
 
-            iRecnum = col%putval( sSubString )
-
-          case (DATETIME_DATA)
-
-            iRecnum = col%putdatetime( sSubstring )
-
-          case (DATE_DATA)
-
-            iRecNum = col%putdate( sSubstring )
-
-          case (TIME_DATA)
-
-            iRecNum = col%puttime( sSubString )
+            call col%put( sSubString )
 
           case default
 
