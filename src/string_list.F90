@@ -80,7 +80,7 @@ contains
     call assert(iStat == 0, "There was a problem allocating memory for a new string list element", &
       __FILE__, __LINE__)
 
-    pNewElement%s    = sText
+    pNewElement%s    = trim(sText)
     pNewElement%next => null()
 
     if (associated( this%first ) ) then

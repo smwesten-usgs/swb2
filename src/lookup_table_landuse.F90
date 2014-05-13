@@ -14,7 +14,6 @@ module table_record_landuse
     integer (kind=c_short) :: iLandUseType
     integer (kind=c_short) :: iSoilsGroup
     character (len=:), allocatable :: sLandUseDescription
-    character (len=:), allocatable :: sAssumedPercentImperviousness
     real (kind=c_float) :: rCN_base
     real (kind=c_float) :: rRootingDepth
     real (kind=c_float) :: rMaxInfiltration
@@ -108,7 +107,11 @@ contains
     integer (kind=c_int) :: iNumberOfSoilGroups
     integer (kind=c_int) :: iCount
     integer (kind=c_int) :: iStat
-    type (T_DATA_COLUMN), pointer         :: pCOL
+    type (DATA_COLUMN_T), pointer         :: pLU
+    type (DATA_COLUMN_T), pointer         :: pCOL
+
+
+    character (len=:), allocatable        :: sBuf 
     real (kind=c_float), allocatable      :: rValues(:)
     integer (kind=c_int), allocatable     :: iValues(:)
     integer (kind=c_int), allocatable     :: iRootingDepthSeqNums(:)
@@ -173,10 +176,10 @@ contains
       if (associated(pCOL) ) then
 
         iCount = pCol%count()
-        fCN(:, iSoilsIndex) = pCOL%getColumnFloatVals()
+        fCN(:, iSoilsIndex) = pCOL%asFloat()
 
-        rValues = pCOL%getColumnFloatVals()
-        fCN(:, iSoilsIndex) = rValues
+        ! rValues = pCOL%asFloat()
+        ! fCN(:, iSoilsIndex) = rValues
 
         print *, "CN VALUES FOR: "//sText
         print *, rValues
@@ -198,7 +201,7 @@ contains
 
         iCount = pCol%count()
 
-        fRZ(:, iSoilsIndex) = pCOL%getColumnFloatVals()
+        fRZ(:, iSoilsIndex) = pCOL%asFloat()
 
         print *, "RZ VALUES FOR: "//sText
         print *, fRZ(:, iSoilsIndex)
@@ -220,7 +223,7 @@ contains
 
         iCount = pCol%count()
 
-        fMaxRecharge(:, iSoilsIndex) = pCOL%getColumnFloatVals()
+        fMaxRecharge(:, iSoilsIndex) = pCOL%asFloat()
 
         print *, "MAXIMUM RECHARGE VALUES FOR: "//sText
         print *, fMaxRecharge(:, iSoilsIndex)
@@ -234,8 +237,9 @@ contains
     !! data structure.
 
     iCount = 0
+    pLU => DF%getcol("LU_Code")
 
-    do iIndex=1, iNumberOfRecords
+    do iLUIndex=1, iNumberOfRecords
 
       do iSoilsIndex=1, iNumberOfSoilGroups
 
@@ -243,8 +247,29 @@ contains
 
         associate( lu => this%data(iCount) )
           
-          pCol => DF%getcol("LU_Code")
-          lu%iLandUseType = iIndex
+          call pLU%get(iLUIndex, lu%iLandUseType )
+          lu%iSoilsGroup = iSoilsIndex
+
+          pCol => DF%getcol("Description")
+          if (associated(pCol) ) then
+            call pCol%get( iLUIndex, sBuf )
+            lu%sLandUseDescription = trim(adjustl(clean(sBuf, '"')))
+          else
+            lu%sLandUseDescription = "NA"
+          endif  
+
+          lu%rCN_base = fCN(iLUIndex, iSoilsIndex)
+          lu%rRootingDepth = fRZ(iLUIndex, iSoilsIndex)
+
+          print *, lu%iLanduseType, lu%iSoilsGroup, lu%sLandUseDescription
+
+        end associate 
+        
+      enddo
+      
+    enddo     
+
+    call pCol%stData%print()
 
   end subroutine map_columns_to_fields_sub  
 

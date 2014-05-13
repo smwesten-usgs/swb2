@@ -11,5 +11,7 @@ program test_landuse_table
   call LU%readfile(sFilename = "LU_lookup_NLCD.txt", sCommentChars = "#", sDelimiters= sTAB)
   call LU%map()
 
+  print *, LU%data%rCN_base
+
   
 end program test_landuse_table
