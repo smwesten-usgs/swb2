@@ -6,12 +6,12 @@ program test_landuse_table
   use lookup_table_landuse
   implicit none
 
-  type (LOOKUP_TABLE_T) :: LU
+  type (LOOKUP_TABLE_LANDUSE_T) :: LU
 
   call LU%readfile(sFilename = "LU_lookup_NLCD.txt", sCommentChars = "#", sDelimiters= sTAB)
   call LU%map()
 
-  print *, LU%data%rCN_base
+  call LU%data%
 
   
 end program test_landuse_table

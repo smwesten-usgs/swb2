@@ -4,25 +4,6 @@
 !! run SWB. Note that the design is such that it should be possible to run the 
 !! basic checks separately from the actual SWB program execution. It would be
 !! nice to generalize this code somehow. 
-module table_record_landuse
-
-  use iso_c_binding, only : c_short, c_float
-  implicit none
-
-  type, public :: TABLE_RECORD_LANDUSE_T
-
-    integer (kind=c_short) :: iLandUseType
-    integer (kind=c_short) :: iSoilsGroup
-    character (len=:), allocatable :: sLandUseDescription
-    real (kind=c_float) :: rCN_base
-    real (kind=c_float) :: rRootingDepth
-    real (kind=c_float) :: rMaxInfiltration
-    real (kind=c_float) :: rIntercept_GrowingSeason
-    real (kind=c_float) :: rIntercept_NonGrowingSeason
-
-  end type TABLE_RECORD_LANDUSE_T
-
-end module table_record_landuse
 
 module lookup_table_landuse
 
@@ -31,7 +12,7 @@ module lookup_table_landuse
   use data_file
   use data_column
   use data_frame
-  use constants_and_conversions, only : sTAB, lFALSE, lTRUE
+  use constants_and_conversions, only : sTAB, lFALSE, lTRUE, rTINYVAL
   use strings
   use string_list
   use types_new
@@ -40,9 +21,23 @@ module lookup_table_landuse
 
   private
 
-  type, public :: LOOKUP_TABLE_T
+  type, public :: TABLE_RECORD_LANDUSE_T
 
-    type (LOOKUP_TABLE_DATA_T), allocatable    :: data(:)
+    integer (kind=c_short) :: iLandUseType
+    integer (kind=c_short) :: iSoilsGroup
+    character (len=:), allocatable :: sLandUseDescription
+    real (kind=c_float) :: rCN_base
+    real (kind=c_float) :: rRootingDepth
+    real (kind=c_float) :: rMaxRecharge
+    real (kind=c_float) :: rIntercept_GrowingSeason
+    real (kind=c_float) :: rIntercept_NonGrowingSeason
+
+  end type TABLE_RECORD_LANDUSE_T
+
+
+  type, public :: LOOKUP_TABLE_LANDUSE_T
+
+    type (TABLE_RECORD_LANDUSE_T), pointer    :: data(:) => null()
     
   contains
 
@@ -52,7 +47,7 @@ module lookup_table_landuse
     procedure :: map_columns_to_fields_sub
     generic :: map => map_columns_to_fields_sub
 
-  end type LOOKUP_TABLE_T
+  end type LOOKUP_TABLE_LANDUSE_T
 
   type (DATA_FRAME_T) :: DF
   type (DATA_FILE_T)  :: FILE
@@ -63,7 +58,7 @@ contains
 
   subroutine read_lookup_table_sub(this, sFilename, sCommentChars, sDelimiters)
 
-    class (LOOKUP_TABLE_T) :: this
+    class (LOOKUP_TABLE_LANDUSE_T) :: this
     character (len=*), intent(in)  :: sFilename
     character (len=*), intent(in)  :: sCommentChars
     character (len=*), intent(in)  :: sDelimiters
@@ -80,10 +75,11 @@ contains
 
     iCount = FILE%slColNames%count
 
+    !> Set up a local data structure to hold the raw table data
     call DF%initialize( slColNames=FILE%slColNames, &
         iRecordCount = FILE%iNumberOfRecords )
 
-
+    !> Read in the table values line by line
     do while ( .not. FILE%isEOF() )
 
       sBuf = FILE%readLine()
@@ -98,7 +94,7 @@ contains
 
   subroutine map_columns_to_fields_sub(this)
 
-    class (LOOKUP_TABLE_T)  :: this
+    class (LOOKUP_TABLE_LANDUSE_T)  :: this
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iLUIndex 
@@ -109,6 +105,8 @@ contains
     integer (kind=c_int) :: iStat
     type (DATA_COLUMN_T), pointer         :: pLU
     type (DATA_COLUMN_T), pointer         :: pCOL
+    type (DATA_COLUMN_T), pointer         :: pInterception_grow
+    type (DATA_COLUMN_T), pointer         :: pInterception_nongrow
 
 
     character (len=:), allocatable        :: sBuf 
@@ -128,13 +126,18 @@ contains
     real (kind=c_float), allocatable      :: fMaxRecharge(:,:)  
     character (len=:), allocatable        :: sText
 
-    character (len=64), allocatable :: sLandUseDescription(:)
-    character (len=16), allocatable :: sAssumedPercentImperviousness(:)
+    character (len=64), allocatable  :: sLandUseDescription(:)
+    character (len=16), allocatable  :: sAssumedPercentImperviousness(:)
     real (kind=c_float), allocatable :: rMaxInfiltration(:)
     real (kind=c_float), allocatable :: rIntercept_GrowingSeason(:)
     real (kind=c_float), allocatable :: rIntercept_NonGrowingSeason(:)
 
     iNumberOfRecords = FILE%iNumberOfRecords
+
+    pLU => null()
+    pCol => null()
+    pInterception_grow => null()
+    pInterception_nongrow => null()
 
     !> First task: figure out how many soil groups are in the table
     !! To do this, assume that user has logically named the rooting depths with
@@ -160,9 +163,12 @@ contains
 
     iNumberOfSoilGroups = iNumberOfRootingDepthColumns
 
-    if (.not. allocated( this%data) ) then
+    if (.not. associated( this%data) ) then
       allocate( this%data( iNumberOfRecords * iNumberOfSoilGroups ), stat=iStat)
       if( iStat /= 0)  call die("Failed to allocate memory for data table.", __FILE__, __LINE__)
+    else
+      call die("Data table already allocated", __FILE__, __LINE__)
+
     endif        
 
     allocate( fCN( iNumberOfRecords, iNumberOfSoilGroups), stat=iStat)
@@ -179,10 +185,10 @@ contains
         fCN(:, iSoilsIndex) = pCOL%asFloat()
 
         ! rValues = pCOL%asFloat()
-        ! fCN(:, iSoilsIndex) = rValues
+        !fCN(:, iSoilsIndex) = rValues
 
         print *, "CN VALUES FOR: "//sText
-        print *, rValues
+        print *, fCN(:, iSoilsIndex)
 
       endif  
 
@@ -238,6 +244,8 @@ contains
 
     iCount = 0
     pLU => DF%getcol("LU_Code")
+    pInterception_grow => DF%getcol("Interception_growing")
+    pInterception_nongrow => DF%getcol("Interception_nongrowing")
 
     do iLUIndex=1, iNumberOfRecords
 
@@ -258,10 +266,21 @@ contains
             lu%sLandUseDescription = "NA"
           endif  
 
-          lu%rCN_base = fCN(iLUIndex, iSoilsIndex)
-          lu%rRootingDepth = fRZ(iLUIndex, iSoilsIndex)
+          lu%rCN_base = fCN( iLUIndex, iSoilsIndex )
+          lu%rRootingDepth = fRZ( iLUIndex, iSoilsIndex )
+          lu%rMaxRecharge = fMaxRecharge( iLUIndex, iSoilsIndex )
 
-          print *, lu%iLanduseType, lu%iSoilsGroup, lu%sLandUseDescription
+          if (associated(pInterception_grow) ) then
+            call pInterception_grow%get(iLUIndex, lu%rIntercept_GrowingSeason)
+          else
+            lu%rIntercept_GrowingSeason = rTINYVAL
+          endif
+              
+          if (associated(pInterception_nongrow) ) then
+            call pInterception_grow%get(iLUIndex, lu%rIntercept_NonGrowingSeason)
+          else
+            lu%rIntercept_NonGrowingSeason = rTINYVAL
+          endif
 
         end associate 
         
@@ -269,9 +288,40 @@ contains
       
     enddo     
 
-    call pCol%stData%print()
-
   end subroutine map_columns_to_fields_sub  
 
+
+  function get_pointer_fn(this, iLanduseType, iSoilsGroup)   result(pRec)
+
+    class (LOOKUP_TABLE_LANDUSE_T)           :: this
+    integer (kind=c_int)                     :: iLandUseType
+    integer (kind=c_int)                     :: iSoilsGroup
+    type (TABLE_RECORD_LANDUSE_T), pointer   :: pRec
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iIndex
+
+    pRec => null()
+
+    do iIndex = 1, uBound(this%data, 1)
+      associate ( rec => this%data(iIndex) )
+        
+        if ( (rec%iLanduseType == iLanduseType) .and. (rec%iSoilsGroup == iSoilsGroup) ) then
+          pRec => this%data(iIndex)
+          exit
+        endif
+
+      end associate
+
+    enddo 
+
+    if ( .not. associated( pRec ) ) &
+      call warn( sMessage = "Failed to find a landuse table entry corresponding to landuse code "     &
+        //asCharacter(iLanduseType)//" and soils group "//asCharacter(iSoilsGroup),               &
+        lFatal = lTRUE, sHints = "Make sure that a landuse table entry exists for all combinations " &
+        //"of landuse and soil type values found in the input grids.") 
+
+
+  end function get_pointer_fn
 
 end module lookup_table_landuse  
