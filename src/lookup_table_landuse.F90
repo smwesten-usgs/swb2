@@ -47,6 +47,9 @@ module lookup_table_landuse
     procedure :: map_columns_to_fields_sub
     generic :: map => map_columns_to_fields_sub
 
+    procedure :: get_pointer_fn
+    generic :: getpointer => get_pointer_fn
+
   end type LOOKUP_TABLE_LANDUSE_T
 
   type (DATA_FRAME_T) :: DF

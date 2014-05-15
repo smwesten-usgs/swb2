@@ -7,11 +7,12 @@ program test_landuse_table
   implicit none
 
   type (LOOKUP_TABLE_LANDUSE_T) :: LU
+  type (TABLE_RECORD_LANDUSE_T), pointer :: pLUrec
 
   call LU%readfile(sFilename = "LU_lookup_NLCD.txt", sCommentChars = "#", sDelimiters= sTAB)
   call LU%map()
 
-  call LU%data%
+  pLUrec => LU%getpointer(iLanduseType=22, iSoilsGroup=3)
 
   
 end program test_landuse_table
