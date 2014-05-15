@@ -12,7 +12,7 @@ program test_landuse_table
   call LU%readfile(sFilename = "LU_lookup_NLCD.txt", sCommentChars = "#", sDelimiters= sTAB)
   call LU%map()
 
-  pLUrec => LU%getpointer(iLanduseType=22, iSoilsGroup=3)
+  pLUrec => LU%getpointer(iLanduseCode=22, iSoilsGroup=3)
 
   
 end program test_landuse_table

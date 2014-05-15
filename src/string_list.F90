@@ -401,8 +401,6 @@ contains
     class (STRING_LIST_T), intent(inout) :: this
     
     ! [ LOCALS ]
-    integer (kind=c_int) :: iIndex
-    integer (kind=c_int) :: iStat
     type (STRING_LIST_ELEMENT_T), pointer :: current => null()
     type (STRING_LIST_ELEMENT_T), pointer :: toremove => null()
 

@@ -1,6 +1,6 @@
 
 !> Type controlling how the landuse table is read in, parsed, checked for basic
-!! range violations, and ultimately used to populate the data structure used to 
+!! range violations, and ultimately used to populate the table structure used to 
 !! run SWB. Note that the design is such that it should be possible to run the 
 !! basic checks separately from the actual SWB program execution. It would be
 !! nice to generalize this code somehow. 
@@ -21,23 +21,30 @@ module lookup_table_landuse
 
   private
 
+  !> enumerated constants for working with LANDUSE LOOKUP TABLE objects
+  enum, bind(c)
+    enumerator :: LU_LANDUSE_CODE = 1, LU_SOILS_GROUP = 2
+  end enum
+
+  !> enumerated constants for working with LANDUSE LOOKUP TABLE objects
+  enum, bind(c)
+    enumerator :: LU_CN_BASE = 1, LU_ROOTING_DEPTH = 2, LU_MAX_RECHARGE = 3,   &
+                  LU_INTERCEPTION_GROW = 4, LU_INTERCEPTION_NONGROW = 5
+  end enum
+
+
   type, public :: TABLE_RECORD_LANDUSE_T
 
-    integer (kind=c_short) :: iLandUseType
-    integer (kind=c_short) :: iSoilsGroup
     character (len=:), allocatable :: sLandUseDescription
-    real (kind=c_float) :: rCN_base
-    real (kind=c_float) :: rRootingDepth
-    real (kind=c_float) :: rMaxRecharge
-    real (kind=c_float) :: rIntercept_GrowingSeason
-    real (kind=c_float) :: rIntercept_NonGrowingSeason
+    integer (kind=c_int) :: i(2)
+    real (kind=c_float)  :: f(5)
 
   end type TABLE_RECORD_LANDUSE_T
 
 
   type, public :: LOOKUP_TABLE_LANDUSE_T
 
-    type (TABLE_RECORD_LANDUSE_T), pointer    :: data(:) => null()
+    type (TABLE_RECORD_LANDUSE_T), pointer    :: table(:) => null()
     
   contains
 
@@ -78,7 +85,7 @@ contains
 
     iCount = FILE%slColNames%count
 
-    !> Set up a local data structure to hold the raw table data
+    !> Set up a local table structure to hold the raw table table
     call DF%initialize( slColNames=FILE%slColNames, &
         iRecordCount = FILE%iNumberOfRecords )
 
@@ -113,8 +120,6 @@ contains
 
 
     character (len=:), allocatable        :: sBuf 
-    real (kind=c_float), allocatable      :: rValues(:)
-    integer (kind=c_int), allocatable     :: iValues(:)
     integer (kind=c_int), allocatable     :: iRootingDepthSeqNums(:)
     integer (kind=c_int), allocatable     :: iCurveNumberSeqNums(:)
     integer (kind=c_int), allocatable     :: iMaxRechargeSeqNums(:)
@@ -129,12 +134,6 @@ contains
     real (kind=c_float), allocatable      :: fMaxRecharge(:,:)  
     character (len=:), allocatable        :: sText
 
-    character (len=64), allocatable  :: sLandUseDescription(:)
-    character (len=16), allocatable  :: sAssumedPercentImperviousness(:)
-    real (kind=c_float), allocatable :: rMaxInfiltration(:)
-    real (kind=c_float), allocatable :: rIntercept_GrowingSeason(:)
-    real (kind=c_float), allocatable :: rIntercept_NonGrowingSeason(:)
-
     iNumberOfRecords = FILE%iNumberOfRecords
 
     pLU => null()
@@ -145,37 +144,48 @@ contains
     !> First task: figure out how many soil groups are in the table
     !! To do this, assume that user has logically named the rooting depths with
     !! sequential numbers attached to the column name (e.g. RZ_1, RZ_2, etc.)
+
+    !> First, obtain a string list for all columns whose names contain "RZ"
     slRootingDepth = DF%slColNames%grep("RZ")
+    !> Next extract the integer portion of those column names
     iRootingDepthSeqNums = slRootingDepth%asInt()
+    !> Finally, find the maximum value for the numbered "RZ" columns
     iNumberOfRootingDepthColumns = maxval(iRootingDepthSeqNums)
 
+    !> Repeat for curve numbers (CN)
     slCurveNumber = DF%slColNames%grep("CN")
     iCurveNumberSeqNums = slCurveNumber%asInt()
     iNumberOfCurveNumberColumns = maxval(iCurveNumberSeqNums)
     
+    !> Repeat for maximum recharge values
     slMaxRecharge = DF%slColNames%grep("Max_Recharge")
     iMaxRechargeSeqNums = slMaxRecharge%asInt()
     iNumberOfMaxRechargeColumns = maxval(iMaxRechargeSeqNums)
     
     associate( a => iNumberOfRootingDepthColumns, b => iNumberOfCurveNumberColumns, c => iNumberOfMaxRechargeColumns)
 
+      !> check to ensure that the number of columns indicated for these soil group-related items is the same
       if ( .not. (a==b .and. b==c) )  &
          call warn(sMessage="Number of soil group-related parameters in landuse lookup table is unequal", lFatal=lTRUE)
 
     end associate
 
+    ! OK. We know the number of soil groups
     iNumberOfSoilGroups = iNumberOfRootingDepthColumns
 
-    if (.not. associated( this%data) ) then
-      allocate( this%data( iNumberOfRecords * iNumberOfSoilGroups ), stat=iStat)
-      if( iStat /= 0)  call die("Failed to allocate memory for data table.", __FILE__, __LINE__)
+    if (.not. associated( this%table) ) then
+      allocate( this%table( iNumberOfRecords * iNumberOfSoilGroups ), stat=iStat)
+      if( iStat /= 0)  call die("Failed to allocate memory for table table.", __FILE__, __LINE__)
     else
       call die("Data table already allocated", __FILE__, __LINE__)
 
     endif        
 
+    !> Next, allocate room for the temporary local variables to hold the curve numbers,
+    !> rooting depths, and max recharge values
+
     allocate( fCN( iNumberOfRecords, iNumberOfSoilGroups), stat=iStat)
-    if( iStat /= 0)  call die("Failed to allocate memory for data table.", __FILE__, __LINE__)
+    if( iStat /= 0)  call die("Failed to allocate memory for table table.", __FILE__, __LINE__)
 
     do iSoilsIndex = 1, iNumberOfSoilGroups
 
@@ -184,14 +194,7 @@ contains
 
       if (associated(pCOL) ) then
 
-        iCount = pCol%count()
         fCN(:, iSoilsIndex) = pCOL%asFloat()
-
-        ! rValues = pCOL%asFloat()
-        !fCN(:, iSoilsIndex) = rValues
-
-        print *, "CN VALUES FOR: "//sText
-        print *, fCN(:, iSoilsIndex)
 
       endif  
 
@@ -199,7 +202,7 @@ contains
 
 
     allocate( fRZ( iNumberOfRecords, iNumberOfSoilGroups), stat=iStat)
-    if( iStat /= 0)  call die("Failed to allocate memory for data table.", __FILE__, __LINE__)
+    if( iStat /= 0)  call die("Failed to allocate memory for table table.", __FILE__, __LINE__)
 
     do iSoilsIndex = 1, iNumberOfSoilGroups
 
@@ -208,12 +211,7 @@ contains
 
       if (associated(pCOL) ) then
 
-        iCount = pCol%count()
-
         fRZ(:, iSoilsIndex) = pCOL%asFloat()
-
-        print *, "RZ VALUES FOR: "//sText
-        print *, fRZ(:, iSoilsIndex)
 
       endif  
 
@@ -221,7 +219,7 @@ contains
 
 
     allocate( fMaxRecharge( iNumberOfRecords, iNumberOfSoilGroups), stat=iStat)
-    if( iStat /= 0)  call die("Failed to allocate memory for data table.", __FILE__, __LINE__)
+    if( iStat /= 0)  call die("Failed to allocate memory for table table.", __FILE__, __LINE__)
 
     do iSoilsIndex = 1, iNumberOfSoilGroups
 
@@ -230,20 +228,15 @@ contains
 
       if (associated(pCOL) ) then
 
-        iCount = pCol%count()
-
         fMaxRecharge(:, iSoilsIndex) = pCOL%asFloat()
-
-        print *, "MAXIMUM RECHARGE VALUES FOR: "//sText
-        print *, fMaxRecharge(:, iSoilsIndex)
 
       endif  
 
     enddo
 
 
-    !> OK, now we have all of the data in place. Time to map it from the data frame to the 
-    !! data structure.
+    !> OK, now we have all of the table in place. Time to map it from the table frame to the 
+    !! table structure.
 
     iCount = 0
     pLU => DF%getcol("LU_Code")
@@ -256,10 +249,10 @@ contains
 
         iCount = iCount + 1
 
-        associate( lu => this%data(iCount) )
+        associate( lu => this%table(iCount) )
           
-          call pLU%get(iLUIndex, lu%iLandUseType )
-          lu%iSoilsGroup = iSoilsIndex
+          call pLU%get(iLUIndex, lu%i(LU_LANDUSE_CODE) )
+          lu%i(LU_SOILS_GROUP) = iSoilsIndex
 
           pCol => DF%getcol("Description")
           if (associated(pCol) ) then
@@ -269,20 +262,20 @@ contains
             lu%sLandUseDescription = "NA"
           endif  
 
-          lu%rCN_base = fCN( iLUIndex, iSoilsIndex )
-          lu%rRootingDepth = fRZ( iLUIndex, iSoilsIndex )
-          lu%rMaxRecharge = fMaxRecharge( iLUIndex, iSoilsIndex )
+          lu%f(LU_CN_BASE) = fCN( iLUIndex, iSoilsIndex )
+          lu%f(LU_ROOTING_DEPTH) = fRZ( iLUIndex, iSoilsIndex )
+          lu%f(LU_MAX_RECHARGE) = fMaxRecharge( iLUIndex, iSoilsIndex )
 
           if (associated(pInterception_grow) ) then
-            call pInterception_grow%get(iLUIndex, lu%rIntercept_GrowingSeason)
+            call pInterception_grow%get(iLUIndex, lu%f(LU_INTERCEPTION_GROW))
           else
-            lu%rIntercept_GrowingSeason = rTINYVAL
+            lu%f(LU_INTERCEPTION_GROW) = rTINYVAL
           endif
               
           if (associated(pInterception_nongrow) ) then
-            call pInterception_grow%get(iLUIndex, lu%rIntercept_NonGrowingSeason)
+            call pInterception_grow%get(iLUIndex, lu%f(LU_INTERCEPTION_NONGROW))
           else
-            lu%rIntercept_NonGrowingSeason = rTINYVAL
+            lu%f(LU_INTERCEPTION_NONGROW) = rTINYVAL
           endif
 
         end associate 
@@ -294,10 +287,10 @@ contains
   end subroutine map_columns_to_fields_sub  
 
 
-  function get_pointer_fn(this, iLanduseType, iSoilsGroup)   result(pRec)
+  function get_pointer_fn(this, iLanduseCode, iSoilsGroup)   result(pRec)
 
     class (LOOKUP_TABLE_LANDUSE_T)           :: this
-    integer (kind=c_int)                     :: iLandUseType
+    integer (kind=c_int)                     :: iLandUseCode
     integer (kind=c_int)                     :: iSoilsGroup
     type (TABLE_RECORD_LANDUSE_T), pointer   :: pRec
 
@@ -306,11 +299,11 @@ contains
 
     pRec => null()
 
-    do iIndex = 1, uBound(this%data, 1)
-      associate ( rec => this%data(iIndex) )
+    do iIndex = 1, uBound(this%table, 1)
+      associate ( rec => this%table(iIndex) )
         
-        if ( (rec%iLanduseType == iLanduseType) .and. (rec%iSoilsGroup == iSoilsGroup) ) then
-          pRec => this%data(iIndex)
+        if ( ( rec%i(LU_LANDUSE_CODE) == iLanduseCode ) .and. ( rec%i(LU_SOILS_GROUP) == iSoilsGroup ) ) then
+          pRec => this%table(iIndex)
           exit
         endif
 
@@ -320,7 +313,7 @@ contains
 
     if ( .not. associated( pRec ) ) &
       call warn( sMessage = "Failed to find a landuse table entry corresponding to landuse code "     &
-        //asCharacter(iLanduseType)//" and soils group "//asCharacter(iSoilsGroup),               &
+        //asCharacter(iLanduseCode)//" and soils group "//asCharacter(iSoilsGroup),               &
         lFatal = lTRUE, sHints = "Make sure that a landuse table entry exists for all combinations " &
         //"of landuse and soil type values found in the input grids.") 
 
