@@ -49,13 +49,17 @@ module lookup_table_irrigation
      "Irrigation_amount  ", "Frac_irrig_fm_GW   ", "Irr_efficiency_GW  ", "Irr_efficiency_SW  ", &
      "Mean_plant_height  " ]
 
+  integer (kind=c_int), parameter :: NUMBER_OF_REAL_COLUMNS     = 13
+  integer (kind=c_int), parameter :: NUMBER_OF_INTEGER_COLUMNS  = 7
+  integer (kind=c_int), parameter :: NUMBER_OF_LOGICAL_COLUMNS  = 1
+
   type, public :: TABLE_RECORD_IRRIGATION_T
 
     character (len=:), allocatable :: sCropDescription
 
-    integer (kind=c_int)           :: i(7)
-    real (kind=c_float)            :: f(13)
-    logical (kind=c_bool)          :: l(1)
+    integer (kind=c_int)           :: i(:,:)
+    real (kind=c_float)            :: f(:,:)
+    logical (kind=c_bool)          :: l(:,:)
 
   end type TABLE_RECORD_IRRIGATION_T
 
@@ -154,33 +158,54 @@ contains
     !> OK, now we have all of the data in place. Time to map it from the data frame to the 
     !! data structure.
 
-    pIRR => DF%getcol("LU_Code")
+    allocate( this%table%i(iNumberOfRecords, NUMBER_OF_INTEGER_COLUMNS), stat=iStat)
+    if (iStat /= 0)   call die("Failed to allocate memory for table object", __FILE__, __LINE__)
+
+    allocate( this%table%f(iNumberOfRecords, NUMBER_OF_REAL_COLUMNS), stat=iStat)
+    if (iStat /= 0)   call die("Failed to allocate memory for table object", __FILE__, __LINE__)
+
+    allocate( this%table%l(iNumberOfRecords, NUMBER_OF_LOGICAL_COLUMNS), stat=iStat)
+    if (iStat /= 0)   call die("Failed to allocate memory for table object", __FILE__, __LINE__)
+
+
+
+    pCol => DF%getcol("Crop_Description")
 
     do iLUIndex=1, iNumberOfRecords
 
       associate( irr=> this%table(iLUIndex) )
-        
-        call pIRR%get( iLUIndex )
 
-        pCol => DF%getcol("Crop_Description")
         if (associated(pCol) ) then
           call pCol%get( iLUIndex, sBuf )
           irr%sCropDescription = trim(adjustl(clean(sBuf, '"')))
         else
           irr%sCropDescription = "NA"
-        endif  
+        endif 
+
+      end associate   
       
-        do iIndex=1, ubound(sRealVarNames, 1)
-
-          pCol => DF%getcol( trim( sRealVarNames(iIndex) ) )
-
-          if ( associated(pCol) ) then
-
-            call pCol%get( )
-
-        enddo  
-
     enddo     
+
+
+    do iIndex=1, ubound(sRealVarNames, 1)
+
+      pCol => DF%getcol( trim( sRealVarNames(iIndex) ) )
+
+      if ( associated(pCol) ) then
+
+        this%table%f(:, iIndex) = pCol%asFloat()
+
+      else
+
+        this%table%f(:, iIndex) = fTINYVAL
+
+      endif
+      
+    enddo  
+
+
+
+
 
   end subroutine map_columns_to_fields_sub  
 
