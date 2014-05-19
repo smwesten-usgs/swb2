@@ -66,6 +66,8 @@ module parameters
 
     procedure, private   :: count_matching_keywords_fn
 
+    procedure, private   :: add_entry_to_dict_sub
+
 
   end type PARAMETER_DICT_T
 
@@ -110,10 +112,20 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iIndex
+    type (DATA_FILE_T)   :: DF
 
     if ( this%count > 0 ) then
 
-      do iIndex = 1, this%count
+      ! iterate over the list of files
+      do iIndex = 1, this%filenames%count
+
+       ! open the file
+        call DF%open(sFilename = this%filenames%get(iIndex),           &
+                     sCommentChars = this%delimiters%get(iIndex),      &
+                     sDelimiters = this%comment_chars%get(iIndex) )
+
+        ! obtain the headers from the file
+        DF%slColNames = DF%readHeader()
 
       enddo
 
@@ -121,5 +133,85 @@ contains
 
   end subroutine munge_files_and_add_to_param_list_sub
 
+!--------------------------------------------------------------------------------------------------
+
+  subroutine add_key_sub(this, sKeyword)
+
+    class (PARAMETER_DICT_ENTRY_T)  :: this
+    character (len=*), intent(in)   :: sKeyword
+
+     this%keyword = sKeyword
+
+  end subroutine add_key_sub  
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine add_parameter_value_sub(this, sValue)
+
+    class (PARAMETER_DICT_ENTRY_T)  :: this
+    character (len=*), intent(in)   :: sValue
+
+    call this%params%append(sValue)
+
+  end subroutine 
+
+
+!--------------------------------------------------------------------------------------------------
+
+  function find_matching_key_fn(this, sKey)   result(pDict)
+
+    class (PARAMETER_DICT_T)                :: this
+    character (len=*), intent(in)           :: sKey
+    type (PARAMETER_DICT_ENTRY_T), pointer  :: pDict
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iIndex
+    
+    pDict => this%first
+
+    do while ( associated( pDict ) )
+
+      if ( pDict%key .strequal. sKey )  exit
+      
+      pDict => pDict%next
+
+    enddo
+
+  end function find_matching_key_fn
+  
+!--------------------------------------------------------------------------------------------------
+
+  subroutine add_entry_to_dict_sub(this, dict_entry)
+
+    class (PARAMETER_DICT_T)                :: this
+    type (PARAMETER_DICT_ENTRY_T), pointer  :: dict_entry
+
+    ! [ LOCALS ]
+    type (PARAMETER_DICT_ENTRY_T), pointer  :: temp_entry    
+
+    if ( associated(dict_entry) ) then
+
+      if ( associated( this%last) ) then
+
+        temp_entry       => this%last
+        temp_entry%last  => dict_entry
+        this%last        => dict_entry
+        dict_entry%last  => null()
+
+      else  ! this is the first dictionary entry
+
+        this%first => dict_entry
+        this%last  => dict_entry
+
+      endif
+
+    else
+
+      call warn( "Internal programming error: dictionary entry is null",   &
+          __FILE__, __LINE__ )
+
+    endif  
+
+  end subroutine add_entry_to_dict_sub  
 
 end module parameters

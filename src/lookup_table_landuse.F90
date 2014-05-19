@@ -77,7 +77,7 @@ contains
     character (len=MAX_STR_LEN) :: sBuf
     integer (kind=c_int)        :: iCount
 
-    call FILE%open(sFilename = sFilename,    &
+    call FILE%open(sFilename = sFilename,              &
                    sCommentChars = sCommentChars,      &
                    sDelimiters = sDelimiters )
 
