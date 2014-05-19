@@ -1,8 +1,10 @@
 module parameters
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
+  use data_file
   use strings
   use string_list
+  use constants_and_conversions
   implicit none
 
   private
@@ -21,14 +23,15 @@ module parameters
     type (STRING_LIST_T)  :: filenames
     type (STRING_LIST_T)  :: delimiters
     type (STRING_LIST_T)  :: comment_chars
+    integer (kind=c_int)  :: count           = 0
 
   contains
 
     procedure, private   :: add_filename_to_list_sub
     generic              :: add => add_filename_to_list_sub
 
-    procedure, private   :: munge_file_and_add_to_param_list_sub
-    generic              :: munge => munge_file_and_add_to_param_list_sub
+    procedure, private   :: munge_files_and_add_to_param_list_sub
+    generic              :: munge => munge_files_and_add_to_param_list_sub
 
   end type PARAMETER_FILES_T    
 
@@ -68,8 +71,55 @@ module parameters
 
 contains
 
-  
+  subroutine add_filename_to_list_sub(this, sFilename, sDelimiters, sCommentChars )
 
+    class (STRING_LIST_T)             :: this
+    character (len=*), intent(in)     :: sFilename
+    character (len=*), intent(in), optional :: sDelimiters
+    character (len=*), intent(in), optional :: sCommentChars
+
+    ! [ LOCALS ]
+    character (len=:), allocatable  :: sDelimiters_
+    character (len=:), allocatable  :: sCommentChars_
+
+    if (present(sDelimiters) ) then
+      sDelimiters_ = sDelimiters
+    else 
+      sDelimiters_ = sTAB
+    endif
+
+    if ( present(sCommentChars) ) then
+      sCommentChars_ = sCommentChars
+    else
+      sCommentChars_ = "#!"
+    endif  
+
+    call this%filenames%append(sFilename)
+    call this%delimiters%append(sDelimiters_)
+    call this%comment_chars%append(sCommentChars_)
+
+    this%count = this%count + 1
+
+  end subroutine add_filename_to_list_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine munge_files_and_add_to_param_list_sub(this)
+
+    class (PARAMETER_FILES_T)    :: this
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iIndex
+
+    if ( this%count > 0 ) then
+
+      do iIndex = 1, this%count
+
+      enddo
+
+    endif
+
+  end subroutine munge_files_and_add_to_param_list_sub
 
 
 end module parameters
