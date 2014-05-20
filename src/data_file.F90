@@ -62,20 +62,11 @@ module data_file
     procedure, private :: return_current_linenum_fn
     generic :: currentLineNum => return_current_linenum_fn
 
-! procedure :: readHeaderMultiline => read_multiline_header_sub
-! procedure :: numRows => return_num_rows_fn
-! procedure :: numCols => return_num_cols_fn
-! procedure :: countRows => count_rows_sub
-! procedure :: countColumns => cound_columns_sub
-
     procedure, private :: read_header_fn
     generic, public    :: readHeader => read_header_fn
 
     procedure, private :: read_line_of_data_fn
     generic, public    :: readLine => read_line_of_data_fn
-
-! procedure :: putRow => put_row_of_data_sub
-! procedure :: getNext => get_next_data_item_fn
 
   end type DATA_FILE_T
 
@@ -129,35 +120,30 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int) :: iIndex
     integer (kind=c_int) :: iLen
-    integer (kind=c_int) :: iLeadingSpace
-    character (len=32)   :: sBufTemp
+    character (len=1)   :: sBufTemp
 
     iLen = len_trim( this%sBuf ) 
 
-    if ( iLen < 32 ) then
-      sBufTemp = this%sBuf(1:iLen)
-    else
-      sBufTemp = this%sBuf(1:32)  
-    endif  
+    sBufTemp = adjustl(this%sBuf)
 
-    iIndex = index( adjustl(sBufTemp) , this%sCommentChars )
+    iIndex = verify( sBufTemp , this%sCommentChars )
     
     lIsComment = lFALSE
 
-    if ( iIndex == 1 .or. len_trim(this%sBuf) == 0 ) lIsComment = lTRUE
+    if ( iIndex == 0 .or. len_trim(this%sBuf) == 0 ) lIsComment = lTRUE
         
   end function is_current_line_a_comment_fn  
 
 
 
 
-  subroutine open_file_read_access_sub(this, sFilename, sCommentChars, sDelimiters)
+  subroutine open_file_read_access_sub(this, sFilename, sCommentChars, sDelimiters )
 
     class (DATA_FILE_T), intent(inout) :: this
-    character (len=*), intent(in) :: sFilename
-    character (len=*), intent(in) :: sCommentChars
-    character (len=*), intent(in) :: sDelimiters
-
+    character (len=*), intent(in)      :: sFilename
+    character (len=*), intent(in)      :: sCommentChars
+    character (len=*), intent(in)      :: sDelimiters
+    
     this%sCommentChars = sCommentChars
     this%sDelimiters = sDelimiters
 
@@ -172,6 +158,7 @@ contains
       call this%countLines()
 
       write(*, fmt="(/,15x, a)") "Opened file "//dquote(sFilename)
+      write(*, fmt="(a60, a8)") "Comment characters: ", dquote(sCommentChars)
       write(*, fmt="(a60, i8)") "Number of lines in file: ", this%numLines()
       write(*, fmt="(a60, i8)") "Number of lines excluding blanks, headers and comments: ", this%numRecords()
 

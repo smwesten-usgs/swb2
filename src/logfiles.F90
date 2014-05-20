@@ -93,7 +93,7 @@ contains
 
     if (this%lIsOpen) then
 
-      write(unit=this$iUnitNum, fmt="(a)")  sMessage
+      write(unit=this%iUnitNum, fmt="(a)")  sMessage
 
     endif 
 

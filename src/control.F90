@@ -1288,26 +1288,12 @@ subroutine control_setModelOptions(sControlFile)
     elseif (sItem == "SOIL_GROUP_SET_MAXIMUM_ALLOWED" ) then
       call HSG%set_valid_maximum(asInt(sRecord))
 
-
-    else if ( sItem == "LAND_USE_LOOKUP_TABLE" ) then
-      write(UNIT=LU_LOG,FMT=*) "Reading land-use lookup table"
-      call Chomp ( sRecord, pConfig%sLandUseLookupFilename )
-      if ( len_trim(pConfig%sLandUseLookupFilename) == 0 ) then
-        call Assert( .false._c_bool, "No land use lookup table specified" )
-      end if
-      call model_ReadLanduseLookupTable( pConfig )
-      flush(UNIT=LU_LOG)
-
-    else if ( sItem == "IRRIGATION_LOOKUP_TABLE" ) then
-      write(UNIT=LU_LOG,FMT=*) "Reading irrigation lookup table"
-      call Chomp ( sRecord, pConfig%sIrrigationLookupFilename )
-      call assert(len_trim(pConfig%sIrrigationLookupFilename) > 0, &
-        "No irrigation lookup table specified", trim(__FILE__), __LINE__ )
-      call assert(len_trim(pConfig%sLandUseLookupFilename) > 0, &
-         "The irrigation module cannot be activated before specifying " &
-         //"a land use lookup table", trim(__FILE__), __LINE__ )
-      call model_ReadIrrigationLookupTable( pConfig, pGrd )
-      flush(UNIT=LU_LOG)
+    !************
+    !************ This replaces the specific landuse and irrigation table input blocks.
+    !************
+    else if ( sItem == "LOOKUP_TABLE" ) then
+      write(UNIT=LU_LOG,FMT=*) "Lookup table specified. Filename: "//dquote(sRecord)
+      call PARAM_FILES%add( (trim(sRecord) ) )
 
     else if ( sItem == "BASIN_MASK" ) then
       write(UNIT=LU_LOG,FMT=*) "Populating basin mask grid"

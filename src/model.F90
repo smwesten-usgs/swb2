@@ -24,7 +24,6 @@ module model
   use irrigation
   use netcdf4_support
   use sm_thornthwaite_mather
-  use snow
   use water_balance
 
    implicit none

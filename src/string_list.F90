@@ -37,16 +37,16 @@ module string_list
     procedure :: list_return_all_as_int_fn
     procedure :: list_subset_partial_matches_fn
 
-    generic :: append => list_append_string_sub, &
-                         list_append_int_sub
-    generic :: get => list_get_value_at_index_fn
-    generic :: print => list_print_sub
-    generic :: grep => list_subset_partial_matches_fn
-    generic :: which => list_return_position_of_matching_string_fn
+    generic :: append        => list_append_string_sub, &
+                                list_append_int_sub
+    generic :: get           => list_get_value_at_index_fn
+    generic :: print         => list_print_sub
+    generic :: grep          => list_subset_partial_matches_fn
+    generic :: which         => list_return_position_of_matching_string_fn
     generic :: countmatching => list_return_count_of_matching_string_fn
-    generic :: deallocate => list_items_deallocate_all_sub
-    generic :: asFloat => list_return_all_as_float_fn
-    generic :: asInt => list_return_all_as_int_fn
+    generic :: deallocate    => list_items_deallocate_all_sub
+    generic :: asFloat       => list_return_all_as_float_fn
+    generic :: asInt         => list_return_all_as_int_fn
 
   end type STRING_LIST_T
 
@@ -120,34 +120,24 @@ contains
 
     current => this%first
 
-    if (iIndex > 0 .and. iIndex <= this%count .and. associated( current ) ) then
+    do while ( associated( current ) .and. iCount < this%count )
 
-      do while ( associated( current ) .and. iCount < this%count )
+      iCount = iCount + 1
 
-        iCount = iCount + 1
+      if (iCount == iIndex)  exit
 
-        if (iCount == iIndex)  exit
+      current => current%next
 
-        current => current%next
-
-      enddo
+    enddo
     
-      if (associated(current) ) then
-        sText = current%s
-      else
-        sText = "<NA>"
-        call warn("Internal logic error: should never be able to execute this part of block", &
-          __FILE__, __LINE__ )
-      endif  
-
+    if (associated(current) ) then
+      sText = current%s
     else
-
       sText = "<NA>"
-      call warn("Internal logic error: Index out of bounds or unassociated pointer", &
-          __FILE__, __LINE__ )
-
+      call warn("Unable to find a pointer associated with index: "//asCharacter(iIndex), &
+        __FILE__, __LINE__ )
     endif  
-
+   
 
   end function list_get_value_at_index_fn
 
@@ -178,7 +168,7 @@ contains
 
       iCount = iCount + 1
 
-      write(iLU_, fmt="(a)") current%s
+      write(iLU_, fmt="(t10,a,t20,a)") "["//asCharacter(iCount)//"] ", current%s
 
       current => current%next
 

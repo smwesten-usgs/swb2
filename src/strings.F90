@@ -527,24 +527,34 @@ end subroutine char_to_lowercase_sub
     integer (kind=c_int) :: iIndex
 
     if ( present(sDelimiters) ) then
-      sDelimiters_ = sDelimiters
+      select case (sDelimiters)
+        case ("WHITESPACE")
+          sDelimiters_ = sWHITESPACE
+        case ("TAB", "TABS")  
+          sDelimiters_ = sTAB
+        case ("COMMA", "CSV")  
+          sDelimiters_ = ","
+        case default
+          sDelimiters_ = sDelimiters        
+      end select    
     else
       sDelimiters_ = sWHITESPACE
     endif
 
-    iIndex = scan( string = sText1, &
-                   set = sDelimiters_ )
+    sText1 = adjustl(sText1)
 
+    iIndex = scan( string = sText1, set = sDelimiters_ )
+        
     if (iIndex == 0) then
       ! no delimiters found; return string as was supplied originally
       sText2 = sText1
       sText1 = ""
     else
       ! delimiters were found; split and return the chunks of text
-      sText2 = trim(adjustl( sText1(1:iIndex-1) ) )
-      sText1 = trim(adjustl(sText1(iIndex + 1:) ) )
+      sText2 = trim( sText1(1:iIndex-1) )
+      sText1 = trim( sText1(iIndex + 1:) ) 
     endif
-
+    
   end subroutine split_and_return_text_sub
 
 !--------------------------------------------------------------------------------------------------

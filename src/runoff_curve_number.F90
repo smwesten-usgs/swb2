@@ -4,26 +4,55 @@
 
 !> Updates runoff curve numbers and calculates runoff based on those curve numbers.
 module runoff_curve_number
-!!****h* SWB/runoff_curve_number
-! NAME
-!
-!   runoff_curve_number.f95 -
-!
-! SYNOPSIS
-!   Initializes and updates SCS curve numbers, and calculates surface runoff
-!   from an individual grid cell.
-!
-! NOTES
-!
-!!***
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double
   use types
   use swb_grid
+  use parameters
 
   implicit none
 
+  private
+
+  type, public  :: RUNOFF_CURVE_NUMBER_T
+
+    real (kind=c_float), allocatable    :: CN(:,:)
+
+
+  contains
+
+    procedure      :: initialize_parameter_values_sub
+    procedure      :: return_landuse_index_fn
+    procedure      :: get_base_curve_number_fn
+    procedure      :: update_curve_number_fn
+    procedure      :: calculate_runoff_fn
+
+  end type RUNOFF_CURVE_NUMBER_T  
+
+
+
 contains
+
+
+subroutine initialize_parameter_values_sub(this)
+
+  class (RUNOFF_CURVE_NUMBER_T)     :: this
+
+  ! [ LOCALS ]
+  integer (kind=c_int)   :: iNumberOfLanduses
+  integer (kind=c_int)   :: iNumberOfSoilGroups
+
+  !> Repeat for curve numbers (CN)
+  call PARAMS%get_values(sKey="raincoef_3", fValues=fValues)
+  slCurveNumber = DF%slColNames%grep("CN")
+  iCurveNumberSeqNums = slCurveNumber%asInt()
+  iNumberOfCurveNumberColumns = maxval(iCurveNumberSeqNums)
+
+
+end subroutine initialize_parameter_values_sub
+
+
+
 
 subroutine runoff_InitializeCurveNumber( pGrd, pConfig )
   !! Looks up the base curve number for each cell and stores it in the grid

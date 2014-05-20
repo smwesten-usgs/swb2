@@ -1,8 +1,10 @@
 module dictionary
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
+  use constants_and_conversions, only : iTINYVAL, fTINYVAL
   use strings
   use string_list
+  use exceptions
   implicit none
 
   private
@@ -17,10 +19,10 @@ module dictionary
   contains
 
     procedure, private   :: add_key_sub
-    generic              :: addkey => add_key_sub
+    generic              :: add_key => add_key_sub
 
     procedure, private   :: add_string_sub
-    generic              :: addstring => add_string_sub
+    generic              :: add_string => add_string_sub
 
   end type DICT_ENTRY_T 
 
@@ -34,16 +36,24 @@ module dictionary
   contains
   
     procedure, private   :: get_entry_by_key_fn 
-    generic              :: get => get_entry_by_key_fn
+    generic              :: get_entry => get_entry_by_key_fn
 
     procedure, private   :: add_entry_to_dict_sub
-    generic              :: add => add_entry_to_dict_sub
+    generic              :: add_entry => add_entry_to_dict_sub
 
     procedure, private   :: delete_entry_by_key_sub
-    generic              :: delete => delete_entry_by_key_sub
+    generic              :: delete_entry => delete_entry_by_key_sub
 
     procedure, private   :: print_all_dictionary_entries_sub
-    generic              :: print => print_all_dictionary_entries_sub
+    generic              :: print_all => print_all_dictionary_entries_sub
+
+    procedure, private   :: grep_dictionary_key_names_fn
+    generic              :: grep_keys => grep_dictionary_key_names_fn
+
+    procedure, private   :: get_values_as_int_sub
+    procedure, private   :: get_values_as_float_sub
+    generic              :: get_values => get_values_as_int_sub, &
+                                          get_values_as_float_sub
 
   end type DICT_T
 
@@ -99,6 +109,9 @@ contains
 
     enddo
 
+    if (.not. associated( pDict ) )  &
+      call warn("Failed to find a dictionary entry with a key value of "//dquote(sKey))
+
   end function get_entry_by_key_fn
   
 !--------------------------------------------------------------------------------------------------
@@ -110,12 +123,15 @@ contains
 
     if ( associated(dict_entry) ) then
 
+      this%count = this%count + 1
+
       if ( associated( this%last) ) then
 
       ! dictionary has at least one entry
 
         dict_entry%previous  => this%last
         dict_entry%next      => null()
+        this%last%next       => dict_entry
         this%last            => dict_entry
 
       else  ! this is the first dictionary entry
@@ -136,6 +152,7 @@ contains
 
   end subroutine add_entry_to_dict_sub  
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine delete_entry_by_key_sub(this, sKey)
 
@@ -146,7 +163,7 @@ contains
     type (DICT_ENTRY_T), pointer   :: pTarget
     type (DICT_ENTRY_T), pointer   :: pTemp
 
-    pTarget => this%get(sKey)
+    pTarget => this%get_entry(sKey)
 
     if ( associated( pTarget ) ) then
 
@@ -163,12 +180,92 @@ contains
   end subroutine delete_entry_by_key_sub
 
 
+  subroutine get_values_as_int_sub(this, sKey, iValues)
+
+    class (DICT_T)                                  :: this
+    character (len=*), intent(in)                   :: sKey
+    integer (kind=c_int), allocatable, intent(out)  :: iValues(:)
+
+    ! [ LOCALS ]
+    type (DICT_ENTRY_T), pointer   :: pTarget
+    integer (kind=c_int)           :: iStat
+    
+    pTarget => this%get_entry(sKey)
+
+    if ( associated( pTarget ) ) then
+
+      iValues = pTarget%sl%asInt()
+
+    else
+
+      allocate(iValues(1), stat=iStat)
+      call assert(iStat == 0, "Failed to allocate memory to iValues array", &
+        __FILE__, __LINE__)
+
+      iValues = iTINYVAL
+
+    endif  
+
+
+  end subroutine get_values_as_int_sub
+
+
+
+  subroutine get_values_as_float_sub(this, sKey, fValues)
+
+    class (DICT_T)                                  :: this
+    character (len=*), intent(in)                   :: sKey
+    real (kind=c_float), allocatable, intent(out)   :: fValues(:)
+
+    ! [ LOCALS ]
+    type (DICT_ENTRY_T), pointer   :: pTarget
+    integer (kind=c_int)           :: iStat
+    
+    pTarget => this%get_entry(sKey)
+
+    if ( associated( pTarget ) ) then
+
+      fValues = pTarget%sl%asFloat()
+
+    else
+
+      allocate(fValues(1), stat=iStat)
+      call assert(iStat == 0, "Failed to allocate memory to iValues array", &
+        __FILE__, __LINE__)
+      fValues = fTINYVAL
+
+    endif  
+
+  end subroutine get_values_as_float_sub
+
+
+
+
 
   subroutine print_all_dictionary_entries_sub(this)
 
     class (DICT_T)    :: this
 
+    ! [ LOCALS ]
+    type (DICT_ENTRY_T), pointer   :: current
+    character (len=512)            :: sTempBuf
+    integer (kind=c_int)           :: iCount
 
+    current => this%first
+    iCount = 0
+   
+    do while ( associated( current ) )
+
+      iCount = iCount + 1
+      sTempBuf = current%key
+
+      write(*, fmt="(/,a,a)") asCharacter(iCount),")  KEY: "//dquote(sTempBuf)
+      write(*, fmt="(t5,a)") " --ENTRIES--:"
+      call current%sl%print()
+
+      current => current%next
+
+    enddo  
 
   end subroutine print_all_dictionary_entries_sub
  
