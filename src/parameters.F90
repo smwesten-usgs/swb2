@@ -36,41 +36,6 @@ module parameters
   end type PARAMETER_FILES_T    
 
 
-  type, public :: PARAMETER_DICT_ENTRY_T
-
-    character (len=:), allocatable            :: key
-    type (STRING_LIST_T)                      :: params
-    type (PARAMETER_DICT_ENTRY_T), pointer    :: next       => null()
-
-  contains
-
-    procedure, private   :: add_key_sub
-    generic              :: addkey => add_key_sub
-
-    procedure, private   :: add_parameter_value_sub
-    generic              :: addparam => add_parameter_value_sub
-
-  end type PARAMETER_DICT_ENTRY_T 
-
-
-  type, public :: PARAMETER_DICT_T
-
-    type (PARAMETER_DICT_ENTRY_T), pointer   :: first   => null()
-    type (PARAMETER_DICT_ENTRY_T), pointer   :: last    => null()
-    integer (kind=c_int)                     :: count   = 0
-
-  contains
-  
-    procedure, private   :: find_matching_keyword_fn 
-
-
-    procedure, private   :: count_matching_keywords_fn
-
-    procedure, private   :: add_entry_to_dict_sub
-
-
-  end type PARAMETER_DICT_T
-
 contains
 
   subroutine add_filename_to_list_sub(this, sFilename, sDelimiters, sCommentChars )
@@ -135,83 +100,9 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine add_key_sub(this, sKeyword)
-
-    class (PARAMETER_DICT_ENTRY_T)  :: this
-    character (len=*), intent(in)   :: sKeyword
-
-     this%keyword = sKeyword
-
-  end subroutine add_key_sub  
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine add_parameter_value_sub(this, sValue)
-
-    class (PARAMETER_DICT_ENTRY_T)  :: this
-    character (len=*), intent(in)   :: sValue
-
-    call this%params%append(sValue)
-
-  end subroutine 
+ 
 
 
-!--------------------------------------------------------------------------------------------------
 
-  function find_matching_key_fn(this, sKey)   result(pDict)
-
-    class (PARAMETER_DICT_T)                :: this
-    character (len=*), intent(in)           :: sKey
-    type (PARAMETER_DICT_ENTRY_T), pointer  :: pDict
-
-    ! [ LOCALS ]
-    integer (kind=c_int) :: iIndex
-    
-    pDict => this%first
-
-    do while ( associated( pDict ) )
-
-      if ( pDict%key .strequal. sKey )  exit
-      
-      pDict => pDict%next
-
-    enddo
-
-  end function find_matching_key_fn
-  
-!--------------------------------------------------------------------------------------------------
-
-  subroutine add_entry_to_dict_sub(this, dict_entry)
-
-    class (PARAMETER_DICT_T)                :: this
-    type (PARAMETER_DICT_ENTRY_T), pointer  :: dict_entry
-
-    ! [ LOCALS ]
-    type (PARAMETER_DICT_ENTRY_T), pointer  :: temp_entry    
-
-    if ( associated(dict_entry) ) then
-
-      if ( associated( this%last) ) then
-
-        temp_entry       => this%last
-        temp_entry%last  => dict_entry
-        this%last        => dict_entry
-        dict_entry%last  => null()
-
-      else  ! this is the first dictionary entry
-
-        this%first => dict_entry
-        this%last  => dict_entry
-
-      endif
-
-    else
-
-      call warn( "Internal programming error: dictionary entry is null",   &
-          __FILE__, __LINE__ )
-
-    endif  
-
-  end subroutine add_entry_to_dict_sub  
 
 end module parameters
