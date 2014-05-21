@@ -95,9 +95,6 @@ contains
     class (DICT_T)                :: this
     character (len=*), intent(in) :: sKey
     type (DICT_ENTRY_T), pointer  :: pDict
-
-    ! [ LOCALS ]
-    integer (kind=c_int) :: iIndex
     
     pDict => this%first
 
@@ -113,7 +110,39 @@ contains
       call warn("Failed to find a dictionary entry with a key value of "//dquote(sKey))
 
   end function get_entry_by_key_fn
-  
+ 
+
+
+
+ function grep_dictionary_key_names_fn(this, sKey)   result( slString )
+
+    class (DICT_T)                :: this
+    character (len=*), intent(in) :: sKey
+    type (STRING_LIST_T)          :: slString
+
+    ! [ LOCALS ]
+    type (DICT_ENTRY_T), pointer     :: current
+    integer (kind=c_int)             :: iIndex
+    
+    current => this%first
+
+    do while ( associated( current ) )
+
+      iIndex = index(string=current%key, substring=sKey)
+
+      if ( iIndex > 0 )  call slString%append(current%key)
+      
+      current => current%next
+
+    enddo
+
+    if ( slString%count == 0 )  &
+      call warn("Failed to find a dictionary entry that contains the value of "//dquote(sKey))
+
+  end function grep_dictionary_key_names_fn
+ 
+
+
 !--------------------------------------------------------------------------------------------------
 
   subroutine add_entry_to_dict_sub(this, dict_entry)
