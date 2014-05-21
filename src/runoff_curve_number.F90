@@ -39,14 +39,16 @@ subroutine initialize_parameter_values_sub(this)
   class (RUNOFF_CURVE_NUMBER_T)     :: this
 
   ! [ LOCALS ]
-  integer (kind=c_int)   :: iNumberOfLanduses
-  integer (kind=c_int)   :: iNumberOfSoilGroups
+  integer (kind=c_int)              :: iNumberOfLanduses
+  integer (kind=c_int)              :: iNumberOfSoilGroups
+  integer (kind=c_int), allocatable :: iCurveNumberSeqNums(:)
+  integer (kind=c_int)              :: iNumberOfCurveNumberColumns
+
 
   !> Repeat for curve numbers (CN)
-  call PARAMS%get_values(sKey="raincoef_3", fValues=fValues)
-  slCurveNumber = DF%slColNames%grep("CN")
+  slCurveNumber = PARAMS%grep_keys("CN")
   iCurveNumberSeqNums = slCurveNumber%asInt()
-  iNumberOfCurveNumberColumns = maxval(iCurveNumberSeqNums)
+  iNumberOfCurveNumberColumns = count( iCurveNumberSeqNums > 0 )
 
 
 end subroutine initialize_parameter_values_sub
