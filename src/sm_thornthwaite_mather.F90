@@ -6,33 +6,13 @@
 !> been calculated. Soil moisture for a given soil accumulated potential water loss (APWL)
 !> is determined by means of Thornthwaite and Mathers' (1957) tables.
 module sm_thornthwaite_mather
-!!****h* SWB/sm_thornthwaite_mather
-! NAME
-!
-!   sm_thornthwaite_mather.f95 - Soil moisture calculation routines based on Thornthwaite
-!   and Mather (1957)
-! SYNOPSIS
-!   Soil moisture calculation routines based on Thornthwaite
-!   and Mather (1957).
-!
-! NOTES
-!
-!!***
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double
   use types
-  use swb_grid
-  use stats
-  use RLE
 
   implicit none
 
   real (kind=c_float), parameter :: APWL_Cap = -40.69_c_float
-
-  !! Module data
-
-  !! Table of data for the Thornthwaite soil moisture balance calculations
-  type ( T_GENERAL_GRID ),pointer :: gWLT
 
   ! parameters that allow the Thornthwaite-Mather tables (1957) to be
   ! represented by a single equation
@@ -40,30 +20,6 @@ module sm_thornthwaite_mather
   real (kind=c_double), parameter :: rTM_exp_term = -1.03678439421169_c_double
 
 contains
-
-subroutine sm_thornthwaite_mather_Configure ( sRecord )
-  !! Configures the module based on command-line options
-  ! [ ARGUMENTS ]
-  character (len=*),intent(inout) :: sRecord
-  ! [ LOCALS ]
-  character (len=256) :: sOption
-
-  ! Read the grid for the water-loss table
-  call Chomp( sRecord, sOption )
-  call Assert( len_trim(sOption) > 0, &
-     "No Soil-moisture retention table file was specified", &
-     TRIM(__FILE__), __LINE__)
-  write(UNIT=LU_LOG,FMT=*)"Reading ",trim(sOption)," for soil-moisture retention information"
-  gWLT => grid_Read( sOption, "SURFER", DATATYPE_REAL )
-
-  write(UNIT=LU_LOG,FMT=*)"Read in the soil-moisture retention file with the following dimensions:"
-  write(UNIT=LU_LOG,FMT=*)"iNX = ",gWLT%iNX
-  write(UNIT=LU_LOG,FMT=*)"iNY = ",gWLT%iNY
-  write(UNIT=LU_LOG,FMT=*)"iDataType = ",gWLT%iDataType
-  write(UNIT=LU_LOG,FMT=*)"rX0, rX1 = ",gWLT%rX0, gWLT%rX1
-  write(UNIT=LU_LOG,FMT=*)"rY0, rY1 = ",gWLT%rY0, gWLT%rY1
-
-end subroutine sm_thornthwaite_mather_Configure
 
 !------------------------------------------------------------------------------
 
@@ -134,15 +90,6 @@ subroutine sm_thornthwaite_mather_Initialize ( pGrd, pConfig )
     end do
 
   end do
-
-#ifdef DEBUG_PRINT
- call grid_WriteArcGrid("initial_APWL.asc",dpZERO,dpONE,dpZERO, &
-    dpONE,pGrd%Cells(:,:)%rSM_AccumPotentWatLoss)
-#endif
-
-  !! initialize Thorntwaite-Mather soil moisture accounting variables
-
-  pGrd%Cells%rReferenceET0 = rZERO
 
 end subroutine sm_thornthwaite_mather_Initialize
 

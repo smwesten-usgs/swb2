@@ -52,8 +52,12 @@ module dictionary
 
     procedure, private   :: get_values_as_int_sub
     procedure, private   :: get_values_as_float_sub
-    generic              :: get_values => get_values_as_int_sub, &
-                                          get_values_as_float_sub
+    procedure, private   :: get_values_as_int_given_list_of_keys_sub
+    procedure, private   :: get_values_as_float_given_list_of_keys_sub
+    generic              :: get_values => get_values_as_int_sub,                       &
+                                          get_values_as_float_sub,                     &
+                                          get_values_as_int_given_list_of_keys_sub,    &
+                                          get_values_as_float_given_list_of_keys_sub
 
   end type DICT_T
 
@@ -137,7 +141,8 @@ contains
     enddo
 
     if ( slString%count == 0 )  &
-      call warn("Failed to find a dictionary entry that contains the value of "//dquote(sKey))
+      call warn("Failed to find a dictionary entry that contains the value of "//dquote(sKey), &
+        __FILE__, __LINE__)
 
   end function grep_dictionary_key_names_fn
  
@@ -238,6 +243,101 @@ contains
 
   end subroutine get_values_as_int_sub
 
+  !> Search through keys for a match; return integer values.
+  !!
+  !! THis routine allows for multiple header values to be supplied 
+  !! in the search for the appropriate column.
+  !! @param[in]  this  Object of DICT_T class.
+  !! @param[in]  slKeys String list containing one or more possible key values to
+  !!                    search for.
+  !! @param[out] iValues Integer vector of values associated with one of the provided keys.
+  subroutine get_values_as_int_given_list_of_keys_sub(this, slKeys, iValues)
+
+    class (DICT_T)                                  :: this
+    type (STRING_LIST_T), intent(in)                :: slKeys
+    integer (kind=c_int), allocatable, intent(out)  :: iValues(:)
+
+    ! [ LOCALS ]
+    type (DICT_ENTRY_T), pointer   :: pTarget
+    integer (kind=c_int)           :: iStat
+    integer (kind=c_int)           :: iCount
+    
+    iCount = 0
+
+    do while ( iCount < slKeys%count )
+
+      iCount = iCount + 1
+     
+      pTarget => this%get_entry(slKeys%get(iCount) )
+
+      if ( associated( pTarget ) ) exit
+
+    enddo
+
+    if ( associated( pTarget ) ) then
+
+      iValues = pTarget%sl%asInt()
+
+    else
+
+      allocate(iValues(1), stat=iStat)
+      call assert(iStat == 0, "Failed to allocate memory to iValues array", &
+        __FILE__, __LINE__)
+
+      iValues = iTINYVAL
+
+    endif  
+
+
+  end subroutine get_values_as_int_given_list_of_keys_sub
+
+  !> Search through keys for a match; return float values.
+  !!
+  !! THis routine allows for multiple header values to be supplied 
+  !! in the search for the appropriate column.
+  !! @param[in]  this  Object of DICT_T class.
+  !! @param[in]  slKeys String list containing one or more possible key values to
+  !!                    search for.
+  !! @param[out] fValues Float vector of values associated with one of the provided keys.
+  subroutine get_values_as_float_given_list_of_keys_sub(this, slKeys, fValues)
+
+    class (DICT_T)                                  :: this
+    type (STRING_LIST_T), intent(in)                :: slKeys
+    real (kind=c_float), allocatable, intent(out)   :: fValues(:)
+
+    ! [ LOCALS ]
+    type (DICT_ENTRY_T), pointer   :: pTarget
+    integer (kind=c_int)           :: iStat
+    integer (kind=c_int)           :: iCount
+    
+    iCount = 0
+
+    do while ( iCount < slKeys%count )
+
+      iCount = iCount + 1
+     
+      pTarget => this%get_entry(slKeys%get(iCount) )
+
+      if ( associated( pTarget ) ) exit
+
+    enddo
+
+    if ( associated( pTarget ) ) then
+
+      fValues = pTarget%sl%asFloat()
+
+    else
+
+      allocate(fValues(1), stat=iStat)
+      call assert(iStat == 0, "Failed to allocate memory to iValues array", &
+        __FILE__, __LINE__)
+
+      fValues = fTINYVAL
+
+    endif  
+
+
+  end subroutine get_values_as_float_given_list_of_keys_sub
 
 
   subroutine get_values_as_float_sub(this, sKey, fValues)

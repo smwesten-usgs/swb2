@@ -956,11 +956,6 @@ module types
       ! Prefix of input ARC or SURFER gridded precip time-series files
       character (len=256) :: sPrecipFilePrefix = ""
 
-      ! ET parameters
-      real (kind=c_float) :: rET_Slope = 0.0023    ! default is for Hargreaves (1985) method
-      real (kind=c_float) :: rET_Exponent = 0.5
-      real (kind=c_float) :: rET_Constant = 17.8
-
       ! precip correction factors
       real (kind=c_float) :: rRainfall_Corr_Factor = 1.0
       real (kind=c_float) :: rSnowFall_SWE_Corr_Factor = 1.0
@@ -968,15 +963,6 @@ module types
       ! minimum value for valid precip  and temperature data
       real (kind=c_float) :: rMinValidPrecip = 0.
       real (kind=c_float) :: rMinValidTemp = -100.0
-
-      ! define temperature values at which precip is all rain or all snow
-      real (kind=c_float) :: rTMaxAllSnow = 30.5
-      real (kind=c_float) :: rTMaxAllRain = 40.0
-
-      ! SNOW DEPTH parameters for fresh snow
-      real (kind=c_float) :: rSNWD_slp1 = 51.3
-      real (kind=c_float) :: rSNWD_intcp1 = 67.9
-      real (kind=c_float) :: rSNWD_denom = 2.6
 
       ! Filename for standard (single-station) time-series file
       character (len=256) :: sTimeSeriesFilename = ""
@@ -1069,17 +1055,6 @@ module types
       ! define a pointer to the ROOTING DEPTH lookup table
       real (kind=c_float), dimension(:,:),pointer :: ROOTING_DEPTH
 
-      ! define a pointer to the READILY_EVAPORABLE_WATER lookup table
-      real (kind=c_float), dimension(:,:),pointer :: READILY_EVAPORABLE_WATER
-
-      ! define a pointer to the TOTAL_EVAPORABLE_WATER lookup table
-      real (kind=c_float), dimension(:,:),pointer :: TOTAL_EVAPORABLE_WATER
-
-      ! define threshold value for CFGI below which ground is considered unfrozen
-      real (kind=c_float) :: rLL_CFGI = 9999.0
-      ! define threshold value for CFGI above which ground is considered frozen
-      real (kind=c_float) :: rUL_CFGI = 9999.0
-
       ! define the land use category associated with open water
       integer(kind=c_int) :: iOPEN_WATER_LU = iNO_DATA_NCDC
 
@@ -1087,50 +1062,9 @@ module types
       real (kind=c_float) :: rSouthernLatitude = rNO_DATA_NCDC
       real (kind=c_float) :: rNorthernLatitude = rNO_DATA_NCDC
 
-#ifdef STREAM_INTERACTIONS
-      ! Data for the elevation corrections on temperature
-      logical (kind=c_bool) :: lElevAdjustment
-      real (kind=c_float) :: rElevStationElevation
-      real (kind=c_float) :: rElevDryFactor
-      real (kind=c_float) :: rElevHumidFactor
-      real (kind=c_float) :: rElevHumidityThreshold
-#endif
-
        ! data structure to hold information about which cells we
        ! want to write our SSF files for
        type (T_SSF_FILES), dimension(:), pointer :: SSF_FILES
-
-#ifdef STREAM_INTERACTIONS
-    !! Added by Vic Kelson, February 2008
-     !!
-    !! These arrays manage the "Stream Interactions" option. This option uses
-    !! special Curve Number values to remove water from the grid, e.g. to a
-     !! surface stream or to a fracture network. A grid of "stream" information
-     !! is read; non-zero entries in the grid capture water based on the index
-     !! number in the cell. For example, if the grid cell stream value is 3,
-     !! index 3 in the arrays below are used.
-     !!
-     !! Influent runoff water (IR) is captured by the stream capture code according
-     !! to the values below. For cells with non-zero stream index,
-     !!
-     !! If 0 < IR < rStreamMaxInflow, the cell captures proportionally
-     !!       IR = IR * (1 - rStreamMaxCapture / rStreamMaxInflow)
-     !! If IR >= rStreamMaxInflow the cell captures the cell captures its maximum
-     !!       IR = IR - rStreamMaxCapture
-     !!
-     !! The code defaults both values to a very large number, thus any amount of
-     !! inflow into a cell where the stream index is non-zero will be captured.
-     !! For most "surface water" applications, these values need not be changed
-     !! unless there are special cases. For "fracture recharge" problems, these
-     !! values allow the modeler to set the maximum amount that a fracture can
-     !! capture.
-     !!
-    !! The constant STREAM_INTERACTIONS_MAX is the maximum number of curve
-    !! number entries allowed for the fracture recharge option.
-    real (kind=c_float), dimension(STREAM_INTERACTIONS_MAX) :: rStreamMaxInflow
-    real (kind=c_float), dimension(STREAM_INTERACTIONS_MAX) :: rStreamMaxCapture
-#endif
-
   end type T_MODEL_CONFIGURATION
 
   !> data structure to hold a line of input from the classic time-series file

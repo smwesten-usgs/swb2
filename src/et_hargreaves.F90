@@ -32,8 +32,12 @@ module et_hargreaves
 
   implicit none
 
-  !> @defgroup evapotranspiration Hargreaves-Samani
-  !> @{
+  private
+
+  ! ET parameters -- default values are from Hargreaves and Samani (1985)
+  real (kind=c_float) :: fET_Slope = 0.0023     
+  real (kind=c_float) :: fET_Exponent = 0.5
+  real (kind=c_float) :: fET_Constant = 17.8
 
 contains
 
@@ -76,94 +80,42 @@ end subroutine et_hargreaves_configure
 
 !------------------------------------------------------------------------------
 
-subroutine et_hargreaves_ComputeET( pGrd, pConfig, iDayOfYear, iNumDaysInYear)
+subroutine et_hargreaves_ComputeET( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax )
   !! Computes the potential ET for each cell, based on TMIN and TMAX.
   !! Stores cell-by-cell PET values in the model grid.
 
-  !!
-  ! [ ARGUMENTS ]
-  type ( T_GENERAL_GRID ),pointer :: pGrd
-  type (T_MODEL_CONFIGURATION), pointer :: pConfig ! pointer to data structure that contains
-                                                   ! model options, flags, and other settings
-
   integer (kind=c_int),intent(in) :: iDayOfYear
   integer (kind=c_int),intent(in) :: iNumDaysInYear
+  real (kind=c_float), intent(in) :: fLatitude
+  real (kind=c_float), intent(in) :: fTMin
+  real (kind=c_float), intent(in) :: fTMax
 
   ! [ LOCALS ]
-  real (kind=c_double) :: rLatitude, rDelta, rOmega_s, rD_r, rRa
-  integer (kind=c_int) :: iCol, iRow
-  type (T_CELL), pointer :: cel
-
-!  write(UNIT=LU_LOG,FMT=*) iDayOfYear, iNumDaysInYear
+  real (kind=c_double) :: fDelta, fOmega_s, fD_r, fRa
 
   rD_r =rel_Earth_Sun_dist(iDayOfYear,iNumDaysInYear)
   rDelta = solar_declination(iDayOfYear, iNumDaysInYear)
 
-!!!   *$OMP PARALLEL DO ORDERED PRIVATE(iRow, iCol, rLatitude, rOmega_s, rRa)
-
-  do iRow=1,pGrd%iNY
-
-    rLatitude = row_latitude(pConfig%rNorthernLatitude, &
-            pConfig%rSouthernLatitude, pGrd%iNY, iRow)
-    rOmega_s = sunset_angle(rLatitude, rDelta)
+  rOmega_s = sunset_angle(fLatitude, fDelta)
 
 	! NOTE that the following equation returns extraterrestrial radiation in
 	! MJ / m**2 / day.  The Hargreaves equation requires extraterrestrial
 	! radiation to be expressed in units of mm / day.
-	rRa = extraterrestrial_radiation_Ra(rLatitude,rDelta,rOmega_s,rD_r)
+	fRa = extraterrestrial_radiation_Ra(fLatitude, fDelta, fOmega_s, fD_r)
 
-!	write(UNIT=LU_LOG,FMT=*) "Row: ",iRow,"   Latitude: ",rLatitude, "  N_Lat: ",pConfig%rNorthernLatitude, &
-!	   "  S_Lat: ",pConfig%rSouthernLatitude, "  Ra: ", rRa
-
-    do iCol=1,pGrd%iNX
-
-      cel => pGrd%Cells(iCol, iRow)
-
-      if (pGrd%iMask(iCol, iRow) == iINACTIVE_CELL) cycle
-
-      pGrd%Cells(iCol,iRow)%rReferenceET0 = ET0_hargreaves( &
-                                           pConfig, &
-                                           equivalent_evaporation(rRa), &
-                                           pGrd%Cells(iCol,iRow)%rTMin, &
-                                           pGrd%Cells(iCol,iRow)%rTMax)
+  fReferenceET0 = ET0_hargreaves( equivalent_evaporation(rRa), &
+                                  pGrd%Cells(iCol,iRow)%rTMin, &
+                                  pGrd%Cells(iCol,iRow)%rTMax)
     end do
 
   end do
 
-!!!   *$OMP END PARALLEL DO
-
-!  write(UNIT=LU_LOG,FMT=*) "=========HARGREAVES POTET CALCULATION==========="
-!  write(UNIT=LU_STD_OUT,FMT="(A)") &
-!       "                                 min          mean           max"
-!  call stats_WriteMinMeanMax(LU_STD_OUT,"POTET" , pGrd%Cells(:,:)%rReferenceET0 )
-!
-!  write(UNIT=LU_LOG,FMT=*) "=========HARGREAVES POTET CALCULATION==========="
-
-
 end subroutine et_hargreaves_ComputeET
 
-!--------------------------------------------------------------------------
-!!****f* et_hargreaves/ET0_hargreaves
-! NAME
-!   ET0_hargreaves - Calculates reference ET from air temperature data.
-!
-! SYNOPSIS
-!   Calculates reference ET given minimum and maximum air temperature.
-!
-! INPUTS
-!   r_mm - Value in millimeters.
-!
-! OUTPUTS
-!   r_in - Value in inches.
-!
-! SOURCE
 
-function ET0_hargreaves(pConfig, rRa, rTMinF, rTMaxF) result(rET_0)
+function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)
 
   ! [ ARGUMENTS ]
-
-  type (T_MODEL_CONFIGURATION), pointer :: pConfig ! pointer to data structure that contains
-                                                   ! model options, flags, and other settings
   real (kind=c_double),intent(in) :: rRa
   real (kind=c_float),intent(in) :: rTMinF
   real (kind=c_float),intent(in) :: rTMaxF
@@ -187,16 +139,13 @@ function ET0_hargreaves(pConfig, rRa, rTMinF, rTMaxF) result(rET_0)
 !           / rMM_PER_INCH)
 
   rET_0 = MAX(rZERO, &
-           ( pConfig%rET_Slope &
+           ( fET_Slope &
            * rRa &
-           * (FtoC(rTavg) + pConfig%rET_Constant) &
-           * (rTDelta**pConfig%rET_Exponent)) &
+           * (FtoC(rTavg) + pConfig%fET_Constant) &
+           * (rTDelta**fET_Exponent)) &
            / rMM_PER_INCH)
 
 end function ET0_hargreaves
 
-!!***
-
-  !> @}
 
 end module et_hargreaves

@@ -6,8 +6,8 @@
 module runoff_curve_number
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double
-  use types
-  use swb_grid
+  use exceptions
+  use continuous_frozen_ground_index
   use parameters
 
   implicit none
@@ -17,7 +17,7 @@ module runoff_curve_number
   type, public  :: RUNOFF_CURVE_NUMBER_T
 
     real (kind=c_float), allocatable    :: CN(:,:)
-
+    integer (kind=c_int), allocatable   :: iLanduseCodes(:)
 
   contains
 
@@ -29,286 +29,236 @@ module runoff_curve_number
 
   end type RUNOFF_CURVE_NUMBER_T  
 
-
-
 contains
 
+  subroutine initialize_parameter_values_sub(this)
 
-subroutine initialize_parameter_values_sub(this)
+    class (RUNOFF_CURVE_NUMBER_T)     :: this
 
-  class (RUNOFF_CURVE_NUMBER_T)     :: this
+    ! [ LOCALS ]
+    integer (kind=c_int)              :: iNumberOfLanduses
+    integer (kind=c_int)              :: iNumberOfSoilGroups
+    integer (kind=c_int), allocatable :: iCurveNumberSeqNums(:)
+    type (STRING_LIST_T)              :: slList
+    integer (kind=c_int)              :: iStat
+    integer (kind=c_int)              :: iSoilsIndex
+    character (len=:), allocatable    :: sText
 
-  ! [ LOCALS ]
-  integer (kind=c_int)              :: iNumberOfLanduses
-  integer (kind=c_int)              :: iNumberOfSoilGroups
-  integer (kind=c_int), allocatable :: iCurveNumberSeqNums(:)
-  integer (kind=c_int)              :: iNumberOfCurveNumberColumns
+    call slList%append("LU_Code", "Landuse_Lookup_Code")
+
+    !> Determine how many soil groups are present
+    slCurveNumber = PARAMS%grep_keys("CN")
+    iCurveNumberSeqNums = slCurveNumber%asInt()
+    iNumberOfSoilGroups = count( iCurveNumberSeqNums > 0 )
+
+    !> Determine how many landuse codes are present
+    call PARAMS%get_values( slList, this%iLanduseCodes )
+    iNumberOfLanduses = count( this%iLanduseCodes > 0 )
+
+    allocate( CN(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
+    call assert( iStat == 0, "Failed to allocate memory for curve number table", &
+      __FILE__, __LINE__)
+
+    ! we should have the curve number table fully filled out following this block
+    do iSoilsIndex = 1, iNumberOfSoilGroups
+      sText = "CN_"//asCharacter(iSoilsIndex)
+      call PARAMS%get_values( sText, CN(:, iSoilsIndex) )
+    enddo  
+    
+  end subroutine initialize_parameter_values_sub
 
 
-  !> Repeat for curve numbers (CN)
-  slCurveNumber = PARAMS%grep_keys("CN")
-  iCurveNumberSeqNums = slCurveNumber%asInt()
-  iNumberOfCurveNumberColumns = count( iCurveNumberSeqNums > 0 )
+  function return_landuse_index_fn(this, iLanduseCode)  result(iLanduseIndex)
 
+    class (RUNOFF_CURVE_NUMBER_T)     :: this
 
-end subroutine initialize_parameter_values_sub
+    ! [ LOCALS ]
+    integer (kind=c_int)   :: iLanduseIndex
+    logical (kind=c_bool)  :: lMatch
 
+    iLanduseIndex = 0
+    lMatch = lFALSE
 
+    do while (iIndex < ubound(this%iLanduseCodes, 1) )
 
+      iLanduseIndex = iLanduseIndex + 1
 
-subroutine runoff_InitializeCurveNumber( pGrd, pConfig )
-  !! Looks up the base curve number for each cell and stores it in the grid
-  ! [ ARGUMENTS ]
-  type ( T_GENERAL_GRID ),pointer :: pGrd        ! pointer to model grid
-  type (T_MODEL_CONFIGURATION), pointer :: pConfig ! pointer to data structure that contains
-                                                   ! model options, flags, and other setting
-
-  ! [ LOCALS ]
-  integer (kind=c_int) :: iCol,iRow,k,l
-  type (T_CELL),pointer :: cel              ! pointer to a grid cell data structure
-  type ( T_LANDUSE_LOOKUP ),pointer :: pLU  ! pointer to landuse data structure
-  logical (kind=c_bool) :: lMatch
-
-  write(UNIT=LU_LOG,FMT=*)"Initializing the base curve numbers"
-  ! Initialize all CNs to "bare rock"
-  pGrd%Cells(:,:)%rBaseCN = real(5,c_float)
-
-  do iRow=1,pGrd%iNY
-    do iCol=1,pGrd%iNX
-      ! Use the LU and SG in the grid cell, along with the LU option to
-      ! look up the curve number
-
-	  cel => pGrd%Cells(iCol,iRow)
-
-    if (pGrd%iMask(iCol, iRow) == iINACTIVE_CELL) cycle
-
-	  lMatch = lFALSE
-
-      ! iterate through all land use types
-      do k = 1,size(pConfig%LU,1)
-
-        !create pointer to a specific land use type
-        pLU => pConfig%LU(k)
-		    call assert(associated(pLU), &
-		   "pointer association failed - runoff_curve_number")
-
-        if ( pLU%iLandUseType == cel%iLandUse ) then
-
-          do l=1,size(pConfig%CN,2)
-            if(cel%iSoilGroup==l) then
-              cel%rBaseCN = pConfig%CN(k,l)
-              lMatch = lTRUE
-              exit
-            end if
-
-          end do
-
-          if(.not. lMatch) then
-            write(UNIT=LU_LOG,FMT=*) iRow,iCol,k, "LU:",pLU%iLandUseType, &
-  		        "Soil:",cel%iSoilGroup, "CN:",cel%rBaseCN
-            call assert(lFALSE, "Failed to find a curve number for this " &
-	  	        //"combined landuse and soil type. See logfile for details.", &
-              trim(__FILE__),__LINE__)
-          endif
-
-          exit
-        end if
-
-      end do
-
+      if (iLanduseCode == this%iLanduseCodes(iLanduseIndex) ) then
+        lMatch = lTRUE
+        exit
+      endif
+      
     end do
 
-  end do
+    if ( .not. lMatch ) &
+       call warn("Failed to find a matching landuse code in tables. LU code = " &
+          //asCharacter(iLanduseCode), lFatal=lTRUE)
 
-  write(UNIT=LU_LOG,FMT=*) 'CN minimum: ',MINVAL(pGrd%Cells(:,:)%rBaseCN)
-  write(UNIT=LU_LOG,FMT=*) 'CN maximum: ',MAXVAL(pGrd%Cells(:,:)%rBaseCN)
+  end function return_landuse_index_fn(this, iLanduseCode)
 
-#ifdef DEBUG_PRINT
-  call grid_WriteArcGrid("BASE_CURVE_NUMBER.grd", &
-          pGrd%rX0,pGrd%rX1,pGrd%rY0,pGrd%rY1,pGrd%Cells(:,:)%rBaseCN )
-#endif
 
-  write(UNIT=LU_LOG,FMT=*) "returning from base curve number initialization..."
+  function get_base_curve_number_fn(this, iLanduseIndex, iSoilsGroup )  result( fCN )
 
-  return
-end subroutine runoff_InitializeCurveNumber
+    class (RUNOFF_CURVE_NUMBER_T)      :: this
+    integer (kind=c_int), intent(in)   :: iLanduseIndex
+    integer (kind=c_int), intent(in)   :: iSoilsGroup
+    real (kind=c_float)                :: fCN
 
-!--------------------------------------------------------------------------
+    if (iLanduseIndex > ubound(CN, 1) .or. iSoilsGroup > ubound(CN, 2) ) &
+      call die( "Index out of bounds. iLanduseIndex = "//asCharacter(iLanduseIndex) &
+         //"; iSoilsGroup = "//asCharacter(iSoilsGroup), __FILE__, __LINE__ )
+    
+    fCN  this%CN( iLanduseIndex, iSoilsGroup )
 
-function prob_runoff_enhancement(rCFGI, rLL, rUL)    result(rPf)
-
-  real (kind=c_float) :: rCFGI, rLL, rUL, rPf
-
-  call Assert(LOGICAL(rLL<=rUL,kind=c_bool), &
-    "Lower CFGI limit defining unfrozen ground must be <= upper CFGI limit")
-
-  if(rCFGI <= rLL) then
-    rPf = rZERO
-  elseif(rCFGI >= rUL) then
-    rPf = rONE
-  else
-    rPf = (rCFGI - rLL) / (rUL - rLL)
-  end if
-
-  return
-
-end function prob_runoff_enhancement
+  end function get_base_curve_number_fn
 
 !--------------------------------------------------------------------------
 
-subroutine runoff_UpdateCurveNumber(pConfig, cel,iJulDay)
-  !! Updates the curve numbers for this iteration
-  ! [ ARGUMENTS ]
-  type (T_MODEL_CONFIGURATION), pointer :: pConfig ! pointer to data structure that con
-                                                   ! model options, flags, and other se
-  type (T_CELL),pointer :: cel
-  integer (kind=c_int),intent(in) :: iJulDay
-  ! [ LOCALS ]
-  real (kind=c_float) :: rTotalInflow
-  real (kind=c_float) :: rTempCN
-  real (kind=c_float) :: rPf
+  function prob_runoff_enhancement( fCFGI )    result(rPf)
 
-  !! update curve numbers based on antecedent moisture conditions
-! real (kind=c_float),dimension(5),parameter :: rDRY_COEFS = (/ &
-!                       1.44206581732462E-06_c_float, &
-!                      -2.54340415305462E-04_c_float, &
-!                       2.07018739405394E-02_c_float, &
-!                      -7.67877072822852E-03_c_float, &
-!                       2.09678222732103_c_float /)
-!  real (kind=c_float),dimension(5),parameter :: rWET_COEFS = (/ &
-!                      -6.20352282661163E-07_c_float, &
-!                       1.60650096926368E-04_c_float, &
-!                      -2.03362629006156E-02_c_float, &
-!                       2.01054923513527_c_float, &
-!                       3.65427885962651_c_float /)
+    real (kind=c_float), intent(in) :: fCFGI
+    real (kind=c_float)             :: fPf
 
-  ! Here goes...
-  rTotalInflow = sum(cel%rNetInflowBuf)
-
-  ! Correct the curve number...
-  if(cel%rCFGI>pConfig%rLL_CFGI &
-       .and. cel%rSoilWaterCap > rNEAR_ZERO) then
-!    cel%rAdjCN = MIN(98_c_float,cel%rAdjCN + &
-!       ((98_c_float-cel%rAdjCN) * cel%rSoilMoisture / cel%rSoilWaterCap))
-
-     rPf = prob_runoff_enhancement(cel%rCFGI,pConfig%rLL_CFGI,pConfig%rUL_CFGI)
-
-     ! use probability of runoff enhancement to calculate a weighted
-     ! average of curve number under Type II vs Type III antecedent
-     ! runoff conditions
-     cel%rAdjCN = cel%rBaseCN * (1-rPf) + &
-                  (cel%rBaseCN / (0.427 + 0.00573 * cel%rBaseCN) * rPf)
-
-  else if ( lf_model_GrowingSeason(pConfig, iJulDay) ) then
-
-    if ( rTotalInflow < pConfig%rDRY_GROWING ) then           ! AMC I
-
-
-!      cel%rAdjCN = polynomial(cel%rBaseCN,rDRY_COEFS)
-
-!      The following comes from page 192, eq. 3.145 of "SCS Curve Number
-!      Methodology"
-
-      cel%rAdjCN = cel%rBaseCN / (2.281 - 0.01281 * cel%rBaseCN)
-
-    else if ( rTotalInflow >= pConfig%rDRY_GROWING &
-        .and. rTotalInflow < pConfig%rWET_GROWING ) then	  ! AMC II
-
-       cel%rAdjCN = real(cel%rBaseCN)
-
-    else													  ! AMC III
-
-!      cel%rAdjCN = polynomial(cel%rBaseCN,rWET_COEFS)
-      cel%rAdjCN = cel%rBaseCN / (0.427 + 0.00573 * cel%rBaseCN)
-    end if
-
-  else ! dormant (non-growing) season
-
-    if ( rTotalInflow < pConfig%rDRY_DORMANT ) then           ! AMC I
-
-!      cel%rAdjCN = polynomial(cel%rBaseCN,rDRY_COEFS)
-      cel%rAdjCN = cel%rBaseCN / (2.281 - 0.01281 * cel%rBaseCN)
-
-    else if ( rTotalInflow >= pConfig%rDRY_DORMANT &
-        .and. rTotalInflow < pConfig%rWET_DORMANT ) then      ! AMC II
-
-      cel%rAdjCN = real(cel%rBaseCN)
-
-    else													  ! AMC III
-
-!      cel%rAdjCN = polynomial(cel%rBaseCN,rWET_COEFS)
-      cel%rAdjCN = cel%rBaseCN / (0.427 + 0.00573 * cel%rBaseCN)
-
-    end if
-
-  end if
-
-  ! ensure that whatever modification have been made to the curve number
-  ! remain within reasonable bounds
-  cel%rAdjCN = MIN(cel%rAdjCN,rHUNDRED)
-  cel%rAdjCN = MAX(cel%rAdjCN,rZERO)
-
-end subroutine runoff_UpdateCurveNumber
-
-!--------------------------------------------------------------------------
-
-function runoff_CellRunoff_CurveNumber(pConfig, cel, iJulDay) result(rOutFlow)
-  !! Calculates a single cell's runoff using curve numbers
-  type (T_MODEL_CONFIGURATION), pointer :: pConfig ! pointer to data structure that contains
-                                                   ! model options, flags, and other settings
-  type (T_CELL),pointer :: cel
-  integer (kind=c_int),intent(in) :: iJulDay
-  ! [ RETURN VALUE ]
-  real (kind=c_float) :: rOutFlow
-  ! [ LOCALS ]
-  real (kind=c_float) :: rP
-  real (kind=c_float) :: rCN_05
-  real (kind=c_float) :: rSMax
-
-  rP = cel%rNetRainfall &
-       + cel%rSnowMelt &
-       + cel%rIrrigationAmount &
-       + cel%rInFlow
-
-  call runoff_UpdateCurveNumber(pConfig,cel,iJulDay)
-
-  rSMax = (rTHOUSAND / cel%rAdjCN) - rTEN
-
-  if(pConfig%iConfigureInitialAbstraction == &
-                                      CONFIG_SM_INIT_ABSTRACTION_TR55) then
-
-    if ( rP > rPOINT2*rSMax ) then
-      rOutFlow = ( rP - rPOINT2*rSMax )**2  / (rP + rPOINT8*rSMax)
+    if(rCFGI <= CFGI_LL ) then
+      rPf = rZERO
+    elseif(rCFGI >= CFGI_UL) then
+      rPf = rONE
     else
-      rOutFlow = rZERO
+      rPf = ( rCFGI - CFGI_LL ) / ( CFGI_UL - CFGI_LL )
     end if
 
-  else if(pConfig%iConfigureInitialAbstraction == &
-                                   CONFIG_SM_INIT_ABSTRACTION_HAWKINS) then
-
-    ! Equation 9, Hawkins and others, 2002
-    rCN_05 = 100_c_float / &
-      ((1.879_c_float * ((100_c_float / cel%rAdjCN) - 1_c_float )**1.15_c_float) +1_c_float)
-
-
-	  ! Equation 8, Hawkins and others, 2002
-    rSMax = 1.33_c_float * ( rSMax ) ** 1.15_c_float
-
-    ! now consider runoff if Ia ~ 0.05S
-    if ( rP > 0.05_c_float * rSMax ) then
-      rOutFlow = ( rP - 0.05_c_float * rSMax )**2  / (rP + 0.95_c_float*rSMax)
-    else
-      rOutFlow = rZERO
-    end if
-
-  else
-    call Assert(lFALSE, "Illegal initial abstraction method specified" )
-  end if
-
-  return
-
-end function runoff_CellRunoff_CurveNumber
+  end function prob_runoff_enhancement
 
 !--------------------------------------------------------------------------
+
+  function update_curve_number_fn(this, iLanduseIndex, iSoilsGroup, fInflow, fCFGI, &
+    lIsGrowingSeason )  result( fCN_adj )
+    
+    class (RUNOFF_CURVE_NUMBER_T)     :: this
+    integer (kind=c_int), intent(in)  :: iLanduseIndex
+    integer (kind=c_int), intent(in)  :: iSoilsIndex
+    real (kind=c_float), intent(in)   :: fInflow
+    real (kind=c_float), intent(in)   :: fCFGI
+    logical (kind=c_bool), intent(in) :: lIsGrowingSeason
+    
+    ! [ LOCALS ]
+    real (kind=c_float) :: fPf
+    real (kind=c_float) :: fCN
+
+    fCN = this%get_curvenum( iLanduseIndex, iSoilsGroup )
+
+    ! Correct the curve number...
+    if( fCFGI > CFGI_LL ) then
+
+       fPf = prob_runoff_enhancement( fCFGI )
+
+       ! use probability of runoff enhancement to calculate a weighted
+       ! average of curve number under Type II vs Type III antecedent
+       ! runoff conditions
+       fCN_adj = fCN * (1-rPf) + &
+                    ( fCN / ( 0.427 + 0.00573 * fCN ) * rPf )
+
+    else if ( lIsGrowingSeason ) then
+
+      if ( rTotalInflow < pConfig%rDRY_GROWING ) then              ! AMC I
+
+  !      The following comes from page 192, eq. 3.145 of "SCS Curve Number
+  !      Methodology"
+
+        fCN_adj = fCN / (2.281 - 0.01281 * fCN )
+
+      else if ( rTotalInflow >= pConfig%rDRY_GROWING &
+          .and. rTotalInflow < pConfig%rWET_GROWING ) then	       ! AMC II
+
+         fCN_adj = fCN
+
+      else													                               ! AMC III
+        fCN_adj = fCN / ( 0.427 + 0.00573 * fCN )
+      end if
+
+    else ! dormant (non-growing) season
+
+      if ( rTotalInflow < pConfig%rDRY_DORMANT ) then              ! AMC I
+
+        fCN_adj = cel%rBaseCN / (2.281 - 0.01281 * cel%rBaseCN)
+
+      else if ( fInflow >= pConfig%rDRY_DORMANT &
+          .and. fInflow < pConfig%rWET_DORMANT ) then              ! AMC II
+
+        fCN_adj = fCN
+
+      else													                               ! AMC III
+
+        fCN_adj = fCN / ( 0.427 + 0.00573 * fCN )
+
+      end if
+
+    end if
+
+    ! ensure that whatever modification have been made to the curve number
+    ! remain within reasonable bounds
+    fCN_adj = MIN( fCN_adj, 100_c_float ) 
+    fCN_adj = MAX( fCN_adj, 0_c_float )
+
+  end function update_curve_number_fn
+
+!--------------------------------------------------------------------------
+
+  function calculate_runoff_fn(this, fCN, fInflow )   result(fOutflow)
+
+    !! Calculates a single cell's runoff using curve numbers
+    
+    ! [ RETURN VALUE ]
+    real (kind=c_float) :: rOutFlow
+    ! [ LOCALS ]
+    real (kind=c_float) :: rP
+    real (kind=c_float) :: rCN_05
+    real (kind=c_float) :: rSMax
+
+    rP = cel%rNetRainfall &
+         + cel%rSnowMelt &
+         + cel%rIrrigationAmount &
+         + cel%rInFlow
+
+    call runoff_UpdateCurveNumber(pConfig,cel,iJulDay)
+
+    rSMax = (1000_c_float / cel%rAdjCN) - 10_c_float
+
+    if(pConfig%iConfigureInitialAbstraction == &
+                                        CONFIG_SM_INIT_ABSTRACTION_TR55) then
+
+      if ( rP > rPOINT2*rSMax ) then
+        rOutFlow = ( rP - 0.2_c_float * rSMax )**2  / (rP + 0.8_c_float * rSMax)
+      else
+        rOutFlow = 0_c_float
+      end if
+
+    else if(pConfig%iConfigureInitialAbstraction == &
+                                     CONFIG_SM_INIT_ABSTRACTION_HAWKINS) then
+
+      ! Equation 9, Hawkins and others, 2002
+      rCN_05 = 100_c_float / &
+        ((1.879_c_float * ((100_c_float / cel%rAdjCN) - 1_c_float )**1.15_c_float) +1_c_float)
+
+
+  	  ! Equation 8, Hawkins and others, 2002
+      rSMax = 1.33_c_float * ( rSMax ) ** 1.15_c_float
+
+      ! now consider runoff if Ia ~ 0.05S
+      if ( rP > 0.05_c_float * rSMax ) then
+        rOutFlow = ( rP - 0.05_c_float * rSMax )**2  / (rP + 0.95_c_float*rSMax)
+      else
+        rOutFlow = 0_c_float
+      end if
+
+    else
+      call Assert(lFALSE, "Illegal initial abstraction method specified" )
+    end if
+
+    return
+
+  end function calculate_runoff_fn
+
+  !--------------------------------------------------------------------------
 
 end module runoff_curve_number

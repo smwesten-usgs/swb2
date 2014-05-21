@@ -7,7 +7,7 @@ module exceptions
 
   private
 
-  public :: assert, die, warn
+  public :: assert, die, warn, check_warnings
 
   interface  assert
      module procedure :: assert_4bit
@@ -52,13 +52,14 @@ contains
   subroutine check_warnings()
 
     ! [ LOCALS ]
-    character (len=3) :: sNumWarnings
+    character (len=6) :: sNumWarnings
 
-    if ( NUMBER_OF_FATAL_WARNINGS > 0 ) &
-      write(unit=sNumWarnings, fmt="(i3)") NUMBER_OF_FATAL_WARNINGS
-      call die( sMessage=sNumWarnings//" warnings were issued and will "  &
+    if ( NUMBER_OF_FATAL_WARNINGS > 0 ) then
+      write(unit=sNumWarnings, fmt="(i0)") NUMBER_OF_FATAL_WARNINGS
+      call die( sMessage=trim(adjustl(sNumWarnings))//" warnings were issued and will "  &
         //"cause serious problems later in the run.", &
         sHints="Please address the warnings and try again.")
+    endif  
 
   end subroutine check_warnings  
 
