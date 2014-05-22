@@ -3,7 +3,7 @@ module parameters
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
   use exceptions
   use types_new
-  use data_file
+  use file_operations
   use strings
   use string_list
   use dictionary
@@ -84,7 +84,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)         :: iFileIndex, iColIndex
     integer (kind=c_int)         :: iStat
-    type (DATA_FILE_T)           :: DF
+    type (ASCII_FILE_T)           :: DF
     type (DICT_ENTRY_T), pointer :: pDict
     type (DICT_ENTRY_T), pointer :: pCurrentDict
     integer (kind=c_int)         :: iNumberOfHeaderLines
