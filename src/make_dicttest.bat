@@ -1,0 +1,2 @@
+gfortran types_new.F90 constants_and_conversions.F90 strings.F90 string_list.F90 data_file.F90 dictionary.F90 parameters.F90 test_params.F90 ^
+exceptions.F90 -fexceptions -fbounds-check -o test_params.exe
