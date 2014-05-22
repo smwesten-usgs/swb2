@@ -44,11 +44,16 @@ contains
     integer (kind=c_int)              :: iSoilsIndex
     character (len=:), allocatable    :: sText
 
-    call slList%append("LU_Code", "Landuse_Lookup_Code")
+    call slList%append("LU_Code")
+    call slList%append("Landuse_Lookup_Code")
 
     !> Determine how many soil groups are present
+
+    ! retrieve a string list of all keys associated with curve number (i.e. "CN_1", "CN_2", "CN_3", etc)
     slCurveNumber = PARAMS%grep_keys("CN")
+    ! Convert the string list to an vector of integers; this call strips off the "CN_" part of label
     iCurveNumberSeqNums = slCurveNumber%asInt()
+    ! count how many items are present in the vector; this should equal the number of soils groups
     iNumberOfSoilGroups = count( iCurveNumberSeqNums > 0 )
 
     !> Determine how many landuse codes are present

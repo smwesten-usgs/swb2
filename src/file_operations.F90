@@ -1,4 +1,4 @@
-module data_file
+module file_operations
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
   use iso_fortran_env, only : IOSTAT_END
@@ -11,7 +11,7 @@ module data_file
 
   private
   
-  type, public :: DATA_FILE_T
+  type, public :: ASCII_FILE_T
 
     character (len=:), allocatable  :: sFilename
     character (len=:), allocatable  :: sDelimiters
@@ -68,53 +68,58 @@ module data_file
     procedure, private :: read_line_of_data_fn
     generic, public    :: readLine => read_line_of_data_fn
 
-  end type DATA_FILE_T
+  end type ASCII_FILE_T
 
 
 contains
 
   function return_num_lines_fn(this)    result(iNumLines)
 
-    class (DATA_FILE_T)   :: this
+    class (ASCII_FILE_T)   :: this
     integer (kind=c_int) :: iNumLines
 
     iNumLines = this%iNumberOfLines
 
   end function return_num_lines_fn
 
+!--------------------------------------------------------------------------------------------------
 
   function return_num_records_fn(this)                 result(iNumRecords)
 
-    class (DATA_FILE_T)   :: this
+    class (ASCII_FILE_T)   :: this
     integer (kind=c_int) :: iNumRecords
 
     iNumRecords = this%iNumberOfRecords
 
   end function return_num_records_fn
 
+!--------------------------------------------------------------------------------------------------
 
   function return_current_linenum_fn(this)          result(iCurrentLinenum)
 
-    class (DATA_FILE_T)   :: this
+    class (ASCII_FILE_T)   :: this
     integer (kind=c_int) :: iCurrentLinenum
 
     iCurrentLinenum = this%iCurrentLinenum
 
   end function return_current_linenum_fn
 
+!--------------------------------------------------------------------------------------------------
+
   function have_we_reached_the_EOF_fn(this)           result(lIsEOF)
 
-    class (DATA_FILE_T)     :: this
+    class (ASCII_FILE_T)     :: this
     logical (kind=c_bool)   :: lIsEOF
 
     lIsEOF = this%lEOF
 
   end function have_we_reached_the_EOF_fn  
 
+!--------------------------------------------------------------------------------------------------
 
   function is_current_line_a_comment_fn(this)         result(lIsComment)
 
-    class (DATA_FILE_T)     :: this
+    class (ASCII_FILE_T)     :: this
     logical (kind=c_bool)   :: lIsComment
 
     ! [ LOCALS ]
@@ -134,18 +139,22 @@ contains
         
   end function is_current_line_a_comment_fn  
 
+!--------------------------------------------------------------------------------------------------
 
+  subroutine open_file_read_access_sub(this, sFilename, sCommentChars, sDelimiters, lHasHeader )
 
-
-  subroutine open_file_read_access_sub(this, sFilename, sCommentChars, sDelimiters )
-
-    class (DATA_FILE_T), intent(inout) :: this
-    character (len=*), intent(in)      :: sFilename
-    character (len=*), intent(in)      :: sCommentChars
-    character (len=*), intent(in)      :: sDelimiters
+    class (ASCII_FILE_T), intent(inout)         :: this
+    character (len=*), intent(in)               :: sFilename
+    character (len=*), intent(in)               :: sCommentChars
+    character (len=*), intent(in)               :: sDelimiters
+    logical (kind=c_bool), intent(in), optional :: lHasHeader
     
     this%sCommentChars = sCommentChars
     this%sDelimiters = sDelimiters
+
+    if (present( lHasHeader ) ) then
+      if (.not. lHasHeader ) this%iNumberOfHeaderLines = 0
+    endif
 
     if (.not. this%isOpen() ) then
 
@@ -170,10 +179,11 @@ contains
 
   end subroutine open_file_read_access_sub
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine open_file_write_access_sub(this, sFilename)
 
-    class (DATA_FILE_T), intent(inout) :: this
+    class (ASCII_FILE_T), intent(inout) :: this
     character (len=*), intent(in) :: sFilename
 
     if (.not. this%isOpen() ) then
@@ -195,22 +205,22 @@ contains
 
   end subroutine open_file_write_access_sub
 
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine close_file_sub(this)
 
-    class (DATA_FILE_T) :: this
+    class (ASCII_FILE_T) :: this
 
     close(unit=this%iUnitNum, iostat=this%iStat)
     this%lIsOpen = lFALSE
 
   end subroutine close_file_sub
 
-
+!--------------------------------------------------------------------------------------------------
 
   function does_file_exist_fn(this, sFilename) result(lExists)
 
-    class (DATA_FILE_T)              :: this
+    class (ASCII_FILE_T)              :: this
     character (len=*), intent(in)    :: sFilename
     logical(kind=c_bool)             :: lExists
 
@@ -218,21 +228,22 @@ contains
 
   end function does_file_exist_fn
 
-
+!--------------------------------------------------------------------------------------------------
 
   function is_file_open_fn(this) result(lIsOpen)
 
-    class (DATA_FILE_T) :: this
+    class (ASCII_FILE_T) :: this
     logical(kind=c_bool) :: lIsOpen
 
     lIsOpen = this%lIsOpen
 
   end function is_file_open_fn
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine count_number_of_lines_sub(this)
 
-    class (DATA_FILE_T), intent(inout) :: this
+    class (ASCII_FILE_T), intent(inout) :: this
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iStat
@@ -269,27 +280,20 @@ contains
 
   end subroutine count_number_of_lines_sub
 
-
+!--------------------------------------------------------------------------------------------------
 
   function read_header_fn(this) result (stList)
 
-    class (DATA_FILE_T), intent(inout) :: this
+    class (ASCII_FILE_T), intent(inout) :: this
     type (STRING_LIST_T) :: stList
 
     ! [ LOCALS ]
     character (len=MAX_STR_LEN)           :: sString 
     character (len=MAX_STR_LEN)           :: sSubString
     character (len=:), allocatable        :: sSubStringClean
-    logical (kind=c_bool)                 :: lIsComment
-    
-    lIsComment = lTRUE
 
-    do while( lIsComment )
 
-      this%sBuf = this%readline()
-      lIsComment = this%isComment()
-
-    enddo
+    this%sBuf = this%readline()
 
     do while ( len_trim( this%sBuf ) > 0)
 
@@ -303,34 +307,40 @@ contains
 
   end function read_header_fn
 
-
-
+!--------------------------------------------------------------------------------------------------
 
   function read_line_of_data_fn(this) result(sText)
 
-    class (DATA_FILE_T), intent(inout) :: this
+    class (ASCII_FILE_T), intent(inout) :: this
     character (len=:), allocatable     :: sText
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iStat
+    logical (kind=c_bool)                 :: lIsComment
+    
+    lIsComment = lTRUE
 
-    if (this%isOpen() ) then
+    do while ( lIsComment .and. this%isOpen() )
 
-      read (unit = this%iUnitNum, fmt = "(a)", iostat = iStat) this%sBuf
+      if (this%isOpen() ) then
 
-      if (iStat == IOSTAT_END) then
-        this%lEOF = lTRUE
-        sText = ""
-        call this%close()
-      else
-        sText = trim(this%sBuf)
-        this%iCurrentLinenum = this%iCurrentLinenum + 1
+        read (unit = this%iUnitNum, fmt = "(a)", iostat = iStat) this%sBuf
+
+        if (iStat == IOSTAT_END) then
+          this%lEOF = lTRUE
+          sText = ""
+          call this%close()
+        else
+          sText = trim(this%sBuf)
+          this%iCurrentLinenum = this%iCurrentLinenum + 1
+        endif
+
+        lIsComment = this%isComment()
+
       endif
 
-    endif
+    enddo
 
   end function read_line_of_data_fn
 
-
-
-end module data_file
+end module file_operations

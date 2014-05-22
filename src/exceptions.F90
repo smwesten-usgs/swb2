@@ -32,16 +32,16 @@ contains
     iLU = OUTPUT_UNIT
 
     write (unit=iLU, fmt="(/,/,a)") "** ERROR -- PROGRAM EXECUTION HALTED **"
-    write (unit=iLU, fmt="(/,t5,a,t23,a)") "error condition: ", trim(sMessage)
+    write (unit=iLU, fmt="(/,t3,a19,t22,a)") "error condition:  ", trim(sMessage)
 
     if (present(sModule))  &
-      write (unit=iLU, fmt="(t5,a,t23,a)")     "module: ", trim(sModule)
+      write (unit=iLU, fmt="(t3,a19,t22,a)") "module:  ", trim(sModule)
 
     if (present(iLine))  &
-      write (unit=iLU, fmt="(t5,a,t23,i0)")  "line no: ", iLine
+      write (unit=iLU, fmt="(t3,a19,t22,i0)") "line no:  ", iLine
 
     if (present(sHints)) &
-      write (unit=iLU, fmt="(/,t5,'==> ',a)") sHints
+      write (unit=iLU, fmt="(/,t2,'==>  ',a)") sHints
 
     write (unit=iLU, fmt="(/)")
 
@@ -78,16 +78,16 @@ contains
     iLU = OUTPUT_UNIT
 
     write (unit=iLU, fmt="(/,/,a)") "** WARNING **"
-    write (unit=iLU, fmt="(/,t5,a,t23,a)") "possible error: ", trim(sMessage)
+    write (unit=iLU, fmt="(/,t3,a19,t22,a)") "possible error:  ", trim(sMessage)
 
     if (present(sModule))  &
-      write (unit=iLU, fmt="(t5,a,t23,a)")     "module: ", trim(sModule)
+      write (unit=iLU, fmt="(t3,a19,t22,a)")     "module:  ", trim(sModule)
 
     if (present(iLine))  &
-      write (unit=iLU, fmt="(t5,a,t23,i0)")  "line no: ", iLine
+      write (unit=iLU, fmt="(t3,a19,t22,i0)")  "line no:  ", iLine
 
     if (present(sHints)) &
-      write (unit=iLU, fmt="(/,t5,'==> ',a)") sHints
+      write (unit=iLU, fmt="(/,t3,'==>  ',a)") sHints
 
     write (unit=iLU, fmt="(/)")
 
