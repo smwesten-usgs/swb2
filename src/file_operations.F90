@@ -82,6 +82,7 @@ contains
 
   end function return_num_lines_fn
 
+!--------------------------------------------------------------------------------------------------
 
   function return_num_records_fn(this)                 result(iNumRecords)
 
@@ -92,6 +93,7 @@ contains
 
   end function return_num_records_fn
 
+!--------------------------------------------------------------------------------------------------
 
   function return_current_linenum_fn(this)          result(iCurrentLinenum)
 
@@ -102,6 +104,8 @@ contains
 
   end function return_current_linenum_fn
 
+!--------------------------------------------------------------------------------------------------
+
   function have_we_reached_the_EOF_fn(this)           result(lIsEOF)
 
     class (ASCII_FILE_T)     :: this
@@ -111,6 +115,7 @@ contains
 
   end function have_we_reached_the_EOF_fn  
 
+!--------------------------------------------------------------------------------------------------
 
   function is_current_line_a_comment_fn(this)         result(lIsComment)
 
@@ -134,8 +139,7 @@ contains
         
   end function is_current_line_a_comment_fn  
 
-
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine open_file_read_access_sub(this, sFilename, sCommentChars, sDelimiters, lHasHeader )
 
@@ -175,6 +179,7 @@ contains
 
   end subroutine open_file_read_access_sub
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine open_file_write_access_sub(this, sFilename)
 
@@ -200,7 +205,7 @@ contains
 
   end subroutine open_file_write_access_sub
 
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine close_file_sub(this)
 
@@ -211,7 +216,7 @@ contains
 
   end subroutine close_file_sub
 
-
+!--------------------------------------------------------------------------------------------------
 
   function does_file_exist_fn(this, sFilename) result(lExists)
 
@@ -223,7 +228,7 @@ contains
 
   end function does_file_exist_fn
 
-
+!--------------------------------------------------------------------------------------------------
 
   function is_file_open_fn(this) result(lIsOpen)
 
@@ -234,6 +239,7 @@ contains
 
   end function is_file_open_fn
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine count_number_of_lines_sub(this)
 
@@ -274,7 +280,7 @@ contains
 
   end subroutine count_number_of_lines_sub
 
-
+!--------------------------------------------------------------------------------------------------
 
   function read_header_fn(this) result (stList)
 
@@ -301,8 +307,7 @@ contains
 
   end function read_header_fn
 
-
-
+!--------------------------------------------------------------------------------------------------
 
   function read_line_of_data_fn(this) result(sText)
 
@@ -337,7 +342,5 @@ contains
     enddo
 
   end function read_line_of_data_fn
-
-
 
 end module file_operations

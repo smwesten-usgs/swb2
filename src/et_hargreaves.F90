@@ -106,10 +106,7 @@ subroutine et_hargreaves_ComputeET( iDayOfYear, iNumDaysInYear, fLatitude, fTMin
   fReferenceET0 = ET0_hargreaves( equivalent_evaporation(rRa), &
                                   pGrd%Cells(iCol,iRow)%rTMin, &
                                   pGrd%Cells(iCol,iRow)%rTMax)
-    end do
-
-  end do
-
+    
 end subroutine et_hargreaves_ComputeET
 
 

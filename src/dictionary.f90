@@ -53,10 +53,12 @@ module dictionary
 
     procedure, private   :: get_values_as_int_sub
     procedure, private   :: get_values_as_float_sub
+    procedure, private   :: get_values_as_string_list_sub
     procedure, private   :: get_values_as_int_given_list_of_keys_sub
     procedure, private   :: get_values_as_float_given_list_of_keys_sub
     generic              :: get_values => get_values_as_int_sub,                       &
                                           get_values_as_float_sub,                     &
+                                          get_values_as_string_list_sub,               &
                                           get_values_as_int_given_list_of_keys_sub,    &
                                           get_values_as_float_given_list_of_keys_sub
 
@@ -243,6 +245,46 @@ contains
 
 
   end subroutine get_values_as_int_sub
+
+
+
+
+
+
+ subroutine get_values_as_string_list_sub(this, sKey, slString)
+
+    class (DICT_T)                                  :: this
+    character (len=*), intent(in)                   :: sKey
+    type (STRING_LIST_T), intent(out)               :: slString
+
+    ! [ LOCALS ]
+    type (DICT_ENTRY_T), pointer   :: pTarget
+    integer (kind=c_int)           :: iStat
+    
+    pTarget => this%get_entry(sKey)
+
+    if ( associated( pTarget ) ) then
+
+      slString = pTarget%sl
+
+    else
+
+      call slString%append("<NA>")
+      call warn("Failed to find dictionary entry with a key value of "//dquote(sKey), &
+        __FILE__, __LINE__ )
+
+    endif  
+
+
+  end subroutine get_values_as_string_list_sub
+
+
+
+
+
+
+
+
 
   !> Search through keys for a match; return integer values.
   !!

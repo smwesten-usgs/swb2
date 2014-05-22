@@ -10,62 +10,153 @@ module et_crop_coefficients
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double
   use types
+  use control_file
+  use parameters
 	use sm_thornthwaite_mather
   implicit none
 
+  private
+
+  real (kind=c_float), allocatable   :: fREW(:,:)
+  real (kind=c_float), allocatable   :: fTEW(:,:)
+  real (kind=c_float), allocatable   :: iL_plant(:) 
+  real (kind=c_float), allocatable   :: iL_ini(:) 
+  real (kind=c_float), allocatable   :: iL_mid(:) 
+  real (kind=c_float), allocatable   :: iL_late(:) 
+  real (kind=c_float), allocatable   :: fKcb_ini(:)
+  real (kind=c_float), allocatable   :: fKcb_mid(:)
+  real (kind=c_float), allocatable   :: fKcb_end(:)
+  real (kind=c_float), allocatable   :: fKcb_min(:)
+  real (kind=c_float), allocatable   :: fDepletion_fraction(:)
+  real (kind=c_float), allocatable   :: fMean_plant_height(:)
+
   contains
+
+  subroutine et_kc_initialize()
+
+    ! [ LOCALS ]
+    type (STRING_LIST_T)             :: slREW, slTEW
+    integer (kind=c_int)             :: iTEWSeqNums, iREWSeqNums
+    integer (kind=c_int)             :: iNumberOfTEW, iNumberOfREW
+    integer (kind=c_int)             :: iIndex
+    character (len=:), allocatable   :: sText
+
+   ! retrieve a string list of all keys associated with REW (i.e. "REW_1", "REW_2", "REW_3", etc)
+   slREW = PARAMS%grep_keys("REW")
+   ! Convert the string list to an vector of integers; this call strips off the "REW_" part of label
+   iREWSeqNums = slREW%asInt()
+   ! count how many items are present in the vector; this should equal the number of soils groups
+   iNumberOfREW = count( iREWSeqNums > 0 )
+
+   ! retrieve a string list of all keys associated with TEW (i.e. "TEW_1", "TEW_2", "TEW_3", etc)
+   slTEW = PARAMS%grep_keys("TEW")
+   ! Convert the string list to an vector of integers; this call strips off the "TEW_" part of label
+   iTEWSeqNums = slTEW%asInt()
+   ! count how many items are present in the vector; this should equal the number of soils groups
+   iNumberOfTEW = count( iTEWSeqNums > 0 )
+
+
+   !> Determine how many landuse codes are present
+   call PARAMS%get_values( slList, this%iLanduseCodes )
+   iNumberOfLanduses = count( this%iLanduseCodes > 0 )
+
+   allocate( REW(iNumberOfLanduses, iNumberOfREW), stat=iStat )
+   call assert( iStat == 0, "Failed to allocate memory for readily evaporable water (REW) table", &
+     __FILE__, __LINE__)
+
+   allocate( TEW(iNumberOfLanduses, iNumberOfTEW), stat=iStat )
+   call assert( iStat == 0, "Failed to allocate memory for total evaporable water (TEW) table", &
+     __FILE__, __LINE__)
+
+   ! we should have the REW table fully filled out following this block
+   do iIndex = 1, iNumberOfREW
+     sText = "REW_"//asCharacter(iIndex)
+     call PARAMS%get_values( sText, fREW(:, iIndex) )
+   enddo  
+
+   ! we should have the TEW table fully filled out following this block
+   do iIndex = 1, iNumberOfTEW
+     sText = "TEW_"//asCharacter(iIndex)
+     call PARAMS%get_values( sText, fTEW(:, iIndex) )
+   enddo  
+
+   call PARAMS%get_values( "L_ini", iL_ini(:) )
+   call PARAMS%get_values( "L_mid", iL_mid(:) )
+   call PARAMS%get_values( "L_late", iL_late(:) )
+   call PARAMS%get_values( "L_min", iL_min(:) )
+
+   call PARAMS%get_values( "Kcb_ini", fKcb_ini(:) )
+   call PARAMS%get_values( "Kcb_mid", fKcb_mid(:) )
+   call PARAMS%get_values( "Kcb_end", fKcb_end(:) )
+   call PARAMS%get_values( "Kcb_min", fKcb_min(:) )
+
+   call PARAMS%get_values( "Depletion_Fraction", fDepletion_fraction(:) )
+   call PARAMS%get_values( "Mean_Plant_Height", fMean_plant_height(:) )
+
+
+  end subroutine et_kc_initialize
 
 !------------------------------------------------------------------------------
 
- !> Update the current basal crop corfficient (Kcb) for
+ !> Update the current basal crop coefficient (Kcb) for
  !! a SINGLE irrigation table entry
  !!
  !! @param[inout] pIRRIGATION pointer to a single line of information in the irrigation file.
  !! @param[in] iThreshold either the current day of year or the number of growing degree days.
  !! @retval rKcb Basal crop coefficient given the irrigation table entries and the current threshold values.
- function et_kc_UpdateCropCoefficient(pIRRIGATION, iThreshold)  result(rKcb)
+ function et_kc_UpdateCropCoefficient( iFAOIndex, iThreshold )  result(fKcb)
 
-  type (T_IRRIGATION_LOOKUP),pointer :: pIRRIGATION  ! pointer to an irrigation table entry
+  integer (kind=c_int), intent(in)   :: iFAOIndex
   integer (kind=c_int), intent(in)   :: iThreshold
-  real (kind=c_float)                :: rKcb
+  real (kind=c_float)                :: fKcb
 
   ! [ LOCALS ]
-  integer (kind=c_int) :: i, j
+  real (kind=c_double) :: fFrac
 
-  real (kind=c_double) :: frac
+  associate ( L_ini => iL_ini(iFAOIndex), L_mid => iL_mid(iFAOIndex), L_late => iL_late(iFAOIndex), &
+              L_plant => iL_plant(iFAOIndex), Kcb_ini => fKcb_ini(iFAOIndex),                       &
+              Kcb_dev => fKcb_dev(iFAOIndex), Kcb_mid => fKcb_mid(iFAOIndex),                       &
+              Kcb_end => fKcb_end(iFAOIndex) )
 
-  ! now calculate Kcb for the given landuse
-  if(iThreshold > pIRRIGATION%iL_late) then
-    rKcb = pIRRIGATION%rKcb_min
+    ! now calculate Kcb for the given landuse
+    if( iThreshold > L_late ) then
 
-  elseif ( iThreshold > pIRRIGATION%iL_mid ) then
-    frac = real(iThreshold - pIRRIGATION%iL_mid, kind=c_double ) &
-      / real( pIRRIGATION%iL_late - pIRRIGATION%iL_mid, kind=c_double )
-    rKcb =  pIRRIGATION%rKcb_mid * (1_c_double - frac) &
-                         + pIRRIGATION%rKcb_end * frac
+      fKcb = Kcb_min
 
-  elseif ( iThreshold > pIRRIGATION%iL_dev ) then
-    rKcb = pIRRIGATION%rKcb_mid
+    elseif ( iThreshold > L_mid ) then
+      
+      fFrac = real(iThreshold - L_mid, kind=c_double ) / real( L_late - L_mid, kind=c_double )
 
-  elseif ( iThreshold > pIRRIGATION%iL_ini ) then
-    frac = real(iThreshold - pIRRIGATION%iL_ini) &
-        / real( pIRRIGATION%iL_dev - pIRRIGATION%iL_ini )
-    rKcb = pIRRIGATION%rKcb_ini * (1_c_double - frac) &
-                           + pIRRIGATION%rKcb_mid * frac
+      fKcb =  Kcb_mid * (1_c_double - fFrac) + Kcb_end * fFrac
 
-  elseif ( iThreshold >= pIRRIGATION%iL_plant ) then
-    rKcb = pIRRIGATION%rKcb_ini
-  else
-    rKcb = pIRRIGATION%rKcb_min
-  endif
+    elseif ( iThreshold > L_dev ) then
+      
+      fKcb = Kcb_mid
+
+    elseif ( iThreshold > L_ini ) then
+
+      fFrac = real( iThreshold - L_ini ) / real( L_dev - L_ini )
+
+      fKcb = Kcb_ini * (1_c_double - fFrac) + Kcb_mid * fFrac
+
+    elseif ( iThreshold >= L_plant ) then
+      
+      rKcb = Kcb_ini
+    
+    else
+    
+      rKcb = Kcb_min
+    
+    endif
+
+  end associate
 
 end function et_kc_UpdateCropCoefficient
 
 !------------------------------------------------------------------------------
 
 !>
-function et_kc_CalcEvaporationReductionCoefficient(rTEW, rREW, &
-   rDeficit)  result(rKr)
+function et_kc_CalcEvaporationReductionCoefficient(rTEW, rREW, rDeficit)  result(rKr)
 
   ! [ ARGUMENTS ]
   real (kind=c_float) :: rTEW
@@ -88,36 +179,35 @@ end function et_kc_CalcEvaporationReductionCoefficient
 !------------------------------------------------------------------------------
 
 !> This function estimates the fraction of the ground covered by
-!> vegetation during the growing season
-!> @note Implemented as equation 76, FAO-56, Allen and others
-function et_kc_CalcFractionExposedAndWettedSoil( pIRRIGATION )   result (r_few)
+!! vegetation during the growing season
+!!
+!!@note Implemented as equation 76, FAO-56, Allen and others
+function et_kc_CalcFractionExposedAndWettedSoil( iFAOIndex, fKcb)   result (f_few)
 
-  ! [ ARGUMENTS ]
-  type (T_IRRIGATION_LOOKUP), pointer :: pIRRIGATION  ! pointer to an irrigation table entry
-
-  ! [ RESULT ]
-  real (kind=c_float) :: r_few
+  integer (kind=c_int), intent(in)     :: iFAOIndex
+  real (kind=c_float), intent(in)      :: fKcb
+  real (kind=c_float)                  :: f_few
 
   ! [ LOCALS ]
-  real (kind=c_float) :: r_fc
-  real (kind=c_float) :: rNumerator
-  real (kind=c_float) :: rDenominator
-  real (kind=c_float) :: rExponent
+  real (kind=c_float) :: f_fc
+  real (kind=c_float) :: fNumerator
+  real (kind=c_float) :: fDenominator
+  real (kind=c_float) :: fExponent
 
-  rNumerator = pIRRIGATION%rKcb - pIRRIGATION%rKcb_min
-  rDenominator = pIRRIGATION%rKcb_mid - pIRRIGATION%rKcb_min
-  rExponent = 1.0 + 0.5 * pIRRIGATION%rMeanPlantHeight * rM_PER_FOOT
+  fNumerator = fKcb - fKcb_min(iFAOIndex)
+  fDenominator = fKcb_mid(iFAOIndex) - fKcb_min(iFAOIndex)
+  fExponent = 1_c_float + 0.5_c_float * fMean_plant_height * rM_PER_FOOT
 
-  if(rDenominator > rNEAR_ZERO) then
-    r_fc = (rNumerator / rDenominator) ** rExponent
+  if(fDenominator >  0_c_float ) then
+    f_fc = ( fNumerator / fDenominator) ** fExponent
   else
-    r_fc = 1.0
+    f_fc = 1c_float
   endif
 
-  r_few = 1.0 - r_fc
+  f_few = 1c_float - f_fc
 
-  if (r_few < 0.) r_few = 0.0
-  if (r_few > 1.) r_few = 1.0
+  if ( f_few < 0_c_float ) f_few = 0_c_float
+  if ( f_few > 1_c_float ) f_few = 1_c_float
 
 end function et_kc_CalcFractionExposedAndWettedSoil
 
@@ -125,7 +215,7 @@ end function et_kc_CalcFractionExposedAndWettedSoil
 
 !> Calculate the effective root zone depth.
 !!
-!! Calculate the effective root zone depth give then current stage
+!! Calculate the effective root zone depth given the current stage
 !! of plant growth, the soil type, and the crop type.
 !!
 !! @param[in] pIRRIGATION pointer to a specific line of the irrigation
@@ -137,35 +227,35 @@ end function et_kc_CalcFractionExposedAndWettedSoil
 !!     the time that the crop is planted.
 !! @retval rZr_i current active rooting depth.
 !! @note Implemented as equation 8-1 (Annex 8), FAO-56, Allen and others.
-function et_kc_CalcEffectiveRootDepth(pIRRIGATION, rZr_max, iThreshold) 	result(rZr_i)
+function et_kc_CalcEffectiveRootDepth(iFAOIndex, fZr_max, iThreshold) 	result(fZr_i)
 
-  ! [ ARGUMENTS ]
-  type (T_IRRIGATION_LOOKUP),pointer :: pIRRIGATION  ! pointer to an irrigation table entry
-	real (kind=c_float) :: rZr_max
-	integer (kind=c_int) :: iThreshold ! either GDD or DOY
+  integer (kind=c_int), intent(in)    :: iFAOIndex 
+	real (kind=c_float), intent(in)     :: fZr_max
+	integer (kind=c_int), intent(in)    :: iThreshold ! either GDD or DOY
 
   ! [ RESULT ]
-  real (kind=c_float) :: rZr_i
+  real (kind=c_float) :: fZr_i
 
 	! [ LOCALS ]
 	! 0.328 feet equals 0.1 meters, which is seems to be the standard
 	! initial rooting depth in the FAO-56 methodology
-	real (kind=c_float), parameter :: rZr_min = 0.328
+	real (kind=c_float), parameter :: fZr_min = 0.328
 
-	if ( pIRRIGATION%rKcb_mid - pIRRIGATION%rKcb_ini < 0.1) then
-	  ! this is needed because for areas like forests, where the
-		 ! Kcb_ini and Kcb_mid are nearly the same, we assume that root depths are
-		 ! constant
-	  rZr_i = rZr_max
+  ! if there is not much difference between the Kcb_mid and Kcb_ini, assume that
+  ! we are dealing with an area such as a forest, where we assume that the rooting
+  ! depths are constant year-round
+	if ( fKcb_mid(iFAOIndex) - fKcb_ini(iFAOIndex) < 0.1) then
 
-	elseif(iThreshold < pIRRIGATION%iL_plant) then
+	  fZr_i = fZr_max
 
-	  rZr_i = rZr_min
+	elseif ( iThreshold < iL_plant(iFAOIndex) ) then
+
+	  fZr_i = fZr_min
 
 	else
 
-    rZr_i = rZr_min + (rZr_max - rZr_min) * ( real(iThreshold) - real(pIRRIGATION%iL_plant)) &
-                                           / ( real(pIrrigation%iL_dev) -  real(pIRRIGATION%iL_plant) )
+    fZr_i = fZr_min + (fZr_max - fZr_min) * real(iThreshold - iL_plant(iFAOIndex), kind=c_float ) &
+                                           / real( iL_dev(iFAOIndex) -  iL_plant(iFAOIndex), kind=c_float)
 
   endif
 
@@ -173,20 +263,17 @@ end function et_kc_CalcEffectiveRootDepth
 
 !------------------------------------------------------------------------------
 
-!> This function estimates Ke, the bare surface evaporation
-!> coefficient
-!> @note Implemented as equation 71, FAO-56, Allen and others
-function et_kc_CalcSurfaceEvaporationCoefficient( pIRRIGATION, &
-      rKr )     result(rKe)
+!> This function estimates Ke, the bare surface evaporation coefficient
+!!
+!! @note Implemented as equation 71, FAO-56, Allen and others
+function et_kc_CalcSurfaceEvaporationCoefficient( iFAOIndex, fKr, fKcb )     result(fKe)
 
-  ! [ ARGUMENTS ]
-  type (T_IRRIGATION_LOOKUP),pointer :: pIRRIGATION  ! pointer to an irrigation table entry
-  real (kind=c_float) :: rKr
+  integer (kind=c_int), intent(in)     :: iFAOIndex
+  real (kind=c_float), intent(in)      :: fKr
+  real (kind=c_float), intent(in)      :: fKcb
+  real (kind=c_float)                  :: fKe
 
-  ! [ RESULT ]
-  real (kind=c_float) :: rKe
-
-  rKe = rKr * ( pIRRIGATION%rKcb_max - pIRRIGATION%rKcb )
+  fKe = fKr * ( rKcb_max(iFAOIndex) - fKcb )
 
 end function et_kc_CalcSurfaceEvaporationCoefficient
 
@@ -194,43 +281,48 @@ end function et_kc_CalcSurfaceEvaporationCoefficient
 
 !> This subroutine updates the total available water (TAW)
 !> (water within the rootzone) for a gridcell
-subroutine et_kc_CalcTotalAvailableWater( pIRRIGATION, cel)
+subroutine et_kc_CalcTotalAvailableWater(fTotalAvailableWater, fReadilyAvailableWater, &
+                iFAOIndex, fAvailableWaterCapacity, fCurrentRootingDepth )
 
-  ! [ ARGUMENTS ]
-  type (T_IRRIGATION_LOOKUP),pointer :: pIRRIGATION  ! pointer to an irrigation table entry
-  type (T_CELL), pointer :: cel
+  real (kind=c_float), intent(out)      :: fTotalAvailableWater
+  real (kind=c_float), intent(out)      :: fReadilyAvailableWater  
+  integer (kind=c_int), intent(in)      :: iFAOIndex
+  real (kind=c_float), intent(in)       :: fAvailableWaterCapacity
+  real (kind=c_float), intent(in)       :: fCurrentRootingDepth
 
-  cel%rTotalAvailableWater = cel%rCurrentRootingDepth * cel%rSoilWaterCapInput
-  cel%rReadilyAvailableWater = cel%rTotalAvailableWater * pIRRIGATION%rDepletionFraction
+  fTotalAvailableWater = fCurrentRootingDepth * fSoilWaterCapInput
+  fReadilyAvailableWater = fTotalAvailableWater * fDepletion_fraction(iFAOIndex)
 
   end subroutine et_kc_CalcTotalAvailableWater
 
 !------------------------------------------------------------------------------
 
 !> This function estimates Ks, water stress coefficient
-!> @note Implemented as equation 84, FAO-56, Allen and others
-function et_kc_CalcWaterStressCoefficient( pIRRIGATION, &
-                                           rDeficit, &
-                                           cel)        result(rKs)
+!!
+!! @note Implemented as equation 84, FAO-56, Allen and others
+function et_kc_CalcWaterStressCoefficient( iFAOIndex, fDeficit, &
+                      fTotalAvailableWater, fReadilyAvailableWater )      result(fKs)
 
-  ! [ ARGUMENTS ]
-  type (T_IRRIGATION_LOOKUP),pointer :: pIRRIGATION  ! pointer to an irrigation table entry
-  real (kind=c_float) :: rDeficit
-  type (T_CELL), pointer :: cel
+  integer (kind=c_int), intent(in)     :: iFAOIndex
+  real (kind=c_float), intent(in)      :: fDeficit
+  real (kind=c_float), intent(in)      :: fTotalAvailableWater
+  real (kind=c_float), intent(in)      :: fReadilyAvailableWater
+  real (kind=c_float)                  :: fKs
 
-  ! [ RESULT ]
-  real (kind=c_float) :: rKs
+  if ( fDeficit < fReadilyAvailableWater ) then
+    
+    fKs = 1_c_float
+  
+  elseif ( fDeficit < fTotalAvailableWater ) then
 
-  if (rDeficit < cel%rReadilyAvailableWater) then
-    rKs = rONE
-  elseif (rDeficit < cel%rTotalAvailableWater) then
-
-    rKs = ( cel%rTotalAvailableWater - rDeficit + 1.0e-6) &
-          / ( (1.0 - pIRRIGATION%rDepletionFraction) &
-          * (cel%rTotalAvailableWater + 1.0e-6) )
+    fKs = ( fTotalAvailableWater - fDeficit + 1e-6_c_float ) &
+             / ( (1_c_float - fDepletion_fraction(iFAOIndex) ) &
+          * ( fTotalAvailableWater + 1e-6_c_float ) )
 
   else
-    rKs = rZERO
+
+    fKs = 0_c_float
+  
   endif
 
 end function et_kc_CalcWaterStressCoefficient
@@ -257,19 +349,6 @@ subroutine et_kc_ApplyCropCoefficients(pGrd, pConfig)
   real (kind=c_float) :: rKs       ! Water stress coefficient
 	real (kind=c_float) :: rZr_max   ! Maximum rooting depth
 
-   ! iterate over cells; update evaporation coefficients,
-   ! calculate Kc, and apply to ET0
-   do iRow=1,pGrd%iNY
-     do iCol=1,pGrd%iNX  ! last index in a Fortran array should be the slowest changing
-       cel => pGrd%Cells(iCol, iRow)
-
-       if ( pGrd%iMask(iCol, iRow) == iINACTIVE_CELL ) cycle
-
-!       if(cel%rReferenceET0 < rNEAR_ZERO) cycle
-       if(cel%rSoilWaterCap <= rNear_ZERO &
-            .or. cel%iLandUse == pConfig%iOPEN_WATER_LU) cycle
-
-       pIRRIGATION => pConfig%IRRIGATION(cel%iIrrigationTableIndex)
 
 			 rZr_max = pConfig%ROOTING_DEPTH(cel%iLandUseIndex,cel%iSoilGroup)
 

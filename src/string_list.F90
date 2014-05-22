@@ -10,6 +10,11 @@ module string_list
 
   public :: STRING_LIST_T
 
+  public :: assignment(=)
+  interface assignment(=)
+    module procedure :: assign_string_list_to_string_list_sub
+  end interface assignment(=)
+    
   type STRING_LIST_ELEMENT_T
 
     character (len=:), allocatable               :: s
@@ -29,6 +34,7 @@ module string_list
     procedure :: list_append_string_sub
     procedure :: list_append_int_sub
     procedure :: list_get_value_at_index_fn
+    procedure :: list_get_values_in_range_fn
     procedure :: list_print_sub
     procedure :: list_return_position_of_matching_string_fn
     procedure :: list_return_count_of_matching_string_fn
@@ -39,7 +45,8 @@ module string_list
 
     generic :: append        => list_append_string_sub, &
                                 list_append_int_sub
-    generic :: get           => list_get_value_at_index_fn
+    generic :: get           => list_get_value_at_index_fn, &
+                                list_get_values_in_range_fn
     generic :: print         => list_print_sub
     generic :: grep          => list_subset_partial_matches_fn
     generic :: which         => list_return_position_of_matching_string_fn
@@ -63,6 +70,27 @@ contains
     call this%list_append_string_sub( asCharacter(iValue) )
 
   end subroutine list_append_int_sub
+
+  
+  subroutine assign_string_list_to_string_list_sub(slList2, slList1)
+
+    type (STRING_LIST_T), intent(out)   :: slList2
+    type (STRING_LIST_T), intent(in)    :: slList1
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iIndex
+
+    if ( slList1%count > 0 ) then
+
+      do iIndex=1, slList1%count
+
+        call slList2%append( slList1%get(iIndex) )
+
+      enddo
+      
+    endif     
+
+  end subroutine assign_string_list_to_string_list_sub
 
 
 
@@ -140,6 +168,52 @@ contains
    
 
   end function list_get_value_at_index_fn
+
+
+
+
+  !> Iterate over a range of indices; return a space-delimited string comprised of the values.
+  function list_get_values_in_range_fn(this, iStartIndex, iEndIndex)   result(sText)
+
+    class (STRING_LIST_T), intent(in)        :: this
+    integer (kind=c_int), intent(in)         :: iStartIndex
+    integer (kind=c_int), intent(in)         :: iEndIndex
+    character (len=:), allocatable           :: sText
+
+    ! [ LOCALS ]
+    integer (kind=c_int)                      :: iCount
+    class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
+
+    iCount = 0
+
+    current => this%first
+
+    do while ( associated( current ) .and. iCount < this%count )
+
+      iCount = iCount + 1
+
+      if (iCount == iStartIndex ) then
+        sText = current%s
+      elseif (iCount > iStartIndex .and. iCount <= iEndIndex ) then  
+        sText = sText//" "//current%s
+      endif
+        
+      current => current%next
+
+    enddo
+    
+    if ( len_trim(sText) == 0 ) then
+      sText = "<NA>"
+      call warn("Unable to find a pointer associated with index range: " &
+          //asCharacter(iStartIndex)//" to "//asCharacter(iEndIndex), &
+          __FILE__, __LINE__ )
+    endif  
+   
+
+  end function list_get_values_in_range_fn
+
+
+
 
 !--------------------------------------------------------------------------------------------------
 
