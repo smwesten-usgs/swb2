@@ -1,6 +1,6 @@
 module data_catalog_entry
 
-  use types
+  use constants_and_conversions
   use swb_grid
   use netcdf4_support
   use iso_c_binding, only : c_int, c_bool, c_float, c_double

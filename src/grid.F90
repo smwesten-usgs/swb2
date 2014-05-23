@@ -8,9 +8,15 @@
 module swb_grid
 
   use iso_c_binding
-  use types
+  use constants_and_conversions
+  use strings
 
   implicit none
+
+  integer (kind=c_int), parameter :: GRID_DATATYPE_INT = 0
+  integer (kind=c_int), parameter :: GRID_DATATYPE_REAL = 1
+  integer (kind=c_int), parameter :: GRID_DATATYPE_CELL_GRID = 2
+  integer (kind=c_int), parameter :: GRID_DATATYPE_ALL = 3
 
   !> interface to C code that provides a simplified entry point to PROJ4
   !> capabilities: it has been modified so that all C pointers are kept within the
@@ -27,6 +33,31 @@ module swb_grid
     integer(kind=c_int) :: pj_init_and_transform
     end function pj_init_and_transform
   end interface
+
+
+  type T_GENERAL_GRID
+!      integer (kind=c_int) :: iGridType            ! One of the grid type options above
+      integer (kind=c_int) :: iNX                   ! Number of cells in the x-direction
+      integer (kind=c_int) :: iNY                   ! Number of cells in the y-direction
+      integer (kind=c_int) :: iNumGridCells         ! Total number of grid cells
+      integer (kind=c_int) :: iDataType             ! Data type contained in the grid (integer, real, SWB cell)
+      character (len=256)  :: sProj4_string         ! proj4 string defining coordinate system of grid
+      character (len=256)  :: sFilename             ! original file name that the data was read from
+      real (kind=c_double)    :: rGridCellSize         ! size of one side of a grid cell
+      integer (kind=c_int) :: iLengthUnits= -99999  ! length units code
+      real (kind=c_double)    :: rX0, rX1              ! World-coordinate range in X
+      real (kind=c_double)    :: rY0, rY1              ! World-coordinate range in Y
+      integer (kind=c_int), dimension(:,:), pointer :: iData ! Integer data
+      integer (kind=c_int) :: iNoDataValue = -99999
+      real (kind=c_float) :: rNoDataValue = -99999.0
+      real (kind=c_float), dimension(:,:), pointer :: rData    ! Real data
+      real (kind=c_double), dimension(:,:), allocatable :: rX    ! x coordinate associated with data
+      real (kind=c_double), dimension(:,:), allocatable :: rY    ! y coordinate associated with data
+      integer (kind=c_int), dimension(:,:), allocatable :: iMask ! Mask for processing results
+      type (T_CELL), dimension(:,:), pointer :: Cells        ! T_CELL objects
+  end type T_GENERAL_GRID
+
+
 
   type T_ERROR_MESSAGE
     character(len=40) :: cErrorMessageText
@@ -532,8 +563,8 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
           iHdrRecs = iHdrRecs + 1
       else
           ! Found the data -- construct the grid
-          if ( lXLLCenter ) rX0 = rX0 - rHALF*rCellSize
-          if ( lYLLCenter ) rY0 = rY0 - rHALF*rCellSize
+          if ( lXLLCenter ) rX0 = rX0 - 0.5_c_float*rCellSize
+          if ( lYLLCenter ) rY0 = rY0 - 0.5_c_float*rCellSize
           rX1 = rX0 + real(iNX, kind=c_double) * rCellSize
           rY1 = rY0 + real(iNY, kind=c_double) * rCellSize
 
@@ -541,7 +572,7 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
 
           pGrd%rGridCellSize = rCellSize
           ! Go back to the top, skip the header...
-          rewind ( unit=LU_GRID, iostat=iStat )
+          rewind ( unit=LU_GRID, iostat=iStat ) 
           call Assert ( iStat == 0, "Failed to rewind grid file" )
           do iCol=1,iHdrRecs
               read ( unit=LU_GRID, fmt="(a256)", iostat=iStat ) sInputRecord
@@ -555,7 +586,7 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
                   read ( unit=LU_GRID, fmt=*, iostat=iStat ) pGrd%iData(:,iRow)
                   call Assert ( iStat == 0, &
                     "Failed to read integer grid data - file: " &
-                    //trim(sFileName)//"  row num: "//TRIM(int2char(iRow)), &
+                    //trim(sFileName)//"  row num: "//TRIM( asCharacter(iRow)), &
                    TRIM(__FILE__),__LINE__ )
                 end do
                 if(len_trim(sNoDataValue) > 0) then
@@ -569,7 +600,7 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
                   read ( unit=LU_GRID, fmt=*, iostat=iStat ) pGrd%rData(:,iRow)
                   call Assert ( iStat == 0, &
                     "Failed to read real grid data - file: " &
-                    //trim(sFileName)//"  row num: "//TRIM(int2char(iRow)), &
+                    //trim(sFileName)//"  row num: "//TRIM( asCharacter(iRow)), &
                    TRIM(__FILE__),__LINE__ )
                 end do
                 if(len_trim(sNoDataValue) > 0) then
@@ -690,7 +721,7 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
                   read ( unit=LU_GRID, fmt=*, iostat=iStat ) pGrd%iData(:,iRow)
                   call Assert ( iStat == 0, &
                     "Failed to read integer grid data - file: " &
-                    //trim(sFileName)//"  row num: "//TRIM(int2char(iRow)), &
+                    //trim(sFileName)//"  row num: "//TRIM( asCharacter(iRow)), &
                    TRIM(__FILE__),__LINE__ )
                 end do
                 if(len_trim(sNoDataValue) > 0) then
@@ -704,7 +735,7 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
                   read ( unit=LU_GRID, fmt=*, iostat=iStat ) pGrd%rData(:,iRow)
                   call Assert ( iStat == 0, &
                     "Failed to read real grid data - file: " &
-                    //trim(sFileName)//"  row num: "//TRIM(int2char(iRow)), &
+                    //trim(sFileName)//"  row num: "//TRIM( asCharacter(iRow)), &
                    TRIM(__FILE__),__LINE__ )
                 end do
                 if(len_trim(sNoDataValue) > 0) then
@@ -942,7 +973,7 @@ subroutine grid_WriteArcGrid(sFilename, pGrd)
   endif
 
   ! dynamically create the Fortran output format
-  write(sBuf,FMT="(a,a,a)") '(',TRIM(int2char(iNumCols)),'(a,1x))'
+  write(sBuf,FMT="(a,a,a)") '(',TRIM( asCharacter(iNumCols)),'(a,1x))'
 
   open ( LU_TEMP, file=sFilename, iostat=istat, status="REPLACE" )
   call Assert( istat==0, "Could not open output file "//dQuote(sFilename), &
@@ -1004,7 +1035,7 @@ subroutine grid_WriteSurferGrid(sFilename, pGrd)
   integer (kind=c_int) :: iNumCols, iNumRows
   integer (kind=c_int) ::  iStat
   character(len=256) :: sBuf
-  real (kind=c_float) :: rHalfCell
+  real (kind=c_float) :: fHalfCell
 
   if ( pGrd%iDataType == DATATYPE_INT ) then
     iNumCols = size(pGrd%iData,1)
@@ -1017,10 +1048,10 @@ subroutine grid_WriteSurferGrid(sFilename, pGrd)
       trim(__FILE__), __LINE__)
   endif
 
-  rHalfCell = pGrd%rGridCellSize * rHALF
+  fHalfCell = pGrd%rGridCellSize * 0.5_c_float
 
   ! dynamically create the Fortran output format
-  write(sBuf,FMT="(a,a,a)") '(',TRIM(int2char(iNumCols)),'(a,1x))'
+  write(sBuf,FMT="(a,a,a)") '(',TRIM( asCharacter(iNumCols)),'(a,1x))'
 
   open ( LU_TEMP, file=sFilename, iostat=istat, status="REPLACE" )
   call Assert( istat==0, "Could not open output file "//dQuote(sFilename), &
@@ -1035,12 +1066,12 @@ subroutine grid_WriteSurferGrid(sFilename, pGrd)
     trim(__FILE__), __LINE__)
 
   write ( unit=LU_TEMP, fmt="(2f14.3)", iostat=istat ) &
-           pGrd%rX0 + rHalfCell , pGrd%rX1 - rHalfCell
+           pGrd%rX0 + fHalfCell , pGrd%rX1 - fHalfCell
   call Assert( istat==0, "Error writing SURFER X limits", &
     trim(__FILE__), __LINE__)
 
   write ( unit=LU_TEMP, fmt="(2f14.3)", iostat=istat ) &
-           pGrd%rY0 + rHalfCell, pGrd%rY1 - rHalfCell
+           pGrd%rY0 + fHalfCell, pGrd%rY1 - fHalfCell
   call Assert( istat==0, "Error writing SURFER Y limits", &
     trim(__FILE__), __LINE__)
 
@@ -1271,7 +1302,7 @@ subroutine grid_LookupColumn(pGrd,rXval,iBefore,iAfter,rFrac)
   else if ( iAfter > pGrd%iNX ) then
     iAfter = -1
   else
-    rFrac = mod(rColPosition,rONE)
+    rFrac = mod(rColPosition, 1.0_c_float )
   end if
 
 end subroutine grid_LookupColumn
@@ -1342,7 +1373,7 @@ subroutine grid_LookupRow(pGrd,rYval,iBefore,iAfter,rFrac)
   else if ( iAfter > pGrd%iNY ) then
     iAfter = iBefore
   else
-    rFrac = mod(rColPosition,rONE)
+    rFrac = mod(rColPosition, 1.0_c_float )
   end if
 
 end subroutine grid_LookupRow
@@ -1379,8 +1410,8 @@ subroutine grid_Transform(pGrd, sFromPROJ4, sToPROJ4 )
   if( index(string=csFromPROJ4, substring="latlon") > 0 &
       .or. index(string=csFromPROJ4, substring="lonlat") > 0 ) then
 
-    pGrd%rX = pGrd%rX * dpPI_OVER_180
-    pGrd%rY = pGrd%rY * dpPI_OVER_180
+    pGrd%rX = pGrd%rX * DEGREES_TO_RADIANS
+    pGrd%rY = pGrd%rY * DEGREES_TO_RADIANS
 
   endif
 
@@ -1476,7 +1507,7 @@ subroutine grid_CheckForPROJ4Error(iRetVal, sFromPROJ4, sToPROJ4)
     do i=1,49
       if(iRetVal == tErrorMessage(i)%iErrorNumber) then
           sErrorMessage = sErrorMessage &
-          //"~ PROJ4 Error number "//int2char(iRetVal)//" reported.~" &
+          //"~ PROJ4 Error number "// asCharacter(iRetVal)//" reported.~" &
           //"   ==> error description: "//trim(tErrorMessage(i)%cErrorMessageText)
           lFound = lTRUE
         exit
@@ -1533,7 +1564,7 @@ function grid_Interpolate(pGrd,rXval,rYval) result ( rValue )
   call Assert (ib>0 .and. ia>0 .and. ib <= ubound(pGrd%rData,1) &
      .and. ia <= ubound(pGrd%rData,1), &
     "Internal programming error: illegal bounds caught~requested column value " &
-    //trim(real2char(rValue=rXval, sFmt="F12.3")) &
+    //trim( asCharacter(fValue=rXval, iNumDigits=3)) &
     //" out of range", trim(__FILE__), __LINE__)
 
   ! In some cases, when things really dry out, the y value
@@ -1555,12 +1586,12 @@ function grid_Interpolate(pGrd,rXval,rYval) result ( rValue )
   call Assert (jb>0 .and. ja>0 .and. jb <= ubound(pGrd%rData,2) &
      .and. ja <= ubound(pGrd%rData,2), &
     "Internal programming error: illegal bounds caught~requested row value " &
-    //trim(real2char(rValue=rXval, sFmt="F12.3")) &
+    //trim( asCharacter(fValue=rXval, iNumDigits=3)) &
     //" out of range", trim(__FILE__), __LINE__)
 
-  rValue = (rONE-u) * (rONE-v) * pGrd%rData(ib,jb)   + &
-              u  * (rONE-v) * pGrd%rData(ib,ja)   + &
-           (rONE-u) *       v  * pGrd%rData(ia,jb)   + &
+  rValue = ( 1.0_c_float -u) * ( 1.0_c_float -v) * pGrd%rData(ib,jb)   + &
+              u  * ( 1.0_c_float -v) * pGrd%rData(ib,ja)   + &
+           ( 1.0_c_float -u) *       v  * pGrd%rData(ia,jb)   + &
               u  *       v  * pGrd%rData(ia,ja)
 
 end function grid_Interpolate
@@ -1640,20 +1671,20 @@ function grid_SearchColumn(pGrd,rXval,rZval,rNoData) result ( rValue )
   call Assert (ib>0 .and. ia>0 .and. ib <= ubound(pGrd%rData,1) &
      .and. ia <= ubound(pGrd%rData,1), &
     "Internal programming error: requested X value " &
-    //trim(real2char(rValue=rXval, sFmt="F12.3")) &
+    //trim( asCharacter(fValue=rXval, iNumDigits=3)) &
     //" out of range", trim(__FILE__), __LINE__)
 
   call assert(ubound(rCol,1) == ubound(pGrd%rData,2), &
     "Internal programming error: upper bound of rCol /= upper " &
     //"bound of first array element of pGrd%rData~" &
-    //"ubound(rCol)="//trim(int2char(ubound(rCol,1))) &
-    //"~ubound(pGrd%rData)="//trim(int2char(ubound(pGrd%rData,1))), &
+    //"ubound(rCol)="//trim( asCharacter(ubound(rCol,1))) &
+    //"~ubound(pGrd%rData)="//trim( asCharacter(ubound(pGrd%rData,1))), &
     trim(__FILE__), __LINE__)
 
   ! interpolate the column of values based on the columns of values
   ! that bracket the real value rXval
-!  rCol = u*pGrd%rData(:,ia) + (rONE-u)*pGrd%rData(:,ib)
-  rCol = u * pGrd%rData(ia,:) + (rONE-u)*pGrd%rData(ib,:)
+!  rCol = u*pGrd%rData(:,ia) + ( 1.0_c_float -u)*pGrd%rData(:,ib)
+  rCol = u * pGrd%rData(ia,:) + ( 1.0_c_float -u)*pGrd%rData(ib,:)
   ! Fix missing values
 
   do iRow=1,pGrd%iNY
@@ -1680,32 +1711,32 @@ function grid_SearchColumn(pGrd,rXval,rZval,rNoData) result ( rValue )
       else
         ! end of the line -- we didn't find the value, so return the limit
         v = real(iRow-1) / real(pGrd%iNY-1)
-        rValue = (rONE-v)*pGrd%rY0 + v*pGrd%rY1
+        rValue = ( 1.0_c_float -v)*pGrd%rY0 + v*pGrd%rY1
         exit
       endif
     else
       if ( rprev == rNoData ) then
         rprev = rCol(iRow)
       else
-        if ( sign(rONE,rCol(iRow)-rZval) /= sign(rONE,rprev-rZval) ) then
+        if ( sign( 1.0_c_float ,rCol(iRow)-rZval) /= sign( 1.0_c_float ,rprev-rZval) ) then
           ! Found it!
           frac = (rZval-rCol(iRow-1)) / (rCol(iRow)-rCol(iRow-1))
           ! Note: it's 'iRow-2' in the next expr to account for one-based indexing
           v = ( real(iRow-2)+frac ) / real(pGrd%iNY-1)
-          rValue = v*pGrd%rY0 + (rONE-v)*pGrd%rY1
+          rValue = v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1
           exit
         else if ( rZval < rprev .and. rCol(iRow) > rprev ) then
           ! Doesn't exist, choose the limit
           v = real(iRow-2) / real(pGrd%iNY-1)
-          rValue = v*pGrd%rY0 + (rONE-v)*pGrd%rY1
+          rValue = v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1
           exit
         else if ( rZval > rprev .and. rCol(iRow) < rprev ) then
           v = real(iRow-2) / real(pGrd%iNY-1)
-          rValue = v*pGrd%rY0 + (rONE-v)*pGrd%rY1
+          rValue = v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1
           exit
         else if ( iRow == pGrd%iNY ) then
-          v = rONE
-          rValue = v*pGrd%rY0 + (rONE-v)*pGrd%rY1
+          v =  1.0_c_float 
+          rValue = v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1
           exit
         end if
       end if
@@ -1786,7 +1817,7 @@ function grid_GetGridColNum(pGrd,rX)  result(iColumnNumber)
     call grid_DumpGridExtent(pGrd)
     write(*, fmt="(a)") "was attempting to find column associated with X: "//trim(asCharacter(rX))
     call assert(lFALSE,  "INTERNAL PROGRAMMING ERROR: Column number out of bounds (value: " &
-     //trim(int2char(iColumnNumber))//")", &
+     //trim( asCharacter(iColumnNumber))//")", &
      trim(__FILE__), __LINE__)
   endif
 
@@ -1807,7 +1838,7 @@ function grid_GetGridRowNum(pGrd,rY)  result(iRowNumber)
     call grid_DumpGridExtent(pGrd)
     write(*, fmt="(a)") "was attempting to find row associated with Y: "//trim(asCharacter(rY))
     call assert(lFALSE,  "INTERNAL PROGRAMMING ERROR: Row number out of bounds (value: " &
-     //trim(int2char(iRowNumber))//")", &
+     //trim( asCharacter(iRowNumber))//")", &
      trim(__FILE__), __LINE__)
   endif
 
@@ -1920,7 +1951,7 @@ function grid_GetGridX(pGrd,iColumnNumber)  result(rX)
   real (kind=c_double) :: rX
   integer (kind=c_int) :: iColumnNumber
 
-  rX = pGrd%rX0 + pGrd%rGridCellSize * (REAL(iColumnNumber, kind=c_double) - dpHALF)
+  rX = pGrd%rX0 + pGrd%rGridCellSize * (REAL(iColumnNumber, kind=c_double) -  0.5_c_double )
 
 end function grid_GetGridX
 
@@ -1933,7 +1964,7 @@ function grid_GetGridY(pGrd,iRowNumber)  result(rY)
   integer (kind=c_int) :: iRowNumber
 
   rY = pGrd%rY1 &
-          - pGrd%rGridCellSize * (REAL(iRowNumber, kind=c_double) - dpHALF)
+          - pGrd%rGridCellSize * (REAL(iRowNumber, kind=c_double) -  0.5_c_double )
 
 end function grid_GetGridY
 
@@ -1983,8 +2014,8 @@ subroutine grid_DumpGridExtent(pGrd)
   call echolog("GRID DETAILS:")
   call echolog("---------------------------------------------------")
   call echolog("file: "//dquote(pGrd%sFilename) )
-  call echolog("nx: "//trim(int2char(pGrd%iNX) ) )
-  call echolog("ny: "//trim(int2char(pGrd%iNY) ) )
+  call echolog("nx: "//trim( asCharacter(pGrd%iNX) ) )
+  call echolog("ny: "//trim( asCharacter(pGrd%iNY) ) )
   call echolog("cellsize: "//trim(asCharacter(pGrd%rGridCellSize) ) )
   call echolog("X0: "//trim(asCharacter(pGrd%rX0) ) )
   call echolog("Y0: "//trim(asCharacter(pGrd%rY0) ) )

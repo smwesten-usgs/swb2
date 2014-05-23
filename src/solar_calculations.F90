@@ -5,6 +5,9 @@ module solar_calculations
   use exceptions
   implicit none
 
+  real (kind=c_float) :: EARTH_SUN_DIST_Dr
+  real (kind=c_float) :: SOLAR_DECLINATION_Delta
+
 contains  
 
   !> Calculate the number of daylight hours at a location.

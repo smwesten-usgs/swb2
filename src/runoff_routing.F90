@@ -145,27 +145,6 @@ subroutine model_Runoff_NoRouting(pGrd, pConfig, iDayOfYear, iMonth)
   cel%rFlowOutOfGrid = rR
 !       cel%rOutFlow = rR
 
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-!! What is the point of this? If we aren't routing,
-!! only a small amount of water (generated from a
-!! cell directly beneath a stream segment) will
-!! be captured...
-!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-#ifdef STREAM_INTERACTIONS
-  ! Capture into streams or fractures
-  cel%rStreamCapture = rZERO
-  if ( cel%iStreamIndex /= 0 ) then
-    ! Compute the amount of fracture recharge
-    cel%rStreamCapture = cel%rInFlow * pconfig%rStreamMaxCapture(cel%iStreamIndex) &
-      / pconfig%rStreamMaxInflow(cel%iStreamIndex)
-    if (cel%rStreamCapture < rZERO) then
-      print *, "Negative!", cel%rInFlow, cel%rStreamCapture
-    endif
-    cel%rOutFlow = cel%rOutFlow - cel%rStreamCapture
-  end if
-#endif
-
   ! we've removed the water from the grid; it shouldn't be included in
   ! "outflow" water
   cel%rOutFlow = rZERO

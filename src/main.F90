@@ -80,8 +80,7 @@
 program main
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double
-  use types
-  use control
+  use loop_initialize
   use iso_fortran_env
 
   implicit none
@@ -90,6 +89,8 @@ program main
   integer (kind=c_int) :: iNumArgs
   character (len=1024) :: sCompilerFlags
   character (len=256) :: sCompilerVersion
+
+  character (len=9), parameter :: SWB_VERSION = "2.0 alpha"
 
   iNumArgs = COMMAND_ARGUMENT_COUNT()
 
@@ -118,26 +119,6 @@ program main
       //TRIM(int2char(__G95_MINOR__))
 #endif
 
-    write(UNIT=*,FMT="(a)") "Compilation options:"
-    write(UNIT=*,FMT="(a)") "----------------------------------"
-#ifdef STREAM_INTERACTIONS
-    write(UNIT=*,FMT="(a)") " STREAM_INTERACTIONS         yes"
-#else
-    write(UNIT=*,FMT="(a)") " STREAM_INTERACTIONS          no"
-#endif
-
-#ifdef STRICT_DATE_CHECKING
-    write(UNIT=*,FMT="(a)") " STRICT_DATE_CHECKING        yes"
-#else
-    write(UNIT=*,FMT="(a)") " STRICT_DATE_CHECKING         no"
-#endif
-
-#ifdef DEBUG_PRINT
-    write(UNIT=*,FMT="(a)") " DEBUG_PRINT                 yes"
-#else
-    write(UNIT=*,FMT="(a)") " DEBUG_PRINT                  no"
-#endif
-
     write(UNIT=*,FMT="(/,/,a,/)")    "Usage: swb [control file name]"
 
     stop
@@ -145,12 +126,14 @@ program main
   end if
 
   call GET_COMMAND_ARGUMENT(1,sControlFile)
+  
 
-  ! pass control to control module
-  call control_setModelOptions(sControlFile)
+  ! read control file
+  call read_control_file(sControlFile)
 
-  close(unit=LU_LOG)
+  call initialize_precipitation_options()
 
-  stop
+
+
 
 end program main

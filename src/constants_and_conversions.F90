@@ -10,6 +10,14 @@ module constants_and_conversions
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
   implicit none
 
+  ! 
+  integer (kind=c_int), parameter :: DATATYPE_INT = 0
+  integer (kind=c_int), parameter :: DATATYPE_REAL = 1
+  integer (kind=c_int), parameter :: DATATYPE_CELL_GRID = 2
+  integer (kind=c_int), parameter :: DATATYPE_SHORT = 3
+  integer (kind=c_int), parameter :: DATATYPE_DOUBLE = 4
+  integer (kind=c_int), parameter :: DATATYPE_NA = -9999
+
   ! [ common mathematical constants ]
   public :: PI, TWOPI, HALFPI
   real (kind=c_double), parameter    :: PI = 3.1415926535897932384626433_c_double
@@ -37,9 +45,11 @@ module constants_and_conversions
   integer(kind=c_int), parameter     :: iTINYVAL = -(HUGE(0_c_int) - 1)
   real (kind=c_float), parameter     :: rFREEZING = 32_c_float
   real (kind=c_double), parameter    :: dFREEZING = 32_c_double
-  real (kind=c_float), parameter  :: fZERO = 0.0_c_float
-  real (kind=c_float), parameter  :: rZERO = 0.0_c_float
-  real (kind=c_double), parameter :: dZERO = 0.0_c_double
+  integer (kind=c_int), parameter    :: iZERO = 0_c_int
+  real (kind=c_float), parameter     :: fZERO = 0.0_c_float
+  real (kind=c_float), parameter     :: rZERO = 0.0_c_float
+  real (kind=c_double), parameter    :: dZERO = 0.0_c_double
+
 
   ! [ special ASCII characters ]
   public :: sTAB, sWHITESPACE, sBACKSLASH, sFORWARDSLASH, sRETURN, sCOMMENT_CHARS
@@ -54,6 +64,31 @@ module constants_and_conversions
   ! [ select conversion factors ]
   real (kind=c_double), parameter :: C_PER_F = 5_c_double / 9_c_double
   real (kind=c_double), parameter :: F_PER_C = 9_c_double / 5_c_double  
+
+
+
+type T_CELL
+      integer (kind=c_int) :: iFlowDir = iZERO    ! Flow direction from flow-dir grid
+      integer (kind=c_int) :: iSoilGroup = iZERO  ! Soil type from soil-type grid
+      integer (kind=c_int) :: iLandUseIndex       ! Index (row num) of land use table
+      integer (kind=c_int) :: iLandUse = iZERO    ! Land use from land-use grid
+      integer (kind=c_int) :: iIrrigationTableIndex = iZERO  ! Index (row num) of irrigation table
+      real (kind=c_float) :: rElevation =rZERO            ! Ground elevation
+      real (kind=c_float) :: rSoilWaterCapInput = rZERO   ! Soil water capacity from grid file
+      real (kind=c_float) :: rSoilWaterCap = rZERO        ! Soil water capacity adjusted for LU/LC
+      real (kind=c_float) :: rSoilMoisture = rZERO        ! Soil moisture in inches of water
+      real (kind=c_float) :: rCurrentRootingDepth = 0.2   ! Current rooting depth for use w FAO56 calculations
+      real (kind=c_float) :: rKcb = rZERO                 ! crop coefficient for this cell
+      real (kind=c_float) :: rTotalAvailableWater = rZERO
+      real (kind=c_float) :: rReadilyAvailableWater = rZERO
+
+  end type T_CELL
+
+
+
+
+
+
 
   !> establish generic interfaces to single and double precision functions
   public :: C_to_F

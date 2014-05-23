@@ -1,7 +1,7 @@
 program test_control_file
 
   use iso_c_binding, only : c_int, c_float, c_bool
-  use control_file
+  use loop_initialize
   use string_list
 
   type (STRING_LIST_T) :: myList, mySubset
