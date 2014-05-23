@@ -10,13 +10,16 @@ module swb_grid
   use iso_c_binding
   use constants_and_conversions
   use strings
+  use logfile, only : LOGS
 
   implicit none
 
-  integer (kind=c_int), parameter :: GRID_DATATYPE_INT = 0
-  integer (kind=c_int), parameter :: GRID_DATATYPE_REAL = 1
-  integer (kind=c_int), parameter :: GRID_DATATYPE_CELL_GRID = 2
-  integer (kind=c_int), parameter :: GRID_DATATYPE_ALL = 3
+  private
+
+  integer (kind=c_int), public, parameter :: GRID_DATATYPE_INT = 0
+  integer (kind=c_int), public, parameter :: GRID_DATATYPE_REAL = 1
+  integer (kind=c_int), public, parameter :: GRID_DATATYPE_CELL_GRID = 2
+  integer (kind=c_int), public, parameter :: GRID_DATATYPE_ALL = 3
 
   !> interface to C code that provides a simplified entry point to PROJ4
   !> capabilities: it has been modified so that all C pointers are kept within the
@@ -35,7 +38,7 @@ module swb_grid
   end interface
 
 
-  type T_GENERAL_GRID
+  type, public :: T_GENERAL_GRID
 !      integer (kind=c_int) :: iGridType            ! One of the grid type options above
       integer (kind=c_int) :: iNX                   ! Number of cells in the x-direction
       integer (kind=c_int) :: iNY                   ! Number of cells in the y-direction
@@ -116,6 +119,9 @@ module swb_grid
     T_ERROR_MESSAGE("point not within available datum shift grids ", -48), &
     T_ERROR_MESSAGE("invalid sweep axis, choose x or y            ", -49) /)
 
+  public :: grid_gridToGrid, grid_Create, grid_Destroy, grid_Read
+  public :: grid_Conform, grid_Transform, grid_Interpolate, grid_PopulateXY
+
   interface grid_gridToGrid
     module procedure grid_gridToGrid_int
     module procedure grid_gridToGrid_short
@@ -133,6 +139,9 @@ module swb_grid
 
   integer (kind=c_int), parameter :: COLUMN = 1
   integer (kind=c_int), parameter :: ROW = 2
+
+  !> @todo change these global (module) variables to local variables
+  integer (kind=c_int) :: LU_TEMP, LU_GRID
 
 contains
 
@@ -514,7 +523,7 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
   call assert( lFileExists, "The Arc ASCII grid file "//dquote(sFilename)// &
     " could not be found.",trim(__FILE__),__LINE__)
 
-  open ( LU_GRID, iostat=iStat, file=trim(sFileName) )
+  open ( newunit=LU_GRID, iostat=iStat, file=trim(sFileName) )
   call Assert( iStat == 0, &
     "Could not open input file " // trim(sFileName) )
 
@@ -620,7 +629,7 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
 
   if ( iDataType == DATATYPE_INT ) call grid_checkIntegerGridValues(pGrd, sFilename)
 
-  close ( unit=LU_GRID, iostat=iStat )
+  open ( unit=LU_GRID, iostat=iStat )
   call Assert ( iStat == 0, "Failed to close grid file" )
 
 end function grid_ReadArcGrid_fn
@@ -656,7 +665,7 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
   call assert( lFileExists, "The Arc ASCII grid file "//dquote(sFilename)// &
     " could not be found.",trim(__FILE__),__LINE__)
 
-  open ( LU_GRID, iostat=iStat, file=trim(sFileName) )
+  open ( newunit=LU_GRID, iostat=iStat, file=trim(sFileName) )
   call Assert( iStat == 0, &
     "Could not open input file " // trim(sFileName) )
 
@@ -755,7 +764,7 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
 
   if ( pGrd%iDataType == DATATYPE_INT ) call grid_checkIntegerGridValues(pGrd, sFilename)
 
-  close ( unit=LU_GRID, iostat=iStat )
+  open ( unit=LU_GRID, iostat=iStat )
   call Assert ( iStat == 0, "Failed to close grid file" )
 
 end subroutine grid_ReadArcGrid_sub
@@ -806,7 +815,7 @@ function grid_ReadSurferGrid_fn ( sFileName, iDataType ) result ( pGrd )
   call assert( lFileExists, "The Surfer ASCII grid file "//dquote(sFilename)// &
     " could not be found.",trim(__FILE__),__LINE__)
 
-  open ( LU_GRID, iostat=iStat, file=trim(sFileName) )
+  open ( newunit=LU_GRID, iostat=iStat, file=trim(sFileName) )
   call Assert( LOGICAL(iStat == 0,kind=c_bool), &
      "Could not open input file " // trim(sFileName) )
 
@@ -851,7 +860,7 @@ function grid_ReadSurferGrid_fn ( sFileName, iDataType ) result ( pGrd )
 
   if ( iDataType == DATATYPE_INT ) call grid_checkIntegerGridValues(pGrd, sFilename)
 
-  close ( unit=LU_GRID, iostat=iStat )
+  open ( unit=LU_GRID, iostat=iStat )
   call Assert ( iStat == 0, "Failed to close grid file" )
 
 end function grid_ReadSurferGrid_fn
@@ -878,7 +887,7 @@ subroutine grid_ReadSurferGrid_sub ( sFileName, pGrd )
   call assert( lFileExists, "The Surfer ASCII grid file "//dquote(sFilename)// &
     " could not be found.",trim(__FILE__),__LINE__)
 
-  open ( LU_GRID, iostat=iStat, file=trim(sFileName) )
+  open ( newunit=LU_GRID, iostat=iStat, file=trim(sFileName) )
   call Assert( LOGICAL(iStat == 0,kind=c_bool), &
      "Could not open input file " // trim(sFileName) )
 
@@ -920,7 +929,7 @@ subroutine grid_ReadSurferGrid_sub ( sFileName, pGrd )
 
   if ( pGrd%iDataType == DATATYPE_INT ) call grid_checkIntegerGridValues(pGrd, sFilename)
 
-  close ( unit=LU_GRID, iostat=iStat )
+  open ( unit=LU_GRID, iostat=iStat )
   call Assert ( iStat == 0, "Failed to close grid file" )
 
 end subroutine grid_ReadSurferGrid_sub

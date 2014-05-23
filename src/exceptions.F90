@@ -3,6 +3,7 @@ module exceptions
   use iso_c_binding
   use iso_fortran_env, only : OUTPUT_UNIT
   use types_new
+  use logfiles, only : LOGS
   implicit none
 
   private
@@ -27,23 +28,25 @@ contains
 !    integer (kind=c_int), intent(in), optional  :: iLU
     
     ! [ LOCALS ]
-    integer (kind=c_int) :: iLU
+    character (len=6) :: sLineNum
 
-    iLU = OUTPUT_UNIT
-
-    write (unit=iLU, fmt="(/,/,a)") "** ERROR -- PROGRAM EXECUTION HALTED **"
-    write (unit=iLU, fmt="(/,t3,a19,t22,a)") "error condition:  ", trim(sMessage)
+    call LOGS%echo( " " )
+    call LOGS%echo( "** ERROR -- PROGRAM EXECUTION HALTED **" )
+    call LOGS%echo( " " )
+    call LOGS%echo( "         error condition:  "//trim(sMessage) )
 
     if (present(sModule))  &
-      write (unit=iLU, fmt="(t3,a19,t22,a)") "module:  ", trim(sModule)
+      call LOGS%echo( "                  module:  "//trim(sModule) )
 
-    if (present(iLine))  &
-      write (unit=iLU, fmt="(t3,a19,t22,i0)") "line no:  ", iLine
+    if (present(iLine)) then
+      write(sLineNum, fmt="(i0)") iLine
+      call LOGS%echo( "               line number:  "//trim(sLineNum) )
+    endif  
 
     if (present(sHints)) &
-      write (unit=iLU, fmt="(/,t2,'==>  ',a)") sHints
+      call LOGS%echo( "   ==> "//trim(sHints) )
 
-    write (unit=iLU, fmt="(/)")
+    call LOGS%echo(" ")
 
     stop
  

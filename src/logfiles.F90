@@ -1,6 +1,7 @@
 module logfiles
 
   use iso_c_binding, only : c_bool, c_int
+  use iso_fortran_env, only : OUTPUT_UNIT
   implicit none
 
   private
@@ -12,7 +13,7 @@ module logfiles
                   DT_HOUR = 5, DT_MINUTES = 6, DT_SECONDS = 7, DT_MILLISECONDS = 8
   end enum
 
-  enum, public, bind(c)
+  enum, bind(c)
     enumerator :: LOG_NONE = 0, LOG_GENERAL = 1, LOG_DETAILED = 2, LOG_ALL = 3
   end enum   
 
@@ -22,7 +23,7 @@ module logfiles
     logical (kind=c_bool)           :: lIsOpen(2)       = .false._c_bool
     integer (kind=c_int)            :: iUnitNum(2)
     integer (kind=c_int)            :: iStat(2)
-    integer (kind=c_int)            :: iLoggingLevel    = LOG_GENERAL
+    integer (kind=c_int)            :: iLogLevel        = LOG_GENERAL
  
   contains
 
@@ -35,49 +36,54 @@ module logfiles
     procedure, private :: write_to_logfiles_and_screen_sub
     generic            :: echo => write_to_logfiles_sub
 
-    procedure, private :: open_file_write_access_sub
-    generic            :: open => open_file_write_access_sub
+    procedure, private :: open_files_write_access_sub
+    generic            :: open => open_files_write_access_sub
 
-    procedure, private :: close_file_sub
-    generic            :: close => close_file_sub
+    procedure, private :: close_files_sub
+    generic            :: close => close_files_sub
 
     procedure, private :: make_prefix_sub
     generic            :: make_prefix => make_prefix_sub
 
   end type LOGFILE_T
 
+  type (LOGFILE_T), public :: LOGS
+
 contains
 
-  subroutine open_file_write_access_sub(this)
+  subroutine initialize_logfiles_sub(this)
+
+    class (LOGFILE_T)  :: this
+
+
+  end subroutine initialize_logfiles_sub
+
+
+  subroutine open_files_write_access_sub(this)
 
     class (LOGFILE_T), intent(inout) :: this
-    character (len=*), intent(in) :: sFilename
-    character (len=*), intent(in), optional :: sCommentChars
-    character (len=*), intent(in), optional :: sDelimiters
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iIndex
     character (len=:), allocatable   :: sFilename
     character (len=12)               :: sDescriptor(2) = [ "GENERAL ", "DETAILED" ]
 
-    if ( this%iLoggingLevel /= LOGGING_NONE ) then
+    if ( this%iLogLevel /= LOG_NONE ) then
 
-      do iIndex = 1, min(this%iLoggingLevel, 2)
+      do iIndex = 1, min(this%iLogLevel, 2)
 
         sFilename = trim(this%sFilePrefix)//"_"//trim(sDescriptor(iIndex))//".txt"
 
-        if (.not. this%isOpen(iIndex) ) then
+        if (.not. this%lIsOpen(iIndex) ) then
 
-          open(newunit=this%iUnitNum(iIndex), file=sFilename, iostat=this%iStat(iIndex), access='WRITE')
+          open(newunit=this%iUnitNum(iIndex), file=sFilename, iostat=this%iStat(iIndex), action='WRITE')
           call assert(this%iStat(iIndex) == 0, "Failed to open file.", __FILE__, __LINE__)
 
-          if (this%iStat(iIndex) == 0) this%lIsOpen(iIndex) = lTRUE
-
-          write(*, fmt="(/,10x, a)") "Opened file "//dquote(sFilename)
+          if (this%iStat(iIndex) == 0) this%lIsOpen(iIndex) = .true._c_bool
    
         else
 
-          stop("Failed to open file logfile "//dquote(sFilename) )
+          stop( "Failed to open file logfile." )
 
         endif
 
@@ -86,7 +92,24 @@ contains
     endif
         
 
-  end subroutine open_file_write_access_sub
+  end subroutine open_files_write_access_sub
+
+
+  subroutine close_files_sub(this)
+
+    class (LOGFILE_T)    :: this
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iIndex
+
+    do iIndex = 1,2
+
+      if (this%lIsOpen(iIndex) )  close( unit=this%iUnitNum(iIndex) )
+
+    enddo
+
+  end subroutine close_files_sub
+
 
   subroutine make_prefix_sub(this)
 
@@ -138,16 +161,16 @@ contains
 
       case ( LOG_GENERAL )
 
-        call writeMultiLine(sMessageText=sMessage, unit=this%iUnitNum( LOG_GENERAL ) )
+        call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_GENERAL ) )
 
       case ( LOG_DETAILED )
 
-        call writeMultiLine(sMessageText=sMessage, unit=this%iUnitNum( LOG_DETAILED ) )
+        call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_DETAILED ) )
 
       case ( LOG_ALL )
 
-        call writeMultiLine(sMessageText=sMessage, unit=this%iUnitNum( LOG_GENERAL ) )
-        call writeMultiLine(sMessageText=sMessage, unit=this%iUnitNum( LOG_DETAILED ) )
+        call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_GENERAL ) )
+        call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_DETAILED ) )
 
       case default
 
@@ -197,7 +220,7 @@ contains
     class (LOGFILE_T)                    :: this
     character(len=*), intent(in)         :: sMessage
 
-    call writeMultiLine(sMessage, LU_STD_OUT ) 
+    call writeMultiLine(sMessage, OUTPUT_UNIT ) 
     call this%write( sMessage ) 
 
   end subroutine write_to_logfiles_and_screen_sub
@@ -212,14 +235,14 @@ contains
     character (len=1)    :: sDelimiter
     integer (kind=c_int) :: iIndex
 
-    sDelimiters = "~"
+    sDelimiter = "~"
 
     sText1 = adjustl(sText1)
 
-    iIndex = scan( string = sText1, set = sDelimiters )
+    iIndex = scan( string = sText1, set = sDelimiter )
         
     if (iIndex == 0) then
-      ! no delimiters found; return string as was supplied originally
+      ! no delimiter found; return string as was supplied originally
       sText2 = sText1
       sText1 = ""
     else
@@ -230,4 +253,14 @@ contains
     
   end subroutine split
 
-end logfiles
+
+  function dquote(sText1)    result(sText)
+
+    character (len=*), intent(in)         :: sText1
+    character (len=len_trim(sText1)+2)    :: sText
+
+    sText = '"'//trim(sText1)//'"'
+
+  end function dquote
+
+end module logfiles
