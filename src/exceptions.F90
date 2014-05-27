@@ -77,22 +77,26 @@ contains
     
     ! [ LOCALS ]
     integer (kind=c_int) :: iLU
+    character (len=32)   :: sBuf
 
     iLU = OUTPUT_UNIT
-
-    write (unit=iLU, fmt="(/,/,a)") "** WARNING **"
-    write (unit=iLU, fmt="(/,t3,a19,t22,a)") "possible error:  ", trim(sMessage)
+    
+    call LOGS%echo(" "); call LOGS%echo(" ")
+    call LOGS%echo("  ** WARNING **")
+    call LOGS%echo("      possible error:  "//trim(sMessage) )
 
     if (present(sModule))  &
-      write (unit=iLU, fmt="(t3,a19,t22,a)")     "module:  ", trim(sModule)
+      call LOGS%echo("              module:  "//trim(sModule) )
 
-    if (present(iLine))  &
-      write (unit=iLU, fmt="(t3,a19,t22,i0)")  "line no:  ", iLine
+    if (present(iLine)) then
+      write(sBuf, fmt="(i0)") iLine
+      call LOGS%echo("             line no:  "//trim(sBuf) )
+    endif  
 
     if (present(sHints)) &
-      write (unit=iLU, fmt="(/,t3,'==>  ',a)") sHints
+      call LOGS%echo("   ==> "//trim(sHints) )
 
-    write (unit=iLU, fmt="(/)")
+      call LOGS%echo(" ")
 
     if (present(lFatal)) then
       if (lFatal)  NUMBER_OF_FATAL_WARNINGS = NUMBER_OF_FATAL_WARNINGS + 1
@@ -106,12 +110,20 @@ contains
 
     logical (kind=c_bool), intent(in)           :: lCondition
     character (len=*), intent(in)               :: sMessage
-    character (len=*), intent(in)               :: sModule
-    integer (kind=c_int), intent(in)            :: iLine 
+    character (len=*), intent(in), optional     :: sModule
+    integer (kind=c_int), intent(in), optional  :: iLine 
 
     if (.not. lCondition) then
 
-      call die(sMessage, sModule, iLine)
+      if ( present(sModule) .and. present(iLine) ) then
+        call die( sMessage=sMessage, sModule=sModule, iLine=iLine )
+      elseif ( present(sModule) ) then
+        call die( sMessage=sMessage, sModule=sModule )  
+      elseif ( present(iLine) ) then
+        call die( sMessage=sMessage, iLine=iLine )
+      else
+        call die( sMessage=sMessage )  
+      endif
 
     endif      
 
@@ -122,13 +134,21 @@ contains
 
     logical (kind=4), intent(in)                :: lCondition
     character (len=*), intent(in)               :: sMessage
-    character (len=*), intent(in)               :: sModule
-    integer (kind=c_int), intent(in)            :: iLine 
+    character (len=*), intent(in), optional     :: sModule
+    integer (kind=c_int), intent(in), optional  :: iLine 
 
 
     if (.not. lCondition) then
 
-      call die(sMessage, sModule, iLine)
+      if ( present(sModule) .and. present(iLine) ) then
+        call die( sMessage=sMessage, sModule=sModule, iLine=iLine )
+      elseif ( present(sModule) ) then
+        call die( sMessage=sMessage, sModule=sModule )  
+      elseif ( present(iLine) ) then
+        call die( sMessage=sMessage, iLine=iLine )
+      else
+        call die( sMessage=sMessage )  
+      endif
 
     endif      
 

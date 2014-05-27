@@ -15,6 +15,8 @@ module datetime
   implicit none
   private
 
+  public :: gregorian_date, julian_day, isLeap, day_of_year
+
   type, public :: T_DATETIME
 
     integer (kind=c_short)  :: iMonth = 1
@@ -1140,6 +1142,35 @@ function mmddyyyy2doy(sMMDDYYYY)  result(iDOY)
 
 end function mmddyyyy2doy
 
+!--------------------------------------------------------------------------
+
+function day_of_year(iJD) result(iDOY)
+
+  integer (kind=c_int), intent(in) :: iJD
+
+  ! [ LOCALS ]
+  integer (kind=c_int) :: iFirstDay, iLastDay, iDOY
+  integer (kind=c_int) :: iMonth, iDay, iYear
+
+
+  call gregorian_date(iJD, iYear, iMonth, iDay)
+  iFirstDay = julian_day ( iYear, 1, 1 )
+
+  iDOY = iJD - iFirstDay + 1
+
+end function day_of_year
+
+!--------------------------------------------------------------------------
+
+function isLeap(iYear)   result(lResult)
+
+  integer (kind=c_int), intent(in)     :: iYear
+  logical (kind=c_bool) :: lResult
+
+  lResult = ( mod(iYear, 4) == 0 .and. mod(iYear, 100) /= 0 ) .or. &
+                 ( mod(iYear, 400) == 0 .and. iYear /= 0 )
+
+end function isLeap
 
 
 end module datetime

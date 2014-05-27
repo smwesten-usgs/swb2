@@ -10,7 +10,6 @@ module et_crop_coefficients
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double
   use types
-  use control_file
   use parameters
 	use sm_thornthwaite_mather
   implicit none

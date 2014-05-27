@@ -6,12 +6,17 @@ module logfiles
 
   private
 
+  character (len=20), parameter, public   :: COMPILATION_TIMESTAMP = __DATE__//" "//__TIME__
+  character (len=9), parameter, public    :: SWB_VERSION = "2.0 alpha"
+
   public :: LOGFILE_T
 
   enum, bind(c)
     enumerator :: DT_YEAR = 1, DT_MONTH = 2, DT_DAY = 3, DT_DIFF_FM_UTC = 4,          &
                   DT_HOUR = 5, DT_MINUTES = 6, DT_SECONDS = 7, DT_MILLISECONDS = 8
   end enum
+
+  public :: LOG_NONE, LOG_GENERAL, LOG_DETAILED, LOG_ALL
 
   enum, bind(c)
     enumerator :: LOG_NONE = 0, LOG_GENERAL = 1, LOG_DETAILED = 2, LOG_ALL = 3
@@ -34,7 +39,7 @@ module logfiles
     generic            :: write => write_to_logfiles_sub
 
     procedure, private :: write_to_logfiles_and_screen_sub
-    generic            :: echo => write_to_logfiles_sub
+    generic            :: echo => write_to_logfiles_and_screen_sub
 
     procedure, private :: open_files_write_access_sub
     generic            :: open => open_files_write_access_sub
@@ -51,13 +56,27 @@ module logfiles
 
 contains
 
-  subroutine initialize_logfiles_sub(this)
+  subroutine initialize_logfiles_sub(this, iLogLevel)
 
-    class (LOGFILE_T)  :: this
+    class (LOGFILE_T)                           :: this
+    integer (kind=c_int), intent(in), optional  :: iLogLevel
 
+    ! [ LOCALS ] 
+    integer (kind=c_int) :: iLogLevel_
+
+    if (present(iLogLevel) ) then
+      iLogLevel_ = iLogLevel
+    else
+      iLogLevel_ = LOG_GENERAL
+    endif    
+
+    call this%make_prefix()
+    this%iLogLevel = iLogLevel_
+    call this%open()
 
   end subroutine initialize_logfiles_sub
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine open_files_write_access_sub(this)
 
@@ -66,6 +85,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int) :: iIndex
     character (len=:), allocatable   :: sFilename
+    character (len=:), allocatable   :: sDatetime
     character (len=12)               :: sDescriptor(2) = [ "GENERAL ", "DETAILED" ]
 
     if ( this%iLogLevel /= LOG_NONE ) then
@@ -77,9 +97,17 @@ contains
         if (.not. this%lIsOpen(iIndex) ) then
 
           open(newunit=this%iUnitNum(iIndex), file=sFilename, iostat=this%iStat(iIndex), action='WRITE')
-          call assert(this%iStat(iIndex) == 0, "Failed to open file.", __FILE__, __LINE__)
+          if (this%iStat(iIndex) /= 0) then
+            write(unit=OUTPUT_UNIT, fmt="(a)") "Failed to open logfile "//'"'//trim(sFilename)//'".' 
+            stop
+          endif  
 
           if (this%iStat(iIndex) == 0) this%lIsOpen(iIndex) = .true._c_bool
+
+          sDatetime = make_timestamp()
+
+          write(this%iUnitNum(iIndex), fmt="(a)") "SWB version "//SWB_VERSION//" compiled on "//COMPILATION_TIMESTAMP         
+          write(this%iUnitNum(iIndex), fmt="(a)") "Model run started at "//sDatetime          
    
         else
 
@@ -94,6 +122,7 @@ contains
 
   end subroutine open_files_write_access_sub
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine close_files_sub(this)
 
@@ -104,12 +133,18 @@ contains
 
     do iIndex = 1,2
 
-      if (this%lIsOpen(iIndex) )  close( unit=this%iUnitNum(iIndex) )
+      if (this%lIsOpen(iIndex) ) then
+
+        flush ( unit=this%iUnitNum(iIndex) )
+        close ( unit=this%iUnitNum(iIndex) )
+
+      endif
 
     enddo
 
   end subroutine close_files_sub
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine make_prefix_sub(this)
 
@@ -140,15 +175,20 @@ contains
 
   end subroutine make_prefix_sub
 
+!--------------------------------------------------------------------------------------------------
 
-  subroutine write_to_logfiles_sub(this, sMessage, iLogLevel )
+  subroutine write_to_logfiles_sub(this, sMessage, iLogLevel, iTab, iSpc )
 
     class (LOGFILE_T)                            :: this
     character (len=*), intent(in)                :: sMessage
     integer (kind=c_int), intent(in), optional   :: iLogLevel
+    integer (kind=c_int), intent(in), optional   :: iTab
+    integer (kind=c_int), intent(in), optional   :: iSpc
 
     ! [ LOCALS ]
     integer (kind=c_int)  :: iLogLevel_
+    integer (kind=c_int)  :: iTab_
+    integer (kind=c_int)  :: iSpc_
 
     ! if no loglevel value supplied by user, assume that only a general level of logging is desired.
     if ( present(iLogLevel) ) then
@@ -157,20 +197,32 @@ contains
       iLogLevel_ = min( 1, this%iLogLevel )
     endif
 
+    if (present(iTab) ) then
+      iTab_ = iTab
+    else
+      iTab_ = 1
+    endif
+
+    if (present(iSpc) ) then
+      iSpc_ = iSpc
+    else
+      iSpc_ = len_trim(sMessage)
+    endif
+
     select case (iLogLevel_)
 
       case ( LOG_GENERAL )
 
-        call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_GENERAL ) )
+        call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_GENERAL ), iTab=iTab_, iSpc=iSpc_ )
 
       case ( LOG_DETAILED )
 
-        call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_DETAILED ) )
+        call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_DETAILED ), iTab=iTab_, iSpc=iSpc_ )
 
       case ( LOG_ALL )
 
-        call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_GENERAL ) )
-        call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_DETAILED ) )
+        call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_GENERAL ), iTab=iTab_, iSpc=iSpc_ )
+        call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_DETAILED ), iTab=iTab_, iSpc=iSpc_ )
 
       case default
 
@@ -178,26 +230,33 @@ contains
 
   end subroutine write_to_logfiles_sub
 
+!--------------------------------------------------------------------------------------------------
+
   !> Write multiple lines of output to Fortran logical unit
   !> @details Writes one or more lines of an input text string to a Fortran
   !> logical unit number. To output multiple lines, insert a tilde (~) at
   !> each point in the text string where a carriage return is desired.
   !> @param[in] sMessageText Character string that contains the message to be written.
   !> @param[in] iLU Integer value of the Fortran logical unit number to write to.
-  subroutine writeMultiLine(sMessageText, iLU)
+  subroutine writeMultiLine(sMessageText, iLU, iTab, iSpc)
 
     ! [ ARGUMENTS ]
-    character (len=*) :: sMessageText
-    integer (kind=c_int) :: iLU
+    character (len=*), intent(in)     :: sMessageText
+    integer (kind=c_int), intent(in)  :: iLU
+    integer (kind=c_int), intent(in)  :: iTab
+    integer (kind=c_int), intent(in)  :: iSpc
 
     ! [ LOCALS ]
     character (len=len(sMessageText) ) :: sRecord
     character (len=256) :: sItem
     logical (kind=c_bool) :: lFileOpen
+    character (len=12) :: sFmt
 
     inquire (unit=iLU, opened=lFileOpen)
 
     sRecord = trim(sMessageText)
+
+    write(sFmt, fmt="('(t',i0,' ,a',i0,')')") iTab, iSpc
 
     if (lFileOpen) then
 
@@ -206,25 +265,53 @@ contains
         ! break up string with '~' as delimiter
         call split(sRecord, sItem)
         if(len_trim(sItem) == 0) exit
-        write(UNIT=iLU,FMT="(a)") trim(sItem)
+        write(UNIT=iLU,FMT=trim(sFmt) ) trim(sItem)
       enddo
 
     endif
 
   end subroutine writeMultiLine
 
+!--------------------------------------------------------------------------------------------------
 
 !> echo to screen AND write to logfile
-  subroutine write_to_logfiles_and_screen_sub(this, sMessage)
+  subroutine write_to_logfiles_and_screen_sub(this, sMessage, iLogLevel, iTab, iSpc)
 
-    class (LOGFILE_T)                    :: this
-    character(len=*), intent(in)         :: sMessage
+    class (LOGFILE_T)                            :: this
+    character(len=*), intent(in)                 :: sMessage
+    integer (kind=c_int), intent(in), optional   :: iLogLevel
+    integer (kind=c_int), intent(in), optional   :: iTab
+    integer (kind=c_int), intent(in), optional   :: iSpc
 
-    call writeMultiLine(sMessage, OUTPUT_UNIT ) 
-    call this%write( sMessage ) 
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iLogLevel_
+    integer (kind=c_int) :: iTab_
+    integer (kind=c_int) :: iSpc_
+
+    if (present(iLogLevel)) then
+      iLogLevel_ = iLogLevel
+    else
+      iLogLevel_ = 1
+    endif
+
+    if (present(iTab) ) then
+      iTab_ = iTab
+    else
+      iTab_ = 1
+    endif
+
+    if (present(iSpc) ) then
+      iSpc_ = iSpc
+    else
+      iSpc_ = len_trim(sMessage)
+    endif
+
+    call writeMultiLine(sMessage, OUTPUT_UNIT, iTab_, iSpc_ ) 
+    call this%write( sMessage, iLogLevel_, iTab_, iSpc_ ) 
 
   end subroutine write_to_logfiles_and_screen_sub
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine split(sText1, sText2)
 
@@ -253,6 +340,7 @@ contains
     
   end subroutine split
 
+!--------------------------------------------------------------------------------------------------
 
   function dquote(sText1)    result(sText)
 
@@ -262,5 +350,42 @@ contains
     sText = '"'//trim(sText1)//'"'
 
   end function dquote
+
+!--------------------------------------------------------------------------------------------------
+
+  function make_timestamp()    result(sDatetime)
+
+    character (len=:), allocatable   :: sDatetime
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iValues(8)
+    character (len=2)    :: sHour
+    character (len=2)    :: sMinutes
+    character (len=2)    :: sSeconds
+    
+    character (len=2)    :: sDay
+    character (len=2)    :: sMonth
+    character (len=4)    :: sYear
+    character (len=9)    :: sMonthName
+
+    character (len=9), parameter :: MONTHS(12) = &
+      ["January  ", "February ", "March    ", "April    ", "May      ", "June     ", "July     ", &
+       "August   ", "September", "October  ", "November ", "December "]
+
+    call DATE_AND_TIME( VALUES = iValues )
+
+    write(sHour, fmt="(i0.2)") iValues( DT_HOUR )
+    write(sMinutes, fmt="(i0.2)") iValues( DT_MINUTES )
+    write(sSeconds, fmt="(i0.2)") iValues( DT_SECONDS )
+    write(sMonth, fmt="(i0.2)") iValues( DT_MONTH )
+    write(sDay, fmt="(i0.2)") iValues( DT_DAY )
+    write(sYear, fmt="(i0.4)") iValues( DT_YEAR )
+  
+    sMonthName = MONTHS( iValues( DT_MONTH ) )
+
+    sDatetime = trim(sMonthName)//" "//sDay//" "//sYear//" "//sHour//":"//sMinutes//":"//sSeconds
+
+  end function make_timestamp                                                   
+
 
 end module logfiles

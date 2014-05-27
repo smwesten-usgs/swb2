@@ -25,7 +25,12 @@
 module netcdf4_support
 
   use iso_c_binding
-  use types
+  use constants_and_conversions
+  use exceptions
+  use logfiles
+  use netcdf_c_api_interfaces
+  use strings
+  use datetime, only : gregorian_date, julian_day
 
   use swb_grid
 !  use typesizes
@@ -102,6 +107,10 @@ module netcdf4_support
   integer (kind=c_int), public, parameter :: NC_RIGHT = 1
   integer (kind=c_int), public, parameter :: NC_TOP    = 0
   integer (kind=c_int), public, parameter :: NC_BOTTOM = 1
+
+  integer (kind=c_int), parameter :: COLUMN = 1
+  integer (kind=c_int), parameter :: ROW = 2
+
 
   character (len=25), dimension(4), parameter :: NETCDF_FORMAT_STRING = &
     ["NC_FORMAT_CLASSIC        ", &
@@ -463,7 +472,7 @@ function nf_return_AttValue( NCFILE, iVarIndex, sAttName)   result(sAttValue)
 
   do iIndex=lbound(pNC_ATT,1), ubound(pNC_ATT,1)
 
-    if (str_compare(sAttName, pNC_ATT(iIndex)%sAttributeName) ) then
+    if ( sAttName .strequal. pNC_ATT(iIndex)%sAttributeName ) then
       lFound = lTRUE
       exit
     endif
@@ -915,10 +924,10 @@ subroutine nf_return_native_coord_bounds(NCFILE)
   rYmin = minval(NCFILE%rY_Coords(NCFILE%iRowBounds(NC_TOP):NCFILE%iRowBounds(NC_BOTTOM)) )
   rYmax = maxval(NCFILE%rY_Coords(NCFILE%iRowBounds(NC_TOP):NCFILE%iRowBounds(NC_BOTTOM)) )
 
-  NCFILE%rX(NC_LEFT) = rXmin - NCFILE%rGridCellSizeX * dpHALF
-  NCFILE%rX(NC_RIGHT) = rXmax + NCFILE%rGridCellSizeX * dpHALF
-  NCFILE%rY(NC_TOP) = rYmax + NCFILE%rGridCellSizeY * dpHALF
-  NCFILE%rY(NC_BOTTOM) = rYmin - NCFILE%rGridCellSizeY * dpHALF
+  NCFILE%rX(NC_LEFT) = rXmin - NCFILE%rGridCellSizeX * 0.5_c_double
+  NCFILE%rX(NC_RIGHT) = rXmax + NCFILE%rGridCellSizeX * 0.5_c_double
+  NCFILE%rY(NC_TOP) = rYmax + NCFILE%rGridCellSizeY * 0.5_c_double
+  NCFILE%rY(NC_BOTTOM) = rYmin - NCFILE%rGridCellSizeY * 0.5_c_double
 
 #ifdef DEBUG_PRINT
   print *, "Grid cell size (X): ", NCFILE%rGridCellSizeX
@@ -1079,7 +1088,7 @@ subroutine nf_open_file(NCFILE, sFilename, iLU)
   ! [ LOCALS ]
   logical (kind=c_bool) :: lFileOpen
 
-  call echolog("Attempting to open READONLY NetCDF file: " &
+  call LOGS%echo("Attempting to open READONLY NetCDF file: " &
     //dquote(sFilename))
 
   call nf_trap( nc_open(trim(sFilename)//c_null_char, &
@@ -1090,7 +1099,7 @@ subroutine nf_open_file(NCFILE, sFilename, iLU)
   call nf_trap( nc_inq_format(ncid=NCFILE%iNCID, formatp=NCFILE%iFileFormat), &
                __FILE__, __LINE__)
 
-  call echolog("   Succeeded.  ncid: "//trim(asCharacter(NCFILE%iNCID)) &
+  call LOGS%echo("   Succeeded.  ncid: "//trim(asCharacter(NCFILE%iNCID)) &
          //"  format: "//trim(NETCDF_FORMAT_STRING(NCFILE%iFileFormat) ) )
 
   NCFILE%sFilename = sFilename
@@ -1186,7 +1195,7 @@ subroutine nf_trap( iResultCode, sFilename, iLineNumber )
     cpResult = nc_strerror(iResultCode)
     sTextString = char_ptr_to_fortran_string( cpResult )
 
-    call echolog("NetCDF ERROR: "//dquote( sTextString  )//" | error code was: " &
+    call LOGS%echo("NetCDF ERROR: "//dquote( sTextString  )//" | error code was: " &
       //trim(asCharacter(iResultCode)) )
 
     call assert(lFALSE, "SWB is stopping due to a problem reading or accessing" &
@@ -1202,7 +1211,7 @@ subroutine netcdf_close_file( NCFILE)
 
   type (T_NETCDF4_FILE ) :: NCFILE
 
-  call echolog("Closing NetCDF file with name: "//dquote(NCFILE%sFilename))
+  call LOGS%echo("Closing NetCDF file with name: "//dquote(NCFILE%sFilename))
   call nf_trap( nc_close(NCFILE%iNCID), __FILE__, __LINE__ )
 
 !  call nf_deallocate_data_struct( NCFILE=NCFILE )
@@ -2169,7 +2178,7 @@ subroutine nf_get_time_units(NCFILE)
 
   do iIndex=0, pNC_VAR%iNumberOfAttributes - 1
 
-    if ( str_compare(pNC_VAR%pNC_ATT(iIndex)%sAttributeName, "units") ) then
+    if ( pNC_VAR%pNC_ATT(iIndex)%sAttributeName .strequal. "units"   ) then
       lFound = lTRUE
       exit
     endif
@@ -2227,7 +2236,7 @@ subroutine nf_get_xyz_units(NCFILE)
 
     do iIndex2=0, pNC_VAR%iNumberOfAttributes - 1
 
-      if ( str_compare(pNC_VAR%pNC_ATT(iIndex2)%sAttributeName, "units") ) then
+      if ( pNC_VAR%pNC_ATT(iIndex2)%sAttributeName .strequal. "units" ) then
         lFound = lTRUE
         exit
       endif
@@ -2261,7 +2270,7 @@ subroutine nf_get_scale_and_offset(NCFILE)
 
   do iIndex=0, pNC_VAR%iNumberOfAttributes - 1
 
-    if ( str_compare(pNC_VAR%pNC_ATT(iIndex)%sAttributeName, "scale_factor") ) then
+    if ( pNC_VAR%pNC_ATT(iIndex)%sAttributeName .strequal. "scale_factor" ) then
       lFound = lTRUE
       exit
     endif
@@ -2278,7 +2287,7 @@ subroutine nf_get_scale_and_offset(NCFILE)
 
   do iIndex=0, pNC_VAR%iNumberOfAttributes - 1
 
-    if ( str_compare(pNC_VAR%pNC_ATT(iIndex)%sAttributeName, "add_offset") ) then
+    if ( pNC_VAR%pNC_ATT(iIndex)%sAttributeName .strequal. "add_offset" ) then
       lFound = lTRUE
       exit
     endif
@@ -2307,25 +2316,25 @@ subroutine nf_get_variable_id_and_type( NCFILE )
 
      pNC_VAR => NCFILE%pNC_VAR(iIndex)
 
-     if (str_compare(pNC_VAR%sVariableName, NCFILE%sVarName(NC_X) ) ) then
+     if ( pNC_VAR%sVariableName .strequal. NCFILE%sVarName(NC_X)  ) then
        NCFILE%iVarIndex(NC_X) = iIndex
        NCFILE%iVarID(NC_X) = pNC_VAR%iNC_VarID
        NCFILE%iVarType(NC_X) = pNC_VAR%iNC_VarType
        NCFILE%iVar_DimID(NC_X,:) = pNC_VAR%iNC_DimID
 
-     elseif (str_compare(pNC_VAR%sVariableName,  NCFILE%sVarName(NC_Y) ) ) then
+     elseif ( pNC_VAR%sVariableName .strequal. NCFILE%sVarName(NC_Y) ) then
        NCFILE%iVarIndex(NC_Y) = iIndex
        NCFILE%iVarID(NC_Y) = pNC_VAR%iNC_VarID
        NCFILE%iVarType(NC_Y) = pNC_VAR%iNC_VarType
        NCFILE%iVar_DimID(NC_Y,:) = pNC_VAR%iNC_DimID
 
-     elseif (str_compare(pNC_VAR%sVariableName,  NCFILE%sVarName(NC_Z) ) ) then
+     elseif ( pNC_VAR%sVariableName .strequal. NCFILE%sVarName(NC_Z) ) then
        NCFILE%iVarIndex(NC_Z) = iIndex
        NCFILE%iVarID(NC_Z) = pNC_VAR%iNC_VarID
        NCFILE%iVarType(NC_Z) = pNC_VAR%iNC_VarType
        NCFILE%iVar_DimID(NC_Z,:) = pNC_VAR%iNC_DimID
 
-     elseif (str_compare(pNC_VAR%sVariableName,  NCFILE%sVarName(NC_TIME) ) ) then
+     elseif ( pNC_VAR%sVariableName .strequal. NCFILE%sVarName(NC_TIME) ) then
        NCFILE%iVarIndex(NC_TIME) = iIndex
        NCFILE%iVarID(NC_TIME) = pNC_VAR%iNC_VarID
        NCFILE%iVarType(NC_TIME) = pNC_VAR%iNC_VarType
@@ -2365,7 +2374,7 @@ function nf_return_index_double(rValues, rTargetValue)  result(iIndex)
   real (kind=c_double) :: rDiff, rDiffMin
 
   if ( .not. (rTargetValue >= minval(rValues) .and. rTargetValue <= maxval(rValues)) ) then
-    call echolog("rTargetValue (" &
+    call LOGS%echo("rTargetValue (" &
     //trim(asCharacter(rTargetValue))//") is not within the range " &
     //trim(asCharacter(minval(rValues)))//" to "//trim(asCharacter(maxval(rValues))) )
 
@@ -2456,7 +2465,7 @@ subroutine nf_create(NCFILE, sFilename, iLU)
   NCFILE%iFileFormat = NC_FORMAT_NETCDF4
 
   if (present(iLU) ) then
-    call echolog("Created NetCDF file for output. Filename: " &
+    call LOGS%echo("Created NetCDF file for output. Filename: " &
       //dquote(NCFILE%sFilename)//"; NCID="//trim(asCharacter(NCFILE%iNCID) ) )
   endif
 

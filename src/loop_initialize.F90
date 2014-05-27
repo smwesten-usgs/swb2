@@ -1,7 +1,7 @@
 module loop_initialize
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
-  use constants_and_conversions, only : lTRUE, lFALSE
+  use constants_and_conversions, only : lTRUE, lFALSE, asFloat
   use data_catalog_entry
   use exceptions
   use strings
@@ -84,6 +84,7 @@ contains
     integer (kind=c_int)             :: iIndex
     character (len=:), allocatable   :: sCmdText
     character (len=:), allocatable   :: sOptionText
+    character (len=:), allocatable   :: sArgText
     integer (kind=c_int)             :: iStat
 
 
@@ -102,13 +103,21 @@ contains
 
         sCmdText = myDirectives%get(iIndex)
 
-        select case(sCmdText)
-        
+
+        call CF_DICT%get_values("PRECIPITATION", myOptions )
+
+        select case ( sCmdText )
+
           case ( "PRECIPITATION" )
 
             call CF_DICT%get_values("PRECIPITATION", myOptions )
+            sOptionText = myOptions%get(1)
 
-              sOptionText = myOptions%get(1)
+              if (.not. associated(PRCP))  allocate(PRCP, stat=iStat)
+                call assert(iStat==0, "Problem allocating memory for the precipitation (PRCP) data structure",   &
+                  __FILE__, __LINE__)
+
+              PRCP%sVariableName_z = "prcp"
 
               select case (sOptionText)
 
@@ -125,7 +134,112 @@ contains
 
                 end select  
 
+          case ( "PRECIPITATION_SCALE" )
+
+            call CF_DICT%get_values("PRECIPITATION_SCALE", myOptions )
+            sOptionText = myOptions%get(1)
+            call PRCP%set_scale(asFloat(sOptionText))
+
+          case ( "PRECIPITATION_OFFSET" )
+  
+            call CF_DICT%get_values("PRECIPITATION_OFFSET", myOptions )
+            sOptionText = myOptions%get(1)
+            call PRCP%set_offset(asFloat(sOptionText))
+
+          case ( "PRECIPITATION_CONVERSION_FACTOR" )
+            
+            call CF_DICT%get_values("PRECIPITATION_CONVERSION_FACTOR", myOptions )
+            sOptionText = myOptions%get(1)
+            call PRCP%set_conversion_factor(asFloat(sOptionText))
+
+          case ( "NETCDF_PRECIP_X_VAR" )
+
+            call CF_DICT%get_values("NETCDF_PRECIP_X_VAR", myOptions )
+            sOptionText = myOptions%get(1)
+            PRCP%sVariableName_x = trim(sOptionText)
+
+          case ( "NETCDF_PRECIP_Y_VAR" )
+
+            call CF_DICT%get_values("NETCDF_PRECIP_Y_VAR", myOptions )
+            sOptionText = myOptions%get(1)
+            PRCP%sVariableName_y = trim(sOptionText)
+
+          case ( "NETCDF_PRECIP_Z_VAR" )
+
+            call CF_DICT%get_values("NETCDF_PRECIP_Z_VAR", myOptions )
+            sOptionText = myOptions%get(1)
+            PRCP%sVariableName_z = trim(sOptionText)
+
+          case ( "NETCDF_PRECIP_TIME_VAR" )
+
+            call CF_DICT%get_values("NETCDF_PRECIP_TIME_VAR", myOptions )
+            sOptionText = myOptions%get(1)
+            PRCP%sVariableName_time = trim(sOptionText)
+
+          case ( "NETCDF_PRECIP_VARIABLE_ORDER" )
+
+            call CF_DICT%get_values("NETCDF_PRECIP_VARIABLE_ORDER", myOptions )
+            sOptionText = myOptions%get(1)
+            call PRCP%set_variable_order( asLowercase(sOptionText) )
+
+          case ( "NETCDF_PRECIP_FLIP_VERTICAL" )
+
+            call PRCP%set_grid_flip_vertical()
+
+          case ( "NETCDF_PRECIP_FLIP_HORIZONTAL" )
+
+            call PRCP%set_grid_flip_horizontal()
+
+          case ( "NETCDF_PRECIP_MAKE_LOCAL_ARCHIVE" )
+
+            call PRCP%set_make_local_archive(lTRUE)
+
           case ( "PRECIPITATION_GRID_PROJECTION_DEFINITION" )
+
+            call CF_DICT%get_values("PRECIPITATION_GRID_PROJECTION_DEFINITION", myOptions )
+            sOptionText = myOptions%get(1)
+            sArgText = myOptions%get(2, myOptions%count )
+            call PRCP%set_PROJ4( trim(sArgText) )
+
+          case ( "PRECIPITATION_MINIMUM_ALLOWED_VALUE" )
+
+            call CF_DICT%get_values("PRECIPITATION_MINIMUM_ALLOWED_VALUE", myOptions )
+            sOptionText = myOptions%get(1)
+            PRCP%rMinAllowedValue = asFloat(sOptionText)
+
+          case ( "PRECIPITATION_MAXIMUM_ALLOWED_VALUE" )
+
+            call CF_DICT%get_values("PRECIPITATION_MAXIMUM_ALLOWED_VALUE", myOptions )
+            sOptionText = myOptions%get(1)
+            PRCP%rMaxAllowedValue = asFloat(sOptionText)
+
+          case ( "PRECIPITATION_MISSING_VALUES_CODE" )
+
+            call CF_DICT%get_values("PRECIPITATION_MISSING_VALUES_CODE", myOptions )
+            sOptionText = myOptions%get(1)
+            PRCP%rMissingValuesCode = asFloat(sOptionText)
+
+          case ( "PRECIPITATION_MISSING_VALUES_OPERATOR" ) 
+
+            call CF_DICT%get_values("PRECIPITATION_MISSING_VALUES_OPERATOR", myOptions )
+            sOptionText = myOptions%get(1)
+            PRCP%sMissingValuesOperator = trim(sOptionText)
+
+          case ( "PRECIPITATION_MISSING_VALUES_ACTION")
+            
+            call CF_DICT%get_values("PRECIPITATION_MISSING_VALUES_ACTION", myOptions )
+            sOptionText = myOptions%get(1)
+
+            if (sOptionText == "ZERO") then
+              PRCP%iMissingValuesAction = MISSING_VALUES_ZERO_OUT
+            elseif (sOptionText == "MEAN" ) then
+              PRCP%iMissingValuesAction = MISSING_VALUES_REPLACE_WITH_MEAN
+            else
+              call assert(lFALSE, "Unknown missing value action supplied for" &
+                //" precipitation data: "//dquote(sOptionText) )
+            endif
+
+
 
           case default
 

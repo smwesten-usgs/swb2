@@ -45,36 +45,6 @@ subroutine sm_thornthwaite_mather_Initialize ( pGrd, pConfig )
 
       if ( cel%rSoilWaterCap > rNEAR_ZERO ) then
 
-        if (pConfig%iConfigureSM == CONFIG_SM_TM_LOOKUP_TABLE) then
-
-        !! Constrain rSoilWaterCap to limits of Thornthwaite-Mather tables
-
-          if ( cel%rSoilWaterCap < 0.5_c_float ) then
-            write(UNIT=LU_LOG,FMT="(a,f10.3,a,i4,',',i4,a)") &
-              'Soil water capacity', cel%rSoilWaterCap,' for cell ',iRow,iCol, &
-              ' out of range; adjusted to 0.5'
-            flush(unit=LU_LOG)
-            cel%rSoilWaterCap = 0.51_c_float
-          else if ( cel%rSoilWaterCap > 17.5_c_float ) then
-             write(UNIT=LU_LOG,FMT="(a,f10.3,a,i4,',',i4,a)") &
-              'Soil water capacity', cel%rSoilWaterCap,' for cell ',iRow,iCol, &
-              ' out of range; adjusted to 17.5'
-            flush(unit=LU_LOG)
-            cel%rSoilWaterCap = 17.49_c_float
-          end if
-
-          !! convert input soil moisture (as percent of soil water capacity)
-          !! TO soil moisture in inches
-          cel%rSoilMoisture = (cel%rSoilMoisturePct/rHUNDRED) * cel%rSoilWaterCap
-
-          ! calculate APWL from T-M table
-          cel%rSM_AccumPotentWatLoss = grid_SearchColumn(pGrd=gWLT, &
-                                               rXval=cel%rSoilWaterCap, &
-                                               rZval=cel%rSoilMoisture, &
-                                               rNoData=-rONE)
-
-        elseif ( pConfig%iConfigureSM == CONFIG_SM_TM_EQUATIONS ) then
-
           !! convert input soil moisture (as percent of soil water capacity)
           !! TO soil moisture in inches
           cel%rSoilMoisture = (cel%rSoilMoisturePct/rHUNDRED) * cel%rSoilWaterCap
@@ -82,8 +52,6 @@ subroutine sm_thornthwaite_mather_Initialize ( pGrd, pConfig )
          ! calculate APWL from equation
          cel%rSM_AccumPotentWatLoss = &
            sm_thornthwaite_mather_APWL(cel%rSoilWaterCap,real(cel%rSoilMoisture, kind=c_double) )
-
-        endif
 
       end if
 

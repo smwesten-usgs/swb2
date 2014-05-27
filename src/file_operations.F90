@@ -3,6 +3,7 @@ module file_operations
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
   use iso_fortran_env, only : IOSTAT_END
   use types_new
+  use logfiles
   use exceptions
   use constants_and_conversions
   use strings
@@ -166,7 +167,7 @@ contains
 
       call this%countLines()
 
-      write(*, fmt="(/,15x, a)") "Opened file "//dquote(sFilename)
+      call LOGS%write( sMessage="Opened file "//dquote(sFilename), iTab=15)
       write(*, fmt="(a60, a8)") "Comment characters: ", dquote(sCommentChars)
       write(*, fmt="(a60, i8)") "Number of lines in file: ", this%numLines()
       write(*, fmt="(a60, i8)") "Number of lines excluding blanks, headers and comments: ", this%numRecords()

@@ -1,6 +1,6 @@
 module strings
 
-  use iso_c_binding, only : c_int, c_long_long, c_float, c_double, c_bool
+  use iso_c_binding, only : c_int, c_long_long, c_float, c_double, c_bool, c_short
   use constants_and_conversions
   use exceptions
   implicit none
@@ -35,6 +35,7 @@ module strings
 
     public :: asCharacter
     interface asCharacter
+      procedure :: short_to_char_fn
       procedure :: int_to_char_fn
       procedure :: long_long_to_char_fn
       procedure :: float_to_char_fn
@@ -179,7 +180,28 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function int_to_char_fn(iValue)    result(sText)
+  elemental function short_to_char_fn(iValue)    result(sText)
+
+    integer (kind=c_short), intent(in)  :: iValue
+    character (len=:), allocatable    :: sText
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iStat
+    character (len=32)   :: sBuf
+
+    write(sBuf, fmt=*, iostat=iStat)  iValue
+
+    if (iStat==0) then
+      sText = trim( adjustl(sBuf) )
+    else
+      sText = "NA"
+    endif  
+
+  end function short_to_char_fn
+
+!--------------------------------------------------------------------------------------------------
+
+  elemental function int_to_char_fn(iValue)    result(sText)
 
     integer (kind=c_int), intent(in)  :: iValue
     character (len=:), allocatable    :: sText
@@ -200,7 +222,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function long_long_to_char_fn(iValue)    result(sText)
+  elemental function long_long_to_char_fn(iValue)    result(sText)
 
     integer (kind=c_long_long), intent(in)  :: iValue
     character (len=:), allocatable          :: sText
@@ -221,7 +243,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function float_to_char_fn(fValue, iNumdigits)    result(sText)
+  elemental function float_to_char_fn(fValue, iNumdigits)    result(sText)
 
     real (kind=c_float), intent(in)             :: fValue
     integer (kind=c_int), intent(in), optional  :: iNumdigits
@@ -250,7 +272,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function double_to_char_fn(dValue, iNumdigits)    result(sText)
+  elemental function double_to_char_fn(dValue, iNumdigits)    result(sText)
 
     real (kind=c_double), intent(in)             :: dValue
     integer (kind=c_int), intent(in), optional  :: iNumdigits

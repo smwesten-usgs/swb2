@@ -80,6 +80,7 @@
 program main
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double
+  use logfiles
   use loop_initialize
   use iso_fortran_env
 
@@ -89,8 +90,6 @@ program main
   integer (kind=c_int) :: iNumArgs
   character (len=1024) :: sCompilerFlags
   character (len=256) :: sCompilerVersion
-
-  character (len=9), parameter :: SWB_VERSION = "2.0 alpha"
 
   iNumArgs = COMMAND_ARGUMENT_COUNT()
 
@@ -127,11 +126,15 @@ program main
 
   call GET_COMMAND_ARGUMENT(1,sControlFile)
   
+  ! open and initialize logfiles
+  call LOGS%initialize( iLogLevel = LOG_GENERAL )
 
   ! read control file
   call read_control_file(sControlFile)
 
   call initialize_precipitation_options()
+
+  call LOGS%close()
 
 
 
