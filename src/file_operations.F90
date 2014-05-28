@@ -167,14 +167,15 @@ contains
 
       call this%countLines()
 
-      call LOGS%write( sMessage="Opened file "//dquote(sFilename), iTab=15)
-      write(*, fmt="(a60, a8)") "Comment characters: ", dquote(sCommentChars)
-      write(*, fmt="(a60, i8)") "Number of lines in file: ", this%numLines()
-      write(*, fmt="(a60, i8)") "Number of lines excluding blanks, headers and comments: ", this%numRecords()
+      call LOGS%write( sMessage="Opened file "//dquote(sFilename), iTab=20, iLinesBefore=1, iLogLevel=LOG_ALL )
+      call LOGS%write( "Comment characters: "//dquote(sCommentChars), iTab=40 )
+      call LOGS%write( "Number of lines in file: "//asCharacter( this%numLines() ), iTab=35 )
+      call LOGS%write( "Number of lines excluding blanks, headers and comments: " &
+           //asCharacter( this%numRecords() ), iTab=4, iLinesAfter=1 )
 
     else
 
-      print *, "Failed to open file "//dquote(sFilename)//" with read access"
+      call die( "Failed to open file "//dquote(sFilename)//" with read access." )
 
     endif
 
@@ -196,11 +197,11 @@ contains
 
       this%lEOF = lFALSE
 
-      write(*, fmt="(/,10x, a)") "Opened file "//dquote(sFilename)
+      call LOGS%write( "Opened file "//dquote(sFilename) )
    
     else
 
-      print *, "Failed to open file "//dquote(sFilename)//" with WRITE access"
+      call LOGS%write( "Failed to open file "//dquote(sFilename)//" with WRITE access" )
 
     endif
 

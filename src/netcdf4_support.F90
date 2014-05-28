@@ -575,7 +575,7 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
   character (len=*), optional :: sVarName_y
   character (len=*), optional :: sVarName_z
   character (len=*), optional :: sVarName_time
-  type (T_GRID_BOUNDS), optional :: tGridBounds
+  type (GRID_BOUNDS_T), optional :: tGridBounds
   integer (kind=c_int), optional :: iLU
 
   ! [ LOCALS ]
@@ -1088,7 +1088,7 @@ subroutine nf_open_file(NCFILE, sFilename, iLU)
   ! [ LOCALS ]
   logical (kind=c_bool) :: lFileOpen
 
-  call LOGS%echo("Attempting to open READONLY NetCDF file: " &
+  call LOGS%write("Attempting to open READONLY NetCDF file: " &
     //dquote(sFilename))
 
   call nf_trap( nc_open(trim(sFilename)//c_null_char, &
@@ -1099,7 +1099,7 @@ subroutine nf_open_file(NCFILE, sFilename, iLU)
   call nf_trap( nc_inq_format(ncid=NCFILE%iNCID, formatp=NCFILE%iFileFormat), &
                __FILE__, __LINE__)
 
-  call LOGS%echo("   Succeeded.  ncid: "//trim(asCharacter(NCFILE%iNCID)) &
+  call LOGS%write("   Succeeded.  ncid: "//trim(asCharacter(NCFILE%iNCID)) &
          //"  format: "//trim(NETCDF_FORMAT_STRING(NCFILE%iFileFormat) ) )
 
   NCFILE%sFilename = sFilename
@@ -1195,7 +1195,7 @@ subroutine nf_trap( iResultCode, sFilename, iLineNumber )
     cpResult = nc_strerror(iResultCode)
     sTextString = char_ptr_to_fortran_string( cpResult )
 
-    call LOGS%echo("NetCDF ERROR: "//dquote( sTextString  )//" | error code was: " &
+    call LOGS%write("NetCDF ERROR: "//dquote( sTextString  )//" | error code was: " &
       //trim(asCharacter(iResultCode)) )
 
     call assert(lFALSE, "SWB is stopping due to a problem reading or accessing" &
@@ -1211,7 +1211,7 @@ subroutine netcdf_close_file( NCFILE)
 
   type (T_NETCDF4_FILE ) :: NCFILE
 
-  call LOGS%echo("Closing NetCDF file with name: "//dquote(NCFILE%sFilename))
+  call LOGS%write("Closing NetCDF file with name: "//dquote(NCFILE%sFilename))
   call nf_trap( nc_close(NCFILE%iNCID), __FILE__, __LINE__ )
 
 !  call nf_deallocate_data_struct( NCFILE=NCFILE )
@@ -2374,7 +2374,7 @@ function nf_return_index_double(rValues, rTargetValue)  result(iIndex)
   real (kind=c_double) :: rDiff, rDiffMin
 
   if ( .not. (rTargetValue >= minval(rValues) .and. rTargetValue <= maxval(rValues)) ) then
-    call LOGS%echo("rTargetValue (" &
+    call LOGS%write("rTargetValue (" &
     //trim(asCharacter(rTargetValue))//") is not within the range " &
     //trim(asCharacter(minval(rValues)))//" to "//trim(asCharacter(maxval(rValues))) )
 
@@ -2465,7 +2465,7 @@ subroutine nf_create(NCFILE, sFilename, iLU)
   NCFILE%iFileFormat = NC_FORMAT_NETCDF4
 
   if (present(iLU) ) then
-    call LOGS%echo("Created NetCDF file for output. Filename: " &
+    call LOGS%write("Created NetCDF file for output. Filename: " &
       //dquote(NCFILE%sFilename)//"; NCID="//trim(asCharacter(NCFILE%iNCID) ) )
   endif
 

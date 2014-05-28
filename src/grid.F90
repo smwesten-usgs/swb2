@@ -45,7 +45,7 @@ module swb_grid
   end interface
 
 
-  type, public :: T_GENERAL_GRID
+  type, public :: GENERAL_GRID_T
 !      integer (kind=c_int) :: iGridType            ! One of the grid type options above
       integer (kind=c_int) :: iNX                   ! Number of cells in the x-direction
       integer (kind=c_int) :: iNY                   ! Number of cells in the y-direction
@@ -65,16 +65,16 @@ module swb_grid
       real (kind=c_double), dimension(:,:), allocatable :: rY    ! y coordinate associated with data
       integer (kind=c_int), dimension(:,:), allocatable :: iMask ! Mask for processing results
       type (T_CELL), dimension(:,:), pointer :: Cells        ! T_CELL objects
-  end type T_GENERAL_GRID
+  end type GENERAL_GRID_T
 
 
-  type, public :: T_GRID_BOUNDS
+  type, public :: GRID_BOUNDS_T
     real (kind=c_double) :: rXll, rYll
     real (kind=c_double) :: rXul, rYul
     real (kind=c_double) :: rXlr, rYlr
     real (kind=c_double) :: rXur, rYur
     character (len=256) :: sPROJ4_string
-  end type T_GRID_BOUNDS
+  end type GRID_BOUNDS_T
 
 
   type T_ERROR_MESSAGE
@@ -186,7 +186,7 @@ function grid_CreateComplete ( iNX, iNY, rX0, rY0, rX1, rY1, iDataType ) result 
   real (kind=c_double), intent(in) :: rX1, rY1          ! Upper-right corner (world coords)
   integer (kind=c_int), intent(in) :: iDataType       ! Data type (DATATYPE_INT, etc.)
   ! RETURN VALUE
-  type (T_GENERAL_GRID), pointer :: pGrd
+  type (GENERAL_GRID_T), pointer :: pGrd
   ! LOCALS
   integer (kind=c_int) :: iStat
 
@@ -195,13 +195,13 @@ function grid_CreateComplete ( iNX, iNY, rX0, rY0, rX1, rY1, iDataType ) result 
      "Could not allocate pointer to T_GRID object", trim(__FILE__),__LINE__ )
 
   if (iNX <= 0 .or. iNY <= 0) then
-    call LOGS%echo("Illegal grid dimensions: ")
-    call LOGS%echo("iNX: "//asCharacter(iNX) )
-    call LOGS%echo("iNY: "//asCharacter(iNY) )
-    call LOGS%echo("rX0: "//asCharacter(rX0) )
-    call LOGS%echo("rY0: "//asCharacter(rY0) )
-    call LOGS%echo("rX1: "//asCharacter(rX1) )
-    call LOGS%echo("rY1: "//asCharacter(rY1) )
+    call LOGS%write("Illegal grid dimensions: ")
+    call LOGS%write("iNX: "//asCharacter(iNX) )
+    call LOGS%write("iNY: "//asCharacter(iNY) )
+    call LOGS%write("rX0: "//asCharacter(rX0) )
+    call LOGS%write("rY0: "//asCharacter(rY0) )
+    call LOGS%write("rX1: "//asCharacter(rX1) )
+    call LOGS%write("rY1: "//asCharacter(rY1) )
     call assert ( lFALSE, &
        "INTERNAL PROGRAMMING ERROR? - Illegal grid dimensions specified", trim(__FILE__),__LINE__)
   endif
@@ -275,7 +275,7 @@ function grid_CreateSimple ( iNX, iNY, rX0, rY0, rGridCellSize, iDataType ) resu
   integer (kind=c_int), intent(in) :: iDataType       ! Data type (DATATYPE_INT, etc.)
 
   ! RETURN VALUE
-  type (T_GENERAL_GRID), pointer :: pGrd
+  type (GENERAL_GRID_T), pointer :: pGrd
   ! LOCALS
   integer (kind=c_int) :: iStat
 
@@ -367,9 +367,9 @@ end function grid_CreateSimple
 ! SOURCE
 
 subroutine grid_Destroy ( pGrd )
-  !! Destroys the data in the T_GENERAL_GRID pGrd
+  !! Destroys the data in the GENERAL_GRID_T pGrd
   ! ARGUMENTS
-  type ( T_GENERAL_GRID ), pointer :: pGrd
+  type ( GENERAL_GRID_T ), pointer :: pGrd
   ! LOCALS
   integer (kind=c_int) :: iStat
 
@@ -450,7 +450,7 @@ function grid_Read ( sFilename, sFileType, iDataType ) result ( pGrd )
   character (len=*), intent(in) :: sFileType          ! File type (see above)
   integer (kind=c_int), intent(in) :: iDataType       ! T_GRID_INT or T_GRID_REAL
   ! RETURN VALUE
-  type (T_GENERAL_GRID), pointer :: pGrd
+  type (GENERAL_GRID_T), pointer :: pGrd
 
   if ( trim(sFileType) == "ARC_GRID" ) then
       pGrd => grid_ReadArcGrid_fn( sFileName, iDataType )
@@ -471,7 +471,7 @@ subroutine grid_ReadExisting ( sFileName, sFileType, pGrd )
   ! ARGUMENTS
   character (len=*), intent(in) :: sFilename          ! Name of the grid input file
   character (len=*), intent(in) :: sFileType          ! File type (see above)
-  type (T_GENERAL_GRID), pointer :: pGrd
+  type (GENERAL_GRID_T), pointer :: pGrd
 
   if ( trim(sFileType) == "ARC_GRID" ) then
       call grid_ReadArcGrid_sub( sFilename, pGrd )
@@ -516,7 +516,7 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
   character (len=*), intent(in) :: sFileName          ! Name of the grid input file
   integer (kind=c_int), intent(in) :: iDataType       ! T_GRID_INT or T_GRID_REAL
   ! RETURN VALUE
-  type (T_GENERAL_GRID), pointer :: pGrd
+  type (GENERAL_GRID_T), pointer :: pGrd
   ! LOCALS
   character (len=256) :: sInputRecord                 ! Text record for input
   character (len=256) :: sDirective                   ! Directive for input
@@ -657,7 +657,7 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
 
   ! ARGUMENTS
   character (len=*), intent(in) :: sFileName          ! Name of the grid input file
-  type (T_GENERAL_GRID), pointer :: pGrd
+  type (GENERAL_GRID_T), pointer :: pGrd
 
   ! LOCALS
   character (len=256) :: sInputRecord                 ! Text record for input
@@ -817,7 +817,7 @@ function grid_ReadSurferGrid_fn ( sFileName, iDataType ) result ( pGrd )
   character (len=*), intent(in) :: sFileName          ! Name of the grid input file
   integer (kind=c_int), intent(in) :: iDataType       ! T_GRID_INT or T_GRID_REAL
   ! RETURN VALUE
-  type (T_GENERAL_GRID), pointer :: pGrd
+  type (GENERAL_GRID_T), pointer :: pGrd
   ! LOCALS
   character (len=4) :: sSentinel                      ! Better be "DSAA" for SURFER!
   integer (kind=c_int) :: iStat                       ! For "iostat="
@@ -888,7 +888,7 @@ subroutine grid_ReadSurferGrid_sub ( sFileName, pGrd )
 
   ! ARGUMENTS
   character (len=*), intent(in) :: sFileName          ! Name of the grid input file
-  type (T_GENERAL_GRID), pointer :: pGrd
+  type (GENERAL_GRID_T), pointer :: pGrd
 
   ! LOCALS
   character (len=4) :: sSentinel                      ! Better be "DSAA" for SURFER!
@@ -957,7 +957,7 @@ subroutine grid_WriteGrid(sFilename, pGrd, iOutputFormat)
 
   ! [ ARGUMENTS ]
   character (len=*),intent(in) :: sFilename
-  type (T_GENERAL_GRID), pointer :: pGrd
+  type (GENERAL_GRID_T), pointer :: pGrd
   integer (kind=c_int) :: iOutputFormat
 
   if ( iOutputFormat == OUTPUT_ARC ) then
@@ -978,7 +978,7 @@ subroutine grid_WriteArcGrid(sFilename, pGrd)
 
   ! [ ARGUMENTS ]
   character (len=*),intent(in) :: sFilename
-  type (T_GENERAL_GRID), pointer :: pGrd
+  type (GENERAL_GRID_T), pointer :: pGrd
 
 
   ! [ LOCALS ]
@@ -1054,7 +1054,7 @@ subroutine grid_WriteSurferGrid(sFilename, pGrd)
 
   ! [ ARGUMENTS ]
   character (len=*),intent(in) :: sFilename
-  type (T_GENERAL_GRID), pointer :: pGrd
+  type (GENERAL_GRID_T), pointer :: pGrd
 
   ! [ LOCALS ]
   integer (kind=c_int) :: iCol,iRow
@@ -1160,7 +1160,7 @@ function grid_Conform ( pGrd1, pGrd2, rTolerance ) result ( lConform )
   !! extent coordinates (this defaults to rDEFAULT_TOLERANCE, below). The tolerance
   !! is set to abs(rTolerance * ( rX1-rX1 ) )
   ! ARGUMENTS
-  type (T_GENERAL_GRID), pointer :: pGrd1,pGrd2
+  type (GENERAL_GRID_T), pointer :: pGrd1,pGrd2
   real (kind=c_float), intent(in), optional :: rTolerance
   ! RETURN VALUE
   logical (kind=c_bool) :: lConform
@@ -1178,38 +1178,38 @@ function grid_Conform ( pGrd1, pGrd2, rTolerance ) result ( lConform )
 
   if ( pGrd1%iNX /= pGrd2%iNX ) then
     lConform = lFALSE
-    call LOGS%echo("Unequal number of columns between grids", iLogLevel=LOG_ALL)
+    call LOGS%write("Unequal number of columns between grids", iLogLevel=LOG_ALL)
   endif
 
   if ( pGrd1%iNY /= pGrd2%iNY ) then
     lConform = lFALSE
-    call LOGS%echo("Unequal number of rows between grids", iLogLevel=LOG_ALL)
+    call LOGS%write("Unequal number of rows between grids", iLogLevel=LOG_ALL)
   endif
 
   if( abs ( pGrd1%rX0 - pGrd2%rX0 ) > rTol ) then
-     call LOGS%echo("Lower left-hand side X coordinates don't match:", iLogLevel=LOG_ALL)
-     call LOGS%echo("Grid 1 value: "//asCharacter(pGrd1%rX0)  &
+     call LOGS%write("Lower left-hand side X coordinates don't match:", iLogLevel=LOG_ALL)
+     call LOGS%write("Grid 1 value: "//asCharacter(pGrd1%rX0)  &
           //"; grid 2 value: "//asCharacter(pGrd2%rX0), iLogLevel=LOG_ALL)
     lConform = lFALSE
   endif
 
   if( abs ( pGrd1%rY0 - pGrd2%rY0 ) > rTol ) then
-    call LOGS%echo("Lower left-hand side Y coordinates don't match:", iLogLevel=LOG_ALL)
-    call LOGS%echo("Grid 1 value: "//asCharacter(pGrd1%rY0)  &
+    call LOGS%write("Lower left-hand side Y coordinates don't match:", iLogLevel=LOG_ALL)
+    call LOGS%write("Grid 1 value: "//asCharacter(pGrd1%rY0)  &
           //"; grid 2 value: "//asCharacter(pGrd2%rY0), iLogLevel=LOG_ALL)
     lConform = lFALSE
   endif
 
   if( abs ( pGrd1%rX1 - pGrd2%rX1 ) > rTol ) then
-     call LOGS%echo("Upper right-hand side X coordinates don't match:", iLogLevel=LOG_ALL)
-     call LOGS%echo("Grid 1 value: "//asCharacter(pGrd1%rX1)  &
+     call LOGS%write("Upper right-hand side X coordinates don't match:", iLogLevel=LOG_ALL)
+     call LOGS%write("Grid 1 value: "//asCharacter(pGrd1%rX1)  &
           //"; grid 2 value: "//asCharacter(pGrd2%rX1), iLogLevel=LOG_ALL)
     lConform = lFALSE
   endif
 
   if( abs ( pGrd1%rY1 - pGrd2%rY1 ) > rTol ) then
-    call LOGS%echo("Upper right-hand side Y coordinates don't match:", iLogLevel=LOG_ALL)
-    call LOGS%echo("Grid 1 value: "//asCharacter(pGrd1%rY1)  &
+    call LOGS%write("Upper right-hand side Y coordinates don't match:", iLogLevel=LOG_ALL)
+    call LOGS%write("Grid 1 value: "//asCharacter(pGrd1%rY1)  &
           //"; grid 2 value: "//asCharacter(pGrd2%rY1), iLogLevel=LOG_ALL)
     lConform = lFALSE
   endif
@@ -1224,7 +1224,7 @@ function grid_CompletelyCover( pBaseGrd, pOtherGrd, rTolerance ) result ( lCompl
   !! extent coordinates (this defaults to rDEFAULT_TOLERANCE, below). The tolerance
   !! is set to abs(rTolerance * ( rX1-rX1 ) )
   ! ARGUMENTS
-  type (T_GENERAL_GRID), pointer :: pBaseGrd,pOtherGrd
+  type (GENERAL_GRID_T), pointer :: pBaseGrd,pOtherGrd
   real (kind=c_float), intent(in), optional :: rTolerance
   ! RETURN VALUE
   logical (kind=c_bool) :: lCompletelyCover
@@ -1249,16 +1249,16 @@ function grid_CompletelyCover( pBaseGrd, pOtherGrd, rTolerance ) result ( lCompl
   else
       lCompletelyCover = lFALSE
 
-      call LOGS%echo("Extents of the grid file "//dquote(pOtherGrd%sFilename) &
+      call LOGS%write("Extents of the grid file "//dquote(pOtherGrd%sFilename) &
           //" do not cover the base grid extents.")
 
-      call LOGS%echo( " " )
-      call LOGS%echo("    BASE GRID EXTENTS    ANCILLARY GRID EXTENTS")
-      call LOGS%echo("X0:  "//trim(asCharacter(pBaseGrd%rX0))//"      "//trim(asCharacter(pOtherGrd%rX0)) )
-      call LOGS%echo("Y0:  "//trim(asCharacter(pBaseGrd%rY0))//"      "//trim(asCharacter(pOtherGrd%rY0)) )
-      call LOGS%echo("X1:  "//trim(asCharacter(pBaseGrd%rX1))//"      "//trim(asCharacter(pOtherGrd%rX1)) )
-      call LOGS%echo("Y1:  "//trim(asCharacter(pBaseGrd%rY1))//"      "//trim(asCharacter(pOtherGrd%rY1)) )
-      call LOGS%echo(" ")
+      call LOGS%write( " " )
+      call LOGS%write("    BASE GRID EXTENTS    ANCILLARY GRID EXTENTS")
+      call LOGS%write("X0:  "//trim(asCharacter(pBaseGrd%rX0))//"      "//trim(asCharacter(pOtherGrd%rX0)) )
+      call LOGS%write("Y0:  "//trim(asCharacter(pBaseGrd%rY0))//"      "//trim(asCharacter(pOtherGrd%rY0)) )
+      call LOGS%write("X1:  "//trim(asCharacter(pBaseGrd%rX1))//"      "//trim(asCharacter(pOtherGrd%rX1)) )
+      call LOGS%write("Y1:  "//trim(asCharacter(pBaseGrd%rY1))//"      "//trim(asCharacter(pOtherGrd%rY1)) )
+      call LOGS%write(" ")
 
   end if
 
@@ -1311,7 +1311,7 @@ end function grid_CompletelyCover
 subroutine grid_LookupColumn(pGrd,rXval,iBefore,iAfter,rFrac)
 
   ! [ ARGUMENTS ]
-  type ( T_GENERAL_GRID ),pointer :: pGrd
+  type ( GENERAL_GRID_T ),pointer :: pGrd
   real (kind=c_float),intent(in) :: rXval
   integer (kind=c_int),intent(out) :: iBefore,iAfter
   real (kind=c_float),intent(out) :: rFrac
@@ -1379,7 +1379,7 @@ end subroutine grid_LookupColumn
 subroutine grid_LookupRow(pGrd,rYval,iBefore,iAfter,rFrac)
 
   ! [ ARGUMENTS ]
-  type ( T_GENERAL_GRID ),pointer :: pGrd
+  type ( GENERAL_GRID_T ),pointer :: pGrd
   real (kind=c_float),intent(in) :: rYval
   integer (kind=c_int),intent(out) :: iBefore,iAfter
   real (kind=c_float),intent(out) :: rFrac
@@ -1415,7 +1415,7 @@ end subroutine grid_LookupRow
 !> @param[in] sToPROJ4
 subroutine grid_Transform(pGrd, sFromPROJ4, sToPROJ4 )
 
-  type ( T_GENERAL_GRID ),pointer :: pGrd
+  type ( GENERAL_GRID_T ),pointer :: pGrd
   character (len=*) :: sFromPROJ4, sToPROJ4
   character (kind=C_CHAR, len=len_trim(sFromPROJ4)) :: csFromPROJ4
   character (kind=C_CHAR, len=len_trim(sToPROJ4)) :: csToPROJ4
@@ -1464,7 +1464,7 @@ end subroutine grid_Transform
 
 subroutine grid_checkIntegerGridValues(pGrd, sFilename)
 
-  type ( T_GENERAL_GRID ),pointer :: pGrd
+  type ( GENERAL_GRID_T ),pointer :: pGrd
   character (len=*), intent(in)   :: sFilename
 
   ! [ LOCALS ]
@@ -1494,9 +1494,9 @@ subroutine grid_checkIntegerGridValues(pGrd, sFilename)
 
 
   if (size(pGrd%iData) /= iRunningSum) then
-    call LOGS%echo(repeat("*",80))
-    call LOGS%echo("Possible illegal or missing values in integer grid file: "//trim(sFileName))
-    call LOGS%echo(repeat("*",80))
+    call LOGS%write(repeat("*",80))
+    call LOGS%write("Possible illegal or missing values in integer grid file: "//trim(sFileName))
+    call LOGS%write(repeat("*",80))
   endif
 
 end subroutine grid_checkIntegerGridValues
@@ -1574,7 +1574,7 @@ function grid_Interpolate(pGrd,rXval,rYval) result ( rValue )
   !! the column position 'xval'. Assumes that the row and column spacing
   !! are constant. Applicable only to DATATYPE_REAL grids.
   ! [ ARGUMENTS ]
-  type ( T_GENERAL_GRID ),pointer :: pGrd
+  type ( GENERAL_GRID_T ),pointer :: pGrd
   real (kind=c_float),intent(in) :: rXval,rYval
   ! [ RETURN VALUE ]
   real (kind=c_float) :: rValue
@@ -1666,7 +1666,7 @@ function grid_SearchColumn(pGrd,rXval,rZval,rNoData) result ( rValue )
   !! table (y=pGrd%rY1). Applicable only to DATATYPE_REAL grids.
   !! Parameter 'rmv' is the missing value code for the grid.
   ! [ ARGUMENTS ]
-  type ( T_GENERAL_GRID ),pointer :: pGrd
+  type ( GENERAL_GRID_T ),pointer :: pGrd
   real (kind=c_float),intent(in) :: rXval,rZval,rNoData
   ! [ RETURN VALUE ]
   real (kind=c_float) :: rValue
@@ -1797,7 +1797,7 @@ end function grid_SearchColumn
 
 function grid_LookupReal(pGrd,rXval,rYval) result(rValue)
   !! Returns the grid value for the cell containing (rXval,rYval)
-  type ( T_GENERAL_GRID ),pointer :: pGrd
+  type ( GENERAL_GRID_T ),pointer :: pGrd
   real (kind=c_float),intent(in) :: rXval,rYval
   real (kind=c_float) :: rValue
   integer (kind=c_int) :: iCol,iRow
@@ -1816,7 +1816,7 @@ end function grid_LookupReal
 
 function grid_GetGridColNum(pGrd,rX)  result(iColumnNumber)
 
-  type ( T_GENERAL_GRID ),pointer :: pGrd
+  type ( GENERAL_GRID_T ),pointer :: pGrd
   real (kind=c_double) :: rX
   integer (kind=c_int) :: iColumnNumber
 
@@ -1850,7 +1850,7 @@ end function grid_GetGridColNum
 
 function grid_GetGridRowNum(pGrd,rY)  result(iRowNumber)
 
-  type ( T_GENERAL_GRID ),pointer :: pGrd
+  type ( GENERAL_GRID_T ),pointer :: pGrd
   real (kind=c_double) :: rY
   integer (kind=c_int) :: iRowNumber
 
@@ -1871,7 +1871,7 @@ end function grid_GetGridRowNum
 
 function grid_GetGridColRowNum(pGrd, rX, rY)    result(iColRow)
 
-  type ( T_GENERAL_GRID ),pointer :: pGrd
+  type ( GENERAL_GRID_T ),pointer :: pGrd
   real (kind=c_double) :: rX, rY
   integer (kind=c_int), dimension(2) :: iColRow
 
@@ -1970,7 +1970,7 @@ end function grid_GetGridColRowNum
 
 function grid_GetGridX(pGrd,iColumnNumber)  result(rX)
 
-  type ( T_GENERAL_GRID ),pointer :: pGrd
+  type ( GENERAL_GRID_T ),pointer :: pGrd
   real (kind=c_double) :: rX
   integer (kind=c_int) :: iColumnNumber
 
@@ -1982,7 +1982,7 @@ end function grid_GetGridX
 
 function grid_GetGridY(pGrd,iRowNumber)  result(rY)
 
-  type ( T_GENERAL_GRID ),pointer :: pGrd
+  type ( GENERAL_GRID_T ),pointer :: pGrd
   real (kind=c_double) :: rY
   integer (kind=c_int) :: iRowNumber
 
@@ -1996,7 +1996,7 @@ end function grid_GetGridY
 subroutine grid_PopulateXY(pGrd)
 
   ! [ ARGUMENTS ]
-  type ( T_GENERAL_GRID ),pointer :: pGrd         ! pointer to model grid
+  type ( GENERAL_GRID_T ),pointer :: pGrd         ! pointer to model grid
     ! model options, flags, and other settings
 
   ! [ LOCALS ]
@@ -2031,22 +2031,22 @@ end subroutine grid_PopulateXY
 
 subroutine grid_DumpGridExtent(pGrd)
 
-  type ( T_GENERAL_GRID ),pointer :: pGrd
+  type ( GENERAL_GRID_T ),pointer :: pGrd
 
-  call LOGS%echo("---------------------------------------------------")
-  call LOGS%echo("GRID DETAILS:")
-  call LOGS%echo("---------------------------------------------------")
-  call LOGS%echo("file: "//dquote(pGrd%sFilename) )
-  call LOGS%echo("nx: "//trim( asCharacter(pGrd%iNX) ) )
-  call LOGS%echo("ny: "//trim( asCharacter(pGrd%iNY) ) )
-  call LOGS%echo("cellsize: "//trim(asCharacter(pGrd%rGridCellSize) ) )
-  call LOGS%echo("X0: "//trim(asCharacter(pGrd%rX0) ) )
-  call LOGS%echo("Y0: "//trim(asCharacter(pGrd%rY0) ) )
-  call LOGS%echo("X1: "//trim(asCharacter(pGrd%rX1) ) )
-  call LOGS%echo("Y1: "//trim(asCharacter(pGrd%rY1) ) )
-  call LOGS%echo("Type: "//trim(asCharacter(pGrd%iDataType) ) )
-  call LOGS%echo("PROJ4 string: "//dquote(pGrd%sPROJ4_string) )
-  call LOGS%echo("---------------------------------------------------")
+  call LOGS%write("---------------------------------------------------")
+  call LOGS%write("GRID DETAILS:")
+  call LOGS%write("---------------------------------------------------")
+  call LOGS%write("file: "//dquote(pGrd%sFilename) )
+  call LOGS%write("nx: "//trim( asCharacter(pGrd%iNX) ) )
+  call LOGS%write("ny: "//trim( asCharacter(pGrd%iNY) ) )
+  call LOGS%write("cellsize: "//trim(asCharacter(pGrd%rGridCellSize) ) )
+  call LOGS%write("X0: "//trim(asCharacter(pGrd%rX0) ) )
+  call LOGS%write("Y0: "//trim(asCharacter(pGrd%rY0) ) )
+  call LOGS%write("X1: "//trim(asCharacter(pGrd%rX1) ) )
+  call LOGS%write("Y1: "//trim(asCharacter(pGrd%rY1) ) )
+  call LOGS%write("Type: "//trim(asCharacter(pGrd%iDataType) ) )
+  call LOGS%write("PROJ4 string: "//dquote(pGrd%sPROJ4_string) )
+  call LOGS%write("---------------------------------------------------")
 
 end subroutine grid_DumpGridExtent
 
@@ -2055,8 +2055,8 @@ end subroutine grid_DumpGridExtent
 subroutine grid_GridToGrid_int(pGrdFrom, iArrayFrom, pGrdTo, iArrayTo)
 
   ! [ ARGUMENTS ]
-  type ( T_GENERAL_GRID ),pointer :: pGrdFrom   ! pointer to source grid
-  type ( T_GENERAL_GRID ),pointer :: pGrdTo     ! pointer to destination grid
+  type ( GENERAL_GRID_T ),pointer :: pGrdFrom   ! pointer to source grid
+  type ( GENERAL_GRID_T ),pointer :: pGrdTo     ! pointer to destination grid
   integer (kind=c_int), dimension(:,:) :: iArrayFrom
   integer (kind=c_int), dimension(:,:), intent(inout) :: iArrayTo
 
@@ -2072,8 +2072,8 @@ subroutine grid_GridToGrid_int(pGrdFrom, iArrayFrom, pGrdTo, iArrayTo)
   if(.not. allocated(pGrdTo%rX) )  call grid_PopulateXY(pGrdTo)
   if(.not. allocated(pGrdFrom%rX) )  call grid_PopulateXY(pGrdFrom)
 
-  call LOGS%echo("Target grid resolution: "//trim(asCharacter( pGrdTo%rGridCellSize )))
-  call LOGS%echo("Source grid resolution: "//trim(asCharacter( pGrdFrom%rGridCellSize )))
+  call LOGS%write("Target grid resolution: "//trim(asCharacter( pGrdTo%rGridCellSize )))
+  call LOGS%write("Source grid resolution: "//trim(asCharacter( pGrdFrom%rGridCellSize )))
 
   iSpread = max(1, nint(pGrdTo%rGridCellSize / pGrdFrom%rGridCellSize / 2.))
 
@@ -2145,8 +2145,8 @@ end subroutine grid_GridToGrid_int
 subroutine grid_GridToGrid_short(pGrdFrom, iArrayFrom, pGrdTo, iArrayTo)
 
   ! [ ARGUMENTS ]
-  type ( T_GENERAL_GRID ),pointer :: pGrdFrom   ! pointer to source grid
-  type ( T_GENERAL_GRID ),pointer :: pGrdTo     ! pointer to destination grid
+  type ( GENERAL_GRID_T ),pointer :: pGrdFrom   ! pointer to source grid
+  type ( GENERAL_GRID_T ),pointer :: pGrdTo     ! pointer to destination grid
   integer (kind=c_int), dimension(:,:) :: iArrayFrom
   integer (kind=c_short), dimension(:,:), intent(inout) :: iArrayTo
 
@@ -2201,8 +2201,8 @@ end subroutine grid_GridToGrid_short
 subroutine grid_GridToGrid_sgl(pGrdFrom, rArrayFrom, pGrdTo, rArrayTo)
 
   ! [ ARGUMENTS ]
-  type ( T_GENERAL_GRID ),pointer :: pGrdFrom   ! pointer to source grid
-  type ( T_GENERAL_GRID ),pointer :: pGrdTo     ! pointer to destination grid
+  type ( GENERAL_GRID_T ),pointer :: pGrdFrom   ! pointer to source grid
+  type ( GENERAL_GRID_T ),pointer :: pGrdTo     ! pointer to destination grid
   real (kind=c_float), dimension(:,:) :: rArrayFrom
   real (kind=c_float), dimension(:,:), intent(inout) :: rArrayTo
 

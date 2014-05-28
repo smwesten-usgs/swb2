@@ -16,10 +16,10 @@ module logfiles
                   DT_HOUR = 5, DT_MINUTES = 6, DT_SECONDS = 7, DT_MILLISECONDS = 8
   end enum
 
-  public :: LOG_NONE, LOG_GENERAL, LOG_DETAILED, LOG_ALL
+  public :: LOG_NONE, LOG_GENERAL, LOG_DEBUG, LOG_ALL
 
   enum, bind(c)
-    enumerator :: LOG_NONE = 0, LOG_GENERAL = 1, LOG_DETAILED = 2, LOG_ALL = 3
+    enumerator :: LOG_NONE = 0, LOG_GENERAL = 1, LOG_DEBUG = 2, LOG_ALL = 3
   end enum   
 
   type LOGFILE_T
@@ -38,8 +38,11 @@ module logfiles
     procedure, private :: write_to_logfiles_sub
     generic            :: write => write_to_logfiles_sub
 
-    procedure, private :: write_to_logfiles_and_screen_sub
-    generic            :: echo => write_to_logfiles_and_screen_sub
+    procedure, private :: set_log_level_sub
+    generic            :: set_loglevel => set_log_level_sub
+
+    procedure, private :: set_screen_echo_sub
+    generic            :: set_echo => set_screen_echo_sub
 
     procedure, private :: open_files_write_access_sub
     generic            :: open => open_files_write_access_sub
@@ -54,7 +57,32 @@ module logfiles
 
   type (LOGFILE_T), public :: LOGS
 
+  integer (kind=c_int)  :: CURRENT_LOG_LEVEL = LOG_GENERAL
+  logical (kind=c_bool) :: CURRENT_LOG_ECHO = .false._c_bool
+
 contains
+
+  subroutine set_log_level_sub( this, iLogLevel )
+
+    class (LOGFILE_T)                           :: this
+    integer (kind=c_int), intent(in)            :: iLogLevel
+
+    CURRENT_LOG_LEVEL = iLogLevel
+
+  end subroutine set_log_level_sub
+
+!--------------------------------------------------------------------------------------------------  
+
+  subroutine set_screen_echo_sub( this, lEcho )
+
+    class (LOGFILE_T)                           :: this
+    logical (kind=c_bool), intent(in)           :: lEcho
+
+    CURRENT_LOG_ECHO = lEcho
+
+  end subroutine set_screen_echo_sub
+
+!--------------------------------------------------------------------------------------------------
 
   subroutine initialize_logfiles_sub(this, iLogLevel)
 
@@ -86,7 +114,7 @@ contains
     integer (kind=c_int) :: iIndex
     character (len=:), allocatable   :: sFilename
     character (len=:), allocatable   :: sDatetime
-    character (len=12)               :: sDescriptor(2) = [ "GENERAL ", "DETAILED" ]
+    character (len=12)               :: sDescriptor(2) = [ "GENERAL ", "DEBUG   " ]
 
     if ( this%iLogLevel /= LOG_NONE ) then
 
@@ -177,25 +205,25 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine write_to_logfiles_sub(this, sMessage, iLogLevel, iTab, iSpc )
+  subroutine write_to_logfiles_sub(this, sMessage, iTab, iSpc, iLinesBefore, iLinesAfter, iLogLevel, lEcho )
 
     class (LOGFILE_T)                            :: this
     character (len=*), intent(in)                :: sMessage
-    integer (kind=c_int), intent(in), optional   :: iLogLevel
     integer (kind=c_int), intent(in), optional   :: iTab
     integer (kind=c_int), intent(in), optional   :: iSpc
+    integer (kind=c_int), intent(in), optional   :: iLinesBefore
+    integer (kind=c_int), intent(in), optional   :: iLinesAfter
+    integer (kind=c_int), intent(in), optional   :: iLogLevel
+    logical (kind=c_bool), intent(in), optional  :: lEcho
 
     ! [ LOCALS ]
-    integer (kind=c_int)  :: iLogLevel_
     integer (kind=c_int)  :: iTab_
     integer (kind=c_int)  :: iSpc_
-
-    ! if no loglevel value supplied by user, assume that only a general level of logging is desired.
-    if ( present(iLogLevel) ) then
-      iLogLevel_ = min( iLogLevel, this%iLogLevel )
-    else
-      iLogLevel_ = min( 1, this%iLogLevel )
-    endif
+    integer (kind=c_int)  :: iLinesBefore_
+    integer (kind=c_int)  :: iLinesAfter_
+    
+    if (present(iLogLevel) )   call this%set_loglevel( iLogLevel )
+    if (present(lEcho) )       call this%set_echo( lEcho )
 
     if (present(iTab) ) then
       iTab_ = iTab
@@ -209,20 +237,48 @@ contains
       iSpc_ = len_trim(sMessage)
     endif
 
-    select case (iLogLevel_)
+    if (present(iLinesBefore) ) then
+      iLinesBefore_ = iLinesBefore
+    else
+      iLinesBefore_ = 0
+    endif
+
+    if (present(iLinesAfter) ) then
+      iLinesAfter_ = iLinesAfter
+    else
+      iLinesAfter_ = 0
+    endif
+
+    if ( CURRENT_LOG_ECHO ) then
+
+      call writeMultiLine(sMessageText=sMessage, iLU=OUTPUT_UNIT, &
+        iTab=iTab_, iSpc=iSpc_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
+
+    endif
+
+    select case ( CURRENT_LOG_LEVEL )
 
       case ( LOG_GENERAL )
 
-        call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_GENERAL ), iTab=iTab_, iSpc=iSpc_ )
+        if ( this%iLogLevel >= LOG_GENERAL ) &
+          call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_GENERAL ), &
+            iTab=iTab_, iSpc=iSpc_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
 
-      case ( LOG_DETAILED )
+      case ( LOG_DEBUG )
 
-        call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_DETAILED ), iTab=iTab_, iSpc=iSpc_ )
+        if ( this%iLogLevel >= LOG_DEBUG ) &
+          call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_DEBUG ), &
+            iTab=iTab_, iSpc=iSpc_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
 
       case ( LOG_ALL )
 
-        call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_GENERAL ), iTab=iTab_, iSpc=iSpc_ )
-        call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_DETAILED ), iTab=iTab_, iSpc=iSpc_ )
+        if ( this%iLogLevel >= LOG_GENERAL ) &
+          call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_GENERAL ), &
+            iTab=iTab_, iSpc=iSpc_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
+        
+        if ( this%iLogLevel >= LOG_DEBUG ) &
+          call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_DEBUG ), &
+            iTab=iTab_, iSpc=iSpc_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
 
       case default
 
@@ -238,19 +294,23 @@ contains
   !> each point in the text string where a carriage return is desired.
   !> @param[in] sMessageText Character string that contains the message to be written.
   !> @param[in] iLU Integer value of the Fortran logical unit number to write to.
-  subroutine writeMultiLine(sMessageText, iLU, iTab, iSpc)
+  subroutine writeMultiLine(sMessageText, iLU, iTab, iSpc, iLinesBefore, iLinesAfter)
 
     ! [ ARGUMENTS ]
     character (len=*), intent(in)     :: sMessageText
     integer (kind=c_int), intent(in)  :: iLU
     integer (kind=c_int), intent(in)  :: iTab
     integer (kind=c_int), intent(in)  :: iSpc
+    integer (kind=c_int), intent(in)  :: iLinesBefore
+    integer (kind=c_int), intent(in)  :: iLinesAfter
+
 
     ! [ LOCALS ]
     character (len=len(sMessageText) ) :: sRecord
     character (len=256) :: sItem
     logical (kind=c_bool) :: lFileOpen
     character (len=12) :: sFmt
+    integer (kind=c_int) :: iIndex
 
     inquire (unit=iLU, opened=lFileOpen)
 
@@ -260,6 +320,12 @@ contains
 
     if (lFileOpen) then
 
+      if ( iLinesBefore > 0 ) then
+        do iIndex=1, iLinesBefore
+          write(UNIT=iLU,FMT="(/)" )
+        enddo
+      endif    
+
       do
 
         ! break up string with '~' as delimiter
@@ -268,48 +334,16 @@ contains
         write(UNIT=iLU,FMT=trim(sFmt) ) trim(sItem)
       enddo
 
+      if ( iLinesAfter > 0 ) then
+        do iIndex=1, iLinesAfter
+          write(UNIT=iLU,FMT="(/)" )
+        enddo
+      endif    
+
+
     endif
 
   end subroutine writeMultiLine
-
-!--------------------------------------------------------------------------------------------------
-
-!> echo to screen AND write to logfile
-  subroutine write_to_logfiles_and_screen_sub(this, sMessage, iLogLevel, iTab, iSpc)
-
-    class (LOGFILE_T)                            :: this
-    character(len=*), intent(in)                 :: sMessage
-    integer (kind=c_int), intent(in), optional   :: iLogLevel
-    integer (kind=c_int), intent(in), optional   :: iTab
-    integer (kind=c_int), intent(in), optional   :: iSpc
-
-    ! [ LOCALS ]
-    integer (kind=c_int) :: iLogLevel_
-    integer (kind=c_int) :: iTab_
-    integer (kind=c_int) :: iSpc_
-
-    if (present(iLogLevel)) then
-      iLogLevel_ = iLogLevel
-    else
-      iLogLevel_ = 1
-    endif
-
-    if (present(iTab) ) then
-      iTab_ = iTab
-    else
-      iTab_ = 1
-    endif
-
-    if (present(iSpc) ) then
-      iSpc_ = iSpc
-    else
-      iSpc_ = len_trim(sMessage)
-    endif
-
-    call writeMultiLine(sMessage, OUTPUT_UNIT, iTab_, iSpc_ ) 
-    call this%write( sMessage, iLogLevel_, iTab_, iSpc_ ) 
-
-  end subroutine write_to_logfiles_and_screen_sub
 
 !--------------------------------------------------------------------------------------------------
 

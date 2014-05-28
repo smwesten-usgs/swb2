@@ -63,8 +63,8 @@ module data_catalog_entry
     character (len=256) :: sVariableName_time = "time"
     character (len=3)   :: sVariableOrder = "tyx"
 
-    type (T_GRID_BOUNDS) :: GRID_BOUNDS_NATIVE
-    type (T_GRID_BOUNDS) :: GRID_BOUNDS_BASE
+    type (GRID_BOUNDS_T) :: GRID_BOUNDS_NATIVE
+    type (GRID_BOUNDS_T) :: GRID_BOUNDS_BASE
 
     integer (kind=c_int)  :: iNC_FILE_STATUS = NETCDF_FILE_CLOSED
     type (T_NETCDF4_FILE) :: NCFILE
@@ -79,13 +79,13 @@ module data_catalog_entry
     ! pGrdNative is a grid created to serve as an intermediary between
     ! the native coordinate of the data source file and the project coordinates
     ! in use by swb
-    type (T_GENERAL_GRID), pointer :: pGrdNative => null()
+    type (GENERAL_GRID_T), pointer :: pGrdNative => null()
     logical (kind=c_bool) :: lGridIsPersistent = lFALSE
     logical (kind=c_bool) :: lGridHasChanged = lFALSE
     logical (kind=c_bool) :: lPerformFullInitialization = lTRUE
     logical (kind=c_bool) :: lCreateLocalNetCDFArchive = lFALSE
 
-    type (T_GENERAL_GRID), pointer :: pGrdBase => null()
+    type (GENERAL_GRID_T), pointer :: pGrdBase => null()
 
   contains
 
@@ -259,7 +259,7 @@ subroutine initialize_gridded_data_object_sub( this, &
    sPROJ4)
 
    class (DATA_CATALOG_ENTRY_T) :: this
-   type ( T_GENERAL_GRID ),pointer :: pGrd
+   type ( GENERAL_GRID_T ),pointer :: pGrd
    character (len=*) :: sDescription
    character (len=*) :: sFileType
    character (len=*), optional :: sFilename
@@ -334,7 +334,7 @@ subroutine initialize_netcdf_data_object_sub( this, &
    class (DATA_CATALOG_ENTRY_T) :: this
    character (len=*) :: sDescription
    integer (kind=c_int) :: iDataType
-   type ( T_GENERAL_GRID ),pointer :: pGrdBase
+   type ( GENERAL_GRID_T ),pointer :: pGrdBase
    character (len=*), optional :: sFilename
    character (len=*), optional :: sFilenameTemplate
    character (len=*), optional :: sPROJ4
@@ -385,7 +385,7 @@ end subroutine initialize_netcdf_data_object_sub
     iValues, rValues)
 
     class (DATA_CATALOG_ENTRY_T) :: this
-    type ( T_GENERAL_GRID ), pointer :: pGrdBase
+    type ( GENERAL_GRID_T ), pointer :: pGrdBase
     integer (kind=c_int), intent(in), optional :: iMonth, iDay, iYear, iJulianDay
     integer (kind=c_int), dimension(:,:), optional :: iValues
     real (kind=c_float), dimension(:,:), optional :: rValues
@@ -441,7 +441,7 @@ end subroutine initialize_netcdf_data_object_sub
 subroutine getvalues_constant_sub( this, pGrdBase )
 
   class (DATA_CATALOG_ENTRY_T) :: this
-  type ( T_GENERAL_GRID ), pointer :: pGrdBase
+  type ( GENERAL_GRID_T ), pointer :: pGrdBase
 
   select case (this%iSourceDataType)
 
@@ -482,18 +482,18 @@ subroutine getvalues_constant_sub( this, pGrdBase )
 
   class (DATA_CATALOG_ENTRY_T) :: this
 
-  call LOGS%echo("---------------------------------------------------")
-  call LOGS%echo("DATA STRUCTURE DETAILS:")
-  call LOGS%echo("---------------------------------------------------")
+  call LOGS%write("---------------------------------------------------")
+  call LOGS%write("DATA STRUCTURE DETAILS:")
+  call LOGS%write("---------------------------------------------------")
 
-  call LOGS%echo("  source data form: "//trim(asCharacter(this%iSourceDataForm)) )
-  call LOGS%echo("  source data type: "//trim(asCharacter(this%iSourceDataType)) )
-  call LOGS%echo("  source file type: "//trim(asCharacter(this%iSourceFileType)) )
-  call LOGS%echo("  description: "//trim(this%sDescription) )
-  call LOGS%echo("  source PROJ4 string: "//trim(this%sSourcePROJ4_string) )
-  call LOGS%echo("  source file type: "//trim(this%sSourceFileType) )
-  call LOGS%echo("  filename template: "//trim(this%sFilenameTemplate) )
-  call LOGS%echo("  source filename: "//trim(this%sSourceFilename) )
+  call LOGS%write("  source data form: "//trim(asCharacter(this%iSourceDataForm)) )
+  call LOGS%write("  source data type: "//trim(asCharacter(this%iSourceDataType)) )
+  call LOGS%write("  source file type: "//trim(asCharacter(this%iSourceFileType)) )
+  call LOGS%write("  description: "//trim(this%sDescription) )
+  call LOGS%write("  source PROJ4 string: "//trim(this%sSourcePROJ4_string) )
+  call LOGS%write("  source file type: "//trim(this%sSourceFileType) )
+  call LOGS%write("  filename template: "//trim(this%sFilenameTemplate) )
+  call LOGS%write("  source filename: "//trim(this%sSourceFilename) )
 
   if (associated(this%pGrdNative))  call grid_DumpGridExtent(this%pGrdNative)
 
@@ -504,7 +504,7 @@ subroutine getvalues_constant_sub( this, pGrdBase )
   subroutine getvalues_gridded_sub( this, pGrdBase, iMonth, iDay, iYear)
 
     class (DATA_CATALOG_ENTRY_T) :: this
-    type ( T_GENERAL_GRID ), pointer :: pGrdBase
+    type ( GENERAL_GRID_T ), pointer :: pGrdBase
     integer (kind=c_int), optional :: iMonth
     integer (kind=c_int), optional :: iDay
     integer (kind=c_int), optional :: iYear
@@ -545,7 +545,7 @@ subroutine getvalues_constant_sub( this, pGrdBase )
         endif
       endif
 
-      call LOGS%echo("Opening file "//dQuote(this%sSourceFilename) &
+      call LOGS%write("Opening file "//dQuote(this%sSourceFilename) &
         //" for "//trim(this%sDescription)//" data.", iLogLevel=LOG_ALL )
 
       if ( this%lGridIsPersistent .and. associated(this%pGrdNative) ) then
@@ -603,17 +603,17 @@ subroutine getvalues_constant_sub( this, pGrdBase )
 subroutine transform_grid_to_grid(this, pGrdBase)
 
     class (DATA_CATALOG_ENTRY_T) :: this
-    type ( T_GENERAL_GRID ), pointer :: pGrdBase
+    type ( GENERAL_GRID_T ), pointer :: pGrdBase
 
     if( len_trim( this%sSourcePROJ4_string ) > 0 ) then
 
       ! only invoke the transform procedure if the PROJ4 strings are different
       if (.not. ( this%pGrdNative%sPROJ4_string .strequal. pGrdBase%sPROJ4_string ) ) then
 
-        call LOGS%echo(" ")
-        call LOGS%echo("Transforming gridded data in file: "//dquote(this%sSourceFilename) )
-        call LOGS%echo("  FROM: "//squote(this%sSourcePROJ4_string) )
-        call LOGS%echo("  TO:   "//squote(pGrdBase%sPROJ4_string) )
+        call LOGS%write(" ")
+        call LOGS%write("Transforming gridded data in file: "//dquote(this%sSourceFilename) )
+        call LOGS%write("  FROM: "//squote(this%sSourcePROJ4_string) )
+        call LOGS%write("  TO:   "//squote(pGrdBase%sPROJ4_string) )
 
         call grid_Transform(pGrd=this%pGrdNative, &
                           sFromPROJ4=this%sSourcePROJ4_string, &
@@ -944,7 +944,7 @@ end subroutine set_constant_value_real
      iMonth, iDay, iYear, iJulianDay)
 
     class (DATA_CATALOG_ENTRY_T) :: this
-    type ( T_GENERAL_GRID ), pointer :: pGrdBase
+    type ( GENERAL_GRID_T ), pointer :: pGrdBase
     integer (kind=c_int) :: iMonth, iDay, iYear, iJulianDay
 
     ! [ LOCALS ]
@@ -1081,10 +1081,10 @@ end subroutine set_constant_value_real
 
         if (.not. netcdf_date_within_range(NCFILE=this%NCFILE, iJulianDay=iJulianDay) ) then
 
-          call LOGS%echo("Valid date range (NetCDF): "//trim(asCharacter(this%NCFILE%iFirstDayJD)) &
+          call LOGS%write("Valid date range (NetCDF): "//trim(asCharacter(this%NCFILE%iFirstDayJD)) &
             //" to "//trim(asCharacter(this%NCFILE%iLastDayJD)) )
 
-          call LOGS%echo("Current Julian Day value: "//trim(asCharacter(iJulianDay)) )
+          call LOGS%write("Current Julian Day value: "//trim(asCharacter(iJulianDay)) )
 
           call assert (lFALSE, "Date range for currently open NetCDF file" &
             //" does not include the present simulation date.", &
@@ -1124,15 +1124,15 @@ end subroutine set_constant_value_real
 
       endif
 
-      call LOGS%echo( repeat("=", 60) )
-      call LOGS%echo( "Missing day found in NetCDF file - padding values" )
+      call LOGS%write( repeat("=", 60) )
+      call LOGS%write( "Missing day found in NetCDF file - padding values" )
 !      call stats_WriteMinMeanMax( iLU=LU_STD_OUT, &
 !        sText=trim(this%NCFILE%sFilename), &
 !        rData=this%pGrdNative%rData)
 !      call stats_WriteMinMeanMax( iLU=LU_LOG, &
 !        sText=trim(this%NCFILE%sFilename), &
 !        rData=this%pGrdNative%rData)
-      call LOGS%echo( repeat("=", 60) )
+      call LOGS%write( repeat("=", 60) )
 
     endif
 
@@ -1377,7 +1377,7 @@ end subroutine set_maximum_allowable_value_real_sub
   subroutine calc_project_boundaries(this, pGrdBase)
 
     class (DATA_CATALOG_ENTRY_T) :: this
-    type ( T_GENERAL_GRID ), pointer :: pGrdBase
+    type ( GENERAL_GRID_T ), pointer :: pGrdBase
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iRetVal

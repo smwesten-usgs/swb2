@@ -127,12 +127,15 @@ program main
   call GET_COMMAND_ARGUMENT(1,sControlFile)
   
   ! open and initialize logfiles
-  call LOGS%initialize( iLogLevel = LOG_GENERAL )
+  call LOGS%initialize( iLogLevel = LOG_DEBUG )
 
   ! read control file
   call read_control_file(sControlFile)
 
-  call initialize_precipitation_options()
+  call initialize_options()
+  
+
+  call check_for_fatal_warnings()
 
   call LOGS%close()
 
