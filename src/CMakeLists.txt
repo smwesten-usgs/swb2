@@ -3,7 +3,7 @@ if(TARGET__SWB_EXECUTABLE)
 
   add_executable(swb
             constants_and_conversions.F90
-            data_catalog.F90
+            #data_catalog.F90
 		data_catalog_entry.F90
 		datetime.F90
             dictionary.F90
@@ -17,7 +17,7 @@ if(TARGET__SWB_EXECUTABLE)
             loop_initialize.F90
             main.F90
             #meteorological_calculations.F90
-            model_domain.F90
+            #model_domain.F90
             #model.F90
             netcdf4_support.F90
             netcdf_c_api_interfaces.F90

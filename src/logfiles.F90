@@ -114,13 +114,13 @@ contains
     integer (kind=c_int) :: iIndex
     character (len=:), allocatable   :: sFilename
     character (len=:), allocatable   :: sDatetime
-    character (len=12)               :: sDescriptor(2) = [ "GENERAL ", "DEBUG   " ]
+    character (len=12)               :: sDescriptor(2) = [ "         ", "_DEBUG   " ]
 
     if ( this%iLogLevel /= LOG_NONE ) then
 
       do iIndex = 1, min(this%iLogLevel, 2)
 
-        sFilename = trim(this%sFilePrefix)//"_"//trim(sDescriptor(iIndex))//".txt"
+        sFilename = trim(this%sFilePrefix)//trim(sDescriptor(iIndex))//".txt"
 
         if (.not. this%lIsOpen(iIndex) ) then
 
@@ -135,7 +135,7 @@ contains
           sDatetime = make_timestamp()
 
           write(this%iUnitNum(iIndex), fmt="(a)") "SWB version "//SWB_VERSION//" compiled on "//COMPILATION_TIMESTAMP         
-          write(this%iUnitNum(iIndex), fmt="(a)") "Model run started at "//sDatetime          
+          write(this%iUnitNum(iIndex), fmt="(a,/)") "Model run started at "//sDatetime          
    
         else
 
@@ -197,8 +197,8 @@ contains
     write(sDay, fmt="(i0.2)") iValues( DT_DAY )
     write(sYear, fmt="(i0.4)") iValues( DT_YEAR )
 
-    this%sFilePrefix = "SWB_LOGFILE__"//sYear//"_"//sMonth//"_"//sDay//"__"  &
-                                                   //sHour//"-"//sMinutes//"-"//sSeconds
+    this%sFilePrefix = "SWB_LOGFILE__"//sYear//sMonth//sDay//"_"  &
+                                                   //sHour//sMinutes//sSeconds
 
 
   end subroutine make_prefix_sub

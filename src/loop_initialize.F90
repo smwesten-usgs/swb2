@@ -4,7 +4,6 @@ module loop_initialize
   use constants_and_conversions, only : lTRUE, lFALSE, asFloat
   use data_catalog_entry
   use exceptions
-  use model_domain, only : pGrd
   use strings
   use string_list
   use file_operations
@@ -88,7 +87,21 @@ contains
     call initialize_soils_group_options()
     call initialize_landuse_options()
 
+
   end subroutine initialize_options
+
+
+  subroutine populate_data_grids()
+
+    call populate_flow_direction_grid()
+
+  end subroutine populate_data_grids
+ 
+  subroutine populate_flow_direction_grid()
+
+    call FLOWDIR
+
+  end subroutine populate_flow_direction_grid
 
 
   subroutine initialize_precipitation_options()

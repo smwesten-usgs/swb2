@@ -194,6 +194,8 @@ module data_catalog_entry
   integer (kind=c_int), parameter :: FILETYPE_NETCDF = 2
   integer (kind=c_int), parameter :: FILETYPE_NONE = 3
 
+  type (GENERAL_GRID_T), public, pointer :: pGrd
+
 contains
 
   subroutine set_keyword_sub(this, sKeyword)

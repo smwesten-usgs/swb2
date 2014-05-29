@@ -16,18 +16,28 @@ module et_crop_coefficients
 
   private
 
-  real (kind=c_float), allocatable   :: fREW(:,:)
-  real (kind=c_float), allocatable   :: fTEW(:,:)
-  real (kind=c_float), allocatable   :: iL_plant(:) 
-  real (kind=c_float), allocatable   :: iL_ini(:) 
-  real (kind=c_float), allocatable   :: iL_mid(:) 
-  real (kind=c_float), allocatable   :: iL_late(:) 
-  real (kind=c_float), allocatable   :: fKcb_ini(:)
-  real (kind=c_float), allocatable   :: fKcb_mid(:)
-  real (kind=c_float), allocatable   :: fKcb_end(:)
-  real (kind=c_float), allocatable   :: fKcb_min(:)
-  real (kind=c_float), allocatable   :: fDepletion_fraction(:)
-  real (kind=c_float), allocatable   :: fMean_plant_height(:)
+  type, public :: SM_FAO56_T
+
+    real (kind=c_float), allocatable   :: fREW(:)
+    real (kind=c_float), allocatable   :: fTEW(:)
+    real (kind=c_float)                :: iL_plant 
+    real (kind=c_float)                :: iL_ini 
+    real (kind=c_float)                :: iL_mid 
+    real (kind=c_float)                :: iL_late 
+    real (kind=c_float)                :: fKcb_ini
+    real (kind=c_float)                :: fKcb_mid
+    real (kind=c_float)                :: fKcb_end
+    real (kind=c_float)                :: fKcb_min
+    real (kind=c_float)                :: fDepletion_fraction
+    real (kind=c_float)                :: fMean_plant_height
+
+  contains
+
+    procedure, private   :: fao56_initialize
+
+  end type SM_FAO56_T
+
+  type (SM_FAO56_T), allocatable ::  
 
   contains
 
@@ -289,7 +299,7 @@ subroutine et_kc_CalcTotalAvailableWater(fTotalAvailableWater, fReadilyAvailable
   real (kind=c_float), intent(in)       :: fAvailableWaterCapacity
   real (kind=c_float), intent(in)       :: fCurrentRootingDepth
 
-  fTotalAvailableWater = fCurrentRootingDepth * fSoilWaterCapInput
+  fTotalAvailableWater = fCurrentRootingDepth * fAvailableWaterCapacity
   fReadilyAvailableWater = fTotalAvailableWater * fDepletion_fraction(iFAOIndex)
 
   end subroutine et_kc_CalcTotalAvailableWater
