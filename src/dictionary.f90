@@ -2,7 +2,7 @@ module dictionary
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
   use constants_and_conversions, only : iTINYVAL, fTINYVAL, lTRUE, lFALSE
-  use logfiles, only : LOG_DEBUG, LOG_GENERAL
+  use logfiles
   use strings
   use string_list
   use exceptions
@@ -434,9 +434,9 @@ contains
       iCount = iCount + 1
       sTempBuf = current%key
 
-      write(*, fmt="(/,a,a)") asCharacter(iCount),")  KEY: "//dquote(sTempBuf)
-      write(*, fmt="(t5,a)") " --ENTRIES--:"
-      call current%sl%print()
+      call LOGS%write( asCharacter(iCount)//")  KEY: "//dquote(sTempBuf), iLogLevel=LOG_DEBUG, lEcho=lFALSE, iTab=2 )
+      call LOGS%write( " --ENTRIES--:", iTab=5 )
+      call current%sl%print( iLU=LOGS%iUnitNum( LOG_DEBUG ) )
 
       current => current%next
 

@@ -3,11 +3,12 @@ module loop_initialize
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
   use constants_and_conversions, only : lTRUE, lFALSE, asFloat
   use data_catalog_entry
-  use exceptions
-  use strings
-  use string_list
-  use file_operations
   use dictionary
+  use exceptions
+  use file_operations
+  use parameters
+  use strings
+  use string_list  
   implicit none
 
   private
@@ -86,9 +87,11 @@ contains
     call initialize_water_capacity_options()
     call initialize_soils_group_options()
     call initialize_landuse_options()
+    call initialize_parameter_tables()
 
 
   end subroutine initialize_options
+
 
 
   subroutine populate_data_grids()
@@ -97,11 +100,14 @@ contains
 
   end subroutine populate_data_grids
  
+
+
   subroutine populate_flow_direction_grid()
 
-    call FLOWDIR
+    !call FLOWDIR
 
   end subroutine populate_flow_direction_grid
+
 
 
   subroutine initialize_precipitation_options()
@@ -1013,7 +1019,7 @@ contains
 
     else  
     
-      allocate(HSG, stat=iStat)
+      allocate(LULC, stat=iStat)
       call assert( iStat == 0, "Failed to allocate memory for the landuse (LULC) data structure", &
         __FILE__, __LINE__ )
 
@@ -1093,6 +1099,77 @@ contains
   end subroutine initialize_landuse_options  
 
 
+
+
+  subroutine initialize_parameter_tables()
+
+    ! [ LOCALS ]
+    type (STRING_LIST_T)             :: myDirectives
+    type (STRING_LIST_T)             :: myOptions
+    type (STRING_LIST_T)             :: slString  
+    integer (kind=c_int)             :: iIndex
+    character (len=:), allocatable   :: sCmdText
+    character (len=:), allocatable   :: sOptionText
+    character (len=:), allocatable   :: sArgText
+    integer (kind=c_int)             :: iStat
+    type (PARAMETER_FILES_T)         :: PARAM_FILES
+
+
+    myDirectives = CF_DICT%grep_keys("LOOKUP_TABLE")
+      
+    if ( myDirectives%count == 0 ) then
+
+      call warn("Your control file seems to be missing the required lookup table(s).", &
+        lFatal = lTRUE )
+
+    else  
+    
+      call LOGS%set_loglevel( LOG_ALL )
+      call LOGS%set_echo( lFALSE )
+
+      do iIndex = 1, myDirectives%count
+
+        ! myDirectives is a string list of all SWB directives that contain the phrase "LOOKUP_TABLE"
+        ! sCmdText contains an individual directive
+        sCmdText = myDirectives%get(iIndex)
+
+        ! For this directive, obtain the associated dictionary entries
+        call CF_DICT%get_values(sCmdText, myOptions )
+
+        ! dictionary entries are initially space-delimited; sArgText contains
+        ! all dictionary entries present, concatenated, with a space between entries
+        sArgText = myOptions%get(1, myOptions%count )
+
+        ! echo the original directive and dictionary entries to the logfile
+        call LOGS%write(">> "//sCmdText//" "//sArgText)
+
+        ! most of the time, we only care about the first dictionary entry, obtained below
+        sOptionText = myOptions%get(1)
+
+        select case ( sCmdText )
+
+          case ( "LOOKUP_TABLE", "LANDUSE_LOOKUP_TABLE", "IRRIGATION_LOOKUP_TABLE", "LAND_USE_LOOKUP_TABLE" )
+
+            call PARAM_FILES%add( sOptionText )
+
+          case default
+
+            call warn("Unknown directive present. Ignoring. Directive is: "//dquote(sCmdText) )
+
+        end select
+
+      enddo  
+
+      if ( myDirectives%count > 0 ) then
+
+        call PARAM_FILES%munge()
+        call PARAMS%print_all()       
+
+      endif
+
+    endif
+
+  end subroutine initialize_parameter_tables
 
 
 !--------------------------------------------------------------------------------------------------  

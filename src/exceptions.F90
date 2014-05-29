@@ -2,7 +2,6 @@ module exceptions
 
   use iso_c_binding
   use iso_fortran_env, only : OUTPUT_UNIT
-  use types_new
   use logfiles, only : LOGS, LOG_GENERAL, LOG_ALL
   implicit none
 

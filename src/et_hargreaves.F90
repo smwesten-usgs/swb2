@@ -26,13 +26,12 @@ module et_hargreaves
 !!***
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double
-  use types
-  use stats
-  use meteorological_functions
+  use constants_and_conversions
+  use meteorological_calculations
+  use solar_calculations
 
   implicit none
 
-  private
 
   ! ET parameters -- default values are from Hargreaves and Samani (1985)
   real (kind=c_float) :: fET_Slope = 0.0023     
@@ -41,46 +40,46 @@ module et_hargreaves
 
 contains
 
-subroutine et_hargreaves_configure( pConfig, sRecord )
+subroutine et_hargreaves_configure( ) !pConfig, sRecord )
   !! Configures the module, using the command line in 'sRecord'
   ! [ ARGUMENTS ]
-  type (T_MODEL_CONFIGURATION), pointer :: pConfig ! pointer to data structure that contains
+!  type (T_MODEL_CONFIGURATION), pointer :: pConfig ! pointer to data structure that contains
                                                    ! model options, flags, and other settings
-  character (len=*),intent(inout) :: sRecord
+!  character (len=*),intent(inout) :: sRecord
 
   ! [ LOCALS ]
   character (len=256) :: sOption
   integer (kind=c_int) :: iStat
   real (kind=c_float) :: rValue
 
-  write(UNIT=LU_LOG,FMT=*) "Configuring Hargreaves PET model"
+!  write(UNIT=LU_LOG,FMT=*) "Configuring Hargreaves PET model"
 
-  if (pConfig%rSouthernLatitude <= rNO_DATA_NCDC &
-    .or. pConfig%rNorthernLatitude <= rNO_DATA_NCDC) then
+!   if (pConfig%rSouthernLatitude <= rNO_DATA_NCDC &
+!     .or. pConfig%rNorthernLatitude <= rNO_DATA_NCDC) then
 
-    call Chomp( sRecord,sOption )
-    read ( unit=sOption, fmt=*, iostat=iStat ) rValue
-    call Assert( iStat == 0, "Could not read the southerly latitude" )
-    pConfig%rSouthernLatitude = dpTWOPI * rValue / 360.0_c_float
+!     call Chomp( sRecord,sOption )
+!     read ( unit=sOption, fmt=*, iostat=iStat ) rValue
+!     call Assert( iStat == 0, "Could not read the southerly latitude" )
+!     pConfig%rSouthernLatitude = dpTWOPI * rValue / 360.0_c_float
 
-    call Chomp( sRecord,sOption )
-    read ( unit=sOption, fmt=*, iostat=iStat ) rValue
-    call Assert( iStat == 0, "Could not read the northerly latitude" )
-    pConfig%rNorthernLatitude = dpTWOPI * rValue / 360.0_c_float
+!     call Chomp( sRecord,sOption )
+!     read ( unit=sOption, fmt=*, iostat=iStat ) rValue
+!     call Assert( iStat == 0, "Could not read the northerly latitude" )
+!     pConfig%rNorthernLatitude = dpTWOPI * rValue / 360.0_c_float
 
-  else
+!   else
 
-    call echolog("Southern and northern latitude values have been determined" &
-      //"~from project grid bounds and projection parameters. The values supplied" &
-      //"~with the Hargreaves PET option will be ignored...")
+!     call echolog("Southern and northern latitude values have been determined" &
+!       //"~from project grid bounds and projection parameters. The values supplied" &
+!       //"~with the Hargreaves PET option will be ignored...")
 
-  endif
+!   endif
 
 end subroutine et_hargreaves_configure
 
 !------------------------------------------------------------------------------
 
-subroutine et_hargreaves_ComputeET( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax )
+function et_hargreaves_ComputeET( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax )  result(fReferenceET0)
   !! Computes the potential ET for each cell, based on TMIN and TMAX.
   !! Stores cell-by-cell PET values in the model grid.
 
@@ -89,25 +88,24 @@ subroutine et_hargreaves_ComputeET( iDayOfYear, iNumDaysInYear, fLatitude, fTMin
   real (kind=c_float), intent(in) :: fLatitude
   real (kind=c_float), intent(in) :: fTMin
   real (kind=c_float), intent(in) :: fTMax
+  real (kind=c_float)             :: fReferenceET0
 
   ! [ LOCALS ]
   real (kind=c_double) :: fDelta, fOmega_s, fD_r, fRa
 
-  rD_r =rel_Earth_Sun_dist(iDayOfYear,iNumDaysInYear)
-  rDelta = solar_declination(iDayOfYear, iNumDaysInYear)
+  fD_r =rel_Earth_Sun_dist(iDayOfYear,iNumDaysInYear)
+  fDelta = solar_declination(iDayOfYear, iNumDaysInYear)
 
-  rOmega_s = sunset_angle(fLatitude, fDelta)
+  fOmega_s = sunrise_sunset_angle(asDouble(fLatitude), fDelta)
 
 	! NOTE that the following equation returns extraterrestrial radiation in
 	! MJ / m**2 / day.  The Hargreaves equation requires extraterrestrial
 	! radiation to be expressed in units of mm / day.
-	fRa = extraterrestrial_radiation_Ra(fLatitude, fDelta, fOmega_s, fD_r)
+	fRa = extraterrestrial_radiation_Ra(asDouble(fLatitude), fDelta, fOmega_s, fD_r)
 
-  fReferenceET0 = ET0_hargreaves( equivalent_evaporation(rRa), &
-                                  pGrd%Cells(iCol,iRow)%rTMin, &
-                                  pGrd%Cells(iCol,iRow)%rTMax)
+  fReferenceET0 = ET0_hargreaves( equivalent_evaporation(fRa), fTMin, fTMax)
     
-end subroutine et_hargreaves_ComputeET
+end function et_hargreaves_ComputeET
 
 
 function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)
@@ -126,21 +124,17 @@ function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)
 
   rTAvg = (rTMinF + rTMaxF) / 2_c_double
 
-  rTDelta = FtoK(rTMaxF) - FtoK(rTMinF)
-
-!  rET_0 = MAX(rZERO, &
-!           ( 0.0023_c_float &
-!           * rRa &
-!           * (FtoC(rTavg) + 17.8_c_float) &
-!           * sqrt(rTDelta)) &
-!           / rMM_PER_INCH)
+  rTDelta = F_to_K(rTMaxF) - F_to_K(rTMinF)
 
   rET_0 = MAX(rZERO, &
-           ( fET_Slope &
-           * rRa &
-           * (FtoC(rTavg) + pConfig%fET_Constant) &
-           * (rTDelta**fET_Exponent)) &
-           / rMM_PER_INCH)
+                mm_to_in( 0.0023_c_float * rRa * (F_to_C(rTavg) + 17.8_c_float) * sqrt(rTDelta)) )
+
+!  rET_0 = MAX(rZERO, &
+!           ( fET_Slope &
+!           * rRa &
+!           * (F_to_C(rTavg) + pConfig%fET_Constant) &
+!           * (rTDelta**fET_Exponent)) &
+!           / rMM_PER_INCH)
 
 end function ET0_hargreaves
 

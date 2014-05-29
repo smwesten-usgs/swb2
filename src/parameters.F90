@@ -2,7 +2,6 @@ module parameters
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
   use exceptions
-  use types_new
   use file_operations
   use strings
   use string_list
