@@ -61,12 +61,27 @@ module cell_class
 
     type (CELL_NORMAL_T), pointer :: pDownslope
 
-    procedure ( interception_method ), pointer, private :: interception_method_ptr => null()
+    procedure ( interception_method ), pointer, private      :: interception_method_ptr => null()
+    procedure ( interception_init_method ), pointer, private :: interception_init_method_ptr => null()
+
     procedure ( infiltration_method ), pointer, private :: infiltration_method_ptr => null()
     procedure ( et_method ), pointer, private           :: et_method_ptr => null()
     procedure ( sm_method ), pointer, private           :: sm_method_ptr => null()
 
   contains
+
+    procedure :: set_interception_method_sub
+    generic   :: set_interception => set_interception_method_sub
+
+    procedure :: set_infiltration_method_sub
+    generic   :: set_infiltration => set_infiltration_method_sub
+
+    procedure :: set_et_method_sub
+    generic   :: set_evapotranspiration => set_et_method_sub
+
+    procedure :: set_sm_method_sub
+    generic   :: set_soil_moist => set_sm_sub
+
 
   end type CELL_NORMAL_T
 
@@ -75,6 +90,13 @@ module cell_class
       import :: CELL_NORMAL_T
       class ( CELL_NORMAL_T ), intent(inout)  :: this
     end subroutine interception_method
+  end interface
+
+  abstract interface
+    subroutine interception_init_method(this)
+      import :: CELL_NORMAL_T
+      class ( CELL_NORMAL_T ), intent(inout)  :: this
+    end subroutine interception_init_method
   end interface
 
   abstract interface

@@ -50,9 +50,13 @@ contains
         pCell => this%cell(iRow, iCol)
 
         if (iMask( iRow, iCol) == CELL_INACTIVE ) then
+
           allocate( CELL_BASE_CLASS_T::pCell)
+
         elseif ( iMask( iRow, iCol ) == CELL_NORMAL ) then
+
           allocate( CELL_NORMAL_T::pCell )
+          
         endif  
 
         call pCell%print()

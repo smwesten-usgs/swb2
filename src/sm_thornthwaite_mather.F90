@@ -2,9 +2,7 @@
 !> Contains a single module, @ref sm_thornthwaite_mather, which estimates runoff by
 !> means of the NRCS/SCS curve number method.
 
-!> Performs the actual soil-moisture balance once precip, snowmelt, runoff, and ET have
-!> been calculated. Soil moisture for a given soil accumulated potential water loss (APWL)
-!> is determined by means of Thornthwaite and Mathers' (1957) tables.
+
 module sm_thornthwaite_mather
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double

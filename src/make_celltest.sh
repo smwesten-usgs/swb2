@@ -1,0 +1,2 @@
+#!/bin/bash
+gfortran-4.9 constants_and_conversions.F90 exceptions.F90 logfiles.F90 meteorological_calculations.F90 solar_calculations.F90 et_hargreaves.F90 cell_class.F90 cell_collection.F90 test_cell_type.F90 -o celltest
