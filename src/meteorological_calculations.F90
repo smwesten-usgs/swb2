@@ -1,10 +1,7 @@
 module meteorological_calculations
 
-	use iso_c_binding, only : c_int, c_float, c_double, c_bool
-  
+  use iso_c_binding, only : c_int, c_float, c_double, c_bool
   use constants_and_conversions
-  use types 
-  
   implicit none
 
 contains
@@ -34,7 +31,34 @@ end function sat_vapor_pressure_e_0
 
 !--------------------------------------------------------------------------
 
+!--------------------------------------------------------------------------
+!!****f* meteorological_functions/equivalent_evaporation
+! NAME
+! equivalent_evaporation - returns a radiation value in terms of equivalent
+! evaporation
+! SYNOPSIS
+! Returns a radiation value in terms of equivalent evaporation (mm/day),
+! given an input of radiation in MJ / m**2 / day
+!
+! INPUTS
+! rR - Input radiation, in MJ / m**2 / day
+!
+! OUTPUTS
+! rR_ET - Radiation expressed as equivalent evaporation, in mm / day
+!
+! SOURCE
 
+function equivalent_evaporation(rR) result(rR_ET)
+
+  ! [ ARGUMENTS ]
+  real (kind=c_double), intent(in) :: rR
+
+  ! [ LOCALS ]
+  real (kind=c_double) :: rR_ET
+
+    rR_ET = rR * 0.408_c_double
+
+end function equivalent_evaporation
 
 
 

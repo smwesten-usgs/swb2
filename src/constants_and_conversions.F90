@@ -10,6 +10,14 @@ module constants_and_conversions
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
   implicit none
 
+  ! 
+  integer (kind=c_int), parameter :: DATATYPE_INT = 0
+  integer (kind=c_int), parameter :: DATATYPE_REAL = 1
+  integer (kind=c_int), parameter :: DATATYPE_CELL_GRID = 2
+  integer (kind=c_int), parameter :: DATATYPE_SHORT = 3
+  integer (kind=c_int), parameter :: DATATYPE_DOUBLE = 4
+  integer (kind=c_int), parameter :: DATATYPE_NA = -9999
+
   ! [ common mathematical constants ]
   public :: PI, TWOPI, HALFPI
   real (kind=c_double), parameter    :: PI = 3.1415926535897932384626433_c_double
@@ -37,9 +45,11 @@ module constants_and_conversions
   integer(kind=c_int), parameter     :: iTINYVAL = -(HUGE(0_c_int) - 1)
   real (kind=c_float), parameter     :: rFREEZING = 32_c_float
   real (kind=c_double), parameter    :: dFREEZING = 32_c_double
-  real (kind=c_float), parameter  :: fZERO = 0.0_c_float
-  real (kind=c_float), parameter  :: rZERO = 0.0_c_float
-  real (kind=c_double), parameter :: dZERO = 0.0_c_double
+  integer (kind=c_int), parameter    :: iZERO = 0_c_int
+  real (kind=c_float), parameter     :: fZERO = 0.0_c_float
+  real (kind=c_float), parameter     :: rZERO = 0.0_c_float
+  real (kind=c_double), parameter    :: dZERO = 0.0_c_double
+
 
   ! [ special ASCII characters ]
   public :: sTAB, sWHITESPACE, sBACKSLASH, sFORWARDSLASH, sRETURN, sCOMMENT_CHARS
@@ -54,6 +64,31 @@ module constants_and_conversions
   ! [ select conversion factors ]
   real (kind=c_double), parameter :: C_PER_F = 5_c_double / 9_c_double
   real (kind=c_double), parameter :: F_PER_C = 9_c_double / 5_c_double  
+
+
+
+type T_CELL
+      integer (kind=c_int) :: iFlowDir = iZERO    ! Flow direction from flow-dir grid
+      integer (kind=c_int) :: iSoilGroup = iZERO  ! Soil type from soil-type grid
+      integer (kind=c_int) :: iLandUseIndex       ! Index (row num) of land use table
+      integer (kind=c_int) :: iLandUse = iZERO    ! Land use from land-use grid
+      integer (kind=c_int) :: iIrrigationTableIndex = iZERO  ! Index (row num) of irrigation table
+      real (kind=c_float) :: rElevation =rZERO            ! Ground elevation
+      real (kind=c_float) :: rSoilWaterCapInput = rZERO   ! Soil water capacity from grid file
+      real (kind=c_float) :: rSoilWaterCap = rZERO        ! Soil water capacity adjusted for LU/LC
+      real (kind=c_float) :: rSoilMoisture = rZERO        ! Soil moisture in inches of water
+      real (kind=c_float) :: rCurrentRootingDepth = 0.2   ! Current rooting depth for use w FAO56 calculations
+      real (kind=c_float) :: rKcb = rZERO                 ! crop coefficient for this cell
+      real (kind=c_float) :: rTotalAvailableWater = rZERO
+      real (kind=c_float) :: rReadilyAvailableWater = rZERO
+
+  end type T_CELL
+
+
+
+
+
+
 
   !> establish generic interfaces to single and double precision functions
   public :: C_to_F
@@ -130,7 +165,7 @@ contains
   !> Convert degrees to radians.
   !! @param[in]  degrees   Angle in degrees.
   !! @retval     radians  Angle in radians.
-  function deg_to_rad_sgl_fn( degrees )    result( radians )
+  elemental function deg_to_rad_sgl_fn( degrees )    result( radians )
 
     real (kind=c_float), intent(in)    :: degrees
     real (kind=c_float)                :: radians
@@ -145,7 +180,7 @@ contains
   !> Convert degrees to radians.
   !! @param[in]  degrees   Angle in degrees.
   !! @retval     radians   Angle in radians.
-  function deg_to_rad_dbl_fn(degrees)    result(radians)
+  elemental function deg_to_rad_dbl_fn(degrees)    result(radians)
 
     real (kind=c_double), intent(in)    :: degrees
     real (kind=c_double)                :: radians
@@ -160,7 +195,7 @@ contains
   !> Convert radians to degrees.
   !! @param[in]  radians   Angle in radians.
   !! @retval     degrees   Angle in degrees.
-  function rad_to_deg_sgl_fn(radians)    result(degrees)
+  elemental function rad_to_deg_sgl_fn(radians)    result(degrees)
 
     real (kind=c_float), intent(in)    :: radians
     real (kind=c_float)                :: degrees
@@ -174,7 +209,7 @@ contains
   !> Convert radians to degrees.
   !! @param[in]  radians   Angle in radians.
   !! @retval     degrees   Angle in degrees.
-  function rad_to_deg_dbl_fn(radians)    result(degrees)
+  elemental function rad_to_deg_dbl_fn(radians)    result(degrees)
 
     real (kind=c_double), intent(in)    :: radians
     real (kind=c_double)                :: degrees
@@ -189,7 +224,7 @@ contains
   !> Convert degrees Fahrenheit to degrees Celsius.
   !! @param[in]  degrees_F   Temperature in degrees Fahrenheit.
   !! @retval     degrees_C   Temperature in degrees Celcius.
-  function FtoC_sgl_fn(degrees_F)   result(degrees_C)
+  elemental function FtoC_sgl_fn(degrees_F)   result(degrees_C)
  
     real (kind=c_float),intent(in) :: degrees_F
     real (kind=c_float) :: degrees_C
@@ -204,7 +239,7 @@ contains
   !> Convert degrees Fahrenheit to degrees Celsius.
   !! @param[in] degrees_F Temperature in degrees Fahrenheit.
   !! @retval degrees_C Temperature in degrees Celcius.
-  function FtoC_dbl_fn( degrees_F )   result( degrees_C )
+  elemental function FtoC_dbl_fn( degrees_F )   result( degrees_C )
    
     real (kind=c_double),intent(in) :: degrees_F
     real (kind=c_double) :: degrees_C
@@ -219,7 +254,7 @@ contains
   !> Convert degrees Celsius to degrees Fahrenheit.
   !! @param[in] degrees_C Temperature in degrees Celsius.
   !! @retval degrees_F Temperature in degrees Fahrenheit.
-  function CtoF_sgl_fn( degrees_C )   result( degrees_F )
+  elemental function CtoF_sgl_fn( degrees_C )   result( degrees_F )
 
     real (kind=c_float),intent(in) :: degrees_C
     real (kind=c_float) :: degrees_F
@@ -234,7 +269,7 @@ contains
   !> Convert degrees Celsius to degrees Fahrenheit.
   !! @param[in] degrees_C Temperature in degrees Celsius.
   !! @retval degrees_F Temperature in degree
-  function CtoF_dbl_fn( degrees_C )   result( degrees_F )
+  elemental function CtoF_dbl_fn( degrees_C )   result( degrees_F )
 
     real (kind=c_double),intent(in) :: degrees_C
     real (kind=c_double) :: degrees_F
@@ -249,7 +284,7 @@ contains
   !> Convert degrees Fahrenheit to Kelvins.
   !! @param[in] degrees_F Temperature in degrees Fahrenheit.
   !! @retval degrees_K Temperature in Kelvins.
-  function FtoK_sgl_fn( degrees_F )    result( degrees_K )
+  elemental function FtoK_sgl_fn( degrees_F )    result( degrees_K )
 
     real (kind=c_float),intent(in) :: degrees_F
     real (kind=c_float) :: degrees_K
@@ -264,7 +299,7 @@ contains
   !> Convert degrees Fahrenheit to Kelvins.
   !! @param[in] degrees_F Temperature in degrees Fahrenheit.
   !! @retval degrees_K Temperature in Kelvins.
-  function FtoK_dbl_fn( degrees_F )    result( degrees_K )
+  elemental function FtoK_dbl_fn( degrees_F )    result( degrees_K )
 
     real (kind=c_double),intent(in) :: degrees_F
     real (kind=c_double) :: degrees_K
@@ -279,7 +314,7 @@ contains
   !> Convert degrees Celsius to Kelvins.
   !! @param[in] degrees_C Temperature in degrees Celcius.
   !! @retval degrees_K Temperature in Kelvins.
-  function CtoK_sgl_fn( degrees_C )    result( degrees_K )
+  elemental function CtoK_sgl_fn( degrees_C )    result( degrees_K )
 
     real (kind=c_float), intent(in) :: degrees_C
     real (kind=c_float) :: degrees_K
@@ -294,7 +329,7 @@ contains
   !> Convert degrees Fahrenheit to Kelvins.
   !! @param[in] degrees_C Temperature in degrees Celsius.
   !! @retval degrees_K Temperature in Kelvins.
-  function CtoK_dbl_fn( degrees_C )    result( degrees_K )
+  elemental function CtoK_dbl_fn( degrees_C )    result( degrees_K )
 
     real (kind=c_double), intent(in) :: degrees_C
     real (kind=c_double) :: degrees_K
@@ -309,7 +344,7 @@ contains
   !>  Convert millimeters to inches.
   !! @param[in] mm Value in millimeters.
   !! @retval inches Value in inches.
-  function mm_to_inches_sgl_fn(r_mm) result(r_in)
+  elemental function mm_to_inches_sgl_fn(r_mm) result(r_in)
 
     real (kind=c_float),intent(in) :: r_mm
     real (kind=c_float) :: r_in
@@ -323,7 +358,7 @@ contains
   !>  Convert millimeters to inches.
   !! @param[in] mm Value in millimeters.
   !! @retval inches Value in inches.
-  function mm_to_inches_dbl_fn( mm ) result( inches )
+  elemental function mm_to_inches_dbl_fn( mm ) result( inches )
 
     real (kind=c_double),intent(in) :: mm
     real (kind=c_double) :: inches
@@ -335,14 +370,14 @@ contains
 !--------------------------------------------------------------------------------------------------
 
 !> Convert a character value into a integer
-function char2int(sValue)  result(iValue)
+elemental function char2int(sValue)  result(iValue)
 
-  character (len=*) :: sValue
+  character (len=*), intent(in) :: sValue
   integer (kind=c_int) :: iValue
 
   ! [ LOCALS ]
   integer (kind=c_int) :: iStat
-  character (len=len_trim(sValue)) :: sTempVal 
+  character (len=:), allocatable :: sTempVal 
   real (kind=c_float)  :: rValue
 
   sTempVal = keepnumeric(sValue)  
@@ -368,9 +403,9 @@ end function char2int
 !--------------------------------------------------------------------------------------------------
 
 !> Convert a real value into a integer
-function real2int(rValue)  result(iValue)
+elemental function real2int(rValue)  result(iValue)
 
-  real (kind=c_float) :: rValue
+  real (kind=c_float), intent(in) :: rValue
   integer (kind=c_int) :: iValue
 
   iValue = int(rValue, kind=c_int)
@@ -380,9 +415,9 @@ end function real2int
 !--------------------------------------------------------------------------------------------------
 
 !> Convert a double-precision value to an integer
-function dbl2int(rValue)  result(iValue)
+elemental function dbl2int(rValue)  result(iValue)
 
-  real (kind=c_double) :: rValue
+  real (kind=c_double), intent(in) :: rValue
   integer (kind=c_int) :: iValue
 
   iValue = int(rValue, kind=c_int)
@@ -392,9 +427,9 @@ end function dbl2int
 !--------------------------------------------------------------------------------------------------
 
 !> Convert a character value into a real
-function char2real(sValue)  result(rValue)
+elemental function char2real(sValue)  result(rValue)
 
-  character (len=*) :: sValue
+  character (len=*), intent(in) :: sValue
   real (kind=c_float) :: rValue
 
   ! [ LOCALS ]
@@ -409,9 +444,9 @@ end function char2real
 !--------------------------------------------------------------------------------------------------
 
 !> Convert an int value into a real
-function int2real(iValue)  result(rValue)
+elemental function int2real(iValue)  result(rValue)
 
-  integer (kind=c_int) :: iValue
+  integer (kind=c_int), intent(in) :: iValue
   real (kind=c_float) :: rValue
 
   rValue = real(iValue, kind=c_float)
@@ -421,9 +456,9 @@ end function int2real
 !--------------------------------------------------------------------------------------------------
 
 !> Convert a dbl value into a real
-function dbl2real(dpValue)  result(rValue)
+elemental function dbl2real(dpValue)  result(rValue)
 
-  real (kind=c_double) :: dpValue
+  real (kind=c_double), intent(in) :: dpValue
   real (kind=c_float) :: rValue
 
   rValue = real(dpValue, kind=c_float)
@@ -433,9 +468,9 @@ end function dbl2real
 !--------------------------------------------------------------------------------------------------
 
 !> Convert a character value into a double
-function char2dbl(sValue)  result(dValue)
+elemental function char2dbl(sValue)  result(dValue)
 
-  character (len=*)    :: sValue
+  character (len=*), intent(in)    :: sValue
   real (kind=c_double) :: dValue
 
   ! [ LOCALS ]
@@ -450,9 +485,9 @@ end function char2dbl
 !--------------------------------------------------------------------------------------------------
 
 !> Convert an int value into a double
-function int2dbl(iValue)  result(dValue)
+elemental function int2dbl(iValue)  result(dValue)
 
-  integer (kind=c_int) :: iValue
+  integer (kind=c_int), intent(in) :: iValue
   real (kind=c_double) :: dValue
 
   dValue = real(iValue, kind=c_double)
@@ -462,9 +497,9 @@ end function int2dbl
 !--------------------------------------------------------------------------------------------------
 
 !> Convert a real value into a double
-function real2dbl(fValue)  result(dValue)
+elemental function real2dbl(fValue)  result(dValue)
 
-  real (kind=c_float) :: fValue
+  real (kind=c_float), intent(in) :: fValue
   real (kind=c_double) :: dValue
 
   dValue = real(fValue, kind=c_double)
@@ -548,13 +583,14 @@ end function fortran_to_c_string
   !!
   !! Keep only the numeric characters in a text string.
   !! @param[in] sTextIn
-  function keepnumeric(sText1)            result(sText)
+  elemental function keepnumeric(sText1)            result(sText)
 
     ! ARGUMENTS
-    character (len=*), intent(inout)           :: sText1
-    character (len=:), allocatable :: sText
+    character (len=*), intent(in)           :: sText1
+    character (len=:), allocatable          :: sText
 
     ! LOCALS
+    character (len=:), allocatable :: sTemp
     character (len=512)            :: sBuf
     integer (kind=c_int)           :: iR                 ! Index in sRecord
     integer (kind=c_int)           :: iIndex1, iIndex2
@@ -566,17 +602,17 @@ end function fortran_to_c_string
       //"!@#$%^&*()_+-={}[]|\:;'<,>?/~`'"//sDOUBLE_QUOTE
 
     ! eliminate any leading spaces
-    sText1 = adjustl(sText1)
+    sTemp = adjustl(sText1)
     sBuf = ""
     iIndex2 = 0
 
     do iIndex1 = 1,len_trim(sText1)
 
-      iR = SCAN(sText1(iIndex1:iIndex1), sTargetCharacters_)
+      iR = SCAN(sTemp(iIndex1:iIndex1), sTargetCharacters_)
   
       if(iR==0) then
         iIndex2 = iIndex2 + 1
-        sBuf(iIndex2:iIndex2) = sText1(iIndex1:iIndex1)
+        sBuf(iIndex2:iIndex2) = sTemp(iIndex1:iIndex1)
       end if
 
     enddo

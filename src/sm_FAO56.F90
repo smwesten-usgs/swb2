@@ -6,29 +6,39 @@
 !>  Provide support for assessing the effect of irrigation on recharge
 !> values by estimating the irrigation required to maintain soil moisture levels
 !> for specific crop types.
-module et_crop_coefficients
+module sm_FAO56
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double
   use types
-  use control_file
   use parameters
 	use sm_thornthwaite_mather
   implicit none
 
   private
 
-  real (kind=c_float), allocatable   :: fREW(:,:)
-  real (kind=c_float), allocatable   :: fTEW(:,:)
-  real (kind=c_float), allocatable   :: iL_plant(:) 
-  real (kind=c_float), allocatable   :: iL_ini(:) 
-  real (kind=c_float), allocatable   :: iL_mid(:) 
-  real (kind=c_float), allocatable   :: iL_late(:) 
-  real (kind=c_float), allocatable   :: fKcb_ini(:)
-  real (kind=c_float), allocatable   :: fKcb_mid(:)
-  real (kind=c_float), allocatable   :: fKcb_end(:)
-  real (kind=c_float), allocatable   :: fKcb_min(:)
-  real (kind=c_float), allocatable   :: fDepletion_fraction(:)
-  real (kind=c_float), allocatable   :: fMean_plant_height(:)
+  type, public :: SM_FAO56_T
+
+    integer (kind=c_int), allocatable  :: iLanduseCode(:)
+    real (kind=c_float), allocatable   :: fREW(:,:)
+    real (kind=c_float), allocatable   :: fTEW(:,:)
+    real (kind=c_float), allocatable   :: iL_plant(:) 
+    real (kind=c_float), allocatable   :: iL_ini(:) 
+    real (kind=c_float), allocatable   :: iL_mid(:) 
+    real (kind=c_float), allocatable   :: iL_late(:) 
+    real (kind=c_float), allocatable   :: fKcb_ini(:)
+    real (kind=c_float), allocatable   :: fKcb_mid(:)
+    real (kind=c_float), allocatable   :: fKcb_end(:)
+    real (kind=c_float), allocatable   :: fKcb_min(:)
+    real (kind=c_float), allocatable   :: fDepletion_fraction(:)
+    real (kind=c_float), allocatable   :: fMean_plant_height(:)
+
+  contains
+
+    procedure, private   :: fao56_initialize
+
+  end type SM_FAO56_T
+
+  type (SM_FAO56_T) :: SM_FAO56_TABLE
 
   contains
 
@@ -57,8 +67,8 @@ module et_crop_coefficients
 
 
    !> Determine how many landuse codes are present
-   call PARAMS%get_values( slList, this%iLanduseCodes )
-   iNumberOfLanduses = count( this%iLanduseCodes > 0 )
+   call PARAMS%get_values( slList, this%iLanduseCode )
+   iNumberOfLanduses = count( this%iLanduseCode > 0 )
 
    allocate( REW(iNumberOfLanduses, iNumberOfREW), stat=iStat )
    call assert( iStat == 0, "Failed to allocate memory for readily evaporable water (REW) table", &
@@ -80,18 +90,18 @@ module et_crop_coefficients
      call PARAMS%get_values( sText, fTEW(:, iIndex) )
    enddo  
 
-   call PARAMS%get_values( "L_ini", iL_ini(:) )
-   call PARAMS%get_values( "L_mid", iL_mid(:) )
-   call PARAMS%get_values( "L_late", iL_late(:) )
-   call PARAMS%get_values( "L_min", iL_min(:) )
+   call PARAMS%get_values( "L_ini", this%iL_ini(:) )
+   call PARAMS%get_values( "L_mid", this%iL_mid(:) )
+   call PARAMS%get_values( "L_late", this%iL_late(:) )
+   call PARAMS%get_values( "L_min", this%iL_min(:) )
 
-   call PARAMS%get_values( "Kcb_ini", fKcb_ini(:) )
-   call PARAMS%get_values( "Kcb_mid", fKcb_mid(:) )
-   call PARAMS%get_values( "Kcb_end", fKcb_end(:) )
-   call PARAMS%get_values( "Kcb_min", fKcb_min(:) )
+   call PARAMS%get_values( "Kcb_ini", this%fKcb_ini(:) )
+   call PARAMS%get_values( "Kcb_mid", this%fKcb_mid(:) )
+   call PARAMS%get_values( "Kcb_end", this%fKcb_end(:) )
+   call PARAMS%get_values( "Kcb_min", this%fKcb_min(:) )
 
-   call PARAMS%get_values( "Depletion_Fraction", fDepletion_fraction(:) )
-   call PARAMS%get_values( "Mean_Plant_Height", fMean_plant_height(:) )
+   call PARAMS%get_values( "Depletion_Fraction", this%fDepletion_fraction(:) )
+   call PARAMS%get_values( "Mean_Plant_Height", this%fMean_plant_height(:) )
 
 
   end subroutine et_kc_initialize
@@ -113,10 +123,10 @@ module et_crop_coefficients
   ! [ LOCALS ]
   real (kind=c_double) :: fFrac
 
-  associate ( L_ini => iL_ini(iFAOIndex), L_mid => iL_mid(iFAOIndex), L_late => iL_late(iFAOIndex), &
-              L_plant => iL_plant(iFAOIndex), Kcb_ini => fKcb_ini(iFAOIndex),                       &
-              Kcb_dev => fKcb_dev(iFAOIndex), Kcb_mid => fKcb_mid(iFAOIndex),                       &
-              Kcb_end => fKcb_end(iFAOIndex) )
+  associate ( L_ini => this%iL_ini(iFAOIndex), L_mid => this%iL_mid(iFAOIndex), L_late => this%iL_late(iFAOIndex), &
+              L_plant => this%iL_plant(iFAOIndex), Kcb_ini => this%fKcb_ini(iFAOIndex),                            &
+              Kcb_dev => this%fKcb_dev(iFAOIndex), Kcb_mid => this%fKcb_mid(iFAOIndex),                            &
+              Kcb_end => this%fKcb_end(iFAOIndex) )
 
     ! now calculate Kcb for the given landuse
     if( iThreshold > L_late ) then
@@ -290,7 +300,7 @@ subroutine et_kc_CalcTotalAvailableWater(fTotalAvailableWater, fReadilyAvailable
   real (kind=c_float), intent(in)       :: fAvailableWaterCapacity
   real (kind=c_float), intent(in)       :: fCurrentRootingDepth
 
-  fTotalAvailableWater = fCurrentRootingDepth * fSoilWaterCapInput
+  fTotalAvailableWater = fCurrentRootingDepth * fAvailableWaterCapacity
   fReadilyAvailableWater = fTotalAvailableWater * fDepletion_fraction(iFAOIndex)
 
   end subroutine et_kc_CalcTotalAvailableWater
@@ -462,4 +472,4 @@ subroutine et_kc_ApplyCropCoefficients(pGrd, pConfig)
 
 end subroutine et_kc_ApplyCropCoefficients
 
-end module et_crop_coefficients
+end module sm_FAO56

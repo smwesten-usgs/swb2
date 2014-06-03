@@ -1,0 +1,1 @@
+gfortran-4.9 -O types_new.F90 constants_and_conversions.F90 file_operations.F90 exceptions.F90 logfiles.F90 datetime.F90 dictionary.F90 data_catalog_entry.F90 netcdf4_support.F90 netcdf_c_api_interfaces.F90 grid.F90 strings.F90 string_list.F90 loop_initialize.F90 main.F90 -o swbex 

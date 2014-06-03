@@ -80,8 +80,8 @@
 program main
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double
-  use types
-  use control
+  use logfiles
+  use loop_initialize
   use iso_fortran_env
 
   implicit none
@@ -118,26 +118,6 @@ program main
       //TRIM(int2char(__G95_MINOR__))
 #endif
 
-    write(UNIT=*,FMT="(a)") "Compilation options:"
-    write(UNIT=*,FMT="(a)") "----------------------------------"
-#ifdef STREAM_INTERACTIONS
-    write(UNIT=*,FMT="(a)") " STREAM_INTERACTIONS         yes"
-#else
-    write(UNIT=*,FMT="(a)") " STREAM_INTERACTIONS          no"
-#endif
-
-#ifdef STRICT_DATE_CHECKING
-    write(UNIT=*,FMT="(a)") " STRICT_DATE_CHECKING        yes"
-#else
-    write(UNIT=*,FMT="(a)") " STRICT_DATE_CHECKING         no"
-#endif
-
-#ifdef DEBUG_PRINT
-    write(UNIT=*,FMT="(a)") " DEBUG_PRINT                 yes"
-#else
-    write(UNIT=*,FMT="(a)") " DEBUG_PRINT                  no"
-#endif
-
     write(UNIT=*,FMT="(/,/,a,/)")    "Usage: swb [control file name]"
 
     stop
@@ -145,12 +125,21 @@ program main
   end if
 
   call GET_COMMAND_ARGUMENT(1,sControlFile)
+  
+  ! open and initialize logfiles
+  call LOGS%initialize( iLogLevel = LOG_DEBUG )
 
-  ! pass control to control module
-  call control_setModelOptions(sControlFile)
+  ! read control file
+  call read_control_file(sControlFile)
 
-  close(unit=LU_LOG)
+  call initialize_options()
+  
 
-  stop
+  call check_for_fatal_warnings()
+
+  call LOGS%close()
+
+
+
 
 end program main

@@ -1,7 +1,8 @@
 module dictionary
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
-  use constants_and_conversions, only : iTINYVAL, fTINYVAL
+  use constants_and_conversions, only : iTINYVAL, fTINYVAL, lTRUE, lFALSE
+  use logfiles
   use strings
   use string_list
   use exceptions
@@ -114,7 +115,8 @@ contains
     enddo
 
     if (.not. associated( pDict ) )  &
-      call warn("Failed to find a dictionary entry with a key value of "//dquote(sKey))
+      call warn( sMessage="Failed to find a dictionary entry with a key value of "//dquote(sKey), &
+        iLogLevel=LOG_DEBUG )
 
   end function get_entry_by_key_fn
  
@@ -145,7 +147,7 @@ contains
 
     if ( slString%count == 0 )  &
       call warn("Failed to find a dictionary entry that contains the value of "//dquote(sKey), &
-        __FILE__, __LINE__)
+        __FILE__, __LINE__, iLogLevel=LOG_DEBUG, lEcho=lFalse )
 
   end function grep_dictionary_key_names_fn
  
@@ -270,8 +272,9 @@ contains
     else
 
       call slString%append("<NA>")
-      call warn("Failed to find dictionary entry with a key value of "//dquote(sKey), &
-        __FILE__, __LINE__ )
+      call warn(sMessage="Failed to find a dictionary entry that contains the value of "//dquote(sKey), &
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
+
 
     endif  
 
@@ -431,9 +434,9 @@ contains
       iCount = iCount + 1
       sTempBuf = current%key
 
-      write(*, fmt="(/,a,a)") asCharacter(iCount),")  KEY: "//dquote(sTempBuf)
-      write(*, fmt="(t5,a)") " --ENTRIES--:"
-      call current%sl%print()
+      call LOGS%write( asCharacter(iCount)//")  KEY: "//dquote(sTempBuf), iLogLevel=LOG_DEBUG, lEcho=lFALSE, iTab=2 )
+      call LOGS%write( " --ENTRIES--:", iTab=5 )
+      call current%sl%print( iLU=LOGS%iUnitNum( LOG_DEBUG ) )
 
       current => current%next
 

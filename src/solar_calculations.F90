@@ -5,6 +5,9 @@ module solar_calculations
   use exceptions
   implicit none
 
+  real (kind=c_float) :: EARTH_SUN_DIST_Dr
+  real (kind=c_float) :: SOLAR_DECLINATION_Delta
+
 contains  
 
   !> Calculate the number of daylight hours at a location.
@@ -591,11 +594,11 @@ contains
     ! [ LOCALS ]
     real (kind=c_double) :: rTempval
 
-    rTempval = sin( rAlpha ) * sin( rLatitude ) - sin( rDelta ) )          &
+    rTempval = ( sin( rAlpha ) * sin( rLatitude ) - sin( rDelta ) )          &
               /   ( cos( rAlpha ) * cos( rLatitude ) )
 
     ! avoid a NaN; cap value at 1.0
-    if ( abs( rTempval ) > 1.0 ) rTempval = sign( 1.0, rTempval )
+    if ( abs( rTempval ) > 1.0_c_double ) rTempval = sign( 1.0_c_double, rTempval )
 
     rPsi = acos( rTempval )
 

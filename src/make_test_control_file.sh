@@ -1,1 +1,1 @@
-gfortran-4.9 -O types_new.F90 constants_and_conversions.F90 file_operations.F90 exceptions.F90 dictionary.F90 strings.F90 string_list.F90 control_file.F90 test_control_file.F90 -o test_control_file 
+gfortran-4.9 -O types_new.F90 constants_and_conversions.F90 file_operations.F90 exceptions.F90 dictionary.F90 strings.F90 string_list.F90 loop_initialize.F90 test_control_file.F90 -o test_control_file 
