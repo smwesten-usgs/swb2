@@ -146,8 +146,8 @@ contains
     enddo
 
     if ( slString%count == 0 )  &
-      call warn("Failed to find a dictionary entry that contains the value of "//dquote(sKey), &
-        __FILE__, __LINE__, iLogLevel=LOG_DEBUG, lEcho=lFalse )
+      call warn(sMessage="Failed to find a dictionary entry that contains the value of " , &     ! //dquote(sKey), &
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFalse )
 
   end function grep_dictionary_key_names_fn
  
