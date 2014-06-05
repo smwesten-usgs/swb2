@@ -271,7 +271,8 @@ contains
 
           case default
 
-          call warn("Unknown directive present. Ignoring. Directive is: "//dquote(sCmdText) )
+          call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
+              //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
 
         end select
 
@@ -444,7 +445,8 @@ contains
 
           case default
 
-            call warn("Unknown directive present. Ignoring. Directive is: "//dquote(sCmdText) )
+            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
+              //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
  
         end select
 
@@ -614,7 +616,8 @@ contains
 
           case default
 
-            call warn("Unknown directive present. Ignoring. Directive is: "//dquote(sCmdText) )
+            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
+              //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
  
         end select
 
@@ -671,7 +674,7 @@ contains
 
     else
 
-      call warn("Wrong number of entries present for grid specification", lFatal=lTRUE)
+      call warn("Grid specification is flawed.", lFatal=lTRUE )
 
     endif
 
@@ -769,7 +772,8 @@ contains
 
           case default
 
-            call warn("Unknown directive present. Ignoring. Directive is: "//dquote(sCmdText) )
+            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
+              //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
  
         end select
 
@@ -872,7 +876,8 @@ contains
 
           case default
 
-            call warn("Unknown directive present. Ignoring. Directive is: "//dquote(sCmdText) )
+            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
+              //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
  
         end select
 
@@ -981,7 +986,8 @@ contains
 
           case default
 
-            call warn("Unknown directive present. Ignoring. Directive is: "//dquote(sCmdText) )
+            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
+              //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
  
         end select
 
@@ -1088,7 +1094,8 @@ contains
 
           case default
 
-            call warn("Unknown directive present. Ignoring. Directive is: "//dquote(sCmdText) )
+            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
+              //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
  
         end select
 
@@ -1113,7 +1120,10 @@ contains
     character (len=:), allocatable   :: sArgText
     integer (kind=c_int)             :: iStat
     type (PARAMETER_FILES_T)         :: PARAM_FILES
+    integer (kind=c_int)             :: iCount
 
+
+    iCount = 0
 
     myDirectives = CF_DICT%grep_keys("LOOKUP_TABLE")
       
@@ -1151,16 +1161,18 @@ contains
           case ( "LOOKUP_TABLE", "LANDUSE_LOOKUP_TABLE", "IRRIGATION_LOOKUP_TABLE", "LAND_USE_LOOKUP_TABLE" )
 
             call PARAM_FILES%add( sOptionText )
+            iCount = iCount + 1
 
           case default
 
-            call warn("Unknown directive present. Ignoring. Directive is: "//dquote(sCmdText) )
-
+            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
+              //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
+        
         end select
 
       enddo  
 
-      if ( myDirectives%count > 0 ) then
+      if ( iCount > 0 ) then
 
         call PARAM_FILES%munge()
         call PARAMS%print_all()       

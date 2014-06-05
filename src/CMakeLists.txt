@@ -2,6 +2,8 @@
 if(TARGET__SWB_EXECUTABLE)
 
   add_executable(swb
+            cell_class.F90
+            cell_collection.F90
             constants_and_conversions.F90
             #data_catalog.F90
 		data_catalog_entry.F90
@@ -13,6 +15,7 @@ if(TARGET__SWB_EXECUTABLE)
             exceptions.F90
             file_operations.F90
             grid.F90
+            interception_bucket.F90
             logfiles.F90
             loop_initialize.F90
             main.F90

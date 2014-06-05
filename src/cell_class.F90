@@ -3,6 +3,7 @@ module cell_class
   use iso_c_binding
   use constants_and_conversions
   use et_hargreaves
+  use interception_bucket
   implicit none
 
   private
@@ -124,6 +125,16 @@ module cell_class
 contains
 
   !! implementations of the interfaces above
+
+  subroutine set_interception_method_sub(this)
+
+    class (CELL_NORMAL_T), intent(inout)   :: this
+
+    this%interception_init_method_ptr => INTERCEPTION_BUCKET%initialize()
+    this%interception_method_ptr => INTERCEPTION_BUCKET%calculate()
+
+  end subroutine set_interception_method_sub
+
 
   subroutine et_hargreaves_samani(this)
 

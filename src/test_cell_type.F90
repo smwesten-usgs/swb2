@@ -4,7 +4,7 @@ program test_cell_type
   use cell_collection
   implicit none
 
-  call CELLS%initialize(2, 2, reshape( source=[1,1,0,1], shape=[2,2] ) )
+  call CELLS%initialize(4, 4, reshape( source=[1,1,0,1, 0,1,0,0, 0,1,1,1, 1,1,0,0], shape=[4,4] ) )
 
 
 

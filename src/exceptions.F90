@@ -97,11 +97,11 @@ contains
     call LOGS%write("possible error:  "//trim(sMessage), iTab=12 )
 
     if (present(sModule))  &
-      call LOGS%write("module:  "//trim(sModule), iTab=21 )
+      call LOGS%write("module:  "//trim(sModule), iTab=20 )
 
     if (present(iLine)) then
       write(sBuf, fmt="(i0)") iLine
-      call LOGS%write("line no:  "//trim(sBuf), iTab=16 )
+      call LOGS%write("line no:  "//trim(sBuf), iTab=19 )
     endif  
 
     if (present(sHints)) &
