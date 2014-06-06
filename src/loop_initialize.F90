@@ -2,6 +2,8 @@ module loop_initialize
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
   use constants_and_conversions, only : lTRUE, lFALSE, asFloat
+  use cell_class
+  use cell_collection
   use data_catalog_entry
   use dictionary
   use exceptions
@@ -88,6 +90,7 @@ contains
     call initialize_soils_group_options()
     call initialize_landuse_options()
     call initialize_parameter_tables()
+    call initialize_interception_method()
 
 
   end subroutine initialize_options
@@ -641,6 +644,7 @@ contains
     integer (kind=c_int)             :: iStat
     real (kind=c_double)             :: rX0, rX1, rY0, rY1, rGridCellSize
     integer (kind=c_int)             :: iNX, iNY
+    real (kind=c_float)              :: fTempVal
 
 
     ! For this directive, obtain the associated dictionary entries
@@ -662,19 +666,24 @@ contains
 
       rGridCellSize = asDouble( myOptions%get(5) )
 
-      pGrd => grid_Create(iNX, iNY, rX0, rY0, rGridCellSize, GRID_DATATYPE_ALL) 
+      !pGrd => grid_Create(iNX, iNY, rX0, rY0, rGridCellSize, GRID_DATATYPE_ALL) 
+      call CELLS%initialize(iNX, iNY, rX0, rY0, rGridCellSize)
 
     elseif ( myOptions%count == 7 ) then
 
-      rX0 = asDouble( myOptions%get(5) )
-      rY0 = asDouble( myOptions%get(6) )
+      rX1 = asDouble( myOptions%get(5) )
+      rY1 = asDouble( myOptions%get(6) )
       rGridCellSize = asDouble( myOptions%get(7) )
 
-      pGrd => grid_Create(iNX, iNY, rX0, rY0, rX1, rY1, GRID_DATATYPE_ALL)
+      fTempVal = ( rX1 - rX0 ) / real(iNX, kind=c_double)
+      
+
+      !pGrd => grid_Create(iNX, iNY, rX0, rY0, rX1, rY1, GRID_DATATYPE_ALL)
+      call CELLS%initialize(iNX, iNY, rX0, rY0, rGridCellSize)
 
     else
 
-      call warn("Grid specification is flawed.", lFatal=lTRUE )
+      call warn("Grid specification is flawed or missing.", lFatal=lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
     endif
 
@@ -700,7 +709,7 @@ contains
 
     if ( myDirectives%count == 0 ) then
       call warn("Your control file seems to be missing any of the required directives relating to FLOW_DIRECTION", &
-        lFatal = lTRUE )
+        lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
     else  
     
       allocate(FLOWDIR, stat=iStat)
@@ -804,7 +813,7 @@ contains
 
     if ( myDirectives%count == 0 ) then
       call warn("Your control file seems to be missing any of the required directives relating to WATER_CAPACITY", &
-        lFatal = lTRUE )
+        lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
     else  
     
       allocate(AWC, stat=iStat)
@@ -913,7 +922,7 @@ contains
     if ( myDirectives%count == 0 ) then
 
       call warn("Your control file seems to be missing any of the required directives relating to SOILS_GROUP", &
-        lFatal = lTRUE )
+        lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
     else  
     
@@ -1021,7 +1030,7 @@ contains
     if ( myDirectives%count == 0 ) then
 
       call warn("Your control file seems to be missing any of the required directives relating to LANDUSE", &
-        lFatal = lTRUE )
+        lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
     else  
     
@@ -1183,6 +1192,75 @@ contains
 
   end subroutine initialize_parameter_tables
 
+
+    subroutine initialize_interception_method()
+
+    ! [ LOCALS ]
+    type (STRING_LIST_T)             :: myDirectives
+    type (STRING_LIST_T)             :: myOptions  
+    integer (kind=c_int)             :: iIndex
+    character (len=:), allocatable   :: sCmdText
+    character (len=:), allocatable   :: sOptionText
+    character (len=:), allocatable   :: sArgText
+    integer (kind=c_int)             :: iStat
+
+
+    myDirectives = CF_DICT%grep_keys("INTERCEPTION")
+      
+    if ( myDirectives%count == 0 ) then
+
+      call warn("Your control file seems to be missing any of the required directives relating to INTERCEPTION method.", &
+        lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+
+    else  
+    
+      call LOGS%set_loglevel( LOG_ALL )
+      call LOGS%set_echo( lFALSE )
+
+      do iIndex = 1, myDirectives%count
+
+        ! myDirectives is a string list of all SWB directives that contain the phrase "LANDUSE"
+        ! sCmdText contains an individual directive
+        sCmdText = myDirectives%get(iIndex)
+
+        ! For this directive, obtain the associated dictionary entries
+        call CF_DICT%get_values(sCmdText, myOptions )
+
+        ! dictionary entries are initially space-delimited; sArgText contains
+        ! all dictionary entries present, concatenated, with a space between entries
+        sArgText = myOptions%get(1, myOptions%count )
+
+        ! echo the original directive and dictionary entries to the logfile
+        call LOGS%write(">> "//sCmdText//" "//sArgText)
+
+        ! most of the time, we only care about the first dictionary entry, obtained below
+        sOptionText = myOptions%get(1)
+
+        select case ( sCmdText )
+
+          case ( "INTERCEPTION_METHOD" )
+
+            sArgText = myOptions%get(2)
+
+            select case (sOptionText)
+
+              case ( "BUCKET" )
+
+                call CELLS%cell%set_interception("BUCKET")
+
+            end select
+            
+          case default
+          
+        end select
+        
+      enddo
+      
+    endif
+    
+
+
+  end subroutine initialize_interception_method
 
 !--------------------------------------------------------------------------------------------------  
 

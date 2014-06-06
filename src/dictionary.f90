@@ -301,7 +301,7 @@ contains
 
     class (DICT_T)                                  :: this
     type (STRING_LIST_T), intent(in)                :: slKeys
-    integer (kind=c_int), allocatable, intent(out)  :: iValues(:)
+    integer (kind=c_int), allocatable, intent(inout)  :: iValues(:)
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
@@ -349,7 +349,7 @@ contains
 
     class (DICT_T)                                  :: this
     type (STRING_LIST_T), intent(in)                :: slKeys
-    real (kind=c_float), allocatable, intent(out)   :: fValues(:)
+    real (kind=c_float), allocatable, intent(inout)   :: fValues(:)
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
@@ -388,9 +388,9 @@ contains
 
   subroutine get_values_as_float_sub(this, sKey, fValues)
 
-    class (DICT_T)                                  :: this
-    character (len=*), intent(in)                   :: sKey
-    real (kind=c_float), allocatable, intent(out)   :: fValues(:)
+    class (DICT_T)                                    :: this
+    character (len=*), intent(in)                     :: sKey
+    real (kind=c_float), allocatable, intent(inout)   :: fValues(:)
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget

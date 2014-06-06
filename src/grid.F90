@@ -19,8 +19,8 @@ module swb_grid
 
   integer (kind=c_int), public, parameter :: GRID_DATATYPE_INT = 0
   integer (kind=c_int), public, parameter :: GRID_DATATYPE_REAL = 1
-  integer (kind=c_int), public, parameter :: GRID_DATATYPE_CELL_GRID = 2
-  integer (kind=c_int), public, parameter :: GRID_DATATYPE_ALL = 3
+!   integer (kind=c_int), public, parameter :: GRID_DATATYPE_CELL_GRID = 2
+!   integer (kind=c_int), public, parameter :: GRID_DATATYPE_ALL = 3
 
   integer (kind=c_int), public, parameter :: OUTPUT_SURFER = 0
   integer (kind=c_int), public, parameter :: OUTPUT_ARC = 1
@@ -46,25 +46,26 @@ module swb_grid
 
 
   type, public :: GENERAL_GRID_T
-!      integer (kind=c_int) :: iGridType            ! One of the grid type options above
-      integer (kind=c_int) :: iNX                   ! Number of cells in the x-direction
-      integer (kind=c_int) :: iNY                   ! Number of cells in the y-direction
-      integer (kind=c_int) :: iNumGridCells         ! Total number of grid cells
-      integer (kind=c_int) :: iDataType             ! Data type contained in the grid (integer, real, SWB cell)
-      character (len=256)  :: sProj4_string         ! proj4 string defining coordinate system of grid
-      character (len=256)  :: sFilename             ! original file name that the data was read from
-      real (kind=c_double)    :: rGridCellSize         ! size of one side of a grid cell
-      integer (kind=c_int) :: iLengthUnits= -99999  ! length units code
-      real (kind=c_double)    :: rX0, rX1              ! World-coordinate range in X
-      real (kind=c_double)    :: rY0, rY1              ! World-coordinate range in Y
-      integer (kind=c_int), dimension(:,:), pointer :: iData ! Integer data
-      integer (kind=c_int) :: iNoDataValue = -99999
-      real (kind=c_float) :: rNoDataValue = -99999.0
-      real (kind=c_float), dimension(:,:), pointer :: rData    ! Real data
-      real (kind=c_double), dimension(:,:), allocatable :: rX    ! x coordinate associated with data
-      real (kind=c_double), dimension(:,:), allocatable :: rY    ! y coordinate associated with data
-      integer (kind=c_int), dimension(:,:), allocatable :: iMask ! Mask for processing results
-      type (T_CELL), dimension(:,:), pointer :: Cells        ! T_CELL objects
+    integer (kind=c_int)            :: iNX                   ! Number of cells in the x-direction
+    integer (kind=c_int)            :: iNY                   ! Number of cells in the y-direction
+    integer (kind=c_int)            :: iNumGridCells         ! Total number of grid cells
+    integer (kind=c_int)            :: iDataType             ! Data type contained in the grid (integer, real, SWB cell)
+    character (len=:), allocatable  :: sProj4_string         ! proj4 string defining coordinate system of grid
+    character (len=:), allocatable  :: sFilename             ! original file name that the data was read from
+    real (kind=c_double)            :: rGridCellSize         ! size of one side of a grid cell
+    integer (kind=c_int)            :: iLengthUnits= -99999  ! length units code
+    real (kind=c_double)            :: rX0, rX1              ! World-coordinate range in X
+    real (kind=c_double)            :: rY0, rY1              ! World-coordinate range in Y
+    
+    integer (kind=c_int), dimension(:,:), pointer     :: iData ! Integer data
+    real (kind=c_float), dimension(:,:), pointer      :: rData    ! Real data
+    real (kind=c_double), dimension(:,:), allocatable :: rX    ! x coordinate associated with data
+    real (kind=c_double), dimension(:,:), allocatable :: rY    ! y coordinate associated with data
+    integer (kind=c_int), dimension(:,:), allocatable :: iMask ! Mask for processing results
+
+    integer (kind=c_int)                    :: iNoDataValue = -99999
+    real (kind=c_float)                     :: rNoDataValue = -99999.0
+!      type (T_CELL), dimension(:,:), pointer :: Cells        ! T_CELL objects
   end type GENERAL_GRID_T
 
 
@@ -77,62 +78,62 @@ module swb_grid
   end type GRID_BOUNDS_T
 
 
-  type T_ERROR_MESSAGE
+  type ERROR_MESSAGE_T
     character(len=40) :: cErrorMessageText
     integer           :: iErrorNumber
-  end type T_ERROR_MESSAGE
+  end type ERROR_MESSAGE_T
 
   ! error messages adapted from file "pj_strerrno.c" in PROJ.4.8.0
-  type(T_ERROR_MESSAGE), dimension(49) :: tErrorMessage = (/ &
-    T_ERROR_MESSAGE("no arguments in initialization list          ",  -1), &
-    T_ERROR_MESSAGE("no options found in 'init' file              ",  -2), &
-    T_ERROR_MESSAGE("no colon in init= string                     ",  -3), &
-    T_ERROR_MESSAGE("projection not named                         ",  -4), &
-    T_ERROR_MESSAGE("unknown projection id                        ",  -5), &
-    T_ERROR_MESSAGE("effective eccentricity = 1.                  ",  -6), &
-    T_ERROR_MESSAGE("unknown unit conversion id                   ",  -7), &
-    T_ERROR_MESSAGE("invalid boolean param argument               ",  -8), &
-    T_ERROR_MESSAGE("unknown elliptical parameter name            ",  -9), &
-    T_ERROR_MESSAGE("reciprocal flattening (1/f) = 0              ", -10), &
-    T_ERROR_MESSAGE("|radius reference latitude| > 90             ", -11), &
-    T_ERROR_MESSAGE("squared eccentricity < 0                     ", -12), &
-    T_ERROR_MESSAGE("major axis or radius = 0 or not given        ", -13), &
-    T_ERROR_MESSAGE("latitude or longitude exceeded limits        ", -14), &
-    T_ERROR_MESSAGE("invalid x or y                               ", -15), &
-    T_ERROR_MESSAGE("improperly formed DMS value                  ", -16), &
-    T_ERROR_MESSAGE("non-convergent inverse meridional dist       ", -17), &
-    T_ERROR_MESSAGE("non-convergent inverse phi2                  ", -18), &
-    T_ERROR_MESSAGE("acos/asin: |arg| >1.+1e-14                   ", -19), &
-    T_ERROR_MESSAGE("tolerance condition error                    ", -20), &
-    T_ERROR_MESSAGE("conic lat_1 = -lat_2                         ", -21), &
-    T_ERROR_MESSAGE("lat_1 >= 90                                  ", -22), &
-    T_ERROR_MESSAGE("lat_1 = 0                                    ", -23), &
-    T_ERROR_MESSAGE("lat_ts >= 90                                 ", -24), &
-    T_ERROR_MESSAGE("no distance between control points           ", -25), &
-    T_ERROR_MESSAGE("projection not selected to be rotated        ", -26), &
-    T_ERROR_MESSAGE("W <= 0 or M <= 0                             ", -27), &
-    T_ERROR_MESSAGE("lsat not in 1-5 range                        ", -28), &
-    T_ERROR_MESSAGE("path not in range                            ", -29), &
-    T_ERROR_MESSAGE("h <= 0                                       ", -30), &
-    T_ERROR_MESSAGE("k <= 0                                       ", -31), &
-    T_ERROR_MESSAGE("lat_0 = 0 or 90 or alpha = 90                ", -32), &
-    T_ERROR_MESSAGE("lat_1=lat_2 or lat_1=0 or lat_2=90           ", -33), &
-    T_ERROR_MESSAGE("elliptical usage required                    ", -34), &
-    T_ERROR_MESSAGE("invalid UTM zone number                      ", -35), &
-    T_ERROR_MESSAGE("arg(s) out of range for Tcheby eval          ", -36), &
-    T_ERROR_MESSAGE("failed to find projection to be rotated      ", -37), &
-    T_ERROR_MESSAGE("failed to load datum shift file              ", -38), &
-    T_ERROR_MESSAGE("both n ), & m must be spec'd and > 0         ", -39), &
-    T_ERROR_MESSAGE("n <= 0, n > 1 or not specified               ", -40), &
-    T_ERROR_MESSAGE("lat_1 or lat_2 not specified                 ", -41), &
-    T_ERROR_MESSAGE("|lat_1| == |lat_2|                           ", -42), &
-    T_ERROR_MESSAGE("lat_0 is pi/2 from mean lat                  ", -43), &
-    T_ERROR_MESSAGE("unparseable coordinate system definition     ", -44), &
-    T_ERROR_MESSAGE("geocentric transformation missing z or ellps ", -45), &
-    T_ERROR_MESSAGE("unknown prime meridian conversion id         ", -46), &
-    T_ERROR_MESSAGE("illegal axis orientation combination         ", -47), &
-    T_ERROR_MESSAGE("point not within available datum shift grids ", -48), &
-    T_ERROR_MESSAGE("invalid sweep axis, choose x or y            ", -49) /)
+  type(ERROR_MESSAGE_T), dimension(49) :: tErrorMessage = (/ &
+    ERROR_MESSAGE_T("no arguments in initialization list          ",  -1), &
+    ERROR_MESSAGE_T("no options found in 'init' file              ",  -2), &
+    ERROR_MESSAGE_T("no colon in init= string                     ",  -3), &
+    ERROR_MESSAGE_T("projection not named                         ",  -4), &
+    ERROR_MESSAGE_T("unknown projection id                        ",  -5), &
+    ERROR_MESSAGE_T("effective eccentricity = 1.                  ",  -6), &
+    ERROR_MESSAGE_T("unknown unit conversion id                   ",  -7), &
+    ERROR_MESSAGE_T("invalid boolean param argument               ",  -8), &
+    ERROR_MESSAGE_T("unknown elliptical parameter name            ",  -9), &
+    ERROR_MESSAGE_T("reciprocal flattening (1/f) = 0              ", -10), &
+    ERROR_MESSAGE_T("|radius reference latitude| > 90             ", -11), &
+    ERROR_MESSAGE_T("squared eccentricity < 0                     ", -12), &
+    ERROR_MESSAGE_T("major axis or radius = 0 or not given        ", -13), &
+    ERROR_MESSAGE_T("latitude or longitude exceeded limits        ", -14), &
+    ERROR_MESSAGE_T("invalid x or y                               ", -15), &
+    ERROR_MESSAGE_T("improperly formed DMS value                  ", -16), &
+    ERROR_MESSAGE_T("non-convergent inverse meridional dist       ", -17), &
+    ERROR_MESSAGE_T("non-convergent inverse phi2                  ", -18), &
+    ERROR_MESSAGE_T("acos/asin: |arg| >1.+1e-14                   ", -19), &
+    ERROR_MESSAGE_T("tolerance condition error                    ", -20), &
+    ERROR_MESSAGE_T("conic lat_1 = -lat_2                         ", -21), &
+    ERROR_MESSAGE_T("lat_1 >= 90                                  ", -22), &
+    ERROR_MESSAGE_T("lat_1 = 0                                    ", -23), &
+    ERROR_MESSAGE_T("lat_ts >= 90                                 ", -24), &
+    ERROR_MESSAGE_T("no distance between control points           ", -25), &
+    ERROR_MESSAGE_T("projection not selected to be rotated        ", -26), &
+    ERROR_MESSAGE_T("W <= 0 or M <= 0                             ", -27), &
+    ERROR_MESSAGE_T("lsat not in 1-5 range                        ", -28), &
+    ERROR_MESSAGE_T("path not in range                            ", -29), &
+    ERROR_MESSAGE_T("h <= 0                                       ", -30), &
+    ERROR_MESSAGE_T("k <= 0                                       ", -31), &
+    ERROR_MESSAGE_T("lat_0 = 0 or 90 or alpha = 90                ", -32), &
+    ERROR_MESSAGE_T("lat_1=lat_2 or lat_1=0 or lat_2=90           ", -33), &
+    ERROR_MESSAGE_T("elliptical usage required                    ", -34), &
+    ERROR_MESSAGE_T("invalid UTM zone number                      ", -35), &
+    ERROR_MESSAGE_T("arg(s) out of range for Tcheby eval          ", -36), &
+    ERROR_MESSAGE_T("failed to find projection to be rotated      ", -37), &
+    ERROR_MESSAGE_T("failed to load datum shift file              ", -38), &
+    ERROR_MESSAGE_T("both n ), & m must be spec'd and > 0         ", -39), &
+    ERROR_MESSAGE_T("n <= 0, n > 1 or not specified               ", -40), &
+    ERROR_MESSAGE_T("lat_1 or lat_2 not specified                 ", -41), &
+    ERROR_MESSAGE_T("|lat_1| == |lat_2|                           ", -42), &
+    ERROR_MESSAGE_T("lat_0 is pi/2 from mean lat                  ", -43), &
+    ERROR_MESSAGE_T("unparseable coordinate system definition     ", -44), &
+    ERROR_MESSAGE_T("geocentric transformation missing z or ellps ", -45), &
+    ERROR_MESSAGE_T("unknown prime meridian conversion id         ", -46), &
+    ERROR_MESSAGE_T("illegal axis orientation combination         ", -47), &
+    ERROR_MESSAGE_T("point not within available datum shift grids ", -48), &
+    ERROR_MESSAGE_T("invalid sweep axis, choose x or y            ", -49) /)
 
   public :: grid_gridToGrid, grid_Create, grid_Destroy, grid_Read
   public :: grid_CheckForPROJ4Error, grid_CompletelyCover
@@ -222,29 +223,29 @@ function grid_CreateComplete ( iNX, iNY, rX0, rY0, rX1, rY1, iDataType ) result 
               TRIM(__FILE__),__LINE__)
           pGrd%rData = rZERO
 
-      case ( GRID_DATATYPE_CELL_GRID )
-          allocate ( pGrd%Cells( iNX, iNY ), stat=iStat )
-          call assert (iStat == 0, &
-             "Could not allocate cell-by-cell data", &
-             TRIM(__FILE__),__LINE__)
+!       case ( GRID_DATATYPE_CELL_GRID )
+!           allocate ( pGrd%Cells( iNX, iNY ), stat=iStat )
+!           call assert (iStat == 0, &
+!              "Could not allocate cell-by-cell data", &
+!              TRIM(__FILE__),__LINE__)
 
-      case ( GRID_DATATYPE_ALL )
-          allocate ( pGrd%iData( iNX, iNY ), stat=iStat )
-          call assert (iStat == 0, &
-             "Could not allocate integer data", &
-              TRIM(__FILE__),__LINE__)
-              pGrd%iData = 0
+!       case ( GRID_DATATYPE_ALL )
+!           allocate ( pGrd%iData( iNX, iNY ), stat=iStat )
+!           call assert (iStat == 0, &
+!              "Could not allocate integer data", &
+!               TRIM(__FILE__),__LINE__)
+!               pGrd%iData = 0
 
-          allocate ( pGrd%rData( iNX, iNY ), stat=iStat )
-          call assert (iStat == 0, &
-             "Could not allocate real data", &
-              TRIM(__FILE__),__LINE__)
-              pGrd%rData = 0.0
+!           allocate ( pGrd%rData( iNX, iNY ), stat=iStat )
+!           call assert (iStat == 0, &
+!              "Could not allocate real data", &
+!               TRIM(__FILE__),__LINE__)
+!               pGrd%rData = 0.0
 
-          allocate ( pGrd%Cells( iNX, iNY ), stat=iStat )
-          call assert (iStat == 0, &
-             "Could not allocate cell-by-cell data", &
-             TRIM(__FILE__),__LINE__)
+!           allocate ( pGrd%Cells( iNX, iNY ), stat=iStat )
+!           call assert (iStat == 0, &
+!              "Could not allocate cell-by-cell data", &
+!              TRIM(__FILE__),__LINE__)
 
       case default
           call assert ( lFALSE, 'Internal error -- illegal grid data type' )
@@ -301,29 +302,29 @@ function grid_CreateSimple ( iNX, iNY, rX0, rY0, rGridCellSize, iDataType ) resu
               TRIM(__FILE__),__LINE__)
           pGrd%rData = rZERO
 
-      case ( GRID_DATATYPE_CELL_GRID )
-          allocate ( pGrd%Cells( iNX, iNY ), stat=iStat )
-          call assert (iStat == 0, &
-             "Could not allocate cell-by-cell data", &
-             TRIM(__FILE__),__LINE__)
+!       case ( GRID_DATATYPE_CELL_GRID )
+!           allocate ( pGrd%Cells( iNX, iNY ), stat=iStat )
+!           call assert (iStat == 0, &
+!              "Could not allocate cell-by-cell data", &
+!              TRIM(__FILE__),__LINE__)
 
-      case ( GRID_DATATYPE_ALL )
-          allocate ( pGrd%iData( iNX, iNY ), stat=iStat )
-          call assert (iStat == 0, &
-             "Could not allocate integer data", &
-              TRIM(__FILE__),__LINE__)
-              pGrd%iData = 0
+!       case ( GRID_DATATYPE_ALL )
+!           allocate ( pGrd%iData( iNX, iNY ), stat=iStat )
+!           call assert (iStat == 0, &
+!              "Could not allocate integer data", &
+!               TRIM(__FILE__),__LINE__)
+!               pGrd%iData = 0
 
-          allocate ( pGrd%rData( iNX, iNY ), stat=iStat )
-          call assert (iStat == 0, &
-             "Could not allocate real data", &
-              TRIM(__FILE__),__LINE__)
-              pGrd%rData = 0.0
+!           allocate ( pGrd%rData( iNX, iNY ), stat=iStat )
+!           call assert (iStat == 0, &
+!              "Could not allocate real data", &
+!               TRIM(__FILE__),__LINE__)
+!               pGrd%rData = 0.0
 
-          allocate ( pGrd%Cells( iNX, iNY ), stat=iStat )
-          call assert (iStat == 0, &
-             "Could not allocate cell-by-cell data", &
-             TRIM(__FILE__),__LINE__)
+!           allocate ( pGrd%Cells( iNX, iNY ), stat=iStat )
+!           call assert (iStat == 0, &
+!              "Could not allocate cell-by-cell data", &
+!              TRIM(__FILE__),__LINE__)
 
       case default
           call assert ( lFALSE, 'Internal error -- illegal grid data type' )
@@ -381,16 +382,16 @@ subroutine grid_Destroy ( pGrd )
     else if ( pGrd%iDataType == GRID_DATATYPE_REAL ) then
       deallocate ( pGrd%rData, stat=iStat )
       call assert ( iStat == 0, "Failed to deallocate real grid" )
-    else if ( pGrd%iDataType == GRID_DATATYPE_CELL_GRID ) then
-      deallocate ( pGrd%Cells, stat=iStat )
-      call assert ( iStat == 0, "Failed to deallocate cell grid" )
-    else if ( pGrd%iDataType == GRID_DATATYPE_ALL ) then
-      deallocate ( pGrd%iData, stat=iStat )
-      call assert ( iStat == 0, "Failed to deallocate integer grid" )
-      deallocate ( pGrd%rData, stat=iStat )
-      call assert ( iStat == 0, "Failed to deallocate real grid" )
-      deallocate ( pGrd%Cells, stat=iStat )
-      call assert ( iStat == 0, "Failed to deallocate cell grid" )
+!     else if ( pGrd%iDataType == GRID_DATATYPE_CELL_GRID ) then
+!       deallocate ( pGrd%Cells, stat=iStat )
+!       call assert ( iStat == 0, "Failed to deallocate cell grid" )
+!       else if ( pGrd%iDataType == GRID_DATATYPE_ALL ) then
+!       deallocate ( pGrd%iData, stat=iStat )
+!       call assert ( iStat == 0, "Failed to deallocate integer grid" )
+!       deallocate ( pGrd%rData, stat=iStat )
+!       call assert ( iStat == 0, "Failed to deallocate real grid" )
+!       deallocate ( pGrd%Cells, stat=iStat )
+!       call assert ( iStat == 0, "Failed to deallocate cell grid" )
     else
       call assert ( lFALSE, "Internal error -- unknown grid type", &
         trim(__FILE__), __LINE__)
@@ -1823,6 +1824,8 @@ function grid_GetGridColNum(pGrd,rX)  result(iColumnNumber)
 !  print *, "rX: ",rX
 !  print *, pGrd%rX0, pGrd%rX1, pGrd%iNX
 
+  !! this only works if the data are in the originally supplied projection. If the coordinates have been
+  !! transformed, there is no guarantee that the assumption used in this calculation will hold.
   iColumnNumber = NINT(real(pGrd%iNX, kind=c_double) &
                * ( rX - pGrd%rX0 ) / (pGrd%rX1 - pGrd%rX0) + 0.5_c_double, kind=c_int)
 
@@ -2051,13 +2054,57 @@ subroutine grid_DumpGridExtent(pGrd)
 end subroutine grid_DumpGridExtent
 
 !----------------------------------------------------------------------
+function grid_GridToPoint_int(pGrdFrom, pGrdTo, iCol, iRow)  result(iValue)
+
+  type ( GENERAL_GRID_T ), pointer :: pGrdFrom
+  type ( GENERAL_GRID_T ), pointer :: pGrdTo
+  integer (kind=c_int), intent(in) :: iCol
+  integer (kind=c_int), intent(in) :: iRow
+  integer (kind=c_int)             :: iValue
+
+  ! [ LOCALS ]
+  integer (kind=c_int), dimension(2) :: iColRow
+  integer (kind=c_int) :: iSrcCol, iSrcRow
+  integer (kind=c_int) :: iSpread
+
+  ! must ensure that there are coordinates associated with the "to" grid...
+  ! by default, these are left unpopulated during a "normal" swb run
+  if( .not. allocated(pGrdTo%rX)   )  call grid_PopulateXY(pGrdTo)
+  if( .not. allocated(pGrdFrom%rX) )  call grid_PopulateXY(pGrdFrom)
+
+  iColRow = grid_GetGridColRowNum(pGrd=pGrdFrom, &
+             rX=real(pGrdTo%rX(iCol, iRow), kind=c_double), &
+             rY=real(pGrdTo%rY(iCol, iRow), kind=c_double))
+
+  if ( iColRow(COLUMN) < 1 .or. iColRow(COLUMN) > pGrdFrom%iNX )                       &
+    call die( "Illegal column number supplied: "//trim(asCharacter(iColRow(COLUMN))),  &
+      trim(__FILE__), __LINE__)
+
+  if ( iColRow(ROW) < 1 .or. iColRow(ROW) > pGrdFrom%iNY )                             &
+    call die( "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))),        &
+      trim(__FILE__), __LINE__)
+
+  !> @todo check the logic here...intent is to ensure that the majority filter is
+  !!       searching an area that adequately covers corresponding gridcell areas
+  iSpread = max(1, nint(pGrdTo%rGridCellSize / pGrdFrom%rGridCellSize / 2.))
+
+  iValue = grid_majorityFilter_int(pGrdFrom=pGrdFrom,  &
+             iTargetCol=iColRow(COLUMN), &
+             iTargetRow=iColRow(ROW), &
+             iNoDataValue=pGrdFrom%iNoDataValue, &
+             iSpread=iSpread)
+
+
+end function grid_GridToPoint_int
+
+
+!----------------------------------------------------------------------
 
 subroutine grid_GridToGrid_int(pGrdFrom, iArrayFrom, pGrdTo, iArrayTo)
 
-  ! [ ARGUMENTS ]
-  type ( GENERAL_GRID_T ),pointer :: pGrdFrom   ! pointer to source grid
-  type ( GENERAL_GRID_T ),pointer :: pGrdTo     ! pointer to destination grid
-  integer (kind=c_int), dimension(:,:) :: iArrayFrom
+  type ( GENERAL_GRID_T ), pointer                    :: pGrdFrom   ! pointer to source grid
+  type ( GENERAL_GRID_T ), pointer                    :: pGrdTo     ! pointer to destination grid
+  integer (kind=c_int), dimension(:,:)                :: iArrayFrom
   integer (kind=c_int), dimension(:,:), intent(inout) :: iArrayTo
 
 
@@ -2097,9 +2144,7 @@ subroutine grid_GridToGrid_int(pGrdFrom, iArrayFrom, pGrdTo, iArrayTo)
           "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))), &
           trim(__FILE__), __LINE__)
 
-        iArrayTo(iCol,iRow) = grid_majorityFilter_int(iValues=iArrayFrom, &
-          iNX=pGrdFrom%iNX, &
-          iNY=pGrdFrom%iNY, &
+        iArrayTo(iCol,iRow) = grid_majorityFilter_int( pGrdFrom=pGrdFrom, &
           iTargetCol=iColRow(COLUMN), &
           iTargetRow=iColRow(ROW), &
           iNoDataValue=pGrdFrom%iNoDataValue, &
@@ -2126,9 +2171,7 @@ subroutine grid_GridToGrid_int(pGrdFrom, iArrayFrom, pGrdTo, iArrayTo)
           "Illegal row number supplied: "//trim(asCharacter(iSrcRow)), &
           trim(__FILE__), __LINE__)
 
-        iArrayTo(iCol,iRow) = grid_majorityFilter_int(iValues=iArrayFrom, &
-          iNX=pGrdFrom%iNX, &
-          iNY=pGrdFrom%iNY, &
+        iArrayTo(iCol,iRow) = grid_majorityFilter_int( pGrdFrom=pGrdFrom, &
           iTargetCol=iSrcCol, &
           iTargetRow=iSrcRow, &
           iNoDataValue=pGrdFrom%iNoDataValue, &
@@ -2156,10 +2199,6 @@ subroutine grid_GridToGrid_short(pGrdFrom, iArrayFrom, pGrdTo, iArrayTo)
   integer (kind=c_int), dimension(2) :: iColRow
   integer (kind=c_int) :: iSpread
 
-  print *, trim(__FILE__), __LINE__
-  print *, pGrdTo%rGridCellSize
-  print *, pGrdFrom%rGridCellSize
-
   iSpread = max(1, nint(pGrdTo%rGridCellSize / pGrdFrom%rGridCellSize / 2.))
 
   ! must ensure that there are coordinates associated with the "to" grid...
@@ -2183,9 +2222,7 @@ subroutine grid_GridToGrid_short(pGrdFrom, iArrayFrom, pGrdTo, iArrayTo)
         trim(__FILE__), __LINE__)
 
 
-      iArrayTo(iCol,iRow) = grid_majorityFilter_int(iValues=iArrayFrom, &
-         iNX=pGrdFrom%iNX, &
-         iNY=pGrdFrom%iNY, &
+      iArrayTo(iCol,iRow) = grid_majorityFilter_int( pGrdFrom=pGrdFrom, &
          iTargetCol=iColRow(COLUMN), &
          iTargetRow=iColRow(ROW), &
          iNoDataValue=pGrdFrom%iNoDataValue, &
@@ -2198,13 +2235,11 @@ end subroutine grid_GridToGrid_short
 
 !----------------------------------------------------------------------
 
-subroutine grid_GridToGrid_sgl(pGrdFrom, rArrayFrom, pGrdTo, rArrayTo)
+subroutine grid_GridToGrid_sgl(pGrdFrom,  pGrdTo)
 
   ! [ ARGUMENTS ]
   type ( GENERAL_GRID_T ),pointer :: pGrdFrom   ! pointer to source grid
   type ( GENERAL_GRID_T ),pointer :: pGrdTo     ! pointer to destination grid
-  real (kind=c_float), dimension(:,:) :: rArrayFrom
-  real (kind=c_float), dimension(:,:), intent(inout) :: rArrayTo
 
   ! [ LOCALS ]
   integer (kind=c_int), dimension(2) :: iColRow
@@ -2240,7 +2275,7 @@ subroutine grid_GridToGrid_sgl(pGrdFrom, rArrayFrom, pGrdTo, rArrayTo)
           "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))), &
           trim(__FILE__), __LINE__)
 
-        rArrayTo(iCol,iRow) = rArrayFrom( iColRow(COLUMN), iColRow(ROW) )
+        pGrdTo%rData(iCol,iRow) = pGrdFrom%rData( iColRow(COLUMN), iColRow(ROW) )
 
 !         rArrayTo(iCol,iRow) = grid_Convolve_sgl(rValues=rArrayFrom, &
 !           iTargetCol=iColRow(COLUMN), &
@@ -2269,7 +2304,7 @@ subroutine grid_GridToGrid_sgl(pGrdFrom, rArrayFrom, pGrdTo, rArrayTo)
           "Illegal row number supplied: "//trim(asCharacter(iSrcRow)), &
           trim(__FILE__), __LINE__)
 
-        rArrayTo(iCol,iRow) = rArrayFrom( iSrcCol, iSrcRow )
+        pGrdTo%rData(iCol,iRow) = pGrdFrom%rData( iSrcCol, iSrcRow )
       enddo
     enddo
 
@@ -2281,13 +2316,10 @@ end subroutine grid_GridToGrid_sgl
 
 !----------------------------------------------------------------------
 
-function grid_MajorityFilter_int(iValues, iNX, iNY, iTargetCol, &
+function grid_MajorityFilter_int(pGrdFrom, iTargetCol, &
    iTargetRow, iNoDataValue, iSpread)  result(iRetVal)
 
-  ! [ ARGUMENTS ]
-  integer (kind=c_int), dimension(iNX, iNY) :: iValues
-  integer (kind=c_int) :: iNX
-  integer (kind=c_int) :: iNY
+  type ( GENERAL_GRID_T ),pointer :: pGrdFrom   ! pointer to source grid
   integer (kind=c_int) :: iTargetCol          ! column number of target cell
   integer (kind=c_int) :: iTargetRow          ! row number of target cell
   integer (kind=c_int) :: iNoDataValue
@@ -2311,57 +2343,42 @@ function grid_MajorityFilter_int(iValues, iNX, iNY, iTargetCol, &
   ! need to set a reasonable upper bound on the spread to consider
   iSpread = min(iSpread, 12)
 
-   do iRow=max(1,iTargetRow - iSpread), min(iNY, iTargetRow + iSpread)
-     do iCol=max(1,iTargetCol - iSpread), min(iNX, iTargetCol + iSpread)
+   do iRow=max(1,iTargetRow - iSpread), min(pGrdFrom%iNY, iTargetRow + iSpread)
+     do iCol=max(1,iTargetCol - iSpread), min(pGrdFrom%iNX, iTargetCol + iSpread)
 !
        iCellNum = iCellNum + 1
 !
        lMatch = lFALSE
 !
        do i=1, iLast
-         if (iValue(i) == iValues(iCol, iRow) ) then
+         if (iValue(i) == pGrdFrom%iData(iCol, iRow) ) then
            iCount(i) = iCount(i) + 1
            lMatch = lTRUE
            exit
          endif
        enddo
-!
+       
+       ! this integer value has not been found previously; add the value to the next position
+       ! and increment counter
        if (.not. lMatch) then
          iLast = iLast + 1
-         iValue(iLast) = iValues(iCol, iRow)
+         iValue(iLast) = pGrdFrom%iData(iCol, iRow)
          iCount(iLast) = iCount(iLast) + 1
          lMatch = lTRUE
        endif
-!
-!       if (iRow == iTargetRow .and. iCol == iTargetCol) then
-!         print *, "iCol, iRow, iValue, iMask: ", iCol, iRow, "[", iValues(iCol, iRow), "]", iMask(iCellNum)," {central cell}, value = ", iValues(iCol, iRow)
-!       else
-!         print *, "iCol, iRow, iValue, iMask: ", iCol, iRow, "[", iValues(iCol, iRow), "]", iMask(iCellNum)
-!       endif
 
      enddo
    enddo
-!
-!   print *, "values: ", iValue
-!   print *, "counts: ", iCount
-!
-!   iIndex = MAXLOC(iCount, mask=(iValue /= iNoDataValue), dim=1)
+
    iIndex = MAXLOC(iCount, dim=1)
-!
-!   print *, "index: ", iIndex
-!   print *, "return value: ", iValue(iIndex)
-!   print *, "------------------------------------------------------"
-!   print *, "  "
-!
    iRetVal = iValue(iIndex)
 
 end function grid_majorityFilter_int
 
-function grid_Convolve_sgl(rValues, iTargetCol, &
+function grid_Convolve_sgl( pGrdFrom, iTargetCol, &
    iTargetRow, rKernel, rNoDataValue)  result(rRetVal)
 
-  ! [ ARGUMENTS ]
-  real (kind=c_float), dimension(:,:) :: rValues
+  type ( GENERAL_GRID_T ),pointer :: pGrdFrom   ! pointer to source grid
   integer (kind=c_int) :: iNX
   integer (kind=c_int) :: iNY
   integer (kind=c_int) :: iTargetCol          ! column number of target cell
@@ -2384,8 +2401,8 @@ function grid_Convolve_sgl(rValues, iTargetCol, &
   iKernelSize = size(rKernel, dim=1)
   iIncValue = (iKernelSize - 1) / 2
 
-  iNX = ubound(rValues,1)
-  iNY = ubound(rValues,2)
+  iNX = ubound(pGrdFrom%rData,1)
+  iNY = ubound(pGrdFrom%rData,2)
 
   iRowMin = max(1,iTargetRow - iIncValue)
   iRowMax = min(iNY, iTargetRow + iIncValue)
@@ -2400,11 +2417,9 @@ function grid_Convolve_sgl(rValues, iTargetCol, &
     ! fall near the edge of the source grid. Ideally, the source grid will
     ! be greater than the target grid by a wide enough margin that this
     ! code will rarely be used.
-    rRetVal = rValues(iTargetCol, iTargetRow)
+    rRetVal = pGrdFrom%rData(iTargetCol, iTargetRow)
 
   else
-
-!    rRetVal = sum(rValues(iColMin:iColMax, iRowMin:iRowMax) * rKernel ) / sum( rKernel )
 
     do iCol=0,iKernelSize-1
       do iRow=0,iKernelSize-1
@@ -2416,7 +2431,7 @@ function grid_Convolve_sgl(rValues, iTargetCol, &
           cycle   ! our calculated row or column number is outside of the
                   ! bounds of the rValues array
         else
-          rRetVal = rRetVal + rValues(iColnum,iRownum) * rKernel(iCol+1, iRow+1)
+          rRetVal = rRetVal + pGrdFrom%rData(iColnum,iRownum) * rKernel(iCol+1, iRow+1)
           rKernelSum = rKernelSum + rKernel(iCol+1, iRow+1)
         endif
       enddo

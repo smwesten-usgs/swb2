@@ -94,7 +94,15 @@ contains
     if ( present( lEcho ) )       call LOGS%set_echo( lEcho )
 
     call LOGS%write("** WARNING **", iLinesBefore=1, iTab=2)
-    call LOGS%write("possible error:  "//trim(sMessage), iTab=12 )
+
+    if (present(lFatal)) then
+      if (lFatal) then
+        NUMBER_OF_FATAL_WARNINGS = NUMBER_OF_FATAL_WARNINGS + 1
+        call LOGS%write("fatal error:  "//trim(sMessage), iTab=16 )
+      endif
+    else
+      call LOGS%write("possible error:  "//trim(sMessage), iTab=12 )
+    endif  
 
     if (present(sModule))  &
       call LOGS%write("module:  "//trim(sModule), iTab=20 )
@@ -108,10 +116,6 @@ contains
       call LOGS%write("   ==> "//trim(sHints), iTab=9, iLinesBefore=1 )
 
     call LOGS%write("", iLinesAfter=1)  
-
-    if (present(lFatal)) then
-      if (lFatal)  NUMBER_OF_FATAL_WARNINGS = NUMBER_OF_FATAL_WARNINGS + 1
-    endif  
 
   end subroutine warn
 

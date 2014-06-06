@@ -66,7 +66,7 @@ module constants_and_conversions
   real (kind=c_double), parameter :: F_PER_C = 9_c_double / 5_c_double  
 
 
-
+! this type is still needed for the grid module
 type T_CELL
       integer (kind=c_int) :: iFlowDir = iZERO    ! Flow direction from flow-dir grid
       integer (kind=c_int) :: iSoilGroup = iZERO  ! Soil type from soil-type grid
@@ -86,7 +86,12 @@ type T_CELL
 
 
 
-
+  public :: operator(.approxequal.)
+  interface operator(.approxequal.)
+    module procedure approx_equal_float_float
+    module procedure approx_equal_double_double
+    module procedure approx_equal_float_double
+  end interface operator(.approxequal.)  
 
 
 
@@ -158,7 +163,61 @@ type T_CELL
   public :: c_to_fortran_string
   public :: fortran_to_c_string
 
+  real (kind=c_float), parameter  :: TOLERANCE_FLOAT = 1e-6_c_float
+  real (kind=c_double), parameter :: TOLERANCE_DOUBLE = 1e-9_c_double
+
 contains
+
+
+  elemental function approx_equal_float_float(fValue1, fValue2)  result(lBool)
+
+    real (kind=c_float), intent(in)    :: fValue1
+    real (kind=c_float), intent(in)    :: fValue2
+    logical (kind=c_bool)              :: lBool
+
+    if ( abs( fValue1 - fValue2 ) < TOLERANCE_FLOAT ) then
+      lBool = lTRUE
+    else
+      lBool = lFALSE
+    endif
+
+  end function approx_equal_float_float
+
+
+
+
+  elemental function approx_equal_float_double(fValue1, fValue2)  result(lBool)
+
+    real (kind=c_float), intent(in)    :: fValue1
+    real (kind=c_double), intent(in)    :: fValue2
+    logical (kind=c_bool)              :: lBool
+
+    if ( abs( fValue1 - real(fValue2, kind=c_float) ) < TOLERANCE_FLOAT ) then
+      lBool = lTRUE
+    else
+      lBool = lFALSE
+    endif
+
+  end function approx_equal_float_double
+
+
+
+
+
+  elemental function approx_equal_double_double(fValue1, fValue2)  result(lBool)
+
+    real (kind=c_double), intent(in)    :: fValue1
+    real (kind=c_double), intent(in)    :: fValue2
+    logical (kind=c_bool)               :: lBool
+
+    if ( abs( fValue1 - fValue2 ) < TOLERANCE_DOUBLE ) then
+      lBool = lTRUE
+    else
+      lBool = lFALSE
+    endif
+
+  end function approx_equal_double_double
+
 
 !--------------------------------------------------------------------------
 

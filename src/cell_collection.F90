@@ -10,6 +10,13 @@ module cell_collection
 
     class (CELL_BASE_CLASS_T), dimension(:,:), pointer :: cell => null()
 
+    character (len=:), allocatable  :: sPROJ4_string
+    integer (kind=c_int)            :: iNumCols
+    integer (kind=c_int)            :: iNumRows
+    real (kind=c_double)            :: fX_ll, fY_ll
+    real (kind=c_double)            :: fX_ur, fY_ur
+    real (kind=c_float)             :: fGridcellSize
+
   contains
 
     procedure :: initialize_cells_sub
@@ -27,39 +34,35 @@ module cell_collection
 
 contains  
 
-  subroutine initialize_cells_sub( this, iNRows, iNCols, iMask )
+  subroutine initialize_cells_sub( this, iNumCols, iNumRows, fX_ll, fY_ll, fGridcellSize )
 
-    class (CELL_COLLECTION_T), intent(inout)  :: this
-    integer (kind=c_int), intent(in)          :: iNRows
-    integer (kind=c_int), intent(in)          :: iNCols
-    integer (kind=c_int), intent(in)          :: iMask(:,:)
-
+    class (CELL_COLLECTION_T), intent(inout)     :: this
+    integer (kind=c_int), intent(in)             :: iNumCols
+    integer (kind=c_int), intent(in)             :: iNumRows
+    real (kind=c_double), intent(in)             :: fX_ll
+    real (kind=c_double), intent(in)             :: fY_ll
+    real (kind=c_double), intent(in)              :: fGridcellSize
 
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iStat
     integer (kind=c_int)                 :: iRow, iCol
     class (CELL_BASE_CLASS_T), pointer   :: pCell
 
-    allocate( this%cell(iNRows, iNCols), stat=iStat )
+    this%iNumCols = iNumCols
+    this%iNumRows = iNumRows
+    this%fX_ll = fX_ll
+    this%fY_ll = fY_ll
+    this%fGridcellSize = fGridcellSize
+
+    allocate( this%cell(iNumCols, iNumRows), stat=iStat )
 
     if (iStat /=0) stop("Could not allocate memory for cells")
 
-    do iRow=1, iNRows
-      do iCol=1, iNCols
+    do iRow=1, iNumRows
+      do iCol=1, iNumCols
 
-        pCell => this%cell(iRow, iCol)
-
-        if (iMask( iRow, iCol) == CELL_INACTIVE ) then
-
-          allocate( CELL_BASE_CLASS_T::pCell)
-
-        elseif ( iMask( iRow, iCol ) == CELL_NORMAL ) then
-
-          allocate( CELL_NORMAL_T::pCell )
-          
-        endif  
-
-        call pCell%print()
+        pCell => this%cell(iCol, iRow)
+        allocate( CELL_NORMAL_T::pCell )
 
       enddo
 
@@ -69,5 +72,33 @@ contains
 
   end subroutine initialize_cells_sub
 
+
+  ! change allocation of inactive cells to a less memory intensive dynamic type
+  subroutine reallocate_cells_sub(this, iMask )
+
+    class (CELL_COLLECTION_T), intent(inout)     :: this
+    integer (kind=c_int), intent(in)             :: iMask(:,:)
+    
+    ! [ LOCALS ]
+    integer (kind=c_int)                 :: iStat
+    integer (kind=c_int)                 :: iRow, iCol
+    class (CELL_BASE_CLASS_T), pointer   :: pCell
+
+    do iRow=1, this%iNumRows
+      do iCol=1, this%iNumCols
+
+        if (iMask(iCol, iRow) == CELL_INACTIVE ) then
+
+          pCell => this%cell(iCol, iRow)
+          allocate( CELL_BASE_CLASS_T::pCell )
+
+        endif  
+
+      enddo
+
+    enddo  
+
+
+  end subroutine reallocate_cells_sub
 
 end module cell_collection

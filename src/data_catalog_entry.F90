@@ -18,30 +18,32 @@ module data_catalog_entry
     type (DATA_CATALOG_ENTRY_T), pointer :: previous => null()
     type (DATA_CATALOG_ENTRY_T), pointer :: next     => null()
 
-    integer (kind=c_int)  :: iSourceDataForm    ! constant, static grid, dynamic grid
-    integer (kind=c_int)  :: iSourceDataType = DATATYPE_NA  ! real, short, integer, etc.
-    integer (kind=c_int)  :: iSourceFileType  ! Arc ASCII, Surfer, NetCDF
-    integer (kind=c_int)  :: iTargetDataType = DATATYPE_NA  ! Fortran real, integer, etc.
-    character (len=256)   :: sDescription = ""
-    character (len=256)   :: sSourcePROJ4_string
-    character (len=256)   :: sSourceFileType
-    character (len=256)   :: sFilenameTemplate
-    character (len=256)   :: sSourceFilename      ! e.g. 1980_00_prcp.nc
-    character (len=256)   :: sOldFilename = "NA"  ! e.g. 1980_00_prcp.nc
-    integer (kind=c_int)  :: iFileCount = -1
-    integer (kind=c_int)  :: iFileCountYear = -9999
-    logical (kind=c_bool) :: lProjectionDiffersFromBase = lFALSE
-    real (kind=c_float)   :: rMinAllowedValue = -rBIGVAL     ! default condition is to impose
-    real (kind=c_float)   :: rMaxAllowedValue = rBIGVAL      ! no bounds on data
-    integer (kind=c_int)  :: iMinAllowedValue = -iBIGVAL     ! default condition is to impose
-    integer (kind=c_int)  :: iMaxAllowedValue = iBIGVAL      ! no bounds on data
-    real (kind=c_float)   :: rMissingValuesCode = -rBIGVAL
-    integer (kind=c_int)  :: iMissingValuesCode = -iBIGVAL
-    character (len=2)     :: sMissingValuesOperator = "<="
-    integer (kind=c_int)  :: iMissingValuesAction = 0
-    real (kind=c_double)  :: rScaleFactor = 1_c_double
-    real (kind=c_double)  :: rAddOffset = 0_c_double
-    real (kind=c_double)  :: rConversionFactor = 1_c_double
+    integer (kind=c_int)               :: iSourceDataForm    ! constant, static grid, dynamic grid
+    integer (kind=c_int)               :: iSourceDataType = DATATYPE_NA  ! real, short, integer, etc.
+    integer (kind=c_int)               :: iSourceFileType  ! Arc ASCII, Surfer, NetCDF
+    integer (kind=c_int)               :: iTargetDataType = DATATYPE_NA  ! Fortran real, integer, etc.
+    
+    character (len=:), allocatable     :: sDescription
+    character (len=:), allocatable     :: sSourcePROJ4_string
+    character (len=:), allocatable     :: sSourceFileType
+    character (len=:), allocatable     :: sFilenameTemplate
+    character (len=:), allocatable     :: sSourceFilename      ! e.g. 1980_00_prcp.nc
+    character (len=:), allocatable     :: sOldFilename        
+    integer (kind=c_int)               :: iFileCount = -1
+    integer (kind=c_int)               :: iFileCountYear = -9999
+    logical (kind=c_bool)              :: lProjectionDiffersFromBase = lFALSE
+    real (kind=c_float)                :: rMinAllowedValue = -rBIGVAL     ! default condition is to impose
+    real (kind=c_float)                :: rMaxAllowedValue = rBIGVAL      ! no bounds on data
+    integer (kind=c_int)               :: iMinAllowedValue = -iBIGVAL     ! default condition is to impose
+    integer (kind=c_int)               :: iMaxAllowedValue = iBIGVAL      ! no bounds on data
+    real (kind=c_float)                :: rMissingValuesCode = -rBIGVAL
+    integer (kind=c_int)               :: iMissingValuesCode = -iBIGVAL
+    character (len=2)                  :: sMissingValuesOperator = "<="
+    integer (kind=c_int)               :: iMissingValuesAction = 0
+    
+    real (kind=c_double)               :: rScaleFactor = 1_c_double
+    real (kind=c_double)               :: rAddOffset = 0_c_double
+    real (kind=c_double)               :: rConversionFactor = 1_c_double
 
     logical (kind=c_bool) :: lUserSuppliedScaleAndOffset = lFALSE
     logical (kind=c_bool) :: lApplyConversionFactor = lFALSE
@@ -57,34 +59,35 @@ module data_catalog_entry
     logical (kind=c_bool) :: lPadValues = lFALSE
 
     ! the following are only used if data are being read from a NetCDF file
-    character (len=256) :: sVariableName_x = "x"
-    character (len=256) :: sVariableName_y = "y"
-    character (len=256) :: sVariableName_z = ""
-    character (len=256) :: sVariableName_time = "time"
-    character (len=3)   :: sVariableOrder = "tyx"
+    character (len=32)       :: sVariableName_x = "x"
+    character (len=32)       :: sVariableName_y = "y"
+    character (len=32)       :: sVariableName_z = ""
+    character (len=32)       :: sVariableName_time = "time"
+    character (len=8)        :: sVariableOrder = "tyx"
 
-    type (GRID_BOUNDS_T) :: GRID_BOUNDS_NATIVE
-    type (GRID_BOUNDS_T) :: GRID_BOUNDS_BASE
+    type (GRID_BOUNDS_T)     :: GRID_BOUNDS_NATIVE
+    type (GRID_BOUNDS_T)     :: GRID_BOUNDS_BASE
 
-    integer (kind=c_int)  :: iNC_FILE_STATUS = NETCDF_FILE_CLOSED
-    type (T_NETCDF4_FILE) :: NCFILE
+    integer (kind=c_int)     :: iNC_FILE_STATUS = NETCDF_FILE_CLOSED
+    type (T_NETCDF4_FILE)    :: NCFILE
 
-    integer (kind=c_int)    :: iNC_ARCHIVE_STATUS = NETCDF_FILE_CLOSED
-    type (T_NETCDF4_FILE)   :: NCFILE_ARCHIVE
-    integer (kind=c_size_t) :: iNCFILE_RECNUM = 0
+    integer (kind=c_int)     :: iNC_ARCHIVE_STATUS = NETCDF_FILE_CLOSED
+    type (T_NETCDF4_FILE)    :: NCFILE_ARCHIVE
+    integer (kind=c_size_t)  :: iNCFILE_RECNUM = 0
 
-    integer (kind=c_int) :: iConstantValue
-    real (kind=c_float)  :: rConstantValue
+    integer (kind=c_int)     :: iConstantValue
+    real (kind=c_float)      :: rConstantValue
 
     ! pGrdNative is a grid created to serve as an intermediary between
     ! the native coordinate of the data source file and the project coordinates
     ! in use by swb
     type (GENERAL_GRID_T), pointer :: pGrdNative => null()
-    logical (kind=c_bool) :: lGridIsPersistent = lFALSE
-    logical (kind=c_bool) :: lGridHasChanged = lFALSE
-    logical (kind=c_bool) :: lPerformFullInitialization = lTRUE
-    logical (kind=c_bool) :: lCreateLocalNetCDFArchive = lFALSE
-
+    logical (kind=c_bool)          :: lGridIsPersistent = lFALSE
+    logical (kind=c_bool)          :: lGridHasChanged = lFALSE
+    logical (kind=c_bool)          :: lPerformFullInitialization = lTRUE
+    logical (kind=c_bool)          :: lCreateLocalNetCDFArchive = lFALSE
+     
+    ! pGrdBase can be populated, with data accessed by cells as needed 
     type (GENERAL_GRID_T), pointer :: pGrdBase => null()
 
   contains
@@ -207,6 +210,7 @@ contains
 
   end subroutine set_keyword_sub
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine initialize_constant_real_data_object_sub( this, &
      sDescription, &
@@ -228,7 +232,7 @@ contains
 
   end subroutine initialize_constant_real_data_object_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine initialize_constant_int_data_object_sub( this, &
     sDescription, &
@@ -250,7 +254,7 @@ contains
 
   end subroutine initialize_constant_int_data_object_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
 subroutine initialize_gridded_data_object_sub( this, &
    sDescription, &
@@ -323,7 +327,7 @@ subroutine initialize_gridded_data_object_sub( this, &
 
 end subroutine initialize_gridded_data_object_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
 subroutine initialize_netcdf_data_object_sub( this, &
    sDescription, &
@@ -381,7 +385,7 @@ subroutine initialize_netcdf_data_object_sub( this, &
 
 end subroutine initialize_netcdf_data_object_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine getvalues_sub( this, pGrdBase, iMonth, iDay, iYear, iJulianDay, &
     iValues, rValues)
@@ -438,7 +442,7 @@ end subroutine initialize_netcdf_data_object_sub
 
   end subroutine getvalues_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
 subroutine getvalues_constant_sub( this, pGrdBase )
 
@@ -478,7 +482,7 @@ subroutine getvalues_constant_sub( this, pGrdBase )
 
   end subroutine getvalues_constant_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine dump_data_structure_sub(this)
 
@@ -501,7 +505,7 @@ subroutine getvalues_constant_sub( this, pGrdBase )
 
   end subroutine dump_data_structure_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine getvalues_gridded_sub( this, pGrdBase, iMonth, iDay, iYear)
 
@@ -600,7 +604,7 @@ subroutine getvalues_constant_sub( this, pGrdBase )
 
   end subroutine getvalues_gridded_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
 subroutine transform_grid_to_grid(this, pGrdBase)
 
@@ -632,16 +636,12 @@ subroutine transform_grid_to_grid(this, pGrdBase)
         case ( GRID_DATATYPE_REAL )
 
           call grid_gridToGrid(pGrdFrom=this%pGrdNative,&
-                              rArrayFrom=this%pGrdNative%rData, &
-                              pGrdTo=pGrdBase, &
-                              rArrayTo=pGrdBase%rData )
+                              pGrdTo=pGrdBase )
 
         case ( GRID_DATATYPE_INT )
 
-          call grid_gridToGrid(pGrdFrom=this%pGrdNative,&
-                            iArrayFrom=this%pGrdNative%iData, &
-                            pGrdTo=pGrdBase, &
-                            iArrayTo=pGrdBase%iData )
+          call grid_gridToGrid(pGrdFrom=this%pGrdNative, &
+                            pGrdTo=pGrdBase )
         case default
 
           call assert(lFALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: value=" &
@@ -678,7 +678,7 @@ subroutine transform_grid_to_grid(this, pGrdBase)
 
 end subroutine transform_grid_to_grid
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
 subroutine set_constant_value_int( this, iValue )
 
@@ -689,7 +689,7 @@ subroutine set_constant_value_int( this, iValue )
 
 end subroutine set_constant_value_int
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
 subroutine set_constant_value_real( this, rValue )
 
@@ -700,7 +700,7 @@ subroutine set_constant_value_real( this, rValue )
 
 end subroutine set_constant_value_real
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine set_filecount( this, iValue, iYear)
 
@@ -714,7 +714,7 @@ end subroutine set_constant_value_real
 
   end subroutine set_filecount
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine increment_filecount( this )
 
@@ -724,7 +724,7 @@ end subroutine set_constant_value_real
 
   end subroutine increment_filecount
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine reset_filecount( this )
 
@@ -734,7 +734,7 @@ end subroutine set_constant_value_real
 
   end subroutine reset_filecount
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine reset_at_yearend_filecount( this, iYear )
 
@@ -748,7 +748,7 @@ end subroutine set_constant_value_real
 
   end subroutine reset_at_yearend_filecount
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine make_filename_from_template( this, iMonth, iDay, iYear )
 
@@ -863,7 +863,7 @@ end subroutine set_constant_value_real
 
   end subroutine make_filename_from_template
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   function test_for_need_to_pad_values(this, iMonth, iDay, iYear ) &
                                             result(lNeedToPadData)
@@ -940,7 +940,7 @@ end subroutine set_constant_value_real
 
   end function test_for_need_to_pad_values
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine getvalues_dynamic_netcdf_sub( this, pGrdBase, &
      iMonth, iDay, iYear, iJulianDay)
@@ -1145,7 +1145,7 @@ end subroutine set_constant_value_real
 
   end subroutine getvalues_dynamic_netcdf_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine put_values_to_local_NetCDF_sub(this, iMonth, iDay, iYear)
 
@@ -1190,7 +1190,7 @@ end subroutine set_constant_value_real
 
   end subroutine put_values_to_local_NetCDF_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   function get_source_filetype_fn(this)  result(iFileType)
 
@@ -1220,7 +1220,7 @@ end subroutine set_constant_value_real
 
   end function get_source_filetype_fn
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine set_PROJ4_string_sub(this, sPROJ4_string)
 
@@ -1231,7 +1231,7 @@ end subroutine set_constant_value_real
 
   end subroutine set_PROJ4_string_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine set_grid_flip_horizontal_sub(this)
 
@@ -1241,7 +1241,7 @@ end subroutine set_constant_value_real
 
   end subroutine set_grid_flip_horizontal_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine set_grid_flip_vertical_sub(this)
 
@@ -1251,7 +1251,7 @@ end subroutine set_constant_value_real
 
   end subroutine set_grid_flip_vertical_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine set_variable_order_sub(this, sVariableOrder)
 
@@ -1262,7 +1262,7 @@ end subroutine set_constant_value_real
 
   end subroutine set_variable_order_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
 subroutine set_scale_sub(this, rScaleFactor)
 
@@ -1274,7 +1274,7 @@ subroutine set_scale_sub(this, rScaleFactor)
 
 end subroutine set_scale_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
 subroutine set_conversion_factor_sub(this, rConversionFactor)
 
@@ -1285,7 +1285,7 @@ subroutine set_conversion_factor_sub(this, rConversionFactor)
 
 end subroutine set_conversion_factor_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
 subroutine set_archive_local_sub(this, lValue)
 
@@ -1296,7 +1296,7 @@ subroutine set_archive_local_sub(this, lValue)
 
 end subroutine set_archive_local_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
 subroutine set_offset_sub(this, rAddOffset)
 
@@ -1308,7 +1308,7 @@ subroutine set_offset_sub(this, rAddOffset)
 
 end subroutine set_offset_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
 subroutine set_missing_value_int_sub(this, iMissingVal)
 
@@ -1319,7 +1319,7 @@ subroutine set_missing_value_int_sub(this, iMissingVal)
 
 end subroutine set_missing_value_int_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
 subroutine set_missing_value_real_sub(this, rMissingVal)
 
@@ -1330,7 +1330,7 @@ subroutine set_missing_value_real_sub(this, rMissingVal)
 
 end subroutine set_missing_value_real_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
 subroutine set_minimum_allowable_value_int_sub(this, iMinVal)
 
@@ -1341,7 +1341,7 @@ subroutine set_minimum_allowable_value_int_sub(this, iMinVal)
 
 end subroutine set_minimum_allowable_value_int_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
 subroutine set_maximum_allowable_value_int_sub(this, iMaxVal)
 
@@ -1352,7 +1352,7 @@ subroutine set_maximum_allowable_value_int_sub(this, iMaxVal)
 
 end subroutine set_maximum_allowable_value_int_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
 subroutine set_minimum_allowable_value_real_sub(this, rMinVal)
 
@@ -1363,7 +1363,7 @@ subroutine set_minimum_allowable_value_real_sub(this, rMinVal)
 
 end subroutine set_minimum_allowable_value_real_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
 subroutine set_maximum_allowable_value_real_sub(this, rMaxVal)
 
@@ -1374,7 +1374,7 @@ subroutine set_maximum_allowable_value_real_sub(this, rMaxVal)
 
 end subroutine set_maximum_allowable_value_real_sub
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine calc_project_boundaries(this, pGrdBase)
 
@@ -1438,7 +1438,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
   end subroutine calc_project_boundaries
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine data_GridEnforceLimits_int(this, iValues)
 
@@ -1456,7 +1456,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
   end subroutine data_GridEnforceLimits_int
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine data_GridEnforceLimits_real(this, rValues)
 
@@ -1474,7 +1474,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
   end subroutine data_GridEnforceLimits_real
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine data_GridHandleMissingData_real(this, rValues)
 
@@ -1565,7 +1565,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
   end subroutine data_GridHandleMissingData_real
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   subroutine data_GridHandleMissingData_int(this, iValues)
 
@@ -1655,5 +1655,7 @@ end subroutine set_maximum_allowable_value_real_sub
     end select
 
   end subroutine data_GridHandleMissingData_int
+
+!--------------------------------------------------------------------------------------------------
 
 end module data_catalog_entry

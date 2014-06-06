@@ -111,15 +111,15 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function is_char_equal_to_char_fn(sText1, sText2)   result(lBool)
+  elemental function is_char_equal_to_char_fn(sText1, sText2)   result(lBool)
 
     character (len=*), intent(in)      :: sText1
     character (len=*), intent(in)      :: sText2    
     logical (kind=c_bool)              :: lBool
 
     ! [ LOCALS ]
-    character (len=len_trim(sText1))  :: sTemp1
-    character (len=len_trim(sText2))  :: sTemp2
+    character (len=:), allocatable    :: sTemp1
+    character (len=:), allocatable    :: sTemp2
 
     lBool = lFALSE
 
@@ -301,7 +301,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function logical_to_char_fn(lValue)    result(sText)
+  elemental function logical_to_char_fn(lValue)    result(sText)
 
     logical (kind=c_bool), intent(in)    :: lValue
     character (len=:), allocatable       :: sText
@@ -316,10 +316,10 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function squote_char_fn(sText1)    result(sText)
+  elemental function squote_char_fn(sText1)    result(sText)
 
     character (len=*), intent(in)         :: sText1
-    character (len=len_trim(sText1)+2)    :: sText
+    character (len=:), allocatable        :: sText
 
     sText = "'"//trim(sText1)//"'"
 
@@ -327,10 +327,10 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function dquote_char_fn(sText1)    result(sText)
+  elemental function dquote_char_fn(sText1)    result(sText)
 
     character (len=*), intent(in)         :: sText1
-    character (len=len_trim(sText1)+2)    :: sText
+    character (len=:), allocatable        :: sText
 
     sText = '"'//trim(sText1)//'"'
 
@@ -338,7 +338,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function char_to_uppercase_fn ( s )                    result(sText)
+  elemental function char_to_uppercase_fn ( s )                    result(sText)
 
     ! ARGUMENTS
     character (len=*), intent(in) :: s
@@ -349,13 +349,13 @@ contains
 
     ! CONSTANTS
     integer (kind=c_int), parameter :: LOWER_TO_UPPER = -32
-
-    ! LOWER_TO_UPPER = ichar( "A" ) - ichar( "a" ) 
+    integer (kind=c_int), parameter :: ASCII_SMALL_A = ichar("a")
+    integer (kind=c_int), parameter :: ASCII_SMALL_Z = ichar("z")    
 
     sText = s
 
     do i=1,len_trim(sText)
-        if ( ichar(sText(i:i) ) >= ichar("a") .and. ichar(sText(i:i)) <= ichar("z") ) then
+        if ( ichar(sText(i:i) ) >= ASCII_SMALL_A .and. ichar(sText(i:i)) <= ASCII_SMALL_Z ) then
             sText(i:i) = char( ichar( sText(i:i) ) + LOWER_TO_UPPER )
         end if
     end do
@@ -364,65 +364,70 @@ contains
 
 !--------------------------------------------------------------------------
 
-function char_to_lowercase_fn ( s )                               result(sText)
+  elemental function char_to_lowercase_fn ( s )                               result(sText)
 
-  ! ARGUMENTS
-  character (len=*), intent(in) :: s
-  character(len=len(s)) :: sText
+    ! ARGUMENTS
+    character (len=*), intent(in) :: s
+    character(len=len(s)) :: sText
 
-  ! LOCALS
-  integer (kind=c_int) :: i    ! do loop index
-  ! CONSTANTS
-  integer (kind=c_int), parameter :: UPPER_TO_LOWER = 32
+    ! LOCALS
+    integer (kind=c_int) :: i    ! do loop index
+    ! CONSTANTS
+    integer (kind=c_int), parameter :: UPPER_TO_LOWER = 32
+    integer (kind=c_int), parameter :: ASCII_A = ichar("A")
+    integer (kind=c_int), parameter :: ASCII_Z = ichar("Z")    
 
-  ! UPPER_TO_LOWER = ichar( "a" ) - ichar( "A" )
+    sText = s
 
-  sText = s
+    do i=1,len_trim(sText)
+        if ( ichar(sText(i:i) ) >= ASCII_A .and. ichar(sText(i:i)) <= ASCII_Z ) then
+            sText(i:i) = char( ichar( sText(i:i) ) + UPPER_TO_LOWER )
+        end if
+    end do
 
-  do i=1,len_trim(sText)
-      if ( ichar(sText(i:i) ) >= ichar("A") .and. ichar(sText(i:i)) <= ichar("Z") ) then
-          sText(i:i) = char( ichar( sText(i:i) ) + UPPER_TO_LOWER )
-      end if
-  end do
-
-end function char_to_lowercase_fn
-
-
-subroutine char_to_uppercase_sub ( s )
-
-  ! ARGUMENTS
-  character (len=*), intent(inout) :: s
-  ! LOCALS
-  integer (kind=c_int) :: i    ! do loop index
-  ! CONSTANTS
-  integer (kind=c_int) :: LOWER_TO_UPPER = ichar( "A" ) - ichar( "a" )
-
-  do i=1,len_trim(s)
-      if ( ichar(s(i:i) ) >= ichar("a") .and. ichar(s(i:i)) <= ichar("z") ) then
-          s(i:i) = char( ichar( s(i:i) ) + LOWER_TO_UPPER )
-      end if
-  end do
-
-end subroutine char_to_uppercase_sub
+  end function char_to_lowercase_fn
 
 
-subroutine char_to_lowercase_sub ( s )
+  elemental subroutine char_to_uppercase_sub ( s )
 
-  ! ARGUMENTS
-  character (len=*), intent(inout) :: s
-  ! LOCALS
-  integer (kind=c_int) :: i    ! do loop index
-  ! CONSTANTS
-  integer (kind=c_int), parameter :: UPPER_TO_LOWER = 32
-  ! UPPER_TO_LOWER = ichar( "a" ) - ichar( "A" )
+    ! ARGUMENTS
+    character (len=*), intent(inout) :: s
+    ! LOCALS
+    integer (kind=c_int) :: i    ! do loop index
+    ! CONSTANTS
+    integer (kind=c_int), parameter :: LOWER_TO_UPPER = -32
+    integer (kind=c_int), parameter :: ASCII_SMALL_A = ichar("a")
+    integer (kind=c_int), parameter :: ASCII_SMALL_Z = ichar("z")    
 
-  do i=1,len_trim( s )
-      if ( ichar(s(i:i) ) >= ichar("A") .and. ichar(s(i:i)) <= ichar("Z") ) then
-          s(i:i) = char( ichar( s(i:i) ) + UPPER_TO_LOWER )
-      end if
-  end do
+    do i=1,len_trim(s)
+        if ( ichar(s(i:i) ) >= ASCII_SMALL_A .and. ichar(s(i:i)) <= ASCII_SMALL_Z ) then
+            s(i:i) = char( ichar( s(i:i) ) + LOWER_TO_UPPER )
+        end if
+    end do
 
-end subroutine char_to_lowercase_sub
+  end subroutine char_to_uppercase_sub
+
+
+  elemental subroutine char_to_lowercase_sub ( s )
+
+    ! ARGUMENTS
+    character (len=*), intent(inout) :: s
+    ! LOCALS
+    integer (kind=c_int) :: i    ! do loop index
+    ! CONSTANTS
+    integer (kind=c_int), parameter :: UPPER_TO_LOWER = 32
+    integer (kind=c_int), parameter :: ASCII_A = ichar("A")
+    integer (kind=c_int), parameter :: ASCII_Z = ichar("Z")    
+
+    ! UPPER_TO_LOWER = ichar( "a" ) - ichar( "A" )
+
+    do i=1,len_trim( s )
+        if ( ichar(s(i:i) ) >= ASCII_A .and. ichar(s(i:i)) <= ASCII_Z ) then
+            s(i:i) = char( ichar( s(i:i) ) + UPPER_TO_LOWER )
+        end if
+    end do
+
+  end subroutine char_to_lowercase_sub
 
 
 

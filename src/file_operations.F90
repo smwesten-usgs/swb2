@@ -2,7 +2,6 @@ module file_operations
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
   use iso_fortran_env, only : IOSTAT_END
-  use types_new
   use logfiles
   use exceptions
   use constants_and_conversions
@@ -11,6 +10,8 @@ module file_operations
   implicit none
 
   private
+  
+  integer (kind=c_int), parameter :: MAX_STR_LEN = 8192
   
   type, public :: ASCII_FILE_T
 
@@ -70,7 +71,6 @@ module file_operations
     generic, public    :: readLine => read_line_of_data_fn
 
   end type ASCII_FILE_T
-
 
 contains
 
