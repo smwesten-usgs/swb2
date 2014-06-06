@@ -87,16 +87,15 @@ module cell_class
   end type CELL_NORMAL_T
 
   abstract interface
-    subroutine interception_method(this)
-      import :: CELL_NORMAL_T
-      class ( CELL_NORMAL_T ), intent(inout)  :: this
-    end subroutine interception_method
+    function interception_method( iLanduseIndex, fPrecip)   result(fInterception)
+      integer (kind=c_int) :: iLandUseIndex
+      real (kind=c_float)  :: fPrecip
+      real (kind=c_float)  :: fInterception
+    end function interception_method
   end interface
 
   abstract interface
-    subroutine interception_init_method(this)
-      import :: CELL_NORMAL_T
-      class ( CELL_NORMAL_T ), intent(inout)  :: this
+    subroutine interception_init_method()
     end subroutine interception_init_method
   end interface
 

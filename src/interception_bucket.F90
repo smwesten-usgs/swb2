@@ -15,20 +15,13 @@ module interception_bucket
     real (kind=c_float), allocatable  :: fInterceptionValue_GrowingSeason(:)
     real (kind=c_float), allocatable  :: fInterceptionValue_DormantSeason(:)
 
-  contains
-
-    procedure :: initialize_interception_bucket_sub
-    generic   :: initialize => initialize_bucket_sub
-
   end type INTERCEPTION_BUCKET_T
 
   type (INTERCEPTION_BUCKET_T) :: DAT
 
 contains   
 
-  subroutine initialize_interception_bucket_sub(this)
-
-    class (CELL_NORMAL_T), intent(inout)  :: this
+  subroutine initialize_interception_bucket_sub()
 
     ! [ LOCALS ]
     integer (kind=c_int)        :: iNumberOfLanduses
@@ -48,27 +41,36 @@ contains
       call warn( "The number of landuses does not match the number of interception values.",   &
         __FILE__, __LINE__, lFatal=.true._c_bool )
 
-  end subroutine  
+  end subroutine initialize_interception_bucket_sub
 
 
-  subroutine calculate_interception_bucket_sub(this)
+  function calculate_interception_bucket( iLanduseIndex, fPrecip )   result( fInterception )
 
-    class (CELL_NORMAL_T), intent(inout)   :: this
+    integer (kind=c_int), intent(in) :: iLanduseIndex
+    real (kind=c_float), intent(in)  :: fPrecip
+    real (kind=c_float)              :: fInterception
 
     !!! Need to come up with a module that provides the current day of year, month, day, year, and growing season
 
-    if ( this%iLanduseIndex > ubound( DAT%fInterceptionValue_GrowingSeason, 1) &
+    ! [ LOCALS ]
+    feal (kind=c_float) :: fPotentialInterception
+
+    if ( iLanduseIndex > ubound( DAT%fInterceptionValue_GrowingSeason, 1) &
       call die( "Internal programming error -- index out of bounds", __FILE__, __LINE__ )
 
     if (GROWING_SEASON) then
 
-      this%fInterception = DAT%fInterceptionValue_GrowingSeason(this%iLanduseIndex)
+      fPotentialInterception = DAT%fInterceptionValue_GrowingSeason(iLanduseIndex)
 
     else
 
-      this%fInterception = DAT%fInterceptionValue_DormantSeason(this%iLanduseIndex)
+      fPotentialInterception = DAT%fInterceptionValue_DormantSeason(iLanduseIndex)
 
     endif
+
+    fInterception = min( fPotentialInterception, fPrecip )
+
  
+  end function calculate_interception_bucket
 
 end module interception_bucket
