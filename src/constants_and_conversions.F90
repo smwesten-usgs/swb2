@@ -7,7 +7,7 @@
 !! conversions between various temperature and distance units.
 module constants_and_conversions
 
-  use iso_c_binding, only : c_int, c_float, c_double, c_bool
+  use iso_c_binding, only : c_short, c_int, c_float, c_double, c_bool
   implicit none
 
   ! 
@@ -84,7 +84,16 @@ type T_CELL
 
   end type T_CELL
 
+  type BOUNDS_T
+    character (len=:), allocatable  :: sPROJ4_string
+    integer (kind=c_int)            :: iNumCols
+    integer (kind=c_int)            :: iNumRows
+    real (kind=c_double)            :: fX_ll, fY_ll
+    real (kind=c_double)            :: fX_ur, fY_ur
+    real (kind=c_double)            :: fGridcellSize
+  end type BOUNDS_T
 
+  type (BOUNDS_T), public :: BNDS
 
   public :: operator(.approxequal.)
   interface operator(.approxequal.)
@@ -148,6 +157,7 @@ type T_CELL
 
   public asInt
   interface asInt
+    module procedure short2int
     module procedure char2int
     module procedure real2int
     module procedure dbl2int
@@ -428,36 +438,48 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-!> Convert a character value into a integer
-elemental function char2int(sValue)  result(iValue)
+  !> Convert a short integer to an integer
+  elemental function short2int(iShortVal)    result(iValue)
 
-  character (len=*), intent(in) :: sValue
-  integer (kind=c_int) :: iValue
+    integer (kind=c_short), intent(in)    :: iShortVal
+    integer (kind=c_int)                  :: iValue
 
-  ! [ LOCALS ]
-  integer (kind=c_int) :: iStat
-  character (len=:), allocatable :: sTempVal 
-  real (kind=c_float)  :: rValue
+    iValue = int( iShortVal, kind=c_int )
 
-  sTempVal = keepnumeric(sValue)  
+  end function short2int  
 
-  ! if the cleaned up string appears to be a real value, 
-  ! attempt to read as real and convert to int
-  if ( scan(sTempVal, ".") /= 0 ) then
+!--------------------------------------------------------------------------------------------------
 
-    read(unit=sTempVal, fmt=*, iostat=iStat) rValue
+  !> Convert a character value into a integer
+  elemental function char2int(sValue)  result(iValue)
 
-    if (iStat == 0)  iValue = int(rValue, kind=c_int)
+    character (len=*), intent(in) :: sValue
+    integer (kind=c_int) :: iValue
 
-  else  
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iStat
+    character (len=:), allocatable :: sTempVal 
+    real (kind=c_float)  :: rValue
 
-    read(unit=sTempVal, fmt=*, iostat=iStat) iValue
+    sTempVal = keepnumeric(sValue)  
 
-  endif
+    ! if the cleaned up string appears to be a real value, 
+    ! attempt to read as real and convert to int
+    if ( scan(sTempVal, ".") /= 0 ) then
 
-  if (iStat /= 0)  iValue = iTINYVAL
+      read(unit=sTempVal, fmt=*, iostat=iStat) rValue
 
-end function char2int
+      if (iStat == 0)  iValue = int(rValue, kind=c_int)
+
+    else  
+
+      read(unit=sTempVal, fmt=*, iostat=iStat) iValue
+
+    endif
+
+    if (iStat /= 0)  iValue = iTINYVAL
+
+  end function char2int
 
 !--------------------------------------------------------------------------------------------------
 

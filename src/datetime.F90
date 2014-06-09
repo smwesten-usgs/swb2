@@ -1,9 +1,9 @@
 !> @file
 !>  Contains a single module, @ref datetime, which
 !> contains all time and date-related routines as well as the
-!> @ref T_DATETIME class.
+!> @ref DATETIME_T class.
 
-!>  This module contains all time and date-related routines as well as the @ref T_DATETIME class.
+!>  This module contains all time and date-related routines as well as the @ref DATETIME_T class.
 module datetime
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double, c_bool
@@ -16,7 +16,7 @@ module datetime
 
   public :: gregorian_date, julian_day, isLeap, day_of_year
 
-  type, public :: T_DATETIME
+  type, public :: DATETIME_T
 
     integer (kind=c_short)  :: iMonth = 1
     integer (kind=c_short)  :: iDay = 1
@@ -78,8 +78,9 @@ module datetime
     procedure, public :: setJulianDate => set_julian_date_sub
     procedure, public :: getFractionOfDay => get_fraction_of_day_fn
 
-  end type T_DATETIME
+  end type DATETIME_T
 
+ 
   ! the following values are determined by the date format string; defaults to MM/DD/YYYY
   character (len=14), private :: sDATE_FORMAT = "MM/DD/YYYY"
   character (len=14), public  :: sDEFAULT_DATE_FORMAT = "MM/DD/YYYY"
@@ -127,7 +128,7 @@ end subroutine set_default_time_format
 
 subroutine set_date_format_indices(this, sDateFormat)
 
-  class (T_DATETIME), intent(inout) :: this
+  class (DATETIME_T), intent(inout) :: this
   character (len=*), intent(in), optional :: sDateFormat
 
   ! [ LOCALS ]
@@ -167,7 +168,7 @@ end subroutine set_date_format_indices
 
 subroutine set_time_format_indices(this, sTimeFormat)
 
-  class (T_DATETIME), intent(inout) :: this
+  class (DATETIME_T), intent(inout) :: this
   character (len=*), intent(in), optional :: sTimeFormat
 
   ! [ LOCALS ]
@@ -199,7 +200,7 @@ end subroutine set_time_format_indices
 
 subroutine parse_text_to_date_sub(this, sString)
 
-  class (T_DATETIME), intent(inout) :: this
+  class (DATETIME_T), intent(inout) :: this
   character (len=*), intent(in) :: sString
 
   ! [ LOCALS ]
@@ -255,7 +256,7 @@ end subroutine parse_text_to_date_sub
 
 subroutine parse_text_to_time_sub(this, sString)
 
-  class (T_DATETIME), intent(inout) :: this
+  class (DATETIME_T), intent(inout) :: this
   character (len=*), intent(in) :: sString
 
 
@@ -312,7 +313,7 @@ end subroutine parse_text_to_time_sub
 
 subroutine calc_water_year_sub(this)
 
-  class (T_DATETIME) :: this
+  class (DATETIME_T) :: this
 
     if(this%iMonth > 9) then
        this%iWaterYearHigh = this%iYear + 1
@@ -334,7 +335,7 @@ end subroutine calc_water_year_sub
 ! subroutine populate_julian_day_sub(this, iMonth, iDay, iYear, &
 !                                 iHour, iMinute, iSecond)
 !
-!   class (T_DATETIME) :: this
+!   class (DATETIME_T) :: this
 !   integer (kind=c_int), intent(in) :: iMonth
 !   integer (kind=c_int), intent(in) :: iDay
 !   integer (kind=c_int), intent(in) :: iYear
@@ -374,7 +375,7 @@ end subroutine calc_water_year_sub
 subroutine calc_julian_day_sub(this, iMonth, iDay, iYear, &
                                 iHour, iMinute, iSecond)
 
-  class (T_DATETIME) :: this
+  class (DATETIME_T) :: this
   integer (kind=c_int), intent(in), optional :: iMonth
   integer (kind=c_int), intent(in), optional :: iDay
   integer (kind=c_int), intent(in), optional :: iYear
@@ -404,7 +405,7 @@ end subroutine calc_julian_day_sub
 
 subroutine calc_gregorian_date_sub(this)
 
-  class (T_DATETIME) :: this
+  class (DATETIME_T) :: this
 
   ! [ LOCALS ]
   integer (kind=c_int) :: iMonth
@@ -578,8 +579,8 @@ end function julian_day
 
 function is_date_greater_than(date1, date2)   result(lResult)
 
-  class(T_DATETIME), intent(in) :: date1
-  class(T_DATETIME), intent(in) :: date2
+  class(DATETIME_T), intent(in) :: date1
+  class(DATETIME_T), intent(in) :: date2
 
   ! [ LOCALS ]
   logical(kind=c_bool ) :: lResult
@@ -601,8 +602,8 @@ end function is_date_greater_than
 
 function is_date_less_than(date1, date2)   result(lResult)
 
-  class(T_DATETIME), intent(in) :: date1
-  class(T_DATETIME), intent(in) :: date2
+  class(DATETIME_T), intent(in) :: date1
+  class(DATETIME_T), intent(in) :: date2
 
   ! [ LOCALS ]
   logical(kind=c_bool ) :: lResult
@@ -624,8 +625,8 @@ end function is_date_less_than
 
 function is_date_LT_or_equal_to(date1, date2)   result(lResult)
 
-  class(T_DATETIME), intent(in) :: date1
-  class(T_DATETIME), intent(in) :: date2
+  class(DATETIME_T), intent(in) :: date1
+  class(DATETIME_T), intent(in) :: date2
 
   ! [ LOCALS ]
   logical(kind=c_bool ) :: lResult
@@ -640,8 +641,8 @@ end function is_date_LT_or_equal_to
 
 function is_date_GT_or_equal_to(date1, date2)   result(lResult)
 
-  class(T_DATETIME), intent(in) :: date1
-  class(T_DATETIME), intent(in) :: date2
+  class(DATETIME_T), intent(in) :: date1
+  class(DATETIME_T), intent(in) :: date2
 
   ! [ LOCALS ]
   logical(kind=c_bool ) :: lResult
@@ -656,8 +657,8 @@ end function is_date_GT_or_equal_to
 
 function is_date_equal_to(date1, date2)   result(lResult)
 
-  class(T_DATETIME), intent(in) :: date1
-  class(T_DATETIME), intent(in) :: date2
+  class(DATETIME_T), intent(in) :: date1
+  class(DATETIME_T), intent(in) :: date2
 
   ! [ LOCALS ]
   logical(kind=c_bool ) :: lResult
@@ -679,8 +680,8 @@ end function is_date_equal_to
 
 function date_minus_date_fn(date1, date2)  result(rDelta)
 
-  class(T_DATETIME), intent(in) :: date1
-  class(T_DATETIME), intent(in) :: date2
+  class(DATETIME_T), intent(in) :: date1
+  class(DATETIME_T), intent(in) :: date2
   real (kind=c_double) :: rDelta
 
   rDelta = date1%dJulianDate - date2%dJulianDate
@@ -697,7 +698,7 @@ end function date_minus_date_fn
 
 function write_pretty_date_fn(this)     result(sDateText)
 
-  class(T_DATETIME) :: this
+  class(DATETIME_T) :: this
   character (len=10) :: sDateText
 
   write(sDateText, fmt="(i2.2,'/',i2.2,'/',i4.4)") &
@@ -709,7 +710,7 @@ end function write_pretty_date_fn
 
 function write_list_date_fn(this)                     result(sDateText)
 
-  class(T_DATETIME) :: this
+  class(DATETIME_T) :: this
   character (len=10) :: sDateText
 
   ! [ LOCALS ]
@@ -736,7 +737,7 @@ end function write_list_date_fn
 
 function write_list_time_fn(this)                     result(sTimeText)
 
-  class(T_DATETIME) :: this
+  class(DATETIME_T) :: this
   character (len=8) :: sTimeText
 
   write(sTimeText,fmt="(i2.2,':',i2.2':',i2.2)") this%iHour, this%iMinute, this%iSecond
@@ -747,7 +748,7 @@ end function write_list_time_fn
 
 function write_list_datetime_fn(this)    result(sDatetimeText)
 
-  class(T_DATETIME) :: this
+  class(DATETIME_T) :: this
 !  character(len=*), optional :: sDateFormat
 !  logical (kind=c_bool), optional :: lDateOnly
   character (len=19) :: sDatetimeText
@@ -817,7 +818,7 @@ end function write_list_datetime_fn
 
 subroutine system_time_to_date_sub(this)
 
-  class (T_DATETIME) :: this
+  class (DATETIME_T) :: this
 
   ! [ LOCALS ]
   character (len=16) :: sDateText
@@ -923,7 +924,7 @@ end subroutine system_time_to_date_sub
 
 subroutine set_julian_date_sub(this, dValue)
 
-  class (T_DATETIME)    :: this
+  class (DATETIME_T)    :: this
   real (kind=c_double)  :: dValue
 
   this%dJulianDate = dValue
@@ -936,7 +937,7 @@ end subroutine set_julian_date_sub
 
 function get_julian_day_fn(this)                   result(iJulianDay)
 
-  class(T_DATETIME)    :: this
+  class(DATETIME_T)    :: this
   integer (kind=c_int) :: iJulianDay
 
   iJulianDay = int(this%dJulianDate, kind=c_int)
@@ -947,7 +948,7 @@ end function get_julian_day_fn
 
 function get_fraction_of_day_fn(this)           result(dFractionOfDay)
 
-  class(T_DATETIME)      :: this
+  class(DATETIME_T)      :: this
   real (kind=c_double)   :: dFractionOfDay
 
   dFractionOfDay = this%dJulianDate - real( int(this%dJulianDate, kind=c_int ), kind=c_double)
@@ -958,7 +959,7 @@ end function get_fraction_of_day_fn
 
 function get_days_in_month_fn(this)          result(iDaysInMonth)
 
-  class(T_DATETIME) :: this
+  class(DATETIME_T) :: this
   integer (kind=c_int) :: iDaysInMonth
 
   ! [ LOCALS ]
@@ -977,7 +978,7 @@ end function get_days_in_month_fn
 
 function get_days_in_year_fn(this)  result(iDaysInYear)
 
-  class(T_DATETIME) :: this
+  class(DATETIME_T) :: this
   integer (kind=c_int) :: iDaysInYear
 
   if (this%isLeapYear() ) then
@@ -992,7 +993,7 @@ end function get_days_in_year_fn
 
 subroutine date_plus_day_sub(this)
 
-  class(T_DATETIME) :: this
+  class(DATETIME_T) :: this
 
   this%dJulianDate = this%dJulianDate + 1_c_double
   call this%calcGregorianDate()
@@ -1003,7 +1004,7 @@ end subroutine date_plus_day_sub
 
 subroutine date_minus_day_sub(this)
 
-  class(T_DATETIME) :: this
+  class(DATETIME_T) :: this
 
   this%dJulianDate = this%dJulianDate - 1_c_double
   call this%calcGregorianDate()
@@ -1014,7 +1015,7 @@ end subroutine date_minus_day_sub
 
 function is_leap_year_fn(this)   result(lIsLeapYear)
 
-  class(T_DATETIME)       :: this
+  class(DATETIME_T)       :: this
   logical (kind=c_bool)   :: lIsLeapYear
 
   lIsLeapYear = ( mod(this%iYear, 4) == 0 .and. mod(this%iYear, 100) /= 0 ) .or. &
@@ -1171,5 +1172,6 @@ function isLeap(iYear)   result(lResult)
 
 end function isLeap
 
+!--------------------------------------------------------------------------
 
 end module datetime

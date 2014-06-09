@@ -22,6 +22,9 @@ module cell_collection
     procedure :: initialize_cells_sub
     generic   :: initialize => initialize_cells_sub
 
+    procedure :: solve_cells_sub
+    generic   :: solve => solve_cells_sub
+
   end type CELL_COLLECTION_T
 
   !type (CELL_PTR), allocatable :: CELLS(:,:)
@@ -34,7 +37,7 @@ module cell_collection
 
 contains  
 
-  subroutine initialize_cells_sub( this, iNumCols, iNumRows, fX_ll, fY_ll, fGridcellSize )
+  subroutine initialize_cells_sub( this, iNumCols, iNumRows, fX_ll, fY_ll, fGridCellSize )
 
     class (CELL_COLLECTION_T), intent(inout)     :: this
     integer (kind=c_int), intent(in)             :: iNumCols
@@ -91,6 +94,7 @@ contains
 
           pCell => this%cell(iCol, iRow)
           allocate( CELL_BASE_CLASS_T::pCell )
+          call pCell%set_col_row( iCol, iRow )
 
         endif  
 
@@ -100,5 +104,34 @@ contains
 
 
   end subroutine reallocate_cells_sub
+
+
+
+
+  ! march through a single iteration of the solution
+  subroutine solve_cells_sub( this )
+
+    class (CELL_COLLECTION_T), intent(inout)     :: this
+    
+    ! [ LOCALS ]
+    integer (kind=c_int)                 :: iStat
+    class (CELL_BASE_CLASS_T), pointer   :: pCell
+    integer (kind=c_int)                 :: iCol
+    integer (kind=c_int)                 :: iRow
+
+    do iRow=1, this%iNumRows
+      do iCol=1, this%iNumCols
+
+          pCell => this%cell(iCol, iRow)
+          ! call pCell%solve()
+
+      enddo
+
+    enddo  
+
+  end subroutine solve_cells_sub
+
+
+
 
 end module cell_collection

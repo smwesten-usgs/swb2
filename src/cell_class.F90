@@ -1,6 +1,7 @@
 module cell_class
 
   use iso_c_binding
+  use data_catalog_entry
   use constants_and_conversions
   use et_hargreaves
   use interception_bucket
@@ -10,6 +11,9 @@ module cell_class
   private
 
   type, public :: CELL_BASE_CLASS_T
+
+    integer (kind=c_int) :: iRow
+    integer (kind=c_int) :: iCol
 
     integer (kind=c_int) :: iSoilGroup = 0_c_int               ! Soil type from soil-type grid
     integer (kind=c_int) :: iLandUseIndex                      ! Index (row num) of land use table
@@ -21,8 +25,11 @@ module cell_class
     procedure           :: print_all_sub
     generic             :: print => print_all_sub
 
-    procedure :: set_interception_method_sub
-    generic   :: set_interception => set_interception_method_sub
+    procedure :: cell_set_interception_method_sub
+    generic   :: set_interception => cell_set_interception_method_sub
+
+    procedure :: cell_set_col_row_sub
+    generic   :: set_col_row => cell_set_col_row_sub
 
   end type CELL_BASE_CLASS_T  
 
@@ -64,7 +71,7 @@ module cell_class
     real (kind=c_float) :: fIrrigationFromGW = 0.0_c_float ! term to hold irrigation term, if any
     real (kind=c_float) :: fIrrigationFromSW = 0.0_c_float ! term to hold irrigation term, if any
 
-    type (CELL_NORMAL_T), pointer :: pDownslope
+    type (CELL_NORMAL_T), pointer :: pDownslope => null()
 
     procedure ( interception_method ), pointer, private      :: calc_interception => null()
     procedure ( interception_init_method ), pointer, private :: init_interception => null()
@@ -76,13 +83,13 @@ module cell_class
   contains
 
 !     procedure :: set_infiltration_method_sub
-!     generic   :: set_infiltration => set_infiltration_method_sub
+!     generic   :: set_infiltration_method => set_infiltration_method_sub
 
 !     procedure :: set_et_method_sub
-!     generic   :: set_evapotranspiration => set_et_method_sub
+!     generic   :: set_evapotranspiration_method => set_et_method_sub
 
 !     procedure :: set_sm_method_sub
-!     generic   :: set_soil_moist => set_sm_sub
+!     generic   :: set_soil_moist_method => set_sm_method_sub
 
 
   end type CELL_NORMAL_T
@@ -127,7 +134,7 @@ contains
 
   !! implementations of the interfaces above
 
-  elemental subroutine set_interception_method_sub(this, sMethodName)
+  elemental subroutine cell_set_interception_method_sub(this, sMethodName)
 
     class (CELL_BASE_CLASS_T), intent(inout)   :: this
     character (len=*), intent(in)              :: sMethodName
@@ -138,13 +145,13 @@ contains
 
         if ( sMethodName .strequal. "BUCKET" ) then
 
-          this%init_interception => initialize_interception_bucket
-          this%calc_interception => calculate_interception_bucket
+          this%init_interception => cell_initialize_interception_bucket
+          this%calc_interception => cell_calculate_interception_bucket
 
         elseif ( sMethodName .strequal. "GASH" ) then
 
-          this%init_interception => initialize_interception_gash
-          this%calc_interception => calculate_interception_gash
+          this%init_interception => cell_initialize_interception_gash
+          this%calc_interception => cell_calculate_interception_gash
 
         endif
 
@@ -152,7 +159,26 @@ contains
      
     end select
 
-  end subroutine set_interception_method_sub
+  end subroutine cell_set_interception_method_sub
+
+
+
+  elemental subroutine get_interception_value_sub(this)
+
+    class (CELL_BASE_CLASS_T), intent(inout)   :: this
+
+    select type (this)
+
+      type is (CELL_NORMAL_T)
+
+        call this%calc_interception()
+
+      class default
+      
+    end select    
+
+  end subroutine get_interception_value_sub
+
 
 
   subroutine et_hargreaves_samani(this)
@@ -196,7 +222,7 @@ contains
   end subroutine print_all_sub
 
   
-  subroutine initialize_interception_bucket(this)
+  subroutine cell_initialize_interception_bucket(this)
 
     use interception_bucket
 
@@ -204,33 +230,52 @@ contains
 
 
 
-  end subroutine initialize_interception_bucket
+  end subroutine cell_initialize_interception_bucket
 
 
 
-  subroutine calculate_interception_bucket(this)
+  subroutine cell_calculate_interception_bucket(this)
 
     use interception_bucket
 
     class (CELL_NORMAL_T), intent(inout)  :: this
 
-  end subroutine calculate_interception_bucket
+    ! [ LOCALS ]
+    real (kind=c_float) :: fGrossPrecip
+
+    call PRCP%getvalue(this%iCol, this%iRow, fGrossPrecip )
+
+    this%fInterception = calculate_interception_bucket( this%iLandUseIndex, fGrossPrecip )
+
+  end subroutine cell_calculate_interception_bucket
 
 
 
-  subroutine initialize_interception_gash(this)
-
-    class (CELL_NORMAL_T), intent(inout)  :: this
-
-
-  end subroutine initialize_interception_gash
-
-
-
-  subroutine calculate_interception_gash(this)
+  subroutine cell_initialize_interception_gash(this)
 
     class (CELL_NORMAL_T), intent(inout)  :: this
 
-  end subroutine calculate_interception_gash
+
+  end subroutine cell_initialize_interception_gash
+
+
+
+  subroutine cell_calculate_interception_gash(this)
+
+    class (CELL_NORMAL_T), intent(inout)  :: this
+
+  end subroutine cell_calculate_interception_gash
+
+
+  subroutine cell_set_col_row_sub( this, iCol, iRow )
+
+    class (CELL_BASE_CLASS_T), intent(inout)  :: this
+    integer (kind=c_int), intent(in)      :: iCol
+    integer (kind=c_int), intent(in)      :: iRow
+
+    this%iRow = iRow
+    this%iCol = iCol
+
+  end subroutine cell_set_col_row_sub  
 
 end module cell_class

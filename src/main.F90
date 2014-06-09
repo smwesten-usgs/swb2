@@ -82,6 +82,7 @@ program main
   use iso_c_binding, only : c_short, c_int, c_float, c_double
   use logfiles
   use loop_initialize
+  use loop_iterate
   use cell_collection
   use iso_fortran_env
 
@@ -134,11 +135,13 @@ program main
   call read_control_file(sControlFile)
 
   call initialize_options()
+  call iterate_over_simulation_days()
   
 
   call check_for_fatal_warnings()
 
 
+   
 
   !! create matrix of cells
 !  call CELLS%initialize(4, 4, reshape( source=[1,1,0,1, 0,1,0,0, 0,1,1,1, 1,1,0,0], shape=[4,4] ) )

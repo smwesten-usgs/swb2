@@ -1,13 +1,15 @@
 module loop_initialize
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
-  use constants_and_conversions, only : lTRUE, lFALSE, asFloat
+  use constants_and_conversions, only : lTRUE, lFALSE, asFloat, BNDS
   use cell_class
   use cell_collection
+  use datetime
   use data_catalog_entry
   use dictionary
   use exceptions
   use file_operations
+  use loop_iterate
   use parameters
   use strings
   use string_list  
@@ -91,6 +93,7 @@ contains
     call initialize_landuse_options()
     call initialize_parameter_tables()
     call initialize_interception_method()
+    call initialize_start_and_end_dates()
 
 
   end subroutine initialize_options
@@ -146,7 +149,7 @@ contains
         sCmdText = myDirectives%get(iIndex)
 
         ! For this directive, obtain the associated dictionary entries
-        call CF_DICT%get_values(sCmdText, myOptions )
+        call CF_DICT%get_values( sCmdText, myOptions )
 
         ! dictionary entries are initially space-delimited; sArgText contains
         ! all dictionary entries present, concatenated, with a space between entries
@@ -155,9 +158,11 @@ contains
         ! echo the original directive and dictionary entries to the logfile
         call LOGS%write(">> "//sCmdText//" "//sArgText)
 
+        call CF_DICT%get_values(sCmdText, myOptions )
+
         ! most of the time, we only care about the first dictionary entry, obtained below
         sOptionText = myOptions%get(1)
-
+        
         select case ( sCmdText )
 
           case ( "PRECIPITATION" )
@@ -184,8 +189,7 @@ contains
                   call PRCP%initialize_netcdf( &
                     sDescription=trim(sCmdText), &
                     sFilenameTemplate = trim(sArgText), &
-                    iDataType=DATATYPE_REAL, &
-                    pGrdBase=pGrd)
+                    iDataType=DATATYPE_REAL )
      
                 case default
 
@@ -206,35 +210,35 @@ contains
             
             call PRCP%set_conversion_factor(asFloat(sOptionText))
 
-          case ( "NETCDF_PRECIP_X_VAR" )
+          case ( "NETCDF_PRECIPITATION_X_VAR" )
 
             PRCP%sVariableName_x = trim(sOptionText)
 
-          case ( "NETCDF_PRECIP_Y_VAR" )
+          case ( "NETCDF_PRECIPITATION_Y_VAR" )
 
             PRCP%sVariableName_y = trim(sOptionText)
 
-          case ( "NETCDF_PRECIP_Z_VAR" )
+          case ( "NETCDF_PRECIPITATION_Z_VAR" )
 
             PRCP%sVariableName_z = trim(sOptionText)
 
-          case ( "NETCDF_PRECIP_TIME_VAR" )
+          case ( "NETCDF_PRECIPITATION_TIME_VAR" )
 
             PRCP%sVariableName_time = trim(sOptionText)
 
-          case ( "NETCDF_PRECIP_VARIABLE_ORDER" )
+          case ( "NETCDF_PRECIPITATION_VARIABLE_ORDER" )
 
             call PRCP%set_variable_order( asLowercase(sOptionText) )
 
-          case ( "NETCDF_PRECIP_FLIP_VERTICAL" )
+          case ( "NETCDF_PRECIPITATION_FLIP_VERTICAL" )
 
             call PRCP%set_grid_flip_vertical()
 
-          case ( "NETCDF_PRECIP_FLIP_HORIZONTAL" )
+          case ( "NETCDF_PRECIPITATION_FLIP_HORIZONTAL" )
 
             call PRCP%set_grid_flip_horizontal()
 
-          case ( "NETCDF_PRECIP_MAKE_LOCAL_ARCHIVE" )
+          case ( "NETCDF_PRECIPITATION_MAKE_LOCAL_ARCHIVE" )
 
             call PRCP%set_make_local_archive(lTRUE)
 
@@ -269,8 +273,6 @@ contains
               call assert(lFALSE, "Unknown missing value action supplied for" &
                 //" precipitation data: "//dquote(sOptionText) )
             endif
-
-
 
           case default
 
@@ -332,7 +334,7 @@ contains
         ! most of the time, we only care about the first dictionary entry, obtained below
         sOptionText = myOptions%get(1)
 
-        call CF_DICT%get_values("TMAX", myOptions )
+        call CF_DICT%get_values(sCmdText, myOptions )
 
         select case ( sCmdText )
 
@@ -360,8 +362,7 @@ contains
                 call TMAX%initialize_netcdf( &
                   sDescription=trim(sCmdText), &
                   sFilenameTemplate = trim(sArgText), &
-                  iDataType=DATATYPE_REAL, &
-                  pGrdBase=pGrd)
+                  iDataType=DATATYPE_REAL )
    
               case default
 
@@ -503,8 +504,6 @@ contains
         ! most of the time, we only care about the first dictionary entry, obtained below
         sOptionText = myOptions%get(1)
 
-        call CF_DICT%get_values("TMIN", myOptions )
-
         select case ( sCmdText )
 
           case ( "TMIN" )
@@ -531,8 +530,7 @@ contains
                 call TMIN%initialize_netcdf( &
                   sDescription=trim(sCmdText), &
                   sFilenameTemplate = trim(sArgText), &
-                  iDataType=DATATYPE_REAL, &
-                  pGrdBase=pGrd)
+                  iDataType=DATATYPE_REAL )
    
               case default
 
@@ -669,6 +667,9 @@ contains
       !pGrd => grid_Create(iNX, iNY, rX0, rY0, rGridCellSize, GRID_DATATYPE_ALL) 
       call CELLS%initialize(iNX, iNY, rX0, rY0, rGridCellSize)
 
+      rX1 = rX0 + rGridCellSize * real(iNX, kind=c_double)
+      rY1 = rY0 + rGridCellSize * real(iNY, kind=c_double)
+
     elseif ( myOptions%count == 7 ) then
 
       rX1 = asDouble( myOptions%get(5) )
@@ -687,6 +688,12 @@ contains
 
     endif
 
+    BNDS%fX_ll = rX0
+    BNDS%fY_ll = rY0
+    BNDS%fY_ur = rY1
+    BNDS%fX_ur = rX1
+    BNDS%fGridCellSize = rGridCellSize
+    BNDS%sPROJ4_string = ""
 
   end subroutine initialize_grid_options
 
@@ -764,8 +771,7 @@ contains
                 call FLOWDIR%initialize_netcdf( &
                   sDescription=trim(sCmdText), &
                   sFilenameTemplate = trim(sArgText), &
-                  iDataType=DATATYPE_REAL, &
-                  pGrdBase=pGrd)
+                  iDataType=DATATYPE_REAL )
      
               case default
 
@@ -868,8 +874,7 @@ contains
                 call AWC%initialize_netcdf( &
                   sDescription=trim(sCmdText), &
                   sFilenameTemplate = trim(sArgText), &
-                  iDataType=DATATYPE_REAL, &
-                  pGrdBase=pGrd)
+                  iDataType=DATATYPE_REAL )
      
               case default
 
@@ -978,8 +983,7 @@ contains
                 call HSG%initialize_netcdf( &
                   sDescription=trim(sCmdText), &
                   sFilenameTemplate = trim(sArgText), &
-                  iDataType=DATATYPE_REAL, &
-                  pGrdBase=pGrd)
+                  iDataType=DATATYPE_REAL )
      
               case default
 
@@ -1005,6 +1009,96 @@ contains
     endif
 
   end subroutine initialize_soils_group_options  
+
+
+
+
+
+
+
+
+  subroutine initialize_start_and_end_dates()
+
+    ! [ LOCALS ]
+    type (STRING_LIST_T)             :: myDirectives
+    type (STRING_LIST_T)             :: myOptions  
+    integer (kind=c_int)             :: iIndex
+    character (len=:), allocatable   :: sCmdText
+    character (len=:), allocatable   :: sOptionText
+    character (len=:), allocatable   :: sArgText
+    integer (kind=c_int)             :: iStat
+
+
+    myDirectives = CF_DICT%grep_keys("DATE")
+      
+    if ( myDirectives%count < 2 ) then
+
+      call warn("Your control file seems to be missing START_DATE and/or END_DATE", &
+        lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+
+    else  
+    
+      call LOGS%set_loglevel( LOG_ALL )
+      call LOGS%set_echo( lFALSE )
+
+      do iIndex = 1, myDirectives%count
+
+        ! myDirectives is a string list of all SWB directives that contain the phrase "LANDUSE"
+        ! sCmdText contains an individual directive
+        sCmdText = myDirectives%get(iIndex)
+
+        ! For this directive, obtain the associated dictionary entries
+        call CF_DICT%get_values(sCmdText, myOptions )
+
+        ! dictionary entries are initially space-delimited; sArgText contains
+        ! all dictionary entries present, concatenated, with a space between entries
+        sArgText = myOptions%get(1, myOptions%count )
+
+        ! echo the original directive and dictionary entries to the logfile
+        call LOGS%write(">> "//sCmdText//" "//sArgText)
+
+        ! most of the time, we only care about the first dictionary entry, obtained below
+        sOptionText = myOptions%get(1)
+
+        select case ( sCmdText )
+
+          case ( "START_DATE", "STARTDATE" )
+
+            call SIM_DT%start%parseDate( sOptionText )
+            call SIM_DT%start%calcJulianDay()
+
+            print *, dquote(sOptionText)
+
+          case ( "END_DATE", "ENDDATE" )
+
+            call SIM_DT%end%parseDate( sOptionText )
+            call SIM_DT%end%calcJulianDay()
+
+print *, dquote(sOptionText)
+
+          case default
+
+            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
+              //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
+ 
+        end select
+
+      enddo
+
+      SIM_DT%curr = SIM_DT%start
+
+      SIM_DT%iDaysInMonth = SIM_DT%curr%dayspermonth()
+      SIM_DT%iDaysInYear = SIM_DT%curr%daysperyear()
+      SIM_DT%lIsLeapYear = SIM_DT%curr%isLeapYear()
+
+    endif
+
+  end subroutine initialize_start_and_end_dates 
+
+
+
+
+
 
 
 
@@ -1079,15 +1173,16 @@ contains
                 call LULC%initialize(sDescription=trim(sCmdText), &
                   sFileType=trim(sOptionText), &
                   sFilenameTemplate=trim(sArgText), &
-                  iDataType=DATATYPE_REAL )
+                  iDataType=DATATYPE_INT, &
+                  sPROJ4_string=BNDS%sPROJ4_string )
 
               case ( "NETCDF" )
                   
                 call LULC%initialize_netcdf( &
                   sDescription=trim(sCmdText), &
                   sFilenameTemplate = trim(sArgText), &
-                  iDataType=DATATYPE_REAL, &
-                  pGrdBase=pGrd)
+                  iDataType=DATATYPE_INT, &
+                  sPROJ4_string=BNDS%sPROJ4_string ) 
      
               case default
 

@@ -127,6 +127,11 @@ module data_catalog_entry
 
     procedure, public :: getvalues => getvalues_sub
 
+    procedure, private :: get_value_int_sub
+    procedure, private :: get_value_float_sub
+    generic            :: getvalue => get_value_int_sub, &
+                                      get_value_float_sub
+
  !   procedure :: update => update_data_object_sub
  !   procedure :: destroy => create_data_object_sub
     procedure :: get_filetype => get_source_filetype_fn
@@ -210,6 +215,47 @@ contains
 
   end subroutine set_keyword_sub
 
+  subroutine get_value_int_sub(this, iCol, iRow, iValue)
+
+    class (DATA_CATALOG_ENTRY_T), intent(in)  :: this
+    integer (kind=c_int), intent(in)          :: iCol
+    integer (kind=c_int), intent(in)          :: iRow
+    integer (kind=c_int), intent(out)         :: iValue
+
+    if ( .not. associated(this%pGrdBase) ) &
+      call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
+
+    if (iCol <= ubound(this%pGrdBase%iData,1) .and. iRow <= ubound(this%pGrdBase%iData,2) ) then
+      iValue = this%pGrdBase%iData(iCol, iRow)
+    else
+      call die ("Row/column indices out of bounds: ~row: "//asCharacter(iRow)//"~ col:"//asCharacter(iCol), &
+        __FILE__, __LINE__ )
+    endif      
+
+  end subroutine get_value_int_sub
+
+
+  subroutine get_value_float_sub(this, iCol, iRow, fValue)
+
+    class (DATA_CATALOG_ENTRY_T), intent(in)  :: this
+    integer (kind=c_int), intent(in)          :: iCol
+    integer (kind=c_int), intent(in)          :: iRow
+    real (kind=c_float), intent(out)          :: fValue
+
+    if ( .not. associated(this%pGrdBase) ) &
+      call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
+
+    if (iCol <= ubound(this%pGrdBase%iData,1) .and. iRow <= ubound(this%pGrdBase%iData,2) ) then
+      fValue = this%pGrdBase%rData(iCol, iRow)
+    else
+      call die ("Row/column indices out of bounds: ~row: "//asCharacter(iRow)//"~ col:"//asCharacter(iCol), &
+        __FILE__, __LINE__ )
+    endif      
+
+
+
+  end subroutine get_value_float_sub
+
 !--------------------------------------------------------------------------------------------------
 
   subroutine initialize_constant_real_data_object_sub( this, &
@@ -262,7 +308,7 @@ subroutine initialize_gridded_data_object_sub( this, &
    iDataType, &
    sFilename, &
    sFilenameTemplate, &
-   sPROJ4)
+   sPROJ4_string )
 
    class (DATA_CATALOG_ENTRY_T) :: this
    type ( GENERAL_GRID_T ),pointer :: pGrd
@@ -271,14 +317,15 @@ subroutine initialize_gridded_data_object_sub( this, &
    character (len=*), optional :: sFilename
    integer (kind=c_int) :: iDataType
    character (len=*), optional :: sFilenameTemplate
-   character (len=*), optional :: sPROJ4
+   character (len=*), optional :: sPROJ4_string
 
-   if (present(sPROJ4) ) then
-     this%sSourcePROJ4_string = trim(sPROJ4)
-     if(.not. ( sPROJ4 .strequal. pGrd%sPROJ4_string) ) &
+   if (present(sPROJ4_string) ) then
+     this%sSourcePROJ4_string = trim(sPROJ4_string)
+     if(.not. ( sPROJ4_string .strequal. BNDS%sPROJ4_string) ) &
          this%lProjectionDiffersFromBase = lTRUE
    else
-     this%sSourcePROJ4_string =  ""
+     this%sSourcePROJ4_string =  BNDS%sPROJ4_string
+     this%lProjectionDiffersFromBase = lTRUE
    endif
 
    if (present(sFilename)) then
@@ -322,6 +369,7 @@ subroutine initialize_gridded_data_object_sub( this, &
     trim(__FILE__), __LINE__)
 
   nullify(this%pGrdNative)
+
   call netcdf_nullify_data_struct( NCFILE=this%NCFILE )
   call netcdf_nullify_data_struct( NCFILE=this%NCFILE_ARCHIVE )
 
@@ -332,10 +380,9 @@ end subroutine initialize_gridded_data_object_sub
 subroutine initialize_netcdf_data_object_sub( this, &
    sDescription, &
    iDataType, &
-   pGrdBase, &
    sFilename, &
    sFilenameTemplate, &
-   sPROJ4)
+   sPROJ4_string )
 
    class (DATA_CATALOG_ENTRY_T) :: this
    character (len=*) :: sDescription
@@ -343,12 +390,15 @@ subroutine initialize_netcdf_data_object_sub( this, &
    type ( GENERAL_GRID_T ),pointer :: pGrdBase
    character (len=*), optional :: sFilename
    character (len=*), optional :: sFilenameTemplate
-   character (len=*), optional :: sPROJ4
+   character (len=*), optional :: sPROJ4_string
 
-   if (present(sPROJ4) ) then
-     this%sSourcePROJ4_string = trim(sPROJ4)
+   if (present(sPROJ4_string) ) then
+     this%sSourcePROJ4_string = trim(sPROJ4_string)
+     if(.not. ( sPROJ4_string .strequal. BNDS%sPROJ4_string) ) &
+       this%lProjectionDiffersFromBase = lTRUE
    else
-     this%sSourcePROJ4_string =  ""
+     this%sSourcePROJ4_string =  BNDS%sPROJ4_string
+     this%lProjectionDiffersFromBase = lTRUE
    endif
 
    if (present(sFilename)) then
@@ -387,14 +437,10 @@ end subroutine initialize_netcdf_data_object_sub
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine getvalues_sub( this, pGrdBase, iMonth, iDay, iYear, iJulianDay, &
-    iValues, rValues)
+  subroutine getvalues_sub( this, iMonth, iDay, iYear, iJulianDay )
 
     class (DATA_CATALOG_ENTRY_T) :: this
-    type ( GENERAL_GRID_T ), pointer :: pGrdBase
     integer (kind=c_int), intent(in), optional :: iMonth, iDay, iYear, iJulianDay
-    integer (kind=c_int), dimension(:,:), optional :: iValues
-    real (kind=c_float), dimension(:,:), optional :: rValues
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iNumDaysToPad
@@ -403,23 +449,22 @@ end subroutine initialize_netcdf_data_object_sub
 
     if(this%iSourceDataForm == DYNAMIC_GRID ) then
 
-      call getvalues_gridded_sub( this, pGrdBase, iMonth, iDay, iYear)
+      call getvalues_gridded_sub( this, iMonth, iDay, iYear)
 
 
     elseif ( this%iSourceDataForm == DYNAMIC_NETCDF_GRID ) then
 
       iLocalJulianDay = iJulianDay
-      call getvalues_dynamic_netcdf_sub( this, &
-                           pGrdBase,  iMonth, iDay, iYear, iLocalJulianDay)
+      call getvalues_dynamic_netcdf_sub( this, iMonth, iDay, iYear, iLocalJulianDay)
 
 
     elseif(this%iSourceDataForm == STATIC_GRID ) then
 
-      call getvalues_gridded_sub( this, pGrdBase)
+      call getvalues_gridded_sub( this )
 
     elseif(this%iSourceDataForm == CONSTANT_GRID ) then
 
-      call getvalues_constant_sub( this, pGrdBase )
+      call getvalues_constant_sub( this )
 
     else
 
@@ -428,46 +473,37 @@ end subroutine initialize_netcdf_data_object_sub
 
     endif
 
-    if (present(rValues)) then
+!     if (present(rValues)) then
 
-       rValues = ( pGrdBase%rData * this%rScaleFactor + this%rAddOffset ) * this%rConversionFactor
+!        rValues = ( pGrdBase%rData * this%rScaleFactor + this%rAddOffset ) * this%rConversionFactor
 
-    endif
+!     endif
 
-    if (present(iValues)) then
+!     if (present(iValues)) then
 
-        iValues = ( pGrdBase%iData * int(this%rScaleFactor, kind=c_int)  &
-                                  + int(this%rAddOffset,kind=c_int) ) * this%rConversionFactor
-    endif
+!         iValues = ( pGrdBase%iData * int(this%rScaleFactor, kind=c_int)  &
+!                                   + int(this%rAddOffset,kind=c_int) ) * this%rConversionFactor
+!     endif
 
   end subroutine getvalues_sub
 
 !--------------------------------------------------------------------------------------------------
 
-subroutine getvalues_constant_sub( this, pGrdBase )
+subroutine getvalues_constant_sub( this  )
 
   class (DATA_CATALOG_ENTRY_T) :: this
-  type ( GENERAL_GRID_T ), pointer :: pGrdBase
 
   select case (this%iSourceDataType)
 
     case ( DATATYPE_REAL )
 
-      if (.not. all( pGrdBase%rData == this%rConstantValue ) ) then
-
-        this%lGridHasChanged = lTRUE
-        pGrdBase%rData = this%rConstantValue
-
-      endif
+      this%lGridHasChanged = lTRUE
+      this%pGrdBase%rData = ( this%rConstantValue * this%rScaleFactor + this%rAddOffset ) * this%rConversionFactor
 
     case ( DATATYPE_INT)
 
-      if (.not. all( pGrdBase%iData == this%iConstantValue ) ) then
-
-        this%lGridHasChanged = lTRUE
-        pGrdBase%iData = this%iConstantValue
-
-      endif
+      this%lGridHasChanged = lTRUE
+      this%pGrdBase%iData = ( this%iConstantValue * this%rScaleFactor + this%rAddOffset ) * this%rConversionFactor
 
     case default
 
@@ -507,10 +543,9 @@ subroutine getvalues_constant_sub( this, pGrdBase )
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine getvalues_gridded_sub( this, pGrdBase, iMonth, iDay, iYear)
+  subroutine getvalues_gridded_sub( this, iMonth, iDay, iYear)
 
     class (DATA_CATALOG_ENTRY_T) :: this
-    type ( GENERAL_GRID_T ), pointer :: pGrdBase
     integer (kind=c_int), optional :: iMonth
     integer (kind=c_int), optional :: iDay
     integer (kind=c_int), optional :: iYear
@@ -594,7 +629,7 @@ subroutine getvalues_constant_sub( this, pGrdBase )
 
       end select
 
-      call this%transfer_from_native( pGrdBase )
+      call this%transfer_from_native() 
 
       if (.not. this%lGridIsPersistent )  call grid_Destroy(this%pGrdNative)
 
@@ -606,76 +641,54 @@ subroutine getvalues_constant_sub( this, pGrdBase )
 
 !--------------------------------------------------------------------------------------------------
 
-subroutine transform_grid_to_grid(this, pGrdBase)
+subroutine transform_grid_to_grid(this)
 
-    class (DATA_CATALOG_ENTRY_T) :: this
-    type ( GENERAL_GRID_T ), pointer :: pGrdBase
+  class (DATA_CATALOG_ENTRY_T) :: this
 
-    if( len_trim( this%sSourcePROJ4_string ) > 0 ) then
+  ! only invoke the transform procedure if the PROJ4 strings are different
+  if (.not. ( this%pGrdNative%sPROJ4_string .strequal. this%pGrdBase%sPROJ4_string ) ) then
 
-      ! only invoke the transform procedure if the PROJ4 strings are different
-      if (.not. ( this%pGrdNative%sPROJ4_string .strequal. pGrdBase%sPROJ4_string ) ) then
+    call LOGS%write("Transforming gridded data in file: "//dquote(this%sSourceFilename), iLinesBefore=1 )
+    call LOGS%write("FROM: "//squote(this%sSourcePROJ4_string), iTab=2 )
+    call LOGS%write("TO:   "//squote(this%pGrdBase%sPROJ4_string), iTab=2 )
 
-        call LOGS%write(" ")
-        call LOGS%write("Transforming gridded data in file: "//dquote(this%sSourceFilename) )
-        call LOGS%write("  FROM: "//squote(this%sSourcePROJ4_string) )
-        call LOGS%write("  TO:   "//squote(pGrdBase%sPROJ4_string) )
+    call grid_Transform(pGrd=this%pGrdNative, &
+                      sFromPROJ4=this%sSourcePROJ4_string, &
+                      sToPROJ4=BNDS%sPROJ4_string )
 
-        call grid_Transform(pGrd=this%pGrdNative, &
-                          sFromPROJ4=this%sSourcePROJ4_string, &
-                          sToPROJ4=pGrdBase%sPROJ4_string )
+    !! following this call, the pGrdNative%rX and pGrdNative%rY values will be given in the 
+    !! base SWB project projection 
 
-      endif
+  endif
 
-      call assert( grid_CompletelyCover( pGrdBase, this%pGrdNative ), &
-        "Transformed grid read from file "//dquote(this%sSourceFilename) &
-        //" doesn't completely cover your model domain.")
+  if (.not. associated(this%pGrdBase) ) &
+    this%pGrdBase => grid_Create( iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, &
+      rGridCellSize=BNDS%fGridCellSize, iDataType=this%iTargetDataType )
 
-      select case (this%iTargetDataType)
+  call assert( grid_CompletelyCover( this%pGrdBase, this%pGrdNative ), &
+    "Transformed grid read from file "//dquote(this%sSourceFilename) &
+    //" doesn't completely cover your model domain.")
 
-        case ( GRID_DATATYPE_REAL )
+  select case (this%iTargetDataType)
 
-          call grid_gridToGrid(pGrdFrom=this%pGrdNative,&
-                              pGrdTo=pGrdBase )
+    case ( GRID_DATATYPE_REAL )
 
-        case ( GRID_DATATYPE_INT )
+      call grid_gridToGrid(pGrdFrom=this%pGrdNative,&
+                          pGrdTo=this%pGrdBase )
 
-          call grid_gridToGrid(pGrdFrom=this%pGrdNative, &
-                            pGrdTo=pGrdBase )
-        case default
+    case ( GRID_DATATYPE_INT )
 
-          call assert(lFALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: value=" &
-            //trim(asCharacter(this%iSourceDataType)), &
-            trim(__FILE__), __LINE__)
+      call grid_gridToGrid(pGrdFrom=this%pGrdNative, &
+                        pGrdTo=this%pGrdBase )
+    case default
 
-      end select
+      call assert(lFALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: value=" &
+        //trim(asCharacter(this%iSourceDataType)), &
+        trim(__FILE__), __LINE__)
 
-    else
+  end select
 
-      call assert( grid_Conform( pGrdBase, this%pGrdNative ), &
-                        "Non-conforming grid. Filename: " &
-                        //dquote(this%pGrdNative%sFilename) )
-
-      select case (this%iTargetDataType)
-
-        case ( GRID_DATATYPE_REAL )
-
-          pGrdBase%rData = this%pGrdNative%rData
-
-        case ( GRID_DATATYPE_INT)
-
-          pGrdBase%iData = this%pGrdNative%iData
-
-        case default
-
-          call assert(lFALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: value=" &
-              //trim(asCharacter(this%iSourceDataType)), &
-            trim(__FILE__), __LINE__)
-
-      end select
-
-    endif
-
+    
 end subroutine transform_grid_to_grid
 
 !--------------------------------------------------------------------------------------------------
@@ -942,11 +955,9 @@ end subroutine set_constant_value_real
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine getvalues_dynamic_netcdf_sub( this, pGrdBase, &
-     iMonth, iDay, iYear, iJulianDay)
+  subroutine getvalues_dynamic_netcdf_sub( this, iMonth, iDay, iYear, iJulianDay)
 
     class (DATA_CATALOG_ENTRY_T) :: this
-    type ( GENERAL_GRID_T ), pointer :: pGrdBase
     integer (kind=c_int) :: iMonth, iDay, iYear, iJulianDay
 
     ! [ LOCALS ]
@@ -998,7 +1009,7 @@ end subroutine set_constant_value_real
 
             ! calculate the project boundaries in the coordinate system of
             ! the native data file
-            call this%calc_project_boundaries(pGrdBase=pGrdBase)
+            call this%calc_project_boundaries(pGrdBase=this%pGrdBase)
 
             call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE, &
               sFilename=this%sSourceFilename, &
@@ -1025,12 +1036,12 @@ end subroutine set_constant_value_real
               sVarName_z=this%sVariableName_z, &
               sVarName_time=this%sVariableName_time )
 
-            this%NCFILE%iNX = pGrdBase%iNX
-            this%NCFILE%iNY = pGrdBase%iNY
-            this%NCFILE%rX(NC_LEFT) = pGrdBase%rX0
-            this%NCFILE%rY(NC_BOTTOM) = pGrdBase%rY0
-            this%NCFILE%rX(NC_RIGHT) = pGrdBase%rX1
-            this%NCFILE%rY(NC_TOP) = pGrdBase%rY1
+            this%NCFILE%iNX = this%pGrdBase%iNX
+            this%NCFILE%iNY = this%pGrdBase%iNY
+            this%NCFILE%rX(NC_LEFT) = this%pGrdBase%rX0
+            this%NCFILE%rY(NC_BOTTOM) = this%pGrdBase%rY0
+            this%NCFILE%rX(NC_RIGHT) = this%pGrdBase%rX1
+            this%NCFILE%rY(NC_TOP) = this%pGrdBase%rY1
 
           endif
 
@@ -1141,7 +1152,7 @@ end subroutine set_constant_value_real
     if (this%lCreateLocalNetCDFArchive) &
              call this%put_values_to_archive(iMonth, iDay, iYear)
 
-    call this%transfer_from_native( pGrdBase )
+    call this%transfer_from_native( )
 
   end subroutine getvalues_dynamic_netcdf_sub
 

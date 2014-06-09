@@ -8,6 +8,8 @@ module interception_bucket
 
   private
 
+  public calculate_interception_bucket
+
   logical (kind=c_bool) :: GROWING_SEASON = .true._c_bool
 
   integer (kind=c_int), allocatable :: iLanduseCodes(:)

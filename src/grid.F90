@@ -142,7 +142,6 @@ module swb_grid
 
   interface grid_gridToGrid
     module procedure grid_gridToGrid_int
-    module procedure grid_gridToGrid_short
     module procedure grid_gridToGrid_sgl
   end interface grid_gridToGrid
 
@@ -2100,13 +2099,10 @@ end function grid_GridToPoint_int
 
 !----------------------------------------------------------------------
 
-subroutine grid_GridToGrid_int(pGrdFrom, iArrayFrom, pGrdTo, iArrayTo)
+subroutine grid_GridToGrid_int( pGrdFrom, pGrdTo )
 
   type ( GENERAL_GRID_T ), pointer                    :: pGrdFrom   ! pointer to source grid
   type ( GENERAL_GRID_T ), pointer                    :: pGrdTo     ! pointer to destination grid
-  integer (kind=c_int), dimension(:,:)                :: iArrayFrom
-  integer (kind=c_int), dimension(:,:), intent(inout) :: iArrayTo
-
 
   ! [ LOCALS ]
   integer (kind=c_int) :: iCol, iRow
@@ -2119,127 +2115,51 @@ subroutine grid_GridToGrid_int(pGrdFrom, iArrayFrom, pGrdTo, iArrayTo)
   if(.not. allocated(pGrdTo%rX) )  call grid_PopulateXY(pGrdTo)
   if(.not. allocated(pGrdFrom%rX) )  call grid_PopulateXY(pGrdFrom)
 
-  call LOGS%write("Target grid resolution: "//trim(asCharacter( pGrdTo%rGridCellSize )))
-  call LOGS%write("Source grid resolution: "//trim(asCharacter( pGrdFrom%rGridCellSize )))
+  call LOGS%write("Target grid resolution: "//trim(asCharacter( pGrdTo%rGridCellSize )), iLogLevel=LOG_DEBUG )
+  call LOGS%write("Source grid resolution: "//trim(asCharacter( pGrdFrom%rGridCellSize )), iLogLevel=LOG_DEBUG)
 
   iSpread = max(1, nint(pGrdTo%rGridCellSize / pGrdFrom%rGridCellSize / 2.))
-
-!  if (.not. str_compare(pGrdFrom%sPROJ4_string,pGrdTo%sPROJ4_string)) then
-  if ( lTRUE ) then
 
 !!!   *$OMP PARALLEL DO ORDERED PRIVATE(iRow, iCol, iColRow)
-
-    do iRow=1,pGrdTo%iNY
-      do iCol=1,pGrdTo%iNX
-
-        iColRow = grid_GetGridColRowNum(pGrd=pGrdFrom, &
-                   rX=real(pGrdTo%rX(iCol, iRow), kind=c_double), &
-                   rY=real(pGrdTo%rY(iCol, iRow), kind=c_double))
-
-        call assert(iColRow(COLUMN) > 0 .and. iColRow(COLUMN) <= pGrdFrom%iNX, &
-          "Illegal column number supplied: "//trim(asCharacter(iColRow(COLUMN))), &
-          trim(__FILE__), __LINE__)
-
-        call assert(iColRow(ROW) > 0 .and. iColRow(ROW) <= pGrdFrom%iNY, &
-          "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))), &
-          trim(__FILE__), __LINE__)
-
-        iArrayTo(iCol,iRow) = grid_majorityFilter_int( pGrdFrom=pGrdFrom, &
-          iTargetCol=iColRow(COLUMN), &
-          iTargetRow=iColRow(ROW), &
-          iNoDataValue=pGrdFrom%iNoDataValue, &
-          iSpread=iSpread)
-
-      enddo
-    enddo
-
-!!!   *$OMP END PARALLEL DO
-
-  else
-
-!!!   *$OMP PARALLEL DO ORDERED PRIVATE(iRow, iCol, iSrcCol, iSrcRow)
-    do iRow=1,pGrdTo%iNY
-      do iCol=1,pGrdTo%iNX
-        iSrcCol = grid_GetGridColNum(pGrdFrom,real(pGrdTo%rX(iCol, iRow), kind=c_double) )
-        iSrcRow = grid_GetGridRowNum(pGrdFrom,real(pGrdTo%rY(iCol, iRow), kind=c_double) )
-
-        call assert(iSrcCol > 0 .and. iSrcCol <= pGrdFrom%iNX, &
-          "Illegal column number supplied: "//trim(asCharacter(iSrcCol)), &
-          trim(__FILE__), __LINE__)
-
-        call assert(iSrcRow > 0 .and. iSrcRow <= pGrdFrom%iNY, &
-          "Illegal row number supplied: "//trim(asCharacter(iSrcRow)), &
-          trim(__FILE__), __LINE__)
-
-        iArrayTo(iCol,iRow) = grid_majorityFilter_int( pGrdFrom=pGrdFrom, &
-          iTargetCol=iSrcCol, &
-          iTargetRow=iSrcRow, &
-          iNoDataValue=pGrdFrom%iNoDataValue, &
-          iSpread=iSpread)
-
-      enddo
-    enddo
-!!!   *$OMP END PARALLEL DO
-
-  endif
-
-end subroutine grid_GridToGrid_int
-
-subroutine grid_GridToGrid_short(pGrdFrom, iArrayFrom, pGrdTo, iArrayTo)
-
-  ! [ ARGUMENTS ]
-  type ( GENERAL_GRID_T ),pointer :: pGrdFrom   ! pointer to source grid
-  type ( GENERAL_GRID_T ),pointer :: pGrdTo     ! pointer to destination grid
-  integer (kind=c_int), dimension(:,:) :: iArrayFrom
-  integer (kind=c_short), dimension(:,:), intent(inout) :: iArrayTo
-
-
-  ! [ LOCALS ]
-  integer (kind=c_int) :: iCol, iRow
-  integer (kind=c_int), dimension(2) :: iColRow
-  integer (kind=c_int) :: iSpread
-
-  iSpread = max(1, nint(pGrdTo%rGridCellSize / pGrdFrom%rGridCellSize / 2.))
-
-  ! must ensure that there are coordinates associated with the "to" grid...
-  ! by default, these are left unpopulated during a "normal" swb run
-  if(.not. allocated(pGrdTo%rX) )  call grid_PopulateXY(pGrdTo)
-  if(.not. allocated(pGrdFrom%rX) )  call grid_PopulateXY(pGrdFrom)
 
   do iRow=1,pGrdTo%iNY
     do iCol=1,pGrdTo%iNX
 
-       iColRow = grid_GetGridColRowNum(pGrd=pGrdFrom, &
-                   rX=real(pGrdTo%rX(iCol, iRow), kind=c_double), &
-                   rY=real(pGrdTo%rY(iCol, iRow), kind=c_double))
+      iColRow = grid_GetGridColRowNum(pGrd=pGrdFrom, &
+                 rX=real(pGrdTo%rX(iCol, iRow), kind=c_double), &
+                 rY=real(pGrdTo%rY(iCol, iRow), kind=c_double))
 
-       call assert(iColRow(COLUMN) > 0 .and. iColRow(COLUMN) <= pGrdFrom%iNX, &
-         "Illegal column number supplied: "//trim(asCharacter(iColRow(COLUMN))), &
-         trim(__FILE__), __LINE__)
+      call assert(iColRow(COLUMN) > 0 .and. iColRow(COLUMN) <= pGrdFrom%iNX, &
+        "Illegal column number supplied: "//trim(asCharacter(iColRow(COLUMN))), &
+        trim(__FILE__), __LINE__)
 
       call assert(iColRow(ROW) > 0 .and. iColRow(ROW) <= pGrdFrom%iNY, &
         "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))), &
         trim(__FILE__), __LINE__)
 
-
-      iArrayTo(iCol,iRow) = grid_majorityFilter_int( pGrdFrom=pGrdFrom, &
-         iTargetCol=iColRow(COLUMN), &
-         iTargetRow=iColRow(ROW), &
-         iNoDataValue=pGrdFrom%iNoDataValue, &
-         iSpread=iSpread)
+      pGrdTo%iData(iCol,iRow) = grid_majorityFilter_int( pGrdFrom=pGrdFrom,         &
+             iTargetCol=iColRow(COLUMN),                                            &
+             iTargetRow=iColRow(ROW),                                               &
+             iNoDataValue=pGrdFrom%iNoDataValue,                                    &
+             iSpread=iSpread) 
 
     enddo
   enddo
 
-end subroutine grid_GridToGrid_short
+!!!   *$OMP END PARALLEL DO
+
+end subroutine grid_GridToGrid_int
 
 !----------------------------------------------------------------------
 
-subroutine grid_GridToGrid_sgl(pGrdFrom,  pGrdTo)
+subroutine grid_GridToGrid_sgl(pGrdFrom,  pGrdTo, fScaleFactor, fAddOffset, fConversionFactor)
 
   ! [ ARGUMENTS ]
   type ( GENERAL_GRID_T ),pointer :: pGrdFrom   ! pointer to source grid
   type ( GENERAL_GRID_T ),pointer :: pGrdTo     ! pointer to destination grid
+  real (kind=c_double)            :: fScaleFactor
+  real (kind=c_double)            :: fAddOffset
+  real (kind=c_double)            :: fConversionFactor
 
   ! [ LOCALS ]
   integer (kind=c_int), dimension(2) :: iColRow
@@ -2255,62 +2175,35 @@ subroutine grid_GridToGrid_sgl(pGrdFrom,  pGrdTo)
   if(.not. allocated(pGrdTo%rX) )  call grid_PopulateXY(pGrdTo)
   if(.not. allocated(pGrdFrom%rX) )  call grid_PopulateXY(pGrdFrom)
 
-!  if (.not. str_compare(pGrdFrom%sPROJ4_string,pGrdTo%sPROJ4_string)) then
-  if ( lTRUE ) then
-
 !!!   *$OMP PARALLEL DO ORDERED PRIVATE(iRow, iCol, iColRow)
 
-    do iRow=1,pGrdTo%iNY
-      do iCol=1,pGrdTo%iNX
+  do iRow=1,pGrdTo%iNY
+    do iCol=1,pGrdTo%iNX
 
-        iColRow = grid_GetGridColRowNum(pGrd=pGrdFrom, &
-                   rX=real(pGrdTo%rX(iCol, iRow), kind=c_double), &
-                   rY=real(pGrdTo%rY(iCol, iRow), kind=c_double))
+      iColRow = grid_GetGridColRowNum(pGrd=pGrdFrom, &
+                 rX=real(pGrdTo%rX(iCol, iRow), kind=c_double), &
+                 rY=real(pGrdTo%rY(iCol, iRow), kind=c_double))
 
-        call assert(iColRow(COLUMN) > 0 .and. iColRow(COLUMN) <= pGrdFrom%iNX, &
-          "Illegal column number supplied: "//trim(asCharacter(iColRow(COLUMN))), &
-          trim(__FILE__), __LINE__)
+      call assert(iColRow(COLUMN) > 0 .and. iColRow(COLUMN) <= pGrdFrom%iNX, &
+        "Illegal column number supplied: "//trim(asCharacter(iColRow(COLUMN))), &
+        trim(__FILE__), __LINE__)
 
-        call assert(iColRow(ROW) > 0 .and. iColRow(ROW) <= pGrdFrom%iNY, &
-          "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))), &
-          trim(__FILE__), __LINE__)
+      call assert(iColRow(ROW) > 0 .and. iColRow(ROW) <= pGrdFrom%iNY, &
+        "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))), &
+        trim(__FILE__), __LINE__)
 
-        pGrdTo%rData(iCol,iRow) = pGrdFrom%rData( iColRow(COLUMN), iColRow(ROW) )
+      pGrdTo%rData(iCol,iRow) = ( fConversionFactor * pGrdFrom%rData( iColRow(COLUMN), iColRow(ROW) )  &
+                                  + fAddOffset ) * fConversionFactor
 
 !         rArrayTo(iCol,iRow) = grid_Convolve_sgl(rValues=rArrayFrom, &
 !           iTargetCol=iColRow(COLUMN), &
 !           iTargetRow=iColRow(ROW), &
 !           rKernel=rKernel)
 
-      enddo
     enddo
+  enddo
 
 !!!   *$OMP END PARALLEL DO
-
-  else  ! if we have the same projections as the base, our standard methods work
-
-!!!   *$OMP PARALLEL DO ORDERED PRIVATE(iRow, iCol, iSrcRow, iSrcCol)
-
-    do iRow=1,pGrdTo%iNY
-      do iCol=1,pGrdTo%iNX
-        iSrcCol = grid_GetGridColNum(pGrdFrom,real(pGrdTo%rX(iCol, iRow), kind=c_double) )
-        iSrcRow = grid_GetGridRowNum(pGrdFrom,real(pGrdTo%rY(iCol, iRow), kind=c_double) )
-
-        call assert(iSrcCol > 0 .and. iSrcCol <= pGrdFrom%iNX, &
-          "Illegal column number supplied: "//trim(asCharacter(iSrcCol)), &
-          trim(__FILE__), __LINE__)
-
-        call assert(iSrcRow > 0 .and. iSrcRow <= pGrdFrom%iNY, &
-          "Illegal row number supplied: "//trim(asCharacter(iSrcRow)), &
-          trim(__FILE__), __LINE__)
-
-        pGrdTo%rData(iCol,iRow) = pGrdFrom%rData( iSrcCol, iSrcRow )
-      enddo
-    enddo
-
-!!!   *$OMP END PARALLEL DO
-
-  endif
 
 end subroutine grid_GridToGrid_sgl
 

@@ -18,6 +18,7 @@ if(TARGET__SWB_EXECUTABLE)
             interception_bucket.F90
             logfiles.F90
             loop_initialize.F90
+            loop_iterate.F90
             main.F90
             #meteorological_calculations.F90
             #model_domain.F90
@@ -224,6 +225,7 @@ if(TARGET__SWB_LIBRARY)
             interception_bucket.F90
             logfiles.F90
             loop_initialize.F90
+            loop_iterate.F90
             #meteorological_calculations.F90
             #model_domain.F90
             #model.F90
