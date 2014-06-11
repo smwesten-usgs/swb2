@@ -10,7 +10,7 @@ module cell_class
 
   private
 
-  type, public :: CELL_BASE_CLASS_T
+  type, public :: CELL_T
 
     integer (kind=c_int) :: iRow
     integer (kind=c_int) :: iCol
@@ -19,28 +19,7 @@ module cell_class
     integer (kind=c_int) :: iLandUseIndex                      ! Index (row num) of land use table
     integer (kind=c_int) :: iLandUse = 0_c_int                 ! Land use from land-use grid
     real (kind=c_double) :: fLatitude
-
-  contains
-
-    procedure           :: print_all_sub
-    generic             :: print => print_all_sub
-
-    procedure :: cell_set_interception_method_sub
-    generic   :: set_interception => cell_set_interception_method_sub
-
-    procedure :: cell_set_col_row_sub
-    generic   :: set_col_row => cell_set_col_row_sub
-
-    procedure :: calculate_mass_balance_sub
-    generic   :: solve => calculate_mass_balance_sub
-
-    procedure :: calculate_interception_mass_balance_sub
-    procedure :: calculate_soil_mass_balance_sub
-
-  end type CELL_BASE_CLASS_T  
-
-  type, extends(CELL_BASE_CLASS_T), public :: CELL_NORMAL_T
-
+    
     integer (kind=c_int) :: iSumUpslopeCells = 0_c_int
     integer (kind=c_int) :: iNumUpslopeConnections = 0_c_int
 
@@ -48,7 +27,6 @@ module cell_class
     real (kind=c_float) :: fInterceptionStorage = 0.0_c_float    ! This is a reservoir to hold intercepted moisture
     real (kind=c_float) :: fSnowStorage = 0.0_c_float            ! Water present on ground as snow
     real (kind=c_float) :: fStreamStorage = 0.0_c_float          ! Water present in a stream or river
-
     
     real (kind=c_float) :: fSM_AccumPotentWatLoss = 0.0_c_float  ! Accumulated potential water loss
 
@@ -77,10 +55,9 @@ module cell_class
     real (kind=c_float) :: fIrrigationFromGW = 0.0_c_float ! term to hold irrigation term, if any
     real (kind=c_float) :: fIrrigationFromSW = 0.0_c_float ! term to hold irrigation term, if any
 
-    type (CELL_NORMAL_T), pointer :: pDownslope => null()
+    type (CELL_T), pointer :: pDownslope => null()
 
     procedure ( interception_method ), pointer, private      :: calc_interception => null()
-    procedure ( interception_init_method ), pointer, private :: init_interception => null()
 
 !     procedure ( infiltration_method ), pointer, private :: infiltration_method_ptr => null()
 !     procedure ( et_method ), pointer, private           :: et_method_ptr => null()
@@ -88,6 +65,20 @@ module cell_class
 
   contains
 
+    procedure :: print_all_sub
+    generic   :: print => print_all_sub
+
+    procedure :: cell_set_interception_method_sub
+    generic   :: set_interception => cell_set_interception_method_sub
+
+    procedure :: cell_set_col_row_sub
+    generic   :: set_col_row => cell_set_col_row_sub
+
+    procedure :: calculate_mass_balance_sub
+    generic   :: solve => calculate_mass_balance_sub
+
+    procedure :: calculate_interception_mass_balance_sub
+    procedure :: calculate_soil_mass_balance_sub
 !     procedure :: set_infiltration_method_sub
 !     generic   :: set_infiltration_method => set_infiltration_method_sub
 
@@ -98,40 +89,33 @@ module cell_class
 !     generic   :: set_soil_moist_method => set_sm_method_sub
 
 
-  end type CELL_NORMAL_T
+  end type CELL_T
 
   abstract interface
     subroutine interception_method( this ) 
-      import :: CELL_NORMAL_T
-      class ( CELL_NORMAL_T ), intent(inout)  :: this
+      import :: CELL_T
+      class ( CELL_T ), intent(inout)  :: this
     end subroutine interception_method
   end interface
 
   abstract interface
-    subroutine interception_init_method( this )
-      import :: CELL_NORMAL_T
-      class ( CELL_NORMAL_T ), intent(inout)  :: this
-    end subroutine interception_init_method
-  end interface
-
-  abstract interface
     subroutine infiltration_method( this )
-      import :: CELL_NORMAL_T
-      class ( CELL_NORMAL_T ), intent(inout)  :: this
+      import :: CELL_T
+      class ( CELL_T ), intent(inout)  :: this
     end subroutine infiltration_method
   end interface
 
   abstract interface
     subroutine et_method( this )
-      import :: CELL_NORMAL_T
-      class ( CELL_NORMAL_T ), intent(inout)  :: this
+      import :: CELL_T
+      class ( CELL_T ), intent(inout)  :: this
     end subroutine et_method
   end interface    
 
   abstract interface
     subroutine sm_method( this )
-      import :: CELL_NORMAL_T
-      class ( CELL_NORMAL_T ), intent(inout)  :: this
+      import :: CELL_T
+      class ( CELL_T ), intent(inout)  :: this
     end subroutine sm_method
   end interface    
 
@@ -142,7 +126,7 @@ contains
 
   subroutine calculate_mass_balance_sub(this)
 
-    class (CELL_BASE_CLASS_T), intent(inout)  :: this
+    class (CELL_T), intent(inout)  :: this
 
     call this%calculate_interception_mass_balance_sub()
     call this%calculate_soil_mass_balance_sub()
@@ -152,18 +136,19 @@ contains
 
   subroutine calculate_interception_mass_balance_sub(this)
 
-    class (CELL_BASE_CLASS_T), intent(inout)   :: this
+    class (CELL_T), intent(inout)   :: this
 
-    select type(this)
+    call PRCP%getvalue(this%iCol, this%iRow, this%fGrossPrecip )
 
-      type is (CELL_NORMAL_T)
+    if (associated( this%calc_interception) ) then
+      call this%calc_interception()
+    else
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__, &
+        "This may be happening because there is no check to see whether the user has specified a valid~" &
+        //"method in the control file.")
+    endif
 
-        call PRCP%getvalue(this%iCol, this%iRow, this%fGrossPrecip )
-        call this%calc_interception()
-
-      class default
-
-    end select
+    if (this%fInterception > 0.02) print *, this%iRow, this%iCol, this%fGrossPrecip, this%fInterception
 
   end subroutine calculate_interception_mass_balance_sub
 
@@ -171,54 +156,29 @@ contains
 
   subroutine calculate_soil_mass_balance_sub(this)
 
-    class (CELL_BASE_CLASS_T), intent(inout)   :: this
+    class (CELL_T), intent(inout)   :: this
 
     ! [ LOCALS ]
     integer (kind=c_int) :: i, j
     real (kind=c_double) :: f, g
-
-    select type(this)
-
-      type is (CELL_NORMAL_T)
-
-
-    !    do i=1, 10000000
-     !     f = cos(real(i))
-      !    g = sin(real(i))
-       !   f = f * g + sqrt(real(i))
-     !   enddo
-
-      class default
-
-    end select
 
   end subroutine calculate_soil_mass_balance_sub
 
 
   elemental subroutine cell_set_interception_method_sub(this, sMethodName)
 
-    class (CELL_BASE_CLASS_T), intent(inout)   :: this
-    character (len=*), intent(in)              :: sMethodName
+    class (CELL_T), intent(inout)   :: this
+    character (len=*), intent(in)   :: sMethodName
 
-    select type (this)
+    if ( sMethodName .strequal. "BUCKET" ) then
 
-      type is (CELL_NORMAL_T)
+      this%calc_interception => cell_calculate_interception_bucket
 
-        if ( sMethodName .strequal. "BUCKET" ) then
+    elseif ( sMethodName .strequal. "GASH" ) then
 
-          this%init_interception => cell_initialize_interception_bucket
-          this%calc_interception => cell_calculate_interception_bucket
+      this%calc_interception => cell_calculate_interception_gash
 
-        elseif ( sMethodName .strequal. "GASH" ) then
-
-          this%init_interception => cell_initialize_interception_gash
-          this%calc_interception => cell_calculate_interception_gash
-
-        endif
-
-      class default
-     
-    end select
+    endif
 
   end subroutine cell_set_interception_method_sub
 
@@ -226,17 +186,9 @@ contains
 
   elemental subroutine get_interception_value_sub(this)
 
-    class (CELL_BASE_CLASS_T), intent(inout)   :: this
+    class (CELL_T), intent(inout)   :: this
 
-    select type (this)
-
-      type is (CELL_NORMAL_T)
-
-        call this%calc_interception()
-
-      class default
-      
-    end select    
+    call this%calc_interception()
 
   end subroutine get_interception_value_sub
 
@@ -244,7 +196,7 @@ contains
 
   subroutine et_hargreaves_samani(this)
 
-    class (CELL_NORMAL_T), intent(inout)   :: this
+    class (CELL_T), intent(inout)   :: this
 
     this%fReferenceET0 = et_hargreaves_ComputeET( iDayOfYear=180, iNumDaysInYear=365,    &
          fLatitude=asFloat(this%fLatitude), fTMin=this%fTMin, fTMax=this%fTMax )
@@ -263,35 +215,10 @@ contains
 
   subroutine print_all_sub(this)
 
-    class (CELL_BASE_CLASS_T) :: this
-
-    select type(this)
-
-      type is (CELL_NORMAL_T)
-
-        print *, "Normal cell"
-
-      type is (CELL_BASE_CLASS_T)
-
-        print *, "Inactive cell"
-
-      class default
-      
-    end select  
+    class (CELL_T) :: this
 
 
   end subroutine print_all_sub
-
-  
-  subroutine cell_initialize_interception_bucket(this)
-
-    use interception_bucket
-
-    class (CELL_NORMAL_T), intent(inout)  :: this
-
-
-
-  end subroutine cell_initialize_interception_bucket
 
 
 
@@ -299,7 +226,7 @@ contains
 
     use interception_bucket
 
-    class (CELL_NORMAL_T), intent(inout)  :: this
+    class (CELL_T), intent(inout)  :: this
 
     this%fInterception = calculate_interception_bucket( this%iLandUseIndex, this%fGrossPrecip )
 
@@ -307,25 +234,16 @@ contains
 
 
 
-  subroutine cell_initialize_interception_gash(this)
-
-    class (CELL_NORMAL_T), intent(inout)  :: this
-
-
-  end subroutine cell_initialize_interception_gash
-
-
-
   subroutine cell_calculate_interception_gash(this)
 
-    class (CELL_NORMAL_T), intent(inout)  :: this
+    class (CELL_T), intent(inout)  :: this
 
   end subroutine cell_calculate_interception_gash
 
 
   subroutine cell_set_col_row_sub( this, iCol, iRow )
 
-    class (CELL_BASE_CLASS_T), intent(inout)  :: this
+    class (CELL_T), intent(inout)         :: this
     integer (kind=c_int), intent(in)      :: iCol
     integer (kind=c_int), intent(in)      :: iRow
 

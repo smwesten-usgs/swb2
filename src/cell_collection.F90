@@ -1,6 +1,7 @@
 module cell_collection
 
   use iso_c_binding
+  use exceptions
   use cell_class
   implicit none
 
@@ -8,7 +9,7 @@ module cell_collection
 
   type, public :: CELL_COLLECTION_T
 
-    class (CELL_BASE_CLASS_T), dimension(:,:), pointer :: cell => null()
+    class (CELL_T), dimension(:), pointer :: cell
 
     character (len=:), allocatable  :: sPROJ4_string
     integer (kind=c_int)            :: iNumCols
@@ -44,12 +45,12 @@ contains
     integer (kind=c_int), intent(in)             :: iNumRows
     real (kind=c_double), intent(in)             :: fX_ll
     real (kind=c_double), intent(in)             :: fY_ll
-    real (kind=c_double), intent(in)              :: fGridcellSize
+    real (kind=c_double), intent(in)             :: fGridcellSize
 
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iStat
-    integer (kind=c_int)                 :: iRow, iCol
-    class (CELL_BASE_CLASS_T), pointer   :: pCell
+    integer (kind=c_int)                 :: iRow, iCol, iIndex
+    class (CELL_T), pointer              :: pCell
 
     this%iNumCols = iNumCols
     this%iNumRows = iNumRows
@@ -57,43 +58,23 @@ contains
     this%fY_ll = fY_ll
     this%fGridcellSize = fGridcellSize
 
-    !allocate( CELL_BASE_CLASS_T :: this%cell(iNumCols, iNumRows), stat=iStat )
+    allocate( this%cell(iNumCols * iNumRows), stat=iStat )
 
     if (iStat /=0) stop("Could not allocate memory for cells")
 
     do iRow=1, iNumRows
       do iCol=1, iNumCols
 
-        pCell => this%cell(iCol, iRow)
-         allocate( CELL_NORMAL_T::pCell )
-        call pCell%set_col_row( iCol, iRow )
+        iIndex = iCol + (iRow - 1) * iNumCols
 
-      enddo
+        if ( iIndex <= ubound(this%cell, 1) ) then
 
-    enddo  
-  
+          pCell => this%cell(iIndex)
+          call pCell%set_col_row( iCol, iRow )
+ 
+        else
 
-  end subroutine initialize_cells_sub
-
-
-  ! change allocation of inactive cells to a less memory intensive dynamic type
-  subroutine reallocate_cells_sub(this, iMask )
-
-    class (CELL_COLLECTION_T), intent(inout)     :: this
-    integer (kind=c_int), intent(in)             :: iMask(:,:)
-    
-    ! [ LOCALS ]
-    integer (kind=c_int)                 :: iStat
-    integer (kind=c_int)                 :: iRow, iCol
-    class (CELL_BASE_CLASS_T), pointer   :: pCell
-
-    do iRow=1, this%iNumRows
-      do iCol=1, this%iNumCols
-
-        if (iMask(iCol, iRow) == CELL_INACTIVE ) then
-
-          pCell => this%cell(iCol, iRow)
-          allocate( CELL_BASE_CLASS_T::pCell )
+          call die("Index out of bounds", __FILE__, __LINE__)
 
         endif  
 
@@ -101,10 +82,7 @@ contains
 
     enddo  
 
-
-  end subroutine reallocate_cells_sub
-
-
+  end subroutine initialize_cells_sub
 
 
   ! march through a single iteration of the solution
@@ -114,40 +92,24 @@ contains
     
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iStat
-    class (CELL_BASE_CLASS_T), pointer   :: pCell
-    integer (kind=c_int)                 :: iCol
-    integer (kind=c_int)                 :: iRow
+    class (CELL_T), pointer              :: pCell
+    integer (kind=c_int)                 :: iIndex
 
-    !$OMP PARALLEL
+    ! $OMP PARALLEL
 
-    !$OMP DO PRIVATE(iRow, iCol, pCell)
+    ! $OMP DO PRIVATE(iIndex, pCell)
 
-    do iRow=1, this%iNumRows
-      do iCol=1, this%iNumCols
+    do iIndex=1, ubound(this%cell, 1)
 
-          pCell => this%cell(iCol, iRow)
-          call pCell%solve()
+      pCell => this%cell(iIndex)
 
-          select type(pCell)
-
-            type is (CELL_NORMAL_T)
-
-              print *, pCell%fGrossPrecip
-
-             class default
-
-              print *, pCell%iRow, pCell%iCol
-
-
-           end select  
-
-      enddo
+      call pCell%solve()
 
     enddo  
 
-    !$OMP END DO
+    ! $OMP END DO
 
-    !$OMP END PARALLEL
+    ! $OMP END PARALLEL
 
   end subroutine solve_cells_sub
 

@@ -205,12 +205,11 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine write_to_logfiles_sub(this, sMessage, iTab, iSpc, iLinesBefore, iLinesAfter, iLogLevel, lEcho )
+  subroutine write_to_logfiles_sub(this, sMessage, iTab, iLinesBefore, iLinesAfter, iLogLevel, lEcho )
 
     class (LOGFILE_T)                            :: this
     character (len=*), intent(in)                :: sMessage
     integer (kind=c_int), intent(in), optional   :: iTab
-    integer (kind=c_int), intent(in), optional   :: iSpc
     integer (kind=c_int), intent(in), optional   :: iLinesBefore
     integer (kind=c_int), intent(in), optional   :: iLinesAfter
     integer (kind=c_int), intent(in), optional   :: iLogLevel
@@ -218,7 +217,6 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int)  :: iTab_
-    integer (kind=c_int)  :: iSpc_
     integer (kind=c_int)  :: iLinesBefore_
     integer (kind=c_int)  :: iLinesAfter_
     
@@ -229,12 +227,6 @@ contains
       iTab_ = iTab
     else
       iTab_ = 1
-    endif
-
-    if (present(iSpc) ) then
-      iSpc_ = iSpc
-    else
-      iSpc_ = len_trim(sMessage)
     endif
 
     if (present(iLinesBefore) ) then
@@ -252,7 +244,7 @@ contains
     if ( CURRENT_LOG_ECHO ) then
 
       call writeMultiLine(sMessageText=sMessage, iLU=OUTPUT_UNIT, &
-        iTab=iTab_, iSpc=iSpc_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
+        iTab=iTab_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
 
     endif
 
@@ -262,23 +254,23 @@ contains
 
         if ( this%iLogLevel >= LOG_GENERAL ) &
           call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_GENERAL ), &
-            iTab=iTab_, iSpc=iSpc_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
+            iTab=iTab_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
 
       case ( LOG_DEBUG )
 
         if ( this%iLogLevel >= LOG_DEBUG ) &
           call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_DEBUG ), &
-            iTab=iTab_, iSpc=iSpc_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
+            iTab=iTab_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
 
       case ( LOG_ALL )
 
         if ( this%iLogLevel >= LOG_GENERAL ) &
           call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_GENERAL ), &
-            iTab=iTab_, iSpc=iSpc_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
+            iTab=iTab_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
         
         if ( this%iLogLevel >= LOG_DEBUG ) &
           call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_DEBUG ), &
-            iTab=iTab_, iSpc=iSpc_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
+            iTab=iTab_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
 
       case default
 
@@ -294,13 +286,12 @@ contains
   !> each point in the text string where a carriage return is desired.
   !> @param[in] sMessageText Character string that contains the message to be written.
   !> @param[in] iLU Integer value of the Fortran logical unit number to write to.
-  subroutine writeMultiLine(sMessageText, iLU, iTab, iSpc, iLinesBefore, iLinesAfter)
+  subroutine writeMultiLine(sMessageText, iLU, iTab, iLinesBefore, iLinesAfter)
 
     ! [ ARGUMENTS ]
     character (len=*), intent(in)     :: sMessageText
     integer (kind=c_int), intent(in)  :: iLU
     integer (kind=c_int), intent(in)  :: iTab
-    integer (kind=c_int), intent(in)  :: iSpc
     integer (kind=c_int), intent(in)  :: iLinesBefore
     integer (kind=c_int), intent(in)  :: iLinesAfter
 
@@ -316,8 +307,6 @@ contains
 
     sRecord = trim(sMessageText)
 
-    write(sFmt, fmt="('(t',i0,' ,a',i0,')')") iTab, iSpc
-
     if (lFileOpen) then
 
       if ( iLinesBefore > 0 ) then
@@ -330,6 +319,7 @@ contains
 
         ! break up string with '~' as delimiter
         call split(sRecord, sItem)
+        write(sFmt, fmt="('(t',i0,' ,a',i0,')')") iTab, len_trim(sItem)
         if(len_trim(sItem) == 0) exit
         write(UNIT=iLU,FMT=trim(sFmt) ) trim(sItem)
       enddo

@@ -1005,146 +1005,166 @@ end subroutine set_constant_value_real
     ! call once at start of run...
     if ( this%iFileCountYear < 0 ) call this%set_filecount(-1, iYear)
 
-    if (this%iNC_FILE_STATUS == NETCDF_FILE_OPEN) then
+    do 
 
-      ! check to see whether currently opened file is within date range
-      ! if past date range, close file
+      if (this%iNC_FILE_STATUS == NETCDF_FILE_OPEN) then
 
-      if ( .not. netcdf_date_within_range(NCFILE=this%NCFILE, iJulianDay=iJulianDay ) ) then
-        call netcdf_close_file( NCFILE=this%NCFILE )
-        this%iNC_FILE_STATUS = NETCDF_FILE_CLOSED
+        ! check to see whether currently opened file is within date range
+        ! if past date range, close file
+
+        if ( netcdf_date_within_range(NCFILE=this%NCFILE, iJulianDay=iJulianDay ) ) then
+          exit
+        else  
+          call netcdf_close_file( NCFILE=this%NCFILE )
+          this%iNC_FILE_STATUS = NETCDF_FILE_CLOSED
+        endif
+
       endif
 
-    endif
+      if ( this%iNC_FILE_STATUS == NETCDF_FILE_CLOSED ) then
 
-    if ( this%iNC_FILE_STATUS == NETCDF_FILE_CLOSED ) then
+        ! increment or reset file counter based on current year value
+        call this%increment_filecount()
 
-      ! increment or reset file counter based on current year value
-      call this%increment_filecount()
+        ! the numerical counter used in creating filenames is reset at the end of each year
+        call this%reset_at_yearend_filecount(iYear)
 
-      ! the numerical counter used in creating filenames is reset at the end of each year
-      call this%reset_at_yearend_filecount(iYear)
+        ! based on the template information, create the filename that SWB
+        ! is to look for
+        call this%make_filename( iMonth=iMonth, iYear=iYear, iDay=iDay)
 
-      ! based on the template information, create the filename that SWB
-      ! is to look for
-      call this%make_filename( iMonth=iMonth, iYear=iYear, iDay=iDay)
+        this%lPadValues = this%test_for_need_to_pad_values(iMonth=iMonth, iYear=iYear, iDay=iDay)
 
-      this%lPadValues = this%test_for_need_to_pad_values(iMonth=iMonth, iYear=iYear, iDay=iDay)
+        ! call to test_for_need_to_pad_values return value of "TRUE" if
+        ! if attempts to open a nonexistent file within the last few days of a year.
+        ! The assumption is that values missing at the end of a calendar year
+        ! translates into a missing file at the year's end
 
-      ! call to test_for_need_to_pad_values return value of "TRUE" if
-      ! if attempts to open a nonexistent file within the last few days of a year.
-      ! The assumption is that values missing at the end of a calendar year
-      ! translates into a missing file at the year's end
+        if (.not. this%lPadValues) then
 
-      if (.not. this%lPadValues) then
+          if (this%lPerformFullInitialization ) then
 
-        if (this%lPerformFullInitialization ) then
+            if( len_trim( this%sSourcePROJ4_string ) > 0 ) then
 
-          if( len_trim( this%sSourcePROJ4_string ) > 0 ) then
+              ! calculate the project boundaries in the coordinate system of
+              ! the native data file
+              call this%calc_project_boundaries(pGrdBase=this%pGrdBase)
 
-            ! calculate the project boundaries in the coordinate system of
-            ! the native data file
-            call this%calc_project_boundaries(pGrdBase=this%pGrdBase)
+              call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE, &
+                sFilename=this%sSourceFilename, &
+                lFlipHorizontal=this%lFlipHorizontal, &
+                lFlipVertical=this%lFlipVertical, &
+                sVariableOrder=this%sVariableOrder, &
+                sVarName_x=this%sVariableName_x, &
+                sVarName_y=this%sVariableName_y, &
+                sVarName_z=this%sVariableName_z, &
+                sVarName_time=this%sVariableName_time, &
+                tGridBounds=this%GRID_BOUNDS_NATIVE )
 
-            call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE, &
-              sFilename=this%sSourceFilename, &
-              lFlipHorizontal=this%lFlipHorizontal, &
-              lFlipVertical=this%lFlipVertical, &
-              sVariableOrder=this%sVariableOrder, &
-              sVarName_x=this%sVariableName_x, &
-              sVarName_y=this%sVariableName_y, &
-              sVarName_z=this%sVariableName_z, &
-              sVarName_time=this%sVariableName_time, &
-              tGridBounds=this%GRID_BOUNDS_NATIVE )
+            else  ! PROJ4 string is blank
 
-          else  ! PROJ4 string is blank
+              ! assume source NetCDF file is in same projection and
+              ! of same dimensions as base grid
+              call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE, &
+                sFilename=this%sSourceFilename, &
+                lFlipHorizontal=this%lFlipHorizontal, &
+                lFlipVertical=this%lFlipVertical, &
+                sVariableOrder=this%sVariableOrder, &
+                sVarName_x=this%sVariableName_x, &
+                sVarName_y=this%sVariableName_y, &
+                sVarName_z=this%sVariableName_z, &
+                sVarName_time=this%sVariableName_time )
 
-            ! assume source NetCDF file is in same projection and
-            ! of same dimensions as base grid
-            call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE, &
-              sFilename=this%sSourceFilename, &
-              lFlipHorizontal=this%lFlipHorizontal, &
-              lFlipVertical=this%lFlipVertical, &
-              sVariableOrder=this%sVariableOrder, &
-              sVarName_x=this%sVariableName_x, &
-              sVarName_y=this%sVariableName_y, &
-              sVarName_z=this%sVariableName_z, &
-              sVarName_time=this%sVariableName_time )
+              this%NCFILE%iNX = this%pGrdBase%iNX
+              this%NCFILE%iNY = this%pGrdBase%iNY
+              this%NCFILE%rX(NC_LEFT) = this%pGrdBase%rX0
+              this%NCFILE%rY(NC_BOTTOM) = this%pGrdBase%rY0
+              this%NCFILE%rX(NC_RIGHT) = this%pGrdBase%rX1
+              this%NCFILE%rY(NC_TOP) = this%pGrdBase%rY1
 
-            this%NCFILE%iNX = this%pGrdBase%iNX
-            this%NCFILE%iNY = this%pGrdBase%iNY
-            this%NCFILE%rX(NC_LEFT) = this%pGrdBase%rX0
-            this%NCFILE%rY(NC_BOTTOM) = this%pGrdBase%rY0
-            this%NCFILE%rX(NC_RIGHT) = this%pGrdBase%rX1
-            this%NCFILE%rY(NC_TOP) = this%pGrdBase%rY1
+            endif
+
+            this%iNC_FILE_STATUS = NETCDF_FILE_OPEN
+
+            this%iSourceDataType = this%NCFILE%iVarType(NC_Z)
+
+            ! if the user has not supplied a scale and offset,
+            ! then populate these values with the scale and offset
+            ! factor included in the NetCDF attribute data, if any.
+            if (.not. this%lUserSuppliedScaleAndOffset) then
+              this%rAddOffset = this%NCFILE%rAddOffset(NC_Z)
+              this%rScaleFactor = this%NCFILE%rScaleFactor(NC_Z)
+            endif
+
+            ! Amongst other things, the call to netcdf_open_and_prepare
+            ! finds the nearest column and row that correspond to the
+            ! project bounds, then back-calculates the coordinate values
+            ! of the column and row numbers in the *NATIVE* coordinate system
+            if ( associated(this%pGrdNative) )  call grid_Destroy (this%pGrdNative)
+
+            this%pGrdNative => grid_Create ( iNX=this%NCFILE%iNX, &
+                      iNY=this%NCFILE%iNY, &
+                      rX0=this%NCFILE%rX(NC_LEFT), &
+                      rY0=this%NCFILE%rY(NC_BOTTOM), &
+                      rX1=this%NCFILE%rX(NC_RIGHT), &
+                      rY1=this%NCFILE%rY(NC_TOP), &
+                      iDataType=this%iTargetDataType )
+
+            if( len_trim( this%sSourcePROJ4_string ) > 0 ) then
+              ! ensure that PROJ4 string is associated with the native grid
+              this%pGrdNative%sPROJ4_string = this%sSourcePROJ4_string
+            endif
+
+            this%pGrdNative%sFilename = this%sSourceFilename
+
+            ! we don't need to perform all these steps for the next file; we are
+            ! assuming, of course, that all of the subsequent files cover the same
+            ! extents and are in the same projection as this first file
+            this%lPerformFullInitialization = lFALSE
+
+          else
+            ! Projection settings can be left alone; read values from new
+            ! NetCDF file with same grid boundaries, projection, etc.
+
+  !          call netcdf_open_file(NCFILE=this%NCFILE, sFilename=this%sSourceFilename, iLU=LU_LOG)
+            call netcdf_open_file(NCFILE=this%NCFILE, sFilename=this%sSourceFilename)
+
+            this%iNC_FILE_STATUS = NETCDF_FILE_OPEN
 
           endif
 
-          this%iNC_FILE_STATUS = NETCDF_FILE_OPEN
 
-          this%iSourceDataType = this%NCFILE%iVarType(NC_Z)
+          if ( netcdf_date_within_range(NCFILE=this%NCFILE, iJulianDay=iJulianDay) ) then
 
-          ! if the user has not supplied a scale and offset,
-          ! then populate these values with the scale and offset
-          ! factor included in the NetCDF attribute data, if any.
-          if (.not. this%lUserSuppliedScaleAndOffset) then
-            this%rAddOffset = this%NCFILE%rAddOffset(NC_Z)
-            this%rScaleFactor = this%NCFILE%rScaleFactor(NC_Z)
+            exit
+
+          elseif ( scan(this%sFilenameTemplate, "#") /= 0 ) then
+            
+            call netcdf_close_file( NCFILE=this%NCFILE )
+            this%iNC_FILE_STATUS = NETCDF_FILE_CLOSED
+            call LOGS%write("Did not find the current date in the file "//dquote(this%sSourceFilename)//"~" &
+              //"JD range: "//asCharacter(this%NCFILE%iFirstDayJD)//" to "//asCharacter(this%NCFILE%iLastDayJD) &
+              //"~current JD: "//asCharacter(iJulianDay)//"~ Will increment sequential file number and try again.", &
+              iLinesBefore=1, iLinesAfter=1 )
+
+          else  
+
+            call LOGS%write("Valid date range (NetCDF): "//trim(asCharacter(this%NCFILE%iFirstDayJD)) &
+              //" to "//trim(asCharacter(this%NCFILE%iLastDayJD)) )
+
+            call LOGS%write("Current Julian Day value: "//trim(asCharacter(iJulianDay)) )
+
+            call assert (lFALSE, "Date range for currently open NetCDF file" &
+              //" does not include the present simulation date.", &
+              trim(__FILE__), __LINE__)
+
           endif
 
-          ! Amongst other things, the call to netcdf_open_and_prepare
-          ! finds the nearest column and row that correspond to the
-          ! project bounds, then back-calculates the coordinate values
-          ! of the column and row numbers in the *NATIVE* coordinate system
-          if ( associated(this%pGrdNative) )  call grid_Destroy (this%pGrdNative)
+        endif   ! if(lPadValues)
 
-          this%pGrdNative => grid_Create ( iNX=this%NCFILE%iNX, &
-                    iNY=this%NCFILE%iNY, &
-                    rX0=this%NCFILE%rX(NC_LEFT), &
-                    rY0=this%NCFILE%rY(NC_BOTTOM), &
-                    rX1=this%NCFILE%rX(NC_RIGHT), &
-                    rY1=this%NCFILE%rY(NC_TOP), &
-                    iDataType=this%iTargetDataType )
+      endif  ! If (NC_FILE_STATUS == NETCDF_CLOSED)
 
-          if( len_trim( this%sSourcePROJ4_string ) > 0 ) then
-            ! ensure that PROJ4 string is associated with the native grid
-            this%pGrdNative%sPROJ4_string = this%sSourcePROJ4_string
-          endif
-
-          this%pGrdNative%sFilename = this%sSourceFilename
-
-          ! we don't need to perform all these steps for the next file; we are
-          ! assuming, of course, that all of the subsequent files cover the same
-          ! extents and are in the same projection as this first file
-          this%lPerformFullInitialization = lFALSE
-
-        else
-          ! Projection settings can be left alone; read values from new
-          ! NetCDF file with same grid boundaries, projection, etc.
-
-!          call netcdf_open_file(NCFILE=this%NCFILE, sFilename=this%sSourceFilename, iLU=LU_LOG)
-          call netcdf_open_file(NCFILE=this%NCFILE, sFilename=this%sSourceFilename)
-
-          this%iNC_FILE_STATUS = NETCDF_FILE_OPEN
-
-        endif
-
-        if (.not. netcdf_date_within_range(NCFILE=this%NCFILE, iJulianDay=iJulianDay) ) then
-
-          call LOGS%write("Valid date range (NetCDF): "//trim(asCharacter(this%NCFILE%iFirstDayJD)) &
-            //" to "//trim(asCharacter(this%NCFILE%iLastDayJD)) )
-
-          call LOGS%write("Current Julian Day value: "//trim(asCharacter(iJulianDay)) )
-
-          call assert (lFALSE, "Date range for currently open NetCDF file" &
-            //" does not include the present simulation date.", &
-            trim(__FILE__), __LINE__)
-
-        endif
-
-      endif   ! if(lPadValues)
-
-    endif  ! If (NC_FILE_STATUS == NETCDF_CLOSED)
+    enddo
 
     if (.not. this%lPadValues) then
 

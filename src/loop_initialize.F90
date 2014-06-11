@@ -9,6 +9,7 @@ module loop_initialize
   use dictionary
   use exceptions
   use file_operations
+  use interception_bucket
   use loop_iterate
   use parameters
   use strings
@@ -1353,11 +1354,14 @@ contains
               case ( "BUCKET" )
 
                 call CELLS%cell%set_interception("BUCKET")
+                call initialize_interception_bucket()
 
             end select
             
           case default
           
+            call warn("Unknown interception method was specified: "//dquote(sArgText), iLogLevel=LOG_ALL )
+
         end select
         
       enddo
