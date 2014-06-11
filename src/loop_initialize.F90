@@ -244,7 +244,7 @@ contains
 
           case ( "PRECIPITATION_GRID_PROJECTION_DEFINITION" )
 
-            sArgText = myOptions%get(2, myOptions%count )
+            sArgText = myOptions%get(1, myOptions%count )
             call PRCP%set_PROJ4( trim(sArgText) )
 
           case ( "PRECIPITATION_MINIMUM_ALLOWED_VALUE" )
@@ -417,7 +417,7 @@ contains
 
           case ( "TMAX_GRID_PROJECTION_DEFINITION" )
 
-            sArgText = myOptions%get(2, myOptions%count )
+            sArgText = myOptions%get(1, myOptions%count )
             call TMAX%set_PROJ4( trim(sArgText) )
 
           case ( "TMAX_MINIMUM_ALLOWED_VALUE" )
@@ -585,7 +585,7 @@ contains
 
           case ( "TMIN_GRID_PROJECTION_DEFINITION" )
 
-            sArgText = myOptions%get(2, myOptions%count )
+            sArgText = myOptions%get(1, myOptions%count )
             call TMIN%set_PROJ4( trim(sArgText) )
 
           case ( "TMIN_MINIMUM_ALLOWED_VALUE" )
@@ -688,12 +688,26 @@ contains
 
     endif
 
+    call myOptions%deallocate()
+
+    ! For this directive, obtain the associated dictionary entries
+    call CF_DICT%get_values( "BASE_PROJECTION_DEFINITION", myOptions )
+
+    ! dictionary entries are initially space-delimited; sArgText contains
+    ! all dictionary entries present, concatenated, with a space between entries
+    sArgText = myOptions%get(1, myOptions%count )
+
+    ! echo the original directive and dictionary entries to the logfile
+    call LOGS%write(">> "//"BASE_PROJECTION_DEFINITION "//sArgText)
+
+    BNDS%iNumCols = iNX
+    BNDS%iNumRows = iNY
     BNDS%fX_ll = rX0
     BNDS%fY_ll = rY0
     BNDS%fY_ur = rY1
     BNDS%fX_ur = rX1
     BNDS%fGridCellSize = rGridCellSize
-    BNDS%sPROJ4_string = ""
+    BNDS%sPROJ4_string = trim(sArgText)
 
   end subroutine initialize_grid_options
 
@@ -782,7 +796,7 @@ contains
 
           case ( "FLOW_DIRECTION_PROJECTION_DEFINITION" )
 
-            sArgText = myOptions%get(2, myOptions%count )
+            sArgText = myOptions%get(1, myOptions%count )
             call FLOWDIR%set_PROJ4( trim(sArgText) )
 
           case default
@@ -885,7 +899,7 @@ contains
 
           case ( "WATER_CAPACITY_PROJECTION_DEFINITION" )
 
-            sArgText = myOptions%get(2, myOptions%count )
+            sArgText = myOptions%get(1, myOptions%count )
             call AWC%set_PROJ4( trim(sArgText) )
 
           case default
@@ -994,7 +1008,7 @@ contains
 
           case ( "SOILS_GROUP_PROJECTION_DEFINITION", "SOIL_GROUP_PROJECTION_DEFINITION" )
 
-            sArgText = myOptions%get(2, myOptions%count )
+            sArgText = myOptions%get(1, myOptions%count )
             call HSG%set_PROJ4( trim(sArgText) )
 
           case default
@@ -1067,14 +1081,10 @@ contains
             call SIM_DT%start%parseDate( sOptionText )
             call SIM_DT%start%calcJulianDay()
 
-            print *, dquote(sOptionText)
-
           case ( "END_DATE", "ENDDATE" )
 
             call SIM_DT%end%parseDate( sOptionText )
             call SIM_DT%end%calcJulianDay()
-
-print *, dquote(sOptionText)
 
           case default
 
@@ -1086,6 +1096,7 @@ print *, dquote(sOptionText)
       enddo
 
       SIM_DT%curr = SIM_DT%start
+      SIM_DT%iDOY = day_of_year( SIM_DT%curr%getJulianDay() )
 
       SIM_DT%iDaysInMonth = SIM_DT%curr%dayspermonth()
       SIM_DT%iDaysInYear = SIM_DT%curr%daysperyear()
@@ -1193,7 +1204,7 @@ print *, dquote(sOptionText)
 
           case ( "LANDUSE_PROJECTION_DEFINITION", "LAND_USE_PROJECTION_DEFINITION" )
 
-            sArgText = myOptions%get(2, myOptions%count )
+            sArgText = myOptions%get(1, myOptions%count )
             call LULC%set_PROJ4( trim(sArgText) )
 
           case default

@@ -1094,8 +1094,6 @@ subroutine nf_open_file(NCFILE, sFilename, iLU)
   call nf_trap( nc_open(trim(sFilename)//c_null_char, &
                 NC_READONLY, NCFILE%iNCID), __FILE__, __LINE__ )
 
-  print *, __FILE__,": ",__LINE__
-
   call nf_trap( nc_inq_format(ncid=NCFILE%iNCID, formatp=NCFILE%iFileFormat), &
                __FILE__, __LINE__)
 
@@ -1103,13 +1101,6 @@ subroutine nf_open_file(NCFILE, sFilename, iLU)
          //"  format: "//trim(NETCDF_FORMAT_STRING(NCFILE%iFileFormat) ) )
 
   NCFILE%sFilename = sFilename
-
-!  call netcdf_dump_cdl( NCFILE, LU_STD_OUT)
-
-!  NCFILE%dpFirstAndLastTimeValues = nf_get_first_and_last(NCFILE=NCFILE, &
-!    iVarIndex=NCFILE%iVarIndex(NC_TIME) )
-
-!  call nf_calculate_time_range(NCFILE)
 
   if( present(iLU) ) then
     inquire (unit=iLU, opened=lFileOpen)

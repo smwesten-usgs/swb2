@@ -22,15 +22,15 @@ int pj_init_and_transform( const char *from_projection, const char *to_projectio
 
     if (!(pj_from = pj_init_plus(from_projection)) ) {
 	    printf("\nPROJ4 ERROR: There was a problem creating a PROJ4 object; "
-	      "something is\nwrong with the PROJ4 string you supplied."
-	      "\nOffending string: '%s'",from_projection);
+	      "something is\nwrong with the PROJ4 string associated with the source projection."
+	      "\nOffending string: '%s'\n\n",from_projection);
         exit(1);
 	}
 
     if (!(pj_to = pj_init_plus(to_projection)) ) {
 	    printf("\nPROJ4 ERROR: There was a problem creating a PROJ4 object; "
-	      "something is\nwrong with the PROJ4 string you supplied."
-	      "\nOffending string: '%s'",to_projection);
+	      "something is\nwrong with the PROJ4 string associated with the destination projection."
+	      "\nOffending string: '%s'\n\n",to_projection);
         exit(1);
 	}
 

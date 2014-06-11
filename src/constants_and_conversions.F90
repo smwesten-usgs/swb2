@@ -13,9 +13,8 @@ module constants_and_conversions
   ! 
   integer (kind=c_int), parameter :: DATATYPE_INT = 0
   integer (kind=c_int), parameter :: DATATYPE_REAL = 1
-  integer (kind=c_int), parameter :: DATATYPE_CELL_GRID = 2
-  integer (kind=c_int), parameter :: DATATYPE_SHORT = 3
-  integer (kind=c_int), parameter :: DATATYPE_DOUBLE = 4
+  integer (kind=c_int), parameter :: DATATYPE_SHORT = 2
+  integer (kind=c_int), parameter :: DATATYPE_DOUBLE = 3
   integer (kind=c_int), parameter :: DATATYPE_NA = -9999
 
   ! [ common mathematical constants ]

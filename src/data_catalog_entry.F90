@@ -259,19 +259,24 @@ contains
 !--------------------------------------------------------------------------------------------------
 
   subroutine initialize_constant_real_data_object_sub( this, &
-     sDescription, &
-     rConstant )
+    sDescription, &
+    rConstant )
 
-     class (DATA_CATALOG_ENTRY_T) :: this
-     character (len=*) :: sDescription
-     real (kind=c_float), intent(in) :: rConstant
+    class (DATA_CATALOG_ENTRY_T) :: this
+    character (len=*) :: sDescription
+    real (kind=c_float), intent(in) :: rConstant
 
-     this%rConstantValue = rConstant
-     this%sDescription = trim(sDescription)
-     this%iSourceDataForm = CONSTANT_GRID
-     this%iSourceDataType = DATATYPE_REAL
-     this%iTargetDataType = DATATYPE_REAL
-     this%iSourceFileType = FILETYPE_NONE
+    this%rConstantValue = rConstant
+    this%sDescription = trim(sDescription)
+    this%iSourceDataForm = CONSTANT_GRID
+    this%iSourceDataType = DATATYPE_REAL
+    this%iTargetDataType = DATATYPE_REAL
+    this%iSourceFileType = FILETYPE_NONE
+
+    this%pGrdBase => grid_Create(iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, &
+      rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, rGridCellSize=BNDS%fGridCellSize, iDataType=DATATYPE_REAL)
+
+    this%pGrdBase%sPROJ4_string = BNDS%sPROJ4_string
 
     call netcdf_nullify_data_struct( NCFILE=this%NCFILE )
     call netcdf_nullify_data_struct( NCFILE=this%NCFILE_ARCHIVE )
@@ -295,6 +300,11 @@ contains
     this%iTargetDataType = DATATYPE_INT
     this%iSourceFileType = FILETYPE_NONE
 
+    this%pGrdBase => grid_Create(iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, &
+      rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, rGridCellSize=BNDS%fGridCellSize, iDataType=DATATYPE_INT)
+
+    this%pGrdBase%sPROJ4_string = BNDS%sPROJ4_string
+
     call netcdf_nullify_data_struct( NCFILE=this%NCFILE )
     call netcdf_nullify_data_struct( NCFILE=this%NCFILE_ARCHIVE )
 
@@ -303,60 +313,53 @@ contains
 !--------------------------------------------------------------------------------------------------
 
 subroutine initialize_gridded_data_object_sub( this, &
-   sDescription, &
-   sFileType, &
-   iDataType, &
-   sFilename, &
-   sFilenameTemplate, &
-   sPROJ4_string )
+  sDescription, &
+  sFileType, &
+  iDataType, &
+  sFilename, &
+  sFilenameTemplate, &
+  sPROJ4_string )
 
-   class (DATA_CATALOG_ENTRY_T) :: this
-   type ( GENERAL_GRID_T ),pointer :: pGrd
-   character (len=*) :: sDescription
-   character (len=*) :: sFileType
-   character (len=*), optional :: sFilename
-   integer (kind=c_int) :: iDataType
-   character (len=*), optional :: sFilenameTemplate
-   character (len=*), optional :: sPROJ4_string
+  class (DATA_CATALOG_ENTRY_T) :: this
+  character (len=*) :: sDescription
+  character (len=*) :: sFileType
+  character (len=*), optional :: sFilename
+  integer (kind=c_int) :: iDataType
+  character (len=*), optional :: sFilenameTemplate
+  character (len=*), optional :: sPROJ4_string
 
-   if (present(sPROJ4_string) ) then
-     this%sSourcePROJ4_string = trim(sPROJ4_string)
-     if(.not. ( sPROJ4_string .strequal. BNDS%sPROJ4_string) ) &
-         this%lProjectionDiffersFromBase = lTRUE
-   else
-     this%sSourcePROJ4_string =  BNDS%sPROJ4_string
-     this%lProjectionDiffersFromBase = lTRUE
-   endif
+  if (present(sPROJ4_string) ) then
+    this%sSourcePROJ4_string = trim(sPROJ4_string)
+    if(.not. ( sPROJ4_string .strequal. BNDS%sPROJ4_string) ) &
+      this%lProjectionDiffersFromBase = lTRUE
+  else
+    this%sSourcePROJ4_string =  BNDS%sPROJ4_string
+    this%lProjectionDiffersFromBase = lTRUE
+  endif
 
-   if (present(sFilename)) then
-     this%sSourceFilename = sFilename
-     this%iSourceDataForm = STATIC_GRID
-   else
-     this%sSourceFilename = ""
-   endif
+  if (present(sFilename)) then
+    this%sSourceFilename = sFilename
+    this%iSourceDataForm = STATIC_GRID
+  else
+    this%sSourceFilename = ""
+  endif
 
-   if (present(sFilenameTemplate)) then
-     this%sFilenameTemplate = sFilenameTemplate
-     this%sSourceFilename = ""
-     this%iSourceDataForm = DYNAMIC_GRID
-     this%lGridIsPersistent = lTRUE
-   else
-     this%sFilenameTemplate = ""
-   endif
+  if (present(sFilenameTemplate)) then
+    this%sFilenameTemplate = sFilenameTemplate
+    this%sSourceFilename = ""
+    this%iSourceDataForm = DYNAMIC_GRID
+    this%lGridIsPersistent = lTRUE
+  else
+    this%sFilenameTemplate = ""
+  endif
 
-   call assert(.not. (len_trim(this%sSourceFilename) > 0 &
-      .and. len_trim(this%sFilenameTemplate) > 0), &
-      "INTERNAL PROGRAMMING ERROR - values may be assigned to either " &
-      //dquote("Filename")//" or the "//dquote("sFilenameTemplate") &
-      //" -- NOT BOTH", trim(__FILE__), __LINE__)
+  this%sSourceFileType = sFileType
+  this%iSourceFileType = this%get_filetype()
 
-   this%sSourceFileType = sFileType
-   this%iSourceFileType = this%get_filetype()
+  this%iSourceDataType = iDataType
+  this%iTargetDataType = iDataType
 
-   this%iSourceDataType = iDataType
-   this%iTargetDataType = iDataType
-
-   this%sDescription = trim(sDescription)
+  this%sDescription = trim(sDescription)
 
   call assert(this%iSourceFileType == FILETYPE_ARC_ASCII .or. &
     this%iSourceFileType == FILETYPE_SURFER, "Only Arc ASCII or " &
@@ -367,6 +370,18 @@ subroutine initialize_gridded_data_object_sub( this, &
     this%iSourceDataType == DATATYPE_REAL, "Only integer or " &
     //"real data types are supported as static grid inputs.", &
     trim(__FILE__), __LINE__)
+
+
+  this%pGrdBase => grid_Create(iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, &
+    rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, rGridCellSize=BNDS%fGridCellSize, iDataType=iDataType)
+
+  this%pGrdBase%sPROJ4_string = BNDS%sPROJ4_string
+
+  call assert(.not. (len_trim(this%sSourceFilename) > 0 &
+    .and. len_trim(this%sFilenameTemplate) > 0), &
+    "INTERNAL PROGRAMMING ERROR - values may be assigned to either " &
+    //dquote("Filename")//" or the "//dquote("sFilenameTemplate") &
+    //" -- NOT BOTH", trim(__FILE__), __LINE__)
 
   nullify(this%pGrdNative)
 
@@ -417,6 +432,11 @@ subroutine initialize_netcdf_data_object_sub( this, &
    else
      this%sFilenameTemplate = ""
    endif
+
+   this%pGrdBase => grid_Create(iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, &
+     rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, rGridCellSize=BNDS%fGridCellSize, iDataType=iDataType)
+
+   this%pGrdBase%sPROJ4_string = BNDS%sPROJ4_string
 
    call assert(.not. (len_trim(this%sSourceFilename) > 0 &
       .and. len_trim(this%sFilenameTemplate) > 0), &
@@ -493,6 +513,9 @@ subroutine getvalues_constant_sub( this  )
 
   class (DATA_CATALOG_ENTRY_T) :: this
 
+  if ( .not. associated(this%pGrdBase) ) &
+    call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
+
   select case (this%iSourceDataType)
 
     case ( DATATYPE_REAL )
@@ -551,6 +574,9 @@ subroutine getvalues_constant_sub( this  )
     integer (kind=c_int), optional :: iYear
     logical (kind=c_bool) :: lExist
     logical (kind=c_bool) :: lOpened
+
+    if ( .not. associated(this%pGrdBase) ) &
+      call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
 
     this%lGridHasChanged = lFALSE
 
@@ -645,6 +671,9 @@ subroutine transform_grid_to_grid(this)
 
   class (DATA_CATALOG_ENTRY_T) :: this
 
+  if (.not. associated(this%pGrdNative) )  &
+    call die("INTERNAL PROGRAMMING ERROR--Null pointer detected.", __FILE__, __LINE__)
+
   ! only invoke the transform procedure if the PROJ4 strings are different
   if (.not. ( this%pGrdNative%sPROJ4_string .strequal. this%pGrdBase%sPROJ4_string ) ) then
 
@@ -674,7 +703,10 @@ subroutine transform_grid_to_grid(this)
     case ( GRID_DATATYPE_REAL )
 
       call grid_gridToGrid(pGrdFrom=this%pGrdNative,&
-                          pGrdTo=this%pGrdBase )
+                          pGrdTo=this%pGrdBase, &
+                          fScaleFactor=this%rScaleFactor, &
+                          fAddOffset=this%rAddOffset, &
+                          fConversionFactor=this%rConversionFactor )
 
     case ( GRID_DATATYPE_INT )
 
@@ -965,6 +997,9 @@ end subroutine set_constant_value_real
     integer (kind=c_int) :: iStat
     logical (kind=c_bool) :: lDateTimeFound
 
+    if ( .not. associated(this%pGrdBase) ) &
+      call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
+
     this%lPadValues = lFALSE
 
     ! call once at start of run...
@@ -1061,6 +1096,8 @@ end subroutine set_constant_value_real
           ! finds the nearest column and row that correspond to the
           ! project bounds, then back-calculates the coordinate values
           ! of the column and row numbers in the *NATIVE* coordinate system
+          if ( associated(this%pGrdNative) )  call grid_Destroy (this%pGrdNative)
+
           this%pGrdNative => grid_Create ( iNX=this%NCFILE%iNX, &
                     iNY=this%NCFILE%iNY, &
                     rX0=this%NCFILE%rX(NC_LEFT), &

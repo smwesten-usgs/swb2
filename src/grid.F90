@@ -57,8 +57,8 @@ module swb_grid
     real (kind=c_double)            :: rX0, rX1              ! World-coordinate range in X
     real (kind=c_double)            :: rY0, rY1              ! World-coordinate range in Y
     
-    integer (kind=c_int), dimension(:,:), pointer     :: iData ! Integer data
-    real (kind=c_float), dimension(:,:), pointer      :: rData    ! Real data
+    integer (kind=c_int), dimension(:,:), allocatable   :: iData ! Integer data
+    real (kind=c_float), dimension(:,:), allocatable    :: rData    ! Real data
     real (kind=c_double), dimension(:,:), allocatable :: rX    ! x coordinate associated with data
     real (kind=c_double), dimension(:,:), allocatable :: rY    ! y coordinate associated with data
     integer (kind=c_int), dimension(:,:), allocatable :: iMask ! Mask for processing results

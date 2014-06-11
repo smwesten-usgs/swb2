@@ -57,7 +57,7 @@ contains
     this%fY_ll = fY_ll
     this%fGridcellSize = fGridcellSize
 
-    allocate( this%cell(iNumCols, iNumRows), stat=iStat )
+    !allocate( CELL_BASE_CLASS_T :: this%cell(iNumCols, iNumRows), stat=iStat )
 
     if (iStat /=0) stop("Could not allocate memory for cells")
 
@@ -65,13 +65,13 @@ contains
       do iCol=1, iNumCols
 
         pCell => this%cell(iCol, iRow)
-        allocate( CELL_NORMAL_T::pCell )
+         allocate( CELL_NORMAL_T::pCell )
+        call pCell%set_col_row( iCol, iRow )
 
       enddo
 
     enddo  
-
-
+  
 
   end subroutine initialize_cells_sub
 
@@ -94,7 +94,6 @@ contains
 
           pCell => this%cell(iCol, iRow)
           allocate( CELL_BASE_CLASS_T::pCell )
-          call pCell%set_col_row( iCol, iRow )
 
         endif  
 
@@ -119,15 +118,36 @@ contains
     integer (kind=c_int)                 :: iCol
     integer (kind=c_int)                 :: iRow
 
+    !$OMP PARALLEL
+
+    !$OMP DO PRIVATE(iRow, iCol, pCell)
+
     do iRow=1, this%iNumRows
       do iCol=1, this%iNumCols
 
           pCell => this%cell(iCol, iRow)
-          ! call pCell%solve()
+          call pCell%solve()
+
+          select type(pCell)
+
+            type is (CELL_NORMAL_T)
+
+              print *, pCell%fGrossPrecip
+
+             class default
+
+              print *, pCell%iRow, pCell%iCol
+
+
+           end select  
 
       enddo
 
     enddo  
+
+    !$OMP END DO
+
+    !$OMP END PARALLEL
 
   end subroutine solve_cells_sub
 

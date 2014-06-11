@@ -31,6 +31,12 @@ module cell_class
     procedure :: cell_set_col_row_sub
     generic   :: set_col_row => cell_set_col_row_sub
 
+    procedure :: calculate_mass_balance_sub
+    generic   :: solve => calculate_mass_balance_sub
+
+    procedure :: calculate_interception_mass_balance_sub
+    procedure :: calculate_soil_mass_balance_sub
+
   end type CELL_BASE_CLASS_T  
 
   type, extends(CELL_BASE_CLASS_T), public :: CELL_NORMAL_T
@@ -133,6 +139,61 @@ module cell_class
 contains
 
   !! implementations of the interfaces above
+
+  subroutine calculate_mass_balance_sub(this)
+
+    class (CELL_BASE_CLASS_T), intent(inout)  :: this
+
+    call this%calculate_interception_mass_balance_sub()
+    call this%calculate_soil_mass_balance_sub()
+
+  end subroutine calculate_mass_balance_sub
+
+
+  subroutine calculate_interception_mass_balance_sub(this)
+
+    class (CELL_BASE_CLASS_T), intent(inout)   :: this
+
+    select type(this)
+
+      type is (CELL_NORMAL_T)
+
+        call PRCP%getvalue(this%iCol, this%iRow, this%fGrossPrecip )
+        call this%calc_interception()
+
+      class default
+
+    end select
+
+  end subroutine calculate_interception_mass_balance_sub
+
+
+
+  subroutine calculate_soil_mass_balance_sub(this)
+
+    class (CELL_BASE_CLASS_T), intent(inout)   :: this
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: i, j
+    real (kind=c_double) :: f, g
+
+    select type(this)
+
+      type is (CELL_NORMAL_T)
+
+
+    !    do i=1, 10000000
+     !     f = cos(real(i))
+      !    g = sin(real(i))
+       !   f = f * g + sqrt(real(i))
+     !   enddo
+
+      class default
+
+    end select
+
+  end subroutine calculate_soil_mass_balance_sub
+
 
   elemental subroutine cell_set_interception_method_sub(this, sMethodName)
 
@@ -240,12 +301,7 @@ contains
 
     class (CELL_NORMAL_T), intent(inout)  :: this
 
-    ! [ LOCALS ]
-    real (kind=c_float) :: fGrossPrecip
-
-    call PRCP%getvalue(this%iCol, this%iRow, fGrossPrecip )
-
-    this%fInterception = calculate_interception_bucket( this%iLandUseIndex, fGrossPrecip )
+    this%fInterception = calculate_interception_bucket( this%iLandUseIndex, this%fGrossPrecip )
 
   end subroutine cell_calculate_interception_bucket
 
