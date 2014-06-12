@@ -135,12 +135,10 @@ program main
   call read_control_file(sControlFile)
 
   call initialize_options()
-  call iterate_over_simulation_days()
   
-
   call check_for_fatal_warnings()
 
-
+  call iterate_over_simulation_days()
    
 
   !! create matrix of cells

@@ -13,11 +13,12 @@ module cell_class
 
   type, public :: CELL_T
 
-    integer (kind=c_int) :: iSoilGroup = 0_c_int               ! Soil type from soil-type grid
-    integer (kind=c_int) :: iLandUseIndex                      ! Index (row num) of land use table
-    integer (kind=c_int) :: iLandUseCode = 0_c_int                 ! Land use from land-use grid
-    real (kind=c_double) :: fLatitude
-    
+    integer (kind=c_int)  :: iSoilGroup = 0_c_int               ! Soil type from soil-type grid
+    integer (kind=c_int)  :: iLandUseIndex                      ! Index (row num) of land use table
+    integer (kind=c_int)  :: iLandUseCode = 0_c_int                 ! Land use from land-use grid
+    real (kind=c_double)  :: fLatitude
+    logical (kind=c_bool) :: lActive = lTRUE 
+
     integer (kind=c_int) :: iSumUpslopeCells = 0_c_int
     integer (kind=c_int) :: iNumUpslopeConnections = 0_c_int
 
@@ -181,7 +182,7 @@ contains
         //"method in the control file.")
     endif
 
-    if (this%fInterception > 0.02) print *, this%fGrossPrecip, this%fInterception
+    print *, this%fGrossPrecip, this%fInterception
 
   end subroutine calculate_interception_mass_balance_sub
 

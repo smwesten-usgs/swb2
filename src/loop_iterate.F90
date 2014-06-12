@@ -67,6 +67,10 @@ contains
       call TMIN%getvalues( iMonth, iDay, iYear, iJulianDay )
       call TMAX%getvalues( iMonth, iDay, iYear, iJulianDay )
 
+      CELLS%cell%fGrossPrecip = PRCP%pGrdBase%rData
+      CELLS%cell%fTMax = TMAX%pGrdBase%rData
+      CELLS%cell%fTMin = TMIN%pGrdBase%rData
+
     end associate
 
   end subroutine get_required_climate_data

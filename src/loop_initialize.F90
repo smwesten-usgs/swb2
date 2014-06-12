@@ -92,9 +92,9 @@ contains
     call initialize_tmin_options()
     call initialize_flow_direction_options()
     call initialize_water_capacity_options()
+    call initialize_parameter_tables()
     call initialize_soils_group_options()
     call initialize_landuse_options()
-    call initialize_parameter_tables()
     call initialize_interception_method()
 
   end subroutine initialize_options
@@ -778,7 +778,7 @@ contains
 
                 call FLOWDIR%initialize(sDescription=trim(sCmdText), &
                   sFileType=trim(sOptionText), &
-                  sFilenameTemplate=trim(sArgText), &
+                  sFilename=trim(sArgText), &
                   iDataType=DATATYPE_REAL )
 
               case ( "NETCDF" )
@@ -881,7 +881,7 @@ contains
 
                 call AWC%initialize(sDescription=trim(sCmdText), &
                   sFileType=trim(sOptionText), &
-                  sFilenameTemplate=trim(sArgText), &
+                  sFilename=trim(sArgText), &
                   iDataType=DATATYPE_REAL )
 
               case ( "NETCDF" )
@@ -990,15 +990,15 @@ contains
 
                 call HSG%initialize(sDescription=trim(sCmdText), &
                   sFileType=trim(sOptionText), &
-                  sFilenameTemplate=trim(sArgText), &
-                  iDataType=DATATYPE_REAL )
+                  sFilename=trim(sArgText), &
+                  iDataType=DATATYPE_INT )
 
               case ( "NETCDF" )
                   
                 call HSG%initialize_netcdf( &
                   sDescription=trim(sCmdText), &
                   sFilenameTemplate = trim(sArgText), &
-                  iDataType=DATATYPE_REAL )
+                  iDataType=DATATYPE_INT )
      
               case default
 
@@ -1020,6 +1020,11 @@ contains
         end select
 
       enddo
+
+      call HSG%getvalues(  )
+
+      call CELLS%initialize_soil_groups()
+
 
     endif
 
@@ -1184,7 +1189,7 @@ contains
 
                 call LULC%initialize(sDescription=trim(sCmdText), &
                   sFileType=trim(sOptionText), &
-                  sFilenameTemplate=trim(sArgText), &
+                  sFilename=trim(sArgText), &
                   iDataType=DATATYPE_INT, &
                   sPROJ4_string=BNDS%sPROJ4_string )
 
@@ -1217,7 +1222,8 @@ contains
 
       enddo
 
-      call LULC%getvalues( iMonth=asInt(SIM_DT%start%iMonth), iDay=asInt(SIM_DT%start%iDay), iYear=SIM_DT%start%iYear )
+!      call LULC%getvalues( iMonth=asInt(SIM_DT%start%iMonth), iDay=asInt(SIM_DT%start%iDay), iYear=SIM_DT%start%iYear )
+      call LULC%getvalues(  )
 
       call CELLS%initialize_landuse()
 

@@ -28,6 +28,9 @@ module cell_collection
     procedure :: initialize_cells_landuse_sub
     generic   :: initialize_landuse => initialize_cells_landuse_sub
 
+    procedure :: initialize_cells_soil_groups_sub
+    generic   :: initialize_soil_groups => initialize_cells_soil_groups_sub
+
     procedure :: solve_cells_sub
     generic   :: solve => solve_cells_sub
 
@@ -90,7 +93,10 @@ contains
     ! $OMP DO PRIVATE(iRow, iCol, iIndex, pCell)
 
     CELLS%cell%iLandUseCode = LULC%pGrdBase%iData
-    CELLS%cell%iSoilGroup = HSG%pGrdBase%iData
+
+    !CELLS%cell%iSoilGroup = HSG%pGrdBase%iData
+
+    call LOGS%write("Landuse codes as read into SWB data structure", iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_DEBUG)
 
     do iIndex = 1, ubound(iLandUseCodes, 1)
 
@@ -100,34 +106,49 @@ contains
 
       end where
 
-      print *, count(CELLS%cell%iLandUseIndex == iIndex), " cells have an index value of ", iIndex
+      call LOGS%write( asCharacter(count(CELLS%cell%iLandUseIndex == iIndex) )//" cells have a value of " &
+        //asCharacter(iLandUseCodes(iIndex) )//" and an index value of "//asCharacter(iIndex), iLogLevel=LOG_DEBUG )
       
     end do    
 
-!     do iRow=1, this%iNumRows
-!       do iCol=1, this%iNumCols
-
-!         if ( iIndex <= ubound(this%cell, 1) ) then
-
-!           pCell => this%cell(iCol, iRow)
-!           call pCell%set_landuse_index( iLandUseCodes )
- 
-!         else
-
-!           call die("Index out of bounds", __FILE__, __LINE__)
-
-!         endif  
-
-!       enddo
-
-!     enddo  
-
-    ! $OMP END DO
-
-    ! $OMP END PARALLEL
+    call LOGS%write("", iLinesBefore=1, iLogLevel=LOG_DEBUG)
 
   end subroutine initialize_cells_landuse_sub
 
+
+  subroutine initialize_cells_soil_groups_sub( this )
+
+    class (CELL_COLLECTION_T), intent(inout)     :: this
+
+    ! [ LOCALS ]
+    integer (kind=c_int)                 :: iStat
+    integer (kind=c_int)                 :: iRow, iCol, iIndex
+    class (CELL_T), pointer              :: pCell
+    
+    CELLS%cell%iSoilGroup = HSG%pGrdBase%iData
+
+    where ( CELLS%cell%iSoilGroup  < 1 )
+
+      CELLS%cell%lActive = lFALSE
+
+    end where
+
+    call LOGS%write("Inactivated "//asCharacter(count(CELLS%cell%iSoilGroup < 1))//" cells " &
+      //"(out of a total of "//asCharacter(size(CELLS%cell%iSoilGroup) )//") with soil group " &
+      //"values of zero or less", iLinesBefore=1, iLinesAfter=1 )
+
+    call LOGS%write("Soil hydrologic groups as read into SWB data structure", iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_DEBUG)
+
+    do iIndex = 1, maxval(HSG%pGrdBase%iData)
+
+      call LOGS%write( asCharacter(count(CELLS%cell%iSoilGroup == iIndex) )//" cells belong to soils group " &
+        //asCharacter(iIndex), iLogLevel=LOG_DEBUG )
+      
+    end do    
+
+    call LOGS%write("", iLinesBefore=1, iLogLevel=LOG_DEBUG)
+
+  end subroutine initialize_cells_soil_groups_sub
 
 
 
