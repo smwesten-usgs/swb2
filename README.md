@@ -1,9 +1,9 @@
-SWB - A Modified Thornthwaite-Mather Soil-Water-Balance Code for Estimating Groundwater Recharge
+SWB2 - [EXPERIMENTAL] A Modified Thornthwaite-Mather Soil-Water-Balance Code for Estimating Groundwater Recharge
 ------------------------------------------------------------------------------------------------
 
-*NOTICE*: This is the public GitHub repository for the USGS Soil-Water-Balance model.
-Code found here is under development and may not be suitable for
-important project work. The official version of the code may be found at:
+*NOTICE*: This is the public GitHub repository for an EXPERIMENTAL version of the USGS Soil-Water-Balance model.
+Code found here is under development and IS NOT be suitable for
+project work. The official version of the code may be found at:
 <http://wi.water.usgs.gov/Soil_Water_Balance/>.
 
 The Soil-Water-Balance (SWB) computer code has been developed to calculate spatial and temporal
@@ -14,6 +14,9 @@ components of the soil-water balance calculated at a daily timestep.
 Recharge calculations are made on a rectangular grid of computational elements that may be 
 easily imported into a regional groundwater-flow model. Recharge estimates calculated by
  the code may be output as daily, monthly, or annual values.
+ 
+The experimental version in this repository incorporates some of the latest Fortran 2003/2008 features. This
+ version is an INCOMPLETE WORK IN PROGRESS.
 
 
 Software User Rights Notice
