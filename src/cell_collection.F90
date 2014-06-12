@@ -1,15 +1,17 @@
 module cell_collection
 
   use iso_c_binding
+  use data_catalog_entry
   use exceptions
   use cell_class
+  use parameters
   implicit none
 
   private
 
   type, public :: CELL_COLLECTION_T
 
-    class (CELL_T), dimension(:), pointer :: cell
+    class (CELL_T), dimension(:,:), pointer :: cell
 
     character (len=:), allocatable  :: sPROJ4_string
     integer (kind=c_int)            :: iNumCols
@@ -22,6 +24,9 @@ module cell_collection
 
     procedure :: initialize_cells_sub
     generic   :: initialize => initialize_cells_sub
+
+    procedure :: initialize_cells_landuse_sub
+    generic   :: initialize_landuse => initialize_cells_landuse_sub
 
     procedure :: solve_cells_sub
     generic   :: solve => solve_cells_sub
@@ -58,31 +63,72 @@ contains
     this%fY_ll = fY_ll
     this%fGridcellSize = fGridcellSize
 
-    allocate( this%cell(iNumCols * iNumRows), stat=iStat )
+    allocate( this%cell(iNumCols, iNumRows), stat=iStat )
 
     if (iStat /=0) stop("Could not allocate memory for cells")
 
-    do iRow=1, iNumRows
-      do iCol=1, iNumCols
-
-        iIndex = iCol + (iRow - 1) * iNumCols
-
-        if ( iIndex <= ubound(this%cell, 1) ) then
-
-          pCell => this%cell(iIndex)
-          call pCell%set_col_row( iCol, iRow )
- 
-        else
-
-          call die("Index out of bounds", __FILE__, __LINE__)
-
-        endif  
-
-      enddo
-
-    enddo  
-
   end subroutine initialize_cells_sub
+
+
+  subroutine initialize_cells_landuse_sub( this )
+
+    class (CELL_COLLECTION_T), intent(inout)     :: this
+
+    ! [ LOCALS ]
+    integer (kind=c_int)                 :: iStat
+    integer (kind=c_int)                 :: iRow, iCol, iIndex
+    class (CELL_T), pointer              :: pCell
+    integer (kind=c_int), allocatable    :: iLandUseCodes(:)
+    integer (kind=c_int)                 :: iLandUseIndices(256)
+    integer (kind=c_int)                 :: iLU, iCount
+    
+    !> Determine how many landuse codes are present
+    call PARAMS%get_values( sKey="LU_Code", iValues=iLanduseCodes )
+
+    ! $OMP PARALLEL
+
+    ! $OMP DO PRIVATE(iRow, iCol, iIndex, pCell)
+
+    CELLS%cell%iLandUseCode = LULC%pGrdBase%iData
+    CELLS%cell%iSoilGroup = HSG%pGrdBase%iData
+
+    do iIndex = 1, ubound(iLandUseCodes, 1)
+
+      where (CELLS%cell%iLandUseCode == iLandUseCodes(iIndex) )
+
+        CELLS%cell%iLandUseIndex = iIndex
+
+      end where
+
+      print *, count(CELLS%cell%iLandUseIndex == iIndex), " cells have an index value of ", iIndex
+      
+    end do    
+
+!     do iRow=1, this%iNumRows
+!       do iCol=1, this%iNumCols
+
+!         if ( iIndex <= ubound(this%cell, 1) ) then
+
+!           pCell => this%cell(iCol, iRow)
+!           call pCell%set_landuse_index( iLandUseCodes )
+ 
+!         else
+
+!           call die("Index out of bounds", __FILE__, __LINE__)
+
+!         endif  
+
+!       enddo
+
+!     enddo  
+
+    ! $OMP END DO
+
+    ! $OMP END PARALLEL
+
+  end subroutine initialize_cells_landuse_sub
+
+
 
 
   ! march through a single iteration of the solution
@@ -93,17 +139,20 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iStat
     class (CELL_T), pointer              :: pCell
-    integer (kind=c_int)                 :: iIndex
+    integer (kind=c_int)                 :: iCol, iRow
 
     ! $OMP PARALLEL
 
-    ! $OMP DO PRIVATE(iIndex, pCell)
+    ! $OMP DO PRIVATE(iCol, iRow, pCell)
 
-    do iIndex=1, ubound(this%cell, 1)
+    do iRow=1, this%iNumRows
 
-      pCell => this%cell(iIndex)
+      do iCol=1, this%iNumCols
 
-      call pCell%solve()
+        pCell => this%cell(iCol, iRow)
+        call pCell%solve()
+
+      enddo
 
     enddo  
 

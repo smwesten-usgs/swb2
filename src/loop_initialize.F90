@@ -84,7 +84,9 @@ contains
 
   subroutine initialize_options()
 
+   
     call initialize_grid_options()
+    call initialize_start_and_end_dates()
     call initialize_precipitation_options()
     call initialize_tmax_options()
     call initialize_tmin_options()
@@ -94,8 +96,6 @@ contains
     call initialize_landuse_options()
     call initialize_parameter_tables()
     call initialize_interception_method()
-    call initialize_start_and_end_dates()
-
 
   end subroutine initialize_options
 
@@ -1217,10 +1217,20 @@ contains
 
       enddo
 
+      call LULC%getvalues( iMonth=asInt(SIM_DT%start%iMonth), iDay=asInt(SIM_DT%start%iDay), iYear=SIM_DT%start%iYear )
+
+      call CELLS%initialize_landuse()
+
     endif
 
   end subroutine initialize_landuse_options  
 
+
+
+  subroutine initialize_cell_values()
+
+
+  end subroutine initialize_cell_values  
 
 
 

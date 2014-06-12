@@ -5,6 +5,7 @@ module cell_class
   use constants_and_conversions
   use et_hargreaves
   use interception_bucket
+  use parameters
   use strings
   implicit none
 
@@ -12,12 +13,9 @@ module cell_class
 
   type, public :: CELL_T
 
-    integer (kind=c_int) :: iRow
-    integer (kind=c_int) :: iCol
-
     integer (kind=c_int) :: iSoilGroup = 0_c_int               ! Soil type from soil-type grid
     integer (kind=c_int) :: iLandUseIndex                      ! Index (row num) of land use table
-    integer (kind=c_int) :: iLandUse = 0_c_int                 ! Land use from land-use grid
+    integer (kind=c_int) :: iLandUseCode = 0_c_int                 ! Land use from land-use grid
     real (kind=c_double) :: fLatitude
     
     integer (kind=c_int) :: iSumUpslopeCells = 0_c_int
@@ -79,6 +77,10 @@ module cell_class
 
     procedure :: calculate_interception_mass_balance_sub
     procedure :: calculate_soil_mass_balance_sub
+
+    procedure :: cell_set_landuse_index_sub
+    generic   :: set_landuse_index => cell_set_landuse_index_sub
+
 !     procedure :: set_infiltration_method_sub
 !     generic   :: set_infiltration_method => set_infiltration_method_sub
 
@@ -124,6 +126,37 @@ contains
 
   !! implementations of the interfaces above
 
+  subroutine cell_set_landuse_index_sub(this, iLandUseCodes )
+
+    class (CELL_T), intent(inout)      :: this
+    integer (kind=c_int), intent(in)   :: iLandUseCodes(:)
+        ! [ LOCALS ]
+    integer (kind=c_int)                :: iIndex
+    logical (kind=c_bool)               :: lMatch
+
+    lMatch = lFALSE
+
+!    call LULC%getvalue(this%iCol, this%iRow, this%iLandUseCode)
+
+    do iIndex=1, ubound(iLandUseCodes, 1)
+
+      if (this%iLandUseCode == iLandUseCodes(iIndex) ) then
+        this%iLandUseIndex = iIndex
+        lMatch = lTRUE
+        exit
+      endif
+      
+    enddo    
+        
+
+    if ( .not. lMatch )     &
+      call warn( sMessage="The landuse value "//asCharacter(this%iLandUseCode)//" was not matched with a value from the landuse table",   &
+        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+
+
+  end subroutine cell_set_landuse_index_sub
+
+
   subroutine calculate_mass_balance_sub(this)
 
     class (CELL_T), intent(inout)  :: this
@@ -138,7 +171,7 @@ contains
 
     class (CELL_T), intent(inout)   :: this
 
-    call PRCP%getvalue(this%iCol, this%iRow, this%fGrossPrecip )
+!    call PRCP%getvalue(this%iCol, this%iRow, this%fGrossPrecip )
 
     if (associated( this%calc_interception) ) then
       call this%calc_interception()
@@ -148,7 +181,7 @@ contains
         //"method in the control file.")
     endif
 
-    if (this%fInterception > 0.02) print *, this%iRow, this%iCol, this%fGrossPrecip, this%fInterception
+    if (this%fInterception > 0.02) print *, this%fGrossPrecip, this%fInterception
 
   end subroutine calculate_interception_mass_balance_sub
 
@@ -247,8 +280,8 @@ contains
     integer (kind=c_int), intent(in)      :: iCol
     integer (kind=c_int), intent(in)      :: iRow
 
-    this%iRow = iRow
-    this%iCol = iCol
+!    this%iRow = iRow
+!    this%iCol = iCol
 
   end subroutine cell_set_col_row_sub  
 
