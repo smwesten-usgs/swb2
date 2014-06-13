@@ -182,6 +182,15 @@ contains
         "This may be happening because there is no check to see whether the user has specified a valid~" &
         //"method in the control file.")
     endif
+
+
+    if (associated( this%calc_reference_et) ) then
+      call this%calc_reference_et()
+    else
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__, &
+        "This may be happening because there is no check to see whether the user has specified a valid~" &
+        //"method in the control file.")
+    endif
     
   end subroutine calculate_interception_mass_balance_sub
 

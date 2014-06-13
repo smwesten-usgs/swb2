@@ -96,6 +96,7 @@ contains
     call initialize_soils_group_options()
     call initialize_landuse_options()
     call initialize_interception_method()
+    call initialize_evapotranspiration_method()
 
   end subroutine initialize_options
 
@@ -1392,7 +1393,7 @@ contains
 
 
 
-    subroutine initialize_et_method()
+    subroutine initialize_evapotranspiration_method()
 
     ! [ LOCALS ]
     type (STRING_LIST_T)             :: myDirectives
@@ -1404,11 +1405,11 @@ contains
     integer (kind=c_int)             :: iStat
 
 
-    myDirectives = CF_DICT%grep_keys("INTERCEPTION")
+    myDirectives = CF_DICT%grep_keys("EVAPOTRANSPIRATION")
       
     if ( myDirectives%count == 0 ) then
 
-      call warn("Your control file seems to be missing any of the required directives relating to INTERCEPTION method.", &
+      call warn("Your control file seems to be missing any of the required directives relating to EVAPOTRANSPIRATION method.", &
         lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
     else  
@@ -1446,12 +1447,10 @@ contains
               case ( "HARGREAVES", "HARGREAVES-SAMANI" )
 
                 call CELLS%cell%set_evapotranspiration("HARGREAVES")
-                call initialize_et_hargreaves()
 
               case ( "J-H", "JENSEN-HAISE" )
 
                 call CELLS%cell%set_evapotranspiration("JENSEN-HAISE")
-                call initialize_et_hargreaves()
 
             end select
             
@@ -1467,7 +1466,7 @@ contains
     
 
 
-  end subroutine initialize_et_method
+  end subroutine initialize_evapotranspiration_method
 
 
 
