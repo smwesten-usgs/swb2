@@ -12,7 +12,7 @@ contains
 
   !> Calculate the number of daylight hours at a location.
   !! 
-  !! @param[in]  rOmega_s   Sunset hour angle in Radians.
+  !! @param[in]  dOmega_s   Sunset hour angle in Radians.
   !! @retval           rN   Number of daylight hours.
   !!
   !! @note Implementation follows equation 34, Allen and others (1998).
@@ -20,15 +20,12 @@ contains
   !! @note Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!       "Crop Evapotranspiration (Guidelines for computing crop water
   !!       requirements)", Food and Agriculture Organization, Rome, Italy.
-  function daylight_hours(rOmega_s) result(rN)  bind(c)
+  function daylight_hours( dOmega_s )    result(rN)   bind(c)
 
-    ! [ ARGUMENTS ]
-    real (kind=c_double), intent(in) :: rOmega_s
+    real (kind=c_double), intent(in)   :: dOmega_s
+    real (kind=c_double)               :: dN
 
-    ! [ LOCALS ]
-    real (kind=c_double) :: rN
-
-    rN = 24_c_double / PI * rOmega_s
+    dN = 24_c_double / PI * dOmega_s
 
   end function daylight_hours
 
@@ -42,12 +39,12 @@ contains
 ! IF one does not wish to add the 'byref' function call as shown above, the Fortran code itself
 ! may be modified to force values to be passed by value rather than by reference:
 !
-!  subroutine daylight_hours_c(rOmega_s, rN)  bind(c, name="daylight_hours_c")
+!  subroutine daylight_hours_c(dOmega_s, dN)  bind(c, name="daylight_hours_c")
 !    
-!    real (kind=c_double), intent(in), value        :: rOmega_s
-!    real (kind=c_double), intent(out)              :: rN 
+!    real (kind=c_double), intent(in), value        :: dOmega_s
+!    real (kind=c_double), intent(out)              :: dN 
 !
-!    rN = daylight_hours(rOmega_s)
+!    dN = daylight_hours(dOmega_s)
 !
 !  end subroutine daylight_hours_c
 
@@ -55,10 +52,10 @@ contains
 
   !>  Calculate extraterrestrial radiation given latitude and time of year.
   !!
-  !! @param[in]  rLatitude   Latitude of grid cell in RADIANS.
-  !! @param[in]     rDelta   Solar declination in RADIANS.
-  !! @param[in]   rOmega_s   Sunset hour angle in RADIANS.
-  !! @param[in]     rDsubR   Inverse relative distance Earth-Sun.
+  !! @param[in]  dLatitude   Latitude of grid cell in RADIANS.
+  !! @param[in]     dDelta   Solar declination in RADIANS.
+  !! @param[in]   dOmega_s   Sunset hour angle in RADIANS.
+  !! @param[in]     dDsubR   Inverse relative distance Earth-Sun.
   !!
   !! @retval           rRa   Extraterrestrial radiation in MJ / m**2 / day.
   !!
@@ -74,34 +71,34 @@ contains
   !!        requirements)", Food and Agriculture Organization, Rome, Italy.
   !!
   !! @sa http://www.fao.org/docrep/x0490e/x0490e07.htm#solar%20radiation
-  function extraterrestrial_radiation_Ra(rLatitude,rDelta,rOmega_s,rDsubR) result(rRa)
+  function extraterrestrial_radiation__Ra(dLatitude, dDelta,dOmega_s, dDsubR)    result(dRa)
 
     ! [ ARGUMENTS ]
-    real (kind=c_double), intent(in) :: rLatitude
-    real (kind=c_double), intent(in) :: rDelta
-    real (kind=c_double), intent(in) :: rOmega_s
-    real (kind=c_double), intent(in) :: rDsubR
+    real (kind=c_double), intent(in) :: dLatitude
+    real (kind=c_double), intent(in) :: dDelta
+    real (kind=c_double), intent(in) :: dOmega_s
+    real (kind=c_double), intent(in) :: dDsubR
 
     ! [ LOCALS ]
-    real (kind=c_double) :: rRa
-    real (kind=c_double) :: rPartA, rPartB
-    real (kind=c_double), parameter :: rGsc = 0.0820_c_double  ! MJ / m**2 / min
+    real (kind=c_double) :: dRa
+    real (kind=c_double) :: dPartA, dPartB
+    real (kind=c_double), parameter :: dGsc = 0.0820_c_double  ! MJ / m**2 / min
 
-    rPartA = rOmega_s * sin(rLatitude) * sin(rDelta)
-    rPartB = cos(rLatitude) * cos(rDelta) * sin(rOmega_s)
+    dPartA = dOmega_s * sin( dLatitude ) * sin( dDelta )
+    dPartB = cos( dLatitude ) * cos( dDelta ) * sin( dOmega_s )
 
-    rRa = 24_c_double * 60_c_double * rGsc * rDsubR * (rPartA + rPartB) / PI
+    dRa = 24_c_double * 60_c_double * dGsc * dDsubR * ( dPartA + dPartB ) / PI
 
-  end function extraterrestrial_radiation_Ra
+  end function extraterrestrial_radiation__Ra
 
 
   !------------------------------------------------------------------------------------------------
 
   !> Calculate net shortwave radiation
   !!
-  !! @param[in]      rRs   Incoming shortwave solar radiation, in MJ / m**2 / day
-  !! @param[in]  rAlbedo   Albedo or canopy reflection coefficient; 0.23 for grass reference crop
-  !! @retval        rRns   Net shortwave radiation, in MJ / m**2 / day
+  !! @param[in]      dRs   Incoming shortwave solar radiation, in MJ / m**2 / day
+  !! @param[in]  dAlbedo   Albedo or canopy reflection coefficient; 0.23 for grass reference crop
+  !! @retval        dRns   Net shortwave radiation, in MJ / m**2 / day
   !!
   !! @note Implementation follows equation 38, Allen and others (1998).
   !!
@@ -109,17 +106,17 @@ contains
   !!   Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
-  function net_shortwave_radiation_Rns(rRs, rAlbedo)  result(rRns)
+  function net_shortwave_radiation__Rns(dRs, dAlbedo)  result(dRns)
 
-    real(kind=c_double), intent(in) :: rRs
-    real(kind=c_double), intent(in) :: rAlbedo
+    real(kind=c_double), intent(in) :: dRs
+    real(kind=c_double), intent(in) :: dAlbedo
 
     ! [ LOCALS ]
-    real(kind=c_double) :: rRns
+    real(kind=c_double) :: dRns
 
-    rRns = (1_c_double - rAlbedo) * rRs
+    dRns = (1_c_double - dAlbedo) * dRs
 
-  end function net_shortwave_radiation_Rns
+  end function net_shortwave_radiation__Rns
 
   !------------------------------------------------------------------------------------------------
 
@@ -127,24 +124,24 @@ contains
   !!
   !! @param[in]      iDayOfYear   Integer day of the year (January 1 = 1)
   !! @param[in]  iNumDaysInYear   Number of days in the current year
-  !! @retval             rDelta   Solar declination, in RADIANS
+  !! @retval             dDelta   Solar declination, in RADIANS
   !!
   !! @note Implementation follows equation XXX? in:
   !!
   !! @note Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
-  function solar_declination_simple(iDayOfYear, iNumDaysInYear) result(rDelta)  bind(c)
+  function solar_declination_simple__delta(iDayOfYear, iNumDaysInYear) result(dDelta)  bind(c)
 
     integer (kind=c_int), intent(in) :: iDayOfYear
     integer (kind=c_int), intent(in) :: iNumDaysInYear
-    real (kind=c_double) :: rDelta
+    real (kind=c_double) :: dDelta
 
-    rDelta = 0.409_c_double &
+    dDelta = 0.409_c_double &
              * sin( (TWOPI * real(iDayOfYear, kind=c_double) / real(iNumDaysInYear, kind=c_double) ) &
   		          - 1.39_c_double)
 
-  end function solar_declination_simple
+  end function solar_declination_simple__delta
 
 
   !------------------------------------------------------------------------------------------------
@@ -153,7 +150,7 @@ contains
   !!
   !! @param[in]      iDayOfYear   Integer day of the year (January 1 = 1)
   !! @param[in]  iNumDaysInYear   Number of days in the current year
-  !! @retval             rDelta   Solar declination, in RADIANS
+  !! @retval             dDelta   Solar declination, in RADIANS
   !!
   !! @note Implementation follows equation 1.3.1 in Iqbal (1983).
   !!
@@ -162,27 +159,27 @@ contains
   !!
   !! @note Reference:
   !!       Iqbal, Muhammad (1983-09-28). An Introduction To Solar Radiation (p. 10). Elsevier Science. Kindle Edition. 
-  function solar_declination(iDayOfYear, iNumDaysInYear) result(rDelta)  bind(c)
+  function solar_declination__delta(iDayOfYear, iNumDaysInYear) result(dDelta)  bind(c)
 
     integer (kind=c_int), intent(in) :: iDayOfYear
     integer (kind=c_int), intent(in) :: iNumDaysInYear
-    real (kind=c_double) :: rDelta
+    real (kind=c_double) :: dDelta
 
     ! [ LOCALS ]
-    real (kind=c_double) :: rGamma
+    real (kind=c_double) :: dGamma
 
-    rGamma = day_angle_gamma(iDayOfYear, iNumDaysInYear)
+    dGamma = day_angle__gamma( iDayOfYear, iNumDaysInYear )
     
-    rDelta =   0.006918_c_double                                       &
-             - 0.399912_c_double * cos( rGamma )                       &
-             + 0.070257_c_double * sin( rGamma )                       &
-             - 0.006758_c_double * cos( 2_c_double * rGamma )          &
-             + 0.000907_c_double * sin( 2_c_double * rGamma )          &
-             - 0.002697_c_double * cos( 3_c_double * rGamma )          &
-             + 0.00148_c_double  * sin( 3_c_double * rGamma )
+    dDelta =   0.006918_c_double                                       &
+             - 0.399912_c_double * cos( dGamma )                       &
+             + 0.070257_c_double * sin( dGamma )                       &
+             - 0.006758_c_double * cos( 2_c_double * dGamma )          &
+             + 0.000907_c_double * sin( 2_c_double * dGamma )          &
+             - 0.002697_c_double * cos( 3_c_double * dGamma )          &
+             + 0.00148_c_double  * sin( 3_c_double * dGamma )
 
 
-  end function solar_declination
+  end function solar_declination__delta
 
 
   !------------------------------------------------------------------------------------------------
@@ -191,7 +188,7 @@ contains
   !!
   !! @param[in]      iDayOfYear   Integer day of the year (January 1 = 1)
   !! @param[in]  iNumDaysInYear   Number of days in the current year
-  !! @retval             rDsubR   Relative Earth-Sun distance
+  !! @retval             dDsubR   Relative Earth-Sun distance
   !!
   !! @note Implementation follows equation 23, Allen and others (1998): <BR>
   !! @f$ d_r = 1 + 0.033 \cos \left( \frac{ 2 \pi }{365} J \right) @f$  <BR><BR>
@@ -208,26 +205,26 @@ contains
   !! 
   !! @note Equation 1.2.3 in Iqbal, Muhammad (1983-09-28). An Introduction To Solar Radiation (p. 28).
   !!       Elsevier Science. Kindle Edition. 
-  function rel_Earth_Sun_dist(iDayOfYear,iNumDaysInYear) result(rDsubR)   bind(c)
+  function relative_earth_sun_distance__D_r( iDayOfYear, iNumDaysInYear )   result( dDsubR )   bind(c)
 
     ! [ ARGUMENTS ]
     integer (kind=c_int), intent(in) :: iDayOfYear
     integer (kind=c_int), intent(in) :: iNumDaysInYear
-    real (kind=c_float) :: rDsubR
+    real (kind=c_double) :: dDsubR
 
-    rDsubR = 1_c_double + 0.033_c_double &
-             * cos( TWOPI * real(iDayOfYear, kind=c_double)          &
-                                      / real(iNumDaysInYear, kind=c_double ) )
+    dDsubR = 1_c_double + 0.033_c_double &
+             * cos( TWOPI * real( iDayOfYear, kind=c_double )          &
+                                      / real( iNumDaysInYear, kind=c_double ) )
 
-  end function rel_Earth_Sun_dist
+  end function relative_earth_sun_distance__D_r
 
   !------------------------------------------------------------------------------------------------
 
   !> Calculate sunrise/sunset angle, in RADIANS.
   !!
-  !! @param[in]  rLatitude   Latitude, in RADIANS
-  !! @param[in]     rDelta   Solar declination, in RADIANS
-  !! @retval      rOmega_s   Sunset angle, in RADIANS
+  !! @param[in]  dLatitude   Latitude, in RADIANS
+  !! @param[in]     dDelta   Solar declination, in RADIANS
+  !! @retval      dOmega_s   Sunset angle, in RADIANS
   !!
   !! @note Implementation follows equation 25, Allen and others (1998).
   !!
@@ -238,20 +235,19 @@ contains
   !!   Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
-   function sunrise_sunset_angle(rLatitude, rDelta) result(rOmega_s)    bind(c)
+   function sunrise_sunset_angle__omega_s( dLatitude, dDelta ) result( dOmega_s )    bind(c)
 
-    real (kind=c_double), intent(in) :: rLatitude
-    real (kind=c_double), intent(in) :: rDelta
-    real (kind=c_double) :: rOmega_s
+    real (kind=c_double), intent(in) :: dLatitude
+    real (kind=c_double), intent(in) :: dDelta
+    real (kind=c_double) :: dOmega_s
 
-    call assert(rLatitude <1.58 .and. rLatitude > -1.58, &
+    call assert(dLatitude < 1.58_c_double .and. dLatitude > -1.58_c_double, &
       "Internal programming error: Latitude must be expressed in RADIANS", &
-      TRIM(__FILE__),__LINE__)
+      __FILE__,__LINE__)
 
-    rOmega_s = acos( - tan(rLatitude) * tan(rDelta) )
+    dOmega_s = acos( - tan(dLatitude) * tan(dDelta) )
 
-  end function sunrise_sunset_angle
-
+  end function sunrise_sunset_angle__omega_s
 
   !------------------------------------------------------------------------------------------------
 
@@ -260,10 +256,10 @@ contains
   !! Calculates the solar radiation using Hargreave's radiation formula.
   !! For use when percent possible daily sunshine value is not available.
   !!
-  !! @param[in]    rRa   Extraterrestrial radiation, in MJ / m**2 / day
+  !! @param[in]    dRa   Extraterrestrial radiation, in MJ / m**2 / day
   !! @param[in]  rTMin   Minimum daily air temperature, in &deg;C
   !! @param[in]  rTMax   Maximum daily air temperature, in &deg;C
-  !! @retval       rRa   Solar radiation, in MJ / m**2 / day
+  !! @retval       dRa   Solar radiation, in MJ / m**2 / day
   !!
   !! @note Implementation follows equation 50, Allen and others (1998).
   !!
@@ -271,19 +267,19 @@ contains
   !!   Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
-  function solar_radiation_Hargreaves_Rs(rRa, rTMin, rTMax)   result(rRs)
+  function solar_radiation_Hargreaves__Rs( dRa, fTMin, fTMax )   result( dRs )   bind(c)
 
-    real (kind=c_double), intent(in) :: rRa
-    real (kind=c_float), intent(in) :: rTMin
-    real (kind=c_float), intent(in) :: rTMax
-    real (kind=c_double) :: rRs
+    real (kind=c_double), intent(in) :: dRa
+    real (kind=c_float), intent(in)  :: fTMin
+    real (kind=c_float), intent(in)  :: fTMax
+    real (kind=c_double)             :: dRs
 
     ! [ LOCALS ]
-    real (kind=c_double), parameter :: rKRs = 0.175
+    real (kind=c_double), parameter :: dKRs = 0.175
 
-    rRs = rKRs * sqrt( C_to_K(rTMax) - C_to_K(rTMin) ) * rRa
+    dRs = dKRs * sqrt( C_to_K(dTMax) - C_to_K(dTMin) ) * dRa
 
-  end function solar_radiation_Hargreaves_Rs
+  end function solar_radiation_Hargreaves__Rs
 
   !------------------------------------------------------------------------------------------------
 
@@ -293,31 +289,31 @@ contains
   !! substituting the rearranged Hargreaves solar radiation formula into
   !! equation 5 results in the formulation below
   !!
-  !! @param[in]  rTMax   Maximum daily air temperature, in &deg;C
-  !! @param[in]  rTMin   Minimum daily air temperature, in &deg;C
-  !! @retval     rPsun   Percentage of possible sunshine, dimensionless percentage
+  !! @param[in]  fTMax   Maximum daily air temperature, in &deg;C
+  !! @param[in]  fTMin   Minimum daily air temperature, in &deg;C
+  !! @retval     fPsun   Percentage of possible sunshine, dimensionless percentage
   !!
   !! @todo [Need to add reference here...]
-  function estimate_percent_of_possible_sunshine(rTMax, rTMin)  result(rPsun)
+  function estimate_percent_of_possible_sunshine__psun(fTMax, fTMin)  result(fPsun)   bind(c)
 
-    real (kind=c_float), intent(in) :: rTMax
-    real (kind=c_float), intent(in) :: rTMin
-    real (kind=c_float) :: rPsun
+    real (kind=c_float), intent(in) :: fTMax
+    real (kind=c_float), intent(in) :: fTMin
+    real (kind=c_float) :: fPsun
 
     ! [ LOCALS ]
-    real (kind=c_float), parameter :: rKRs = 0.175
+    real (kind=c_float), parameter :: fKRs = 0.175
 
-    rPsun = ( 2_c_float * rKRs * sqrt( C_to_K( rTMAX ) - C_to_K( rTMIN ) ) ) - 0.5_c_float
+    fPsun = ( 2_c_float * fKRs * sqrt( C_to_K( fTMAX ) - C_to_K( fTMIN ) ) ) - 0.5_c_float
 
-    if ( rPsun < 0_c_float ) then
-      rPsun = 0_c_float
-    elseif ( rPsun > 1.0_c_float ) then
-      rPsun = 100_c_float
+    if ( fPsun < 0_c_float ) then
+      fPsun = 0_c_float
+    elseif ( fPsun > 1.0_c_float ) then
+      fPsun = 100_c_float
     else
-      rPsun = rPsun * 100_c_float
+      fPsun = fPsun * 100_c_float
     endif
 
-  end function estimate_percent_of_possible_sunshine
+  end function estimate_percent_of_possible_sunshine__psun
 
   !------------------------------------------------------------------------------------------------
 
@@ -326,12 +322,12 @@ contains
   !! Calculate the clear sky solar radiation (i.e. when rPctSun = 100,
   !!   n/N=1.  Required for computing net longwave radiation.
   !!
-  !! @param[in]  rRa   Extraterrestrial radiation, in MJ / m**2 / day
-  !! @param[in]  rAs   Solar radiation regression constant, expressing the fraction
+  !! @param[in]  dRa   Extraterrestrial radiation, in MJ / m**2 / day
+  !! @param[in]  dAs   Solar radiation regression constant, expressing the fraction
   !!                     of extraterrestrial radiation that reaches earth on OVERCAST days.
-  !! @param[in]  rBs   Solar radiation regression constant. As + Bs express the fraction
+  !! @param[in]  sBs   Solar radiation regression constant. As + Bs express the fraction
   !!                     of extraterrestrial radiation that reaches earth on CLEAR days.
-  !! @retval    rRso   Clear sky solar radiation, in MJ / m**2 / day
+  !! @retval    dRso   Clear sky solar radiation, in MJ / m**2 / day
   !!
   !! @note Implementation follows equation 36, Allen and others (1998).
   !!
@@ -339,35 +335,34 @@ contains
   !!   Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
-  function clear_sky_solar_radiation_Rso(rRa, rAs_in, rBs_in) result(rRso)
+  function clear_sky_solar_radiation__Rso( dRa, dAs, dBs )   result( dRso )   bind(c)
 
-    real (kind=c_double), intent(in) :: rRa
-    real (kind=c_double), intent(in), optional :: rAs_in
-    real (kind=c_double), intent(in),optional :: rBs_in
+    real (kind=c_double), intent(in)           :: dRa
+    real (kind=c_double), intent(in), optional :: dAs
+    real (kind=c_double), intent(in),optional  :: dBs
+    real (kind=c_double)                       :: dRso
 
     ! [ LOCALS ]
-    real (kind=c_double) :: rRso
-    real (kind=c_double) :: rAs
-    real (kind=c_double) :: rBs
+    real (kind=c_double) :: dAs_
+    real (kind=c_double) :: dBs_
 
     ! assign default value to As if none is provided
-    if(present(rAs_in)) then
-      rAs = rAs_in
+    if ( present( dAs ) ) then
+      dAs_ = dAs
     else
-      rAs = 0.25_c_double
-
+      dAs_ = 0.25_c_double
     end if
 
     ! assign default value to Bs if none is provided
-    if(present(rBs_in)) then
-      rBs = rBs_in
+    if ( present( dBs ) ) then
+      dBs_ = dBs
     else
-      rBs = 0.5_c_double
+      dBs_ = 0.5_c_double
     end if
 
-    rRso = (rAs + rBs) * rRa
+    dRso = (dAs_ + dBs_) * dRa
 
-  end function clear_sky_solar_radiation_Rso
+  end function clear_sky_solar_radiation__Rso
 
   !------------------------------------------------------------------------------------------------
 
@@ -377,9 +372,9 @@ contains
   !!   n/N=1.  Required for computing net longwave radiation.
   !!   For use when no regression coefficients (A, B) are known.
   !!
-  !! @param[in]         rRa   Extraterrestrial radiation, in MJ / m**2 / day
-  !! @param[in]  rElevation   Elevation, in METERS above sea level
-  !! @retval           rRso   Clear sky solar radiation, in MJ / m**2 / day
+  !! @param[in]         dRa   Extraterrestrial radiation, in MJ / m**2 / day
+  !! @param[in]  fElevation   Elevation, in METERS above sea level
+  !! @retval           dRso   Clear sky solar radiation, in MJ / m**2 / day
   !!
   !! @note Implementation follows equation 37, Allen and others (1998).
   !!
@@ -387,28 +382,28 @@ contains
   !!   Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
-  function clear_sky_solar_radiation_noAB_Rso(rRa, rElevation) result(rRso)
+  function clear_sky_solar_radiation_noAB__Rso(dRa, fElevation) result(dRso)
 
-    real (kind=c_double), intent(in) :: rRa
-    real (kind=c_double), intent(in) :: rElevation
-    real (kind=c_float) :: rRso
+    real (kind=c_double), intent(in) :: dRa
+    real (kind=c_float), intent(in)  :: fElevation
+    real (kind=c_double)             :: dRso
 
-    rRso = ( 0.75_c_double + 1.0E-5_c_double * rElevation ) * rRa
+    dRso = ( 0.75_c_double + 1.0E-5_c_double * fElevation ) * dRa
 
-  end function clear_sky_solar_radiation_noAB_Rso
+  end function clear_sky_solar_radiation_noAB__Rso
 
   !------------------------------------------------------------------------------------------------
 
   !> Calculate solar radiation by means of the Angstrom formula.
   !!
-  !! @param[in]      rRa   Extraterrestrial radiation in MJ / m**2 / day
-  !! @param[in]      rAs   Solar radiation regression constant, expressing the fraction
+  !! @param[in]      dRa   Extraterrestrial radiation in MJ / m**2 / day
+  !! @param[in]      dAs   Solar radiation regression constant, expressing the fraction
   !!                         of extraterrestrial radiation that reaches earth on OVERCAST days.
-  !! @param[in]      rBs   Solar radiation regression constant. As + Bs express the fraction
+  !! @param[in]      dBs   Solar radiation regression constant. As + Bs express the fraction
   !!                         of extraterrestrial radiation that reaches earth on CLEAR days.
-  !! @param[in]  rPctSun   Percent of TOTAL number of sunshine hours during which the
+  !! @param[in]  fPctSun   Percent of TOTAL number of sunshine hours during which the
   !!                         sun actually shown.
-  !! @retval         rRs   Solar radiation in MJ / m**2 / day
+  !! @retval         fRs   Solar radiation in MJ / m**2 / day
   !!
   !! @notes
   !!  Implementation follows equation 35, Allen and others (1998).
@@ -417,29 +412,27 @@ contains
   !!   Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
-  function solar_radiation_Rs(rRa, rAs, rBs, rPctSun) result(rRs)
+  function solar_radiation__Rs(dRa, dAs, dBs, fPctSun) result(dRs)
 
-    real (kind=c_double), intent(in) :: rRa
-    real (kind=c_double), intent(in) :: rAs
-    real (kind=c_double), intent(in) :: rBs
-    real (kind=c_double), intent(in) :: rPctSun
+    real (kind=c_double), intent(in) :: dRa
+    real (kind=c_double), intent(in) :: dAs
+    real (kind=c_double), intent(in) :: dBs
+    real (kind=c_double), intent(in) :: fPctSun
+    real (kind=c_double)             :: dRs
 
-    ! [ LOCALS ]
-    real (kind=c_double) :: rRs
+    dRs = ( dAs + (dBs * fPctSun / 100_c_float ) ) * dRa
 
-    rRs = ( rAs + (rBs * rPctSun / 100_c_float ) ) * rRa
-
-  end function solar_radiation_Rs
+  end function solar_radiation__Rs
 
   !------------------------------------------------------------------------------------------------
 
   !> Calculate net longwave radiation flux.
   !!
-  !! @param[in]  rTMin   Minimum daily air temperature, in &deg;C
-  !! @param[in]  rTMax   Maximum daily air temperature, in &deg;C
-  !! @param[in]    rRs   Measured or calculated shortwave solar radiation, in MJ / m**2 / day
-  !! @param[in]   rRso   Calculated clear-sky radiation, in MJ / m**2 / day
-  !! @retval      rRnl   Net longwave solar radiation flux (incoming minus outgoing), in MJ / m**2 / day
+  !! @param[in]  fTMin   Minimum daily air temperature, in &deg;C
+  !! @param[in]  fTMax   Maximum daily air temperature, in &deg;C
+  !! @param[in]    dRs   Measured or calculated shortwave solar radiation, in MJ / m**2 / day
+  !! @param[in]   dRso   Calculated clear-sky radiation, in MJ / m**2 / day
+  !! @retval      dRnl   Net longwave solar radiation flux (incoming minus outgoing), in MJ / m**2 / day
   !!
   !! @note
   !! Implementation follows equation 39, Allen and others (1998).
@@ -449,33 +442,32 @@ contains
   !!   Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
-  function net_longwave_radiation_Rnl(rTMin, rTMax, rRs, rRso)  result(rRnl)
+  function net_longwave_radiation__Rnl(fTMin, fTMax, dRs, dRso)  result(dRnl)
 
-    real(kind=c_float), intent(in)  :: rTMin
-    real(kind=c_float), intent(in)  :: rTMax
-    real(kind=c_double), intent(in) :: rRs
-    real(kind=c_double), intent(in) :: rRso
+    real(kind=c_float), intent(in)  :: fTMin
+    real(kind=c_float), intent(in)  :: fTMax
+    real(kind=c_double), intent(in) :: dRs
+    real(kind=c_double), intent(in) :: dRso
+    real(kind=c_double)             :: dRnl
 
     ! [ LOCALS ]
-    real(kind=c_double) :: rRnl
-    real(kind=c_double) :: rTAvg_K
-    real(kind=c_double) :: rTAvg_4
+    real(kind=c_double)             :: dTAvg_K
+    real(kind=c_double)             :: dTAvg_4
+    real (kind=c_double)            :: d_ea
+    real (kind=c_double)            :: dCloudFrac
+    real (kind=c_double), parameter :: dSIGMA = 4.903E-9_c_double
 
-    real (kind=c_double)            :: r_ea
-    real (kind=c_double)            :: rCloudFrac
-    real (kind=c_double), parameter :: rSIGMA = 4.903E-9_c_double
+    dTAvg_K = C_to_K((fTMin + fTMax ) / 2.0_c_float )
 
-    rTAvg_K = C_to_K((rTMin + rTMax ) / 2.)
+    dTAvg_4 = rTAvg_K * rTAvg_K * rTAvg_K * rTAvg_K * rSIGMA
+    d_ea = dewpoint_vapor_pressure_ea( fTMin )
 
-    rTAvg_4 = rTAvg_K * rTAvg_K * rTAvg_K * rTAvg_K * rSIGMA
-!    r_ea = dewpoint_vapor_pressure_ea( rTMin )
+    dCloudFrac = min( dRs / dRso, 1.0_d_double )
 
-    rCloudFrac = min(rRs / rRso, 1.0)
+    dRnl = dTAvg_4 * ( 0.34_c_double - 0.14_c_double * sqrt( d_ea ) ) &
+            * ( 1.35_c_double * dCloudFrac - 0.35_c_double )
 
-    rRnl = rTAvg_4 * ( 0.34_c_double - 0.14_c_double * sqrt( r_ea ) ) &
-            * ( 1.35_c_double * rCloudFrac - 0.35_c_double )
-
-  end function net_longwave_radiation_Rnl
+  end function net_longwave_radiation__Rnl
 
   !------------------------------------------------------------------------------------------------
 
@@ -487,21 +479,21 @@ contains
   !!
   !! @param[in]        iDayOfYear   Current day of the year.
   !! @param[in]    iNumDaysInYear   Number of days in the current year.
-  !! @retval               rGamma   Day angle in RADIANS.
+  !! @retval               dGamma   Day angle in RADIANS.
   !!
   !! @note Implementation follows equation 1.2.2 in Iqbal (1983)
   !! 
   !! @note Reference: 
   !!       Iqbal, Muhammad (1983-09-28). An Introduction To Solar Radiation (p. 3). Elsevier Science. Kindle Edition. 
-  function day_angle_gamma(iDayOfYear, iNumDaysInYear)     result(rGamma)  bind(c)
+  function day_angle__gamma(iDayOfYear, iNumDaysInYear)     result(dGamma)  bind(c)
 
     integer (kind=c_int), intent(in)   :: iDayOfYear
     integer (kind=c_int), intent(in)   :: iNumDaysInYear
-    real (kind=c_double)               :: rGamma
+    real (kind=c_double)               :: dGamma
 
-    rGamma = TWOPI * ( iDayOfYear - 1 ) / iNumDaysInYear
+    dGamma = TWOPI * ( iDayOfYear - 1 ) / iNumDaysInYear
 
-  end function day_angle_gamma  
+  end function day_angle__gamma  
 
   !------------------------------------------------------------------------------------------------
 
@@ -511,18 +503,18 @@ contains
   !! @param[in]      rTheta_z   Solar zenith angle for given location and time, in RADIANS
   !!
   !! @retval           rAlpha   Solar altitude angle for given location and time, in RADIANS  
-  function solar_altitude(rTheta_z)    result(rAlpha)   bind(c)
+  function solar_altitude__alpha( dTheta_z )    result( dAlpha )   bind(c)
 
-    real (kind=c_double), intent(in)   :: rTheta_z
-    real (kind=c_double)               :: rAlpha
+    real (kind=c_double), intent(in)   :: dTheta_z
+    real (kind=c_double)               :: dAlpha
 
-    call assert( rTheta_z >= rZERO .and. rTheta_z <= HALFPI, &
+    call assert( dTheta_z >= 0.0_c_double .and. dTheta_z <= HALFPI, &
       "Internal programming error: solar zenith angle must be in radians and in the range 0 to pi/2", &
       __FILE__, __LINE__) 
 
-    rAlpha = HALFPI - rAlpha
+    dAlpha = HALFPI - dAlpha
 
-  end function solar_altitude  
+  end function solar_altitude__alpha  
 
 
   !------------------------------------------------------------------------------------------------
@@ -545,30 +537,30 @@ contains
   !!   Reference:
   !!   Jacobson, M.Z., 2005, Fundamentals of atmospheric modeling, Second Edition:
   !!   Cambridge University Press.
-	function zenith_angle(rLatitude, rDelta, rOmega ) result(rTheta_z)     bind(c)
+	function zenith_angle__theta_z( dLatitude, dDelta, dOmega ) result( dTheta_z )     bind(c)
 
-	  real (kind=c_double), intent(in)            :: rLatitude
-	  real (kind=c_double), intent(in)            :: rDelta
-    real (kind=c_double), intent(in), optional  :: rOmega
+	  real (kind=c_double), intent(in)            :: dLatitude
+	  real (kind=c_double), intent(in)            :: dDelta
+    real (kind=c_double), intent(in), optional  :: dOmega
 
 	  ! [ LOCALS ]
-	  real (kind=c_double) :: rTheta_z
-    real (kind=c_double) :: rOmega_
+	  real (kind=c_double) :: dTheta_z
+    real (kind=c_double) :: dOmega_
 
-    if (present(rOmega) ) then
-      rOmega_ = rOmega_
+    if ( present( dOmega ) ) then
+      dOmega_ = dOmega_
     else
-      rOmega_ = rZERO
+      dOmega_ = 0.0_c_double
     endif 
 
-	  call assert( rLatitude <= HALFPI .and. rLatitude >= -HALFPI , &
+	  call assert( dLatitude <= HALFPI .and. dLatitude >= -HALFPI , &
 	    "Internal programming error: Latitude must be expressed in RADIANS and range from -pi/2 to pi/2", &
 	    __FILE__, __LINE__ )
 
 
-	  rTheta_z = acos( sin(rLatitude) * sin(rDelta) + cos(rLatitude) * cos(rDelta) * cos(rOmega_) )
+	  dTheta_z = acos( sin(dLatitude) * sin(dDelta) + cos(dLatitude) * cos(dDelta) * cos(dOmega_) )
 
-	end function zenith_angle
+	end function zenith_angle__theta_z
 
   !------------------------------------------------------------------------------------------------
 
@@ -584,7 +576,7 @@ contains
   !!
   !! @note Reference: 
   !!       Iqbal, Muhammad (1983-09-28). An Introduction To Solar Radiation (p. 15). Elsevier Science. Kindle Edition. 
-  function azimuth_angle(rAlpha, rLatitude, rDelta)   result(rPsi)    bind(c)
+  function azimuth_angle__psi(rAlpha, rLatitude, rDelta)   result(rPsi)    bind(c)
 
     real (kind=c_double), intent(in)      :: rAlpha
     real (kind=c_double), intent(in)      :: rLatitude
@@ -602,6 +594,6 @@ contains
 
     rPsi = acos( rTempval )
 
-  end function azimuth_angle
+  end function azimuth_angle__psi
 
 end module solar_calculations

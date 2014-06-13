@@ -28,6 +28,7 @@ if(TARGET__SWB_EXECUTABLE)
             parameters.F90
             #runoff_curve_number.F90
             #sm_thornthwaite_mather.F90
+            simulation_datetime.F90
             solar_calculations.F90
             strings.F90
             string_list.F90
@@ -234,6 +235,7 @@ if(TARGET__SWB_LIBRARY)
             parameters.F90
             #runoff_curve_number.F90
             #sm_thornthwaite_mather.F90
+            simulation_datetime.F90
             solar_calculations.F90
             strings.F90
             string_list.F90

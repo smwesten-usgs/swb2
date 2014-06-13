@@ -59,7 +59,7 @@ module cell_class
     procedure ( interception_method ), pointer, private      :: calc_interception => null()
 
 !     procedure ( infiltration_method ), pointer, private :: infiltration_method_ptr => null()
-!     procedure ( et_method ), pointer, private           :: et_method_ptr => null()
+    procedure ( et_method ), pointer, private            :: calc_reference_et => null()
 !     procedure ( sm_method ), pointer, private           :: sm_method_ptr => null()
 
   contains
@@ -85,8 +85,8 @@ module cell_class
 !     procedure :: set_infiltration_method_sub
 !     generic   :: set_infiltration_method => set_infiltration_method_sub
 
-!     procedure :: set_et_method_sub
-!     generic   :: set_evapotranspiration_method => set_et_method_sub
+     procedure :: cell_set_evapotranspiration_method_sub
+     generic   :: set_evapotranspiration => cell_set_evapotranspiration_method_sub
 
 !     procedure :: set_sm_method_sub
 !     generic   :: set_soil_moist_method => set_sm_method_sub
@@ -137,8 +137,6 @@ contains
 
     lMatch = lFALSE
 
-!    call LULC%getvalue(this%iCol, this%iRow, this%iLandUseCode)
-
     do iIndex=1, ubound(iLandUseCodes, 1)
 
       if (this%iLandUseCode == iLandUseCodes(iIndex) ) then
@@ -163,6 +161,7 @@ contains
     class (CELL_T), intent(inout)  :: this
 
     call this%calculate_interception_mass_balance_sub()
+    !call this%calculate_snow_mass_balance_sub()
     call this%calculate_soil_mass_balance_sub()
 
   end subroutine calculate_mass_balance_sub
@@ -181,9 +180,7 @@ contains
         "This may be happening because there is no check to see whether the user has specified a valid~" &
         //"method in the control file.")
     endif
-
-    print *, this%fGrossPrecip, this%fInterception
-
+    
   end subroutine calculate_interception_mass_balance_sub
 
 
@@ -227,24 +224,42 @@ contains
   end subroutine get_interception_value_sub
 
 
+  elemental subroutine cell_set_evapotranspiration_method_sub(this, sMethodName)
 
-  subroutine et_hargreaves_samani(this)
+    class (CELL_T), intent(inout)   :: this
+    character (len=*), intent(in)   :: sMethodName
+
+    if ( sMethodName .strequal. "HARGREAVES" .or. sMethodName .strequal. "HARGREAVES-SAMANI" ) then
+
+      this%calc_et => cell_calculate_et_hargreaves
+
+    elseif ( sMethodName .strequal. "JENSEN-HAISE" .or. sMethodName .strequal. "JH" ) then
+
+      this%calc_et => cell_calculate_et_jensen_haise
+
+    endif
+
+  end subroutine cell_set_evapotranspiration_method_sub
+
+
+
+  subroutine cell_calculate_et_hargreaves(this)
 
     class (CELL_T), intent(inout)   :: this
 
-    this%fReferenceET0 = et_hargreaves_ComputeET( iDayOfYear=180, iNumDaysInYear=365,    &
+    this%fReferenceET0 = et_hargreaves_ComputeET( iDayOfYear=SIM_DT%iDOY, iNumDaysInYear=SIM_DT%iDaysInYear,    &
          fLatitude=asFloat(this%fLatitude), fTMin=this%fTMin, fTMax=this%fTMax )
 
-  end subroutine et_hargreaves_samani 
+  end subroutine cell_calculate_et_hargreaves
 
 
-!   subroutine et_jensen_haise(this)
+   subroutine cell_calculate_et_jensen_haise(this)
 
-!     class (CELL_T), intent(inout)   :: this
+     class (CELL_T), intent(inout)   :: this
 
-!     this%fReferenceET0 = et_jh_ComputeET( iDayOfYear, iNumDaysInYear, this%fLatitude, this%fTMin, this%fTMax )
+     this%fReferenceET0 = et_jh_ComputeET( iDayOfYear=, iNumDaysInYear, this%fLatitude, this%fTMin, this%fTMax )
 
-!   end subroutine et_jensen_haise 
+   end subroutine cell_calculate_et_jensen_haise 
 
 
   subroutine print_all_sub(this)

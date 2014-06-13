@@ -5,6 +5,7 @@ module cell_collection
   use exceptions
   use cell_class
   use parameters
+  use simulation_datetime
   implicit none
 
   private

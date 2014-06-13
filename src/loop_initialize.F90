@@ -1388,6 +1388,84 @@ contains
 
   end subroutine initialize_interception_method
 
+
+
+
+
+    subroutine initialize_et_method()
+
+    ! [ LOCALS ]
+    type (STRING_LIST_T)             :: myDirectives
+    type (STRING_LIST_T)             :: myOptions  
+    integer (kind=c_int)             :: iIndex
+    character (len=:), allocatable   :: sCmdText
+    character (len=:), allocatable   :: sOptionText
+    character (len=:), allocatable   :: sArgText
+    integer (kind=c_int)             :: iStat
+
+
+    myDirectives = CF_DICT%grep_keys("INTERCEPTION")
+      
+    if ( myDirectives%count == 0 ) then
+
+      call warn("Your control file seems to be missing any of the required directives relating to INTERCEPTION method.", &
+        lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+
+    else  
+    
+      call LOGS%set_loglevel( LOG_ALL )
+      call LOGS%set_echo( lFALSE )
+
+      do iIndex = 1, myDirectives%count
+
+        ! myDirectives is a string list of all SWB directives that contain the phrase "LANDUSE"
+        ! sCmdText contains an individual directive
+        sCmdText = myDirectives%get(iIndex)
+
+        ! For this directive, obtain the associated dictionary entries
+        call CF_DICT%get_values(sCmdText, myOptions )
+
+        ! dictionary entries are initially space-delimited; sArgText contains
+        ! all dictionary entries present, concatenated, with a space between entries
+        sArgText = myOptions%get(1, myOptions%count )
+
+        ! echo the original directive and dictionary entries to the logfile
+        call LOGS%write(">> "//sCmdText//" "//sArgText)
+
+        ! most of the time, we only care about the first dictionary entry, obtained below
+        sOptionText = myOptions%get(1)
+
+        select case ( sCmdText )
+
+          case ( "EVAPOTRANSPIRATION_METHOD", "ET_METHOD" )
+
+            sArgText = myOptions%get(2)
+
+            select case (sOptionText)
+
+              case ( "HARGREAVES" )
+
+                call CELLS%cell%set_et("HARGREAVES")
+                call initialize_et_hargreaves()
+
+            end select
+            
+          case default
+          
+            call warn("Unknown evapotranspiration method was specified: "//dquote(sArgText), iLogLevel=LOG_ALL )
+
+        end select
+        
+      enddo
+      
+    endif
+    
+
+
+  end subroutine initialize_et_method
+
+
+
 !--------------------------------------------------------------------------------------------------  
 
   subroutine check_for_fatal_warnings()
