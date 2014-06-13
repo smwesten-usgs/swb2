@@ -4,8 +4,10 @@ module cell_class
   use data_catalog_entry
   use constants_and_conversions
   use et_hargreaves
+  use et_jensen_haise
   use interception_bucket
   use parameters
+  use simulation_datetime
   use strings
   implicit none
 
@@ -70,6 +72,9 @@ module cell_class
     procedure :: cell_set_interception_method_sub
     generic   :: set_interception => cell_set_interception_method_sub
 
+    procedure :: cell_set_evapotranspiration_method_sub
+    generic   :: set_evapotranspiration => cell_set_evapotranspiration_method_sub
+
     procedure :: cell_set_col_row_sub
     generic   :: set_col_row => cell_set_col_row_sub
 
@@ -84,9 +89,6 @@ module cell_class
 
 !     procedure :: set_infiltration_method_sub
 !     generic   :: set_infiltration_method => set_infiltration_method_sub
-
-     procedure :: cell_set_evapotranspiration_method_sub
-     generic   :: set_evapotranspiration => cell_set_evapotranspiration_method_sub
 
 !     procedure :: set_sm_method_sub
 !     generic   :: set_soil_moist_method => set_sm_method_sub
@@ -229,13 +231,15 @@ contains
     class (CELL_T), intent(inout)   :: this
     character (len=*), intent(in)   :: sMethodName
 
-    if ( sMethodName .strequal. "HARGREAVES" .or. sMethodName .strequal. "HARGREAVES-SAMANI" ) then
+    if ( ( sMethodName .strequal. "HARGREAVES" ) &
+         .or. ( sMethodName .strequal. "HARGREAVES-SAMANI" ) ) then
 
-      this%calc_et => cell_calculate_et_hargreaves
+      this%calc_reference_et => cell_calculate_et_hargreaves
 
-    elseif ( sMethodName .strequal. "JENSEN-HAISE" .or. sMethodName .strequal. "JH" ) then
+    elseif ( ( sMethodName .strequal. "JENSEN-HAISE" ) &
+         .or. ( sMethodName .strequal. "JH" ) ) then
 
-      this%calc_et => cell_calculate_et_jensen_haise
+      this%calc_reference_et => cell_calculate_et_jensen_haise
 
     endif
 
@@ -257,7 +261,8 @@ contains
 
      class (CELL_T), intent(inout)   :: this
 
-     this%fReferenceET0 = et_jh_ComputeET( iDayOfYear=, iNumDaysInYear, this%fLatitude, this%fTMin, this%fTMax )
+     this%fReferenceET0 = et_jh_ComputeET( iDayOfYear=SIM_DT%iDOY, iNumDaysInYear=SIM_DT%iDaysInYear, &
+       fLatitude=asFloat(this%fLatitude), fTMin=this%fTMin, fTMax=this%fTMax )
 
    end subroutine cell_calculate_et_jensen_haise 
 

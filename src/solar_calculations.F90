@@ -2,6 +2,7 @@ module solar_calculations
 
   use iso_c_binding 
   use constants_and_conversions
+  use meteorological_calculations
   use exceptions
   implicit none
 
@@ -20,7 +21,7 @@ contains
   !! @note Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!       "Crop Evapotranspiration (Guidelines for computing crop water
   !!       requirements)", Food and Agriculture Organization, Rome, Italy.
-  function daylight_hours( dOmega_s )    result(rN)   bind(c)
+  function daylight_hours( dOmega_s )    result(dN)   bind(c)
 
     real (kind=c_double), intent(in)   :: dOmega_s
     real (kind=c_double)               :: dN
@@ -277,7 +278,7 @@ contains
     ! [ LOCALS ]
     real (kind=c_double), parameter :: dKRs = 0.175
 
-    dRs = dKRs * sqrt( C_to_K(dTMax) - C_to_K(dTMin) ) * dRa
+    dRs = dKRs * sqrt( C_to_K(fTMax) - C_to_K(fTMin) ) * dRa
 
   end function solar_radiation_Hargreaves__Rs
 
@@ -459,10 +460,10 @@ contains
 
     dTAvg_K = C_to_K((fTMin + fTMax ) / 2.0_c_float )
 
-    dTAvg_4 = rTAvg_K * rTAvg_K * rTAvg_K * rTAvg_K * rSIGMA
-    d_ea = dewpoint_vapor_pressure_ea( fTMin )
+    dTAvg_4 = dTAvg_K * dTAvg_K * dTAvg_K * dTAvg_K * dSIGMA
+    d_ea = dewpoint_vapor_pressure__e_a( fTMin )
 
-    dCloudFrac = min( dRs / dRso, 1.0_d_double )
+    dCloudFrac = min( dRs / dRso, 1.0_c_double )
 
     dRnl = dTAvg_4 * ( 0.34_c_double - 0.14_c_double * sqrt( d_ea ) ) &
             * ( 1.35_c_double * dCloudFrac - 0.35_c_double )

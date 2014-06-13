@@ -11,7 +11,7 @@ if(TARGET__SWB_EXECUTABLE)
             dictionary.F90
             #et_FAO56_crop_coefficients.F90
             et_hargreaves.F90
-            #et_jensen_haise.F90
+            et_jensen_haise.F90
             exceptions.F90
             file_operations.F90
             grid.F90
@@ -219,7 +219,7 @@ if(TARGET__SWB_LIBRARY)
             dictionary.F90
             #et_FAO56_crop_coefficients.F90
             et_hargreaves.F90
-            #et_jensen_haise.F90
+            et_jensen_haise.F90
             exceptions.F90
             file_operations.F90
             grid.F90

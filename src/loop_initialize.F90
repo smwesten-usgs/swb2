@@ -1443,9 +1443,14 @@ contains
 
             select case (sOptionText)
 
-              case ( "HARGREAVES" )
+              case ( "HARGREAVES", "HARGREAVES-SAMANI" )
 
-                call CELLS%cell%set_et("HARGREAVES")
+                call CELLS%cell%set_evapotranspiration("HARGREAVES")
+                call initialize_et_hargreaves()
+
+              case ( "J-H", "JENSEN-HAISE" )
+
+                call CELLS%cell%set_evapotranspiration("JENSEN-HAISE")
                 call initialize_et_hargreaves()
 
             end select
