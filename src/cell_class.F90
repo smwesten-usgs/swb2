@@ -263,8 +263,6 @@ contains
     this%fReferenceET0 = et_hargreaves_ComputeET( iDayOfYear=SIM_DT%iDOY, iNumDaysInYear=SIM_DT%iDaysInYear,    &
          fLatitude=asFloat(this%dLatitude), fTMin=this%fTMin, fTMax=this%fTMax )
 
-    print *, this%fReferenceET0, SIM_DT%iDOY, SIM_DT%iDaysInYear, this%dLatitude, this%fTMin, this%fTMax
-
   end subroutine cell_calculate_et_hargreaves
 
 

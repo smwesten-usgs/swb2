@@ -107,8 +107,6 @@ function et_hargreaves_ComputeET( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, 
 	fRa = extraterrestrial_radiation__Ra(dLatitude_radians, fDelta, fOmega_s, fD_r)
 
   fReferenceET0 = ET0_hargreaves( equivalent_evaporation(fRa), fTMin, fTMax)
-
-  print *, fRa, fD_r, fDelta, fOmega_s, fLatitude
     
 end function et_hargreaves_ComputeET
 
@@ -127,7 +125,7 @@ function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)
   real (kind=c_double) :: rTDelta
   real (kind=c_double) :: rTAvg
 
-  rTAvg = (rTMinF + rTMaxF) / 2_c_double
+  rTAvg = (rTMinF + rTMaxF) / 2.0_c_double
 
   rTDelta = F_to_K(rTMaxF) - F_to_K(rTMinF)
 

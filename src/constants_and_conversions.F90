@@ -42,8 +42,8 @@ module constants_and_conversions
   real (kind=c_double), parameter    :: dTINYVAL = -(HUGE(0_c_double) - 1)  
   real (kind=c_float), parameter     :: fTINYVAL = -(HUGE(0_c_float) - 1)
   integer(kind=c_int), parameter     :: iTINYVAL = -(HUGE(0_c_int) - 1)
-  real (kind=c_float), parameter     :: rFREEZING = 32_c_float
-  real (kind=c_double), parameter    :: dFREEZING = 32_c_double
+  real (kind=c_float), parameter     :: rFREEZING = 32.0_c_float
+  real (kind=c_double), parameter    :: dFREEZING = 32.0_c_double
   integer (kind=c_int), parameter    :: iZERO = 0_c_int
   real (kind=c_float), parameter     :: fZERO = 0.0_c_float
   real (kind=c_float), parameter     :: rZERO = 0.0_c_float
@@ -61,8 +61,8 @@ module constants_and_conversions
   character (len=1), parameter :: sDOUBLE_QUOTE = achar(34)
 
   ! [ select conversion factors ]
-  real (kind=c_double), parameter :: C_PER_F = 5_c_double / 9_c_double
-  real (kind=c_double), parameter :: F_PER_C = 9_c_double / 5_c_double  
+  real (kind=c_double), parameter :: C_PER_F = 5.0_c_double / 9.0_c_double
+  real (kind=c_double), parameter :: F_PER_C = 9.0_c_double / 5.0_c_double  
 
 
 ! this type is still needed for the grid module
@@ -172,8 +172,8 @@ type T_CELL
   public :: c_to_fortran_string
   public :: fortran_to_c_string
 
-  real (kind=c_float), parameter  :: TOLERANCE_FLOAT = 1e-6_c_float
-  real (kind=c_double), parameter :: TOLERANCE_DOUBLE = 1e-9_c_double
+  real (kind=c_float), parameter  :: TOLERANCE_FLOAT = 1.0e-6_c_float
+  real (kind=c_double), parameter :: TOLERANCE_DOUBLE = 1.0e-9_c_double
 
 contains
 
@@ -412,12 +412,12 @@ contains
   !>  Convert millimeters to inches.
   !! @param[in] mm Value in millimeters.
   !! @retval inches Value in inches.
-  elemental function mm_to_inches_sgl_fn(r_mm) result(r_in)
+  elemental function mm_to_inches_sgl_fn(mm) result(inches)
 
-    real (kind=c_float),intent(in) :: r_mm
-    real (kind=c_float) :: r_in
+    real (kind=c_float),intent(in) :: mm
+    real (kind=c_float) :: inches
 
-    r_in = r_mm / 25.4_c_double
+    inches = mm / 25.4_c_double
 
   end function mm_to_inches_sgl_fn
 
