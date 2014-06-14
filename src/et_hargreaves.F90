@@ -92,18 +92,23 @@ function et_hargreaves_ComputeET( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, 
 
   ! [ LOCALS ]
   real (kind=c_double) :: fDelta, fOmega_s, fD_r, fRa
+  real (kind=c_double) :: dLatitude_radians
+
+  dLatitude_radians = fLatitude * DEGREES_TO_RADIANS
 
   fD_r =relative_earth_sun_distance__D_r(iDayOfYear,iNumDaysInYear)
   fDelta = solar_declination_simple__delta(iDayOfYear, iNumDaysInYear)
 
-  fOmega_s = sunrise_sunset_angle__omega_s(asDouble(fLatitude), fDelta)
+  fOmega_s = sunrise_sunset_angle__omega_s(dLatitude_radians, fDelta)
 
 	! NOTE that the following equation returns extraterrestrial radiation in
 	! MJ / m**2 / day.  The Hargreaves equation requires extraterrestrial
 	! radiation to be expressed in units of mm / day.
-	fRa = extraterrestrial_radiation__Ra(asDouble(fLatitude), fDelta, fOmega_s, fD_r)
+	fRa = extraterrestrial_radiation__Ra(dLatitude_radians, fDelta, fOmega_s, fD_r)
 
   fReferenceET0 = ET0_hargreaves( equivalent_evaporation(fRa), fTMin, fTMax)
+
+  print *, fRa, fD_r, fDelta, fOmega_s, fLatitude
     
 end function et_hargreaves_ComputeET
 

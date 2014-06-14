@@ -72,7 +72,7 @@ contains
   !!        requirements)", Food and Agriculture Organization, Rome, Italy.
   !!
   !! @sa http://www.fao.org/docrep/x0490e/x0490e07.htm#solar%20radiation
-  function extraterrestrial_radiation__Ra(dLatitude, dDelta,dOmega_s, dDsubR)    result(dRa)
+  function extraterrestrial_radiation__Ra(dLatitude, dDelta, dOmega_s, dDsubR)    result(dRa)
 
     ! [ ARGUMENTS ]
     real (kind=c_double), intent(in) :: dLatitude

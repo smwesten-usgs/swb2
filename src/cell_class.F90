@@ -18,7 +18,7 @@ module cell_class
     integer (kind=c_int)  :: iSoilGroup = 0_c_int               ! Soil type from soil-type grid
     integer (kind=c_int)  :: iLandUseIndex                      ! Index (row num) of land use table
     integer (kind=c_int)  :: iLandUseCode = 0_c_int                 ! Land use from land-use grid
-    real (kind=c_double)  :: fLatitude
+    real (kind=c_double)  :: dLatitude
     logical (kind=c_bool) :: lActive = lTRUE 
 
     integer (kind=c_int) :: iSumUpslopeCells = 0_c_int
@@ -261,7 +261,9 @@ contains
     class (CELL_T), intent(inout)   :: this
 
     this%fReferenceET0 = et_hargreaves_ComputeET( iDayOfYear=SIM_DT%iDOY, iNumDaysInYear=SIM_DT%iDaysInYear,    &
-         fLatitude=asFloat(this%fLatitude), fTMin=this%fTMin, fTMax=this%fTMax )
+         fLatitude=asFloat(this%dLatitude), fTMin=this%fTMin, fTMax=this%fTMax )
+
+    print *, this%fReferenceET0, SIM_DT%iDOY, SIM_DT%iDaysInYear, this%dLatitude, this%fTMin, this%fTMax
 
   end subroutine cell_calculate_et_hargreaves
 
@@ -271,7 +273,7 @@ contains
      class (CELL_T), intent(inout)   :: this
 
      this%fReferenceET0 = et_jh_ComputeET( iDayOfYear=SIM_DT%iDOY, iNumDaysInYear=SIM_DT%iDaysInYear, &
-       fLatitude=asFloat(this%fLatitude), fTMin=this%fTMin, fTMax=this%fTMax )
+       fLatitude=asFloat(this%dLatitude), fTMin=this%fTMin, fTMax=this%fTMax )
 
    end subroutine cell_calculate_et_jensen_haise 
 

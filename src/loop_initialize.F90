@@ -711,6 +711,10 @@ contains
     BNDS%fGridCellSize = rGridCellSize
     BNDS%sPROJ4_string = trim(sArgText)
 
+    CELLS%sPROJ4_string = trim(sArgText)
+
+    call CELLS%initialize_latitude()
+
   end subroutine initialize_grid_options
 
 

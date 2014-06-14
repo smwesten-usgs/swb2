@@ -1447,6 +1447,17 @@ subroutine grid_Transform(pGrd, sFromPROJ4, sToPROJ4 )
 
   call grid_CheckForPROJ4Error(iRetVal, sFromPROJ4, sToPROJ4)
 
+
+  !> If the coordinates have been converted TO latlon, convert back to degrees
+
+  if( index(string=csToPROJ4, substring="latlon") > 0 &
+      .or. index(string=csToPROJ4, substring="lonlat") > 0 ) then
+
+    pGrd%rX = pGrd%rX * RADIANS_TO_DEGREES
+    pGrd%rY = pGrd%rY * RADIANS_TO_DEGREES
+
+  endif
+
   ! now update the grid boundaries based on the transformed coordinate values
   pGrd%rGridCellSize = ( maxval(pGrd%rX) - minval(pGrd%rX) ) &
              / real(pGrd%iNX - 1, kind=c_double)

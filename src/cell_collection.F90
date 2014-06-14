@@ -6,6 +6,7 @@ module cell_collection
   use cell_class
   use parameters
   use simulation_datetime
+  use swb_grid
   implicit none
 
   private
@@ -19,7 +20,7 @@ module cell_collection
     integer (kind=c_int)            :: iNumRows
     real (kind=c_double)            :: fX_ll, fY_ll
     real (kind=c_double)            :: fX_ur, fY_ur
-    real (kind=c_float)             :: fGridcellSize
+    real (kind=c_double)             :: dGridcellSize
 
   contains
 
@@ -28,6 +29,9 @@ module cell_collection
 
     procedure :: initialize_cells_landuse_sub
     generic   :: initialize_landuse => initialize_cells_landuse_sub
+
+    procedure :: initialize_cells_latitude_sub
+    generic   :: initialize_latitude => initialize_cells_latitude_sub
 
     procedure :: initialize_cells_soil_groups_sub
     generic   :: initialize_soil_groups => initialize_cells_soil_groups_sub
@@ -47,31 +51,59 @@ module cell_collection
 
 contains  
 
-  subroutine initialize_cells_sub( this, iNumCols, iNumRows, fX_ll, fY_ll, fGridCellSize )
+  subroutine initialize_cells_sub( this, iNumCols, iNumRows, dX_ll, dY_ll, dGridCellSize )
 
     class (CELL_COLLECTION_T), intent(inout)     :: this
     integer (kind=c_int), intent(in)             :: iNumCols
     integer (kind=c_int), intent(in)             :: iNumRows
-    real (kind=c_double), intent(in)             :: fX_ll
-    real (kind=c_double), intent(in)             :: fY_ll
-    real (kind=c_double), intent(in)             :: fGridcellSize
+    real (kind=c_double), intent(in)             :: dX_ll
+    real (kind=c_double), intent(in)             :: dY_ll
+    real (kind=c_double), intent(in)             :: dGridcellSize
 
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iStat
     integer (kind=c_int)                 :: iRow, iCol, iIndex
     class (CELL_T), pointer              :: pCell
 
+
     this%iNumCols = iNumCols
     this%iNumRows = iNumRows
-    this%fX_ll = fX_ll
-    this%fY_ll = fY_ll
-    this%fGridcellSize = fGridcellSize
+    this%fX_ll = dX_ll
+    this%fY_ll = dY_ll
+    this%dGridcellSize = dGridcellSize
 
     allocate( this%cell(iNumCols, iNumRows), stat=iStat )
 
     if (iStat /=0) stop("Could not allocate memory for cells")
 
   end subroutine initialize_cells_sub
+
+
+
+  subroutine initialize_cells_latitude_sub(this)
+
+    class (CELL_COLLECTION_T), intent(inout)     :: this
+
+    ! [ LOCALS ]
+    type (GENERAL_GRID_T), pointer       :: pGrd
+
+    pGrd => grid_Create( iNX=this%iNumCols, iNY=this%iNumRows, rX0=this%fX_ll, rY0=this%fY_ll, &
+        rGridCellSize=this%dGridCellSize, iDataType=GRID_DATATYPE_INT )  
+
+    call grid_Transform(pGrd=pGrd, sFromPROJ4=this%sPROJ4_string, &
+        sToPROJ4="+proj=lonlat +ellps=GRS80 +datum=WGS84 +no_defs" )
+
+    this%cell%dLatitude = pGrd%rY
+
+    print *, "****"
+    print *, minval(pGrd%rY)
+
+    print *, maxval(pGrd%rY)
+
+    call grid_Destroy(pGrd)
+
+  end subroutine initialize_cells_latitude_sub
+
 
 
   subroutine initialize_cells_landuse_sub( this )
