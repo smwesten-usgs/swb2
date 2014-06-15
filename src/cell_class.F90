@@ -3,6 +3,7 @@ module cell_class
   use iso_c_binding
   use data_catalog_entry
   use constants_and_conversions
+  use continuous_frozen_ground_index
   use et_hargreaves
   use et_jensen_haise
   use interception_bucket
@@ -37,8 +38,9 @@ module cell_class
     real (kind=c_float) :: fBareSoilEvap = 0.0_c_float
     real (kind=c_float) :: fActualET = 0.0_c_float               ! Actual Evapotranspiration
 
-    real (kind=c_float) :: fInFlow = 0.0_c_float            ! flow in from uphill
-    real (kind=c_float) :: fOutFlow = 0.0_c_float           ! flow out downhill
+    real (kind=c_float) :: fRunOn = 0.0_c_float            ! flow in from uphill
+    real (kind=c_float) :: fRunOff = 0.0_c_float           ! calculated infiltration excess
+    real (kind=c_float) :: fOutFlow = 0.0_c_float          ! runoff routed to next cell
     real (kind=c_float) :: fRouteFraction = 1.0_c_float     ! Fraction of outflow to route downslope
     real (kind=c_float) :: fGrossPrecip = 0.0_c_float       ! Precip - no interception applied
     real (kind=c_float) :: fInterception = 0.0_c_float      ! Interception term
@@ -82,6 +84,7 @@ module cell_class
     generic   :: solve => calculate_mass_balance_sub
 
     procedure :: calculate_interception_mass_balance_sub
+    procedure :: calculate_snow_mass_balance_sub
     procedure :: calculate_soil_mass_balance_sub
 
     procedure :: cell_set_landuse_index_sub
@@ -163,17 +166,19 @@ contains
     class (CELL_T), intent(inout)  :: this
 
     call this%calculate_interception_mass_balance_sub()
-    !call this%calculate_snow_mass_balance_sub()
+    call this%calculate_snow_mass_balance_sub()
     call this%calculate_soil_mass_balance_sub()
 
   end subroutine calculate_mass_balance_sub
+
 
 
   subroutine calculate_interception_mass_balance_sub(this)
 
     class (CELL_T), intent(inout)   :: this
 
-!    call PRCP%getvalue(this%iCol, this%iRow, this%fGrossPrecip )
+    ! [ LOCALS ]
+    real (kind=c_float)  :: fReferenceET_minus_interception
 
     if (associated( this%calc_interception) ) then
       call this%calc_interception()
@@ -192,7 +197,57 @@ contains
         //"method in the control file.")
     endif
     
+    this%fInterceptionStorage = this%fInterceptionStorage + this%fInterception
+
+    fReferenceET_minus_interception = this%fReferenceET0 - this%fInterceptionStorage
+
+    if ( fReferenceET_minus_interception >= 0.0_c_float ) then  ! potential ET evaporates all interception storage water
+    
+       this%fInterceptionStorage = 0.0_c_float
+       this%fReferenceET0_adj = fReferenceET_minus_interception
+
+    else ! not enough potential ET to completely dry out interception storage
+
+      this%fInterceptionStorage = this%fInterceptionStorage - this%fReferenceET0
+      this%fReferenceET0_adj = 0.0_c_float
+
+    endif
+
+    !if ( this%fReference_ET0 > this%fInterceptionStorage ) 
+
   end subroutine calculate_interception_mass_balance_sub
+
+
+  
+  subroutine calculate_snow_mass_balance_sub(this)
+
+    class (CELL_T), intent(inout)   :: this
+
+    ! [ LOCALS ]
+    real (kind=c_float)   :: fTAvg
+
+    fTAvg = ( this%fTMin + this%fTMax ) / 2.0_c_float
+
+    call update_continuous_frozen_ground_index( this%fCFGI, fTAvg, this%fSnowStorage )
+
+!     if (associated( this%calc_snowfall) ) then
+!       call this%calc_snowfall()
+!     else
+!       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__, &
+!         "This may be happening because there is no check to see whether the user has specified a valid~" &
+!         //"method in the control file.")
+!     endif
+
+
+!     if (associated( this%calc_snowmelt) ) then
+!       call this%calc_snowmelt()
+!     else
+!       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__, &
+!         "This may be happening because there is no check to see whether the user has specified a valid~" &
+!         //"method in the control file.")
+!     endif
+
+  end subroutine calculate_snow_mass_balance_sub
 
 
 
@@ -201,8 +256,15 @@ contains
     class (CELL_T), intent(inout)   :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: i, j
-    real (kind=c_double) :: f, g
+    real (kind=c_float) :: fP_minus_PE
+    real (kind=c_float) :: fInflow
+
+    fInflow = this%fRunOn + this%fGrossPrecip - this%fInterception + this%fSnowMelt
+    fP_minus_PE = fInflow - this%fReferenceET0_adj
+
+!     if ( fP_minus_PE < 0.0_c_float ) then
+
+!       this%fAPWL = this%fAPWL + abs( fP_minus_PE )
 
   end subroutine calculate_soil_mass_balance_sub
 

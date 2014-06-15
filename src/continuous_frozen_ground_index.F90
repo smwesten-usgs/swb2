@@ -9,6 +9,8 @@ module continuous_frozen_ground_index
   real (kind=c_float), public :: CFGI_LL = 55.
   real (kind=c_float), public :: CFGI_UL = 83.
   
+  public update_continuous_frozen_ground_index
+
 contains  
 
 
@@ -28,19 +30,20 @@ contains
 
     ! [ ARGUMENTS ]
     real (kind=c_float), intent(inout)       :: rCFGI
-    real (kind=c_float), intent(in)          :: rT_Avg
+    real (kind=c_float), intent(in)          :: rTAvg_F
     real (kind=c_float), intent(in)          :: rSnowCover
 
     ! [ LOCALS ]
     real (kind=c_float), parameter    :: rDecay_Coefficient_A                      = 0.97_c_float
     real (kind=c_float), parameter    :: rSnow_Reduction_Coefficient_Freezing      = 0.08_c_float
     real (kind=c_float), parameter    :: rSnow_Reduction_Coefficient_Thawing       = 0.5_c_float     
-    
+    real (kind=c_float), parameter    :: rCM_PER_INCH                              = 2.54_c_float
+
     real (kind=c_float) :: rTAvg_C              ! temporary variable holding avg temp in C
     real (kind=c_float) :: rSnowDepthCM         ! snow depth in centimeters
 
 
-    rTAvg_C = FtoC( rT_Avg )
+    rTAvg_C = F_to_C( rTAvg_F )
 
     ! assuming snow depth is 10 times the water content of the snow in inches
     rSnowDepthCM = rSnowCover * 10.0_c_float * rCM_PER_INCH
@@ -53,16 +56,16 @@ contains
 
       if( Tavg > rFREEZING) then
 
-        CFGI = max( A * CFGI - Tavg * exp ( -0.4_c_float * K_thaw * rSnowDepthCM ), rZERO)
+        CFGI = max( A * CFGI - Tavg * exp ( -0.4_c_float * K_thaw * rSnowDepthCM ), 0.0_c_float )
 
       else ! temperature is below freezing
         
-        CFGI = max( A * CFGI - Tavg * exp ( -0.4_c_float * K_freeze * rSnowDepthCM ), rZERO)
+        CFGI = max( A * CFGI - Tavg * exp ( -0.4_c_float * K_freeze * rSnowDepthCM ), 0.0_c_float )
 
       end if
 
     end associate  
 
-  end subroutine model_UpdateContinuousFrozenGroundIndex
+  end subroutine update_continuous_frozen_ground_index
 
 end module continuous_frozen_ground_index

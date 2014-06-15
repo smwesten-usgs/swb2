@@ -30,7 +30,7 @@ module netcdf4_support
   use logfiles
   use netcdf_c_api_interfaces
   use strings
-  use datetime, only : gregorian_date, julian_day
+  use datetime
 
   use swb_grid
 !  use typesizes
@@ -229,7 +229,7 @@ module netcdf4_support
   public :: T_NETCDF4_FILE
 
   public :: netcdf_open_and_prepare_as_input
-  public :: netcdf_open_and_prepare_as_output
+  public :: netcdf_open_and_prepare_as_output_archive
   public :: netcdf_date_within_range
   public :: netcdf_deallocate_data_struct
   public :: netcdf_nullify_data_struct
@@ -720,7 +720,7 @@ end subroutine netcdf_open_and_prepare_as_input
 
 !----------------------------------------------------------------------
 
-subroutine netcdf_open_and_prepare_as_output(NCFILE, NCFILE_ARCHIVE, &
+subroutine netcdf_open_and_prepare_as_output_archive(NCFILE, NCFILE_ARCHIVE, &
    iOriginMonth, iOriginDay, iOriginYear, iStartYear, iEndYear)
 
   type (T_NETCDF4_FILE ) :: NCFILE
@@ -813,7 +813,97 @@ subroutine netcdf_open_and_prepare_as_output(NCFILE, NCFILE_ARCHIVE, &
 
 !  call netcdf_close_file(NCFILE_ARCHIVE)
 
+end subroutine netcdf_open_and_prepare_as_output_archive
+
+
+
+subroutine netcdf_open_and_prepare_as_output(NCFILE, &
+   StartDate, EndDate )
+
+  type (T_NETCDF4_FILE ), intent(inout)   :: NCFILE
+  type (DATETIME_T), intent(in)           :: StartDate
+  type (DATETIME_T), intent(in)           :: EndDate
+ 
+!   ! [ LOCALS ]
+!   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
+!   type (T_NETCDF_DIMENSION), pointer :: pNC_DIM
+!   integer (kind=c_int) :: iIndex
+!   integer (kind=c_int) :: iNumCols, iNumRows
+!   integer (kind=c_int) :: iMinCol, iMaxCol
+!   integer (kind=c_int) :: iMinRow, iMaxRow
+!   real (kind=c_double), dimension(:), allocatable :: rX, rY
+!   character (len=10) :: sOriginText
+!   character (len=256) :: sFilename
+
+!   write(sOriginText, fmt="(i4.4,'-',i2.2,'-',i2.2)") iOriginYear, &
+!     iOriginMonth, iOriginDay
+
+!   iMaxRow = maxval(NCFILE%iRowBounds)
+!   iMinRow = minval(NCFILE%iRowBounds)
+!   iMaxCol = maxval(NCFILE%iColBounds)
+!   iMinCol = minval(NCFILE%iColBounds)
+
+!   iNumRows = iMaxRow - iMinRow + 1
+!   iNumCols = iMaxCol - iMinCol + 1
+
+!   allocate(rX(iNumCols))
+!   allocate(rY(iNumRows))
+!   rX = NCFILE%rX_Coords(iMinCol:iMaxCol)
+!   rY = NCFILE%rY_Coords(iMinRow:iMaxRow)
+
+!   sFilename = trim(NCFILE%sVarName(NC_Z))//"_"//trim(asCharacter(iStartYear)) &
+!     //"_"//trim(asCharacter(iEndYear))//"__" &
+!     //trim(asCharacter(iNumRows)) &
+!      //"_by_"//trim(asCharacter(iNumCols))//".nc"
+
+!   call nf_create(NCFILE=NCFILE, sFilename=trim(sFilename) )
+
+!   !> set dimension values in the NCFILE struct
+!   call nf_set_standard_dimensions(NCFILE=NCFILE, &
+!                        iNX=iNumCols, &
+!                        iNY=iNumRows)
+
+!   NCFILE%sVarUnits(NC_X)    =   
+!   NCFILE%sVarUnits(NC_Y)    =   
+!   NCFILE%sVarUnits(NC_Z)    =   
+
+!   !> transfer dimension values to NetCDF file
+!   call nf_define_dimensions( NCFILE=NCFILE )
+
+!   !> set variable values in the NCFILE struct
+!   call nf_set_standard_variables(NCFILE=NCFILE, &
+!        sVarName_z = trim(NCFILE%sVarName(NC_Z)) )
+
+!   !> transfer variable values to NetCDF file
+!   call nf_define_variables(NCFILE=NCFILE)
+
+!   call nf_get_variable_id_and_type( NCFILE=NCFILE )
+
+!   call nf_set_standard_attributes(NCFILE=NCFILE, &
+!     sOriginText=sOriginText)
+
+!   call nf_set_global_attributes(NCFILE=NCFILE, &
+!      sDataType=trim(NCFILE%sVarName(NC_Z)), &
+!      sSourceFile=trim(NCFILE%sFilename))
+
+!   call nf_put_attributes(NCFILE=NCFILE)
+
+!   !> enable a low level of data compression for the
+!   !> variable of interest
+!   call nf_define_deflate(NCFILE=NCFILE, &
+!      iVarID=NCFILE_ARCHIVE%iVarID(NC_Z), &
+!      iShuffle=NC_SHUFFLE_YES, &
+!      iDeflate=NC_DEFLATE_YES, &
+!      iDeflate_level=2 )
+
+!   call nf_enddef(NCFILE=NCFILE)
+
+!   call nf_put_x_and_y(NCFILE=NCFILE, &
+!        dpX=NCFILE%rX_Coords(iMinCol:iMaxCol), &
+!        dpY=NCFILE%rY_Coords(iMinRow:iMaxRow) )
+
 end subroutine netcdf_open_and_prepare_as_output
+
 
 !----------------------------------------------------------------------
 

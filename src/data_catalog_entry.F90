@@ -1227,7 +1227,7 @@ end subroutine set_constant_value_real
 
     if (this%iNC_ARCHIVE_STATUS == NETCDF_FILE_CLOSED) then
 
-      call netcdf_open_and_prepare_as_output(NCFILE=this%NCFILE, &
+      call netcdf_open_and_prepare_as_output_archive(NCFILE=this%NCFILE, &
                NCFILE_ARCHIVE=this%NCFILE_ARCHIVE, &
                iOriginMonth=iMonth, iOriginDay=iDay, iOriginYear=iYear, &
                iStartYear=this%iStartYear, iEndYear=this%iEndYear)

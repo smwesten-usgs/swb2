@@ -95,11 +95,6 @@ contains
 
     this%cell%dLatitude = pGrd%rY
 
-    print *, "****"
-    print *, minval(pGrd%rY)
-
-    print *, maxval(pGrd%rY)
-
     call grid_Destroy(pGrd)
 
   end subroutine initialize_cells_latitude_sub
@@ -195,9 +190,9 @@ contains
     class (CELL_T), pointer              :: pCell
     integer (kind=c_int)                 :: iCol, iRow
 
-    ! $OMP PARALLEL
+    !$OMP PARALLEL
 
-    ! $OMP DO PRIVATE(iCol, iRow, pCell)
+    !$OMP DO PRIVATE(iCol, iRow, pCell)
 
     do iRow=1, this%iNumRows
 
@@ -210,9 +205,9 @@ contains
 
     enddo  
 
-    ! $OMP END DO
+    !$OMP END DO
 
-    ! $OMP END PARALLEL
+    !$OMP END PARALLEL
 
   end subroutine solve_cells_sub
 

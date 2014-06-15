@@ -5,6 +5,7 @@ if(TARGET__SWB_EXECUTABLE)
             cell_class.F90
             cell_collection.F90
             constants_and_conversions.F90
+            continuous_frozen_ground_index.F90
             #data_catalog.F90
 		data_catalog_entry.F90
 		datetime.F90
@@ -213,6 +214,7 @@ if(TARGET__SWB_LIBRARY)
             cell_class.F90
             cell_collection.F90
             constants_and_conversions.F90
+            continuous_frozen_ground_index.F90
             #data_catalog.F90
             data_catalog_entry.F90
             datetime.F90
