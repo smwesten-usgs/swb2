@@ -6,10 +6,15 @@ module continuous_frozen_ground_index
 
   private
 
-  real (kind=c_float), public :: CFGI_LL = 55.
-  real (kind=c_float), public :: CFGI_UL = 83.
-  
+  public :: CFGI_LL, CFGI_UL
+  public :: CFGI
   public update_continuous_frozen_ground_index
+
+
+  real (kind=c_float)               :: CFGI_LL = 55.
+  real (kind=c_float)               :: CFGI_UL = 83.
+  
+  real (kind=c_float), allocatable  :: CFGI(:)
 
 contains  
 
@@ -26,11 +31,12 @@ contains
   !! @note Molnau, M. and Bissell, V.C., 1983, A continuous frozen ground index for 
   !! flood forecasting: In Proceedings 51st Annual Meeting Western Snow Conference, 
   !! 109–119, Canadian Water Resources Assoc. Cambridge, Ont.
-  subroutine update_continuous_frozen_ground_index( rCFGI, rTAvg_F, rSnowCover )
+  elemental subroutine update_continuous_frozen_ground_index( rCFGI, rTMax_F, rTMin_F, rSnowCover )
 
     ! [ ARGUMENTS ]
     real (kind=c_float), intent(inout)       :: rCFGI
-    real (kind=c_float), intent(in)          :: rTAvg_F
+    real (kind=c_float), intent(in)          :: rTMax_F
+    real (kind=c_float), intent(in)          :: rTMin_F
     real (kind=c_float), intent(in)          :: rSnowCover
 
     ! [ LOCALS ]
@@ -43,7 +49,7 @@ contains
     real (kind=c_float) :: rSnowDepthCM         ! snow depth in centimeters
 
 
-    rTAvg_C = F_to_C( rTAvg_F )
+    rTAvg_C = F_to_C( (rTMax_F + rTMin_F) / 2.0_c_float )
 
     ! assuming snow depth is 10 times the water content of the snow in inches
     rSnowDepthCM = rSnowCover * 10.0_c_float * rCM_PER_INCH
@@ -54,7 +60,7 @@ contains
                K_freeze => rSnow_Reduction_Coefficient_Freezing,             &
                K_thaw => rSnow_Reduction_Coefficient_Thawing )
 
-      if( Tavg > rFREEZING) then
+      if( Tavg > 0.0_c_float ) then
 
         CFGI = max( A * CFGI - Tavg * exp ( -0.4_c_float * K_thaw * rSnowDepthCM ), 0.0_c_float )
 

@@ -2,16 +2,18 @@ module loop_initialize
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
   use constants_and_conversions, only : lTRUE, lFALSE, asFloat, BNDS
-  use cell_class
-  use cell_collection
+!  use cell_class
+!  use cell_collection
   use datetime
   use data_catalog_entry
   use dictionary
   use exceptions
   use file_operations
   use interception_bucket
-  use loop_iterate
+!  use loop_iterate
+  use model_domain
   use parameters
+  use simulation_datetime
   use strings
   use string_list  
   implicit none
@@ -97,6 +99,12 @@ contains
     call initialize_landuse_options()
     call initialize_interception_method()
     call initialize_evapotranspiration_method()
+    call MODEL%set_inactive_cells()
+
+    call MODEL%initialize_arrays()
+    call initialize_soils_landuse_awc_flowdir_values()
+
+    call MODEL%preflight_check_function_pointers()
 
   end subroutine initialize_options
 
@@ -667,7 +675,7 @@ contains
       rGridCellSize = asDouble( myOptions%get(5) )
 
       !pGrd => grid_Create(iNX, iNY, rX0, rY0, rGridCellSize, GRID_DATATYPE_ALL) 
-      call CELLS%initialize(iNX, iNY, rX0, rY0, rGridCellSize)
+      call MODEL%initialize_grid(iNX, iNY, rX0, rY0, rGridCellSize)
 
       rX1 = rX0 + rGridCellSize * real(iNX, kind=c_double)
       rY1 = rY0 + rGridCellSize * real(iNY, kind=c_double)
@@ -682,7 +690,7 @@ contains
       
 
       !pGrd => grid_Create(iNX, iNY, rX0, rY0, rX1, rY1, GRID_DATATYPE_ALL)
-      call CELLS%initialize(iNX, iNY, rX0, rY0, rGridCellSize)
+      call MODEL%initialize_grid(iNX, iNY, rX0, rY0, rGridCellSize)
 
     else
 
@@ -711,9 +719,7 @@ contains
     BNDS%fGridCellSize = rGridCellSize
     BNDS%sPROJ4_string = trim(sArgText)
 
-    CELLS%sPROJ4_string = trim(sArgText)
-
-    call CELLS%initialize_latitude()
+    MODEL%PROJ4_string = trim(sArgText)
 
   end subroutine initialize_grid_options
 
@@ -1028,15 +1034,25 @@ contains
 
       call HSG%getvalues(  )
 
-      call CELLS%initialize_soil_groups()
-
-
     endif
 
   end subroutine initialize_soils_group_options  
 
 
 
+  subroutine initialize_soils_landuse_awc_flowdir_values()
+
+
+
+      call MODEL%initialize_latitude()
+
+      call MODEL%initialize_soil_groups()
+
+      call MODEL%initialize_landuse()
+
+
+
+  end subroutine initialize_soils_landuse_awc_flowdir_values
 
 
 
@@ -1230,8 +1246,6 @@ contains
 !      call LULC%getvalues( iMonth=asInt(SIM_DT%start%iMonth), iDay=asInt(SIM_DT%start%iDay), iYear=SIM_DT%start%iYear )
       call LULC%getvalues(  )
 
-      call CELLS%initialize_landuse()
-
     endif
 
   end subroutine initialize_landuse_options  
@@ -1323,6 +1337,8 @@ contains
 
     subroutine initialize_interception_method()
 
+    use interception__bucket
+
     ! [ LOCALS ]
     type (STRING_LIST_T)             :: myDirectives
     type (STRING_LIST_T)             :: myOptions  
@@ -1374,7 +1390,7 @@ contains
 
               case ( "BUCKET" )
 
-                call CELLS%cell%set_interception("BUCKET")
+                call MODEL%set_interception("BUCKET")
                 call initialize_interception_bucket()
 
             end select
@@ -1450,11 +1466,11 @@ contains
 
               case ( "HARGREAVES", "HARGREAVES-SAMANI" )
 
-                call CELLS%cell%set_evapotranspiration("HARGREAVES")
+                call MODEL%set_evapotranspiration("HARGREAVES")
 
               case ( "J-H", "JENSEN-HAISE" )
 
-                call CELLS%cell%set_evapotranspiration("JENSEN-HAISE")
+                call MODEL%set_evapotranspiration("JENSEN-HAISE")
 
             end select
             

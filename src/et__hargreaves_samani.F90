@@ -5,7 +5,7 @@
 
 !>  Calculates potential evapotranspiration by means of the
 !>  Hargreaves-Samani (1985) method.
-module et_hargreaves
+module et__hargreaves_samani
 !!****h* SWB/et_hargreaves
 ! NAME
 !   et_hargreaves.f95 - Evapotranspiration calculation using the
@@ -79,7 +79,7 @@ end subroutine et_hargreaves_configure
 
 !------------------------------------------------------------------------------
 
-function et_hargreaves_ComputeET( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax )  result(fReferenceET0)
+elemental function et_hargreaves_ComputeET( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax )  result(fReferenceET0)
   !! Computes the potential ET for each cell, based on TMIN and TMAX.
   !! Stores cell-by-cell PET values in the model grid.
 
@@ -111,7 +111,7 @@ function et_hargreaves_ComputeET( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, 
 end function et_hargreaves_ComputeET
 
 
-function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)
+elemental function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)
 
   ! [ ARGUMENTS ]
   real (kind=c_double),intent(in) :: rRa
@@ -142,4 +142,4 @@ function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)
 end function ET0_hargreaves
 
 
-end module et_hargreaves
+end module et__hargreaves_samani

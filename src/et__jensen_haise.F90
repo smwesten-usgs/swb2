@@ -5,7 +5,7 @@
 
 !>  Calculates potential evapotranspiration by means of the
 !>  Jensen-Haise (1963) method.
-module et_jensen_haise
+module et__jensen_haise
 !!****h* SWB/et_jensen_haise
 ! NAME
 !   et_jensen_haise.f95 - Evapotranspiration calculation using the
@@ -35,10 +35,10 @@ module et_jensen_haise
 
 contains
 
-function et_jh_ComputeET( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax, fAlbedo, fAs, fBs, fSunPct )  result(fReferenceET0)
+elemental function et_jh_ComputeET( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax, fAlbedo, fAs, fBs, fSunPct )  result(fReferenceET0)
 
-  integer (kind=c_int),intent(in)           :: iDayOfYear
-  integer (kind=c_int),intent(in)           :: iNumDaysInYear
+  integer (kind=c_int), intent(in)          :: iDayOfYear
+  integer (kind=c_int), intent(in)          :: iNumDaysInYear
   real (kind=c_float), intent(in)           :: fLatitude
   real (kind=c_float), intent(in)           :: fTMin
   real (kind=c_float), intent(in)           :: fTMax
@@ -124,4 +124,4 @@ function et_jh_ComputeET( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax, f
 
 end function et_jh_ComputeET
 
-end module et_jensen_haise
+end module et__jensen_haise

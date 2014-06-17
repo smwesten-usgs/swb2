@@ -41,6 +41,7 @@ module cell_class
     real (kind=c_float) :: fRunOn = 0.0_c_float            ! flow in from uphill
     real (kind=c_float) :: fRunOff = 0.0_c_float           ! calculated infiltration excess
     real (kind=c_float) :: fOutFlow = 0.0_c_float          ! runoff routed to next cell
+    real (kind-c_float) :: fInfiltration = 0.0_c_float     ! infiltration
     real (kind=c_float) :: fRouteFraction = 1.0_c_float     ! Fraction of outflow to route downslope
     real (kind=c_float) :: fGrossPrecip = 0.0_c_float       ! Precip - no interception applied
     real (kind=c_float) :: fInterception = 0.0_c_float      ! Interception term
@@ -287,6 +288,24 @@ contains
   end subroutine cell_set_interception_method_sub
 
 
+  elemental subroutine cell_set_infiltration_method_sub(this, sMethodName)
+
+    class (CELL_T), intent(inout)   :: this
+    character (len=*), intent(in)   :: sMethodName
+
+    if ( ( sMethodName .strequal. "C-N" ) .or. ( sMethodName .strequal. "CURVE_NUMBER" ) ) then
+
+      this%calc_infiltration => cell_calculate_infiltration_curve_number
+
+!     elseif ( ( sMethodName .strequal. "G-A" ) .or. ( sMethodName .strequal. "GREEN_AMPT" ) ) then
+
+!       this%calc_infiltration => cell_calculate_infiltration_green_ampt
+
+    endif
+
+  end subroutine cell_set_infiltration_method_sub
+
+
 
   elemental subroutine get_interception_value_sub(this)
 
@@ -316,6 +335,12 @@ contains
 
   end subroutine cell_set_evapotranspiration_method_sub
 
+
+  subroutine cell_calculate_infiltration_curve_number(this)
+
+    class (CELL_T), intent(inout)   :: this
+
+  end cell_calculate_infiltration_curve_number
 
 
   subroutine cell_calculate_et_hargreaves(this)
