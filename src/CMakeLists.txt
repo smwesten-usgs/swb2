@@ -16,6 +16,7 @@ if(TARGET__SWB_EXECUTABLE)
             exceptions.F90
             file_operations.F90
             grid.F90
+            infiltration__curve_number.F90            
             interception__bucket.F90
             logfiles.F90
             loop_initialize.F90
@@ -225,6 +226,7 @@ if(TARGET__SWB_LIBRARY)
             exceptions.F90
             file_operations.F90
             grid.F90
+            infiltration__curve_number.F90
             interception__bucket.F90
             logfiles.F90
             loop_initialize.F90

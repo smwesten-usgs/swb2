@@ -4,6 +4,7 @@ module model_domain
   use continuous_frozen_ground_index
   use data_catalog_entry
   use exceptions
+  use infiltration__curve_number
   use simulation_datetime
   use parameters
   implicit none
@@ -31,6 +32,7 @@ module model_domain
     real (kind=c_float), allocatable       :: reference_ET0(:)
     real (kind=c_float), allocatable       :: reference_ET0_adj(:)
     real (kind=c_float), allocatable       :: actual_ET(:)
+    real (kind=c_float), allocatable       :: inflow(:)
     real (kind=c_float), allocatable       :: runon(:)
     real (kind=c_float), allocatable       :: runoff(:)
     real (kind=c_float), allocatable       :: outflow(:)
@@ -44,6 +46,7 @@ module model_domain
     real (kind=c_float), allocatable       :: interception_storage(:)
     real (kind=c_float), allocatable       :: snow_storage(:)
     real (kind=c_float), allocatable       :: soil_storage(:)
+    real (kind=c_float), allocatable       :: soil_storage_max(:)
     real (kind=c_float), allocatable       :: stream_storage(:)
          
     real (kind=c_float), allocatable       :: gross_precip(:)
@@ -52,8 +55,8 @@ module model_domain
     real (kind=c_float), allocatable       :: routing_fraction(:)
 
     procedure ( interception_method ), pointer, private      :: calc_interception => null()
-!     procedure ( infiltration_method ), pointer, private :: infiltration_method_ptr => null()
-    procedure ( et_method ), pointer, private            :: calc_reference_et => null()
+    procedure ( infiltration_method ), pointer, private      :: calc_infiltration => null()
+    procedure ( et_method ), pointer, private                :: calc_reference_et => null()
 !     procedure ( sm_method ), pointer, private           :: sm_method_ptr => null()
 
   contains
@@ -171,7 +174,7 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
-    integer (kind=c_int)  :: iStat(20)
+    integer (kind=c_int)  :: iStat(22)
 
     iCount = count( this%active )
 
@@ -184,18 +187,20 @@ contains
     allocate( this%reference_ET0(iCount), stat=iStat(6) )
     allocate( this%reference_ET0_adj(iCount), stat=iStat(7) )
     allocate( this%actual_ET(iCount), stat=iStat(8) )
-    allocate( this%runon(iCount), stat=iStat(9) )
-    allocate( this%runoff(iCount), stat=iStat(10) )
-    allocate( this%outflow(iCount), stat=iStat(11) )
-    allocate( this%infiltration(iCount), stat=iStat(12) )
-    allocate( this%snowfall(iCount), stat=iStat(13) )
-    allocate( this%snowmelt(iCount), stat=iStat(14) )
-    allocate( this%net_precip(iCount), stat=iStat(15) )
-    allocate( this%GDD_20(iCount), stat=iStat(16) )
-    allocate( this%interception_storage(iCount), stat=iStat(17) )
-    allocate( this%snow_storage(iCount), stat=iStat(18) )
-    allocate( this%soil_storage(iCount), stat=iStat(19) )
-    allocate( this%stream_storage(iCount), stat=iStat(20) )
+    allocate( this%inflow(iCount), stat=iStat(9))
+    allocate( this%runon(iCount), stat=iStat(10) )
+    allocate( this%runoff(iCount), stat=iStat(11) )
+    allocate( this%outflow(iCount), stat=iStat(12) )
+    allocate( this%infiltration(iCount), stat=iStat(13) )
+    allocate( this%snowfall(iCount), stat=iStat(14) )
+    allocate( this%snowmelt(iCount), stat=iStat(15) )
+    allocate( this%net_precip(iCount), stat=iStat(16) )
+    allocate( this%GDD_20(iCount), stat=iStat(17) )
+    allocate( this%interception_storage(iCount), stat=iStat(18) )
+    allocate( this%snow_storage(iCount), stat=iStat(19) )
+    allocate( this%soil_storage(iCount), stat=iStat(20) )
+    allocate( this%soil_storage_max(iCount), stat=iStat(21))
+    allocate( this%stream_storage(iCount), stat=iStat(22) )
 
     if ( any( iStat /= 0 ) )  call die("Problem allocating memory", __FILE__, __LINE__)
 
@@ -247,6 +252,8 @@ contains
 
   end subroutine initialize_landuse_codes_sub
 
+!--------------------------------------------------------------------------------------------------  
+
   subroutine initialize_soil_groups_sub( this )
 
     class (MODEL_DOMAIN_T), intent(inout)     :: this
@@ -270,7 +277,7 @@ contains
 
   end subroutine initialize_soil_groups_sub
 
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine initialize_latitude_sub(this)
 
@@ -462,7 +469,7 @@ contains
 
     if ( ( sMethodName .strequal. "C-N" ) .or. ( sMethodName .strequal. "CURVE_NUMBER" ) ) then
 
-!      this%calc_infiltration => calculate_infiltration_curve_number
+      this%calc_infiltration => model_calculate_infiltration_curve_number
 
 !     elseif ( ( sMethodName .strequal. "G-A" ) .or. ( sMethodName .strequal. "GREEN_AMPT" ) ) then
 
@@ -527,7 +534,7 @@ contains
   end subroutine model_calculate_et_hargreaves
 
 
-   subroutine model_calculate_et_jensen_haise(this)
+  subroutine model_calculate_et_jensen_haise(this)
 
     use et__jensen_haise
 
@@ -536,9 +543,17 @@ contains
      this%reference_ET0 = et_jh_ComputeET( iDayOfYear=SIM_DT%iDOY, iNumDaysInYear=SIM_DT%iDaysInYear, &
        fLatitude=this%latitude, fTMin=this%Tmin, fTMax=this%Tmax )
 
-   end subroutine model_calculate_et_jensen_haise 
+  end subroutine model_calculate_et_jensen_haise 
 
 
+
+  subroutine model_calculate_infiltration_curve_number(this)
+
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+
+  end subroutine model_calculate_infiltration_curve_number
 
 
 

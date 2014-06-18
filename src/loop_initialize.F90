@@ -99,6 +99,7 @@ contains
     call initialize_landuse_options()
     call initialize_interception_method()
     call initialize_evapotranspiration_method()
+    call initialize_infiltration_method()
     call MODEL%set_inactive_cells()
 
     call MODEL%initialize_arrays()
@@ -1491,6 +1492,90 @@ contains
 
 
 !--------------------------------------------------------------------------------------------------  
+
+
+
+  subroutine initialize_infiltration_method()
+
+    use infiltration__curve_number
+
+    ! [ LOCALS ]
+    type (STRING_LIST_T)             :: myDirectives
+    type (STRING_LIST_T)             :: myOptions  
+    integer (kind=c_int)             :: iIndex
+    character (len=:), allocatable   :: sCmdText
+    character (len=:), allocatable   :: sOptionText
+    character (len=:), allocatable   :: sArgText
+    integer (kind=c_int)             :: iStat
+
+
+    myDirectives = CF_DICT%grep_keys("INFILTRATION")
+      
+    if ( myDirectives%count == 0 ) then
+
+      call warn("Your control file seems to be missing any of the required directives relating to INFILTRATION method.", &
+        lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+
+    else  
+    
+      call LOGS%set_loglevel( LOG_ALL )
+      call LOGS%set_echo( lFALSE )
+
+      do iIndex = 1, myDirectives%count
+
+        ! myDirectives is a string list of all SWB directives that contain the phrase "LANDUSE"
+        ! sCmdText contains an individual directive
+        sCmdText = myDirectives%get(iIndex)
+
+        ! For this directive, obtain the associated dictionary entries
+        call CF_DICT%get_values(sCmdText, myOptions )
+
+        ! dictionary entries are initially space-delimited; sArgText contains
+        ! all dictionary entries present, concatenated, with a space between entries
+        sArgText = myOptions%get(1, myOptions%count )
+
+        ! echo the original directive and dictionary entries to the logfile
+        call LOGS%write(">> "//sCmdText//" "//sArgText)
+
+        ! most of the time, we only care about the first dictionary entry, obtained below
+        sOptionText = myOptions%get(1)
+
+        select case ( sCmdText )
+
+          case ( "INFILTRATION_METHOD", "RUNOFF_METHOD" )
+
+            sArgText = myOptions%get(2)
+
+            select case (sOptionText)
+
+              case ( "C-N", "CURVE_NUMBER" )
+
+                call MODEL%set_infiltration("CURVE_NUMBER")
+                call initialize_infiltration__curve_number()
+
+              case ( "G-A", "GREEN_AMPT", "GREEN-AMPT" )
+
+                call MODEL%set_infiltration("GREEN_AMPT")
+
+            end select
+            
+          case default
+          
+            call warn("Unknown infiltration method was specified: "//dquote(sArgText), iLogLevel=LOG_ALL )
+
+        end select
+        
+      enddo
+      
+    endif
+    
+
+
+  end subroutine initialize_infiltation_method
+
+
+!--------------------------------------------------------------------------------------------------
+
 
   subroutine check_for_fatal_warnings()
 
