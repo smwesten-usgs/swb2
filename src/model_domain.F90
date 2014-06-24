@@ -41,7 +41,7 @@ module model_domain
     real (kind=c_float), allocatable       :: snowmelt(:)
     real (kind=c_float), allocatable       :: interception(:)
     real (kind=c_float), allocatable       :: net_precip(:)
-    real (kind=c_float), allocatable       :: GDD_20(:)
+    real (kind=c_float), allocatable       :: GDD_28(:)
      
     real (kind=c_float), allocatable       :: interception_storage(:)
     real (kind=c_float), allocatable       :: snow_storage(:)

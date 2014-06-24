@@ -25,6 +25,7 @@ contains
     integer (kind=c_int)              :: iNumberOfSoilGroups
     integer (kind=c_int), allocatable :: iCurveNumberSeqNums(:)
     type (STRING_LIST_T)              :: slList
+    type (STRING_LIST_T)              :: slCurveNumber
     integer (kind=c_int)              :: iStat
     integer (kind=c_int)              :: iSoilsIndex
     character (len=:), allocatable    :: sText
@@ -43,8 +44,8 @@ contains
     iNumberOfSoilGroups = count( iCurveNumberSeqNums > 0 )
 
     !> Determine how many landuse codes are present
-    call PARAMS%get_values( slList, this%iLanduseCodes )
-    iNumberOfLanduses = count( this%iLanduseCodes > 0 )
+    call PARAMS%get_values( slList, iLanduseCodes )
+    iNumberOfLanduses = count( iLanduseCodes > 0 )
 
     allocate( CN(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
     call assert( iStat == 0, "Failed to allocate memory for curve number table", &
@@ -85,18 +86,18 @@ contains
     iLanduseIndex = 0
     lMatch = lFALSE
 
-    do while (iIndex < ubound(this%iLanduseCodes, 1) )
+    do while (iIndex < ubound( iLanduseCodes, 1) )
 
       iLanduseIndex = iLanduseIndex + 1
 
-      if (iLanduseCode == this%iLanduseCodes(iLanduseIndex) ) then
+      if (iLanduseCode == iLanduseCodes(iLanduseIndex) ) then
         lMatch = lTRUE
         exit
       endif
       
     end do
 
-  end function return_landuse_index_fn(this, iLanduseCode)
+  end function return_landuse_index_fn
 
 !--------------------------------------------------------------------------------------------------
 
@@ -112,15 +113,15 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  elemental function prob_runoff_enhancement( fCFGI )    result(rPf)
+  elemental function prob_runoff_enhancement( fCFGI )    result(fPf)
 
     real (kind=c_float), intent(in) :: fCFGI
     real (kind=c_float)             :: fPf
 
     if(rCFGI <= CFGI_LL ) then
-      rPf = rZERO
+      fPf = 0_c_float
     elseif(rCFGI >= CFGI_UL) then
-      rPf = rONE
+      fPf = 1.0_c_float
     else
       rPf = ( rCFGI - CFGI_LL ) / ( CFGI_UL - CFGI_LL )
     end if
@@ -135,26 +136,32 @@ contains
     real (kind=c_float), intent(in)  :: fRunoff
     real (kind=c_float)              :: fS_current
 
-    fS_current = fS_prev + 
+    fS_current = fS_prev  
 
   end function update_soil_moist_index_fn
 
 !--------------------------------------------------------------------------------------------------
 
-  function update_curve_number_fn( iLanduseIndex, iSoilsGroup, fInflow, fCFGI, &
+  function update_curve_number_fn( iLanduseIndex, iSoilsGroup, iSoilStorage, fSoilStorage_Max, fCFGI, &
     lIsGrowingSeason )  result( fCN_adj )
     
     integer (kind=c_int), intent(in)  :: iLanduseIndex
     integer (kind=c_int), intent(in)  :: iSoilsIndex
-    real (kind=c_float), intent(in)   :: fInflow
+    real (kind=c_float), intent(in)   :: fSoilStorage
+    real (kind=c_float), intent(in)   :: fSoilStorage_Max
     real (kind=c_float), intent(in)   :: fCFGI
     logical (kind=c_bool), intent(in) :: lIsGrowingSeason
-    
+    real (kind=c_float)               :: fCN_adj
+
     ! [ LOCALS ]
     real (kind=c_float) :: Pf
     real (kind=c_float) :: CN_base
+    real (kind=c_float) :: fFraction_FC   ! fraction of field capacity
 
-    CN_base = this%get_curvenum( iLanduseIndex, iSoilsGroup )
+    fFraction_FC = 0.0
+    if (fSoilStorage_Max > 0.0) fFraction_FC = max( 1.0_c_float, fSoilStorage/ fSoilStorage_Max )
+
+    CN_base = get_curvenum( iLanduseIndex, iSoilsGroup )
 
     ! Correct the curve number...
     if( fCFGI > CFGI_LL ) then
