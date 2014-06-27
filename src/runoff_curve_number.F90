@@ -121,7 +121,7 @@ contains
 
 !--------------------------------------------------------------------------
 
-  function update_curve_number_fn( iLanduseIndex, iSoilsGroup, fInflow, fCFGI, &
+  function update_curve_number_fn( iLanduseIndex, iSoilsIndex, fInflow, fCFGI, &
     lIsGrowingSeason )  result( fCN_adj )
     
     integer (kind=c_int), intent(in)  :: iLanduseIndex

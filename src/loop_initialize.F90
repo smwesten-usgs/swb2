@@ -1550,12 +1550,12 @@ contains
 
               case ( "C-N", "CURVE_NUMBER" )
 
-                call MODEL%set_infiltration("CURVE_NUMBER")
+                call MODEL%set_infiltration_method("CURVE_NUMBER")
                 call initialize_infiltration__curve_number()
 
               case ( "G-A", "GREEN_AMPT", "GREEN-AMPT" )
 
-                call MODEL%set_infiltration("GREEN_AMPT")
+                call MODEL%set_infiltration_method("GREEN_AMPT")
 
             end select
             
@@ -1571,7 +1571,7 @@ contains
     
 
 
-  end subroutine initialize_infiltation_method
+  end subroutine initialize_infiltration_method
 
 
 !--------------------------------------------------------------------------------------------------

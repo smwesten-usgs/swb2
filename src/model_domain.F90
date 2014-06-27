@@ -105,8 +105,6 @@ module model_domain
 
   end type MODEL_DOMAIN_T
 
-
-
   abstract interface
     subroutine interception_method( this ) 
       import :: MODEL_DOMAIN_T
@@ -139,6 +137,16 @@ module model_domain
 
 contains
 
+  !
+  ! current concept:
+  !
+  ! The only 2-D array is the array that contains the mask of active cells.
+  !
+  ! All remaining state variables and ancillary variables are kept in 1-D vectors
+  ! that are PACK-ed and UNPACK-ed as needed by i/o routines. This is cumbersome for fully
+  ! active grids, but should amount to significant memory and processing savings when running
+  ! SWB for, say, and island domain.
+  !
 
   subroutine initialize_grid_sub(this, iNumCols, iNumRows, dX_ll, dY_ll, dGridCellSize )
 
@@ -195,7 +203,7 @@ contains
     allocate( this%snowfall(iCount), stat=iStat(14) )
     allocate( this%snowmelt(iCount), stat=iStat(15) )
     allocate( this%net_precip(iCount), stat=iStat(16) )
-    allocate( this%GDD_20(iCount), stat=iStat(17) )
+    allocate( this%GDD_28(iCount), stat=iStat(17) )
     allocate( this%interception_storage(iCount), stat=iStat(18) )
     allocate( this%snow_storage(iCount), stat=iStat(19) )
     allocate( this%soil_storage(iCount), stat=iStat(20) )
@@ -420,7 +428,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int) :: iStat
 
-    if (.not. allocated(CFGI) ) allocate(CFGI( count(this%active) ), stat=iStat )
+    if (.not. allocated(CFGI) ) call initialize_continuous_frozen_ground_index( count( this%active ) )
 
     call update_continuous_frozen_ground_index( CFGI, this%Tmin, this%Tmax, this%snow_storage )
 
