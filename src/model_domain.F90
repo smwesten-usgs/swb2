@@ -54,10 +54,10 @@ module model_domain
     real (kind=c_float), allocatable       :: Tmax(:)
     real (kind=c_float), allocatable       :: routing_fraction(:)
 
-    procedure ( interception_method ), pointer, private      :: calc_interception => null()
-    procedure ( infiltration_method ), pointer, private      :: calc_infiltration => null()
-    procedure ( et_method ), pointer, private                :: calc_reference_et => null()
-!     procedure ( sm_method ), pointer, private           :: sm_method_ptr => null()
+    procedure ( interception_method ), pointer, private      :: calc_interception  => null()
+    procedure ( infiltration_method ), pointer, private      :: calc_infiltration  => null()
+    procedure ( et_method ), pointer, private                :: calc_reference_et  => null()
+    procedure ( sm_method ), pointer, private                :: calc_soil_moisture => null()
 
   contains
 
@@ -75,6 +75,9 @@ module model_domain
 
     procedure :: set_infiltration_method_sub
     generic   :: set_infiltration_method => set_infiltration_method_sub
+
+    procedure :: set_soil_moisture_method_sub
+    generic   :: set_soil_moisture_method => set_soil_moisture_method_sub 
 
     procedure :: set_inactive_cells_sub
     generic   :: set_inactive_cells => set_inactive_cells_sub
@@ -378,16 +381,13 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)   :: this
 
     if (.not. associated( this%calc_interception) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__, &
-        "This may be happening because there is no check to see whether the user has specified a valid~" &
-        //"method in the control file.")
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
+    if (.not. associated( this%calc_infiltration) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%calc_reference_et) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__, &
-        "This may be happening because there is no check to see whether the user has specified a valid~" &
-        //"method in the control file.")
-
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
   end subroutine preflight_check_function_pointers
 
@@ -442,6 +442,19 @@ contains
 
  
     this%inflow = this%runon + this%gross_precip - this%interception + this%snowmelt
+    call this%calc_infiltration()
+    this%runoff = this%inflow - this%infiltration
+
+
+    print *, " Precip avg:       ", sum( this%gross_precip ) / ubound( this%gross_precip, 1 )
+
+    print *, " Interception avg: ", sum( this%interception ) / ubound( this%interception, 1 )
+
+    print *, " Inflow avg:       ", sum( this%inflow ) / ubound( this%inflow, 1 )
+
+    print *, " Infiltration avg: ", sum( this%infiltration ) / ubound( this%infiltration, 1 )
+
+    print *, " Runoff avg:       ", sum( this%runoff ) / ubound( this%runoff, 1 )
 
 !     if ( fP_minus_PE < 0.0_c_float ) then
 
@@ -560,6 +573,13 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
+
+    this%infiltration = calculate_infiltration__curve_number( &
+      iLanduseIndex=this%landuse_index, &
+      iSoilsIndex=this%soil_group, &
+      fSoilStorage=this%soil_storage, &
+      fSoilStorage_Max=this%soil_storage_max, &
+      fInflow=this%inflow, fCFGI=CFGI )
 
   end subroutine model_calculate_infiltration_curve_number
 
