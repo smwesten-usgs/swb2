@@ -6,8 +6,7 @@
 module soil_moisture__thornthwaite_mather
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double
-  use types
-
+  use exceptions
   implicit none
 
   real (kind=c_float), parameter :: APWL_Cap = -40.69_c_float
@@ -23,7 +22,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-subroutine initialize_soil_moisture__thornthwaite_mather( iNumActiveCells )
+  subroutine initialize_soil_moisture__thornthwaite_mather( iNumActiveCells )
 
     integer (kind=c_int), intent(in)  :: iNumActiveCells
 
@@ -35,73 +34,79 @@ subroutine initialize_soil_moisture__thornthwaite_mather( iNumActiveCells )
 
     APWL = 0.0_c_float 
 
-end subroutine initialize_soil_moisture__thornthwaite_mather
+  end subroutine initialize_soil_moisture__thornthwaite_mather
 
-!----------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
-function soil_moisture__thornthwaite_mather_soil_storage( fSWC, fAPWL)  result(fSoilStorage)
+  elemental function soil_moisture__thornthwaite_mather_soil_storage( fSWC, fAPWL)  result(fSoilStorage)
 
-  real (kind=c_float), intent(in) :: fSWC     ! max soil-water capacity (inches)
-  real (kind=c_float), intent(in) :: fAPWL    ! accum pot. water loss (inches)
+    real (kind=c_float), intent(in) :: fSWC     ! max soil-water capacity (inches)
+    real (kind=c_float), intent(in) :: fAPWL    ! accum pot. water loss (inches)
+    real (kind=c_float)             :: fSoilStorage
 
-  real (kind=c_double) :: fSoilStorage
+    ! equation as implemented in R;
+    ! sm.df$y = maximum soil-water capacity
+    ! sm.df$x = APWL
+    ! 10^(log10(sm.df$y) - (s.opt[[1]]*sm.df$y^e.opt[[1]]) * sm.df$x)
 
-  ! equation as implemented in R;
-  ! sm.df$y = maximum soil-water capacity
-  ! sm.df$x = APWL
-  ! 10^(log10(sm.df$y) - (s.opt[[1]]*sm.df$y^e.opt[[1]]) * sm.df$x)
+    if (fSWC > 0.0_c_float ) then
 
-  fSoilStorage = 0.0_c_float
+      fSoilStorage = 10.0_c_float**( log10( fSWC )  - ( abs( fAPWL ) * TM_SLOPE_TERM * fSWC**TM_EXP_TERM ) )
+   
+    else
+   
+      fSoilStorage = 0.0_c_float
+  
+    endif
 
-  if (fSWC > 0.0_c_float ) &
+  end function soil_moisture__thornthwaite_mather_soil_storage
 
-    fSoilStorage = 10.0c_float**( log10( fSWC )  - ( abs( fAPWL ) * TM_SLOPE_TERM * fSWC**TM_EXP_TERM ) )
+!--------------------------------------------------------------------------------------------------
 
-end function soil_moisture__thornthwaite_mather_soil_storage
+  function soil_moisture__thornthwaite_mather_update_APWL( fInfiltration, fReference_ET )   result( fAPWL )
 
-!------------------------------------------------------------------------------
+    real (kind=c_float), intent(in)  :: fInfiltration
+    real (kind=c_float), intent(in)  :: fReference_ET
+    real (kind=c_float)              :: fAPWL
 
-function soil_moisture__thornthwaite_mather_update_APWL( fInfiltration, fReference_ET )   result( fAPWL )
+    ! [ LOCALS ]
+    real (kind=c_float) :: P_minus_PE
 
-  real (kind=c_float), intent(in)  :: fInfiltration
-  real (kind=c_float), intent(in)  :: fReference_ET
+    P_minus_PE = fInfiltration - fReference_ET
 
-  ! [ LOCALS ]
-  real (kind=c_float) :: P_minus_PE
+    if ( P_minus_PE < 0.0_c_float ) then
 
-  P_minus_PE = fInfiltration - fReference_ET
+    else
 
-  if ( P_minus_PE < 0.0_c_float ) then
+    endif
 
-  else
+  end function soil_moisture__thornthwaite_mather_update_APWL
 
-  endif
+!--------------------------------------------------------------------------------------------------
 
-end function soil_moisture__thornthwaite_mather_update_APWL
+  function soil_moisture__thornthwaite_mather_APWL(fSWC, fSoilStorage)  result(fAPWL)
 
+    real (kind=c_float), intent(in) :: fSWC            ! max soil-water capacity (inches)
+    real (kind=c_float), intent(in) :: fSoilStorage  ! curr soil storage (inches)
+    real (kind=c_float)             :: fAPWL
 
+    ! equation as implemented in R;
+    ! sm.df$y = maximum soil-water capacity
+    ! sm.df$x = APWL
+    ! (log10(sm.df$y) - log10(sm.df$pred)) / (s.opt[[1]] * sm.df$y^e.opt[[1]])
 
+    if (fSWC > 0.0_c_float .and. fSoilStorage > 0.0_c_float ) then
 
-function soil_moisture__thornthwaite_mather_APWL(fSWC, fSoilStorage)  result(fAPWL)
+      fAPWL = -( log10(fSWC) - log10(fSoilStorage)) / ( TM_SLOPE_TERM * fSWC**TM_EXP_TERM )
 
-  real (kind=c_float), intent(in) :: fSWC            ! max soil-water capacity (inches)
-  real (kind=c_float), intent(in) :: fSoilStorage  ! curr soil storage (inches)
+    else
+    
+      fAPWL = 0.0_c_float
 
-  real (kind=c_float) :: fAPWL
+    endif  
 
-  ! equation as implemented in R;
-  ! sm.df$y = maximum soil-water capacity
-  ! sm.df$x = APWL
-  ! (log10(sm.df$y) - log10(sm.df$pred)) / (s.opt[[1]] * sm.df$y^e.opt[[1]])
+  end function soil_moisture__thornthwaite_mather_APWL
 
-  fAPWL = 0.0_c_float
-
-  if (fSWC > 0.0_c_float .and. fSoilStorage > 0.0_c_float ) &
-
-    fAPWL = -( log10(fSWC) - log10(fSoilStorage)) / ( TM_SLOPE_TERM * fSWC**TM_EXP_TERM )
-
-end function soil_moisture__thornthwaite_mather_APWL
-
-!------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
 end module soil_moisture__thornthwaite_mather

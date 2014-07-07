@@ -1,3 +1,10 @@
+!
+! concept: for each significant gridded data input, keep track of the 
+!          native coordinates, the transformed base (project) coordinates, 
+!          and provide methods for extracting data from appropriate locations
+!          as needed.
+!
+
 module data_catalog_entry
 
   use constants_and_conversions
@@ -87,7 +94,8 @@ module data_catalog_entry
     logical (kind=c_bool)          :: lPerformFullInitialization = lTRUE
     logical (kind=c_bool)          :: lCreateLocalNetCDFArchive = lFALSE
      
-    ! pGrdBase can be populated, with data accessed by cells as needed 
+    ! pGrdBase takes the coordinate system and dimensions as defined
+    ! for the overall SWB project (i.e. BASE_PROJECTION_DEFINITION )
     type (GENERAL_GRID_T), pointer :: pGrdBase => null()
 
   contains
@@ -252,12 +260,11 @@ contains
         __FILE__, __LINE__ )
     endif      
 
-
-
   end subroutine get_value_float_sub
 
 !--------------------------------------------------------------------------------------------------
 
+  !> todo Why are we creating full-blown pGrdBase object for a grid of constant value?
   subroutine initialize_constant_real_data_object_sub( this, &
     sDescription, &
     rConstant )

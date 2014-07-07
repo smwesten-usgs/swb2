@@ -54,10 +54,11 @@ module model_domain
     real (kind=c_float), allocatable       :: Tmax(:)
     real (kind=c_float), allocatable       :: routing_fraction(:)
 
-    procedure ( interception_method ), pointer, private      :: calc_interception  => null()
-    procedure ( infiltration_method ), pointer, private      :: calc_infiltration  => null()
-    procedure ( et_method ), pointer, private                :: calc_reference_et  => null()
-    procedure ( sm_method ), pointer, private                :: calc_soil_moisture => null()
+    procedure ( interception_method ), pointer, private        :: calc_interception      => null()
+    procedure ( infiltration_method ), pointer, private        :: calc_infiltration      => null()
+    procedure ( et_method ), pointer, private                  :: calc_reference_et      => null()
+    procedure ( sm_method ), pointer, private                  :: calc_soil_moisture     => null()
+    procedure ( precipitation_data_method ), pointer, private  :: get_precipitation_data => model_get_precip_normal
 
   contains
 
@@ -79,6 +80,9 @@ module model_domain
     procedure :: set_soil_moisture_method_sub
     generic   :: set_soil_moisture_method => set_soil_moisture_method_sub 
 
+    procedure :: set_precipitation_data_method_sub
+    generic   :: set_precipitation_data_method => set_precipitation_data_method_sub
+
     procedure :: set_inactive_cells_sub
     generic   :: set_inactive_cells => set_inactive_cells_sub
 
@@ -98,12 +102,11 @@ module model_domain
     procedure :: initialize_landuse_codes_sub
     generic   :: initialize_landuse => initialize_landuse_codes_sub
 
-     procedure :: initialize_latitude_sub
-     generic   :: initialize_latitude => initialize_latitude_sub
+    procedure :: initialize_latitude_sub
+    generic   :: initialize_latitude => initialize_latitude_sub
 
-     procedure :: initialize_soil_groups_sub
-     generic   :: initialize_soil_groups => initialize_soil_groups_sub
-
+    procedure :: initialize_soil_groups_sub
+    generic   :: initialize_soil_groups => initialize_soil_groups_sub
 
 
   end type MODEL_DOMAIN_T
@@ -135,6 +138,14 @@ module model_domain
       class ( MODEL_DOMAIN_T ), intent(inout)  :: this
     end subroutine sm_method
   end interface    
+
+  abstract interface
+    subroutine precipitation_data_method( this )
+      import :: MODEL_DOMAIN_T
+      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
+    end subroutine precipitation_data_method
+  end interface    
+
 
   type (MODEL_DOMAIN_T), public :: MODEL
 
@@ -217,6 +228,15 @@ contains
 
   end subroutine initialize_arrays_sub
 
+
+  subroutine initialize_netcdf_output_sub
+
+    
+
+
+  end subroutine initialize_netcdf_output_sub
+
+
   
   subroutine set_inactive_cells_sub(this)
 
@@ -236,8 +256,7 @@ contains
 
   end subroutine set_inactive_cells_sub
 
-
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine initialize_landuse_codes_sub( this )
 
@@ -353,7 +372,7 @@ contains
       call TMIN%getvalues( iMonth, iDay, iYear, iJulianDay )
       call TMAX%getvalues( iMonth, iDay, iYear, iJulianDay )
 
-      this%gross_precip = pack( PRCP%pGrdBase%rData, this%active )
+      call this%get_precipitation_data()
       this%Tmax = pack( TMAX%pGrdBase%rData, this%active )
       this%Tmin = pack( TMIN%pGrdBase%rData, this%active )
 
@@ -362,7 +381,6 @@ contains
   end subroutine get_climate_data
 
 !--------------------------------------------------------------------------------------------------
-
 
   subroutine calculate_mass_balance_sub(this)
 
@@ -374,7 +392,7 @@ contains
 
   end subroutine calculate_mass_balance_sub
 
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine preflight_check_function_pointers(this)
 
@@ -389,8 +407,12 @@ contains
     if (.not. associated( this%calc_reference_et) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
+    if (.not. associated( this%get_precipitation_data ) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+
   end subroutine preflight_check_function_pointers
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine calculate_interception_mass_balance_sub(this)
 
@@ -420,6 +442,7 @@ contains
 
   end subroutine calculate_interception_mass_balance_sub
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine calculate_snow_mass_balance_sub(this)
 
@@ -434,7 +457,7 @@ contains
 
   end subroutine calculate_snow_mass_balance_sub
 
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine calculate_soil_mass_balance_sub(this)
 
@@ -462,8 +485,7 @@ contains
 
   end subroutine calculate_soil_mass_balance_sub
 
-
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine set_interception_method_sub(this, sMethodName)
 
@@ -482,6 +504,7 @@ contains
 
   end subroutine set_interception_method_sub
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine set_infiltration_method_sub(this, sMethodName)
 
@@ -500,7 +523,26 @@ contains
 
   end subroutine set_infiltration_method_sub
 
+!--------------------------------------------------------------------------------------------------
 
+  subroutine set_soil_moisture_method_sub(this, sMethodName)
+
+    class (MODEL_DOMAIN_T), intent(inout)   :: this
+    character (len=*), intent(in)           :: sMethodName
+
+    if ( ( sMethodName .strequal. "T-M" ) .or. ( sMethodName .strequal. "THORNTHWAITE_MATHER" ) ) then
+
+      this%calc_soil_moisture => model_calculate_soil_moisture_thornthwaite_mather
+
+!     elseif ( ( sMethodName .strequal. "G-A" ) .or. ( sMethodName .strequal. "GREEN_AMPT" ) ) then
+
+!       this%calc_infiltration => cell_calculate_infiltration_green_ampt
+
+    endif
+
+  end subroutine set_soil_moisture_method_sub
+
+!--------------------------------------------------------------------------------------------------
 
   subroutine set_evapotranspiration_method_sub(this, sMethodName)
 
@@ -521,7 +563,28 @@ contains
 
   end subroutine set_evapotranspiration_method_sub
 
+!--------------------------------------------------------------------------------------------------
 
+  subroutine set_precipitation_data_method_sub  (this, sMethodName)
+
+    class (MODEL_DOMAIN_T), intent(inout)   :: this
+    character (len=*), intent(in)           :: sMethodName
+
+    if ( ( sMethodName .strequal. "NORMAL" ) &
+         .or. ( sMethodName .strequal. "STANDARD" ) ) then
+
+      this%calc_reference_et => model_get_precip_normal
+
+    elseif ( ( sMethodName .strequal. "METHOD_OF_FRAGMENTS" ) &
+         .or. ( sMethodName .strequal. "FRAGMENTS" ) ) then
+
+      this%get_precipitation_data => model_get_precip_method_of_fragments
+
+    endif
+
+  end subroutine set_precipitation_data_method_sub
+
+!--------------------------------------------------------------------------------------------------
 
   subroutine model_calculate_interception_bucket(this)
 
@@ -533,7 +596,7 @@ contains
 
   end subroutine model_calculate_interception_bucket
 
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine model_calculate_interception_gash(this)
 
@@ -541,7 +604,7 @@ contains
 
   end subroutine model_calculate_interception_gash
 
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine model_calculate_et_hargreaves(this)
 
@@ -554,6 +617,7 @@ contains
 
   end subroutine model_calculate_et_hargreaves
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine model_calculate_et_jensen_haise(this)
 
@@ -566,7 +630,7 @@ contains
 
   end subroutine model_calculate_et_jensen_haise 
 
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine model_calculate_infiltration_curve_number(this)
 
@@ -583,8 +647,33 @@ contains
 
   end subroutine model_calculate_infiltration_curve_number
 
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_soil_moisture_thornthwaite_mather( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_calculate_soil_moisture_thornthwaite_mather
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_get_precip_normal(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    this%gross_precip = pack( PRCP%pGrdBase%rData, this%active )
+
+  end subroutine model_get_precip_normal  
+
+!--------------------------------------------------------------------------------------------------
+ 
+  subroutine model_get_precip_method_of_fragments(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    this%gross_precip = pack( PRCP%pGrdBase%rData, this%active )
 
 
-
+  end subroutine model_get_precip_method_of_fragments 
 
 end module model_domain

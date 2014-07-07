@@ -209,6 +209,10 @@ contains
 
                 end select  
 
+          case ( "PRECIPITATION_METHOD_OF_FRAGMENTS")
+          
+            call MODEL%set_precipitation_data_method("FRAGMENTS")      
+
           case ( "PRECIPITATION_SCALE" )
 
             call PRCP%set_scale(asFloat(sOptionText))

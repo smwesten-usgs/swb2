@@ -817,90 +817,86 @@ end subroutine netcdf_open_and_prepare_as_output_archive
 
 
 
-subroutine netcdf_open_and_prepare_as_output(NCFILE, &
-   StartDate, EndDate )
+subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUnits, &
+   pGrd, StartDate, EndDate )
 
-  type (T_NETCDF4_FILE ), intent(inout)   :: NCFILE
-  type (DATETIME_T), intent(in)           :: StartDate
-  type (DATETIME_T), intent(in)           :: EndDate
+  character (len=*), intent(in)              :: sVariableName
+  character (len=*), intent(in)              :: sVariableUnits
+  type (GENERAL_GRID_T), intent(in), pointer :: pGrd
+  type (DATETIME_T), intent(in)              :: StartDate
+  type (DATETIME_T), intent(in)              :: EndDate
+  type (T_NETCDF4_FILE ), pointer            :: NCFILE
  
 !   ! [ LOCALS ]
-!   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
-!   type (T_NETCDF_DIMENSION), pointer :: pNC_DIM
-!   integer (kind=c_int) :: iIndex
-!   integer (kind=c_int) :: iNumCols, iNumRows
-!   integer (kind=c_int) :: iMinCol, iMaxCol
-!   integer (kind=c_int) :: iMinRow, iMaxRow
-!   real (kind=c_double), dimension(:), allocatable :: rX, rY
-!   character (len=10) :: sOriginText
-!   character (len=256) :: sFilename
+  type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
+  type (T_NETCDF_DIMENSION), pointer :: pNC_DIM
+  integer (kind=c_int) :: iIndex
+  real (kind=c_double), dimension(:), allocatable   :: rX, rY
+  character (len=10)                                :: sOriginText
+  character (len=:), allocatable                    :: sFilename
 
-!   write(sOriginText, fmt="(i4.4,'-',i2.2,'-',i2.2)") iOriginYear, &
-!     iOriginMonth, iOriginDay
 
-!   iMaxRow = maxval(NCFILE%iRowBounds)
-!   iMinRow = minval(NCFILE%iRowBounds)
-!   iMaxCol = maxval(NCFILE%iColBounds)
-!   iMinCol = minval(NCFILE%iColBounds)
+!    integer (kind=c_int)            :: iNX                   ! Number of cells in the x-direction
+!     integer (kind=c_int)            :: iNY                   ! Number of cells in the y-direction
+!     integer (kind=c_int)            :: iNumGridCells         ! Total number of grid cells
+!     integer (kind=c_int)            :: iDataType             ! Data type contained in the grid (integer, real, SWB cell)
+!     character (len=:), allocatable  :: sProj4_string         ! proj4 string defining coordinate system of grid
+!     character (len=:), allocatable  :: sFilename             ! original file name that the data was read from
+!     real (kind=c_double)            :: rGridCellSize         ! size of one side of a grid cell
+!     integer (kind=c_int)            :: iLengthUnits= -99999  ! length units code
+!     real (kind=c_double)            :: rX0, rX1              ! World-coordinate range in X
+!     real (kind=c_double)            :: rY0, rY1              ! World-coordinate range in Y
 
-!   iNumRows = iMaxRow - iMinRow + 1
-!   iNumCols = iMaxCol - iMinCol + 1
+  write(sOriginText, fmt="(i4.4,'-',i2.2,'-',i2.2)") StartDate%iYear, StartDate%iMonth, StartDate%iDay
 
-!   allocate(rX(iNumCols))
-!   allocate(rY(iNumRows))
-!   rX = NCFILE%rX_Coords(iMinCol:iMaxCol)
-!   rY = NCFILE%rY_Coords(iMinRow:iMaxRow)
+  sFilename = trim(sVariableName)//"_"//trim(asCharacter(StartDate%iYear)) &
+    //"_"//trim(asCharacter(EndDate%iYear))//"__" &
+    //trim(asCharacter(pGrd%iNY)) &
+    //"_by_"//trim(asCharacter(pGrd%iNX))//".nc"
 
-!   sFilename = trim(NCFILE%sVarName(NC_Z))//"_"//trim(asCharacter(iStartYear)) &
-!     //"_"//trim(asCharacter(iEndYear))//"__" &
-!     //trim(asCharacter(iNumRows)) &
-!      //"_by_"//trim(asCharacter(iNumCols))//".nc"
+  call nf_create(NCFILE=NCFILE, sFilename=trim(sFilename) )
 
-!   call nf_create(NCFILE=NCFILE, sFilename=trim(sFilename) )
+  !> set dimension values in the NCFILE struct
+  call nf_set_standard_dimensions(NCFILE=NCFILE, iNX=pGrd%iNX, iNY=pGrd%iNY)
 
-!   !> set dimension values in the NCFILE struct
-!   call nf_set_standard_dimensions(NCFILE=NCFILE, &
-!                        iNX=iNumCols, &
-!                        iNY=iNumRows)
+  !> @todo implement more flexible method of assigning units
+  NCFILE%sVarUnits(NC_X)    = "meters"  
+  NCFILE%sVarUnits(NC_Y)    = "meters"  
+  NCFILE%sVarUnits(NC_Z)    = sVariableUnits  
 
-!   NCFILE%sVarUnits(NC_X)    =   
-!   NCFILE%sVarUnits(NC_Y)    =   
-!   NCFILE%sVarUnits(NC_Z)    =   
+  !> transfer dimension values to NetCDF file
+  call nf_define_dimensions( NCFILE=NCFILE )
 
-!   !> transfer dimension values to NetCDF file
-!   call nf_define_dimensions( NCFILE=NCFILE )
+  !> set variable values in the NCFILE struct
+  call nf_set_standard_variables(NCFILE=NCFILE, sVarName_z = sVariableName )
 
-!   !> set variable values in the NCFILE struct
-!   call nf_set_standard_variables(NCFILE=NCFILE, &
-!        sVarName_z = trim(NCFILE%sVarName(NC_Z)) )
+  !> transfer variable values to NetCDF file
+  call nf_define_variables(NCFILE=NCFILE)
 
-!   !> transfer variable values to NetCDF file
-!   call nf_define_variables(NCFILE=NCFILE)
+  call nf_get_variable_id_and_type( NCFILE=NCFILE )
 
-!   call nf_get_variable_id_and_type( NCFILE=NCFILE )
+  call nf_set_standard_attributes(NCFILE=NCFILE, sOriginText=sOriginText)
 
-!   call nf_set_standard_attributes(NCFILE=NCFILE, &
-!     sOriginText=sOriginText)
+  call nf_set_global_attributes(NCFILE=NCFILE, &
+     sDataType=trim(NCFILE%sVarName(NC_Z)), &
+     sSourceFile=trim(NCFILE%sFilename))
 
-!   call nf_set_global_attributes(NCFILE=NCFILE, &
-!      sDataType=trim(NCFILE%sVarName(NC_Z)), &
-!      sSourceFile=trim(NCFILE%sFilename))
+  call nf_put_attributes(NCFILE=NCFILE)
 
-!   call nf_put_attributes(NCFILE=NCFILE)
+  !> enable a low level of data compression for the variable of interest
+  call nf_define_deflate(NCFILE=NCFILE, &
+     iVarID=NCFILE%iVarID(NC_Z), &
+     iShuffle=NC_SHUFFLE_YES, &
+     iDeflate=NC_DEFLATE_YES, &
+     iDeflate_level=2 )
 
-!   !> enable a low level of data compression for the
-!   !> variable of interest
-!   call nf_define_deflate(NCFILE=NCFILE, &
-!      iVarID=NCFILE_ARCHIVE%iVarID(NC_Z), &
-!      iShuffle=NC_SHUFFLE_YES, &
-!      iDeflate=NC_DEFLATE_YES, &
-!      iDeflate_level=2 )
+  call nf_enddef(NCFILE=NCFILE)
 
-!   call nf_enddef(NCFILE=NCFILE)
-
-!   call nf_put_x_and_y(NCFILE=NCFILE, &
-!        dpX=NCFILE%rX_Coords(iMinCol:iMaxCol), &
-!        dpY=NCFILE%rY_Coords(iMinRow:iMaxRow) )
+  ! we are only supplying a vector of X and Y on the assumption that the base projection
+  ! results in a uniform grid (in other words, we have the same X value for all coluns of a given row)
+  call nf_put_x_and_y(NCFILE=NCFILE, &
+       dpX=pGrd%rX(:,1), &
+       dpY=pGrd%rY(1,:) )
 
 end subroutine netcdf_open_and_prepare_as_output
 

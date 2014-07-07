@@ -273,7 +273,7 @@ contains
       fRunoff = 0.0_c_float
     end if
 
-    fInfiltration = fInflow - fRunoff
+    fInfiltration = max( 0.0_c_float, fInflow - fRunoff )
 
   end function calculate_infiltration__curve_number
 

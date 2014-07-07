@@ -28,7 +28,6 @@ if(TARGET__SWB_EXECUTABLE)
             netcdf4_support.F90
             netcdf_c_api_interfaces.F90
             parameters.F90
-            #runoff_curve_number.F90
             soil_moisture__thornthwaite_mather.F90
             simulation_datetime.F90
             solar_calculations.F90
@@ -237,7 +236,6 @@ if(TARGET__SWB_LIBRARY)
             netcdf4_support.F90
             netcdf_c_api_interfaces.F90
             parameters.F90
-            #runoff_curve_number.F90
             soil_moisture__thornthwaite_mather.F90
             simulation_datetime.F90
             solar_calculations.F90
