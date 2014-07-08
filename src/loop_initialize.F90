@@ -13,6 +13,7 @@ module loop_initialize
 !  use loop_iterate
   use model_domain
   use parameters
+  use precipitation__method_of_fragments
   use simulation_datetime
   use strings
   use string_list  
@@ -212,6 +213,17 @@ contains
           case ( "PRECIPITATION_METHOD_OF_FRAGMENTS")
           
             call MODEL%set_precipitation_data_method("FRAGMENTS")      
+
+          case ( "PRECIPITATION_METHOD_OF_FRAGMENTS_DAILY_FILE")
+          
+            ! note this formulation is backsliding toward old model of immediate processing
+            ! was trying to read in entire control file, do checking, and *then* actually read
+            ! in the files themselves
+            call read_daily_fragments( sArgText )  
+
+          case ( "PRECIPITATION_METHOD_OF_FRAGMENTS_NORMALIZATION_FILE")
+          
+            call read_annual_normalization( sArgText )  
 
           case ( "PRECIPITATION_SCALE" )
 
