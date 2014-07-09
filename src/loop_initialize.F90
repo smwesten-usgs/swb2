@@ -44,10 +44,12 @@ contains
                   sDelimiters = "WHITESPACE", &
                   lHasHeader = .false._c_bool )
 
-    do while ( .not. CF%isEOF() )
+    do 
 
       ! read in next line of file
       sRecord = CF%readLine()
+
+      if ( CF%isEOF() )  exit
 
       ! create and allocate memory for dictionary entry
       CF_ENTRY => null()
@@ -107,6 +109,8 @@ contains
     call initialize_soils_landuse_awc_flowdir_values()
 
     call MODEL%preflight_check_function_pointers()
+
+    call MODEL%initialize_netcdf_output()
 
   end subroutine initialize_options
 

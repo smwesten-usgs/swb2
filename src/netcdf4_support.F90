@@ -230,6 +230,7 @@ module netcdf4_support
 
   public :: netcdf_open_and_prepare_as_input
   public :: netcdf_open_and_prepare_as_output_archive
+  public :: netcdf_open_and_prepare_as_output
   public :: netcdf_date_within_range
   public :: netcdf_deallocate_data_struct
   public :: netcdf_nullify_data_struct
@@ -818,22 +819,24 @@ end subroutine netcdf_open_and_prepare_as_output_archive
 
 
 subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUnits, &
-   pGrd, StartDate, EndDate )
+   iNX, iNY, fX, fY, StartDate, EndDate )
 
+  type (T_NETCDF4_FILE ), pointer            :: NCFILE
   character (len=*), intent(in)              :: sVariableName
   character (len=*), intent(in)              :: sVariableUnits
-  type (GENERAL_GRID_T), intent(in), pointer :: pGrd
+  integer (kind=c_int), intent(in)           :: iNX
+  integer (kind=c_int), intent(in)           :: iNY
+  real (kind=c_double), intent(in)           :: fX(:)
+  real (kind=c_double), intent(in)           :: fY(:)
   type (DATETIME_T), intent(in)              :: StartDate
   type (DATETIME_T), intent(in)              :: EndDate
-  type (T_NETCDF4_FILE ), pointer            :: NCFILE
  
 !   ! [ LOCALS ]
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
   type (T_NETCDF_DIMENSION), pointer :: pNC_DIM
   integer (kind=c_int) :: iIndex
-  real (kind=c_double), dimension(:), allocatable   :: rX, rY
   character (len=10)                                :: sOriginText
-  character (len=:), allocatable                    :: sFilename
+  character (len=256)                               :: sFilename
 
 
 !    integer (kind=c_int)            :: iNX                   ! Number of cells in the x-direction
@@ -851,36 +854,38 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
 
   sFilename = trim(sVariableName)//"_"//trim(asCharacter(StartDate%iYear)) &
     //"_"//trim(asCharacter(EndDate%iYear))//"__" &
-    //trim(asCharacter(pGrd%iNY)) &
-    //"_by_"//trim(asCharacter(pGrd%iNX))//".nc"
+    //trim(asCharacter(iNY)) &
+    //"_by_"//trim(asCharacter(iNX))//".nc"
+
+  call LOGS%write("Attempting to open NetCDF file for writing with filename "//dquote(sFilename))
 
   call nf_create(NCFILE=NCFILE, sFilename=trim(sFilename) )
 
   !> set dimension values in the NCFILE struct
-  call nf_set_standard_dimensions(NCFILE=NCFILE, iNX=pGrd%iNX, iNY=pGrd%iNY)
-
+  call nf_set_standard_dimensions(NCFILE=NCFILE, iNX=iNX, iNY=iNY)
+  
   !> @todo implement more flexible method of assigning units
   NCFILE%sVarUnits(NC_X)    = "meters"  
   NCFILE%sVarUnits(NC_Y)    = "meters"  
   NCFILE%sVarUnits(NC_Z)    = sVariableUnits  
-
+  
   !> transfer dimension values to NetCDF file
   call nf_define_dimensions( NCFILE=NCFILE )
-
+  
   !> set variable values in the NCFILE struct
   call nf_set_standard_variables(NCFILE=NCFILE, sVarName_z = sVariableName )
-
+  
   !> transfer variable values to NetCDF file
   call nf_define_variables(NCFILE=NCFILE)
-
+  
   call nf_get_variable_id_and_type( NCFILE=NCFILE )
-
+  
   call nf_set_standard_attributes(NCFILE=NCFILE, sOriginText=sOriginText)
-
+  
   call nf_set_global_attributes(NCFILE=NCFILE, &
      sDataType=trim(NCFILE%sVarName(NC_Z)), &
-     sSourceFile=trim(NCFILE%sFilename))
-
+     sSourceFile="NA" )
+  
   call nf_put_attributes(NCFILE=NCFILE)
 
   !> enable a low level of data compression for the variable of interest
@@ -895,8 +900,8 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   ! we are only supplying a vector of X and Y on the assumption that the base projection
   ! results in a uniform grid (in other words, we have the same X value for all coluns of a given row)
   call nf_put_x_and_y(NCFILE=NCFILE, &
-       dpX=pGrd%rX(:,1), &
-       dpY=pGrd%rY(1,:) )
+       dpX=fX, &
+       dpY=fY )
 
 end subroutine netcdf_open_and_prepare_as_output
 
@@ -1275,7 +1280,7 @@ subroutine nf_trap( iResultCode, sFilename, iLineNumber )
     call LOGS%write("NetCDF ERROR: "//dquote( sTextString  )//" | error code was: " &
       //trim(asCharacter(iResultCode)) )
 
-    call assert(lFALSE, "SWB is stopping due to a problem reading or accessing" &
+    call assert(lFALSE, "SWB is stopping due to a problem reading or writing" &
       //" a NetCDF file", trim(sFile), iLine)
 
   endif
@@ -2726,6 +2731,7 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, sSourceFile)
   call assert(iStat == 0, "Could not allocate memory for NC_ATT member of NC_FILE", &
     trim(__FILE__), __LINE__)
 
+  NCFILE%iNumberOfAttributes = 1
 
   block
 
@@ -2760,6 +2766,7 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText)
 
   pNC_ATT => NCFILE%pNC_VAR(NC_TIME)%pNC_ATT
 
+  !! define attributes associated with TIME variable
   block
 
     pNC_ATT(0)%sAttributeName = "units"
@@ -2934,6 +2941,8 @@ end function nf_define_variable
 
 !----------------------------------------------------------------------
 
+!! before this function is called, the values associated with NCFILE must be defined.
+
 subroutine nf_define_variables( NCFILE )
 
   type (T_NETCDF4_FILE) :: NCFILE
@@ -2943,6 +2952,9 @@ subroutine nf_define_variables( NCFILE )
   integer (kind=c_int) :: iIndex
   character (len=256) :: sDimName
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
+
+  !! note: the default number of variables for a simple archive file is 4:
+  !! 0) time, 1) Y, 2) X, 3) variable of interest
 
   do iIndex = 0, NCFILE%iNumberOfVariables-1
 
@@ -3043,10 +3055,12 @@ subroutine nf_put_attributes(NCFILE)
   integer (kind=c_int) :: iIndex2
   integer (kind=c_int) :: iStat
 
+  ! loop over variables
   do iIndex = 0, NCFILE%iNumberOfVariables-1
 
     pNC_VAR => NCFILE%pNC_VAR(iIndex)
 
+    ! for each variable, loop over the associated attributes
     do iIndex2 = 0, pNC_VAR%iNumberOfAttributes-1
 
       pNC_ATT => pNC_VAR%pNC_ATT(iIndex2)
@@ -3055,8 +3069,9 @@ subroutine nf_put_attributes(NCFILE)
 
           case (NC_DOUBLE)
 
-            call assert(allocated(pNC_ATT%dpAttValue), &
-              "INTERNAL PROGRAMMING ERROR - attempt to use unallocated variable", &
+            if (.not. allocated(pNC_ATT%sAttValue) ) &
+              call die("INTERNAL PROGRAMMING ERROR - attempt to use unallocated variable; " &
+              //"attribute name: "//dquote(pNC_ATT%sAttributeName), &
               trim(__FILE__), __LINE__)
 
             call nf_put_attribute(NCFILE=NCFILE, &
@@ -3066,8 +3081,9 @@ subroutine nf_put_attributes(NCFILE)
 
           case (NC_INT)
 
-            call assert(allocated(pNC_ATT%iAttValue), &
-              "INTERNAL PROGRAMMING ERROR - attempt to use unallocated variable", &
+            if (.not. allocated(pNC_ATT%sAttValue) ) &
+              call die("INTERNAL PROGRAMMING ERROR - attempt to use unallocated variable; " &
+              //"attribute name: "//dquote(pNC_ATT%sAttributeName), &
               trim(__FILE__), __LINE__)
 
             call nf_put_attribute(NCFILE=NCFILE, &
@@ -3077,8 +3093,9 @@ subroutine nf_put_attributes(NCFILE)
 
           case (NC_FLOAT)
 
-            call assert(allocated(pNC_ATT%rAttValue), &
-              "INTERNAL PROGRAMMING ERROR - attempt to use unallocated variable", &
+            if (.not. allocated(pNC_ATT%sAttValue) ) &
+              call die("INTERNAL PROGRAMMING ERROR - attempt to use unallocated variable; " &
+              //"attribute name: "//dquote(pNC_ATT%sAttributeName), &
               trim(__FILE__), __LINE__)
 
             call nf_put_attribute(NCFILE=NCFILE, &
@@ -3088,8 +3105,9 @@ subroutine nf_put_attributes(NCFILE)
 
           case (NC_CHAR)
 
-            call assert(allocated(pNC_ATT%sAttValue), &
-              "INTERNAL PROGRAMMING ERROR - attempt to use unallocated variable", &
+            if (.not. allocated(pNC_ATT%sAttValue) ) &
+              call die("INTERNAL PROGRAMMING ERROR - attempt to use unallocated variable; " &
+              //"attribute name: "//dquote(pNC_ATT%sAttributeName), &
               trim(__FILE__), __LINE__)
 
             call nf_put_attribute(NCFILE=NCFILE, &
@@ -3103,8 +3121,10 @@ subroutine nf_put_attributes(NCFILE)
 
   enddo
 
-
+  ! now loop over global attributes
   do iIndex2 = 0, NCFILE%iNumberOfAttributes-1
+
+   print *, __FILE__, ": ", __LINE__, "   |   ", NCFILE%iNumberOfAttributes
 
     pNC_ATT => NCFILE%pNC_ATT(iIndex2)
 
@@ -3112,8 +3132,9 @@ subroutine nf_put_attributes(NCFILE)
 
       case (NC_DOUBLE)
 
-        call assert(allocated(pNC_ATT%dpAttValue), &
-          "INTERNAL PROGRAMMING ERROR - attempt to use unallocated variable", &
+        if (.not. allocated(pNC_ATT%sAttValue) ) &
+          call die("INTERNAL PROGRAMMING ERROR - attempt to use unallocated variable; " &
+          //"attribute name: "//dquote(pNC_ATT%sAttributeName), &
           trim(__FILE__), __LINE__)
 
         call nf_put_attribute(NCFILE=NCFILE, &
@@ -3123,8 +3144,9 @@ subroutine nf_put_attributes(NCFILE)
 
       case (NC_INT)
 
-        call assert(allocated(pNC_ATT%iAttValue), &
-          "INTERNAL PROGRAMMING ERROR - attempt to use unallocated variable", &
+        if (.not. allocated(pNC_ATT%sAttValue) ) &
+          call die("INTERNAL PROGRAMMING ERROR - attempt to use unallocated variable; " &
+          //"attribute name: "//dquote(pNC_ATT%sAttributeName), &
           trim(__FILE__), __LINE__)
 
         call nf_put_attribute(NCFILE=NCFILE, &
@@ -3134,8 +3156,9 @@ subroutine nf_put_attributes(NCFILE)
 
       case (NC_FLOAT)
 
-        call assert(allocated(pNC_ATT%rAttValue), &
-          "INTERNAL PROGRAMMING ERROR - attempt to use unallocated variable", &
+        if (.not. allocated(pNC_ATT%sAttValue) ) &
+          call die("INTERNAL PROGRAMMING ERROR - attempt to use unallocated variable; " &
+          //"attribute name: "//dquote(pNC_ATT%sAttributeName), &
           trim(__FILE__), __LINE__)
 
         call nf_put_attribute(NCFILE=NCFILE, &
@@ -3145,8 +3168,9 @@ subroutine nf_put_attributes(NCFILE)
 
       case (NC_CHAR)
 
-        call assert(allocated(pNC_ATT%sAttValue), &
-          "INTERNAL PROGRAMMING ERROR - attempt to use unallocated variable", &
+        if (.not. allocated(pNC_ATT%sAttValue) ) &
+          call die("INTERNAL PROGRAMMING ERROR - attempt to use unallocated variable; " &
+          //"attribute name: "//dquote(pNC_ATT%sAttributeName), &
           trim(__FILE__), __LINE__)
 
         call nf_put_attribute(NCFILE=NCFILE, &
@@ -3257,7 +3281,7 @@ subroutine netcdf_put_variable_vector(NCFILE, iVarID, iStart, iCount, iStride, &
 
   elseif (present(rValues) ) then
 
-   call nf_trap(nc_put_vars_float(ncid=NCFILE%iNCID, &
+    call nf_trap(nc_put_vars_float(ncid=NCFILE%iNCID, &
                        varid=iVarID, &
                        startp=iStart, &
                        countp=iCount, &
@@ -3266,8 +3290,6 @@ subroutine netcdf_put_variable_vector(NCFILE, iVarID, iStart, iCount, iStride, &
                        __FILE__, __LINE__)
 
   elseif (present(dpValues) ) then
-
-
 
     call nf_trap(nc_put_vars_double(ncid=NCFILE%iNCID, &
                        varid=iVarID, &

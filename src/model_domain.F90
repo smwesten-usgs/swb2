@@ -11,14 +11,18 @@ module model_domain
 
   private
 
+  ! concept: the only state variables that should appear in this module should be
+  !          those that are required regardless of what other program options are active
+
   type, public :: MODEL_DOMAIN_T
 
-    character (len=:), allocatable  :: PROJ4_string
-    integer (kind=c_int)            :: number_of_columns
-    integer (kind=c_int)            :: number_of_rows
-    real (kind=c_double)            :: X_ll, Y_ll
-    real (kind=c_double)            :: X_ur, Y_ur
-    real (kind=c_double)            :: gridcellsize
+    character (len=:), allocatable     :: PROJ4_string
+    integer (kind=c_int)               :: number_of_columns
+    integer (kind=c_int)               :: number_of_rows
+    real (kind=c_double)               :: X_ll, Y_ll
+    real (kind=c_double)               :: X_ur, Y_ur
+    real (kind=c_double), allocatable  :: X(:), Y(:)
+    real (kind=c_double)               :: gridcellsize
 
     logical (kind=c_bool), allocatable     :: active(:,:)
 
@@ -98,6 +102,10 @@ module model_domain
     procedure :: calculate_soil_mass_balance_sub
 
     procedure :: get_climate_data
+    procedure :: write_variables_to_netcdf
+
+    procedure :: initialize_netcdf_output_sub
+    generic   :: initialize_netcdf_output => initialize_netcdf_output_sub
 
     procedure :: initialize_landuse_codes_sub
     generic   :: initialize_landuse => initialize_landuse_codes_sub
@@ -148,6 +156,8 @@ module model_domain
 
 
   type (MODEL_DOMAIN_T), public :: MODEL
+
+  type (T_NETCDF4_FILE), pointer, public :: NCDFOUT
 
 contains
 
@@ -228,15 +238,21 @@ contains
 
   end subroutine initialize_arrays_sub
 
+!--------------------------------------------------------------------------------------------------
 
-  subroutine initialize_netcdf_output_sub
+  subroutine initialize_netcdf_output_sub(this)
 
-    
+    class (MODEL_DOMAIN_T), intent(in)   :: this
 
+      allocate( NCDFOUT )
+
+      call netcdf_open_and_prepare_as_output( NCFILE=NCDFOUT, sVariableName="gross_precipitation", &
+        sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
+        fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end )
 
   end subroutine initialize_netcdf_output_sub
 
-
+!--------------------------------------------------------------------------------------------------
   
   subroutine set_inactive_cells_sub(this)
 
@@ -251,7 +267,7 @@ contains
 
     end where
 
-    call LOGS%write(asCharacter(count(this%active))//" calls are currently active out of a total of " &
+    call LOGS%write(asCharacter(count(this%active))//" cells are currently active out of a total of " &
       //asCharacter(size(this%active)), iLinesBefore=1, iLinesAfter=1)
 
   end subroutine set_inactive_cells_sub
@@ -315,14 +331,26 @@ contains
 
     ! [ LOCALS ]
     type (GENERAL_GRID_T), pointer       :: pGrd
+    integer (kind=c_int)                 :: iIndex
 
     pGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
         rX0=this%X_ll, rY0=this%Y_ll, &
         rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_INT )  
 
+    allocate ( this%X(this%number_of_columns ) )
+    allocate ( this%Y(this%number_of_rows ) )
+
+    ! call the grid routine to populate the X and Y values
+    call grid_PopulateXY(pGrd)
+
+    ! populating these in order to have them available later for use in writing results to NetCDF
+    this%X = pGrd%rX( :, 1 )
+    this%Y = pGrd%rY( 1, : ) 
+
+    ! transform to unprojected (lat/lon) coordinate system
     call grid_Transform(pGrd=pGrd, sFromPROJ4=this%PROJ4_string, &
         sToPROJ4="+proj=lonlat +ellps=GRS80 +datum=WGS84 +no_defs" )
-
+    
     this%latitude = pack( pGrd%rY, this%active )
 
     call grid_Destroy(pGrd)
@@ -341,6 +369,7 @@ contains
       call this%get_climate_data()
       print *, __FILE__,": ", __LINE__
       call this%solve()
+      call this%write_variables_to_netcdf()
       call SIM_DT%addDay()
 
     enddo 
@@ -379,6 +408,29 @@ contains
     end associate
 
   end subroutine get_climate_data
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine write_variables_to_netcdf(this)
+
+    class (MODEL_DOMAIN_T), intent(out)  :: this
+
+    call netcdf_put_variable_vector(NCFILE=NCDFOUT, &
+       iVarID=NCDFOUT%iVarID(NC_TIME), &
+       iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t)], &
+       iCount=[1_c_size_t], &
+       iStride=[1_c_size_t], &
+       dpValues=[real(SIM_DT%iNumDaysFromOrigin, kind=c_double)])
+
+
+!     call netcdf_put_variable_vector(NCFILE=NCFILE, &
+!                    iVarID=NCFILE%pNC_VAR(NC_X)%iNC_VarID, &
+!                    iStart=[0_c_size_t], &
+!                    iCount=[iLength], &
+!                    iStride=[1_c_ptrdiff_t], &
+!                    dpValues=dpX)
+
+  end subroutine write_variables_to_netcdf
 
 !--------------------------------------------------------------------------------------------------
 

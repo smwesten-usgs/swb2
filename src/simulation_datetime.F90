@@ -14,6 +14,7 @@ module simulation_datetime
     integer (kind=c_int)    :: iDaysInMonth
     integer (kind=c_int)    :: iDaysInYear
     logical (kind=c_bool)   :: lIsLeapYear
+    integer (kind=c_int)    :: iNumDaysFromOrigin = 0
 
   contains
 
@@ -37,7 +38,7 @@ contains
     this%iDaysInYear = this%curr%daysperyear()
     this%lIsLeapYear = this%curr%isLeapYear()
     this%iDOY = day_of_year( this%curr%getJulianDay() )
-    SIM_DT%iDOY = this%iDOY
+    this%iNumDaysFromOrigin = this%iNumDaysFromOrigin + 1
 
   end subroutine increment_by_one_day_sub
 
