@@ -2790,10 +2790,10 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText)
 
   end block
 
-  allocate( NCFILE%pNC_VAR(NC_Z)%pNC_ATT(0:iNumAttributes-1), stat=iStat)
+  allocate( NCFILE%pNC_VAR(NC_Z)%pNC_ATT(0:0), stat=iStat)
   call assert(iStat == 0, "Could not allocate memory for NC_ATT member in NC_VAR struct of NC_FILE", &
     trim(__FILE__), __LINE__)
-  NCFILE%pNC_VAR(NC_Z)%iNumberOfAttributes = iNumAttributes
+  NCFILE%pNC_VAR(NC_Z)%iNumberOfAttributes = 1
 
   pNC_ATT => NCFILE%pNC_VAR(NC_Z)%pNC_ATT
 
@@ -2804,19 +2804,6 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText)
     pNC_ATT(0)%sAttValue(0) = NCFILE%sVarUnits(NC_Z)
     pNC_ATT(0)%iNC_AttType = NC_CHAR
     pNC_ATT(0)%iNC_AttSize = 1_c_size_t
-
-    pNC_ATT(1)%sAttributeName = "calendar"
-    allocate(pNC_ATT(1)%sAttValue(0:0))
-    pNC_ATT(1)%sAttValue(0) = "standard"
-    pNC_ATT(1)%iNC_AttType = NC_CHAR
-    pNC_ATT(1)%iNC_AttSize = 1_c_size_t
-
-    pNC_ATT(2)%sAttributeName = "long_name"
-    allocate(pNC_ATT(2)%sAttValue(0:0))
-    pNC_ATT(2)%sAttValue(0) = "time"
-    pNC_ATT(2)%iNC_AttType = NC_CHAR
-    pNC_ATT(2)%iNC_AttSize = 1_c_size_t
-
 
   end block
 

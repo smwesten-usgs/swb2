@@ -25,6 +25,8 @@ module model_domain
     real (kind=c_double)               :: gridcellsize
 
     logical (kind=c_bool), allocatable     :: active(:,:)
+    real (kind=c_float), allocatable       :: dont_care(:,:)
+    real (kind=c_float), allocatable       :: array_output(:,:)
 
     integer (kind=c_int), allocatable      :: landuse_code(:)
     integer (kind=c_int), allocatable      :: landuse_index(:)
@@ -54,8 +56,8 @@ module model_domain
     real (kind=c_float), allocatable       :: stream_storage(:)
          
     real (kind=c_float), allocatable       :: gross_precip(:)
-    real (kind=c_float), allocatable       :: Tmin(:)
-    real (kind=c_float), allocatable       :: Tmax(:)
+    real (kind=c_float), allocatable       :: tmin(:)
+    real (kind=c_float), allocatable       :: tmax(:)
     real (kind=c_float), allocatable       :: routing_fraction(:)
 
     procedure ( interception_method ), pointer, private        :: calc_interception      => null()
@@ -196,6 +198,12 @@ contains
     allocate(this%active(iNumCols, iNumRows), stat=iStat )
     call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
 
+    allocate(this%dont_care(iNumCols, iNumRows), stat=iStat )
+    call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
+
+    allocate(this%array_output(iNumCols, iNumRows), stat=iStat )
+    call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
+
   end subroutine initialize_grid_sub
 
 
@@ -242,13 +250,20 @@ contains
 
   subroutine initialize_netcdf_output_sub(this)
 
-    class (MODEL_DOMAIN_T), intent(in)   :: this
+    class (MODEL_DOMAIN_T), intent(inout)   :: this
 
-      allocate( NCDFOUT )
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iStat
+
+      allocate( NCDFOUT, stat=iStat)
+
+      if ( iStat /= 0 )  call die("Problem allocating memory", __FILE__, __LINE__)
 
       call netcdf_open_and_prepare_as_output( NCFILE=NCDFOUT, sVariableName="gross_precipitation", &
         sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
         fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end )
+
+      this%dont_care = -9999._c_float
 
   end subroutine initialize_netcdf_output_sub
 
@@ -366,10 +381,13 @@ contains
     do while ( SIM_DT%curr <= SIM_DT%end )
 
       call LOGS%write("Calculating: "//SIM_DT%curr%prettydate(), iLogLevel=LOG_ALL, lEcho=.true._c_bool )
+
       call this%get_climate_data()
-      print *, __FILE__,": ", __LINE__
+
       call this%solve()
+
       call this%write_variables_to_netcdf()
+
       call SIM_DT%addDay()
 
     enddo 
@@ -395,14 +413,21 @@ contains
       iMonth = asInt( dt%iMonth )
       iDay = asInt( dt%iDay )
       iYear = dt%iYear
-
-
+  
+      ! next three statements retrieve the data from the raw or native form
       call PRCP%getvalues( iMonth, iDay, iYear, iJulianDay )
+  
       call TMIN%getvalues( iMonth, iDay, iYear, iJulianDay )
+
       call TMAX%getvalues( iMonth, iDay, iYear, iJulianDay )
 
+      ! the following statements process the raw data in order to get it into the 
+      ! right units or properly pack the data
       call this%get_precipitation_data()
+!      this%gross_precip = pack( PRCP%pGrdBase%rData, this%active )
+
       this%Tmax = pack( TMAX%pGrdBase%rData, this%active )
+
       this%Tmin = pack( TMIN%pGrdBase%rData, this%active )
 
     end associate
@@ -413,22 +438,23 @@ contains
 
   subroutine write_variables_to_netcdf(this)
 
-    class (MODEL_DOMAIN_T), intent(out)  :: this
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     call netcdf_put_variable_vector(NCFILE=NCDFOUT, &
        iVarID=NCDFOUT%iVarID(NC_TIME), &
        iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t)], &
        iCount=[1_c_size_t], &
-       iStride=[1_c_size_t], &
+       iStride=[1_c_ptrdiff_t], &
        dpValues=[real(SIM_DT%iNumDaysFromOrigin, kind=c_double)])
 
+    this%array_output = unpack(this%gross_precip, this%active, this%dont_care)
 
-!     call netcdf_put_variable_vector(NCFILE=NCFILE, &
-!                    iVarID=NCFILE%pNC_VAR(NC_X)%iNC_VarID, &
-!                    iStart=[0_c_size_t], &
-!                    iCount=[iLength], &
-!                    iStride=[1_c_ptrdiff_t], &
-!                    dpValues=dpX)
+    call netcdf_put_variable_array(NCFILE=NCDFOUT, &
+                   iVarID=NCDFOUT%iVarID(NC_Z), &
+                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
+                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
+                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
+                   rValues=this%array_output )
 
   end subroutine write_variables_to_netcdf
 
@@ -625,7 +651,7 @@ contains
     if ( ( sMethodName .strequal. "NORMAL" ) &
          .or. ( sMethodName .strequal. "STANDARD" ) ) then
 
-      this%calc_reference_et => model_get_precip_normal
+      this%get_precipitation_data => model_get_precip_normal
 
     elseif ( ( sMethodName .strequal. "METHOD_OF_FRAGMENTS" ) &
          .or. ( sMethodName .strequal. "FRAGMENTS" ) ) then
@@ -712,6 +738,8 @@ contains
   subroutine model_get_precip_normal(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+      print *, __FILE__, ": ", __LINE__
+      print *, shape( this%active )
 
     this%gross_precip = pack( PRCP%pGrdBase%rData, this%active )
 
@@ -722,8 +750,11 @@ contains
   subroutine model_get_precip_method_of_fragments(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+          print *, __FILE__, ": ", __LINE__
+
 
     this%gross_precip = pack( PRCP%pGrdBase%rData, this%active )
+      print *, __FILE__, ": ", __LINE__
 
 
   end subroutine model_get_precip_method_of_fragments 
