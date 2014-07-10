@@ -156,10 +156,13 @@ module model_domain
     end subroutine precipitation_data_method
   end interface    
 
+  type, public :: NETCDF_FILE_COLLECTION_T
+    type (T_NETCDF4_FILE), pointer, public :: ncfile
+  end type NETCDF_FILE_COLLECTION_T
 
   type (MODEL_DOMAIN_T), public :: MODEL
 
-  type (T_NETCDF4_FILE), pointer, public :: NCDFOUT
+  type (NETCDF_FILE_COLLECTION_T), allocatable, public :: OUTPUT(:)
 
 contains
 
@@ -214,7 +217,7 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
-    integer (kind=c_int)  :: iStat(22)
+    integer (kind=c_int)  :: iStat(23)
 
     iCount = count( this%active )
 
@@ -242,6 +245,8 @@ contains
     allocate( this%soil_storage_max(iCount), stat=iStat(21))
     allocate( this%stream_storage(iCount), stat=iStat(22) )
 
+    allocate( OUTPUT(2), stat=iStat(23) )
+
     if ( any( iStat /= 0 ) )  call die("Problem allocating memory", __FILE__, __LINE__)
 
   end subroutine initialize_arrays_sub
@@ -254,14 +259,19 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iStat
+    integer (kind=c_int) :: iIndex
 
-      allocate( NCDFOUT, stat=iStat)
+    do iIndex = 1, ubound(OUTPUT, 1)
+      allocate ( OUTPUT(iIndex)%ncfile )
+    enddo  
 
-      if ( iStat /= 0 )  call die("Problem allocating memory", __FILE__, __LINE__)
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(1)%ncfile, sVariableName="gross_precipitation", &
+      sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end )
 
-      call netcdf_open_and_prepare_as_output( NCFILE=NCDFOUT, sVariableName="gross_precipitation", &
-        sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-        fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end )
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(2)%ncfile, sVariableName="interception", &
+      sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end )
 
       this%dont_care = -9999._c_float
 
@@ -440,21 +450,38 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call netcdf_put_variable_vector(NCFILE=NCDFOUT, &
-       iVarID=NCDFOUT%iVarID(NC_TIME), &
-       iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t)], &
-       iCount=[1_c_size_t], &
-       iStride=[1_c_ptrdiff_t], &
-       dpValues=[real(SIM_DT%iNumDaysFromOrigin, kind=c_double)])
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iIndex
+
+    do iIndex = 1, ubound( OUTPUT, 1 )
+
+      call netcdf_put_variable_vector(NCFILE=OUTPUT(iIndex)%ncfile, &
+         iVarID=OUTPUT(iIndex)%ncfile%iVarID(NC_TIME), &
+         iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t)], &
+         iCount=[1_c_size_t], &
+         iStride=[1_c_ptrdiff_t], &
+         dpValues=[real(SIM_DT%iNumDaysFromOrigin, kind=c_double)])
+
+    enddo
 
     this%array_output = unpack(this%gross_precip, this%active, this%dont_care)
 
-    call netcdf_put_variable_array(NCFILE=NCDFOUT, &
-                   iVarID=NCDFOUT%iVarID(NC_Z), &
+    call netcdf_put_variable_array(NCFILE=OUTPUT(1)%ncfile, &
+                   iVarID=OUTPUT(1)%ncfile%iVarID(NC_Z), &
                    iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
                    iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
+
+    this%array_output = unpack(this%interception, this%active, this%dont_care)
+
+    call netcdf_put_variable_array(NCFILE=OUTPUT(2)%ncfile, &
+                   iVarID=OUTPUT(2)%ncfile%iVarID(NC_Z), &
+                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
+                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
+                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
+                   rValues=this%array_output )
+
 
   end subroutine write_variables_to_netcdf
 

@@ -237,10 +237,6 @@ contains
   
             call PRCP%set_offset(asFloat(sOptionText))
 
-          case ( "PRECIPITATION_CONVERSION_FACTOR" )
-            
-            call PRCP%set_conversion_factor(asFloat(sOptionText))
-
           case ( "NETCDF_PRECIPITATION_X_VAR" )
 
             PRCP%sVariableName_x = trim(sOptionText)
@@ -410,10 +406,6 @@ contains
   
             call TMAX%set_offset(asFloat(sOptionText))
 
-          case ( "TMAX_CONVERSION_FACTOR" )
-            
-            call TMAX%set_conversion_factor(asFloat(sOptionText))
-
           case ( "NETCDF_TMAX_X_VAR" )
 
             TMAX%sVariableName_x = trim(sOptionText)
@@ -577,10 +569,6 @@ contains
           case ( "TMIN_OFFSET" )
   
             call TMIN%set_offset(asFloat(sOptionText))
-
-          case ( "TMIN_CONVERSION_FACTOR" )
-            
-            call TMIN%set_conversion_factor(asFloat(sOptionText))
 
           case ( "NETCDF_TMIN_X_VAR" )
 
