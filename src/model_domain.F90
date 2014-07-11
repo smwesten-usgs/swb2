@@ -245,7 +245,7 @@ contains
     allocate( this%soil_storage_max(iCount), stat=iStat(21))
     allocate( this%stream_storage(iCount), stat=iStat(22) )
 
-    allocate( OUTPUT(2), stat=iStat(23) )
+    allocate( OUTPUT(4), stat=iStat(23) )
 
     if ( any( iStat /= 0 ) )  call die("Problem allocating memory", __FILE__, __LINE__)
 
@@ -270,6 +270,14 @@ contains
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end )
 
     call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(2)%ncfile, sVariableName="interception", &
+      sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end )
+
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(3)%ncfile, sVariableName="runoff", &
+      sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end )
+
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(4)%ncfile, sVariableName="infiltration", &
       sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end )
 
@@ -482,6 +490,23 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
+    this%array_output = unpack(this%runoff, this%active, this%dont_care)
+
+    call netcdf_put_variable_array(NCFILE=OUTPUT(3)%ncfile, &
+                   iVarID=OUTPUT(3)%ncfile%iVarID(NC_Z), &
+                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
+                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
+                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
+                   rValues=this%array_output )
+
+    this%array_output = unpack(this%infiltration, this%active, this%dont_care)
+
+    call netcdf_put_variable_array(NCFILE=OUTPUT(4)%ncfile, &
+                   iVarID=OUTPUT(4)%ncfile%iVarID(NC_Z), &
+                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
+                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
+                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
+                   rValues=this%array_output )
 
   end subroutine write_variables_to_netcdf
 

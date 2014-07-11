@@ -229,11 +229,11 @@ contains
           
             call read_annual_normalization( sArgText )  
 
-          case ( "PRECIPITATION_SCALE" )
+          case ( "PRECIPITATION_SCALE_FACTOR" )
 
             call PRCP%set_scale(asFloat(sOptionText))
 
-          case ( "PRECIPITATION_OFFSET" )
+          case ( "PRECIPITATION_ADD_OFFSET" )
   
             call PRCP%set_offset(asFloat(sOptionText))
 
@@ -398,11 +398,11 @@ contains
 
               end select  
 
-          case ( "TMAX_SCALE" )
+          case ( "TMAX_SCALE_FACTOR" )
 
             call TMAX%set_scale(asFloat(sOptionText))
 
-          case ( "TMAX_OFFSET" )
+          case ( "TMAX_ADD_OFFSET" )
   
             call TMAX%set_offset(asFloat(sOptionText))
 
@@ -562,11 +562,11 @@ contains
 
               end select  
 
-          case ( "TMIN_SCALE" )
+          case ( "TMIN_SCALE_FACTOR" )
 
             call TMIN%set_scale(asFloat(sOptionText))
 
-          case ( "TMIN_OFFSET" )
+          case ( "TMIN_ADD_OFFSET" )
   
             call TMIN%set_offset(asFloat(sOptionText))
 

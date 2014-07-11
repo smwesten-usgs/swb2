@@ -17,8 +17,6 @@ module data_catalog_entry
   use iso_c_binding
   implicit none
 
-  private
-
   integer (kind=c_int), public, parameter :: NETCDF_FILE_OPEN = 27
   integer (kind=c_int), public, parameter :: NETCDF_FILE_CLOSED = 42
 
@@ -173,26 +171,26 @@ module data_catalog_entry
 
   end type DATA_CATALOG_ENTRY_T
 
-  type (DATA_CATALOG_ENTRY_T), pointer :: PRCP => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: TMAX => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: TMIN => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: RELHUM => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: WINDSPD => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: PCT_POSS_SUN => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: SOLRAD => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: LULC => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: AWC => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: HSG => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: FLOWDIR => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: MASK => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: BASIN_MASK => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: REF_ET => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: FOG_ZONE_NUM => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: FOG_ELEV_ZONE_NUM => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: PRCP_GRID_NUM => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: PAN_EVAP_ZONE_NUM => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: RUNOFF_ZONE_NUM => null()  
-  type (DATA_CATALOG_ENTRY_T), pointer :: ROUTING_FRAC => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: PRCP => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: TMAX => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: TMIN => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: RELHUM => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: WINDSPD => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: PCT_POSS_SUN => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: SOLRAD => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: LULC => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: AWC => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: HSG => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: FLOWDIR => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: MASK => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: BASIN_MASK => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: REF_ET => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: FOG_ZONE_NUM => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: FOG_ELEV_ZONE_NUM => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: PRCP_GRID_NUM => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: PAN_EVAP_ZONE_NUM => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: RUNOFF_ZONE_NUM => null()  
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: ROUTING_FRAC => null()
 
   integer (kind=c_int), parameter, public :: MISSING_VALUES_ZERO_OUT = 0
   integer (kind=c_int), parameter, public :: MISSING_VALUES_REPLACE_WITH_MEAN = 1
@@ -503,17 +501,21 @@ end subroutine initialize_netcdf_data_object_sub
 
     endif
 
-!     if (present(rValues)) then
+     if (this%iTargetDataType == DATATYPE_REAL) then
 
-!        rValues = ( pGrdBase%rData * this%rScaleFactor + this%rAddOffset ) * this%rConversionFactor
+       call apply_scale_and_offset(fResult=this%pGrdBase%rData, fValue=this%pGrdBase%rData,          &
+              dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
 
-!     endif
+     elseif ( this%iTargetDataType == DATATYPE_INT ) then
 
-!     if (present(iValues)) then
+       call apply_scale_and_offset(iResult=this%pGrdBase%iData, iValue=this%pGrdBase%iData,          &
+              dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
 
-!         iValues = ( pGrdBase%iData * int(this%rScaleFactor, kind=c_int)  &
-!                                   + int(this%rAddOffset,kind=c_int) ) * this%rConversionFactor
-!     endif
+     else
+
+        call die("Unsupported data type specified", __FILE__, __LINE__)
+
+     endif
 
   end subroutine getvalues_sub
 
@@ -556,15 +558,13 @@ subroutine getvalues_constant_sub( this  )
 
       this%lGridHasChanged = lTRUE
 
-      call apply_scale_and_offset(fResult=this%pGrdBase%rData, fValue=this%rConstantValue,          &
-                 dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
+      this%pGrdNative%rData = this%rConstantValue
        
     case ( DATATYPE_INT)
 
       this%lGridHasChanged = lTRUE
 
-      call apply_scale_and_offset(iResult=this%pGrdBase%iData, iValue=this%iConstantValue,          &
-                 dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
+      this%pGrdBase%iData = this%iConstantValue
 
     case default
 
@@ -743,16 +743,10 @@ subroutine transform_grid_to_grid(this)
       call grid_gridToGrid_sgl(pGrdFrom=this%pGrdNative,&
                           pGrdTo=this%pGrdBase )
 
-      call apply_scale_and_offset(fResult=this%pGrdBase%rData, fValue=this%pGrdBase%rData,          &
-              dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
-
     case ( GRID_DATATYPE_INT )
 
       call grid_gridToGrid_int(pGrdFrom=this%pGrdNative, &
                         pGrdTo=this%pGrdBase )
-
-      call apply_scale_and_offset(iResult=this%pGrdBase%iData, iValue=this%pGrdBase%iData,          &
-              dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
 
     case default
 
@@ -1038,11 +1032,16 @@ end subroutine set_constant_value_real
     integer (kind=c_int) :: iTimeIndex
     integer (kind=c_int) :: iStat
     logical (kind=c_bool) :: lDateTimeFound
+    real (kind=c_double) :: dAddOffset
+    real (kind=c_double) :: dScaleFactor
 
     if ( .not. associated(this%pGrdBase) ) &
       call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
 
     this%lPadValues = lFALSE
+
+    dAddOffset = this%NCFILE%rAddOffset(NC_Z)
+    dScaleFactor = this%NCFILE%rScaleFactor(NC_Z)
 
     ! call once at start of run...
     if ( this%iFileCountYear < 0 ) call this%set_filecount(-1, iYear)
@@ -1212,6 +1211,9 @@ end subroutine set_constant_value_real
         endif
 
         call netcdf_get_variable_slice(NCFILE=this%NCFILE, rValues=this%pGrdNative%rData)
+
+        this%pGrdNative%rData = this%pGrdNative%rData * dScaleFactor + dAddOffset
+
         call this%handle_missing_values(this%pGrdNative%rData)
         call this%enforce_limits(this%pGrdNative%rData)
         exit

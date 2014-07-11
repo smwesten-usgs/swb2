@@ -242,11 +242,6 @@ module netcdf4_support
   public :: netcdf_put_variable_array
   public :: netcdf_put_variable_vector
 
-  interface apply_scale_and_offset
-    module procedure :: apply_scale_and_offset_float
-    module procedure :: apply_scale_and_offset_int
-  end interface apply_scale_and_offset
-
 contains
 
 !----------------------------------------------------------------------
@@ -1674,8 +1669,7 @@ subroutine nf_get_variable_slice_short(NCFILE, rValues)
         do iCol=iFromCol, iToCol, iByCol
           do iRow=iFromRow, iToRow, iByRow
             iIndex = iIndex + 1
-            call apply_scale_and_offset(fResult=rValues(iCol,iRow), fValue=real(iTemp(iIndex), kind=c_float), &
-                dUserScaleFactor=NCFILE%rScaleFactor, dUserAddOffset=NCFILE%rAddOffset )
+            rValues(iCol,iRow) = real(iTemp(iIndex), kind=c_float)
           enddo
         enddo
 
@@ -1692,8 +1686,7 @@ subroutine nf_get_variable_slice_short(NCFILE, rValues)
         do iRow=iFromRow, iToRow, iByRow
           do iCol=iFromCol, iToCol, iByCol
             iIndex = iIndex + 1
-            call apply_scale_and_offset(fResult=rValues(iCol,iRow), fValue=real(iTemp(iIndex), kind=c_float), &
-                dUserScaleFactor=NCFILE%rScaleFactor, dUserAddOffset=NCFILE%rAddOffset )
+            rValues(iCol,iRow) = real(iTemp(iIndex), kind=c_float)
           enddo
         enddo
 
@@ -1742,7 +1735,7 @@ subroutine nf_get_variable_slice_float(NCFILE, rValues)
       do iCol=iFromCol, iToCol, iByCol
         do iRow=iFromRow, iToRow, iByRow
           iIndex = iIndex + 1
-          rValues(iCol,iRow) = rTemp(iIndex) * NCFILE%rScaleFactor + NCFILE%rAddOffset
+          rValues(iCol,iRow) = rTemp(iIndex)
         enddo
       enddo
 
@@ -1759,7 +1752,7 @@ subroutine nf_get_variable_slice_float(NCFILE, rValues)
       do iRow=iFromRow, iToRow, iByRow
         do iCol=iFromCol, iToCol, iByCol
           iIndex = iIndex + 1
-          rValues(iCol,iRow) = rTemp(iIndex) * NCFILE%rScaleFactor + NCFILE%rAddOffset
+          rValues(iCol,iRow) = rTemp(iIndex)
         enddo
       enddo
 
@@ -1799,8 +1792,6 @@ subroutine nf_get_variable_vector_short(NCFILE, iNC_VarID, iNC_Start, iNC_Count,
        stridep=[iNC_Stride], &
        vars=iNC_Vars), __FILE__, __LINE__ )
 
-  iNC_Vars =  iNC_Vars * NCFILE%rScaleFactor + NCFILE%rAddOffset
-
 end subroutine nf_get_variable_vector_short
 
 !----------------------------------------------------------------------
@@ -1834,8 +1825,6 @@ subroutine nf_get_variable_array_short(NCFILE, iNC_VarID, iNC_Start, iNC_Count, 
        countp=[iNC_Count], &
        stridep=[iNC_Stride], &
        vars=iNC_Vars), __FILE__, __LINE__ )
-
-  iNC_Vars =  iNC_Vars * NCFILE%rScaleFactor + NCFILE%rAddOffset
 
 end subroutine nf_get_variable_array_short
 
@@ -1879,8 +1868,6 @@ subroutine nf_get_variable_array_as_vector_short(NCFILE, iNC_VarID, iNC_Start, i
        stridep=[iNC_Stride], &
        vars=iNC_Vars), __FILE__, __LINE__ )
 
-  iNC_Vars =  iNC_Vars * NCFILE%rScaleFactor + NCFILE%rAddOffset
-
 end subroutine nf_get_variable_array_as_vector_short
 
 !----------------------------------------------------------------------
@@ -1915,8 +1902,6 @@ subroutine nf_get_variable_vector_int(NCFILE, iNC_VarID, iNC_Start, iNC_Count, &
        stridep=[iNC_Stride], &
        vars=iNC_Vars), __FILE__, __LINE__ )
 
-  iNC_Vars =  iNC_Vars * NCFILE%rScaleFactor + NCFILE%rAddOffset
-
 end subroutine nf_get_variable_vector_int
 
 !----------------------------------------------------------------------
@@ -1937,8 +1922,6 @@ subroutine nf_get_variable_vector_double(NCFILE, iNC_VarID, iNC_Start, iNC_Count
        countp=[iNC_Count], &
        stridep=[iNC_Stride], &
        vars=dpNC_Vars), __FILE__, __LINE__ )
-
-  dpNC_Vars =  dpNC_Vars * NCFILE%rScaleFactor + NCFILE%rAddOffset
 
 end subroutine nf_get_variable_vector_double
 
@@ -1961,8 +1944,6 @@ subroutine nf_get_variable_array_double(NCFILE, iNC_VarID, iNC_Start, iNC_Count,
        stridep=[iNC_Stride], &
        vars=dpNC_Vars), __FILE__, __LINE__ )
 
-  dpNC_Vars =  dpNC_Vars * NCFILE%rScaleFactor + NCFILE%rAddOffset
-
 end subroutine nf_get_variable_array_double
 
 !----------------------------------------------------------------------
@@ -1983,8 +1964,6 @@ subroutine nf_get_variable_array_as_vector_double(NCFILE, iNC_VarID, iNC_Start, 
        countp=[iNC_Count], &
        stridep=[iNC_Stride], &
        vars=dpNC_Vars), __FILE__, __LINE__ )
-
-  dpNC_Vars =  dpNC_Vars * NCFILE%rScaleFactor + NCFILE%rAddOffset
 
 end subroutine nf_get_variable_array_as_vector_double
 
@@ -2007,8 +1986,6 @@ subroutine nf_get_variable_vector_float(NCFILE, iNC_VarID, iNC_Start, iNC_Count,
        stridep=[iNC_Stride], &
        vars=rNC_Vars), __FILE__, __LINE__ )
 
-  rNC_Vars =  rNC_Vars * NCFILE%rScaleFactor + NCFILE%rAddOffset
-
 end subroutine nf_get_variable_vector_float
 
 !----------------------------------------------------------------------
@@ -2030,9 +2007,6 @@ subroutine nf_get_variable_array_float(NCFILE, iNC_VarID, iNC_Start, iNC_Count, 
        stridep=[iNC_Stride], &
        vars=rNC_Vars), __FILE__, __LINE__ )
 
-  call apply_scale_and_offset(fResult=rNC_Vars, fValue=rNC_Vars, &
-                dUserScaleFactor=NCFILE%rScaleFactor, dUserAddOffset=NCFILE%rAddOffset )
-
 end subroutine nf_get_variable_array_float
 
 !----------------------------------------------------------------------
@@ -2053,8 +2027,6 @@ subroutine nf_get_variable_array_as_vector_float(NCFILE, iNC_VarID, iNC_Start, i
        countp=[iNC_Count], &
        stridep=[iNC_Stride], &
        vars=rNC_Vars), __FILE__, __LINE__ )
-
-  rNC_Vars =  rNC_Vars * NCFILE%rScaleFactor + NCFILE%rAddOffset
 
 end subroutine nf_get_variable_array_as_vector_float
 
@@ -3318,30 +3290,6 @@ subroutine netcdf_put_variable_vector(NCFILE, iVarID, iStart, iCount, iStride, &
   endif
 
 end subroutine netcdf_put_variable_vector
-
-
-elemental subroutine apply_scale_and_offset_float(fResult, fValue, dUserScaleFactor, dUserAddOffset )
-
-  real (kind=c_float), intent(out)  :: fResult
-  real (kind=c_float), intent(in)   :: fValue
-  real (kind=c_double), intent(in)   :: dUserScaleFactor
-  real (kind=c_double), intent(in)   :: dUserAddOffset
-
-  fResult = ( fValue * dUserScaleFactor ) + dUserAddOffset
-
-end subroutine apply_scale_and_offset_float
-
-
-elemental subroutine apply_scale_and_offset_int(iResult, iValue, dUserScaleFactor, dUserAddOffset )
-
-  integer (kind=c_int), intent(out) :: iResult
-  integer (kind=c_int), intent(in)  :: iValue
-  real (kind=c_double), intent(in)   :: dUserScaleFactor
-  real (kind=c_double), intent(in)   :: dUserAddOffset
-
-  iResult = ( real( iValue, kind=c_float) * dUserScaleFactor ) + dUserAddOffset
-
-end subroutine apply_scale_and_offset_int
 
 
 end module netcdf4_support
