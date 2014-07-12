@@ -22,7 +22,7 @@ export INSTALL_PREFIX=/usr/local/bin
 
 # define other variables for use in the CMakeList.txt file
 # options are "Release" or "Debug"
-export BUILD_TYPE="Debug"
+export BUILD_TYPE="Release"
 # options are "x86" (32-bit) or "x64" (64-bit)
 export OS="mac_osx"
 
