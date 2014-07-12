@@ -6,6 +6,7 @@ module model_domain
   use exceptions
   use infiltration__curve_number
   use simulation_datetime
+  use snowfall__original
   use parameters
   implicit none
 
@@ -46,7 +47,7 @@ module model_domain
     real (kind=c_float), allocatable       :: snowfall(:)
     real (kind=c_float), allocatable       :: snowmelt(:)
     real (kind=c_float), allocatable       :: interception(:)
-    real (kind=c_float), allocatable       :: net_rainfall(:)
+    real (kind=c_float), allocatable       :: rainfall(:)
     real (kind=c_float), allocatable       :: GDD_28(:)
      
     real (kind=c_float), allocatable       :: interception_storage(:)
@@ -64,7 +65,7 @@ module model_domain
     procedure ( infiltration_method ), pointer         :: calc_infiltration      => null()
     procedure ( et_method ), pointer                   :: calc_reference_et      => null()
     procedure ( sm_method ), pointer                   :: calc_soil_moisture     => null()
-    procedure ( snowfall_method ), pointer             :: calc_snowfall          => null()
+    procedure ( snowfall_method ), pointer             :: calc_snowfall          => model_calculate_snowfall_original
     procedure ( precipitation_data_method ), pointer   :: get_precipitation_data => model_get_precip_normal
 
   contains
@@ -90,8 +91,8 @@ module model_domain
     procedure :: set_snowfall_method_sub
     generic   :: set_snowfall_method => set_snowfall_method_sub
 
-    procedure :: set_snowmelt_method_sub
-    generic   :: set_snowmelt_method => set_snowmelt_method_sub
+!    procedure :: set_snowmelt_method_sub
+!    generic   :: set_snowmelt_method => set_snowmelt_method_sub
 
     procedure :: set_precipitation_data_method_sub
     generic   :: set_precipitation_data_method => set_precipitation_data_method_sub
@@ -163,12 +164,12 @@ module model_domain
     end subroutine snowfall_method
   end interface    
 
-  abstract interface
-    subroutine snowmelt_method( this )
-      import :: MODEL_DOMAIN_T
-      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
-    end subroutine snowmelt_method
-  end interface    
+!   abstract interface
+!     subroutine snowmelt_method( this )
+!       import :: MODEL_DOMAIN_T
+!       class ( MODEL_DOMAIN_T ), intent(inout)  :: this
+!     end subroutine snowmelt_method
+!   end interface    
 
   abstract interface
     subroutine precipitation_data_method( this )
@@ -195,7 +196,7 @@ contains
   ! All remaining state variables and ancillary variables are kept in 1-D vectors
   ! that are PACK-ed and UNPACK-ed as needed by i/o routines. This is cumbersome for fully
   ! active grids, but should amount to significant memory and processing savings when running
-  ! SWB for, say, and island domain.
+  ! SWB for, say, an island domain.
   !
 
   subroutine initialize_grid_sub(this, iNumCols, iNumRows, dX_ll, dY_ll, dGridCellSize )
@@ -258,7 +259,7 @@ contains
     allocate( this%infiltration(iCount), stat=iStat(13) )
     allocate( this%snowfall(iCount), stat=iStat(14) )
     allocate( this%snowmelt(iCount), stat=iStat(15) )
-    allocate( this%net_rainfall(iCount), stat=iStat(16) )
+    allocate( this%rainfall(iCount), stat=iStat(16) )
     allocate( this%GDD_28(iCount), stat=iStat(17) )
     allocate( this%interception_storage(iCount), stat=iStat(18) )
     allocate( this%snow_storage(iCount), stat=iStat(19) )
@@ -467,9 +468,11 @@ contains
       call this%get_precipitation_data()
 !      this%gross_precip = pack( PRCP%pGrdBase%rData, this%active )
 
-      this%Tmax = pack( TMAX%pGrdBase%rData, this%active )
+      this%tmax = pack( TMAX%pGrdBase%rData, this%active )
 
-      this%Tmin = pack( TMIN%pGrdBase%rData, this%active )
+      this%tmin = pack( TMIN%pGrdBase%rData, this%active )
+
+      call this%calc_snowfall()
 
     end associate
 
@@ -563,8 +566,8 @@ contains
     if (.not. associated( this%calc_snowfall) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
-    if (.not. associated( this%calc_snowmelt) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+!    if (.not. associated( this%calc_snowmelt) ) &
+!      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%get_precipitation_data ) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
@@ -612,7 +615,7 @@ contains
 
     if (.not. allocated(CFGI) ) call initialize_continuous_frozen_ground_index( count( this%active ) )
 
-    call update_continuous_frozen_ground_index( CFGI, this%Tmin, this%Tmax, this%snow_storage )
+    call update_continuous_frozen_ground_index( CFGI, this%tmin, this%tmax, this%snow_storage )
 
   end subroutine calculate_snow_mass_balance_sub
 
@@ -684,7 +687,7 @@ contains
 
     elseif ( ( sMethodName .strequal. "PRMS" ) .or. ( sMethodName .strequal. "PRMS_SNOWFALL" ) ) then
 
-      this%calc_infiltration => model_calculate_snowfall_prms
+      this%calc_snowfall => model_calculate_snowfall_prms
 
     endif
 
@@ -775,11 +778,9 @@ contains
 
   subroutine model_calculate_snowfall_original(this)
 
-    use snowfall__original
-
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    this%snowfall = calculate_snowfall_original( this%tmax, this%tmin, this%gross_precip )
+    call calculate_snowfall_original( this%snowfall, this%rainfall, this%tmin, this%tmax, this%gross_precip )
 
   end subroutine model_calculate_snowfall_original
 
@@ -787,11 +788,11 @@ contains
 
   subroutine model_calculate_snowfall_prms(this)
 
-    use snowfall__prms
+!    use snowfall__prms
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    this%snowfall = calculate_snowfall_prms( this%tmax, this%tmin, this%gross_precip )
+  !  this%snowfall = calculate_snowfall_prms( this%tmax, this%tmin, this%gross_precip )
 
   end subroutine model_calculate_snowfall_prms
 
@@ -799,11 +800,11 @@ contains
 
   subroutine model_calculate_snowmelt_original(this)
 
-    use snowmelt__original
+!    use snowmelt__original
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    this%snowmelt = calculate_snowmelt_original( this%tmax, this%tmin, this%gross_precip )
+  !  this%snowmelt = calculate_snowmelt_original( this%tmax, this%tmin, this%gross_precip )
 
   end subroutine model_calculate_snowmelt_original
 
@@ -811,11 +812,11 @@ contains
 
   subroutine model_calculate_snowmelt_prms(this)
 
-    use snowmelt__prms
+!    use snowmelt__prms
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    this%snowmelt = calculate_snowmelt_prms( this%tmax, this%tmin, this%gross_precip )
+  !  this%snowmelt = calculate_snowmelt_prms( this%tmax, this%tmin, this%gross_precip )
 
   end subroutine model_calculate_snowmelt_prms
 
@@ -876,8 +877,6 @@ contains
   subroutine model_get_precip_normal(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-      print *, __FILE__, ": ", __LINE__
-      print *, shape( this%active )
 
     this%gross_precip = pack( PRCP%pGrdBase%rData, this%active )
 
@@ -888,12 +887,8 @@ contains
   subroutine model_get_precip_method_of_fragments(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-          print *, __FILE__, ": ", __LINE__
-
 
     this%gross_precip = pack( PRCP%pGrdBase%rData, this%active )
-      print *, __FILE__, ": ", __LINE__
-
 
   end subroutine model_get_precip_method_of_fragments 
 

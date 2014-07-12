@@ -2,7 +2,9 @@ module precipitation__method_of_fragments
 
   use iso_c_binding
   use data_catalog_entry
+  use exceptions
   use file_operations
+  use strings
   implicit none
 
   private

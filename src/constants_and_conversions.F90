@@ -43,6 +43,7 @@ module constants_and_conversions
   real (kind=c_float), parameter     :: fTINYVAL = -(HUGE(0_c_float) - 1)
   integer(kind=c_int), parameter     :: iTINYVAL = -(HUGE(0_c_int) - 1)
   real (kind=c_float), parameter     :: rFREEZING = 32.0_c_float
+  real (kind=c_float), parameter     :: fFREEZING = 32.0_c_float
   real (kind=c_double), parameter    :: dFREEZING = 32.0_c_double
   integer (kind=c_int), parameter    :: iZERO = 0_c_int
   real (kind=c_float), parameter     :: fZERO = 0.0_c_float
