@@ -46,7 +46,7 @@ module model_domain
     real (kind=c_float), allocatable       :: snowfall(:)
     real (kind=c_float), allocatable       :: snowmelt(:)
     real (kind=c_float), allocatable       :: interception(:)
-    real (kind=c_float), allocatable       :: net_precip(:)
+    real (kind=c_float), allocatable       :: net_rainfall(:)
     real (kind=c_float), allocatable       :: GDD_28(:)
      
     real (kind=c_float), allocatable       :: interception_storage(:)
@@ -60,11 +60,12 @@ module model_domain
     real (kind=c_float), allocatable       :: tmax(:)
     real (kind=c_float), allocatable       :: routing_fraction(:)
 
-    procedure ( interception_method ), pointer, private        :: calc_interception      => null()
-    procedure ( infiltration_method ), pointer, private        :: calc_infiltration      => null()
-    procedure ( et_method ), pointer, private                  :: calc_reference_et      => null()
-    procedure ( sm_method ), pointer, private                  :: calc_soil_moisture     => null()
-    procedure ( precipitation_data_method ), pointer, private  :: get_precipitation_data => model_get_precip_normal
+    procedure ( interception_method ), pointer         :: calc_interception      => null()
+    procedure ( infiltration_method ), pointer         :: calc_infiltration      => null()
+    procedure ( et_method ), pointer                   :: calc_reference_et      => null()
+    procedure ( sm_method ), pointer                   :: calc_soil_moisture     => null()
+    procedure ( snowfall_method ), pointer             :: calc_snowfall          => null()
+    procedure ( precipitation_data_method ), pointer   :: get_precipitation_data => model_get_precip_normal
 
   contains
 
@@ -85,6 +86,12 @@ module model_domain
 
     procedure :: set_soil_moisture_method_sub
     generic   :: set_soil_moisture_method => set_soil_moisture_method_sub 
+
+    procedure :: set_snowfall_method_sub
+    generic   :: set_snowfall_method => set_snowfall_method_sub
+
+    procedure :: set_snowmelt_method_sub
+    generic   :: set_snowmelt_method => set_snowmelt_method_sub
 
     procedure :: set_precipitation_data_method_sub
     generic   :: set_precipitation_data_method => set_precipitation_data_method_sub
@@ -147,6 +154,20 @@ module model_domain
       import :: MODEL_DOMAIN_T
       class ( MODEL_DOMAIN_T ), intent(inout)  :: this
     end subroutine sm_method
+  end interface    
+
+  abstract interface
+    subroutine snowfall_method( this )
+      import :: MODEL_DOMAIN_T
+      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
+    end subroutine snowfall_method
+  end interface    
+
+  abstract interface
+    subroutine snowmelt_method( this )
+      import :: MODEL_DOMAIN_T
+      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
+    end subroutine snowmelt_method
   end interface    
 
   abstract interface
@@ -237,7 +258,7 @@ contains
     allocate( this%infiltration(iCount), stat=iStat(13) )
     allocate( this%snowfall(iCount), stat=iStat(14) )
     allocate( this%snowmelt(iCount), stat=iStat(15) )
-    allocate( this%net_precip(iCount), stat=iStat(16) )
+    allocate( this%net_rainfall(iCount), stat=iStat(16) )
     allocate( this%GDD_28(iCount), stat=iStat(17) )
     allocate( this%interception_storage(iCount), stat=iStat(18) )
     allocate( this%snow_storage(iCount), stat=iStat(19) )
@@ -392,6 +413,8 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  !> @todo Move this into a separate module 
+
   subroutine iterate_over_simulation_days(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
@@ -537,6 +560,12 @@ contains
     if (.not. associated( this%calc_reference_et) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
+    if (.not. associated( this%calc_snowfall) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+
+    if (.not. associated( this%calc_snowmelt) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+
     if (.not. associated( this%get_precipitation_data ) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
@@ -598,17 +627,6 @@ contains
     call this%calc_infiltration()
     this%runoff = this%inflow - this%infiltration
 
-
-    print *, " Precip avg:       ", sum( this%gross_precip ) / ubound( this%gross_precip, 1 )
-
-    print *, " Interception avg: ", sum( this%interception ) / ubound( this%interception, 1 )
-
-    print *, " Inflow avg:       ", sum( this%inflow ) / ubound( this%inflow, 1 )
-
-    print *, " Infiltration avg: ", sum( this%infiltration ) / ubound( this%infiltration, 1 )
-
-    print *, " Runoff avg:       ", sum( this%runoff ) / ubound( this%runoff, 1 )
-
 !     if ( fP_minus_PE < 0.0_c_float ) then
 
 !       this%fAPWL = this%fAPWL + abs( fP_minus_PE )
@@ -652,6 +670,25 @@ contains
     endif
 
   end subroutine set_infiltration_method_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine set_snowfall_method_sub(this, sMethodName)
+
+    class (MODEL_DOMAIN_T), intent(inout)   :: this
+    character (len=*), intent(in)           :: sMethodName
+
+    if ( ( sMethodName .strequal. "ORIGINAL" ) .or. ( sMethodName .strequal. "ORIGINAL_SWB_METHOD" ) ) then
+
+      this%calc_snowfall => model_calculate_snowfall_original
+
+    elseif ( ( sMethodName .strequal. "PRMS" ) .or. ( sMethodName .strequal. "PRMS_SNOWFALL" ) ) then
+
+      this%calc_infiltration => model_calculate_snowfall_prms
+
+    endif
+
+  end subroutine set_snowfall_method_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -735,6 +772,55 @@ contains
   end subroutine model_calculate_interception_gash
 
 !--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_snowfall_original(this)
+
+    use snowfall__original
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    this%snowfall = calculate_snowfall_original( this%tmax, this%tmin, this%gross_precip )
+
+  end subroutine model_calculate_snowfall_original
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_snowfall_prms(this)
+
+    use snowfall__prms
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    this%snowfall = calculate_snowfall_prms( this%tmax, this%tmin, this%gross_precip )
+
+  end subroutine model_calculate_snowfall_prms
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_snowmelt_original(this)
+
+    use snowmelt__original
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    this%snowmelt = calculate_snowmelt_original( this%tmax, this%tmin, this%gross_precip )
+
+  end subroutine model_calculate_snowmelt_original
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_snowmelt_prms(this)
+
+    use snowmelt__prms
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    this%snowmelt = calculate_snowmelt_prms( this%tmax, this%tmin, this%gross_precip )
+
+  end subroutine model_calculate_snowmelt_prms
+
+
+  !--------------------------------------------------------------------------------------------------
 
   subroutine model_calculate_et_hargreaves(this)
 
