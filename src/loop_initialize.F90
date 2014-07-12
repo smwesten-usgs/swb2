@@ -9,7 +9,6 @@ module loop_initialize
   use dictionary
   use exceptions
   use file_operations
-  use interception_bucket
 !  use loop_iterate
   use model_domain
   use parameters
