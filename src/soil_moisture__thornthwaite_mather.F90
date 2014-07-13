@@ -63,7 +63,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function soil_moisture__thornthwaite_mather_update_APWL( fInfiltration, fReference_ET )   result( fAPWL )
+  elemental function soil_moisture__thornthwaite_mather_update_APWL( fInfiltration, fReference_ET )   result( fAPWL )
 
     real (kind=c_float), intent(in)  :: fInfiltration
     real (kind=c_float), intent(in)  :: fReference_ET
@@ -74,6 +74,7 @@ contains
 
     P_minus_PE = fInfiltration - fReference_ET
 
+    ! P - PE < 0: soil is losing moisture; ET exceeds infiltration/precip
     if ( P_minus_PE < 0.0_c_float ) then
 
     else
@@ -84,7 +85,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function soil_moisture__thornthwaite_mather_APWL(fSWC, fSoilStorage)  result(fAPWL)
+  elemental function soil_moisture__thornthwaite_mather_APWL(fSWC, fSoilStorage)  result(fAPWL)
 
     real (kind=c_float), intent(in) :: fSWC            ! max soil-water capacity (inches)
     real (kind=c_float), intent(in) :: fSoilStorage  ! curr soil storage (inches)
@@ -108,5 +109,10 @@ contains
   end function soil_moisture__thornthwaite_mather_APWL
 
 !--------------------------------------------------------------------------------------------------
+
+  elemental subroutine calculate_soil_moisture__thornthwaite_mather
+
+
+  end subroutine calculate_soil_moisture__thornthwaite_mather
 
 end module soil_moisture__thornthwaite_mather

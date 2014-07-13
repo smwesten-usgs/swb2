@@ -90,24 +90,40 @@ contains
 
    
     call initialize_grid_options()
+
     call initialize_start_and_end_dates()
+    
     call initialize_precipitation_options()
+    
     call initialize_tmax_options()
+    
     call initialize_tmin_options()
+    
     call initialize_flow_direction_options()
+    
     call initialize_water_capacity_options()
+    
     call initialize_parameter_tables()
+    
     call initialize_soils_group_options()
+    
     call initialize_landuse_options()
+    
     call initialize_interception_method()
+    
     call initialize_evapotranspiration_method()
+    
     call initialize_infiltration_method()
+    
     call MODEL%set_inactive_cells()
 
     call MODEL%initialize_arrays()
+    
     call initialize_soils_landuse_awc_flowdir_values()
 
-    call MODEL%preflight_check_function_pointers()
+    call MODEL%preflight_check_method_pointers()
+
+    call MODEL%initialize_methods()
 
     call MODEL%initialize_netcdf_output()
 
@@ -228,11 +244,11 @@ contains
           
             call read_annual_normalization( sArgText )  
 
-          case ( "PRECIPITATION_SCALE_FACTOR" )
+          case ( "PRECIPITATION_SCALE_FACTOR", "PRECIPITATION_SCALE" )
 
             call PRCP%set_scale(asFloat(sOptionText))
 
-          case ( "PRECIPITATION_ADD_OFFSET" )
+          case ( "PRECIPITATION_ADD_OFFSET", "PRECIPITATION_OFFSET" )
   
             call PRCP%set_offset(asFloat(sOptionText))
 
@@ -397,11 +413,11 @@ contains
 
               end select  
 
-          case ( "TMAX_SCALE_FACTOR" )
+          case ( "TMAX_SCALE_FACTOR", "TMAX_SCALE" )
 
             call TMAX%set_scale(asFloat(sOptionText))
 
-          case ( "TMAX_ADD_OFFSET" )
+          case ( "TMAX_ADD_OFFSET", "TMAX_OFFSET" )
   
             call TMAX%set_offset(asFloat(sOptionText))
 
@@ -561,11 +577,11 @@ contains
 
               end select  
 
-          case ( "TMIN_SCALE_FACTOR" )
+          case ( "TMIN_SCALE_FACTOR", "TMIN_SCALE" )
 
             call TMIN%set_scale(asFloat(sOptionText))
 
-          case ( "TMIN_ADD_OFFSET" )
+          case ( "TMIN_ADD_OFFSET", "TMIN_OFFSET" )
   
             call TMIN%set_offset(asFloat(sOptionText))
 
@@ -1343,142 +1359,141 @@ contains
   end subroutine initialize_parameter_tables
 
 
-    subroutine initialize_interception_method()
+  subroutine initialize_interception_method()
 
-    use interception__bucket
+  use interception__bucket
 
-    ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions  
-    integer (kind=c_int)             :: iIndex
-    character (len=:), allocatable   :: sCmdText
-    character (len=:), allocatable   :: sOptionText
-    character (len=:), allocatable   :: sArgText
-    integer (kind=c_int)             :: iStat
+  ! [ LOCALS ]
+  type (STRING_LIST_T)             :: myDirectives
+  type (STRING_LIST_T)             :: myOptions  
+  integer (kind=c_int)             :: iIndex
+  character (len=:), allocatable   :: sCmdText
+  character (len=:), allocatable   :: sOptionText
+  character (len=:), allocatable   :: sArgText
+  integer (kind=c_int)             :: iStat
 
 
-    myDirectives = CF_DICT%grep_keys("INTERCEPTION")
-      
-    if ( myDirectives%count == 0 ) then
-
-      call warn("Your control file seems to be missing any of the required directives relating to INTERCEPTION method.", &
-        lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
-
-    else  
+  myDirectives = CF_DICT%grep_keys("INTERCEPTION")
     
-      call LOGS%set_loglevel( LOG_ALL )
-      call LOGS%set_echo( lFALSE )
+  if ( myDirectives%count == 0 ) then
 
-      do iIndex = 1, myDirectives%count
+    call warn("Your control file seems to be missing any of the required directives relating to INTERCEPTION method.", &
+      lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
-        ! myDirectives is a string list of all SWB directives that contain the phrase "LANDUSE"
-        ! sCmdText contains an individual directive
-        sCmdText = myDirectives%get(iIndex)
+  else  
+  
+    call LOGS%set_loglevel( LOG_ALL )
+    call LOGS%set_echo( lFALSE )
 
-        ! For this directive, obtain the associated dictionary entries
-        call CF_DICT%get_values(sCmdText, myOptions )
+    do iIndex = 1, myDirectives%count
 
-        ! dictionary entries are initially space-delimited; sArgText contains
-        ! all dictionary entries present, concatenated, with a space between entries
-        sArgText = myOptions%get(1, myOptions%count )
+      ! myDirectives is a string list of all SWB directives that contain the phrase "LANDUSE"
+      ! sCmdText contains an individual directive
+      sCmdText = myDirectives%get(iIndex)
 
-        ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(">> "//sCmdText//" "//sArgText)
+      ! For this directive, obtain the associated dictionary entries
+      call CF_DICT%get_values(sCmdText, myOptions )
 
-        ! most of the time, we only care about the first dictionary entry, obtained below
-        sOptionText = myOptions%get(1)
+      ! dictionary entries are initially space-delimited; sArgText contains
+      ! all dictionary entries present, concatenated, with a space between entries
+      sArgText = myOptions%get(1, myOptions%count )
 
-        select case ( sCmdText )
+      ! echo the original directive and dictionary entries to the logfile
+      call LOGS%write(">> "//sCmdText//" "//sArgText)
 
-          case ( "INTERCEPTION_METHOD" )
+      ! most of the time, we only care about the first dictionary entry, obtained below
+      sOptionText = myOptions%get(1)
 
-            sArgText = myOptions%get(2)
+      select case ( sCmdText )
 
-            select case (sOptionText)
+        case ( "INTERCEPTION_METHOD" )
 
-              case ( "BUCKET" )
+          sArgText = myOptions%get(2)
 
-                call MODEL%set_interception("BUCKET")
-                call initialize_interception_bucket()
+          select case (sOptionText)
 
-            end select
-            
-          case default
+            case ( "BUCKET" )
+
+              call MODEL%set_interception("BUCKET")
+
+          end select
           
-            call warn("Unknown interception method was specified: "//dquote(sArgText), iLogLevel=LOG_ALL )
-
-        end select
+        case default
         
-      enddo
+          call warn("Unknown interception method was specified: "//dquote(sArgText), iLogLevel=LOG_ALL )
+
+      end select
       
-    endif
+    enddo
     
+  endif
+  
 
 
-  end subroutine initialize_interception_method
+end subroutine initialize_interception_method
 
 
 
 
 
-    subroutine initialize_evapotranspiration_method()
+subroutine initialize_evapotranspiration_method()
 
-    ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions  
-    integer (kind=c_int)             :: iIndex
-    character (len=:), allocatable   :: sCmdText
-    character (len=:), allocatable   :: sOptionText
-    character (len=:), allocatable   :: sArgText
-    integer (kind=c_int)             :: iStat
+  ! [ LOCALS ]
+  type (STRING_LIST_T)             :: myDirectives
+  type (STRING_LIST_T)             :: myOptions  
+  integer (kind=c_int)             :: iIndex
+  character (len=:), allocatable   :: sCmdText
+  character (len=:), allocatable   :: sOptionText
+  character (len=:), allocatable   :: sArgText
+  integer (kind=c_int)             :: iStat
 
 
-    myDirectives = CF_DICT%grep_keys("EVAPOTRANSPIRATION")
-      
-    if ( myDirectives%count == 0 ) then
-
-      call warn("Your control file seems to be missing any of the required directives relating to EVAPOTRANSPIRATION method.", &
-        lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
-
-    else  
+  myDirectives = CF_DICT%grep_keys("EVAPOTRANSPIRATION")
     
-      call LOGS%set_loglevel( LOG_ALL )
-      call LOGS%set_echo( lFALSE )
+  if ( myDirectives%count == 0 ) then
 
-      do iIndex = 1, myDirectives%count
+    call warn("Your control file seems to be missing any of the required directives relating to EVAPOTRANSPIRATION method.", &
+      lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
-        ! myDirectives is a string list of all SWB directives that contain the phrase "LANDUSE"
-        ! sCmdText contains an individual directive
-        sCmdText = myDirectives%get(iIndex)
+  else  
+  
+    call LOGS%set_loglevel( LOG_ALL )
+    call LOGS%set_echo( lFALSE )
 
-        ! For this directive, obtain the associated dictionary entries
-        call CF_DICT%get_values(sCmdText, myOptions )
+    do iIndex = 1, myDirectives%count
 
-        ! dictionary entries are initially space-delimited; sArgText contains
-        ! all dictionary entries present, concatenated, with a space between entries
-        sArgText = myOptions%get(1, myOptions%count )
+      ! myDirectives is a string list of all SWB directives that contain the phrase "LANDUSE"
+      ! sCmdText contains an individual directive
+      sCmdText = myDirectives%get(iIndex)
 
-        ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(">> "//sCmdText//" "//sArgText)
+      ! For this directive, obtain the associated dictionary entries
+      call CF_DICT%get_values(sCmdText, myOptions )
 
-        ! most of the time, we only care about the first dictionary entry, obtained below
-        sOptionText = myOptions%get(1)
+      ! dictionary entries are initially space-delimited; sArgText contains
+      ! all dictionary entries present, concatenated, with a space between entries
+      sArgText = myOptions%get(1, myOptions%count )
 
-        select case ( sCmdText )
+      ! echo the original directive and dictionary entries to the logfile
+      call LOGS%write(">> "//sCmdText//" "//sArgText)
 
-          case ( "EVAPOTRANSPIRATION_METHOD", "ET_METHOD" )
+      ! most of the time, we only care about the first dictionary entry, obtained below
+      sOptionText = myOptions%get(1)
 
-            sArgText = myOptions%get(2)
+      select case ( sCmdText )
 
-            select case (sOptionText)
+        case ( "EVAPOTRANSPIRATION_METHOD", "ET_METHOD" )
 
-              case ( "HARGREAVES", "HARGREAVES-SAMANI" )
+          sArgText = myOptions%get(2)
 
-                call MODEL%set_evapotranspiration("HARGREAVES")
+          select case (sOptionText)
 
-              case ( "J-H", "JENSEN-HAISE" )
+            case ( "HARGREAVES", "HARGREAVES-SAMANI" )
 
-                call MODEL%set_evapotranspiration("JENSEN-HAISE")
+              call MODEL%set_evapotranspiration("HARGREAVES")
+
+            case ( "J-H", "JENSEN-HAISE" )
+
+              call MODEL%set_evapotranspiration("JENSEN-HAISE")
 
             end select
             
@@ -1503,8 +1518,6 @@ contains
 
 
   subroutine initialize_infiltration_method()
-
-    use infiltration__curve_number
 
     ! [ LOCALS ]
     type (STRING_LIST_T)             :: myDirectives
@@ -1558,7 +1571,6 @@ contains
               case ( "C-N", "CURVE_NUMBER" )
 
                 call MODEL%set_infiltration_method("CURVE_NUMBER")
-                call initialize_infiltration__curve_number()
 
               case ( "G-A", "GREEN_AMPT", "GREEN-AMPT" )
 

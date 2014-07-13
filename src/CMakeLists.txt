@@ -32,6 +32,7 @@ if(TARGET__SWB_EXECUTABLE)
             soil_moisture__thornthwaite_mather.F90
             simulation_datetime.F90
             snowfall__original.F90
+            snowmelt__original.F90
             solar_calculations.F90
             strings.F90
             string_list.F90
@@ -242,6 +243,7 @@ if(TARGET__SWB_LIBRARY)
             soil_moisture__thornthwaite_mather.F90
             simulation_datetime.F90
             snowfall__original.F90
+            snowmelt__original.F90
             solar_calculations.F90
             strings.F90
             string_list.F90

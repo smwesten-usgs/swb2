@@ -4,7 +4,6 @@ module model_domain
   use continuous_frozen_ground_index
   use data_catalog_entry
   use exceptions
-  use infiltration__curve_number
   use simulation_datetime
   use snowfall__original
   use parameters
@@ -61,11 +60,19 @@ module model_domain
     real (kind=c_float), allocatable       :: tmax(:)
     real (kind=c_float), allocatable       :: routing_fraction(:)
 
-    procedure ( interception_method ), pointer         :: calc_interception      => null()
-    procedure ( infiltration_method ), pointer         :: calc_infiltration      => null()
-    procedure ( et_method ), pointer                   :: calc_reference_et      => null()
-    procedure ( sm_method ), pointer                   :: calc_soil_moisture     => null()
+    procedure ( interception_method ), pointer         :: init_interception      => model_initialize_interception_bucket
+    procedure ( infiltration_method ), pointer         :: init_infiltration      => model_initialize_infiltration_curve_number
+    procedure ( et_method ), pointer                   :: init_reference_et      => model_initialize_et_hargreaves
+    procedure ( sm_method ), pointer                   :: init_soil_moisture     => model_initialize_soil_moisture_thornthwaite_mather
+    procedure ( snowfall_method ), pointer             :: init_snowfall          => model_initialize_snowfall_original
+    procedure ( snowfall_method ), pointer             :: init_snowmelt          => model_initialize_snowmelt_original
+
+    procedure ( interception_method ), pointer         :: calc_interception      => model_calculate_interception_bucket
+    procedure ( infiltration_method ), pointer         :: calc_infiltration      => model_calculate_infiltration_curve_number
+    procedure ( et_method ), pointer                   :: calc_reference_et      => model_calculate_et_hargreaves
+    procedure ( sm_method ), pointer                   :: calc_soil_moisture     => model_calculate_soil_moisture_thornthwaite_mather
     procedure ( snowfall_method ), pointer             :: calc_snowfall          => model_calculate_snowfall_original
+    procedure ( snowmelt_method ), pointer             :: calc_snowmelt          => model_calculate_snowmelt_original    
     procedure ( precipitation_data_method ), pointer   :: get_precipitation_data => model_get_precip_normal
 
   contains
@@ -100,7 +107,7 @@ module model_domain
     procedure :: set_inactive_cells_sub
     generic   :: set_inactive_cells => set_inactive_cells_sub
 
-    procedure :: preflight_check_function_pointers
+    procedure :: preflight_check_method_pointers
 
     procedure :: iterate_over_simulation_days
     
@@ -113,6 +120,9 @@ module model_domain
 
     procedure :: get_climate_data
     procedure :: write_variables_to_netcdf
+
+    procedure :: initialize_methods_sub
+    generic   :: initialize_methods => initialize_methods_sub
 
     procedure :: initialize_netcdf_output_sub
     generic   :: initialize_netcdf_output => initialize_netcdf_output_sub
@@ -128,6 +138,52 @@ module model_domain
 
 
   end type MODEL_DOMAIN_T
+
+
+
+  abstract interface
+    subroutine init_interception_method( this ) 
+      import :: MODEL_DOMAIN_T
+      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
+    end subroutine init_interception_method
+  end interface
+
+  abstract interface
+    subroutine init_infiltration_method( this )
+      import :: MODEL_DOMAIN_T
+      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
+    end subroutine init_infiltration_method
+  end interface
+
+  abstract interface
+    subroutine init_et_method( this )
+      import :: MODEL_DOMAIN_T
+      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
+    end subroutine init_et_method
+  end interface    
+
+  abstract interface
+    subroutine init_sm_method( this )
+      import :: MODEL_DOMAIN_T
+      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
+    end subroutine init_sm_method
+  end interface    
+
+  abstract interface
+    subroutine init_snowfall_method( this )
+      import :: MODEL_DOMAIN_T
+      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
+    end subroutine init_snowfall_method
+  end interface    
+
+  abstract interface
+    subroutine init_snowmelt_method( this )
+      import :: MODEL_DOMAIN_T
+      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
+    end subroutine init_snowmelt_method
+  end interface    
+
+
 
   abstract interface
     subroutine interception_method( this ) 
@@ -164,12 +220,12 @@ module model_domain
     end subroutine snowfall_method
   end interface    
 
-!   abstract interface
-!     subroutine snowmelt_method( this )
-!       import :: MODEL_DOMAIN_T
-!       class ( MODEL_DOMAIN_T ), intent(inout)  :: this
-!     end subroutine snowmelt_method
-!   end interface    
+  abstract interface
+    subroutine snowmelt_method( this )
+      import :: MODEL_DOMAIN_T
+      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
+    end subroutine snowmelt_method
+  end interface    
 
   abstract interface
     subroutine precipitation_data_method( this )
@@ -267,13 +323,26 @@ contains
     allocate( this%soil_storage_max(iCount), stat=iStat(21))
     allocate( this%stream_storage(iCount), stat=iStat(22) )
 
-    allocate( OUTPUT(6), stat=iStat(23) )
+    allocate( OUTPUT(7), stat=iStat(23) )
 
     if ( any( iStat /= 0 ) )  call die("Problem allocating memory", __FILE__, __LINE__)
 
-    this%calc_snowfall => model_calculate_snowfall_original
-
   end subroutine initialize_arrays_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine initialize_methods_sub(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)   :: this
+
+    call this%init_interception
+    call this%init_snowfall
+    call this%init_snowmelt
+    call this%init_infiltration
+    call this%init_soil_moisture
+    call this%init_reference_et
+    
+  end subroutine initialize_methods_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -309,7 +378,11 @@ contains
       sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(6)%ncfile, sVariableName="snow_storage", &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(6)%ncfile, sVariableName="snowmelt", &
+      sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end )
+
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(7)%ncfile, sVariableName="snow_storage", &
       sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end )
 
@@ -484,8 +557,6 @@ contains
 
       call this%calc_snowfall()
 
-      this%snow_storage = this%snow_storage + this%snowfall
-
     end associate
 
   end subroutine get_climate_data
@@ -555,10 +626,19 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
-    this%array_output = unpack(this%snow_storage, this%active, this%dont_care)
+    this%array_output = unpack(this%snowmelt, this%active, this%dont_care)
 
     call netcdf_put_variable_array(NCFILE=OUTPUT(6)%ncfile, &
                    iVarID=OUTPUT(6)%ncfile%iVarID(NC_Z), &
+                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
+                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
+                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
+                   rValues=this%array_output )
+
+    this%array_output = unpack(this%snow_storage, this%active, this%dont_care)
+
+    call netcdf_put_variable_array(NCFILE=OUTPUT(7)%ncfile, &
+                   iVarID=OUTPUT(7)%ncfile%iVarID(NC_Z), &
                    iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
                    iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
@@ -580,9 +660,25 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine preflight_check_function_pointers(this)
+  subroutine preflight_check_method_pointers(this)
 
     class (MODEL_DOMAIN_T), intent(inout)   :: this
+
+    if (.not. associated( this%init_interception) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+
+    if (.not. associated( this%init_infiltration) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+
+    if (.not. associated( this%init_reference_et) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+
+    if (.not. associated( this%init_snowfall) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+
+    if (.not. associated( this%init_snowmelt) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+
 
     if (.not. associated( this%calc_interception) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
@@ -596,13 +692,13 @@ contains
     if (.not. associated( this%calc_snowfall) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
-!    if (.not. associated( this%calc_snowmelt) ) &
-!      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+    if (.not. associated( this%calc_snowmelt) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%get_precipitation_data ) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
-  end subroutine preflight_check_function_pointers
+  end subroutine preflight_check_method_pointers
 
 !--------------------------------------------------------------------------------------------------
 
@@ -647,6 +743,11 @@ contains
 
     call update_continuous_frozen_ground_index( CFGI, this%tmin, this%tmax, this%snow_storage )
 
+    call this%calc_snowmelt
+
+    this%snow_storage = this%snow_storage + this%snowfall
+    this%snow_storage = this%snow_storage - this%snowmelt
+
   end subroutine calculate_snow_mass_balance_sub
 
 !--------------------------------------------------------------------------------------------------
@@ -667,6 +768,8 @@ contains
   end subroutine calculate_soil_mass_balance_sub
 
 !--------------------------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
+
 
   subroutine set_interception_method_sub(this, sMethodName)
 
@@ -675,10 +778,12 @@ contains
 
     if ( sMethodName .strequal. "BUCKET" ) then
 
+      this%init_interception => model_initialize_interception_bucket
       this%calc_interception => model_calculate_interception_bucket
 
     elseif ( sMethodName .strequal. "GASH" ) then
 
+      this%init_interception => model_initialize_interception_gash
       this%calc_interception => model_calculate_interception_gash
 
     endif
@@ -694,6 +799,7 @@ contains
 
     if ( ( sMethodName .strequal. "C-N" ) .or. ( sMethodName .strequal. "CURVE_NUMBER" ) ) then
 
+      this%init_infiltration => model_initialize_infiltration_curve_number
       this%calc_infiltration => model_calculate_infiltration_curve_number
 
 !     elseif ( ( sMethodName .strequal. "G-A" ) .or. ( sMethodName .strequal. "GREEN_AMPT" ) ) then
@@ -713,10 +819,12 @@ contains
 
     if ( ( sMethodName .strequal. "ORIGINAL" ) .or. ( sMethodName .strequal. "ORIGINAL_SWB_METHOD" ) ) then
 
+      this%init_snowfall => model_initialize_snowfall_original
       this%calc_snowfall => model_calculate_snowfall_original
 
     elseif ( ( sMethodName .strequal. "PRMS" ) .or. ( sMethodName .strequal. "PRMS_SNOWFALL" ) ) then
 
+      this%init_snowfall => model_initialize_snowfall_prms
       this%calc_snowfall => model_calculate_snowfall_prms
 
     endif
@@ -732,6 +840,7 @@ contains
 
     if ( ( sMethodName .strequal. "T-M" ) .or. ( sMethodName .strequal. "THORNTHWAITE_MATHER" ) ) then
 
+      this%init_soil_moisture => model_initialize_soil_moisture_thornthwaite_mather
       this%calc_soil_moisture => model_calculate_soil_moisture_thornthwaite_mather
 
 !     elseif ( ( sMethodName .strequal. "G-A" ) .or. ( sMethodName .strequal. "GREEN_AMPT" ) ) then
@@ -752,11 +861,13 @@ contains
     if ( ( sMethodName .strequal. "HARGREAVES" ) &
          .or. ( sMethodName .strequal. "HARGREAVES-SAMANI" ) ) then
 
+      this%init_reference_et => model_initialize_et_hargreaves
       this%calc_reference_et => model_calculate_et_hargreaves
 
     elseif ( ( sMethodName .strequal. "JENSEN-HAISE" ) &
          .or. ( sMethodName .strequal. "JH" ) ) then
 
+      this%init_reference_et => model_initialize_et_jensen_haise
       this%calc_reference_et => model_calculate_et_jensen_haise
 
     endif
@@ -786,6 +897,18 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  subroutine model_initialize_interception_bucket(this)
+
+    use interception__bucket
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call initialize_interception_bucket( )
+
+  end subroutine model_initialize_interception_bucket
+
+!--------------------------------------------------------------------------------------------------
+
   subroutine model_calculate_interception_bucket(this)
 
     use interception__bucket
@@ -798,11 +921,27 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  subroutine model_initialize_interception_gash(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_initialize_interception_gash
+
+!--------------------------------------------------------------------------------------------------
+
   subroutine model_calculate_interception_gash(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
   end subroutine model_calculate_interception_gash
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_snowfall_original(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_initialize_snowfall_original
 
 !--------------------------------------------------------------------------------------------------
 
@@ -813,6 +952,16 @@ contains
     call calculate_snowfall_original( this%snowfall, this%rainfall, this%tmin, this%tmax, this%gross_precip )
 
   end subroutine model_calculate_snowfall_original
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_snowfall_prms(this)
+
+!    use snowfall__prms
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_initialize_snowfall_prms
 
 !--------------------------------------------------------------------------------------------------
 
@@ -828,15 +977,36 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_snowmelt_original(this)
+  subroutine model_initialize_snowmelt_original(this)
 
 !    use snowmelt__original
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-  !  this%snowmelt = calculate_snowmelt_original( this%tmax, this%tmin, this%gross_precip )
+  end subroutine model_initialize_snowmelt_original
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_snowmelt_original(this)
+
+    use snowmelt__original
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call calculate_snowmelt_original( fSnowmelt=this%snowmelt, fSnow_storage=this%snow_storage, &
+                                      fTMin=this%tmin, fTMax=this%tmax )
 
   end subroutine model_calculate_snowmelt_original
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_snowmelt_prms(this)
+
+!    use snowmelt__prms
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_initialize_snowmelt_prms
 
 !--------------------------------------------------------------------------------------------------
 
@@ -853,6 +1023,16 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
+  subroutine model_initialize_et_hargreaves(this)
+
+    use et__hargreaves_samani
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_initialize_et_hargreaves
+
+  !--------------------------------------------------------------------------------------------------
+
   subroutine model_calculate_et_hargreaves(this)
 
     use et__hargreaves_samani
@@ -863,6 +1043,16 @@ contains
          fLatitude=this%latitude, fTMin=this%Tmin, fTMax=this%Tmax )
 
   end subroutine model_calculate_et_hargreaves
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_et_jensen_haise(this)
+
+    use et__jensen_haise
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_initialize_et_jensen_haise 
 
 !--------------------------------------------------------------------------------------------------
 
@@ -879,11 +1069,23 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_infiltration_curve_number(this)
+  subroutine model_initialize_infiltration_curve_number(this)
 
+    use infiltration__curve_number
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
+    call initialize_infiltration__curve_number()
+
+  end subroutine model_initialize_infiltration_curve_number
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_infiltration_curve_number(this)
+
+    use infiltration__curve_number
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     this%infiltration = calculate_infiltration__curve_number( &
       iLanduseIndex=this%landuse_index, &
@@ -893,6 +1095,18 @@ contains
       fInflow=this%inflow, fCFGI=CFGI )
 
   end subroutine model_calculate_infiltration_curve_number
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_soil_moisture_thornthwaite_mather( this )
+
+    use soil_moisture__thornthwaite_mather
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call initialize_soil_moisture__thornthwaite_mather( iNumActiveCells=count(this%active) )
+
+  end subroutine model_initialize_soil_moisture_thornthwaite_mather
 
 !--------------------------------------------------------------------------------------------------
 
