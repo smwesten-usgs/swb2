@@ -101,14 +101,14 @@ contains
     
     call initialize_flow_direction_options()
     
-    call initialize_water_capacity_options()
-    
     call initialize_parameter_tables()
     
     call initialize_soils_group_options()
     
     call initialize_landuse_options()
-    
+
+    call initialize_available_water_capacity_options()
+
     call initialize_interception_method()
     
     call initialize_evapotranspiration_method()
@@ -849,113 +849,6 @@ contains
   end subroutine initialize_flow_direction_options  
 
 
-
-
-
-
-    subroutine initialize_water_capacity_options()
-
-    ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions  
-    integer (kind=c_int)             :: iIndex
-    character (len=:), allocatable   :: sCmdText
-    character (len=:), allocatable   :: sOptionText
-    character (len=:), allocatable   :: sArgText
-    integer (kind=c_int)             :: iStat
-
-
-    myDirectives = CF_DICT%grep_keys("WATER_CAPACITY")
-
-    if ( myDirectives%count == 0 ) then
-      call warn("Your control file seems to be missing any of the required directives relating to WATER_CAPACITY", &
-        lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
-    else  
-    
-      allocate(AWC, stat=iStat)
-      call assert( iStat == 0, "Failed to allocate memory for the water capacity (AWC) data structure", &
-        __FILE__, __LINE__ )
-
-      call LOGS%set_loglevel( LOG_ALL )
-      call LOGS%set_echo( lFALSE )
-
-      do iIndex = 1, myDirectives%count
-
-        ! myDirectives is a string list of all SWB directives that contain the phrase "WATER_CAPACITY"
-        ! sCmdText contains an individual directive
-        sCmdText = myDirectives%get(iIndex)
-
-        ! For this directive, obtain the associated dictionary entries
-        call CF_DICT%get_values(sCmdText, myOptions )
-
-        ! dictionary entries are initially space-delimited; sArgText contains
-        ! all dictionary entries present, concatenated, with a space between entries
-        sArgText = myOptions%get(1, myOptions%count )
-
-        ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(">> "//sCmdText//" "//sArgText)
-
-        ! most of the time, we only care about the first dictionary entry, obtained below
-        sOptionText = myOptions%get(1)
-
-        select case ( sCmdText )
-
-          case ( "WATER_CAPACITY" )
-
-            if (.not. associated(AWC))  allocate(AWC, stat=iStat)
-              call assert(iStat==0, "Problem allocating memory for the water capacity (AWC) data structure",   &
-                __FILE__, __LINE__)
-
-            FLOWDIR%sVariableName_z = "awc"
-
-            sArgText = myOptions%get(2)
-
-            select case (sOptionText)
-
-              case ( "ARC_ASCII", "SURFER", "ARC_GRID" )
-
-                call AWC%initialize(sDescription=trim(sCmdText), &
-                  sFileType=trim(sOptionText), &
-                  sFilename=trim(sArgText), &
-                  iDataType=DATATYPE_REAL )
-
-              case ( "NETCDF" )
-                  
-                call AWC%initialize_netcdf( &
-                  sDescription=trim(sCmdText), &
-                  sFilenameTemplate = trim(sArgText), &
-                  iDataType=DATATYPE_REAL )
-     
-              case default
-
-                call warn( "Did not find a valid WATER_CAPACITY option. Value supplied was: "//dquote(sOptionText), &
-                    lFatal = lTRUE )
-
-            end select  
-
-          case ( "WATER_CAPACITY_PROJECTION_DEFINITION" )
-
-            sArgText = myOptions%get(1, myOptions%count )
-            call AWC%set_PROJ4( trim(sArgText) )
-
-          case default
-
-            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
-              //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
- 
-        end select
-
-      enddo
-
-    endif
-
-  end subroutine initialize_water_capacity_options  
-
-
-
-
-
-
   subroutine initialize_soils_group_options()
 
     ! [ LOCALS ]
@@ -1163,8 +1056,6 @@ contains
 
 
 
-
-
   subroutine initialize_landuse_options()
 
     ! [ LOCALS ]
@@ -1273,6 +1164,116 @@ contains
     endif
 
   end subroutine initialize_landuse_options  
+
+
+
+  subroutine initialize_available_water_capacity_options()
+
+    ! [ LOCALS ]
+    type (STRING_LIST_T)             :: myDirectives
+    type (STRING_LIST_T)             :: myOptions  
+    integer (kind=c_int)             :: iIndex
+    character (len=:), allocatable   :: sCmdText
+    character (len=:), allocatable   :: sOptionText
+    character (len=:), allocatable   :: sArgText
+    integer (kind=c_int)             :: iStat
+
+
+    myDirectives = CF_DICT%grep_keys("WATER_CAPACITY")
+    if (myDirectives%count == 0) then
+      call myDirectives%deallocate()      
+      myDirectives = CF_DICT%grep_keys("AVAILABLE_WATER_CAPACITY")
+    endif
+      
+    if ( myDirectives%count == 0 ) then
+
+      call warn("Your control file seems to be missing any of the required directives relating to WATER CAPACITY", &
+        lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+
+    else  
+    
+      allocate(AWC, stat=iStat)
+      call assert( iStat == 0, "Failed to allocate memory for the available water capacity (AWC) data structure", &
+        __FILE__, __LINE__ )
+
+      call LOGS%set_loglevel( LOG_ALL )
+      call LOGS%set_echo( lFALSE )
+
+      do iIndex = 1, myDirectives%count
+
+        ! myDirectives is a string list of all SWB directives that contain the phrase "LANDUSE"
+        ! sCmdText contains an individual directive
+        sCmdText = myDirectives%get(iIndex)
+
+        ! For this directive, obtain the associated dictionary entries
+        call CF_DICT%get_values(sCmdText, myOptions )
+
+        ! dictionary entries are initially space-delimited; sArgText contains
+        ! all dictionary entries present, concatenated, with a space between entries
+        sArgText = myOptions%get(1, myOptions%count )
+
+        ! echo the original directive and dictionary entries to the logfile
+        call LOGS%write(">> "//sCmdText//" "//sArgText)
+
+        ! most of the time, we only care about the first dictionary entry, obtained below
+        sOptionText = myOptions%get(1)
+
+        select case ( sCmdText )
+
+          case ( "WATER_CAPACITY", "AVAILABLE_WATER_CAPACITY", "AWC" )
+
+            if (.not. associated(LULC))  allocate(LULC, stat=iStat)
+              call assert(iStat==0, "Problem allocating memory for the soils group (LULC) data structure",   &
+                __FILE__, __LINE__)
+
+            AWC%sVariableName_z = "awc"
+
+            sArgText = myOptions%get(2)
+
+            select case (sOptionText)
+
+              case ( "ARC_ASCII", "SURFER", "ARC_GRID" )
+
+                call LULC%initialize(sDescription=trim(sCmdText), &
+                  sFileType=trim(sOptionText), &
+                  sFilename=trim(sArgText), &
+                  iDataType=DATATYPE_INT, &
+                  sPROJ4_string=BNDS%sPROJ4_string )
+
+              case ( "NETCDF" )
+                  
+                call LULC%initialize_netcdf( &
+                  sDescription=trim(sCmdText), &
+                  sFilenameTemplate = trim(sArgText), &
+                  iDataType=DATATYPE_INT, &
+                  sPROJ4_string=BNDS%sPROJ4_string ) 
+     
+              case default
+
+                call warn( "Did not find a valid WATER_CAPACITY option. Value supplied was: "//dquote(sOptionText), &
+                    lFatal = lTRUE )
+
+            end select  
+
+          case ( "WATER_CAPACITY_PROJECTION_DEFINITION", "AVAILABLE_WATER_CAPACITY_PROJECTION_DEFINITION" )
+
+            sArgText = myOptions%get(1, myOptions%count )
+            call AWC%set_PROJ4( trim(sArgText) )
+
+          case default
+
+            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
+              //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
+ 
+        end select
+
+      enddo
+
+      call AWC%getvalues(  )
+
+    endif
+
+  end subroutine initialize_available_water_capacity_options  
 
 
 

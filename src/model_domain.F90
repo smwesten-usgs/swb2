@@ -33,6 +33,8 @@ module model_domain
     integer (kind=c_int), allocatable      :: soil_group(:)
     integer (kind=c_int), allocatable      :: num_upslope_connections(:)
     integer (kind=c_int), allocatable      :: sum_upslope_cells(:)
+
+    real (kind=c_float), allocatable       :: awc(:)
      
     real (kind=c_float), allocatable       :: latitude(:)
     real (kind=c_float), allocatable       :: reference_ET0(:)
@@ -296,7 +298,7 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
-    integer (kind=c_int)  :: iStat(24)
+    integer (kind=c_int)  :: iStat(26)
 
     iCount = count( this%active )
 
@@ -305,27 +307,28 @@ contains
     allocate( this%soil_group(iCount), stat=iStat(3) )
     allocate( this%num_upslope_connections(iCount), stat=iStat(4) )
     allocate( this%sum_upslope_cells(iCount), stat=iStat(5) )
-    allocate( this%latitude(iCount), stat=iStat(6) )
-    allocate( this%reference_ET0(iCount), stat=iStat(6) )
-    allocate( this%reference_ET0_adj(iCount), stat=iStat(7) )
-    allocate( this%actual_ET(iCount), stat=iStat(8) )
-    allocate( this%inflow(iCount), stat=iStat(9))
-    allocate( this%runon(iCount), stat=iStat(10) )
-    allocate( this%runoff(iCount), stat=iStat(11) )
-    allocate( this%outflow(iCount), stat=iStat(12) )
-    allocate( this%infiltration(iCount), stat=iStat(13) )
-    allocate( this%snowfall(iCount), stat=iStat(14) )
-    allocate( this%snowmelt(iCount), stat=iStat(15) )
-    allocate( this%rainfall(iCount), stat=iStat(16) )
-    allocate( this%GDD_28(iCount), stat=iStat(17) )
-    allocate( this%interception_storage(iCount), stat=iStat(18) )
-    allocate( this%snow_storage(iCount), stat=iStat(19) )
-    allocate( this%soil_storage(iCount), stat=iStat(20) )
-    allocate( this%soil_storage_max(iCount), stat=iStat(21) )
-    allocate( this%potential_recharge(iCount), stat=iStat(22) )
-    allocate( this%stream_storage(iCount), stat=iStat(23) )
+    allocate( this%awc(iCount), stat=iStat(6) )
+    allocate( this%latitude(iCount), stat=iStat(7) )
+    allocate( this%reference_ET0(iCount), stat=iStat(8) )
+    allocate( this%reference_ET0_adj(iCount), stat=iStat(9) )
+    allocate( this%actual_ET(iCount), stat=iStat(10) )
+    allocate( this%inflow(iCount), stat=iStat(11))
+    allocate( this%runon(iCount), stat=iStat(12) )
+    allocate( this%runoff(iCount), stat=iStat(13) )
+    allocate( this%outflow(iCount), stat=iStat(14) )
+    allocate( this%infiltration(iCount), stat=iStat(15) )
+    allocate( this%snowfall(iCount), stat=iStat(16) )
+    allocate( this%snowmelt(iCount), stat=iStat(17) )
+    allocate( this%rainfall(iCount), stat=iStat(18) )
+    allocate( this%GDD_28(iCount), stat=iStat(19) )
+    allocate( this%interception_storage(iCount), stat=iStat(20) )
+    allocate( this%snow_storage(iCount), stat=iStat(21) )
+    allocate( this%soil_storage(iCount), stat=iStat(22) )
+    allocate( this%soil_storage_max(iCount), stat=iStat(23) )
+    allocate( this%potential_recharge(iCount), stat=iStat(24) )
+    allocate( this%stream_storage(iCount), stat=iStat(25) )
 
-    allocate( OUTPUT(11), stat=iStat(24) )
+    allocate( OUTPUT(13), stat=iStat(26) )
 
     if ( any( iStat /= 0 ) )  call die("Problem allocating memory", __FILE__, __LINE__)
 
@@ -404,6 +407,15 @@ contains
       sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end )
 
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(12)%ncfile, sVariableName="tmin", &
+      sVariableUnits="degrees Fahrenheit", iNX=this%number_of_columns, iNY=this%number_of_rows, &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end )
+
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(13)%ncfile, sVariableName="tmax", &
+      sVariableUnits="degrees Fahrenheit", iNX=this%number_of_columns, iNY=this%number_of_rows, &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end )
+
+
       this%dont_care = -9999._c_float
 
   end subroutine initialize_netcdf_output_sub
@@ -478,6 +490,31 @@ contains
     call LOGS%write("", iLinesBefore=1, iLogLevel=LOG_DEBUG)
 
   end subroutine initialize_soil_groups_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine initialize_available_water_content_sub( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)     :: this
+
+    ! [ LOCALS ]
+    integer (kind=c_int)                 :: iStat
+    integer (kind=c_int)                 :: iIndex
+    
+    this%soil_group = pack( AWC%pGrdBase%iData, this%active )
+
+    call LOGS%write("Soil hydrologic groups as read into SWB data structure", iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_DEBUG)
+
+    do iIndex = 1, maxval(HSG%pGrdBase%iData)
+
+      call LOGS%write( asCharacter(count(MODEL%soil_group == iIndex) )//" cells belong to soils group " &
+        //asCharacter(iIndex), iLogLevel=LOG_DEBUG )
+      
+    end do    
+
+    call LOGS%write("", iLinesBefore=1, iLogLevel=LOG_DEBUG)
+
+  end subroutine initialize_available_water_content_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -570,7 +607,6 @@ contains
 !      this%gross_precip = pack( PRCP%pGrdBase%rData, this%active )
 
       this%tmax = pack( TMAX%pGrdBase%rData, this%active )
-
       this%tmin = pack( TMIN%pGrdBase%rData, this%active )
 
       call this%calc_snowfall()
@@ -697,6 +733,25 @@ contains
                    iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
+
+    this%array_output = unpack(this%tmin, this%active, this%dont_care)
+
+    call netcdf_put_variable_array(NCFILE=OUTPUT(12)%ncfile, &
+                   iVarID=OUTPUT(12)%ncfile%iVarID(NC_Z), &
+                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
+                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
+                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
+                   rValues=this%array_output )
+
+    this%array_output = unpack(this%tmax, this%active, this%dont_care)
+
+    call netcdf_put_variable_array(NCFILE=OUTPUT(13)%ncfile, &
+                   iVarID=OUTPUT(13)%ncfile%iVarID(NC_Z), &
+                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
+                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
+                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
+                   rValues=this%array_output )
+
 
   end subroutine write_variables_to_netcdf
 
