@@ -124,6 +124,9 @@ module model_domain
     procedure :: get_climate_data
     procedure :: write_variables_to_netcdf
 
+    procedure :: initialize_soil_layers_sub
+    generic   :: initialize_soil_layers => initialize_soil_layers_sub
+
     procedure :: initialize_methods_sub
     generic   :: initialize_methods => initialize_methods_sub
 
@@ -244,6 +247,8 @@ module model_domain
   type (MODEL_DOMAIN_T), public :: MODEL
 
   type (NETCDF_FILE_COLLECTION_T), allocatable, public :: OUTPUT(:)
+
+  real (kind=c_float), allocatable  :: ROOTING_DEPTH(:,:)
 
 contains
 
@@ -501,18 +506,7 @@ contains
     integer (kind=c_int)                 :: iStat
     integer (kind=c_int)                 :: iIndex
     
-    this%soil_group = pack( AWC%pGrdBase%iData, this%active )
-
-    call LOGS%write("Soil hydrologic groups as read into SWB data structure", iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_DEBUG)
-
-    do iIndex = 1, maxval(HSG%pGrdBase%iData)
-
-      call LOGS%write( asCharacter(count(MODEL%soil_group == iIndex) )//" cells belong to soils group " &
-        //asCharacter(iIndex), iLogLevel=LOG_DEBUG )
-      
-    end do    
-
-    call LOGS%write("", iLinesBefore=1, iLogLevel=LOG_DEBUG)
+    this%awc = pack( AWC%pGrdBase%rData, this%active )
 
   end subroutine initialize_available_water_content_sub
 
@@ -859,6 +853,75 @@ contains
   end subroutine calculate_snow_mass_balance_sub
 
 !--------------------------------------------------------------------------------------------------
+
+  subroutine initialize_soil_layers_sub( this )
+
+    use strings
+    use string_list
+
+    class (MODEL_DOMAIN_T), intent(inout)   :: this
+
+    ! [ LOCALS ]
+    integer (kind=c_int)              :: iNumActiveCells
+    integer (kind=c_int)              :: iStat
+    integer (kind=c_int)              :: iNumberOfLanduses
+    integer (kind=c_int)              :: iNumberOfSoilGroups
+    integer (kind=c_int)              :: iSoilsIndex
+    integer (kind=c_int)              :: iLUIndex
+    integer (kind=c_int), allocatable :: iLanduseCodes(:)
+    type (STRING_LIST_T)              :: slList
+    type (STRING_LIST_T)              :: slRZ
+    integer (kind=c_int), allocatable :: iRZ_SeqNums(:) 
+    real (kind=c_float), allocatable  :: RZ(:)
+    character (len=:), allocatable    :: sText
+    real (kind=c_float), allocatable  :: water_capacity(:)
+
+    iNumActiveCells = ubound(this%soil_storage_max,1)
+
+    call slList%append("LU_Code")
+    call slList%append("Landuse_Lookup_Code")
+
+    !> Determine how many soil groups are present
+
+    ! retrieve a string list of all keys associated with root zone depth (i.e. RZ_1, RZ_2, RZ_3, etc.)
+    slRZ = PARAMS%grep_keys("RZ")
+    ! Convert the string list to an vector of integers; this call strips off the "RZ_" part of label
+    iRZ_SeqNums = slRZ%asInt()
+    ! count how many items are present in the vector; this should equal the number of soils groups
+    iNumberOfSoilGroups = count( iRZ_SeqNums > 0 )
+
+    !> Determine how many landuse codes are present
+    call PARAMS%get_values( slList, iLanduseCodes )
+    iNumberOfLanduses = count( iLanduseCodes > 0 )
+
+    allocate( ROOTING_DEPTH(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
+    call assert( iStat == 0, "Failed to allocate memory for maximum rooting depth table", &
+      __FILE__, __LINE__)
+
+    ! we should have the max rooting depth table fully filled out following this block
+    do iSoilsIndex = 1, iNumberOfSoilGroups
+      sText = "RZ_"//asCharacter(iSoilsIndex)
+      call PARAMS%get_values( sText, RZ )
+      ROOTING_DEPTH(:, iSoilsIndex) = RZ
+    enddo  
+
+    this%awc = pack(AWC%pGrdBase%rData, this%active)
+
+    do iSoilsIndex = 1, iNumberOfSoilGroups
+      do iLUIndex = 1, iNumberOfLanduses
+
+        where ( this%landuse_index == iLUIndex .and. this%soil_group == iSoilsIndex )
+
+          this%soil_storage_max = ROOTING_DEPTH( iLUIndex, iSoilsIndex ) * this%awc
+
+        end where
+
+      enddo
+    enddo
+
+  end subroutine initialize_soil_layers_sub
+
+  !------------------------------------------------------------------------------------------------
 
   subroutine calculate_soil_mass_balance_sub(this)
 
@@ -1212,9 +1275,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call initialize_soil_moisture__thornthwaite_mather( fSoilStorage_Max=this%soil_storage_max,   &
-                                                        iLanduseIndex=this%landuse_index,         &
-                                                        iSoilsGroup=this%soil_group )
+    call initialize_soil_moisture__thornthwaite_mather( ubound( this%active, 1) )
 
   end subroutine model_initialize_soil_moisture_thornthwaite_mather
 

@@ -8,9 +8,10 @@ module soil_moisture_storage
 
 contains
 
-    subroutine initialize_soil_layers( fSoilStorage_Max, iLanduseIndex, iSoilsGroup )
+  subroutine initialize_soil_layers( fSoilStorage_Max, lActive, iLanduseIndex, iSoilsGroup )
 
     real (kind=c_float), intent(inout)    :: fSoilStorage_Max(:)
+    logical (kind=c_bool), intent(in)     :: lActive(:,:)
     integer (kind=c_int), intent(in)      :: iLanduseIndex(:)
     integer (kind=c_int), intent(in)      :: iSoilsGroup(:)
 
@@ -26,7 +27,7 @@ contains
     integer (kind=c_int), allocatable :: iRZ_SeqNums(:) 
     real (kind=c_float), allocatable  :: RZ(:)
     character (len=:), allocatable    :: sText
-
+    real (kind=c_float), allocatable  :: water_capacity(:,:)
 
     iNumActiveCells = ubound(fSoilStorage_Max,1)
 
@@ -57,12 +58,14 @@ contains
       ROOTING_DEPTH(:, iSoilsIndex) = RZ
     enddo  
 
+    water_capacity = pack(AWC, lActive)
+
     do iSoilsIndex = 1, iNumberOfSoilGroups
       do iLUIndex = 1, iNumberOfLanduses
 
         where ( iLanduseIndex == iLUIndex .and. iSoilsGroup == iSoilsIndex )
 
-          fSoilStorage_Max = ROOTING_DEPTH( iLUIndex, iSoilsIndex ) * 2.
+          fSoilStorage_Max = ROOTING_DEPTH( iLUIndex, iSoilsIndex ) * water_capacity
 
         end where
 
