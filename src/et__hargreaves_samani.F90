@@ -5,7 +5,7 @@
 
 !>  Calculates potential evapotranspiration by means of the
 !>  Hargreaves-Samani (1985) method.
-module et_hargreaves
+module et__hargreaves_samani
 !!****h* SWB/et_hargreaves
 ! NAME
 !   et_hargreaves.f95 - Evapotranspiration calculation using the
@@ -79,7 +79,7 @@ end subroutine et_hargreaves_configure
 
 !------------------------------------------------------------------------------
 
-function et_hargreaves_ComputeET( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax )  result(fReferenceET0)
+elemental function et_hargreaves_ComputeET( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax )  result(fReferenceET0)
   !! Computes the potential ET for each cell, based on TMIN and TMAX.
   !! Stores cell-by-cell PET values in the model grid.
 
@@ -92,23 +92,26 @@ function et_hargreaves_ComputeET( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, 
 
   ! [ LOCALS ]
   real (kind=c_double) :: fDelta, fOmega_s, fD_r, fRa
+  real (kind=c_double) :: dLatitude_radians
+
+  dLatitude_radians = fLatitude * DEGREES_TO_RADIANS
 
   fD_r =relative_earth_sun_distance__D_r(iDayOfYear,iNumDaysInYear)
   fDelta = solar_declination_simple__delta(iDayOfYear, iNumDaysInYear)
 
-  fOmega_s = sunrise_sunset_angle__omega_s(asDouble(fLatitude), fDelta)
+  fOmega_s = sunrise_sunset_angle__omega_s(dLatitude_radians, fDelta)
 
 	! NOTE that the following equation returns extraterrestrial radiation in
 	! MJ / m**2 / day.  The Hargreaves equation requires extraterrestrial
 	! radiation to be expressed in units of mm / day.
-	fRa = extraterrestrial_radiation__Ra(asDouble(fLatitude), fDelta, fOmega_s, fD_r)
+	fRa = extraterrestrial_radiation__Ra(dLatitude_radians, fDelta, fOmega_s, fD_r)
 
   fReferenceET0 = ET0_hargreaves( equivalent_evaporation(fRa), fTMin, fTMax)
     
 end function et_hargreaves_ComputeET
 
 
-function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)
+elemental function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)
 
   ! [ ARGUMENTS ]
   real (kind=c_double),intent(in) :: rRa
@@ -122,7 +125,7 @@ function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)
   real (kind=c_double) :: rTDelta
   real (kind=c_double) :: rTAvg
 
-  rTAvg = (rTMinF + rTMaxF) / 2_c_double
+  rTAvg = (rTMinF + rTMaxF) / 2.0_c_double
 
   rTDelta = F_to_K(rTMaxF) - F_to_K(rTMinF)
 
@@ -139,4 +142,4 @@ function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)
 end function ET0_hargreaves
 
 
-end module et_hargreaves
+end module et__hargreaves_samani

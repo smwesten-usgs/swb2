@@ -1,4 +1,4 @@
-module interception_bucket
+module interception__bucket
 
   use iso_c_binding
   use exceptions
@@ -56,7 +56,7 @@ contains
   end function initialize_interception_bucket_python_sub
 
 
-  function calculate_interception_bucket( iLanduseIndex, fPrecip )   result( fInterception )  bind(c)
+  elemental function calculate_interception_bucket( iLanduseIndex, fPrecip )   result( fInterception )
 
     integer (kind=c_int), intent(in) :: iLanduseIndex
     real (kind=c_float), intent(in)  :: fPrecip
@@ -66,9 +66,6 @@ contains
 
     ! [ LOCALS ]
     real (kind=c_float) :: fPotentialInterception
-
-    if ( iLanduseIndex > ubound( fInterceptionValue_GrowingSeason, 1) ) &
-      call die( "Internal programming error -- index out of bounds", __FILE__, __LINE__ )
 
     if (GROWING_SEASON) then
 
@@ -85,4 +82,4 @@ contains
  
   end function calculate_interception_bucket
 
-end module interception_bucket
+end module interception__bucket

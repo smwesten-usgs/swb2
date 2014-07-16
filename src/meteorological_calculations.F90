@@ -19,7 +19,7 @@ contains
 !!    Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
 !!    "Crop Evapotranspiration (Guidelines for computing crop water
 !!    requirements)", Food and Agriculture Organization, Rome, Italy.
-function sat_vapor_pressure__e_0(rT) result (re_0)
+elemental function sat_vapor_pressure__e_0(rT) result (re_0)
 
   real (kind=c_float), intent(in)   :: rT
   real (kind=c_float)               :: re_0
@@ -42,7 +42,7 @@ end function sat_vapor_pressure__e_0
 !!
 !! @note Reference:
 !!    
-function dewpoint_vapor_pressure__e_a(fTMin) result (fe_a)
+elemental function dewpoint_vapor_pressure__e_a(fTMin) result (fe_a)
 
   ! [ ARGUMENTS ]
   real (kind=c_float), intent(in) :: fTMin
@@ -72,7 +72,7 @@ end function dewpoint_vapor_pressure__e_a
 !
 ! SOURCE
 
-function equivalent_evaporation(rR) result(rR_ET)
+elemental function equivalent_evaporation(rR) result(rR_ET)
 
   ! [ ARGUMENTS ]
   real (kind=c_double), intent(in) :: rR

@@ -82,8 +82,7 @@ program main
   use iso_c_binding, only : c_short, c_int, c_float, c_double
   use logfiles
   use loop_initialize
-  use loop_iterate
-  use cell_collection
+  use model_domain
   use iso_fortran_env
 
   implicit none
@@ -138,7 +137,7 @@ program main
   
   call check_for_fatal_warnings()
 
-  call iterate_over_simulation_days()
+  call MODEL%iterate_over_simulation_days()
    
 
   !! create matrix of cells

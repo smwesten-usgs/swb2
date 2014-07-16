@@ -2,33 +2,37 @@
 if(TARGET__SWB_EXECUTABLE)
 
   add_executable(swb
-            cell_class.F90
-            cell_collection.F90
+            #cell_class.F90
+            #cell_collection.F90
             constants_and_conversions.F90
+            continuous_frozen_ground_index.F90
             #data_catalog.F90
 		data_catalog_entry.F90
 		datetime.F90
             dictionary.F90
             #et_FAO56_crop_coefficients.F90
-            et_hargreaves.F90
-            et_jensen_haise.F90
+            et__hargreaves_samani.F90
+            et__jensen_haise.F90
             exceptions.F90
             file_operations.F90
             grid.F90
-            interception_bucket.F90
+            infiltration__curve_number.F90            
+            interception__bucket.F90
             logfiles.F90
             loop_initialize.F90
-            loop_iterate.F90
+            #loop_iterate.F90
             main.F90
             meteorological_calculations.F90
-            #model_domain.F90
+            model_domain.F90
             #model.F90
             netcdf4_support.F90
             netcdf_c_api_interfaces.F90
             parameters.F90
-            #runoff_curve_number.F90
-            #sm_thornthwaite_mather.F90
+            precipitation__method_of_fragments.F90
+            soil_moisture__thornthwaite_mather.F90
             simulation_datetime.F90
+            snowfall__original.F90
+            snowmelt__original.F90
             solar_calculations.F90
             strings.F90
             string_list.F90
@@ -210,32 +214,36 @@ endif()
 if(TARGET__SWB_LIBRARY)
 
   add_library(swblib SHARED
-            cell_class.F90
-            cell_collection.F90
+            #cell_class.F90
+            #cell_collection.F90
             constants_and_conversions.F90
+            continuous_frozen_ground_index.F90
             #data_catalog.F90
             data_catalog_entry.F90
             datetime.F90
             dictionary.F90
             #et_FAO56_crop_coefficients.F90
-            et_hargreaves.F90
-            et_jensen_haise.F90
+            et__hargreaves_samani.F90
+            et__jensen_haise.F90
             exceptions.F90
             file_operations.F90
             grid.F90
-            interception_bucket.F90
+            infiltration__curve_number.F90
+            interception__bucket.F90
             logfiles.F90
             loop_initialize.F90
-            loop_iterate.F90
+            #loop_iterate.F90
             meteorological_calculations.F90
-            #model_domain.F90
+            model_domain.F90
             #model.F90
             netcdf4_support.F90
             netcdf_c_api_interfaces.F90
             parameters.F90
-            #runoff_curve_number.F90
-            #sm_thornthwaite_mather.F90
+            precipitation__method_of_fragments.F90
+            soil_moisture__thornthwaite_mather.F90
             simulation_datetime.F90
+            snowfall__original.F90
+            snowmelt__original.F90
             solar_calculations.F90
             strings.F90
             string_list.F90

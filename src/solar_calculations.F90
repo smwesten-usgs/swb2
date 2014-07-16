@@ -72,7 +72,7 @@ contains
   !!        requirements)", Food and Agriculture Organization, Rome, Italy.
   !!
   !! @sa http://www.fao.org/docrep/x0490e/x0490e07.htm#solar%20radiation
-  function extraterrestrial_radiation__Ra(dLatitude, dDelta,dOmega_s, dDsubR)    result(dRa)
+  elemental function extraterrestrial_radiation__Ra(dLatitude, dDelta, dOmega_s, dDsubR)    result(dRa)
 
     ! [ ARGUMENTS ]
     real (kind=c_double), intent(in) :: dLatitude
@@ -132,7 +132,7 @@ contains
   !! @note Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
-  function solar_declination_simple__delta(iDayOfYear, iNumDaysInYear) result(dDelta)  bind(c)
+  elemental function solar_declination_simple__delta(iDayOfYear, iNumDaysInYear) result(dDelta)
 
     integer (kind=c_int), intent(in) :: iDayOfYear
     integer (kind=c_int), intent(in) :: iNumDaysInYear
@@ -160,7 +160,7 @@ contains
   !!
   !! @note Reference:
   !!       Iqbal, Muhammad (1983-09-28). An Introduction To Solar Radiation (p. 10). Elsevier Science. Kindle Edition. 
-  function solar_declination__delta(iDayOfYear, iNumDaysInYear) result(dDelta)  bind(c)
+  elemental function solar_declination__delta(iDayOfYear, iNumDaysInYear) result(dDelta)
 
     integer (kind=c_int), intent(in) :: iDayOfYear
     integer (kind=c_int), intent(in) :: iNumDaysInYear
@@ -206,7 +206,7 @@ contains
   !! 
   !! @note Equation 1.2.3 in Iqbal, Muhammad (1983-09-28). An Introduction To Solar Radiation (p. 28).
   !!       Elsevier Science. Kindle Edition. 
-  function relative_earth_sun_distance__D_r( iDayOfYear, iNumDaysInYear )   result( dDsubR )   bind(c)
+  elemental function relative_earth_sun_distance__D_r( iDayOfYear, iNumDaysInYear )   result( dDsubR ) 
 
     ! [ ARGUMENTS ]
     integer (kind=c_int), intent(in) :: iDayOfYear
@@ -236,15 +236,11 @@ contains
   !!   Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
-   function sunrise_sunset_angle__omega_s( dLatitude, dDelta ) result( dOmega_s )    bind(c)
+   elemental function sunrise_sunset_angle__omega_s( dLatitude, dDelta ) result( dOmega_s ) 
 
     real (kind=c_double), intent(in) :: dLatitude
     real (kind=c_double), intent(in) :: dDelta
     real (kind=c_double) :: dOmega_s
-
-    call assert(dLatitude < 1.58_c_double .and. dLatitude > -1.58_c_double, &
-      "Internal programming error: Latitude must be expressed in RADIANS", &
-      __FILE__,__LINE__)
 
     dOmega_s = acos( - tan(dLatitude) * tan(dDelta) )
 
@@ -295,7 +291,7 @@ contains
   !! @retval     fPsun   Percentage of possible sunshine, dimensionless percentage
   !!
   !! @todo [Need to add reference here...]
-  function estimate_percent_of_possible_sunshine__psun(fTMax, fTMin)  result(fPsun)   bind(c)
+  elemental function estimate_percent_of_possible_sunshine__psun(fTMax, fTMin)  result(fPsun)
 
     real (kind=c_float), intent(in) :: fTMax
     real (kind=c_float), intent(in) :: fTMin
@@ -486,7 +482,7 @@ contains
   !! 
   !! @note Reference: 
   !!       Iqbal, Muhammad (1983-09-28). An Introduction To Solar Radiation (p. 3). Elsevier Science. Kindle Edition. 
-  function day_angle__gamma(iDayOfYear, iNumDaysInYear)     result(dGamma)  bind(c)
+  elemental function day_angle__gamma(iDayOfYear, iNumDaysInYear)     result(dGamma)
 
     integer (kind=c_int), intent(in)   :: iDayOfYear
     integer (kind=c_int), intent(in)   :: iNumDaysInYear

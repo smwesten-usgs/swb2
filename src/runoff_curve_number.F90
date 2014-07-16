@@ -14,26 +14,12 @@ module runoff_curve_number
 
   private
 
-  type, public  :: RUNOFF_CURVE_NUMBER_T
-
-    real (kind=c_float), allocatable    :: CN(:,:)
-    integer (kind=c_int), allocatable   :: iLanduseCodes(:)
-
-  contains
-
-    procedure      :: initialize_parameter_values_sub
-    procedure      :: return_landuse_index_fn
-    procedure      :: get_base_curve_number_fn
-    procedure      :: update_curve_number_fn
-    procedure      :: calculate_runoff_fn
-
-  end type RUNOFF_CURVE_NUMBER_T  
+  real (kind=c_float), allocatable    :: CN(:,:)
+  integer (kind=c_int), allocatable   :: iLanduseCodes(:)
 
 contains
 
-  subroutine initialize_parameter_values_sub(this)
-
-    class (RUNOFF_CURVE_NUMBER_T)     :: this
+  subroutine initialize_infiltration__curve_number()
 
     ! [ LOCALS ]
     integer (kind=c_int)              :: iNumberOfLanduses
@@ -70,7 +56,7 @@ contains
       call PARAMS%get_values( sText, CN(:, iSoilsIndex) )
     enddo  
     
-  end subroutine initialize_parameter_values_sub
+  end subroutine initialize_infiltration__curve_number
 
 
   function return_landuse_index_fn(this, iLanduseCode)  result(iLanduseIndex)
@@ -102,9 +88,8 @@ contains
   end function return_landuse_index_fn(this, iLanduseCode)
 
 
-  function get_base_curve_number_fn(this, iLanduseIndex, iSoilsGroup )  result( fCN )
+  function get_base_curve_number_fn(iLanduseIndex, iSoilsGroup )  result( fCN )
 
-    class (RUNOFF_CURVE_NUMBER_T)      :: this
     integer (kind=c_int), intent(in)   :: iLanduseIndex
     integer (kind=c_int), intent(in)   :: iSoilsGroup
     real (kind=c_float)                :: fCN
@@ -113,7 +98,7 @@ contains
       call die( "Index out of bounds. iLanduseIndex = "//asCharacter(iLanduseIndex) &
          //"; iSoilsGroup = "//asCharacter(iSoilsGroup), __FILE__, __LINE__ )
     
-    fCN  this%CN( iLanduseIndex, iSoilsGroup )
+    fCN = CN( iLanduseIndex, iSoilsGroup )
 
   end function get_base_curve_number_fn
 
@@ -136,10 +121,9 @@ contains
 
 !--------------------------------------------------------------------------
 
-  function update_curve_number_fn(this, iLanduseIndex, iSoilsGroup, fInflow, fCFGI, &
+  function update_curve_number_fn( iLanduseIndex, iSoilsIndex, fInflow, fCFGI, &
     lIsGrowingSeason )  result( fCN_adj )
     
-    class (RUNOFF_CURVE_NUMBER_T)     :: this
     integer (kind=c_int), intent(in)  :: iLanduseIndex
     integer (kind=c_int), intent(in)  :: iSoilsIndex
     real (kind=c_float), intent(in)   :: fInflow
@@ -209,21 +193,17 @@ contains
 
 !--------------------------------------------------------------------------
 
-  function calculate_runoff_fn(this, fCN, fInflow )   result(fOutflow)
+  function calculate_runoff_fn(fCN, fInflow )   result(fOutflow)
 
     !! Calculates a single cell's runoff using curve numbers
     
-    ! [ RETURN VALUE ]
+    real (kind=c_float) :: fInclow
     real (kind=c_float) :: rOutFlow
     ! [ LOCALS ]
     real (kind=c_float) :: rP
     real (kind=c_float) :: rCN_05
     real (kind=c_float) :: rSMax
 
-    rP = cel%rNetRainfall &
-         + cel%rSnowMelt &
-         + cel%rIrrigationAmount &
-         + cel%rInFlow
 
     call runoff_UpdateCurveNumber(pConfig,cel,iJulDay)
 

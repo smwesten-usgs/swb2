@@ -135,15 +135,10 @@ module swb_grid
     ERROR_MESSAGE_T("point not within available datum shift grids ", -48), &
     ERROR_MESSAGE_T("invalid sweep axis, choose x or y            ", -49) /)
 
-  public :: grid_gridToGrid, grid_Create, grid_Destroy, grid_Read
+  public :: grid_gridToGrid_int, grid_gridToGrid_sgl, grid_Create, grid_Destroy, grid_Read
   public :: grid_CheckForPROJ4Error, grid_CompletelyCover
   public :: grid_ReadExisting, grid_DumpGridExtent
   public :: grid_Conform, grid_Transform, grid_Interpolate, grid_PopulateXY
-
-  interface grid_gridToGrid
-    module procedure grid_gridToGrid_int
-    module procedure grid_gridToGrid_sgl
-  end interface grid_gridToGrid
 
   interface grid_Create
     module procedure grid_CreateSimple
@@ -1447,6 +1442,17 @@ subroutine grid_Transform(pGrd, sFromPROJ4, sToPROJ4 )
 
   call grid_CheckForPROJ4Error(iRetVal, sFromPROJ4, sToPROJ4)
 
+
+  !> If the coordinates have been converted TO latlon, convert back to degrees
+
+  if( index(string=csToPROJ4, substring="latlon") > 0 &
+      .or. index(string=csToPROJ4, substring="lonlat") > 0 ) then
+
+    pGrd%rX = pGrd%rX * RADIANS_TO_DEGREES
+    pGrd%rY = pGrd%rY * RADIANS_TO_DEGREES
+
+  endif
+
   ! now update the grid boundaries based on the transformed coordinate values
   pGrd%rGridCellSize = ( maxval(pGrd%rX) - minval(pGrd%rX) ) &
              / real(pGrd%iNX - 1, kind=c_double)
@@ -2152,14 +2158,11 @@ end subroutine grid_GridToGrid_int
 
 !----------------------------------------------------------------------
 
-subroutine grid_GridToGrid_sgl(pGrdFrom,  pGrdTo, fScaleFactor, fAddOffset, fConversionFactor)
+subroutine grid_GridToGrid_sgl(pGrdFrom,  pGrdTo )
 
   ! [ ARGUMENTS ]
   type ( GENERAL_GRID_T ),pointer :: pGrdFrom   ! pointer to source grid
   type ( GENERAL_GRID_T ),pointer :: pGrdTo     ! pointer to destination grid
-  real (kind=c_double)            :: fScaleFactor
-  real (kind=c_double)            :: fAddOffset
-  real (kind=c_double)            :: fConversionFactor
 
   ! [ LOCALS ]
   integer (kind=c_int), dimension(2) :: iColRow
@@ -2192,8 +2195,7 @@ subroutine grid_GridToGrid_sgl(pGrdFrom,  pGrdTo, fScaleFactor, fAddOffset, fCon
         "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))), &
         trim(__FILE__), __LINE__)
 
-      pGrdTo%rData(iCol,iRow) = ( fConversionFactor * pGrdFrom%rData( iColRow(COLUMN), iColRow(ROW) )  &
-                                  + fAddOffset ) * fConversionFactor
+      pGrdTo%rData(iCol,iRow) = pGrdFrom%rData( iColRow(COLUMN), iColRow(ROW) )
 
 !         rArrayTo(iCol,iRow) = grid_Convolve_sgl(rValues=rArrayFrom, &
 !           iTargetCol=iColRow(COLUMN), &

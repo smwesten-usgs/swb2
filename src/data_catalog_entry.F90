@@ -1,3 +1,10 @@
+!
+! concept: for each significant gridded data input, keep track of the 
+!          native coordinates, the transformed base (project) coordinates, 
+!          and provide methods for extracting data from appropriate locations
+!          as needed.
+!
+
 module data_catalog_entry
 
   use constants_and_conversions
@@ -41,12 +48,9 @@ module data_catalog_entry
     character (len=2)                  :: sMissingValuesOperator = "<="
     integer (kind=c_int)               :: iMissingValuesAction = 0
     
-    real (kind=c_double)               :: rScaleFactor = 1_c_double
-    real (kind=c_double)               :: rAddOffset = 0_c_double
-    real (kind=c_double)               :: rConversionFactor = 1_c_double
+    real (kind=c_double)               :: rUserScaleFactor = 1_c_double
+    real (kind=c_double)               :: rUserAddOffset = 0_c_double
 
-    logical (kind=c_bool) :: lUserSuppliedScaleAndOffset = lFALSE
-    logical (kind=c_bool) :: lApplyConversionFactor = lFALSE
     logical (kind=c_bool) :: lMissingFilesAreAllowed = lFALSE
     logical (kind=c_bool) :: lFlipHorizontal = lFALSE
     logical (kind=c_bool) :: lFlipVertical = lFALSE
@@ -87,7 +91,8 @@ module data_catalog_entry
     logical (kind=c_bool)          :: lPerformFullInitialization = lTRUE
     logical (kind=c_bool)          :: lCreateLocalNetCDFArchive = lFALSE
      
-    ! pGrdBase can be populated, with data accessed by cells as needed 
+    ! pGrdBase takes the coordinate system and dimensions as defined
+    ! for the overall SWB project (i.e. BASE_PROJECTION_DEFINITION )
     type (GENERAL_GRID_T), pointer :: pGrdBase => null()
 
   contains
@@ -118,7 +123,6 @@ module data_catalog_entry
 
     procedure, public :: set_grid_flip_horizontal => set_grid_flip_horizontal_sub
     procedure, public :: set_grid_flip_vertical => set_grid_flip_vertical_sub
-    procedure, public :: set_conversion_factor => set_conversion_factor_sub
 
     procedure, public :: getvalues_constant => getvalues_constant_sub
     procedure, public :: getvalues_gridded => getvalues_gridded_sub
@@ -167,26 +171,26 @@ module data_catalog_entry
 
   end type DATA_CATALOG_ENTRY_T
 
-  type (DATA_CATALOG_ENTRY_T), pointer :: PRCP => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: TMAX => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: TMIN => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: RELHUM => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: WINDSPD => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: PCT_POSS_SUN => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: SOLRAD => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: LULC => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: AWC => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: HSG => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: FLOWDIR => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: MASK => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: BASIN_MASK => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: REF_ET => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: FOG_ZONE_NUM => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: FOG_ELEV_ZONE_NUM => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: PRCP_GRID_NUM => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: PAN_EVAP_ZONE_NUM => null()
-  type (DATA_CATALOG_ENTRY_T), pointer :: RUNOFF_ZONE_NUM => null()  
-  type (DATA_CATALOG_ENTRY_T), pointer :: ROUTING_FRAC => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: PRCP => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: TMAX => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: TMIN => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: RELHUM => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: WINDSPD => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: PCT_POSS_SUN => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: SOLRAD => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: LULC => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: AWC => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: HSG => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: FLOWDIR => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: MASK => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: BASIN_MASK => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: REF_ET => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: FOG_ZONE_NUM => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: FOG_ELEV_ZONE_NUM => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: PRCP_GRID_NUM => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: PAN_EVAP_ZONE_NUM => null()
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: RUNOFF_ZONE_NUM => null()  
+  type (DATA_CATALOG_ENTRY_T), pointer, public :: ROUTING_FRAC => null()
 
   integer (kind=c_int), parameter, public :: MISSING_VALUES_ZERO_OUT = 0
   integer (kind=c_int), parameter, public :: MISSING_VALUES_REPLACE_WITH_MEAN = 1
@@ -203,6 +207,11 @@ module data_catalog_entry
   integer (kind=c_int), parameter :: FILETYPE_NONE = 3
 
   type (GENERAL_GRID_T), public, pointer :: pGrd
+
+  interface apply_scale_and_offset
+    module procedure :: apply_scale_and_offset_float
+    module procedure :: apply_scale_and_offset_int
+  end interface apply_scale_and_offset
 
 contains
 
@@ -252,12 +261,11 @@ contains
         __FILE__, __LINE__ )
     endif      
 
-
-
   end subroutine get_value_float_sub
 
 !--------------------------------------------------------------------------------------------------
 
+  !> todo Why are we creating full-blown pGrdBase object for a grid of constant value?
   subroutine initialize_constant_real_data_object_sub( this, &
     sDescription, &
     rConstant )
@@ -493,21 +501,49 @@ end subroutine initialize_netcdf_data_object_sub
 
     endif
 
-!     if (present(rValues)) then
+     if (this%iTargetDataType == DATATYPE_REAL) then
 
-!        rValues = ( pGrdBase%rData * this%rScaleFactor + this%rAddOffset ) * this%rConversionFactor
+       call apply_scale_and_offset(fResult=this%pGrdBase%rData, fValue=this%pGrdBase%rData,          &
+              dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
 
-!     endif
+     elseif ( this%iTargetDataType == DATATYPE_INT ) then
 
-!     if (present(iValues)) then
+       call apply_scale_and_offset(iResult=this%pGrdBase%iData, iValue=this%pGrdBase%iData,          &
+              dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
 
-!         iValues = ( pGrdBase%iData * int(this%rScaleFactor, kind=c_int)  &
-!                                   + int(this%rAddOffset,kind=c_int) ) * this%rConversionFactor
-!     endif
+     else
+
+        call die("Unsupported data type specified", __FILE__, __LINE__)
+
+     endif
 
   end subroutine getvalues_sub
 
 !--------------------------------------------------------------------------------------------------
+
+elemental subroutine apply_scale_and_offset_float(fResult, fValue, dUserScaleFactor, dUserAddOffset )
+
+  real (kind=c_float), intent(out)  :: fResult
+  real (kind=c_float), intent(in)   :: fValue
+  real (kind=c_double), intent(in)   :: dUserScaleFactor
+  real (kind=c_double), intent(in)   :: dUserAddOffset
+
+  fResult = ( fValue * dUserScaleFactor ) + dUserAddOffset
+
+end subroutine apply_scale_and_offset_float
+
+
+elemental subroutine apply_scale_and_offset_int(iResult, iValue, dUserScaleFactor, dUserAddOffset )
+
+  integer (kind=c_int), intent(out) :: iResult
+  integer (kind=c_int), intent(in)  :: iValue
+  real (kind=c_double), intent(in)   :: dUserScaleFactor
+  real (kind=c_double), intent(in)   :: dUserAddOffset
+
+  iResult = ( real( iValue, kind=c_float) * dUserScaleFactor ) + dUserAddOffset
+
+end subroutine apply_scale_and_offset_int
+
 
 subroutine getvalues_constant_sub( this  )
 
@@ -521,12 +557,14 @@ subroutine getvalues_constant_sub( this  )
     case ( DATATYPE_REAL )
 
       this%lGridHasChanged = lTRUE
-      this%pGrdBase%rData = ( this%rConstantValue * this%rScaleFactor + this%rAddOffset ) * this%rConversionFactor
 
+      this%pGrdNative%rData = this%rConstantValue
+       
     case ( DATATYPE_INT)
 
       this%lGridHasChanged = lTRUE
-      this%pGrdBase%iData = ( this%iConstantValue * this%rScaleFactor + this%rAddOffset ) * this%rConversionFactor
+
+      this%pGrdBase%iData = this%iConstantValue
 
     case default
 
@@ -702,16 +740,14 @@ subroutine transform_grid_to_grid(this)
 
     case ( GRID_DATATYPE_REAL )
 
-      call grid_gridToGrid(pGrdFrom=this%pGrdNative,&
-                          pGrdTo=this%pGrdBase, &
-                          fScaleFactor=this%rScaleFactor, &
-                          fAddOffset=this%rAddOffset, &
-                          fConversionFactor=this%rConversionFactor )
+      call grid_gridToGrid_sgl(pGrdFrom=this%pGrdNative,&
+                          pGrdTo=this%pGrdBase )
 
     case ( GRID_DATATYPE_INT )
 
-      call grid_gridToGrid(pGrdFrom=this%pGrdNative, &
+      call grid_gridToGrid_int(pGrdFrom=this%pGrdNative, &
                         pGrdTo=this%pGrdBase )
+
     case default
 
       call assert(lFALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: value=" &
@@ -996,11 +1032,16 @@ end subroutine set_constant_value_real
     integer (kind=c_int) :: iTimeIndex
     integer (kind=c_int) :: iStat
     logical (kind=c_bool) :: lDateTimeFound
+    real (kind=c_double) :: dAddOffset
+    real (kind=c_double) :: dScaleFactor
 
     if ( .not. associated(this%pGrdBase) ) &
       call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
 
     this%lPadValues = lFALSE
+
+    dAddOffset = this%NCFILE%rAddOffset(NC_Z)
+    dScaleFactor = this%NCFILE%rScaleFactor(NC_Z)
 
     ! call once at start of run...
     if ( this%iFileCountYear < 0 ) call this%set_filecount(-1, iYear)
@@ -1088,14 +1129,6 @@ end subroutine set_constant_value_real
 
             this%iSourceDataType = this%NCFILE%iVarType(NC_Z)
 
-            ! if the user has not supplied a scale and offset,
-            ! then populate these values with the scale and offset
-            ! factor included in the NetCDF attribute data, if any.
-            if (.not. this%lUserSuppliedScaleAndOffset) then
-              this%rAddOffset = this%NCFILE%rAddOffset(NC_Z)
-              this%rScaleFactor = this%NCFILE%rScaleFactor(NC_Z)
-            endif
-
             ! Amongst other things, the call to netcdf_open_and_prepare
             ! finds the nearest column and row that correspond to the
             ! project bounds, then back-calculates the coordinate values
@@ -1178,6 +1211,9 @@ end subroutine set_constant_value_real
         endif
 
         call netcdf_get_variable_slice(NCFILE=this%NCFILE, rValues=this%pGrdNative%rData)
+
+        this%pGrdNative%rData = this%pGrdNative%rData * dScaleFactor + dAddOffset
+
         call this%handle_missing_values(this%pGrdNative%rData)
         call this%enforce_limits(this%pGrdNative%rData)
         exit
@@ -1227,7 +1263,7 @@ end subroutine set_constant_value_real
 
     if (this%iNC_ARCHIVE_STATUS == NETCDF_FILE_CLOSED) then
 
-      call netcdf_open_and_prepare_as_output(NCFILE=this%NCFILE, &
+      call netcdf_open_and_prepare_as_output_archive(NCFILE=this%NCFILE, &
                NCFILE_ARCHIVE=this%NCFILE_ARCHIVE, &
                iOriginMonth=iMonth, iOriginDay=iDay, iOriginYear=iYear, &
                iStartYear=this%iStartYear, iEndYear=this%iEndYear)
@@ -1337,21 +1373,9 @@ subroutine set_scale_sub(this, rScaleFactor)
    class (DATA_CATALOG_ENTRY_T) :: this
    real (kind=c_float) :: rScaleFactor
 
-   this%rScaleFactor = rScaleFactor
-   this%lUserSuppliedScaleAndOffset = lTRUE
+   this%rUserScaleFactor = rScaleFactor
 
 end subroutine set_scale_sub
-
-!--------------------------------------------------------------------------------------------------
-
-subroutine set_conversion_factor_sub(this, rConversionFactor)
-
-   class (DATA_CATALOG_ENTRY_T) :: this
-   real (kind=c_float) :: rConversionFactor
-
-   this%rConversionFactor = rConversionFactor
-
-end subroutine set_conversion_factor_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1371,8 +1395,7 @@ subroutine set_offset_sub(this, rAddOffset)
    class (DATA_CATALOG_ENTRY_T) :: this
    real (kind=c_float) :: rAddOffset
 
-   this%rAddOffset = rAddOffset
-   this%lUserSuppliedScaleAndOffset = lTRUE
+   this%rUserAddOffset = rAddOffset
 
 end subroutine set_offset_sub
 
