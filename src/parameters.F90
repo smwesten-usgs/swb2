@@ -3,6 +3,7 @@ module parameters
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
   use exceptions
   use file_operations
+  use logfiles
   use strings
   use string_list
   use dictionary
@@ -102,6 +103,8 @@ contains
 
         ! obtain the headers from the file
         DF%slColNames = DF%readHeader()
+
+        call LOGS%write( "Number of columns in file: "//asCharacter( DF%slColNames%count ), iTab=35 )
 
         ! loop over each column header
         do iColIndex = 1, DF%slColNames%count

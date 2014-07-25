@@ -167,11 +167,11 @@ contains
 
       call this%countLines()
 
-      call LOGS%write( sMessage="Opened file "//dquote(sFilename), iTab=20, iLinesBefore=1, iLogLevel=LOG_ALL )
-      call LOGS%write( "Comment characters: "//dquote(sCommentChars), iTab=40 )
-      call LOGS%write( "Number of lines in file: "//asCharacter( this%numLines() ), iTab=35 )
+      call LOGS%write( sMessage="Opened file "//dquote(sFilename), iTab=22, iLinesBefore=1, iLogLevel=LOG_ALL )
+      call LOGS%write( "Comment characters: "//dquote(sCommentChars), iTab=42 )
+      call LOGS%write( "Number of lines in file: "//asCharacter( this%numLines() ), iTab=37 )
       call LOGS%write( "Number of lines excluding blanks, headers and comments: " &
-           //asCharacter( this%numRecords() ), iTab=4, iLinesAfter=1 )
+           //asCharacter( this%numRecords() ), iTab=6 )
 
     else
 

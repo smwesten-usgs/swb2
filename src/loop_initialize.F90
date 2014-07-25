@@ -103,24 +103,25 @@ contains
     
     call initialize_parameter_tables()
     
+  print *, __FILE__, ": ", __LINE__    
     call initialize_soils_group_options()
-    
+  print *, __FILE__, ": ", __LINE__        
     call initialize_landuse_options()
-
+  print *, __FILE__, ": ", __LINE__    
     call initialize_available_water_capacity_options()
-
+  print *, __FILE__, ": ", __LINE__    
     call initialize_interception_method()
-    
+  print *, __FILE__, ": ", __LINE__        
     call initialize_evapotranspiration_method()
-    
+  print *, __FILE__, ": ", __LINE__        
     call initialize_infiltration_method()
-    
+  print *, __FILE__, ": ", __LINE__        
     call MODEL%set_inactive_cells()
-
+  print *, __FILE__, ": ", __LINE__    
     call MODEL%initialize_arrays()
-    
+  print *, __FILE__, ": ", __LINE__        
     call initialize_soils_landuse_awc_flowdir_values()
-
+  print *, __FILE__, ": ", __LINE__    
     call MODEL%preflight_check_method_pointers()
 
     call MODEL%initialize_methods()
@@ -212,14 +213,14 @@ contains
 
                   call PRCP%initialize(sDescription=trim(sCmdText), &
                     sFileType=trim(sOptionText), &
-                    sFilenameTemplate=trim(sArgText), &
+                    sFilename=trim(sArgText), &
                     iDataType=DATATYPE_REAL )
 
                 case ("NETCDF")
                   
                   call PRCP%initialize_netcdf( &
                     sDescription=trim(sCmdText), &
-                    sFilenameTemplate = trim(sArgText), &
+                    sFilename = trim(sArgText), &
                     iDataType=DATATYPE_REAL )
      
                 case default
@@ -396,14 +397,14 @@ contains
 
                 call TMAX%initialize(sDescription=trim(sCmdText), &
                   sFileType=trim(sOptionText), &
-                  sFilenameTemplate=trim(sArgText), &
+                  sFilename=trim(sArgText), &
                   iDataType=DATATYPE_REAL )
 
               case ("NETCDF")
                 
                 call TMAX%initialize_netcdf( &
                   sDescription=trim(sCmdText), &
-                  sFilenameTemplate = trim(sArgText), &
+                  sFilename = trim(sArgText), &
                   iDataType=DATATYPE_REAL )
    
               case default
@@ -560,14 +561,14 @@ contains
 
                 call TMIN%initialize(sDescription=trim(sCmdText), &
                   sFileType=trim(sOptionText), &
-                  sFilenameTemplate=trim(sArgText), &
+                  sFilename=trim(sArgText), &
                   iDataType=DATATYPE_REAL )
 
               case ("NETCDF")
                 
                 call TMIN%initialize_netcdf( &
                   sDescription=trim(sCmdText), &
-                  sFilenameTemplate = trim(sArgText), &
+                  sFilename = trim(sArgText), &
                   iDataType=DATATYPE_REAL )
    
               case default
@@ -814,14 +815,14 @@ contains
                 call FLOWDIR%initialize(sDescription=trim(sCmdText), &
                   sFileType=trim(sOptionText), &
                   sFilename=trim(sArgText), &
-                  iDataType=DATATYPE_REAL )
+                  iDataType=DATATYPE_INT )
 
               case ( "NETCDF" )
                   
                 call FLOWDIR%initialize_netcdf( &
                   sDescription=trim(sCmdText), &
-                  sFilenameTemplate = trim(sArgText), &
-                  iDataType=DATATYPE_REAL )
+                  sFilename = trim(sArgText), &
+                  iDataType=DATATYPE_INT )
      
               case default
 
@@ -923,9 +924,10 @@ contains
 
               case ( "NETCDF" )
                   
-                call HSG%initialize_netcdf( &
+
+                call HSG%initialize_netcdf(    &
                   sDescription=trim(sCmdText), &
-                  sFilenameTemplate = trim(sArgText), &
+                  sFilename = trim(sArgText),  &
                   iDataType=DATATYPE_INT )
      
               case default
@@ -949,7 +951,12 @@ contains
 
       enddo
 
+
+!! REally should have this data load later in the process to allow as much of the
+!! control file as possible to be read in and processed.
+  print *, __FILE__, ": ", __LINE__    
       call HSG%getvalues(  )
+        print *, __FILE__, ": ", __LINE__    
 
     endif
 
@@ -1135,7 +1142,7 @@ contains
                   
                 call LULC%initialize_netcdf( &
                   sDescription=trim(sCmdText), &
-                  sFilenameTemplate = trim(sArgText), &
+                  sFilename = trim(sArgText), &
                   iDataType=DATATYPE_INT, &
                   sPROJ4_string=BNDS%sPROJ4_string ) 
      
@@ -1246,7 +1253,7 @@ contains
                   
                 call AWC%initialize_netcdf( &
                   sDescription=trim(sCmdText), &
-                  sFilenameTemplate = trim(sArgText), &
+                  sFilename = trim(sArgText), &
                   iDataType=DATATYPE_REAL, &
                   sPROJ4_string=BNDS%sPROJ4_string ) 
      

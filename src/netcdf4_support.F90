@@ -623,34 +623,50 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
   if (present(sVarName_time) ) then
     NCFILE%sVarName(NC_TIME) = sVarName_time
   else
-    NCFILE%sVarName(NC_TIME) = ""
+    NCFILE%sVarName(NC_TIME) = "time"
   endif
 
   call nf_get_variable_id_and_type( NCFILE )
 
+print *, __FILE__, ": ", __LINE__
+
   ! OK. We only want to attempt to call functions that
   ! process the time variable if a time variable actually exists!!
-  if (len_trim(NCFILE%sVarName(NC_TIME)) > 0 ) then
+  if ( NCFILE%iVarID(NC_TIME) > 0 ) then
+print *, __FILE__, ": ", __LINE__
+
+   print *, NCFILE%iVarID(NC_TIME)
 
     NCFILE%dpFirstAndLastTimeValues = nf_get_first_and_last(NCFILE=NCFILE, &
         iVarIndex=NCFILE%iVarIndex(NC_TIME) )
+print *, __FILE__, ": ", __LINE__
 
     call nf_get_time_units(NCFILE=NCFILE)
+print *, __FILE__, ": ", __LINE__
 
     call nf_calculate_time_range(NCFILE)
+print *, __FILE__, ": ", __LINE__
 
     !> retrieve the time values as included in the NetCDF file
     call nf_get_time_vals(NCFILE)
 
   endif
 
+print *, __FILE__, ": ", __LINE__
+
   call nf_get_xyz_units(NCFILE=NCFILE)
+
+print *, __FILE__, ": ", __LINE__
 
   !> establish scale_factor and add_offset values, if present
   call nf_get_scale_and_offset(NCFILE=NCFILE)
 
+print *, __FILE__, ": ", __LINE__
+
   !> retrieve the X and Y coordinates from the NetCDF file...
   call nf_get_x_and_y(NCFILE)
+
+print *, __FILE__, ": ", __LINE__
 
   if (present(tGridBounds) ) then
 
@@ -683,6 +699,8 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
     write(*, fmt="(a,i6,i6,a,f14.3,f14.3)") "UR: ", iColRow_ur(COLUMN), iColRow_ur(ROW), " <==> ", tGridBounds%rXur, tGridBounds%rYur
 #endif
 
+print *, __FILE__, ": ", __LINE__
+
     NCFILE%iColBounds(NC_LEFT) = &
       max( min( iColRow_ul(COLUMN), iColRow_ur(COLUMN), iColRow_ll(COLUMN), iColRow_lr(COLUMN) ) - 4, &
                 lbound(NCFILE%rX_Coords,1) )
@@ -711,10 +729,13 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
 
   endif
 
+print *, __FILE__, ": ", __LINE__
   !> based on the subset of the NetCDF file as determined above, set the
   !> start, count, and stride parameters for use in all further data
   !> retrievals
   call nf_set_start_count_stride(NCFILE)
+
+print *, __FILE__, ": ", __LINE__
 
   !> establish the bounds to iterate over; this can enable horiz or vert flipping
   call nf_set_iteration_bounds(NCFILE)
@@ -1237,19 +1258,25 @@ subroutine netcdf_open_file(NCFILE, sFilename, iLU)
   !> SAME PROVIDER!! MUST UPDATE TO ENSURE THAT THE INDICES ARE STILL RELEVANT
   call nf_get_variable_id_and_type( NCFILE )
 
-  NCFILE%dpFirstAndLastTimeValues = nf_get_first_and_last(NCFILE=NCFILE, &
-      iVarIndex=NCFILE%iVarIndex(NC_TIME) )
+  ! OK. We only want to attempt to call functions that
+  ! process the time variable if a time variable actually exists!!
+  if ( NCFILE%iVarID(NC_TIME) > 0 ) then
 
-  !> retrieve the origin for the time units associated with this file
-  call nf_get_time_units(NCFILE=NCFILE)
+    NCFILE%dpFirstAndLastTimeValues = nf_get_first_and_last(NCFILE=NCFILE, &
+        iVarIndex=NCFILE%iVarIndex(NC_TIME) )
 
-  !> retrieve the time value specific to this file
-  call nf_get_time_vals(NCFILE)
+    !> retrieve the origin for the time units associated with this file
+    call nf_get_time_units(NCFILE=NCFILE)
+
+    !> retrieve the time value specific to this file
+    call nf_get_time_vals(NCFILE)
+
+    call nf_calculate_time_range(NCFILE)
+
+  endif
 
   !> establish scale_factor and add_offset values, if present
   call nf_get_scale_and_offset(NCFILE=NCFILE)
-
-  call nf_calculate_time_range(NCFILE)
 
 end subroutine netcdf_open_file
 

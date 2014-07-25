@@ -33,8 +33,8 @@ module data_catalog_entry
     character (len=:), allocatable     :: sDescription
     character (len=:), allocatable     :: sSourcePROJ4_string
     character (len=:), allocatable     :: sSourceFileType
-    character (len=:), allocatable     :: sFilenameTemplate
     character (len=:), allocatable     :: sSourceFilename      ! e.g. 1980_00_prcp.nc
+    character (len=:), allocatable     :: sFilenameTemplate
     character (len=:), allocatable     :: sOldFilename        
     integer (kind=c_int)               :: iFileCount = -1
     integer (kind=c_int)               :: iFileCountYear = -9999
@@ -127,7 +127,8 @@ module data_catalog_entry
     procedure, public :: getvalues_constant => getvalues_constant_sub
     procedure, public :: getvalues_gridded => getvalues_gridded_sub
 
-    procedure, public :: getvalues_netcdf => getvalues_dynamic_netcdf_sub
+    procedure, public :: getvalues_netcdf => getvalues_dynamic_netcdf_sub, &
+                                             getvalues_static_netcdf_sub
 
     procedure, public :: getvalues => getvalues_sub
 
@@ -325,15 +326,13 @@ subroutine initialize_gridded_data_object_sub( this, &
   sFileType, &
   iDataType, &
   sFilename, &
-  sFilenameTemplate, &
   sPROJ4_string )
 
   class (DATA_CATALOG_ENTRY_T) :: this
   character (len=*) :: sDescription
   character (len=*) :: sFileType
-  character (len=*), optional :: sFilename
+  character (len=*) :: sFilename
   integer (kind=c_int) :: iDataType
-  character (len=*), optional :: sFilenameTemplate
   character (len=*), optional :: sPROJ4_string
 
   if (present(sPROJ4_string) ) then
@@ -345,20 +344,22 @@ subroutine initialize_gridded_data_object_sub( this, &
     this%lProjectionDiffersFromBase = lTRUE
   endif
 
-  if (present(sFilename)) then
-    this%sSourceFilename = sFilename
-    this%iSourceDataForm = STATIC_GRID
-  else
-    this%sSourceFilename = ""
-  endif
+  this%sSourceFilename = sFilename
 
-  if (present(sFilenameTemplate)) then
-    this%sFilenameTemplate = sFilenameTemplate
-    this%sSourceFilename = ""
+  !> if either a '%' or '#' character is present in the filename,
+  !! treat it as a template, not as a normal filename.
+  if ( scan(string=sFilename, set="%#") > 0 ) then
+
     this%iSourceDataForm = DYNAMIC_GRID
     this%lGridIsPersistent = lTRUE
+    this%sFilenameTemplate = trim( sFilename )
+
   else
+
+    this%iSourceDataForm = STATIC_GRID
+    this%lGridIsPersistent = lFALSE
     this%sFilenameTemplate = ""
+
   endif
 
   this%sSourceFileType = sFileType
@@ -385,12 +386,6 @@ subroutine initialize_gridded_data_object_sub( this, &
 
   this%pGrdBase%sPROJ4_string = BNDS%sPROJ4_string
 
-  call assert(.not. (len_trim(this%sSourceFilename) > 0 &
-    .and. len_trim(this%sFilenameTemplate) > 0), &
-    "INTERNAL PROGRAMMING ERROR - values may be assigned to either " &
-    //dquote("Filename")//" or the "//dquote("sFilenameTemplate") &
-    //" -- NOT BOTH", trim(__FILE__), __LINE__)
-
   nullify(this%pGrdNative)
 
   call netcdf_nullify_data_struct( NCFILE=this%NCFILE )
@@ -404,15 +399,13 @@ subroutine initialize_netcdf_data_object_sub( this, &
    sDescription, &
    iDataType, &
    sFilename, &
-   sFilenameTemplate, &
    sPROJ4_string )
 
    class (DATA_CATALOG_ENTRY_T) :: this
    character (len=*) :: sDescription
    integer (kind=c_int) :: iDataType
    type ( GENERAL_GRID_T ),pointer :: pGrdBase
-   character (len=*), optional :: sFilename
-   character (len=*), optional :: sFilenameTemplate
+   character (len=*) :: sFilename
    character (len=*), optional :: sPROJ4_string
 
    if (present(sPROJ4_string) ) then
@@ -424,33 +417,28 @@ subroutine initialize_netcdf_data_object_sub( this, &
      this%lProjectionDiffersFromBase = lTRUE
    endif
 
-   if (present(sFilename)) then
-     this%sSourceFilename = sFilename
-     this%iSourceDataForm = STATIC_NETCDF_GRID
-     this%lGridIsPersistent = lFALSE
-   else
-     this%sSourceFilename = ""
-   endif
+  this%sSourceFilename = sFilename
 
-   if (present(sFilenameTemplate)) then
-     this%sFilenameTemplate = sFilenameTemplate
-     this%sSourceFilename = ""
-     this%lGridIsPersistent = lTRUE
-     this%iSourceDataForm = DYNAMIC_NETCDF_GRID
-   else
-     this%sFilenameTemplate = ""
-   endif
+  !> if either a '%' or '#' character is present in the filename,
+  !! treat it as a template, not as a normal filename.
+  if ( scan(string=sFilename, set="%#") > 0 ) then
+
+    this%iSourceDataForm = DYNAMIC_NETCDF_GRID
+    this%lGridIsPersistent = lTRUE
+    this%sFilenameTemplate = trim(sFilename)
+
+  else
+
+    this%iSourceDataForm = STATIC_NETCDF_GRID
+    this%lGridIsPersistent = lFALSE
+    this%sFilenameTemplate = ""
+
+  endif
 
    this%pGrdBase => grid_Create(iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, &
      rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, rGridCellSize=BNDS%fGridCellSize, iDataType=iDataType)
 
    this%pGrdBase%sPROJ4_string = BNDS%sPROJ4_string
-
-   call assert(.not. (len_trim(this%sSourceFilename) > 0 &
-      .and. len_trim(this%sFilenameTemplate) > 0), &
-      "INTERNAL PROGRAMMING ERROR - values may be assigned to either " &
-      //dquote("Filename")//" or the "//dquote("sFilenameTemplate") &
-      //" -- NOT BOTH", trim(__FILE__), __LINE__)
 
    this%sSourceFileType = "NETCDF"
    this%iSourceFileType = this%get_filetype()
@@ -477,20 +465,34 @@ end subroutine initialize_netcdf_data_object_sub
 
     if(this%iSourceDataForm == DYNAMIC_GRID ) then
 
+print *, __FILE__, ": ", __LINE__
+
       call getvalues_gridded_sub( this, iMonth, iDay, iYear)
 
+print *, __FILE__, ": ", __LINE__
 
     elseif ( this%iSourceDataForm == DYNAMIC_NETCDF_GRID ) then
+
+print *, __FILE__, ": ", __LINE__
 
       iLocalJulianDay = iJulianDay
       call getvalues_dynamic_netcdf_sub( this, iMonth, iDay, iYear, iLocalJulianDay)
 
+    elseif ( this%iSourceDataForm == STATIC_NETCDF_GRID ) then
+
+print *, __FILE__, ": ", __LINE__
+
+      call getvalues_static_netcdf_sub( this )
 
     elseif(this%iSourceDataForm == STATIC_GRID ) then
+
+print *, __FILE__, ": ", __LINE__
 
       call getvalues_gridded_sub( this )
 
     elseif(this%iSourceDataForm == CONSTANT_GRID ) then
+
+print *, __FILE__, ": ", __LINE__
 
       call getvalues_constant_sub( this )
 
@@ -532,6 +534,7 @@ elemental subroutine apply_scale_and_offset_float(fResult, fValue, dUserScaleFac
 
 end subroutine apply_scale_and_offset_float
 
+!--------------------------------------------------------------------------------------------------
 
 elemental subroutine apply_scale_and_offset_int(iResult, iValue, dUserScaleFactor, dUserAddOffset )
 
@@ -544,6 +547,7 @@ elemental subroutine apply_scale_and_offset_int(iResult, iValue, dUserScaleFacto
 
 end subroutine apply_scale_and_offset_int
 
+!--------------------------------------------------------------------------------------------------
 
 subroutine getvalues_constant_sub( this  )
 
@@ -625,12 +629,14 @@ subroutine getvalues_constant_sub( this  )
         //" improper file type in use for a call to this subroutine", &
         trim(__FILE__), __LINE__)
 
-      if ( len_trim(this%sFilenameTemplate) > 0 ) then
+      if(this%iSourceDataForm == DYNAMIC_GRID ) then
+
         if(.not. (present(iMonth) .and. present(iDay) .and. present(iYear) ) ) &
           call assert(lFALSE, "INTERNAL PROGRAMMING ERROR - month, day, and year" &
             //" arguments must be supplied when calling this subroutine in a " &
             //"dynamic mode.", trim(__FILE__), __LINE__)
         call this%make_filename(iMonth, iDay, iYear)
+
       endif
 
       ! if the source filename hasn't changed, we don't need to be here
@@ -833,7 +839,7 @@ end subroutine set_constant_value_real
 
   subroutine make_filename_from_template( this, iMonth, iDay, iYear )
 
-    class (DATA_CATALOG_ENTRY_T) :: this
+    class (DATA_CATALOG_ENTRY_T)   :: this
     integer (kind=c_int), optional :: iMonth, iDay, iYear
 
     ! [ LOCALS ]
@@ -861,85 +867,88 @@ end subroutine set_constant_value_real
     call assert(iStatus==0, "Problem detemining what the current working" &
       //" directory is", trim(__FILE__), __LINE__)
 
-    sNewFilename = this%sFilenameTemplate
+    if (len_trim( this%sFilenameTemplate ) > 0 ) then
 
-    iCount = 0
+      sNewFilename = this%sSourceFilename
 
-    do
+      iCount = 0
 
-      lMatch = lFALSE
+      do
 
-      if (present(iYear) ) iPos_Y = &
-           max(index(sNewFilename, "%Y"), index(sNewFilename, "%y") )
+        lMatch = lFALSE
 
-      if (iPos_Y > 0) then
-        lMatch = lTRUE
-        iLen=len_trim(sNewFilename)
-        sNewFilename = sNewFilename(1:iPos_Y - 1)//trim(asCharacter(iYear)) &
-                       //sNewFilename(iPos_Y + 2:iLen)
+        if (present(iYear) ) iPos_Y = &
+             max(index(sNewFilename, "%Y"), index(sNewFilename, "%y") )
 
-      endif
+        if (iPos_Y > 0) then
+          lMatch = lTRUE
+          iLen=len_trim(sNewFilename)
+          sNewFilename = sNewFilename(1:iPos_Y - 1)//trim(asCharacter(iYear)) &
+                         //sNewFilename(iPos_Y + 2:iLen)
 
-      iPos = index(sNewFilename, "#")
-
-      if (iPos > 0) then
-
-        iPos2 = index(sNewFilename(1:iPos),"%", BACK=lTRUE)
-        sBuf2 = trim(asCharacter(this%iFileCount))
-        iNumZeros = max(0, iPos - iPos2 - 1)
-
-        if (iNumZeros > 0) then
-          iNumZerosToPrint = max(0,iNumZeros - len_trim(sBuf2) + 1)
-          sNumber = repeat("0", iNumZerosToPrint )//trim(sBuf2)
-        else
-          sNumber = repeat("0", iNumZeros - len_trim(sBuf2) )//trim(sBuf2)
         endif
 
-        lMatch = lTRUE
-        iLen=len_trim(sNewFilename)
-        sNewFilename = sNewFilename(1:iPos-2-iNumZeros)//trim(sNumber) &
-                       //sNewFilename(iPos+1:iLen)
+        iPos = index(sNewFilename, "#")
+
+        if (iPos > 0) then
+
+          iPos2 = index(sNewFilename(1:iPos),"%", BACK=lTRUE)
+          sBuf2 = trim(asCharacter(this%iFileCount))
+          iNumZeros = max(0, iPos - iPos2 - 1)
+
+          if (iNumZeros > 0) then
+            iNumZerosToPrint = max(0,iNumZeros - len_trim(sBuf2) + 1)
+            sNumber = repeat("0", iNumZerosToPrint )//trim(sBuf2)
+          else
+            sNumber = repeat("0", iNumZeros - len_trim(sBuf2) )//trim(sBuf2)
+          endif
+
+          lMatch = lTRUE
+          iLen=len_trim(sNewFilename)
+          sNewFilename = sNewFilename(1:iPos-2-iNumZeros)//trim(sNumber) &
+                         //sNewFilename(iPos+1:iLen)
+        endif
+
+        if (present(iMonth) ) iPos_M = &
+            max(index(sNewFilename, "%M"), index(sNewFilename, "%m") )
+
+        if (iPos_M > 0) then
+          lMatch = lTRUE
+          write (unit=sBuf, fmt="(i2.2)") iMonth
+
+          iLen=len_trim(sNewFilename)
+          sNewFilename = sNewFilename(1:iPos_M - 1)//sBuf &
+                         //sNewFilename(iPos_M + 2:iLen)
+        endif
+
+        if (present(iDay) ) iPos_D = &
+             max(index(sNewFilename, "%D"),index(sNewFilename, "%d") )
+
+        if (iPos_D > 0) then
+          lMatch = lTRUE
+          write (unit=sBuf, fmt="(i2.2)") iDay
+          iLen=len_trim(sNewFilename)
+          sNewFilename = sNewFilename(1:iPos_D - 1)//sBuf &
+                         //sNewFilename(iPos_D + 2:iLen)
+        endif
+
+        if (.not. lMatch) exit
+
+        iCount = iCount + 1
+
+        ! failsafe
+        if (iCount > 4) exit
+
+      enddo
+
+      if( index(string=sCWD, substring=sFORWARDSLASH) > 0 ) then
+        sDelimiter = sFORWARDSLASH
+      else
+        sDelimiter = sBACKSLASH
       endif
 
-      if (present(iMonth) ) iPos_M = &
-          max(index(sNewFilename, "%M"), index(sNewFilename, "%m") )
+    endif  
 
-      if (iPos_M > 0) then
-        lMatch = lTRUE
-        write (unit=sBuf, fmt="(i2.2)") iMonth
-
-        iLen=len_trim(sNewFilename)
-        sNewFilename = sNewFilename(1:iPos_M - 1)//sBuf &
-                       //sNewFilename(iPos_M + 2:iLen)
-      endif
-
-      if (present(iDay) ) iPos_D = &
-           max(index(sNewFilename, "%D"),index(sNewFilename, "%d") )
-
-      if (iPos_D > 0) then
-        lMatch = lTRUE
-        write (unit=sBuf, fmt="(i2.2)") iDay
-        iLen=len_trim(sNewFilename)
-        sNewFilename = sNewFilename(1:iPos_D - 1)//sBuf &
-                       //sNewFilename(iPos_D + 2:iLen)
-      endif
-
-      if (.not. lMatch) exit
-
-      iCount = iCount + 1
-
-      ! failsafe
-      if (iCount > 4) exit
-
-    enddo
-
-    if( index(string=sCWD, substring=sFORWARDSLASH) > 0 ) then
-      sDelimiter = sFORWARDSLASH
-    else
-      sDelimiter = sBACKSLASH
-    endif
-
-!    this%sSourceFilename = trim(sCWD)//trim(sDelimiter)//trim(sNewFilename)
     this%sSourceFilename = trim(sNewFilename)
 
   end subroutine make_filename_from_template
@@ -1171,7 +1180,7 @@ end subroutine set_constant_value_real
 
             exit
 
-          elseif ( scan(this%sFilenameTemplate, "#") /= 0 ) then
+          elseif ( scan(this%sSourceFilename, "#") /= 0 ) then
             
             call netcdf_close_file( NCFILE=this%NCFILE )
             this%iNC_FILE_STATUS = NETCDF_FILE_CLOSED
@@ -1248,6 +1257,122 @@ end subroutine set_constant_value_real
     call this%transfer_from_native( )
 
   end subroutine getvalues_dynamic_netcdf_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine getvalues_static_netcdf_sub( this )
+
+    class (DATA_CATALOG_ENTRY_T) :: this
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iStat
+    real (kind=c_double) :: dAddOffset
+    real (kind=c_double) :: dScaleFactor
+
+    if ( .not. associated(this%pGrdBase) ) &
+      call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
+
+    dAddOffset = this%NCFILE%rAddOffset(NC_Z)
+    dScaleFactor = this%NCFILE%rScaleFactor(NC_Z)
+
+    if ( this%iNC_FILE_STATUS == NETCDF_FILE_CLOSED ) then
+
+       if (this%lPerformFullInitialization ) then
+
+          if( len_trim( this%sSourcePROJ4_string ) > 0 ) then
+
+            ! calculate the project boundaries in the coordinate system of
+            ! the native data file
+            call this%calc_project_boundaries(pGrdBase=this%pGrdBase)
+
+            call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE, &
+              sFilename=this%sSourceFilename, &
+              lFlipHorizontal=this%lFlipHorizontal, &
+              lFlipVertical=this%lFlipVertical, &
+              sVariableOrder=this%sVariableOrder, &
+              sVarName_x=this%sVariableName_x, &
+              sVarName_y=this%sVariableName_y, &
+              sVarName_z=this%sVariableName_z, &
+              sVarName_time=this%sVariableName_time, &
+              tGridBounds=this%GRID_BOUNDS_NATIVE )
+
+          else  ! PROJ4 string is blank
+
+            ! assume source NetCDF file is in same projection and
+            ! of same dimensions as base grid
+            call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE, &
+              sFilename=this%sSourceFilename, &
+              lFlipHorizontal=this%lFlipHorizontal, &
+              lFlipVertical=this%lFlipVertical, &
+              sVariableOrder=this%sVariableOrder, &
+              sVarName_x=this%sVariableName_x, &
+              sVarName_y=this%sVariableName_y, &
+              sVarName_z=this%sVariableName_z, &
+              sVarName_time=this%sVariableName_time )
+
+            this%NCFILE%iNX = this%pGrdBase%iNX
+            this%NCFILE%iNY = this%pGrdBase%iNY
+            this%NCFILE%rX(NC_LEFT) = this%pGrdBase%rX0
+            this%NCFILE%rY(NC_BOTTOM) = this%pGrdBase%rY0
+            this%NCFILE%rX(NC_RIGHT) = this%pGrdBase%rX1
+            this%NCFILE%rY(NC_TOP) = this%pGrdBase%rY1
+
+          endif
+
+          this%iNC_FILE_STATUS = NETCDF_FILE_OPEN
+
+          this%iSourceDataType = this%NCFILE%iVarType(NC_Z)
+
+          ! Amongst other things, the call to netcdf_open_and_prepare
+          ! finds the nearest column and row that correspond to the
+          ! project bounds, then back-calculates the coordinate values
+          ! of the column and row numbers in the *NATIVE* coordinate system
+          if ( associated(this%pGrdNative) )  call grid_Destroy (this%pGrdNative)
+
+          this%pGrdNative => grid_Create ( iNX=this%NCFILE%iNX, &
+                    iNY=this%NCFILE%iNY, &
+                    rX0=this%NCFILE%rX(NC_LEFT), &
+                    rY0=this%NCFILE%rY(NC_BOTTOM), &
+                    rX1=this%NCFILE%rX(NC_RIGHT), &
+                    rY1=this%NCFILE%rY(NC_TOP), &
+                    iDataType=this%iTargetDataType )
+
+          if( len_trim( this%sSourcePROJ4_string ) > 0 ) then
+            ! ensure that PROJ4 string is associated with the native grid
+            this%pGrdNative%sPROJ4_string = this%sSourcePROJ4_string
+          endif
+
+          this%pGrdNative%sFilename = this%sSourceFilename
+
+          ! we don't need to perform all these steps for the next file; we are
+          ! assuming, of course, that all of the subsequent files cover the same
+          ! extents and are in the same projection as this first file
+          this%lPerformFullInitialization = lFALSE
+
+        else
+          ! Projection settings can be left alone; read values from new
+          ! NetCDF file with same grid boundaries, projection, etc.
+
+!          call netcdf_open_file(NCFILE=this%NCFILE, sFilename=this%sSourceFilename, iLU=LU_LOG)
+          call netcdf_open_file(NCFILE=this%NCFILE, sFilename=this%sSourceFilename)
+
+          this%iNC_FILE_STATUS = NETCDF_FILE_OPEN
+
+        endif
+
+
+    endif  ! If (NC_FILE_STATUS == NETCDF_CLOSED)
+
+    call netcdf_get_variable_slice(NCFILE=this%NCFILE, rValues=this%pGrdNative%rData)
+
+    this%pGrdNative%rData = this%pGrdNative%rData * dScaleFactor + dAddOffset
+
+    call this%handle_missing_values(this%pGrdNative%rData)
+    call this%enforce_limits(this%pGrdNative%rData)
+
+    call this%transfer_from_native( )
+
+  end subroutine getvalues_static_netcdf_sub
 
 !--------------------------------------------------------------------------------------------------
 
