@@ -967,7 +967,9 @@ contains
 
       call MODEL%initialize_landuse()
 
+      call MODEL%initialize_available_water_content()
 
+      call MODEL%initialize_soil_layers()
 
   end subroutine initialize_soils_landuse_awc_flowdir_values
 
@@ -1222,7 +1224,7 @@ contains
 
           case ( "WATER_CAPACITY", "AVAILABLE_WATER_CAPACITY", "AWC" )
 
-            if (.not. associated(LULC))  allocate(LULC, stat=iStat)
+            if (.not. associated(AWC))  allocate(AWC, stat=iStat)
               call assert(iStat==0, "Problem allocating memory for the soils group (LULC) data structure",   &
                 __FILE__, __LINE__)
 
@@ -1234,18 +1236,18 @@ contains
 
               case ( "ARC_ASCII", "SURFER", "ARC_GRID" )
 
-                call LULC%initialize(sDescription=trim(sCmdText), &
+                call AWC%initialize(sDescription=trim(sCmdText), &
                   sFileType=trim(sOptionText), &
                   sFilename=trim(sArgText), &
-                  iDataType=DATATYPE_INT, &
+                  iDataType=DATATYPE_REAL, &
                   sPROJ4_string=BNDS%sPROJ4_string )
 
               case ( "NETCDF" )
                   
-                call LULC%initialize_netcdf( &
+                call AWC%initialize_netcdf( &
                   sDescription=trim(sCmdText), &
                   sFilenameTemplate = trim(sArgText), &
-                  iDataType=DATATYPE_INT, &
+                  iDataType=DATATYPE_REAL, &
                   sPROJ4_string=BNDS%sPROJ4_string ) 
      
               case default

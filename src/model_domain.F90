@@ -124,6 +124,9 @@ module model_domain
     procedure :: get_climate_data
     procedure :: write_variables_to_netcdf
 
+    procedure :: initialize_available_water_content_sub
+    generic   :: initialize_available_water_content => initialize_available_water_content_sub
+
     procedure :: initialize_soil_layers_sub
     generic   :: initialize_soil_layers => initialize_soil_layers_sub
 
@@ -333,7 +336,7 @@ contains
     allocate( this%potential_recharge(iCount), stat=iStat(24) )
     allocate( this%stream_storage(iCount), stat=iStat(25) )
 
-    allocate( OUTPUT(13), stat=iStat(26) )
+    allocate( OUTPUT(14), stat=iStat(26) )
 
     if ( any( iStat /= 0 ) )  call die("Problem allocating memory", __FILE__, __LINE__)
 
@@ -420,6 +423,9 @@ contains
       sVariableUnits="degrees Fahrenheit", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end )
 
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(14)%ncfile, sVariableName="available_water_content", &
+      sVariableUnits="inches per foot", iNX=this%number_of_columns, iNY=this%number_of_rows, &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end )
 
       this%dont_care = -9999._c_float
 
@@ -746,6 +752,14 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
+    this%array_output = unpack(this%awc, this%active, this%dont_care)
+
+    call netcdf_put_variable_array(NCFILE=OUTPUT(14)%ncfile, &
+                   iVarID=OUTPUT(14)%ncfile%iVarID(NC_Z), &
+                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
+                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
+                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
+                   rValues=this%array_output )
 
   end subroutine write_variables_to_netcdf
 

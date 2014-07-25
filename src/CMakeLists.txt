@@ -1,7 +1,7 @@
 
 if(TARGET__SWB_EXECUTABLE)
 
-  add_executable(swb
+  add_executable(swb2
             #cell_class.F90
             #cell_collection.F90
             constants_and_conversions.F90
@@ -204,16 +204,16 @@ if(TARGET__SWB_EXECUTABLE)
 
             )
 
-  set_target_properties(swb
+  set_target_properties(swb2
             PROPERTIES COMPILE_DEFINITIONS "${PREPROCESSOR_DEFINES}")
 
-  target_link_libraries(swb ${EXTRA_LIBS})
+  target_link_libraries(swb2 ${EXTRA_LIBS})
 
 endif()
 
 if(TARGET__SWB_LIBRARY)
 
-  add_library(swblib SHARED
+  add_library(swb2lib SHARED
             #cell_class.F90
             #cell_collection.F90
             constants_and_conversions.F90
@@ -415,9 +415,9 @@ if(TARGET__SWB_LIBRARY)
 
             )
 
-  set_target_properties(swblib
+  set_target_properties(swb2lib
             PROPERTIES COMPILE_DEFINITIONS "${PREPROCESSOR_DEFINES}")
 
-  target_link_libraries(swblib ${EXTRA_LIBS})
+  target_link_libraries(swb2lib ${EXTRA_LIBS})
 
 endif()
