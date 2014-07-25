@@ -1,4 +1,4 @@
-# CMake project for swb
+# CMake project for swb2
 
 # This script expects that the following configuration variables are
 # set and passed during CMake invocation:
@@ -18,7 +18,7 @@
 # LIB_PATH3
 # LIB_PATH4
 
-message("Processing top-level CMakelists.txt for project swb")
+message("Processing top-level CMakelists.txt for project swb2")
 
 #------------------------------------------------------------------------------------#
 #                           Build directory check                                    #
@@ -46,10 +46,10 @@ include(CPack)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(PACKAGE_BUGREPORT "smwesten@usgs.gov")
-set(PACKAGE_NAME "swb")
-set(PACKAGE_STRING "swb 1.2 BETA")
-set(PACKAGE_TARNAME "swb")
-set(PACKAGE_VERSION "1.2 BETA")
+set(PACKAGE_NAME "swb2")
+set(PACKAGE_STRING "swb2 2.0 ALPHA")
+set(PACKAGE_TARNAME "swb2")
+set(PACKAGE_VERSION "2.0 ALPHA")
 
 cmake_minimum_required(VERSION 2.8)
 
@@ -77,10 +77,10 @@ include( cmake/find_programs_and_libraries.cmake )
 #set(MODULE_DIR ${INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/include/${OS}/${Fortran_COMPILER_NAME} )
 
 if ("${OS}" STREQUAL "win_x64" OR "${OS}" STREQUAL "win_x86")
-  add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb.exe ${CMAKE_INSTALL_PREFIX}/swb.exe
+  add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2.exe ${CMAKE_INSTALL_PREFIX}/swb2.exe
   )
 else()
-  add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb ${CMAKE_INSTALL_PREFIX}/swb
+  add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2 ${CMAKE_INSTALL_PREFIX}/swb2
   )
 endif()
 

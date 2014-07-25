@@ -623,27 +623,34 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
   if (present(sVarName_time) ) then
     NCFILE%sVarName(NC_TIME) = sVarName_time
   else
-    NCFILE%sVarName(NC_TIME) = "time"
+    NCFILE%sVarName(NC_TIME) = ""
   endif
 
   call nf_get_variable_id_and_type( NCFILE )
 
-  NCFILE%dpFirstAndLastTimeValues = nf_get_first_and_last(NCFILE=NCFILE, &
-      iVarIndex=NCFILE%iVarIndex(NC_TIME) )
+  ! OK. We only want to attempt to call functions that
+  ! process the time variable if a time variable actually exists!!
+  if (len_trim(NCFILE%sVarName(NC_TIME)) > 0 ) then
 
-  call nf_get_time_units(NCFILE=NCFILE)
+    NCFILE%dpFirstAndLastTimeValues = nf_get_first_and_last(NCFILE=NCFILE, &
+        iVarIndex=NCFILE%iVarIndex(NC_TIME) )
+
+    call nf_get_time_units(NCFILE=NCFILE)
+
+    call nf_calculate_time_range(NCFILE)
+
+    !> retrieve the time values as included in the NetCDF file
+    call nf_get_time_vals(NCFILE)
+
+  endif
+
   call nf_get_xyz_units(NCFILE=NCFILE)
 
   !> establish scale_factor and add_offset values, if present
   call nf_get_scale_and_offset(NCFILE=NCFILE)
 
-  call nf_calculate_time_range(NCFILE)
-
   !> retrieve the X and Y coordinates from the NetCDF file...
   call nf_get_x_and_y(NCFILE)
-
-  !> retrieve the time values as included in the NetCDF file
-  call nf_get_time_vals(NCFILE)
 
   if (present(tGridBounds) ) then
 
@@ -2283,6 +2290,9 @@ subroutine nf_get_time_units(NCFILE)
   call chomp(sDateTime, sItem, "/-")
   read(sItem, *) NCFILE%iOriginMonth
 
+  !> @todo this does not appear to have the fix that was applied to the master swb branch to 
+  !!       deal with cases where no time values are given at all
+
   read(sDateTime, *) NCFILE%iOriginDay
 
   call chomp(sDateTime, sItem, ":")
@@ -2438,9 +2448,9 @@ subroutine nf_get_variable_id_and_type( NCFILE )
      "Unable to find the variable named "//dquote(NCFILE%sVarName(NC_Z))//" in " &
      //"file "//dquote(NCFILE%sFilename), trim(__FILE__), __LINE__)
 
-   call assert(NCFILE%iVarID(NC_TIME) >= 0, &
-     "Unable to find the variable named "//dquote(NCFILE%sVarName(NC_TIME))//" in " &
-     //"file "//dquote(NCFILE%sFilename), trim(__FILE__), __LINE__)
+   if ( NCFILE%iVarID(NC_TIME) < 0 )  &
+     call warn("Unable to find the variable named "//dquote(NCFILE%sVarName(NC_TIME))//" in " &
+       //"file "//dquote(NCFILE%sFilename) )
 
 end subroutine nf_get_variable_id_and_type
 
