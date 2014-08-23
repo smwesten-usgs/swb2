@@ -38,7 +38,6 @@ module data_catalog_entry
     character (len=:), allocatable     :: sOldFilename        
     integer (kind=c_int)               :: iFileCount = -1
     integer (kind=c_int)               :: iFileCountYear = -9999
-    logical (kind=c_bool)              :: lProjectionDiffersFromBase = lFALSE
     real (kind=c_float)                :: rMinAllowedValue = -rBIGVAL     ! default condition is to impose
     real (kind=c_float)                :: rMaxAllowedValue = rBIGVAL      ! no bounds on data
     integer (kind=c_int)               :: iMinAllowedValue = -iBIGVAL     ! default condition is to impose
@@ -337,11 +336,8 @@ subroutine initialize_gridded_data_object_sub( this, &
 
   if (present(sPROJ4_string) ) then
     this%sSourcePROJ4_string = trim(sPROJ4_string)
-    if(.not. ( sPROJ4_string .strequal. BNDS%sPROJ4_string) ) &
-      this%lProjectionDiffersFromBase = lTRUE
   else
     this%sSourcePROJ4_string =  BNDS%sPROJ4_string
-    this%lProjectionDiffersFromBase = lTRUE
   endif
 
   this%sSourceFilename = sFilename
@@ -410,11 +406,8 @@ subroutine initialize_netcdf_data_object_sub( this, &
 
    if (present(sPROJ4_string) ) then
      this%sSourcePROJ4_string = trim(sPROJ4_string)
-     if(.not. ( sPROJ4_string .strequal. BNDS%sPROJ4_string) ) &
-       this%lProjectionDiffersFromBase = lTRUE
    else
      this%sSourcePROJ4_string =  BNDS%sPROJ4_string
-     this%lProjectionDiffersFromBase = lTRUE
    endif
 
   this%sSourceFilename = sFilename
@@ -1368,6 +1361,7 @@ end subroutine set_constant_value_real
     this%pGrdNative%rData = this%pGrdNative%rData * dScaleFactor + dAddOffset
 
     call this%handle_missing_values(this%pGrdNative%rData)
+
     call this%enforce_limits(this%pGrdNative%rData)
 
     call this%transfer_from_native( )

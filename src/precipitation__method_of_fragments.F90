@@ -30,15 +30,13 @@ module precipitation__method_of_fragments
 
 contains
 
-  ! current concept: use normal template mechanism to bring in monthly data grids (i.e. PRCP object contains MONTHLY normal sums)
-  !                  read annual summed precip from a table
-  !                  read fragments in as a table
+  ! current concept: use normal template mechanism to bring in month-year data grids 
+  !                      (i.e. PRCP object contains MONTHLY sums for given year)
   ! 
-  ! randomly choose a fragment
-  ! multiply monthly grid by normalized annual sum (e.g. 1.1 in a wet year, 0.9 in a dry year)
-  ! calculate daily precip by multiplying daily fragment value by monthly sum 
-
-
+  !  read fragments in as a table
+  !  randomly choose a fragment
+  !  multiply monthly grid by normalized annual sum (e.g. 1.1 in a wet year, 0.9 in a dry year)
+  !  calculate daily precip by multiplying daily fragment value by monthly sum 
 
   subroutine initialize_precipitation_method_of_fragments(iNumActiveCells )
 

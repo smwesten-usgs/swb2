@@ -96,11 +96,11 @@ contains
     call initialize_precipitation_options()
     
     call initialize_tmax_options()
-    
+  print *, __FILE__, ": ", __LINE__        
     call initialize_tmin_options()
-    
+  print *, __FILE__, ": ", __LINE__        
     call initialize_flow_direction_options()
-    
+  print *, __FILE__, ": ", __LINE__        
     call initialize_parameter_tables()
     
   print *, __FILE__, ": ", __LINE__    
@@ -329,7 +329,6 @@ contains
       enddo
 
     endif
-
 
 
   end subroutine initialize_precipitation_options
@@ -955,7 +954,8 @@ contains
 !! REally should have this data load later in the process to allow as much of the
 !! control file as possible to be read in and processed.
   print *, __FILE__, ": ", __LINE__    
-      call HSG%getvalues(  )
+      call HSG%set_variable_order("yx")
+      !call HSG%getvalues(  )
         print *, __FILE__, ": ", __LINE__    
 
     endif

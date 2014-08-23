@@ -30,6 +30,7 @@ contains
     integer (kind=c_int)              :: iSoilsIndex
     character (len=:), allocatable    :: sText
 
+    !> creating a list of the keywords that will be recognized as equivalent
     call slList%append("LU_Code")
     call slList%append("Landuse_Lookup_Code")
 
