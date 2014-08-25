@@ -96,32 +96,19 @@ contains
     call initialize_precipitation_options()
     
     call initialize_tmax_options()
-  print *, __FILE__, ": ", __LINE__        
     call initialize_tmin_options()
-  print *, __FILE__, ": ", __LINE__        
     call initialize_flow_direction_options()
-  print *, __FILE__, ": ", __LINE__        
     call initialize_parameter_tables()
     
-  print *, __FILE__, ": ", __LINE__    
     call initialize_soils_group_options()
-  print *, __FILE__, ": ", __LINE__        
     call initialize_landuse_options()
-  print *, __FILE__, ": ", __LINE__    
     call initialize_available_water_capacity_options()
-  print *, __FILE__, ": ", __LINE__    
     call initialize_interception_method()
-  print *, __FILE__, ": ", __LINE__        
     call initialize_evapotranspiration_method()
-  print *, __FILE__, ": ", __LINE__        
     call initialize_infiltration_method()
-  print *, __FILE__, ": ", __LINE__        
     call MODEL%set_inactive_cells()
-  print *, __FILE__, ": ", __LINE__    
     call MODEL%initialize_arrays()
-  print *, __FILE__, ": ", __LINE__        
     call initialize_soils_landuse_awc_flowdir_values()
-  print *, __FILE__, ": ", __LINE__    
     call MODEL%preflight_check_method_pointers()
 
     call MODEL%initialize_methods()
@@ -209,7 +196,12 @@ contains
 
               select case (sOptionText)
 
-                case ("ARC_ASCII", "SURFER")
+                case ("CONSTANT")
+
+                  call PRCP%initialize(sDescription=trim(sCmdText), &
+                    rConstant=asFloat(sArgText)  )
+
+                case ("ARC_ASCII", "SURFER", "ARC_GRID")
 
                   call PRCP%initialize(sDescription=trim(sCmdText), &
                     sFileType=trim(sOptionText), &
@@ -240,10 +232,6 @@ contains
             ! was trying to read in entire control file, do checking, and *then* actually read
             ! in the files themselves
             call read_daily_fragments( sArgText )  
-
-          case ( "PRECIPITATION_METHOD_OF_FRAGMENTS_NORMALIZATION_FILE")
-          
-            call read_annual_normalization( sArgText )  
 
           case ( "PRECIPITATION_SCALE_FACTOR", "PRECIPITATION_SCALE" )
 
@@ -392,7 +380,12 @@ contains
 
             select case (sOptionText)
 
-              case ("ARC_ASCII", "SURFER")
+              case ("CONSTANT")
+
+                call TMAX%initialize(sDescription=trim(sCmdText), &
+                  rConstant=asFloat(sArgText)  )            
+
+              case ("ARC_ASCII", "SURFER", "ARC_GRID")
 
                 call TMAX%initialize(sDescription=trim(sCmdText), &
                   sFileType=trim(sOptionText), &
@@ -556,7 +549,12 @@ contains
 
             select case (sOptionText)
 
-              case ("ARC_ASCII", "SURFER")
+              case ("CONSTANT")
+
+                call TMIN%initialize(sDescription=trim(sCmdText), &
+                  rConstant=asFloat(sArgText) )
+
+              case ("ARC_ASCII", "SURFER", "ARC_GRID")
 
                 call TMIN%initialize(sDescription=trim(sCmdText), &
                   sFileType=trim(sOptionText), &
@@ -955,7 +953,7 @@ contains
 !! control file as possible to be read in and processed.
   print *, __FILE__, ": ", __LINE__    
       call HSG%set_variable_order("yx")
-      !call HSG%getvalues(  )
+      call HSG%getvalues(  )
         print *, __FILE__, ": ", __LINE__    
 
     endif

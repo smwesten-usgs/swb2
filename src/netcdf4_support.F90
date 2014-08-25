@@ -111,7 +111,6 @@ module netcdf4_support
   integer (kind=c_int), parameter :: COLUMN = 1
   integer (kind=c_int), parameter :: ROW = 2
 
-
   character (len=25), dimension(4), parameter :: NETCDF_FORMAT_STRING = &
     ["NC_FORMAT_CLASSIC        ", &
      "NC_FORMAT_64BIT          ", &
@@ -891,7 +890,7 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   
   call nf_set_global_attributes(NCFILE=NCFILE, &
      sDataType=trim(NCFILE%sVarName(NC_Z)), &
-     sSourceFile="NA" )
+     sSourceFile="(SWB-generated)" )
   
   call nf_put_attributes(NCFILE=NCFILE)
 
@@ -2825,11 +2824,11 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, sSourceFile)
   ! [ LOCALS ]
   integer (kind=c_int) :: iStat
 
-  allocate( NCFILE%pNC_ATT(0:0), stat=iStat)
+  NCFILE%iNumberOfAttributes = 2
+
+  allocate( NCFILE%pNC_ATT(0:NCFILE%iNumberOfAttributes-1), stat=iStat)
   call assert(iStat == 0, "Could not allocate memory for NC_ATT member of NC_FILE", &
     trim(__FILE__), __LINE__)
-
-  NCFILE%iNumberOfAttributes = 1
 
   block
 
@@ -2838,6 +2837,12 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, sSourceFile)
     NCFILE%pNC_ATT(0)%sAttValue(0) = trim(sDataType)//" data from file "//trim(sSourceFile)
     NCFILE%pNC_ATT(0)%iNC_AttType = NC_CHAR
     NCFILE%pNC_ATT(0)%iNC_AttSize = 1_c_size_t
+
+    NCFILE%pNC_ATT(1)%sAttributeName = "conventions"
+    allocate(NCFILE%pNC_ATT(1)%sAttValue(0:0))
+    NCFILE%pNC_ATT(1)%sAttValue(0) = "CF-1.6"
+    NCFILE%pNC_ATT(1)%iNC_AttType = NC_CHAR
+    NCFILE%pNC_ATT(1)%iNC_AttSize = 1_c_size_t
 
   end block
 
@@ -2888,10 +2893,11 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText)
 
   end block
 
-  allocate( NCFILE%pNC_VAR(NC_Z)%pNC_ATT(0:0), stat=iStat)
+  iNumAttributes = 2
+  allocate( NCFILE%pNC_VAR(NC_Z)%pNC_ATT(0:iNumAttributes-1), stat=iStat)
   call assert(iStat == 0, "Could not allocate memory for NC_ATT member in NC_VAR struct of NC_FILE", &
     trim(__FILE__), __LINE__)
-  NCFILE%pNC_VAR(NC_Z)%iNumberOfAttributes = 1
+  NCFILE%pNC_VAR(NC_Z)%iNumberOfAttributes = iNumAttributes
 
   pNC_ATT => NCFILE%pNC_VAR(NC_Z)%pNC_ATT
 
@@ -2903,9 +2909,15 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText)
     pNC_ATT(0)%iNC_AttType = NC_CHAR
     pNC_ATT(0)%iNC_AttSize = 1_c_size_t
 
+    pNC_ATT(1)%sAttributeName = "missing_value"
+    allocate(pNC_ATT(1)%sAttValue(0:0))
+    pNC_ATT(1)%sAttValue(0) = "-9999.0"
+    pNC_ATT(1)%iNC_AttType = NC_CHAR
+    pNC_ATT(1)%iNC_AttSize = 1_c_size_t
+
   end block
 
-
+  iNumAttributes = 3
   allocate( NCFILE%pNC_VAR(NC_Y)%pNC_ATT(0:iNumAttributes-1), stat=iStat)
   call assert(iStat == 0, "Could not allocate memory for NC_ATT member in NC_VAR struct of NC_FILE", &
     trim(__FILE__), __LINE__)
@@ -2936,6 +2948,7 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText)
 
   end block
 
+  iNumAttributes = 3
   allocate( NCFILE%pNC_VAR(NC_X)%pNC_ATT(0:iNumAttributes-1), stat=iStat)
   call assert(iStat == 0, "Could not allocate memory for NC_ATT member in NC_VAR struct of NC_FILE", &
     trim(__FILE__), __LINE__)
@@ -3077,6 +3090,12 @@ subroutine nf_put_attribute(NCFILE, iVarID, sAttributeName, &
 
     iNumberOfAttributes = size( sAttributeValue, 1)
     iNumberOfAttributes = int(len_trim(sAttributeValue(1)), kind=c_size_t)
+
+    print *, __FILE__, __LINE__
+    print *, trim(sAttributeName)
+    print *, trim(sAttributeValue(1))
+    print *, iNumberOfAttributes
+    print *, iVarID
 
     call nf_trap( nc_put_att_text(ncid=NCFILE%iNCID, &
                     varid=iVarID, &

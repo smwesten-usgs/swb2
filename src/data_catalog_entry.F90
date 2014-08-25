@@ -266,6 +266,7 @@ contains
 !--------------------------------------------------------------------------------------------------
 
   !> todo Why are we creating full-blown pGrdBase object for a grid of constant value?
+
   subroutine initialize_constant_real_data_object_sub( this, &
     sDescription, &
     rConstant )
@@ -555,8 +556,8 @@ subroutine getvalues_constant_sub( this  )
 
       this%lGridHasChanged = lTRUE
 
-      this%pGrdNative%rData = this%rConstantValue
-       
+      this%pGrdBase%rData = this%rConstantValue
+
     case ( DATATYPE_INT)
 
       this%lGridHasChanged = lTRUE
@@ -1420,7 +1421,8 @@ end subroutine set_constant_value_real
      class (DATA_CATALOG_ENTRY_T) :: this
      integer (kind=c_int) :: iFileType
 
-     if ( this%sSourceFileType .strequal. "ARC_GRID" ) then
+     if ( (this%sSourceFileType .strequal. "ARC_GRID") &
+         .or. (this%sSourceFileType .strequal. "ARC_ASCII") ) then
 
        iFileType = FILETYPE_ARC_ASCII
 

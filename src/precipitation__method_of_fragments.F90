@@ -17,16 +17,11 @@ module precipitation__method_of_fragments
     integer (kind=c_int) :: iFragmentSet
     real (kind=c_float)  :: fFragmentValue(31)
   end type FRAGMENTS_T
-
-  type, public :: NORMALIZATION_FACTOR_T
-    integer (kind=c_int) :: iYear
-    real (kind=c_float)  :: fNormalizationFactor
-  end type NORMALIZATION_FACTOR_T  
   
   type (FRAGMENTS_T), allocatable, public            :: FRAGMENTS(:)
-  type (NORMALIZATION_FACTOR_T), allocatable, public :: NORMALIZATION_FACTOR(:)
+  type (FRAGMENTS_T), pointer, public                :: pFRAGMENT => null()
 
-  public :: initialize_precipitation_method_of_fragments, read_daily_fragments, read_annual_normalization
+  public :: initialize_precipitation_method_of_fragments, read_daily_fragments
 
 contains
 
@@ -147,68 +142,16 @@ contains
       
     enddo    
 
+    call LOGS%write("Maximum rain gage zone number: "//asCharacter(maxval(FRAGMENTS%iRainGageZone)), &
+      iTab=31, iLinesAfter=1, iLogLevel=LOG_ALL)
+
   end subroutine read_daily_fragments
 
+  
+!   subroutine apply_daily_fragments()
 
-  subroutine read_annual_normalization( sFilename )
+!   end subroutine apply_daily_fragments
 
-    character (len=*), intent(in)    :: sFilename
-
-    ! [ LOCALS ]
-    character (len=512)   :: sRecord, sSubstring
-    integer (kind=c_int)  :: iStat
-    integer (kind=c_int)  :: iCount
-    integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: iNumLines  
-    type (ASCII_FILE_T)   :: NORMALIZATION_FILE
-
-
-    call NORMALIZATION_FILE%open( sFilename = sFilename, &
-                  sCommentChars = "#%!", &
-                  sDelimiters = "WHITESPACE", &
-                  lHasHeader = .false._c_bool )
-
-    iNumLines = NORMALIZATION_FILE%numLines()
-
-    allocate(  NORMALIZATION_FACTOR( iNumLines ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory for fragments table", &
-      __FILE__, __LINE__ )
-
-    iCount = 0
-
-    do 
-
-      ! read in next line of file
-      sRecord = NORMALIZATION_FILE%readLine()
-
-      if ( NORMALIZATION_FILE%isEOF() ) exit 
-
-      iCount = iCount + 1
-
-      ! read in year number
-      call chomp(sRecord, sSubstring, NORMALIZATION_FILE%sDelimiters )
-
-      if ( len_trim(sSubstring) == 0 ) &
-      call die( "Missing year number", &
-        __FILE__, __LINE__, "Problem occured on line number "//asCharacter(NORMALIZATION_FILE%currentLineNum() ) &
-        //" of file "//dquote(sFilename) )
-
-      NORMALIZATION_FACTOR(iCount)%iYear = asInt( sSubString )
-
-      ! read in normalization factor
-      call chomp(sRecord, sSubstring, NORMALIZATION_FILE%sDelimiters )
-
-      if ( len_trim(sSubstring) == 0 ) &
-      call die( "Missing precipitation normalization factor", &
-        __FILE__, __LINE__, "Problem occured on line number "//asCharacter(NORMALIZATION_FILE%currentLineNum() ) &
-        //" of file "//dquote(sFilename) )
-
-
-      NORMALIZATION_FACTOR(iCount)%fNormalizationFactor = asFloat( sSubString )
-      
-    enddo    
-
-  end subroutine read_annual_normalization
 
 
 end module precipitation__method_of_fragments

@@ -255,22 +255,26 @@ contains
         if ( this%iLogLevel >= LOG_GENERAL ) &
           call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_GENERAL ), &
             iTab=iTab_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
+        flush(this%iUnitNum( LOG_GENERAL ))  
 
       case ( LOG_DEBUG )
 
         if ( this%iLogLevel >= LOG_DEBUG ) &
           call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_DEBUG ), &
             iTab=iTab_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
+        flush(this%iUnitNum( LOG_DEBUG ))
 
       case ( LOG_ALL )
 
         if ( this%iLogLevel >= LOG_GENERAL ) &
           call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_GENERAL ), &
             iTab=iTab_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
-        
+        flush(this%iUnitNum( LOG_GENERAL ))
+
         if ( this%iLogLevel >= LOG_DEBUG ) &
           call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_DEBUG ), &
             iTab=iTab_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
+        flush(this%iUnitNum( LOG_DEBUG ))
 
       case default
 

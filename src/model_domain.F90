@@ -1314,6 +1314,8 @@ contains
 
   subroutine model_get_precip_normal(this)
 
+    use precipitation__method_of_fragments
+
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     this%gross_precip = pack( PRCP%pGrdBase%rData, this%active )
