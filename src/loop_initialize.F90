@@ -2,9 +2,8 @@ module loop_initialize
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
   use constants_and_conversions, only : lTRUE, lFALSE, asFloat, BNDS
-!  use cell_class
-!  use cell_collection
   use datetime
+  use data_catalog
   use data_catalog_entry
   use dictionary
   use exceptions
@@ -27,6 +26,24 @@ module loop_initialize
 
   type (DICT_T), public             :: CF_DICT 
   type (DICT_ENTRY_T), pointer      :: CF_ENTRY
+
+  type GRIDDED_DATASETS_T
+    character (len=15)     :: sName
+    logical (kind=c_bool)  :: lOptional
+    integer (kind=c_int)   :: iDataType 
+  end type GRIDDED_DATASETS_T
+
+  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(9) = &
+
+    [ GRIDDED_DATASETS_T("PRECIPITATION  ", lFALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("TMIN           ", lFALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("TMAX           ", lFALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("SOLAR_RADIATION", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("WIND_SPEED     ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("FOG_ZONE       ", lTRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("LAND_USE       ", lFALSE, DATATYPE_INT ),       &
+      GRIDDED_DATASETS_T("SOIL_GROUPS    ", lFALSE, DATATYPE_INT ),       &
+      GRIDDED_DATASETS_T("REL_HUMIDITY   ", lTRUE, DATATYPE_FLOAT )   ]
 
 contains
 
@@ -88,21 +105,33 @@ contains
 
   subroutine initialize_options()
 
-   
+    integer (kind=c_int) :: iIndex
+
     call initialize_grid_options()
 
     call initialize_start_and_end_dates()
     
-    call initialize_precipitation_options()
+!     call initialize_precipitation_options()
     
-    call initialize_tmax_options()
-    call initialize_tmin_options()
-    call initialize_flow_direction_options()
+!     call initialize_tmax_options()
+!     call initialize_tmin_options()
+!     call initialize_flow_direction_options()
     call initialize_parameter_tables()
     
-    call initialize_soils_group_options()
-    call initialize_landuse_options()
-    call initialize_available_water_capacity_options()
+!     call initialize_soils_group_options()
+
+    do iIndex = 1, ubound(KNOWN_GRIDS, 1)
+
+      print *, KNOWN_GRIDS(iIndex)%sName, KNOWN_GRIDS(iIndex)%iDataType
+
+      call initialize_generic_grid( sKey=KNOWN_GRIDS(iIndex)%sName, &
+         lOptional=KNOWN_GRIDS(iIndex)%lOptional,                   &
+         iDataType=KNOWN_GRIDS(iIndex)%iDataType )
+   
+    enddo
+
+!     call initialize_landuse_options()
+!     call initialize_available_water_capacity_options()
     call initialize_interception_method()
     call initialize_evapotranspiration_method()
     call initialize_infiltration_method()
@@ -320,6 +349,210 @@ contains
 
 
   end subroutine initialize_precipitation_options
+
+
+
+
+
+
+  subroutine initialize_generic_grid(sKey, lOptional, iDataType )
+
+    character (len=*), intent(in)      :: sKey
+    logical (kind=c_bool), intent(in)  :: lOptional
+    integer (kind=c_int), intent(in)   :: iDataType
+
+    ! [ LOCALS ]
+    type (STRING_LIST_T)                 :: myDirectives
+    type (STRING_LIST_T)                 :: myOptions  
+    integer (kind=c_int)                 :: iIndex
+    character (len=:), allocatable       :: sCmdText
+    character (len=:), allocatable       :: sArgText
+    character (len=:), allocatable       :: sArgText_1
+    character (len=:), allocatable       :: sArgText_2
+    integer (kind=c_int)                 :: iStat
+    type (DATA_CATALOG_ENTRY_T), pointer :: pENTRY
+
+
+    myDirectives = CF_DICT%grep_keys( sKey )
+
+    if ( myDirectives%count == 0 ) then
+      
+      if (.not. lOptional) then
+
+        call LOGS%write("Your control file seems to be missing any of the required directives relating to "//dquote(sKey), &
+            iLogLevel=LOG_ALL, lEcho=lTRUE )
+        call warn("Your control file is missing required directives. See the logfile and fix this before running again.", &
+          lFatal = lTRUE )
+
+      endif
+
+    else  
+    
+      allocate(pENTRY, stat=iStat)
+      call assert( iStat == 0, "Failed to allocate memory for the "//dquote(sKey)//" data structure", &
+        __FILE__, __LINE__ )
+
+      do iIndex = 1, myDirectives%count
+
+        ! myDirectives is a string list of all SWB directives that contain sKey
+        ! sCmdText contains an individual directive
+        sCmdText = myDirectives%get(iIndex)
+
+        ! For this directive, obtain the associated dictionary entries
+        call CF_DICT%get_values(sCmdText, myOptions )
+
+        ! dictionary entries are initially space-delimited; sArgText_1 contains
+        ! all dictionary entries present, concatenated, with a space between entries
+        sArgText = myOptions%get(1, myOptions%count )
+
+        ! echo the original directive and dictionary entries to the logfile
+        call LOGS%write(">> "//sCmdText//" "//sArgText)
+
+        ! most of the time, we only care about the first dictionary entry, obtained below
+        sArgText_1 = myOptions%get(1)
+        sArgText_2 = myOptions%get(2)
+
+!        call CF_DICT%get_values(sCmdText, myOptions )
+
+        if ( sCmdText .strequal. sKey ) then
+
+          pENTRY%sVariableName_z = asLowercase( sKey )
+
+          if (sArgText_1 .strequal. "CONSTANT" ) then
+
+              call pENTRY%initialize(            &
+                sDescription=trim(sCmdText),     &
+                rConstant=asFloat(sArgText_2)  )            
+
+            elseif ( (sArgText_1 .strequal. "ARC_ASCII")              &
+                .or. (sArgText_1 .strequal. "SURFER")                 &
+                .or. (sArgText_1 .strequal. "ARC_GRID") ) then
+
+              call pENTRY%initialize(           &
+                sDescription=trim(sCmdText),    &
+                sFileType=trim(sArgText_1),     &
+                sFilename=trim(sArgText_2),     &
+                iDataType=iDataType )
+
+            elseif ( sArgText_1 .strequal. "NETCDF" ) then
+              
+              call pENTRY%initialize_netcdf(    &
+                sDescription=trim(sCmdText),    &
+                sFilename = trim(sArgText),     &
+                iDataType=iDataType )
+ 
+            else
+
+              call warn( "Did not find a valid "//dquote(sKey)//" option. Value supplied was: "//dquote(sArgText_1), &
+                lFatal = lTRUE )
+
+            endif  
+
+        elseif ( index( string=sCmdText, substring="_SCALE" ) > 0 ) then
+
+          call pENTRY%set_scale(asFloat(sArgText_1))
+
+        elseif ( index( string=sCmdText, substring="_OFFSET" ) > 0 ) then
+
+          call pENTRY%set_offset(asFloat(sArgText_1))
+
+        elseif ( index( string=sCmdText, substring="NETCDF_X_VAR" ) > 0 ) then
+
+          pENTRY%sVariableName_x = trim(sArgText_1)
+
+        elseif ( index( string=sCmdText, substring="NETCDF_Y_VAR" ) > 0 ) then
+
+          pENTRY%sVariableName_y = trim(sArgText_1)
+
+        elseif ( index( string=sCmdText, substring="NETCDF_Z_VAR" ) > 0 ) then
+
+          pENTRY%sVariableName_z = trim(sArgText_1)
+
+        elseif ( index( string=sCmdText, substring="NETCDF_TIME_VAR" ) > 0 ) then
+
+          pENTRY%sVariableName_time = trim(sArgText_1)
+
+        elseif ( index( string=sCmdText, substring="NETCDF_VARIABLE_ORDER" ) > 0 ) then
+
+          call pENTRY%set_variable_order( asLowercase(sArgText_1) )
+
+        elseif ( index( string=sCmdText, substring="NETCDF_FLIP_VERTICAL" ) > 0 ) then
+
+          call pENTRY%set_grid_flip_vertical()
+
+        elseif ( index( string=sCmdText, substring="NETCDF_FLIP_HORIZONTAL" ) > 0 ) then
+
+          call pENTRY%set_grid_flip_horizontal()
+
+        elseif ( index( string=sCmdText, substring="NETCDF_MAKE_LOCAL_ARCHIVE" ) > 0 ) then
+
+          call pENTRY%set_make_local_archive(lTRUE)
+
+        elseif ( index( string=sCmdText, substring="_PROJECTION_DEFINITION" ) > 0 ) then 
+
+          call pENTRY%set_PROJ4( trim(sArgText) )
+
+        elseif ( index( string=sCmdText, substring="_MINIMUM_ALLOWED_VALUE" ) > 0 ) then
+
+          pENTRY%rMinAllowedValue = asFloat(sArgText_1)
+
+        elseif ( index( string=sCmdText, substring="_MAXIMUM_ALLOWED_VALUE" ) > 0 ) then
+
+          pENTRY%rMaxAllowedValue = asFloat(sArgText_1)
+
+        elseif ( index( string=sCmdText, substring="_MISSING_VALUES_CODE" ) > 0 ) then
+
+          pENTRY%rMissingValuesCode = asFloat(sArgText_1)
+
+        elseif ( index( string=sCmdText, substring="_MISSING_VALUES_OPERATOR" ) > 0 ) then
+
+          pENTRY%sMissingValuesOperator = trim(sArgText_1)
+
+        elseif ( index( string=sCmdText, substring= "_MISSING_VALUES_ACTION") > 0 ) then
+          
+          if (sArgText_1 .strequal. "ZERO") then
+
+            pENTRY%iMissingValuesAction = MISSING_VALUES_ZERO_OUT
+          
+          elseif (sArgText_1 .strequal. "MEAN" ) then
+          
+            pENTRY%iMissingValuesAction = MISSING_VALUES_REPLACE_WITH_MEAN
+          
+          else
+          
+            call warn("Unknown missing value action supplied for " &
+              //dquote(sKey)//" data: "//dquote(sArgText_1) )
+          
+          endif
+
+        else
+
+          call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
+            //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
+ 
+        endif
+
+      enddo
+
+    print *, __FILE__, __LINE__
+
+      call DAT%add( key=sKey, data=pENTRY )
+
+    print *, __FILE__, __LINE__
+
+
+      pENTRY => null()
+
+    endif
+
+  end subroutine initialize_generic_grid
+
+
+
+
+
+
+
 
 
   subroutine initialize_tmax_options()
@@ -951,10 +1184,8 @@ contains
 
 !! REally should have this data load later in the process to allow as much of the
 !! control file as possible to be read in and processed.
-  print *, __FILE__, ": ", __LINE__    
       call HSG%set_variable_order("yx")
       call HSG%getvalues(  )
-        print *, __FILE__, ": ", __LINE__    
 
     endif
 
@@ -1339,19 +1570,17 @@ contains
         ! most of the time, we only care about the first dictionary entry, obtained below
         sOptionText = myOptions%get(1)
 
-        select case ( sCmdText )
-
-          case ( "LOOKUP_TABLE", "LANDUSE_LOOKUP_TABLE", "IRRIGATION_LOOKUP_TABLE", "LAND_USE_LOOKUP_TABLE" )
+        if ( index(string=sCmdText, substring="LOOKUP_TABLE" ) > 0 ) then
 
             call PARAM_FILES%add( sOptionText )
             iCount = iCount + 1
 
-          case default
+        else
 
             call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
               //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
         
-        end select
+        endif
 
       enddo  
 

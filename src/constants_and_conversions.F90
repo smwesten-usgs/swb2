@@ -11,22 +11,23 @@ module constants_and_conversions
   implicit none
 
   ! 
-  integer (kind=c_int), parameter :: DATATYPE_INT = 0
-  integer (kind=c_int), parameter :: DATATYPE_REAL = 1
-  integer (kind=c_int), parameter :: DATATYPE_SHORT = 2
-  integer (kind=c_int), parameter :: DATATYPE_DOUBLE = 3
-  integer (kind=c_int), parameter :: DATATYPE_NA = -9999
+  integer (kind=c_int), parameter :: DATATYPE_INT     = 0
+  integer (kind=c_int), parameter :: DATATYPE_FLOAT   = 1
+  integer (kind=c_int), parameter :: DATATYPE_REAL    = 1
+  integer (kind=c_int), parameter :: DATATYPE_SHORT   = 2
+  integer (kind=c_int), parameter :: DATATYPE_DOUBLE  = 3
+  integer (kind=c_int), parameter :: DATATYPE_NA      = -9999
 
   ! [ common mathematical constants ]
   public :: PI, TWOPI, HALFPI
   real (kind=c_double), parameter    :: PI = 3.1415926535897932384626433_c_double
-  real (kind=c_double), parameter    :: TWOPI = 3.1415926535897932384626433_c_double * 2_c_double
-  real (kind=c_double), parameter    :: HALFPI = 3.1415926535897932384626433_c_double / 2_c_double
+  real (kind=c_double), parameter    :: TWOPI = 3.1415926535897932384626433_c_double * 2.0_c_double
+  real (kind=c_double), parameter    :: HALFPI = 3.1415926535897932384626433_c_double / 2.0_c_double
 
   ! [ trig conversion factors ]
   public :: DEGREES_TO_RADIANS, RADIANS_TO_DEGREES
-  real (kind=c_double), parameter    :: DEGREES_TO_RADIANS = TWOPI / 360_c_double
-  real (kind=c_double), parameter    :: RADIANS_TO_DEGREES = 360_c_double / TWOPI
+  real (kind=c_double), parameter    :: DEGREES_TO_RADIANS = TWOPI / 360.0_c_double
+  real (kind=c_double), parameter    :: RADIANS_TO_DEGREES = 360.0_c_double / TWOPI
  
   ! [ common 'magic' numbers and logicals ]
   public :: lTRUE, lFALSE
@@ -35,12 +36,12 @@ module constants_and_conversions
   public :: rZERO
   logical (kind=c_bool), parameter   :: lTRUE = .true._c_bool
   logical (kind=c_bool), parameter   :: lFALSE = .false._c_bool
-  real (kind=c_float), parameter     :: rBIGVAL = HUGE(0_c_float)
-  real (kind=c_double), parameter    :: dBIGVAL = HUGE(0_c_double)
+  real (kind=c_float), parameter     :: rBIGVAL = HUGE(0.0_c_float)
+  real (kind=c_double), parameter    :: dBIGVAL = HUGE(0.0_c_double)
   integer(kind=c_int), parameter     :: iBIGVAL = HUGE(0_c_int)
-  real (kind=c_float), parameter     :: rTINYVAL = -(HUGE(0_c_float) - 1)
-  real (kind=c_double), parameter    :: dTINYVAL = -(HUGE(0_c_double) - 1)  
-  real (kind=c_float), parameter     :: fTINYVAL = -(HUGE(0_c_float) - 1)
+  real (kind=c_float), parameter     :: rTINYVAL = -(HUGE(0.0_c_float) - 1.0)
+  real (kind=c_double), parameter    :: dTINYVAL = -(HUGE(0.0_c_double) - 1.0)  
+  real (kind=c_float), parameter     :: fTINYVAL = -(HUGE(0.0_c_float) - 1.0)
   integer(kind=c_int), parameter     :: iTINYVAL = -(HUGE(0_c_int) - 1)
   real (kind=c_float), parameter     :: rFREEZING = 32.0_c_float
   real (kind=c_float), parameter     :: fFREEZING = 32.0_c_float
