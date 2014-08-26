@@ -12,10 +12,8 @@ module dictionary
 
   type, public :: DICT_ENTRY_T
 
-!     character (len=:), allocatable            :: key
-!     character (len=:), allocatable            :: secondary_key
-    character (len=64)                        :: key
-    character (len=64)                        :: secondary_key
+     character (len=:), allocatable            :: key
+     character (len=:), allocatable            :: secondary_key
 
     type (STRING_LIST_T)                      :: sl
     type (DICT_ENTRY_T), pointer              :: previous   => null()

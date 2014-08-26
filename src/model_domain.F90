@@ -516,7 +516,7 @@ contains
     enddo  
 
     if ( count(this%landuse_code < 0 ) > 0) &
-       call warn("Some landuse codes were not mathed between grid and lookup table.")
+       call warn("Some landuse codes were not matched between grid and lookup table.")
 
   end subroutine initialize_landuse_codes_sub
 
@@ -1036,10 +1036,8 @@ contains
   end subroutine calculate_soil_mass_balance_sub
 
 !--------------------------------------------------------------------------------------------------
-!--------------------------------------------------------------------------------------------------
 
-
-  subroutine set_interception_method_sub(this, sMethodName)
+  subroutine set_method_sub
 
     class (MODEL_DOMAIN_T), intent(inout)   :: this
     character (len=*), intent(in)           :: sMethodName
@@ -1053,6 +1051,106 @@ contains
 
       this%init_interception => model_initialize_interception_gash
       this%calc_interception => model_calculate_interception_gash
+
+    endif
+
+  end subroutine set_method_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine set_interception_method_sub(this, sCmdText, sMethodName)
+
+    class (MODEL_DOMAIN_T), intent(inout)   :: this
+    character (len=*), intent(in)           :: sCmdText
+    character (len=*), intent(in)           :: sMethodName
+
+    if ( sCmdText .contains. "INTERCEPTION" ) then
+
+      if ( sMethodName .strequal. "BUCKET" ) then
+
+        this%init_interception => model_initialize_interception_bucket
+        this%calc_interception => model_calculate_interception_bucket
+
+      elseif ( sMethodName .strequal. "GASH" ) then
+
+        this%init_interception => model_initialize_interception_gash
+        this%calc_interception => model_calculate_interception_gash
+
+      else
+
+         call warn("Your control file specifies an unknown or unsupported INTERCEPTION method.", &
+            lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+
+      endif
+
+    elseif ( sCmdText .contains. "INFILTRATION" ) then
+
+      if ( ( sMethodName .strequal. "C-N" ) .or. ( sMethodName .strequal. "CURVE_NUMBER" ) ) then
+
+        this%init_infiltration => model_initialize_infiltration_curve_number
+        this%calc_infiltration => model_calculate_infiltration_curve_number
+
+      else
+
+         call warn("Your control file specifies an unknown or unsupported INFILTRATION method.", &
+            lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+
+      endif
+
+    elseif ( sCmdText .contains. "SNOWFALL" ) then
+
+      if ( ( sMethodName .strequal. "ORIGINAL" ) .or. ( sMethodName .strequal. "ORIGINAL_SWB_METHOD" ) ) then
+
+        this%init_snowfall => model_initialize_snowfall_original
+        this%calc_snowfall => model_calculate_snowfall_original
+
+      elseif ( sMethodName .strequal. "PRMS" ) then
+
+        this%init_snowfall => model_initialize_snowfall_prms
+        this%calc_snowfall => model_calculate_snowfall_prms
+
+      else
+
+         call warn("Your control file specifies an unknown or unsupported SNOWFALL method.", &
+            lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+
+      endif
+
+    elseif ( sCmdText .contains. "EVAPOTRANSPIRATION" ) then
+
+      if ( ( sMethodName .strequal. "HARGREAVES" ) &
+           .or. ( sMethodName .strequal. "HARGREAVES-SAMANI" ) ) then
+
+        this%init_reference_et => model_initialize_et_hargreaves
+        this%calc_reference_et => model_calculate_et_hargreaves
+
+      elseif ( ( sMethodName .strequal. "JENSEN-HAISE" ) &
+           .or. ( sMethodName .strequal. "JH" ) ) then
+
+        this%init_reference_et => model_initialize_et_jensen_haise
+        this%calc_reference_et => model_calculate_et_jensen_haise
+
+      else
+
+         call warn("Your control file specifies an unknown or unsupported EVAPOTRANSPIRATION method.", &
+            lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+
+      endif
+
+    elseif ( sCmdText .contains. "EVAPOTRANSPIRATION" ) then
+
+
+
+    elseif ( ( sMethodName .strequal. "NORMAL" ) &
+         .or. ( sMethodName .strequal. "STANDARD" ) ) then
+
+      this%get_precipitation_data => model_get_precip_normal
+
+    elseif ( ( sMethodName .strequal. "METHOD_OF_FRAGMENTS" ) &
+         .or. ( sMethodName .strequal. "FRAGMENTS" ) ) then
+
+      this%get_precipitation_data => model_get_precip_method_of_fragments
+
 
     endif
 

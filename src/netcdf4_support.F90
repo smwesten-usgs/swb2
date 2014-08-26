@@ -3222,8 +3222,6 @@ subroutine nf_put_attributes(NCFILE)
   ! now loop over global attributes
   do iIndex2 = 0, NCFILE%iNumberOfAttributes-1
 
-   print *, __FILE__, ": ", __LINE__, "   |   ", NCFILE%iNumberOfAttributes
-
     pNC_ATT => NCFILE%pNC_ATT(iIndex2)
 
     select case (pNC_ATT%iNC_AttType)
