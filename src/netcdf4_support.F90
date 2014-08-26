@@ -3091,12 +3091,6 @@ subroutine nf_put_attribute(NCFILE, iVarID, sAttributeName, &
     iNumberOfAttributes = size( sAttributeValue, 1)
     iNumberOfAttributes = int(len_trim(sAttributeValue(1)), kind=c_size_t)
 
-    print *, __FILE__, __LINE__
-    print *, trim(sAttributeName)
-    print *, trim(sAttributeValue(1))
-    print *, iNumberOfAttributes
-    print *, iVarID
-
     call nf_trap( nc_put_att_text(ncid=NCFILE%iNCID, &
                     varid=iVarID, &
                     name=trim(sAttributeName), &

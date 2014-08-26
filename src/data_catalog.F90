@@ -136,6 +136,8 @@ contains
     if (this%count == 0 ) then
 
       if (associated (data) ) then
+        
+        call data%setkey( key )
         this%last  => data
         this%first => data
         data%next      => null()
@@ -238,6 +240,9 @@ contains
       data => this%first
 
       do while ( associated(data) )
+
+    print *, __FILE__, __LINE__
+    print *, dquote(key), "   ", dquote(data%sKeyword)
 
         if ( data%sKeyword .strequal. key ) exit
         data => data%next

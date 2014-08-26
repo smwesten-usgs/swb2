@@ -2,6 +2,7 @@ module model_domain
 
   use iso_c_binding
   use continuous_frozen_ground_index
+  use data_catalog
   use data_catalog_entry
   use exceptions
   use simulation_datetime
@@ -237,9 +238,10 @@ module model_domain
   end interface    
 
   abstract interface
-    subroutine precipitation_data_method( this )
-      import :: MODEL_DOMAIN_T
+    subroutine precipitation_data_method( this, pPRCP )
+      import :: MODEL_DOMAIN_T, DATA_CATALOG_ENTRY_T
       class ( MODEL_DOMAIN_T ), intent(inout)  :: this
+      type (DATA_CATALOG_ENTRY_T), pointer     :: pPRCP
     end subroutine precipitation_data_method
   end interface    
 
@@ -436,11 +438,35 @@ contains
   subroutine set_inactive_cells_sub(this)
 
     class (MODEL_DOMAIN_T), intent(inout)   :: this
+    type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
+    type (DATA_CATALOG_ENTRY_T), pointer :: pLULC      
+
+
+    pLULC => DAT%find("LAND_USE")
+    pHSG => DAT%find("SOILS_GROUP")
+    
+    if ( .not. associated(pHSG) ) &
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+
+    if ( .not. associated(pHSG%pGrdBase) ) &
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+
+    if ( .not. allocated(pHSG%pGrdBase%iData) ) &
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of UNALLOCATED variable", __FILE__, __LINE__)
+
+    if ( .not. associated(pLULC) ) &
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+
+    if ( .not. associated(pLULC%pGrdBase) ) &
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+
+    if ( .not. allocated(pLULC%pGrdBase%iData) ) &
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of UNALLOCATED variable", __FILE__, __LINE__)
 
     this%active = .true._c_bool
 
-    where (       HSG%pGrdBase%iData < 1 &
-            .or.  LULC%pGrdBase%iData < 1 )
+    where (       pHSG%pGrdBase%iData < 1 &
+            .or.  pLULC%pGrdBase%iData < 1 )
 
       this%active = .false._c_bool
 
@@ -461,11 +487,25 @@ contains
     integer (kind=c_int)                 :: iIndex
     integer (kind=c_int), allocatable    :: iLandUseCodes(:)
     integer (kind=c_int)                 :: iLandUseIndices(256)
+    type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
     
     !> Determine how many landuse codes are present
     call PARAMS%get_values( sKey="LU_Code", iValues=iLanduseCodes )
 
-    this%landuse_code = pack( LULC%pGrdBase%iData, this%active )
+    pLULC => DAT%find("LAND_USE")
+
+    if ( associated(pLULC) ) then
+      if (associated( pLULC%pGrdBase) ) then
+        this%landuse_code = pack( pLULC%pGrdBase%iData, this%active )
+      else
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      endif  
+    else
+      call die("Attempted use of NULL pointer. Failed to find LAND_USE data element.", &
+        __FILE__, __LINE__)
+    endif
+
+    this%landuse_index = -9999
 
     do iIndex=1, ubound(iLandUseCodes, 1)
 
@@ -474,6 +514,9 @@ contains
       end where
 
     enddo  
+
+    if ( count(this%landuse_code < 0 ) > 0) &
+       call warn("Some landuse codes were not mathed between grid and lookup table.")
 
   end subroutine initialize_landuse_codes_sub
 
@@ -486,12 +529,24 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iStat
     integer (kind=c_int)                 :: iIndex
+    type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
+
+    pHSG => DAT%find("SOILS_GROUP")
     
-    this%soil_group = pack( HSG%pGrdBase%iData, this%active )
+    if ( associated(pHSG) ) then
+      if (associated( pHSG%pGrdBase) ) then
+        this%soil_group = pack( pHSG%pGrdBase%rData, this%active )
+      else
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      endif  
+    else
+      call die("Attempted use of NULL pointer. Failed to find SOILS_GROUP data element.", &
+        __FILE__, __LINE__)
+    endif
 
-    call LOGS%write("Soil hydrologic groups as read into SWB data structure", iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_DEBUG)
+    call LOGS%write("Soils hydrologic groups as read into SWB data structure", iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_DEBUG)
 
-    do iIndex = 1, maxval(HSG%pGrdBase%iData)
+    do iIndex = 1, maxval(pHSG%pGrdBase%iData)
 
       call LOGS%write( asCharacter(count(MODEL%soil_group == iIndex) )//" cells belong to soils group " &
         //asCharacter(iIndex), iLogLevel=LOG_DEBUG )
@@ -511,8 +566,21 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iStat
     integer (kind=c_int)                 :: iIndex
+    type (DATA_CATALOG_ENTRY_T), pointer :: pAWC
+
+    pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
     
-    this%awc = pack( AWC%pGrdBase%rData, this%active )
+    if ( associated(pAWC) ) then
+      if (associated( pAWC%pGrdBase) ) then
+        this%awc = pack( pAWC%pGrdBase%rData, this%active )
+      else
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      endif  
+    else
+      call die("Attempted use of NULL pointer. Failed to find AVAILABLE_WATER_CONTENT data element.", &
+        __FILE__, __LINE__)
+    endif
+          
 
   end subroutine initialize_available_water_content_sub
 
@@ -585,7 +653,22 @@ contains
     integer (kind=c_int) ::iMonth
     integer (kind=c_int) ::iDay
     integer (kind=c_int) ::iYear
+    type (DATA_CATALOG_ENTRY_T), pointer :: pPRCP
+    type (DATA_CATALOG_ENTRY_T), pointer :: pTMAX
+    type (DATA_CATALOG_ENTRY_T), pointer :: pTMIN
 
+    pPRCP => DAT%find("PRECIPITATION")
+    if ( .not. associated(pPRCP) ) &
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+
+    pTMAX => DAT%find("TMAX")
+    if ( .not. associated(pTMAX) ) &
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+
+
+    pTMIN => DAT%find("TMIN")
+    if ( .not. associated(pTMIN) ) &
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
 
     associate ( dt => SIM_DT%curr )
 
@@ -595,19 +678,19 @@ contains
       iYear = dt%iYear
   
       ! next three statements retrieve the data from the raw or native form
-      call PRCP%getvalues( iMonth, iDay, iYear, iJulianDay )
+      call pPRCP%getvalues( iMonth, iDay, iYear, iJulianDay )
   
-      call TMIN%getvalues( iMonth, iDay, iYear, iJulianDay )
+      call pTMIN%getvalues( iMonth, iDay, iYear, iJulianDay )
 
-      call TMAX%getvalues( iMonth, iDay, iYear, iJulianDay )
+      call pTMAX%getvalues( iMonth, iDay, iYear, iJulianDay )
 
       ! the following statements process the raw data in order to get it into the 
       ! right units or properly pack the data
-      call this%get_precipitation_data()
+      call this%get_precipitation_data(pPRCP)
 !      this%gross_precip = pack( PRCP%pGrdBase%rData, this%active )
 
-      this%tmax = pack( TMAX%pGrdBase%rData, this%active )
-      this%tmin = pack( TMIN%pGrdBase%rData, this%active )
+      this%tmax = pack( pTMAX%pGrdBase%rData, this%active )
+      this%tmin = pack( pTMIN%pGrdBase%rData, this%active )
 
       call this%calc_snowfall()
 
@@ -919,7 +1002,7 @@ contains
       ROOTING_DEPTH(:, iSoilsIndex) = RZ
     enddo  
 
-    this%awc = pack(AWC%pGrdBase%rData, this%active)
+!     this%awc = pack(pAWC%pGrdBase%rData, this%active)
 
     do iSoilsIndex = 1, iNumberOfSoilGroups
       do iLUIndex = 1, iNumberOfLanduses
@@ -1312,23 +1395,39 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_get_precip_normal(this)
+  subroutine model_get_precip_normal(this, pPRCP)
 
     use precipitation__method_of_fragments
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+    type (DATA_CATALOG_ENTRY_T), pointer   :: pPRCP 
 
-    this%gross_precip = pack( PRCP%pGrdBase%rData, this%active )
+
+    if (.not. associated(pPRCP) ) &
+      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
+
+    if (.not. associated(pPRCP%pGrdBase) ) &
+      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
+
+    this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active )
 
   end subroutine model_get_precip_normal  
 
 !--------------------------------------------------------------------------------------------------
  
-  subroutine model_get_precip_method_of_fragments(this)
+  subroutine model_get_precip_method_of_fragments(this, pPRCP)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+    type (DATA_CATALOG_ENTRY_T), pointer   :: pPRCP 
 
-    this%gross_precip = pack( PRCP%pGrdBase%rData, this%active )
+
+    if (.not. associated(pPRCP) ) &
+      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
+
+    if (.not. associated(pPRCP%pGrdBase) ) &
+      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
+
+    this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active )
 
   end subroutine model_get_precip_method_of_fragments 
 

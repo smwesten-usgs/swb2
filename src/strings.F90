@@ -105,6 +105,9 @@ contains
     sTemp1 = asUppercase(sText1)
     sTemp2 = asUppercase(sText2)
 
+    print *, __FILE__, __LINE__
+    print *, dquote(sTemp1), "   substring: ", dquote(sTemp2)
+
     if ( index(sText1, sText2) /= 0 ) lBool = lTRUE
 
   end function is_string2_present_in_string1_fn    
