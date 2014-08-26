@@ -101,8 +101,9 @@ contains
 
     call CF%close()
 
-
   end subroutine read_control_file
+
+!--------------------------------------------------------------------------------------------------  
 
   subroutine initialize_options()
 
@@ -147,22 +148,6 @@ contains
     call MODEL%initialize_netcdf_output()
 
   end subroutine initialize_options
-
-
-
-  subroutine populate_data_grids()
-
-    call populate_flow_direction_grid()
-
-  end subroutine populate_data_grids
- 
-
-
-  subroutine populate_flow_direction_grid()
-
-    !call FLOWDIR
-
-  end subroutine populate_flow_direction_grid
 
 
 
@@ -376,6 +361,10 @@ contains
 
 
     myDirectives = CF_DICT%grep_keys( sKey )
+
+
+    print *, __FILE__, __LINE__, " | "
+    call myDirectives%print
 
     if ( myDirectives%count == 0 ) then
       

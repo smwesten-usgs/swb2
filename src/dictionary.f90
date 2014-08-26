@@ -12,8 +12,11 @@ module dictionary
 
   type, public :: DICT_ENTRY_T
 
-    character (len=:), allocatable            :: key
-    character (len=:), allocatable            :: secondary_key
+!     character (len=:), allocatable            :: key
+!     character (len=:), allocatable            :: secondary_key
+    character (len=64)                        :: key
+    character (len=64)                        :: secondary_key
+
     type (STRING_LIST_T)                      :: sl
     type (DICT_ENTRY_T), pointer              :: previous   => null()
     type (DICT_ENTRY_T), pointer              :: next       => null()
@@ -125,9 +128,9 @@ contains
 
  function grep_dictionary_key_names_fn(this, sKey)   result( slString )
 
-    class (DICT_T)                :: this
-    character (len=*), intent(in) :: sKey
-    type (STRING_LIST_T)          :: slString
+    class (DICT_T)                   :: this
+    character (len=*), intent(in)    :: sKey
+    type (STRING_LIST_T)             :: slString
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer     :: current
@@ -137,7 +140,7 @@ contains
 
     do while ( associated( current ) )
 
-      iIndex = index(string=current%key, substring=sKey)
+      iIndex = index(string=current%key, substring=trim(sKey) )
 
       if ( iIndex > 0 )  call slString%append(current%key)
       
