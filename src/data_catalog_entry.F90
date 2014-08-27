@@ -30,12 +30,12 @@ module data_catalog_entry
     integer (kind=c_int)               :: iSourceFileType  ! Arc ASCII, Surfer, NetCDF
     integer (kind=c_int)               :: iTargetDataType = DATATYPE_NA  ! Fortran real, integer, etc.
     
-    character (len=:), allocatable     :: sDescription
-    character (len=:), allocatable     :: sSourcePROJ4_string
-    character (len=:), allocatable     :: sSourceFileType
-    character (len=:), allocatable     :: sSourceFilename      ! e.g. 1980_00_prcp.nc
-    character (len=:), allocatable     :: sFilenameTemplate
-    character (len=:), allocatable     :: sOldFilename        
+    character (len=256)                :: sDescription
+    character (len=256)                :: sSourcePROJ4_string
+    character (len=256)                :: sSourceFileType
+    character (len=256)                :: sSourceFilename      ! e.g. 1980_00_prcp.nc
+    character (len=256)                :: sFilenameTemplate
+    character (len=256)                :: sOldFilename        
     integer (kind=c_int)               :: iFileCount = -1
     integer (kind=c_int)               :: iFileCountYear = -9999
     real (kind=c_float)                :: rMinAllowedValue = -rBIGVAL     ! default condition is to impose
@@ -459,34 +459,22 @@ end subroutine initialize_netcdf_data_object_sub
 
     if(this%iSourceDataForm == DYNAMIC_GRID ) then
 
-print *, __FILE__, ": ", __LINE__
-
       call getvalues_gridded_sub( this, iMonth, iDay, iYear)
 
-print *, __FILE__, ": ", __LINE__
-
     elseif ( this%iSourceDataForm == DYNAMIC_NETCDF_GRID ) then
-
-print *, __FILE__, ": ", __LINE__
 
       iLocalJulianDay = iJulianDay
       call getvalues_dynamic_netcdf_sub( this, iMonth, iDay, iYear, iLocalJulianDay)
 
     elseif ( this%iSourceDataForm == STATIC_NETCDF_GRID ) then
 
-print *, __FILE__, ": ", __LINE__
-
       call getvalues_static_netcdf_sub( this )
 
     elseif(this%iSourceDataForm == STATIC_GRID ) then
 
-print *, __FILE__, ": ", __LINE__
-
       call getvalues_gridded_sub( this )
 
     elseif(this%iSourceDataForm == CONSTANT_GRID ) then
-
-print *, __FILE__, ": ", __LINE__
 
       call getvalues_constant_sub( this )
 
@@ -651,7 +639,7 @@ subroutine getvalues_constant_sub( this  )
       endif
 
       call LOGS%write("Opening file "//dQuote(this%sSourceFilename) &
-        //" for "//trim(this%sDescription)//" data.", iLogLevel=LOG_ALL )
+        //" for "//trim(this%sDescription)//" data.", iLogLevel=LOG_ALL, lEcho=lFALSE )
 
       if ( this%lGridIsPersistent .and. associated(this%pGrdNative) ) then
 

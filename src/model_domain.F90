@@ -87,26 +87,8 @@ module model_domain
     procedure :: initialize_grid_sub
     generic   :: initialize_grid => initialize_grid_sub
 
-    procedure :: set_interception_method_sub
-    generic   :: set_interception => set_interception_method_sub
-
-    procedure :: set_evapotranspiration_method_sub
-    generic   :: set_evapotranspiration => set_evapotranspiration_method_sub
-
-    procedure :: set_infiltration_method_sub
-    generic   :: set_infiltration_method => set_infiltration_method_sub
-
-    procedure :: set_soil_moisture_method_sub
-    generic   :: set_soil_moisture_method => set_soil_moisture_method_sub 
-
-    procedure :: set_snowfall_method_sub
-    generic   :: set_snowfall_method => set_snowfall_method_sub
-
-!    procedure :: set_snowmelt_method_sub
-!    generic   :: set_snowmelt_method => set_snowmelt_method_sub
-
-    procedure :: set_precipitation_data_method_sub
-    generic   :: set_precipitation_data_method => set_precipitation_data_method_sub
+    procedure :: set_method_sub
+    generic   :: set_method => set_method_sub
 
     procedure :: set_inactive_cells_sub
     generic   :: set_inactive_cells => set_inactive_cells_sub
@@ -121,6 +103,15 @@ module model_domain
     procedure :: calculate_interception_mass_balance_sub
     procedure :: calculate_snow_mass_balance_sub
     procedure :: calculate_soil_mass_balance_sub
+
+    procedure :: read_in_available_water_content_sub
+    generic   :: get_available_water_content => read_in_available_water_content_sub
+
+    procedure :: read_in_land_use_sub
+    generic   :: get_land_use => read_in_land_use_sub
+
+    procedure :: read_in_soil_groups_sub
+    generic   :: get_soil_groups => read_in_soil_groups_sub
 
     procedure :: get_climate_data
     procedure :: write_variables_to_netcdf
@@ -146,7 +137,9 @@ module model_domain
     procedure :: initialize_soil_groups_sub
     generic   :: initialize_soil_groups => initialize_soil_groups_sub
 
-
+    procedure :: summarize_state_variables_sub
+    generic   :: summarize => summarize_state_variables_sub
+  
   end type MODEL_DOMAIN_T
 
 
@@ -245,6 +238,11 @@ module model_domain
     end subroutine precipitation_data_method
   end interface    
 
+  interface minmaxmean
+    procedure :: minmaxmean_float
+    procedure :: minmaxmean_int
+  end interface minmaxmean
+
   type, public :: NETCDF_FILE_COLLECTION_T
     type (T_NETCDF4_FILE), pointer, public :: ncfile
   end type NETCDF_FILE_COLLECTION_T
@@ -278,10 +276,7 @@ contains
     real (kind=c_double), intent(in)             :: dGridcellSize
 
     ! [ LOCALS ]
-    integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iStat
-
-    iCount = count( this%active )
 
     this%number_of_columns = iNumCols
     this%number_of_rows = iNumRows
@@ -329,14 +324,15 @@ contains
     allocate( this%infiltration(iCount), stat=iStat(15) )
     allocate( this%snowfall(iCount), stat=iStat(16) )
     allocate( this%snowmelt(iCount), stat=iStat(17) )
-    allocate( this%rainfall(iCount), stat=iStat(18) )
-    allocate( this%GDD_28(iCount), stat=iStat(19) )
-    allocate( this%interception_storage(iCount), stat=iStat(20) )
-    allocate( this%snow_storage(iCount), stat=iStat(21) )
-    allocate( this%soil_storage(iCount), stat=iStat(22) )
-    allocate( this%soil_storage_max(iCount), stat=iStat(23) )
-    allocate( this%potential_recharge(iCount), stat=iStat(24) )
-    allocate( this%stream_storage(iCount), stat=iStat(25) )
+    allocate( this%interception(iCount), stat=iStat(18) )
+    allocate( this%rainfall(iCount), stat=iStat(19) )
+    allocate( this%GDD_28(iCount), stat=iStat(20) )
+    allocate( this%interception_storage(iCount), stat=iStat(21) )
+    allocate( this%snow_storage(iCount), stat=iStat(22) )
+    allocate( this%soil_storage(iCount), stat=iStat(23) )
+    allocate( this%soil_storage_max(iCount), stat=iStat(24) )
+    allocate( this%potential_recharge(iCount), stat=iStat(25) )
+    allocate( this%stream_storage(iCount), stat=iStat(26) )
 
     allocate( OUTPUT(14), stat=iStat(26) )
 
@@ -440,10 +436,12 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)   :: this
     type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
     type (DATA_CATALOG_ENTRY_T), pointer :: pLULC      
+    type (DATA_CATALOG_ENTRY_T), pointer :: pAWC      
 
 
     pLULC => DAT%find("LAND_USE")
     pHSG => DAT%find("SOILS_GROUP")
+    pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
     
     if ( .not. associated(pHSG) ) &
       call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
@@ -452,6 +450,15 @@ contains
       call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
 
     if ( .not. allocated(pHSG%pGrdBase%iData) ) &
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of UNALLOCATED variable", __FILE__, __LINE__)
+
+    if ( .not. associated(pAWC) ) &
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+
+    if ( .not. associated(pAWC%pGrdBase) ) &
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+
+    if ( .not. allocated(pAWC%pGrdBase%rData) ) &
       call die("INTERNAL PROGRAMMING ERROR: attempted use of UNALLOCATED variable", __FILE__, __LINE__)
 
     if ( .not. associated(pLULC) ) &
@@ -465,15 +472,16 @@ contains
 
     this%active = .true._c_bool
 
-    where (       pHSG%pGrdBase%iData < 1 &
-            .or.  pLULC%pGrdBase%iData < 1 )
+    where (       pHSG%pGrdBase%iData < 1  &
+            .or.  pLULC%pGrdBase%iData < 0 &
+            .or.  pAWC%pGrdBase%rData < 0.0 )
 
       this%active = .false._c_bool
 
     end where
 
     call LOGS%write(asCharacter(count(this%active))//" cells are currently active out of a total of " &
-      //asCharacter(size(this%active)), iLinesBefore=1, iLinesAfter=1)
+      //asCharacter(size(this%active)), iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_ALL)
 
   end subroutine set_inactive_cells_sub
 
@@ -486,8 +494,10 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iIndex
     integer (kind=c_int), allocatable    :: iLandUseCodes(:)
-    integer (kind=c_int)                 :: iLandUseIndices(256)
     type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
+    integer (kind=c_int)                 :: iIndex2
+    integer (kind=c_int)                 :: iCount
+    integer (kind=c_int)                 :: iStat
     
     !> Determine how many landuse codes are present
     call PARAMS%get_values( sKey="LU_Code", iValues=iLanduseCodes )
@@ -495,6 +505,9 @@ contains
     pLULC => DAT%find("LAND_USE")
 
     if ( associated(pLULC) ) then
+
+      call pLULC%getvalues()
+
       if (associated( pLULC%pGrdBase) ) then
         this%landuse_code = pack( pLULC%pGrdBase%iData, this%active )
       else
@@ -505,20 +518,109 @@ contains
         __FILE__, __LINE__)
     endif
 
+    deallocate(this%landuse_index)
+    allocate( this%landuse_index( ubound( this%landuse_code, 1) ), stat=iStat )
+    call assert( iStat == 0, "Problem allocating memory.", __FILE__, __LINE__ )
+
     this%landuse_index = -9999
+    iCount = 0
+    
+    do iIndex = 1, ubound(this%landuse_code,1)
 
-    do iIndex=1, ubound(iLandUseCodes, 1)
+      do iIndex2=1, ubound(iLandUseCodes, 1)
 
-      where ( this%landuse_code == iLandUseCodes(iIndex) )
-        this%landuse_index = iIndex
-      end where
+        if (this%landuse_code(iIndex) == iLandUseCodes(iIndex2) ) then
+          this%landuse_index(iIndex) = iIndex2
+          iCount = iCount + 1
+        endif
 
-    enddo  
+      enddo
 
-    if ( count(this%landuse_code < 0 ) > 0) &
-       call warn("Some landuse codes were not matched between grid and lookup table.")
+    enddo    
+
+    call LOGS%write("Matches were found between landuse grid value and table value for " &
+      //asCharacter(iCount)//" cells out of a total of "//asCharacter(iIndex)//" active cells.", &
+      iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_DEBUG)
 
   end subroutine initialize_landuse_codes_sub
+
+!--------------------------------------------------------------------------------------------------  
+
+  subroutine read_in_soil_groups_sub( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)     :: this
+
+    ! [ LOCALS ]
+    integer (kind=c_int)                 :: iStat
+    integer (kind=c_int)                 :: iIndex
+    type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
+
+    pHSG => DAT%find("SOILS_GROUP")
+    
+    if ( associated(pHSG) ) then
+
+      call pHSG%getvalues()
+
+    else
+    
+      call die("Error attempting to access SOILS_GROUP data.")
+
+    endif    
+
+
+  end subroutine read_in_soil_groups_sub
+
+!--------------------------------------------------------------------------------------------------  
+
+  subroutine read_in_land_use_sub( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)     :: this
+
+    ! [ LOCALS ]
+    integer (kind=c_int)                 :: iStat
+    integer (kind=c_int)                 :: iIndex
+    type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
+
+    pLULC => DAT%find("LAND_USE")
+    
+    if ( associated(pLULC) ) then
+
+      call pLULC%getvalues()
+
+    else
+    
+      call die("Error attempting to access LAND_USE data.")
+
+    endif    
+
+
+  end subroutine read_in_land_use_sub
+
+!--------------------------------------------------------------------------------------------------  
+
+  subroutine read_in_available_water_content_sub( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)     :: this
+
+    ! [ LOCALS ]
+    integer (kind=c_int)                 :: iStat
+    integer (kind=c_int)                 :: iIndex
+    type (DATA_CATALOG_ENTRY_T), pointer :: pAWC
+
+    pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
+    
+    if ( associated(pAWC) ) then
+
+      call pAWC%getvalues()
+
+    else
+    
+      call die("Error attempting to access AVAILABLE_WATER_CONTENT data.")
+
+    endif    
+
+
+  end subroutine read_in_available_water_content_sub
 
 !--------------------------------------------------------------------------------------------------  
 
@@ -534,8 +636,9 @@ contains
     pHSG => DAT%find("SOILS_GROUP")
     
     if ( associated(pHSG) ) then
+
       if (associated( pHSG%pGrdBase) ) then
-        this%soil_group = pack( pHSG%pGrdBase%rData, this%active )
+        this%soil_group = pack( pHSG%pGrdBase%iData, this%active )
       else
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif  
@@ -571,6 +674,9 @@ contains
     pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
     
     if ( associated(pAWC) ) then
+
+      call pAWC%getvalues()
+
       if (associated( pAWC%pGrdBase) ) then
         this%awc = pack( pAWC%pGrdBase%rData, this%active )
       else
@@ -631,11 +737,8 @@ contains
       call LOGS%write("Calculating: "//SIM_DT%curr%prettydate(), iLogLevel=LOG_ALL, lEcho=.true._c_bool )
 
       call this%get_climate_data()
-
       call this%solve()
-
       call this%write_variables_to_netcdf()
-
       call SIM_DT%addDay()
 
     enddo 
@@ -972,6 +1075,7 @@ contains
     real (kind=c_float), allocatable  :: RZ(:)
     character (len=:), allocatable    :: sText
     real (kind=c_float), allocatable  :: water_capacity(:)
+    integer (kind=c_int)              :: iIndex
 
     iNumActiveCells = ubound(this%soil_storage_max,1)
 
@@ -989,7 +1093,7 @@ contains
 
     !> Determine how many landuse codes are present
     call PARAMS%get_values( slList, iLanduseCodes )
-    iNumberOfLanduses = count( iLanduseCodes > 0 )
+    iNumberOfLanduses = count( iLanduseCodes >= 0 )
 
     allocate( ROOTING_DEPTH(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
     call assert( iStat == 0, "Failed to allocate memory for maximum rooting depth table", &
@@ -1006,13 +1110,11 @@ contains
 
     do iSoilsIndex = 1, iNumberOfSoilGroups
       do iLUIndex = 1, iNumberOfLanduses
-
-        where ( this%landuse_index == iLUIndex .and. this%soil_group == iSoilsIndex )
-
-          this%soil_storage_max = ROOTING_DEPTH( iLUIndex, iSoilsIndex ) * this%awc
-
-        end where
-
+        do iIndex = 1, ubound(this%soil_storage_max, 1)
+          if ( this%landuse_index(iIndex) == iLUIndex .and. this%soil_group(iIndex) == iSoilsIndex ) then
+            this%soil_storage_max = ROOTING_DEPTH( iLUIndex, iSoilsIndex ) * this%awc(iIndex)
+          endif
+        enddo
       enddo
     enddo
 
@@ -1037,28 +1139,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine set_method_sub
-
-    class (MODEL_DOMAIN_T), intent(inout)   :: this
-    character (len=*), intent(in)           :: sMethodName
-
-    if ( sMethodName .strequal. "BUCKET" ) then
-
-      this%init_interception => model_initialize_interception_bucket
-      this%calc_interception => model_calculate_interception_bucket
-
-    elseif ( sMethodName .strequal. "GASH" ) then
-
-      this%init_interception => model_initialize_interception_gash
-      this%calc_interception => model_calculate_interception_gash
-
-    endif
-
-  end subroutine set_method_sub
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine set_interception_method_sub(this, sCmdText, sMethodName)
+  subroutine set_method_sub(this, sCmdText, sMethodName)
 
     class (MODEL_DOMAIN_T), intent(inout)   :: this
     character (len=*), intent(in)           :: sCmdText
@@ -1078,7 +1159,7 @@ contains
 
       else
 
-         call warn("Your control file specifies an unknown or unsupported INTERCEPTION method.", &
+        call warn("Your control file specifies an unknown or unsupported INTERCEPTION method.", &
             lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
       endif
@@ -1092,7 +1173,7 @@ contains
 
       else
 
-         call warn("Your control file specifies an unknown or unsupported INFILTRATION method.", &
+        call warn("Your control file specifies an unknown or unsupported INFILTRATION method.", &
             lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
       endif
@@ -1111,7 +1192,7 @@ contains
 
       else
 
-         call warn("Your control file specifies an unknown or unsupported SNOWFALL method.", &
+        call warn("Your control file specifies an unknown or unsupported SNOWFALL method.", &
             lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
       endif
@@ -1132,134 +1213,52 @@ contains
 
       else
 
-         call warn("Your control file specifies an unknown or unsupported EVAPOTRANSPIRATION method.", &
+        call warn("Your control file specifies an unknown or unsupported EVAPOTRANSPIRATION method.", &
             lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
       endif
 
-    elseif ( sCmdText .contains. "EVAPOTRANSPIRATION" ) then
+    elseif ( sCmdText .contains. "PRECIPITATION" ) then
 
+      if ( ( sMethodName .strequal. "NORMAL" ) &
+           .or. ( sMethodName .strequal. "STANDARD" ) ) then
 
+        this%get_precipitation_data => model_get_precip_normal
 
-    elseif ( ( sMethodName .strequal. "NORMAL" ) &
-         .or. ( sMethodName .strequal. "STANDARD" ) ) then
+      elseif ( ( sMethodName .strequal. "METHOD_OF_FRAGMENTS" ) &
+           .or. ( sMethodName .strequal. "FRAGMENTS" ) ) then
 
-      this%get_precipitation_data => model_get_precip_normal
+        this%get_precipitation_data => model_get_precip_method_of_fragments
 
-    elseif ( ( sMethodName .strequal. "METHOD_OF_FRAGMENTS" ) &
-         .or. ( sMethodName .strequal. "FRAGMENTS" ) ) then
+      else
 
-      this%get_precipitation_data => model_get_precip_method_of_fragments
+        call warn("Your control file specifies an unknown or unsupported PRECIPITATION method.", &
+            lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
+      endif
 
-    endif
+    elseif ( sCmdText .contains. "SOIL_MOISTURE" ) then
 
-  end subroutine set_interception_method_sub
+      if ( ( sMethodName .strequal. "T-M" ) .or. ( sMethodName .strequal. "THORNTHWAITE_MATHER" ) ) then
 
-!--------------------------------------------------------------------------------------------------
+        this%init_soil_moisture => model_initialize_soil_moisture_thornthwaite_mather
+        this%calc_soil_moisture => model_calculate_soil_moisture_thornthwaite_mather
 
-  subroutine set_infiltration_method_sub(this, sMethodName)
+      else
 
-    class (MODEL_DOMAIN_T), intent(inout)   :: this
-    character (len=*), intent(in)           :: sMethodName
+        call warn("Your control file specifies an unknown or unsupported SOIL_MOISTURE method.", &
+          lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
-    if ( ( sMethodName .strequal. "C-N" ) .or. ( sMethodName .strequal. "CURVE_NUMBER" ) ) then
+      endif
 
-      this%init_infiltration => model_initialize_infiltration_curve_number
-      this%calc_infiltration => model_calculate_infiltration_curve_number
+    else
 
-!     elseif ( ( sMethodName .strequal. "G-A" ) .or. ( sMethodName .strequal. "GREEN_AMPT" ) ) then
+      call warn("Your control file references an unknown or unsupported method: "//dquote(sCmdText), &
+          lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
-!       this%calc_infiltration => cell_calculate_infiltration_green_ampt
+    endif 
 
-    endif
-
-  end subroutine set_infiltration_method_sub
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine set_snowfall_method_sub(this, sMethodName)
-
-    class (MODEL_DOMAIN_T), intent(inout)   :: this
-    character (len=*), intent(in)           :: sMethodName
-
-    if ( ( sMethodName .strequal. "ORIGINAL" ) .or. ( sMethodName .strequal. "ORIGINAL_SWB_METHOD" ) ) then
-
-      this%init_snowfall => model_initialize_snowfall_original
-      this%calc_snowfall => model_calculate_snowfall_original
-
-    elseif ( ( sMethodName .strequal. "PRMS" ) .or. ( sMethodName .strequal. "PRMS_SNOWFALL" ) ) then
-
-      this%init_snowfall => model_initialize_snowfall_prms
-      this%calc_snowfall => model_calculate_snowfall_prms
-
-    endif
-
-  end subroutine set_snowfall_method_sub
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine set_soil_moisture_method_sub(this, sMethodName)
-
-    class (MODEL_DOMAIN_T), intent(inout)   :: this
-    character (len=*), intent(in)           :: sMethodName
-
-    if ( ( sMethodName .strequal. "T-M" ) .or. ( sMethodName .strequal. "THORNTHWAITE_MATHER" ) ) then
-
-      this%init_soil_moisture => model_initialize_soil_moisture_thornthwaite_mather
-      this%calc_soil_moisture => model_calculate_soil_moisture_thornthwaite_mather
-
-!     elseif ( ( sMethodName .strequal. "G-A" ) .or. ( sMethodName .strequal. "GREEN_AMPT" ) ) then
-
-!       this%calc_infiltration => cell_calculate_infiltration_green_ampt
-
-    endif
-
-  end subroutine set_soil_moisture_method_sub
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine set_evapotranspiration_method_sub(this, sMethodName)
-
-    class (MODEL_DOMAIN_T), intent(inout)   :: this
-    character (len=*), intent(in)           :: sMethodName
-
-    if ( ( sMethodName .strequal. "HARGREAVES" ) &
-         .or. ( sMethodName .strequal. "HARGREAVES-SAMANI" ) ) then
-
-      this%init_reference_et => model_initialize_et_hargreaves
-      this%calc_reference_et => model_calculate_et_hargreaves
-
-    elseif ( ( sMethodName .strequal. "JENSEN-HAISE" ) &
-         .or. ( sMethodName .strequal. "JH" ) ) then
-
-      this%init_reference_et => model_initialize_et_jensen_haise
-      this%calc_reference_et => model_calculate_et_jensen_haise
-
-    endif
-
-  end subroutine set_evapotranspiration_method_sub
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine set_precipitation_data_method_sub  (this, sMethodName)
-
-    class (MODEL_DOMAIN_T), intent(inout)   :: this
-    character (len=*), intent(in)           :: sMethodName
-
-    if ( ( sMethodName .strequal. "NORMAL" ) &
-         .or. ( sMethodName .strequal. "STANDARD" ) ) then
-
-      this%get_precipitation_data => model_get_precip_normal
-
-    elseif ( ( sMethodName .strequal. "METHOD_OF_FRAGMENTS" ) &
-         .or. ( sMethodName .strequal. "FRAGMENTS" ) ) then
-
-      this%get_precipitation_data => model_get_precip_method_of_fragments
-
-    endif
-
-  end subroutine set_precipitation_data_method_sub
+  end subroutine set_method_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1470,7 +1469,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call initialize_soil_moisture__thornthwaite_mather( ubound( this%active, 1) )
+    call initialize_soil_moisture__thornthwaite_mather( count( this%active ) )
 
   end subroutine model_initialize_soil_moisture_thornthwaite_mather
 
@@ -1528,5 +1527,79 @@ contains
     this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active )
 
   end subroutine model_get_precip_method_of_fragments 
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine minmaxmean_float( variable , varname )
+
+    real (kind=c_float), dimension(:)  :: variable
+    character (len=*), intent(in)      :: varname
+
+    ! [ LOCALS ] 
+    integer (kind=c_int) :: iCount
+
+    if (size( variable, 1) > 0 ) then
+      write (*, fmt="(a20, f14.3, f14.3, f14.3, i10)") varname, minval(variable), maxval(variable), &
+        sum(variable) / size(variable,1), size(variable,1)
+    else
+      write(*, fmt="(a20, f14.3, f14.3, f14.3, i10)") varname, -9999.,-9999.,-9999.,0
+    endif
+
+
+  end subroutine minmaxmean_float
+
+
+  subroutine minmaxmean_int( variable , varname )
+
+    integer (kind=c_int), dimension(:)  :: variable
+    character (len=*), intent(in)       :: varname
+
+    ! [ LOCALS ] 
+    integer (kind=c_int) :: iCount
+
+    if (size( variable, 1) > 0 ) then
+      write (*, fmt="(a20, i14, i14, i14, i10)") varname, minval(variable), maxval(variable), &
+        sum(variable) / size(variable,1), size(variable,1)
+    else
+      write(*, fmt="(a20, i14, i14, i14, i10)") varname, -9999,-9999,-9999,0
+    endif
+
+  end subroutine minmaxmean_int
+
+  subroutine summarize_state_variables_sub(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)   :: this
+
+    call minmaxmean( this%landuse_code , "LULC")
+     call minmaxmean( this%landuse_index, "LULC_index")
+     call minmaxmean( this%soil_group, "HSG")
+     call minmaxmean( this%num_upslope_connections, "Upslope")
+     call minmaxmean( this%sum_upslope_cells, "Sum_upslope")
+
+     call minmaxmean( this%awc, "AWC")
+    
+     call minmaxmean( this%latitude, "Lat")
+     call minmaxmean( this%reference_ET0, "ET0")
+     call minmaxmean( this%reference_ET0_adj, "ET0_adn")
+     call minmaxmean( this%actual_ET, "ActET")
+     call minmaxmean( this%inflow, "Inflow")
+     call minmaxmean( this%runon, "runon")
+     call minmaxmean( this%runoff, "runoff")
+     call minmaxmean( this%outflow, "outflow")
+     call minmaxmean( this%infiltration, "infilt")
+     call minmaxmean( this%snowfall, "snowfall")
+     call minmaxmean( this%snowmelt, "snowmelt")
+     call minmaxmean( this%interception, "intercept")
+     call minmaxmean( this%rainfall, "rainfall")
+     call minmaxmean( this%GDD_28, "GDD28")
+    
+     call minmaxmean( this%interception_storage, "Intcp_stor")
+     call minmaxmean( this%snow_storage, "Snow_stor")
+     call minmaxmean( this%soil_storage, "Soil_stor")
+     call minmaxmean( this%soil_storage_max, "Soil_stor_max")
+     call minmaxmean( this%potential_recharge, "Potential_recharge")
+     call minmaxmean( this%stream_storage, "stream_storage")
+
+  end subroutine summarize_state_variables_sub
 
 end module model_domain

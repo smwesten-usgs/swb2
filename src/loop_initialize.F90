@@ -133,12 +133,16 @@ contains
    
     enddo
 
-    call initialize_interception_method()
-    call initialize_evapotranspiration_method()
-    call initialize_infiltration_method()
-    call MODEL%set_inactive_cells()
-    call MODEL%initialize_arrays()
+    do iIndex = 1, ubound(KNOWN_METHODS, 1)
+
+      call initialize_generic_method( sKey=KNOWN_METHODS(iIndex)%sName )
+   
+    enddo
+    
     call initialize_soils_landuse_awc_flowdir_values()
+
+    call MODEL%summarize()
+
     call MODEL%preflight_check_method_pointers()
 
     call MODEL%initialize_methods()
@@ -376,8 +380,9 @@ contains
       rGridCellSize = asDouble( myOptions%get(5) )
 
       !pGrd => grid_Create(iNX, iNY, rX0, rY0, rGridCellSize, GRID_DATATYPE_ALL) 
-      call MODEL%initialize_grid(iNX, iNY, rX0, rY0, rGridCellSize)
 
+      call MODEL%initialize_grid(iNX, iNY, rX0, rY0, rGridCellSize)
+      print *, __FILE__, __LINE__
       rX1 = rX0 + rGridCellSize * real(iNX, kind=c_double)
       rY1 = rY0 + rGridCellSize * real(iNY, kind=c_double)
 
@@ -388,11 +393,9 @@ contains
       rGridCellSize = asDouble( myOptions%get(7) )
 
       fTempVal = ( rX1 - rX0 ) / real(iNX, kind=c_double)
-      
-
-      !pGrd => grid_Create(iNX, iNY, rX0, rY0, rX1, rY1, GRID_DATATYPE_ALL)
+      print *, __FILE__, __LINE__      
       call MODEL%initialize_grid(iNX, iNY, rX0, rY0, rGridCellSize)
-
+      print *, __FILE__, __LINE__
     else
 
       call warn("Grid specification is flawed or missing.", lFatal=lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
@@ -429,6 +432,17 @@ contains
   subroutine initialize_soils_landuse_awc_flowdir_values()
 
 !! this shouldnt be here....move to model_domain
+! 
+
+      call MODEL%get_land_use()
+
+      call MODEL%get_available_water_content()
+
+      call MODEL%get_soil_groups()
+
+      call MODEL%set_inactive_cells()
+
+      call MODEL%initialize_arrays()
 
       call MODEL%initialize_latitude()
 
@@ -442,9 +456,7 @@ contains
 
   end subroutine initialize_soils_landuse_awc_flowdir_values
 
-
-
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine initialize_start_and_end_dates()
 
@@ -588,7 +600,7 @@ contains
       if ( iCount > 0 ) then
 
         call PARAM_FILES%munge()
-        call PARAMS%print_all()       
+        ! call PARAMS%print_all()       
 
       endif
 
@@ -597,78 +609,6 @@ contains
   end subroutine initialize_parameter_tables
 
 !--------------------------------------------------------------------------------------------------
-
-  subroutine initialize_interception_method()
-
-  use interception__bucket
-
-  ! [ LOCALS ]
-  type (STRING_LIST_T)             :: myDirectives
-  type (STRING_LIST_T)             :: myOptions  
-  integer (kind=c_int)             :: iIndex
-  character (len=:), allocatable   :: sCmdText
-  character (len=:), allocatable   :: sOptionText
-  character (len=:), allocatable   :: sArgText
-  integer (kind=c_int)             :: iStat
-
-
-  myDirectives = CF_DICT%grep_keys("INTERCEPTION")
-    
-  if ( myDirectives%count == 0 ) then
-
-    call warn("Your control file seems to be missing any of the required directives relating to INTERCEPTION method.", &
-      lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
-
-  else  
-  
-    call LOGS%set_loglevel( LOG_ALL )
-    call LOGS%set_echo( lFALSE )
-
-    do iIndex = 1, myDirectives%count
-
-      ! myDirectives is a string list of all SWB directives that contain the phrase "LANDUSE"
-      ! sCmdText contains an individual directive
-      sCmdText = myDirectives%get(iIndex)
-
-      ! For this directive, obtain the associated dictionary entries
-      call CF_DICT%get_values(sCmdText, myOptions )
-
-      ! dictionary entries are initially space-delimited; sArgText contains
-      ! all dictionary entries present, concatenated, with a space between entries
-      sArgText = myOptions%get(1, myOptions%count )
-
-      ! echo the original directive and dictionary entries to the logfile
-      call LOGS%write(">> "//sCmdText//" "//sArgText)
-
-      ! most of the time, we only care about the first dictionary entry, obtained below
-      sOptionText = myOptions%get(1)
-
-      select case ( sCmdText )
-
-        case ( "INTERCEPTION_METHOD" )
-
-          sArgText = myOptions%get(2)
-
-          select case (sOptionText)
-
-            case ( "BUCKET" )
-
-              call MODEL%set_interception("BUCKET")
-
-          end select
-          
-        case default
-        
-          call warn("Unknown interception method was specified: "//dquote(sArgText), iLogLevel=LOG_ALL )
-
-      end select
-      
-    enddo
-    
-  endif
-
-end subroutine initialize_interception_method
-
 
 subroutine initialize_generic_method( sKey )
 
@@ -717,9 +657,7 @@ subroutine initialize_generic_method( sKey )
 
       if ( index(string=sCmdText, substring="METHOD" ) > 0 ) then
 
-        sArgText = myOptions%get(2)
-
-        call MODEL%set_method( trim(sCmdText), trim(aArgText) )
+        call MODEL%set_method( trim(sCmdText), trim(sOptionText) )
 
       endif
       
@@ -728,156 +666,6 @@ subroutine initialize_generic_method( sKey )
   endif
 
 end subroutine initialize_generic_method
-
-!--------------------------------------------------------------------------------------------------
-
-subroutine initialize_evapotranspiration_method()
-
-  ! [ LOCALS ]
-  type (STRING_LIST_T)             :: myDirectives
-  type (STRING_LIST_T)             :: myOptions  
-  integer (kind=c_int)             :: iIndex
-  character (len=:), allocatable   :: sCmdText
-  character (len=:), allocatable   :: sOptionText
-  character (len=:), allocatable   :: sArgText
-  integer (kind=c_int)             :: iStat
-
-
-  myDirectives = CF_DICT%grep_keys("EVAPOTRANSPIRATION")
-    
-  if ( myDirectives%count == 0 ) then
-
-    call warn("Your control file seems to be missing any of the required directives relating to EVAPOTRANSPIRATION method.", &
-      lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
-
-  else  
-  
-    call LOGS%set_loglevel( LOG_ALL )
-    call LOGS%set_echo( lFALSE )
-
-    do iIndex = 1, myDirectives%count
-
-      ! myDirectives is a string list of all SWB directives that contain the phrase "LANDUSE"
-      ! sCmdText contains an individual directive
-      sCmdText = myDirectives%get(iIndex)
-
-      ! For this directive, obtain the associated dictionary entries
-      call CF_DICT%get_values(sCmdText, myOptions )
-
-      ! dictionary entries are initially space-delimited; sArgText contains
-      ! all dictionary entries present, concatenated, with a space between entries
-      sArgText = myOptions%get(1, myOptions%count )
-
-      ! echo the original directive and dictionary entries to the logfile
-      call LOGS%write(">> "//sCmdText//" "//sArgText)
-
-      ! most of the time, we only care about the first dictionary entry, obtained below
-      sOptionText = myOptions%get(1)
-
-      select case ( sCmdText )
-
-        case ( "EVAPOTRANSPIRATION_METHOD", "ET_METHOD" )
-
-          sArgText = myOptions%get(2)
-
-          select case (sOptionText)
-
-            case ( "HARGREAVES", "HARGREAVES-SAMANI" )
-
-              call MODEL%set_evapotranspiration("HARGREAVES")
-
-            case ( "J-H", "JENSEN-HAISE" )
-
-              call MODEL%set_evapotranspiration("JENSEN-HAISE")
-
-            end select
-            
-          case default
-          
-            call warn("Unknown evapotranspiration method was specified: "//dquote(sArgText), iLogLevel=LOG_ALL )
-
-        end select
-        
-      enddo
-      
-    endif
-
-  end subroutine initialize_evapotranspiration_method
-
-!--------------------------------------------------------------------------------------------------  
-
-  subroutine initialize_infiltration_method()
-
-    ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions  
-    integer (kind=c_int)             :: iIndex
-    character (len=:), allocatable   :: sCmdText
-    character (len=:), allocatable   :: sOptionText
-    character (len=:), allocatable   :: sArgText
-    integer (kind=c_int)             :: iStat
-
-
-    myDirectives = CF_DICT%grep_keys("INFILTRATION")
-      
-    if ( myDirectives%count == 0 ) then
-
-      call warn("Your control file seems to be missing any of the required directives relating to INFILTRATION method.", &
-        lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
-
-    else  
-    
-      call LOGS%set_loglevel( LOG_ALL )
-      call LOGS%set_echo( lFALSE )
-
-      do iIndex = 1, myDirectives%count
-
-        ! myDirectives is a string list of all SWB directives that contain the phrase "LANDUSE"
-        ! sCmdText contains an individual directive
-        sCmdText = myDirectives%get(iIndex)
-
-        ! For this directive, obtain the associated dictionary entries
-        call CF_DICT%get_values(sCmdText, myOptions )
-
-        ! dictionary entries are initially space-delimited; sArgText contains
-        ! all dictionary entries present, concatenated, with a space between entries
-        sArgText = myOptions%get(1, myOptions%count )
-
-        ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(">> "//sCmdText//" "//sArgText)
-
-        ! most of the time, we only care about the first dictionary entry, obtained below
-        sOptionText = myOptions%get(1)
-
-        select case ( sCmdText )
-
-          case ( "INFILTRATION_METHOD", "RUNOFF_METHOD" )
-
-            sArgText = myOptions%get(2)
-
-            select case (sOptionText)
-
-              case ( "C-N", "CURVE_NUMBER" )
-
-                call MODEL%set_infiltration_method("CURVE_NUMBER")
-
-              case ( "G-A", "GREEN_AMPT", "GREEN-AMPT" )
-
-                call MODEL%set_infiltration_method("GREEN_AMPT")
-
-            end select
-            
-          case default
-          
-            call warn("Unknown infiltration method was specified: "//dquote(sArgText), iLogLevel=LOG_ALL )
-
-        end select
-        
-      enddo
-      
-    endif
-
-  end subroutine initialize_infiltration_method
 
 !--------------------------------------------------------------------------------------------------
 

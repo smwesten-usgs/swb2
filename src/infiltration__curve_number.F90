@@ -48,7 +48,7 @@ contains
 
     !> Determine how many landuse codes are present
     call PARAMS%get_values( slList, iLanduseCodes )
-    iNumberOfLanduses = count( iLanduseCodes > 0 )
+    iNumberOfLanduses = count( iLanduseCodes >= 0 )
 
     allocate( CN_AMCIII(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
     call assert( iStat == 0, "Failed to allocate memory for curve number table - AMC III", &
