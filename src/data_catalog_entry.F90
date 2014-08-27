@@ -627,6 +627,7 @@ subroutine getvalues_constant_sub( this  )
       this%sOldFilename = this%sSourceFilename
 
       inquire(file=this%sSourceFilename, exist=lExist, opened=lOpened)
+
       ! if the file doesn't exist, EXIT
       if (.not. lExist ) then
         if ( this%lMissingFilesAreAllowed ) then
@@ -639,7 +640,7 @@ subroutine getvalues_constant_sub( this  )
       endif
 
       call LOGS%write("Opening file "//dQuote(this%sSourceFilename) &
-        //" for "//trim(this%sDescription)//" data.", iLogLevel=LOG_ALL, lEcho=lFALSE )
+        //" for "//trim(this%sDescription)//" data.", iLogLevel=LOG_ALL, lEcho=lTRUE )
 
       if ( this%lGridIsPersistent .and. associated(this%pGrdNative) ) then
 
@@ -821,15 +822,17 @@ end subroutine set_constant_value_real
 
   subroutine make_filename_from_template( this, iMonth, iDay, iYear )
 
-    class (DATA_CATALOG_ENTRY_T)   :: this
-    integer (kind=c_int), optional :: iMonth, iDay, iYear
+    class (DATA_CATALOG_ENTRY_T) :: this
+    integer (kind=c_int), optional :: iMonth
+    integer (kind=c_int), optional :: iDay
+    integer (kind=c_int), optional :: iYear
 
     ! [ LOCALS ]
     character (len=256) :: sNewFilename
     character (len=256) :: sUppercaseFilename
     character (len=256) :: sCWD
     character (len=256) :: sBuf2
-    integer (kind=c_int) :: iPos_Y, iPos_D, iPos_M, iPos, iPos2, iLen, iCount
+    integer (kind=c_int) :: iPos_Y, iPos_D, iPos_M, iPos_0D, iPos_0M, iPos, iPos2, iLen, iCount
     integer (kind=c_int) :: iNumZeros, iNumZerosToPrint
     logical (kind=c_bool) :: lMatch
     logical (kind=c_bool) :: lExist
@@ -849,18 +852,17 @@ end subroutine set_constant_value_real
     call assert(iStatus==0, "Problem detemining what the current working" &
       //" directory is", trim(__FILE__), __LINE__)
 
-    if (len_trim( this%sFilenameTemplate ) > 0 ) then
+    sNewFilename = this%sFilenameTemplate
 
-      sNewFilename = this%sSourceFilename
+    iCount = 0
 
-      iCount = 0
+    do
 
-      do
+      lMatch = lFALSE
 
-        lMatch = lFALSE
-
-        if (present(iYear) ) iPos_Y = &
-             max(index(sNewFilename, "%Y"), index(sNewFilename, "%y") )
+      if (present(iYear) ) then
+        
+        iPos_Y = max(index(sNewFilename, "%Y"), index(sNewFilename, "%y") )
 
         if (iPos_Y > 0) then
           lMatch = lTRUE
@@ -870,67 +872,103 @@ end subroutine set_constant_value_real
 
         endif
 
-        iPos = index(sNewFilename, "#")
+      endif  
 
-        if (iPos > 0) then
+      ! evaluate template string for "#" characters
+      iPos = index(sNewFilename, "#")
 
-          iPos2 = index(sNewFilename(1:iPos),"%", BACK=lTRUE)
-          sBuf2 = trim(asCharacter(this%iFileCount))
-          iNumZeros = max(0, iPos - iPos2 - 1)
+      if (iPos > 0) then
 
-          if (iNumZeros > 0) then
-            iNumZerosToPrint = max(0,iNumZeros - len_trim(sBuf2) + 1)
-            sNumber = repeat("0", iNumZerosToPrint )//trim(sBuf2)
-          else
-            sNumber = repeat("0", iNumZeros - len_trim(sBuf2) )//trim(sBuf2)
-          endif
+        ! example:  %000#
+        ! trying to determine how many zero values have been inserted between % and # characters
+        iPos2 = index(sNewFilename(1:iPos),"%", BACK=lTRUE)
+        sBuf2 = trim(asCharacter(this%iFileCount))
+        iNumZeros = max(0, iPos - iPos2 - 1)
 
-          lMatch = lTRUE
-          iLen=len_trim(sNewFilename)
-          sNewFilename = sNewFilename(1:iPos-2-iNumZeros)//trim(sNumber) &
-                         //sNewFilename(iPos+1:iLen)
+        if (iNumZeros > 0) then
+          iNumZerosToPrint = max(0,iNumZeros - len_trim(sBuf2) + 1)
+          sNumber = repeat("0", iNumZerosToPrint )//trim(sBuf2)
+        else
+          sNumber = trim(sBuf2)
         endif
 
-        if (present(iMonth) ) iPos_M = &
-            max(index(sNewFilename, "%M"), index(sNewFilename, "%m") )
+        lMatch = lTRUE
+        iLen=len_trim(sNewFilename)
+        sNewFilename = sNewFilename(1:iPos-2-iNumZeros)//trim(sNumber) &
+                       //sNewFilename(iPos+1:iLen)
+      endif
 
-        if (iPos_M > 0) then
+
+      ! evaluate template string for "%m": month number
+      if (present(iMonth) ) then
+
+        iPos_M = max(index(sNewFilename, "%M"), index(sNewFilename, "%m") )
+        iPos_0M = max(index(sNewFilename, "%0M"), index(sNewFilename, "%0m") )
+
+        if ( iPos_0M > 0 ) then
+
           lMatch = lTRUE
           write (unit=sBuf, fmt="(i2.2)") iMonth
 
           iLen=len_trim(sNewFilename)
-          sNewFilename = sNewFilename(1:iPos_M - 1)//sBuf &
+          sNewFilename = sNewFilename(1:iPos_0M - 1)//trim(sBuf) &
+                         //sNewFilename(iPos_0M + 3:iLen)
+
+        elseif ( iPos_M > 0 ) then
+
+          lMatch = lTRUE
+          sBuf = asCharacter( iMonth )
+
+          iLen=len_trim(sNewFilename)
+          sNewFilename = sNewFilename(1:iPos_M - 1)//trim(sBuf) &
                          //sNewFilename(iPos_M + 2:iLen)
+
         endif
 
-        if (present(iDay) ) iPos_D = &
-             max(index(sNewFilename, "%D"),index(sNewFilename, "%d") )
+      endif
 
-        if (iPos_D > 0) then
+      ! evaluate template string for "%d": day number
+      if (present(iDay) )  then
+
+        iPos_D = max(index(sNewFilename, "%D"),index(sNewFilename, "%d") )
+        iPos_0D = max(index(sNewFilename, "%0D"), index(sNewFilename, "%0d") )
+
+        if (iPos_0D > 0) then
           lMatch = lTRUE
           write (unit=sBuf, fmt="(i2.2)") iDay
           iLen=len_trim(sNewFilename)
-          sNewFilename = sNewFilename(1:iPos_D - 1)//sBuf &
+          sNewFilename = sNewFilename(1:iPos_0D - 1)//sBuf &
+                         //sNewFilename(iPos_0D + 3:iLen)
+
+        elseif ( iPos_D > 0 ) then
+
+          lMatch = lTRUE
+          sBuf = asCharacter( iDay )
+
+          iLen=len_trim(sNewFilename)
+          sNewFilename = sNewFilename(1:iPos_D - 1)//trim(sBuf) &
                          //sNewFilename(iPos_D + 2:iLen)
+
         endif
 
-        if (.not. lMatch) exit
-
-        iCount = iCount + 1
-
-        ! failsafe
-        if (iCount > 4) exit
-
-      enddo
-
-      if( index(string=sCWD, substring=sFORWARDSLASH) > 0 ) then
-        sDelimiter = sFORWARDSLASH
-      else
-        sDelimiter = sBACKSLASH
       endif
 
-    endif  
+      if (.not. lMatch) exit
 
+      iCount = iCount + 1
+
+      ! failsafe
+      if (iCount > 4) exit
+
+    enddo
+
+    if( index(string=sCWD, substring=sFORWARDSLASH) > 0 ) then
+      sDelimiter = sFORWARDSLASH
+    else
+      sDelimiter = sBACKSLASH
+    endif
+
+!    this%sSourceFilename = trim(sCWD)//trim(sDelimiter)//trim(sNewFilename)
     this%sSourceFilename = trim(sNewFilename)
 
   end subroutine make_filename_from_template
