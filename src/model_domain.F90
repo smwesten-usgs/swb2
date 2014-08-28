@@ -64,12 +64,13 @@ module model_domain
     real (kind=c_float), allocatable       :: tmax(:)
     real (kind=c_float), allocatable       :: routing_fraction(:)
 
-    procedure ( interception_method ), pointer         :: init_interception      => model_initialize_interception_bucket
-    procedure ( infiltration_method ), pointer         :: init_infiltration      => model_initialize_infiltration_curve_number
-    procedure ( et_method ), pointer                   :: init_reference_et      => model_initialize_et_hargreaves
-    procedure ( sm_method ), pointer                   :: init_soil_moisture     => model_initialize_soil_moisture_thornthwaite_mather
-    procedure ( snowfall_method ), pointer             :: init_snowfall          => model_initialize_snowfall_original
-    procedure ( snowfall_method ), pointer             :: init_snowmelt          => model_initialize_snowmelt_original
+    procedure ( interception_method ), pointer         :: init_interception       => model_initialize_interception_bucket
+    procedure ( infiltration_method ), pointer         :: init_infiltration       => model_initialize_infiltration_curve_number
+    procedure ( et_method ), pointer                   :: init_reference_et       => model_initialize_et_hargreaves
+    procedure ( sm_method ), pointer                   :: init_soil_moisture      => model_initialize_soil_moisture_thornthwaite_mather
+    procedure ( snowfall_method ), pointer             :: init_snowfall           => model_initialize_snowfall_original
+    procedure ( snowfall_method ), pointer             :: init_snowmelt           => model_initialize_snowmelt_original
+    procedure ( precipitation_data_method_init ), pointer   :: init_precipitation_data => model_initialize_precip_normal
 
     procedure ( interception_method ), pointer         :: calc_interception      => model_calculate_interception_bucket
     procedure ( infiltration_method ), pointer         :: calc_infiltration      => model_calculate_infiltration_curve_number
@@ -231,6 +232,13 @@ module model_domain
   end interface    
 
   abstract interface
+    subroutine precipitation_data_method_init( this )
+      import :: MODEL_DOMAIN_T, DATA_CATALOG_ENTRY_T
+      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
+    end subroutine precipitation_data_method_init
+  end interface    
+
+  abstract interface
     subroutine precipitation_data_method( this, pPRCP )
       import :: MODEL_DOMAIN_T, DATA_CATALOG_ENTRY_T
       class ( MODEL_DOMAIN_T ), intent(inout)  :: this
@@ -352,7 +360,8 @@ contains
     call this%init_infiltration
     call this%init_soil_moisture
     call this%init_reference_et
-    
+    call this%init_precipitation_data
+
   end subroutine initialize_methods_sub
 
 !--------------------------------------------------------------------------------------------------
@@ -1152,10 +1161,14 @@ contains
         this%init_interception => model_initialize_interception_bucket
         this%calc_interception => model_calculate_interception_bucket
 
+        call LOGS%WRITE( "==> BUCKET INTERCEPTION submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
       elseif ( sMethodName .strequal. "GASH" ) then
 
         this%init_interception => model_initialize_interception_gash
         this%calc_interception => model_calculate_interception_gash
+
+        call LOGS%WRITE( "==> GASH INTERCEPTION submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
       else
 
@@ -1171,6 +1184,8 @@ contains
         this%init_infiltration => model_initialize_infiltration_curve_number
         this%calc_infiltration => model_calculate_infiltration_curve_number
 
+        call LOGS%WRITE( "==> CURVE NUMBER INFILTRATION submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
       else
 
         call warn("Your control file specifies an unknown or unsupported INFILTRATION method.", &
@@ -1185,10 +1200,14 @@ contains
         this%init_snowfall => model_initialize_snowfall_original
         this%calc_snowfall => model_calculate_snowfall_original
 
+        call LOGS%WRITE( "==> ORIGINAL SNOWFALL submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
       elseif ( sMethodName .strequal. "PRMS" ) then
 
         this%init_snowfall => model_initialize_snowfall_prms
         this%calc_snowfall => model_calculate_snowfall_prms
+
+        call LOGS%WRITE( "==> PRMS SNOWFALL submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
       else
 
@@ -1205,11 +1224,17 @@ contains
         this%init_reference_et => model_initialize_et_hargreaves
         this%calc_reference_et => model_calculate_et_hargreaves
 
+        call LOGS%WRITE( "==> HARGREAVES-SAMANI EVAPOTRANSPIRATION submodel selected.", &
+            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
       elseif ( ( sMethodName .strequal. "JENSEN-HAISE" ) &
            .or. ( sMethodName .strequal. "JH" ) ) then
 
         this%init_reference_et => model_initialize_et_jensen_haise
         this%calc_reference_et => model_calculate_et_jensen_haise
+
+        call LOGS%WRITE( "==> JENSEN_HAISE EVAPOTRANSPIRATION submodel selected.", &
+            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
       else
 
@@ -1223,12 +1248,20 @@ contains
       if ( ( sMethodName .strequal. "NORMAL" ) &
            .or. ( sMethodName .strequal. "STANDARD" ) ) then
 
+        this%init_precipitation_data => model_initialize_precip_normal
         this%get_precipitation_data => model_get_precip_normal
+
+        call LOGS%WRITE( "==> STANDARD PRECIPITATION submodel selected.", &
+            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
       elseif ( ( sMethodName .strequal. "METHOD_OF_FRAGMENTS" ) &
            .or. ( sMethodName .strequal. "FRAGMENTS" ) ) then
 
+        this%init_precipitation_data => model_initialize_precip_method_of_fragments
         this%get_precipitation_data => model_get_precip_method_of_fragments
+
+        call LOGS%WRITE( "==> METHOD OF FRAGMENTS PRECIPITATION submodel selected.", &
+            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
       else
 
@@ -1243,6 +1276,9 @@ contains
 
         this%init_soil_moisture => model_initialize_soil_moisture_thornthwaite_mather
         this%calc_soil_moisture => model_calculate_soil_moisture_thornthwaite_mather
+
+        call LOGS%WRITE( "==> THORNTHWAITE-MATHER SOIL MOISTURE submodel selected.", &
+            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
       else
 
@@ -1492,9 +1528,17 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_get_precip_normal(this, pPRCP)
+  subroutine model_initialize_precip_normal(this)
 
-    use precipitation__method_of_fragments
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    !> Nothing here to see. Initialization not really needed for the "normal" method.
+
+  end subroutine model_initialize_precip_normal
+
+!--------------------------------------------------------------------------------------------------
+ 
+  subroutine model_get_precip_normal(this, pPRCP)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     type (DATA_CATALOG_ENTRY_T), pointer   :: pPRCP 
@@ -1511,8 +1555,22 @@ contains
   end subroutine model_get_precip_normal  
 
 !--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_precip_method_of_fragments(this)
+
+    use precipitation__method_of_fragments
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call initialize_precipitation_method_of_fragments( this%active )
+
+  end subroutine model_initialize_precip_method_of_fragments
+
+!--------------------------------------------------------------------------------------------------
  
   subroutine model_get_precip_method_of_fragments(this, pPRCP)
+
+    use precipitation__method_of_fragments
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     type (DATA_CATALOG_ENTRY_T), pointer   :: pPRCP 
@@ -1537,14 +1595,28 @@ contains
 
     ! [ LOCALS ] 
     integer (kind=c_int) :: iCount
+    character (len=20)   :: sVarname
+    character (len=14)   :: sMin
+    character (len=14)   :: sMax
+    character (len=14)   :: sMean
+    character (len=10)   :: sCount
+
+    write (sVarname, fmt="(a20)") adjustl(varname)
 
     if (size( variable, 1) > 0 ) then
-      write (*, fmt="(a20, f14.3, f14.3, f14.3, i10)") varname, minval(variable), maxval(variable), &
-        sum(variable) / size(variable,1), size(variable,1)
+      write (sMin, fmt="(g14.3)")   minval(variable)
+      write (sMax, fmt="(g14.3)")   maxval(variable)
+      write (sMean, fmt="(g14.3)")  sum(variable) / size(variable,1)
+      write (sCount, fmt="(i10)") size(variable,1)
     else
-      write(*, fmt="(a20, f14.3, f14.3, f14.3, i10)") varname, -9999.,-9999.,-9999.,0
+      write (sMin, fmt="(g14.3)")   -9999.
+      write (sMax, fmt="(g14.3)")   -9999.
+      write (sMean, fmt="(g14.3)")  -9999.
+      write (sCount, fmt="(i10)")       0
     endif
 
+    call LOGS%write( adjustl(sVarname)//" | "//adjustl(sMin)//" | "//adjustl(sMax) &
+       //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_DEBUG, lEcho=lTRUE )
 
   end subroutine minmaxmean_float
 
@@ -1556,13 +1628,28 @@ contains
 
     ! [ LOCALS ] 
     integer (kind=c_int) :: iCount
+    character (len=20)   :: sVarname
+    character (len=14)   :: sMin
+    character (len=14)   :: sMax
+    character (len=14)   :: sMean
+    character (len=10)   :: sCount
+
+    write (sVarname, fmt="(a20)") adjustl(varname)
 
     if (size( variable, 1) > 0 ) then
-      write (*, fmt="(a20, i14, i14, i14, i10)") varname, minval(variable), maxval(variable), &
-        sum(variable) / size(variable,1), size(variable,1)
+      write (sMin, fmt="(i14)")   minval(variable)
+      write (sMax, fmt="(i14)")   maxval(variable)
+      write (sMean, fmt="(i14)")  sum(variable) / size(variable,1)
+      write (sCount, fmt="(i10)") size(variable,1)
     else
-      write(*, fmt="(a20, i14, i14, i14, i10)") varname, -9999,-9999,-9999,0
+      write (sMin, fmt="(i14)")   -9999
+      write (sMax, fmt="(i14)")   -9999
+      write (sMean, fmt="(i14)")  -9999
+      write (sCount, fmt="(i10)")  0
     endif
+
+    call LOGS%write( adjustl(sVarname)//" | "//adjustl(sMin)//" | "//adjustl(sMax) &
+       //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_DEBUG, lEcho=lTRUE )
 
   end subroutine minmaxmean_int
 
@@ -1570,35 +1657,38 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)   :: this
 
-    call minmaxmean( this%landuse_code , "LULC")
-     call minmaxmean( this%landuse_index, "LULC_index")
-     call minmaxmean( this%soil_group, "HSG")
-     call minmaxmean( this%num_upslope_connections, "Upslope")
-     call minmaxmean( this%sum_upslope_cells, "Sum_upslope")
+    call LOGS%write( "variable name        | min            | max            | mean           | count         ")
+    call LOGS%write( "-------------------- | -------------- | -------------- | -------------- | --------------")
 
-     call minmaxmean( this%awc, "AWC")
+    call minmaxmean( this%landuse_code , "LULC")
+    call minmaxmean( this%landuse_index, "LULC_index")
+    call minmaxmean( this%soil_group, "HSG")
+    call minmaxmean( this%num_upslope_connections, "upslope")
+    call minmaxmean( this%sum_upslope_cells, "sum_upslope")
+
+    call minmaxmean( this%awc, "AWC")
     
-     call minmaxmean( this%latitude, "Lat")
-     call minmaxmean( this%reference_ET0, "ET0")
-     call minmaxmean( this%reference_ET0_adj, "ET0_adn")
-     call minmaxmean( this%actual_ET, "ActET")
-     call minmaxmean( this%inflow, "Inflow")
-     call minmaxmean( this%runon, "runon")
-     call minmaxmean( this%runoff, "runoff")
-     call minmaxmean( this%outflow, "outflow")
-     call minmaxmean( this%infiltration, "infilt")
-     call minmaxmean( this%snowfall, "snowfall")
-     call minmaxmean( this%snowmelt, "snowmelt")
-     call minmaxmean( this%interception, "intercept")
-     call minmaxmean( this%rainfall, "rainfall")
-     call minmaxmean( this%GDD_28, "GDD28")
+    call minmaxmean( this%latitude, "Lat")
+    call minmaxmean( this%reference_ET0, "ET0")
+    call minmaxmean( this%reference_ET0_adj, "ET0_adn")
+    call minmaxmean( this%actual_ET, "actET")
+    call minmaxmean( this%inflow, "inflow")
+    call minmaxmean( this%runon, "runon")
+    call minmaxmean( this%runoff, "runoff")
+    call minmaxmean( this%outflow, "outflow")
+    call minmaxmean( this%infiltration, "infilt")
+    call minmaxmean( this%snowfall, "snowfall")
+    call minmaxmean( this%snowmelt, "snowmelt")
+    call minmaxmean( this%interception, "intercept")
+    call minmaxmean( this%rainfall, "rainfall")
+    call minmaxmean( this%GDD_28, "GDD28")
     
-     call minmaxmean( this%interception_storage, "Intcp_stor")
-     call minmaxmean( this%snow_storage, "Snow_stor")
-     call minmaxmean( this%soil_storage, "Soil_stor")
-     call minmaxmean( this%soil_storage_max, "Soil_stor_max")
-     call minmaxmean( this%potential_recharge, "Potential_recharge")
-     call minmaxmean( this%stream_storage, "stream_storage")
+    call minmaxmean( this%interception_storage, "intcp_stor")
+    call minmaxmean( this%snow_storage, "snow_stor")
+    call minmaxmean( this%soil_storage, "soil_stor")
+    call minmaxmean( this%soil_storage_max, "soil_stor_max")
+    call minmaxmean( this%potential_recharge, "potential_recharge")
+    call minmaxmean( this%stream_storage, "stream_storage")
 
   end subroutine summarize_state_variables_sub
 

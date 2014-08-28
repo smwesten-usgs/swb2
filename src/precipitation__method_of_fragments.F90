@@ -1,6 +1,7 @@
 module precipitation__method_of_fragments
 
   use iso_c_binding
+  use data_catalog
   use data_catalog_entry
   use exceptions
   use file_operations
@@ -30,18 +31,27 @@ contains
   ! 
   !  read fragments in as a table
   !  randomly choose a fragment
-  !  multiply monthly grid by normalized annual sum (e.g. 1.1 in a wet year, 0.9 in a dry year)
-  !  calculate daily precip by multiplying daily fragment value by monthly sum 
+  !  calculate daily precip by multiplying daily fragment value by month-year value 
 
-  subroutine initialize_precipitation_method_of_fragments(iNumActiveCells )
+  subroutine initialize_precipitation_method_of_fragments( lActive )
 
-    integer (kind=c_int), intent(in)  :: iNumActiveCells
+    logical (kind=c_bool), intent(in)     :: lActive(:,:)
 
     ! [ LOCALS ]
     integer (kind=c_int)        :: iStat
+    type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ZONE
 
-    allocate( RAIN_GAGE_ID( iNumActiveCells ), stat=iStat )
+    ! locate the data structure associated with the gridded rainfall zone entries
+    pRAINFALL_ZONE => DAT%find("RAINFALL_ZONE")
+    if ( .not. associated(pRAINFALL_ZONE) ) &
+        call die("A RAINFALL_ZONE grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
+
+    allocate( RAIN_GAGE_ID( count(lActive) ), stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+
+    call pRAINFALL_ZONE%getvalues()
+
+    RAIN_GAGE_ID = pack( pRAINFALL_ZONE%pGrdBase%iData, lActive )
 
 !     !> Determine how many landuse codes are present
 !     call PARAMS%get_values( sKey="LU_Code", iValues=iLanduseCodes )

@@ -1477,22 +1477,35 @@ subroutine grid_checkIntegerGridValues(pGrd, sFilename)
   integer (kind=c_int) :: iRunningSum
   integer (kind=c_int) :: iIndex
   integer (kind=c_int) :: iCount
+  integer (kind=c_int) :: iRecord
+  character (len=10)   :: sBuf0
+  character (len=14)   :: sBuf1
+  character (len=10)   :: sBuf2
+  character (len=40)   :: sBuf3
 
   iRunningSum = 0
+  iRecord = 0
 
-  call LOGS%write(" ")
-  call LOGS%write("Summary of integer grid data values for file "//dquote(sFilename) )
+ call LOGS%write("### Summary of integer grid data values for file "//dquote(sFilename)//" ###", &
+    iLogLevel=LOG_ALL, iLinesBefore=1, iLinesAfter=1 )
 
+  call LOGS%write("number     | count          | value     ")
+  call LOGS%write("---------- | -------------- | ----------")
   do iIndex=0,maxval(pGrd%iData)
     iCount=COUNT( pGrd%iData==iIndex )
     if ( iCount > 0 ) then
+      iRecord = iRecord + 1
       iRunningSum = iRunningSum + iCount
-      call LOGS%write( "   "//asCharacter(iCount)//" grid cells have value: "//asCharacter(iIndex) )
+      write (sBuf0, fmt="(i10)") iRecord
+      write (sBuf1, fmt="(i14)") iCount
+      write (sBuf2, fmt="(i10)")  iIndex
+      write (sBuf3, fmt="(a10,' | ', a14,' | ',a10)") adjustl(sBuf0), adjustl(sBuf1), adjustl(sBuf2)
+      call LOGS%write( sBuf3 )
     end if
   end do
 
   call LOGS%write("   Total number of grid cells with value NODATA: " &
-    //asCharacter( COUNT(pGrd%iData == pGrd%iNoDataValue ) ) )
+    //asCharacter( COUNT(pGrd%iData == pGrd%iNoDataValue ) ), iLinesBefore=1 )
 
   call LOGS%write("   Total number of grid cells: "//asCharacter( size(pGrd%iData) ) )
 

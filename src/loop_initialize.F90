@@ -37,7 +37,7 @@ module loop_initialize
     character (len=23)     :: sName
   end type METHODS_LIST_T
 
-  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(11) = &
+  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(12) = &
 
     [ GRIDDED_DATASETS_T("PRECIPITATION          ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("TMIN                   ", lFALSE, DATATYPE_FLOAT ),     &
@@ -46,15 +46,18 @@ module loop_initialize
       GRIDDED_DATASETS_T("POTENTIAL_ET           ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("SOLAR_RADIATION        ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("WIND_SPEED             ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("RAINFALL_ZONE          ", lTRUE, DATATYPE_INT ),        &
       GRIDDED_DATASETS_T("FOG_ZONE               ", lTRUE, DATATYPE_INT ),        &
       GRIDDED_DATASETS_T("LAND_USE               ", lFALSE, DATATYPE_INT ),       &
       GRIDDED_DATASETS_T("SOILS_GROUP            ", lFALSE, DATATYPE_INT ),       &
       GRIDDED_DATASETS_T("RELATIVE_HUMIDITY      ", lTRUE, DATATYPE_FLOAT )   ]
 
-  type (METHODS_LIST_T)  :: KNOWN_METHODS(3) =     &
+  type (METHODS_LIST_T)  :: KNOWN_METHODS(5) =     &
     [ METHODS_LIST_T("INTERCEPTION           "),   &
       METHODS_LIST_T("EVAPOTRANSPIRATION     "),   &
-      METHODS_LIST_T("INFILTRATION           ")  ]
+      METHODS_LIST_T("INFILTRATION           "),   &
+      METHODS_LIST_T("PRECIPITATION          "),   &
+      METHODS_LIST_T("SOIL_MOISTURE          ")  ]
 
 contains
 
@@ -169,7 +172,6 @@ contains
     character (len=:), allocatable       :: sArgText_2
     integer (kind=c_int)                 :: iStat
     type (DATA_CATALOG_ENTRY_T), pointer :: pENTRY
-
 
     pENTRY => null()
 
@@ -328,6 +330,11 @@ contains
               //dquote(sKey)//" data: "//dquote(sArgText_1) )
           
           endif
+
+        elseif ( index( string=sCmdText, substring="_METHOD") > 0 ) then
+
+          ! no operation; just keep SWB quiet about this and it will be included in the
+          ! methods initialization section
 
         else
 

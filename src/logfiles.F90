@@ -135,7 +135,7 @@ contains
           sDatetime = make_timestamp()
 
           write(this%iUnitNum(iIndex), fmt="(a)") "SWB version "//SWB_VERSION//" compiled on "//COMPILATION_TIMESTAMP         
-          write(this%iUnitNum(iIndex), fmt="(a,/)") "Model run started at "//sDatetime          
+          write(this%iUnitNum(iIndex), fmt="(a,/)") "Model run started on "//sDatetime          
    
         else
 
