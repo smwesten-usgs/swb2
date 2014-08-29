@@ -236,8 +236,11 @@ contains
 
 !--------------------------------------------------------------------------------------------------
   
-  subroutine shuffle_fragments()
+  subroutine update_fragments( lShuffle )
 
+    logical (kind=c_bool), intent(in) :: lShuffle
+
+    ! [ LOCALS ]
     integer (kind=c_int) :: iIndex
     integer (kind=c_int) :: iMaxRainZones
     integer (kind=c_int) :: iMonth
@@ -261,24 +264,25 @@ contains
 
     do iIndex = 1, iMaxRainZones
  
-      iStartRecord = FRAGMENTS_SETS( iIndex )%iStartRecord(iMonth)   
-      iNumberOfFragments = FRAGMENTS_SETS(iIndex)%iNumberOfFragments(iMonth)
-      iEndRecord = iStartRecord + iNumberOfFragments - 1
-      iTargetRecord = iStartRecord + fRandomNumbers(iIndex) * real( iNumberOfFragments - 1)
+      if ( lShuffle ) then
 
-      call assert (iTargetRecord <= iEndRecord, "Miscalculation in target record: calculated record is past the end", &
-        __FILE__, __LINE__ )
+        iStartRecord = FRAGMENTS_SETS( iIndex )%iStartRecord(iMonth)   
+        iNumberOfFragments = FRAGMENTS_SETS(iIndex)%iNumberOfFragments(iMonth)
+        iEndRecord = iStartRecord + iNumberOfFragments - 1
+        iTargetRecord = iStartRecord + fRandomNumbers(iIndex) * real( iNumberOfFragments - 1)
 
-      print *, "TargetRecord: ", iTargetRecord
+        call assert (iTargetRecord <= iEndRecord, "Miscalculation in target record: calculated record is past the end", &
+          __FILE__, __LINE__ )
+        CURRENT_FRAGMENTS(iIndex)%pFragment => FRAGMENTS( iTargetRecord )
 
-      CURRENT_FRAGMENTS(iIndex)%pFragment => FRAGMENTS( iTargetRecord )
-
-      write(*,fmt="(i5,a,i4,i5,i5,31f8.3)") iIndex,") ", FRAGMENTS( iTargetRecord)%iRainGageZone, FRAGMENTS( iTargetRecord)%iMonth, &
-         FRAGMENTS( iTargetRecord)%iFragmentSet, FRAGMENTS( iTargetRecord)%fFragmentValue
+      endif
+     
+!      write(*,fmt="(i5,a,i4,i5,i5,31f8.3)") iIndex,") ", FRAGMENTS( iTargetRecord)%iRainGageZone, FRAGMENTS( iTargetRecord)%iMonth, &
+!         FRAGMENTS( iTargetRecord)%iFragmentSet, FRAGMENTS( iTargetRecord)%fFragmentValue
 
       where ( RAIN_GAGE_ID == iIndex )
 
-        FRAGMENT_VALUE = FRAGMENTS( iTargetRecord )%fFragmentValue( iDay )
+        FRAGMENT_VALUE = CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay )
 
       endwhere  
 
@@ -287,7 +291,7 @@ contains
     
 
 
-  end subroutine shuffle_fragments
+  end subroutine update_fragments
 
 
 
@@ -308,8 +312,10 @@ contains
     iMaxRainZones = maxval(FRAGMENTS%iRainGageZone)
 
     if ( iDay == 1 .or. lFirstCall ) then
-      call shuffle_fragments()
+      call update_fragments( lShuffle = lTRUE)
       lFirstCall = lFALSE
+    else 
+      call update_fragments( lShuffle = lFALSE )
     endif  
 
   end subroutine calculate_precipitation_method_of_fragments

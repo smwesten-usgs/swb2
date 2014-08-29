@@ -8,6 +8,7 @@ module model_domain
   use simulation_datetime
   use snowfall__original
   use parameters
+  use netcdf4_support, only: NC_FLOAT
   implicit none
 
   private
@@ -436,7 +437,7 @@ contains
       sVariableUnits="inches per foot", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end )
 
-      this%dont_care = -9999._c_float
+      this%dont_care = NC_FLOAT
 
   end subroutine initialize_netcdf_output_sub
 
