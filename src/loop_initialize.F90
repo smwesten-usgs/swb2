@@ -24,9 +24,6 @@ module loop_initialize
 
   type (ASCII_FILE_T) :: CF
 
-  type (DICT_T), public             :: CF_DICT 
-  type (DICT_ENTRY_T), pointer      :: CF_ENTRY
-
   type GRIDDED_DATASETS_T
     character (len=23)     :: sName
     logical (kind=c_bool)  :: lOptional
@@ -630,7 +627,7 @@ subroutine initialize_generic_method( sKey )
   character (len=:), allocatable   :: sArgText
   integer (kind=c_int)             :: iStat
 
-
+  ! obtain a list of control file directives whose key values contain the string sKey
   myDirectives = CF_DICT%grep_keys( trim(sKey) )
     
   if ( myDirectives%count == 0 ) then
@@ -643,10 +640,10 @@ subroutine initialize_generic_method( sKey )
     call LOGS%set_loglevel( LOG_ALL )
     call LOGS%set_echo( lFALSE )
 
+    ! repeat this process for each control file directive in list
     do iIndex = 1, myDirectives%count
 
-      ! myDirectives is a string list of all SWB directives that contain the phrase given in sKey
-      ! sCmdText contains an individual directive
+      ! sCmdText contains an individual directive (e.g. TMAX NETCDF input/tmax_%0m_%0d_%0Y.nc )
       sCmdText = myDirectives%get(iIndex)
 
       ! For this directive, obtain the associated dictionary entries

@@ -66,6 +66,11 @@ module dictionary
 
   end type DICT_T
 
+  ! CF = "Control File"; this dictionary will be populated elsewhere with all of the 
+  !                      directives found in the SWB control file.
+  type (DICT_T), public                     :: CF_DICT 
+  type (DICT_ENTRY_T), public, pointer      :: CF_ENTRY
+
 contains
 
  !!

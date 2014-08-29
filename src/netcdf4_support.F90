@@ -98,6 +98,8 @@ module netcdf4_support
   integer (c_int), public, parameter :: NC_Y       = 1
   integer (c_int), public, parameter :: NC_X       = 2
   integer (c_int), public, parameter :: NC_Z       = 3
+  integer (c_int), public, parameter :: NC_LAT     = 4
+  integer (c_int), public, parameter :: NC_LON     = 5  
 
   integer (kind=c_int), parameter :: NC_FIRST = 0
   integer (kind=c_int), parameter :: NC_LAST  = 1
@@ -825,7 +827,7 @@ end subroutine netcdf_open_and_prepare_as_output_archive
 
 
 subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUnits, &
-   iNX, iNY, fX, fY, StartDate, EndDate )
+   iNX, iNY, fX, fY, StartDate, EndDate, dpLat, dpLon )
 
   type (T_NETCDF4_FILE ), pointer            :: NCFILE
   character (len=*), intent(in)              :: sVariableName
@@ -836,7 +838,9 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   real (kind=c_double), intent(in)           :: fY(:)
   type (DATETIME_T), intent(in)              :: StartDate
   type (DATETIME_T), intent(in)              :: EndDate
- 
+  real (kind=c_double), intent(in), optional :: dpLat(:,:)
+  real (kind=c_double), intent(in), optional :: dpLon(:,:)
+
 !   ! [ LOCALS ]
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
   type (T_NETCDF_DIMENSION), pointer :: pNC_DIM
@@ -879,14 +883,14 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   call nf_define_dimensions( NCFILE=NCFILE )
   
   !> set variable values in the NCFILE struct
-  call nf_set_standard_variables(NCFILE=NCFILE, sVarName_z = sVariableName )
+  call nf_set_standard_variables(NCFILE=NCFILE, sVarName_z = sVariableName, lLatLon=lTRUE )
   
   !> transfer variable values to NetCDF file
   call nf_define_variables(NCFILE=NCFILE)
   
   call nf_get_variable_id_and_type( NCFILE=NCFILE )
   
-  call nf_set_standard_attributes(NCFILE=NCFILE, sOriginText=sOriginText)
+  call nf_set_standard_attributes(NCFILE=NCFILE, sOriginText=sOriginText, lLatLon=lTRUE )
   
   call nf_set_global_attributes(NCFILE=NCFILE, &
      sDataType=trim(NCFILE%sVarName(NC_Z)), &
@@ -908,6 +912,14 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   call nf_put_x_and_y(NCFILE=NCFILE, &
        dpX=fX, &
        dpY=fY )
+
+  if (present( dpLat ) .and. present( dpLon ) ) then
+
+    call nf_put_lat_and_lon(NCFILE=NCFILE, &
+       dpLat=dpLat, &
+       dpLon=dpLon )
+
+  endif  
 
 end subroutine netcdf_open_and_prepare_as_output
 
@@ -2767,17 +2779,29 @@ end subroutine nf_set_standard_dimensions
 
 !----------------------------------------------------------------------
 
-subroutine nf_set_standard_variables(NCFILE, sVarName_z)
+subroutine nf_set_standard_variables(NCFILE, sVarName_z, lLatLon)
 
-  type (T_NETCDF4_FILE ) :: NCFILE
-  character (len=*) :: sVarName_z
+  type (T_NETCDF4_FILE )            :: NCFILE
+  character (len=*)                 :: sVarName_z
+  logical (kind=c_bool), optional   :: lLatLon
 
   ! [ LOCALS ]
   integer (kind=c_int) :: iStat
+  logical (kind=c_bool) :: lLatLon_
+
+  if (present( lLatLon) ) then
+    lLatLon_ = lLatLon
+  else
+    lLatLon_ = lFALSE
+  endif   
 
   iStat = 0
 
-  NCFILE%iNumberOfVariables = 4
+  if ( lLatLon_ ) then
+    NCFILE%iNumberOfVariables = 6
+  else
+    NCFILE%iNumberOfVariables = 4
+  endif    
 
   if (associated(NCFILE%pNC_VAR) ) deallocate(NCFILE%pNC_VAR, stat=iStat)
   call assert(iStat == 0, "Could not deallocate memory for NC_VAR member in NC_FILE defined type", &
@@ -2794,13 +2818,13 @@ subroutine nf_set_standard_variables(NCFILE, sVarName_z)
 
   NCFILE%pNC_VAR(NC_Y)%sVariableName = "y"
   NCFILE%pNC_VAR(NC_Y)%iNC_VarType = NC_DOUBLE
-  NCFILE%pNC_VAR(NC_Y)% iNumberOfDimensions = 1
+  NCFILE%pNC_VAR(NC_Y)%iNumberOfDimensions = 1
   NCFILE%pNC_VAR(NC_Y)%iNC_DimID = NCFILE%pNC_DIM(NC_Y)%iNC_DimID
 
   NCFILE%pNC_VAR(NC_X)%sVariableName = "x"
   NCFILE%pNC_VAR(NC_X)%iNC_VarType = NC_DOUBLE
-  NCFILE%pNC_VAR(NC_X)% iNumberOfDimensions = 1
-  NCFILE%pNC_VAR(NC_X)%iNC_DimID = NCFILE%pNC_DIM(NC_X)%iNC_DimID
+  NCFILE%pNC_VAR(NC_X)%iNumberOfDimensions = 1
+  NCFILE%pNC_VAR(NC_X)%iNC_DimID = NCFILE%pNC_DIM(NC_X)%iNC_DimID  
 
   NCFILE%pNC_VAR(NC_Z)%sVariableName = trim(sVarName_z)
   NCFILE%pNC_VAR(NC_Z)%iNC_VarType = NC_FLOAT
@@ -2810,6 +2834,21 @@ subroutine nf_set_standard_variables(NCFILE, sVarName_z)
                                  NCFILE%pNC_DIM(NC_X)%iNC_DimID,0]
 
   NCFILE%sVarName(NC_Z) = trim(sVarName_z)
+
+  if ( lLatLon_ ) then
+
+    NCFILE%pNC_VAR(NC_LAT)%sVariableName = "lat"
+    NCFILE%pNC_VAR(NC_LAT)%iNC_VarType = NC_FLOAT
+    NCFILE%pNC_VAR(NC_LAT)%iNumberOfDimensions = 2
+    NCFILE%pNC_VAR(NC_LAT)%iNC_DimID = [NCFILE%pNC_DIM(NC_Y)%iNC_DimID, &
+                                        NCFILE%pNC_DIM(NC_X)%iNC_DimID,0,0]
+
+    NCFILE%pNC_VAR(NC_LON)%sVariableName = "lon"
+    NCFILE%pNC_VAR(NC_LON)%iNC_VarType = NC_FLOAT
+    NCFILE%pNC_VAR(NC_LON)%iNumberOfDimensions = 2
+    NCFILE%pNC_VAR(NC_LON)%iNC_DimID = [NCFILE%pNC_DIM(NC_Y)%iNC_DimID, &
+                                        NCFILE%pNC_DIM(NC_X)%iNC_DimID,0,0]
+  endif
 
 end subroutine nf_set_standard_variables
 
@@ -2850,16 +2889,23 @@ end subroutine nf_set_global_attributes
 
 !----------------------------------------------------------------------
 
-subroutine nf_set_standard_attributes(NCFILE, sOriginText)
+subroutine nf_set_standard_attributes(NCFILE, sOriginText, lLatLon )
 
-  type (T_NETCDF4_FILE ) :: NCFILE
-  character (len=*) :: sOriginText
+  type (T_NETCDF4_FILE )             :: NCFILE
+  character (len=*)                  :: sOriginText
+  logical (kind=c_bool), optional    :: lLatLon
 
   ! [ LOCALS ]
-  integer (kind=c_int) :: iStat
-  integer (kind=c_int) :: iNumAttributes
+  integer (kind=c_int)                             :: iStat
+  integer (kind=c_int)                             :: iNumAttributes
   type (T_NETCDF_ATTRIBUTE), dimension(:), pointer :: pNC_ATT
+  logical (kind=c_bool)                            :: lLatLon_
 
+  if (present( lLatLon ) ) then
+    lLatLon_ = lLatLon
+  else
+    lLatLon_ = lFALSE
+  endif  
 
   iNumAttributes = 3
   allocate( NCFILE%pNC_VAR(NC_TIME)%pNC_ATT(0:iNumAttributes-1), stat=iStat)
@@ -2979,7 +3025,72 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText)
 
   end block
 
+  if ( lLatLon_) then
 
+    iNumAttributes = 3
+    allocate( NCFILE%pNC_VAR(NC_LAT)%pNC_ATT(0:iNumAttributes-1), stat=iStat)
+    call assert(iStat == 0, "Could not allocate memory for NC_ATT member in NC_VAR struct of NC_FILE", &
+      trim(__FILE__), __LINE__)
+    NCFILE%pNC_VAR(NC_LAT)%iNumberOfAttributes = iNumAttributes
+
+    pNC_ATT => NCFILE%pNC_VAR(NC_LAT)%pNC_ATT
+
+    block
+
+      pNC_ATT(0)%sAttributeName = "units"
+      allocate(pNC_ATT(0)%sAttValue(0:0))
+      pNC_ATT(0)%sAttValue(0) = "degrees_north"
+      pNC_ATT(0)%iNC_AttType = NC_CHAR
+      pNC_ATT(0)%iNC_AttSize = 1_c_size_t
+
+      pNC_ATT(1)%sAttributeName = "long_name"
+      allocate(pNC_ATT(1)%sAttValue(0:0))
+      pNC_ATT(1)%sAttValue(0) = "latitude"
+      pNC_ATT(1)%iNC_AttType = NC_CHAR
+      pNC_ATT(1)%iNC_AttSize = 1_c_size_t
+
+      pNC_ATT(2)%sAttributeName = "standard_name"
+      allocate(pNC_ATT(2)%sAttValue(0:0))
+      pNC_ATT(2)%sAttValue(0) = "latitude"
+      pNC_ATT(2)%iNC_AttType = NC_CHAR
+      pNC_ATT(2)%iNC_AttSize = 1_c_size_t
+
+
+    end block
+
+
+    iNumAttributes = 3
+    allocate( NCFILE%pNC_VAR(NC_LON)%pNC_ATT(0:iNumAttributes-1), stat=iStat)
+    call assert(iStat == 0, "Could not allocate memory for NC_ATT member in NC_VAR struct of NC_FILE", &
+      trim(__FILE__), __LINE__)
+    NCFILE%pNC_VAR(NC_LON)%iNumberOfAttributes = iNumAttributes
+
+    pNC_ATT => NCFILE%pNC_VAR(NC_LON)%pNC_ATT
+
+    block
+
+      pNC_ATT(0)%sAttributeName = "units"
+      allocate(pNC_ATT(0)%sAttValue(0:0))
+      pNC_ATT(0)%sAttValue(0) = "degrees_east"
+      pNC_ATT(0)%iNC_AttType = NC_CHAR
+      pNC_ATT(0)%iNC_AttSize = 1_c_size_t
+
+      pNC_ATT(1)%sAttributeName = "long_name"
+      allocate(pNC_ATT(1)%sAttValue(0:0))
+      pNC_ATT(1)%sAttValue(0) = "longitude"
+      pNC_ATT(1)%iNC_AttType = NC_CHAR
+      pNC_ATT(1)%iNC_AttSize = 1_c_size_t
+
+      pNC_ATT(2)%sAttributeName = "standard_name"
+      allocate(pNC_ATT(2)%sAttValue(0:0))
+      pNC_ATT(2)%sAttValue(0) = "longitude"
+      pNC_ATT(2)%iNC_AttType = NC_CHAR
+      pNC_ATT(2)%iNC_AttSize = 1_c_size_t
+
+
+    end block
+
+  endif
 
 end subroutine nf_set_standard_attributes
 
@@ -3014,6 +3125,38 @@ subroutine nf_put_x_and_y(NCFILE, dpX, dpY)
                    dpValues=dpY)
 
 end subroutine nf_put_x_and_y
+
+!----------------------------------------------------------------------
+
+subroutine nf_put_lat_and_lon(NCFILE, dpLat, dpLon)
+
+  type (T_NETCDF4_FILE) :: NCFILE
+  real (kind=c_double), dimension(:,:) :: dpLat
+  real (kind=c_double), dimension(:,:) :: dpLon
+
+  ! [ LOCALS ]
+  integer (kind=c_size_t) :: iNX, iNY
+
+  iNX = int( size(dpLat, 2), kind=c_size_t)
+  iNY = int( size(dpLat, 1), kind=c_size_t)
+
+
+  call netcdf_put_variable_array(NCFILE=NCFILE, &
+                   iVarID=NCFILE%pNC_VAR(NC_LAT)%iNC_VarID, &
+                   iStart=[0_c_size_t, 0_c_size_t], &
+                   iCount=[ iNY, iNX ], &
+                   iStride=[1_c_ptrdiff_t,1_c_ptrdiff_t], &
+                   dpValues=dpLat)
+
+
+  call netcdf_put_variable_array(NCFILE=NCFILE, &
+                   iVarID=NCFILE%pNC_VAR(NC_LON)%iNC_VarID, &
+                   iStart=[0_c_size_t, 0_c_size_t], &
+                   iCount=[ iNY, iNX ],&
+                   iStride=[1_c_ptrdiff_t,1_c_ptrdiff_t], &
+                   dpValues=dpLon)
+
+end subroutine nf_put_lat_and_lon
 
 !----------------------------------------------------------------------
 

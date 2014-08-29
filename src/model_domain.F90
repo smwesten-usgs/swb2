@@ -261,6 +261,8 @@ module model_domain
 
   real (kind=c_float), allocatable  :: ROOTING_DEPTH(:,:)
 
+  type (GENERAL_GRID_T), pointer       :: pCOORD_GRD
+
 contains
 
   !
@@ -380,7 +382,7 @@ contains
 
     call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(1)%ncfile, sVariableName="gross_precipitation", &
       sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end )
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end , dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX )
 
     call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(2)%ncfile, sVariableName="interception", &
       sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
@@ -706,10 +708,9 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)     :: this
 
     ! [ LOCALS ]
-    type (GENERAL_GRID_T), pointer       :: pGrd
     integer (kind=c_int)                 :: iIndex
 
-    pGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
+    pCOORD_GRD => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
         rX0=this%X_ll, rY0=this%Y_ll, &
         rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_INT )  
 
@@ -717,19 +718,17 @@ contains
     allocate ( this%Y(this%number_of_rows ) )
 
     ! call the grid routine to populate the X and Y values
-    call grid_PopulateXY(pGrd)
+    call grid_PopulateXY( pCOORD_GRD )
 
     ! populating these in order to have them available later for use in writing results to NetCDF
-    this%X = pGrd%rX( :, 1 )
-    this%Y = pGrd%rY( 1, : ) 
+    this%X = pCOORD_GRD%rX( :, 1 )
+    this%Y = pCOORD_GRD%rY( 1, : ) 
 
     ! transform to unprojected (lat/lon) coordinate system
-    call grid_Transform(pGrd=pGrd, sFromPROJ4=this%PROJ4_string, &
+    call grid_Transform(pGrd=pCOORD_GRD, sFromPROJ4=this%PROJ4_string, &
         sToPROJ4="+proj=lonlat +ellps=GRS80 +datum=WGS84 +no_defs" )
     
-    this%latitude = pack( pGrd%rY, this%active )
-
-    call grid_Destroy(pGrd)
+    this%latitude = pack( pCOORD_GRD%rY, this%active )
 
   end subroutine initialize_latitude_sub
 
@@ -1581,8 +1580,10 @@ contains
 
     if (.not. associated(pPRCP%pGrdBase) ) &
       call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
+   
+    call calculate_precipitation_method_of_fragments()
 
-    this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active )
+    this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * FRAGMENT_VALUE
 
   end subroutine model_get_precip_method_of_fragments 
 
