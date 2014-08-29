@@ -130,7 +130,7 @@ contains
 
 
     call LOGS%write("### Summary of fragment sets in memory ###", &
-       iLogLevel=LOG_ALL, iLinesBefore=1, iLinesAfter=1 )
+       iLogLevel=LOG_ALL, iLinesBefore=1, iLinesAfter=1, lEcho=lFALSE )
     call LOGS%write("gage number | month      | start index  | num records ")
     call LOGS%write("----------- | ---------- | ------------ | ------------")
     do iIndex=1, ubound( FRAGMENTS_SETS, 1)

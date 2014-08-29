@@ -40,7 +40,7 @@ module netcdf4_support
 
   private
 
-  public :: NC_FLOAT
+  public :: NC_FLOAT, NC_FILL_FLOAT
 
   integer(kind=c_int), public :: NC_READONLY          = 0
   integer(kind=c_int), public :: NC_READWRITE         = 1
@@ -139,7 +139,7 @@ module netcdf4_support
 
   type T_NETCDF_ATTRIBUTE
     character (len=64) :: sAttributeName
-    character (len=64), dimension(:), allocatable :: sAttValue
+    character (len=256), dimension(:), allocatable :: sAttValue
     integer (kind=c_short), dimension(:), allocatable :: i2AttValue
     integer (kind=c_int), dimension(:), allocatable :: iAttValue
     real (kind=c_float), dimension(:), allocatable :: rAttValue
@@ -829,7 +829,7 @@ end subroutine netcdf_open_and_prepare_as_output_archive
 
 
 subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUnits, &
-   iNX, iNY, fX, fY, StartDate, EndDate, dpLat, dpLon )
+   iNX, iNY, fX, fY, StartDate, EndDate, dpLat, dpLon, fValidMin, fValidMax )
 
   type (T_NETCDF4_FILE ), pointer            :: NCFILE
   character (len=*), intent(in)              :: sVariableName
@@ -842,6 +842,9 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   type (DATETIME_T), intent(in)              :: EndDate
   real (kind=c_double), intent(in), optional :: dpLat(:,:)
   real (kind=c_double), intent(in), optional :: dpLon(:,:)
+  real (kind=c_float), intent(in), optional  :: fValidMin
+  real (kind=c_float), intent(in), optional  :: fValidMax
+
 
 !   ! [ LOCALS ]
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
@@ -892,11 +895,11 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   
   call nf_get_variable_id_and_type( NCFILE=NCFILE )
   
-  call nf_set_standard_attributes(NCFILE=NCFILE, sOriginText=sOriginText, lLatLon=lTRUE )
+  call nf_set_standard_attributes(NCFILE=NCFILE, sOriginText=sOriginText, lLatLon=lTRUE, &
+      fValidMin=fValidMin, fValidMax=fValidMax )
   
   call nf_set_global_attributes(NCFILE=NCFILE, &
-     sDataType=trim(NCFILE%sVarName(NC_Z)), &
-     sSourceFile="(SWB-generated)" )
+     sDataType=trim(NCFILE%sVarName(NC_Z)) )
   
   call nf_put_attributes(NCFILE=NCFILE)
 
@@ -2856,16 +2859,22 @@ end subroutine nf_set_standard_variables
 
 !----------------------------------------------------------------------
 
-subroutine nf_set_global_attributes(NCFILE, sDataType, sSourceFile)
+subroutine nf_set_global_attributes(NCFILE, sDataType, sSourceFile )
 
   type (T_NETCDF4_FILE ) :: NCFILE
-  character (len=*) :: sDataType
-  character (len=*) :: sSourceFile
+  character (len=*), intent(in) :: sDataType
+  character (len=*), intent(in), optional :: sSourceFile
 
   ! [ LOCALS ]
   integer (kind=c_int) :: iStat
+  type (DATETIME_T)    :: DT
+  character (len=20)   :: sDateTime
 
-  NCFILE%iNumberOfAttributes = 2
+  call DT%systime()
+  sDateTime = DT%prettydatetime()
+
+
+  NCFILE%iNumberOfAttributes = 3
 
   allocate( NCFILE%pNC_ATT(0:NCFILE%iNumberOfAttributes-1), stat=iStat)
   call assert(iStat == 0, "Could not allocate memory for NC_ATT member of NC_FILE", &
@@ -2873,11 +2882,24 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, sSourceFile)
 
   block
 
-    NCFILE%pNC_ATT(0)%sAttributeName = "source"
-    allocate(NCFILE%pNC_ATT(0)%sAttValue(0:0))
-    NCFILE%pNC_ATT(0)%sAttValue(0) = trim(sDataType)//" data from file "//trim(sSourceFile)
-    NCFILE%pNC_ATT(0)%iNC_AttType = NC_CHAR
-    NCFILE%pNC_ATT(0)%iNC_AttSize = 1_c_size_t
+    if (present(sSourceFile) ) then
+
+      NCFILE%pNC_ATT(0)%sAttributeName = "source"
+      allocate(NCFILE%pNC_ATT(0)%sAttValue(0:0))
+      NCFILE%pNC_ATT(0)%sAttValue(0) = trim(sDataType)//" data from file "//dquote(sSourceFile)
+      NCFILE%pNC_ATT(0)%iNC_AttType = NC_CHAR
+      NCFILE%pNC_ATT(0)%iNC_AttSize = 1_c_size_t
+
+    else
+
+      NCFILE%pNC_ATT(0)%sAttributeName = "source"
+      allocate(NCFILE%pNC_ATT(0)%sAttValue(0:0))
+      NCFILE%pNC_ATT(0)%sAttValue(0) = trim(sDataType)//" data from SWB2 run (version "//SWB_VERSION &
+        //", compiled on: "//COMPILATION_TIMESTAMP//")"
+      NCFILE%pNC_ATT(0)%iNC_AttType = NC_CHAR
+      NCFILE%pNC_ATT(0)%iNC_AttSize = 1_c_size_t
+
+    endif  
 
     NCFILE%pNC_ATT(1)%sAttributeName = "conventions"
     allocate(NCFILE%pNC_ATT(1)%sAttValue(0:0))
@@ -2885,17 +2907,25 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, sSourceFile)
     NCFILE%pNC_ATT(1)%iNC_AttType = NC_CHAR
     NCFILE%pNC_ATT(1)%iNC_AttSize = 1_c_size_t
 
+    NCFILE%pNC_ATT(2)%sAttributeName = "history"
+    allocate(NCFILE%pNC_ATT(2)%sAttValue(0:0))
+    NCFILE%pNC_ATT(2)%sAttValue(0) = trim(sDateTime)//": Soil-Water-Balance model run started."
+    NCFILE%pNC_ATT(2)%iNC_AttType = NC_CHAR
+    NCFILE%pNC_ATT(2)%iNC_AttSize = 1_c_size_t
+
   end block
 
 end subroutine nf_set_global_attributes
 
 !----------------------------------------------------------------------
 
-subroutine nf_set_standard_attributes(NCFILE, sOriginText, lLatLon )
+subroutine nf_set_standard_attributes(NCFILE, sOriginText, lLatLon, fValidMin, fValidMax )
 
   type (T_NETCDF4_FILE )             :: NCFILE
   character (len=*)                  :: sOriginText
   logical (kind=c_bool), optional    :: lLatLon
+  real (kind=c_float), optional      :: fValidMin
+  real (kind=c_float), optional      :: fValidMax
 
   ! [ LOCALS ]
   integer (kind=c_int)                             :: iStat
@@ -2941,15 +2971,15 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, lLatLon )
 
   end block
 
-  iNumAttributes = 2
-  allocate( NCFILE%pNC_VAR(NC_Z)%pNC_ATT(0:iNumAttributes-1), stat=iStat)
-  call assert(iStat == 0, "Could not allocate memory for NC_ATT member in NC_VAR struct of NC_FILE", &
-    trim(__FILE__), __LINE__)
-  NCFILE%pNC_VAR(NC_Z)%iNumberOfAttributes = iNumAttributes
+  if (present( fValidMin ) .and. present( fValidMax) ) then
 
-  pNC_ATT => NCFILE%pNC_VAR(NC_Z)%pNC_ATT
+    iNumAttributes = 3
+    allocate( NCFILE%pNC_VAR(NC_Z)%pNC_ATT(0:iNumAttributes-1), stat=iStat)
+    call assert(iStat == 0, "Could not allocate memory for NC_ATT member in NC_VAR struct of NC_FILE", &
+      trim(__FILE__), __LINE__)
+    NCFILE%pNC_VAR(NC_Z)%iNumberOfAttributes = iNumAttributes
 
-  block
+    pNC_ATT => NCFILE%pNC_VAR(NC_Z)%pNC_ATT
 
     pNC_ATT(0)%sAttributeName = "units"
     allocate(pNC_ATT(0)%sAttValue(0:0))
@@ -2957,13 +2987,35 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, lLatLon )
     pNC_ATT(0)%iNC_AttType = NC_CHAR
     pNC_ATT(0)%iNC_AttSize = 1_c_size_t
 
-    pNC_ATT(1)%sAttributeName = "missing_value"
+    pNC_ATT(1)%sAttributeName = "valid_min"
     allocate(pNC_ATT(1)%sAttValue(0:0))
-    pNC_ATT(1)%sAttValue(0) = "-9999.0"
+    pNC_ATT(1)%sAttValue(0) = asCharacter(fValidMin)
     pNC_ATT(1)%iNC_AttType = NC_CHAR
     pNC_ATT(1)%iNC_AttSize = 1_c_size_t
 
-  end block
+    pNC_ATT(2)%sAttributeName = "valid_max"
+    allocate(pNC_ATT(2)%sAttValue(0:0))
+    pNC_ATT(2)%sAttValue(0) = asCharacter(fValidMax)
+    pNC_ATT(2)%iNC_AttType = NC_CHAR
+    pNC_ATT(2)%iNC_AttSize = 1_c_size_t
+
+  else  
+
+    iNumAttributes = 1
+    allocate( NCFILE%pNC_VAR(NC_Z)%pNC_ATT(0:iNumAttributes-1), stat=iStat)
+    call assert(iStat == 0, "Could not allocate memory for NC_ATT member in NC_VAR struct of NC_FILE", &
+      trim(__FILE__), __LINE__)
+    NCFILE%pNC_VAR(NC_Z)%iNumberOfAttributes = iNumAttributes
+
+    pNC_ATT => NCFILE%pNC_VAR(NC_Z)%pNC_ATT
+
+    pNC_ATT(0)%sAttributeName = "units"
+    allocate(pNC_ATT(0)%sAttValue(0:0))
+    pNC_ATT(0)%sAttValue(0) = NCFILE%sVarUnits(NC_Z)
+    pNC_ATT(0)%iNC_AttType = NC_CHAR
+    pNC_ATT(0)%iNC_AttSize = 1_c_size_t
+
+  endif
 
   iNumAttributes = 3
   allocate( NCFILE%pNC_VAR(NC_Y)%pNC_ATT(0:iNumAttributes-1), stat=iStat)

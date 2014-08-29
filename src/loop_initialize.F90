@@ -174,7 +174,7 @@ contains
 
     myDirectives = CF_DICT%grep_keys( sKey )
 
-    call myDirectives%print
+    ! call myDirectives%print
 
     if ( myDirectives%count == 0 ) then
       
@@ -202,7 +202,7 @@ contains
         ! For this directive, obtain the associated dictionary entries
         call CF_DICT%get_values(sCmdText, myOptions )
 
-        call myOptions%print()
+        ! call myOptions%print()
 
         ! dictionary entries are initially space-delimited; sArgText_1 contains
         ! all dictionary entries present, concatenated, with a space between entries
@@ -386,7 +386,7 @@ contains
       !pGrd => grid_Create(iNX, iNY, rX0, rY0, rGridCellSize, GRID_DATATYPE_ALL) 
 
       call MODEL%initialize_grid(iNX, iNY, rX0, rY0, rGridCellSize)
-      print *, __FILE__, __LINE__
+
       rX1 = rX0 + rGridCellSize * real(iNX, kind=c_double)
       rY1 = rY0 + rGridCellSize * real(iNY, kind=c_double)
 
@@ -397,9 +397,9 @@ contains
       rGridCellSize = asDouble( myOptions%get(7) )
 
       fTempVal = ( rX1 - rX0 ) / real(iNX, kind=c_double)
-      print *, __FILE__, __LINE__      
+
       call MODEL%initialize_grid(iNX, iNY, rX0, rY0, rGridCellSize)
-      print *, __FILE__, __LINE__
+
     else
 
       call warn("Grid specification is flawed or missing.", lFatal=lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
