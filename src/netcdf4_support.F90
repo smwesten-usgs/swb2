@@ -3194,8 +3194,6 @@ subroutine nf_put_lat_and_lon(NCFILE, dpLat, dpLon)
   iNX = int( size(dpLat, 2), kind=c_size_t)
   iNY = int( size(dpLat, 1), kind=c_size_t)
 
-  print *, size(dpLat,1), size(dpLat,2), iNX, iNY
-
   call netcdf_put_variable_array(NCFILE=NCFILE, &
                    iVarID=NCFILE%pNC_VAR(NC_LAT)%iNC_VarID, &
                    iStart=[0_c_size_t, 0_c_size_t], &

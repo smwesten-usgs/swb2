@@ -439,7 +439,7 @@ contains
       sVariableUnits="inches per foot", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
 
-      this%dont_care = NC_FILL_FLOAT
+      this%dont_care = -99999.
 
   end subroutine initialize_netcdf_output_sub
 

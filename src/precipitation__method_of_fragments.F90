@@ -115,8 +115,16 @@ contains
 
       iCount = iCount + 1
 
-      if (FRAGMENTS(iIndex + 1)%iFragmentSet == 1) then 
+      if ( (FRAGMENTS(iIndex + 1)%iFragmentSet == 1) .and. ( FRAGMENTS(iIndex)%iFragmentSet == 1)) then 
+        ! this should be the case if there is only a single fragment associated with this gage and month
         FRAGMENTS_SETS( iRainGageZone )%iNumberOfFragments(iMonth) = iCount
+        FRAGMENTS_SETS( iRainGageZone )%iRainGageZone = iRainGageZone
+        FRAGMENTS_SETS( iRainGageZone )%iStartRecord(iMonth) = iIndex        
+        iCount = 0
+
+      elseif (FRAGMENTS(iIndex + 1)%iFragmentSet == 1) then 
+        FRAGMENTS_SETS( iRainGageZone )%iNumberOfFragments(iMonth) = iCount
+
         iCount = 0
       elseif ( FRAGMENTS(iIndex)%iFragmentSet == 1) then
         FRAGMENTS_SETS( iRainGageZone )%iRainGageZone = iRainGageZone
@@ -252,6 +260,8 @@ contains
     integer (kind=c_int) :: iEndRecord
     integer (kind=c_int) :: iTargetRecord
     integer (kind=c_int) :: iStat
+    integer (kind=c_int) :: iUBOUND_FRAGMENTS
+    integer (kind=c_int) :: iUBOUND_CURRENT_FRAGMENTS
 
     iMaxRainZones = maxval(FRAGMENTS%iRainGageZone)
     iMonth = SIM_DT%curr%iMonth
@@ -262,6 +272,9 @@ contains
 
     call random_number( fRandomNumbers )
 
+    iUBOUND_FRAGMENTS = ubound( FRAGMENTS, 1)
+    iUBOUND_CURRENT_FRAGMENTS = ubound( CURRENT_FRAGMENTS, 1)
+
     do iIndex = 1, iMaxRainZones
  
       if ( lShuffle ) then
@@ -271,8 +284,20 @@ contains
         iEndRecord = iStartRecord + iNumberOfFragments - 1
         iTargetRecord = iStartRecord + fRandomNumbers(iIndex) * real( iNumberOfFragments - 1)
 
-        call assert (iTargetRecord <= iEndRecord, "Miscalculation in target record: calculated record is past the end", &
-          __FILE__, __LINE__ )
+        if ( ( iIndex > iUBOUND_CURRENT_FRAGMENTS ) .or. ( iTargetRecord > iUBOUND_FRAGMENTS ) &
+            .or. ( iIndex < 1 ) .or. ( iTargetRecord < 1) ) then
+          call LOGS%write("Error detected in method of fragments routine; dump of current variables follows:", &
+              iLinesBefore=1)
+          call LOGS%write("iIndex:"//asCharacter(iIndex), iTab=3 )
+          call LOGS%write("iStartRecord: "//asCharacter(iStartRecord), iTab=3 )
+          call LOGS%write("iNumberOfFragments: "//asCharacter(iNumberOfFragments), iTab=3 )
+          call LOGS%write("iEndRecord: "//asCharacter(iEndRecord), iTab=3 )
+          call LOGS%write("iTargetRecord: "//asCharacter(iTargetRecord), iTab=3 )
+          call LOGS%write("fRandomNumbers(iIndex): "//asCharacter(fRandomNumbers(iIndex)), iTab=3 )
+          call die( "Miscalculation in target record: calculated record is past the end", &
+            __FILE__, __LINE__ )
+        endif
+          
         CURRENT_FRAGMENTS(iIndex)%pFragment => FRAGMENTS( iTargetRecord )
 
       endif
