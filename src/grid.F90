@@ -528,12 +528,15 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
   integer (kind=c_int) :: iCount,iCumlCount
   logical (kind=c_bool) :: lXLLCenter, lYLLCenter  ! Flags XLLCENTER / XLLCORNER
   logical (kind=c_bool) :: lFileExists
-
+  logical (kind=c_bool) :: lIsOpen
 
   ! Pre-scan for the number of header records and read the header
   inquire(file=trim(sFileName), EXIST=lFileExists)
   call assert( lFileExists, "The Arc ASCII grid file "//dquote(sFilename)// &
     " could not be found.",trim(__FILE__),__LINE__)
+
+  inquire(unit=LU_GRID, OPENED=lIsOpen )
+  if (lIsOpen )  close( unit=LU_GRID )
 
   open ( newunit=LU_GRID, iostat=iStat, file=trim(sFileName) )
   call assert( iStat == 0, &
@@ -670,12 +673,16 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
   integer (kind=c_int) :: iCount,iCumlCount
   logical (kind=c_bool) :: lXLLCenter, lYLLCenter  ! Flags XLLCENTER / XLLCORNER
   logical (kind=c_bool) :: lFileExists
+  logical (kind=c_bool) :: lIsOpen
 
   ! Pre-scan for the number of header records and read the header
 
-  inquire(file=trim(sFileName), EXIST=lFileExists)
+  inquire(file=trim(sFileName), EXIST=lFileExists, OPENED=lIsOpen )
   call assert( lFileExists, "The Arc ASCII grid file "//dquote(sFilename)// &
     " could not be found.",trim(__FILE__),__LINE__)
+
+  inquire(unit=LU_GRID, OPENED=lIsOpen )
+  if (lIsOpen )  close( unit=LU_GRID )
 
   open ( newunit=LU_GRID, iostat=iStat, file=trim(sFileName) )
   call assert( iStat == 0, &
@@ -822,10 +829,14 @@ function grid_ReadSurferGrid_fn ( sFileName, iDataType ) result ( pGrd )
   real (kind=c_double) :: rY0,rY1                       ! Limits in Y
   real (kind=c_float) :: rZ0,rZ1                       ! Limits in Z (not used)
   logical (kind=c_bool) :: lFileExists
+  logical (kind=c_bool) :: lIsOpen
 
   inquire(file=trim(sFileName), EXIST=lFileExists)
   call assert( lFileExists, "The Surfer ASCII grid file "//dquote(sFilename)// &
     " could not be found.",trim(__FILE__),__LINE__)
+
+  inquire(unit=LU_GRID, OPENED=lIsOpen )
+  if (lIsOpen )  close( unit=LU_GRID )
 
   open ( newunit=LU_GRID, iostat=iStat, file=trim(sFileName) )
   call assert( iStat == 0, &
@@ -894,10 +905,14 @@ subroutine grid_ReadSurferGrid_sub ( sFileName, pGrd )
   real (kind=c_double) :: rY0,rY1                       ! Limits in Y
   real (kind=c_float) :: rZ0,rZ1                       ! Limits in Z (not used)
   logical (kind=c_bool) :: lFileExists
+  logical (kind=c_bool) :: lIsOpen
 
   inquire(file=trim(sFileName), EXIST=lFileExists)
   call assert( lFileExists, "The Surfer ASCII grid file "//dquote(sFilename)// &
     " could not be found.",trim(__FILE__),__LINE__)
+
+  inquire(unit=LU_GRID, OPENED=lIsOpen )
+  if (lIsOpen )  close( unit=LU_GRID )
 
   open ( newunit=LU_GRID, iostat=iStat, file=trim(sFileName) )
   call assert( iStat == 0, &

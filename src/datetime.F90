@@ -115,7 +115,7 @@ module datetime
   end type MONTH_T
 
   !> Month information
-  type ( MONTH_T ),dimension(12),target :: MONTHS =    &
+  type ( MONTH_T ), public, target :: MONTHS(12) =     &
    [  MONTH_T( 'Jan','January  ',   1,  31, 1, 31),    &
       MONTH_T( 'Feb','February ',  32,  59, 2, 29),    &
       MONTH_T( 'Mar','March    ',  60,  90, 3, 31),    &

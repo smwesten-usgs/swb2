@@ -14,6 +14,10 @@ module precipitation__method_of_fragments
 
   private
 
+  public :: precipitation_method_of_fragments_initialize
+  public :: read_daily_fragments
+  public :: precipitation_method_of_fragments_calculate
+
   integer (kind=c_int), allocatable, public :: RAIN_GAGE_ID(:)
   real (kind=c_float), allocatable, public  :: FRAGMENT_VALUE(:)
 
@@ -35,14 +39,11 @@ module precipitation__method_of_fragments
   end type FRAGMENTS_SET_T
 
   
-  type (FRAGMENTS_T), allocatable, target, public            :: FRAGMENTS(:)
+  type (FRAGMENTS_T), allocatable, target, public       :: FRAGMENTS(:)
 
-  type (PTR_FRAGMENTS_T), allocatable                :: CURRENT_FRAGMENTS(:)
+  type (PTR_FRAGMENTS_T), allocatable                   :: CURRENT_FRAGMENTS(:)
   
-  type (FRAGMENTS_SET_T), allocatable, public        :: FRAGMENTS_SETS(:)
-
-  public :: initialize_precipitation_method_of_fragments, read_daily_fragments
-  public :: calculate_precipitation_method_of_fragments
+  type (FRAGMENTS_SET_T), allocatable, public           :: FRAGMENTS_SETS(:)
 
 contains
 
@@ -53,7 +54,7 @@ contains
   !  randomly choose a fragment
   !  calculate daily precip by multiplying daily fragment value by month-year value 
 
-  subroutine initialize_precipitation_method_of_fragments( lActive )
+  subroutine precipitation_method_of_fragments_initialize( lActive )
 
     logical (kind=c_bool), intent(in)     :: lActive(:,:)
 
@@ -152,7 +153,7 @@ contains
       enddo  
     end do
 
-  end subroutine initialize_precipitation_method_of_fragments
+  end subroutine precipitation_method_of_fragments_initialize
 
 !--------------------------------------------------------------------------------------------------
 
@@ -305,6 +306,19 @@ contains
 !      write(*,fmt="(i5,a,i4,i5,i5,31f8.3)") iIndex,") ", FRAGMENTS( iTargetRecord)%iRainGageZone, FRAGMENTS( iTargetRecord)%iMonth, &
 !         FRAGMENTS( iTargetRecord)%iFragmentSet, FRAGMENTS( iTargetRecord)%fFragmentValue
 
+      if ( ( CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay ) < 0.0 ) &
+         .or. ( CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay ) > 1.0 ) ) then
+
+        call LOGS%write("Error detected in method of fragments routine; dump of current variables follows:", &
+              iLinesBefore=1)
+        call LOGS%write("iIndex:"//asCharacter(iIndex), iTab=3 )
+        call LOGS%write("iDay: "//asCharacter(iDay), iTab=3 )
+        call LOGS%write("iRainGageZone: "//asCharacter(FRAGMENTS( iTargetRecord)%iRainGageZone), iTab=3 )      
+        call LOGS%write("iFragmentSet: "//asCharacter(FRAGMENTS( iTargetRecord)%iFragmentSet), iTab=3 )
+        call LOGS%write("fFragmentValue: "//asCharacter(FRAGMENTS( iTargetRecord)%fFragmentValue(iDay) ), iTab=3 )
+
+      endif
+
       where ( RAIN_GAGE_ID == iIndex )
 
         FRAGMENT_VALUE = CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay )
@@ -320,7 +334,7 @@ contains
 
 
 
-  subroutine calculate_precipitation_method_of_fragments()
+  subroutine precipitation_method_of_fragments_calculate()
 
     integer (kind=c_int)              :: iIndex
     integer (kind=c_int)              :: iMaxRainZones
@@ -343,7 +357,7 @@ contains
       call update_fragments( lShuffle = lFALSE )
     endif  
 
-  end subroutine calculate_precipitation_method_of_fragments
+  end subroutine precipitation_method_of_fragments_calculate
 
 !--------------------------------------------------------------------------------------------------
 

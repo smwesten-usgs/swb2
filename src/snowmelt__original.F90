@@ -5,7 +5,7 @@ module snowmelt__original
 
   private
 
-  public :: calculate_snowmelt_original
+  public :: snowmelt_original_calculate
 
   real (kind=c_float), parameter    :: FREEZING      = 32.0_c_float
   real (kind=c_float), parameter    :: MELT_INDEX    = 1.5_c_float
@@ -14,7 +14,7 @@ module snowmelt__original
 
 contains
 
-  elemental subroutine calculate_snowmelt_original( fSnowmelt, fSnow_storage, fTMin, fTMax )
+  elemental subroutine snowmelt_original_calculate( fSnowmelt, fSnow_storage, fTMin, fTMax )
 
     real (kind=c_float), intent(inout)    :: fSnowmelt
     real (kind=c_float), intent(inout)    :: fSnow_storage
@@ -43,6 +43,6 @@ contains
 
     end if
 
-  end subroutine calculate_snowmelt_original  
+  end subroutine snowmelt_original_calculate
 
 end module snowmelt__original 

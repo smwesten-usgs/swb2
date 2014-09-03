@@ -8,7 +8,8 @@ module interception__bucket
 
   private
 
-  public calculate_interception_bucket, initialize_interception_bucket
+  public interception_bucket_initialize
+  public interception_bucket_calculate
 
   logical (kind=c_bool) :: GROWING_SEASON = .true._c_bool
 
@@ -18,7 +19,7 @@ module interception__bucket
 
 contains   
 
-  subroutine initialize_interception_bucket()
+  subroutine interception_bucket_initialize()
 
     ! [ LOCALS ]
     integer (kind=c_int)        :: iNumberOfLanduses
@@ -38,7 +39,7 @@ contains
       call warn( sMessage="The number of landuses does not match the number of interception values.",   &
         sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
 
-  end subroutine initialize_interception_bucket
+  end subroutine interception_bucket_initialize
 
 
   function initialize_interception_bucket_python_sub( n, fInterception_GrowingSeason, &
@@ -56,7 +57,7 @@ contains
   end function initialize_interception_bucket_python_sub
 
 
-  elemental function calculate_interception_bucket( iLanduseIndex, fPrecip )   result( fInterception )
+  elemental function interception_bucket_calculate( iLanduseIndex, fPrecip )   result( fInterception )
 
     integer (kind=c_int), intent(in) :: iLanduseIndex
     real (kind=c_float), intent(in)  :: fPrecip
@@ -80,6 +81,6 @@ contains
     fInterception = min( fPotentialInterception, fPrecip )
 
  
-  end function calculate_interception_bucket
+  end function interception_bucket_calculate
 
 end module interception__bucket

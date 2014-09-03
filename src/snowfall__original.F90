@@ -5,13 +5,13 @@ module snowfall__original
 
   private
 
-  public :: calculate_snowfall_original
+  public :: snowfall_original_calculate
 
   real (kind=c_float), parameter :: FREEZING = 32.0_c_float
 
 contains
 
-  elemental subroutine calculate_snowfall_original( fSnowfall, fRainfall, fTMin, fTMax, fPrecip)
+  elemental subroutine snowfall_original_calculate( fSnowfall, fRainfall, fTMin, fTMax, fPrecip)
 
     real (kind=c_float), intent(inout)  :: fSnowfall
     real (kind=c_float), intent(inout)  :: fRainfall
@@ -31,6 +31,6 @@ contains
 
     endif
 
-  end subroutine calculate_snowfall_original
+  end subroutine snowfall_original_calculate
 
 end module snowfall__original

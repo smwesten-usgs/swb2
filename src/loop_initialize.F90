@@ -34,13 +34,14 @@ module loop_initialize
     character (len=23)     :: sName
   end type METHODS_LIST_T
 
-  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(12) = &
+  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(13) = &
 
     [ GRIDDED_DATASETS_T("PRECIPITATION          ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("TMIN                   ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("TMAX                   ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("AVAILABLE_WATER_CONTENT", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("POTENTIAL_ET           ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("MONTHLY_POTENTIAL_ET   ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("SOLAR_RADIATION        ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("WIND_SPEED             ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("RAINFALL_ZONE          ", lTRUE, DATATYPE_INT ),        &
@@ -241,13 +242,14 @@ contains
               
               call pENTRY%initialize_netcdf(    &
                 sDescription=trim(sCmdText),    &
-                sFilename = trim(sArgText_2),     &
+                sFilename = trim(sArgText_2),   &
                 iDataType=iDataType )
  
             else
 
               call warn( "Did not find a valid "//dquote(sKey)//" option. Value supplied was: "//dquote(sArgText_1), &
-                lFatal = lTRUE )
+                lFatal = lTRUE, sHints="Valid options include "//dquote("ARC_ASCII")//", "//dquote("ARC_GRID") &
+                //", "//dquote("SURFER")//", or "//dquote("NETCDF") )
 
             endif  
 

@@ -14,8 +14,8 @@ module soil_moisture__thornthwaite_mather
 
   private
 
-  public :: initialize_soil_moisture__thornthwaite_mather
-  public :: calculate_soil_moisture__thornthwaite_mather
+  public :: soil_moisture_thornthwaite_mather_initialize
+  public :: soil_moisture_thornthwaite_mather_calculate
 
   ! parameters that allow the Thornthwaite-Mather tables (1957) to be
   ! represented by a single equation
@@ -30,7 +30,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine initialize_soil_moisture__thornthwaite_mather( iNumActiveCells )
+  subroutine soil_moisture_thornthwaite_mather_initialize( iNumActiveCells )
 
     integer (kind=c_int), intent(in)     :: iNumActiveCells
 
@@ -42,7 +42,7 @@ contains
 
     APWL = 0.0_c_float 
 
-  end subroutine initialize_soil_moisture__thornthwaite_mather
+  end subroutine soil_moisture_thornthwaite_mather_initialize
 
 !--------------------------------------------------------------------------------------------------
 
@@ -96,7 +96,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  elemental subroutine calculate_soil_moisture__thornthwaite_mather(fAPWL, fSoilStorage, fSoilStorage_Excess,                &
+  elemental subroutine soil_moisture_thornthwaite_mather_calculate(fAPWL, fSoilStorage, fSoilStorage_Excess,                &
                                             fSoilStorage_Max, fInfiltration, fReference_ET)
 
     real (kind=c_float), intent(inout)   :: fAPWL
@@ -138,6 +138,6 @@ contains
 
     endif
 
-  end subroutine calculate_soil_moisture__thornthwaite_mather
+  end subroutine soil_moisture_thornthwaite_mather_calculate
 
 end module soil_moisture__thornthwaite_mather

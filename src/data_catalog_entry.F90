@@ -832,16 +832,16 @@ end subroutine set_constant_value_real
     character (len=256) :: sUppercaseFilename
     character (len=256) :: sCWD
     character (len=256) :: sBuf2
-    integer (kind=c_int) :: iPos_Y, iPos_D, iPos_M, iPos_0D, iPos_0M, iPos, iPos2, iLen, iCount
+    integer (kind=c_int) :: iPos_Y, iPos_D, iPos_M, iPos_0D, iPos_0M, iPos_B, iPos_BF, iPos, iPos2, iLen, iCount
     integer (kind=c_int) :: iNumZeros, iNumZerosToPrint
     logical (kind=c_bool) :: lMatch
     logical (kind=c_bool) :: lExist
-    character (len=2) :: sBuf
+    character (len=16) :: sBuf
     character (len=12) :: sNumber
     character (len=1) :: sDelimiter
     integer (kind=c_int) :: iStatus
 
-    iPos_Y = 0; iPos_M = 0; iPos_D = 0; iPos = 0; sNumber = ""
+    iPos_Y = 0; iPos_M = 0; iPos_D = 0; iPos = 0; iPos_B = 0; iPos_BF = 0; sNumber = ""
 
     ! EXAMPLES of the kinds of templates that we need to be able to understand:
     ! tars1980\prcp.nc   template => "tars%Y\prcp.nc"
@@ -902,8 +902,10 @@ end subroutine set_constant_value_real
       ! evaluate template string for "%m": month number
       if (present(iMonth) ) then
 
-        iPos_M = max(index(sNewFilename, "%M"), index(sNewFilename, "%m") )
-        iPos_0M = max(index(sNewFilename, "%0M"), index(sNewFilename, "%0m") )
+        iPos_M = index(sNewFilename, "%m")
+        iPos_0M = index(sNewFilename, "%0m")
+        iPos_B = index(sNewFilename, "%b")
+        iPos_BF = index(sNewFilename, "%B")
 
         if ( iPos_0M > 0 ) then
 
@@ -923,6 +925,24 @@ end subroutine set_constant_value_real
           sNewFilename = sNewFilename(1:iPos_M - 1)//trim(sBuf) &
                          //sNewFilename(iPos_M + 2:iLen)
 
+        elseif ( iPos_B > 0 ) then
+
+          lMatch = lTRUE
+          sBuf = MONTHS( iMonth )%sName
+
+          iLen=len_trim(sNewFilename)
+          sNewFilename = sNewFilename(1:iPos_B - 1)//trim(sBuf) &
+                         //sNewFilename(iPos_B + 2:iLen)
+
+        elseif ( iPos_BF > 0 ) then
+
+          lMatch = lTRUE
+          sBuf = MONTHS( iMonth )%sFullName
+
+          iLen=len_trim(sNewFilename)
+          sNewFilename = sNewFilename(1:iPos_BF - 1)//trim(sBuf) &
+                         //sNewFilename(iPos_BF + 2:iLen)                         
+
         endif
 
       endif
@@ -937,7 +957,7 @@ end subroutine set_constant_value_real
           lMatch = lTRUE
           write (unit=sBuf, fmt="(i2.2)") iDay
           iLen=len_trim(sNewFilename)
-          sNewFilename = sNewFilename(1:iPos_0D - 1)//sBuf &
+          sNewFilename = sNewFilename(1:iPos_0D - 1)//trim(sBuf) &
                          //sNewFilename(iPos_0D + 3:iLen)
 
         elseif ( iPos_D > 0 ) then

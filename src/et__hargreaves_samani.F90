@@ -40,7 +40,7 @@ module et__hargreaves_samani
 
 contains
 
-subroutine et_hargreaves_configure( ) !pConfig, sRecord )
+subroutine et_hargreaves_initialize( ) !pConfig, sRecord )
   !! Configures the module, using the command line in 'sRecord'
   ! [ ARGUMENTS ]
 !  type (T_MODEL_CONFIGURATION), pointer :: pConfig ! pointer to data structure that contains
@@ -75,11 +75,11 @@ subroutine et_hargreaves_configure( ) !pConfig, sRecord )
 
 !   endif
 
-end subroutine et_hargreaves_configure
+end subroutine et_hargreaves_initialize
 
 !------------------------------------------------------------------------------
 
-elemental function et_hargreaves_ComputeET( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax )  result(fReferenceET0)
+elemental function et_hargreaves_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax )  result(fReferenceET0)
   !! Computes the potential ET for each cell, based on TMIN and TMAX.
   !! Stores cell-by-cell PET values in the model grid.
 
@@ -108,7 +108,7 @@ elemental function et_hargreaves_ComputeET( iDayOfYear, iNumDaysInYear, fLatitud
 
   fReferenceET0 = ET0_hargreaves( equivalent_evaporation(fRa), fTMin, fTMax)
     
-end function et_hargreaves_ComputeET
+end function et_hargreaves_calculate
 
 
 elemental function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)

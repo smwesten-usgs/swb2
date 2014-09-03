@@ -1238,6 +1238,15 @@ contains
         call LOGS%WRITE( "==> JENSEN_HAISE EVAPOTRANSPIRATION submodel selected.", &
             iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
+      elseif ( ( sMethodName .strequal. "MONTHLY_GRID" ) &
+           .or. ( sMethodName .strequal. "MONTHLY_GRIDDED" ) ) then
+
+        this%init_reference_et => model_initialize_et_monthly_grid
+        this%calc_reference_et => model_calculate_et_monthly_grid
+
+        call LOGS%WRITE( "==> MONTHLY_GRID EVAPOTRANSPIRATION submodel selected.", &
+            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
       else
 
         call warn("Your control file specifies an unknown or unsupported EVAPOTRANSPIRATION method.", &
@@ -1306,7 +1315,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call initialize_interception_bucket( )
+    call interception_bucket_initialize( )
 
   end subroutine model_initialize_interception_bucket
 
@@ -1318,7 +1327,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    this%interception = calculate_interception_bucket( this%landuse_index, this%gross_precip )
+    this%interception = interception_bucket_calculate( this%landuse_index, this%gross_precip )
 
   end subroutine model_calculate_interception_bucket
 
@@ -1352,7 +1361,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call calculate_snowfall_original( this%snowfall, this%rainfall, this%tmin, this%tmax, this%gross_precip )
+    call snowfall_original_calculate( this%snowfall, this%rainfall, this%tmin, this%tmax, this%gross_precip )
 
   end subroutine model_calculate_snowfall_original
 
@@ -1396,7 +1405,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call calculate_snowmelt_original( fSnowmelt=this%snowmelt, fSnow_storage=this%snow_storage, &
+    call snowmelt_original_calculate( fSnowmelt=this%snowmelt, fSnow_storage=this%snow_storage, &
                                       fTMin=this%tmin, fTMax=this%tmax )
 
   end subroutine model_calculate_snowmelt_original
@@ -1442,10 +1451,37 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    this%reference_ET0 = et_hargreaves_ComputeET( iDayOfYear=SIM_DT%iDOY, iNumDaysInYear=SIM_DT%iDaysInYear,    &
+    this%reference_ET0 = et_hargreaves_calculate( iDayOfYear=SIM_DT%iDOY, iNumDaysInYear=SIM_DT%iDaysInYear,    &
          fLatitude=this%latitude, fTMin=this%Tmin, fTMax=this%Tmax )
 
   end subroutine model_calculate_et_hargreaves
+
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_et_monthly_grid(this)
+
+    use et__monthly_grid
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call et_monthly_grid_initialize( this%active )
+
+  end subroutine model_initialize_et_monthly_grid
+
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_et_monthly_grid(this)
+
+    use et__monthly_grid
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call et_monthly_grid_calculate( )
+
+    this%reference_ET0 = pack( pMONTHLY_ET_GRID%pGrdBase%rData, this%active ) &
+                                      / real( SIM_DT%iDaysInMonth, kind=c_float)
+
+  end subroutine model_calculate_et_monthly_grid
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1465,7 +1501,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-     this%reference_ET0 = et_jh_ComputeET( iDayOfYear=SIM_DT%iDOY, iNumDaysInYear=SIM_DT%iDaysInYear, &
+     this%reference_ET0 = et_jh_calculate( iDayOfYear=SIM_DT%iDOY, iNumDaysInYear=SIM_DT%iDaysInYear, &
        fLatitude=this%latitude, fTMin=this%Tmin, fTMax=this%Tmax )
 
   end subroutine model_calculate_et_jensen_haise 
@@ -1478,7 +1514,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call initialize_infiltration__curve_number()
+    call infiltration_curve_number_initialize()
 
   end subroutine model_initialize_infiltration_curve_number
 
@@ -1490,7 +1526,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    this%infiltration = calculate_infiltration__curve_number( &
+    this%infiltration = infiltration_curve_number_calculate( &
       iLanduseIndex=this%landuse_index, &
       iSoilsIndex=this%soil_group, &
       fSoilStorage=this%soil_storage, &
@@ -1507,7 +1543,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call initialize_soil_moisture__thornthwaite_mather( count( this%active ) )
+    call soil_moisture_thornthwaite_mather_initialize( count( this%active ) )
 
   end subroutine model_initialize_soil_moisture_thornthwaite_mather
 
@@ -1519,7 +1555,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call calculate_soil_moisture__thornthwaite_mather(fAPWL=APWL,                                   &
+    call soil_moisture_thornthwaite_mather_calculate(fAPWL=APWL,                                   &
                                                       fSoilStorage=this%soil_storage,               &
                                                       fSoilStorage_Excess=this%potential_recharge,  &
                                                       fSoilStorage_Max=this%soil_storage_max,       &
@@ -1564,7 +1600,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call initialize_precipitation_method_of_fragments( this%active )
+    call precipitation_method_of_fragments_initialize( this%active )
 
   end subroutine model_initialize_precip_method_of_fragments
 
@@ -1584,7 +1620,7 @@ contains
     if (.not. associated(pPRCP%pGrdBase) ) &
       call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
    
-    call calculate_precipitation_method_of_fragments()
+    call precipitation_method_of_fragments_calculate()
 
     this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * FRAGMENT_VALUE
 

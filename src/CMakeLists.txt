@@ -13,6 +13,7 @@ if(TARGET__SWB_EXECUTABLE)
             #et_FAO56_crop_coefficients.F90
             et__hargreaves_samani.F90
             et__jensen_haise.F90
+            et__monthly_grid.F90
             exceptions.F90
             file_operations.F90
             grid.F90
@@ -29,6 +30,7 @@ if(TARGET__SWB_EXECUTABLE)
             netcdf_c_api_interfaces.F90
             parameters.F90
             precipitation__method_of_fragments.F90
+            routing__D8.F90
             soil_moisture__thornthwaite_mather.F90
             simulation_datetime.F90
             snowfall__original.F90
@@ -225,6 +227,7 @@ if(TARGET__SWB_LIBRARY)
             #et_FAO56_crop_coefficients.F90
             et__hargreaves_samani.F90
             et__jensen_haise.F90
+            et__monthly_grid.F90            
             exceptions.F90
             file_operations.F90
             grid.F90
@@ -240,6 +243,7 @@ if(TARGET__SWB_LIBRARY)
             netcdf_c_api_interfaces.F90
             parameters.F90
             precipitation__method_of_fragments.F90
+            routing__D8.F90
             soil_moisture__thornthwaite_mather.F90
             simulation_datetime.F90
             snowfall__original.F90
