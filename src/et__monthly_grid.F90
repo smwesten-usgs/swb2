@@ -37,9 +37,9 @@ contains
 
 
     ! locate the data structure associated with the gridded rainfall zone entries
-    pMONTHLY_ET_GRID => DAT%find("MONTHLY_POTENTIAL_ET")
+    pMONTHLY_ET_GRID => DAT%find("POTENTIAL_ET")
     if ( .not. associated(pMONTHLY_ET_GRID) ) &
-        call die("A MONTHLY_POTENTIAL_ET grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
+        call die("A POTENTIAL_ET grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
 
   end subroutine et_monthly_grid_initialize
 

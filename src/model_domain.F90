@@ -26,6 +26,9 @@ module model_domain
     real (kind=c_double), allocatable  :: X(:), Y(:)
     real (kind=c_double)               :: gridcellsize
 
+    !> @todo: why do we need a BNDS data structure that duplicates the project boundary
+    !!        information present in the MODEL_DOMAIN_T data structure??
+
     logical (kind=c_bool), allocatable     :: active(:,:)
     real (kind=c_float), allocatable       :: dont_care(:,:)
     real (kind=c_float), allocatable       :: array_output(:,:)
@@ -51,6 +54,7 @@ module model_domain
     real (kind=c_float), allocatable       :: snowmelt(:)
     real (kind=c_float), allocatable       :: interception(:)
     real (kind=c_float), allocatable       :: rainfall(:)
+    real (kind=c_float), allocatable       :: fog(:)
     real (kind=c_float), allocatable       :: GDD_28(:)
      
     real (kind=c_float), allocatable       :: interception_storage(:)
@@ -65,21 +69,23 @@ module model_domain
     real (kind=c_float), allocatable       :: tmax(:)
     real (kind=c_float), allocatable       :: routing_fraction(:)
 
-    procedure ( interception_method ), pointer         :: init_interception       => model_initialize_interception_bucket
-    procedure ( infiltration_method ), pointer         :: init_infiltration       => model_initialize_infiltration_curve_number
-    procedure ( et_method ), pointer                   :: init_reference_et       => model_initialize_et_hargreaves
-    procedure ( sm_method ), pointer                   :: init_soil_moisture      => model_initialize_soil_moisture_thornthwaite_mather
-    procedure ( snowfall_method ), pointer             :: init_snowfall           => model_initialize_snowfall_original
-    procedure ( snowfall_method ), pointer             :: init_snowmelt           => model_initialize_snowmelt_original
-    procedure ( precipitation_data_method_init ), pointer   :: init_precipitation_data => model_initialize_precip_normal
+    procedure ( simple_method ), pointer         :: init_interception       => model_initialize_interception_bucket
+    procedure ( simple_method ), pointer         :: init_infiltration       => model_initialize_infiltration_curve_number
+    procedure ( simple_method ), pointer         :: init_reference_et       => model_initialize_et_hargreaves
+    procedure ( simple_method ), pointer         :: init_soil_moisture      => model_initialize_soil_moisture_thornthwaite_mather
+    procedure ( simple_method ), pointer         :: init_snowfall           => model_initialize_snowfall_original
+    procedure ( simple_method ), pointer         :: init_snowmelt           => model_initialize_snowmelt_original
+    procedure ( simple_method ), pointer         :: init_precipitation_data => model_initialize_precip_normal
+    procedure ( simple_method ), pointer         :: init_fog                => model_initialize_fog_normal
 
-    procedure ( interception_method ), pointer         :: calc_interception      => model_calculate_interception_bucket
-    procedure ( infiltration_method ), pointer         :: calc_infiltration      => model_calculate_infiltration_curve_number
-    procedure ( et_method ), pointer                   :: calc_reference_et      => model_calculate_et_hargreaves
-    procedure ( sm_method ), pointer                   :: calc_soil_moisture     => model_calculate_soil_moisture_thornthwaite_mather
-    procedure ( snowfall_method ), pointer             :: calc_snowfall          => model_calculate_snowfall_original
-    procedure ( snowmelt_method ), pointer             :: calc_snowmelt          => model_calculate_snowmelt_original    
-    procedure ( precipitation_data_method ), pointer   :: get_precipitation_data => model_get_precip_normal
+    procedure ( simple_method ), pointer         :: calc_interception      => model_calculate_interception_bucket
+    procedure ( simple_method ), pointer         :: calc_infiltration      => model_calculate_infiltration_curve_number
+    procedure ( simple_method ), pointer         :: calc_reference_et      => model_calculate_et_hargreaves
+    procedure ( simple_method ), pointer         :: calc_soil_moisture     => model_calculate_soil_moisture_thornthwaite_mather
+    procedure ( simple_method ), pointer         :: calc_snowfall          => model_calculate_snowfall_original
+    procedure ( simple_method ), pointer         :: calc_snowmelt          => model_calculate_snowmelt_original    
+    procedure ( simple_method ), pointer         :: get_precipitation_data => model_get_precip_normal
+    procedure ( simple_method ), pointer         :: calc_fog               => model_calculate_fog_normal
 
   contains
 
@@ -145,107 +151,13 @@ module model_domain
   end type MODEL_DOMAIN_T
 
 
-
   abstract interface
-    subroutine init_interception_method( this ) 
+    subroutine simple_method( this )
       import :: MODEL_DOMAIN_T
       class ( MODEL_DOMAIN_T ), intent(inout)  :: this
-    end subroutine init_interception_method
-  end interface
+    end subroutine simple_method
+  end interface  
 
-  abstract interface
-    subroutine init_infiltration_method( this )
-      import :: MODEL_DOMAIN_T
-      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
-    end subroutine init_infiltration_method
-  end interface
-
-  abstract interface
-    subroutine init_et_method( this )
-      import :: MODEL_DOMAIN_T
-      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
-    end subroutine init_et_method
-  end interface    
-
-  abstract interface
-    subroutine init_sm_method( this )
-      import :: MODEL_DOMAIN_T
-      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
-    end subroutine init_sm_method
-  end interface    
-
-  abstract interface
-    subroutine init_snowfall_method( this )
-      import :: MODEL_DOMAIN_T
-      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
-    end subroutine init_snowfall_method
-  end interface    
-
-  abstract interface
-    subroutine init_snowmelt_method( this )
-      import :: MODEL_DOMAIN_T
-      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
-    end subroutine init_snowmelt_method
-  end interface    
-
-
-
-  abstract interface
-    subroutine interception_method( this ) 
-      import :: MODEL_DOMAIN_T
-      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
-    end subroutine interception_method
-  end interface
-
-  abstract interface
-    subroutine infiltration_method( this )
-      import :: MODEL_DOMAIN_T
-      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
-    end subroutine infiltration_method
-  end interface
-
-  abstract interface
-    subroutine et_method( this )
-      import :: MODEL_DOMAIN_T
-      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
-    end subroutine et_method
-  end interface    
-
-  abstract interface
-    subroutine sm_method( this )
-      import :: MODEL_DOMAIN_T
-      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
-    end subroutine sm_method
-  end interface    
-
-  abstract interface
-    subroutine snowfall_method( this )
-      import :: MODEL_DOMAIN_T
-      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
-    end subroutine snowfall_method
-  end interface    
-
-  abstract interface
-    subroutine snowmelt_method( this )
-      import :: MODEL_DOMAIN_T
-      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
-    end subroutine snowmelt_method
-  end interface    
-
-  abstract interface
-    subroutine precipitation_data_method_init( this )
-      import :: MODEL_DOMAIN_T, DATA_CATALOG_ENTRY_T
-      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
-    end subroutine precipitation_data_method_init
-  end interface    
-
-  abstract interface
-    subroutine precipitation_data_method( this, pPRCP )
-      import :: MODEL_DOMAIN_T, DATA_CATALOG_ENTRY_T
-      class ( MODEL_DOMAIN_T ), intent(inout)  :: this
-      type (DATA_CATALOG_ENTRY_T), pointer     :: pPRCP
-    end subroutine precipitation_data_method
-  end interface    
 
   interface minmaxmean
     procedure :: minmaxmean_float
@@ -345,7 +257,7 @@ contains
     allocate( this%potential_recharge(iCount), stat=iStat(25) )
     allocate( this%stream_storage(iCount), stat=iStat(26) )
 
-    allocate( OUTPUT(14), stat=iStat(26) )
+    allocate( OUTPUT(15), stat=iStat(26) )
 
     if ( any( iStat /= 0 ) )  call die("Problem allocating memory", __FILE__, __LINE__)
 
@@ -439,6 +351,10 @@ contains
       sVariableUnits="inches per foot", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
 
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(15)%ncfile, sVariableName="interception_storage", &
+      sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
+
       this%dont_care = -99999.
 
   end subroutine initialize_netcdf_output_sub
@@ -486,9 +402,9 @@ contains
 
     this%active = .true._c_bool
 
-    where (       pHSG%pGrdBase%iData < 1  &
-            .or.  pLULC%pGrdBase%iData < 0 &
-            .or.  pAWC%pGrdBase%rData < 0.0 )
+    where (       ( pHSG%pGrdBase%iData  < 1 )      &
+            .or.  ( pLULC%pGrdBase%iData < 0 )      &
+            .or.  ( pAWC%pGrdBase%rData < 0.0 ) )
 
       this%active = .false._c_bool
 
@@ -512,6 +428,7 @@ contains
     integer (kind=c_int)                 :: iIndex2
     integer (kind=c_int)                 :: iCount
     integer (kind=c_int)                 :: iStat
+    logical (kind=c_bool)                :: lMatch
     
     !> Determine how many landuse codes are present
     call PARAMS%get_values( sKey="LU_Code", iValues=iLanduseCodes )
@@ -520,7 +437,7 @@ contains
 
     if ( associated(pLULC) ) then
 
-      call pLULC%getvalues()
+      ! call pLULC%getvalues()
 
       if (associated( pLULC%pGrdBase) ) then
         this%landuse_code = pack( pLULC%pGrdBase%iData, this%active )
@@ -539,22 +456,36 @@ contains
     this%landuse_index = -9999
     iCount = 0
     
+
     do iIndex = 1, ubound(this%landuse_code,1)
+
+      lMatch = lFALSE
 
       do iIndex2=1, ubound(iLandUseCodes, 1)
 
         if (this%landuse_code(iIndex) == iLandUseCodes(iIndex2) ) then
           this%landuse_index(iIndex) = iIndex2
           iCount = iCount + 1
+          lMatch = lTRUE
+          exit
         endif
 
       enddo
+
+      if ( .not. lMatch ) &
+        call LOGS%write("Failed to match landuse code "//asCharacter(this%landuse_code(iIndex) ) &
+          //" with a corresponding landuse code from lookup tables.", iLogLevel=LOG_ALL )
 
     enddo    
 
     call LOGS%write("Matches were found between landuse grid value and table value for " &
       //asCharacter(iCount)//" cells out of a total of "//asCharacter(iIndex)//" active cells.", &
-      iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_DEBUG)
+      iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_ALL)
+
+    if ( count(this%landuse_index < 0) > 0 ) &
+      call warn(asCharacter(count(this%landuse_index < 0))//" negative values are present" &
+      //" in the landuse_index vector.", lFatal=lTRUE, sHints="Negative landuse INDEX values are the " &
+      //"result of landuse values for which no match can be found between the grid file and lookup table.")
 
   end subroutine initialize_landuse_codes_sub
 
@@ -767,13 +698,8 @@ contains
     integer (kind=c_int) ::iMonth
     integer (kind=c_int) ::iDay
     integer (kind=c_int) ::iYear
-    type (DATA_CATALOG_ENTRY_T), pointer :: pPRCP
     type (DATA_CATALOG_ENTRY_T), pointer :: pTMAX
     type (DATA_CATALOG_ENTRY_T), pointer :: pTMIN
-
-    pPRCP => DAT%find("PRECIPITATION")
-    if ( .not. associated(pPRCP) ) &
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
 
     pTMAX => DAT%find("TMAX")
     if ( .not. associated(pTMAX) ) &
@@ -791,16 +717,14 @@ contains
       iDay = asInt( dt%iDay )
       iYear = dt%iYear
   
-      ! next three statements retrieve the data from the raw or native form
-      call pPRCP%getvalues( iMonth, iDay, iYear, iJulianDay )
-  
+      ! next two statements retrieve the data from the raw or native form  
       call pTMIN%getvalues( iMonth, iDay, iYear, iJulianDay )
 
       call pTMAX%getvalues( iMonth, iDay, iYear, iJulianDay )
 
       ! the following statements process the raw data in order to get it into the 
       ! right units or properly pack the data
-      call this%get_precipitation_data(pPRCP)
+      call this%get_precipitation_data()
 !      this%gross_precip = pack( PRCP%pGrdBase%rData, this%active )
 
       this%tmax = pack( pTMAX%pGrdBase%rData, this%active )
@@ -821,6 +745,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int) :: iIndex
 
+    ! first put out the current time variable for all open NetCDF files
     do iIndex = 1, ubound( OUTPUT, 1 )
 
       call netcdf_put_variable_vector(NCFILE=OUTPUT(iIndex)%ncfile, &
@@ -832,6 +757,7 @@ contains
 
     enddo
 
+    ! next, unpack each vector and output as an array
     this%array_output = unpack(this%gross_precip, this%active, this%dont_care)
 
     call netcdf_put_variable_array(NCFILE=OUTPUT(1)%ncfile, &
@@ -957,6 +883,16 @@ contains
                    iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
+
+
+    this%array_output = unpack(this%interception_storage, this%active, this%dont_care)
+
+    call netcdf_put_variable_array(NCFILE=OUTPUT(15)%ncfile, &
+                   iVarID=OUTPUT(15)%ncfile%iVarID(NC_Z), &
+                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
+                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
+                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
+                   rValues=this%array_output)
 
   end subroutine write_variables_to_netcdf
 
@@ -1119,12 +1055,19 @@ contains
 
 !     this%awc = pack(pAWC%pGrdBase%rData, this%active)
 
-    do iIndex = 1, ubound(this%soil_storage_max, 1)
-      do iSoilsIndex = 1, iNumberOfSoilGroups
-        do iLUIndex = 1, iNumberOfLanduses
+ 
+    do iSoilsIndex = 1, iNumberOfSoilGroups
+      do iLUIndex = 1, iNumberOfLanduses
+
+        print *, "LU: ", iLUIndex, "  Soils: ", iSoilsIndex, "  | # matches = ", &
+            count( this%landuse_index == iLUIndex .and. this%soil_group == iSoilsIndex )
+
+        do iIndex = 1, ubound(this%soil_storage_max, 1)
+    
           if ( this%landuse_index(iIndex) == iLUIndex .and. this%soil_group(iIndex) == iSoilsIndex ) then
-            this%soil_storage_max = ROOTING_DEPTH( iLUIndex, iSoilsIndex ) * this%awc(iIndex)
+            this%soil_storage_max(iIndex) = ROOTING_DEPTH( iLUIndex, iSoilsIndex ) * this%awc(iIndex)
           endif
+
         enddo
       enddo
     enddo
@@ -1283,7 +1226,7 @@ contains
 
     elseif ( sCmdText .contains. "SOIL_MOISTURE" ) then
 
-      if ( ( sMethodName .strequal. "T-M" ) .or. ( sMethodName .strequal. "THORNTHWAITE_MATHER" ) ) then
+      if ( ( sMethodName .strequal. "T-M" ) .or. ( sMethodName .strequal. "THORNTHWAITE-MATHER" ) ) then
 
         this%init_soil_moisture => model_initialize_soil_moisture_thornthwaite_mather
         this%calc_soil_moisture => model_calculate_soil_moisture_thornthwaite_mather
@@ -1566,6 +1509,26 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  subroutine model_initialize_fog_normal(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    !> Nothing here to see. Initialization not really needed for the "normal" method.
+
+  end subroutine model_initialize_fog_normal
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_fog_monthly_grid(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    !> Nothing here to see. Initialization not really needed for the "normal" method.
+
+  end subroutine model_initialize_fog_monthly_grid
+
+!--------------------------------------------------------------------------------------------------
+
   subroutine model_initialize_precip_normal(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
@@ -1576,14 +1539,48 @@ contains
 
 !--------------------------------------------------------------------------------------------------
  
-  subroutine model_get_precip_normal(this, pPRCP)
+  subroutine model_calculate_fog_normal(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    type (DATA_CATALOG_ENTRY_T), pointer   :: pPRCP 
 
+  end subroutine model_calculate_fog_normal  
 
-    if (.not. associated(pPRCP) ) &
-      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_fog_monthly_grid(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_calculate_fog_monthly_grid  
+
+!--------------------------------------------------------------------------------------------------
+ 
+  subroutine model_get_precip_normal(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    ! [ LOCALS ]
+    type (DATA_CATALOG_ENTRY_T), pointer :: pPRCP
+    integer (kind=c_int) :: iJulianDay
+    integer (kind=c_int) ::iMonth
+    integer (kind=c_int) ::iDay
+    integer (kind=c_int) ::iYear
+
+    pPRCP => DAT%find("PRECIPITATION")
+    if ( .not. associated(pPRCP) ) &
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+
+    associate ( dt => SIM_DT%curr )
+
+      iJulianDay = dt%getJulianDay()
+      iMonth = asInt( dt%iMonth )
+      iDay = asInt( dt%iDay )
+      iYear = dt%iYear
+  
+      ! next three statements retrieve the data from the raw or native form
+      call pPRCP%getvalues( iMonth, iDay, iYear, iJulianDay )
+
+    end associate
 
     if (.not. associated(pPRCP%pGrdBase) ) &
       call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
@@ -1606,20 +1603,38 @@ contains
 
 !--------------------------------------------------------------------------------------------------
  
-  subroutine model_get_precip_method_of_fragments(this, pPRCP)
+  subroutine model_get_precip_method_of_fragments(this)
 
     use precipitation__method_of_fragments
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    type (DATA_CATALOG_ENTRY_T), pointer   :: pPRCP 
+    integer (kind=c_int) :: iJulianDay
+    integer (kind=c_int) ::iMonth
+    integer (kind=c_int) ::iDay
+    integer (kind=c_int) ::iYear
 
+    ! [ LOCALS ]
+    type (DATA_CATALOG_ENTRY_T), pointer :: pPRCP
 
-    if (.not. associated(pPRCP) ) &
-      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
+    pPRCP => DAT%find("PRECIPITATION")
+    if ( .not. associated(pPRCP) ) &
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+
+    associate ( dt => SIM_DT%curr )
+
+      iJulianDay = dt%getJulianDay()
+      iMonth = asInt( dt%iMonth )
+      iDay = asInt( dt%iDay )
+      iYear = dt%iYear
+  
+      ! next three statements retrieve the data from the raw or native form
+      call pPRCP%getvalues( iMonth, iDay, iYear, iJulianDay )
+
+    end associate
 
     if (.not. associated(pPRCP%pGrdBase) ) &
       call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
-   
+
     call precipitation_method_of_fragments_calculate()
 
     this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * FRAGMENT_VALUE

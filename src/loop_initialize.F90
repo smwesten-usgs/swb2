@@ -34,14 +34,13 @@ module loop_initialize
     character (len=23)     :: sName
   end type METHODS_LIST_T
 
-  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(13) = &
+  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(12) = &
 
     [ GRIDDED_DATASETS_T("PRECIPITATION          ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("TMIN                   ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("TMAX                   ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("AVAILABLE_WATER_CONTENT", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("POTENTIAL_ET           ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("MONTHLY_POTENTIAL_ET   ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("SOLAR_RADIATION        ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("WIND_SPEED             ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("RAINFALL_ZONE          ", lTRUE, DATATYPE_INT ),        &
@@ -67,6 +66,8 @@ contains
     character (len=256)   :: sRecord, sSubstring
     integer (kind=c_int)  :: iStat
 
+    ! open the control file and define the comment characters and delimiters to be used in 
+    ! parsing the ASCII text
     call CF%open( sFilename = sFilename, &
                   sCommentChars = "#%!", &
                   sDelimiters = "WHITESPACE", &
@@ -74,12 +75,12 @@ contains
 
     do 
 
-      ! read in next line of file
+      ! read in next line of the control file
       sRecord = CF%readLine()
 
       if ( CF%isEOF() )  exit
 
-      ! create and allocate memory for dictionary entry
+      ! create and allocate memory for a single dictionary entry
       CF_ENTRY => null()
       allocate( CF_ENTRY, stat=iStat )
       call assert(iStat == 0, "Failed to allocate memory for dictionary object", &
@@ -90,13 +91,15 @@ contains
 
       if ( len_trim(sSubstring) > 0 ) then
 
+        ! first add the key value to the directory entry data structure
         call CF_ENTRY%add_key( sSubstring )
 
         ! break off first directive for the current record
         call chomp(sRecord, sSubstring, CF%sDelimiters )
 
         do while ( len_trim(sSubString) > 0 )
-
+          
+          ! add the next directive snippet to dictionary entry data structure
           call CF_ENTRY%add_string( sSubstring )
 
           ! break off next directive for the current record
@@ -104,12 +107,14 @@ contains
 
         enddo  
 
+        ! add the dictionary entry to the dictionary data structure
         call CF_DICT%add_entry(CF_ENTRY)
 
       endif  
       
     enddo
 
+    ! close the control file
     call CF%close()
 
   end subroutine read_control_file
@@ -120,12 +125,21 @@ contains
 
     integer (kind=c_int) :: iIndex
 
+    ! define SWB project boundary and geographic projection
     call initialize_grid_options()
 
+    ! define the start and end date for the simulation
     call initialize_start_and_end_dates()
-    
+
+    ! read in and munge all tables that have been defined in the control file as ***_LOOKUP_TABLE
     call initialize_parameter_tables()
     
+    ! scan input file entries for keywords associated with known gridded datasets
+    ! (e.g. PRECIPITATION, TMIN, TMAX, FOG_ZONE, etc.)
+    
+    ! if the grid is mentioned in the control file, call the bound "initialize" method that 
+    ! will wire in the type of data file. all associated methods will also be acted upon if 
+    ! present in the control file (e.g. TMAX_ADD_OFFSET, TMAX_NETCDF_X_VAR, etc.)
     do iIndex = 1, ubound(KNOWN_GRIDS, 1)
 
       call initialize_generic_grid( sKey=KNOWN_GRIDS(iIndex)%sName, &
@@ -134,20 +148,28 @@ contains
    
     enddo
 
+    ! scan the control file input for method specifications
+    ! (e.g. EVAPOTRANSPIRATION_METHOD HARGREAVES-SAMANI )
     do iIndex = 1, ubound(KNOWN_METHODS, 1)
 
       call initialize_generic_method( sKey=KNOWN_METHODS(iIndex)%sName )
    
     enddo
     
+    ! bring in soils (HSG, AWC), landuse, and flow direction data from native grids
+    ! and pack that data into vectors for active grid cells only
     call initialize_soils_landuse_awc_flowdir_values()
 
+    ! temporary diagnostic: dump statistics on each of the state variables
     call MODEL%summarize()
 
+    ! check to see that there are no NULL method pointers
     call MODEL%preflight_check_method_pointers()
 
+    ! call each of the initialization routines associated with the chosen methods
     call MODEL%initialize_methods()
 
+    ! open and prepare NetCDF files for output
     call MODEL%initialize_netcdf_output()
 
   end subroutine initialize_options
@@ -170,30 +192,40 @@ contains
     character (len=:), allocatable       :: sArgText_2
     integer (kind=c_int)                 :: iStat
     type (DATA_CATALOG_ENTRY_T), pointer :: pENTRY
+    logical (kind=c_bool)             :: lGridPresent
 
     pENTRY => null()
+    lGridPresent = lFALSE
 
+    ! obtain a string list of directives that contain the keyword
+    ! (e.g. if the key is "TMIN", this might return:
+    ! "TMIN ARC_ASCII input/mygrid.asc"
+    ! "TMIN_PROJECTION_DEFINITION =Proj=latlon +datum=WGS84"
+    ! "TMIN_MINIMUM_ALLOWED_VALUE -60.0" )
+    ! the loop below then handles the specific directives in turn
     myDirectives = CF_DICT%grep_keys( sKey )
 
     ! call myDirectives%print
 
     if ( myDirectives%count == 0 ) then
-      
+    
+      call LOGS%write("Your control file seems to be missing any directives relating to "//dquote(sKey)//".", &
+        iLogLevel=LOG_ALL, lEcho=lTRUE )
+    
       if (.not. lOptional) then
-
-        call LOGS%write("Your control file seems to be missing any of the required directives relating to "//dquote(sKey), &
-            iLogLevel=LOG_ALL, lEcho=lTRUE )
-        call warn("Your control file is missing required directives. See the logfile and fix this before running again.", &
+        call warn("Your control file is missing required directive "//dquote(sKey)//". See the logfile and fix this before running again.", &
           lFatal = lTRUE )
 
       endif
 
     else  
     
+      ! allocate memory for a generic data_catalog_entry
       allocate(pENTRY, stat=iStat)
       call assert( iStat == 0, "Failed to allocate memory for the "//dquote(sKey)//" data structure", &
         __FILE__, __LINE__ )
 
+      ! process all known directives associated with key word
       do iIndex = 1, myDirectives%count
 
         ! myDirectives is a string list of all SWB directives that contain sKey
@@ -203,30 +235,34 @@ contains
         ! For this directive, obtain the associated dictionary entries
         call CF_DICT%get_values(sCmdText, myOptions )
 
-        ! call myOptions%print()
+!       print *, " >>> ", trim(sCmdText)
+!       call myOptions%print()
 
         ! dictionary entries are initially space-delimited; sArgText_1 contains
         ! all dictionary entries present, concatenated, with a space between entries
         sArgText = myOptions%get(1, myOptions%count )
 
         ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(">> "//sCmdText//" "//sArgText, iLogLevel=LOG_GENERAL)
+        call LOGS%write(">> "//sCmdText//" "//sArgText, iLogLevel=LOG_GENERAL, iTab=4)
 
         ! most of the time, we only care about the first dictionary entry, obtained below
         sArgText_1 = myOptions%get(1)
         sArgText_2 = myOptions%get(2)
 
-!        call CF_DICT%get_values(sCmdText, myOptions )
-
+        ! first option is that the key value and directive are the same 
+        ! (.e.g. "PRECIPITATION"; no trailing underscores or modifiers )
+        ! this is a grid definition directive
         if ( sCmdText .strequal. sKey ) then
 
           pENTRY%sVariableName_z = asLowercase( sKey )
 
+          ! determine the type of grid and act appropriately
           if (sArgText_1 .strequal. "CONSTANT" ) then
 
               call pENTRY%initialize(            &
                 sDescription=trim(sCmdText),     &
-                rConstant=asFloat(sArgText_2)  )            
+                rConstant=asFloat(sArgText_2)  ) 
+              lGridPresent = lTRUE           
 
             elseif ( (sArgText_1 .strequal. "ARC_ASCII")              &
                 .or. (sArgText_1 .strequal. "SURFER")                 &
@@ -237,6 +273,7 @@ contains
                 sFileType=trim(sArgText_1),     &
                 sFilename=trim(sArgText_2),     &
                 iDataType=iDataType )
+              lGridPresent = lTRUE
 
             elseif ( sArgText_1 .strequal. "NETCDF" ) then
               
@@ -244,6 +281,7 @@ contains
                 sDescription=trim(sCmdText),    &
                 sFilename = trim(sArgText_2),   &
                 iDataType=iDataType )
+              lGridPresent = lTRUE
  
             else
 
@@ -337,14 +375,16 @@ contains
 
         else
 
-          call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
-            //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
+          call warn("Unknown directive detected in code at line "//asCharacter(__LINE__)//", file "//__FILE__ &
+            //". ~Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
  
         endif
 
       enddo
 
-      call DAT%add( key=sKey, data=pENTRY )
+      ! if an unadorned grid specification directive was processed, then we can add the key and
+      ! the data_catalog_entry to the data_catalog
+      if ( lGridPresent )call DAT%add( key=sKey, data=pENTRY )
 
       pENTRY => null()
 
@@ -385,8 +425,6 @@ contains
 
       rGridCellSize = asDouble( myOptions%get(5) )
 
-      !pGrd => grid_Create(iNX, iNY, rX0, rY0, rGridCellSize, GRID_DATATYPE_ALL) 
-
       call MODEL%initialize_grid(iNX, iNY, rX0, rY0, rGridCellSize)
 
       rX1 = rX0 + rGridCellSize * real(iNX, kind=c_double)
@@ -420,6 +458,8 @@ contains
     ! echo the original directive and dictionary entries to the logfile
     call LOGS%write(">> "//"BASE_PROJECTION_DEFINITION "//sArgText)
 
+    ! BNDS is a module-level data structure that will be used in other modules to 
+    ! supply bounding box information for the SWB project area
     BNDS%iNumCols = iNX
     BNDS%iNumRows = iNY
     BNDS%fX_ll = rX0

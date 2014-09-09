@@ -319,6 +319,10 @@ contains
 
       endif
 
+    !  call LOGS%write("frag: "//asCharacter(iIndex)//"  day: "//asCharacter(iDay) &
+    !     //"  value: "//asCharacter( CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay ) ), &
+    !     lEcho=lTRUE )
+
       where ( RAIN_GAGE_ID == iIndex )
 
         FRAGMENT_VALUE = CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay )

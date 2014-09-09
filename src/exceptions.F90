@@ -93,23 +93,23 @@ contains
     if ( present( iLogLevel ) )   call LOGS%set_loglevel( iLogLevel )
     if ( present( lEcho ) )       call LOGS%set_echo( lEcho )
 
-    call LOGS%write("** WARNING **", iLinesBefore=1, iTab=2)
-
     if (present(lFatal)) then
       if (lFatal) then
         NUMBER_OF_FATAL_WARNINGS = NUMBER_OF_FATAL_WARNINGS + 1
-        call LOGS%write("fatal error:  "//trim(sMessage), iTab=16 )
+        call LOGS%write(" ** WARNING fatal error: **", iTab=6, iLinesBefore=1)
+        call LOGS%write( trim(sMessage), iTab=16 )
       endif
     else
-      call LOGS%write("possible error:  "//trim(sMessage), iTab=12 )
+      call LOGS%write(" ** WARNING possible error: **", iTab=10, iLinesBefore=1)
+      call LOGS%write( trim(sMessage), iTab=16 )
     endif  
 
     if (present(sModule))  &
-      call LOGS%write("module:  "//trim(sModule), iTab=20 )
+      call LOGS%write("module:  "//trim(sModule), iTab=18 )
 
     if (present(iLine)) then
       write(sBuf, fmt="(i0)") iLine
-      call LOGS%write("line no:  "//trim(sBuf), iTab=19 )
+      call LOGS%write("line no:  "//trim(sBuf), iTab=18 )
     endif  
 
     if (present(sHints)) &

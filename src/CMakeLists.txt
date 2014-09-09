@@ -15,6 +15,7 @@ if(TARGET__SWB_EXECUTABLE)
             et__jensen_haise.F90
             et__monthly_grid.F90
             exceptions.F90
+            fog__monthly_grid.F90
             file_operations.F90
             grid.F90
             infiltration__curve_number.F90            
@@ -229,6 +230,7 @@ if(TARGET__SWB_LIBRARY)
             et__jensen_haise.F90
             et__monthly_grid.F90            
             exceptions.F90
+            fog__monthly_grid.F90
             file_operations.F90
             grid.F90
             infiltration__curve_number.F90

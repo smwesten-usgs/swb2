@@ -1,7 +1,7 @@
 module soil_moisture_storage
 
   use iso_c_binding
-  implicit iNumberOfLanduses
+  implicit none
 
   private
 
@@ -62,6 +62,9 @@ contains
 
     do iSoilsIndex = 1, iNumberOfSoilGroups
       do iLUIndex = 1, iNumberOfLanduses
+
+        print *, "LU: ", iLUIndex, "  Soils: ", iSoilsIndex, "  | # matches = ", &
+          count( iLanduseIndex == iLUIndex .and. iSoilsGroup == iSoilsIndex )
 
         where ( iLanduseIndex == iLUIndex .and. iSoilsGroup == iSoilsIndex )
 
