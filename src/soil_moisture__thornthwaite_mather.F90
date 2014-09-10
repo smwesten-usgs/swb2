@@ -117,6 +117,7 @@ contains
 
       fAPWL = fAPWL - fP_minus_PE
       fSoilStorage = calc_soil_storage_given_current_APWL( fSWC=fSoilStorage_Max, fAPWL=fAPWL )
+      fSoilStorage_Excess = 0.0_c_float
     
     else ! P > PE: soil is gaining moisture; add P - PE directly to soil moisture, then
          ! beck-calculate a new APWL that corresponds to the new soil moisture
