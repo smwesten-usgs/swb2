@@ -50,11 +50,8 @@ module model_domain
     real (kind=c_float), allocatable       :: runoff(:)
     real (kind=c_float), allocatable       :: outflow(:)
     real (kind=c_float), allocatable       :: infiltration(:)
-    real (kind=c_float), allocatable       :: snowfall(:)
     real (kind=c_float), allocatable       :: snowmelt(:)
     real (kind=c_float), allocatable       :: interception(:)
-    real (kind=c_float), allocatable       :: rainfall(:)
-    real (kind=c_float), allocatable       :: fog(:)
     real (kind=c_float), allocatable       :: GDD_28(:)
      
     real (kind=c_float), allocatable       :: interception_storage(:)
@@ -65,6 +62,9 @@ module model_domain
     real (kind=c_float), allocatable       :: stream_storage(:)
          
     real (kind=c_float), allocatable       :: gross_precip(:)
+    real (kind=c_float), allocatable       :: rainfall(:)
+    real (kind=c_float), allocatable       :: snowfall(:)
+
     real (kind=c_float), allocatable       :: tmin(:)
     real (kind=c_float), allocatable       :: tmax(:)
     real (kind=c_float), allocatable       :: routing_fraction(:)
@@ -76,7 +76,7 @@ module model_domain
     procedure ( simple_method ), pointer         :: init_snowfall           => model_initialize_snowfall_original
     procedure ( simple_method ), pointer         :: init_snowmelt           => model_initialize_snowmelt_original
     procedure ( simple_method ), pointer         :: init_precipitation_data => model_initialize_precip_normal
-    procedure ( simple_method ), pointer         :: init_fog                => model_initialize_fog_normal
+    procedure ( simple_method ), pointer         :: init_fog                => model_initialize_fog_none
 
     procedure ( simple_method ), pointer         :: calc_interception      => model_calculate_interception_bucket
     procedure ( simple_method ), pointer         :: calc_infiltration      => model_calculate_infiltration_curve_number
@@ -85,7 +85,7 @@ module model_domain
     procedure ( simple_method ), pointer         :: calc_snowfall          => model_calculate_snowfall_original
     procedure ( simple_method ), pointer         :: calc_snowmelt          => model_calculate_snowmelt_original    
     procedure ( simple_method ), pointer         :: get_precipitation_data => model_get_precip_normal
-    procedure ( simple_method ), pointer         :: calc_fog               => model_calculate_fog_normal
+    procedure ( simple_method ), pointer         :: calc_fog               => model_calculate_fog_none
 
   contains
 
@@ -272,6 +272,7 @@ contains
     call this%init_interception
     call this%init_snowfall
     call this%init_snowmelt
+    call this%init_fog
     call this%init_infiltration
     call this%init_soil_moisture
     call this%init_reference_et
@@ -959,6 +960,8 @@ contains
     ! [ LOCALS ]
     real (kind=c_float)  :: fReferenceET_minus_interception
 
+    call this%calc_fog()
+
     call this%calc_interception()
 
     call this%calc_reference_et()
@@ -1160,6 +1163,25 @@ contains
             lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
       endif
+
+    elseif ( sCmdText .contains. "FOG" ) then
+
+      if ( sMethodName .strequal. "MONTHLY_GRID" ) then
+
+        this%init_fog => model_initialize_fog_monthly_grid
+        this%calc_fog => model_calculate_fog_monthly_grid
+
+        call LOGS%WRITE( "==> MONTHLY_GRID FOG submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
+      else
+
+        this%init_fog => model_initialize_fog_none
+        this%calc_fog => model_calculate_fog_none
+
+        call LOGS%WRITE( "==> NULL FOG submodel selected (i.e. no fog term).", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
+      endif
+
 
     elseif ( sCmdText .contains. "EVAPOTRANSPIRATION" ) then
 
@@ -1509,21 +1531,24 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_initialize_fog_normal(this)
+  subroutine model_initialize_fog_none(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     !> Nothing here to see. Initialization not really needed for the "normal" method.
 
-  end subroutine model_initialize_fog_normal
+  end subroutine model_initialize_fog_none
 
 !--------------------------------------------------------------------------------------------------
 
   subroutine model_initialize_fog_monthly_grid(this)
 
+    use fog__monthly_grid 
+
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    !> Nothing here to see. Initialization not really needed for the "normal" method.
+    call fog_monthly_grid_initialize( lActive=this%active, dX=this%X, dY=this%Y, &
+      dX_lon=pCOORD_GRD%rX , dY_lat=pCOORD_GRD%rY )
 
   end subroutine model_initialize_fog_monthly_grid
 
@@ -1539,17 +1564,22 @@ contains
 
 !--------------------------------------------------------------------------------------------------
  
-  subroutine model_calculate_fog_normal(this)
+  subroutine model_calculate_fog_none(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-  end subroutine model_calculate_fog_normal  
+  end subroutine model_calculate_fog_none  
 
 !--------------------------------------------------------------------------------------------------
 
   subroutine model_calculate_fog_monthly_grid(this)
 
+    use fog__monthly_grid
+
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call fog_monthly_grid_calculate( fRainfall=this%rainfall, lActive=this%active, &
+             fDont_Care=this%dont_care )
 
   end subroutine model_calculate_fog_monthly_grid  
 

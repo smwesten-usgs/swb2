@@ -243,6 +243,7 @@ module netcdf4_support
   public :: netcdf_get_variable_slice
   public :: netcdf_update_time_starting_index
   public :: netcdf_put_variable_array
+  public :: netcdf_put_packed_variable_array
   public :: netcdf_put_variable_vector
 
 contains
@@ -2973,7 +2974,7 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, lLatLon, fValidMin, f
 
   if (present( fValidMin ) .and. present( fValidMax) ) then
 
-    iNumAttributes = 3
+    iNumAttributes = 4
     allocate( NCFILE%pNC_VAR(NC_Z)%pNC_ATT(0:iNumAttributes-1), stat=iStat)
     call assert(iStat == 0, "Could not allocate memory for NC_ATT member in NC_VAR struct of NC_FILE", &
       trim(__FILE__), __LINE__)
@@ -2988,16 +2989,23 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, lLatLon, fValidMin, f
     pNC_ATT(0)%iNC_AttSize = 1_c_size_t
 
     pNC_ATT(1)%sAttributeName = "valid_min"
-    allocate(pNC_ATT(1)%sAttValue(0:0))
-    pNC_ATT(1)%sAttValue(0) = asCharacter(fValidMin)
-    pNC_ATT(1)%iNC_AttType = NC_CHAR
+    allocate(pNC_ATT(1)%rAttValue(0:0))
+    pNC_ATT(1)%rAttValue(0) = fValidMin
+    pNC_ATT(1)%iNC_AttType = NC_FLOAT
     pNC_ATT(1)%iNC_AttSize = 1_c_size_t
 
     pNC_ATT(2)%sAttributeName = "valid_max"
-    allocate(pNC_ATT(2)%sAttValue(0:0))
-    pNC_ATT(2)%sAttValue(0) = asCharacter(fValidMax)
-    pNC_ATT(2)%iNC_AttType = NC_CHAR
+    allocate(pNC_ATT(2)%rAttValue(0:0))
+    pNC_ATT(2)%rAttValue(0) = fValidMax
+    pNC_ATT(2)%iNC_AttType = NC_FLOAT
     pNC_ATT(2)%iNC_AttSize = 1_c_size_t
+
+    pNC_ATT(3)%sAttributeName = "valid_range"
+    allocate(pNC_ATT(3)%rAttValue(0:1))
+    pNC_ATT(3)%rAttValue(0) = fValidMin
+    pNC_ATT(3)%rAttValue(1) = fValidMax
+    pNC_ATT(3)%iNC_AttType = NC_FLOAT
+    pNC_ATT(3)%iNC_AttSize = 2_c_size_t
 
   else  
 
@@ -3363,7 +3371,7 @@ subroutine nf_put_attributes(NCFILE)
 
           case (NC_DOUBLE)
 
-            if (.not. allocated(pNC_ATT%sAttValue) ) &
+            if (.not. allocated(pNC_ATT%dpAttValue) ) &
               call die("INTERNAL PROGRAMMING ERROR - attempt to use unallocated variable; " &
               //"attribute name: "//dquote(pNC_ATT%sAttributeName), &
               trim(__FILE__), __LINE__)
@@ -3375,7 +3383,7 @@ subroutine nf_put_attributes(NCFILE)
 
           case (NC_INT)
 
-            if (.not. allocated(pNC_ATT%sAttValue) ) &
+            if (.not. allocated(pNC_ATT%iAttValue) ) &
               call die("INTERNAL PROGRAMMING ERROR - attempt to use unallocated variable; " &
               //"attribute name: "//dquote(pNC_ATT%sAttributeName), &
               trim(__FILE__), __LINE__)
@@ -3387,7 +3395,7 @@ subroutine nf_put_attributes(NCFILE)
 
           case (NC_FLOAT)
 
-            if (.not. allocated(pNC_ATT%sAttValue) ) &
+            if (.not. allocated(pNC_ATT%rAttValue) ) &
               call die("INTERNAL PROGRAMMING ERROR - attempt to use unallocated variable; " &
               //"attribute name: "//dquote(pNC_ATT%sAttributeName), &
               trim(__FILE__), __LINE__)
@@ -3536,6 +3544,68 @@ subroutine netcdf_put_variable_array(NCFILE, iVarID, iStart, iCount, iStride, &
   endif
 
 end subroutine netcdf_put_variable_array
+
+subroutine netcdf_put_packed_variable_array(NCFILE, iVarID, iStart, iCount, iStride, &
+   lMask, iValues, iField, i2Values, i2Field, rValues, rField, dpValues, dpField)
+
+  type (T_NETCDF4_FILE ) :: NCFILE
+  integer (kind=c_int) :: iVarID
+  integer (kind=c_size_t), dimension(:)            :: iStart
+  integer (kind=c_size_t), dimension(:)            :: iCount
+  integer (kind=c_ptrdiff_t), dimension(:)         :: iStride
+  logical (kind=c_bool), dimension(:,:)            :: lMask
+  integer (kind=c_int), dimension(:), optional     :: iValues
+  integer (kind=c_int), dimension(:,:), optional   :: iField
+  integer (kind=c_short), dimension(:), optional   :: i2Values
+  integer (kind=c_short), dimension(:,:), optional :: i2Field
+  real (kind=c_float), dimension(:), optional      :: rValues
+  real (kind=c_float), dimension(:,:), optional    :: rField
+  real (kind=c_double), dimension(:), optional     :: dpValues
+  real (kind=c_double), dimension(:,:), optional   :: dpField
+
+  if (present(iValues) ) then
+
+    call nf_trap(nc_put_vars_int(ncid=NCFILE%iNCID, &
+                       varid=iVarID, &
+                       startp=iStart, &
+                       countp=iCount, &
+                       stridep=iStride, &
+                       vars=unpack(iValues, lMask, iField)), &
+                       __FILE__, __LINE__)
+
+  elseif (present(i2Values) ) then
+
+    call nf_trap(nc_put_vars_short(ncid=NCFILE%iNCID, &
+                       varid=iVarID, &
+                       startp=iStart, &
+                       countp=iCount, &
+                       stridep=iStride, &
+                       vars=unpack(i2Values, lMask, i2Field)), &
+                       __FILE__, __LINE__)
+
+  elseif (present(rValues) ) then
+
+   call nf_trap(nc_put_vars_float(ncid=NCFILE%iNCID, &
+                       varid=iVarID, &
+                       startp=iStart, &
+                       countp=iCount, &
+                       stridep=iStride, &
+                       vars=unpack(rValues, lMask, rField)), &
+                       __FILE__, __LINE__)
+
+  elseif (present(dpValues) ) then
+
+    call nf_trap(nc_put_vars_double(ncid=NCFILE%iNCID, &
+                       varid=iVarID, &
+                       startp=iStart, &
+                       countp=iCount, &
+                       stridep=iStride, &
+                       vars=unpack(dpValues, lMask, dpField)), &
+                       __FILE__, __LINE__)
+
+  endif
+
+end subroutine netcdf_put_packed_variable_array
 
 
 subroutine netcdf_put_variable_vector(NCFILE, iVarID, iStart, iCount, iStride, &
