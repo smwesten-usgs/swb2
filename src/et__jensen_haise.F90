@@ -31,11 +31,11 @@ module et__jensen_haise
 
   private
 
-  public :: et_jh_ComputeET
+  public :: et_jh_calculate
 
 contains
 
-elemental function et_jh_ComputeET( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax, fAlbedo, fAs, fBs, fSunPct )  result(fReferenceET0)
+elemental function et_jh_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax, fAlbedo, fAs, fBs, fSunPct )  result(fReferenceET0)
 
   integer (kind=c_int), intent(in)          :: iDayOfYear
   integer (kind=c_int), intent(in)          :: iNumDaysInYear
@@ -122,6 +122,6 @@ elemental function et_jh_ComputeET( iDayOfYear, iNumDaysInYear, fLatitude, fTMin
 !
 ! where Rs is the solar radiation in inches per day 
 
-end function et_jh_ComputeET
+end function et_jh_calculate
 
 end module et__jensen_haise

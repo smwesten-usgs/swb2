@@ -2,9 +2,8 @@ module loop_initialize
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
   use constants_and_conversions, only : lTRUE, lFALSE, asFloat, BNDS
-!  use cell_class
-!  use cell_collection
   use datetime
+  use data_catalog
   use data_catalog_entry
   use dictionary
   use exceptions
@@ -25,8 +24,39 @@ module loop_initialize
 
   type (ASCII_FILE_T) :: CF
 
-  type (DICT_T), public             :: CF_DICT 
-  type (DICT_ENTRY_T), pointer      :: CF_ENTRY
+  type GRIDDED_DATASETS_T
+    character (len=23)     :: sName
+    logical (kind=c_bool)  :: lOptional
+    integer (kind=c_int)   :: iDataType 
+  end type GRIDDED_DATASETS_T
+
+  type METHODS_LIST_T
+    character (len=23)     :: sName
+  end type METHODS_LIST_T
+
+  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(13) = &
+
+    [ GRIDDED_DATASETS_T("PRECIPITATION          ", lFALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("TMIN                   ", lFALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("TMAX                   ", lFALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("AVAILABLE_WATER_CONTENT", lFALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("POTENTIAL_ET           ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("SOLAR_RADIATION        ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("WIND_SPEED             ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("RAINFALL_ZONE          ", lTRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("FOG_ZONE               ", lTRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("FOG_ELEVATION          ", lTRUE, DATATYPE_INT ),        &      
+      GRIDDED_DATASETS_T("LAND_USE               ", lFALSE, DATATYPE_INT ),       &
+      GRIDDED_DATASETS_T("SOILS_GROUP            ", lFALSE, DATATYPE_INT ),       &
+      GRIDDED_DATASETS_T("RELATIVE_HUMIDITY      ", lTRUE, DATATYPE_FLOAT )   ]
+
+  type (METHODS_LIST_T)  :: KNOWN_METHODS(6) =     &
+    [ METHODS_LIST_T("INTERCEPTION           "),   &
+      METHODS_LIST_T("EVAPOTRANSPIRATION     "),   &
+      METHODS_LIST_T("INFILTRATION           "),   &
+      METHODS_LIST_T("PRECIPITATION          "),   &
+      METHODS_LIST_T("FOG                    "),   &
+      METHODS_LIST_T("SOIL_MOISTURE          ")  ]
 
 contains
 
@@ -38,6 +68,8 @@ contains
     character (len=256)   :: sRecord, sSubstring
     integer (kind=c_int)  :: iStat
 
+    ! open the control file and define the comment characters and delimiters to be used in 
+    ! parsing the ASCII text
     call CF%open( sFilename = sFilename, &
                   sCommentChars = "#%!", &
                   sDelimiters = "WHITESPACE", &
@@ -45,12 +77,12 @@ contains
 
     do 
 
-      ! read in next line of file
+      ! read in next line of the control file
       sRecord = CF%readLine()
 
       if ( CF%isEOF() )  exit
 
-      ! create and allocate memory for dictionary entry
+      ! create and allocate memory for a single dictionary entry
       CF_ENTRY => null()
       allocate( CF_ENTRY, stat=iStat )
       call assert(iStat == 0, "Failed to allocate memory for dictionary object", &
@@ -61,13 +93,15 @@ contains
 
       if ( len_trim(sSubstring) > 0 ) then
 
+        ! first add the key value to the directory entry data structure
         call CF_ENTRY%add_key( sSubstring )
 
         ! break off first directive for the current record
         call chomp(sRecord, sSubstring, CF%sDelimiters )
 
         do while ( len_trim(sSubString) > 0 )
-
+          
+          ! add the next directive snippet to dictionary entry data structure
           call CF_ENTRY%add_string( sSubstring )
 
           ! break off next directive for the current record
@@ -75,598 +109,292 @@ contains
 
         enddo  
 
+        ! add the dictionary entry to the dictionary data structure
         call CF_DICT%add_entry(CF_ENTRY)
 
       endif  
       
     enddo
 
+    ! close the control file
     call CF%close()
-
 
   end subroutine read_control_file
 
+!--------------------------------------------------------------------------------------------------  
+
   subroutine initialize_options()
 
-   
+    integer (kind=c_int) :: iIndex
+
+    ! define SWB project boundary and geographic projection
     call initialize_grid_options()
 
+    ! define the start and end date for the simulation
     call initialize_start_and_end_dates()
-    
-    call initialize_precipitation_options()
-    
-    call initialize_tmax_options()
-    
-    call initialize_tmin_options()
-    
-    call initialize_flow_direction_options()
-    
+
+    ! read in and munge all tables that have been defined in the control file as ***_LOOKUP_TABLE
     call initialize_parameter_tables()
     
-  print *, __FILE__, ": ", __LINE__    
-    call initialize_soils_group_options()
-  print *, __FILE__, ": ", __LINE__        
-    call initialize_landuse_options()
-  print *, __FILE__, ": ", __LINE__    
-    call initialize_available_water_capacity_options()
-  print *, __FILE__, ": ", __LINE__    
-    call initialize_interception_method()
-  print *, __FILE__, ": ", __LINE__        
-    call initialize_evapotranspiration_method()
-  print *, __FILE__, ": ", __LINE__        
-    call initialize_infiltration_method()
-  print *, __FILE__, ": ", __LINE__        
-    call MODEL%set_inactive_cells()
-  print *, __FILE__, ": ", __LINE__    
-    call MODEL%initialize_arrays()
-  print *, __FILE__, ": ", __LINE__        
+    ! scan input file entries for keywords associated with known gridded datasets
+    ! (e.g. PRECIPITATION, TMIN, TMAX, FOG_ZONE, etc.)
+    
+    ! if the grid is mentioned in the control file, call the bound "initialize" method that 
+    ! will wire in the type of data file. all associated methods will also be acted upon if 
+    ! present in the control file (e.g. TMAX_ADD_OFFSET, TMAX_NETCDF_X_VAR, etc.)
+    do iIndex = 1, ubound(KNOWN_GRIDS, 1)
+
+      call initialize_generic_grid( sKey=KNOWN_GRIDS(iIndex)%sName, &
+         lOptional=KNOWN_GRIDS(iIndex)%lOptional,                   &
+         iDataType=KNOWN_GRIDS(iIndex)%iDataType )
+   
+    enddo
+
+    ! scan the control file input for method specifications
+    ! (e.g. EVAPOTRANSPIRATION_METHOD HARGREAVES-SAMANI )
+    do iIndex = 1, ubound(KNOWN_METHODS, 1)
+
+      call initialize_generic_method( sKey=KNOWN_METHODS(iIndex)%sName )
+   
+    enddo
+    
+    ! bring in soils (HSG, AWC), landuse, and flow direction data from native grids
+    ! and pack that data into vectors for active grid cells only
     call initialize_soils_landuse_awc_flowdir_values()
-  print *, __FILE__, ": ", __LINE__    
+
+    ! temporary diagnostic: dump statistics on each of the state variables
+    call MODEL%summarize()
+
+    ! check to see that there are no NULL method pointers
     call MODEL%preflight_check_method_pointers()
 
+    ! call each of the initialization routines associated with the chosen methods
     call MODEL%initialize_methods()
 
+    ! open and prepare NetCDF files for output
     call MODEL%initialize_netcdf_output()
 
   end subroutine initialize_options
 
+!--------------------------------------------------------------------------------------------------
 
+  subroutine initialize_generic_grid(sKey, lOptional, iDataType )
 
-  subroutine populate_data_grids()
-
-    call populate_flow_direction_grid()
-
-  end subroutine populate_data_grids
- 
-
-
-  subroutine populate_flow_direction_grid()
-
-    !call FLOWDIR
-
-  end subroutine populate_flow_direction_grid
-
-
-
-  subroutine initialize_precipitation_options()
+    character (len=*), intent(in)      :: sKey
+    logical (kind=c_bool), intent(in)  :: lOptional
+    integer (kind=c_int), intent(in)   :: iDataType
 
     ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions  
-    integer (kind=c_int)             :: iIndex
-    character (len=:), allocatable   :: sCmdText
-    character (len=:), allocatable   :: sOptionText
-    character (len=:), allocatable   :: sArgText
-    integer (kind=c_int)             :: iStat
+    type (STRING_LIST_T)                 :: myDirectives
+    type (STRING_LIST_T)                 :: myOptions  
+    integer (kind=c_int)                 :: iIndex
+    character (len=:), allocatable       :: sCmdText
+    character (len=:), allocatable       :: sArgText
+    character (len=:), allocatable       :: sArgText_1
+    character (len=:), allocatable       :: sArgText_2
+    integer (kind=c_int)                 :: iStat
+    type (DATA_CATALOG_ENTRY_T), pointer :: pENTRY
+    logical (kind=c_bool)             :: lGridPresent
 
+    pENTRY => null()
+    lGridPresent = lFALSE
 
-    myDirectives = CF_DICT%grep_keys("PRECIP")
+    ! obtain a string list of directives that contain the keyword
+    ! (e.g. if the key is "TMIN", this might return:
+    ! "TMIN ARC_ASCII input/mygrid.asc"
+    ! "TMIN_PROJECTION_DEFINITION =Proj=latlon +datum=WGS84"
+    ! "TMIN_MINIMUM_ALLOWED_VALUE -60.0" )
+    ! the loop below then handles the specific directives in turn
+    myDirectives = CF_DICT%grep_keys( sKey )
+
+    ! call myDirectives%print
 
     if ( myDirectives%count == 0 ) then
-      call warn("Your control file seems to be missing any of the required directives relating to PRECIPITATION", &
-        lFatal = lTRUE )
+    
+      call LOGS%write("Your control file seems to be missing any directives relating to "//dquote(sKey)//".", &
+        iLogLevel=LOG_ALL, lEcho=lTRUE )
+    
+      if (.not. lOptional) then
+        call warn("Your control file is missing required directive "//dquote(sKey)//". See the logfile and fix this before running again.", &
+          lFatal = lTRUE )
+
+      endif
+
     else  
     
-      allocate(PRCP, stat=iStat)
-      call assert( iStat == 0, "Failed to allocate memory for the precipitation (PRCP) data structure", &
+      ! allocate memory for a generic data_catalog_entry
+      allocate(pENTRY, stat=iStat)
+      call assert( iStat == 0, "Failed to allocate memory for the "//dquote(sKey)//" data structure", &
         __FILE__, __LINE__ )
 
-      call LOGS%set_loglevel( LOG_ALL )
-      call LOGS%set_echo( lFALSE )
-
+      ! process all known directives associated with key word
       do iIndex = 1, myDirectives%count
 
-        ! myDirectives is a string list of all SWB directives that contain the phrase "PRECIP"
-        ! sCmdText contains an individual directive
-        sCmdText = myDirectives%get(iIndex)
-
-        ! For this directive, obtain the associated dictionary entries
-        call CF_DICT%get_values( sCmdText, myOptions )
-
-        ! dictionary entries are initially space-delimited; sArgText contains
-        ! all dictionary entries present, concatenated, with a space between entries
-        sArgText = myOptions%get(1, myOptions%count )
-
-        ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(">> "//sCmdText//" "//sArgText)
-
-        call CF_DICT%get_values(sCmdText, myOptions )
-
-        ! most of the time, we only care about the first dictionary entry, obtained below
-        sOptionText = myOptions%get(1)
-        
-        select case ( sCmdText )
-
-          case ( "PRECIPITATION" )
-
-              if (.not. associated(PRCP))  allocate(PRCP, stat=iStat)
-                call assert(iStat==0, "Problem allocating memory for the precipitation (PRCP) data structure",   &
-                  __FILE__, __LINE__)
-
-              PRCP%sVariableName_z = "prcp"
-
-              sArgText = myOptions%get(2)
-
-              select case (sOptionText)
-
-                case ("ARC_ASCII", "SURFER")
-
-                  call PRCP%initialize(sDescription=trim(sCmdText), &
-                    sFileType=trim(sOptionText), &
-                    sFilename=trim(sArgText), &
-                    iDataType=DATATYPE_REAL )
-
-                case ("NETCDF")
-                  
-                  call PRCP%initialize_netcdf( &
-                    sDescription=trim(sCmdText), &
-                    sFilename = trim(sArgText), &
-                    iDataType=DATATYPE_REAL )
-     
-                case default
-
-                  call warn( "Did not find a valid PRECIPITATION option. Value supplied was: "//dquote(sOptionText), &
-                    lFatal = lTRUE )
-
-                end select  
-
-          case ( "PRECIPITATION_METHOD_OF_FRAGMENTS")
-          
-            call MODEL%set_precipitation_data_method("FRAGMENTS")      
-
-          case ( "PRECIPITATION_METHOD_OF_FRAGMENTS_DAILY_FILE")
-          
-            ! note this formulation is backsliding toward old model of immediate processing
-            ! was trying to read in entire control file, do checking, and *then* actually read
-            ! in the files themselves
-            call read_daily_fragments( sArgText )  
-
-          case ( "PRECIPITATION_METHOD_OF_FRAGMENTS_NORMALIZATION_FILE")
-          
-            call read_annual_normalization( sArgText )  
-
-          case ( "PRECIPITATION_SCALE_FACTOR", "PRECIPITATION_SCALE" )
-
-            call PRCP%set_scale(asFloat(sOptionText))
-
-          case ( "PRECIPITATION_ADD_OFFSET", "PRECIPITATION_OFFSET" )
-  
-            call PRCP%set_offset(asFloat(sOptionText))
-
-          case ( "NETCDF_PRECIPITATION_X_VAR" )
-
-            PRCP%sVariableName_x = trim(sOptionText)
-
-          case ( "NETCDF_PRECIPITATION_Y_VAR" )
-
-            PRCP%sVariableName_y = trim(sOptionText)
-
-          case ( "NETCDF_PRECIPITATION_Z_VAR" )
-
-            PRCP%sVariableName_z = trim(sOptionText)
-
-          case ( "NETCDF_PRECIPITATION_TIME_VAR" )
-
-            PRCP%sVariableName_time = trim(sOptionText)
-
-          case ( "NETCDF_PRECIPITATION_VARIABLE_ORDER" )
-
-            call PRCP%set_variable_order( asLowercase(sOptionText) )
-
-          case ( "NETCDF_PRECIPITATION_FLIP_VERTICAL" )
-
-            call PRCP%set_grid_flip_vertical()
-
-          case ( "NETCDF_PRECIPITATION_FLIP_HORIZONTAL" )
-
-            call PRCP%set_grid_flip_horizontal()
-
-          case ( "NETCDF_PRECIPITATION_MAKE_LOCAL_ARCHIVE" )
-
-            call PRCP%set_make_local_archive(lTRUE)
-
-          case ( "PRECIPITATION_GRID_PROJECTION_DEFINITION" )
-
-            sArgText = myOptions%get(1, myOptions%count )
-            call PRCP%set_PROJ4( trim(sArgText) )
-
-          case ( "PRECIPITATION_MINIMUM_ALLOWED_VALUE" )
-
-            PRCP%rMinAllowedValue = asFloat(sOptionText)
-
-          case ( "PRECIPITATION_MAXIMUM_ALLOWED_VALUE" )
-
-            PRCP%rMaxAllowedValue = asFloat(sOptionText)
-
-          case ( "PRECIPITATION_MISSING_VALUES_CODE" )
-
-            PRCP%rMissingValuesCode = asFloat(sOptionText)
-
-          case ( "PRECIPITATION_MISSING_VALUES_OPERATOR" ) 
-
-            PRCP%sMissingValuesOperator = trim(sOptionText)
-
-          case ( "PRECIPITATION_MISSING_VALUES_ACTION")
-
-            if (sOptionText == "ZERO") then
-              PRCP%iMissingValuesAction = MISSING_VALUES_ZERO_OUT
-            elseif (sOptionText == "MEAN" ) then
-              PRCP%iMissingValuesAction = MISSING_VALUES_REPLACE_WITH_MEAN
-            else
-              call assert(lFALSE, "Unknown missing value action supplied for" &
-                //" precipitation data: "//dquote(sOptionText) )
-            endif
-
-          case default
-
-          call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
-              //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
-
-        end select
-
-
-
-      enddo
-
-    endif
-
-
-
-  end subroutine initialize_precipitation_options
-
-
-  subroutine initialize_tmax_options()
-
-    ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions  
-    integer (kind=c_int)             :: iIndex
-    character (len=:), allocatable   :: sCmdText
-    character (len=:), allocatable   :: sOptionText
-    character (len=:), allocatable   :: sArgText
-    integer (kind=c_int)             :: iStat
-
-
-    myDirectives = CF_DICT%grep_keys("TMAX")
-
-    if ( myDirectives%count == 0 ) then
-      call warn("Your control file seems to be missing any of the required directives relating to TMAX", &
-        lFatal = lTRUE )
-    else  
-    
-      allocate(TMAX, stat=iStat)
-      call assert( iStat == 0, "Failed to allocate memory for the maximum air temperature (TMAX) data structure", &
-        __FILE__, __LINE__ )
-
-      do iIndex = 1, myDirectives%count
-
-        ! myDirectives is a string list of all SWB directives that contain the phrase "PRECIP"
+        ! myDirectives is a string list of all SWB directives that contain sKey
         ! sCmdText contains an individual directive
         sCmdText = myDirectives%get(iIndex)
 
         ! For this directive, obtain the associated dictionary entries
         call CF_DICT%get_values(sCmdText, myOptions )
 
-        ! dictionary entries are initially space-delimited; sArgText contains
+!       print *, " >>> ", trim(sCmdText)
+!       call myOptions%print()
+
+        ! dictionary entries are initially space-delimited; sArgText_1 contains
         ! all dictionary entries present, concatenated, with a space between entries
         sArgText = myOptions%get(1, myOptions%count )
 
         ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(">> "//sCmdText//" "//sArgText)
+        call LOGS%write(">> "//sCmdText//" "//sArgText, iLogLevel=LOG_GENERAL, iTab=4)
 
         ! most of the time, we only care about the first dictionary entry, obtained below
-        sOptionText = myOptions%get(1)
+        sArgText_1 = myOptions%get(1)
+        sArgText_2 = myOptions%get(2)
 
-        call CF_DICT%get_values(sCmdText, myOptions )
+        ! first option is that the key value and directive are the same 
+        ! (.e.g. "PRECIPITATION"; no trailing underscores or modifiers )
+        ! this is a grid definition directive
+        if ( sCmdText .strequal. sKey ) then
 
-        select case ( sCmdText )
+          pENTRY%sVariableName_z = asLowercase( sKey )
 
-          case ( "TMAX" )
+          ! determine the type of grid and act appropriately
+          if (sArgText_1 .strequal. "CONSTANT" ) then
 
-            if (.not. associated(TMAX))  allocate(TMAX, stat=iStat)
-              call assert(iStat==0, "Problem allocating memory for the maximum air temperature (TMAX) data structure",   &
-                __FILE__, __LINE__)
+              call pENTRY%initialize(            &
+                sDescription=trim(sCmdText),     &
+                rConstant=asFloat(sArgText_2)  ) 
+              lGridPresent = lTRUE           
 
-            TMAX%sVariableName_z = "tmax"
+            elseif ( (sArgText_1 .strequal. "ARC_ASCII")              &
+                .or. (sArgText_1 .strequal. "SURFER")                 &
+                .or. (sArgText_1 .strequal. "ARC_GRID") ) then
 
-            sArgText = myOptions%get(2)
+              call pENTRY%initialize(           &
+                sDescription=trim(sCmdText),    &
+                sFileType=trim(sArgText_1),     &
+                sFilename=trim(sArgText_2),     &
+                iDataType=iDataType )
+              lGridPresent = lTRUE
 
-            select case (sOptionText)
-
-              case ("ARC_ASCII", "SURFER")
-
-                call TMAX%initialize(sDescription=trim(sCmdText), &
-                  sFileType=trim(sOptionText), &
-                  sFilename=trim(sArgText), &
-                  iDataType=DATATYPE_REAL )
-
-              case ("NETCDF")
-                
-                call TMAX%initialize_netcdf( &
-                  sDescription=trim(sCmdText), &
-                  sFilename = trim(sArgText), &
-                  iDataType=DATATYPE_REAL )
-   
-              case default
-
-                call warn( "Did not find a valid TMAX option. Value supplied was: "//dquote(sOptionText), &
-                  lFatal = lTRUE )
-
-              end select  
-
-          case ( "TMAX_SCALE_FACTOR", "TMAX_SCALE" )
-
-            call TMAX%set_scale(asFloat(sOptionText))
-
-          case ( "TMAX_ADD_OFFSET", "TMAX_OFFSET" )
-  
-            call TMAX%set_offset(asFloat(sOptionText))
-
-          case ( "NETCDF_TMAX_X_VAR" )
-
-            TMAX%sVariableName_x = trim(sOptionText)
-
-          case ( "NETCDF_TMAX_Y_VAR" )
-
-            TMAX%sVariableName_y = trim(sOptionText)
-
-          case ( "NETCDF_TMAX_Z_VAR" )
-
-            TMAX%sVariableName_z = trim(sOptionText)
-
-          case ( "NETCDF_TMAX_TIME_VAR" )
-
-            TMAX%sVariableName_time = trim(sOptionText)
-
-          case ( "NETCDF_TMAX_VARIABLE_ORDER" )
-
-            call TMAX%set_variable_order( asLowercase(sOptionText) )
-
-          case ( "NETCDF_TMAX_FLIP_VERTICAL" )
-
-            call TMAX%set_grid_flip_vertical()
-
-          case ( "NETCDF_TMAX_FLIP_HORIZONTAL" )
-
-            call TMAX%set_grid_flip_horizontal()
-
-          case ( "NETCDF_TMAX_MAKE_LOCAL_ARCHIVE" )
-
-            call TMAX%set_make_local_archive(lTRUE)
-
-          case ( "TMAX_GRID_PROJECTION_DEFINITION" )
-
-            sArgText = myOptions%get(1, myOptions%count )
-            call TMAX%set_PROJ4( trim(sArgText) )
-
-          case ( "TMAX_MINIMUM_ALLOWED_VALUE" )
-
-            TMAX%rMinAllowedValue = asFloat(sOptionText)
-
-          case ( "TMAX_MAXIMUM_ALLOWED_VALUE" )
-
-            TMAX%rMaxAllowedValue = asFloat(sOptionText)
-
-          case ( "TMAX_MISSING_VALUES_CODE" )
-
-            TMAX%rMissingValuesCode = asFloat(sOptionText)
-
-          case ( "TMAX_MISSING_VALUES_OPERATOR" ) 
-
-            TMAX%sMissingValuesOperator = trim(sOptionText)
-
-          case ( "TMAX_MISSING_VALUES_ACTION")
-            
-            if (sOptionText == "ZERO") then
-              TMAX%iMissingValuesAction = MISSING_VALUES_ZERO_OUT
-            elseif (sOptionText == "MEAN" ) then
-              TMAX%iMissingValuesAction = MISSING_VALUES_REPLACE_WITH_MEAN
-            else
-              call assert(lFALSE, "Unknown missing value action supplied for" &
-                //" TMAX data: "//dquote(sOptionText) )
-            endif
-
-          case default
-
-            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
-              //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
+            elseif ( sArgText_1 .strequal. "NETCDF" ) then
+              
+              call pENTRY%initialize_netcdf(    &
+                sDescription=trim(sCmdText),    &
+                sFilename = trim(sArgText_2),   &
+                iDataType=iDataType )
+              lGridPresent = lTRUE
  
-        end select
+            else
+
+              call warn( "Did not find a valid "//dquote(sKey)//" option. Value supplied was: "//dquote(sArgText_1), &
+                lFatal = lTRUE, sHints="Valid options include "//dquote("ARC_ASCII")//", "//dquote("ARC_GRID") &
+                //", "//dquote("SURFER")//", or "//dquote("NETCDF") )
+
+            endif  
+
+        elseif ( index( string=sCmdText, substring="_SCALE" ) > 0 ) then
+
+          call pENTRY%set_scale(asFloat(sArgText_1))
+
+        elseif ( index( string=sCmdText, substring="_OFFSET" ) > 0 ) then
+
+          call pENTRY%set_offset(asFloat(sArgText_1))
+
+        elseif ( index( string=sCmdText, substring="NETCDF_X_VAR" ) > 0 ) then
+
+          pENTRY%sVariableName_x = trim(sArgText_1)
+
+        elseif ( index( string=sCmdText, substring="NETCDF_Y_VAR" ) > 0 ) then
+
+          pENTRY%sVariableName_y = trim(sArgText_1)
+
+        elseif ( index( string=sCmdText, substring="NETCDF_Z_VAR" ) > 0 ) then
+
+          pENTRY%sVariableName_z = trim(sArgText_1)
+
+        elseif ( index( string=sCmdText, substring="NETCDF_TIME_VAR" ) > 0 ) then
+
+          pENTRY%sVariableName_time = trim(sArgText_1)
+
+        elseif ( index( string=sCmdText, substring="NETCDF_VARIABLE_ORDER" ) > 0 ) then
+
+          call pENTRY%set_variable_order( asLowercase(sArgText_1) )
+
+        elseif ( index( string=sCmdText, substring="NETCDF_FLIP_VERTICAL" ) > 0 ) then
+
+          call pENTRY%set_grid_flip_vertical()
+
+        elseif ( index( string=sCmdText, substring="NETCDF_FLIP_HORIZONTAL" ) > 0 ) then
+
+          call pENTRY%set_grid_flip_horizontal()
+
+        elseif ( index( string=sCmdText, substring="NETCDF_MAKE_LOCAL_ARCHIVE" ) > 0 ) then
+
+          call pENTRY%set_make_local_archive(lTRUE)
+
+        elseif ( index( string=sCmdText, substring="_PROJECTION_DEFINITION" ) > 0 ) then 
+
+          call pENTRY%set_PROJ4( trim(sArgText) )
+
+        elseif ( index( string=sCmdText, substring="_MINIMUM_ALLOWED_VALUE" ) > 0 ) then
+
+          pENTRY%rMinAllowedValue = asFloat(sArgText_1)
+
+        elseif ( index( string=sCmdText, substring="_MAXIMUM_ALLOWED_VALUE" ) > 0 ) then
+
+          pENTRY%rMaxAllowedValue = asFloat(sArgText_1)
+
+        elseif ( index( string=sCmdText, substring="_MISSING_VALUES_CODE" ) > 0 ) then
+
+          pENTRY%rMissingValuesCode = asFloat(sArgText_1)
+
+        elseif ( index( string=sCmdText, substring="_MISSING_VALUES_OPERATOR" ) > 0 ) then
+
+          pENTRY%sMissingValuesOperator = trim(sArgText_1)
+
+        elseif ( index( string=sCmdText, substring= "_MISSING_VALUES_ACTION") > 0 ) then
+          
+          if (sArgText_1 .strequal. "ZERO") then
+
+            pENTRY%iMissingValuesAction = MISSING_VALUES_ZERO_OUT
+          
+          elseif (sArgText_1 .strequal. "MEAN" ) then
+          
+            pENTRY%iMissingValuesAction = MISSING_VALUES_REPLACE_WITH_MEAN
+          
+          else
+          
+            call warn("Unknown missing value action supplied for " &
+              //dquote(sKey)//" data: "//dquote(sArgText_1) )
+          
+          endif
+
+        elseif ( index( string=sCmdText, substring="_METHOD") > 0 ) then
+
+          ! no operation; just keep SWB quiet about this and it will be included in the
+          ! methods initialization section
+
+        else
+
+          call warn("Unknown directive detected in code at line "//asCharacter(__LINE__)//", file "//__FILE__ &
+            //". ~Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
+ 
+        endif
 
       enddo
 
-    endif
+      ! if an unadorned grid specification directive was processed, then we can add the key and
+      ! the data_catalog_entry to the data_catalog
+      if ( lGridPresent )call DAT%add( key=sKey, data=pENTRY )
 
-  end subroutine initialize_tmax_options
-
-
-
-  subroutine initialize_tmin_options()
-
-    ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions  
-    integer (kind=c_int)             :: iIndex
-    character (len=:), allocatable   :: sCmdText
-    character (len=:), allocatable   :: sOptionText
-    character (len=:), allocatable   :: sArgText
-    integer (kind=c_int)             :: iStat
-
-
-    myDirectives = CF_DICT%grep_keys("TMIN")
-
-    if ( myDirectives%count == 0 ) then
-      call warn("Your control file seems to be missing any of the required directives relating to TMIN", &
-        lFatal = lTRUE )
-    else  
-    
-      allocate(TMIN, stat=iStat)
-      call assert( iStat == 0, "Failed to allocate memory for the maximum air temperature (TMIN) data structure", &
-        __FILE__, __LINE__ )
-
-      do iIndex = 1, myDirectives%count
-
-        ! myDirectives is a string list of all SWB directives that contain the phrase "PRECIP"
-        ! sCmdText contains an individual directive
-        sCmdText = myDirectives%get(iIndex)
-
-        ! For this directive, obtain the associated dictionary entries
-        call CF_DICT%get_values(sCmdText, myOptions )
-
-        ! dictionary entries are initially space-delimited; sArgText contains
-        ! all dictionary entries present, concatenated, with a space between entries
-        sArgText = myOptions%get(1, myOptions%count )
-
-        ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(">> "//sCmdText//" "//sArgText)
-
-        ! most of the time, we only care about the first dictionary entry, obtained below
-        sOptionText = myOptions%get(1)
-
-        select case ( sCmdText )
-
-          case ( "TMIN" )
-
-            if (.not. associated(TMIN))  allocate(TMIN, stat=iStat)
-              call assert(iStat==0, "Problem allocating memory for the maximum air temperature (TMIN) data structure",   &
-                __FILE__, __LINE__)
-
-            TMIN%sVariableName_z = "tmin"
-
-            sArgText = myOptions%get(2)
-
-            select case (sOptionText)
-
-              case ("ARC_ASCII", "SURFER")
-
-                call TMIN%initialize(sDescription=trim(sCmdText), &
-                  sFileType=trim(sOptionText), &
-                  sFilename=trim(sArgText), &
-                  iDataType=DATATYPE_REAL )
-
-              case ("NETCDF")
-                
-                call TMIN%initialize_netcdf( &
-                  sDescription=trim(sCmdText), &
-                  sFilename = trim(sArgText), &
-                  iDataType=DATATYPE_REAL )
-   
-              case default
-
-                call warn( "Did not find a valid TMIN option. Value supplied was: "//dquote(sOptionText), &
-                  lFatal = lTRUE )
-
-              end select  
-
-          case ( "TMIN_SCALE_FACTOR", "TMIN_SCALE" )
-
-            call TMIN%set_scale(asFloat(sOptionText))
-
-          case ( "TMIN_ADD_OFFSET", "TMIN_OFFSET" )
-  
-            call TMIN%set_offset(asFloat(sOptionText))
-
-          case ( "NETCDF_TMIN_X_VAR" )
-
-            TMIN%sVariableName_x = trim(sOptionText)
-
-          case ( "NETCDF_TMIN_Y_VAR" )
-
-            TMIN%sVariableName_y = trim(sOptionText)
-
-          case ( "NETCDF_TMIN_Z_VAR" )
-
-            TMIN%sVariableName_z = trim(sOptionText)
-
-          case ( "NETCDF_TMIN_TIME_VAR" )
-
-            TMIN%sVariableName_time = trim(sOptionText)
-
-          case ( "NETCDF_TMIN_VARIABLE_ORDER" )
-
-            call TMIN%set_variable_order( asLowercase(sOptionText) )
-
-          case ( "NETCDF_TMIN_FLIP_VERTICAL" )
-
-            call TMIN%set_grid_flip_vertical()
-
-          case ( "NETCDF_TMIN_FLIP_HORIZONTAL" )
-
-            call TMIN%set_grid_flip_horizontal()
-
-          case ( "NETCDF_TMIN_MAKE_LOCAL_ARCHIVE" )
-
-            call TMIN%set_make_local_archive(lTRUE)
-
-          case ( "TMIN_GRID_PROJECTION_DEFINITION" )
-
-            sArgText = myOptions%get(1, myOptions%count )
-            call TMIN%set_PROJ4( trim(sArgText) )
-
-          case ( "TMIN_MINIMUM_ALLOWED_VALUE" )
-
-            TMIN%rMinAllowedValue = asFloat(sOptionText)
-
-          case ( "TMIN_MAXIMUM_ALLOWED_VALUE" )
-
-            TMIN%rMaxAllowedValue = asFloat(sOptionText)
-
-          case ( "TMIN_MISSING_VALUES_CODE" )
-
-            TMIN%rMissingValuesCode = asFloat(sOptionText)
-
-          case ( "TMIN_MISSING_VALUES_OPERATOR" ) 
-
-            TMIN%sMissingValuesOperator = trim(sOptionText)
-
-          case ( "TMIN_MISSING_VALUES_ACTION")
-            
-            if (sOptionText == "ZERO") then
-              TMIN%iMissingValuesAction = MISSING_VALUES_ZERO_OUT
-            elseif (sOptionText == "MEAN" ) then
-              TMIN%iMissingValuesAction = MISSING_VALUES_REPLACE_WITH_MEAN
-            else
-              call assert(lFALSE, "Unknown missing value action supplied for" &
-                //" TMIN data: "//dquote(sOptionText) )
-            endif
-
-          case default
-
-            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
-              //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
- 
-        end select
-
-      enddo
+      pENTRY => null()
 
     endif
 
-  end subroutine initialize_tmin_options
+  end subroutine initialize_generic_grid
 
-
-
-
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine initialize_grid_options()
 
@@ -699,7 +427,6 @@ contains
 
       rGridCellSize = asDouble( myOptions%get(5) )
 
-      !pGrd => grid_Create(iNX, iNY, rX0, rY0, rGridCellSize, GRID_DATATYPE_ALL) 
       call MODEL%initialize_grid(iNX, iNY, rX0, rY0, rGridCellSize)
 
       rX1 = rX0 + rGridCellSize * real(iNX, kind=c_double)
@@ -712,9 +439,7 @@ contains
       rGridCellSize = asDouble( myOptions%get(7) )
 
       fTempVal = ( rX1 - rX0 ) / real(iNX, kind=c_double)
-      
 
-      !pGrd => grid_Create(iNX, iNY, rX0, rY0, rX1, rY1, GRID_DATATYPE_ALL)
       call MODEL%initialize_grid(iNX, iNY, rX0, rY0, rGridCellSize)
 
     else
@@ -735,6 +460,8 @@ contains
     ! echo the original directive and dictionary entries to the logfile
     call LOGS%write(">> "//"BASE_PROJECTION_DEFINITION "//sArgText)
 
+    ! BNDS is a module-level data structure that will be used in other modules to 
+    ! supply bounding box information for the SWB project area
     BNDS%iNumCols = iNX
     BNDS%iNumRows = iNY
     BNDS%fX_ll = rX0
@@ -748,225 +475,22 @@ contains
 
   end subroutine initialize_grid_options
 
-
-
-
-  subroutine initialize_flow_direction_options()
-
-    ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions  
-    integer (kind=c_int)             :: iIndex
-    character (len=:), allocatable   :: sCmdText
-    character (len=:), allocatable   :: sOptionText
-    character (len=:), allocatable   :: sArgText
-    integer (kind=c_int)             :: iStat
-
-
-    myDirectives = CF_DICT%grep_keys("FLOW_DIRECTION")
-
-    if ( myDirectives%count == 0 ) then
-      call warn("Your control file seems to be missing any of the required directives relating to FLOW_DIRECTION", &
-        lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
-    else  
-    
-      allocate(FLOWDIR, stat=iStat)
-      call assert( iStat == 0, "Failed to allocate memory for the flow direction (FLOWDIR) data structure", &
-        __FILE__, __LINE__ )
-
-      call LOGS%set_loglevel( LOG_ALL )
-      call LOGS%set_echo( lFALSE )
-
-      do iIndex = 1, myDirectives%count
-
-        ! myDirectives is a string list of all SWB directives that contain the phrase "FLOW_DIRECTION"
-        ! sCmdText contains an individual directive
-        sCmdText = myDirectives%get(iIndex)
-
-        ! For this directive, obtain the associated dictionary entries
-        call CF_DICT%get_values(sCmdText, myOptions )
-
-        ! dictionary entries are initially space-delimited; sArgText contains
-        ! all dictionary entries present, concatenated, with a space between entries
-        sArgText = myOptions%get(1, myOptions%count )
-
-        ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(">> "//sCmdText//" "//sArgText)
-
-        ! most of the time, we only care about the first dictionary entry, obtained below
-        sOptionText = myOptions%get(1)
-
-        select case ( sCmdText )
-
-          case ( "FLOW_DIRECTION" )
-
-            if (.not. associated(PRCP))  allocate(PRCP, stat=iStat)
-              call assert(iStat==0, "Problem allocating memory for the flow direction (FLOWDIR) data structure",   &
-                __FILE__, __LINE__)
-
-            FLOWDIR%sVariableName_z = "flowdir"
-
-            sArgText = myOptions%get(2)
-
-            select case (sOptionText)
-
-              case ( "ARC_ASCII", "SURFER", "ARC_GRID" )
-
-                call FLOWDIR%initialize(sDescription=trim(sCmdText), &
-                  sFileType=trim(sOptionText), &
-                  sFilename=trim(sArgText), &
-                  iDataType=DATATYPE_INT )
-
-              case ( "NETCDF" )
-                  
-                call FLOWDIR%initialize_netcdf( &
-                  sDescription=trim(sCmdText), &
-                  sFilename = trim(sArgText), &
-                  iDataType=DATATYPE_INT )
-     
-              case default
-
-                call warn( "Did not find a valid FLOW_DIRECTION option. Value supplied was: "//dquote(sOptionText), &
-                    lFatal = lTRUE )
-
-            end select  
-
-          case ( "FLOW_DIRECTION_PROJECTION_DEFINITION" )
-
-            sArgText = myOptions%get(1, myOptions%count )
-            call FLOWDIR%set_PROJ4( trim(sArgText) )
-
-          case default
-
-            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
-              //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
- 
-        end select
-
-      enddo
-
-    endif
-
-  end subroutine initialize_flow_direction_options  
-
-
-  subroutine initialize_soils_group_options()
-
-    ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions  
-    integer (kind=c_int)             :: iIndex
-    character (len=:), allocatable   :: sCmdText
-    character (len=:), allocatable   :: sOptionText
-    character (len=:), allocatable   :: sArgText
-    integer (kind=c_int)             :: iStat
-
-
-    myDirectives = CF_DICT%grep_keys("SOILS_GROUP")
-    if (myDirectives%count == 0) then
-      call myDirectives%deallocate()      
-      myDirectives = CF_DICT%grep_keys("SOIL_GROUP")
-    endif
-      
-    if ( myDirectives%count == 0 ) then
-
-      call warn("Your control file seems to be missing any of the required directives relating to SOILS_GROUP", &
-        lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
-
-    else  
-    
-      allocate(HSG, stat=iStat)
-      call assert( iStat == 0, "Failed to allocate memory for the soils group (HSG) data structure", &
-        __FILE__, __LINE__ )
-
-      call LOGS%set_loglevel( LOG_ALL )
-      call LOGS%set_echo( lFALSE )
-
-      do iIndex = 1, myDirectives%count
-
-        ! myDirectives is a string list of all SWB directives that contain the phrase "WATER_CAPACITY"
-        ! sCmdText contains an individual directive
-        sCmdText = myDirectives%get(iIndex)
-
-        ! For this directive, obtain the associated dictionary entries
-        call CF_DICT%get_values(sCmdText, myOptions )
-
-        ! dictionary entries are initially space-delimited; sArgText contains
-        ! all dictionary entries present, concatenated, with a space between entries
-        sArgText = myOptions%get(1, myOptions%count )
-
-        ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(">> "//sCmdText//" "//sArgText)
-
-        ! most of the time, we only care about the first dictionary entry, obtained below
-        sOptionText = myOptions%get(1)
-
-        select case ( sCmdText )
-
-          case ( "SOILS_GROUP", "SOIL_GROUP" )
-
-            if (.not. associated(HSG))  allocate(HSG, stat=iStat)
-              call assert(iStat==0, "Problem allocating memory for the soils group (HSG) data structure",   &
-                __FILE__, __LINE__)
-
-            HSG%sVariableName_z = "hsg"
-
-            sArgText = myOptions%get(2)
-
-            select case (sOptionText)
-
-              case ( "ARC_ASCII", "SURFER", "ARC_GRID" )
-
-                call HSG%initialize(sDescription=trim(sCmdText), &
-                  sFileType=trim(sOptionText), &
-                  sFilename=trim(sArgText), &
-                  iDataType=DATATYPE_INT )
-
-              case ( "NETCDF" )
-                  
-
-                call HSG%initialize_netcdf(    &
-                  sDescription=trim(sCmdText), &
-                  sFilename = trim(sArgText),  &
-                  iDataType=DATATYPE_INT )
-     
-              case default
-
-                call warn( "Did not find a valid SOILS_GROUP option. Value supplied was: "//dquote(sOptionText), &
-                    lFatal = lTRUE )
-
-            end select  
-
-          case ( "SOILS_GROUP_PROJECTION_DEFINITION", "SOIL_GROUP_PROJECTION_DEFINITION" )
-
-            sArgText = myOptions%get(1, myOptions%count )
-            call HSG%set_PROJ4( trim(sArgText) )
-
-          case default
-
-            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
-              //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
- 
-        end select
-
-      enddo
-
-
-!! REally should have this data load later in the process to allow as much of the
-!! control file as possible to be read in and processed.
-  print *, __FILE__, ": ", __LINE__    
-      call HSG%getvalues(  )
-        print *, __FILE__, ": ", __LINE__    
-
-    endif
-
-  end subroutine initialize_soils_group_options  
-
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine initialize_soils_landuse_awc_flowdir_values()
 
+!! this shouldnt be here....move to model_domain
+! 
 
+      call MODEL%get_land_use()
+
+      call MODEL%get_available_water_content()
+
+      call MODEL%get_soil_groups()
+
+      call MODEL%set_inactive_cells()
+
+      call MODEL%initialize_arrays()
 
       call MODEL%initialize_latitude()
 
@@ -980,9 +504,7 @@ contains
 
   end subroutine initialize_soils_landuse_awc_flowdir_values
 
-
-
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine initialize_start_and_end_dates()
 
@@ -1059,239 +581,7 @@ contains
 
   end subroutine initialize_start_and_end_dates 
 
-
-
-
-
-
-
-  subroutine initialize_landuse_options()
-
-    ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions  
-    integer (kind=c_int)             :: iIndex
-    character (len=:), allocatable   :: sCmdText
-    character (len=:), allocatable   :: sOptionText
-    character (len=:), allocatable   :: sArgText
-    integer (kind=c_int)             :: iStat
-
-
-    myDirectives = CF_DICT%grep_keys("LAND_USE")
-    if (myDirectives%count == 0) then
-      call myDirectives%deallocate()      
-      myDirectives = CF_DICT%grep_keys("LANDUSE")
-    endif
-      
-    if ( myDirectives%count == 0 ) then
-
-      call warn("Your control file seems to be missing any of the required directives relating to LANDUSE", &
-        lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
-
-    else  
-    
-      allocate(LULC, stat=iStat)
-      call assert( iStat == 0, "Failed to allocate memory for the landuse (LULC) data structure", &
-        __FILE__, __LINE__ )
-
-      call LOGS%set_loglevel( LOG_ALL )
-      call LOGS%set_echo( lFALSE )
-
-      do iIndex = 1, myDirectives%count
-
-        ! myDirectives is a string list of all SWB directives that contain the phrase "LANDUSE"
-        ! sCmdText contains an individual directive
-        sCmdText = myDirectives%get(iIndex)
-
-        ! For this directive, obtain the associated dictionary entries
-        call CF_DICT%get_values(sCmdText, myOptions )
-
-        ! dictionary entries are initially space-delimited; sArgText contains
-        ! all dictionary entries present, concatenated, with a space between entries
-        sArgText = myOptions%get(1, myOptions%count )
-
-        ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(">> "//sCmdText//" "//sArgText)
-
-        ! most of the time, we only care about the first dictionary entry, obtained below
-        sOptionText = myOptions%get(1)
-
-        select case ( sCmdText )
-
-          case ( "LANDUSE", "LAND_USE" )
-
-            if (.not. associated(LULC))  allocate(LULC, stat=iStat)
-              call assert(iStat==0, "Problem allocating memory for the soils group (LULC) data structure",   &
-                __FILE__, __LINE__)
-
-            LULC%sVariableName_z = "lulc"
-
-            sArgText = myOptions%get(2)
-
-            select case (sOptionText)
-
-              case ( "ARC_ASCII", "SURFER", "ARC_GRID" )
-
-                call LULC%initialize(sDescription=trim(sCmdText), &
-                  sFileType=trim(sOptionText), &
-                  sFilename=trim(sArgText), &
-                  iDataType=DATATYPE_INT, &
-                  sPROJ4_string=BNDS%sPROJ4_string )
-
-              case ( "NETCDF" )
-                  
-                call LULC%initialize_netcdf( &
-                  sDescription=trim(sCmdText), &
-                  sFilename = trim(sArgText), &
-                  iDataType=DATATYPE_INT, &
-                  sPROJ4_string=BNDS%sPROJ4_string ) 
-     
-              case default
-
-                call warn( "Did not find a valid LANDUSE option. Value supplied was: "//dquote(sOptionText), &
-                    lFatal = lTRUE )
-
-            end select  
-
-          case ( "LANDUSE_PROJECTION_DEFINITION", "LAND_USE_PROJECTION_DEFINITION" )
-
-            sArgText = myOptions%get(1, myOptions%count )
-            call LULC%set_PROJ4( trim(sArgText) )
-
-          case default
-
-            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
-              //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
- 
-        end select
-
-      enddo
-
-!      call LULC%getvalues( iMonth=asInt(SIM_DT%start%iMonth), iDay=asInt(SIM_DT%start%iDay), iYear=SIM_DT%start%iYear )
-      call LULC%getvalues(  )
-
-    endif
-
-  end subroutine initialize_landuse_options  
-
-
-
-  subroutine initialize_available_water_capacity_options()
-
-    ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions  
-    integer (kind=c_int)             :: iIndex
-    character (len=:), allocatable   :: sCmdText
-    character (len=:), allocatable   :: sOptionText
-    character (len=:), allocatable   :: sArgText
-    integer (kind=c_int)             :: iStat
-
-
-    myDirectives = CF_DICT%grep_keys("WATER_CAPACITY")
-    if (myDirectives%count == 0) then
-      call myDirectives%deallocate()      
-      myDirectives = CF_DICT%grep_keys("AVAILABLE_WATER_CAPACITY")
-    endif
-      
-    if ( myDirectives%count == 0 ) then
-
-      call warn("Your control file seems to be missing any of the required directives relating to WATER CAPACITY", &
-        lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
-
-    else  
-    
-      allocate(AWC, stat=iStat)
-      call assert( iStat == 0, "Failed to allocate memory for the available water capacity (AWC) data structure", &
-        __FILE__, __LINE__ )
-
-      call LOGS%set_loglevel( LOG_ALL )
-      call LOGS%set_echo( lFALSE )
-
-      do iIndex = 1, myDirectives%count
-
-        ! myDirectives is a string list of all SWB directives that contain the phrase "LANDUSE"
-        ! sCmdText contains an individual directive
-        sCmdText = myDirectives%get(iIndex)
-
-        ! For this directive, obtain the associated dictionary entries
-        call CF_DICT%get_values(sCmdText, myOptions )
-
-        ! dictionary entries are initially space-delimited; sArgText contains
-        ! all dictionary entries present, concatenated, with a space between entries
-        sArgText = myOptions%get(1, myOptions%count )
-
-        ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(">> "//sCmdText//" "//sArgText)
-
-        ! most of the time, we only care about the first dictionary entry, obtained below
-        sOptionText = myOptions%get(1)
-
-        select case ( sCmdText )
-
-          case ( "WATER_CAPACITY", "AVAILABLE_WATER_CAPACITY", "AWC" )
-
-            if (.not. associated(AWC))  allocate(AWC, stat=iStat)
-              call assert(iStat==0, "Problem allocating memory for the soils group (LULC) data structure",   &
-                __FILE__, __LINE__)
-
-            AWC%sVariableName_z = "awc"
-
-            sArgText = myOptions%get(2)
-
-            select case (sOptionText)
-
-              case ( "ARC_ASCII", "SURFER", "ARC_GRID" )
-
-                call AWC%initialize(sDescription=trim(sCmdText), &
-                  sFileType=trim(sOptionText), &
-                  sFilename=trim(sArgText), &
-                  iDataType=DATATYPE_REAL, &
-                  sPROJ4_string=BNDS%sPROJ4_string )
-
-              case ( "NETCDF" )
-                  
-                call AWC%initialize_netcdf( &
-                  sDescription=trim(sCmdText), &
-                  sFilename = trim(sArgText), &
-                  iDataType=DATATYPE_REAL, &
-                  sPROJ4_string=BNDS%sPROJ4_string ) 
-     
-              case default
-
-                call warn( "Did not find a valid WATER_CAPACITY option. Value supplied was: "//dquote(sOptionText), &
-                    lFatal = lTRUE )
-
-            end select  
-
-          case ( "WATER_CAPACITY_PROJECTION_DEFINITION", "AVAILABLE_WATER_CAPACITY_PROJECTION_DEFINITION" )
-
-            sArgText = myOptions%get(1, myOptions%count )
-            call AWC%set_PROJ4( trim(sArgText) )
-
-          case default
-
-            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
-              //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
- 
-        end select
-
-      enddo
-
-      call AWC%getvalues(  )
-
-    endif
-
-  end subroutine initialize_available_water_capacity_options  
-
-
-
-  subroutine initialize_cell_values()
-
-
-  end subroutine initialize_cell_values  
-
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine initialize_parameter_tables()
 
@@ -1341,26 +631,24 @@ contains
         ! most of the time, we only care about the first dictionary entry, obtained below
         sOptionText = myOptions%get(1)
 
-        select case ( sCmdText )
-
-          case ( "LOOKUP_TABLE", "LANDUSE_LOOKUP_TABLE", "IRRIGATION_LOOKUP_TABLE", "LAND_USE_LOOKUP_TABLE" )
+        if ( index(string=sCmdText, substring="LOOKUP_TABLE" ) > 0 ) then
 
             call PARAM_FILES%add( sOptionText )
             iCount = iCount + 1
 
-          case default
+        else
 
             call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
               //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
         
-        end select
+        endif
 
       enddo  
 
       if ( iCount > 0 ) then
 
         call PARAM_FILES%munge()
-        call PARAMS%print_all()       
+        ! call PARAMS%print_all()       
 
       endif
 
@@ -1368,10 +656,11 @@ contains
 
   end subroutine initialize_parameter_tables
 
+!--------------------------------------------------------------------------------------------------
 
-  subroutine initialize_interception_method()
+subroutine initialize_generic_method( sKey )
 
-  use interception__bucket
+  character (len=*), intent(in)    :: sKey
 
   ! [ LOCALS ]
   type (STRING_LIST_T)             :: myDirectives
@@ -1382,12 +671,12 @@ contains
   character (len=:), allocatable   :: sArgText
   integer (kind=c_int)             :: iStat
 
-
-  myDirectives = CF_DICT%grep_keys("INTERCEPTION")
+  ! obtain a list of control file directives whose key values contain the string sKey
+  myDirectives = CF_DICT%grep_keys( trim(sKey) )
     
   if ( myDirectives%count == 0 ) then
 
-    call warn("Your control file seems to be missing any of the required directives relating to INTERCEPTION method.", &
+    call warn("Your control file seems to be missing any of the required directives relating to "//dquote(sKey)//" method.", &
       lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
   else  
@@ -1395,10 +684,10 @@ contains
     call LOGS%set_loglevel( LOG_ALL )
     call LOGS%set_echo( lFALSE )
 
+    ! repeat this process for each control file directive in list
     do iIndex = 1, myDirectives%count
 
-      ! myDirectives is a string list of all SWB directives that contain the phrase "LANDUSE"
-      ! sCmdText contains an individual directive
+      ! sCmdText contains an individual directive (e.g. TMAX NETCDF input/tmax_%0m_%0d_%0Y.nc )
       sCmdText = myDirectives%get(iIndex)
 
       ! For this directive, obtain the associated dictionary entries
@@ -1414,197 +703,19 @@ contains
       ! most of the time, we only care about the first dictionary entry, obtained below
       sOptionText = myOptions%get(1)
 
-      select case ( sCmdText )
+      if ( index(string=sCmdText, substring="METHOD" ) > 0 ) then
 
-        case ( "INTERCEPTION_METHOD" )
+        call MODEL%set_method( trim(sCmdText), trim(sOptionText) )
 
-          sArgText = myOptions%get(2)
-
-          select case (sOptionText)
-
-            case ( "BUCKET" )
-
-              call MODEL%set_interception("BUCKET")
-
-          end select
-          
-        case default
-        
-          call warn("Unknown interception method was specified: "//dquote(sArgText), iLogLevel=LOG_ALL )
-
-      end select
+      endif
       
     enddo
     
   endif
-  
 
-
-end subroutine initialize_interception_method
-
-
-
-
-
-subroutine initialize_evapotranspiration_method()
-
-  ! [ LOCALS ]
-  type (STRING_LIST_T)             :: myDirectives
-  type (STRING_LIST_T)             :: myOptions  
-  integer (kind=c_int)             :: iIndex
-  character (len=:), allocatable   :: sCmdText
-  character (len=:), allocatable   :: sOptionText
-  character (len=:), allocatable   :: sArgText
-  integer (kind=c_int)             :: iStat
-
-
-  myDirectives = CF_DICT%grep_keys("EVAPOTRANSPIRATION")
-    
-  if ( myDirectives%count == 0 ) then
-
-    call warn("Your control file seems to be missing any of the required directives relating to EVAPOTRANSPIRATION method.", &
-      lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
-
-  else  
-  
-    call LOGS%set_loglevel( LOG_ALL )
-    call LOGS%set_echo( lFALSE )
-
-    do iIndex = 1, myDirectives%count
-
-      ! myDirectives is a string list of all SWB directives that contain the phrase "LANDUSE"
-      ! sCmdText contains an individual directive
-      sCmdText = myDirectives%get(iIndex)
-
-      ! For this directive, obtain the associated dictionary entries
-      call CF_DICT%get_values(sCmdText, myOptions )
-
-      ! dictionary entries are initially space-delimited; sArgText contains
-      ! all dictionary entries present, concatenated, with a space between entries
-      sArgText = myOptions%get(1, myOptions%count )
-
-      ! echo the original directive and dictionary entries to the logfile
-      call LOGS%write(">> "//sCmdText//" "//sArgText)
-
-      ! most of the time, we only care about the first dictionary entry, obtained below
-      sOptionText = myOptions%get(1)
-
-      select case ( sCmdText )
-
-        case ( "EVAPOTRANSPIRATION_METHOD", "ET_METHOD" )
-
-          sArgText = myOptions%get(2)
-
-          select case (sOptionText)
-
-            case ( "HARGREAVES", "HARGREAVES-SAMANI" )
-
-              call MODEL%set_evapotranspiration("HARGREAVES")
-
-            case ( "J-H", "JENSEN-HAISE" )
-
-              call MODEL%set_evapotranspiration("JENSEN-HAISE")
-
-            end select
-            
-          case default
-          
-            call warn("Unknown evapotranspiration method was specified: "//dquote(sArgText), iLogLevel=LOG_ALL )
-
-        end select
-        
-      enddo
-      
-    endif
-    
-
-
-  end subroutine initialize_evapotranspiration_method
-
-
-
-!--------------------------------------------------------------------------------------------------  
-
-
-
-  subroutine initialize_infiltration_method()
-
-    ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions  
-    integer (kind=c_int)             :: iIndex
-    character (len=:), allocatable   :: sCmdText
-    character (len=:), allocatable   :: sOptionText
-    character (len=:), allocatable   :: sArgText
-    integer (kind=c_int)             :: iStat
-
-
-    myDirectives = CF_DICT%grep_keys("INFILTRATION")
-      
-    if ( myDirectives%count == 0 ) then
-
-      call warn("Your control file seems to be missing any of the required directives relating to INFILTRATION method.", &
-        lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
-
-    else  
-    
-      call LOGS%set_loglevel( LOG_ALL )
-      call LOGS%set_echo( lFALSE )
-
-      do iIndex = 1, myDirectives%count
-
-        ! myDirectives is a string list of all SWB directives that contain the phrase "LANDUSE"
-        ! sCmdText contains an individual directive
-        sCmdText = myDirectives%get(iIndex)
-
-        ! For this directive, obtain the associated dictionary entries
-        call CF_DICT%get_values(sCmdText, myOptions )
-
-        ! dictionary entries are initially space-delimited; sArgText contains
-        ! all dictionary entries present, concatenated, with a space between entries
-        sArgText = myOptions%get(1, myOptions%count )
-
-        ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(">> "//sCmdText//" "//sArgText)
-
-        ! most of the time, we only care about the first dictionary entry, obtained below
-        sOptionText = myOptions%get(1)
-
-        select case ( sCmdText )
-
-          case ( "INFILTRATION_METHOD", "RUNOFF_METHOD" )
-
-            sArgText = myOptions%get(2)
-
-            select case (sOptionText)
-
-              case ( "C-N", "CURVE_NUMBER" )
-
-                call MODEL%set_infiltration_method("CURVE_NUMBER")
-
-              case ( "G-A", "GREEN_AMPT", "GREEN-AMPT" )
-
-                call MODEL%set_infiltration_method("GREEN_AMPT")
-
-            end select
-            
-          case default
-          
-            call warn("Unknown infiltration method was specified: "//dquote(sArgText), iLogLevel=LOG_ALL )
-
-        end select
-        
-      enddo
-      
-    endif
-    
-
-
-  end subroutine initialize_infiltration_method
-
+end subroutine initialize_generic_method
 
 !--------------------------------------------------------------------------------------------------
-
 
   subroutine check_for_fatal_warnings()
 

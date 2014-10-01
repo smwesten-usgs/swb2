@@ -528,12 +528,15 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
   integer (kind=c_int) :: iCount,iCumlCount
   logical (kind=c_bool) :: lXLLCenter, lYLLCenter  ! Flags XLLCENTER / XLLCORNER
   logical (kind=c_bool) :: lFileExists
-
+  logical (kind=c_bool) :: lIsOpen
 
   ! Pre-scan for the number of header records and read the header
   inquire(file=trim(sFileName), EXIST=lFileExists)
   call assert( lFileExists, "The Arc ASCII grid file "//dquote(sFilename)// &
     " could not be found.",trim(__FILE__),__LINE__)
+
+  inquire(unit=LU_GRID, OPENED=lIsOpen )
+  if (lIsOpen )  close( unit=LU_GRID )
 
   open ( newunit=LU_GRID, iostat=iStat, file=trim(sFileName) )
   call assert( iStat == 0, &
@@ -670,12 +673,16 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
   integer (kind=c_int) :: iCount,iCumlCount
   logical (kind=c_bool) :: lXLLCenter, lYLLCenter  ! Flags XLLCENTER / XLLCORNER
   logical (kind=c_bool) :: lFileExists
+  logical (kind=c_bool) :: lIsOpen
 
   ! Pre-scan for the number of header records and read the header
 
-  inquire(file=trim(sFileName), EXIST=lFileExists)
+  inquire(file=trim(sFileName), EXIST=lFileExists, OPENED=lIsOpen )
   call assert( lFileExists, "The Arc ASCII grid file "//dquote(sFilename)// &
     " could not be found.",trim(__FILE__),__LINE__)
+
+  inquire(unit=LU_GRID, OPENED=lIsOpen )
+  if (lIsOpen )  close( unit=LU_GRID )
 
   open ( newunit=LU_GRID, iostat=iStat, file=trim(sFileName) )
   call assert( iStat == 0, &
@@ -822,10 +829,14 @@ function grid_ReadSurferGrid_fn ( sFileName, iDataType ) result ( pGrd )
   real (kind=c_double) :: rY0,rY1                       ! Limits in Y
   real (kind=c_float) :: rZ0,rZ1                       ! Limits in Z (not used)
   logical (kind=c_bool) :: lFileExists
+  logical (kind=c_bool) :: lIsOpen
 
   inquire(file=trim(sFileName), EXIST=lFileExists)
   call assert( lFileExists, "The Surfer ASCII grid file "//dquote(sFilename)// &
     " could not be found.",trim(__FILE__),__LINE__)
+
+  inquire(unit=LU_GRID, OPENED=lIsOpen )
+  if (lIsOpen )  close( unit=LU_GRID )
 
   open ( newunit=LU_GRID, iostat=iStat, file=trim(sFileName) )
   call assert( iStat == 0, &
@@ -894,10 +905,14 @@ subroutine grid_ReadSurferGrid_sub ( sFileName, pGrd )
   real (kind=c_double) :: rY0,rY1                       ! Limits in Y
   real (kind=c_float) :: rZ0,rZ1                       ! Limits in Z (not used)
   logical (kind=c_bool) :: lFileExists
+  logical (kind=c_bool) :: lIsOpen
 
   inquire(file=trim(sFileName), EXIST=lFileExists)
   call assert( lFileExists, "The Surfer ASCII grid file "//dquote(sFilename)// &
     " could not be found.",trim(__FILE__),__LINE__)
+
+  inquire(unit=LU_GRID, OPENED=lIsOpen )
+  if (lIsOpen )  close( unit=LU_GRID )
 
   open ( newunit=LU_GRID, iostat=iStat, file=trim(sFileName) )
   call assert( iStat == 0, &
@@ -1477,22 +1492,35 @@ subroutine grid_checkIntegerGridValues(pGrd, sFilename)
   integer (kind=c_int) :: iRunningSum
   integer (kind=c_int) :: iIndex
   integer (kind=c_int) :: iCount
+  integer (kind=c_int) :: iRecord
+  character (len=10)   :: sBuf0
+  character (len=14)   :: sBuf1
+  character (len=10)   :: sBuf2
+  character (len=40)   :: sBuf3
 
   iRunningSum = 0
+  iRecord = 0
 
-  call LOGS%write(" ")
-  call LOGS%write("Summary of integer grid data values for file "//dquote(sFilename) )
+ call LOGS%write("### Summary of integer grid data values for file "//dquote(sFilename)//" ###", &
+    iLogLevel=LOG_ALL, iLinesBefore=1, iLinesAfter=1 )
 
+  call LOGS%write("number     | count          | value     ")
+  call LOGS%write("---------- | -------------- | ----------")
   do iIndex=0,maxval(pGrd%iData)
     iCount=COUNT( pGrd%iData==iIndex )
     if ( iCount > 0 ) then
+      iRecord = iRecord + 1
       iRunningSum = iRunningSum + iCount
-      call LOGS%write( "   "//asCharacter(iCount)//" grid cells have value: "//asCharacter(iIndex) )
+      write (sBuf0, fmt="(i10)") iRecord
+      write (sBuf1, fmt="(i14)") iCount
+      write (sBuf2, fmt="(i10)")  iIndex
+      write (sBuf3, fmt="(a10,' | ', a14,' | ',a10)") adjustl(sBuf0), adjustl(sBuf1), adjustl(sBuf2)
+      call LOGS%write( sBuf3 )
     end if
   end do
 
   call LOGS%write("   Total number of grid cells with value NODATA: " &
-    //asCharacter( COUNT(pGrd%iData == pGrd%iNoDataValue ) ) )
+    //asCharacter( COUNT(pGrd%iData == pGrd%iNoDataValue ) ), iLinesBefore=1 )
 
   call LOGS%write("   Total number of grid cells: "//asCharacter( size(pGrd%iData) ) )
 

@@ -140,10 +140,6 @@ program main
   call MODEL%iterate_over_simulation_days()
    
 
-  !! create matrix of cells
-!  call CELLS%initialize(4, 4, reshape( source=[1,1,0,1, 0,1,0,0, 0,1,1,1, 1,1,0,0], shape=[4,4] ) )
-
-
 
 
 

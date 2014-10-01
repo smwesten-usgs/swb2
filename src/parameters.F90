@@ -84,7 +84,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)         :: iFileIndex, iColIndex
     integer (kind=c_int)         :: iStat
-    type (ASCII_FILE_T)           :: DF
+    type (ASCII_FILE_T)          :: DF
     type (DICT_ENTRY_T), pointer :: pDict
     type (DICT_ENTRY_T), pointer :: pCurrentDict
     integer (kind=c_int)         :: iNumberOfHeaderLines

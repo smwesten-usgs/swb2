@@ -286,7 +286,7 @@ contains
     if (present(iNumDigits) ) then
       write(sFmt, fmt="('(G0.',i0,')')") iNumdigits
     else
-      sFmt = "(G0.4)"
+      sFmt = "(G0.12)"
     endif    
 
     write(sBuf, fmt=sFmt, iostat=iStat)  dValue

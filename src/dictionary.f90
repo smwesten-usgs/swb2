@@ -12,8 +12,9 @@ module dictionary
 
   type, public :: DICT_ENTRY_T
 
-    character (len=:), allocatable            :: key
-    character (len=:), allocatable            :: secondary_key
+     character (len=:), allocatable            :: key
+     character (len=:), allocatable            :: secondary_key
+
     type (STRING_LIST_T)                      :: sl
     type (DICT_ENTRY_T), pointer              :: previous   => null()
     type (DICT_ENTRY_T), pointer              :: next       => null()
@@ -64,6 +65,11 @@ module dictionary
                                           get_values_as_float_given_list_of_keys_sub
 
   end type DICT_T
+
+  ! CF = "Control File"; this dictionary will be populated elsewhere with all of the 
+  !                      directives found in the SWB control file.
+  type (DICT_T), public                     :: CF_DICT 
+  type (DICT_ENTRY_T), public, pointer      :: CF_ENTRY
 
 contains
 
@@ -125,9 +131,9 @@ contains
 
  function grep_dictionary_key_names_fn(this, sKey)   result( slString )
 
-    class (DICT_T)                :: this
-    character (len=*), intent(in) :: sKey
-    type (STRING_LIST_T)          :: slString
+    class (DICT_T)                   :: this
+    character (len=*), intent(in)    :: sKey
+    type (STRING_LIST_T)             :: slString
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer     :: current
@@ -137,7 +143,7 @@ contains
 
     do while ( associated( current ) )
 
-      iIndex = index(string=current%key, substring=sKey)
+      iIndex = index(string=current%key, substring=trim(sKey) )
 
       if ( iIndex > 0 )  call slString%append(current%key)
       

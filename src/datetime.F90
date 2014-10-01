@@ -70,6 +70,7 @@ module datetime
     procedure, public :: subtractDay => date_minus_day_sub
 
     procedure, public :: prettydate => write_pretty_date_fn
+    procedure, public :: prettydatetime => write_pretty_datetime_fn
     procedure, public :: listdatetime => write_list_datetime_fn
     procedure, public :: listdate => write_list_date_fn
     procedure, public :: listtime => write_list_time_fn
@@ -101,6 +102,32 @@ module datetime
   integer (kind=c_int), private :: iScanMin2 = 5
   integer (kind=c_int), private :: iScanSec1 = 7
   integer (kind=c_int), private :: iScanSec2 = 8
+
+  !> Container for calendar lookup information
+  type MONTH_T
+    ! Container for calendar lookup information
+    character (len=3) :: sName          ! Abbreviated name
+    character (len=9) :: sFullName      ! Full month name
+    integer (kind=c_int) :: iStart      ! Starting (Julian) date
+    integer (kind=c_int) :: iEnd        ! Ending (Julian) date
+    integer (kind=c_int) :: iMonth      ! Month number (1-12)
+    integer (kind=c_int) :: iNumDays    ! Max number of days in month
+  end type MONTH_T
+
+  !> Month information
+  type ( MONTH_T ), public, target :: MONTHS(12) =     &
+   [  MONTH_T( 'Jan','January  ',   1,  31, 1, 31),    &
+      MONTH_T( 'Feb','February ',  32,  59, 2, 29),    &
+      MONTH_T( 'Mar','March    ',  60,  90, 3, 31),    &
+      MONTH_T( 'Apr','April    ',  91, 120, 4, 30),    &
+      MONTH_T( 'May','May      ', 121, 151, 5, 31),    &
+      MONTH_T( 'Jun','June     ', 152, 181, 6, 30),    &
+      MONTH_T( 'Jul','July     ', 182, 212, 7, 31),    &
+      MONTH_T( 'Aug','August   ', 213, 243, 8, 31),    &
+      MONTH_T( 'Sep','September', 244, 273, 9, 30),    &
+      MONTH_T( 'Oct','October  ', 274, 304, 10, 31),   &
+      MONTH_T( 'Nov','November ', 305, 334, 11, 30),   &
+      MONTH_T( 'Dec','December ', 335, 365, 12, 31)  ]
 
 contains
 
@@ -693,6 +720,18 @@ end function date_minus_date_fn
 
 !------------------------------------------------------------------------------
 
+
+!------------------------------------------------------------------------------
+
+function write_pretty_datetime_fn(this)     result(sDateTimeText)
+
+  class(DATETIME_T) :: this
+  character (len=20) :: sDateTimeText
+
+  write(sDateTimeText, fmt="(a3,' ',i2.2,' ',i4.4, 1x, i2.2,':',i2.2,':',i2.2)") &
+    MONTHS(this%iMonth)%sName, this%iDay, this%iYear, this%iHour, this%iMinute, this%iSecond
+
+end function write_pretty_datetime_fn
 
 !------------------------------------------------------------------------------
 

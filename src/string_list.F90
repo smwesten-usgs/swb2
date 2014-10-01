@@ -445,7 +445,8 @@ contains
 
     do while ( associated(current) .and. iCount < this%count )
     
-      if ( (current%s .strequal. sChar) .or. (current%s .contains. sChar) ) then
+      if ( (current%s .strequal. sChar) .or. &
+             (index(string=asUppercase(current%s), substring=asUppercase(sChar) ) > 0 ) ) then
 
         iCount = iCount + 1
         call newList%append(current%s)
