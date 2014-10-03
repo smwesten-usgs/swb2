@@ -1,3 +1,11 @@
+!> @file
+!! Contains the module \ref fog__monthly_grid.
+
+!>
+!!  Module \ref fog__monthly_grid
+!!  provides support for estimating fog drip given a gridded map
+!!  of FOG_ZONE and FOG_ELEVATION, and a table containing monthly
+!!  fog factors. 
 module fog__monthly_grid
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double
@@ -35,6 +43,16 @@ module fog__monthly_grid
 
 contains
 
+  !> Initialize the fog drip algorithm. 
+  !!
+  !! Read in a fog zone grid and a fog elevation grid.
+  !! Read in the fog ratios monthly file. Open a NetCDF output file to hold fog variable output.
+  !!
+  !! @param[in] lActive 2-D array of active cells within the model domain.
+  !! @param[in] dX 1D vector of X coordinates associated with the model domain.
+  !! @param[in] dY 1D vector of Y coordinates.
+  !! @param[in] dX_lon 2D array of longitude values.
+  !! @param[in] dY_lat 2D array of latitude values.
   subroutine fog_monthly_grid_initialize( lActive, dX, dY, dX_lon, dY_lat )
 
     logical (kind=c_bool), intent(in)     :: lActive(:,:)

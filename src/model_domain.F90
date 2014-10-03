@@ -72,6 +72,7 @@ module model_domain
     procedure ( simple_method ), pointer         :: init_interception       => model_initialize_interception_bucket
     procedure ( simple_method ), pointer         :: init_infiltration       => model_initialize_infiltration_curve_number
     procedure ( simple_method ), pointer         :: init_reference_et       => model_initialize_et_hargreaves
+    procedure ( simple_method ), pointer         :: init_routing            => model_initialize_routing_D8
     procedure ( simple_method ), pointer         :: init_soil_moisture      => model_initialize_soil_moisture_thornthwaite_mather
     procedure ( simple_method ), pointer         :: init_snowfall           => model_initialize_snowfall_original
     procedure ( simple_method ), pointer         :: init_snowmelt           => model_initialize_snowmelt_original
@@ -81,6 +82,7 @@ module model_domain
     procedure ( simple_method ), pointer         :: calc_interception      => model_calculate_interception_bucket
     procedure ( simple_method ), pointer         :: calc_infiltration      => model_calculate_infiltration_curve_number
     procedure ( simple_method ), pointer         :: calc_reference_et      => model_calculate_et_hargreaves
+    procedure ( simple_method ), pointer         :: calc_routing           => model_calculate_routing_D8
     procedure ( simple_method ), pointer         :: calc_soil_moisture     => model_calculate_soil_moisture_thornthwaite_mather
     procedure ( simple_method ), pointer         :: calc_snowfall          => model_calculate_snowfall_original
     procedure ( simple_method ), pointer         :: calc_snowmelt          => model_calculate_snowmelt_original    
@@ -274,6 +276,7 @@ contains
     call this%init_snowmelt
     call this%init_fog
     call this%init_infiltration
+    call this%init_routing
     call this%init_soil_moisture
     call this%init_reference_et
     call this%init_precipitation_data
@@ -434,6 +437,7 @@ contains
     !> Determine how many landuse codes are present
     call PARAMS%get_values( sKey="LU_Code", iValues=iLanduseCodes )
 
+    ! obtain a pointer to the LAND_USE grid
     pLULC => DAT%find("LAND_USE")
 
     if ( associated(pLULC) ) then
@@ -1164,6 +1168,26 @@ contains
 
       endif
 
+
+    elseif ( sCmdText .contains. "FLOW_ROUTING" ) then
+
+      if ( sMethodName .strequal. "D8" ) then
+
+        this%init_fog => model_initialize_routing_D8
+        this%calc_fog => model_calculate_routing_D8
+
+        call LOGS%WRITE( "==> D8 FLOW ROUTING submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
+      else
+
+        this%init_fog => model_initialize_routing_none
+        this%calc_fog => model_calculate_routing_none
+
+        call LOGS%WRITE( "==> NULL FLOW ROUTING submodel selected -- NO routing will be performed.", &
+            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
+      endif
+
     elseif ( sCmdText .contains. "FOG" ) then
 
       if ( sMethodName .strequal. "MONTHLY_GRID" ) then
@@ -1311,6 +1335,37 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
   end subroutine model_calculate_interception_gash
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_routing_none(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_initialize_routing_none  
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_routing_D8(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_initialize_routing_D8  
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_routing_none(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_calculate_routing_none  
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_routing_D8(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_calculate_routing_D8  
 
 !--------------------------------------------------------------------------------------------------
 
