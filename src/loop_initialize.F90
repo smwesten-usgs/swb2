@@ -34,7 +34,7 @@ module loop_initialize
     character (len=23)     :: sName
   end type METHODS_LIST_T
 
-  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(14) = &
+  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(13) = &
 
     [ GRIDDED_DATASETS_T("PRECIPITATION          ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("TMIN                   ", lFALSE, DATATYPE_FLOAT ),     &
@@ -45,8 +45,7 @@ module loop_initialize
       GRIDDED_DATASETS_T("WIND_SPEED             ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("RAINFALL_ZONE          ", lTRUE, DATATYPE_INT ),        &
       GRIDDED_DATASETS_T("FLOW_DIRECTION         ", lFALSE, DATATYPE_INT),        &
-      GRIDDED_DATASETS_T("FOG_ZONE               ", lTRUE, DATATYPE_INT ),        &
-      GRIDDED_DATASETS_T("FOG_ELEVATION          ", lTRUE, DATATYPE_INT ),        &      
+      GRIDDED_DATASETS_T("FOG_RATIO              ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("LAND_USE               ", lFALSE, DATATYPE_INT ),       &
       GRIDDED_DATASETS_T("SOILS_GROUP            ", lFALSE, DATATYPE_INT ),       &
       GRIDDED_DATASETS_T("RELATIVE_HUMIDITY      ", lTRUE, DATATYPE_FLOAT )   ]
