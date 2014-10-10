@@ -68,6 +68,9 @@ contains
     allocate ( pNCFILE, stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
 
+    allocate ( FOG( count( lActive ) ), stat=iStat)
+    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+
     call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE, sVariableName="fog", &
       sVariableUnits="inches", iNX=iNX, iNY=iNY, &
       fX=dX, fY=dY, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=dY_lat, dpLon=dX_lon  )
@@ -117,13 +120,11 @@ contains
 
       ! write timestamp to NetCDF file
       call netcdf_put_variable_vector(NCFILE=pNCFILE, &
-      iVarID=pNCFILE%iVarID(NC_TIME), &
-      iStart=[int( iNumDaysFromOrigin, kind=c_size_t)], &
-      iCount=[1_c_size_t], &
-      iStride=[1_c_ptrdiff_t], &
-      dpValues=[real( iNumDaysFromOrigin, kind=c_double)])
-
-      FOG = 0.0_c_float
+        iVarID=pNCFILE%iVarID(NC_TIME), &
+        iStart=[int( iNumDaysFromOrigin, kind=c_size_t)], &
+        iCount=[1_c_size_t], &
+        iStride=[1_c_ptrdiff_t], &
+        dpValues=[real( iNumDaysFromOrigin, kind=c_double)])
 
       FOG = fRainfall * pack( pFOG_RATIO%pGrdBase%rData, lActive )
 
@@ -135,7 +136,6 @@ contains
                    rValues=FOG, lMask=lActive, rField=fDont_Care )
      
     end associate
-
 
   end subroutine fog_monthly_grid_calculate
 
