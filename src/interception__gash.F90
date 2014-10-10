@@ -1,4 +1,4 @@
-module interception__bucket
+module interception__gash
 
   use iso_c_binding
   use exceptions
@@ -8,10 +8,8 @@ module interception__bucket
 
   private
 
-  public interception_bucket_initialize
-  public interception_bucket_calculate
-
-  logical (kind=c_bool) :: GROWING_SEASON = .true._c_bool
+  public interception_gash_initialize
+  public interception_gash_calculate
 
   integer (kind=c_int), allocatable :: iLanduseCodes(:)
   real (kind=c_float), allocatable  :: fInterceptionValue_GrowingSeason(:)
@@ -19,7 +17,7 @@ module interception__bucket
 
 contains   
 
-  subroutine interception_bucket_initialize()
+  subroutine interception_gash_initialize()
 
     ! [ LOCALS ]
     integer (kind=c_int)        :: iNumberOfLanduses
@@ -39,16 +37,15 @@ contains
       call warn( sMessage="The number of landuses does not match the number of interception values.",   &
         sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
 
-  end subroutine interception_bucket_initialize
+  end subroutine interception_gash_initialize
 
+!--------------------------------------------------------------------------------------------------
 
-  elemental function interception_bucket_calculate( iLanduseIndex, fPrecip )   result( fInterception )
+  elemental function interception_gash_calculate( iLanduseIndex, fPrecip )   result( fInterception )
 
     integer (kind=c_int), intent(in) :: iLanduseIndex
     real (kind=c_float), intent(in)  :: fPrecip
     real (kind=c_float)              :: fInterception
-
-    !!! Need to come up with a module that provides the current day of year, month, day, year, and growing season
 
     ! [ LOCALS ]
     real (kind=c_float) :: fPotentialInterception
@@ -66,6 +63,6 @@ contains
     fInterception = min( fPotentialInterception, fPrecip )
 
  
-  end function interception_bucket_calculate
+  end function interception_gash_calculate
 
-end module interception__bucket
+end module interception__gash

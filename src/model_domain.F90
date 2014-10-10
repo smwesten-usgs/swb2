@@ -1348,7 +1348,11 @@ contains
 
   subroutine model_initialize_routing_D8(this)
 
+    use routing__D8
+
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call routing_D8_initialize( this%active )
 
   end subroutine model_initialize_routing_D8  
 !--------------------------------------------------------------------------------------------------
@@ -1363,7 +1367,10 @@ contains
 
   subroutine model_calculate_routing_D8(this)
 
+    use routing__D8
+
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+
 
   end subroutine model_calculate_routing_D8  
 
