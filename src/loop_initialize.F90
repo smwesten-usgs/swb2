@@ -50,13 +50,14 @@ module loop_initialize
       GRIDDED_DATASETS_T("SOILS_GROUP            ", lFALSE, DATATYPE_INT ),       &
       GRIDDED_DATASETS_T("RELATIVE_HUMIDITY      ", lTRUE, DATATYPE_FLOAT )   ]
 
-  type (METHODS_LIST_T)  :: KNOWN_METHODS(6) =     &
-    [ METHODS_LIST_T("INTERCEPTION           "),   &
-      METHODS_LIST_T("EVAPOTRANSPIRATION     "),   &
-      METHODS_LIST_T("INFILTRATION           "),   &
-      METHODS_LIST_T("PRECIPITATION          "),   &
-      METHODS_LIST_T("FOG                    "),   &
-      METHODS_LIST_T("SOIL_MOISTURE          ")  ]
+  type (METHODS_LIST_T), parameter  :: KNOWN_METHODS(7) =   &
+    [ METHODS_LIST_T("INTERCEPTION           "),            &
+      METHODS_LIST_T("EVAPOTRANSPIRATION     "),            &
+      METHODS_LIST_T("INFILTRATION           "),            &
+      METHODS_LIST_T("PRECIPITATION          "),            &
+      METHODS_LIST_T("FOG                    "),            &
+      METHODS_LIST_T("SOIL_MOISTURE          "),            &
+      METHODS_LIST_T("FLOW_ROUTING           ")    ]
 
 contains
 

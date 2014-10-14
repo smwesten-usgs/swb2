@@ -26,7 +26,6 @@ module fog__monthly_grid
   public :: fog_monthly_grid_initialize, fog_monthly_grid_calculate, pFOG_RATIO
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pFOG_RATIO        ! data catalog object => FOG_RATIO grid
-  real (kind=c_float), allocatable     :: FOG(:)           ! 
   type (T_NETCDF4_FILE), pointer       :: pNCFILE ! pointer to OUTPUT NetCDF file
 
 contains
@@ -68,9 +67,6 @@ contains
     allocate ( pNCFILE, stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
 
-    allocate ( FOG( count( lActive ) ), stat=iStat)
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
-
     call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE, sVariableName="fog", &
       sVariableUnits="inches", iNX=iNX, iNY=iNY, &
       fX=dX, fY=dY, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=dY_lat, dpLon=dX_lon  )
@@ -80,9 +76,10 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine fog_monthly_grid_calculate( fRainfall, lActive, fDont_Care )
+  subroutine fog_monthly_grid_calculate( fRainfall, fFog, lActive, fDont_Care )
 
     real (kind=c_float), intent(in)        :: fRainfall(:)
+    real (kind=c_float), intent(inout)     :: fFog(:)
     logical (kind=c_bool), intent(in)      :: lActive(:,:)
     real (kind=c_float), intent(in)        :: fDont_Care(:,:)
 
@@ -126,14 +123,14 @@ contains
         iStride=[1_c_ptrdiff_t], &
         dpValues=[real( iNumDaysFromOrigin, kind=c_double)])
 
-      FOG = fRainfall * pack( pFOG_RATIO%pGrdBase%rData, lActive )
+      fFog = fRainfall * pack( pFOG_RATIO%pGrdBase%rData, lActive )
 
       call netcdf_put_packed_variable_array(NCFILE=pNCFILE, &
                    iVarID=pNCFILE%iVarID(NC_Z), &
                    iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
                    iCount=[1_c_size_t, int(iNY, kind=c_size_t), int(iNX, kind=c_size_t)],              &
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=FOG, lMask=lActive, rField=fDont_Care )
+                   rValues=fFog, lMask=lActive, rField=fDont_Care )
      
     end associate
 

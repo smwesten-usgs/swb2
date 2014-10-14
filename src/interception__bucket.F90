@@ -42,10 +42,11 @@ contains
   end subroutine interception_bucket_initialize
 
 
-  elemental function interception_bucket_calculate( iLanduseIndex, fPrecip )   result( fInterception )
+  elemental function interception_bucket_calculate( iLanduseIndex, fPrecip, fFog )   result( fInterception )
 
     integer (kind=c_int), intent(in) :: iLanduseIndex
     real (kind=c_float), intent(in)  :: fPrecip
+    real (kind=c_float), intent(in)  :: fFog
     real (kind=c_float)              :: fInterception
 
     !!! Need to come up with a module that provides the current day of year, month, day, year, and growing season
@@ -63,7 +64,7 @@ contains
 
     endif
 
-    fInterception = min( fPotentialInterception, fPrecip )
+    fInterception = min( fPotentialInterception, fPrecip + fFog )
 
  
   end function interception_bucket_calculate

@@ -62,6 +62,7 @@ module model_domain
     real (kind=c_float), allocatable       :: stream_storage(:)
          
     real (kind=c_float), allocatable       :: gross_precip(:)
+    real (kind=c_float), allocatable       :: fog(:)
     real (kind=c_float), allocatable       :: rainfall(:)
     real (kind=c_float), allocatable       :: snowfall(:)
 
@@ -69,10 +70,12 @@ module model_domain
     real (kind=c_float), allocatable       :: tmax(:)
     real (kind=c_float), allocatable       :: routing_fraction(:)
 
+    integer (kind=c_int), allocatable      :: index_order(:)
+
     procedure ( simple_method ), pointer         :: init_interception       => model_initialize_interception_bucket
     procedure ( simple_method ), pointer         :: init_infiltration       => model_initialize_infiltration_curve_number
     procedure ( simple_method ), pointer         :: init_reference_et       => model_initialize_et_hargreaves
-    procedure ( simple_method ), pointer         :: init_routing            => model_initialize_routing_D8
+    procedure ( simple_method ), pointer         :: init_routing            => model_initialize_routing_none
     procedure ( simple_method ), pointer         :: init_soil_moisture      => model_initialize_soil_moisture_thornthwaite_mather
     procedure ( simple_method ), pointer         :: init_snowfall           => model_initialize_snowfall_original
     procedure ( simple_method ), pointer         :: init_snowmelt           => model_initialize_snowmelt_original
@@ -80,10 +83,14 @@ module model_domain
     procedure ( simple_method ), pointer         :: init_fog                => model_initialize_fog_none
 
     procedure ( simple_method ), pointer         :: calc_interception      => model_calculate_interception_bucket
-    procedure ( simple_method ), pointer         :: calc_infiltration      => model_calculate_infiltration_curve_number
+
+    procedure ( simple_method_w_optional ), pointer   :: calc_infiltration => model_calculate_infiltration_curve_number
+    
     procedure ( simple_method ), pointer         :: calc_reference_et      => model_calculate_et_hargreaves
-    procedure ( simple_method ), pointer         :: calc_routing           => model_calculate_routing_D8
-    procedure ( simple_method ), pointer         :: calc_soil_moisture     => model_calculate_soil_moisture_thornthwaite_mather
+    procedure ( simple_method ), pointer         :: calc_routing           => model_calculate_routing_none
+
+    procedure ( simple_method_w_optional ), pointer  :: calc_soil_moisture => model_calculate_soil_moisture_thornthwaite_mather
+    
     procedure ( simple_method ), pointer         :: calc_snowfall          => model_calculate_snowfall_original
     procedure ( simple_method ), pointer         :: calc_snowmelt          => model_calculate_snowmelt_original    
     procedure ( simple_method ), pointer         :: get_precipitation_data => model_get_precip_normal
@@ -161,6 +168,15 @@ module model_domain
   end interface  
 
 
+  abstract interface
+    subroutine simple_method_w_optional( this, index )
+      import :: MODEL_DOMAIN_T, c_int
+      class ( MODEL_DOMAIN_T ), intent(inout)       :: this
+      integer (kind=c_int), intent(in), optional    :: index
+    end subroutine simple_method_w_optional
+  end interface  
+
+
   interface minmaxmean
     procedure :: minmaxmean_float
     procedure :: minmaxmean_int
@@ -228,7 +244,7 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
-    integer (kind=c_int)  :: iStat(26)
+    integer (kind=c_int)  :: iStat(29)
 
     iCount = count( this%active )
 
@@ -257,9 +273,11 @@ contains
     allocate( this%soil_storage(iCount), stat=iStat(23) )
     allocate( this%soil_storage_max(iCount), stat=iStat(24) )
     allocate( this%potential_recharge(iCount), stat=iStat(25) )
-    allocate( this%stream_storage(iCount), stat=iStat(26) )
+    allocate( this%fog(iCount), stat=iStat(26) )
+    allocate( this%stream_storage(iCount), stat=iStat(27) )
+    allocate( this%index_order(iCount), stat=iStat(28) )
 
-    allocate( OUTPUT(15), stat=iStat(26) )
+    allocate( OUTPUT(16), stat=iStat(29) )
 
     if ( any( iStat /= 0 ) )  call die("Problem allocating memory", __FILE__, __LINE__)
 
@@ -311,51 +329,55 @@ contains
       sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(4)%ncfile, sVariableName="infiltration", &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(4)%ncfile, sVariableName="runon", &
       sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(5)%ncfile, sVariableName="snowfall", &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(5)%ncfile, sVariableName="infiltration", &
       sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(6)%ncfile, sVariableName="snowmelt", &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(6)%ncfile, sVariableName="snowfall", &
       sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(7)%ncfile, sVariableName="snow_storage", &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(7)%ncfile, sVariableName="snowmelt", &
+      sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
+
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(8)%ncfile, sVariableName="snow_storage", &
       sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(8)%ncfile, sVariableName="soil_storage", &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(9)%ncfile, sVariableName="soil_storage", &
       sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(9)%ncfile, sVariableName="potential_recharge", &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(10)%ncfile, sVariableName="potential_recharge", &
       sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(10)%ncfile, sVariableName="reference_ET0", &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(11)%ncfile, sVariableName="reference_ET0", &
       sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(11)%ncfile, sVariableName="reference_ET0_adj", &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(12)%ncfile, sVariableName="reference_ET0_adj", &
       sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(12)%ncfile, sVariableName="tmin", &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(13)%ncfile, sVariableName="tmin", &
       sVariableUnits="degrees Fahrenheit", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(13)%ncfile, sVariableName="tmax", &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(14)%ncfile, sVariableName="tmax", &
       sVariableUnits="degrees Fahrenheit", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(14)%ncfile, sVariableName="available_water_content", &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(15)%ncfile, sVariableName="available_water_content", &
       sVariableUnits="inches per foot", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(15)%ncfile, sVariableName="interception_storage", &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(16)%ncfile, sVariableName="interception_storage", &
       sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
 
@@ -790,7 +812,7 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
-    this%array_output = unpack(this%infiltration, this%active, this%dont_care)
+    this%array_output = unpack(this%runon, this%active, this%dont_care)
 
     call netcdf_put_variable_array(NCFILE=OUTPUT(4)%ncfile, &
                    iVarID=OUTPUT(4)%ncfile%iVarID(NC_Z), &
@@ -799,7 +821,7 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
-    this%array_output = unpack(this%snowfall, this%active, this%dont_care)
+    this%array_output = unpack(this%infiltration, this%active, this%dont_care)
 
     call netcdf_put_variable_array(NCFILE=OUTPUT(5)%ncfile, &
                    iVarID=OUTPUT(5)%ncfile%iVarID(NC_Z), &
@@ -808,7 +830,7 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
-    this%array_output = unpack(this%snowmelt, this%active, this%dont_care)
+    this%array_output = unpack(this%snowfall, this%active, this%dont_care)
 
     call netcdf_put_variable_array(NCFILE=OUTPUT(6)%ncfile, &
                    iVarID=OUTPUT(6)%ncfile%iVarID(NC_Z), &
@@ -817,7 +839,7 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
-    this%array_output = unpack(this%snow_storage, this%active, this%dont_care)
+    this%array_output = unpack(this%snowmelt, this%active, this%dont_care)
 
     call netcdf_put_variable_array(NCFILE=OUTPUT(7)%ncfile, &
                    iVarID=OUTPUT(7)%ncfile%iVarID(NC_Z), &
@@ -826,7 +848,7 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
-    this%array_output = unpack(this%soil_storage, this%active, this%dont_care)
+    this%array_output = unpack(this%snow_storage, this%active, this%dont_care)
 
     call netcdf_put_variable_array(NCFILE=OUTPUT(8)%ncfile, &
                    iVarID=OUTPUT(8)%ncfile%iVarID(NC_Z), &
@@ -835,7 +857,7 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
-    this%array_output = unpack(this%potential_recharge, this%active, this%dont_care)
+    this%array_output = unpack(this%soil_storage, this%active, this%dont_care)
 
     call netcdf_put_variable_array(NCFILE=OUTPUT(9)%ncfile, &
                    iVarID=OUTPUT(9)%ncfile%iVarID(NC_Z), &
@@ -844,7 +866,7 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
-    this%array_output = unpack(this%reference_ET0, this%active, this%dont_care)
+    this%array_output = unpack(this%potential_recharge, this%active, this%dont_care)
 
     call netcdf_put_variable_array(NCFILE=OUTPUT(10)%ncfile, &
                    iVarID=OUTPUT(10)%ncfile%iVarID(NC_Z), &
@@ -853,7 +875,7 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
-    this%array_output = unpack(this%reference_ET0_adj, this%active, this%dont_care)
+    this%array_output = unpack(this%reference_ET0, this%active, this%dont_care)
 
     call netcdf_put_variable_array(NCFILE=OUTPUT(11)%ncfile, &
                    iVarID=OUTPUT(11)%ncfile%iVarID(NC_Z), &
@@ -862,7 +884,7 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
-    this%array_output = unpack(this%tmin, this%active, this%dont_care)
+    this%array_output = unpack(this%reference_ET0_adj, this%active, this%dont_care)
 
     call netcdf_put_variable_array(NCFILE=OUTPUT(12)%ncfile, &
                    iVarID=OUTPUT(12)%ncfile%iVarID(NC_Z), &
@@ -871,7 +893,7 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
-    this%array_output = unpack(this%tmax, this%active, this%dont_care)
+    this%array_output = unpack(this%tmin, this%active, this%dont_care)
 
     call netcdf_put_variable_array(NCFILE=OUTPUT(13)%ncfile, &
                    iVarID=OUTPUT(13)%ncfile%iVarID(NC_Z), &
@@ -880,7 +902,7 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
-    this%array_output = unpack(this%awc, this%active, this%dont_care)
+    this%array_output = unpack(this%tmax, this%active, this%dont_care)
 
     call netcdf_put_variable_array(NCFILE=OUTPUT(14)%ncfile, &
                    iVarID=OUTPUT(14)%ncfile%iVarID(NC_Z), &
@@ -889,11 +911,20 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
-
-    this%array_output = unpack(this%interception_storage, this%active, this%dont_care)
+    this%array_output = unpack(this%awc, this%active, this%dont_care)
 
     call netcdf_put_variable_array(NCFILE=OUTPUT(15)%ncfile, &
                    iVarID=OUTPUT(15)%ncfile%iVarID(NC_Z), &
+                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
+                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
+                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
+                   rValues=this%array_output )
+
+
+    this%array_output = unpack(this%interception_storage, this%active, this%dont_care)
+
+    call netcdf_put_variable_array(NCFILE=OUTPUT(16)%ncfile, &
+                   iVarID=OUTPUT(16)%ncfile%iVarID(NC_Z), &
                    iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
                    iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
@@ -973,6 +1004,7 @@ contains
     this%interception_storage = this%interception_storage + this%interception
 
     this%reference_ET0_adj = this%reference_ET0 - this%interception_storage
+
     where ( this%reference_ET0_adj >= 0.0_c_float ) ! potential ET evaporates all interception storage water
     
        this%interception_storage = 0.0_c_float
@@ -1085,15 +1117,45 @@ contains
 
   subroutine calculate_soil_mass_balance_sub(this)
 
+    use routing__D8
+
     class (MODEL_DOMAIN_T), intent(inout)   :: this
 
- 
-    this%inflow = this%runon + this%gross_precip - this%interception + this%snowmelt
-    call this%calc_infiltration()
-    this%runoff = this%inflow - this%infiltration
+    ! [ LOCALS ]
+    integer (kind=c_int) :: index
 
-    call this%calc_soil_moisture
+!     if ( associated(this%calc_routing) ) then
 
+      do index=lbound(this%runon,1), ubound(this%runon,1)
+
+        this%inflow(index) =   this%runon(index)                      &
+                             + this%gross_precip(index)               &
+                             + this%fog(index)                        &
+                             + this%snowmelt(index)                   &
+                             - this%interception(index)                      
+                             
+        call this%calc_infiltration( index )
+
+        this%runoff(index) = this%inflow(index) - this%infiltration(index)
+
+        if ( TARGET_INDEX( index ) /= D8_UNDETERMINED ) then
+          this%runon(TARGET_INDEX( index ) ) = this%runoff(index)
+
+        endif
+
+        call this%calc_soil_moisture(index)
+
+      enddo  
+
+!     else
+
+!       this%inflow = this%runon + this%gross_precip - this%interception + this%snowmelt
+!       call this%calc_infiltration()
+!       this%runoff = this%inflow - this%infiltration
+
+!       call this%calc_soil_moisture
+
+!     endif
 
 
   end subroutine calculate_soil_mass_balance_sub
@@ -1173,15 +1235,15 @@ contains
 
       if ( sMethodName .strequal. "D8" ) then
 
-        this%init_fog => model_initialize_routing_D8
-        this%calc_fog => model_calculate_routing_D8
+        this%init_routing => model_initialize_routing_D8
+        this%calc_routing => model_calculate_routing_D8
 
         call LOGS%WRITE( "==> D8 FLOW ROUTING submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
       else
 
-        this%init_fog => model_initialize_routing_none
-        this%calc_fog => model_calculate_routing_none
+        this%init_routing => model_initialize_routing_none
+        this%calc_routing => model_calculate_routing_none
 
         call LOGS%WRITE( "==> NULL FLOW ROUTING submodel selected -- NO routing will be performed.", &
             iLogLevel = LOG_DEBUG, lEcho = lFALSE )
@@ -1316,7 +1378,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    this%interception = interception_bucket_calculate( this%landuse_index, this%gross_precip )
+    this%interception = interception_bucket_calculate( this%landuse_index, this%gross_precip, this%fog )
 
   end subroutine model_calculate_interception_bucket
 
@@ -1338,14 +1400,6 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_initialize_routing_none(this)
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-  end subroutine model_initialize_routing_none  
-
-!--------------------------------------------------------------------------------------------------
-
   subroutine model_initialize_routing_D8(this)
 
     use routing__D8
@@ -1355,13 +1409,6 @@ contains
     call routing_D8_initialize( this%active )
 
   end subroutine model_initialize_routing_D8  
-!--------------------------------------------------------------------------------------------------
-
-  subroutine model_calculate_routing_none(this)
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-  end subroutine model_calculate_routing_none  
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1373,6 +1420,22 @@ contains
 
 
   end subroutine model_calculate_routing_D8  
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_routing_none(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    
+  end subroutine model_initialize_routing_none  
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_routing_none(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_calculate_routing_none  
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1547,18 +1610,32 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_infiltration_curve_number(this)
+  subroutine model_calculate_infiltration_curve_number(this, index )
 
     use infiltration__curve_number
 
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    class (MODEL_DOMAIN_T), intent(inout)       :: this
+    integer (kind=c_int), intent(in), optional  :: index
 
-    this%infiltration = infiltration_curve_number_calculate( &
-      iLanduseIndex=this%landuse_index, &
-      iSoilsIndex=this%soil_group, &
-      fSoilStorage=this%soil_storage, &
-      fSoilStorage_Max=this%soil_storage_max, &
-      fInflow=this%inflow, fCFGI=CFGI )
+    if ( present(index) ) then
+
+      this%infiltration( index ) = infiltration_curve_number_calculate( &
+        iLanduseIndex=this%landuse_index( index ), &
+        iSoilsIndex=this%soil_group( index ), &
+        fSoilStorage=this%soil_storage( index ), &
+        fSoilStorage_Max=this%soil_storage_max( index ), &
+        fInflow=this%inflow( index ), fCFGI=CFGI( index ) )
+
+    else
+
+      this%infiltration = infiltration_curve_number_calculate( &
+        iLanduseIndex=this%landuse_index, &
+        iSoilsIndex=this%soil_group, &
+        fSoilStorage=this%soil_storage, &
+        fSoilStorage_Max=this%soil_storage_max, &
+        fInflow=this%inflow, fCFGI=CFGI )
+
+    endif
 
   end subroutine model_calculate_infiltration_curve_number
 
@@ -1576,18 +1653,32 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_soil_moisture_thornthwaite_mather( this )
+  subroutine model_calculate_soil_moisture_thornthwaite_mather( this, index )
 
     use soil_moisture__thornthwaite_mather
 
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    class (MODEL_DOMAIN_T), intent(inout)       :: this
+    integer (kind=c_int), intent(in), optional  :: index
 
-    call soil_moisture_thornthwaite_mather_calculate(fAPWL=APWL,                                   &
-                                                      fSoilStorage=this%soil_storage,               &
-                                                      fSoilStorage_Excess=this%potential_recharge,  &
-                                                      fSoilStorage_Max=this%soil_storage_max,       &
-                                                      fInfiltration=this%infiltration,              &
-                                                      fReference_ET=this%reference_ET0_adj )
+    if ( present( index ) ) then
+
+      call soil_moisture_thornthwaite_mather_calculate(fAPWL=APWL(index),                                    &
+                                                        fSoilStorage=this%soil_storage(index),               &
+                                                        fSoilStorage_Excess=this%potential_recharge(index),  &
+                                                        fSoilStorage_Max=this%soil_storage_max(index),       &
+                                                        fInfiltration=this%infiltration(index),              &
+                                                        fReference_ET=this%reference_ET0_adj(index) )
+
+    else
+
+      call soil_moisture_thornthwaite_mather_calculate(fAPWL=APWL,                                    &
+                                                        fSoilStorage=this%soil_storage,               &
+                                                        fSoilStorage_Excess=this%potential_recharge,  &
+                                                        fSoilStorage_Max=this%soil_storage_max,       &
+                                                        fInfiltration=this%infiltration,              &
+                                                        fReference_ET=this%reference_ET0_adj )
+
+    endif
 
   end subroutine model_calculate_soil_moisture_thornthwaite_mather
 
@@ -1598,6 +1689,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     !> Nothing here to see. Initialization not really needed for the "normal" method.
+    this%fog = 0.0_c_float
 
   end subroutine model_initialize_fog_none
 
@@ -1640,7 +1732,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call fog_monthly_grid_calculate( fRainfall=this%rainfall, lActive=this%active, &
+    call fog_monthly_grid_calculate( fRainfall=this%rainfall, fFog=this%fog, lActive=this%active, &
              fDont_Care=this%dont_care )
 
   end subroutine model_calculate_fog_monthly_grid  
