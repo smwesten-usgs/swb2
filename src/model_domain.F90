@@ -1418,6 +1418,8 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
+    call routing_D8_calculate( fRunoff=this%runoff, fRunon=this%runon )
+
 
   end subroutine model_calculate_routing_D8  
 

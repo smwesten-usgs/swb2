@@ -152,15 +152,22 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int)   :: iOrderIndex
- 
+    logical (kind=c_bool)  :: lFound
+
+    lFound = lFALSE
+
     do iOrderIndex = lbound(COL1D,1), ubound(COL1D,1) 
 
       if( COL1D(iOrderIndex) == iCol  .and.  ROW1D(iOrderIndex) == iRow ) then
       	iIndex = iOrderIndex
+        lFound = lTRUE
       	exit
       endif
 
     enddo
+
+    if ( .not. lFound ) call warn( "No index found for cell at col: "//asCharacter( iCol ) &
+      //", row: "//asCharacter( iRow ) )
 
   end function routing_D8_get_index
 
@@ -429,8 +436,26 @@ main_loop: do
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine routing_D8_calculate
 
+  subroutine routing_D8_calculate( fRunoff, fRunon )
+
+    real (kind=c_float), intent(in)       :: fRunoff(:)
+    real (kind=c_float), intent(inout)    :: fRunOn(:)
+
+    integer (kind=c_int)    :: iIndex
+
+    fRunon = 0.0_c_float
+
+    do iIndex=lbound(TARGET_INDEX, 1),ubound(TARGET_INDEX, 1)
+
+      if ( TARGET_INDEX(iIndex) >= lbound(TARGET_INDEX, 1) &
+        .and. TARGET_INDEX( iIndex ) <= ubound(TARGET_INDEX, 1) ) then
+
+        fRunon( TARGET_INDEX( iIndex ) ) = fRunoff( ORDER_INDEX( iIndex ) )
+
+      endif
+
+    enddo
 
   end subroutine routing_D8_calculate
 
