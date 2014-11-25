@@ -1123,27 +1123,34 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int) :: index
+    integer (kind=c_int) :: orderindex
 
 !     if ( associated(this%calc_routing) ) then
 
+      this%runon = 0.0_c_float
+
       do index=lbound(this%runon,1), ubound(this%runon,1)
 
-        this%inflow(index) =   this%runon(index)                      &
-                             + this%gross_precip(index)               &
-                             + this%fog(index)                        &
-                             + this%snowmelt(index)                   &
-                             - this%interception(index)                      
+        orderindex = ORDER_INDEX( index )
+
+        this%inflow(orderindex) =   this%runon(orderindex)                      &
+                                  + this%gross_precip(orderindex)               &
+                                  + this%fog(orderindex)                        &
+                                  + this%snowmelt(orderindex)                   &
+                                  - this%interception(orderindex)                      
                              
-        call this%calc_infiltration( index )
+        call this%calc_infiltration( orderindex )
 
-        this%runoff(index) = this%inflow(index) - this%infiltration(index)
+        this%runoff(orderindex) = this%inflow(orderindex) - this%infiltration(orderindex)
 
-        if ( TARGET_INDEX( index ) /= D8_UNDETERMINED ) then
-          this%runon(TARGET_INDEX( index ) ) = this%runoff(index)
+        if ( TARGET_INDEX( orderindex ) /= D8_UNDETERMINED ) then
+          this%runon(TARGET_INDEX( orderindex ) ) = this%runoff(orderindex)
+          print *, orderindex, TARGET_INDEX( orderindex ), this%inflow(orderindex), this%runoff(orderindex), &
+            this%runon(TARGET_INDEX( orderindex ) )
 
         endif
 
-        call this%calc_soil_moisture(index)
+        call this%calc_soil_moisture(orderindex)
 
       enddo  
 
@@ -1418,7 +1425,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call routing_D8_calculate( fRunoff=this%runoff, fRunon=this%runon )
+!    call routing_D8_calculate( fRunoff=this%runoff, fRunon=this%runon )
 
 
   end subroutine model_calculate_routing_D8  

@@ -10,7 +10,7 @@ module routing__D8
 
   private
 
-  public :: routing_D8_initialize, routing_D8_calculate, D8_UNDETERMINED, TARGET_INDEX
+  public :: routing_D8_initialize, routing_D8_calculate, D8_UNDETERMINED, TARGET_INDEX, ORDER_INDEX
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pD8_FLOWDIR    ! data catalog object => D8 flow direction grid
 
@@ -39,6 +39,13 @@ module routing__D8
   integer (kind=c_int), parameter       :: D8_NORTHEAST    = 128
 
   integer (kind=c_int), parameter       :: D8_UNDETERMINED = -999
+
+  ! idea here is to create an array of row and column numbers, then use the 
+  ! PACK statement to create a vector of row-column numbers in the same order that
+  ! the rest of the vectors are packed.
+
+  ! the vector of row-column numbers may then be used to make the required D8 routing connections.
+  ! there shouldn't be any difference between ROW_INDEX, COL_INDEX, and ORDER_INDEX
 
 contains
 
@@ -165,9 +172,6 @@ contains
       endif
 
     enddo
-
-    if ( .not. lFound ) call warn( "No index found for cell at col: "//asCharacter( iCol ) &
-      //", row: "//asCharacter( iRow ) )
 
   end function routing_D8_get_index
 
