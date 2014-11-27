@@ -15,8 +15,6 @@ module swb_grid
 
   implicit none
 
-  private
-
   integer (kind=c_int), public, parameter :: GRID_DATATYPE_INT = 0
   integer (kind=c_int), public, parameter :: GRID_DATATYPE_REAL = 1
 !   integer (kind=c_int), public, parameter :: GRID_DATATYPE_CELL_GRID = 2
@@ -149,8 +147,8 @@ module swb_grid
   integer (kind=c_int), parameter :: FOUR_CELLS = 1
   integer (kind=c_int), parameter :: EIGHT_CELLS = 2
 
-  integer (kind=c_int), parameter :: COLUMN = 1
-  integer (kind=c_int), parameter :: ROW = 2
+  integer (kind=c_int), parameter, private :: COLUMN = 1
+  integer (kind=c_int), parameter, private :: ROW = 2
 
   !> @todo change these global (module) variables to local variables
   integer (kind=c_int) :: LU_TEMP, LU_GRID

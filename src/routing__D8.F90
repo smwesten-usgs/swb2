@@ -18,7 +18,7 @@ module routing__D8
   integer (kind=c_int), allocatable     :: iTargetCol(:,:)
   logical (kind=c_bool), allocatable    :: lDownhillMarked(:,:)
   integer (kind=c_int), allocatable     :: iSumOfUpslopeCells(:,:)
-  integer (kind=c_int), allocatable     :: iNumberOfConnections(:,:)
+  integer (kind=c_int), allocatable     :: iNumberOfUpslopeConnections(:,:)
   integer (kind=c_int), allocatable     :: ROW2D(:,:)
   integer (kind=c_int), allocatable     :: COL2D(:,:) 
   integer (kind=c_int), allocatable     :: ROW1D(:)
@@ -101,7 +101,7 @@ contains
     allocate( iSumOfUpslopeCells( iNX, iNY ), stat=iStat )
     call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
 
-    allocate( iNumberOfConnections( iNX, iNY ), stat=iStat )
+    allocate( iNumberOfUpslopeConnections( iNX, iNY ), stat=iStat )
     call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
 
     allocate( ROW_INDEX( count( lActive) ), stat=iStat )
@@ -261,6 +261,8 @@ contains
 
   subroutine routing_D8_determine_solution_order( lActive )
 
+    use swb_grid
+
     logical (kind=c_bool), intent(in)    :: lActive(:,:)
 
     ! [ LOCALS ]
@@ -271,11 +273,15 @@ contains
     integer (kind=c_int)  :: iNumberOfChangedCells
     integer (kind=c_int)  :: iCol_lbound, iCol_ubound
     integer (kind=c_int)  :: iRow_lbound, iRow_ubound
-    integer (kind=c_int)  :: iTempSum, iTempConnections
-    logical (kind=c_bool) :: lAnyUnmarkedUpslopeCells 
+    integer (kind=c_int)  :: iUpslopeSum, iUpslopeConnections
+    logical (kind=c_bool) :: lAnyUnmarkedUpslopeCells
+    logical (kind=c_bool) :: lCircular 
     integer (kind=c_int)  :: iNumberRemaining
-    integer (kind=c_int)  :: iOrderIndex
-    integer (kind=c_int)  :: iIndex
+    integer (kind=c_int)  :: iIndex, k, iCount
+    integer (kind=c_int)  :: iDelta
+    integer (kind=c_int)  :: iPasses
+    integer (kind=c_int)  :: iPassesWithoutChange
+    type (GENERAL_GRID_T), pointer  :: pTempGrid
 
     iCol_lbound = lbound(lActive, 1)
     iCol_ubound = ubound(lActive, 1)
@@ -286,78 +292,21 @@ contains
     lDownhillMarked = lFALSE
     iSumOfUpslopeCells = 0_c_int
 
-    iOrderIndex = 0
+    iIndex = 0
+    iPasses = 0
+    iPassesWithoutChange = 0
 
-    ! first pass through: simply make a note of how many upslope connections feed into each cell
-    do iColnum=iCol_lbound, iCol_ubound
-	    do iRownum=iRow_lbound, iRow_ubound
-
-        ! ignore current cell if it is not an active cell
-	      if ( .not. lActive(iColnum, iRownum) ) cycle
-	        
-        iTempConnections = 0_c_int
-
-        do iColsrch=max( iColNum-1, iCol_lbound),min( iColnum+1, iCol_ubound) 			    
-          do iRowsrch=max( iRowNum-1, iRow_lbound),min( iRownum+1, iRow_ubound) 
-
-            ! ignore search cell if it is not an active cell
-	          if ( .not. lActive(iColsrch, iRowsrch) ) cycle
-	      
-            ! no need to consider current cell
-            if ( ( iColsrch == iColnum ) .and. ( iRowsrch == iRownum ) )  cycle
-
-	            ! if adjacent cell points to current cell, note it and move on	
-	            if ( ( iTargetCol(iColsrch, iRowsrch) == iColnum ) &
-	            	.and. ( iTargetRow(iColsrch, iRowsrch) == iRownum ) )    &
-
-	                iTempConnections = iTempConnections + 1 
-	  
-              ! if the current cell points back at the search cell, we have
-              ! circular flow. convert the current cell to an undetermined
-              ! flow direction	  
-              if ( ( iTargetCol(iColnum, iRownum) == iColsrch )      &
-	            	.and. ( iTargetRow(iColnum, iRownum) == iRowsrch ) ) then
-
-                iTargetCol( iColnum, iRownum ) = D8_UNDETERMINED
-                iTargetRow( iColnum, iRownum ) = D8_UNDETERMINED
-
-              endif                 
-
-          enddo                  
-        enddo    
-
-        iNumberOfConnections(iColnum, iRownum) = iTempConnections
-        
-        if ( iTempConnections == 0 ) then
-          lDownhillMarked(iColnum, iRownum) = lTRUE
-          iOrderIndex = iOrderIndex + 1
-          COLUMN_INDEX(iOrderIndex) = iColnum
-          ROW_INDEX(iOrderIndex) = iRownum
-          ORDER_INDEX(iOrderIndex) = routing_D8_get_index( iColnum, iRownum ) 
-
-          if ( iTargetCol(iColNum,iRowNum) /= D8_UNDETERMINED           &
-          	 .and. iTargetRow(iColNum, iRowNum) /= D8_UNDETERMINED ) then
-               TARGET_INDEX(iOrderIndex) = routing_D8_get_index( iTargetCol(iColnum, iRownum ), &
-          	      iTargetRow( iColNum, iRowNum ) )
-          else
-          
-            TARGET_INDEX(iOrderIndex) = D8_UNDETERMINED
-
-          endif
-
-        endif  
-
-	    enddo
-	  enddo            
-
-    print *, "### at end of first loop of cell ordering... ", count( lDownhillMarked ), " cells marked so far " &
-      //"out of ", count( lActive ), " active cells."
+    pTempGrid=>grid_Create( BNDS%iNumCols, BNDS%iNumRows, BNDS%fX_ll, BNDS%fY_ll, &
+      BNDS%fX_ur, BNDS%fY_ur, DATATYPE_INT )
 
 
 main_loop: do
 
       iNumberOfChangedCells = 0_c_int
+      iDelta = 0_c_int
+      iPasses = iPasses + 1
 
+      ! iterate over entire model domain
 	    do iColnum=iCol_lbound, iCol_ubound
 	    	do iRownum=iRow_lbound, iRow_ubound
 
@@ -365,30 +314,46 @@ main_loop: do
 	        if ( lDownhillMarked(iColnum, iRownum) ) cycle
 
           iNumberOfChangedCells = iNumberOfChangedCells + 1
-	        iTempSum = 0_c_int
-	        iTempConnections = 0_c_int
+	        iUpslopeSum = 0_c_int
+	        iUpslopeConnections = 0_c_int
 	        lAnyUnmarkedUpslopeCells = lFALSE
+          lCircular = lFALSE
 
+          ! search the 8 cells immediately adjacent to the current cell
 	local_search: do iColsrch=max( iColNum-1, iCol_lbound),min( iColnum+1, iCol_ubound) 			    
 	                do iRowsrch=max( iRowNum-1, iRow_lbound),min( iRownum+1, iRow_ubound) 
 
 	 			            ! if adjacent cell points to current cell, note it and move on	
 	 			            if ( ( iTargetCol(iColsrch, iRowsrch) == iColnum ) &
 	 			            	.and. ( iTargetRow(iColsrch, iRowsrch) == iRownum ) ) then
-	 			               			              
+	 			               			
+                      ! if the target of the current cell points back at the adjacent
+                      ! cell, mark current cell as having a "circular" connection      
+                      if ( ( iTargetCol( iColNum, iRowNum ) == iColsrch )                &
+                        .and. ( iTargetRow( iColNum, iRowNum ) == iRowsrch ) )  lCircular = lTRUE
+
+                      ! if adjacent cell falls outside the area of active cells,
+                      ! ignore it and move on                    
 	 			              if ( .not. lActive( iColsrch, iRowsrch ) ) then
 
 	 			              	cycle
+ 
+                      ! if the adjacent cell is marked (that is, still has unresolved
+                      ! upslope contributions), add the 1 to the number of connections
+                      ! and add the adjacent cells' sum of upslope cells to the
+                      ! current cells' running sum of upslope cells
+	 			              elseif(	lDownhillMarked( iColsrch, iRowsrch ) ) then
 
-	 			              elseif(	.not. lDownhillMarked( iColsrch, iRowsrch ) ) then
-
-	                      lAnyUnmarkedUpslopeCells = lTRUE
-	 			              	exit local_search
+                        iUpslopeSum = iUpslopeSum + iSumOfUpslopeCells(iColsrch, iRowsrch)
+                        iUpslopeConnections = iUpslopeConnections + 1 
 	 			           	  
+                      ! add number of upslope cells and connections to temporary variables
+                      ! if we get to the end of the search and find no unmarked adjacent cells,
+                      ! we have determined the number of upslope contributing cells and will
+                      ! be able to mark the current cell 
 	 			           	  else
 
-	 			                iTempSum = iTempSum + iSumOfUpslopeCells(iColsrch, iRowsrch)
-	 			                iTempConnections = iTempConnections + 1 
+                        lAnyUnmarkedUpslopeCells = lTRUE
 	 			           	  
 	 			           	  endif
 
@@ -401,37 +366,111 @@ main_loop: do
 	              ! contributing flow to the current cell? if so, ignore and move on. otherwise,
 	              ! mark current cell as marked, update stats, and continue with next cell
 
-	              if ( .not. lAnyUnmarkedUpslopeCells ) then
 
-	                iSumOfUpslopeCells(iColnum, iRownum) = iTempSum
-	                iNumberOfConnections(iColnum, iRownum) = iTempConnections
-	                lDownhillMarked(iColnum, iRownum) = lTRUE
-                  iOrderIndex = iOrderIndex + 1
-                  COLUMN_INDEX(iOrderIndex) = iColnum
-                  ROW_INDEX(iOrderIndex) = iRownum
-                  ORDER_INDEX(iOrderIndex) = routing_D8_get_index( iColnum, iRownum )
-				
-				          if ( iTargetCol(iColNum,iRowNum) /= D8_UNDETERMINED           &
-				          	 .and. iTargetRow(iColNum, iRowNum) /= D8_UNDETERMINED ) then
-				               TARGET_INDEX(iOrderIndex) = routing_D8_get_index( iTargetCol(iColnum, iRownum ), &
-				          	      iTargetRow( iColNum, iRowNum ) )
-				          else
-				          
-				            TARGET_INDEX(iOrderIndex) = D8_UNDETERMINED
+!           if ( iUpstreamCount == 0  &
+!             .or. (iUpstreamCount == 1 .and. lCircular)) then
+!             iNChange = iNChange+1
+!             cel%lDownhillMarked = lTRUE
+!             iOrderCount = iOrderCount+1
+!             iOrderCol(iOrderCount) = iCol
+!             iOrderRow(iOrderCount) = iRow
+!             !write(UNIT=LU_LOG,FMT=*) 'found ',iOrderCount, iRow, iCol
+!           elseif ( iNumIterationsNochange > 10 ) then
+!             ! convert offending cell into a depression
+!             ! we've gotten to this point because flow paths are circular;
+!             ! this is likely in a flat area of the DEM, and is in reality
+!             ! likely to be a depression
+!             iNChange = iNChange+1
+!             cel%lDownhillMarked = lTRUE
+!             cel%iFlowDir = 0
+!             iOrderCount = iOrderCount+1
+!             iOrderCol(iOrderCount) = iCol
+!             iOrderRow(iOrderCount) = iRow
+!             !write(UNIT=LU_LOG,FMT=*) 'found ',iOrderCount, iRow, iCol
 
-		              endif
+	              if ( ( .not. lAnyUnmarkedUpslopeCells ) &
+                  .or. (iUpslopeConnections == 1 .and. lCircular ) ) then
+
+                  iDelta = iDelta + 1
+	                iSumOfUpslopeCells( iColnum, iRownum ) = iUpslopeSum
+	                iNumberOfUpslopeConnections( iColnum, iRownum ) = iUpslopeConnections
+	                lDownhillMarked( iColnum, iRownum ) = lTRUE
+                  iIndex = iIndex + 1
+                  COLUMN_INDEX( iIndex ) = iColnum
+                  ROW_INDEX( iIndex ) = iRownum
+                  ORDER_INDEX( iIndex ) = routing_D8_get_index( iColnum, iRownum )
+
+                  if ( lCircular )  TARGET_INDEX( iIndex ) = D8_UNDETERMINED
+
+                elseif ( iPassesWithoutChange > 10 ) then
+
+                  iDelta = iDelta + 1
+                  iSumOfUpslopeCells( iColnum, iRownum ) = iUpslopeSum
+                  iNumberOfUpslopeConnections( iColnum, iRownum ) = iUpslopeConnections
+                  lDownhillMarked( iColnum, iRownum ) = lTRUE
+                  iIndex = iIndex + 1
+                  COLUMN_INDEX( iIndex ) = iColnum
+                  ROW_INDEX( iIndex ) = iRownum
+                  ORDER_INDEX( iIndex ) = routing_D8_get_index( iColnum, iRownum )
+
+                  TARGET_INDEX( iIndex ) = D8_UNDETERMINED
 
                 endif
 
 	      enddo  		
 	  	enddo
 
-      if (iNumberOfChangedCells == 0) exit main_loop
+!      if (iNumberOfChangedCells == 0) exit main_loop
 
       iNumberRemaining = count( lActive ) - count( lDownhillMarked )
 
+      if ( iNumberRemaining==0 )   exit main_loop
+
       print *, "### determining solution order... ", count( lDownhillMarked ), " cells marked so far " &
-        //"out of ", count( lActive ), " active cells."  
+        //"out of ", count( lActive ), " active cells." 
+
+
+      if ( iDelta==0 ) then
+
+        iPassesWithoutChange = iPassesWithoutChange + 1
+
+        where( lDownHillMarked .or.  ( .not. lActive ) )
+          pTempGrid%iData = -1
+        elsewhere
+          pTempGrid%iData = pD8_FLOWDIR%pGrdBase%iData
+        end where
+
+        write(*,"(/,1x,'Summary of remaining unmarked cells')")
+
+        ! loop over possible (legal) values of the flow direction grid
+        do k=0,128
+          iCount=COUNT(.not. lDownHillMarked &
+            .and. pD8_FLOWDIR%pGrdBase%iData==k .and. lActive )
+          if(iCount>0) then
+            write(*,FMT="(3x,i8,' unmarked grid cells have flowdir value: ',i8)") &
+              iCount, k
+          end if
+        end do
+
+        write(*,FMT="(3x,a)") repeat("-",60)
+        write(*,FMT="(3x,i8,' Total cells with nonzero flow " &
+          //"direction values')") count( pD8_FLOWDIR%pGrdBase%iData > 0 )
+
+
+        call grid_WriteArcGrid("iteration"//asCharacter(iPasses)// &
+          "problem_gridcells.asc", pTempGrid)
+
+      end if
+
+
+
+
+
+
+
+
+
+
 
   	enddo main_loop
 
