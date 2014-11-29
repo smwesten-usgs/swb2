@@ -42,7 +42,7 @@ module sm_FAO56
 
   contains
 
-  subroutine et_kc_initialize()
+  subroutine sm_FAO56_initialize()
 
     ! [ LOCALS ]
     type (STRING_LIST_T)             :: slREW, slTEW
@@ -104,7 +104,7 @@ module sm_FAO56
    call PARAMS%get_values( "Mean_Plant_Height", this%fMean_plant_height(:) )
 
 
-  end subroutine et_kc_initialize
+  end subroutine sm_FAO56_initialize
 
 !------------------------------------------------------------------------------
 
@@ -114,7 +114,7 @@ module sm_FAO56
  !! @param[inout] pIRRIGATION pointer to a single line of information in the irrigation file.
  !! @param[in] iThreshold either the current day of year or the number of growing degree days.
  !! @retval rKcb Basal crop coefficient given the irrigation table entries and the current threshold values.
- function et_kc_UpdateCropCoefficient( iFAOIndex, iThreshold )  result(fKcb)
+ function sm_FAO56_UpdateCropCoefficient( iFAOIndex, iThreshold )  result(fKcb)
 
   integer (kind=c_int), intent(in)   :: iFAOIndex
   integer (kind=c_int), intent(in)   :: iThreshold
@@ -161,12 +161,12 @@ module sm_FAO56
 
   end associate
 
-end function et_kc_UpdateCropCoefficient
+end function sm_FAO56_UpdateCropCoefficient
 
 !------------------------------------------------------------------------------
 
 !>
-function et_kc_CalcEvaporationReductionCoefficient(rTEW, rREW, rDeficit)  result(rKr)
+function sm_FAO56_CalcEvaporationReductionCoefficient(rTEW, rREW, rDeficit)  result(rKr)
 
   ! [ ARGUMENTS ]
   real (kind=c_float) :: rTEW
@@ -184,7 +184,7 @@ function et_kc_CalcEvaporationReductionCoefficient(rTEW, rREW, rDeficit)  result
     rKr = 0.
   endif
 
-end function et_kc_CalcEvaporationReductionCoefficient
+end function sm_FAO56_CalcEvaporationReductionCoefficient
 
 !------------------------------------------------------------------------------
 
@@ -192,7 +192,7 @@ end function et_kc_CalcEvaporationReductionCoefficient
 !! vegetation during the growing season
 !!
 !!@note Implemented as equation 76, FAO-56, Allen and others
-function et_kc_CalcFractionExposedAndWettedSoil( iFAOIndex, fKcb)   result (f_few)
+function sm_FAO56_CalcFractionExposedAndWettedSoil( iFAOIndex, fKcb)   result (f_few)
 
   integer (kind=c_int), intent(in)     :: iFAOIndex
   real (kind=c_float), intent(in)      :: fKcb
@@ -219,7 +219,7 @@ function et_kc_CalcFractionExposedAndWettedSoil( iFAOIndex, fKcb)   result (f_fe
   if ( f_few < 0_c_float ) f_few = 0_c_float
   if ( f_few > 1_c_float ) f_few = 1_c_float
 
-end function et_kc_CalcFractionExposedAndWettedSoil
+end function sm_FAO56_CalcFractionExposedAndWettedSoil
 
 !------------------------------------------------------------------------------
 
@@ -237,7 +237,7 @@ end function et_kc_CalcFractionExposedAndWettedSoil
 !!     the time that the crop is planted.
 !! @retval rZr_i current active rooting depth.
 !! @note Implemented as equation 8-1 (Annex 8), FAO-56, Allen and others.
-function et_kc_CalcEffectiveRootDepth(iFAOIndex, fZr_max, iThreshold) 	result(fZr_i)
+function sm_FAO56_CalcEffectiveRootDepth(iFAOIndex, fZr_max, iThreshold) 	result(fZr_i)
 
   integer (kind=c_int), intent(in)    :: iFAOIndex 
 	real (kind=c_float), intent(in)     :: fZr_max
@@ -269,14 +269,14 @@ function et_kc_CalcEffectiveRootDepth(iFAOIndex, fZr_max, iThreshold) 	result(fZ
 
   endif
 
-end function et_kc_CalcEffectiveRootDepth
+end function sm_FAO56_CalcEffectiveRootDepth
 
 !------------------------------------------------------------------------------
 
 !> This function estimates Ke, the bare surface evaporation coefficient
 !!
 !! @note Implemented as equation 71, FAO-56, Allen and others
-function et_kc_CalcSurfaceEvaporationCoefficient( iFAOIndex, fKr, fKcb )     result(fKe)
+function sm_FAO56_CalcSurfaceEvaporationCoefficient( iFAOIndex, fKr, fKcb )     result(fKe)
 
   integer (kind=c_int), intent(in)     :: iFAOIndex
   real (kind=c_float), intent(in)      :: fKr
@@ -285,13 +285,13 @@ function et_kc_CalcSurfaceEvaporationCoefficient( iFAOIndex, fKr, fKcb )     res
 
   fKe = fKr * ( rKcb_max(iFAOIndex) - fKcb )
 
-end function et_kc_CalcSurfaceEvaporationCoefficient
+end function sm_FAO56_CalcSurfaceEvaporationCoefficient
 
 !------------------------------------------------------------------------------
 
 !> This subroutine updates the total available water (TAW)
 !> (water within the rootzone) for a gridcell
-subroutine et_kc_CalcTotalAvailableWater(fTotalAvailableWater, fReadilyAvailableWater, &
+subroutine sm_FAO56_CalcTotalAvailableWater(fTotalAvailableWater, fReadilyAvailableWater, &
                 iFAOIndex, fAvailableWaterCapacity, fCurrentRootingDepth )
 
   real (kind=c_float), intent(out)      :: fTotalAvailableWater
@@ -303,14 +303,14 @@ subroutine et_kc_CalcTotalAvailableWater(fTotalAvailableWater, fReadilyAvailable
   fTotalAvailableWater = fCurrentRootingDepth * fAvailableWaterCapacity
   fReadilyAvailableWater = fTotalAvailableWater * fDepletion_fraction(iFAOIndex)
 
-  end subroutine et_kc_CalcTotalAvailableWater
+  end subroutine sm_FAO56_CalcTotalAvailableWater
 
 !------------------------------------------------------------------------------
 
 !> This function estimates Ks, water stress coefficient
 !!
 !! @note Implemented as equation 84, FAO-56, Allen and others
-function et_kc_CalcWaterStressCoefficient( iFAOIndex, fDeficit, &
+function sm_FAO56_CalcWaterStressCoefficient( iFAOIndex, fDeficit, &
                       fTotalAvailableWater, fReadilyAvailableWater )      result(fKs)
 
   integer (kind=c_int), intent(in)     :: iFAOIndex
@@ -335,11 +335,11 @@ function et_kc_CalcWaterStressCoefficient( iFAOIndex, fDeficit, &
   
   endif
 
-end function et_kc_CalcWaterStressCoefficient
+end function sm_FAO56_CalcWaterStressCoefficient
 
 !------------------------------------------------------------------------------
 
-subroutine et_kc_ApplyCropCoefficients(pGrd, pConfig)
+subroutine sm_FAO56_ApplyCropCoefficients(pGrd, pConfig)
 
   ! [ ARGUMENTS ]
   type ( T_GENERAL_GRID ),pointer :: pGrd        ! pointer to model grid
@@ -364,20 +364,20 @@ subroutine et_kc_ApplyCropCoefficients(pGrd, pConfig)
 
        if(pIRRIGATION%lUnitsAreDOY) then
 
-         cel%rKcb = et_kc_UpdateCropCoefficient(pIRRIGATION, pConfig%iDayOfYear)
+         cel%rKcb = sm_FAO56_UpdateCropCoefficient(pIRRIGATION, pConfig%iDayOfYear)
 
 				 if(pConfig%iDayOfYear < pIRRIGATION%iL_dev) then
-				   cel%rCurrentRootingDepth = et_kc_CalcEffectiveRootDepth(pIRRIGATION, &
+				   cel%rCurrentRootingDepth = sm_FAO56_CalcEffectiveRootDepth(pIRRIGATION, &
 				     rZr_max, pConfig%iDayOfYear)
 !					 cel%rSoilWaterCap = cel%rCurrentRootingDepth * cel%rSoilWaterCapInput
 				 endif
 
        else
 
-         cel%rKcb = et_kc_UpdateCropCoefficient(pIRRIGATION, INT(cel%rGDD, kind=c_int))
+         cel%rKcb = sm_FAO56_UpdateCropCoefficient(pIRRIGATION, INT(cel%rGDD, kind=c_int))
 
 				 if(int(cel%rGDD, kind=c_int) < pIRRIGATION%iL_dev) then
-				   cel%rCurrentRootingDepth = et_kc_CalcEffectiveRootDepth(pIRRIGATION, &
+				   cel%rCurrentRootingDepth = sm_FAO56_CalcEffectiveRootDepth(pIRRIGATION, &
 				     rZr_max,INT(cel%rGDD, kind=c_int))
 !					 cel%rSoilWaterCap = cel%rCurrentRootingDepth * cel%rSoilWaterCapInput
 				 endif
@@ -392,7 +392,7 @@ subroutine et_kc_ApplyCropCoefficients(pGrd, pConfig)
        ! following call updates the total available water (TAW) and
        ! readily available water (RAW) on the basis of the current
        ! plant root depth
-       call et_kc_CalcTotalAvailableWater( pIRRIGATION, cel)
+       call sm_FAO56_CalcTotalAvailableWater( pIRRIGATION, cel)
 
        ! "STANDARD" vs "NONSTANDARD": in the FAO56 publication the term
        ! "STANDARD" is used to refer to crop ET requirements under
@@ -405,16 +405,16 @@ subroutine et_kc_ApplyCropCoefficients(pGrd, pConfig)
 				 ! the adjustments for nonstandard growing conditions (e.g. plant
 				 ! stress and resulting decrease in ET during dry conditions).
 
-         rKr = et_kc_CalcEvaporationReductionCoefficient(rTEW, rREW, rDeficit)
-         r_few = et_kc_CalcFractionExposedAndWettedSoil( pIRRIGATION )
-         rKe = min(et_kc_CalcSurfaceEvaporationCoefficient( pIRRIGATION, &
+         rKr = sm_FAO56_CalcEvaporationReductionCoefficient(rTEW, rREW, rDeficit)
+         r_few = sm_FAO56_CalcFractionExposedAndWettedSoil( pIRRIGATION )
+         rKe = min(sm_FAO56_CalcSurfaceEvaporationCoefficient( pIRRIGATION, &
                  rKr ), r_few * pIRRIGATION%rKcb_mid )
 
          if (rKe < 0) print *, "rKe < 0: ", cel%iIrrigationTableIndex, iRow, iCol, cel%iLandUse, cel%iSoilGroup, rKe, pIRRIGATION%rKcb, pIRRIGATION%rKcb_max
          if (rKr < 0) print *, "rKr < 0: ", cel%iIrrigationTableIndex, iRow, iCol, cel%iLandUse, cel%iSoilGroup, rKr, pIRRIGATION%rKcb, pIRRIGATION%rKcb_max
          if (r_few < 0) print *, "r_few < 0: ", cel%iIrrigationTableIndex, iRow, iCol, cel%iLandUse, cel%iSoilGroup, r_few, pIRRIGATION%rKcb, pIRRIGATION%rKcb_max
 
-         rKs = et_kc_CalcWaterStressCoefficient( pIRRIGATION, rDeficit, cel)
+         rKs = sm_FAO56_CalcWaterStressCoefficient( pIRRIGATION, rDeficit, cel)
 
          cel%rBareSoilEvap = cel%rReferenceET0 * rKe
          cel%rCropETc = cel%rReferenceET0 * (cel%rKcb * rKs)
@@ -425,7 +425,7 @@ subroutine et_kc_ApplyCropCoefficients(pGrd, pConfig)
 				 ! stress and resulting decrease in ET during dry conditions).
 				 ! *EXCLUDING* explicit calculation of BareSoilEvap
 
-         rKs = et_kc_CalcWaterStressCoefficient( pIRRIGATION, rDeficit, cel)
+         rKs = sm_FAO56_CalcWaterStressCoefficient( pIRRIGATION, rDeficit, cel)
 
          cel%rBareSoilEvap = rZERO
          cel%rCropETc = cel%rReferenceET0 * (cel%rKcb * rKs)
@@ -440,9 +440,9 @@ subroutine et_kc_ApplyCropCoefficients(pGrd, pConfig)
 
 				 ! NO reductions in Kc due to water availability
 
-         rKr = et_kc_CalcEvaporationReductionCoefficient(rTEW, rREW, rDeficit)
-         r_few = et_kc_CalcFractionExposedAndWettedSoil( pIRRIGATION )
-         rKe = min(et_kc_CalcSurfaceEvaporationCoefficient( pIRRIGATION, &
+         rKr = sm_FAO56_CalcEvaporationReductionCoefficient(rTEW, rREW, rDeficit)
+         r_few = sm_FAO56_CalcFractionExposedAndWettedSoil( pIRRIGATION )
+         rKe = min(sm_FAO56_CalcSurfaceEvaporationCoefficient( pIRRIGATION, &
                  rKr ), r_few * pIRRIGATION%rKcb_mid )
 
          cel%rBareSoilEvap = cel%rReferenceET0 * rKe
@@ -470,6 +470,6 @@ subroutine et_kc_ApplyCropCoefficients(pGrd, pConfig)
      enddo
    enddo
 
-end subroutine et_kc_ApplyCropCoefficients
+end subroutine sm_FAO56_ApplyCropCoefficients
 
 end module sm_FAO56

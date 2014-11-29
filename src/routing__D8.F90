@@ -6,8 +6,6 @@ module routing__D8
   use exceptions
   implicit none
 
-  integer (kind=c_int), allocatable :: DOWNSTREAM_CELL_INDEX(:)
-
   private
 
   public :: routing_D8_initialize, routing_D8_calculate, D8_UNDETERMINED, TARGET_INDEX, ORDER_INDEX
@@ -61,6 +59,7 @@ contains
     integer (kind=c_int)                 :: iRownum  
     integer (kind=c_int)                 :: iIndex 
     integer (kind=c_int)                 :: iCount
+    character (len=256)                  :: sBuf
 
     integer (kind=c_int) :: iCol_lbound, iCol_ubound
     integer (kind=c_int) :: iRow_lbound, iRow_ubound
@@ -116,9 +115,6 @@ contains
     allocate( ORDER_INDEX( count( lActive) ), stat=iStat )
     call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
 
-    allocate( DOWNSTREAM_CELL_INDEX( count( lActive) ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
-
     ! locate the data structure associated with the gridded flow direction entries
     pD8_FLOWDIR => DAT%find("FLOW_DIRECTION")
     if ( .not. associated(pD8_FLOWDIR) ) &
@@ -134,11 +130,6 @@ contains
         COL2D( iColnum, iRownum ) = iColNum   ! right-most index should vary slowest
         ROW2D( iColnum, iRownum ) = iRownum
 
-        if ( lActive( iColnum, iRownum) ) then
-        	iCount = iCount + 1
-        	ORDER_INDEX(iCount) = iCount
-        endif
-
       enddo
     enddo
 
@@ -146,6 +137,24 @@ contains
     ROW1D = pack( ROW2D, lActive )	
 
     call routing_D8_determine_solution_order( lActive )    
+
+    open(27, file="D8_routing_table.txt", iostat=iStat, status="REPLACE")
+
+    do iIndex = 1, ubound(COL1D,1)
+
+      sBuf = ""
+
+      write(sBuf,*)  ORDER_INDEX( iIndex ),sTAB, TARGET_INDEX( iIndex )
+      write(sBuf,*) trim(sBuf)//sTab//asCharacter(COL1D( ORDER_INDEX( iIndex ) ) )//sTAB &
+        //asCharacter( ROW1D( ORDER_INDEX( iIndex ) ) )
+
+      if ( TARGET_INDEX( iIndex ) > 0 ) &
+        write(sBuf,*) trim(sBuf)//sTab//asCharacter(COL1D( TARGET_INDEX( iIndex ) ) )//sTAB &
+        //asCharacter( ROW1D( TARGET_INDEX( iIndex ) ) )
+
+      write(27,*)  trim(sBuf)  
+
+    enddo
 
   end subroutine routing_D8_initialize
 
@@ -161,17 +170,21 @@ contains
     integer (kind=c_int)   :: iOrderIndex
     logical (kind=c_bool)  :: lFound
 
+    iIndex = -999
     lFound = lFALSE
 
     do iOrderIndex = lbound(COL1D,1), ubound(COL1D,1) 
 
-      if( COL1D(iOrderIndex) == iCol  .and.  ROW1D(iOrderIndex) == iRow ) then
+      if( COL1D( iOrderIndex ) == iCol  .and.  ROW1D( iOrderIndex ) == iRow ) then
       	iIndex = iOrderIndex
         lFound = lTRUE
       	exit
       endif
 
     enddo
+
+!    if ( .not. lFound ) call warn("Did not find matching column and row number; col=" &
+!      //asCharacter(iCol)//"; row="//asCharacter(iRow), __FILE__, __LINE__ )
 
   end function routing_D8_get_index
 
@@ -195,11 +208,10 @@ contains
 
     associate ( dir => pD8_FLOWDIR%pGrdBase%iData )
 
+	   	do iRownum=iRow_lbound, iRow_ubound
+        do iColnum=iCol_lbound, iCol_ubound
 
-	    do iColnum=iCol_lbound, iCol_ubound
-	    	do iRownum=iRow_lbound, iRow_ubound
-
-          select case ( dir(iColnum, iRownum) )
+          select case ( dir( iColnum, iRownum ) )
 
             case ( D8_EAST )
 
@@ -307,8 +319,8 @@ main_loop: do
       iPasses = iPasses + 1
 
       ! iterate over entire model domain
-	    do iColnum=iCol_lbound, iCol_ubound
-	    	do iRownum=iRow_lbound, iRow_ubound
+	    do iRownum=iRow_lbound, iRow_ubound
+        do iColnum=iCol_lbound, iCol_ubound
 
 	        if ( .not. lActive(iColnum, iRownum) ) cycle
 	        if ( lDownhillMarked(iColnum, iRownum) ) cycle
@@ -320,8 +332,8 @@ main_loop: do
           lCircular = lFALSE
 
           ! search the 8 cells immediately adjacent to the current cell
-	local_search: do iColsrch=max( iColNum-1, iCol_lbound),min( iColnum+1, iCol_ubound) 			    
-	                do iRowsrch=max( iRowNum-1, iRow_lbound),min( iRownum+1, iRow_ubound) 
+	local_search: do iRowsrch=max( iRowNum-1, iRow_lbound),min( iRownum+1, iRow_ubound) 
+                  do iColsrch=max( iColNum-1, iCol_lbound),min( iColnum+1, iCol_ubound)      
 
 	 			            ! if adjacent cell points to current cell, note it and move on	
 	 			            if ( ( iTargetCol(iColsrch, iRowsrch) == iColnum ) &
@@ -399,6 +411,8 @@ main_loop: do
                   COLUMN_INDEX( iIndex ) = iColnum
                   ROW_INDEX( iIndex ) = iRownum
                   ORDER_INDEX( iIndex ) = routing_D8_get_index( iColnum, iRownum )
+                  TARGET_INDEX( iIndex ) = routing_D8_get_index( iTargetCol( iColNum, iRowNum ), &
+                    iTargetRow( iColNum, iRowNum ) )
 
                   if ( lCircular )  TARGET_INDEX( iIndex ) = D8_UNDETERMINED
 
@@ -444,11 +458,10 @@ main_loop: do
 
         ! loop over possible (legal) values of the flow direction grid
         do k=0,128
-          iCount=COUNT(.not. lDownHillMarked &
+          iCount=COUNT( .not. lDownHillMarked                         &
             .and. pD8_FLOWDIR%pGrdBase%iData==k .and. lActive )
-          if(iCount>0) then
-            write(*,FMT="(3x,i8,' unmarked grid cells have flowdir value: ',i8)") &
-              iCount, k
+          if( iCount > 0 ) then
+            write(*,FMT="(3x,i8,' unmarked grid cells have flowdir value: ',i8)") iCount, k
           end if
         end do
 
@@ -461,15 +474,6 @@ main_loop: do
           "problem_gridcells.asc", pTempGrid)
 
       end if
-
-
-
-
-
-
-
-
-
 
 
   	enddo main_loop

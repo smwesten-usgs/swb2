@@ -1143,12 +1143,22 @@ contains
 
         this%runoff(orderindex) = this%inflow(orderindex) - this%infiltration(orderindex)
 
-        if ( TARGET_INDEX( orderindex ) > 0 ) then
-          print *, orderindex
-          print *, TARGET_INDEX( orderindex ), this%inflow(orderindex), this%runoff(orderindex), &
-            this%runon(TARGET_INDEX( orderindex ) )
+        if ( orderindex < lbound(this%runon, 1) ) then
 
-          this%runon(TARGET_INDEX( orderindex ) ) = this%runoff(orderindex)
+          cycle
+
+        else 
+         
+!          print *, orderindex, TARGET_INDEX( orderindex ), this%inflow(orderindex), this%runoff(orderindex)
+    
+          if ( TARGET_INDEX( orderindex ) > 0) then
+            
+            this%runon( TARGET_INDEX( orderindex ) ) = this%runoff( orderindex )
+
+!            print *, orderindex, TARGET_INDEX( orderindex ), this%inflow(orderindex), this%runoff(orderindex), &
+!              this%runon(TARGET_INDEX( orderindex ) )
+
+          endif 
 
         endif
 
