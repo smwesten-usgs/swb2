@@ -757,6 +757,7 @@ contains
       this%tmax = pack( pTMAX%pGrdBase%rData, this%active )
       this%tmin = pack( pTMIN%pGrdBase%rData, this%active )
 
+      ! partition preciptation into rainfall and snowfall fractions
       call this%calc_snowfall()
 
     end associate
@@ -1155,7 +1156,7 @@ contains
             
             this%runon( TARGET_INDEX( orderindex ) ) = this%runoff( orderindex )
 
-!            print *, orderindex, TARGET_INDEX( orderindex ), this%inflow(orderindex), this%runoff(orderindex), &
+!            print *, orderindex, TARGET_INDEX( orderindex ), this%inflow( orderindex ), this%runoff( orderindex ), &
 !              this%runon(TARGET_INDEX( orderindex ) )
 
           endif 

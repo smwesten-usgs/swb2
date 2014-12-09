@@ -2653,10 +2653,24 @@ subroutine nf_create(NCFILE, sFilename, iLU)
   character (len=256) :: sBuf
   call getcwd(sBuf)
 
-  call nf_trap(nc_create(path=trim(fortran_to_c_string(sFilename)), &
-                 cmode=NC_NETCDF4, &
-                 ncidp=NCFILE%iNCID), &
-                 __FILE__, __LINE__)
+   call nf_trap(nc_create(path=trim(fortran_to_c_string(sFilename)), &
+                  cmode=NC_NETCDF4, &
+                  ncidp=NCFILE%iNCID), &
+                  __FILE__, __LINE__)
+
+!
+! had read somewhere that the interface:
+! character (kind=c_char)   :: varname(*)
+! 
+! would properly pass fortran string to c; however, 
+! this does not appear ot be the case.
+!
+
+!   call nf_trap(nc_create(path=trim(sFilename), &
+!                  cmode=NC_NETCDF4, &
+!                  ncidp=NCFILE%iNCID), &
+!                  __FILE__, __LINE__)
+
 
   NCFILE%sFilename = trim(sFilename)
   NCFILE%iFileFormat = NC_FORMAT_NETCDF4

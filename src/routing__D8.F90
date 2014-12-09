@@ -64,6 +64,8 @@ contains
     integer (kind=c_int) :: iCol_lbound, iCol_ubound
     integer (kind=c_int) :: iRow_lbound, iRow_ubound
 
+    type (GENERAL_GRID_T), pointer  :: pTempGrid
+
     iCol_lbound = lbound(lActive, 1)
     iCol_ubound = ubound(lActive, 1)
 
@@ -122,6 +124,13 @@ contains
 
     call pD8_FLOWDIR%getvalues()
 
+    pTempGrid=>grid_Create( BNDS%iNumCols, BNDS%iNumRows, BNDS%fX_ll, BNDS%fY_ll, &
+      BNDS%fX_ur, BNDS%fY_ur, DATATYPE_INT )
+
+    pTempGrid%iData = pD8_FLOWDIR%pGrdBase%iData
+
+    call grid_WriteArcGrid("D8_Flow_Direction_Grid.asc", pTempGrid)
+
     call routing_D8_assign_downstream_row_col( lActive )
 
     do iRownum=iRow_lbound, iRow_ubound    
@@ -140,6 +149,9 @@ contains
 
     open(27, file="D8_routing_table.txt", iostat=iStat, status="REPLACE")
 
+    write(27,*) "ORDER_INDEX"//sTAB//"TARGET_INDEX"//sTAB//"From_COL"//sTAB//"From_ROW" &
+      //sTAB//"To_COL"//sTAB//"To_ROW"//"D8_flowdir"
+
     do iIndex = 1, ubound(COL1D,1)
 
       sBuf = ""
@@ -150,7 +162,8 @@ contains
 
       if ( TARGET_INDEX( iIndex ) > 0 ) &
         write(sBuf,*) trim(sBuf)//sTab//asCharacter(COL1D( TARGET_INDEX( iIndex ) ) )//sTAB &
-        //asCharacter( ROW1D( TARGET_INDEX( iIndex ) ) )
+        //asCharacter( ROW1D( TARGET_INDEX( iIndex ) ) )//sTAB//asCharacter( pD8_FLOWDIR%pGrdBase%iData( COL1D( ORDER_INDEX( iIndex ) ), &
+          ROW1D( ORDER_INDEX( iIndex ) ) ) )
 
       write(27,*)  trim(sBuf)  
 
@@ -335,26 +348,24 @@ main_loop: do
 	local_search: do iRowsrch=max( iRowNum-1, iRow_lbound),min( iRownum+1, iRow_ubound) 
                   do iColsrch=max( iColNum-1, iCol_lbound),min( iColnum+1, iCol_ubound)      
 
-	 			            ! if adjacent cell points to current cell, note it and move on	
+	 			            ! if adjacent cell points to current cell, determine what to do with runoff	
 	 			            if ( ( iTargetCol(iColsrch, iRowsrch) == iColnum ) &
 	 			            	.and. ( iTargetRow(iColsrch, iRowsrch) == iRownum ) ) then
+
+                      ! if adjacent cell falls outside the area of active cells,
+                      ! ignore it and move on                    
+                      if ( .not. lActive( iColsrch, iRowsrch ) )  cycle
 	 			               			
                       ! if the target of the current cell points back at the adjacent
                       ! cell, mark current cell as having a "circular" connection      
                       if ( ( iTargetCol( iColNum, iRowNum ) == iColsrch )                &
                         .and. ( iTargetRow( iColNum, iRowNum ) == iRowsrch ) )  lCircular = lTRUE
 
-                      ! if adjacent cell falls outside the area of active cells,
-                      ! ignore it and move on                    
-	 			              if ( .not. lActive( iColsrch, iRowsrch ) ) then
-
-	 			              	cycle
- 
-                      ! if the adjacent cell is marked (that is, still has unresolved
+                      ! if the adjacent cell is marked (that is, has no unresolved
                       ! upslope contributions), add the 1 to the number of connections
                       ! and add the adjacent cells' sum of upslope cells to the
                       ! current cells' running sum of upslope cells
-	 			              elseif(	lDownhillMarked( iColsrch, iRowsrch ) ) then
+	 			              if(	lDownhillMarked( iColsrch, iRowsrch ) ) then
 
                         iUpslopeSum = iUpslopeSum + iSumOfUpslopeCells(iColsrch, iRowsrch)
                         iUpslopeConnections = iUpslopeConnections + 1 
@@ -377,28 +388,6 @@ main_loop: do
 	              ! OK this is the end of the local search area; did we uncover any unmarked cells
 	              ! contributing flow to the current cell? if so, ignore and move on. otherwise,
 	              ! mark current cell as marked, update stats, and continue with next cell
-
-
-!           if ( iUpstreamCount == 0  &
-!             .or. (iUpstreamCount == 1 .and. lCircular)) then
-!             iNChange = iNChange+1
-!             cel%lDownhillMarked = lTRUE
-!             iOrderCount = iOrderCount+1
-!             iOrderCol(iOrderCount) = iCol
-!             iOrderRow(iOrderCount) = iRow
-!             !write(UNIT=LU_LOG,FMT=*) 'found ',iOrderCount, iRow, iCol
-!           elseif ( iNumIterationsNochange > 10 ) then
-!             ! convert offending cell into a depression
-!             ! we've gotten to this point because flow paths are circular;
-!             ! this is likely in a flat area of the DEM, and is in reality
-!             ! likely to be a depression
-!             iNChange = iNChange+1
-!             cel%lDownhillMarked = lTRUE
-!             cel%iFlowDir = 0
-!             iOrderCount = iOrderCount+1
-!             iOrderCol(iOrderCount) = iCol
-!             iOrderRow(iOrderCount) = iRow
-!             !write(UNIT=LU_LOG,FMT=*) 'found ',iOrderCount, iRow, iCol
 
 	              if ( ( .not. lAnyUnmarkedUpslopeCells ) &
                   .or. (iUpslopeConnections == 1 .and. lCircular ) ) then
