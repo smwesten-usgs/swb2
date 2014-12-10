@@ -22,10 +22,8 @@ module loop_initialize
   public :: read_control_file, initialize_options
   public :: check_for_fatal_warnings
 
-  type (ASCII_FILE_T) :: CF
-
   type GRIDDED_DATASETS_T
-    character (len=23)     :: sName
+    character (len=29)     :: sName
     logical (kind=c_bool)  :: lOptional
     integer (kind=c_int)   :: iDataType 
   end type GRIDDED_DATASETS_T
@@ -34,21 +32,24 @@ module loop_initialize
     character (len=23)     :: sName
   end type METHODS_LIST_T
 
-  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(13) = &
+  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(16) = &
 
-    [ GRIDDED_DATASETS_T("PRECIPITATION          ", lFALSE, DATATYPE_FLOAT ),     &
-      GRIDDED_DATASETS_T("TMIN                   ", lFALSE, DATATYPE_FLOAT ),     &
-      GRIDDED_DATASETS_T("TMAX                   ", lFALSE, DATATYPE_FLOAT ),     &
-      GRIDDED_DATASETS_T("AVAILABLE_WATER_CONTENT", lFALSE, DATATYPE_FLOAT ),     &
-      GRIDDED_DATASETS_T("POTENTIAL_ET           ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("SOLAR_RADIATION        ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("WIND_SPEED             ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("RAINFALL_ZONE          ", lTRUE, DATATYPE_INT ),        &
-      GRIDDED_DATASETS_T("FLOW_DIRECTION         ", lFALSE, DATATYPE_INT),        &
-      GRIDDED_DATASETS_T("FOG_RATIO              ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("LAND_USE               ", lFALSE, DATATYPE_INT ),       &
-      GRIDDED_DATASETS_T("SOILS_GROUP            ", lFALSE, DATATYPE_INT ),       &
-      GRIDDED_DATASETS_T("RELATIVE_HUMIDITY      ", lTRUE, DATATYPE_FLOAT )   ]
+    [ GRIDDED_DATASETS_T("PRECIPITATION                ", lFALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("TMIN                         ", lFALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("TMAX                         ", lFALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("AVAILABLE_WATER_CONTENT      ", lFALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("POTENTIAL_ET                 ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("SOLAR_RADIATION              ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("WIND_SPEED                   ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("RAINFALL_ZONE                ", lTRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("FLOW_DIRECTION               ", lFALSE, DATATYPE_INT),        &
+      GRIDDED_DATASETS_T("FOG_RATIO                    ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("LAND_USE                     ", lFALSE, DATATYPE_INT ),       &
+      GRIDDED_DATASETS_T("SOILS_GROUP                  ", lFALSE, DATATYPE_INT ),       &
+      GRIDDED_DATASETS_T("CANOPY_COVER_FRACTION        ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("STEMFLOW_FRACTION            ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("EVAPORATION_TO_RAINFALL_RATIO", lTRUE, DATATYPE_FLOAT ),      &                  
+      GRIDDED_DATASETS_T("RELATIVE_HUMIDITY            ", lTRUE, DATATYPE_FLOAT )   ]
 
   type (METHODS_LIST_T), parameter  :: KNOWN_METHODS(7) =   &
     [ METHODS_LIST_T("INTERCEPTION           "),            &
@@ -68,6 +69,7 @@ contains
     ! [ LOCALS ]
     character (len=256)   :: sRecord, sSubstring
     integer (kind=c_int)  :: iStat
+    type (ASCII_FILE_T) :: CF
 
     ! open the control file and define the comment characters and delimiters to be used in 
     ! parsing the ASCII text
@@ -92,30 +94,34 @@ contains
       ! break off key value for the current record
       call chomp(sRecord, sSubstring, CF%sDelimiters )
 
-      if ( len_trim(sSubstring) > 0 ) then
+      if ( len_trim( sSubstring ) > 0 ) then
 
         ! first add the key value to the directory entry data structure
         call CF_ENTRY%add_key( sSubstring )
 
         ! break off first directive for the current record
-        call chomp(sRecord, sSubstring, CF%sDelimiters )
+        call chomp( sRecord, sSubstring, CF%sDelimiters )
 
-        do while ( len_trim(sSubString) > 0 )
+        do while ( len_trim( sSubString ) > 0 )
           
           ! add the next directive snippet to dictionary entry data structure
           call CF_ENTRY%add_string( sSubstring )
 
           ! break off next directive for the current record
-          call chomp(sRecord, sSubstring, CF%sDelimiters )
+          call chomp( sRecord, sSubstring, CF%sDelimiters )
 
         enddo  
 
         ! add the dictionary entry to the dictionary data structure
-        call CF_DICT%add_entry(CF_ENTRY)
+        call CF_DICT%add_entry( CF_ENTRY )
 
       endif  
       
     enddo
+
+    print *, __FILE__, " : ", __LINE__
+
+    call CF_DICT%print_all()
 
     ! close the control file
     call CF%close()
@@ -583,6 +589,15 @@ contains
   end subroutine initialize_start_and_end_dates 
 
 !--------------------------------------------------------------------------------------------------
+
+  !> Find any parameter tables specified in the control file; process and store contents.
+  !!
+  !! Any control file entry that contains the text "LOOKUP_TABLE" is assumed to specify a parameter table
+  !! that needs to be read in and processed. 
+  !!
+  !! @note The entries given in the files are implicitly assumed to be in sorted order. For example, if the parameters
+  !! pertain to landuse codes, it is assumed that all table values are given in order from lowest to highest 
+  !! landuse code.
 
   subroutine initialize_parameter_tables()
 

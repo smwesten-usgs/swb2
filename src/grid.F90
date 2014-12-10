@@ -57,6 +57,7 @@ module swb_grid
     
     integer (kind=c_int), dimension(:,:), allocatable   :: iData ! Integer data
     real (kind=c_float), dimension(:,:), allocatable    :: rData    ! Real data
+    real (kind=c_float), dimension(:,:), allocatable    :: fData    ! Float data
     real (kind=c_double), dimension(:,:), allocatable :: rX    ! x coordinate associated with data
     real (kind=c_double), dimension(:,:), allocatable :: rY    ! y coordinate associated with data
     integer (kind=c_int), dimension(:,:), allocatable :: iMask ! Mask for processing results

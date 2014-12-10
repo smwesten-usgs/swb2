@@ -20,6 +20,7 @@ if(TARGET__SWB_EXECUTABLE)
             grid.F90
             infiltration__curve_number.F90            
             interception__bucket.F90
+            interception__gash.F90
             logfiles.F90
             loop_initialize.F90
             #loop_iterate.F90
@@ -39,7 +40,6 @@ if(TARGET__SWB_EXECUTABLE)
             solar_calculations.F90
             strings.F90
             string_list.F90
-
  
 
             proj4/aasincos.c
@@ -228,16 +228,18 @@ if(TARGET__SWB_LIBRARY)
             #et_FAO56_crop_coefficients.F90
             et__hargreaves_samani.F90
             et__jensen_haise.F90
-            et__monthly_grid.F90            
+            et__monthly_grid.F90
             exceptions.F90
             fog__monthly_grid.F90
             file_operations.F90
             grid.F90
-            infiltration__curve_number.F90
+            infiltration__curve_number.F90            
             interception__bucket.F90
+            interception_gash.F90
             logfiles.F90
             loop_initialize.F90
             #loop_iterate.F90
+            main.F90
             meteorological_calculations.F90
             model_domain.F90
             #model.F90

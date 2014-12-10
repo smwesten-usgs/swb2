@@ -12,8 +12,8 @@ module dictionary
 
   type, public :: DICT_ENTRY_T
 
-     character (len=:), allocatable            :: key
-     character (len=:), allocatable            :: secondary_key
+    character (len=:), allocatable            :: key
+    character (len=:), allocatable            :: secondary_key
 
     type (STRING_LIST_T)                      :: sl
     type (DICT_ENTRY_T), pointer              :: previous   => null()
@@ -79,7 +79,7 @@ contains
 
  subroutine add_key_sub(this, sKey)
 
-    class (DICT_ENTRY_T)  :: this
+    class (DICT_ENTRY_T)            :: this
     character (len=*), intent(in)   :: sKey
 
      this%key = sKey
@@ -90,7 +90,7 @@ contains
 
   subroutine add_string_sub(this, sValue)
 
-    class (DICT_ENTRY_T)  :: this
+    class (DICT_ENTRY_T)            :: this
     character (len=*), intent(in)   :: sValue
 
     call this%sl%append(sValue)
@@ -126,10 +126,9 @@ contains
 
   end function get_entry_by_key_fn
  
+!--------------------------------------------------------------------------------------------------
 
-
-
- function grep_dictionary_key_names_fn(this, sKey)   result( slString )
+  function grep_dictionary_key_names_fn(this, sKey)   result( slString )
 
     class (DICT_T)                   :: this
     character (len=*), intent(in)    :: sKey
@@ -156,8 +155,6 @@ contains
         //dquote(sKey), sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE )
 
   end function grep_dictionary_key_names_fn
- 
-
 
 !--------------------------------------------------------------------------------------------------
 
@@ -224,6 +221,7 @@ contains
 
   end subroutine delete_entry_by_key_sub
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine get_values_as_int_sub(this, sKey, iValues)
 
@@ -254,12 +252,9 @@ contains
 
   end subroutine get_values_as_int_sub
 
+!--------------------------------------------------------------------------------------------------
 
-
-
-
-
- subroutine get_values_as_string_list_sub(this, sKey, slString)
+  subroutine get_values_as_string_list_sub(this, sKey, slString)
 
     class (DICT_T)                                  :: this
     character (len=*), intent(in)                   :: sKey
@@ -287,13 +282,7 @@ contains
 
   end subroutine get_values_as_string_list_sub
 
-
-
-
-
-
-
-
+!--------------------------------------------------------------------------------------------------
 
   !> Search through keys for a match; return integer values.
   !!
@@ -303,24 +292,28 @@ contains
   !! @param[in]  slKeys String list containing one or more possible key values to
   !!                    search for.
   !! @param[out] iValues Integer vector of values associated with one of the provided keys.
+
   subroutine get_values_as_int_given_list_of_keys_sub(this, slKeys, iValues)
 
-    class (DICT_T)                                  :: this
-    type (STRING_LIST_T), intent(in)                :: slKeys
-    integer (kind=c_int), allocatable, intent(inout)  :: iValues(:)
+    class (DICT_T)                                     :: this
+    type (STRING_LIST_T), intent(inout)                :: slKeys
+    integer (kind=c_int), allocatable, intent(inout)   :: iValues(:)
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
     integer (kind=c_int)           :: iCount
+    character (len=:), allocatable :: sText
     
     iCount = 0
 
     do while ( iCount < slKeys%count )
 
       iCount = iCount + 1
+
+      sText = slKeys%get( iCount)
      
-      pTarget => this%get_entry(slKeys%get(iCount) )
+      pTarget => this%get_entry( sText )
 
       if ( associated( pTarget ) ) exit
 
@@ -343,6 +336,8 @@ contains
 
   end subroutine get_values_as_int_given_list_of_keys_sub
 
+!--------------------------------------------------------------------------------------------------
+
   !> Search through keys for a match; return float values.
   !!
   !! THis routine allows for multiple header values to be supplied 
@@ -351,16 +346,18 @@ contains
   !! @param[in]  slKeys String list containing one or more possible key values to
   !!                    search for.
   !! @param[out] fValues Float vector of values associated with one of the provided keys.
+
   subroutine get_values_as_float_given_list_of_keys_sub(this, slKeys, fValues)
 
-    class (DICT_T)                                  :: this
-    type (STRING_LIST_T), intent(in)                :: slKeys
+    class (DICT_T)                                    :: this
+    type (STRING_LIST_T), intent(inout)               :: slKeys
     real (kind=c_float), allocatable, intent(inout)   :: fValues(:)
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
     integer (kind=c_int)           :: iCount
+    character (len=:), allocatable :: sText
     
     iCount = 0
 
@@ -368,7 +365,9 @@ contains
 
       iCount = iCount + 1
      
-      pTarget => this%get_entry(slKeys%get(iCount) )
+      sText = slKeys%get( iCount)
+
+      pTarget => this%get_entry( sText )
 
       if ( associated( pTarget ) ) exit
 
@@ -391,6 +390,7 @@ contains
 
   end subroutine get_values_as_float_given_list_of_keys_sub
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine get_values_as_float_sub(this, sKey, fValues)
 
@@ -419,9 +419,7 @@ contains
 
   end subroutine get_values_as_float_sub
 
-
-
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine print_all_dictionary_entries_sub(this)
 

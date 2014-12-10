@@ -72,6 +72,7 @@ module model_domain
 
     integer (kind=c_int), allocatable      :: index_order(:)
 
+    !> declare and initialize procedure pointers such that the default methods are in place
     procedure ( simple_method ), pointer         :: init_interception       => model_initialize_interception_bucket
     procedure ( simple_method ), pointer         :: init_infiltration       => model_initialize_infiltration_curve_number
     procedure ( simple_method ), pointer         :: init_reference_et       => model_initialize_et_hargreaves
@@ -1125,6 +1126,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int) :: index
     integer (kind=c_int) :: orderindex
+    integer (kind=c_int) :: targetindex
 
 !     if ( associated(this%calc_routing) ) then
 
@@ -1133,37 +1135,30 @@ contains
       do index=lbound(this%runon,1), ubound(this%runon,1)
 
         orderindex = ORDER_INDEX( index )
+        targetindex = TARGET_INDEX( index )
 
-        this%inflow(orderindex) =   this%runon(orderindex)                      &
-                                  + this%gross_precip(orderindex)               &
-                                  + this%fog(orderindex)                        &
-                                  + this%snowmelt(orderindex)                   &
-                                  - this%interception(orderindex)                      
+        this%inflow( orderindex ) =   this%runon( orderindex )                      &
+                                    + this%gross_precip( orderindex )               &
+                                    + this%fog( orderindex )                        &
+                                    + this%snowmelt( orderindex )                   &
+                                    - this%interception( orderindex )                      
                              
         call this%calc_infiltration( orderindex )
 
-        this%runoff(orderindex) = this%inflow(orderindex) - this%infiltration(orderindex)
+        this%runoff( orderindex ) = this%inflow( orderindex ) - this%infiltration( orderindex )
 
-        if ( orderindex < lbound(this%runon, 1) ) then
-
-          cycle
-
-        else 
-         
 !          print *, orderindex, TARGET_INDEX( orderindex ), this%inflow(orderindex), this%runoff(orderindex)
     
-          if ( TARGET_INDEX( orderindex ) > 0) then
-            
-            this%runon( TARGET_INDEX( orderindex ) ) = this%runoff( orderindex )
+        if ( targetindex > 0) then
+          
+          this%runon( targetindex ) = this%runoff( orderindex )
 
 !            print *, orderindex, TARGET_INDEX( orderindex ), this%inflow( orderindex ), this%runoff( orderindex ), &
 !              this%runon(TARGET_INDEX( orderindex ) )
 
-          endif 
+        endif 
 
-        endif
-
-        call this%calc_soil_moisture(orderindex)
+        call this%calc_soil_moisture( orderindex )
 
       enddo  
 
@@ -1406,7 +1401,11 @@ contains
 
   subroutine model_initialize_interception_gash(this)
 
+    use interception__gash
+
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call interception_gash_initialize( this%active )
 
   end subroutine model_initialize_interception_gash
 
@@ -1414,7 +1413,11 @@ contains
 
   subroutine model_calculate_interception_gash(this)
 
+    use interception__gash
+
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call interception_gash_calculate( this%gross_precip, this%fog, this%interception )
 
   end subroutine model_calculate_interception_gash
 
