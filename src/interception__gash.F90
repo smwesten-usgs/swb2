@@ -26,6 +26,12 @@ module interception__gash
   real (kind=c_float), allocatable   :: STEMFLOW_FRACTION(:)
   real (kind=c_float), allocatable   :: EVAPORATION_TO_RAINFALL_RATIO(:)
 
+  real (kind=c_float), allocatable   :: CANOPY_STORAGE_CAPACITY(:)
+  real (kind=c_float), allocatable   :: TRUNK_STORAGE_CAPACITY(:)  
+
+  real (kind=c_float), allocatable   :: CANOPY_STORAGE_CAPACITY_UNPACKED(:)
+  real (kind=c_float), allocatable   :: TRUNK_STORAGE_CAPACITY_UNPACKED(:)  
+
   type (T_NETCDF4_FILE), pointer       :: pNCFILE           ! pointer to OUTPUT NetCDF file
 
 contains
@@ -35,10 +41,10 @@ contains
   !! Read in a canopy cover and stemflow fraction grids, 
   !! read in evaporation to rainfall ratio grid.
   !!
-  subroutine interception_gash_initialize( lActive )
+  subroutine interception_gash_initialize( lActive, iLandUseIndex )
 
-    logical (kind=c_bool)                :: lActive(:,:)
-
+    logical (kind=c_bool), intent(in)    :: lActive(:,:)
+    integer (kind=c_int), intent(in)     :: iLanduseIndex(:)
 
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iStat
@@ -46,14 +52,19 @@ contains
     integer (kind=c_int)                 :: iIndex 
     type (GENERAL_GRID_T), pointer       :: pTempGrid
     integer (kind=c_int)                 :: iCount
-    integer (kind=c_int), allocatable    :: iLanduseCodes(:)
+    integer (kind=c_int)                 :: iNumRecs
+    integer (kind=c_int), allocatable    :: iLanduseTableCodes(:)
     integer (kind=c_int)                 :: iNumberOfLanduses
+    logical (kind=c_bool)                :: lAreLengthsEqual
 
     iCount = count( lActive )
 
     allocate( CANOPY_COVER_FRACTION( iCount ), stat=iStat )
+    call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
     allocate( STEMFLOW_FRACTION( iCount ), stat=iStat )
+    call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
     allocate( EVAPORATION_TO_RAINFALL_RATIO( iCount ), stat=iStat )
+    call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
 
     ! locate the data structure associated with the gridded canopy cover fraction
     pCANOPY_COVER_FRACTION => DAT%find("CANOPY_COVER_FRACTION")
@@ -109,17 +120,60 @@ contains
     !! now grab the table values needed for this module
 
     ! create list of possible table headings to look for...
-    slList = "LU_Code"
-    call slList%append("Landuse_Lookup_Code")
+    call slList%append( "LU_Code" )
+    call slList%append( "Landuse_Lookup_Code" )
 
     !> Determine how many landuse codes are present
-    call PARAMS%get_values( slList, iLanduseCodes )
-    iNumberOfLanduses = count( iLanduseCodes >= 0 )
+    call PARAMS%get_values( slList, iLanduseTableCodes )
+    iNumberOfLanduses = count( iLanduseTableCodes >= 0 )
+
+    call slList%deallocate()
+    call slList%append("Canopy_Capacity")
+    call slList%append("Canopy_Storage_Capacity")
+    call PARAMS%get_values( slList, CANOPY_STORAGE_CAPACITY )
+
+    call slList%deallocate()
+    call slList%append("Trunk_Capacity")
+    call slList%append("Trunk_Storage_Capacity")
+    call PARAMS%get_values( slList, TRUNK_STORAGE_CAPACITY )
+
+    iNumRecs = ubound(CANOPY_STORAGE_CAPACITY,1)
+    lAreLengthsEqual = ( iNumRecs == iNumberOfLanduses ) 
+
+    if ( .not. lAreLengthsEqual )                                                       &
+      call warn( sMessage="The number of canopy storage capacity values ("              &
+        //asCharacter( iNumRecs )//") does not match the number of landuse values ("    &
+        //asCharacter( iNumberOfLanduses )//").",                                       &
+        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
 
 
+    iNumRecs = ubound(TRUNK_STORAGE_CAPACITY,1)
+    lAreLengthsEqual = ( iNumRecs == iNumberOfLanduses )
+
+    if ( .not. lAreLengthsEqual )                                                        &
+      call warn( sMessage="The number of trunk storage capacity values ("                &
+        //asCharacter( iNumRecs )//") does not match the number of landuse values ("     &
+        //asCharacter( iNumberOfLanduses )//").",                                        &
+        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
 
 
+    allocate( CANOPY_STORAGE_CAPACITY_UNPACKED( iCount ), stat=iStat )
+    call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
 
+    allocate( TRUNK_STORAGE_CAPACITY_UNPACKED( iCount ), stat=iStat )
+    call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
+
+    do iIndex = lbound(iLandUseTableCodes,1), ubound(iLandUseTableCodes,1)
+      where (iLanduseIndex == iIndex)
+
+        CANOPY_STORAGE_CAPACITY_UNPACKED = CANOPY_STORAGE_CAPACITY( iIndex )
+        TRUNK_STORAGE_CAPACITY_UNPACKED = TRUNK_STORAGE_CAPACITY( iIndex ) 
+
+      end where  
+    enddo
+
+    deallocate(CANOPY_STORAGE_CAPACITY)
+    deallocate(TRUNK_STORAGE_CAPACITY)
 
   end subroutine interception_gash_initialize
 
@@ -132,14 +186,31 @@ contains
     real (kind=c_float), intent(inout)     :: fInterception(:)
 
     ! [ LOCALS ]
-    real (kind=c_float) :: fPrecipitation_at_Saturation
+    real (kind=c_float), allocatable :: fPrecipitation_at_Saturation(:)
+    real (kind=c_float)              :: coef2 = 0.0
+
+
+    allocate( fPrecipitation_at_Saturation(ubound(CANOPY_STORAGE_CAPACITY_UNPACKED,1) ) )
  
     associate( Psat => fPrecipitation_at_Saturation )
 
-!      Psat = - ( CANOPY_COVER_FRACTION / STEMFLOW_FRACTION )
+     print *, lbound(CANOPY_STORAGE_CAPACITY_UNPACKED,1), ubound(CANOPY_STORAGE_CAPACITY_UNPACKED,1)
+     print *, lbound(TRUNK_STORAGE_CAPACITY_UNPACKED,1), ubound(TRUNK_STORAGE_CAPACITY_UNPACKED,1)
+     print *, lbound(CANOPY_COVER_FRACTION,1), ubound(CANOPY_COVER_FRACTION,1)
+     print *, lbound(EVAPORATION_TO_RAINFALL_RATIO,1), ubound(EVAPORATION_TO_RAINFALL_RATIO,1)
+
+      Psat = - ( CANOPY_STORAGE_CAPACITY_UNPACKED / &
+                  ( ( CANOPY_COVER_FRACTION + 0.001 ) * EVAPORATION_TO_RAINFALL_RATIO )  &
+                     * log( ( 1.0 - EVAPORATION_TO_RAINFALL_RATIO ) ) &
+                       / ( 1.0 - ( 1.0 - coef2 ) * EVAPORATION_TO_RAINFALL_RATIO ) )
+
+      print *, __FILE__, " : ", __LINE__, "   Psat (min,max)=", minval(Psat), maxval(Psat)
+
+    !  where (fRainfall)
 
 !                !! calc Precip needed to saturate canopy    
-!                 Psat=-( cancap( ilu(ip) ) / ( canfrac( ip )*cerf( ip ) ) ) * log( ( 1 - cerf( ip ) ) / ( 1 - ( 1 - ceint2 ) * cerf( ip ) ) )
+!                 Psat=-( cancap( ilu(ip) ) / ( canfrac( ip )*cerf( ip ) ) ) &
+!                                 * log( ( 1 - cerf( ip ) ) / ( 1 - ( 1 - ceint2 ) * cerf( ip ) ) )
 !                 if(drf+dfog.lt.Psat)then
 !                    dcanint=canfrac(ip)*(drf+dfog)
 !                 elseif(drf+dfog.gt.tcap(ilu(ip))/tfrac(ip))then

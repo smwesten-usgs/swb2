@@ -312,7 +312,7 @@ contains
       iCount = iCount + 1
 
       sText = slKeys%get( iCount)
-     
+
       pTarget => this%get_entry( sText )
 
       if ( associated( pTarget ) ) exit

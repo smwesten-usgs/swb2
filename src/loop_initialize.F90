@@ -112,16 +112,12 @@ contains
 
         enddo  
 
-        ! add the dictionary entry to the dictionary data structure
+        ! add the final entry to the dictionary data structure
         call CF_DICT%add_entry( CF_ENTRY )
 
       endif  
       
     enddo
-
-    print *, __FILE__, " : ", __LINE__
-
-    call CF_DICT%print_all()
 
     ! close the control file
     call CF%close()
@@ -243,9 +239,6 @@ contains
 
         ! For this directive, obtain the associated dictionary entries
         call CF_DICT%get_values(sCmdText, myOptions )
-
-!       print *, " >>> ", trim(sCmdText)
-!       call myOptions%print()
 
         ! dictionary entries are initially space-delimited; sArgText_1 contains
         ! all dictionary entries present, concatenated, with a space between entries

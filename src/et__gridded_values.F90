@@ -1,12 +1,12 @@
 !> @file
-!>  Contains a single module, et_monthly_grid, which
+!>  Contains a single module, et_gridded_values, which
 !>  populates the reference et by applying the monthly value obtained from a reference grid.
 
 
 !>  Populate potential evapotranspiration by substituting in 
-!>  the daily average ET from a monthly grid.
+!>  the daily average ET from a gridded data source.
 
-module et__monthly_grid
+module et__gridded_values
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double
   use constants_and_conversions
@@ -20,13 +20,13 @@ module et__monthly_grid
 
   private
 
-  public :: et_monthly_grid_initialize, et_monthly_grid_calculate, pMONTHLY_ET_GRID
+  public :: et_gridded_values_initialize, et_gridded_values_calculate, pET_GRID
 
-  type (DATA_CATALOG_ENTRY_T), pointer :: pMONTHLY_ET_GRID
+  type (DATA_CATALOG_ENTRY_T), pointer :: pET_GRID
 
 contains
 
-  subroutine et_monthly_grid_initialize( lActive )
+  subroutine et_gridded_values_initialize( lActive )
 
     logical (kind=c_bool), intent(in)     :: lActive(:,:)
 
@@ -37,22 +37,21 @@ contains
 
 
     ! locate the data structure associated with the gridded rainfall zone entries
-    pMONTHLY_ET_GRID => DAT%find("POTENTIAL_ET")
-    if ( .not. associated(pMONTHLY_ET_GRID) ) &
+    pET_GRID => DAT%find("POTENTIAL_ET")
+    if ( .not. associated(pET_GRID) ) &
         call die("A POTENTIAL_ET grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
 
-  end subroutine et_monthly_grid_initialize
+  end subroutine et_gridded_values_initialize
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine et_monthly_grid_calculate()
+  subroutine et_gridded_values_calculate()
 
     ! [ LOCALS ] 
     integer (kind=c_int) :: iJulianDay
     integer (kind=c_int) :: iMonth
     integer (kind=c_int) :: iDay
     integer (kind=c_int) :: iYear
-    integer (kind=c_int) :: iDaysInMonth
 
     associate ( dt => SIM_DT%curr )
 
@@ -60,12 +59,11 @@ contains
       iMonth = asInt( dt%iMonth )
       iDay = asInt( dt%iDay )
       iYear = dt%iYear
-      iDaysInMonth = SIM_DT%iDaysInMonth
   
-      call pMONTHLY_ET_GRID%getvalues( iMonth, iDay, iYear, iJulianDay )
+      call pET_GRID%getvalues( iMonth, iDay, iYear, iJulianDay )
 
     end associate
 
-  end subroutine et_monthly_grid_calculate
+  end subroutine et_gridded_values_calculate
 
-end module et__monthly_grid
+end module et__gridded_values

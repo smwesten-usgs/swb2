@@ -278,7 +278,7 @@ contains
     allocate( this%stream_storage(iCount), stat=iStat(27) )
     allocate( this%index_order(iCount), stat=iStat(28) )
 
-    allocate( OUTPUT(16), stat=iStat(29) )
+    allocate( OUTPUT(15), stat=iStat(29) )
 
     if ( any( iStat /= 0 ) )  call die("Problem allocating memory", __FILE__, __LINE__)
 
@@ -319,68 +319,77 @@ contains
     call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(1)%ncfile, sVariableName="gross_precipitation", &
       sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=50.0 )
+      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
 
     call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(2)%ncfile, sVariableName="interception", &
       sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=20.0 )
+      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
 
     call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(3)%ncfile, sVariableName="runoff", &
       sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
 
     call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(4)%ncfile, sVariableName="runon", &
       sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0   )
 
     call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(5)%ncfile, sVariableName="infiltration", &
       sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
 
     call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(6)%ncfile, sVariableName="snowfall", &
       sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
 
     call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(7)%ncfile, sVariableName="snowmelt", &
       sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
 
     call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(8)%ncfile, sVariableName="snow_storage", &
       sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
 
     call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(9)%ncfile, sVariableName="soil_storage", &
       sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
 
     call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(10)%ncfile, sVariableName="potential_recharge", &
       sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
 
     call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(11)%ncfile, sVariableName="reference_ET0", &
       sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
 
     call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(12)%ncfile, sVariableName="reference_ET0_adj", &
       sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
 
     call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(13)%ncfile, sVariableName="tmin", &
       sVariableUnits="degrees Fahrenheit", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
 
     call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(14)%ncfile, sVariableName="tmax", &
       sVariableUnits="degrees Fahrenheit", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,&
+      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(15)%ncfile, sVariableName="available_water_content", &
-      sVariableUnits="inches per foot", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(16)%ncfile, sVariableName="interception_storage", &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(15)%ncfile, sVariableName="interception_storage", &
       sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX  )
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
 
       this%dont_care = -99999.
 
@@ -913,7 +922,7 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
-    this%array_output = unpack(this%awc, this%active, this%dont_care)
+    this%array_output = unpack(this%interception_storage, this%active, this%dont_care)
 
     call netcdf_put_variable_array(NCFILE=OUTPUT(15)%ncfile, &
                    iVarID=OUTPUT(15)%ncfile%iVarID(NC_Z), &
@@ -921,16 +930,6 @@ contains
                    iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
-
-
-    this%array_output = unpack(this%interception_storage, this%active, this%dont_care)
-
-    call netcdf_put_variable_array(NCFILE=OUTPUT(16)%ncfile, &
-                   iVarID=OUTPUT(16)%ncfile%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=this%array_output)
 
   end subroutine write_variables_to_netcdf
 
@@ -1313,6 +1312,15 @@ contains
         call LOGS%WRITE( "==> MONTHLY_GRID EVAPOTRANSPIRATION submodel selected.", &
             iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
+      elseif ( ( sMethodName .strequal. "DAILY_GRID" ) &
+           .or. ( sMethodName .strequal. "DAILY_GRIDDED" ) ) then
+
+        this%init_reference_et => model_initialize_et_daily_grid
+        this%calc_reference_et => model_calculate_et_daily_grid
+
+        call LOGS%WRITE( "==> DAILY_GRID EVAPOTRANSPIRATION submodel selected.", &
+            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
       else
 
         call warn("Your control file specifies an unknown or unsupported EVAPOTRANSPIRATION method.", &
@@ -1405,7 +1413,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call interception_gash_initialize( this%active )
+    call interception_gash_initialize( this%active, this%landuse_index )
 
   end subroutine model_initialize_interception_gash
 
@@ -1573,13 +1581,39 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-  subroutine model_initialize_et_monthly_grid(this)
+  subroutine model_initialize_et_daily_grid(this)
 
-    use et__monthly_grid
+    use et__gridded_values
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call et_monthly_grid_initialize( this%active )
+    call et_gridded_values_initialize( this%active )
+
+  end subroutine model_initialize_et_daily_grid
+
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_et_daily_grid(this)
+
+    use et__gridded_values
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call et_gridded_values_calculate( )
+
+    this%reference_ET0 = pack( pET_GRID%pGrdBase%rData, this%active )
+
+  end subroutine model_calculate_et_daily_grid
+
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_et_monthly_grid(this)
+
+    use et__gridded_values
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call et_gridded_values_initialize( this%active )
 
   end subroutine model_initialize_et_monthly_grid
 
@@ -1587,13 +1621,13 @@ contains
 
   subroutine model_calculate_et_monthly_grid(this)
 
-    use et__monthly_grid
+    use et__gridded_values
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call et_monthly_grid_calculate( )
+    call et_gridded_values_calculate( )
 
-    this%reference_ET0 = pack( pMONTHLY_ET_GRID%pGrdBase%rData, this%active ) &
+    this%reference_ET0 = pack( pET_GRID%pGrdBase%rData, this%active ) &
                                       / real( SIM_DT%iDaysInMonth, kind=c_float)
 
   end subroutine model_calculate_et_monthly_grid

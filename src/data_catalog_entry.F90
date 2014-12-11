@@ -171,27 +171,6 @@ module data_catalog_entry
 
   end type DATA_CATALOG_ENTRY_T
 
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: PRCP => null()
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: TMAX => null()
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: TMIN => null()
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: RELHUM => null()
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: WINDSPD => null()
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: PCT_POSS_SUN => null()
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: SOLRAD => null()
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: LULC => null()
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: AWC => null()
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: HSG => null()
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: FLOWDIR => null()
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: MASK => null()
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: BASIN_MASK => null()
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: REF_ET => null()
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: FOG_ZONE_NUM => null()
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: FOG_ELEV_ZONE_NUM => null()
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: PRCP_GRID_NUM => null()
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: PAN_EVAP_ZONE_NUM => null()
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: RUNOFF_ZONE_NUM => null()  
-!   type (DATA_CATALOG_ENTRY_T), pointer, public :: ROUTING_FRAC => null()
-
   integer (kind=c_int), parameter, public :: MISSING_VALUES_ZERO_OUT = 0
   integer (kind=c_int), parameter, public :: MISSING_VALUES_REPLACE_WITH_MEAN = 1
 
@@ -485,21 +464,25 @@ end subroutine initialize_netcdf_data_object_sub
 
     endif
 
-     if (this%iTargetDataType == DATATYPE_REAL) then
+    if ( this%lGridHasChanged ) then
 
-       call apply_scale_and_offset(fResult=this%pGrdBase%rData, fValue=this%pGrdBase%rData,          &
+      if (this%iTargetDataType == DATATYPE_REAL) then
+
+        call apply_scale_and_offset(fResult=this%pGrdBase%rData, fValue=this%pGrdBase%rData,          &
               dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
 
-     elseif ( this%iTargetDataType == DATATYPE_INT ) then
+      elseif ( this%iTargetDataType == DATATYPE_INT ) then
 
-       call apply_scale_and_offset(iResult=this%pGrdBase%iData, iValue=this%pGrdBase%iData,          &
+         call apply_scale_and_offset(iResult=this%pGrdBase%iData, iValue=this%pGrdBase%iData,          &
               dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
 
-     else
+      else
 
         call die("Unsupported data type specified", __FILE__, __LINE__)
 
-     endif
+      endif
+
+    endif  
 
   end subroutine getvalues_sub
 
@@ -617,6 +600,8 @@ subroutine getvalues_constant_sub( this  )
           call assert(lFALSE, "INTERNAL PROGRAMMING ERROR - month, day, and year" &
             //" arguments must be supplied when calling this subroutine in a " &
             //"dynamic mode.", trim(__FILE__), __LINE__)
+
+
         call this%make_filename(iMonth, iDay, iYear)
 
       endif
@@ -683,10 +668,6 @@ subroutine getvalues_constant_sub( this  )
       end select
 
       call this%transfer_from_native() 
-
-      if (.not. this%lGridIsPersistent )  call grid_Destroy(this%pGrdNative)
-
-      exit
 
     enddo
 

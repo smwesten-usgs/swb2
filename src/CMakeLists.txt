@@ -11,9 +11,9 @@ if(TARGET__SWB_EXECUTABLE)
 		datetime.F90
             dictionary.F90
             #et_FAO56_crop_coefficients.F90
+            et__gridded_values.F90
             et__hargreaves_samani.F90
             et__jensen_haise.F90
-            et__monthly_grid.F90
             exceptions.F90
             fog__monthly_grid.F90
             file_operations.F90
@@ -226,9 +226,9 @@ if(TARGET__SWB_LIBRARY)
             datetime.F90
             dictionary.F90
             #et_FAO56_crop_coefficients.F90
+            et__gridded_values.F90
             et__hargreaves_samani.F90
             et__jensen_haise.F90
-            et__monthly_grid.F90
             exceptions.F90
             fog__monthly_grid.F90
             file_operations.F90
