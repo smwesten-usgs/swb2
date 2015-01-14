@@ -194,17 +194,20 @@ contains
  
     associate( Psat => fPrecipitation_at_Saturation )
 
-     print *, lbound(CANOPY_STORAGE_CAPACITY_UNPACKED,1), ubound(CANOPY_STORAGE_CAPACITY_UNPACKED,1)
-     print *, lbound(TRUNK_STORAGE_CAPACITY_UNPACKED,1), ubound(TRUNK_STORAGE_CAPACITY_UNPACKED,1)
-     print *, lbound(CANOPY_COVER_FRACTION,1), ubound(CANOPY_COVER_FRACTION,1)
-     print *, lbound(EVAPORATION_TO_RAINFALL_RATIO,1), ubound(EVAPORATION_TO_RAINFALL_RATIO,1)
+      where ( CANOPY_COVER_FRACTION > 0. .and. EVAPORATION_TO_RAINFALL_RATIO  > 0. )
 
-      Psat = - ( CANOPY_STORAGE_CAPACITY_UNPACKED / &
-                  ( ( CANOPY_COVER_FRACTION + 0.001 ) * EVAPORATION_TO_RAINFALL_RATIO )  &
+        Psat = - ( CANOPY_STORAGE_CAPACITY_UNPACKED / &
+                  ( ( CANOPY_COVER_FRACTION ) * EVAPORATION_TO_RAINFALL_RATIO )  &
                      * log( ( 1.0 - EVAPORATION_TO_RAINFALL_RATIO ) ) &
                        / ( 1.0 - ( 1.0 - coef2 ) * EVAPORATION_TO_RAINFALL_RATIO ) )
 
-      print *, __FILE__, " : ", __LINE__, "   Psat (min,max)=", minval(Psat), maxval(Psat)
+      elsewhere
+      
+        Psat = 0.0
+
+      endwhere    
+
+!       print *, __FILE__, " : ", __LINE__, "   Psat (min,max)=", minval(Psat), maxval(Psat)
 
     !  where (fRainfall)
 

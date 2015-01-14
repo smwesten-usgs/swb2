@@ -57,8 +57,11 @@ module netcdf4_support
   integer(kind=c_int), parameter :: NC_FILL_BYTE    = -127
   integer(kind=c_int), parameter :: NC_FILL_SHORT   = -32767
   integer(kind=c_int), parameter :: NC_FILL_INT     = -2147483647
-  real(kind=c_float),  parameter :: NC_FILL_FLOAT   = 9.9692099683868690e+36
-  real(kind=c_double), parameter :: NC_FILL_DOUBLE  = 9.9692099683868690d+36
+
+  real(kind=c_float),  parameter :: NC_FILL_FLOAT   = 9.9692099683868690e+36_c_float
+  real(kind=c_double), parameter :: NC_FILL_DOUBLE  = 9.9692099683868690e+36_c_double
+!  real(kind=c_float),  parameter :: NC_FILL_FLOAT   = -( HUGE( 0_c_float ) - 1.0_c_float )
+!  real(kind=c_double), parameter :: NC_FILL_DOUBLE  = -( HUGE( 0_c_double ) - 1.0_c_double )
 
   ! mode flags for opening and creating datasets
   integer(kind=c_int), parameter :: NC_NOWRITE          = 0
@@ -905,11 +908,11 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   call nf_put_attributes(NCFILE=NCFILE)
 
   !> enable a low level of data compression for the variable of interest
-  call nf_define_deflate(NCFILE=NCFILE, &
-     iVarID=NCFILE%iVarID(NC_Z), &
-     iShuffle=NC_SHUFFLE_YES, &
-     iDeflate=NC_DEFLATE_YES, &
-     iDeflate_level=2 )
+   call nf_define_deflate(NCFILE=NCFILE, &
+      iVarID=NCFILE%iVarID(NC_Z), &
+      iShuffle=NC_SHUFFLE_YES, &
+      iDeflate=NC_DEFLATE_YES, &
+      iDeflate_level=3 )
 
   call nf_enddef(NCFILE=NCFILE)
 
@@ -2988,7 +2991,7 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, lLatLon, fValidMin, f
 
   if (present( fValidMin ) .and. present( fValidMax) ) then
 
-    iNumAttributes = 4
+    iNumAttributes = 5
     allocate( NCFILE%pNC_VAR(NC_Z)%pNC_ATT(0:iNumAttributes-1), stat=iStat)
     call assert(iStat == 0, "Could not allocate memory for NC_ATT member in NC_VAR struct of NC_FILE", &
       trim(__FILE__), __LINE__)
@@ -3020,6 +3023,12 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, lLatLon, fValidMin, f
     pNC_ATT(3)%rAttValue(1) = fValidMax
     pNC_ATT(3)%iNC_AttType = NC_FLOAT
     pNC_ATT(3)%iNC_AttSize = 2_c_size_t
+
+    pNC_ATT(4)%sAttributeName = "_FillValue"
+    allocate(pNC_ATT(4)%rAttValue(0:0))
+    pNC_ATT(4)%rAttValue(0) = NC_FILL_FLOAT
+    pNC_ATT(4)%iNC_AttType = NC_FLOAT
+    pNC_ATT(4)%iNC_AttSize = 1_c_size_t
 
   else  
 

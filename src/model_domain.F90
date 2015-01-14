@@ -391,7 +391,7 @@ contains
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
 
-      this%dont_care = -99999.
+      this%dont_care = NC_FILL_FLOAT
 
   end subroutine initialize_netcdf_output_sub
 
@@ -1099,8 +1099,10 @@ contains
     do iSoilsIndex = 1, iNumberOfSoilGroups
       do iLUIndex = 1, iNumberOfLanduses
 
-        print *, "LU: ", iLUIndex, "  Soils: ", iSoilsIndex, "  | # matches = ", &
-            count( this%landuse_index == iLUIndex .and. this%soil_group == iSoilsIndex )
+        call LOGS%WRITE( "LU: "//asCharacter(iLUIndex)//"  Soils: "//asCharacter(iSoilsIndex)//"  | # matches = "//  &
+            asCharacter(count( this%landuse_index == iLUIndex .and. this%soil_group == iSoilsIndex ) ),              &
+            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
 
         do iIndex = 1, ubound(this%soil_storage_max, 1)
     
