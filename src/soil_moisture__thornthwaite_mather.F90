@@ -97,32 +97,46 @@ contains
 !--------------------------------------------------------------------------------------------------
 
   elemental subroutine soil_moisture_thornthwaite_mather_calculate(fAPWL, fSoilStorage, fSoilStorage_Excess,                &
-                                            fSoilStorage_Max, fInfiltration, fReference_ET)
+                                            fActual_ET, fSoilStorage_Max, fInfiltration, fReference_ET)
 
     real (kind=c_float), intent(inout)   :: fAPWL
     real (kind=c_float), intent(inout)   :: fSoilStorage
     real (kind=c_float), intent(out)     :: fSoilStorage_Excess
+    real (kind=c_float), intent(out)     :: fActual_ET
     real (kind=c_float), intent(in)      :: fSoilStorage_Max
     real (kind=c_float), intent(in)      :: fInfiltration
     real (kind=c_float), intent(in)      :: fReference_ET
 
     ! [ LOCALS ]
     real (kind=c_float) :: fP_minus_PE
+    real (kind=c_float) :: fOldSoilStorage
 
     fP_minus_PE = fInfiltration - fReference_ET
 
+    fOldSoilStorage = fSoilStorage
+
     ! P - PE < 0: soil is losing moisture; ET exceeds infiltration/precip
     ! must update new APWL, then back-calculate new soil moisture
+    !
+    ! in this case, Actual ET will be less than Potential or Reference ET because
+    ! of resistance in the soil layer to giving up moisture at the current level of
+    ! accumulated potential water loss
+    !
     if ( fP_minus_PE < 0.0_c_float ) then
 
       fAPWL = fAPWL - fP_minus_PE
       fSoilStorage = calc_soil_storage_given_current_APWL( fSWC=fSoilStorage_Max, fAPWL=fAPWL )
       fSoilStorage_Excess = 0.0_c_float
+      fActual_ET = fOldSoilStorage - fSoilStorage
     
     else ! P > PE: soil is gaining moisture; add P - PE directly to soil moisture, then
-         ! beck-calculate a new APWL that corresponds to the new soil moisture
+         ! back-calculate a new APWL that corresponds to the new soil moisture
+         !
+         ! Actual ET is assumed to be equal to potential ET
+         !
 
       fSoilStorage = fSoilStorage + fP_minus_PE
+      fActual_ET = fReference_ET
 
       if (fSoilStorage > fSoilStorage_Max ) then
 

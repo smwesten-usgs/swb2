@@ -44,6 +44,7 @@ module model_domain
     real (kind=c_float), allocatable       :: latitude(:)
     real (kind=c_float), allocatable       :: reference_ET0(:)
     real (kind=c_float), allocatable       :: reference_ET0_adj(:)
+    real (kind=c_float), allocatable       :: interception_ET(:)
     real (kind=c_float), allocatable       :: actual_ET(:)
     real (kind=c_float), allocatable       :: inflow(:)
     real (kind=c_float), allocatable       :: runon(:)
@@ -245,7 +246,7 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
-    integer (kind=c_int)  :: iStat(29)
+    integer (kind=c_int)  :: iStat(30)
 
     iCount = count( this%active )
 
@@ -258,27 +259,28 @@ contains
     allocate( this%latitude(iCount), stat=iStat(7) )
     allocate( this%reference_ET0(iCount), stat=iStat(8) )
     allocate( this%reference_ET0_adj(iCount), stat=iStat(9) )
-    allocate( this%actual_ET(iCount), stat=iStat(10) )
-    allocate( this%inflow(iCount), stat=iStat(11))
-    allocate( this%runon(iCount), stat=iStat(12) )
-    allocate( this%runoff(iCount), stat=iStat(13) )
-    allocate( this%outflow(iCount), stat=iStat(14) )
-    allocate( this%infiltration(iCount), stat=iStat(15) )
-    allocate( this%snowfall(iCount), stat=iStat(16) )
-    allocate( this%snowmelt(iCount), stat=iStat(17) )
-    allocate( this%interception(iCount), stat=iStat(18) )
-    allocate( this%rainfall(iCount), stat=iStat(19) )
-    allocate( this%GDD_28(iCount), stat=iStat(20) )
-    allocate( this%interception_storage(iCount), stat=iStat(21) )
-    allocate( this%snow_storage(iCount), stat=iStat(22) )
-    allocate( this%soil_storage(iCount), stat=iStat(23) )
-    allocate( this%soil_storage_max(iCount), stat=iStat(24) )
-    allocate( this%potential_recharge(iCount), stat=iStat(25) )
-    allocate( this%fog(iCount), stat=iStat(26) )
-    allocate( this%stream_storage(iCount), stat=iStat(27) )
-    allocate( this%index_order(iCount), stat=iStat(28) )
+    allocate( this%interception_ET(iCount), stat=iStat(10) )
+    allocate( this%actual_ET(iCount), stat=iStat(11) )
+    allocate( this%inflow(iCount), stat=iStat(12))
+    allocate( this%runon(iCount), stat=iStat(13) )
+    allocate( this%runoff(iCount), stat=iStat(14) )
+    allocate( this%outflow(iCount), stat=iStat(15) )
+    allocate( this%infiltration(iCount), stat=iStat(16) )
+    allocate( this%snowfall(iCount), stat=iStat(17) )
+    allocate( this%snowmelt(iCount), stat=iStat(18) )
+    allocate( this%interception(iCount), stat=iStat(19) )
+    allocate( this%rainfall(iCount), stat=iStat(20) )
+    allocate( this%GDD_28(iCount), stat=iStat(21) )
+    allocate( this%interception_storage(iCount), stat=iStat(22) )
+    allocate( this%snow_storage(iCount), stat=iStat(23) )
+    allocate( this%soil_storage(iCount), stat=iStat(24) )
+    allocate( this%soil_storage_max(iCount), stat=iStat(25) )
+    allocate( this%potential_recharge(iCount), stat=iStat(26) )
+    allocate( this%fog(iCount), stat=iStat(27) )
+    allocate( this%stream_storage(iCount), stat=iStat(28) )
+    allocate( this%index_order(iCount), stat=iStat(29) )
 
-    allocate( OUTPUT(15), stat=iStat(29) )
+    allocate( OUTPUT(16), stat=iStat(30) )
 
     if ( any( iStat /= 0 ) )  call die("Problem allocating memory", __FILE__, __LINE__)
 
@@ -376,17 +378,22 @@ contains
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(13)%ncfile, sVariableName="tmin", &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(13)%ncfile, sVariableName="actual_ET", &
+      sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
+
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(14)%ncfile, sVariableName="tmin", &
       sVariableUnits="degrees Fahrenheit", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(14)%ncfile, sVariableName="tmax", &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(15)%ncfile, sVariableName="tmax", &
       sVariableUnits="degrees Fahrenheit", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,&
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(15)%ncfile, sVariableName="interception_storage", &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(16)%ncfile, sVariableName="interception_storage", &
       sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
@@ -904,7 +911,7 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
-    this%array_output = unpack(this%tmin, this%active, this%dont_care)
+    this%array_output = unpack(this%actual_ET, this%active, this%dont_care)
 
     call netcdf_put_variable_array(NCFILE=OUTPUT(13)%ncfile, &
                    iVarID=OUTPUT(13)%ncfile%iVarID(NC_Z), &
@@ -913,7 +920,7 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
-    this%array_output = unpack(this%tmax, this%active, this%dont_care)
+    this%array_output = unpack(this%tmin, this%active, this%dont_care)
 
     call netcdf_put_variable_array(NCFILE=OUTPUT(14)%ncfile, &
                    iVarID=OUTPUT(14)%ncfile%iVarID(NC_Z), &
@@ -922,10 +929,19 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
-    this%array_output = unpack(this%interception_storage, this%active, this%dont_care)
+    this%array_output = unpack(this%tmax, this%active, this%dont_care)
 
     call netcdf_put_variable_array(NCFILE=OUTPUT(15)%ncfile, &
                    iVarID=OUTPUT(15)%ncfile%iVarID(NC_Z), &
+                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
+                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
+                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
+                   rValues=this%array_output )
+
+    this%array_output = unpack(this%interception_storage, this%active, this%dont_care)
+
+    call netcdf_put_variable_array(NCFILE=OUTPUT(16)%ncfile, &
+                   iVarID=OUTPUT(16)%ncfile%iVarID(NC_Z), &
                    iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
                    iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
@@ -996,26 +1012,12 @@ contains
     ! [ LOCALS ]
     real (kind=c_float)  :: fReferenceET_minus_interception
 
+    call this%calc_reference_et()
     call this%calc_fog()
-
     call this%calc_interception()
 
-    call this%calc_reference_et()
-
-    this%interception_storage = this%interception_storage + this%interception
-
-    this%reference_ET0_adj = this%reference_ET0 - this%interception_storage
-
-    where ( this%reference_ET0_adj >= 0.0_c_float ) ! potential ET evaporates all interception storage water
-    
-       this%interception_storage = 0.0_c_float
-
-    elsewhere ! not enough potential ET to completely dry out interception storage
-
-      this%interception_storage = this%interception_storage - this%reference_ET0
-      this%reference_ET0_adj = 0.0_c_float
-
-    end where
+!    this%interception_storage = this%interception_storage + this%interception
+    this%reference_ET0_adj = max( 0.0_c_float, this%reference_ET0 - this%interception_ET )
 
   end subroutine calculate_interception_mass_balance_sub
 
@@ -1404,6 +1406,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     this%interception = interception_bucket_calculate( this%landuse_index, this%gross_precip, this%fog )
+    this%interception_ET = this%interception
 
   end subroutine model_calculate_interception_bucket
 
@@ -1428,6 +1431,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     call interception_gash_calculate( this%gross_precip, this%fog, this%interception )
+    this%interception_ET = this%interception
 
   end subroutine model_calculate_interception_gash
 
@@ -1726,6 +1730,7 @@ contains
       call soil_moisture_thornthwaite_mather_calculate(fAPWL=APWL(index),                                    &
                                                         fSoilStorage=this%soil_storage(index),               &
                                                         fSoilStorage_Excess=this%potential_recharge(index),  &
+                                                        fActual_ET=this%actual_ET(index),                    &
                                                         fSoilStorage_Max=this%soil_storage_max(index),       &
                                                         fInfiltration=this%infiltration(index),              &
                                                         fReference_ET=this%reference_ET0_adj(index) )
@@ -1735,6 +1740,7 @@ contains
       call soil_moisture_thornthwaite_mather_calculate(fAPWL=APWL,                                    &
                                                         fSoilStorage=this%soil_storage,               &
                                                         fSoilStorage_Excess=this%potential_recharge,  &
+                                                        fActual_ET=this%actual_ET,                    &
                                                         fSoilStorage_Max=this%soil_storage_max,       &
                                                         fInfiltration=this%infiltration,              &
                                                         fReference_ET=this%reference_ET0_adj )

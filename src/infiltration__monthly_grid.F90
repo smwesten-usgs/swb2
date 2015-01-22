@@ -36,7 +36,7 @@ contains
   !!
   subroutine infiltration_monthly_grid_initialize( lActive )
 
-    logical (kind=c_logical), intent(in)   :: lActive(:,:)
+    logical (kind=c_bool), intent(in)   :: lActive(:,:)
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iStat
@@ -48,9 +48,9 @@ contains
 
     call pRUNOFF_ZONE%getvalues( )
 
-    allocate RUNOFF_ZONE( lActive, stat=iStat )
+    allocate ( RUNOFF_ZONE( count( lActive ) ), stat=iStat )
 
-    RUNOFF_ZONE = pack( pRUNOFF_ZONE%iData, lActive )
+    RUNOFF_ZONE = pack( pRUNOFF_ZONE%pGrdBase%iData, lActive )
 
   end subroutine infiltration_monthly_grid_initialize
 

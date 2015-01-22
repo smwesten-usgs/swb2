@@ -48,6 +48,11 @@ module strings
       procedure :: split_and_return_text_sub
     end interface chomp
 
+    public :: fieldCount
+    interface fieldCount
+      procedure :: count_number_of_fields_fn
+    end interface fieldCount  
+
     public :: clean
     interface clean
       procedure :: remove_multiple_characters_fn
@@ -543,6 +548,31 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  function count_number_of_fields_fn( sText, sDelimiters )     result( iCount )
+
+    character (len=*), intent(in)               :: sText
+    character (len=*), intent(in), optional     :: sDelimiters
+    integer (kind=c_int)                        :: iCount
+
+    ! [ LOCALS ]
+    character (len=len(sText)) :: sText1
+    character (len=len(sText)) :: sText2
+
+    iCount = 0
+
+    do
+      call chomp(sText1=sText1, sText2=sText2, sDelimiters=sDelimiters )
+
+      if ( len_trim( sText1 ) > 0 ) iCount = iCount + 1
+
+      if ( len_trim( sText2 ) == 0 )  exit
+
+    enddo
+    
+  end function count_number_of_fields_fn  
+
+!--------------------------------------------------------------------------------------------------
+
   subroutine split_and_return_text_sub(sText1, sText2, sDelimiters)
 
     character (len=*), intent(inout)                     :: sText1
@@ -554,6 +584,7 @@ contains
     integer (kind=c_int) :: iIndex
 
     if ( present(sDelimiters) ) then
+
       select case (sDelimiters)
         case ("WHITESPACE")
           sDelimiters_ = sWHITESPACE
@@ -562,10 +593,14 @@ contains
         case ("COMMA", "CSV")  
           sDelimiters_ = ","
         case default
+          call warn( "Possible improper use of chomp field delimiter--default delimiters in use", __FILE__, __LINE__ )
           sDelimiters_ = sDelimiters        
       end select    
+
     else
+
       sDelimiters_ = sWHITESPACE
+
     endif
 
     sText1 = adjustl(sText1)

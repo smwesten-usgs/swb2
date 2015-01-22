@@ -117,6 +117,7 @@ contains
       iCount = iCount + 1
 
       if ( (FRAGMENTS(iIndex + 1)%iFragmentSet == 1) .and. ( FRAGMENTS(iIndex)%iFragmentSet == 1)) then 
+        
         ! this should be the case if there is only a single fragment associated with this gage and month
         FRAGMENTS_SETS( iRainGageZone )%iNumberOfFragments(iMonth) = iCount
         FRAGMENTS_SETS( iRainGageZone )%iRainGageZone = iRainGageZone
@@ -124,12 +125,15 @@ contains
         iCount = 0
 
       elseif (FRAGMENTS(iIndex + 1)%iFragmentSet == 1) then 
+        
         FRAGMENTS_SETS( iRainGageZone )%iNumberOfFragments(iMonth) = iCount
-
         iCount = 0
+
       elseif ( FRAGMENTS(iIndex)%iFragmentSet == 1) then
+        
         FRAGMENTS_SETS( iRainGageZone )%iRainGageZone = iRainGageZone
         FRAGMENTS_SETS( iRainGageZone )%iStartRecord(iMonth) = iIndex
+
       endif  
 
     enddo  
