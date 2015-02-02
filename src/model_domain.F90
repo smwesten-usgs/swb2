@@ -1425,7 +1425,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call interception_gash_calculate( this%gross_precip, this%fog, this%interception )
+    call interception_gash_calculate( this%gross_precip + this%fog, this%interception )
 
   end subroutine model_calculate_interception_gash
 

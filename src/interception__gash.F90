@@ -179,30 +179,66 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine interception_gash_calculate( fRainfall, fFog, fInterception )
+  subroutine interception_gash_calculate( fPrecip, fInterception )
 
-    real (kind=c_float), intent(in)        :: fRainfall(:)
-    real (kind=c_float), intent(in)        :: fFog(:)
+    real (kind=c_float), intent(in)        :: fPrecip(:)
     real (kind=c_float), intent(inout)     :: fInterception(:)
 
     ! [ LOCALS ]
-    real (kind=c_float), allocatable :: fPrecipitation_at_Saturation(:)
+    real (kind=c_float), allocatable :: fPrecipitation_at_Canopy_Saturation(:)
+    real (kind=c_float), allocatable :: fPrecipitation_at_Trunk_Saturation(:)
     real (kind=c_float)              :: coef2 = 0.0
 
-
-    allocate( fPrecipitation_at_Saturation(ubound(CANOPY_STORAGE_CAPACITY_UNPACKED,1) ) )
+    allocate( fPrecipitation_at_Canopy_Saturation(ubound(CANOPY_STORAGE_CAPACITY_UNPACKED,1) ) )
+    allocate( fPrecipitation_at_Trunk_Saturation(ubound(TRUNK_STORAGE_CAPACITY_UNPACKED,1) ) )
  
-    associate( Psat => fPrecipitation_at_Saturation )
+    associate( Psat => fPrecipitation_at_Canopy_Saturation, Tsat => fPrecipitation_at_Trunk_Saturation )
 
-     print *, lbound(CANOPY_STORAGE_CAPACITY_UNPACKED,1), ubound(CANOPY_STORAGE_CAPACITY_UNPACKED,1)
-     print *, lbound(TRUNK_STORAGE_CAPACITY_UNPACKED,1), ubound(TRUNK_STORAGE_CAPACITY_UNPACKED,1)
-     print *, lbound(CANOPY_COVER_FRACTION,1), ubound(CANOPY_COVER_FRACTION,1)
-     print *, lbound(EVAPORATION_TO_RAINFALL_RATIO,1), ubound(EVAPORATION_TO_RAINFALL_RATIO,1)
+    where ( CANOPY_COVER_FRACTION > 0.0 .and. EVAPORATION_TO_RAINFALL_RATIO > 0.0 )
 
       Psat = - ( CANOPY_STORAGE_CAPACITY_UNPACKED / &
-                  ( ( CANOPY_COVER_FRACTION + 0.001 ) * EVAPORATION_TO_RAINFALL_RATIO )  &
+                  ( ( CANOPY_COVER_FRACTION ) * EVAPORATION_TO_RAINFALL_RATIO )  &
                      * log( ( 1.0 - EVAPORATION_TO_RAINFALL_RATIO ) ) &
                        / ( 1.0 - ( 1.0 - coef2 ) * EVAPORATION_TO_RAINFALL_RATIO ) )
+
+    elsewhere
+
+      Psat = 0.0
+
+    end where
+
+
+    where ( STEMFLOW_FRACTION > 0.0 )
+
+      Tsat = TRUNK_STORAGE_CAPACITY_UNPACKED / STEMFLOW_FRACTION
+
+    elsewhere
+
+      Tsat = 0.0
+
+    end where  
+
+
+    where ( fPrecip < Psat )
+
+      fInterception = CANOPY_COVER_FRACTION * ( fPrecip )
+
+
+    else where ( fPrecip > Tsat )
+
+      fInterception = CANOPY_COVER_FRACTION * Psat                                  &
+                      + CANOPY_COVER_FRACTION * EVAPORATION_TO_RAINFALL_RATIO       &
+                          * ( fPrecip - Psat )                                      &
+                      + TRUNK_STORAGE_CAPACITY_UNPACKED
+
+    elsewhere
+
+      fInterception = CANOPY_COVER_FRACTION * Psat                                  &
+                      + CANOPY_COVER_FRACTION * EVAPORATION_TO_RAINFALL_RATIO       &
+                          * ( fPrecip - Psat )                                      &
+                      + STEMFLOW_FRACTION * fPrecip
+
+    end where  
 
       print *, __FILE__, " : ", __LINE__, "   Psat (min,max)=", minval(Psat), maxval(Psat)
 
