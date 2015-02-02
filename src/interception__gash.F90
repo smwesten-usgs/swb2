@@ -26,13 +26,14 @@ module interception__gash
   real (kind=c_float), allocatable   :: STEMFLOW_FRACTION(:)
   real (kind=c_float), allocatable   :: EVAPORATION_TO_RAINFALL_RATIO(:)
 
+  real (kind=c_float), allocatable   :: CANOPY_STORAGE_CAPACITY_TABLE_VALUES(:)
+  real (kind=c_float), allocatable   :: TRUNK_STORAGE_CAPACITY_TABLE_VALUES(:)  
+
   real (kind=c_float), allocatable   :: CANOPY_STORAGE_CAPACITY(:)
   real (kind=c_float), allocatable   :: TRUNK_STORAGE_CAPACITY(:)  
+  real (kind=c_float), allocatable   :: P_SAT(:)
 
-  real (kind=c_float), allocatable   :: CANOPY_STORAGE_CAPACITY_UNPACKED(:)
-  real (kind=c_float), allocatable   :: TRUNK_STORAGE_CAPACITY_UNPACKED(:)  
-
-  type (T_NETCDF4_FILE), pointer       :: pNCFILE           ! pointer to OUTPUT NetCDF file
+  type (T_NETCDF4_FILE), pointer     :: pNCFILE           ! pointer to OUTPUT NetCDF file
 
 contains
 
@@ -130,14 +131,14 @@ contains
     call slList%deallocate()
     call slList%append("Canopy_Capacity")
     call slList%append("Canopy_Storage_Capacity")
-    call PARAMS%get_values( slList, CANOPY_STORAGE_CAPACITY )
+    call PARAMS%get_values( slList, CANOPY_STORAGE_CAPACITY_TABLE_VALUES )
 
     call slList%deallocate()
     call slList%append("Trunk_Capacity")
     call slList%append("Trunk_Storage_Capacity")
-    call PARAMS%get_values( slList, TRUNK_STORAGE_CAPACITY )
+    call PARAMS%get_values( slList, TRUNK_STORAGE_CAPACITY_TABLE_VALUES )
 
-    iNumRecs = ubound(CANOPY_STORAGE_CAPACITY,1)
+    iNumRecs = ubound(CANOPY_STORAGE_CAPACITY_TABLE_VALUES,1)
     lAreLengthsEqual = ( iNumRecs == iNumberOfLanduses ) 
 
     if ( .not. lAreLengthsEqual )                                                       &
@@ -147,7 +148,7 @@ contains
         sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
 
 
-    iNumRecs = ubound(TRUNK_STORAGE_CAPACITY,1)
+    iNumRecs = ubound(TRUNK_STORAGE_CAPACITY_TABLE_VALUES,1)
     lAreLengthsEqual = ( iNumRecs == iNumberOfLanduses )
 
     if ( .not. lAreLengthsEqual )                                                        &
@@ -157,90 +158,91 @@ contains
         sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
 
 
-    allocate( CANOPY_STORAGE_CAPACITY_UNPACKED( iCount ), stat=iStat )
+    allocate( CANOPY_STORAGE_CAPACITY( iCount ), stat=iStat )
     call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
 
-    allocate( TRUNK_STORAGE_CAPACITY_UNPACKED( iCount ), stat=iStat )
+    allocate( TRUNK_STORAGE_CAPACITY( iCount ), stat=iStat )
     call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
+
+    print *, "++++++++"
+    print *, lbound(iLandUseTableCodes,1), ubound(iLandUseTableCodes,1), minval(iLanduseIndex),maxval(iLanduseIndex)
 
     do iIndex = lbound(iLandUseTableCodes,1), ubound(iLandUseTableCodes,1)
+
+      print *, iIndex, CANOPY_STORAGE_CAPACITY_TABLE_VALUES( iIndex ), TRUNK_STORAGE_CAPACITY_TABLE_VALUES( iIndex )
+
       where (iLanduseIndex == iIndex)
 
-        CANOPY_STORAGE_CAPACITY_UNPACKED = CANOPY_STORAGE_CAPACITY( iIndex )
-        TRUNK_STORAGE_CAPACITY_UNPACKED = TRUNK_STORAGE_CAPACITY( iIndex ) 
+        CANOPY_STORAGE_CAPACITY = CANOPY_STORAGE_CAPACITY_TABLE_VALUES( iIndex )
+        TRUNK_STORAGE_CAPACITY = TRUNK_STORAGE_CAPACITY_TABLE_VALUES( iIndex ) 
 
-      end where  
+      end where
+
     enddo
 
-    deallocate(CANOPY_STORAGE_CAPACITY)
-    deallocate(TRUNK_STORAGE_CAPACITY)
+    allocate( P_SAT(ubound(CANOPY_STORAGE_CAPACITY,1) ) )
+ 
+    P_SAT = precipitation_at_saturation( EVAPORATION_TO_RAINFALL_RATIO, CANOPY_STORAGE_CAPACITY, CANOPY_COVER_FRACTION )
+
+
+    deallocate(CANOPY_STORAGE_CAPACITY_TABLE_VALUES)
+    deallocate(TRUNK_STORAGE_CAPACITY_TABLE_VALUES)
 
   end subroutine interception_gash_initialize
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine interception_gash_calculate( fPrecip, fInterception )
+  elemental function precipitation_at_saturation( E_div_P, canopy_storage, canopy_cover_fraction )  result( Psat )
 
-    real (kind=c_float), intent(in)        :: fPrecip(:)
+    real (kind=c_float), intent(in)    :: E_div_P
+    real (kind=c_float), intent(in)    :: canopy_storage
+    real (kind=c_float), intent(in)    :: canopy_cover_fraction
+    real (kind=c_float)                :: Psat
+
+    ! [ LOCALS ]
+    real (kind=c_float)                :: P_div_E
+
+    P_div_E = 0.0_c_float
+
+    if ( E_div_P > 0.0_c_float )  P_div_E = 1.0_c_float / E_div_P 
+
+    Psat = - P_div_E * canopy_storage / canopy_cover_fraction * log( 1.0_c_float - E_div_P )
+
+
+
+  end function precipitation_at_saturation  
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine interception_gash_calculate( fRainfall, fFog, fInterception )
+
+    real (kind=c_float), intent(in)        :: fRainfall(:)
+    real (kind=c_float), intent(in)        :: fFog(:)
     real (kind=c_float), intent(inout)     :: fInterception(:)
 
     ! [ LOCALS ]
-    real (kind=c_float), allocatable :: fPrecipitation_at_Canopy_Saturation(:)
-    real (kind=c_float), allocatable :: fPrecipitation_at_Trunk_Saturation(:)
-    real (kind=c_float)              :: coef2 = 0.0
+    real (kind=c_float), allocatable :: fGrossPrecip(:)
+    integer (kind=c_int)             :: index
+  
+    fGrossPrecip = fRainfall + fFog
 
-    allocate( fPrecipitation_at_Canopy_Saturation(ubound(CANOPY_STORAGE_CAPACITY_UNPACKED,1) ) )
-    allocate( fPrecipitation_at_Trunk_Saturation(ubound(TRUNK_STORAGE_CAPACITY_UNPACKED,1) ) )
- 
-    associate( Psat => fPrecipitation_at_Canopy_Saturation, Tsat => fPrecipitation_at_Trunk_Saturation )
+    where( fGrossPrecip < P_SAT )
 
-    where ( CANOPY_COVER_FRACTION > 0.0 .and. EVAPORATION_TO_RAINFALL_RATIO > 0.0 )
+      fInterception = CANOPY_COVER_FRACTION * fGrossPrecip
 
-      Psat = - ( CANOPY_STORAGE_CAPACITY_UNPACKED / &
-                  ( ( CANOPY_COVER_FRACTION ) * EVAPORATION_TO_RAINFALL_RATIO )  &
-                     * log( ( 1.0 - EVAPORATION_TO_RAINFALL_RATIO ) ) &
-                       / ( 1.0 - ( 1.0 - coef2 ) * EVAPORATION_TO_RAINFALL_RATIO ) )
+    elsewhere ( fGrossPrecip > TRUNK_STORAGE_CAPACITY / STEMFLOW_FRACTION )
 
-    elsewhere
+      fInterception =   CANOPY_COVER_FRACTION * P_SAT                                                         &
+                      + CANOPY_COVER_FRACTION * EVAPORATION_TO_RAINFALL_RATIO * ( fGrossPrecip - P_SAT )      &
+                      + TRUNK_STORAGE_CAPACITY
 
-      Psat = 0.0
+    elsewhere 
 
-    end where
+      fInterception =   CANOPY_COVER_FRACTION * P_SAT                                                         &
+                      + CANOPY_COVER_FRACTION * EVAPORATION_TO_RAINFALL_RATIO * ( fGrossPrecip - P_SAT )      &
+                      + STEMFLOW_FRACTION * fGrossPrecip
+    endwhere
 
-
-    where ( STEMFLOW_FRACTION > 0.0 )
-
-      Tsat = TRUNK_STORAGE_CAPACITY_UNPACKED / STEMFLOW_FRACTION
-
-    elsewhere
-
-      Tsat = 0.0
-
-    end where  
-
-
-    where ( fPrecip < Psat )
-
-      fInterception = CANOPY_COVER_FRACTION * ( fPrecip )
-
-
-    else where ( fPrecip > Tsat )
-
-      fInterception = CANOPY_COVER_FRACTION * Psat                                  &
-                      + CANOPY_COVER_FRACTION * EVAPORATION_TO_RAINFALL_RATIO       &
-                          * ( fPrecip - Psat )                                      &
-                      + TRUNK_STORAGE_CAPACITY_UNPACKED
-
-    elsewhere
-
-      fInterception = CANOPY_COVER_FRACTION * Psat                                  &
-                      + CANOPY_COVER_FRACTION * EVAPORATION_TO_RAINFALL_RATIO       &
-                          * ( fPrecip - Psat )                                      &
-                      + STEMFLOW_FRACTION * fPrecip
-
-    end where  
-
-      print *, __FILE__, " : ", __LINE__, "   Psat (min,max)=", minval(Psat), maxval(Psat)
 
     !  where (fRainfall)
 
@@ -257,9 +259,6 @@ contains
 !      1                     (drf+dfog-Psat)+tfrac(ip)*(drf+dfog)
 !                 endif
 !                 dpnet=drf+dfog-dcanint
-
-    end associate
-
  
   end subroutine interception_gash_calculate
 

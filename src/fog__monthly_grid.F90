@@ -69,7 +69,8 @@ contains
 
     call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE, sVariableName="fog", &
       sVariableUnits="inches", iNX=iNX, iNY=iNY, &
-      fX=dX, fY=dY, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=dY_lat, dpLon=dX_lon  )
+      fX=dX, fY=dY, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=dY_lat, dpLon=dX_lon, &
+      fValidMin=0.0, fValidMax=2000.0   )
 
 
   end subroutine fog_monthly_grid_initialize

@@ -169,8 +169,7 @@ contains
 
   end function list_get_value_at_index_fn
 
-
-
+!--------------------------------------------------------------------------------------------------
 
   !> Iterate over a range of indices; return a space-delimited string comprised of the values.
   function list_get_values_in_range_fn(this, iStartIndex, iEndIndex)   result(sText)
@@ -211,9 +210,6 @@ contains
    
 
   end function list_get_values_in_range_fn
-
-
-
 
 !--------------------------------------------------------------------------------------------------
 
