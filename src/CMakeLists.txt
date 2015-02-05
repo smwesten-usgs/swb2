@@ -18,7 +18,8 @@ if(TARGET__SWB_EXECUTABLE)
             fog__monthly_grid.F90
             file_operations.F90
             grid.F90
-            infiltration__curve_number.F90            
+            infiltration__curve_number.F90 
+#            infiltration__monthly_grid.F90           
             interception__bucket.F90
             interception__gash.F90
             logfiles.F90
@@ -233,7 +234,8 @@ if(TARGET__SWB_LIBRARY)
             fog__monthly_grid.F90
             file_operations.F90
             grid.F90
-            infiltration__curve_number.F90            
+            infiltration__curve_number.F90
+#            infiltration__monthly_grid.F90            
             interception__bucket.F90
             interception_gash.F90
             logfiles.F90

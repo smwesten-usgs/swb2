@@ -2863,14 +2863,14 @@ subroutine nf_set_standard_variables(NCFILE, sVarName_z, lLatLon)
     NCFILE%pNC_VAR(NC_LAT)%sVariableName = "lat"
     NCFILE%pNC_VAR(NC_LAT)%iNC_VarType = NC_FLOAT
     NCFILE%pNC_VAR(NC_LAT)%iNumberOfDimensions = 2
-    NCFILE%pNC_VAR(NC_LAT)%iNC_DimID = [NCFILE%pNC_DIM(NC_X)%iNC_DimID, &
-                                        NCFILE%pNC_DIM(NC_Y)%iNC_DimID,0,0]
+    NCFILE%pNC_VAR(NC_LAT)%iNC_DimID = [NCFILE%pNC_DIM(NC_Y)%iNC_DimID, &
+                                        NCFILE%pNC_DIM(NC_X)%iNC_DimID,0,0]
 
     NCFILE%pNC_VAR(NC_LON)%sVariableName = "lon"
     NCFILE%pNC_VAR(NC_LON)%iNC_VarType = NC_FLOAT
     NCFILE%pNC_VAR(NC_LON)%iNumberOfDimensions = 2
-    NCFILE%pNC_VAR(NC_LON)%iNC_DimID = [NCFILE%pNC_DIM(NC_X)%iNC_DimID, &
-                                        NCFILE%pNC_DIM(NC_Y)%iNC_DimID,0,0]
+    NCFILE%pNC_VAR(NC_LON)%iNC_DimID = [NCFILE%pNC_DIM(NC_Y)%iNC_DimID, &
+                                        NCFILE%pNC_DIM(NC_X)%iNC_DimID,0,0]
   endif
 
 end subroutine nf_set_standard_variables
@@ -3222,8 +3222,8 @@ subroutine nf_put_lat_and_lon(NCFILE, dpLat, dpLon)
   ! [ LOCALS ]
   integer (kind=c_size_t) :: iNX, iNY
 
-  iNX = int( size(dpLat, 2), kind=c_size_t)
-  iNY = int( size(dpLat, 1), kind=c_size_t)
+  iNX = int( size(dpLat, 1), kind=c_size_t)
+  iNY = int( size(dpLat, 2), kind=c_size_t)
 
   call netcdf_put_variable_array(NCFILE=NCFILE, &
                    iVarID=NCFILE%pNC_VAR(NC_LAT)%iNC_VarID, &

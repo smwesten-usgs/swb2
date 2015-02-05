@@ -7,16 +7,16 @@ rmdir /S /Q tests
 del /S /Q *.txt
 
 :: set CMAKE-related and build-related variables
-set CMAKEROOT=C:\Program Files (x86)\CMake 2.8
+set CMAKEROOT=C:\Program Files (x86)\CMake\
 set COMPILER_DIR=C:\MinGW64
-set COMPILER_VERSION=4.9.0
+set COMPILER_VERSION=4.9.2
 set COMPILER_TRIPLET=x86_64-w64-mingw32
 set LIB_PATH1=%COMPILER_DIR%/%COMPILER_TRIPLET%/lib
 set LIB_PATH2=%COMPILER_DIR%/lib/gcc/%COMPILER_TRIPLET%/%COMPILER_VERSION%
 
 set MAKE_EXECUTABLE_NAME=mingw32-make.exe
 set Fortran_COMPILER_NAME=gfortran
-set R_HOME=C:\Program Files\R\R-3.0.1\bin
+set R_HOME=C:\Program Files\R\R-3.1.2\bin
 set OMP_NUM_THREADS=8
 
 :: define where 'make copy' will place executables
