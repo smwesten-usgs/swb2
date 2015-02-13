@@ -53,15 +53,19 @@ module sm_FAO56
 
    ! retrieve a string list of all keys associated with REW (i.e. "REW_1", "REW_2", "REW_3", etc)
    slREW = PARAMS%grep_keys("REW")
+
    ! Convert the string list to an vector of integers; this call strips off the "REW_" part of label
    iREWSeqNums = slREW%asInt()
+
    ! count how many items are present in the vector; this should equal the number of soils groups
    iNumberOfREW = count( iREWSeqNums > 0 )
 
    ! retrieve a string list of all keys associated with TEW (i.e. "TEW_1", "TEW_2", "TEW_3", etc)
    slTEW = PARAMS%grep_keys("TEW")
+
    ! Convert the string list to an vector of integers; this call strips off the "TEW_" part of label
    iTEWSeqNums = slTEW%asInt()
+
    ! count how many items are present in the vector; this should equal the number of soils groups
    iNumberOfTEW = count( iTEWSeqNums > 0 )
 
@@ -114,7 +118,7 @@ module sm_FAO56
  !! @param[inout] pIRRIGATION pointer to a single line of information in the irrigation file.
  !! @param[in] iThreshold either the current day of year or the number of growing degree days.
  !! @retval rKcb Basal crop coefficient given the irrigation table entries and the current threshold values.
- function sm_FAO56_UpdateCropCoefficient( iFAOIndex, iThreshold )  result(fKcb)
+ elemental function sm_FAO56_UpdateCropCoefficient( iFAOIndex, iThreshold )  result(fKcb)
 
   integer (kind=c_int), intent(in)   :: iFAOIndex
   integer (kind=c_int), intent(in)   :: iThreshold
@@ -123,6 +127,7 @@ module sm_FAO56
   ! [ LOCALS ]
   real (kind=c_double) :: fFrac
 
+  ! define shorthand variable names for remainder of function
   associate ( L_ini => this%iL_ini(iFAOIndex), L_mid => this%iL_mid(iFAOIndex), L_late => this%iL_late(iFAOIndex), &
               L_plant => this%iL_plant(iFAOIndex), Kcb_ini => this%fKcb_ini(iFAOIndex),                            &
               Kcb_dev => this%fKcb_dev(iFAOIndex), Kcb_mid => this%fKcb_mid(iFAOIndex),                            &
@@ -166,7 +171,7 @@ end function sm_FAO56_UpdateCropCoefficient
 !------------------------------------------------------------------------------
 
 !>
-function sm_FAO56_CalcEvaporationReductionCoefficient(rTEW, rREW, rDeficit)  result(rKr)
+elemental function sm_FAO56_CalcEvaporationReductionCoefficient(rTEW, rREW, rDeficit)  result(rKr)
 
   ! [ ARGUMENTS ]
   real (kind=c_float) :: rTEW
@@ -192,7 +197,7 @@ end function sm_FAO56_CalcEvaporationReductionCoefficient
 !! vegetation during the growing season
 !!
 !!@note Implemented as equation 76, FAO-56, Allen and others
-function sm_FAO56_CalcFractionExposedAndWettedSoil( iFAOIndex, fKcb)   result (f_few)
+elemental function sm_FAO56_CalcFractionExposedAndWettedSoil( iFAOIndex, fKcb)   result (f_few)
 
   integer (kind=c_int), intent(in)     :: iFAOIndex
   real (kind=c_float), intent(in)      :: fKcb
@@ -237,7 +242,7 @@ end function sm_FAO56_CalcFractionExposedAndWettedSoil
 !!     the time that the crop is planted.
 !! @retval rZr_i current active rooting depth.
 !! @note Implemented as equation 8-1 (Annex 8), FAO-56, Allen and others.
-function sm_FAO56_CalcEffectiveRootDepth(iFAOIndex, fZr_max, iThreshold) 	result(fZr_i)
+elemental function sm_FAO56_CalcEffectiveRootDepth(iFAOIndex, fZr_max, iThreshold) 	result(fZr_i)
 
   integer (kind=c_int), intent(in)    :: iFAOIndex 
 	real (kind=c_float), intent(in)     :: fZr_max
@@ -276,7 +281,7 @@ end function sm_FAO56_CalcEffectiveRootDepth
 !> This function estimates Ke, the bare surface evaporation coefficient
 !!
 !! @note Implemented as equation 71, FAO-56, Allen and others
-function sm_FAO56_CalcSurfaceEvaporationCoefficient( iFAOIndex, fKr, fKcb )     result(fKe)
+elemental function sm_FAO56_CalcSurfaceEvaporationCoefficient( iFAOIndex, fKr, fKcb )     result(fKe)
 
   integer (kind=c_int), intent(in)     :: iFAOIndex
   real (kind=c_float), intent(in)      :: fKr
@@ -291,7 +296,7 @@ end function sm_FAO56_CalcSurfaceEvaporationCoefficient
 
 !> This subroutine updates the total available water (TAW)
 !> (water within the rootzone) for a gridcell
-subroutine sm_FAO56_CalcTotalAvailableWater(fTotalAvailableWater, fReadilyAvailableWater, &
+elemental subroutine sm_FAO56_CalcTotalAvailableWater(fTotalAvailableWater, fReadilyAvailableWater, &
                 iFAOIndex, fAvailableWaterCapacity, fCurrentRootingDepth )
 
   real (kind=c_float), intent(out)      :: fTotalAvailableWater
@@ -310,7 +315,7 @@ subroutine sm_FAO56_CalcTotalAvailableWater(fTotalAvailableWater, fReadilyAvaila
 !> This function estimates Ks, water stress coefficient
 !!
 !! @note Implemented as equation 84, FAO-56, Allen and others
-function sm_FAO56_CalcWaterStressCoefficient( iFAOIndex, fDeficit, &
+elemental function sm_FAO56_CalcWaterStressCoefficient( iFAOIndex, fDeficit, &
                       fTotalAvailableWater, fReadilyAvailableWater )      result(fKs)
 
   integer (kind=c_int), intent(in)     :: iFAOIndex
