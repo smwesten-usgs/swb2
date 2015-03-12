@@ -404,18 +404,20 @@ contains
 
     integer (kind=c_int) :: iMonth
     integer (kind=c_int) :: iDay
+    integer (kind=c_int) :: iYear
     type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ADJUST_FACTOR      
 
 
     iMonth = SIM_DT%curr%iMonth
     iDay = SIM_DT%curr%iDay
+    iYear = SIM_DT%curr%iYear
 
     ! locate the data structure associated with the gridded rainfall adjustment factor
     pRAINFALL_ADJUST_FACTOR => DAT%find("RAINFALL_ADJUST_FACTOR")
     if ( .not. associated(pRAINFALL_ADJUST_FACTOR) ) &
         call die("A RAINFALL_ADJUST_FACTOR grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
 
-    call pRAINFALL_ADJUST_FACTOR%getvalues()
+    call pRAINFALL_ADJUST_FACTOR%getvalues(iMonth=iMonth, iDay=iDay, iYear=iYear  )
 
     ! map the 2D array of RAINFALL_ADJUST_FACTOR values to the vector of active cells
     RAINFALL_ADJUST_FACTOR = pack( pRAINFALL_ADJUST_FACTOR%pGrdBase%rData, lActive )
