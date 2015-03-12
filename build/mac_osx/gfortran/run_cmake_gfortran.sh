@@ -6,14 +6,14 @@ rm -f *.txt
 
 # set CMAKE-related and build-related variables
 export CMAKEROOT=/usr/bin/cmake
-export COMPILER_VERSION=4.9.1
+export COMPILER_VERSION=4.9.2
 export COMPILER_MAJ_VERSION=4.9
-export COMPILER_TRIPLET=x86_64-apple-darwin13.3.0
+export COMPILER_TRIPLET=x86_64-apple-darwin13.4.0
 export COMPILER_DIR=/usr/local
 export LIB_PATH1="/usr/local/lib/gcc/$COMPILER_TRIPLET/$COMPILER_VERSION"
 export LIB_PATH2=/usr/OpenMotif/lib
 export LIB_PATH3=/usr/local/lib
-export LIB_PATH4=/usr/local/Library/LinkedKegs/gfortran/gfortran/lib
+export LIB_PATH4=/usr/local/Cellar/gcc49/4.9.2_1/lib/gcc/4.9
 export Fortran_COMPILER_NAME=gfortran
 export R_HOME=/usr/bin/R
 

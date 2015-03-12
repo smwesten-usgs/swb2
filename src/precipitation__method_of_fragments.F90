@@ -1,3 +1,19 @@
+!> @file
+!! Contains the module @ref precipitation__method_of_fragments.
+
+!>
+!!  Module @ref precipitation__method_of_fragments
+!!  provides support for creating synthetic daily precipitation
+!!  given grids of monthly sum precipitation and a "fragments" file.
+!!  The fragments file is generated from observations at discrete locations, 
+!!  the values of which range from 0 to 1, and the sum of which is 1.
+!!  The fragment value is simply the daily observed precipitation value divided
+!!  by the monthly sum of all observed precipitation values for that station.
+!!
+!!  In addition, this routine accepts another set of rainfall adjustment grids, 
+!!  needed in order to ensure the resulting precipitation totals fall in line with 
+!!  other published values, in the development case, the Rainfall Atlas of Hawaii. 
+
 module precipitation__method_of_fragments
 
   use iso_c_binding
@@ -18,9 +34,13 @@ module precipitation__method_of_fragments
   public :: read_daily_fragments
   public :: precipitation_method_of_fragments_calculate
 
+  !> Module variable that holds the rainfall gage (zone) number
   integer (kind=c_int), allocatable, public :: RAIN_GAGE_ID(:)
+
+  !> Module variable that holds the current day's rainfall fragment value
   real (kind=c_float), allocatable, public  :: FRAGMENT_VALUE(:)
 
+  !> Data structure that holds a single line of data from the input rainfall fragments file.
   type, public :: FRAGMENTS_T
     integer (kind=c_int) :: iMonth
     integer (kind=c_int) :: iRainGageZone
@@ -28,31 +48,38 @@ module precipitation__method_of_fragments
     real (kind=c_float)  :: fFragmentValue(31)
   end type FRAGMENTS_T
 
+  !> Pointer to a rainfall fragments data structure.
   type, public :: PTR_FRAGMENTS_T
     type (FRAGMENTS_T), pointer  :: pFragment => null()
   end type PTR_FRAGMENTS_T
 
+  !> Data structure to hold the current active rainfall fragments for
+  !! a particular rain gage zone.
   type, public :: FRAGMENTS_SET_T
     integer (kind=c_int) :: iRainGageZone
     integer (kind=c_int) :: iNumberOfFragments(12)
     integer (kind=c_int) :: iStartRecord(12)
   end type FRAGMENTS_SET_T
 
-  
+  !> Array of all fragments read in from the rainfall fragments file.
   type (FRAGMENTS_T), allocatable, target, public       :: FRAGMENTS(:)
 
+  !> Subset of rainfall fragments file pointing to the currently active fragments.
   type (PTR_FRAGMENTS_T), allocatable                   :: CURRENT_FRAGMENTS(:)
   
+  !> Array of fragments sets; fragments sets include indices to the start record
+  !! associated with the fragment for each month
   type (FRAGMENTS_SET_T), allocatable, public           :: FRAGMENTS_SETS(:)
 
 contains
 
-  ! current concept: use normal template mechanism to bring in month-year data grids 
-  !                      (i.e. PRCP object contains MONTHLY sums for given year)
-  ! 
-  !  read fragments in as a table
-  !  randomly choose a fragment
-  !  calculate daily precip by multiplying daily fragment value by month-year value 
+  !> Initialize method of fragments.
+  !!
+  !! This routine accesses the "RAINFALL_ZONE" gridded data object and 
+  !! calls the routine to read in the rainfall fragments file. Values of RAINFALL_ZONE are stored
+  !! in a module variable @ref RAIN_GAGE_ID for future reference.
+  !!
+  !! @params[in]   lActive   2-D boolean array defining active and inactive cells
 
   subroutine precipitation_method_of_fragments_initialize( lActive )
 
@@ -62,18 +89,7 @@ contains
     integer (kind=c_int)                 :: iStat
     type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ZONE
     type (STRING_LIST_T)                 :: slString
-    integer (kind=c_int)                 :: iIndex
     integer (kind=c_int)                 :: iMaxRainZones
-    integer (kind=c_int)                 :: iRainGageZone    
-    integer (kind=c_int)                 :: iFragmentChunk
-    integer (kind=c_int)                 :: iMonth
-    integer (kind=c_int)                 :: iCount
-    character (len=10)   :: sBuf0
-    character (len=10)   :: sBuf1
-    character (len=12)   :: sBuf2
-    character (len=10)   :: sBuf3
-    character (len=52)   :: sBuf4
-
 
     ! locate the data structure associated with the gridded rainfall zone entries
     pRAINFALL_ZONE => DAT%find("RAINFALL_ZONE")
@@ -88,14 +104,17 @@ contains
 
     call pRAINFALL_ZONE%getvalues()
 
+    ! map the 2D array of RAINFALL_ZONE values to the vector of active cells
     RAIN_GAGE_ID = pack( pRAINFALL_ZONE%pGrdBase%iData, lActive )
 
     ! look up the name of the fragments file in the control file dictionary
     call CF_DICT%get_values( sKey="FRAGMENTS_DAILY_FILE", slString=slString )
 
+    ! use the first entry in the string list slString as the filename to open for
+    ! use with the daily fragments routine
     call read_daily_fragments( slString%get(1) )
 
-    !> Now the fragments file is in memory. Now create an ancillary data structure
+    !> Now the fragments file is in memory. Create an ancillary data structure
     !> to keep track of which records correspond to various rain zones
 
     iMaxRainZones = maxval(FRAGMENTS%iRainGageZone)
@@ -106,24 +125,50 @@ contains
     allocate (CURRENT_FRAGMENTS( iMaxRainZones ), stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
 
-    iCount = 0 
+    call process_fragment_sets()
 
-    ! now iterate through *all* fragments, keeping track of the starting record for each new rainfall gage #
-    do iIndex = 1, ubound( FRAGMENTS, 1 ) - 1
+  end subroutine precipitation_method_of_fragments_initialize
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine process_fragment_sets()
+
+    integer (kind=c_int)   :: iCount
+    integer (kind=c_int)   :: iIndex
+    integer (kind=c_int)   :: iRainGageZone 
+    integer (kind=c_int)   :: iPreviousRainGageZone   
+    integer (kind=c_int)   :: iFragmentChunk
+    integer (kind=c_int)   :: iMonth
+    character (len=10)     :: sBuf0
+    character (len=10)     :: sBuf1
+    character (len=12)     :: sBuf2
+    character (len=10)     :: sBuf3
+    character (len=52)     :: sBuf4
+
+    ! this counter is used to accumulate the number of fragments associated with the 
+    ! current raingage zone/month combination
+    iCount = 0 
+    iPreviousRainGageZone = FRAGMENTS( lbound( FRAGMENTS, 1) )%iRainGageZone
+    
+    ! now iterate through *all* fragments, keeping track of the starting record for each new rainfall gage 
+    ! zone number
+    do iIndex = lbound( FRAGMENTS, 1), ubound( FRAGMENTS, 1 )
  
       iRainGageZone = FRAGMENTS(iIndex)%iRainGageZone
       iMonth = FRAGMENTS(iIndex)%iMonth
 
       iCount = iCount + 1
 
+      if (iIndex < ubound( FRAGMENTS, 1) ) then
+      ! this should be true if there is only a single fragment associated with this gage and month
       if ( (FRAGMENTS(iIndex + 1)%iFragmentSet == 1) .and. ( FRAGMENTS(iIndex)%iFragmentSet == 1)) then 
         
-        ! this should be the case if there is only a single fragment associated with this gage and month
         FRAGMENTS_SETS( iRainGageZone )%iNumberOfFragments(iMonth) = iCount
         FRAGMENTS_SETS( iRainGageZone )%iRainGageZone = iRainGageZone
         FRAGMENTS_SETS( iRainGageZone )%iStartRecord(iMonth) = iIndex        
         iCount = 0
 
+      ! if the next record contains a fragment set value of 1, then set the *current* record count
       elseif (FRAGMENTS(iIndex + 1)%iFragmentSet == 1) then 
         
         FRAGMENTS_SETS( iRainGageZone )%iNumberOfFragments(iMonth) = iCount
@@ -139,6 +184,10 @@ contains
     enddo  
 
     ! This needs to be in place to fill in the data value for the last record.
+    ! @todo this logic needs to be much more bulletproof...
+    iCount = iCount + 1
+    FRAGMENTS_SETS( iRainGageZone )%iRainGageZone = iRainGageZone
+    FRAGMENTS_SETS( iRainGageZone )%iStartRecord(iMonth) = iIndex +1       
     FRAGMENTS_SETS( iRainGageZone )%iNumberOfFragments(iMonth) = iCount
 
 
@@ -157,7 +206,7 @@ contains
       enddo  
     end do
 
-  end subroutine precipitation_method_of_fragments_initialize
+  end subroutine process_fragment_sets
 
 !--------------------------------------------------------------------------------------------------
 
@@ -174,16 +223,15 @@ contains
     type (ASCII_FILE_T)   :: FRAGMENTS_FILE
 
 
-    call FRAGMENTS_FILE%open( sFilename = sFilename, &
-                  sCommentChars = "#%!", &
-                  sDelimiters = "WHITESPACE", &
-                  lHasHeader = .false._c_bool )
+    call FRAGMENTS_FILE%open( sFilename = sFilename,         &
+                              sCommentChars = "#%!",         &
+                              sDelimiters = "WHITESPACE",    &
+                              lHasHeader = .false._c_bool )
 
     iNumLines = FRAGMENTS_FILE%numLines()
 
     allocate(  FRAGMENTS( iNumLines ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory for fragments table", &
-      __FILE__, __LINE__ )
+    call assert( iStat == 0, "Problem allocating memory for fragments table", __FILE__, __LINE__ )
 
     iCount = 0
 
@@ -293,11 +341,13 @@ contains
             .or. ( iIndex < 1 ) .or. ( iTargetRecord < 1) ) then
           call LOGS%write("Error detected in method of fragments routine; dump of current variables follows:", &
               iLinesBefore=1)
-          call LOGS%write("iIndex:"//asCharacter(iIndex), iTab=3 )
+          call LOGS%write("iIndex: "//asCharacter(iIndex), iTab=3 )
           call LOGS%write("iStartRecord: "//asCharacter(iStartRecord), iTab=3 )
           call LOGS%write("iNumberOfFragments: "//asCharacter(iNumberOfFragments), iTab=3 )
           call LOGS%write("iEndRecord: "//asCharacter(iEndRecord), iTab=3 )
           call LOGS%write("iTargetRecord: "//asCharacter(iTargetRecord), iTab=3 )
+          call LOGS%write("ubound(CURRENT_FRAGMENTS, 1): "//asCharacter(iUBOUND_CURRENT_FRAGMENTS), iTab=3 )
+          call LOGS%write("ubound(FRAGMENTS, 1): "//asCharacter(iUBOUND_FRAGMENTS), iTab=3 )                    
           call LOGS%write("fRandomNumbers(iIndex): "//asCharacter(fRandomNumbers(iIndex)), iTab=3 )
           call die( "Miscalculation in target record: calculated record is past the end", &
             __FILE__, __LINE__ )
@@ -335,12 +385,9 @@ contains
 
     enddo  
 
-    
-
-
   end subroutine update_fragments
 
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine precipitation_method_of_fragments_calculate()
 

@@ -72,6 +72,7 @@ contains
   !!        requirements)", Food and Agriculture Organization, Rome, Italy.
   !!
   !! @sa http://www.fao.org/docrep/x0490e/x0490e07.htm#solar%20radiation
+
   elemental function extraterrestrial_radiation__Ra(dLatitude, dDelta, dOmega_s, dDsubR)    result(dRa)
 
     ! [ ARGUMENTS ]
@@ -107,6 +108,7 @@ contains
   !!   Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
+
   function net_shortwave_radiation__Rns(dRs, dAlbedo)  result(dRns)
 
     real(kind=c_double), intent(in) :: dRs
@@ -132,6 +134,7 @@ contains
   !! @note Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
+
   elemental function solar_declination_simple__delta(iDayOfYear, iNumDaysInYear) result(dDelta)
 
     integer (kind=c_int), intent(in) :: iDayOfYear
@@ -160,6 +163,7 @@ contains
   !!
   !! @note Reference:
   !!       Iqbal, Muhammad (1983-09-28). An Introduction To Solar Radiation (p. 10). Elsevier Science. Kindle Edition. 
+
   elemental function solar_declination__delta(iDayOfYear, iNumDaysInYear) result(dDelta)
 
     integer (kind=c_int), intent(in) :: iDayOfYear
@@ -206,6 +210,7 @@ contains
   !! 
   !! @note Equation 1.2.3 in Iqbal, Muhammad (1983-09-28). An Introduction To Solar Radiation (p. 28).
   !!       Elsevier Science. Kindle Edition. 
+
   elemental function relative_earth_sun_distance__D_r( iDayOfYear, iNumDaysInYear )   result( dDsubR ) 
 
     ! [ ARGUMENTS ]
@@ -236,6 +241,7 @@ contains
   !!   Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
+
    elemental function sunrise_sunset_angle__omega_s( dLatitude, dDelta ) result( dOmega_s ) 
 
     real (kind=c_double), intent(in) :: dLatitude
@@ -264,6 +270,7 @@ contains
   !!   Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
+
   function solar_radiation_Hargreaves__Rs( dRa, fTMin, fTMax )   result( dRs )   bind(c)
 
     real (kind=c_double), intent(in) :: dRa
@@ -291,6 +298,7 @@ contains
   !! @retval     fPsun   Percentage of possible sunshine, dimensionless percentage
   !!
   !! @todo [Need to add reference here...]
+
   elemental function estimate_percent_of_possible_sunshine__psun(fTMax, fTMin)  result(fPsun)
 
     real (kind=c_float), intent(in) :: fTMax
@@ -332,6 +340,7 @@ contains
   !!   Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
+
   function clear_sky_solar_radiation__Rso( dRa, dAs, dBs )   result( dRso )   bind(c)
 
     real (kind=c_double), intent(in)           :: dRa
@@ -379,6 +388,7 @@ contains
   !!   Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
+
   function clear_sky_solar_radiation_noAB__Rso(dRa, fElevation) result(dRso)
 
     real (kind=c_double), intent(in) :: dRa
@@ -409,6 +419,7 @@ contains
   !!   Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
+
   function solar_radiation__Rs(dRa, dAs, dBs, fPctSun) result(dRs)
 
     real (kind=c_double), intent(in) :: dRa
@@ -439,6 +450,7 @@ contains
   !!   Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
+
   function net_longwave_radiation__Rnl(fTMin, fTMax, dRs, dRso)  result(dRnl)
 
     real(kind=c_float), intent(in)  :: fTMin
@@ -482,6 +494,7 @@ contains
   !! 
   !! @note Reference: 
   !!       Iqbal, Muhammad (1983-09-28). An Introduction To Solar Radiation (p. 3). Elsevier Science. Kindle Edition. 
+
   elemental function day_angle__gamma(iDayOfYear, iNumDaysInYear)     result(dGamma)
 
     integer (kind=c_int), intent(in)   :: iDayOfYear
@@ -500,6 +513,7 @@ contains
   !! @param[in]      rTheta_z   Solar zenith angle for given location and time, in RADIANS
   !!
   !! @retval           rAlpha   Solar altitude angle for given location and time, in RADIANS  
+
   function solar_altitude__alpha( dTheta_z )    result( dAlpha )   bind(c)
 
     real (kind=c_double), intent(in)   :: dTheta_z
@@ -534,6 +548,7 @@ contains
   !!   Reference:
   !!   Jacobson, M.Z., 2005, Fundamentals of atmospheric modeling, Second Edition:
   !!   Cambridge University Press.
+
 	function zenith_angle__theta_z( dLatitude, dDelta, dOmega ) result( dTheta_z )     bind(c)
 
 	  real (kind=c_double), intent(in)            :: dLatitude
@@ -573,6 +588,7 @@ contains
   !!
   !! @note Reference: 
   !!       Iqbal, Muhammad (1983-09-28). An Introduction To Solar Radiation (p. 15). Elsevier Science. Kindle Edition. 
+  
   function azimuth_angle__psi(rAlpha, rLatitude, rDelta)   result(rPsi)    bind(c)
 
     real (kind=c_double), intent(in)      :: rAlpha

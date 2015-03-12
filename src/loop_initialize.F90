@@ -32,7 +32,7 @@ module loop_initialize
     character (len=23)     :: sName
   end type METHODS_LIST_T
 
-  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(16) = &
+  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(17) = &
 
     [ GRIDDED_DATASETS_T("PRECIPITATION                ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("TMIN                         ", lFALSE, DATATYPE_FLOAT ),     &
@@ -48,7 +48,8 @@ module loop_initialize
       GRIDDED_DATASETS_T("SOILS_GROUP                  ", lFALSE, DATATYPE_INT ),       &
       GRIDDED_DATASETS_T("CANOPY_COVER_FRACTION        ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("STEMFLOW_FRACTION            ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("EVAPORATION_TO_RAINFALL_RATIO", lTRUE, DATATYPE_FLOAT ),      &                  
+      GRIDDED_DATASETS_T("EVAPORATION_TO_RAINFALL_RATIO", lTRUE, DATATYPE_FLOAT ),      & 
+      GRIDDED_DATASETS_T("PRECIP_ADJUST_FACTOR         ", lTRUE, DATATYPE_FLOAT ),      &                 
       GRIDDED_DATASETS_T("RELATIVE_HUMIDITY            ", lTRUE, DATATYPE_FLOAT )   ]
 
   type (METHODS_LIST_T), parameter  :: KNOWN_METHODS(7) =   &
@@ -180,6 +181,21 @@ contains
   end subroutine initialize_options
 
 !--------------------------------------------------------------------------------------------------
+
+
+
+  !> Generic routine to handle intake of gridded data.
+  !! 
+  !! @param[in]  sKey        Name for the data type being processed.
+  !! @param[in]  lOptional   If lOptional is TRUE, kill model run eventually IF sKey
+  !!                         does not match a known data type.
+  !! @param[in]  iDataType   Datatype as defined in @ref constants_and-conversion.F90
+  !!
+  !! This routine accepts a data grid type, for example, "PRECIPITATION", and attempts to
+  !! handle all related control file directives associated with this data type. In this way,
+  !! a new gridded data type may be added simply by extending the list of known data types
+  !! to the list defined in the module variable @ref KNOWN_TYPES.
+  !!
 
   subroutine initialize_generic_grid(sKey, lOptional, iDataType )
 

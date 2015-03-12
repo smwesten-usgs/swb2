@@ -15,6 +15,11 @@ module model_domain
 
   ! concept: the only state variables that should appear in this module should be
   !          those that are required regardless of what other program options are active
+  !
+  !
+  ! additionally: concept is to have a set of more or less standard procedure pointers that are common to
+  !               a soil moisture balance; the pointer may be set to a different procedure thus changing
+  !               the behavior and mechanisms within the model
 
   type, public :: MODEL_DOMAIN_T
 
@@ -188,6 +193,7 @@ module model_domain
     type (T_NETCDF4_FILE), pointer, public :: ncfile
   end type NETCDF_FILE_COLLECTION_T
 
+  ! creating several module-level globals
   type (MODEL_DOMAIN_T), public :: MODEL
 
   type (NETCDF_FILE_COLLECTION_T), allocatable, public :: OUTPUT(:)

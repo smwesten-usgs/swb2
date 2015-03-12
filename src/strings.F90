@@ -593,7 +593,6 @@ contains
         case ("COMMA", "CSV")  
           sDelimiters_ = ","
         case default
-          call warn( "Possible improper use of chomp field delimiter--default delimiters in use", __FILE__, __LINE__ )
           sDelimiters_ = sDelimiters        
       end select    
 
