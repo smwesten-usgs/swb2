@@ -80,7 +80,7 @@ module model_domain
 
     !> declare and initialize procedure pointers such that the default methods are in place
     procedure ( simple_method ), pointer         :: init_interception       => model_initialize_interception_bucket
-    procedure ( simple_method ), pointer         :: init_infiltration       => model_initialize_infiltration_curve_number
+    procedure ( simple_method ), pointer         :: init_runoff             => model_initialize_runoff_curve_number
     procedure ( simple_method ), pointer         :: init_reference_et       => model_initialize_et_hargreaves
     procedure ( simple_method ), pointer         :: init_routing            => model_initialize_routing_none
     procedure ( simple_method ), pointer         :: init_soil_moisture      => model_initialize_soil_moisture_thornthwaite_mather
@@ -244,7 +244,7 @@ contains
 
   end subroutine initialize_grid_sub
 
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine initialize_arrays_sub(this)
 
@@ -302,7 +302,7 @@ contains
     call this%init_snowfall
     call this%init_snowmelt
     call this%init_fog
-    call this%init_infiltration
+    call this%init_runoff
     call this%init_routing
     call this%init_soil_moisture
     call this%init_reference_et
@@ -976,7 +976,7 @@ contains
     if (.not. associated( this%init_interception) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
-    if (.not. associated( this%init_infiltration) ) &
+    if (.not. associated( this%init_runoff) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%init_reference_et) ) &
@@ -1152,9 +1152,11 @@ contains
                                     + this%snowmelt( orderindex )                   &
                                     - this%interception( orderindex )                      
                              
-        call this%calc_infiltration( orderindex )
+        call this%calc_runoff( orderindex )
 
-        this%runoff( orderindex ) = this%inflow( orderindex ) - this%infiltration( orderindex )
+!        this%runoff( orderindex ) = this%inflow( orderindex ) - this%infiltration( orderindex )
+ 
+        this%infiltration( orderindex ) = this%inflow( orderindex ) - this%runoff( orderindex )
 
 !          print *, orderindex, TARGET_INDEX( orderindex ), this%inflow(orderindex), this%runoff(orderindex)
     
@@ -1215,18 +1217,25 @@ contains
 
       endif
 
-    elseif ( sCmdText .contains. "INFILTRATION" ) then
+    elseif ( sCmdText .contains. "RUNOFF" ) then
 
       if ( ( sMethodName .strequal. "C-N" ) .or. ( sMethodName .strequal. "CURVE_NUMBER" ) ) then
 
-        this%init_infiltration => model_initialize_infiltration_curve_number
-        this%calc_infiltration => model_calculate_infiltration_curve_number
+        this%init_runoff => model_initialize_runoff_curve_number
+        this%calc_runoff => model_calculate_runoff_curve_number
 
-        call LOGS%WRITE( "==> CURVE NUMBER INFILTRATION submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> CURVE NUMBER RUNOFF submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
+      elseif ( ( sMethodName .strequal. "RUNOFF_RATIO" ) .or. ( sMethodName .strequal. "MONTHLY_GRID" ) ) then
+
+        this%init_runoff => model_initialize_runoff_monthly_grid
+        this%calc_runoff => model_calculate_runoff_monthly_grid
+
+        call LOGS%WRITE( "==> MONTHLY RUNOFF RATIO submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
       else
 
-        call warn("Your control file specifies an unknown or unsupported INFILTRATION method.", &
+        call warn("Your control file specifies an unknown or unsupported RUNOFF method.", &
             lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
       endif
@@ -1669,28 +1678,28 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_initialize_infiltration_curve_number(this)
+  subroutine model_initialize_runoff_curve_number(this)
 
-    use infiltration__curve_number
+    use runoff__curve_number
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call infiltration_curve_number_initialize()
+    call runoff_curve_number_initialize()
 
-  end subroutine model_initialize_infiltration_curve_number
+  end subroutine model_initialize_runoff_curve_number
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_infiltration_curve_number(this, index )
+  subroutine model_calculate_runoff_curve_number(this, index )
 
-    use infiltration__curve_number
+    use runoff__curve_number
 
     class (MODEL_DOMAIN_T), intent(inout)       :: this
     integer (kind=c_int), intent(in), optional  :: index
 
     if ( present(index) ) then
 
-      this%infiltration( index ) = infiltration_curve_number_calculate( &
+      this%runoff( index ) = infiltration_curve_number_calculate( &
         iLanduseIndex=this%landuse_index( index ), &
         iSoilsIndex=this%soil_group( index ), &
         fSoilStorage=this%soil_storage( index ), &
@@ -1699,7 +1708,7 @@ contains
 
     else
 
-      this%infiltration = infiltration_curve_number_calculate( &
+      this%runoff = infiltration_curve_number_calculate( &
         iLanduseIndex=this%landuse_index, &
         iSoilsIndex=this%soil_group, &
         fSoilStorage=this%soil_storage, &
@@ -1708,7 +1717,7 @@ contains
 
     endif
 
-  end subroutine model_calculate_infiltration_curve_number
+  end subroutine model_calculate_runoff_curve_number
 
 !--------------------------------------------------------------------------------------------------
 

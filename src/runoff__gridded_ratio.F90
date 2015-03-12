@@ -1,12 +1,12 @@
 !> @file
-!! Contains the module \ref infiltration__monthly_grid.
+!! Contains the module \ref runoff__gridded_ratio.
 
 !>
-!!  Module \ref infiltration__monthly_grid
+!!  Module \ref runoff__gridded_ratio
 !!  provides support for estimating fog drip given a gridded map
 !!  of RUNOFF_ZONE, and a table containing monthly
 !!  fog factors. 
-module infiltration__monthly_grid
+module runoff__gridded_ratio
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double, c_bool
   use constants_and_conversions
@@ -79,13 +79,13 @@ contains
       iDaysInMonth = SIM_DT%iDaysInMonth
       iNumDaysFromOrigin = SIM_DT%iNumDaysFromOrigin
 
-      if ( .not. associated(pFOG_RATIO) ) &
+      if ( .not. associated(pRUNOFF_RATIO) ) &
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
 
-      if ( .not. allocated(pFOG_RATIO%pGrdBase%rData) ) &
+      if ( .not. allocated(pRUNOFF_RATIO%pGrdBase%rData) ) &
         call die("INTERNAL PROGRAMMING ERROR: attempted use of unallocated variable", __FILE__, __LINE__)
 
-      call pFOG_RATIO%getvalues( iMonth, iDay, iYear, iJulianDay )
+      call pRUNOFF_RATIO%getvalues( iMonth, iDay, iYear, iJulianDay )
 
      
     end associate
@@ -179,4 +179,4 @@ contains
 
   end subroutine read_monthly_runoff_ratios
 
-end module infiltration__monthly_grid
+end module runoff__gridded_ratio
