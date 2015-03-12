@@ -1865,14 +1865,16 @@ contains
     use precipitation__method_of_fragments
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    ! [ LOCALS ]
+    type (DATA_CATALOG_ENTRY_T), pointer :: pPRCP
     integer (kind=c_int) :: iJulianDay
     integer (kind=c_int) ::iMonth
     integer (kind=c_int) ::iDay
     integer (kind=c_int) ::iYear
 
-    ! [ LOCALS ]
-    type (DATA_CATALOG_ENTRY_T), pointer :: pPRCP
-
+    ! in this usage, it is assumed that the precipitation grids that are being read in represent
+    ! MONTHLY sum of precipitation
     pPRCP => DAT%find("PRECIPITATION")
     if ( .not. associated(pPRCP) ) &
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
@@ -1892,9 +1894,9 @@ contains
     if (.not. associated(pPRCP%pGrdBase) ) &
       call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
 
-    call precipitation_method_of_fragments_calculate()
+    call precipitation_method_of_fragments_calculate( this%active )
 
-    this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * FRAGMENT_VALUE
+    this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * FRAGMENT_VALUE * RAINFALL_ADJUST_FACTOR
 
   end subroutine model_get_precip_method_of_fragments 
 

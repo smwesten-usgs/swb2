@@ -1500,8 +1500,9 @@ subroutine grid_checkIntegerGridValues(pGrd, sFilename)
   iRunningSum = 0
   iRecord = 0
 
+ call LOGS%set_echo(lFALSE)
  call LOGS%write("### Summary of integer grid data values for file "//dquote(sFilename)//" ###", &
-    iLogLevel=LOG_ALL, iLinesBefore=1, iLinesAfter=1 )
+    iLogLevel=LOG_GENERAL, iLinesBefore=1, iLinesAfter=1 )
 
   call LOGS%write("number     | count          | value     ")
   call LOGS%write("---------- | -------------- | ----------")

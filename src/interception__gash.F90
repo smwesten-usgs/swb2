@@ -165,6 +165,7 @@ contains
     call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
 
     print *, "++++++++"
+    print *, __FILE__, ": ", __LINE__
     print *, lbound(iLandUseTableCodes,1), ubound(iLandUseTableCodes,1), minval(iLanduseIndex),maxval(iLanduseIndex)
 
     do iIndex = lbound(iLandUseTableCodes,1), ubound(iLandUseTableCodes,1)

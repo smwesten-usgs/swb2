@@ -40,6 +40,9 @@ module precipitation__method_of_fragments
   !> Module variable that holds the current day's rainfall fragment value
   real (kind=c_float), allocatable, public  :: FRAGMENT_VALUE(:)
 
+  !> Module variable that holds the rainfall adjustment factor
+  real (kind=c_float), allocatable, public  :: RAINFALL_ADJUST_FACTOR(:)
+
   !> Data structure that holds a single line of data from the input rainfall fragments file.
   type, public :: FRAGMENTS_T
     integer (kind=c_int) :: iMonth
@@ -71,6 +74,8 @@ module precipitation__method_of_fragments
   !! associated with the fragment for each month
   type (FRAGMENTS_SET_T), allocatable, public           :: FRAGMENTS_SETS(:)
 
+  type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ADJUST_FACTOR      
+
 contains
 
   !> Initialize method of fragments.
@@ -98,14 +103,18 @@ contains
 
     allocate( RAIN_GAGE_ID( count(lActive) ), stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+ 
+    call pRAINFALL_ZONE%getvalues()
+ 
+    ! map the 2D array of RAINFALL_ZONE values to the vector of active cells
+    RAIN_GAGE_ID = pack( pRAINFALL_ZONE%pGrdBase%iData, lActive )
+
+    allocate( RAINFALL_ADJUST_FACTOR( count(lActive) ), stat=iStat )
+    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
 
     allocate( FRAGMENT_VALUE( count(lActive) ), stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
 
-    call pRAINFALL_ZONE%getvalues()
-
-    ! map the 2D array of RAINFALL_ZONE values to the vector of active cells
-    RAIN_GAGE_ID = pack( pRAINFALL_ZONE%pGrdBase%iData, lActive )
 
     ! look up the name of the fragments file in the control file dictionary
     call CF_DICT%get_values( sKey="FRAGMENTS_DAILY_FILE", slString=slString )
@@ -139,6 +148,7 @@ contains
     integer (kind=c_int)   :: iPreviousRainGageZone   
     integer (kind=c_int)   :: iFragmentChunk
     integer (kind=c_int)   :: iMonth
+    integer (kind=c_int)   :: iPreviousMonth
     character (len=10)     :: sBuf0
     character (len=10)     :: sBuf1
     character (len=12)     :: sBuf2
@@ -148,48 +158,40 @@ contains
     ! this counter is used to accumulate the number of fragments associated with the 
     ! current raingage zone/month combination
     iCount = 0 
-    iPreviousRainGageZone = FRAGMENTS( lbound( FRAGMENTS, 1) )%iRainGageZone
+
+    iRainGageZone = FRAGMENTS( lbound( FRAGMENTS, 1) )%iRainGageZone
+    iPreviousRainGageZone = iRainGageZone
+    iPreviousMonth = FRAGMENTS( lbound( FRAGMENTS, 1) )%iMonth
+
+    ! populate the first record of FRAGMENT_SETS
+    FRAGMENTS_SETS( iRainGageZone )%iRainGageZone = iRainGageZone
+    FRAGMENTS_SETS( iRainGageZone )%iStartRecord(iPreviousMonth) = lbound( FRAGMENTS, 1)
+
     
     ! now iterate through *all* fragments, keeping track of the starting record for each new rainfall gage 
     ! zone number
-    do iIndex = lbound( FRAGMENTS, 1), ubound( FRAGMENTS, 1 )
+    do iIndex = lbound( FRAGMENTS, 1) + 1, ubound( FRAGMENTS, 1 )
  
       iRainGageZone = FRAGMENTS(iIndex)%iRainGageZone
       iMonth = FRAGMENTS(iIndex)%iMonth
 
       iCount = iCount + 1
 
-      if (iIndex < ubound( FRAGMENTS, 1) ) then
-      ! this should be true if there is only a single fragment associated with this gage and month
-      if ( (FRAGMENTS(iIndex + 1)%iFragmentSet == 1) .and. ( FRAGMENTS(iIndex)%iFragmentSet == 1)) then 
+      if ( iRainGageZone /= iPreviousRainGageZone ) then
         
-        FRAGMENTS_SETS( iRainGageZone )%iNumberOfFragments(iMonth) = iCount
+        FRAGMENTS_SETS( iPreviousRainGageZone )%iNumberOfFragments(iPreviousMonth) = iCount
         FRAGMENTS_SETS( iRainGageZone )%iRainGageZone = iRainGageZone
-        FRAGMENTS_SETS( iRainGageZone )%iStartRecord(iMonth) = iIndex        
-        iCount = 0
-
-      ! if the next record contains a fragment set value of 1, then set the *current* record count
-      elseif (FRAGMENTS(iIndex + 1)%iFragmentSet == 1) then 
-        
+        FRAGMENTS_SETS( iRainGageZone )%iStartRecord(iMonth) = iIndex   
+        ! need to handle the last fragment set as a special case
         FRAGMENTS_SETS( iRainGageZone )%iNumberOfFragments(iMonth) = iCount
         iCount = 0
 
-      elseif ( FRAGMENTS(iIndex)%iFragmentSet == 1) then
-        
-        FRAGMENTS_SETS( iRainGageZone )%iRainGageZone = iRainGageZone
-        FRAGMENTS_SETS( iRainGageZone )%iStartRecord(iMonth) = iIndex
-
-      endif  
+      endif
+      
+      iPreviousMonth = iMonth
+      iPreviousRainGageZone = iRainGageZone  
 
     enddo  
-
-    ! This needs to be in place to fill in the data value for the last record.
-    ! @todo this logic needs to be much more bulletproof...
-    iCount = iCount + 1
-    FRAGMENTS_SETS( iRainGageZone )%iRainGageZone = iRainGageZone
-    FRAGMENTS_SETS( iRainGageZone )%iStartRecord(iMonth) = iIndex +1       
-    FRAGMENTS_SETS( iRainGageZone )%iNumberOfFragments(iMonth) = iCount
-
 
     call LOGS%write("### Summary of fragment sets in memory ###", &
        iLogLevel=LOG_ALL, iLinesBefore=1, iLinesAfter=1, lEcho=lFALSE )
@@ -389,8 +391,11 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine precipitation_method_of_fragments_calculate()
+  subroutine precipitation_method_of_fragments_calculate( lActive )
 
+    logical (kind=c_bool), intent(in)     :: lActive(:,:)
+
+    ! [ LOCALS ]
     integer (kind=c_int)              :: iIndex
     integer (kind=c_int)              :: iMaxRainZones
     real (kind=c_float), allocatable  :: fRandomNumbers(:)
@@ -399,9 +404,22 @@ contains
 
     integer (kind=c_int) :: iMonth
     integer (kind=c_int) :: iDay
+    type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ADJUST_FACTOR      
+
 
     iMonth = SIM_DT%curr%iMonth
     iDay = SIM_DT%curr%iDay
+
+    ! locate the data structure associated with the gridded rainfall adjustment factor
+    pRAINFALL_ADJUST_FACTOR => DAT%find("RAINFALL_ADJUST_FACTOR")
+    if ( .not. associated(pRAINFALL_ADJUST_FACTOR) ) &
+        call die("A RAINFALL_ADJUST_FACTOR grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
+
+    call pRAINFALL_ADJUST_FACTOR%getvalues()
+
+    ! map the 2D array of RAINFALL_ADJUST_FACTOR values to the vector of active cells
+    RAINFALL_ADJUST_FACTOR = pack( pRAINFALL_ADJUST_FACTOR%pGrdBase%rData, lActive )
+
 
     iMaxRainZones = maxval(FRAGMENTS%iRainGageZone)
 
