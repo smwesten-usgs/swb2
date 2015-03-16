@@ -23,10 +23,13 @@ module runoff__gridded_ratio
 
   private
 
-  public :: infiltration_monthly_grid_initialize, infiltration_monthly_grid_calculate
+  public :: runoff_gridded_ratio_initialize, runoff_gridded_ratio_calculate
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pRUNOFF_ZONE
   integer (kind=c_int), allocatable    :: RUNOFF_ZONE(:)
+
+  type (DATA_CATALOG_ENTRY_T), pointer :: pRUNOFF_RATIOS
+  integer (kind=c_int), allocatable    :: RUNOFF_RATIOS(:)
 
 contains
 
@@ -34,7 +37,7 @@ contains
   !!
   !! Read in a runoff zone grid.
   !!
-  subroutine infiltration_monthly_grid_initialize( lActive )
+  subroutine runoff_gridded_ratio_initialize( lActive )
 
     logical (kind=c_bool), intent(in)   :: lActive(:,:)
 
@@ -49,16 +52,22 @@ contains
     call pRUNOFF_ZONE%getvalues( )
 
     allocate ( RUNOFF_ZONE( count( lActive ) ), stat=iStat )
+    call assert(iStat==0, "Failed to allocate memory for the RUNOFF_ZONE variable", __FILE__, __LINE__)
 
     RUNOFF_ZONE = pack( pRUNOFF_ZONE%pGrdBase%iData, lActive )
 
-  end subroutine infiltration_monthly_grid_initialize
+    allocate ( RUNOFF_RATIOS( count( lActive ) ), stat=iStat)
+    call assert(iStat==0, "Failed to allocate memory for the RUNOFF_RATIOS variable", __FILE__, __LINE__)
+
+  end subroutine runoff_gridded_ratio_initialize
 
 !--------------------------------------------------------------------------------------------------
 
-  elemental function infiltration_monthly_grid_calculate( fRainfall )   result( fRunoff )
+  subroutine runoff_gridded_ratio_calculate( fRainfall, fRunoff, lActive )
 
     real (kind=c_float), intent(inout)        :: fRainfall(:)
+    real (kind=c_float), intent(inout)        :: fRunoff(:)
+    logical (kind=c_bool), intent(in)      :: lActive(:,:)
 
     ! [ LOCALS ] 
     integer (kind=c_int) :: iJulianDay
@@ -79,104 +88,18 @@ contains
       iDaysInMonth = SIM_DT%iDaysInMonth
       iNumDaysFromOrigin = SIM_DT%iNumDaysFromOrigin
 
-      if ( .not. associated(pRUNOFF_RATIO) ) &
+      if ( .not. associated(pRUNOFF_RATIOS) ) &
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
 
-      if ( .not. allocated(pRUNOFF_RATIO%pGrdBase%rData) ) &
+      if ( .not. allocated(pRUNOFF_RATIOS%pGrdBase%rData) ) &
         call die("INTERNAL PROGRAMMING ERROR: attempted use of unallocated variable", __FILE__, __LINE__)
 
-      call pRUNOFF_RATIO%getvalues( iMonth, iDay, iYear, iJulianDay )
+      call pRUNOFF_RATIOS%getvalues( iMonth, iDay, iYear, iJulianDay )
 
-     
     end associate
 
-  end subroutine infiltration_monthly_grid_calculate
+    RUNOFF_RATIOS = pack( pRUNOFF_RATIOS%pGrdBase%rData, lActive ) 
 
-!--------------------------------------------------------------------------------------------------
-
-  subroutine read_monthly_runoff_ratios( sFilename )
-
-    character (len=*), intent(in)    :: sFilename
-
-    ! [ LOCALS ]
-    character (len=512)   :: sRecord, sSubstring
-    integer (kind=c_int)  :: iStat
-    integer (kind=c_int)  :: iCount
-    integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: iNumLines  
-    type (ASCII_FILE_T)   :: RUNOFF_RATIO_FILE
-
-    call RUNOFF_RATIO_FILE%open( sFilename = sFilename, &
-                  sCommentChars = "#%!", &
-                  sDelimiters = "WHITESPACE", &
-                  lHasHeader = .false._c_bool )
-
-    iNumLines = RUNOFF_RATIO_FILE%numLines()
-
-    allocate(  RUNOFF_RATIOS( iNumLines ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory for runoff ratio table", &
-      __FILE__, __LINE__ )
-
-    iCount = 0
-
-    do 
-
-      ! read in next line of file
-      sRecord = RUNOFF_RATIO_FILE%readLine()
-
-      if ( RUNOFF_RATIO_FILE%isEOF() ) exit 
-
-      iCount = iCount + 1
-
-      ! read in date
-      call chomp(sRecord, sSubstring, RUNOFF_RATIO_FILE%sDelimiters )
-
-      if ( len_trim(sSubstring) == 0 ) &
-      call die( "Missing date in the monthly runoff ratio file", &
-        __FILE__, __LINE__, "Problem occured on line number "//asCharacter(RUNOFF_RATIO_FILE%currentLineNum() ) &
-        //" of file "//dquote(sFilename) )
-
-      RUNOFF_RATIOS(iCount)%iMonth = asInt(sSubString)
-
-      ! read in rain gage zone
-      call chomp(sRecord, sSubstring, RUNOFF_RATIO_FILE%sDelimiters )
-
-      if ( len_trim(sSubstring) == 0 ) &
-      call die( "Missing rain gage zone number in the daily fragments file", &
-        __FILE__, __LINE__, "Problem occured on line number "//asCharacter(RUNOFF_RATIO_FILE%currentLineNum() ) &
-        //" of file "//dquote(sFilename) )
-
-      RUNOFF_RATIOS(iCount)%iRainGageZone = asInt(sSubString)
-
-      ! read in fragment set number for this zone
-      call chomp(sRecord, sSubstring, RUNOFF_RATIO_FILE%sDelimiters )
-
-      if ( len_trim(sSubstring) == 0 ) &
-      call die( "Missing fragment set number in the daily fragments file", &
-        __FILE__, __LINE__, "Problem occured on line number "//asCharacter(RUNOFF_RATIO_FILE%currentLineNum() ) &
-        //" of file "//dquote(sFilename) )
-
-      RUNOFF_RATIOS(iCount)%iFragmentSet = asInt(sSubString)
-      
-      do iIndex = 1, 31
-
-        ! read in fragment for given day of month
-        call chomp(sRecord, sSubstring, RUNOFF_RATIO_FILE%sDelimiters )
-
-        if ( len_trim(sSubstring) == 0 ) &
-        call die( "Missing fragment value in the daily fragments file", &
-          __FILE__, __LINE__, "Problem occured on line number "//asCharacter(RUNOFF_RATIO_FILE%currentLineNum() ) &
-          //" of file "//dquote(sFilename) )
-
-        RUNOFF_RATIOS(iCount)%fFragmentValue(iIndex) = asFloat( sSubstring )
-
-      enddo
-      
-    enddo    
-
-    call LOGS%write("Maximum runoff zone number: "//asCharacter(maxval(RUNOFF_RATIOS%iRainGageZone)), &
-      iTab=31, iLinesAfter=1, iLogLevel=LOG_ALL)
-
-  end subroutine read_monthly_runoff_ratios
+  end subroutine runoff_gridded_ratio_calculate
 
 end module runoff__gridded_ratio

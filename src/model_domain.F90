@@ -91,7 +91,7 @@ module model_domain
 
     procedure ( simple_method ), pointer         :: calc_interception      => model_calculate_interception_bucket
 
-    procedure ( simple_method_w_optional ), pointer   :: calc_infiltration => model_calculate_infiltration_curve_number
+    procedure ( simple_method_w_optional ), pointer   :: calc_runoff       => model_calculate_runoff_curve_number
     
     procedure ( simple_method ), pointer         :: calc_reference_et      => model_calculate_et_hargreaves
     procedure ( simple_method ), pointer         :: calc_routing           => model_calculate_routing_none
@@ -992,7 +992,7 @@ contains
     if (.not. associated( this%calc_interception) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
-    if (.not. associated( this%calc_infiltration) ) &
+    if (.not. associated( this%calc_runoff) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%calc_reference_et) ) &
@@ -1228,10 +1228,10 @@ contains
 
       elseif ( ( sMethodName .strequal. "RUNOFF_RATIO" ) .or. ( sMethodName .strequal. "MONTHLY_GRID" ) ) then
 
-        this%init_runoff => model_initialize_runoff_monthly_grid
-        this%calc_runoff => model_calculate_runoff_monthly_grid
+        this%init_runoff => model_initialize_runoff_gridded_ratio
+        this%calc_runoff => model_calculate_runoff_gridded_ratio
 
-        call LOGS%WRITE( "==> MONTHLY RUNOFF RATIO submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> RUNOFF RATIO submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
       else
 
@@ -1699,7 +1699,7 @@ contains
 
     if ( present(index) ) then
 
-      this%runoff( index ) = infiltration_curve_number_calculate( &
+      this%runoff( index ) = runoff_curve_number_calculate( &
         iLanduseIndex=this%landuse_index( index ), &
         iSoilsIndex=this%soil_group( index ), &
         fSoilStorage=this%soil_storage( index ), &
@@ -1708,7 +1708,7 @@ contains
 
     else
 
-      this%runoff = infiltration_curve_number_calculate( &
+      this%runoff = runoff_curve_number_calculate( &
         iLanduseIndex=this%landuse_index, &
         iSoilsIndex=this%soil_group, &
         fSoilStorage=this%soil_storage, &
@@ -1718,6 +1718,32 @@ contains
     endif
 
   end subroutine model_calculate_runoff_curve_number
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_runoff_gridded_ratio(this)
+
+    use runoff__gridded_ratio
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call runoff_gridded_ratio_initialize( this%active )
+
+  end subroutine model_initialize_runoff_gridded_ratio
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_runoff_gridded_ratio(this, index )
+
+    use runoff__gridded_ratio
+
+    class (MODEL_DOMAIN_T), intent(inout)       :: this
+    integer (kind=c_int), intent(in), optional  :: index
+
+    call runoff_gridded_ratio_calculate(this%inflow, this%runoff, this%active)
+
+
+  end subroutine model_calculate_runoff_gridded_ratio
 
 !--------------------------------------------------------------------------------------------------
 

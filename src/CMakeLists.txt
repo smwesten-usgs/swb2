@@ -18,8 +18,6 @@ if(TARGET__SWB_EXECUTABLE)
             fog__monthly_grid.F90
             file_operations.F90
             grid.F90
-            infiltration__curve_number.F90 
-#            infiltration__monthly_grid.F90           
             interception__bucket.F90
             interception__gash.F90
             logfiles.F90
@@ -34,6 +32,8 @@ if(TARGET__SWB_EXECUTABLE)
             parameters.F90
             precipitation__method_of_fragments.F90
             routing__D8.F90
+            runoff__curve_number.F90 
+            runoff__gridded_ratio.F90                       
             soil_moisture__thornthwaite_mather.F90
             simulation_datetime.F90
             snowfall__original.F90
@@ -234,8 +234,6 @@ if(TARGET__SWB_LIBRARY)
             fog__monthly_grid.F90
             file_operations.F90
             grid.F90
-            infiltration__curve_number.F90
-#            infiltration__monthly_grid.F90            
             interception__bucket.F90
             interception_gash.F90
             logfiles.F90
@@ -250,6 +248,8 @@ if(TARGET__SWB_LIBRARY)
             parameters.F90
             precipitation__method_of_fragments.F90
             routing__D8.F90
+            runoff__curve_number.F90 
+            runoff__gridded_ratio.F90                       
             soil_moisture__thornthwaite_mather.F90
             simulation_datetime.F90
             snowfall__original.F90

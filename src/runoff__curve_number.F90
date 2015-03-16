@@ -1,4 +1,4 @@
-module infiltration__curve_number
+module runoff__curve_number
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
   use continuous_frozen_ground_index
@@ -16,12 +16,12 @@ module infiltration__curve_number
   real (kind=c_float), allocatable    :: Smax(:,:)
   integer (kind=c_int), allocatable   :: iLanduseCodes(:)
 
-  public :: infiltration_curve_number_initialize
-  public :: infiltration_curve_number_calculate
+  public :: runoff_curve_number_initialize
+  public :: runoff_curve_number_calculate
 
 contains
 
-  subroutine infiltration_curve_number_initialize( )
+  subroutine runoff_curve_number_initialize( )
 
     ! [ LOCALS ]
     integer (kind=c_int)              :: iNumberOfLanduses
@@ -78,7 +78,7 @@ contains
     CN_AMCIII = CN_II_to_CN_III( CN_AMCII )
     Smax = ( 1000.0_c_float / CN_AMCI ) - 10.0_c_float
     
-  end subroutine infiltration_curve_number_initialize
+  end subroutine runoff_curve_number_initialize
 
 !--------------------------------------------------------------------------------------------------
 
@@ -237,7 +237,7 @@ contains
   !! @note Reference: Woodward, D. E., R. H. Hawkins, R. Jiang, A. Hjelmfeldt Jr, J. Van Mullem,
   !!       and Q. D. Quan. “Runoff Curve Number Method: Examination of the Initial Abstraction Ratio.”
   !!       In Conference Proceeding Paper, World Water and Environmental Resources Congress, 2003.
-  elemental function infiltration_curve_number_calculate(iLanduseIndex, iSoilsIndex, fSoilStorage, fSoilStorage_Max, &
+  elemental function runoff_curve_number_calculate(iLanduseIndex, iSoilsIndex, fSoilStorage, fSoilStorage_Max, &
                   fInflow, fCFGI )   result(fInfiltration)
 
     integer (kind=c_int), intent(in)  :: iLanduseIndex
@@ -276,7 +276,7 @@ contains
     fInfiltration = max( 0.0_c_float, fInflow - fRunoff )
 
 
-  end function infiltration_curve_number_calculate
+  end function runoff_curve_number_calculate
 
 
-end module infiltration__curve_number
+end module runoff__curve_number
