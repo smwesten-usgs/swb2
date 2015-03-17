@@ -55,7 +55,7 @@ module loop_initialize
   type (METHODS_LIST_T), parameter  :: KNOWN_METHODS(7) =   &
     [ METHODS_LIST_T("INTERCEPTION           "),            &
       METHODS_LIST_T("EVAPOTRANSPIRATION     "),            &
-      METHODS_LIST_T("INFILTRATION           "),            &
+      METHODS_LIST_T("RUNOFF                 "),            &
       METHODS_LIST_T("PRECIPITATION          "),            &
       METHODS_LIST_T("FOG                    "),            &
       METHODS_LIST_T("SOIL_MOISTURE          "),            &

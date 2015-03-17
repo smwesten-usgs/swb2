@@ -1228,8 +1228,8 @@ contains
 
       elseif ( ( sMethodName .strequal. "RUNOFF_RATIO" ) .or. ( sMethodName .strequal. "MONTHLY_GRID" ) ) then
 
-        this%init_runoff => model_initialize_runoff_gridded_ratio
-        this%calc_runoff => model_calculate_runoff_gridded_ratio
+        this%init_runoff => model_initialize_runoff_gridded_values
+        this%calc_runoff => model_calculate_runoff_gridded_values
 
         call LOGS%WRITE( "==> RUNOFF RATIO submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
@@ -1721,29 +1721,29 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_initialize_runoff_gridded_ratio(this)
+  subroutine model_initialize_runoff_gridded_values(this)
 
-    use runoff__gridded_ratio
+    use runoff__gridded_values
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call runoff_gridded_ratio_initialize( this%active )
+    call runoff_gridded_values_initialize( this%active )
 
-  end subroutine model_initialize_runoff_gridded_ratio
+  end subroutine model_initialize_runoff_gridded_values
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_runoff_gridded_ratio(this, index )
+  subroutine model_calculate_runoff_gridded_values(this, index )
 
-    use runoff__gridded_ratio
+    use runoff__gridded_values
 
     class (MODEL_DOMAIN_T), intent(inout)       :: this
     integer (kind=c_int), intent(in), optional  :: index
 
-    call runoff_gridded_ratio_calculate(this%inflow, this%runoff, this%active)
+    call runoff_gridded_values_calculate(this%inflow, this%runoff, this%active)
 
 
-  end subroutine model_calculate_runoff_gridded_ratio
+  end subroutine model_calculate_runoff_gridded_values
 
 !--------------------------------------------------------------------------------------------------
 
