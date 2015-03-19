@@ -544,6 +544,8 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
   iHdrRecs = 0
   lXLLCenter = lFALSE
   lYLLCenter = lFALSE
+  sNoDataValue = ""
+
   do
       read ( unit=LU_GRID, fmt="(a256)", iostat=iStat ) sInputRecord
       call assert ( iStat == 0, &
@@ -604,7 +606,9 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
           end do
           ! ... and read the data.
           select case ( iDataType )
+
               case ( DATATYPE_INT )
+
                 do iRow=1,pGrd%iNY
                   read ( unit=LU_GRID, fmt=*, iostat=iStat ) pGrd%iData(:,iRow)
                   call assert ( iStat == 0, &
@@ -618,7 +622,9 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
                     "Failed to read NODATA value in grid data - file: " &
                     //dquote(sFileName), TRIM(__FILE__),__LINE__ )
                 endif
+
               case ( DATATYPE_REAL )
+
                 do iRow=1,pGrd%iNY
                   read ( unit=LU_GRID, fmt=*, iostat=iStat ) pGrd%rData(:,iRow)
                   call assert ( iStat == 0, &
@@ -632,10 +638,13 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
                     "Failed to read NODATA value in grid data - file: " &
                     //trim(sFileName), TRIM(__FILE__),__LINE__ )
                 endif
+
               case default
+
                   call assert ( lFALSE, &
                     "Internal error -- illegal ARC GRID data type", &
                     TRIM(__FILE__),__LINE__)
+
           end select
           exit
       end if
@@ -690,6 +699,8 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
   iHdrRecs = 0
   lXLLCenter = lFALSE
   lYLLCenter = lFALSE
+  sNoDataValue = ""
+  
   do
       read ( unit=LU_GRID, fmt="(a256)", iostat=iStat ) sInputRecord
       call assert ( iStat == 0, &

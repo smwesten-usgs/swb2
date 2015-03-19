@@ -24,9 +24,9 @@ module datetime
     integer (kind=c_short)  :: iHour = 0
     integer (kind=c_short)  :: iMinute = 0
     integer (kind=c_short)  :: iSecond = 0
-    integer (kind=c_int)    :: iWaterYearHigh
-    integer (kind=c_int)    :: iWaterYearLow
-    real (kind=c_double)    :: dJulianDate
+    integer (kind=c_int)    :: iWaterYearHigh = 0
+    integer (kind=c_int)    :: iWaterYearLow = 0
+    real (kind=c_double)    :: dJulianDate = 0.0_c_double
 
   contains
 
@@ -277,6 +277,8 @@ subroutine parse_text_to_date_sub(this, sString)
   this%iYear = iYear
   this%iDay = iDay
 
+  this%dJulianDate = this%dJulianDate + julian_day( iMonth=iMonth, iDay=iDay, iYear=iYear )
+
 end subroutine parse_text_to_date_sub
 
 !------------------------------------------------------------------------------
@@ -333,6 +335,10 @@ subroutine parse_text_to_time_sub(this, sString)
   this%iHour = iHour
   this%iMinute = iMinute
   this%iSecond = iSecond
+
+  this%dJulianDate = this%dJulianDate + real( iHour, kind=c_double) / 24.0_c_double      &
+                                      + real( iMinute, kind=c_double) / 1440.0_c_double  &
+                                      + real( iSecond, kind=c_double) / 86400.0_c_double
 
 end subroutine parse_text_to_time_sub
 

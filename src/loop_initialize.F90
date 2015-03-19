@@ -32,7 +32,7 @@ module loop_initialize
     character (len=23)     :: sName
   end type METHODS_LIST_T
 
-  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(17) = &
+  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(18) = &
 
     [ GRIDDED_DATASETS_T("PRECIPITATION                ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("TMIN                         ", lFALSE, DATATYPE_FLOAT ),     &
@@ -49,7 +49,8 @@ module loop_initialize
       GRIDDED_DATASETS_T("CANOPY_COVER_FRACTION        ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("STEMFLOW_FRACTION            ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("EVAPORATION_TO_RAINFALL_RATIO", lTRUE, DATATYPE_FLOAT ),      & 
-      GRIDDED_DATASETS_T("RAINFALL_ADJUST_FACTOR       ", lTRUE, DATATYPE_FLOAT ),      &                 
+      GRIDDED_DATASETS_T("RAINFALL_ADJUST_FACTOR       ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("RUNOFF_ZONE                  ", lTRUE, DATATYPE_INT ),        &                 
       GRIDDED_DATASETS_T("RELATIVE_HUMIDITY            ", lTRUE, DATATYPE_FLOAT )   ]
 
   type (METHODS_LIST_T), parameter  :: KNOWN_METHODS(7) =   &
@@ -167,7 +168,7 @@ contains
     call initialize_soils_landuse_awc_flowdir_values()
 
     ! temporary diagnostic: dump statistics on each of the state variables
-    call MODEL%summarize()
+!    call MODEL%summarize()
 
     ! check to see that there are no NULL method pointers
     call MODEL%preflight_check_method_pointers()

@@ -26,13 +26,14 @@ module runoff__gridded_values
   public :: runoff_gridded_values_initialize, runoff_gridded_values_calculate
 
   real (kind=c_float), allocatable     :: RUNOFF_TABLE_VALUES(:,:)
+  type ( DATETIME_T ), allocatable     :: RUNOFF_TABLE_DATES(:)
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pRUNOFF_ZONE
   integer (kind=c_int), allocatable    :: RUNOFF_ZONE(:)
  
   integer (kind=c_int), allocatable    :: RUNOFF_RATIOS(:)
 
-contains
+ contains
 
   !> Initialize the infiltration grid. 
   !!
@@ -80,11 +81,12 @@ contains
     ! [ LOCALS ]
     character (len=65536)   :: sRecord, sSubstring
     integer (kind=c_int)    :: iStat
-    integer (kind=c_int)    :: iCount
+    integer (kind=c_int)    :: iLineNum
+    integer (kind=c_int)    :: iFieldNum
     integer (kind=c_int)    :: iIndex
     integer (kind=c_int)    :: iNumLines  
     integer (kind=c_int)    :: iNumFields
-    type (ASCII_FILE_T)     :: RUNOFF_RATIO_FILE
+    type (ASCII_FILE_T)     :: RUNOFF_RATIO_FILE    
 
     call RUNOFF_RATIO_FILE%open( sFilename = sFilename, &
                   sCommentChars = "#%!", &
@@ -98,83 +100,111 @@ contains
 
     iNumFields = fieldCount( sRecord )
 
-    allocate(  RUNOFF_TABLE_VALUES( iNumLines, iNumFields ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory for runoff ratio table", &
+    allocate(  RUNOFF_TABLE_VALUES( iNumLines, iNumFields -1 ), stat=iStat )
+    call assert( iStat == 0, "Problem allocating memory for runoff ratio table values", &
       __FILE__, __LINE__ )
 
-    iCount = 0
+    allocate(  RUNOFF_TABLE_DATES( iNumLines ), stat=iStat )
+    call assert( iStat == 0, "Problem allocating memory for runoff ratio table date values vector", &
+      __FILE__, __LINE__ )
 
-!     do 
 
-!       ! read in next line of file
-!       sRecord = RUNOFF_RATIO_FILE%readLine()
+    iLineNum = 0
+    iFieldNum = 0
 
-!       if ( RUNOFF_RATIO_FILE%isEOF() ) exit 
+    do 
 
-!       iCount = iCount + 1
+      ! read in next line of file
+      sRecord = RUNOFF_RATIO_FILE%readLine()
 
-!       ! read in date
-!       call chomp(sRecord, sSubstring, RUNOFF_RATIO_FILE%sDelimiters )
+      if ( RUNOFF_RATIO_FILE%isEOF() ) exit 
 
-!       if ( len_trim(sSubstring) == 0 ) &
-!       call die( "Missing date in the monthly runoff ratio file", &
-!         __FILE__, __LINE__, "Problem occured on line number "//asCharacter(RUNOFF_RATIO_FILE%currentLineNum() ) &
-!         //" of file "//dquote(sFilename) )
+      iLineNum = iLineNum + 1
+      iFieldNum = 0
 
-!      RUNOFF_RATIOS(iCount)%iMonth = asInt(sSubString)
+      ! read in date
+      call chomp(sRecord, sSubstring, RUNOFF_RATIO_FILE%sDelimiters )
 
-      ! read in rain gage zone
-!      call chomp(sRecord, sSubstring, RUNOFF_RATIO_FILE%sDelimiters )
+      if ( len_trim(sSubstring) == 0 ) &
+      call die( "Missing date in the monthly runoff ratio file", &
+        __FILE__, __LINE__, "Problem occured on line number "//asCharacter(RUNOFF_RATIO_FILE%currentLineNum() ) &
+        //" of file "//dquote(sFilename) )
 
-    
-      
-!       do iIndex = 2, ubound( RUNOFF_RATIOS, 2)
+      call RUNOFF_TABLE_DATES( iLineNum )%parseDate( sSubString ) 
+
+       do iIndex = 2, iNumFields
 
 !         ! read in fragment for given day of month
-!         call chomp(sRecord, sSubstring, RUNOFF_RATIO_FILE%sDelimiters )
+         call chomp(sRecord, sSubstring, RUNOFF_RATIO_FILE%sDelimiters )
 
-!         if ( len_trim(sSubstring) == 0 ) &
-!         call die( "Missing fragment value in the daily fragments file", &
-!           __FILE__, __LINE__, "Problem occured on line number "//asCharacter(RUNOFF_RATIO_FILE%currentLineNum() ) &
-!           //" of file "//dquote(sFilename) )
+         if ( len_trim(sSubstring) == 0 ) &
+           call die( "Missing or corrupt value in the runoff ratio file", &
+             __FILE__, __LINE__, "Problem occured on line number "//asCharacter(RUNOFF_RATIO_FILE%currentLineNum() ) &
+             //" of file "//dquote(sFilename) )
 
-!         RUNOFF_RATIOS(iCount)%fFragmentValue(iIndex) = asFloat( sSubstring )
+         RUNOFF_TABLE_VALUES(iLineNum, iIndex - 1 ) = asFloat( sSubstring )
 
-!       enddo
+      enddo
       
-!     enddo    
+    enddo    
 
 
   end subroutine read_runoff_ratio_table
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine runoff_gridded_values_calculate( fRainfall, fRunoff, lActive )
+  subroutine runoff_gridded_values_calculate( fRainfall, fRunoff )
 
     real (kind=c_float), intent(inout)        :: fRainfall(:)
     real (kind=c_float), intent(inout)        :: fRunoff(:)
-    logical (kind=c_bool), intent(in)         :: lActive(:,:)
 
     ! [ LOCALS ] 
-    integer (kind=c_int) :: iJulianDay
-    integer (kind=c_int) :: iMonth
-    integer (kind=c_int) :: iDay
-    integer (kind=c_int) :: iYear
-    integer (kind=c_int) :: iDaysInMonth
-    integer (kind=c_int) :: iNumDaysFromOrigin
-    integer (kind=c_int) :: iIndex
-    real (kind=c_float)  :: fFactor
+    integer (kind=c_int)  :: iJulianDay
+    integer (kind=c_int)  :: iMonth
+    integer (kind=c_int)  :: iDay
+    integer (kind=c_int)  :: iYear
+    integer (kind=c_int)  :: iDaysInMonth
+    integer (kind=c_int)  :: iNumDaysFromOrigin
+    integer (kind=c_int)  :: iLineNum
+    integer (kind=c_int)  :: iFieldNum
+    real (kind=c_float)   :: fFactor
+    logical (kind=c_bool) :: lMatch
+    integer (kind=c_int)  :: iCount
 
-    associate ( dt => SIM_DT%curr )
+    lMatch = lFALSE
+    iCount = 0
 
-      iJulianDay = dt%getJulianDay()
-      iMonth = asInt( dt%iMonth )
-      iDay = asInt( dt%iDay )
-      iYear = dt%iYear
-      iDaysInMonth = SIM_DT%iDaysInMonth
-      iNumDaysFromOrigin = SIM_DT%iNumDaysFromOrigin
+    do iLineNum = lbound( RUNOFF_TABLE_DATES, 1), ubound( RUNOFF_TABLE_DATES, 1) - 1
 
-    end associate
+      if (     ( RUNOFF_TABLE_DATES( iLineNum ) <= SIM_DT%curr )   &
+        .and.  ( RUNOFF_TABLE_DATES( iLineNum + 1 ) > SIM_DT%curr ) )  then
+          
+          lMatch = lTRUE
+          exit
+      endif    
+
+    enddo  
+
+    if ( .not. lMatch )   &
+      call die( "Failed to find an appropriate date value in the RUNOFF_RATIO file.", &
+        __FILE__, __LINE__ )
+
+    do iFieldNum = lbound(RUNOFF_TABLE_VALUES, 2), ubound(RUNOFF_TABLE_VALUES, 2)
+
+      iCount = iCount + count( RUNOFF_ZONE == iFieldNum )
+
+      where ( RUNOFF_ZONE == iFieldNum )
+
+        RUNOFF_RATIOS = RUNOFF_TABLE_VALUES( iLineNum, iFieldNum )
+
+      end where
+      
+    enddo    
+
+    print *, "TOTAL Number of cells: ", size(RUNOFF_ZONE), "   Number of cells for which runoff ratios were distributed: ", iCount
+
+    fRunoff = fRainfall * RUNOFF_RATIOS
+
 
   end subroutine runoff_gridded_values_calculate
 
