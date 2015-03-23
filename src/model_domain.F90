@@ -1175,8 +1175,13 @@ contains
 
      else
 
-       this%inflow = this%gross_precip - this%interception + this%snowmelt
+       this%runon = 0.0_c_float
+       this%inflow = this%gross_precip +this%fog - this%interception + this%snowmelt
        call this%calc_runoff()
+       print *, "Gross Precip: ", minval(this%gross_precip), maxval(this%gross_precip)
+       print *, "Interception: ", minval(this%interception), maxval(this%interception)
+       print *, "Inflow: ", minval(this%inflow), maxval(this%inflow)
+       print *, "Runoff: ", minval(this%runoff), maxval(this%runoff)
        this%infiltration = this%inflow - this%runoff
        call this%calc_soil_moisture()
 
@@ -1722,7 +1727,13 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)       :: this
     integer (kind=c_int), intent(in), optional  :: index
 
-    call runoff_gridded_values_calculate(this%inflow, this%runoff )
+    call runoff_gridded_values_calculate( )
+
+    this%runoff = this%inflow * RUNOFF_RATIOS
+
+
+    print *, "RGV::   Inflow: ", minval(this%inflow), maxval(this%inflow)
+    print *, "RGV::   Runoff: ", minval(this%runoff), maxval(this%runoff)
 
 
   end subroutine model_calculate_runoff_gridded_values

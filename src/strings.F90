@@ -555,17 +555,26 @@ contains
     integer (kind=c_int)                        :: iCount
 
     ! [ LOCALS ]
-    character (len=len(sText)) :: sText1
-    character (len=len(sText)) :: sText2
+    character (len=len(sText))      :: sText1
+    character (len=len(sText))      :: sText2
+    character (len=:), allocatable  :: sDelimiters_
+
+    if ( present(sDelimiters) ) then
+      sDelimiters_ = sDelimiters_
+    else
+      sDelimiters_ = sWHITESPACE
+    endif    
 
     iCount = 0
 
-    do
-      call chomp(sText1=sText1, sText2=sText2, sDelimiters=sDelimiters )
+    sText1 = sText
 
-      if ( len_trim( sText1 ) > 0 ) iCount = iCount + 1
+    do
+      call chomp(sText1=sText1, sText2=sText2, sDelimiters=sDelimiters_ )
 
       if ( len_trim( sText2 ) == 0 )  exit
+
+      iCount = iCount + 1
 
     enddo
     
@@ -613,7 +622,7 @@ contains
     else
       ! delimiters were found; split and return the chunks of text
       sText2 = trim( sText1(1:iIndex-1) )
-      sText1 = trim( sText1(iIndex + 1:) ) 
+      sText1 = trim( adjustl( sText1(iIndex + 1:) ) ) 
     endif
     
   end subroutine split_and_return_text_sub

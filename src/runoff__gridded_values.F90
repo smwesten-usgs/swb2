@@ -25,13 +25,13 @@ module runoff__gridded_values
 
   public :: runoff_gridded_values_initialize, runoff_gridded_values_calculate
 
-  real (kind=c_float), allocatable     :: RUNOFF_TABLE_VALUES(:,:)
-  type ( DATETIME_T ), allocatable     :: RUNOFF_TABLE_DATES(:)
+  real (kind=c_float), allocatable           :: RUNOFF_TABLE_VALUES(:,:)
+  type ( DATETIME_T ), allocatable           :: RUNOFF_TABLE_DATES(:)
 
-  type (DATA_CATALOG_ENTRY_T), pointer :: pRUNOFF_ZONE
-  integer (kind=c_int), allocatable    :: RUNOFF_ZONE(:)
+  type (DATA_CATALOG_ENTRY_T), pointer       :: pRUNOFF_ZONE
+  integer (kind=c_int), allocatable          :: RUNOFF_ZONE(:)
  
-  integer (kind=c_int), allocatable    :: RUNOFF_RATIOS(:)
+  real (kind=c_float), allocatable, public   :: RUNOFF_RATIOS(:)
 
  contains
 
@@ -153,10 +153,7 @@ module runoff__gridded_values
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine runoff_gridded_values_calculate( fRainfall, fRunoff )
-
-    real (kind=c_float), intent(inout)        :: fRainfall(:)
-    real (kind=c_float), intent(inout)        :: fRunoff(:)
+  subroutine runoff_gridded_values_calculate( )
 
     ! [ LOCALS ] 
     integer (kind=c_int)  :: iJulianDay
@@ -200,11 +197,6 @@ module runoff__gridded_values
       end where
       
     enddo    
-
-    print *, "TOTAL Number of cells: ", size(RUNOFF_ZONE), "   Number of cells for which runoff ratios were distributed: ", iCount
-
-    fRunoff = fRainfall * RUNOFF_RATIOS
-
 
   end subroutine runoff_gridded_values_calculate
 

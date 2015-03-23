@@ -11,7 +11,7 @@ module file_operations
 
   private
   
-  integer (kind=c_int), parameter :: MAX_STR_LEN = 8192
+  integer (kind=c_int), parameter :: MAX_STR_LEN = 65536
   
   type, public :: ASCII_FILE_T
 

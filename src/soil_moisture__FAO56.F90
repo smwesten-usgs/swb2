@@ -18,19 +18,19 @@ module sm_FAO56
 
   type, public :: SM_FAO56_T
 
-    integer (kind=c_int), allocatable  :: iLanduseCode(:)
-    real (kind=c_float), allocatable   :: fREW(:,:)
-    real (kind=c_float), allocatable   :: fTEW(:,:)
-    real (kind=c_float), allocatable   :: iL_plant(:) 
-    real (kind=c_float), allocatable   :: iL_ini(:) 
-    real (kind=c_float), allocatable   :: iL_mid(:) 
-    real (kind=c_float), allocatable   :: iL_late(:) 
-    real (kind=c_float), allocatable   :: fKcb_ini(:)
-    real (kind=c_float), allocatable   :: fKcb_mid(:)
-    real (kind=c_float), allocatable   :: fKcb_end(:)
-    real (kind=c_float), allocatable   :: fKcb_min(:)
-    real (kind=c_float), allocatable   :: fDepletion_fraction(:)
-    real (kind=c_float), allocatable   :: fMean_plant_height(:)
+    integer (kind=c_int), allocatable  :: iLanduseCode
+    real (kind=c_float), allocatable   :: fREW(:)
+    real (kind=c_float), allocatable   :: fTEW(:)
+    real (kind=c_float), allocatable   :: iL_plant 
+    real (kind=c_float), allocatable   :: iL_ini 
+    real (kind=c_float), allocatable   :: iL_mid 
+    real (kind=c_float), allocatable   :: iL_late 
+    real (kind=c_float), allocatable   :: fKcb_ini
+    real (kind=c_float), allocatable   :: fKcb_mid
+    real (kind=c_float), allocatable   :: fKcb_end
+    real (kind=c_float), allocatable   :: fKcb_min
+    real (kind=c_float), allocatable   :: fDepletion_fraction
+    real (kind=c_float), allocatable   :: fMean_plant_height
 
   contains
 
@@ -38,11 +38,16 @@ module sm_FAO56
 
   end type SM_FAO56_T
 
-  type (SM_FAO56_T) :: SM_FAO56_TABLE
+  type (SM_FAO56_T), allocatable :: SM_FAO56_TABLE(:)
+
+  integer (kind=c_int), allocatable   :: FAO56_INDEX(:)
 
   contains
 
-  subroutine sm_FAO56_initialize()
+  subroutine sm_FAO56_initialize( this, lActive )
+
+    type (SM_FAO56_T) :: this
+    logical (kind=c_bool), intent(in)   :: Active(:)
 
     ! [ LOCALS ]
     type (STRING_LIST_T)             :: slREW, slTEW
@@ -107,6 +112,9 @@ module sm_FAO56
    call PARAMS%get_values( "Depletion_Fraction", this%fDepletion_fraction(:) )
    call PARAMS%get_values( "Mean_Plant_Height", this%fMean_plant_height(:) )
 
+  !> @TODO Add more logic here to perform checks on the validity of this data.
+
+  !> @TODO need to go through each active grid cell and record the table index value
 
   end subroutine sm_FAO56_initialize
 
@@ -118,9 +126,9 @@ module sm_FAO56
  !! @param[inout] pIRRIGATION pointer to a single line of information in the irrigation file.
  !! @param[in] iThreshold either the current day of year or the number of growing degree days.
  !! @retval rKcb Basal crop coefficient given the irrigation table entries and the current threshold values.
- elemental function sm_FAO56_UpdateCropCoefficient( iFAOIndex, iThreshold )  result(fKcb)
+ elemental function sm_FAO56_UpdateCropCoefficient( iFAO_Index, iThreshold )  result(fKcb)
 
-  integer (kind=c_int), intent(in)   :: iFAOIndex
+  integer (kind=c_int), intent(in)   :: iFAO_Index
   integer (kind=c_int), intent(in)   :: iThreshold
   real (kind=c_float)                :: fKcb
 
@@ -128,10 +136,10 @@ module sm_FAO56
   real (kind=c_double) :: fFrac
 
   ! define shorthand variable names for remainder of function
-  associate ( L_ini => this%iL_ini(iFAOIndex), L_mid => this%iL_mid(iFAOIndex), L_late => this%iL_late(iFAOIndex), &
-              L_plant => this%iL_plant(iFAOIndex), Kcb_ini => this%fKcb_ini(iFAOIndex),                            &
-              Kcb_dev => this%fKcb_dev(iFAOIndex), Kcb_mid => this%fKcb_mid(iFAOIndex),                            &
-              Kcb_end => this%fKcb_end(iFAOIndex) )
+  associate ( L_ini => this%iL_ini(iFAO_Index), L_mid => this%iL_mid(iFAO_Index), L_late => this%iL_late(iFAO_Index), &
+              L_plant => this%iL_plant(iFAO_Index), Kcb_ini => this%fKcb_ini(iFAO_Index),                            &
+              Kcb_dev => this%fKcb_dev(iFAO_Index), Kcb_mid => this%fKcb_mid(iFAO_Index),                            &
+              Kcb_end => this%fKcb_end(iFAO_Index) )
 
     ! now calculate Kcb for the given landuse
     if( iThreshold > L_late ) then
@@ -197,9 +205,9 @@ end function sm_FAO56_CalcEvaporationReductionCoefficient
 !! vegetation during the growing season
 !!
 !!@note Implemented as equation 76, FAO-56, Allen and others
-elemental function sm_FAO56_CalcFractionExposedAndWettedSoil( iFAOIndex, fKcb)   result (f_few)
+elemental function sm_FAO56_CalcFractionExposedAndWettedSoil( iFAO_Index, fKcb)   result (f_few)
 
-  integer (kind=c_int), intent(in)     :: iFAOIndex
+  integer (kind=c_int), intent(in)     :: iFAO_Index
   real (kind=c_float), intent(in)      :: fKcb
   real (kind=c_float)                  :: f_few
 
@@ -209,16 +217,18 @@ elemental function sm_FAO56_CalcFractionExposedAndWettedSoil( iFAOIndex, fKcb)  
   real (kind=c_float) :: fDenominator
   real (kind=c_float) :: fExponent
 
-  fNumerator = fKcb - fKcb_min(iFAOIndex)
-  fDenominator = fKcb_mid(iFAOIndex) - fKcb_min(iFAOIndex)
+  fNumerator = fKcb - fKcb_min(iFAO_Index)
+  fDenominator = fKcb_mid(iFAO_Index) - fKcb_min(iFAO_Index)
   fExponent = 1_c_float + 0.5_c_float * fMean_plant_height * rM_PER_FOOT
 
+  ! calculate the fraction of the ground that is currently covered
   if(fDenominator >  0_c_float ) then
     f_fc = ( fNumerator / fDenominator) ** fExponent
   else
     f_fc = 1c_float
   endif
 
+  ! now calculate the fraction of the ground that is EXPOSED and WETTED
   f_few = 1c_float - f_fc
 
   if ( f_few < 0_c_float ) f_few = 0_c_float
@@ -242,9 +252,9 @@ end function sm_FAO56_CalcFractionExposedAndWettedSoil
 !!     the time that the crop is planted.
 !! @retval rZr_i current active rooting depth.
 !! @note Implemented as equation 8-1 (Annex 8), FAO-56, Allen and others.
-elemental function sm_FAO56_CalcEffectiveRootDepth(iFAOIndex, fZr_max, iThreshold) 	result(fZr_i)
+elemental function sm_FAO56_CalcEffectiveRootDepth(iFAO_Index, fZr_max, iThreshold) 	result(fZr_i)
 
-  integer (kind=c_int), intent(in)    :: iFAOIndex 
+  integer (kind=c_int), intent(in)    :: iFAO_Index 
 	real (kind=c_float), intent(in)     :: fZr_max
 	integer (kind=c_int), intent(in)    :: iThreshold ! either GDD or DOY
 
@@ -259,18 +269,18 @@ elemental function sm_FAO56_CalcEffectiveRootDepth(iFAOIndex, fZr_max, iThreshol
   ! if there is not much difference between the Kcb_mid and Kcb_ini, assume that
   ! we are dealing with an area such as a forest, where we assume that the rooting
   ! depths are constant year-round
-	if ( fKcb_mid(iFAOIndex) - fKcb_ini(iFAOIndex) < 0.1) then
+	if ( fKcb_mid(iFAO_Index) - fKcb_ini(iFAO_Index) < 0.1) then
 
 	  fZr_i = fZr_max
 
-	elseif ( iThreshold < iL_plant(iFAOIndex) ) then
+	elseif ( iThreshold < iL_plant(iFAO_Index) ) then
 
 	  fZr_i = fZr_min
 
 	else
 
-    fZr_i = fZr_min + (fZr_max - fZr_min) * real(iThreshold - iL_plant(iFAOIndex), kind=c_float ) &
-                                           / real( iL_dev(iFAOIndex) -  iL_plant(iFAOIndex), kind=c_float)
+    fZr_i = fZr_min + (fZr_max - fZr_min) * real(iThreshold - iL_plant(iFAO_Index), kind=c_float ) &
+                                           / real( iL_dev(iFAO_Index) -  iL_plant(iFAO_Index), kind=c_float)
 
   endif
 
@@ -281,14 +291,14 @@ end function sm_FAO56_CalcEffectiveRootDepth
 !> This function estimates Ke, the bare surface evaporation coefficient
 !!
 !! @note Implemented as equation 71, FAO-56, Allen and others
-elemental function sm_FAO56_CalcSurfaceEvaporationCoefficient( iFAOIndex, fKr, fKcb )     result(fKe)
+elemental function sm_FAO56_CalcSurfaceEvaporationCoefficient( iFAO_Index, fKr, fKcb )     result(fKe)
 
-  integer (kind=c_int), intent(in)     :: iFAOIndex
+  integer (kind=c_int), intent(in)     :: iFAO_Index
   real (kind=c_float), intent(in)      :: fKr
   real (kind=c_float), intent(in)      :: fKcb
   real (kind=c_float)                  :: fKe
 
-  fKe = fKr * ( rKcb_max(iFAOIndex) - fKcb )
+  fKe = fKr * ( rKcb_max(iFAO_Index) - fKcb )
 
 end function sm_FAO56_CalcSurfaceEvaporationCoefficient
 
@@ -297,16 +307,16 @@ end function sm_FAO56_CalcSurfaceEvaporationCoefficient
 !> This subroutine updates the total available water (TAW)
 !> (water within the rootzone) for a gridcell
 elemental subroutine sm_FAO56_CalcTotalAvailableWater(fTotalAvailableWater, fReadilyAvailableWater, &
-                iFAOIndex, fAvailableWaterCapacity, fCurrentRootingDepth )
+                iFAO_Index, fAvailableWaterCapacity, fCurrentRootingDepth )
 
   real (kind=c_float), intent(out)      :: fTotalAvailableWater
   real (kind=c_float), intent(out)      :: fReadilyAvailableWater  
-  integer (kind=c_int), intent(in)      :: iFAOIndex
+  integer (kind=c_int), intent(in)      :: iFAO_Index
   real (kind=c_float), intent(in)       :: fAvailableWaterCapacity
   real (kind=c_float), intent(in)       :: fCurrentRootingDepth
 
   fTotalAvailableWater = fCurrentRootingDepth * fAvailableWaterCapacity
-  fReadilyAvailableWater = fTotalAvailableWater * fDepletion_fraction(iFAOIndex)
+  fReadilyAvailableWater = fTotalAvailableWater * fDepletion_fraction(iFAO_Index)
 
   end subroutine sm_FAO56_CalcTotalAvailableWater
 
@@ -315,10 +325,10 @@ elemental subroutine sm_FAO56_CalcTotalAvailableWater(fTotalAvailableWater, fRea
 !> This function estimates Ks, water stress coefficient
 !!
 !! @note Implemented as equation 84, FAO-56, Allen and others
-elemental function sm_FAO56_CalcWaterStressCoefficient( iFAOIndex, fDeficit, &
+elemental function sm_FAO56_CalcWaterStressCoefficient( iFAO_Index, fDeficit, &
                       fTotalAvailableWater, fReadilyAvailableWater )      result(fKs)
 
-  integer (kind=c_int), intent(in)     :: iFAOIndex
+  integer (kind=c_int), intent(in)     :: iFAO_Index
   real (kind=c_float), intent(in)      :: fDeficit
   real (kind=c_float), intent(in)      :: fTotalAvailableWater
   real (kind=c_float), intent(in)      :: fReadilyAvailableWater
@@ -331,7 +341,7 @@ elemental function sm_FAO56_CalcWaterStressCoefficient( iFAOIndex, fDeficit, &
   elseif ( fDeficit < fTotalAvailableWater ) then
 
     fKs = ( fTotalAvailableWater - fDeficit + 1e-6_c_float ) &
-             / ( (1_c_float - fDepletion_fraction(iFAOIndex) ) &
+             / ( (1_c_float - fDepletion_fraction(iFAO_Index) ) &
           * ( fTotalAvailableWater + 1e-6_c_float ) )
 
   else
@@ -405,69 +415,23 @@ subroutine sm_FAO56_ApplyCropCoefficients(pGrd, pConfig)
        ! of water. "NONSTANDARD" is the term used to describe ET requirements
        ! when plants are under stress, when water is scarce.
 
-       if ( pConfig%iConfigureFAO56 == CONFIG_FAO56_TWO_FACTOR_NONSTANDARD ) then
-         ! we are using the full FAO56 soil water balance approach, *INCLUDING*
-				 ! the adjustments for nonstandard growing conditions (e.g. plant
-				 ! stress and resulting decrease in ET during dry conditions).
+       ! we are using the full FAO56 soil water balance approach, *INCLUDING*
+			 ! the adjustments for nonstandard growing conditions (e.g. plant
+			 ! stress and resulting decrease in ET during dry conditions).
 
-         rKr = sm_FAO56_CalcEvaporationReductionCoefficient(rTEW, rREW, rDeficit)
-         r_few = sm_FAO56_CalcFractionExposedAndWettedSoil( pIRRIGATION )
-         rKe = min(sm_FAO56_CalcSurfaceEvaporationCoefficient( pIRRIGATION, &
-                 rKr ), r_few * pIRRIGATION%rKcb_mid )
+       rKr = sm_FAO56_CalcEvaporationReductionCoefficient(rTEW, rREW, rDeficit)
+       r_few = sm_FAO56_CalcFractionExposedAndWettedSoil( pIRRIGATION )
+       rKe = min(sm_FAO56_CalcSurfaceEvaporationCoefficient( pIRRIGATION, &
+               rKr ), r_few * pIRRIGATION%rKcb_mid )
 
-         if (rKe < 0) print *, "rKe < 0: ", cel%iIrrigationTableIndex, iRow, iCol, cel%iLandUse, cel%iSoilGroup, rKe, pIRRIGATION%rKcb, pIRRIGATION%rKcb_max
-         if (rKr < 0) print *, "rKr < 0: ", cel%iIrrigationTableIndex, iRow, iCol, cel%iLandUse, cel%iSoilGroup, rKr, pIRRIGATION%rKcb, pIRRIGATION%rKcb_max
-         if (r_few < 0) print *, "r_few < 0: ", cel%iIrrigationTableIndex, iRow, iCol, cel%iLandUse, cel%iSoilGroup, r_few, pIRRIGATION%rKcb, pIRRIGATION%rKcb_max
+       if (rKe < 0) print *, "rKe < 0: ", cel%iIrrigationTableIndex, iRow, iCol, cel%iLandUse, cel%iSoilGroup, rKe, pIRRIGATION%rKcb, pIRRIGATION%rKcb_max
+       if (rKr < 0) print *, "rKr < 0: ", cel%iIrrigationTableIndex, iRow, iCol, cel%iLandUse, cel%iSoilGroup, rKr, pIRRIGATION%rKcb, pIRRIGATION%rKcb_max
+       if (r_few < 0) print *, "r_few < 0: ", cel%iIrrigationTableIndex, iRow, iCol, cel%iLandUse, cel%iSoilGroup, r_few, pIRRIGATION%rKcb, pIRRIGATION%rKcb_max
 
-         rKs = sm_FAO56_CalcWaterStressCoefficient( pIRRIGATION, rDeficit, cel)
+       rKs = sm_FAO56_CalcWaterStressCoefficient( pIRRIGATION, rDeficit, cel)
 
-         cel%rBareSoilEvap = cel%rReferenceET0 * rKe
-         cel%rCropETc = cel%rReferenceET0 * (cel%rKcb * rKs)
-
-       elseif ( pConfig%iConfigureFAO56 == CONFIG_FAO56_ONE_FACTOR_NONSTANDARD ) then
-         ! we are using the full FAO56 soil water balance approach, *INCLUDING*
-				 ! the adjustments for nonstandard growing conditions (e.g. plant
-				 ! stress and resulting decrease in ET during dry conditions).
-				 ! *EXCLUDING* explicit calculation of BareSoilEvap
-
-         rKs = sm_FAO56_CalcWaterStressCoefficient( pIRRIGATION, rDeficit, cel)
-
-         cel%rBareSoilEvap = rZERO
-         cel%rCropETc = cel%rReferenceET0 * (cel%rKcb * rKs)
-
-       elseif ( pConfig%iConfigureFAO56 == CONFIG_FAO56_TWO_FACTOR_STANDARD ) then
-
-         ! if we are not using the full FAO56 soil water balance approach,
-         ! we should just adjust the potential ET by the crop coefficient.
-         ! The Thornthwaite-Mather soil moisture retention tables already
-         ! account for the fact that water becomes more difficult to extract
-         ! as the APWL increases...
-
-				 ! NO reductions in Kc due to water availability
-
-         rKr = sm_FAO56_CalcEvaporationReductionCoefficient(rTEW, rREW, rDeficit)
-         r_few = sm_FAO56_CalcFractionExposedAndWettedSoil( pIRRIGATION )
-         rKe = min(sm_FAO56_CalcSurfaceEvaporationCoefficient( pIRRIGATION, &
-                 rKr ), r_few * pIRRIGATION%rKcb_mid )
-
-         cel%rBareSoilEvap = cel%rReferenceET0 * rKe
-         cel%rCropETc = cel%rReferenceET0 * cel%rKcb
-
-       elseif ( pConfig%iConfigureFAO56 == CONFIG_FAO56_ONE_FACTOR_STANDARD ) then
-
-				 ! NO reductions in Kc due to water availability
-				 ! NO explicit calculation of BareSoilEvap
-				 ! no real calculations required because we're applying the crop coefficient directly
-
-         cel%rBareSoilEvap = rZERO
-         cel%rCropETc = cel%rReferenceET0 * cel%rKcb
-
-			 else
-
-			   call assert(lFALSE, "Programming error - unknown FAO56 configuration option", &
-				   trim(__FILE__), __LINE__)
-
-       endif
+       cel%rBareSoilEvap = cel%rReferenceET0 * rKe
+       cel%rCropETc = cel%rReferenceET0 * (cel%rKcb * rKs)
 
        ! "Adjusted" Reference ET is the general term being used in the water balance
        cel%rReferenceET0_adj = cel%rCropETc + cel%rBareSoilEvap
