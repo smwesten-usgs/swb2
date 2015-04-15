@@ -9,40 +9,26 @@
 module sm_FAO56
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double
-  use types
   use parameters
-	use sm_thornthwaite_mather
   implicit none
 
   private
 
-  type, public :: SM_FAO56_T
+  integer (kind=c_int), allocatable  :: LANDUSE_CODE(:)
+  real (kind=c_float), allocatable   :: REW(:,:)
+  real (kind=c_float), allocatable   :: TEW(:,:)
+  real (kind=c_float), allocatable   :: L_PLANT(:) 
+  real (kind=c_float), allocatable   :: L_INI(:)
+  real (kind=c_float), allocatable   :: L_MID(:)
+  real (kind=c_float), allocatable   :: L_LATE(:)
+  real (kind=c_float), allocatable   :: KCB_INI(:)
+  real (kind=c_float), allocatable   :: KCB_MID(:)
+  real (kind=c_float), allocatable   :: KCB_END(:)
+  real (kind=c_float), allocatable   :: KCB_MIN(:)
+  real (kind=c_float), allocatable   :: DEPLETION_FRACTION(:)
+  real (kind=c_float), allocatable   :: MEAN_PLANT_HEIGHT(:)
 
-    integer (kind=c_int), allocatable  :: iLanduseCode
-    real (kind=c_float), allocatable   :: fREW(:)
-    real (kind=c_float), allocatable   :: fTEW(:)
-    real (kind=c_float), allocatable   :: iL_plant 
-    real (kind=c_float), allocatable   :: iL_ini 
-    real (kind=c_float), allocatable   :: iL_mid 
-    real (kind=c_float), allocatable   :: iL_late 
-    real (kind=c_float), allocatable   :: fKcb_ini
-    real (kind=c_float), allocatable   :: fKcb_mid
-    real (kind=c_float), allocatable   :: fKcb_end
-    real (kind=c_float), allocatable   :: fKcb_min
-    real (kind=c_float), allocatable   :: fDepletion_fraction
-    real (kind=c_float), allocatable   :: fMean_plant_height
-
-  contains
-
-    procedure, private   :: fao56_initialize
-
-  end type SM_FAO56_T
-
-  type (SM_FAO56_T), allocatable :: SM_FAO56_TABLE(:)
-
-  integer (kind=c_int), allocatable   :: FAO56_INDEX(:)
-
-  contains
+contains
 
   subroutine sm_FAO56_initialize( this, lActive )
 
@@ -51,6 +37,7 @@ module sm_FAO56
 
     ! [ LOCALS ]
     type (STRING_LIST_T)             :: slREW, slTEW
+    type (STRING_LIST_T)             :: slList
     integer (kind=c_int)             :: iTEWSeqNums, iREWSeqNums
     integer (kind=c_int)             :: iNumberOfTEW, iNumberOfREW
     integer (kind=c_int)             :: iIndex
@@ -74,10 +61,14 @@ module sm_FAO56
    ! count how many items are present in the vector; this should equal the number of soils groups
    iNumberOfTEW = count( iTEWSeqNums > 0 )
 
+   !> create string list that allows for alternate heading identifiers for the landuse code
+   call slList%append("LU_Code")
+   call slList%append("Landuse_Code")
+   call slList%append("Landuse_Lookup_Code")
 
    !> Determine how many landuse codes are present
-   call PARAMS%get_values( slList, this%iLanduseCode )
-   iNumberOfLanduses = count( this%iLanduseCode > 0 )
+   call PARAMS%get_values( slList, LANDUSE_CODE )
+   iNumberOfLanduses = count( LANDUSE_CODE > 0 )
 
    allocate( REW(iNumberOfLanduses, iNumberOfREW), stat=iStat )
    call assert( iStat == 0, "Failed to allocate memory for readily evaporable water (REW) table", &
@@ -90,31 +81,37 @@ module sm_FAO56
    ! we should have the REW table fully filled out following this block
    do iIndex = 1, iNumberOfREW
      sText = "REW_"//asCharacter(iIndex)
-     call PARAMS%get_values( sText, fREW(:, iIndex) )
+     call PARAMS%get_values( sText, REW(:, iIndex) )
    enddo  
 
    ! we should have the TEW table fully filled out following this block
    do iIndex = 1, iNumberOfTEW
      sText = "TEW_"//asCharacter(iIndex)
-     call PARAMS%get_values( sText, fTEW(:, iIndex) )
+     call PARAMS%get_values( sText, TEW(:, iIndex) )
    enddo  
 
-   call PARAMS%get_values( "L_ini", this%iL_ini(:) )
-   call PARAMS%get_values( "L_mid", this%iL_mid(:) )
-   call PARAMS%get_values( "L_late", this%iL_late(:) )
-   call PARAMS%get_values( "L_min", this%iL_min(:) )
+   !> @TODO What should happen if the TEW / REW header entries do *not* fall in a 
+   !!       logical sequence of values? In other words, if the user has columns named
+   !!       REW_1, REW_3, REW_5, only the values associated with "REW_1" would be retrieved.
+   !!       Needless to say, this would be catastrophic.
 
-   call PARAMS%get_values( "Kcb_ini", this%fKcb_ini(:) )
-   call PARAMS%get_values( "Kcb_mid", this%fKcb_mid(:) )
-   call PARAMS%get_values( "Kcb_end", this%fKcb_end(:) )
-   call PARAMS%get_values( "Kcb_min", this%fKcb_min(:) )
+   call PARAMS%get_values( "L_ini", L_INI )
+   call PARAMS%get_values( "L_mid", L_MID )
+   call PARAMS%get_values( "L_late", L_LATE )
+   call PARAMS%get_values( "L_min", L_MIN )
 
-   call PARAMS%get_values( "Depletion_Fraction", this%fDepletion_fraction(:) )
-   call PARAMS%get_values( "Mean_Plant_Height", this%fMean_plant_height(:) )
+   call PARAMS%get_values( "Kcb_ini", KCB_INI )
+   call PARAMS%get_values( "Kcb_mid", KCB_MID )
+   call PARAMS%get_values( "Kcb_end", KCB_END )
+   call PARAMS%get_values( "Kcb_min", KCB_MIN )
+
+   call PARAMS%get_values( "Depletion_Fraction", DEPLETION_FRACTION )
+   call PARAMS%get_values( "Mean_Plant_Height", MEAN_PLANT_HEIGHT )
 
   !> @TODO Add more logic here to perform checks on the validity of this data.
 
-  !> @TODO need to go through each active grid cell and record the table index value
+  !> @TODO Need to handle missing values. WHat do we do if an entire column of values
+  !!       is missing?
 
   end subroutine sm_FAO56_initialize
 
@@ -136,10 +133,10 @@ module sm_FAO56
   real (kind=c_double) :: fFrac
 
   ! define shorthand variable names for remainder of function
-  associate ( L_ini => this%iL_ini(iFAO_Index), L_mid => this%iL_mid(iFAO_Index), L_late => this%iL_late(iFAO_Index), &
-              L_plant => this%iL_plant(iFAO_Index), Kcb_ini => this%fKcb_ini(iFAO_Index),                            &
-              Kcb_dev => this%fKcb_dev(iFAO_Index), Kcb_mid => this%fKcb_mid(iFAO_Index),                            &
-              Kcb_end => this%fKcb_end(iFAO_Index) )
+  associate ( L_ini => this%L_INI(iFAO_Index), L_mid => this%L_MID(iFAO_Index), L_late => this%L_LATE(iFAO_Index), &
+              L_plant => this%L_PLANT(iFAO_Index), Kcb_ini => this%KCB_INI(iFAO_Index),                            &
+              Kcb_dev => this%fKcb_dev(iFAO_Index), Kcb_mid => this%KCB_MID(iFAO_Index),                            &
+              Kcb_end => this%KCB_END(iFAO_Index) )
 
     ! now calculate Kcb for the given landuse
     if( iThreshold > L_late ) then
@@ -217,9 +214,9 @@ elemental function sm_FAO56_CalcFractionExposedAndWettedSoil( iFAO_Index, fKcb) 
   real (kind=c_float) :: fDenominator
   real (kind=c_float) :: fExponent
 
-  fNumerator = fKcb - fKcb_min(iFAO_Index)
-  fDenominator = fKcb_mid(iFAO_Index) - fKcb_min(iFAO_Index)
-  fExponent = 1_c_float + 0.5_c_float * fMean_plant_height * rM_PER_FOOT
+  fNumerator = fKcb - KCB_MIN(iFAO_Index)
+  fDenominator = KCB_MID(iFAO_Index) - KCB_MIN(iFAO_Index)
+  fExponent = 1_c_float + 0.5_c_float * MEAN_PLANT_HEIGHT * rM_PER_FOOT
 
   ! calculate the fraction of the ground that is currently covered
   if(fDenominator >  0_c_float ) then
@@ -269,18 +266,18 @@ elemental function sm_FAO56_CalcEffectiveRootDepth(iFAO_Index, fZr_max, iThresho
   ! if there is not much difference between the Kcb_mid and Kcb_ini, assume that
   ! we are dealing with an area such as a forest, where we assume that the rooting
   ! depths are constant year-round
-	if ( fKcb_mid(iFAO_Index) - fKcb_ini(iFAO_Index) < 0.1) then
+	if ( KCB_MID(iFAO_Index) - KCB_INI(iFAO_Index) < 0.1) then
 
 	  fZr_i = fZr_max
 
-	elseif ( iThreshold < iL_plant(iFAO_Index) ) then
+	elseif ( iThreshold < L_PLANT(iFAO_Index) ) then
 
 	  fZr_i = fZr_min
 
 	else
 
-    fZr_i = fZr_min + (fZr_max - fZr_min) * real(iThreshold - iL_plant(iFAO_Index), kind=c_float ) &
-                                           / real( iL_dev(iFAO_Index) -  iL_plant(iFAO_Index), kind=c_float)
+    fZr_i = fZr_min + (fZr_max - fZr_min) * real(iThreshold - L_PLANT(iFAO_Index), kind=c_float ) &
+                                           / real( iL_dev(iFAO_Index) -  L_PLANT(iFAO_Index), kind=c_float)
 
   endif
 
@@ -316,7 +313,7 @@ elemental subroutine sm_FAO56_CalcTotalAvailableWater(fTotalAvailableWater, fRea
   real (kind=c_float), intent(in)       :: fCurrentRootingDepth
 
   fTotalAvailableWater = fCurrentRootingDepth * fAvailableWaterCapacity
-  fReadilyAvailableWater = fTotalAvailableWater * fDepletion_fraction(iFAO_Index)
+  fReadilyAvailableWater = fTotalAvailableWater * DEPLETION_FRACTION(iFAO_Index)
 
   end subroutine sm_FAO56_CalcTotalAvailableWater
 
@@ -341,7 +338,7 @@ elemental function sm_FAO56_CalcWaterStressCoefficient( iFAO_Index, fDeficit, &
   elseif ( fDeficit < fTotalAvailableWater ) then
 
     fKs = ( fTotalAvailableWater - fDeficit + 1e-6_c_float ) &
-             / ( (1_c_float - fDepletion_fraction(iFAO_Index) ) &
+             / ( (1_c_float - DEPLETION_FRACTION(iFAO_Index) ) &
           * ( fTotalAvailableWater + 1e-6_c_float ) )
 
   else

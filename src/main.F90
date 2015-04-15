@@ -16,18 +16,21 @@ program main
 
   implicit none
 
-  character (len=256) :: sControlFile
-  integer (kind=c_int) :: iNumArgs
-  character (len=1024) :: sCompilerFlags
-  character (len=256) :: sCompilerVersion
+  character (len=256)            :: sControlFile
+  integer (kind=c_int)           :: iNumArgs
+  character (len=1024)           :: sCompilerFlags
+  character (len=256)            :: sCompilerVersion
+  character (len=256)            :: sVersionString 
 
   iNumArgs = COMMAND_ARGUMENT_COUNT()
 
+  sVersionString = "  Soil Water Balance Code version "//trim(SWB_VERSION)    &
+      //" -- compiled on: "//trim(__DATE__)//" "//trim(__TIME__)
+
   if(iNumArgs/=1) then
 
-    write(UNIT=*,FMT="(/,a,/)") &
-      "Soil Water Balance Code version "//trim(SWB_VERSION)//" -- compiled on: "// &
-      TRIM(__DATE__) //" "// TRIM(__TIME__)
+    write(UNIT=*,FMT="(/,a,/)") trim( sVersionString )
+
 #ifdef __GFORTRAN__
     sCompilerFlags = COMPILER_OPTIONS()
     sCompilerVersion = COMPILER_VERSION()
@@ -55,7 +58,11 @@ program main
   end if
 
   call GET_COMMAND_ARGUMENT(1,sControlFile)
-  
+
+  write(unit=*, fmt="(/,a)") repeat("-",len_trim(sVersionString)+2)  
+  write(UNIT=*,FMT="(a)") trim( sVersionString )
+  write(unit=*, fmt="(a,/)") repeat("-",len_trim(sVersionString)+2)  
+
   ! open and initialize logfiles
   call LOGS%initialize( iLogLevel = LOG_DEBUG )
 

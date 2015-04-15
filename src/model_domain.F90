@@ -1075,6 +1075,7 @@ contains
     iNumActiveCells = ubound(this%soil_storage_max,1)
 
     call slList%append("LU_Code")
+    call slList%append("Landuse_Code")
     call slList%append("Landuse_Lookup_Code")
 
     !> Determine how many soil groups are present
@@ -1178,10 +1179,10 @@ contains
        this%runon = 0.0_c_float
        this%inflow = this%gross_precip +this%fog - this%interception + this%snowmelt
        call this%calc_runoff()
-       print *, "Gross Precip: ", minval(this%gross_precip), maxval(this%gross_precip)
-       print *, "Interception: ", minval(this%interception), maxval(this%interception)
-       print *, "Inflow: ", minval(this%inflow), maxval(this%inflow)
-       print *, "Runoff: ", minval(this%runoff), maxval(this%runoff)
+!        print *, "Gross Precip: ", minval(this%gross_precip), maxval(this%gross_precip)
+!        print *, "Interception: ", minval(this%interception), maxval(this%interception)
+!        print *, "Inflow: ", minval(this%inflow), maxval(this%inflow)
+!        print *, "Runoff: ", minval(this%runoff), maxval(this%runoff)
        this%infiltration = this%inflow - this%runoff
        call this%calc_soil_moisture()
 
@@ -1730,11 +1731,6 @@ contains
     call runoff_gridded_values_calculate( )
 
     this%runoff = this%inflow * RUNOFF_RATIOS
-
-
-    print *, "RGV::   Inflow: ", minval(this%inflow), maxval(this%inflow)
-    print *, "RGV::   Runoff: ", minval(this%runoff), maxval(this%runoff)
-
 
   end subroutine model_calculate_runoff_gridded_values
 
