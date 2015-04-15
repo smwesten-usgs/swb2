@@ -164,13 +164,13 @@ contains
     allocate( TRUNK_STORAGE_CAPACITY( iCount ), stat=iStat )
     call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
 
-    print *, "++++++++"
-    print *, __FILE__, ": ", __LINE__
-    print *, lbound(iLandUseTableCodes,1), ubound(iLandUseTableCodes,1), minval(iLanduseIndex),maxval(iLanduseIndex)
+!    print *, "++++++++"
+!    print *, __FILE__, ": ", __LINE__
+!    print *, lbound(iLandUseTableCodes,1), ubound(iLandUseTableCodes,1), minval(iLanduseIndex),maxval(iLanduseIndex)
 
     do iIndex = lbound(iLandUseTableCodes,1), ubound(iLandUseTableCodes,1)
 
-      print *, iIndex, CANOPY_STORAGE_CAPACITY_TABLE_VALUES( iIndex ), TRUNK_STORAGE_CAPACITY_TABLE_VALUES( iIndex )
+!      print *, iIndex, CANOPY_STORAGE_CAPACITY_TABLE_VALUES( iIndex ), TRUNK_STORAGE_CAPACITY_TABLE_VALUES( iIndex )
 
       where (iLanduseIndex == iIndex)
 

@@ -42,7 +42,7 @@ module loop_initialize
       GRIDDED_DATASETS_T("SOLAR_RADIATION              ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("WIND_SPEED                   ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("RAINFALL_ZONE                ", lTRUE, DATATYPE_INT ),        &
-      GRIDDED_DATASETS_T("FLOW_DIRECTION               ", lFALSE, DATATYPE_INT),        &
+      GRIDDED_DATASETS_T("FLOW_DIRECTION               ", lTRUE, DATATYPE_INT),         &
       GRIDDED_DATASETS_T("FOG_RATIO                    ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("LAND_USE                     ", lFALSE, DATATYPE_INT ),       &
       GRIDDED_DATASETS_T("SOILS_GROUP                  ", lFALSE, DATATYPE_INT ),       &
@@ -231,11 +231,11 @@ contains
 
     if ( myDirectives%count == 0 ) then
     
-      call LOGS%write("Your control file seems to be missing any directives relating to "//dquote(sKey)//".", &
-        iLogLevel=LOG_ALL, lEcho=lTRUE )
+      call LOGS%write("Your control file is missing gridded data relating to "//dquote(sKey)//".", &
+        iLogLevel=LOG_ALL, lEcho=lFALSE )
     
       if (.not. lOptional) then
-        call warn("Your control file is missing required directive "//dquote(sKey)//". See the logfile and fix this before running again.", &
+        call warn("Your control file is missing gridded data relating to "//dquote(sKey)//".", &
           lFatal = lTRUE )
 
       endif
@@ -702,7 +702,7 @@ subroutine initialize_generic_method( sKey )
     
   if ( myDirectives%count == 0 ) then
 
-    call warn("Your control file seems to be missing any of the required directives relating to "//dquote(sKey)//" method.", &
+    call warn("Your control file is missing any of the required directives relating to "//dquote(sKey)//" method.", &
       lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
   else  

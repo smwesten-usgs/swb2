@@ -315,7 +315,7 @@ contains
 
       if ( iLinesBefore > 0 ) then
         do iIndex=1, iLinesBefore
-          write(UNIT=iLU,FMT="(/)" )
+          write(UNIT=iLU, FMT="(a)" ) ""
         enddo
       endif    
 
@@ -330,7 +330,7 @@ contains
 
       if ( iLinesAfter > 0 ) then
         do iIndex=1, iLinesAfter
-          write(UNIT=iLU,FMT="(/)" )
+          write(UNIT=iLU,FMT="(a)" ) ""
         enddo
       endif    
 

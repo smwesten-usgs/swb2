@@ -1,13 +1,13 @@
 !> @file
-!> Contains a single module, @ref types, which contains types definitions
-!>  and general utility functions used by the SWB code.
-
-!> Contains types definitions and general utility functions used by the SWB code.
-!>
-!> This module defines parameters and derived data types for use throughout
-!> the SWB code.  This module also contains a number of utility functions
-!> that perform string manipulations, convert Celcius to Fahrenheit, and
-!> convert between Julian days and Gregorian dates.
+!! Contains a single module, @ref types, which contains types definitions
+!!  and general utility functions used by the SWB code.
+!!
+!! Contains types definitions and general utility functions used by the SWB code.
+!!
+!! This module defines parameters and derived data types for use throughout
+!! the SWB code.  This module also contains a number of utility functions
+!! that perform string manipulations, convert Celcius to Fahrenheit, and
+!! convert between Julian days and Gregorian dates.
 module types
 
 #ifdef __INTEL_COMPILER
@@ -17,9 +17,6 @@ module types
   use iso_c_binding
 
   implicit none
-
-  !> @defgroup types types
-  !> @{
 
   character(len=45), public, parameter :: &
       SWB_VERSION = "1.2 BETA (geographic transformations enabled)"
@@ -865,8 +862,6 @@ module types
 
   !> generic configuration
   integer (kind=c_int), parameter :: CONFIG_NONE = 0
-
-  !> @}
 
   !> Type that contains model configuration data.
   !>
@@ -2911,7 +2906,6 @@ subroutine gregorian_date(iJD, iYear, iMonth, iDay, iOrigin)
 
 end subroutine gregorian_date
 
-  !> @}
 
 function asCSV(sText)  result(sResult)
 

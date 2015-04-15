@@ -1,8 +1,9 @@
 module string_list
 
-  use iso_c_binding, only : c_int, c_float
+  use iso_c_binding, only             : c_int, c_float
   use constants_and_conversions, only : asInt, asFloat
   use strings
+  use logfiles, only                  : LOG_DEBUG
   use exceptions
   implicit none
 
@@ -162,8 +163,10 @@ contains
       sText = current%s
     else
       sText = "<NA>"
-      call warn("Unable to find a pointer associated with index: "//asCharacter(iIndex), &
-        __FILE__, __LINE__ )
+      call warn(sMessage="Unable to find a pointer associated with index: "//asCharacter(iIndex),  &
+                iLogLevel=LOG_DEBUG,                                                               &
+                sModule=__FILE__,                                                                  &
+                iLine=__LINE__ )
     endif  
    
 

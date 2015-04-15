@@ -121,8 +121,9 @@ contains
     enddo
 
     if (.not. associated( pDict ) )  &
-      call warn( sMessage="Failed to find a dictionary entry with a key value of "//dquote(sKey), &
-        iLogLevel=LOG_DEBUG )
+      call warn( sMessage="Failed to find a dictionary entry with a key value of "//dquote(sKey),   &
+                 iLogLevel=LOG_DEBUG,                                                               & 
+                 lEcho=lFALSE )
 
   end function get_entry_by_key_fn
  
