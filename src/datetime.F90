@@ -30,54 +30,53 @@ module datetime
 
   contains
 
-    procedure, public  :: calcJulianDay => calc_julian_day_sub
-!    procedure, public :: populateJulianDay => populate_julian_day_sub
-!    generic, public :: calcJulianDay => calc_julian_day_sub, &
-!                                           populate_julian_day_sub
+    procedure  :: calcJulianDay => calc_julian_day_sub
+    procedure  :: dayspermonth => get_days_in_month_fn
+    procedure  :: daysperyear => get_days_in_year_fn
+    procedure  :: calcGregorianDate => calc_gregorian_date_sub
+    procedure  :: calcWaterYear => calc_water_year_sub
+    procedure  :: parseDate => parse_text_to_date_sub
+    procedure  :: parseTime => parse_text_to_time_sub
+    procedure  :: isLeapYear => is_leap_year_fn    
 
-    procedure, public :: dayspermonth => get_days_in_month_fn
-    procedure, public :: daysperyear => get_days_in_year_fn
+    procedure  :: setTimeFormat => set_time_format_indices
+    procedure  :: setDateFormat => set_Date_format_indices
 
-    procedure :: calcGregorianDate => calc_gregorian_date_sub
-    procedure, public :: calcWaterYear => calc_water_year_sub
-    procedure, public :: parseDate => parse_text_to_date_sub
-    procedure, public :: parseTime => parse_text_to_time_sub
-    procedure, public :: isLeapYear => is_leap_year_fn
+    procedure :: is_date_greater_than
+    !> ">" operator for comparing two date objects; see @ref is_date_greater_than for implementation details.
+    generic   :: operator( > ) => is_date_greater_than
 
-    procedure, public :: setTimeFormat => set_time_format_indices
-    procedure, public :: setDateFormat => set_Date_format_indices
+    procedure :: is_date_less_than    
+    !> "<" operator for comparing two date objects
+    generic   :: operator( < ) => is_date_less_than
 
-    ! define operators that will work with datetime objects
-    procedure, public :: is_date_greater_than
-    generic :: operator( > ) => is_date_greater_than
+    procedure :: is_date_GT_or_equal_to 
+    !> ">=" operator for comparing two date objects
+    generic   :: operator( >= ) => is_date_GT_or_equal_to
 
-    procedure, public :: is_date_less_than
-    generic :: operator( < ) => is_date_less_than
+    procedure :: is_date_LT_or_equal_to    
+    !> "<=" operator for comparing two date objects
+    generic   :: operator( <= ) => is_date_LT_or_equal_to
 
-    procedure, public :: is_date_GT_or_equal_to
-    generic :: operator( >= ) => is_date_GT_or_equal_to
+    procedure :: is_date_equal_to  
+    !> "==" operator for comparing two date objects
+    generic   :: operator( == ) => is_date_equal_to
 
-    procedure :: is_date_LT_or_equal_to
-    generic, public :: operator( <= ) => is_date_LT_or_equal_to
+    procedure :: date_minus_date_fn    
+    !> "-" operator for subtracting two date objects
+    generic   :: operator( - ) => date_minus_date_fn
 
-    procedure, public :: is_date_equal_to
-    generic, public :: operator( == ) => is_date_equal_to
-
-    procedure, public :: date_minus_date_fn
-    generic, public :: operator( - ) => date_minus_date_fn
-
-    procedure, public :: addDay => date_plus_day_sub
-    procedure, public :: subtractDay => date_minus_day_sub
-
-    procedure, public :: prettydate => write_pretty_date_fn
-    procedure, public :: prettydatetime => write_pretty_datetime_fn
-    procedure, public :: listdatetime => write_list_datetime_fn
-    procedure, public :: listdate => write_list_date_fn
-    procedure, public :: listtime => write_list_time_fn
-    procedure, public :: systime => system_time_to_date_sub
-    procedure, public :: getJulianDay => get_julian_day_fn
-    procedure, public :: setJulianDate => set_julian_date_sub
-    procedure, public :: getFractionOfDay => get_fraction_of_day_fn
+    procedure  :: addDay => date_plus_day_sub
+    procedure  :: subtractDay => date_minus_day_sub    
+    procedure  :: prettydate => write_pretty_date_fn
+    procedure  :: prettydatetime => write_pretty_datetime_fn
+    procedure  :: listdatetime => write_list_datetime_fn
+    procedure  :: listdate => write_list_date_fn
+    procedure  :: listtime => write_list_time_fn    
+    procedure  :: systime => system_time_to_date_sub
+    procedure  :: getJulianDay => get_julian_day_fn
+    procedure  :: setJulianDate => set_julian_date_sub
+    procedure  :: getFractionOfDay => get_fraction_of_day_fn    
 
   end type DATETIME_T
 

@@ -1177,7 +1177,7 @@ contains
      else
 
        this%runon = 0.0_c_float
-       this%inflow = this%gross_precip +this%fog - this%interception + this%snowmelt
+       this%inflow = this%gross_precip + this%fog - this%interception + this%snowmelt
        call this%calc_runoff()
 !        print *, "Gross Precip: ", minval(this%gross_precip), maxval(this%gross_precip)
 !        print *, "Interception: ", minval(this%interception), maxval(this%interception)
