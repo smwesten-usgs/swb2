@@ -1730,7 +1730,7 @@ contains
 
     call runoff_gridded_values_calculate( )
 
-    this%runoff = this%inflow * RUNOFF_RATIOS
+    this%runoff = ( this%rainfall + this%snowmelt ) * RUNOFF_RATIOS
 
   end subroutine model_calculate_runoff_gridded_values
 
