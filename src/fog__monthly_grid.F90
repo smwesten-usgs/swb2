@@ -4,8 +4,8 @@
 !>
 !!  Module \ref fog__monthly_grid
 !!  provides support for estimating fog drip given a gridded map
-!!  of FOG_ZONE and FOG_ELEVATION, and a table containing monthly
-!!  fog factors. 
+!!  of FOG_RATIO and FOG_CAPTURE_EFFICIENCY.
+
 module fog__monthly_grid
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double
@@ -15,6 +15,7 @@ module fog__monthly_grid
   use dictionary
   use file_operations
   use netcdf4_support
+  use parameters
   use simulation_datetime
   use strings
   use string_list
@@ -25,8 +26,9 @@ module fog__monthly_grid
 
   public :: fog_monthly_grid_initialize, fog_monthly_grid_calculate, pFOG_RATIO
 
-  type (DATA_CATALOG_ENTRY_T), pointer :: pFOG_RATIO        ! data catalog object => FOG_RATIO grid
-  type (T_NETCDF4_FILE), pointer       :: pNCFILE ! pointer to OUTPUT NetCDF file
+  type (DATA_CATALOG_ENTRY_T), pointer :: pFOG_RATIO
+  real (kind=c_float), allocatable     :: fFOG_CATCH_EFFICIENCY(:)
+  type (T_NETCDF4_FILE), pointer       :: pNCFILE
 
 contains
 
@@ -40,6 +42,7 @@ contains
   !! @param[in] dY 1D vector of Y coordinates.
   !! @param[in] dX_lon 2D array of longitude values.
   !! @param[in] dY_lat 2D array of latitude values.
+
   subroutine fog_monthly_grid_initialize( lActive, dX, dY, dX_lon, dY_lat )
 
     logical (kind=c_bool), intent(in)     :: lActive(:,:)
@@ -54,10 +57,9 @@ contains
     integer (kind=c_int)                 :: iIndex 
     integer (kind=c_int)                 :: iNX
     integer (kind=c_int)                 :: iNY
-
-
-    iNX = ubound(lActive, 1)
-    iNY = ubound(lActive, 2)
+    integer (kind=c_int), allocatable    :: iLanduseCodes(:)
+    integer (kind=c_int)                 :: iNumberOfLanduses
+    logical (kind=c_bool)                :: lAreLengthsEqual
 
     ! locate the data structure associated with the gridded fog ratio entries
     pFOG_RATIO => DAT%find("FOG_RATIO")
@@ -66,6 +68,28 @@ contains
 
     allocate ( pNCFILE, stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+
+
+    !> Determine how many landuse codes are present
+    call slString%append("LU_Code")
+    call slString%append("Landuse_Code")
+    
+    call PARAMS%get_values( slKeys=slString, iValues=iLanduseCodes )
+    iNumberOfLanduses = count( iLanduseCodes > 0 )
+
+    call slString%deallocate()
+    
+    call PARAMS%get_values( sKey="Fog_catch_eff" , fValues=fFOG_CATCH_EFFICIENCY )
+
+    lAreLengthsEqual = ( ( ubound(fFOG_CATCH_EFFICIENCY,1) == ubound(iLanduseCodes,1) )  )
+
+    if ( .not. lAreLengthsEqual )     &
+      call warn( sMessage="The number of landuses does not match the number of interception values.",   &
+        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+
+    !> open another netCDF file to hold fog interception
+    iNX = ubound(lActive, 1)
+    iNY = ubound(lActive, 2)
 
     call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE, sVariableName="fog", &
       sVariableUnits="inches", iNX=iNX, iNY=iNY, &
@@ -124,7 +148,7 @@ contains
         iStride=[1_c_ptrdiff_t], &
         dpValues=[real( iNumDaysFromOrigin, kind=c_double)])
 
-      fFog = fRainfall * pack( pFOG_RATIO%pGrdBase%rData, lActive )
+      fFog = fRainfall * pack( pFOG_RATIO%pGrdBase%rData, lActive ) 
 
       call netcdf_put_packed_variable_array(NCFILE=pNCFILE, &
                    iVarID=pNCFILE%iVarID(NC_Z), &

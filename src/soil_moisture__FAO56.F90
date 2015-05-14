@@ -357,23 +357,15 @@ end function calc_water_stress_coefficient_Ks
 
 !------------------------------------------------------------------------------
 
- elemental subroutine soil_moisture_FAO56_calculate(fAPWL, fSoilStorage, fSoilStorage_Excess,                &
+ elemental subroutine soil_moisture_FAO56_calculate( fSoilStorage, fSoilStorage_Excess,                &
                                             fActual_ET, fSoilStorage_Max, fInfiltration, fReference_ET)
 
-    real (kind=c_float), intent(inout)   :: fAPWL
-    real (kind=c_float), intent(inout)   :: fSoilStorage
-    real (kind=c_float), intent(out)     :: fSoilStorage_Excess
-    real (kind=c_float), intent(out)     :: fActual_ET
-    real (kind=c_float), intent(in)      :: fSoilStorage_Max
-    real (kind=c_float), intent(in)      :: fInfiltration
-    real (kind=c_float), intent(in)      :: fReference_ET
-
-subroutine sm_FAO56_ApplyCropCoefficients(pGrd, pConfig)
-
-  ! [ ARGUMENTS ]
-  type ( T_GENERAL_GRID ),pointer :: pGrd        ! pointer to model grid
-  type (T_MODEL_CONFIGURATION), pointer :: pConfig ! pointer to data structure that contains
-                                                   ! model options, flags, and other setting
+  real (kind=c_float), intent(inout)   :: fSoilStorage
+  real (kind=c_float), intent(out)     :: fSoilStorage_Excess
+  real (kind=c_float), intent(out)     :: fActual_ET
+  real (kind=c_float), intent(in)      :: fSoilStorage_Max
+  real (kind=c_float), intent(in)      :: fInfiltration
+  real (kind=c_float), intent(in)      :: fReference_ET
 
   ! [ LOCALS ]
   integer (kind=c_int) :: iRow, iCol
@@ -413,7 +405,7 @@ subroutine sm_FAO56_ApplyCropCoefficients(pGrd, pConfig)
 
        endif
 
-       rREW = pConfig%READILY_EVAPORABLE_WATER(cel%iLandUseIndex, cel%iSoilGroup)
+       rREW = REW(cel%iLandUseIndex, cel%iSoilGroup)
        rTEW = pConfig%TOTAL_EVAPORABLE_WATER(cel%iLandUseIndex, cel%iSoilGroup)
 
        ! Deficit is defined in the sense of Thornthwaite and Mather
