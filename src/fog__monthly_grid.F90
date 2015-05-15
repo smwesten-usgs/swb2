@@ -74,17 +74,23 @@ contains
     call slString%append("LU_Code")
     call slString%append("Landuse_Code")
     
-    call PARAMS%get_values( slKeys=slString, iValues=iLanduseCodes )
+    call PARAM_DICT%get_values( slKeys=slString, iValues=iLanduseCodes )
     iNumberOfLanduses = count( iLanduseCodes > 0 )
 
-    call slString%deallocate()
+    call slString%clear()
+
+    call slString%append("Fog_catch_eff")
+    call slString%append("Fog_catch_efficiency")
     
-    call PARAMS%get_values( sKey="Fog_catch_eff" , fValues=fFOG_CATCH_EFFICIENCY )
+    call PARAM_DICT%get_values( slKeys=slString , fValues=fFOG_CATCH_EFFICIENCY )
+    if ( fFOG_CATCH_EFFICIENCY(1) <= fTINYVAL )  &
+      call warn( "Failed to find a data column containing fog catch efficiency values.", lFATAL=lTRUE, &
+        iLogLevel=LOG_ALL )
 
     lAreLengthsEqual = ( ( ubound(fFOG_CATCH_EFFICIENCY,1) == ubound(iLanduseCodes,1) )  )
 
     if ( .not. lAreLengthsEqual )     &
-      call warn( sMessage="The number of landuses does not match the number of interception values.",   &
+      call warn( sMessage="The number of landuses does not match the number of fog catch efficiency values.",   &
         sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
 
     !> open another netCDF file to hold fog interception
@@ -101,10 +107,11 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine fog_monthly_grid_calculate( fRainfall, fFog, lActive, fDont_Care )
+  subroutine fog_monthly_grid_calculate( fRainfall, fFog, iLanduse_Index, lActive, fDont_Care )
 
     real (kind=c_float), intent(in)        :: fRainfall(:)
     real (kind=c_float), intent(inout)     :: fFog(:)
+    integer (kind=c_int), intent(in)       :: iLanduse_Index(:)
     logical (kind=c_bool), intent(in)      :: lActive(:,:)
     real (kind=c_float), intent(in)        :: fDont_Care(:,:)
 
@@ -148,7 +155,8 @@ contains
         iStride=[1_c_ptrdiff_t], &
         dpValues=[real( iNumDaysFromOrigin, kind=c_double)])
 
-      fFog = fRainfall * pack( pFOG_RATIO%pGrdBase%rData, lActive ) 
+      fFog = fRainfall * pack( pFOG_RATIO%pGrdBase%rData, lActive )   &
+                       * fFOG_CATCH_EFFICIENCY( iLanduse_Index )
 
       call netcdf_put_packed_variable_array(NCFILE=pNCFILE, &
                    iVarID=pNCFILE%iVarID(NC_Z), &

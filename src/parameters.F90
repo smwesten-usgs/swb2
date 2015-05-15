@@ -1,8 +1,8 @@
 module parameters
 
-  use iso_c_binding, only : c_int, c_float, c_double, c_bool
+  use iso_c_binding, only    : c_int, c_float, c_double, c_bool
   use exceptions
-  use file_operations
+  use file_operations, only  : ASCII_FILE_T
   use logfiles
   use strings
   use string_list
@@ -21,7 +21,7 @@ module parameters
   !! data type required for the parameter. once all params are in place, the data structures can be
   !! deallocated. 
 
-  type, public :: PARAMETER_FILES_T
+  type, public :: PARAMETERS_T
 
     type (STRING_LIST_T)               :: filenames
     type (STRING_LIST_T)               :: delimiters
@@ -31,22 +31,23 @@ module parameters
   contains
 
     procedure, private   :: add_filename_to_list_sub
-    generic              :: add => add_filename_to_list_sub
+    generic              :: add_file => add_filename_to_list_sub
 
     procedure, private   :: munge_files_and_add_to_param_list_sub
-    generic              :: munge => munge_files_and_add_to_param_list_sub
+    generic              :: munge_file => munge_files_and_add_to_param_list_sub
 
-  end type PARAMETER_FILES_T    
+  end type PARAMETERS_T    
 
-  type (DICT_T), public :: PARAMS
+  type (PARAMETERS_T), public :: PARAMS
+  type (DICT_T), public       :: PARAM_DICT
 
   integer (kind=c_int), parameter :: MAX_TABLE_RECORD_LEN = 512
 
 contains
 
-  subroutine add_filename_to_list_sub(this, sFilename, sDelimiters, sCommentChars )
+  subroutine add_filename_to_list_sub( this, sFilename, sDelimiters, sCommentChars )
 
-    class (PARAMETER_FILES_T)                     :: this
+    class (PARAMETERS_T)                     :: this
     character (len=*), intent(in)                 :: sFilename
     character (len=*), intent(in), optional       :: sDelimiters
     character (len=*), intent(in), optional       :: sCommentChars
@@ -69,9 +70,9 @@ contains
 
     this%count = this%count + 1
     
-    call this%filenames%append(sFilename)
-    call this%delimiters%append(sDelimiters_)
-    call this%comment_chars%append(sCommentChars_)
+    call this%filenames%append( sFilename )
+    call this%delimiters%append( sDelimiters_ )
+    call this%comment_chars%append( sCommentChars_ )
     
   end subroutine add_filename_to_list_sub
 
@@ -79,7 +80,7 @@ contains
 
   subroutine munge_files_and_add_to_param_list_sub(this)
 
-    class (PARAMETER_FILES_T)    :: this
+    class (PARAMETERS_T)    :: this
 
     ! [ LOCALS ]
     integer (kind=c_int)         :: iFileIndex, iColIndex
@@ -117,7 +118,7 @@ contains
 
           ! add dictionary entry to dictionary
           call pDict%add_key( DF%slColNames%get(iColIndex) )
-          call PARAMS%add_entry(pDict)
+          call PARAM_DICT%add_entry( pDict )
 
         enddo  
 
@@ -135,22 +136,22 @@ contains
 
             ! find pointer associated with header name
             ! (inefficient, but should be OK for small # of columns)
-            pCurrentDict => PARAMS%get_entry( DF%slColNames%get(iColIndex) )
+            pCurrentDict => PARAM_DICT%get_entry( DF%slColNames%get(iColIndex) )
 
             ! break off next column of data for the current record
             call chomp(sRecord, sItem, this%delimiters%get(iFileIndex) )
 
             ! must avoid manipulating null pointers at all costs
-            if ( associated(pCurrentDict)) then
+            if ( associated( pCurrentDict )) then
             
               ! if not null, it means that we were able to return a pointer
               ! associated with the current column heading
-              call pCurrentDict%add_string(sItem)
+              call pCurrentDict%add_string( sItem ) 
             
             else
             
               call warn("Internal programming error: null pointer detected" &
-                //" -- was trying to find pointer associated with column"//dquote(DF%slColNames%get(iColIndex)), &
+                //" -- was trying to find pointer associated with column "//dquote(DF%slColNames%get(iColIndex)), &
                 __FILE__, __LINE__)  
             
             endif 

@@ -465,7 +465,7 @@ contains
 
     endif
 
-    call myOptions%deallocate()
+    call myOptions%clear()
 
     ! For this directive, obtain the associated dictionary entries
     call CF_DICT%get_values( "BASE_PROJECTION_DEFINITION", myOptions )
@@ -620,7 +620,7 @@ contains
     character (len=:), allocatable   :: sOptionText
     character (len=:), allocatable   :: sArgText
     integer (kind=c_int)             :: iStat
-    type (PARAMETER_FILES_T)         :: PARAM_FILES
+    type (PARAMETERS_T)         :: PARAMS
     integer (kind=c_int)             :: iCount
 
 
@@ -659,7 +659,7 @@ contains
 
         if ( index(string=sCmdText, substring="LOOKUP_TABLE" ) > 0 ) then
 
-            call PARAM_FILES%add( sOptionText )
+            call PARAMS%add_file( sOptionText )
             iCount = iCount + 1
 
         else
@@ -673,7 +673,7 @@ contains
 
       if ( iCount > 0 ) then
 
-        call PARAM_FILES%munge()
+        call PARAMS%munge_file()
         ! call PARAMS%print_all()       
 
       endif

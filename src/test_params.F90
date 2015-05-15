@@ -9,30 +9,30 @@ program test_params
   use parameters
   implicit none
 
-  type (PARAMETER_FILES_T)             :: PARAM_FILES
+  type (PARAMETERS_T)             :: PARAMS
   real (kind=c_float), allocatable     :: fValues(:)
   type (STRING_LIST_T)                 :: slString
 
 
-  call PARAM_FILES%add("LU_lookup_NLCD.txt")
-  !call PARAM_FILES%add("rain_adj_factors_maui.prn", sDelimiters = "WHITESPACE")
-  call PARAM_FILES%add("IRRIGATION_lookup_TWO_FACTOR.txt")
-  call PARAM_FILES%munge()
+  call PARAMS%add_file("LU_lookup_NLCD.txt")
+  !call PARAMS%add_file("rain_adj_factors_maui.prn", sDelimiters = "WHITESPACE")
+  call PARAMS%add_file("IRRIGATION_lookup_TWO_FACTOR.txt")
+  call PARAMS%munge_file()
 
 
-  !call PARAMS%get_values(sKey="raincoef_3", fValues=fValues)
+  !call PARAM_DICT%get_values(sKey="raincoef_3", fValues=fValues)
 
   !print *, "count: ", ubound(fValues, 1)
   !print *, "min  : ", minval(fValues)
   !print *, "max  : ", maxval(fValues)
   !print *, "mean : ", sum(fValues)/ ubound(fValues, 1)
 
-  slString = PARAMS%grep_keys("REW")
+  slString = PARAM_DICT%grep_keys("REW")
   call slString%print()
 
   call slString%deallocate()
 
-  slString = PARAMS%grep_keys("L_")  
+  slString = PARAM_DICT%grep_keys("L_")  
   call slString%print()
 
   call check_warnings()

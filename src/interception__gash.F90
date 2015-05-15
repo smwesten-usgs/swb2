@@ -125,18 +125,18 @@ contains
     call slList%append( "Landuse_Lookup_Code" )
 
     !> Determine how many landuse codes are present
-    call PARAMS%get_values( slList, iLanduseTableCodes )
+    call PARAM_DICT%get_values( slList, iLanduseTableCodes )
     iNumberOfLanduses = count( iLanduseTableCodes >= 0 )
 
-    call slList%deallocate()
+    call slList%clear()
     call slList%append("Canopy_Capacity")
     call slList%append("Canopy_Storage_Capacity")
-    call PARAMS%get_values( slList, CANOPY_STORAGE_CAPACITY_TABLE_VALUES )
+    call PARAM_DICT%get_values( slList, CANOPY_STORAGE_CAPACITY_TABLE_VALUES )
 
-    call slList%deallocate()
+    call slList%clear()
     call slList%append("Trunk_Capacity")
     call slList%append("Trunk_Storage_Capacity")
-    call PARAMS%get_values( slList, TRUNK_STORAGE_CAPACITY_TABLE_VALUES )
+    call PARAM_DICT%get_values( slList, TRUNK_STORAGE_CAPACITY_TABLE_VALUES )
 
     iNumRecs = ubound(CANOPY_STORAGE_CAPACITY_TABLE_VALUES,1)
     lAreLengthsEqual = ( iNumRecs == iNumberOfLanduses ) 

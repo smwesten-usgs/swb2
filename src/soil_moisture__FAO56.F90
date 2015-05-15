@@ -27,6 +27,7 @@ module sm_FAO56
   real (kind=c_float), allocatable   :: KCB_MID(:)
   real (kind=c_float), allocatable   :: KCB_END(:)
   real (kind=c_float), allocatable   :: KCB_MIN(:)
+  real (kind=c_float), 
   real (kind=c_float), allocatable   :: DEPLETION_FRACTION(:)
   real (kind=c_float), allocatable   :: MEAN_PLANT_HEIGHT(:)
 
@@ -46,7 +47,7 @@ contains
     character (len=:), allocatable   :: sText
 
    ! retrieve a string list of all keys associated with REW (i.e. "REW_1", "REW_2", "REW_3", etc)
-   slREW = PARAMS%grep_keys("REW")
+   slREW = PARAM_DICT%grep_keys("REW")
 
    ! Convert the string list to an vector of integers; this call strips off the "REW_" part of label
    iREWSeqNums = slREW%asInt()
@@ -55,7 +56,7 @@ contains
    iNumberOfREW = count( iREWSeqNums > 0 )
 
    ! retrieve a string list of all keys associated with TEW (i.e. "TEW_1", "TEW_2", "TEW_3", etc)
-   slTEW = PARAMS%grep_keys("TEW")
+   slTEW = PARAM_DICT%grep_keys("TEW")
 
    ! Convert the string list to an vector of integers; this call strips off the "TEW_" part of label
    iTEWSeqNums = slTEW%asInt()
@@ -69,7 +70,7 @@ contains
    call slList%append("Landuse_Lookup_Code")
 
    !> Determine how many landuse codes are present
-   call PARAMS%get_values( slList, LANDUSE_CODE )
+   call PARAM_DICT%get_values( slList, LANDUSE_CODE )
    iNumberOfLanduses = count( LANDUSE_CODE > 0 )
 
    allocate( REW(iNumberOfLanduses, iNumberOfREW), stat=iStat )
@@ -87,13 +88,13 @@ contains
    ! we should have the REW table fully filled out following this block
    do iIndex = 1, iNumberOfREW
      sText = "REW_"//asCharacter(iIndex)
-     call PARAMS%get_values( sText, REW(:, iIndex) )
+     call PARAM_DICT%get_values( sText, REW(:, iIndex) )
    enddo  
 
    ! we should have the TEW table fully filled out following this block
    do iIndex = 1, iNumberOfTEW
      sText = "TEW_"//asCharacter(iIndex)
-     call PARAMS%get_values( sText, TEW(:, iIndex) )
+     call PARAM_DICT%get_values( sText, TEW(:, iIndex) )
    enddo  
 
    !> @TODO What should happen if the TEW / REW header entries do *not* fall in a 
@@ -101,18 +102,18 @@ contains
    !!       REW_1, REW_3, REW_5, only the values associated with "REW_1" would be retrieved.
    !!       Needless to say, this would be catastrophic.
 
-   call PARAMS%get_values( "L_ini", L_INI )
-   call PARAMS%get_values( "L_mid", L_MID )
-   call PARAMS%get_values( "L_late", L_LATE )
-   call PARAMS%get_values( "L_min", L_MIN )
+   call PARAM_DICT%get_values( "L_ini", L_INI )
+   call PARAM_DICT%get_values( "L_mid", L_MID )
+   call PARAM_DICT%get_values( "L_late", L_LATE )
+   call PARAM_DICT%get_values( "L_min", L_MIN )
 
-   call PARAMS%get_values( "Kcb_ini", KCB_INI )
-   call PARAMS%get_values( "Kcb_mid", KCB_MID )
-   call PARAMS%get_values( "Kcb_end", KCB_END )
-   call PARAMS%get_values( "Kcb_min", KCB_MIN )
+   call PARAM_DICT%get_values( "Kcb_ini", KCB_INI )
+   call PARAM_DICT%get_values( "Kcb_mid", KCB_MID )
+   call PARAM_DICT%get_values( "Kcb_end", KCB_END )
+   call PARAM_DICT%get_values( "Kcb_min", KCB_MIN )
 
-   call PARAMS%get_values( "Depletion_Fraction", DEPLETION_FRACTION )
-   call PARAMS%get_values( "Mean_Plant_Height", MEAN_PLANT_HEIGHT )
+   call PARAM_DICT%get_values( "Depletion_Fraction", DEPLETION_FRACTION )
+   call PARAM_DICT%get_values( "Mean_Plant_Height", MEAN_PLANT_HEIGHT )
 
   !> @TODO Add more logic here to perform checks on the validity of this data.
 
@@ -128,7 +129,9 @@ contains
  !!
  !! @param[inout] pIRRIGATION pointer to a single line of information in the irrigation file.
  !! @param[in] iThreshold either the current day of year or the number of growing degree days.
- !! @retval rKcb Basal crop coefficient given the irrigation table entries and the current threshold values.
+ !! @retval rKcb Basal crop coefficient given the irrigation table entries and the 
+ !!         current threshold values.
+
  elemental function sm_FAO56_UpdateCropCoefficient( iFAO_Index, iThreshold )  result(fKcb)
 
   integer (kind=c_int), intent(in)   :: iFAO_Index
@@ -182,7 +185,7 @@ end function sm_FAO56_UpdateCropCoefficient
 !------------------------------------------------------------------------------
 
 !>
-elemental function sm_FAO56_CalcEvaporationReductionCoefficient(rTEW, rREW, rDeficit)  result(rKr)
+elemental function calc_evaporation_reduction_coeficient(rTEW, rREW, rDeficit)  result(rKr)
 
   ! [ ARGUMENTS ]
   real (kind=c_float) :: rTEW
@@ -200,7 +203,7 @@ elemental function sm_FAO56_CalcEvaporationReductionCoefficient(rTEW, rREW, rDef
     rKr = 0.
   endif
 
-end function sm_FAO56_CalcEvaporationReductionCoefficient
+end function calc_evaporation_reduction_coeficient
 
 !------------------------------------------------------------------------------
 
@@ -220,8 +223,8 @@ elemental function calc_fraction_wetted_and_exposed_soil( iFAO_Index, fKcb)   re
   real (kind=c_float) :: fDenominator
   real (kind=c_float) :: fExponent
 
-  fNumerator = fKcb - KCB_MIN(iFAO_Index)
-  fDenominator = KCB_MID(iFAO_Index) - KCB_MIN(iFAO_Index)
+  fNumerator = fKcb - KCB_MIN( iFAO_Index )
+  fDenominator = KCB_MID(iFAO_Index) - KCB_MIN( iFAO_Index )
   fExponent = 1_c_float + 0.5_c_float * MEAN_PLANT_HEIGHT * rM_PER_FOOT
 
   ! calculate the fraction of the ground that is currently covered
@@ -255,7 +258,7 @@ end function calc_fraction_wetted_and_exposed_soil
 !!     the time that the crop is planted.
 !! @retval rZr_i current active rooting depth.
 !! @note Implemented as equation 8-1 (Annex 8), FAO-56, Allen and others.
-elemental function calc_effective_root_depth(iFAO_Index, fZr_max, iThreshold) 	result(fZr_i)
+elemental function calc_effective_root_depth( iFAO_Index, fZr_max, iThreshold ) 	result(fZr_i)
 
   integer (kind=c_int), intent(in)    :: iFAO_Index 
 	real (kind=c_float), intent(in)     :: fZr_max
@@ -272,11 +275,11 @@ elemental function calc_effective_root_depth(iFAO_Index, fZr_max, iThreshold) 	r
   ! if there is not much difference between the Kcb_mid and Kcb_ini, assume that
   ! we are dealing with an area such as a forest, where we assume that the rooting
   ! depths are constant year-round
-	if ( KCB_MID(iFAO_Index) - KCB_INI(iFAO_Index) < 0.1) then
+	if ( KCB_MID(iFAO_Index) - KCB_INI( iFAO_Index ) < 0.1) then
 
 	  fZr_i = fZr_max
 
-	elseif ( iThreshold < L_PLANT(iFAO_Index) ) then
+	elseif ( iThreshold < L_PLANT( iFAO_Index ) ) then
 
 	  fZr_i = fZr_min
 
@@ -301,7 +304,7 @@ elemental function calc_surface_evaporation_coefficient( iFAO_Index, fKr, fKcb )
   real (kind=c_float), intent(in)      :: fKcb
   real (kind=c_float)                  :: fKe
 
-  fKe = fKr * ( rKcb_max(iFAO_Index) - fKcb )
+  fKe = fKr * ( rKcb_max( iFAO_Index ) - fKcb )
 
 end function calc_surface_evaporation_coefficient
 
@@ -319,7 +322,7 @@ elemental subroutine calc_total_available_water_TAW(fTotalAvailableWater, fReadi
   real (kind=c_float), intent(in)       :: fCurrentRootingDepth
 
   fTotalAvailableWater = fCurrentRootingDepth * fAvailableWaterCapacity
-  fReadilyAvailableWater = fTotalAvailableWater * DEPLETION_FRACTION(iFAO_Index)
+  fReadilyAvailableWater = fTotalAvailableWater * DEPLETION_FRACTION( iFAO_Index )
 
   end subroutine calc_total_available_water_TAW
 
@@ -357,20 +360,21 @@ end function calc_water_stress_coefficient_Ks
 
 !------------------------------------------------------------------------------
 
- elemental subroutine soil_moisture_FAO56_calculate( fSoilStorage, fSoilStorage_Excess,                &
-                                            fActual_ET, fSoilStorage_Max, fInfiltration, fReference_ET)
+ elemental subroutine soil_moisture_FAO56_calculate( fSoilStorage                        &
+                                            fSoilStorage_Excess,                         &
+                                            fActual_ET, fSoilStorage_Max, fInfiltration, &
+                                            fReference_ET, iLandUseIndex, iSoilGroup )
 
   real (kind=c_float), intent(inout)   :: fSoilStorage
+  real (kind=c_float), intent(inout)   :: fActual_ET
   real (kind=c_float), intent(out)     :: fSoilStorage_Excess
-  real (kind=c_float), intent(out)     :: fActual_ET
   real (kind=c_float), intent(in)      :: fSoilStorage_Max
   real (kind=c_float), intent(in)      :: fInfiltration
   real (kind=c_float), intent(in)      :: fReference_ET
+  integer (kind=c_int), intent(in)     :: iLandUseIndex
+  integer (kind=c_int), intent(in)     :: iSoilGroup
 
   ! [ LOCALS ]
-  integer (kind=c_int) :: iRow, iCol
-  type (T_IRRIGATION_LOOKUP),pointer :: pIRRIGATION  ! pointer to an irrigation table entry
-  type (T_CELL),pointer :: cel
   real (kind=c_float) :: rTEW      ! Total evaporable water
   real (kind=c_float) :: rREW      ! Readily evaporable water
   real (kind=c_float) :: rKr       ! Evaporation reduction coefficient
@@ -381,7 +385,7 @@ end function calc_water_stress_coefficient_Ks
 	real (kind=c_float) :: rZr_max   ! Maximum rooting depth
 
 
-			 rZr_max = pConfig%ROOTING_DEPTH(cel%iLandUseIndex,cel%iSoilGroup)
+			 rZr_max = ROOTING_DEPTH( iLandUseIndex, iSoilGroup )
 
        if(pIRRIGATION%lUnitsAreDOY) then
 
@@ -405,11 +409,11 @@ end function calc_water_stress_coefficient_Ks
 
        endif
 
-       rREW = REW(cel%iLandUseIndex, cel%iSoilGroup)
-       rTEW = pConfig%TOTAL_EVAPORABLE_WATER(cel%iLandUseIndex, cel%iSoilGroup)
+       rREW = REW( iLandUseIndex, iSoilGroup )
+       rTEW = TEW( iLandUseIndex, iSoilGroup )
 
        ! Deficit is defined in the sense of Thornthwaite and Mather
-       rDeficit = MAX(rZERO, cel%rSoilWaterCap - cel%rSoilMoisture)
+       rDeficit = MAX( rZERO, cel%rSoilWaterCap - cel%rSoilMoisture )
        ! following call updates the total available water (TAW) and
        ! readily available water (RAW) on the basis of the current
        ! plant root depth
@@ -425,7 +429,7 @@ end function calc_water_stress_coefficient_Ks
 			 ! the adjustments for nonstandard growing conditions (e.g. plant
 			 ! stress and resulting decrease in ET during dry conditions).
 
-       rKr = sm_FAO56_CalcEvaporationReductionCoefficient(rTEW, rREW, rDeficit)
+       rKr = calc_evaporation_reduction_coeficient(rTEW, rREW, rDeficit)
        r_few = calc_fraction_wetted_and_exposed_soil( pIRRIGATION )
        rKe = min(calc_surface_evaporation_coefficient( pIRRIGATION, &
                rKr ), r_few * pIRRIGATION%rKcb_mid )
@@ -440,7 +444,7 @@ end function calc_water_stress_coefficient_Ks
        cel%rCropETc = cel%rReferenceET0 * (cel%rKcb * rKs)
 
        ! "Adjusted" Reference ET is the general term being used in the water balance
-       cel%rReferenceET0_adj = cel%rCropETc + cel%rBareSoilEvap
+       fActual_ET = fCropETc + fBareSoilEvap
 
      enddo
    enddo

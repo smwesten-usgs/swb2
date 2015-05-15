@@ -215,7 +215,7 @@ contains
       pTemp%next => pTarget%next
       pTarget%next%previous => pTemp
 
-      call pTarget%sl%deallocate()
+      call pTarget%sl%clear()
 
     endif  
 

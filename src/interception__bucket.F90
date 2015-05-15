@@ -26,11 +26,11 @@ contains
     logical (kind=c_bool)       :: lAreLengthsEqual
 
     !> Determine how many landuse codes are present
-    call PARAMS%get_values( sKey="LU_Code", iValues=iLanduseCodes )
+    call PARAM_DICT%get_values( sKey="LU_Code", iValues=iLanduseCodes )
     iNumberOfLanduses = count( iLanduseCodes > 0 )
     
-    call PARAMS%get_values( sKey="Interception_Growing" , fValues=fInterceptionValue_GrowingSeason )
-    call PARAMS%get_values( sKey="Interception_Nongrowing", fValues=fInterceptionValue_DormantSeason )
+    call PARAM_DICT%get_values( sKey="Interception_Growing" , fValues=fInterceptionValue_GrowingSeason )
+    call PARAM_DICT%get_values( sKey="Interception_Nongrowing", fValues=fInterceptionValue_DormantSeason )
 
     lAreLengthsEqual = ( ( ubound(fInterceptionValue_GrowingSeason,1) == ubound(iLanduseCodes,1) )  &
                   .and. ( ubound(fInterceptionValue_DormantSeason,1) == ubound(iLanduseCodes,1) )    )

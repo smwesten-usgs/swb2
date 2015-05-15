@@ -52,12 +52,11 @@ module string_list
     generic :: grep          => list_subset_partial_matches_fn
     generic :: which         => list_return_position_of_matching_string_fn
     generic :: countmatching => list_return_count_of_matching_string_fn
-    generic :: deallocate    => list_items_deallocate_all_sub
+    generic :: clear         => list_items_deallocate_all_sub
     generic :: asFloat       => list_return_all_as_float_fn
     generic :: asInt         => list_return_all_as_int_fn
 
   end type STRING_LIST_T
-
 
 
 contains

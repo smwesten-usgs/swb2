@@ -37,14 +37,14 @@ contains
     !> Determine how many soil groups are present
 
     ! retrieve a string list of all keys associated with root zone depth (i.e. RZ_1, RZ_2, RZ_3, etc.)
-    slRZ = PARAMS%grep_keys("RZ")
+    slRZ = PARAM_DICT%grep_keys("RZ")
     ! Convert the string list to an vector of integers; this call strips off the "RZ_" part of label
     iRZ_SeqNums = slRZ%asInt()
     ! count how many items are present in the vector; this should equal the number of soils groups
     iNumberOfSoilGroups = count( iRZ_SeqNums > 0 )
 
     !> Determine how many landuse codes are present
-    call PARAMS%get_values( slList, iLanduseCodes )
+    call PARAM_DICT%get_values( slList, iLanduseCodes )
     iNumberOfLanduses = count( iLanduseCodes > 0 )
 
     allocate( ROOTING_DEPTH(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
@@ -54,7 +54,7 @@ contains
     ! we should have the max rooting depth table fully filled out following this block
     do iSoilsIndex = 1, iNumberOfSoilGroups
       sText = "RZ_"//asCharacter(iSoilsIndex)
-      call PARAMS%get_values( sText, RZ )
+      call PARAM_DICT%get_values( sText, RZ )
       ROOTING_DEPTH(:, iSoilsIndex) = RZ
     enddo  
 
