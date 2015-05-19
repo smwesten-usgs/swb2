@@ -2,7 +2,7 @@ module interception__bucket
 
   use iso_c_binding
   use exceptions
-  use parameters
+  use parameters, only     : PARAMS
   use strings
   implicit none
 
@@ -24,13 +24,15 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)        :: iNumberOfLanduses
     logical (kind=c_bool)       :: lAreLengthsEqual
+    character (len=:), allocatable :: sCrap
 
     !> Determine how many landuse codes are present
-    call PARAM_DICT%get_values( sKey="LU_Code", iValues=iLanduseCodes )
+    sCrap = "LU_Code"
+    call PARAMS%get_parameters( sKey=sCrap, iValues=iLanduseCodes )
     iNumberOfLanduses = count( iLanduseCodes > 0 )
     
-    call PARAM_DICT%get_values( sKey="Interception_Growing" , fValues=fInterceptionValue_GrowingSeason )
-    call PARAM_DICT%get_values( sKey="Interception_Nongrowing", fValues=fInterceptionValue_DormantSeason )
+    call PARAMS%get_parameters( sKey="Interception_Growing" , fValues=fInterceptionValue_GrowingSeason )
+    call PARAMS%get_parameters( sKey="Interception_Nongrowing", fValues=fInterceptionValue_DormantSeason )
 
     lAreLengthsEqual = ( ( ubound(fInterceptionValue_GrowingSeason,1) == ubound(iLanduseCodes,1) )  &
                   .and. ( ubound(fInterceptionValue_DormantSeason,1) == ubound(iLanduseCodes,1) )    )
@@ -41,6 +43,7 @@ contains
 
   end subroutine interception_bucket_initialize
 
+!--------------------------------------------------------------------------------------------------
 
   elemental function interception_bucket_calculate( iLanduseIndex, fPrecip, fFog )   result( fInterception )
 

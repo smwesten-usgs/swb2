@@ -5,7 +5,7 @@ module parameters
   use file_operations, only  : ASCII_FILE_T
   use logfiles
   use strings
-  use string_list
+  use string_list, only      : STRING_LIST_T
   use dictionary
   use constants_and_conversions
   implicit none
@@ -36,10 +36,29 @@ module parameters
     procedure, private   :: munge_files_and_add_to_param_list_sub
     generic              :: munge_file => munge_files_and_add_to_param_list_sub
 
+    procedure, private   :: get_parameter_values_int
+    procedure, private   :: get_parameter_values_float
+    procedure, private   :: get_parameter_table_float
+
+    generic              :: get_parameters => get_parameter_values_int,     &
+                                              get_parameter_values_float,   &
+                                              get_parameter_table_float
+
+    procedure            :: grep_name => grep_parameter_name
+
+
+    ! other functionality:
+    !  * retrieve parameter list:
+    !      1) input = single string
+    !      2) input = string list
+    !  * basic error checking re: number of params in list 
+
+
+
   end type PARAMETERS_T    
 
   type (PARAMETERS_T), public :: PARAMS
-  type (DICT_T), public       :: PARAM_DICT
+  type (DICT_T), public       :: PARAMS_DICT
 
   integer (kind=c_int), parameter :: MAX_TABLE_RECORD_LEN = 512
 
@@ -118,7 +137,7 @@ contains
 
           ! add dictionary entry to dictionary
           call pDict%add_key( DF%slColNames%get(iColIndex) )
-          call PARAM_DICT%add_entry( pDict )
+          call PARAMS_DICT%add_entry( pDict )
 
         enddo  
 
@@ -136,7 +155,7 @@ contains
 
             ! find pointer associated with header name
             ! (inefficient, but should be OK for small # of columns)
-            pCurrentDict => PARAM_DICT%get_entry( DF%slColNames%get(iColIndex) )
+            pCurrentDict => PARAMS_DICT%get_entry( DF%slColNames%get(iColIndex) )
 
             ! break off next column of data for the current record
             call chomp(sRecord, sItem, this%delimiters%get(iFileIndex) )
@@ -168,5 +187,87 @@ contains
   end subroutine munge_files_and_add_to_param_list_sub
 
 !--------------------------------------------------------------------------------------------------
+
+  function grep_parameter_name( this, sKey )      result( slList )
+
+    class (PARAMETERS_T)                                       :: this
+    character (len=*), intent(in)                              :: sKey
+    type ( STRING_LIST_T )                                     :: slList
+
+    slList = PARAMS_DICT%grep_keys( sKey )  
+
+  end function grep_parameter_name  
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine get_parameter_values_int( this, iValues, slKeys, sKey )
+
+    class (PARAMETERS_T)                                       :: this
+    integer (kind=c_int), intent(in out), allocatable          :: iValues(:)  
+    type (STRING_LIST_T), intent(in out),             optional :: slKeys
+    character (len=*),    intent(in ),             optional :: sKey
+
+    if ( present( slKeys) ) then
+
+      call PARAMS_DICT%get_values( slKeys=slKeys, iValues=iValues )
+
+    else if ( present( sKey) ) then
+
+      call PARAMS_DICT%get_values( sKey=sKey, iValues=iValues )
+    
+    endif
+
+  end subroutine get_parameter_values_int
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine get_parameter_values_float( this, fValues, slKeys, sKey )
+
+    class (PARAMETERS_T)                                       :: this
+    real (kind=c_float),  intent(in out), allocatable          :: fValues(:)  
+    type (STRING_LIST_T), intent(in out),             optional :: slKeys
+    character (len=*),    intent(in ),             optional :: sKey
+
+    if ( present( slKeys) ) then
+
+      call PARAMS_DICT%get_values( slKeys=slKeys, fValues=fValues )
+
+    else if ( present( sKey) ) then
+
+      call PARAMS_DICT%get_values( sKey=sKey, fValues=fValues )
+    
+    endif
+
+  end subroutine get_parameter_values_float
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine get_parameter_table_float( this, fValues, sPrefix, iNumRows, iNumCols )
+
+    class (PARAMETERS_T)                                       :: this
+    real (kind=c_float),  intent(in out), allocatable          :: fValues(:,:)
+    character (len=*),    intent(in)                           :: sPrefix
+    integer (kind=c_int), intent(in)                           :: iNumRows
+    integer (kind=c_int), intent(in)                           :: iNumCols 
+
+    ! [ LOCALS ]
+    integer (kind=c_int)             :: iIndex   
+    integer (kind=c_int)             :: iStat
+    character (len=256)              :: sText
+    real (kind=c_float), allocatable :: fTempVal(:) 
+
+    allocate( fTempVal( iNumRows ), stat=iStat )
+    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+
+    allocate( fValues( iNumRows, iNumCols ), stat=iStat )
+    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+
+    do iIndex = 1, iNumCols
+      sText = trim(sPrefix)//asCharacter(iIndex)
+      call PARAMS_DICT%get_values( sKey=sText, fValues=fTempVal )
+      fValues(:,iIndex) = fTempVal
+    enddo  
+
+  end subroutine get_parameter_table_float
 
 end module parameters

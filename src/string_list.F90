@@ -43,6 +43,7 @@ module string_list
     procedure :: list_return_all_as_float_fn
     procedure :: list_return_all_as_int_fn
     procedure :: list_subset_partial_matches_fn
+    final     :: list_finalize_sub
 
     generic :: append        => list_append_string_sub, &
                                 list_append_int_sub
@@ -456,6 +457,16 @@ contains
     enddo  
 
   end function list_subset_partial_matches_fn
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine list_finalize_sub(this)
+
+    type (STRING_LIST_T) :: this
+
+    call this%clear()
+
+  end subroutine list_finalize_sub  
 
 !--------------------------------------------------------------------------------------------------
 

@@ -8,14 +8,14 @@
 
 module fog__monthly_grid
 
-  use iso_c_binding, only : c_short, c_int, c_float, c_double
+  use iso_c_binding, only       : c_short, c_int, c_float, c_double
   use constants_and_conversions
   use data_catalog
   use data_catalog_entry
   use dictionary
   use file_operations
   use netcdf4_support
-  use parameters
+  use parameters, only          : PARAMS
   use simulation_datetime
   use strings
   use string_list
@@ -74,7 +74,7 @@ contains
     call slString%append("LU_Code")
     call slString%append("Landuse_Code")
     
-    call PARAM_DICT%get_values( slKeys=slString, iValues=iLanduseCodes )
+    call PARAMS%get_parameters( slKeys=slString, iValues=iLanduseCodes )
     iNumberOfLanduses = count( iLanduseCodes > 0 )
 
     call slString%clear()
@@ -82,7 +82,7 @@ contains
     call slString%append("Fog_catch_eff")
     call slString%append("Fog_catch_efficiency")
     
-    call PARAM_DICT%get_values( slKeys=slString , fValues=fFOG_CATCH_EFFICIENCY )
+    call PARAMS%get_parameters( slKeys=slString , fValues=fFOG_CATCH_EFFICIENCY )
     if ( fFOG_CATCH_EFFICIENCY(1) <= fTINYVAL )  &
       call warn( "Failed to find a data column containing fog catch efficiency values.", lFATAL=lTRUE, &
         iLogLevel=LOG_ALL )

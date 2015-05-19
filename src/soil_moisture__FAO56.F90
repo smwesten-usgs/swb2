@@ -8,34 +8,43 @@
 !> for specific crop types.
 module sm_FAO56
 
-  use iso_c_binding, only : c_short, c_int, c_float, c_double
-  use parameters
+  use iso_c_binding, only : c_bool, c_short, c_int, c_float, c_double
+  use parameters, only    : PARAMS
+  use string_list
   implicit none
 
   private
 
-  public : soil_moisture_FAO56_initialize, soil_moisture_FAO56_calculate
+  public :: soil_moisture_FAO56_initialize, soil_moisture_FAO56_calculate
 
+  enum, bind(c)
+    enumerator :: L_INIT=1, L_MID, L_LATE, L_FALLOW
+  end enum 
+
+  enum, bind(c)
+    enumerator :: KCB_INIT=1, KCB_MID, KCB_END, KCB_MIN
+  end enum 
+
+  enum, bind(c)
+    enumerator :: JAN = 1, FEB, MAR, APR, MAY, JUN, JUL, AUG, SEP, OCT, NOV, DEC
+  end enum 
+
+  ! Private, module level variables
   integer (kind=c_int), allocatable  :: LANDUSE_CODE(:)
   real (kind=c_float), allocatable   :: REW(:,:)
   real (kind=c_float), allocatable   :: TEW(:,:)
-  real (kind=c_float), allocatable   :: L_PLANT(:) 
-  real (kind=c_float), allocatable   :: L_INI(:)
-  real (kind=c_float), allocatable   :: L_MID(:)
-  real (kind=c_float), allocatable   :: L_LATE(:)
-  real (kind=c_float), allocatable   :: KCB_INI(:)
-  real (kind=c_float), allocatable   :: KCB_MID(:)
-  real (kind=c_float), allocatable   :: KCB_END(:)
-  real (kind=c_float), allocatable   :: KCB_MIN(:)
-  real (kind=c_float), 
+  real (kind=c_float), allocatable   :: KCB(:,:)
+  real (kind=c_float), allocatable   :: PLANTING_DATE(:)
+  real (kind=c_float), allocatable   :: L_GROWTH(:,:)
+  logical (kind=c_bool), allocatable :: UNITS_ARE_DOY(:)
+  !real (kind=c_float), 
   real (kind=c_float), allocatable   :: DEPLETION_FRACTION(:)
   real (kind=c_float), allocatable   :: MEAN_PLANT_HEIGHT(:)
 
 contains
 
-  subroutine soil_moisture_FAO56_initialize( this, lActive )
+  subroutine soil_moisture_FAO56_initialize( lActive )
 
-    type (SM_FAO56_T) :: this
     logical (kind=c_bool), intent(in)   :: Active(:)
 
     ! [ LOCALS ]
@@ -45,9 +54,29 @@ contains
     integer (kind=c_int)             :: iNumberOfTEW, iNumberOfREW
     integer (kind=c_int)             :: iIndex
     character (len=:), allocatable   :: sText
+    real (kind=c_float), allocatable :: L_ini(:)
+    real (kind=c_float), allocatable :: L_mid(:)
+    real (kind=c_float), allocatable :: L_late(:)
+    real (kind=c_float), allocatable :: Kcb_ini(:)            
+    real (kind=c_float), allocatable :: Kcb_mid(:)            
+    real (kind=c_float), allocatable :: Kcb_end(:)            
+    real (kind=c_float), allocatable :: Kcb_min(:)
+    
+    real (kind=c_float), allocatable :: Kcb_jan(:)
+    real (kind=c_float), allocatable :: Kcb_feb(:)
+    real (kind=c_float), allocatable :: Kcb_mar(:)
+    real (kind=c_float), allocatable :: Kcb_apr(:)
+    real (kind=c_float), allocatable :: Kcb_may(:)                
+    real (kind=c_float), allocatable :: Kcb_jun(:)
+    real (kind=c_float), allocatable :: Kcb_jul(:)
+    real (kind=c_float), allocatable :: Kcb_aug(:)
+    real (kind=c_float), allocatable :: Kcb_sep(:)
+    real (kind=c_float), allocatable :: Kcb_oct(:)
+    real (kind=c_float), allocatable :: Kcb_nov(:)
+    real (kind=c_float), allocatable :: Kcb_dec(:)
 
    ! retrieve a string list of all keys associated with REW (i.e. "REW_1", "REW_2", "REW_3", etc)
-   slREW = PARAM_DICT%grep_keys("REW")
+   slREW = PARAMS%grep_name("REW")
 
    ! Convert the string list to an vector of integers; this call strips off the "REW_" part of label
    iREWSeqNums = slREW%asInt()
@@ -56,7 +85,7 @@ contains
    iNumberOfREW = count( iREWSeqNums > 0 )
 
    ! retrieve a string list of all keys associated with TEW (i.e. "TEW_1", "TEW_2", "TEW_3", etc)
-   slTEW = PARAM_DICT%grep_keys("TEW")
+   slTEW = PARAMS%grep_name("TEW")
 
    ! Convert the string list to an vector of integers; this call strips off the "TEW_" part of label
    iTEWSeqNums = slTEW%asInt()
@@ -70,7 +99,7 @@ contains
    call slList%append("Landuse_Lookup_Code")
 
    !> Determine how many landuse codes are present
-   call PARAM_DICT%get_values( slList, LANDUSE_CODE )
+   call PARAMS%get_parameters( slList, LANDUSE_CODE )
    iNumberOfLanduses = count( LANDUSE_CODE > 0 )
 
    allocate( REW(iNumberOfLanduses, iNumberOfREW), stat=iStat )
@@ -85,35 +114,57 @@ contains
    !! are all soils in grid included in table values?
    !> is soil suffix vector continuous?
 
+   ! Retrieve and populate the Readily Evaporable Water (REW) table values
+   CALL PARAMS%get_parameters( fValues=REW, sPrefix="REW_", iNumRows=iNumberOfLanduses,    &
+                               iNumCols=iNumberOfREW )
+
+   ! Retrieve and populate the Total Evaporable Water (TEW) table values
+   CALL PARAMS%get_parameters( fValues=TEW, sPrefix="TEW_", iNumRows=iNumberOfLanduses,    &
+                               iNumCols=iNumberOfREW )
+
+
    ! we should have the REW table fully filled out following this block
-   do iIndex = 1, iNumberOfREW
-     sText = "REW_"//asCharacter(iIndex)
-     call PARAM_DICT%get_values( sText, REW(:, iIndex) )
-   enddo  
+ !  do iIndex = 1, iNumberOfREW
+ !    sText = "REW_"//asCharacter(iIndex)
+ !    call PARAMS%get_parameters( sText, REW(:, iIndex) )
+ !  enddo  
 
    ! we should have the TEW table fully filled out following this block
-   do iIndex = 1, iNumberOfTEW
-     sText = "TEW_"//asCharacter(iIndex)
-     call PARAM_DICT%get_values( sText, TEW(:, iIndex) )
-   enddo  
+ !  do iIndex = 1, iNumberOfTEW
+ !    sText = "TEW_"//asCharacter(iIndex)
+ !    call PARAMS%get_parameters( sText, TEW(:, iIndex) )
+ !  enddo  
 
    !> @TODO What should happen if the TEW / REW header entries do *not* fall in a 
    !!       logical sequence of values? In other words, if the user has columns named
    !!       REW_1, REW_3, REW_5, only the values associated with "REW_1" would be retrieved.
    !!       Needless to say, this would be catastrophic.
 
-   call PARAM_DICT%get_values( "L_ini", L_INI )
-   call PARAM_DICT%get_values( "L_mid", L_MID )
-   call PARAM_DICT%get_values( "L_late", L_LATE )
-   call PARAM_DICT%get_values( "L_min", L_MIN )
+   call PARAMS%get_parameters( "L_ini", L_ini )
+   call PARAMS%get_parameters( "L_mid", L_mid )
+   call PARAMS%get_parameters( "L_late", L_late )
+!   call PARAMS%get_parameters( "L_min", L_min )
 
-   call PARAM_DICT%get_values( "Kcb_ini", KCB_INI )
-   call PARAM_DICT%get_values( "Kcb_mid", KCB_MID )
-   call PARAM_DICT%get_values( "Kcb_end", KCB_END )
-   call PARAM_DICT%get_values( "Kcb_min", KCB_MIN )
+   call PARAMS%get_parameters( "Kcb_ini", KCB_ini )
+   call PARAMS%get_parameters( "Kcb_mid", KCB_mid )
+   call PARAMS%get_parameters( "Kcb_end", KCB_end )
+   call PARAMS%get_parameters( "Kcb_min", KCB_min )
 
-   call PARAM_DICT%get_values( "Depletion_Fraction", DEPLETION_FRACTION )
-   call PARAM_DICT%get_values( "Mean_Plant_Height", MEAN_PLANT_HEIGHT )
+   call PARAMS%get_parameters( "Kcb_Jan", KCB_jan )
+   call PARAMS%get_parameters( "Kcb_Feb", KCB_feb )
+   call PARAMS%get_parameters( "Kcb_Mar", KCB_mar )
+   call PARAMS%get_parameters( "Kcb_Apr", KCB_apr )
+   call PARAMS%get_parameters( "Kcb_May", KCB_may )
+   call PARAMS%get_parameters( "Kcb_Jun", KCB_jun )
+   call PARAMS%get_parameters( "Kcb_Jul", KCB_jul )
+   call PARAMS%get_parameters( "Kcb_Aug", KCB_aug )
+   call PARAMS%get_parameters( "Kcb_Sep", KCB_sep )
+   call PARAMS%get_parameters( "Kcb_Oct", KCB_oct )
+   call PARAMS%get_parameters( "Kcb_Nov", KCB_nov )
+   call PARAMS%get_parameters( "Kcb_Dec", KCB_dec )
+
+   call PARAMS%get_parameters( "Depletion_Fraction", DEPLETION_FRACTION )
+   call PARAMS%get_parameters( "Mean_Plant_Height", MEAN_PLANT_HEIGHT )
 
   !> @TODO Add more logic here to perform checks on the validity of this data.
 
@@ -139,13 +190,20 @@ contains
   real (kind=c_float)                :: fKcb
 
   ! [ LOCALS ]
-  real (kind=c_double) :: fFrac
+  real (kind=c_float) :: fFrac
 
   ! define shorthand variable names for remainder of function
-  associate ( L_ini => this%L_INI(iFAO_Index), L_mid => this%L_MID(iFAO_Index), L_late => this%L_LATE(iFAO_Index), &
-              L_plant => this%L_PLANT(iFAO_Index), Kcb_ini => this%KCB_INI(iFAO_Index),                            &
-              Kcb_dev => this%fKcb_dev(iFAO_Index), Kcb_mid => this%KCB_MID(iFAO_Index),                            &
-              Kcb_end => this%KCB_END(iFAO_Index) )
+  associate ( L_ini => L_GROWTH( L_INIT, iFAO_Index ),       &
+              L_mid => L_GROWTH( L_MID, iFAO_Index ),        &
+              L_late => L_GROWTH( L_LATE, iFAO_Index ),      &
+              Kcb_ini => KCB(KCB_INI, iFAO_Index),           &
+              Kcb_mid => KCB(KCB_MID, iFAO_Index),           &
+              Kcb_min => KCB(KCB_MIN, iFAO_Index),           &
+              Kcb_end => KCB(KCB_END, iFAO_Index) )
+
+    ! NOTE that L ("length") may be given in terms of DAYS or GDD increments;
+    !      Therefore, the value of "iThreshold" may also be specified in terms of
+    !      GDD or day of year (DOY).
 
     ! now calculate Kcb for the given landuse
     if( iThreshold > L_late ) then
@@ -154,9 +212,9 @@ contains
 
     elseif ( iThreshold > L_mid ) then
       
-      fFrac = real(iThreshold - L_mid, kind=c_double ) / real( L_late - L_mid, kind=c_double )
+      fFrac = real(iThreshold - L_mid, kind=c_double ) / real( L_late - L_mid, kind=c_float )
 
-      fKcb =  Kcb_mid * (1_c_double - fFrac) + Kcb_end * fFrac
+      fKcb =  Kcb_mid * (1_c_float - fFrac) + Kcb_end * fFrac
 
     elseif ( iThreshold > L_dev ) then
       
@@ -166,7 +224,7 @@ contains
 
       fFrac = real( iThreshold - L_ini ) / real( L_dev - L_ini )
 
-      fKcb = Kcb_ini * (1_c_double - fFrac) + Kcb_mid * fFrac
+      fKcb = Kcb_ini * (1_c_float - fFrac) + Kcb_mid * fFrac
 
     elseif ( iThreshold >= L_plant ) then
       
@@ -185,6 +243,7 @@ end function sm_FAO56_UpdateCropCoefficient
 !------------------------------------------------------------------------------
 
 !>
+
 elemental function calc_evaporation_reduction_coeficient(rTEW, rREW, rDeficit)  result(rKr)
 
   ! [ ARGUMENTS ]
@@ -211,6 +270,7 @@ end function calc_evaporation_reduction_coeficient
 !! vegetation during the growing season
 !!
 !!@note Implemented as equation 76, FAO-56, Allen and others
+
 elemental function calc_fraction_wetted_and_exposed_soil( iFAO_Index, fKcb)   result (f_few)
 
   integer (kind=c_int), intent(in)     :: iFAO_Index
@@ -223,22 +283,22 @@ elemental function calc_fraction_wetted_and_exposed_soil( iFAO_Index, fKcb)   re
   real (kind=c_float) :: fDenominator
   real (kind=c_float) :: fExponent
 
-  fNumerator = fKcb - KCB_MIN( iFAO_Index )
-  fDenominator = KCB_MID(iFAO_Index) - KCB_MIN( iFAO_Index )
-  fExponent = 1_c_float + 0.5_c_float * MEAN_PLANT_HEIGHT * rM_PER_FOOT
+  fNumerator = fKcb - KCB( KCB_MIN, iFAO_Index )
+  fDenominator = KCB( KCB_MID, iFAO_Index) - KCB( KCB_MIN, iFAO_Index )
+  fExponent = 1.0_c_float + 0.5_c_float * MEAN_PLANT_HEIGHT( iFAO_Index ) * rM_PER_FOOT
 
   ! calculate the fraction of the ground that is currently covered
-  if(fDenominator >  0_c_float ) then
+  if(fDenominator >  0.0_c_float ) then
     f_fc = ( fNumerator / fDenominator) ** fExponent
   else
-    f_fc = 1c_float
+    f_fc = 1.0_c_float
   endif
 
   ! now calculate the fraction of the ground that is EXPOSED and WETTED
-  f_few = 1c_float - f_fc
+  f_few = 1.0_c_float - f_fc
 
-  if ( f_few < 0_c_float ) f_few = 0_c_float
-  if ( f_few > 1_c_float ) f_few = 1_c_float
+  if ( f_few < 0.0_c_float ) f_few = 0.0_c_float
+  if ( f_few > 1.0_c_float ) f_few = 1.0_c_float
 
 end function calc_fraction_wetted_and_exposed_soil
 
@@ -258,6 +318,7 @@ end function calc_fraction_wetted_and_exposed_soil
 !!     the time that the crop is planted.
 !! @retval rZr_i current active rooting depth.
 !! @note Implemented as equation 8-1 (Annex 8), FAO-56, Allen and others.
+
 elemental function calc_effective_root_depth( iFAO_Index, fZr_max, iThreshold ) 	result(fZr_i)
 
   integer (kind=c_int), intent(in)    :: iFAO_Index 
@@ -297,6 +358,7 @@ end function calc_effective_root_depth
 !> This function estimates Ke, the bare surface evaporation coefficient
 !!
 !! @note Implemented as equation 71, FAO-56, Allen and others
+
 elemental function calc_surface_evaporation_coefficient( iFAO_Index, fKr, fKcb )     result(fKe)
 
   integer (kind=c_int), intent(in)     :: iFAO_Index
@@ -312,6 +374,7 @@ end function calc_surface_evaporation_coefficient
 
 !> This subroutine updates the total available water (TAW)
 !> (water within the rootzone) for a gridcell
+
 elemental subroutine calc_total_available_water_TAW(fTotalAvailableWater, fReadilyAvailableWater, &
                 iFAO_Index, fAvailableWaterCapacity, fCurrentRootingDepth )
 
@@ -331,6 +394,7 @@ elemental subroutine calc_total_available_water_TAW(fTotalAvailableWater, fReadi
 !> This function estimates Ks, water stress coefficient
 !!
 !! @note Implemented as equation 84, FAO-56, Allen and others
+
 elemental function calc_water_stress_coefficient_Ks( iFAO_Index, fDeficit, &
                       fTotalAvailableWater, fReadilyAvailableWater )      result(fKs)
 
@@ -360,7 +424,7 @@ end function calc_water_stress_coefficient_Ks
 
 !------------------------------------------------------------------------------
 
- elemental subroutine soil_moisture_FAO56_calculate( fSoilStorage                        &
+ elemental subroutine soil_moisture_FAO56_calculate( fSoilStorage,                       &
                                             fSoilStorage_Excess,                         &
                                             fActual_ET, fSoilStorage_Max, fInfiltration, &
                                             fReference_ET, iLandUseIndex, iSoilGroup )
@@ -387,7 +451,7 @@ end function calc_water_stress_coefficient_Ks
 
 			 rZr_max = ROOTING_DEPTH( iLandUseIndex, iSoilGroup )
 
-       if(pIRRIGATION%lUnitsAreDOY) then
+       if ( UNITS_ARE_DOY( iLandUseIndex ) ) then
 
          cel%rKcb = sm_FAO56_UpdateCropCoefficient(pIRRIGATION, pConfig%iDayOfYear)
 

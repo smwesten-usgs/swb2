@@ -5,7 +5,7 @@ module runoff__curve_number
   use exceptions
   use strings
   use string_list
-  use parameters
+  use parameters, only     : PARAMS, PARAMS_DICT
   implicit none
 
   private
@@ -40,14 +40,14 @@ contains
     !> Determine how many soil groups are present
 
     ! retrieve a string list of all keys associated with curve number (i.e. "CN_1", "CN_2", "CN_3", etc)
-    slCurveNumber = PARAM_DICT%grep_keys("CN")
+    slCurveNumber = PARAMS_DICT%grep_keys("CN")
     ! Convert the string list to an vector of integers; this call strips off the "CN_" part of label
     iCurveNumberSeqNums = slCurveNumber%asInt()
     ! count how many items are present in the vector; this should equal the number of soils groups
     iNumberOfSoilGroups = count( iCurveNumberSeqNums > 0 )
 
     !> Determine how many landuse codes are present
-    call PARAM_DICT%get_values( slList, iLanduseCodes )
+    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCodes )
     iNumberOfLanduses = count( iLanduseCodes >= 0 )
 
     allocate( CN_AMCIII(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
@@ -69,7 +69,7 @@ contains
     ! we should have the curve number table fully filled out following this block
     do iSoilsIndex = 1, iNumberOfSoilGroups
       sText = "CN_"//asCharacter(iSoilsIndex)
-      call PARAM_DICT%get_values( sText, CN )
+      call PARAMS%get_parameters( sKey=sText, fValues=CN )
       CN_AMCII(:, iSoilsIndex) = CN
     enddo  
 

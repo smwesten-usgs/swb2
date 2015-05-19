@@ -409,6 +409,9 @@ contains
 
     endif
 
+    call myDirectives%clear()
+    call myOptions%clear()
+
   end subroutine initialize_generic_grid
 
 !--------------------------------------------------------------------------------------------------

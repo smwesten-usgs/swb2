@@ -6,7 +6,7 @@ module interception__gash
   use data_catalog_entry
   use dictionary
   use file_operations
-  use parameters
+  use parameters, only       : PARAMS
   use swb_grid
   use simulation_datetime
   use strings
@@ -125,18 +125,18 @@ contains
     call slList%append( "Landuse_Lookup_Code" )
 
     !> Determine how many landuse codes are present
-    call PARAM_DICT%get_values( slList, iLanduseTableCodes )
+    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseTableCodes )
     iNumberOfLanduses = count( iLanduseTableCodes >= 0 )
 
     call slList%clear()
     call slList%append("Canopy_Capacity")
     call slList%append("Canopy_Storage_Capacity")
-    call PARAM_DICT%get_values( slList, CANOPY_STORAGE_CAPACITY_TABLE_VALUES )
+    call PARAMS%get_parameters( slKeys=slList, fValues=CANOPY_STORAGE_CAPACITY_TABLE_VALUES )
 
     call slList%clear()
     call slList%append("Trunk_Capacity")
     call slList%append("Trunk_Storage_Capacity")
-    call PARAM_DICT%get_values( slList, TRUNK_STORAGE_CAPACITY_TABLE_VALUES )
+    call PARAMS%get_parameters( slKeys=slList, fValues=TRUNK_STORAGE_CAPACITY_TABLE_VALUES )
 
     iNumRecs = ubound(CANOPY_STORAGE_CAPACITY_TABLE_VALUES,1)
     lAreLengthsEqual = ( iNumRecs == iNumberOfLanduses ) 

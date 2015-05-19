@@ -7,8 +7,8 @@ module model_domain
   use exceptions
   use simulation_datetime
   use snowfall__original
-  use parameters
-  use netcdf4_support, only: NC_FILL_FLOAT
+  use parameters, only       : PARAMS, PARAMS_DICT 
+  use netcdf4_support, only  : NC_FILL_FLOAT
   implicit none
 
   private
@@ -74,6 +74,7 @@ module model_domain
 
     real (kind=c_float), allocatable       :: tmin(:)
     real (kind=c_float), allocatable       :: tmax(:)
+    real (kind=c_float), allocatable       :: tmean(:)
     real (kind=c_float), allocatable       :: routing_fraction(:)
 
     integer (kind=c_int), allocatable      :: index_order(:)
@@ -101,6 +102,8 @@ module model_domain
     procedure ( simple_method ), pointer         :: calc_snowfall          => model_calculate_snowfall_original
     procedure ( simple_method ), pointer         :: calc_snowmelt          => model_calculate_snowmelt_original    
     procedure ( simple_method ), pointer         :: get_precipitation_data => model_get_precip_normal
+    procedure ( simple_method ), pointer         :: get_air_temperature_data                                       &     
+                                                                           => model_get_air_temperature_normal
     procedure ( simple_method ), pointer         :: calc_fog               => model_calculate_fog_none
 
   contains
@@ -480,7 +483,7 @@ contains
     logical (kind=c_bool)                :: lMatch
     
     !> Determine how many landuse codes are present
-    call PARAM_DICT%get_values( sKey="LU_Code", iValues=iLanduseCodes )
+    call PARAMS%get_parameters( sKey="LU_Code", iValues=iLanduseCodes )
 
     ! obtain a pointer to the LAND_USE grid
     pLULC => DAT%find("LAND_USE")
@@ -748,17 +751,6 @@ contains
     integer (kind=c_int) ::iMonth
     integer (kind=c_int) ::iDay
     integer (kind=c_int) ::iYear
-    type (DATA_CATALOG_ENTRY_T), pointer :: pTMAX
-    type (DATA_CATALOG_ENTRY_T), pointer :: pTMIN
-
-    pTMAX => DAT%find("TMAX")
-    if ( .not. associated(pTMAX) ) &
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
-
-
-    pTMIN => DAT%find("TMIN")
-    if ( .not. associated(pTMIN) ) &
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
 
     associate ( dt => SIM_DT%curr )
 
@@ -767,18 +759,10 @@ contains
       iDay = asInt( dt%iDay )
       iYear = dt%iYear
   
-      ! next two statements retrieve the data from the raw or native form  
-      call pTMIN%getvalues( iMonth, iDay, iYear, iJulianDay )
-
-      call pTMAX%getvalues( iMonth, iDay, iYear, iJulianDay )
-
       ! the following statements process the raw data in order to get it into the 
       ! right units or properly pack the data
       call this%get_precipitation_data()
-!      this%gross_precip = pack( PRCP%pGrdBase%rData, this%active )
-
-      this%tmax = pack( pTMAX%pGrdBase%rData, this%active )
-      this%tmin = pack( pTMIN%pGrdBase%rData, this%active )
+      call this%get_air_temperature_data()
 
       ! partition preciptation into rainfall and snowfall fractions
       call this%calc_snowfall()
@@ -1007,6 +991,9 @@ contains
     if (.not. associated( this%get_precipitation_data ) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
+    if (.not. associated( this%get_air_temperature_data ) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+
   end subroutine preflight_check_method_pointers
 
 !--------------------------------------------------------------------------------------------------
@@ -1081,14 +1068,14 @@ contains
     !> Determine how many soil groups are present
 
     ! retrieve a string list of all keys associated with root zone depth (i.e. RZ_1, RZ_2, RZ_3, etc.)
-    slRZ = PARAM_DICT%grep_keys("RZ")
+    slRZ = PARAMS_DICT%grep_keys("RZ")
     ! Convert the string list to an vector of integers; this call strips off the "RZ_" part of label
     iRZ_SeqNums = slRZ%asInt()
     ! count how many items are present in the vector; this should equal the number of soils groups
     iNumberOfSoilGroups = count( iRZ_SeqNums > 0 )
 
     !> Determine how many landuse codes are present
-    call PARAM_DICT%get_values( slList, iLanduseCodes )
+    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCodes )
     iNumberOfLanduses = count( iLanduseCodes >= 0 )
 
     allocate( ROOTING_DEPTH(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
@@ -1098,7 +1085,7 @@ contains
     ! we should have the max rooting depth table fully filled out following this block
     do iSoilsIndex = 1, iNumberOfSoilGroups
       sText = "RZ_"//asCharacter(iSoilsIndex)
-      call PARAM_DICT%get_values( sText, RZ )
+      call PARAMS%get_parameters( sKey=sText, fValues=RZ )
       ROOTING_DEPTH(:, iSoilsIndex) = RZ
     enddo  
 
@@ -1834,6 +1821,65 @@ contains
       fDont_Care=this%dont_care )
 
   end subroutine model_calculate_fog_monthly_grid  
+
+!--------------------------------------------------------------------------------------------------
+ 
+  subroutine model_get_air_temperature_normal(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    ! [ LOCALS ]
+    type (DATA_CATALOG_ENTRY_T), pointer :: pPRCP
+    integer (kind=c_int) :: iJulianDay
+    integer (kind=c_int) ::iMonth
+    integer (kind=c_int) ::iDay
+    integer (kind=c_int) ::iYear
+
+    type (DATA_CATALOG_ENTRY_T), pointer :: pTMAX
+    type (DATA_CATALOG_ENTRY_T), pointer :: pTMIN
+
+    pTMAX => DAT%find("TMAX")
+    if ( .not. associated(pTMAX) ) &
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+
+
+    pTMIN => DAT%find("TMIN")
+    if ( .not. associated(pTMIN) ) &
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+
+    associate ( dt => SIM_DT%curr )
+
+      iJulianDay = dt%getJulianDay()
+      iMonth = asInt( dt%iMonth )
+      iDay = asInt( dt%iDay )
+      iYear = dt%iYear
+  
+      ! next two statements retrieve the data from the raw or native form  
+      call pTMIN%getvalues( iMonth, iDay, iYear, iJulianDay )
+
+      call pTMAX%getvalues( iMonth, iDay, iYear, iJulianDay )
+
+      ! the following statements process the raw data in order to get it into the 
+      ! right units or properly pack the data
+      call this%get_precipitation_data()
+!      this%gross_precip = pack( PRCP%pGrdBase%rData, this%active )
+
+    if (.not. associated(pTMAX%pGrdBase) ) &
+      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
+
+    if (.not. associated(pTMIN%pGrdBase) ) &
+      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
+
+      this%tmax = pack( pTMAX%pGrdBase%rData, this%active )
+      this%tmin = pack( pTMIN%pGrdBase%rData, this%active )
+      this%tmean = ( this%tmax + this%tmin ) / 2.0_c_float
+
+      ! partition preciptation into rainfall and snowfall fractions
+      call this%calc_snowfall()
+
+    end associate
+
+  end subroutine model_get_air_temperature_normal  
 
 !--------------------------------------------------------------------------------------------------
  
