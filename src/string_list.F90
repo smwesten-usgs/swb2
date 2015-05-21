@@ -37,6 +37,7 @@ module string_list
     procedure :: list_get_value_at_index_fn
     procedure :: list_get_values_in_range_fn
     procedure :: list_print_sub
+    procedure :: list_all_fn
     procedure :: list_return_position_of_matching_string_fn
     procedure :: list_return_count_of_matching_string_fn
     procedure :: list_items_deallocate_all_sub
@@ -50,6 +51,7 @@ module string_list
     generic :: get           => list_get_value_at_index_fn, &
                                 list_get_values_in_range_fn
     generic :: print         => list_print_sub
+    generic :: listall       => list_all_fn
     generic :: grep          => list_subset_partial_matches_fn
     generic :: which         => list_return_position_of_matching_string_fn
     generic :: countmatching => list_return_count_of_matching_string_fn
@@ -248,6 +250,40 @@ contains
     enddo
 
   end subroutine list_print_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  function list_all_fn(this)  result( sListValues )
+
+    use iso_fortran_env, only : OUTPUT_UNIT
+
+    class (STRING_LIST_T), intent(in)     :: this
+    character (len=:), allocatable        :: sListValues
+
+    ! [ LOCALS ]
+    class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
+    integer (kind=c_int)                      :: iLU_
+    integer (kind=c_int)                      :: iCount
+    character (len=2048)                      :: sBuf
+      
+    current => this%first
+    iCount = 0
+
+    sBuf = ""
+
+    do while ( associated( current ) .and. iCount < this%count )
+
+      iCount = iCount + 1
+
+      sBuf = trim(sBuf)//"("//asCharacter(iCount)//") "//current%s
+
+      current => current%next
+
+    enddo
+
+    sListValues = trim(sBuf)
+
+  end function list_all_fn
 
 !--------------------------------------------------------------------------------------------------
 
@@ -488,6 +524,7 @@ contains
         current => current%next
 
         if ( allocated( toremove%s ) )    deallocate( toremove%s )
+        if ( associated( toremove ) )  deallocate( toremove )
 
       enddo  
 

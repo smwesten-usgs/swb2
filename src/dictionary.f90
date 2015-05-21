@@ -152,8 +152,8 @@ contains
     enddo
 
     if ( slString%count == 0 )  &
-      call warn(sMessage="Failed to find a dictionary entry that contains the value of " &
-        //dquote(sKey), sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE )
+      call warn(sMessage="Failed to find a dictionary entry associated with a key value of "//dquote(sKey)//".", &
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE )
 
   end function grep_dictionary_key_names_fn
 
@@ -246,6 +246,9 @@ contains
       call assert(iStat == 0, "Failed to allocate memory to iValues array", &
         __FILE__, __LINE__)
 
+      call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
+
       iValues = iTINYVAL
 
     endif  
@@ -274,9 +277,8 @@ contains
     else
 
       call slString%append("<NA>")
-      call warn(sMessage="Failed to find a dictionary entry that contains the value of "//dquote(sKey), &
+      call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
         sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
-
 
     endif  
 
@@ -330,6 +332,9 @@ contains
       call assert(iStat == 0, "Failed to allocate memory to iValues array", &
         __FILE__, __LINE__)
 
+      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
+
       iValues = iTINYVAL
 
     endif  
@@ -381,8 +386,12 @@ contains
     else
 
       allocate(fValues(1), stat=iStat)
-      call assert(iStat == 0, "Failed to allocate memory to iValues array", &
+      call assert(iStat == 0, "Failed to allocate memory to fValues array", &
         __FILE__, __LINE__)
+
+      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
+
 
       fValues = fTINYVAL
 

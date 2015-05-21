@@ -54,6 +54,8 @@ contains
  
   end subroutine die
 
+  !------------------------------------------------------------------------------------------------
+
   subroutine check_warnings()
 
     ! [ LOCALS ]
@@ -104,7 +106,9 @@ contains
 
   end subroutine check_warnings  
 
-   subroutine warn(sMessage, sModule, iLine, sHints, lFatal, iLogLevel, lEcho)
+!------------------------------------------------------------------------------------------------
+
+  subroutine warn(sMessage, sModule, iLine, sHints, lFatal, iLogLevel, lEcho)
 
     character (len=*), intent(in)               :: sMessage
     character (len=*), intent(in), optional     :: sModule
@@ -148,7 +152,7 @@ contains
 
   end subroutine warn
 
-
+!------------------------------------------------------------------------------------------------
 
   subroutine assert_1bit(lCondition, sMessage, sModule, iLine)
 
@@ -173,6 +177,7 @@ contains
 
   end subroutine assert_1bit
 
+!------------------------------------------------------------------------------------------------
 
   subroutine assert_4bit(lCondition, sMessage, sModule, iLine)
 
@@ -198,5 +203,6 @@ contains
 
   end subroutine assert_4bit
 
+!------------------------------------------------------------------------------------------------
 
 end module exceptions

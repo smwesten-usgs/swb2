@@ -1097,11 +1097,15 @@ contains
 
 !     this%awc = pack(pAWC%pGrdBase%rData, this%active)
 
- 
+    call LOGS%WRITE( "Landuse Code |  Soils Code  | Number of Matches",              &
+      iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+    call LOGS%WRITE( "-------------|--------------|------------------- ",            &
+      iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
     do iSoilsIndex = 1, iNumberOfSoilGroups
       do iLUIndex = 1, iNumberOfLanduses
 
-        call LOGS%WRITE( "LU: "//asCharacter(iLUIndex)//"  Soils: "//asCharacter(iSoilsIndex)//"  | # matches = "//  &
+        call LOGS%WRITE( asCharacter(iLUIndex)//" | "//asCharacter(iSoilsIndex)//" |xz "//  &
             asCharacter(count( this%landuse_index == iLUIndex .and. this%soil_group == iSoilsIndex ) ),              &
             iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
