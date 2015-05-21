@@ -113,7 +113,7 @@ contains
 
    !> Determine how many landuse codes are present
    call PARAMS%get_parameters( slKeys=slList, iValues=LANDUSE_CODE )
-   iNumberOfLanduses = count( LANDUSE_CODE > 0 )
+   iNumberOfLanduses = count( LANDUSE_CODE >= 0 )
 
    !allocate( REW(iNumberOfLanduses, iNumberOfREW), stat=iStat )
    !call assert( iStat == 0, "Failed to allocate memory for readily evaporable water (REW) table", &

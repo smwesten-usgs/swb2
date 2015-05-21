@@ -263,7 +263,7 @@ contains
 
     if ( iNumCols == 0 ) then
 
-      call warn( "Failed to find any data columns with headers containing the string " &
+      call warn( "Failed to find any lookup table columns with headers containing the string " &
         //dQuote( sPrefix )//".", lFatal = lTRUE )
 
     else
@@ -279,6 +279,7 @@ contains
       do iIndex = 1, iNumCols
         sText = trim(sPrefix)//asCharacter(iIndex)
         call PARAMS_DICT%get_values( sKey=sText, fValues=fTempVal )
+
         fValues(:,iIndex) = fTempVal
       enddo  
 

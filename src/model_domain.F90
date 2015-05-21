@@ -7,6 +7,7 @@ module model_domain
   use exceptions
   use simulation_datetime
   use snowfall__original
+  use string_list, only      : STRING_LIST_T
   use parameters, only       : PARAMS, PARAMS_DICT 
   use netcdf4_support, only  : NC_FILL_FLOAT
   implicit none
@@ -482,9 +483,15 @@ contains
     integer (kind=c_int)                 :: iCount
     integer (kind=c_int)                 :: iStat
     logical (kind=c_bool)                :: lMatch
+    type (STRING_LIST_T)                 :: slList
+
+    call slList%append("LU_Code")
+    call slList%append("LU_code")
+    call slList%append("Landuse_Code")
+    call slList%append("LULC_Code")
     
     !> Determine how many landuse codes are present
-    call PARAMS%get_parameters( sKey="LU_Code", iValues=iLanduseCodes )
+    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCodes )
 
     ! obtain a pointer to the LAND_USE grid
     pLULC => DAT%find("LAND_USE")
@@ -502,10 +509,6 @@ contains
       call die("Attempted use of NULL pointer. Failed to find LAND_USE data element.", &
         __FILE__, __LINE__)
     endif
-
-    deallocate(this%landuse_index)
-    allocate( this%landuse_index( ubound( this%landuse_code, 1) ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory.", __FILE__, __LINE__ )
 
     this%landuse_index = -9999
     iCount = 0
@@ -540,6 +543,8 @@ contains
       call warn(asCharacter(count(this%landuse_index < 0))//" negative values are present" &
       //" in the landuse_index vector.", lFatal=lTRUE, sHints="Negative landuse INDEX values are the " &
       //"result of landuse values for which no match can be found between the grid file and lookup table.")
+
+    call slList%clear()
 
   end subroutine initialize_landuse_codes_sub
 

@@ -120,7 +120,7 @@ contains
 
       do iIndex = 1, min(this%iLogLevel, 2)
 
-        sFilename = trim(this%sFilePrefix)//trim(sDescriptor(iIndex))//".txt"
+        sFilename = trim(this%sFilePrefix)//trim(sDescriptor(iIndex))//".md"
 
         if (.not. this%lIsOpen(iIndex) ) then
 

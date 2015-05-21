@@ -77,7 +77,7 @@ contains
     call PARAMS%get_parameters( slKeys=slString, iValues=iLanduseCodes )
     iNumberOfLanduses = count( iLanduseCodes > 0 )
 
-    call slString%clear()
+!    call slString%clear()
 
     call slString%append("Fog_catch_eff")
     call slString%append("Fog_catch_efficiency")

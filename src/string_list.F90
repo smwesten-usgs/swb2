@@ -163,10 +163,10 @@ contains
       sText = current%s
     else
       sText = "<NA>"
-      call warn(sMessage="Unable to find a pointer associated with index: "//asCharacter(iIndex),  &
-                iLogLevel=LOG_DEBUG,                                                               &
-                sModule=__FILE__,                                                                  &
-                iLine=__LINE__ )
+!      call warn(sMessage="Unable to find a pointer associated with index: "//asCharacter(iIndex),  &
+!                iLogLevel=LOG_DEBUG,                                                               &
+!                sModule=__FILE__,                                                                  &
+!                iLine=__LINE__ )
     endif  
    
 
@@ -206,9 +206,9 @@ contains
     
     if ( len_trim(sText) == 0 ) then
       sText = "<NA>"
-      call warn("Unable to find a pointer associated with index range: " &
-          //asCharacter(iStartIndex)//" to "//asCharacter(iEndIndex), &
-          __FILE__, __LINE__ )
+!      call warn("Unable to find a pointer associated with index range: " &
+!          //asCharacter(iStartIndex)//" to "//asCharacter(iEndIndex), &
+!          __FILE__, __LINE__ )
     endif  
    
 
@@ -419,10 +419,7 @@ contains
    
   end function list_return_position_of_matching_string_fn
 
-
-
-
-
+!--------------------------------------------------------------------------------------------------
 
   function list_subset_partial_matches_fn(this, sChar)     result(newList)
 

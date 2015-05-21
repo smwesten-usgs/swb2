@@ -8,10 +8,10 @@
 !> to the control_setModelOptions routine in module \ref control.
 program main
 
-  use iso_c_binding, only : c_short, c_int, c_float, c_double
-  use logfiles
-  use loop_initialize
-  use model_domain
+  use iso_c_binding, only   : c_short, c_int, c_float, c_double
+  use logfiles, only        : LOGS, LOG_DEBUG, SWB_VERSION
+  use loop_initialize, only : initialize_options, check_for_fatal_warnings, read_control_file
+  use model_domain, only    : MODEL
   use iso_fortran_env
 
   implicit none
@@ -24,7 +24,7 @@ program main
 
   iNumArgs = COMMAND_ARGUMENT_COUNT()
 
-  sVersionString = "  Soil Water Balance Code version "//trim(SWB_VERSION)    &
+  sVersionString = "  Soil Water Balance Code version "//trim( SWB_VERSION )    &
       //" -- compiled on: "//trim(__DATE__)//" "//trim(__TIME__)
 
   if(iNumArgs/=1) then
@@ -67,7 +67,7 @@ program main
   call LOGS%initialize( iLogLevel = LOG_DEBUG )
 
   ! read control file
-  call read_control_file(sControlFile)
+  call read_control_file( sControlFile )
 
   call initialize_options()
   

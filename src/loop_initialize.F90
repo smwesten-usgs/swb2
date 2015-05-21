@@ -677,7 +677,7 @@ contains
       if ( iCount > 0 ) then
 
         call PARAMS%munge_file()
-        ! call PARAMS%print_all()       
+        call PARAMS_DICT%print_all()       
 
       endif
 
