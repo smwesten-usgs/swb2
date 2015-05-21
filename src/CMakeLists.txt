@@ -35,7 +35,7 @@ if(TARGET__SWB_EXECUTABLE)
             runoff__curve_number.F90 
             runoff__gridded_values.F90                       
             soil_moisture__thornthwaite_mather.F90
-            soil_moisture__FAO56.F90
+            soil_moisture__FAO_56.F90
             simulation_datetime.F90
             snowfall__original.F90
             snowmelt__original.F90
@@ -252,7 +252,7 @@ if(TARGET__SWB_LIBRARY)
             runoff__curve_number.F90 
             runoff__gridded_values.F90                       
             soil_moisture__thornthwaite_mather.F90
-            soil_moisture__FAO56.F90
+            soil_moisture__FAO_56.F90
             simulation_datetime.F90
             snowfall__original.F90
             snowmelt__original.F90

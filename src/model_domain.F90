@@ -45,6 +45,7 @@ module model_domain
     integer (kind=c_int), allocatable      :: sum_upslope_cells(:)
 
     real (kind=c_float), allocatable       :: awc(:)
+    real (kind=c_float), allocatable       :: gdd(:)
      
     real (kind=c_float), allocatable       :: latitude(:)
     real (kind=c_float), allocatable       :: reference_ET0(:)
@@ -1375,6 +1376,14 @@ contains
         call LOGS%WRITE( "==> THORNTHWAITE-MATHER SOIL MOISTURE submodel selected.", &
             iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
+      elseif ( ( sMethodName .strequal. "FAO56" ) .or. ( sMethodName .strequal. "FAO-56" ) ) then
+
+        this%init_soil_moisture => model_initialize_soil_moisture_fao_56
+        this%calc_soil_moisture => model_calculate_soil_moisture_fao_56
+
+        call LOGS%WRITE( "==> FAO-56 SOIL MOISTURE submodel selected.", &
+            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
       else
 
         call warn("Your control file specifies an unknown or unsupported SOIL_MOISTURE method.", &
@@ -1765,6 +1774,55 @@ contains
     endif
 
   end subroutine model_calculate_soil_moisture_thornthwaite_mather
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_soil_moisture_fao_56( this )
+
+    use soil_moisture__FAO_56
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call soil_moisture_FAO56_initialize( count( this%active ) )
+
+  end subroutine model_initialize_soil_moisture_fao_56
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_soil_moisture_fao_56( this, index )
+
+    use soil_moisture__FAO_56
+
+    class (MODEL_DOMAIN_T), intent(inout)       :: this
+    integer (kind=c_int), intent(in), optional  :: index
+
+    if ( present( index ) ) then
+
+      call soil_moisture_FAO56_calculate( fSoilStorage=this%soil_storage(index),                             &
+                                          fActual_ET=this%actual_ET(index),                                  &
+                                          fSoilStorage_Excess=this%potential_recharge(index),                &
+                                          fInfiltration=this%infiltration(index),                            &
+                                          fGDD=this%gdd(index),                                              &
+                                          fAvailableWaterCapacity=this%awc(index),                           &
+                                          fReference_ET0=this%reference_ET0_adj(index),                      &
+                                          fRootingDepth=ROOTING_DEPTH( this%landuse_index(index),            &
+                                                                      this%soil_group(index) ),              &
+                                          iLanduseIndex=this%landuse_index(index),                           &
+                                          iSoilGroup=this%soil_group(index) )
+
+    else
+
+!       call soil_moisture_FAO56_calculate(fAPWL=APWL,                                    &
+!                                                         fSoilStorage=this%soil_storage,               &
+!                                                         fSoilStorage_Excess=this%potential_recharge,  &
+!                                                         fActual_ET=this%actual_ET,                    &
+!                                                         fSoilStorage_Max=this%soil_storage_max,       &
+!                                                         fInfiltration=this%infiltration,              &
+!                                                         fReference_ET=this%reference_ET0_adj )
+
+    endif
+
+  end subroutine model_calculate_soil_moisture_fao_56
 
 !--------------------------------------------------------------------------------------------------
 

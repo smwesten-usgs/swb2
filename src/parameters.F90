@@ -37,7 +37,7 @@ module parameters
     generic              :: munge_file => munge_files_and_add_to_param_list_sub
 
     procedure, private   :: get_parameter_values_int
-    procedure, private   :: get_parameter_values_float
+    procedure            :: get_parameter_values_float
     procedure, private   :: get_parameter_table_float
 
     generic              :: get_parameters => get_parameter_values_int,     &
@@ -205,7 +205,7 @@ contains
     class (PARAMETERS_T)                                       :: this
     integer (kind=c_int), intent(in out), allocatable          :: iValues(:)  
     type (STRING_LIST_T), intent(in out),             optional :: slKeys
-    character (len=*),    intent(in ),             optional :: sKey
+    character (len=*),    intent(in ),                optional :: sKey
 
     if ( present( slKeys) ) then
 
@@ -226,7 +226,7 @@ contains
     class (PARAMETERS_T)                                       :: this
     real (kind=c_float),  intent(in out), allocatable          :: fValues(:)  
     type (STRING_LIST_T), intent(in out),             optional :: slKeys
-    character (len=*),    intent(in ),             optional :: sKey
+    character (len=*),    intent(in ),                optional :: sKey
 
     if ( present( slKeys) ) then
 
@@ -242,31 +242,47 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine get_parameter_table_float( this, fValues, sPrefix, iNumRows, iNumCols )
+  subroutine get_parameter_table_float( this, fValues, sPrefix, iNumRows )
 
     class (PARAMETERS_T)                                       :: this
     real (kind=c_float),  intent(in out), allocatable          :: fValues(:,:)
     character (len=*),    intent(in)                           :: sPrefix
     integer (kind=c_int), intent(in)                           :: iNumRows
-    integer (kind=c_int), intent(in)                           :: iNumCols 
 
     ! [ LOCALS ]
     integer (kind=c_int)             :: iIndex   
     integer (kind=c_int)             :: iStat
     character (len=256)              :: sText
+    integer (kind=c_int)             :: iNumCols
+    type (STRING_LIST_T)             :: slList
     real (kind=c_float), allocatable :: fTempVal(:) 
 
-    allocate( fTempVal( iNumRows ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+    slList = PARAMS%grep_name( sPrefix )
 
-    allocate( fValues( iNumRows, iNumCols ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+    iNumCols = slList%count
 
-    do iIndex = 1, iNumCols
-      sText = trim(sPrefix)//asCharacter(iIndex)
-      call PARAMS_DICT%get_values( sKey=sText, fValues=fTempVal )
-      fValues(:,iIndex) = fTempVal
-    enddo  
+    if ( iNumCols == 0 ) then
+
+      call warn( "Failed to find any data columns with headers containing the string " &
+        //dQuote( sPrefix )//".", lFatal = lTRUE )
+
+    else
+
+      allocate( fTempVal( iNumRows ), stat=iStat )
+      call assert( iStat == 0, "Problem allocating memory.", __FILE__, __LINE__ )
+
+      allocate( fValues( iNumRows, iNumCols ), stat=iStat )
+      call assert( iStat == 0, "Problem allocating memory."                            &
+        //"~iNumCols: "//asCharacter(iNumCols)//"; iNumRows: "//asCharacter(iNumRows)  &
+        //" sPrefix: "//dQuote(sPrefix), __FILE__, __LINE__ )
+
+      do iIndex = 1, iNumCols
+        sText = trim(sPrefix)//asCharacter(iIndex)
+        call PARAMS_DICT%get_values( sKey=sText, fValues=fTempVal )
+        fValues(:,iIndex) = fTempVal
+      enddo  
+
+    endif
 
   end subroutine get_parameter_table_float
 

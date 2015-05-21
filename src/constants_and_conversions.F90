@@ -63,8 +63,9 @@ module constants_and_conversions
   character (len=1), parameter :: sDOUBLE_QUOTE = achar(34)
 
   ! [ select conversion factors ]
-  real (kind=c_double), parameter :: C_PER_F = 5.0_c_double / 9.0_c_double
-  real (kind=c_double), parameter :: F_PER_C = 9.0_c_double / 5.0_c_double  
+  real (kind=c_double), parameter :: C_PER_F    = 5.0_c_double / 9.0_c_double
+  real (kind=c_double), parameter :: F_PER_C    = 9.0_c_double / 5.0_c_double  
+  real (kind=c_double), parameter :: M_PER_FOOT = 0.3048_c_double 
 
 
 ! this type is still needed for the grid module
