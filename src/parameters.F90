@@ -200,54 +200,91 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine get_parameter_values_int( this, iValues, slKeys, sKey )
+  subroutine get_parameter_values_int( this, iValues, slKeys, sKey, lFatal )
 
     class (PARAMETERS_T)                                       :: this
     integer (kind=c_int), intent(in out), allocatable          :: iValues(:)  
     type (STRING_LIST_T), intent(in out),             optional :: slKeys
     character (len=*),    intent(in ),                optional :: sKey
+    logical (kind=c_bool), intent(in),                optional :: lFatal
+
+    ! [ LOCALS ]
+    logical (kind=c_bool) :: lFatal_
+
+    if ( present (lFatal) ) then
+      lFatal_ = lFatal
+    else
+      lFatal_ = lFALSE
+    endif 
 
     if ( present( slKeys) ) then
 
       call PARAMS_DICT%get_values( slKeys=slKeys, iValues=iValues )
 
+      if ( any( iValues <= iTINYVAL ) ) &
+        call warn( "Failed to find any lookup table columns with headers containing the string(s) " &
+          //dQuote( slKeys%listall() )//".", lFatal = lFatal_ )
+
     else if ( present( sKey) ) then
 
       call PARAMS_DICT%get_values( sKey=sKey, iValues=iValues )
-    
+
+      if ( any( iValues <= iTINYVAL ) ) &
+        call warn( "Failed to find any lookup table columns with headers containing the string " &
+          //dQuote( sKey )//".", lFatal = lFatal_ )
+
     endif
 
   end subroutine get_parameter_values_int
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine get_parameter_values_float( this, fValues, slKeys, sKey )
+  subroutine get_parameter_values_float( this, fValues, slKeys, sKey, lFatal )
 
     class (PARAMETERS_T)                                       :: this
     real (kind=c_float),  intent(in out), allocatable          :: fValues(:)  
     type (STRING_LIST_T), intent(in out),             optional :: slKeys
     character (len=*),    intent(in ),                optional :: sKey
+    logical (kind=c_bool), intent(in),                optional :: lFatal
+
+    ! [ LOCALS ]
+    logical (kind=c_bool) :: lFatal_
+
+    if ( present (lFatal) ) then
+      lFatal_ = lFatal
+    else
+      lFatal_ = lFALSE
+    endif 
 
     if ( present( slKeys) ) then
 
       call PARAMS_DICT%get_values( slKeys=slKeys, fValues=fValues )
 
+      if ( any( fValues <= fTINYVAL ) ) &
+        call warn( "Failed to find any lookup table columns with headers containing the string(s) " &
+          //dQuote( slKeys%listall() )//".", lFatal = lFatal_ )
+
     else if ( present( sKey) ) then
 
       call PARAMS_DICT%get_values( sKey=sKey, fValues=fValues )
-    
+
+      if ( any( fValues <= fTINYVAL ) ) &
+        call warn( "Failed to find any lookup table columns with headers containing the string " &
+          //dQuote( sKey )//".", lFatal = lFatal_ )
+
     endif
 
   end subroutine get_parameter_values_float
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine get_parameter_table_float( this, fValues, sPrefix, iNumRows )
+  subroutine get_parameter_table_float( this, fValues, sPrefix, iNumRows, lFatal )
 
     class (PARAMETERS_T)                                       :: this
     real (kind=c_float),  intent(in out), allocatable          :: fValues(:,:)
     character (len=*),    intent(in)                           :: sPrefix
     integer (kind=c_int), intent(in)                           :: iNumRows
+    logical (kind=c_bool), intent(in),                optional :: lFatal
 
     ! [ LOCALS ]
     integer (kind=c_int)             :: iIndex   
@@ -256,6 +293,13 @@ contains
     integer (kind=c_int)             :: iNumCols
     type (STRING_LIST_T)             :: slList
     real (kind=c_float), allocatable :: fTempVal(:) 
+    logical (kind=c_bool) :: lFatal_
+
+    if ( present (lFatal) ) then
+      lFatal_ = lFatal
+    else
+      lFatal_ = lFALSE
+    endif 
 
     slList = PARAMS%grep_name( sPrefix )
 
@@ -264,7 +308,7 @@ contains
     if ( iNumCols == 0 ) then
 
       call warn( "Failed to find any lookup table columns with headers containing the string " &
-        //dQuote( sPrefix )//".", lFatal = lTRUE )
+        //dQuote( sPrefix )//".", lFatal = lFatal_ )
 
     else
 

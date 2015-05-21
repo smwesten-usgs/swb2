@@ -275,7 +275,7 @@ contains
 
       iCount = iCount + 1
 
-      sBuf = trim(sBuf)//"("//asCharacter(iCount)//") "//current%s
+      sBuf = trim(sBuf)//"("//asCharacter(iCount)//") "//current%s//" "
 
       current => current%next
 

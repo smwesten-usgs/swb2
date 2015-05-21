@@ -68,6 +68,7 @@ contains
 
     allocate ( pNCFILE, stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+    print *, slString%listall()
 
 
     !> Determine how many landuse codes are present
@@ -83,6 +84,7 @@ contains
     call slString%append("Fog_catch_efficiency")
     
     call PARAMS%get_parameters( slKeys=slString , fValues=fFOG_CATCH_EFFICIENCY )
+
     if ( fFOG_CATCH_EFFICIENCY(1) <= fTINYVAL )  &
       call warn( "Failed to find a data column containing fog catch efficiency values.", lFATAL=lTRUE, &
         iLogLevel=LOG_ALL )

@@ -247,7 +247,7 @@ contains
         __FILE__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
-        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
 
       iValues = iTINYVAL
 
@@ -255,6 +255,40 @@ contains
 
 
   end subroutine get_values_as_int_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine get_values_as_logical_sub(this, sKey, iValues)
+
+    class (DICT_T)                                  :: this
+    character (len=*), intent(in)                   :: sKey
+    logical (kind=c_bool), allocatable, intent(out)  :: lValues(:)
+
+    ! [ LOCALS ]
+    type (DICT_ENTRY_T), pointer   :: pTarget
+    integer (kind=c_int)           :: iStat
+    
+    pTarget => this%get_entry(sKey)
+
+    if ( associated( pTarget ) ) then
+
+      lValues = pTarget%sl%asLogical()
+
+    else
+
+      allocate(iValues(1), stat=iStat)
+      call assert(iStat == 0, "Failed to allocate memory to iValues array", &
+        __FILE__, __LINE__)
+
+      call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+
+      iValues = iTINYVAL
+
+    endif  
+
+
+  end subroutine get_values_as_logical_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -278,7 +312,7 @@ contains
 
       call slString%append("<NA>")
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
-        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
 
     endif  
 
@@ -333,7 +367,7 @@ contains
         __FILE__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
-        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
 
       iValues = iTINYVAL
 
@@ -390,7 +424,7 @@ contains
         __FILE__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
-        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
 
 
       fValues = fTINYVAL
@@ -423,6 +457,10 @@ contains
       allocate(fValues(1), stat=iStat)
       call assert(iStat == 0, "Failed to allocate memory to iValues array", &
         __FILE__, __LINE__)
+
+      call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+
       fValues = fTINYVAL
 
     endif  

@@ -9,7 +9,7 @@
 module soil_moisture__FAO_56
 
   use iso_c_binding, only             : c_bool, c_short, c_int, c_float, c_double
-  use constants_and_conversions, only : M_PER_FOOT
+  use constants_and_conversions, only : M_PER_FOOT, lTRUE, lFALSE
   use exceptions, only                : assert
   use parameters, only                : PARAMS
   use simulation_datetime, only       : SIM_DT 
@@ -151,15 +151,16 @@ contains
    !!       REW_1, REW_3, REW_5, only the values associated with "REW_1" would be retrieved.
    !!       Needless to say, this would be catastrophic.
 
-   call PARAMS%get_parameters( sKey="L_ini", fValues=L_ini )
-   call PARAMS%get_parameters( sKey="L_mid", fValues=L_mid )
-   call PARAMS%get_parameters( sKey="L_late", fValues=L_late )
-!   call PARAMS%get_parameters( "L_min", L_min )
+   call PARAMS%get_parameters( sKey="Planting_date", fValues=PLANTING_DATE, lFatal=lTRUE )
 
-   call PARAMS%get_parameters( sKey="Kcb_ini", fValues=KCB_ini )
-   call PARAMS%get_parameters( sKey="Kcb_mid", fValues=KCB_mid )
-   call PARAMS%get_parameters( sKey="Kcb_end", fValues=KCB_end )
-   call PARAMS%get_parameters( sKey="Kcb_min", fValues=KCB_min )
+   call PARAMS%get_parameters( sKey="L_ini", fValues=L_ini, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="L_mid", fValues=L_mid, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="L_late", fValues=L_late, lFatal=lTRUE )
+
+   call PARAMS%get_parameters( sKey="Kcb_ini", fValues=KCB_ini, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="Kcb_mid", fValues=KCB_mid, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="Kcb_end", fValues=KCB_end, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="Kcb_min", fValues=KCB_min, lFatal=lTRUE )
 
    call PARAMS%get_parameters( sKey="Kcb_Jan", fValues=KCB_jan )
    call PARAMS%get_parameters( sKey="Kcb_Feb", fValues=KCB_feb )
@@ -444,7 +445,7 @@ end function calc_water_stress_coefficient_Ks
 
 !------------------------------------------------------------------------------
 
- elemental subroutine soil_moisture_FAO56_calculate( fSoilStorage, fActual_ET,             &
+  subroutine soil_moisture_FAO56_calculate( fSoilStorage, fActual_ET,             &
    fSoilStorage_Excess, fInfiltration, fGDD, fAvailableWaterCapacity, fReference_ET0,       &
    fRootingDepth, iLanduseIndex, iSoilGroup )
 
@@ -476,7 +477,7 @@ end function calc_water_stress_coefficient_Ks
   real (kind=c_float) :: fBareSoilEvap
   real (kind=c_float) :: fCropETc
 
-  fSoilStorage_Max = fAvailableWaterCapacity * fZr_max
+  fSoilStorage_Max = fAvailableWaterCapacity * fRootingDepth
 
   if ( UNITS_ARE_DOY( iLanduseIndex ) ) then
 
