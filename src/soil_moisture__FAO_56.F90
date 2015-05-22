@@ -21,11 +21,11 @@ module soil_moisture__FAO_56
   public :: soil_moisture_FAO56_initialize, soil_moisture_FAO56_calculate
 
   enum, bind(c)
-    enumerator :: L_INIT=1, L_DEV, L_MID, L_LATE, L_FALLOW
+    enumerator :: L_INI=1, L_DEV, L_MID, L_LATE, L_FALLOW
   end enum 
 
   enum, bind(c)
-    enumerator :: KCB_INI=1, KCB_MID, KCB_END, KCB_MIN
+    enumerator :: KCB_INI=13, KCB_MID, KCB_END, KCB_MIN
   end enum 
 
   enum, bind(c)
@@ -40,7 +40,8 @@ module soil_moisture__FAO_56
   real (kind=c_float), allocatable   :: KCB(:,:)
   real (kind=c_float), allocatable   :: PLANTING_DATE(:)
   real (kind=c_float), allocatable   :: L_GROWTH(:,:)
-  logical (kind=c_bool), allocatable :: UNITS_ARE_DOY(:)
+  logical (kind=c_bool), allocatable :: UNITS_ARE_DAYS(:)
+  integer (kind=c_int), allocatable  :: DAYS_SINCE_PLANTING(:)
 
   !real (kind=c_float), 
   real (kind=c_float), allocatable   :: DEPLETION_FRACTION(:)
@@ -67,13 +68,14 @@ contains
 
     character (len=:), allocatable   :: sText
 
-    real (kind=c_float), allocatable :: L_ini(:)
-    real (kind=c_float), allocatable :: L_mid(:)
-    real (kind=c_float), allocatable :: L_late(:)
-    real (kind=c_float), allocatable :: Kcb_ini(:)            
-    real (kind=c_float), allocatable :: Kcb_mid(:)            
-    real (kind=c_float), allocatable :: Kcb_end(:)            
-    real (kind=c_float), allocatable :: Kcb_min(:)
+    real (kind=c_float), allocatable :: L_ini_(:)
+    real (kind=c_float), allocatable :: L_mid_(:)
+    real (kind=c_float), allocatable :: L_late_(:)
+    real (kind=c_float), allocatable :: L_fallow_(:)
+    real (kind=c_float), allocatable :: Kcb_ini_(:)            
+    real (kind=c_float), allocatable :: Kcb_mid_(:)            
+    real (kind=c_float), allocatable :: Kcb_end_(:)            
+    real (kind=c_float), allocatable :: Kcb_min_(:)
     
     real (kind=c_float), allocatable :: Kcb_jan(:)
     real (kind=c_float), allocatable :: Kcb_feb(:)
@@ -115,6 +117,12 @@ contains
    call PARAMS%get_parameters( slKeys=slList, iValues=LANDUSE_CODE )
    iNumberOfLanduses = count( LANDUSE_CODE >= 0 )
 
+   allocate( DAYS_SINCE_PLANTING( iNumActiveCells ), stat=iStat )
+   call assert( iStat==0, "Failed to allocate memory for the DAYS_SINCE_PLANTING array", &
+      __FILE__, __LINE__ )
+
+   DAYS_SINCE_PLANTING = 0
+
    !allocate( REW(iNumberOfLanduses, iNumberOfREW), stat=iStat )
    !call assert( iStat == 0, "Failed to allocate memory for readily evaporable water (REW) table", &
    !  __FILE__, __LINE__)
@@ -153,14 +161,15 @@ contains
 
    call PARAMS%get_parameters( sKey="Planting_date", fValues=PLANTING_DATE, lFatal=lTRUE )
 
-   call PARAMS%get_parameters( sKey="L_ini", fValues=L_ini, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="L_mid", fValues=L_mid, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="L_late", fValues=L_late, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="L_ini", fValues=L_ini_, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="L_mid", fValues=L_mid_, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="L_late", fValues=L_late_, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="L_fallow", fValues=L_fallow_, lFatal=lTRUE )
 
-   call PARAMS%get_parameters( sKey="Kcb_ini", fValues=KCB_ini, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="Kcb_mid", fValues=KCB_mid, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="Kcb_end", fValues=KCB_end, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="Kcb_min", fValues=KCB_min, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="Kcb_ini", fValues=KCB_ini_, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="Kcb_mid", fValues=KCB_mid_, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="Kcb_end", fValues=KCB_end_, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="Kcb_min", fValues=KCB_min_, lFatal=lTRUE )
 
    call PARAMS%get_parameters( sKey="Kcb_Jan", fValues=KCB_jan )
    call PARAMS%get_parameters( sKey="Kcb_Feb", fValues=KCB_feb )
@@ -175,8 +184,28 @@ contains
    call PARAMS%get_parameters( sKey="Kcb_Nov", fValues=KCB_nov )
    call PARAMS%get_parameters( sKey="Kcb_Dec", fValues=KCB_dec )
 
-   call PARAMS%get_parameters( sKey="Depletion_Fraction", fValues=DEPLETION_FRACTION )
-   call PARAMS%get_parameters( sKey="Mean_Plant_Height", fValues=MEAN_PLANT_HEIGHT )
+   call PARAMS%get_parameters( sKey="Depletion_Fraction", fValues=DEPLETION_FRACTION, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="Mean_Plant_Height", fValues=MEAN_PLANT_HEIGHT, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="Units_Are_Days", lValues=UNITS_ARE_DAYS, lFatal=lTRUE )
+
+    allocate( L_GROWTH( 16, iNumberOfLanduses ), stat=iStat )
+    call assert( iStat==0, "Failed to allocate memory for L_GROWTH array", &
+      __FILE__, __LINE__ )
+
+    allocate( KCB( 16, iNumberOfLanduses ), stat=iStat )
+    call assert( iStat==0, "Failed to allocate memory for KCB array", &
+      __FILE__, __LINE__ )
+
+
+    L_GROWTH( L_INI, :) = L_ini_
+    L_GROWTH( L_MID, :) = L_mid_
+    L_GROWTH( L_LATE, :) = L_late_
+    L_GROWTH( L_FALLOW, :) = L_fallow_
+
+    KCB( KCB_INI, :) = KCB_ini_
+    KCB( KCB_MID, :) = KCB_mid_
+    KCB( KCB_END, :) = KCB_end_
+    KCB( KCB_MIN, :) = KCB_min_
 
   !> @TODO Add more logic here to perform checks on the validity of this data.
 
@@ -197,6 +226,15 @@ contains
 
  elemental function sm_FAO56_UpdateCropCoefficient( iLanduseIndex, iThreshold )  result(fKcb)
 
+  !>
+  !>
+  !>  @TODO modify so that monthly values may be used *or* alternatively the 4 values
+  !>        specified in FAO-56
+  !>
+  !>
+
+
+
   integer (kind=c_int), intent(in)   :: iLanduseIndex
   integer (kind=c_int), intent(in)   :: iThreshold
   real (kind=c_float)                :: fKcb
@@ -205,7 +243,7 @@ contains
   real (kind=c_float) :: fFrac
 
   ! define shorthand variable names for remainder of function
-  associate ( L_ini => L_GROWTH( L_INIT, iLanduseIndex ),       &
+  associate ( L_ini => L_GROWTH( L_INI, iLanduseIndex ),       &
               L_mid => L_GROWTH( L_MID, iLanduseIndex ),        &
               L_late => L_GROWTH( L_LATE, iLanduseIndex ),      &
               Kcb_ini => KCB(KCB_INI, iLanduseIndex),           &
@@ -303,8 +341,8 @@ elemental function calc_fraction_wetted_and_exposed_soil( iLanduseIndex, fKcb)  
   real (kind=c_float) :: fDenominator
   real (kind=c_float) :: fExponent
 
-  fNumerator = fKcb - KCB( KCB_MIN, iLanduseIndex )
-  fDenominator = KCB( KCB_MID, iLanduseIndex) - KCB( KCB_MIN, iLanduseIndex )
+  fNumerator = fKcb - minval(KCB( :, iLanduseIndex ) )
+  fDenominator = maxval( KCB( :, iLanduseIndex) ) - minval( KCB( :, iLanduseIndex ) )
   fExponent = 1.0_c_float + 0.5_c_float * MEAN_PLANT_HEIGHT( iLanduseIndex ) * M_PER_FOOT
 
   ! calculate the fraction of the ground that is currently covered
@@ -339,11 +377,11 @@ end function calc_fraction_wetted_and_exposed_soil
 !! @retval rZr_i current active rooting depth.
 !! @note Implemented as equation 8-1 (Annex 8), FAO-56, Allen and others.
 
-elemental function calc_effective_root_depth( iLanduseIndex, fZr_max, iThreshold ) 	result(fZr_i)
+elemental function calc_effective_root_depth( iLanduseIndex, fZr_max, fKCB ) 	result(fZr_i)
 
   integer (kind=c_int), intent(in)    :: iLanduseIndex 
 	real (kind=c_float), intent(in)     :: fZr_max
-	integer (kind=c_int), intent(in)    :: iThreshold ! either GDD or DOY
+  real (kind=c_float), intent(in)     :: fKCB
 
   ! [ RESULT ]
   real (kind=c_float) :: fZr_i
@@ -352,23 +390,26 @@ elemental function calc_effective_root_depth( iLanduseIndex, fZr_max, iThreshold
 	! 0.328 feet equals 0.1 meters, which is seems to be the standard
 	! initial rooting depth in the FAO-56 methodology
 	real (kind=c_float), parameter :: fZr_min = 0.328
+  real (kind=c_float)            :: fMaxKCB
+  real (kind=c_float)            :: fMinKCB
 
-  ! if there is not much difference between the Kcb_mid and Kcb_ini, assume that
+  fMaxKCB = maxval( KCB( :, iLanduseIndex ) )
+  fMinKCB = minval( KCB( :, iLanduseIndex ) ) 
+
+  ! if there is not much difference between the MAX Kcb and MIN Kcb, assume that
   ! we are dealing with an area such as a forest, where we assume that the rooting
   ! depths are constant year-round
-	if ( KCB(KCB_MID, iLanduseIndex) - KCB( KCB_INI, iLanduseIndex ) < 0.1) then
+	if ( ( fMaxKCB - fMinKCB ) < 0.1_c_float ) then
 
 	  fZr_i = fZr_max
 
-	elseif ( iThreshold < PLANTING_DATE( iLanduseIndex ) ) then
+	elseif ( fMaxKCB > 0.0_C_float ) then
 
-	  fZr_i = fZr_min
+    fZr_i = fZr_min + (fZr_max - fZr_min) * fKCB / fMaxKCB 
 
-	else
+  else
 
-    fZr_i = fZr_min + (fZr_max - fZr_min)                                     &
-            * real(iThreshold - PLANTING_DATE(iLanduseIndex), kind=c_float )     &
-            / real( L_GROWTH( L_DEV, iLanduseIndex ) -  PLANTING_DATE(iLanduseIndex), kind=c_float)
+    fZr_i = fZr_min
 
   endif
 
@@ -387,7 +428,7 @@ elemental function calc_surface_evaporation_coefficient( iLanduseIndex, fKr, fKc
   real (kind=c_float), intent(in)      :: fKcb
   real (kind=c_float)                  :: fKe
 
-  fKe = fKr * ( KCB( KCB_MID, iLanduseIndex ) - fKcb )
+  fKe = fKr * ( maxval( KCB( :, iLanduseIndex ) ) - fKcb )
 
 end function calc_surface_evaporation_coefficient
 
@@ -445,9 +486,9 @@ end function calc_water_stress_coefficient_Ks
 
 !------------------------------------------------------------------------------
 
-  subroutine soil_moisture_FAO56_calculate( fSoilStorage, fActual_ET,             &
-   fSoilStorage_Excess, fInfiltration, fGDD, fAvailableWaterCapacity, fReference_ET0,       &
-   fRootingDepth, iLanduseIndex, iSoilGroup )
+  subroutine soil_moisture_FAO56_calculate( fSoilStorage, fActual_ET,                     &
+    fSoilStorage_Excess, fInfiltration, fGDD, fAvailableWaterCapacity, fReference_ET0,    &
+    fRootingDepth, iLanduseIndex, iSoilGroup )
 
   real (kind=c_float), intent(inout)   :: fSoilStorage
   real (kind=c_float), intent(inout)   :: fActual_ET
@@ -479,26 +520,25 @@ end function calc_water_stress_coefficient_Ks
 
   fSoilStorage_Max = fAvailableWaterCapacity * fRootingDepth
 
-  if ( UNITS_ARE_DOY( iLanduseIndex ) ) then
+  if ( UNITS_ARE_DAYS( iLanduseIndex ) ) then
 
    fKcb = sm_FAO56_UpdateCropCoefficient( iLanduseIndex, SIM_DT%iDOY )
 
    if ( SIM_DT%iDOY < L_GROWTH( L_DEV, iLanduseIndex ) ) then
 
-     fZr = calc_effective_root_depth( iLanduseIndex, &
-                              fZr_max, SIM_DT%iDOY )
   !					 cel%rSoilWaterCap = cel%rCurrentRootingDepth * cel%rSoilWaterCapInput
    endif
 
   else
 
-   fKcb = sm_FAO56_UpdateCropCoefficient( iLanduseIndex, INT(fGDD, kind=c_int))
+   fKcb = sm_FAO56_UpdateCropCoefficient( iLanduseIndex, INT(fGDD, kind=c_int) )
 
-   fZr = calc_effective_root_depth( iLanduseIndex, &
-                              fZr_max, INT(fGDD, kind=c_int) )
   !					 cel%rSoilWaterCap = cel%rCurrentRootingDepth * cel%rSoilWaterCapInput
 
   endif
+
+  ! change from earlier coding: rooting depth is now simply keyed into the current Kcb
+  fZr = calc_effective_root_depth( iLanduseIndex, fZr_max, fKcb )
 
   fREW = REW( iLanduseIndex, iSoilGroup )
   fTEW = TEW( iLanduseIndex, iSoilGroup )
@@ -506,11 +546,11 @@ end function calc_water_stress_coefficient_Ks
   ! following call updates the total available water (TAW) and
   ! readily available water (RAW) on the basis of the current
   ! plant root depth
-  call calc_total_available_water_TAW( fTotalAvailableWater=fTAW,                       &
-                                      fReadilyAvailableWater=fRAW,                     &
-                                      iLanduseIndex=iLanduseIndex,                     &
-                                      fAvailableWaterCapacity=fAvailableWaterCapacity, &
-                                      fCurrentRootingDepth=fZr )
+  call calc_total_available_water_TAW( fTotalAvailableWater=fTAW,                        &
+                                       fReadilyAvailableWater=fRAW,                      &
+                                       iLanduseIndex=iLanduseIndex,                      &
+                                       fAvailableWaterCapacity=fAvailableWaterCapacity,  &
+                                       fCurrentRootingDepth=fZr )
 
   ! Deficit is defined in the sense of Thornthwaite and Mather
   !
@@ -530,22 +570,18 @@ end function calc_water_stress_coefficient_Ks
   ! stress and resulting decrease in ET during dry conditions).
 
   fKr = calc_evaporation_reduction_coeficient(fTotalEvaporableWater=fTEW,    &
-                                             fReadilyEvaporableWater=fREW,  &
+                                             fReadilyEvaporableWater=fREW,   &
                                              fDeficit=fDeficit )
 
   f_few = calc_fraction_wetted_and_exposed_soil( iLanduseIndex, fKcb )
 
   fKe = min(calc_surface_evaporation_coefficient( iLanduseIndex, fKr, fKcb ),   &
-           f_few * KCB( KCB_MID, iLanduseIndex) )
-
-  !if (fKe < 0) print *, "fKe < 0: ", cel%iIrrigationTableIndex, iRow, iCol, cel%iLandUse, cel%iSoilGroup, rKe, pIRRIGATION%rKcb, pIRRIGATION%rKcb_max
-  !if (fKr < 0) print *, "fKr < 0: ", cel%iIrrigationTableIndex, iRow, iCol, cel%iLandUse, cel%iSoilGroup, rKr, pIRRIGATION%rKcb, pIRRIGATION%rKcb_max
-  !if (f_few < 0) print *, "f_few < 0: ", cel%iIrrigationTableIndex, iRow, iCol, cel%iLandUse, cel%iSoilGroup, r_few, pIRRIGATION%rKcb, pIRRIGATION%rKcb_max
+            f_few * KCB( KCB_MID, iLanduseIndex) )
 
   fKs = calc_water_stress_coefficient_Ks( iLanduseIndex=iLanduseIndex,   &
-                                         fDeficit=fDeficit,             &
-                                         fTotalAvailableWater=fTAW,     &
-                                         fReadilyAvailableWater=fRAW )
+                                          fDeficit=fDeficit,             &
+                                          fTotalAvailableWater=fTAW,     &
+                                          fReadilyAvailableWater=fRAW )
 
 
   fBareSoilEvap = fReference_ET0 * fKe
@@ -553,6 +589,15 @@ end function calc_water_stress_coefficient_Ks
 
   ! 
   fActual_ET = fCropETc + fBareSoilEvap
+
+  fSoilStorage = fSoilStorage + fInfiltration - fActual_ET
+
+  if (fSoilStorage > fSoilStorage_Max ) then
+    fSoilStorage_Excess = fSoilStorage - fSoilStorage_Max
+    fSoilStorage = fSoilStorage_Max
+  else
+    fSoilStorage_Excess = 0.0_c_float
+  endif  
 
 end subroutine soil_moisture_FAO56_calculate
 

@@ -38,11 +38,13 @@ module parameters
 
     procedure, private   :: get_parameter_values_int
     procedure            :: get_parameter_values_float
+    procedure            :: get_parameter_values_logical
     procedure, private   :: get_parameter_table_float
 
     generic              :: get_parameters => get_parameter_values_int,     &
                                               get_parameter_values_float,   &
-                                              get_parameter_table_float
+                                              get_parameter_table_float,    &
+                                              get_parameter_values_logical
 
     procedure            :: grep_name => grep_parameter_name
 
@@ -197,6 +199,45 @@ contains
     slList = PARAMS_DICT%grep_keys( sKey )  
 
   end function grep_parameter_name  
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine get_parameter_values_logical( this, lValues, slKeys, sKey, lFatal )
+
+    class (PARAMETERS_T)                                        :: this
+    logical (kind=c_bool), intent(in out), allocatable          :: lValues(:)  
+    type (STRING_LIST_T), intent(in out),              optional :: slKeys
+    character (len=*),    intent(in ),                 optional :: sKey
+    logical (kind=c_bool), intent(in),                 optional :: lFatal
+
+    ! [ LOCALS ]
+    logical (kind=c_bool) :: lFatal_
+
+    if ( present (lFatal) ) then
+      lFatal_ = lFatal
+    else
+      lFatal_ = lFALSE
+    endif 
+
+    if ( present( slKeys) ) then
+
+      call PARAMS_DICT%get_values( slKeys=slKeys, lValues=lValues )
+
+!       if ( any( iValues <= iTINYVAL ) ) &
+!         call warn( "Failed to find any lookup table columns with headers containing the string(s) " &
+!           //dQuote( slKeys%listall() )//".", lFatal = lFatal_ )
+
+    else if ( present( sKey) ) then
+
+      call PARAMS_DICT%get_values( sKey=sKey, lValues=lValues )
+
+!       if ( any( iValues <= iTINYVAL ) ) &
+!         call warn( "Failed to find any lookup table columns with headers containing the string " &
+!           //dQuote( sKey )//".", lFatal = lFatal_ )
+
+    endif
+
+  end subroutine get_parameter_values_logical
 
 !--------------------------------------------------------------------------------------------------
 

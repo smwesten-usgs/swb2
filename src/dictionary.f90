@@ -55,14 +55,18 @@ module dictionary
 
     procedure, private   :: get_values_as_int_sub
     procedure, private   :: get_values_as_float_sub
+    procedure, private   :: get_values_as_logical_sub
     procedure, private   :: get_values_as_string_list_sub
     procedure, private   :: get_values_as_int_given_list_of_keys_sub
     procedure, private   :: get_values_as_float_given_list_of_keys_sub
+    procedure, private   :: get_values_as_logical_given_list_of_keys_sub
     generic              :: get_values => get_values_as_int_sub,                       &
                                           get_values_as_float_sub,                     &
+                                          get_values_as_logical_sub,                   &
                                           get_values_as_string_list_sub,               &
                                           get_values_as_int_given_list_of_keys_sub,    &
-                                          get_values_as_float_given_list_of_keys_sub
+                                          get_values_as_float_given_list_of_keys_sub,  &
+                                          get_values_as_logical_given_list_of_keys_sub
 
   end type DICT_T
 
@@ -258,10 +262,10 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine get_values_as_logical_sub(this, sKey, iValues)
+  subroutine get_values_as_logical_sub(this, sKey, lValues)
 
-    class (DICT_T)                                  :: this
-    character (len=*), intent(in)                   :: sKey
+    class (DICT_T)                                   :: this
+    character (len=*), intent(in)                    :: sKey
     logical (kind=c_bool), allocatable, intent(out)  :: lValues(:)
 
     ! [ LOCALS ]
@@ -276,19 +280,74 @@ contains
 
     else
 
-      allocate(iValues(1), stat=iStat)
-      call assert(iStat == 0, "Failed to allocate memory to iValues array", &
+      allocate(lValues(1), stat=iStat)
+      call assert(iStat == 0, "Failed to allocate memory to lValues array", &
         __FILE__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
         sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
 
-      iValues = iTINYVAL
+      lValues = lFALSE
 
     endif  
 
-
   end subroutine get_values_as_logical_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  !> Search through keys for a match; return logical values.
+  !!
+  !! THis routine allows for multiple header values to be supplied 
+  !! in the search for the appropriate column.
+  !! @param[in]  this  Object of DICT_T class.
+  !! @param[in]  slKeys String list containing one or more possible key values to
+  !!                    search for.
+  !! @param[out] iValues Integer vector of values associated with one of the provided keys.
+
+  subroutine get_values_as_logical_given_list_of_keys_sub(this, slKeys, lValues)
+
+    class (DICT_T)                                     :: this
+    type (STRING_LIST_T), intent(inout)                :: slKeys
+    logical (kind=c_bool), allocatable, intent(inout)   :: lValues(:)
+
+    ! [ LOCALS ]
+    type (DICT_ENTRY_T), pointer   :: pTarget
+    integer (kind=c_int)           :: iStat
+    integer (kind=c_int)           :: iCount
+    character (len=:), allocatable :: sText
+    
+    iCount = 0
+
+    do while ( iCount < slKeys%count )
+
+      iCount = iCount + 1
+
+      sText = slKeys%get( iCount)
+
+      pTarget => this%get_entry( sText )
+
+      if ( associated( pTarget ) ) exit
+
+    enddo
+
+    if ( associated( pTarget ) ) then
+
+      lValues = pTarget%sl%asLogical()
+
+    else
+
+      allocate(lValues(1), stat=iStat)
+      call assert(iStat == 0, "Failed to allocate memory to lValues array", &
+        __FILE__, __LINE__)
+
+      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+
+      lValues = lFALSE
+
+    endif  
+
+  end subroutine get_values_as_logical_given_list_of_keys_sub
 
 !--------------------------------------------------------------------------------------------------
 

@@ -146,6 +146,7 @@ type T_CELL
   public :: asFloat
   interface asFloat
     module procedure char2real
+    module procedure short2real
     module procedure int2real
     module procedure dbl2real
   end interface asFloat
@@ -153,6 +154,7 @@ type T_CELL
   public :: asDouble
   interface asDouble
     module procedure char2dbl
+    module procedure short2dbl
     module procedure int2dbl
     module procedure real2dbl
   end interface asDouble
@@ -164,6 +166,15 @@ type T_CELL
     module procedure real2int
     module procedure dbl2int
   end interface asInt
+
+  public asLogical
+  interface asLogical
+    module procedure short2logical
+    module procedure int2logical
+    module procedure real2logical
+    module procedure dbl2logical
+    module procedure char2logical
+  end interface asLogical
 
   public :: mm_to_in
   interface mm_to_in
@@ -236,6 +247,7 @@ contains
   !> Convert degrees to radians.
   !! @param[in]  degrees   Angle in degrees.
   !! @retval     radians  Angle in radians.
+
   elemental function deg_to_rad_sgl_fn( degrees )    result( radians )
 
     real (kind=c_float), intent(in)    :: degrees
@@ -251,6 +263,7 @@ contains
   !> Convert degrees to radians.
   !! @param[in]  degrees   Angle in degrees.
   !! @retval     radians   Angle in radians.
+
   elemental function deg_to_rad_dbl_fn(degrees)    result(radians)
 
     real (kind=c_double), intent(in)    :: degrees
@@ -266,6 +279,7 @@ contains
   !> Convert radians to degrees.
   !! @param[in]  radians   Angle in radians.
   !! @retval     degrees   Angle in degrees.
+
   elemental function rad_to_deg_sgl_fn(radians)    result(degrees)
 
     real (kind=c_float), intent(in)    :: radians
@@ -280,6 +294,7 @@ contains
   !> Convert radians to degrees.
   !! @param[in]  radians   Angle in radians.
   !! @retval     degrees   Angle in degrees.
+
   elemental function rad_to_deg_dbl_fn(radians)    result(degrees)
 
     real (kind=c_double), intent(in)    :: radians
@@ -295,6 +310,7 @@ contains
   !> Convert degrees Fahrenheit to degrees Celsius.
   !! @param[in]  degrees_F   Temperature in degrees Fahrenheit.
   !! @retval     degrees_C   Temperature in degrees Celcius.
+
   elemental function FtoC_sgl_fn(degrees_F)   result(degrees_C)
  
     real (kind=c_float),intent(in) :: degrees_F
@@ -310,6 +326,7 @@ contains
   !> Convert degrees Fahrenheit to degrees Celsius.
   !! @param[in] degrees_F Temperature in degrees Fahrenheit.
   !! @retval degrees_C Temperature in degrees Celcius.
+
   elemental function FtoC_dbl_fn( degrees_F )   result( degrees_C )
    
     real (kind=c_double),intent(in) :: degrees_F
@@ -325,6 +342,7 @@ contains
   !> Convert degrees Celsius to degrees Fahrenheit.
   !! @param[in] degrees_C Temperature in degrees Celsius.
   !! @retval degrees_F Temperature in degrees Fahrenheit.
+
   elemental function CtoF_sgl_fn( degrees_C )   result( degrees_F )
 
     real (kind=c_float),intent(in) :: degrees_C
@@ -340,6 +358,7 @@ contains
   !> Convert degrees Celsius to degrees Fahrenheit.
   !! @param[in] degrees_C Temperature in degrees Celsius.
   !! @retval degrees_F Temperature in degree
+
   elemental function CtoF_dbl_fn( degrees_C )   result( degrees_F )
 
     real (kind=c_double),intent(in) :: degrees_C
@@ -355,6 +374,7 @@ contains
   !> Convert degrees Fahrenheit to Kelvins.
   !! @param[in] degrees_F Temperature in degrees Fahrenheit.
   !! @retval degrees_K Temperature in Kelvins.
+
   elemental function FtoK_sgl_fn( degrees_F )    result( degrees_K )
 
     real (kind=c_float),intent(in) :: degrees_F
@@ -370,6 +390,7 @@ contains
   !> Convert degrees Fahrenheit to Kelvins.
   !! @param[in] degrees_F Temperature in degrees Fahrenheit.
   !! @retval degrees_K Temperature in Kelvins.
+
   elemental function FtoK_dbl_fn( degrees_F )    result( degrees_K )
 
     real (kind=c_double),intent(in) :: degrees_F
@@ -385,6 +406,7 @@ contains
   !> Convert degrees Celsius to Kelvins.
   !! @param[in] degrees_C Temperature in degrees Celcius.
   !! @retval degrees_K Temperature in Kelvins.
+
   elemental function CtoK_sgl_fn( degrees_C )    result( degrees_K )
 
     real (kind=c_float), intent(in) :: degrees_C
@@ -400,6 +422,7 @@ contains
   !> Convert degrees Fahrenheit to Kelvins.
   !! @param[in] degrees_C Temperature in degrees Celsius.
   !! @retval degrees_K Temperature in Kelvins.
+
   elemental function CtoK_dbl_fn( degrees_C )    result( degrees_K )
 
     real (kind=c_double), intent(in) :: degrees_C
@@ -415,6 +438,7 @@ contains
   !>  Convert millimeters to inches.
   !! @param[in] mm Value in millimeters.
   !! @retval inches Value in inches.
+
   elemental function mm_to_inches_sgl_fn(mm) result(inches)
 
     real (kind=c_float),intent(in) :: mm
@@ -429,6 +453,7 @@ contains
   !>  Convert millimeters to inches.
   !! @param[in] mm Value in millimeters.
   !! @retval inches Value in inches.
+
   elemental function mm_to_inches_dbl_fn( mm ) result( inches )
 
     real (kind=c_double),intent(in) :: mm
@@ -440,7 +465,105 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  !> Convert a short integer to a logical value
+
+  elemental function short2logical(iShortVal)    result(lValue)
+
+    integer (kind=c_short), intent(in)    :: iShortVal
+    logical (kind=c_bool)                 :: lValue
+
+    if ( iShortVal == 0 ) then
+      lValue = lFALSE
+    else
+      lValue = lTRUE
+    endif
+
+  end function short2logical  
+
+!--------------------------------------------------------------------------------------------------
+
+  !> Convert an integer to a logical value
+
+  elemental function int2logical(iValue)    result(lValue)
+
+    integer (kind=c_int), intent(in)      :: iValue
+    logical (kind=c_bool)                 :: lValue
+
+    if ( iValue == 0 ) then
+      lValue = lFALSE
+    else
+      lValue = lTRUE
+    endif
+
+  end function int2logical  
+
+!--------------------------------------------------------------------------------------------------
+
+  !> Convert a real to a logical value
+
+  elemental function real2logical(rValue)    result(lValue)
+
+    real (kind=c_float), intent(in)      :: rValue
+    logical (kind=c_bool)                :: lValue
+
+    ! [ LOCALS ]
+    real (kind=c_float), parameter :: fMinResolution = 2.0 * spacing(1.0_c_float)
+
+    if ( rValue > -fMinResolution .and. rValue < fMinResolution ) then
+      lValue = lFALSE
+    else
+      lValue = lTRUE
+    endif
+
+  end function real2logical  
+
+!--------------------------------------------------------------------------------------------------
+
+  !> Convert a double to a logical value
+
+  elemental function dbl2logical(rValue)    result(lValue)
+
+    real (kind=c_double), intent(in)      :: rValue
+    logical (kind=c_bool)                 :: lValue
+
+    ! [ LOCALS ]
+    real (kind=c_double), parameter :: dMinResolution = 2.0 * spacing(1.0_c_float)
+
+    if ( rValue > -dMinResolution .and. rValue < dMinResolution ) then
+      lValue = lFALSE
+    else
+      lValue = lTRUE
+    endif
+
+  end function dbl2logical  
+
+!--------------------------------------------------------------------------------------------------
+
+  !> Convert a character string to a logical value
+
+  elemental function char2logical(sValue)    result(lValue)
+
+    character (len=*), intent(in)      :: sValue
+    logical (kind=c_bool)              :: lValue
+
+    select case ( sValue )
+
+      case ( "TRUE", "True", "true", "T", "YES", "Yes", "yes", "1" )
+
+        lValue = lTRUE
+
+      case default
+
+        lValue = lFALSE
+
+    end select    
+
+  end function char2logical  
+
+!--------------------------------------------------------------------------------------------------
+
   !> Convert a short integer to an integer
+
   elemental function short2int(iShortVal)    result(iValue)
 
     integer (kind=c_short), intent(in)    :: iShortVal
@@ -453,6 +576,7 @@ contains
 !--------------------------------------------------------------------------------------------------
 
   !> Convert a character value into a integer
+
   elemental function char2int(sValue)  result(iValue)
 
     character (len=*), intent(in) :: sValue
@@ -486,6 +610,7 @@ contains
 !--------------------------------------------------------------------------------------------------
 
 !> Convert a real value into a integer
+
 elemental function real2int(rValue)  result(iValue)
 
   real (kind=c_float), intent(in) :: rValue
@@ -498,6 +623,7 @@ end function real2int
 !--------------------------------------------------------------------------------------------------
 
 !> Convert a double-precision value to an integer
+
 elemental function dbl2int(rValue)  result(iValue)
 
   real (kind=c_double), intent(in) :: rValue
@@ -510,6 +636,7 @@ end function dbl2int
 !--------------------------------------------------------------------------------------------------
 
 !> Convert a character value into a real
+
 elemental function char2real(sValue)  result(rValue)
 
   character (len=*), intent(in) :: sValue
@@ -526,7 +653,21 @@ end function char2real
 
 !--------------------------------------------------------------------------------------------------
 
+!> Convert a short int value into a real
+
+elemental function short2real(iValue)  result(rValue)
+
+  integer (kind=c_short), intent(in) :: iValue
+  real (kind=c_float)                :: rValue
+
+  rValue = real(iValue, kind=c_float)
+
+end function short2real
+
+!--------------------------------------------------------------------------------------------------
+
 !> Convert an int value into a real
+
 elemental function int2real(iValue)  result(rValue)
 
   integer (kind=c_int), intent(in) :: iValue
@@ -539,6 +680,7 @@ end function int2real
 !--------------------------------------------------------------------------------------------------
 
 !> Convert a dbl value into a real
+
 elemental function dbl2real(dpValue)  result(rValue)
 
   real (kind=c_double), intent(in) :: dpValue
@@ -551,6 +693,7 @@ end function dbl2real
 !--------------------------------------------------------------------------------------------------
 
 !> Convert a character value into a double
+
 elemental function char2dbl(sValue)  result(dValue)
 
   character (len=*), intent(in)    :: sValue
@@ -567,7 +710,21 @@ end function char2dbl
 
 !--------------------------------------------------------------------------------------------------
 
+!> Convert a short int value into a double
+
+elemental function short2dbl(iValue)  result(dValue)
+
+  integer (kind=c_short), intent(in) :: iValue
+  real (kind=c_double)               :: dValue
+
+  dValue = real(iValue, kind=c_double)
+
+end function short2dbl
+
+!--------------------------------------------------------------------------------------------------
+
 !> Convert an int value into a double
+
 elemental function int2dbl(iValue)  result(dValue)
 
   integer (kind=c_int), intent(in) :: iValue
@@ -580,6 +737,7 @@ end function int2dbl
 !--------------------------------------------------------------------------------------------------
 
 !> Convert a real value into a double
+
 elemental function real2dbl(fValue)  result(dValue)
 
   real (kind=c_float), intent(in) :: fValue

@@ -1,7 +1,7 @@
 module string_list
 
-  use iso_c_binding, only             : c_int, c_float
-  use constants_and_conversions, only : asInt, asFloat
+  use iso_c_binding, only             : c_int, c_float, c_bool
+  use constants_and_conversions, only : asInt, asFloat, asLogical
   use strings
   use logfiles, only                  : LOG_DEBUG
   use exceptions
@@ -43,6 +43,7 @@ module string_list
     procedure :: list_items_deallocate_all_sub
     procedure :: list_return_all_as_float_fn
     procedure :: list_return_all_as_int_fn
+    procedure :: list_return_all_as_logical_fn
     procedure :: list_subset_partial_matches_fn
     final     :: list_finalize_sub
 
@@ -58,6 +59,7 @@ module string_list
     generic :: clear         => list_items_deallocate_all_sub
     generic :: asFloat       => list_return_all_as_float_fn
     generic :: asInt         => list_return_all_as_int_fn
+    generic :: asLogical     => list_return_all_as_logical_fn
 
   end type STRING_LIST_T
 
@@ -343,6 +345,36 @@ contains
     enddo
 
   end function list_return_all_as_int_fn
+
+!--------------------------------------------------------------------------------------------------
+
+  function list_return_all_as_logical_fn(this)    result(lValues)
+
+    class (STRING_LIST_T), intent(in)     :: this
+    logical (kind=c_bool), allocatable     :: lValues(:)
+
+    ! [ LOCALS ]
+    class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
+    integer (kind=c_int)                      :: iStat
+    integer (kind=c_int)                      :: iIndex
+
+    allocate( lValues( this%count ), stat=iStat )
+    if (iStat /= 0)  call die("Failed to allocate memory for list conversion", __FILE__, __LINE__)
+
+    current => this%first
+    iIndex = 0
+
+    do while ( associated( current ) .and. iIndex < ubound(lValues,1) )
+
+      iIndex = iIndex + 1
+
+      lValues(iIndex) = asLogical( current%s )
+      
+      current => current%next
+
+    enddo
+
+  end function list_return_all_as_logical_fn
 
 !--------------------------------------------------------------------------------------------------
 

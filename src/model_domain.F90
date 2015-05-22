@@ -104,8 +104,10 @@ module model_domain
     procedure ( simple_method ), pointer         :: calc_snowfall          => model_calculate_snowfall_original
     procedure ( simple_method ), pointer         :: calc_snowmelt          => model_calculate_snowmelt_original    
     procedure ( simple_method ), pointer         :: get_precipitation_data => model_get_precip_normal
-    procedure ( simple_method ), pointer         :: get_air_temperature_data                                       &     
-                                                                           => model_get_air_temperature_normal
+    procedure ( simple_method ), pointer         :: get_minimum_air_temperature_data                                       &     
+                                                                           => model_get_minimum_air_temperature_normal
+    procedure ( simple_method ), pointer         :: get_maximum_air_temperature_data                                       &     
+                                                                           => model_get_maximum_air_temperature_normal
     procedure ( simple_method ), pointer         :: calc_fog               => model_calculate_fog_none
 
   contains
@@ -257,7 +259,7 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
-    integer (kind=c_int)  :: iStat(30)
+    integer (kind=c_int)  :: iStat(31)
 
     iCount = count( this%active )
 
@@ -290,8 +292,9 @@ contains
     allocate( this%fog(iCount), stat=iStat(27) )
     allocate( this%stream_storage(iCount), stat=iStat(28) )
     allocate( this%index_order(iCount), stat=iStat(29) )
+    allocate( this%gdd(iCount), stat=iStat(30) )
 
-    allocate( OUTPUT(16), stat=iStat(30) )
+    allocate( OUTPUT(16), stat=iStat(31) )
 
     if ( any( iStat /= 0 ) )  call die("Problem allocating memory", __FILE__, __LINE__)
 
@@ -768,7 +771,8 @@ contains
       ! the following statements process the raw data in order to get it into the 
       ! right units or properly pack the data
       call this%get_precipitation_data()
-      call this%get_air_temperature_data()
+      call this%get_minimum_air_temperature_data()
+      call this%get_maximum_air_temperature_data()
 
       ! partition preciptation into rainfall and snowfall fractions
       call this%calc_snowfall()
@@ -997,7 +1001,10 @@ contains
     if (.not. associated( this%get_precipitation_data ) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
-    if (.not. associated( this%get_air_temperature_data ) ) &
+    if (.not. associated( this%get_minimum_air_temperature_data ) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+
+    if (.not. associated( this%get_maximum_air_temperature_data ) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
   end subroutine preflight_check_method_pointers
@@ -1805,6 +1812,20 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)       :: this
     integer (kind=c_int), intent(in), optional  :: index
 
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iIndex
+
+!  soil_moisture_thornthwaite_mather_calculate(fAPWL, fSoilStorage, fSoilStorage_Excess,                &
+!                                             fActual_ET, fSoilStorage_Max, fInfiltration, fReference_ET)
+
+!     real (kind=c_float), intent(inout)   :: fAPWL
+!     real (kind=c_float), intent(inout)   :: fSoilStorage
+!     real (kind=c_float), intent(out)     :: fSoilStorage_Excess
+!     real (kind=c_float), intent(out)     :: fActual_ET
+!     real (kind=c_float), intent(in)      :: fSoilStorage_Max
+!     real (kind=c_float), intent(in)      :: fInfiltration
+!     real (kind=c_float), intent(in)      :: fReference_ET
+    
     if ( present( index ) ) then
 
       call soil_moisture_FAO56_calculate( fSoilStorage=this%soil_storage(index),                             &
@@ -1821,13 +1842,21 @@ contains
 
     else
 
-!       call soil_moisture_FAO56_calculate(fAPWL=APWL,                                    &
-!                                                         fSoilStorage=this%soil_storage,               &
-!                                                         fSoilStorage_Excess=this%potential_recharge,  &
-!                                                         fActual_ET=this%actual_ET,                    &
-!                                                         fSoilStorage_Max=this%soil_storage_max,       &
-!                                                         fInfiltration=this%infiltration,              &
-!                                                         fReference_ET=this%reference_ET0_adj )
+      do iIndex=1, ubound(this%soil_storage,1)
+
+        call soil_moisture_FAO56_calculate( fSoilStorage=this%soil_storage(iIndex),                             &
+                                            fActual_ET=this%actual_ET(iIndex),                                  &
+                                            fSoilStorage_Excess=this%potential_recharge(iIndex),                &
+                                            fInfiltration=this%infiltration(iIndex),                            &
+                                            fGDD=this%gdd(iIndex),                                              &
+                                            fAvailableWaterCapacity=this%awc(iIndex),                           &
+                                            fReference_ET0=this%reference_ET0_adj(iIndex),                      &
+                                            fRootingDepth=ROOTING_DEPTH( this%landuse_Index(iIndex),            &
+                                                                        this%soil_group(iIndex) ),              &
+                                            iLanduseIndex=this%landuse_index(iIndex),                           &
+                                            iSoilGroup=this%soil_group(iIndex) )
+
+      enddo
 
     endif
 
@@ -1891,24 +1920,53 @@ contains
 
 !--------------------------------------------------------------------------------------------------
  
-  subroutine model_get_air_temperature_normal(this)
+  subroutine model_get_maximum_air_temperature_normal(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     ! [ LOCALS ]
-    type (DATA_CATALOG_ENTRY_T), pointer :: pPRCP
     integer (kind=c_int) :: iJulianDay
     integer (kind=c_int) ::iMonth
     integer (kind=c_int) ::iDay
     integer (kind=c_int) ::iYear
 
     type (DATA_CATALOG_ENTRY_T), pointer :: pTMAX
-    type (DATA_CATALOG_ENTRY_T), pointer :: pTMIN
 
     pTMAX => DAT%find("TMAX")
     if ( .not. associated(pTMAX) ) &
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
 
+    associate ( dt => SIM_DT%curr )
+
+      iJulianDay = dt%getJulianDay()
+      iMonth = asInt( dt%iMonth )
+      iDay = asInt( dt%iDay )
+      iYear = dt%iYear
+  
+      call pTMAX%getvalues( iMonth, iDay, iYear, iJulianDay )
+
+    end associate
+
+    if (.not. associated(pTMAX%pGrdBase) ) &
+      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
+
+    this%tmax = pack( pTMAX%pGrdBase%rData, this%active )
+
+  end subroutine model_get_maximum_air_temperature_normal  
+
+!--------------------------------------------------------------------------------------------------
+ 
+  subroutine model_get_minimum_air_temperature_normal(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iJulianDay
+    integer (kind=c_int) ::iMonth
+    integer (kind=c_int) ::iDay
+    integer (kind=c_int) ::iYear
+
+    type (DATA_CATALOG_ENTRY_T), pointer :: pTMIN
 
     pTMIN => DAT%find("TMIN")
     if ( .not. associated(pTMIN) ) &
@@ -1921,32 +1979,16 @@ contains
       iDay = asInt( dt%iDay )
       iYear = dt%iYear
   
-      ! next two statements retrieve the data from the raw or native form  
       call pTMIN%getvalues( iMonth, iDay, iYear, iJulianDay )
 
-      call pTMAX%getvalues( iMonth, iDay, iYear, iJulianDay )
-
-      ! the following statements process the raw data in order to get it into the 
-      ! right units or properly pack the data
-      call this%get_precipitation_data()
-!      this%gross_precip = pack( PRCP%pGrdBase%rData, this%active )
-
-    if (.not. associated(pTMAX%pGrdBase) ) &
-      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
+    end associate
 
     if (.not. associated(pTMIN%pGrdBase) ) &
       call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
 
-      this%tmax = pack( pTMAX%pGrdBase%rData, this%active )
-      this%tmin = pack( pTMIN%pGrdBase%rData, this%active )
-      this%tmean = ( this%tmax + this%tmin ) / 2.0_c_float
+    this%tmin = pack( pTMIN%pGrdBase%rData, this%active )
 
-      ! partition preciptation into rainfall and snowfall fractions
-      call this%calc_snowfall()
-
-    end associate
-
-  end subroutine model_get_air_temperature_normal  
+  end subroutine model_get_minimum_air_temperature_normal  
 
 !--------------------------------------------------------------------------------------------------
  
