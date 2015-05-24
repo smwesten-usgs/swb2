@@ -134,8 +134,9 @@ contains
 
           sDatetime = make_timestamp()
 
-          write(this%iUnitNum(iIndex), fmt="(a)") "SWB version "//SWB_VERSION//" compiled on "//COMPILATION_TIMESTAMP         
-          write(this%iUnitNum(iIndex), fmt="(a,/)") "Model run started on "//sDatetime          
+          write(this%iUnitNum(iIndex), fmt="(a,/)") "# USGS Soil Water Balance Code run log #"
+          write(this%iUnitNum(iIndex), fmt="(a,/)") "## Model run started on "//sDatetime//" ##"          
+          write(this%iUnitNum(iIndex), fmt="(a)") "## SWB version "//SWB_VERSION//" compiled on "//COMPILATION_TIMESTAMP//" ##"          
    
         else
 
@@ -315,7 +316,7 @@ contains
 
       if ( iLinesBefore > 0 ) then
         do iIndex=1, iLinesBefore
-          write(UNIT=iLU, FMT="(a)" ) ""
+          write(UNIT=iLU, FMT="(a,2x)" ) ""
         enddo
       endif    
 
@@ -323,14 +324,14 @@ contains
 
         ! break up string with '~' as delimiter
         call split(sRecord, sItem)
-        write(sFmt, fmt="('(t',i0,' ,a',i0,')')") iTab, len_trim(sItem)
+        write(sFmt, fmt="('(t',i0,' ,a)')") iTab
         if(len_trim(sItem) == 0) exit
-        write(UNIT=iLU,FMT=trim(sFmt) ) trim(sItem)
+        write(UNIT=iLU,FMT=trim(sFmt) ) trim(sItem)//"  "
       enddo
 
       if ( iLinesAfter > 0 ) then
         do iIndex=1, iLinesAfter
-          write(UNIT=iLU,FMT="(a)" ) ""
+          write(UNIT=iLU,FMT="(a,2x)" ) ""
         enddo
       endif    
 

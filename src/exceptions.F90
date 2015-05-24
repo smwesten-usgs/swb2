@@ -82,20 +82,20 @@ contains
       write(unit=sNumWarnings, fmt="(i0)") NUMBER_OF_FATAL_WARNINGS
       call LOGS%write( "** "//trim(adjustl(sNumWarnings))//" FATAL WARNING"//trim(sBigS)//" DETECTED IN INPUT **", iLinesBefore=1, iLinesAfter=1 )
    
-      call LOGS%write( "Summary of fatal warning"//trim(sLittleS)//": ", iTab=4 )
-      call LOGS%write( "-------------------------- ", iLinesAfter=1, iTab=4 )
+      call LOGS%write( "# Summary of fatal warning"//trim(sLittleS)//"#" )
+      call LOGS%write( "-------------------------- ", iLinesAfter=1 )
 
       do iIndex = 1, NUMBER_OF_FATAL_WARNINGS
         if (iIndex <= MAX_FATAL_WARNINGS ) then
           write(unit=sIndex, fmt="(i0)") iIndex
-          call LOGS%write( trim(adjustl(sIndex))//") "//trim(WARNING_TEXT(iIndex)), iTab=4 )
+          call LOGS%write( trim(adjustl(sIndex))//") "//trim(WARNING_TEXT(iIndex)) )
         endif
       enddo
 
       if ( NUMBER_OF_FATAL_WARNINGS > MAX_FATAL_WARNINGS ) then
         write(unit=sMaxWarnings, fmt="(i0)") MAX_FATAL_WARNINGS
-        call LOGS%write( "There were more than "//trim(adjustl(sMaxWarnings))//" fatal warnings. " &
-          //" Only a partial list of warnings is shown above.", iLinesAfter=1, iTab=2 )
+        call LOGS%write( "*There were more than "//trim(adjustl(sMaxWarnings))//" fatal warnings. " &
+          //" Only a partial list of warnings is shown above.*", iLinesAfter=1, iTab=2 )
       endif  
 
       call die( sMessage="Fatal warning"//trim(sLittleS)//" associated with input.", &

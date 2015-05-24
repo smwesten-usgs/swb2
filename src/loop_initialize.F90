@@ -262,7 +262,7 @@ contains
         sArgText = myOptions%get(1, myOptions%count )
 
         ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(">> "//sCmdText//" "//sArgText, iLogLevel=LOG_GENERAL, iTab=4)
+        call LOGS%write(sCmdText//" "//sArgText, iLogLevel=LOG_GENERAL, iTab=4)
 
         ! most of the time, we only care about the first dictionary entry, obtained below
         sArgText_1 = myOptions%get(1)
@@ -436,7 +436,7 @@ contains
     sArgText = myOptions%get(1, myOptions%count )
 
     ! echo the original directive and dictionary entries to the logfile
-    call LOGS%write(">> "//"GRID "//sArgText)
+    call LOGS%write("GRID "//sArgText, iTab=4)
 
     iNX = asInt( myOptions%get(1) )
     iNY = asInt( myOptions%get(2) )
@@ -478,7 +478,7 @@ contains
     sArgText = myOptions%get(1, myOptions%count )
 
     ! echo the original directive and dictionary entries to the logfile
-    call LOGS%write(">> "//"BASE_PROJECTION_DEFINITION "//sArgText)
+    call LOGS%write("BASE_PROJECTION_DEFINITION "//sArgText, iTab=4)
 
     ! BNDS is a module-level data structure that will be used in other modules to 
     ! supply bounding box information for the SWB project area
@@ -564,7 +564,7 @@ contains
         sArgText = myOptions%get(1, myOptions%count )
 
         ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(">> "//sCmdText//" "//sArgText)
+        call LOGS%write(sCmdText//" "//sArgText, iTab=4)
 
         ! most of the time, we only care about the first dictionary entry, obtained below
         sOptionText = myOptions%get(1)
@@ -655,7 +655,7 @@ contains
         sArgText = myOptions%get(1, myOptions%count )
 
         ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(">> "//sCmdText//" "//sArgText)
+        call LOGS%write(sCmdText//" "//sArgText, iTab=4)
 
         ! most of the time, we only care about the first dictionary entry, obtained below
         sOptionText = myOptions%get(1)
@@ -727,7 +727,7 @@ subroutine initialize_generic_method( sKey )
       sArgText = myOptions%get(1, myOptions%count )
 
       ! echo the original directive and dictionary entries to the logfile
-      call LOGS%write(">> "//sCmdText//" "//sArgText)
+      call LOGS%write(sCmdText//" "//sArgText, iTab=4)
 
       ! most of the time, we only care about the first dictionary entry, obtained below
       sOptionText = myOptions%get(1)
