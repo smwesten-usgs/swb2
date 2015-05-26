@@ -91,6 +91,7 @@ module model_domain
     procedure ( simple_method ), pointer         :: init_snowmelt           => model_initialize_snowmelt_original
     procedure ( simple_method ), pointer         :: init_precipitation_data => model_initialize_precip_normal
     procedure ( simple_method ), pointer         :: init_fog                => model_initialize_fog_none
+    procedure ( simple_method ), pointer         :: init_irrigation         => model_initialize_irrigation_none
 
     procedure ( simple_method ), pointer         :: calc_interception      => model_calculate_interception_bucket
 
@@ -102,13 +103,18 @@ module model_domain
     procedure ( simple_method_w_optional ), pointer  :: calc_soil_moisture => model_calculate_soil_moisture_thornthwaite_mather
     
     procedure ( simple_method ), pointer         :: calc_snowfall          => model_calculate_snowfall_original
-    procedure ( simple_method ), pointer         :: calc_snowmelt          => model_calculate_snowmelt_original    
+    procedure ( simple_method ), pointer         :: calc_snowmelt          => model_calculate_snowmelt_original  
+    procedure ( simple_method ), pointer         :: calc_fog               => model_calculate_fog_none
+    procedure ( simple_method ), pointer         :: calc_irrigation        => model_calculate_irrigation_none
+
+    procedure (simple_method), pointer           :: output_soil_moisture   => model_output_irrigation_none
+    procedure (simple_method), pointer           :: output_irrigation      => model_output_irrigation_none
+
     procedure ( simple_method ), pointer         :: get_precipitation_data => model_get_precip_normal
     procedure ( simple_method ), pointer         :: get_minimum_air_temperature_data                                       &     
                                                                            => model_get_minimum_air_temperature_normal
     procedure ( simple_method ), pointer         :: get_maximum_air_temperature_data                                       &     
                                                                            => model_get_maximum_air_temperature_normal
-    procedure ( simple_method ), pointer         :: calc_fog               => model_calculate_fog_none
 
   contains
 
@@ -1793,6 +1799,16 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  subroutine model_output_soil_moisture_none( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)       :: this
+    
+    ! nothing to do here.
+
+  end subroutine model_output_soil_moisture_none
+
+!--------------------------------------------------------------------------------------------------
+
   subroutine model_initialize_soil_moisture_fao_56( this )
 
     use soil_moisture__FAO_56
@@ -1861,6 +1877,43 @@ contains
     endif
 
   end subroutine model_calculate_soil_moisture_fao_56
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_output_soil_moisture_fao_56( this )
+
+    use soil_moisture__FAO_56
+
+    class (MODEL_DOMAIN_T), intent(inout)       :: this
+
+  end subroutine model_output_soil_moisture_fao_56
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_irrigation_none( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    !> Nothing here to see. Initialization not really needed for the "normal" method.
+
+  end subroutine model_initialize_irrigation_none
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_irrigation_none( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    !> Nothing here to see. 
+
+  end subroutine model_calculate_irrigation_none
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_output_irrigation_none( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    !> Nothing here to see. 
+
+  end subroutine model_output_irrigation_none
 
 !--------------------------------------------------------------------------------------------------
 

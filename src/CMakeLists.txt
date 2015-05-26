@@ -20,6 +20,7 @@ if(TARGET__SWB_EXECUTABLE)
             grid.F90
             interception__bucket.F90
             interception__gash.F90
+            irrigation.F90
             logfiles.F90
             loop_initialize.F90
             #loop_iterate.F90
@@ -237,6 +238,7 @@ if(TARGET__SWB_LIBRARY)
             grid.F90
             interception__bucket.F90
             interception_gash.F90
+            irrigation.F90
             logfiles.F90
             loop_initialize.F90
             #loop_iterate.F90
