@@ -1,4 +1,4 @@
-module loop_initialize
+module model_initialize
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
   use constants_and_conversions, only : lTRUE, lFALSE, asFloat, BNDS
@@ -30,6 +30,7 @@ module loop_initialize
 
   type METHODS_LIST_T
     character (len=23)     :: sName
+    logical (kind=c_bool)  :: lOptional
   end type METHODS_LIST_T
 
   type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(19) = &
@@ -55,14 +56,14 @@ module loop_initialize
       GRIDDED_DATASETS_T("RELATIVE_HUMIDITY            ", lTRUE, DATATYPE_FLOAT )   ]
 
   type (METHODS_LIST_T), parameter  :: KNOWN_METHODS(8) =   &
-    [ METHODS_LIST_T("INTERCEPTION           "),            &
-      METHODS_LIST_T("EVAPOTRANSPIRATION     "),            &
-      METHODS_LIST_T("RUNOFF                 "),            &
-      METHODS_LIST_T("PRECIPITATION          "),            &
-      METHODS_LIST_T("FOG                    "),            &
-      METHODS_LIST_T("SOIL_MOISTURE          "),            &
-      METHODS_LIST_T("IRRIGATION             "),            &
-      METHODS_LIST_T("FLOW_ROUTING           ")    ]
+    [ METHODS_LIST_T("INTERCEPTION           ", lFALSE),    &
+      METHODS_LIST_T("EVAPOTRANSPIRATION     ", lFALSE),    &
+      METHODS_LIST_T("RUNOFF                 ", lFALSE),    &
+      METHODS_LIST_T("PRECIPITATION          ", lFALSE),    &
+      METHODS_LIST_T("FOG                    ", lTRUE),     &
+      METHODS_LIST_T("SOIL_MOISTURE          ", lFALSE),    &
+      METHODS_LIST_T("IRRIGATION             ", lTRUE),     &
+      METHODS_LIST_T("FLOW_ROUTING           ", lFALSE)  ]
 
 contains
 
@@ -151,9 +152,9 @@ contains
     ! present in the control file (e.g. TMAX_ADD_OFFSET, TMAX_NETCDF_X_VAR, etc.)
     do iIndex = 1, ubound(KNOWN_GRIDS, 1)
 
-      call initialize_generic_grid( sKey=KNOWN_GRIDS(iIndex)%sName, &
-         lOptional=KNOWN_GRIDS(iIndex)%lOptional,                   &
-         iDataType=KNOWN_GRIDS(iIndex)%iDataType )
+      call initialize_generic_grid( sKey=KNOWN_GRIDS(iIndex)%sName,            &
+                                    lOptional=KNOWN_GRIDS(iIndex)%lOptional,   &
+                                    iDataType=KNOWN_GRIDS(iIndex)%iDataType )
    
     enddo
 
@@ -161,7 +162,8 @@ contains
     ! (e.g. EVAPOTRANSPIRATION_METHOD HARGREAVES-SAMANI )
     do iIndex = 1, ubound(KNOWN_METHODS, 1)
 
-      call initialize_generic_method( sKey=KNOWN_METHODS(iIndex)%sName )
+      call initialize_generic_method( sKey=KNOWN_METHODS( iIndex )%sName,              &
+                                      lOptional=KNOWN_METHODS( iIndex )%lOptional )
    
     enddo
     
@@ -689,9 +691,10 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-subroutine initialize_generic_method( sKey )
+subroutine initialize_generic_method( sKey, lOptional)
 
-  character (len=*), intent(in)    :: sKey
+  character (len=*), intent(in)     :: sKey
+  logical (kind=c_bool), intent(in) :: lOptional
 
   ! [ LOCALS ]
   type (STRING_LIST_T)             :: myDirectives
@@ -701,14 +704,17 @@ subroutine initialize_generic_method( sKey )
   character (len=:), allocatable   :: sOptionText
   character (len=:), allocatable   :: sArgText
   integer (kind=c_int)             :: iStat
+  logical (kind=c_bool)            :: lFatal
 
   ! obtain a list of control file directives whose key values contain the string sKey
   myDirectives = CF_DICT%grep_keys( trim(sKey) )
     
+  lFatal = .not. lOptional
+
   if ( myDirectives%count == 0 ) then
 
     call warn("Your control file is missing any of the required directives relating to "//dquote(sKey)//" method.", &
-      lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+      lFatal = lFatal, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
   else  
   
@@ -755,4 +761,4 @@ end subroutine initialize_generic_method
   end subroutine check_for_fatal_warnings
 
 
-end module loop_initialize
+end module model_initialize

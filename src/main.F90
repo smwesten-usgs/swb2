@@ -8,10 +8,11 @@
 !> to the control_setModelOptions routine in module \ref control.
 program main
 
-  use iso_c_binding, only   : c_short, c_int, c_float, c_double
-  use logfiles, only        : LOGS, LOG_DEBUG, SWB_VERSION
-  use loop_initialize, only : initialize_options, check_for_fatal_warnings, read_control_file
-  use model_domain, only    : MODEL
+  use iso_c_binding, only    : c_short, c_int, c_float, c_double
+  use logfiles, only         : LOGS, LOG_DEBUG, SWB_VERSION
+  use model_initialize, only : initialize_options, check_for_fatal_warnings, read_control_file
+  use model_domain, only     : MODEL
+  use model_iterate, only    : iterate_over_simulation_days
   use iso_fortran_env
 
   implicit none

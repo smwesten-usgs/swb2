@@ -2,7 +2,7 @@
 
 ## Model Theory
 
-The SWB code uses a modified Thornthwaite-Mather soil-moisture accounting method @cite <thornthwaite_instructions_1957> to calculate recharge; recharge is calculated separately for each grid cell in the model domain. Sources and sinks of water within each grid cell are determined on the basis of input climate data and landscape characteristics; recharge is calculated as the difference between the change in soil moisture and these sources and sinks (eq.~\ref{eq:swb_mass_bal}):
+The SWB code uses a modified Thornthwaite-Mather soil-moisture accounting method \cite thornthwaite_instructions_1957 to calculate recharge; recharge is calculated separately for each grid cell in the model domain. Sources and sinks of water within each grid cell are determined on the basis of input climate data and landscape characteristics; recharge is calculated as the difference between the change in soil moisture and these sources and sinks (eq.~\ref{eq:swb_mass_bal}):
 
 
 \f{equation}{
@@ -26,8 +26,7 @@ Snowmelt is based on a temperature-index method. In the SWB code it is assumed t
 The curve number method defines runoff in relation to the difference between precipitation and an \quotes{initial abstraction} term. Conceptually, this initial abstraction term represents the summation of all processes that might act to reduce runoff, including interception by plants and fallen leaves, depression storage, and infiltration (Woodward and others, 2003). Equation 2 is used to calculate runoff volumes (Woodward and others, 2002):
 
 \f{equation}{
-R =  \dfrac{(P - I_a)^2}{(P + [S_{max} - I_a])} %\mbox{,}
-\label{eq:runoff_volumes_scs_cn}
+R =  \dfrac{(P - I_a)^2}{(P + [S_{max} - I_a])} \text{,}
 \f}
 
 where $R$ is runoff, $P$ is daily precipitation, $S_{max}$ is the maximum soil-moisture holding capacity, and $I_a$ is initial abstraction, the amount of precipitation that must fall before any runoff is generated.

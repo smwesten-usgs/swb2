@@ -714,7 +714,7 @@ contains
 
     pCOORD_GRD => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
         rX0=this%X_ll, rY0=this%Y_ll, &
-        rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_INT )  
+        rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
 
     allocate ( this%X(this%number_of_columns ) )
     allocate ( this%Y(this%number_of_rows ) )
@@ -731,6 +731,12 @@ contains
         sToPROJ4="+proj=lonlat +ellps=GRS80 +datum=WGS84 +no_defs" )
     
     this%latitude = pack( pCOORD_GRD%rY, this%active )
+
+    pCOORD_GRD%rData=pCOORD_GRD%rX
+    call grid_WriteArcGrid( sFilename="Longitude__calculated.asc", pGrd=pCOORD_GRD )
+    pCOORD_GRD%rData=pCOORD_GRD%rY
+    call grid_WriteArcGrid( sFilename="Latitude__calculated.asc", pGrd=pCOORD_GRD )
+
 
   end subroutine initialize_latitude_sub
 

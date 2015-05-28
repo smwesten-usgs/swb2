@@ -20,13 +20,14 @@ if(TARGET__SWB_EXECUTABLE)
             grid.F90
             interception__bucket.F90
             interception__gash.F90
-            irrigation.F90
+            #irrigation.F90
             logfiles.F90
-            loop_initialize.F90
             #loop_iterate.F90
             main.F90
             meteorological_calculations.F90
             model_domain.F90
+            model_initialize.F90
+            model_iterate.F90
             #model.F90
             netcdf4_support.F90
             netcdf_c_api_interfaces.F90
@@ -238,13 +239,14 @@ if(TARGET__SWB_LIBRARY)
             grid.F90
             interception__bucket.F90
             interception_gash.F90
-            irrigation.F90
+            #irrigation.F90
             logfiles.F90
-            loop_initialize.F90
             #loop_iterate.F90
             main.F90
             meteorological_calculations.F90
             model_domain.F90
+            model_initialize.F90
+            model_iterate.F90
             #model.F90
             netcdf4_support.F90
             netcdf_c_api_interfaces.F90

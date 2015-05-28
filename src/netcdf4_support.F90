@@ -2861,13 +2861,13 @@ subroutine nf_set_standard_variables(NCFILE, sVarName_z, lLatLon)
   if ( lLatLon_ ) then
 
     NCFILE%pNC_VAR(NC_LAT)%sVariableName = "lat"
-    NCFILE%pNC_VAR(NC_LAT)%iNC_VarType = NC_FLOAT
+    NCFILE%pNC_VAR(NC_LAT)%iNC_VarType = NC_DOUBLE
     NCFILE%pNC_VAR(NC_LAT)%iNumberOfDimensions = 2
     NCFILE%pNC_VAR(NC_LAT)%iNC_DimID = [NCFILE%pNC_DIM(NC_Y)%iNC_DimID, &
                                         NCFILE%pNC_DIM(NC_X)%iNC_DimID,0,0]
 
     NCFILE%pNC_VAR(NC_LON)%sVariableName = "lon"
-    NCFILE%pNC_VAR(NC_LON)%iNC_VarType = NC_FLOAT
+    NCFILE%pNC_VAR(NC_LON)%iNC_VarType = NC_DOUBLE
     NCFILE%pNC_VAR(NC_LON)%iNumberOfDimensions = 2
     NCFILE%pNC_VAR(NC_LON)%iNC_DimID = [NCFILE%pNC_DIM(NC_Y)%iNC_DimID, &
                                         NCFILE%pNC_DIM(NC_X)%iNC_DimID,0,0]
