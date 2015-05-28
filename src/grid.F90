@@ -1053,7 +1053,7 @@ subroutine grid_WriteArcGrid(sFilename, pGrd)
 
   elseif ( pGrd%iDataType == DATATYPE_REAL ) then
 
-    write ( unit=LU_TEMP, fmt="('NODATA_VALUE ',f14.3)", iostat=istat ) pGrd%rNoDataValue
+    write ( unit=LU_TEMP, fmt="('NODATA_VALUE ',f14.4)", iostat=istat ) pGrd%rNoDataValue
     call assert( istat==0, "Error writing NODATA value", trim(__FILE__), __LINE__)
     do iRow=1,iNumRows
       write( unit=LU_TEMP, fmt=TRIM(sBuf), iostat=istat ) &

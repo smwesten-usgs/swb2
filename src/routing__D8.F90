@@ -63,6 +63,7 @@ contains
 
     integer (kind=c_int) :: iCol_lbound, iCol_ubound
     integer (kind=c_int) :: iRow_lbound, iRow_ubound
+    integer (kind=c_int) :: iUnitNum
 
     type (GENERAL_GRID_T), pointer  :: pTempGrid
 
@@ -147,27 +148,43 @@ contains
 
     call routing_D8_determine_solution_order( lActive )    
 
-    open(27, file="D8_routing_table.txt", iostat=iStat, status="REPLACE")
+    open( newunit=iUnitNum, file="D8_routing_table.txt", iostat=iStat, status="REPLACE")
 
-    write(27,*) "ORDER_INDEX"//sTAB//"TARGET_INDEX"//sTAB//"From_COL"//sTAB//"From_ROW" &
-      //sTAB//"To_COL"//sTAB//"To_ROW"//"D8_flowdir"
+    write(iUnitNum,*) "ORDER_INDEX"//sTAB//"TARGET_INDEX"//sTAB//"From_COL"//sTAB//"From_ROW" &
+      //sTAB//"To_COL"//sTAB//"To_ROW"//sTAB//"D8_flowdir"//sTAB//"Num_Adjacent_Upslope_Connections"//sTAB &
+      //"Sum_of_Upslope_Contributing_Cells"
 
     do iIndex = 1, ubound(COL1D,1)
 
       sBuf = ""
 
-      write(sBuf,*)  ORDER_INDEX( iIndex ),sTAB, TARGET_INDEX( iIndex )
-      write(sBuf,*) trim(sBuf)//sTab//asCharacter(COL1D( ORDER_INDEX( iIndex ) ) )//sTAB &
-        //asCharacter( ROW1D( ORDER_INDEX( iIndex ) ) )
+      associate( Order_index => ORDER_INDEX( iIndex ),                                        &
+                 Target_index => TARGET_INDEX( iIndex ),                                      &
+                 Rownum => ROW1D( ORDER_INDEX( iIndex ) ),                                    &
+                 Colnum => COL1D( ORDER_INDEX( iIndex ) ),                                    &
+                 D8_flowdir => pD8_FLOWDIR%pGrdBase%iData( COL1D( ORDER_INDEX( iIndex ) ),    &
+                                  ROW1D( ORDER_INDEX( iIndex ) ) ),                           &
+                 Num_adjacent => iNumberOfUpslopeConnections( COL1D( ORDER_INDEX( iIndex ) ), &
+                                     ROW1D( ORDER_INDEX( iIndex ) ) ),                        &
+                 Sum_upslope => iSumOfUpslopeCells( COL1D( ORDER_INDEX( iIndex ) ),           &
+                                     ROW1D( ORDER_INDEX( iIndex ) ) )  )
 
-      if ( TARGET_INDEX( iIndex ) > 0 ) &
-        write(sBuf,*) trim(sBuf)//sTab//asCharacter(COL1D( TARGET_INDEX( iIndex ) ) )//sTAB &
-        //asCharacter( ROW1D( TARGET_INDEX( iIndex ) ) )//sTAB//asCharacter( pD8_FLOWDIR%pGrdBase%iData( COL1D( ORDER_INDEX( iIndex ) ), &
-          ROW1D( ORDER_INDEX( iIndex ) ) ) )
+        write(sBuf,*)  Order_index,sTAB, Target_index
+        write(sBuf,*) trim(sBuf)//sTab//asCharacter( Colnum )//sTAB &
+          //asCharacter( Rownum )
 
-      write(27,*)  trim(sBuf)  
+        if ( Target_index > 0 ) &
+          write(sBuf,*) trim(sBuf)//sTab//asCharacter( Colnum )//sTAB &
+          //asCharacter( Rownum )//sTAB//asCharacter( D8_flowdir )//sTAB &
+          //asCharacter( Num_adjacent )//sTAB//asCharacter( Sum_upslope )
+
+        write(iUnitNum,*)  trim(sBuf)  
+
+      end associate
 
     enddo
+
+    close ( iUnitNum )
 
   end subroutine routing_D8_initialize
 
