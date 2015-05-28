@@ -2,13 +2,13 @@
 
 ## Model Theory
 
-The SWB code uses a modified Thornthwaite-Mather soil-moisture accounting method \citep{thornthwaite_instructions_1957} to calculate recharge; recharge is calculated separately for each grid cell in the model domain. Sources and sinks of water within each grid cell are determined on the basis of input climate data and landscape characteristics; recharge is calculated as the difference between the change in soil moisture and these sources and sinks (eq.~\ref{eq:swb_mass_bal}):
+The SWB code uses a modified Thornthwaite-Mather soil-moisture accounting method @cite <thornthwaite_instructions_1957> to calculate recharge; recharge is calculated separately for each grid cell in the model domain. Sources and sinks of water within each grid cell are determined on the basis of input climate data and landscape characteristics; recharge is calculated as the difference between the change in soil moisture and these sources and sinks (eq.~\ref{eq:swb_mass_bal}):
 
 
-\f[
-   recharge = \underbrace{(rainfall + snowmelt + inflow)}_\text{sources} - \underbrace{(interception + outflow + ET)}_\text{sinks} - \underbrace{\Delta soil moisture}_\text{change in storage}  
+\f{equation}{
+   recharge = \underbrace{(rainfall + snowmelt + inflow)}_\text{sources} - \underbrace{(interception + outflow + ET)}_\text{sinks} - \underbrace{\Delta soil  \: moisture}_\text{change in storage}  
   \label{eq:swb_mass_bal}
-\f]
+\f}
 
 Each of the water-budget components given in equation ~\ref{eq:swb_mass_bal} is handled by one or more modules within the SWB model. Specific water-balance components are discussed briefly below.
 
@@ -25,27 +25,27 @@ Snowmelt is based on a temperature-index method. In the SWB code it is assumed t
 **outflow (or surface runoff).** from a cell is calculated by use of the U.S. Department of Agriculture, Natural Resources Conservation Service (NRCS) curve number rainfall-runoff relation (Cronshey and others, 1986). This rainfall-runoff relation is based on four basin properties: soil type, land use, surface condition, and antecedent runoff condition.
 The curve number method defines runoff in relation to the difference between precipitation and an \quotes{initial abstraction} term. Conceptually, this initial abstraction term represents the summation of all processes that might act to reduce runoff, including interception by plants and fallen leaves, depression storage, and infiltration (Woodward and others, 2003). Equation 2 is used to calculate runoff volumes (Woodward and others, 2002):
 
-\f[
+\f{equation}{
 R =  \dfrac{(P - I_a)^2}{(P + [S_{max} - I_a])} %\mbox{,}
 \label{eq:runoff_volumes_scs_cn}
-\f]
+\f}
 
 where $R$ is runoff, $P$ is daily precipitation, $S_{max}$ is the maximum soil-moisture holding capacity, and $I_a$ is initial abstraction, the amount of precipitation that must fall before any runoff is generated.
 
 The initial abstraction ($I_a$) term is related to a maximum storage term ($S_{max}$) as follows:
 
-\f[
+\f{equation}{
 I_a = 0.2 S_{max}
 \label{eq:initial_abstraction_scs_cn}
-\f]
+\f}
 
 
 The maximum storage term is defined by the curve number for the land-cover type under consideration:
 
-\f[
+\f{equation}{
 S_{max} = \left( \dfrac{1000}{CN}\right) - 10
 \label{eq:s_max_scs_cn}
-\f]
+\f}
 
 
 Curve numbers are adjusted upward or downward depending on how much precipitation has occurred in the previous 5-day period. The amount of precipitation that has fallen in the previous 5-day period is used to describe soil-moisture conditions; three classes of moisture conditions are defined and are called antecedent runoff condition I, II, and III, defined as shown in table~\ref{tab: antecedent_runoff_cond}.

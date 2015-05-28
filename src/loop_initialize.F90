@@ -32,7 +32,7 @@ module loop_initialize
     character (len=23)     :: sName
   end type METHODS_LIST_T
 
-  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(18) = &
+  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(19) = &
 
     [ GRIDDED_DATASETS_T("PRECIPITATION                ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("TMIN                         ", lFALSE, DATATYPE_FLOAT ),     &
@@ -50,16 +50,18 @@ module loop_initialize
       GRIDDED_DATASETS_T("STEMFLOW_FRACTION            ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("EVAPORATION_TO_RAINFALL_RATIO", lTRUE, DATATYPE_FLOAT ),      & 
       GRIDDED_DATASETS_T("RAINFALL_ADJUST_FACTOR       ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("RUNOFF_ZONE                  ", lTRUE, DATATYPE_INT ),        &                 
+      GRIDDED_DATASETS_T("RUNOFF_ZONE                  ", lTRUE, DATATYPE_INT ),        & 
+      GRIDDED_DATASETS_T("IRRIGATION_MASK              ", lTRUE, DATATYPE_INT),         &                
       GRIDDED_DATASETS_T("RELATIVE_HUMIDITY            ", lTRUE, DATATYPE_FLOAT )   ]
 
-  type (METHODS_LIST_T), parameter  :: KNOWN_METHODS(7) =   &
+  type (METHODS_LIST_T), parameter  :: KNOWN_METHODS(8) =   &
     [ METHODS_LIST_T("INTERCEPTION           "),            &
       METHODS_LIST_T("EVAPOTRANSPIRATION     "),            &
       METHODS_LIST_T("RUNOFF                 "),            &
       METHODS_LIST_T("PRECIPITATION          "),            &
       METHODS_LIST_T("FOG                    "),            &
       METHODS_LIST_T("SOIL_MOISTURE          "),            &
+      METHODS_LIST_T("IRRIGATION             "),            &
       METHODS_LIST_T("FLOW_ROUTING           ")    ]
 
 contains

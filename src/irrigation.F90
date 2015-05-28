@@ -30,7 +30,6 @@ module irrigation
   real (kind=c_float), allocatable   :: FRACTION_OF_IRRIGATION_FROM_GW(:)   
   integer (kind=c_int), allocatable  :: FIRST_DAY_OF_IRRIGATION(:)
   integer (kind=c_int), allocatable  :: LAST_DAY_OF_IRRIGATION(:)
-  integer (kind=c_int), allocatable  :: MAXIMUM_ALLOWABLE_DEPLETION_VECTOR(:)
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pIRRIGATION_MASK
 
@@ -74,26 +73,10 @@ contains
     call PARAMS%get_parameters( slKeys=slList, fValues=MAXIMUM_ALLOWABLE_DEPLETION, lFatal=lTRUE ) 
     call slList%clear()
 
-    allocate ( MAXIMUM_ALLOWABLE_DEPLETION_VECTOR( iNumActiveCells ), stat=iStat )
-    call allocate( iStat == 0, "Failed to allocate memory for MAXIMUM_ALLOWABLE_DEPLETION_VECTOR", __FILE__, __LINE__ )
-
     ! locate the data structure associated with the gridded irrigation mask entries
     pIRRIGATION_MASK => DAT%find("IRRIGATION_MASK")
     if ( .not. associated(pIRRIGATION_MASK) ) &
         call die("A IRRIGATION_MASK grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
-
-    do iIndex=lbound( MAXIMUM_ALLOWABLE_DEPLETION,1 ), ubound( MAXIMUM_ALLOWABLE_DEPLETION, 1)
-
-      where ( iLanduseIndex == iIndex )
-
-        MAXIMUM_ALLOWABLE_DEPLETION_VECTOR = MAXIMUM_ALLOWABLE_DEPLETION
-
-      end where
-      
-    enddo         
-
-
-
 
   end subroutine irrigation__initialize
 
@@ -150,8 +133,8 @@ contains
 
        ! do nothing 
 
-    else where ( MAXIMUM_ALLOWABLE_DEPLETION_VECTOR > 0.99         &
-         .or. fSoilStorage_Max < rNEAR_ZERO                      &
+    else where ( MAXIMUM_ALLOWABLE_DEPLETION( iLanduseIndex ) > 0.99         &
+         .or. fSoilStorage_Max < rNEAR_ZERO                                  &
          .or. iIrrigation_Mask == 0 )              
 
       ! do nothing

@@ -422,7 +422,6 @@ contains
     ! map the 2D array of RAINFALL_ADJUST_FACTOR values to the vector of active cells
     RAINFALL_ADJUST_FACTOR = pack( pRAINFALL_ADJUST_FACTOR%pGrdBase%rData, lActive )
 
-
     iMaxRainZones = maxval(FRAGMENTS%iRainGageZone)
 
     if ( iDay == 1 .or. lFirstCall ) then
