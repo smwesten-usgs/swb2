@@ -384,7 +384,7 @@ main_loop: do
                       ! current cells' running sum of upslope cells
 	 			              if(	lDownhillMarked( iColsrch, iRowsrch ) ) then
 
-                        iUpslopeSum = iUpslopeSum + iSumOfUpslopeCells(iColsrch, iRowsrch)
+                        iUpslopeSum = iUpslopeSum + iSumOfUpslopeCells(iColsrch, iRowsrch) + 1
                         iUpslopeConnections = iUpslopeConnections + 1 
 	 			           	  
                       ! add number of upslope cells and connections to temporary variables
@@ -484,11 +484,17 @@ main_loop: do
 
   	enddo main_loop
 
+    pTempGrid%iData = iSumOfUpslopeCells
+    call grid_WriteArcGrid("D8_Flow_Routing__Upslope_Contributing_Area.asc", pTempGrid)
+
+    pTempGrid%iData = iNumberOfUpslopeConnections
+    call grid_WriteArcGrid("D8_Flow_Routing__Number_of_Adjacent_Upslope_Connections.asc", pTempGrid)
+
+    call grid_Destroy( pTempGrid )
+
   end subroutine routing_D8_determine_solution_order
 
-
 !--------------------------------------------------------------------------------------------------
-
 
   subroutine routing_D8_calculate( fRunoff, fRunon )
 
