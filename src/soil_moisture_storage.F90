@@ -47,7 +47,7 @@ contains
     call PARAM_DICT%get_values( slList, iLanduseCodes )
     iNumberOfLanduses = count( iLanduseCodes > 0 )
 
-    allocate( ROOTING_DEPTH(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
+    allocate( MAX_ROOTING_DEPTH(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
     call assert( iStat == 0, "Failed to allocate memory for maximum rooting depth table", &
       __FILE__, __LINE__)
 
@@ -55,7 +55,7 @@ contains
     do iSoilsIndex = 1, iNumberOfSoilGroups
       sText = "RZ_"//asCharacter(iSoilsIndex)
       call PARAM_DICT%get_values( sText, RZ )
-      ROOTING_DEPTH(:, iSoilsIndex) = RZ
+      MAX_ROOTING_DEPTH(:, iSoilsIndex) = RZ
     enddo  
 
     water_capacity = pack(AWC, lActive)
@@ -68,7 +68,7 @@ contains
 
         where ( iLanduseIndex == iLUIndex .and. iSoilsGroup == iSoilsIndex )
 
-          fSoilStorage_Max = ROOTING_DEPTH( iLUIndex, iSoilsIndex ) * water_capacity
+          fSoilStorage_Max = MAX_ROOTING_DEPTH( iLUIndex, iSoilsIndex ) * water_capacity
 
         end where
 

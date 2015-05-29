@@ -47,6 +47,8 @@ module model_domain
 
     real (kind=c_float), allocatable       :: awc(:)
     real (kind=c_float), allocatable       :: gdd(:)
+
+    real (kind=c_float), allocatable       :: rooting_depth(:)
      
     real (kind=c_float), allocatable       :: latitude(:)
     real (kind=c_float), allocatable       :: reference_ET0(:)
@@ -67,7 +69,6 @@ module model_domain
     real (kind=c_float), allocatable       :: soil_storage(:)
     real (kind=c_float), allocatable       :: soil_storage_max(:)
     real (kind=c_float), allocatable       :: potential_recharge(:)
-    real (kind=c_float), allocatable       :: stream_storage(:)
          
     real (kind=c_float), allocatable       :: gross_precip(:)
     real (kind=c_float), allocatable       :: fog(:)
@@ -211,7 +212,7 @@ module model_domain
 
   type (NETCDF_FILE_COLLECTION_T), allocatable, public :: OUTPUT(:)
 
-  real (kind=c_float), allocatable  :: ROOTING_DEPTH(:,:)
+  real (kind=c_float), allocatable  :: MAX_ROOTING_DEPTH(:,:)
 
   type (GENERAL_GRID_T), pointer       :: pCOORD_GRD
 
@@ -296,7 +297,7 @@ contains
     allocate( this%soil_storage_max(iCount), stat=iStat(25) )
     allocate( this%potential_recharge(iCount), stat=iStat(26) )
     allocate( this%fog(iCount), stat=iStat(27) )
-    allocate( this%stream_storage(iCount), stat=iStat(28) )
+    allocate( this%rooting_depth(iCount), stat=iStat(28) )
     allocate( this%index_order(iCount), stat=iStat(29) )
     allocate( this%gdd(iCount), stat=iStat(30) )
 
@@ -869,14 +870,26 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
-    this%array_output = unpack(this%snowmelt, this%active, this%dont_care)
+!    this%array_output = unpack(this%snowmelt, this%active, this%dont_care)
 
-    call netcdf_put_variable_array(NCFILE=OUTPUT(7)%ncfile, &
-                   iVarID=OUTPUT(7)%ncfile%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=this%array_output )
+    !> @TODO convert the remaining calls from "netcdf_put_variable_array" to 
+    !! "netcdf_put_packed_variable"
+
+    call netcdf_put_packed_variable_array(NCFILE=OUTPUT(7)%ncfile,                                                             &
+                   iVarID=OUTPUT(7)%ncfile%iVarID(NC_Z),                                                                       &
+                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t],                              &
+                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],   &
+                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                                                      &
+                   lMask=this%active,                                                                                          &
+                   rValues=this%snowmelt,                                                                                      &
+                   rField=this%dont_care )
+
+!     call netcdf_put_variable_array(NCFILE=OUTPUT(7)%ncfile, &
+!                    iVarID=OUTPUT(7)%ncfile%iVarID(NC_Z), &
+!                    iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
+!                    iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
+!                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
+!                    rValues=this%array_output )
 
     this%array_output = unpack(this%snow_storage, this%active, this%dont_care)
 
@@ -1103,7 +1116,7 @@ contains
     call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCodes )
     iNumberOfLanduses = count( iLanduseCodes >= 0 )
 
-    allocate( ROOTING_DEPTH(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
+    allocate( MAX_ROOTING_DEPTH(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
     call assert( iStat == 0, "Failed to allocate memory for maximum rooting depth table", &
       __FILE__, __LINE__)
 
@@ -1111,7 +1124,7 @@ contains
     do iSoilsIndex = 1, iNumberOfSoilGroups
       sText = "RZ_"//asCharacter(iSoilsIndex)
       call PARAMS%get_parameters( sKey=sText, fValues=RZ )
-      ROOTING_DEPTH(:, iSoilsIndex) = RZ
+      MAX_ROOTING_DEPTH(:, iSoilsIndex) = RZ
     enddo  
 
 !     this%awc = pack(pAWC%pGrdBase%rData, this%active)
@@ -1132,7 +1145,7 @@ contains
         do iIndex = 1, ubound(this%soil_storage_max, 1)
     
           if ( this%landuse_index(iIndex) == iLUIndex .and. this%soil_group(iIndex) == iSoilsIndex ) then
-            this%soil_storage_max(iIndex) = ROOTING_DEPTH( iLUIndex, iSoilsIndex ) * this%awc(iIndex)
+            this%soil_storage_max(iIndex) = MAX_ROOTING_DEPTH( iLUIndex, iSoilsIndex ) * this%awc(iIndex)
           endif
 
         enddo
@@ -1857,7 +1870,7 @@ contains
                                           fGDD=this%gdd(index),                                              &
                                           fAvailableWaterCapacity=this%awc(index),                           &
                                           fReference_ET0=this%reference_ET0_adj(index),                      &
-                                          fRootingDepth=ROOTING_DEPTH( this%landuse_index(index),            &
+                                          fRootingDepth=MAX_ROOTING_DEPTH( this%landuse_index(index),            &
                                                                       this%soil_group(index) ),              &
                                           iLanduseIndex=this%landuse_index(index),                           &
                                           iSoilGroup=this%soil_group(index) )
@@ -1873,7 +1886,7 @@ contains
                                             fGDD=this%gdd(iIndex),                                              &
                                             fAvailableWaterCapacity=this%awc(iIndex),                           &
                                             fReference_ET0=this%reference_ET0_adj(iIndex),                      &
-                                            fRootingDepth=ROOTING_DEPTH( this%landuse_Index(iIndex),            &
+                                            fRootingDepth=MAX_ROOTING_DEPTH( this%landuse_Index(iIndex),            &
                                                                         this%soil_group(iIndex) ),              &
                                             iLanduseIndex=this%landuse_index(iIndex),                           &
                                             iSoilGroup=this%soil_group(iIndex) )
@@ -2241,7 +2254,6 @@ contains
     call minmaxmean( this%soil_storage, "soil_stor")
     call minmaxmean( this%soil_storage_max, "soil_stor_max")
     call minmaxmean( this%potential_recharge, "potential_recharge")
-    call minmaxmean( this%stream_storage, "stream_storage")
 
   end subroutine summarize_state_variables_sub
 

@@ -503,9 +503,6 @@ contains
 
   subroutine initialize_soils_landuse_awc_flowdir_values()
 
-!! this shouldnt be here....move to model_domain
-! 
-
       call MODEL%get_land_use()
 
       call MODEL%get_available_water_content()

@@ -24,7 +24,7 @@ module soil_moisture__thornthwaite_mather
 
   real (kind=c_float), allocatable, public  :: APWL(:)
   integer (kind=c_int), allocatable         :: iLanduseCodes(:)
-  real (kind=c_float), allocatable          :: ROOTING_DEPTH(:,:)
+  real (kind=c_float), allocatable          :: MAX_ROOTING_DEPTH(:,:)
 
 contains
 
