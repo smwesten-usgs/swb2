@@ -62,8 +62,8 @@ contains
 
     allocate( CANOPY_COVER_FRACTION( iCount ), stat=iStat )
     call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
-    allocate( STEMFLOW_FRACTION( iCount ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
+!    allocate( STEMFLOW_FRACTION( iCount ), stat=iStat )
+!    call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
     allocate( EVAPORATION_TO_RAINFALL_RATIO( iCount ), stat=iStat )
     call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
 
@@ -73,9 +73,9 @@ contains
         call die("A CANOPY_COVER_FRACTION grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
 
     ! locate the data structure associated with the gridded stemflow fraction
-    pSTEMFLOW_FRACTION => DAT%find("STEMFLOW_FRACTION")
-    if ( .not. associated(pSTEMFLOW_FRACTION) ) &
-        call die("A STEMFLOW_FRACTION grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
+!    pSTEMFLOW_FRACTION => DAT%find("STEMFLOW_FRACTION")
+!    if ( .not. associated(pSTEMFLOW_FRACTION) ) &
+!        call die("A STEMFLOW_FRACTION grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
 
     ! locate the data structure associated with the gridded evaporation to rainfall ratio
     pEVAPORATION_TO_RAINFALL_RATIO => DAT%find("EVAPORATION_TO_RAINFALL_RATIO")
@@ -93,7 +93,6 @@ contains
 
     CANOPY_COVER_FRACTION = pack( pCANOPY_COVER_FRACTION%pGrdBase%rData, lActive )
 
-
     call pSTEMFLOW_FRACTION%getvalues()
 
     pTempGrid=>grid_Create( BNDS%iNumCols, BNDS%iNumRows, BNDS%fX_ll, BNDS%fY_ll, &
@@ -105,7 +104,6 @@ contains
 
     STEMFLOW_FRACTION = pack( pSTEMFLOW_FRACTION%pGrdBase%rData, lActive )
 
-
     call pEVAPORATION_TO_RAINFALL_RATIO%getvalues()
 
     pTempGrid=>grid_Create( BNDS%iNumCols, BNDS%iNumRows, BNDS%fX_ll, BNDS%fY_ll, &
@@ -116,7 +114,6 @@ contains
     call grid_WriteArcGrid("Evaporation_to_Rainfall_Ratio__echo.asc", pTempGrid)
 
     EVAPORATION_TO_RAINFALL_RATIO = pack( pEVAPORATION_TO_RAINFALL_RATIO%pGrdBase%rData, lActive )
-
 
     !! now grab the table values needed for this module
 
@@ -164,13 +161,7 @@ contains
     allocate( TRUNK_STORAGE_CAPACITY( iCount ), stat=iStat )
     call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
 
-!    print *, "++++++++"
-!    print *, __FILE__, ": ", __LINE__
-!    print *, lbound(iLandUseTableCodes,1), ubound(iLandUseTableCodes,1), minval(iLanduseIndex),maxval(iLanduseIndex)
-
     do iIndex = lbound(iLandUseTableCodes,1), ubound(iLandUseTableCodes,1)
-
-!      print *, iIndex, CANOPY_STORAGE_CAPACITY_TABLE_VALUES( iIndex ), TRUNK_STORAGE_CAPACITY_TABLE_VALUES( iIndex )
 
       where (iLanduseIndex == iIndex)
 
@@ -209,57 +200,63 @@ contains
 
     Psat = - P_div_E * canopy_storage / canopy_cover_fraction * log( 1.0_c_float - E_div_P )
 
-
-
   end function precipitation_at_saturation  
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine interception_gash_calculate( fRainfall, fFog, fInterception )
+  elemental subroutine interception_gash_calculate( fRainfall, fFog, fCanopy_Cover_Fraction,       &
+                                                    fTrunk_Storage_Capacity, fStemflow_Fraction,   &
+                                                    fEvaporation_to_Rainfall_Ratio,                &
+                                                    fPrecipitation_at_Saturation, fInterception )
 
-    real (kind=c_float), intent(in)        :: fRainfall(:)
-    real (kind=c_float), intent(in)        :: fFog(:)
-    real (kind=c_float), intent(inout)     :: fInterception(:)
+    real (kind=c_float), intent(in)        :: fRainfall
+    real (kind=c_float), intent(in)        :: fFog
+    real (kind=c_float), intent(in)        :: fCanopy_Cover_Fraction
+    real (kind=c_float), intent(in)        :: fTrunk_Storage_Capacity
+    real (kind=c_float), intent(in)        :: fStemflow_Fraction    
+    real (kind=c_float), intent(in)        :: fEvaporation_to_Rainfall_Ratio    
+    real (kind=c_float), intent(in)        :: fPrecipitation_at_Saturation
+    real (kind=c_float), intent(inout)     :: fInterception
 
     ! [ LOCALS ]
-    real (kind=c_float), allocatable :: fGrossPrecip(:)
-    integer (kind=c_int)             :: index
-  
-    fGrossPrecip = fRainfall + fFog
+    real (kind=c_float)      :: fRainfall_plus_Fog(:)
+      
+    fRainfall_plus_Fog = fRainfall + fFog
 
-    where( fGrossPrecip < P_SAT )
+    if ( fRainfall_plus_Fog < fPrecipitation_at_Saturation ) then
 
-      fInterception = CANOPY_COVER_FRACTION * fGrossPrecip
+      fInterception = fCanopy_Cover_Fraction * fRainfall_plus_Fog
 
-    elsewhere ( fGrossPrecip > TRUNK_STORAGE_CAPACITY / STEMFLOW_FRACTION )
+    else if ( fRainfall_plus_Fog > fTrunk_Storage_Capacity / fStemflow_Fraction ) then
 
-      fInterception =   CANOPY_COVER_FRACTION * P_SAT                                                         &
-                      + CANOPY_COVER_FRACTION * EVAPORATION_TO_RAINFALL_RATIO * ( fGrossPrecip - P_SAT )      &
-                      + TRUNK_STORAGE_CAPACITY
+      fInterception =  fCanopy_Cover_Fraction * fPrecipitation_at_Saturation               &
+                      + fCanopy_Cover_Fraction * fEvaporation_to_Rainfall_Ratio            &
+                         * ( fRainfall_plus_Fog - fPrecipitation_at_Saturation )           &
+                      + fTrunk_Storage_Capacity
 
-    elsewhere 
+    else
 
-      fInterception =   CANOPY_COVER_FRACTION * P_SAT                                                         &
-                      + CANOPY_COVER_FRACTION * EVAPORATION_TO_RAINFALL_RATIO * ( fGrossPrecip - P_SAT )      &
-                      + STEMFLOW_FRACTION * fGrossPrecip
-    endwhere
+      fInterception =  fCanopy_Cover_Fraction * fPrecipitation_at_Saturation               &
+                      + fCanopy_Cover_Fraction * fEvaporation_to_Rainfall_Ratio            &
+                         * ( fRainfall_plus_Fog - fPrecipitation_at_Saturation )           &
+                      + fStemflow_Fraction * fRainfall_plus_Fog
+    end if
 
 
-    !  where (fRainfall)
-
+    !! HWB code:
 !                !! calc Precip needed to saturate canopy    
 !                 Psat=-( cancap( ilu(ip) ) / ( canfrac( ip )*cerf( ip ) ) ) &
 !                                 * log( ( 1 - cerf( ip ) ) / ( 1 - ( 1 - ceint2 ) * cerf( ip ) ) )
-!                 if(drf+dfog.lt.Psat)then
-!                    dcanint=canfrac(ip)*(drf+dfog)
-!                 elseif(drf+dfog.gt.tcap(ilu(ip))/tfrac(ip))then
-!                    dcanint=canfrac(ip)*Psat+canfrac(ip)*cerf(ip)*
-!      1                     (drf+dfog-Psat)+tcap(ilu(ip))
+!
+!                 if ( drf + dfog .lt. Psat )then
+!                    dcanint = canfrac(ip) * ( drf + dfog )
+!                 elseif ( drf + dfog .gt. tcap( ilu(ip) ) / tfrac(ip) ) then
+!                    dcanint = canfrac(ip) * Psat + canfrac(ip) * cerf(ip) * ( drf + dfog - Psat ) + tcap( ilu(ip) )
 !                 else
-!                    dcanint=canfrac(ip)*Psat+canfrac(ip)*cerf(ip)*
-!      1                     (drf+dfog-Psat)+tfrac(ip)*(drf+dfog)
+!                    dcanint = canfrac(ip) * Psat + canfrac(ip) * cerf(ip) *( drf + dfog - Psat ) + tfrac(ip) * ( drf + dfog )
 !                 endif
-!                 dpnet=drf+dfog-dcanint
+!
+!                 dpnet = drf + dfog - dcanint
  
   end subroutine interception_gash_calculate
 
