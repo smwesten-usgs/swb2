@@ -26,6 +26,7 @@ module precipitation__method_of_fragments
   use strings
   use string_list
   use simulation_datetime
+  use swb_grid
   implicit none
 
   private
@@ -108,6 +109,9 @@ contains
  
     ! map the 2D array of RAINFALL_ZONE values to the vector of active cells
     RAIN_GAGE_ID = pack( pRAINFALL_ZONE%pGrdBase%iData, lActive )
+
+    call grid_WriteArcGrid(sFilename="Rain_Gage_ID__as_read_into_SWB.asc", &
+      pGrd=pRAINFALL_ZONE%pGrdBase%iData )
 
     allocate( RAINFALL_ADJUST_FACTOR( count(lActive) ), stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )

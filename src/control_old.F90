@@ -1292,7 +1292,7 @@ subroutine control_setModelOptions(sControlFile)
     !************
     else if ( sItem == "LOOKUP_TABLE" ) then
       write(UNIT=LU_LOG,FMT=*) "Lookup table specified. Filename: "//dquote(sRecord)
-      call PARAM_FILES%add( (trim(sRecord) ) )
+      call PARAMS%add_file( (trim(sRecord) ) )
 
     else if ( sItem == "BASIN_MASK" ) then
       write(UNIT=LU_LOG,FMT=*) "Populating basin mask grid"

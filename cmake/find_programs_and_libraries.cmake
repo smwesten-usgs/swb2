@@ -136,7 +136,9 @@ else()
 
   find_library(LIBXM
           NAMES Xm libXm libXm.dylib
-          PATHS ${LIB_PATH} )
+          PATHS 
+          /usr/OpenMotif/lib
+          ${LIB_PATH} )
 
   set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" ".dylib")
 
@@ -183,8 +185,14 @@ if ("${OS}" STREQUAL "mac_osx" )
 #          ${SWB_PATH}
           ${LIB_PATH} )
 
+  find_library(LIBXT
+          NAMES Xt libXt.dylib
+          PATHS
+          /opt/X11/lib
+          ${LIB_PATH})
+
   set( EXTERNAL_LIBS ${EXTERNAL_LIBS}  ${LIBLDAP} ${LIBCRYPTO} ${LIBSSL} ${LIBLBER}
-        ${LIBSSH2} ${LIBSASL2} )
+        ${LIBSSH2} ${LIBSASL2} ${LIBXT} )
 
 endif()
 
