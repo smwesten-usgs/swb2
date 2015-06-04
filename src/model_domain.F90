@@ -495,7 +495,7 @@ contains
     logical (kind=c_bool)                :: lMatch
     type (STRING_LIST_T)                 :: slList
 
-    call slList%append("LU_Code")
+     call slList%append("LU_Code")
     call slList%append("LU_code")
     call slList%append("Landuse_Code")
     call slList%append("LULC_Code")
@@ -607,6 +607,7 @@ contains
 
     endif    
 
+    call grid_WriteArcGrid("Landuse_land_cover__as_read_into_SWB.asc", pLULC%pGrdBase )
 
   end subroutine read_in_land_use_sub
 
