@@ -9,7 +9,7 @@
 module soil_moisture__FAO_56
 
   use iso_c_binding, only             : c_bool, c_short, c_int, c_float, c_double
-  use constants_and_conversions, only : M_PER_FOOT, lTRUE, lFALSE
+  use constants_and_conversions, only : M_PER_FOOT, lTRUE, lFALSE, fTINYVAL, asInt
   use exceptions, only                : assert
   use parameters, only                : PARAMS
   use simulation_datetime, only       : SIM_DT 
@@ -63,7 +63,7 @@ contains
     integer (kind=c_int), allocatable :: iREWSeqNums(:)
     integer (kind=c_int)              :: iNumberOfTEW, iNumberOfREW
     integer (kind=c_int)              :: iNumberOfLanduses
-    integer (kind=c_int)              :: iIndex
+    integer (kind=c_int)              :: iIndex, iIndex2
     integer (kind=c_int)              :: iStat
 
     character (len=:), allocatable   :: sText
@@ -188,7 +188,7 @@ contains
    call PARAMS%get_parameters( sKey="Mean_Plant_Height", fValues=MEAN_PLANT_HEIGHT, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="Units_Are_Days", lValues=UNITS_ARE_DAYS, lFatal=lTRUE )
 
-    allocate( L_GROWTH( 16, iNumberOfLanduses ), stat=iStat )
+    allocate( L_GROWTH( 5, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for L_GROWTH array", &
       __FILE__, __LINE__ )
 
@@ -196,16 +196,39 @@ contains
     call assert( iStat==0, "Failed to allocate memory for KCB array", &
       __FILE__, __LINE__ )
 
+    L_GROWTH = 0_c_int
 
     L_GROWTH( L_INI, :) = L_ini_
     L_GROWTH( L_MID, :) = L_mid_
     L_GROWTH( L_LATE, :) = L_late_
     L_GROWTH( L_FALLOW, :) = L_fallow_
 
+    KCB = fTINYVAL
+
     KCB( KCB_INI, :) = KCB_ini_
     KCB( KCB_MID, :) = KCB_mid_
     KCB( KCB_END, :) = KCB_end_
     KCB( KCB_MIN, :) = KCB_min_
+
+    KCB( JAN, lbound(KCB_jan, 1):ubound(KCB_jan, 1)) = KCB_jan
+    KCB( FEB, lbound(KCB_feb, 1):ubound(KCB_feb, 1)) = KCB_feb
+    KCB( MAR, lbound(KCB_mar, 1):ubound(KCB_mar, 1)) = KCB_mar
+    KCB( APR, lbound(KCB_apr, 1):ubound(KCB_apr, 1)) = KCB_apr
+    KCB( MAY, lbound(KCB_may, 1):ubound(KCB_may, 1)) = KCB_may
+    KCB( JUN, lbound(KCB_jun, 1):ubound(KCB_jun, 1)) = KCB_jun
+    KCB( JUL, lbound(KCB_jul, 1):ubound(KCB_jul, 1)) = KCB_jul
+    KCB( AUG, lbound(KCB_aug, 1):ubound(KCB_aug, 1)) = KCB_aug
+    KCB( SEP, lbound(KCB_sep, 1):ubound(KCB_sep, 1)) = KCB_sep
+    KCB( OCT, lbound(KCB_oct, 1):ubound(KCB_oct, 1)) = KCB_oct
+    KCB( NOV, lbound(KCB_nov, 1):ubound(KCB_nov, 1)) = KCB_nov
+    KCB( DEC, lbound(KCB_dec, 1):ubound(KCB_dec, 1)) = KCB_dec
+
+    print *, __FILE__, ": ", __LINE__
+
+    do iIndex=lbound( KCB, 2), ubound( KCB, 2) 
+      write(*, fmt="(i6,16f9.3)") iIndex, (KCB( iIndex2, iIndex ), iIndex2=1,16)
+    enddo
+
 
   !> @TODO Add more logic here to perform checks on the validity of this data.
 
@@ -224,7 +247,8 @@ contains
  !! @retval rKcb Basal crop coefficient given the irrigation table entries and the 
  !!         current threshold values.
 
- elemental function sm_FAO56_UpdateCropCoefficient( iLanduseIndex, iThreshold )  result(fKcb)
+ elemental function sm_FAO56_UpdateCropCoefficient( iLanduseIndex, iThreshold, iMonth ) &
+                                                                          result(fKcb)
 
   !>
   !>
@@ -237,57 +261,66 @@ contains
 
   integer (kind=c_int), intent(in)   :: iLanduseIndex
   integer (kind=c_int), intent(in)   :: iThreshold
+  integer (kind=c_int), intent(in)   :: iMonth
   real (kind=c_float)                :: fKcb
 
   ! [ LOCALS ]
   real (kind=c_float) :: fFrac
 
-  ! define shorthand variable names for remainder of function
-  associate ( L_ini => L_GROWTH( L_INI, iLanduseIndex ),       &
-              L_mid => L_GROWTH( L_MID, iLanduseIndex ),        &
-              L_late => L_GROWTH( L_LATE, iLanduseIndex ),      &
-              Kcb_ini => KCB(KCB_INI, iLanduseIndex),           &
-              Kcb_mid => KCB(KCB_MID, iLanduseIndex),           &
-              Kcb_min => KCB(KCB_MIN, iLanduseIndex),           &
-              PlantingDate => PLANTING_DATE( iLanduseIndex),    &
-              Kcb_end => KCB(KCB_END, iLanduseIndex) )
+  if ( KCB( iMonth, iLanduseIndex ) > 0.0_c_float ) then
 
-    ! NOTE that L ("length") may be given in terms of DAYS or GDD increments;
-    !      Therefore, the value of "iThreshold" may also be specified in terms of
-    !      GDD or day of year (DOY).
+    fKCB = KCB( iMonth, iLanduseIndex )
 
-    ! now calculate Kcb for the given landuse
-    if( iThreshold > L_late ) then
+  else  
 
-      fKcb = Kcb_min
+    ! define shorthand variable names for remainder of function
+    associate ( L_ini => L_GROWTH( L_INI, iLanduseIndex ),       &
+                L_mid => L_GROWTH( L_MID, iLanduseIndex ),        &
+                L_late => L_GROWTH( L_LATE, iLanduseIndex ),      &
+                Kcb_ini => KCB(KCB_INI, iLanduseIndex),           &
+                Kcb_mid => KCB(KCB_MID, iLanduseIndex),           &
+                Kcb_min => KCB(KCB_MIN, iLanduseIndex),           &
+                PlantingDate => PLANTING_DATE( iLanduseIndex),    &
+                Kcb_end => KCB(KCB_END, iLanduseIndex) )
 
-    elseif ( iThreshold > L_mid ) then
+      ! NOTE that L ("length") may be given in terms of DAYS or GDD increments;
+      !      Therefore, the value of "iThreshold" may also be specified in terms of
+      !      GDD or day of year (DOY).
+
+      ! now calculate Kcb for the given landuse
+      if( iThreshold > L_late ) then
+
+        fKcb = Kcb_min
+
+      elseif ( iThreshold > L_mid ) then
+        
+        fFrac = real(iThreshold - L_mid, kind=c_double ) / real( L_late - L_mid, kind=c_float )
+
+        fKcb =  Kcb_mid * (1_c_float - fFrac) + Kcb_end * fFrac
+
+      elseif ( iThreshold > L_dev ) then
+        
+        fKcb = Kcb_mid
+
+      elseif ( iThreshold > L_ini ) then
+
+        fFrac = real( iThreshold - L_ini ) / real( L_dev - L_ini )
+
+        fKcb = Kcb_ini * (1_c_float - fFrac) + Kcb_mid * fFrac
+
+      elseif ( iThreshold >= PlantingDate ) then
+        
+        fKcb = Kcb_ini
       
-      fFrac = real(iThreshold - L_mid, kind=c_double ) / real( L_late - L_mid, kind=c_float )
-
-      fKcb =  Kcb_mid * (1_c_float - fFrac) + Kcb_end * fFrac
-
-    elseif ( iThreshold > L_dev ) then
+      else
       
-      fKcb = Kcb_mid
-
-    elseif ( iThreshold > L_ini ) then
-
-      fFrac = real( iThreshold - L_ini ) / real( L_dev - L_ini )
-
-      fKcb = Kcb_ini * (1_c_float - fFrac) + Kcb_mid * fFrac
-
-    elseif ( iThreshold >= PlantingDate ) then
+        fKcb = Kcb_min
       
-      fKcb = Kcb_ini
-    
-    else
-    
-      fKcb = Kcb_min
-    
-    endif
+      endif
 
-  end associate
+    end associate
+
+  end if
 
 end function sm_FAO56_UpdateCropCoefficient
 
@@ -522,7 +555,7 @@ end function calc_water_stress_coefficient_Ks
 
   if ( UNITS_ARE_DAYS( iLanduseIndex ) ) then
 
-   fKcb = sm_FAO56_UpdateCropCoefficient( iLanduseIndex, SIM_DT%iDOY )
+   fKcb = sm_FAO56_UpdateCropCoefficient( iLanduseIndex, SIM_DT%iDOY, asInt(SIM_DT%curr%iMonth) )
 
    if ( SIM_DT%iDOY < L_GROWTH( L_DEV, iLanduseIndex ) ) then
 
@@ -531,7 +564,7 @@ end function calc_water_stress_coefficient_Ks
 
   else
 
-   fKcb = sm_FAO56_UpdateCropCoefficient( iLanduseIndex, INT(fGDD, kind=c_int) )
+   fKcb = sm_FAO56_UpdateCropCoefficient( iLanduseIndex, INT(fGDD, kind=c_int), asInt(SIM_DT%curr%iMonth)  )
 
   !					 cel%rSoilWaterCap = cel%rCurrentRootingDepth * cel%rSoilWaterCapInput
 
