@@ -1487,7 +1487,19 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call interception_gash_calculate( this%gross_precip, this%fog, this%interception )
+! interception_gash_calculate( fRainfall, fFog, fCanopy_Cover_Fraction,       &
+!                                                     fTrunk_Storage_Capacity, fStemflow_Fraction,   &
+!                                                     fEvaporation_to_Rainfall_Ratio,                &
+!                                                     fPrecipitation_at_Saturation, fInterception )
+
+    call interception_gash_calculate( this%gross_precip, this%fog,                        &
+                               CANOPY_COVER_FRACTION,                                     &
+                               TRUNK_STORAGE_CAPACITY_TABLE_VALUES( this%landuse_index ), &
+                               STEMFLOW_FRACTION_TABLE_VALUES( this%landuse_index ),      &
+                               EVAPORATION_TO_RAINFALL_RATIO,                             &
+                               P_SAT,                                                     &
+                               this%interception )
+
     this%interception_ET = this%interception
 
   end subroutine model_calculate_interception_gash
