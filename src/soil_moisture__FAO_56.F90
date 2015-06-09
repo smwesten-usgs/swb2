@@ -555,16 +555,16 @@ end function calc_water_stress_coefficient_Ks
 
   if ( UNITS_ARE_DAYS( iLanduseIndex ) ) then
 
-   fKcb = sm_FAO56_UpdateCropCoefficient( iLanduseIndex, SIM_DT%iDOY, asInt(SIM_DT%curr%iMonth) )
+    fKcb = sm_FAO56_UpdateCropCoefficient( iLanduseIndex, SIM_DT%iDOY, asInt(SIM_DT%curr%iMonth) )
 
-   if ( SIM_DT%iDOY < L_GROWTH( L_DEV, iLanduseIndex ) ) then
+    if ( SIM_DT%iDOY < L_GROWTH( L_DEV, iLanduseIndex ) ) then
 
   !					 cel%rSoilWaterCap = cel%rCurrentRootingDepth * cel%rSoilWaterCapInput
-   endif
+    endif
 
   else
 
-   fKcb = sm_FAO56_UpdateCropCoefficient( iLanduseIndex, INT(fGDD, kind=c_int), asInt(SIM_DT%curr%iMonth)  )
+    fKcb = sm_FAO56_UpdateCropCoefficient( iLanduseIndex, INT(fGDD, kind=c_int), asInt(SIM_DT%curr%iMonth)  )
 
   !					 cel%rSoilWaterCap = cel%rCurrentRootingDepth * cel%rSoilWaterCapInput
 

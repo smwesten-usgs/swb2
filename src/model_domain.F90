@@ -1485,17 +1485,27 @@ contains
 
     use interception__gash
 
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    class (MODEL_DOMAIN_T), intent(inout)      :: this
+
+    ! [ LOCALS ]
+    real (kind=c_float), allocatable :: fTrunk_Storage_Capacity(:)
+    real (kind=c_float), allocatable :: fStemflow_Fraction(:)
 
 ! interception_gash_calculate( fRainfall, fFog, fCanopy_Cover_Fraction,       &
 !                                                     fTrunk_Storage_Capacity, fStemflow_Fraction,   &
 !                                                     fEvaporation_to_Rainfall_Ratio,                &
 !                                                     fPrecipitation_at_Saturation, fInterception )
 
-    call interception_gash_calculate( this%gross_precip, this%fog,                        &
+    fTrunk_Storage_Capacity = TRUNK_STORAGE_CAPACITY_TABLE_VALUES( this%landuse_index )
+    fStemflow_Fraction = STEMFLOW_FRACTION_TABLE_VALUES( this%landuse_index )
+    
+    call interception_gash_calculate( this%gross_precip,                                  &
+                               this%fog,                                                  &
                                CANOPY_COVER_FRACTION,                                     &
-                               TRUNK_STORAGE_CAPACITY_TABLE_VALUES( this%landuse_index ), &
-                               STEMFLOW_FRACTION_TABLE_VALUES( this%landuse_index ),      &
+                               !TRUNK_STORAGE_CAPACITY_TABLE_VALUES( this%landuse_index ), &
+                               fTrunk_Storage_Capacity, &
+                               !STEMFLOW_FRACTION_TABLE_VALUES( this%landuse_index ),      &
+                               fStemflow_Fraction, &
                                EVAPORATION_TO_RAINFALL_RATIO,                             &
                                P_SAT,                                                     &
                                this%interception )

@@ -88,5 +88,5 @@ include( cmake/print_summary.cmake )
 
 enable_testing()
 add_subdirectory(src)
-add_subdirectory(tests/general)
-add_subdirectory(tests/irrigation)
+#add_subdirectory(tests/general)
+#add_subdirectory(tests/irrigation)

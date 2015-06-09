@@ -190,6 +190,54 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  subroutine add_to_param_list_sub(this, sKey, sValue, iValue, fValue)
+
+    class (PARAMETERS_T)                        :: this
+    character (len=*), intent(in)               :: sKey
+    character (len=*), intent(in), optional     :: sValue
+    integer (kind=c_int), intent(in), optional  :: iValue
+    real (kind=c_float), intent(in), optional   :: fValue
+
+    ! [ LOCALS ]
+    integer (kind=c_int)         :: iStat
+    type (DICT_ENTRY_T), pointer :: pDict
+    type (DICT_ENTRY_T), pointer :: pCurrentDict
+    character (len=MAX_TABLE_RECORD_LEN) :: sRecord, sItem
+
+
+    pCurrentDict => null()
+    pCurrentDict => PARAMS_DICT%get_entry( sKey )
+
+    if ( .not. associated( pCurrentDict )) then
+
+      ! if key doesn't currently exist, make a new entry with this key value
+      allocate( pDict, stat=iStat )
+      call assert(iStat == 0, "Failed to allocate memory for dictionary object", &
+          __FILE__, __LINE__ )
+
+      ! add dictionary entry to dictionary
+      call pDict%add_key( sKey )
+
+    endif
+     
+    if ( present( sValue ) ) then
+
+      call pCurrentDict%add_string( sValue ) 
+    
+    else if ( present ( iValue ) ) then
+
+      call pCurrentDict%add_string( iValue ) 
+    
+    else if ( present ( fValue ) ) then
+
+      call pCurrentDict%add_string( fValue ) 
+    
+    endif 
+
+  end subroutine add_to_param_list_sub
+
+!--------------------------------------------------------------------------------------------------
+
   function grep_parameter_name( this, sKey )      result( slList )
 
     class (PARAMETERS_T)                                       :: this

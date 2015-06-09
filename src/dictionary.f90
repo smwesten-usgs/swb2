@@ -21,11 +21,15 @@ module dictionary
 
   contains
 
-    procedure, private   :: add_key_sub
-    generic              :: add_key => add_key_sub
+    procedure   :: add_key_sub
+    generic     :: add_key => add_key_sub
 
-    procedure, private   :: add_string_sub
-    generic              :: add_string => add_string_sub
+    procedure   :: add_string_sub
+    procedure   :: add_integer_sub
+    procedure   :: add_float_sub
+    generic     :: add_string => add_string_sub, &
+                                 add_integer_sub, &
+                                 add_float_sub
 
   end type DICT_ENTRY_T 
 
@@ -99,7 +103,29 @@ contains
 
     call this%sl%append(sValue)
 
-  end subroutine 
+  end subroutine add_string_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine add_float_sub(this, fValue)
+
+    class (DICT_ENTRY_T)             :: this
+    real (kind=c_float), intent(in)  :: fValue
+
+    call this%sl%append( asCharacter( fValue ) )
+
+  end subroutine add_float_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine add_integer_sub(this, iValue)
+
+    class (DICT_ENTRY_T)               :: this
+    integer (kind=c_int), intent(in)   :: iValue
+
+    call this%sl%append( asCharacter( iValue ) )
+
+  end subroutine add_integer_sub
 
 !--------------------------------------------------------------------------------------------------
 
