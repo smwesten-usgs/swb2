@@ -30,16 +30,19 @@ module parameters
 
   contains
 
-    procedure, private   :: add_filename_to_list_sub
+    procedure            :: add_filename_to_list_sub
     generic              :: add_file => add_filename_to_list_sub
 
-    procedure, private   :: munge_files_and_add_to_param_list_sub
+    procedure            :: add_to_param_list_sub
+    generic              :: add_parameters => add_to_param_list_sub
+
+    procedure            :: munge_files_and_add_to_param_list_sub
     generic              :: munge_file => munge_files_and_add_to_param_list_sub
 
-    procedure, private   :: get_parameter_values_int
+    procedure            :: get_parameter_values_int
     procedure            :: get_parameter_values_float
     procedure            :: get_parameter_values_logical
-    procedure, private   :: get_parameter_table_float
+    procedure            :: get_parameter_table_float
 
     generic              :: get_parameters => get_parameter_values_int,     &
                                               get_parameter_values_float,   &
@@ -190,17 +193,20 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine add_to_param_list_sub(this, sKey, sValue, iValue, fValue)
+  subroutine add_to_param_list_sub(this, sKey, sValues, iValues, fValues, dValues, lValues)
 
-    class (PARAMETERS_T)                        :: this
-    character (len=*), intent(in)               :: sKey
-    character (len=*), intent(in), optional     :: sValue
-    integer (kind=c_int), intent(in), optional  :: iValue
-    real (kind=c_float), intent(in), optional   :: fValue
+    class (PARAMETERS_T)                         :: this
+    character (len=*), intent(in)                :: sKey
+    character (len=*), intent(in), optional      :: sValues(:)
+    integer (kind=c_int), intent(in), optional   :: iValues(:)
+    real (kind=c_float), intent(in), optional    :: fValues(:)
+    real (kind=c_double), intent(in), optional   :: dValues(:)
+    logical (kind=c_bool), intent(in), optional  :: lValues(:)        
 
     ! [ LOCALS ]
     integer (kind=c_int)         :: iStat
     type (DICT_ENTRY_T), pointer :: pDict
+    integer (kind=c_int)         :: iIndex
     type (DICT_ENTRY_T), pointer :: pCurrentDict
     character (len=MAX_TABLE_RECORD_LEN) :: sRecord, sItem
 
@@ -211,26 +217,56 @@ contains
     if ( .not. associated( pCurrentDict )) then
 
       ! if key doesn't currently exist, make a new entry with this key value
-      allocate( pDict, stat=iStat )
+      allocate( pCurrentDict, stat=iStat )
+
       call assert(iStat == 0, "Failed to allocate memory for dictionary object", &
           __FILE__, __LINE__ )
 
       ! add dictionary entry to dictionary
-      call pDict%add_key( sKey )
+      call pCurrentDict%add_key( sKey )
+      call PARAMS_DICT%add_entry( pCurrentDict )
 
     endif
      
-    if ( present( sValue ) ) then
+    if ( present( sValues ) ) then
 
-      call pCurrentDict%add_string( sValue ) 
+      do iIndex = lbound(sValues,1), ubound(sValues,1)
+
+        call pCurrentDict%add_string( sValues( iIndex ) )
+
+      enddo   
     
-    else if ( present ( iValue ) ) then
+    else if ( present ( iValues ) ) then
 
-      call pCurrentDict%add_string( iValue ) 
+      do iIndex = lbound(iValues,1), ubound(iValues,1)
+
+        call pCurrentDict%add_string( iValues( iIndex ) )
+
+      enddo
     
-    else if ( present ( fValue ) ) then
+    else if ( present ( fValues ) ) then
 
-      call pCurrentDict%add_string( fValue ) 
+      do iIndex = lbound(fValues,1), ubound(fValues,1)
+
+        call pCurrentDict%add_string( fValues( iIndex ) )
+
+      enddo  
+
+    else if ( present ( dValues ) ) then
+
+      do iIndex = lbound(dValues,1), ubound(dValues,1)
+
+        call pCurrentDict%add_string( dValues( iIndex ) )
+
+      enddo
+
+    else if ( present ( lValues ) ) then
+
+      do iIndex = lbound(lValues,1), ubound(lValues,1)
+
+        call pCurrentDict%add_string( lValues( iIndex ) )
+
+      enddo
     
     endif 
 
@@ -286,6 +322,47 @@ contains
     endif
 
   end subroutine get_parameter_values_logical
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine get_parameter_values_string_list( this, slValues, slKeys, sKey, lFatal )
+
+    class (PARAMETERS_T)                                        :: this
+    type (STRING_LIST_T), intent(in out)                        :: slValues  
+    type (STRING_LIST_T), intent(in out),              optional :: slKeys
+    character (len=*),    intent(in ),                 optional :: sKey
+    logical (kind=c_bool), intent(in),                 optional :: lFatal
+
+    ! [ LOCALS ]
+    logical (kind=c_bool) :: lFatal_
+
+    if ( present (lFatal) ) then
+      lFatal_ = lFatal
+    else
+      lFatal_ = lFALSE
+    endif 
+
+    if ( present( slKeys) ) then
+
+      call PARAMS_DICT%get_values( slKeys=slKeys, slString=slValues )
+
+!       if ( any( iValues <= iTINYVAL ) ) &
+!         call warn( "Failed to find any lookup table columns with headers containing the string(s) " &
+!           //dQuote( slKeys%listall() )//".", lFatal = lFatal_ )
+
+    else if ( present( sKey) ) then
+
+      call PARAMS_DICT%get_values( sKey=sKey, slString=slValues )
+
+!       if ( any( iValues <= iTINYVAL ) ) &
+!         call warn( "Failed to find any lookup table columns with headers containing the string " &
+!           //dQuote( sKey )//".", lFatal = lFatal_ )
+
+    endif
+
+  end subroutine get_parameter_values_string_list
+
+!--------------------------------------------------------------------------------------------------
 
 !--------------------------------------------------------------------------------------------------
 

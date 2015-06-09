@@ -27,10 +27,13 @@ module dictionary
     procedure   :: add_string_sub
     procedure   :: add_integer_sub
     procedure   :: add_float_sub
-    generic     :: add_string => add_string_sub, &
-                                 add_integer_sub, &
-                                 add_float_sub
-
+    procedure   :: add_double_sub
+    procedure   :: add_logical_sub    
+    generic     :: add_string => add_string_sub,   &
+                                 add_integer_sub,  &
+                                 add_float_sub,    &
+                                 add_double_sub,   &
+                                 add_logical_sub
   end type DICT_ENTRY_T 
 
 
@@ -64,13 +67,15 @@ module dictionary
     procedure, private   :: get_values_as_int_given_list_of_keys_sub
     procedure, private   :: get_values_as_float_given_list_of_keys_sub
     procedure, private   :: get_values_as_logical_given_list_of_keys_sub
+    procedure, private   :: get_values_as_string_list_given_list_of_keys_sub
     generic              :: get_values => get_values_as_int_sub,                       &
-                                          get_values_as_float_sub,                     &
-                                          get_values_as_logical_sub,                   &
-                                          get_values_as_string_list_sub,               &
-                                          get_values_as_int_given_list_of_keys_sub,    &
-                                          get_values_as_float_given_list_of_keys_sub,  &
-                                          get_values_as_logical_given_list_of_keys_sub
+                                          get_values_as_float_sub,                        &
+                                          get_values_as_logical_sub,                      &
+                                          get_values_as_string_list_sub,                  &
+                                          get_values_as_int_given_list_of_keys_sub,       &
+                                          get_values_as_float_given_list_of_keys_sub,     &
+                                          get_values_as_logical_given_list_of_keys_sub,   &
+                                          get_values_as_string_list_given_list_of_keys_sub
 
   end type DICT_T
 
@@ -126,6 +131,28 @@ contains
     call this%sl%append( asCharacter( iValue ) )
 
   end subroutine add_integer_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine add_double_sub(this, dValue)
+
+    class (DICT_ENTRY_T)               :: this
+    real (kind=c_double), intent(in)   :: dValue
+
+    call this%sl%append( asCharacter( dValue ) )
+
+  end subroutine add_double_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine add_logical_sub(this, lValue)
+
+    class (DICT_ENTRY_T)                :: this
+    logical (kind=c_bool), intent(in)   :: lValue
+
+    call this%sl%append( asCharacter( lValue ) )
+
+  end subroutine add_logical_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -377,6 +404,48 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  subroutine get_values_as_string_list_given_list_of_keys_sub(this, slKeys, slString )
+
+    class (DICT_T)                                     :: this
+    type (STRING_LIST_T), intent(inout)                :: slKeys
+    type ( STRING_LIST_T ), intent(out)                :: slString
+
+    ! [ LOCALS ]
+    type (DICT_ENTRY_T), pointer   :: pTarget
+    integer (kind=c_int)           :: iStat
+    integer (kind=c_int)           :: iCount
+    character (len=:), allocatable :: sText
+    
+    iCount = 0
+
+    do while ( iCount < slKeys%count )
+
+      iCount = iCount + 1
+
+      sText = slKeys%get( iCount)
+
+      pTarget => this%get_entry( sText )
+
+      if ( associated( pTarget ) ) exit
+
+    enddo
+
+    if ( associated( pTarget ) ) then
+
+      slString = pTarget%sl
+
+    else
+
+      call slString%append("<NA>")
+      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+
+    endif  
+
+  end subroutine get_values_as_string_list_given_list_of_keys_sub
+
+!--------------------------------------------------------------------------------------------------
+
   subroutine get_values_as_string_list_sub(this, sKey, slString)
 
     class (DICT_T)                                  :: this
@@ -554,14 +623,31 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine print_all_dictionary_entries_sub(this)
+  subroutine print_all_dictionary_entries_sub(this, iLogLevel, lEcho )
 
-    class (DICT_T)    :: this
+    class (DICT_T)                               :: this
+    integer (kind=c_int), intent(in), optional   :: iLogLevel
+    logical (kind=c_bool), intent(in), optional  :: lEcho
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: current
     character (len=512)            :: sTempBuf
     integer (kind=c_int)           :: iCount
+    integer (kind=c_int)           :: iIndex
+    integer (kind=c_int)           :: iLogLevel_
+    logical (kind=c_bool)          :: lEcho_
+
+    if ( present( iLogLevel ) ) then
+      iLogLevel_ = iLogLevel
+    else
+      iLogLevel_ = LOGS%iLogLevel
+    end if  
+
+    if ( present( lEcho ) ) then
+      lEcho_ = lEcho
+    else
+      lEcho_ = lFALSE
+    end if  
 
     current => this%first
     iCount = 0
@@ -571,9 +657,19 @@ contains
       iCount = iCount + 1
       sTempBuf = current%key
 
-      call LOGS%write( asCharacter(iCount)//")  KEY: "//dquote(sTempBuf), iLogLevel=LOG_DEBUG, lEcho=lFALSE, iTab=2 )
+      call LOGS%write( asCharacter(iCount)//")  KEY: "//dquote(sTempBuf),    &
+        iLogLevel=iLogLevel_, lEcho=lEcho_, iTab=2 )
       call LOGS%write( " --ENTRIES--:", iTab=5 )
-      call current%sl%print( iLU=LOGS%iUnitNum( LOG_DEBUG ) )
+
+      if ( iLogLevel_ /= LOG_NONE ) then
+
+        do iIndex = LOG_GENERAL, min( iLogLevel_, LOG_DEBUG)
+          call current%sl%print( iLU=LOGS%iUnitNum( iIndex ) )
+        enddo
+
+      endif  
+      
+      if ( lEcho_ )   call current%sl%print()  
 
       current => current%next
 

@@ -10,6 +10,7 @@ module soil_moisture__FAO_56
 
   use iso_c_binding, only             : c_bool, c_short, c_int, c_float, c_double
   use constants_and_conversions, only : M_PER_FOOT, lTRUE, lFALSE, fTINYVAL, asInt
+  use datetime
   use exceptions, only                : assert
   use parameters, only                : PARAMS
   use simulation_datetime, only       : SIM_DT 
@@ -19,9 +20,10 @@ module soil_moisture__FAO_56
   private
 
   public :: soil_moisture_FAO56_initialize, soil_moisture_FAO56_calculate
+  public :: sm_FAO56_UpdateCropCoefficient
 
   enum, bind(c)
-    enumerator :: L_INI=1, L_DEV, L_MID, L_LATE, L_FALLOW
+    enumerator :: L_DOY_INI=1, L_DOY_DEV, L_DOY_MID, L_DOY_LATE
   end enum 
 
   enum, bind(c)
@@ -40,6 +42,7 @@ module soil_moisture__FAO_56
   real (kind=c_float), allocatable   :: KCB(:,:)
   real (kind=c_float), allocatable   :: PLANTING_DATE(:)
   real (kind=c_float), allocatable   :: L_GROWTH(:,:)
+  type (DATETIME_T), allocatable     :: DATE_GROWTH(:,:)
   logical (kind=c_bool), allocatable :: UNITS_ARE_DAYS(:)
   integer (kind=c_int), allocatable  :: DAYS_SINCE_PLANTING(:)
 
@@ -68,10 +71,12 @@ contains
 
     character (len=:), allocatable   :: sText
 
+    character (len=12), allocatable  :: sPlantingDate(:)
+
     real (kind=c_float), allocatable :: L_ini_(:)
+    real (kind=c_float), allocatable :: L_dev_(:)
     real (kind=c_float), allocatable :: L_mid_(:)
     real (kind=c_float), allocatable :: L_late_(:)
-    real (kind=c_float), allocatable :: L_fallow_(:)
     real (kind=c_float), allocatable :: Kcb_ini_(:)            
     real (kind=c_float), allocatable :: Kcb_mid_(:)            
     real (kind=c_float), allocatable :: Kcb_end_(:)            
@@ -90,24 +95,6 @@ contains
     real (kind=c_float), allocatable :: Kcb_nov(:)
     real (kind=c_float), allocatable :: Kcb_dec(:)
 
-!    ! retrieve a string list of all keys associated with REW (i.e. "REW_1", "REW_2", "REW_3", etc)
-!    slREW = PARAMS%grep_name("REW")
-
-!    ! Convert the string list to an vector of integers; this call strips off the "REW_" part of label
-!    iREWSeqNums = slREW%asInt()
-
-!    ! count how many items are present in the vector; this should equal the number of soils groups
-!    iNumberOfREW = count( iREWSeqNums > 0 )
-
-!    ! retrieve a string list of all keys associated with TEW (i.e. "TEW_1", "TEW_2", "TEW_3", etc)
-!    slTEW = PARAMS%grep_name("TEW")
-
-!    ! Convert the string list to an vector of integers; this call strips off the "TEW_" part of label
-!    iTEWSeqNums = slTEW%asInt()
-
-!    ! count how many items are present in the vector; this should equal the number of soils groups
-!    iNumberOfTEW = count( iTEWSeqNums > 0 )
-
    !> create string list that allows for alternate heading identifiers for the landuse code
    call slList%append("LU_Code")
    call slList%append("Landuse_Code")
@@ -123,14 +110,6 @@ contains
 
    DAYS_SINCE_PLANTING = 0
 
-   !allocate( REW(iNumberOfLanduses, iNumberOfREW), stat=iStat )
-   !call assert( iStat == 0, "Failed to allocate memory for readily evaporable water (REW) table", &
-   !  __FILE__, __LINE__)
-
-   !allocate( TEW(iNumberOfLanduses, iNumberOfTEW), stat=iStat )
-   !call assert( iStat == 0, "Failed to allocate memory for total evaporable water (TEW) table", &
-   !  __FILE__, __LINE__)
-
    !> @todo Implement thorough input error checking: 
    !! are all soils in grid included in table values?
    !> is soil suffix vector continuous?
@@ -141,30 +120,17 @@ contains
    ! Retrieve and populate the Total Evaporable Water (TEW) table values
    CALL PARAMS%get_parameters( fValues=TEW, sPrefix="TEW_", iNumRows=iNumberOfLanduses )
 
-
-   ! we should have the REW table fully filled out following this block
- !  do iIndex = 1, iNumberOfREW
- !    sText = "REW_"//asCharacter(iIndex)
- !    call PARAMS%get_parameters( sText, REW(:, iIndex) )
- !  enddo  
-
-   ! we should have the TEW table fully filled out following this block
- !  do iIndex = 1, iNumberOfTEW
- !    sText = "TEW_"//asCharacter(iIndex)
- !    call PARAMS%get_parameters( sText, TEW(:, iIndex) )
- !  enddo  
-
    !> @TODO What should happen if the TEW / REW header entries do *not* fall in a 
    !!       logical sequence of values? In other words, if the user has columns named
    !!       REW_1, REW_3, REW_5, only the values associated with "REW_1" would be retrieved.
    !!       Needless to say, this would be catastrophic.
 
-   call PARAMS%get_parameters( sKey="Planting_date", fValues=PLANTING_DATE, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="Planting_date", sValues=sPlantingDate, lFatal=lTRUE )
 
    call PARAMS%get_parameters( sKey="L_ini", fValues=L_ini_, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="L_dev", fValues=L_dev_, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="L_mid", fValues=L_mid_, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="L_late", fValues=L_late_, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="L_fallow", fValues=L_fallow_, lFatal=lTRUE )
 
    call PARAMS%get_parameters( sKey="Kcb_ini", fValues=KCB_ini_, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="Kcb_mid", fValues=KCB_mid_, lFatal=lTRUE )
@@ -188,8 +154,12 @@ contains
    call PARAMS%get_parameters( sKey="Mean_Plant_Height", fValues=MEAN_PLANT_HEIGHT, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="Units_Are_Days", lValues=UNITS_ARE_DAYS, lFatal=lTRUE )
 
-    allocate( L_GROWTH( 5, iNumberOfLanduses ), stat=iStat )
+    allocate( L_GROWTH( 4, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for L_GROWTH array", &
+      __FILE__, __LINE__ )
+
+    allocate( DATE_GROWTH( 4, iNumberOfLanduses ), stat=iStat )
+    call assert( iStat==0, "Failed to allocate memory for DATE_GROWTH array", &
       __FILE__, __LINE__ )
 
     allocate( KCB( 16, iNumberOfLanduses ), stat=iStat )
@@ -198,37 +168,30 @@ contains
 
     L_GROWTH = 0_c_int
 
-    L_GROWTH( L_INI, :) = L_ini_
-    L_GROWTH( L_MID, :) = L_mid_
-    L_GROWTH( L_LATE, :) = L_late_
-    L_GROWTH( L_FALLOW, :) = L_fallow_
+    L_GROWTH( L_DOY_INI, :) = L_ini_ + PLANTING_DATE
+    L_GROWTH( L_DOY_DEV, :) = L_dev_ + L_GROWTH( L_DOY_INI, :)
+    L_GROWTH( L_DOY_MID, :) = L_mid_ + L_GROWTH( L_DOY_DEV, :)
+    L_GROWTH( L_DOY_LATE, :) = L_late_ + L_GROWTH( L_DOY_MID, :)
 
     KCB = fTINYVAL
-
+ 
     KCB( KCB_INI, :) = KCB_ini_
     KCB( KCB_MID, :) = KCB_mid_
     KCB( KCB_END, :) = KCB_end_
     KCB( KCB_MIN, :) = KCB_min_
 
-    KCB( JAN, lbound(KCB_jan, 1):ubound(KCB_jan, 1)) = KCB_jan
-    KCB( FEB, lbound(KCB_feb, 1):ubound(KCB_feb, 1)) = KCB_feb
-    KCB( MAR, lbound(KCB_mar, 1):ubound(KCB_mar, 1)) = KCB_mar
-    KCB( APR, lbound(KCB_apr, 1):ubound(KCB_apr, 1)) = KCB_apr
-    KCB( MAY, lbound(KCB_may, 1):ubound(KCB_may, 1)) = KCB_may
-    KCB( JUN, lbound(KCB_jun, 1):ubound(KCB_jun, 1)) = KCB_jun
-    KCB( JUL, lbound(KCB_jul, 1):ubound(KCB_jul, 1)) = KCB_jul
-    KCB( AUG, lbound(KCB_aug, 1):ubound(KCB_aug, 1)) = KCB_aug
-    KCB( SEP, lbound(KCB_sep, 1):ubound(KCB_sep, 1)) = KCB_sep
-    KCB( OCT, lbound(KCB_oct, 1):ubound(KCB_oct, 1)) = KCB_oct
-    KCB( NOV, lbound(KCB_nov, 1):ubound(KCB_nov, 1)) = KCB_nov
-    KCB( DEC, lbound(KCB_dec, 1):ubound(KCB_dec, 1)) = KCB_dec
-
-    print *, __FILE__, ": ", __LINE__
-
-    do iIndex=lbound( KCB, 2), ubound( KCB, 2) 
-      write(*, fmt="(i6,16f9.3)") iIndex, (KCB( iIndex2, iIndex ), iIndex2=1,16)
-    enddo
-
+    if (all( KCB_jan > fTINYVAL ) ) KCB( JAN, lbound(KCB_jan, 1):ubound(KCB_jan, 1)) = KCB_jan
+    if (all( KCB_feb > fTINYVAL ) ) KCB( FEB, lbound(KCB_feb, 1):ubound(KCB_feb, 1)) = KCB_feb
+    if (all( KCB_mar > fTINYVAL ) ) KCB( MAR, lbound(KCB_mar, 1):ubound(KCB_mar, 1)) = KCB_mar
+    if (all( KCB_apr > fTINYVAL ) ) KCB( APR, lbound(KCB_apr, 1):ubound(KCB_apr, 1)) = KCB_apr
+    if (all( KCB_may > fTINYVAL ) ) KCB( MAY, lbound(KCB_may, 1):ubound(KCB_may, 1)) = KCB_may
+    if (all( KCB_jun > fTINYVAL ) ) KCB( JUN, lbound(KCB_jun, 1):ubound(KCB_jun, 1)) = KCB_jun
+    if (all( KCB_jul > fTINYVAL ) ) KCB( JUL, lbound(KCB_jul, 1):ubound(KCB_jul, 1)) = KCB_jul
+    if (all( KCB_aug > fTINYVAL ) ) KCB( AUG, lbound(KCB_aug, 1):ubound(KCB_aug, 1)) = KCB_aug
+    if (all( KCB_sep > fTINYVAL ) ) KCB( SEP, lbound(KCB_sep, 1):ubound(KCB_sep, 1)) = KCB_sep
+    if (all( KCB_oct > fTINYVAL ) ) KCB( OCT, lbound(KCB_oct, 1):ubound(KCB_oct, 1)) = KCB_oct
+    if (all( KCB_nov > fTINYVAL ) ) KCB( NOV, lbound(KCB_nov, 1):ubound(KCB_nov, 1)) = KCB_nov
+    if (all( KCB_dec > fTINYVAL ) ) KCB( DEC, lbound(KCB_dec, 1):ubound(KCB_dec, 1)) = KCB_dec
 
   !> @TODO Add more logic here to perform checks on the validity of this data.
 
@@ -274,9 +237,10 @@ contains
   else  
 
     ! define shorthand variable names for remainder of function
-    associate ( L_ini => L_GROWTH( L_INI, iLanduseIndex ),       &
-                L_mid => L_GROWTH( L_MID, iLanduseIndex ),        &
-                L_late => L_GROWTH( L_LATE, iLanduseIndex ),      &
+    associate ( L_ini => L_GROWTH( L_DOY_INI, iLanduseIndex ),       &
+                L_dev => L_GROWTH( L_DOY_DEV, iLanduseIndex ),        &
+                L_mid => L_GROWTH( L_DOY_MID, iLanduseIndex ),        &
+                L_late => L_GROWTH( L_DOY_LATE, iLanduseIndex ),      &
                 Kcb_ini => KCB(KCB_INI, iLanduseIndex),           &
                 Kcb_mid => KCB(KCB_MID, iLanduseIndex),           &
                 Kcb_min => KCB(KCB_MIN, iLanduseIndex),           &
@@ -557,7 +521,7 @@ end function calc_water_stress_coefficient_Ks
 
     fKcb = sm_FAO56_UpdateCropCoefficient( iLanduseIndex, SIM_DT%iDOY, asInt(SIM_DT%curr%iMonth) )
 
-    if ( SIM_DT%iDOY < L_GROWTH( L_DEV, iLanduseIndex ) ) then
+    if ( SIM_DT%iDOY < L_GROWTH( L_DOY_DEV, iLanduseIndex ) ) then
 
   !					 cel%rSoilWaterCap = cel%rCurrentRootingDepth * cel%rSoilWaterCapInput
     endif

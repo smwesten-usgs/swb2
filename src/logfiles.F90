@@ -84,13 +84,23 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine initialize_logfiles_sub(this, iLogLevel)
+  subroutine initialize_logfiles_sub(this, iLogLevel, sFilePrefix, lWrite_SWB_Info )
 
-    class (LOGFILE_T)                           :: this
-    integer (kind=c_int), intent(in), optional  :: iLogLevel
+    class (LOGFILE_T)                            :: this
+    integer (kind=c_int), intent(in), optional   :: iLogLevel
+    character (len=*), intent(in), optional      :: sFilePrefix
+    logical (kind=c_bool), intent(in), optional  :: lWrite_SWB_Info
+
 
     ! [ LOCALS ] 
-    integer (kind=c_int) :: iLogLevel_
+    integer (kind=c_int)    :: iLogLevel_
+    logical (kind=c_bool)   :: lWrite_SWB_Info_
+
+    if ( present( lWrite_SWB_Info) ) then
+      lWrite_SWB_Info_ = lWrite_SWB_Info
+    else
+      lWrite_SWB_Info_ = .true._c_bool
+    endif    
 
     if (present(iLogLevel) ) then
       iLogLevel_ = iLogLevel
@@ -98,23 +108,36 @@ contains
       iLogLevel_ = LOG_GENERAL
     endif    
 
-    call this%make_prefix()
+    if ( present( sFilePrefix) ) then
+      this%sFilePrefix = sFilePrefix
+    else  
+      call this%make_prefix()
+    endif
+      
     this%iLogLevel = iLogLevel_
-    call this%open()
+    call this%open( lWrite_SWB_Info=lWrite_SWB_Info_ )
 
   end subroutine initialize_logfiles_sub
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine open_files_write_access_sub(this)
+  subroutine open_files_write_access_sub(this, lWrite_SWB_Info )
 
-    class (LOGFILE_T), intent(inout) :: this
+    class (LOGFILE_T), intent(inout)             :: this
+    logical (kind=c_bool), intent(in), optional  :: lWrite_SWB_Info
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iIndex
     character (len=:), allocatable   :: sFilename
     character (len=:), allocatable   :: sDatetime
     character (len=12)               :: sDescriptor(2) = [ "         ", "_DEBUG   " ]
+    logical (kind=c_bool)            :: lWrite_SWB_Info_
+
+    if ( present( lWrite_SWB_Info) ) then
+      lWrite_SWB_Info_ = lWrite_SWB_Info
+    else
+      lWrite_SWB_Info_ = .true._c_bool
+    endif    
 
     if ( this%iLogLevel /= LOG_NONE ) then
 
@@ -134,10 +157,14 @@ contains
 
           sDatetime = make_timestamp()
 
-          write(this%iUnitNum(iIndex), fmt="(a,/)") "# USGS Soil Water Balance Code run log #"
-          write(this%iUnitNum(iIndex), fmt="(a,/)") "## Model run started on "//sDatetime//" ##"          
-          write(this%iUnitNum(iIndex), fmt="(a)") "## SWB version "//SWB_VERSION//" compiled on "//COMPILATION_TIMESTAMP//" ##"          
+          if ( lWrite_SWB_Info_ ) then
+
+            write(this%iUnitNum(iIndex), fmt="(a,/)") "# USGS Soil Water Balance Code run log #"
+            write(this%iUnitNum(iIndex), fmt="(a,/)") "## Model run started on "//sDatetime//" ##"          
+            write(this%iUnitNum(iIndex), fmt="(a)") "## SWB version "//SWB_VERSION//" compiled on "//COMPILATION_TIMESTAMP//" ##"          
    
+          endif
+
         else
 
           stop( "Failed to open file logfile." )
