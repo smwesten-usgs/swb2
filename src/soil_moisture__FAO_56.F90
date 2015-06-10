@@ -71,7 +71,7 @@ contains
 
     character (len=:), allocatable   :: sText
 
-    character (len=12), allocatable  :: sPlantingDate(:)
+    type (STRING_LIST_T)             :: slPlantingDate
 
     real (kind=c_float), allocatable :: L_ini_(:)
     real (kind=c_float), allocatable :: L_dev_(:)
@@ -125,7 +125,7 @@ contains
    !!       REW_1, REW_3, REW_5, only the values associated with "REW_1" would be retrieved.
    !!       Needless to say, this would be catastrophic.
 
-   call PARAMS%get_parameters( sKey="Planting_date", sValues=sPlantingDate, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="Planting_date", slValues=slPlantingDate, lFatal=lTRUE )
 
    call PARAMS%get_parameters( sKey="L_ini", fValues=L_ini_, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="L_dev", fValues=L_dev_, lFatal=lTRUE )

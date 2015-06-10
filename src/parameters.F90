@@ -43,11 +43,13 @@ module parameters
     procedure            :: get_parameter_values_float
     procedure            :: get_parameter_values_logical
     procedure            :: get_parameter_table_float
+    procedure            :: get_parameter_values_string_list
 
     generic              :: get_parameters => get_parameter_values_int,     &
                                               get_parameter_values_float,   &
                                               get_parameter_table_float,    &
-                                              get_parameter_values_logical
+                                              get_parameter_values_logical, &
+                                              get_parameter_values_string_list
 
     procedure            :: grep_name => grep_parameter_name
 
