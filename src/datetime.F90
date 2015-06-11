@@ -66,6 +66,9 @@ module datetime
     !> "-" operator for subtracting two date objects
     generic   :: operator( - ) => date_minus_date_fn
 
+    procedure :: date_plus_float_fn
+    generic   :: operator( + ) => date_plus_float_fn
+
     procedure  :: addDay => date_plus_day_sub
     procedure  :: subtractDay => date_minus_day_sub    
     procedure  :: prettydate => write_pretty_date_fn
@@ -435,9 +438,9 @@ end subroutine calc_julian_day_sub
 
 !--------------------------------------------------------------------------
 
-subroutine calc_gregorian_date_sub(this)
+elemental subroutine calc_gregorian_date_sub(this)
 
-  class (DATETIME_T) :: this
+  class (DATETIME_T), intent(inout) :: this
 
   ! [ LOCALS ]
   integer (kind=c_int) :: iMonth
@@ -449,7 +452,7 @@ subroutine calc_gregorian_date_sub(this)
 
   real(kind=c_float) :: rHour, rMinute, rSecond
 
-  call gregorian_date(this%getJulianDay(), iYear, iMonth, iDay)
+  call gregorian_date( this%getJulianDay(), iYear, iMonth, iDay )
 
   this%iYear = iYear
   this%iMonth = iMonth
@@ -498,15 +501,15 @@ end subroutine calc_gregorian_date_sub
 !
 ! SOURCE
 
-subroutine gregorian_date(iJD, iYear, iMonth, iDay, iOrigin)
+elemental subroutine gregorian_date(iJD, iYear, iMonth, iDay, iOrigin)
 
 !! COMPUTES THE GREGORIAN CALENDAR DATE (YEAR,MONTH,DAY)
 !! GIVEN THE JULIAN DATE (JD).
 
   ! [ ARGUMENTS ]
-  integer (kind=c_int) :: iJD
-  integer (kind=c_int), intent(inout) :: iYear, iMonth, iDay
-  integer (kind=c_int), optional :: iOrigin
+  integer (kind=c_int), value        :: iJD
+  integer (kind=c_int), intent(inout)        :: iYear, iMonth, iDay
+  integer (kind=c_int), intent(in), optional :: iOrigin
   ! [ LOCALS ]
   integer (kind=c_int) iI,iJ,iK,iL,iN
   integer (kind=c_int) :: iOffset
@@ -609,7 +612,7 @@ end function julian_day
 
 !------------------------------------------------------------------------------
 
-function is_date_greater_than(date1, date2)   result(lResult)
+elemental function is_date_greater_than(date1, date2)   result(lResult)
 
   class(DATETIME_T), intent(in) :: date1
   class(DATETIME_T), intent(in) :: date2
@@ -632,7 +635,7 @@ end function is_date_greater_than
 
 !------------------------------------------------------------------------------
 
-function is_date_less_than(date1, date2)   result(lResult)
+elemental function is_date_less_than(date1, date2)   result(lResult)
 
   class(DATETIME_T), intent(in) :: date1
   class(DATETIME_T), intent(in) :: date2
@@ -655,7 +658,7 @@ end function is_date_less_than
 
 !------------------------------------------------------------------------------
 
-function is_date_LT_or_equal_to(date1, date2)   result(lResult)
+elemental function is_date_LT_or_equal_to(date1, date2)   result(lResult)
 
   class(DATETIME_T), intent(in) :: date1
   class(DATETIME_T), intent(in) :: date2
@@ -671,7 +674,7 @@ end function is_date_LT_or_equal_to
 
 !------------------------------------------------------------------------------
 
-function is_date_GT_or_equal_to(date1, date2)   result(lResult)
+elemental function is_date_GT_or_equal_to(date1, date2)   result(lResult)
 
   class(DATETIME_T), intent(in) :: date1
   class(DATETIME_T), intent(in) :: date2
@@ -687,7 +690,7 @@ end function is_date_GT_or_equal_to
 
 !------------------------------------------------------------------------------
 
-function is_date_equal_to(date1, date2)   result(lResult)
+elemental function is_date_equal_to(date1, date2)   result(lResult)
 
   class(DATETIME_T), intent(in) :: date1
   class(DATETIME_T), intent(in) :: date2
@@ -710,7 +713,7 @@ end function is_date_equal_to
 
 !------------------------------------------------------------------------------
 
-function date_minus_date_fn(date1, date2)  result(rDelta)
+elemental function date_minus_date_fn(date1, date2)  result(rDelta)
 
   class(DATETIME_T), intent(in) :: date1
   class(DATETIME_T), intent(in) :: date2
@@ -722,6 +725,17 @@ end function date_minus_date_fn
 
 !------------------------------------------------------------------------------
 
+elemental function date_plus_float_fn(date1, fValue)  result(newdate)
+
+  class(DATETIME_T), intent(in)   :: date1
+  real (kind=c_float), intent(in) :: fValue
+  class(DATETIME_T), allocatable  :: newdate
+
+  allocate( newdate )
+  newdate%dJulianDate = date1%dJulianDate + real( fValue, kind=c_double)
+  call newdate%calcGregorianDate()
+
+end function date_plus_float_fn
 
 !------------------------------------------------------------------------------
 
@@ -966,10 +980,10 @@ end subroutine system_time_to_date_sub
 
 !------------------------------------------------------------------------------
 
-subroutine set_julian_date_sub(this, dValue)
+elemental subroutine set_julian_date_sub(this, dValue)
 
-  class (DATETIME_T)    :: this
-  real (kind=c_double)  :: dValue
+  class (DATETIME_T), intent(inout)      :: this
+  real (kind=c_double), intent(out)   :: dValue
 
   this%dJulianDate = dValue
 
@@ -979,10 +993,10 @@ end subroutine set_julian_date_sub
 
 !------------------------------------------------------------------------------
 
-function get_julian_day_fn(this)                   result(iJulianDay)
+elemental function get_julian_day_fn(this)                   result(iJulianDay)
 
-  class(DATETIME_T)    :: this
-  integer (kind=c_int) :: iJulianDay
+  class(DATETIME_T), intent(in)    :: this
+  integer (kind=c_int)             :: iJulianDay
 
   iJulianDay = int(this%dJulianDate, kind=c_int)
 
@@ -990,10 +1004,10 @@ end function get_julian_day_fn
 
 !------------------------------------------------------------------------------
 
-function get_fraction_of_day_fn(this)           result(dFractionOfDay)
+elemental function get_fraction_of_day_fn(this)           result(dFractionOfDay)
 
-  class(DATETIME_T)      :: this
-  real (kind=c_double)   :: dFractionOfDay
+  class(DATETIME_T), intent(in)      :: this
+  real (kind=c_double)               :: dFractionOfDay
 
   dFractionOfDay = this%dJulianDate - real( int(this%dJulianDate, kind=c_int ), kind=c_double)
 
@@ -1190,7 +1204,7 @@ end function mmddyyyy2doy
 
 function day_of_year(iJD) result(iDOY)
 
-  integer (kind=c_int), intent(in) :: iJD
+  integer (kind=c_int), value :: iJD
 
   ! [ LOCALS ]
   integer (kind=c_int) :: iFirstDay, iLastDay, iDOY

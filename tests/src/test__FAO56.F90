@@ -2,8 +2,10 @@ program test__FAO56
 
   use iso_c_binding, only  : c_int, c_float, c_bool
   use constants_and_conversions
+  use datetime
   use logfiles
   use parameters, only          : PARAMS, PARAMS_DICT
+  use simulation_datetime
   use soil_moisture__FAO_56
   use string_list
   implicit none
@@ -13,7 +15,15 @@ program test__FAO56
 !     fRootingDepth, iLanduseIndex, iSoilGroup )
 
   integer (kind=c_int) :: iIndex
-  real (kind=c_float)  :: fKcb_
+  real (kind=c_float)  :: fKcb_, fKcb2
+
+  call SIM_DT%start%parseDate( "10/01/1999" )
+  call SIM_DT%start%calcJulianDay()
+
+  call SIM_DT%end%parseDate( "9/30/2000" )
+  call SIM_DT%end%calcJulianDay()
+
+  SIM_DT%curr = SIM_DT%start
 
 
   call LOGS%initialize( iLogLevel = LOG_GENERAL, sFilePrefix="LOGFILE__test__FAO56", &
@@ -43,7 +53,7 @@ program test__FAO56
   call PARAMS%add_parameters( sKey="Kcb_nov", fValues=[ 0.0, 0.0, 0.35 ] )
   call PARAMS%add_parameters( sKey="Kcb_dec", fValues=[ 0.0, 0.0, 0.25 ] )
   
-  call PARAMS%add_parameters( sKey="Planting_date", fValues=[ 76.0, 1.0, 1.0 ] )  
+  call PARAMS%add_parameters( sKey="Planting_date", sValues=["05/01","04/15","05/10"] )  
 
   call PARAMS%add_parameters( sKey="Units_Are_Days", lValues=[ lTRUE, lTRUE, lTRUE ] )
   call PARAMS%add_parameters( sKey="Mean_Plant_Height", fValues=[ 5.0, 30.0, 5.0 ] )
@@ -63,23 +73,13 @@ program test__FAO56
 
   call soil_moisture_FAO56_initialize( 4 )
 
-  do iIndex = 1,365
+  do while ( SIM_DT%curr <= SIM_DT%end )
 
-    fKcb_ = sm_FAO56_UpdateCropCoefficient( iLanduseIndex=1,     &
-                                           iThreshold=iIndex,   & 
-                                           iMonth=1 )
+    fKcb_ = sm_FAO56_UpdateCropCoefficient_DateAsThreshold( iLanduseIndex=1 )
+    fKcb2 = sm_FAO56_UpdateCropCoefficient_DateAsThreshold( iLanduseIndex=3 )
 
-    print *, iIndex, fKcb_
-
-  enddo
-
-  do iIndex = 1,12
-
-    fKcb_ = sm_FAO56_UpdateCropCoefficient( iLanduseIndex=3,     &
-                                           iThreshold=1,   & 
-                                           iMonth=iIndex )
-
-    print *, iIndex, fKcb_
+    print *, SIM_DT%curr%prettydate(), fKcb_, fKcb2
+    call SIM_DT%addDay()
 
   enddo
 
