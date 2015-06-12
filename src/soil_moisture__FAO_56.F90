@@ -21,10 +21,15 @@ module soil_moisture__FAO_56
   private
 
   public :: soil_moisture_FAO56_initialize, soil_moisture_FAO56_calculate
-  public :: sm_FAO56_UpdateCropCoefficient_DateAsThreshold, update_growth_stage_dates
+  public :: soil_moisture_FAO56_update_growth_stage_dates
+  public :: update_crop_coefficient_date_as_threshold, update_crop_coefficient_GDD_as_threshold
 
   enum, bind(c)
     enumerator :: L_DOY_INI=1, L_DOY_DEV, L_DOY_MID, L_DOY_LATE
+  end enum 
+
+  enum, bind(c)
+    enumerator :: GDD_PLANT=1, GDD_INI, GDD_DEV, GDD_MID, GDD_LATE
   end enum 
 
   enum, bind(c)
@@ -46,15 +51,13 @@ module soil_moisture__FAO_56
   real (kind=c_float), allocatable   :: TEW(:,:)
   real (kind=c_float), allocatable   :: KCB(:,:)
   real (kind=c_float), allocatable   :: GROWTH_STAGE_DOY(:,:)
+  real (kind=c_float), allocatable   :: GROWTH_STAGE_GDD(:,:)
   type (DATETIME_T), allocatable     :: GROWTH_STAGE_DATE(:,:)
   logical (kind=c_bool), allocatable :: UNITS_ARE_DAYS(:)
 
   !real (kind=c_float), 
   real (kind=c_float), allocatable   :: DEPLETION_FRACTION(:)
   real (kind=c_float), allocatable   :: MEAN_PLANT_HEIGHT(:)
-
-  ! variables kept for each computational cell (i.e. varies cell-by-cell)
-  real (kind=c_float), allocatable    :: fKCB(:)
 
 contains
 
@@ -82,6 +85,13 @@ contains
     real (kind=c_float), allocatable :: L_dev_(:)
     real (kind=c_float), allocatable :: L_mid_(:)
     real (kind=c_float), allocatable :: L_late_(:)
+
+    real (kind=c_float), allocatable :: GDD_plant_(:)
+    real (kind=c_float), allocatable :: GDD_ini_(:)
+    real (kind=c_float), allocatable :: GDD_dev_(:)
+    real (kind=c_float), allocatable :: GDD_mid_(:)
+    real (kind=c_float), allocatable :: GDD_late_(:)
+
     real (kind=c_float), allocatable :: Kcb_ini_(:)            
     real (kind=c_float), allocatable :: Kcb_mid_(:)            
     real (kind=c_float), allocatable :: Kcb_end_(:)            
@@ -131,6 +141,12 @@ contains
    call PARAMS%get_parameters( sKey="L_mid", fValues=L_mid_, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="L_late", fValues=L_late_, lFatal=lTRUE )
 
+   call PARAMS%get_parameters( sKey="GDD_plant", fValues=GDD_plant_, lFatal=lFALSE )
+   call PARAMS%get_parameters( sKey="GDD_ini", fValues=GDD_ini_, lFatal=lFALSE )
+   call PARAMS%get_parameters( sKey="GDD_dev", fValues=GDD_dev_, lFatal=lFALSE )
+   call PARAMS%get_parameters( sKey="GDD_mid", fValues=GDD_mid_, lFatal=lFALSE )
+   call PARAMS%get_parameters( sKey="GDD_late", fValues=GDD_late_, lFatal=lFALSE )
+
    call PARAMS%get_parameters( sKey="Kcb_ini", fValues=KCB_ini_, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="Kcb_mid", fValues=KCB_mid_, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="Kcb_end", fValues=KCB_end_, lFatal=lTRUE )
@@ -157,6 +173,10 @@ contains
     call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_DOY array", &
       __FILE__, __LINE__ )
 
+    allocate( GROWTH_STAGE_GDD( 5, iNumberOfLanduses ), stat=iStat )
+    call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_GDD array", &
+      __FILE__, __LINE__ )
+
     allocate( GROWTH_STAGE_DATE( 5, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for DATE_GROWTH array", &
       __FILE__, __LINE__ )
@@ -171,19 +191,24 @@ contains
     GROWTH_STAGE_DOY( L_DOY_MID,  : ) = L_mid_
     GROWTH_STAGE_DOY( L_DOY_LATE, : ) = L_late_
 
+    GROWTH_STAGE_GDD = 0.0_c_float
+
+    if (ubound(GDD_plant_,1) == iNumberOfLanduses) GROWTH_STAGE_GDD( GDD_PLANT,  : ) = GDD_plant_
+    if (ubound(GDD_ini_,1) == iNumberOfLanduses) GROWTH_STAGE_GDD( GDD_INI,  : ) = GDD_ini_
+    if (ubound(GDD_dev_,1) == iNumberOfLanduses) GROWTH_STAGE_GDD( GDD_DEV,  : ) = GDD_dev_
+    if (ubound(GDD_mid_,1) == iNumberOfLanduses) GROWTH_STAGE_GDD( GDD_MID,  : ) = GDD_mid_
+    if (ubound(GDD_late_,1) == iNumberOfLanduses) GROWTH_STAGE_GDD( GDD_LATE, : ) = GDD_late_
+
     do iIndex=1, slPlantingDate%count   
 
       sMMDDYYYY = trim(slPlantingDate%get( iIndex ))//"/"//asCharacter( SIM_DT%start%iYear ) 
 
       call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)%parsedate( sMMDDYYYY )
  
-
       GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) + L_ini_( iIndex )
       GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) + L_dev_( iIndex )
       GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) + L_mid_( iIndex )
       GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) + L_late_( iIndex )
-
-!      GROWTH_STAGE_DATE( ENDDATE_INI, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) + 1.0
 
     enddo
 
@@ -224,17 +249,8 @@ contains
  !! @retval rKcb Basal crop coefficient given the irrigation table entries and the 
  !!         current threshold values.
 
- elemental function sm_FAO56_UpdateCropCoefficient_DateAsThreshold( iLanduseIndex )   &
+ elemental function update_crop_coefficient_date_as_threshold( iLanduseIndex )           & 
                                                                           result(fKcb)
-
-  !>
-  !>
-  !>  @TODO modify so that monthly values may be used *or* alternatively the 4 values
-  !>        specified in FAO-56
-  !>
-  !>
-
-
 
   integer (kind=c_int), intent(in)   :: iLanduseIndex
   real (kind=c_float)                :: fKcb
@@ -259,10 +275,6 @@ contains
                 PlantingDate => GROWTH_STAGE_DATE( PLANTING_DATE, iLanduseIndex),    &
                 Kcb_end => KCB(KCB_END, iLanduseIndex),                              &
                 current_date => SIM_DT%curr )
-
-      ! NOTE that L ("length") may be given in terms of DAYS or GDD increments;
-      !      Therefore, the value of "iThreshold" may also be specified in terms of
-      !      GDD or day of year (DOY).
 
       ! now calculate Kcb for the given landuse
       if( current_date > Date_late ) then
@@ -299,11 +311,83 @@ contains
 
   end if
 
-end function sm_FAO56_UpdateCropCoefficient_DateAsThreshold
+end function update_crop_coefficient_date_as_threshold
 
 !------------------------------------------------------------------------------
 
-subroutine update_growth_stage_dates( )
+ !> Update the current basal crop coefficient (Kcb), with GDD as the threhold
+ !!
+ !! @param[in] fGDD current growing degree day value associated with the cell.
+ !! @retval fKcb Basal crop coefficient given the irrigation table entries and the 
+ !!         current threshold values.
+
+ elemental function update_crop_coefficient_GDD_as_threshold( iLanduseIndex, fGDD )   &
+                                                                         result(fKcb)
+
+  integer (kind=c_int), intent(in)   :: iLanduseIndex
+  real (kind=c_float), intent(in)    :: fGDD
+  real (kind=c_float)                :: fKcb
+
+  ! [ LOCALS ]
+  real (kind=c_float) :: fFrac
+
+  if ( KCB( SIM_DT%curr%iMonth, iLanduseIndex ) > 0.0_c_float ) then
+
+    fKCB = KCB( SIM_DT%curr%iMonth, iLanduseIndex )
+
+  else  
+
+    ! define shorthand variable names for remainder of function
+    associate ( GDD_ini_ => GROWTH_STAGE_GDD( GDD_INI, iLanduseIndex ),         &
+                GDD_dev_ => GROWTH_STAGE_GDD( GDD_DEV, iLanduseIndex ),         &
+                GDD_mid_ => GROWTH_STAGE_GDD( GDD_MID, iLanduseIndex ),         &
+                GDD_late_ => GROWTH_STAGE_GDD( GDD_LATE, iLanduseIndex ),       &
+                Kcb_ini => KCB(KCB_INI, iLanduseIndex),                         &
+                Kcb_mid => KCB(KCB_MID, iLanduseIndex),                         &
+                Kcb_min => KCB(KCB_MIN, iLanduseIndex),                         &
+                GDD_plant_ => GROWTH_STAGE_GDD( GDD_PLANT, iLanduseIndex),      &
+                Kcb_end => KCB(KCB_END, iLanduseIndex) )
+
+      ! now calculate Kcb for the given landuse
+      if( fGDD > GDD_late_ ) then
+
+        fKcb = Kcb_min
+
+      elseif ( fGDD > GDD_mid_ ) then
+        
+        fFrac = ( fGDD - GDD_mid_ ) / ( GDD_late_ - GDD_mid_ )
+
+        fKcb =  Kcb_mid * (1_c_float - fFrac) + Kcb_end * fFrac
+
+      elseif ( fGDD > GDD_dev_ ) then
+        
+        fKcb = Kcb_mid
+
+      elseif ( fGDD > GDD_ini_ ) then
+
+        fFrac = ( fGDD - GDD_ini_ ) / ( GDD_dev_ - GDD_ini_ )
+
+        fKcb = Kcb_ini * (1_c_float - fFrac) + Kcb_mid * fFrac
+
+      elseif ( fGDD >= GDD_plant_ ) then
+        
+        fKcb = Kcb_ini
+      
+      else
+      
+        fKcb = Kcb_min
+      
+      endif
+
+    end associate
+
+  end if
+
+end function update_crop_coefficient_GDD_as_threshold
+
+!------------------------------------------------------------------------------
+
+subroutine soil_moisture_FAO56_update_growth_stage_dates( )
 
   ! [ LOCALS ]
   integer (kind=c_int) :: iIndex
@@ -311,7 +395,7 @@ subroutine update_growth_stage_dates( )
 
   do iIndex=lbound(GROWTH_STAGE_DATE,2), ubound(GROWTH_STAGE_DATE,2) 
 
-    print *, SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate()
+!     print *, SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate()
 
     if ( SIM_DT%curr <= GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) ) cycle 
 
@@ -335,7 +419,7 @@ subroutine update_growth_stage_dates( )
   enddo
 
 
-end subroutine update_growth_stage_dates
+end subroutine soil_moisture_FAO56_update_growth_stage_dates
 
 !------------------------------------------------------------------------------
 
@@ -564,13 +648,11 @@ end function calc_water_stress_coefficient_Ks
   real (kind=c_float) :: fBareSoilEvap
   real (kind=c_float) :: fCropETc
 
-  call update_growth_stage_dates()
-
   fSoilStorage_Max = fAvailableWaterCapacity * fRootingDepth
 
   if ( UNITS_ARE_DAYS( iLanduseIndex ) ) then
 
-    fKcb = sm_FAO56_UpdateCropCoefficient_DateAsThreshold( iLanduseIndex )
+    fKcb = update_crop_coefficient_date_as_threshold( iLanduseIndex )
 
   else
 

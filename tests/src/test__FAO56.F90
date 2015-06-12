@@ -75,11 +75,11 @@ program test__FAO56
 
   do while ( SIM_DT%curr <= SIM_DT%end )
 
-    call update_growth_stage_dates()
+    call soil_moisture_FAO56_update_growth_stage_dates()
 
-    fKcb1 = sm_FAO56_UpdateCropCoefficient_DateAsThreshold( iLanduseIndex=1 )
-    fKcb2 = sm_FAO56_UpdateCropCoefficient_DateAsThreshold( iLanduseIndex=2 )
-    fKcb3 = sm_FAO56_UpdateCropCoefficient_DateAsThreshold( iLanduseIndex=3 )
+    fKcb1 = update_crop_coefficient_date_as_threshold( iLanduseIndex=1 )
+    fKcb2 = update_crop_coefficient_date_as_threshold( iLanduseIndex=2 )
+    fKcb3 = update_crop_coefficient_date_as_threshold( iLanduseIndex=3 )
 
     print *, SIM_DT%curr%prettydate(), fKcb1, fKcb2, fKcb3
     call SIM_DT%addDay()
