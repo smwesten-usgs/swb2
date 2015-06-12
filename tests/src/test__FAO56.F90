@@ -15,12 +15,12 @@ program test__FAO56
 !     fRootingDepth, iLanduseIndex, iSoilGroup )
 
   integer (kind=c_int) :: iIndex
-  real (kind=c_float)  :: fKcb_, fKcb2
+  real (kind=c_float)  :: fKcb1, fKcb2, fKcb3
 
-  call SIM_DT%start%parseDate( "10/01/1999" )
+  call SIM_DT%start%parseDate( "01/01/1999" )
   call SIM_DT%start%calcJulianDay()
 
-  call SIM_DT%end%parseDate( "9/30/2000" )
+  call SIM_DT%end%parseDate( "12/31/2000" )
   call SIM_DT%end%calcJulianDay()
 
   SIM_DT%curr = SIM_DT%start
@@ -30,15 +30,15 @@ program test__FAO56
                         lWrite_SWB_Info = lFALSE )	
 
   call PARAMS%add_parameters( sKey="LU_Code", iValues=[ 1, 41, 81 ] )
-  call PARAMS%add_parameters( sKey="L_ini", iValues=[ 50, 90, 0 ] )
-  call PARAMS%add_parameters( sKey="L_dev", iValues=[ 107, 110, 0 ] )  
-  call PARAMS%add_parameters( sKey="L_mid", iValues=[ 331, 120, 0 ] )
-  call PARAMS%add_parameters( sKey="L_late", iValues=[ 152, 200, 0 ] )
+  call PARAMS%add_parameters( sKey="L_ini", iValues=[ 50, 20, 0 ] )
+  call PARAMS%add_parameters( sKey="L_dev", iValues=[ 107, 30, 0 ] )  
+  call PARAMS%add_parameters( sKey="L_mid", iValues=[ 331, 40, 0 ] )
+  call PARAMS%add_parameters( sKey="L_late", iValues=[ 152, 30, 0 ] )
 
-  call PARAMS%add_parameters( sKey="Kcb_ini", fValues=[ 0.5, 0.95, 0. ] )
-  call PARAMS%add_parameters( sKey="Kcb_mid", fValues=[ 1.25, 0.95, 0. ] )
-  call PARAMS%add_parameters( sKey="Kcb_end", fValues=[ 0.88, 0.95, 0. ] )
-  call PARAMS%add_parameters( sKey="Kcb_min", fValues=[ 0.15, 0.95, 0. ] )
+  call PARAMS%add_parameters( sKey="Kcb_ini", fValues=[ 0.5, 0.4, 0. ] )
+  call PARAMS%add_parameters( sKey="Kcb_mid", fValues=[ 1.25, 1.15, 0. ] )
+  call PARAMS%add_parameters( sKey="Kcb_end", fValues=[ 0.88, 0.85, 0. ] )
+  call PARAMS%add_parameters( sKey="Kcb_min", fValues=[ 0.15, 0.15, 0. ] )
 
   call PARAMS%add_parameters( sKey="Kcb_jan", fValues=[ 0.0, 0.0, 0.25 ] )
   call PARAMS%add_parameters( sKey="Kcb_feb", fValues=[ 0.0, 0.0, 0.35 ] )
@@ -53,7 +53,7 @@ program test__FAO56
   call PARAMS%add_parameters( sKey="Kcb_nov", fValues=[ 0.0, 0.0, 0.35 ] )
   call PARAMS%add_parameters( sKey="Kcb_dec", fValues=[ 0.0, 0.0, 0.25 ] )
   
-  call PARAMS%add_parameters( sKey="Planting_date", sValues=["05/01","04/15","05/10"] )  
+  call PARAMS%add_parameters( sKey="Planting_date", sValues=["05/01","04/25","05/10"] )  
 
   call PARAMS%add_parameters( sKey="Units_Are_Days", lValues=[ lTRUE, lTRUE, lTRUE ] )
   call PARAMS%add_parameters( sKey="Mean_Plant_Height", fValues=[ 5.0, 30.0, 5.0 ] )
@@ -75,10 +75,13 @@ program test__FAO56
 
   do while ( SIM_DT%curr <= SIM_DT%end )
 
-    fKcb_ = sm_FAO56_UpdateCropCoefficient_DateAsThreshold( iLanduseIndex=1 )
-    fKcb2 = sm_FAO56_UpdateCropCoefficient_DateAsThreshold( iLanduseIndex=3 )
+    call update_growth_stage_dates()
 
-    print *, SIM_DT%curr%prettydate(), fKcb_, fKcb2
+    fKcb1 = sm_FAO56_UpdateCropCoefficient_DateAsThreshold( iLanduseIndex=1 )
+    fKcb2 = sm_FAO56_UpdateCropCoefficient_DateAsThreshold( iLanduseIndex=2 )
+    fKcb3 = sm_FAO56_UpdateCropCoefficient_DateAsThreshold( iLanduseIndex=3 )
+
+    print *, SIM_DT%curr%prettydate(), fKcb1, fKcb2, fKcb3
     call SIM_DT%addDay()
 
   enddo

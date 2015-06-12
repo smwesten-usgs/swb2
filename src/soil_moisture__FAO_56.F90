@@ -21,7 +21,7 @@ module soil_moisture__FAO_56
   private
 
   public :: soil_moisture_FAO56_initialize, soil_moisture_FAO56_calculate
-  public :: sm_FAO56_UpdateCropCoefficient_DateAsThreshold
+  public :: sm_FAO56_UpdateCropCoefficient_DateAsThreshold, update_growth_stage_dates
 
   enum, bind(c)
     enumerator :: L_DOY_INI=1, L_DOY_DEV, L_DOY_MID, L_DOY_LATE
@@ -178,12 +178,12 @@ contains
       call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)%parsedate( sMMDDYYYY )
  
 
-!      GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) + L_ini_( iIndex )
+      GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) + L_ini_( iIndex )
+      GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) + L_dev_( iIndex )
+      GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) + L_mid_( iIndex )
+      GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) + L_late_( iIndex )
 
-      print *, GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)%prettydate()
- 
-      GROWTH_STAGE_DATE( ENDDATE_INI, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) + 1.0
-      print *, GROWTH_STAGE_DATE( ENDDATE_INI, iIndex)%prettydate()
+!      GROWTH_STAGE_DATE( ENDDATE_INI, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) + 1.0
 
     enddo
 
@@ -307,8 +307,32 @@ subroutine update_growth_stage_dates( )
 
   ! [ LOCALS ]
   integer (kind=c_int) :: iIndex
+  integer (kind=c_int) :: iNextPlantingYear
 
-!  do iIndex = 
+  do iIndex=lbound(GROWTH_STAGE_DATE,2), ubound(GROWTH_STAGE_DATE,2) 
+
+    print *, SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate()
+
+    if ( SIM_DT%curr <= GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) ) cycle 
+
+    GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%iYear = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%iYear + 1
+    call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%calcJulianDay()
+
+    print *, "New planting date set for LU Index ",iIndex,": ",  &
+       GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate()
+
+    GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) &
+                                              + GROWTH_STAGE_DOY( L_DOY_INI, iIndex )
+    GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )&
+                                              + GROWTH_STAGE_DOY( L_DOY_DEV, iIndex )
+    GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )&
+                                              + GROWTH_STAGE_DOY( L_DOY_MID, iIndex )
+    GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )&
+                                              + GROWTH_STAGE_DOY( L_DOY_LATE, iIndex )
+
+!      GROWTH_STAGE_DATE( ENDDATE_INI, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) + 1.0
+
+  enddo
 
 
 end subroutine update_growth_stage_dates
@@ -539,6 +563,8 @@ end function calc_water_stress_coefficient_Ks
   real (kind=c_float) :: fSoilStorage_Max
   real (kind=c_float) :: fBareSoilEvap
   real (kind=c_float) :: fCropETc
+
+  call update_growth_stage_dates()
 
   fSoilStorage_Max = fAvailableWaterCapacity * fRootingDepth
 

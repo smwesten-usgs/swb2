@@ -660,8 +660,8 @@ end function is_date_less_than
 
 elemental function is_date_LT_or_equal_to(date1, date2)   result(lResult)
 
-  class(DATETIME_T), intent(in) :: date1
-  class(DATETIME_T), intent(in) :: date2
+  class ( DATETIME_T ), intent(in) :: date1
+  type ( DATETIME_T ), intent(in) :: date2
 
   ! [ LOCALS ]
   logical(kind=c_bool ) :: lResult
@@ -676,8 +676,8 @@ end function is_date_LT_or_equal_to
 
 elemental function is_date_GT_or_equal_to(date1, date2)   result(lResult)
 
-  class(DATETIME_T), intent(in) :: date1
-  class(DATETIME_T), intent(in) :: date2
+  class ( DATETIME_T), intent(in) :: date1
+  type ( DATETIME_T), intent(in) :: date2
 
   ! [ LOCALS ]
   logical(kind=c_bool ) :: lResult
@@ -729,7 +729,7 @@ elemental function date_plus_float_fn(date1, fValue)  result(newdate)
 
   class(DATETIME_T), intent(in)   :: date1
   real (kind=c_float), intent(in) :: fValue
-  class(DATETIME_T), allocatable  :: newdate
+  type(DATETIME_T), allocatable  :: newdate
 
   allocate( newdate )
   newdate%dJulianDate = date1%dJulianDate + real( fValue, kind=c_double)
