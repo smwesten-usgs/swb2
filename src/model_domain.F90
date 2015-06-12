@@ -93,6 +93,7 @@ module model_domain
     procedure ( simple_method ), pointer         :: init_precipitation_data => model_initialize_precip_normal
     procedure ( simple_method ), pointer         :: init_fog                => model_initialize_fog_none
     procedure ( simple_method ), pointer         :: init_irrigation         => model_initialize_irrigation_none
+    procedure ( simple_method ), pointer         :: init_GDD                => model_initialize_GDD
 
     procedure ( simple_method ), pointer         :: calc_interception      => model_calculate_interception_bucket
 
@@ -107,6 +108,7 @@ module model_domain
     procedure ( simple_method ), pointer         :: calc_snowmelt          => model_calculate_snowmelt_original  
     procedure ( simple_method ), pointer         :: calc_fog               => model_calculate_fog_none
     procedure ( simple_method ), pointer         :: calc_irrigation        => model_calculate_irrigation_none
+    procedure ( simple_method ), pointer         :: calc_GDD               => model_calculate_GDD
 
     procedure (simple_method), pointer           :: output_soil_moisture   => model_output_irrigation_none
     procedure (simple_method), pointer           :: output_irrigation      => model_output_irrigation_none
@@ -132,8 +134,6 @@ module model_domain
     generic   :: set_inactive_cells => set_inactive_cells_sub
 
     procedure :: preflight_check_method_pointers
-
-    procedure :: iterate_over_simulation_days
     
     procedure :: calculate_mass_balance_sub
     generic   :: solve => calculate_mass_balance_sub
@@ -322,6 +322,7 @@ contains
     call this%init_soil_moisture
     call this%init_reference_et
     call this%init_precipitation_data
+    call this%init_GDD
 
   end subroutine initialize_methods_sub
 
@@ -495,7 +496,7 @@ contains
     logical (kind=c_bool)                :: lMatch
     type (STRING_LIST_T)                 :: slList
 
-     call slList%append("LU_Code")
+    call slList%append("LU_Code")
     call slList%append("LU_code")
     call slList%append("Landuse_Code")
     call slList%append("LULC_Code")
@@ -581,7 +582,6 @@ contains
 
     endif    
 
-
   end subroutine read_in_soil_groups_sub
 
 !--------------------------------------------------------------------------------------------------  
@@ -633,7 +633,6 @@ contains
       call die("Error attempting to access AVAILABLE_WATER_CONTENT data.")
 
     endif    
-
 
   end subroutine read_in_available_water_content_sub
 
@@ -744,27 +743,6 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  !> @todo Move this into a separate module 
-
-  subroutine iterate_over_simulation_days(this)
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-    do while ( SIM_DT%curr <= SIM_DT%end )
-
-      call LOGS%write("Calculating: "//SIM_DT%curr%prettydate(), iLogLevel=LOG_ALL, lEcho=.true._c_bool )
-
-      call this%get_climate_data()
-      call this%solve()
-      call this%write_variables_to_netcdf()
-      call SIM_DT%addDay()
-
-    enddo 
-
-  end subroutine iterate_over_simulation_days
-
-!--------------------------------------------------------------------------------------------------
-
   subroutine get_climate_data(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
@@ -788,8 +766,11 @@ contains
       call this%get_minimum_air_temperature_data()
       call this%get_maximum_air_temperature_data()
 
-      ! partition preciptation into rainfall and snowfall fractions
+      ! partition precipitation into rainfall and snowfall fractions
       call this%calc_snowfall()
+
+      ! update growing degree day statistic
+      call this%calc_GDD()
 
     end associate
 
@@ -1008,6 +989,11 @@ contains
     if (.not. associated( this%init_snowmelt) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
+    if (.not. associated( this%init_irrigation) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+
+    if (.not. associated( this%init_GDD) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%calc_interception) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
@@ -1022,6 +1008,12 @@ contains
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%calc_snowmelt) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+
+    if (.not. associated( this%calc_irrigation) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+
+    if (.not. associated( this%calc_GDD) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%get_precipitation_data ) ) &
@@ -1138,7 +1130,7 @@ contains
     do iSoilsIndex = 1, iNumberOfSoilGroups
       do iLUIndex = 1, iNumberOfLanduses
 
-        call LOGS%WRITE( asCharacter(iLUIndex)//" | "//asCharacter(iSoilsIndex)//" |xz "//  &
+        call LOGS%WRITE( asCharacter(iLUIndex)//" | "//asCharacter(iSoilsIndex)//" | "//  &
             asCharacter(count( this%landuse_index == iLUIndex .and. this%soil_group == iSoilsIndex ) ),              &
             iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
@@ -1152,6 +1144,8 @@ contains
         enddo
       enddo
     enddo
+
+    call slList%clear()
 
   end subroutine initialize_soil_layers_sub
 
@@ -1956,6 +1950,44 @@ contains
     !> Nothing here to see. 
 
   end subroutine model_output_irrigation_none
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_GDD( this )
+
+    use growing_degree_day
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    !> Nothing here to see. Initialization not really needed for the "normal" method.
+
+    call growing_degree_day_initialize( iNumActiveCells=count( this%active ) )
+
+  end subroutine model_initialize_GDD
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_GDD( this )
+
+    use growing_degree_day, only : GDD, GDD_BASE, GDD_MAX, growing_degree_day_calculate
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    !> Nothing here to see. 
+
+    call growing_degree_day_calculate( fGDD=GDD,          &
+                                    fTMean=this%tmean,    &
+                                    fT_GDD_Base=GDD_BASE, &
+                                    fT_GDD_Max=GDD_MAX      )
+
+  end subroutine model_calculate_GDD
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_output_GDD( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    !> Nothing here to see. 
+
+  end subroutine model_output_GDD
 
 !--------------------------------------------------------------------------------------------------
 

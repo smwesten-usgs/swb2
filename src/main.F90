@@ -74,15 +74,8 @@ program main
   
   call check_for_fatal_warnings()
 
-  call MODEL%iterate_over_simulation_days()
+  call iterate_over_simulation_days( MODEL )
    
-
-
-
-
   call LOGS%close()
-
-
-
 
 end program main

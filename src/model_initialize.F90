@@ -33,7 +33,7 @@ module model_initialize
     logical (kind=c_bool)  :: lOptional
   end type METHODS_LIST_T
 
-  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(19) = &
+  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(21) = &
 
     [ GRIDDED_DATASETS_T("PRECIPITATION                ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("TMIN                         ", lFALSE, DATATYPE_FLOAT ),     &
@@ -47,6 +47,8 @@ module model_initialize
       GRIDDED_DATASETS_T("FOG_RATIO                    ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("LAND_USE                     ", lFALSE, DATATYPE_INT ),       &
       GRIDDED_DATASETS_T("SOILS_GROUP                  ", lFALSE, DATATYPE_INT ),       &
+      GRIDDED_DATASETS_T("INITIAL_PERCENT_SOIL_MOISTURE", lFALSE, DATATYPE_FLOAT),      &
+      GRIDDED_DATASETS_T("INITIAL_SNOW_COVER_STORAGE   ", lFALSE, DATATYPE_FLOAT),      &
       GRIDDED_DATASETS_T("CANOPY_COVER_FRACTION        ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("STEMFLOW_FRACTION            ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("EVAPORATION_TO_RAINFALL_RATIO", lTRUE, DATATYPE_FLOAT ),      & 

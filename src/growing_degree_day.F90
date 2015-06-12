@@ -9,8 +9,8 @@ module growing_degree_day
 
   private
 
-  public :: GDD
-  public growing_degree_day_update, growing_degree_day_initialize
+  public :: GDD, GDD_BASE, GDD_MAX
+  public growing_degree_day_calculate, growing_degree_day_initialize
 
   real (kind=c_float), allocatable  :: GDD(:)
   real (kind=c_float), allocatable  :: GDD_BASE(:)
@@ -48,6 +48,7 @@ contains
     call slList%append("GDD_Max_Temp")
     call slList%append("GDD_Maximum_Temperature")
     call slList%append("GDD_Maximum_Temp")
+    call slList%append("GDD_Max")
 
     call PARAMS%get_parameters( slKeys=slList, fValues=fGDD_Max_, lFatal=lTRUE )
 
@@ -59,7 +60,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  elemental subroutine growing_degree_day_update( fGDD, fTMean, fT_GDD_Base, fT_GDD_Max )
+  elemental subroutine growing_degree_day_calculate( fGDD, fTMean, fT_GDD_Base, fT_GDD_Max )
 
     ! [ ARGUMENTS ]
     real (kind=c_float), intent(inout)       :: fGDD
@@ -67,8 +68,21 @@ contains
     real (kind=c_float), intent(in)          :: fT_GDD_Base
     real (kind=c_float), intent(in)          :: fT_GDD_Max
 
-    fGDD = min( max( 0.0_c_float, fTMean - fT_GDD_Base ), fT_GDD_Max )
+    ! [ LOCALS ]
+    real (kind=c_float) :: fDelta
 
-  end subroutine growing_degree_day_update  
+    fDelta = min(fTMean, fT_GDD_Max) - fT_GDD_Base
+
+    if ( fDelta > 0.0_c_float ) then
+
+      fGDD = fGDD + fDelta
+
+    else
+
+      fGDD = 0.0_c_float
+
+    end if
+
+  end subroutine growing_degree_day_calculate 
 
 end module growing_degree_day

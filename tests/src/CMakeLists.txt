@@ -28,6 +28,7 @@
             ${PROJECT_SOURCE_DIR}/src/dictionary.F90
             ${PROJECT_SOURCE_DIR}/src/exceptions.F90
             ${PROJECT_SOURCE_DIR}/src/file_operations.F90
+            ${PROJECT_SOURCE_DIR}/src/growing_degree_day.F90
             ${PROJECT_SOURCE_DIR}/src/logfiles.F90
             ${PROJECT_SOURCE_DIR}/src/parameters.F90
             ${PROJECT_SOURCE_DIR}/src/strings.F90

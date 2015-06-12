@@ -4,6 +4,7 @@ program test__GDD
   use constants_and_conversions
   use datetime
   use logfiles
+  use growing_degree_day
   use parameters, only          : PARAMS, PARAMS_DICT
   use strings
   use string_list
@@ -20,7 +21,7 @@ program test__GDD
 
   call PARAMS_DICT%print_all()
 
-
+  call growing_degree_day_initialize( 4 )
   
 
 end program test__GDD
