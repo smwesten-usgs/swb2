@@ -11,10 +11,10 @@ module soil_moisture__FAO_56
   use iso_c_binding, only             : c_bool, c_short, c_int, c_float, c_double
   use constants_and_conversions, only : M_PER_FOOT, lTRUE, lFALSE, fTINYVAL, asInt
   use datetime
-  use exceptions, only                : assert
+  use exceptions, only                : assert, warn
   use parameters, only                : PARAMS
   use simulation_datetime, only       : SIM_DT 
-  use strings, only                   : asCharacter
+  use strings, only                   : asCharacter, sQuote
   use string_list
   implicit none
 
@@ -186,10 +186,41 @@ contains
       __FILE__, __LINE__ )
 
     GROWTH_STAGE_DOY = 0.0_c_float
-    GROWTH_STAGE_DOY( L_DOY_INI,  : ) = L_ini_
-    GROWTH_STAGE_DOY( L_DOY_DEV,  : ) = L_dev_
-    GROWTH_STAGE_DOY( L_DOY_MID,  : ) = L_mid_
-    GROWTH_STAGE_DOY( L_DOY_LATE, : ) = L_late_
+
+
+    if ( (ubound(L_ini_,1) == iNumberOfLanduses)      &
+     .and. (ubound(L_dev_,1) == iNumberOfLanduses)  &
+     .and. (ubound(L_mid_,1) == iNumberOfLanduses)  & 
+     .and. (ubound(L_late_,1) == iNumberOfLanduses) &
+     .and. ( slPlantingDate%count == iNumberOfLanduses ) ) then
+
+      GROWTH_STAGE_DOY( L_DOY_INI,  : ) = L_ini_
+      GROWTH_STAGE_DOY( L_DOY_DEV,  : ) = L_dev_
+      GROWTH_STAGE_DOY( L_DOY_MID,  : ) = L_mid_
+      GROWTH_STAGE_DOY( L_DOY_LATE, : ) = L_late_
+
+      do iIndex=1, slPlantingDate%count   
+
+        sMMDDYYYY = trim(slPlantingDate%get( iIndex ))//"/"//asCharacter( SIM_DT%start%iYear ) 
+
+        call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)%parsedate( sMMDDYYYY, __FILE__, __LINE__ )
+   
+        GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) + L_ini_( iIndex )
+        GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) + L_dev_( iIndex )
+        GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) + L_mid_( iIndex )
+        GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) + L_late_( iIndex )
+
+      enddo
+
+    else
+
+      call warn( sMessage="Problem processing planting dates and growth phase lengths; the number " &
+        //"of growth phase lengths and planting dates must be equal to the number of landuses present.", &
+        lFatal=lTRUE )
+
+    endif  
+
+
 
     GROWTH_STAGE_GDD = 0.0_c_float
 
@@ -199,18 +230,6 @@ contains
     if (ubound(GDD_mid_,1) == iNumberOfLanduses) GROWTH_STAGE_GDD( GDD_MID,  : ) = GDD_mid_
     if (ubound(GDD_late_,1) == iNumberOfLanduses) GROWTH_STAGE_GDD( GDD_LATE, : ) = GDD_late_
 
-    do iIndex=1, slPlantingDate%count   
-
-      sMMDDYYYY = trim(slPlantingDate%get( iIndex ))//"/"//asCharacter( SIM_DT%start%iYear ) 
-
-      call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)%parsedate( sMMDDYYYY )
- 
-      GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) + L_ini_( iIndex )
-      GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) + L_dev_( iIndex )
-      GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) + L_mid_( iIndex )
-      GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) + L_late_( iIndex )
-
-    enddo
 
     KCB = fTINYVAL
  

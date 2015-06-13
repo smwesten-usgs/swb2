@@ -227,10 +227,12 @@ end subroutine set_time_format_indices
 
 !------------------------------------------------------------------------------
 
-subroutine parse_text_to_date_sub(this, sString)
+subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
 
-  class (DATETIME_T), intent(inout) :: this
-  character (len=*), intent(in) :: sString
+  class (DATETIME_T), intent(inout)          :: this
+  character (len=*), intent(in)              :: sString
+  character (len=*), intent(in), optional    :: sFilename
+  integer (kind=c_int), intent(in), optional :: iLinenumber
 
   ! [ LOCALS ]
   integer (kind=c_int) :: iStat
@@ -238,8 +240,22 @@ subroutine parse_text_to_date_sub(this, sString)
   integer (kind=c_int) :: iDay
   integer (kind=c_int) :: iYear
   integer (kind=c_int) :: iMonthOffset, iDayOffset
-  character (len=256) :: sStr
-  character (len=256) :: sMonth, sDay, sYear, sBuf
+  character (len=256)  :: sStr
+  character (len=256)  :: sMonth, sDay, sYear, sBuf
+  character (len=256)  :: sFilename_
+  integer (kind=c_int) :: iLinenumber_ 
+
+  if ( present( sFilename) ) then
+    sFilename_ = sFilename
+  else
+    sFilename_ = "<unknown>"
+  endif
+
+  if ( present( iLinenumber ) ) then
+    iLinenumber_ = iLinenumber
+  else
+    iLinenumber_ = -9999
+  endif    
 
   ! these offset amounts have value of 1 if the program detects a single-digit date value
   iMonthOffset = 0; iDayOffset = 0
@@ -253,9 +269,14 @@ subroutine parse_text_to_date_sub(this, sString)
     sMonth = trim(sBuf)
   endif
   read(sMonth,fmt=*, iostat = iStat) iMonth
-  call Assert(iStat==0 .and. (iMonth > 0 .and. iMonth <= 12), &
-    "Error parsing month value from text file - got "//trim(sMonth)//";"// &
-    " date text: "//trim(sStr), TRIM(__FILE__),__LINE__)
+
+  if ( .not. (iStat==0 .and. (iMonth > 0 .and. iMonth <= 12) ) ) then
+    
+    call Assert(lFALSE, &
+      "Error parsing month value - got "//trim(sMonth)//";"// &
+      " date text: "//trim(sStr),sFilename_, iLinenumber_, TRIM(__FILE__), __LINE__ )
+
+  endif  
 
   sDay = sStr( iScanDD1 - iMonthOffset : iScanDD2 -iMonthOffset )
   sBuf = clean(sDay)
@@ -264,14 +285,25 @@ subroutine parse_text_to_date_sub(this, sString)
     sDay = trim(sBuf)
   endif
   read(sDay, fmt=*, iostat = iStat) iDay
-  call Assert(iStat==0 .and. (iDay > 0 .and. iDay <= 31), &
-    "Error parsing day value from text file - got "//trim(sDay)//";"// &
-    " date text: "//trim(sStr), TRIM(__FILE__),__LINE__)
+
+  if ( .not. (iStat==0 .and. (iDay > 0 .and. iDay <= 31) ) ) then
+    
+    call Assert(lFALSE, &
+      "Error parsing day value - got "//trim(sDay)//";"// &
+      " date text: "//trim(sStr),sFilename_, iLinenumber_, TRIM(__FILE__), __LINE__ )
+
+  endif  
 
   sYear = sStr( iScanYYYY1 - iMonthOffset - iDayOffset: iScanYYYY2 - iMonthOffset - iDayOffset)
   read(sYear,fmt=*, iostat = iStat) iYear
-  call Assert(iStat==0, "Error parsing year value from text file - got "//trim(sYear)//";"// &
-    " date text: "//trim(sStr), TRIM(__FILE__),__LINE__)
+
+  if ( iStat/=0 ) then
+    
+    call Assert(lFALSE, &
+      "Error parsing year value - got "//trim(sYear)//";"// &
+      " date text: "//trim(sStr),sFilename_, iLinenumber_, TRIM(__FILE__), __LINE__ )
+
+  endif  
 
 !  if(iYear <= 99 ) iYear = iYear + 1900    ! this might be a lethal assumption
 
@@ -317,18 +349,18 @@ subroutine parse_text_to_time_sub(this, sString)
     sHour = trim(sBuf)
   endif
   read(sHour,fmt=*, iostat = iStat) iHour
-  call Assert(iStat==0, "Error parsing hour value from text file - got "//trim(sHour)//";"// &
+  call Assert(iStat==0, "Error parsing hour value - got "//trim(sHour)//";"// &
     " time text: "//trim(sStr), TRIM(__FILE__),__LINE__)
 
   sMinute = sStr(iScanMin1 - iOffset : iScanMin2 - iOffset )
   read(sMinute,fmt=*, iostat = iStat) iMinute
-  call Assert(iStat==0, "Error parsing minutes value from text file - got "//trim(sMinute)//";"// &
+  call Assert(iStat==0, "Error parsing minutes value - got "//trim(sMinute)//";"// &
     " time text: "//trim(sStr), TRIM(__FILE__),__LINE__)
 
   if(iScanSec1 /= 0) then
     sSecond = sStr(iScanSec1 - iOffset : iScanSec2 - iOffset )
     read(sSecond,fmt=*, iostat = iStat) iSecond
-    call Assert(iStat==0, "Error parsing hour value from text file - got "//trim(sSecond)//";"// &
+    call Assert(iStat==0, "Error parsing hour value - got "//trim(sSecond)//";"// &
       " time text: "//trim(sStr), TRIM(__FILE__),__LINE__)
   else
     iSecond = 0

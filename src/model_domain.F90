@@ -118,6 +118,8 @@ module model_domain
                                                                            => model_get_minimum_air_temperature_normal
     procedure ( simple_method ), pointer         :: get_maximum_air_temperature_data                                       &     
                                                                            => model_get_maximum_air_temperature_normal
+    procedure ( simple_method ), pointer         :: calculate_mean_air_temperature                                       &     
+                                                                           => model_calculate_mean_air_temperature
 
   contains
 
@@ -765,6 +767,8 @@ contains
       call this%get_precipitation_data()
       call this%get_minimum_air_temperature_data()
       call this%get_maximum_air_temperature_data()
+
+      call this%calculate_mean_air_temperature()
 
       ! partition precipitation into rainfall and snowfall fractions
       call this%calc_snowfall()
@@ -1960,7 +1964,8 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     !> Nothing here to see. Initialization not really needed for the "normal" method.
 
-    call growing_degree_day_initialize( iNumActiveCells=count( this%active ) )
+    call growing_degree_day_initialize( lActive=this%active, dX=this%X, dY=this%Y, &
+      dX_lon=pCOORD_GRD%rX , dY_lat=pCOORD_GRD%rY )
 
   end subroutine model_initialize_GDD
 
@@ -1973,10 +1978,10 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     !> Nothing here to see. 
 
-    call growing_degree_day_calculate( fGDD=GDD,          &
-                                    fTMean=this%tmean,    &
-                                    fT_GDD_Base=GDD_BASE, &
-                                    fT_GDD_Max=GDD_MAX      )
+    call growing_degree_day_calculate( fGDD=GDD,                   &
+                                       fTMean=this%tmean,          &
+                                       fT_GDD_Base=GDD_BASE,       &
+                                       fT_GDD_Max=GDD_MAX      )
 
   end subroutine model_calculate_GDD
 
@@ -2047,6 +2052,16 @@ contains
 
 !--------------------------------------------------------------------------------------------------
  
+  subroutine model_calculate_mean_air_temperature(this)
+
+     class ( MODEL_DOMAIN_T ), intent(inout)   :: this
+
+     this%tmean = ( this%tmin + this%tmax ) / 2.0_c_float
+
+  end subroutine model_calculate_mean_air_temperature
+  
+!--------------------------------------------------------------------------------------------------    
+
   subroutine model_get_maximum_air_temperature_normal(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
