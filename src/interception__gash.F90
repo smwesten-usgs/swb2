@@ -24,6 +24,7 @@ module interception__gash
 
   public interception_gash_initialize
   public interception_gash_calculate
+  public precipitation_at_saturation
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pCANOPY_COVER_FRACTION
   type (DATA_CATALOG_ENTRY_T), pointer :: pEVAPORATION_TO_RAINFALL_RATIO
@@ -152,37 +153,35 @@ contains
 
     allocate( P_SAT(ubound(CANOPY_COVER_FRACTION,1) ), stat=iStat )
     call assert( iStat==0, "Problem allocating memory for P_SAT.", __FILE__, __LINE__ )
- 
-    P_SAT = precipitation_at_saturation( EVAPORATION_TO_RAINFALL_RATIO, iLanduseIndex, &
+
+    P_SAT = precipitation_at_saturation( EVAPORATION_TO_RAINFALL_RATIO,    &
+      CANOPY_STORAGE_CAPACITY_TABLE_VALUES( iLanduseIndex ), &
       CANOPY_COVER_FRACTION )
 
   end subroutine interception_gash_initialize
 
 !--------------------------------------------------------------------------------------------------
 
-  elemental function precipitation_at_saturation( E_div_P, iLanduseIndex, canopy_cover_fraction )  result( Psat )
+  elemental function precipitation_at_saturation( E_div_P, canopy_storage_capacity, canopy_cover_fraction )  &
+                                                                               result( Psat )
 
     real (kind=c_float), intent(in)    :: E_div_P
-    integer (kind=c_int), intent(in)   :: iLanduseIndex
+    real (kind=c_float), intent(in)    :: canopy_storage_capacity
     real (kind=c_float), intent(in)    :: canopy_cover_fraction
     real (kind=c_float)                :: Psat
 
     ! [ LOCALS ]
     real (kind=c_float)                :: P_div_E
 
-    associate ( canopy_storage => CANOPY_STORAGE_CAPACITY_TABLE_VALUES( iLanduseIndex ) )
+    if ( canopy_cover_fraction > 0.0_c_float .and. canopy_storage_capacity > 0.0_c_float ) then
+      
+       Psat = - ( canopy_storage_capacity / ( canopy_cover_fraction * E_div_P ) )      &
+                     * log( 1.0_c_float - E_div_P )
+    else
 
-      if ( canopy_cover_fraction > 0.0_c_float .and. canopy_storage > 0.0_c_float ) then
-        
-         Psat = - ( canopy_storage / ( canopy_cover_fraction * E_div_P ) )      &
-                       * log( 1.0_c_float - E_div_P )
-      else
+      Psat = 0.0_c_float
 
-        Psat = 0.0_c_float
-
-      endif
-
-    end associate
+    endif
 
 !                !! calc Precip needed to saturate canopy    
 !                 Psat=-( cancap( ilu(ip) ) / ( canfrac( ip )*cerf( ip ) ) ) &
