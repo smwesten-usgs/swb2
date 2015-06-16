@@ -1891,7 +1891,7 @@ contains
                                           fGDD=this%gdd(index),                                              &
                                           fAvailableWaterCapacity=this%awc(index),                           &
                                           fReference_ET0=this%reference_ET0_adj(index),                      &
-                                          fRootingDepth=MAX_ROOTING_DEPTH( this%landuse_index(index),            &
+                                          fMaxRootingDepth=MAX_ROOTING_DEPTH( this%landuse_index(index),            &
                                                                       this%soil_group(index) ),              &
                                           iLanduseIndex=this%landuse_index(index),                           &
                                           iSoilGroup=this%soil_group(index) )
@@ -1907,7 +1907,7 @@ contains
                                             fGDD=this%gdd(iIndex),                                              &
                                             fAvailableWaterCapacity=this%awc(iIndex),                           &
                                             fReference_ET0=this%reference_ET0_adj(iIndex),                      &
-                                            fRootingDepth=MAX_ROOTING_DEPTH( this%landuse_Index(iIndex),            &
+                                            fMaxRootingDepth=MAX_ROOTING_DEPTH( this%landuse_Index(iIndex),            &
                                                                         this%soil_group(iIndex) ),              &
                                             iLanduseIndex=this%landuse_index(iIndex),                           &
                                             iSoilGroup=this%soil_group(iIndex) )

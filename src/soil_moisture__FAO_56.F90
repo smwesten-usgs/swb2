@@ -637,7 +637,7 @@ end function calc_water_stress_coefficient_Ks
 
   subroutine soil_moisture_FAO56_calculate( fSoilStorage, fActual_ET,                     &
     fSoilStorage_Excess, fInfiltration, fGDD, fAvailableWaterCapacity, fReference_ET0,    &
-    fRootingDepth, iLanduseIndex, iSoilGroup )
+    fMaxRootingDepth, iLanduseIndex, iSoilGroup )
 
   real (kind=c_float), intent(inout)   :: fSoilStorage
   real (kind=c_float), intent(inout)   :: fActual_ET
@@ -646,7 +646,7 @@ end function calc_water_stress_coefficient_Ks
   real (kind=c_float), intent(in)      :: fGDD
   real (kind=c_float), intent(in)      :: fAvailableWaterCapacity
   real (kind=c_float), intent(in)      :: fReference_ET0
-  real (kind=c_float), intent(in)      :: fRootingDepth
+  real (kind=c_float), intent(in)      :: fMaxRootingDepth
   integer (kind=c_int), intent(in)     :: iLanduseIndex
   integer (kind=c_int), intent(in)     :: iSoilGroup
 
@@ -667,8 +667,6 @@ end function calc_water_stress_coefficient_Ks
   real (kind=c_float) :: fBareSoilEvap
   real (kind=c_float) :: fCropETc
 
-  fSoilStorage_Max = fAvailableWaterCapacity * fRootingDepth
-
   if ( UNITS_ARE_DAYS( iLanduseIndex ) ) then
 
     fKcb = update_crop_coefficient_date_as_threshold( iLanduseIndex )
@@ -680,9 +678,16 @@ end function calc_water_stress_coefficient_Ks
   !					 cel%rSoilWaterCap = cel%rCurrentRootingDepth * cel%rSoilWaterCapInput
 
   endif
-
+  
   ! change from earlier coding: rooting depth is now simply keyed into the current Kcb
-  fZr = calc_effective_root_depth( iLanduseIndex, fZr_max, fKcb )
+  fZr =   calc_effective_root_depth( iLanduseIndex=iLanduseIndex,   &
+                             fZr_max=fMaxRootingDepth,              &
+                             fKCB=fKcb )
+
+  ! SoilStorge_Max in this formulation will vary in proportion to the current
+  ! rooting depth...as season progresses, rooting depth increases and the
+  ! amount of soil storage also increases.
+  fSoilStorage_Max = fAvailableWaterCapacity * fZr
 
   fREW = REW( iLanduseIndex, iSoilGroup )
   fTEW = TEW( iLanduseIndex, iSoilGroup )
