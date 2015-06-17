@@ -9,7 +9,7 @@
 module soil_moisture__FAO_56
 
   use iso_c_binding, only             : c_bool, c_short, c_int, c_float, c_double
-  use constants_and_conversions, only : M_PER_FOOT, lTRUE, lFALSE, fTINYVAL, asInt
+  use constants_and_conversions, only : M_PER_FOOT, lTRUE, lFALSE, fTINYVAL, iTINYVAL, asInt
   use datetime
   use exceptions, only                : assert, warn
   use parameters, only                : PARAMS
@@ -44,16 +44,20 @@ module soil_moisture__FAO_56
     enumerator :: JAN = 1, FEB, MAR, APR, MAY, JUN, JUL, AUG, SEP, OCT, NOV, DEC
   end enum 
 
+   enum, bind(c)
+     enumerator :: KCB_METHOD_GDD = 1, KCB_METHOD_MONTHLY_VALUES, KCB_METHOD_FAO56
+   end enum  
+
   ! Private, module level variables
   ! kept at a landuse code level (i.e. same value applies to all cells with same LU codes)
   integer (kind=c_int), allocatable  :: LANDUSE_CODE(:)
   real (kind=c_float), allocatable   :: REW(:,:)
   real (kind=c_float), allocatable   :: TEW(:,:)
   real (kind=c_float), allocatable   :: KCB(:,:)
+  integer (kind=c_int), allocatable  :: KCB_METHOD(:)
   real (kind=c_float), allocatable   :: GROWTH_STAGE_DOY(:,:)
   real (kind=c_float), allocatable   :: GROWTH_STAGE_GDD(:,:)
   type (DATETIME_T), allocatable     :: GROWTH_STAGE_DATE(:,:)
-  logical (kind=c_bool), allocatable :: UNITS_ARE_DAYS(:)
 
   !real (kind=c_float), 
   real (kind=c_float), allocatable   :: DEPLETION_FRACTION(:)
@@ -167,7 +171,6 @@ contains
 
    call PARAMS%get_parameters( sKey="Depletion_Fraction", fValues=DEPLETION_FRACTION, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="Mean_Plant_Height", fValues=MEAN_PLANT_HEIGHT, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="Units_Are_Days", lValues=UNITS_ARE_DAYS, lFatal=lTRUE )
 
     allocate( GROWTH_STAGE_DOY( 4, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_DOY array", &
@@ -185,19 +188,21 @@ contains
     call assert( iStat==0, "Failed to allocate memory for KCB array", &
       __FILE__, __LINE__ )
 
-    GROWTH_STAGE_DOY = 0.0_c_float
+    allocate( KCB_METHOD( iNumberOfLanduses ), stat=iStat )
+    call assert( iStat==0, "Failed to allocate memory for KCB_METHOD vector", &
+      __FILE__, __LINE__ )
 
+    KCB_METHOD = iTINYVAL
+    KCB = fTINYVAL
+    GROWTH_STAGE_GDD = fTINYVAL
+    GROWTH_STAGE_DOY = fTINYVAL
 
-    if ( (ubound(L_ini_,1) == iNumberOfLanduses)      &
-     .and. (ubound(L_dev_,1) == iNumberOfLanduses)  &
-     .and. (ubound(L_mid_,1) == iNumberOfLanduses)  & 
-     .and. (ubound(L_late_,1) == iNumberOfLanduses) &
-     .and. ( slPlantingDate%count == iNumberOfLanduses ) ) then
+    if ( ubound(L_ini_,1) == iNumberOfLanduses )   GROWTH_STAGE_DOY( L_DOY_INI,  : ) = L_ini_
+    if ( ubound(L_dev_,1) == iNumberOfLanduses )   GROWTH_STAGE_DOY( L_DOY_DEV,  : ) = L_dev_
+    if ( ubound(L_mid_,1) == iNumberOfLanduses )   GROWTH_STAGE_DOY( L_DOY_MID,  : ) = L_mid_
+    if ( ubound(L_late_,1) == iNumberOfLanduses )  GROWTH_STAGE_DOY( L_DOY_LATE, : ) = L_late_
 
-      GROWTH_STAGE_DOY( L_DOY_INI,  : ) = L_ini_
-      GROWTH_STAGE_DOY( L_DOY_DEV,  : ) = L_dev_
-      GROWTH_STAGE_DOY( L_DOY_MID,  : ) = L_mid_
-      GROWTH_STAGE_DOY( L_DOY_LATE, : ) = L_late_
+    if ( slPlantingDate%count == iNumberOfLanduses ) then
 
       do iIndex=1, slPlantingDate%count   
 
@@ -212,44 +217,61 @@ contains
 
       enddo
 
-    else
-
-      call warn( sMessage="Problem processing planting dates and growth phase lengths; the number " &
-        //"of growth phase lengths and planting dates must be equal to the number of landuses present.", &
-        lFatal=lTRUE )
-
     endif  
 
+    if (ubound(GDD_plant_,1) == iNumberOfLanduses)  GROWTH_STAGE_GDD( GDD_PLANT,  : ) = GDD_plant_
+    if (ubound(GDD_ini_,1) == iNumberOfLanduses)    GROWTH_STAGE_GDD( GDD_INI,  : ) = GDD_ini_
+    if (ubound(GDD_dev_,1) == iNumberOfLanduses)    GROWTH_STAGE_GDD( GDD_DEV,  : ) = GDD_dev_
+    if (ubound(GDD_mid_,1) == iNumberOfLanduses)    GROWTH_STAGE_GDD( GDD_MID,  : ) = GDD_mid_
+    if (ubound(GDD_late_,1) == iNumberOfLanduses)   GROWTH_STAGE_GDD( GDD_LATE, : ) = GDD_late_
 
+    if (ubound(KCB_ini_,1) == iNumberOfLanduses)  KCB( KCB_INI, :) = KCB_ini_
+    if (ubound(KCB_mid_,1) == iNumberOfLanduses)  KCB( KCB_MID, :) = KCB_mid_
+    if (ubound(KCB_end_,1) == iNumberOfLanduses)  KCB( KCB_END, :) = KCB_end_
+    if (ubound(KCB_min_,1) == iNumberOfLanduses)  KCB( KCB_MIN, :) = KCB_min_
 
-    GROWTH_STAGE_GDD = 0.0_c_float
+    if (ubound(KCB_jan,1) == iNumberOfLanduses)   KCB( JAN, :) = KCB_jan
+    if (ubound(KCB_feb,1) == iNumberOfLanduses)   KCB( FEB, :) = KCB_feb
+    if (ubound(KCB_mar,1) == iNumberOfLanduses)   KCB( MAR, :) = KCB_mar
+    if (ubound(KCB_apr,1) == iNumberOfLanduses)   KCB( APR, :) = KCB_apr
+    if (ubound(KCB_may,1) == iNumberOfLanduses)   KCB( MAY, :) = KCB_may
+    if (ubound(KCB_jun,1) == iNumberOfLanduses)   KCB( JUN, :) = KCB_jun
+    if (ubound(KCB_jul,1) == iNumberOfLanduses)   KCB( JUL, :) = KCB_jul
+    if (ubound(KCB_aug,1) == iNumberOfLanduses)   KCB( AUG, :) = KCB_aug
+    if (ubound(KCB_sep,1) == iNumberOfLanduses)   KCB( SEP, :) = KCB_sep
+    if (ubound(KCB_oct,1) == iNumberOfLanduses)   KCB( OCT, :) = KCB_oct
+    if (ubound(KCB_nov,1) == iNumberOfLanduses)   KCB( NOV, :) = KCB_nov
+    if (ubound(KCB_dec,1) == iNumberOfLanduses)   KCB( DEC, :) = KCB_dec
 
-    if (ubound(GDD_plant_,1) == iNumberOfLanduses) GROWTH_STAGE_GDD( GDD_PLANT,  : ) = GDD_plant_
-    if (ubound(GDD_ini_,1) == iNumberOfLanduses) GROWTH_STAGE_GDD( GDD_INI,  : ) = GDD_ini_
-    if (ubound(GDD_dev_,1) == iNumberOfLanduses) GROWTH_STAGE_GDD( GDD_DEV,  : ) = GDD_dev_
-    if (ubound(GDD_mid_,1) == iNumberOfLanduses) GROWTH_STAGE_GDD( GDD_MID,  : ) = GDD_mid_
-    if (ubound(GDD_late_,1) == iNumberOfLanduses) GROWTH_STAGE_GDD( GDD_LATE, : ) = GDD_late_
+    do iIndex = lbound( KCB_METHOD, 1), ubound( KCB_METHOD, 1)
 
+      if ( all( KCB( JAN:DEC, iIndex ) > 0.0_c_float ) ) then
+        KCB_METHOD( iIndex ) = KCB_METHOD_MONTHLY_VALUES
+              
+      elseif ( all( GROWTH_STAGE_GDD( :, iIndex ) > 0.0_c_float )  &
+         .and. all( KCB( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
+        KCB_METHOD( iIndex ) = KCB_METHOD_GDD
 
-    KCB = fTINYVAL
- 
-    KCB( KCB_INI, :) = KCB_ini_
-    KCB( KCB_MID, :) = KCB_mid_
-    KCB( KCB_END, :) = KCB_end_
-    KCB( KCB_MIN, :) = KCB_min_
+      elseif ( all( GROWTH_STAGE_DOY( :, iIndex ) > 0.0_c_float )  &
+         .and. all( KCB( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
+        KCB_METHOD( iIndex ) = KCB_METHOD_FAO56
+      endif
 
-    if (all( KCB_jan > fTINYVAL ) ) KCB( JAN, lbound(KCB_jan, 1):ubound(KCB_jan, 1)) = KCB_jan
-    if (all( KCB_feb > fTINYVAL ) ) KCB( FEB, lbound(KCB_feb, 1):ubound(KCB_feb, 1)) = KCB_feb
-    if (all( KCB_mar > fTINYVAL ) ) KCB( MAR, lbound(KCB_mar, 1):ubound(KCB_mar, 1)) = KCB_mar
-    if (all( KCB_apr > fTINYVAL ) ) KCB( APR, lbound(KCB_apr, 1):ubound(KCB_apr, 1)) = KCB_apr
-    if (all( KCB_may > fTINYVAL ) ) KCB( MAY, lbound(KCB_may, 1):ubound(KCB_may, 1)) = KCB_may
-    if (all( KCB_jun > fTINYVAL ) ) KCB( JUN, lbound(KCB_jun, 1):ubound(KCB_jun, 1)) = KCB_jun
-    if (all( KCB_jul > fTINYVAL ) ) KCB( JUL, lbound(KCB_jul, 1):ubound(KCB_jul, 1)) = KCB_jul
-    if (all( KCB_aug > fTINYVAL ) ) KCB( AUG, lbound(KCB_aug, 1):ubound(KCB_aug, 1)) = KCB_aug
-    if (all( KCB_sep > fTINYVAL ) ) KCB( SEP, lbound(KCB_sep, 1):ubound(KCB_sep, 1)) = KCB_sep
-    if (all( KCB_oct > fTINYVAL ) ) KCB( OCT, lbound(KCB_oct, 1):ubound(KCB_oct, 1)) = KCB_oct
-    if (all( KCB_nov > fTINYVAL ) ) KCB( NOV, lbound(KCB_nov, 1):ubound(KCB_nov, 1)) = KCB_nov
-    if (all( KCB_dec > fTINYVAL ) ) KCB( DEC, lbound(KCB_dec, 1):ubound(KCB_dec, 1)) = KCB_dec
+      if ( KCB_METHOD( iIndex ) < 0 )  &
+        call warn("There are missing day-of-year (L_ini, Ldev, L_mid, L_late), " &
+          //"growing degree-day ~(GDD_plant, GDD_ini, GDD_dev, GDD_mid, GDD_late)," &
+          //" or monthly crop coefficients (Kcb_jan...Kcb_dec) for" &
+          //"~landuse "//asCharacter( LANDUSE_CODE( iIndex ) ), lFatal=lTRUE )
+
+      if ( KCB_METHOD( iIndex ) == KCB_METHOD_FAO56 ) then
+        if ( .not. ( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) > SIM_DT%start ) )  &
+
+        call warn("Cannot determine planting date for FAO-56 soil moisture procedure for " &
+          //"landuse "//asCharacter( LANDUSE_CODE( iIndex) ), lFatal=lTRUE )
+
+      endif
+
+    enddo
 
   !> @TODO Add more logic here to perform checks on the validity of this data.
 
@@ -268,7 +290,7 @@ contains
  !! @retval rKcb Basal crop coefficient given the irrigation table entries and the 
  !!         current threshold values.
 
- elemental function update_crop_coefficient_date_as_threshold( iLanduseIndex )           & 
+ function update_crop_coefficient_date_as_threshold( iLanduseIndex )           & 
                                                                           result(fKcb)
 
   integer (kind=c_int), intent(in)   :: iLanduseIndex
@@ -277,7 +299,7 @@ contains
   ! [ LOCALS ]
   real (kind=c_float) :: fFrac
 
-  if ( KCB( SIM_DT%curr%iMonth, iLanduseIndex ) > 0.0_c_float ) then
+  if ( KCB_METHOD( iLanduseIndex ) == KCB_METHOD_MONTHLY_VALUES ) then
 
     fKCB = KCB( SIM_DT%curr%iMonth, iLanduseIndex )
 
@@ -340,7 +362,7 @@ end function update_crop_coefficient_date_as_threshold
  !! @retval fKcb Basal crop coefficient given the irrigation table entries and the 
  !!         current threshold values.
 
- elemental function update_crop_coefficient_GDD_as_threshold( iLanduseIndex, fGDD )   &
+ function update_crop_coefficient_GDD_as_threshold( iLanduseIndex, fGDD )   &
                                                                          result(fKcb)
 
   integer (kind=c_int), intent(in)   :: iLanduseIndex
@@ -350,57 +372,49 @@ end function update_crop_coefficient_date_as_threshold
   ! [ LOCALS ]
   real (kind=c_float) :: fFrac
 
-  if ( KCB( SIM_DT%curr%iMonth, iLanduseIndex ) > 0.0_c_float ) then
+  ! define shorthand variable names for remainder of function
+  associate ( GDD_ini_ => GROWTH_STAGE_GDD( GDD_INI, iLanduseIndex ),         &
+              GDD_dev_ => GROWTH_STAGE_GDD( GDD_DEV, iLanduseIndex ),         &
+              GDD_mid_ => GROWTH_STAGE_GDD( GDD_MID, iLanduseIndex ),         &
+              GDD_late_ => GROWTH_STAGE_GDD( GDD_LATE, iLanduseIndex ),       &
+              Kcb_ini => KCB(KCB_INI, iLanduseIndex),                         &
+              Kcb_mid => KCB(KCB_MID, iLanduseIndex),                         &
+              Kcb_min => KCB(KCB_MIN, iLanduseIndex),                         &
+              GDD_plant_ => GROWTH_STAGE_GDD( GDD_PLANT, iLanduseIndex),      &
+              Kcb_end => KCB(KCB_END, iLanduseIndex) )
 
-    fKCB = KCB( SIM_DT%curr%iMonth, iLanduseIndex )
+    ! now calculate Kcb for the given landuse
+    if( fGDD > GDD_late_ ) then
 
-  else  
+      fKcb = Kcb_min
 
-    ! define shorthand variable names for remainder of function
-    associate ( GDD_ini_ => GROWTH_STAGE_GDD( GDD_INI, iLanduseIndex ),         &
-                GDD_dev_ => GROWTH_STAGE_GDD( GDD_DEV, iLanduseIndex ),         &
-                GDD_mid_ => GROWTH_STAGE_GDD( GDD_MID, iLanduseIndex ),         &
-                GDD_late_ => GROWTH_STAGE_GDD( GDD_LATE, iLanduseIndex ),       &
-                Kcb_ini => KCB(KCB_INI, iLanduseIndex),                         &
-                Kcb_mid => KCB(KCB_MID, iLanduseIndex),                         &
-                Kcb_min => KCB(KCB_MIN, iLanduseIndex),                         &
-                GDD_plant_ => GROWTH_STAGE_GDD( GDD_PLANT, iLanduseIndex),      &
-                Kcb_end => KCB(KCB_END, iLanduseIndex) )
-
-      ! now calculate Kcb for the given landuse
-      if( fGDD > GDD_late_ ) then
-
-        fKcb = Kcb_min
-
-      elseif ( fGDD > GDD_mid_ ) then
-        
-        fFrac = ( fGDD - GDD_mid_ ) / ( GDD_late_ - GDD_mid_ )
-
-        fKcb =  Kcb_mid * (1_c_float - fFrac) + Kcb_end * fFrac
-
-      elseif ( fGDD > GDD_dev_ ) then
-        
-        fKcb = Kcb_mid
-
-      elseif ( fGDD > GDD_ini_ ) then
-
-        fFrac = ( fGDD - GDD_ini_ ) / ( GDD_dev_ - GDD_ini_ )
-
-        fKcb = Kcb_ini * (1_c_float - fFrac) + Kcb_mid * fFrac
-
-      elseif ( fGDD >= GDD_plant_ ) then
-        
-        fKcb = Kcb_ini
+    elseif ( fGDD > GDD_mid_ ) then
       
-      else
-      
-        fKcb = Kcb_min
-      
-      endif
+      fFrac = ( fGDD - GDD_mid_ ) / ( GDD_late_ - GDD_mid_ )
 
-    end associate
+      fKcb =  Kcb_mid * (1_c_float - fFrac) + Kcb_end * fFrac
 
-  end if
+    elseif ( fGDD > GDD_dev_ ) then
+      
+      fKcb = Kcb_mid
+
+    elseif ( fGDD > GDD_ini_ ) then
+
+      fFrac = ( fGDD - GDD_ini_ ) / ( GDD_dev_ - GDD_ini_ )
+
+      fKcb = Kcb_ini * (1_c_float - fFrac) + Kcb_mid * fFrac
+
+    elseif ( fGDD >= GDD_plant_ ) then
+      
+      fKcb = Kcb_ini
+    
+    else
+    
+      fKcb = Kcb_min
+    
+    endif
+
+  end associate
 
 end function update_crop_coefficient_GDD_as_threshold
 
@@ -417,6 +431,8 @@ subroutine soil_moisture_FAO56_update_growth_stage_dates( )
 !     print *, SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate()
 
     if ( SIM_DT%curr <= GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) ) cycle 
+
+    if ( KCB_METHOD( iIndex ) /= KCB_METHOD_FAO56 ) cycle
 
     GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%iYear = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%iYear + 1
     call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%calcJulianDay()
@@ -444,7 +460,7 @@ end subroutine soil_moisture_FAO56_update_growth_stage_dates
 
 !>
 
-elemental function calc_evaporation_reduction_coeficient(fTotalEvaporableWater,                &
+function calc_evaporation_reduction_coefficient(fTotalEvaporableWater,                &
                                               fReadilyEvaporableWater, fDeficit)  result(fKr)
 
   ! [ ARGUMENTS ]
@@ -459,6 +475,9 @@ elemental function calc_evaporation_reduction_coeficient(fTotalEvaporableWater, 
               TEW => fTotalEvaporableWater,       &
               Deficit => fDeficit )
 
+
+  print *, "fKr: Deficit=",Deficit, "  REW=",REW, "  TEW=", TEW
+
     if ( Deficit > REW .and. Deficit < TEW ) then
       fKr = (TEW - Deficit) / (TEW - REW)
     elseif ( Deficit <= REW ) then
@@ -469,7 +488,7 @@ elemental function calc_evaporation_reduction_coeficient(fTotalEvaporableWater, 
 
   end associate
 
-end function calc_evaporation_reduction_coeficient
+end function calc_evaporation_reduction_coefficient
 
 !------------------------------------------------------------------------------
 
@@ -478,7 +497,7 @@ end function calc_evaporation_reduction_coeficient
 !!
 !!@note Implemented as equation 76, FAO-56, Allen and others
 
-elemental function calc_fraction_wetted_and_exposed_soil( iLanduseIndex, fKcb)   result (f_few)
+function calc_fraction_wetted_and_exposed_soil( iLanduseIndex, fKcb)   result (f_few)
 
   integer (kind=c_int), intent(in)     :: iLanduseIndex
   real (kind=c_float), intent(in)      :: fKcb
@@ -490,8 +509,18 @@ elemental function calc_fraction_wetted_and_exposed_soil( iLanduseIndex, fKcb)  
   real (kind=c_float) :: fDenominator
   real (kind=c_float) :: fExponent
 
-  fNumerator = fKcb - minval(KCB( :, iLanduseIndex ) )
-  fDenominator = maxval( KCB( :, iLanduseIndex) ) - minval( KCB( :, iLanduseIndex ) )
+  if ( KCB_METHOD( iLanduseIndex ) == KCB_METHOD_MONTHLY_VALUES ) then
+
+    fNumerator = fKcb - minval(KCB( JAN:DEC, iLanduseIndex ) )
+    fDenominator = maxval( KCB( JAN:DEC, iLanduseIndex) ) - minval( KCB( JAN:DEC, iLanduseIndex ) )
+
+  else 
+  
+    fNumerator = fKcb - minval(KCB( KCB_INI:KCB_MIN, iLanduseIndex ) )
+    fDenominator = maxval( KCB( KCB_INI:KCB_MIN, iLanduseIndex) ) - minval( KCB( KCB_INI:KCB_MIN, iLanduseIndex ) )
+
+  endif
+
   fExponent = 1.0_c_float + 0.5_c_float * MEAN_PLANT_HEIGHT( iLanduseIndex ) * M_PER_FOOT
 
   ! calculate the fraction of the ground that is currently covered
@@ -506,6 +535,9 @@ elemental function calc_fraction_wetted_and_exposed_soil( iLanduseIndex, fKcb)  
 
   if ( f_few < 0.0_c_float ) f_few = 0.0_c_float
   if ( f_few > 1.0_c_float ) f_few = 1.0_c_float
+
+print *, "f_few: fNumerator=",fNumerator,"  fDenominator=",fDenominator,"  maxval(KCB)=",maxval( KCB( :, iLanduseIndex) ), &
+   "  minval(KCB)=",minval( KCB( :, iLanduseIndex) ),"  Plant_Height=", MEAN_PLANT_HEIGHT( iLanduseIndex )
 
 end function calc_fraction_wetted_and_exposed_soil
 
@@ -526,7 +558,7 @@ end function calc_fraction_wetted_and_exposed_soil
 !! @retval rZr_i current active rooting depth.
 !! @note Implemented as equation 8-1 (Annex 8), FAO-56, Allen and others.
 
-elemental function calc_effective_root_depth( iLanduseIndex, fZr_max, fKCB ) 	result(fZr_i)
+function calc_effective_root_depth( iLanduseIndex, fZr_max, fKCB ) 	result(fZr_i)
 
   integer (kind=c_int), intent(in)    :: iLanduseIndex 
 	real (kind=c_float), intent(in)     :: fZr_max
@@ -570,7 +602,7 @@ end function calc_effective_root_depth
 !!
 !! @note Implemented as equation 71, FAO-56, Allen and others
 
-elemental function calc_surface_evaporation_coefficient( iLanduseIndex, fKr, fKcb )     result(fKe)
+function calc_surface_evaporation_coefficient( iLanduseIndex, fKr, fKcb )     result(fKe)
 
   integer (kind=c_int), intent(in)     :: iLanduseIndex
   real (kind=c_float), intent(in)      :: fKr
@@ -586,7 +618,7 @@ end function calc_surface_evaporation_coefficient
 !> This subroutine updates the total available water (TAW)
 !> (water within the rootzone) for a gridcell
 
-elemental subroutine calc_total_available_water_TAW(fTotalAvailableWater, fReadilyAvailableWater, &
+subroutine calc_total_available_water_TAW(fTotalAvailableWater, fReadilyAvailableWater, &
                 iLanduseIndex, fAvailableWaterCapacity, fCurrentRootingDepth )
 
   real (kind=c_float), intent(out)      :: fTotalAvailableWater
@@ -606,7 +638,7 @@ elemental subroutine calc_total_available_water_TAW(fTotalAvailableWater, fReadi
 !!
 !! @note Implemented as equation 84, FAO-56, Allen and others
 
-elemental function calc_water_stress_coefficient_Ks( iLanduseIndex, fDeficit, &
+function calc_water_stress_coefficient_Ks( iLanduseIndex, fDeficit, &
                       fTotalAvailableWater, fReadilyAvailableWater )      result(fKs)
 
   integer (kind=c_int), intent(in)     :: iLanduseIndex
@@ -669,7 +701,8 @@ end function calc_water_stress_coefficient_Ks
 
   fSoilStorage_Max = fAvailableWaterCapacity * fRootingDepth
 
-  if ( UNITS_ARE_DAYS( iLanduseIndex ) ) then
+  if ( KCB_METHOD( iLanduseIndex )  == KCB_METHOD_FAO56  &
+    .or. KCB_METHOD( iLanduseIndex ) == KCB_METHOD_MONTHLY_VALUES ) then
 
     fKcb = update_crop_coefficient_date_as_threshold( iLanduseIndex )
 
@@ -713,7 +746,7 @@ end function calc_water_stress_coefficient_Ks
   ! the adjustments for nonstandard growing conditions (e.g. plant
   ! stress and resulting decrease in ET during dry conditions).
 
-  fKr = calc_evaporation_reduction_coeficient(fTotalEvaporableWater=fTEW,    &
+  fKr = calc_evaporation_reduction_coefficient(fTotalEvaporableWater=fTEW,    &
                                              fReadilyEvaporableWater=fREW,   &
                                              fDeficit=fDeficit )
 
@@ -727,6 +760,7 @@ end function calc_water_stress_coefficient_Ks
                                           fTotalAvailableWater=fTAW,     &
                                           fReadilyAvailableWater=fRAW )
 
+  
 
   fBareSoilEvap = fReference_ET0 * fKe
   fCropETc = fReference_ET0 * (fKcb * fKs)
@@ -735,6 +769,9 @@ end function calc_water_stress_coefficient_Ks
   fActual_ET = fCropETc + fBareSoilEvap
 
   fSoilStorage = fSoilStorage + fInfiltration - fActual_ET
+
+print *, fRootingDepth, iLanduseIndex, iSoilGroup, fSoilStorage, fKr, f_few, &
+   fKe, fKs, fKcb, fReference_ET0, fBareSoilEvap, fCropETc, fActual_ET
 
   if (fSoilStorage > fSoilStorage_Max ) then
     fSoilStorage_Excess = fSoilStorage - fSoilStorage_Max

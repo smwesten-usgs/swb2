@@ -669,6 +669,10 @@ subroutine getvalues_constant_sub( this  )
 
       call this%transfer_from_native() 
 
+      if ( .not. this%lGridIsPersistent )  call grid_Destroy( this%pGrdNative )
+
+      exit
+
     enddo
 
   end subroutine getvalues_gridded_sub
