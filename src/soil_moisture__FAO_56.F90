@@ -475,9 +475,6 @@ function calc_evaporation_reduction_coefficient(fTotalEvaporableWater,          
               TEW => fTotalEvaporableWater,       &
               Deficit => fDeficit )
 
-
-  print *, "fKr: Deficit=",Deficit, "  REW=",REW, "  TEW=", TEW
-
     if ( Deficit > REW .and. Deficit < TEW ) then
       fKr = (TEW - Deficit) / (TEW - REW)
     elseif ( Deficit <= REW ) then
@@ -485,6 +482,8 @@ function calc_evaporation_reduction_coefficient(fTotalEvaporableWater,          
     else
       fKr = 0.0_c_float
     endif
+
+    print *, "fKr: Deficit=",Deficit, "  REW=",REW, "  TEW=", TEW, "  fKr=", fKr
 
   end associate
 
@@ -537,7 +536,7 @@ function calc_fraction_wetted_and_exposed_soil( iLanduseIndex, fKcb)   result (f
   if ( f_few > 1.0_c_float ) f_few = 1.0_c_float
 
 print *, "f_few: fNumerator=",fNumerator,"  fDenominator=",fDenominator,"  maxval(KCB)=",maxval( KCB( :, iLanduseIndex) ), &
-   "  minval(KCB)=",minval( KCB( :, iLanduseIndex) ),"  Plant_Height=", MEAN_PLANT_HEIGHT( iLanduseIndex )
+   "  minval(KCB)=",minval( KCB( :, iLanduseIndex) ),"  Plant_Height=", MEAN_PLANT_HEIGHT( iLanduseIndex ), "  f_few=", f_few
 
 end function calc_fraction_wetted_and_exposed_soil
 
@@ -669,7 +668,7 @@ end function calc_water_stress_coefficient_Ks
 
   subroutine soil_moisture_FAO56_calculate( fSoilStorage, fActual_ET,                     &
     fSoilStorage_Excess, fInfiltration, fGDD, fAvailableWaterCapacity, fReference_ET0,    &
-    fRootingDepth, iLanduseIndex, iSoilGroup )
+    fMaxRootingDepth, iLanduseIndex, iSoilGroup )
 
   real (kind=c_float), intent(inout)   :: fSoilStorage
   real (kind=c_float), intent(inout)   :: fActual_ET
@@ -678,7 +677,7 @@ end function calc_water_stress_coefficient_Ks
   real (kind=c_float), intent(in)      :: fGDD
   real (kind=c_float), intent(in)      :: fAvailableWaterCapacity
   real (kind=c_float), intent(in)      :: fReference_ET0
-  real (kind=c_float), intent(in)      :: fRootingDepth
+  real (kind=c_float), intent(in)      :: fMaxRootingDepth
   integer (kind=c_int), intent(in)     :: iLanduseIndex
   integer (kind=c_int), intent(in)     :: iSoilGroup
 
@@ -699,7 +698,7 @@ end function calc_water_stress_coefficient_Ks
   real (kind=c_float) :: fBareSoilEvap
   real (kind=c_float) :: fCropETc
 
-  fSoilStorage_Max = fAvailableWaterCapacity * fRootingDepth
+  fSoilStorage_Max = fAvailableWaterCapacity * fMaxRootingDepth
 
   if ( KCB_METHOD( iLanduseIndex )  == KCB_METHOD_FAO56  &
     .or. KCB_METHOD( iLanduseIndex ) == KCB_METHOD_MONTHLY_VALUES ) then
@@ -770,8 +769,10 @@ end function calc_water_stress_coefficient_Ks
 
   fSoilStorage = fSoilStorage + fInfiltration - fActual_ET
 
-print *, fRootingDepth, iLanduseIndex, iSoilGroup, fSoilStorage, fKr, f_few, &
-   fKe, fKs, fKcb, fReference_ET0, fBareSoilEvap, fCropETc, fActual_ET
+print *, "infil=", fInfiltration, "  rootmax=",fMaxRootingDepth, "  LU=",iLanduseIndex, "  soil=",iSoilGroup,   &
+  "  soilstor=",fSoilStorage, "  fKr=",fKr, "  f_few=",f_few, &
+   "  fKe=",fKe, "  fKs=", fKs, "  fKcb=",fKcb, "  fRefET=",fReference_ET0, &
+   "  baresoilevap=", fBareSoilEvap, "  cropEtc=", fCropETc, "  ActET=", fActual_ET
 
   if (fSoilStorage > fSoilStorage_Max ) then
     fSoilStorage_Excess = fSoilStorage - fSoilStorage_Max
