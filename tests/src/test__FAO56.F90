@@ -82,6 +82,9 @@ program test__FAO56
     fKcb3 = update_crop_coefficient_date_as_threshold( iLanduseIndex=3 )
 
     print *, SIM_DT%curr%prettydate(), fKcb1, fKcb2, fKcb3
+    
+    !calc_effective_root_depth( iLanduseIndex, fZr_max, fKCB )
+
     call SIM_DT%addDay()
 
   enddo
