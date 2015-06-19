@@ -1855,7 +1855,12 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call soil_moisture_FAO56_initialize( count( this%active ) )
+    call soil_moisture_FAO56_initialize( fSoilStorage=this%soil_storage,        &
+                                         iLanduseIndex=this%landuse_index,      &
+                                         iSoilGroup=this%soil_group,            &
+                                         fMax_Rooting_Depths=MAX_ROOTING_DEPTH, &
+                                         fAvailable_Water_Content=this%awc,     &
+                                         lActive=this%active )
 
   end subroutine model_initialize_soil_moisture_fao_56
 

@@ -16,6 +16,9 @@ program test__FAO56
 
   integer (kind=c_int) :: iIndex
   real (kind=c_float)  :: fKcb1, fKcb2, fKcb3
+  logical (kind=c_bool) :: lActive(2,2)
+
+  lActive = lTRUE
 
   call SIM_DT%start%parseDate( "01/01/1999" )
   call SIM_DT%start%calcJulianDay()
@@ -71,7 +74,7 @@ program test__FAO56
 
   call PARAMS_DICT%print_all()
 
-  call soil_moisture_FAO56_initialize( 4 )
+  call soil_moisture_FAO56_initialize( lActive )
 
   do while ( SIM_DT%curr <= SIM_DT%end )
 
@@ -81,7 +84,7 @@ program test__FAO56
     fKcb2 = update_crop_coefficient_date_as_threshold( iLanduseIndex=2 )
     fKcb3 = update_crop_coefficient_date_as_threshold( iLanduseIndex=3 )
 
-    print *, SIM_DT%curr%prettydate(), fKcb1, fKcb2, fKcb3
+!    print *, SIM_DT%curr%prettydate(), fKcb1, fKcb2, fKcb3
     
     !calc_effective_root_depth( iLanduseIndex, fZr_max, fKCB )
 

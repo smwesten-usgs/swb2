@@ -10,8 +10,10 @@ module soil_moisture__FAO_56
 
   use iso_c_binding, only             : c_bool, c_short, c_int, c_float, c_double
   use constants_and_conversions, only : M_PER_FOOT, lTRUE, lFALSE, fTINYVAL, iTINYVAL, asInt
+  use data_catalog, only              : DAT
+  use data_catalog_entry, only        : DATA_CATALOG_ENTRY_T
   use datetime
-  use exceptions, only                : assert, warn
+  use exceptions, only                : assert, warn, die
   use parameters, only                : PARAMS
   use simulation_datetime, only       : SIM_DT 
   use strings, only                   : asCharacter, sQuote
@@ -62,12 +64,20 @@ module soil_moisture__FAO_56
   !real (kind=c_float), 
   real (kind=c_float), allocatable   :: DEPLETION_FRACTION(:)
   real (kind=c_float), allocatable   :: MEAN_PLANT_HEIGHT(:)
+  real (kind=c_float), allocatable   :: INITIAL_PERCENT_SOIL_MOISTURE(:)
 
 contains
 
-  subroutine soil_moisture_FAO56_initialize( iNumActiveCells )
+  subroutine soil_moisture_FAO56_initialize( fSoilStorage, iLanduseIndex, iSoilGroup, &
+                                             fMax_Rooting_Depths, fAvailable_Water_Content, &
+                                             lActive )
 
-    integer (kind=c_int), intent(in)   :: iNumActiveCells
+    real (kind=c_float), intent(inout)   :: fSoilStorage(:)
+    integer (kind=c_int), intent(in)     :: iLanduseIndex(:)
+    integer (kind=c_int), intent(in)     :: iSoilGroup(:)
+    real (kind=c_float), intent(in)      :: fMax_Rooting_Depths(:, :)
+    real (kind=c_float), intent(in)      :: fAvailable_Water_Content(:)
+    logical (kind=c_bool), intent(in)    :: lActive(:,:)
 
     ! [ LOCALS ]
     type (STRING_LIST_T)              :: slREW, slTEW
@@ -113,6 +123,24 @@ contains
     real (kind=c_float), allocatable :: Kcb_oct(:)
     real (kind=c_float), allocatable :: Kcb_nov(:)
     real (kind=c_float), allocatable :: Kcb_dec(:)
+
+    real (kind=c_float)              :: fKcb_initial
+    real (kind=c_float)              :: fRz_initial
+
+    type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_PERCENT_SOIL_MOISTURE
+
+    ! locate the data structure associated with the gridded rainfall zone entries
+    pINITIAL_PERCENT_SOIL_MOISTURE => DAT%find("INITIAL_PERCENT_SOIL_MOISTURE")
+    if ( .not. associated( pINITIAL_PERCENT_SOIL_MOISTURE ) ) &
+        call die("A INITIAL_PERCENT_SOIL_MOISTURE grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
+
+    allocate( INITIAL_PERCENT_SOIL_MOISTURE( count(lActive) ), stat=iStat )
+    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+ 
+    call pINITIAL_PERCENT_SOIL_MOISTURE%getvalues()
+ 
+    ! map the 2D array of RAINFALL_ZONE values to the vector of active cells
+    INITIAL_PERCENT_SOIL_MOISTURE = pack( pINITIAL_PERCENT_SOIL_MOISTURE%pGrdBase%rData, lActive )
 
    !> create string list that allows for alternate heading identifiers for the landuse code
    call slList%append("LU_Code")
@@ -270,6 +298,18 @@ contains
           //"landuse "//asCharacter( LANDUSE_CODE( iIndex) ), lFatal=lTRUE )
 
       endif
+
+    enddo
+
+    do iIndex = lbound( fSoilStorage, 1 ), ubound( fSoilStorage,1 )
+
+      fKcb_initial = update_crop_coefficient_date_as_threshold( iLanduseIndex( iIndex ) )
+      fRz_initial = calc_effective_root_depth( iLanduseIndex=iLanduseIndex( iIndex ),                &
+                                               fZr_max=fMax_Rooting_Depths( iLanduseIndex( iIndex ), &
+                                                                            iSoilGroup( iIndex ) ),  &
+                                               fKCB=fKcb_initial )
+      fSoilStorage( iIndex ) = INITIAL_PERCENT_SOIL_MOISTURE( iIndex )    &
+                               * fRz_initial * fAvailable_Water_Content( iIndex )
 
     enddo
 
@@ -483,7 +523,7 @@ function calc_evaporation_reduction_coefficient(fTotalEvaporableWater,          
       fKr = 0.0_c_float
     endif
 
-    print *, "fKr: Deficit=",Deficit, "  REW=",REW, "  TEW=", TEW, "  fKr=", fKr
+!    print *, "fKr: Deficit=",Deficit, "  REW=",REW, "  TEW=", TEW, "  fKr=", fKr
 
   end associate
 
@@ -535,8 +575,8 @@ function calc_fraction_wetted_and_exposed_soil( iLanduseIndex, fKcb)   result (f
   if ( f_few < 0.0_c_float ) f_few = 0.0_c_float
   if ( f_few > 1.0_c_float ) f_few = 1.0_c_float
 
-print *, "f_few: fNumerator=",fNumerator,"  fDenominator=",fDenominator,"  maxval(KCB)=",maxval( KCB( :, iLanduseIndex) ), &
-   "  minval(KCB)=",minval( KCB( :, iLanduseIndex) ),"  Plant_Height=", MEAN_PLANT_HEIGHT( iLanduseIndex ), "  f_few=", f_few
+!print *, "f_few: fNumerator=",fNumerator,"  fDenominator=",fDenominator,"  maxval(KCB)=",maxval( KCB( :, iLanduseIndex) ), &
+!   "  minval(KCB)=",minval( KCB( :, iLanduseIndex) ),"  Plant_Height=", MEAN_PLANT_HEIGHT( iLanduseIndex ), "  f_few=", f_few
 
 end function calc_fraction_wetted_and_exposed_soil
 
@@ -573,8 +613,13 @@ function calc_effective_root_depth( iLanduseIndex, fZr_max, fKCB ) 	result(fZr_i
   real (kind=c_float)            :: fMaxKCB
   real (kind=c_float)            :: fMinKCB
 
-  fMaxKCB = maxval( KCB( :, iLanduseIndex ) )
-  fMinKCB = minval( KCB( :, iLanduseIndex ) ) 
+  if ( KCB_METHOD( iLanduseIndex ) == KCB_METHOD_MONTHLY_VALUES ) then
+    fMaxKCB = maxval( KCB( JAN:DEC, iLanduseIndex ) )
+    fMinKCB = minval( KCB( JAN:DEC, iLanduseIndex ) )
+  else
+    fMaxKCB = maxval( KCB( KCB_INI:KCB_MIN, iLanduseIndex ) )
+    fMinKCB = minval( KCB( KCB_INI:KCB_MIN, iLanduseIndex ) )  
+  endif   
 
   ! if there is not much difference between the MAX Kcb and MIN Kcb, assume that
   ! we are dealing with an area such as a forest, where we assume that the rooting
@@ -698,8 +743,6 @@ end function calc_water_stress_coefficient_Ks
   real (kind=c_float) :: fBareSoilEvap
   real (kind=c_float) :: fCropETc
 
-  fSoilStorage_Max = fAvailableWaterCapacity * fMaxRootingDepth
-
   if ( KCB_METHOD( iLanduseIndex )  == KCB_METHOD_FAO56  &
     .or. KCB_METHOD( iLanduseIndex ) == KCB_METHOD_MONTHLY_VALUES ) then
 
@@ -714,7 +757,10 @@ end function calc_water_stress_coefficient_Ks
   endif
 
   ! change from earlier coding: rooting depth is now simply keyed into the current Kcb
-  fZr = calc_effective_root_depth( iLanduseIndex, fZr_max, fKcb )
+  fZr = calc_effective_root_depth( iLanduseIndex, fMaxRootingDepth, fKcb )
+
+  ! fSoilStorageMax is now dynamic, unlike previous SWB versions
+  fSoilStorage_Max = fAvailableWaterCapacity * fZr
 
   fREW = REW( iLanduseIndex, iSoilGroup )
   fTEW = TEW( iLanduseIndex, iSoilGroup )
@@ -732,8 +778,7 @@ end function calc_water_stress_coefficient_Ks
   !
   ! ### This should be defined in terms of TAW and RAW, no?
   !
-  fDeficit = MAX( 0.0_c_float, fSoilStorage_Max - fSoilStorage )
-
+  fDeficit = max( 0.0_c_float, fSoilStorage_Max - fSoilStorage )
 
   ! "STANDARD" vs "NONSTANDARD": in the FAO56 publication the term
   ! "STANDARD" is used to refer to crop ET requirements under
@@ -760,7 +805,6 @@ end function calc_water_stress_coefficient_Ks
                                           fReadilyAvailableWater=fRAW )
 
   
-
   fBareSoilEvap = fReference_ET0 * fKe
   fCropETc = fReference_ET0 * (fKcb * fKs)
 
@@ -769,18 +813,14 @@ end function calc_water_stress_coefficient_Ks
 
   fSoilStorage = fSoilStorage + fInfiltration - fActual_ET
 
-print *, "infil=", fInfiltration, "  rootmax=",fMaxRootingDepth, "  LU=",iLanduseIndex, "  soil=",iSoilGroup,   &
-  "  soilstor=",fSoilStorage, "  fKr=",fKr, "  f_few=",f_few, &
-   "  fKe=",fKe, "  fKs=", fKs, "  fKcb=",fKcb, "  fRefET=",fReference_ET0, &
-   "  baresoilevap=", fBareSoilEvap, "  cropEtc=", fCropETc, "  ActET=", fActual_ET
+!print *, "infil=", fInfiltration, "  rootmax=",fMaxRootingDepth, "  LU=",iLanduseIndex, "  soil=",iSoilGroup,   &
+!!  "  soilstor=",fSoilStorage, "  fKr=",fKr, "  f_few=",f_few, &
+!   "  fKe=",fKe, "  fKs=", fKs, "  fKcb=",fKcb, "  fRefET=",fReference_ET0, &
+!   "  baresoilevap=", fBareSoilEvap, "  cropEtc=", fCropETc, "  ActET=", fActual_ET
 
-  if (fSoilStorage > fSoilStorage_Max ) then
-    fSoilStorage_Excess = fSoilStorage - fSoilStorage_Max
-    fSoilStorage = fSoilStorage_Max
-  else
-    fSoilStorage_Excess = 0.0_c_float
-  endif  
-
+  fSoilStorage = min( fSoilStorage_Max, fSoilStorage )
+  fSoilStorage_Excess = max( 0.0_c_float, fSoilStorage - fSoilStorage_Max )
+  
 end subroutine soil_moisture_FAO56_calculate
 
 end module soil_moisture__FAO_56

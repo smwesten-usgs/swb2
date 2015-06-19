@@ -8,21 +8,13 @@ One of the developers of curve number methodology developed a graphical method w
 
 The curve number aligner has been expressed in equation form as given below (Woodward and others, 2002):
 
-@f[
-CN_A = -60.8  +  1.6083 CN_B
-@f]
+$$ CN_A = -60.8  +  1.6083 CN_B $$
 
-@f[
-CN_B =  CN_B
-@f]
+$$ CN_B =  CN_B $$
 
-@f[
-CN_C =  34.0  +  0.6600 CN_B
-@f]
+$$ CN_C =  34.0  +  0.6600 CN_B $$
 
-@f[
-CN_D =  47.2  +  0.5283 CN_B
-@f]
+$$ CN_D =  47.2  +  0.5283 CN_B $$
 
 
 ## References
