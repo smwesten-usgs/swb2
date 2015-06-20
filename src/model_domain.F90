@@ -74,6 +74,7 @@ module model_domain
     real (kind=c_float), allocatable       :: fog(:)
     real (kind=c_float), allocatable       :: rainfall(:)
     real (kind=c_float), allocatable       :: snowfall(:)
+    real (kind=c_float), allocatable       :: irrigation(:)
 
     real (kind=c_float), allocatable       :: tmin(:)
     real (kind=c_float), allocatable       :: tmax(:)
@@ -268,7 +269,7 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
-    integer (kind=c_int)  :: iStat(31)
+    integer (kind=c_int)  :: iStat(32)
 
     iCount = count( this%active )
 
@@ -299,11 +300,12 @@ contains
     allocate( this%soil_storage_max(iCount), stat=iStat(25) )
     allocate( this%potential_recharge(iCount), stat=iStat(26) )
     allocate( this%fog(iCount), stat=iStat(27) )
-    allocate( this%rooting_depth(iCount), stat=iStat(28) )
-    allocate( this%index_order(iCount), stat=iStat(29) )
-    allocate( this%gdd(iCount), stat=iStat(30) )
+    allocate( this%irrigation(iCount), stat=iStat(28) )
+    allocate( this%rooting_depth(iCount), stat=iStat(29) )
+    allocate( this%index_order(iCount), stat=iStat(30) )
+    allocate( this%gdd(iCount), stat=iStat(31) )
 
-    allocate( OUTPUT(16), stat=iStat(31) )
+    allocate( OUTPUT(16), stat=iStat(32) )
 
     if ( any( iStat /= 0 ) )  call die("Problem allocating memory", __FILE__, __LINE__)
 
@@ -1178,6 +1180,7 @@ contains
         this%inflow( orderindex ) =   this%runon( orderindex )                      &
                                     + this%gross_precip( orderindex )               &
                                     + this%fog( orderindex )                        &
+                                    + this%irrigation( orderindex )                 &
                                     + this%snowmelt( orderindex )                   &
                                     - this%interception( orderindex )                      
                              
@@ -1205,7 +1208,8 @@ contains
      else
 
        this%runon = 0.0_c_float
-       this%inflow = this%gross_precip + this%fog - this%interception + this%snowmelt
+       this%inflow = this%gross_precip + this%fog + this%irrigation     &
+                      - this%interception + this%snowmelt
        call this%calc_runoff()
 !        print *, "Gross Precip: ", minval(this%gross_precip), maxval(this%gross_precip)
 !        print *, "Interception: ", minval(this%interception), maxval(this%interception)
@@ -1333,6 +1337,23 @@ contains
 
       endif
 
+    elseif ( sCmdText .contains. "IRRIGATION" ) then
+
+      if ( sMethodName .strequal. "ON" ) then
+
+        this%init_irrigation => model_initialize_irrigation
+        this%calc_irrigation => model_calculate_irrigation
+
+        call LOGS%WRITE( "==> IRRIGATION will be calculated and applied as needed.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
+      else
+
+        this%init_fog => model_initialize_irrigation_none
+        this%calc_fog => model_calculate_irrigation_none
+
+        call LOGS%WRITE( "==> IRRIGATION will *NOT* be active.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
+      endif
 
     elseif ( sCmdText .contains. "EVAPOTRANSPIRATION" ) then
 
@@ -1938,7 +1959,8 @@ contains
   subroutine model_initialize_irrigation_none( this )
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    !> Nothing here to see. Initialization not really needed for the "normal" method.
+
+    this%irrigation = 0.0_c_float
 
   end subroutine model_initialize_irrigation_none
 
@@ -1959,6 +1981,41 @@ contains
     !> Nothing here to see. 
 
   end subroutine model_output_irrigation_none
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_irrigation( this )
+
+    use irrigation
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    !> Nothing here to see. Initialization not really needed for the "normal" method.
+
+    call irrigation__initialize( this%active )
+
+  end subroutine model_initialize_irrigation
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_irrigation( this )
+
+  use irrigation
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    !> Nothing here to see. 
+
+  end subroutine model_calculate_irrigation
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_output_irrigation( this )
+
+    use irrigation
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    !> Nothing here to see. 
+
+  end subroutine model_output_irrigation
 
 !--------------------------------------------------------------------------------------------------
 

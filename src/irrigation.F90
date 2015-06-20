@@ -11,6 +11,7 @@ module irrigation
   use constants_and_conversions
   use data_catalog, only           : DAT
   use data_catalog_entry, only     : DATA_CATALOG_ENTRY_T
+  use exceptions, only             : warn, die
   use parameters, only             : PARAMS
   use simulation_datetime, only    : SIM_DT
   use string_list, only            : STRING_LIST_T
@@ -22,14 +23,13 @@ module irrigation
   public :: irrigation__initialize, irrigation__calculate
 
 
-  real (kind=c_float), allocatable   :: MAXIMUM_ALLOWABLE_DEPLETION(:)
+  real (kind=c_float), allocatable   :: MAXIMUM_ALLOWABLE_DEPLETION_FRACTION(:)
   real (kind=c_float), allocatable   :: IRRIGATION_FROM_GROUNDWATER(:)
   real (kind=c_float), allocatable   :: IRRIGATION_FROM_SURFACE_WATER(:) 
-  real (kind=c_float), allocatable   :: IRRIGATION_TOTAL(:)
 
   real (kind=c_float), allocatable   :: FRACTION_OF_IRRIGATION_FROM_GW(:)   
-  integer (kind=c_int), allocatable  :: FIRST_DAY_OF_IRRIGATION(:)
-  integer (kind=c_int), allocatable  :: LAST_DAY_OF_IRRIGATION(:)
+  real (kind=c_float), allocatable   :: FIRST_DAY_OF_IRRIGATION(:)
+  real (kind=c_float), allocatable   :: LAST_DAY_OF_IRRIGATION(:)
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pIRRIGATION_MASK
 
@@ -45,10 +45,9 @@ contains
 !! @param[in] pConfig Pointer to the configuration data structure (type T_CONFIG).
 !!
 
-  subroutine irrigation__initialize( iNumActiveCells, iLanduseIndex )
+  subroutine irrigation__initialize( lActive )
 
-    integer (kind=c_int), intent(in)   :: iNumActiveCells
-    integer (kind=c_int), intent(in)   :: iLanduseIndex(:)
+    logical (kind=c_bool), intent(in)  :: lActive(:,:)
 
     ! [ LOCALS ]
     type (STRING_LIST_T)              :: slList
@@ -70,26 +69,45 @@ contains
     call slList%append("Maximum_allowable_depletion")
     call slList%append("MAD")
 
-    call PARAMS%get_parameters( slKeys=slList, fValues=MAXIMUM_ALLOWABLE_DEPLETION, lFatal=lTRUE ) 
+    call PARAMS%get_parameters( slKeys=slList,                                  &
+                                fValues=MAXIMUM_ALLOWABLE_DEPLETION_FRACTION,   &
+                                lFatal=lTRUE ) 
+    call slList%clear()
+
+    call slList%append("First_day_of_irrigation")
+    call slList%append("First_DOY_irrigation")
+    call slList%append("Irrigation_start")
+
+    call PARAMS%get_parameters( slKeys=slList, fValues=FIRST_DAY_OF_IRRIGATION, lFatal=lTRUE ) 
+    call slList%clear()
+
+    call slList%append("Last_day_of_irrigation")
+    call slList%append("Last_DOY_irrigation")
+    call slList%append("Irrigation_end")
+
+    call PARAMS%get_parameters( slKeys=slList, fValues=LAST_DAY_OF_IRRIGATION, lFatal=lTRUE ) 
     call slList%clear()
 
     ! locate the data structure associated with the gridded irrigation mask entries
     pIRRIGATION_MASK => DAT%find("IRRIGATION_MASK")
     if ( .not. associated(pIRRIGATION_MASK) ) &
         call die("A IRRIGATION_MASK grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
-
+ 
   end subroutine irrigation__initialize
 
 !--------------------------------------------------------------------------------------------------  
 
-  subroutine irrigation__calculate( iLanduseIndex, fSoilStorage_Max, lActive )
+  subroutine irrigation__calculate( fIrrigationAmount, iLanduseIndex, fSoilStorage, & 
+                                    fSoilStorage_Max, lActive )
 
-    integer (kind=c_int), intent(in)  :: iLanduseIndex(:)
-    real (kind=c_float), intent(in)   :: fSoilStorage_Max(:)
-    logical (kind=c_bool), intent(in) :: lActive(:,:)
+    real (kind=c_float), intent(inout)  :: fIrrigationAmount(:)
+    integer (kind=c_int), intent(in)    :: iLanduseIndex(:)
+    real (kind=c_float), intent(in)     :: fSoilStorage(:)
+    real (kind=c_float), intent(in)     :: fSoilStorage_Max(:)
+    logical (kind=c_bool), intent(in)   :: lActive(:,:)
 
     ! [ LOCALS ]
-    real (kind=c_float)  :: fDepletionFraction(:)
+    real (kind=c_float)  :: fDepletionFraction
     real (kind=c_double) :: rDepletionAmount
     real (kind=c_double) :: rIrrigationAmount
 
@@ -105,7 +123,6 @@ contains
     ! zero out Irrigation term
     IRRIGATION_FROM_GROUNDWATER = rZERO
     IRRIGATION_FROM_SURFACE_WATER = rZERO
-    IRRIGATION_TOTAL = rZERO
 
     associate ( dt => SIM_DT%curr )
 
@@ -133,13 +150,17 @@ contains
 
        ! do nothing 
 
-    else where ( MAXIMUM_ALLOWABLE_DEPLETION( iLanduseIndex ) > 0.99         &
-         .or. fSoilStorage_Max < rNEAR_ZERO                                  &
+    else where ( MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex ) > 0.99     &
+         .or. fSoilStorage_Max <= fZERO                                           &
          .or. iIrrigation_Mask == 0 )              
 
       ! do nothing
 
-    else where ( fDepletionFraction > MAXIMUM_ALLOWABLE_DEPLETION_VECTOR ) 
+    else where ( fSoilStorage / fSoilStorage_Max < MAXIMUM_ALLOWABLE_DEPLETION_FRACTION ) 
+
+      fIrrigationAmount = fSoilStorage_Max - fSoilStorage
+      IRRIGATION_FROM_GROUNDWATER = fIrrigationAmount * FRACTION_OF_IRRIGATION_FROM_GW
+      IRRIGATION_FROM_SURFACE_WATER = fIrrigationAmount - IRRIGATION_FROM_GROUNDWATER
 
         !> NEW as of 4/23/2014: irrigation amount can either be the amount
         !! of the current soil moisture deficit *or* a specified maximum

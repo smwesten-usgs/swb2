@@ -21,7 +21,7 @@ if(TARGET__SWB_EXECUTABLE)
             growing_degree_day.F90
             interception__bucket.F90
             interception__gash.F90
-            #irrigation.F90
+            irrigation.F90
             logfiles.F90
             #loop_iterate.F90
             main.F90
@@ -241,7 +241,7 @@ if(TARGET__SWB_LIBRARY)
             growing_degree_day.F90
             interception__bucket.F90
             interception_gash.F90
-            #irrigation.F90
+            irrigation.F90
             logfiles.F90
             #loop_iterate.F90
             main.F90
