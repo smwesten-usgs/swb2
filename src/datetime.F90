@@ -14,7 +14,7 @@ module datetime
   implicit none
   private
 
-  public :: gregorian_date, julian_day, isLeap, day_of_year
+  public :: gregorian_date, julian_day, isLeap, day_of_year, mmdd2doy
 
   type, public :: DATETIME_T
 

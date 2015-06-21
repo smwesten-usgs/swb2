@@ -69,6 +69,7 @@ module model_domain
     real (kind=c_float), allocatable       :: soil_storage(:)
     real (kind=c_float), allocatable       :: soil_storage_max(:)
     real (kind=c_float), allocatable       :: potential_recharge(:)
+    real (kind=c_float), allocatable       :: current_rooting_depth(:)
          
     real (kind=c_float), allocatable       :: gross_precip(:)
     real (kind=c_float), allocatable       :: fog(:)
@@ -327,6 +328,7 @@ contains
     call this%init_reference_et
     call this%init_precipitation_data
     call this%init_GDD
+    call this%init_irrigation
 
   end subroutine initialize_methods_sub
 
@@ -1355,7 +1357,8 @@ contains
 
     elseif ( sCmdText .contains. "IRRIGATION" ) then
 
-      if ( sMethodName .strequal. "ON" ) then
+      if ( ( sMethodName .strequal. "FAO56" )  &
+             .or. ( sMethodName .strequal. "FAO-56" ) ) then
 
         this%init_irrigation => model_initialize_irrigation
         this%calc_irrigation => model_calculate_irrigation
@@ -1364,8 +1367,8 @@ contains
 
       else
 
-        this%init_fog => model_initialize_irrigation_none
-        this%calc_fog => model_calculate_irrigation_none
+        this%init_irrigation => model_initialize_irrigation_none
+        this%calc_irrigation => model_calculate_irrigation_none
 
         call LOGS%WRITE( "==> IRRIGATION will *NOT* be active.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
@@ -2005,8 +2008,7 @@ contains
     use irrigation
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    !> Nothing here to see. Initialization not really needed for the "normal" method.
-
+   
     call irrigation__initialize( this%active )
 
   end subroutine model_initialize_irrigation

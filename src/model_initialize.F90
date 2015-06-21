@@ -739,6 +739,9 @@ subroutine initialize_generic_method( sKey, lOptional)
       ! most of the time, we only care about the first dictionary entry, obtained below
       sOptionText = myOptions%get(1)
 
+      ! Any entry in the control file that contains the substring "METHOD" will be
+      ! handed to the "set_method" subroutine in an attempt to wire up the correct
+      ! process modules
       if ( index(string=sCmdText, substring="METHOD" ) > 0 ) then
 
         call MODEL%set_method( trim(sCmdText), trim(sOptionText) )

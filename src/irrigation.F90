@@ -11,9 +11,11 @@ module irrigation
   use constants_and_conversions
   use data_catalog, only           : DAT
   use data_catalog_entry, only     : DATA_CATALOG_ENTRY_T
-  use exceptions, only             : warn, die
+  use datetime, only               : mmdd2doy
+  use exceptions, only             : warn, die, assert
   use parameters, only             : PARAMS
   use simulation_datetime, only    : SIM_DT
+  use strings, only                : asCharacter
   use string_list, only            : STRING_LIST_T
 
   implicit none
@@ -28,8 +30,8 @@ module irrigation
   real (kind=c_float), allocatable   :: IRRIGATION_FROM_SURFACE_WATER(:) 
 
   real (kind=c_float), allocatable   :: FRACTION_OF_IRRIGATION_FROM_GW(:)   
-  real (kind=c_float), allocatable   :: FIRST_DAY_OF_IRRIGATION(:)
-  real (kind=c_float), allocatable   :: LAST_DAY_OF_IRRIGATION(:)
+  integer (kind=c_int), allocatable  :: FIRST_DAY_OF_IRRIGATION(:)
+  integer (kind=c_int), allocatable  :: LAST_DAY_OF_IRRIGATION(:)
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pIRRIGATION_MASK
 
@@ -52,8 +54,29 @@ contains
     ! [ LOCALS ]
     type (STRING_LIST_T)              :: slList
     integer (kind=c_int)              :: iNumberOfLanduses
+    integer (kind=c_int), allocatable :: iLanduseTableCodes(:)
+    integer (kind=c_int)              :: iNumRecs
+    logical (kind=c_bool)             :: lAreLengthsEqual
     integer (kind=c_int)              :: iIndex
     integer (kind=c_int)              :: iStat
+    character (len=256)               :: sBuf
+    type (STRING_LIST_T)              :: slIrrigationBegin
+    type (STRING_LIST_T)              :: slIrrigationEnd  
+
+    allocate( IRRIGATION_FROM_GROUNDWATER( count( lActive ) ), stat=iStat )
+    call assert( iStat==0, "Failed to allocate memory.", __FILE__, __LINE__ )
+
+    allocate( IRRIGATION_FROM_SURFACE_WATER( count( lActive ) ), stat=iStat )
+    call assert( iStat==0, "Failed to allocate memory.", __FILE__, __LINE__ )
+
+    ! create list of possible table headings to look for...
+    call slList%append( "LU_Code" )
+    call slList%append( "Landuse_Lookup_Code" )
+
+    !> Determine how many landuse codes are present
+    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseTableCodes )
+    iNumberOfLanduses = count( iLanduseTableCodes >= 0 )
+    call slList%clear()
 
     call slList%append("Fraction_irrigation_from_GW")
     call slList%append("Frac_irr_fm_GW")
@@ -78,15 +101,72 @@ contains
     call slList%append("First_DOY_irrigation")
     call slList%append("Irrigation_start")
 
-    call PARAMS%get_parameters( slKeys=slList, fValues=FIRST_DAY_OF_IRRIGATION, lFatal=lTRUE ) 
+    call PARAMS%get_parameters( slKeys=slList, slValues=slIrrigationBegin, lFatal=lTRUE ) 
     call slList%clear()
+
+    allocate( FIRST_DAY_OF_IRRIGATION( slIrrigationBegin%count ), stat=iStat )
+    call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
+
+    do iIndex = 1, slIrrigationBegin%count
+      sBuf = slIrrigationBegin%get( iIndex )
+      FIRST_DAY_OF_IRRIGATION( iIndex ) = mmdd2doy( sBuf )
+    enddo  
 
     call slList%append("Last_day_of_irrigation")
     call slList%append("Last_DOY_irrigation")
     call slList%append("Irrigation_end")
 
-    call PARAMS%get_parameters( slKeys=slList, fValues=LAST_DAY_OF_IRRIGATION, lFatal=lTRUE ) 
+    call PARAMS%get_parameters( slKeys=slList, slValues=slIrrigationEnd, lFatal=lTRUE ) 
     call slList%clear()
+
+    allocate( LAST_DAY_OF_IRRIGATION( slIrrigationEnd%count ), stat=iStat )
+    call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
+
+    do iIndex = 1, slIrrigationEnd%count
+      sBuf = slIrrigationEnd%get( iIndex )
+      LAST_DAY_OF_IRRIGATION( iIndex ) = mmdd2doy( sBuf )
+    enddo  
+
+    iNumRecs = ubound(FIRST_DAY_OF_IRRIGATION,1)
+    lAreLengthsEqual = ( iNumRecs == iNumberOfLanduses ) 
+
+    if ( .not. lAreLengthsEqual )                                                       &
+      call warn( sMessage="The number of values specifying date of first "              &
+        //"irrigation application ("                                                    &
+        //asCharacter( iNumRecs )//") does not match the number of landuse values ("    &
+        //asCharacter( iNumberOfLanduses )//").",                                       &
+        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+
+    iNumRecs = ubound(LAST_DAY_OF_IRRIGATION,1)
+    lAreLengthsEqual = ( iNumRecs == iNumberOfLanduses ) 
+
+    if ( .not. lAreLengthsEqual )                                                       &
+      call warn( sMessage="The number of values specifying date of last irrigation"     &
+        //" application ("                                                              &
+        //asCharacter( iNumRecs )//") does not match the number of landuse values ("    &
+        //asCharacter( iNumberOfLanduses )//").",                                       &
+        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+
+    iNumRecs = ubound(FRACTION_OF_IRRIGATION_FROM_GW,1)
+    lAreLengthsEqual = ( iNumRecs == iNumberOfLanduses ) 
+
+    if ( .not. lAreLengthsEqual )                                                       &
+      call warn( sMessage="The number of values specifying the fraction of irrigation"  &
+        //" from groundwater ("                                                         &
+        //asCharacter( iNumRecs )//") does not match the number of landuse values ("    &
+        //asCharacter( iNumberOfLanduses )//").",                                       &
+        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+
+    iNumRecs = ubound(MAXIMUM_ALLOWABLE_DEPLETION_FRACTION,1)
+    lAreLengthsEqual = ( iNumRecs == iNumberOfLanduses ) 
+
+    if ( .not. lAreLengthsEqual )                                                       &
+      call warn( sMessage="The number of values the maximum allowable depletion "       &
+        //" fraction ("                                                                 &
+        //asCharacter( iNumRecs )//") does not match the number of landuse values ("    &
+        //asCharacter( iNumberOfLanduses )//").",                                       &
+        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+
 
     ! locate the data structure associated with the gridded irrigation mask entries
     pIRRIGATION_MASK => DAT%find("IRRIGATION_MASK")
@@ -156,10 +236,12 @@ contains
 
       ! do nothing
 
-    else where ( fSoilStorage / fSoilStorage_Max < MAXIMUM_ALLOWABLE_DEPLETION_FRACTION ) 
+    else where ( fSoilStorage / fSoilStorage_Max           &
+                       < MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex ) ) 
 
       fIrrigationAmount = fSoilStorage_Max - fSoilStorage
-      IRRIGATION_FROM_GROUNDWATER = fIrrigationAmount * FRACTION_OF_IRRIGATION_FROM_GW
+      IRRIGATION_FROM_GROUNDWATER = fIrrigationAmount          &
+                                      * FRACTION_OF_IRRIGATION_FROM_GW( iLanduseIndex )
       IRRIGATION_FROM_SURFACE_WATER = fIrrigationAmount - IRRIGATION_FROM_GROUNDWATER
 
         !> NEW as of 4/23/2014: irrigation amount can either be the amount
