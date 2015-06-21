@@ -305,7 +305,7 @@ contains
     allocate( this%index_order(iCount), stat=iStat(30) )
     allocate( this%gdd(iCount), stat=iStat(31) )
 
-    allocate( OUTPUT(16), stat=iStat(32) )
+    allocate( OUTPUT(17), stat=iStat(32) )
 
     if ( any( iStat /= 0 ) )  call die("Problem allocating memory", __FILE__, __LINE__)
 
@@ -423,6 +423,11 @@ contains
       sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
+
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(17)%ncfile, sVariableName="irrigation", &
+      sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
 
       this%dont_care = NC_FILL_FLOAT
 
@@ -960,6 +965,15 @@ contains
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=this%array_output )
 
+    call netcdf_put_packed_variable_array(NCFILE=OUTPUT(17)%ncfile,                                                             &
+                   iVarID=OUTPUT(17)%ncfile%iVarID(NC_Z),                                                                       &
+                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t],                               &
+                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],    &
+                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                                                       &
+                   lMask=this%active,                                                                                           &
+                   rValues=this%irrigation,                                                                                     &
+                   rField=this%dont_care )
+
   end subroutine write_variables_to_netcdf
 
 !--------------------------------------------------------------------------------------------------
@@ -1167,6 +1181,8 @@ contains
     integer (kind=c_int) :: index
     integer (kind=c_int) :: orderindex
     integer (kind=c_int) :: targetindex
+
+     call this%calc_irrigation()
 
      if ( associated(this%calc_routing) ) then
 
@@ -2002,20 +2018,14 @@ contains
   use irrigation
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    !> Nothing here to see. 
+
+    call irrigation__calculate( fIrrigationAmount=this%irrigation,        &
+                                iLanduseIndex=this%landuse_index,         &
+                                fSoilStorage=this%soil_storage,           & 
+                                fSoilStorage_Max=this%soil_storage_max,   &
+                                lActive=this%active )
 
   end subroutine model_calculate_irrigation
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine model_output_irrigation( this )
-
-    use irrigation
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-    !> Nothing here to see. 
-
-  end subroutine model_output_irrigation
 
 !--------------------------------------------------------------------------------------------------
 
