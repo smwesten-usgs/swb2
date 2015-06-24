@@ -53,6 +53,7 @@ set(PACKAGE_VERSION "2.0 ALPHA")
 
 cmake_minimum_required(VERSION 2.8)
 
+include( cmake/version_control.cmake )
 include( cmake/options_and_targets.cmake )
 
 #------------------------------------------------------------------------

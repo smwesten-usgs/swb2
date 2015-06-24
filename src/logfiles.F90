@@ -1,13 +1,13 @@
 module logfiles
 
+  use version_control, only  : SWB_VERSION, GIT_COMMIT_HASH_STRING,           &
+                               GIT_BRANCH_STRING, COMPILE_DATE, COMPILE_TIME, &
+                               COMPILATION_TIMESTAMP
   use iso_c_binding, only : c_bool, c_int
   use iso_fortran_env, only : OUTPUT_UNIT
   implicit none
 
   private
-
-  character (len=20), parameter, public   :: COMPILATION_TIMESTAMP = __DATE__//" "//__TIME__
-  character (len=9), parameter, public    :: SWB_VERSION = "2.0 alpha"
 
   public :: LOGFILE_T
 
@@ -159,9 +159,13 @@ contains
 
           if ( lWrite_SWB_Info_ ) then
 
-            write(this%iUnitNum(iIndex), fmt="(a,/)") "# USGS Soil Water Balance Code run log #"
+            write(this%iUnitNum(iIndex), fmt="(a)") "# USGS Soil Water Balance Code run log #"
+            write(this%iUnitNum(iIndex), fmt="(a,/)") repeat("-", 80)
             write(this%iUnitNum(iIndex), fmt="(a,/)") "## Model run started on "//sDatetime//" ##"          
-            write(this%iUnitNum(iIndex), fmt="(a)") "## SWB version "//SWB_VERSION//" compiled on "//COMPILATION_TIMESTAMP//" ##"          
+            write(this%iUnitNum(iIndex), fmt="(a)") "## SWB version "//SWB_VERSION//" compiled on "  &
+              //COMPILATION_TIMESTAMP//" ##"   
+            write(this%iUnitNum(iIndex), fmt="(a,/)") "Git branch and commit hash: " &
+              //trim( GIT_BRANCH_STRING)//"  "//trim(GIT_COMMIT_HASH_STRING)         
    
           endif
 

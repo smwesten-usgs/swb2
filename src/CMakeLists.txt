@@ -46,6 +46,7 @@ if(TARGET__SWB_EXECUTABLE)
             strings.F90
             string_list.F90
  
+            generated/version_control.F90
 
             proj4/aasincos.c
             proj4/adjlon.c
@@ -266,7 +267,7 @@ if(TARGET__SWB_LIBRARY)
             strings.F90
             string_list.F90
 
- 
+            generated/version_control.F90
 
             proj4/aasincos.c
             proj4/adjlon.c

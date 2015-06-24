@@ -32,6 +32,11 @@ module netcdf4_support
   use strings
   use datetime
 
+  use version_control, only  : SWB_VERSION, GIT_COMMIT_HASH_STRING,           &
+                               GIT_BRANCH_STRING, COMPILE_DATE, COMPILE_TIME, &
+                               COMPILATION_TIMESTAMP
+
+
   use swb_grid
 !  use typesizes
   use netcdf_c_api_interfaces

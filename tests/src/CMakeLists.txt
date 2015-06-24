@@ -19,6 +19,8 @@
 #           ${PROJECT_SOURCE_DIR}/src/strings.F90
 #           ${PROJECT_SOURCE_DIR}/src/string_list.F90
 
+
+
 #           ${PROJECT_SOURCE_DIR}/src/proj4/aasincos.c
 #           ${PROJECT_SOURCE_DIR}/src/proj4/adjlon.c
 #           ${PROJECT_SOURCE_DIR}/src/proj4/bch2bps.c
@@ -208,6 +210,8 @@
             ${PROJECT_SOURCE_DIR}/src/strings.F90
             ${PROJECT_SOURCE_DIR}/src/string_list.F90
 
+            ${PROJECT_SOURCE_DIR}/src/generated/version_control.F90            
+
             ${PROJECT_SOURCE_DIR}/src/proj4/aasincos.c
             ${PROJECT_SOURCE_DIR}/src/proj4/adjlon.c
             ${PROJECT_SOURCE_DIR}/src/proj4/bch2bps.c
@@ -395,6 +399,8 @@
             ${PROJECT_SOURCE_DIR}/src/simulation_datetime.F90
             ${PROJECT_SOURCE_DIR}/src/strings.F90
             ${PROJECT_SOURCE_DIR}/src/string_list.F90
+
+            ${PROJECT_SOURCE_DIR}/src/generated/version_control.F90                        
 
             ${PROJECT_SOURCE_DIR}/src/proj4/aasincos.c
             ${PROJECT_SOURCE_DIR}/src/proj4/adjlon.c
