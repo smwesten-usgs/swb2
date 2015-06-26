@@ -284,37 +284,55 @@ contains
           ! determine the type of grid and act appropriately
           if (sArgText_1 .strequal. "CONSTANT" ) then
 
+            select case ( iDataType )
+
+              case ( DATATYPE_FLOAT )
+
               call pENTRY%initialize(            &
                 sDescription=trim(sCmdText),     &
                 rConstant=asFloat(sArgText_2)  ) 
-              lGridPresent = lTRUE           
+              lGridPresent = lTRUE   
 
-            elseif ( (sArgText_1 .strequal. "ARC_ASCII")              &
-                .or. (sArgText_1 .strequal. "SURFER")                 &
-                .or. (sArgText_1 .strequal. "ARC_GRID") ) then
+            case ( DATATYPE_INT )
 
-              call pENTRY%initialize(           &
-                sDescription=trim(sCmdText),    &
-                sFileType=trim(sArgText_1),     &
-                sFilename=trim(sArgText_2),     &
-                iDataType=iDataType )
-              lGridPresent = lTRUE
+              call pENTRY%initialize(            &
+                sDescription=trim(sCmdText),     &
+                iConstant=asInt(sArgText_2)  ) 
+              lGridPresent = lTRUE   
 
-            elseif ( sArgText_1 .strequal. "NETCDF" ) then
-              
-              call pENTRY%initialize_netcdf(    &
-                sDescription=trim(sCmdText),    &
-                sFilename = trim(sArgText_2),   &
-                iDataType=iDataType )
-              lGridPresent = lTRUE
- 
-            else
+            case default
 
-              call warn( "Did not find a valid "//dquote(sKey)//" option. Value supplied was: "//dquote(sArgText_1), &
-                lFatal = lTRUE, sHints="Valid options include "//dquote("ARC_ASCII")//", "//dquote("ARC_GRID") &
-                //", "//dquote("SURFER")//", or "//dquote("NETCDF") )
+              call die( "INTERNAL PROGRAMMING ERROR: Unhandled data type selected.", &
+                __FILE__, __LINE__ )
 
-            endif  
+            end select
+            
+          elseif ( (sArgText_1 .strequal. "ARC_ASCII")              &
+              .or. (sArgText_1 .strequal. "SURFER")                 &
+              .or. (sArgText_1 .strequal. "ARC_GRID") ) then
+
+            call pENTRY%initialize(           &
+              sDescription=trim(sCmdText),    &
+              sFileType=trim(sArgText_1),     &
+              sFilename=trim(sArgText_2),     &
+              iDataType=iDataType )
+            lGridPresent = lTRUE
+
+          elseif ( sArgText_1 .strequal. "NETCDF" ) then
+            
+            call pENTRY%initialize_netcdf(    &
+              sDescription=trim(sCmdText),    &
+              sFilename = trim(sArgText_2),   &
+              iDataType=iDataType )
+            lGridPresent = lTRUE
+
+          else
+
+            call warn( "Did not find a valid "//dquote(sKey)//" option. Value supplied was: "//dquote(sArgText_1), &
+              lFatal = lTRUE, sHints="Valid options include "//dquote("ARC_ASCII")//", "//dquote("ARC_GRID") &
+              //", "//dquote("SURFER")//", or "//dquote("NETCDF") )
+
+          endif  
 
         elseif ( index( string=sCmdText, substring="_SCALE" ) > 0 ) then
 

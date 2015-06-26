@@ -34,6 +34,7 @@ module irrigation
   integer (kind=c_int), allocatable  :: LAST_DAY_OF_IRRIGATION(:)
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pIRRIGATION_MASK
+  integer (kind=c_int), allocatable  :: IRRIGATION_MASK(:)
 
 contains
 
@@ -67,6 +68,9 @@ contains
     call assert( iStat==0, "Failed to allocate memory.", __FILE__, __LINE__ )
 
     allocate( IRRIGATION_FROM_SURFACE_WATER( count( lActive ) ), stat=iStat )
+    call assert( iStat==0, "Failed to allocate memory.", __FILE__, __LINE__ )
+
+    allocate( IRRIGATION_MASK( count( lActive ) ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory.", __FILE__, __LINE__ )
 
     ! create list of possible table headings to look for...
@@ -172,7 +176,11 @@ contains
     pIRRIGATION_MASK => DAT%find("IRRIGATION_MASK")
     if ( .not. associated(pIRRIGATION_MASK) ) &
         call die("A IRRIGATION_MASK grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
- 
+
+    call pIRRIGATION_MASK%getvalues( )
+
+    IRRIGATION_MASK = pack( pIRRIGATION_MASK%pGrdBase%iData, lActive )
+
   end subroutine irrigation__initialize
 
 !--------------------------------------------------------------------------------------------------  
@@ -198,7 +206,8 @@ contains
     integer (kind=c_int)              :: iDayOfYear
     integer (kind=c_int)              :: iDaysInMonth
     integer (kind=c_int)              :: iNumDaysFromOrigin
-    integer (kind=c_int), allocatable :: iIrrigation_Mask(:)
+!     integer (kind=c_int), allocatable :: iIrrigation_Mask(:)
+    integer (kind=c_int)              :: iIndex
 
     ! zero out Irrigation term
     IRRIGATION_FROM_GROUNDWATER = rZERO
@@ -216,8 +225,10 @@ contains
 
     end associate  
 
-    call pIRRIGATION_MASK%getvalues( iMonth, iDay, iYear, iJulianDay )
-    iIrrigation_Mask = pack( pIRRIGATION_MASK%pGrdBase%iData, lActive )
+!     call pIRRIGATION_MASK%getvalues( iMonth, iDay, iYear, iJulianDay )
+!     iIrrigation_Mask = pack( pIRRIGATION_MASK%pGrdBase%iData, lActive )
+
+    print *, "IRRIGATION MASK VALUES (0, >0): ",count( IRRIGATION_MASK == 0), count( IRRIGATION_MASK > 0)
 
     ! for each cell, add water if soil storage zone is below the
     ! maximum allowable depletion
@@ -225,55 +236,41 @@ contains
     ! now we run the gauntlet of tests to ensure that we really need
     ! to perform all of the irrigation calculations
 
-    where ( iDayOfYear < FIRST_DAY_OF_IRRIGATION( iLanduseIndex )     &
-       .or. iDayOfYear > LAST_DAY_OF_IRRIGATION( iLanduseIndex ) )
+    do iIndex=lbound(fSoilStorage,1), ubound(fSoilStorage,1)
 
-       ! do nothing 
-
-    else where ( MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex ) > 0.99     &
-         .or. fSoilStorage_Max <= fZERO                                           &
-         .or. iIrrigation_Mask == 0 )              
-
-      ! do nothing
-
-    else where ( fSoilStorage / fSoilStorage_Max           &
-                       < MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex ) ) 
-
-      fIrrigationAmount = fSoilStorage_Max - fSoilStorage
-      IRRIGATION_FROM_GROUNDWATER = fIrrigationAmount          &
-                                      * FRACTION_OF_IRRIGATION_FROM_GW( iLanduseIndex )
-      IRRIGATION_FROM_SURFACE_WATER = fIrrigationAmount - IRRIGATION_FROM_GROUNDWATER
-
-        !> NEW as of 4/23/2014: irrigation amount can either be the amount
-        !! of the current soil moisture deficit *or* a specified maximum
-        !! daily amount
-!         if (pIRRIGATION%rIrrigationAmount <= rNEAR_ZERO) then
-!           rIrrigationAmount = cel%rSoilWaterCap - cel%rSoilMoisture
-!         else
-!           rIrrigationAmount = pIRRIGATION%rIrrigationAmount
-!         endif
-
-!         cel%rIrrigationFromGW = REAL(pIRRIGATION%rFractionOfIrrigationFromGW &
-!                                     * rIrrigationAmount, kind=c_double )
-
-!         cel%rIrrigationFromSW = real((1.0 - pIRRIGATION%rFractionOfIrrigationFromGW) &
-!                                     * rIrrigationAmount, kind=c_double )
-
-        !> @todo Must difinitively figure out what to do with water that
-        !! is calculated to be used as part of the inefficiency in the
-        !! delivery system.
-
-        ! rIrrigationAmount is the value that actually enters the mass balance
-        ! NOTE!! Currently we are assuming that the amounts from GW and SW are the amounts a grower
-        !        would estimate based on pumping rates and times; it is assumed that the inefficiencies
-        !        in delivery result in water that bypasses the root zone.
-!         cel%rIrrigationAmount = cel%rIrrigationFromGW * REAL(pIRRIGATION%rIrrigationEfficiency_GW, kind=c_double ) &
-!                               + cel%rIrrigationFromSW * REAL(pIRRIGATION%rIrrigationEfficiency_SW, kind=c_double )
+!     where ( iDayOfYear < FIRST_DAY_OF_IRRIGATION( iLanduseIndex )     &
+!        .or. iDayOfYear > LAST_DAY_OF_IRRIGATION( iLanduseIndex ) )
 
 
-!      endif
+      if ( ( iDayOfYear < FIRST_DAY_OF_IRRIGATION( iLanduseIndex( iIndex ) ) ) &
+        .or. ( iDayOfYear > LAST_DAY_OF_IRRIGATION( iLanduseIndex( iIndex ) ) ) )  cycle
 
-    end where  
+
+!     else where ( MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex ) > 0.99     &
+!          .or. fSoilStorage_Max <= fZERO                                           &
+!          .or. iIrrigation_Mask == 0 )              
+
+      if ( MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex( iIndex ) ) > 0.99 )  cycle
+      if ( fSoilStorage_Max( iIndex ) <= fZERO ) cycle
+      if ( IRRIGATION_MASK( iIndex ) == 0 ) cycle 
+
+!     else where ( ( 1.0_c_float - fSoilStorage / fSoilStorage_Max )           &
+!                        > MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex ) ) 
+
+      if ( ( 1.0_c_float - fSoilStorage( iIndex ) / fSoilStorage_Max( iIndex ) )                           &
+             > MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex( iIndex ) ) ) then
+
+      fIrrigationAmount( iIndex ) = fSoilStorage_Max( iIndex ) - fSoilStorage( iIndex )
+      IRRIGATION_FROM_GROUNDWATER( iIndex ) = fIrrigationAmount( iIndex )          &
+                                      * FRACTION_OF_IRRIGATION_FROM_GW( iLanduseIndex( iIndex ) )
+      IRRIGATION_FROM_SURFACE_WATER( iIndex ) = fIrrigationAmount( iIndex )  &
+                                                 - IRRIGATION_FROM_GROUNDWATER( iIndex )
+
+      endif
+
+!     end where  
+
+    enddo
 
   end subroutine irrigation__calculate
 

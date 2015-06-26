@@ -9,7 +9,8 @@
 module soil_moisture__FAO_56
 
   use iso_c_binding, only             : c_bool, c_short, c_int, c_float, c_double
-  use constants_and_conversions, only : M_PER_FOOT, lTRUE, lFALSE, fTINYVAL, iTINYVAL, asInt
+  use constants_and_conversions, only : M_PER_FOOT, lTRUE, lFALSE, fTINYVAL, &
+                                        iTINYVAL, asInt, fZERO
   use data_catalog, only              : DAT
   use data_catalog_entry, only        : DATA_CATALOG_ENTRY_T
   use datetime
@@ -65,6 +66,8 @@ module soil_moisture__FAO_56
   real (kind=c_float), allocatable   :: DEPLETION_FRACTION(:)
   real (kind=c_float), allocatable   :: MEAN_PLANT_HEIGHT(:)
   real (kind=c_float), allocatable   :: INITIAL_PERCENT_SOIL_MOISTURE(:)
+
+  integer (kind=c_int)               :: LU_SOILS_CSV
 
 contains
 
@@ -128,6 +131,13 @@ contains
     real (kind=c_float)              :: fRz_initial
 
     type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_PERCENT_SOIL_MOISTURE
+
+    open( newunit=LU_SOILS_CSV, file="FAO56_variables_dump.csv" )
+
+    write (unit=LU_SOILS_CSV, fmt="(a)" )"fInfiltration, fMaxRootingDepth, fZr, LU, " &
+      //"SoilGroup, fKr, f_few, fKe, fKs, fKcb, fRefET, baresoilevap, cropEtc, "      &
+      //"ActET, fSoilStorage_Max, fSoilStorage, fDeficit, fSoilStorage_Excess"
+
 
     ! locate the data structure associated with the gridded rainfall zone entries
     pINITIAL_PERCENT_SOIL_MOISTURE => DAT%find("INITIAL_PERCENT_SOIL_MOISTURE")
@@ -717,11 +727,11 @@ end function calc_water_stress_coefficient_Ks
 
   real (kind=c_float), intent(inout)   :: fSoilStorage
   real (kind=c_float), intent(inout)   :: fActual_ET
-  real (kind=c_float), intent(out)     :: fSoilStorage_Excess
-  real (kind=c_float), intent(in)      :: fInfiltration
-  real (kind=c_float), intent(in)      :: fGDD
-  real (kind=c_float), intent(in)      :: fAvailableWaterCapacity
-  real (kind=c_float), intent(in)      :: fReference_ET0
+  real (kind=c_float), intent(inout)     :: fSoilStorage_Excess
+  real (kind=c_float), intent(inout)      :: fInfiltration
+  real (kind=c_float), intent(inout)      :: fGDD
+  real (kind=c_float), intent(inout)      :: fAvailableWaterCapacity
+  real (kind=c_float), intent(inout)      :: fReference_ET0
   real (kind=c_float), intent(in)      :: fMaxRootingDepth
   integer (kind=c_int), intent(in)     :: iLanduseIndex
   integer (kind=c_int), intent(in)     :: iSoilGroup
@@ -813,13 +823,34 @@ end function calc_water_stress_coefficient_Ks
 
   fSoilStorage = fSoilStorage + fInfiltration - fActual_ET
 
-!print *, "infil=", fInfiltration, "  rootmax=",fMaxRootingDepth, "  LU=",iLanduseIndex, "  soil=",iSoilGroup,   &
-!!  "  soilstor=",fSoilStorage, "  fKr=",fKr, "  f_few=",f_few, &
-!   "  fKe=",fKe, "  fKs=", fKs, "  fKcb=",fKcb, "  fRefET=",fReference_ET0, &
-!   "  baresoilevap=", fBareSoilEvap, "  cropEtc=", fCropETc, "  ActET=", fActual_ET
+  if ( fSoilStorage > fSoilStorage_Max ) then
 
-  fSoilStorage = min( fSoilStorage_Max, fSoilStorage )
-  fSoilStorage_Excess = max( 0.0_c_float, fSoilStorage - fSoilStorage_Max )
+    fSoilStorage_Excess = fSoilStorage - fSoilStorage_Max
+    fSoilStorage = fSoilStorage_Max
+
+  elseif ( fSoilStorage < fZERO ) then 
+  
+    fActual_ET = fActual_ET + fSoilStorage
+    fSoilStorage = fZERO
+    fSoilStorage_Excess = fZERO
+
+  else
+  
+    fSoilStorage_Excess = fZERO
+
+  endif   
+
+!     if ( fSoilStorage_Max > 0.0 ) then
+
+!       if ( fSoilStorage / fSoilStorage_Max < 0.5 ) &
+
+!       write (unit=LU_SOILS_CSV, fmt="(3(f12.3,','),2(i8,','),12(f12.3,','),f12.3)" )  &
+!         fInfiltration,                                                       &
+!         fMaxRootingDepth, fZr, iLanduseIndex, iSoilGroup,fKr,f_few,          &
+!         fKe, fKs, fKcb, fReference_ET0, fBareSoilEvap, fCropETc, fActual_ET, &
+!         fSoilStorage_Max, fSoilStorage, fDeficit, fSoilStorage_Excess
+
+!     endif
   
 end subroutine soil_moisture_FAO56_calculate
 

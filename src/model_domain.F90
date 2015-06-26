@@ -1196,7 +1196,7 @@ contains
         targetindex = TARGET_INDEX( index )
 
         this%inflow( orderindex ) =   this%runon( orderindex )                      &
-                                    + this%gross_precip( orderindex )               &
+                                    + this%rainfall( orderindex )               &
                                     + this%fog( orderindex )                        &
                                     + this%irrigation( orderindex )                 &
                                     + this%snowmelt( orderindex )                   &
@@ -1226,14 +1226,15 @@ contains
      else
 
        this%runon = 0.0_c_float
-       this%inflow = this%gross_precip + this%fog + this%irrigation     &
+       this%inflow = this%rainfall + this%fog + this%irrigation     &
                       - this%interception + this%snowmelt
        call this%calc_runoff()
+       this%infiltration = this%inflow - this%runoff
 !        print *, "Gross Precip: ", minval(this%gross_precip), maxval(this%gross_precip)
 !        print *, "Interception: ", minval(this%interception), maxval(this%interception)
 !        print *, "Inflow: ", minval(this%inflow), maxval(this%inflow)
 !        print *, "Runoff: ", minval(this%runoff), maxval(this%runoff)
-       this%infiltration = this%inflow - this%runoff
+
        call this%calc_soil_moisture()
 
      endif
@@ -1500,7 +1501,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    this%interception = interception_bucket_calculate( this%landuse_index, this%gross_precip, this%fog )
+    this%interception = interception_bucket_calculate( this%landuse_index, this%rainfall, this%fog )
     this%interception_ET = this%interception
 
   end subroutine model_calculate_interception_bucket
@@ -1537,7 +1538,7 @@ contains
     fTrunk_Storage_Capacity = TRUNK_STORAGE_CAPACITY_TABLE_VALUES( this%landuse_index )
     fStemflow_Fraction = STEMFLOW_FRACTION_TABLE_VALUES( this%landuse_index )
     
-    call interception_gash_calculate( this%gross_precip,                                  &
+    call interception_gash_calculate( this%rainfall,                                      &
                                this%fog,                                                  &
                                CANOPY_COVER_FRACTION,                                     &
                                !TRUNK_STORAGE_CAPACITY_TABLE_VALUES( this%landuse_index ), &
@@ -1828,7 +1829,9 @@ contains
 
     call runoff_gridded_values_calculate( )
 
-    this%runoff = ( this%rainfall + this%snowmelt ) * RUNOFF_RATIOS
+!     this%runoff = ( this%rainfall + this%snowmelt ) * RUNOFF_RATIOS
+
+    this%runoff = this%inflow * RUNOFF_RATIOS
 
   end subroutine model_calculate_runoff_gridded_values
 
@@ -1945,6 +1948,17 @@ contains
 
       do iIndex=1, ubound(this%soil_storage,1)
 
+!         print *, "LU=",this%landuse_index( iIndex ), &
+!                  " Soils=",this%soil_group( iIndex ),    &
+!                  " rain:",this%rainfall( iIndex ),      &
+!                  " intcp:",this%interception( iIndex ),  &
+!                  " fog:",this%fog( iIndex ),           &
+!                  " snmelt:",this%snowmelt( iIndex ),      &
+!                  " runon:",this%runon( iIndex ),         &
+!                  " inflow:", this%inflow( iIndex ),        &
+!                  " runoff:",this%runoff( iIndex ),        &
+!                  " infil:",this%infiltration( iIndex )
+
         call soil_moisture_FAO56_calculate( fSoilStorage=this%soil_storage(iIndex),                             &
                                             fActual_ET=this%actual_ET(iIndex),                                  &
                                             fSoilStorage_Excess=this%potential_recharge(iIndex),                &
@@ -1952,8 +1966,8 @@ contains
                                             fGDD=this%gdd(iIndex),                                              &
                                             fAvailableWaterCapacity=this%awc(iIndex),                           &
                                             fReference_ET0=this%reference_ET0_adj(iIndex),                      &
-                                            fMaxRootingDepth=MAX_ROOTING_DEPTH( this%landuse_Index(iIndex),            &
-                                                                        this%soil_group(iIndex) ),              &
+                                            fMaxRootingDepth=MAX_ROOTING_DEPTH( this%landuse_Index(iIndex),     &
+                                                                                this%soil_group(iIndex) ),      &
                                             iLanduseIndex=this%landuse_index(iIndex),                           &
                                             iSoilGroup=this%soil_group(iIndex) )
 
