@@ -218,7 +218,19 @@ module model_domain
 
   real (kind=c_float), allocatable  :: MAX_ROOTING_DEPTH(:,:)
 
-  type (GENERAL_GRID_T), pointer       :: pCOORD_GRD
+  type (GENERAL_GRID_T), pointer    :: pCOORD_GRD
+
+  integer (kind=c_int), parameter   :: NCDF_NUM_OUTPUTS = 16
+
+  enum, bind(c)
+    enumerator :: NCDF_GROSS_PRECIPITATION=1, NCDF_RAINFALL, NCDF_SNOWFALL, &
+                  NCDF_INTERCEPTION, NCDF_RUNON, NCDF_RUNOFF,               &
+                  NCDF_SNOW_STORAGE, NCDF_SOIL_STORAGE,                     &
+                  NCDF_REFERENCE_ET0,                                       &
+                  NCDF_ACTUAL_ET, NCDF_SNOWMELT, NCDF_TMIN, NCDF_TMAX,      &
+                  NCDF_POTENTIAL_RECHARGE, NCDF_INFILTRATION,               &
+                  NCDF_IRRIGATION
+  end enum 
 
 contains
 
@@ -306,8 +318,6 @@ contains
     allocate( this%index_order(iCount), stat=iStat(30) )
     allocate( this%gdd(iCount), stat=iStat(31) )
 
-    allocate( OUTPUT(17), stat=iStat(32) )
-
     if ( any( iStat /= 0 ) )  call die("Problem allocating memory", __FILE__, __LINE__)
 
   end subroutine initialize_arrays_sub
@@ -342,93 +352,107 @@ contains
     integer (kind=c_int) :: iStat
     integer (kind=c_int) :: iIndex
 
+    allocate ( OUTPUT( NCDF_NUM_OUTPUTS ), stat=iStat )
+    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+
     do iIndex = 1, ubound(OUTPUT, 1)
       allocate ( OUTPUT(iIndex)%ncfile )
     enddo  
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(1)%ncfile, sVariableName="gross_precipitation", &
-      sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_GROSS_PRECIPITATION )%ncfile, &
+      sVariableName="gross_precipitation", sVariableUnits="inches_per_day",                   &
+      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(2)%ncfile, sVariableName="interception", &
-      sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_RAINFALL )%ncfile,            &
+      sVariableName="rainfall", sVariableUnits="inches_per_day",                              &
+      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(3)%ncfile, sVariableName="runoff", &
-      sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_INTERCEPTION )%ncfile,        &
+      sVariableName="interception", sVariableUnits="inches_per_day",                          &
+      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(4)%ncfile, sVariableName="runon", &
-      sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_RUNOFF )%ncfile,              &
+      sVariableName="runoff", sVariableUnits="inches_per_day",                                &
+      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
+      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
+
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_RUNON )%ncfile,               &
+      sVariableName="runon", sVariableUnits="inches_per_day",                                 &
+      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0   )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(5)%ncfile, sVariableName="infiltration", &
-      sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_INFILTRATION )%ncfile,        &
+      sVariableName="infiltration", sVariableUnits="inches_per_day",                          &
+      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(6)%ncfile, sVariableName="snowfall", &
-      sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_SNOWFALL )%ncfile,            &
+      sVariableName="snowfall", sVariableUnits="inches_per_day",                              &
+      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(7)%ncfile, sVariableName="snowmelt", &
-      sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_SNOWMELT )%ncfile,            &
+      sVariableName="snowmelt", sVariableUnits="inches_per_day",                              &
+      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(8)%ncfile, sVariableName="snow_storage", &
-      sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_SNOW_STORAGE )%ncfile,        &
+      sVariableName="snow_storage", sVariableUnits="inches",                                  &
+      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(9)%ncfile, sVariableName="soil_storage", &
-      sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_SOIL_STORAGE )%ncfile,        &
+      sVariableName="soil_storage", sVariableUnits="inches",                                  &
+      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(10)%ncfile, sVariableName="potential_recharge", &
-      sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_POTENTIAL_RECHARGE )%ncfile,  &
+      sVariableName="potential_recharge", sVariableUnits="inches",                            &
+      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(11)%ncfile, sVariableName="reference_ET0", &
-      sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_REFERENCE_ET0 )%ncfile,       &
+      sVariableName="reference_ET0", sVariableUnits="inches",                                 &
+      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(12)%ncfile, sVariableName="reference_ET0_adj", &
-      sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_ACTUAL_ET )%ncfile,           &
+      sVariableName="actual_ET", sVariableUnits="inches",                                     &
+      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(13)%ncfile, sVariableName="actual_ET", &
-      sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_TMIN )%ncfile,                &
+      sVariableName="tmin", sVariableUnits="degrees Fahrenheit",                              &
+      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(14)%ncfile, sVariableName="tmin", &
-      sVariableUnits="degrees Fahrenheit", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_TMAX )%ncfile,                &
+      sVariableName="tmax", sVariableUnits="degrees Fahrenheit",                              &
+      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(15)%ncfile, sVariableName="tmax", &
-      sVariableUnits="degrees Fahrenheit", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,&
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(16)%ncfile, sVariableName="interception_storage", &
-      sVariableUnits="inches", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT(17)%ncfile, sVariableName="irrigation", &
-      sVariableUnits="inches_per_day", iNX=this%number_of_columns, iNY=this%number_of_rows, &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end, &
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_IRRIGATION )%ncfile,          &
+      sVariableName="irrigation", sVariableUnits="inches_per_day",                            &
+      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
 
       this%dont_care = NC_FILL_FLOAT
@@ -801,6 +825,7 @@ contains
     ! first put out the current time variable for all open NetCDF files
     do iIndex = 1, ubound( OUTPUT, 1 )
 
+
       call netcdf_put_variable_vector(NCFILE=OUTPUT(iIndex)%ncfile, &
          iVarID=OUTPUT(iIndex)%ncfile%iVarID(NC_TIME), &
          iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t)], &
@@ -810,171 +835,155 @@ contains
 
     enddo
 
-    ! next, unpack each vector and output as an array
-    this%array_output = unpack(this%gross_precip, this%active, this%dont_care)
+    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_GROSS_PRECIPITATION )%ncfile,     &
+            iVarID=OUTPUT( NCDF_GROSS_PRECIPITATION )%ncfile%iVarID(NC_Z),                      &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
+                                int(this%number_of_columns, kind=c_size_t) ],                   &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+            lMask=this%active,                                                                  &
+            rValues=this%gross_precip,                                                          &
+            rField=this%dont_care )
 
-    call netcdf_put_variable_array(NCFILE=OUTPUT(1)%ncfile, &
-                   iVarID=OUTPUT(1)%ncfile%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=this%array_output )
+    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_INTERCEPTION )%ncfile,            &
+            iVarID=OUTPUT( NCDF_INTERCEPTION )%ncfile%iVarID(NC_Z),                             &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
+                                int(this%number_of_columns, kind=c_size_t) ],                   &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+            lMask=this%active,                                                                  &
+            rValues=this%interception,                                                          &
+            rField=this%dont_care )
 
-    this%array_output = unpack(this%interception, this%active, this%dont_care)
+    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_RUNOFF )%ncfile,                  &
+            iVarID=OUTPUT( NCDF_RUNOFF )%ncfile%iVarID(NC_Z),                                   &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
+                                int(this%number_of_columns, kind=c_size_t) ],                   &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+            lMask=this%active,                                                                  &
+            rValues=this%runoff,                                                                &
+            rField=this%dont_care )
 
-    call netcdf_put_variable_array(NCFILE=OUTPUT(2)%ncfile, &
-                   iVarID=OUTPUT(2)%ncfile%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=this%array_output )
+    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_RUNON )%ncfile,                   &
+            iVarID=OUTPUT( NCDF_RUNON )%ncfile%iVarID(NC_Z),                                    &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
+                                int(this%number_of_columns, kind=c_size_t) ],                   &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+            lMask=this%active,                                                                  &
+            rValues=this%runon,                                                                 &
+            rField=this%dont_care )
 
-    this%array_output = unpack(this%runoff, this%active, this%dont_care)
+    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_INFILTRATION )%ncfile,            &
+            iVarID=OUTPUT( NCDF_INFILTRATION )%ncfile%iVarID(NC_Z),                             &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
+                                int(this%number_of_columns, kind=c_size_t) ],                   &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+            lMask=this%active,                                                                  &
+            rValues=this%infiltration,                                                          &
+            rField=this%dont_care )
 
-    call netcdf_put_variable_array(NCFILE=OUTPUT(3)%ncfile, &
-                   iVarID=OUTPUT(3)%ncfile%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=this%array_output )
+    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_SNOWFALL )%ncfile,                &
+            iVarID=OUTPUT( NCDF_SNOWFALL )%ncfile%iVarID(NC_Z),                                 &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
+                                int(this%number_of_columns, kind=c_size_t) ],                   &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+            lMask=this%active,                                                                  &
+            rValues=this%snowfall,                                                              &
+            rField=this%dont_care )
 
-    this%array_output = unpack(this%runon, this%active, this%dont_care)
+    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_SNOWMELT )%ncfile,                &
+            iVarID=OUTPUT( NCDF_SNOWMELT )%ncfile%iVarID(NC_Z),                                 &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
+                                int(this%number_of_columns, kind=c_size_t) ],                   &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+            lMask=this%active,                                                                  &
+            rValues=this%snowmelt,                                                              &
+            rField=this%dont_care )
 
-    call netcdf_put_variable_array(NCFILE=OUTPUT(4)%ncfile, &
-                   iVarID=OUTPUT(4)%ncfile%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=this%array_output )
+    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_SNOW_STORAGE )%ncfile,            &
+            iVarID=OUTPUT( NCDF_SNOW_STORAGE )%ncfile%iVarID(NC_Z),                             &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
+                                int(this%number_of_columns, kind=c_size_t) ],                   &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+            lMask=this%active,                                                                  &
+            rValues=this%snow_storage,                                                          &
+            rField=this%dont_care )
 
-    this%array_output = unpack(this%infiltration, this%active, this%dont_care)
+    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_SOIL_STORAGE )%ncfile,            &
+            iVarID=OUTPUT( NCDF_SOIL_STORAGE )%ncfile%iVarID(NC_Z),                             &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
+                                int(this%number_of_columns, kind=c_size_t) ],                   &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+            lMask=this%active,                                                                  &
+            rValues=this%soil_storage,                                                          &
+            rField=this%dont_care )
 
-    call netcdf_put_variable_array(NCFILE=OUTPUT(5)%ncfile, &
-                   iVarID=OUTPUT(5)%ncfile%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=this%array_output )
+    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_POTENTIAL_RECHARGE )%ncfile,      &
+            iVarID=OUTPUT( NCDF_POTENTIAL_RECHARGE )%ncfile%iVarID(NC_Z),                       &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
+                                int(this%number_of_columns, kind=c_size_t) ],                   &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+            lMask=this%active,                                                                  &
+            rValues=this%potential_recharge,                                                    &
+            rField=this%dont_care )
 
-    this%array_output = unpack(this%snowfall, this%active, this%dont_care)
+    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_REFERENCE_ET0 )%ncfile,           &
+            iVarID=OUTPUT( NCDF_REFERENCE_ET0 )%ncfile%iVarID(NC_Z),                            &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
+                                int(this%number_of_columns, kind=c_size_t) ],                   &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+            lMask=this%active,                                                                  &
+            rValues=this%reference_ET0,                                                         &
+            rField=this%dont_care )
 
-    call netcdf_put_variable_array(NCFILE=OUTPUT(6)%ncfile, &
-                   iVarID=OUTPUT(6)%ncfile%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=this%array_output )
+    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_ACTUAL_ET )%ncfile,               &
+            iVarID=OUTPUT( NCDF_ACTUAL_ET )%ncfile%iVarID(NC_Z),                                &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
+                                int(this%number_of_columns, kind=c_size_t) ],                   &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+            lMask=this%active,                                                                  &
+            rValues=this%actual_et,                                                             &
+            rField=this%dont_care )
 
-!    this%array_output = unpack(this%snowmelt, this%active, this%dont_care)
+    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_TMIN )%ncfile,                    &
+            iVarID=OUTPUT( NCDF_TMIN )%ncfile%iVarID(NC_Z),                                     &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
+                                int(this%number_of_columns, kind=c_size_t) ],                   &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+            lMask=this%active,                                                                  &
+            rValues=this%tmin,                                                                  &
+            rField=this%dont_care )
 
-    !> @TODO convert the remaining calls from "netcdf_put_variable_array" to 
-    !! "netcdf_put_packed_variable"
+    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_TMAX )%ncfile,                    &
+            iVarID=OUTPUT( NCDF_TMAX )%ncfile%iVarID(NC_Z),                                     &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
+                                int(this%number_of_columns, kind=c_size_t) ],                   &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+            lMask=this%active,                                                                  &
+            rValues=this%tmax,                                                                  &
+            rField=this%dont_care )
 
-    call netcdf_put_packed_variable_array(NCFILE=OUTPUT(7)%ncfile,                                                             &
-                   iVarID=OUTPUT(7)%ncfile%iVarID(NC_Z),                                                                       &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t],                              &
-                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],   &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                                                      &
-                   lMask=this%active,                                                                                          &
-                   rValues=this%snowmelt,                                                                                      &
-                   rField=this%dont_care )
-
-!     call netcdf_put_variable_array(NCFILE=OUTPUT(7)%ncfile, &
-!                    iVarID=OUTPUT(7)%ncfile%iVarID(NC_Z), &
-!                    iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-!                    iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
-!                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-!                    rValues=this%array_output )
-
-    this%array_output = unpack(this%snow_storage, this%active, this%dont_care)
-
-    call netcdf_put_variable_array(NCFILE=OUTPUT(8)%ncfile, &
-                   iVarID=OUTPUT(8)%ncfile%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=this%array_output )
-
-    this%array_output = unpack(this%soil_storage, this%active, this%dont_care)
-
-    call netcdf_put_variable_array(NCFILE=OUTPUT(9)%ncfile, &
-                   iVarID=OUTPUT(9)%ncfile%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=this%array_output )
-
-    this%array_output = unpack(this%potential_recharge, this%active, this%dont_care)
-
-    call netcdf_put_variable_array(NCFILE=OUTPUT(10)%ncfile, &
-                   iVarID=OUTPUT(10)%ncfile%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=this%array_output )
-
-    this%array_output = unpack(this%reference_ET0, this%active, this%dont_care)
-
-    call netcdf_put_variable_array(NCFILE=OUTPUT(11)%ncfile, &
-                   iVarID=OUTPUT(11)%ncfile%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=this%array_output )
-
-    this%array_output = unpack(this%reference_ET0_adj, this%active, this%dont_care)
-
-    call netcdf_put_variable_array(NCFILE=OUTPUT(12)%ncfile, &
-                   iVarID=OUTPUT(12)%ncfile%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=this%array_output )
-
-    this%array_output = unpack(this%actual_ET, this%active, this%dont_care)
-
-    call netcdf_put_variable_array(NCFILE=OUTPUT(13)%ncfile, &
-                   iVarID=OUTPUT(13)%ncfile%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=this%array_output )
-
-    this%array_output = unpack(this%tmin, this%active, this%dont_care)
-
-    call netcdf_put_variable_array(NCFILE=OUTPUT(14)%ncfile, &
-                   iVarID=OUTPUT(14)%ncfile%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=this%array_output )
-
-    this%array_output = unpack(this%tmax, this%active, this%dont_care)
-
-    call netcdf_put_variable_array(NCFILE=OUTPUT(15)%ncfile, &
-                   iVarID=OUTPUT(15)%ncfile%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=this%array_output )
-
-    this%array_output = unpack(this%interception_storage, this%active, this%dont_care)
-
-    call netcdf_put_variable_array(NCFILE=OUTPUT(16)%ncfile, &
-                   iVarID=OUTPUT(16)%ncfile%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],              &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=this%array_output )
-
-    call netcdf_put_packed_variable_array(NCFILE=OUTPUT(17)%ncfile,                                                             &
-                   iVarID=OUTPUT(17)%ncfile%iVarID(NC_Z),                                                                       &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t],                               &
-                   iCount=[1_c_size_t, int(this%number_of_rows, kind=c_size_t), int(this%number_of_columns, kind=c_size_t)],    &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                                                       &
-                   lMask=this%active,                                                                                           &
-                   rValues=this%irrigation,                                                                                     &
-                   rField=this%dont_care )
+    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_IRRIGATION )%ncfile,              &
+            iVarID=OUTPUT( NCDF_IRRIGATION )%ncfile%iVarID(NC_Z),                               &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
+                                int(this%number_of_columns, kind=c_size_t) ],                   &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+            lMask=this%active,                                                                  &
+            rValues=this%irrigation,                                                            &
+            rField=this%dont_care )
 
   end subroutine write_variables_to_netcdf
 

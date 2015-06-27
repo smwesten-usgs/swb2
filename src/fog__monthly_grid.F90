@@ -166,7 +166,7 @@ contains
                    iCount=[1_c_size_t, int(iNY, kind=c_size_t), int(iNX, kind=c_size_t)],              &
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
                    rValues=fFog, lMask=lActive, rField=fDont_Care )
-     
+
     end associate
 
   end subroutine fog_monthly_grid_calculate

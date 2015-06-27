@@ -152,6 +152,11 @@ contains
     ! map the 2D array of RAINFALL_ZONE values to the vector of active cells
     INITIAL_PERCENT_SOIL_MOISTURE = pack( pINITIAL_PERCENT_SOIL_MOISTURE%pGrdBase%rData, lActive )
 
+   if ( minval( INITIAL_PERCENT_SOIL_MOISTURE ) < fZERO &
+      .or. maxval( INITIAL_PERCENT_SOIL_MOISTURE ) > 100.0_c_float )  &
+     call warn(sMessage="One or more initial percent soils moisture values outside of " &
+       //"valid range (0% to 100%)", lFatal=lTRUE )
+
    !> create string list that allows for alternate heading identifiers for the landuse code
    call slList%append("LU_Code")
    call slList%append("Landuse_Code")
@@ -318,7 +323,7 @@ contains
                                                fZr_max=fMax_Rooting_Depths( iLanduseIndex( iIndex ), &
                                                                             iSoilGroup( iIndex ) ),  &
                                                fKCB=fKcb_initial )
-      fSoilStorage( iIndex ) = INITIAL_PERCENT_SOIL_MOISTURE( iIndex )    &
+      fSoilStorage( iIndex ) = INITIAL_PERCENT_SOIL_MOISTURE( iIndex ) / 100.0_c_float    &
                                * fRz_initial * fAvailable_Water_Content( iIndex )
 
     enddo
@@ -617,9 +622,9 @@ function calc_effective_root_depth( iLanduseIndex, fZr_max, fKCB ) 	result(fZr_i
   real (kind=c_float) :: fZr_i
 
 	! [ LOCALS ]
-	! 0.328 feet equals 0.1 meters, which is seems to be the standard
+	! 0.3048 feet equals 0.1 meters, which is seems to be the standard
 	! initial rooting depth in the FAO-56 methodology
-	real (kind=c_float), parameter :: fZr_min = 0.328
+	real (kind=c_float), parameter :: fZr_min = 0.3048
   real (kind=c_float)            :: fMaxKCB
   real (kind=c_float)            :: fMinKCB
 
@@ -634,19 +639,21 @@ function calc_effective_root_depth( iLanduseIndex, fZr_max, fKCB ) 	result(fZr_i
   ! if there is not much difference between the MAX Kcb and MIN Kcb, assume that
   ! we are dealing with an area such as a forest, where we assume that the rooting
   ! depths are constant year-round
-	if ( ( fMaxKCB - fMinKCB ) < 0.1_c_float ) then
+! 	if ( ( fMaxKCB - fMinKCB ) < 0.1_c_float ) then
 
-	  fZr_i = fZr_max
+! 	  fZr_i = fZr_max
 
-	elseif ( fMaxKCB > 0.0_C_float ) then
+! 	elseif ( fMaxKCB > 0.0_C_float ) then
 
-    fZr_i = fZr_min + (fZr_max - fZr_min) * fKCB / fMaxKCB 
+!     fZr_i = fZr_min + (fZr_max - fZr_min) * fKCB / fMaxKCB 
 
-  else
+!   else
 
-    fZr_i = fZr_min
+!     fZr_i = fZr_min
 
-  endif
+!   endif
+
+  fZr_i = fZr_max
 
 end function calc_effective_root_depth
 
@@ -769,8 +776,7 @@ end function calc_water_stress_coefficient_Ks
   ! change from earlier coding: rooting depth is now simply keyed into the current Kcb
   fZr = calc_effective_root_depth( iLanduseIndex, fMaxRootingDepth, fKcb )
 
-  ! fSoilStorageMax is now dynamic, unlike previous SWB versions
-  fSoilStorage_Max = fAvailableWaterCapacity * fZr
+  fSoilStorage_Max = fAvailableWaterCapacity * fMaxRootingDepth
 
   fREW = REW( iLanduseIndex, iSoilGroup )
   fTEW = TEW( iLanduseIndex, iSoilGroup )
@@ -786,8 +792,9 @@ end function calc_water_stress_coefficient_Ks
 
   ! Deficit is defined in the sense of Thornthwaite and Mather
   !
-  ! ### This should be defined in terms of TAW and RAW, no?
-  !
+  ! deficit: defined in terms relative to the *current* rooting depth,
+  !          in other words, relative to the maximum amount of water the
+  !          roots in their current growth state could access
   fDeficit = max( 0.0_c_float, fSoilStorage_Max - fSoilStorage )
 
   ! "STANDARD" vs "NONSTANDARD": in the FAO56 publication the term
@@ -813,7 +820,6 @@ end function calc_water_stress_coefficient_Ks
                                           fDeficit=fDeficit,             &
                                           fTotalAvailableWater=fTAW,     &
                                           fReadilyAvailableWater=fRAW )
-
   
   fBareSoilEvap = fReference_ET0 * fKe
   fCropETc = fReference_ET0 * (fKcb * fKs)

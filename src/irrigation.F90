@@ -228,8 +228,6 @@ contains
 !     call pIRRIGATION_MASK%getvalues( iMonth, iDay, iYear, iJulianDay )
 !     iIrrigation_Mask = pack( pIRRIGATION_MASK%pGrdBase%iData, lActive )
 
-    print *, "IRRIGATION MASK VALUES (0, >0): ",count( IRRIGATION_MASK == 0), count( IRRIGATION_MASK > 0)
-
     ! for each cell, add water if soil storage zone is below the
     ! maximum allowable depletion
 
@@ -238,24 +236,14 @@ contains
 
     do iIndex=lbound(fSoilStorage,1), ubound(fSoilStorage,1)
 
-!     where ( iDayOfYear < FIRST_DAY_OF_IRRIGATION( iLanduseIndex )     &
-!        .or. iDayOfYear > LAST_DAY_OF_IRRIGATION( iLanduseIndex ) )
-
+      fIrrigationAmount( iIndex ) = fZERO
 
       if ( ( iDayOfYear < FIRST_DAY_OF_IRRIGATION( iLanduseIndex( iIndex ) ) ) &
         .or. ( iDayOfYear > LAST_DAY_OF_IRRIGATION( iLanduseIndex( iIndex ) ) ) )  cycle
 
-
-!     else where ( MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex ) > 0.99     &
-!          .or. fSoilStorage_Max <= fZERO                                           &
-!          .or. iIrrigation_Mask == 0 )              
-
       if ( MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex( iIndex ) ) > 0.99 )  cycle
       if ( fSoilStorage_Max( iIndex ) <= fZERO ) cycle
       if ( IRRIGATION_MASK( iIndex ) == 0 ) cycle 
-
-!     else where ( ( 1.0_c_float - fSoilStorage / fSoilStorage_Max )           &
-!                        > MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex ) ) 
 
       if ( ( 1.0_c_float - fSoilStorage( iIndex ) / fSoilStorage_Max( iIndex ) )                           &
              > MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex( iIndex ) ) ) then
@@ -267,8 +255,6 @@ contains
                                                  - IRRIGATION_FROM_GROUNDWATER( iIndex )
 
       endif
-
-!     end where  
 
     enddo
 
