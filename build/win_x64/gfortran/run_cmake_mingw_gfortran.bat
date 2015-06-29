@@ -48,6 +48,7 @@ set CMAKE_Fortran_FLAGS_PROFILE="-O2 -pg -g -fno-omit-frame-pointer -DNDEBUG -fn
 :: recreate clean Windows environment
 set PATH=c:\windows;c:\windows\system32;c:\windows\system32\Wbem
 set PATH=%PATH%;C:\Program Files (x86)\7-Zip
+set PATH=%PATH%;C:\Program Files (x86)\Git\bin
 set PATH=%PATH%;%CMAKEROOT%\bin;%CMAKEROOT%\share
 set PATH=%PATH%;C:\MinGW64\bin
 set PATH=%PATH%;C:\MinGW64\include;C:\MinGW64\lib
