@@ -4,46 +4,62 @@
   <navindex>
     <tab type="mainpage" visible="yes" title="SWB"/>
 
-  <tab type="usergroup" title="Introduction">
-     <tab type="user" url="@ref abstract" title="Abstract"/>
-     <tab type="user" url="@ref background" title="Background"/>  
-  </tab>
+    <tab type="usergroup" title="Introduction">
+       <tab type="user" url="@ref abstract" title="Abstract"/>
+       <tab type="user" url="@ref background" title="Background"/> 
+       <tab type="user" url="@ref swb_changes" title="Changes from Previous Versions"/> 
+    </tab>
 
-	<tab type="usergroup" title="Theory">
-    <tab type="user" url="@ref scope" title="Scope and Purpose"/>
-    <tab type="user" url="@ref model_theory" title="Model Theory"/>	 
-	  <tab type="user" url="@ref irrigation_module_docs" title="Irrigation Calculations"/>
-  </tab>
+  	<tab type="usergroup" title="Theory">
+      <tab type="user" url="@ref scope" title="Scope and Purpose"/>
+      <tab type="user" url="@ref model_theory" title="Model Theory"/>	 
+      <tab type="usergroup" title="Process Options">
+        <tab type="user" url="@ref interception" title="Interception"/>
+        <tab type="user" url="@ref snowfall" title="Snowfall"/>
+        <tab type="user" url="@ref snowmelt" title="Snowmelt"/>
+        <tab type="user" url="@ref fog_interception" title="Fog Interception" />
+        <tab type="user" url="@ref runoff" title="Runoff"/>
+        <tab type="user" url="@ref flow_routing" title="Flow_Routing"/>
+        <tab type="user" url="@ref potential_et" title="Potential or Reference Evapotranspiration"/>
+        <tab type="user" url="@ref soil_moist" title="Soil Moisture and Actual Evapotranspiration" />
+        <tab type="user" url="@ref irrigation" title="Irrigation Application"/>
+      </tab>
+    </tab>
 
-	<tab type="usergroup" title="Application">
-     <tab type="user" url="@ref directives" title="Control File Directives"/>
-     <tab type="user" url="@ref geotransformations" title="Coordinate Transformations"/>	 
-	   <tab type="user" url="@ref variable_descriptions" title="Output Variable Descriptions"/>
-	   <tab type="user" url="@ref specific_datasets" title="Gridded Climate Datasets"/>
-	   <tab type="user" url="@ref parameterization" title="Suggested Starting Parameter Values"/>	 
-  </tab>
+  	<tab type="usergroup" title="Application">
+       <tab type="user" url="@ref directives" title="Control File Directives"/>
+       <tab type="user" url="@ref geotransformations" title="Coordinate Transformations"/>	 
+  	   <tab type="user" url="@ref variable_descriptions" title="Output Variable Descriptions"/>
+  	   <tab type="user" url="@ref specific_datasets" title="Gridded Climate Datasets"/>
+  	   <tab type="user" url="@ref parameterization" title="Suggested Starting Parameter Values"/>	 
+       <tab type="user" url="@ref faq" title="Frequently Asked Questions"/>
+    </tab>
 
-	<tab type="usergroup" title="Development">
-     <tab type="user" url="@ref conventions" title="Coding Conventions"/>
-	 <tab type="user" url="@ref todo" title="To-Do List"/>
+  	<tab type="usergroup" title="Development">
+       <tab type="user" url="@ref conventions" title="Coding Conventions"/>
+  	   <tab type="user" url="@ref todo" title="To-Do List"/>
     </tab>	
-	
+  	
     <tab type="pages" visible="no" title="" intro=""/>
     <tab type="modules" visible="yes" title="" intro=""/>
+      
     <tab type="namespaces" visible="yes" title="">
       <tab type="namespacelist" visible="yes" title="" intro=""/>
       <tab type="namespacemembers" visible="yes" title="" intro=""/>
     </tab>
+
     <tab type="classes" visible="yes" title="">
       <tab type="classlist" visible="yes" title="" intro=""/>
       <tab type="classindex" visible="$ALPHABETICAL_INDEX" title=""/> 
       <tab type="hierarchy" visible="yes" title="" intro=""/>
       <tab type="classmembers" visible="yes" title="" intro=""/>
     </tab>
+
     <tab type="files" visible="yes" title="">
       <tab type="filelist" visible="yes" title="" intro=""/>
       <tab type="globals" visible="yes" title="" intro=""/>
     </tab>
+
     <tab type="examples" visible="yes" title="" intro=""/>  
 
   </navindex>
