@@ -1,16 +1,17 @@
-# Model Description {#model_desc}
-
-## Model Theory
+## Model Theory {#model_theory} 
 
 The SWB code uses a modified Thornthwaite-Mather soil-moisture accounting method \cite thornthwaite_instructions_1957 to calculate recharge; recharge is calculated separately for each grid cell in the model domain. Sources and sinks of water within each grid cell are determined on the basis of input climate data and landscape characteristics; recharge is calculated as the difference between the change in soil moisture and these sources and sinks (eq.~\ref{eq:swb_mass_bal}):
 
 
-\f{equation}{
-   recharge = \underbrace{(rainfall + snowmelt + inflow)}_\text{sources} - \underbrace{(interception + outflow + ET)}_\text{sinks} - \underbrace{\Delta soil  \: moisture}_\text{change in storage}  
-  \label{eq:swb_mass_bal}
-\f}
+$recharge = (rainfall + snowmelt + inflow) - (interception + outflow + ET) - \Delta soilmoisture$
 
 Each of the water-budget components given in equation ~\ref{eq:swb_mass_bal} is handled by one or more modules within the SWB model. Specific water-balance components are discussed briefly below.
+
+$E = m{c^2}$
+
+$recharge = \underbrace {\left( {rainfall + snowmelt + fog} \right)}_{sources}$
+
+$recharge = \underbrace {\left( {rainfall + snowmelt + fog} \right)}_{sources}$
 
 **rainfall.** Precipitation data are input as daily values either as a time series at a single gage or as a series of daily Arc ASCII or Surfer grid files created by the user. Precipitation-gage records from an unlimited number of sites may be used if the user supplies precipitation as a series of grid files. SWB converts partitions precipitation into rainfall and snowfall components on the basis of daily minimum and maximum air temperatures.
 
@@ -41,16 +42,15 @@ I_a = 0.2 S_{max}
 
 The maximum storage term is defined by the curve number for the land-cover type under consideration:
 
-\f{equation}{
-S_{max} = \left( \dfrac{1000}{CN}\right) - 10
-\label{eq:s_max_scs_cn}
-\f}
-
+$S_{max} = \left( \dfrac{1000}{CN}\right) - 10$
 
 Curve numbers are adjusted upward or downward depending on how much precipitation has occurred in the previous 5-day period. The amount of precipitation that has fallen in the previous 5-day period is used to describe soil-moisture conditions; three classes of moisture conditions are defined and are called antecedent runoff condition I, II, and III, defined as shown in table~\ref{tab: antecedent_runoff_cond}.
 
-Runoff condition number | Description | Nongrowing Season | Growing Season
-----------|-----------------------|------------|--------------------
-    I     |    Dry                | 0.05       | 1.4     
-    II    |    Average            | 0.5 -- 1.1 | 1.4 -- 2.1 
-    III   |    Near Saturation    | 1.1        | 2.1    
+Table: Antecedent Runoff Conditions 
+
+| Runoff condition number | Description | Nongrowing Season | Growing Season |
+| ----------|-----------------------|------------|--------------------|
+|    I     |    Dry                | 0.05       | 1.4                 |
+|    II    |    Average            | 0.5 -- 1.1 | 1.4 -- 2.1          |
+|    III   |    Near Saturation    | 1.1        | 2.1                 |
+
