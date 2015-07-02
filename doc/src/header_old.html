@@ -1,15 +1,28 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html><!-- InstanceBegin template="/Templates/infodata.dwt" codeOutsideHTMLIsLocked="false" --> 
+<head>
+
+<link href="$relpath^tabs.css" rel="stylesheet" type="text/css"/>
+<script type="text/javascript" src="$relpath^jquery.js"></script>
+<script type="text/javascript" src="$relpath^dynsections.js"></script>
+$treeview
+$search
+
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
-    tex2jax: {inlineMath: [['$','$'], ['\\(','\\)']] },
-	TeX: { equationNumbers: { autoNumber: "AMS" } }
-	});
+    tex2jax: {processEnvironments: true,
+              inlineMath: [['$','$'], ['\\(','\\)']] },
+    TeX: { equationNumbers: { autoNumber: "all" } }
+  });
 </script>
+
 <script type="text/javascript"
   src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
-<head>
+
+<link href="$relpath^$stylesheet" rel="stylesheet" type="text/css" />
+$extrastylesheet
+
 <!-- InstanceBeginEditable name="doctitle" -->
 <title>SOIL-WATER-BALANCE SOURCE CODE BROWSER- USGS Wisconsin Water Science Center</title>
 <!-- InstanceEndEditable -->
@@ -30,11 +43,6 @@
 <!--this adds or changes styles for Wisconsin applications -->
 <link href="http://wi.water.usgs.gov/styles/wi.css" rel="stylesheet" type="text/css" media="screen"/>
 <link href="http://wi.water.usgs.gov/styles/wi-print.css" rel="stylesheet" type="text/css" media="print"/>
-<!--this set of stylesheet references come from the standard Doxygen-generated html -->
-<link href="tabs.css" rel="stylesheet" type="text/css"/>
-<link href="search/search.css" rel="stylesheet" type="text/css"/>
-<script type="text/javascript" src="search/search.js"></script>
-<link href="doxygen.css" rel="stylesheet" type="text/css"/>
 
 <!-- InstanceBeginEditable name="head" -->
 <style type="text/css">
@@ -57,7 +65,7 @@
 </head>
 
 <body onload='searchBox.OnSelectItem(0);'>
-<div id="usgslogo"><img src="../images/logo/printmedia-usgsbanner.gif" alt="green USGS logo"/></div>
+<div id="usgslogo"><img src="http://wi.water.usgs.gov/images/logo/printmedia-usgsbanner.gif" alt="green USGS logo"/></div>
 
 <table cellpadding="0" cellspacing="0" id="menutable">
     <tr><td width="100%" valign="top"><!-- START header and top navigation section -->
@@ -79,4 +87,6 @@
 	<p>Soil-Water-Balance Source Code Browser</p>
 
 </div>
+
+
 <!-- END USGS Header Template -->

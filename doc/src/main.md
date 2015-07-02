@@ -1,4 +1,4 @@
-@mainpage SWB--A Modified Thornthwaite-Mather Soil-Water-Balance code for estimating groundwater recharge 
+@mainpage SWB 2.0--A Modified Thornthwaite-Mather Soil-Water-Balance code for estimating groundwater recharge 
 
 The SWB model calculates recharge by use of commonly available geographic information system
 (GIS) data layers in combination with tabular climatological data. The code is based on a modified Thornthwaite-Mather

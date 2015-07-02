@@ -13,6 +13,7 @@
 $treeview
 $search
 
+<!-- MathJax customization -->
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
     tex2jax: {processEnvironments: true,
@@ -25,10 +26,48 @@ $search
   src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
 </script>
 
+<!--this sets the usgs std styles -->
+<link href="http://www.usgs.gov/styles/common.css" rel="stylesheet" type="text/css" />
+<!--this sets the title bar color and default header -->
+<link href="http://www.usgs.gov/frameworkfiles/styles/custom.css" rel="stylesheet" type="text/css" />
+<!--this sets the main styles used in the Water framework -->
+<link href="http://www.usgs.gov/frameworkfiles/styles/framework.css" rel="stylesheet" type="text/css" />
+<!--this adds or changes styles for Wisconsin applications -->
+<!-- IN PARTICULAR, wi.css DEFINES THE IMAGE FILE: banner_fisc_water.jpg -->
+<link href="http://wi.water.usgs.gov/styles/wi.css" rel="stylesheet" type="text/css" media="screen"/>
+<link href="http://wi.water.usgs.gov/styles/wi-print.css" rel="stylesheet" type="text/css" media="print"/>
+
 <link href="$relpath^$stylesheet" rel="stylesheet" type="text/css" />
 $extrastylesheet
 </head>
 <body>
+
+<!-- begin material from USGS -->
+
+<table cellpadding="0" cellspacing="0" id="menutable">
+  <tbody>
+    <tr>
+      <td width="100%" valign="top">
+      <!-- BEGIN USGS Header Template -->
+      <div id="usgscolorbanddata">
+      <div id="usgsbanner">
+      <div id="usgsidentifier"><a href="http://www.usgs.gov/"><img src="http://www.usgs.gov/images/header_graphic_usgsIdentifier_white.jpg" alt="USGS - science for a changing world" title="U.S. Geological Survey Home Page" width="178" height="72" /></a></div>
+      <div id="usgsccsabox">
+      <div id="usgsccsa">
+        <br /><a href="http://www.usgs.gov/">USGS Home</a>
+        <br /><a href="http://www.usgs.gov/ask/">Contact USGS</a>
+        <br /><a href="http://search.usgs.gov/">Search USGS</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="usgstitle" width=100%>
+  <p>Wisconsin Water Science Center</p>
+</div> 
+
+<!-- end material from USGS -->
+
 <div id="top"><!-- do not remove this div, it is closed by doxygen! -->
 
 <!--BEGIN TITLEAREA-->
