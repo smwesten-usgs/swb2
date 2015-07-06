@@ -681,7 +681,7 @@ SHOW_NAMESPACES        = YES
 # by doxygen. Whatever the program writes to standard output is used as the file
 # version. For an example see the documentation.
 
-FILE_VERSION_FILTER    = "git log -1 --format=%h"
+FILE_VERSION_FILTER    = "git log -1 --pretty=format:\"This documentation corresponds to Git commit %h, last modifed on %ad%n\""
 
 # The LAYOUT_FILE tag can be used to specify a layout file which will be parsed
 # by doxygen. The layout file controls the global structure of the generated
@@ -828,7 +828,8 @@ EXCLUDE                = src/swbread.F90 \
                          src/test_params.F90 \
                          src/types_new.F90 \
                          src/types.F90 \
-                         doc/src/temp
+                         doc/src/temp \
+                         src/soil_moisture_single_layer.F90
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded

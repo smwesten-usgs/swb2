@@ -10,6 +10,7 @@ if(TARGET__SWB_EXECUTABLE)
 		data_catalog_entry.F90
 		datetime.F90
             dictionary.F90
+            direct_recharge__gridded_data.F90
             #et_FAO56_crop_coefficients.F90
             et__gridded_values.F90
             et__hargreaves_samani.F90
@@ -231,6 +232,7 @@ if(TARGET__SWB_LIBRARY)
             data_catalog_entry.F90
             datetime.F90
             dictionary.F90
+            direct_recharge__gridded_data.F90            
             #et_FAO56_crop_coefficients.F90
             et__gridded_values.F90
             et__hargreaves_samani.F90
@@ -264,6 +266,7 @@ if(TARGET__SWB_LIBRARY)
             snowfall__original.F90
             snowmelt__original.F90
             solar_calculations.F90
+            direct_recharge__gridded_data.F90            
             strings.F90
             string_list.F90
 

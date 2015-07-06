@@ -95,6 +95,7 @@ module model_domain
     procedure ( simple_method ), pointer         :: init_precipitation_data => model_initialize_precip_normal
     procedure ( simple_method ), pointer         :: init_fog                => model_initialize_fog_none
     procedure ( simple_method ), pointer         :: init_irrigation         => model_initialize_irrigation_none
+    procedure ( simple_method ), pointer         :: init_direct_recharge  => model_initialize_direct_recharge_none
     procedure ( simple_method ), pointer         :: init_GDD                => model_initialize_GDD
 
     procedure ( simple_method ), pointer         :: calc_interception      => model_calculate_interception_bucket
@@ -111,6 +112,7 @@ module model_domain
     procedure ( simple_method ), pointer         :: calc_fog               => model_calculate_fog_none
     procedure ( simple_method ), pointer         :: calc_irrigation        => model_calculate_irrigation_none
     procedure ( simple_method ), pointer         :: calc_GDD               => model_calculate_GDD
+    procedure ( simple_method ), pointer         :: calc_direct_recharge => model_calculate_direct_recharge_none    
 
     procedure (simple_method), pointer           :: output_soil_moisture   => model_output_irrigation_none
     procedure (simple_method), pointer           :: output_irrigation      => model_output_irrigation_none
@@ -339,6 +341,7 @@ contains
     call this%init_precipitation_data
     call this%init_GDD
     call this%init_irrigation
+    call this%init_direct_recharge
 
   end subroutine initialize_methods_sub
 
@@ -1247,6 +1250,9 @@ contains
        call this%calc_soil_moisture()
 
      endif
+
+     ! add any other direct recharge terms to the potential recharge based on the water balance
+     call this%calc_direct_recharge()
    
   end subroutine calculate_soil_mass_balance_sub
 
@@ -1257,6 +1263,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)   :: this
     character (len=*), intent(in)           :: sCmdText
     character (len=*), intent(in)           :: sMethodName
+
 
     if ( sCmdText .contains. "INTERCEPTION" ) then
 
@@ -1452,6 +1459,24 @@ contains
       else
 
         call warn("Your control file specifies an unknown or unsupported PRECIPITATION method.", &
+            lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+
+      endif
+
+    elseif ( sCmdText .contains. "DIRECT_RECHARGE" ) then
+
+      if ( ( sMethodName .strequal. "EXTERNAL" )                                               &
+           .or. ( sMethodName .strequal. "GRIDDED" ) ) then
+
+        this%init_direct_recharge => model_initialize_direct_recharge_gridded
+        this%calc_direct_recharge => model_calculate_direct_recharge_gridded
+
+        call LOGS%WRITE( "==> GRIDDED values for water main leakage (etc.) will be used.", &
+            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
+      else
+
+        call warn("Your control file specifies an unknown or unsupported DIRECT_RECHARGE method.", &
             lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
       endif
@@ -2090,6 +2115,57 @@ contains
     !> Nothing here to see. 
 
   end subroutine model_output_GDD
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_direct_recharge_none ( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_initialize_direct_recharge_none
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_direct_recharge_none ( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_calculate_direct_recharge_none
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_direct_recharge_gridded ( this )
+
+    use direct_recharge__gridded_data
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call direct_recharge_initialize( lActive=this%active, iLandUseIndex=this%landuse_index,   &
+                                     dX=this%X, dY=this%Y,                                    &
+                                     dX_lon=pCOORD_GRD%rX , dY_lat=pCOORD_GRD%rY )
+
+  end subroutine model_initialize_direct_recharge_gridded
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_direct_recharge_gridded ( this )
+
+    use direct_recharge__gridded_data
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call direct_recharge_calculate( iLanduse_Index=this%landuse_index,   &
+                                    lActive=this%active,         &
+                                    fDont_Care=this%dont_care )
+
+    this%potential_recharge = this%potential_recharge   &
+                              + fCESSPOOL               &
+                              + fWATER_MAIN             & 
+                              + fWATER_BODY_RECHARGE    & 
+                              + fSTORM_DRAIN            &
+                              + fDISPOSAL_WELL
+
+  end subroutine model_calculate_direct_recharge_gridded
 
 !--------------------------------------------------------------------------------------------------
 

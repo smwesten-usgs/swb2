@@ -1,9 +1,11 @@
 !> @file
-!>  Contains a single module, @ref datetime, which
-!> contains all time and date-related routines as well as the
-!> @ref DATETIME_T class.
+!!  Contains Fortran module @ref datetime, which
+!! @ref DATETIME_T class and associated time and date-related routines.
 
-!>  This module contains all time and date-related routines as well as the @ref DATETIME_T class.
+!> This module contains the @ref DATETIME_T class and associated
+!! time and date-related routines, along with the @ref MONTH_T class which
+!! defines month names and three-letter abbreviations.
+
 module datetime
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double, c_bool
@@ -105,9 +107,9 @@ module datetime
   integer (kind=c_int), private :: iScanSec1 = 7
   integer (kind=c_int), private :: iScanSec2 = 8
 
-  !> Container for calendar lookup information
+  !> Container for month name and length information
+
   type MONTH_T
-    ! Container for calendar lookup information
     character (len=3) :: sName          ! Abbreviated name
     character (len=9) :: sFullName      ! Full month name
     integer (kind=c_int) :: iStart      ! Starting (Julian) date
@@ -117,6 +119,7 @@ module datetime
   end type MONTH_T
 
   !> Month information
+
   type ( MONTH_T ), public, target :: MONTHS(12) =     &
    [  MONTH_T( 'Jan','January  ',   1,  31, 1, 31),    &
       MONTH_T( 'Feb','February ',  32,  59, 2, 29),    &

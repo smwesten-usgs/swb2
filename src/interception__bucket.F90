@@ -24,11 +24,11 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)        :: iNumberOfLanduses
     logical (kind=c_bool)       :: lAreLengthsEqual
-    character (len=:), allocatable :: sCrap
+    character (len=:), allocatable :: sTemp
 
     !> Determine how many landuse codes are present
-    sCrap = "LU_Code"
-    call PARAMS%get_parameters( sKey=sCrap, iValues=iLanduseCodes )
+    sTemp = "LU_Code"
+    call PARAMS%get_parameters( sKey=sTemp, iValues=iLanduseCodes )
     iNumberOfLanduses = count( iLanduseCodes > 0 )
     
     call PARAMS%get_parameters( sKey="Interception_Growing" , fValues=fInterceptionValue_GrowingSeason )

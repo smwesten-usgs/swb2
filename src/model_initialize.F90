@@ -33,7 +33,7 @@ module model_initialize
     logical (kind=c_bool)  :: lOptional
   end type METHODS_LIST_T
 
-  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(21) = &
+  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(26) = &
 
     [ GRIDDED_DATASETS_T("PRECIPITATION                ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("TMIN                         ", lFALSE, DATATYPE_FLOAT ),     &
@@ -53,11 +53,16 @@ module model_initialize
       GRIDDED_DATASETS_T("STEMFLOW_FRACTION            ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("EVAPORATION_TO_RAINFALL_RATIO", lTRUE, DATATYPE_FLOAT ),      & 
       GRIDDED_DATASETS_T("RAINFALL_ADJUST_FACTOR       ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("CESSPOOL_LEAKAGE             ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("STORM_DRAIN_LEAKAGE          ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("WATER_BODY_LEAKAGE           ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("WATER_MAIN_LEAKAGE           ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("DISPOSAL_WELL_DISCHARGE      ", lTRUE, DATATYPE_FLOAT ),      &      
       GRIDDED_DATASETS_T("RUNOFF_ZONE                  ", lTRUE, DATATYPE_INT ),        & 
       GRIDDED_DATASETS_T("IRRIGATION_MASK              ", lTRUE, DATATYPE_INT),         &                
       GRIDDED_DATASETS_T("RELATIVE_HUMIDITY            ", lTRUE, DATATYPE_FLOAT )   ]
 
-  type (METHODS_LIST_T), parameter  :: KNOWN_METHODS(8) =   &
+  type (METHODS_LIST_T), parameter  :: KNOWN_METHODS(9) =   &
     [ METHODS_LIST_T("INTERCEPTION           ", lFALSE),    &
       METHODS_LIST_T("EVAPOTRANSPIRATION     ", lFALSE),    &
       METHODS_LIST_T("RUNOFF                 ", lFALSE),    &
@@ -65,6 +70,7 @@ module model_initialize
       METHODS_LIST_T("FOG                    ", lTRUE),     &
       METHODS_LIST_T("SOIL_MOISTURE          ", lFALSE),    &
       METHODS_LIST_T("IRRIGATION             ", lTRUE),     &
+      METHODS_LIST_T("DIRECT_RECHARGE        ", lTRUE),     &
       METHODS_LIST_T("FLOW_ROUTING           ", lFALSE)  ]
 
 contains
@@ -760,7 +766,7 @@ subroutine initialize_generic_method( sKey, lOptional)
       ! Any entry in the control file that contains the substring "METHOD" will be
       ! handed to the "set_method" subroutine in an attempt to wire up the correct
       ! process modules
-      if ( index(string=sCmdText, substring="METHOD" ) > 0 ) then
+      if ( ( sCmdText .contains. "METHOD" ) ) then
 
         call MODEL%set_method( trim(sCmdText), trim(sOptionText) )
 
