@@ -284,7 +284,7 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
-    integer (kind=c_int)  :: iStat(32)
+    integer (kind=c_int)  :: iStat(31)
 
     iCount = count( this%active )
 
@@ -1030,6 +1030,12 @@ contains
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%calc_interception) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+
+    if (.not. associated( this%init_direct_recharge) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+
+    if (.not. associated( this%calc_direct_recharge) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%calc_runoff) ) &
@@ -2144,6 +2150,8 @@ contains
                                      dX=this%X, dY=this%Y,                                    &
                                      dX_lon=pCOORD_GRD%rX , dY_lat=pCOORD_GRD%rY )
 
+    print *, __FILE__, ": ", __LINE__
+
   end subroutine model_initialize_direct_recharge_gridded
 
 !--------------------------------------------------------------------------------------------------
@@ -2158,12 +2166,7 @@ contains
                                     lActive=this%active,         &
                                     fDont_Care=this%dont_care )
 
-    this%potential_recharge = this%potential_recharge   &
-                              + fCESSPOOL               &
-                              + fWATER_MAIN             & 
-                              + fWATER_BODY_RECHARGE    & 
-                              + fSTORM_DRAIN            &
-                              + fDISPOSAL_WELL
+    this%potential_recharge = this%potential_recharge + DIRECT_RECHARGE
 
   end subroutine model_calculate_direct_recharge_gridded
 

@@ -20,14 +20,15 @@ module exceptions
 
 contains
 
-   subroutine die(sMessage, sCalledBy, iCalledByLine, sModule, iLine, sHints)
+   subroutine die(sMessage, sModule, iLine, sHints, sCalledBy, iCalledByLine )
 
     character (len=*), intent(in)               :: sMessage
-    character (len=*), intent(in), optional     :: sCalledBy
-    integer (kind=c_int), intent(in), optional  :: iCalledByLine
     character (len=*), intent(in), optional     :: sModule
     integer (kind=c_int), intent(in), optional  :: iLine 
     character (len=*), intent(in), optional     :: sHints
+    character (len=*), intent(in), optional     :: sCalledBy
+    integer (kind=c_int), intent(in), optional  :: iCalledByLine
+    
 !    integer (kind=c_int), intent(in), optional  :: iLU
     
     ! [ LOCALS ]

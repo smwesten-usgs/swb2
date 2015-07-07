@@ -33,7 +33,7 @@ module model_initialize
     logical (kind=c_bool)  :: lOptional
   end type METHODS_LIST_T
 
-  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(26) = &
+  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(27) = &
 
     [ GRIDDED_DATASETS_T("PRECIPITATION                ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("TMIN                         ", lFALSE, DATATYPE_FLOAT ),     &
@@ -57,7 +57,8 @@ module model_initialize
       GRIDDED_DATASETS_T("STORM_DRAIN_LEAKAGE          ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("WATER_BODY_LEAKAGE           ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("WATER_MAIN_LEAKAGE           ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("DISPOSAL_WELL_DISCHARGE      ", lTRUE, DATATYPE_FLOAT ),      &      
+      GRIDDED_DATASETS_T("DISPOSAL_WELL_DISCHARGE      ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("ANNUAL_DIRECT_RECHARGE_RATE  ", lTRUE, DATATYPE_FLOAT ),      &      
       GRIDDED_DATASETS_T("RUNOFF_ZONE                  ", lTRUE, DATATYPE_INT ),        & 
       GRIDDED_DATASETS_T("IRRIGATION_MASK              ", lTRUE, DATATYPE_INT),         &                
       GRIDDED_DATASETS_T("RELATIVE_HUMIDITY            ", lTRUE, DATATYPE_FLOAT )   ]

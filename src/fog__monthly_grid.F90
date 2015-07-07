@@ -68,8 +68,6 @@ contains
 
     allocate ( pNCFILE, stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
-    print *, slString%listall()
-
 
     !> Determine how many landuse codes are present
     call slString%append("LU_Code")

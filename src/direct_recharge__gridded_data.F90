@@ -24,26 +24,31 @@ module direct_recharge__gridded_data
   private
 
   public :: direct_recharge_initialize, direct_recharge_calculate
-  public :: fCESSPOOL, fWATER_MAIN, fWATER_BODY_RECHARGE
-  public :: fDISPOSAL_WELL, fSTORM_DRAIN
+  public :: DIRECT_RECHARGE
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pCESSPOOL
   type (DATA_CATALOG_ENTRY_T), pointer :: pDISPOSAL_WELL
   type (DATA_CATALOG_ENTRY_T), pointer :: pSTORM_DRAIN
   type (DATA_CATALOG_ENTRY_T), pointer :: pWATER_BODY_RECHARGE
   type (DATA_CATALOG_ENTRY_T), pointer :: pWATER_MAIN
+  type (DATA_CATALOG_ENTRY_T), pointer :: pANNUAL_RECHARGE_RATE    
 
   real (kind=c_float), allocatable     :: fCESSPOOL(:)
   real (kind=c_float), allocatable     :: fDISPOSAL_WELL(:)
   real (kind=c_float), allocatable     :: fSTORM_DRAIN(:)
   real (kind=c_float), allocatable     :: fWATER_BODY_RECHARGE(:)
   real (kind=c_float), allocatable     :: fWATER_MAIN(:)
+  real (kind=c_float), allocatable     :: fANNUAL_RECHARGE_RATE(:)
+  real (kind=c_float), allocatable     :: DIRECT_RECHARGE(:)
 
   real (kind=c_float), allocatable     :: fCESSPOOL_TABLE(:)
   real (kind=c_float), allocatable     :: fDISPOSAL_WELL_TABLE(:)
   real (kind=c_float), allocatable     :: fSTORM_DRAIN_TABLE(:)
   real (kind=c_float), allocatable     :: fWATER_BODY_RECHARGE_TABLE(:)
   real (kind=c_float), allocatable     :: fWATER_MAIN_TABLE(:)
+  real (kind=c_float), allocatable     :: fANNUAL_RECHARGE_RATE_TABLE(:)
+
+  type (T_NETCDF4_FILE), pointer       :: pNCFILE
 
 contains
 
@@ -52,7 +57,9 @@ contains
   !! Open gridded data file.
   !! Open a NetCDF output file to hold variable output.
   !!
-  !! @param[in] lActive 2-D array of active cells within the model domain.
+  !! @param[in] lActive 2D array of active cells within the model domain.
+  !! @param[in] iLanduseIndex 1D vector of indices corresponding to rows of the
+  !!            landuse lookup table(s).
   !! @param[in] dX 1D vector of X coordinates associated with the model domain.
   !! @param[in] dY 1D vector of Y coordinates.
   !! @param[in] dX_lon 2D array of longitude values.
@@ -77,30 +84,23 @@ contains
     integer (kind=c_int)                 :: iNumberOfLanduses
     logical (kind=c_bool)                :: lAreLengthsEqual
 
-    allocate( fCESSPOOL( count( lActive ) ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
-
-    allocate( fDISPOSAL_WELL( count( lActive ) ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
-
-    allocate( fWATER_MAIN( count( lActive ) ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
-
-    allocate( fWATER_BODY_RECHARGE( count( lActive ) ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
-
-    allocate( fSTORM_DRAIN( count( lActive ) ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
-                
-    fCESSPOOL = 0.0_c_float; fDISPOSAL_WELL = 0.0_c_float; fWATER_MAIN = 0.0_c_float
-    fWATER_BODY_RECHARGE = 0.0_c_float; fSTORM_DRAIN = 0.0_c_float
-
     !> Determine how many landuse codes are present
     call slString%append( "LU_Code" )
     call slString%append( "Landuse_Code" )
     
     call PARAMS%get_parameters( slKeys=slString, iValues=iLanduseCodes )
     iNumberOfLanduses = count( iLanduseCodes > 0 )
+
+    call slString%clear()
+    call slString%append( "Annual_direct_recharge_rate" )
+    call slString%append( "Annual_recharge_rate" )
+    call slString%append( "Annual_direct_recharge" )
+    
+    call PARAMS%get_parameters( slKeys=slString , fValues=fANNUAL_RECHARGE_RATE_TABLE )
+
+    ! attempt to find a source of GRIDDED ANNUAL DIRECT RECHARGE data
+    pANNUAL_RECHARGE_RATE => DAT%find( "ANNUAL_DIRECT_RECHARGE_RATE" )
+
 
     call slString%clear()
     call slString%append( "Cesspool_direct_recharge" )
@@ -110,7 +110,9 @@ contains
     
     call PARAMS%get_parameters( slKeys=slString , fValues=fCESSPOOL_TABLE )
 
-    pCESSPOOL => DAT%find( "CESSPOOL" )
+    ! attempt to find a source of GRIDDED CESSPOOL data
+    pCESSPOOL => DAT%find( "CESSPOOL_LEAKAGE" )
+
 
     call slString%clear()
     call slString%append( "Storm_drain_discharge" )
@@ -121,6 +123,7 @@ contains
 
     pSTORM_DRAIN => DAT%find( "STORM_DRAIN" )
 
+
     call slString%clear()
     call slString%append( "Water_body_recharge" )
     call slString%append( "Water_body_discharge" )
@@ -129,6 +132,7 @@ contains
     call PARAMS%get_parameters( slKeys=slString , fValues=fWATER_BODY_RECHARGE_TABLE )
 
     pWATER_BODY_RECHARGE => DAT%find( "WATER_BODY_RECHARGE" )
+
 
     call slString%clear()
     call slString%append( "Water_main_recharge" )
@@ -139,6 +143,7 @@ contains
 
     pWATER_MAIN => DAT%find( "WATER_MAIN_LEAKAGE" )
 
+
     call slString%clear()
     call slString%append( "Disposal_well_recharge" )
     call slString%append( "Disposal_well_discharge" )
@@ -147,7 +152,36 @@ contains
 
     pDISPOSAL_WELL => DAT%find( "DISPOSAL_WELL_DISCHARGE" )
 
-    if ( fCESSPOOL_TABLE(1) > fTINYVAL ) then
+
+    if ( associated( pANNUAL_RECHARGE_RATE ) ) then
+
+      allocate( fANNUAL_RECHARGE_RATE( count( lActive ) ), stat=iStat )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+
+    elseif ( fANNUAL_RECHARGE_RATE_TABLE(1) > fTINYVAL ) then
+
+      lAreLengthsEqual = ( ( ubound(fANNUAL_RECHARGE_RATE_TABLE,1) == ubound(iLanduseCodes,1) )  )
+
+      if ( .not. lAreLengthsEqual )     &
+        call warn( sMessage="The number of landuses does not match the number of annual direct"   &
+          //" recharge rate values.", sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+
+      allocate( fANNUAL_RECHARGE_RATE( count( lActive ) ), stat=iStat )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+
+      do iIndex=lbound( iLandUseIndex, 1 ), ubound( iLandUseIndex, 1 )
+        fANNUAL_RECHARGE_RATE( iIndex ) = fANNUAL_RECHARGE_RATE_TABLE( iLandUseIndex( iIndex ) )
+      enddo  
+
+     endif
+
+
+    if ( associated( pCESSPOOL ) ) then
+
+      allocate( fCESSPOOL( count( lActive ) ), stat=iStat )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+
+    elseif ( fCESSPOOL_TABLE(1) > fTINYVAL ) then
 
       lAreLengthsEqual = ( ( ubound(fCESSPOOL_TABLE,1) == ubound(iLanduseCodes,1) )  )
 
@@ -155,39 +189,125 @@ contains
         call warn( sMessage="The number of landuses does not match the number of cesspool discharge/leakage values.",   &
           sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
 
+      allocate( fCESSPOOL( count( lActive ) ), stat=iStat )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+
       do iIndex=lbound( iLandUseIndex, 1 ), ubound( iLandUseIndex, 1 )
         fCESSPOOL( iIndex ) = fCESSPOOL_TABLE( iLandUseIndex( iIndex ) )
       enddo  
 
      endif
 
-!     if ( fFOG_CATCH_EFFICIENCY(1) <= fTINYVAL )  &
-!       call warn( "Failed to find a data column containing fog catch efficiency values.", lFATAL=lTRUE, &
-!         iLogLevel=LOG_ALL )
 
-!     lAreLengthsEqual = ( ( ubound(fFOG_CATCH_EFFICIENCY,1) == ubound(iLanduseCodes,1) )  )
+    if ( associated( pSTORM_DRAIN ) ) then
 
-!     if ( .not. lAreLengthsEqual )     &
-!       call warn( sMessage="The number of landuses does not match the number of fog catch efficiency values.",   &
-!         sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+      allocate( fSTORM_DRAIN( count( lActive ) ), stat=iStat )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+
+    elseif ( fSTORM_DRAIN_TABLE(1) > fTINYVAL ) then
+
+      lAreLengthsEqual = ( ( ubound(fSTORM_DRAIN_TABLE,1) == ubound(iLanduseCodes,1) )  )
+
+      if ( .not. lAreLengthsEqual )     &
+        call warn( sMessage="The number of landuses does not match the number of storm drain discharge/leakage values.",   &
+          sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+
+      allocate( fSTORM_DRAIN( count( lActive ) ), stat=iStat )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+
+      do iIndex=lbound( iLandUseIndex, 1 ), ubound( iLandUseIndex, 1 )
+        fSTORM_DRAIN( iIndex ) = fSTORM_DRAIN_TABLE( iLandUseIndex( iIndex ) )
+      enddo  
+
+     endif
 
 
-!     if ( .not. associated(pCESSPOOL) ) &
-!         call die("A FOG_RATIO grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
-
-!     allocate ( pNCFILE, stat=iStat )
-!     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
 
 
-!     !> open another netCDF file to hold fog interception
-!     iNX = ubound(lActive, 1)
-!     iNY = ubound(lActive, 2)
+    if ( associated( pWATER_BODY_RECHARGE ) ) then
 
-!     call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE, sVariableName="fog", &
-!       sVariableUnits="inches", iNX=iNX, iNY=iNY, &
-!       fX=dX, fY=dY, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=dY_lat, dpLon=dX_lon, &
-!       fValidMin=0.0, fValidMax=2000.0   )
+      allocate( fWATER_BODY_RECHARGE( count( lActive ) ), stat=iStat )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
 
+    elseif ( fWATER_BODY_RECHARGE_TABLE(1) > fTINYVAL ) then
+
+      lAreLengthsEqual = ( ( ubound(fWATER_BODY_RECHARGE_TABLE,1) == ubound(iLanduseCodes,1) )  )
+
+      if ( .not. lAreLengthsEqual )     &
+        call warn( sMessage="The number of landuses does not match the number of water body recharge/leakage values.",   &
+          sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+
+      allocate( fWATER_BODY_RECHARGE( count( lActive ) ), stat=iStat )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+
+      do iIndex=lbound( iLandUseIndex, 1 ), ubound( iLandUseIndex, 1 )
+        fWATER_BODY_RECHARGE( iIndex ) = fWATER_BODY_RECHARGE_TABLE( iLandUseIndex( iIndex ) )
+      enddo  
+
+     endif
+
+
+
+
+    if ( associated( pWATER_MAIN ) ) then
+
+      allocate( fWATER_MAIN( count( lActive ) ), stat=iStat )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+
+    elseif ( fWATER_MAIN_TABLE(1) > fTINYVAL ) then
+
+      lAreLengthsEqual = ( ( ubound(fWATER_MAIN_TABLE,1) == ubound(iLanduseCodes,1) )  )
+
+      if ( .not. lAreLengthsEqual )     &
+        call warn( sMessage="The number of landuses does not match the number of water main leakage values.",   &
+          sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+
+      allocate( fWATER_MAIN( count( lActive ) ), stat=iStat )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+
+      do iIndex=lbound( iLandUseIndex, 1 ), ubound( iLandUseIndex, 1 )
+        fWATER_MAIN( iIndex ) = fWATER_MAIN_TABLE( iLandUseIndex( iIndex ) )
+      enddo  
+
+     endif
+
+
+    if ( associated( pDISPOSAL_WELL ) ) then
+
+      allocate( fDISPOSAL_WELL( count( lActive ) ), stat=iStat )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+
+    elseif ( fDISPOSAL_WELL_TABLE(1) > fTINYVAL ) then
+
+      lAreLengthsEqual = ( ( ubound(fDISPOSAL_WELL_TABLE,1) == ubound(iLanduseCodes,1) )  )
+
+      if ( .not. lAreLengthsEqual )     &
+        call warn( sMessage="The number of landuses does not match the number of discharge well values.",   &
+          sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+
+      allocate( fDISPOSAL_WELL( count( lActive ) ), stat=iStat )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+
+      do iIndex=lbound( iLandUseIndex, 1 ), ubound( iLandUseIndex, 1 )
+        fDISPOSAL_WELL( iIndex ) = fDISPOSAL_WELL_TABLE( iLandUseIndex( iIndex ) )
+      enddo  
+
+     endif
+
+    allocate( DIRECT_RECHARGE( count( lActive ) ), stat=iStat )
+    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+
+    !> open another netCDF file to hold total direct recharge
+    iNX = ubound(lActive, 1)
+    iNY = ubound(lActive, 2)
+
+    allocate ( pNCFILE, stat=iStat )
+    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+
+    call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE, sVariableName="direct_recharge", &
+      sVariableUnits="inches", iNX=iNX, iNY=iNY, &
+      fX=dX, fY=dY, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=dY_lat, dpLon=dX_lon, &
+      fValidMin=0.0, fValidMax=2000.0   )
 
   end subroutine direct_recharge_initialize
 
@@ -225,7 +345,9 @@ contains
 
       if ( associated( pCESSPOOL ) ) then
         call pCESSPOOL%getvalues( iMonth, iDay, iYear, iJulianDay )
+
         if ( pCESSPOOL%lGridHasChanged ) fCESSPOOL = pack( pCESSPOOL%pGrdBase%rData, lActive )
+
       endif
 
       if ( associated( pDISPOSAL_WELL ) ) then
@@ -248,21 +370,35 @@ contains
         if ( pWATER_MAIN%lGridHasChanged ) fWATER_MAIN = pack( pWATER_MAIN%pGrdBase%rData, lActive )
       endif      
 
-!       ! write timestamp to NetCDF file
-!       call netcdf_put_variable_vector(NCFILE=pNCFILE, &
-!         iVarID=pNCFILE%iVarID(NC_TIME), &
-!         iStart=[int( iNumDaysFromOrigin, kind=c_size_t)], &
-!         iCount=[1_c_size_t], &
-!         iStride=[1_c_ptrdiff_t], &
-!         dpValues=[real( iNumDaysFromOrigin, kind=c_double)])
+      DIRECT_RECHARGE = 0.0_c_float
 
+      if ( allocated( fCESSPOOL ) )  DIRECT_RECHARGE = DIRECT_RECHARGE + fCESSPOOL
 
-!       call netcdf_put_packed_variable_array(NCFILE=pNCFILE, &
-!                    iVarID=pNCFILE%iVarID(NC_Z), &
-!                    iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-!                    iCount=[1_c_size_t, int(iNY, kind=c_size_t), int(iNX, kind=c_size_t)],              &
-!                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-!                    rValues=fFog, lMask=lActive, rField=fDont_Care )
+      if ( allocated( fDISPOSAL_WELL ) )  DIRECT_RECHARGE = DIRECT_RECHARGE + fDISPOSAL_WELL
+
+      if ( allocated( fWATER_MAIN ) )  DIRECT_RECHARGE = DIRECT_RECHARGE + fWATER_MAIN
+
+      if ( allocated( fWATER_BODY_RECHARGE ) )  DIRECT_RECHARGE = DIRECT_RECHARGE + fWATER_BODY_RECHARGE
+
+      if ( allocated( fSTORM_DRAIN ) )  DIRECT_RECHARGE = DIRECT_RECHARGE + fSTORM_DRAIN
+
+      if ( allocated( fANNUAL_RECHARGE_RATE) )  DIRECT_RECHARGE = DIRECT_RECHARGE + fANNUAL_RECHARGE_RATE
+
+      ! write timestamp to NetCDF file
+      call netcdf_put_variable_vector(NCFILE=pNCFILE, &
+        iVarID=pNCFILE%iVarID(NC_TIME), &
+        iStart=[int( iNumDaysFromOrigin, kind=c_size_t)], &
+        iCount=[1_c_size_t], &
+        iStride=[1_c_ptrdiff_t], &
+        dpValues=[real( iNumDaysFromOrigin, kind=c_double)])
+
+      call netcdf_put_packed_variable_array(NCFILE=pNCFILE, &
+                   iVarID=pNCFILE%iVarID(NC_Z), &
+                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
+                   iCount=[1_c_size_t, int(iNY, kind=c_size_t), int(iNX, kind=c_size_t)],         &
+                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
+                   rValues=DIRECT_RECHARGE, lMask=lActive, rField=fDont_Care )
+
 
     end associate
 
