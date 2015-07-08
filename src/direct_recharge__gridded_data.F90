@@ -84,10 +84,11 @@ contains
     integer (kind=c_int)                 :: iNumberOfLanduses
     logical (kind=c_bool)                :: lAreLengthsEqual
 
+
     !> Determine how many landuse codes are present
     call slString%append( "LU_Code" )
     call slString%append( "Landuse_Code" )
-    
+
     call PARAMS%get_parameters( slKeys=slString, iValues=iLanduseCodes )
     iNumberOfLanduses = count( iLanduseCodes > 0 )
 
@@ -95,7 +96,7 @@ contains
     call slString%append( "Annual_direct_recharge_rate" )
     call slString%append( "Annual_recharge_rate" )
     call slString%append( "Annual_direct_recharge" )
-    
+
     call PARAMS%get_parameters( slKeys=slString , fValues=fANNUAL_RECHARGE_RATE_TABLE )
 
     ! attempt to find a source of GRIDDED ANNUAL DIRECT RECHARGE data
@@ -143,6 +144,7 @@ contains
 
     pWATER_MAIN => DAT%find( "WATER_MAIN_LEAKAGE" )
 
+print *, __FILE__, ": ", __LINE__
 
     call slString%clear()
     call slString%append( "Disposal_well_recharge" )
@@ -152,6 +154,8 @@ contains
 
     pDISPOSAL_WELL => DAT%find( "DISPOSAL_WELL_DISCHARGE" )
 
+
+print *, __FILE__, ": ", __LINE__
 
     if ( associated( pANNUAL_RECHARGE_RATE ) ) then
 
@@ -174,6 +178,9 @@ contains
       enddo  
 
      endif
+
+
+print *, __FILE__, ": ", __LINE__
 
 
     if ( associated( pCESSPOOL ) ) then
@@ -199,6 +206,8 @@ contains
      endif
 
 
+print *, __FILE__, ": ", __LINE__
+
     if ( associated( pSTORM_DRAIN ) ) then
 
       allocate( fSTORM_DRAIN( count( lActive ) ), stat=iStat )
@@ -221,7 +230,7 @@ contains
 
      endif
 
-
+print *, __FILE__, ": ", __LINE__
 
 
     if ( associated( pWATER_BODY_RECHARGE ) ) then
@@ -247,7 +256,7 @@ contains
      endif
 
 
-
+print *, __FILE__, ": ", __LINE__
 
     if ( associated( pWATER_MAIN ) ) then
 
@@ -271,6 +280,7 @@ contains
 
      endif
 
+print *, __FILE__, ": ", __LINE__
 
     if ( associated( pDISPOSAL_WELL ) ) then
 
@@ -293,6 +303,8 @@ contains
       enddo  
 
      endif
+
+print *, __FILE__, ": ", __LINE__
 
     allocate( DIRECT_RECHARGE( count( lActive ) ), stat=iStat )
     call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
@@ -345,9 +357,7 @@ contains
 
       if ( associated( pCESSPOOL ) ) then
         call pCESSPOOL%getvalues( iMonth, iDay, iYear, iJulianDay )
-
         if ( pCESSPOOL%lGridHasChanged ) fCESSPOOL = pack( pCESSPOOL%pGrdBase%rData, lActive )
-
       endif
 
       if ( associated( pDISPOSAL_WELL ) ) then
@@ -370,6 +380,12 @@ contains
         if ( pWATER_MAIN%lGridHasChanged ) fWATER_MAIN = pack( pWATER_MAIN%pGrdBase%rData, lActive )
       endif      
 
+      if ( associated( pANNUAL_RECHARGE_RATE ) ) then
+        call pANNUAL_RECHARGE_RATE%getvalues( iMonth, iDay, iYear, iJulianDay )
+        if ( pANNUAL_RECHARGE_RATE%lGridHasChanged ) fANNUAL_RECHARGE_RATE = pack( pANNUAL_RECHARGE_RATE%pGrdBase%rData, lActive )
+      endif      
+
+
       DIRECT_RECHARGE = 0.0_c_float
 
       if ( allocated( fCESSPOOL ) )  DIRECT_RECHARGE = DIRECT_RECHARGE + fCESSPOOL
@@ -382,7 +398,7 @@ contains
 
       if ( allocated( fSTORM_DRAIN ) )  DIRECT_RECHARGE = DIRECT_RECHARGE + fSTORM_DRAIN
 
-      if ( allocated( fANNUAL_RECHARGE_RATE) )  DIRECT_RECHARGE = DIRECT_RECHARGE + fANNUAL_RECHARGE_RATE
+      if ( allocated( fANNUAL_RECHARGE_RATE) )  DIRECT_RECHARGE = DIRECT_RECHARGE + fANNUAL_RECHARGE_RATE / 365.25_c_float
 
       ! write timestamp to NetCDF file
       call netcdf_put_variable_vector(NCFILE=pNCFILE, &

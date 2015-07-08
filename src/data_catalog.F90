@@ -1,3 +1,13 @@
+!> @file
+!!  Contains module @ref data_catalog, which
+!!  keeps track of all @ref DATA_CATALOG_T entries
+!!  created during the course of a SWB run.
+
+
+!>  Manage, find, and retrieve data for
+!!  all @ref DATA_CATALOG_T entries
+!!  created during the course of a SWB run.
+
 module data_catalog
 
   use iso_c_binding, only : c_int, c_float, c_bool, c_double
@@ -10,14 +20,16 @@ module data_catalog
   public :: DATA_CATALOG_T
 
   type DATA_CATALOG_T
-    type (DATA_CATALOG_ENTRY_T), pointer            :: first => null()
-    type (DATA_CATALOG_ENTRY_T), pointer            :: last  => null()
-    integer (kind=c_int)                            :: count = 0
+    type (DATA_CATALOG_ENTRY_T), pointer            :: first    => null()
+    type (DATA_CATALOG_ENTRY_T), pointer            :: last     => null()
+    type (DATA_CATALOG_ENTRY_T), pointer            :: current  => null()      
+    integer (kind=c_int)                            :: count    = 0
   contains
 
     procedure :: catalog_add_entry_sub
     procedure :: catalog_delete_entry_sub
     procedure :: catalog_find_key_fn
+    procedure :: catalog_find_next_key_fn
     procedure :: catalog_get_entry_at_index_fn
     procedure :: catalog_print_sub
     procedure :: catalog_set_all_PROJ4_string_sub
@@ -27,6 +39,7 @@ module data_catalog
     generic :: add => catalog_add_entry_sub
     generic :: delete => catalog_delete_entry_sub
     generic :: find => catalog_find_key_fn
+    generic :: next => catalog_find_next_key_fn
     generic :: get => catalog_get_entry_at_index_fn
     generic :: print => catalog_print_sub
     generic :: set_PROJ4 => catalog_set_all_PROJ4_string_sub
@@ -216,6 +229,8 @@ contains
 
         iCount = iCount + 1
 
+        this%current => data
+
         if ( iCount == index ) exit
         data => data%next
 
@@ -239,16 +254,47 @@ contains
 
       data => this%first
 
+      this%current => this%first
+
       do while ( associated(data) )
 
         if ( data%sKeyword .strequal. key ) exit
         data => data%next
+        this%current => data
 
       enddo
 
     endif
 
   end function catalog_find_key_fn
+
+!--------------------------------------------------------------------------------------------------
+
+  function catalog_find_next_key_fn( this, key)   result( data )
+
+    class (DATA_CATALOG_T)                :: this
+    character (len=*), intent(in)         :: key
+    type (DATA_CATALOG_ENTRY_T), pointer  :: data
+
+    data => null()
+
+    if ( associated( this%current ) ) then
+
+      this%current => this%current%next
+      data => this%current
+
+      do while ( associated(data) )
+
+        if ( data%sKeyword .strequal. key ) exit
+
+        data => data%next
+        this%current => data
+
+      enddo
+
+    endif
+
+  end function catalog_find_next_key_fn
 
 !--------------------------------------------------------------------------------------------------
 

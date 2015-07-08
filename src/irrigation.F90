@@ -30,6 +30,7 @@ module irrigation
   real (kind=c_float), allocatable   :: IRRIGATION_FROM_SURFACE_WATER(:) 
 
   real (kind=c_float), allocatable   :: FRACTION_OF_IRRIGATION_FROM_GW(:)   
+  real (kind=c_float), allocatable   :: IRRIGATION_EFFICIENCY(:)
   integer (kind=c_int), allocatable  :: FIRST_DAY_OF_IRRIGATION(:)
   integer (kind=c_int), allocatable  :: LAST_DAY_OF_IRRIGATION(:)
 
@@ -80,8 +81,8 @@ contains
     !> Determine how many landuse codes are present
     call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseTableCodes )
     iNumberOfLanduses = count( iLanduseTableCodes >= 0 )
-    call slList%clear()
 
+    call slList%clear()
     call slList%append("Fraction_irrigation_from_GW")
     call slList%append("Frac_irr_fm_GW")
     call slList%append("Fraction_irrigation_from_groundwater")
@@ -90,8 +91,8 @@ contains
     call slList%append("Fraction_of_irrigation_from_groundwater")
 
     call PARAMS%get_parameters( slKeys=slList, fValues=FRACTION_OF_IRRIGATION_FROM_GW, lFatal=lTRUE )
-    call slList%clear()
 
+    call slList%clear()
     call slList%append("Max_allowable_depletion")
     call slList%append("Maximum_allowable_depletion")
     call slList%append("MAD")
@@ -99,14 +100,33 @@ contains
     call PARAMS%get_parameters( slKeys=slList,                                  &
                                 fValues=MAXIMUM_ALLOWABLE_DEPLETION_FRACTION,   &
                                 lFatal=lTRUE ) 
-    call slList%clear()
 
+    call slList%clear()
     call slList%append("First_day_of_irrigation")
     call slList%append("First_DOY_irrigation")
     call slList%append("Irrigation_start")
 
     call PARAMS%get_parameters( slKeys=slList, slValues=slIrrigationBegin, lFatal=lTRUE ) 
+
+
     call slList%clear()
+    call slList%append("Irrigation_efficiency")
+    call slList%append("Irrigation_application_efficiency")
+
+    call PARAMS%get_parameters( slKeys=slList,                                  &
+                                fValues=IRRIGATION_EFFICIENCY,   &
+                                lFatal=lTRUE ) 
+
+    iNumRecs = ubound(IRRIGATION_EFFICIENCY,1)
+    lAreLengthsEqual = ( iNumRecs == iNumberOfLanduses ) 
+
+    if ( .not. lAreLengthsEqual )                                                       &
+      call warn( sMessage="The number of values specifying irrigation application"      &
+        //" efficiency ("                                                    &
+        //asCharacter( iNumRecs )//") does not match the number of landuse values ("    &
+        //asCharacter( iNumberOfLanduses )//").",                                       &
+        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+
 
     allocate( FIRST_DAY_OF_IRRIGATION( slIrrigationBegin%count ), stat=iStat )
     call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
@@ -116,6 +136,7 @@ contains
       FIRST_DAY_OF_IRRIGATION( iIndex ) = mmdd2doy( sBuf )
     enddo  
 
+    call slList%clear()
     call slList%append("Last_day_of_irrigation")
     call slList%append("Last_DOY_irrigation")
     call slList%append("Irrigation_end")
@@ -208,6 +229,7 @@ contains
     integer (kind=c_int)              :: iNumDaysFromOrigin
 !     integer (kind=c_int), allocatable :: iIrrigation_Mask(:)
     integer (kind=c_int)              :: iIndex
+    real (kind=c_float)               :: fEfficiency
 
     ! zero out Irrigation term
     IRRIGATION_FROM_GROUNDWATER = rZERO
@@ -238,6 +260,8 @@ contains
 
       fIrrigationAmount( iIndex ) = fZERO
 
+      fEfficiency = max( IRRIGATION_EFFICIENCY( iLanduseIndex( iIndex ) ), 0.20_c_float )
+
       if ( ( iDayOfYear < FIRST_DAY_OF_IRRIGATION( iLanduseIndex( iIndex ) ) ) &
         .or. ( iDayOfYear > LAST_DAY_OF_IRRIGATION( iLanduseIndex( iIndex ) ) ) )  cycle
 
@@ -248,7 +272,9 @@ contains
       if ( ( 1.0_c_float - fSoilStorage( iIndex ) / fSoilStorage_Max( iIndex ) )                           &
              > MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex( iIndex ) ) ) then
 
-      fIrrigationAmount( iIndex ) = fSoilStorage_Max( iIndex ) - fSoilStorage( iIndex )
+
+      fIrrigationAmount( iIndex ) = ( fSoilStorage_Max( iIndex ) - fSoilStorage( iIndex ) ) / fEfficiency
+
       IRRIGATION_FROM_GROUNDWATER( iIndex ) = fIrrigationAmount( iIndex )          &
                                       * FRACTION_OF_IRRIGATION_FROM_GW( iLanduseIndex( iIndex ) )
       IRRIGATION_FROM_SURFACE_WATER( iIndex ) = fIrrigationAmount( iIndex )  &
