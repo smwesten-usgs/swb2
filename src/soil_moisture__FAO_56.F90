@@ -10,7 +10,7 @@ module soil_moisture__FAO_56
 
   use iso_c_binding, only             : c_bool, c_short, c_int, c_float, c_double
   use constants_and_conversions, only : M_PER_FOOT, lTRUE, lFALSE, fTINYVAL, &
-                                        iTINYVAL, asInt, fZERO
+                                        iTINYVAL, asInt, fZERO, in_to_mm
   use data_catalog, only              : DAT
   use data_catalog_entry, only        : DATA_CATALOG_ENTRY_T
   use datetime
@@ -131,13 +131,6 @@ contains
     real (kind=c_float)              :: fRz_initial
 
     type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_PERCENT_SOIL_MOISTURE
-
-    open( newunit=LU_SOILS_CSV, file="FAO56_variables_dump.csv" )
-
-    write (unit=LU_SOILS_CSV, fmt="(a)" )"fInfiltration, fMaxRootingDepth, fZr, LU, " &
-      //"SoilGroup, fKr, f_few, fKe, fKs, fKcb, fRefET, baresoilevap, cropEtc, "      &
-      //"ActET, fSoilStorage_Max, fSoilStorage, fDeficit, fSoilStorage_Excess"
-
 
     ! locate the data structure associated with the gridded rainfall zone entries
     pINITIAL_PERCENT_SOIL_MOISTURE => DAT%find("INITIAL_PERCENT_SOIL_MOISTURE")
@@ -700,13 +693,19 @@ subroutine calc_total_available_water_TAW(fTotalAvailableWater, fReadilyAvailabl
 !! @note Implemented as equation 84, FAO-56, Allen and others
 
 function calc_water_stress_coefficient_Ks( iLanduseIndex, fDeficit, &
-                      fTotalAvailableWater, fReadilyAvailableWater )      result(fKs)
+                      fTotalAvailableWater, fReadilyAvailableWater, &
+                      fReference_ET0 )                                  result(fKs)
 
   integer (kind=c_int), intent(in)     :: iLanduseIndex
   real (kind=c_float), intent(in)      :: fDeficit
   real (kind=c_float), intent(in)      :: fTotalAvailableWater
   real (kind=c_float), intent(in)      :: fReadilyAvailableWater
+  real (kind=c_float), intent(in)      :: fReference_ET0
+
+  ! [ LOCALS ]
   real (kind=c_float)                  :: fKs
+  real (kind=c_float)                  :: p
+
 
   if ( fDeficit < fReadilyAvailableWater ) then
     
@@ -714,9 +713,11 @@ function calc_water_stress_coefficient_Ks( iLanduseIndex, fDeficit, &
   
   elseif ( fDeficit < fTotalAvailableWater ) then
 
+    p = adjust_depletion_fraction_p( p_table_22=DEPLETION_FRACTION( iLanduseIndex ),   &
+                                     fReference_ET0=fReference_ET0 )
+
     fKs = ( fTotalAvailableWater - fDeficit + 1.0e-6_c_float ) &
-             / ( (1.0_c_float - DEPLETION_FRACTION( iLanduseIndex ) ) &
-          * ( fTotalAvailableWater + 1.0e-6_c_float ) )
+             / ( (1.0_c_float - p ) * ( fTotalAvailableWater + 1.0e-6_c_float ) )
 
   else
 
@@ -728,136 +729,155 @@ end function calc_water_stress_coefficient_Ks
 
 !------------------------------------------------------------------------------
 
+!> Adjust the depletion fraction based on current reference ET0.
+!!
+!! From FAO-56: "The fraction p is a function of the evaporation power of the atmosphere.
+!! At low rates of ETc, the p values listed in Table 22 are higher than at high rates of ETc.
+!! For hot dry weather conditions, where ETc is high, p is 10-25% less than the values 
+!! presented in Table 22, and the soil is still relatively wet when the stress starts to occur.
+!! When the crop evapotranspiration is low, p will be up to 20% more than the listed values.
+!! 
+!! @param[in] p_table_22 This is the unadjusted depletion fraction value; FAO-56
+!!     table 22 gives values of the depletion fraction relative to a reference ET0 value of 5mm.
+!! @param[in] fReference_ET0 The reference ET0 to which the depletion fraction will be
+!!     adjusted.
+!! @note Discussed as a footnote to Table 22, FAO-56, Allen and others.
+!!   See @ref http://www.fao.org/docrep/x0490e/x0490e0e.htm#TopOfPage for details.
+
+function adjust_depletion_fraction_p( p_table_22, fReference_ET0 )   result( p )
+
+  real (kind=c_float), intent(in)      :: p_table_22
+  real (kind=c_float), intent(in)      :: fReference_ET0
+  real (kind=c_float)                  :: p
+
+  p = p_table_22 + 0.04_c_float * ( 5.0_c_float - in_to_mm( fReference_ET0 ) )
+
+  p = min( p, 0.8_c_float )
+  p = max( p, 0.1_c_float )
+
+end function adjust_depletion_fraction_p
+
+!------------------------------------------------------------------------------
+
   subroutine soil_moisture_FAO56_calculate( fSoilStorage, fActual_ET,                     &
     fSoilStorage_Excess, fInfiltration, fGDD, fAvailableWaterCapacity, fReference_ET0,    &
     fMaxRootingDepth, iLanduseIndex, iSoilGroup )
 
-  real (kind=c_float), intent(inout)   :: fSoilStorage
-  real (kind=c_float), intent(inout)   :: fActual_ET
-  real (kind=c_float), intent(inout)     :: fSoilStorage_Excess
-  real (kind=c_float), intent(inout)      :: fInfiltration
-  real (kind=c_float), intent(inout)      :: fGDD
-  real (kind=c_float), intent(inout)      :: fAvailableWaterCapacity
-  real (kind=c_float), intent(inout)      :: fReference_ET0
-  real (kind=c_float), intent(in)      :: fMaxRootingDepth
-  integer (kind=c_int), intent(in)     :: iLanduseIndex
-  integer (kind=c_int), intent(in)     :: iSoilGroup
+    real (kind=c_float), intent(inout)   :: fSoilStorage
+    real (kind=c_float), intent(inout)   :: fActual_ET
+    real (kind=c_float), intent(inout)     :: fSoilStorage_Excess
+    real (kind=c_float), intent(inout)      :: fInfiltration
+    real (kind=c_float), intent(inout)      :: fGDD
+    real (kind=c_float), intent(inout)      :: fAvailableWaterCapacity
+    real (kind=c_float), intent(inout)      :: fReference_ET0
+    real (kind=c_float), intent(in)      :: fMaxRootingDepth
+    integer (kind=c_int), intent(in)     :: iLanduseIndex
+    integer (kind=c_int), intent(in)     :: iSoilGroup
 
-  ! [ LOCALS ]
-  real (kind=c_float) :: fKcb      ! cell's current crop coefficient
-  real (kind=c_float) :: fTEW      ! Total evaporable water
-  real (kind=c_float) :: fREW      ! Readily evaporable water
-  real (kind=c_float) :: fTAW      ! Total Available Water
-  real (kind=c_float) :: fRAW      ! Readily Available Water
-  real (kind=c_float) :: fKr       ! Evaporation reduction coefficient
-  real (kind=c_float) :: fDeficit  ! Soil moisture deficit
-  real (kind=c_float) :: f_few     ! Fraction exposed and wetted soil
-  real (kind=c_float) :: fKe       ! Surface evaporation coefficient
-  real (kind=c_float) :: fKs       ! Water stress coefficient
-	real (kind=c_float) :: fZr_max   ! Maximum rooting depth
-  real (kind=c_float) :: fZr       ! Current rooting depth
-  real (kind=c_float) :: fSoilStorage_Max
-  real (kind=c_float) :: fBareSoilEvap
-  real (kind=c_float) :: fCropETc
+    ! [ LOCALS ]
+    real (kind=c_float) :: fKcb      ! cell's current crop coefficient
+    real (kind=c_float) :: fTEW      ! Total evaporable water
+    real (kind=c_float) :: fREW      ! Readily evaporable water
+    real (kind=c_float) :: fTAW      ! Total Available Water
+    real (kind=c_float) :: fRAW      ! Readily Available Water
+    real (kind=c_float) :: fKr       ! Evaporation reduction coefficient
+    real (kind=c_float) :: fDeficit  ! Soil moisture deficit
+    real (kind=c_float) :: f_few     ! Fraction exposed and wetted soil
+    real (kind=c_float) :: fKe       ! Surface evaporation coefficient
+    real (kind=c_float) :: fKs       ! Water stress coefficient
+  	real (kind=c_float) :: fZr_max   ! Maximum rooting depth
+    real (kind=c_float) :: fZr       ! Current rooting depth
+    real (kind=c_float) :: fSoilStorage_Max
+    real (kind=c_float) :: fBareSoilEvap
+    real (kind=c_float) :: fCropETc
 
-  if ( KCB_METHOD( iLanduseIndex )  == KCB_METHOD_FAO56  &
-    .or. KCB_METHOD( iLanduseIndex ) == KCB_METHOD_MONTHLY_VALUES ) then
+    if ( KCB_METHOD( iLanduseIndex )  == KCB_METHOD_FAO56  &
+      .or. KCB_METHOD( iLanduseIndex ) == KCB_METHOD_MONTHLY_VALUES ) then
 
-    fKcb = update_crop_coefficient_date_as_threshold( iLanduseIndex )
+      fKcb = update_crop_coefficient_date_as_threshold( iLanduseIndex )
 
-  else
+    else
 
-  !  fKcb = sm_FAO56_UpdateCropCoefficient( iLanduseIndex, INT(fGDD, kind=c_int), asInt(SIM_DT%curr%iMonth)  )
+    !  fKcb = sm_FAO56_UpdateCropCoefficient( iLanduseIndex, INT(fGDD, kind=c_int), asInt(SIM_DT%curr%iMonth)  )
 
-  !					 cel%rSoilWaterCap = cel%rCurrentRootingDepth * cel%rSoilWaterCapInput
+    !					 cel%rSoilWaterCap = cel%rCurrentRootingDepth * cel%rSoilWaterCapInput
 
-  endif
+    endif
 
-  ! change from earlier coding: rooting depth is now simply keyed into the current Kcb
-  fZr = calc_effective_root_depth( iLanduseIndex, fMaxRootingDepth, fKcb )
+    ! change from earlier coding: rooting depth is now simply keyed into the current Kcb
+    fZr = calc_effective_root_depth( iLanduseIndex, fMaxRootingDepth, fKcb )
 
-  fSoilStorage_Max = fAvailableWaterCapacity * fMaxRootingDepth
+    fSoilStorage_Max = fAvailableWaterCapacity * fMaxRootingDepth
 
-  fREW = REW( iLanduseIndex, iSoilGroup )
-  fTEW = TEW( iLanduseIndex, iSoilGroup )
+    fREW = REW( iLanduseIndex, iSoilGroup )
+    fTEW = TEW( iLanduseIndex, iSoilGroup )
 
-  ! following call updates the total available water (TAW) and
-  ! readily available water (RAW) on the basis of the current
-  ! plant root depth
-  call calc_total_available_water_TAW( fTotalAvailableWater=fTAW,                        &
-                                       fReadilyAvailableWater=fRAW,                      &
-                                       iLanduseIndex=iLanduseIndex,                      &
-                                       fAvailableWaterCapacity=fAvailableWaterCapacity,  &
-                                       fCurrentRootingDepth=fZr )
+    ! following call updates the total available water (TAW) and
+    ! readily available water (RAW) on the basis of the current
+    ! plant root depth
+    call calc_total_available_water_TAW( fTotalAvailableWater=fTAW,                        &
+                                         fReadilyAvailableWater=fRAW,                      &
+                                         iLanduseIndex=iLanduseIndex,                      &
+                                         fAvailableWaterCapacity=fAvailableWaterCapacity,  &
+                                         fCurrentRootingDepth=fZr )
 
-  ! Deficit is defined in the sense of Thornthwaite and Mather
-  !
-  ! deficit: defined in terms relative to the *current* rooting depth,
-  !          in other words, relative to the maximum amount of water the
-  !          roots in their current growth state could access
-  fDeficit = max( 0.0_c_float, fSoilStorage_Max - fSoilStorage )
+    ! Deficit is defined in the sense of Thornthwaite and Mather
+    !
+    ! deficit: defined in terms relative to the *current* rooting depth,
+    !          in other words, relative to the maximum amount of water the
+    !          roots in their current growth state could access
+    fDeficit = max( 0.0_c_float, fSoilStorage_Max - fSoilStorage )
 
-  ! "STANDARD" vs "NONSTANDARD": in the FAO56 publication the term
-  ! "STANDARD" is used to refer to crop ET requirements under
-  ! ideal conditions (i.e. plants not stressed due to scarcity
-  ! of water. "NONSTANDARD" is the term used to describe ET requirements
-  ! when plants are under stress, when water is scarce.
+    ! "STANDARD" vs "NONSTANDARD": in the FAO56 publication the term
+    ! "STANDARD" is used to refer to crop ET requirements under
+    ! ideal conditions (i.e. plants not stressed due to scarcity
+    ! of water. "NONSTANDARD" is the term used to describe ET requirements
+    ! when plants are under stress, when water is scarce.
 
-  ! we are using the full FAO56 soil water balance approach, *INCLUDING*
-  ! the adjustments for nonstandard growing conditions (e.g. plant
-  ! stress and resulting decrease in ET during dry conditions).
+    ! we are using the full FAO56 soil water balance approach, *INCLUDING*
+    ! the adjustments for nonstandard growing conditions (e.g. plant
+    ! stress and resulting decrease in ET during dry conditions).
 
-  fKr = calc_evaporation_reduction_coefficient(fTotalEvaporableWater=fTEW,    &
-                                             fReadilyEvaporableWater=fREW,   &
-                                             fDeficit=fDeficit )
+    fKr = calc_evaporation_reduction_coefficient(fTotalEvaporableWater=fTEW,    &
+                                               fReadilyEvaporableWater=fREW,   &
+                                               fDeficit=fDeficit )
 
-  f_few = calc_fraction_wetted_and_exposed_soil( iLanduseIndex, fKcb )
+    f_few = calc_fraction_wetted_and_exposed_soil( iLanduseIndex, fKcb )
 
-  fKe = min(calc_surface_evaporation_coefficient( iLanduseIndex, fKr, fKcb ),   &
-            f_few * KCB( KCB_MID, iLanduseIndex) )
+    fKe = min(calc_surface_evaporation_coefficient( iLanduseIndex, fKr, fKcb ),   &
+              f_few * KCB( KCB_MID, iLanduseIndex) )
 
-  fKs = calc_water_stress_coefficient_Ks( iLanduseIndex=iLanduseIndex,   &
-                                          fDeficit=fDeficit,             &
-                                          fTotalAvailableWater=fTAW,     &
-                                          fReadilyAvailableWater=fRAW )
-  
-  fBareSoilEvap = fReference_ET0 * fKe
-  fCropETc = fReference_ET0 * (fKcb * fKs)
+    fKs = calc_water_stress_coefficient_Ks( iLanduseIndex=iLanduseIndex,   &
+                                            fDeficit=fDeficit,             &
+                                            fTotalAvailableWater=fTAW,     &
+                                            fReadilyAvailableWater=fRAW,   &
+                                            fReference_ET0=fReference_ET0 )
+    
+    fBareSoilEvap = fReference_ET0 * fKe
+    fCropETc = fReference_ET0 * (fKcb * fKs)
 
-  ! 
-  fActual_ET = fCropETc + fBareSoilEvap
+    ! 
+    fActual_ET = fCropETc + fBareSoilEvap
 
-  fSoilStorage = fSoilStorage + fInfiltration - fActual_ET
+    fSoilStorage = fSoilStorage + fInfiltration - fActual_ET
 
-  if ( fSoilStorage > fSoilStorage_Max ) then
+    if ( fSoilStorage > fSoilStorage_Max ) then
 
-    fSoilStorage_Excess = fSoilStorage - fSoilStorage_Max
-    fSoilStorage = fSoilStorage_Max
+      fSoilStorage_Excess = fSoilStorage - fSoilStorage_Max
+      fSoilStorage = fSoilStorage_Max
 
-  elseif ( fSoilStorage < fZERO ) then 
-  
-    fActual_ET = fActual_ET + fSoilStorage
-    fSoilStorage = fZERO
-    fSoilStorage_Excess = fZERO
+    elseif ( fSoilStorage < fZERO ) then 
+    
+      fActual_ET = fActual_ET + fSoilStorage
+      fSoilStorage = fZERO
+      fSoilStorage_Excess = fZERO
 
-  else
-  
-    fSoilStorage_Excess = fZERO
+    else
+    
+      fSoilStorage_Excess = fZERO
 
-  endif   
-
-!     if ( fSoilStorage_Max > 0.0 ) then
-
-!       if ( fSoilStorage / fSoilStorage_Max < 0.5 ) &
-
-!       write (unit=LU_SOILS_CSV, fmt="(3(f12.3,','),2(i8,','),12(f12.3,','),f12.3)" )  &
-!         fInfiltration,                                                       &
-!         fMaxRootingDepth, fZr, iLanduseIndex, iSoilGroup,fKr,f_few,          &
-!         fKe, fKs, fKcb, fReference_ET0, fBareSoilEvap, fCropETc, fActual_ET, &
-!         fSoilStorage_Max, fSoilStorage, fDeficit, fSoilStorage_Excess
-
-!     endif
-  
-end subroutine soil_moisture_FAO56_calculate
+    endif   
+    
+  end subroutine soil_moisture_FAO56_calculate
 
 end module soil_moisture__FAO_56

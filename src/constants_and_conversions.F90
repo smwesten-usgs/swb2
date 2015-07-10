@@ -182,6 +182,12 @@ type T_CELL
     module procedure mm_to_inches_dbl_fn
   end interface mm_to_in    
 
+  public :: in_to_mm
+  interface in_to_mm
+    module procedure inches_to_mm_sgl_fn
+    module procedure inches_to_mm_dbl_fn
+  end interface in_to_mm    
+
   public :: char_ptr_to_fortran_string
   public :: c_to_fortran_string
   public :: fortran_to_c_string
@@ -432,6 +438,35 @@ contains
 
   end function CtoK_dbl_fn
 
+!--------------------------------------------------------------------------------------------------
+
+  !>  Convert inches to mm.
+  !! @param[in] inches Value in inches.
+  !! @retval mm Value in millimeters.
+
+  elemental function inches_to_mm_sgl_fn( inches )   result( mm )
+
+    real (kind=c_float),intent(in) :: inches
+    real (kind=c_float)            :: mm
+
+    mm = inches * 25.4_c_double
+
+  end function inches_to_mm_sgl_fn
+
+!--------------------------------------------------------------------------------------------------
+
+  !>  Convert inches to mm.
+  !! @param[in] inches Value in inches.
+  !! @retval mm Value in millimeters.
+
+  elemental function inches_to_mm_dbl_fn( inches )   result( mm )
+
+    real (kind=c_double),intent(in) :: inches
+    real (kind=c_double)            :: mm
+
+    mm = inches * 25.4_c_double
+
+  end function inches_to_mm_dbl_fn
 
 !--------------------------------------------------------------------------------------------------
 
