@@ -35,7 +35,9 @@ module irrigation
   integer (kind=c_int), allocatable  :: LAST_DAY_OF_IRRIGATION(:)
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pIRRIGATION_MASK
-  integer (kind=c_int), allocatable  :: IRRIGATION_MASK(:)
+  real (kind=c_float), allocatable     :: IRRIGATION_MASK(:)
+
+  type (DATA_CATALOG_ENTRY_T), pointer :: pPERVIOUS_SURFACE_FRACTION
 
 contains
 
@@ -195,12 +197,31 @@ contains
 
     ! locate the data structure associated with the gridded irrigation mask entries
     pIRRIGATION_MASK => DAT%find("IRRIGATION_MASK")
-    if ( .not. associated(pIRRIGATION_MASK) ) &
-        call die("A IRRIGATION_MASK grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
+    if ( associated(pIRRIGATION_MASK) ) call pIRRIGATION_MASK%getvalues( )
 
-    call pIRRIGATION_MASK%getvalues( )
 
-    IRRIGATION_MASK = pack( pIRRIGATION_MASK%pGrdBase%iData, lActive )
+    ! locate the data structure associated with the gridded pervious surface fraction values
+    pPERVIOUS_SURFACE_FRACTION => DAT%find("PERVIOUS_SURFACE_FRACTION")
+    if ( associated(pPERVIOUS_SURFACE_FRACTION) ) call pPERVIOUS_SURFACE_FRACTION%getvalues( )
+
+    if (    associated(pPERVIOUS_SURFACE_FRACTION) .and. associated(pIRRIGATION_MASK) ) then
+
+      IRRIGATION_MASK = pack( real(pIRRIGATION_MASK%pGrdBase%iData, kind=c_float)     &
+                            * pPERVIOUS_SURFACE_FRACTION%pGrdBase%rData, lActive )
+
+    elseif ( associated(pPERVIOUS_SURFACE_FRACTION) ) then
+
+      IRRIGATION_MASK = pack( pPERVIOUS_SURFACE_FRACTION%pGrdBase%rData, lActive )
+
+    elseif ( associated(pIRRIGATION_MASK) ) then
+
+      IRRIGATION_MASK = pack( real(pIRRIGATION_MASK%pGrdBase%iData, kind=c_float), lActive )
+
+    else
+
+      IRRIGATION_MASK = 1.0_c_float
+
+    endif
 
   end subroutine irrigation__initialize
 
@@ -267,13 +288,14 @@ contains
 
       if ( MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex( iIndex ) ) > 0.99 )  cycle
       if ( fSoilStorage_Max( iIndex ) <= fZERO ) cycle
-      if ( IRRIGATION_MASK( iIndex ) == 0 ) cycle 
+      if ( IRRIGATION_MASK( iIndex ) < 1.0e-6_c_float ) cycle 
 
       if ( ( 1.0_c_float - fSoilStorage( iIndex ) / fSoilStorage_Max( iIndex ) )                           &
              > MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex( iIndex ) ) ) then
 
 
-      fIrrigationAmount( iIndex ) = ( fSoilStorage_Max( iIndex ) - fSoilStorage( iIndex ) ) / fEfficiency
+      fIrrigationAmount( iIndex ) = ( fSoilStorage_Max( iIndex ) - fSoilStorage( iIndex ) ) &
+                                     * IRRIGATION_MASK( iIndex ) / fEfficiency
 
       IRRIGATION_FROM_GROUNDWATER( iIndex ) = fIrrigationAmount( iIndex )          &
                                       * FRACTION_OF_IRRIGATION_FROM_GW( iLanduseIndex( iIndex ) )
