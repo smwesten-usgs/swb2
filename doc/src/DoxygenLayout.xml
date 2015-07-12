@@ -10,7 +10,7 @@
        <tab type="user" url="@ref swb_changes" title="Changes from Previous Versions"/> 
     </tab>
 
-  	<tab type="usergroup" title="Theory">
+  	<tab type="usergroup" url="@ref model_description" title="Model Description">
       <tab type="user" url="@ref scope" title="Scope and Purpose"/>
       <tab type="user" url="@ref model_theory" title="Model Theory"/>	 
       <tab type="usergroup" title="Process Options">
@@ -27,7 +27,7 @@
       <tab type="user" url="@ref potential_limitations" title="Potential Limitations"/>
     </tab>
 
-  	<tab type="usergroup" title="Application">
+  	<tab type="usergroup" title="Model Application">
        <tab type="user" url="@ref directives" title="Control File Directives"/>
        <tab type="user" url="@ref geotransformations" title="Coordinate Transformations"/>	 
   	   <tab type="user" url="@ref variable_descriptions" title="Output Variable Descriptions"/>
