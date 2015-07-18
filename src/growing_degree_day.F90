@@ -23,19 +23,23 @@ module growing_degree_day
  
 contains
 
-  subroutine growing_degree_day_initialize( lActive, dX, dY, dX_lon, dY_lat )
+  subroutine growing_degree_day_initialize( lActive, iLanduseIndex, dX, dY, dX_lon, dY_lat )
 
     logical (kind=c_bool), intent(in)     :: lActive(:,:)
+    integer (kind=c_int), intent(in)      :: iLanduseIndex(:)
     real (kind=c_double), intent(in)      :: dX(:)
     real (kind=c_double), intent(in)      :: dY(:)
     real (kind=c_double), intent(in)      :: dX_lon(:,:)
     real (kind=c_double), intent(in)      :: dY_lat(:,:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)  :: iStat
-    type (STRING_LIST_T)  :: slList
+    integer (kind=c_int)              :: iStat
+    integer (kind=c_int)              :: iIndex
+    type (STRING_LIST_T)              :: slList
     real (kind=c_float), allocatable  :: fGDD_Base_(:)
     real (kind=c_float), allocatable  :: fGDD_Max_(:)
+    integer (kind=c_int)              :: iNumberOfLanduses
+    integer (kind=c_int), allocatable :: iLanduseCode(:)
 
     allocate( GDD( count( lActive ) ), stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
@@ -50,8 +54,7 @@ contains
     call slList%append("GDD_Base_Temperature")
     call slList%append("GDD_Base")
 
-    call PARAMS%get_parameters( slKeys=slList, fValues=fGDD_Base_, lFatal=lTRUE )
-
+    call PARAMS%get_parameters( slKeys=slList, fValues=fGDD_Base_ )
     call slList%clear()
 
     call slList%append("GDD_Max_Temp")
@@ -59,9 +62,45 @@ contains
     call slList%append("GDD_Maximum_Temp")
     call slList%append("GDD_Max")
 
-    call PARAMS%get_parameters( slKeys=slList, fValues=fGDD_Max_, lFatal=lTRUE )
-
+    call PARAMS%get_parameters( slKeys=slList, fValues=fGDD_Max_ )
     call slList%clear()
+
+    !> create string list that allows for alternate heading identifiers for the landuse code
+    call slList%append("LU_Code")
+    call slList%append("Landuse_Code") 
+    call slList%append("Landuse_Lookup_Code")
+
+    !> Determine how many landuse codes are present
+    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCode )
+    iNumberOfLanduses = count( iLanduseCode >= 0 )
+    call slList%clear()
+
+    if ( ubound( fGDD_Max_, 1 ) == iNumberOfLanduses ) then
+
+      do iIndex=1, ubound( iLanduseIndex, 1)
+        GDD_MAX( iIndex ) = fGDD_Max_( iLanduseIndex( iIndex ) )
+      enddo 
+      
+    else
+    
+      ! if no GDD_MAX found in parameter tables, assign the default FAO-56 value
+      GDD_MAX = 86.0_c_float  
+
+    endif   
+
+
+    if ( ubound( fGDD_Base_, 1 ) == iNumberOfLanduses ) then
+
+      do iIndex=1, ubound( iLanduseIndex, 1)
+        GDD_BASE( iIndex ) = fGDD_Base_( iLanduseIndex( iIndex ) )
+      enddo 
+      
+    else
+    
+      ! if no GDD_Base found in parameter tables, assign the default FAO-56 value
+      GDD_BASE = 50.0_c_float  
+
+    endif   
 
     GDD = 0.0_c_float 
 

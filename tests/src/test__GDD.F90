@@ -29,7 +29,8 @@ program test__GDD
 
   call PARAMS_DICT%print_all()
 
-  call growing_degree_day_initialize(lActive=lActive, dX=[100.0_c_double, 200.0_c_double], &
+  call growing_degree_day_initialize(lActive=lActive, iLanduseIndex=[1,2,3],  &
+      dX=[100.0_c_double, 200.0_c_double], &
       dY=[100.0_c_double, 200.0_c_double], &
       dX_lon=latlon , dY_lat=latlon )
   

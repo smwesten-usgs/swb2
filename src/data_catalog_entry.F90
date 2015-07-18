@@ -464,25 +464,23 @@ end subroutine initialize_netcdf_data_object_sub
 
     endif
 
-    if ( this%lGridHasChanged ) then
+    !> Now apply te user scale and offset amounts
+    if (this%iTargetDataType == DATATYPE_REAL) then
 
-      if (this%iTargetDataType == DATATYPE_REAL) then
+      call apply_scale_and_offset(fResult=this%pGrdBase%rData, fValue=this%pGrdBase%rData,          &
+            dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
 
-        call apply_scale_and_offset(fResult=this%pGrdBase%rData, fValue=this%pGrdBase%rData,          &
-              dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
 
-      elseif ( this%iTargetDataType == DATATYPE_INT ) then
+    elseif ( this%iTargetDataType == DATATYPE_INT ) then
 
-         call apply_scale_and_offset(iResult=this%pGrdBase%iData, iValue=this%pGrdBase%iData,          &
-              dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
+       call apply_scale_and_offset(iResult=this%pGrdBase%iData, iValue=this%pGrdBase%iData,          &
+            dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
 
-      else
+    else
 
-        call die("Unsupported data type specified", __FILE__, __LINE__)
+      call die("Unsupported data type specified", __FILE__, __LINE__)
 
-      endif
-
-    endif  
+    endif
 
   end subroutine getvalues_sub
 

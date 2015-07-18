@@ -41,12 +41,16 @@ module dictionary
 
     type (DICT_ENTRY_T), pointer   :: first   => null()
     type (DICT_ENTRY_T), pointer   :: last    => null()
+    type (DICT_ENTRY_T), pointer   :: current => null()
     integer (kind=c_int)           :: count   = 0
 
   contains
   
     procedure, private   :: get_entry_by_key_fn 
     generic              :: get_entry => get_entry_by_key_fn
+
+    procedure, private   :: get_next_entry_by_key_fn
+    generic              :: get_next_entry => get_next_entry_by_key_fn
 
     procedure, private   :: add_entry_to_dict_sub
     generic              :: add_entry => add_entry_to_dict_sub
@@ -168,12 +172,14 @@ contains
     type (DICT_ENTRY_T), pointer  :: pDict
     
     pDict => this%first
+    this%current => this%first
 
     do while ( associated( pDict ) )
 
       if ( pDict%key .strequal. sKey )  exit
       
       pDict => pDict%next
+      this%current => pDict
 
     enddo
 
@@ -183,7 +189,35 @@ contains
                  lEcho=lFALSE )
 
   end function get_entry_by_key_fn
- 
+
+!-------------------------------------------------------------------------------------------------- 
+
+  function get_next_entry_by_key_fn(this, sKey)   result( pDict )
+
+    class (DICT_T)                :: this
+    character (len=*), intent(in) :: sKey
+    type (DICT_ENTRY_T), pointer  :: pDict
+    
+    ! if "current" location is not null, it will point to the location of the 
+    ! last key value found. move forward by one before examining the next key...
+    if (associated( this%current) ) pDict => this%current%next
+
+    do while ( associated( pDict ) )
+
+      if ( pDict%key .strequal. sKey )  exit
+      
+      pDict => pDict%next
+      this%current => pDict
+
+    enddo
+
+    if (.not. associated( pDict ) )  &
+      call warn( sMessage="Failed to find another dictionary entry with a key value of "//dquote(sKey),   &
+                 iLogLevel=LOG_DEBUG,                                                               & 
+                 lEcho=lFALSE )
+
+  end function get_next_entry_by_key_fn
+
 !--------------------------------------------------------------------------------------------------
 
   function grep_dictionary_key_names_fn(this, sKey)   result( slString )
@@ -193,18 +227,17 @@ contains
     type (STRING_LIST_T)             :: slString
 
     ! [ LOCALS ]
-    type (DICT_ENTRY_T), pointer     :: current
     integer (kind=c_int)             :: iIndex
     
-    current => this%first
+    this%current => this%first
 
-    do while ( associated( current ) )
+    do while ( associated(this%current ) )
 
-      iIndex = index(string=current%key, substring=trim(sKey) )
+      iIndex = index(string=this%current%key, substring=trim(sKey) )
 
-      if ( iIndex > 0 )  call slString%append(current%key)
+      if ( iIndex > 0 )  call slString%append(this%current%key)
       
-      current => current%next
+      this%current => this%current%next
 
     enddo
 
@@ -233,11 +266,13 @@ contains
         dict_entry%next      => null()
         this%last%next       => dict_entry
         this%last            => dict_entry
+        this%current         => dict_entry
 
       else  ! this is the first dictionary entry
 
         this%first => dict_entry
         this%last  => dict_entry
+        this%current => dict_entry
         dict_entry%previous => null()
         dict_entry%next     => null()
 
@@ -269,13 +304,25 @@ contains
 
       ! first remove object from linked list
       pTemp => pTarget%previous
-      pTemp%next => pTarget%next
-      pTarget%next%previous => pTemp
+
+      if (associated( pTemp) ) then
+        ! if pTemp is unassociated, it means we're at the head of the list
+        pTemp%next => pTarget%next
+        pTarget%next%previous => pTemp
+
+      else
+      
+        pTemp => pTarget%next  
+        this%first => pTemp
+
+      endif  
+
+      ! set "current" pointer to entry that was just before the now-deleted entry
+      this%current => pTemp
 
       call pTarget%sl%clear()
 
     endif  
-
 
   end subroutine delete_entry_by_key_sub
 

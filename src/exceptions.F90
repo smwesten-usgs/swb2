@@ -99,14 +99,16 @@ contains
       do iIndex = 1, NUMBER_OF_FATAL_WARNINGS
         if (iIndex <= MAX_FATAL_WARNINGS ) then
           write(unit=sIndex, fmt="(i0)") iIndex
-          call LOGS%write( trim(adjustl(sIndex))//") "//trim(WARNING_TEXT(iIndex)) )
+          call LOGS%write( trim(adjustl(sIndex))//":", iLinesBefore=1)
+          call LOGS%write( repeat("-",80) )
+          call LOGS%write( trim(WARNING_TEXT(iIndex)) )
         endif
       enddo
 
-      if ( NUMBER_OF_FATAL_WARNINGS > MAX_FATAL_WARNINGS ) then
+      if ( NUMBER_OF_FATAL_WARNINGS >= MAX_FATAL_WARNINGS ) then
         write(unit=sMaxWarnings, fmt="(i0)") MAX_FATAL_WARNINGS
         call LOGS%write( "*There were more than "//trim(adjustl(sMaxWarnings))//" fatal warnings. " &
-          //" Only a partial list of warnings is shown above.*", iLinesAfter=1, iTab=2 )
+          //" Only a partial list of warnings is shown above.*", iLinesBefore=1, iLinesAfter=1, iTab=2 )
       endif  
 
       call die( sMessage="Fatal warning"//trim(sLittleS)//" associated with input.", &
@@ -141,7 +143,9 @@ contains
         NUMBER_OF_FATAL_WARNINGS = NUMBER_OF_FATAL_WARNINGS + 1
         call LOGS%write(" ** WARNING fatal error: **", iTab=6, iLinesBefore=1)
         call LOGS%write( trim(sMessage), iTab=16 )
-        WARNING_TEXT( NUMBER_OF_FATAL_WARNINGS ) = trim(sMessage)
+
+        if (NUMBER_OF_FATAL_WARNINGS <= ubound( WARNING_TEXT,1 ) )     &
+          WARNING_TEXT( NUMBER_OF_FATAL_WARNINGS ) = trim(sMessage)
       endif
     else
       call LOGS%write(" ** WARNING possible error: **", iTab=10, iLinesBefore=1)

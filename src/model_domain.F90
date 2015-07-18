@@ -58,11 +58,11 @@ module model_domain
     real (kind=c_float), allocatable       :: inflow(:)
     real (kind=c_float), allocatable       :: runon(:)
     real (kind=c_float), allocatable       :: runoff(:)
+    real (kind=c_float), allocatable       :: runoff_outside(:)
     real (kind=c_float), allocatable       :: outflow(:)
     real (kind=c_float), allocatable       :: infiltration(:)
     real (kind=c_float), allocatable       :: snowmelt(:)
     real (kind=c_float), allocatable       :: interception(:)
-    real (kind=c_float), allocatable       :: GDD_28(:)
      
     real (kind=c_float), allocatable       :: interception_storage(:)
     real (kind=c_float), allocatable       :: snow_storage(:)
@@ -96,7 +96,7 @@ module model_domain
     procedure ( simple_method ), pointer         :: init_fog                => model_initialize_fog_none
     procedure ( simple_method ), pointer         :: init_irrigation         => model_initialize_irrigation_none
     procedure ( simple_method ), pointer         :: init_direct_recharge  => model_initialize_direct_recharge_none
-    procedure ( simple_method ), pointer         :: init_GDD                => model_initialize_GDD
+    procedure ( simple_method ), pointer         :: init_GDD                => model_initialize_GDD_none
 
     procedure ( simple_method ), pointer         :: calc_interception      => model_calculate_interception_bucket
 
@@ -111,9 +111,10 @@ module model_domain
     procedure ( simple_method ), pointer         :: calc_snowmelt          => model_calculate_snowmelt_original  
     procedure ( simple_method ), pointer         :: calc_fog               => model_calculate_fog_none
     procedure ( simple_method ), pointer         :: calc_irrigation        => model_calculate_irrigation_none
-    procedure ( simple_method ), pointer         :: calc_GDD               => model_calculate_GDD
+    procedure ( simple_method ), pointer         :: calc_GDD               => model_calculate_GDD_none
     procedure ( simple_method ), pointer         :: calc_direct_recharge => model_calculate_direct_recharge_none    
 
+    procedure (simple_method), pointer           :: output_GDD             => model_output_GDD_none
     procedure (simple_method), pointer           :: output_soil_moisture   => model_output_irrigation_none
     procedure (simple_method), pointer           :: output_irrigation      => model_output_irrigation_none
 
@@ -222,7 +223,7 @@ module model_domain
 
   type (GENERAL_GRID_T), pointer    :: pCOORD_GRD
 
-  integer (kind=c_int), parameter   :: NCDF_NUM_OUTPUTS = 16
+  integer (kind=c_int), parameter   :: NCDF_NUM_OUTPUTS = 17
 
   enum, bind(c)
     enumerator :: NCDF_GROSS_PRECIPITATION=1, NCDF_RAINFALL, NCDF_SNOWFALL, &
@@ -231,7 +232,7 @@ module model_domain
                   NCDF_REFERENCE_ET0,                                       &
                   NCDF_ACTUAL_ET, NCDF_SNOWMELT, NCDF_TMIN, NCDF_TMAX,      &
                   NCDF_POTENTIAL_RECHARGE, NCDF_INFILTRATION,               &
-                  NCDF_IRRIGATION
+                  NCDF_IRRIGATION, NCDF_RUNOFF_OUTSIDE
   end enum 
 
 contains
@@ -308,17 +309,17 @@ contains
     allocate( this%snowmelt(iCount), stat=iStat(18) )
     allocate( this%interception(iCount), stat=iStat(19) )
     allocate( this%rainfall(iCount), stat=iStat(20) )
-    allocate( this%GDD_28(iCount), stat=iStat(21) )
-    allocate( this%interception_storage(iCount), stat=iStat(22) )
-    allocate( this%snow_storage(iCount), stat=iStat(23) )
-    allocate( this%soil_storage(iCount), stat=iStat(24) )
-    allocate( this%soil_storage_max(iCount), stat=iStat(25) )
-    allocate( this%potential_recharge(iCount), stat=iStat(26) )
-    allocate( this%fog(iCount), stat=iStat(27) )
-    allocate( this%irrigation(iCount), stat=iStat(28) )
-    allocate( this%rooting_depth(iCount), stat=iStat(29) )
-    allocate( this%index_order(iCount), stat=iStat(30) )
-    allocate( this%gdd(iCount), stat=iStat(31) )
+    allocate( this%interception_storage(iCount), stat=iStat(21) )
+    allocate( this%snow_storage(iCount), stat=iStat(22) )
+    allocate( this%soil_storage(iCount), stat=iStat(23) )
+    allocate( this%soil_storage_max(iCount), stat=iStat(24) )
+    allocate( this%potential_recharge(iCount), stat=iStat(25) )
+    allocate( this%fog(iCount), stat=iStat(26) )
+    allocate( this%irrigation(iCount), stat=iStat(27) )
+    allocate( this%rooting_depth(iCount), stat=iStat(28) )
+    allocate( this%index_order(iCount), stat=iStat(29) )
+    allocate( this%gdd(iCount), stat=iStat(30) )
+    allocate( this%runoff_outside( iCount ), stat=iStat(31) )
 
     if ( any( iStat /= 0 ) )  call die("Problem allocating memory", __FILE__, __LINE__)
 
@@ -382,6 +383,12 @@ contains
 
     call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_RUNOFF )%ncfile,              &
       sVariableName="runoff", sVariableUnits="inches_per_day",                                &
+      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
+      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
+      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
+
+    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_RUNOFF_OUTSIDE )%ncfile,      &
+      sVariableName="runoff_outside", sVariableUnits="inches_per_day",                        &
       iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
       fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
       dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
@@ -616,7 +623,10 @@ contains
 
     else
     
-      call die("Error attempting to access SOILS_GROUP data.")
+      call warn(sMessage="SOILS_GROUP dataset is flawed or missing.", lFatal=lTRUE,     &
+        iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"  &
+        //" been ~included in the control file for the SOILS_GROUP dataset.",           &
+        lEcho = lTRUE )
 
     endif    
 
@@ -641,7 +651,10 @@ contains
 
     else
     
-      call die("Error attempting to access LAND_USE data.")
+      call warn(sMessage="LAND_USE dataset is flawed or missing.", lFatal=lTRUE,         &
+        iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"   &
+        //" been ~included in the control file for the LAND_USE dataset.",               &
+        lEcho = lTRUE )
 
     endif    
 
@@ -668,7 +681,10 @@ contains
 
     else
     
-      call die("Error attempting to access AVAILABLE_WATER_CONTENT data.")
+      call warn(sMessage="AVAILABLE_WATER_CONTENT dataset is flawed or missing.", lFatal=lTRUE,     &
+        iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"              &
+        //" been ~included in the control file for the AVAILABLE_WATER_CONTENT dataset.",           &
+        lEcho = lTRUE )
 
     endif    
 
@@ -868,6 +884,16 @@ contains
             rValues=this%runoff,                                                                &
             rField=this%dont_care )
 
+    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_RUNOFF_OUTSIDE )%ncfile,          &
+            iVarID=OUTPUT( NCDF_RUNOFF_OUTSIDE )%ncfile%iVarID(NC_Z),                           &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
+                                int(this%number_of_columns, kind=c_size_t) ],                   &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+            lMask=this%active,                                                                  &
+            rValues=this%runoff_outside,                                                        &
+            rField=this%dont_care )
+
     call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_RUNON )%ncfile,                   &
             iVarID=OUTPUT( NCDF_RUNON )%ncfile%iVarID(NC_Z),                                    &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
@@ -988,6 +1014,8 @@ contains
             rValues=this%irrigation,                                                            &
             rField=this%dont_care )
 
+    call this%output_GDD()
+
   end subroutine write_variables_to_netcdf
 
 !--------------------------------------------------------------------------------------------------
@@ -996,6 +1024,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
+    call this%calc_GDD()
     call this%calculate_interception_mass_balance_sub()
     call this%calculate_snow_mass_balance_sub()
     call this%calculate_soil_mass_balance_sub()
@@ -1202,63 +1231,81 @@ contains
     integer (kind=c_int) :: orderindex
     integer (kind=c_int) :: targetindex
 
-     call this%calc_irrigation()
+    call this%calc_irrigation()
 
-     if ( associated(this%calc_routing) ) then
+    if ( associated(this%calc_routing) ) then
 
       this%runon = 0.0_c_float
 
-      do index=lbound(this%runon,1), ubound(this%runon,1)
+      do index=lbound( ORDER_INDEX, 1 ), ubound( ORDER_INDEX, 1 )
 
         orderindex = ORDER_INDEX( index )
         targetindex = TARGET_INDEX( index )
 
         this%inflow( orderindex ) =   this%runon( orderindex )                      &
-                                    + this%rainfall( orderindex )               &
+                                    + this%rainfall( orderindex )                   &
                                     + this%fog( orderindex )                        &
                                     + this%irrigation( orderindex )                 &
                                     + this%snowmelt( orderindex )                   &
                                     - this%interception( orderindex )                      
                              
-        call this%calc_runoff( orderindex )
 
-!        this%runoff( orderindex ) = this%inflow( orderindex ) - this%infiltration( orderindex )
- 
-        this%infiltration( orderindex ) = this%inflow( orderindex ) - this%runoff( orderindex )
+        if ( this%soil_storage_max( orderindex ) .approxequal. 0.0_c_float ) then
 
-!          print *, orderindex, TARGET_INDEX( orderindex ), this%inflow(orderindex), this%runoff(orderindex)
-    
-        if ( targetindex > 0) then
+          ! this is an open water cell; special treatment
+          this%runoff_outside( orderindex ) =   &
+            max( 0.0_c_float, this%inflow( orderindex ) - this%reference_ET0( orderindex ) )
+          this%actual_ET( orderindex ) = this%reference_ET0( orderindex )    
           
-          this%runon( targetindex ) = this%runoff( orderindex )
+          this%potential_recharge( orderindex ) = 0.0_c_float
 
-!            print *, orderindex, TARGET_INDEX( orderindex ), this%inflow( orderindex ), this%runoff( orderindex ), &
-!              this%runon(TARGET_INDEX( orderindex ) )
+        else
 
-        endif 
+          ! this is a normal (non open water) cell
 
-        call this%calc_soil_moisture( orderindex )
+          call this%calc_runoff( orderindex )
+ 
+          this%infiltration( orderindex ) = this%inflow( orderindex ) - this%runoff( orderindex )
 
-      enddo  
+          if ( targetindex > 0)  this%runon( targetindex ) = this%runoff( orderindex )
+     
+          call this%calc_soil_moisture( orderindex )          
 
-     else
+        endif
 
-       this%runon = 0.0_c_float
-       this%inflow = this%rainfall + this%fog + this%irrigation     &
-                      - this%interception + this%snowmelt
-       call this%calc_runoff()
-       this%infiltration = this%inflow - this%runoff
-!        print *, "Gross Precip: ", minval(this%gross_precip), maxval(this%gross_precip)
-!        print *, "Interception: ", minval(this%interception), maxval(this%interception)
-!        print *, "Inflow: ", minval(this%inflow), maxval(this%inflow)
-!        print *, "Runoff: ", minval(this%runoff), maxval(this%runoff)
+      enddo
 
-       call this%calc_soil_moisture()
+    else   ! no routing
 
-     endif
+      this%runon = 0.0_c_float
 
-     ! add any other direct recharge terms to the potential recharge based on the water balance
-     call this%calc_direct_recharge()
+      this%inflow =   this%rainfall                  &
+                    + this%fog                       &
+                    + this%irrigation                &
+                    + this%snowmelt                  &
+                    - this%interception
+
+      call this%calc_runoff()
+      call this%calc_soil_moisture()
+
+      where ( this%soil_storage_max .approxequal. 0.0_c_float )
+
+        this%runoff_outside = max( 0.0_c_float, this%inflow - this%reference_ET0 )
+        this%actual_ET = this%reference_ET0
+        this%potential_recharge = 0.0_c_float
+        this%runoff = 0.0_c_float
+        this%infiltration = 0.0_c_float
+
+      else where
+
+        this%infiltration = this%inflow - this%runoff
+
+      end where
+
+    endif
+
+    ! add any other direct recharge terms to the potential recharge based on the water balance
+    call this%calc_direct_recharge()
    
   end subroutine calculate_soil_mass_balance_sub
 
@@ -1277,6 +1324,11 @@ contains
 
         this%init_interception => model_initialize_interception_bucket
         this%calc_interception => model_calculate_interception_bucket
+
+        ! when the "bucket" model is used, it requires some means of determining 
+        ! "growing" vs. "non-growing" season
+        this%init_GDD => model_initialize_GDD
+        this%calc_GDD => model_calculate_GDD
 
         call LOGS%WRITE( "==> BUCKET INTERCEPTION submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
@@ -1385,6 +1437,11 @@ contains
 
         this%init_irrigation => model_initialize_irrigation
         this%calc_irrigation => model_calculate_irrigation
+
+        ! when irrigation is invoked, we need to track GDD as a possible means
+        ! by which to update and model the seasonal change in crop coefficient (Kcb)
+        this%init_GDD => model_initialize_GDD
+        this%calc_GDD => model_calculate_GDD
 
         call LOGS%WRITE( "==> IRRIGATION will be calculated and applied as needed.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
@@ -2085,6 +2142,37 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  subroutine model_initialize_GDD_none( this )
+
+    use growing_degree_day
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    !> Nothing here to see. 
+
+  end subroutine model_initialize_GDD_none
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_GDD_none( this )
+
+    use growing_degree_day, only : GDD, GDD_BASE, GDD_MAX, growing_degree_day_calculate
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    !> Nothing here to see. 
+
+  end subroutine model_calculate_GDD_none
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_output_GDD_none( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    !> Nothing here to see. 
+
+  end subroutine model_output_GDD_none
+
+!--------------------------------------------------------------------------------------------------
+
   subroutine model_initialize_GDD( this )
 
     use growing_degree_day
@@ -2092,8 +2180,12 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     !> Nothing here to see. Initialization not really needed for the "normal" method.
 
-    call growing_degree_day_initialize( lActive=this%active, dX=this%X, dY=this%Y, &
-      dX_lon=pCOORD_GRD%rX , dY_lat=pCOORD_GRD%rY )
+    call growing_degree_day_initialize( lActive=this%active,                  &
+                                        iLanduseIndex=this%landuse_index,     &
+                                        dX=this%X,                            & 
+                                        dY=this%Y,                            &
+                                        dX_lon=pCOORD_GRD%rX,                 &
+                                        dY_lat=pCOORD_GRD%rY  )
 
   end subroutine model_initialize_GDD
 
@@ -2493,7 +2585,6 @@ contains
     call minmaxmean( this%snowmelt, "snowmelt")
     call minmaxmean( this%interception, "intercept")
     call minmaxmean( this%rainfall, "rainfall")
-    call minmaxmean( this%GDD_28, "GDD28")
     
     call minmaxmean( this%interception_storage, "intcp_stor")
     call minmaxmean( this%snow_storage, "snow_stor")

@@ -233,10 +233,34 @@ contains
     GROWTH_STAGE_GDD = fTINYVAL
     GROWTH_STAGE_DOY = fTINYVAL
 
-    if ( ubound(L_ini_,1) == iNumberOfLanduses )   GROWTH_STAGE_DOY( L_DOY_INI,  : ) = L_ini_
-    if ( ubound(L_dev_,1) == iNumberOfLanduses )   GROWTH_STAGE_DOY( L_DOY_DEV,  : ) = L_dev_
-    if ( ubound(L_mid_,1) == iNumberOfLanduses )   GROWTH_STAGE_DOY( L_DOY_MID,  : ) = L_mid_
-    if ( ubound(L_late_,1) == iNumberOfLanduses )  GROWTH_STAGE_DOY( L_DOY_LATE, : ) = L_late_
+    if ( ubound(L_ini_,1) == iNumberOfLanduses ) then
+      GROWTH_STAGE_DOY( L_DOY_INI,  : ) = L_ini_
+    else
+      call warn(sMessage="L_ini has "//asCharacter(ubound(L_ini_,1))//" entries; there are "  &
+        //asCharacter(iNumberOfLanduses)//" landuse codes.", lFatal=lTRUE)
+    endif      
+
+    if ( ubound(L_dev_,1) == iNumberOfLanduses ) then
+      GROWTH_STAGE_DOY( L_DOY_DEV,  : ) = L_dev_
+    else
+      call warn(sMessage="L_dev has "//asCharacter(ubound(L_dev_,1))//" entries; there are "  &
+        //asCharacter(iNumberOfLanduses)//" landuse codes.", lFatal=lTRUE)
+    endif      
+
+    if ( ubound(L_mid_,1) == iNumberOfLanduses ) then
+      GROWTH_STAGE_DOY( L_DOY_MID,  : ) = L_mid_
+    else
+      call warn(sMessage="L_mid has "//asCharacter(ubound(L_mid_,1))//" entries; there are "  &
+        //asCharacter(iNumberOfLanduses)//" landuse codes.", lFatal=lTRUE)
+    endif      
+
+    if ( ubound(L_late_,1) == iNumberOfLanduses ) then
+      GROWTH_STAGE_DOY( L_DOY_LATE, : ) = L_late_
+    else
+      call warn(sMessage="L_late has "//asCharacter(ubound(L_late_,1))//" entries; there are "  &
+        //asCharacter(iNumberOfLanduses)//" landuse codes.", lFatal=lTRUE)
+    endif      
+
 
     if ( slPlantingDate%count == iNumberOfLanduses ) then
 
@@ -281,23 +305,31 @@ contains
 
     do iIndex = lbound( KCB_METHOD, 1), ubound( KCB_METHOD, 1)
 
-      if ( all( KCB( JAN:DEC, iIndex ) > 0.0_c_float ) ) then
+      if ( all( KCB( JAN:DEC, iIndex ) >= 0.0_c_float ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_MONTHLY_VALUES
               
-      elseif ( all( GROWTH_STAGE_GDD( :, iIndex ) > 0.0_c_float )  &
-         .and. all( KCB( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
+      elseif ( all( GROWTH_STAGE_GDD( :, iIndex ) >= 0.0_c_float )  &
+         .and. all( KCB( KCB_INI:KCB_MIN, iIndex ) >= 0.0_c_float ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_GDD
 
-      elseif ( all( GROWTH_STAGE_DOY( :, iIndex ) > 0.0_c_float )  &
-         .and. all( KCB( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
+      elseif ( all( GROWTH_STAGE_DOY( :, iIndex ) >= 0.0_c_float )  &
+         .and. all( KCB( KCB_INI:KCB_MIN, iIndex ) >= 0.0_c_float ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_FAO56
       endif
 
+      print *, "============================================= "
+      print *, iIndex
+      print *, GROWTH_STAGE_DOY(:, iIndex)
+      print *, " "
+      print *, KCB( KCB_INI:KCB_MIN, iIndex )
+      print *, " "
+
+
       if ( KCB_METHOD( iIndex ) < 0 )  &
-        call warn("There are missing day-of-year (L_ini, Ldev, L_mid, L_late), " &
+        call warn("There are missing day-of-year (L_ini, L_dev, L_mid, L_late), " &
           //"growing degree-day ~(GDD_plant, GDD_ini, GDD_dev, GDD_mid, GDD_late)," &
-          //" or monthly crop coefficients (Kcb_jan...Kcb_dec) for" &
-          //"~landuse "//asCharacter( LANDUSE_CODE( iIndex ) ), lFatal=lTRUE )
+          //" or monthly crop ~coefficients (Kcb_jan...Kcb_dec) for" &
+          //" landuse "//asCharacter( LANDUSE_CODE( iIndex ) ), lFatal=lTRUE )
 
       if ( KCB_METHOD( iIndex ) == KCB_METHOD_FAO56 ) then
         if ( .not. ( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) > SIM_DT%start ) )  &

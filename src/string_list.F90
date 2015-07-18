@@ -1,7 +1,7 @@
 module string_list
 
   use iso_c_binding, only             : c_int, c_float, c_bool
-  use constants_and_conversions, only : asInt, asFloat, asLogical
+  use constants_and_conversions, only : asInt, asFloat, asLogical, lTRUE, lFALSE
   use strings
   use logfiles, only                  : LOG_DEBUG
   use exceptions
@@ -40,6 +40,7 @@ module string_list
     procedure :: list_all_fn
     procedure :: list_return_position_of_matching_string_fn
     procedure :: list_return_count_of_matching_string_fn
+    procedure :: list_is_string_in_list_fn
     procedure :: list_items_deallocate_all_sub
     procedure :: list_return_all_as_float_fn
     procedure :: list_return_all_as_int_fn
@@ -57,6 +58,7 @@ module string_list
     generic :: grep          => list_subset_partial_matches_fn
     generic :: which         => list_return_position_of_matching_string_fn
     generic :: countmatching => list_return_count_of_matching_string_fn
+    generic :: iselement     => list_is_string_in_list_fn
     generic :: clear         => list_items_deallocate_all_sub
     generic :: asFloat       => list_return_all_as_float_fn
     generic :: asInt         => list_return_all_as_int_fn
@@ -430,6 +432,29 @@ contains
     end do
 
   end function break_string_into_list_fn
+
+!--------------------------------------------------------------------------------------------------
+
+  function list_is_string_in_list_fn(this, sChar)  result( lResult )
+
+    class (STRING_LIST_T), intent(in) :: this
+    character (len=*), intent(in)     :: sChar
+    logical (kind=c_bool)             :: lResult    
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iCount
+
+    iCount = 0
+
+    iCount = this%countmatching( sChar )
+
+    if ( iCount > 0 ) then
+      lResult = lTRUE
+    else
+      lResult = lFALSE
+    endif
+
+  end function list_is_string_in_list_fn
 
 !--------------------------------------------------------------------------------------------------
 

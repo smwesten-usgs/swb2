@@ -29,16 +29,18 @@
 
   	<tab type="usergroup" url="@ref model_application" title="Model Application">
        <tab type="user" url="@ref overview_of_input_and_output_files" title="Overview of Input and Output Files"/>
-       <tab type="user" url="@ref general_discussion_of_gridded_datasets" title="General Discussion Regarding Gridded Datasets"/>	 
+       <tab type="user" url="@ref general_discussion_of_gridded_datasets" title="General Discussion Regarding Gridded Datasets"/>
+       <tab type="user" url="@ref required_gridded_datasets" title="Required Gridded Datasets"/>       	 
   	   <tab type="user" url="@ref variable_descriptions" title="Output Variable Descriptions"/>
   	   <tab type="user" url="@ref specific_datasets" title="Gridded Climate Datasets"/>
   	   <tab type="user" url="@ref parameterization" title="Suggested Starting Parameter Values"/>	 
        <tab type="user" url="@ref faq" title="Frequently Asked Questions"/>
     </tab>
 
-    <tab type="usergroup" url="@ref example_applications" title="Example Applications">
+    <tab type="usergroup" url="@ref example_applications" title="Model Application Examples">
        <tab type="user" url="@ref example_maui_hawaii" title="Maui, Hawaii"/>
        <tab type="user" url="@ref example_little_plover_river_wisconsin" title="Little Plover River, Wisconsin"/>
+       <tab type="user" url="@ref example_new_climate_datasets" title="Example of New Climate Data Source"/>
     </tab>
 
   	<tab type="usergroup" title="Code Development and Documentation">

@@ -566,59 +566,68 @@ contains
     character (len=:), allocatable   :: sOptionText
     character (len=:), allocatable   :: sArgText
     integer (kind=c_int)             :: iStat
+    logical (kind=c_bool)            :: lHaveStartDate
+    logical (kind=c_bool)            :: lHaveEndDate
 
+    lHaveStartDate = lFALSE
+    lHaveEndDate = lFALSE
 
     myDirectives = CF_DICT%grep_keys("DATE")
       
-    if ( myDirectives%count < 2 ) then
+!     if ( myDirectives%count < 2 ) then
 
-      call warn("Your control file seems to be missing START_DATE and/or END_DATE", &
-        lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+!       call warn(sMessage="Your control file seems to be missing START_DATE and/or END_DATE", &
+!         sHints="Add a START_DATE and/or END_DATE directive to your control file. Date "      &
+!         //"~should be specified as mm/dd/yyyy.", lFatal = lTRUE, iLogLevel = LOG_ALL,        &
+!         lEcho = lTRUE )
 
-    else  
-    
-      call LOGS%set_loglevel( LOG_ALL )
-      call LOGS%set_echo( lFALSE )
+  
+    call LOGS%set_loglevel( LOG_ALL )
+    call LOGS%set_echo( lFALSE )
 
-      do iIndex = 1, myDirectives%count
+    do iIndex = 1, myDirectives%count
 
-        ! myDirectives is a string list of all SWB directives that contain the phrase "LANDUSE"
-        ! sCmdText contains an individual directive
-        sCmdText = myDirectives%get(iIndex)
+      ! myDirectives is a string list of all SWB directives that contain the string "DATE"
+      ! sCmdText contains an individual directive
+      sCmdText = myDirectives%get(iIndex)
 
-        ! For this directive, obtain the associated dictionary entries
-        call CF_DICT%get_values(sCmdText, myOptions )
+      ! For this directive, obtain the associated dictionary entries
+      call CF_DICT%get_values(sCmdText, myOptions )
 
-        ! dictionary entries are initially space-delimited; sArgText contains
-        ! all dictionary entries present, concatenated, with a space between entries
-        sArgText = myOptions%get(1, myOptions%count )
+      ! dictionary entries are initially space-delimited; sArgText contains
+      ! all dictionary entries present, concatenated, with a space between entries
+      sArgText = myOptions%get(1, myOptions%count )
 
-        ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(sCmdText//" "//sArgText, iTab=4)
+      ! echo the original directive and dictionary entries to the logfile
+      call LOGS%write(sCmdText//" "//sArgText, iTab=4)
 
-        ! most of the time, we only care about the first dictionary entry, obtained below
-        sOptionText = myOptions%get(1)
+      ! most of the time, we only care about the first dictionary entry, obtained below
+      sOptionText = myOptions%get(1)
 
-        select case ( sCmdText )
+      select case ( sCmdText )
 
-          case ( "START_DATE", "STARTDATE" )
+        case ( "START_DATE", "STARTDATE", "BEGIN_DATE" )
 
-            call SIM_DT%start%parseDate( sOptionText )
-            call SIM_DT%start%calcJulianDay()
+          lHaveStartDate = lTRUE
+          call SIM_DT%start%parseDate( sOptionText )
+          call SIM_DT%start%calcJulianDay()
 
-          case ( "END_DATE", "ENDDATE" )
+        case ( "END_DATE", "ENDDATE", "STOP_DATE" )
 
-            call SIM_DT%end%parseDate( sOptionText )
-            call SIM_DT%end%calcJulianDay()
+          lHaveEndDate = lTRUE
+          call SIM_DT%end%parseDate( sOptionText )
+          call SIM_DT%end%calcJulianDay()
 
-          case default
+        case default
 
-            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
-              //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
- 
-        end select
+          call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
+            //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
 
-      enddo
+      end select
+
+    enddo
+
+    if ( lHaveStartDate .and. lHaveEndDate ) then
 
       SIM_DT%curr = SIM_DT%start
       SIM_DT%iDOY = day_of_year( SIM_DT%curr%getJulianDay() )
@@ -627,6 +636,16 @@ contains
       SIM_DT%iDaysInYear = SIM_DT%curr%daysperyear()
       SIM_DT%lIsLeapYear = SIM_DT%curr%isLeapYear()
 
+      call LOGS%write("Model run start date set to: "//SIM_DT%start%prettydate(), iTab=4)
+      call LOGS%write("Model run end date set to:   "//SIM_DT%end%prettydate(), iTab=4)
+
+    else
+    
+      call warn(sMessage="Your control file seems to be missing START_DATE and/or END_DATE", &
+        sHints="Add a START_DATE and/or END_DATE directive to your control file. Date "      &
+        //"~should be specified as mm/dd/yyyy.", lFatal = lTRUE, iLogLevel = LOG_ALL,        &
+        lEcho = lTRUE )
+  
     endif
 
   end subroutine initialize_start_and_end_dates 
@@ -652,10 +671,13 @@ contains
     character (len=:), allocatable   :: sCmdText
     character (len=:), allocatable   :: sOptionText
     character (len=:), allocatable   :: sArgText
+    character (len=:), allocatable   :: sText
+    character (len=256)              :: sBuf
     integer (kind=c_int)             :: iStat
-    type (PARAMETERS_T)         :: PARAMS
+    type (PARAMETERS_T)              :: PARAMS
     integer (kind=c_int)             :: iCount
-
+    type (DICT_ENTRY_T), pointer     :: pDict1
+    type (DICT_ENTRY_T), pointer     :: pDict2
 
     iCount = 0
 
@@ -671,13 +693,13 @@ contains
       call LOGS%set_loglevel( LOG_ALL )
       call LOGS%set_echo( lFALSE )
 
+      ! iterate over list of all control file statements that contain the phrase "LOOKUP_TABLE"
       do iIndex = 1, myDirectives%count
 
-        ! myDirectives is a string list of all SWB directives that contain the phrase "LOOKUP_TABLE"
         ! sCmdText contains an individual directive
         sCmdText = myDirectives%get(iIndex)
 
-        ! For this directive, obtain the associated dictionary entries
+        ! for this directive, obtain the associated dictionary entries
         call CF_DICT%get_values(sCmdText, myOptions )
 
         ! dictionary entries are initially space-delimited; sArgText contains
