@@ -18,6 +18,8 @@ module runoff__curve_number
 
   public :: runoff_curve_number_initialize
   public :: runoff_curve_number_calculate
+  public :: update_curve_number_fn
+  public :: CN_AMCI, CN_AMCII, CN_AMCIII, Smax
 
 contains
 
@@ -135,7 +137,7 @@ contains
     real (kind=c_float) :: frac
 
     fFraction_FC = 0.0
-    if (fSoilStorage_Max > 0.0) fFraction_FC = max( 1.0_c_float, fSoilStorage / fSoilStorage_Max )
+    if (fSoilStorage_Max > 0.0) fFraction_FC = min( 1.0_c_float, fSoilStorage / fSoilStorage_Max )
 
     ! Correct the curve number...
     !
@@ -143,7 +145,7 @@ contains
     ! *and* the CFGI indicates frozen ground conditions, assume that runoff enhancement
     ! is probable. If the soils froze under relatively dry conditions, assume that some pore
     ! space is open in the frozen ground.
-    if( fCFGI > CFGI_LL .and. fFraction_FC > 0.85 ) then
+    if( fCFGI > CFGI_LL .and. fFraction_FC > 0.5 ) then
 
       Pf = prob_runoff_enhancement( fCFGI )
 
@@ -153,16 +155,16 @@ contains
       CN_adj = CN_AMCII(iLanduseIndex, iSoilsIndex) * ( 1.0_c_float - Pf ) &
                 + CN_AMCIII(iLanduseIndex, iSoilsIndex) * Pf 
 
-    elseif ( fFraction_FC > 0.75_c_float ) then   ! adjust upward toward AMC III
+    elseif ( fFraction_FC > 0.5_c_float ) then   ! adjust upward toward AMC III
 
       ! we want a number ranging from 0 to 1 indicating the relative split
       ! between CN AMCII and CN AMCIII
-      frac = ( fFraction_FC - 0.75_c_float ) / 0.25_c_float
+      frac = ( fFraction_FC - 0.5_c_float ) / 0.5_c_float
 
       CN_adj = CN_AMCII(iLanduseIndex, iSoilsIndex) * ( 1.0_c_float - frac ) &
                 + CN_AMCIII(iLanduseIndex, iSoilsIndex) * frac 
 
-    elseif ( fFraction_FC < 0.25_c_float ) then   ! adjust downward toward AMC I
+    elseif ( fFraction_FC < 0.5_c_float ) then   ! adjust downward toward AMC I
 
       ! we want a number ranging from 0 to 1 indicating the relative split
       ! between CN AMCII and CN AMCI 
@@ -170,7 +172,7 @@ contains
       ! ex. fFraction_FC = 0.48; frac = 2.0 * 0.48 = 0.96
       !     CN_adj = 0.96 ( CN_AMCII ) + ( 1.0 - 0.96 ) * CN_AMCIII
       !
-      frac = fFraction_FC / 0.25_c_float
+      frac = fFraction_FC / 0.5_c_float
 
       CN_adj = CN_AMCIII(iLanduseIndex, iSoilsIndex) * ( 1.0_c_float - frac ) &
                 + CN_AMCII(iLanduseIndex, iSoilsIndex) * frac 

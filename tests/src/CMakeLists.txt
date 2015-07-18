@@ -574,4 +574,32 @@
   target_link_libraries(test__GDD ${EXTRA_LIBS})
 
 
+
+  add_executable(test__CN_update
+            ${PROJECT_SOURCE_DIR}/src/constants_and_conversions.F90
+            ${PROJECT_SOURCE_DIR}/src/continuous_frozen_ground_index.F90
+            ${PROJECT_SOURCE_DIR}/src/datetime.F90
+            ${PROJECT_SOURCE_DIR}/src/dictionary.F90
+            ${PROJECT_SOURCE_DIR}/src/exceptions.F90
+            ${PROJECT_SOURCE_DIR}/src/file_operations.F90
+            ${PROJECT_SOURCE_DIR}/src/runoff__curve_number.F90
+            ${PROJECT_SOURCE_DIR}/src/logfiles.F90
+            ${PROJECT_SOURCE_DIR}/src/parameters.F90
+            ${PROJECT_SOURCE_DIR}/src/simulation_datetime.F90
+            ${PROJECT_SOURCE_DIR}/src/strings.F90
+            ${PROJECT_SOURCE_DIR}/src/string_list.F90
+
+            ${PROJECT_SOURCE_DIR}/src/generated/version_control.F90                        
+
+
+            test__CN_update.F90
+            )
+
+  set_target_properties(test__CN_update
+            PROPERTIES COMPILE_DEFINITIONS "${PREPROCESSOR_DEFINES}")
+
+  target_link_libraries(test__CN_update ${EXTRA_LIBS})
+
+
+
 #endif()
