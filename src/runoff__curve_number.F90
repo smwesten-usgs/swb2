@@ -10,16 +10,16 @@ module runoff__curve_number
 
   private
 
-  real (kind=c_float), allocatable    :: CN_AMCIII(:,:)
-  real (kind=c_float), allocatable    :: CN_AMCII(:,:)
-  real (kind=c_float), allocatable    :: CN_AMCI(:,:)
+  real (kind=c_float), allocatable    :: CN_ARCIII(:,:)
+  real (kind=c_float), allocatable    :: CN_ARCII(:,:)
+  real (kind=c_float), allocatable    :: CN_ARCI(:,:)
   real (kind=c_float), allocatable    :: Smax(:,:)
   integer (kind=c_int), allocatable   :: iLanduseCodes(:)
 
   public :: runoff_curve_number_initialize
   public :: runoff_curve_number_calculate
   public :: update_curve_number_fn
-  public :: CN_AMCI, CN_AMCII, CN_AMCIII, Smax
+  public :: CN_ARCI, CN_ARCII, CN_ARCIII, Smax
 
 contains
 
@@ -52,15 +52,15 @@ contains
     call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCodes )
     iNumberOfLanduses = count( iLanduseCodes >= 0 )
 
-    allocate( CN_AMCIII(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
+    allocate( CN_ARCIII(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
     call assert( iStat == 0, "Failed to allocate memory for curve number table - AMC III", &
       __FILE__, __LINE__)
 
-    allocate( CN_AMCII(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
+    allocate( CN_ARCII(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
     call assert( iStat == 0, "Failed to allocate memory for curve number table - AMC II", &
       __FILE__, __LINE__)
 
-    allocate( CN_AMCI(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
+    allocate( CN_ARCI(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
     call assert( iStat == 0, "Failed to allocate memory for curve number table - AMC I", &
       __FILE__, __LINE__)
 
@@ -72,13 +72,13 @@ contains
     do iSoilsIndex = 1, iNumberOfSoilGroups
       sText = "CN_"//asCharacter(iSoilsIndex)
       call PARAMS%get_parameters( sKey=sText, fValues=CN )
-      CN_AMCII(:, iSoilsIndex) = CN
+      CN_ARCII(:, iSoilsIndex) = CN
     enddo  
 
     ! calculate SMax based on CN for AMC I
-    CN_AMCI = CN_II_to_CN_I( CN_AMCII )
-    CN_AMCIII = CN_II_to_CN_III( CN_AMCII )
-    Smax = ( 1000.0_c_float / CN_AMCI ) - 10.0_c_float
+    CN_ARCI = CN_II_to_CN_I( CN_ARCII )
+    CN_ARCIII = CN_II_to_CN_III( CN_ARCII )
+    Smax = ( 1000.0_c_float / CN_ARCI ) - 10.0_c_float
     
   end subroutine runoff_curve_number_initialize
 
@@ -152,8 +152,8 @@ contains
       ! use probability of runoff enhancement to calculate a weighted
       ! average of curve number under Type II vs Type III antecedent
       ! runoff conditions
-      CN_adj = CN_AMCII(iLanduseIndex, iSoilsIndex) * ( 1.0_c_float - Pf ) &
-                + CN_AMCIII(iLanduseIndex, iSoilsIndex) * Pf 
+      CN_adj = CN_ARCII(iLanduseIndex, iSoilsIndex) * ( 1.0_c_float - Pf ) &
+                + CN_ARCIII(iLanduseIndex, iSoilsIndex) * Pf 
 
     elseif ( fFraction_FC > 0.5_c_float ) then   ! adjust upward toward AMC III
 
@@ -161,8 +161,8 @@ contains
       ! between CN AMCII and CN AMCIII
       frac = ( fFraction_FC - 0.5_c_float ) / 0.5_c_float
 
-      CN_adj = CN_AMCII(iLanduseIndex, iSoilsIndex) * ( 1.0_c_float - frac ) &
-                + CN_AMCIII(iLanduseIndex, iSoilsIndex) * frac 
+      CN_adj = CN_ARCII(iLanduseIndex, iSoilsIndex) * ( 1.0_c_float - frac ) &
+                + CN_ARCIII(iLanduseIndex, iSoilsIndex) * frac 
 
     elseif ( fFraction_FC < 0.5_c_float ) then   ! adjust downward toward AMC I
 
@@ -170,16 +170,16 @@ contains
       ! between CN AMCII and CN AMCI 
       !
       ! ex. fFraction_FC = 0.48; frac = 2.0 * 0.48 = 0.96
-      !     CN_adj = 0.96 ( CN_AMCII ) + ( 1.0 - 0.96 ) * CN_AMCIII
+      !     CN_adj = 0.96 ( CN_ARCII ) + ( 1.0 - 0.96 ) * CN_ARCIII
       !
       frac = fFraction_FC / 0.5_c_float
 
-      CN_adj = CN_AMCIII(iLanduseIndex, iSoilsIndex) * ( 1.0_c_float - frac ) &
-                + CN_AMCII(iLanduseIndex, iSoilsIndex) * frac 
+      CN_adj = CN_ARCI(iLanduseIndex, iSoilsIndex) * ( 1.0_c_float - frac ) &
+                + CN_ARCII(iLanduseIndex, iSoilsIndex) * frac 
 
     else
 
-      CN_adj = CN_AMCII(iLanduseIndex, iSoilsIndex)
+      CN_adj = CN_ARCII(iLanduseIndex, iSoilsIndex)
 
     endif  
 
@@ -240,7 +240,7 @@ contains
   !!       and Q. D. Quan. “Runoff Curve Number Method: Examination of the Initial Abstraction Ratio.”
   !!       In Conference Proceeding Paper, World Water and Environmental Resources Congress, 2003.
   elemental function runoff_curve_number_calculate(iLanduseIndex, iSoilsIndex, fSoilStorage, fSoilStorage_Max, &
-                  fInflow, fCFGI )   result(fInfiltration)
+                  fInflow, fCFGI )   result(fRunoff)
 
     integer (kind=c_int), intent(in)  :: iLanduseIndex
     integer (kind=c_int), intent(in)  :: iSoilsIndex
@@ -248,13 +248,12 @@ contains
     real (kind=c_float), intent(in)   :: fSoilStorage_Max
     real (kind=c_float), intent(in)   :: fInflow
     real (kind=c_float), intent(in)   :: fCFGI
-    real (kind=c_float)               :: fInfiltration
+    real (kind=c_float)               :: fRunoff
     
     ! [ LOCALS ]
     real (kind=c_float) :: CN_05
     real (kind=c_float) :: S
     real (kind=c_float) :: CN_adj
-    real (kind=c_float) :: fRunoff
 
     CN_adj = update_curve_number_fn( iLanduseIndex, iSoilsIndex, fSoilStorage, &
                           fSoilStorage_Max, fCFGI )
@@ -274,9 +273,6 @@ contains
     else
       fRunoff = 0.0_c_float
     end if
-
-    fInfiltration = max( 0.0_c_float, fInflow - fRunoff )
-
 
   end function runoff_curve_number_calculate
 
