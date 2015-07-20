@@ -1,4 +1,4 @@
-# Examples {#model_application}
+# Example Applications {#example_applications}
 
 Accurate estimates of the spatial and temporal distribution of recharge are important for many types of hydrologic assessments, including those that concern water-quality protection, streamflow and riparian ecosystem management, aquifer replenishment, groundwater-flow modeling, and contaminant transport; these recharge estimates are often key to understanding the effects of development in urban, industrial, and agricultural regions. With increasing demand for hydrologic assessments in support of management decisions comes an increased need for practical methods to quantify recharge rates and delineate zones of similar recharge @cite scanlon_choosing_2002.
 

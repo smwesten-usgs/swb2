@@ -7,12 +7,6 @@ $recharge = (rainfall + snowmelt + inflow) - (interception + outflow + ET) - \De
 
 Each of the water-budget components given in equation ~\ref{eq:swb_mass_bal} is handled by one or more modules within the SWB model. Specific water-balance components are discussed briefly below.
 
-$E = m{c^2}$
-
-$recharge = \underbrace {\left( {rainfall + snowmelt + fog} \right)}_{sources}$
-
-$recharge = \underbrace {\left( {rainfall + snowmelt + fog} \right)}_{sources}$
-
 **rainfall.** Precipitation data are input as daily values either as a time series at a single gage or as a series of daily Arc ASCII or Surfer grid files created by the user. Precipitation-gage records from an unlimited number of sites may be used if the user supplies precipitation as a series of grid files. SWB converts partitions precipitation into rainfall and snowfall components on the basis of daily minimum and maximum air temperatures.
 
 **snowmelt.** Snow is allowed to accumulate and\slash or melt on a daily basis. The daily mean, maximum, and minimum air temperatures are used to determine whether precipitation takes the form of rain or snow. Precipitation that falls on a day when the mean temperature minus one-third the difference between the daily high and low temperatures is less than or equal to the freezing point of water is considered to fall as snow (Dripps and Bradbury, 2005).

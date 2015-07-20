@@ -4,6 +4,7 @@ module growing_degree_day
                             c_size_t, c_ptrdiff_t
 
   use constants_and_conversions
+  use datetime                   , only : mmdd2doy
   use exceptions
   use netcdf4_support
   use parameters
@@ -13,12 +14,13 @@ module growing_degree_day
 
   private
 
-  public :: GDD, GDD_BASE, GDD_MAX
+  public :: GDD, GDD_BASE, GDD_MAX, GDD_RESET_DATE
   public growing_degree_day_calculate, growing_degree_day_initialize
 
   real (kind=c_float), allocatable  :: GDD(:)
   real (kind=c_float), allocatable  :: GDD_BASE(:)
   real (kind=c_float), allocatable  :: GDD_MAX(:) 
+  integer (kind=c_int), allocatable :: GDD_RESET_DATE(:)
   type (T_NETCDF4_FILE), pointer    :: pNCFILE
  
 contains
@@ -36,6 +38,8 @@ contains
     integer (kind=c_int)              :: iStat
     integer (kind=c_int)              :: iIndex
     type (STRING_LIST_T)              :: slList
+    type (STRING_LIST_T)              :: slGDD_Reset
+    character (len=32)                :: sBuf
     real (kind=c_float), allocatable  :: fGDD_Base_(:)
     real (kind=c_float), allocatable  :: fGDD_Max_(:)
     integer (kind=c_int)              :: iNumberOfLanduses
@@ -49,6 +53,16 @@ contains
 
     allocate( GDD_MAX( count( lActive ) ), stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+
+    !> create string list that allows for alternate heading identifiers for the landuse code
+    call slList%append("LU_Code")
+    call slList%append("Landuse_Code") 
+    call slList%append("Landuse_Lookup_Code")
+
+    !> Determine how many landuse codes are present
+    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCode )
+    iNumberOfLanduses = count( iLanduseCode >= 0 )
+    call slList%clear()
 
     call slList%append("GDD_Base_Temp")
     call slList%append("GDD_Base_Temperature")
@@ -65,16 +79,31 @@ contains
     call PARAMS%get_parameters( slKeys=slList, fValues=fGDD_Max_ )
     call slList%clear()
 
-    !> create string list that allows for alternate heading identifiers for the landuse code
-    call slList%append("LU_Code")
-    call slList%append("Landuse_Code") 
-    call slList%append("Landuse_Lookup_Code")
+    call slList%append("GDD_Reset_Date")
+    call slList%append("GDD_Reset")
 
-    !> Determine how many landuse codes are present
-    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCode )
-    iNumberOfLanduses = count( iLanduseCode >= 0 )
+    call PARAMS%get_parameters( slKeys=slList, slValues=slGDD_Reset ) 
     call slList%clear()
 
+    allocate( GDD_RESET_DATE( iNumberOfLanduses ), stat=iStat )
+    call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
+
+
+    if ( slGDD_Reset%count == iNumberOfLanduses ) then
+
+      do iIndex=1, slGDD_Reset%count
+        sBuf = slGDD_Reset%get( iIndex )
+        GDD_RESET_DATE( iIndex ) = mmdd2doy( sBuf )
+      enddo 
+      
+    else
+    
+      ! if no GDD_RESET_DATE found in parameter tables, assign the default: reset GDD at end of calendar year
+      GDD_RESET_DATE = 365_c_int  
+
+    endif   
+
+    
     if ( ubound( fGDD_Max_, 1 ) == iNumberOfLanduses ) then
 
       do iIndex=1, ubound( iLanduseIndex, 1)
@@ -116,10 +145,11 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  elemental subroutine growing_degree_day_calculate( fGDD, fTMean, fT_GDD_Base, fT_GDD_Max )
+  elemental subroutine growing_degree_day_calculate( fGDD, iGDD_Reset_DOY, fTMean, fT_GDD_Base, fT_GDD_Max )
 
     ! [ ARGUMENTS ]
     real (kind=c_float), intent(inout)       :: fGDD
+    integer (kind=c_int), intent(in)         :: iGDD_Reset_DOY
     real (kind=c_float), intent(in)          :: fTMean
     real (kind=c_float), intent(in)          :: fT_GDD_Base
     real (kind=c_float), intent(in)          :: fT_GDD_Max
@@ -127,17 +157,11 @@ contains
     ! [ LOCALS ]
     real (kind=c_float) :: fDelta
 
+    if ( SIM_DT%iDOY >= iGDD_Reset_DOY ) fGDD = 0.0_c_float
+
     fDelta = min(fTMean, fT_GDD_Max) - fT_GDD_Base
 
-    if ( fDelta > 0.0_c_float ) then
-
-      fGDD = fGDD + fDelta
-
-    else
-
-      fGDD = 0.0_c_float
-
-    end if
+    if ( fDelta > 0.0_c_float ) fGDD = fGDD + fDelta
 
   end subroutine growing_degree_day_calculate 
 

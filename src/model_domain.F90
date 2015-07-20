@@ -2193,14 +2193,14 @@ contains
 
   subroutine model_calculate_GDD( this )
 
-    use growing_degree_day, only : GDD, GDD_BASE, GDD_MAX, growing_degree_day_calculate
+    use growing_degree_day, only : GDD, GDD_BASE, GDD_MAX, GDD_RESET_DATE, growing_degree_day_calculate
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    !> Nothing here to see. 
 
-    call growing_degree_day_calculate( fGDD=GDD,                   &
-                                       fTMean=this%tmean,          &
-                                       fT_GDD_Base=GDD_BASE,       &
+    call growing_degree_day_calculate( fGDD=GDD,                                            &
+                                       iGDD_Reset_DOY=GDD_RESET_DATE( this%landuse_index ), &
+                                       fTMean=this%tmean,                                   &
+                                       fT_GDD_Base=GDD_BASE,                                &
                                        fT_GDD_Max=GDD_MAX      )
 
   end subroutine model_calculate_GDD

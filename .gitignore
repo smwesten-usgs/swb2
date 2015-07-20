@@ -20,3 +20,9 @@ doc/doxygen/html/*.*
 share/Redistributables
 share/external
 share/related_codes/Hawaii_Water_Budget_Code/
+doc/src/raw/temp
+doc/src/temp
+doc/src/raw/tempfile.md
+doc/src/raw/tempfile.mde
+doc/src/raw/tempfile_utf.md
+version_control.F90
