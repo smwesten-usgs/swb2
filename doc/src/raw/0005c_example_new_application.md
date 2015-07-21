@@ -1,4 +1,6 @@
-# Soil-Water-Balance Model: hints for using new climate datasets {#example_new_climate_datasets}
+# Example Setup of a New SWB Application {#example_new_application}
+
+[TOC]
 
 New sources of gridded climate data come online every day. Many of these gridded datasets can be used to provide SWB with the needed precipitation and air temperature data. Making use of these new gridded datasets, however, requires the user to research the ways in which these new data were encoded into the netCDF file format. In this section we document the steps taken in order to generate the control file statements needed to make SWB understand a new data source.
 
