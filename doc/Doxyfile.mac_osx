@@ -162,7 +162,7 @@ FULL_PATH_NAMES        = NO
 # will be relative from the directory where doxygen is started.
 # This tag requires that the tag FULL_PATH_NAMES is set to YES.
 
-STRIP_FROM_PATH        = 
+STRIP_FROM_PATH        = /Users/smwesten/Source_Code/swb2
 
 # The STRIP_FROM_INC_PATH tag can be used to strip a user-defined part of the
 # path mentioned in the documentation of a class, which tells the reader which
@@ -704,7 +704,7 @@ LAYOUT_FILE            = src/resources/DoxygenLayout.xml
 # LATEX_BIB_STYLE. To use this feature you need bibtex and perl available in the
 # search path. See also \cite for info how to create references.
 
-CITE_BIB_FILES         = src/resources/Zotero.bib
+CITE_BIB_FILES         = src/resources/Zotero_July_2015.bib
 
 #---------------------------------------------------------------------------
 # Configuration options related to warning and progress messages
@@ -776,8 +776,8 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = ../src \
-                         src \
-                         ../src/proj4
+                         ../src/proj4 \
+                         src/to_doxygen
 
 # This tag can be used to specify the character encoding of the source files
 # that doxygen parses. Internally doxygen uses the UTF-8 encoding. Doxygen uses
@@ -2018,7 +2018,7 @@ SEARCH_INCLUDES        = YES
 # preprocessor.
 # This tag requires that the tag SEARCH_INCLUDES is set to YES.
 
-INCLUDE_PATH           = include/win_x64/gfortran
+INCLUDE_PATH           = ../include/mac_osx/gfortran
 
 # You can use the INCLUDE_FILE_PATTERNS tag to specify one or more wildcard
 # patterns (like *.h and *.hpp) to filter out the header-files in the

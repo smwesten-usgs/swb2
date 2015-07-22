@@ -2,6 +2,22 @@
 
 [TOC]
 
+This section presents development of a complete SWB 2.0 application for the state of Wisconsin. The tasks involved in setting up a new SWB application are:
+
+1. Determine geographic area of application;
+2. Decide on projection system (if any) to be used;
+3. Determine which process options within SWB are most appropriate;
+4. Locate and possibly download the required climate and GIS datasets;
+5. Perform GIS operations, especially if flow routing is to be used;
+5. Examine the metadata for each of the climate and GIS datasets, and add directives to the control file as appropriate.
+6. Create one or more lookup tables to supply all needed parameters for the process options in use.
+
+# Geographic Area of Application
+
+For this example we're targeting the entire state of Wisconsin, USA. ![State of Wisconsin]( ../images/State_of_Wisconsin.png )
+
+# Climate Data
+
 New sources of gridded climate data come online every day. Many of these gridded datasets can be used to provide SWB with the needed precipitation and air temperature data. Making use of these new gridded datasets, however, requires the user to research the ways in which these new data were encoded into the netCDF file format. In this section we document the steps taken in order to generate the control file statements needed to make SWB understand a new data source.
 
 The Global Precipitation Climatology Project (GPCP) generates estimates of precipitation for the entire globe on a daily basis by merging microwave, infrared, and sounder datasets with precipitation gage data. The resolution is 1-degree by 1-degree, far too coarse for many SWB applications, but entirely suitable for this example. The datasets may be found at https://climatedataguide.ucar.edu/climate-data/gpcp-daily-global-precipitation-climatology-project. The remainder of this example assumes that the new netCDF datasets ave been downloaded and placed in a local subdirectory, and that the required software drivers for netCDF files have been downloaded and installed on the user's machine. The netCDF C libraries and utility programs demonstrated in this example may be obtained [here] (http://www.unidata.ucar.edu/software/netcdf/docs/winbin.html).

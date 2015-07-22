@@ -26,3 +26,6 @@ doc/src/raw/tempfile.md
 doc/src/raw/tempfile.mde
 doc/src/raw/tempfile_utf.md
 version_control.F90
+doc/src/raw/temp_junk
+doc/src/to_docx
+doc/src/to_doxygen
