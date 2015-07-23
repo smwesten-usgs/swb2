@@ -8,6 +8,7 @@ module model_domain
   use simulation_datetime
   use snowfall__original
   use string_list, only      : STRING_LIST_T
+  use swb_grid
   use parameters, only       : PARAMS, PARAMS_DICT 
   use netcdf4_support, only  : NC_FILL_FLOAT
   implicit none
@@ -41,6 +42,7 @@ module model_domain
 
     integer (kind=c_int), allocatable      :: landuse_code(:)
     integer (kind=c_int), allocatable      :: landuse_index(:)
+    integer (kind=c_int), allocatable      :: soil_code(:)
     integer (kind=c_int), allocatable      :: soil_group(:)
     integer (kind=c_int), allocatable      :: num_upslope_connections(:)
     integer (kind=c_int), allocatable      :: sum_upslope_cells(:)
@@ -48,7 +50,7 @@ module model_domain
     real (kind=c_float), allocatable       :: awc(:)
     real (kind=c_float), allocatable       :: gdd(:)
 
-    real (kind=c_float), allocatable       :: rooting_depth(:)
+    real (kind=c_float), allocatable       :: max_rooting_depth(:)
      
     real (kind=c_float), allocatable       :: latitude(:)
     real (kind=c_float), allocatable       :: reference_ET0(:)
@@ -97,6 +99,7 @@ module model_domain
     procedure ( simple_method ), pointer         :: init_irrigation         => model_initialize_irrigation_none
     procedure ( simple_method ), pointer         :: init_direct_recharge  => model_initialize_direct_recharge_none
     procedure ( simple_method ), pointer         :: init_GDD                => model_initialize_GDD_none
+    procedure ( simple_method ), pointer         :: init_AWC                => model_initialize_available_water_content_gridded
 
     procedure ( simple_method ), pointer         :: calc_interception      => model_calculate_interception_bucket
 
@@ -118,6 +121,7 @@ module model_domain
     procedure (simple_method), pointer           :: output_soil_moisture   => model_output_irrigation_none
     procedure (simple_method), pointer           :: output_irrigation      => model_output_irrigation_none
 
+    procedure ( simple_method ), pointer         :: read_awc_data           => model_read_available_water_content_gridded
     procedure ( simple_method ), pointer         :: get_precipitation_data => model_get_precip_normal
     procedure ( simple_method ), pointer         :: get_minimum_air_temperature_data                                       &     
                                                                            => model_get_minimum_air_temperature_normal
@@ -149,11 +153,8 @@ module model_domain
     procedure :: calculate_snow_mass_balance_sub
     procedure :: calculate_soil_mass_balance_sub
 
-    procedure :: read_in_available_water_content_sub
-    generic   :: get_available_water_content => read_in_available_water_content_sub
-
     procedure :: read_in_land_use_sub
-    generic   :: get_land_use => read_in_land_use_sub
+    generic   :: read_land_use_codes => read_in_land_use_sub
 
     procedure :: read_in_soil_groups_sub
     generic   :: get_soil_groups => read_in_soil_groups_sub
@@ -161,11 +162,8 @@ module model_domain
     procedure :: get_climate_data
     procedure :: write_variables_to_netcdf
 
-    procedure :: initialize_available_water_content_sub
-    generic   :: initialize_available_water_content => initialize_available_water_content_sub
-
-    procedure :: initialize_soil_layers_sub
-    generic   :: initialize_soil_layers => initialize_soil_layers_sub
+    procedure :: initialize_root_zone_depths_sub
+    generic   :: initialize_root_zone_depths => initialize_root_zone_depths_sub
 
     procedure :: initialize_methods_sub
     generic   :: initialize_methods => initialize_methods_sub
@@ -220,6 +218,8 @@ module model_domain
   type (NETCDF_FILE_COLLECTION_T), allocatable, public :: OUTPUT(:)
 
   real (kind=c_float), allocatable  :: MAX_ROOTING_DEPTH(:,:)
+
+  type (GENERAL_GRID_T), pointer    :: pROOTING_DEPTH
 
   type (GENERAL_GRID_T), pointer    :: pCOORD_GRD
 
@@ -316,12 +316,14 @@ contains
     allocate( this%potential_recharge(iCount), stat=iStat(25) )
     allocate( this%fog(iCount), stat=iStat(26) )
     allocate( this%irrigation(iCount), stat=iStat(27) )
-    allocate( this%rooting_depth(iCount), stat=iStat(28) )
+    allocate( this%max_rooting_depth(iCount), stat=iStat(28) )
     allocate( this%index_order(iCount), stat=iStat(29) )
     allocate( this%gdd(iCount), stat=iStat(30) )
     allocate( this%runoff_outside( iCount ), stat=iStat(31) )
 
     if ( any( iStat /= 0 ) )  call die("Problem allocating memory", __FILE__, __LINE__)
+
+    this%max_rooting_depth = pack( pROOTING_DEPTH%rData, this%active )
 
   end subroutine initialize_arrays_sub
 
@@ -473,6 +475,8 @@ contains
   
   subroutine set_inactive_cells_sub(this)
 
+    use awc__table_values, only  : AVAILABLE_WATER_CONTENT
+
     class (MODEL_DOMAIN_T), intent(inout)   :: this
     type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
     type (DATA_CATALOG_ENTRY_T), pointer :: pLULC      
@@ -480,7 +484,7 @@ contains
 
 
     pLULC => DAT%find("LAND_USE")
-    pHSG => DAT%find("SOILS_GROUP")
+    pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
     pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
     
     if ( .not. associated(pHSG) ) &
@@ -492,14 +496,14 @@ contains
     if ( .not. allocated(pHSG%pGrdBase%iData) ) &
       call die("INTERNAL PROGRAMMING ERROR: attempted use of UNALLOCATED variable", __FILE__, __LINE__)
 
-    if ( .not. associated(pAWC) ) &
-      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+!     if ( .not. associated(pAWC) ) &
+!       call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
 
-    if ( .not. associated(pAWC%pGrdBase) ) &
-      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+!     if ( .not. associated(pAWC%pGrdBase) ) &
+!       call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
 
-    if ( .not. allocated(pAWC%pGrdBase%rData) ) &
-      call die("INTERNAL PROGRAMMING ERROR: attempted use of UNALLOCATED variable", __FILE__, __LINE__)
+!     if ( .not. allocated(pAWC%pGrdBase%rData) ) &
+!       call die("INTERNAL PROGRAMMING ERROR: attempted use of UNALLOCATED variable", __FILE__, __LINE__)
 
     if ( .not. associated(pLULC) ) &
       call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
@@ -512,13 +516,32 @@ contains
 
     this%active = .true._c_bool
 
-    where (       ( pHSG%pGrdBase%iData  < 1 )      &
-            .or.  ( pLULC%pGrdBase%iData < 0 )      &
-            .or.  ( pAWC%pGrdBase%rData < 0.0 ) )
+    if ( associated( pAWC) ) then
 
-      this%active = .false._c_bool
+      where (       ( pHSG%pGrdBase%iData  < 1 )      &
+              .or.  ( pLULC%pGrdBase%iData < 0 )      &
+              .or.  ( pAWC%pGrdBase%rData < 0.0 ) )
 
-    end where
+        this%active = .false._c_bool
+
+      end where
+
+    elseif ( allocated( AVAILABLE_WATER_CONTENT ) ) then
+
+      where (       ( pHSG%pGrdBase%iData  < 1 )      &
+              .or.  ( pLULC%pGrdBase%iData < 0 )      &
+              .or.  ( AVAILABLE_WATER_CONTENT < 0.0 ) )
+
+        this%active = .false._c_bool
+
+      end where
+      
+    else
+
+      call die( "Found neither gridded nor tabular data to use in initializing available water capacity.", &
+        __FILE__, __LINE__ )
+
+    endif
 
     call LOGS%write(asCharacter(count(this%active))//" cells are currently active out of a total of " &
       //asCharacter(size(this%active)), iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_ALL)
@@ -553,8 +576,6 @@ contains
     pLULC => DAT%find("LAND_USE")
 
     if ( associated(pLULC) ) then
-
-      ! call pLULC%getvalues()
 
       if (associated( pLULC%pGrdBase) ) then
         this%landuse_code = pack( pLULC%pGrdBase%iData, this%active )
@@ -592,7 +613,7 @@ contains
     enddo    
 
     call LOGS%write("Matches were found between landuse grid value and table value for " &
-      //asCharacter(iCount)//" cells out of a total of "//asCharacter(iIndex)//" active cells.", &
+      //asCharacter(iCount)//" cells out of a total of "//asCharacter(ubound(this%landuse_code,1))//" active cells.", &
       iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_ALL)
 
     if ( count(this%landuse_index < 0) > 0 ) &
@@ -615,7 +636,7 @@ contains
     integer (kind=c_int)                 :: iIndex
     type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
 
-    pHSG => DAT%find("SOILS_GROUP")
+    pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
     
     if ( associated(pHSG) ) then
 
@@ -623,9 +644,9 @@ contains
 
     else
     
-      call warn(sMessage="SOILS_GROUP dataset is flawed or missing.", lFatal=lTRUE,     &
+      call warn(sMessage="HYDROLOGIC_SOILS_GROUP dataset is flawed or missing.", lFatal=lTRUE,     &
         iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"  &
-        //" been ~included in the control file for the SOILS_GROUP dataset.",           &
+        //" been ~included in the control file for the HYDROLOGIC_SOILS_GROUP dataset.",           &
         lEcho = lTRUE )
 
     endif    
@@ -648,6 +669,7 @@ contains
     if ( associated(pLULC) ) then
 
       call pLULC%getvalues()
+      call grid_WriteArcGrid("Landuse_land_cover__as_read_into_SWB.asc", pLULC%pGrdBase )
 
     else
     
@@ -658,37 +680,36 @@ contains
 
     endif    
 
-    call grid_WriteArcGrid("Landuse_land_cover__as_read_into_SWB.asc", pLULC%pGrdBase )
-
   end subroutine read_in_land_use_sub
 
 !--------------------------------------------------------------------------------------------------  
 
-  subroutine read_in_available_water_content_sub( this )
+!   subroutine read_in_available_water_content_sub( this )
 
-    class (MODEL_DOMAIN_T), intent(inout)     :: this
+!     class (MODEL_DOMAIN_T), intent(inout)     :: this
 
-    ! [ LOCALS ]
-    integer (kind=c_int)                 :: iStat
-    integer (kind=c_int)                 :: iIndex
-    type (DATA_CATALOG_ENTRY_T), pointer :: pAWC
+!     ! [ LOCALS ]
+!     integer (kind=c_int)                 :: iStat
+!     integer (kind=c_int)                 :: iIndex
+!     type (DATA_CATALOG_ENTRY_T), pointer :: pAWC
 
-    pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
+!     pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
     
-    if ( associated(pAWC) ) then
+!     if ( associated(pAWC) ) then
 
-      call pAWC%getvalues()
+!       call pAWC%getvalues()
+!       call grid_WriteArcGrid("Available_Water_Content__as_read_in_by_SWB.asc", pAWC%pGrdBase )
 
-    else
+!     else
     
-      call warn(sMessage="AVAILABLE_WATER_CONTENT dataset is flawed or missing.", lFatal=lTRUE,     &
-        iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"              &
-        //" been ~included in the control file for the AVAILABLE_WATER_CONTENT dataset.",           &
-        lEcho = lTRUE )
+!       call warn(sMessage="AVAILABLE_WATER_CONTENT dataset is flawed or missing.", lFatal=lFALSE,    &
+!         iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"              &
+!         //" been ~included in the control file for the AVAILABLE_WATER_CONTENT dataset.",           &
+!         lEcho = lTRUE )
 
-    endif    
+!     endif    
 
-  end subroutine read_in_available_water_content_sub
+!   end subroutine read_in_available_water_content_sub
 
 !--------------------------------------------------------------------------------------------------  
 
@@ -701,7 +722,7 @@ contains
     integer (kind=c_int)                 :: iIndex
     type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
 
-    pHSG => DAT%find("SOILS_GROUP")
+    pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
     
     if ( associated(pHSG) ) then
 
@@ -711,11 +732,11 @@ contains
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif  
     else
-      call die("Attempted use of NULL pointer. Failed to find SOILS_GROUP data element.", &
+      call die("Attempted use of NULL pointer. Failed to find HYDROLOGIC_SOILS_GROUP data element.", &
         __FILE__, __LINE__)
     endif
 
-    call LOGS%write("Soils hydrologic groups as read into SWB data structure", iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_DEBUG)
+    call LOGS%write("Hydrologic soils groups as read into SWB data structure", iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_DEBUG)
 
     do iIndex = 1, maxval(pHSG%pGrdBase%iData)
 
@@ -727,36 +748,6 @@ contains
     call LOGS%write("", iLinesBefore=1, iLogLevel=LOG_DEBUG)
 
   end subroutine initialize_soil_groups_sub
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine initialize_available_water_content_sub( this )
-
-    class (MODEL_DOMAIN_T), intent(inout)     :: this
-
-    ! [ LOCALS ]
-    integer (kind=c_int)                 :: iStat
-    integer (kind=c_int)                 :: iIndex
-    type (DATA_CATALOG_ENTRY_T), pointer :: pAWC
-
-    pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
-    
-    if ( associated(pAWC) ) then
-
-      call pAWC%getvalues()
-
-      if (associated( pAWC%pGrdBase) ) then
-        this%awc = pack( pAWC%pGrdBase%rData, this%active )
-      else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
-      endif  
-    else
-      call die("Attempted use of NULL pointer. Failed to find AVAILABLE_WATER_CONTENT data element.", &
-        __FILE__, __LINE__)
-    endif
-          
-
-  end subroutine initialize_available_water_content_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1136,7 +1127,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine initialize_soil_layers_sub( this )
+  subroutine initialize_root_zone_depths_sub( this )
 
     use strings
     use string_list
@@ -1158,6 +1149,36 @@ contains
     character (len=:), allocatable    :: sText
     real (kind=c_float), allocatable  :: water_capacity(:)
     integer (kind=c_int)              :: iIndex
+    type (GENERAL_GRID_T), pointer    :: pTempGrd
+
+    type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
+    type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
+
+    pLULC => DAT%find("LAND_USE")
+    pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
+    
+    call assert( associated( pLULC), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pLULC", &
+      __FILE__, __LINE__ )
+
+    call assert( associated( pLULC%pGrdBase ),   &
+      "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pLULC%pGrdBase", __FILE__, __LINE__ )
+
+    call assert( allocated( pLULC%pGrdBase%iData ),   &
+      "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pLULC%pGrdBase%iData", __FILE__, __LINE__ )
+
+    call assert( associated( pHSG), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pHSG", &
+      __FILE__, __LINE__ )
+
+    call assert( associated( pHSG%pGrdBase ),      & 
+      "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pHSG%pGrdBase", __FILE__, __LINE__ )
+
+    call assert( allocated( pHSG%pGrdBase%iData ),      & 
+      "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pHSG%pGrdBase%iData", __FILE__, __LINE__ )
+
+
+    pROOTING_DEPTH => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
+        rX0=this%X_ll, rY0=this%Y_ll, &
+        rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
 
     iNumActiveCells = ubound(this%soil_storage_max,1)
 
@@ -1189,8 +1210,6 @@ contains
       MAX_ROOTING_DEPTH(:, iSoilsIndex) = RZ
     enddo  
 
-!     this%awc = pack(pAWC%pGrdBase%rData, this%active)
-
     call LOGS%WRITE( "Landuse Code |  Soils Code  | Number of Matches",              &
       iLogLevel = LOG_DEBUG, lEcho = lFALSE )
     call LOGS%WRITE( "-------------|--------------|------------------- ",            &
@@ -1199,24 +1218,27 @@ contains
     do iSoilsIndex = 1, iNumberOfSoilGroups
       do iLUIndex = 1, iNumberOfLanduses
 
-        call LOGS%WRITE( asCharacter(iLUIndex)//" | "//asCharacter(iSoilsIndex)//" | "//  &
-            asCharacter(count( this%landuse_index == iLUIndex .and. this%soil_group == iSoilsIndex ) ),              &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( asCharacter(iLanduseCodes( iLUIndex) )//" | "//asCharacter(iSoilsIndex)//" | "//    &
+            asCharacter(count( pLULC%pGrdBase%iData == iLanduseCodes( iLUIndex)             &
+                                 .and. pHSG%pGrdBase%iData == iSoilsIndex ) ),              &
+                                 iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
 
-        do iIndex = 1, ubound(this%soil_storage_max, 1)
-    
-          if ( this%landuse_index(iIndex) == iLUIndex .and. this%soil_group(iIndex) == iSoilsIndex ) then
-            this%soil_storage_max(iIndex) = MAX_ROOTING_DEPTH( iLUIndex, iSoilsIndex ) * this%awc(iIndex)
-          endif
+         where ( pLULC%pGrdBase%iData == iLanduseCodes( iLUIndex) .and. pHSG%pGrdBase%iData == iSoilsIndex )
 
-        enddo
+           pROOTING_DEPTH%rData = MAX_ROOTING_DEPTH( iLUIndex, iSoilsIndex )
+
+         endwhere 
+
       enddo
+
     enddo
 
     call slList%clear()
 
-  end subroutine initialize_soil_layers_sub
+    call grid_WriteArcGrid("Maximum_rooting_depth.asc", pROOTING_DEPTH )
+
+  end subroutine initialize_root_zone_depths_sub
 
   !------------------------------------------------------------------------------------------------
 
@@ -1392,6 +1414,28 @@ contains
 
       endif
 
+    elseif ( sCmdText .contains. "AVAILABLE_WATER_CONTENT" ) then
+
+      if ( ( sMethodName .strequal. "TABLE" ) ) then
+
+        this%init_awc => model_initialize_available_water_content_table
+        this%read_awc_data => model_read_available_water_content_table
+
+        call LOGS%WRITE( "==> TABLE method for populating AVAILABLE_WATER_CONTENT selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
+      elseif ( ( sMethodName .strequal. "GRID" ) .or. ( sMethodName .strequal. "GRIDDED" ) ) then
+
+        this%init_awc => model_initialize_available_water_content_gridded
+        this%read_awc_data => model_read_available_water_content_gridded
+
+        call LOGS%WRITE( "==> GRIDDED VALUES method for populating AVAILABLE_WATER_CONTENT selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
+      else
+
+        call warn("Your control file specifies an unknown or unsupported AVAILABLE_WATER_CONTENT method.", &
+            lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+
+      endif
 
     elseif ( sCmdText .contains. "FLOW_ROUTING" ) then
 
@@ -2139,6 +2183,77 @@ contains
                                 lActive=this%active )
 
   end subroutine model_calculate_irrigation
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_read_available_water_content_gridded( this )
+
+    use awc__gridded_values
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call awc_gridded_values_read( )
+
+  end subroutine model_read_available_water_content_gridded  
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_available_water_content_gridded( this )
+
+    use awc__gridded_values
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call awc_gridded_values_initialize( lActive=this%active,  &
+                                        fAWC=this%awc )
+
+  end subroutine model_initialize_available_water_content_gridded  
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_read_available_water_content_table( this )
+
+    use awc__table_values
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call assert( associated( pROOTING_DEPTH ), "INTERNAL PROGRAMING ERROR -- Null Pointer detected", &
+      __FILE__, __LINE__ )
+
+    call awc_table_values_read( fRooting_Depth=pROOTING_DEPTH%rData )
+
+  end subroutine model_read_available_water_content_table  
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_available_water_content_table( this )
+
+    use awc__table_values
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    ! [ LOCALS ]
+    integer (kind=c_int)            :: iStat
+    type (GENERAL_GRID_T), pointer  :: pTempGrd
+
+    pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
+      rX0=this%X_ll, rY0=this%Y_ll, &
+      rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+
+
+    allocate ( this%soil_code (count( this%active ) ), stat=iStat )
+
+    call awc_table_values_initialize( lActive=this%active,                        &
+                                      fAWC=this%awc,                              &
+                                      iSoils_Code=this%soil_code )
+
+    pTempGrd%rData = unpack( this%awc, this%active, this%dont_care )
+
+    call grid_WriteArcGrid( sFilename="Available_water_content__as_calculated_inches_per_foot.asc", pGrd=pTempGrd )
+
+    call grid_Destroy( pTempGrd )
+
+  end subroutine model_initialize_available_water_content_table  
 
 !--------------------------------------------------------------------------------------------------
 

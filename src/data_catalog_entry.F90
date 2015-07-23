@@ -244,8 +244,6 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  !> todo Why are we creating full-blown pGrdBase object for a grid of constant value?
-
   subroutine initialize_constant_real_data_object_sub( this, &
     sDescription, &
     rConstant )

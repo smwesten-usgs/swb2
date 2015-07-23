@@ -4,6 +4,8 @@ if(TARGET__SWB_EXECUTABLE)
   add_executable(swb2
             #cell_class.F90
             #cell_collection.F90
+            awc__gridded_values.F90
+            awc__table_values.F90
             constants_and_conversions.F90
             continuous_frozen_ground_index.F90
             data_catalog.F90
@@ -224,6 +226,8 @@ endif()
 if(TARGET__SWB_LIBRARY)
 
   add_library(swb2lib SHARED
+            awc__gridded_values.F90
+            awc__table_values.F90
             #cell_class.F90
             #cell_collection.F90
             constants_and_conversions.F90

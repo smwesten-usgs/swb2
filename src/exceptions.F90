@@ -169,7 +169,7 @@ contains
 
 !------------------------------------------------------------------------------------------------
 
-  subroutine assert_1bit(lCondition, sMessage, sCalledBy, iCalledByLine, sModule, iLine)
+  subroutine assert_1bit(lCondition, sMessage, sModule, iLine, sCalledBy, iCalledByLine )
 
     logical (kind=c_bool), intent(in)           :: lCondition
     character (len=*), intent(in)               :: sMessage
@@ -198,7 +198,7 @@ contains
 
 !------------------------------------------------------------------------------------------------
 
-  subroutine assert_4bit(lCondition, sMessage, sCalledBy, iCalledByLine, sModule, iLine)
+  subroutine assert_4bit(lCondition, sMessage, sModule, iLine, sCalledBy, iCalledByLine )
 
     logical (kind=4), intent(in)                :: lCondition
     character (len=*), intent(in)               :: sMessage

@@ -33,12 +33,12 @@ module model_initialize
     logical (kind=c_bool)  :: lOptional
   end type METHODS_LIST_T
 
-  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(29) = &
+  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(30) = &
 
     [ GRIDDED_DATASETS_T("PRECIPITATION                ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("TMIN                         ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("TMAX                         ", lFALSE, DATATYPE_FLOAT ),     &
-      GRIDDED_DATASETS_T("AVAILABLE_WATER_CONTENT      ", lFALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("AVAILABLE_WATER_CONTENT      ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("POTENTIAL_ET                 ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("SOLAR_RADIATION              ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("WIND_SPEED                   ", lTRUE, DATATYPE_FLOAT ),      &
@@ -46,7 +46,8 @@ module model_initialize
       GRIDDED_DATASETS_T("FLOW_DIRECTION               ", lTRUE, DATATYPE_INT),         &
       GRIDDED_DATASETS_T("FOG_RATIO                    ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("LAND_USE                     ", lFALSE, DATATYPE_INT ),       &
-      GRIDDED_DATASETS_T("SOILS_GROUP                  ", lFALSE, DATATYPE_INT ),       &
+      GRIDDED_DATASETS_T("SOILS_CODE                   ", lTRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("HYDROLOGIC_SOILS_GROUP       ", lFALSE, DATATYPE_INT ),       &
       GRIDDED_DATASETS_T("INITIAL_PERCENT_SOIL_MOISTURE", lFALSE, DATATYPE_FLOAT),      &
       GRIDDED_DATASETS_T("INITIAL_SNOW_COVER_STORAGE   ", lFALSE, DATATYPE_FLOAT),      &
       GRIDDED_DATASETS_T("CANOPY_COVER_FRACTION        ", lTRUE, DATATYPE_FLOAT ),      &
@@ -65,12 +66,13 @@ module model_initialize
       GRIDDED_DATASETS_T("IRRIGATION_MASK              ", lTRUE, DATATYPE_INT),         &                
       GRIDDED_DATASETS_T("RELATIVE_HUMIDITY            ", lTRUE, DATATYPE_FLOAT )   ]
 
-  type (METHODS_LIST_T), parameter  :: KNOWN_METHODS(9) =   &
+  type (METHODS_LIST_T), parameter  :: KNOWN_METHODS(10) =   &
     [ METHODS_LIST_T("INTERCEPTION           ", lFALSE),    &
       METHODS_LIST_T("EVAPOTRANSPIRATION     ", lFALSE),    &
       METHODS_LIST_T("RUNOFF                 ", lFALSE),    &
       METHODS_LIST_T("PRECIPITATION          ", lFALSE),    &
       METHODS_LIST_T("FOG                    ", lTRUE),     &
+      METHODS_LIST_T("AVAILABLE_WATER_CONTENT", lTRUE),     &
       METHODS_LIST_T("SOIL_MOISTURE          ", lFALSE),    &
       METHODS_LIST_T("IRRIGATION             ", lTRUE),     &
       METHODS_LIST_T("DIRECT_RECHARGE        ", lTRUE),     &
@@ -532,11 +534,13 @@ contains
 
   subroutine initialize_soils_landuse_awc_flowdir_values()
 
-      call MODEL%get_land_use()
-
-      call MODEL%get_available_water_content()
+      call MODEL%read_land_use_codes()
 
       call MODEL%get_soil_groups()
+
+      call MODEL%initialize_root_zone_depths()
+
+      call MODEL%read_AWC_data()
 
       call MODEL%set_inactive_cells()
 
@@ -544,13 +548,11 @@ contains
 
       call MODEL%initialize_latitude()
 
+      call MODEL%init_AWC()
+
       call MODEL%initialize_soil_groups()
 
       call MODEL%initialize_landuse()
-
-      call MODEL%initialize_available_water_content()
-
-      call MODEL%initialize_soil_layers()
 
   end subroutine initialize_soils_landuse_awc_flowdir_values
 
