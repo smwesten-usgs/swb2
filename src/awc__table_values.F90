@@ -53,14 +53,17 @@ contains
     integer (kind=c_int)               :: iNumberOfSoilsComponentFractions     
 
     real (kind=c_float)                :: fTemp_AWC               
+    real (kind=c_float)                :: fDepthOfDeepestHorizon
+    real (kind=c_float)                :: fFinal_AWC
+    integer (kind=c_int)               :: iDeepestSoilHorizon
+    logical (kind=c_bool)              :: lFirst
 
     type (STRING_LIST_T)               :: slList
     integer (kind=c_int)               :: iStat
-    integer (kind=c_int)               :: iIndex
-    integer (kind=c_int)               :: iIndex2
+    integer (kind=c_int)               :: iIndex, iIndex2
     integer (kind=c_int)               :: iIndex_x, iIndex_y
     real (kind=c_float)                :: fRooting_Depth_inches
-
+    real (kind=c_float)                :: fSoil_Thickness_Total
 
    call slList%append("LU_Code")
    call slList%append("Landuse_Code")
@@ -160,20 +163,47 @@ contains
         fRooting_Depth_inches = fRooting_Depth( iIndex_x, iIndex_y ) * 12.0_c_float
 
         fTemp_AWC = 0.0_c_float
+        lFirst = lTRUE
+        iDeepestSoilHorizon = 0_c_int
+        fDepthOfDeepestHorizon = 0.0_c_float
+        fFinal_AWC = 0.0_c_float
 
-        do iIndex2=1, iNumberOfSoils
-          if ( pSOILS_CODE_GRID%pGrdBase%iData( iIndex_x, iIndex_y ) == iSoils_Table_Code( iIndex2 ) ) then
-            if ( fRooting_Depth_inches < fSoils_Top_Depth( iIndex2 ) ) cycle
-            if ( fRooting_Depth_inches > fSoils_Bottom_Depth( iIndex2 ) ) then
+        do iIndex=1, iNumberOfSoils
+          if ( pSOILS_CODE_GRID%pGrdBase%iData( iIndex_x, iIndex_y ) == iSoils_Table_Code( iIndex ) ) then
 
-              fTemp_AWC = fTemp_AWC + fSoils_AWC( iIndex2 ) * fSoils_Component_Fraction( iIndex2 )     &
-                                    * fSoils_Horizon_Thickness( iIndex2 )
+            ! look for current soil code; calculate the component-weighted mean AWC for the deepest horizon
+            if ( lFirst ) then
 
-            elseif ( fRooting_Depth_inches >= fSoils_Top_Depth( iIndex2 )                    &
-                   .and. fRooting_Depth_inches <= fSoils_Bottom_Depth( iIndex2 ) ) then
+              lFirst = lFALSE
+
+              do iIndex2=iIndex, iNumberOfSoils
+                iDeepestSoilHorizon = max( iDeepestSoilHorizon, iSoils_Horizons( iIndex2 ) )
+              enddo
+
+              do iIndex2=iIndex, iNumberOfSoils
+                if ( iDeepestSoilHorizon == iSoils_Horizons( iIndex2) )   &
+                  fFinal_AWC = fFinal_AWC + fSoils_AWC( iIndex2 ) * fSoils_Component_Fraction( iIndex2 )
+                  fDepthOfDeepestHorizon = fSoils_Bottom_Depth( iIndex2 )
+              enddo
+
+            endif  
+
+            ! rooting depth never reaches to this horizon; ignore
+            if ( fRooting_Depth_inches < fSoils_Top_Depth( iIndex ) ) cycle
+
+            ! rooting depth exceeds lower bound of current horizon; entire horizon
+            ! depth used as weight factor
+            if ( fRooting_Depth_inches > fSoils_Bottom_Depth( iIndex ) ) then
+
+              fTemp_AWC = fTemp_AWC + fSoils_AWC( iIndex ) * fSoils_Component_Fraction( iIndex )     &
+                                    * fSoils_Horizon_Thickness( iIndex )
+
+            ! rooting depth falls in between the upper and lower bounds of the current soil horizon
+            elseif ( fRooting_Depth_inches >= fSoils_Top_Depth( iIndex )                    &
+                   .and. fRooting_Depth_inches <= fSoils_Bottom_Depth( iIndex ) ) then
             
-              fTemp_AWC = fTemp_AWC + fSoils_AWC( iIndex2 ) * fSoils_Component_Fraction( iIndex2 )     &
-                                    * ( fSoils_Bottom_Depth( iIndex2 ) - fRooting_Depth_inches )
+              fTemp_AWC = fTemp_AWC + fSoils_AWC( iIndex ) * fSoils_Component_Fraction( iIndex )     &
+                                    * ( fRooting_Depth_inches - fSoils_Top_Depth( iIndex ) )
 
             endif                         
 
@@ -181,7 +211,17 @@ contains
 
         enddo  
 
-        fTemp_AWC = fTemp_AWC / fRooting_Depth_inches  ! divide by total rooting depth to obtain weighted average
+        ! if the soil data from the table doesn't extend to the rooting depth, extrapolate
+        if (fRooting_Depth_inches > fDepthOfDeepestHorizon )  &
+
+              fTemp_AWC = fTemp_AWC + fFinal_AWC * ( fRooting_Depth_inches - fDepthOfDeepestHorizon )
+
+
+        if ( fRooting_Depth_inches > 0.0_c_float ) then
+          fTemp_AWC = fTemp_AWC / fRooting_Depth_inches  ! divide by total rooting depth to obtain weighted average
+        else
+          fTemp_AWC = 0.0_c_float
+        endif    
 
         ! table values are in/in; multiply by 12 in/ft to return AWC in inches/foot
         AVAILABLE_WATER_CONTENT(iIndex_x, iIndex_y) = fTemp_AWC * 12.0_c_float 
@@ -189,7 +229,38 @@ contains
       enddo
 
     enddo
-    
+ 
+
+! Original HWB code...
+
+! c........compute area-weighted soil-moisture storage capacity and account for
+! c        depth-varying AWC
+!          smca(i,k)=0.
+!          do 420 j=1,nseq(i)
+!          do 400 l=1,nlay(i,j)
+!             if(z.ge.zt(i,j,l).and.z.le.zb(i,j,l))then
+! c...........bottom of root zone is within current layer
+!                smca(i,k)=smca(i,k)+pct(i,j,l)*awc(i,j,l)*(z-zt(i,j,l))
+!             elseif(z.gt.zb(i,j,l).and.l.eq.nlay(i,j))then
+! c...........bottom of root zone is below current layer, which is the
+! c           bottom layer; extrapolate bottom layer down to root depth
+!                smca(i,k)=smca(i,k)+pct(i,j,l)*awc(i,j,l)*(z-zt(i,j,l))
+!             elseif(z.gt.zb(i,j,l).and.l.lt.nlay(i,j))then
+! c...........bottom of root zone is below current layer, which is not the
+! c           bottom layer; include entire current layer
+!                smca(i,k)=smca(i,k)+pct(i,j,l)*awc(i,j,l)*
+!      1         (zb(i,j,l)-zt(i,j,l))
+! c...........exit if bottom of root zone is above current layer
+!             elseif(z.lt.zt(i,j,l))then
+!                goto 440
+!             endif
+!  400     continue
+!  420     continue
+!  440     continue
+
+
+
+
   end subroutine awc_table_values_read
 
 !--------------------------------------------------------------------------------------------------
