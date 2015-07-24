@@ -176,12 +176,16 @@ contains
 
               lFirst = lFALSE
 
+              ! find deepest soil horizon for the current soils code
               do iIndex2=iIndex, iNumberOfSoils
-                iDeepestSoilHorizon = max( iDeepestSoilHorizon, iSoils_Horizons( iIndex2 ) )
+                if ( pSOILS_CODE_GRID%pGrdBase%iData( iIndex_x, iIndex_y ) == iSoils_Table_Code( iIndex2 ) )  &
+                  iDeepestSoilHorizon = max( iDeepestSoilHorizon, iSoils_Horizons( iIndex2 ) )
               enddo
 
+              ! if we're in the deepest horizon of the current soils code, calculate the composite averaged AWC
               do iIndex2=iIndex, iNumberOfSoils
-                if ( iDeepestSoilHorizon == iSoils_Horizons( iIndex2) )   &
+                if ( ( pSOILS_CODE_GRID%pGrdBase%iData( iIndex_x, iIndex_y ) == iSoils_Table_Code( iIndex2 ) )  &
+                  .and. ( iDeepestSoilHorizon == iSoils_Horizons( iIndex2) ) )   &
                   fFinal_AWC = fFinal_AWC + fSoils_AWC( iIndex2 ) * fSoils_Component_Fraction( iIndex2 )
                   fDepthOfDeepestHorizon = fSoils_Bottom_Depth( iIndex2 )
               enddo
