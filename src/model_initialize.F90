@@ -550,6 +550,8 @@ contains
 
       call MODEL%init_AWC()
 
+      call MODEL%initialize_soil_storage_max()
+
       call MODEL%initialize_soil_groups()
 
       call MODEL%initialize_landuse()

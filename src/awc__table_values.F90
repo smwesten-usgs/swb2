@@ -73,6 +73,8 @@ contains
 
    call slList%append("Soils_Code")
    call slList%append("Soils_Lookup_Code")
+   call slList%append("Soil_Code")
+   call slList%append("Soil_Lookup_Code")
 
    call PARAMS%get_parameters( slKeys=slList, iValues=iSoils_Table_Code )
    iNumberOfSoils = count( iSoils_Table_Code >= 0 )
@@ -80,12 +82,15 @@ contains
 
    call slList%append("Soils_Component")
    call slList%append("Soils_Component_Number")
+   call slList%append("Soil_Component")
+   call slList%append("Soil_Component_Number")
 
    call PARAMS%get_parameters( slKeys=slList, iValues=iSoils_Components )
    iNumberOfSoilsComponents = count( iSoils_Components >= 0 )
    call slList%clear()
 
    call slList%append("Soils_Top_Depth")
+   call slList%append("Soil_Top_Depth")   
    call slList%append("Soils_Z_Top")
    call slList%append("Soils_Top_of_Horizon")
 
@@ -94,6 +99,7 @@ contains
    call slList%clear()
 
    call slList%append("Soils_Bottom_Depth")
+   call slList%append("Soil_Bottom_Depth")   
    call slList%append("Soils_Z_Bottom")
    call slList%append("Soils_Bottom_of_Horizon")
 
@@ -103,12 +109,15 @@ contains
 
    call slList%append("Soils_Horizon")
    call slList%append("Soils_Horizon_Number")
+   call slList%append("Soil_Horizon")
+   call slList%append("Soil_Horizon_Number")
 
    call PARAMS%get_parameters( slKeys=slList, iValues=iSoils_Horizons )
    iNumberOfSoilsHorizons = count( iSoils_Horizons >= 0 )
    call slList%clear()
 
    call slList%append("Soils_Component_Fraction")
+   call slList%append("Soil_Component_Fraction")
 
    call PARAMS%get_parameters( slKeys=slList, fValues=fSoils_Component_Fraction )
    iNumberOfSoilsComponentFractions = count( fSoils_Component_Fraction >= 0 )
@@ -117,12 +126,17 @@ contains
 
    call slList%append("Soils_Available_Water_Content")
    call slList%append("Soils_AWC")
+   call slList%append("Soil_Available_Water_Content")
+   call slList%append("Soil_AWC")
    call slList%append("Available_Water_Content") 
    call slList%append("AWC")
  
    call PARAMS%get_parameters( slKeys=slList, fValues=fSoils_AWC )
    iNumberOfSoilsAWC = count( fSoils_AWC >= 0 )
    call slList%clear()
+
+   !> @todo Need a *LOT* more data validation and guard code here to prevent execution in the case
+   !! where only some data fields are found, or are only partially populated.
 
     ! locate the data structure associated with the gridded rainfall zone entries
     pSOILS_CODE_GRID => DAT%find("SOILS_CODE")
@@ -135,13 +149,15 @@ contains
 
     allocate(AVAILABLE_WATER_CONTENT( ubound(fRooting_Depth, 1), ubound(fRooting_Depth, 2) ), stat=iStat )
 
+    ! this should be in units of inches
     fSoils_Horizon_Thickness = fSoils_Bottom_Depth - fSoils_Top_Depth
 
     do iIndex_x=lbound( fRooting_Depth, 1 ), ubound( fRooting_Depth, 1 )
 
       do iIndex_y=lbound( fRooting_Depth, 2 ), ubound( fRooting_Depth, 2 )
 
-        fRooting_Depth_inches = fRooting_Depth( iIndex_x, iIndex_y ) / 12.0_c_float
+        ! rooting depth in feet * 12 in/ft = rooting depth in inches
+        fRooting_Depth_inches = fRooting_Depth( iIndex_x, iIndex_y ) * 12.0_c_float
 
         fTemp_AWC = 0.0_c_float
 
@@ -166,7 +182,9 @@ contains
         enddo  
 
         fTemp_AWC = fTemp_AWC / fRooting_Depth_inches  ! divide by total rooting depth to obtain weighted average
-        AVAILABLE_WATER_CONTENT(iIndex_x, iIndex_y) = fTemp_AWC / 12.0_c_float      ! need to return AWC in inches per foot of rooting depth
+
+        ! table values are in/in; multiply by 12 in/ft to return AWC in inches/foot
+        AVAILABLE_WATER_CONTENT(iIndex_x, iIndex_y) = fTemp_AWC * 12.0_c_float 
  
       enddo
 

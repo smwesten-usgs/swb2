@@ -317,14 +317,6 @@ contains
         KCB_METHOD( iIndex ) = KCB_METHOD_FAO56
       endif
 
-      print *, "============================================= "
-      print *, iIndex
-      print *, GROWTH_STAGE_DOY(:, iIndex)
-      print *, " "
-      print *, KCB( KCB_INI:KCB_MIN, iIndex )
-      print *, " "
-
-
       if ( KCB_METHOD( iIndex ) < 0 )  &
         call warn("There are missing day-of-year (L_ini, L_dev, L_mid, L_late), " &
           //"growing degree-day ~(GDD_plant, GDD_ini, GDD_dev, GDD_mid, GDD_late)," &

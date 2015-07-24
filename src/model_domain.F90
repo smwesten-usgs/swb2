@@ -168,6 +168,9 @@ module model_domain
     procedure :: initialize_methods_sub
     generic   :: initialize_methods => initialize_methods_sub
 
+    procedure :: initialize_soil_storage_max_sub
+    generic   :: initialize_soil_storage_max => initialize_soil_storage_max_sub
+
     procedure :: initialize_netcdf_output_sub
     generic   :: initialize_netcdf_output => initialize_netcdf_output_sub
 
@@ -748,6 +751,29 @@ contains
     call LOGS%write("", iLinesBefore=1, iLogLevel=LOG_DEBUG)
 
   end subroutine initialize_soil_groups_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine initialize_soil_storage_max_sub( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)     :: this
+
+    ! [ LOCALS ]
+    type ( GENERAL_GRID_T ), pointer :: pTempGrd
+
+    this%soil_storage_max = this%max_rooting_depth * this%awc
+
+    pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
+        rX0=this%X_ll, rY0=this%Y_ll, &
+        rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+
+    pTempGrd%rData = unpack( this%soil_storage_max, this%active, this%dont_care )
+
+    call grid_WriteArcGrid( sFilename="Soil_Storage_Maximum__as_calculated_inches.asc", pGrd=pTempGrd )
+
+    call grid_Destroy( pTempGrd )
+
+  end subroutine initialize_soil_storage_max_sub  
 
 !--------------------------------------------------------------------------------------------------
 
