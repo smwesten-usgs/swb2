@@ -2230,8 +2230,23 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
+    ! [ LOCALS ]
+    type (GENERAL_GRID_T), pointer  :: pTempGrd
+
+    pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
+      rX0=this%X_ll, rY0=this%Y_ll, &
+      rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+
+
     call awc_gridded_values_initialize( lActive=this%active,  &
                                         fAWC=this%awc )
+
+    pTempGrd%rData = unpack( this%awc, this%active, this%dont_care )
+
+    call grid_WriteArcGrid( sFilename="Available_water_content__as_read_in_inches_per_foot.asc", pGrd=pTempGrd )
+
+    call grid_Destroy( pTempGrd )
+
 
   end subroutine model_initialize_available_water_content_gridded  
 

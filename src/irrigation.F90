@@ -293,15 +293,13 @@ contains
       if ( ( 1.0_c_float - fSoilStorage( iIndex ) / fSoilStorage_Max( iIndex ) )                           &
              > MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex( iIndex ) ) ) then
 
+        fIrrigationAmount( iIndex ) = ( fSoilStorage_Max( iIndex ) - fSoilStorage( iIndex ) ) &
+                                       * IRRIGATION_MASK( iIndex ) / fEfficiency
 
-      fIrrigationAmount( iIndex ) = ( fSoilStorage_Max( iIndex ) - fSoilStorage( iIndex ) ) &
-                                     * IRRIGATION_MASK( iIndex ) / fEfficiency
-
-      IRRIGATION_FROM_GROUNDWATER( iIndex ) = fIrrigationAmount( iIndex )          &
-                                      * FRACTION_OF_IRRIGATION_FROM_GW( iLanduseIndex( iIndex ) )
-      IRRIGATION_FROM_SURFACE_WATER( iIndex ) = fIrrigationAmount( iIndex )  &
-                                                 - IRRIGATION_FROM_GROUNDWATER( iIndex )
-
+        IRRIGATION_FROM_GROUNDWATER( iIndex ) = fIrrigationAmount( iIndex )          &
+                                        * FRACTION_OF_IRRIGATION_FROM_GW( iLanduseIndex( iIndex ) )
+        IRRIGATION_FROM_SURFACE_WATER( iIndex ) = fIrrigationAmount( iIndex )  &
+                                                   - IRRIGATION_FROM_GROUNDWATER( iIndex )
       endif
 
     enddo
