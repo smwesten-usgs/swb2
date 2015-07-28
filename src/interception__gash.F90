@@ -46,9 +46,10 @@ contains
   !!
   !! Read in a canopy cover fraction and rainfall-to-evaporation ratio grids
   !!
-  subroutine interception_gash_initialize( lActive, iLandUseIndex )
+  subroutine interception_gash_initialize( lActive, fCanopy_Cover_Fraction, iLandUseIndex )
 
     logical (kind=c_bool), intent(in)    :: lActive(:,:)
+    real (kind=c_float), intent(in)      :: fCanopy_Cover_Fraction(:)
     integer (kind=c_int), intent(in)     :: iLanduseIndex(:)
 
     ! [ LOCALS ]
@@ -63,28 +64,13 @@ contains
 
     iCount = count( lActive )
 
-    allocate( CANOPY_COVER_FRACTION( iCount ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
-
     allocate( EVAPORATION_TO_RAINFALL_RATIO( iCount ), stat=iStat )
     call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
-
-    ! locate the data structure associated with the gridded canopy cover fraction
-    pCANOPY_COVER_FRACTION => DAT%find("CANOPY_COVER_FRACTION")
-    if ( .not. associated(pCANOPY_COVER_FRACTION) ) &
-        call die("A CANOPY_COVER_FRACTION grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
 
     ! locate the data structure associated with the gridded evaporation to rainfall ratio
     pEVAPORATION_TO_RAINFALL_RATIO => DAT%find("EVAPORATION_TO_RAINFALL_RATIO")
     if ( .not. associated( pEVAPORATION_TO_RAINFALL_RATIO ) ) &
         call die("A EVAPORATION_TO_RAINFALL_RATIO grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
-
-    call pCANOPY_COVER_FRACTION%getvalues()
-
-    call grid_WriteArcGrid("Canopy_Cover_Fraction__echo.asc", &
-      pCANOPY_COVER_FRACTION%pGrdBase)
-
-    CANOPY_COVER_FRACTION = pack( pCANOPY_COVER_FRACTION%pGrdBase%rData, lActive )
 
 
     call pEVAPORATION_TO_RAINFALL_RATIO%getvalues()
@@ -151,12 +137,12 @@ contains
         sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
 
 
-    allocate( P_SAT(ubound(CANOPY_COVER_FRACTION,1) ), stat=iStat )
+    allocate( P_SAT( count( lActive ) ), stat=iStat )
     call assert( iStat==0, "Problem allocating memory for P_SAT.", __FILE__, __LINE__ )
 
     P_SAT = precipitation_at_saturation( EVAPORATION_TO_RAINFALL_RATIO,    &
       CANOPY_STORAGE_CAPACITY_TABLE_VALUES( iLanduseIndex ), &
-      CANOPY_COVER_FRACTION )
+      fCanopy_Cover_Fraction )
 
   end subroutine interception_gash_initialize
 

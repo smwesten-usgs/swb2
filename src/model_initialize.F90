@@ -50,9 +50,9 @@ module model_initialize
       GRIDDED_DATASETS_T("HYDROLOGIC_SOILS_GROUP       ", lFALSE, DATATYPE_INT ),       &
       GRIDDED_DATASETS_T("INITIAL_PERCENT_SOIL_MOISTURE", lFALSE, DATATYPE_FLOAT),      &
       GRIDDED_DATASETS_T("INITIAL_SNOW_COVER_STORAGE   ", lFALSE, DATATYPE_FLOAT),      &
-      GRIDDED_DATASETS_T("CANOPY_COVER_FRACTION        ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("PERVIOUS_SURFACE_FRACTION    ", lTRUE, DATATYPE_FLOAT ),      &      
-      GRIDDED_DATASETS_T("IMPERVIOUS_SURFACE_FRACTION  ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("PERCENT_CANOPY_COVER         ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("PERCENT_PERVIOUS_COVER       ", lTRUE, DATATYPE_FLOAT ),      &      
+      GRIDDED_DATASETS_T("PERCENT_IMPERVIOUS_COVER     ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("STEMFLOW_FRACTION            ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("EVAPORATION_TO_RAINFALL_RATIO", lTRUE, DATATYPE_FLOAT ),      & 
       GRIDDED_DATASETS_T("RAINFALL_ADJUST_FACTOR       ", lTRUE, DATATYPE_FLOAT ),      &
@@ -555,6 +555,10 @@ contains
       call MODEL%initialize_soil_groups()
 
       call MODEL%initialize_landuse()
+
+      call MODEL%initialize_percent_impervious()
+
+      call MODEL%initialize_percent_canopy_cover()
 
   end subroutine initialize_soils_landuse_awc_flowdir_values
 

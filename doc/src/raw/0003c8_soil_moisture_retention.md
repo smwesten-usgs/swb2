@@ -11,7 +11,9 @@ When SWB is run with this process option soil moisture is tabulated by means of 
 
 *Accumulated Potential Water Loss (APWL)*. The accumulated potential water loss is calculated as a running total of the daily $P-PE$ values during periods when $P-PE$ is negative. This running total represents the total amount of unsatisfied potential evapotranspiration to which the soil has been subjected. Soils typically yield water more easily during the first days in which $P-PE$ is negative. On subsequent days, as the APWL grows, soil moisture is less readily given up. The nonlinear relation between soil moisture and the accumulated potential water loss was described by Thornthwaite and Mather (1957) in a series of tables. These tables are incorporated into the SWB code.
 
-Note that the accumulated potential water loss can grow without bound; it represents the cumulative daily potential water loss given the potential evapotranspiration and observed precipitation. 
+Note that the accumulated potential water loss can grow without bound; it represents the cumulative daily potential water loss given the potential evapotranspiration and observed precipitation. Accumulated potential water loss is calculated as:
+
+$APWL = \sum\limits_{}^{} {(precip - PET)} $
 
 *Soil moisture*, $\Delta\,soil\,moisture$. The soil-moisture term represents the amount of water held in soil storage for a given grid cell. Soil moisture has an upper bound that corresponds to the soil's maximum water-holding capacity (roughly equivalent to the field capacity); soil moisture has a lower bound that corresponds to the soil's permanent wilting point.
 
@@ -21,11 +23,43 @@ When $P-PE$ is negative, the new soil-moisture term is found by looking up the s
 
 *Actual ET*. When $P-PE$ is positive, the actual evapotranspiration equals the potential evapotranspiration. When $P-PE$ is negative, the actual evapotranspiration is equal only to the amount of water that can be extracted from the soil ($\Delta$ soil moisture). 
 
-*Soil moisture SURPLUS*. If the soil moisture reaches the maximum soil-moisture capacity, any excess precipitation is added to the daily soil-moisture surplus value. Under most conditions, the soil-moisture surplus value is equivalent to the daily groundwater recharge value.
+## Calculation Procedure
 
-*Soil moisture DEFICIT*. The daily soil-moisture deficit is the amount by which the actual evapotranspiration differs from the potential evapotranspiration. 
+During the course of a model run, the soil layer is considered to be in one of three states:
 
-The soil-moisture surplus and deficit terms have no direct bearing on the calculation of recharge; these terms feature rather prominently in the original work by [@thornthwaite_water_1955; @thornthwaite_instructions_1957] and are included here for completeness.
+| $P - PE$    | Soil Status                                     |     $SM_{t}$       | $APWL_{t}$  |  $AET_{t}$   |  Excess (potential recharge) |
+|-------------|-------------------------------------------------|--------------------|-------------|----------|---------------------|
+|  < 0        | drying                                          | SM from T-M tables | $APWL_{t-1} + (P-PE)$ | $SM_{t-1} - SM_{t}$  | 0.0     |
+|  > 0        | wetting *and* $SM_{t-1} + (P - PE) < SM_{max}$  | $SM_{t-1} + (P-PE)$| $APWL$ from tables   | $PE$ |   0.0         |
+|  > 0        | wetting *and* $SM_{t-1} + (P - PE) > SM_{max}$  | $SM_{max}$  | 0.0  | $PE$   | $SM_{t-1} + (P - PE) - SM_{max}$    |
+
+
+## Relation between Accumulated Potential Water Loss and Extractable Water
+
+Version 1.0 of the SWB model reads in digitized versions of the Thornthwaite-Mather soil-moisture retention tables. The amount of computing involved in negotiating the lookup tables and interpolating a result was significant enough to warrant generalization; in addition, small roundoff errors were accumulated in the course of repeated conversions between accumulated potential water loss and the corresponding soil moisture values. In order to avoid the use of lookup tables altogether a generalized equation was developed, using the Thornthwaite and Mather [-@thornthwaite_instructions_1957] table values as the basis for the equations.
+
+There are at least two articles in the literature that describe simple relations that can be used to summarize the Thornthwaite-Mather table values. They are essentially the same, varying only in the choice to use the base-10 or natural logarithm in the calculation. 
+
+The first form of the generalized equation is suggested by Pastor and Post [-@pastor_calculating_1984]: 
+
+$soil\,moisture = SWC \cdot {e^{\left( {constant - {\textstyle{{factor} \over {SWC}}}} \right)APWL}}$
+
+where:
+
+   $SWC$ is the soil water capacity (or field capacity), and
+   $APWL$ is the accumulated potential water loss.
+
+Pastor and Post [-@pastor_calculating_1984] report values of 0.000461 for the value of the constant, and 1.10559 for the factor value.
+
+The second form of the generalized equation is suggested in Kolka and Wolf [-@kolka_estimating_1998]:
+
+$soil\,moisture = {10^{\left[ {{{\log }_{10}}(SWC) - \left( {{\textstyle{{constant} \over {SWC^{exponent}}}}} \right)APWL} \right]}}$
+
+where:
+  $SWC$ is the soil water capacity (or field capacity), and
+  $APWL$ is the accumulated potential water loss.
+
+Kolka and Wolf [-@kolka_estimating_1998] report values of 0.525 for the value of the constant, and 1.0371 for the value of the exponent.
 
 ~~~~~~~~
 CONTROL_FILE_STATEMENT 1

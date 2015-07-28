@@ -37,8 +37,6 @@ module irrigation
   type (DATA_CATALOG_ENTRY_T), pointer :: pIRRIGATION_MASK
   real (kind=c_float), allocatable     :: IRRIGATION_MASK(:)
 
-  type (DATA_CATALOG_ENTRY_T), pointer :: pPERVIOUS_SURFACE_FRACTION
-
 contains
 
 !> Estimate the irrigation water required to sustain plant growth.
@@ -200,20 +198,7 @@ contains
     if ( associated(pIRRIGATION_MASK) ) call pIRRIGATION_MASK%getvalues( )
 
 
-    ! locate the data structure associated with the gridded pervious surface fraction values
-    pPERVIOUS_SURFACE_FRACTION => DAT%find("PERVIOUS_SURFACE_FRACTION")
-    if ( associated(pPERVIOUS_SURFACE_FRACTION) ) call pPERVIOUS_SURFACE_FRACTION%getvalues( )
-
-    if (    associated(pPERVIOUS_SURFACE_FRACTION) .and. associated(pIRRIGATION_MASK) ) then
-
-      IRRIGATION_MASK = pack( real(pIRRIGATION_MASK%pGrdBase%iData, kind=c_float)     &
-                            * pPERVIOUS_SURFACE_FRACTION%pGrdBase%rData, lActive )
-
-    elseif ( associated(pPERVIOUS_SURFACE_FRACTION) ) then
-
-      IRRIGATION_MASK = pack( pPERVIOUS_SURFACE_FRACTION%pGrdBase%rData, lActive )
-
-    elseif ( associated(pIRRIGATION_MASK) ) then
+    if ( associated(pIRRIGATION_MASK) ) then
 
       IRRIGATION_MASK = pack( real(pIRRIGATION_MASK%pGrdBase%iData, kind=c_float), lActive )
 
@@ -228,12 +213,13 @@ contains
 !--------------------------------------------------------------------------------------------------  
 
   subroutine irrigation__calculate( fIrrigationAmount, iLanduseIndex, fSoilStorage, & 
-                                    fSoilStorage_Max, lActive )
+                                    fSoilStorage_Max, fImpervious_Fraction, lActive )
 
     real (kind=c_float), intent(inout)  :: fIrrigationAmount(:)
     integer (kind=c_int), intent(in)    :: iLanduseIndex(:)
     real (kind=c_float), intent(in)     :: fSoilStorage(:)
     real (kind=c_float), intent(in)     :: fSoilStorage_Max(:)
+    real (kind=c_float), intent(in)     :: fImpervious_Fraction(:)
     logical (kind=c_bool), intent(in)   :: lActive(:,:)
 
     ! [ LOCALS ]
@@ -290,14 +276,17 @@ contains
       if ( fSoilStorage_Max( iIndex ) <= fZERO ) cycle
       if ( IRRIGATION_MASK( iIndex ) < 1.0e-6_c_float ) cycle 
 
-      if ( ( 1.0_c_float - fSoilStorage( iIndex ) / fSoilStorage_Max( iIndex ) )                           &
+      if ( ( 1.0_c_float - fSoilStorage( iIndex ) / fSoilStorage_Max( iIndex ) )                             &
              > MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex( iIndex ) ) ) then
 
         fIrrigationAmount( iIndex ) = ( fSoilStorage_Max( iIndex ) - fSoilStorage( iIndex ) ) &
-                                       * IRRIGATION_MASK( iIndex ) / fEfficiency
+                                       * IRRIGATION_MASK( iIndex )                            &
+                                       * ( 1.0_c_float - fImpervious_Fraction( iIndex ) )     &
+                                       / fEfficiency
 
-        IRRIGATION_FROM_GROUNDWATER( iIndex ) = fIrrigationAmount( iIndex )          &
-                                        * FRACTION_OF_IRRIGATION_FROM_GW( iLanduseIndex( iIndex ) )
+        IRRIGATION_FROM_GROUNDWATER( iIndex ) = fIrrigationAmount( iIndex )                                  &
+                                                * FRACTION_OF_IRRIGATION_FROM_GW( iLanduseIndex( iIndex ) )
+                                                
         IRRIGATION_FROM_SURFACE_WATER( iIndex ) = fIrrigationAmount( iIndex )  &
                                                    - IRRIGATION_FROM_GROUNDWATER( iIndex )
       endif

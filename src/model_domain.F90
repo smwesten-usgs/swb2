@@ -47,6 +47,8 @@ module model_domain
     integer (kind=c_int), allocatable      :: num_upslope_connections(:)
     integer (kind=c_int), allocatable      :: sum_upslope_cells(:)
 
+    real (kind=c_float), allocatable       :: impervious_fraction(:)
+    real (kind=c_float), allocatable       :: canopy_cover_fraction(:)
     real (kind=c_float), allocatable       :: awc(:)
     real (kind=c_float), allocatable       :: gdd(:)
 
@@ -67,7 +69,11 @@ module model_domain
     real (kind=c_float), allocatable       :: interception(:)
      
     real (kind=c_float), allocatable       :: interception_storage(:)
+
     real (kind=c_float), allocatable       :: snow_storage(:)
+    real (kind=c_float), allocatable       :: surface_storage(:)
+    real (kind=c_float), allocatable       :: surface_storage_max(:)
+    real (kind=c_float), allocatable       :: surface_storage_excess(:)
     real (kind=c_float), allocatable       :: soil_storage(:)
     real (kind=c_float), allocatable       :: soil_storage_max(:)
     real (kind=c_float), allocatable       :: potential_recharge(:)
@@ -150,6 +156,7 @@ module model_domain
     generic   :: solve => calculate_mass_balance_sub
 
     procedure :: calculate_interception_mass_balance_sub
+    procedure :: calculate_impervious_surface_mass_balance_sub
     procedure :: calculate_snow_mass_balance_sub
     procedure :: calculate_soil_mass_balance_sub
 
@@ -176,6 +183,12 @@ module model_domain
 
     procedure :: initialize_landuse_codes_sub
     generic   :: initialize_landuse => initialize_landuse_codes_sub
+
+    procedure :: initialize_percent_impervious_sub
+    generic   :: initialize_percent_impervious => initialize_percent_impervious_sub
+
+    procedure :: initialize_percent_canopy_cover_sub
+    generic   :: initialize_percent_canopy_cover => initialize_percent_canopy_cover_sub
 
     procedure :: initialize_latitude_sub
     generic   :: initialize_latitude => initialize_latitude_sub
@@ -288,7 +301,7 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
-    integer (kind=c_int)  :: iStat(31)
+    integer (kind=c_int)  :: iStat(36)
 
     iCount = count( this%active )
 
@@ -323,6 +336,11 @@ contains
     allocate( this%index_order(iCount), stat=iStat(29) )
     allocate( this%gdd(iCount), stat=iStat(30) )
     allocate( this%runoff_outside( iCount ), stat=iStat(31) )
+    allocate( this%impervious_fraction( iCount ), stat=iStat(32) )
+    allocate( this%surface_storage( iCount ), stat=iStat(33) ) 
+    allocate( this%surface_storage_excess( iCount ), stat=iStat(34) )
+    allocate( this%surface_storage_max( iCount ), stat=iStat(35) )           
+    allocate( this%canopy_cover_fraction( iCount ), stat=iStat(36) )           
 
     if ( any( iStat /= 0 ) )  call die("Problem allocating memory", __FILE__, __LINE__)
 
@@ -777,6 +795,100 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  subroutine initialize_percent_impervious_sub( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)     :: this
+    ! [ LOCALS ]
+    integer (kind=c_int)                 :: iStat
+    integer (kind=c_int)                 :: iIndex
+    type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_IMPERVIOUS
+    type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_PERVIOUS      
+    type ( GENERAL_GRID_T ), pointer     :: pTempGrd
+
+    pPERCENT_IMPERVIOUS => DAT%find("PERCENT_IMPERVIOUS_COVER")
+    pPERCENT_PERVIOUS => DAT%find("PERCENT_PERVIOUS_COVER")
+
+    if ( associated(pPERCENT_IMPERVIOUS) ) then
+
+      call pPERCENT_IMPERVIOUS%getvalues()
+
+      if (associated( pPERCENT_IMPERVIOUS%pGrdBase) ) then
+        this%impervious_fraction = pack( pPERCENT_IMPERVIOUS%pGrdBase%rData/100.0_c_float, this%active )
+      else
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      endif  
+
+    elseif ( associated( pPERCENT_PERVIOUS ) ) then
+
+      call pPERCENT_PERVIOUS%getvalues()
+
+      if (associated( pPERCENT_PERVIOUS%pGrdBase) ) then
+        this%impervious_fraction = pack( (1.0_c_float - pPERCENT_PERVIOUS%pGrdBase%rData/100.0_c_float), this%active )
+      else
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      endif  
+
+    else
+
+      this%impervious_fraction = 0.0_c_float
+
+    endif
+
+    pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
+        rX0=this%X_ll, rY0=this%Y_ll, &
+        rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+
+    pTempGrd%rData = unpack( this%impervious_fraction, this%active, this%dont_care )
+
+    call grid_WriteArcGrid( sFilename="Fraction_impervious_surface__as_read_in_unitless.asc", pGrd=pTempGrd )
+
+    call grid_Destroy( pTempGrd )
+
+  end subroutine initialize_percent_impervious_sub  
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine initialize_percent_canopy_cover_sub( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)     :: this
+    ! [ LOCALS ]
+    integer (kind=c_int)                 :: iStat
+    integer (kind=c_int)                 :: iIndex
+    type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_CANOPY_COVER
+    type ( GENERAL_GRID_T ), pointer     :: pTempGrd
+
+    pPERCENT_CANOPY_COVER => DAT%find("PERCENT_CANOPY_COVER")
+
+    if ( associated(pPERCENT_CANOPY_COVER) ) then
+
+      call pPERCENT_CANOPY_COVER%getvalues()
+
+      if (associated( pPERCENT_CANOPY_COVER%pGrdBase) ) then
+        this%canopy_cover_fraction = pack( pPERCENT_CANOPY_COVER%pGrdBase%rData/100.0_c_float, this%active )
+      else
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      endif  
+
+    else
+
+      this%canopy_cover_fraction = 1.0_c_float
+
+    endif
+
+    pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
+        rX0=this%X_ll, rY0=this%Y_ll, &
+        rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+
+    pTempGrd%rData = unpack( this%canopy_cover_fraction, this%active, this%dont_care )
+
+    call grid_WriteArcGrid( sFilename="Fraction_canopy_cover__as_read_in_unitless.asc", pGrd=pTempGrd )
+
+    call grid_Destroy( pTempGrd )
+
+  end subroutine initialize_percent_canopy_cover_sub  
+
+!--------------------------------------------------------------------------------------------------
+
   subroutine initialize_latitude_sub(this)
 
     class (MODEL_DOMAIN_T), intent(inout)     :: this
@@ -1043,6 +1155,7 @@ contains
 
     call this%calc_GDD()
     call this%calculate_interception_mass_balance_sub()
+    call this%calculate_impervious_surface_mass_balance_sub()
     call this%calculate_snow_mass_balance_sub()
     call this%calculate_soil_mass_balance_sub()
 
@@ -1115,19 +1228,33 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine calculate_interception_mass_balance_sub(this)
+  subroutine calculate_impervious_surface_mass_balance_sub(this)
 
     class (MODEL_DOMAIN_T), intent(inout)   :: this
 
-    ! [ LOCALS ]
-    real (kind=c_float)  :: fReferenceET_minus_interception
+    this%surface_storage = this%surface_storage + this%rainfall + this%snowmelt
+
+    this%actual_ET = this%actual_ET + min( this%reference_ET0, this%surface_storage) * this%impervious_fraction
+      
+    this%surface_storage = this%surface_storage - min( this%reference_ET0, this%surface_storage)
+
+    this%surface_storage_excess = max( 0.0_c_float,                                                            &
+                                         this%surface_storage - this%surface_storage_max )
+
+  end subroutine calculate_impervious_surface_mass_balance_sub    
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine calculate_interception_mass_balance_sub(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)   :: this
 
     call this%calc_reference_et()
     call this%calc_fog()
     call this%calc_interception()
 
-!    this%interception_storage = this%interception_storage + this%interception
-    this%reference_ET0_adj = max( 0.0_c_float, this%reference_ET0 - this%interception_ET )
+    this%interception_storage = this%interception_storage + this%interception
+    this%actual_ET = min( this%reference_ET0, this%interception_storage) * this%impervious_fraction
 
   end subroutine calculate_interception_mass_balance_sub
 
@@ -1142,12 +1269,12 @@ contains
 
     if (.not. allocated(CFGI) ) call initialize_continuous_frozen_ground_index( count( this%active ) )
 
-    call update_continuous_frozen_ground_index( CFGI, this%tmin, this%tmax, this%snow_storage )
-
     call this%calc_snowmelt
 
     this%snow_storage = this%snow_storage + this%snowfall
     this%snow_storage = this%snow_storage - this%snowmelt
+
+    call update_continuous_frozen_ground_index( CFGI, this%tmin, this%tmax, this%snow_storage )
 
   end subroutine calculate_snow_mass_balance_sub
 
@@ -1681,7 +1808,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call interception_gash_initialize( this%active, this%landuse_index )
+    call interception_gash_initialize( this%active, this%canopy_cover_fraction, this%landuse_index )
 
   end subroutine model_initialize_interception_gash
 
@@ -2202,10 +2329,11 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call irrigation__calculate( fIrrigationAmount=this%irrigation,        &
-                                iLanduseIndex=this%landuse_index,         &
-                                fSoilStorage=this%soil_storage,           & 
-                                fSoilStorage_Max=this%soil_storage_max,   &
+    call irrigation__calculate( fIrrigationAmount=this%irrigation,             &
+                                iLanduseIndex=this%landuse_index,              &
+                                fSoilStorage=this%soil_storage,                & 
+                                fSoilStorage_Max=this%soil_storage_max,        &
+                                fImpervious_Fraction=this%impervious_fraction, &
                                 lActive=this%active )
 
   end subroutine model_calculate_irrigation
