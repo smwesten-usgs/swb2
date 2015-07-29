@@ -1834,7 +1834,7 @@ contains
     
     call interception_gash_calculate( this%rainfall,                                      &
                                this%fog,                                                  &
-                               CANOPY_COVER_FRACTION,                                     &
+                               this%canopy_cover_fraction,                                &
                                !TRUNK_STORAGE_CAPACITY_TABLE_VALUES( this%landuse_index ), &
                                fTrunk_Storage_Capacity, &
                                !STEMFLOW_FRACTION_TABLE_VALUES( this%landuse_index ),      &
