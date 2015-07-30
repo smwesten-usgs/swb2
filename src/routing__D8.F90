@@ -303,7 +303,7 @@ contains
 
   subroutine routing_D8_determine_solution_order( lActive )
 
-    use swb_grid
+    use grid
 
     logical (kind=c_bool), intent(in)    :: lActive(:,:)
 

@@ -37,7 +37,7 @@ module netcdf4_support
                                COMPILATION_TIMESTAMP
 
 
-  use swb_grid
+  use grid
 !  use typesizes
   use netcdf_c_api_interfaces
 

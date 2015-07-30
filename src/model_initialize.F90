@@ -1,25 +1,27 @@
 module model_initialize
 
-  use iso_c_binding, only : c_int, c_float, c_double, c_bool
-  use constants_and_conversions, only : lTRUE, lFALSE, asFloat, BNDS
+  use iso_c_binding, only                : c_int, c_float, c_double, c_bool
+  use constants_and_conversions, only    : lTRUE, lFALSE, asFloat, BNDS
   use datetime
   use data_catalog
   use data_catalog_entry
   use dictionary
   use exceptions
   use file_operations
+  use grid
 !  use loop_iterate
-  use model_domain
+  use model_domain, only                 : MODEL
+  use output, only                       : initialize_output
   use parameters
   use precipitation__method_of_fragments
-  use simulation_datetime
+  use simulation_datetime, only          : SIM_DT
   use strings
   use string_list  
   implicit none
 
   private
 
-  public :: read_control_file, initialize_options
+  public :: read_control_file, initialize_all
   public :: check_for_fatal_warnings
 
   type GRIDDED_DATASETS_T
@@ -33,7 +35,7 @@ module model_initialize
     logical (kind=c_bool)  :: lOptional
   end type METHODS_LIST_T
 
-  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(30) = &
+  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(31) = &
 
     [ GRIDDED_DATASETS_T("PRECIPITATION                ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("TMIN                         ", lFALSE, DATATYPE_FLOAT ),     &
@@ -63,22 +65,486 @@ module model_initialize
       GRIDDED_DATASETS_T("DISPOSAL_WELL_DISCHARGE      ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("ANNUAL_DIRECT_RECHARGE_RATE  ", lTRUE, DATATYPE_FLOAT ),      &      
       GRIDDED_DATASETS_T("RUNOFF_ZONE                  ", lTRUE, DATATYPE_INT ),        & 
+      GRIDDED_DATASETS_T("SOIL_STORAGE_MAX             ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("IRRIGATION_MASK              ", lTRUE, DATATYPE_INT),         &                
       GRIDDED_DATASETS_T("RELATIVE_HUMIDITY            ", lTRUE, DATATYPE_FLOAT )   ]
 
-  type (METHODS_LIST_T), parameter  :: KNOWN_METHODS(10) =   &
+  type (METHODS_LIST_T), parameter  :: KNOWN_METHODS(11) =   &
     [ METHODS_LIST_T("INTERCEPTION           ", lFALSE),    &
       METHODS_LIST_T("EVAPOTRANSPIRATION     ", lFALSE),    &
       METHODS_LIST_T("RUNOFF                 ", lFALSE),    &
       METHODS_LIST_T("PRECIPITATION          ", lFALSE),    &
       METHODS_LIST_T("FOG                    ", lTRUE),     &
       METHODS_LIST_T("AVAILABLE_WATER_CONTENT", lTRUE),     &
+      METHODS_LIST_T("MAXIMUM_SOIL_STORAGE   ", lTRUE),     &
       METHODS_LIST_T("SOIL_MOISTURE          ", lFALSE),    &
       METHODS_LIST_T("IRRIGATION             ", lTRUE),     &
       METHODS_LIST_T("DIRECT_RECHARGE        ", lTRUE),     &
       METHODS_LIST_T("FLOW_ROUTING           ", lFALSE)  ]
 
+  type (GENERAL_GRID_T), pointer    :: pCOORD_GRD
+
 contains
+
+  subroutine initialize_all()
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iIndex
+
+    ! define SWB project boundary and geographic projection
+    call initialize_grid_options()
+
+    ! define the start and end date for the simulation
+    call initialize_start_and_end_dates()
+
+    ! read in and munge all tables that have been defined in the control file as ***_LOOKUP_TABLE
+    call initialize_parameter_tables()
+    
+    ! scan input file entries for keywords associated with known gridded datasets
+    ! (e.g. PRECIPITATION, TMIN, TMAX, FOG_ZONE, etc.)
+    
+    ! if the grid is mentioned in the control file, call the bound "initialize" method that 
+    ! will wire in the type of data file. all associated methods will also be acted upon if 
+    ! present in the control file (e.g. TMAX_ADD_OFFSET, TMAX_NETCDF_X_VAR, etc.)
+    do iIndex = 1, ubound(KNOWN_GRIDS, 1)
+
+      call initialize_generic_grid( sKey=KNOWN_GRIDS(iIndex)%sName,            &
+                                    lOptional=KNOWN_GRIDS(iIndex)%lOptional,   &
+                                    iDataType=KNOWN_GRIDS(iIndex)%iDataType )
+   
+    enddo
+
+    ! scan the control file input for method specifications
+    ! (e.g. EVAPOTRANSPIRATION_METHOD HARGREAVES-SAMANI )
+    do iIndex = 1, ubound(KNOWN_METHODS, 1)
+
+      call initialize_generic_method( sKey=KNOWN_METHODS( iIndex )%sName,              &
+                                      lOptional=KNOWN_METHODS( iIndex )%lOptional )
+   
+    enddo
+    
+    ! bring in soils (HSG, AWC), landuse, and flow direction data from native grids
+    ! and pack that data into vectors for active grid cells only
+    call initialize_soils_landuse_awc_flowdir_values()
+
+    ! temporary diagnostic: dump statistics on each of the state variables
+!    call MODEL%summarize()
+
+    call initialize_ancillary_values()
+
+    ! check to see that there are no NULL method pointers
+    call MODEL%preflight_check_method_pointers()
+
+    ! call each of the initialization routines associated with the chosen methods
+    call MODEL%initialize_methods()
+
+    ! open and prepare NetCDF files for output
+    call initialize_output( MODEL )
+
+    call check_for_fatal_warnings()
+
+  end subroutine initialize_all
+
+!--------------------------------------------------------------------------------------------------
+
+  !> Initialize soils, landuse, and available water content values.
+  !!
+  !! @NOTE Rather than read the raw values and initialize the SWB 
+  !! variables in one step, we have two steps: 
+  !! 1. read raw;
+  !! 2. initialize SWB variables.
+  !!
+  !! Two steps are needed because the call to "set_inactive_cells" requires access to the "raw"
+  !! values, not the SWB variables. Basically any cell with negative values found in the landuse, soils groups, 
+  !! or awc grids results in that cell being inactivated. Once the complete collection of active cells is 
+  !! found, the SWB variables can be initialized.
+  !!
+
+  subroutine initialize_soils_landuse_awc_flowdir_values()
+
+    call read_landuse_codes()
+
+    call read_hydrologic_soils_groups()
+
+    call initialize_root_zone_depths()
+
+    ! null pointer after this point 
+    call MODEL%read_AWC_data()
+
+    call MODEL%set_inactive_cells()
+
+    call MODEL%initialize_arrays()
+
+    call MODEL%init_AWC()
+
+    call MODEL%init_soil_moisture_max()
+
+    call initialize_hydrologic_soils_groups()
+
+    call initialize_landuse_codes()
+
+  end subroutine initialize_soils_landuse_awc_flowdir_values
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine initialize_ancillary_values()
+
+    call initialize_percent_impervious()
+
+    call initialize_percent_canopy_cover()
+
+    call initialize_latitude()
+
+    call initialize_soil_storage()
+
+  end subroutine initialize_ancillary_values
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine initialize_soil_storage()
+
+    type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_PERCENT_SOIL_MOISTURE
+
+    ! [ LOCALS ]
+    real (kind=c_float), allocatable  :: fInitial_Percent_Soil_Moisture(:)
+    integer (kind=c_int)              :: iStat 
+
+    allocate ( fInitial_Percent_Soil_Moisture( count( MODEL%active ) ), stat=iStat )
+
+    ! locate the data structure associated with the gridded rainfall zone entries
+    pINITIAL_PERCENT_SOIL_MOISTURE => DAT%find("INITIAL_PERCENT_SOIL_MOISTURE")
+
+    if ( .not. associated( pINITIAL_PERCENT_SOIL_MOISTURE ) ) then
+        call warn(sMessage="An INITIAL_PERCENT_SOIL_MOISTURE grid (or constant) was not found.",    &
+        sHints="Check your control file to see that a valid INITIAL_PERCENT_SOIL_MOISTURE grid or"  &
+          //" constant is specified.", lFatal=lTRUE )
+    else    
+
+      call pINITIAL_PERCENT_SOIL_MOISTURE%getvalues()
+ 
+      ! map the 2D array of RAINFALL_ZONE values to the vector of active cells
+      fInitial_Percent_Soil_Moisture = pack( pINITIAL_PERCENT_SOIL_MOISTURE%pGrdBase%rData, MODEL%active )
+
+     if ( minval( fInitial_Percent_Soil_Moisture ) < fZERO &
+        .or. maxval( fInitial_Percent_Soil_Moisture ) > 100.0_c_float )  &
+       call warn(sMessage="One or more initial percent soils moisture values outside of " &
+         //"valid range (0% to 100%)", lFatal=lTRUE )
+
+     MODEL%soil_storage = fInitial_Percent_Soil_Moisture * MODEL%soil_storage_max  
+
+    endif
+
+  end subroutine initialize_soil_storage
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine initialize_percent_impervious()
+
+    ! [ LOCALS ]
+    integer (kind=c_int)                 :: iStat
+    integer (kind=c_int)                 :: iIndex
+    type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_IMPERVIOUS
+    type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_PERVIOUS      
+    type ( GENERAL_GRID_T ), pointer     :: pTempGrd
+
+    pPERCENT_IMPERVIOUS => DAT%find("PERCENT_IMPERVIOUS_COVER")
+    pPERCENT_PERVIOUS => DAT%find("PERCENT_PERVIOUS_COVER")
+
+    if ( associated(pPERCENT_IMPERVIOUS) ) then
+
+      call pPERCENT_IMPERVIOUS%getvalues()
+
+      if (associated( pPERCENT_IMPERVIOUS%pGrdBase) ) then
+        MODEL%impervious_fraction = pack( pPERCENT_IMPERVIOUS%pGrdBase%rData/100.0_c_float, MODEL%active )
+      else
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      endif  
+
+    elseif ( associated( pPERCENT_PERVIOUS ) ) then
+
+      call pPERCENT_PERVIOUS%getvalues()
+
+      if (associated( pPERCENT_PERVIOUS%pGrdBase) ) then
+        MODEL%impervious_fraction = pack( (1.0_c_float - pPERCENT_PERVIOUS%pGrdBase%rData/100.0_c_float), MODEL%active )
+      else
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      endif  
+
+    else
+
+      MODEL%impervious_fraction = 0.0_c_float
+
+    endif
+
+     if ( minval( MODEL%impervious_fraction ) < fZERO &
+        .or. maxval( MODEL%impervious_fraction ) > 1.0_c_float )  &
+       call warn(sMessage="One or more percent (im)pervious cover values values are outside of " &
+         //"valid range (0% to 100%)", lFatal=lTRUE )
+
+    pTempGrd => grid_Create( iNX=MODEL%number_of_columns, iNY=MODEL%number_of_rows, &
+        rX0=MODEL%X_ll, rY0=MODEL%Y_ll, &
+        rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+
+    pTempGrd%rData = unpack( MODEL%impervious_fraction, MODEL%active, MODEL%dont_care )
+
+    call grid_WriteArcGrid( sFilename="Fraction_impervious_surface__as_read_in_unitless.asc", pGrd=pTempGrd )
+
+    call grid_Destroy( pTempGrd )
+
+  end subroutine initialize_percent_impervious  
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine initialize_percent_canopy_cover
+
+    ! [ LOCALS ]
+    integer (kind=c_int)                 :: iStat
+    integer (kind=c_int)                 :: iIndex
+    type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_CANOPY_COVER
+    type ( GENERAL_GRID_T ), pointer     :: pTempGrd
+
+    pPERCENT_CANOPY_COVER => DAT%find("PERCENT_CANOPY_COVER")
+
+    if ( associated(pPERCENT_CANOPY_COVER) ) then
+
+      call pPERCENT_CANOPY_COVER%getvalues()
+
+      if (associated( pPERCENT_CANOPY_COVER%pGrdBase) ) then
+        MODEL%canopy_cover_fraction = pack( pPERCENT_CANOPY_COVER%pGrdBase%rData/100.0_c_float, MODEL%active )
+      else
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      endif  
+
+    else
+
+      MODEL%canopy_cover_fraction = 1.0_c_float
+
+      call warn("Could not find a grid or constant value for the canopy cover fraction. Using a" &
+        //" value of 1.0 for the entire model domain." )
+
+    endif
+
+    pTempGrd => grid_Create( iNX=MODEL%number_of_columns, iNY=MODEL%number_of_rows, &
+        rX0=MODEL%X_ll, rY0=MODEL%Y_ll, &
+        rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+
+    pTempGrd%rData = unpack( MODEL%canopy_cover_fraction, MODEL%active, MODEL%dont_care )
+
+    call grid_WriteArcGrid( sFilename="Fraction_canopy_cover__as_read_in_unitless.asc", pGrd=pTempGrd )
+
+    call grid_Destroy( pTempGrd )
+
+  end subroutine initialize_percent_canopy_cover
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine initialize_root_zone_depths
+
+    use model_domain, only : MAX_ROOTING_DEPTH
+
+    ! [ LOCALS ]
+    integer (kind=c_int)              :: iNumActiveCells
+    integer (kind=c_int)              :: iStat
+    integer (kind=c_int)              :: iNumberOfLanduses
+    integer (kind=c_int)              :: iNumberOfSoilGroups
+    integer (kind=c_int)              :: iSoilsIndex
+    integer (kind=c_int)              :: iLUIndex
+    integer (kind=c_int), allocatable :: iLanduseCodes(:)
+    type (STRING_LIST_T)              :: slList
+    type (STRING_LIST_T)              :: slRZ
+    integer (kind=c_int), allocatable :: iRZ_SeqNums(:) 
+    real (kind=c_float), allocatable  :: RZ(:)
+    character (len=:), allocatable    :: sText
+    real (kind=c_float), allocatable  :: water_capacity(:)
+    integer (kind=c_int)              :: iIndex
+    type (GENERAL_GRID_T), pointer    :: pRooting_Depth
+    real (kind=c_float), allocatable  :: fMax_Rooting_Depth(:,:)
+
+    type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
+    type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
+
+    pLULC => DAT%find("LAND_USE")
+    pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
+    
+    call assert( associated( pLULC), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pLULC", &
+      __FILE__, __LINE__ )
+
+    call assert( associated( pLULC%pGrdBase ),   &
+      "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pLULC%pGrdBase", __FILE__, __LINE__ )
+
+    call assert( allocated( pLULC%pGrdBase%iData ),   &
+      "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pLULC%pGrdBase%iData", __FILE__, __LINE__ )
+
+    call assert( associated( pHSG), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pHSG", &
+      __FILE__, __LINE__ )
+
+    call assert( associated( pHSG%pGrdBase ),      & 
+      "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pHSG%pGrdBase", __FILE__, __LINE__ )
+
+    call assert( allocated( pHSG%pGrdBase%iData ),      & 
+      "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pHSG%pGrdBase%iData", __FILE__, __LINE__ )
+
+
+    pRooting_Depth => grid_Create( iNX=MODEL%number_of_columns, iNY=MODEL%number_of_rows, &
+        rX0=MODEL%X_ll, rY0=MODEL%Y_ll, &
+        rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+
+    iNumActiveCells = ubound(MODEL%soil_storage_max,1)
+
+    call slList%append("LU_Code")
+    call slList%append("Landuse_Code")
+    call slList%append("Landuse_Lookup_Code")
+
+    !> Determine how many soil groups are present
+
+    ! retrieve a string list of all keys associated with root zone depth (i.e. RZ_1, RZ_2, RZ_3, etc.)
+    slRZ = PARAMS_DICT%grep_keys("RZ")
+    ! Convert the string list to an vector of integers; MODEL call strips off the "RZ_" part of label
+    iRZ_SeqNums = slRZ%asInt()
+    ! count how many items are present in the vector; MODEL should equal the number of soils groups
+    iNumberOfSoilGroups = count( iRZ_SeqNums > 0 )
+
+    !> Determine how many landuse codes are present
+    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCodes )
+    iNumberOfLanduses = count( iLanduseCodes >= 0 )
+
+    allocate( fMax_Rooting_Depth(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
+    call assert( iStat == 0, "Failed to allocate memory for maximum rooting depth table", &
+      __FILE__, __LINE__)
+
+    ! we should have the max rooting depth table fully filled out following MODEL block
+    do iSoilsIndex = 1, iNumberOfSoilGroups
+      sText = "RZ_"//asCharacter(iSoilsIndex)
+      call PARAMS%get_parameters( sKey=sText, fValues=RZ )
+      fMax_Rooting_Depth(:, iSoilsIndex) = RZ
+    enddo  
+
+    call LOGS%WRITE( "Landuse Code |  Soils Code  | Number of Matches",              &
+      iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+    call LOGS%WRITE( "-------------|--------------|------------------- ",            &
+      iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
+    do iSoilsIndex = 1, iNumberOfSoilGroups
+      do iLUIndex = 1, iNumberOfLanduses
+
+        call LOGS%WRITE( asCharacter(iLanduseCodes( iLUIndex) )//" | "//asCharacter(iSoilsIndex)//" | "//    &
+            asCharacter(count( pLULC%pGrdBase%iData == iLanduseCodes( iLUIndex)             &
+                                 .and. pHSG%pGrdBase%iData == iSoilsIndex ) ),              &
+                                 iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
+
+         where ( pLULC%pGrdBase%iData == iLanduseCodes( iLUIndex) .and. pHSG%pGrdBase%iData == iSoilsIndex )
+
+           pRooting_Depth%rData = fMax_Rooting_Depth( iLUIndex, iSoilsIndex )
+
+         endwhere 
+
+      enddo
+
+    enddo
+
+    call slList%clear()
+
+    call grid_WriteArcGrid("Maximum_rooting_depth.asc", pRooting_Depth )
+
+    MODEL%current_rooting_depth = pack( pRooting_Depth%rData, MODEL%active )
+
+    MAX_ROOTING_DEPTH = pRooting_Depth%rData
+
+    call grid_Destroy( pRooting_Depth )
+
+  end subroutine initialize_root_zone_depths
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine initialize_hydrologic_soils_groups
+
+    ! [ LOCALS ]
+    integer (kind=c_int)                 :: iStat
+    integer (kind=c_int)                 :: iIndex
+    type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
+
+    pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
+    
+    if ( associated(pHSG) ) then
+
+      if (associated( pHSG%pGrdBase) ) then
+        MODEL%soil_group = pack( pHSG%pGrdBase%iData, MODEL%active )
+      else
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      endif  
+
+    else
+
+      call die("Attempted use of NULL pointer. Failed to find HYDROLOGIC_SOILS_GROUP data element.", &
+        __FILE__, __LINE__)
+
+    endif
+
+    call LOGS%write("Hydrologic soils groups as read into SWB data structure", iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_DEBUG)
+
+    do iIndex = 1, maxval(pHSG%pGrdBase%iData)
+
+      call LOGS%write( asCharacter(count(MODEL%soil_group == iIndex) )//" cells belong to soils group " &
+        //asCharacter(iIndex), iLogLevel=LOG_DEBUG )
+      
+    end do    
+
+    call LOGS%write("", iLinesBefore=1, iLogLevel=LOG_DEBUG)
+
+  end subroutine initialize_hydrologic_soils_groups
+
+!--------------------------------------------------------------------------------------------------  
+
+  subroutine read_hydrologic_soils_groups
+
+    ! [ LOCALS ]
+    type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
+
+    pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
+    
+    if ( associated(pHSG) ) then
+
+      call pHSG%getvalues()
+      call grid_WriteArcGrid("Hydrologic_soils_groups__as_read_into_SWB.asc", pHSG%pGrdBase )
+
+    else
+    
+      call warn(sMessage="HYDROLOGIC_SOILS_GROUP dataset is flawed or missing.", lFatal=lTRUE,     &
+        iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"  &
+        //" been ~included in the control file for the HYDROLOGIC_SOILS_GROUP dataset.",           &
+        lEcho = lTRUE )
+
+    endif    
+
+  end subroutine read_hydrologic_soils_groups
+
+!--------------------------------------------------------------------------------------------------  
+
+  subroutine read_landuse_codes
+
+    ! [ LOCALS ]
+    type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
+
+    pLULC => DAT%find("LAND_USE")
+    
+    if ( associated(pLULC) ) then
+
+      call pLULC%getvalues()
+      call grid_WriteArcGrid("Landuse_land_cover__as_read_into_SWB.asc", pLULC%pGrdBase )
+
+    else
+    
+      call warn(sMessage="LAND_USE dataset is flawed or missing.", lFatal=lTRUE,         &
+        iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"   &
+        //" been ~included in the control file for the LAND_USE dataset.",               &
+        lEcho = lTRUE )
+
+    endif    
+
+  end subroutine read_landuse_codes
+
+!--------------------------------------------------------------------------------------------------
 
   subroutine read_control_file( sFilename ) 
 
@@ -142,62 +608,6 @@ contains
 
   end subroutine read_control_file
 
-!--------------------------------------------------------------------------------------------------  
-
-  subroutine initialize_options()
-
-    integer (kind=c_int) :: iIndex
-
-    ! define SWB project boundary and geographic projection
-    call initialize_grid_options()
-
-    ! define the start and end date for the simulation
-    call initialize_start_and_end_dates()
-
-    ! read in and munge all tables that have been defined in the control file as ***_LOOKUP_TABLE
-    call initialize_parameter_tables()
-    
-    ! scan input file entries for keywords associated with known gridded datasets
-    ! (e.g. PRECIPITATION, TMIN, TMAX, FOG_ZONE, etc.)
-    
-    ! if the grid is mentioned in the control file, call the bound "initialize" method that 
-    ! will wire in the type of data file. all associated methods will also be acted upon if 
-    ! present in the control file (e.g. TMAX_ADD_OFFSET, TMAX_NETCDF_X_VAR, etc.)
-    do iIndex = 1, ubound(KNOWN_GRIDS, 1)
-
-      call initialize_generic_grid( sKey=KNOWN_GRIDS(iIndex)%sName,            &
-                                    lOptional=KNOWN_GRIDS(iIndex)%lOptional,   &
-                                    iDataType=KNOWN_GRIDS(iIndex)%iDataType )
-   
-    enddo
-
-    ! scan the control file input for method specifications
-    ! (e.g. EVAPOTRANSPIRATION_METHOD HARGREAVES-SAMANI )
-    do iIndex = 1, ubound(KNOWN_METHODS, 1)
-
-      call initialize_generic_method( sKey=KNOWN_METHODS( iIndex )%sName,              &
-                                      lOptional=KNOWN_METHODS( iIndex )%lOptional )
-   
-    enddo
-    
-    ! bring in soils (HSG, AWC), landuse, and flow direction data from native grids
-    ! and pack that data into vectors for active grid cells only
-    call initialize_soils_landuse_awc_flowdir_values()
-
-    ! temporary diagnostic: dump statistics on each of the state variables
-!    call MODEL%summarize()
-
-    ! check to see that there are no NULL method pointers
-    call MODEL%preflight_check_method_pointers()
-
-    ! call each of the initialization routines associated with the chosen methods
-    call MODEL%initialize_methods()
-
-    ! open and prepare NetCDF files for output
-    call MODEL%initialize_netcdf_output()
-
-  end subroutine initialize_options
-
 !--------------------------------------------------------------------------------------------------
 
 
@@ -210,7 +620,7 @@ contains
   !! @param[in]  iDataType   Datatype as defined in @ref constants_and-conversion.F90
   !!
   !! This routine accepts a data grid type, for example, "PRECIPITATION", and attempts to
-  !! handle all related control file directives associated with this data type. In this way,
+  !! handle all related control file directives associated with MODEL data type. In MODEL way,
   !! a new gridded data type may be added simply by extending the list of known data types
   !! to the list defined in the module variable @ref KNOWN_TYPES.
   !!
@@ -237,7 +647,7 @@ contains
     lGridPresent = lFALSE
 
     ! obtain a string list of directives that contain the keyword
-    ! (e.g. if the key is "TMIN", this might return:
+    ! (e.g. if the key is "TMIN", MODEL might return:
     ! "TMIN ARC_ASCII input/mygrid.asc"
     ! "TMIN_PROJECTION_DEFINITION =Proj=latlon +datum=WGS84"
     ! "TMIN_MINIMUM_ALLOWED_VALUE -60.0" )
@@ -271,7 +681,7 @@ contains
         ! sCmdText contains an individual directive
         sCmdText = myDirectives%get(iIndex)
 
-        ! For this directive, obtain the associated dictionary entries
+        ! For MODEL directive, obtain the associated dictionary entries
         call CF_DICT%get_values(sCmdText, myOptions )
 
         ! dictionary entries are initially space-delimited; sArgText_1 contains
@@ -287,7 +697,7 @@ contains
 
         ! first option is that the key value and directive are the same 
         ! (.e.g. "PRECIPITATION"; no trailing underscores or modifiers )
-        ! this is a grid definition directive
+        ! MODEL is a grid definition directive
         if ( sCmdText .strequal. sKey ) then
 
           pENTRY%sVariableName_z = asLowercase( sKey )
@@ -424,7 +834,7 @@ contains
 
         elseif ( index( string=sCmdText, substring="_METHOD") > 0 ) then
 
-          ! no operation; just keep SWB quiet about this and it will be included in the
+          ! no operation; just keep SWB quiet about MODEL and it will be included in the
           ! methods initialization section
 
         else
@@ -463,7 +873,7 @@ contains
     real (kind=c_float)              :: fTempVal
 
 
-    ! For this directive, obtain the associated dictionary entries
+    ! For MODEL directive, obtain the associated dictionary entries
     call CF_DICT%get_values( "GRID", myOptions )
 
     ! dictionary entries are initially space-delimited; sArgText contains
@@ -505,7 +915,7 @@ contains
 
     call myOptions%clear()
 
-    ! For this directive, obtain the associated dictionary entries
+    ! For MODEL directive, obtain the associated dictionary entries
     call CF_DICT%get_values( "BASE_PROJECTION_DEFINITION", myOptions )
 
     ! dictionary entries are initially space-delimited; sArgText contains
@@ -529,38 +939,6 @@ contains
     MODEL%PROJ4_string = trim(sArgText)
 
   end subroutine initialize_grid_options
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine initialize_soils_landuse_awc_flowdir_values()
-
-      call MODEL%read_land_use_codes()
-
-      call MODEL%get_soil_groups()
-
-      call MODEL%initialize_root_zone_depths()
-
-      call MODEL%read_AWC_data()
-
-      call MODEL%set_inactive_cells()
-
-      call MODEL%initialize_arrays()
-
-      call MODEL%initialize_latitude()
-
-      call MODEL%init_AWC()
-
-      call MODEL%initialize_soil_storage_max()
-
-      call MODEL%initialize_soil_groups()
-
-      call MODEL%initialize_landuse()
-
-      call MODEL%initialize_percent_impervious()
-
-      call MODEL%initialize_percent_canopy_cover()
-
-  end subroutine initialize_soils_landuse_awc_flowdir_values
 
 !--------------------------------------------------------------------------------------------------
 
@@ -599,7 +977,7 @@ contains
       ! sCmdText contains an individual directive
       sCmdText = myDirectives%get(iIndex)
 
-      ! For this directive, obtain the associated dictionary entries
+      ! For MODEL directive, obtain the associated dictionary entries
       call CF_DICT%get_values(sCmdText, myOptions )
 
       ! dictionary entries are initially space-delimited; sArgText contains
@@ -707,7 +1085,7 @@ contains
         ! sCmdText contains an individual directive
         sCmdText = myDirectives%get(iIndex)
 
-        ! for this directive, obtain the associated dictionary entries
+        ! for MODEL directive, obtain the associated dictionary entries
         call CF_DICT%get_values(sCmdText, myOptions )
 
         ! dictionary entries are initially space-delimited; sArgText contains
@@ -747,77 +1125,183 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-subroutine initialize_generic_method( sKey, lOptional)
+  subroutine initialize_generic_method( sKey, lOptional)
 
-  character (len=*), intent(in)     :: sKey
-  logical (kind=c_bool), intent(in) :: lOptional
+    character (len=*), intent(in)     :: sKey
+    logical (kind=c_bool), intent(in) :: lOptional
 
-  ! [ LOCALS ]
-  type (STRING_LIST_T)             :: myDirectives
-  type (STRING_LIST_T)             :: myOptions  
-  integer (kind=c_int)             :: iIndex
-  character (len=:), allocatable   :: sCmdText
-  character (len=:), allocatable   :: sOptionText
-  character (len=:), allocatable   :: sArgText
-  integer (kind=c_int)             :: iStat
-  logical (kind=c_bool)            :: lFatal
+    ! [ LOCALS ]
+    type (STRING_LIST_T)             :: myDirectives
+    type (STRING_LIST_T)             :: myOptions  
+    integer (kind=c_int)             :: iIndex
+    character (len=:), allocatable   :: sCmdText
+    character (len=:), allocatable   :: sOptionText
+    character (len=:), allocatable   :: sArgText
+    integer (kind=c_int)             :: iStat
+    logical (kind=c_bool)            :: lFatal
 
-  ! obtain a list of control file directives whose key values contain the string sKey
-  myDirectives = CF_DICT%grep_keys( trim(sKey) )
-    
-  lFatal = .not. lOptional
-
-  if ( myDirectives%count == 0 ) then
-
-    call warn("Your control file is missing any of the required directives relating to "//dquote(sKey)//" method.", &
-      lFatal = lFatal, iLogLevel = LOG_ALL, lEcho = lTRUE )
-
-  else  
-  
-    call LOGS%set_loglevel( LOG_ALL )
-    call LOGS%set_echo( lFALSE )
-
-    ! repeat this process for each control file directive in list
-    do iIndex = 1, myDirectives%count
-
-      ! sCmdText contains an individual directive (e.g. TMAX NETCDF input/tmax_%0m_%0d_%0Y.nc )
-      sCmdText = myDirectives%get(iIndex)
-
-      ! For this directive, obtain the associated dictionary entries
-      call CF_DICT%get_values(sCmdText, myOptions )
-
-      ! dictionary entries are initially space-delimited; sArgText contains
-      ! all dictionary entries present, concatenated, with a space between entries
-      sArgText = myOptions%get(1, myOptions%count )
-
-      ! echo the original directive and dictionary entries to the logfile
-      call LOGS%write(sCmdText//" "//sArgText, iTab=4)
-
-      ! most of the time, we only care about the first dictionary entry, obtained below
-      sOptionText = myOptions%get(1)
-
-      ! Any entry in the control file that contains the substring "METHOD" will be
-      ! handed to the "set_method" subroutine in an attempt to wire up the correct
-      ! process modules
-      if ( ( sCmdText .contains. "METHOD" ) ) then
-
-        call MODEL%set_method( trim(sCmdText), trim(sOptionText) )
-
-      endif
+    ! obtain a list of control file directives whose key values contain the string sKey
+    myDirectives = CF_DICT%grep_keys( trim(sKey) )
       
-    enddo
-    
-  endif
+    lFatal = .not. lOptional
 
-end subroutine initialize_generic_method
+    if ( myDirectives%count == 0 ) then
+
+      call warn("Your control file is missing any of the required directives relating to "//dquote(sKey)//" method.", &
+        lFatal = lFatal, iLogLevel = LOG_ALL, lEcho = lTRUE )
+
+    else  
+    
+      call LOGS%set_loglevel( LOG_ALL )
+      call LOGS%set_echo( lFALSE )
+
+      ! repeat MODEL process for each control file directive in list
+      do iIndex = 1, myDirectives%count
+
+        ! sCmdText contains an individual directive (e.g. TMAX NETCDF input/tmax_%0m_%0d_%0Y.nc )
+        sCmdText = myDirectives%get(iIndex)
+
+        ! For MODEL directive, obtain the associated dictionary entries
+        call CF_DICT%get_values(sCmdText, myOptions )
+
+        ! dictionary entries are initially space-delimited; sArgText contains
+        ! all dictionary entries present, concatenated, with a space between entries
+        sArgText = myOptions%get(1, myOptions%count )
+
+        ! echo the original directive and dictionary entries to the logfile
+        call LOGS%write(sCmdText//" "//sArgText, iTab=4)
+
+        ! most of the time, we only care about the first dictionary entry, obtained below
+        sOptionText = myOptions%get(1)
+
+        ! Any entry in the control file that contains the substring "METHOD" will be
+        ! handed to the "set_method" subroutine in an attempt to wire up the correct
+        ! process modules
+        if ( ( sCmdText .contains. "METHOD" ) ) then
+
+          call MODEL%set_method( trim(sCmdText), trim(sOptionText) )
+
+        endif
+        
+      enddo
+      
+    endif
+
+  end subroutine initialize_generic_method
+
+
+
+  subroutine initialize_latitude()
+
+    ! [ LOCALS ]
+    integer (kind=c_int)  :: iIndex
+
+    pCOORD_GRD => grid_Create( iNX=MODEL%number_of_columns, iNY=MODEL%number_of_rows, &
+        rX0=MODEL%X_ll, rY0=MODEL%Y_ll, &
+        rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+
+    allocate ( MODEL%X(MODEL%number_of_columns ) )
+    allocate ( MODEL%Y(MODEL%number_of_rows ) )
+
+    ! call the grid routine to populate the X and Y values
+    call grid_PopulateXY( pCOORD_GRD )
+
+    ! populating these in order to have them available later for use in writing results to NetCDF
+    MODEL%X = pCOORD_GRD%rX( :, 1 )
+    MODEL%Y = pCOORD_GRD%rY( 1, : ) 
+
+    ! transform to unprojected (lat/lon) coordinate system
+    call grid_Transform(pGrd=pCOORD_GRD, sFromPROJ4=MODEL%PROJ4_string, &
+        sToPROJ4="+proj=lonlat +ellps=GRS80 +datum=WGS84 +no_defs" )
+    
+    MODEL%latitude = pack( pCOORD_GRD%rY, MODEL%active )
+
+    MODEL%X_lon = pCOORD_GRD%rX
+    MODEL%Y_lat = pCOORD_GRD%rY
+
+    pCOORD_GRD%rData=pCOORD_GRD%rX
+    call grid_WriteArcGrid( sFilename="Longitude__calculated.asc", pGrd=pCOORD_GRD )
+    pCOORD_GRD%rData=pCOORD_GRD%rY
+    call grid_WriteArcGrid( sFilename="Latitude__calculated.asc", pGrd=pCOORD_GRD )
+
+    call grid_Destroy( pCOORD_GRD )
+
+  end subroutine initialize_latitude
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine check_for_fatal_warnings()
+  subroutine initialize_landuse_codes()
 
-    call check_warnings()
+    ! [ LOCALS ]
+    integer (kind=c_int)                 :: iIndex
+    integer (kind=c_int), allocatable    :: iLandUseCodes(:)
+    type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
+    integer (kind=c_int)                 :: iIndex2
+    integer (kind=c_int)                 :: iCount
+    integer (kind=c_int)                 :: iStat
+    logical (kind=c_bool)                :: lMatch
+    type (STRING_LIST_T)                 :: slList
 
-  end subroutine check_for_fatal_warnings
+    call slList%append("LU_Code")
+    call slList%append("LU_code")
+    call slList%append("Landuse_Code")
+    call slList%append("LULC_Code")
+    
+    !> Determine how many landuse codes are present
+    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCodes )
+
+    ! obtain a pointer to the LAND_USE grid
+    pLULC => DAT%find("LAND_USE")
+
+    if ( associated(pLULC) ) then
+
+      if (associated( pLULC%pGrdBase) ) then
+        MODEL%landuse_code = pack( pLULC%pGrdBase%iData, MODEL%active )
+      else
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      endif  
+    else
+      call die("Attempted use of NULL pointer. Failed to find LAND_USE data element.", &
+        __FILE__, __LINE__)
+    endif
+
+    MODEL%landuse_index = -9999
+    iCount = 0
+    
+
+    do iIndex = 1, ubound(MODEL%landuse_code,1)
+
+      lMatch = lFALSE
+
+      do iIndex2=1, ubound(iLandUseCodes, 1)
+
+        if (MODEL%landuse_code(iIndex) == iLandUseCodes(iIndex2) ) then
+          MODEL%landuse_index(iIndex) = iIndex2
+          iCount = iCount + 1
+          lMatch = lTRUE
+          exit
+        endif
+
+      enddo
+
+      if ( .not. lMatch ) &
+        call LOGS%write("Failed to match landuse code "//asCharacter(MODEL%landuse_code(iIndex) ) &
+          //" with a corresponding landuse code from lookup tables.", iLogLevel=LOG_ALL )
+
+    enddo    
+
+    call LOGS%write("Matches were found between landuse grid value and table value for " &
+      //asCharacter(iCount)//" cells out of a total of "//asCharacter(ubound(MODEL%landuse_code,1))//" active cells.", &
+      iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_ALL)
+
+    if ( count(MODEL%landuse_index < 0) > 0 ) &
+      call warn(asCharacter(count(MODEL%landuse_index < 0))//" negative values are present" &
+      //" in the landuse_index vector.", lFatal=lTRUE, sHints="Negative landuse INDEX values are the " &
+      //"result of landuse values for which no match can be found between the grid file and lookup table.")
+
+    call slList%clear()
+
+  end subroutine initialize_landuse_codes 
 
 
 end module model_initialize

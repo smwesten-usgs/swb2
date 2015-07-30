@@ -1,10 +1,11 @@
 !> @file
-!>  Contains a single module, et_gridded_values, which
-!>  populates the reference et by applying the monthly value obtained from a reference grid.
+!>  Contains the module awc__table_values, which populates
+!! the available water content by reading in and depth-averaging
+!! soil available water contents over multiple soil horizons.
 
 
-!>  Populate potential evapotranspiration by substituting in 
-!>  the daily average ET from a gridded data source.
+!> Populate the available water content by reading in and depth-averaging
+!! soil available water contents over multiple soil horizons.
 
 module awc__table_values
 

@@ -65,7 +65,6 @@ module soil_moisture__FAO_56
   !real (kind=c_float), 
   real (kind=c_float), allocatable   :: DEPLETION_FRACTION(:)
   real (kind=c_float), allocatable   :: MEAN_PLANT_HEIGHT(:)
-  real (kind=c_float), allocatable   :: INITIAL_PERCENT_SOIL_MOISTURE(:)
 
   integer (kind=c_int)               :: LU_SOILS_CSV
 
@@ -131,24 +130,6 @@ contains
     real (kind=c_float)              :: fRz_initial
 
     type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_PERCENT_SOIL_MOISTURE
-
-    ! locate the data structure associated with the gridded rainfall zone entries
-    pINITIAL_PERCENT_SOIL_MOISTURE => DAT%find("INITIAL_PERCENT_SOIL_MOISTURE")
-    if ( .not. associated( pINITIAL_PERCENT_SOIL_MOISTURE ) ) &
-        call die("A INITIAL_PERCENT_SOIL_MOISTURE grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
-
-    allocate( INITIAL_PERCENT_SOIL_MOISTURE( count(lActive) ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
- 
-    call pINITIAL_PERCENT_SOIL_MOISTURE%getvalues()
- 
-    ! map the 2D array of RAINFALL_ZONE values to the vector of active cells
-    INITIAL_PERCENT_SOIL_MOISTURE = pack( pINITIAL_PERCENT_SOIL_MOISTURE%pGrdBase%rData, lActive )
-
-   if ( minval( INITIAL_PERCENT_SOIL_MOISTURE ) < fZERO &
-      .or. maxval( INITIAL_PERCENT_SOIL_MOISTURE ) > 100.0_c_float )  &
-     call warn(sMessage="One or more initial percent soils moisture values outside of " &
-       //"valid range (0% to 100%)", lFatal=lTRUE )
 
    !> create string list that allows for alternate heading identifiers for the landuse code
    call slList%append("LU_Code")
@@ -333,17 +314,17 @@ contains
 
     enddo
 
-    do iIndex = lbound( fSoilStorage, 1 ), ubound( fSoilStorage,1 )
+!     do iIndex = lbound( fSoilStorage, 1 ), ubound( fSoilStorage,1 )
 
-      fKcb_initial = update_crop_coefficient_date_as_threshold( iLanduseIndex( iIndex ) )
-      fRz_initial = calc_effective_root_depth( iLanduseIndex=iLanduseIndex( iIndex ),                &
-                                               fZr_max=fMax_Rooting_Depths( iLanduseIndex( iIndex ), &
-                                                                            iSoilGroup( iIndex ) ),  &
-                                               fKCB=fKcb_initial )
-      fSoilStorage( iIndex ) = INITIAL_PERCENT_SOIL_MOISTURE( iIndex ) / 100.0_c_float    &
-                               * fRz_initial * fAvailable_Water_Content( iIndex )
+!       fKcb_initial = update_crop_coefficient_date_as_threshold( iLanduseIndex( iIndex ) )
+!       fRz_initial = calc_effective_root_depth( iLanduseIndex=iLanduseIndex( iIndex ),                &
+!                                                fZr_max=fMax_Rooting_Depths( iLanduseIndex( iIndex ), &
+!                                                                             iSoilGroup( iIndex ) ),  &
+!                                                fKCB=fKcb_initial )
+!       fSoilStorage( iIndex ) = INITIAL_PERCENT_SOIL_MOISTURE( iIndex ) / 100.0_c_float    &
+!                                * fRz_initial * fAvailable_Water_Content( iIndex )
 
-    enddo
+!     enddo
 
   !> @TODO Add more logic here to perform checks on the validity of this data.
 
@@ -783,17 +764,16 @@ end function adjust_depletion_fraction_p
 
 !------------------------------------------------------------------------------
 
-  subroutine soil_moisture_FAO56_calculate( fSoilStorage, fActual_ET,                     &
+  subroutine soil_moisture_FAO56_calculate( fSoilStorage,                                 &
     fSoilStorage_Excess, fInfiltration, fGDD, fAvailableWaterCapacity, fReference_ET0,    &
     fMaxRootingDepth, iLanduseIndex, iSoilGroup )
 
     real (kind=c_float), intent(inout)   :: fSoilStorage
-    real (kind=c_float), intent(inout)   :: fActual_ET
-    real (kind=c_float), intent(inout)     :: fSoilStorage_Excess
-    real (kind=c_float), intent(inout)      :: fInfiltration
-    real (kind=c_float), intent(inout)      :: fGDD
-    real (kind=c_float), intent(inout)      :: fAvailableWaterCapacity
-    real (kind=c_float), intent(inout)      :: fReference_ET0
+    real (kind=c_float), intent(inout)   :: fSoilStorage_Excess
+    real (kind=c_float), intent(inout)   :: fInfiltration
+    real (kind=c_float), intent(inout)   :: fGDD
+    real (kind=c_float), intent(inout)   :: fAvailableWaterCapacity
+    real (kind=c_float), intent(inout)   :: fReference_ET0
     real (kind=c_float), intent(in)      :: fMaxRootingDepth
     integer (kind=c_int), intent(in)     :: iLanduseIndex
     integer (kind=c_int), intent(in)     :: iSoilGroup
@@ -880,10 +860,7 @@ end function adjust_depletion_fraction_p
     fBareSoilEvap = fReference_ET0 * fKe
     fCropETc = fReference_ET0 * (fKcb * fKs)
 
-    ! 
-    fActual_ET = fCropETc + fBareSoilEvap
-
-    fSoilStorage = fSoilStorage + fInfiltration - fActual_ET
+    fSoilStorage = fSoilStorage + fInfiltration - fCropETc - fBareSoilEvap
 
     if ( fSoilStorage > fSoilStorage_Max ) then
 
@@ -892,7 +869,6 @@ end function adjust_depletion_fraction_p
 
     elseif ( fSoilStorage < fZERO ) then 
     
-      fActual_ET = fActual_ET + fSoilStorage
       fSoilStorage = fZERO
       fSoilStorage_Excess = fZERO
 

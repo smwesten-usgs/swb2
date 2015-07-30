@@ -7,7 +7,7 @@ module exceptions
 
   private
 
-  public :: assert, die, warn, check_warnings
+  public :: assert, die, warn, check_for_fatal_warnings
 
   interface  assert
      module procedure :: assert_4bit
@@ -67,7 +67,7 @@ contains
 
   !------------------------------------------------------------------------------------------------
 
-  subroutine check_warnings()
+  subroutine check_for_fatal_warnings()
 
     ! [ LOCALS ]
     character (len=6)     :: sNumWarnings
@@ -117,7 +117,7 @@ contains
     endif  
 
 
-  end subroutine check_warnings  
+  end subroutine check_for_fatal_warnings  
 
 !------------------------------------------------------------------------------------------------
 

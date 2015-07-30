@@ -12,7 +12,7 @@ module data_catalog_entry
   use exceptions
   use logfiles
   use strings
-  use swb_grid
+  use grid
   use netcdf4_support
   use iso_c_binding
   implicit none

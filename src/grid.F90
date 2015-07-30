@@ -1,11 +1,11 @@
 !> @file
-!>  Contains a single module, swb_grid, which
+!>  Contains a single module, grid, which
 !>  provides support for gridded ASCII data file and data structure operations
 !> @ingroup grid
 
 !>  Provides support for input and output of gridded ASCII data,
 !> as well as for creation and destruction of grid data structures (defined types).
-module swb_grid
+module grid
 
   use iso_c_binding
   use constants_and_conversions
@@ -2400,4 +2400,4 @@ function grid_Convolve_sgl( pGrdFrom, iTargetCol, &
 
 end function grid_Convolve_sgl
 
-end module swb_grid
+end module grid

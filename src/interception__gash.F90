@@ -7,7 +7,7 @@ module interception__gash
   use dictionary
   use file_operations
   use parameters, only       : PARAMS
-  use swb_grid
+  use grid
   use simulation_datetime
   use strings
   use string_list
