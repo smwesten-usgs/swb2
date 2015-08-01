@@ -277,8 +277,9 @@ contains
     integer (kind=c_int), intent(inout)   :: iSoils_Code(:)
 
     iSoils_Code = pack( pSOILS_CODE_GRID%pGrdBase%iData, lActive )
+
     fAWC = pack( AVAILABLE_WATER_CONTENT, lActive )
-    
+
   end subroutine awc_table_values_initialize
 
 end module awc__table_values

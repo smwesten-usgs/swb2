@@ -851,11 +851,15 @@ end function adjust_depletion_fraction_p
     fKe = min(calc_surface_evaporation_coefficient( iLanduseIndex, fKr, fKcb ),   &
               f_few * KCB( KCB_MID, iLanduseIndex) )
 
+    print *, iLanduseIndex, iSoilGroup, fZr, fSoilStorage_Max, fAvailableWaterCapacity, fMaxRootingDepth, &
+        fDeficit, fTAW, fRAW, fKcb, fReference_ET0
+
     fKs = calc_water_stress_coefficient_Ks( iLanduseIndex=iLanduseIndex,   &
                                             fDeficit=fDeficit,             &
                                             fTotalAvailableWater=fTAW,     &
                                             fReadilyAvailableWater=fRAW,   &
                                             fReference_ET0=fReference_ET0 )
+
     
     fBareSoilEvap = fReference_ET0 * fKe
     fCropETc = fReference_ET0 * (fKcb * fKs)

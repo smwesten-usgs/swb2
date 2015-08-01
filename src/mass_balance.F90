@@ -2,6 +2,8 @@ module mass_balance
 
   use constants_and_conversions
   use model_domain, only         : MODEL_DOMAIN_T
+  use strings, only              : asCharacter
+  use logfiles
   use iso_c_binding, only        : c_short, c_int, c_float, c_double
   implicit none
 
@@ -127,6 +129,7 @@ contains
                     - cells%interception
 
       call cells%calc_runoff()
+
       call cells%calc_soil_moisture()
 
       where ( cells%soil_storage_max .approxequal. 0.0_c_float )
@@ -172,5 +175,40 @@ contains
     call update_continuous_frozen_ground_index( CFGI, cells%tmin, cells%tmax, cells%snow_storage )
 
   end subroutine calculate_snow_mass_balance_sub
+
+
+  subroutine minmaxmean( variable , varname )
+
+    real (kind=c_float), dimension(:)  :: variable
+    character (len=*), intent(in)      :: varname
+
+    ! [ LOCALS ] 
+    integer (kind=c_int) :: iCount
+    character (len=20)   :: sVarname
+    character (len=14)   :: sMin
+    character (len=14)   :: sMax
+    character (len=14)   :: sMean
+    character (len=10)   :: sCount
+
+    write (sVarname, fmt="(a20)") adjustl(varname)
+
+    if (size( variable, 1) > 0 ) then
+      write (sMin, fmt="(g14.3)")   minval(variable)
+      write (sMax, fmt="(g14.3)")   maxval(variable)
+      write (sMean, fmt="(g14.3)")  sum(variable) / size(variable,1)
+      write (sCount, fmt="(i10)") size(variable,1)
+    else
+      write (sMin, fmt="(g14.3)")   -9999.
+      write (sMax, fmt="(g14.3)")   -9999.
+      write (sMean, fmt="(g14.3)")  -9999.
+      write (sCount, fmt="(i10)")       0
+    endif
+
+    call LOGS%write( adjustl(sVarname)//" | "//adjustl(sMin)//" | "//adjustl(sMax) &
+       //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_DEBUG, lEcho=lTRUE )
+
+  end subroutine minmaxmean
+
+
 
 end module mass_balance

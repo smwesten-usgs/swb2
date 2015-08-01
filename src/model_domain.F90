@@ -54,7 +54,6 @@ module model_domain
      
     real (kind=c_float), allocatable       :: latitude(:)
     real (kind=c_float), allocatable       :: reference_ET0(:)
-    real (kind=c_float), allocatable       :: reference_ET0_adj(:)
     real (kind=c_float), allocatable       :: interception_ET(:)
     real (kind=c_float), allocatable       :: actual_ET(:)
     real (kind=c_float), allocatable       :: inflow(:)
@@ -242,7 +241,8 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
-    integer (kind=c_int)  :: iStat(37)
+    integer (kind=c_int)  :: iIndex
+    integer (kind=c_int)  :: iStat(34)
 
     iCount = count( this%active )
 
@@ -254,37 +254,39 @@ contains
     allocate( this%awc(iCount), stat=iStat(6) )
     allocate( this%latitude(iCount), stat=iStat(7) )
     allocate( this%reference_ET0(iCount), stat=iStat(8) )
-    allocate( this%reference_ET0_adj(iCount), stat=iStat(9) )
-    allocate( this%interception_ET(iCount), stat=iStat(10) )
-    allocate( this%actual_ET(iCount), stat=iStat(11) )
-    allocate( this%inflow(iCount), stat=iStat(12))
-    allocate( this%runon(iCount), stat=iStat(13) )
-    allocate( this%runoff(iCount), stat=iStat(14) )
-    allocate( this%outflow(iCount), stat=iStat(15) )
-    allocate( this%infiltration(iCount), stat=iStat(16) )
-    allocate( this%snowfall(iCount), stat=iStat(17) )
-    allocate( this%snowmelt(iCount), stat=iStat(18) )
-    allocate( this%interception(iCount), stat=iStat(19) )
-    allocate( this%rainfall(iCount), stat=iStat(20) )
-    allocate( this%interception_storage(iCount), stat=iStat(21) )
-    allocate( this%snow_storage(iCount), stat=iStat(22) )
-    allocate( this%soil_storage(iCount), stat=iStat(23) )
-    allocate( this%soil_storage_max(iCount), stat=iStat(24) )
-    allocate( this%potential_recharge(iCount), stat=iStat(25) )
-    allocate( this%fog(iCount), stat=iStat(26) )
-    allocate( this%irrigation(iCount), stat=iStat(27) )
-    allocate( this%max_rooting_depth(iCount), stat=iStat(28) )
-    allocate( this%index_order(iCount), stat=iStat(29) )
-    allocate( this%gdd(iCount), stat=iStat(30) )
-    allocate( this%runoff_outside( iCount ), stat=iStat(31) )
-    allocate( this%impervious_fraction( iCount ), stat=iStat(32) )
-    allocate( this%surface_storage( iCount ), stat=iStat(33) ) 
-    allocate( this%surface_storage_excess( iCount ), stat=iStat(34) )
-    allocate( this%surface_storage_max( iCount ), stat=iStat(35) )           
-    allocate( this%canopy_cover_fraction( iCount ), stat=iStat(36) ) 
-    allocate( this%soil_storage_previous_day( iCount ), stat=iStat(37) )          
+    allocate( this%actual_ET(iCount), stat=iStat(9) )
+    allocate( this%inflow(iCount), stat=iStat(10))
+    allocate( this%runon(iCount), stat=iStat(11) )
+    allocate( this%runoff(iCount), stat=iStat(12) )
+    allocate( this%outflow(iCount), stat=iStat(13) )
+    allocate( this%infiltration(iCount), stat=iStat(14) )
+    allocate( this%snowfall(iCount), stat=iStat(15) )
+    allocate( this%snowmelt(iCount), stat=iStat(16) )
+    allocate( this%interception(iCount), stat=iStat(17) )
+    allocate( this%rainfall(iCount), stat=iStat(18) )
+    allocate( this%interception_storage(iCount), stat=iStat(19) )
+    allocate( this%snow_storage(iCount), stat=iStat(20) )
+    allocate( this%soil_storage(iCount), stat=iStat(21) )
+    allocate( this%soil_storage_max(iCount), stat=iStat(22) )
+    allocate( this%potential_recharge(iCount), stat=iStat(23) )
+    allocate( this%fog(iCount), stat=iStat(24) )
+    allocate( this%irrigation(iCount), stat=iStat(25) )
+    allocate( this%index_order(iCount), stat=iStat(26) )
+    allocate( this%gdd(iCount), stat=iStat(27) )
+    allocate( this%runoff_outside( iCount ), stat=iStat(28) )
+    allocate( this%impervious_fraction( iCount ), stat=iStat(29) )
+    allocate( this%surface_storage( iCount ), stat=iStat(30) ) 
+    allocate( this%surface_storage_excess( iCount ), stat=iStat(31) )
+    allocate( this%surface_storage_max( iCount ), stat=iStat(32) )           
+    allocate( this%canopy_cover_fraction( iCount ), stat=iStat(33) ) 
+    allocate( this%soil_storage_previous_day( iCount ), stat=iStat(34) )          
 
-    if ( any( iStat /= 0 ) )  call die("Problem allocating memory", __FILE__, __LINE__)
+    do iIndex = 1, ubound( iStat, 1)
+      if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="  &
+        //asCharacter(iIndex), __FILE__, __LINE__ )
+    enddo
+    
+    if (any( iStat /= 0) ) call die ( "Unable to allocate memory for one or more arrays.", __FILE__, __LINE__ )  
 
   end subroutine initialize_arrays_sub
 
@@ -1064,7 +1066,7 @@ contains
     call et_gridded_values_calculate( )
 
     this%reference_ET0 = pack( pET_GRID%pGrdBase%rData, this%active ) &
-                                      / real( SIM_DT%iDaysInMonth, kind=c_float)
+                                      / real( SIM_DT%iDaysInMonth, kind=c_float)    
 
   end subroutine model_calculate_et_monthly_grid
 
@@ -1227,6 +1229,7 @@ contains
 
     this%soil_storage_max = this%max_rooting_depth * this%awc
 
+
     pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
         rX0=this%X_ll, rY0=this%Y_ll, &
         rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
@@ -1329,7 +1332,7 @@ contains
                                             fInfiltration=this%infiltration(iIndex),                            &
                                             fGDD=this%gdd(iIndex),                                              &
                                             fAvailableWaterCapacity=this%awc(iIndex),                           &
-                                            fReference_ET0=this%reference_ET0_adj(iIndex),                      &
+                                            fReference_ET0=this%reference_ET0(iIndex),                          &
                                             fMaxRootingDepth=MAX_ROOTING_DEPTH( this%landuse_Index(iIndex),     &
                                                                                 this%soil_group(iIndex) ),      &
                                             iLanduseIndex=this%landuse_index(iIndex),                           &
@@ -1483,7 +1486,11 @@ contains
                                       fAWC=this%awc,                              &
                                       iSoils_Code=this%soil_code )
 
+print *, __FILE__, ": ", __LINE__
+
     pTempGrd%rData = unpack( this%awc, this%active, this%dont_care )
+
+print *, __FILE__, ": ", __LINE__
 
     call grid_WriteArcGrid( sFilename="Available_water_content__as_calculated_inches_per_foot.asc", pGrd=pTempGrd )
 
@@ -1922,7 +1929,6 @@ contains
     
     call minmaxmean( this%latitude, "Lat")
     call minmaxmean( this%reference_ET0, "ET0")
-    call minmaxmean( this%reference_ET0_adj, "ET0_adn")
     call minmaxmean( this%actual_ET, "actET")
     call minmaxmean( this%inflow, "inflow")
     call minmaxmean( this%runon, "runon")

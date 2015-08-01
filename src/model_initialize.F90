@@ -166,6 +166,7 @@ contains
 
     call read_hydrologic_soils_groups()
 
+    ! problem is occuring in this step; cannot pack max_rooting_depth until active(:,:) has been determined
     call initialize_root_zone_depths()
 
     ! null pointer after this point 
@@ -448,6 +449,7 @@ contains
     call grid_WriteArcGrid("Maximum_rooting_depth.asc", pRooting_Depth )
 
     MODEL%current_rooting_depth = pack( pRooting_Depth%rData, MODEL%active )
+    MODEL%max_rooting_depth = pack( pRooting_Depth%rData, MODEL%active )
 
     MAX_ROOTING_DEPTH = pRooting_Depth%rData
 
