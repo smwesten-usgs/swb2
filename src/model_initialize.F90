@@ -10,7 +10,7 @@ module model_initialize
   use file_operations
   use grid
 !  use loop_iterate
-  use model_domain, only                 : MODEL
+  use model_domain, only                 : MODEL, minmaxmean
   use output, only                       : initialize_output
   use parameters
   use precipitation__method_of_fragments
@@ -231,8 +231,8 @@ contains
        call warn(sMessage="One or more initial percent soils moisture values outside of " &
          //"valid range (0% to 100%)", lFatal=lTRUE )
 
-     MODEL%soil_storage = fInitial_Percent_Soil_Moisture * MODEL%soil_storage_max  
-
+     MODEL%soil_storage = fInitial_Percent_Soil_Moisture / 100.0_c_float * MODEL%soil_storage_max  
+    
     endif
 
   end subroutine initialize_soil_storage
@@ -447,9 +447,6 @@ contains
     call slList%clear()
 
     call grid_WriteArcGrid("Maximum_rooting_depth.asc", pRooting_Depth )
-
-    MODEL%current_rooting_depth = pack( pRooting_Depth%rData, MODEL%active )
-    MODEL%max_rooting_depth = pack( pRooting_Depth%rData, MODEL%active )
 
     MAX_ROOTING_DEPTH = pRooting_Depth%rData
 

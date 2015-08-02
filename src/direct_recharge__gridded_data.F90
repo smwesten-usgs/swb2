@@ -144,7 +144,6 @@ contains
 
     pWATER_MAIN => DAT%find( "WATER_MAIN_LEAKAGE" )
 
-print *, __FILE__, ": ", __LINE__
 
     call slString%clear()
     call slString%append( "Disposal_well_recharge" )
@@ -154,8 +153,6 @@ print *, __FILE__, ": ", __LINE__
 
     pDISPOSAL_WELL => DAT%find( "DISPOSAL_WELL_DISCHARGE" )
 
-
-print *, __FILE__, ": ", __LINE__
 
     if ( associated( pANNUAL_RECHARGE_RATE ) ) then
 
@@ -178,9 +175,6 @@ print *, __FILE__, ": ", __LINE__
       enddo  
 
      endif
-
-
-print *, __FILE__, ": ", __LINE__
 
 
     if ( associated( pCESSPOOL ) ) then
@@ -206,8 +200,6 @@ print *, __FILE__, ": ", __LINE__
      endif
 
 
-print *, __FILE__, ": ", __LINE__
-
     if ( associated( pSTORM_DRAIN ) ) then
 
       allocate( fSTORM_DRAIN( count( lActive ) ), stat=iStat )
@@ -229,8 +221,6 @@ print *, __FILE__, ": ", __LINE__
       enddo  
 
      endif
-
-print *, __FILE__, ": ", __LINE__
 
 
     if ( associated( pWATER_BODY_RECHARGE ) ) then
@@ -256,8 +246,6 @@ print *, __FILE__, ": ", __LINE__
      endif
 
 
-print *, __FILE__, ": ", __LINE__
-
     if ( associated( pWATER_MAIN ) ) then
 
       allocate( fWATER_MAIN( count( lActive ) ), stat=iStat )
@@ -280,7 +268,6 @@ print *, __FILE__, ": ", __LINE__
 
      endif
 
-print *, __FILE__, ": ", __LINE__
 
     if ( associated( pDISPOSAL_WELL ) ) then
 
@@ -304,7 +291,6 @@ print *, __FILE__, ": ", __LINE__
 
      endif
 
-print *, __FILE__, ": ", __LINE__
 
     allocate( DIRECT_RECHARGE( count( lActive ) ), stat=iStat )
     call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )

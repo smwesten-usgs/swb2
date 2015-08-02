@@ -191,6 +191,8 @@ module model_domain
 
   type (GENERAL_GRID_T), pointer            :: pROOTING_DEPTH
 
+  public :: minmaxmean
+
 contains
 
   !
@@ -1227,8 +1229,11 @@ contains
     ! [ LOCALS ]
     type ( GENERAL_GRID_T ), pointer :: pTempGrd
 
-    this%soil_storage_max = this%max_rooting_depth * this%awc
+    !> @todo this should be in its own routine...
+    this%current_rooting_depth = pack( MAX_ROOTING_DEPTH, MODEL%active )
+    this%max_rooting_depth = pack( MAX_ROOTING_DEPTH, MODEL%active )
 
+    this%soil_storage_max = this%max_rooting_depth * this%awc
 
     pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
         rX0=this%X_ll, rY0=this%Y_ll, &
@@ -1267,11 +1272,10 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call soil_moisture_FAO56_initialize( fSoilStorage=this%soil_storage,        &
-                                         iLanduseIndex=this%landuse_index,      &
-                                         iSoilGroup=this%soil_group,            &
-                                         fMax_Rooting_Depths=MAX_ROOTING_DEPTH, &
-                                         fAvailable_Water_Content=this%awc,     &
+    call soil_moisture_FAO56_initialize( fSoilStorage=this%soil_storage,             &
+                                         iLanduseIndex=this%landuse_index,           &
+                                         iSoilGroup=this%soil_group,                 &
+                                         fAvailable_Water_Content=this%awc,          &
                                          lActive=this%active )
 
   end subroutine model_initialize_soil_moisture_fao_56
@@ -1307,8 +1311,7 @@ contains
                                           fGDD=this%gdd(index),                                              &
                                           fAvailableWaterCapacity=this%awc(index),                           &
                                           fReference_ET0=this%reference_ET0(index),                          &
-                                          fMaxRootingDepth=MAX_ROOTING_DEPTH( this%landuse_index(index),     &
-                                                                      this%soil_group(index) ),              &
+                                          fMaxRootingDepth=this%max_rooting_depth(index),                    &
                                           iLanduseIndex=this%landuse_index(index),                           &
                                           iSoilGroup=this%soil_group(index) )
 
@@ -1333,8 +1336,7 @@ contains
                                             fGDD=this%gdd(iIndex),                                              &
                                             fAvailableWaterCapacity=this%awc(iIndex),                           &
                                             fReference_ET0=this%reference_ET0(iIndex),                          &
-                                            fMaxRootingDepth=MAX_ROOTING_DEPTH( this%landuse_Index(iIndex),     &
-                                                                                this%soil_group(iIndex) ),      &
+                                            fMaxRootingDepth=this%max_rooting_depth(iIndex),                    &
                                             iLanduseIndex=this%landuse_index(iIndex),                           &
                                             iSoilGroup=this%soil_group(iIndex) )
 
@@ -1486,11 +1488,7 @@ contains
                                       fAWC=this%awc,                              &
                                       iSoils_Code=this%soil_code )
 
-print *, __FILE__, ": ", __LINE__
-
     pTempGrd%rData = unpack( this%awc, this%active, this%dont_care )
-
-print *, __FILE__, ": ", __LINE__
 
     call grid_WriteArcGrid( sFilename="Available_water_content__as_calculated_inches_per_foot.asc", pGrd=pTempGrd )
 

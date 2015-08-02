@@ -71,13 +71,11 @@ module soil_moisture__FAO_56
 contains
 
   subroutine soil_moisture_FAO56_initialize( fSoilStorage, iLanduseIndex, iSoilGroup, &
-                                             fMax_Rooting_Depths, fAvailable_Water_Content, &
-                                             lActive )
+                                             fAvailable_Water_Content, lActive )
 
     real (kind=c_float), intent(inout)   :: fSoilStorage(:)
     integer (kind=c_int), intent(in)     :: iLanduseIndex(:)
     integer (kind=c_int), intent(in)     :: iSoilGroup(:)
-    real (kind=c_float), intent(in)      :: fMax_Rooting_Depths(:, :)
     real (kind=c_float), intent(in)      :: fAvailable_Water_Content(:)
     logical (kind=c_bool), intent(in)    :: lActive(:,:)
 
@@ -850,9 +848,6 @@ end function adjust_depletion_fraction_p
 
     fKe = min(calc_surface_evaporation_coefficient( iLanduseIndex, fKr, fKcb ),   &
               f_few * KCB( KCB_MID, iLanduseIndex) )
-
-    print *, iLanduseIndex, iSoilGroup, fZr, fSoilStorage_Max, fAvailableWaterCapacity, fMaxRootingDepth, &
-        fDeficit, fTAW, fRAW, fKcb, fReference_ET0
 
     fKs = calc_water_stress_coefficient_Ks( iLanduseIndex=iLanduseIndex,   &
                                             fDeficit=fDeficit,             &
