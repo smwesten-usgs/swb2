@@ -225,6 +225,7 @@ contains
     ! [ LOCALS ]
     real (kind=c_float)  :: fDepletionFraction
     real (kind=c_double) :: rDepletionAmount
+    real (kind=c_float)  :: fPervious_Fraction
     real (kind=c_double) :: rIrrigationAmount
 
     integer (kind=c_int)              :: iMonth
@@ -267,8 +268,6 @@ contains
 
       fIrrigationAmount( iIndex ) = fZERO
 
-      fEfficiency = max( IRRIGATION_EFFICIENCY( iLanduseIndex( iIndex ) ), 0.20_c_float )
-
       if ( ( iDayOfYear < FIRST_DAY_OF_IRRIGATION( iLanduseIndex( iIndex ) ) ) &
         .or. ( iDayOfYear > LAST_DAY_OF_IRRIGATION( iLanduseIndex( iIndex ) ) ) )  cycle
 
@@ -276,19 +275,41 @@ contains
       if ( fSoilStorage_Max( iIndex ) <= fZERO ) cycle
       if ( IRRIGATION_MASK( iIndex ) < 1.0e-6_c_float ) cycle 
 
-      if ( ( 1.0_c_float - fSoilStorage( iIndex ) / fSoilStorage_Max( iIndex ) )                             &
-             > MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex( iIndex ) ) ) then
+      fDepletionFraction = 1.0_c_float - fSoilStorage( iIndex ) / fSoilStorage_Max( iIndex )
+
+      if ( fDepletionFraction > MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex( iIndex ) ) ) then
+
+        fEfficiency = max( IRRIGATION_EFFICIENCY( iLanduseIndex( iIndex ) ), 0.20_c_float )
+
+        fPervious_Fraction = 1.0_c_float - fImpervious_Fraction( iIndex )
 
         fIrrigationAmount( iIndex ) = ( fSoilStorage_Max( iIndex ) - fSoilStorage( iIndex ) ) &
                                        * IRRIGATION_MASK( iIndex )                            &
-                                       * ( 1.0_c_float - fImpervious_Fraction( iIndex ) )     &
+                                       * fPervious_Fraction                                   &
                                        / fEfficiency
 
         IRRIGATION_FROM_GROUNDWATER( iIndex ) = fIrrigationAmount( iIndex )                                  &
                                                 * FRACTION_OF_IRRIGATION_FROM_GW( iLanduseIndex( iIndex ) )
-                                                
+
         IRRIGATION_FROM_SURFACE_WATER( iIndex ) = fIrrigationAmount( iIndex )  &
                                                    - IRRIGATION_FROM_GROUNDWATER( iIndex )
+
+!         if ( iLanduseIndex( iIndex ) ==  ) then
+
+!           print *,fDepletionFraction, &
+!                   MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( iLanduseIndex(iIndex) ), &
+!                   fSoilStorage_Max( iIndex ), &
+!                   fSoilStorage( iIndex ), &
+!                   IRRIGATION_MASK( iIndex ), &
+!                   fImpervious_Fraction( iIndex ), &
+!                   fEfficiency, &
+!                   fIrrigationAmount( iIndex )
+
+
+!         endif
+
+
+
       endif
 
     enddo

@@ -185,6 +185,16 @@ contains
             rValues=cells%gross_precip,                                                          &
             rField=cells%dont_care )
 
+    call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_RAINFALL )%ncfile,                &
+            iVarID=NC_OUT( NCDF_RAINFALL )%ncfile%iVarID(NC_Z),                                 &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+            iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                      &
+                                int(cells%number_of_columns, kind=c_size_t) ],                  &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+            lMask=cells%active,                                                                 &
+            rValues=cells%rainfall,                                                             &
+            rField=cells%dont_care )
+
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_INTERCEPTION )%ncfile,            &
             iVarID=NC_OUT( NCDF_INTERCEPTION )%ncfile%iVarID(NC_Z),                             &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &

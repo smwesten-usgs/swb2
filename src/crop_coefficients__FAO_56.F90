@@ -1,12 +1,11 @@
 !> @file
-!>  Contains a single module, \ref et_crop_coefficients, which
+!>  Contains a single module, \ref crop_coefficients__FAO56, which
 !>  provides support for modifying reference ET through the use of
-!> crop coefficients
+!>  crop coefficients
 
-!>  Provide support for assessing the effect of irrigation on recharge
-!> values by estimating the irrigation required to maintain soil moisture levels
-!> for specific crop types.
-module soil_moisture__FAO_56
+!> Update crop coefficients for crop types in simulation.
+
+module crop_coefficients__FAO_56
 
   use iso_c_binding, only             : c_bool, c_short, c_int, c_float, c_double
   use constants_and_conversions, only : M_PER_FOOT, lTRUE, lFALSE, fTINYVAL, &
@@ -23,8 +22,8 @@ module soil_moisture__FAO_56
 
   private
 
-  public :: soil_moisture_FAO56_initialize, soil_moisture_FAO56_calculate
-  public :: soil_moisture_FAO56_update_growth_stage_dates
+  public :: crop_coefficients_FAO56_initialize, crop_coefficients_FAO56_calculate
+  public :: crop_coefficients_FAO56_update_growth_stage_dates
   public :: update_crop_coefficient_date_as_threshold, update_crop_coefficient_GDD_as_threshold
 
   enum, bind(c)
@@ -70,8 +69,8 @@ module soil_moisture__FAO_56
 
 contains
 
-  subroutine soil_moisture_FAO56_initialize( fSoilStorage, iLanduseIndex, iSoilGroup, &
-                                             fAvailable_Water_Content, lActive )
+  subroutine crop_coefficients_FAO56_initialize( fSoilStorage, iLanduseIndex, iSoilGroup, &
+                                                 fAvailable_Water_Content, lActive )
 
     real (kind=c_float), intent(inout)   :: fSoilStorage(:)
     integer (kind=c_int), intent(in)     :: iLanduseIndex(:)
@@ -329,7 +328,7 @@ contains
   !> @TODO Need to handle missing values. WHat do we do if an entire column of values
   !!       is missing?
 
-  end subroutine soil_moisture_FAO56_initialize
+  end subroutine crop_coefficients_FAO56_initialize
 
 !------------------------------------------------------------------------------
 
@@ -471,7 +470,7 @@ end function update_crop_coefficient_GDD_as_threshold
 
 !------------------------------------------------------------------------------
 
-subroutine soil_moisture_FAO56_update_growth_stage_dates( )
+subroutine crop_coefficients_FAO56_update_growth_stage_dates( )
 
   ! [ LOCALS ]
   integer (kind=c_int) :: iIndex
@@ -505,93 +504,8 @@ subroutine soil_moisture_FAO56_update_growth_stage_dates( )
   enddo
 
 
-end subroutine soil_moisture_FAO56_update_growth_stage_dates
+end subroutine crop_coefficients_FAO56_update_growth_stage_dates
 
-!------------------------------------------------------------------------------
-
-!>
-
-function calc_evaporation_reduction_coefficient(fTotalEvaporableWater,                &
-                                              fReadilyEvaporableWater, fDeficit)  result(fKr)
-
-  ! [ ARGUMENTS ]
-  real (kind=c_float), intent(in) :: fTotalEvaporableWater
-  real (kind=c_float), intent(in) :: fReadilyEvaporableWater
-  real (kind=c_float), intent(in) :: fDeficit
-
-  ! [ RESULT ]
-  real (kind=c_float) :: fKr
-
-  associate ( REW => fReadilyEvaporableWater,     &
-              TEW => fTotalEvaporableWater,       &
-              Deficit => fDeficit )
-
-    if ( Deficit > REW .and. Deficit < TEW ) then
-      fKr = (TEW - Deficit) / (TEW - REW)
-    elseif ( Deficit <= REW ) then
-      fKr = 1.0_c_float
-    else
-      fKr = 0.0_c_float
-    endif
-
-!    print *, "fKr: Deficit=",Deficit, "  REW=",REW, "  TEW=", TEW, "  fKr=", fKr
-
-  end associate
-
-end function calc_evaporation_reduction_coefficient
-
-!------------------------------------------------------------------------------
-
-!> This function estimates the fraction of the ground covered by
-!! vegetation during the growing season
-!!
-!!@note Implemented as equation 76, FAO-56, Allen and others
-
-function calc_fraction_wetted_and_exposed_soil( iLanduseIndex, fKcb)   result (f_few)
-
-  integer (kind=c_int), intent(in)     :: iLanduseIndex
-  real (kind=c_float), intent(in)      :: fKcb
-  real (kind=c_float)                  :: f_few
-
-  ! [ LOCALS ]
-  real (kind=c_float) :: f_fc
-  real (kind=c_float) :: fNumerator
-  real (kind=c_float) :: fDenominator
-  real (kind=c_float) :: fExponent
-
-  if ( KCB_METHOD( iLanduseIndex ) == KCB_METHOD_MONTHLY_VALUES ) then
-
-    fNumerator = fKcb - minval(KCB( JAN:DEC, iLanduseIndex ) )
-    fDenominator = maxval( KCB( JAN:DEC, iLanduseIndex) ) - minval( KCB( JAN:DEC, iLanduseIndex ) )
-
-  else 
-  
-    fNumerator = fKcb - minval(KCB( KCB_INI:KCB_MIN, iLanduseIndex ) )
-    fDenominator = maxval( KCB( KCB_INI:KCB_MIN, iLanduseIndex) ) - minval( KCB( KCB_INI:KCB_MIN, iLanduseIndex ) )
-
-  endif
-
-  fExponent = 1.0_c_float + 0.5_c_float * MEAN_PLANT_HEIGHT( iLanduseIndex ) * M_PER_FOOT
-
-  ! calculate the fraction of the ground that is currently covered
-  if(fDenominator >  0.0_c_float ) then
-    f_fc = ( fNumerator / fDenominator) ** fExponent
-  else
-    f_fc = 1.0_c_float
-  endif
-
-  ! now calculate the fraction of the ground that is EXPOSED and WETTED
-  f_few = 1.0_c_float - f_fc
-
-  if ( f_few < 0.0_c_float ) f_few = 0.0_c_float
-  if ( f_few > 1.0_c_float ) f_few = 1.0_c_float
-
-!print *, "f_few: fNumerator=",fNumerator,"  fDenominator=",fDenominator,"  maxval(KCB)=",maxval( KCB( :, iLanduseIndex) ), &
-!   "  minval(KCB)=",minval( KCB( :, iLanduseIndex) ),"  Plant_Height=", MEAN_PLANT_HEIGHT( iLanduseIndex ), "  f_few=", f_few
-
-end function calc_fraction_wetted_and_exposed_soil
-
-!------------------------------------------------------------------------------
 
 !> Calculate the effective root zone depth.
 !!
@@ -608,19 +522,19 @@ end function calc_fraction_wetted_and_exposed_soil
 !! @retval rZr_i current active rooting depth.
 !! @note Implemented as equation 8-1 (Annex 8), FAO-56, Allen and others.
 
-function calc_effective_root_depth( iLanduseIndex, fZr_max, fKCB ) 	result(fZr_i)
+function calc_effective_root_depth( iLanduseIndex, fZr_max, fKCB )  result(fZr_i)
 
   integer (kind=c_int), intent(in)    :: iLanduseIndex 
-	real (kind=c_float), intent(in)     :: fZr_max
+  real (kind=c_float), intent(in)     :: fZr_max
   real (kind=c_float), intent(in)     :: fKCB
 
   ! [ RESULT ]
   real (kind=c_float) :: fZr_i
 
-	! [ LOCALS ]
-	! 0.3048 feet equals 0.1 meters, which is seems to be the standard
-	! initial rooting depth in the FAO-56 methodology
-	real (kind=c_float), parameter :: fZr_min = 0.3048
+  ! [ LOCALS ]
+  ! 0.3048 feet equals 0.1 meters, which is seems to be the standard
+  ! initial rooting depth in the FAO-56 methodology
+  real (kind=c_float), parameter :: fZr_min = 0.3048
   real (kind=c_float)            :: fMaxKCB
   real (kind=c_float)            :: fMinKCB
 
@@ -635,11 +549,11 @@ function calc_effective_root_depth( iLanduseIndex, fZr_max, fKCB ) 	result(fZr_i
   ! if there is not much difference between the MAX Kcb and MIN Kcb, assume that
   ! we are dealing with an area such as a forest, where we assume that the rooting
   ! depths are constant year-round
-! 	if ( ( fMaxKCB - fMinKCB ) < 0.1_c_float ) then
+!   if ( ( fMaxKCB - fMinKCB ) < 0.1_c_float ) then
 
-! 	  fZr_i = fZr_max
+!     fZr_i = fZr_max
 
-! 	elseif ( fMaxKCB > 0.0_C_float ) then
+!   elseif ( fMaxKCB > 0.0_C_float ) then
 
 !     fZr_i = fZr_min + (fZr_max - fZr_min) * fKCB / fMaxKCB 
 
@@ -653,117 +567,10 @@ function calc_effective_root_depth( iLanduseIndex, fZr_max, fKCB ) 	result(fZr_i
 
 end function calc_effective_root_depth
 
-!------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
-!> This function estimates Ke, the bare surface evaporation coefficient
-!!
-!! @note Implemented as equation 71, FAO-56, Allen and others
-
-function calc_surface_evaporation_coefficient( iLanduseIndex, fKr, fKcb )     result(fKe)
-
-  integer (kind=c_int), intent(in)     :: iLanduseIndex
-  real (kind=c_float), intent(in)      :: fKr
-  real (kind=c_float), intent(in)      :: fKcb
-  real (kind=c_float)                  :: fKe
-
-  fKe = fKr * ( maxval( KCB( :, iLanduseIndex ) ) - fKcb )
-
-end function calc_surface_evaporation_coefficient
-
-!------------------------------------------------------------------------------
-
-!> This subroutine updates the total available water (TAW)
-!> (water within the rootzone) for a gridcell
-
-subroutine calc_total_available_water_TAW(fTotalAvailableWater, fReadilyAvailableWater, &
-                iLanduseIndex, fAvailableWaterCapacity, fCurrentRootingDepth )
-
-  real (kind=c_float), intent(out)      :: fTotalAvailableWater
-  real (kind=c_float), intent(out)      :: fReadilyAvailableWater  
-  integer (kind=c_int), intent(in)      :: iLanduseIndex
-  real (kind=c_float), intent(in)       :: fAvailableWaterCapacity
-  real (kind=c_float), intent(in)       :: fCurrentRootingDepth
-
-  fTotalAvailableWater = fCurrentRootingDepth * fAvailableWaterCapacity
-  fReadilyAvailableWater = fTotalAvailableWater * DEPLETION_FRACTION( iLanduseIndex )
-
-  end subroutine calc_total_available_water_TAW
-
-!------------------------------------------------------------------------------
-
-!> This function estimates Ks, water stress coefficient
-!!
-!! @note Implemented as equation 84, FAO-56, Allen and others
-
-function calc_water_stress_coefficient_Ks( iLanduseIndex, fDeficit, &
-                      fTotalAvailableWater, fReadilyAvailableWater, &
-                      fReference_ET0 )                                  result(fKs)
-
-  integer (kind=c_int), intent(in)     :: iLanduseIndex
-  real (kind=c_float), intent(in)      :: fDeficit
-  real (kind=c_float), intent(in)      :: fTotalAvailableWater
-  real (kind=c_float), intent(in)      :: fReadilyAvailableWater
-  real (kind=c_float), intent(in)      :: fReference_ET0
-
-  ! [ LOCALS ]
-  real (kind=c_float)                  :: fKs
-  real (kind=c_float)                  :: p
-
-
-  if ( fDeficit < fReadilyAvailableWater ) then
-    
-    fKs = 1.0_c_float
-  
-  elseif ( fDeficit < fTotalAvailableWater ) then
-
-    p = adjust_depletion_fraction_p( p_table_22=DEPLETION_FRACTION( iLanduseIndex ),   &
-                                     fReference_ET0=fReference_ET0 )
-
-    fKs = ( fTotalAvailableWater - fDeficit + 1.0e-6_c_float ) &
-             / ( (1.0_c_float - p ) * ( fTotalAvailableWater + 1.0e-6_c_float ) )
-
-  else
-
-    fKs = 0.0_c_float
-  
-  endif
-
-end function calc_water_stress_coefficient_Ks
-
-!------------------------------------------------------------------------------
-
-!> Adjust the depletion fraction based on current reference ET0.
-!!
-!! From FAO-56: "The fraction p is a function of the evaporation power of the atmosphere.
-!! At low rates of ETc, the p values listed in Table 22 are higher than at high rates of ETc.
-!! For hot dry weather conditions, where ETc is high, p is 10-25% less than the values 
-!! presented in Table 22, and the soil is still relatively wet when the stress starts to occur.
-!! When the crop evapotranspiration is low, p will be up to 20% more than the listed values.
-!! 
-!! @param[in] p_table_22 This is the unadjusted depletion fraction value; FAO-56
-!!     table 22 gives values of the depletion fraction relative to a reference ET0 value of 5mm.
-!! @param[in] fReference_ET0 The reference ET0 to which the depletion fraction will be
-!!     adjusted.
-!! @note Discussed as a footnote to Table 22, FAO-56, Allen and others.
-!!   See @ref http://www.fao.org/docrep/x0490e/x0490e0e.htm#TopOfPage for details.
-
-function adjust_depletion_fraction_p( p_table_22, fReference_ET0 )   result( p )
-
-  real (kind=c_float), intent(in)      :: p_table_22
-  real (kind=c_float), intent(in)      :: fReference_ET0
-  real (kind=c_float)                  :: p
-
-  p = p_table_22 + 0.04_c_float * ( 5.0_c_float - in_to_mm( fReference_ET0 ) )
-
-  p = min( p, 0.8_c_float )
-  p = max( p, 0.1_c_float )
-
-end function adjust_depletion_fraction_p
-
-!------------------------------------------------------------------------------
-
-  subroutine soil_moisture_FAO56_calculate( fSoilStorage,                                 &
-    fSoilStorage_Excess, fInfiltration, fGDD, fAvailableWaterCapacity, fReference_ET0,    &
+  subroutine crop_coefficients_FAO56_calculate( fSoilStorage,                                 &
+    fSoilStorage_Excess, fInfiltration, fGDD, fAvailableWaterCapacity, fReference_ET0,        &
     fMaxRootingDepth, iLanduseIndex, iSoilGroup )
 
     real (kind=c_float), intent(inout)   :: fSoilStorage
@@ -792,6 +599,12 @@ end function adjust_depletion_fraction_p
     real (kind=c_float) :: fSoilStorage_Max
     real (kind=c_float) :: fBareSoilEvap
     real (kind=c_float) :: fCropETc
+
+!     if (iLanduseIndex == 4) then
+!       print *, "FAO56: ", fSoilStorage,                                 &
+!         fSoilStorage_Excess, fInfiltration, fGDD, fAvailableWaterCapacity, fReference_ET0,    &
+!         fMaxRootingDepth, iLanduseIndex, iSoilGroup
+!     endif
 
     if ( KCB_METHOD( iLanduseIndex )  == KCB_METHOD_FAO56  &
       .or. KCB_METHOD( iLanduseIndex ) == KCB_METHOD_MONTHLY_VALUES ) then
@@ -877,6 +690,6 @@ end function adjust_depletion_fraction_p
 
     endif   
     
-  end subroutine soil_moisture_FAO56_calculate
+  end subroutine crop_coefficients_FAO56_calculate
 
-end module soil_moisture__FAO_56
+end module crop_coefficients__FAO_56

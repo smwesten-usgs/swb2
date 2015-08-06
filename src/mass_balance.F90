@@ -39,7 +39,7 @@ contains
     call cells%calc_fog()
     call cells%calc_interception()
 
-    cells%interception_storage = cells%interception_storage + cells%interception
+    cells%interception_storage = cells%interception_storage + cells%interception * cells%canopy_cover_fraction
     cells%actual_ET = min( cells%reference_ET0, cells%interception_storage) * cells%canopy_cover_fraction
 
   end subroutine calculate_interception_mass_balance_sub
@@ -50,14 +50,15 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)   :: cells
 
-    cells%surface_storage = cells%surface_storage + cells%rainfall + cells%snowmelt
+    cells%surface_storage = cells%surface_storage + ( cells%rainfall + cells%snowmelt )   &
+                                                          * cells%impervious_fraction
 
     cells%actual_ET = cells%actual_ET + min( cells%reference_ET0, cells%surface_storage) * cells%impervious_fraction
       
     cells%surface_storage = cells%surface_storage - min( cells%reference_ET0, cells%surface_storage)
 
-    cells%surface_storage_excess = max( 0.0_c_float,                                                            &
-                                         cells%surface_storage - cells%surface_storage_max )
+    cells%surface_storage_excess = max( 0.0_c_float, cells%surface_storage - cells%surface_storage_max )         &
+                                       * cells%impervious_fraction
 
   end subroutine calculate_impervious_surface_mass_balance_sub    
 
@@ -88,7 +89,6 @@ contains
         cells%inflow( orderindex ) =  cells%runon( orderindex )                      &
                                     + cells%rainfall( orderindex )                   &
                                     + cells%fog( orderindex )                        &
-                                    + cells%irrigation( orderindex )                 &
                                     + cells%snowmelt( orderindex )                   &
                                     - cells%interception( orderindex )                      
                              
@@ -108,6 +108,8 @@ contains
 
           call cells%calc_runoff( orderindex )
  
+          cells%inflow( orderindex ) =  cells%inflow( orderindex ) + cells%irrigation( orderindex )
+
           cells%infiltration( orderindex ) = cells%inflow( orderindex ) - cells%runoff( orderindex )
 
           if ( targetindex > 0)  cells%runon( targetindex ) = cells%runoff( orderindex )
@@ -124,13 +126,12 @@ contains
 
       cells%inflow =  cells%rainfall                  &
                     + cells%fog                       &
-                    + cells%irrigation                &
                     + cells%snowmelt                  &
                     - cells%interception
 
       call cells%calc_runoff()
 
-      call cells%calc_soil_moisture()
+      cells%inflow =  cells%inflow + cells%irrigation
 
       where ( cells%soil_storage_max .approxequal. 0.0_c_float )
 
@@ -145,6 +146,8 @@ contains
         cells%infiltration = cells%inflow - cells%runoff
 
       end where
+
+      call cells%calc_soil_moisture()
 
     endif
 
