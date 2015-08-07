@@ -7,8 +7,8 @@ module actual_evapotranspiration__thornthwaite_mather
 contains
 
   elemental subroutine calculate_actual_et_thornthwaite_mather(                      &
-                                                  available_water,                   &
-                                                  available_water_capacity,          &
+                                                  soil_storage,                      &
+                                                  max_soil_storage,                  &
                                                   precipitation,                     &
                                                   reference_et0,                     &
                                                   actual_et,                         &

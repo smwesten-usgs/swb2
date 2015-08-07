@@ -9,12 +9,6 @@ When SWB is run with this process option soil moisture is tabulated by means of 
 
 *P minus PE* $(P-PE)$. The first step in calculating a new soil moisture value for any given grid cell is to subtract potential evapotranspiration from the daily precipitation ($P-PE$). Negative values of $P-PE$ represent a potential deficiency of water, whereas positive $P-PE$ values represent a potential surplus of water.
 
-*Accumulated Potential Water Loss (APWL)*. The accumulated potential water loss is calculated as a running total of the daily $P-PE$ values during periods when $P-PE$ is negative. This running total represents the total amount of unsatisfied potential evapotranspiration to which the soil has been subjected. Soils typically yield water more easily during the first days in which $P-PE$ is negative. On subsequent days, as the APWL grows, soil moisture is less readily given up. The nonlinear relation between soil moisture and the accumulated potential water loss was described by Thornthwaite and Mather (1957) in a series of tables. These tables are incorporated into the SWB code.
-
-Note that the accumulated potential water loss can grow without bound; it represents the cumulative daily potential water loss given the potential evapotranspiration and observed precipitation. Accumulated potential water loss is calculated as:
-
-$APWL = \sum\limits_{}^{} {(precip - PET)} $
-
 *Soil moisture*, $\Delta\,soil\,moisture$. The soil-moisture term represents the amount of water held in soil storage for a given grid cell. Soil moisture has an upper bound that corresponds to the soil's maximum water-holding capacity (roughly equivalent to the field capacity); soil moisture has a lower bound that corresponds to the soil's permanent wilting point.
 
 When $P-PE$ is positive, the new soil-moisture value is found by adding this $P-PE$ term directly to the preceding soil-moisture value. If the new soil-moisture value is still below the maximum water-holding capacity, the Thornthwaite-Mather soil-moisture tables are consulted to back-calculate a new, reduced accumulated potential water-loss value. If the new soil-moisture value exceeds the maximum water-holding capacity, the soil-moisture value is capped at the value of the maximum water-holding capacity, the excess moisture is converted to recharge, and the accumulated potential water-loss term is reset to zero.

@@ -1,8 +1,8 @@
 module model_iterate
 
   use iso_c_binding, only         : c_bool
+  use daily_calculation, only     : perform_daily_calculation
   use logfiles, only              : LOGS, LOG_ALL
-  use mass_balance, only          : calculate_mass_balance
   use model_domain, only          : MODEL_DOMAIN_T
   use simulation_datetime, only   : SIM_DT
   use string_list, only           : STRING_LIST_T
@@ -26,7 +26,7 @@ contains
       call LOGS%write("Calculating: "//SIM_DT%curr%prettydate(), iLogLevel=LOG_ALL, lEcho=.true._c_bool )
 
       call this%get_climate_data()
-      call calculate_mass_balance(this)
+      call perform_daily_calculation(this)
       call write_output(this)
       call SIM_DT%addDay()
 

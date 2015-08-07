@@ -494,28 +494,4 @@ main_loop: do
 
   end subroutine routing_D8_determine_solution_order
 
-!--------------------------------------------------------------------------------------------------
-
-  subroutine routing_D8_calculate( fRunoff, fRunon )
-
-    real (kind=c_float), intent(in)       :: fRunoff(:)
-    real (kind=c_float), intent(inout)    :: fRunOn(:)
-
-    integer (kind=c_int)    :: iIndex
-
-    fRunon = 0.0_c_float
-
-    do iIndex=lbound(TARGET_INDEX, 1),ubound(TARGET_INDEX, 1)
-
-      if ( TARGET_INDEX(iIndex) >= lbound(TARGET_INDEX, 1) &
-        .and. TARGET_INDEX( iIndex ) <= ubound(TARGET_INDEX, 1) ) then
-
-        fRunon( TARGET_INDEX( iIndex ) ) = fRunoff( ORDER_INDEX( iIndex ) )
-
-      endif
-
-    enddo
-
-  end subroutine routing_D8_calculate
-
 end module routing__D8

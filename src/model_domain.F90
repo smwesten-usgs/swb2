@@ -62,6 +62,7 @@ module model_domain
     real (kind=c_float), allocatable       :: runoff_outside(:)
     real (kind=c_float), allocatable       :: outflow(:)
     real (kind=c_float), allocatable       :: infiltration(:)
+    real (kind=c_float), allocatable       :: potential_snowmelt(:)
     real (kind=c_float), allocatable       :: snowmelt(:)
     real (kind=c_float), allocatable       :: interception(:)
      
@@ -102,7 +103,7 @@ module model_domain
     procedure ( simple_method ), pointer         :: init_precipitation_data => model_initialize_precip_normal
     procedure ( simple_method ), pointer         :: init_fog                => model_initialize_fog_none
     procedure ( simple_method ), pointer         :: init_irrigation         => model_initialize_irrigation_none
-    procedure ( simple_method ), pointer         :: init_direct_recharge  => model_initialize_direct_recharge_none
+    procedure ( simple_method ), pointer         :: init_direct_recharge    => model_initialize_direct_recharge_none
     procedure ( simple_method ), pointer         :: init_GDD                => model_initialize_GDD_none
     procedure ( simple_method ), pointer         :: init_AWC                => model_initialize_available_water_content_gridded
 
@@ -887,6 +888,25 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  subroutine model_initialize_routing_none(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_initialize_routing_none  
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_routing_none(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    ! no routing to be done; just call the runoff calculation routine and move on
+    call this%calc_runoff()
+
+  end subroutine model_calculate_routing_none  
+
+!--------------------------------------------------------------------------------------------------
+
   subroutine model_initialize_routing_D8(this)
 
     use routing__D8
@@ -901,12 +921,25 @@ contains
 
   subroutine model_calculate_routing_D8(this)
 
-    use routing__D8
+    use routing__D8, only   : TARGET_INDEX, ORDER_INDEX
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-!    call routing_D8_calculate( fRunoff=this%runoff, fRunon=this%runon )
+    ! [ LOCALS ]
+    integer (kind=c_int) :: index
 
+    do index=lbound( ORDER_INDEX, 1 ), ubound( ORDER_INDEX, 1 )
+
+      call this%calc_runoff( index )
+
+      if ( (    TARGET_INDEX( index ) >= lbound( ORDER_INDEX, 1) ) &
+        .and. ( TARGET_INDEX( index ) <= ubound( ORDER_INDEX, 1) ) ) then
+
+        runon( TARGET_INDEX( index ) ) = runoff( ORDER_INDEX( index ) )
+
+      endif  
+      
+    enddo
 
   end subroutine model_calculate_routing_D8  
 
@@ -932,8 +965,6 @@ contains
 
   subroutine model_initialize_snowfall_prms(this)
 
-!    use snowfall__prms
-
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
   end subroutine model_initialize_snowfall_prms
@@ -942,19 +973,13 @@ contains
 
   subroutine model_calculate_snowfall_prms(this)
 
-!    use snowfall__prms
-
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-  !  this%snowfall = calculate_snowfall_prms( this%tmax, this%tmin, this%gross_precip )
 
   end subroutine model_calculate_snowfall_prms
 
 !--------------------------------------------------------------------------------------------------
 
   subroutine model_initialize_snowmelt_original(this)
-
-!    use snowmelt__original
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
@@ -968,16 +993,14 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call snowmelt_original_calculate( fSnowmelt=this%snowmelt, fSnow_storage=this%snow_storage, &
-                                      fTMin=this%tmin, fTMax=this%tmax )
+    call snowmelt_original_calculate( potential_snowmelt=this%potential_snowmelt, tmin=this%tmin,   &
+                                      tmax=this%tmax, imperial_units=lTRUE )
 
   end subroutine model_calculate_snowmelt_original
 
 !--------------------------------------------------------------------------------------------------
 
   subroutine model_initialize_snowmelt_prms(this)
-
-!    use snowmelt__prms
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
@@ -987,14 +1010,9 @@ contains
 
   subroutine model_calculate_snowmelt_prms(this)
 
-!    use snowmelt__prms
-
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-  !  this%snowmelt = calculate_snowmelt_prms( this%tmax, this%tmin, this%gross_precip )
-
   end subroutine model_calculate_snowmelt_prms
-
 
   !--------------------------------------------------------------------------------------------------
 
@@ -1155,70 +1173,30 @@ contains
   subroutine model_calculate_runoff_gridded_values(this, index )
 
     use runoff__gridded_values
+    use datetime, only           : DATETIME_T
 
     class (MODEL_DOMAIN_T), intent(inout)       :: this
     integer (kind=c_int), intent(in), optional  :: index
 
-    call runoff_gridded_values_calculate( )
+    ! [ LOCALS ]
+    type (DATETIME_T), save     :: date_of_last_grid_update
 
-!     this%runoff = ( this%rainfall + this%snowmelt ) * RUNOFF_RATIOS
-
-    this%runoff = this%inflow * RUNOFF_RATIOS
-
-  end subroutine model_calculate_runoff_gridded_values
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine model_initialize_soil_moisture_thornthwaite_mather( this )
-
-    use soil_moisture__thornthwaite_mather
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-    call soil_moisture_thornthwaite_mather_initialize( count( this%active ) )
-
-  end subroutine model_initialize_soil_moisture_thornthwaite_mather
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine model_calculate_soil_moisture_thornthwaite_mather( this, index )
-
-    use soil_moisture__thornthwaite_mather
-
-    class (MODEL_DOMAIN_T), intent(inout)       :: this
-    integer (kind=c_int), intent(in), optional  :: index
+    if ( date_of_last_grid_update /= SIM_DT%curr ) then
+      call runoff_gridded_values_calculate( )
+      date_of_last_grid_update = SIM_DT%curr
+    endif
 
     if ( present( index ) ) then
-
-      call soil_moisture_thornthwaite_mather_calculate(fAPWL=APWL(index),                                    &
-                                                        fSoilStorage=this%soil_storage(index),               &
-                                                        fSoilStorage_Excess=this%potential_recharge(index),  &
-                                                        fSoilStorage_Max=this%soil_storage_max(index),       &
-                                                        fInfiltration=this%infiltration(index),              &
-                                                        fReference_ET=this%reference_ET0(index) )
+  
+      this%runoff( index ) = this%inflow( index ) * RUNOFF_RATIOS( index )
 
     else
 
-      call soil_moisture_thornthwaite_mather_calculate(fAPWL=APWL,                                    &
-                                                        fSoilStorage=this%soil_storage,               &
-                                                        fSoilStorage_Excess=this%potential_recharge,  &
-                                                        fSoilStorage_Max=this%soil_storage_max,       &
-                                                        fInfiltration=this%infiltration,              &
-                                                        fReference_ET=this%reference_ET0 )
+      this%runoff = this%inflow * RUNOFF_RATIOS
 
     endif
 
-  end subroutine model_calculate_soil_moisture_thornthwaite_mather
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine model_output_soil_moisture_none( this )
-
-    class (MODEL_DOMAIN_T), intent(inout)       :: this
-    
-    ! nothing to do here.
-
-  end subroutine model_output_soil_moisture_none
+  end subroutine model_calculate_runoff_gridded_values
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1263,98 +1241,6 @@ contains
     call grid_Destroy( pTempGrd )
 
   end subroutine model_initialize_soil_storage_max_gridded
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine model_initialize_soil_moisture_fao_56( this )
-
-    use soil_moisture__FAO_56
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-    call soil_moisture_FAO56_initialize( fSoilStorage=this%soil_storage,             &
-                                         iLanduseIndex=this%landuse_index,           &
-                                         iSoilGroup=this%soil_group,                 &
-                                         fAvailable_Water_Content=this%awc,          &
-                                         lActive=this%active )
-
-  end subroutine model_initialize_soil_moisture_fao_56
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine model_calculate_soil_moisture_fao_56( this, index )
-
-    use soil_moisture__FAO_56
-
-    class (MODEL_DOMAIN_T), intent(inout)       :: this
-    integer (kind=c_int), intent(in), optional  :: index
-
-    ! [ LOCALS ]
-    integer (kind=c_int) :: iIndex
-
-!  soil_moisture_thornthwaite_mather_calculate(fAPWL, fSoilStorage, fSoilStorage_Excess,                &
-!                                             fActual_ET, fSoilStorage_Max, fInfiltration, fReference_ET)
-
-!     real (kind=c_float), intent(inout)   :: fAPWL
-!     real (kind=c_float), intent(inout)   :: fSoilStorage
-!     real (kind=c_float), intent(out)     :: fSoilStorage_Excess
-!     real (kind=c_float), intent(out)     :: fActual_ET
-!     real (kind=c_float), intent(in)      :: fSoilStorage_Max
-!     real (kind=c_float), intent(in)      :: fInfiltration
-!     real (kind=c_float), intent(in)      :: fReference_ET
-    
-    if ( present( index ) ) then
-
-      call soil_moisture_FAO56_calculate( fSoilStorage=this%soil_storage(index),                             &
-                                          fSoilStorage_Excess=this%potential_recharge(index),                &
-                                          fInfiltration=this%infiltration(index),                            &
-                                          fGDD=this%gdd(index),                                              &
-                                          fAvailableWaterCapacity=this%awc(index),                           &
-                                          fReference_ET0=this%reference_ET0(index),                          &
-                                          fMaxRootingDepth=this%max_rooting_depth(index),                    &
-                                          iLanduseIndex=this%landuse_index(index),                           &
-                                          iSoilGroup=this%soil_group(index) )
-
-    else
-
-      do iIndex=1, ubound(this%soil_storage,1)
-
-!         print *, "LU=",this%landuse_index( iIndex ), &
-!                  " Soils=",this%soil_group( iIndex ),    &
-!                  " rain:",this%rainfall( iIndex ),      &
-!                  " intcp:",this%interception( iIndex ),  &
-!                  " fog:",this%fog( iIndex ),           &
-!                  " snmelt:",this%snowmelt( iIndex ),      &
-!                  " runon:",this%runon( iIndex ),         &
-!                  " inflow:", this%inflow( iIndex ),        &
-!                  " runoff:",this%runoff( iIndex ),        &
-!                  " infil:",this%infiltration( iIndex )
-
-        call soil_moisture_FAO56_calculate( fSoilStorage=this%soil_storage(iIndex),                             &
-                                            fSoilStorage_Excess=this%potential_recharge(iIndex),                &
-                                            fInfiltration=this%infiltration(iIndex),                            &
-                                            fGDD=this%gdd(iIndex),                                              &
-                                            fAvailableWaterCapacity=this%awc(iIndex),                           &
-                                            fReference_ET0=this%reference_ET0(iIndex),                          &
-                                            fMaxRootingDepth=this%max_rooting_depth(iIndex),                    &
-                                            iLanduseIndex=this%landuse_index(iIndex),                           &
-                                            iSoilGroup=this%soil_group(iIndex) )
-
-      enddo
-
-    endif
-
-  end subroutine model_calculate_soil_moisture_fao_56
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine model_output_soil_moisture_fao_56( this )
-
-    use soil_moisture__FAO_56
-
-    class (MODEL_DOMAIN_T), intent(inout)       :: this
-
-  end subroutine model_output_soil_moisture_fao_56
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1569,6 +1455,17 @@ contains
 
   end subroutine model_output_GDD
 
+
+  subroutine model_calculate_actual_et_thornthwaite_mather( this )
+
+
+    calculate_actual_et_thornthwaite_mather( soil_storage,                      &
+                                             max_soil_storage,                  &
+                                             precipitation,                     &
+                                             reference_et0,                     &
+                                             actual_et,                         &
+                                             crop_coefficient_kcb )
+
 !--------------------------------------------------------------------------------------------------
 
   subroutine model_initialize_direct_recharge_none ( this )
@@ -1659,7 +1556,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_fog_monthly_grid(this)
+  subroutine model_calculate_fog_monthly_grid(this)v
 
     use fog__monthly_grid
 
