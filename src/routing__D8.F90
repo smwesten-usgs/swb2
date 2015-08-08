@@ -8,7 +8,7 @@ module routing__D8
 
   private
 
-  public :: routing_D8_initialize, routing_D8_calculate, D8_UNDETERMINED, TARGET_INDEX, ORDER_INDEX
+  public :: routing_D8_initialize, D8_UNDETERMINED, TARGET_INDEX, ORDER_INDEX
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pD8_FLOWDIR    ! data catalog object => D8 flow direction grid
 

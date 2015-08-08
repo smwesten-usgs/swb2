@@ -3,6 +3,12 @@ module daily_calculation
   use continuous_frozen_ground_index, only   : update_continuous_frozen_ground_index
   use model_domain, only                     : MODEL_DOMAIN_T
   use iso_c_binding, only                    : c_short, c_int, c_float, c_double
+
+  use mass_balance__impervious_surface, only : calculate_impervious_surface_mass_balance
+  use mass_balance__interception, only       : calculate_interception_mass_balance
+  use mass_balance__snow, only               : calculate_snow_mass_balance
+  use mass_balance__soil, only               : calculate_soil_mass_balance
+
   implicit none
 
   private
@@ -16,13 +22,14 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: cells
 
     call cells%calc_GDD()
-    call cells%update_crop_coefficients()
+    call cells%update_crop_coefficient()
 
     call cells%calc_reference_et()
-    call cells%calculate_snowfall()
-    call cells%calculate_snowmelt()
+    call cells%calc_snowfall()
+    call cells%calc_snowmelt()
 
-    call update_continuous_frozen_ground_index( CFGI, cells%tmin, cells%tmax, cells%snow_storage )
+    call update_continuous_frozen_ground_index( cells%continuous_frozen_ground_index, cells%tmin,    &
+                                                cells%tmax, cells%snow_storage )
        
     call cells%calc_fog()
     call cells%calc_interception()
@@ -60,8 +67,8 @@ contains
 
 
     call calculate_soil_mass_balance( potential_recharge=cells%potential_recharge,       &
-                                      soil_moisture=cells%soil_moisture,                 &
-                                      max_soil_moisture=cells%max_soil_moisture,         &
+                                      soil_storage=cells%soil_storage,                   &
+                                      max_soil_storage=cells%max_soil_storage,           &
                                       actual_et=cells%actual_et,                         &
                                       infiltration=cells%infiltration )
 

@@ -1,6 +1,6 @@
 !> @file
-!>  Contains a single module, soil_storage_max__gridded_values, which
-!>  populates soil_storage_max by reading maximum soil storage directly from a gridded input.
+!>  Contains a single module, max_soil_storage__gridded_values, which
+!>  populates max_soil_storage by reading maximum soil storage directly from a gridded input.
 
 
 !>  Populate maximum soil storage by reading in 
@@ -17,13 +17,13 @@ module soil_storage_max__gridded_values
 
   private
 
-  public :: soil_storage_max_gridded_values_initialize
+  public :: max_soil_storage_gridded_values_initialize
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pSOIL_STORAGE_MAX_GRID
 
 contains
     
-  subroutine soil_storage_max_gridded_values_initialize( lActive, fSoil_Storage_Max )
+  subroutine max_soil_storage_gridded_values_initialize( lActive, fSoil_Storage_Max )
 
     logical (kind=c_bool), intent(in)     :: lActive(:,:)
     real (kind=c_float), intent(inout)    :: fSoil_Storage_Max(:)
@@ -38,6 +38,6 @@ contains
 
     fSoil_Storage_Max = pack( pSOIL_STORAGE_MAX_GRID%pGrdBase%rData, lActive )
     
-  end subroutine soil_storage_max_gridded_values_initialize
+  end subroutine max_soil_storage_gridded_values_initialize
 
 end module soil_storage_max__gridded_values

@@ -1,10 +1,20 @@
 module actual_evapotranspiration__fao56
 
 
-  use iso_c_binding, only : c_short, c_int, c_float, c_double
+  use iso_c_binding, only               : c_short, c_int, c_float, c_double
+  use constants_and_conversions, only   : in_to_mm, lTRUE, lFALSE
+  use parameters, only                  : PARAMS
   implicit none
 
+  real (kind=c_float), allocatable   :: DEPLETION_FRACTION(:)
+
 contains
+
+  subroutine initialize_actual_et_FAO56( ) 
+
+    call PARAMS%get_parameters( sKey="Depletion_Fraction", fValues=DEPLETION_FRACTION, lFatal=lTRUE )
+
+  end subroutine initialize_actual_et_FAO56
 
   !> Adjust the depletion fraction based on current reference ET0.
   !!
@@ -36,20 +46,21 @@ contains
 
 !----------------------------------------------------------------------------------------------------
 
-	elemental subroutine calculate_actual_et_fao56( soil_storage,                      &
+	elemental subroutine calculate_actual_et_fao56( actual_et,                         &
+
+                                                  soil_storage,                      &
+                                                  depletion_fraction_p,              &
                                                   max_soil_storage,                  &
                                                   precipitation,                     &
                                                   reference_et0,                     &
-                                                  depletion_fraction_p,              &
-                                                  actual_et,                         &
                                                   crop_coefficient_kcb )
 
+    real (kind=c_float), intent(inout)             :: actual_et
+    real (kind=c_float), intent(in)                :: depletion_fraction_p
     real (kind=c_float), intent(in)                :: soil_storage
     real (kind=c_float), intent(in)                :: max_soil_storage
     real (kind=c_float), intent(in)                :: precipitation
     real (kind=c_float), intent(in)                :: reference_et0
-    real (kind=c_float), intent(in)                :: depletion_fraction_p
-    real (kind=c_float), intent(out)               :: actual_et
     real (kind=c_float), intent(in), optional      :: crop_coefficient_kcb
 
     ! [ LOCALS ]
@@ -69,28 +80,24 @@ contains
     p = adjust_depletion_fraction_p( p_table_22=depletion_fraction_p,  &
                                      reference_et0=reference_et0 )
 
-    select case( P_minus_PE )
+    if ( P_minus_PE >= 0.0_c_float ) then
 
-      case ( >= 0.0_c_float )
+      actual_et = reference_et0 * Kcb
 
-        actual_et = reference_et0 * Kcb
+    elseif( P_minus_PE < 0.0_c_float ) then
 
-      case ( < 0.0_c_float )
+      if ( max_soil_storage > 0.0_c_float ) then
 
-        if ( max_soil_storage > 0.0_c_float ) then
+        actual_et = precipitation + soil_storage * ( 1.0_c_float - exp( P_minus_PE / max_soil_storage ) )
 
-          actual_et = precipitation + soil_storage * ( 1.0_c_float - exp( P_minus_PE / max_soil_storage ) )
+      else
+     
+        actual_et = reference_et0
 
-        else
-       
-          actual_et = reference_et0
+      endif     
 
-        endif     
-
-      case default
-
-    end select  
+     endif
 
   end subroutine calculate_actual_et_fao56
 
-end module actual_evapotraspiration__fao56
+end module actual_evapotranspiration__fao56

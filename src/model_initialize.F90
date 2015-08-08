@@ -164,7 +164,7 @@ contains
 
     call read_landuse_codes()
 
-    call read_hydrologic_soils_groups()
+    call read_hydrologic_soil_groups()
 
     ! problem is occuring in this step; cannot pack max_rooting_depth until active(:,:) has been determined
     call initialize_root_zone_depths()
@@ -180,7 +180,7 @@ contains
 
     call MODEL%init_soil_moisture_max()
 
-    call initialize_hydrologic_soils_groups()
+    call initialize_hydrologic_soil_groups()
 
     call initialize_landuse_codes()
 
@@ -231,7 +231,7 @@ contains
        call warn(sMessage="One or more initial percent soils moisture values outside of " &
          //"valid range (0% to 100%)", lFatal=lTRUE )
 
-     MODEL%soil_storage = fInitial_Percent_Soil_Moisture / 100.0_c_float * MODEL%soil_storage_max  
+     MODEL%soil_storage = fInitial_Percent_Soil_Moisture / 100.0_c_float * MODEL%max_soil_storage  
     
     endif
 
@@ -390,7 +390,7 @@ contains
         rX0=MODEL%X_ll, rY0=MODEL%Y_ll, &
         rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
 
-    iNumActiveCells = ubound(MODEL%soil_storage_max,1)
+    iNumActiveCells = ubound(MODEL%max_soil_storage,1)
 
     call slList%append("LU_Code")
     call slList%append("Landuse_Code")
@@ -456,7 +456,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine initialize_hydrologic_soils_groups
+  subroutine initialize_hydrologic_soil_groups
 
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iStat
@@ -491,11 +491,11 @@ contains
 
     call LOGS%write("", iLinesBefore=1, iLogLevel=LOG_DEBUG)
 
-  end subroutine initialize_hydrologic_soils_groups
+  end subroutine initialize_hydrologic_soil_groups
 
 !--------------------------------------------------------------------------------------------------  
 
-  subroutine read_hydrologic_soils_groups
+  subroutine read_hydrologic_soil_groups
 
     ! [ LOCALS ]
     type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
@@ -505,7 +505,7 @@ contains
     if ( associated(pHSG) ) then
 
       call pHSG%getvalues()
-      call grid_WriteArcGrid("Hydrologic_soils_groups__as_read_into_SWB.asc", pHSG%pGrdBase )
+      call grid_WriteArcGrid("Hydrologic_soil_groups__as_read_into_SWB.asc", pHSG%pGrdBase )
 
     else
     
@@ -516,7 +516,7 @@ contains
 
     endif    
 
-  end subroutine read_hydrologic_soils_groups
+  end subroutine read_hydrologic_soil_groups
 
 !--------------------------------------------------------------------------------------------------  
 

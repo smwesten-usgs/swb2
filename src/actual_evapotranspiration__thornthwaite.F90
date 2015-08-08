@@ -33,30 +33,23 @@ contains
 
     P_minus_PE = precipitation - reference_et0 * Kcb
 
-    select case( P_minus_PE )
+    if ( P_minus_PE >= 0.0_c_float ) then
 
-      !> $P - PE >= 0$: more precip than evaporation; actual ET equals potential ET
-      case ( >= 0.0_c_float )
+      actual_et = reference_et0 * Kcb
 
-        actual_et = reference_et0 * Kcb
+    elseif ( P_minus_PE < 0.0_c_float ) then
 
-      !> $P - PE < 0$: less precip than evaporation; actual ET limited by amount that can be
-      !!               extracted from soil at current saturation fraction
-      case ( < 0.0_c_float )
+      if ( max_soil_storage > 0.0_c_float ) then
 
-        if ( max_soil_storage > 0.0_c_float ) then
+        actual_et = precipitation + soil_storage * ( 1.0_c_float - exp( P_minus_PE / max_soil_storage ) )
 
-          actual_et = precipitation + soil_storage * ( 1.0_c_float - exp( P_minus_PE / max_soil_storage ) )
+      else
+     
+        actual_et = reference_et0
 
-        else
-       
-          actual_et = reference_et0
+      endif     
 
-        endif     
-
-      case default
-
-    end select  
+    endif
 
   end subroutine calculate_actual_et_thornthwaite_mather
 

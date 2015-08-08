@@ -241,7 +241,7 @@ contains
   !!       In Conference Proceeding Paper, World Water and Environmental Resources Congress, 2003.
   elemental subroutine runoff_curve_number_calculate(runoff,                              &
                                                      landuse_index,                       &
-                                                     soils_index,                         &
+                                                     soil_group,                         &
                                                      soil_storage,                        &
                                                      max_soil_storage,                    & 
                                                      inflow,                              &
@@ -249,7 +249,7 @@ contains
 
     real (kind=c_float), intent(inout)  :: runoff
     integer (kind=c_int), intent(in)    :: landuse_index
-    integer (kind=c_int), intent(in)    :: soils_index
+    integer (kind=c_int), intent(in)    :: soil_group
     real (kind=c_float), intent(in)     :: soil_storage
     real (kind=c_float), intent(in)     :: max_soil_storage
     real (kind=c_float), intent(in)     :: inflow
@@ -260,7 +260,7 @@ contains
     real (kind=c_float) :: S
     real (kind=c_float) :: CN_adj
 
-    CN_adj = update_curve_number_fn( landuse_index, soils_index, soil_storage, &
+    CN_adj = update_curve_number_fn( landuse_index, soil_group, soil_storage, &
                           max_soil_storage, continuous_frozen_ground_index )
 
     S = ( 1000.0_c_float / CN_adj ) - 10.0_c_float

@@ -5,12 +5,15 @@ module mass_balance__snow
 
 contains
  
-  subroutine calculate_snow_mass_balance( snow_storage, potential_snowmelt, snowmelt, snowfall )
+  elemental subroutine calculate_snow_mass_balance( snow_storage,         &
+                                                    potential_snowmelt,   &
+                                                    snowmelt,             &
+                                                    snowfall )
 
-    real (kind=c_float), intent(inout)    :: snow_storage
-    real (kind=float), intent(inout)      :: snowmelt
-    real (kind=float), intent(in)         :: potential_snowmelt
-    real (kind=float), intent(in)         :: snowfall    
+    real (kind=c_float), intent(inout)      :: snow_storage
+    real (kind=c_float), intent(inout)      :: snowmelt
+    real (kind=c_float), intent(in)         :: potential_snowmelt
+    real (kind=c_float), intent(in)         :: snowfall    
 
     snow_storage = snow_storage + snowfall
 

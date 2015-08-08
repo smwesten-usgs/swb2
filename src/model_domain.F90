@@ -49,6 +49,8 @@ module model_domain
     real (kind=c_float), allocatable       :: canopy_cover_fraction(:)
     real (kind=c_float), allocatable       :: awc(:)
     real (kind=c_float), allocatable       :: gdd(:)
+    real (kind=c_float), allocatable       :: crop_coefficient_kcb(:)
+    real (kind=c_float), allocatable       :: continuous_frozen_ground_index(:)    
 
     real (kind=c_float), allocatable       :: max_rooting_depth(:)
      
@@ -74,7 +76,7 @@ module model_domain
     real (kind=c_float), allocatable       :: surface_storage_excess(:)
     real (kind=c_float), allocatable       :: soil_storage(:)
     real (kind=c_float), allocatable       :: soil_storage_previous_day(:)
-    real (kind=c_float), allocatable       :: soil_storage_max(:)
+    real (kind=c_float), allocatable       :: max_soil_storage(:)
     real (kind=c_float), allocatable       :: potential_recharge(:)
     real (kind=c_float), allocatable       :: current_rooting_depth(:)
          
@@ -95,9 +97,9 @@ module model_domain
     procedure ( simple_method ), pointer         :: init_interception       => model_initialize_interception_bucket
     procedure ( simple_method ), pointer         :: init_runoff             => model_initialize_runoff_curve_number
     procedure ( simple_method ), pointer         :: init_reference_et       => model_initialize_et_hargreaves
+    procedure ( simple_method ), pointer         :: init_actual_et          => model_initialize_actual_et_thornthwaite_mather
     procedure ( simple_method ), pointer         :: init_routing            => model_initialize_routing_D8
-    procedure ( simple_method ), pointer         :: init_soil_moisture      => model_initialize_soil_moisture_thornthwaite_mather
-    procedure ( simple_method ), pointer         :: init_soil_moisture_max  => model_initialize_soil_storage_max_internally_calculated
+    procedure ( simple_method ), pointer         :: init_soil_moisture_max  => model_initialize_max_soil_storage_internally_calculated
     procedure ( simple_method ), pointer         :: init_snowfall           => model_initialize_snowfall_original
     procedure ( simple_method ), pointer         :: init_snowmelt           => model_initialize_snowmelt_original
     procedure ( simple_method ), pointer         :: init_precipitation_data => model_initialize_precip_normal
@@ -106,16 +108,17 @@ module model_domain
     procedure ( simple_method ), pointer         :: init_direct_recharge    => model_initialize_direct_recharge_none
     procedure ( simple_method ), pointer         :: init_GDD                => model_initialize_GDD_none
     procedure ( simple_method ), pointer         :: init_AWC                => model_initialize_available_water_content_gridded
+    procedure ( simple_method ), pointer         :: init_crop_coefficient   => model_initialize_crop_coefficient_none
 
-    procedure ( simple_method ), pointer         :: calc_interception      => model_calculate_interception_bucket
+    procedure ( simple_method ), pointer         :: calc_interception       => model_calculate_interception_bucket
+    procedure ( simple_method ), pointer         :: update_crop_coefficient => model_update_crop_coefficient_none    
 
     procedure ( simple_method_w_optional ), pointer   :: calc_runoff       => model_calculate_runoff_curve_number
     
     procedure ( simple_method ), pointer         :: calc_reference_et      => model_calculate_et_hargreaves
     procedure ( simple_method ), pointer         :: calc_routing           => model_calculate_routing_D8
 
-    procedure ( simple_method_w_optional ), pointer  :: calc_soil_moisture => model_calculate_soil_moisture_thornthwaite_mather
-    
+    procedure ( simple_method ), pointer         :: calc_actual_et         => model_calculate_actual_et_thornthwaite_mather
     procedure ( simple_method ), pointer         :: calc_snowfall          => model_calculate_snowfall_original
     procedure ( simple_method ), pointer         :: calc_snowmelt          => model_calculate_snowmelt_original  
     procedure ( simple_method ), pointer         :: calc_fog               => model_calculate_fog_none
@@ -245,7 +248,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: iStat(34)
+    integer (kind=c_int)  :: iStat(35)
 
     iCount = count( this%active )
 
@@ -270,7 +273,7 @@ contains
     allocate( this%interception_storage(iCount), stat=iStat(19) )
     allocate( this%snow_storage(iCount), stat=iStat(20) )
     allocate( this%soil_storage(iCount), stat=iStat(21) )
-    allocate( this%soil_storage_max(iCount), stat=iStat(22) )
+    allocate( this%max_soil_storage(iCount), stat=iStat(22) )
     allocate( this%potential_recharge(iCount), stat=iStat(23) )
     allocate( this%fog(iCount), stat=iStat(24) )
     allocate( this%irrigation(iCount), stat=iStat(25) )
@@ -282,7 +285,8 @@ contains
     allocate( this%surface_storage_excess( iCount ), stat=iStat(31) )
     allocate( this%surface_storage_max( iCount ), stat=iStat(32) )           
     allocate( this%canopy_cover_fraction( iCount ), stat=iStat(33) ) 
-    allocate( this%soil_storage_previous_day( iCount ), stat=iStat(34) )          
+    allocate( this%soil_storage_previous_day( iCount ), stat=iStat(34) )   
+    allocate( this%crop_coefficient_kcb( iCount ), stat=iStat(35) )       
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="  &
@@ -290,6 +294,10 @@ contains
     enddo
     
     if (any( iStat /= 0) ) call die ( "Unable to allocate memory for one or more arrays.", __FILE__, __LINE__ )  
+
+    this%fog = 0.0_c_float
+    this%impervious_fraction = 0.0_c_float
+    this%canopy_cover_fraction = 1.0_c_float
 
   end subroutine initialize_arrays_sub
 
@@ -305,8 +313,8 @@ contains
     call this%init_fog
     call this%init_runoff
     call this%init_soil_moisture_max
-    if ( associated( this%init_routing) )  call this%init_routing
-    call this%init_soil_moisture
+    call this%init_routing
+    call this%init_actual_et
     call this%init_reference_et
     call this%init_precipitation_data
     call this%init_GDD
@@ -784,18 +792,18 @@ contains
 
       if ( ( sMethodName .strequal. "T-M" ) .or. ( sMethodName .strequal. "THORNTHWAITE-MATHER" ) ) then
 
-        this%init_soil_moisture => model_initialize_soil_moisture_thornthwaite_mather
-        this%calc_soil_moisture => model_calculate_soil_moisture_thornthwaite_mather
+        this%init_actual_et => model_initialize_actual_et_thornthwaite_mather
+        this%calc_actual_et => model_calculate_actual_et_thornthwaite_mather
 
-        call LOGS%WRITE( "==> THORNTHWAITE-MATHER SOIL MOISTURE submodel selected.", &
+        call LOGS%WRITE( "==> THORNTHWAITE-MATHER SOIL MOISTURE RETENTION submodel selected.", &
             iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
       elseif ( ( sMethodName .strequal. "FAO56" ) .or. ( sMethodName .strequal. "FAO-56" ) ) then
 
-        this%init_soil_moisture => model_initialize_soil_moisture_fao_56
-        this%calc_soil_moisture => model_calculate_soil_moisture_fao_56
+        this%init_actual_et => model_initialize_actual_et_fao56
+        this%calc_actual_et => model_calculate_actual_et_fao56
 
-        call LOGS%WRITE( "==> FAO-56 SOIL MOISTURE submodel selected.", &
+        call LOGS%WRITE( "==> FAO-56 SOIL MOISTURE RETENTION submodel selected.", &
             iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
       else
@@ -935,7 +943,7 @@ contains
       if ( (    TARGET_INDEX( index ) >= lbound( ORDER_INDEX, 1) ) &
         .and. ( TARGET_INDEX( index ) <= ubound( ORDER_INDEX, 1) ) ) then
 
-        runon( TARGET_INDEX( index ) ) = runoff( ORDER_INDEX( index ) )
+        this%runon( TARGET_INDEX( index ) ) = this%runoff( ORDER_INDEX( index ) )
 
       endif  
       
@@ -1129,28 +1137,32 @@ contains
 
   subroutine model_calculate_runoff_curve_number(this, index )
 
-    use runoff__curve_number
+    use runoff__curve_number, only  : runoff_curve_number_calculate
 
     class (MODEL_DOMAIN_T), intent(inout)       :: this
     integer (kind=c_int), intent(in), optional  :: index
 
     if ( present(index) ) then
 
-      this%runoff( index ) = runoff_curve_number_calculate( &
-        iLanduseIndex=this%landuse_index( index ), &
-        iSoilsIndex=this%soil_group( index ), &
-        fSoilStorage=this%soil_storage( index ), &
-        fSoilStorage_Max=this%soil_storage_max( index ), &
-        fInflow=this%inflow( index ), fCFGI=CFGI( index ) )
+      call runoff_curve_number_calculate(runoff=this%runoff( index ),                                    &
+                                                    landuse_index=this%landuse_index( index ),           &
+                                                    soil_group=this%soil_group( index ),               &
+                                                    soil_storage=this%soil_storage( index ),             &
+                                                    max_soil_storage=this%max_soil_storage( index ),     & 
+                                                    inflow=this%inflow( index ),                         &
+                                                    continuous_frozen_ground_index=                      &
+                                                        this%continuous_frozen_ground_index( index ) ) 
 
     else
 
-      this%runoff = runoff_curve_number_calculate( &
-        iLanduseIndex=this%landuse_index, &
-        iSoilsIndex=this%soil_group, &
-        fSoilStorage=this%soil_storage, &
-        fSoilStorage_Max=this%soil_storage_max, &
-        fInflow=this%inflow, fCFGI=CFGI )
+      call runoff_curve_number_calculate(runoff=this%runoff,                                             &
+                                                    landuse_index=this%landuse_index,                    &
+                                                    soil_group=this%soil_group,                        &
+                                                    soil_storage=this%soil_storage,                      &
+                                                    max_soil_storage=this%max_soil_storage,              & 
+                                                    inflow=this%inflow,                                  &
+                                                    continuous_frozen_ground_index=                      &
+                                                        this%continuous_frozen_ground_index ) 
 
     endif
 
@@ -1181,7 +1193,7 @@ contains
     ! [ LOCALS ]
     type (DATETIME_T), save     :: date_of_last_grid_update
 
-    if ( date_of_last_grid_update /= SIM_DT%curr ) then
+    if ( .not. ( date_of_last_grid_update == SIM_DT%curr ) ) then
       call runoff_gridded_values_calculate( )
       date_of_last_grid_update = SIM_DT%curr
     endif
@@ -1200,7 +1212,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_initialize_soil_storage_max_internally_calculated(this)
+  subroutine model_initialize_max_soil_storage_internally_calculated(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
@@ -1211,36 +1223,36 @@ contains
     this%current_rooting_depth = pack( MAX_ROOTING_DEPTH, MODEL%active )
     this%max_rooting_depth = pack( MAX_ROOTING_DEPTH, MODEL%active )
 
-    this%soil_storage_max = this%max_rooting_depth * this%awc
+    this%max_soil_storage = this%max_rooting_depth * this%awc
 
     pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
         rX0=this%X_ll, rY0=this%Y_ll, &
         rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
 
-    pTempGrd%rData = unpack( this%soil_storage_max, this%active, this%dont_care )
+    pTempGrd%rData = unpack( this%max_soil_storage, this%active, this%dont_care )
 
     call grid_WriteArcGrid( sFilename="Soil_Storage_Maximum__as_calculated_inches.asc", pGrd=pTempGrd )
 
     call grid_Destroy( pTempGrd )
 
-  end subroutine model_initialize_soil_storage_max_internally_calculated  
+  end subroutine model_initialize_max_soil_storage_internally_calculated  
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_initialize_soil_storage_max_gridded(this)
+  subroutine model_initialize_max_soil_storage_gridded(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     ! [ LOCALS ]
     type ( GENERAL_GRID_T ), pointer :: pTempGrd
 
-    pTempGrd%rData = unpack( this%soil_storage_max, this%active, this%dont_care )
+    pTempGrd%rData = unpack( this%max_soil_storage, this%active, this%dont_care )
 
     call grid_WriteArcGrid( sFilename="Soil_Storage_Maximum__as_read_in_inches.asc", pGrd=pTempGrd )
 
     call grid_Destroy( pTempGrd )
 
-  end subroutine model_initialize_soil_storage_max_gridded
+  end subroutine model_initialize_max_soil_storage_gridded
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1293,7 +1305,7 @@ contains
     call irrigation__calculate( fIrrigationAmount=this%irrigation,             &
                                 iLanduseIndex=this%landuse_index,              &
                                 fSoilStorage=this%soil_storage,                & 
-                                fSoilStorage_Max=this%soil_storage_max,        &
+                                fSoilStorage_Max=this%max_soil_storage,        &
                                 fImpervious_Fraction=this%impervious_fraction, &
                                 lActive=this%active )
 
@@ -1455,16 +1467,63 @@ contains
 
   end subroutine model_output_GDD
 
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_actual_et_thornthwaite_mather(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+
+  end subroutine model_initialize_actual_et_thornthwaite_mather    
+
+!--------------------------------------------------------------------------------------------------
 
   subroutine model_calculate_actual_et_thornthwaite_mather( this )
 
+    use actual_evapotranspiration__thornthwaite_mather
 
-    calculate_actual_et_thornthwaite_mather( soil_storage,                      &
-                                             max_soil_storage,                  &
-                                             precipitation,                     &
-                                             reference_et0,                     &
-                                             actual_et,                         &
-                                             crop_coefficient_kcb )
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+
+    call calculate_actual_et_thornthwaite_mather( soil_storage=this%soil_storage,                   &
+                                                  max_soil_storage=this%max_soil_storage,           &
+                                                  precipitation=this%infiltration,                  &
+                                                  reference_et0=this%reference_et0,                 &
+                                                  actual_et=this%actual_et,                         &
+                                                  crop_coefficient_kcb=this%crop_coefficient_kcb )
+
+  end subroutine model_calculate_actual_et_thornthwaite_mather
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_actual_et_fao56(this)
+
+    use actual_evapotranspiration__fao56
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call initialize_actual_et_fao56()
+
+  end subroutine model_initialize_actual_et_fao56    
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_actual_et_fao56( this )
+
+    use actual_evapotranspiration__fao56
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+
+    call calculate_actual_et_fao56( soil_storage=this%soil_storage,                                              &
+                                                  max_soil_storage=this%max_soil_storage,                        &
+                                                  precipitation=this%infiltration,                               &
+                                                  reference_et0=this%reference_et0,                              &
+                                                  depletion_fraction_p=DEPLETION_FRACTION( this%landuse_index ), &
+                                                  actual_et=this%actual_et,                                      &
+                                                  crop_coefficient_kcb=this%crop_coefficient_kcb )
+
+  end subroutine model_calculate_actual_et_fao56
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1512,6 +1571,27 @@ contains
 
   end subroutine model_calculate_direct_recharge_gridded
 
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_crop_coefficient_none(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    this%crop_coefficient_kcb = 1.0_c_float
+
+  end subroutine model_initialize_crop_coefficient_none
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_update_crop_coefficient_none(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    !> Nothing here to see. 
+
+  end subroutine model_update_crop_coefficient_none
+
 !--------------------------------------------------------------------------------------------------
 
   subroutine model_initialize_fog_none(this)
@@ -1556,7 +1636,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_fog_monthly_grid(this)v
+  subroutine model_calculate_fog_monthly_grid(this)
 
     use fog__monthly_grid
 
@@ -1838,7 +1918,7 @@ contains
     call minmaxmean( this%interception_storage, "intcp_stor")
     call minmaxmean( this%snow_storage, "snow_stor")
     call minmaxmean( this%soil_storage, "soil_stor")
-    call minmaxmean( this%soil_storage_max, "soil_stor_max")
+    call minmaxmean( this%max_soil_storage, "soil_stor_max")
     call minmaxmean( this%potential_recharge, "potential_recharge")
 
   end subroutine summarize_state_variables_sub

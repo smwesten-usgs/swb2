@@ -6,6 +6,8 @@ module mass_balance__interception
 
   private
 
+  public :: calculate_interception_mass_balance
+
 contains
 
   elemental subroutine calculate_interception_mass_balance( interception_storage,     &
@@ -25,9 +27,9 @@ contains
 !     call cells%calc_interception()
 
 
-    interception_storage = interception_storage + interception * cells%canopy_cover_fraction
+    interception_storage = interception_storage + interception * canopy_cover_fraction
 
-    actual_et = min( reference_et0, interception_storage ) * cells%canopy_cover_fraction
+    actual_et = min( reference_et0, interception_storage ) * canopy_cover_fraction
 
     interception_storage = interception_storage - actual_et
 

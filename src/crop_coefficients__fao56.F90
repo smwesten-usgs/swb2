@@ -62,7 +62,6 @@ module crop_coefficients__FAO_56
   type (DATETIME_T), allocatable     :: GROWTH_STAGE_DATE(:,:)
 
   !real (kind=c_float), 
-  real (kind=c_float), allocatable   :: DEPLETION_FRACTION(:)
   real (kind=c_float), allocatable   :: MEAN_PLANT_HEIGHT(:)
 
   integer (kind=c_int)               :: LU_SOILS_CSV
@@ -183,7 +182,6 @@ contains
    call PARAMS%get_parameters( sKey="Kcb_Nov", fValues=KCB_nov )
    call PARAMS%get_parameters( sKey="Kcb_Dec", fValues=KCB_dec )
 
-   call PARAMS%get_parameters( sKey="Depletion_Fraction", fValues=DEPLETION_FRACTION, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="Mean_Plant_Height", fValues=MEAN_PLANT_HEIGHT, lFatal=lTRUE )
 
     allocate( GROWTH_STAGE_DOY( 4, iNumberOfLanduses ), stat=iStat )
