@@ -2,12 +2,14 @@ module daily_calculation
 
   use continuous_frozen_ground_index, only   : update_continuous_frozen_ground_index
   use model_domain, only                     : MODEL_DOMAIN_T
-  use iso_c_binding, only                    : c_short, c_int, c_float, c_double
+  use iso_c_binding, only                    : c_short, c_int, c_float, c_double, c_bool
 
   use mass_balance__impervious_surface, only : calculate_impervious_surface_mass_balance
   use mass_balance__interception, only       : calculate_interception_mass_balance
   use mass_balance__snow, only               : calculate_snow_mass_balance
   use mass_balance__soil, only               : calculate_soil_mass_balance
+
+  use logfiles
 
   implicit none
 
@@ -22,7 +24,12 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: cells
 
     call cells%calc_GDD()
+
+!    call minmaxmean_float( cells%crop_coefficient_kcb, "kcb, before call")
+
     call cells%update_crop_coefficient()
+
+!    call minmaxmean_float( cells%crop_coefficient_kcb, "after, before call")
 
     call cells%calc_reference_et()
     call cells%calc_snowfall()
@@ -56,15 +63,20 @@ contains
                                                     impervious_fraction=cells%impervious_fraction,           &
                                                     reference_et0=cells%reference_et0 ) 
 
+
+    ! in HWB, runoff is calculated on the basis of rainfall only
+    cells%inflow = cells%runon + cells%rainfall + cells%snowmelt                   
+
     ! call to calc_routing also triggers an embedded call to calc_runoff
     call cells%calc_routing()
 
+    ! redefine "inflow" to include larger list of sources
     cells%inflow = cells%runon + cells%rainfall + cells%fog + cells%snowmelt                  &
                    + cells%surface_storage_excess - cells%interception + cells%irrigation
+   
     cells%infiltration = cells%inflow - cells%runoff
 
     call cells%calc_actual_et()
-
 
     call calculate_soil_mass_balance( potential_recharge=cells%potential_recharge,       &
                                       soil_storage=cells%soil_storage,                   &
@@ -75,5 +87,39 @@ contains
     call cells%calc_direct_recharge()
 
   end subroutine perform_daily_calculation
+
+
+  subroutine minmaxmean_float( variable , varname )
+
+    real (kind=c_float), dimension(:)  :: variable
+    character (len=*), intent(in)      :: varname
+
+    ! [ LOCALS ] 
+    integer (kind=c_int) :: iCount
+    character (len=20)   :: sVarname
+    character (len=14)   :: sMin
+    character (len=14)   :: sMax
+    character (len=14)   :: sMean
+    character (len=10)   :: sCount
+
+    write (sVarname, fmt="(a20)") adjustl(varname)
+
+    if (size( variable, 1) > 0 ) then
+      write (sMin, fmt="(g14.3)")   minval(variable)
+      write (sMax, fmt="(g14.3)")   maxval(variable)
+      write (sMean, fmt="(g14.3)")  sum(variable) / size(variable,1)
+      write (sCount, fmt="(i10)") size(variable,1)
+    else
+      write (sMin, fmt="(g14.3)")   -9999.
+      write (sMax, fmt="(g14.3)")   -9999.
+      write (sMean, fmt="(g14.3)")  -9999.
+      write (sCount, fmt="(i10)")       0
+    endif
+
+    call LOGS%write( adjustl(sVarname)//" | "//adjustl(sMin)//" | "//adjustl(sMax) &
+       //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_DEBUG, lEcho=.true._c_bool )
+
+  end subroutine minmaxmean_float
+
 
 end module daily_calculation

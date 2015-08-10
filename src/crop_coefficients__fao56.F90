@@ -5,7 +5,7 @@
 
 !> Update crop coefficients for crop types in simulation.
 
-module crop_coefficients__FAO_56
+module crop_coefficients__FAO56
 
   use iso_c_binding, only             : c_bool, c_short, c_int, c_float, c_double
   use constants_and_conversions, only : M_PER_FOOT, lTRUE, lFALSE, fTINYVAL, &
@@ -338,7 +338,7 @@ contains
  !! @retval rKcb Basal crop coefficient given the irrigation table entries and the 
  !!         current threshold values.
 
- function update_crop_coefficient_date_as_threshold( iLanduseIndex )           & 
+ elemental function update_crop_coefficient_date_as_threshold( iLanduseIndex )           & 
                                                                           result(fKcb)
 
   integer (kind=c_int), intent(in)   :: iLanduseIndex
@@ -410,7 +410,7 @@ end function update_crop_coefficient_date_as_threshold
  !! @retval fKcb Basal crop coefficient given the irrigation table entries and the 
  !!         current threshold values.
 
- function update_crop_coefficient_GDD_as_threshold( iLanduseIndex, fGDD )   &
+ elemental function update_crop_coefficient_GDD_as_threshold( iLanduseIndex, fGDD )   &
                                                                          result(fKcb)
 
   integer (kind=c_int), intent(in)   :: iLanduseIndex
@@ -468,41 +468,38 @@ end function update_crop_coefficient_GDD_as_threshold
 
 !------------------------------------------------------------------------------
 
-subroutine crop_coefficients_FAO56_update_growth_stage_dates( )
+  subroutine crop_coefficients_FAO56_update_growth_stage_dates( )
 
-  ! [ LOCALS ]
-  integer (kind=c_int) :: iIndex
-  integer (kind=c_int) :: iNextPlantingYear
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iIndex
+    integer (kind=c_int) :: iNextPlantingYear
 
-  do iIndex=lbound(GROWTH_STAGE_DATE,2), ubound(GROWTH_STAGE_DATE,2) 
+    do iIndex=lbound(GROWTH_STAGE_DATE,2), ubound(GROWTH_STAGE_DATE,2) 
 
-!     print *, SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate()
+  !     print *, SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate()
 
-    if ( SIM_DT%curr <= GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) ) cycle 
+      if ( SIM_DT%curr <= GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) ) cycle 
 
-    if ( KCB_METHOD( iIndex ) /= KCB_METHOD_FAO56 ) cycle
+      if ( KCB_METHOD( iIndex ) /= KCB_METHOD_FAO56 ) cycle
 
-    GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%iYear = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%iYear + 1
-    call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%calcJulianDay()
+      GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%iYear = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%iYear + 1
+      call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%calcJulianDay()
 
-    print *, "New planting date set for LU Index ",iIndex,": ",  &
-       GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate()
+      GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) &
+                                                + GROWTH_STAGE_DOY( L_DOY_INI, iIndex )
+      GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )&
+                                                + GROWTH_STAGE_DOY( L_DOY_DEV, iIndex )
+      GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )&
+                                                + GROWTH_STAGE_DOY( L_DOY_MID, iIndex )
+      GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )&
+                                                + GROWTH_STAGE_DOY( L_DOY_LATE, iIndex )
 
-    GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) &
-                                              + GROWTH_STAGE_DOY( L_DOY_INI, iIndex )
-    GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )&
-                                              + GROWTH_STAGE_DOY( L_DOY_DEV, iIndex )
-    GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )&
-                                              + GROWTH_STAGE_DOY( L_DOY_MID, iIndex )
-    GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )&
-                                              + GROWTH_STAGE_DOY( L_DOY_LATE, iIndex )
+  !      GROWTH_STAGE_DATE( ENDDATE_INI, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) + 1.0
 
-!      GROWTH_STAGE_DATE( ENDDATE_INI, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) + 1.0
-
-  enddo
+    enddo
 
 
-end subroutine crop_coefficients_FAO56_update_growth_stage_dates
+  end subroutine crop_coefficients_FAO56_update_growth_stage_dates
 
 
 !> Calculate the effective root zone depth.
@@ -520,7 +517,7 @@ end subroutine crop_coefficients_FAO56_update_growth_stage_dates
 !! @retval rZr_i current active rooting depth.
 !! @note Implemented as equation 8-1 (Annex 8), FAO-56, Allen and others.
 
-function calc_effective_root_depth( iLanduseIndex, fZr_max, fKCB )  result(fZr_i)
+elemental function calc_effective_root_depth( iLanduseIndex, fZr_max, fKCB )  result(fZr_i)
 
   integer (kind=c_int), intent(in)    :: iLanduseIndex 
   real (kind=c_float), intent(in)     :: fZr_max
@@ -567,26 +564,20 @@ end function calc_effective_root_depth
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine crop_coefficients_FAO56_calculate( Kcb, fGDD, iLanduseIndex )
+  elemental subroutine crop_coefficients_FAO56_calculate( Kcb, GDD, landuse_index )
 
     real (kind=c_float), intent(inout)   :: Kcb
-    real (kind=c_float), intent(in)      :: fGDD
-    integer (kind=c_int), intent(in)     :: iLanduseIndex
+    real (kind=c_float), intent(in)      :: GDD
+    integer (kind=c_int), intent(in)     :: landuse_index
 
-!     if (iLanduseIndex == 4) then
-!       print *, "FAO56: ", fSoilStorage,                                 &
-!         fSoilStorage_Excess, fInfiltration, fGDD, fAvailableWaterCapacity, fReference_ET0,    &
-!         fMaxRootingDepth, iLanduseIndex, iSoilGroup
-!     endif
+    if ( KCB_METHOD( landuse_index )  == KCB_METHOD_FAO56  &
+      .or. KCB_METHOD( landuse_index ) == KCB_METHOD_MONTHLY_VALUES ) then
 
-    if ( KCB_METHOD( iLanduseIndex )  == KCB_METHOD_FAO56  &
-      .or. KCB_METHOD( iLanduseIndex ) == KCB_METHOD_MONTHLY_VALUES ) then
-
-      Kcb = update_crop_coefficient_date_as_threshold( iLanduseIndex )
+      Kcb = update_crop_coefficient_date_as_threshold( landuse_index )
 
     else
 
-    !  fKcb = sm_FAO56_UpdateCropCoefficient( iLanduseIndex, INT(fGDD, kind=c_int), asInt(SIM_DT%curr%iMonth)  )
+    !  fKcb = sm_FAO56_UpdateCropCoefficient( landuse_index, INT(fGDD, kind=c_int), asInt(SIM_DT%curr%iMonth)  )
 
     !					 cel%rSoilWaterCap = cel%rCurrentRootingDepth * cel%rSoilWaterCapInput
 
@@ -594,4 +585,4 @@ end function calc_effective_root_depth
     
   end subroutine crop_coefficients_FAO56_calculate
 
-end module crop_coefficients__FAO_56
+end module crop_coefficients__FAO56

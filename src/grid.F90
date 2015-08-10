@@ -1513,10 +1513,10 @@ subroutine grid_checkIntegerGridValues(pGrd, sFilename)
 
  call LOGS%set_echo(lFALSE)
  call LOGS%write("### Summary of integer grid data values for file "//dquote(sFilename)//" ###", &
-    iLogLevel=LOG_GENERAL, iLinesBefore=1, iLinesAfter=1 )
+    iLogLevel=LOG_DEBUG, iLinesBefore=1, iLinesAfter=1 )
 
-  call LOGS%write("number     | count          | value     ")
-  call LOGS%write("---------- | -------------- | ----------")
+  call LOGS%write("number     | count          | value     ", iLogLevel=LOG_DEBUG )
+  call LOGS%write("---------- | -------------- | ----------", iLogLevel=LOG_DEBUG )
   do iIndex=0,maxval(pGrd%iData)
     iCount=COUNT( pGrd%iData==iIndex )
     if ( iCount > 0 ) then
@@ -1526,22 +1526,22 @@ subroutine grid_checkIntegerGridValues(pGrd, sFilename)
       write (sBuf1, fmt="(i14)") iCount
       write (sBuf2, fmt="(i10)")  iIndex
       write (sBuf3, fmt="(a10,' | ', a14,' | ',a10)") adjustl(sBuf0), adjustl(sBuf1), adjustl(sBuf2)
-      call LOGS%write( sBuf3 )
+      call LOGS%write( sBuf3, iLogLevel=LOG_DEBUG )
     end if
   end do
 
   call LOGS%write("   Total number of grid cells with value NODATA: " &
-    //asCharacter( COUNT(pGrd%iData == pGrd%iNoDataValue ) ), iLinesBefore=1 )
+    //asCharacter( COUNT(pGrd%iData == pGrd%iNoDataValue ) ), iLinesBefore=1, iLogLevel=LOG_ALL )
 
-  call LOGS%write("   Total number of grid cells: "//asCharacter( size(pGrd%iData) ) )
+  call LOGS%write("   Total number of grid cells: "//asCharacter( size(pGrd%iData) ), iLogLevel=LOG_ALL )
 
-  call LOGS%write("   Total number of grid cells with value >= 0: "//asCharacter(iRunningSum) )
+  call LOGS%write("   Total number of grid cells with value >= 0: "//asCharacter(iRunningSum), iLogLevel=LOG_ALL )
 
 
   if (size(pGrd%iData) /= iRunningSum) then
-    call LOGS%write(repeat("*",80))
-    call LOGS%write("Possible illegal or missing values in integer grid file: "//trim(sFileName))
-    call LOGS%write(repeat("*",80))
+    call LOGS%write(repeat("*",80), iLogLevel=LOG_ALL)
+    call LOGS%write("Possible illegal or missing values in integer grid file: "//trim(sFileName), iLogLevel=LOG_ALL)
+    call LOGS%write(repeat("*",80), iLogLevel=LOG_ALL)
   endif
 
 end subroutine grid_checkIntegerGridValues
@@ -2144,10 +2144,11 @@ end function grid_GridToPoint_int
 
 !----------------------------------------------------------------------
 
-subroutine grid_GridToGrid_int( pGrdFrom, pGrdTo )
+subroutine grid_GridToGrid_int( pGrdFrom, pGrdTo, lUseMajorityFilter )
 
-  type ( GENERAL_GRID_T ), pointer                    :: pGrdFrom   ! pointer to source grid
-  type ( GENERAL_GRID_T ), pointer                    :: pGrdTo     ! pointer to destination grid
+  type ( GENERAL_GRID_T ), pointer                    :: pGrdFrom            ! pointer to source grid
+  type ( GENERAL_GRID_T ), pointer                    :: pGrdTo              ! pointer to destination grid
+  logical (kind=c_bool), intent(in)                   :: lUseMajorityFilter
 
   ! [ LOCALS ]
   integer (kind=c_int) :: iCol, iRow
@@ -2163,8 +2164,10 @@ subroutine grid_GridToGrid_int( pGrdFrom, pGrdTo )
 
   fGridcellRatio = pGrdTo%rGridCellSize / pGrdFrom%rGridCellSize
 
-  ! if target grid resolution is much more coarse than source grid resolution: MAJORITY FILTER
-  if ( fGridcellRatio > 2.5_c_float ) then
+  ! Allow USER to trigger whether the majority filter is employed or not
+  if ( lUseMajorityFilter ) then
+
+    call LOGS%write( "** Majority filter in use for data from grid file "//dquote(pGrdFrom%sFilename), lEcho=lTRUE )
 
     iSpread = max( 1, nint( fGridcellRatio / 2.0_c_float ) )
 
@@ -2192,7 +2195,7 @@ subroutine grid_GridToGrid_int( pGrdFrom, pGrdTo )
       enddo
     enddo
 
-  else  ! target grid resolution similar to or more dense than source grid resolution: NEAREST NEIGHBOR
+  else  ! target grid resolution similar to or more dense than source grid resolution: NEAREST NEIGHBOR [DEFAULT]
 
     do iRow=1,pGrdTo%iNY
       do iCol=1,pGrdTo%iNX

@@ -17,18 +17,18 @@ module model_iterate
 
 contains
 
-  subroutine iterate_over_simulation_days(this)
+  subroutine iterate_over_simulation_days(cells)
 
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    class (MODEL_DOMAIN_T), intent(inout)  :: cells
 
     do while ( SIM_DT%curr <= SIM_DT%end )
 
       call LOGS%write("Calculating: "//SIM_DT%curr%prettydate(), iLogLevel=LOG_ALL, lEcho=.true._c_bool )
 
-      call this%get_climate_data()
-      call perform_daily_calculation(this)
-      call write_output(this)
-      call SIM_DT%addDay()
+      call cells%get_climate_data( )
+      call perform_daily_calculation( cells )
+      call write_output( cells )
+      call SIM_DT%addDay( )
 
     enddo 
 

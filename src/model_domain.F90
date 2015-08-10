@@ -248,7 +248,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: iStat(35)
+    integer (kind=c_int)  :: iStat(37)
 
     iCount = count( this%active )
 
@@ -286,7 +286,9 @@ contains
     allocate( this%surface_storage_max( iCount ), stat=iStat(32) )           
     allocate( this%canopy_cover_fraction( iCount ), stat=iStat(33) ) 
     allocate( this%soil_storage_previous_day( iCount ), stat=iStat(34) )   
-    allocate( this%crop_coefficient_kcb( iCount ), stat=iStat(35) )       
+    allocate( this%crop_coefficient_kcb( iCount ), stat=iStat(35) )   
+    allocate( this%potential_snowmelt( iCount ), stat=iStat(36) )  
+    allocate( this%continuous_frozen_ground_index( iCount ), stat=iStat(37) )         
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="  &
@@ -308,18 +310,32 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)   :: this
 
     call this%init_interception
+
     call this%init_snowfall
+
     call this%init_snowmelt
+
     call this%init_fog
+
     call this%init_runoff
+
     call this%init_soil_moisture_max
+
     call this%init_routing
+
     call this%init_actual_et
+
     call this%init_reference_et
+
     call this%init_precipitation_data
+
     call this%init_GDD
+
     call this%init_irrigation
+
     call this%init_direct_recharge
+
+    call this%init_crop_coefficient
 
   end subroutine initialize_methods_sub
 
@@ -493,6 +509,9 @@ contains
     if (.not. associated( this%init_GDD) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
+    if (.not. associated( this%init_routing) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )    
+
     if (.not. associated( this%calc_interception) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
@@ -518,6 +537,9 @@ contains
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%calc_GDD) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+
+    if (.not. associated( this%calc_routing) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%get_precipitation_data ) ) &
@@ -552,14 +574,14 @@ contains
         this%init_GDD => model_initialize_GDD
         this%calc_GDD => model_calculate_GDD
 
-        call LOGS%WRITE( "==> BUCKET INTERCEPTION submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> BUCKET INTERCEPTION submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( sMethodName .strequal. "GASH" ) then
 
         this%init_interception => model_initialize_interception_gash
         this%calc_interception => model_calculate_interception_gash
 
-        call LOGS%WRITE( "==> GASH INTERCEPTION submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> GASH INTERCEPTION submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
@@ -575,14 +597,14 @@ contains
         this%init_runoff => model_initialize_runoff_curve_number
         this%calc_runoff => model_calculate_runoff_curve_number
 
-        call LOGS%WRITE( "==> CURVE NUMBER RUNOFF submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> CURVE NUMBER RUNOFF submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( sMethodName .strequal. "RUNOFF_RATIO" ) .or. ( sMethodName .strequal. "MONTHLY_GRID" ) ) then
 
         this%init_runoff => model_initialize_runoff_gridded_values
         this%calc_runoff => model_calculate_runoff_gridded_values
 
-        call LOGS%WRITE( "==> RUNOFF RATIO submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> RUNOFF RATIO submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
@@ -598,14 +620,14 @@ contains
         this%init_snowfall => model_initialize_snowfall_original
         this%calc_snowfall => model_calculate_snowfall_original
 
-        call LOGS%WRITE( "==> ORIGINAL SNOWFALL submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> ORIGINAL SNOWFALL submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( sMethodName .strequal. "PRMS" ) then
 
         this%init_snowfall => model_initialize_snowfall_prms
         this%calc_snowfall => model_calculate_snowfall_prms
 
-        call LOGS%WRITE( "==> PRMS SNOWFALL submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> PRMS SNOWFALL submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
@@ -621,14 +643,14 @@ contains
         this%init_awc => model_initialize_available_water_content_table
         this%read_awc_data => model_read_available_water_content_table
 
-        call LOGS%WRITE( "==> TABLE method for populating AVAILABLE_WATER_CONTENT selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> TABLE method for populating AVAILABLE_WATER_CONTENT selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( sMethodName .strequal. "GRID" ) .or. ( sMethodName .strequal. "GRIDDED" ) ) then
 
         this%init_awc => model_initialize_available_water_content_gridded
         this%read_awc_data => model_read_available_water_content_gridded
 
-        call LOGS%WRITE( "==> GRIDDED VALUES method for populating AVAILABLE_WATER_CONTENT selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> GRIDDED VALUES method for populating AVAILABLE_WATER_CONTENT selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
@@ -644,15 +666,37 @@ contains
         this%init_routing => model_initialize_routing_D8
         this%calc_routing => model_calculate_routing_D8
 
-        call LOGS%WRITE( "==> D8 FLOW ROUTING submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> D8 FLOW ROUTING submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
-        this%init_routing => null()
-        this%calc_routing => null()
+        this%init_routing => model_initialize_routing_none
+        this%calc_routing => model_calculate_routing_none
 
         call LOGS%WRITE( "==> NULL FLOW ROUTING submodel selected -- NO routing will be performed.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
+
+      endif
+
+    elseif ( ( sCmdText .contains. "CROP_COEFFICIENT" )    &
+        .or. ( sCmdText .contains. "CROP_COEF" ) )  then
+
+      if ( ( sMethodName .strequal. "FAO56" )  &
+             .or. ( sMethodName .strequal. "FAO-56" ) ) then
+
+        this%init_crop_coefficient => model_initialize_crop_coefficient_FAO56
+        this%update_crop_coefficient => model_update_crop_coefficient_FAO56
+
+        call LOGS%WRITE( "==> FAO-56 crop coefficient calculation method selected.", iLogLevel = LOG_ALL, &
+           lEcho = lFALSE )
+
+      else
+
+        this%init_crop_coefficient => model_initialize_crop_coefficient_none
+        this%update_crop_coefficient => model_update_crop_coefficient_none
+
+        call LOGS%WRITE( "==> NO crop coefficient calculation method selected. Kcb defaults to 1.0.",     &
+          iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       endif
 
@@ -663,14 +707,14 @@ contains
         this%init_fog => model_initialize_fog_monthly_grid
         this%calc_fog => model_calculate_fog_monthly_grid
 
-        call LOGS%WRITE( "==> MONTHLY_GRID FOG submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> MONTHLY_GRID FOG submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
         this%init_fog => model_initialize_fog_none
         this%calc_fog => model_calculate_fog_none
 
-        call LOGS%WRITE( "==> NULL FOG submodel selected (i.e. no fog term).", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> NULL FOG submodel selected (i.e. no fog term).", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       endif
 
@@ -687,14 +731,14 @@ contains
         this%init_GDD => model_initialize_GDD
         this%calc_GDD => model_calculate_GDD
 
-        call LOGS%WRITE( "==> IRRIGATION will be calculated and applied as needed.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> IRRIGATION will be calculated and applied as needed.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
         this%init_irrigation => model_initialize_irrigation_none
         this%calc_irrigation => model_calculate_irrigation_none
 
-        call LOGS%WRITE( "==> IRRIGATION will *NOT* be active.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> IRRIGATION will *NOT* be active.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       endif
 
@@ -707,7 +751,7 @@ contains
         this%calc_reference_et => model_calculate_et_hargreaves
 
         call LOGS%WRITE( "==> HARGREAVES-SAMANI EVAPOTRANSPIRATION submodel selected.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( sMethodName .strequal. "JENSEN-HAISE" ) &
            .or. ( sMethodName .strequal. "JH" ) ) then
@@ -716,7 +760,7 @@ contains
         this%calc_reference_et => model_calculate_et_jensen_haise
 
         call LOGS%WRITE( "==> JENSEN_HAISE EVAPOTRANSPIRATION submodel selected.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( sMethodName .strequal. "MONTHLY_GRID" ) &
            .or. ( sMethodName .strequal. "MONTHLY_GRIDDED" ) ) then
@@ -725,7 +769,7 @@ contains
         this%calc_reference_et => model_calculate_et_monthly_grid
 
         call LOGS%WRITE( "==> MONTHLY_GRID EVAPOTRANSPIRATION submodel selected.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( sMethodName .strequal. "DAILY_GRID" ) &
            .or. ( sMethodName .strequal. "DAILY_GRIDDED" ) ) then
@@ -734,7 +778,7 @@ contains
         this%calc_reference_et => model_calculate_et_daily_grid
 
         call LOGS%WRITE( "==> DAILY_GRID EVAPOTRANSPIRATION submodel selected.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
@@ -752,7 +796,7 @@ contains
         this%get_precipitation_data => model_get_precip_normal
 
         call LOGS%WRITE( "==> STANDARD PRECIPITATION submodel selected.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( sMethodName .strequal. "METHOD_OF_FRAGMENTS" ) &
            .or. ( sMethodName .strequal. "FRAGMENTS" ) ) then
@@ -761,7 +805,7 @@ contains
         this%get_precipitation_data => model_get_precip_method_of_fragments
 
         call LOGS%WRITE( "==> METHOD OF FRAGMENTS PRECIPITATION submodel selected.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
@@ -779,7 +823,7 @@ contains
         this%calc_direct_recharge => model_calculate_direct_recharge_gridded
 
         call LOGS%WRITE( "==> GRIDDED values for water main leakage (etc.) will be used.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
@@ -796,7 +840,7 @@ contains
         this%calc_actual_et => model_calculate_actual_et_thornthwaite_mather
 
         call LOGS%WRITE( "==> THORNTHWAITE-MATHER SOIL MOISTURE RETENTION submodel selected.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( sMethodName .strequal. "FAO56" ) .or. ( sMethodName .strequal. "FAO-56" ) ) then
 
@@ -804,7 +848,7 @@ contains
         this%calc_actual_et => model_calculate_actual_et_fao56
 
         call LOGS%WRITE( "==> FAO-56 SOIL MOISTURE RETENTION submodel selected.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
@@ -909,6 +953,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     ! no routing to be done; just call the runoff calculation routine and move on
+    this%runon = 0.0_c_float
     call this%calc_runoff()
 
   end subroutine model_calculate_routing_none  
@@ -935,6 +980,8 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int) :: index
+
+    this%runon=0.0_c_float
 
     do index=lbound( ORDER_INDEX, 1 ), ubound( ORDER_INDEX, 1 )
 
@@ -1194,7 +1241,7 @@ contains
     type (DATETIME_T), save     :: date_of_last_grid_update
 
     if ( .not. ( date_of_last_grid_update == SIM_DT%curr ) ) then
-      call runoff_gridded_values_calculate( )
+      call runoff_gridded_values_update_ratios( )
       date_of_last_grid_update = SIM_DT%curr
     endif
 
@@ -1480,16 +1527,24 @@ contains
 
   subroutine model_calculate_actual_et_thornthwaite_mather( this )
 
-    use actual_evapotranspiration__thornthwaite_mather
+    use actual_et__thornthwaite_mather
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
 
-    call calculate_actual_et_thornthwaite_mather( soil_storage=this%soil_storage,                   &
+    call minmaxmean( this%soil_storage, "soil_storage")
+    call minmaxmean( this%max_soil_storage, "max_soil_storage")
+    call minmaxmean( this%infiltration, "infiltration")
+    call minmaxmean( this%crop_coefficient_kcb, "kcb")
+    call minmaxmean( this%actual_et, "actual_et")
+
+
+    call calculate_actual_et_thornthwaite_mather( actual_et=this%actual_et,                         &
+                                                  impervious_fraction=this%impervious_fraction,     &
+                                                  soil_storage=this%soil_storage,                   &
                                                   max_soil_storage=this%max_soil_storage,           &
                                                   precipitation=this%infiltration,                  &
                                                   reference_et0=this%reference_et0,                 &
-                                                  actual_et=this%actual_et,                         &
                                                   crop_coefficient_kcb=this%crop_coefficient_kcb )
 
   end subroutine model_calculate_actual_et_thornthwaite_mather
@@ -1498,7 +1553,7 @@ contains
 
   subroutine model_initialize_actual_et_fao56(this)
 
-    use actual_evapotranspiration__fao56
+    use actual_et__fao56
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
@@ -1510,18 +1565,27 @@ contains
 
   subroutine model_calculate_actual_et_fao56( this )
 
-    use actual_evapotranspiration__fao56
+    use actual_et__fao56
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
+    call minmaxmean( this%soil_storage, "soil_storage")
+    call minmaxmean( this%max_soil_storage, "max_soil_storage")
+    call minmaxmean( this%infiltration, "infiltration")
+    call minmaxmean( this%crop_coefficient_kcb, "kcb")
+    call minmaxmean( this%actual_et, "actual_et")
+    call minmaxmean( this%reference_et0, "reference_et0")
+    call minmaxmean( this%impervious_fraction, "impervious_fraction")
+    call minmaxmean( DEPLETION_FRACTION(this%landuse_index), "DEPLETION_FRACTION")
 
-    call calculate_actual_et_fao56( soil_storage=this%soil_storage,                                              &
-                                                  max_soil_storage=this%max_soil_storage,                        &
-                                                  precipitation=this%infiltration,                               &
-                                                  reference_et0=this%reference_et0,                              &
-                                                  depletion_fraction_p=DEPLETION_FRACTION( this%landuse_index ), &
-                                                  actual_et=this%actual_et,                                      &
-                                                  crop_coefficient_kcb=this%crop_coefficient_kcb )
+    call calculate_actual_et_fao56( actual_et=this%actual_et,                                      &
+                                    impervious_fraction=this%impervious_fraction,                  &
+                                    soil_storage=this%soil_storage,                                &
+                                    max_soil_storage=this%max_soil_storage,                        &
+                                    precipitation=this%infiltration,                               &
+                                    reference_et0=this%reference_et0,                              &
+                                    depletion_fraction_p=DEPLETION_FRACTION( this%landuse_index ), &
+                                    crop_coefficient_kcb=this%crop_coefficient_kcb )
 
   end subroutine model_calculate_actual_et_fao56
 
@@ -1578,8 +1642,6 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    this%crop_coefficient_kcb = 1.0_c_float
-
   end subroutine model_initialize_crop_coefficient_none
 
 !--------------------------------------------------------------------------------------------------
@@ -1588,9 +1650,39 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    !> Nothing here to see. 
+    this%crop_coefficient_kcb = 1.0_c_float
 
   end subroutine model_update_crop_coefficient_none
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_crop_coefficient_FAO56(this)
+
+    use crop_coefficients__FAO56, only : crop_coefficients_FAO56_initialize
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call crop_coefficients_FAO56_initialize( fSoilStorage=this%soil_storage,      &
+                                             iLanduseIndex=this%landuse_index,    &
+                                             iSoilGroup=this%soil_group,          &
+                                             fAvailable_Water_Content=this%awc,   &
+                                             lActive=this%active )
+
+  end subroutine model_initialize_crop_coefficient_FAO56
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_update_crop_coefficient_FAO56(this)
+
+    use crop_coefficients__FAO56, only : crop_coefficients_FAO56_calculate
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    
+    call crop_coefficients_FAO56_calculate( Kcb=this%crop_coefficient_kcb,      &
+                                            GDD=this%gdd,                       &
+                                            landuse_index=this%landuse_index )
+
+  end subroutine model_update_crop_coefficient_FAO56
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1850,7 +1942,7 @@ contains
     endif
 
     call LOGS%write( adjustl(sVarname)//" | "//adjustl(sMin)//" | "//adjustl(sMax) &
-       //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_DEBUG, lEcho=lTRUE )
+       //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_ALL, lEcho=lTRUE )
 
   end subroutine minmaxmean_float
 
@@ -1883,7 +1975,7 @@ contains
     endif
 
     call LOGS%write( adjustl(sVarname)//" | "//adjustl(sMin)//" | "//adjustl(sMax) &
-       //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_DEBUG, lEcho=lTRUE )
+       //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_ALL, lEcho=lTRUE )
 
   end subroutine minmaxmean_int
 

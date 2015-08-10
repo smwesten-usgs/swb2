@@ -1,4 +1,4 @@
-module actual_evapotranspiration__thornthwaite_mather
+module actual_et__thornthwaite_mather
 
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double
@@ -7,18 +7,20 @@ module actual_evapotranspiration__thornthwaite_mather
 contains
 
   elemental subroutine calculate_actual_et_thornthwaite_mather(                      &
+                                                  actual_et,                         &
+                                                  impervious_fraction,               &
                                                   soil_storage,                      &
                                                   max_soil_storage,                  &
                                                   precipitation,                     &
                                                   reference_et0,                     &
-                                                  actual_et,                         &
                                                   crop_coefficient_kcb )
 
+    real (kind=c_float), intent(inout)             :: actual_et
+    real (kind=c_float), intent(in)                :: impervious_fraction
     real (kind=c_float), intent(in)                :: soil_storage
     real (kind=c_float), intent(in)                :: max_soil_storage
     real (kind=c_float), intent(in)                :: precipitation
     real (kind=c_float), intent(in)                :: reference_et0
-    real (kind=c_float), intent(out)               :: actual_et
     real (kind=c_float), intent(in), optional      :: crop_coefficient_kcb
 
     ! [ LOCALS ]
@@ -51,6 +53,9 @@ contains
 
     endif
 
+    ! scale actual et value in proportion to the fraction of pervious land area present
+    actual_et = actual_et * ( 1.0_c_float - impervious_fraction )
+
   end subroutine calculate_actual_et_thornthwaite_mather
 
-end module actual_evapotranspiration__thornthwaite_mather
+end module actual_et__thornthwaite_mather

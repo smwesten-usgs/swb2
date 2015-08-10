@@ -69,7 +69,7 @@ module model_initialize
       GRIDDED_DATASETS_T("IRRIGATION_MASK              ", lTRUE, DATATYPE_INT),         &                
       GRIDDED_DATASETS_T("RELATIVE_HUMIDITY            ", lTRUE, DATATYPE_FLOAT )   ]
 
-  type (METHODS_LIST_T), parameter  :: KNOWN_METHODS(11) =   &
+  type (METHODS_LIST_T), parameter  :: KNOWN_METHODS(12) =   &
     [ METHODS_LIST_T("INTERCEPTION           ", lFALSE),    &
       METHODS_LIST_T("EVAPOTRANSPIRATION     ", lFALSE),    &
       METHODS_LIST_T("RUNOFF                 ", lFALSE),    &
@@ -79,6 +79,7 @@ module model_initialize
       METHODS_LIST_T("MAXIMUM_SOIL_STORAGE   ", lTRUE),     &
       METHODS_LIST_T("SOIL_MOISTURE          ", lFALSE),    &
       METHODS_LIST_T("IRRIGATION             ", lTRUE),     &
+      METHODS_LIST_T("CROP_COEFFICIENT       ", lTRUE),     &
       METHODS_LIST_T("DIRECT_RECHARGE        ", lTRUE),     &
       METHODS_LIST_T("FLOW_ROUTING           ", lFALSE)  ]
 
@@ -166,10 +167,8 @@ contains
 
     call read_hydrologic_soil_groups()
 
-    ! problem is occuring in this step; cannot pack max_rooting_depth until active(:,:) has been determined
     call initialize_root_zone_depths()
 
-    ! null pointer after this point 
     call MODEL%read_AWC_data()
 
     call MODEL%set_inactive_cells()
@@ -688,7 +687,7 @@ contains
         sArgText = myOptions%get(1, myOptions%count )
 
         ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(sCmdText//" "//sArgText, iLogLevel=LOG_GENERAL, iTab=4)
+        call LOGS%write("> "//sCmdText//" "//sArgText, iLinesBefore=1 )
 
         ! most of the time, we only care about the first dictionary entry, obtained below
         sArgText_1 = myOptions%get(1)
@@ -753,6 +752,11 @@ contains
               //", "//dquote("SURFER")//", or "//dquote("NETCDF") )
 
           endif  
+
+
+        elseif ( index( string=sCmdText, substring="_USE_MAJORITY_FILTER" ) > 0 ) then
+
+          call pENTRY%set_majority_filter_flag( lTRUE )
 
         elseif ( index( string=sCmdText, substring="_SCALE" ) > 0 ) then
 
@@ -880,7 +884,7 @@ contains
     sArgText = myOptions%get(1, myOptions%count )
 
     ! echo the original directive and dictionary entries to the logfile
-    call LOGS%write("GRID "//sArgText, iTab=4)
+    call LOGS%write("> GRID "//sArgText, iLinesBefore=1 )
 
     iNX = asInt( myOptions%get(1) )
     iNY = asInt( myOptions%get(2) )
@@ -922,7 +926,7 @@ contains
     sArgText = myOptions%get(1, myOptions%count )
 
     ! echo the original directive and dictionary entries to the logfile
-    call LOGS%write("BASE_PROJECTION_DEFINITION "//sArgText, iTab=4)
+    call LOGS%write("> BASE_PROJECTION_DEFINITION "//sArgText, iLinesBefore=1)
 
     ! BNDS is a module-level data structure that will be used in other modules to 
     ! supply bounding box information for the SWB project area
@@ -984,7 +988,7 @@ contains
       sArgText = myOptions%get(1, myOptions%count )
 
       ! echo the original directive and dictionary entries to the logfile
-      call LOGS%write(sCmdText//" "//sArgText, iTab=4)
+      call LOGS%write("> "//sCmdText//" "//sArgText, iLinesBefore=1 )
 
       ! most of the time, we only care about the first dictionary entry, obtained below
       sOptionText = myOptions%get(1)
@@ -1092,7 +1096,7 @@ contains
         sArgText = myOptions%get(1, myOptions%count )
 
         ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(sCmdText//" "//sArgText, iTab=4)
+        call LOGS%write("> "//sCmdText//" "//sArgText, iLinesBefore=1 )
 
         ! most of the time, we only care about the first dictionary entry, obtained below
         sOptionText = myOptions%get(1)
@@ -1114,7 +1118,7 @@ contains
       if ( iCount > 0 ) then
 
         call PARAMS%munge_file()
-        call PARAMS_DICT%print_all()       
+        call PARAMS_DICT%print_all(iLogLevel=LOG_DEBUG, lEcho=lFALSE)       
 
       endif
 
@@ -1168,7 +1172,7 @@ contains
         sArgText = myOptions%get(1, myOptions%count )
 
         ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write(sCmdText//" "//sArgText, iTab=4)
+        call LOGS%write("> "//sCmdText//" "//sArgText, iLinesBefore=1 )
 
         ! most of the time, we only care about the first dictionary entry, obtained below
         sOptionText = myOptions%get(1)

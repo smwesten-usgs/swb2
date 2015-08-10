@@ -2,8 +2,8 @@
 if(TARGET__SWB_EXECUTABLE)
 
   add_executable(swb2
-            actual_evapotranspiration__fao56.F90
-            actual_evapotranspiration__thornthwaite.F90
+            actual_et__fao56.F90
+            actual_et__thornthwaite_mather.F90
             awc__gridded_values.F90
             awc__table_values.F90
             constants_and_conversions.F90

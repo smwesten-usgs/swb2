@@ -1,4 +1,4 @@
-module actual_evapotranspiration__fao56
+module actual_et__fao56
 
 
   use iso_c_binding, only               : c_short, c_int, c_float, c_double
@@ -47,7 +47,7 @@ contains
 !----------------------------------------------------------------------------------------------------
 
 	elemental subroutine calculate_actual_et_fao56( actual_et,                         &
-
+                                                  impervious_fraction,               &
                                                   soil_storage,                      &
                                                   depletion_fraction_p,              &
                                                   max_soil_storage,                  &
@@ -56,6 +56,7 @@ contains
                                                   crop_coefficient_kcb )
 
     real (kind=c_float), intent(inout)             :: actual_et
+    real (kind=c_float), intent(in)                :: impervious_fraction
     real (kind=c_float), intent(in)                :: depletion_fraction_p
     real (kind=c_float), intent(in)                :: soil_storage
     real (kind=c_float), intent(in)                :: max_soil_storage
@@ -68,6 +69,9 @@ contains
     real (kind=c_float)  :: Kcb
     real (kind=c_float)  :: depletion_amount
     real (kind=c_float)  :: p
+    real (kind=c_float)  :: interim_soil_storage
+    real (kind=c_float)  :: fraction_full_PET
+    real (kind=c_float)  :: root_constant_ci
 
     if ( present( crop_coefficient_kcb ) ) then
       Kcb = crop_coefficient_kcb
@@ -80,24 +84,54 @@ contains
     p = adjust_depletion_fraction_p( p_table_22=depletion_fraction_p,  &
                                      reference_et0=reference_et0 )
 
-    if ( P_minus_PE >= 0.0_c_float ) then
+    ! soil storage value at which actual et begins to decline
+    root_constant_ci = ( 1.0_c_float - p ) * max_soil_storage
 
-      actual_et = reference_et0 * Kcb
+    interim_soil_storage = soil_storage + precipitation
 
-    elseif( P_minus_PE < 0.0_c_float ) then
+    ! root constant of 0 implies a depletion fraction of 1; in other words, 
+    ! there is no declining portion of the AET/PET to AW/AWC relation.
+    if ( root_constant_ci  <= 0.0_c_float ) then
 
-      if ( max_soil_storage > 0.0_c_float ) then
+      actual_et = min( reference_et0, soil_storage + precipitation )
 
-        actual_et = precipitation + soil_storage * ( 1.0_c_float - exp( P_minus_PE / max_soil_storage ) )
+    elseif ( interim_soil_storage > root_constant_ci ) then
 
+
+      ! calculate fraction of day that would be at full reference ET values
+      if ( reference_et0 > 0.0_c_float ) then
+        
+        fraction_full_PET = (interim_soil_storage - root_constant_ci) / reference_et0
+      
       else
-     
+        
+        fraction_full_PET = 99.
+      
+      endif
+
+      ! there is enough soil storage to cover withdrawal of soil moisture at full reference ET values
+      ! for the entire day
+      if ( fraction_full_PET >= 1 ) then
+
         actual_et = reference_et0
 
+      else
+
+        actual_et = reference_et0 * fraction_full_PET                                                    &
+                    + ( 1.0_c_float - fraction_full_PET )                                                &
+                       * interim_soil_storage * ( 1.0_c_float - exp( P_minus_PE / max_soil_storage ) )  
+            
       endif     
 
-     endif
+    else
+
+      actual_et = interim_soil_storage * ( 1.0_c_float - exp( P_minus_PE / max_soil_storage ) )  
+
+    endif
+
+    ! scale actual et value in proportion to the fraction of pervious land area present
+    actual_et = actual_et * ( 1.0_c_float - impervious_fraction )
 
   end subroutine calculate_actual_et_fao56
 
-end module actual_evapotranspiration__fao56
+end module actual_et__fao56
