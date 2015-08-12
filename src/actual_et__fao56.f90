@@ -50,7 +50,7 @@ contains
                                                   impervious_fraction,               &
                                                   soil_storage,                      &
                                                   depletion_fraction_p,              &
-                                                  max_soil_storage,                  &
+                                                  soil_storage_max,                  &
                                                   precipitation,                     &
                                                   reference_et0,                     &
                                                   crop_coefficient_kcb )
@@ -59,7 +59,7 @@ contains
     real (kind=c_float), intent(in)                :: impervious_fraction
     real (kind=c_float), intent(in)                :: depletion_fraction_p
     real (kind=c_float), intent(in)                :: soil_storage
-    real (kind=c_float), intent(in)                :: max_soil_storage
+    real (kind=c_float), intent(in)                :: soil_storage_max
     real (kind=c_float), intent(in)                :: precipitation
     real (kind=c_float), intent(in)                :: reference_et0
     real (kind=c_float), intent(in), optional      :: crop_coefficient_kcb
@@ -85,7 +85,7 @@ contains
                                      reference_et0=reference_et0 )
 
     ! soil storage value at which actual et begins to decline
-    root_constant_ci = ( 1.0_c_float - p ) * max_soil_storage
+    root_constant_ci = ( 1.0_c_float - p ) * soil_storage_max
 
     interim_soil_storage = soil_storage + precipitation
 
@@ -119,13 +119,13 @@ contains
 
         actual_et = reference_et0 * fraction_full_PET                                                    &
                     + ( 1.0_c_float - fraction_full_PET )                                                &
-                       * interim_soil_storage * ( 1.0_c_float - exp( P_minus_PE / max_soil_storage ) )  
+                       * interim_soil_storage * ( 1.0_c_float - exp( P_minus_PE / soil_storage_max ) )  
             
       endif     
 
     else
 
-      actual_et = interim_soil_storage * ( 1.0_c_float - exp( P_minus_PE / max_soil_storage ) )  
+      actual_et = interim_soil_storage * ( 1.0_c_float - exp( P_minus_PE / soil_storage_max ) )  
 
     endif
 

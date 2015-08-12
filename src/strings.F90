@@ -110,8 +110,8 @@ contains
     sTemp1 = asUppercase(sText1)
     sTemp2 = asUppercase(sText2)
 
-    if ( index(sText1, sText2) /= 0 ) lBool = lTRUE
-
+    if ( index(sTemp1, sTemp2) /= 0 ) lBool = lTRUE
+    
   end function is_string2_present_in_string1_fn    
 
 !--------------------------------------------------------------------------------------------------

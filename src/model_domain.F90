@@ -52,7 +52,7 @@ module model_domain
     real (kind=c_float), allocatable       :: crop_coefficient_kcb(:)
     real (kind=c_float), allocatable       :: continuous_frozen_ground_index(:)    
 
-    real (kind=c_float), allocatable       :: max_rooting_depth(:)
+    real (kind=c_float), allocatable       :: rooting_depth_max(:)
      
     real (kind=c_float), allocatable       :: latitude(:)
     real (kind=c_float), allocatable       :: reference_ET0(:)
@@ -76,7 +76,7 @@ module model_domain
     real (kind=c_float), allocatable       :: surface_storage_excess(:)
     real (kind=c_float), allocatable       :: soil_storage(:)
     real (kind=c_float), allocatable       :: soil_storage_previous_day(:)
-    real (kind=c_float), allocatable       :: max_soil_storage(:)
+    real (kind=c_float), allocatable       :: soil_storage_max(:)
     real (kind=c_float), allocatable       :: potential_recharge(:)
     real (kind=c_float), allocatable       :: current_rooting_depth(:)
          
@@ -99,7 +99,7 @@ module model_domain
     procedure ( simple_method ), pointer         :: init_reference_et       => model_initialize_et_hargreaves
     procedure ( simple_method ), pointer         :: init_actual_et          => model_initialize_actual_et_thornthwaite_mather
     procedure ( simple_method ), pointer         :: init_routing            => model_initialize_routing_D8
-    procedure ( simple_method ), pointer         :: init_soil_moisture_max  => model_initialize_max_soil_storage_internally_calculated
+    procedure ( simple_method ), pointer         :: init_soil_storage_max   => model_initialize_soil_storage_max_internally_calculated
     procedure ( simple_method ), pointer         :: init_snowfall           => model_initialize_snowfall_original
     procedure ( simple_method ), pointer         :: init_snowmelt           => model_initialize_snowmelt_original
     procedure ( simple_method ), pointer         :: init_precipitation_data => model_initialize_precip_normal
@@ -147,8 +147,8 @@ module model_domain
     procedure :: initialize_grid_sub
     generic   :: initialize_grid => initialize_grid_sub
 
-    procedure :: set_method_sub
-    generic   :: set_method => set_method_sub
+    procedure :: set_method_pointers_sub
+    generic   :: set_method_pointers => set_method_pointers_sub
 
     procedure :: set_inactive_cells_sub
     generic   :: set_inactive_cells => set_inactive_cells_sub
@@ -191,7 +191,7 @@ module model_domain
   ! creating several module-level globals
   type (MODEL_DOMAIN_T), public             :: MODEL
 
-  real (kind=c_float), allocatable, public  :: MAX_ROOTING_DEPTH(:,:)
+  real (kind=c_float), allocatable, public  :: ROOTING_DEPTH_MAX(:,:)
 
   type (GENERAL_GRID_T), pointer            :: pROOTING_DEPTH
 
@@ -248,7 +248,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: iStat(37)
+    integer (kind=c_int)  :: iStat(39)
 
     iCount = count( this%active )
 
@@ -273,7 +273,7 @@ contains
     allocate( this%interception_storage(iCount), stat=iStat(19) )
     allocate( this%snow_storage(iCount), stat=iStat(20) )
     allocate( this%soil_storage(iCount), stat=iStat(21) )
-    allocate( this%max_soil_storage(iCount), stat=iStat(22) )
+    allocate( this%soil_storage_max(iCount), stat=iStat(22) )
     allocate( this%potential_recharge(iCount), stat=iStat(23) )
     allocate( this%fog(iCount), stat=iStat(24) )
     allocate( this%irrigation(iCount), stat=iStat(25) )
@@ -288,7 +288,9 @@ contains
     allocate( this%soil_storage_previous_day( iCount ), stat=iStat(34) )   
     allocate( this%crop_coefficient_kcb( iCount ), stat=iStat(35) )   
     allocate( this%potential_snowmelt( iCount ), stat=iStat(36) )  
-    allocate( this%continuous_frozen_ground_index( iCount ), stat=iStat(37) )         
+    allocate( this%continuous_frozen_ground_index( iCount ), stat=iStat(37) ) 
+    allocate( this%rooting_depth_max( iCount ), stat=iStat(38) )
+    allocate( this%current_rooting_depth( iCount ), stat=iStat(39) )        
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="  &
@@ -319,7 +321,7 @@ contains
 
     call this%init_runoff
 
-    call this%init_soil_moisture_max
+    call this%init_soil_storage_max
 
     call this%init_routing
 
@@ -472,12 +474,6 @@ contains
 
       call this%calculate_mean_air_temperature()
 
-      ! partition precipitation into rainfall and snowfall fractions
-      call this%calc_snowfall()
-
-      ! update growing degree day statistic
-      call this%calc_GDD()
-
     end associate
 
   end subroutine get_climate_data
@@ -490,56 +486,50 @@ contains
 
     if (.not. associated( this%init_interception) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+    if (.not. associated( this%calc_interception) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ ) 
+
+    if (.not. associated( this%init_irrigation) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+    if (.not. associated( this%calc_irrigation) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%init_runoff) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+    if (.not. associated( this%calc_runoff) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%init_reference_et) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
-
-    if (.not. associated( this%init_snowfall) ) &
+    if (.not. associated( this%calc_reference_et) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%init_snowmelt) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+    if (.not. associated( this%calc_snowmelt) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
-    if (.not. associated( this%init_irrigation) ) &
+    if (.not. associated( this%init_snowfall) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+    if (.not. associated( this%calc_snowfall) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%init_GDD) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+    if (.not. associated( this%calc_GDD) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%init_routing) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )    
-
-    if (.not. associated( this%calc_interception) ) &
+    if (.not. associated( this%calc_routing) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%init_direct_recharge) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
-
     if (.not. associated( this%calc_direct_recharge) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
-    if (.not. associated( this%calc_runoff) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
-
-    if (.not. associated( this%calc_reference_et) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
-
-    if (.not. associated( this%calc_snowfall) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
-
-    if (.not. associated( this%calc_snowmelt) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
-
-    if (.not. associated( this%calc_irrigation) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
-
-    if (.not. associated( this%calc_GDD) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
-
-    if (.not. associated( this%calc_routing) ) &
+    if (.not. associated( this%init_soil_storage_max) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%get_precipitation_data ) ) &
@@ -555,7 +545,7 @@ contains
 
   !------------------------------------------------------------------------------------------------
 
-  subroutine set_method_sub(this, sCmdText, sMethodName)
+  subroutine set_method_pointers_sub(this, sCmdText, sMethodName)
 
     class (MODEL_DOMAIN_T), intent(inout)   :: this
     character (len=*), intent(in)           :: sCmdText
@@ -742,6 +732,26 @@ contains
 
       endif
 
+
+    elseif ( sCmdText .contains. "SOIL_STORAGE_MAX" ) then
+
+      if ( sMethodName .strequal. "GRIDDED" ) then
+
+        this%init_soil_storage_max => model_initialize_soil_storage_max_gridded
+
+        call LOGS%WRITE( "==> SOIL_STORAGE_MAX will be read from a grid. Rooting depths will be recalculated" &
+          //" as ~SOIL_STORAGE_MAX / AWC.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+
+      else
+
+        this%init_soil_storage_max => model_initialize_soil_storage_max_internally_calculated
+
+        call LOGS%WRITE( "==> SOIL_STORAGE_MAX will be internally calculated from the given AWC and rooting depth values.",   &
+          iLogLevel = LOG_ALL, lEcho = lFALSE )
+
+      endif
+
+
     elseif ( sCmdText .contains. "EVAPOTRANSPIRATION" ) then
 
       if ( ( sMethodName .strequal. "HARGREAVES" ) &
@@ -864,7 +874,7 @@ contains
 
     endif 
 
-  end subroutine set_method_sub
+  end subroutine set_method_pointers_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1189,14 +1199,19 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)       :: this
     integer (kind=c_int), intent(in), optional  :: index
 
+    real (kind=c_float) :: interim_inflow
+
     if ( present(index) ) then
+
+      interim_inflow = this%runon( index ) + this%rainfall( index )   &
+                      + this%snowmelt( index ) - this%interception( index )
 
       call runoff_curve_number_calculate(runoff=this%runoff( index ),                                    &
                                                     landuse_index=this%landuse_index( index ),           &
-                                                    soil_group=this%soil_group( index ),               &
+                                                    soil_group=this%soil_group( index ),                 &
                                                     soil_storage=this%soil_storage( index ),             &
-                                                    max_soil_storage=this%max_soil_storage( index ),     & 
-                                                    inflow=this%inflow( index ),                         &
+                                                    soil_storage_max=this%soil_storage_max( index ),     & 
+                                                    inflow=interim_inflow,                               &
                                                     continuous_frozen_ground_index=                      &
                                                         this%continuous_frozen_ground_index( index ) ) 
 
@@ -1204,10 +1219,11 @@ contains
 
       call runoff_curve_number_calculate(runoff=this%runoff,                                             &
                                                     landuse_index=this%landuse_index,                    &
-                                                    soil_group=this%soil_group,                        &
+                                                    soil_group=this%soil_group,                          &
                                                     soil_storage=this%soil_storage,                      &
-                                                    max_soil_storage=this%max_soil_storage,              & 
-                                                    inflow=this%inflow,                                  &
+                                                    soil_storage_max=this%soil_storage_max,              & 
+                                                    inflow=this%runon+this%rainfall                      &
+                                                           +this%snowmelt-this%interception,             &
                                                     continuous_frozen_ground_index=                      &
                                                         this%continuous_frozen_ground_index ) 
 
@@ -1239,6 +1255,7 @@ contains
 
     ! [ LOCALS ]
     type (DATETIME_T), save     :: date_of_last_grid_update
+    real (kind=c_float)         :: interim_inflow
 
     if ( .not. ( date_of_last_grid_update == SIM_DT%curr ) ) then
       call runoff_gridded_values_update_ratios( )
@@ -1247,11 +1264,15 @@ contains
 
     if ( present( index ) ) then
   
-      this%runoff( index ) = this%inflow( index ) * RUNOFF_RATIOS( index )
+      interim_inflow = this%rainfall( index ) + this%snowmelt( index )  &
+                       - this%interception( index )
+
+      this%runoff( index ) = interim_inflow * RUNOFF_RATIOS( index )
 
     else
 
-      this%runoff = this%inflow * RUNOFF_RATIOS
+      this%runoff = ( this%rainfall + this%snowmelt  &
+                       - this%interception )* RUNOFF_RATIOS
 
     endif
 
@@ -1259,7 +1280,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_initialize_max_soil_storage_internally_calculated(this)
+  subroutine model_initialize_soil_storage_max_internally_calculated(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
@@ -1267,39 +1288,76 @@ contains
     type ( GENERAL_GRID_T ), pointer :: pTempGrd
 
     !> @todo this should be in its own routine...
-    this%current_rooting_depth = pack( MAX_ROOTING_DEPTH, MODEL%active )
-    this%max_rooting_depth = pack( MAX_ROOTING_DEPTH, MODEL%active )
+    this%current_rooting_depth = pack( ROOTING_DEPTH_MAX, MODEL%active )
+    this%rooting_depth_max = pack( ROOTING_DEPTH_MAX, MODEL%active )
 
-    this%max_soil_storage = this%max_rooting_depth * this%awc
+    this%soil_storage_max = this%rooting_depth_max * this%awc
 
     pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
         rX0=this%X_ll, rY0=this%Y_ll, &
         rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
 
-    pTempGrd%rData = unpack( this%max_soil_storage, this%active, this%dont_care )
+    pTempGrd%rData = unpack( this%soil_storage_max, this%active, this%dont_care )
 
     call grid_WriteArcGrid( sFilename="Soil_Storage_Maximum__as_calculated_inches.asc", pGrd=pTempGrd )
 
     call grid_Destroy( pTempGrd )
 
-  end subroutine model_initialize_max_soil_storage_internally_calculated  
+  end subroutine model_initialize_soil_storage_max_internally_calculated  
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_initialize_max_soil_storage_gridded(this)
+  subroutine model_initialize_soil_storage_max_gridded(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     ! [ LOCALS ]
     type ( GENERAL_GRID_T ), pointer :: pTempGrd
+    integer (kind=c_int)             :: iStat
+    type (DATA_CATALOG_ENTRY_T), pointer :: pSOIL_STORAGE_MAX_GRID
 
-    pTempGrd%rData = unpack( this%max_soil_storage, this%active, this%dont_care )
+    pSOIL_STORAGE_MAX_GRID => null()
 
-    call grid_WriteArcGrid( sFilename="Soil_Storage_Maximum__as_read_in_inches.asc", pGrd=pTempGrd )
+    pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
+    rX0=this%X_ll, rY0=this%Y_ll, &
+    rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+
+    ! locate the data structure associated with the gridded rainfall zone entries
+    pSOIL_STORAGE_MAX_GRID => DAT%find("SOIL_STORAGE_MAX")
+    if ( .not. associated(pSOIL_STORAGE_MAX_GRID) ) &
+        call die("A SOIL_STORAGE_MAX grid must be supplied in order to make use of this option.", &
+           __FILE__, __LINE__)
+
+    call pSOIL_STORAGE_MAX_GRID%getvalues( )
+
+    this%soil_storage_max = pack( pSOIL_STORAGE_MAX_GRID%pGrdBase%rData, this%active )
+
+    pTempGrd%rData = unpack( this%soil_storage_max, this%active, this%dont_care )
+
+    ! back-calculate rooting_depth_max to make it consistent with the awc and given
+    ! soil_storage_max gridded values
+
+    where ( .not. ( this%awc .approxequal. 0.0_c_float ) )
+
+      this%rooting_depth_max = this%soil_storage_max / this%awc
+
+    else where
+
+      this%rooting_depth_max = 0.0_c_float      
+
+    end where
+
+    this%current_rooting_depth = this%rooting_depth_max
+   
+    call grid_WriteArcGrid( sFilename="Maximum_Soil_Storage__as_read_in_inches.asc", pGrd=pTempGrd )
+    
+    pTempGrd%rData = unpack( this%rooting_depth_max, this%active, this%dont_care )    
+
+    call grid_WriteArcGrid( sFilename="Maximum_Rooting_Depth__as_RECALCULATED_in_feet.asc", pGrd=pTempGrd )
 
     call grid_Destroy( pTempGrd )
 
-  end subroutine model_initialize_max_soil_storage_gridded
+  end subroutine model_initialize_soil_storage_max_gridded
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1352,7 +1410,7 @@ contains
     call irrigation__calculate( fIrrigationAmount=this%irrigation,             &
                                 iLanduseIndex=this%landuse_index,              &
                                 fSoilStorage=this%soil_storage,                & 
-                                fSoilStorage_Max=this%max_soil_storage,        &
+                                fSoilStorage_Max=this%soil_storage_max,        &
                                 fImpervious_Fraction=this%impervious_fraction, &
                                 lActive=this%active )
 
@@ -1406,7 +1464,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call awc_table_values_read( fRooting_Depth=MAX_ROOTING_DEPTH )
+    call awc_table_values_read( fRooting_Depth=ROOTING_DEPTH_MAX )
 
   end subroutine model_read_available_water_content_table  
 
@@ -1533,7 +1591,7 @@ contains
 
 
     call minmaxmean( this%soil_storage, "soil_storage")
-    call minmaxmean( this%max_soil_storage, "max_soil_storage")
+    call minmaxmean( this%soil_storage_max, "soil_storage_max")
     call minmaxmean( this%infiltration, "infiltration")
     call minmaxmean( this%crop_coefficient_kcb, "kcb")
     call minmaxmean( this%actual_et, "actual_et")
@@ -1542,7 +1600,7 @@ contains
     call calculate_actual_et_thornthwaite_mather( actual_et=this%actual_et,                         &
                                                   impervious_fraction=this%impervious_fraction,     &
                                                   soil_storage=this%soil_storage,                   &
-                                                  max_soil_storage=this%max_soil_storage,           &
+                                                  soil_storage_max=this%soil_storage_max,           &
                                                   precipitation=this%infiltration,                  &
                                                   reference_et0=this%reference_et0,                 &
                                                   crop_coefficient_kcb=this%crop_coefficient_kcb )
@@ -1570,7 +1628,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     call minmaxmean( this%soil_storage, "soil_storage")
-    call minmaxmean( this%max_soil_storage, "max_soil_storage")
+    call minmaxmean( this%soil_storage_max, "soil_storage_max")
     call minmaxmean( this%infiltration, "infiltration")
     call minmaxmean( this%crop_coefficient_kcb, "kcb")
     call minmaxmean( this%actual_et, "actual_et")
@@ -1581,7 +1639,7 @@ contains
     call calculate_actual_et_fao56( actual_et=this%actual_et,                                      &
                                     impervious_fraction=this%impervious_fraction,                  &
                                     soil_storage=this%soil_storage,                                &
-                                    max_soil_storage=this%max_soil_storage,                        &
+                                    soil_storage_max=this%soil_storage_max,                        &
                                     precipitation=this%infiltration,                               &
                                     reference_et0=this%reference_et0,                              &
                                     depletion_fraction_p=DEPLETION_FRACTION( this%landuse_index ), &
@@ -2010,7 +2068,7 @@ contains
     call minmaxmean( this%interception_storage, "intcp_stor")
     call minmaxmean( this%snow_storage, "snow_stor")
     call minmaxmean( this%soil_storage, "soil_stor")
-    call minmaxmean( this%max_soil_storage, "soil_stor_max")
+    call minmaxmean( this%soil_storage_max, "soil_stor_max")
     call minmaxmean( this%potential_recharge, "potential_recharge")
 
   end subroutine summarize_state_variables_sub

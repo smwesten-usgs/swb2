@@ -76,7 +76,7 @@ module model_initialize
       METHODS_LIST_T("PRECIPITATION          ", lFALSE),    &
       METHODS_LIST_T("FOG                    ", lTRUE),     &
       METHODS_LIST_T("AVAILABLE_WATER_CONTENT", lTRUE),     &
-      METHODS_LIST_T("MAXIMUM_SOIL_STORAGE   ", lTRUE),     &
+      METHODS_LIST_T("SOIL_STORAGE_MAX       ", lTRUE),     &
       METHODS_LIST_T("SOIL_MOISTURE          ", lFALSE),    &
       METHODS_LIST_T("IRRIGATION             ", lTRUE),     &
       METHODS_LIST_T("CROP_COEFFICIENT       ", lTRUE),     &
@@ -123,6 +123,9 @@ contains
                                       lOptional=KNOWN_METHODS( iIndex )%lOptional )
    
     enddo
+
+    ! check to see that there are no NULL method pointers
+    call MODEL%preflight_check_method_pointers()
     
     ! bring in soils (HSG, AWC), landuse, and flow direction data from native grids
     ! and pack that data into vectors for active grid cells only
@@ -132,9 +135,6 @@ contains
 !    call MODEL%summarize()
 
     call initialize_ancillary_values()
-
-    ! check to see that there are no NULL method pointers
-    call MODEL%preflight_check_method_pointers()
 
     ! call each of the initialization routines associated with the chosen methods
     call MODEL%initialize_methods()
@@ -169,15 +169,19 @@ contains
 
     call initialize_root_zone_depths()
 
+    ! read in the 2D array of AWC values; needed so that we can use it to set inactive cells
     call MODEL%read_AWC_data()
 
     call MODEL%set_inactive_cells()
 
     call MODEL%initialize_arrays()
 
+    ! now that we know which cells are active, pack the 2D array in to 1D vector of AWC values
     call MODEL%init_AWC()
 
-    call MODEL%init_soil_moisture_max()
+    ! if the method selected reads these directly from a grid, the rooting depths previously
+    ! calculated will be overwritten and recalculated using the gridded max soil moisture and awc values
+    call MODEL%init_soil_storage_max()
 
     call initialize_hydrologic_soil_groups()
 
@@ -211,7 +215,7 @@ contains
 
     allocate ( fInitial_Percent_Soil_Moisture( count( MODEL%active ) ), stat=iStat )
 
-    ! locate the data structure associated with the gridded rainfall zone entries
+    ! locate the data structure associated with the gridded initial_percent_soil_moisture entries
     pINITIAL_PERCENT_SOIL_MOISTURE => DAT%find("INITIAL_PERCENT_SOIL_MOISTURE")
 
     if ( .not. associated( pINITIAL_PERCENT_SOIL_MOISTURE ) ) then
@@ -222,7 +226,7 @@ contains
 
       call pINITIAL_PERCENT_SOIL_MOISTURE%getvalues()
  
-      ! map the 2D array of RAINFALL_ZONE values to the vector of active cells
+      ! map the 2D array of INITIAL_PERCENT_SOIL_MOISTURE values to the vector of active cells
       fInitial_Percent_Soil_Moisture = pack( pINITIAL_PERCENT_SOIL_MOISTURE%pGrdBase%rData, MODEL%active )
 
      if ( minval( fInitial_Percent_Soil_Moisture ) < fZERO &
@@ -230,7 +234,7 @@ contains
        call warn(sMessage="One or more initial percent soils moisture values outside of " &
          //"valid range (0% to 100%)", lFatal=lTRUE )
 
-     MODEL%soil_storage = fInitial_Percent_Soil_Moisture / 100.0_c_float * MODEL%max_soil_storage  
+     MODEL%soil_storage = fInitial_Percent_Soil_Moisture / 100.0_c_float * MODEL%soil_storage_max  
     
     endif
 
@@ -340,7 +344,7 @@ contains
 
   subroutine initialize_root_zone_depths
 
-    use model_domain, only : MAX_ROOTING_DEPTH
+    use model_domain, only : ROOTING_DEPTH_MAX
 
     ! [ LOCALS ]
     integer (kind=c_int)              :: iNumActiveCells
@@ -389,7 +393,7 @@ contains
         rX0=MODEL%X_ll, rY0=MODEL%Y_ll, &
         rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
 
-    iNumActiveCells = ubound(MODEL%max_soil_storage,1)
+    iNumActiveCells = ubound(MODEL%soil_storage_max,1)
 
     call slList%append("LU_Code")
     call slList%append("Landuse_Code")
@@ -445,9 +449,9 @@ contains
 
     call slList%clear()
 
-    call grid_WriteArcGrid("Maximum_rooting_depth.asc", pRooting_Depth )
+    call grid_WriteArcGrid("Maximum_rooting_depth__as_assembled_from_table.asc", pRooting_Depth )
 
-    MAX_ROOTING_DEPTH = pRooting_Depth%rData
+    ROOTING_DEPTH_MAX = pRooting_Depth%rData
 
     call grid_Destroy( pRooting_Depth )
 
@@ -837,8 +841,8 @@ contains
 
         elseif ( index( string=sCmdText, substring="_METHOD") > 0 ) then
 
-          ! no operation; just keep SWB quiet about MODEL and it will be included in the
-          ! methods initialization section
+          ! no operation; just keep SWB quiet about METHOD and it will be included in the
+          ! methods initialization section. 
 
         else
 
@@ -1178,11 +1182,11 @@ contains
         sOptionText = myOptions%get(1)
 
         ! Any entry in the control file that contains the substring "METHOD" will be
-        ! handed to the "set_method" subroutine in an attempt to wire up the correct
+        ! handed to the "set_method_pointers" subroutine in an attempt to wire up the correct
         ! process modules
         if ( ( sCmdText .contains. "METHOD" ) ) then
 
-          call MODEL%set_method( trim(sCmdText), trim(sOptionText) )
+          call MODEL%set_method_pointers( trim(sCmdText), trim(sOptionText) )
 
         endif
         

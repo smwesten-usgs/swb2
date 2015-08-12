@@ -10,7 +10,7 @@ contains
                                                   actual_et,                         &
                                                   impervious_fraction,               &
                                                   soil_storage,                      &
-                                                  max_soil_storage,                  &
+                                                  soil_storage_max,                  &
                                                   precipitation,                     &
                                                   reference_et0,                     &
                                                   crop_coefficient_kcb )
@@ -18,7 +18,7 @@ contains
     real (kind=c_float), intent(inout)             :: actual_et
     real (kind=c_float), intent(in)                :: impervious_fraction
     real (kind=c_float), intent(in)                :: soil_storage
-    real (kind=c_float), intent(in)                :: max_soil_storage
+    real (kind=c_float), intent(in)                :: soil_storage_max
     real (kind=c_float), intent(in)                :: precipitation
     real (kind=c_float), intent(in)                :: reference_et0
     real (kind=c_float), intent(in), optional      :: crop_coefficient_kcb
@@ -41,9 +41,9 @@ contains
 
     elseif ( P_minus_PE < 0.0_c_float ) then
 
-      if ( max_soil_storage > 0.0_c_float ) then
+      if ( soil_storage_max > 0.0_c_float ) then
 
-        actual_et = precipitation + soil_storage * ( 1.0_c_float - exp( P_minus_PE / max_soil_storage ) )
+        actual_et = precipitation + soil_storage * ( 1.0_c_float - exp( P_minus_PE / soil_storage_max ) )
 
       else
      

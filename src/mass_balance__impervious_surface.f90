@@ -28,8 +28,10 @@ contains
     real (kind=c_float), intent(in)         :: impervious_fraction
     real (kind=c_float), intent(in)         :: reference_et0
 
+    ! [ LOCALS ]
+    real (kind=c_float) :: interim_storage
 
-    surface_storage = surface_storage + ( rainfall + snowmelt ) * impervious_fraction
+    interim_storage = surface_storage + ( rainfall + snowmelt ) * impervious_fraction
 
     actual_ET = actual_ET + min( reference_ET0, surface_storage) * impervious_fraction
       

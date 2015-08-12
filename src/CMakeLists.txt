@@ -47,7 +47,6 @@ if(TARGET__SWB_EXECUTABLE)
             routing__D8.F90
             runoff__curve_number.F90 
             runoff__gridded_values.F90        
-            soil_storage_max__gridded_values.F90
             simulation_datetime.F90
             snowfall__original.F90
             snowmelt__original.F90

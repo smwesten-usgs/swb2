@@ -99,9 +99,7 @@ contains
       do iIndex = 1, NUMBER_OF_FATAL_WARNINGS
         if (iIndex <= MAX_FATAL_WARNINGS ) then
           write(unit=sIndex, fmt="(i0)") iIndex
-          call LOGS%write( trim(adjustl(sIndex))//":", iLinesBefore=1)
-          call LOGS%write( repeat("-",80) )
-          call LOGS%write( trim(WARNING_TEXT(iIndex)) )
+          call LOGS%write( trim(adjustl(sIndex))//": "//trim(WARNING_TEXT(iIndex)), iLinesBefore=1)
         endif
       enddo
 

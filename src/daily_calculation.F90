@@ -63,14 +63,11 @@ contains
                                                     impervious_fraction=cells%impervious_fraction,           &
                                                     reference_et0=cells%reference_et0 ) 
 
-
-    ! in HWB, runoff is calculated on the basis of rainfall only
-    cells%inflow = cells%runon + cells%rainfall + cells%snowmelt                   
-
     ! call to calc_routing also triggers an embedded call to calc_runoff
+    ! NOTE: only way for "runon" to be positive is if D8 flow routing 
+    !       is enabled.
     call cells%calc_routing()
 
-    ! redefine "inflow" to include larger list of sources
     cells%inflow = cells%runon + cells%rainfall + cells%fog + cells%snowmelt                  &
                    + cells%surface_storage_excess - cells%interception + cells%irrigation
    
@@ -80,7 +77,7 @@ contains
 
     call calculate_soil_mass_balance( potential_recharge=cells%potential_recharge,       &
                                       soil_storage=cells%soil_storage,                   &
-                                      max_soil_storage=cells%max_soil_storage,           &
+                                      soil_storage_max=cells%soil_storage_max,           &
                                       actual_et=cells%actual_et,                         &
                                       infiltration=cells%infiltration )
 

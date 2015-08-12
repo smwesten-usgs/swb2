@@ -25,24 +25,24 @@ program main
   character (len=256)            :: sCompilerVersion
   character (len=256)            :: sVersionString 
   character (len=256)            :: sGitHashString
+  integer (kind=c_int)           :: iCount
 
   iNumArgs = COMMAND_ARGUMENT_COUNT()
 
   sVersionString = "  Soil Water Balance Code version "//trim( SWB_VERSION )    &
-      //" ["//trim( GIT_COMMIT_HASH_STRING )//" ]"                              &
       //" -- compiled on: "//trim(COMPILE_DATE)//" "//trim(COMPILE_TIME)
 
-  sGitHashString = "Git branch and commit hash: "//trim( GIT_BRANCH_STRING )    &
-     //"   ("//trim( GIT_COMMIT_HASH_STRING )//" )"
+  sGitHashString = "    [ Git branch and commit hash: "//trim( GIT_BRANCH_STRING )    &
+     //", "//trim( GIT_COMMIT_HASH_STRING )//" ]"
 
-  write(unit=*, fmt="(/,a)") repeat("-",len_trim(sVersionString)+2)  
+  iCount = max( len_trim( sVersionString ), len_trim( sGitHashString ) )
+
+  write(unit=*, fmt="(/,a)") repeat("-",iCount + 2)  
   write(UNIT=*,FMT="(a)") trim( sVersionString )
-  write(unit=*, fmt="(a,/)") repeat("-",len_trim(sVersionString)+2)  
+  write(UNIT=*,FMT="(a)") trim( sGitHashString )  
+  write(unit=*, fmt="(a,/)") repeat("-",iCount + 2)  
 
   if(iNumArgs/=1) then
-
-    write(unit=*, fmt="(a,/)") trim( sGitHashString )
-
 
 #ifdef __GFORTRAN__
     sCompilerFlags = COMPILER_OPTIONS()

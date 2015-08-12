@@ -243,7 +243,7 @@ contains
                                                      landuse_index,                       &
                                                      soil_group,                         &
                                                      soil_storage,                        &
-                                                     max_soil_storage,                    & 
+                                                     soil_storage_max,                    & 
                                                      inflow,                              &
                                                      continuous_frozen_ground_index ) 
 
@@ -251,7 +251,7 @@ contains
     integer (kind=c_int), intent(in)    :: landuse_index
     integer (kind=c_int), intent(in)    :: soil_group
     real (kind=c_float), intent(in)     :: soil_storage
-    real (kind=c_float), intent(in)     :: max_soil_storage
+    real (kind=c_float), intent(in)     :: soil_storage_max
     real (kind=c_float), intent(in)     :: inflow
     real (kind=c_float), intent(in)     :: continuous_frozen_ground_index
     
@@ -261,7 +261,7 @@ contains
     real (kind=c_float) :: CN_adj
 
     CN_adj = update_curve_number_fn( landuse_index, soil_group, soil_storage, &
-                          max_soil_storage, continuous_frozen_ground_index )
+                          soil_storage_max, continuous_frozen_ground_index )
 
     S = ( 1000.0_c_float / CN_adj ) - 10.0_c_float
 
