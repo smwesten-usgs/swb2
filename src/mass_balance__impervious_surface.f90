@@ -16,6 +16,8 @@ contains
    	                                                               surface_storage_max,        &
    	                                                               rainfall,                   &
    	                                                               snowmelt,                   &
+                                                                   runoff,                     &
+                                                                   fog,                        &
                                                                    interception,               &
                                                                    reference_et0 )
 
@@ -25,18 +27,35 @@ contains
     real (kind=c_float), intent(in)         :: surface_storage_max
     real (kind=c_float), intent(in)         :: rainfall
     real (kind=c_float), intent(in)         :: snowmelt
+    real (kind=c_float), intent(in)         :: runoff    
+    real (kind=c_float), intent(in)         :: fog
     real (kind=c_float), intent(in)         :: interception
     real (kind=c_float), intent(in)         :: reference_et0
 
-    surface_storage = surface_storage + rainfall + snowmelt - interception ! * canopy cover?
+    surface_storage = surface_storage               &
+                      + rainfall                    &
+                      + fog                         &
+                      + snowmelt                    &
+                      - interception                &
+                      - runoff                      &
+                      - reference_et0
 
-!    actual_ET = actual_ET + min( reference_ET0, surface_storage) * impervious_fraction
-      
-    surface_storage = surface_storage - min( reference_ET0, surface_storage)
+    if ( surface_storage > surface_storage_max ) then
+ 
+      surface_storage_excess = surface_storage - surface_storage_max
+      surface_storage = surface_storage_max
 
-    surface_storage_excess = max( 0.0_c_float, surface_storage - surface_storage_max )
+    elseif ( surface_storage < 0.0_c_float ) then
 
+      surface_storage = 0.0_c_float
+      surface_storage_excess = 0.0_c_float
+
+    else
+
+      surface_storage_excess = 0.0_c_float
+
+    endif  
+    
   end subroutine calculate_impervious_surface_mass_balance    
-
 
 end module mass_balance__impervious_surface

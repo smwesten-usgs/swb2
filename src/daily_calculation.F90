@@ -59,6 +59,8 @@ contains
                                                     surface_storage_max=cells%surface_storage_max,           &
                                                     rainfall=cells%rainfall,                                 &
                                                     snowmelt=cells%snowmelt,                                 &
+                                                    runoff=cells%runoff,                                     &
+                                                    fog=cells%fog,                                           &
                                                     interception=cells%interception,                         &
                                                     reference_et0=cells%reference_et0 ) 
 
@@ -79,6 +81,13 @@ contains
 
     call cells%calc_actual_et()
 
+    call minmaxmean( cells%actual_et, "actual_et, lu=17", cells%landuse_code==17 )
+    call minmaxmean( cells%snowmelt, "snowmelt, lu=17", cells%landuse_code==17 )    
+    call minmaxmean( cells%crop_coefficient_kcb, "Kcb, lu=17", cells%landuse_code==17 )
+    call minmaxmean( cells%runon, "runon, lu=17", cells%landuse_code==17 )    
+    call minmaxmean( cells%runoff, "runoff, lu=17", cells%landuse_code==17 )    
+    call minmaxmean( cells%runoff, "rainfall, lu=17", cells%rainfall==17 )        
+
     call calculate_soil_mass_balance( potential_recharge=cells%potential_recharge,       &
                                       soil_storage=cells%soil_storage,                   &
                                       soil_storage_max=cells%soil_storage_max,           &
@@ -90,10 +99,11 @@ contains
   end subroutine perform_daily_calculation
 
 
-  subroutine minmaxmean_float( variable , varname )
+  subroutine minmaxmean( variable , varname, logical_vector )
 
-    real (kind=c_float), dimension(:)  :: variable
-    character (len=*), intent(in)      :: varname
+    real (kind=c_float), dimension(:)           :: variable
+    character (len=*), intent(in)               :: varname
+    logical, intent(in), optional               :: logical_vector(:)
 
     ! [ LOCALS ] 
     integer (kind=c_int) :: iCount
@@ -105,11 +115,19 @@ contains
 
     write (sVarname, fmt="(a20)") adjustl(varname)
 
-    if (size( variable, 1) > 0 ) then
+    if (size( variable, 1) > 0 .and. present( logical_vector ) ) then
+      write (sMin, fmt="(g14.3)")   minval(variable, logical_vector)
+      write (sMax, fmt="(g14.3)")   maxval(variable, logical_vector)
+      write (sMean, fmt="(g14.3)")  sum(variable, logical_vector)     &
+                                     / count( logical_vector )
+      write (sCount, fmt="(i10)") count( logical_vector )
+
+    elseif (size( variable, 1) > 0 ) then
       write (sMin, fmt="(g14.3)")   minval(variable)
       write (sMax, fmt="(g14.3)")   maxval(variable)
       write (sMean, fmt="(g14.3)")  sum(variable) / size(variable,1)
       write (sCount, fmt="(i10)") size(variable,1)
+
     else
       write (sMin, fmt="(g14.3)")   -9999.
       write (sMax, fmt="(g14.3)")   -9999.
@@ -120,7 +138,7 @@ contains
     call LOGS%write( adjustl(sVarname)//" | "//adjustl(sMin)//" | "//adjustl(sMax) &
        //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_DEBUG, lEcho=.true._c_bool )
 
-  end subroutine minmaxmean_float
+  end subroutine minmaxmean
 
 
 end module daily_calculation

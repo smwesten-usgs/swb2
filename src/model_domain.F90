@@ -311,6 +311,9 @@ contains
     this%fog = 0.0_c_float
     this%impervious_fraction = 0.0_c_float
     this%canopy_cover_fraction = 1.0_c_float
+    this%surface_storage = 0.0_c_float
+    this%surface_storage_max = 0.0_c_float
+    this%interception_storage = 0.0_c_float
 
   end subroutine initialize_arrays_sub
 
@@ -1597,14 +1600,6 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-
-    call minmaxmean( this%soil_storage, "soil_storage")
-    call minmaxmean( this%soil_storage_max, "soil_storage_max")
-    call minmaxmean( this%infiltration, "infiltration")
-    call minmaxmean( this%crop_coefficient_kcb, "kcb")
-    call minmaxmean( this%actual_et, "actual_et")
-
-
     call calculate_actual_et_thornthwaite_mather( actual_et=this%actual_et,                         &
                                                   impervious_fraction=this%impervious_fraction,     &
                                                   soil_storage=this%soil_storage,                   &
@@ -1634,15 +1629,6 @@ contains
     use actual_et__fao56
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-    call minmaxmean( this%soil_storage, "soil_storage")
-    call minmaxmean( this%soil_storage_max, "soil_storage_max")
-    call minmaxmean( this%infiltration, "infiltration")
-    call minmaxmean( this%crop_coefficient_kcb, "kcb")
-    call minmaxmean( this%actual_et, "actual_et")
-    call minmaxmean( this%reference_et0, "reference_et0")
-    call minmaxmean( this%impervious_fraction, "impervious_fraction")
-    call minmaxmean( DEPLETION_FRACTION(this%landuse_index), "DEPLETION_FRACTION")
 
     call calculate_actual_et_fao56( actual_et=this%actual_et,                                      &
                                     impervious_fraction=this%impervious_fraction,                  &
