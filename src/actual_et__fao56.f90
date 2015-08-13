@@ -85,7 +85,7 @@ contains
     infiltration_minus_et = infiltration - crop_et
 
     p = adjust_depletion_fraction_p( p_table_22=depletion_fraction_p,  &
-                                     reference_et0=reference_et0 )
+                                     reference_et0=crop_et )
 
     ! soil storage value at which actual et begins to decline
     root_constant_ci = ( 1.0_c_float - p ) * soil_storage_max
