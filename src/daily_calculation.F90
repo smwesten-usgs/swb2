@@ -86,7 +86,15 @@ contains
     call minmaxmean( cells%crop_coefficient_kcb, "Kcb, lu=17", cells%landuse_code==17 )
     call minmaxmean( cells%runon, "runon, lu=17", cells%landuse_code==17 )    
     call minmaxmean( cells%runoff, "runoff, lu=17", cells%landuse_code==17 )    
-    call minmaxmean( cells%runoff, "rainfall, lu=17", cells%rainfall==17 )        
+    call minmaxmean( cells%rainfall, "rainfall, lu=17", cells%landuse_code==17 )        
+    call minmaxmean( cells%fog, "fog, lu=17", cells%landuse_code==17 )
+    call minmaxmean( cells%interception, "interception, lu=17", cells%landuse_code==17 )
+    call minmaxmean( cells%irrigation, "irrigation, lu=17", cells%landuse_code==17 )
+    call minmaxmean( cells%surface_storage_excess, "surface_storage_excess, lu=17", cells%landuse_code==17 )
+    call minmaxmean( cells%surface_storage, "surface_storage, lu=17", cells%landuse_code==17 )    
+    call minmaxmean( cells%soil_storage, "soil_storage, lu=17", cells%landuse_code==17 )
+    call minmaxmean( cells%surface_storage, "surface_storage, lu=17", cells%landuse_code==17 )        
+
 
     call calculate_soil_mass_balance( potential_recharge=cells%potential_recharge,       &
                                       soil_storage=cells%soil_storage,                   &

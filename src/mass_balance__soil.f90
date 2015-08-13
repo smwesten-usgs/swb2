@@ -21,21 +21,25 @@ contains
     real (kind=c_float), intent(in)         :: soil_storage_max
     real (kind=c_float), intent(in)         :: infiltration
  
-    soil_storage = soil_storage + infiltration - actual_et
+    ! [ LOCALS ]
+    real (kind=c_float) :: new_soil_storage
 
-    if ( soil_storage < 0.0_c_float ) then
+    new_soil_storage = soil_storage + infiltration - actual_et
 
-      actual_et = soil_storage + infiltration
+    if ( new_soil_storage < 0.0_c_float ) then
+
+      actual_et = max( 0.0_c_float, soil_storage + infiltration )
       soil_storage = 0.0_c_float
       potential_recharge = 0.0_c_float
 
-    elseif ( soil_storage > soil_storage_max ) then
+    elseif ( new_soil_storage > soil_storage_max ) then
 
-      potential_recharge = soil_storage - soil_storage_max
+      potential_recharge = new_soil_storage - soil_storage_max
       soil_storage = soil_storage_max
 
     else
 
+      soil_storage = new_soil_storage
       potential_recharge = 0.0_c_float
 
     endif
