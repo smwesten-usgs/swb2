@@ -81,6 +81,7 @@ contains
 
     call cells%calc_actual_et()
 
+    call minmaxmean( cells%reference_et0, "reference_et0, lu=17", cells%landuse_code==17 )
     call minmaxmean( cells%actual_et, "actual_et, lu=17", cells%landuse_code==17 )
     call minmaxmean( cells%snowmelt, "snowmelt, lu=17", cells%landuse_code==17 )    
     call minmaxmean( cells%crop_coefficient_kcb, "Kcb, lu=17", cells%landuse_code==17 )
@@ -93,7 +94,8 @@ contains
     call minmaxmean( cells%surface_storage_excess, "surface_storage_excess, lu=17", cells%landuse_code==17 )
     call minmaxmean( cells%surface_storage, "surface_storage, lu=17", cells%landuse_code==17 )    
     call minmaxmean( cells%soil_storage, "soil_storage, lu=17", cells%landuse_code==17 )
-    call minmaxmean( cells%surface_storage, "surface_storage, lu=17", cells%landuse_code==17 )        
+    call minmaxmean( cells%soil_storage_max, "soil_storage_max, lu=17", cells%landuse_code==17 )    
+    call minmaxmean( cells%rooting_depth_max, "rooting_depth_max, lu=17", cells%landuse_code==17 )        
 
 
     call calculate_soil_mass_balance( potential_recharge=cells%potential_recharge,       &
@@ -115,13 +117,13 @@ contains
 
     ! [ LOCALS ] 
     integer (kind=c_int) :: iCount
-    character (len=20)   :: sVarname
+    character (len=30)   :: sVarname
     character (len=14)   :: sMin
     character (len=14)   :: sMax
     character (len=14)   :: sMean
     character (len=10)   :: sCount
 
-    write (sVarname, fmt="(a20)") adjustl(varname)
+    write (sVarname, fmt="(a30)") adjustl(varname)
 
     if (size( variable, 1) > 0 .and. present( logical_vector ) ) then
       write (sMin, fmt="(g14.3)")   minval(variable, logical_vector)

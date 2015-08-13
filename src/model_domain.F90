@@ -1282,8 +1282,7 @@ contains
 
     else
 
-      this%runoff = ( this%rainfall + this%snowmelt  &
-                       - this%interception )* RUNOFF_RATIOS
+      this%runoff = ( this%rainfall + this%snowmelt ) * RUNOFF_RATIOS
 
     endif
 
