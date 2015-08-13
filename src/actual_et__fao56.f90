@@ -124,8 +124,8 @@ contains
 
         actual_et = crop_et * fraction_full_PET                                                                &
                     + root_constant_ci                                                                         &
-                       * ( 1.0_c_float - exp( - crop_et * ( 1.0_c_float - fraction_full_PET ) )   &
-                          / root_constant_ci )  
+                       * ( 1.0_c_float - exp( - crop_et * ( 1.0_c_float - fraction_full_PET )   &
+                          / root_constant_ci ) ) 
             
       endif     
 
