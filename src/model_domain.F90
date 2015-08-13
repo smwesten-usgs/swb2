@@ -1648,7 +1648,7 @@ contains
                                     impervious_fraction=this%impervious_fraction,                  &
                                     soil_storage=this%soil_storage,                                &
                                     soil_storage_max=this%soil_storage_max,                        &
-                                    precipitation=this%infiltration,                               &
+                                    infiltration=this%infiltration,                               &
                                     reference_et0=this%reference_et0,                              &
                                     depletion_fraction_p=DEPLETION_FRACTION( this%landuse_index ), &
                                     crop_coefficient_kcb=this%crop_coefficient_kcb )

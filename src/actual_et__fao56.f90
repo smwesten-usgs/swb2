@@ -51,7 +51,7 @@ contains
                                                   soil_storage,                      &
                                                   depletion_fraction_p,              &
                                                   soil_storage_max,                  &
-                                                  precipitation,                     &
+                                                  infiltration,                     &
                                                   reference_et0,                     &
                                                   crop_coefficient_kcb )
 
@@ -60,13 +60,13 @@ contains
     real (kind=c_float), intent(in)                :: depletion_fraction_p
     real (kind=c_float), intent(in)                :: soil_storage
     real (kind=c_float), intent(in)                :: soil_storage_max
-    real (kind=c_float), intent(in)                :: precipitation
+    real (kind=c_float), intent(in)                :: infiltration
     real (kind=c_float), intent(in)                :: reference_et0
     real (kind=c_float), intent(in), optional      :: crop_coefficient_kcb
 
     ! [ LOCALS ]
     real (kind=c_float)  :: Kcb
-    real (kind=c_float)  :: P_minus_PE
+    real (kind=c_float)  :: infiltration_minus_et
     real (kind=c_float)  :: depletion_amount
     real (kind=c_float)  :: p
     real (kind=c_float)  :: interim_soil_storage
@@ -82,7 +82,7 @@ contains
 
     crop_et =  reference_et0 * Kcb
 
-    P_minus_PE = precipitation - crop_et
+    infiltration_minus_et = infiltration - crop_et
 
     p = adjust_depletion_fraction_p( p_table_22=depletion_fraction_p,  &
                                      reference_et0=reference_et0 )
@@ -90,16 +90,17 @@ contains
     ! soil storage value at which actual et begins to decline
     root_constant_ci = ( 1.0_c_float - p ) * soil_storage_max
 
-    interim_soil_storage = soil_storage + precipitation
+    interim_soil_storage = soil_storage + infiltration
 
     ! root constant of 0 implies a depletion fraction of 1; in other words, 
     ! there is no declining portion of the AET/PET to AW/AWC relation.
+    ! ENTIRE DAY at PET
     if ( root_constant_ci  <= 0.0_c_float ) then
 
-      actual_et = min( crop_et, soil_storage + precipitation )
+      actual_et = min( crop_et, interim_soil_storage )
 
+    ! ALL or PARTIAL DAY at PET
     elseif ( interim_soil_storage > root_constant_ci ) then
-
 
       ! calculate fraction of day that would be at full reference ET values
       if ( crop_et > 0.0_c_float ) then
@@ -118,17 +119,20 @@ contains
 
         actual_et = crop_et
 
+      ! part of day at full PET
       else
 
-        actual_et = crop_et * fraction_full_PET                                                          &
-                    + ( 1.0_c_float - fraction_full_PET )                                                &
-                       * interim_soil_storage * ( 1.0_c_float - exp( P_minus_PE / soil_storage_max ) )  
+        actual_et = crop_et * fraction_full_PET                                                                &
+                    + root_constant_ci                                                                         &
+                       * ( 1.0_c_float - exp( - crop_et * ( 1.0_c_float - fraction_full_PET ) )   &
+                          / root_constant_ci )  
             
       endif     
 
+    ! ENTIRE DAY at LESS THAN PET
     else
 
-      actual_et = interim_soil_storage * ( 1.0_c_float - exp( P_minus_PE / soil_storage_max ) )  
+        actual_et = interim_soil_storage * ( 1.0_c_float - exp( - crop_et / root_constant_ci ) )  
 
     endif
 
