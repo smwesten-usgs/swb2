@@ -54,6 +54,7 @@ module model_domain
 
     real (kind=c_float), allocatable       :: rooting_depth_max(:)
      
+    integer (kind=c_int), allocatable      :: polygon_id(:)
     real (kind=c_float), allocatable       :: latitude(:)
     real (kind=c_float), allocatable       :: reference_ET0(:)
     real (kind=c_float), allocatable       :: interception_ET(:)
@@ -90,6 +91,10 @@ module model_domain
     real (kind=c_float), allocatable       :: tmax(:)
     real (kind=c_float), allocatable       :: tmean(:)
     real (kind=c_float), allocatable       :: routing_fraction(:)
+
+    real (kind=c_float), allocatable       :: hwb_awc_in_per_ft(:)
+    real (kind=c_float), allocatable       :: hwb_soil_storage_max(:)
+    real (kind=c_float), allocatable       :: hwb_rooting_depth(:)     
 
     integer (kind=c_int), allocatable      :: index_order(:)
 
@@ -248,7 +253,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: iStat(39)
+    integer (kind=c_int)  :: iStat(43)
 
     iCount = count( this%active )
 
@@ -290,7 +295,11 @@ contains
     allocate( this%potential_snowmelt( iCount ), stat=iStat(36) )  
     allocate( this%continuous_frozen_ground_index( iCount ), stat=iStat(37) ) 
     allocate( this%rooting_depth_max( iCount ), stat=iStat(38) )
-    allocate( this%current_rooting_depth( iCount ), stat=iStat(39) )        
+    allocate( this%current_rooting_depth( iCount ), stat=iStat(39) )
+    allocate( this%polygon_id( iCount ), stat=iStat(40) )    
+    allocate( this%hwb_rooting_depth( iCount ), stat=iStat(41) )        
+    allocate( this%hwb_soil_storage_max( iCount ), stat=iStat(42) )        
+    allocate( this%hwb_awc_in_per_ft( iCount ), stat=iStat(43) )        
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="  &
@@ -1264,8 +1273,7 @@ contains
 
     if ( present( index ) ) then
   
-      interim_inflow = this%rainfall( index ) + this%snowmelt( index )  &
-                       - this%interception( index )
+      interim_inflow = this%rainfall( index ) + this%snowmelt( index ) 
 
       this%runoff( index ) = interim_inflow * RUNOFF_RATIOS( index )
 
@@ -1334,16 +1342,16 @@ contains
 
     pTempGrd%rData = unpack( this%soil_storage_max, this%active, this%dont_care )
 
-    ! back-calculate rooting_depth_max to make it consistent with the awc and given
+    ! back-calculate awc to make it consistent with rooting_depth_max and given
     ! soil_storage_max gridded values
 
-    where ( .not. ( this%awc .approxequal. 0.0_c_float ) )
+    where ( .not. ( this%rooting_depth_max .approxequal. 0.0_c_float ) )
 
-      this%rooting_depth_max = this%soil_storage_max / this%awc
+      this%awc = this%soil_storage_max / this%rooting_depth_max
 
     else where
 
-      this%rooting_depth_max = 0.0_c_float      
+      this%awc = 0.0_c_float      
 
     end where
 
@@ -1353,7 +1361,7 @@ contains
     
     pTempGrd%rData = unpack( this%rooting_depth_max, this%active, this%dont_care )    
 
-    call grid_WriteArcGrid( sFilename="Maximum_Rooting_Depth__as_RECALCULATED_in_feet.asc", pGrd=pTempGrd )
+    call grid_WriteArcGrid( sFilename="Available_water_content__as_RECALCULATED_in_inches_per_foot.asc", pGrd=pTempGrd )
 
     call grid_Destroy( pTempGrd )
 

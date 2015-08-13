@@ -16,7 +16,7 @@ contains
    	                                                               surface_storage_max,        &
    	                                                               rainfall,                   &
    	                                                               snowmelt,                   &
-                                                                   impervious_fraction,        &
+                                                                   interception,               &
                                                                    reference_et0 )
 
     real (kind=c_float), intent(inout)      :: surface_storage
@@ -25,19 +25,16 @@ contains
     real (kind=c_float), intent(in)         :: surface_storage_max
     real (kind=c_float), intent(in)         :: rainfall
     real (kind=c_float), intent(in)         :: snowmelt
-    real (kind=c_float), intent(in)         :: impervious_fraction
+    real (kind=c_float), intent(in)         :: interception
     real (kind=c_float), intent(in)         :: reference_et0
 
-    ! [ LOCALS ]
-    real (kind=c_float) :: interim_storage
+    surface_storage = surface_storage + rainfall + snowmelt - interception ! * canopy cover?
 
-    interim_storage = surface_storage + ( rainfall + snowmelt ) * impervious_fraction
-
-    actual_ET = actual_ET + min( reference_ET0, surface_storage) * impervious_fraction
+!    actual_ET = actual_ET + min( reference_ET0, surface_storage) * impervious_fraction
       
     surface_storage = surface_storage - min( reference_ET0, surface_storage)
 
-    surface_storage_excess = max( 0.0_c_float, surface_storage - surface_storage_max ) * impervious_fraction
+    surface_storage_excess = max( 0.0_c_float, surface_storage - surface_storage_max )
 
   end subroutine calculate_impervious_surface_mass_balance    
 

@@ -1511,38 +1511,38 @@ subroutine grid_checkIntegerGridValues(pGrd, sFilename)
   iRunningSum = 0
   iRecord = 0
 
- call LOGS%set_echo(lFALSE)
- call LOGS%write("### Summary of integer grid data values for file "//dquote(sFilename)//" ###", &
-    iLogLevel=LOG_DEBUG, iLinesBefore=1, iLinesAfter=1 )
+!  call LOGS%set_echo(lFALSE)
+!  call LOGS%write("### Summary of integer grid data values for file "//dquote(sFilename)//" ###", &
+!     iLogLevel=LOG_DEBUG, iLinesBefore=1, iLinesAfter=1 )
 
-  call LOGS%write("number     | count          | value     ", iLogLevel=LOG_DEBUG )
-  call LOGS%write("---------- | -------------- | ----------", iLogLevel=LOG_DEBUG )
-  do iIndex=0,maxval(pGrd%iData)
-    iCount=COUNT( pGrd%iData==iIndex )
-    if ( iCount > 0 ) then
-      iRecord = iRecord + 1
-      iRunningSum = iRunningSum + iCount
-      write (sBuf0, fmt="(i10)") iRecord
-      write (sBuf1, fmt="(i14)") iCount
-      write (sBuf2, fmt="(i10)")  iIndex
-      write (sBuf3, fmt="(a10,' | ', a14,' | ',a10)") adjustl(sBuf0), adjustl(sBuf1), adjustl(sBuf2)
-      call LOGS%write( sBuf3, iLogLevel=LOG_DEBUG )
-    end if
-  end do
+!   call LOGS%write("number     | count          | value     ", iLogLevel=LOG_DEBUG )
+!   call LOGS%write("---------- | -------------- | ----------", iLogLevel=LOG_DEBUG )
+!   do iIndex=0,maxval(pGrd%iData)
+!     iCount=COUNT( pGrd%iData==iIndex )
+!     if ( iCount > 0 ) then
+!       iRecord = iRecord + 1
+!       iRunningSum = iRunningSum + iCount
+!       write (sBuf0, fmt="(i10)") iRecord
+!       write (sBuf1, fmt="(i14)") iCount
+!       write (sBuf2, fmt="(i10)")  iIndex
+!       write (sBuf3, fmt="(a10,' | ', a14,' | ',a10)") adjustl(sBuf0), adjustl(sBuf1), adjustl(sBuf2)
+!       call LOGS%write( sBuf3, iLogLevel=LOG_DEBUG )
+!     end if
+!   end do
 
-  call LOGS%write("   Total number of grid cells with value NODATA: " &
-    //asCharacter( COUNT(pGrd%iData == pGrd%iNoDataValue ) ), iLinesBefore=1, iLogLevel=LOG_ALL )
+!   call LOGS%write("   Total number of grid cells with value NODATA: " &
+!     //asCharacter( COUNT(pGrd%iData == pGrd%iNoDataValue ) ), iLinesBefore=1, iLogLevel=LOG_ALL )
 
-  call LOGS%write("   Total number of grid cells: "//asCharacter( size(pGrd%iData) ), iLogLevel=LOG_ALL )
+!   call LOGS%write("   Total number of grid cells: "//asCharacter( size(pGrd%iData) ), iLogLevel=LOG_ALL )
 
-  call LOGS%write("   Total number of grid cells with value >= 0: "//asCharacter(iRunningSum), iLogLevel=LOG_ALL )
+!   call LOGS%write("   Total number of grid cells with value >= 0: "//asCharacter(iRunningSum), iLogLevel=LOG_ALL )
 
 
-  if (size(pGrd%iData) /= iRunningSum) then
-    call LOGS%write(repeat("*",80), iLogLevel=LOG_ALL)
-    call LOGS%write("Possible illegal or missing values in integer grid file: "//trim(sFileName), iLogLevel=LOG_ALL)
-    call LOGS%write(repeat("*",80), iLogLevel=LOG_ALL)
-  endif
+!   if (size(pGrd%iData) /= iRunningSum) then
+!     call LOGS%write(repeat("*",80), iLogLevel=LOG_ALL)
+!     call LOGS%write("Possible illegal or missing values in integer grid file: "//trim(sFileName), iLogLevel=LOG_ALL)
+!     call LOGS%write(repeat("*",80), iLogLevel=LOG_ALL)
+!   endif
 
 end subroutine grid_checkIntegerGridValues
 

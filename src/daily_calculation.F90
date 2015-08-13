@@ -46,7 +46,6 @@ contains
     call calculate_interception_mass_balance( interception_storage=cells%interception_storage,     &
                                               actual_et=cells%actual_et,                           &
                                               interception=cells%interception,                     &
-                                              canopy_cover_fraction=cells%canopy_cover_fraction,   &
                                               reference_et0=cells%reference_et0 )
 
     call calculate_snow_mass_balance( snow_storage=cells%snow_storage,                 &
@@ -60,7 +59,7 @@ contains
                                                     surface_storage_max=cells%surface_storage_max,           &
                                                     rainfall=cells%rainfall,                                 &
                                                     snowmelt=cells%snowmelt,                                 &
-                                                    impervious_fraction=cells%impervious_fraction,           &
+                                                    interception=cells%interception,                         &
                                                     reference_et0=cells%reference_et0 ) 
 
     ! call to calc_routing also triggers an embedded call to calc_runoff
@@ -68,8 +67,13 @@ contains
     !       is enabled.
     call cells%calc_routing()
 
-    cells%inflow = cells%runon + cells%rainfall + cells%fog + cells%snowmelt                  &
-                   + cells%surface_storage_excess - cells%interception + cells%irrigation
+    cells%inflow = cells%runon                                                                      &
+                   + cells%rainfall                                                                 &
+                   + cells%fog                                                                      &
+                   + cells%snowmelt                                                                 &
+                   + cells%surface_storage_excess * ( 1.0_c_float - cells%impervious_fraction )     &
+                   - cells%interception                                                             &
+                   + cells%irrigation
    
     cells%infiltration = cells%inflow - cells%runoff
 

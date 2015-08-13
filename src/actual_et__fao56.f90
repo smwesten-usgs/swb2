@@ -65,13 +65,14 @@ contains
     real (kind=c_float), intent(in), optional      :: crop_coefficient_kcb
 
     ! [ LOCALS ]
-    real (kind=c_float)  :: P_minus_PE
     real (kind=c_float)  :: Kcb
+    real (kind=c_float)  :: P_minus_PE
     real (kind=c_float)  :: depletion_amount
     real (kind=c_float)  :: p
     real (kind=c_float)  :: interim_soil_storage
     real (kind=c_float)  :: fraction_full_PET
     real (kind=c_float)  :: root_constant_ci
+    real (kind=c_float)  :: crop_et
 
     if ( present( crop_coefficient_kcb ) ) then
       Kcb = crop_coefficient_kcb
@@ -79,7 +80,9 @@ contains
       Kcb = 1.0_c_float
     endif  
 
-    P_minus_PE = precipitation - reference_et0 * Kcb
+    crop_et =  reference_et0 * Kcb
+
+    P_minus_PE = precipitation - crop_et
 
     p = adjust_depletion_fraction_p( p_table_22=depletion_fraction_p,  &
                                      reference_et0=reference_et0 )
@@ -93,15 +96,15 @@ contains
     ! there is no declining portion of the AET/PET to AW/AWC relation.
     if ( root_constant_ci  <= 0.0_c_float ) then
 
-      actual_et = min( reference_et0, soil_storage + precipitation )
+      actual_et = min( crop_et, soil_storage + precipitation )
 
     elseif ( interim_soil_storage > root_constant_ci ) then
 
 
       ! calculate fraction of day that would be at full reference ET values
-      if ( reference_et0 > 0.0_c_float ) then
+      if ( crop_et > 0.0_c_float ) then
         
-        fraction_full_PET = (interim_soil_storage - root_constant_ci) / reference_et0
+        fraction_full_PET = (interim_soil_storage - root_constant_ci) / crop_et
       
       else
         
@@ -113,11 +116,11 @@ contains
       ! for the entire day
       if ( fraction_full_PET >= 1 ) then
 
-        actual_et = reference_et0
+        actual_et = crop_et
 
       else
 
-        actual_et = reference_et0 * fraction_full_PET                                                    &
+        actual_et = crop_et * fraction_full_PET                                                          &
                     + ( 1.0_c_float - fraction_full_PET )                                                &
                        * interim_soil_storage * ( 1.0_c_float - exp( P_minus_PE / soil_storage_max ) )  
             
@@ -130,7 +133,7 @@ contains
     endif
 
     ! scale actual et value in proportion to the fraction of pervious land area present
-    actual_et = actual_et * ( 1.0_c_float - impervious_fraction )
+    actual_et = max( 0.0_c_float, actual_et * ( 1.0_c_float - impervious_fraction ) )
 
   end subroutine calculate_actual_et_fao56
 

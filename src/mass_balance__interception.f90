@@ -13,13 +13,11 @@ contains
   elemental subroutine calculate_interception_mass_balance( interception_storage,     &
                                                             actual_et,                &
  	                                                          interception,             &
- 	                                                          canopy_cover_fraction,    &
  	                                                          reference_et0 )
 
     real (kind=c_float), intent(inout)      :: interception_storage
     real (kind=c_float), intent(inout)      :: actual_et
     real (kind=c_float), intent(in)         :: interception
-    real (kind=c_float), intent(in)         :: canopy_cover_fraction
     real (kind=c_float), intent(in)         :: reference_et0
 
 !     call cells%calc_reference_et()
@@ -27,11 +25,11 @@ contains
 !     call cells%calc_interception()
 
 
-    interception_storage = interception_storage + interception * canopy_cover_fraction
+    interception_storage = interception_storage + interception
 
-    actual_et = min( reference_et0, interception_storage ) * canopy_cover_fraction
+!    actual_et = min( reference_et0, interception_storage ) * canopy_cover_fraction
 
-    interception_storage = interception_storage - actual_et
+    interception_storage = interception_storage - min( reference_et0, interception_storage )
 
    end subroutine calculate_interception_mass_balance
 
