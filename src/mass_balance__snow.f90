@@ -15,6 +15,7 @@ contains
     real (kind=c_float), intent(in)         :: potential_snowmelt
     real (kind=c_float), intent(in)         :: snowfall    
 
+
     snow_storage = snow_storage + snowfall
 
      if( snow_storage > potential_snowmelt ) then
@@ -28,6 +29,7 @@ contains
       end if
 
     snow_storage = max( snow_storage - snowmelt, 0.0_c_float )
+
 
   end subroutine calculate_snow_mass_balance
 

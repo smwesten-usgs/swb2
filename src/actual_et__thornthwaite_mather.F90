@@ -8,7 +8,6 @@ contains
 
   elemental subroutine calculate_actual_et_thornthwaite_mather(                      &
                                                   actual_et,                         &
-                                                  impervious_fraction,               &
                                                   soil_storage,                      &
                                                   soil_storage_max,                  &
                                                   precipitation,                     &
@@ -16,7 +15,6 @@ contains
                                                   crop_coefficient_kcb )
 
     real (kind=c_float), intent(inout)             :: actual_et
-    real (kind=c_float), intent(in)                :: impervious_fraction
     real (kind=c_float), intent(in)                :: soil_storage
     real (kind=c_float), intent(in)                :: soil_storage_max
     real (kind=c_float), intent(in)                :: precipitation
@@ -52,9 +50,6 @@ contains
       endif     
 
     endif
-
-    ! scale actual et value in proportion to the fraction of pervious land area present
-    actual_et = actual_et * ( 1.0_c_float - impervious_fraction )
 
   end subroutine calculate_actual_et_thornthwaite_mather
 

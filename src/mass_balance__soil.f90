@@ -20,6 +20,7 @@ contains
     real (kind=c_float), intent(inout)      :: actual_et
     real (kind=c_float), intent(in)         :: soil_storage_max
     real (kind=c_float), intent(in)         :: infiltration
+
  
     ! [ LOCALS ]
     real (kind=c_float) :: new_soil_storage
@@ -43,6 +44,7 @@ contains
       potential_recharge = 0.0_c_float
 
     endif
+
 
   end subroutine calculate_soil_mass_balance
 

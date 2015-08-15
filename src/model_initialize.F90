@@ -90,6 +90,8 @@ contains
 
   subroutine initialize_all()
 
+    use polygon_summarize, only : initialize_polygon_summarize
+
     ! [ LOCALS ]
     integer (kind=c_int) :: iIndex
 
@@ -143,6 +145,8 @@ contains
     ! open and prepare NetCDF files for output
     call initialize_output( MODEL )
 
+    call initialize_polygon_summarize()
+
     call check_for_fatal_warnings()
 
   end subroutine initialize_all
@@ -164,11 +168,13 @@ contains
 
   subroutine initialize_soils_landuse_awc_flowdir_values()
 
+    use model_domain, only : ROOTING_DEPTH_MAX
+
     call read_landuse_codes()
 
     call read_hydrologic_soil_groups()
 
-    call initialize_root_zone_depths()
+    call create_rooting_depth_table()
 
     ! read in the 2D array of AWC values; needed so that we can use it to set inactive cells
     call MODEL%read_AWC_data()
@@ -178,10 +184,13 @@ contains
     call MODEL%initialize_arrays()
 
     ! read_polygon matches HWB polygon attributes with the corresponding gridcells in SWB
-!    call read_polygon_id()
+    call read_polygon_id()
 
     ! now that we know which cells are active, pack the 2D array in to 1D vector of AWC values
     call MODEL%init_AWC()
+
+    ! to this point, rooting depths 
+    MODEL%rooting_depth_max = pack( ROOTING_DEPTH_MAX, MODEL%active )
 
     ! if the method selected reads these directly from a grid, the rooting depths previously
     ! calculated will be overwritten and recalculated using the gridded max soil moisture and awc values
@@ -346,7 +355,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine initialize_root_zone_depths
+  subroutine create_rooting_depth_table
 
     use model_domain, only : ROOTING_DEPTH_MAX
 
@@ -460,7 +469,7 @@ contains
 
     call grid_Destroy( pRooting_Depth )
 
-  end subroutine initialize_root_zone_depths
+  end subroutine create_rooting_depth_table
 
 !--------------------------------------------------------------------------------------------------
 
@@ -562,78 +571,82 @@ contains
 
       MODEL%polygon_id = pack( pPOLYGON_ID%pGrdBase%iData, MODEL%active )      
 
-      call slList%append("POLY_ID")
-
-      !> Determine how many POLYGON_IDS are present
-      call PARAMS%get_parameters( slKeys=slList, iValues=polygon_id )
-      iNumberOfPolygonIDs = count( polygon_id > 0 )
-      call slList%clear()
-
-      call slList%append("rooting_depth_inches")
-
-      ! retrieve rooting depths, in inches
-      call PARAMS%get_parameters( slKeys=slList, fValues=rooting_depth_inches )
-      call slList%clear()
-
-      call slList%append("SMC")
-
-      ! retrieve soil moisture maximum content, in inches
-      call PARAMS%get_parameters( slKeys=slList, fValues=soil_moisture_storage )
-      call slList%clear()
-
-      if ( ubound( soil_moisture_storage, 1) == ubound( polygon_id, 1 ) )  any_problems = lFALSE
-
-      exit     
-
-    enddo    
-
-    print *, any_problems, ubound( polygon_id, 1), ubound( soil_moisture_storage, 1), ubound( rooting_depth_inches, 1 )
-    call minmaxmean( soil_moisture_storage, "Max_soil_storage")
-    call minmaxmean( rooting_depth_inches, "Rooting_depth_inches")
-
-    call assert( .not. any_problems, "One or more steps failed while processing POLYGON_ID.", &
-      __FILE__, __LINE__ )
-
-!$OMP PARALLEL DO
-
-    do index=1, ubound( polygon_id, 1)
-
-      if ( mod( index, 10 ) == 0 ) print *, "Processing polygon number "//asCharacter(index) &
-          //" of "//asCharacter( ubound( polygon_id, 1) )
-
-      where ( MODEL%polygon_id == polygon_id( index ) )
-
-        MODEL%hwb_rooting_depth = rooting_depth_inches( MODEL%landuse_index( index ) ) / 12.0_c_float
-
-        MODEL%hwb_soil_storage_max = soil_moisture_storage( index )
-
-      end where
+      exit
 
     enddo
 
-!$OMP END PARALLEL DO
+!       call slList%append("POLY_ID")
 
-    where ( MODEL%hwb_rooting_depth > 0.0_c_float ) 
+!       !> Determine how many POLYGON_IDS are present
+!       call PARAMS%get_parameters( slKeys=slList, iValues=polygon_id )
+!       iNumberOfPolygonIDs = count( polygon_id > 0 )
+!       call slList%clear()
 
-      MODEL%hwb_awc_in_per_ft = MODEL%hwb_soil_storage_max / MODEL%hwb_rooting_depth
+!       call slList%append("rooting_depth_inches")
 
-    end where  
+!       ! retrieve rooting depths, in inches
+!       call PARAMS%get_parameters( slKeys=slList, fValues=rooting_depth_inches )
+!       call slList%clear()
 
-    pTempGrd%rData = unpack( MODEL%hwb_rooting_depth, MODEL%active, MODEL%dont_care )
+!       call slList%append("SMC")
 
-    call grid_WriteArcGrid("Maximum_rooting_depth__as_read_in_from_HWB_input__feet.asc", pTempGrd )
+!       ! retrieve soil moisture maximum content, in inches
+!       call PARAMS%get_parameters( slKeys=slList, fValues=soil_moisture_storage )
+!       call slList%clear()
+
+!       if ( ubound( soil_moisture_storage, 1) == ubound( polygon_id, 1 ) )  any_problems = lFALSE
+
+!       exit     
+
+!     enddo    
+
+!     print *, any_problems, ubound( polygon_id, 1), ubound( soil_moisture_storage, 1), ubound( rooting_depth_inches, 1 )
+!     call minmaxmean( soil_moisture_storage, "Max_soil_storage")
+!     call minmaxmean( rooting_depth_inches, "Rooting_depth_inches")
+
+!     call assert( .not. any_problems, "One or more steps failed while processing POLYGON_ID.", &
+!       __FILE__, __LINE__ )
+
+! !$OMP PARALLEL DO
+
+!     do index=1, ubound( polygon_id, 1)
+
+!       if ( mod( index, 10 ) == 0 ) print *, "Processing polygon number "//asCharacter(index) &
+!           //" of "//asCharacter( ubound( polygon_id, 1) )
+
+!       where ( MODEL%polygon_id == polygon_id( index ) )
+
+!         MODEL%hwb_rooting_depth = rooting_depth_inches( MODEL%landuse_index( index ) ) / 12.0_c_float
+
+!         MODEL%hwb_soil_storage_max = soil_moisture_storage( index )
+
+!       end where
+
+!     enddo
+
+! !$OMP END PARALLEL DO
+
+!     where ( MODEL%hwb_rooting_depth > 0.0_c_float ) 
+
+!       MODEL%hwb_awc_in_per_ft = MODEL%hwb_soil_storage_max / MODEL%hwb_rooting_depth
+
+!     end where  
+
+!     pTempGrd%rData = unpack( MODEL%hwb_rooting_depth, MODEL%active, MODEL%dont_care )
+
+!     call grid_WriteArcGrid("Maximum_rooting_depth__as_read_in_from_HWB_input__feet.asc", pTempGrd )
 
 
-    pTempGrd%rData = unpack( MODEL%hwb_soil_storage_max, MODEL%active, MODEL%dont_care )
+!     pTempGrd%rData = unpack( MODEL%hwb_soil_storage_max, MODEL%active, MODEL%dont_care )
 
-    call grid_WriteArcGrid("Maximum_soil_storage__as_read_in_from_HWB_input__inches.asc", pTempGrd )
+!     call grid_WriteArcGrid("Maximum_soil_storage__as_read_in_from_HWB_input__inches.asc", pTempGrd )
 
 
-    pTempGrd%rData = unpack( MODEL%hwb_awc_in_per_ft, MODEL%active, MODEL%dont_care )
+!     pTempGrd%rData = unpack( MODEL%hwb_awc_in_per_ft, MODEL%active, MODEL%dont_care )
 
-    call grid_WriteArcGrid("Available_water_content__as_read_in_from_HWB_input__inches_per_foot.asc", pTempGrd )
+!     call grid_WriteArcGrid("Available_water_content__as_read_in_from_HWB_input__inches_per_foot.asc", pTempGrd )
 
-    call grid_Destroy( pTempGrd )  
+     call grid_Destroy( pTempGrd )  
 
   end subroutine read_polygon_id
 

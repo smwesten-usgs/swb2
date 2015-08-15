@@ -56,9 +56,13 @@ module model_domain
      
     integer (kind=c_int), allocatable      :: polygon_id(:)
     real (kind=c_float), allocatable       :: latitude(:)
-    real (kind=c_float), allocatable       :: reference_ET0(:)
-    real (kind=c_float), allocatable       :: interception_ET(:)
-    real (kind=c_float), allocatable       :: actual_ET(:)
+    real (kind=c_float), allocatable       :: reference_et0(:)
+
+    real (kind=c_float), allocatable       :: actual_et_interception(:)
+    real (kind=c_float), allocatable       :: actual_et_impervious(:)
+    real (kind=c_float), allocatable       :: actual_et_soil(:)        
+    real (kind=c_float), allocatable       :: actual_et(:)
+    
     real (kind=c_float), allocatable       :: inflow(:)
     real (kind=c_float), allocatable       :: runon(:)
     real (kind=c_float), allocatable       :: runoff(:)
@@ -92,11 +96,9 @@ module model_domain
     real (kind=c_float), allocatable       :: tmean(:)
     real (kind=c_float), allocatable       :: routing_fraction(:)
 
-    real (kind=c_float), allocatable       :: hwb_awc_in_per_ft(:)
-    real (kind=c_float), allocatable       :: hwb_soil_storage_max(:)
-    real (kind=c_float), allocatable       :: hwb_rooting_depth(:)     
-
     integer (kind=c_int), allocatable      :: index_order(:)
+
+    real (kind=c_float), allocatable       :: adjusted_depletion_fraction_p(:)
 
     !> declare and initialize procedure pointers such that the default methods are in place
     procedure ( simple_method ), pointer         :: init_interception       => model_initialize_interception_bucket
@@ -253,7 +255,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: iStat(43)
+    integer (kind=c_int)  :: iStat(44)
 
     iCount = count( this%active )
 
@@ -297,9 +299,10 @@ contains
     allocate( this%rooting_depth_max( iCount ), stat=iStat(38) )
     allocate( this%current_rooting_depth( iCount ), stat=iStat(39) )
     allocate( this%polygon_id( iCount ), stat=iStat(40) )    
-    allocate( this%hwb_rooting_depth( iCount ), stat=iStat(41) )        
-    allocate( this%hwb_soil_storage_max( iCount ), stat=iStat(42) )        
-    allocate( this%hwb_awc_in_per_ft( iCount ), stat=iStat(43) )        
+    allocate( this%actual_et_soil( iCount ), stat=iStat(41) )        
+    allocate( this%actual_et_impervious( iCount ), stat=iStat(42) )
+    allocate( this%actual_et_interception( iCount ), stat=iStat(43) )        
+    allocate( this%adjusted_depletion_fraction_p( iCount ), stat=iStat(44) )
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="  &
@@ -909,7 +912,6 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     this%interception = interception_bucket_calculate( this%landuse_index, this%rainfall, this%fog )
-    this%interception_ET = this%interception
 
   end subroutine model_calculate_interception_bucket
 
@@ -955,8 +957,6 @@ contains
                                EVAPORATION_TO_RAINFALL_RATIO,                             &
                                P_SAT,                                                     &
                                this%interception )
-
-    this%interception_ET = this%interception
 
   end subroutine model_calculate_interception_gash
 
@@ -1599,8 +1599,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call calculate_actual_et_thornthwaite_mather( actual_et=this%actual_et,                         &
-                                                  impervious_fraction=this%impervious_fraction,     &
+    call calculate_actual_et_thornthwaite_mather( actual_et=this%actual_et_soil,                    &
                                                   soil_storage=this%soil_storage,                   &
                                                   soil_storage_max=this%soil_storage_max,           &
                                                   precipitation=this%infiltration,                  &
@@ -1629,13 +1628,13 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call calculate_actual_et_fao56( actual_et=this%actual_et,                                      &
-                                    impervious_fraction=this%impervious_fraction,                  &
-                                    soil_storage=this%soil_storage,                                &
-                                    soil_storage_max=this%soil_storage_max,                        &
-                                    infiltration=this%infiltration,                               &
-                                    reference_et0=this%reference_et0,                              &
-                                    depletion_fraction_p=DEPLETION_FRACTION( this%landuse_index ), &
+    call calculate_actual_et_fao56( actual_et=this%actual_et_soil,                                    &
+                                    adjusted_depletion_fraction_p=this%adjusted_depletion_fraction_p, &
+                                    soil_storage=this%soil_storage,                                   &
+                                    soil_storage_max=this%soil_storage_max,                           &
+                                    infiltration=this%infiltration,                                   &
+                                    reference_et0=this%reference_et0,                                 &
+                                    depletion_fraction_p=DEPLETION_FRACTION( this%landuse_index ),    &
                                     crop_coefficient_kcb=this%crop_coefficient_kcb )
 
   end subroutine model_calculate_actual_et_fao56

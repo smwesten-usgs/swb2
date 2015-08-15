@@ -53,6 +53,7 @@ if(TARGET__SWB_EXECUTABLE)
             solar_calculations.F90
             strings.F90
             string_list.F90
+            polygon_summarize.F90
  
             generated/version_control.F90
 

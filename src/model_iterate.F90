@@ -9,6 +9,7 @@ module model_iterate
   use parameters, only            : PARAMS, PARAMS_DICT 
   use netcdf4_support, only       : NC_FILL_FLOAT
   use output, only                : write_output
+  use polygon_summarize, only     : perform_polygon_summarize
   implicit none
 
   private
@@ -28,6 +29,7 @@ contains
       call cells%get_climate_data( )
       call perform_daily_calculation( cells )
       call write_output( cells )
+      call perform_polygon_summarize( cells )
       call SIM_DT%addDay( )
 
     enddo 

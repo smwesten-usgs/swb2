@@ -44,7 +44,7 @@ contains
     call cells%calc_irrigation()
 
     call calculate_interception_mass_balance( interception_storage=cells%interception_storage,     &
-                                              actual_et=cells%actual_et,                           &
+                                              actual_et=cells%actual_et_interception,              &
                                               interception=cells%interception,                     &
                                               reference_et0=cells%reference_et0 )
 
@@ -54,7 +54,7 @@ contains
                                       snowfall=cells%snowfall )
 
     call calculate_impervious_surface_mass_balance( surface_storage=cells%surface_storage,                   & 
-                                                    actual_et=cells%actual_et,                               &   
+                                                    actual_et=cells%actual_et_impervious,                    &   
                                                     surface_storage_excess=cells%surface_storage_excess,     &
                                                     surface_storage_max=cells%surface_storage_max,           &
                                                     rainfall=cells%rainfall,                                 &
@@ -69,45 +69,42 @@ contains
     !       is enabled.
     call cells%calc_routing()
 
-    cells%inflow = cells%runon                                                                      &
-                   + cells%rainfall                                                                 &
-                   + cells%fog                                                                      &
-                   + cells%snowmelt                                                                 &
-                   + cells%surface_storage_excess * ( 1.0_c_float - cells%impervious_fraction )     &
-                   - cells%interception                                                             &
+    cells%inflow = cells%runon                                                                       &
+                   + ( ( cells%rainfall                                                              &
+                      + cells%fog ) * ( 1.0_c_float - cells%impervious_fraction )                    &
+                      + cells%surface_storage_excess * ( 1.0_c_float - cells%impervious_fraction ) ) &
+                     / (1.0_c_float - cells%impervious_fraction )                                          &
+                   + cells%snowmelt                                                                  &
+                   - cells%interception                                                              &
                    + cells%irrigation
    
     cells%infiltration = cells%inflow - cells%runoff
 
+    ! the following call updates bound variable actual_et_soil
     call cells%calc_actual_et()
 
-    call minmaxmean( cells%reference_et0, "reference_et0, lu=17", cells%landuse_code==17 )
-    call minmaxmean( cells%actual_et, "actual_et, lu=17", cells%landuse_code==17 )
-    call minmaxmean( cells%snowmelt, "snowmelt, lu=17", cells%landuse_code==17 )    
-    call minmaxmean( cells%crop_coefficient_kcb, "Kcb, lu=17", cells%landuse_code==17 )
-    call minmaxmean( cells%runon, "runon, lu=17", cells%landuse_code==17 )    
-    call minmaxmean( cells%runoff, "runoff, lu=17", cells%landuse_code==17 )    
-    call minmaxmean( cells%rainfall, "rainfall, lu=17", cells%landuse_code==17 )        
-    call minmaxmean( cells%fog, "fog, lu=17", cells%landuse_code==17 )
-    call minmaxmean( cells%interception, "interception, lu=17", cells%landuse_code==17 )
-    call minmaxmean( cells%irrigation, "irrigation, lu=17", cells%landuse_code==17 )
-    call minmaxmean( cells%surface_storage_excess, "surface_storage_excess, lu=17", cells%landuse_code==17 )
-    call minmaxmean( cells%surface_storage, "surface_storage, lu=17", cells%landuse_code==17 )    
-    call minmaxmean( cells%soil_storage, "soil_storage, lu=17", cells%landuse_code==17 )
-    call minmaxmean( cells%soil_storage_max, "soil_storage_max, lu=17", cells%landuse_code==17 )    
-    call minmaxmean( cells%rooting_depth_max, "rooting_depth_max, lu=17", cells%landuse_code==17 )        
+    ! big question: is this the appropriate way to account for total actual et?
+    ! it seems reasonable to consider each storage volume as its own control volume,
+    ! while area-weighting each component to come up with a cell-wide average actual_et
 
+    ! NOTE: the formulation below, with interception_et commented out, seems most comparable
+    !       with that used by HWB
+    cells%actual_et = cells%actual_et_soil * ( 1.0_c_float - cells%impervious_fraction )   &
+!                      + cells%actual_et_interception * cells%canopy_cover_fraction         &
+                      + cells%actual_et_impervious * cells%impervious_fraction
+
+    ! moved this call up so that septic could be added to soil mas balance at some future date if needed
+    call cells%calc_direct_recharge()
 
     call calculate_soil_mass_balance( potential_recharge=cells%potential_recharge,       &
                                       soil_storage=cells%soil_storage,                   &
                                       soil_storage_max=cells%soil_storage_max,           &
-                                      actual_et=cells%actual_et,                         &
+                                      actual_et=cells%actual_et_soil,                    &
                                       infiltration=cells%infiltration )
-
-    call cells%calc_direct_recharge()
 
   end subroutine perform_daily_calculation
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine minmaxmean( variable , varname, logical_vector )
 

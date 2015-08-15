@@ -32,14 +32,15 @@ contains
     real (kind=c_float), intent(in)         :: interception
     real (kind=c_float), intent(in)         :: reference_et0
 
+
     surface_storage = surface_storage               &
                       + rainfall                    &
                       + fog                         &
                       + snowmelt                    &
                       - interception                &
-                      - runoff                      &
-                      - reference_et0
+                      - runoff
 
+    ! first determine if surface inputs exceed storage capacity
     if ( surface_storage > surface_storage_max ) then
  
       surface_storage_excess = surface_storage - surface_storage_max
@@ -55,6 +56,21 @@ contains
       surface_storage_excess = 0.0_c_float
 
     endif  
+
+
+    ! now allow for evaporation
+    if (surface_storage > reference_et0) then
+
+      actual_et = reference_et0
+      surface_storage = surface_storage - reference_et0
+
+    else
+
+      actual_et = surface_storage
+      surface_storage = 0.0
+
+    endif
+
     
   end subroutine calculate_impervious_surface_mass_balance    
 

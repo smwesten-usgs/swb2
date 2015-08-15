@@ -47,16 +47,16 @@ contains
 !----------------------------------------------------------------------------------------------------
 
 	elemental subroutine calculate_actual_et_fao56( actual_et,                         &
-                                                  impervious_fraction,               &
+                                                  adjusted_depletion_fraction_p,     &
                                                   soil_storage,                      &
                                                   depletion_fraction_p,              &
                                                   soil_storage_max,                  &
-                                                  infiltration,                     &
+                                                  infiltration,                      &
                                                   reference_et0,                     &
                                                   crop_coefficient_kcb )
 
     real (kind=c_float), intent(inout)             :: actual_et
-    real (kind=c_float), intent(in)                :: impervious_fraction
+    real (kind=c_float), intent(inout)             :: adjusted_depletion_fraction_p    
     real (kind=c_float), intent(in)                :: depletion_fraction_p
     real (kind=c_float), intent(in)                :: soil_storage
     real (kind=c_float), intent(in)                :: soil_storage_max
@@ -86,6 +86,8 @@ contains
 
     p = adjust_depletion_fraction_p( p_table_22=depletion_fraction_p,  &
                                      reference_et0=crop_et )
+  
+    adjusted_depletion_fraction_p = p
 
     ! soil storage value at which actual et begins to decline
     root_constant_ci = ( 1.0_c_float - p ) * soil_storage_max
@@ -135,9 +137,6 @@ contains
         actual_et = interim_soil_storage * ( 1.0_c_float - exp( - crop_et / root_constant_ci ) )  
 
     endif
-
-    ! scale actual et value in proportion to the fraction of pervious land area present
-    actual_et = max( 0.0_c_float, actual_et * ( 1.0_c_float - impervious_fraction ) )
 
   end subroutine calculate_actual_et_fao56
 
