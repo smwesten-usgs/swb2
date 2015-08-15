@@ -70,15 +70,20 @@ contains
     call cells%calc_routing()
 
     cells%inflow = cells%runon                                                                       &
-                   + ( ( cells%rainfall                                                              &
-                      + cells%fog ) * ( 1.0_c_float - cells%impervious_fraction )                    &
-                      + cells%surface_storage_excess * ( 1.0_c_float - cells%impervious_fraction ) ) &
-                     / (1.0_c_float - cells%impervious_fraction )                                          &
+                   + ( cells%rainfall                                                                &
+                     + cells%fog ) * ( 1.0_c_float - cells%impervious_fraction )                     &
+                   + cells%surface_storage_excess * cells%impervious_fraction                        &
                    + cells%snowmelt                                                                  &
                    - cells%interception                                                              &
                    + cells%irrigation
    
-    cells%infiltration = cells%inflow - cells%runoff
+    cells%infiltration = max( 0.0_c_float, cells%inflow - cells%runoff )
+
+    where ( cells%inflow - cells%runoff < 0.0_c_float )
+
+      cells%runoff = cells%inflow
+
+    end where
 
     ! the following call updates bound variable actual_et_soil
     call cells%calc_actual_et()

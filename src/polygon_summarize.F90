@@ -31,8 +31,9 @@ contains
 
       write( LU( index ), "(256a)") "Date", TAB, "POLY_ID", TAB, "count", TAB, "lc",   &
         TAB, "sms_max", TAB, "rain", TAB, "fog", TAB, "irr", TAB, "runoff", TAB,       &
-        "can_evap", TAB, "ref_et0", TAB, "crop_et0", TAB, "actual_et", TAB,           &
-        "recharge", TAB, "sms_end"
+        "can_evap", TAB, "ref_et0", TAB, "crop_et0", TAB, "actual_et", TAB,            &
+        "recharge", TAB, "sms_end", TAB, "surface_storage_excess", TAB,                &
+        "snowmelt"
 
     enddo	
 
@@ -52,7 +53,8 @@ contains
     integer (kind=c_int) :: lc
     character (len=10)   :: date
     real (kind=c_float)  :: sms_max, rain, fog, irr, runoff, can_evap, ref_et0,    &
-                            crop_et0, actual_et, recharge, sms_end
+                            crop_et0, actual_et, recharge, sms_end, snowmelt,      &
+                            surface_storage_excess
     
     date = SIM_DT%curr%prettydate()
 
@@ -73,13 +75,16 @@ contains
       actual_et = mean( cells%actual_et, belongs_to_poly )
       recharge = mean( cells%potential_recharge, belongs_to_poly )
       sms_end = mean( cells%soil_storage, belongs_to_poly )
+      surface_storage_excess = mean( cells%surface_storage_excess, belongs_to_poly )
+      snowmelt = mean( cells%snowmelt, belongs_to_poly )
 
-      write( unit=LU( index ), fmt="(2a,3(i0,a),10(f12.3,a),f12.3)" )          &
+      write( unit=LU( index ), fmt="(2a,3(i0,a),12(f12.3,a),f12.3)" )          &
         date, TAB,                                                             &
         POLY_ID( index ), TAB, count( belongs_to_poly), TAB, lc, TAB,          &
         sms_max, TAB, rain, TAB, fog, TAB,                                     &
         irr, TAB, runoff, TAB, can_evap, TAB, ref_et0, TAB, crop_et0, TAB,     &
-        actual_et, TAB, recharge, TAB, sms_end
+        actual_et, TAB, recharge, TAB, sms_end, TAB, surface_storage_excess,   &
+        TAB, snowmelt
 
       flush( unit=LU( index ) )
 
