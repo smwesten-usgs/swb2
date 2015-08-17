@@ -23,7 +23,7 @@ module runoff__gridded_values
 
   private
 
-  public :: runoff_gridded_values_initialize, runoff_gridded_values_calculate
+  public :: runoff_gridded_values_initialize, runoff_gridded_values_update_ratios
 
   real (kind=c_float), allocatable           :: RUNOFF_TABLE_VALUES(:,:)
   type ( DATETIME_T ), allocatable           :: RUNOFF_TABLE_DATES(:)
@@ -153,7 +153,7 @@ module runoff__gridded_values
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine runoff_gridded_values_calculate( )
+  subroutine runoff_gridded_values_update_ratios( )
 
     ! [ LOCALS ] 
     integer (kind=c_int)  :: iJulianDay
@@ -198,6 +198,6 @@ module runoff__gridded_values
       
     enddo    
 
-  end subroutine runoff_gridded_values_calculate
+  end subroutine runoff_gridded_values_update_ratios
 
 end module runoff__gridded_values

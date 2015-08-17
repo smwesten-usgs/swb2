@@ -12,7 +12,7 @@ module data_catalog_entry
   use exceptions
   use logfiles
   use strings
-  use swb_grid
+  use grid
   use netcdf4_support
   use iso_c_binding
   implicit none
@@ -53,6 +53,7 @@ module data_catalog_entry
     logical (kind=c_bool) :: lMissingFilesAreAllowed = lFALSE
     logical (kind=c_bool) :: lFlipHorizontal = lFALSE
     logical (kind=c_bool) :: lFlipVertical = lFALSE
+    logical (kind=c_bool) :: lUseMajorityFilter = lFALSE
 
     integer (kind=c_int)  :: iDaysToPadAtYearsEnd = 0
     integer (kind=c_int)  :: iDaysToPadIfLeapYear = 1
@@ -110,6 +111,8 @@ module data_catalog_entry
 
     procedure, public :: set_scale => set_scale_sub
     procedure, public :: set_offset => set_offset_sub
+
+    procedure, public :: set_majority_filter_flag => set_majority_filter_flag_sub
 
     procedure, private :: set_minimum_allowable_value_int_sub
     procedure, private :: set_minimum_allowable_value_real_sub
@@ -711,12 +714,13 @@ subroutine transform_grid_to_grid(this)
     case ( GRID_DATATYPE_REAL )
 
       call grid_gridToGrid_sgl(pGrdFrom=this%pGrdNative,&
-                          pGrdTo=this%pGrdBase )
+                               pGrdTo=this%pGrdBase )
 
     case ( GRID_DATATYPE_INT )
 
       call grid_gridToGrid_int(pGrdFrom=this%pGrdNative, &
-                        pGrdTo=this%pGrdBase )
+                               pGrdTo=this%pGrdBase,     &
+                               lUseMajorityFilter=this%lUseMajorityFilter )
 
     case default
 
@@ -1546,6 +1550,17 @@ subroutine set_offset_sub(this, rAddOffset)
    this%rUserAddOffset = rAddOffset
 
 end subroutine set_offset_sub
+
+!--------------------------------------------------------------------------------------------------
+
+subroutine set_majority_filter_flag_sub(this, lUseMajorityFilter)
+
+   class (DATA_CATALOG_ENTRY_T) :: this
+   logical (kind=c_bool)        :: lUseMajorityFilter
+
+   this%lUseMajorityFilter = lUseMajorityFilter
+
+end subroutine set_majority_filter_flag_sub
 
 !--------------------------------------------------------------------------------------------------
 

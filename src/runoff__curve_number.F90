@@ -239,42 +239,47 @@ contains
   !! @note Reference: Woodward, D. E., R. H. Hawkins, R. Jiang, A. Hjelmfeldt Jr, J. Van Mullem,
   !!       and Q. D. Quan. “Runoff Curve Number Method: Examination of the Initial Abstraction Ratio.”
   !!       In Conference Proceeding Paper, World Water and Environmental Resources Congress, 2003.
-  elemental function runoff_curve_number_calculate(iLanduseIndex, iSoilsIndex, fSoilStorage, fSoilStorage_Max, &
-                  fInflow, fCFGI )   result(fRunoff)
+  elemental subroutine runoff_curve_number_calculate(runoff,                              &
+                                                     landuse_index,                       &
+                                                     soil_group,                         &
+                                                     soil_storage,                        &
+                                                     soil_storage_max,                    & 
+                                                     inflow,                              &
+                                                     continuous_frozen_ground_index ) 
 
-    integer (kind=c_int), intent(in)  :: iLanduseIndex
-    integer (kind=c_int), intent(in)  :: iSoilsIndex
-    real (kind=c_float), intent(in)   :: fSoilStorage
-    real (kind=c_float), intent(in)   :: fSoilStorage_Max
-    real (kind=c_float), intent(in)   :: fInflow
-    real (kind=c_float), intent(in)   :: fCFGI
-    real (kind=c_float)               :: fRunoff
+    real (kind=c_float), intent(inout)  :: runoff
+    integer (kind=c_int), intent(in)    :: landuse_index
+    integer (kind=c_int), intent(in)    :: soil_group
+    real (kind=c_float), intent(in)     :: soil_storage
+    real (kind=c_float), intent(in)     :: soil_storage_max
+    real (kind=c_float), intent(in)     :: inflow
+    real (kind=c_float), intent(in)     :: continuous_frozen_ground_index
     
     ! [ LOCALS ]
     real (kind=c_float) :: CN_05
     real (kind=c_float) :: S
     real (kind=c_float) :: CN_adj
 
-    CN_adj = update_curve_number_fn( iLanduseIndex, iSoilsIndex, fSoilStorage, &
-                          fSoilStorage_Max, fCFGI )
+    CN_adj = update_curve_number_fn( landuse_index, soil_group, soil_storage, &
+                          soil_storage_max, continuous_frozen_ground_index )
 
     S = ( 1000.0_c_float / CN_adj ) - 10.0_c_float
 
     ! Equation 9, Hawkins and others, 2002
     CN_05 = 100_c_float / &
-      ((1.879_c_float * ((100.0_c_float / CN_adj ) - 1.0_c_float )**1.15_c_float) + 1.0_c_float)
+            ((1.879_c_float * ((100.0_c_float / CN_adj ) - 1.0_c_float )**1.15_c_float) + 1.0_c_float)
 
     ! Equation 8, Hawkins and others, 2002
     S = 1.33_c_float * ( S ) ** 1.15_c_float
 
     ! now consider runoff if Ia ~ 0.05S
-    if ( fInflow > 0.05_c_float * S ) then
-      fRunoff = ( fInflow - 0.05_c_float * S )**2  / ( fInflow + 0.95_c_float * S )
+    if ( inflow > 0.05_c_float * S ) then
+      runoff = ( inflow - 0.05_c_float * S )**2  / ( inflow + 0.95_c_float * S )
     else
-      fRunoff = 0.0_c_float
+      runoff = 0.0_c_float
     end if
 
-  end function runoff_curve_number_calculate
+  end subroutine runoff_curve_number_calculate
 
 
 end module runoff__curve_number

@@ -708,13 +708,24 @@ contains
         iLogLevel=iLogLevel_, lEcho=lEcho_, iTab=2 )
       call LOGS%write( " --ENTRIES--:", iTab=5 )
 
-      if ( iLogLevel_ /= LOG_NONE ) then
+      select case ( iLogLevel_ )
+  
+        case ( LOG_GENERAL )
 
-        do iIndex = LOG_GENERAL, min( iLogLevel_, LOG_DEBUG)
-          call current%sl%print( iLU=LOGS%iUnitNum( iIndex ) )
-        enddo
+          call current%sl%print( iLU=LOGS%iUnitNum( LOG_GENERAL ) )
 
-      endif  
+        case ( LOG_DEBUG )
+
+          call current%sl%print( iLU=LOGS%iUnitNum( LOG_DEBUG ) )
+
+        case ( LOG_ALL )
+
+          call current%sl%print( iLU=LOGS%iUnitNum( LOG_GENERAL ) )
+          call current%sl%print( iLU=LOGS%iUnitNum( LOG_DEBUG ) )
+
+        case default
+
+      end select  
       
       if ( lEcho_ )   call current%sl%print()  
 

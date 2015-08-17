@@ -7,7 +7,7 @@ module exceptions
 
   private
 
-  public :: assert, die, warn, check_warnings
+  public :: assert, die, warn, check_for_fatal_warnings
 
   interface  assert
      module procedure :: assert_4bit
@@ -67,7 +67,7 @@ contains
 
   !------------------------------------------------------------------------------------------------
 
-  subroutine check_warnings()
+  subroutine check_for_fatal_warnings()
 
     ! [ LOCALS ]
     character (len=6)     :: sNumWarnings
@@ -99,9 +99,7 @@ contains
       do iIndex = 1, NUMBER_OF_FATAL_WARNINGS
         if (iIndex <= MAX_FATAL_WARNINGS ) then
           write(unit=sIndex, fmt="(i0)") iIndex
-          call LOGS%write( trim(adjustl(sIndex))//":", iLinesBefore=1)
-          call LOGS%write( repeat("-",80) )
-          call LOGS%write( trim(WARNING_TEXT(iIndex)) )
+          call LOGS%write( trim(adjustl(sIndex))//": "//trim(WARNING_TEXT(iIndex)), iLinesBefore=1)
         endif
       enddo
 
@@ -117,7 +115,7 @@ contains
     endif  
 
 
-  end subroutine check_warnings  
+  end subroutine check_for_fatal_warnings  
 
 !------------------------------------------------------------------------------------------------
 

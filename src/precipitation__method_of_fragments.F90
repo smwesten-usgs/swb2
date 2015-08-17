@@ -26,7 +26,7 @@ module precipitation__method_of_fragments
   use strings
   use string_list
   use simulation_datetime
-  use swb_grid
+  use grid
   implicit none
 
   private

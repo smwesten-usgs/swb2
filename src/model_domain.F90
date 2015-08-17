@@ -8,7 +8,7 @@ module model_domain
   use simulation_datetime
   use snowfall__original
   use string_list, only      : STRING_LIST_T
-  use swb_grid
+  use grid
   use parameters, only       : PARAMS, PARAMS_DICT 
   use netcdf4_support, only  : NC_FILL_FLOAT
   implicit none
@@ -31,10 +31,8 @@ module model_domain
     real (kind=c_double)               :: X_ll, Y_ll
     real (kind=c_double)               :: X_ur, Y_ur
     real (kind=c_double), allocatable  :: X(:), Y(:)
+    real (kind=c_double), allocatable  :: X_lon(:,:), Y_lat(:,:)
     real (kind=c_double)               :: gridcellsize
-
-    !> @todo: why do we need a BNDS data structure that duplicates the project boundary
-    !!        information present in the MODEL_DOMAIN_T data structure??
 
     logical (kind=c_bool), allocatable     :: active(:,:)
     real (kind=c_float), allocatable       :: dont_care(:,:)
@@ -51,20 +49,27 @@ module model_domain
     real (kind=c_float), allocatable       :: canopy_cover_fraction(:)
     real (kind=c_float), allocatable       :: awc(:)
     real (kind=c_float), allocatable       :: gdd(:)
+    real (kind=c_float), allocatable       :: crop_coefficient_kcb(:)
+    real (kind=c_float), allocatable       :: continuous_frozen_ground_index(:)    
 
-    real (kind=c_float), allocatable       :: max_rooting_depth(:)
+    real (kind=c_float), allocatable       :: rooting_depth_max(:)
      
+    integer (kind=c_int), allocatable      :: polygon_id(:)
     real (kind=c_float), allocatable       :: latitude(:)
-    real (kind=c_float), allocatable       :: reference_ET0(:)
-    real (kind=c_float), allocatable       :: reference_ET0_adj(:)
-    real (kind=c_float), allocatable       :: interception_ET(:)
-    real (kind=c_float), allocatable       :: actual_ET(:)
+    real (kind=c_float), allocatable       :: reference_et0(:)
+
+    real (kind=c_float), allocatable       :: actual_et_interception(:)
+    real (kind=c_float), allocatable       :: actual_et_impervious(:)
+    real (kind=c_float), allocatable       :: actual_et_soil(:)        
+    real (kind=c_float), allocatable       :: actual_et(:)
+    
     real (kind=c_float), allocatable       :: inflow(:)
     real (kind=c_float), allocatable       :: runon(:)
     real (kind=c_float), allocatable       :: runoff(:)
     real (kind=c_float), allocatable       :: runoff_outside(:)
     real (kind=c_float), allocatable       :: outflow(:)
     real (kind=c_float), allocatable       :: infiltration(:)
+    real (kind=c_float), allocatable       :: potential_snowmelt(:)
     real (kind=c_float), allocatable       :: snowmelt(:)
     real (kind=c_float), allocatable       :: interception(:)
      
@@ -75,6 +80,7 @@ module model_domain
     real (kind=c_float), allocatable       :: surface_storage_max(:)
     real (kind=c_float), allocatable       :: surface_storage_excess(:)
     real (kind=c_float), allocatable       :: soil_storage(:)
+    real (kind=c_float), allocatable       :: soil_storage_previous_day(:)
     real (kind=c_float), allocatable       :: soil_storage_max(:)
     real (kind=c_float), allocatable       :: potential_recharge(:)
     real (kind=c_float), allocatable       :: current_rooting_depth(:)
@@ -92,30 +98,34 @@ module model_domain
 
     integer (kind=c_int), allocatable      :: index_order(:)
 
+    real (kind=c_float), allocatable       :: adjusted_depletion_fraction_p(:)
+
     !> declare and initialize procedure pointers such that the default methods are in place
     procedure ( simple_method ), pointer         :: init_interception       => model_initialize_interception_bucket
     procedure ( simple_method ), pointer         :: init_runoff             => model_initialize_runoff_curve_number
     procedure ( simple_method ), pointer         :: init_reference_et       => model_initialize_et_hargreaves
+    procedure ( simple_method ), pointer         :: init_actual_et          => model_initialize_actual_et_thornthwaite_mather
     procedure ( simple_method ), pointer         :: init_routing            => model_initialize_routing_D8
-    procedure ( simple_method ), pointer         :: init_soil_moisture      => model_initialize_soil_moisture_thornthwaite_mather
+    procedure ( simple_method ), pointer         :: init_soil_storage_max   => model_initialize_soil_storage_max_internally_calculated
     procedure ( simple_method ), pointer         :: init_snowfall           => model_initialize_snowfall_original
     procedure ( simple_method ), pointer         :: init_snowmelt           => model_initialize_snowmelt_original
     procedure ( simple_method ), pointer         :: init_precipitation_data => model_initialize_precip_normal
     procedure ( simple_method ), pointer         :: init_fog                => model_initialize_fog_none
     procedure ( simple_method ), pointer         :: init_irrigation         => model_initialize_irrigation_none
-    procedure ( simple_method ), pointer         :: init_direct_recharge  => model_initialize_direct_recharge_none
+    procedure ( simple_method ), pointer         :: init_direct_recharge    => model_initialize_direct_recharge_none
     procedure ( simple_method ), pointer         :: init_GDD                => model_initialize_GDD_none
     procedure ( simple_method ), pointer         :: init_AWC                => model_initialize_available_water_content_gridded
+    procedure ( simple_method ), pointer         :: init_crop_coefficient   => model_initialize_crop_coefficient_none
 
-    procedure ( simple_method ), pointer         :: calc_interception      => model_calculate_interception_bucket
+    procedure ( simple_method ), pointer         :: calc_interception       => model_calculate_interception_bucket
+    procedure ( simple_method ), pointer         :: update_crop_coefficient => model_update_crop_coefficient_none    
 
     procedure ( simple_method_w_optional ), pointer   :: calc_runoff       => model_calculate_runoff_curve_number
     
     procedure ( simple_method ), pointer         :: calc_reference_et      => model_calculate_et_hargreaves
     procedure ( simple_method ), pointer         :: calc_routing           => model_calculate_routing_D8
 
-    procedure ( simple_method_w_optional ), pointer  :: calc_soil_moisture => model_calculate_soil_moisture_thornthwaite_mather
-    
+    procedure ( simple_method ), pointer         :: calc_actual_et         => model_calculate_actual_et_thornthwaite_mather
     procedure ( simple_method ), pointer         :: calc_snowfall          => model_calculate_snowfall_original
     procedure ( simple_method ), pointer         :: calc_snowmelt          => model_calculate_snowmelt_original  
     procedure ( simple_method ), pointer         :: calc_fog               => model_calculate_fog_none
@@ -144,57 +154,18 @@ module model_domain
     procedure :: initialize_grid_sub
     generic   :: initialize_grid => initialize_grid_sub
 
-    procedure :: set_method_sub
-    generic   :: set_method => set_method_sub
+    procedure :: set_method_pointers_sub
+    generic   :: set_method_pointers => set_method_pointers_sub
 
     procedure :: set_inactive_cells_sub
     generic   :: set_inactive_cells => set_inactive_cells_sub
 
     procedure :: preflight_check_method_pointers
     
-    procedure :: calculate_mass_balance_sub
-    generic   :: solve => calculate_mass_balance_sub
-
-    procedure :: calculate_interception_mass_balance_sub
-    procedure :: calculate_impervious_surface_mass_balance_sub
-    procedure :: calculate_snow_mass_balance_sub
-    procedure :: calculate_soil_mass_balance_sub
-
-    procedure :: read_in_land_use_sub
-    generic   :: read_land_use_codes => read_in_land_use_sub
-
-    procedure :: read_in_soil_groups_sub
-    generic   :: get_soil_groups => read_in_soil_groups_sub
-
     procedure :: get_climate_data
-    procedure :: write_variables_to_netcdf
-
-    procedure :: initialize_root_zone_depths_sub
-    generic   :: initialize_root_zone_depths => initialize_root_zone_depths_sub
 
     procedure :: initialize_methods_sub
     generic   :: initialize_methods => initialize_methods_sub
-
-    procedure :: initialize_soil_storage_max_sub
-    generic   :: initialize_soil_storage_max => initialize_soil_storage_max_sub
-
-    procedure :: initialize_netcdf_output_sub
-    generic   :: initialize_netcdf_output => initialize_netcdf_output_sub
-
-    procedure :: initialize_landuse_codes_sub
-    generic   :: initialize_landuse => initialize_landuse_codes_sub
-
-    procedure :: initialize_percent_impervious_sub
-    generic   :: initialize_percent_impervious => initialize_percent_impervious_sub
-
-    procedure :: initialize_percent_canopy_cover_sub
-    generic   :: initialize_percent_canopy_cover => initialize_percent_canopy_cover_sub
-
-    procedure :: initialize_latitude_sub
-    generic   :: initialize_latitude => initialize_latitude_sub
-
-    procedure :: initialize_soil_groups_sub
-    generic   :: initialize_soil_groups => initialize_soil_groups_sub
 
     procedure :: summarize_state_variables_sub
     generic   :: summarize => summarize_state_variables_sub
@@ -224,32 +195,14 @@ module model_domain
     procedure :: minmaxmean_int
   end interface minmaxmean
 
-  type, public :: NETCDF_FILE_COLLECTION_T
-    type (T_NETCDF4_FILE), pointer, public :: ncfile
-  end type NETCDF_FILE_COLLECTION_T
-
   ! creating several module-level globals
-  type (MODEL_DOMAIN_T), public :: MODEL
+  type (MODEL_DOMAIN_T), public             :: MODEL
 
-  type (NETCDF_FILE_COLLECTION_T), allocatable, public :: OUTPUT(:)
+  real (kind=c_float), allocatable, public  :: ROOTING_DEPTH_MAX(:,:)
 
-  real (kind=c_float), allocatable  :: MAX_ROOTING_DEPTH(:,:)
+  type (GENERAL_GRID_T), pointer            :: pROOTING_DEPTH
 
-  type (GENERAL_GRID_T), pointer    :: pROOTING_DEPTH
-
-  type (GENERAL_GRID_T), pointer    :: pCOORD_GRD
-
-  integer (kind=c_int), parameter   :: NCDF_NUM_OUTPUTS = 17
-
-  enum, bind(c)
-    enumerator :: NCDF_GROSS_PRECIPITATION=1, NCDF_RAINFALL, NCDF_SNOWFALL, &
-                  NCDF_INTERCEPTION, NCDF_RUNON, NCDF_RUNOFF,               &
-                  NCDF_SNOW_STORAGE, NCDF_SOIL_STORAGE,                     &
-                  NCDF_REFERENCE_ET0,                                       &
-                  NCDF_ACTUAL_ET, NCDF_SNOWMELT, NCDF_TMIN, NCDF_TMAX,      &
-                  NCDF_POTENTIAL_RECHARGE, NCDF_INFILTRATION,               &
-                  NCDF_IRRIGATION, NCDF_RUNOFF_OUTSIDE
-  end enum 
+  public :: minmaxmean
 
 contains
 
@@ -301,7 +254,8 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
-    integer (kind=c_int)  :: iStat(36)
+    integer (kind=c_int)  :: iIndex
+    integer (kind=c_int)  :: iStat(44)
 
     iCount = count( this%active )
 
@@ -313,38 +267,56 @@ contains
     allocate( this%awc(iCount), stat=iStat(6) )
     allocate( this%latitude(iCount), stat=iStat(7) )
     allocate( this%reference_ET0(iCount), stat=iStat(8) )
-    allocate( this%reference_ET0_adj(iCount), stat=iStat(9) )
-    allocate( this%interception_ET(iCount), stat=iStat(10) )
-    allocate( this%actual_ET(iCount), stat=iStat(11) )
-    allocate( this%inflow(iCount), stat=iStat(12))
-    allocate( this%runon(iCount), stat=iStat(13) )
-    allocate( this%runoff(iCount), stat=iStat(14) )
-    allocate( this%outflow(iCount), stat=iStat(15) )
-    allocate( this%infiltration(iCount), stat=iStat(16) )
-    allocate( this%snowfall(iCount), stat=iStat(17) )
-    allocate( this%snowmelt(iCount), stat=iStat(18) )
-    allocate( this%interception(iCount), stat=iStat(19) )
-    allocate( this%rainfall(iCount), stat=iStat(20) )
-    allocate( this%interception_storage(iCount), stat=iStat(21) )
-    allocate( this%snow_storage(iCount), stat=iStat(22) )
-    allocate( this%soil_storage(iCount), stat=iStat(23) )
-    allocate( this%soil_storage_max(iCount), stat=iStat(24) )
-    allocate( this%potential_recharge(iCount), stat=iStat(25) )
-    allocate( this%fog(iCount), stat=iStat(26) )
-    allocate( this%irrigation(iCount), stat=iStat(27) )
-    allocate( this%max_rooting_depth(iCount), stat=iStat(28) )
-    allocate( this%index_order(iCount), stat=iStat(29) )
-    allocate( this%gdd(iCount), stat=iStat(30) )
-    allocate( this%runoff_outside( iCount ), stat=iStat(31) )
-    allocate( this%impervious_fraction( iCount ), stat=iStat(32) )
-    allocate( this%surface_storage( iCount ), stat=iStat(33) ) 
-    allocate( this%surface_storage_excess( iCount ), stat=iStat(34) )
-    allocate( this%surface_storage_max( iCount ), stat=iStat(35) )           
-    allocate( this%canopy_cover_fraction( iCount ), stat=iStat(36) )           
+    allocate( this%actual_ET(iCount), stat=iStat(9) )
+    allocate( this%inflow(iCount), stat=iStat(10))
+    allocate( this%runon(iCount), stat=iStat(11) )
+    allocate( this%runoff(iCount), stat=iStat(12) )
+    allocate( this%outflow(iCount), stat=iStat(13) )
+    allocate( this%infiltration(iCount), stat=iStat(14) )
+    allocate( this%snowfall(iCount), stat=iStat(15) )
+    allocate( this%snowmelt(iCount), stat=iStat(16) )
+    allocate( this%interception(iCount), stat=iStat(17) )
+    allocate( this%rainfall(iCount), stat=iStat(18) )
+    allocate( this%interception_storage(iCount), stat=iStat(19) )
+    allocate( this%snow_storage(iCount), stat=iStat(20) )
+    allocate( this%soil_storage(iCount), stat=iStat(21) )
+    allocate( this%soil_storage_max(iCount), stat=iStat(22) )
+    allocate( this%potential_recharge(iCount), stat=iStat(23) )
+    allocate( this%fog(iCount), stat=iStat(24) )
+    allocate( this%irrigation(iCount), stat=iStat(25) )
+    allocate( this%index_order(iCount), stat=iStat(26) )
+    allocate( this%gdd(iCount), stat=iStat(27) )
+    allocate( this%runoff_outside( iCount ), stat=iStat(28) )
+    allocate( this%impervious_fraction( iCount ), stat=iStat(29) )
+    allocate( this%surface_storage( iCount ), stat=iStat(30) ) 
+    allocate( this%surface_storage_excess( iCount ), stat=iStat(31) )
+    allocate( this%surface_storage_max( iCount ), stat=iStat(32) )           
+    allocate( this%canopy_cover_fraction( iCount ), stat=iStat(33) ) 
+    allocate( this%soil_storage_previous_day( iCount ), stat=iStat(34) )   
+    allocate( this%crop_coefficient_kcb( iCount ), stat=iStat(35) )   
+    allocate( this%potential_snowmelt( iCount ), stat=iStat(36) )  
+    allocate( this%continuous_frozen_ground_index( iCount ), stat=iStat(37) ) 
+    allocate( this%rooting_depth_max( iCount ), stat=iStat(38) )
+    allocate( this%current_rooting_depth( iCount ), stat=iStat(39) )
+    allocate( this%polygon_id( iCount ), stat=iStat(40) )    
+    allocate( this%actual_et_soil( iCount ), stat=iStat(41) )        
+    allocate( this%actual_et_impervious( iCount ), stat=iStat(42) )
+    allocate( this%actual_et_interception( iCount ), stat=iStat(43) )        
+    allocate( this%adjusted_depletion_fraction_p( iCount ), stat=iStat(44) )
 
-    if ( any( iStat /= 0 ) )  call die("Problem allocating memory", __FILE__, __LINE__)
+    do iIndex = 1, ubound( iStat, 1)
+      if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="  &
+        //asCharacter(iIndex), __FILE__, __LINE__ )
+    enddo
+    
+    if (any( iStat /= 0) ) call die ( "Unable to allocate memory for one or more arrays.", __FILE__, __LINE__ )  
 
-    this%max_rooting_depth = pack( pROOTING_DEPTH%rData, this%active )
+    this%fog = 0.0_c_float
+    this%impervious_fraction = 0.0_c_float
+    this%canopy_cover_fraction = 1.0_c_float
+    this%surface_storage = 0.0_c_float
+    this%surface_storage_max = 0.0_c_float
+    this%interception_storage = 0.0_c_float
 
   end subroutine initialize_arrays_sub
 
@@ -355,142 +327,34 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)   :: this
 
     call this%init_interception
+
     call this%init_snowfall
+
     call this%init_snowmelt
+
     call this%init_fog
+
     call this%init_runoff
-    if ( associated( this%init_routing) )  call this%init_routing
-    call this%init_soil_moisture
+
+    call this%init_soil_storage_max
+
+    call this%init_routing
+
+    call this%init_actual_et
+
     call this%init_reference_et
+
     call this%init_precipitation_data
+
     call this%init_GDD
+
     call this%init_irrigation
+
     call this%init_direct_recharge
 
+    call this%init_crop_coefficient
+
   end subroutine initialize_methods_sub
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine initialize_netcdf_output_sub(this)
-
-    class (MODEL_DOMAIN_T), intent(inout)   :: this
-
-    ! [ LOCALS ]
-    integer (kind=c_int) :: iStat
-    integer (kind=c_int) :: iIndex
-
-    allocate ( OUTPUT( NCDF_NUM_OUTPUTS ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
-
-    do iIndex = 1, ubound(OUTPUT, 1)
-      allocate ( OUTPUT(iIndex)%ncfile )
-    enddo  
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_GROSS_PRECIPITATION )%ncfile, &
-      sVariableName="gross_precipitation", sVariableUnits="inches_per_day",                   &
-      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_RAINFALL )%ncfile,            &
-      sVariableName="rainfall", sVariableUnits="inches_per_day",                              &
-      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_INTERCEPTION )%ncfile,        &
-      sVariableName="interception", sVariableUnits="inches_per_day",                          &
-      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_RUNOFF )%ncfile,              &
-      sVariableName="runoff", sVariableUnits="inches_per_day",                                &
-      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_RUNOFF_OUTSIDE )%ncfile,      &
-      sVariableName="runoff_outside", sVariableUnits="inches_per_day",                        &
-      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_RUNON )%ncfile,               &
-      sVariableName="runon", sVariableUnits="inches_per_day",                                 &
-      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0   )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_INFILTRATION )%ncfile,        &
-      sVariableName="infiltration", sVariableUnits="inches_per_day",                          &
-      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_SNOWFALL )%ncfile,            &
-      sVariableName="snowfall", sVariableUnits="inches_per_day",                              &
-      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_SNOWMELT )%ncfile,            &
-      sVariableName="snowmelt", sVariableUnits="inches_per_day",                              &
-      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_SNOW_STORAGE )%ncfile,        &
-      sVariableName="snow_storage", sVariableUnits="inches",                                  &
-      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_SOIL_STORAGE )%ncfile,        &
-      sVariableName="soil_storage", sVariableUnits="inches",                                  &
-      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_POTENTIAL_RECHARGE )%ncfile,  &
-      sVariableName="potential_recharge", sVariableUnits="inches",                            &
-      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_REFERENCE_ET0 )%ncfile,       &
-      sVariableName="reference_ET0", sVariableUnits="inches",                                 &
-      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_ACTUAL_ET )%ncfile,           &
-      sVariableName="actual_ET", sVariableUnits="inches",                                     &
-      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_TMIN )%ncfile,                &
-      sVariableName="tmin", sVariableUnits="degrees Fahrenheit",                              &
-      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_TMAX )%ncfile,                &
-      sVariableName="tmax", sVariableUnits="degrees Fahrenheit",                              &
-      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0  )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=OUTPUT( NCDF_IRRIGATION )%ncfile,          &
-      sVariableName="irrigation", sVariableUnits="inches_per_day",                            &
-      iNX=this%number_of_columns, iNY=this%number_of_rows,                                    &
-      fX=this%X, fY=this%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=pCOORD_GRD%rY, dpLon=pCOORD_GRD%rX, fValidMin=0.0, fValidMax=2000.0 )
-
-      this%dont_care = NC_FILL_FLOAT
-
-  end subroutine initialize_netcdf_output_sub
 
 !--------------------------------------------------------------------------------------------------
   
@@ -569,140 +433,6 @@ contains
 
   end subroutine set_inactive_cells_sub
 
-!--------------------------------------------------------------------------------------------------
-
-  subroutine initialize_landuse_codes_sub( this )
-
-    class (MODEL_DOMAIN_T), intent(inout)     :: this
-
-    ! [ LOCALS ]
-    integer (kind=c_int)                 :: iIndex
-    integer (kind=c_int), allocatable    :: iLandUseCodes(:)
-    type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
-    integer (kind=c_int)                 :: iIndex2
-    integer (kind=c_int)                 :: iCount
-    integer (kind=c_int)                 :: iStat
-    logical (kind=c_bool)                :: lMatch
-    type (STRING_LIST_T)                 :: slList
-
-    call slList%append("LU_Code")
-    call slList%append("LU_code")
-    call slList%append("Landuse_Code")
-    call slList%append("LULC_Code")
-    
-    !> Determine how many landuse codes are present
-    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCodes )
-
-    ! obtain a pointer to the LAND_USE grid
-    pLULC => DAT%find("LAND_USE")
-
-    if ( associated(pLULC) ) then
-
-      if (associated( pLULC%pGrdBase) ) then
-        this%landuse_code = pack( pLULC%pGrdBase%iData, this%active )
-      else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
-      endif  
-    else
-      call die("Attempted use of NULL pointer. Failed to find LAND_USE data element.", &
-        __FILE__, __LINE__)
-    endif
-
-    this%landuse_index = -9999
-    iCount = 0
-    
-
-    do iIndex = 1, ubound(this%landuse_code,1)
-
-      lMatch = lFALSE
-
-      do iIndex2=1, ubound(iLandUseCodes, 1)
-
-        if (this%landuse_code(iIndex) == iLandUseCodes(iIndex2) ) then
-          this%landuse_index(iIndex) = iIndex2
-          iCount = iCount + 1
-          lMatch = lTRUE
-          exit
-        endif
-
-      enddo
-
-      if ( .not. lMatch ) &
-        call LOGS%write("Failed to match landuse code "//asCharacter(this%landuse_code(iIndex) ) &
-          //" with a corresponding landuse code from lookup tables.", iLogLevel=LOG_ALL )
-
-    enddo    
-
-    call LOGS%write("Matches were found between landuse grid value and table value for " &
-      //asCharacter(iCount)//" cells out of a total of "//asCharacter(ubound(this%landuse_code,1))//" active cells.", &
-      iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_ALL)
-
-    if ( count(this%landuse_index < 0) > 0 ) &
-      call warn(asCharacter(count(this%landuse_index < 0))//" negative values are present" &
-      //" in the landuse_index vector.", lFatal=lTRUE, sHints="Negative landuse INDEX values are the " &
-      //"result of landuse values for which no match can be found between the grid file and lookup table.")
-
-    call slList%clear()
-
-  end subroutine initialize_landuse_codes_sub
-
-!--------------------------------------------------------------------------------------------------  
-
-  subroutine read_in_soil_groups_sub( this )
-
-    class (MODEL_DOMAIN_T), intent(inout)     :: this
-
-    ! [ LOCALS ]
-    integer (kind=c_int)                 :: iStat
-    integer (kind=c_int)                 :: iIndex
-    type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
-
-    pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
-    
-    if ( associated(pHSG) ) then
-
-      call pHSG%getvalues()
-
-    else
-    
-      call warn(sMessage="HYDROLOGIC_SOILS_GROUP dataset is flawed or missing.", lFatal=lTRUE,     &
-        iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"  &
-        //" been ~included in the control file for the HYDROLOGIC_SOILS_GROUP dataset.",           &
-        lEcho = lTRUE )
-
-    endif    
-
-  end subroutine read_in_soil_groups_sub
-
-!--------------------------------------------------------------------------------------------------  
-
-  subroutine read_in_land_use_sub( this )
-
-    class (MODEL_DOMAIN_T), intent(inout)     :: this
-
-    ! [ LOCALS ]
-    integer (kind=c_int)                 :: iStat
-    integer (kind=c_int)                 :: iIndex
-    type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
-
-    pLULC => DAT%find("LAND_USE")
-    
-    if ( associated(pLULC) ) then
-
-      call pLULC%getvalues()
-      call grid_WriteArcGrid("Landuse_land_cover__as_read_into_SWB.asc", pLULC%pGrdBase )
-
-    else
-    
-      call warn(sMessage="LAND_USE dataset is flawed or missing.", lFatal=lTRUE,         &
-        iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"   &
-        //" been ~included in the control file for the LAND_USE dataset.",               &
-        lEcho = lTRUE )
-
-    endif    
-
-  end subroutine read_in_land_use_sub
-
 !--------------------------------------------------------------------------------------------------  
 
 !   subroutine read_in_available_water_content_sub( this )
@@ -732,198 +462,6 @@ contains
 
 !   end subroutine read_in_available_water_content_sub
 
-!--------------------------------------------------------------------------------------------------  
-
-  subroutine initialize_soil_groups_sub( this )
-
-    class (MODEL_DOMAIN_T), intent(inout)     :: this
-
-    ! [ LOCALS ]
-    integer (kind=c_int)                 :: iStat
-    integer (kind=c_int)                 :: iIndex
-    type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
-
-    pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
-    
-    if ( associated(pHSG) ) then
-
-      if (associated( pHSG%pGrdBase) ) then
-        this%soil_group = pack( pHSG%pGrdBase%iData, this%active )
-      else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
-      endif  
-    else
-      call die("Attempted use of NULL pointer. Failed to find HYDROLOGIC_SOILS_GROUP data element.", &
-        __FILE__, __LINE__)
-    endif
-
-    call LOGS%write("Hydrologic soils groups as read into SWB data structure", iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_DEBUG)
-
-    do iIndex = 1, maxval(pHSG%pGrdBase%iData)
-
-      call LOGS%write( asCharacter(count(MODEL%soil_group == iIndex) )//" cells belong to soils group " &
-        //asCharacter(iIndex), iLogLevel=LOG_DEBUG )
-      
-    end do    
-
-    call LOGS%write("", iLinesBefore=1, iLogLevel=LOG_DEBUG)
-
-  end subroutine initialize_soil_groups_sub
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine initialize_soil_storage_max_sub( this )
-
-    class (MODEL_DOMAIN_T), intent(inout)     :: this
-
-    ! [ LOCALS ]
-    type ( GENERAL_GRID_T ), pointer :: pTempGrd
-
-    this%soil_storage_max = this%max_rooting_depth * this%awc
-
-    pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
-        rX0=this%X_ll, rY0=this%Y_ll, &
-        rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
-
-    pTempGrd%rData = unpack( this%soil_storage_max, this%active, this%dont_care )
-
-    call grid_WriteArcGrid( sFilename="Soil_Storage_Maximum__as_calculated_inches.asc", pGrd=pTempGrd )
-
-    call grid_Destroy( pTempGrd )
-
-  end subroutine initialize_soil_storage_max_sub  
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine initialize_percent_impervious_sub( this )
-
-    class (MODEL_DOMAIN_T), intent(inout)     :: this
-    ! [ LOCALS ]
-    integer (kind=c_int)                 :: iStat
-    integer (kind=c_int)                 :: iIndex
-    type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_IMPERVIOUS
-    type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_PERVIOUS      
-    type ( GENERAL_GRID_T ), pointer     :: pTempGrd
-
-    pPERCENT_IMPERVIOUS => DAT%find("PERCENT_IMPERVIOUS_COVER")
-    pPERCENT_PERVIOUS => DAT%find("PERCENT_PERVIOUS_COVER")
-
-    if ( associated(pPERCENT_IMPERVIOUS) ) then
-
-      call pPERCENT_IMPERVIOUS%getvalues()
-
-      if (associated( pPERCENT_IMPERVIOUS%pGrdBase) ) then
-        this%impervious_fraction = pack( pPERCENT_IMPERVIOUS%pGrdBase%rData/100.0_c_float, this%active )
-      else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
-      endif  
-
-    elseif ( associated( pPERCENT_PERVIOUS ) ) then
-
-      call pPERCENT_PERVIOUS%getvalues()
-
-      if (associated( pPERCENT_PERVIOUS%pGrdBase) ) then
-        this%impervious_fraction = pack( (1.0_c_float - pPERCENT_PERVIOUS%pGrdBase%rData/100.0_c_float), this%active )
-      else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
-      endif  
-
-    else
-
-      this%impervious_fraction = 0.0_c_float
-
-    endif
-
-    pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
-        rX0=this%X_ll, rY0=this%Y_ll, &
-        rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
-
-    pTempGrd%rData = unpack( this%impervious_fraction, this%active, this%dont_care )
-
-    call grid_WriteArcGrid( sFilename="Fraction_impervious_surface__as_read_in_unitless.asc", pGrd=pTempGrd )
-
-    call grid_Destroy( pTempGrd )
-
-  end subroutine initialize_percent_impervious_sub  
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine initialize_percent_canopy_cover_sub( this )
-
-    class (MODEL_DOMAIN_T), intent(inout)     :: this
-    ! [ LOCALS ]
-    integer (kind=c_int)                 :: iStat
-    integer (kind=c_int)                 :: iIndex
-    type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_CANOPY_COVER
-    type ( GENERAL_GRID_T ), pointer     :: pTempGrd
-
-    pPERCENT_CANOPY_COVER => DAT%find("PERCENT_CANOPY_COVER")
-
-    if ( associated(pPERCENT_CANOPY_COVER) ) then
-
-      call pPERCENT_CANOPY_COVER%getvalues()
-
-      if (associated( pPERCENT_CANOPY_COVER%pGrdBase) ) then
-        this%canopy_cover_fraction = pack( pPERCENT_CANOPY_COVER%pGrdBase%rData/100.0_c_float, this%active )
-      else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
-      endif  
-
-    else
-
-      this%canopy_cover_fraction = 1.0_c_float
-
-    endif
-
-    pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
-        rX0=this%X_ll, rY0=this%Y_ll, &
-        rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
-
-    pTempGrd%rData = unpack( this%canopy_cover_fraction, this%active, this%dont_care )
-
-    call grid_WriteArcGrid( sFilename="Fraction_canopy_cover__as_read_in_unitless.asc", pGrd=pTempGrd )
-
-    call grid_Destroy( pTempGrd )
-
-  end subroutine initialize_percent_canopy_cover_sub  
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine initialize_latitude_sub(this)
-
-    class (MODEL_DOMAIN_T), intent(inout)     :: this
-
-    ! [ LOCALS ]
-    integer (kind=c_int)                 :: iIndex
-
-    pCOORD_GRD => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
-        rX0=this%X_ll, rY0=this%Y_ll, &
-        rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
-
-    allocate ( this%X(this%number_of_columns ) )
-    allocate ( this%Y(this%number_of_rows ) )
-
-    ! call the grid routine to populate the X and Y values
-    call grid_PopulateXY( pCOORD_GRD )
-
-    ! populating these in order to have them available later for use in writing results to NetCDF
-    this%X = pCOORD_GRD%rX( :, 1 )
-    this%Y = pCOORD_GRD%rY( 1, : ) 
-
-    ! transform to unprojected (lat/lon) coordinate system
-    call grid_Transform(pGrd=pCOORD_GRD, sFromPROJ4=this%PROJ4_string, &
-        sToPROJ4="+proj=lonlat +ellps=GRS80 +datum=WGS84 +no_defs" )
-    
-    this%latitude = pack( pCOORD_GRD%rY, this%active )
-
-    pCOORD_GRD%rData=pCOORD_GRD%rX
-    call grid_WriteArcGrid( sFilename="Longitude__calculated.asc", pGrd=pCOORD_GRD )
-    pCOORD_GRD%rData=pCOORD_GRD%rY
-    call grid_WriteArcGrid( sFilename="Latitude__calculated.asc", pGrd=pCOORD_GRD )
-
-
-  end subroutine initialize_latitude_sub
-
 !--------------------------------------------------------------------------------------------------
 
   subroutine get_climate_data(this)
@@ -951,215 +489,9 @@ contains
 
       call this%calculate_mean_air_temperature()
 
-      ! partition precipitation into rainfall and snowfall fractions
-      call this%calc_snowfall()
-
-      ! update growing degree day statistic
-      call this%calc_GDD()
-
     end associate
 
   end subroutine get_climate_data
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine write_variables_to_netcdf(this)
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-    ! [ LOCALS ]
-    integer (kind=c_int) :: iIndex
-
-    ! first put out the current time variable for all open NetCDF files
-    do iIndex = 1, ubound( OUTPUT, 1 )
-
-
-      call netcdf_put_variable_vector(NCFILE=OUTPUT(iIndex)%ncfile, &
-         iVarID=OUTPUT(iIndex)%ncfile%iVarID(NC_TIME), &
-         iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t)], &
-         iCount=[1_c_size_t], &
-         iStride=[1_c_ptrdiff_t], &
-         dpValues=[real(SIM_DT%iNumDaysFromOrigin, kind=c_double)])
-
-    enddo
-
-    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_GROSS_PRECIPITATION )%ncfile,     &
-            iVarID=OUTPUT( NCDF_GROSS_PRECIPITATION )%ncfile%iVarID(NC_Z),                      &
-            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
-                                int(this%number_of_columns, kind=c_size_t) ],                   &
-            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=this%active,                                                                  &
-            rValues=this%gross_precip,                                                          &
-            rField=this%dont_care )
-
-    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_INTERCEPTION )%ncfile,            &
-            iVarID=OUTPUT( NCDF_INTERCEPTION )%ncfile%iVarID(NC_Z),                             &
-            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
-                                int(this%number_of_columns, kind=c_size_t) ],                   &
-            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=this%active,                                                                  &
-            rValues=this%interception,                                                          &
-            rField=this%dont_care )
-
-    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_RUNOFF )%ncfile,                  &
-            iVarID=OUTPUT( NCDF_RUNOFF )%ncfile%iVarID(NC_Z),                                   &
-            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
-                                int(this%number_of_columns, kind=c_size_t) ],                   &
-            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=this%active,                                                                  &
-            rValues=this%runoff,                                                                &
-            rField=this%dont_care )
-
-    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_RUNOFF_OUTSIDE )%ncfile,          &
-            iVarID=OUTPUT( NCDF_RUNOFF_OUTSIDE )%ncfile%iVarID(NC_Z),                           &
-            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
-                                int(this%number_of_columns, kind=c_size_t) ],                   &
-            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=this%active,                                                                  &
-            rValues=this%runoff_outside,                                                        &
-            rField=this%dont_care )
-
-    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_RUNON )%ncfile,                   &
-            iVarID=OUTPUT( NCDF_RUNON )%ncfile%iVarID(NC_Z),                                    &
-            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
-                                int(this%number_of_columns, kind=c_size_t) ],                   &
-            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=this%active,                                                                  &
-            rValues=this%runon,                                                                 &
-            rField=this%dont_care )
-
-    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_INFILTRATION )%ncfile,            &
-            iVarID=OUTPUT( NCDF_INFILTRATION )%ncfile%iVarID(NC_Z),                             &
-            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
-                                int(this%number_of_columns, kind=c_size_t) ],                   &
-            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=this%active,                                                                  &
-            rValues=this%infiltration,                                                          &
-            rField=this%dont_care )
-
-    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_SNOWFALL )%ncfile,                &
-            iVarID=OUTPUT( NCDF_SNOWFALL )%ncfile%iVarID(NC_Z),                                 &
-            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
-                                int(this%number_of_columns, kind=c_size_t) ],                   &
-            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=this%active,                                                                  &
-            rValues=this%snowfall,                                                              &
-            rField=this%dont_care )
-
-    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_SNOWMELT )%ncfile,                &
-            iVarID=OUTPUT( NCDF_SNOWMELT )%ncfile%iVarID(NC_Z),                                 &
-            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
-                                int(this%number_of_columns, kind=c_size_t) ],                   &
-            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=this%active,                                                                  &
-            rValues=this%snowmelt,                                                              &
-            rField=this%dont_care )
-
-    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_SNOW_STORAGE )%ncfile,            &
-            iVarID=OUTPUT( NCDF_SNOW_STORAGE )%ncfile%iVarID(NC_Z),                             &
-            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
-                                int(this%number_of_columns, kind=c_size_t) ],                   &
-            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=this%active,                                                                  &
-            rValues=this%snow_storage,                                                          &
-            rField=this%dont_care )
-
-    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_SOIL_STORAGE )%ncfile,            &
-            iVarID=OUTPUT( NCDF_SOIL_STORAGE )%ncfile%iVarID(NC_Z),                             &
-            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
-                                int(this%number_of_columns, kind=c_size_t) ],                   &
-            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=this%active,                                                                  &
-            rValues=this%soil_storage,                                                          &
-            rField=this%dont_care )
-
-    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_POTENTIAL_RECHARGE )%ncfile,      &
-            iVarID=OUTPUT( NCDF_POTENTIAL_RECHARGE )%ncfile%iVarID(NC_Z),                       &
-            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
-                                int(this%number_of_columns, kind=c_size_t) ],                   &
-            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=this%active,                                                                  &
-            rValues=this%potential_recharge,                                                    &
-            rField=this%dont_care )
-
-    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_REFERENCE_ET0 )%ncfile,           &
-            iVarID=OUTPUT( NCDF_REFERENCE_ET0 )%ncfile%iVarID(NC_Z),                            &
-            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
-                                int(this%number_of_columns, kind=c_size_t) ],                   &
-            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=this%active,                                                                  &
-            rValues=this%reference_ET0,                                                         &
-            rField=this%dont_care )
-
-    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_ACTUAL_ET )%ncfile,               &
-            iVarID=OUTPUT( NCDF_ACTUAL_ET )%ncfile%iVarID(NC_Z),                                &
-            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
-                                int(this%number_of_columns, kind=c_size_t) ],                   &
-            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=this%active,                                                                  &
-            rValues=this%actual_et,                                                             &
-            rField=this%dont_care )
-
-    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_TMIN )%ncfile,                    &
-            iVarID=OUTPUT( NCDF_TMIN )%ncfile%iVarID(NC_Z),                                     &
-            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
-                                int(this%number_of_columns, kind=c_size_t) ],                   &
-            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=this%active,                                                                  &
-            rValues=this%tmin,                                                                  &
-            rField=this%dont_care )
-
-    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_TMAX )%ncfile,                    &
-            iVarID=OUTPUT( NCDF_TMAX )%ncfile%iVarID(NC_Z),                                     &
-            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
-                                int(this%number_of_columns, kind=c_size_t) ],                   &
-            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=this%active,                                                                  &
-            rValues=this%tmax,                                                                  &
-            rField=this%dont_care )
-
-    call netcdf_put_packed_variable_array(NCFILE=OUTPUT( NCDF_IRRIGATION )%ncfile,              &
-            iVarID=OUTPUT( NCDF_IRRIGATION )%ncfile%iVarID(NC_Z),                               &
-            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(this%number_of_rows, kind=c_size_t),                       &
-                                int(this%number_of_columns, kind=c_size_t) ],                   &
-            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=this%active,                                                                  &
-            rValues=this%irrigation,                                                            &
-            rField=this%dont_care )
-
-    call this%output_GDD()
-
-  end subroutine write_variables_to_netcdf
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine calculate_mass_balance_sub(this)
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-    call this%calc_GDD()
-    call this%calculate_interception_mass_balance_sub()
-    call this%calculate_impervious_surface_mass_balance_sub()
-    call this%calculate_snow_mass_balance_sub()
-    call this%calculate_soil_mass_balance_sub()
-
-  end subroutine calculate_mass_balance_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1169,50 +501,50 @@ contains
 
     if (.not. associated( this%init_interception) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+    if (.not. associated( this%calc_interception) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ ) 
+
+    if (.not. associated( this%init_irrigation) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+    if (.not. associated( this%calc_irrigation) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%init_runoff) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+    if (.not. associated( this%calc_runoff) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%init_reference_et) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
-
-    if (.not. associated( this%init_snowfall) ) &
+    if (.not. associated( this%calc_reference_et) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%init_snowmelt) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+    if (.not. associated( this%calc_snowmelt) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
-    if (.not. associated( this%init_irrigation) ) &
+    if (.not. associated( this%init_snowfall) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+    if (.not. associated( this%calc_snowfall) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%init_GDD) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+    if (.not. associated( this%calc_GDD) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
-    if (.not. associated( this%calc_interception) ) &
+    if (.not. associated( this%init_routing) ) &
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )    
+    if (.not. associated( this%calc_routing) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%init_direct_recharge) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
-
     if (.not. associated( this%calc_direct_recharge) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
-    if (.not. associated( this%calc_runoff) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
-
-    if (.not. associated( this%calc_reference_et) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
-
-    if (.not. associated( this%calc_snowfall) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
-
-    if (.not. associated( this%calc_snowmelt) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
-
-    if (.not. associated( this%calc_irrigation) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
-
-    if (.not. associated( this%calc_GDD) ) &
+    if (.not. associated( this%init_soil_storage_max) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
 
     if (.not. associated( this%get_precipitation_data ) ) &
@@ -1226,267 +558,9 @@ contains
 
   end subroutine preflight_check_method_pointers
 
-!--------------------------------------------------------------------------------------------------
-
-  subroutine calculate_impervious_surface_mass_balance_sub(this)
-
-    class (MODEL_DOMAIN_T), intent(inout)   :: this
-
-    this%surface_storage = this%surface_storage + this%rainfall + this%snowmelt
-
-    this%actual_ET = this%actual_ET + min( this%reference_ET0, this%surface_storage) * this%impervious_fraction
-      
-    this%surface_storage = this%surface_storage - min( this%reference_ET0, this%surface_storage)
-
-    this%surface_storage_excess = max( 0.0_c_float,                                                            &
-                                         this%surface_storage - this%surface_storage_max )
-
-  end subroutine calculate_impervious_surface_mass_balance_sub    
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine calculate_interception_mass_balance_sub(this)
-
-    class (MODEL_DOMAIN_T), intent(inout)   :: this
-
-    call this%calc_reference_et()
-    call this%calc_fog()
-    call this%calc_interception()
-
-    this%interception_storage = this%interception_storage + this%interception
-    this%actual_ET = min( this%reference_ET0, this%interception_storage) * this%impervious_fraction
-
-  end subroutine calculate_interception_mass_balance_sub
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine calculate_snow_mass_balance_sub(this)
-
-    class (MODEL_DOMAIN_T), intent(inout)   :: this
-
-    ! [ LOCALS ]
-    integer (kind=c_int) :: iStat
-
-    if (.not. allocated(CFGI) ) call initialize_continuous_frozen_ground_index( count( this%active ) )
-
-    call this%calc_snowmelt
-
-    this%snow_storage = this%snow_storage + this%snowfall
-    this%snow_storage = this%snow_storage - this%snowmelt
-
-    call update_continuous_frozen_ground_index( CFGI, this%tmin, this%tmax, this%snow_storage )
-
-  end subroutine calculate_snow_mass_balance_sub
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine initialize_root_zone_depths_sub( this )
-
-    use strings
-    use string_list
-
-    class (MODEL_DOMAIN_T), intent(inout)   :: this
-
-    ! [ LOCALS ]
-    integer (kind=c_int)              :: iNumActiveCells
-    integer (kind=c_int)              :: iStat
-    integer (kind=c_int)              :: iNumberOfLanduses
-    integer (kind=c_int)              :: iNumberOfSoilGroups
-    integer (kind=c_int)              :: iSoilsIndex
-    integer (kind=c_int)              :: iLUIndex
-    integer (kind=c_int), allocatable :: iLanduseCodes(:)
-    type (STRING_LIST_T)              :: slList
-    type (STRING_LIST_T)              :: slRZ
-    integer (kind=c_int), allocatable :: iRZ_SeqNums(:) 
-    real (kind=c_float), allocatable  :: RZ(:)
-    character (len=:), allocatable    :: sText
-    real (kind=c_float), allocatable  :: water_capacity(:)
-    integer (kind=c_int)              :: iIndex
-    type (GENERAL_GRID_T), pointer    :: pTempGrd
-
-    type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
-    type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
-
-    pLULC => DAT%find("LAND_USE")
-    pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
-    
-    call assert( associated( pLULC), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pLULC", &
-      __FILE__, __LINE__ )
-
-    call assert( associated( pLULC%pGrdBase ),   &
-      "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pLULC%pGrdBase", __FILE__, __LINE__ )
-
-    call assert( allocated( pLULC%pGrdBase%iData ),   &
-      "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pLULC%pGrdBase%iData", __FILE__, __LINE__ )
-
-    call assert( associated( pHSG), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pHSG", &
-      __FILE__, __LINE__ )
-
-    call assert( associated( pHSG%pGrdBase ),      & 
-      "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pHSG%pGrdBase", __FILE__, __LINE__ )
-
-    call assert( allocated( pHSG%pGrdBase%iData ),      & 
-      "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pHSG%pGrdBase%iData", __FILE__, __LINE__ )
-
-
-    pROOTING_DEPTH => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
-        rX0=this%X_ll, rY0=this%Y_ll, &
-        rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
-
-    iNumActiveCells = ubound(this%soil_storage_max,1)
-
-    call slList%append("LU_Code")
-    call slList%append("Landuse_Code")
-    call slList%append("Landuse_Lookup_Code")
-
-    !> Determine how many soil groups are present
-
-    ! retrieve a string list of all keys associated with root zone depth (i.e. RZ_1, RZ_2, RZ_3, etc.)
-    slRZ = PARAMS_DICT%grep_keys("RZ")
-    ! Convert the string list to an vector of integers; this call strips off the "RZ_" part of label
-    iRZ_SeqNums = slRZ%asInt()
-    ! count how many items are present in the vector; this should equal the number of soils groups
-    iNumberOfSoilGroups = count( iRZ_SeqNums > 0 )
-
-    !> Determine how many landuse codes are present
-    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCodes )
-    iNumberOfLanduses = count( iLanduseCodes >= 0 )
-
-    allocate( MAX_ROOTING_DEPTH(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
-    call assert( iStat == 0, "Failed to allocate memory for maximum rooting depth table", &
-      __FILE__, __LINE__)
-
-    ! we should have the max rooting depth table fully filled out following this block
-    do iSoilsIndex = 1, iNumberOfSoilGroups
-      sText = "RZ_"//asCharacter(iSoilsIndex)
-      call PARAMS%get_parameters( sKey=sText, fValues=RZ )
-      MAX_ROOTING_DEPTH(:, iSoilsIndex) = RZ
-    enddo  
-
-    call LOGS%WRITE( "Landuse Code |  Soils Code  | Number of Matches",              &
-      iLogLevel = LOG_DEBUG, lEcho = lFALSE )
-    call LOGS%WRITE( "-------------|--------------|------------------- ",            &
-      iLogLevel = LOG_DEBUG, lEcho = lFALSE )
-
-    do iSoilsIndex = 1, iNumberOfSoilGroups
-      do iLUIndex = 1, iNumberOfLanduses
-
-        call LOGS%WRITE( asCharacter(iLanduseCodes( iLUIndex) )//" | "//asCharacter(iSoilsIndex)//" | "//    &
-            asCharacter(count( pLULC%pGrdBase%iData == iLanduseCodes( iLUIndex)             &
-                                 .and. pHSG%pGrdBase%iData == iSoilsIndex ) ),              &
-                                 iLogLevel = LOG_DEBUG, lEcho = lFALSE )
-
-
-         where ( pLULC%pGrdBase%iData == iLanduseCodes( iLUIndex) .and. pHSG%pGrdBase%iData == iSoilsIndex )
-
-           pROOTING_DEPTH%rData = MAX_ROOTING_DEPTH( iLUIndex, iSoilsIndex )
-
-         endwhere 
-
-      enddo
-
-    enddo
-
-    call slList%clear()
-
-    call grid_WriteArcGrid("Maximum_rooting_depth.asc", pROOTING_DEPTH )
-
-  end subroutine initialize_root_zone_depths_sub
-
   !------------------------------------------------------------------------------------------------
 
-  subroutine calculate_soil_mass_balance_sub(this)
-
-    use routing__D8
-
-    class (MODEL_DOMAIN_T), intent(inout)   :: this
-
-    ! [ LOCALS ]
-    integer (kind=c_int) :: index
-    integer (kind=c_int) :: orderindex
-    integer (kind=c_int) :: targetindex
-
-    call this%calc_irrigation()
-
-    if ( associated(this%calc_routing) ) then
-
-      this%runon = 0.0_c_float
-
-      do index=lbound( ORDER_INDEX, 1 ), ubound( ORDER_INDEX, 1 )
-
-        orderindex = ORDER_INDEX( index )
-        targetindex = TARGET_INDEX( index )
-
-        this%inflow( orderindex ) =   this%runon( orderindex )                      &
-                                    + this%rainfall( orderindex )                   &
-                                    + this%fog( orderindex )                        &
-                                    + this%irrigation( orderindex )                 &
-                                    + this%snowmelt( orderindex )                   &
-                                    - this%interception( orderindex )                      
-                             
-
-        if ( this%soil_storage_max( orderindex ) .approxequal. 0.0_c_float ) then
-
-          ! this is an open water cell; special treatment
-          this%runoff_outside( orderindex ) =   &
-            max( 0.0_c_float, this%inflow( orderindex ) - this%reference_ET0( orderindex ) )
-          this%actual_ET( orderindex ) = this%reference_ET0( orderindex )    
-          
-          this%potential_recharge( orderindex ) = 0.0_c_float
-
-        else
-
-          ! this is a normal (non open water) cell
-
-          call this%calc_runoff( orderindex )
- 
-          this%infiltration( orderindex ) = this%inflow( orderindex ) - this%runoff( orderindex )
-
-          if ( targetindex > 0)  this%runon( targetindex ) = this%runoff( orderindex )
-     
-          call this%calc_soil_moisture( orderindex )          
-
-        endif
-
-      enddo
-
-    else   ! no routing
-
-      this%runon = 0.0_c_float
-
-      this%inflow =   this%rainfall                  &
-                    + this%fog                       &
-                    + this%irrigation                &
-                    + this%snowmelt                  &
-                    - this%interception
-
-      call this%calc_runoff()
-      call this%calc_soil_moisture()
-
-      where ( this%soil_storage_max .approxequal. 0.0_c_float )
-
-        this%runoff_outside = max( 0.0_c_float, this%inflow - this%reference_ET0 )
-        this%actual_ET = this%reference_ET0
-        this%potential_recharge = 0.0_c_float
-        this%runoff = 0.0_c_float
-        this%infiltration = 0.0_c_float
-
-      else where
-
-        this%infiltration = this%inflow - this%runoff
-
-      end where
-
-    endif
-
-    ! add any other direct recharge terms to the potential recharge based on the water balance
-    call this%calc_direct_recharge()
-   
-  end subroutine calculate_soil_mass_balance_sub
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine set_method_sub(this, sCmdText, sMethodName)
+  subroutine set_method_pointers_sub(this, sCmdText, sMethodName)
 
     class (MODEL_DOMAIN_T), intent(inout)   :: this
     character (len=*), intent(in)           :: sCmdText
@@ -1505,14 +579,14 @@ contains
         this%init_GDD => model_initialize_GDD
         this%calc_GDD => model_calculate_GDD
 
-        call LOGS%WRITE( "==> BUCKET INTERCEPTION submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> BUCKET INTERCEPTION submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( sMethodName .strequal. "GASH" ) then
 
         this%init_interception => model_initialize_interception_gash
         this%calc_interception => model_calculate_interception_gash
 
-        call LOGS%WRITE( "==> GASH INTERCEPTION submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> GASH INTERCEPTION submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
@@ -1528,14 +602,14 @@ contains
         this%init_runoff => model_initialize_runoff_curve_number
         this%calc_runoff => model_calculate_runoff_curve_number
 
-        call LOGS%WRITE( "==> CURVE NUMBER RUNOFF submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> CURVE NUMBER RUNOFF submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( sMethodName .strequal. "RUNOFF_RATIO" ) .or. ( sMethodName .strequal. "MONTHLY_GRID" ) ) then
 
         this%init_runoff => model_initialize_runoff_gridded_values
         this%calc_runoff => model_calculate_runoff_gridded_values
 
-        call LOGS%WRITE( "==> RUNOFF RATIO submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> RUNOFF RATIO submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
@@ -1551,14 +625,14 @@ contains
         this%init_snowfall => model_initialize_snowfall_original
         this%calc_snowfall => model_calculate_snowfall_original
 
-        call LOGS%WRITE( "==> ORIGINAL SNOWFALL submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> ORIGINAL SNOWFALL submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( sMethodName .strequal. "PRMS" ) then
 
         this%init_snowfall => model_initialize_snowfall_prms
         this%calc_snowfall => model_calculate_snowfall_prms
 
-        call LOGS%WRITE( "==> PRMS SNOWFALL submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> PRMS SNOWFALL submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
@@ -1574,14 +648,14 @@ contains
         this%init_awc => model_initialize_available_water_content_table
         this%read_awc_data => model_read_available_water_content_table
 
-        call LOGS%WRITE( "==> TABLE method for populating AVAILABLE_WATER_CONTENT selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> TABLE method for populating AVAILABLE_WATER_CONTENT selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( sMethodName .strequal. "GRID" ) .or. ( sMethodName .strequal. "GRIDDED" ) ) then
 
         this%init_awc => model_initialize_available_water_content_gridded
         this%read_awc_data => model_read_available_water_content_gridded
 
-        call LOGS%WRITE( "==> GRIDDED VALUES method for populating AVAILABLE_WATER_CONTENT selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> GRIDDED VALUES method for populating AVAILABLE_WATER_CONTENT selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
@@ -1597,15 +671,37 @@ contains
         this%init_routing => model_initialize_routing_D8
         this%calc_routing => model_calculate_routing_D8
 
-        call LOGS%WRITE( "==> D8 FLOW ROUTING submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> D8 FLOW ROUTING submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
-        this%init_routing => null()
-        this%calc_routing => null()
+        this%init_routing => model_initialize_routing_none
+        this%calc_routing => model_calculate_routing_none
 
         call LOGS%WRITE( "==> NULL FLOW ROUTING submodel selected -- NO routing will be performed.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
+
+      endif
+
+    elseif ( ( sCmdText .contains. "CROP_COEFFICIENT" )    &
+        .or. ( sCmdText .contains. "CROP_COEF" ) )  then
+
+      if ( ( sMethodName .strequal. "FAO56" )  &
+             .or. ( sMethodName .strequal. "FAO-56" ) ) then
+
+        this%init_crop_coefficient => model_initialize_crop_coefficient_FAO56
+        this%update_crop_coefficient => model_update_crop_coefficient_FAO56
+
+        call LOGS%WRITE( "==> FAO-56 crop coefficient calculation method selected.", iLogLevel = LOG_ALL, &
+           lEcho = lFALSE )
+
+      else
+
+        this%init_crop_coefficient => model_initialize_crop_coefficient_none
+        this%update_crop_coefficient => model_update_crop_coefficient_none
+
+        call LOGS%WRITE( "==> NO crop coefficient calculation method selected. Kcb defaults to 1.0.",     &
+          iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       endif
 
@@ -1616,14 +712,14 @@ contains
         this%init_fog => model_initialize_fog_monthly_grid
         this%calc_fog => model_calculate_fog_monthly_grid
 
-        call LOGS%WRITE( "==> MONTHLY_GRID FOG submodel selected.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> MONTHLY_GRID FOG submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
         this%init_fog => model_initialize_fog_none
         this%calc_fog => model_calculate_fog_none
 
-        call LOGS%WRITE( "==> NULL FOG submodel selected (i.e. no fog term).", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> NULL FOG submodel selected (i.e. no fog term).", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       endif
 
@@ -1640,16 +736,36 @@ contains
         this%init_GDD => model_initialize_GDD
         this%calc_GDD => model_calculate_GDD
 
-        call LOGS%WRITE( "==> IRRIGATION will be calculated and applied as needed.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> IRRIGATION will be calculated and applied as needed.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
         this%init_irrigation => model_initialize_irrigation_none
         this%calc_irrigation => model_calculate_irrigation_none
 
-        call LOGS%WRITE( "==> IRRIGATION will *NOT* be active.", iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> IRRIGATION will *NOT* be active.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       endif
+
+
+    elseif ( sCmdText .contains. "SOIL_STORAGE_MAX" ) then
+
+      if ( sMethodName .strequal. "GRIDDED" ) then
+
+        this%init_soil_storage_max => model_initialize_soil_storage_max_gridded
+
+        call LOGS%WRITE( "==> SOIL_STORAGE_MAX will be read from a grid. Rooting depths will be recalculated" &
+          //" as ~SOIL_STORAGE_MAX / AWC.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+
+      else
+
+        this%init_soil_storage_max => model_initialize_soil_storage_max_internally_calculated
+
+        call LOGS%WRITE( "==> SOIL_STORAGE_MAX will be internally calculated from the given AWC and rooting depth values.",   &
+          iLogLevel = LOG_ALL, lEcho = lFALSE )
+
+      endif
+
 
     elseif ( sCmdText .contains. "EVAPOTRANSPIRATION" ) then
 
@@ -1660,7 +776,7 @@ contains
         this%calc_reference_et => model_calculate_et_hargreaves
 
         call LOGS%WRITE( "==> HARGREAVES-SAMANI EVAPOTRANSPIRATION submodel selected.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( sMethodName .strequal. "JENSEN-HAISE" ) &
            .or. ( sMethodName .strequal. "JH" ) ) then
@@ -1669,7 +785,7 @@ contains
         this%calc_reference_et => model_calculate_et_jensen_haise
 
         call LOGS%WRITE( "==> JENSEN_HAISE EVAPOTRANSPIRATION submodel selected.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( sMethodName .strequal. "MONTHLY_GRID" ) &
            .or. ( sMethodName .strequal. "MONTHLY_GRIDDED" ) ) then
@@ -1678,7 +794,7 @@ contains
         this%calc_reference_et => model_calculate_et_monthly_grid
 
         call LOGS%WRITE( "==> MONTHLY_GRID EVAPOTRANSPIRATION submodel selected.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( sMethodName .strequal. "DAILY_GRID" ) &
            .or. ( sMethodName .strequal. "DAILY_GRIDDED" ) ) then
@@ -1687,7 +803,7 @@ contains
         this%calc_reference_et => model_calculate_et_daily_grid
 
         call LOGS%WRITE( "==> DAILY_GRID EVAPOTRANSPIRATION submodel selected.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
@@ -1705,7 +821,7 @@ contains
         this%get_precipitation_data => model_get_precip_normal
 
         call LOGS%WRITE( "==> STANDARD PRECIPITATION submodel selected.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( sMethodName .strequal. "METHOD_OF_FRAGMENTS" ) &
            .or. ( sMethodName .strequal. "FRAGMENTS" ) ) then
@@ -1714,7 +830,7 @@ contains
         this%get_precipitation_data => model_get_precip_method_of_fragments
 
         call LOGS%WRITE( "==> METHOD OF FRAGMENTS PRECIPITATION submodel selected.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
@@ -1732,7 +848,7 @@ contains
         this%calc_direct_recharge => model_calculate_direct_recharge_gridded
 
         call LOGS%WRITE( "==> GRIDDED values for water main leakage (etc.) will be used.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
@@ -1745,19 +861,19 @@ contains
 
       if ( ( sMethodName .strequal. "T-M" ) .or. ( sMethodName .strequal. "THORNTHWAITE-MATHER" ) ) then
 
-        this%init_soil_moisture => model_initialize_soil_moisture_thornthwaite_mather
-        this%calc_soil_moisture => model_calculate_soil_moisture_thornthwaite_mather
+        this%init_actual_et => model_initialize_actual_et_thornthwaite_mather
+        this%calc_actual_et => model_calculate_actual_et_thornthwaite_mather
 
-        call LOGS%WRITE( "==> THORNTHWAITE-MATHER SOIL MOISTURE submodel selected.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> THORNTHWAITE-MATHER SOIL MOISTURE RETENTION submodel selected.", &
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( sMethodName .strequal. "FAO56" ) .or. ( sMethodName .strequal. "FAO-56" ) ) then
 
-        this%init_soil_moisture => model_initialize_soil_moisture_fao_56
-        this%calc_soil_moisture => model_calculate_soil_moisture_fao_56
+        this%init_actual_et => model_initialize_actual_et_fao56
+        this%calc_actual_et => model_calculate_actual_et_fao56
 
-        call LOGS%WRITE( "==> FAO-56 SOIL MOISTURE submodel selected.", &
-            iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        call LOGS%WRITE( "==> FAO-56 SOIL MOISTURE RETENTION submodel selected.", &
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
@@ -1773,7 +889,7 @@ contains
 
     endif 
 
-  end subroutine set_method_sub
+  end subroutine set_method_pointers_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1796,7 +912,6 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     this%interception = interception_bucket_calculate( this%landuse_index, this%rainfall, this%fog )
-    this%interception_ET = this%interception
 
   end subroutine model_calculate_interception_bucket
 
@@ -1843,9 +958,27 @@ contains
                                P_SAT,                                                     &
                                this%interception )
 
-    this%interception_ET = this%interception
-
   end subroutine model_calculate_interception_gash
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_routing_none(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_initialize_routing_none  
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_routing_none(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    ! no routing to be done; just call the runoff calculation routine and move on
+    this%runon = 0.0_c_float
+    call this%calc_runoff()
+
+  end subroutine model_calculate_routing_none  
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1863,12 +996,27 @@ contains
 
   subroutine model_calculate_routing_D8(this)
 
-    use routing__D8
+    use routing__D8, only   : TARGET_INDEX, ORDER_INDEX
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-!    call routing_D8_calculate( fRunoff=this%runoff, fRunon=this%runon )
+    ! [ LOCALS ]
+    integer (kind=c_int) :: index
 
+    this%runon=0.0_c_float
+
+    do index=lbound( ORDER_INDEX, 1 ), ubound( ORDER_INDEX, 1 )
+
+      call this%calc_runoff( index )
+
+      if ( (    TARGET_INDEX( index ) >= lbound( ORDER_INDEX, 1) ) &
+        .and. ( TARGET_INDEX( index ) <= ubound( ORDER_INDEX, 1) ) ) then
+
+        this%runon( TARGET_INDEX( index ) ) = this%runoff( ORDER_INDEX( index ) )
+
+      endif  
+      
+    enddo
 
   end subroutine model_calculate_routing_D8  
 
@@ -1894,8 +1042,6 @@ contains
 
   subroutine model_initialize_snowfall_prms(this)
 
-!    use snowfall__prms
-
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
   end subroutine model_initialize_snowfall_prms
@@ -1904,19 +1050,13 @@ contains
 
   subroutine model_calculate_snowfall_prms(this)
 
-!    use snowfall__prms
-
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-  !  this%snowfall = calculate_snowfall_prms( this%tmax, this%tmin, this%gross_precip )
 
   end subroutine model_calculate_snowfall_prms
 
 !--------------------------------------------------------------------------------------------------
 
   subroutine model_initialize_snowmelt_original(this)
-
-!    use snowmelt__original
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
@@ -1930,16 +1070,14 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call snowmelt_original_calculate( fSnowmelt=this%snowmelt, fSnow_storage=this%snow_storage, &
-                                      fTMin=this%tmin, fTMax=this%tmax )
+    call snowmelt_original_calculate( potential_snowmelt=this%potential_snowmelt, tmin=this%tmin,   &
+                                      tmax=this%tmax, imperial_units=lTRUE )
 
   end subroutine model_calculate_snowmelt_original
 
 !--------------------------------------------------------------------------------------------------
 
   subroutine model_initialize_snowmelt_prms(this)
-
-!    use snowmelt__prms
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
@@ -1949,14 +1087,9 @@ contains
 
   subroutine model_calculate_snowmelt_prms(this)
 
-!    use snowmelt__prms
-
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-  !  this%snowmelt = calculate_snowmelt_prms( this%tmax, this%tmin, this%gross_precip )
-
   end subroutine model_calculate_snowmelt_prms
-
 
   !--------------------------------------------------------------------------------------------------
 
@@ -2030,7 +1163,7 @@ contains
     call et_gridded_values_calculate( )
 
     this%reference_ET0 = pack( pET_GRID%pGrdBase%rData, this%active ) &
-                                      / real( SIM_DT%iDaysInMonth, kind=c_float)
+                                      / real( SIM_DT%iDaysInMonth, kind=c_float)    
 
   end subroutine model_calculate_et_monthly_grid
 
@@ -2073,28 +1206,38 @@ contains
 
   subroutine model_calculate_runoff_curve_number(this, index )
 
-    use runoff__curve_number
+    use runoff__curve_number, only  : runoff_curve_number_calculate
 
     class (MODEL_DOMAIN_T), intent(inout)       :: this
     integer (kind=c_int), intent(in), optional  :: index
 
+    real (kind=c_float) :: interim_inflow
+
     if ( present(index) ) then
 
-      this%runoff( index ) = runoff_curve_number_calculate( &
-        iLanduseIndex=this%landuse_index( index ), &
-        iSoilsIndex=this%soil_group( index ), &
-        fSoilStorage=this%soil_storage( index ), &
-        fSoilStorage_Max=this%soil_storage_max( index ), &
-        fInflow=this%inflow( index ), fCFGI=CFGI( index ) )
+      interim_inflow = this%runon( index ) + this%rainfall( index )   &
+                      + this%snowmelt( index ) - this%interception( index )
+
+      call runoff_curve_number_calculate(runoff=this%runoff( index ),                                    &
+                                                    landuse_index=this%landuse_index( index ),           &
+                                                    soil_group=this%soil_group( index ),                 &
+                                                    soil_storage=this%soil_storage( index ),             &
+                                                    soil_storage_max=this%soil_storage_max( index ),     & 
+                                                    inflow=interim_inflow,                               &
+                                                    continuous_frozen_ground_index=                      &
+                                                        this%continuous_frozen_ground_index( index ) ) 
 
     else
 
-      this%runoff = runoff_curve_number_calculate( &
-        iLanduseIndex=this%landuse_index, &
-        iSoilsIndex=this%soil_group, &
-        fSoilStorage=this%soil_storage, &
-        fSoilStorage_Max=this%soil_storage_max, &
-        fInflow=this%inflow, fCFGI=CFGI )
+      call runoff_curve_number_calculate(runoff=this%runoff,                                             &
+                                                    landuse_index=this%landuse_index,                    &
+                                                    soil_group=this%soil_group,                          &
+                                                    soil_storage=this%soil_storage,                      &
+                                                    soil_storage_max=this%soil_storage_max,              & 
+                                                    inflow=this%runon+this%rainfall                      &
+                                                           +this%snowmelt-this%interception,             &
+                                                    continuous_frozen_ground_index=                      &
+                                                        this%continuous_frozen_ground_index ) 
 
     endif
 
@@ -2117,169 +1260,114 @@ contains
   subroutine model_calculate_runoff_gridded_values(this, index )
 
     use runoff__gridded_values
-
-    class (MODEL_DOMAIN_T), intent(inout)       :: this
-    integer (kind=c_int), intent(in), optional  :: index
-
-    call runoff_gridded_values_calculate( )
-
-!     this%runoff = ( this%rainfall + this%snowmelt ) * RUNOFF_RATIOS
-
-    this%runoff = this%inflow * RUNOFF_RATIOS
-
-  end subroutine model_calculate_runoff_gridded_values
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine model_initialize_soil_moisture_thornthwaite_mather( this )
-
-    use soil_moisture__thornthwaite_mather
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-    call soil_moisture_thornthwaite_mather_initialize( count( this%active ) )
-
-  end subroutine model_initialize_soil_moisture_thornthwaite_mather
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine model_calculate_soil_moisture_thornthwaite_mather( this, index )
-
-    use soil_moisture__thornthwaite_mather
-
-    class (MODEL_DOMAIN_T), intent(inout)       :: this
-    integer (kind=c_int), intent(in), optional  :: index
-
-    if ( present( index ) ) then
-
-      call soil_moisture_thornthwaite_mather_calculate(fAPWL=APWL(index),                                    &
-                                                        fSoilStorage=this%soil_storage(index),               &
-                                                        fSoilStorage_Excess=this%potential_recharge(index),  &
-                                                        fActual_ET=this%actual_ET(index),                    &
-                                                        fSoilStorage_Max=this%soil_storage_max(index),       &
-                                                        fInfiltration=this%infiltration(index),              &
-                                                        fReference_ET=this%reference_ET0_adj(index) )
-
-    else
-
-      call soil_moisture_thornthwaite_mather_calculate(fAPWL=APWL,                                    &
-                                                        fSoilStorage=this%soil_storage,               &
-                                                        fSoilStorage_Excess=this%potential_recharge,  &
-                                                        fActual_ET=this%actual_ET,                    &
-                                                        fSoilStorage_Max=this%soil_storage_max,       &
-                                                        fInfiltration=this%infiltration,              &
-                                                        fReference_ET=this%reference_ET0_adj )
-
-    endif
-
-  end subroutine model_calculate_soil_moisture_thornthwaite_mather
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine model_output_soil_moisture_none( this )
-
-    class (MODEL_DOMAIN_T), intent(inout)       :: this
-    
-    ! nothing to do here.
-
-  end subroutine model_output_soil_moisture_none
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine model_initialize_soil_moisture_fao_56( this )
-
-    use soil_moisture__FAO_56
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-    call soil_moisture_FAO56_initialize( fSoilStorage=this%soil_storage,        &
-                                         iLanduseIndex=this%landuse_index,      &
-                                         iSoilGroup=this%soil_group,            &
-                                         fMax_Rooting_Depths=MAX_ROOTING_DEPTH, &
-                                         fAvailable_Water_Content=this%awc,     &
-                                         lActive=this%active )
-
-  end subroutine model_initialize_soil_moisture_fao_56
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine model_calculate_soil_moisture_fao_56( this, index )
-
-    use soil_moisture__FAO_56
+    use datetime, only           : DATETIME_T
 
     class (MODEL_DOMAIN_T), intent(inout)       :: this
     integer (kind=c_int), intent(in), optional  :: index
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iIndex
+    type (DATETIME_T), save     :: date_of_last_grid_update
+    real (kind=c_float)         :: interim_inflow
 
-!  soil_moisture_thornthwaite_mather_calculate(fAPWL, fSoilStorage, fSoilStorage_Excess,                &
-!                                             fActual_ET, fSoilStorage_Max, fInfiltration, fReference_ET)
+    if ( .not. ( date_of_last_grid_update == SIM_DT%curr ) ) then
+      call runoff_gridded_values_update_ratios( )
+      date_of_last_grid_update = SIM_DT%curr
+    endif
 
-!     real (kind=c_float), intent(inout)   :: fAPWL
-!     real (kind=c_float), intent(inout)   :: fSoilStorage
-!     real (kind=c_float), intent(out)     :: fSoilStorage_Excess
-!     real (kind=c_float), intent(out)     :: fActual_ET
-!     real (kind=c_float), intent(in)      :: fSoilStorage_Max
-!     real (kind=c_float), intent(in)      :: fInfiltration
-!     real (kind=c_float), intent(in)      :: fReference_ET
-    
     if ( present( index ) ) then
+  
+      interim_inflow = this%rainfall( index ) + this%snowmelt( index ) 
 
-      call soil_moisture_FAO56_calculate( fSoilStorage=this%soil_storage(index),                             &
-                                          fActual_ET=this%actual_ET(index),                                  &
-                                          fSoilStorage_Excess=this%potential_recharge(index),                &
-                                          fInfiltration=this%infiltration(index),                            &
-                                          fGDD=this%gdd(index),                                              &
-                                          fAvailableWaterCapacity=this%awc(index),                           &
-                                          fReference_ET0=this%reference_ET0_adj(index),                      &
-                                          fMaxRootingDepth=MAX_ROOTING_DEPTH( this%landuse_index(index),            &
-                                                                      this%soil_group(index) ),              &
-                                          iLanduseIndex=this%landuse_index(index),                           &
-                                          iSoilGroup=this%soil_group(index) )
+      this%runoff( index ) = interim_inflow * RUNOFF_RATIOS( index )
 
     else
 
-      do iIndex=1, ubound(this%soil_storage,1)
-
-!         print *, "LU=",this%landuse_index( iIndex ), &
-!                  " Soils=",this%soil_group( iIndex ),    &
-!                  " rain:",this%rainfall( iIndex ),      &
-!                  " intcp:",this%interception( iIndex ),  &
-!                  " fog:",this%fog( iIndex ),           &
-!                  " snmelt:",this%snowmelt( iIndex ),      &
-!                  " runon:",this%runon( iIndex ),         &
-!                  " inflow:", this%inflow( iIndex ),        &
-!                  " runoff:",this%runoff( iIndex ),        &
-!                  " infil:",this%infiltration( iIndex )
-
-        call soil_moisture_FAO56_calculate( fSoilStorage=this%soil_storage(iIndex),                             &
-                                            fActual_ET=this%actual_ET(iIndex),                                  &
-                                            fSoilStorage_Excess=this%potential_recharge(iIndex),                &
-                                            fInfiltration=this%infiltration(iIndex),                            &
-                                            fGDD=this%gdd(iIndex),                                              &
-                                            fAvailableWaterCapacity=this%awc(iIndex),                           &
-                                            fReference_ET0=this%reference_ET0_adj(iIndex),                      &
-                                            fMaxRootingDepth=MAX_ROOTING_DEPTH( this%landuse_Index(iIndex),     &
-                                                                                this%soil_group(iIndex) ),      &
-                                            iLanduseIndex=this%landuse_index(iIndex),                           &
-                                            iSoilGroup=this%soil_group(iIndex) )
-
-      enddo
+      this%runoff = ( this%rainfall + this%snowmelt ) * RUNOFF_RATIOS
 
     endif
 
-  end subroutine model_calculate_soil_moisture_fao_56
+  end subroutine model_calculate_runoff_gridded_values
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_output_soil_moisture_fao_56( this )
+  subroutine model_initialize_soil_storage_max_internally_calculated(this)
 
-    use soil_moisture__FAO_56
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    class (MODEL_DOMAIN_T), intent(inout)       :: this
+    ! [ LOCALS ]
+    type ( GENERAL_GRID_T ), pointer :: pTempGrd
 
-  end subroutine model_output_soil_moisture_fao_56
+    !> @todo this should be in its own routine...
+    this%current_rooting_depth = pack( ROOTING_DEPTH_MAX, MODEL%active )
+    this%rooting_depth_max = pack( ROOTING_DEPTH_MAX, MODEL%active )
+
+    this%soil_storage_max = this%rooting_depth_max * this%awc
+
+    pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
+        rX0=this%X_ll, rY0=this%Y_ll, &
+        rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+
+    pTempGrd%rData = unpack( this%soil_storage_max, this%active, this%dont_care )
+
+    call grid_WriteArcGrid( sFilename="Soil_Storage_Maximum__as_calculated_inches.asc", pGrd=pTempGrd )
+
+    call grid_Destroy( pTempGrd )
+
+  end subroutine model_initialize_soil_storage_max_internally_calculated  
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_soil_storage_max_gridded(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    ! [ LOCALS ]
+    type ( GENERAL_GRID_T ), pointer :: pTempGrd
+    integer (kind=c_int)             :: iStat
+    type (DATA_CATALOG_ENTRY_T), pointer :: pSOIL_STORAGE_MAX_GRID
+
+    pSOIL_STORAGE_MAX_GRID => null()
+
+    pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
+    rX0=this%X_ll, rY0=this%Y_ll, &
+    rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+
+    ! locate the data structure associated with the gridded rainfall zone entries
+    pSOIL_STORAGE_MAX_GRID => DAT%find("SOIL_STORAGE_MAX")
+    if ( .not. associated(pSOIL_STORAGE_MAX_GRID) ) &
+        call die("A SOIL_STORAGE_MAX grid must be supplied in order to make use of this option.", &
+           __FILE__, __LINE__)
+
+    call pSOIL_STORAGE_MAX_GRID%getvalues( )
+
+    this%soil_storage_max = pack( pSOIL_STORAGE_MAX_GRID%pGrdBase%rData, this%active )
+
+    pTempGrd%rData = unpack( this%soil_storage_max, this%active, this%dont_care )
+
+    ! back-calculate awc to make it consistent with rooting_depth_max and given
+    ! soil_storage_max gridded values
+
+    where ( .not. ( this%rooting_depth_max .approxequal. 0.0_c_float ) )
+
+      this%awc = this%soil_storage_max / this%rooting_depth_max
+
+    else where
+
+      this%awc = 0.0_c_float      
+
+    end where
+
+    this%current_rooting_depth = this%rooting_depth_max
+   
+    call grid_WriteArcGrid( sFilename="Maximum_Soil_Storage__as_read_in_inches.asc", pGrd=pTempGrd )
+    
+    pTempGrd%rData = unpack( this%rooting_depth_max, this%active, this%dont_care )    
+
+    call grid_WriteArcGrid( sFilename="Available_water_content__as_RECALCULATED_in_inches_per_foot.asc", pGrd=pTempGrd )
+
+    call grid_Destroy( pTempGrd )
+
+  end subroutine model_initialize_soil_storage_max_gridded
 
 !--------------------------------------------------------------------------------------------------
 
@@ -2386,10 +1474,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call assert( associated( pROOTING_DEPTH ), "INTERNAL PROGRAMING ERROR -- Null Pointer detected", &
-      __FILE__, __LINE__ )
-
-    call awc_table_values_read( fRooting_Depth=pROOTING_DEPTH%rData )
+    call awc_table_values_read( fRooting_Depth=ROOTING_DEPTH_MAX )
 
   end subroutine model_read_available_water_content_table  
 
@@ -2462,14 +1547,13 @@ contains
     use growing_degree_day
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    !> Nothing here to see. Initialization not really needed for the "normal" method.
 
     call growing_degree_day_initialize( lActive=this%active,                  &
                                         iLanduseIndex=this%landuse_index,     &
                                         dX=this%X,                            & 
                                         dY=this%Y,                            &
-                                        dX_lon=pCOORD_GRD%rX,                 &
-                                        dY_lat=pCOORD_GRD%rY  )
+                                        dX_lon=this%X_lon,                    &
+                                        dY_lat=this%Y_lat  )
 
   end subroutine model_initialize_GDD
 
@@ -2500,6 +1584,63 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  subroutine model_initialize_actual_et_thornthwaite_mather(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+
+  end subroutine model_initialize_actual_et_thornthwaite_mather    
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_actual_et_thornthwaite_mather( this )
+
+    use actual_et__thornthwaite_mather
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call calculate_actual_et_thornthwaite_mather( actual_et=this%actual_et_soil,                    &
+                                                  soil_storage=this%soil_storage,                   &
+                                                  soil_storage_max=this%soil_storage_max,           &
+                                                  precipitation=this%infiltration,                  &
+                                                  reference_et0=this%reference_et0,                 &
+                                                  crop_coefficient_kcb=this%crop_coefficient_kcb )
+
+  end subroutine model_calculate_actual_et_thornthwaite_mather
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_actual_et_fao56(this)
+
+    use actual_et__fao56
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call initialize_actual_et_fao56()
+
+  end subroutine model_initialize_actual_et_fao56    
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_actual_et_fao56( this )
+
+    use actual_et__fao56
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call calculate_actual_et_fao56( actual_et=this%actual_et_soil,                                    &
+                                    adjusted_depletion_fraction_p=this%adjusted_depletion_fraction_p, &
+                                    soil_storage=this%soil_storage,                                   &
+                                    soil_storage_max=this%soil_storage_max,                           &
+                                    infiltration=this%infiltration,                                   &
+                                    reference_et0=this%reference_et0,                                 &
+                                    depletion_fraction_p=DEPLETION_FRACTION( this%landuse_index ),    &
+                                    crop_coefficient_kcb=this%crop_coefficient_kcb )
+
+  end subroutine model_calculate_actual_et_fao56
+
+!--------------------------------------------------------------------------------------------------
+
   subroutine model_initialize_direct_recharge_none ( this )
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
@@ -2524,9 +1665,7 @@ contains
 
     call direct_recharge_initialize( lActive=this%active, iLandUseIndex=this%landuse_index,   &
                                      dX=this%X, dY=this%Y,                                    &
-                                     dX_lon=pCOORD_GRD%rX , dY_lat=pCOORD_GRD%rY )
-
-    print *, __FILE__, ": ", __LINE__
+                                     dX_lon=this%X_lon , dY_lat=this%Y_lat )
 
   end subroutine model_initialize_direct_recharge_gridded
 
@@ -2545,6 +1684,55 @@ contains
     this%potential_recharge = this%potential_recharge + DIRECT_RECHARGE
 
   end subroutine model_calculate_direct_recharge_gridded
+
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_crop_coefficient_none(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_initialize_crop_coefficient_none
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_update_crop_coefficient_none(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    this%crop_coefficient_kcb = 1.0_c_float
+
+  end subroutine model_update_crop_coefficient_none
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_crop_coefficient_FAO56(this)
+
+    use crop_coefficients__FAO56, only : crop_coefficients_FAO56_initialize
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call crop_coefficients_FAO56_initialize( fSoilStorage=this%soil_storage,      &
+                                             iLanduseIndex=this%landuse_index,    &
+                                             iSoilGroup=this%soil_group,          &
+                                             fAvailable_Water_Content=this%awc,   &
+                                             lActive=this%active )
+
+  end subroutine model_initialize_crop_coefficient_FAO56
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_update_crop_coefficient_FAO56(this)
+
+    use crop_coefficients__FAO56, only : crop_coefficients_FAO56_calculate
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    
+    call crop_coefficients_FAO56_calculate( Kcb=this%crop_coefficient_kcb,      &
+                                            GDD=this%gdd,                       &
+                                            landuse_index=this%landuse_index )
+
+  end subroutine model_update_crop_coefficient_FAO56
 
 !--------------------------------------------------------------------------------------------------
 
@@ -2566,7 +1754,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     call fog_monthly_grid_initialize( lActive=this%active, dX=this%X, dY=this%Y, &
-      dX_lon=pCOORD_GRD%rX , dY_lat=pCOORD_GRD%rY )
+      dX_lon=this%X_lon , dY_lat=this%Y_lat )
 
   end subroutine model_initialize_fog_monthly_grid
 
@@ -2804,7 +1992,7 @@ contains
     endif
 
     call LOGS%write( adjustl(sVarname)//" | "//adjustl(sMin)//" | "//adjustl(sMax) &
-       //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_DEBUG, lEcho=lTRUE )
+       //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_ALL, lEcho=lTRUE )
 
   end subroutine minmaxmean_float
 
@@ -2837,7 +2025,7 @@ contains
     endif
 
     call LOGS%write( adjustl(sVarname)//" | "//adjustl(sMin)//" | "//adjustl(sMax) &
-       //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_DEBUG, lEcho=lTRUE )
+       //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_ALL, lEcho=lTRUE )
 
   end subroutine minmaxmean_int
 
@@ -2858,7 +2046,6 @@ contains
     
     call minmaxmean( this%latitude, "Lat")
     call minmaxmean( this%reference_ET0, "ET0")
-    call minmaxmean( this%reference_ET0_adj, "ET0_adn")
     call minmaxmean( this%actual_ET, "actET")
     call minmaxmean( this%inflow, "inflow")
     call minmaxmean( this%runon, "runon")

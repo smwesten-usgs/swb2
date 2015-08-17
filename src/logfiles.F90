@@ -147,7 +147,7 @@ contains
 
         if (.not. this%lIsOpen(iIndex) ) then
 
-          open(newunit=this%iUnitNum(iIndex), file=sFilename, iostat=this%iStat(iIndex), action='WRITE')
+          open(newunit=this%iUnitNum(iIndex), file=sFilename, iostat=this%iStat(iIndex), action='WRITE', encoding='UTF-8')
           if (this%iStat(iIndex) /= 0) then
             write(unit=OUTPUT_UNIT, fmt="(a)") "Failed to open logfile "//'"'//trim(sFilename)//'".' 
             stop

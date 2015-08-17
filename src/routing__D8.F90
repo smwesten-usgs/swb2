@@ -8,7 +8,7 @@ module routing__D8
 
   private
 
-  public :: routing_D8_initialize, routing_D8_calculate, D8_UNDETERMINED, TARGET_INDEX, ORDER_INDEX
+  public :: routing_D8_initialize, D8_UNDETERMINED, TARGET_INDEX, ORDER_INDEX
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pD8_FLOWDIR    ! data catalog object => D8 flow direction grid
 
@@ -303,7 +303,7 @@ contains
 
   subroutine routing_D8_determine_solution_order( lActive )
 
-    use swb_grid
+    use grid
 
     logical (kind=c_bool), intent(in)    :: lActive(:,:)
 
@@ -493,29 +493,5 @@ main_loop: do
     call grid_Destroy( pTempGrid )
 
   end subroutine routing_D8_determine_solution_order
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine routing_D8_calculate( fRunoff, fRunon )
-
-    real (kind=c_float), intent(in)       :: fRunoff(:)
-    real (kind=c_float), intent(inout)    :: fRunOn(:)
-
-    integer (kind=c_int)    :: iIndex
-
-    fRunon = 0.0_c_float
-
-    do iIndex=lbound(TARGET_INDEX, 1),ubound(TARGET_INDEX, 1)
-
-      if ( TARGET_INDEX(iIndex) >= lbound(TARGET_INDEX, 1) &
-        .and. TARGET_INDEX( iIndex ) <= ubound(TARGET_INDEX, 1) ) then
-
-        fRunon( TARGET_INDEX( iIndex ) ) = fRunoff( ORDER_INDEX( iIndex ) )
-
-      endif
-
-    enddo
-
-  end subroutine routing_D8_calculate
 
 end module routing__D8
