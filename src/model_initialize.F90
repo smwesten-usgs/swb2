@@ -214,6 +214,8 @@ contains
 
     call initialize_soil_storage()
 
+    call initialize_surface_storage_max()
+
   end subroutine initialize_ancillary_values
 
 !--------------------------------------------------------------------------------------------------
@@ -1439,5 +1441,45 @@ contains
 
   end subroutine initialize_landuse_codes 
 
+
+  subroutine initialize_surface_storage_max()
+
+    integer (kind=c_int)               :: iIndex
+    integer (kind=c_int)               :: iStat
+    character (len=256)                :: sBuf
+    type (STRING_LIST_T)               :: slList
+    integer( kind=c_int), allocatable  :: iLanduseTableCodes(:)
+    integer (kind=c_int)               :: iNumberOfLanduses
+    real (kind=c_float), allocatable   :: SURFACE_STORAGE_MAXIMUM(:)
+    real (kind=c_float)                :: current_surface_storage_max
+
+
+    ! create list of possible table headings to look for...
+    call slList%append( "LU_Code" )
+    call slList%append( "Landuse_Lookup_Code" )
+
+    !> Determine how many landuse codes are present
+    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseTableCodes )
+    iNumberOfLanduses = count( iLanduseTableCodes >= 0 )
+
+    call slList%clear()
+    call slList%append("Surface_Storage_Max")
+    call slList%append("Surface_Storage_Maximum")
+
+    call PARAMS%get_parameters( slKeys=slList, fValues=SURFACE_STORAGE_MAXIMUM, lFatal=lTRUE )
+
+    do iIndex=1, ubound( SURFACE_STORAGE_MAXIMUM, 1)
+
+      current_surface_storage_max = SURFACE_STORAGE_MAXIMUM( iIndex )
+
+      where( MODEL%landuse_index == iIndex )
+
+        model%surface_storage_max = current_surface_storage_max
+
+      end where
+      
+    enddo    
+
+  end subroutine initialize_surface_storage_max
 
 end module model_initialize

@@ -57,6 +57,7 @@ module model_domain
     integer (kind=c_int), allocatable      :: polygon_id(:)
     real (kind=c_float), allocatable       :: latitude(:)
     real (kind=c_float), allocatable       :: reference_et0(:)
+    real (kind=c_float), allocatable       :: crop_etc(:)
 
     real (kind=c_float), allocatable       :: actual_et_interception(:)
     real (kind=c_float), allocatable       :: actual_et_impervious(:)
@@ -94,11 +95,16 @@ module model_domain
     real (kind=c_float), allocatable       :: tmin(:)
     real (kind=c_float), allocatable       :: tmax(:)
     real (kind=c_float), allocatable       :: tmean(:)
+
     real (kind=c_float), allocatable       :: routing_fraction(:)
 
     integer (kind=c_int), allocatable      :: index_order(:)
 
     real (kind=c_float), allocatable       :: adjusted_depletion_fraction_p(:)
+
+    ! member variables that are only allocated if particular optional methods are invoked
+
+    real (kind=c_float), allocatable       :: irrigation_mask(:)
 
     !> declare and initialize procedure pointers such that the default methods are in place
     procedure ( simple_method ), pointer         :: init_interception       => model_initialize_interception_bucket
@@ -255,7 +261,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: iStat(44)
+    integer (kind=c_int)  :: iStat(45)
 
     iCount = count( this%active )
 
@@ -303,6 +309,7 @@ contains
     allocate( this%actual_et_impervious( iCount ), stat=iStat(42) )
     allocate( this%actual_et_interception( iCount ), stat=iStat(43) )        
     allocate( this%adjusted_depletion_fraction_p( iCount ), stat=iStat(44) )
+    allocate( this%crop_etc( iCount ), stat=iStat(45) )    
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="  &
@@ -1405,7 +1412,14 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
    
-    call irrigation__initialize( this%active )
+    ! [ LOCALS ]
+    integer (kind=c_int) :: status
+
+    allocate( this%irrigation_mask( count( this%active ) ), stat=status )
+    call assert( status==0, "Problem allocating memory.", &
+      __FILE__, __LINE__ )
+
+    call irrigation__initialize( this%irrigation_mask, this%active )
 
   end subroutine model_initialize_irrigation
 
@@ -1417,12 +1431,15 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call irrigation__calculate( fIrrigationAmount=this%irrigation,             &
-                                iLanduseIndex=this%landuse_index,              &
-                                fSoilStorage=this%soil_storage,                & 
-                                fSoilStorage_Max=this%soil_storage_max,        &
-                                fImpervious_Fraction=this%impervious_fraction, &
-                                lActive=this%active )
+    call irrigation__calculate( irrigation_amount=this%irrigation,                      &
+                                landuse_index=this%landuse_index,                       &
+                                soil_storage=this%soil_storage,                         & 
+                                soil_storage_max=this%soil_storage_max,                 &
+                                impervious_surface_fraction=this%impervious_fraction,   &
+                                rainfall=this%rainfall,                                 &
+                                runoff=this%runoff,                                     &
+                                crop_etc=this%crop_etc,                                 &
+                                irrigation_mask=this%irrigation_mask )
 
   end subroutine model_calculate_irrigation
 
@@ -1603,8 +1620,7 @@ contains
                                                   soil_storage=this%soil_storage,                   &
                                                   soil_storage_max=this%soil_storage_max,           &
                                                   precipitation=this%infiltration,                  &
-                                                  reference_et0=this%reference_et0,                 &
-                                                  crop_coefficient_kcb=this%crop_coefficient_kcb )
+                                                  crop_etc=this%crop_etc )
 
   end subroutine model_calculate_actual_et_thornthwaite_mather
 
@@ -1633,9 +1649,8 @@ contains
                                     soil_storage=this%soil_storage,                                   &
                                     soil_storage_max=this%soil_storage_max,                           &
                                     infiltration=this%infiltration,                                   &
-                                    reference_et0=this%reference_et0,                                 &
-                                    depletion_fraction_p=DEPLETION_FRACTION( this%landuse_index ),    &
-                                    crop_coefficient_kcb=this%crop_coefficient_kcb )
+                                    crop_etc=this%crop_etc,                                           &
+                                    depletion_fraction_p=DEPLETION_FRACTION( this%landuse_index ) )
 
   end subroutine model_calculate_actual_et_fao56
 

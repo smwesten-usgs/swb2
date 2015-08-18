@@ -28,10 +28,11 @@ contains
 !    call minmaxmean_float( cells%crop_coefficient_kcb, "kcb, before call")
 
     call cells%update_crop_coefficient()
-
-!    call minmaxmean_float( cells%crop_coefficient_kcb, "after, before call")
-
     call cells%calc_reference_et()
+
+    ! update crop evapotranspiration; crop_coefficient_kcb defaults to 1.0
+    cells%crop_etc = cells%reference_et0 * cells%crop_coefficient_kcb
+
     call cells%calc_snowfall()
     call cells%calc_snowmelt()
 
@@ -41,7 +42,8 @@ contains
     call cells%calc_fog()
     call cells%calc_interception()
 
-    call cells%calc_irrigation()
+!    call cells%calc_irrigation()
+
 
     call calculate_interception_mass_balance( interception_storage=cells%interception_storage,     &
                                               actual_et=cells%actual_et_interception,              &
@@ -64,10 +66,12 @@ contains
                                                     interception=cells%interception,                         &
                                                     reference_et0=cells%reference_et0 ) 
 
+
     ! call to calc_routing also triggers an embedded call to calc_runoff
     ! NOTE: only way for "runon" to be positive is if D8 flow routing 
     !       is enabled.
     call cells%calc_routing()
+
 
     cells%inflow = cells%runon                                                                       &
                    + ( cells%rainfall                                                                &
@@ -76,7 +80,7 @@ contains
                    + cells%snowmelt                                                                  &
                    - cells%interception                                                              &
                    + cells%irrigation
-   
+
     cells%infiltration = max( 0.0_c_float, cells%inflow - cells%runoff )
 
     where ( cells%inflow - cells%runoff < 0.0_c_float )
@@ -84,6 +88,7 @@ contains
       cells%runoff = cells%inflow
 
     end where
+
 
     ! the following call updates bound variable actual_et_soil
     call cells%calc_actual_et()
@@ -98,8 +103,10 @@ contains
 !                      + cells%actual_et_interception * cells%canopy_cover_fraction         &
                       + cells%actual_et_impervious * cells%impervious_fraction
 
-    ! moved this call up so that septic could be added to soil mas balance at some future date if needed
+    ! moved this call up so that septic could be added to soil mass balance at some future date if needed
     call cells%calc_direct_recharge()
+
+    call cells%calc_irrigation()
 
     call calculate_soil_mass_balance( potential_recharge=cells%potential_recharge,       &
                                       soil_storage=cells%soil_storage,                   &

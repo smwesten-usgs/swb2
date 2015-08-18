@@ -1427,12 +1427,20 @@ end subroutine grid_LookupRow
 !------------------------------------------------------------------------------
 
 !> Call PROJ4 to transform coordinates.
-!> @details This subroutine calls a Fortran wrapper to the C library
-!> PROJ4. A set of input coordinates is transformed to a different
-!> coordinate system.
-!> @param[inout] pGrd
-!> @param[in] sFromPROJ4
-!> @param[in] sToPROJ4
+!! @details This subroutine calls a Fortran wrapper to the C library
+!! PROJ4. A set of input coordinates is transformed to the base SWB
+!! coordinate system.
+!!
+!! The idea is to first create a 2D array of the X and Y coordinates in
+!! the projection system of the input data set. These coordinate values are
+!! then fed to PROJ4, which modifies the values and returns the coordinate
+!! values in the projection system of the base grid. Thereafter, mapping
+!! source to target is a matter of finding the value of the cell closest to 
+!! a SWB grid coordinate pair.
+!! @param[inout] pGrd
+!! @param[in] sFromPROJ4
+!! @param[in] sToPROJ4
+
 subroutine grid_Transform(pGrd, sFromPROJ4, sToPROJ4 )
 
   type ( GENERAL_GRID_T ),pointer :: pGrd
@@ -1488,6 +1496,10 @@ subroutine grid_Transform(pGrd, sFromPROJ4, sToPROJ4 )
 
   ! finally, change the projection string to reflect the new coordinate system
   pGrd%sPROJ4_string = trim(sToPROJ4)
+
+  ! at this point, what we have is the same old values that were read into the
+  ! input grid, but a new set of coordinate and boundary definitions that reference
+  ! the SWB grid projection.
 
 end subroutine grid_Transform
 

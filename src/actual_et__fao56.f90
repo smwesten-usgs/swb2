@@ -7,6 +7,7 @@ module actual_et__fao56
   implicit none
 
   real (kind=c_float), allocatable   :: DEPLETION_FRACTION(:)
+  real (kind=c_float), parameter     :: NEAR_ZERO = 3.0_c_float * tiny( 0.0_c_float )
 
 contains
 
@@ -52,8 +53,7 @@ contains
                                                   depletion_fraction_p,              &
                                                   soil_storage_max,                  &
                                                   infiltration,                      &
-                                                  reference_et0,                     &
-                                                  crop_coefficient_kcb )
+                                                  crop_etc )
 
     real (kind=c_float), intent(inout)             :: actual_et
     real (kind=c_float), intent(inout)             :: adjusted_depletion_fraction_p    
@@ -61,8 +61,7 @@ contains
     real (kind=c_float), intent(in)                :: soil_storage
     real (kind=c_float), intent(in)                :: soil_storage_max
     real (kind=c_float), intent(in)                :: infiltration
-    real (kind=c_float), intent(in)                :: reference_et0
-    real (kind=c_float), intent(in), optional      :: crop_coefficient_kcb
+    real (kind=c_float), intent(in)                :: crop_etc
 
     ! [ LOCALS ]
     real (kind=c_float)  :: Kcb
@@ -72,69 +71,70 @@ contains
     real (kind=c_float)  :: interim_soil_storage
     real (kind=c_float)  :: fraction_full_PET
     real (kind=c_float)  :: root_constant_ci
-    real (kind=c_float)  :: crop_et
 
-    if ( present( crop_coefficient_kcb ) ) then
-      Kcb = crop_coefficient_kcb
-    else
-      Kcb = 1.0_c_float
-    endif  
+    if ( soil_storage_max >= 0.0_c_float .and. soil_storage_max <= NEAR_ZERO ) then
 
-    crop_et =  reference_et0 * Kcb
+      ! by convention, if the soil_storage_max is approximately zero, we are dealing
+      ! with a water body and the actual et should be the potential/crop et
+      actual_et = crop_etc
 
-    infiltration_minus_et = infiltration - crop_et
+    else  
 
-    p = adjust_depletion_fraction_p( p_table_22=depletion_fraction_p,  &
-                                     reference_et0=crop_et )
-  
-    adjusted_depletion_fraction_p = p
+      infiltration_minus_et = infiltration - crop_etc
 
-    ! soil storage value at which actual et begins to decline
-    root_constant_ci = ( 1.0_c_float - p ) * soil_storage_max
+      p = adjust_depletion_fraction_p( p_table_22=depletion_fraction_p,  &
+                                       reference_et0=crop_etc )
+    
+      adjusted_depletion_fraction_p = p
 
-    interim_soil_storage = soil_storage + infiltration
+      ! soil storage value at which actual et begins to decline
+      root_constant_ci = ( 1.0_c_float - p ) * soil_storage_max
 
-    ! root constant of 0 implies a depletion fraction of 1; in other words, 
-    ! there is no declining portion of the AET/PET to AW/AWC relation.
-    ! ENTIRE DAY at PET
-    if ( root_constant_ci  <= 0.0_c_float ) then
+      interim_soil_storage = soil_storage + infiltration
 
-      actual_et = min( crop_et, interim_soil_storage )
+      ! root constant of 0 implies a depletion fraction of 1; in other words, 
+      ! there is no declining portion of the AET/PET to AW/AWC relation.
+      ! ENTIRE DAY at PET
+      if ( root_constant_ci  <= 0.0_c_float ) then
 
-    ! ALL or PARTIAL DAY at PET
-    elseif ( interim_soil_storage > root_constant_ci ) then
+        actual_et = min( crop_etc, interim_soil_storage )
 
-      ! calculate fraction of day that would be at full reference ET values
-      if ( crop_et > 0.0_c_float ) then
+      ! ALL or PARTIAL DAY at PET
+      elseif ( interim_soil_storage > root_constant_ci ) then
+
+        ! calculate fraction of day that would be at full reference ET values
+        if ( crop_etc > 0.0_c_float ) then
+          
+          fraction_full_PET = (interim_soil_storage - root_constant_ci) / crop_etc
         
-        fraction_full_PET = (interim_soil_storage - root_constant_ci) / crop_et
-      
+        else
+          
+          fraction_full_PET = 99.
+        
+        endif
+
+        ! there is enough soil storage to cover withdrawal of soil moisture at full reference ET values
+        ! for the entire day
+        if ( fraction_full_PET >= 1 ) then
+
+          actual_et = crop_etc
+
+        ! part of day at full PET
+        else
+
+          actual_et = crop_etc * fraction_full_PET                                                                &
+                      + root_constant_ci                                                                         &
+                         * ( 1.0_c_float - exp( - crop_etc * ( 1.0_c_float - fraction_full_PET )                  &
+                            / root_constant_ci ) ) 
+              
+        endif     
+
+      ! ENTIRE DAY at LESS THAN PET
       else
-        
-        fraction_full_PET = 99.
-      
+
+          actual_et = interim_soil_storage * ( 1.0_c_float - exp( - crop_etc / root_constant_ci ) )  
+
       endif
-
-      ! there is enough soil storage to cover withdrawal of soil moisture at full reference ET values
-      ! for the entire day
-      if ( fraction_full_PET >= 1 ) then
-
-        actual_et = crop_et
-
-      ! part of day at full PET
-      else
-
-        actual_et = crop_et * fraction_full_PET                                                                &
-                    + root_constant_ci                                                                         &
-                       * ( 1.0_c_float - exp( - crop_et * ( 1.0_c_float - fraction_full_PET )                  &
-                          / root_constant_ci ) ) 
-            
-      endif     
-
-    ! ENTIRE DAY at LESS THAN PET
-    else
-
-        actual_et = interim_soil_storage * ( 1.0_c_float - exp( - crop_et / root_constant_ci ) )  
 
     endif
 
