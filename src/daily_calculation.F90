@@ -42,7 +42,7 @@ contains
     call cells%calc_fog()
     call cells%calc_interception()
 
-!    call cells%calc_irrigation()
+    call cells%calc_irrigation()
 
 
     call calculate_interception_mass_balance( interception_storage=cells%interception_storage,     &
@@ -74,9 +74,10 @@ contains
 
 
     cells%inflow = cells%runon                                                                       &
-                   + ( cells%rainfall                                                                &
-                     + cells%fog ) * ( 1.0_c_float - cells%impervious_fraction )                     &
-                   + cells%surface_storage_excess * cells%impervious_fraction                        &
+                   + cells%rainfall                                                                  &
+                   + cells%fog                                                                       &
+                   + cells%surface_storage_excess * ( 1.0_c_float - cells%pervious_fraction )        &
+                      / ( cells%pervious_fraction )                                                  &
                    + cells%snowmelt                                                                  &
                    - cells%interception                                                              &
                    + cells%irrigation
@@ -99,20 +100,20 @@ contains
 
     ! NOTE: the formulation below, with interception_et commented out, seems most comparable
     !       with that used by HWB
-    cells%actual_et = cells%actual_et_soil * ( 1.0_c_float - cells%impervious_fraction )   &
-!                      + cells%actual_et_interception * cells%canopy_cover_fraction         &
-                      + cells%actual_et_impervious * cells%impervious_fraction
+    cells%actual_et = cells%actual_et_soil * cells%pervious_fraction                            &
+!                      + cells%actual_et_interception * cells%canopy_cover_fraction             &
+                      + cells%actual_et_impervious * ( 1.0_c_float - cells%pervious_fraction )
 
     ! moved this call up so that septic could be added to soil mass balance at some future date if needed
     call cells%calc_direct_recharge()
-
-    call cells%calc_irrigation()
 
     call calculate_soil_mass_balance( potential_recharge=cells%potential_recharge,       &
                                       soil_storage=cells%soil_storage,                   &
                                       soil_storage_max=cells%soil_storage_max,           &
                                       actual_et=cells%actual_et_soil,                    &
                                       infiltration=cells%infiltration )
+
+    cells%potential_recharge = cells%potential_recharge * cells%pervious_fraction
 
   end subroutine perform_daily_calculation
 

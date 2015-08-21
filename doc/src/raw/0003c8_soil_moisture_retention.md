@@ -55,6 +55,15 @@ where:
 
 Kolka and Wolf [-@kolka_estimating_1998] report values of 0.525 for the value of the constant, and 1.0371 for the value of the exponent.
 
+## Thornthwaite-Mather without calculating Accumulated Potential Water Loss
+
+Calculating the amount of soil moisture that can be extracted for a given accumulated potential water loss (APWL) is made easier by adopting a simple equation-based approach as discussed in the previous section. However, this approach still requires that the APWL be calculated and stored for each grid cell. It turns out that there is a better way.
+
+The relation that Thornthwaite and Mather tabulated in their reports and others later represented by fitted equations is depicted graphically in the figure below.
+
+![Figure placeholder: Actual_ET__Thornthwaite__300dpi.png]( ../images/Actual_ET__Thornthwaite__72dpi.png )
+
+
 ~~~~~~~~
 CONTROL_FILE_STATEMENT 1
 CONTROL_FILE_STATEMENT_2

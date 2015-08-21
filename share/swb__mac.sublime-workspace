@@ -4,6 +4,410 @@
 		"selected_items":
 		[
 			[
+				"crop",
+				"crop_coefficient_kcb"
+			],
+			[
+				"poten",
+				"potential_et0"
+			],
+			[
+				"irri",
+				"irrigation_mask"
+			],
+			[
+				"APP_",
+				"APP_OPTION_NAME"
+			],
+			[
+				"lan",
+				"landuse_table_codes"
+			],
+			[
+				"APP",
+				"APPLICATION_METHOD_CODE"
+			],
+			[
+				"APPLI",
+				"APPLICATION_AMOUNT"
+			],
+			[
+				"APPLIC",
+				"APPLICATION_METHOD_CODE"
+			],
+			[
+				"IRRIGA",
+				"IRRIGATION_METHOD_CODE"
+			],
+			[
+				"curren",
+				"current_surface_storage_max"
+			],
+			[
+				"curr",
+				"current_surface_storage_max"
+			],
+			[
+				"initialize_p",
+				"initialize_polygon_summary"
+			],
+			[
+				"roo",
+				"ROOTING_DEPTH_MAX"
+			],
+			[
+				"adjusted",
+				"adjusted_depletion_fraction_p"
+			],
+			[
+				"adju",
+				"adjusted_depletion_fraction_p"
+			],
+			[
+				"actual",
+				"actual_et_impervious"
+			],
+			[
+				"actual_et",
+				"actual_et_interception"
+			],
+			[
+				"actual_et_",
+				"actual_et_impervious"
+			],
+			[
+				"surface",
+				"surface_storage_excess"
+			],
+			[
+				"surfa",
+				"surface_storage_max"
+			],
+			[
+				"surface_s",
+				"surface_storage_max"
+			],
+			[
+				"logical",
+				"logical_vector"
+			],
+			[
+				"log",
+				"logical_vector"
+			],
+			[
+				"rootin",
+				"rooting_depth_max"
+			],
+			[
+				"iS",
+				"iSoilsIndex"
+			],
+			[
+				"soi",
+				"soil_moisture_storage"
+			],
+			[
+				"hwb_",
+				"hwb_rooting_depth"
+			],
+			[
+				"hwb",
+				"hwb_rooting_depth"
+			],
+			[
+				"lF",
+				"lFALSE"
+			],
+			[
+				"rooting",
+				"rooting_depth_inches"
+			],
+			[
+				"soil",
+				"soil_moisture_storage"
+			],
+			[
+				"iNum",
+				"iNumberOfPolygonIDs"
+			],
+			[
+				"pP",
+				"pPOLYGON_ID"
+			],
+			[
+				"POLYGON_ID",
+				"pPOLYGON_ID"
+			],
+			[
+				"M",
+				"MAX_ROOTING_DEPTH"
+			],
+			[
+				"ma",
+				"max_rooting_depth"
+			],
+			[
+				"model_initialize_max",
+				"model_initialize_max_soil_storage_internally_calculated"
+			],
+			[
+				"model_initialize_isoi",
+				"model_initialize_max_soil_storage_gridded"
+			],
+			[
+				"reference",
+				"reference_et0"
+			],
+			[
+				"cons",
+				"root_constant_ci"
+			],
+			[
+				"fraction",
+				"fraction_full_PET"
+			],
+			[
+				"root",
+				"root_constant_ci"
+			],
+			[
+				"model_up",
+				"model_update_crop_coefficient_FAO56"
+			],
+			[
+				"updat",
+				"update_crop_coefficient"
+			],
+			[
+				"model_initialize_c",
+				"model_initialize_crop_coefficient_FAO56"
+			],
+			[
+				"G",
+				"GDD"
+			],
+			[
+				"set_maj",
+				"set_majority_filter_flag_sub"
+			],
+			[
+				"potential",
+				"potential_snowmelt"
+			],
+			[
+				"model_calculate_rout",
+				"model_calculate_routing_none"
+			],
+			[
+				"model_initialize_r",
+				"model_initialize_routing_none"
+			],
+			[
+				"calc_r",
+				"calc_routing"
+			],
+			[
+				"__",
+				"__LINE__"
+			],
+			[
+				"deple",
+				"depletion_fraction_p"
+			],
+			[
+				"imp",
+				"impervious_fraction"
+			],
+			[
+				"calculate",
+				"calculate_soil_mass_balance"
+			],
+			[
+				"calcul",
+				"calculate_snow_mass_balance"
+			],
+			[
+				"calcula",
+				"calculate_interception_mass_balance"
+			],
+			[
+				"contin",
+				"update_continuous_frozen_ground_index"
+			],
+			[
+				"run",
+				"runoff_curve_number_calculate"
+			],
+			[
+				"cont",
+				"continuous_frozen_ground_index"
+			],
+			[
+				"model_calculate_ac",
+				"model_calculate_actual_et_thornthwaite_mather"
+			],
+			[
+				"model_initialize_actual",
+				"model_initialize_actual_et_thornthwaite_mather"
+			],
+			[
+				"model_initialize_ac",
+				"model_initialize_actual_et_thornthwaite_mather"
+			],
+			[
+				"refer",
+				"reference_et0"
+			],
+			[
+				"max",
+				"max_soil_storage"
+			],
+			[
+				"update",
+				"update_continuous_frozen_ground_index"
+			],
+			[
+				"soils_",
+				"soils_index"
+			],
+			[
+				"con",
+				"continuous_frozen_ground_index"
+			],
+			[
+				"potent",
+				"potential_snowmelt"
+			],
+			[
+				"im",
+				"impervious_fraction"
+			],
+			[
+				"sur",
+				"surface_storage_max"
+			],
+			[
+				"ca",
+				"canopy_cover_fraction"
+			],
+			[
+				"interception",
+				"interception_storage"
+			],
+			[
+				"surface_storage",
+				"surface_storage_excess"
+			],
+			[
+				"ref",
+				"reference_et0"
+			],
+			[
+				"de",
+				"depletion_fraction_p"
+			],
+			[
+				"inter",
+				"interim_soil_storage"
+			],
+			[
+				"available",
+				"available_water_capacity"
+			],
+			[
+				"soil_storage",
+				"soil_storage_max"
+			],
+			[
+				"LOG",
+				"LOG_ALL"
+			],
+			[
+				"fRoo",
+				"fMaxRootingDepth"
+			],
+			[
+				"min",
+				"minmaxmean"
+			],
+			[
+				"init_soil_",
+				"init_soil_moisture_max"
+			],
+			[
+				"model_initialize_soil_storage_max_",
+				"model_initialize_soil_storage_max_internally_calculated"
+			],
+			[
+				"current",
+				"current_rooting_depth"
+			],
+			[
+				"soil_st",
+				"soil_storage_previous_day"
+			],
+			[
+				"write",
+				"write_output"
+			],
+			[
+				"X_",
+				"X_lon"
+			],
+			[
+				"initial",
+				"initialize_latitude"
+			],
+			[
+				"initi",
+				"initialize_latitude_sub"
+			],
+			[
+				"initialize_a",
+				"initialize_ancillary_values"
+			],
+			[
+				"che",
+				"check_for_fatal_warnings"
+			],
+			[
+				"initia",
+				"initialize_percent_canopy_cover_sub"
+			],
+			[
+				"initialize_percent",
+				"initialize_percent_canopy_cover_sub"
+			],
+			[
+				"pPERCENT",
+				"pPERCENT_CANOPY_COVER"
+			],
+			[
+				"pPERCEN",
+				"pPERCENT_CANOPY_COVER"
+			],
+			[
+				"get",
+				"getvalues"
+			],
+			[
+				"rain",
+				"rainfall"
+			],
+			[
+				"initialize",
+				"initialize_percent_impervious_sub"
+			],
+			[
+				"fra",
+				"fraction_impervious"
+			],
+			[
+				"pPe",
+				"pPERCENT_PERVIOUS"
+			],
+			[
 				"iD",
 				"iDeepestSoilHorizon"
 			],
@@ -44,10 +448,6 @@
 				"awc_table_values_read"
 			],
 			[
-				"rooting",
-				"max_rooting_depth"
-			],
-			[
 				"awc",
 				"awc__table_values"
 			],
@@ -56,16 +456,8 @@
 				"fRooting_Depth"
 			],
 			[
-				"max",
-				"max_rooting_depth"
-			],
-			[
 				"fSoils_",
 				"fSoils_Horizon_Thickness"
-			],
-			[
-				"iNum",
-				"iNumberOfSoilsComponentFractions"
 			],
 			[
 				"iNu",
@@ -100,14 +492,6 @@
 				"fSoils_Bottom_Depth"
 			],
 			[
-				"fRoo",
-				"fRooting_Depth_inches"
-			],
-			[
-				"soil_storage",
-				"soil_storage_max"
-			],
-			[
 				"pGrd",
 				"pGrdBase"
 			],
@@ -130,424 +514,97 @@
 			[
 				"fGDD",
 				"fGDD_Max_"
-			],
-			[
-				"GDD",
-				"GDD_MAX"
-			],
-			[
-				"model_output_G",
-				"model_output_GDD_none"
-			],
-			[
-				"mode",
-				"model_calculate_GDD"
-			],
-			[
-				"model_initi",
-				"model_initialize_GDD"
-			],
-			[
-				"GRO",
-				"GROWTH_STAGE_DOY"
-			],
-			[
-				"Par",
-				"PARAMS_DICT"
-			],
-			[
-				"get_ne",
-				"get_next_entry_by_key_fn"
-			],
-			[
-				"DI",
-				"DICT_ENTRY_T"
-			],
-			[
-				"list_",
-				"list_is_string_in_list_fn"
-			],
-			[
-				"list",
-				"list_is_string_in_list_fn"
-			],
-			[
-				"coun",
-				"countmatching"
-			],
-			[
-				"WARNIN",
-				"WARNING_TEXT"
-			],
-			[
-				"reference",
-				"reference_ET0"
-			],
-			[
-				"order",
-				"orderindex"
-			],
-			[
-				"runof",
-				"runoff_outside"
-			],
-			[
-				"soil",
-				"soil_storage_max"
-			],
-			[
-				"runo",
-				"runoff_outside"
-			],
-			[
-				"lHave",
-				"lHaveEndDate"
-			],
-			[
-				"adjust",
-				"adjust_depletion_fraction_p"
-			],
-			[
-				"IRRI",
-				"IRRIGATION_EFFICIENCY"
-			],
-			[
-				"IR",
-				"IRRIGATION_EFFICIENCY"
-			],
-			[
-				"fANNU",
-				"fANNUAL_RECHARGE_RATE"
-			],
-			[
-				"DIRECT",
-				"DIRECT_RECHARGE"
-			],
-			[
-				"fANN",
-				"fANNUAL_RECHARGE_RATE"
-			],
-			[
-				"fANNA",
-				"fANNUAL_RECHARGE_RATE_TABLE"
-			],
-			[
-				"fSTORM",
-				"fSTORM_DRAIN"
-			],
-			[
-				"fWATER",
-				"fWATER_BODY_RECHARGE"
-			],
-			[
-				"fDI",
-				"fDISPOSAL_WELL"
-			],
-			[
-				"fWATER_MI",
-				"fWATER_MAIN_TABLE"
-			],
-			[
-				"init_r",
-				"init_direct_recharge"
-			],
-			[
-				"potential",
-				"potential_recharge"
-			],
-			[
-				"potenti",
-				"potential_recharge"
-			],
-			[
-				"recharge",
-				"potential_recharge"
-			],
-			[
-				"calc_s",
-				"calc_sources_and_sinks"
-			],
-			[
-				"model_calculate_s",
-				"model_calculate_sources_and_sinks_none"
-			],
-			[
-				"fWATE",
-				"fWATER_BODY_RECHARGE_TABLE"
-			],
-			[
-				"fSTORM_DRA",
-				"fSTORM_DRAIN_TABLE"
-			],
-			[
-				"fW",
-				"fWATER_BODY_RECHARGE"
-			],
-			[
-				"f",
-				"fWATER_MAIN"
-			],
-			[
-				"DIS",
-				"fDISPOSAL_WELL"
-			],
-			[
-				"pWATER",
-				"pWATER_MAIN"
-			],
-			[
-				"pWATER_",
-				"pWATER_BODY_RECHARGE"
-			],
-			[
-				"fCES",
-				"fCESSPOOL_TABLE"
-			],
-			[
-				"refere",
-				"reference_ET0"
-			],
-			[
-				"NCDF_SNO",
-				"NCDF_SNOWMELT"
-			],
-			[
-				"infil",
-				"infiltration"
-			],
-			[
-				"NCDF_IN",
-				"NCDF_INFILTRATION"
-			],
-			[
-				"fMax",
-				"fMaxRootingDepth"
-			],
-			[
-				"fSoi",
-				"fSoilStorage_Max_RZ"
-			],
-			[
-				"DATATY",
-				"DATATYPE_INT"
-			],
-			[
-				"LU_",
-				"LU_SOILS_CSV"
-			],
-			[
-				"GIT",
-				"GIT_COMMIT_HASH_STRING"
-			],
-			[
-				"COMPI",
-				"COMPILE_TIME"
-			],
-			[
-				"iLan",
-				"iLanduseIndex"
-			],
-			[
-				"IRR",
-				"IRRIGATION_FROM_GROUNDWATER"
-			],
-			[
-				"MA",
-				"MAXIMUM_ALLOWABLE_DEPLETION_FRACTION"
-			],
-			[
-				"mm",
-				"mmdd2doy"
-			],
-			[
-				"slIrr",
-				"slIrrigationBegin"
-			],
-			[
-				"FIRT",
-				"FIRST_DAY_OF_IRRIGATION"
-			],
-			[
-				"slIrri",
-				"slIrrigationEnd"
-			],
-			[
-				"calc",
-				"calc_irrigation"
-			],
-			[
-				"soil_sto",
-				"soil_storage_max"
-			],
-			[
-				"IRRIGAT",
-				"IRRIGATION_FROM_GROUNDWATER"
-			],
-			[
-				"fSoilStorage",
-				"fSoilStorage_Max"
-			],
-			[
-				"model_calculate_irrigation",
-				"model_calculate_irrigation_none"
-			],
-			[
-				"soi",
-				"soil_group"
-			],
-			[
-				"INI",
-				"INITIAL_PERCENT_SOIL_MOISTURE"
-			],
-			[
-				"fInterc",
-				"fInterception_Value"
-			],
-			[
-				"fCanop",
-				"fCanopy_Fraction"
-			],
-			[
-				"canopy",
-				"canopy_cover_fraction"
-			],
-			[
-				"cano",
-				"canopy_storage_capacity"
-			],
-			[
-				"CANOPY",
-				"CANOPY_STORAGE_CAPACITY_TABLE_VALUES"
-			],
-			[
-				"c_s",
-				"c_size_t"
-			],
-			[
-				"MODEL",
-				"MODEL_DOMAIN_T"
-			],
-			[
-				"iLine",
-				"iLinenumber_"
-			],
-			[
-				"iLinenu",
-				"iLinenumber_"
-			],
-			[
-				"iLin",
-				"iLinenumber"
-			],
-			[
-				"sFi",
-				"sFilename"
-			],
-			[
-				"init_i",
-				"init_irrigation"
-			],
-			[
-				"growing",
-				"growing_degree_day_update"
-			],
-			[
-				"fT_GDD",
-				"fT_GDD_Base_F"
-			],
-			[
-				"update",
-				"update_crop_coefficient_date_as_threshold"
-			],
-			[
-				"update_co",
-				"update_crop_coefficient_date_as_threshold"
-			],
-			[
-				"GDD_p",
-				"GDD_plant"
-			],
-			[
-				"GROWTH",
-				"GROWTH_STAGE_GDD"
-			],
-			[
-				"L_DOY_",
-				"L_DOY_MID"
-			],
-			[
-				"L_DO",
-				"L_DOY_INI"
-			],
-			[
-				"ENDDATE_",
-				"ENDDATE_LATE"
-			],
-			[
-				"ENDDATE",
-				"ENDDATE_DEV"
-			],
-			[
-				"DATE",
-				"DATETIME_T"
-			],
-			[
-				"date_pl",
-				"date_plus_float_fn"
-			],
-			[
-				"cal",
-				"calcGregorianDate"
-			],
-			[
-				"GR",
-				"GROWTH_STAGE_DATE"
-			],
-			[
-				"ENDD",
-				"ENDDATE_LATE"
-			],
-			[
-				"ENDDAT",
-				"ENDDATE_MID"
-			],
-			[
-				"END",
-				"ENDDATE_DEV"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/soil_moisture__FAO_56.F90",
+			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/daily_calculation.F90",
 			"settings":
 			{
-				"buffer_size": 38148,
+				"buffer_size": 7415,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/soil_moisture__thornthwaite_mather.F90",
+			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/direct_recharge__gridded_data.F90",
 			"settings":
 			{
-				"buffer_size": 5454,
+				"buffer_size": 15822,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/mass_balance__soil.f90",
+			"settings":
+			{
+				"buffer_size": 1746,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/actual_et__fao56.f90",
+			"settings":
+			{
+				"buffer_size": 5863,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/actual_et__thornthwaite_mather.F90",
+			"settings":
+			{
+				"buffer_size": 1591,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/model_initialize.F90",
+			"settings":
+			{
+				"buffer_size": 55147,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/smwesten/SMWData/Source_Code/Hawaii_Water_Budget_Code/src/HI_WB_3_9_1.f",
+			"settings":
+			{
+				"buffer_size": 127386,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/growing_degree_day.F90",
+			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/polygon_summarize.F90",
 			"settings":
 			{
-				"buffer_size": 7579,
-				"line_ending": "Unix"
+				"buffer_size": 5698,
+				"line_ending": "Unix",
+				"name": "module value_probe"
+			}
+		},
+		{
+			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/CMakeLists.txt",
+			"settings":
+			{
+				"buffer_size": 6801,
+				"line_ending": "Windows"
 			}
 		},
 		{
 			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/model_domain.F90",
 			"settings":
 			{
-				"buffer_size": 115326,
+				"buffer_size": 80328,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/netcdf4_support.F90",
+			"settings":
+			{
+				"buffer_size": 121801,
 				"line_ending": "Unix"
 			}
 		},
@@ -555,47 +612,23 @@
 			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/data_catalog_entry.F90",
 			"settings":
 			{
-				"buffer_size": 65184,
+				"buffer_size": 65770,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/CMakeLists.txt",
+			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/grid.F90",
 			"settings":
 			{
-				"buffer_size": 13208,
+				"buffer_size": 90797,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/awc__table_values.F90",
+			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/mass_balance__impervious_surface.f90",
 			"settings":
 			{
-				"buffer_size": 11310,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/runoff__curve_number.F90",
-			"settings":
-			{
-				"buffer_size": 11017,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/interception__bucket.F90",
-			"settings":
-			{
-				"buffer_size": 2548,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/Users/smwesten/SMWData/Source_Code/swb2/tests/src/test__CN_update.F90",
-			"settings":
-			{
-				"buffer_size": 2817,
+				"buffer_size": 2896,
 				"line_ending": "Unix"
 			}
 		},
@@ -603,47 +636,23 @@
 			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/irrigation.F90",
 			"settings":
 			{
-				"buffer_size": 13399,
+				"buffer_size": 19040,
 				"line_ending": "Windows"
 			}
 		},
 		{
-			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/model_initialize.F90",
+			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/model_iterate.F90",
 			"settings":
 			{
-				"buffer_size": 30236,
+				"buffer_size": 1147,
 				"line_ending": "Unix"
 			}
 		},
 		{
-			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/awc__gridded_values.F90",
+			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/crop_coefficients__fao56.F90",
 			"settings":
 			{
-				"buffer_size": 1460,
-				"line_ending": "Windows"
-			}
-		},
-		{
-			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/dictionary.F90",
-			"settings":
-			{
-				"buffer_size": 22342,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/string_list.F90",
-			"settings":
-			{
-				"buffer_size": 17896,
-				"line_ending": "Unix"
-			}
-		},
-		{
-			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/exceptions.F90",
-			"settings":
-			{
-				"buffer_size": 8222,
+				"buffer_size": 24668,
 				"line_ending": "Unix"
 			}
 		}
@@ -692,62 +701,88 @@
 	[
 		"/Users/smwesten/SMWData/Source_Code/swb2/src",
 		"/Users/smwesten/SMWData/Source_Code/swb2/tests",
-		"/Users/smwesten/SMWData/Source_Code/swb2/tests/src"
+		"/Users/smwesten/SMWData/Source_Code/swb2/tests/bin",
+		"/Users/smwesten/SMWData/Source_Code/swb2/tests/src",
+		"/Users/smwesten/SMWData/Source_Code/Hawaii_Water_Budget_Code/src"
 	],
 	"file_history":
 	[
+		"/Users/smwesten/SMWData/Source_Code/netcdf_editor/netcdf_editor.py",
+		"/Users/smwesten/SMWData/Source_Code/Hawaii_Water_Budget_Code/src/HI_WB_3_9_1.f",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/daily_calculation.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/mass_balance__impervious_surface.f90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/model_domain.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/actual_et__thornthwaite_mather.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/actual_et__fao56.f90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/interception__bucket.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/mass_balance__interception.f90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/fog__monthly_grid.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/mass_balance__snow.f90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/mass_balance__soil.f90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/model_initialize.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/netcdf4_support.F90",
+		"/Users/smwesten/SMWData/Source_Code/Hawaii_Water_Budget_Code/src/HI_WB_SMW.f",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/grid.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/CMakeLists.txt",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/routing__D8.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/runoff__gridded_values.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/awc__gridded_values.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/crop_coefficients__fao56.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/et__gridded_values.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/dictionary.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/data_catalog_entry.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/model_iterate.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/strings.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/exceptions.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/runoff__curve_number.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/logfiles.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/main.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/max_soil_storage__gridded_values.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/direct_recharge__gridded_data.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/actual_evapotranspiration__fao56.f90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/actual_evapotranspiration__thornthwaite.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/output.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/snowmelt__original.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/precipitation__method_of_fragments.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/soil_storage_max__gridded_values.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/awc__table_values.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/interception__gash.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/constants_and_conversions.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/irrigation.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/mass_balance__soil_part_two.f90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/mass_balance.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/soil_moisture__thornthwaite_mather.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/control_old.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/tests/src/CMakeLists.txt",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/water_balance.F90",
+		"/Users/smwesten/SMWData/Source_Code/Hawaii_Water_Budget_Code/src/HI_WB_3_1.f",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/soil_moisture__FAO_56.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/growing_degree_day.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/tests/src/test__CN_update.F90",
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/string_list.F90",
 		"/Users/smwesten/SMWData/Active_Projects/pacific_islands_swb/test_cases/maui_test_case/std_input/LU_lookup_Engott_v3_5.csv",
 		"/Users/smwesten/SMWData/Source_Code/swb/src/runoff_curve_number.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/direct_recharge__gridded_data.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/data_catalog.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/irrigation.F90",
-		"/Users/smwesten/SMWData/Source_Code/Hawaii_Water_Budget_Code/src/HI_WB_3_9_1.f",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/soil_moisture__FAO_56.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/constants_and_conversions.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/exceptions.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/fog__monthly_grid.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/model_domain.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/routing__D8.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/dictionary.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/CMakeLists.txt",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/model_initialize.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/data_catalog_entry.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/netcdf4_support.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/graph.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/datetime.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/soil_moisture__thornthwaite_mather.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/tests/src/test__GASH.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/parameters.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/main.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/growing_degree_day.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/interception__gash.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/dictionary.f90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/string_list.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/logfiles.F90",
 		"/Users/smwesten/.ipython/profile_default/static/custom/custom.css",
 		"/Users/smwesten/SMWData/Source_Code/swb/build/mac_osx/gfortran/run_cmake_gfortran.sh",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/soil_moisture_single_layer.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/tests/src/test__FAO56.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/tests/src/CMakeLists.txt",
 		"/Users/smwesten/SMWData/Source_Code/swb2/tests/src/test__GDD.F90",
 		"/Volumes/SMWData/Active_Projects/Fox_Wolf_Peshtigo/swb_daymet_500m/fwp_swb_Daymet.ctl",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/precipitation__method_of_fragments.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/grid.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/model_iterate.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/soil_moisture_storage.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/types.F90",
 		"/Users/smwesten/SMWData/Source_Code/test/test_spread.F90",
 		"/Users/smwesten/SMWData/Active_Projects/pacific_islands_swb/test_cases/Maui_test_case/input/Air_Temperature_Monthly/tmaxmay_250m.asc",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/logfiles__mmd.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/proj4/proj.c",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/runoff__gridded_values.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/simulation_datetime.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/test_params.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/control_old.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/file_operations.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/interception__bucket.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/runoff__curve_number.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/strings.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/solar_calculations.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/loop_initialize.F90",
 		"/Users/smwesten/Library/Application Support/Sublime Text 3/Packages/Default/Preferences.sublime-settings",
@@ -760,7 +795,6 @@
 		"/Users/smwesten/SMWData/Active_Projects/Pacific_Islands_SWB/test_cases/Maui_test_case_swb/recharge_Maui.ctl",
 		"/Users/smwesten/SMWData/Active_Projects/Pacific_Islands_SWB/test_cases/Maui_test_case/input_files/1920_2010_input/monthly_rain_maui_1920_2010.prn",
 		"/Users/smwesten/SMWData/Active_Projects/Pacific_Islands_SWB/test_cases/Maui_test_case/runs/gwrp/03_1870_land_1978_2007_rain/grass_ref_ET_var_maui.prn",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/et__gridded_values.F90",
 		"/Users/smwesten/SMWData/Source_Code/Hawaii_Water_Budget_Code/HI_WB_3_1__SMW_annotations.f",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/soil_moisture__FAO56.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/infiltration__curve_number.F90",
@@ -800,34 +834,11 @@
 		"/Users/smwesten/SMWData/Source_Code/swb/src/et_jensen_haise.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb/src/output.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb/src/types.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb/eclipse_projects/swb/src/swbstats.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb/src/grid.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb/src/water_balance.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb/src/RLE.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb/src/data_catalog.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb/src/stats.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb/src/et_blaney_criddle.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb/doc/doxygen/html/jquery.js",
-		"/Users/smwesten/SMWData/Source_Code/swb/src/constants_and_conversions.mod",
-		"/Users/smwesten/Library/Application Support/Sublime Text 3/Packages/Default/Default (OSX).sublime-keymap",
-		"/Users/smwesten/Library/Application Support/Sublime Text 3/Packages/User/Function Name Display.sublime-settings",
-		"/Users/smwesten/Library/Application Support/Sublime Text 3/Packages/Function Name Display/Function Name Display.sublime-settings",
-		"/Users/smwesten/SMWData/Source_Code/swb/src/cell_vector.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb/src/types_old.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb/src/lookup_table_class.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb/src/interception_storage.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb/src/snow_storage.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb/src/soil_moisture_storage.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb/src/swbstats.F90",
-		"/Users/smwesten/SMWData/Source_Code/SWB_TEST_CASES/Kirstin_Seleen_NY_v3/recharge_saratoga_SMW_CIDA_MAUER_THREDDS.ctl",
-		"/Users/smwesten/SMWData/Source_Code/swb/cmake/find_programs_and_libraries.cmake",
-		"/Users/smwesten/SMWData/Source_Code/test_dict/test2.F90",
-		"/Users/smwesten/SMWData/Source_Code/strings_n_tables/src/testchar.F90",
-		"/Users/smwesten/SMWData/Source_Code/strings_n_tables/src/test2.f90"
+		"/Users/smwesten/SMWData/Source_Code/swb/eclipse_projects/swb/src/swbstats.F90"
 	],
 	"find":
 	{
-		"height": 35.0
+		"height": 37.0
 	},
 	"find_in_files":
 	{
@@ -843,134 +854,134 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"Grid cell size",
+			"DIRECT",
+			"direc",
+			"potential_et0",
+			"crop_et",
+			"num_days_from_",
+			"%get",
+			"slList",
+			"sBuf",
+			"slApplicationMethod",
+			"slIrrigationEnd",
+			"slIrrigationBegin",
+			"iStat",
+			"iLanduseTableCodes",
+			"iNumberOfLanduses",
+			"lActive",
+			"iJulianDay",
+			"iNumDaysFromOrigin",
+			"dayOfYear",
+			"daysInMonth",
+			"iYear",
+			"iDay",
+			"iMonth",
+			"iIndex",
+			".not. are_lengths_unequal",
+			"num_records == iNumberOfLanduses",
+			"are_lengths_equal",
+			"lAreLengthsEqual",
+			"iNumRecs",
+			"fAmount",
+			"fImpervious_Fraction",
+			"fEfficiency",
+			"soil_storage_Max",
+			"fSoilStorage",
+			"( iIndex )",
+			"iLanduseIndex",
+			"iOption",
+			"fZERO",
+			"fIrrigationAmount",
+			"rIrrigationAmount",
+			"fPervious_Fraction",
+			"fPerviousFraction",
+			"rDepletionAmount",
+			"fDepletionAmount",
+			"fDepletionFraction",
+			"rmltirr",
+			"slIrrigationMethod",
+			"IRRIGATION_METHOD_CODE",
+			"enumerator",
+			"value_probe",
+			"enum",
+			"initialize_root_zone_depths",
+			"lu=17",
+			"landuse_code==17",
+			"rooting",
+			"minmaxmean",
+			"inputs_minus_ET",
+			"soil_inputs",
+			"P_minus_PE",
+			"precipitation",
+			"surface_storage_max",
+			"smc",
+			"root",
+			"hi_wb4",
+			"golfirr",
+			"dont_care",
+			"max_rooting_depth",
+			"MAX_ROOTING_DEPTH",
+			"max_soil_storage",
+			"MAX_SOIL_STORAGE",
+			"SOIL_STORAGE_MAX",
+			"set_method",
+			"set_method_sub",
+			"this",
+			"actual_et",
+			"Summary of integer grid ",
+			"LOG_DEBUG",
+			"iLanduseIndex",
+			"crop_co",
+			"actual_evapotranspiration__fao56",
+			"actual_evapotranspiration__thornthwaite_mather",
+			"grid_gridToGrid_int",
+			"print_all",
+			"KEY:",
+			"crop",
+			"model_initialize_soil_moisture_thornthwaite_mather",
+			"soil_storage_max",
+			"soils_group",
+			"soils_index",
+			"this",
+			"routing_D8",
+			"rainfall",
+			"snowfall",
+			"soil_storage",
+			"minmax",
+			"chunk",
+			"Opening file",
+			"call minmaxmean",
+			"fReference_ET0adj",
+			"fReference_ET0_adj",
+			"MODEL",
+			"pAWC_GRID",
+			"awc",
+			"this",
+			"rooting_depth",
+			"this",
+			"INITIAL_PERCENT_SOIL_MOISTURE",
+			"soil_storage",
+			"this%soil_storage",
+			"this",
+			"BNDS",
+			"pCOORD_GRD%rX",
+			"pCOORD_GRD%rY",
+			"this",
+			"pCOORD_GRD",
+			"OUTPUT",
+			"this",
+			"swb_grid",
+			"smp",
+			"sm0",
+			"smca",
+			"smct",
+			"sm4t",
+			"rd0",
 			"soil_storage_max",
 			"print *,",
 			"swb_grid",
-			"grid",
-			"read_in_available_water_content_sub",
-			"model_get_available_water_content_gridded",
-			"get_awc_data",
-			"MAX_ROOTING_DEPTH",
-			"read_land_use_code",
-			"get_land_use",
-			"initialize_soil_layers",
-			"initialize_soil_layers_sub",
-			"soil_group",
-			"SOILS_GROUP",
-			"rooting_depth",
-			"as",
-			"grid",
-			"soil_storage_max",
-			"_AMC",
-			"model_calculate_GDD",
-			"growing_degree_day_calculate",
-			"Bounds of data",
-			"bounds of",
-			"rmltirr",
-			"nirrdays",
-			"rmltirr",
-			"golfirr",
-			"cropirr",
-			"impervious",
-			"IMPERVIOUS_SURFACE_FRACTION",
-			"direct_recharge",
-			"pNCFILE",
-			"DISCHARGE_WELL",
-			"WATER_MAIN",
-			"WATER_BODY_RECHARGE",
-			"STORM_DRAIN",
-			"fValues array",
-			"SOURCES_AND_SINKS",
-			"sources_and_sinks",
-			"use sources_and_sinks__gridded_data",
-			"source",
-			"set_method_sub",
-			"lGridHasChanged",
-			"iConstantValue",
-			"model_calculate_irrigation",
-			"KCB_METHOD",
-			"fSoilStorage_Max",
-			"OUTPUT",
-			"soil_storage_max",
-			"this",
-			"tmin",
-			"fRootingDepth",
-			"tmin",
-			"logs",
-			"parseDate",
-			"irrigation",
-			"L_GROWTH",
-			"print *",
-			"gashcal",
-			"ceint",
-			"cerf",
-			"icim",
-			"ceint",
-			"grid_Majority",
-			"pLULC",
-			"pCOORD",
-			"_echo",
-			"ROOTING_DEPTH",
-			"thornthwaite",
-			"ROOTING_DEPTH",
-			"loop_initialize",
-			"LOGS%",
-			">>",
-			"make_shaded",
-			"iTab",
-			"index",
-			"<<",
-			"ROOTING_DEPTH",
-			"get_parameters",
-			"rooting_depth",
-			"KCB_INIT",
-			"iLandUseIndex",
-			"iFAO_Index",
-			"SIM_DT%iDayOfYear",
-			"PARAM_DICT%get_values",
-			"generic",
-			"PARAM_DICT%get_values",
-			"PARAM_DICT",
-			"PARAMS%dict",
-			"PARAMETER_FILES_T",
-			"myOptions%deallocate",
-			"PARAMS%munge",
-			"PARAMS%add",
-			"PARAM_FILES",
-			"PARAMS%get_values",
-			"PARAMS%grep_keys",
-			"PARAMETER_FILES_T",
-			"deallocate",
-			"parameter",
-			"Gross Precip:",
-			"fMean_plant_height",
-			"fDepletion_fraction",
-			"fKcb_min",
-			"fKcb_end",
-			"fKcb_mid",
-			"fKcb_ini",
-			"iL_late",
-			"iL_mid",
-			"iL_ini",
-			"iL_plant",
-			"fTEW",
-			"fREW",
-			"iLanduseCode",
-			"iFAOIndex",
-			"init_routing",
-			"runoff_gridded_ratio_calculate",
-			"runoff_gridded_ratio_initialize",
-			"runoff__gridded_ratio",
-			"model_initialize_runoff_gridded_ratio",
-			"model_calculate_runoff_gridded_ratio",
-			"infiltration__monthly_grid",
-			"runoff",
-			"++++++++",
-			"Summary of integer grid",
-			"Summary of fragment",
-			"summary of fragment",
-			"chomp",
-			"pMONTHLY_ET_GRID"
+			"grid"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -978,6 +989,79 @@
 		"regex": false,
 		"replace_history":
 		[
+			"crop_etc",
+			"num_days_from_origin",
+			"sl_temp_list",
+			"str_buffer",
+			"sl_application_method",
+			"sl_irrigation_end",
+			"sl_irrigation_begin",
+			"status",
+			"landuse_table_codes",
+			"number_of_landuse_codes",
+			"is_active",
+			"julian_day",
+			"num_days_from_origin",
+			"day_of_year",
+			"days_in_month",
+			"year",
+			"day",
+			"month",
+			"index",
+			"are_lengths_unequal",
+			"num_records /= iNumberOfLanduses",
+			"are_lengths_unequal",
+			"are_lengths_equal",
+			"num_records",
+			"interim_irrigation_amount",
+			"impervious_surface_fraction",
+			"efficiency",
+			"soil_storage_max",
+			"soil_storage",
+			"",
+			"landuse_index",
+			"option",
+			"0.0_c_float",
+			"irrigation_amount",
+			"pervious_surface_fraction",
+			"depletion_amount",
+			"depletion_fraction",
+			"slApplicationMethod",
+			"APPLICATION_METHOD_CODE",
+			"polygon_summarize",
+			"create_rooting_depth_table",
+			"lu=6",
+			"landuse_code==6",
+			"infiltration_minus_et",
+			"infiltration",
+			"inputs_minus_ET",
+			"soil_inputs",
+			"rooting_depth_max",
+			"ROOTING_DEPTH_MAX",
+			"soil_storage_max",
+			"SOIL_STORAGE_MAX",
+			"set_method_pointers",
+			"set_method_pointers_sub",
+			"cells",
+			"LOG_ALL",
+			"landuse_index",
+			"actual_et__fao56",
+			"actual_et__thornthwaite_mather",
+			"max_soil_storage",
+			"soil_group",
+			"soils_group",
+			"cells",
+			"this",
+			"pSOIL_STORAGE_MAX_GRID",
+			"soil_storage_max",
+			"MODEL",
+			"cells%X_lon",
+			"cells%Y_lat",
+			"MODEL",
+			"NC_OUT",
+			"cells",
+			"model_cells",
+			"grid",
 			"model_read_available_water_content_gridded",
 			"read_awc_data",
 			"read_land_use_codes",
@@ -1032,80 +1116,7 @@
 			"runoff_gridded_values_calculate",
 			"runoff_gridded_values_initialize",
 			"runoff__gridded_values",
-			"model_initialize_runoff_gridded_values",
-			"model_calculate_runoff_gridded_values",
-			"runoff__gridded_ratio",
-			"pET_GRID",
-			"et_gridded_values",
-			"Real",
-			"\"",
-			"sm_FAO56_",
-			"et_FAO56_",
-			"iUpslopeSum",
-			"iUpslopeConnections",
-			"iUpslopeCount",
-			"iIndex",
-			"iNumberOfUpslopeConnections",
-			"dAddOffset",
-			"dScaleFactor",
-			"%fValues",
-			"%dValues",
-			"dDateTimeValues",
-			"dGridCellSizeY",
-			"dGridCellSizeX",
-			"this%dY",
-			"this%dX",
-			"dX_Coords",
-			"dY_Coords",
-			"slVariableNames",
-			"sVariableName_",
-			"this",
-			"NETCDF4_ATTRIBUTE_T",
-			"NETCDF4_DIMENSION_T",
-			"NETCDF4_VARIABLE_T",
-			"NETCDF4_FILE_T",
-			"nf_",
-			"class (NETCDF4_FILE_T)",
-			"slValues",
-			"i2Values",
-			"i2AttributeValues",
-			"sVariableUnits",
-			"nf_get_variable_units",
-			"iDimensionSize",
-			"nf_get_time_values",
-			"ERROR--",
-			"sVariableName",
-			"iAttributeSize",
-			"iAttributeType",
-			"nf_return_dimension_size",
-			"nf_return_dimension_index",
-			"nf_return_attribute_value",
-			"nf_return_variable_index",
-			"nf_return_dimension_id",
-			"nf_return_variable_id",
-			"sDimensionName",
-			"iVariableType",
-			"iDimensionSize",
-			"sAttributeValue",
-			"sAttributeName",
-			"iVariableID",
-			"iDimensionIndex",
-			"iDimensionID",
-			"iVariableIndex",
-			"iVariableID",
-			"this",
-			"class (NETCDF4_FILE_T )             :: this",
-			"this",
-			"pNC_VAR_X",
-			"pNC_VAR_Y",
-			"pNC_DIM_Y",
-			"pNC_DIM_X",
-			"read_in_available_water_capacity_sub",
-			"netcdf_get_varid",
-			"NETCDF4_FILE_T",
-			"NETCDF4_ATTRIBUTE_T",
-			"NETCDF4_VARIABLE_T",
-			"NETCDF4_DIMENSION_T"
+			"model_initialize_runoff_gridded_values"
 		],
 		"reverse": false,
 		"show_context": false,
@@ -1121,148 +1132,240 @@
 			[
 				{
 					"buffer": 0,
-					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/soil_moisture__FAO_56.F90",
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/daily_calculation.F90",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 38148,
+						"buffer_size": 7415,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								15027,
-								15027
+								1423,
+								1423
 							]
 						],
 						"settings":
 						{
-							"function_name_status_row": 318,
+							"function_name_status_row": 44,
 							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1407.0,
+						"translation.y": 765.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 4,
+					"type": "text"
+				},
+				{
+					"buffer": 1,
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/direct_recharge__gridded_data.F90",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 15822,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								625,
+								625
+							]
+						],
+						"settings":
+						{
+							"function_name_status_row": 26,
+							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 7607.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 6,
 					"type": "text"
 				},
 				{
-					"buffer": 1,
-					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/soil_moisture__thornthwaite_mather.F90",
-					"semi_transient": true,
+					"buffer": 2,
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/mass_balance__soil.f90",
+					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 5454,
+						"buffer_size": 1746,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								0,
-								0
+								1669,
+								1669
 							]
 						],
 						"settings":
 						{
-							"function_name_status_row": 0,
+							"function_name_status_row": 49,
 							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1444.0,
+						"translation.y": 293.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 2,
-					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/growing_degree_day.F90",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 7579,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								744,
-								742
-							]
-						],
-						"settings":
-						{
-							"function_name_status_row": 24,
-							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 110.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 13,
-					"type": "text"
-				},
-				{
 					"buffer": 3,
-					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/model_domain.F90",
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/actual_et__fao56.f90",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 115326,
+						"buffer_size": 5863,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								97701,
-								97701
+								3765,
+								3765
 							]
 						],
 						"settings":
 						{
-							"function_name_status_row": 2245,
+							"function_name_status_row": 77,
 							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 39960.0,
+						"translation.y": 2246.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 7,
 					"type": "text"
 				},
 				{
 					"buffer": 4,
-					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/data_catalog_entry.F90",
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/actual_et__thornthwaite_mather.F90",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 65184,
+						"buffer_size": 1591,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								11084,
-								11084
+								1296,
+								1296
 							]
 						],
 						"settings":
 						{
-							"function_name_status_row": 246,
+							"function_name_status_row": 34,
+							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 232.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 5,
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/model_initialize.F90",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 55147,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								9355,
+								9355
+							]
+						],
+						"settings":
+						{
+							"function_name_status_row": 216,
+							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 30391.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
+					"file": "/Users/smwesten/SMWData/Source_Code/Hawaii_Water_Budget_Code/src/HI_WB_3_9_1.f",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 127386,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								81974,
+								81974
+							]
+						],
+						"settings":
+						{
+							"function_name_status_row": 2136,
+							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Punchcard.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 48164.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 7,
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/polygon_summarize.F90",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 5698,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3444,
+								3444
+							]
+						],
+						"settings":
+						{
+							"auto_name": "module value_probe",
+							"function_name_status_row": 86,
 							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
@@ -1271,117 +1374,179 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
+					"stack_index": 11,
 					"type": "text"
 				},
 				{
-					"buffer": 5,
+					"buffer": 8,
 					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/CMakeLists.txt",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 13208,
+						"buffer_size": 6801,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6679,
-								6679
+								1850,
+								1850
 							]
 						],
 						"settings":
 						{
-							"function_name_status_row": 229,
+							"function_name_status_row": 55,
 							"syntax": "Packages/Batch File/Batch File.sublime-syntax",
 							"tab_size": 6,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 3931.0,
+						"translation.y": 1058.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 12,
+					"stack_index": 16,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
-					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/awc__table_values.F90",
+					"buffer": 9,
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/model_domain.F90",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 11310,
+						"buffer_size": 80328,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								6965,
-								6965
+								67137,
+								67137
 							]
 						],
 						"settings":
 						{
-							"function_name_status_row": 180,
+							"function_name_status_row": 1698,
 							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 2694.0,
+						"translation.y": 35089.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
-					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/runoff__curve_number.F90",
+					"buffer": 10,
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/netcdf4_support.F90",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 11017,
+						"buffer_size": 121801,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								9556,
-								9556
+								36457,
+								36457
 							]
 						],
 						"settings":
 						{
-							"function_name_status_row": 240,
+							"function_name_status_row": 1053,
+							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": -0.0,
+						"translation.y": 21941.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 0,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/data_catalog_entry.F90",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 65770,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								56974,
+								56997
+							]
+						],
+						"settings":
+						{
+							"function_name_status_row": 1632,
 							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 35.0,
+						"translation.y": 14339.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 13,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
-					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/interception__bucket.F90",
+					"buffer": 12,
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/grid.F90",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2548,
+						"buffer_size": 90797,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								222,
-								222
+								58776,
+								58776
+							]
+						],
+						"settings":
+						{
+							"function_name_status_row": 1501,
+							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 31017.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 12,
+					"type": "text"
+				},
+				{
+					"buffer": 13,
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/mass_balance__impervious_surface.f90",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2896,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								234,
+								234
 							]
 						],
 						"settings":
@@ -1392,227 +1557,103 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 75.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 14,
 					"type": "text"
 				},
 				{
-					"buffer": 9,
-					"file": "/Users/smwesten/SMWData/Source_Code/swb2/tests/src/test__CN_update.F90",
+					"buffer": 14,
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/irrigation.F90",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 2817,
+						"buffer_size": 19040,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								2423,
-								2423
+								8127,
+								8127
 							]
 						],
 						"settings":
 						{
-							"function_name_status_row": 72,
+							"function_name_status_row": 183,
 							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 595.0,
+						"translation.y": 3197.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 15,
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/model_iterate.F90",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 1147,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1033,
+								1033
+							]
+						],
+						"settings":
+						{
+							"function_name_status_row": 31,
+							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 15,
 					"type": "text"
 				},
 				{
-					"buffer": 10,
-					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/irrigation.F90",
+					"buffer": 16,
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/crop_coefficients__fao56.F90",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 13399,
+						"buffer_size": 24668,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								11823,
-								11823
+								1317,
+								1317
 							]
 						],
 						"settings":
 						{
-							"function_name_status_row": 273,
+							"function_name_status_row": 37,
 							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
-						"translation.x": 0.0,
-						"translation.y": 4786.0,
+						"translation.x": -0.0,
+						"translation.y": 6338.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
-					"type": "text"
-				},
-				{
-					"buffer": 11,
-					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/model_initialize.F90",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 30236,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								20936,
-								20936
-							]
-						],
-						"settings":
-						{
-							"function_name_status_row": 552,
-							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 9409.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 4,
-					"type": "text"
-				},
-				{
-					"buffer": 12,
-					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/awc__gridded_values.F90",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 1460,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								430,
-								430
-							]
-						],
-						"settings":
-						{
-							"function_name_status_row": 13,
-							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 46.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 2,
-					"type": "text"
-				},
-				{
-					"buffer": 13,
-					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/dictionary.F90",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 22342,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								1630,
-								1630
-							]
-						],
-						"settings":
-						{
-							"function_name_status_row": 52,
-							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 3123.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 11,
-					"type": "text"
-				},
-				{
-					"buffer": 14,
-					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/string_list.F90",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 17896,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								163,
-								163
-							]
-						],
-						"settings":
-						{
-							"function_name_status_row": 3,
-							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 113.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 7,
-					"type": "text"
-				},
-				{
-					"buffer": 15,
-					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/exceptions.F90",
-					"semi_transient": false,
-					"settings":
-					{
-						"buffer_size": 8222,
-						"regions":
-						{
-						},
-						"selection":
-						[
-							[
-								7071,
-								7071
-							]
-						],
-						"settings":
-						{
-							"function_name_status_row": 200,
-							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
-							"tab_size": 2,
-							"translate_tabs_to_spaces": true
-						},
-						"translation.x": 0.0,
-						"translation.y": 3180.0,
-						"zoom_level": 1.0
-					},
-					"stack_index": 10,
+					"stack_index": 9,
 					"type": "text"
 				}
 			]
@@ -1651,13 +1692,13 @@
 	"menu_visible": true,
 	"output.find_results":
 	{
-		"height": 124.0
+		"height": 288.0
 	},
 	"pinned_build_system": "",
 	"project": "swb__mac.sublime-project",
 	"replace":
 	{
-		"height": 64.0
+		"height": 68.0
 	},
 	"save_all_on_build": true,
 	"select_file":

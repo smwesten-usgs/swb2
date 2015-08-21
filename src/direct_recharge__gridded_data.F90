@@ -24,7 +24,6 @@ module direct_recharge__gridded_data
   private
 
   public :: direct_recharge_initialize, direct_recharge_calculate
-  public :: DIRECT_RECHARGE
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pCESSPOOL
   type (DATA_CATALOG_ENTRY_T), pointer :: pDISPOSAL_WELL
@@ -39,7 +38,6 @@ module direct_recharge__gridded_data
   real (kind=c_float), allocatable     :: fWATER_BODY_RECHARGE(:)
   real (kind=c_float), allocatable     :: fWATER_MAIN(:)
   real (kind=c_float), allocatable     :: fANNUAL_RECHARGE_RATE(:)
-  real (kind=c_float), allocatable     :: DIRECT_RECHARGE(:)
 
   real (kind=c_float), allocatable     :: fCESSPOOL_TABLE(:)
   real (kind=c_float), allocatable     :: fDISPOSAL_WELL_TABLE(:)
@@ -291,10 +289,6 @@ contains
 
      endif
 
-
-    allocate( DIRECT_RECHARGE( count( lActive ) ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
-
     !> open another netCDF file to hold total direct recharge
     iNX = ubound(lActive, 1)
     iNY = ubound(lActive, 2)
@@ -311,8 +305,9 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine direct_recharge_calculate( iLanduse_Index, lActive, fDont_Care )
+  subroutine direct_recharge_calculate( direct_recharge, iLanduse_Index, lActive, fDont_Care )
 
+    real (kind=c_float), intent(inout)     :: direct_recharge(:)
     integer (kind=c_int), intent(in)       :: iLanduse_Index(:)
     logical (kind=c_bool), intent(in)      :: lActive(:,:)
     real (kind=c_float), intent(in)        :: fDont_Care(:,:)
@@ -372,7 +367,7 @@ contains
       endif      
 
 
-      DIRECT_RECHARGE = 0.0_c_float
+      direct_recharge = 0.0_c_float
 
       if ( allocated( fCESSPOOL ) )  DIRECT_RECHARGE = DIRECT_RECHARGE + fCESSPOOL
 

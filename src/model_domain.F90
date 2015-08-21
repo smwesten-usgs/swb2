@@ -45,7 +45,7 @@ module model_domain
     integer (kind=c_int), allocatable      :: num_upslope_connections(:)
     integer (kind=c_int), allocatable      :: sum_upslope_cells(:)
 
-    real (kind=c_float), allocatable       :: impervious_fraction(:)
+    real (kind=c_float), allocatable       :: pervious_fraction(:)
     real (kind=c_float), allocatable       :: canopy_cover_fraction(:)
     real (kind=c_float), allocatable       :: awc(:)
     real (kind=c_float), allocatable       :: gdd(:)
@@ -293,7 +293,7 @@ contains
     allocate( this%index_order(iCount), stat=iStat(26) )
     allocate( this%gdd(iCount), stat=iStat(27) )
     allocate( this%runoff_outside( iCount ), stat=iStat(28) )
-    allocate( this%impervious_fraction( iCount ), stat=iStat(29) )
+    allocate( this%pervious_fraction( iCount ), stat=iStat(29) )
     allocate( this%surface_storage( iCount ), stat=iStat(30) ) 
     allocate( this%surface_storage_excess( iCount ), stat=iStat(31) )
     allocate( this%surface_storage_max( iCount ), stat=iStat(32) )           
@@ -319,7 +319,7 @@ contains
     if (any( iStat /= 0) ) call die ( "Unable to allocate memory for one or more arrays.", __FILE__, __LINE__ )  
 
     this%fog = 0.0_c_float
-    this%impervious_fraction = 0.0_c_float
+    this%pervious_fraction = 0.0_c_float
     this%canopy_cover_fraction = 1.0_c_float
     this%surface_storage = 0.0_c_float
     this%surface_storage_max = 0.0_c_float
@@ -1435,7 +1435,6 @@ contains
                                 landuse_index=this%landuse_index,                       &
                                 soil_storage=this%soil_storage,                         & 
                                 soil_storage_max=this%soil_storage_max,                 &
-                                impervious_surface_fraction=this%impervious_fraction,   &
                                 rainfall=this%rainfall,                                 &
                                 runoff=this%runoff,                                     &
                                 crop_etc=this%crop_etc,                                 &
@@ -1692,11 +1691,10 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call direct_recharge_calculate( iLanduse_Index=this%landuse_index,   &
-                                    lActive=this%active,         &
+    call direct_recharge_calculate( direct_recharge = this%potential_recharge,   &
+                                    iLanduse_Index=this%landuse_index,           &
+                                    lActive=this%active,                         &
                                     fDont_Care=this%dont_care )
-
-    this%potential_recharge = this%potential_recharge + DIRECT_RECHARGE
 
   end subroutine model_calculate_direct_recharge_gridded
 

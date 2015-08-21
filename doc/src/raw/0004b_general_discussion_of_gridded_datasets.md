@@ -9,7 +9,7 @@ SWB can ingest gridded data in three formats: Surfer, ESRI Arc ASCII, or netCDF.
 
 ### ESRI ASCII Grid
 
-### netCDF
+### NetCDF
 
 ## Geographic Projections
 

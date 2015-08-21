@@ -48,6 +48,10 @@
        <tab type="user" url="@ref calibration_strategy" title="Calibration Strategy"/>
     </tab>
 
+
+    <tab type="usergroup" url="@ref glossary" title="Glossary">
+    </tab>tab>
+
     <tab type="usergroup" url="@ref appendixes" title="SWB Reference">
        <tab type="user" url="@ref appendix_1_data_and_param_requirements" title="Data and Parameter Requirements by Process Option"/>
        <tab type="user" url="@ref appendix_2_control_file_directives" title="Complete List of Control File Directives"/> 

@@ -6,7 +6,8 @@ module polygon_summarize
   use strings
   implicit none
 
-  integer (kind=c_int), parameter :: POLY_ID(4) = [ 17174, 21797, 22865, 27223 ]
+  integer (kind=c_int), parameter :: POLY_ID(10) = [ 17174, 21797, 22865, 27223, &
+      3310, 10997, 11031, 11803, 13124, 27009 ]
 
   enum, bind(c)
     enumerator :: POLY_1=1, POLY_2, POLY_3, POLY_4
@@ -33,7 +34,8 @@ contains
         TAB, "sms_max", TAB, "rain", TAB, "fog", TAB, "irr", TAB, "runoff", TAB,       &
         "can_evap", TAB, "ref_et0", TAB, "crop_et0", TAB, "actual_et", TAB,            &
         "recharge", TAB, "sms_end", TAB, "surface_storage_excess", TAB,                &
-        "snowmelt"
+        "surface_storage", TAB, "snowmelt", TAB, "impervious_fraction",                &
+        TAB, "actual_et_soil"
 
     enddo	
 
@@ -52,10 +54,11 @@ contains
     
     integer (kind=c_int) :: lc
     character (len=10)   :: date
-    real (kind=c_float)  :: sms_max, rain, fog, irr, runoff, can_evap, ref_et0,    &
-                            crop_et0, actual_et, recharge, sms_end, snowmelt,      &
-                            surface_storage_excess
-    
+    real (kind=c_float)  :: sms_max, rain, fog, irr, runoff, can_evap, ref_et0,       &
+                            crop_et0, actual_et, recharge, sms_end, snowmelt,         &
+                            surface_storage_excess, impervious_frac, surface_storage, &
+                            actual_et_soil
+
     date = SIM_DT%curr%prettydate()
 
     do index=1, ubound( POLY_ID, 1 )
@@ -72,19 +75,23 @@ contains
       can_evap = mean( cells%interception, belongs_to_poly )
       ref_et0 = mean( cells%reference_et0, belongs_to_poly )
       crop_et0 = mean( cells%reference_et0 * cells%crop_coefficient_kcb, belongs_to_poly )
+      actual_et_soil = mean( cells%actual_et_soil, belongs_to_poly )
       actual_et = mean( cells%actual_et, belongs_to_poly )
       recharge = mean( cells%potential_recharge, belongs_to_poly )
       sms_end = mean( cells%soil_storage, belongs_to_poly )
       surface_storage_excess = mean( cells%surface_storage_excess, belongs_to_poly )
+      surface_storage = mean( cells%surface_storage, belongs_to_poly )
       snowmelt = mean( cells%snowmelt, belongs_to_poly )
+      impervious_frac = 1.0_c_float - mean( cells%pervious_fraction, belongs_to_poly )
 
-      write( unit=LU( index ), fmt="(2a,3(i0,a),12(f12.3,a),f12.3)" )          &
+      write( unit=LU( index ), fmt="(2a,3(i0,a),15(f12.3,a),f12.3)" )          &
         date, TAB,                                                             &
         POLY_ID( index ), TAB, count( belongs_to_poly), TAB, lc, TAB,          &
         sms_max, TAB, rain, TAB, fog, TAB,                                     &
         irr, TAB, runoff, TAB, can_evap, TAB, ref_et0, TAB, crop_et0, TAB,     &
         actual_et, TAB, recharge, TAB, sms_end, TAB, surface_storage_excess,   &
-        TAB, snowmelt
+        TAB, surface_storage, TAB, snowmelt, TAB, impervious_frac,             &
+        TAB, actual_et_soil
 
       flush( unit=LU( index ) )
 

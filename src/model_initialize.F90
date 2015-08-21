@@ -274,7 +274,7 @@ contains
       call pPERCENT_IMPERVIOUS%getvalues()
 
       if (associated( pPERCENT_IMPERVIOUS%pGrdBase) ) then
-        MODEL%impervious_fraction = pack( pPERCENT_IMPERVIOUS%pGrdBase%rData/100.0_c_float, MODEL%active )
+        MODEL%pervious_fraction = pack( pPERCENT_IMPERVIOUS%pGrdBase%rData/100.0_c_float, MODEL%active )
       else
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif  
@@ -284,19 +284,19 @@ contains
       call pPERCENT_PERVIOUS%getvalues()
 
       if (associated( pPERCENT_PERVIOUS%pGrdBase) ) then
-        MODEL%impervious_fraction = pack( (1.0_c_float - pPERCENT_PERVIOUS%pGrdBase%rData/100.0_c_float), MODEL%active )
+        MODEL%pervious_fraction = pack( (1.0_c_float - pPERCENT_PERVIOUS%pGrdBase%rData/100.0_c_float), MODEL%active )
       else
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif  
 
     else
 
-      MODEL%impervious_fraction = 0.0_c_float
+      MODEL%pervious_fraction = 0.0_c_float
 
     endif
 
-     if ( minval( MODEL%impervious_fraction ) < fZERO &
-        .or. maxval( MODEL%impervious_fraction ) > 1.0_c_float )  &
+     if ( minval( MODEL%pervious_fraction ) < fZERO &
+        .or. maxval( MODEL%pervious_fraction ) > 1.0_c_float )  &
        call warn(sMessage="One or more percent (im)pervious cover values values are outside of " &
          //"valid range (0% to 100%)", lFatal=lTRUE )
 
@@ -304,7 +304,7 @@ contains
         rX0=MODEL%X_ll, rY0=MODEL%Y_ll, &
         rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
 
-    pTempGrd%rData = unpack( MODEL%impervious_fraction, MODEL%active, MODEL%dont_care )
+    pTempGrd%rData = unpack( MODEL%pervious_fraction, MODEL%active, MODEL%dont_care )
 
     call grid_WriteArcGrid( sFilename="Fraction_impervious_surface__as_read_in_unitless.asc", pGrd=pTempGrd )
 

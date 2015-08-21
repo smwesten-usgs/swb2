@@ -179,6 +179,9 @@ contains
 
     !> retrieve application option (i.e. to field capacity, to defined deficit amount, as constant amount)
     call sl_temp_list%clear()
+    call sl_temp_list%append("Irrigation_application_method")
+    call sl_temp_list%append("Irrigation_application_scheme")
+    call sl_temp_list%append("Irrigation_application_option")    
     call sl_temp_list%append("Application_method")
     call sl_temp_list%append("Application_scheme")
     call sl_temp_list%append("Application_option")        
@@ -308,7 +311,6 @@ contains
                                               landuse_index,                &
                                               soil_storage,                 & 
                                               soil_storage_max,             &
-                                              impervious_surface_fraction,  &
                                               rainfall,                     &
                                               runoff,                       &
                                               crop_etc,                     &
@@ -321,13 +323,11 @@ contains
     real (kind=c_float), intent(in)     :: rainfall
     real (kind=c_float), intent(in)     :: runoff
     real (kind=c_float), intent(in)     :: crop_etc
-    real (kind=c_float), intent(in)     :: impervious_surface_fraction
     real (kind=c_float), intent(in)     :: irrigation_mask
 
     ! [ LOCALS ]
     real (kind=c_float)        :: depletion_fraction
     real (kind=c_double)       :: depletion_amount
-    real (kind=c_float)        :: pervious_surface_fraction
 
     integer (kind=c_int)       :: month
     integer (kind=c_int)       :: day
@@ -383,9 +383,7 @@ contains
 
       efficiency = max( IRRIGATION_EFFICIENCY( landuse_index ), 0.20_c_float )
 
-      pervious_surface_fraction = 1.0_c_float - impervious_surface_fraction
-
-      if ( depletion_fraction > MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( landuse_index ) ) then
+      if ( depletion_fraction >= MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( landuse_index ) ) then
 
         select case ( option )
 
@@ -415,7 +413,6 @@ contains
 
         irrigation_amount =  interim_irrigation_amount                                    &
                                        * IRRIGATION_MASK                                  &
-                                       * pervious_surface_fraction                        &
                                        / efficiency 
 
       endif
