@@ -22,6 +22,8 @@ if(TARGET__SWB_EXECUTABLE)
             exceptions.F90
             fog__monthly_grid.F90
             file_operations.F90
+            file_utilities.F90
+            get_libc_error_number.c
             grid.F90
             growing_degree_day.F90
             interception__bucket.F90

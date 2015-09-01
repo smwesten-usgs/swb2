@@ -72,8 +72,8 @@ module model_domain
     real (kind=c_float), allocatable       :: infiltration(:)
     real (kind=c_float), allocatable       :: potential_snowmelt(:)
     real (kind=c_float), allocatable       :: snowmelt(:)
-    real (kind=c_float), allocatable       :: interception(:)
-     
+
+    real (kind=c_float), allocatable       :: interception(:)     
     real (kind=c_float), allocatable       :: interception_storage(:)
 
     real (kind=c_float), allocatable       :: snow_storage(:)
@@ -918,7 +918,8 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    this%interception = interception_bucket_calculate( this%landuse_index, this%rainfall, this%fog )
+    this%interception = interception_bucket_calculate( this%landuse_index, this%rainfall, this%fog, &
+                                                         this%canopy_cover_fraction )
 
   end subroutine model_calculate_interception_bucket
 
@@ -945,11 +946,6 @@ contains
     ! [ LOCALS ]
     real (kind=c_float), allocatable :: fTrunk_Storage_Capacity(:)
     real (kind=c_float), allocatable :: fStemflow_Fraction(:)
-
-! interception_gash_calculate( fRainfall, fFog, fCanopy_Cover_Fraction,       &
-!                                                     fTrunk_Storage_Capacity, fStemflow_Fraction,   &
-!                                                     fEvaporation_to_Rainfall_Ratio,                &
-!                                                     fPrecipitation_at_Saturation, fInterception )
 
     fTrunk_Storage_Capacity = TRUNK_STORAGE_CAPACITY_TABLE_VALUES( this%landuse_index )
     fStemflow_Fraction = STEMFLOW_FRACTION_TABLE_VALUES( this%landuse_index )

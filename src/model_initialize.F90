@@ -206,7 +206,7 @@ contains
 
   subroutine initialize_ancillary_values()
 
-    call initialize_percent_impervious()
+    call initialize_percent_pervious()
 
     call initialize_percent_canopy_cover()
 
@@ -257,7 +257,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine initialize_percent_impervious()
+  subroutine initialize_percent_pervious()
 
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iStat
@@ -274,7 +274,7 @@ contains
       call pPERCENT_IMPERVIOUS%getvalues()
 
       if (associated( pPERCENT_IMPERVIOUS%pGrdBase) ) then
-        MODEL%pervious_fraction = pack( pPERCENT_IMPERVIOUS%pGrdBase%rData/100.0_c_float, MODEL%active )
+        MODEL%pervious_fraction = pack( 1.0_c_float - pPERCENT_IMPERVIOUS%pGrdBase%rData/100.0_c_float, MODEL%active )
       else
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif  
@@ -284,14 +284,14 @@ contains
       call pPERCENT_PERVIOUS%getvalues()
 
       if (associated( pPERCENT_PERVIOUS%pGrdBase) ) then
-        MODEL%pervious_fraction = pack( (1.0_c_float - pPERCENT_PERVIOUS%pGrdBase%rData/100.0_c_float), MODEL%active )
+        MODEL%pervious_fraction = pack( (pPERCENT_PERVIOUS%pGrdBase%rData/100.0_c_float), MODEL%active )
       else
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif  
 
     else
 
-      MODEL%pervious_fraction = 0.0_c_float
+      MODEL%pervious_fraction = 1.0_c_float
 
     endif
 
@@ -306,11 +306,11 @@ contains
 
     pTempGrd%rData = unpack( MODEL%pervious_fraction, MODEL%active, MODEL%dont_care )
 
-    call grid_WriteArcGrid( sFilename="Fraction_impervious_surface__as_read_in_unitless.asc", pGrd=pTempGrd )
+    call grid_WriteArcGrid( sFilename="Fraction_pervious_surface__as_read_in_unitless.asc", pGrd=pTempGrd )
 
     call grid_Destroy( pTempGrd )
 
-  end subroutine initialize_percent_impervious  
+  end subroutine initialize_percent_pervious  
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1441,6 +1441,7 @@ contains
 
   end subroutine initialize_landuse_codes 
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine initialize_surface_storage_max()
 

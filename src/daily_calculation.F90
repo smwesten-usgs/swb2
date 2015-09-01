@@ -38,10 +38,14 @@ contains
 
     call update_continuous_frozen_ground_index( cells%continuous_frozen_ground_index, cells%tmin,    &
                                                 cells%tmax, cells%snow_storage )
-       
+    
+    ! fog calculation does not explicitly consider canopy fraction   
     call cells%calc_fog()
+
+    ! interception calculation *does* reflect the canopy fraction
     call cells%calc_interception()
 
+    ! irrigation calculated as though entire cell is to be irrigated
     call cells%calc_irrigation()
 
 
@@ -77,7 +81,6 @@ contains
                    + cells%rainfall                                                                  &
                    + cells%fog                                                                       &
                    + cells%surface_storage_excess * ( 1.0_c_float - cells%pervious_fraction )        &
-                      / ( cells%pervious_fraction )                                                  &
                    + cells%snowmelt                                                                  &
                    - cells%interception                                                              &
                    + cells%irrigation

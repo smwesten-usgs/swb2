@@ -314,7 +314,7 @@ contains
                                               rainfall,                     &
                                               runoff,                       &
                                               crop_etc,                     &
-                                              irrigation_mask )
+                                              irrigation_mask  )
 
     real (kind=c_float), intent(inout)  :: irrigation_amount
     integer (kind=c_int), intent(in)    :: landuse_index

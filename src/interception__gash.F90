@@ -19,17 +19,14 @@ module interception__gash
             TRUNK_STORAGE_CAPACITY_TABLE_VALUES,    &
             STEMFLOW_FRACTION_TABLE_VALUES,         &
             EVAPORATION_TO_RAINFALL_RATIO,          &
-            CANOPY_COVER_FRACTION,                  &
             P_SAT
 
   public interception_gash_initialize
   public interception_gash_calculate
   public precipitation_at_saturation
 
-  type (DATA_CATALOG_ENTRY_T), pointer :: pCANOPY_COVER_FRACTION
   type (DATA_CATALOG_ENTRY_T), pointer :: pEVAPORATION_TO_RAINFALL_RATIO
 
-  real (kind=c_float), allocatable   :: CANOPY_COVER_FRACTION(:)
   real (kind=c_float), allocatable   :: EVAPORATION_TO_RAINFALL_RATIO(:)
 
   real (kind=c_float), allocatable   :: CANOPY_STORAGE_CAPACITY_TABLE_VALUES(:)

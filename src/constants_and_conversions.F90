@@ -815,7 +815,7 @@ elemental function c_to_fortran_string( cCharacterString )  result(sText)
   implicit none
 
   character (len=*), intent(in) :: cCharacterString
-  character(len=256) :: sText
+  character(len=len(cCharacterString) - 1) :: sText
   integer (kind=c_int) :: iIndex
 
   sText = ""
