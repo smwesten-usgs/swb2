@@ -67,6 +67,7 @@ module model_domain
     real (kind=c_float), allocatable       :: inflow(:)
     real (kind=c_float), allocatable       :: runon(:)
     real (kind=c_float), allocatable       :: runoff(:)
+    real (kind=c_float), allocatable       :: monthly_runoff(:)
     real (kind=c_float), allocatable       :: runoff_outside(:)
     real (kind=c_float), allocatable       :: outflow(:)
     real (kind=c_float), allocatable       :: infiltration(:)
@@ -87,6 +88,7 @@ module model_domain
     real (kind=c_float), allocatable       :: current_rooting_depth(:)
          
     real (kind=c_float), allocatable       :: gross_precip(:)
+    real (kind=c_float), allocatable       :: monthly_gross_precip(:)    
     real (kind=c_float), allocatable       :: fog(:)
     real (kind=c_float), allocatable       :: rainfall(:)
     real (kind=c_float), allocatable       :: snowfall(:)
@@ -1166,7 +1168,7 @@ contains
     call et_gridded_values_calculate( )
 
     this%reference_ET0 = pack( pET_GRID%pGrdBase%rData, this%active ) &
-                                      / real( SIM_DT%iDaysInMonth, kind=c_float)    
+                                      / real( SIM_DT%iDaysInMonth, kind=c_float)
 
   end subroutine model_calculate_et_monthly_grid
 
@@ -1254,6 +1256,12 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
+    ! [ LOCALS ]
+    integer (kind=c_int) :: status
+
+    allocate( this%monthly_runoff( count( this%active ) ), stat=status)
+    call assert( status==0, "Problem allicating memory", __FILE__, __LINE__ )
+
     call runoff_gridded_values_initialize( this%active )
 
   end subroutine model_initialize_runoff_gridded_values
@@ -1288,6 +1296,9 @@ contains
       this%runoff = ( this%rainfall + this%snowmelt ) * RUNOFF_RATIOS
 
     endif
+
+    if ( allocated( this%monthly_gross_precip ) )  &
+      this%monthly_runoff = this%monthly_gross_precip * RUNOFF_RATIOS
 
   end subroutine model_calculate_runoff_gridded_values
 
@@ -1427,14 +1438,31 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call irrigation__calculate( irrigation_amount=this%irrigation,                      &
-                                landuse_index=this%landuse_index,                       &
-                                soil_storage=this%soil_storage,                         & 
-                                soil_storage_max=this%soil_storage_max,                 &
-                                rainfall=this%rainfall,                                 &
-                                runoff=this%runoff,                                     &
-                                crop_etc=this%crop_etc,                                 &
-                                irrigation_mask=this%irrigation_mask )
+    if ( allocated( this%monthly_gross_precip ) .and. allocated( this%monthly_runoff ) ) then
+
+      call irrigation__calculate( irrigation_amount=this%irrigation,                      &
+                                  landuse_index=this%landuse_index,                       &
+                                  soil_storage=this%soil_storage,                         & 
+                                  soil_storage_max=this%soil_storage_max,                 &
+                                  rainfall=this%rainfall,                                 &
+                                  runoff=this%runoff,                                     &
+                                  crop_etc=this%crop_etc,                                 &
+                                  irrigation_mask=this%irrigation_mask,                   &
+                                  monthly_rainfall=this%monthly_gross_precip,             &
+                                  monthly_runoff=this%monthly_runoff )
+
+    else
+
+
+      call irrigation__calculate( irrigation_amount=this%irrigation,                      &
+                                  landuse_index=this%landuse_index,                       &
+                                  soil_storage=this%soil_storage,                         & 
+                                  soil_storage_max=this%soil_storage_max,                 &
+                                  rainfall=this%rainfall,                                 &
+                                  runoff=this%runoff,                                     &
+                                  crop_etc=this%crop_etc,                                 &
+                                  irrigation_mask=this%irrigation_mask )
+    endif
 
   end subroutine model_calculate_irrigation
 
@@ -1925,6 +1953,12 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
+    ! [ LOCALS ]
+    integer (kind=c_int) :: status
+
+    allocate( this%monthly_gross_precip( count( this%active ) ), stat=status)
+    call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+
     call precipitation_method_of_fragments_initialize( this%active )
 
   end subroutine model_initialize_precip_method_of_fragments
@@ -1968,6 +2002,7 @@ contains
     call precipitation_method_of_fragments_calculate( this%active )
 
     this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * FRAGMENT_VALUE * RAINFALL_ADJUST_FACTOR
+    this%monthly_gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * RAINFALL_ADJUST_FACTOR
 
   end subroutine model_get_precip_method_of_fragments 
 

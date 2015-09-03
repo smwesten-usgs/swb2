@@ -314,16 +314,21 @@ contains
                                               rainfall,                     &
                                               runoff,                       &
                                               crop_etc,                     &
-                                              irrigation_mask  )
+                                              irrigation_mask,              &
+                                              monthly_rainfall,             &
+                                              monthly_runoff                &
+                                                )
 
-    real (kind=c_float), intent(inout)  :: irrigation_amount
-    integer (kind=c_int), intent(in)    :: landuse_index
-    real (kind=c_float), intent(in)     :: soil_storage
-    real (kind=c_float), intent(in)     :: soil_storage_max
-    real (kind=c_float), intent(in)     :: rainfall
-    real (kind=c_float), intent(in)     :: runoff
-    real (kind=c_float), intent(in)     :: crop_etc
-    real (kind=c_float), intent(in)     :: irrigation_mask
+    real (kind=c_float), intent(inout)          :: irrigation_amount
+    integer (kind=c_int), intent(in)            :: landuse_index
+    real (kind=c_float), intent(in)             :: soil_storage
+    real (kind=c_float), intent(in)             :: soil_storage_max
+    real (kind=c_float), intent(in)             :: rainfall
+    real (kind=c_float), intent(in)             :: runoff
+    real (kind=c_float), intent(in)             :: crop_etc
+    real (kind=c_float), intent(in)             :: irrigation_mask
+    real (kind=c_float), intent(in), optional   :: monthly_rainfall
+    real (kind=c_float), intent(in), optional   :: monthly_runoff    
 
     ! [ LOCALS ]
     real (kind=c_float)        :: depletion_fraction
@@ -403,7 +408,17 @@ contains
 
           case ( APP_HWB_DEMAND_BASED )
 
-            interim_irrigation_amount = max( 0.0_c_float, crop_etc + runoff - rainfall )
+            if (present( monthly_runoff ) .and. present( monthly_rainfall ) ) then
+
+              interim_irrigation_amount = max( 0.0_c_float,    &
+                ( crop_etc * real( days_in_month, kind=c_float) + monthly_runoff - monthly_rainfall ) )  &
+                  / days_in_month
+
+            else
+            
+              interim_irrigation_amount = max( 0.0_c_float, crop_etc + runoff - rainfall )
+
+            endif  
 
           case default
 

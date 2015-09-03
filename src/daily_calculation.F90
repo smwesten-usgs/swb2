@@ -76,16 +76,13 @@ contains
     !       is enabled.
     call cells%calc_routing()
 
-
+    ! inflow calculated over the entire cell (pervious + impervious) area
     cells%inflow = cells%runon                                                                       &
                    + cells%rainfall                                                                  &
                    + cells%fog                                                                       &
                    + cells%surface_storage_excess * ( 1.0_c_float - cells%pervious_fraction )        &
                    + cells%snowmelt                                                                  &
-                   - cells%interception                                                              &
-                   + cells%irrigation
-
-    cells%infiltration = max( 0.0_c_float, cells%inflow - cells%runoff )
+                   - cells%interception
 
     where ( cells%inflow - cells%runoff < 0.0_c_float )
 
@@ -93,16 +90,24 @@ contains
 
     end where
 
+    ! irrigation not considered to be a contributor to runoff...in addition, infiltration
+    ! term is calculated with respect to the pervious fraction of the cell
+    cells%infiltration = max( 0.0_c_float,                                                           &
+                     cells%runon                                                                     &
+                   + cells%rainfall                                                                  &
+                   + cells%fog                                                                       &
+                   + cells%surface_storage_excess * ( 1.0_c_float - cells%pervious_fraction )        &
+                                                  / cells%pervious_fraction                          &
+                   + cells%snowmelt                                                                  &
+                   - cells%interception                                                              &
+                   + cells%irrigation                                                                &
+                   - cells%runoff )
 
     ! the following call updates bound variable actual_et_soil
     call cells%calc_actual_et()
 
-    ! big question: is this the appropriate way to account for total actual et?
-    ! it seems reasonable to consider each storage volume as its own control volume,
-    ! while area-weighting each component to come up with a cell-wide average actual_et
-
-    ! NOTE: the formulation below, with interception_et commented out, seems most comparable
-    !       with that used by HWB
+    ! actual et for the entire cell is the weighted average of the ET for pervious and impervious
+    ! fractions of the cell
     cells%actual_et = cells%actual_et_soil * cells%pervious_fraction                            &
 !                      + cells%actual_et_interception * cells%canopy_cover_fraction             &
                       + cells%actual_et_impervious * ( 1.0_c_float - cells%pervious_fraction )
@@ -116,7 +121,10 @@ contains
                                       actual_et=cells%actual_et_soil,                    &
                                       infiltration=cells%infiltration )
 
+    ! reporting of potential recharge and irrigation must be adjusted to account for zero
+    ! irrigation and potential recharge associated with the impervious areas
     cells%potential_recharge = cells%potential_recharge * cells%pervious_fraction
+    cells%irrigation = cells%irrigation * cells%pervious_fraction
 
   end subroutine perform_daily_calculation
 
