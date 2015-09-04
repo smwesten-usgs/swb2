@@ -484,10 +484,13 @@ elemental subroutine calc_gregorian_date_sub(this)
   integer (kind=c_int) :: iHour
   integer (kind=c_int) :: iMinute
   integer (kind=c_int) :: iSecond
+  integer (kind=c_int) :: iJulianDay
 
   real(kind=c_float) :: rHour, rMinute, rSecond
 
-  call gregorian_date( this%getJulianDay(), iYear, iMonth, iDay )
+  iJulianDay = this%getJulianDay()
+
+  call gregorian_date( iJulianDay, iYear, iMonth, iDay )
 
   this%iYear = iYear
   this%iMonth = iMonth

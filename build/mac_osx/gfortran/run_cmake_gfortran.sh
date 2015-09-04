@@ -6,14 +6,14 @@ rm -f *.txt
 
 # set CMAKE-related and build-related variables
 export CMAKEROOT=/usr/bin/cmake
-export COMPILER_VERSION=4.9.2
-export COMPILER_MAJ_VERSION=4.9
-export COMPILER_TRIPLET=x86_64-apple-darwin13.4.0
+export COMPILER_VERSION=5.1.0
+export COMPILER_MAJ_VERSION=5
+export COMPILER_TRIPLET=x86_64-apple-darwin14.5.0
 export COMPILER_DIR=/usr/local
-export LIB_PATH1="/usr/local/lib/gcc/$COMPILER_TRIPLET/$COMPILER_VERSION"
+export LIB_PATH1="/usr/local/lib/gcc/$COMPILER_MAJ_VERSION/gcc/$COMPILER_TRIPLET/$COMPILER_VERSION"
 export LIB_PATH2=/opt/X11/lib
 export LIB_PATH3=/usr/local/lib
-export LIB_PATH4=/usr/local/Cellar/gcc49/4.9.2_1/lib/gcc/4.9
+export LIB_PATH4="/usr/local/lib/gcc/$COMPILER_MAJ_VERSION"
 export Fortran_COMPILER_NAME=gfortran
 export R_HOME=/usr/bin/R
 
@@ -34,7 +34,10 @@ export TARGET__SWBSTATS="FALSE"
 # define platform and compiler specific compilation flags
 export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -Wall -fcheck=all -fexceptions -ffree-line-length-none"
 #set CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -floop-parallelize-all -flto -ffree-line-length-none -static-libgcc -static-libgfortran"
+#export CMAKE_Fortran_FLAGS_RELEASE="-O3 -mtune=native -ffree-line-length-none -ffpe-summary='none' -fopenmp"
+
 export CMAKE_Fortran_FLAGS_RELEASE="-O3 -mtune=native -ffree-line-length-none -ffpe-summary='none' -fopenmp"
+
 
 # set important environment variables
 export FC=gfortran-$COMPILER_MAJ_VERSION

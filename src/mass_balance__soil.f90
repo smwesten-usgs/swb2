@@ -31,23 +31,19 @@ contains
 
       actual_et = max( 0.0_c_float, soil_storage + infiltration )
       soil_storage = 0.0_c_float
-!      potential_recharge = 0.0_c_float
+      potential_recharge = 0.0_c_float
 
     elseif ( new_soil_storage > soil_storage_max ) then
 
-      potential_recharge = potential_recharge + new_soil_storage - soil_storage_max
+      potential_recharge = new_soil_storage - soil_storage_max
       soil_storage = soil_storage_max
 
     else
 
       soil_storage = new_soil_storage
-!      potential_recharge = 0.0_c_float
+      potential_recharge = 0.0_c_float
 
     endif
-
-! NOTE: lines 34 and 44 commented out because an earlier call to direct_recharge
-!       zeroes out all potential recharge terms. if direct_recharge module is ever moved or 
-!       eliminated, lines 34 and 44 will need to be restored.
 
   end subroutine calculate_soil_mass_balance
 

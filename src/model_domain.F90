@@ -85,6 +85,7 @@ module model_domain
     real (kind=c_float), allocatable       :: soil_storage_previous_day(:)
     real (kind=c_float), allocatable       :: soil_storage_max(:)
     real (kind=c_float), allocatable       :: potential_recharge(:)
+    real (kind=c_float), allocatable       :: direct_recharge(:)    
     real (kind=c_float), allocatable       :: current_rooting_depth(:)
          
     real (kind=c_float), allocatable       :: gross_precip(:)
@@ -263,7 +264,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: iStat(45)
+    integer (kind=c_int)  :: iStat(46)
 
     iCount = count( this%active )
 
@@ -311,7 +312,8 @@ contains
     allocate( this%actual_et_impervious( iCount ), stat=iStat(42) )
     allocate( this%actual_et_interception( iCount ), stat=iStat(43) )        
     allocate( this%adjusted_depletion_fraction_p( iCount ), stat=iStat(44) )
-    allocate( this%crop_etc( iCount ), stat=iStat(45) )    
+    allocate( this%crop_etc( iCount ), stat=iStat(45) )
+    allocate( this%direct_recharge( iCount ), stat=iStat(46) )        
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="  &
@@ -320,12 +322,17 @@ contains
     
     if (any( iStat /= 0) ) call die ( "Unable to allocate memory for one or more arrays.", __FILE__, __LINE__ )  
 
+!$OMP PARALLEL WORKSHARE
+
     this%fog = 0.0_c_float
     this%pervious_fraction = 0.0_c_float
     this%canopy_cover_fraction = 1.0_c_float
     this%surface_storage = 0.0_c_float
     this%surface_storage_max = 0.0_c_float
     this%interception_storage = 0.0_c_float
+    this%direct_recharge = 0.0_c_float
+
+!$OMP END PARALLEL WORKSHARE
 
   end subroutine initialize_arrays_sub
 
@@ -490,8 +497,10 @@ contains
       iDay = asInt( dt%iDay )
       iYear = dt%iYear
   
+
       ! the following statements process the raw data in order to get it into the 
       ! right units or properly pack the data
+
       call this%get_precipitation_data()
       call this%get_minimum_air_temperature_data()
       call this%get_maximum_air_temperature_data()
@@ -1715,7 +1724,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call direct_recharge_calculate( direct_recharge = this%potential_recharge,   &
+    call direct_recharge_calculate( direct_recharge = this%direct_recharge,      &
                                     iLanduse_Index=this%landuse_index,           &
                                     lActive=this%active,                         &
                                     fDont_Care=this%dont_care )

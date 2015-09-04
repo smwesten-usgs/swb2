@@ -35,7 +35,7 @@ module model_initialize
     logical (kind=c_bool)  :: lOptional
   end type METHODS_LIST_T
 
-  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(32) = &
+  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(35) = &
 
     [ GRIDDED_DATASETS_T("PRECIPITATION                ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("TMIN                         ", lFALSE, DATATYPE_FLOAT ),     &
@@ -55,6 +55,9 @@ module model_initialize
       GRIDDED_DATASETS_T("PERCENT_CANOPY_COVER         ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("PERCENT_PERVIOUS_COVER       ", lTRUE, DATATYPE_FLOAT ),      &      
       GRIDDED_DATASETS_T("PERCENT_IMPERVIOUS_COVER     ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("FRACTION_CANOPY_COVER        ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("FRACTION_PERVIOUS_COVER      ", lTRUE, DATATYPE_FLOAT ),      &      
+      GRIDDED_DATASETS_T("FRACTION_IMPERVIOUS_COVER    ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("STEMFLOW_FRACTION            ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("EVAPORATION_TO_RAINFALL_RATIO", lTRUE, DATATYPE_FLOAT ),      & 
       GRIDDED_DATASETS_T("RAINFALL_ADJUST_FACTOR       ", lTRUE, DATATYPE_FLOAT ),      &
@@ -263,11 +266,15 @@ contains
     integer (kind=c_int)                 :: iStat
     integer (kind=c_int)                 :: iIndex
     type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_IMPERVIOUS
-    type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_PERVIOUS      
+    type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_PERVIOUS
+    type (DATA_CATALOG_ENTRY_T), pointer :: pFRACTION_IMPERVIOUS
+    type (DATA_CATALOG_ENTRY_T), pointer :: pFRACTION_PERVIOUS      
     type ( GENERAL_GRID_T ), pointer     :: pTempGrd
 
     pPERCENT_IMPERVIOUS => DAT%find("PERCENT_IMPERVIOUS_COVER")
     pPERCENT_PERVIOUS => DAT%find("PERCENT_PERVIOUS_COVER")
+    pFRACTION_IMPERVIOUS => DAT%find("FRACTION_IMPERVIOUS_COVER")
+    pFRACTION_PERVIOUS => DAT%find("FRACTION_PERVIOUS_COVER")
 
     if ( associated(pPERCENT_IMPERVIOUS) ) then
 
@@ -289,6 +296,26 @@ contains
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif  
 
+    elseif ( associated(pFRACTION_IMPERVIOUS) ) then
+
+      call pFRACTION_IMPERVIOUS%getvalues()
+
+      if (associated( pFRACTION_IMPERVIOUS%pGrdBase) ) then
+        MODEL%pervious_fraction = pack( 1.0_c_float - pFRACTION_IMPERVIOUS%pGrdBase%rData, MODEL%active )
+      else
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      endif  
+
+    elseif ( associated( pFRACTION_PERVIOUS ) ) then
+
+      call pFRACTION_PERVIOUS%getvalues()
+
+      if (associated( pFRACTION_PERVIOUS%pGrdBase) ) then
+        MODEL%pervious_fraction = pack( pFRACTION_PERVIOUS%pGrdBase%rData, MODEL%active )
+      else
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      endif  
+
     else
 
       MODEL%pervious_fraction = 1.0_c_float
@@ -297,8 +324,14 @@ contains
 
      if ( minval( MODEL%pervious_fraction ) < fZERO &
         .or. maxval( MODEL%pervious_fraction ) > 1.0_c_float )  &
-       call warn(sMessage="One or more percent (im)pervious cover values values are outside of " &
-         //"valid range (0% to 100%)", lFatal=lTRUE )
+       call warn(sMessage="One or more percent (im)pervious cover percent/fraction values are outside of " &
+         //"valid range (0% to 100% or 0.0 to 1.0)", lFatal=lTRUE )
+
+     if ( all( MODEL%pervious_fraction < 1.0_c_float ) ) &
+       call warn(sMessage="All (im)pervious cover percent/fraction values are suspiciously low " &
+         //"(less than 1% or less than 1.0)", lFatal=lTRUE,                                      &
+         sHints="Check to see whether (im)pervious cover is expressed as a fraction (0.0-1.0)"   &
+              //" or a percentage (0-100%)." )
 
     pTempGrd => grid_Create( iNX=MODEL%number_of_columns, iNY=MODEL%number_of_rows, &
         rX0=MODEL%X_ll, rY0=MODEL%Y_ll, &
@@ -320,9 +353,11 @@ contains
     integer (kind=c_int)                 :: iStat
     integer (kind=c_int)                 :: iIndex
     type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_CANOPY_COVER
+    type (DATA_CATALOG_ENTRY_T), pointer :: pFRACTION_CANOPY_COVER      
     type ( GENERAL_GRID_T ), pointer     :: pTempGrd
 
     pPERCENT_CANOPY_COVER => DAT%find("PERCENT_CANOPY_COVER")
+    pFRACTION_CANOPY_COVER => DAT%find("FRACTION_CANOPY_COVER")
 
     if ( associated(pPERCENT_CANOPY_COVER) ) then
 
@@ -330,6 +365,16 @@ contains
 
       if (associated( pPERCENT_CANOPY_COVER%pGrdBase) ) then
         MODEL%canopy_cover_fraction = pack( pPERCENT_CANOPY_COVER%pGrdBase%rData/100.0_c_float, MODEL%active )
+      else
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      endif  
+
+    elseif ( associated(pFRACTION_CANOPY_COVER) ) then
+
+      call pFRACTION_CANOPY_COVER%getvalues()
+
+      if (associated( pFRACTION_CANOPY_COVER%pGrdBase) ) then
+        MODEL%canopy_cover_fraction = pack( pFRACTION_CANOPY_COVER%pGrdBase%rData, MODEL%active )
       else
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif  
@@ -342,6 +387,17 @@ contains
         //" value of 1.0 for the entire model domain." )
 
     endif
+
+    if ( minval( MODEL%canopy_cover_fraction ) < fZERO &
+       .or. maxval( MODEL%canopy_cover_fraction ) > 1.0_c_float )  &
+      call warn(sMessage="One or more percent canopy cover percent/fraction values values are outside of " &
+        //"valid range (0% to 100% or 0.0 to 1.0)", lFatal=lTRUE )
+
+     if ( all( MODEL%canopy_cover_fraction < 1.0_c_float ) )                               &
+       call warn(sMessage="All canopy cover percent/fraction values are suspiciously low " &
+         //"(less than 1% or less than 1.0)", lFatal=lTRUE,                                &
+         sHints="Check to see whether canopy cover is expressed as a fraction (0.0-1.0)"   &
+              //" or a percentage (0-100%)." )
 
     pTempGrd => grid_Create( iNX=MODEL%number_of_columns, iNY=MODEL%number_of_rows, &
         rX0=MODEL%X_ll, rY0=MODEL%Y_ll, &

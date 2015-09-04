@@ -30,6 +30,7 @@ contains
     call cells%update_crop_coefficient()
     call cells%calc_reference_et()
 
+
     ! update crop evapotranspiration; crop_coefficient_kcb defaults to 1.0
     cells%crop_etc = cells%reference_et0 * cells%crop_coefficient_kcb
 
@@ -38,6 +39,7 @@ contains
 
     call update_continuous_frozen_ground_index( cells%continuous_frozen_ground_index, cells%tmin,    &
                                                 cells%tmax, cells%snow_storage )
+
     
     ! fog calculation does not explicitly consider canopy fraction   
     call cells%calc_fog()
@@ -48,17 +50,14 @@ contains
     ! irrigation calculated as though entire cell is to be irrigated
     call cells%calc_irrigation()
 
-
     call calculate_interception_mass_balance( interception_storage=cells%interception_storage,     &
                                               actual_et=cells%actual_et_interception,              &
                                               interception=cells%interception,                     &
                                               reference_et0=cells%reference_et0 )
-
     call calculate_snow_mass_balance( snow_storage=cells%snow_storage,                 &
                                       potential_snowmelt=cells%potential_snowmelt,     &
                                       snowmelt=cells%snowmelt,                         &
                                       snowfall=cells%snowfall )
-
     call calculate_impervious_surface_mass_balance( surface_storage=cells%surface_storage,                   & 
                                                     actual_et=cells%actual_et_impervious,                    &   
                                                     surface_storage_excess=cells%surface_storage_excess,     &
@@ -80,10 +79,11 @@ contains
     cells%inflow = cells%runon                                                                       &
                    + cells%rainfall                                                                  &
                    + cells%fog                                                                       &
-                   + cells%surface_storage_excess * ( 1.0_c_float - cells%pervious_fraction )        &
+!                   + cells%surface_storage_excess * ( 1.0_c_float - cells%pervious_fraction )        &
                    + cells%snowmelt                                                                  &
                    - cells%interception
 
+    ! prevent calculated runoff from exceeding the day's inflow
     where ( cells%inflow - cells%runoff < 0.0_c_float )
 
       cells%runoff = cells%inflow
@@ -112,9 +112,6 @@ contains
 !                      + cells%actual_et_interception * cells%canopy_cover_fraction             &
                       + cells%actual_et_impervious * ( 1.0_c_float - cells%pervious_fraction )
 
-    ! moved this call up so that septic could be added to soil mass balance at some future date if needed
-    call cells%calc_direct_recharge()
-
     call calculate_soil_mass_balance( potential_recharge=cells%potential_recharge,       &
                                       soil_storage=cells%soil_storage,                   &
                                       soil_storage_max=cells%soil_storage_max,           &
@@ -123,8 +120,18 @@ contains
 
     ! reporting of potential recharge and irrigation must be adjusted to account for zero
     ! irrigation and potential recharge associated with the impervious areas
+
     cells%potential_recharge = cells%potential_recharge * cells%pervious_fraction
+
+    call cells%calc_direct_recharge()
+
+    ! reporting of potential recharge and irrigation must be adjusted to account for zero
+    ! irrigation and potential recharge associated with the impervious areas
+    cells%potential_recharge = cells%potential_recharge * cells%pervious_fraction     &
+                              + cells%direct_recharge
+
     cells%irrigation = cells%irrigation * cells%pervious_fraction
+
 
   end subroutine perform_daily_calculation
 
