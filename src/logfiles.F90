@@ -158,7 +158,7 @@ contains
 
       do iIndex = 1, min(this%iLogLevel, 2)
 
-        sFilename = trim(this%sFilePrefix)//trim(sDescriptor(iIndex))//".md"
+        sFilename = trim(OUTPUT_DIRECTORY_NAME)//trim(this%sFilePrefix)//trim(sDescriptor(iIndex))//".md"
 
         if (.not. this%lIsOpen(iIndex) ) then
 

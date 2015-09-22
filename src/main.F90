@@ -27,6 +27,7 @@ program main
   character (len=256)            :: sVersionString       = ""
   character (len=256)            :: sGitHashString       = ""
   integer (kind=c_int)           :: iCount
+  integer (kind=c_int)           :: iLen
 
   iNumArgs = COMMAND_ARGUMENT_COUNT()
 
@@ -43,7 +44,7 @@ program main
   write(UNIT=*,FMT="(a)") trim( sGitHashString )  
   write(unit=*, fmt="(a,/)") repeat("-",iCount + 2)  
 
-  if(iNumArgs/=1) then
+  if(iNumArgs == 0 ) then
 
 #ifdef __GFORTRAN__
     sCompilerFlags = COMPILER_OPTIONS()
@@ -75,7 +76,14 @@ program main
 
   if ( iNumArgs > 1 ) then
     call GET_COMMAND_ARGUMENT(2, sOutputDirectoryName )
+
+    iLen = len_trim( sOutputDirectoryName )
+
+    if ( .not. sOutputDirectoryName(iLen:iLen) .eq. "/" )  &
+      sOutputDirectoryName = trim(sOutputDirectoryName)//"/"
+
     call LOGS%set_output_directory( sOutputDirectoryName )
+
   endif  
  
   ! open and initialize logfiles

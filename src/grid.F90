@@ -1033,7 +1033,7 @@ subroutine grid_WriteArcGrid(sFilename, pGrd)
   ! dynamically create the Fortran output format
   write(sBuf,FMT="(a,a,a)") '(',TRIM( asCharacter(iNumCols)),'(a,1x))'
 
-  open ( LU_TEMP, file=sFilename, iostat=istat, status="REPLACE" )
+  open ( LU_TEMP, file=trim(OUTPUT_DIRECTORY_NAME)//sFilename, iostat=istat, status="REPLACE" )
   call assert( istat==0, "Could not open output file "//dQuote(sFilename), &
       TRIM(__FILE__),__LINE__)
 
@@ -1111,7 +1111,7 @@ subroutine grid_WriteSurferGrid(sFilename, pGrd)
   ! dynamically create the Fortran output format
   write(sBuf,FMT="(a,a,a)") '(',TRIM( asCharacter(iNumCols)),'(a,1x))'
 
-  open ( LU_TEMP, file=sFilename, iostat=istat, status="REPLACE" )
+  open ( LU_TEMP, file=trim(OUTPUT_DIRECTORY_NAME)//sFilename, iostat=istat, status="REPLACE" )
   call assert( istat==0, "Could not open output file "//dQuote(sFilename), &
       TRIM(__FILE__),__LINE__)
 
