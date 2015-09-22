@@ -154,7 +154,19 @@ module grid
   !> @todo change these global (module) variables to local variables
   integer (kind=c_int) :: LU_TEMP, LU_GRID
 
+  character (len=64) :: OUTPUT_DIRECTORY_NAME = ""
+
 contains
+
+
+  subroutine grid_set_output_directory_name( sDirName )
+
+    character (len=*), intent(in)               :: sDirName
+
+    OUTPUT_DIRECTORY_NAME = trim(sDirName)
+
+  end subroutine grid_set_output_directory_name  
+
 
 !--------------------------------------------------------------------------
 
@@ -982,11 +994,11 @@ subroutine grid_WriteGrid(sFilename, pGrd, iOutputFormat)
 
   if ( iOutputFormat == OUTPUT_ARC ) then
 
-    call grid_WriteArcGrid(sFilename, pGrd)
+    call grid_WriteArcGrid(trim(OUTPUT_DIRECTORY_NAME)//sFilename, pGrd)
 
   elseif ( iOutputFormat == OUTPUT_SURFER ) then
 
-    call grid_WriteSurferGrid(sFilename, pGrd)
+    call grid_WriteSurferGrid(trim(OUTPUT_DIRECTORY_NAME)//sFilename, pGrd)
 
   endif
 
@@ -1273,11 +1285,11 @@ function grid_CompletelyCover( pBaseGrd, pOtherGrd, rTolerance ) result ( lCompl
           //" do not cover the base grid extents.")
 
       call LOGS%write( " " )
-      call LOGS%write("    BASE GRID EXTENTS    ANCILLARY GRID EXTENTS")
-      call LOGS%write("X0:  "//trim(asCharacter(pBaseGrd%rX0))//"      "//trim(asCharacter(pOtherGrd%rX0)) )
-      call LOGS%write("Y0:  "//trim(asCharacter(pBaseGrd%rY0))//"      "//trim(asCharacter(pOtherGrd%rY0)) )
-      call LOGS%write("X1:  "//trim(asCharacter(pBaseGrd%rX1))//"      "//trim(asCharacter(pOtherGrd%rX1)) )
-      call LOGS%write("Y1:  "//trim(asCharacter(pBaseGrd%rY1))//"      "//trim(asCharacter(pOtherGrd%rY1)) )
+      call LOGS%write("    BASE GRID EXTENTS   ANCILLARY GRID EXTENTS")
+      call LOGS%write("X0:  "//trim(asCharacter(pBaseGrd%rX0))//"    "//trim(asCharacter(pOtherGrd%rX0)) )
+      call LOGS%write("Y0:  "//trim(asCharacter(pBaseGrd%rY0))//"    "//trim(asCharacter(pOtherGrd%rY0)) )
+      call LOGS%write("X1:  "//trim(asCharacter(pBaseGrd%rX1))//"    "//trim(asCharacter(pOtherGrd%rX1)) )
+      call LOGS%write("Y1:  "//trim(asCharacter(pBaseGrd%rY1))//"    "//trim(asCharacter(pOtherGrd%rY1)) )
       call LOGS%write(" ")
 
   end if

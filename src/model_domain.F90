@@ -1770,10 +1770,13 @@ contains
 
   subroutine model_update_crop_coefficient_FAO56(this)
 
-    use crop_coefficients__FAO56, only : crop_coefficients_FAO56_calculate
+    use crop_coefficients__FAO56, only : crop_coefficients_FAO56_calculate,                &
+                                         crop_coefficients_FAO56_update_growth_stage_dates
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     
+    call crop_coefficients_FAO56_update_growth_stage_dates()
+
     call crop_coefficients_FAO56_calculate( Kcb=this%crop_coefficient_kcb,      &
                                             GDD=this%gdd,                       &
                                             landuse_index=this%landuse_index )
@@ -2017,10 +2020,11 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine minmaxmean_float( variable , varname )
+  subroutine minmaxmean_float( variable , varname, active_cells )
 
     real (kind=c_float), dimension(:)  :: variable
     character (len=*), intent(in)      :: varname
+    logical, dimension(:), optional    :: active_cells
 
     ! [ LOCALS ] 
     integer (kind=c_int) :: iCount
@@ -2032,28 +2036,48 @@ contains
 
     write (sVarname, fmt="(a20)") adjustl(varname)
 
-    if (size( variable, 1) > 0 ) then
-      write (sMin, fmt="(g14.3)")   minval(variable)
-      write (sMax, fmt="(g14.3)")   maxval(variable)
-      write (sMean, fmt="(g14.3)")  sum(variable) / size(variable,1)
-      write (sCount, fmt="(i10)") size(variable,1)
-    else
-      write (sMin, fmt="(g14.3)")   -9999.
-      write (sMax, fmt="(g14.3)")   -9999.
-      write (sMean, fmt="(g14.3)")  -9999.
-      write (sCount, fmt="(i10)")       0
-    endif
+    if ( present( active_cells ) ) then
+
+      if (count( active_cells ) > 0 ) then
+        write (sMin, fmt="(g14.3)")   minval(variable, active_cells )
+        write (sMax, fmt="(g14.3)")   maxval(variable, active_cells )
+        write (sMean, fmt="(g14.3)")  sum(variable, active_cells ) / count( active_cells )
+        write (sCount, fmt="(i10)") count( active_cells )
+      else
+        write (sMin, fmt="(g14.3)")   -9999.
+        write (sMax, fmt="(g14.3)")   -9999.
+        write (sMean, fmt="(g14.3)")  -9999.
+        write (sCount, fmt="(i10)")       0
+      endif
+
+    else  
+
+      if (size( variable, 1) > 0 ) then
+        write (sMin, fmt="(g14.3)")   minval(variable)
+        write (sMax, fmt="(g14.3)")   maxval(variable)
+        write (sMean, fmt="(g14.3)")  sum(variable) / size(variable,1)
+        write (sCount, fmt="(i10)") size(variable,1)
+      else
+        write (sMin, fmt="(g14.3)")   -9999.
+        write (sMax, fmt="(g14.3)")   -9999.
+        write (sMean, fmt="(g14.3)")  -9999.
+        write (sCount, fmt="(i10)")       0
+      endif
+
+    endif  
 
     call LOGS%write( adjustl(sVarname)//" | "//adjustl(sMin)//" | "//adjustl(sMax) &
        //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_ALL, lEcho=lTRUE )
 
+
   end subroutine minmaxmean_float
 
 
-  subroutine minmaxmean_int( variable , varname )
+  subroutine minmaxmean_int( variable , varname, active_cells )
 
     integer (kind=c_int), dimension(:)  :: variable
     character (len=*), intent(in)       :: varname
+    logical, dimension(:), optional     :: active_cells
 
     ! [ LOCALS ] 
     integer (kind=c_int) :: iCount
@@ -2065,16 +2089,34 @@ contains
 
     write (sVarname, fmt="(a20)") adjustl(varname)
 
-    if (size( variable, 1) > 0 ) then
-      write (sMin, fmt="(i14)")   minval(variable)
-      write (sMax, fmt="(i14)")   maxval(variable)
-      write (sMean, fmt="(i14)")  sum(variable) / size(variable,1)
-      write (sCount, fmt="(i10)") size(variable,1)
+    if ( present( active_cells ) ) then
+
+      if (count( active_cells ) > 0 ) then
+        write (sMin, fmt="(i14)")   minval(variable, active_cells )
+        write (sMax, fmt="(i14)")   maxval(variable, active_cells )
+        write (sMean, fmt="(i14)")  sum(variable, active_cells ) / count( active_cells )
+        write (sCount, fmt="(i10)") count( active_cells )
+      else
+        write (sMin, fmt="(i14)")   -9999
+        write (sMax, fmt="(i14)")   -9999
+        write (sMean, fmt="(i14)")  -9999
+        write (sCount, fmt="(i10)")  0
+      endif
+
     else
-      write (sMin, fmt="(i14)")   -9999
-      write (sMax, fmt="(i14)")   -9999
-      write (sMean, fmt="(i14)")  -9999
-      write (sCount, fmt="(i10)")  0
+
+      if (size( variable, 1) > 0 ) then
+        write (sMin, fmt="(i14)")   minval(variable)
+        write (sMax, fmt="(i14)")   maxval(variable)
+        write (sMean, fmt="(i14)")  sum(variable) / size(variable,1)
+        write (sCount, fmt="(i10)") size(variable,1)
+      else
+        write (sMin, fmt="(i14)")   -9999
+        write (sMax, fmt="(i14)")   -9999
+        write (sMean, fmt="(i14)")  -9999
+        write (sCount, fmt="(i10)")  0
+      endif
+
     endif
 
     call LOGS%write( adjustl(sVarname)//" | "//adjustl(sMin)//" | "//adjustl(sMax) &

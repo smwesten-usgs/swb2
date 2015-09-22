@@ -53,14 +53,29 @@ module logfiles
     procedure, private :: make_prefix_sub
     generic            :: make_prefix => make_prefix_sub
 
+    procedure, private :: set_output_directory_name_sub
+    generic            :: set_output_directory => set_output_directory_name_sub
+
   end type LOGFILE_T
 
   type (LOGFILE_T), public :: LOGS
 
-  integer (kind=c_int)  :: CURRENT_LOG_LEVEL = LOG_GENERAL
-  logical (kind=c_bool) :: CURRENT_LOG_ECHO = .false._c_bool
+  integer (kind=c_int)  :: CURRENT_LOG_LEVEL     = LOG_GENERAL
+  logical (kind=c_bool) :: CURRENT_LOG_ECHO      = .false._c_bool
+  character (len=64)    :: OUTPUT_DIRECTORY_NAME = ""
 
 contains
+
+  subroutine set_output_directory_name_sub( this, sDirName )
+
+    class (LOGFILE_T)                           :: this
+    character (len=*), intent(in)               :: sDirName
+
+    OUTPUT_DIRECTORY_NAME = trim(sDirName)
+
+  end subroutine set_output_directory_name_sub  
+
+!--------------------------------------------------------------------------------------------------  
 
   subroutine set_log_level_sub( this, iLogLevel )
 

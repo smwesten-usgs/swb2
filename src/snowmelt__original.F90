@@ -24,6 +24,8 @@ contains
 
     if ( imperial_units ) then
 
+      !> temperatures in degrees Fahrenheit, snowmelt in inches
+
       if ( ( ( tmin + tmax ) / 2.0_c_float ) > FREEZING_F ) then
 
         potential_snowmelt = MELT_INDEX * ( tmax - FREEZING_F ) * DEGC_PER_DEGF / MM_PER_INCH
@@ -35,6 +37,8 @@ contains
       end if
 
     else
+
+      !> temperatures in degrees Celcius, snowmelt in mm
 
       if ( ( ( tmin + tmax ) / 2.0_c_float ) > FREEZING_C ) then
 

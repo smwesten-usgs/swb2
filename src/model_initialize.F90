@@ -1,7 +1,8 @@
 module model_initialize
 
   use iso_c_binding, only                : c_int, c_float, c_double, c_bool
-  use constants_and_conversions, only    : lTRUE, lFALSE, asFloat, BNDS
+  use constants_and_conversions, only    : lTRUE, lFALSE, asFloat, BNDS,      &
+                                             DATATYPE_FLOAT, DATATYPE_INT
   use datetime
   use data_catalog
   use data_catalog_entry
@@ -11,7 +12,7 @@ module model_initialize
   use grid
 !  use loop_iterate
   use model_domain, only                 : MODEL, minmaxmean
-  use output, only                       : initialize_output
+  use output, only                       : initialize_output, set_output_directory
   use parameters
   use precipitation__method_of_fragments
   use simulation_datetime, only          : SIM_DT
@@ -91,12 +92,19 @@ module model_initialize
 
 contains
 
-  subroutine initialize_all()
+  subroutine initialize_all( output_directory_name )
 
     use polygon_summarize, only : initialize_polygon_summarize
 
+    character (len=64), intent(inout) :: output_directory_name
+
+    
     ! [ LOCALS ]
     integer (kind=c_int) :: iIndex
+
+    ! set output directory names for NetCDF and Surfer/Arc ASCII grid output
+    call grid_set_output_directory_name( output_directory_name )
+    call set_output_directory( output_directory_name )
 
     ! define SWB project boundary and geographic projection
     call initialize_grid_options()
@@ -327,9 +335,9 @@ contains
        call warn(sMessage="One or more percent (im)pervious cover percent/fraction values are outside of " &
          //"valid range (0% to 100% or 0.0 to 1.0)", lFatal=lTRUE )
 
-     if ( all( MODEL%pervious_fraction < 1.0_c_float ) ) &
+     if ( all( MODEL%pervious_fraction < 0.01_c_float ) ) &
        call warn(sMessage="All (im)pervious cover percent/fraction values are suspiciously low " &
-         //"(less than 1% or less than 1.0)", lFatal=lTRUE,                                      &
+         //"(less than 1% or less than 0.01)", lFatal=lTRUE,                                      &
          sHints="Check to see whether (im)pervious cover is expressed as a fraction (0.0-1.0)"   &
               //" or a percentage (0-100%)." )
 
@@ -393,9 +401,9 @@ contains
       call warn(sMessage="One or more percent canopy cover percent/fraction values values are outside of " &
         //"valid range (0% to 100% or 0.0 to 1.0)", lFatal=lTRUE )
 
-     if ( all( MODEL%canopy_cover_fraction < 1.0_c_float ) )                               &
+     if ( all( MODEL%canopy_cover_fraction < 0.01_c_float ) )                               &
        call warn(sMessage="All canopy cover percent/fraction values are suspiciously low " &
-         //"(less than 1% or less than 1.0)", lFatal=lTRUE,                                &
+         //"(less than 1% or less than 0.01)", lFatal=lTRUE,                                &
          sHints="Check to see whether canopy cover is expressed as a fraction (0.0-1.0)"   &
               //" or a percentage (0-100%)." )
 
@@ -1382,7 +1390,6 @@ contains
     endif
 
   end subroutine initialize_generic_method
-
 
 
   subroutine initialize_latitude()

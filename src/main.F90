@@ -19,12 +19,13 @@ program main
 
   implicit none
 
-  character (len=256)            :: sControlFile
+  character (len=256)            :: sControlFile         = ""
+  character (len=64)             :: sOutputDirectoryName = ""
   integer (kind=c_int)           :: iNumArgs
-  character (len=1024)           :: sCompilerFlags
-  character (len=256)            :: sCompilerVersion
-  character (len=256)            :: sVersionString 
-  character (len=256)            :: sGitHashString
+  character (len=1024)           :: sCompilerFlags       = ""
+  character (len=256)            :: sCompilerVersion     = ""
+  character (len=256)            :: sVersionString       = ""
+  character (len=256)            :: sGitHashString       = ""
   integer (kind=c_int)           :: iCount
 
   iNumArgs = COMMAND_ARGUMENT_COUNT()
@@ -64,7 +65,7 @@ program main
       //TRIM(int2char(__G95_MINOR__))
 #endif
 
-    write(UNIT=*,FMT="(/,/,a,/)")    "Usage: swb2 [control file name]"
+    write(UNIT=*,FMT="(/,/,a,/)")    "Usage: swb2 [control file name] [output directory name (optional)]"
 
     stop
 
@@ -72,13 +73,18 @@ program main
 
   call GET_COMMAND_ARGUMENT(1,sControlFile)
 
+  if ( iNumArgs > 1 ) then
+    call GET_COMMAND_ARGUMENT(2, sOutputDirectoryName )
+    call LOGS%set_output_directory( sOutputDirectoryName )
+  endif  
+ 
   ! open and initialize logfiles
   call LOGS%initialize( iLogLevel = LOG_DEBUG )
 
   ! read control file
   call read_control_file( sControlFile )
 
-  call initialize_all()
+  call initialize_all( sOutputDirectoryName )
 
   call iterate_over_simulation_days( MODEL )
    

@@ -13,6 +13,7 @@ module crop_coefficients__FAO56
   use data_catalog, only              : DAT
   use data_catalog_entry, only        : DATA_CATALOG_ENTRY_T
   use datetime
+  use logfiles, only                  : LOGS, LOG_ALL
   use exceptions, only                : assert, warn, die
   use parameters, only                : PARAMS
   use simulation_datetime, only       : SIM_DT 
@@ -27,7 +28,7 @@ module crop_coefficients__FAO56
   public :: update_crop_coefficient_date_as_threshold, update_crop_coefficient_GDD_as_threshold
 
   enum, bind(c)
-    enumerator :: L_DOY_INI=1, L_DOY_DEV, L_DOY_MID, L_DOY_LATE
+    enumerator :: L_DOY_INI=1, L_DOY_DEV, L_DOY_MID, L_DOY_LATE, L_DOY_FALLOW
   end enum 
 
   enum, bind(c)
@@ -35,7 +36,8 @@ module crop_coefficients__FAO56
   end enum 
 
   enum, bind(c)
-    enumerator :: PLANTING_DATE=1, ENDDATE_INI, ENDDATE_DEV, ENDDATE_MID, ENDDATE_LATE
+    enumerator :: PLANTING_DATE=1, ENDDATE_INI, ENDDATE_DEV, ENDDATE_MID, ENDDATE_LATE, &
+                    ENDDATE_FALLOW
   end enum 
 
   enum, bind(c)
@@ -57,6 +59,7 @@ module crop_coefficients__FAO56
   real (kind=c_float), allocatable   :: TEW(:,:)
   real (kind=c_float), allocatable   :: KCB(:,:)
   integer (kind=c_int), allocatable  :: KCB_METHOD(:)
+  real (kind=c_float), allocatable   :: GROWTH_STAGE_SHIFT_DAYS(:)
   real (kind=c_float), allocatable   :: GROWTH_STAGE_DOY(:,:)
   real (kind=c_float), allocatable   :: GROWTH_STAGE_GDD(:,:)
   type (DATETIME_T), allocatable     :: GROWTH_STAGE_DATE(:,:)
@@ -81,22 +84,27 @@ contains
     type (STRING_LIST_T)              :: slREW, slTEW
     type (STRING_LIST_T)              :: slList
     type (DATETIME_T)                 :: DT
+    type (DATETIME_T)                 :: temp_date
     integer (kind=c_int), allocatable :: iTEWSeqNums(:)
     integer (kind=c_int), allocatable :: iREWSeqNums(:)
     integer (kind=c_int)              :: iNumberOfTEW, iNumberOfREW
     integer (kind=c_int)              :: iNumberOfLanduses
     integer (kind=c_int)              :: iIndex, iIndex2
     integer (kind=c_int)              :: iStat
+    real (kind=c_float)               :: growing_cycle_length
 
     character (len=10)               :: sMMDDYYYY
     character (len=:), allocatable   :: sText
 
     type (STRING_LIST_T)             :: slPlantingDate
 
+    real (kind=c_float), allocatable :: L_shift_days_(:)
+
     real (kind=c_float), allocatable :: L_ini_(:)
     real (kind=c_float), allocatable :: L_dev_(:)
     real (kind=c_float), allocatable :: L_mid_(:)
     real (kind=c_float), allocatable :: L_late_(:)
+    real (kind=c_float), allocatable :: L_fallow_(:)
 
     real (kind=c_float), allocatable :: GDD_plant_(:)
     real (kind=c_float), allocatable :: GDD_ini_(:)
@@ -124,6 +132,8 @@ contains
 
     real (kind=c_float)              :: fKcb_initial
     real (kind=c_float)              :: fRz_initial
+
+    real (kind=c_float), parameter   :: NEAR_ZERO = 1.0e-9_c_float
 
     type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_PERCENT_SOIL_MOISTURE
 
@@ -153,10 +163,12 @@ contains
 
    call PARAMS%get_parameters( sKey="Planting_date", slValues=slPlantingDate, lFatal=lTRUE )
 
+   call PARAMS%get_parameters( sKey="L_shift", fValues=L_shift_days_, lFatal=lFALSE )
    call PARAMS%get_parameters( sKey="L_ini", fValues=L_ini_, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="L_dev", fValues=L_dev_, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="L_mid", fValues=L_mid_, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="L_late", fValues=L_late_, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="L_fallow", fValues=L_fallow_, lFatal=lTRUE ) 
 
    call PARAMS%get_parameters( sKey="GDD_plant", fValues=GDD_plant_, lFatal=lFALSE )
    call PARAMS%get_parameters( sKey="GDD_ini", fValues=GDD_ini_, lFatal=lFALSE )
@@ -184,7 +196,11 @@ contains
 
    call PARAMS%get_parameters( sKey="Mean_Plant_Height", fValues=MEAN_PLANT_HEIGHT, lFatal=lTRUE )
 
-    allocate( GROWTH_STAGE_DOY( 4, iNumberOfLanduses ), stat=iStat )
+    allocate( GROWTH_STAGE_SHIFT_DAYS( iNumberOfLanduses ), stat=iStat )
+    call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_SHIFT_DAYS array", &
+      __FILE__, __LINE__ )    
+
+    allocate( GROWTH_STAGE_DOY( 5, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_DOY array", &
       __FILE__, __LINE__ )
 
@@ -192,7 +208,7 @@ contains
     call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_GDD array", &
       __FILE__, __LINE__ )
 
-    allocate( GROWTH_STAGE_DATE( 5, iNumberOfLanduses ), stat=iStat )
+    allocate( GROWTH_STAGE_DATE( 6, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for DATE_GROWTH array", &
       __FILE__, __LINE__ )
 
@@ -208,6 +224,14 @@ contains
     KCB = fTINYVAL
     GROWTH_STAGE_GDD = fTINYVAL
     GROWTH_STAGE_DOY = fTINYVAL
+    GROWTH_STAGE_SHIFT_DAYS = 0.0_c_float
+
+    if ( ubound(L_shift_days_,1) == iNumberOfLanduses ) then
+      GROWTH_STAGE_SHIFT_DAYS = L_shift_days_
+    else
+      call warn(sMessage="L_shift_days has "//asCharacter(ubound(L_ini_,1))//" entries; there are "  &
+        //asCharacter(iNumberOfLanduses)//" landuse codes. Assuming value of zero." )
+    endif      
 
     if ( ubound(L_ini_,1) == iNumberOfLanduses ) then
       GROWTH_STAGE_DOY( L_DOY_INI,  : ) = L_ini_
@@ -237,6 +261,20 @@ contains
         //asCharacter(iNumberOfLanduses)//" landuse codes.", lFatal=lTRUE)
     endif      
 
+    if ( ubound(L_fallow_,1) == iNumberOfLanduses ) then
+      GROWTH_STAGE_DOY( L_DOY_FALLOW, : ) = L_fallow_
+    else
+      call warn(sMessage="L_fallow has "//asCharacter(ubound(L_fallow_,1))//" entries; there are "  &
+        //asCharacter(iNumberOfLanduses)//" landuse codes.", lFatal=lTRUE)
+    endif      
+
+    call LOGS%write(" ## Crop Kcb Curve Summary ##", iLinesAfter=1)
+    call LOGS%write(" _only meaningful for landuses where the Kcb curve is defined " &
+      //"in terms of days _", iLinesAfter=1)
+    call LOGS%write("Landuse Code | Planting Date | End of 'ini' | End of 'dev' " &
+      //"| End of 'mid' | End of 'late' | End of 'fallow' ")
+    call Logs%write("-------------|---------------|--------------|--------------" &
+      //"|--------------|---------------|-----------------")
 
     if ( slPlantingDate%count == iNumberOfLanduses ) then
 
@@ -246,11 +284,24 @@ contains
 
         call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)%parsedate( sMMDDYYYY, __FILE__, __LINE__ )
    
+        GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) &
+                                                    + GROWTH_STAGE_SHIFT_DAYS( iIndex )
+
+        ! march forward through time calculating the various dates on the Kcb curve
+
         GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) + L_ini_( iIndex )
         GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) + L_dev_( iIndex )
         GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) + L_mid_( iIndex )
         GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) + L_late_( iIndex )
+        GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) + L_fallow_( iIndex )        
 
+        call LOGS%write( asCharacter( LANDUSE_CODE( iIndex ))//" | "                &
+           //trim( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate() )//" | " &
+           //trim( GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )%prettydate() )//" | "   &
+           //trim( GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )%prettydate() )//" | "   &
+           //trim( GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )%prettydate() )//" | "   &
+           //trim( GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate() )//" | "  &
+           //trim( GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex )%prettydate() ) )
       enddo
 
     endif  
@@ -279,33 +330,28 @@ contains
     if (ubound(KCB_nov,1) == iNumberOfLanduses)   KCB( NOV, :) = KCB_nov
     if (ubound(KCB_dec,1) == iNumberOfLanduses)   KCB( DEC, :) = KCB_dec
 
+
+    ! go through the table values and try to figure out how Kcb curves should be constructed:
+    ! Monthly Kcb, GDD-based, or DOY-based
     do iIndex = lbound( KCB_METHOD, 1), ubound( KCB_METHOD, 1)
 
-      if ( all( KCB( JAN:DEC, iIndex ) >= 0.0_c_float ) ) then
+      if ( all( KCB( JAN:DEC, iIndex ) > NEAR_ZERO ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_MONTHLY_VALUES
               
-      elseif ( all( GROWTH_STAGE_GDD( :, iIndex ) >= 0.0_c_float )  &
-         .and. all( KCB( KCB_INI:KCB_MIN, iIndex ) >= 0.0_c_float ) ) then
+      elseif ( all( GROWTH_STAGE_GDD( :, iIndex ) > NEAR_ZERO )              &
+         .and. all( KCB( KCB_INI:KCB_MIN, iIndex ) > NEAR_ZERO ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_GDD
 
-      elseif ( all( GROWTH_STAGE_DOY( :, iIndex ) >= 0.0_c_float )  &
-         .and. all( KCB( KCB_INI:KCB_MIN, iIndex ) >= 0.0_c_float ) ) then
+      elseif ( all( GROWTH_STAGE_DOY( :, iIndex ) > NEAR_ZERO )              &
+         .and. all( KCB( KCB_INI:KCB_MIN, iIndex ) > NEAR_ZERO ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_FAO56
       endif
 
       if ( KCB_METHOD( iIndex ) < 0 )  &
-        call warn("There are missing day-of-year (L_ini, L_dev, L_mid, L_late), " &
+        call warn("There are missing day-of-year (L_ini, L_dev, L_mid, L_late, L_fallow), " &
           //"growing degree-day ~(GDD_plant, GDD_ini, GDD_dev, GDD_mid, GDD_late)," &
           //" or monthly crop ~coefficients (Kcb_jan...Kcb_dec) for" &
           //" landuse "//asCharacter( LANDUSE_CODE( iIndex ) ), lFatal=lTRUE )
-
-      if ( KCB_METHOD( iIndex ) == KCB_METHOD_FAO56 ) then
-        if ( .not. ( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) > SIM_DT%start ) )  &
-
-        call warn("Cannot determine planting date for FAO-56 soil moisture procedure for " &
-          //"landuse "//asCharacter( LANDUSE_CODE( iIndex) ), lFatal=lTRUE )
-
-      endif
 
     enddo
 
@@ -358,6 +404,7 @@ contains
                 Date_dev => GROWTH_STAGE_DATE( ENDDATE_DEV, iLanduseIndex ),         &
                 Date_mid => GROWTH_STAGE_DATE( ENDDATE_MID, iLanduseIndex ),         &
                 Date_late => GROWTH_STAGE_DATE( ENDDATE_LATE, iLanduseIndex ),       &
+                Date_fallow => GROWTH_STAGE_DATE( ENDDATE_FALLOW, iLanduseIndex ),   &                
                 Kcb_ini => KCB(KCB_INI, iLanduseIndex),                              &
                 Kcb_mid => KCB(KCB_MID, iLanduseIndex),                              &
                 Kcb_min => KCB(KCB_MIN, iLanduseIndex),                              &
@@ -472,19 +519,31 @@ end function update_crop_coefficient_GDD_as_threshold
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iIndex
-    integer (kind=c_int) :: iNextPlantingYear
+    real (kind=c_double) :: dTempDate
+    type (DATETIME_T)    :: dtTempDate
+    real (kind=c_float)  :: growing_cycle_length
 
     do iIndex=lbound(GROWTH_STAGE_DATE,2), ubound(GROWTH_STAGE_DATE,2) 
 
   !     print *, SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate()
 
-      if ( SIM_DT%curr <= GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) ) cycle 
+      ! if we have not yet reached the enddate associated with the fallow period, skip
+      if ( SIM_DT%curr <= GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) ) cycle 
 
       if ( KCB_METHOD( iIndex ) /= KCB_METHOD_FAO56 ) cycle
 
-      GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%iYear = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%iYear + 1
-      call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%calcJulianDay()
+      ! current date is beyond the enddate associated with fallow period;
+      ! update Kcb curve and dates
 
+      ! it's possible that the planting date might be later in the current calendar year
+      call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%setYear( SIM_DT%curr%iYear )
+ 
+      ! however, if we're already past that point in the year, planting date must be
+      ! next celendar year
+      if ( SIM_DT%iDOY > GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%getDayOfYear() )  &
+        call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%addYear()
+
+      ! now calculate dates associated with the rest of the Kcb curve
       GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) &
                                                 + GROWTH_STAGE_DOY( L_DOY_INI, iIndex )
       GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )&
@@ -493,8 +552,23 @@ end function update_crop_coefficient_GDD_as_threshold
                                                 + GROWTH_STAGE_DOY( L_DOY_MID, iIndex )
       GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )&
                                                 + GROWTH_STAGE_DOY( L_DOY_LATE, iIndex )
+      GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )&
+                                                + GROWTH_STAGE_DOY( L_DOY_FALLOW, iIndex )
 
-  !      GROWTH_STAGE_DATE( ENDDATE_INI, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) + 1.0
+      call LOGS%write("## Updating Kcb Date Values ##", iLinesAfter=1)
+      call LOGS%write("Landuse Code | Planting Date | End of 'ini' | End of 'dev' " &
+        //"| End of 'mid' | End of 'late' | End of 'fallow' ")
+      call Logs%write("-------------|---------------|--------------|--------------" &
+        //"|--------------|---------------|-----------------")
+
+      call LOGS%write( asCharacter( LANDUSE_CODE( iIndex ))//" | "                &
+         //trim( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate() )//" | " &
+         //trim( GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )%prettydate() )//" | "   &
+         //trim( GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )%prettydate() )//" | "   &
+         //trim( GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )%prettydate() )//" | "   &
+         //trim( GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate() )//" | "  &
+         //trim( GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex )%prettydate() ),      &
+         lEcho=lFALSE, iLogLevel=LOG_ALL )
 
     enddo
 

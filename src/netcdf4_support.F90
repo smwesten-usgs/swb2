@@ -838,7 +838,7 @@ end subroutine netcdf_open_and_prepare_as_output_archive
 
 
 subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUnits, &
-   iNX, iNY, fX, fY, StartDate, EndDate, dpLat, dpLon, fValidMin, fValidMax )
+   iNX, iNY, fX, fY, StartDate, EndDate, dpLat, dpLon, fValidMin, fValidMax, sDirName )
 
   type (T_NETCDF4_FILE ), pointer            :: NCFILE
   character (len=*), intent(in)              :: sVariableName
@@ -853,6 +853,7 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   real (kind=c_double), intent(in), optional :: dpLon(:,:)
   real (kind=c_float), intent(in), optional  :: fValidMin
   real (kind=c_float), intent(in), optional  :: fValidMax
+  character (len=*), intent(in), optional    :: sDirName
 
 
 !   ! [ LOCALS ]
@@ -861,7 +862,13 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   integer (kind=c_int) :: iIndex
   character (len=10)                                :: sOriginText
   character (len=256)                               :: sFilename
+  character (len=64)                                :: sDirName_
 
+  if (present( sDirName ) ) then
+    sDirName_ = sDirName
+  else
+    sDirName_ = ""
+  endif    
 
 !    integer (kind=c_int)            :: iNX                   ! Number of cells in the x-direction
 !     integer (kind=c_int)            :: iNY                   ! Number of cells in the y-direction
@@ -876,9 +883,8 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
 
   write(sOriginText, fmt="(i4.4,'-',i2.2,'-',i2.2)") StartDate%iYear, StartDate%iMonth, StartDate%iDay
 
-  sFilename = trim(sVariableName)//"_"//trim(asCharacter(StartDate%iYear)) &
-    //"_"//trim(asCharacter(EndDate%iYear))//"__" &
-    //trim(asCharacter(iNY)) &
+  sFilename = trim(sDirName)//trim(sVariableName)//"_"//trim(asCharacter(StartDate%iYear))   &
+    //"_"//trim(asCharacter(EndDate%iYear))//"__"//trim(asCharacter(iNY))                    &
     //"_by_"//trim(asCharacter(iNX))//".nc"
 
   call LOGS%write("Attempting to open NetCDF file for writing with filename "//dquote(sFilename))

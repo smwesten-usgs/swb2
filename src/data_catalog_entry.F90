@@ -701,7 +701,7 @@ subroutine transform_grid_to_grid(this)
 
   endif
 
-  if (.not. associated(this%pGrdBase) ) &
+  if ( .not. associated(this%pGrdBase) ) &
     this%pGrdBase => grid_Create( iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, &
       rGridCellSize=BNDS%fGridCellSize, iDataType=this%iTargetDataType )
 

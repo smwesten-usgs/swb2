@@ -4,3 +4,5 @@ Accurate estimates of the spatial and temporal distribution of recharge are impo
 
 The Soil-Water-Balance code has been developed to allow estimates of recharge to be made quickly and easily. The code calculates components of the water balance at a daily timestep by means of a modified version of the Thornthwaite-Mather soil-moisture-balance approach [@thornthwaite_approach_1948; @thornthwaite_instructions_1957]. Data requirements include several commonly available tabular and gridded data types: (1) precipitation and temperature, (2) land-use classification, (3) hydrologic soil group, (4) flow direction and (5) soil-water capacity. The data and formats required are designed to take advantage of widely available GIS datasets and file structures.
 
+Two versions of the Soil-Water-Balance code now exist (versions 1.0 and 2.0). Version 2.0 simulates all of the processes that Version 1.0 does. However, Version 2.0 elimi
+

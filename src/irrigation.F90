@@ -46,6 +46,7 @@ module irrigation
   integer (kind=c_int), allocatable    :: FIRST_DAY_OF_IRRIGATION(:)
   integer (kind=c_int), allocatable    :: LAST_DAY_OF_IRRIGATION(:)
   integer (kind=c_int), allocatable    :: APPLICATION_METHOD_CODE(:)
+  integer (kind=c_short), allocatable  :: MONTHLY_IRRIGATION_SCHEDULE(:,:)
   real (kind=c_float), allocatable     :: APPLICATION_AMOUNT(:)
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pIRRIGATION_MASK
@@ -75,11 +76,14 @@ contains
     integer (kind=c_int)              :: num_records
     logical (kind=c_bool)             :: are_lengths_unequal
     integer (kind=c_int)              :: index
+    integer (kind=c_int)              :: i
     integer (kind=c_int)              :: status
     character (len=256)               :: str_buffer
     type (STRING_LIST_T)              :: sl_irrigation_begin
     type (STRING_LIST_T)              :: sl_irrigation_end  
-    type (STRING_LIST_T)              :: sl_application_method      
+    type (STRING_LIST_T)              :: sl_application_method 
+    type (STRING_LIST_T)              :: sl_monthly_irrigation_schedule 
+    character (len=31)                :: temp_str    
 
     allocate( IRRIGATION_FROM_GROUNDWATER( count( is_active ) ), stat=status )
     call assert( status==0, "Failed to allocate memory.", __FILE__, __LINE__ )
@@ -94,6 +98,16 @@ contains
     !> determine how many landuse codes are present
     call PARAMS%get_parameters( slKeys=sl_temp_list, iValues=landuse_table_codes )
     number_of_landuse_codes = count( landuse_table_codes >= 0 )
+
+    ! create list of possible table headings to look for...
+    call sl_temp_list%clear()
+    call sl_temp_list%append( "Monthly_Irrigation_Schedule" )
+    call sl_temp_list%append( "Monthly_Irr_Schedule" )
+    call sl_temp_list%append( "Irrigation_Application_Schedule" )    
+    call sl_temp_list%append( "Monthly_Application_Schedule" )    
+
+    !> determine how many landuse codes are present
+    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_monthly_irrigation_schedule )
 
     !> retrieve list of fraction of irrigation from groundwater
     call sl_temp_list%clear()
@@ -268,6 +282,30 @@ contains
         sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
 
 
+    num_records = sl_monthly_irrigation_schedule%count
+    are_lengths_unequal = ( num_records /= number_of_landuse_codes ) 
+
+    allocate( MONTHLY_IRRIGATION_SCHEDULE( number_of_landuse_codes, 31 ), stat=status )
+    call assert( status==0, "Problem allocating memory")
+
+    if ( are_lengths_unequal ) then
+      call warn( sMessage="The number of values defining monthly irrigation application"  &
+        //" timing ("//asCharacter( num_records )//")~does not match the number of"       &
+        //" landuse codes ("//asCharacter( number_of_landuse_codes )//"). ~Assuming"      &
+        //" that irrigation is applied *every* day [default].",                           &
+        sModule=__FILE__, iLine=__LINE__, lEcho=.true._c_bool, iLogLevel=LOG_ALL )
+
+      MONTHLY_IRRIGATION_SCHEDULE = 1
+
+    else
+      do index=1, number_of_landuse_codes
+        temp_str = sl_monthly_irrigation_schedule%get( index )
+        do i=1, ubound(MONTHLY_IRRIGATION_SCHEDULE, 2)
+          MONTHLY_IRRIGATION_SCHEDULE( index, i ) = asInt( temp_str(i:i) )
+        enddo  
+      enddo  
+    endif  
+
     num_records = ubound(APPLICATION_METHOD_CODE,1)
     are_lengths_unequal = ( num_records /= number_of_landuse_codes ) 
 
@@ -342,6 +380,8 @@ contains
     integer (kind=c_int)       :: days_in_month
     integer (kind=c_int)       :: num_days_from_origin
     integer (kind=c_int)       :: index
+    character (len=31)         :: irrigation_day
+    integer (kind=c_int)       :: irrigation_days_per_month
     real (kind=c_float)        :: efficiency
     real (kind=c_float)        :: interim_irrigation_amount
     integer (kind=c_int)       :: option
@@ -374,6 +414,8 @@ contains
     do
 
       irrigation_amount = 0.0_c_float
+
+      if ( MONTHLY_IRRIGATION_SCHEDULE( landuse_index, day ) == 0 ) exit
 
       if ( ( day_of_year < FIRST_DAY_OF_IRRIGATION( landuse_index ) ) &
         .or. ( day_of_year > LAST_DAY_OF_IRRIGATION( landuse_index ) ) )  exit
@@ -410,9 +452,15 @@ contains
 
             if (present( monthly_runoff ) .and. present( monthly_rainfall ) ) then
 
-              interim_irrigation_amount = max( 0.0_c_float,    &
+              irrigation_days_per_month = sum( MONTHLY_IRRIGATION_SCHEDULE( landuse_index, : ) )
+
+              if ( irrigation_days_per_month <= 0 ) then
+                interim_irrigation_amount = 0.0_c_float
+              else  
+                interim_irrigation_amount = max( 0.0_c_float,    &
                 ( crop_etc * real( days_in_month, kind=c_float) + monthly_runoff - monthly_rainfall ) )  &
-                  / days_in_month
+                  / irrigation_days_per_month
+              endif
 
             else
             

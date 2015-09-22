@@ -64,21 +64,29 @@ module datetime
     !> "==" operator for comparing two date objects
     generic   :: operator( == ) => is_date_equal_to
 
-    procedure :: date_minus_date_fn    
+    procedure :: date_minus_date_fn   
+    procedure :: date_minus_float_fn 
     !> "-" operator for subtracting two date objects
-    generic   :: operator( - ) => date_minus_date_fn
+    generic   :: operator( - ) => date_minus_date_fn, &
+                                  date_minus_float_fn
 
     procedure :: date_plus_float_fn
     generic   :: operator( + ) => date_plus_float_fn
 
+    procedure  :: setDay => date_set_day_sub
+    procedure  :: setMonth => date_set_month_sub
+    procedure  :: setYear => date_set_year_sub        
     procedure  :: addDay => date_plus_day_sub
     procedure  :: subtractDay => date_minus_day_sub    
+    procedure  :: addYear => date_plus_year_sub
+    procedure  :: subtractYear => date_minus_year_sub    
     procedure  :: prettydate => write_pretty_date_fn
     procedure  :: prettydatetime => write_pretty_datetime_fn
     procedure  :: listdatetime => write_list_datetime_fn
     procedure  :: listdate => write_list_date_fn
     procedure  :: listtime => write_list_time_fn    
     procedure  :: systime => system_time_to_date_sub
+    procedure  :: getDayOfYear => get_day_of_year_fn
     procedure  :: getJulianDay => get_julian_day_fn
     procedure  :: setJulianDate => set_julian_date_sub
     procedure  :: getFractionOfDay => get_fraction_of_day_fn    
@@ -777,6 +785,17 @@ end function date_plus_float_fn
 
 !------------------------------------------------------------------------------
 
+elemental function date_minus_float_fn(date1, fValue)  result(newdate)
+
+  class(DATETIME_T), intent(in)   :: date1
+  real (kind=c_float), intent(in) :: fValue
+  type(DATETIME_T), allocatable  :: newdate
+
+  allocate( newdate )
+  newdate%dJulianDate = date1%dJulianDate - real( fValue, kind=c_double)
+  call newdate%calcGregorianDate()
+
+end function date_minus_float_fn
 
 !------------------------------------------------------------------------------
 
@@ -1087,6 +1106,64 @@ end function get_days_in_year_fn
 
 !------------------------------------------------------------------------------
 
+subroutine date_plus_year_sub(this)
+
+  class(DATETIME_T) :: this
+
+  this%iYear = this%iYear + 1_c_int
+  call this%calcJulianDay()
+
+end subroutine date_plus_year_sub
+
+!------------------------------------------------------------------------------
+
+subroutine date_set_day_sub(this, newday)
+
+  class(DATETIME_T)                  :: this
+  integer (kind=c_int), intent(in)   :: newday
+
+  this%iDay = newday
+  call this%calcJulianDay()
+
+end subroutine date_set_day_sub
+
+!------------------------------------------------------------------------------
+
+subroutine date_set_month_sub(this, newmonth)
+
+  class(DATETIME_T)                  :: this
+  integer (kind=c_int), intent(in)   :: newmonth
+
+  this%iMonth = newmonth
+  call this%calcJulianDay()
+
+end subroutine date_set_month_sub
+
+!------------------------------------------------------------------------------
+
+subroutine date_set_year_sub(this, newyear)
+
+  class(DATETIME_T)                  :: this
+  integer (kind=c_int), intent(in)   :: newyear
+
+  this%iYear = newyear
+  call this%calcJulianDay()
+
+end subroutine date_set_year_sub
+
+!------------------------------------------------------------------------------
+
+subroutine date_minus_year_sub(this)
+
+  class(DATETIME_T) :: this
+
+  this%iYear = this%iYear - 1_c_int
+  call this%calcJulianDay()
+
+end subroutine date_minus_year_sub
+
+!------------------------------------------------------------------------------
+
 subroutine date_plus_day_sub(this)
 
   class(DATETIME_T) :: this
@@ -1237,6 +1314,17 @@ function mmddyyyy2doy(sMMDDYYYY)  result(iDOY)
   iDOY = iJD - iStartingJD + 1
 
 end function mmddyyyy2doy
+
+!--------------------------------------------------------------------------
+
+function get_day_of_year_fn(this)  result(iDOY)
+
+  class(DATETIME_T)    :: this
+  integer (kind=c_int) :: iDOY
+
+  iDOY = day_of_year( int( this%dJulianDate, kind=c_int) )
+  
+end function get_day_of_year_fn
 
 !--------------------------------------------------------------------------
 
