@@ -15,11 +15,14 @@ program main
   use model_iterate, only    : iterate_over_simulation_days
   use version_control, only  : SWB_VERSION, GIT_COMMIT_HASH_STRING, &
                                GIT_BRANCH_STRING, COMPILE_DATE, COMPILE_TIME
+  use string_list, only      : STRING_LIST_T
   use iso_fortran_env
 
   implicit none
 
-  character (len=256)            :: sControlFile         = ""
+  type (STRING_LIST_T)           :: slControlFiles
+
+  character (len=256)            :: sBuf
   character (len=64)             :: sOutputDirectoryName = ""
   integer (kind=c_int)           :: iNumArgs
   character (len=1024)           :: sCompilerFlags       = ""
@@ -27,6 +30,7 @@ program main
   character (len=256)            :: sVersionString       = ""
   character (len=256)            :: sGitHashString       = ""
   integer (kind=c_int)           :: iCount
+  integer (kind=c_int)           :: iIndex
   integer (kind=c_int)           :: iLen
 
   iNumArgs = COMMAND_ARGUMENT_COUNT()
@@ -72,25 +76,39 @@ program main
 
   end if
 
-  call GET_COMMAND_ARGUMENT(1,sControlFile)
+  do iIndex=1, iNumArgs
 
-  if ( iNumArgs > 1 ) then
-    call GET_COMMAND_ARGUMENT(2, sOutputDirectoryName )
+    call GET_COMMAND_ARGUMENT( iIndex, sBuf )
 
-    iLen = len_trim( sOutputDirectoryName )
+    if ( scan( sBuf, ".") > 0 ) then
 
-    if ( .not. sOutputDirectoryName(iLen:iLen) .eq. "/" )  &
-      sOutputDirectoryName = trim(sOutputDirectoryName)//"/"
+      call slControlFiles%append( sBuf )
 
-    call LOGS%set_output_directory( sOutputDirectoryName )
+    else  
 
-  endif  
+      sOutputDirectoryName = sBuf
+      iLen = len_trim( sOutputDirectoryName )
+
+      if ( .not. sOutputDirectoryName(iLen:iLen) .eq. "/" )  &
+        sOutputDirectoryName = trim(sOutputDirectoryName)//"/"
+
+      call LOGS%set_output_directory( sOutputDirectoryName )
+
+    endif  
+
+  enddo 
  
   ! open and initialize logfiles
   call LOGS%initialize( iLogLevel = LOG_DEBUG )
 
-  ! read control file
-  call read_control_file( sControlFile )
+  do iIndex=1, slControlFiles%count
+
+    ! read control file
+    call read_control_file( slControlFiles%get( iIndex ) )
+
+  enddo  
+
+  call slControlFiles%clear()
 
   call initialize_all( sOutputDirectoryName )
 

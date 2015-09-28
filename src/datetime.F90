@@ -65,10 +65,12 @@ module datetime
     generic   :: operator( == ) => is_date_equal_to
 
     procedure :: date_minus_date_fn   
-    procedure :: date_minus_float_fn 
+    procedure :: date_minus_float_fn
+    procedure :: date_minus_int_fn     
     !> "-" operator for subtracting two date objects
-    generic   :: operator( - ) => date_minus_date_fn, &
-                                  date_minus_float_fn
+    generic   :: operator( - ) => date_minus_date_fn,   &
+                                  date_minus_float_fn,  &
+                                  date_minus_int_fn
 
     procedure :: date_plus_float_fn
     generic   :: operator( + ) => date_plus_float_fn
@@ -796,6 +798,20 @@ elemental function date_minus_float_fn(date1, fValue)  result(newdate)
   call newdate%calcGregorianDate()
 
 end function date_minus_float_fn
+
+!-------------------------------------------------------------------------------
+
+elemental function date_minus_int_fn(date1, iValue)  result(newdate)
+
+  class(DATETIME_T), intent(in)    :: date1
+  integer (kind=c_int), intent(in) :: iValue
+  type(DATETIME_T), allocatable    :: newdate
+
+  allocate( newdate )
+  newdate%dJulianDate = date1%dJulianDate - real( iValue, kind=c_double)
+  call newdate%calcGregorianDate()
+
+end function date_minus_int_fn
 
 !------------------------------------------------------------------------------
 

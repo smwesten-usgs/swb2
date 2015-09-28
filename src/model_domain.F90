@@ -87,6 +87,7 @@ module model_domain
     real (kind=c_float), allocatable       :: potential_recharge(:)
     real (kind=c_float), allocatable       :: direct_recharge(:)    
     real (kind=c_float), allocatable       :: current_rooting_depth(:)
+    integer (kind=c_int), allocatable      :: number_of_days_since_planting(:)
          
     real (kind=c_float), allocatable       :: gross_precip(:)
     real (kind=c_float), allocatable       :: monthly_gross_precip(:)    
@@ -264,7 +265,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: iStat(46)
+    integer (kind=c_int)  :: iStat(47)
 
     iCount = count( this%active )
 
@@ -313,7 +314,8 @@ contains
     allocate( this%actual_et_interception( iCount ), stat=iStat(43) )        
     allocate( this%adjusted_depletion_fraction_p( iCount ), stat=iStat(44) )
     allocate( this%crop_etc( iCount ), stat=iStat(45) )
-    allocate( this%direct_recharge( iCount ), stat=iStat(46) )        
+    allocate( this%direct_recharge( iCount ), stat=iStat(46) )     
+    allocate( this%number_of_days_since_planting( iCount ), stat=iStat(47) )   
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="  &
@@ -331,6 +333,7 @@ contains
     this%surface_storage_max = 0.0_c_float
     this%interception_storage = 0.0_c_float
     this%direct_recharge = 0.0_c_float
+    this%number_of_days_since_planting = 0_c_int
 
 !$OMP END PARALLEL WORKSHARE
 
@@ -1449,28 +1452,30 @@ contains
 
     if ( allocated( this%monthly_gross_precip ) .and. allocated( this%monthly_runoff ) ) then
 
-      call irrigation__calculate( irrigation_amount=this%irrigation,                      &
-                                  landuse_index=this%landuse_index,                       &
-                                  soil_storage=this%soil_storage,                         & 
-                                  soil_storage_max=this%soil_storage_max,                 &
-                                  rainfall=this%rainfall,                                 &
-                                  runoff=this%runoff,                                     &
-                                  crop_etc=this%crop_etc,                                 &
-                                  irrigation_mask=this%irrigation_mask,                   &
-                                  monthly_rainfall=this%monthly_gross_precip,             &
+      call irrigation__calculate( irrigation_amount=this%irrigation,                             &
+                                  landuse_index=this%landuse_index,                              &
+                                  soil_storage=this%soil_storage,                                & 
+                                  soil_storage_max=this%soil_storage_max,                        &
+                                  rainfall=this%rainfall,                                        &
+                                  runoff=this%runoff,                                            &
+                                  crop_etc=this%crop_etc,                                        &
+                                  irrigation_mask=this%irrigation_mask,                          &
+                                  num_days_since_planting=this%number_of_days_since_planting,    &
+                                  monthly_rainfall=this%monthly_gross_precip,                    &
                                   monthly_runoff=this%monthly_runoff )
 
     else
 
 
-      call irrigation__calculate( irrigation_amount=this%irrigation,                      &
-                                  landuse_index=this%landuse_index,                       &
-                                  soil_storage=this%soil_storage,                         & 
-                                  soil_storage_max=this%soil_storage_max,                 &
-                                  rainfall=this%rainfall,                                 &
-                                  runoff=this%runoff,                                     &
-                                  crop_etc=this%crop_etc,                                 &
-                                  irrigation_mask=this%irrigation_mask )
+      call irrigation__calculate( irrigation_amount=this%irrigation,                             &
+                                  landuse_index=this%landuse_index,                              &
+                                  soil_storage=this%soil_storage,                                & 
+                                  soil_storage_max=this%soil_storage_max,                        &
+                                  rainfall=this%rainfall,                                        &
+                                  runoff=this%runoff,                                            &
+                                  crop_etc=this%crop_etc,                                        &
+                                  irrigation_mask=this%irrigation_mask,                          &
+                                  num_days_since_planting=this%number_of_days_since_planting )
     endif
 
   end subroutine model_calculate_irrigation
@@ -1770,12 +1775,16 @@ contains
 
   subroutine model_update_crop_coefficient_FAO56(this)
 
-    use crop_coefficients__FAO56, only : crop_coefficients_FAO56_calculate,                &
-                                         crop_coefficients_FAO56_update_growth_stage_dates
+    use crop_coefficients__FAO56, only : crop_coefficients_FAO56_calculate,                 &
+                                         crop_coefficients_FAO56_update_growth_stage_dates, &
+                                         GROWTH_STAGE_DATE, PLANTING_DATE
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     
-    call crop_coefficients_FAO56_update_growth_stage_dates()
+    call crop_coefficients_FAO56_update_growth_stage_dates( )
+
+    this%number_of_days_since_planting = SIM_DT%curr                            &
+              - GROWTH_STAGE_DATE( PLANTING_DATE, this%landuse_index )
 
     call crop_coefficients_FAO56_calculate( Kcb=this%crop_coefficient_kcb,      &
                                             GDD=this%gdd,                       &

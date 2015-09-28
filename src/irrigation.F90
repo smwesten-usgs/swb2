@@ -43,6 +43,7 @@ module irrigation
   
   real (kind=c_float), allocatable     :: FRACTION_OF_IRRIGATION_FROM_GW(:)   
   real (kind=c_float), allocatable     :: IRRIGATION_EFFICIENCY(:)
+  integer (kind=c_int), allocatable    :: NUM_DAYS_OF_IRRIGATION(:)
   integer (kind=c_int), allocatable    :: FIRST_DAY_OF_IRRIGATION(:)
   integer (kind=c_int), allocatable    :: LAST_DAY_OF_IRRIGATION(:)
   integer (kind=c_int), allocatable    :: APPLICATION_METHOD_CODE(:)
@@ -79,6 +80,7 @@ contains
     integer (kind=c_int)              :: i
     integer (kind=c_int)              :: status
     character (len=256)               :: str_buffer
+    type (STRING_LIST_T)              :: sl_irrigation_days    
     type (STRING_LIST_T)              :: sl_irrigation_begin
     type (STRING_LIST_T)              :: sl_irrigation_end  
     type (STRING_LIST_T)              :: sl_application_method 
@@ -130,6 +132,16 @@ contains
                                 fValues=MAXIMUM_ALLOWABLE_DEPLETION_FRACTION,   &
                                 lFatal=lTRUE ) 
 
+    
+    !> retrieve length (in days since planting) of irrigation
+    call sl_temp_list%clear()
+    call sl_temp_list%append("Irrigation_length")
+    call sl_temp_list%append("Irrigation_days")
+    call sl_temp_list%append("Irrigation_days_since_planting")
+
+    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_irrigation_days, lFatal=lTRUE ) 
+
+
     !> retrieve first day of irrigation
     call sl_temp_list%clear()
     call sl_temp_list%append("First_day_of_irrigation")
@@ -177,7 +189,7 @@ contains
 
     do index = 1, sl_irrigation_begin%count
       str_buffer = sl_irrigation_begin%get( index )
-      FIRST_DAY_OF_IRRIGATION = mmdd2doy( str_buffer )
+      FIRST_DAY_OF_IRRIGATION( index ) = mmdd2doy( str_buffer )
     enddo  
 
     !> process last day of irrigation. retrieved as a list of strings; 
@@ -187,9 +199,20 @@ contains
 
     do index = 1, sl_irrigation_end%count
       str_buffer = sl_irrigation_end%get( index )
-      LAST_DAY_OF_IRRIGATION = mmdd2doy( str_buffer )
+      LAST_DAY_OF_IRRIGATION( index ) = mmdd2doy( str_buffer )
     enddo  
 
+    !> process number of days of irrigation. retrieved as a list of strings; 
+    !! must convert the strings from mm/dd to DOY
+    allocate( NUM_DAYS_OF_IRRIGATION( sl_irrigation_days%count ), stat=status )
+    call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
+
+    NUM_DAYS_OF_IRRIGATION = sl_irrigation_days%asInt()
+
+    
+    where ( NUM_DAYS_OF_IRRIGATION == 0 )
+      NUM_DAYS_OF_IRRIGATION = 9999
+    end where
 
     !> retrieve application option (i.e. to field capacity, to defined deficit amount, as constant amount)
     call sl_temp_list%clear()
@@ -353,6 +376,7 @@ contains
                                               runoff,                       &
                                               crop_etc,                     &
                                               irrigation_mask,              &
+                                              num_days_since_planting,      &
                                               monthly_rainfall,             &
                                               monthly_runoff                &
                                                 )
@@ -365,6 +389,7 @@ contains
     real (kind=c_float), intent(in)             :: runoff
     real (kind=c_float), intent(in)             :: crop_etc
     real (kind=c_float), intent(in)             :: irrigation_mask
+    integer (kind=c_int), intent(in)            :: num_days_since_planting
     real (kind=c_float), intent(in), optional   :: monthly_rainfall
     real (kind=c_float), intent(in), optional   :: monthly_runoff    
 
@@ -423,6 +448,7 @@ contains
       if ( MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( landuse_index ) > 0.99 )  exit
       if ( soil_storage_max <= 0.0_c_float ) exit
       if ( IRRIGATION_MASK < 1.0e-6_c_float ) exit 
+      if ( num_days_since_planting > NUM_DAYS_OF_IRRIGATION( landuse_index ) ) exit
 
       depletion_fraction = 1.0_c_float - soil_storage / soil_storage_max
 

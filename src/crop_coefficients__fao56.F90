@@ -26,6 +26,7 @@ module crop_coefficients__FAO56
   public :: crop_coefficients_FAO56_initialize, crop_coefficients_FAO56_calculate
   public :: crop_coefficients_FAO56_update_growth_stage_dates
   public :: update_crop_coefficient_date_as_threshold, update_crop_coefficient_GDD_as_threshold
+  public :: GROWTH_STAGE_DATE, PLANTING_DATE
 
   enum, bind(c)
     enumerator :: L_DOY_INI=1, L_DOY_DEV, L_DOY_MID, L_DOY_LATE, L_DOY_FALLOW
@@ -229,7 +230,7 @@ contains
     if ( ubound(L_shift_days_,1) == iNumberOfLanduses ) then
       GROWTH_STAGE_SHIFT_DAYS = L_shift_days_
     else
-      call warn(sMessage="L_shift_days has "//asCharacter(ubound(L_ini_,1))//" entries; there are "  &
+      call warn(sMessage="L_shift_days has "//asCharacter(ubound(L_shift_days_,1))//" entries; there are "  &
         //asCharacter(iNumberOfLanduses)//" landuse codes. Assuming value of zero." )
     endif      
 
@@ -413,6 +414,7 @@ contains
                 current_date => SIM_DT%curr )
 
       ! now calculate Kcb for the given landuse
+
       if( current_date > Date_late ) then
 
         fKcb = Kcb_min
