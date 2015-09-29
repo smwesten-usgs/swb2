@@ -1,8 +1,8 @@
 
-# Description of Irrigation Demand Process Option {#irrigation}
+### Irrigation Demand {#irrigation}
 
 
-# FAO-56 {#irrigation_FAO_56}
+#### FAO-56 {#irrigation_FAO_56}
 
 When the irrigation demand is simulated in SWB, the underlying soil-moisture module is automatically changed to the FAO-56 
 The calculation under 'nonstandard' conditions includes the transpiration-limiting effects of soil water stress on plants. When this option is invoked in swb, the Thornthwaite-Mather soil moisture retention tables are **not** consulted. Rather, the crop evapotranspiration amount $(E{T_{c,adj}})$ is adjusted by incorporation of a water stress factor $({K_s})$ whose value may range between 0.0 and 1.0:

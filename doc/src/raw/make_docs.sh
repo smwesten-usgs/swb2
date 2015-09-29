@@ -25,6 +25,9 @@ for filename in 0*.md; do
     echo "References" >> tempfile.md
     echo "----------------" >> tempfile.md
 
+    sed -iEe 's/####/#/g' tempfile.md 
+    sed -iEe 's/###/#/g' tempfile.md 
+
     # now create a Doxygen version of the Markdown files, processing the bibliography
     # using Pandoc
 #    pandoc --from=markdown_mmd+tex_math_dollars+pipe_tables+backtick_code_blocks+citations    \

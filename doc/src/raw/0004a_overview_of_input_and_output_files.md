@@ -1,4 +1,4 @@
-# Overview of Input and Output Files {#overview_of_input_and_output_files}
+## Overview of Input and Output Files {#overview_of_input_and_output_files}
 
 The Soil-Water-Balance Code must be supplied with at least three gridded datasets in order to run:
 

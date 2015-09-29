@@ -1,15 +1,15 @@
-# Control File Directives {#appendix_2_control_file_directives}
+# Control File Directives {#appendix_2_control_file_directives_version_2}
 
 [TOC]
 
-This section provides a complete list of the control file statements understood by SWB. 
+This section provides a complete list of the control file statements understood by SWB, version 2.0. 
 
 # Control File Directives: Gridded Datasets
 
 SWB has a set of common control file directives that may be used with any input gridded dataset. The types of data recognized by SWB (as of July 2015) includes:
 
-|Gridded Dataset Name |
-|---------------------|
+|Gridded Dataset Name           |
+|-------------------------------|
 | PRECIPITATION                 |
 | TMIN                          |
 | TMAX                          |
@@ -53,11 +53,11 @@ For each of the gridded datasets listed above, a standard set of suffixes may be
 | _NETCDF_VARIABLE_ORDER             |  "xyt or txy"    | description of the order in which the gridded data were written |
 | _NETCDF_FLIP_VERTICAL              |  **none**        | if present, all gridded data will be "flipped" around the vertical axis. |
 | _NETCDF_FLIP_HORIZONTAL            |  **none**        | if present, all gridded data will be "flipped" around the horizontal axis  |
-| _NETCDF_MAKE_LOCAL_ARCHIVE         | 1 | 8  |
-| _PROJECTION_DEFINITION             | 2 | 9  |
-| _MINIMUM_ALLOWED_VALUE             | 3 | 10  |   
-| _MAXIMUM_ALLOWED_VALUE             | 4 | 11  |   
-| _MISSING_VALUES_CODE               | 5 | 12  |   
-| _MISSING_VALUES_OPERATOR           | 6 | 13  |   
-| _MISSING_VALUES_ACTION             | 7 | 14  |
+| _NETCDF_MAKE_LOCAL_ARCHIVE         |  |
+| _PROJECTION_DEFINITION             |  | PROJ.4 string describing the geographic projection of the dataset
+| _MINIMUM_ALLOWED_VALUE             | *real value* | ceiling to be applied to the data; data above this value will be reset to this amount
+| _MAXIMUM_ALLOWED_VALUE             | *real value* | floor to be applied to the data; data beneath this value will be reset to this amount   
+| _MISSING_VALUES_CODE               | *real or integer value* | value   
+| _MISSING_VALUES_OPERATOR           | "<", "<=", ">", ">=" | 
+| _MISSING_VALUES_ACTION             | "mean" or "zero" | "mean" will substitute the mean value calculated over the remaining valid cells; "zero" will substitute a value of 0.0 in place of missing values
 

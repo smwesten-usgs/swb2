@@ -1,16 +1,16 @@
-# General Discussion of Gridded Datassets {#general_discussion_of_gridded_datasets}
+## General Discussion of Gridded Datassets {#general_discussion_of_gridded_datasets}
 
 SWB can ingest gridded data in three formats: Surfer, ESRI Arc ASCII, or netCDF. 
 
 
-## Supported File Types
+### Supported File Types
 
-### Surfer ASCII Grid
+#### Surfer ASCII Grid
 
-### ESRI ASCII Grid
+#### ESRI ASCII Grid
 
-### NetCDF
+#### NetCDF
 
-## Geographic Projections
+### Geographic Projections
 
-## Treatment of Missing Values
+### Treatment of Missing Values

@@ -17,7 +17,10 @@ $search
 <script type="text/x-mathjax-config">
   MathJax.Hub.Config({
     tex2jax: {processEnvironments: true,
-              inlineMath: [['$','$'], ['\\(','\\)']] },
+              inlineMath: [ ['$','$'], ['\\(','\\)'] ],
+              displayMath: [ ['$$','$$'], ['\\[','\\]'] ],
+              processEscapes: true 
+      },
     TeX: { equationNumbers: { autoNumber: "all" } }
   });
 </script>
