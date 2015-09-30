@@ -81,8 +81,8 @@ module model_domain
     real (kind=c_float), allocatable       :: surface_storage(:)
     real (kind=c_float), allocatable       :: surface_storage_max(:)
     real (kind=c_float), allocatable       :: surface_storage_excess(:)
+    real (kind=c_float), allocatable       :: storm_drain_capture(:)
     real (kind=c_float), allocatable       :: soil_storage(:)
-    real (kind=c_float), allocatable       :: soil_storage_previous_day(:)
     real (kind=c_float), allocatable       :: soil_storage_max(:)
     real (kind=c_float), allocatable       :: potential_recharge(:)
     real (kind=c_float), allocatable       :: direct_recharge(:)    
@@ -126,7 +126,6 @@ module model_domain
     procedure ( simple_method ), pointer         :: init_GDD                => model_initialize_GDD_none
     procedure ( simple_method ), pointer         :: init_AWC                => model_initialize_available_water_content_gridded
     procedure ( simple_method ), pointer         :: init_crop_coefficient   => model_initialize_crop_coefficient_none
-
     procedure ( simple_method ), pointer         :: calc_interception       => model_calculate_interception_bucket
     procedure ( simple_method ), pointer         :: update_crop_coefficient => model_update_crop_coefficient_none    
 
@@ -300,9 +299,9 @@ contains
     allocate( this%pervious_fraction( iCount ), stat=iStat(29) )
     allocate( this%surface_storage( iCount ), stat=iStat(30) ) 
     allocate( this%surface_storage_excess( iCount ), stat=iStat(31) )
-    allocate( this%surface_storage_max( iCount ), stat=iStat(32) )           
-    allocate( this%canopy_cover_fraction( iCount ), stat=iStat(33) ) 
-    allocate( this%soil_storage_previous_day( iCount ), stat=iStat(34) )   
+    allocate( this%surface_storage_max( iCount ), stat=iStat(32) ) 
+    allocate( this%storm_drain_capture( iCount ), stat=iStat(33) )          
+    allocate( this%canopy_cover_fraction( iCount ), stat=iStat(34) ) 
     allocate( this%crop_coefficient_kcb( iCount ), stat=iStat(35) )   
     allocate( this%potential_snowmelt( iCount ), stat=iStat(36) )  
     allocate( this%continuous_frozen_ground_index( iCount ), stat=iStat(37) ) 

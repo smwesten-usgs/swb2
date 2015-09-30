@@ -18,6 +18,7 @@ module model_initialize
   use simulation_datetime, only          : SIM_DT
   use strings
   use string_list  
+  use storm_drain_capture, only          : storm_drain_capture_initialize
   implicit none
 
   private
@@ -226,6 +227,8 @@ contains
     call initialize_soil_storage()
 
     call initialize_surface_storage_max()
+
+    call storm_drain_capture_initialize()
 
   end subroutine initialize_ancillary_values
 

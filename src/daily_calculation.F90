@@ -2,6 +2,8 @@ module daily_calculation
 
   use continuous_frozen_ground_index, only   : update_continuous_frozen_ground_index
   use model_domain, only                     : MODEL_DOMAIN_T
+  use storm_drain_capture, only              : storm_drain_capture_calculate,             &
+                                               STORM_DRAIN_CAPTURE_FRACTION
   use iso_c_binding, only                    : c_short, c_int, c_float, c_double, c_bool
 
   use mass_balance__impervious_surface, only : calculate_impervious_surface_mass_balance
@@ -54,20 +56,25 @@ contains
                                               actual_et=cells%actual_et_interception,              &
                                               interception=cells%interception,                     &
                                               reference_et0=cells%reference_et0 )
+
     call calculate_snow_mass_balance( snow_storage=cells%snow_storage,                 &
                                       potential_snowmelt=cells%potential_snowmelt,     &
                                       snowmelt=cells%snowmelt,                         &
                                       snowfall=cells%snowfall )
-    call calculate_impervious_surface_mass_balance( surface_storage=cells%surface_storage,                   & 
-                                                    actual_et=cells%actual_et_impervious,                    &   
-                                                    surface_storage_excess=cells%surface_storage_excess,     &
-                                                    surface_storage_max=cells%surface_storage_max,           &
-                                                    rainfall=cells%rainfall,                                 &
-                                                    snowmelt=cells%snowmelt,                                 &
-                                                    runoff=cells%runoff,                                     &
-                                                    fog=cells%fog,                                           &
-                                                    interception=cells%interception,                         &
-                                                    reference_et0=cells%reference_et0 ) 
+
+    call calculate_impervious_surface_mass_balance(                                        &
+        surface_storage=cells%surface_storage,                                             & 
+        actual_et=cells%actual_et_impervious,                                              &   
+        surface_storage_excess=cells%surface_storage_excess,                               &
+        surface_storage_max=cells%surface_storage_max,                                     &
+        storm_drain_capture=cells%storm_drain_capture,                                     &
+        storm_drain_capture_fraction=STORM_DRAIN_CAPTURE_FRACTION( cells%landuse_index ),  &
+        rainfall=cells%rainfall,                                                           &
+        snowmelt=cells%snowmelt,                                                           &
+        runoff=cells%runoff,                                                               &
+        fog=cells%fog,                                                                     &
+        interception=cells%interception,                                                   &
+        reference_et0=cells%reference_et0 )
 
 
     ! call to calc_routing also triggers an embedded call to calc_runoff
