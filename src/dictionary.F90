@@ -50,7 +50,9 @@ module dictionary
     generic              :: get_entry => get_entry_by_key_fn
 
     procedure, private   :: get_next_entry_by_key_fn
-    generic              :: get_next_entry => get_next_entry_by_key_fn
+    procedure, private   :: get_next_entry_fn
+    generic              :: get_next_entry => get_next_entry_by_key_fn, &
+                                              get_next_entry_fn
 
     procedure, private   :: add_entry_to_dict_sub
     generic              :: add_entry => add_entry_to_dict_sub
@@ -63,6 +65,8 @@ module dictionary
 
     procedure, private   :: grep_dictionary_key_names_fn
     generic              :: grep_keys => grep_dictionary_key_names_fn
+
+    procedure, public    :: get_value => get_value_as_string_sub
 
     procedure, private   :: get_values_as_int_sub
     procedure, private   :: get_values_as_float_sub
@@ -217,6 +221,26 @@ contains
                  lEcho=lFALSE )
 
   end function get_next_entry_by_key_fn
+
+!--------------------------------------------------------------------------------------------------
+
+  function get_next_entry_fn(this)   result( pDict )
+
+    class (DICT_T)                :: this
+    type (DICT_ENTRY_T), pointer  :: pDict
+    
+    pDict => null()
+
+    ! if "current" location is not null, it will point to the location of the 
+    ! last key value found. move forward by one before examining the next key...
+    if (associated( this%current) ) pDict => this%current%next
+
+    if (.not. associated( pDict ) )  &
+      call warn( sMessage="Reached end of dictionary.",                    &
+                 iLogLevel=LOG_DEBUG,                                      & 
+                 lEcho=lFALSE )
+
+  end function get_next_entry_fn
 
 !--------------------------------------------------------------------------------------------------
 
@@ -492,6 +516,34 @@ contains
   end subroutine get_values_as_string_list_given_list_of_keys_sub
 
 !--------------------------------------------------------------------------------------------------
+
+  subroutine get_value_as_string_sub(this, sText, sKey)
+
+    class (DICT_T)                                  :: this
+    character(len=:), allocatable, intent(out)      :: sText
+    character (len=*), intent(in), optional         :: sKey
+
+    ! [ LOCALS ]
+    type (DICT_ENTRY_T), pointer   :: pTarget
+    integer (kind=c_int)           :: iStat
+    
+    if ( present( sKey ) )  this%current => this%get_entry(sKey)
+
+    if ( associated( this%current ) ) then
+
+      sText = this%current%sl%listall()
+
+    else
+
+      sText= ""
+      
+    endif  
+
+
+
+  end subroutine get_value_as_string_sub
+  
+!--------------------------------------------------------------------------------------------------  
 
   subroutine get_values_as_string_list_sub(this, sKey, slString)
 

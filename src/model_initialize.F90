@@ -746,19 +746,32 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine write_control_file( sFilename, iLineRange )
+  subroutine write_control_file( sFilename )
 
     character (len=*), intent(in)    :: sFilename
 
     ! [ LOCALS ]
-    character (len=256)   :: sRecord, sSubstring
-    integer (kind=c_int)  :: iStat
-    type (ASCII_FILE_T) :: CF
+    character (len=256)             :: sRecord, sSubstring
+    character (len=:), allocatable  :: sText
+    integer (kind=c_int)            :: iStat
+    type (ASCII_FILE_T)             :: CF
+    type (DICT_ENTRY_T), pointer    :: pDict
 
     call CF%open( sFilename = sFilename )
 
-    call CF_DICT%get_entry("GRID")
+    call CF_DICT%get_value(sText, "GRID")
 
+    pDict => CF_DICT%get_next_entry()
+
+    do while ( associated( pDict ) )
+
+      call CF_DICT%get_value( sText )
+      call CF%writeLine( sText )
+      pDict => CF_DICT%get_next_entry()
+
+    enddo 
+
+    call CF%close()      
 
   end subroutine write_control_file  
 
