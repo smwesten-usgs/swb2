@@ -24,6 +24,7 @@ module file_operations
     integer (kind=c_int)            :: iNumberOfRecords = 0
     integer (kind=c_int)            :: iNumberOfHeaderLines = 1
     logical (kind=c_bool)           :: lIsOpen = lFALSE
+    logical (kind=c_bool)           :: lReadOnly = lTRUE
     logical (kind=c_bool)           :: lEOF = lFALSE
     integer (kind=c_int)            :: iUnitNum
     integer (kind=c_int)            :: iStat
@@ -69,6 +70,9 @@ module file_operations
 
     procedure, private :: read_line_of_data_fn
     generic, public    :: readLine => read_line_of_data_fn
+
+    procedure, private :: write_line_of_data_sub
+    generic, public    :: writeLine => write_line_of_data_sub
 
   end type ASCII_FILE_T
 
@@ -193,9 +197,9 @@ contains
       open(newunit=this%iUnitNum, file=sFilename, iostat=this%iStat, action='WRITE')
       call assert(this%iStat == 0, "Failed to open file "//dquote(sFilename)//".", __FILE__, __LINE__)
 
-      if (this%iStat == 0) this%lIsOpen = lTRUE
-
+      this%lIsOpen = lTRUE
       this%lEOF = lFALSE
+      this%lReadOnly = lFALSE
 
       call LOGS%write( "Opened file "//dquote(sFilename) )
    
@@ -310,6 +314,28 @@ contains
   end function read_header_fn
 
 !--------------------------------------------------------------------------------------------------
+
+  subroutine write_line_of_data_sub( this, sText )
+
+    class (ASCII_FILE_T), intent(inout) :: this
+    character (len=*), intent(in)       :: sText
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iStat
+    
+    call assert( .not. this%lReadOnly, "INTERNAL ERROR -- File "//dquote( this%sFilename )  &
+      //" was opened as READONLY.", __FILE__, __LINE__ )
+
+    if (this%isOpen() ) then
+
+      write (unit = this%iUnitNum, fmt = "(a)", iostat = iStat) sText
+
+    endif
+
+  end subroutine write_line_of_data_sub
+
+
+
 
   function read_line_of_data_fn(this) result(sText)
 

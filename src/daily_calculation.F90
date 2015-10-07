@@ -131,7 +131,7 @@ contains
     cells%potential_recharge = cells%potential_recharge * cells%pervious_fraction
 
     call cells%calc_direct_recharge()
-
+    
     ! reporting of potential recharge and irrigation must be adjusted to account for zero
     ! irrigation and potential recharge associated with the impervious areas
     cells%potential_recharge = cells%potential_recharge * cells%pervious_fraction     &

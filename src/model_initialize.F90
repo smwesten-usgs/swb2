@@ -746,6 +746,23 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  subroutine write_control_file( sFilename, iLineRange )
+
+    character (len=*), intent(in)    :: sFilename
+
+    ! [ LOCALS ]
+    character (len=256)   :: sRecord, sSubstring
+    integer (kind=c_int)  :: iStat
+    type (ASCII_FILE_T) :: CF
+
+    call CF%open( sFilename = sFilename )
+
+    call CF_DICT%get_entry("GRID")
+
+
+  end subroutine write_control_file  
+
+
   subroutine read_control_file( sFilename ) 
 
     character (len=*), intent(in)    :: sFilename
@@ -807,6 +824,8 @@ contains
     call CF%close()
 
   end subroutine read_control_file
+
+  
 
 !--------------------------------------------------------------------------------------------------
 
