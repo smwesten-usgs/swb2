@@ -10,7 +10,7 @@ module output
 
   private
 
-  public :: initialize_output, set_output_directory, write_output
+  public :: initialize_output, set_output_directory, write_output, OUTPUT_DIRECTORY_NAME
 
   type, public :: NETCDF_FILE_COLLECTION_T
     type (T_NETCDF4_FILE), pointer, public :: ncfile

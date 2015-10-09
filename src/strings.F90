@@ -248,24 +248,29 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  elemental function float_to_char_fn(fValue, iNumdigits)    result(sText)
+  elemental function float_to_char_fn(fValue, iFieldWidth, iNumdigits)    result(sText)
 
     real (kind=c_float), intent(in)             :: fValue
+    integer (kind=c_int), intent(in), optional  :: iFieldWidth
     integer (kind=c_int), intent(in), optional  :: iNumdigits
     character (len=:), allocatable              :: sText
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iStat
-    character (len=:), allocatable :: sFmt
+    character (len=32)   :: sFmt
     character (len=32)   :: sBuf
 
-    if (present(iNumDigits) ) then
+    if ( present( iNumDigits) .and. present( iFieldWidth ) ) then
+      write(sFmt, fmt="('(G',i0,'.',i0,')')") iFieldWidth, iNumdigits
+    elseif (present(iNumDigits) ) then
       write(sFmt, fmt="('(G0.',i0,')')") iNumdigits
+    elseif (present(iFieldWidth) ) then
+      write(sFmt, fmt="('(G',i0,'.4)')") iNumdigits      
     else
       sFmt = "(G0.4)"
     endif    
 
-    write(sBuf, fmt=sFmt, iostat=iStat)  fValue
+    write(sBuf, fmt=trim(sFmt), iostat=iStat)  fValue
 
     if (iStat==0) then
       sText = trim( adjustl(sBuf) )

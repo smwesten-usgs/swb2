@@ -23,7 +23,7 @@ module model_initialize
 
   private
 
-  public :: read_control_file, initialize_all
+  public :: read_control_file, write_control_file,initialize_all
   public :: check_for_fatal_warnings
 
   type GRIDDED_DATASETS_T
@@ -746,9 +746,10 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine write_control_file( sFilename )
+  subroutine write_control_file( sFilename, sGridSpecification )
 
-    character (len=*), intent(in)    :: sFilename
+    character (len=*), intent(in)           :: sFilename
+    character (len=*), intent(in), optional :: sGridSpecification
 
     ! [ LOCALS ]
     character (len=256)             :: sRecord, sSubstring
@@ -761,12 +762,16 @@ contains
 
     call CF_DICT%get_value(sText, "GRID")
 
-    pDict => CF_DICT%get_next_entry()
+    ! get GRID specification and move pointer past it; discard values
+    if ( present( sGridSpecification ) ) then
+      pDict => CF_DICT%get_next_entry()
+      call CF%writeLine( trim( sGridSpecification ) )
+    endif  
 
     do while ( associated( pDict ) )
 
       call CF_DICT%get_value( sText )
-      call CF%writeLine( sText )
+      call CF%writeLine( trim(pDict%key)//" "//sText )
       pDict => CF_DICT%get_next_entry()
 
     enddo 

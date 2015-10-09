@@ -315,20 +315,40 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine write_line_of_data_sub( this, sText )
+  subroutine write_line_of_data_sub( this, sText, lAdvance )
 
-    class (ASCII_FILE_T), intent(inout) :: this
-    character (len=*), intent(in)       :: sText
+    class (ASCII_FILE_T), intent(inout)         :: this
+    character (len=*), intent(in)               :: sText
+    logical (kind=c_bool), intent(in), optional :: lAdvance
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iStat
-    
+
     call assert( .not. this%lReadOnly, "INTERNAL ERROR -- File "//dquote( this%sFilename )  &
       //" was opened as READONLY.", __FILE__, __LINE__ )
-
+    
     if (this%isOpen() ) then
 
-      write (unit = this%iUnitNum, fmt = "(a)", iostat = iStat) sText
+      if ( present( lAdvance ) ) then
+        if( lAdvance ) then
+
+          write ( unit = this%iUnitNum, fmt = "(a)", iostat = iStat ) trim(sText)
+          flush ( unit = this%iUnitNum )
+
+        else
+
+          write ( unit = this%iUnitNum, fmt = "(a)", iostat = iStat, advance="no" )   &
+            "\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b\b"//trim(sText)
+          flush ( unit = this%iUnitNum )
+
+        endif  
+
+      else
+
+        write ( unit = this%iUnitNum, fmt = "(a)", iostat = iStat ) trim(sText)
+        flush ( unit = this%iUnitNum )
+
+      endif  
 
     endif
 

@@ -78,11 +78,11 @@ include( cmake/find_programs_and_libraries.cmake )
 #set(MODULE_DIR ${INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/include/${OS}/${Fortran_COMPILER_NAME} )
 
 if ("${OS}" STREQUAL "win_x64" OR "${OS}" STREQUAL "win_x86")
-  add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2.exe ${CMAKE_INSTALL_PREFIX}/swb2.exe
-  )
+  add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2.exe ${CMAKE_INSTALL_PREFIX}/swb2.exe )
+  add_custom_target(copy_launcher ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb_launch.exe ${CMAKE_INSTALL_PREFIX}/swb_launch.exe )
 else()
-  add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2 ${CMAKE_INSTALL_PREFIX}/swb2
-  )
+  add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2 ${CMAKE_INSTALL_PREFIX}/swb2 )
+  add_custom_target(copy_launcher ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb_launch ${CMAKE_INSTALL_PREFIX}/swb_launch ) 
 endif()
 
 include( cmake/print_summary.cmake )
