@@ -1,8 +1,8 @@
 setwd("D:\\SMWData\\Source_Code\\swb\\share\\R-scripts")
 
-gen <- function(x, const, fac1, fac2, fac3, fac4) {
+gen <- function(x, const, fac1, fac2, fac3 ) {
   
-  pred <- const + fac1*x + fac2*x^2 + fac3*x^3 + fac4*x^4
+  pred <- const + fac1*x + fac2*x^2 + fac3*x^3
   return(pred)
 }
 
@@ -30,19 +30,17 @@ TM_2C_new <- data.frame(Temp_degC=seq(32,140), I=numeric(length(seq(32,140))))
 TM_2F <- data.frame(Temp_degF=TM_2C$Temp_degC*9/5+32, I=TM_2C$I)
 TM_2F_new <- data.frame(Temp_degF=seq(32,140), I=numeric(length(seq(32,140))))
 
-TM_2F_opt <- nls( I ~ gen(Temp_degF, const, fac1, fac2, fac3, fac4), 
-                  data=TM_2F, start=list(const=0., fac1=0.5, fac2=0.3, fac3=0.1, fac4=0.05),
+TM_2F_opt <- nls( I ~ gen(Temp_degF, const, fac1, fac2, fac3), 
+                  data=TM_2F, start=list(const=0., fac1=0.5, fac2=0.3, fac3=0.1),
                   control=list(maxiter=3000, tol=1.e-8, printEval=TRUE, 
                                minFactor=1.e-10, warnOnly=TRUE))
 
+TM_table_4 <- read.table("Thornthwaite_Mather_1957__Table_4.dat", as.is=TRUE, header=TRUE)
 mycolnames <- colnames(TM_table_4)[2:ncol(TM_table_4)]
+TM4_mat <- t(as.matrix(TM_table_4[ , -1])) / 25.4
 
 y<- TM_table_4[ ,1] *9/5 + 32
 x<- as.numeric(gsub(pattern="I", replacement="", x=mycolnames) )
-
-
-TM_table_4 <- read.table("Thornthwaite_Mather_1957__Table_4.dat", as.is=TRUE, header=TRUE)
-TM4_mat <- t(as.matrix(TM_table_4[ , -1])) / 25.4
 
 #filled.contour(x, y, sm.mat, axes=T,xlab="ACCUMULATED POTENTIAL WATER LOSS, IN INCHES",
 #   ylab="MAXIMUM SOIL-WATER CAPACITY, IN INCHES")
