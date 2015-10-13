@@ -6,9 +6,9 @@ rm -f *.txt
 
 # set CMAKE-related and build-related variables
 export CMAKEROOT=/usr/bin/cmake
-export COMPILER_VERSION=5.1.0
+export COMPILER_VERSION=5.2.0
 export COMPILER_MAJ_VERSION=5
-export COMPILER_TRIPLET=x86_64-apple-darwin14.5.0
+export COMPILER_TRIPLET=x86_64-apple-darwin15.0.0
 export COMPILER_DIR=/usr/local
 export LIB_PATH1="/usr/local/lib/gcc/$COMPILER_MAJ_VERSION/gcc/$COMPILER_TRIPLET/$COMPILER_VERSION"
 export LIB_PATH2=/opt/X11/lib
