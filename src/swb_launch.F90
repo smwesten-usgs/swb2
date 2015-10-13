@@ -14,7 +14,7 @@ program swb_launch
   use dictionary
   use logfiles, only         : LOGS, LOG_DEBUG
   use file_utilities, only   : mkdir, get_libc_errno, get_libc_err_string,   &
-                                c_get_libc_errno
+                                c_get_libc_errno, remove
   use model_initialize, only : initialize_all, read_control_file, write_control_file
   use version_control, only  : SWB_VERSION, GIT_COMMIT_HASH_STRING, &
                                GIT_BRANCH_STRING, COMPILE_DATE, COMPILE_TIME
@@ -39,13 +39,16 @@ program swb_launch
   real (kind=c_float)              :: divisions_x, divisions_y
   real (kind=c_float)              :: fCellSize
   character (len=64)               :: filename
-  integer (kind=c_int)             :: loc_err
+  integer (kind=c_int)             :: loc_err, c_error_number
   character(len=:), allocatable    :: err_string
 
   real (kind=c_float)              :: fUR_x, fUR_y, fLL_x, fLL_y
   real (kind=c_float)              :: fLL_x1, fLL_y1
 
   integer (kind=c_int)             :: iNX, iNY, iNX1, iNY1
+  integer (kind=c_int)             :: status
+  integer (kind=c_int)             :: number_at_100
+  integer (kind=c_int)             :: number_uninitialized
 
   iNumArgs = COMMAND_ARGUMENT_COUNT()
 
@@ -91,13 +94,13 @@ program swb_launch
   end if
 
   iCount = 0
+  number_at_100 = 0
+  number_uninitialized = 0
 
   do iIndex=1, iNumArgs
 
     call GET_COMMAND_ARGUMENT( iIndex, sBuf )
     
-    print *, iIndex, squote( sBuf )
-
     if ( scan( sBuf, ".") > 0 ) then
 
       call slControlFiles%append( sBuf )
@@ -112,11 +115,8 @@ program swb_launch
       endif    
 
     endif  
-
-  enddo 
- 
-  ! open and initialize logfiles
-  call LOGS%initialize( iLogLevel = LOG_DEBUG )
+             
+  enddo
 
   do iIndex=1, slControlFiles%count
 
@@ -158,19 +158,58 @@ program swb_launch
       call mkdir( "tmp"//asCharacter( iCount ), loc_err )
 
       ! suppress error messages due to directory that already exists
-      if ( loc_err /= 0 .and. loc_err /= 17 ) then
-        call get_libc_err_string( err_string, c_get_libc_errno() )
-        write(*, fmt="(a, i0)") "call to 'mkdir' failed. err=", loc_err
-        write(*, fmt="(a,i0)") "libc errno=",get_libc_errno()
-        write(*, fmt="(a)") "libc error msg: "//trim(err_string)
+      if ( loc_err /= 0 ) then
+        c_error_number = get_libc_errno()
+        if ( c_error_number /= 0 .and. c_error_number /= 17 ) then
+          call get_libc_err_string( err_string, c_error_number )
+          write(*, fmt="(a, i0)") "call to 'mkdir' failed. err=", loc_err
+          write(*, fmt="(a,i0)") "libc errno=", c_error_number
+          write(*, fmt="(a)") "libc error msg: "//trim(err_string)
+        endif  
       endif  
 
+      call remove( "tmp"//asCharacter( iCount )//"/run_progress.txt", loc_err )
+
+      ! suppress error messages due to directory that already exists
+      if ( loc_err /= 0 ) then
+        c_error_number = get_libc_errno()
+        if ( c_error_number /= 0 .and. c_error_number /= 2 ) then
+          call get_libc_err_string( err_string, c_error_number )
+          write(*, fmt="(a, i0)") "call to 'remove' failed. err=", loc_err
+          write(*, fmt="(a,i0)") "libc errno=", c_error_number
+          write(*, fmt="(a)") "libc error msg: "//trim(err_string)
+        endif  
+      endif  
 
       call execute_command_line( "swb2 "//trim(filename)//" "//"tmp"//asCharacter( iCount )  &
         //" > cmdlog"//asCharacter( iCount)//".md", wait=.false. )
 
     enddo
   enddo    
+
+  do
+
+    do iIndex=1, iCount
+      filename = "tmp"//asCharacter(iCount)//"/run_progress.txt"
+      open(unit=12, file=filename, iostat=status, action='READ')
+      if ( status == 0 ) then
+        read (12, fmt="(a)", iostat=status) sBuf
+        !if ( status /= 0 ) cycle
+        if ( scan( sBuf, "Done") > 0 ) number_at_100 = number_at_100 + 1
+        close(unit=12, iostat=status )
+        write(*,fmt="(a)" ) "Instance "//asCharacter(iIndex)//": "//trim(sBuf)
+      else
+        write(*,fmt="(a)" ) "Instance "//asCharacter(iIndex)//": initializing"
+      endif
+    enddo
+
+    write(*,fmt="(/)" ) 
+
+    if ( number_at_100 == iCount ) exit
+
+    call sleep(10)
+
+  enddo
    
   call LOGS%close()
 

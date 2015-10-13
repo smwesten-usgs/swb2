@@ -27,6 +27,13 @@ module file_utilities
   end interface
 
   interface
+    integer function c_remove(filename) bind(c,name="remove")
+      use iso_c_binding
+      character(kind=c_char), intent(in)  :: filename(*)
+    end function
+  end interface
+
+  interface
     function c_getcwd(dirname, size) bind(c,name="getcwd") result(r)
       use iso_c_binding
       character(kind=c_char) ,intent(out) :: dirname(*)
@@ -142,6 +149,7 @@ contains
 
   end subroutine
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine rmdir(dirname, err)
     
@@ -164,6 +172,32 @@ contains
     endif 
 
   end subroutine
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine remove(filename, err)
+    
+    character(*) :: filename
+    integer, optional, intent(out) :: err
+    
+    ! [ LOCALS ]
+    integer :: loc_err
+
+    loc_err =  c_remove(filename//c_null_char)
+
+    if (present(err)) then
+      err = loc_err
+    else
+      if ( loc_err /= 0 )  then
+        write(*, fmt="(a, i0)") "call to 'remove' failed. err=", loc_err
+        write(*, fmt="(a)") "filename: '"//trim(filename)//"'"
+        write(*, fmt="(a,i0)") "libc errno=",get_libc_errno()        
+      endif
+    endif 
+
+  end subroutine
+
+!--------------------------------------------------------------------------------------------------
 
   subroutine get_cwd( dirname )
 
@@ -202,6 +236,8 @@ contains
     endif 
 
   end subroutine
+
+!--------------------------------------------------------------------------------------------------
 
   function get_libc_errno()  result( libc_errno )
 
