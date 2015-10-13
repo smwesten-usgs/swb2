@@ -47,10 +47,14 @@ module dictionary
   contains
   
     procedure, private   :: get_entry_by_key_fn 
-    generic              :: get_entry => get_entry_by_key_fn
+    procedure, private   :: get_entry_by_index_fn
+    generic              :: get_entry => get_entry_by_key_fn,    &
+                                         get_entry_by_index_fn
 
     procedure, private   :: get_next_entry_by_key_fn
-    generic              :: get_next_entry => get_next_entry_by_key_fn
+    procedure, private   :: get_next_entry_fn
+    generic              :: get_next_entry => get_next_entry_by_key_fn, &
+                                              get_next_entry_fn
 
     procedure, private   :: add_entry_to_dict_sub
     generic              :: add_entry => add_entry_to_dict_sub
@@ -63,6 +67,8 @@ module dictionary
 
     procedure, private   :: grep_dictionary_key_names_fn
     generic              :: grep_keys => grep_dictionary_key_names_fn
+
+    procedure, public    :: get_value => get_value_as_string_sub
 
     procedure, private   :: get_values_as_int_sub
     procedure, private   :: get_values_as_float_sub
@@ -190,6 +196,41 @@ contains
 
   end function get_entry_by_key_fn
 
+
+  function get_entry_by_index_fn(this, iIndex)   result( pDict )
+
+    class (DICT_T)                   :: this
+    integer (kind=c_int), intent(in) :: iIndex
+    type (DICT_ENTRY_T), pointer     :: pDict
+    
+    ! [ LOCALS ]
+    integer (kind=c_int)  :: iCurrentIndex
+
+    iCurrentIndex = 1
+
+    pDict => this%first
+    this%current => this%first
+
+    do 
+
+      if ( .not. associated( pDict ) ) exit
+
+      if ( iCurrentIndex == iIndex )  exit
+      
+      pDict => pDict%next
+      this%current => pDict
+      iCurrentIndex = iCurrentIndex + 1
+
+    enddo
+
+    if (.not. associated( pDict ) )  &
+      call warn( sMessage="Failed to find a dictionary entry with a index value of "   &
+        //asCharacter(iIndex),                                                         &
+                 iLogLevel=LOG_DEBUG,                                                  & 
+                 lEcho=lFALSE )
+
+  end function get_entry_by_index_fn
+
 !-------------------------------------------------------------------------------------------------- 
 
   function get_next_entry_by_key_fn(this, sKey)   result( pDict )
@@ -217,6 +258,29 @@ contains
                  lEcho=lFALSE )
 
   end function get_next_entry_by_key_fn
+
+!--------------------------------------------------------------------------------------------------
+
+  function get_next_entry_fn(this)   result( pDict )
+
+    class (DICT_T)                :: this
+    type (DICT_ENTRY_T), pointer  :: pDict
+    
+    pDict => null()
+
+    ! if "current" location is not null, it will point to the location of the 
+    ! last key value found. move forward by one before examining the next key...
+    if (associated( this%current) ) then
+      pDict => this%current%next
+      this%current => this%current%next
+    endif  
+
+    if (.not. associated( pDict ) )  &
+      call warn( sMessage="Reached end of dictionary.",                    &
+                 iLogLevel=LOG_DEBUG,                                      & 
+                 lEcho=lFALSE )
+
+  end function get_next_entry_fn
 
 !--------------------------------------------------------------------------------------------------
 
@@ -492,6 +556,35 @@ contains
   end subroutine get_values_as_string_list_given_list_of_keys_sub
 
 !--------------------------------------------------------------------------------------------------
+
+  subroutine get_value_as_string_sub(this, sText, sKey, iIndex )
+
+    class (DICT_T)                                  :: this
+    character(len=:), allocatable, intent(out)      :: sText
+    character (len=*), intent(in), optional         :: sKey
+    integer (kind=c_int), intent(in), optional      :: iIndex
+
+    ! [ LOCALS ]
+    type (DICT_ENTRY_T), pointer   :: pTarget
+    integer (kind=c_int)           :: iStat
+    
+    if ( present( sKey ) )  this%current => this%get_entry(sKey)
+
+    if ( present( iIndex ) )  this%current => this%get_entry( iIndex )
+
+    if ( associated( this%current ) ) then
+
+      sText = this%current%sl%get( 1, this%current%sl%count )
+
+    else
+
+      sText= ""
+
+    endif  
+
+  end subroutine get_value_as_string_sub
+  
+!--------------------------------------------------------------------------------------------------  
 
   subroutine get_values_as_string_list_sub(this, sKey, slString)
 

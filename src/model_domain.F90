@@ -328,6 +328,7 @@ contains
     this%fog = 0.0_c_float
     this%pervious_fraction = 0.0_c_float
     this%canopy_cover_fraction = 1.0_c_float
+    this%irrigation = 0.0_c_float
     this%surface_storage = 0.0_c_float
     this%surface_storage_max = 0.0_c_float
     this%interception_storage = 0.0_c_float

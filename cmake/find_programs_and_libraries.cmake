@@ -89,12 +89,12 @@ find_library(LIBCURL
         ${LIB_PATH}
         NO_CMAKE_SYSTEM_PATH )
 
-find_library(LIBDISLIN
-        NAMES dismg libdismg libdismg.a disgf libdisgf libdisgf.a dislin.10 dislin dislin.10.dylib libdislin.10.dylib
-        PATHS
-        /usr/local/lib
-        /usr/local/dislin
-        ${SWB_LIBPATH} )
+#find_library(LIBDISLIN
+#        NAMES dismg libdismg libdismg.a disgf libdisgf libdisgf.a dislin.10 dislin dislin.10.dylib libdislin.10.dylib
+#        PATHS
+#        /usr/local/lib
+#        /usr/local/dislin
+#        ${SWB_LIBPATH} )
 
 find_library(LIBGCC
         NAMES gcc libgcc libgcc.a
@@ -106,7 +106,7 @@ find_library(LIBGFORTRAN
         PATHS ${LIB_PATH} )
 
 set( EXTERNAL_LIBS ${LIBNETCDF} ${LIBHDF5_HL} ${LIBHDF5} ${LIBCURL} ${LIBZ}
-                   ${LIBSZ} ${LIBDISLIN} ${LIBGCC} ${LIBGFORTRAN} )
+                   ${LIBSZ} ${LIBGCC} ${LIBGFORTRAN} )
 
 # Now, add platform-specific libraries as needed
 

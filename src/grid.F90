@@ -292,7 +292,8 @@ function grid_CreateSimple ( iNX, iNY, rX0, rY0, rGridCellSize, iDataType ) resu
   call assert ( iStat == 0, &
      "Could not allocate pointer to T_GRID object", trim(__FILE__),__LINE__ )
   call assert ( iNX > 0 .and. iNY > 0, &
-     "Illegal grid dimensions specified", trim(__FILE__),__LINE__)
+     "Illegal grid dimensions specified: NX="//asCharacter(iNX)      &
+     //"  NY="//asCharacter(iNY), trim(__FILE__),__LINE__)
 
   select case (iDataType)
       case ( GRID_DATATYPE_INT )

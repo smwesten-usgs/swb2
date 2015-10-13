@@ -21,11 +21,22 @@ module simulation_datetime
     procedure :: increment_by_one_day_sub
     generic   :: addDay => increment_by_one_day_sub
 
+    procedure :: percent_complete => percent_complete_fn
+
   end type DATE_RANGE_T
 
   type (DATE_RANGE_T), public :: SIM_DT
 
 contains
+
+  function percent_complete_fn( this )   result( percent_complete )
+
+    class (DATE_RANGE_T), intent(inout)   :: this    
+    real (kind=c_float)                   :: percent_complete
+
+    percent_complete = real(this%curr - this%start) / real( this%end - this%start + 1) * 100.
+
+  end function percent_complete_fn
 
 
   subroutine increment_by_one_day_sub(this)

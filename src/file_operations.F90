@@ -201,7 +201,7 @@ contains
       this%lEOF = lFALSE
       this%lReadOnly = lFALSE
 
-      call LOGS%write( "Opened file "//dquote(sFilename) )
+      call LOGS%write( "Opened file with write access: "//dquote(sFilename) )
    
     else
 
@@ -317,18 +317,18 @@ contains
 
   subroutine write_line_of_data_sub( this, sText )
 
-    class (ASCII_FILE_T), intent(inout) :: this
-    character (len=*), intent(in)       :: sText
+    class (ASCII_FILE_T), intent(inout)         :: this
+    character (len=*), intent(in)               :: sText
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iStat
-    
+
     call assert( .not. this%lReadOnly, "INTERNAL ERROR -- File "//dquote( this%sFilename )  &
       //" was opened as READONLY.", __FILE__, __LINE__ )
-
+    
     if (this%isOpen() ) then
 
-      write (unit = this%iUnitNum, fmt = "(a)", iostat = iStat) sText
+      write ( unit = this%iUnitNum, fmt = "(a)", iostat = iStat ) trim(sText)
 
     endif
 
