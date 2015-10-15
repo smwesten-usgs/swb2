@@ -12,5 +12,3 @@ add_executable(test__file_utils
 
 set_target_properties(test__file_utils
           PROPERTIES COMPILE_DEFINITIONS "${PREPROCESSOR_DEFINES}")
-
-target_link_libraries(test__file_utils ${EXTRA_LIBS})

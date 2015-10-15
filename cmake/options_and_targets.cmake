@@ -13,7 +13,8 @@ else()
 
 endif()
 
-# define which portions of swb to build (i.e. swbstats? as library?)
+# define which portions of swb to build
 set( TARGET__SWB_EXECUTABLE "TRUE" )
-set( TARGET__SWB_LIBRARY "FALSE" )
+set( TARGET__SWB_LAUNCH "FALSE" )
+set( TARGET__SWB_MERGE "FALSE" )
 

@@ -228,7 +228,7 @@ if(TARGET__SWB_EXECUTABLE)
   set_target_properties(swb2
             PROPERTIES COMPILE_DEFINITIONS "${PREPROCESSOR_DEFINES}")
 
-  target_link_libraries(swb2 ${EXTRA_LIBS})
+#  target_link_libraries(swb2 ${EXTRA_LIBS})
 
 endif()
 
@@ -460,4 +460,4 @@ add_executable(swb_launch
 set_target_properties(swb_launch
       PROPERTIES COMPILE_DEFINITIONS "${PREPROCESSOR_DEFINES}")
 
-target_link_libraries(swb_launch ${EXTRA_LIBS})
+#target_link_libraries(swb_launch ${EXTRA_LIBS})

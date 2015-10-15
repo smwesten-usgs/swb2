@@ -208,7 +208,7 @@ contains
     type(c_ptr) :: buffer
     character(kind=c_char, len=256) :: tempchar
  
-    buffer=c_getcwd(tempchar, 256_c_long)
+    buffer=c_getcwd(tempchar, 256_c_size_t)
 
     dirname = c_to_fortran_string( tempchar )
     

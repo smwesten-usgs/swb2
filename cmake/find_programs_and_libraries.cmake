@@ -52,42 +52,68 @@ find_library(LIBZ
         ${LIB_PATH}
         NO_CMAKE_SYSTEM_PATH )
 
-find_library(LIBSZ
-        NAMES sz libsz libsz.a
-        PATHS
-        /usr/local/opt/szip/lib
-        ${SWB_LIBPATH}
-        ${LIB_PATH} )
+# libsz is a non-free library; avoid linking to it if possible
 
+#find_library(LIBSZ
+#        NAMES sz libsz libsz.a
+#        PATHS
+#        /usr/local/opt/szip/lib
+#        ${SWB_LIBPATH}
+#        ${LIB_PATH} )
 
 find_library(LIBNETCDF
         NAMES netcdf libnetcdf libnetcdf.a
-        PATHS ${SWB_LIBPATH}
+        PATHS
         ${LIB_PATH}
         NO_CMAKE_SYSTEM_PATH )
-
 
 find_library(LIBHDF5
         NAMES hdf5 libhdf5 libhdf5.a
-        PATHS /usr/local/opt/hdf5/lib
-        ${SWB_LIBPATH}
+        PATHS
+        /usr/local/opt/hdf5/lib
         ${LIB_PATH}
         NO_CMAKE_SYSTEM_PATH )
-
 
 find_library(LIBHDF5_HL
         NAMES hdf5_hl libhdf5_hl libhdf5_hl.a
         PATHS /usr/local/opt/hdf5/lib
-        ${SWB_LIBPATH}
         ${LIB_PATH}
         NO_CMAKE_SYSTEM_PATH )
+
+# the following only needed to link to an HDF4 enabled NetCDF
+
+#find_library(LIBDF
+#        NAMES df libdf libdf.a
+#        PATHS
+#        /usr/local/opt/mfhdf/lib
+#        ${LIB_PATH}
+#        NO_CMAKE_SYSTEM_PATH )
+
+#find_library(LIBPORTABLEXDR
+#        NAMES portablexdr libportablexdr libportablexdr.a
+#        PATHS
+#        /usr/local/opt/portablexdr/lib
+#        ${LIB_PATH}
+#        NO_CMAKE_SYSTEM_PATH )
+
+#find_library(LIBMFHDF
+#        NAMES mfhdf libmfhdf libmfhdf.a
+#        PATHS
+#        /usr/local/opt/mfhdf/lib
+#        ${LIB_PATH}
+#        NO_CMAKE_SYSTEM_PATH )
 
 find_library(LIBCURL
         NAMES curl libcurl libcurl.a
         PATHS /usr/local/opt/curl/lib
-        ${SWB_LIBPATH}
         ${LIB_PATH}
         NO_CMAKE_SYSTEM_PATH )
+
+#find_library(LIBJPEG
+#        NAMES jpeg ljpeg ljpeg.a
+#        PATHS
+#        ${LIB_PATH}
+#        NO_CMAKE_SYSTEM_PATH )
 
 #find_library(LIBDISLIN
 #        NAMES dismg libdismg libdismg.a disgf libdisgf libdisgf.a dislin.10 dislin dislin.10.dylib libdislin.10.dylib
@@ -98,40 +124,41 @@ find_library(LIBCURL
 
 find_library(LIBGCC
         NAMES gcc libgcc libgcc.a
-        PATHS /usr/local/opt/gcc48/lib/gcc/x86_64-apple-darwin13.0.0/4.8.2
+        PATHS
         ${LIB_PATH} )
 
 find_library(LIBGFORTRAN
         NAMES gfortran libgfortran libgfortran.a
         PATHS ${LIB_PATH} )
 
-set( EXTERNAL_LIBS ${LIBNETCDF} ${LIBHDF5_HL} ${LIBHDF5} ${LIBCURL} ${LIBZ}
-                   ${LIBSZ} ${LIBGCC} ${LIBGFORTRAN} )
+set( EXTERNAL_LIBS ${LIBNETCDF} ${LIBHDF5_HL} ${LIBHDF5} ${LIBMFHDF} ${LIBDF} ${LIBJPEG} ${LIBPORTABLEXDR}
+                   ${LIBCURL} ${LIBZ}
+                   ${LIBGCC} ${LIBGFORTRAN} )
 
 # Now, add platform-specific libraries as needed
-
+#
 if ("${OS}" STREQUAL "win_x64" OR "${OS}" STREQUAL "win_x86")
 
   find_library(LIBWINPTHREAD
           NAMES libwinpthread.a winpthread winpthread
           PATHS ${LIB_PATH} )
-
+#
   find_library(LIBWS2_32
           NAMES ws2_32 libws2_32 libws2_32.a
           PATHS ${LIB_PATH} )
-
-  find_library(LIBOPENGL
-          NAMES opengl32 libopengl32 libopengl32.a
-          PATHS ${LIB_PATH} )
-
-  find_library(LIBGDI32
-          NAMES gdi32 libgdi32 libgdi32.a
-          PATHS ${LIB_PATH} )
-
+#
+#  find_library(LIBOPENGL
+#          NAMES opengl32 libopengl32 libopengl32.a
+#          PATHS ${LIB_PATH} )
+#
+#  find_library(LIBGDI32
+#          NAMES gdi32 libgdi32 libgdi32.a
+#          PATHS ${LIB_PATH} )
+#
   set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIBWINPTHREAD} ${LIBWS2_32} ${LIBOPENGL} ${LIBGDI32} )
-
+#
 else()
-
+#
   set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" "*.a")
 
   find_library(LIBXM
@@ -142,22 +169,19 @@ else()
 
   set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" ".dylib")
 
-  set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIBXM} )
-
+#  set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIBXM} )
+#
 endif()
+
+
+### NOTE: the libraries defined below will be needed for linking to libcurl.
 
 if ("${OS}" STREQUAL "mac_osx" )
 
-
-  find_library(LIBCRYPTO
-          NAMES crypto libcrypto libcrypto.a
-          PATHS ${SWB_LIBPATH}
+  find_library(LIBCRYPT32
+          NAMES crypt32 libcrypt32 libcrypt32.a
+          PATHS
           ${LIB_PATH} )
-
-  find_library(LIBLDAP
-          NAMES ldap libldap libldap.dylib
-          PATHS /usr/local/opt/openldap/lib
-          NO_CMAKE_SYSTEM_PATH )
 
   find_library(LIBSASL2
           NAMES gsasl libgsasl sasl2 libsasl2 libsasl2.dylib
@@ -191,10 +215,108 @@ if ("${OS}" STREQUAL "mac_osx" )
           /opt/X11/lib
           ${LIB_PATH})
 
-  set( EXTERNAL_LIBS ${EXTERNAL_LIBS}  ${LIBLDAP} ${LIBCRYPTO} ${LIBSSL} ${LIBLBER}
-        ${LIBSSH2} ${LIBSASL2} ${LIBXT} )
+else()
 
+  find_library(LIBCRYPT32
+          NAMES crypt32 libcrypt32 libcrypt32.a
+          PATHS
+          ${LIB_PATH} )
+
+  find_library(LIBCRYPTO
+          NAMES crypto libcrypto libcrypto.a
+          PATHS
+          ${LIB_PATH} 
+          NO_CMAKE_SYSTEM_PATH )
+
+  find_library(LIBCRYPT
+          NAMES crypt libcrypt libcrypt.a
+          PATHS
+          ${LIB_PATH} 
+          NO_CMAKE_SYSTEM_PATH )
+
+  find_library(LIBGCRYPT
+          NAMES gcrypt libgcrypt libgcrypt.a
+          PATHS 
+          ${LIB_PATH} 
+          NO_CMAKE_SYSTEM_PATH )
+
+  find_library(LIBGPG_ERROR
+          NAMES gpg-error libgpg-error libgpg-error.a
+          PATHS
+          ${LIB_PATH} 
+          NO_CMAKE_SYSTEM_PATH )
+
+  find_library(LIBNETTLE
+          NAMES nettle libnettle libnettle.a
+          PATHS
+          ${LIB_PATH} 
+          NO_CMAKE_SYSTEM_PATH )
+
+  find_library(LIBGNUTLS
+          NAMES gnutls libgnutls libgnutls.a
+          PATHS
+          ${LIB_PATH}
+          NO_CMAKE_SYSTEM_PATH )
+       
+           
+ find_library(LIBWLDAP32
+         NAMES lwldap32 libwldap32 libwldap32.a
+         PATHS 
+         ${LIB_PATH}
+         NO_CMAKE_SYSTEM_PATH )
+
+# find_library(LIBSASL2
+#         NAMES gsasl libgsasl sasl2 libsasl2 libsasl2.dylib
+#         PATHS /usr/local/opt/gsasl/lib
+#          ${SWB_PATH}
+#         NO_CMAKE_SYSTEM_PATH )
+
+# find_library(LIBLBER
+#         NAMES lber liblber liblber.dylib
+#          PATHS ${SWB_PATH}
+#         ${LIB_PATH}
+#         NO_CMAKE_SYSTEM_PATH )
+
+  find_library(LIBSSH2
+          NAMES ssh2 libssh2 libssh2.dylib
+          PATHS
+          ${LIB_PATH})
+
+  find_library(LIBIDN
+          NAMES idn lidn libidn.a
+          PATHS
+          ${LIB_PATH})
+
+  find_library(LIBGMP
+          NAMES gmp lgmp libgmp.a
+          PATHS
+          ${LIB_PATH})
+
+  find_library(LIBINTL
+          NAMES intl lintl lintl.a
+          PATHS
+          ${LIB_PATH})
+
+  find_library(LIBICONV
+          NAMES iconv liconv libiconv.a
+          PATHS
+          ${LIB_PATH})  
+
+  find_library(LIBHOGWEED
+          NAMES hogweed lhogweed lhogweed.a
+          PATHS
+          ${LIB_PATH})
+
+  find_library(LIBSSL
+          NAMES ssl libssl libssl.dylib
+          PATHS
+          ${LIB_PATH} )
+
+          
 endif()
 
+set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIBIDN} ${LIBINTL} ${LIBICONV} ${LIBSSH2} ${LIBSSH2} ${LIBCRYPTO} ${LIBSSL} ${LIBLBER} ${LIBLDAP}
+      ${LIBGCRYPT} ${LIBGPG_ERROR} ${LIBNETTLE} ${LIBGMP} ${LIBCRYPT32} ${LIBGNUTLS} ${LIBNETTLE} ${LIBHOGWEED} ${LIBCRYPT32} ${LIBWLDAP32} 
+      ${LIBWS2_32}  )
 
 link_libraries( ${EXTERNAL_LIBS} )

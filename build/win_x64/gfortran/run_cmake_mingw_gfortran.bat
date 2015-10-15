@@ -1,5 +1,6 @@
 @echo off
 :: remove existing Cmake cache and directories
+del /F /Q CMakeCache.*
 rmdir /S /Q CMakeFiles
 rmdir /S /Q src
 rmdir /S /Q Testing
@@ -51,8 +52,9 @@ set PATH=%PATH%;C:\MinGW64\include;C:\MinGW64\lib
 echo %COMPILER_DIR%\bin\%MAKE_EXECUTABLE_NAME% %%1 > make.bat
 
 :: not every installation will have these; I (SMW) find them useful
-set PATH=%PATH%;c:\Program Files (x86)\Zeus
 set PATH=%PATH%;D:\DOS\gnuwin32\bin
+
+set AR=%COMPILER_TRIPLET%-ar.exe
 
 :: set compiler-specific link and compile flags
 set LDFLAGS="-flto"
@@ -79,11 +81,6 @@ cmake ..\..\.. -G "MinGW Makefiles" ^
 -DCMAKE_C_COMPILER:FILEPATH=%COMPILER_DIR%\bin\gcc.exe ^
 -DCMAKE_Fortran_COMPILER:FILEPATH=%COMPILER_DIR%\bin\gfortran.exe ^
 -DTARGET__SWB_EXECUTABLE:BOOLEAN=%TARGET__SWB_EXECUTABLE% ^
--DTARGET__SWB_LIBRARY:BOOLEAN=%TARGET__SWB_LIBRARY% ^
--DTARGET__SWBSTATS:BOOLEAN=%TARGET__SWBSTATS% ^
--DOPTION__STREAM_INTERACTIONS=%OPTION__STREAM_INTERACTIONS% ^
--DOPTION__STRICT_DATE_CHECKING=%OPTION__STRICT_DATE_CHECKING% ^
--DOPTION__DEBUG_PRINT=%OPTION__DEBUG_PRINT% ^
 -DCMAKE_Fortran_FLAGS_DEBUG=%CMAKE_Fortran_FLAGS_DEBUG% ^
 -DCMAKE_Fortran_FLAGS_RELEASE=%CMAKE_Fortran_FLAGS_RELEASE% ^
 -DCMAKE_Fortran_FLAGS_PROFILE=%CMAKE_Fortran_FLAGS_PROFILE%
