@@ -187,10 +187,20 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine open_file_write_access_sub(this, sFilename)
+  subroutine open_file_write_access_sub(this, sFilename, lQuiet )
 
-    class (ASCII_FILE_T), intent(inout) :: this
-    character (len=*), intent(in) :: sFilename
+    class (ASCII_FILE_T), intent(inout)           :: this
+    character (len=*), intent(in)                 :: sFilename
+    logical (kind=c_bool), intent(in), optional   :: lQuiet
+
+    ! [ LOCALS ]
+    logical :: lQuiet_
+
+    if ( present( lQuiet ) ) then
+      lQuiet_ = lQuiet
+    else
+      lQuiet_ = lFALSE
+    endif  
 
     if (.not. this%isOpen() ) then
 
@@ -201,7 +211,8 @@ contains
       this%lEOF = lFALSE
       this%lReadOnly = lFALSE
 
-      call LOGS%write( "Opened file with write access: "//dquote(sFilename) )
+      if ( .not. lQuiet ) &
+        call LOGS%write( "Opened file with write access: "//dquote(sFilename) )
    
     else
 

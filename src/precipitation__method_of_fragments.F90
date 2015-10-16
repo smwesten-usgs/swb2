@@ -75,6 +75,19 @@ module precipitation__method_of_fragments
   !! associated with the fragment for each month
   type (FRAGMENTS_SET_T), allocatable, public           :: FRAGMENTS_SETS(:)
 
+  !> Data structure to hold static (pre-calculated) fragment selection numbers
+  type, public :: FRAGMENTS_SEQUENCE_T
+    integer (kind=c_int) :: sim_number
+    integer (kind=c_int) :: sim_month
+    integer (kind=c_int) :: sim_rainfall_zone    
+    integer (kind=c_int) :: sim_year
+    real (kind=c_float)  :: sim_random_number
+    integer (kind=c_int) :: sim_selected_set
+  end type FRAGMENTS_SEQUENCE_T
+
+  !> Array of fragment sequence sets
+  type (FRAGMENTS_SEQUENCE_T), allocatable, public  :: FRAGMENTS_SEQUENCE(:)
+
   type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ADJUST_FACTOR      
 
 contains
@@ -123,6 +136,13 @@ contains
     ! use the first entry in the string list slString as the filename to open for
     ! use with the daily fragments routine
     call read_daily_fragments( slString%get(1) )
+    call slString%clear()
+
+    ! look up the name of the fragments SEQUENCE file in the control file dictionary
+    call CF_DICT%get_values( sKey="FRAGMENTS_SEQUENCE_FILE", slString=slString )
+   
+    if ( .not. ( slString%get(1) .strequal. "<NA>" ) )  &
+      call read_fragments_sequence( slString%get(1) )
 
     !> Now the fragments file is in memory. Create an ancillary data structure
     !> to keep track of which records correspond to various rain zones
@@ -138,6 +158,18 @@ contains
     call process_fragment_sets()
 
   end subroutine precipitation_method_of_fragments_initialize
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine initialize_fixed_fragment_selections()
+
+    type (STRING_LIST_T)                 :: slString
+
+    ! look up the name of the fragments sequence file in the control file dictionary
+    call CF_DICT%get_values( sKey="FRAGMENTS_SEQUENCE_FILE", slString=slString )
+
+
+  end subroutine initialize_fixed_fragment_selections
 
 !--------------------------------------------------------------------------------------------------
 
@@ -297,6 +329,128 @@ contains
       iTab=31, iLinesAfter=1, iLogLevel=LOG_ALL)
 
   end subroutine read_daily_fragments
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine read_fragments_sequence( sFilename )
+
+    character (len=*), intent(in)    :: sFilename
+
+    ! [ LOCALS ]
+    character (len=512)   :: sRecord, sSubstring
+    integer (kind=c_int)  :: iStat
+    integer (kind=c_int)  :: iCount
+    integer (kind=c_int)  :: iIndex
+    integer (kind=c_int)  :: iNumLines  
+    type (ASCII_FILE_T)   :: SEQUENCE_FILE
+    character (len=10)     :: sBuf0
+    character (len=10)     :: sBuf1
+    character (len=12)     :: sBuf2
+    character (len=10)     :: sBuf3
+    character (len=14)     :: sBuf4
+    character (len=66)     :: sBuf5    
+
+
+    call SEQUENCE_FILE%open( sFilename = sFilename,         &
+                             sCommentChars = "#%!",         &
+                             sDelimiters = "WHITESPACE",    &
+                             lHasHeader = .false._c_bool )
+
+    iNumLines = SEQUENCE_FILE%numLines()
+
+    allocate(  FRAGMENTS_SEQUENCE( iNumLines ), stat=iStat )
+    call assert( iStat == 0, "Problem allocating memory for fragments sequence table", __FILE__, __LINE__ )
+
+    iCount = 0
+
+    do 
+
+      ! read in next line of file
+      sRecord = SEQUENCE_FILE%readLine()
+
+      if ( SEQUENCE_FILE%isEOF() ) exit 
+
+      iCount = iCount + 1
+
+      ! read in simulation number
+      call chomp(sRecord, sSubstring, SEQUENCE_FILE%sDelimiters )
+
+      if ( len_trim(sSubstring) == 0 ) &
+        call die( "Missing simulation number in the fragments sequence file", &
+          __FILE__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
+          //" of file "//dquote(sFilename) )
+
+      FRAGMENTS_SEQUENCE(iCount)%sim_number = asInt(sSubString)
+
+      ! read in month
+      call chomp(sRecord, sSubstring, SEQUENCE_FILE%sDelimiters )
+
+      if ( len_trim(sSubstring) == 0 ) &
+        call die( "Missing month number in the fragments sequence file", &
+          __FILE__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
+          //" of file "//dquote(sFilename) )
+
+      FRAGMENTS_SEQUENCE(iCount)%sim_month = asInt(sSubString)
+
+      ! read in rainfall zone
+      call chomp(sRecord, sSubstring, SEQUENCE_FILE%sDelimiters )
+
+      if ( len_trim(sSubstring) == 0 ) &
+        call die( "Missing rainfall zone number in the fragments sequence file", &
+          __FILE__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
+          //" of file "//dquote(sFilename) )
+
+      FRAGMENTS_SEQUENCE(iCount)%sim_rainfall_zone = asInt(sSubString)
+      
+
+      ! read in sim_year
+      call chomp(sRecord, sSubstring, SEQUENCE_FILE%sDelimiters )
+
+      if ( len_trim(sSubstring) == 0 ) &
+        call die( "Missing year number in the fragments sequence file", &
+          __FILE__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
+          //" of file "//dquote(sFilename) )
+
+      FRAGMENTS_SEQUENCE(iCount)%sim_year = asInt(sSubString)
+
+      ! read in sim_random_number
+      call chomp(sRecord, sSubstring, SEQUENCE_FILE%sDelimiters )
+
+      if ( len_trim(sSubstring) == 0 ) &
+        call die( "Missing simulation random number in the fragments sequence file", &
+          __FILE__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
+          //" of file "//dquote(sFilename) )
+
+      FRAGMENTS_SEQUENCE(iCount)%sim_random_number = asFloat(sSubString)
+
+      ! read in simulation selected set
+      call chomp(sRecord, sSubstring, SEQUENCE_FILE%sDelimiters )
+
+      if ( len_trim(sSubstring) == 0 ) &
+        call die( "Missing selected fragment set number in the fragments sequence file", &
+          __FILE__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
+          //" of file "//dquote(sFilename) )
+
+      FRAGMENTS_SEQUENCE(iCount)%sim_selected_set = asInt(sSubString)
+
+    enddo
+
+    call LOGS%write("### Summary of fragment sequence sets in memory ###", &
+       iLogLevel=LOG_ALL, iLinesBefore=1, iLinesAfter=1, lEcho=lFALSE )
+    call LOGS%write("sim number | rainfall zone   | month  | year   | selected set ")
+    call LOGS%write("----------- | ---------- | ------------ | ------------|------------")
+    do iIndex=1, ubound( FRAGMENTS_SEQUENCE, 1)
+      write (sBuf0, fmt="(i10)") FRAGMENTS_SEQUENCE( iIndex )%sim_number
+      write (sBuf1, fmt="(i10)") FRAGMENTS_SEQUENCE( iIndex )%sim_rainfall_zone
+      write (sBuf2, fmt="(i12)") FRAGMENTS_SEQUENCE( iIndex )%sim_month
+      write (sBuf3, fmt="(i10)") FRAGMENTS_SEQUENCE( iIndex )%sim_year
+      write (sBuf4, fmt="(i10)") FRAGMENTS_SEQUENCE( iIndex )%sim_selected_set
+      write (sBuf5, fmt="(a10,'  | ', a10,' | ', a12,' | ',a10,' | ',a14)")            &
+        adjustl(sBuf0), adjustl(sBuf1), adjustl(sBuf2), adjustl(sBuf3), adjustl(sBuf4)
+      call LOGS%write( sBuf5 )
+    end do
+
+  end subroutine read_fragments_sequence
 
 !--------------------------------------------------------------------------------------------------
   
