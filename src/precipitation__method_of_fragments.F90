@@ -347,14 +347,14 @@ contains
     character (len=10)     :: sBuf1
     character (len=12)     :: sBuf2
     character (len=10)     :: sBuf3
-    character (len=14)     :: sBuf4
-    character (len=66)     :: sBuf5    
+    character (len=10)     :: sBuf4
+    character (len=52)     :: sBuf5    
 
 
     call SEQUENCE_FILE%open( sFilename = sFilename,         &
                              sCommentChars = "#%!",         &
                              sDelimiters = "WHITESPACE",    &
-                             lHasHeader = .false._c_bool )
+                             lHasHeader = .true._c_bool )
 
     iNumLines = SEQUENCE_FILE%numLines()
 
@@ -445,7 +445,14 @@ contains
       write (sBuf2, fmt="(i12)") FRAGMENTS_SEQUENCE( iIndex )%sim_month
       write (sBuf3, fmt="(i10)") FRAGMENTS_SEQUENCE( iIndex )%sim_year
       write (sBuf4, fmt="(i10)") FRAGMENTS_SEQUENCE( iIndex )%sim_selected_set
-      write (sBuf5, fmt="(a10,'  | ', a10,' | ', a12,' | ',a10,' | ',a14)")            &
+
+      print *, squote(sBuf0)
+      print *, squote(sBuf1)
+      print *, squote(sBuf2)
+      print *, squote(sBuf3)
+      print *, squote(sBuf4)
+
+      write (sBuf5, fmt="(a10,'  | ', a10,' | ', a12,' | ',a10,' | ',a10)")            &
         adjustl(sBuf0), adjustl(sBuf1), adjustl(sBuf2), adjustl(sBuf3), adjustl(sBuf4)
       call LOGS%write( sBuf5 )
     end do
