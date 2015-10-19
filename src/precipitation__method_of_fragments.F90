@@ -41,8 +41,24 @@ module precipitation__method_of_fragments
   !> Module variable that holds the current day's rainfall fragment value
   real (kind=c_float), allocatable, public  :: FRAGMENT_VALUE(:)
 
+  !> Module variable indicating which "simulation number" is active
+  !! Only has meaning if the rainfall fragments are being applied via a predetermined
+  !! sequence file
+  integer (kind=c_int), public :: SIMULATION_NUMBER = 1
+
   !> Module variable that holds the rainfall adjustment factor
   real (kind=c_float), allocatable, public  :: RAINFALL_ADJUST_FACTOR(:)
+
+  !> Module variable that holds a sequence of random numbers associated with the selection
+  !! of the fragment set to use
+  real (kind=c_float), allocatable :: RANDOM_VALUES(:)
+
+  !> Module level variable used to create subsets of the FRAGMENT_SEQUENCES file
+  logical (kind=c_bool), allocatable :: SEQUENCE_SELECTION(:)
+
+  !> Module variable detemining whether fragment sequences are chosen at random or
+  !! selected from an external file
+  logical (kind=c_bool) :: RANDOM_FRAGMENT_SEQUENCES = .true._c_bool
 
   !> Data structure that holds a single line of data from the input rainfall fragments file.
   type, public :: FRAGMENTS_T
@@ -85,6 +101,9 @@ module precipitation__method_of_fragments
     integer (kind=c_int) :: sim_selected_set
   end type FRAGMENTS_SEQUENCE_T
 
+  !> Pointer to all or some of the FRAGMENTS_SEQUENCE array
+  type ( FRAGMENTS_SEQUENCE_T ), pointer :: pFRAGMENTS_SEQUENCE
+
   !> Array of fragment sequence sets
   type (FRAGMENTS_SEQUENCE_T), allocatable, public  :: FRAGMENTS_SEQUENCE(:)
 
@@ -109,6 +128,11 @@ contains
     type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ZONE
     type (STRING_LIST_T)                 :: slString
     integer (kind=c_int)                 :: iMaxRainZones
+    integer (kind=c_int), allocatable    :: iSimulationNumbers(:)
+
+    ! look up the simulation number associated with the desired fragment sequence set
+    call CF_DICT%get_values( sKey="FRAGMENTS_SEQUENCE_SIMULATION_NUMBER", iValues=iSimulationNumbers )
+    if ( iSimulationNumbers(1) > 0 )  SIMULATION_NUMBER = iSimulationNumbers(1)
 
     ! locate the data structure associated with the gridded rainfall zone entries
     pRAINFALL_ZONE => DAT%find("RAINFALL_ZONE")
@@ -141,8 +165,12 @@ contains
     ! look up the name of the fragments SEQUENCE file in the control file dictionary
     call CF_DICT%get_values( sKey="FRAGMENTS_SEQUENCE_FILE", slString=slString )
    
-    if ( .not. ( slString%get(1) .strequal. "<NA>" ) )  &
+    if ( .not. ( slString%get(1) .strequal. "<NA>" ) )  then
       call read_fragments_sequence( slString%get(1) )
+      RANDOM_FRAGMENT_SEQUENCES = .false._c_bool
+      allocate ( SEQUENCE_SELECTION( count(FRAGMENTS_SEQUENCE%sim_month > 0) ), stat=iStat )
+      call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )      
+    endif  
 
     !> Now the fragments file is in memory. Create an ancillary data structure
     !> to keep track of which records correspond to various rain zones
@@ -155,21 +183,12 @@ contains
     allocate (CURRENT_FRAGMENTS( iMaxRainZones ), stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
 
+    allocate (RANDOM_VALUES( iMaxRainZones ), stat=iStat )
+    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+
     call process_fragment_sets()
 
   end subroutine precipitation_method_of_fragments_initialize
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine initialize_fixed_fragment_selections()
-
-    type (STRING_LIST_T)                 :: slString
-
-    ! look up the name of the fragments sequence file in the control file dictionary
-    call CF_DICT%get_values( sKey="FRAGMENTS_SEQUENCE_FILE", slString=slString )
-
-
-  end subroutine initialize_fixed_fragment_selections
 
 !--------------------------------------------------------------------------------------------------
 
@@ -348,13 +367,16 @@ contains
     character (len=12)     :: sBuf2
     character (len=10)     :: sBuf3
     character (len=10)     :: sBuf4
-    character (len=52)     :: sBuf5    
+    character (len=256)     :: sBuf5    
+    type (STRING_LIST_T)   :: slHeader
 
 
     call SEQUENCE_FILE%open( sFilename = sFilename,         &
                              sCommentChars = "#%!",         &
                              sDelimiters = "WHITESPACE",    &
                              lHasHeader = .true._c_bool )
+
+    slHeader = SEQUENCE_FILE%readHeader()
 
     iNumLines = SEQUENCE_FILE%numLines()
 
@@ -446,15 +468,9 @@ contains
       write (sBuf3, fmt="(i10)") FRAGMENTS_SEQUENCE( iIndex )%sim_year
       write (sBuf4, fmt="(i10)") FRAGMENTS_SEQUENCE( iIndex )%sim_selected_set
 
-      print *, squote(sBuf0)
-      print *, squote(sBuf1)
-      print *, squote(sBuf2)
-      print *, squote(sBuf3)
-      print *, squote(sBuf4)
-
-      write (sBuf5, fmt="(a10,'  | ', a10,' | ', a12,' | ',a10,' | ',a10)")            &
+      write (sBuf5, fmt="(a,'  | ', a,'  |  ', a,'  |  ',a,'  |  ',a)")                        &
         adjustl(sBuf0), adjustl(sBuf1), adjustl(sBuf2), adjustl(sBuf3), adjustl(sBuf4)
-      call LOGS%write( sBuf5 )
+      call LOGS%write( trim( sBuf5 ) )
     end do
 
   end subroutine read_fragments_sequence
@@ -470,7 +486,6 @@ contains
     integer (kind=c_int) :: iMaxRainZones
     integer (kind=c_int) :: iMonth
     integer (kind=c_int) :: iDay
-    real (kind=c_float), allocatable  :: fRandomNumbers(:)
 
     integer (kind=c_int) :: iNumberOfFragments
     integer (kind=c_int)  :: iStartRecord
@@ -480,14 +495,10 @@ contains
     integer (kind=c_int) :: iUBOUND_FRAGMENTS
     integer (kind=c_int) :: iUBOUND_CURRENT_FRAGMENTS
 
+
     iMaxRainZones = maxval(FRAGMENTS%iRainGageZone)
     iMonth = SIM_DT%curr%iMonth
     iDay = SIM_DT%curr%iDay
-
-    allocate (fRandomNumbers(iMaxRainZones), stat=iStat)
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
-
-    call random_number( fRandomNumbers )
 
     iUBOUND_FRAGMENTS = ubound( FRAGMENTS, 1)
     iUBOUND_CURRENT_FRAGMENTS = ubound( CURRENT_FRAGMENTS, 1)
@@ -496,10 +507,12 @@ contains
  
       if ( lShuffle ) then
 
+        call update_random_values()
+
         iStartRecord = FRAGMENTS_SETS( iIndex )%iStartRecord(iMonth)   
         iNumberOfFragments = FRAGMENTS_SETS(iIndex)%iNumberOfFragments(iMonth)
         iEndRecord = iStartRecord + iNumberOfFragments - 1
-        iTargetRecord = iStartRecord + fRandomNumbers(iIndex) * real( iNumberOfFragments - 1)
+        iTargetRecord = iStartRecord + RANDOM_VALUES(iIndex) * real( iNumberOfFragments - 1)
 
         if ( ( iIndex > iUBOUND_CURRENT_FRAGMENTS ) .or. ( iTargetRecord > iUBOUND_FRAGMENTS ) &
             .or. ( iIndex < 1 ) .or. ( iTargetRecord < 1) ) then
@@ -512,7 +525,7 @@ contains
           call LOGS%write("iTargetRecord: "//asCharacter(iTargetRecord), iTab=3 )
           call LOGS%write("ubound(CURRENT_FRAGMENTS, 1): "//asCharacter(iUBOUND_CURRENT_FRAGMENTS), iTab=3 )
           call LOGS%write("ubound(FRAGMENTS, 1): "//asCharacter(iUBOUND_FRAGMENTS), iTab=3 )                    
-          call LOGS%write("fRandomNumbers(iIndex): "//asCharacter(fRandomNumbers(iIndex)), iTab=3 )
+          call LOGS%write("RANDOM_VALUES(iIndex): "//asCharacter(RANDOM_VALUES(iIndex)), iTab=3 )
           call die( "Miscalculation in target record: calculated record is past the end", &
             __FILE__, __LINE__ )
         endif
@@ -520,7 +533,7 @@ contains
         CURRENT_FRAGMENTS(iIndex)%pFragment => FRAGMENTS( iTargetRecord )
 
       endif
-     
+
 !      write(*,fmt="(i5,a,i4,i5,i5,31f8.3)") iIndex,") ", FRAGMENTS( iTargetRecord)%iRainGageZone, FRAGMENTS( iTargetRecord)%iMonth, &
 !         FRAGMENTS( iTargetRecord)%iFragmentSet, FRAGMENTS( iTargetRecord)%fFragmentValue
 
@@ -553,6 +566,53 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  subroutine update_random_values()
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iIndex, iIndex2
+    logical (kind=c_bool) :: lSequenceSelection
+
+    if ( RANDOM_FRAGMENT_SEQUENCES ) then
+
+      call random_number( RANDOM_VALUES )
+
+    else
+
+      RANDOM_VALUES = -9999999.9
+
+      do iIndex=1, size(FRAGMENTS_SEQUENCE%sim_month, 1) 
+
+        lSequenceSelection =       ( FRAGMENTS_SEQUENCE(iIndex)%sim_month == SIM_DT%curr%iMonth )            &
+                             .and. ( FRAGMENTS_SEQUENCE(iIndex)%sim_year == SIM_DT%iYearOfSimulation )       &
+                             .and. ( FRAGMENTS_SEQUENCE(iIndex)%sim_number == SIMULATION_NUMBER )
+
+!        print *, FRAGMENTS_SEQUENCE(iIndex)%sim_month, SIM_DT%curr%iMonth
+!        print *, "   ", FRAGMENTS_SEQUENCE(iIndex)%sim_year, SIM_DT%iYearOfSimulation, SIM_DT%curr%iYear, SIM_DT%start%iYear
+!        print *, "   ", FRAGMENTS_SEQUENCE(iIndex)%sim_number, SIMULATION_NUMBER
+!        print *, "   ", FRAGMENTS_SEQUENCE(iIndex)%sim_random_number, FRAGMENTS_SEQUENCE(iIndex)%sim_rainfall_zone
+
+        if ( .not. lSequenceSelection ) cycle
+
+        do iIndex2=1,size(RANDOM_VALUES,1)
+
+          if ( FRAGMENTS_SEQUENCE( iIndex )%sim_rainfall_zone == iIndex2 ) then
+
+            RANDOM_VALUES( iIndex2 ) = FRAGMENTS_SEQUENCE( iIndex )%sim_random_number
+!            print *, "==> ", iIndex, iIndex2, FRAGMENTS_SEQUENCE( iIndex )%sim_rainfall_zone, FRAGMENTS_SEQUENCE( iIndex )%sim_random_number
+            exit
+
+          endif
+
+        enddo  
+
+      enddo  
+
+    endif
+
+  end subroutine update_random_values
+
+!--------------------------------------------------------------------------------------------------
+
   subroutine precipitation_method_of_fragments_calculate( lActive )
 
     logical (kind=c_bool), intent(in)     :: lActive(:,:)
@@ -560,7 +620,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)              :: iIndex
     integer (kind=c_int)              :: iMaxRainZones
-    real (kind=c_float), allocatable  :: fRandomNumbers(:)
+    real (kind=c_float), allocatable  :: RANDOM_VALUES(:)
     integer (kind=c_int)              :: iStat
     logical (kind=c_bool), save       :: lFirstCall = lTRUE
 
@@ -576,6 +636,7 @@ contains
 
     ! locate the data structure associated with the gridded rainfall adjustment factor
     pRAINFALL_ADJUST_FACTOR => DAT%find("RAINFALL_ADJUST_FACTOR")
+
     if ( .not. associated(pRAINFALL_ADJUST_FACTOR) ) &
         call die("A RAINFALL_ADJUST_FACTOR grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
 
@@ -583,14 +644,16 @@ contains
 
     ! map the 2D array of RAINFALL_ADJUST_FACTOR values to the vector of active cells
     RAINFALL_ADJUST_FACTOR = pack( pRAINFALL_ADJUST_FACTOR%pGrdBase%rData, lActive )
-
     iMaxRainZones = maxval(FRAGMENTS%iRainGageZone)
-
     if ( iDay == 1 .or. lFirstCall ) then
+
       call update_fragments( lShuffle = lTRUE)
       lFirstCall = lFALSE
+
     else 
+
       call update_fragments( lShuffle = lFALSE )
+
     endif  
 
   end subroutine precipitation_method_of_fragments_calculate
