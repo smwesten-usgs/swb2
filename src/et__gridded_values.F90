@@ -12,6 +12,7 @@ module et__gridded_values
   use constants_and_conversions
   use data_catalog
   use data_catalog_entry
+  use exceptions
   use simulation_datetime
   use strings
   use string_list

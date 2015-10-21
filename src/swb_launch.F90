@@ -14,11 +14,12 @@ program swb_launch
   use dictionary
   use logfiles, only         : LOGS, LOG_DEBUG
   use file_utilities, only   : mkdir, get_libc_errno, get_libc_err_string,   &
-                                c_get_libc_errno, remove
+                                c_get_libc_errno, remove, execv
   use model_initialize, only : initialize_all, read_control_file, write_control_file
   use version_control, only  : SWB_VERSION, GIT_COMMIT_HASH_STRING, &
                                GIT_BRANCH_STRING, COMPILE_DATE, COMPILE_TIME
   use string_list, only      : STRING_LIST_T
+  use omp_lib
   use iso_fortran_env
 
   implicit none
@@ -49,6 +50,10 @@ program swb_launch
   integer (kind=c_int)             :: status
   integer (kind=c_int)             :: number_at_100
   integer (kind=c_int)             :: number_uninitialized
+  integer (kind=c_int)             :: simulation_instance
+  integer (kind=c_int)             :: number_of_subsets
+  character(len=64), allocatable    :: argv(:)
+  integer (kind=c_int), allocatable :: indexXY(:,:)
 
   iNumArgs = COMMAND_ARGUMENT_COUNT()
 
@@ -87,7 +92,11 @@ program swb_launch
       //TRIM(int2char(__G95_MINOR__))
 #endif
 
-    write(UNIT=*,FMT="(/,/,a,/)")    "Usage: swb2 [control file name]"
+    write(UNIT=*,FMT="(/,/,a,/)")    "Usage: swb_launch [control file name] [num divisions x] [num divisions y]"
+    write(UNIT=*,FMT="(a)")          "swb_launch takes a swb control file and two divisors to break a swb model domain"
+    write(UNIT=*,FMT="(a,/)")        "into equal-sized subproblems, and then launches each as a seperate process."
+    write(UNIT=*,FMT="(a)")          "For example, issuing the command 'swb_launch some_file.ctl 2 2' will result in the"
+    write(UNIT=*,FMT="(a)")          "model domain being broken into four pieces and run as four seperate processes."
 
     stop
 
@@ -96,6 +105,11 @@ program swb_launch
   iCount = 0
   number_at_100 = 0
   number_uninitialized = 0
+
+ 
+  ! open and initialize logfiles
+  call LOGS%initialize( iLogLevel = LOG_DEBUG,  sFilePrefix="SWB_LAUNCH_", lWrite_SWB_Info=.false._c_bool )
+
 
   do iIndex=1, iNumArgs
 
@@ -142,50 +156,107 @@ program swb_launch
 
   iCount = 0
 
-  do iIndex1=1, int(divisions_x)
-    do iIndex2=1, int(divisions_y)
+  number_of_subsets = int(divisions_x) * int(divisions_y)
+  allocate( indexXY( 2, number_of_subsets ) )
+
+  iCount = 0
+  ! split up model domain over the desired spatial domain
+  do iIndex1=int(divisions_y), 1, -1
+    do iIndex2=1, int(divisions_x)
+
       iCount = iCount + 1
-      fLL_x1 = fLL_x + ( iIndex1 - 1 ) * iNX1 * fCellSize
-      fLL_y1 = fLL_y + ( iIndex2 - 1 ) * iNY1 * fCellSize
-
-      filename = "test_control_file_"//asCharacter(iCount)//".ctl"
-
-      call write_control_file( filename,                                            &
-        "GRID "//asCharacter(iNX1)//" "//asCharacter(iNY1)//" "                     &
-        //asCharacter( fLL_x1, 23, 9 )//" "//asCharacter(fLL_y1, 23, 9)             &
-        //" "//asCharacter( fCellsize, 14, 4 ) )
-
-      call mkdir( "tmp"//asCharacter( iCount ), loc_err )
-
-      ! suppress error messages due to directory that already exists
-      if ( loc_err /= 0 ) then
-        c_error_number = get_libc_errno()
-        if ( c_error_number /= 0 .and. c_error_number /= 17 ) then
-          call get_libc_err_string( err_string, c_error_number )
-          write(*, fmt="(a, i0)") "call to 'mkdir' failed. err=", loc_err
-          write(*, fmt="(a,i0)") "libc errno=", c_error_number
-          write(*, fmt="(a)") "libc error msg: "//trim(err_string)
-        endif  
-      endif  
-
-      call remove( "tmp"//asCharacter( iCount )//"/run_progress.txt", loc_err )
-
-      ! suppress error messages due to directory that already exists
-      if ( loc_err /= 0 ) then
-        c_error_number = get_libc_errno()
-        if ( c_error_number /= 0 .and. c_error_number /= 2 ) then
-          call get_libc_err_string( err_string, c_error_number )
-          write(*, fmt="(a, i0)") "call to 'remove' failed. err=", loc_err
-          write(*, fmt="(a,i0)") "libc errno=", c_error_number
-          write(*, fmt="(a)") "libc error msg: "//trim(err_string)
-        endif  
-      endif  
-
-      call execute_command_line( "swb2 "//trim(filename)//" "//"tmp"//asCharacter( iCount )  &
-        //" > cmdlog"//asCharacter( iCount)//".md", wait=.false. )
-
+      indexXY( 2, iCount ) = iIndex1
+      indexXY( 1, iCount ) = iIndex2
+      print *, iCount, iIndex1, iIndex2
     enddo
+  enddo  
+
+
+
+!$omp parallel
+
+!$omp do private( simulation_instance, iIndex1, fLL_x1, fLL_y1, filename, loc_err )
+
+  do iIndex1 = 1, ubound(indexXY,2)
+
+    simulation_instance = int(divisions_x) * ( int(divisions_y) - indexXY( 2, iIndex1 ) ) + indexXY( 1, iIndex1 )
+
+
+    print*, "thread, index, sim instance, indexXY: ",omp_get_thread_num(), iIndex1, simulation_instance, indexXY(1, iIndex1), indexXY(2, iIndex1) 
+
+    fLL_x1 = fLL_x + ( indexXY( 1, iIndex1) - 1 ) * iNX1 * fCellSize
+    fLL_y1 = fLL_y + ( indexXY( 2, iIndex1 ) - 1 ) * iNY1 * fCellSize
+
+    filename = "test_control_file_"//asCharacter(simulation_instance)//".ctl"
+
+    call sleep( simulation_instance * 2 )
+
+    call write_control_file( filename,                                            &
+      "GRID "//asCharacter(iNX1)//" "//asCharacter(iNY1)//" "                     &
+      //asCharacter( fLL_x1, 23, 9 )//" "//asCharacter(fLL_y1, 23, 9)             &
+      //" "//asCharacter( fCellsize, 14, 4 ) )
+
+    call mkdir( "tmp"//asCharacter( simulation_instance ), loc_err )
+
+    ! suppress error messages due to directory that already exists
+    if ( loc_err /= 0 ) then
+      c_error_number = get_libc_errno()
+      if ( c_error_number /= 0 .and. c_error_number /= 17 ) then
+        call get_libc_err_string( err_string, c_error_number )
+        write(*, fmt="(a, i0)") "call to 'mkdir' failed. err=", loc_err
+        write(*, fmt="(a,i0)") "libc errno=", c_error_number
+        write(*, fmt="(a)") "libc error msg: "//trim(err_string)
+      endif  
+
+    endif  
+
+    call remove( "tmp"//asCharacter( simulation_instance )//"/run_progress.txt", loc_err )
+
+    ! suppress error messages due to directory that already exists
+    if ( loc_err /= 0 ) then
+      c_error_number = get_libc_errno()
+      if ( c_error_number /= 0 .and. c_error_number /= 2 ) then
+        call get_libc_err_string( err_string, c_error_number )
+        write(*, fmt="(a, i0)") "call to 'remove' failed. err=", loc_err
+        write(*, fmt="(a,i0)") "libc errno=", c_error_number
+        write(*, fmt="(a)") "libc error msg: "//trim(err_string)
+      endif  
+    endif  
+
+    write(*,fmt="(a)") "Starting SWB in directory /tmp"//asCharacter( simulation_instance )   &
+      //", thread number "//asCharacter( omp_get_thread_num() )//" of "//asCharacter( omp_get_max_threads() )
+
+!      write(*,fmt="(a)") "Starting SWB in directory /tmp"//asCharacter( simulation_instance )
+
+    call execute_command_line( "swb2 "//trim(filename)//" "//"tmp"//asCharacter( simulation_instance )  &
+      //" > cmdlog"//asCharacter( simulation_instance )//".md", wait=.true. )
+
+     ! argv(1) = "swb2"
+     ! argv(2) = trim(filename)
+     ! argv(3) = "tmp"//asCharacter( simulation_instance )
+     ! argv(4) = " cat > nul"
+
+!      call execv( "swb2",[ argv ], loc_err )
+
+      ! if ( loc_err /= 0 ) then
+      !   c_error_number = get_libc_errno()
+      !   if ( c_error_number /= 0 ) then
+      !     call get_libc_err_string( err_string, c_error_number )
+      !     write(*, fmt="(a, i0)") "call to 'execv' failed. err=", loc_err
+      !     write(*, fmt="(a,i0)") "libc errno=", c_error_number
+      !     write(*, fmt="(a)") "libc error msg: "//trim(err_string)
+      !   endif  
+      ! endif  
+
+!      call system( "swb2 "//trim(filename)//" "//"tmp"//asCharacter( iCount )  &
+!        //" > cmdlog"//asCharacter( iCount)//".md" )
+
   enddo    
+
+!$omp end do
+
+!$omp end parallel
+
 
   do
 

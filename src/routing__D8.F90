@@ -1,9 +1,12 @@
 module routing__D8
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double, c_bool
+  use constants_and_conversions
   use data_catalog
   use data_catalog_entry
   use exceptions
+  use grid
+  use strings
   implicit none
 
   private

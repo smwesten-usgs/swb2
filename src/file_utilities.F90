@@ -2,6 +2,7 @@ module file_utilities
 
   use iso_c_binding
   use constants_and_conversions
+  use strings
   implicit none
 
   interface
@@ -63,9 +64,49 @@ module file_utilities
     end function
   end interface
 
+  interface
+    integer function c_execv( filename, argv )  bind(c,name="execv")  
+      use iso_c_binding
+      character(kind=c_char), intent(in)  :: filename(*)
+      type(c_ptr)                         :: argv
+    end function
+  end interface
 
- 
 contains
+
+  subroutine execv( filename, argv, err )
+
+    character(*), intent(in)       :: filename
+    character(len=*), intent(in)  :: argv(:)
+    integer, optional, intent(out) :: err
+
+    ! [ LOCALS ]
+    type(c_ptr)                   :: argv_cptr( ubound( argv, 1) + 2 )
+    character(len=64), target     :: argv_copy( ubound( argv, 1) + 2 )
+    integer (kind=c_int)          :: indx
+    integer (kind=c_int)          :: errno
+    character (len=256)           :: full_filename
+
+    argv_copy = ""
+
+    do indx=1, ubound(argv,1)
+      print *, squote( argv( indx ) )
+      argv_copy( indx + 1 )      = trim( argv( indx ) )//c_null_char
+      argv_cptr( indx + 1 )      = C_LOC( argv_copy( indx + 1 ) )
+    enddo
+
+    ! now tack filename onto first element of array, and null pointer to last element
+    argv_copy(1) = trim( filename )//c_null_char
+    argv_cptr( 1 ) = C_LOC( argv_copy( 1 ) )
+    argv_cptr( size(argv_cptr,1) ) = c_null_ptr
+
+    full_filename = "d:/DOS/"//trim( filename )//c_null_char
+
+    errno = c_execv( trim( full_filename ), argv_cptr )
+
+  end subroutine execv
+
+!--------------------------------------------------------------------------------------------------  
 
   subroutine get_libc_err_string( libc_err_string, libc_err_code )
 
@@ -214,6 +255,23 @@ contains
     
  
   end subroutine get_cwd  
+
+!--------------------------------------------------------------------------------------------------
+
+  function getcwd( )  result( dirname )
+
+    ! [ LOCALS ]
+    integer(c_long) :: i
+    type(c_ptr) :: buffer
+    character(kind=c_char, len=256) :: tempchar
+    character(kind=c_char,len=:), allocatable :: dirname
+
+    buffer=c_getcwd(tempchar, 256_c_size_t)
+
+    dirname = c_to_fortran_string( tempchar )
+    
+ 
+  end function getcwd  
 
   subroutine unlink(filename, err)
     

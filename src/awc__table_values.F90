@@ -13,6 +13,7 @@ module awc__table_values
   use constants_and_conversions
   use data_catalog
   use data_catalog_entry
+  use exceptions
   use parameters
   use strings
   use string_list

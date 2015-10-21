@@ -5,9 +5,11 @@ module interception__gash
   use data_catalog
   use data_catalog_entry
   use dictionary
+  use exceptions  
   use file_operations
-  use parameters, only       : PARAMS
+  use parameters, only          : PARAMS
   use grid
+  use netcdf4_support, only      : T_NETCDF4_FILE
   use simulation_datetime
   use strings
   use string_list

@@ -1,8 +1,7 @@
 module model_initialize
 
   use iso_c_binding, only                : c_int, c_float, c_double, c_bool
-  use constants_and_conversions, only    : lTRUE, lFALSE, asFloat, BNDS,      &
-                                             DATATYPE_FLOAT, DATATYPE_INT
+  use constants_and_conversions
   use datetime
   use data_catalog
   use data_catalog_entry
@@ -11,6 +10,7 @@ module model_initialize
   use file_operations
   use grid
 !  use loop_iterate
+  use logfiles
   use model_domain, only                 : MODEL, minmaxmean
   use output, only                       : initialize_output, set_output_directory
   use parameters
@@ -758,6 +758,8 @@ contains
     type (ASCII_FILE_T)             :: CF
     type (DICT_ENTRY_T), pointer    :: pDict
 
+    pDict => null()
+
     call CF%open( sFilename = sFilename )
 
     call CF_DICT%get_value(sText, "GRID")
@@ -765,6 +767,8 @@ contains
     ! get GRID specification and move pointer past it; discard values
     if ( present( sGridSpecification ) ) then
       pDict => CF_DICT%get_next_entry()
+      call assert( associated( pDict ), "INTERNAL PROGRAMMING ERROR -- Attmpted use of null poitner", &
+        __FILE__, __LINE__ )
       call CF%writeLine( trim( sGridSpecification ) )
     endif  
 

@@ -196,6 +196,7 @@ contains
     ! [ LOCALS ]
     logical :: lQuiet_
 
+
     if ( present( lQuiet ) ) then
       lQuiet_ = lQuiet
     else
@@ -211,13 +212,11 @@ contains
       this%lEOF = lFALSE
       this%lReadOnly = lFALSE
 
-      if ( .not. lQuiet ) &
+      if ( .not. lQuiet_ ) &
         call LOGS%write( "Opened file with write access: "//dquote(sFilename) )
-   
+
     else
-
       call LOGS%write( "Failed to open file "//dquote(sFilename)//" with WRITE access" )
-
     endif
 
   end subroutine open_file_write_access_sub

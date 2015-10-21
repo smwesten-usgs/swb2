@@ -1,16 +1,19 @@
 module model_domain
 
   use iso_c_binding
+  use constants_and_conversions
   use continuous_frozen_ground_index
   use data_catalog
   use data_catalog_entry
   use exceptions
+  use logfiles
   use simulation_datetime
   use snowfall__original
   use string_list, only      : STRING_LIST_T
   use grid
   use parameters, only       : PARAMS, PARAMS_DICT 
   use netcdf4_support, only  : NC_FILL_FLOAT
+  use strings
   implicit none
 
   private
@@ -73,7 +76,7 @@ module model_domain
     real (kind=c_float), allocatable       :: infiltration(:)
     real (kind=c_float), allocatable       :: potential_snowmelt(:)
     real (kind=c_float), allocatable       :: snowmelt(:)
-
+    type (GENERAL_GRID_T), pointer         :: pGrdOut
     real (kind=c_float), allocatable       :: interception(:)     
     real (kind=c_float), allocatable       :: interception_storage(:)
 
@@ -253,6 +256,9 @@ contains
     allocate(this%array_output(iNumCols, iNumRows), stat=iStat )
     call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
 
+    this%pGrdOut => grid_CreateSimple( iNX=iNumCols, iNY=iNumRows,        &
+                      rX0=dX_ll, rY0=dY_ll, rGridCellSize=dGridCellSize,  &
+                      iDataType=GRID_DATATYPE_REAL )
   end subroutine initialize_grid_sub
 
 !--------------------------------------------------------------------------------------------------

@@ -14,6 +14,7 @@ module runoff__gridded_values
   use data_catalog_entry
   use datetime
   use dictionary
+  use exceptions
   use file_operations
   use simulation_datetime
   use strings

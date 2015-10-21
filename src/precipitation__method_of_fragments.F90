@@ -17,11 +17,13 @@
 module precipitation__method_of_fragments
 
   use iso_c_binding
+  use constants_and_conversions, only  : asInt, asFloat, lTRUE, lFALSE
   use data_catalog
   use data_catalog_entry
   use dictionary
   use exceptions
   use file_operations
+  use logfiles, only            : LOGS, LOG_ALL, LOG_DEBUG
   use parameters
   use strings
   use string_list

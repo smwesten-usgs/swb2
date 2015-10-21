@@ -8,12 +8,14 @@
 
 module fog__monthly_grid
 
-  use iso_c_binding, only       : c_short, c_int, c_float, c_double
+  use iso_c_binding, only       : c_short, c_int, c_float, c_double, c_size_t, c_ptrdiff_t
   use constants_and_conversions
   use data_catalog
   use data_catalog_entry
   use dictionary
+  use exceptions
   use file_operations
+  use logfiles, only            : LOGS, LOG_ALL
   use netcdf4_support
   use parameters, only          : PARAMS
   use simulation_datetime

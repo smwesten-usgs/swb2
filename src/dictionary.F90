@@ -2,6 +2,7 @@ module dictionary
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
   use constants_and_conversions, only : iTINYVAL, fTINYVAL, lTRUE, lFALSE
+  use exceptions
   use logfiles
   use strings
   use string_list

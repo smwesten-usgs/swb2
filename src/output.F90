@@ -1,7 +1,7 @@
 module output
 
   use constants_and_conversions
-  use exceptions, only            : assert
+  use exceptions, only            : warn, assert, die
   use model_domain, only          : MODEL_DOMAIN_T
   use iso_c_binding, only         : c_short, c_int, c_float, c_double, c_size_t, c_ptrdiff_t
   use netcdf4_support

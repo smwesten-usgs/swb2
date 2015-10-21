@@ -45,7 +45,7 @@ module netcdf4_support
 
   private
 
-  public :: NC_FLOAT, NC_FILL_FLOAT
+  public :: NC_FLOAT, NC_FILL_FLOAT, NC_FILL_INT
 
   integer(kind=c_int), public :: NC_READONLY          = 0
   integer(kind=c_int), public :: NC_READWRITE         = 1
@@ -174,9 +174,9 @@ module netcdf4_support
     integer (kind=c_int) :: iNumberOfVariables
     integer (kind=c_int) :: iNumberOfAttributes
     integer (kind=c_int) :: iNC3_UnlimitedDimensionNumber
-    integer (kind=c_int) :: iOriginJD
-    integer (kind=c_int) :: iFirstDayJD
-    integer (kind=c_int) :: iLastDayJD
+    integer (kind=c_int) :: iOriginJD   = -99999
+    integer (kind=c_int) :: iFirstDayJD = -99999
+    integer (kind=c_int) :: iLastDayJD  = -99999
     integer (kind=c_int) :: iOriginMonth
     integer (kind=c_int) :: iOriginDay
     integer (kind=c_int) :: iOriginYear
@@ -868,7 +868,8 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
     sDirName_ = sDirName
   else
     sDirName_ = ""
-  endif    
+  endif   
+
 
 !    integer (kind=c_int)            :: iNX                   ! Number of cells in the x-direction
 !     integer (kind=c_int)            :: iNY                   ! Number of cells in the y-direction

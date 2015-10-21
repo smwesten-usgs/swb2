@@ -17,6 +17,8 @@ module data_catalog_entry
   use iso_c_binding
   implicit none
 
+  private
+
   integer (kind=c_int), public, parameter :: NETCDF_FILE_OPEN = 27
   integer (kind=c_int), public, parameter :: NETCDF_FILE_CLOSED = 42
 
@@ -30,30 +32,32 @@ module data_catalog_entry
     integer (kind=c_int)               :: iSourceFileType  ! Arc ASCII, Surfer, NetCDF
     integer (kind=c_int)               :: iTargetDataType = DATATYPE_NA  ! Fortran real, integer, etc.
     
-    character (len=256)                :: sDescription
-    character (len=256)                :: sSourcePROJ4_string
-    character (len=256)                :: sSourceFileType
-    character (len=256)                :: sSourceFilename      ! e.g. 1980_00_prcp.nc
-    character (len=256)                :: sFilenameTemplate
-    character (len=256)                :: sOldFilename        
-    integer (kind=c_int)               :: iFileCount = -1
-    integer (kind=c_int)               :: iFileCountYear = -9999
-    real (kind=c_float)                :: rMinAllowedValue = -rBIGVAL     ! default condition is to impose
-    real (kind=c_float)                :: rMaxAllowedValue = rBIGVAL      ! no bounds on data
-    integer (kind=c_int)               :: iMinAllowedValue = -iBIGVAL     ! default condition is to impose
-    integer (kind=c_int)               :: iMaxAllowedValue = iBIGVAL      ! no bounds on data
-    real (kind=c_float)                :: rMissingValuesCode = -rBIGVAL
-    integer (kind=c_int)               :: iMissingValuesCode = -iBIGVAL
-    character (len=2)                  :: sMissingValuesOperator = "<="
-    integer (kind=c_int)               :: iMissingValuesAction = 0
+    character (len=256)       :: sDescription
+    character (len=256)       :: sSourcePROJ4_string
+    character (len=256)       :: sTargetPROJ4_string
+    character (len=256)       :: sSourceFileType
+    character (len=256)       :: sSourceFilename      ! e.g. 1980_00_prcp.nc
+    character (len=256)       :: sFilenameTemplate
+    character (len=256)       :: sOldFilename        
+    integer (kind=c_int)      :: iFileCount = -1
+    integer (kind=c_int)      :: iFileCountYear = -9999
+    real (kind=c_float)       :: rMinAllowedValue = -rBIGVAL     ! default condition is to impose
+    real (kind=c_float)       :: rMaxAllowedValue = rBIGVAL      ! no bounds on data
+    integer (kind=c_int)      :: iMinAllowedValue = -iBIGVAL     ! default condition is to impose
+    integer (kind=c_int)      :: iMaxAllowedValue = iBIGVAL      ! no bounds on data
+    real (kind=c_float)       :: rMissingValuesCode = -rBIGVAL
+    integer (kind=c_int)      :: iMissingValuesCode = -iBIGVAL
+    character (len=2)         :: sMissingValuesOperator = "&&"
+    integer (kind=c_int)      :: iMissingValuesAction = 0
     
     real (kind=c_double)               :: rUserScaleFactor = 1_c_double
     real (kind=c_double)               :: rUserAddOffset = 0_c_double
 
-    logical (kind=c_bool) :: lMissingFilesAreAllowed = lFALSE
-    logical (kind=c_bool) :: lFlipHorizontal = lFALSE
-    logical (kind=c_bool) :: lFlipVertical = lFALSE
-    logical (kind=c_bool) :: lUseMajorityFilter = lFALSE
+    logical (kind=c_bool)     :: lAllowMissingFiles = lFALSE
+    logical (kind=c_bool)     :: lFlipHorizontal = lFALSE
+    logical (kind=c_bool)     :: lFlipVertical = lFALSE
+    logical (kind=c_bool)     :: lUseMajorityFilter = lFALSE
+    logical (kind=c_bool)     :: lRequireCompleteSpatialCoverage = lTRUE
 
     integer (kind=c_int)  :: iDaysToPadAtYearsEnd = 0
     integer (kind=c_int)  :: iDaysToPadIfLeapYear = 1
@@ -97,42 +101,44 @@ module data_catalog_entry
 
   contains
 
-    procedure, public :: setkey => set_keyword_sub
+    procedure         :: setkey => set_keyword_sub
 
-    procedure, private :: init_const_int => initialize_constant_int_data_object_sub
-    procedure, private :: init_const_real => initialize_constant_real_data_object_sub
-    procedure, private :: init_gridded => initialize_gridded_data_object_sub
+    procedure, private :: initialize_constant_int_data_object_sub
+    procedure, private :: initialize_constant_real_data_object_sub
+    procedure, private :: initialize_gridded_data_object_sub
+    generic            :: initialize => initialize_constant_int_data_object_sub,    &
+                                        initialize_constant_real_data_object_sub,   &
+                                        initialize_gridded_data_object_sub
 
-    procedure, public  :: initialize_netcdf => initialize_netcdf_data_object_sub
+    procedure         :: initialize_netcdf => initialize_netcdf_data_object_sub
 
-    generic, public :: initialize => init_const_int, &
-                             init_const_real, &
-                             init_gridded
+    procedure         :: set_scale => set_scale_sub
+    procedure         :: set_offset => set_offset_sub
 
-    procedure, public :: set_scale => set_scale_sub
-    procedure, public :: set_offset => set_offset_sub
-
-    procedure, public :: set_majority_filter_flag => set_majority_filter_flag_sub
+    procedure         :: set_majority_filter_flag => set_majority_filter_flag_sub
 
     procedure, private :: set_minimum_allowable_value_int_sub
     procedure, private :: set_minimum_allowable_value_real_sub
+    generic            :: set_valid_minimum => set_minimum_allowable_value_int_sub,    &
+                                               set_minimum_allowable_value_real_sub
+
     procedure, private :: set_maximum_allowable_value_int_sub
     procedure, private :: set_maximum_allowable_value_real_sub
-    generic :: set_valid_minimum => set_minimum_allowable_value_int_sub, &
-                                    set_minimum_allowable_value_real_sub
-    generic :: set_valid_maximum => set_maximum_allowable_value_int_sub, &
-                                    set_maximum_allowable_value_real_sub
+    generic            :: set_valid_maximum => set_maximum_allowable_value_int_sub,    &
+                                               set_maximum_allowable_value_real_sub
 
-    procedure, public :: set_grid_flip_horizontal => set_grid_flip_horizontal_sub
-    procedure, public :: set_grid_flip_vertical => set_grid_flip_vertical_sub
+    procedure         :: set_grid_flip_horizontal => set_grid_flip_horizontal_sub
+    procedure         :: set_grid_flip_vertical => set_grid_flip_vertical_sub
 
-    procedure, public :: getvalues_constant => getvalues_constant_sub
-    procedure, public :: getvalues_gridded => getvalues_gridded_sub
+    procedure         :: getvalues_constant => getvalues_constant_sub
+    procedure         :: getvalues_gridded => getvalues_gridded_sub
 
-    procedure, public :: getvalues_netcdf => getvalues_dynamic_netcdf_sub, &
-                                             getvalues_static_netcdf_sub
+    procedure, private :: getvalues_dynamic_netcdf_sub
+    procedure, private :: getvalues_static_netcdf_sub
+    generic            :: getvalues_netcdf => getvalues_dynamic_netcdf_sub,   &
+                                              getvalues_static_netcdf_sub
 
-    procedure, public :: getvalues => getvalues_sub
+    procedure          :: getvalues => getvalues_sub
 
     procedure, private :: get_value_int_sub
     procedure, private :: get_value_float_sub
@@ -143,34 +149,37 @@ module data_catalog_entry
  !   procedure :: destroy => create_data_object_sub
     procedure :: get_filetype => get_source_filetype_fn
 
-    procedure, public :: set_filecount => set_filecount
-    procedure, public :: reset_filecount => reset_filecount
-    procedure, public :: reset_at_yearend_filecount => reset_at_yearend_filecount
-    procedure, public :: increment_filecount => increment_filecount
+    procedure         :: set_filecount => set_filecount
+    procedure         :: reset_filecount => reset_filecount
+    procedure         :: reset_at_yearend_filecount => reset_at_yearend_filecount
+    procedure         :: increment_filecount => increment_filecount
 
-    procedure, private :: set_const_int => set_constant_value_int
-    procedure, private :: set_const_real => set_constant_value_real
-    generic, public :: set_constant => set_const_int, set_const_real
+    procedure, private :: set_constant_value_int
+    procedure, private :: set_constant_value_real
+    generic            :: set_constant => set_constant_value_int,   &
+                                          set_constant_value_real
 
-    procedure, public :: make_filename => make_filename_from_template
-    procedure, public :: set_PROJ4 => set_PROJ4_string_sub
-    procedure, public :: set_variable_order => set_variable_order_sub
-    procedure, public :: dump_data_structure => dump_data_structure_sub
-    procedure, public :: set_make_local_archive => set_archive_local_sub
-    procedure, public :: put_values_to_archive => put_values_to_local_NetCDF_sub
-    procedure, public :: transfer_from_native => transform_grid_to_grid
+    procedure         :: make_filename => make_filename_from_template
+    procedure         :: set_PROJ4 => set_PROJ4_string_sub
+    procedure         :: set_variable_order => set_variable_order_sub
+    procedure         :: set_complete_spatial_coverage_flag => set_complete_spatial_coverage_flag_sub
+    procedure         :: dump_data_structure => dump_data_structure_sub
+    procedure         :: set_make_local_archive => set_archive_local_sub
+    procedure         :: put_values_to_archive => put_values_to_local_NetCDF_sub
+    procedure         :: transfer_from_native => transform_grid_to_grid
 
-    procedure, private :: enforce_limits_real => data_GridEnforceLimits_real
-    procedure, private :: enforce_limits_int => data_GridEnforceLimits_int
-    generic, public :: enforce_limits => enforce_limits_real, enforce_limits_int
+    procedure, private :: data_GridEnforceLimits_real
+    procedure, private :: data_GridEnforceLimits_int
+    generic            :: enforce_limits => data_GridEnforceLimits_real,   &
+                                            data_GridEnforceLimits_int
 
-    procedure, private :: handle_missing_values_real => data_GridHandleMissingData_real
-    procedure, private :: handle_missing_values_int => data_GridHandleMissingData_int
-    generic, public :: handle_missing_values => handle_missing_values_real, &
-                                        handle_missing_values_int
+    procedure, private :: data_GridHandleMissingData_real
+    procedure, private :: data_GridHandleMissingData_int
+    generic            :: handle_missing_values => data_GridHandleMissingData_real,   &
+                                                   data_GridHandleMissingData_int
 
-    procedure, public :: calc_project_boundaries => calc_project_boundaries
-    procedure, public :: test_for_need_to_pad_values => test_for_need_to_pad_values
+    procedure          :: calc_project_boundaries => calc_project_boundaries_sub
+    procedure          :: test_for_need_to_pad_values => test_for_need_to_pad_values_fn
 
   end type DATA_CATALOG_ENTRY_T
 
@@ -251,8 +260,8 @@ contains
     sDescription, &
     rConstant )
 
-    class (DATA_CATALOG_ENTRY_T) :: this
-    character (len=*) :: sDescription
+    class (DATA_CATALOG_ENTRY_T)    :: this
+    character (len=*), intent(in)   :: sDescription
     real (kind=c_float), intent(in) :: rConstant
 
     this%rConstantValue = rConstant
@@ -308,12 +317,13 @@ subroutine initialize_gridded_data_object_sub( this, &
   sFilename, &
   sPROJ4_string )
 
-  class (DATA_CATALOG_ENTRY_T) :: this
-  character (len=*) :: sDescription
-  character (len=*) :: sFileType
-  character (len=*) :: sFilename
-  integer (kind=c_int) :: iDataType
-  character (len=*), optional :: sPROJ4_string
+  class (DATA_CATALOG_ENTRY_T)             :: this
+  character (len=*), intent(in)            :: sDescription
+  character (len=*), intent(in)            :: sFileType
+  character (len=*), intent(in)            :: sFilename
+  integer (kind=c_int)                     :: iDataType
+  character (len=*), intent(in), optional  :: sPROJ4_string
+
 
   if (present(sPROJ4_string) ) then
     this%sSourcePROJ4_string = trim(sPROJ4_string)
@@ -378,12 +388,15 @@ subroutine initialize_netcdf_data_object_sub( this, &
    sFilename, &
    sPROJ4_string )
 
-   class (DATA_CATALOG_ENTRY_T) :: this
-   character (len=*) :: sDescription
-   integer (kind=c_int) :: iDataType
-   type ( GENERAL_GRID_T ),pointer :: pGrdBase
-   character (len=*) :: sFilename
-   character (len=*), optional :: sPROJ4_string
+   class (DATA_CATALOG_ENTRY_T)               :: this
+   character (len=*), intent(in)              :: sDescription
+   integer (kind=c_int), intent(in)           :: iDataType
+   character (len=*), intent(in)              :: sFilename
+   character (len=*), intent(in), optional    :: sPROJ4_string
+
+  ! [ LOCALS ]
+  type ( GENERAL_GRID_T ), pointer           :: pGrdBase
+
 
    if (present(sPROJ4_string) ) then
      this%sSourcePROJ4_string = trim(sPROJ4_string)
@@ -395,19 +408,28 @@ subroutine initialize_netcdf_data_object_sub( this, &
 
   !> if either a '%' or '#' character is present in the filename,
   !! treat it as a template, not as a normal filename.
-  if ( scan(string=sFilename, set="%#") > 0 ) then
+  !! if there is a template, the implication is that there is
+  !! a series of files that will be read in successively, thus "dynamic" NetCDF
+!  if ( scan(string=sFilename, set="%#") > 0 ) then
 
-    this%iSourceDataForm = DYNAMIC_NETCDF_GRID
+
+!> @TODO Implement a way to read variables in via "static" NetCDF grid. 
+!!    In other words, a NetCDF grid having no "time" dimension or variable.
+
+
+    this%iSourceDataForm   = DYNAMIC_NETCDF_GRID
     this%lGridIsPersistent = lTRUE
     this%sFilenameTemplate = trim(sFilename)
 
-  else
+!   else
 
-    this%iSourceDataForm = STATIC_NETCDF_GRID
-    this%lGridIsPersistent = lFALSE
-    this%sFilenameTemplate = ""
+!     !> intent of "static" NetCDF file is to house large non-changing
+!     !! input grids (i.e. landuse, soils )
+!     this%iSourceDataForm   = STATIC_NETCDF_GRID
+!     this%lGridIsPersistent = lFALSE
+!     this%sFilenameTemplate = ""
 
-  endif
+!   endif
 
    this%pGrdBase => grid_Create(iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, &
      rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, rGridCellSize=BNDS%fGridCellSize, iDataType=iDataType)
@@ -557,6 +579,8 @@ subroutine getvalues_constant_sub( this  )
   call LOGS%write("DATA STRUCTURE DETAILS:")
   call LOGS%write("---------------------------------------------------")
 
+  call LOGS%write("  catalog key word: "//dquote( this%sKeyWord ) )
+
   call LOGS%write("  source data form: "//trim(asCharacter(this%iSourceDataForm)) )
   call LOGS%write("  source data type: "//trim(asCharacter(this%iSourceDataType)) )
   call LOGS%write("  source file type: "//trim(asCharacter(this%iSourceFileType)) )
@@ -567,6 +591,7 @@ subroutine getvalues_constant_sub( this  )
   call LOGS%write("  source filename: "//trim(this%sSourceFilename) )
 
   if (associated(this%pGrdNative))  call grid_DumpGridExtent(this%pGrdNative)
+  if (associated(this%pGrdBase))  call grid_DumpGridExtent(this%pGrdBase)
 
   end subroutine dump_data_structure_sub
 
@@ -614,7 +639,7 @@ subroutine getvalues_constant_sub( this  )
 
       ! if the file doesn't exist, EXIT
       if (.not. lExist ) then
-        if ( this%lMissingFilesAreAllowed ) then
+        if ( this%lAllowMissingFiles ) then
          exit
         else
           call assert( lFALSE, &
@@ -705,9 +730,10 @@ subroutine transform_grid_to_grid(this)
     this%pGrdBase => grid_Create( iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, &
       rGridCellSize=BNDS%fGridCellSize, iDataType=this%iTargetDataType )
 
-  call assert( grid_CompletelyCover( this%pGrdBase, this%pGrdNative ), &
-    "Transformed grid read from file "//dquote(this%sSourceFilename) &
-    //" doesn't completely cover your model domain.")
+  if ( this%lRequireCompleteSpatialCoverage )   &
+    call assert( grid_CompletelyCover( this%pGrdBase, this%pGrdNative ), &
+      "Transformed grid read from file "//dquote(this%sSourceFilename) &
+      //" doesn't completely cover your model domain.")
 
   select case (this%iTargetDataType)
 
@@ -980,8 +1006,8 @@ end subroutine set_constant_value_real
 
 !--------------------------------------------------------------------------------------------------
 
-  function test_for_need_to_pad_values(this, iMonth, iDay, iYear ) &
-                                            result(lNeedToPadData)
+  function test_for_need_to_pad_values_fn(this, iMonth, iDay, iYear ) &
+                                               result(lNeedToPadData)
 
     class (DATA_CATALOG_ENTRY_T) :: this
     integer (kind=c_int) :: iMonth, iDay, iYear
@@ -1053,7 +1079,7 @@ end subroutine set_constant_value_real
     enddo
 
 
-  end function test_for_need_to_pad_values
+  end function test_for_need_to_pad_values_fn
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1125,16 +1151,32 @@ end subroutine set_constant_value_real
               ! the native data file
               call this%calc_project_boundaries(pGrdBase=this%pGrdBase)
 
-              call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE, &
-                sFilename=this%sSourceFilename, &
-                lFlipHorizontal=this%lFlipHorizontal, &
-                lFlipVertical=this%lFlipVertical, &
-                sVariableOrder=this%sVariableOrder, &
-                sVarName_x=this%sVariableName_x, &
-                sVarName_y=this%sVariableName_y, &
-                sVarName_z=this%sVariableName_z, &
-                sVarName_time=this%sVariableName_time, &
-                tGridBounds=this%GRID_BOUNDS_NATIVE )
+              if ( this%lRequireCompleteSpatialCoverage ) then
+
+                call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE, &
+                  sFilename=this%sSourceFilename, &
+                  lFlipHorizontal=this%lFlipHorizontal, &
+                  lFlipVertical=this%lFlipVertical, &
+                  sVariableOrder=this%sVariableOrder, &
+                  sVarName_x=this%sVariableName_x, &
+                  sVarName_y=this%sVariableName_y, &
+                  sVarName_z=this%sVariableName_z, &
+                  sVarName_time=this%sVariableName_time, &
+                  tGridBounds=this%GRID_BOUNDS_NATIVE )
+
+              else
+
+                call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE, &
+                  sFilename=this%sSourceFilename, &
+                  lFlipHorizontal=this%lFlipHorizontal, &
+                  lFlipVertical=this%lFlipVertical, &
+                  sVariableOrder=this%sVariableOrder, &
+                  sVarName_x=this%sVariableName_x, &
+                  sVarName_y=this%sVariableName_y, &
+                  sVarName_z=this%sVariableName_z, &
+                  sVarName_time=this%sVariableName_time )
+
+              endif
 
             else  ! PROJ4 string is blank
 
@@ -1310,16 +1352,28 @@ end subroutine set_constant_value_real
             ! the native data file
             call this%calc_project_boundaries(pGrdBase=this%pGrdBase)
 
-            call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE, &
-              sFilename=this%sSourceFilename, &
-              lFlipHorizontal=this%lFlipHorizontal, &
-              lFlipVertical=this%lFlipVertical, &
-              sVariableOrder=this%sVariableOrder, &
-              sVarName_x=this%sVariableName_x, &
-              sVarName_y=this%sVariableName_y, &
-              sVarName_z=this%sVariableName_z, &
-              sVarName_time=this%sVariableName_time, &
-              tGridBounds=this%GRID_BOUNDS_NATIVE )
+            if ( this%lRequireCompleteSpatialCoverage ) then
+              call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE, &
+                sFilename=this%sSourceFilename, &
+                lFlipHorizontal=this%lFlipHorizontal, &
+                lFlipVertical=this%lFlipVertical, &
+                sVariableOrder=this%sVariableOrder, &
+                sVarName_x=this%sVariableName_x, &
+                sVarName_y=this%sVariableName_y, &
+                sVarName_z=this%sVariableName_z, &
+                sVarName_time=this%sVariableName_time, &
+                tGridBounds=this%GRID_BOUNDS_NATIVE )
+            else
+              call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE, &
+                sFilename=this%sSourceFilename, &
+                lFlipHorizontal=this%lFlipHorizontal, &
+                lFlipVertical=this%lFlipVertical, &
+                sVariableOrder=this%sVariableOrder, &
+                sVarName_x=this%sVariableName_x, &
+                sVarName_y=this%sVariableName_y, &
+                sVarName_z=this%sVariableName_z, &
+                sVarName_time=this%sVariableName_time )
+            endif
 
           else  ! PROJ4 string is blank
 
@@ -1586,6 +1640,17 @@ end subroutine set_missing_value_real_sub
 
 !--------------------------------------------------------------------------------------------------
 
+subroutine set_complete_spatial_coverage_flag_sub(this, lRequireCompleteSpatialCoverage )
+
+  class (DATA_CATALOG_ENTRY_T)       :: this
+  logical (kind=c_bool), intent(in)  :: lRequireCompleteSpatialCoverage
+
+  this%lRequireCompleteSpatialCoverage = lRequireCompleteSpatialCoverage
+
+end subroutine set_complete_spatial_coverage_flag_sub
+
+!--------------------------------------------------------------------------------------------------
+
 subroutine set_minimum_allowable_value_int_sub(this, iMinVal)
 
   class (DATA_CATALOG_ENTRY_T) :: this
@@ -1630,7 +1695,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine calc_project_boundaries(this, pGrdBase)
+  subroutine calc_project_boundaries_sub(this, pGrdBase)
 
     class (DATA_CATALOG_ENTRY_T) :: this
     type ( GENERAL_GRID_T ), pointer :: pGrdBase
@@ -1690,7 +1755,7 @@ end subroutine set_maximum_allowable_value_real_sub
    print *, "UR: ", this%GRID_BOUNDS_NATIVE%rXur, this%GRID_BOUNDS_NATIVE%rYur
 #endif
 
-  end subroutine calc_project_boundaries
+  end subroutine calc_project_boundaries_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1739,6 +1804,11 @@ end subroutine set_maximum_allowable_value_real_sub
     real (kind=c_float) :: rMissing, rMean
 
     rMissing = real(this%rMissingValuesCode, kind=c_float)
+
+    ! changing the default operation to "do nothing"
+    ! user must actively choose what to do with missing values
+    ! by specifying a valid operator
+    if ( trim(this%sMissingValuesOperator) .ne. "&&" ) then
 
     select case (this%iMissingValuesAction)
 
@@ -1817,6 +1887,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
     end select
 
+    endif
   end subroutine data_GridHandleMissingData_real
 
 !--------------------------------------------------------------------------------------------------
@@ -1830,6 +1901,7 @@ end subroutine set_maximum_allowable_value_real_sub
     integer (kind=c_int) :: iMissing, iMean
 
     iMissing = this%iMissingValuesCode
+    if ( trim(this%sMissingValuesOperator) .ne. "&&" ) then
 
     select case (this%iMissingValuesAction)
 
@@ -1908,6 +1980,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
     end select
 
+    endif
   end subroutine data_GridHandleMissingData_int
 
 !--------------------------------------------------------------------------------------------------

@@ -1,6 +1,7 @@
 module polygon_summarize
 
   use iso_c_binding
+  use exceptions
   use model_domain, only         : MODEL_DOMAIN_T
   use simulation_datetime, only  : SIM_DT
   use strings

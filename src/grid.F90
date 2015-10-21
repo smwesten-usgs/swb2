@@ -15,6 +15,7 @@ module grid
 
   implicit none
 
+  private
   integer (kind=c_int), public, parameter :: GRID_DATATYPE_INT = 0
   integer (kind=c_int), public, parameter :: GRID_DATATYPE_REAL = 1
 !   integer (kind=c_int), public, parameter :: GRID_DATATYPE_CELL_GRID = 2
@@ -24,6 +25,8 @@ module grid
   integer (kind=c_int), public, parameter :: OUTPUT_ARC = 1
 
   integer (kind=c_int), public, parameter :: GRID_ACTIVE_CELL = 1
+  integer(kind=c_int), parameter :: NC_FILL_INT     = -2147483647
+  real(kind=c_float),  parameter :: NC_FILL_FLOAT   = 9.9692099683868690e+36_c_float
 
   !> interface to C code that provides a simplified entry point to PROJ4
   !> capabilities: it has been modified so that all C pointers are kept within the
@@ -62,8 +65,8 @@ module grid
     real (kind=c_double), dimension(:,:), allocatable :: rY    ! y coordinate associated with data
     integer (kind=c_int), dimension(:,:), allocatable :: iMask ! Mask for processing results
 
-    integer (kind=c_int)                    :: iNoDataValue = -99999
-    real (kind=c_float)                     :: rNoDataValue = -99999.0
+    integer (kind=c_int)                    :: iNoDataValue = NC_FILL_INT
+    real (kind=c_float)                     :: rNoDataValue = NC_FILL_FLOAT
 !      type (T_CELL), dimension(:,:), pointer :: Cells        ! T_CELL objects
   end type GENERAL_GRID_T
 
@@ -134,10 +137,13 @@ module grid
     ERROR_MESSAGE_T("point not within available datum shift grids ", -48), &
     ERROR_MESSAGE_T("invalid sweep axis, choose x or y            ", -49) /)
 
-  public :: grid_gridToGrid_int, grid_gridToGrid_sgl, grid_Create, grid_Destroy, grid_Read
-  public :: grid_CheckForPROJ4Error, grid_CompletelyCover
-  public :: grid_ReadExisting, grid_DumpGridExtent
-  public :: grid_Conform, grid_Transform, grid_Interpolate, grid_PopulateXY
+  public :: grid_gridToGrid_int, grid_gridToGrid_sgl, grid_Create, grid_Destroy, grid_Read, &
+     grid_CheckForPROJ4Error, grid_CompletelyCover,                                         &
+     grid_ReadExisting, grid_DumpGridExtent,                                                &
+     grid_Conform, grid_Transform, grid_Interpolate, grid_PopulateXY,                       &
+     grid_set_nodata_value,                                                                 &
+     grid_CreateComplete, grid_CreateSimple, grid_WriteGrid,                                &
+     grid_WriteArcGrid, grid_WriteSurferGrid, grid_set_output_directory_name
 
   interface grid_Create
     module procedure grid_CreateSimple
@@ -302,14 +308,14 @@ function grid_CreateSimple ( iNX, iNY, rX0, rY0, rGridCellSize, iDataType ) resu
           call assert (iStat == 0, &
              "Could not allocate integer data", &
               TRIM(__FILE__),__LINE__)
-          pGrd%iData = 0
+          pGrd%iData = pGrd%iNoDataValue
 
       case ( GRID_DATATYPE_REAL )
           allocate ( pGrd%rData( iNX, iNY ), stat=iStat )
           call assert (iStat == 0, &
              "Could not allocate real data", &
               TRIM(__FILE__),__LINE__)
-          pGrd%rData = rZERO
+          pGrd%rData = pGrd%rNoDataValue
 
 !       case ( GRID_DATATYPE_CELL_GRID )
 !           allocate ( pGrd%Cells( iNX, iNY ), stat=iStat )
@@ -1069,7 +1075,7 @@ subroutine grid_WriteArcGrid(sFilename, pGrd)
 
   elseif ( pGrd%iDataType == DATATYPE_REAL ) then
 
-    write ( unit=LU_TEMP, fmt="('NODATA_VALUE ',f14.4)", iostat=istat ) pGrd%rNoDataValue
+    write ( unit=LU_TEMP, fmt="('NODATA_VALUE ',g14.4)", iostat=istat ) pGrd%rNoDataValue
     call assert( istat==0, "Error writing NODATA value", trim(__FILE__), __LINE__)
     do iRow=1,iNumRows
       write( unit=LU_TEMP, fmt=TRIM(sBuf), iostat=istat ) &
@@ -1911,13 +1917,13 @@ function grid_GetGridColNum(pGrd,rX)  result(iColumnNumber)
 !  print *, "numerator (RHS): ", rX, pGrd%rX0, ( rX - pGrd%rX0 )
 !  print *, "denominator: ", (pGrd%rX1 - pGrd%rX0)
 
-  if ( iColumnNumber < 1 .or. iColumnNumber > pGrd%iNX ) then
-    call grid_DumpGridExtent(pGrd)
-    write(*, fmt="(a)") "was attempting to find column associated with X: "//trim(asCharacter(rX))
-    call assert(lFALSE,  "INTERNAL PROGRAMMING ERROR: Column number out of bounds (value: " &
-     //trim( asCharacter(iColumnNumber))//")", &
-     trim(__FILE__), __LINE__)
-  endif
+!   if ( iColumnNumber < 1 .or. iColumnNumber > pGrd%iNX ) then
+!     call grid_DumpGridExtent(pGrd)
+!     write(*, fmt="(a)") "was attempting to find column associated with X: "//trim(asCharacter(rX))
+!     call assert(lFALSE,  "INTERNAL PROGRAMMING ERROR: Column number out of bounds (value: " &
+!      //trim( asCharacter(iColumnNumber))//")", &
+!      trim(__FILE__), __LINE__)
+!   endif
 
 end function grid_GetGridColNum
 
@@ -1932,13 +1938,13 @@ function grid_GetGridRowNum(pGrd,rY)  result(iRowNumber)
   iRowNumber = pGrd%iNY - NINT(real(pGrd%iNY, kind=c_double) &
                * ( rY - pGrd%rY0 ) / (pGrd%rY1 - pGrd%rY0) - 0.5_c_double, kind=c_int)
 
-  if ( iRowNumber < 1 .or. iRowNumber > pGrd%iNY ) then
-    call grid_DumpGridExtent(pGrd)
-    write(*, fmt="(a)") "was attempting to find row associated with Y: "//trim(asCharacter(rY))
-    call assert(lFALSE,  "INTERNAL PROGRAMMING ERROR: Row number out of bounds (value: " &
-     //trim( asCharacter(iRowNumber))//")", &
-     trim(__FILE__), __LINE__)
-  endif
+!   if ( iRowNumber < 1 .or. iRowNumber > pGrd%iNY ) then
+!     call grid_DumpGridExtent(pGrd)
+!     write(*, fmt="(a)") "was attempting to find row associated with Y: "//trim(asCharacter(rY))
+!     call assert(lFALSE,  "INTERNAL PROGRAMMING ERROR: Row number out of bounds (value: " &
+!      //trim( asCharacter(iRowNumber))//")", &
+!      trim(__FILE__), __LINE__)
+!   endif
 
 end function grid_GetGridRowNum
 
@@ -1970,6 +1976,8 @@ function grid_GetGridColRowNum(pGrd, rX, rY)    result(iColRow)
   iStartingColNum = grid_GetGridColNum(pGrd,rX)
   iStartingRowNum = grid_GetGridRowNum(pGrd,rY)
 
+  if (iStartingColNum > 0 .and. iStartingColNum <= pGrd%iNX &
+     .and. iStartingRowNum > 0 .and. iStartingRowNum <= pGrd%iNY) then
   rDist = hypot(pGrd%rX(iStartingColNum,iStartingRowNum) - rX, &
               pGrd%rY(iStartingColNum,iStartingRowNum) - rY)
 
@@ -2037,11 +2045,24 @@ function grid_GetGridColRowNum(pGrd, rX, rY)    result(iColRow)
   iColRow(COLUMN) = iCandidateCol
   iColRow(ROW) = iCandidateRow
 
+  else
 
+    iColRow(COLUMN) = iStartingColNum
+    iColRow(ROW) = iStartingRowNum
+  endif  
 end function grid_GetGridColRowNum
 
 
 !----------------------------------------------------------------------
+subroutine grid_set_nodata_value( pGrd, iValue, fValue )
+  type ( GENERAL_GRID_T ),pointer             :: pGrd
+  integer (kind=c_int), intent(in), optional  :: iValue
+  real (kind=c_float), intent(in), optional   :: fValue
+
+  if ( present( iValue ) )  pGrd%iNoDataValue = iValue
+  if ( present( fValue ) )  pGrd%rNoDataValue = fValue
+end subroutine grid_set_nodata_value
+!--------------------------------------------------------------------------------------------------  
 
 function grid_GetGridX(pGrd,iColumnNumber)  result(rX)
 
@@ -2280,13 +2301,15 @@ subroutine grid_GridToGrid_sgl(pGrdFrom,  pGrdTo )
                  rX=real(pGrdTo%rX(iCol, iRow), kind=c_double), &
                  rY=real(pGrdTo%rY(iCol, iRow), kind=c_double))
 
-      call assert(iColRow(COLUMN) > 0 .and. iColRow(COLUMN) <= pGrdFrom%iNX, &
-        "Illegal column number supplied: "//trim(asCharacter(iColRow(COLUMN))), &
-        trim(__FILE__), __LINE__)
+      if ( iColRow(COLUMN) < 1 .or. iColRow(COLUMN) > pGrdFrom%iNX) cycle
+      if ( iColRow(ROW) < 1 .or. iColRow(ROW) > pGrdFrom%iNY) cycle
+!       call assert(iColRow(COLUMN) > 0 .and. iColRow(COLUMN) <= pGrdFrom%iNX, &
+!         "Illegal column number supplied: "//trim(asCharacter(iColRow(COLUMN))), &
+!         trim(__FILE__), __LINE__)
 
-      call assert(iColRow(ROW) > 0 .and. iColRow(ROW) <= pGrdFrom%iNY, &
-        "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))), &
-        trim(__FILE__), __LINE__)
+!       call assert(iColRow(ROW) > 0 .and. iColRow(ROW) <= pGrdFrom%iNY, &
+!         "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))), &
+!         trim(__FILE__), __LINE__)
 
       pGrdTo%rData(iCol,iRow) = pGrdFrom%rData( iColRow(COLUMN), iColRow(ROW) )
 
