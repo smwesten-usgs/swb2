@@ -1,4 +1,4 @@
-module model_iterate
+module swb_merge_iterate
 
   use iso_c_binding, only         : c_bool, c_int, c_size_t, c_ptrdiff_t
   use constants_and_conversions
@@ -6,7 +6,7 @@ module model_iterate
   use data_catalog_entry, only    : DATA_CATALOG_ENTRY_T
   use grid
   use logfiles, only              : LOGS, LOG_ALL
-  use model_domain, only          : MODEL_DOMAIN_T
+  use swb_merge_domain, only      : MODEL_DOMAIN_T
   use simulation_datetime, only   : SIM_DT
   use string_list, only           : STRING_LIST_T
   use strings
@@ -69,6 +69,14 @@ contains
 
         call pENTRY%getvalues( iMonth=int(SIM_DT%curr%iMonth), iDay=int(SIM_DT%curr%iDay),   &
           iYear=SIM_DT%curr%iYear, iJulianDay=SIM_DT%curr%getJulianDay() )
+
+        call minmaxmean_float( variable=pENTRY%pGrdNative%rData,      &
+                           varname="NATIVE: "//trim(pENTRY%NCFILE%sFilename), &
+                           nodata_value= 9.e+35_c_float )
+
+        call minmaxmean_float( variable=pENTRY%pGrdBase%rData,      &
+                           varname="BASE: "//trim(pENTRY%NCFILE%sFilename), &
+                           nodata_value= 9.e+35_c_float )
 
         do col=1, cells%number_of_columns
           do row=1, cells%number_of_rows
@@ -143,4 +151,4 @@ contains
 
 
 
-end module model_iterate
+end module swb_merge_iterate

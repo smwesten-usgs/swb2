@@ -166,7 +166,7 @@ module data_catalog_entry
     procedure         :: dump_data_structure => dump_data_structure_sub
     procedure         :: set_make_local_archive => set_archive_local_sub
     procedure         :: put_values_to_archive => put_values_to_local_NetCDF_sub
-    procedure         :: transfer_from_native => transform_grid_to_grid
+    procedure         :: transform_native_to_base => transform_grid_to_grid_sub
 
     procedure, private :: data_GridEnforceLimits_real
     procedure, private :: data_GridEnforceLimits_int
@@ -656,7 +656,6 @@ subroutine getvalues_constant_sub( this  )
         call grid_ReadExisting ( sFileName=this%sSourceFilename, &
           sFileType=this%sSourceFileType, &
           pGrd=this%pGrdNative )
-
       else
 
         ! create a grid in native coordinates of the source dataset.
@@ -666,7 +665,6 @@ subroutine getvalues_constant_sub( this  )
 
         ! ensure that PROJ4 string is associated with the native grid
         this%pGrdNative%sPROJ4_string = this%sSourcePROJ4_string
-
       endif
 
       this%lGridHasChanged = lTRUE
@@ -691,7 +689,7 @@ subroutine getvalues_constant_sub( this  )
 
       end select
 
-      call this%transfer_from_native() 
+      call this%transform_native_to_base() 
 
       if ( .not. this%lGridIsPersistent )  call grid_Destroy( this%pGrdNative )
 
@@ -703,7 +701,7 @@ subroutine getvalues_constant_sub( this  )
 
 !--------------------------------------------------------------------------------------------------
 
-subroutine transform_grid_to_grid(this)
+subroutine transform_grid_to_grid_sub(this)
 
   class (DATA_CATALOG_ENTRY_T) :: this
 
@@ -739,6 +737,8 @@ subroutine transform_grid_to_grid(this)
 
     case ( GRID_DATATYPE_REAL )
 
+print *, __FILE__, ": ", __LINE__
+
       call grid_gridToGrid_sgl(pGrdFrom=this%pGrdNative,&
                                pGrdTo=this%pGrdBase )
 
@@ -757,7 +757,7 @@ subroutine transform_grid_to_grid(this)
   end select
 
     
-end subroutine transform_grid_to_grid
+end subroutine transform_grid_to_grid_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1308,10 +1308,10 @@ end subroutine set_constant_value_real
 
       call LOGS%write( repeat("=", 60) )
       call LOGS%write( "Missing day found in NetCDF file - padding values" )
-!      call stats_WriteMinMeanMax( iLU=LU_STD_OUT, &
+!      call stats_WriteMinMeanMax( iLU=6, &
 !        sText=trim(this%NCFILE%sFilename), &
 !        rData=this%pGrdNative%rData)
-!      call stats_WriteMinMeanMax( iLU=LU_LOG, &
+!      call stats_WriteMinMeanMax( iLU=6, &
 !        sText=trim(this%NCFILE%sFilename), &
 !        rData=this%pGrdNative%rData)
       call LOGS%write( repeat("=", 60) )
@@ -1321,9 +1321,52 @@ end subroutine set_constant_value_real
     if (this%lCreateLocalNetCDFArchive) &
              call this%put_values_to_archive(iMonth, iDay, iYear)
 
-    call this%transfer_from_native( )
+
+    call this%transform_native_to_base( )
+
+    print *, "NATIVE GRID"
+    call grid_DumpGridExtent( this%pGrdNative )
+    print *, "BASE GRID"    
+    call grid_DumpGridExtent( this%pGrdBase )
+
 
   end subroutine getvalues_dynamic_netcdf_sub
+
+
+  subroutine minmaxmean_float( variable , varname, nodata_value )
+
+    real (kind=c_float), dimension(:,:)  :: variable
+    character (len=*), intent(in)        :: varname
+    real (kind=c_float), intent(in)      :: nodata_value
+
+    ! [ LOCALS ] 
+    integer (kind=c_int) :: iCount
+    character (len=20)   :: sVarname
+    character (len=14)   :: sMin
+    character (len=14)   :: sMax
+    character (len=14)   :: sMean
+    character (len=10)   :: sCount
+
+    write (sVarname, fmt="(a20)") adjustl(varname)
+
+    if (size( variable, 1) > 0 ) then
+      write (sMin, fmt="(g14.3)")   minval(variable, variable < nodata_value )
+      write (sMax, fmt="(g14.3)")   maxval(variable, variable < nodata_value )
+      write (sMean, fmt="(g14.3)")  sum(variable, variable < nodata_value ) / count( variable < nodata_value )
+      write (sCount, fmt="(i10)") count( variable < nodata_value )
+    else
+      write (sMin, fmt="(g14.3)")   -9999.
+      write (sMax, fmt="(g14.3)")   -9999.
+      write (sMean, fmt="(g14.3)")  -9999.
+      write (sCount, fmt="(i10)")       0
+    endif
+
+
+    print *, adjustl(sVarname)//" | "//adjustl(sMin)//" | "//adjustl(sMax) &
+       //" | "//adjustl(sMean)//" | "//adjustl(sCount)
+
+
+  end subroutine minmaxmean_float
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1450,7 +1493,7 @@ end subroutine set_constant_value_real
 
     call this%enforce_limits(this%pGrdNative%rData)
 
-    call this%transfer_from_native( )
+    call this%transform_native_to_base( )
 
   end subroutine getvalues_static_netcdf_sub
 

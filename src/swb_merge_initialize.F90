@@ -1,4 +1,4 @@
-module model_initialize
+module swb_merge_initialize
 
   use iso_c_binding, only                : c_int, c_float, c_double, c_bool
   use constants_and_conversions
@@ -11,7 +11,7 @@ module model_initialize
   use file_operations
   use grid
   use output, only                       : initialize_output
-  use model_domain
+  use swb_merge_domain
   use simulation_datetime, only : SIM_DT
   use strings
   use string_list  
@@ -614,4 +614,4 @@ contains
 
   end subroutine initialize_latitude
 
-end module model_initialize
+end module swb_merge_initialize

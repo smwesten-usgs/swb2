@@ -8,13 +8,13 @@
 !> to the control_setModelOptions routine in module \ref control.
 program main
 
-  use iso_c_binding, only    : c_short, c_int, c_float, c_double
-  use logfiles, only         : LOGS, LOG_DEBUG
-  use model_initialize, only : initialize_all, read_control_file
-  use model_iterate
-  use model_domain, only     : MODEL
-  use version_control, only  : EXECUTABLE_VERSION, GIT_COMMIT_HASH_STRING, &
-                               GIT_BRANCH_STRING, COMPILE_DATE, COMPILE_TIME
+  use iso_c_binding, only        : c_short, c_int, c_float, c_double
+  use logfiles, only             : LOGS, LOG_DEBUG
+  use swb_merge_initialize, only : initialize_all, read_control_file
+  use swb_merge_iterate
+  use swb_merge_domain, only     : MODEL
+  use version_control, only      : SWB_VERSION, GIT_COMMIT_HASH_STRING, &
+                                   GIT_BRANCH_STRING, COMPILE_DATE, COMPILE_TIME
   use iso_fortran_env
 
   implicit none
@@ -26,10 +26,10 @@ program main
   character (len=256)            :: sVersionString 
   character (len=256)            :: sGitHashString
   integer (kind=c_int)           :: iCount
-
+ 
   iNumArgs = COMMAND_ARGUMENT_COUNT()
 
-  sVersionString = "  Soil Water Balance NetCDF File Merge Tool "//trim( EXECUTABLE_VERSION )    &
+  sVersionString = "  Soil Water Balance NetCDF File Merge Tool "//trim( SWB_VERSION )    &
       //" -- compiled on: "//trim(COMPILE_DATE)//" "//trim(COMPILE_TIME)
 
   sGitHashString = "    [ Git branch and commit hash: "//trim( GIT_BRANCH_STRING )    &

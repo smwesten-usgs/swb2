@@ -1,4 +1,4 @@
-module model_domain
+module swb_merge_domain
 
   use iso_c_binding
   use data_catalog
@@ -94,4 +94,4 @@ contains
 
   end subroutine initialize_grid_sub
 
-end module model_domain
+end module swb_merge_domain
