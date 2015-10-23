@@ -737,8 +737,6 @@ subroutine transform_grid_to_grid_sub(this)
 
     case ( GRID_DATATYPE_REAL )
 
-print *, __FILE__, ": ", __LINE__
-
       call grid_gridToGrid_sgl(pGrdFrom=this%pGrdNative,&
                                pGrdTo=this%pGrdBase )
 
@@ -1323,12 +1321,6 @@ end subroutine set_constant_value_real
 
 
     call this%transform_native_to_base( )
-
-    print *, "NATIVE GRID"
-    call grid_DumpGridExtent( this%pGrdNative )
-    print *, "BASE GRID"    
-    call grid_DumpGridExtent( this%pGrdBase )
-
 
   end subroutine getvalues_dynamic_netcdf_sub
 

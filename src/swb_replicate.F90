@@ -93,7 +93,7 @@ program swb_replicate
 
     write(UNIT=*,FMT="(/,/,a,/)")    "Usage: swb_replicate [control file name] [num simulations]"
     write(UNIT=*,FMT="(a)")          "swb_replicate takes a swb control file and runs the model 'num simulation' times"
-    write(UNIT=*,FMT="(a,/)")        "with each launched as a seperate process."
+    write(UNIT=*,FMT="(a,/)")        "with each launched as a separate process."
     write(UNIT=*,FMT="(a)")          "The only use currently for 'swb_replicate' is to allow multiple runs to be made"
     write(UNIT=*,FMT="(a)")          "with the 'FRAGMENTS_SEQUENCE_SIMULATION_NUMBER' set for each simulation instance."
 

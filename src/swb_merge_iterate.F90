@@ -1,6 +1,7 @@
 module swb_merge_iterate
 
   use iso_c_binding, only         : c_bool, c_int, c_size_t, c_ptrdiff_t
+  use ieee_arithmetic, only       : ieee_is_nan
   use constants_and_conversions
   use data_catalog, only          : DATA_CATALOG_T, DAT
   use data_catalog_entry, only    : DATA_CATALOG_ENTRY_T
@@ -65,36 +66,34 @@ contains
 
       cells%pGrdOut%rData = NC_FILL_FLOAT
 
+!      !$omp parallel private( col, row, pENTRY )
+
       do while ( associated( pENTRY ) )
 
         call pENTRY%getvalues( iMonth=int(SIM_DT%curr%iMonth), iDay=int(SIM_DT%curr%iDay),   &
           iYear=SIM_DT%curr%iYear, iJulianDay=SIM_DT%curr%getJulianDay() )
 
-        call minmaxmean_float( variable=pENTRY%pGrdNative%rData,      &
-                           varname="NATIVE: "//trim(pENTRY%NCFILE%sFilename), &
-                           nodata_value= 9.e+35_c_float )
-
-        call minmaxmean_float( variable=pENTRY%pGrdBase%rData,      &
-                           varname="BASE: "//trim(pENTRY%NCFILE%sFilename), &
-                           nodata_value= 9.e+35_c_float )
-
+!        !$omp single
         do col=1, cells%number_of_columns
           do row=1, cells%number_of_rows
 
-            if ( pENTRY%pGrdBase%rData(col, row) < NC_FILL_FLOAT ) then
-              cells%pGrdOut%rData(col, row) = pENTRY%pGrdBase%rData(col, row)
+!               if ( pENTRY%pGrdNative%rData(col, row) > 0.0 ) &
+               print *, col, row, pENTRY%pGrdBase%rData(col, row), pENTRY%pGrdNative%rData(col, row)
 
-!               if ( pENTRY%pGrdBase%rData(col, row) > 0.0 ) &
-!               print *, col, row, pENTRY%pGrdBase%rData(col, row), cells%pGrdOut%rData(col, row)
+            if ( .not. ieee_is_nan( pENTRY%pGrdBase%rData(col, row) ) ) then
+              cells%pGrdOut%rData(col, row) = pENTRY%pGrdBase%rData(col, row)
 
             endif
           enddo  
         enddo
+!        !$omp end single
 
         index_val = index_val + 1
         pENTRY => DAT%get( index_val )
 
       enddo  
+
+!      !$omp end parallel
 
       call netcdf_put_variable_array(NCFILE=pNCFILE,                                            &
             iVarID=pNCFILE%iVarID(NC_Z),                                                        &
