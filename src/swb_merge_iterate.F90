@@ -47,7 +47,7 @@ contains
       fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,          &
       dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0 )
 
-      cells%dont_care = NC_FILL_FLOAT
+    cells%dont_care = NC_FILL_FLOAT
 
     do while ( SIM_DT%curr <= SIM_DT%end )
 
@@ -66,19 +66,19 @@ contains
 
       cells%pGrdOut%rData = NC_FILL_FLOAT
 
-!      !$omp parallel private( col, row, pENTRY )
+!      $omp parallel private( col, row, pENTRY )
 
       do while ( associated( pENTRY ) )
 
         call pENTRY%getvalues( iMonth=int(SIM_DT%curr%iMonth), iDay=int(SIM_DT%curr%iDay),   &
           iYear=SIM_DT%curr%iYear, iJulianDay=SIM_DT%curr%getJulianDay() )
 
-!        !$omp single
+!        $omp single
         do col=1, cells%number_of_columns
           do row=1, cells%number_of_rows
 
 !               if ( pENTRY%pGrdNative%rData(col, row) > 0.0 ) &
-               print *, col, row, pENTRY%pGrdBase%rData(col, row), pENTRY%pGrdNative%rData(col, row)
+!               print *, col, row, pENTRY%pGrdBase%rData(col, row), pENTRY%pGrdNative%rData(col, row)
 
             if ( .not. ieee_is_nan( pENTRY%pGrdBase%rData(col, row) ) ) then
               cells%pGrdOut%rData(col, row) = pENTRY%pGrdBase%rData(col, row)
@@ -86,14 +86,14 @@ contains
             endif
           enddo  
         enddo
-!        !$omp end single
+!        $omp end single
 
         index_val = index_val + 1
         pENTRY => DAT%get( index_val )
 
       enddo  
 
-!      !$omp end parallel
+!      $omp end parallel
 
       call netcdf_put_variable_array(NCFILE=pNCFILE,                                            &
             iVarID=pNCFILE%iVarID(NC_Z),                                                        &

@@ -1288,6 +1288,17 @@ end subroutine set_constant_value_real
 
         this%pGrdNative%rData = this%pGrdNative%rData * dScaleFactor + dAddOffset
 
+
+    call minmaxmean_float( variable=this%pGrdNative%rData,  &
+                           varname="Native grid.",           &
+                           nodata_value=1.e+20 )
+
+
+    call minmaxmean_float( variable=this%pGrdBase%rData,  &
+                           varname="Base grid.",           &
+                           nodata_value=1.e+20 )
+
+
         call this%handle_missing_values(this%pGrdNative%rData)
         call this%enforce_limits(this%pGrdNative%rData)
         exit
@@ -1321,6 +1332,17 @@ end subroutine set_constant_value_real
 
 
     call this%transform_native_to_base( )
+
+    call minmaxmean_float( variable=this%pGrdNative%rData,  &
+                           varname="Native grid..",           &
+                           nodata_value=1.e+20 )
+
+
+    call minmaxmean_float( variable=this%pGrdBase%rData,  &
+                           varname="Base grid..",           &
+                           nodata_value=1.e+20 )
+
+  call this%dump_data_structure()
 
   end subroutine getvalues_dynamic_netcdf_sub
 
