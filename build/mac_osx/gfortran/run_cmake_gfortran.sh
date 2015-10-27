@@ -17,6 +17,8 @@ export LIB_PATH4="/usr/local/lib/gcc/$COMPILER_MAJ_VERSION"
 export Fortran_COMPILER_NAME=gfortran
 export R_HOME=/usr/bin/R
 
+export PATH=/usr/bin:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:/usr/local/opt
+
 # define where 'make copy' will place executables
 export INSTALL_PREFIX=/usr/local/bin
 

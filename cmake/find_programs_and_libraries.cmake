@@ -45,10 +45,9 @@ endif()
 message("MOD: LIB_PATH = ${LIB_PATH}")
 
 find_library(LIBZ
-        NAMES z libz libz.a
+        NAMES z libz libz.a libz.dylib
         PATHS
         /usr/local/opt/zlib/lib
-        ${SWB_LIBPATH}
         ${LIB_PATH}
         NO_CMAKE_SYSTEM_PATH )
 
@@ -104,7 +103,7 @@ find_library(LIBHDF5_HL
 #        NO_CMAKE_SYSTEM_PATH )
 
 find_library(LIBCURL
-        NAMES curl libcurl libcurl.a
+        NAMES curl libcurl libcurl.a libcurl.dylib
         PATHS /usr/local/opt/curl/lib
         ${LIB_PATH}
         NO_CMAKE_SYSTEM_PATH )
@@ -178,10 +177,10 @@ endif()
 
 if ("${OS}" STREQUAL "mac_osx" )
 
-  find_library(LIBCRYPT32
-          NAMES crypt32 libcrypt32 libcrypt32.a
-          PATHS
-          ${LIB_PATH} )
+#  find_library(LIBCRYPT32
+#          NAMES crypt32 libcrypt32 libcrypt32.a
+#          PATHS
+#          ${LIB_PATH} )
 
   find_library(LIBSASL2
           NAMES gsasl libgsasl sasl2 libsasl2 libsasl2.dylib

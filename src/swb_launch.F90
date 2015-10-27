@@ -174,10 +174,11 @@ program swb_launch
 
 
 !$omp parallel
-
 !$omp do private( simulation_instance, iIndex1, fLL_x1, fLL_y1, filename, loc_err )
 
   do iIndex1 = 1, ubound(indexXY,2)
+
+    !! !$omp task private( simulation_instance, fLL_x1, fLL_y1, filename, loc_err ) firstprivate( iIndex1 )
 
     simulation_instance = int(divisions_x) * ( int(divisions_y) - indexXY( 2, iIndex1 ) ) + indexXY( 1, iIndex1 )
 
@@ -229,7 +230,7 @@ program swb_launch
 !      write(*,fmt="(a)") "Starting SWB in directory /tmp"//asCharacter( simulation_instance )
 
     call execute_command_line( "swb2 "//trim(filename)//" "//"tmp"//asCharacter( simulation_instance )  &
-      //" > cmdlog"//asCharacter( simulation_instance )//".md", wait=.true. )
+      //" > cmdlog"//asCharacter( simulation_instance )//".md", wait=.false. )
 
      ! argv(1) = "swb2"
      ! argv(2) = trim(filename)
@@ -251,9 +252,12 @@ program swb_launch
 !      call system( "swb2 "//trim(filename)//" "//"tmp"//asCharacter( iCount )  &
 !        //" > cmdlog"//asCharacter( iCount)//".md" )
 
-  enddo    
+    !! !$omp end task
 
-!$omp end do
+  enddo    
+ !   #!$omp end single
+
+!$omp end do nowait
 
 !$omp end parallel
 
