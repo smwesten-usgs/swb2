@@ -649,3 +649,25 @@ set_target_properties(swb_launch
 
   set_target_properties(swb_merge
             PROPERTIES COMPILE_DEFINITIONS "${PREPROCESSOR_DEFINES}")
+
+  add_executable(swb_replicate
+            constants_and_conversions.F90
+            data_catalog.F90
+            data_catalog_entry.F90
+            datetime.F90
+            dictionary.F90
+            exceptions.F90
+            file_operations.F90
+            grid.F90
+            logfiles.F90
+            swb_replicate.F90
+            simulation_datetime.F90
+            strings.F90
+            string_list.F90
+ 
+            generated/version_control.F90
+
+            )
+
+  set_target_properties(swb_replicate
+            PROPERTIES COMPILE_DEFINITIONS "${PREPROCESSOR_DEFINES}")

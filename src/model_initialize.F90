@@ -106,6 +106,7 @@ contains
     ! set output directory names for NetCDF and Surfer/Arc ASCII grid output
     call grid_set_output_directory_name( output_directory_name )
     call set_output_directory( output_directory_name )
+    call MODEL%set_output_directory( output_directory_name )
 
     ! define SWB project boundary and geographic projection
     call initialize_grid_options()

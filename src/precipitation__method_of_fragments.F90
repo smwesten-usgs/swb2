@@ -514,7 +514,7 @@ contains
         iStartRecord = FRAGMENTS_SETS( iIndex )%iStartRecord(iMonth)   
         iNumberOfFragments = FRAGMENTS_SETS(iIndex)%iNumberOfFragments(iMonth)
         iEndRecord = iStartRecord + iNumberOfFragments - 1
-        iTargetRecord = iStartRecord + RANDOM_VALUES(iIndex) * real( iNumberOfFragments - 1)
+        iTargetRecord = iStartRecord + int(RANDOM_VALUES(iIndex) * real( iNumberOfFragments ))
 
         if ( ( iIndex > iUBOUND_CURRENT_FRAGMENTS ) .or. ( iTargetRecord > iUBOUND_FRAGMENTS ) &
             .or. ( iIndex < 1 ) .or. ( iTargetRecord < 1) ) then
@@ -528,7 +528,7 @@ contains
           call LOGS%write("ubound(CURRENT_FRAGMENTS, 1): "//asCharacter(iUBOUND_CURRENT_FRAGMENTS), iTab=3 )
           call LOGS%write("ubound(FRAGMENTS, 1): "//asCharacter(iUBOUND_FRAGMENTS), iTab=3 )                    
           call LOGS%write("RANDOM_VALUES(iIndex): "//asCharacter(RANDOM_VALUES(iIndex)), iTab=3 )
-          call die( "Miscalculation in target record: calculated record is past the end", &
+          call die( "Miscalculation in target record: calculated record index is out of bounds", &
             __FILE__, __LINE__ )
         endif
           
@@ -536,8 +536,10 @@ contains
 
       endif
 
-!      write(*,fmt="(i5,a,i4,i5,i5,31f8.3)") iIndex,") ", FRAGMENTS( iTargetRecord)%iRainGageZone, FRAGMENTS( iTargetRecord)%iMonth, &
-!         FRAGMENTS( iTargetRecord)%iFragmentSet, FRAGMENTS( iTargetRecord)%fFragmentValue
+!        write(*,fmt="(i5,a,i4,a,i5,a,i5,a,31f8.3)") iIndex,") RGZ: ", FRAGMENTS( iTargetRecord)%iRainGageZone,   &
+!                  " Mnth: ",FRAGMENTS( iTargetRecord)%iMonth, &
+!                  "Frag set: ",FRAGMENTS( iTargetRecord)%iFragmentSet,  &
+!                  "Fragments: ",FRAGMENTS( iTargetRecord)%fFragmentValue
 
       if ( ( CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay ) < 0.0 ) &
          .or. ( CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay ) > 1.0 ) ) then
@@ -600,7 +602,9 @@ contains
           if ( FRAGMENTS_SEQUENCE( iIndex )%sim_rainfall_zone == iIndex2 ) then
 
             RANDOM_VALUES( iIndex2 ) = FRAGMENTS_SEQUENCE( iIndex )%sim_random_number
-!            print *, "==> ", iIndex, iIndex2, FRAGMENTS_SEQUENCE( iIndex )%sim_rainfall_zone, FRAGMENTS_SEQUENCE( iIndex )%sim_random_number
+!            print *, "==> ", iIndex, iIndex2, FRAGMENTS_SEQUENCE( iIndex )%sim_rainfall_zone, &
+!                       FRAGMENTS_SEQUENCE( iIndex )%sim_random_number, &
+!                       FRAGMENTS_SEQUENCE( iIndex )%sim_selected_set
             exit
 
           endif

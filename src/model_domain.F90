@@ -28,6 +28,7 @@ module model_domain
 
   type, public :: MODEL_DOMAIN_T
 
+    character (len=:), allocatable     :: output_directory_name
     character (len=:), allocatable     :: PROJ4_string
     integer (kind=c_int)               :: number_of_columns
     integer (kind=c_int)               :: number_of_rows
@@ -176,6 +177,8 @@ module model_domain
     
     procedure :: get_climate_data
 
+    procedure :: set_output_directory => set_output_directory_sub
+
     procedure :: initialize_methods_sub
     generic   :: initialize_methods => initialize_methods_sub
 
@@ -228,6 +231,17 @@ contains
   ! active grids, but should amount to significant memory and processing savings when running
   ! SWB for, say, an island domain.
   !
+
+  subroutine set_output_directory_sub( this, output_dir_name )
+
+    class (MODEL_DOMAIN_T), intent(inout)        :: this
+    character (len=*), intent(in)                :: output_dir_name
+
+    this%output_directory_name = output_dir_name
+
+  end subroutine set_output_directory_sub  
+
+!--------------------------------------------------------------------------------------------------
 
   subroutine initialize_grid_sub(this, iNumCols, iNumRows, dX_ll, dY_ll, dGridCellSize )
 
@@ -1608,12 +1622,13 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call growing_degree_day_initialize( lActive=this%active,                  &
-                                        iLanduseIndex=this%landuse_index,     &
-                                        dX=this%X,                            & 
-                                        dY=this%Y,                            &
-                                        dX_lon=this%X_lon,                    &
-                                        dY_lat=this%Y_lat  )
+    call growing_degree_day_initialize( lActive=this%active,                               &
+                                        iLanduseIndex=this%landuse_index,                  &
+                                        dX=this%X,                                         & 
+                                        dY=this%Y,                                         &
+                                        dX_lon=this%X_lon,                                 &
+                                        dY_lat=this%Y_lat,                                 &
+                                        output_directory_name=this%output_directory_name )
 
   end subroutine model_initialize_GDD
 
@@ -1817,8 +1832,8 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call fog_monthly_grid_initialize( lActive=this%active, dX=this%X, dY=this%Y, &
-      dX_lon=this%X_lon , dY_lat=this%Y_lat )
+    call fog_monthly_grid_initialize( lActive=this%active, dX=this%X, dY=this%Y,                &
+      dX_lon=this%X_lon , dY_lat=this%Y_lat, output_directory_name=this%output_directory_name )
 
   end subroutine model_initialize_fog_monthly_grid
 
@@ -2030,6 +2045,8 @@ contains
 
     this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * FRAGMENT_VALUE * RAINFALL_ADJUST_FACTOR
     this%monthly_gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * RAINFALL_ADJUST_FACTOR
+
+    print *, "Rainfall for polygon 106237 = ", maxval(this%gross_precip, this%polygon_id == 106237 )
 
   end subroutine model_get_precip_method_of_fragments 
 

@@ -1,5 +1,5 @@
 !> @file
-!!  Contains a single module, @ref netcdf4_support, which
+!!  Contain a single module, @ref netcdf4_support, which
 !!  provides support for use of NetCDF files as input or output.
 !!
 !! Supports use of NetCDF files as input for time-varying,

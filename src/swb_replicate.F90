@@ -172,7 +172,7 @@ program swb_replicate
 
     enddo
   enddo    
-
+!
   do
 
     do iIndex=1, iCount

@@ -81,7 +81,9 @@ contains
 !               print *, col, row, pENTRY%pGrdBase%rData(col, row), pENTRY%pGrdNative%rData(col, row)
 
             if ( .not. ieee_is_nan( pENTRY%pGrdBase%rData(col, row) ) ) then
-              cells%pGrdOut%rData(col, row) = pENTRY%pGrdBase%rData(col, row)
+
+              if ( pENTRY%pGrdBase%rData(col, row) < NC_FILL_FLOAT )               &
+                cells%pGrdOut%rData(col, row) = pENTRY%pGrdBase%rData(col, row)
 
             endif
           enddo  

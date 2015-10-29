@@ -557,11 +557,11 @@ end function update_crop_coefficient_GDD_as_threshold
       GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )&
                                                 + GROWTH_STAGE_DOY( L_DOY_FALLOW, iIndex )
 
-      call LOGS%write("## Updating Kcb Date Values ##", iLinesAfter=1)
+      call LOGS%write("## Updating Kcb Date Values ##", iLinesAfter=1, lEcho=lFALSE )
       call LOGS%write("Landuse Code | Planting Date | End of 'ini' | End of 'dev' " &
-        //"| End of 'mid' | End of 'late' | End of 'fallow' ")
+        //"| End of 'mid' | End of 'late' | End of 'fallow' ", lEcho=lFALSE )
       call Logs%write("-------------|---------------|--------------|--------------" &
-        //"|--------------|---------------|-----------------")
+        //"|--------------|---------------|-----------------", lEcho=lFALSE )
 
       call LOGS%write( asCharacter( LANDUSE_CODE( iIndex ))//" | "                &
          //trim( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate() )//" | " &

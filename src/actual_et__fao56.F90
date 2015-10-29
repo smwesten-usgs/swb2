@@ -66,7 +66,6 @@ contains
 
     ! [ LOCALS ]
     real (kind=c_float)  :: Kcb
-    real (kind=c_float)  :: infiltration_minus_et
     real (kind=c_float)  :: depletion_amount
     real (kind=c_float)  :: p
     real (kind=c_float)  :: interim_soil_storage
@@ -80,8 +79,6 @@ contains
       actual_et = crop_etc
 
     else  
-
-      infiltration_minus_et = infiltration - crop_etc
 
       p = adjust_depletion_fraction_p( p_table_22=depletion_fraction_p,  &
                                        reference_et0=crop_etc )
