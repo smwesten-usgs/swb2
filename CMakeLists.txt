@@ -85,6 +85,8 @@ if ("${OS}" STREQUAL "win_x64" OR "${OS}" STREQUAL "win_x86")
   	                ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb_launch.exe ${CMAKE_INSTALL_PREFIX}/swb_launch.exe
   	                COMMAND
                     ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb_merge.exe ${CMAKE_INSTALL_PREFIX}/swb_merge.exe
+                    COMMAND
+                    ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb_replicate.exe ${CMAKE_INSTALL_PREFIX}/swb_replicate.exe                    
   	                )
 else()
   add_custom_target(copy 
@@ -94,6 +96,8 @@ else()
   	                ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb_launch ${CMAKE_INSTALL_PREFIX}/swb_launch
   	                COMMAND
                     ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb_merge ${CMAKE_INSTALL_PREFIX}/swb_merge
+                    COMMAND
+                    ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb_replicate ${CMAKE_INSTALL_PREFIX}/swb_replicate                    
   	                )
 endif()
 

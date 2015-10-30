@@ -747,10 +747,11 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine write_control_file( sFilename, sGridSpecification )
+  subroutine write_control_file( sFilename, sGridSpecification, sExtraDirective )
 
     character (len=*), intent(in)           :: sFilename
     character (len=*), intent(in), optional :: sGridSpecification
+    character (len=*), intent(in), optional :: sExtraDirective
 
     ! [ LOCALS ]
     character (len=256)             :: sRecord, sSubstring
@@ -763,14 +764,18 @@ contains
 
     call CF%open( sFilename = sFilename )
 
-    call CF_DICT%get_value(sText, "GRID")
-
     ! get GRID specification and move pointer past it; discard values
     if ( present( sGridSpecification ) ) then
+      call CF_DICT%get_value(sText, "GRID")
       pDict => CF_DICT%get_next_entry()
-      call assert( associated( pDict ), "INTERNAL PROGRAMMING ERROR -- Attmpted use of null poitner", &
+      call assert( associated( pDict ), "INTERNAL PROGRAMMING ERROR -- Attempted use of null poitner", &
         __FILE__, __LINE__ )
       call CF%writeLine( trim( sGridSpecification ) )
+    
+    else
+
+      pDict => CF_DICT%get_entry(1)
+
     endif  
 
     do while ( associated( pDict ) )
@@ -780,6 +785,9 @@ contains
       pDict => CF_DICT%get_next_entry()
 
     enddo 
+
+    if ( present( sExtraDirective ) )    &
+      call CF%writeLine( trim( sExtraDirective ) )
 
     call CF%close()      
 

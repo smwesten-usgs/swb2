@@ -8,8 +8,9 @@
 !> to the control_setModelOptions routine in module \ref control.
 program swb_replicate
 
-  use iso_c_binding, only    : c_short, c_int, c_float, c_double
+  use iso_c_binding, only         : c_short, c_int, c_float, c_double
   use constants_and_conversions
+  use exceptions, only            : assert
   use strings
   use dictionary
   use logfiles, only         : LOGS, LOG_DEBUG
@@ -34,23 +35,30 @@ program swb_replicate
   character (len=256)              :: sCompilerVersion     = ""
   character (len=256)              :: sVersionString       = ""
   character (len=256)              :: sGitHashString       = ""
-  integer (kind=c_int)             :: iCount
-  integer (kind=c_int)             :: iIndex, iIndex1, iIndex2
+  integer (kind=c_int)             :: iIndex, iCount
   integer (kind=c_int)             :: iLen
   integer (kind=c_int)             :: num_simulations
+  integer (kind=c_int)             :: active_simulations
   integer (kind=c_int)             :: max_num_simulations
   real (kind=c_float)              :: fCellSize
   character (len=64)               :: filename
   integer (kind=c_int)             :: loc_err, c_error_number
   character(len=:), allocatable    :: err_string
-
-  real (kind=c_float)              :: fUR_x, fUR_y, fLL_x, fLL_y
-  real (kind=c_float)              :: fLL_x1, fLL_y1
-
-  integer (kind=c_int)             :: iNX, iNY, iNX1, iNY1
   integer (kind=c_int)             :: status
-  integer (kind=c_int)             :: number_at_100
-  integer (kind=c_int)             :: number_uninitialized
+
+  logical, parameter               :: FALSE = .false.
+  logical, parameter               :: TRUE  = .true.
+
+  type RUN_DETAILS_T
+    integer (kind=c_int)    :: simulation_number
+    logical (kind=c_bool)   :: is_started          = FALSE
+    logical (kind=c_bool)   :: is_active           = FALSE
+    logical (kind=c_bool)   :: is_finished         = FALSE
+    real (kind=c_float)     :: percent_complete    = 0.0_c_float
+  end type RUN_DETAILS_T
+
+  type (RUN_DETAILS_T), allocatable   :: RUN_DETAILS(:)
+
 
   iNumArgs = COMMAND_ARGUMENT_COUNT()
 
@@ -68,6 +76,7 @@ program swb_replicate
   write(unit=*, fmt="(a,/)") repeat("-",iCount + 2)  
 
   max_num_simulations = omp_get_num_procs()
+  num_simulations = -9999
 
   if(iNumArgs == 0 ) then
 
@@ -102,8 +111,6 @@ program swb_replicate
   end if
 
   iCount = 0
-  number_at_100 = 0
-  number_uninitialized = 0
 
   do iIndex=1, iNumArgs
 
@@ -133,70 +140,108 @@ program swb_replicate
 
   call slControlFiles%clear()
 
-  
-      filename = "test_control_file_"//asCharacter(iCount)//".ctl"
+  call assert( num_simulations > 0, "ERROR - couldn't determine how many simulations to run.", &
+    __FILE__, __LINE__ )
 
-      call write_control_file( filename,                                            &
-        "GRID "//asCharacter(iNX1)//" "//asCharacter(iNY1)//" "                     &
-        //asCharacter( fLL_x1, 23, 9 )//" "//asCharacter(fLL_y1, 23, 9)             &
-        //" "//asCharacter( fCellsize, 14, 4 ) )
+  allocate (RUN_DETAILS( num_simulations ), stat=status )
+  call assert( status==0, "Problem allocating memory for RUN_DETAILS.", &
+    __FILE__, __LINE__ )
 
-      call mkdir( "tmp"//asCharacter( iCount ), loc_err )
+  iCount = num_simulations - 1
 
-      ! suppress error messages due to directory that already exists
-      if ( loc_err /= 0 ) then
-        c_error_number = get_libc_errno()
-        if ( c_error_number /= 0 .and. c_error_number /= 17 ) then
-          call get_libc_err_string( err_string, c_error_number )
-          write(*, fmt="(a, i0)") "call to 'mkdir' failed. err=", loc_err
-          write(*, fmt="(a,i0)") "libc errno=", c_error_number
-          write(*, fmt="(a)") "libc error msg: "//trim(err_string)
-        endif  
+  do iIndex=1, num_simulations
+
+    filename = "test_control_file_"//asCharacter( iIndex )//".ctl"
+
+    call write_control_file( sFilename=filename,                                       &
+      sExtraDirective="FRAGMENTS_SEQUENCE_SIMULATION_NUMBER "//asCharacter(iIndex) )
+
+    call mkdir( "tmp"//asCharacter( iIndex ), loc_err )
+
+    ! suppress error messages due to directory that already exists
+    if ( loc_err /= 0 ) then
+      c_error_number = get_libc_errno()
+      if ( c_error_number /= 0 .and. c_error_number /= 17 ) then
+        call get_libc_err_string( err_string, c_error_number )
+        write(*, fmt="(a, i0)") "call to 'mkdir' failed. err=", loc_err
+        write(*, fmt="(a,i0)") "libc errno=", c_error_number
+        write(*, fmt="(a)") "libc error msg: "//trim(err_string)
       endif  
+    endif  
 
-      call remove( "tmp"//asCharacter( iCount )//"/run_progress.txt", loc_err )
+    call remove( "tmp"//asCharacter( iIndex )//"/run_progress.txt", loc_err )
 
-      ! suppress error messages due to directory that already exists
-      if ( loc_err /= 0 ) then
-        c_error_number = get_libc_errno()
-        if ( c_error_number /= 0 .and. c_error_number /= 2 ) then
-          call get_libc_err_string( err_string, c_error_number )
-          write(*, fmt="(a, i0)") "call to 'remove' failed. err=", loc_err
-          write(*, fmt="(a,i0)") "libc errno=", c_error_number
-          write(*, fmt="(a)") "libc error msg: "//trim(err_string)
-        endif  
+    ! suppress error messages due to directory that already exists
+    if ( loc_err /= 0 ) then
+      c_error_number = get_libc_errno()
+      if ( c_error_number /= 0 .and. c_error_number /= 2 ) then
+        call get_libc_err_string( err_string, c_error_number )
+        write(*, fmt="(a, i0)") "call to 'remove' failed. err=", loc_err
+        write(*, fmt="(a,i0)") "libc errno=", c_error_number
+        write(*, fmt="(a)") "libc error msg: "//trim(err_string)
       endif  
+    endif  
 
-      call execute_command_line( "swb2 "//trim(filename)//" "//"tmp"//asCharacter( iCount )  &
-        //" > cmdlog"//asCharacter( iCount)//".md", wait=.false. )
-
-    enddo
   enddo    
-!
+
+active_simulations = 0
+
   do
 
-    do iIndex=1, iCount
-      filename = "tmp"//asCharacter(iCount)//"/run_progress.txt"
+!$omp parallel
+!$omp single
+
+    do iIndex=1, num_simulations
+
+      if (    active_simulations < max_num_simulations ) then
+     
+        if ( ( .not. RUN_DETAILS( iIndex )%is_started )               &
+          .and. ( .not. RUN_DETAILS( iIndex )%is_finished ) ) then
+          filename = "test_control_file_"//asCharacter( iIndex )//".ctl"
+
+          print *, "PING!!  ", iIndex
+          print *, filename
+
+          !$omp task 
+          call execute_command_line( "swb2 "//trim(filename)//" "//"tmp"//asCharacter( iIndex )  &
+            //" > cmdlog"//asCharacter( iIndex )//".md", wait=.false. )
+          !$omp end task
+
+          RUN_DETAILS( iIndex )%is_started = TRUE
+          RUN_DETAILS( iIndex )%is_active = TRUE
+        endif  
+      endif  
+
+      filename = "tmp"//asCharacter(iIndex)//"/run_progress.txt"
       open(unit=12, file=filename, iostat=status, action='READ')
       if ( status == 0 ) then
         read (12, fmt="(a)", iostat=status) sBuf
         !if ( status /= 0 ) cycle
-        if ( scan( sBuf, "Done") > 0 ) number_at_100 = number_at_100 + 1
+        if ( scan( sBuf, "Done") > 0 ) then
+          RUN_DETAILS( iIndex )%is_finished = TRUE
+          RUN_DETAILS( iIndex )%is_active = FALSE
+        endif
+
         close(unit=12, iostat=status )
         write(*,fmt="(a)" ) "Instance "//asCharacter(iIndex)//": "//trim(sBuf)
       else
-        write(*,fmt="(a)" ) "Instance "//asCharacter(iIndex)//": initializing"
+        write(*,fmt="(a)" ) "Instance "//asCharacter(iIndex)//": **********"
       endif
+
+      active_simulations = count( RUN_DETAILS%is_active )
+
     enddo
 
     write(*,fmt="(/)" ) 
 
-    if ( number_at_100 == iCount ) exit
-
     call sleep(10)
 
+ !$omp end single nowait
+
+!$omp end parallel
+ 
   enddo
-   
+  
   call LOGS%close()
 
 end program swb_replicate
