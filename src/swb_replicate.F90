@@ -42,6 +42,11 @@ program swb_replicate
   integer (kind=c_int)             :: max_num_simulations
   real (kind=c_float)              :: fCellSize
   character (len=64)               :: filename
+  character (len=64)               :: filename_bash
+  character (len=64)               :: filename_batch  
+  character (len=1024)             :: command_line_bash
+  character (len=1024)             :: command_line_batch
+  character (len=256)              :: dirname
   integer (kind=c_int)             :: loc_err, c_error_number
   character(len=:), allocatable    :: err_string
   integer (kind=c_int)             :: status
@@ -74,9 +79,6 @@ program swb_replicate
   write(UNIT=*,FMT="(a)") trim( sVersionString )
   write(UNIT=*,FMT="(a)") trim( sGitHashString )  
   write(unit=*, fmt="(a,/)") repeat("-",iCount + 2)  
-
-  max_num_simulations = omp_get_num_procs()
-  num_simulations = -9999
 
   if(iNumArgs == 0 ) then
 
@@ -111,6 +113,8 @@ program swb_replicate
   end if
 
   iCount = 0
+  num_simulations = -9999
+  max_num_simulations = omp_get_num_procs()
 
   do iIndex=1, iNumArgs
 
@@ -125,6 +129,8 @@ program swb_replicate
       iCount = iCount + 1
       if ( iCount == 1 ) then
         num_simulations = asInt(sBuf)
+      elseif ( iCount == 2 ) then
+        max_num_simulations = asInt(sBuf)
       endif    
 
     endif  
@@ -148,17 +154,24 @@ program swb_replicate
     __FILE__, __LINE__ )
 
   iCount = num_simulations - 1
+  command_line_batch = "nces.exe"
+  command_line_bash = "nces"  
 
   do iIndex=1, num_simulations
+   
+    dirname = "temp"//asCharacter( iIndex )
 
-    call sleep(2)
+!    call sleep(1)
 
-    filename = "test_control_file_"//asCharacter( iIndex )//".ctl"
+    filename = "temp_control_file_"//asCharacter( iIndex )//".ctl"
+
+    command_line_bash = trim(command_line_bash)//" "//trim( dirname )//"/${FILENAME}"
+    command_line_batch = trim(command_line_batch)//" "//trim( dirname )//"/%FILENAME%"    
 
     call write_control_file( sFilename=filename,                                       &
       sExtraDirective="FRAGMENTS_SEQUENCE_SIMULATION_NUMBER "//asCharacter(iIndex) )
 
-    call mkdir( "tmp"//asCharacter( iIndex ), loc_err )
+    call mkdir( trim( dirname ), loc_err )
 
     ! suppress error messages due to directory that already exists
     if ( loc_err /= 0 ) then
@@ -171,7 +184,7 @@ program swb_replicate
       endif  
     endif  
 
-    call remove( "tmp"//asCharacter( iIndex )//"/run_progress.txt", loc_err )
+    call remove( trim( dirname )//"/run_progress.txt", loc_err )
 
     ! suppress error messages due to directory that already exists
     if ( loc_err /= 0 ) then
@@ -186,12 +199,10 @@ program swb_replicate
 
   enddo    
 
-  active_simulations = 0
-
-  do
-
 !$omp parallel
 !$omp single
+
+  do
 
     do iIndex=1, num_simulations
 
@@ -199,23 +210,25 @@ program swb_replicate
      
         if ( ( .not. RUN_DETAILS( iIndex )%is_started )               &
           .and. ( .not. RUN_DETAILS( iIndex )%is_finished ) ) then
-          filename = "test_control_file_"//asCharacter( iIndex )//".ctl"
+          filename = "temp_control_file_"//asCharacter( iIndex )//".ctl"
 
           print *, "PING!!  ", iIndex
           print *, filename
 
           !$omp task firstprivate( filename, iIndex )
-          call execute_command_line( "swb2 "//trim(filename)//" "//"tmp"//asCharacter( iIndex )  &
+          call execute_command_line( "swb2 "//trim(filename)//" "//"temp"//asCharacter( iIndex )  &
             //" > cmdlog"//asCharacter( iIndex )//".md", wait=.false. )
           !$omp end task
 
           RUN_DETAILS( iIndex )%is_started = TRUE
           RUN_DETAILS( iIndex )%is_active = TRUE
         endif  
+      
       endif  
 
-      filename = "tmp"//asCharacter(iIndex)//"/run_progress.txt"
+      filename = "temp"//asCharacter(iIndex)//"/run_progress.txt"
       open(unit=12, file=filename, iostat=status, action='READ')
+
       if ( status == 0 ) then
         read (12, fmt="(a)", iostat=status) sBuf
         !if ( status /= 0 ) cycle
@@ -241,13 +254,23 @@ program swb_replicate
     write(*,fmt="(/)" ) 
 
     call sleep(10)
-
- !$omp end single nowait
-
-!$omp end parallel
  
   enddo
+
+!$omp end single nowait
+!$omp end parallel
   
   call LOGS%close()
+
+  open( unit=14, file="nco_average.bat", action='WRITE', iostat=status )
+  write (14, fmt="(a)" ) "set FILENAME=%%1"
+  write (14, "(a)" ) command_line_batch
+  close(14)
+
+  open( unit=14, file="nco_average.sh", action='WRITE', iostat=status )
+  write (14, fmt="(a)" ) "#!/bin/sh"
+  write (14, fmt="(a)" ) 'FILENAME="$1"'
+  write (14, "(a)" ) command_line_bash
+  close(14)
 
 end program swb_replicate
