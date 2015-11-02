@@ -1,10 +1,14 @@
-# Control File Directives {#appendix_2_control_file_directives_original_swb}
+## Control File Directives {#appendix_2_control_file_directives_original_swb}
 
 [TOC]
 
 This section provides a complete list of the control file statements understood by SWB, version 1.x. 
 
-# Control File Directives: Gridded Datasets
+### Project Setup and Grid Specification
+
+GRID *NX* *NY* *X0* *Y0* *Cell_size*
+
+### Gridded Datasets
 
 For each of the three major climate datasets (precipiration, minimum and maximum air temperature), a standard set of suffixes may be added to the dataset name to control how SWB treats the dataset. The list of suffixes understood by SWB is long:
 

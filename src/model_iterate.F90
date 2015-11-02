@@ -32,8 +32,6 @@ contains
     real (kind=c_float)   :: progress
     integer (kind=c_int)  :: progress_int
 
-    call PROGRESS_FILE%open( sFilename=trim( OUTPUT_DIRECTORY_NAME )//"run_progress.txt", lQuiet=lTRUE )
-
     do while ( SIM_DT%curr <= SIM_DT%end )
 
       call LOGS%write("Calculating: "//SIM_DT%curr%prettydate(), iLogLevel=LOG_ALL, lEcho=.true._c_bool )
@@ -48,6 +46,7 @@ contains
 
       progress_txt = "|"//repeat("-", progress_int)//repeat(" ", 50 - progress_int)//"| " &
         //asCharacter( int(progress) )//"%"
+
       call PROGRESS_FILE%open( sFilename=trim( OUTPUT_DIRECTORY_NAME )//"run_progress.txt", lQuiet=lTRUE )
       call PROGRESS_FILE%writeLine( sText= progress_txt )
       call PROGRESS_FILE%close()
@@ -57,11 +56,9 @@ contains
     enddo 
 
     progress_txt = "Done."
-    call PROGRESS_FILE%open( sFIlename=trim( OUTPUT_DIRECTORY_NAME )//"run_progress.txt", lQuiet=lTRUE )
+    call PROGRESS_FILE%open( sFilename=trim( OUTPUT_DIRECTORY_NAME )//"run_progress.txt", lQuiet=lTRUE )
     call PROGRESS_FILE%writeLine( sText= progress_txt )
     call PROGRESS_FILE%close()
-
-
 
   end subroutine iterate_over_simulation_days
 

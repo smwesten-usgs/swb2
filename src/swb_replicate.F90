@@ -151,6 +151,8 @@ program swb_replicate
 
   do iIndex=1, num_simulations
 
+    call sleep(2)
+
     filename = "test_control_file_"//asCharacter( iIndex )//".ctl"
 
     call write_control_file( sFilename=filename,                                       &
@@ -184,7 +186,7 @@ program swb_replicate
 
   enddo    
 
-active_simulations = 0
+  active_simulations = 0
 
   do
 
@@ -202,7 +204,7 @@ active_simulations = 0
           print *, "PING!!  ", iIndex
           print *, filename
 
-          !$omp task 
+          !$omp task firstprivate( filename, iIndex )
           call execute_command_line( "swb2 "//trim(filename)//" "//"tmp"//asCharacter( iIndex )  &
             //" > cmdlog"//asCharacter( iIndex )//".md", wait=.false. )
           !$omp end task
@@ -225,7 +227,11 @@ active_simulations = 0
         close(unit=12, iostat=status )
         write(*,fmt="(a)" ) "Instance "//asCharacter(iIndex)//": "//trim(sBuf)
       else
-        write(*,fmt="(a)" ) "Instance "//asCharacter(iIndex)//": **********"
+        if ( RUN_DETAILS( iIndex )%is_started ) then
+          write(*,fmt="(a)" ) "Instance "//asCharacter(iIndex)//": started"
+        else
+          write(*,fmt="(a)" ) "Instance "//asCharacter(iIndex)//": **********"
+        endif  
       endif
 
       active_simulations = count( RUN_DETAILS%is_active )
