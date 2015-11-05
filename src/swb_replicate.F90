@@ -44,12 +44,14 @@ program swb_replicate
   character (len=64)               :: filename
   character (len=64)               :: filename_bash
   character (len=64)               :: filename_batch  
+  character (len=64)               :: landuse_filename, lu_prefix, lu_suffix
   character (len=1024)             :: command_line_bash
   character (len=1024)             :: command_line_batch
   character (len=256)              :: dirname
   integer (kind=c_int)             :: loc_err, c_error_number
   character(len=:), allocatable    :: err_string
   integer (kind=c_int)             :: status
+  type (STRING_LIST_T)             :: string_list
 
   logical, parameter               :: FALSE = .false.
   logical, parameter               :: TRUE  = .true.
@@ -102,7 +104,7 @@ program swb_replicate
       //TRIM(int2char(__G95_MINOR__))
 #endif
 
-    write(UNIT=*,FMT="(/,/,a,/)")    "Usage: swb_replicate [control file name] [num simulations]"
+    write(UNIT=*,FMT="(/,/,a,/)")    "Usage: swb_replicate [control file name] [num simulations] [maximum number of processors to use]"
     write(UNIT=*,FMT="(a)")          "swb_replicate takes a swb control file and runs the model 'num simulation' times"
     write(UNIT=*,FMT="(a,/)")        "with each launched as a separate process."
     write(UNIT=*,FMT="(a)")          "The only use currently for 'swb_replicate' is to allow multiple runs to be made"
@@ -127,9 +129,12 @@ program swb_replicate
     else
 
       iCount = iCount + 1
+
       if ( iCount == 1 ) then
-        num_simulations = asInt(sBuf)
+        landuse_filename = trim(sBuf)
       elseif ( iCount == 2 ) then
+        num_simulations = asInt(sBuf)
+      elseif ( iCount == 3 ) then
         max_num_simulations = asInt(sBuf)
       endif    
 
@@ -153,6 +158,9 @@ program swb_replicate
   call assert( status==0, "Problem allocating memory for RUN_DETAILS.", &
     __FILE__, __LINE__ )
 
+  lu_prefix = landuse_filename( 1:scan(landuse_filename, "#")-1 )
+  lu_suffix = landuse_filename( scan(landuse_filename, "#", back=TRUE)+1: len_trim(landuse_filename) )
+
   iCount = num_simulations - 1
   command_line_batch = "nces.exe"
   command_line_bash = "nces"  
@@ -168,8 +176,12 @@ program swb_replicate
     command_line_bash = trim(command_line_bash)//" "//trim( dirname )//"/${FILENAME}"
     command_line_batch = trim(command_line_batch)//" "//trim( dirname )//"/%FILENAME%"    
 
-    call write_control_file( sFilename=filename,                                       &
-      sExtraDirective="FRAGMENTS_SEQUENCE_SIMULATION_NUMBER "//asCharacter(iIndex) )
+    call string_list%append( "FRAGMENTS_SEQUENCE_SIMULATION_NUMBER "//asCharacter(iIndex) )
+    call string_list%append( "LAND_USE ARC_GRID "//trim( lu_prefix )//asCharacter( iIndex )//"."//trim( lu_suffix) )
+
+    call write_control_file( sFilename=filename, slExtraDirectives=string_list )
+
+    call string_list%clear()
 
     call mkdir( trim( dirname ), loc_err )
 
@@ -255,6 +267,8 @@ program swb_replicate
 
     call sleep(10)
  
+    if ( all( RUN_DETAILS%is_finished ) ) exit
+
   enddo
 
 !$omp end single nowait

@@ -747,16 +747,18 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine write_control_file( sFilename, sGridSpecification, sExtraDirective )
+  subroutine write_control_file( sFilename, sGridSpecification, slExtraDirectives )
 
-    character (len=*), intent(in)           :: sFilename
-    character (len=*), intent(in), optional :: sGridSpecification
-    character (len=*), intent(in), optional :: sExtraDirective
+    character (len=*), intent(in)              :: sFilename
+    character (len=*), intent(in), optional    :: sGridSpecification
+    type (STRING_LIST_T), intent(in), optional :: slExtraDirectives
 
     ! [ LOCALS ]
     character (len=256)             :: sRecord, sSubstring
     character (len=:), allocatable  :: sText
     integer (kind=c_int)            :: iStat
+    integer (kind=c_int)            :: iIndex
+    integer (kind=c_int)            :: iCount
     type (ASCII_FILE_T)             :: CF
     type (DICT_ENTRY_T), pointer    :: pDict
 
@@ -786,8 +788,17 @@ contains
 
     enddo 
 
-    if ( present( sExtraDirective ) )    &
-      call CF%writeLine( trim( sExtraDirective ) )
+    if ( present( slExtraDirectives ) ) then
+
+      iCount = slExtraDirectives%count
+
+      do iIndex=1, iCount
+
+        call CF%writeLine( trim( slExtraDirectives%get( iIndex ) ) )
+
+      enddo  
+
+    endif  
 
     call CF%close()      
 
