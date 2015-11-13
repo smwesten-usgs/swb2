@@ -7,11 +7,11 @@ module polygon_summarize
   use strings
   implicit none
 
-  integer (kind=c_int), parameter :: POLY_ID(6) = [ 106237, 113173, 149096, 152055, 185678, 188491 ]
+  integer (kind=c_int), parameter :: POLY_ID(6) = [ 78730, 84845, 84922, 96129, 110609, 123402 ]
 
-  enum, bind(c)
-    enumerator :: POLY_1=1, POLY_2, POLY_3, POLY_4
-  end enum 
+  ! enum, bind(c)
+  !   enumerator :: POLY_1=1, POLY_2, POLY_3, POLY_4
+  ! end enum 
 
   integer (kind=c_int)         :: LU(4)
   character (len=1), parameter :: TAB = achar(9)

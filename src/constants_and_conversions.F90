@@ -191,6 +191,7 @@ type T_CELL
   public :: char_ptr_to_fortran_string
   public :: c_to_fortran_string
   public :: fortran_to_c_string
+  public :: is_numeric
 
   real (kind=c_float), parameter  :: TOLERANCE_FLOAT = 1.0e-6_c_float
   real (kind=c_double), parameter :: TOLERANCE_DOUBLE = 1.0e-9_c_double
@@ -247,6 +248,28 @@ contains
 
   end function approx_equal_double_double
 
+!--------------------------------------------------------------------------
+
+  !> Determine if string contains numeric values.
+  !! @param[in]  degrees     String value.
+  !! @retval     is_numeric  True if any numeric values are present in the string.
+
+  logical ( kind=c_bool ) elemental function is_numeric( value ) 
+
+    character (len=*), intent(in)    :: value
+
+    ! [ LOCALS ]
+    character (len=256) :: sbuf
+
+    sbuf = keepnumeric( value )
+
+    if ( len_trim( sbuf ) == 0 ) then
+      is_numeric = lFALSE
+    else
+      is_numeric = lTRUE
+    endif
+
+  end function is_numeric
 
 !--------------------------------------------------------------------------
 

@@ -23,7 +23,7 @@ module irrigation
 
   private 
 
-  public :: irrigation__initialize, irrigation__calculate
+  public :: irrigation__initialize, irrigation__calculate, irrigation__output_schedule_values
 
   enum, bind(c)
     enumerator :: APP_NONE=0, APP_FIELD_CAPACITY, APP_DEFINED_DEFICIT, APP_CONSTANT_AMOUNT, &
@@ -228,31 +228,6 @@ contains
 
     allocate( APPLICATION_METHOD_CODE( sl_application_method%count ), stat=status )
     call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
-
-    call LOGS%write(" ## Initializing irrigation application rules ##", iLinesBefore=1, &
-      iLinesAfter=1, iLogLevel=LOG_ALL )
-
-    do index = 1, sl_application_method%count
-
-      str_buffer = sl_application_method%get( index )
-
-      if ( str_buffer .contains. "capacity") then
-        APPLICATION_METHOD_CODE( index ) = APP_FIELD_CAPACITY
-      elseif ( str_buffer .contains. "deficit") then
-        APPLICATION_METHOD_CODE( index ) = APP_DEFINED_DEFICIT
-      elseif ( str_buffer .contains. "constant") then
-        APPLICATION_METHOD_CODE( index ) = APP_CONSTANT_AMOUNT
-      elseif ( str_buffer .contains. "demand") then
-        APPLICATION_METHOD_CODE( index ) = APP_HWB_DEMAND_BASED        
-      else
-        APPLICATION_METHOD_CODE( index ) = APP_NONE
-      endif
-
-      call LOGS%write("  landuse "//asCharacter( landuse_table_codes( index ) )//": " &
-        //trim(APP_OPTION_NAME( APPLICATION_METHOD_CODE( index ) ) ), iLogLevel=LOG_ALL )
-
-    enddo  
-
  
     !> retrieve application amount. not used if "field capacity" option is active.
     !! value represents deficit fraction or constant amount depending on application option active.
@@ -318,14 +293,19 @@ contains
         //" that irrigation is applied *every* day [default].",                           &
         sModule=__FILE__, iLine=__LINE__, lEcho=.true._c_bool, iLogLevel=LOG_ALL )
 
-      MONTHLY_IRRIGATION_SCHEDULE = 1
+      MONTHLY_IRRIGATION_SCHEDULE = 1_c_int
 
     else
+
+      MONTHLY_IRRIGATION_SCHEDULE = 0_c_int
+
       do index=1, number_of_landuse_codes
         temp_str = sl_monthly_irrigation_schedule%get( index )
-        do i=1, ubound(MONTHLY_IRRIGATION_SCHEDULE, 2)
-          MONTHLY_IRRIGATION_SCHEDULE( index, i ) = asInt( temp_str(i:i) )
-        enddo  
+        if ( is_numeric( temp_str ) ) then
+          do i=1, ubound(MONTHLY_IRRIGATION_SCHEDULE, 2)
+            MONTHLY_IRRIGATION_SCHEDULE( index, i ) = asInt( temp_str(i:i) )
+          enddo  
+        endif  
       enddo  
     endif  
 
@@ -364,7 +344,45 @@ contains
 
     endif
 
+    call LOGS%write(" ## Initializing irrigation application rules and application schedules ##", iLinesBefore=1, &
+      iLinesAfter=1, iLogLevel=LOG_ALL )
+
+    do index = 1, sl_application_method%count
+
+      str_buffer = sl_application_method%get( index )
+
+      if ( str_buffer .contains. "capacity") then
+        APPLICATION_METHOD_CODE( index ) = APP_FIELD_CAPACITY
+      elseif ( str_buffer .contains. "deficit") then
+        APPLICATION_METHOD_CODE( index ) = APP_DEFINED_DEFICIT
+      elseif ( str_buffer .contains. "constant") then
+        APPLICATION_METHOD_CODE( index ) = APP_CONSTANT_AMOUNT
+      elseif ( str_buffer .contains. "demand") then
+        APPLICATION_METHOD_CODE( index ) = APP_HWB_DEMAND_BASED        
+      else
+        APPLICATION_METHOD_CODE( index ) = APP_NONE
+      endif
+
+
+      call LOGS%write("  landuse "//asCharacter( landuse_table_codes( index ) )//": " &
+        //trim(APP_OPTION_NAME( APPLICATION_METHOD_CODE( index ) ) ), iLogLevel=LOG_ALL )
+
+      print *, __FILE__, ": ", __LINE__, index, MONTHLY_IRRIGATION_SCHEDULE( index, : )
+
+    enddo  
+
   end subroutine irrigation__initialize
+
+!--------------------------------------------------------------------------------------------------  
+
+  function irrigation__output_schedule_values( landuse_index )  result( values )
+
+    integer (kind=c_int), intent(in)   :: landuse_index
+    integer (kind=c_int)               :: values(31)
+
+    values = MONTHLY_IRRIGATION_SCHEDULE( landuse_index, : )
+
+  end function irrigation__output_schedule_values  
 
 !--------------------------------------------------------------------------------------------------  
 
@@ -478,7 +496,7 @@ contains
 
             if (present( monthly_runoff ) .and. present( monthly_rainfall ) ) then
 
-              irrigation_days_per_month = sum( MONTHLY_IRRIGATION_SCHEDULE( landuse_index, : ) )
+              irrigation_days_per_month = count( MONTHLY_IRRIGATION_SCHEDULE( landuse_index, 1:days_in_month ) == 1 )
 
               if ( irrigation_days_per_month <= 0 ) then
                 interim_irrigation_amount = 0.0_c_float

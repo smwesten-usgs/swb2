@@ -1470,6 +1470,9 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
+    ! [ LOCALS ]
+    integer (kind=c_int) :: index
+
     if ( allocated( this%monthly_gross_precip ) .and. allocated( this%monthly_runoff ) ) then
 
       call irrigation__calculate( irrigation_amount=this%irrigation,                             &
@@ -1497,6 +1500,12 @@ contains
                                   irrigation_mask=this%irrigation_mask,                          &
                                   num_days_since_planting=this%number_of_days_since_planting )
     endif
+
+    do index=1, maxval( this%landuse_index )
+
+      print *, "irr sched. for LU_index ", index, irrigation__output_schedule_values( index )
+
+    enddo  
 
   end subroutine model_calculate_irrigation
 
@@ -2045,8 +2054,6 @@ contains
 
     this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * FRAGMENT_VALUE * RAINFALL_ADJUST_FACTOR
     this%monthly_gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * RAINFALL_ADJUST_FACTOR
-
-    print *, "Rainfall for polygon 106237 = ", maxval(this%gross_precip, this%polygon_id == 106237 )
 
   end subroutine model_get_precip_method_of_fragments 
 
