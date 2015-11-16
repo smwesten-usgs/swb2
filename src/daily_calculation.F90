@@ -76,6 +76,11 @@ contains
         interception=cells%interception,                                                   &
         reference_et0=cells%reference_et0 )
 
+    ! modify the surface storage in inches as if the amount calculated for the impervious area
+    ! were to be redistributed uniformly over the total area of the cell
+    cells%surface_storage_excess = cells%surface_storage_excess * ( 1.0_c_float - cells%pervious_fraction )        &
+                                                  / cells%pervious_fraction                             
+
 
     ! call to calc_routing also triggers an embedded call to calc_runoff
     ! NOTE: only way for "runon" to be positive is if D8 flow routing 
@@ -83,6 +88,8 @@ contains
     call cells%calc_routing()
 
     ! inflow calculated over the entire cell (pervious + impervious) area
+    ! surface_storage_excess is commented out because it represents an *internal* transfer of water, 
+    ! it is not a true 'inflow' in sense that water is crossing the cell boundary
     cells%inflow = cells%runon                                                                       &
                    + cells%rainfall                                                                  &
                    + cells%fog                                                                       &
@@ -103,8 +110,7 @@ contains
                      cells%runon                                                                     &
                    + cells%rainfall                                                                  &
                    + cells%fog                                                                       &
-                   + cells%surface_storage_excess * ( 1.0_c_float - cells%pervious_fraction )        &
-                                                  / cells%pervious_fraction                          &
+                   + cells%surface_storage_excess                                                    &
                    + cells%snowmelt                                                                  &
                    - cells%interception                                                              &
                    + cells%irrigation                                                                &
@@ -128,15 +134,23 @@ contains
     ! reporting of potential recharge and irrigation must be adjusted to account for zero
     ! irrigation and potential recharge associated with the impervious areas
 
-    cells%potential_recharge = cells%potential_recharge * cells%pervious_fraction
+!    cells%potential_recharge = cells%potential_recharge * cells%pervious_fraction
 
     call cells%calc_direct_recharge()
     
     ! reporting of potential recharge and irrigation must be adjusted to account for zero
     ! irrigation and potential recharge associated with the impervious areas
-    cells%potential_recharge = cells%potential_recharge * cells%pervious_fraction     &
-                              + cells%direct_recharge
 
+    !
+    ! ***** John, check the calculation below please...it seems that we were multiplying the calculated 
+    ! potential recharge by the pervious fraction *twice*
+    !
+    ! OLD CALCULATION:
+    ! line 133: cells%potential_recharge = cells%potential_recharge * cells%pervious_fraction
+    ! line 146: cells%potential_recharge = cells%potential_recharge * cells%pervious_fraction + cells%direct_recharge
+
+    ! modify potential recharge and irrigation terms 
+    cells%potential_recharge = cells%potential_recharge * cells%pervious_fraction + cells%direct_recharge
     cells%irrigation = cells%irrigation * cells%pervious_fraction
 
 
