@@ -78,8 +78,12 @@ contains
 
     ! modify the surface storage in inches as if the amount calculated for the impervious area
     ! were to be redistributed uniformly over the total area of the cell
-    cells%surface_storage_excess = cells%surface_storage_excess * ( 1.0_c_float - cells%pervious_fraction )        &
-                                                  / cells%pervious_fraction                             
+    cells%surface_storage_excess = cells%surface_storage_excess * ( 1.0_c_float - cells%pervious_fraction )  
+
+!                                                  / cells%pervious_fraction                             
+
+! ***** NOTE: removed the division by pervious_fraction; original code does not appear to divide by pervious fraction
+!             ( see line 2090, HI_WB_3_3.f )
 
 
     ! call to calc_routing also triggers an embedded call to calc_runoff

@@ -503,7 +503,7 @@ contains
               else  
                 interim_irrigation_amount = max( 0.0_c_float,    &
                 ( crop_etc * real( days_in_month, kind=c_float) + monthly_runoff - monthly_rainfall ) )  &
-                  / irrigation_days_per_month
+                  / real( irrigation_days_per_month, kind=c_float )
               endif
 
             else

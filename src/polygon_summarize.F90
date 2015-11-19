@@ -7,7 +7,8 @@ module polygon_summarize
   use strings
   implicit none
 
-  integer (kind=c_int), parameter :: POLY_ID(6) = [ 78730, 84845, 84922, 96129, 110609, 123402 ]
+  !integer (kind=c_int), parameter :: POLY_ID(6) = [ 78730, 84845, 84922, 96129, 110609, 123402,  &
+   integer (kind=c_int), parameter :: POLY_ID(5) = [ 185678, 152055, 149096, 113173, 106237 ]
 
   ! enum, bind(c)
   !   enumerator :: POLY_1=1, POLY_2, POLY_3, POLY_4
