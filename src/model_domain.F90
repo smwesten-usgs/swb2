@@ -1501,12 +1501,6 @@ contains
                                   num_days_since_planting=this%number_of_days_since_planting )
     endif
 
-    do index=1, maxval( this%landuse_index )
-
-      print *, "irr sched. for LU_index ", index, irrigation__output_schedule_values( index )
-
-    enddo  
-
   end subroutine model_calculate_irrigation
 
 !--------------------------------------------------------------------------------------------------

@@ -367,8 +367,6 @@ contains
       call LOGS%write("  landuse "//asCharacter( landuse_table_codes( index ) )//": " &
         //trim(APP_OPTION_NAME( APPLICATION_METHOD_CODE( index ) ) ), iLogLevel=LOG_ALL )
 
-      print *, __FILE__, ": ", __LINE__, index, MONTHLY_IRRIGATION_SCHEDULE( index, : )
-
     enddo  
 
   end subroutine irrigation__initialize
