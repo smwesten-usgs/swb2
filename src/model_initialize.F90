@@ -1008,6 +1008,11 @@ contains
               iDataType=iDataType )
             lGridPresent = lTRUE
 
+          elseif ( sArgText_1 .strequal. "TABLE" ) then
+
+
+            ! add code to get the table header name and table values
+
           else
 
             call warn( "Did not find a valid "//dquote(sKey)//" option. Value supplied was: "//dquote(sArgText_1), &

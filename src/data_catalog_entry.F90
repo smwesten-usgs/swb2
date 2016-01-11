@@ -950,7 +950,7 @@ end subroutine set_constant_value_real
 
           iLen=len_trim(sNewFilename)
           sNewFilename = sNewFilename(1:iPos_BF - 1)//trim(sBuf) &
-                         //sNewFilename(iPos_BF + 2:iLen)                         
+                         //sNewFilename( ( iPos_BF + len_trim(sBuf) - 1):iLen)                         
 
         endif
 
