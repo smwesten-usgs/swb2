@@ -4,16 +4,14 @@ set(CMAKE_FIND_LIBRARY_PREFIXES "lib")
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" ".a")
 
 find_program( R_SCRIPT Rscript.exe Rscript
-    HINTS
-    ENV R_HOME
-	${PATH_TO_R}
     PATHS
+    ${PATH_TO_R}
     "c:/Program Files/R"
     "c:/Program Files/R/R-3.0.1/bin"
     "/usr/bin"
 )
 
-include_directories( ${SWB_INCPATH} "${PROJECT_SOURCE_DIR}/src/proj4")
+include_directories( ${INC_PATH} "${PROJECT_SOURCE_DIR}/src/proj4")
 
 if ("${OS}" STREQUAL "win_x64" OR "${OS}" STREQUAL "win_x86")
 
@@ -47,35 +45,29 @@ message("MOD: LIB_PATH = ${LIB_PATH}")
 find_library(LIBZ
         NAMES z libz libz.a libz.dylib
         PATHS
-        /usr/local/opt/zlib/lib
+        ${LIBZ_PATH}
         ${LIB_PATH}
         NO_CMAKE_SYSTEM_PATH )
-
-# libsz is a non-free library; avoid linking to it if possible
-
-#find_library(LIBSZ
-#        NAMES sz libsz libsz.a
-#        PATHS
-#        /usr/local/opt/szip/lib
-#        ${SWB_LIBPATH}
-#        ${LIB_PATH} )
 
 find_library(LIBNETCDF
         NAMES netcdf libnetcdf libnetcdf.a
         PATHS
         ${LIB_PATH}
+        /share/apps/gcc/${COMPILER_VERSION}/lib
         NO_CMAKE_SYSTEM_PATH )
 
 find_library(LIBHDF5
         NAMES hdf5 libhdf5 libhdf5.a
         PATHS
         /usr/local/opt/hdf5/lib
+        /share/apps/gcc/${COMPILER_VERSION}/lib
         ${LIB_PATH}
         NO_CMAKE_SYSTEM_PATH )
 
 find_library(LIBHDF5_HL
         NAMES hdf5_hl libhdf5_hl libhdf5_hl.a
         PATHS /usr/local/opt/hdf5/lib
+        /share/apps/gcc/${COMPILER_VERSION}/lib
         ${LIB_PATH}
         NO_CMAKE_SYSTEM_PATH )
 
@@ -124,11 +116,15 @@ find_library(LIBCURL
 find_library(LIBGCC
         NAMES gcc libgcc libgcc.a
         PATHS
-        ${LIB_PATH} )
+        ${LIB_PATH}
+        /share/apps/gcc/${COMPILER_VERSION}/lib
+        )
 
 find_library(LIBGFORTRAN
         NAMES gfortran libgfortran libgfortran.a
-        PATHS ${LIB_PATH} )
+        PATHS ${LIB_PATH}
+        /share/apps/gcc/${COMPILER_VERSION}/lib
+        )
 
 set( EXTERNAL_LIBS ${LIBNETCDF} ${LIBHDF5_HL} ${LIBHDF5} ${LIBMFHDF} ${LIBDF} ${LIBJPEG} ${LIBPORTABLEXDR}
                    ${LIBCURL} ${LIBZ}
