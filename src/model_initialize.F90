@@ -1070,6 +1070,16 @@ contains
 
           call pENTRY%set_PROJ4( trim(sArgText) )
 
+
+        elseif ( index( string=sCmdText, substring="_DATE_COLUMN" ) > 0 ) then
+
+          pENTRY%sDateColumnName = trim( sArgText_1 )
+
+        elseif ( index( string=sCmdText, substring="_VALUE_COLUMN" ) > 0 ) then
+
+          pENTRY%sValueColumnName = trim( sArgText_1 )
+
+
         elseif ( index( string=sCmdText, substring="_MINIMUM_ALLOWED_VALUE" ) > 0 ) then
 
           pENTRY%rMinAllowedValue = asFloat(sArgText_1)

@@ -39,6 +39,9 @@ module data_catalog_entry
     character (len=256)       :: sSourceFilename      ! e.g. 1980_00_prcp.nc
     character (len=256)       :: sFilenameTemplate
     character (len=256)       :: sOldFilename        
+    character (len=256)       :: sDateColumnName
+    character (len=256)       :: sValueColumnName
+
     integer (kind=c_int)      :: iFileCount = -1
     integer (kind=c_int)      :: iFileCountYear = -9999
     real (kind=c_float)       :: rMinAllowedValue = -rBIGVAL     ! default condition is to impose

@@ -52,6 +52,7 @@ find_library(LIBZ
 find_library(LIBNETCDF
         NAMES netcdf libnetcdf libnetcdf.a
         PATHS
+        ${LIBNETCDF_PATH}
         ${LIB_PATH}
         /share/apps/gcc/${COMPILER_VERSION}/lib
         NO_CMAKE_SYSTEM_PATH )
@@ -60,97 +61,59 @@ find_library(LIBHDF5
         NAMES hdf5 libhdf5 libhdf5.a
         PATHS
         /usr/local/opt/hdf5/lib
-        /share/apps/gcc/${COMPILER_VERSION}/lib
+        ${LIBHDF5_PATH}
         ${LIB_PATH}
         NO_CMAKE_SYSTEM_PATH )
 
 find_library(LIBHDF5_HL
         NAMES hdf5_hl libhdf5_hl libhdf5_hl.a
         PATHS /usr/local/opt/hdf5/lib
-        /share/apps/gcc/${COMPILER_VERSION}/lib
+        ${LIBHDF5_PATH}
         ${LIB_PATH}
         NO_CMAKE_SYSTEM_PATH )
-
-# the following only needed to link to an HDF4 enabled NetCDF
-
-#find_library(LIBDF
-#        NAMES df libdf libdf.a
-#        PATHS
-#        /usr/local/opt/mfhdf/lib
-#        ${LIB_PATH}
-#        NO_CMAKE_SYSTEM_PATH )
-
-#find_library(LIBPORTABLEXDR
-#        NAMES portablexdr libportablexdr libportablexdr.a
-#        PATHS
-#        /usr/local/opt/portablexdr/lib
-#        ${LIB_PATH}
-#        NO_CMAKE_SYSTEM_PATH )
-
-#find_library(LIBMFHDF
-#        NAMES mfhdf libmfhdf libmfhdf.a
-#        PATHS
-#        /usr/local/opt/mfhdf/lib
-#        ${LIB_PATH}
-#        NO_CMAKE_SYSTEM_PATH )
 
 find_library(LIBCURL
         NAMES curl libcurl libcurl.a libcurl.dylib
-        PATHS /usr/local/opt/curl/lib
+        PATHS
+        /usr/local/opt/curl/lib
+        ${LIBCURL_PATH}
         ${LIB_PATH}
         NO_CMAKE_SYSTEM_PATH )
-
-#find_library(LIBJPEG
-#        NAMES jpeg ljpeg ljpeg.a
-#        PATHS
-#        ${LIB_PATH}
-#        NO_CMAKE_SYSTEM_PATH )
-
-#find_library(LIBDISLIN
-#        NAMES dismg libdismg libdismg.a disgf libdisgf libdisgf.a dislin.10 dislin dislin.10.dylib libdislin.10.dylib
-#        PATHS
-#        /usr/local/lib
-#        /usr/local/dislin
-#        ${SWB_LIBPATH} )
 
 find_library(LIBGCC
         NAMES gcc libgcc libgcc.a
         PATHS
-        ${LIB_PATH}
-        /share/apps/gcc/${COMPILER_VERSION}/lib
-        )
+        ${LIBGCC_PATH}
+        ${LIB_PATH} )
 
 find_library(LIBGFORTRAN
         NAMES gfortran libgfortran libgfortran.a
-        PATHS ${LIB_PATH}
-        /share/apps/gcc/${COMPILER_VERSION}/lib
-        )
+        PATHS 
+        ${LIBGCC_PATH}
+        ${LIB_PATH} )
 
-set( EXTERNAL_LIBS ${LIBNETCDF} ${LIBHDF5_HL} ${LIBHDF5} ${LIBMFHDF} ${LIBDF} ${LIBJPEG} ${LIBPORTABLEXDR}
+set( EXTERNAL_LIBS ${LIBNETCDF} ${LIBHDF5_HL} ${LIBHDF5} 
                    ${LIBCURL} ${LIBZ}
                    ${LIBGCC} ${LIBGFORTRAN} )
 
 # Now, add platform-specific libraries as needed
 #
+
 if ("${OS}" STREQUAL "win_x64" OR "${OS}" STREQUAL "win_x86")
 
   find_library(LIBWINPTHREAD
           NAMES libwinpthread.a winpthread winpthread
-          PATHS ${LIB_PATH} )
-#
+          PATHS 
+          ${LIBWINPTHREAD_PATH}
+          ${LIB_PATH} )
+
   find_library(LIBWS2_32
           NAMES ws2_32 libws2_32 libws2_32.a
-          PATHS ${LIB_PATH} )
-#
-#  find_library(LIBOPENGL
-#          NAMES opengl32 libopengl32 libopengl32.a
-#          PATHS ${LIB_PATH} )
-#
-#  find_library(LIBGDI32
-#          NAMES gdi32 libgdi32 libgdi32.a
-#          PATHS ${LIB_PATH} )
-#
-  set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIBWINPTHREAD} ${LIBWS2_32} ${LIBOPENGL} ${LIBGDI32} )
+          PATHS 
+          ${LIBWS2_32_PATH}
+          ${LIB_PATH} )
+
+  set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIBWINPTHREAD} ${LIBWS2_32} )
 #
 else()
 #
@@ -160,6 +123,7 @@ else()
           NAMES Xm libXm libXm.dylib
           PATHS 
           /usr/OpenMotif/lib
+          ${LIBXM_PATH}
           ${LIB_PATH} )
 
   set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" ".dylib")
