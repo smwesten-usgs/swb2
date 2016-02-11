@@ -1499,7 +1499,7 @@ contains
                                   crop_etc=this%crop_etc,                                        &
                                   irrigation_mask=this%irrigation_mask,                          &
                                   num_days_since_planting=this%number_of_days_since_planting )
-    endif
+    endif  
 
   end subroutine model_calculate_irrigation
 
@@ -1677,11 +1677,31 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
+    real (kind=c_float)   :: actual_et_2( ubound( this%actual_et_soil,1 ) )
+    real (kind=c_float)   :: actual_et_3( ubound( this%actual_et_soil,1 ) )    
+    real (kind=c_float)   :: diff
+    integer (kind=c_int)  :: indx
+
     call calculate_actual_et_thornthwaite_mather( actual_et=this%actual_et_soil,                    &
+                                                  actual_et_2=actual_et_2,  &  
+                                                  actual_et_3=actual_et_3,  &
                                                   soil_storage=this%soil_storage,                   &
                                                   soil_storage_max=this%soil_storage_max,           &
                                                   precipitation=this%infiltration,                  &
                                                   crop_etc=this%crop_etc )
+
+    do indx=1,ubound( this%actual_et_soil,1) 
+      if ( actual_et_2( indx ) > 0.0 ) then  
+        diff = this%actual_et_soil(indx) - actual_et_2(indx) 
+        if ( abs(diff) > 1.0e-3 )                                                 &                                        
+        print *, indx, this%actual_et_soil( indx ), actual_et_2( indx ),          &
+          actual_et_3(indx),                                                      &
+          diff,                                                                   &
+          this%soil_storage( indx ), this%soil_storage_max( indx ),               &
+          this%infiltration( indx ), this%crop_etc( indx ), this%landuse_code( indx )
+      endif    
+    enddo  
+
 
   end subroutine model_calculate_actual_et_thornthwaite_mather
 

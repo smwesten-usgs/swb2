@@ -20,6 +20,11 @@
 
 message("Processing top-level CMakelists.txt for project swb2")
 
+include( CMakeForceCompiler )
+
+CMAKE_FORCE_C_COMPILER( gcc GNU )
+CMAKE_FORCE_Fortran_COMPILER( gfortran GNU )
+
 #------------------------------------------------------------------------------------#
 #                           Build directory check                                    #
 #------------------------------------------------------------------------------------#
@@ -37,6 +42,7 @@ endif()
 # NOTE: must enable CXX as a language in order to use the GNU compiler
 #       toolchain
 #
+
 project (swb Fortran C)
 enable_language (Fortran C)
 
@@ -53,6 +59,9 @@ set(PACKAGE_VERSION "2.0 ALPHA")
 
 cmake_minimum_required(VERSION 2.8)
 
+CMAKE_FORCE_C_COMPILER ( ${CC} ${GCC_VERSION} )
+CMAKE_FORCE_Fortran_COMPILER ( ${FC} ${GCC_VERSION} )
+
 include( cmake/version_control.cmake )
 include( cmake/options_and_targets.cmake )
 
@@ -63,11 +72,8 @@ include( cmake/options_and_targets.cmake )
 # search for programs in the build host directories
 SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
 # for libraries and headers in the target directories
-SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
-
-set(SWB_LIBPATH ${PROJECT_SOURCE_DIR}/lib/${OS}/${Fortran_COMPILER_NAME} )
-set(SWB_INCPATH ${PROJECT_SOURCE_DIR}/include/${OS}/${Fortran_COMPILER_NAME} )
+#SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
+#SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
 
 set(LIB_PATH ${LIB_PATH1} ${LIB_PATH2} ${LIB_PATH3} ${LIB_PATH4} )
 

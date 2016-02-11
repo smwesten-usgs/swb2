@@ -1008,6 +1008,11 @@ contains
               iDataType=iDataType )
             lGridPresent = lTRUE
 
+          elseif ( sArgText_1 .strequal. "TABLE" ) then
+
+
+            ! add code to get the table header name and table values
+
           else
 
             call warn( "Did not find a valid "//dquote(sKey)//" option. Value supplied was: "//dquote(sArgText_1), &
@@ -1064,6 +1069,16 @@ contains
         elseif ( index( string=sCmdText, substring="_PROJECTION_DEFINITION" ) > 0 ) then 
 
           call pENTRY%set_PROJ4( trim(sArgText) )
+
+
+        elseif ( index( string=sCmdText, substring="_DATE_COLUMN" ) > 0 ) then
+
+          pENTRY%sDateColumnName = trim( sArgText_1 )
+
+        elseif ( index( string=sCmdText, substring="_VALUE_COLUMN" ) > 0 ) then
+
+          pENTRY%sValueColumnName = trim( sArgText_1 )
+
 
         elseif ( index( string=sCmdText, substring="_MINIMUM_ALLOWED_VALUE" ) > 0 ) then
 

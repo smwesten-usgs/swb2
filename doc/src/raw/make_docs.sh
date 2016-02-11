@@ -13,10 +13,14 @@ cp ../images/*.* ../../doxygen/html/images
 rm -f ../to_docx/*.*
 rm -f ../to_doxygen/*.*
 
+filelist=""
+
 # iterate over all files in 'raw' directory, in sort order
 for filename in 0*.md; do
     cat $filename  > tempfile.md
         
+    filelist="$filelist $filename"
+
     # create a docx version of the Markdown file, *remove* the "[TOC]" badge
     # that is needed to make Doxygen insert a TOC item.
     sed -Ee 's/\[TOC\]//' tempfile.md > ../to_docx/$filename
@@ -25,16 +29,19 @@ for filename in 0*.md; do
     echo "References" >> tempfile.md
     echo "----------------" >> tempfile.md
 
+    # remove markdown headers at third and fourth level; Doxygen doesn't 
+    # behave nicely when it encounters third and fourth level headers at the
+    # beginning of a file snippet.
     sed -iEe 's/####/#/g' tempfile.md 
     sed -iEe 's/###/#/g' tempfile.md 
 
     # now create a Doxygen version of the Markdown files, processing the bibliography
     # using Pandoc
 #    pandoc --from=markdown_mmd+tex_math_dollars+pipe_tables+backtick_code_blocks+citations    \
-    pandoc --from=markdown_github+citations+backtick_code_blocks        \
-       --to=markdown_github+backtick_code_blocks                        \
+    pandoc --from=markdown_github+citations+backtick_code_blocks               \
+       --to=markdown_github+backtick_code_blocks                               \
        --filter pandoc-citeproc                                         \
-       --bibliography=../resources/Zotero_July_2015.bib                 \
+       --bibliography=../resources/Zotero_Output.bib                    \
        --csl=../resources/us-geological-survey.csl                      \
        --output=../to_doxygen/$filename                                 \
        tempfile.md
@@ -62,16 +69,27 @@ done
 
 # now use Pandoc to assemble the 'docx' fragments into a single docx file for MS Word
 #pandoc --from=markdown+tex_math_dollars+header_attributes+pipe_tables+backtick_code_blocks+citations   \
-pandoc --from=markdown_github+tex_math_dollars+header_attributes+backtick_code_blocks+implicit_figures+citations  \
+pandoc --from=markdown+tex_math_dollars+header_attributes+backtick_code_blocks+implicit_figures+citations  \
        --to=docx                                                            \
        --filter pandoc-citeproc                                             \
        --toc                                                                \
        --reference-docx=../resources/usgs_report_template.docx              \
-       --bibliography=../resources/Zotero_July_2015.bib                     \
+       --bibliography=../resources/Zotero_Output.bib                        \
        --csl=../resources/us-geological-survey.csl                          \
-       -m \
-         `ls ../to_docx/0*.md` \
-       --output=../draft_report.docx
+       -m                                                                   \
+       --output=../draft_report.docx                                        \
+       `ls ../to_docx/0*.md`
+
+pandoc --from=markdown+citations+header_attributes+backtick_code_blocks+tex_math_dollars        \
+   --to=html                                                        \
+   --filter pandoc-citeproc                                         \
+   --bibliography=../resources/Zotero_Output.bib                    \
+   --csl=../resources/us-geological-survey.csl                      \
+   --standalone                                                     \
+   -m                                                               \
+   --mathjax                                                        \
+   --output=../draft_report.html                                    \
+   `ls ../to_docx/0*.md`
 
 # remove temporary working files from directories
 rm -f tempfile.*

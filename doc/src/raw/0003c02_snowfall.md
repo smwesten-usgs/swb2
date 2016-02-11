@@ -9,12 +9,11 @@ Snow is allowed to accumulate and/or melt on a daily basis. The daily mean, maxi
 
 $$\overline T  - \frac{1}{3}\left( {{T_{\max }} - {T_{\min }}} \right) < 32$$
 
-$$\left\{ {\begin{array}{*{20}{c}}
-  {snow,}&{\bar T - {\raise0.5ex\hbox{$\scriptstyle 1$}
-\kern-0.1em/\kern-0.15em
-\lower0.25ex\hbox{$\scriptstyle 3$}}\left( {{T_{\max }} - {T_{\min }}} \right) < 32} \\ 
-  {rain,}&{otherwise} 
-\end{array}} \right.$$
+$$\left( {\begin{array}{*{20}{c}}
+  {{a_{11}}}&{{a_{12}}}&{{a_{13}}} \\\\ 
+  {{a_{21}}}&{{a_{22}}}&{{a_{23}}} \\\\ 
+  {{a_{31}}}&{{a_{32}}}&{{a_{33}}} 
+\end{array}} \right)$$
 
 
 $$\begin{align}
@@ -28,4 +27,3 @@ y(t)& =Y+c\sin \theta t-\dfrac{1}{2}gt^2
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.
 
 Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. 
-
