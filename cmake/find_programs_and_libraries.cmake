@@ -1,7 +1,7 @@
 
 set(CMAKE_FIND_LIBRARY_PREFIXES "lib")
 
-set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" ".a")
+set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" ".a" ".so")
 
 find_program( R_SCRIPT Rscript.exe Rscript
     PATHS
@@ -46,39 +46,34 @@ find_library(LIBZ
         NAMES z libz libz.a libz.dylib
         PATHS
         ${LIBZ_PATH}
-        ${LIB_PATH}
-        NO_CMAKE_SYSTEM_PATH )
+        ${LIB_PATH} )
 
 find_library(LIBNETCDF
         NAMES netcdf libnetcdf libnetcdf.a
         PATHS
         ${LIBNETCDF_PATH}
         ${LIB_PATH}
-        /share/apps/gcc/${COMPILER_VERSION}/lib
-        NO_CMAKE_SYSTEM_PATH )
+        /share/apps/gcc/${COMPILER_VERSION}/lib )
 
 find_library(LIBHDF5
         NAMES hdf5 libhdf5 libhdf5.a
         PATHS
         /usr/local/opt/hdf5/lib
         ${LIBHDF5_PATH}
-        ${LIB_PATH}
-        NO_CMAKE_SYSTEM_PATH )
+        ${LIB_PATH} )
 
 find_library(LIBHDF5_HL
         NAMES hdf5_hl libhdf5_hl libhdf5_hl.a
         PATHS /usr/local/opt/hdf5/lib
         ${LIBHDF5_PATH}
-        ${LIB_PATH}
-        NO_CMAKE_SYSTEM_PATH )
+        ${LIB_PATH} )
 
 find_library(LIBCURL
         NAMES curl libcurl libcurl.a libcurl.dylib
         PATHS
         /usr/local/opt/curl/lib
         ${LIBCURL_PATH}
-        ${LIB_PATH}
-        NO_CMAKE_SYSTEM_PATH )
+        ${LIB_PATH} )
 
 find_library(LIBGCC
         NAMES gcc libgcc libgcc.a
@@ -174,7 +169,7 @@ if ("${OS}" STREQUAL "mac_osx" )
           /opt/X11/lib
           ${LIB_PATH})
 
-else()
+elseif ("${OS}" STREQUAL "win_x64" OR "${OS}" STREQUAL "win_x86")
 
   find_library(LIBCRYPT32
           NAMES crypt32 libcrypt32 libcrypt32.a
