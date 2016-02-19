@@ -635,7 +635,7 @@ contains
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
     integer (kind=c_int)           :: iCount
-    character (len=:), allocatable :: sText
+    character (len=256)            :: sText
     
     iCount = 0
 

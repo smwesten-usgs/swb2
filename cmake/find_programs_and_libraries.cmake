@@ -68,12 +68,12 @@ find_library(LIBHDF5_HL
         ${LIBHDF5_PATH}
         ${LIB_PATH} )
 
-find_library(LIBCURL
-        NAMES curl libcurl libcurl.a libcurl.dylib
-        PATHS
-        /usr/local/opt/curl/lib
-        ${LIBCURL_PATH}
-        ${LIB_PATH} )
+#find_library(LIBCURL
+#        NAMES curl libcurl libcurl.a libcurl.dylib
+#        PATHS
+#        /usr/local/opt/curl/lib
+#        ${LIBCURL_PATH}
+#        ${LIB_PATH} )
 
 find_library(LIBGCC
         NAMES gcc libgcc libgcc.a
