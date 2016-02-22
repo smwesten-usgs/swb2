@@ -22,6 +22,10 @@ module data_catalog_entry
   integer (kind=c_int), public, parameter :: NETCDF_FILE_OPEN = 27
   integer (kind=c_int), public, parameter :: NETCDF_FILE_CLOSED = 42
 
+  integer (kind=c_int), parameter, public :: FILE_TEMPLATE_CAPITALIZED_MONTHNAME = 0
+  integer (kind=c_int), parameter, public :: FILE_TEMPLATE_LOWERCASE_MONTHNAME   = 1
+  integer (kind=c_int), parameter, public :: FILE_TEMPLATE_UPPERCASE_MONTHNAME   = 2
+
   type, public :: DATA_CATALOG_ENTRY_T
     character (len=:), allocatable :: sKeyword
     type (DATA_CATALOG_ENTRY_T), pointer :: previous => null()
@@ -38,6 +42,7 @@ module data_catalog_entry
     character (len=256)       :: sSourceFileType
     character (len=256)       :: sSourceFilename      ! e.g. 1980_00_prcp.nc
     character (len=256)       :: sFilenameTemplate
+    integer (kind=c_int)      :: iFilename_Monthname_Capitalization_Rule = FILE_TEMPLATE_CAPITALIZED_MONTHNAME
     character (len=256)       :: sOldFilename        
     character (len=256)       :: sDateColumnName
     character (len=256)       :: sValueColumnName
@@ -940,8 +945,25 @@ end subroutine set_constant_value_real
         elseif ( iPos_B > 0 ) then
 
           lMatch = lTRUE
-          sBuf = MONTHS( iMonth )%sName
 
+          select case ( this% iFilename_Monthname_Capitalization_Rule )
+
+            case ( FILE_TEMPLATE_UPPERCASE_MONTHNAME )
+
+              sBuf = MONTHS( iMonth )%sName
+              call toUppercase( sBuf )
+
+            case ( FILE_TEMPLATE_LOWERCASE_MONTHNAME )
+
+              sBuf = MONTHS( iMonth )%sName
+              call toLowercase ( sBuf )
+
+            case default
+
+              sBuf = MONTHS( iMonth )%sName
+
+          end select
+            
           iLen=len_trim(sNewFilename)
           sNewFilename = sNewFilename(1:iPos_B - 1)//trim(sBuf) &
                          //sNewFilename(iPos_B + 2:iLen)
@@ -949,7 +971,24 @@ end subroutine set_constant_value_real
         elseif ( iPos_BF > 0 ) then
 
           lMatch = lTRUE
-          sBuf = MONTHS( iMonth )%sFullName
+
+          select case ( this% iFilename_Monthname_Capitalization_Rule )
+
+            case ( FILE_TEMPLATE_UPPERCASE_MONTHNAME )
+
+              sBuf = MONTHS( iMonth )%sFullName
+              call toUppercase( sBuf )
+
+            case ( FILE_TEMPLATE_LOWERCASE_MONTHNAME )
+
+              sBuf = MONTHS( iMonth )%sFullName
+              call toLowercase( sBuf )              
+
+            case default
+
+              sBuf = MONTHS( iMonth )%sFullName
+
+          end select
 
           iLen=len_trim(sNewFilename)
           sNewFilename = sNewFilename(1:iPos_BF - 1)//trim(sBuf) &

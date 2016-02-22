@@ -108,69 +108,6 @@ if ("${OS}" STREQUAL "win_x64" OR "${OS}" STREQUAL "win_x86")
           ${LIBWS2_32_PATH}
           ${LIB_PATH} )
 
-  set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIBWINPTHREAD} ${LIBWS2_32} )
-#
-else()
-#
-  set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" "*.a")
-
-  find_library(LIBXM
-          NAMES Xm libXm libXm.dylib
-          PATHS 
-          /usr/OpenMotif/lib
-          ${LIBXM_PATH}
-          ${LIB_PATH} )
-
-  set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" ".dylib")
-
-#  set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIBXM} )
-#
-endif()
-
-
-### NOTE: the libraries defined below will be needed for linking to libcurl.
-
-if ("${OS}" STREQUAL "mac_osx" )
-
-#  find_library(LIBCRYPT32
-#          NAMES crypt32 libcrypt32 libcrypt32.a
-#          PATHS
-#          ${LIB_PATH} )
-
-  find_library(LIBSASL2
-          NAMES gsasl libgsasl sasl2 libsasl2 libsasl2.dylib
-          PATHS /usr/local/opt/gsasl/lib
-#          ${SWB_PATH}
-          NO_CMAKE_SYSTEM_PATH )
-
-  find_library(LIBLBER
-          NAMES lber liblber liblber.dylib
-#          PATHS ${SWB_PATH}
-          ${LIB_PATH}
-          NO_CMAKE_SYSTEM_PATH )
-
-  find_library(LIBSSH2
-          NAMES ssh2 libssh2 libssh2.dylib
-          PATHS
-          /usr/local/opt/libssh2/lib
-#          ${SWB_PATH}
-          ${LIB_PATH})
-
-  find_library(LIBSSL
-          NAMES ssl libssl libssl.dylib
-          PATHS
-          /usr/local/opt/openssl/lib
-#          ${SWB_PATH}
-          ${LIB_PATH} )
-
-  find_library(LIBXT
-          NAMES Xt libXt.dylib
-          PATHS
-          /opt/X11/lib
-          ${LIB_PATH})
-
-elseif ("${OS}" STREQUAL "win_x64" OR "${OS}" STREQUAL "win_x86")
-
   find_library(LIBCRYPT32
           NAMES crypt32 libcrypt32 libcrypt32.a
           PATHS
@@ -212,7 +149,7 @@ elseif ("${OS}" STREQUAL "win_x64" OR "${OS}" STREQUAL "win_x86")
           ${LIB_PATH}
           NO_CMAKE_SYSTEM_PATH )
        
-           
+# the entries below are needed to link to DAP-enabled NetCDF           
  find_library(LIBWLDAP32
          NAMES lwldap32 libwldap32 libwldap32.a
          PATHS 
@@ -266,11 +203,81 @@ elseif ("${OS}" STREQUAL "win_x64" OR "${OS}" STREQUAL "win_x86")
           PATHS
           ${LIB_PATH} )
 
-          
+  set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIBWINPTHREAD} ${LIBWS2_32} )
+#
+elseif ("${OS}" STREQUAL "mac_osx" )
+#
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" "*.a")
+
+  find_library(LIBXM
+          NAMES Xm libXm libXm.dylib
+          PATHS 
+          /usr/OpenMotif/lib
+          ${LIBXM_PATH}
+          ${LIB_PATH} )
+
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" ".dylib")
+
+#  set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIBXM} )
+#
+
+### NOTE: the libraries defined below will be needed for linking to libcurl.
+
+#  find_library(LIBCRYPT32
+#          NAMES crypt32 libcrypt32 libcrypt32.a
+#          PATHS
+#          ${LIB_PATH} )
+
+  find_library(LIBSASL2
+          NAMES gsasl libgsasl sasl2 libsasl2 libsasl2.dylib
+          PATHS /usr/local/opt/gsasl/lib
+#          ${SWB_PATH}
+          NO_CMAKE_SYSTEM_PATH )
+
+  find_library(LIBLBER
+          NAMES lber liblber liblber.dylib
+#          PATHS ${SWB_PATH}
+          ${LIB_PATH}
+          NO_CMAKE_SYSTEM_PATH )
+
+  find_library(LIBSSH2
+          NAMES ssh2 libssh2 libssh2.dylib
+          PATHS
+          /usr/local/opt/libssh2/lib
+#          ${SWB_PATH}
+          ${LIB_PATH})
+
+  find_library(LIBSSL
+          NAMES ssl libssl libssl.dylib
+          PATHS
+          /usr/local/opt/openssl/lib
+#          ${SWB_PATH}
+          ${LIB_PATH} )
+
+  find_library(LIBXT
+          NAMES Xt libXt.dylib
+          PATHS
+          /opt/X11/lib
+          ${LIB_PATH})
+
+else()
+
+  find_library(LIBDL
+          NAMES dl libdl 
+          PATHS
+          /lib64
+          ${LIB_PATH})
+
+  find_library(LIBC
+          NAMES c libc 
+          PATHS
+          /lib64
+          ${LIB_PATH})
+
 endif()
 
 set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIBIDN} ${LIBINTL} ${LIBICONV} ${LIBSSH2} ${LIBSSH2} ${LIBCRYPTO} ${LIBSSL} ${LIBLBER} ${LIBLDAP}
       ${LIBGCRYPT} ${LIBGPG_ERROR} ${LIBNETTLE} ${LIBGMP} ${LIBCRYPT32} ${LIBGNUTLS} ${LIBNETTLE} ${LIBHOGWEED} ${LIBCRYPT32} ${LIBWLDAP32} 
-      ${LIBWS2_32}  )
+      ${LIBWS2_32} ${LIBDL} ${LIBC} )
 
 link_libraries( ${EXTERNAL_LIBS} )

@@ -195,6 +195,7 @@ contains
     class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
 
     iCount = 0
+    sText = " "
 
     current => this%first
 

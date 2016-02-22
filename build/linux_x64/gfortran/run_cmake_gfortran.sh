@@ -16,14 +16,14 @@ export INSTALL_PREFIX=/usr/local/bin
 
 # define other variables for use in the CMakeList.txt file
 # options are "Release" or "Debug"
-export BUILD_TYPE="Debug"
+export BUILD_TYPE="Release"
 # options are "x86" (32-bit) or "x64" (64-bit)
 export PLATFORM_TYPE="x64"
 
 # define platform and compiler specific compilation flags
-export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -wall -fbacktrace -fcheck=all -fexceptions -ffree-line-length-none -fpe0"
+export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -Wall -fbacktrace -fcheck=all -fexceptions -ffree-line-length-none -static"
 #set CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -floop-parallelize-all -flto -ffree-line-length-none -static-libgcc -static-libgfortran"
-export CMAKE_Fortran_FLAGS_RELEASE="-O3 -mtune=native -ftree-parallelize-loops=8 -floop-parallelize-all -ffree-line-length-none -static"
+export CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -ffree-line-length-none -static"
 
 # set important environment variables
 export FC=/usr/bin/gfortran
@@ -46,7 +46,7 @@ export CPPFLAGS="-DgFortran"
 -DCC="$CC "                       \
 -DLIBGCC_PATH="/usr/lib/gcc/x86_64-redhat-linux/5.3.1/"  \
 -DPLATFORM_TYPE="$PLATFORM_TYPE " \
--DCMAKE_BUILD_TYPE="$BUILD_TYPE " \
+-DBUILD_TYPE="$BUILD_TYPE " \
 -DCMAKE_INSTALL_PREFIX:PATH="$INSTALL_PREFIX " \
 -DLIB_PATH1="/usr/lib64" \
 -DLIB_PATH2="/usr/local/lib" \

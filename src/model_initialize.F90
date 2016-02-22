@@ -1026,6 +1026,18 @@ contains
 
           call pENTRY%set_majority_filter_flag( lTRUE )
 
+        elseif ( index( string=sCmdText, substring="_MONTHNAMES_CAPITALIZED" ) > 0 ) then          
+
+          pENTRY%iFilename_Monthname_Capitalization_Rule = FILE_TEMPLATE_CAPITALIZED_MONTHNAME
+
+        elseif ( index( string=sCmdText, substring="_MONTHNAMES_LOWERCASE" ) > 0 ) then          
+
+          pENTRY%iFilename_Monthname_Capitalization_Rule = FILE_TEMPLATE_LOWERCASE_MONTHNAME
+
+        elseif ( index( string=sCmdText, substring="_MONTHNAMES_UPPERCASE" ) > 0 ) then          
+
+          pENTRY%iFilename_Monthname_Capitalization_Rule = FILE_TEMPLATE_UPPERCASE_MONTHNAME
+
         elseif ( index( string=sCmdText, substring="_SCALE" ) > 0 ) then
 
           call pENTRY%set_scale(asFloat(sArgText_1))
