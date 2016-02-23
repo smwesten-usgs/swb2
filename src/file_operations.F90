@@ -10,8 +10,11 @@ module file_operations
   implicit none
 
   private
+
+  public :: fully_qualified_filename
   
-  integer (kind=c_int), parameter :: MAX_STR_LEN = 65536
+  integer (kind=c_int), parameter         :: MAX_STR_LEN    = 65536
+  character (len=256), public             :: DATA_DIRECTORY = ""
   
   type, public :: ASCII_FILE_T
 
@@ -163,7 +166,7 @@ contains
 
     if (.not. this%isOpen() ) then
 
-      open(newunit=this%iUnitNum, file=sFilename, iostat=this%iStat, action='READ')
+      open(newunit=this%iUnitNum, file=fully_qualified_filename( sFilename ), iostat=this%iStat, action='READ')
       call assert(this%iStat == 0, "Failed to open file "//dquote(sFilename)//".", __FILE__, __LINE__)
 
       if (this%iStat == 0) this%lIsOpen = lTRUE
@@ -171,7 +174,8 @@ contains
 
       call this%countLines()
 
-      call LOGS%write( sMessage="Opened file "//dquote(sFilename), iTab=22, iLinesBefore=1, iLogLevel=LOG_ALL )
+      call LOGS%write( sMessage="Opened file "//dquote( fully_qualified_filename( sFilename ) ), iTab=22, &
+                       iLinesBefore=1, iLogLevel=LOG_ALL )
       call LOGS%write( "Comment characters: "//dquote(sCommentChars), iTab=42 )
       call LOGS%write( "Number of lines in file: "//asCharacter( this%numLines() ), iTab=37 )
       call LOGS%write( "Number of lines excluding blanks, headers and comments: " &
@@ -179,7 +183,7 @@ contains
 
     else
 
-      call die( "Failed to open file "//dquote(sFilename)//" with read access." )
+      call die( "Failed to open file "//dquote( fully_qualified_filename( sFilename ) )//" with read access." )
 
     endif
 
@@ -240,7 +244,7 @@ contains
     character (len=*), intent(in)    :: sFilename
     logical(kind=c_bool)             :: lExists
 
-    inquire(file=sFilename, exist=lExists)
+    inquire(file=fully_qualified_filename( sFilename ), exist=lExists)
 
   end function does_file_exist_fn
 
@@ -333,7 +337,8 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int) :: iStat
 
-    call assert( .not. this%lReadOnly, "INTERNAL ERROR -- File "//dquote( this%sFilename )  &
+    call assert( .not. this%lReadOnly, "INTERNAL ERROR -- File "  &
+      //dquote( fully_qualified_filename( this%sFilename ) )      &
       //" was opened as READONLY.", __FILE__, __LINE__ )
     
     if (this%isOpen() ) then
@@ -344,8 +349,7 @@ contains
 
   end subroutine write_line_of_data_sub
 
-
-
+!--------------------------------------------------------------------------------------------------
 
   function read_line_of_data_fn(this) result(sText)
 
@@ -380,5 +384,17 @@ contains
     enddo
 
   end function read_line_of_data_fn
+
+!--------------------------------------------------------------------------------------------------
+
+  function fully_qualified_filename( filename )
+
+    character(len=*), intent(in)    :: filename
+    character(len=:), allocatable   :: fully_qualified_filename
+
+    fully_qualified_filename = trim( DATA_DIRECTORY )//trim(filename)
+
+  end function fully_qualified_filename
+
 
 end module file_operations

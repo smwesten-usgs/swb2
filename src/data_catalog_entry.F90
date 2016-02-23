@@ -10,6 +10,7 @@ module data_catalog_entry
   use constants_and_conversions
   use datetime
   use exceptions
+  use file_operations, only      : fully_qualified_filename
   use logfiles
   use strings
   use grid
@@ -40,10 +41,10 @@ module data_catalog_entry
     character (len=256)       :: sSourcePROJ4_string
     character (len=256)       :: sTargetPROJ4_string
     character (len=256)       :: sSourceFileType
-    character (len=256)       :: sSourceFilename      ! e.g. 1980_00_prcp.nc
-    character (len=256)       :: sFilenameTemplate
+    character (len=512)       :: sSourceFilename      ! e.g. 1980_00_prcp.nc
+    character (len=512)       :: sFilenameTemplate
     integer (kind=c_int)      :: iFilename_Monthname_Capitalization_Rule = FILE_TEMPLATE_CAPITALIZED_MONTHNAME
-    character (len=256)       :: sOldFilename        
+    character (len=512)       :: sOldFilename        
     character (len=256)       :: sDateColumnName
     character (len=256)       :: sValueColumnName
 
@@ -339,7 +340,7 @@ subroutine initialize_gridded_data_object_sub( this, &
     this%sSourcePROJ4_string =  BNDS%sPROJ4_string
   endif
 
-  this%sSourceFilename = sFilename
+  this%sSourceFilename = fully_qualified_filename( sFilename )
 
   !> if either a '%' or '#' character is present in the filename,
   !! treat it as a template, not as a normal filename.
@@ -412,7 +413,7 @@ subroutine initialize_netcdf_data_object_sub( this, &
      this%sSourcePROJ4_string =  BNDS%sPROJ4_string
    endif
 
-  this%sSourceFilename = sFilename
+  this%sSourceFilename = fully_qualified_filename( sFilename )
 
   !> if either a '%' or '#' character is present in the filename,
   !! treat it as a template, not as a normal filename.
@@ -2059,7 +2060,5 @@ end subroutine set_maximum_allowable_value_real_sub
 
     endif
   end subroutine data_GridHandleMissingData_int
-
-!--------------------------------------------------------------------------------------------------
 
 end module data_catalog_entry

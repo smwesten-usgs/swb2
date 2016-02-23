@@ -8,7 +8,7 @@
 !> to the control_setModelOptions routine in module \ref control.
 program main
 
-  use iso_c_binding, only    : c_short, c_int, c_float, c_double
+  use iso_c_binding, only    : c_short, c_int, c_float, c_double, c_bool
   use logfiles, only         : LOGS, LOG_DEBUG
   use model_initialize, only : initialize_all, read_control_file
   use model_domain, only     : MODEL
@@ -23,7 +23,8 @@ program main
   type (STRING_LIST_T)           :: slControlFiles
 
   character (len=256)            :: sBuf
-  character (len=64)             :: sOutputDirectoryName = ""
+  character (len=256)            :: sOutputDirectoryName = ""
+  character (len=256)            :: sDataDirectoryName   = ""
   integer (kind=c_int)           :: iNumArgs
   character (len=1024)           :: sCompilerFlags       = ""
   character (len=256)            :: sCompilerVersion     = ""
@@ -70,7 +71,9 @@ program main
       //TRIM(int2char(__G95_MINOR__))
 #endif
 
-    write(UNIT=*,FMT="(/,/,a,/)")    "Usage: swb2 [control file name] [output directory name (optional)]"
+    write(UNIT=*,FMT="(/,/,a,/,a,/,a,/)")  "Usage: swb2 [control file name] [--output_dir=][--data_dir=]", &
+                                           "                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~", &
+                                           "                                    (flags are optional)"
 
     stop
 
@@ -80,26 +83,36 @@ program main
 
     call GET_COMMAND_ARGUMENT( iIndex, sBuf )
 
-    if ( scan( sBuf, ".") > 0 ) then
+    if ( sBuf(1:13) .eq. "--output_dir=" ) then
 
-      call slControlFiles%append( sBuf )
-
-    else  
-
-      sOutputDirectoryName = sBuf
+      sOutputDirectoryName = sBuf(14:)
       iLen = len_trim( sOutputDirectoryName )
-
       if ( .not. sOutputDirectoryName(iLen:iLen) .eq. "/" )  &
         sOutputDirectoryName = trim(sOutputDirectoryName)//"/"
 
       call LOGS%set_output_directory( sOutputDirectoryName )
 
-    endif  
+
+    elseif ( sBuf(1:11) .eq. "--data_dir=" ) then
+
+      sDataDirectoryName = sBuf(12:)
+      iLen = len_trim( sDataDirectoryName )
+      if ( .not. sDataDirectoryName(iLen:iLen) .eq. "/" )  &
+        sDataDirectoryName = trim(sDataDirectoryName)//"/"
+
+    else
+
+      ! no match on the command-line argument flags; this must be a control file
+      call slControlFiles%append( sBuf )
+
+    endif
 
   enddo 
  
   ! open and initialize logfiles
   call LOGS%initialize( iLogLevel = LOG_DEBUG )
+  call LOGS%write( sMessage='Base data directory name set to: "'//trim( sDataDirectoryName )//'"', &
+                   lEcho=.TRUE._c_bool )
 
   do iIndex=1, slControlFiles%count
 
@@ -110,7 +123,7 @@ program main
 
   call slControlFiles%clear()
 
-  call initialize_all( sOutputDirectoryName )
+  call initialize_all( sOutputDirectoryName, sDataDirectoryName )
 
   call iterate_over_simulation_days( MODEL )
    

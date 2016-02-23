@@ -172,7 +172,8 @@ contains
     OUTPUT_DIRECTORY_NAME = trim(sDirName)
 
     call LOGS%write("ASCII grids will be written to subdirectory "             &
-      //dquote( OUTPUT_DIRECTORY_NAME ), iLogLevel=LOG_ALL, lEcho=lTRUE )
+      //dquote( OUTPUT_DIRECTORY_NAME ), iLogLevel=LOG_ALL,                    &
+      iLinesBefore=1, lEcho=lTRUE )
 
   end subroutine grid_set_output_directory_name  
 

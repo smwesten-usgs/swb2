@@ -93,11 +93,11 @@ module model_initialize
 
 contains
 
-  subroutine initialize_all( output_directory_name )
+  subroutine initialize_all( output_directory_name, data_directory_name )
 
     use polygon_summarize, only : initialize_polygon_summarize
 
-    character (len=64), intent(inout) :: output_directory_name
+    character (len=256), intent(inout) :: output_directory_name, data_directory_name
 
     
     ! [ LOCALS ]
@@ -105,6 +105,7 @@ contains
 
     ! set output directory names for NetCDF and Surfer/Arc ASCII grid output
     call grid_set_output_directory_name( output_directory_name )
+    call set_data_directory( data_directory_name)
     call set_output_directory( output_directory_name )
     call MODEL%set_output_directory( output_directory_name )
 
@@ -232,6 +233,17 @@ contains
     call storm_drain_capture_initialize()
 
   end subroutine initialize_ancillary_values
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine set_data_directory( data_directory_name )
+
+    character(len=*), intent(inout) :: data_directory_name
+
+    ! setting the MODULE variable DATA_DIRECTORY, module = file_operations
+    DATA_DIRECTORY = data_directory_name
+
+  end subroutine set_data_directory
 
 !--------------------------------------------------------------------------------------------------
 
