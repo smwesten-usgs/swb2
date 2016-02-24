@@ -342,13 +342,13 @@ subroutine initialize_gridded_data_object_sub( this, &
 
   this%sSourceFilename = fully_qualified_filename( sFilename )
 
-  !> if either a '%' or '#' character is present in the filename,
+  !> if either a '%' or '#' character is present in the filename
   !! treat it as a template, not as a normal filename.
   if ( scan(string=sFilename, set="%#") > 0 ) then
 
     this%iSourceDataForm = DYNAMIC_GRID
     this%lGridIsPersistent = lTRUE
-    this%sFilenameTemplate = trim( sFilename )
+    this%sFilenameTemplate = trim( this%sSourceFilename )
 
   else
 
