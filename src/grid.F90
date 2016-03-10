@@ -1512,10 +1512,20 @@ subroutine grid_Transform(pGrd, sFromPROJ4, sToPROJ4 )
   ! now update the grid boundaries based on the transformed coordinate values
   pGrd%rGridCellSize = ( maxval(pGrd%rX) - minval(pGrd%rX) ) &
              / real(pGrd%iNX - 1, kind=c_double)
+
+  print *, "Gridcell size (calculated): ", pGrd%rGridCellSize
+  print *, "minval(rX): ", minval(pGrd%rX)
+  print *, "minval(rY): ", minval(pGrd%rY)
+
   pGrd%rX0 = minval(pGrd%rX) - pGrd%rGridCellSize / 2_c_float
   pGrd%rX1 = maxval(pGrd%rX) + pGrd%rGridCellSize / 2_c_float
   pGrd%rY0 = minval(pGrd%rY) - pGrd%rGridCellSize / 2_c_float
   pGrd%rY1 = maxval(pGrd%rY) + pGrd%rGridCellSize / 2_c_float
+
+  print *, "pGrd%rX0 = minval(pGrd%rX) - pGrd%rGridCellSize / 2_c_float: ", pGrd%rX0
+  print *, "pGrd%rX1 = maxval(pGrd%rX) + pGrd%rGridCellSize / 2_c_float: ", pGrd%rX1 
+  print *, "pGrd%rY0 = minval(pGrd%rY) - pGrd%rGridCellSize / 2_c_float: ", pGrd%rY0
+  print *, "pGrd%rY1 = maxval(pGrd%rY) + pGrd%rGridCellSize / 2_c_float: ", pGrd%rY1
 
   ! finally, change the projection string to reflect the new coordinate system
   pGrd%sPROJ4_string = trim(sToPROJ4)

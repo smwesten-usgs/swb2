@@ -1022,7 +1022,6 @@ contains
 
           elseif ( sArgText_1 .strequal. "TABLE" ) then
 
-
             ! add code to get the table header name and table values
 
           else

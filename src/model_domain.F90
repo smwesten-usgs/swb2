@@ -273,6 +273,10 @@ contains
     this%pGrdOut => grid_CreateSimple( iNX=iNumCols, iNY=iNumRows,        &
                       rX0=dX_ll, rY0=dY_ll, rGridCellSize=dGridCellSize,  &
                       iDataType=GRID_DATATYPE_REAL )
+
+    !! @TODO rename 'dont_care' to 'no_data' or similar
+    this%dont_care = NC_FILL_FLOAT
+
   end subroutine initialize_grid_sub
 
 !--------------------------------------------------------------------------------------------------
@@ -345,16 +349,56 @@ contains
 
 !$OMP PARALLEL WORKSHARE
 
-    this%fog = 0.0_c_float
-    this%pervious_fraction = 0.0_c_float
-    this%canopy_cover_fraction = 1.0_c_float
-    this%irrigation = 0.0_c_float
-    this%surface_storage = 0.0_c_float
-    this%surface_storage_max = 0.0_c_float
-    this%interception_storage = 0.0_c_float
-    this%direct_recharge = 0.0_c_float
-    this%number_of_days_since_planting = 0_c_int
+    this%landuse_code                        = 0_c_int
+    this%landuse_index                       = 0_c_int
+    this%soil_group                          = 0_c_int
+    this%num_upslope_connections             = 0_c_int
+    this%sum_upslope_cells                   = 0_c_int
+    this%awc                                 = 0.0_c_float
+    this%latitude                            = 0.0_c_float
+    this%reference_ET0                       = 0.0_c_float
+    this%actual_ET                           = 0.0_c_float
+    this%inflow                              = 0.0_c_float
+    this%runon                               = 0.0_c_float
+    this%runoff                              = 0.0_c_float
+    this%outflow                             = 0.0_c_float
+    this%infiltration                        = 0.0_c_float
+    this%snowfall                            = 0.0_c_float
+    this%snowmelt                            = 0.0_c_float
 
+    this%interception                        = 0.0_c_float
+    this%rainfall                            = 0.0_c_float
+    this%interception_storage                = 0.0_c_float
+    this%snow_storage                        = 0.0_c_float
+    this%soil_storage                        = 0.0_c_float
+    this%soil_storage_max                    = 0.0_c_float
+
+    this%potential_recharge                  = 0.0_c_float
+    this%fog                                 = 0.0_c_float
+    this%irrigation                          = 0.0_c_float
+    this%index_order                         = 0_c_int
+    this%gdd                                 = 0.0_c_float
+    this%runoff_outside                      = 0.0_c_float
+    this%pervious_fraction                   = 0.0_c_float
+    this%surface_storage                     = 0.0_c_float
+    this%surface_storage_excess              = 0.0_c_float
+    this%surface_storage_max                 = 0.0_c_float
+    this%storm_drain_capture                 = 0.0_c_float
+    this%canopy_cover_fraction               = 0.0_c_float
+    this%crop_coefficient_kcb                = 0.0_c_float
+    this%potential_snowmelt                  = 0.0_c_float
+    this%continuous_frozen_ground_index      = 0.0_c_float
+    this%rooting_depth_max                   = 0.0_c_float
+    this%current_rooting_depth               = 0.0_c_float
+    this%polygon_id                          = 0_c_int
+    this%actual_et_soil                      = 0.0_c_float
+    this%actual_et_impervious                = 0.0_c_float
+    this%actual_et_interception              = 0.0_c_float
+    this%adjusted_depletion_fraction_p       = 0.0_c_float
+    this%crop_etc                            = 0.0_c_float
+    this%direct_recharge                     = 0.0_c_float
+    this%number_of_days_since_planting       = 0_c_int
+    
 !$OMP END PARALLEL WORKSHARE
 
   end subroutine initialize_arrays_sub
