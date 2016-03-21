@@ -2100,7 +2100,8 @@ contains
       iDay = asInt( dt%iDay )
       iYear = dt%iYear
   
-      ! next three statements retrieve the data from the raw or native form
+      ! get current grid value for precip; in the design case, this is a grid of MONTHLY 
+      ! mean precipitation totals in inches
       call pPRCP%getvalues( iMonth, iDay, iYear, iJulianDay )
 
     end associate

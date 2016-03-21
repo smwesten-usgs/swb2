@@ -23,7 +23,7 @@ export PLATFORM_TYPE="x64"
 # define platform and compiler specific compilation flags
 export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -Wall -fbacktrace -fcheck=all -fexceptions -ffree-line-length-none -static"
 #set CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -floop-parallelize-all -flto -ffree-line-length-none -static-libgcc -static-libgfortran"
-export CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -ffree-line-length-none -static -finit-local-zero"
+export CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -ffree-line-length-none -finit-local-zero"
 
 # set important environment variables
 export FC=/usr/bin/gfortran

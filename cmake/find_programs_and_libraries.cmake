@@ -1,7 +1,7 @@
 
 set(CMAKE_FIND_LIBRARY_PREFIXES "lib")
 
-set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" ".a" ".so")
+set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" ".so" ".a")
 
 find_program( R_SCRIPT Rscript.exe Rscript
     PATHS
@@ -53,27 +53,28 @@ find_library(LIBNETCDF
         PATHS
         ${LIBNETCDF_PATH}
         ${LIB_PATH}
+        /usr/local/lib64
         /share/apps/gcc/${COMPILER_VERSION}/lib )
 
 find_library(LIBHDF5
         NAMES hdf5 libhdf5 libhdf5.a
         PATHS
-        /usr/local/opt/hdf5/lib
+        /usr/local/lib64
         ${LIBHDF5_PATH}
         ${LIB_PATH} )
 
 find_library(LIBHDF5_HL
         NAMES hdf5_hl libhdf5_hl libhdf5_hl.a
-        PATHS /usr/local/opt/hdf5/lib
+        PATHS /usr/local/lib64
         ${LIBHDF5_PATH}
         ${LIB_PATH} )
 
-#find_library(LIBCURL
-#        NAMES curl libcurl libcurl.a libcurl.dylib
-#        PATHS
-#        /usr/local/opt/curl/lib
-#        ${LIBCURL_PATH}
-#        ${LIB_PATH} )
+find_library(LIBCURL
+        NAMES curl libcurl libcurl.a libcurl.dylib
+        PATHS
+        /usr/local/opt/curl/lib
+        ${LIBCURL_PATH}
+        ${LIB_PATH} )
 
 find_library(LIBGCC
         NAMES gcc libgcc libgcc.a

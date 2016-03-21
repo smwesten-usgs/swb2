@@ -1326,8 +1326,8 @@ contains
       SIM_DT%iDaysInYear = SIM_DT%curr%daysperyear()
       SIM_DT%lIsLeapYear = SIM_DT%curr%isLeapYear()
 
-      call LOGS%write("Model run start date set to: "//SIM_DT%start%prettydate(), iTab=4)
-      call LOGS%write("Model run end date set to:   "//SIM_DT%end%prettydate(), iTab=4)
+      call LOGS%write("Model run start date set to: "//SIM_DT%start%prettydate(), iTab=4, lEcho=lTRUE)
+      call LOGS%write("Model run end date set to:   "//SIM_DT%end%prettydate(), iTab=4, lEcho=lTRUE)
 
     else
     

@@ -111,6 +111,8 @@ module precipitation__method_of_fragments
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ADJUST_FACTOR      
 
+  integer (kind=c_int) :: LU_FRAGMENTS_ECHO
+
 contains
 
   !> Initialize method of fragments.
@@ -189,6 +191,10 @@ contains
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
 
     call process_fragment_sets()
+
+    open( newunit=LU_FRAGMENTS_ECHO, file="Fragments_as_implemented_by_SWB.csv")
+    write( LU_FRAGMENTS_ECHO, fmt="(a, 30('fragment, '),'fragment')")                 &
+        "Index, Month, Rain_Zone, Year, Random Number, Fragment_Set,"
 
   end subroutine precipitation_method_of_fragments_initialize
 
@@ -276,6 +282,7 @@ contains
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
     integer (kind=c_int)  :: iNumLines  
+    real (kind=c_float)   :: fTempValue
     type (ASCII_FILE_T)   :: FRAGMENTS_FILE
 
 
@@ -340,7 +347,16 @@ contains
           __FILE__, __LINE__, "Problem occured on line number "//asCharacter(FRAGMENTS_FILE%currentLineNum() ) &
           //" of file "//dquote(sFilename) )
 
-        FRAGMENTS(iCount)%fFragmentValue(iIndex) = asFloat( sSubstring )
+        fTempValue = asFloat( sSubstring )
+
+        ! This substitution is needed to prevent "-9999" or "9999" values embedded in the fragments file
+        ! from creeping into calculations. In the event of a "9999", the appropriate substitution is
+        ! zero, since the previous fragments for the month to this point should already sum to 1.0
+        if ( ( fTempValue < 0.0_c_float ) .or. ( fTempValue > 1.0_c_float ) ) then
+          FRAGMENTS(iCount)%fFragmentValue(iIndex) = 0.0_c_float
+        else
+          FRAGMENTS(iCount)%fFragmentValue(iIndex) = fTempValue          
+        endif          
 
       enddo
       
@@ -479,6 +495,17 @@ contains
 
 !--------------------------------------------------------------------------------------------------
   
+  !> Update rainfall fragments on daily basis.
+  !!
+  !! If called when lShuffle is TRUE:
+  !! 1) update random values
+  !! 2) random values are used to select the next active fragment set
+  !!    for the current RainGageZone
+  !!
+  !! *Each* time the routine is called, the appropriate fragment is 
+  !! selected from the current active fragement set and is assigned
+  !! to all cells that share a common RainGageZone
+
   subroutine update_fragments( lShuffle )
 
     logical (kind=c_bool), intent(in) :: lShuffle
@@ -488,6 +515,7 @@ contains
     integer (kind=c_int) :: iMaxRainZones
     integer (kind=c_int) :: iMonth
     integer (kind=c_int) :: iDay
+    integer (kind=c_int) :: iYearOfSimulation
 
     integer (kind=c_int) :: iNumberOfFragments
     integer (kind=c_int)  :: iStartRecord
@@ -496,14 +524,17 @@ contains
     integer (kind=c_int) :: iStat
     integer (kind=c_int) :: iUBOUND_FRAGMENTS
     integer (kind=c_int) :: iUBOUND_CURRENT_FRAGMENTS
+    character (len=512)  :: sBuf
 
 
     iMaxRainZones = maxval(FRAGMENTS%iRainGageZone)
     iMonth = SIM_DT%curr%iMonth
     iDay = SIM_DT%curr%iDay
+    iYearOfSimulation=SIM_DT%iYearOfSimulation
 
     iUBOUND_FRAGMENTS = ubound( FRAGMENTS, 1)
     iUBOUND_CURRENT_FRAGMENTS = ubound( CURRENT_FRAGMENTS, 1)
+
 
     do iIndex = 1, iMaxRainZones
  
@@ -534,18 +565,24 @@ contains
           
         CURRENT_FRAGMENTS(iIndex)%pFragment => FRAGMENTS( iTargetRecord )
 
-      endif
+         write(LU_FRAGMENTS_ECHO,fmt="(4(i5,','),f10.6,',',i5,',',30(f8.3,','),f8.3)")   &
+                     iIndex,                                                             &
+                     FRAGMENTS( iTargetRecord)%iMonth,                                   &
+                     FRAGMENTS( iTargetRecord)%iRainGageZone,                            &                     
+                     iYearOfSimulation,                                                  &
+                     RANDOM_VALUES(iIndex),                                              &
+                     FRAGMENTS( iTargetRecord)%iFragmentSet,                             &
+                     FRAGMENTS( iTargetRecord)%fFragmentValue
 
-!        write(*,fmt="(i5,a,i4,a,i5,a,i5,a,31f8.3)") iIndex,") RGZ: ", FRAGMENTS( iTargetRecord)%iRainGageZone,   &
-!                  " Mnth: ",FRAGMENTS( iTargetRecord)%iMonth, &
-!                  "Frag set: ",FRAGMENTS( iTargetRecord)%iFragmentSet,  &
-!                  "Fragments: ",FRAGMENTS( iTargetRecord)%fFragmentValue
+        ! call LOGS%write( trim(sBuf), iLogLevel=LOG_DEBUG, lEcho=lFALSE )
+
+      endif
 
       if ( ( CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay ) < 0.0 ) &
          .or. ( CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay ) > 1.0 ) ) then
 
         call LOGS%write("Error detected in method of fragments routine; dump of current variables follows:", &
-              iLinesBefore=1)
+              iLinesBefore=1, iLogLevel=LOG_ALL )
         call LOGS%write("iIndex:"//asCharacter(iIndex), iTab=3 )
         call LOGS%write("iDay: "//asCharacter(iDay), iTab=3 )
         call LOGS%write("iRainGageZone: "//asCharacter(FRAGMENTS( iTargetRecord)%iRainGageZone), iTab=3 )      
@@ -590,11 +627,6 @@ contains
                              .and. ( FRAGMENTS_SEQUENCE(iIndex)%sim_year == SIM_DT%iYearOfSimulation )       &
                              .and. ( FRAGMENTS_SEQUENCE(iIndex)%sim_number == SIMULATION_NUMBER )
 
-!        print *, FRAGMENTS_SEQUENCE(iIndex)%sim_month, SIM_DT%curr%iMonth
-!        print *, "   ", FRAGMENTS_SEQUENCE(iIndex)%sim_year, SIM_DT%iYearOfSimulation, SIM_DT%curr%iYear, SIM_DT%start%iYear
-!        print *, "   ", FRAGMENTS_SEQUENCE(iIndex)%sim_number, SIMULATION_NUMBER
-!        print *, "   ", FRAGMENTS_SEQUENCE(iIndex)%sim_random_number, FRAGMENTS_SEQUENCE(iIndex)%sim_rainfall_zone
-
         if ( .not. lSequenceSelection ) cycle
 
         do iIndex2=1,size(RANDOM_VALUES,1)
@@ -602,9 +634,6 @@ contains
           if ( FRAGMENTS_SEQUENCE( iIndex )%sim_rainfall_zone == iIndex2 ) then
 
             RANDOM_VALUES( iIndex2 ) = FRAGMENTS_SEQUENCE( iIndex )%sim_random_number
-!            print *, "==> ", iIndex, iIndex2, FRAGMENTS_SEQUENCE( iIndex )%sim_rainfall_zone, &
-!                       FRAGMENTS_SEQUENCE( iIndex )%sim_random_number, &
-!                       FRAGMENTS_SEQUENCE( iIndex )%sim_selected_set
             exit
 
           endif
