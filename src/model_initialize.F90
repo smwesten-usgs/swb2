@@ -193,9 +193,15 @@ contains
     ! read in the 2D array of AWC values; needed so that we can use it to set inactive cells
     call MODEL%read_AWC_data()
 
+    ! determine which grid cells should be inactive on the basis of available water content, 
+    ! hudrologic soils group, and/or soils group grids
     call MODEL%set_inactive_cells()
 
+    ! allocate and zero out model arrays
     call MODEL%initialize_arrays()
+
+    ! create 1D vectors containing row-column indices of unpacked grid
+    call MODEL%initialize_row_column_indices()
 
     ! read_polygon matches HWB polygon attributes with the corresponding gridcells in SWB
     call read_polygon_id()
@@ -361,7 +367,7 @@ contains
         rX0=MODEL%X_ll, rY0=MODEL%Y_ll, &
         rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
 
-    pTempGrd%rData = unpack( MODEL%pervious_fraction, MODEL%active, MODEL%dont_care )
+    pTempGrd%rData = unpack( MODEL%pervious_fraction, MODEL%active, MODEL%nodata_fill_value )
 
     call grid_WriteArcGrid( sFilename="Fraction_pervious_surface__as_read_in_unitless.asc", pGrd=pTempGrd )
 
@@ -427,7 +433,7 @@ contains
         rX0=MODEL%X_ll, rY0=MODEL%Y_ll, &
         rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
 
-    pTempGrd%rData = unpack( MODEL%canopy_cover_fraction, MODEL%active, MODEL%dont_care )
+    pTempGrd%rData = unpack( MODEL%canopy_cover_fraction, MODEL%active, MODEL%nodata_fill_value )
 
     call grid_WriteArcGrid( sFilename="Fraction_canopy_cover__as_read_in_unitless.asc", pGrd=pTempGrd )
 
@@ -714,17 +720,17 @@ contains
 
 !     end where  
 
-!     pTempGrd%rData = unpack( MODEL%hwb_rooting_depth, MODEL%active, MODEL%dont_care )
+!     pTempGrd%rData = unpack( MODEL%hwb_rooting_depth, MODEL%active, MODEL%nodata_fill_value )
 
 !     call grid_WriteArcGrid("Maximum_rooting_depth__as_read_in_from_HWB_input__feet.asc", pTempGrd )
 
 
-!     pTempGrd%rData = unpack( MODEL%hwb_soil_storage_max, MODEL%active, MODEL%dont_care )
+!     pTempGrd%rData = unpack( MODEL%hwb_soil_storage_max, MODEL%active, MODEL%nodata_fill_value )
 
 !     call grid_WriteArcGrid("Maximum_soil_storage__as_read_in_from_HWB_input__inches.asc", pTempGrd )
 
 
-!     pTempGrd%rData = unpack( MODEL%hwb_awc_in_per_ft, MODEL%active, MODEL%dont_care )
+!     pTempGrd%rData = unpack( MODEL%hwb_awc_in_per_ft, MODEL%active, MODEL%nodata_fill_value )
 
 !     call grid_WriteArcGrid("Available_water_content__as_read_in_from_HWB_input__inches_per_foot.asc", pTempGrd )
 

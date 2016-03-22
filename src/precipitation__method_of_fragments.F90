@@ -535,6 +535,9 @@ contains
     iUBOUND_FRAGMENTS = ubound( FRAGMENTS, 1)
     iUBOUND_CURRENT_FRAGMENTS = ubound( CURRENT_FRAGMENTS, 1)
 
+    ! if by chance a mismatch in shape-to-grid results in an active cell with *NO* valid
+    ! rain gage ID, we need to set the entire array to zero to quash any spurious values getting in 
+    FRAGMENT_VALUE = 0.0_c_float
 
     do iIndex = 1, iMaxRainZones
  

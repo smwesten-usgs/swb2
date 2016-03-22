@@ -79,12 +79,14 @@ find_library(LIBCURL
 find_library(LIBGCC
         NAMES gcc libgcc libgcc.a
         PATHS
+        /usr/local/lib64
         ${LIBGCC_PATH}
         ${LIB_PATH} )
 
 find_library(LIBGFORTRAN
         NAMES gfortran libgfortran libgfortran.a
         PATHS 
+        /usr/local/lib64
         ${LIBGCC_PATH}
         ${LIB_PATH} )
 

@@ -36,6 +36,10 @@ module constants_and_conversions
   public :: rZERO
   logical (kind=c_bool), parameter   :: lTRUE = .true._c_bool
   logical (kind=c_bool), parameter   :: lFALSE = .false._c_bool
+
+  logical (kind=c_bool), parameter   :: TRUE = .true._c_bool
+  logical (kind=c_bool), parameter   :: FALSE = .false._c_bool
+
   real (kind=c_float), parameter     :: rBIGVAL = HUGE(0.0_c_float)
   real (kind=c_double), parameter    :: dBIGVAL = HUGE(0.0_c_double)
   integer(kind=c_int), parameter     :: iBIGVAL = HUGE(0_c_int)

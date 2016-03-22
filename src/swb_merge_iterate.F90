@@ -47,7 +47,7 @@ contains
       fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,          &
       dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0 )
 
-    cells%dont_care = NC_FILL_FLOAT
+    cells%nodata_fill_value = NC_FILL_FLOAT
 
     do while ( SIM_DT%curr <= SIM_DT%end )
 

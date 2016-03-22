@@ -111,13 +111,13 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine fog_monthly_grid_calculate( fRainfall, fFog, iLanduse_Index, lActive, fDont_Care )
+  subroutine fog_monthly_grid_calculate( fRainfall, fFog, iLanduse_Index, lActive, nodata_fill_value )
 
     real (kind=c_float), intent(in)        :: fRainfall(:)
     real (kind=c_float), intent(inout)     :: fFog(:)
     integer (kind=c_int), intent(in)       :: iLanduse_Index(:)
     logical (kind=c_bool), intent(in)      :: lActive(:,:)
-    real (kind=c_float), intent(in)        :: fDont_Care(:,:)
+    real (kind=c_float), intent(in)        :: nodata_fill_value(:,:)
 
     ! [ LOCALS ] 
     integer (kind=c_int) :: iJulianDay
@@ -131,8 +131,8 @@ contains
     integer (kind=c_int) :: iIndex
     real (kind=c_float)  :: fFactor
 
-    iNX = ubound(fDont_Care, 1)
-    iNY = ubound(fDont_Care, 2)
+    iNX = ubound(nodata_fill_value, 1)
+    iNY = ubound(nodata_fill_value, 2)
 
     associate ( dt => SIM_DT%curr )
 
@@ -167,7 +167,7 @@ contains
                    iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
                    iCount=[1_c_size_t, int(iNY, kind=c_size_t), int(iNX, kind=c_size_t)],              &
                    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=fFog, lMask=lActive, rField=fDont_Care )
+                   rValues=fFog, lMask=lActive, rField=nodata_fill_value )
 
     end associate
 

@@ -20,6 +20,9 @@ module routing__D8
   logical (kind=c_bool), allocatable    :: lDownhillMarked(:,:)
   integer (kind=c_int), allocatable     :: iSumOfUpslopeCells(:,:)
   integer (kind=c_int), allocatable     :: iNumberOfUpslopeConnections(:,:)
+  
+  !> @TODO remove redundant data elements; row1d, col1d, etc. are now also stored in the model data structure.
+
   integer (kind=c_int), allocatable     :: ROW2D(:,:)
   integer (kind=c_int), allocatable     :: COL2D(:,:) 
   integer (kind=c_int), allocatable     :: ROW1D(:)

@@ -31,7 +31,7 @@ module swb_merge_domain
     real (kind=c_double)               :: gridcellsize
 
     logical (kind=c_bool), allocatable     :: active(:,:)
-    real (kind=c_float), allocatable       :: dont_care(:,:)
+    real (kind=c_float), allocatable       :: nodata_fill_value(:,:)
     real (kind=c_float), allocatable       :: array_output(:,:)
     real (kind=c_float), allocatable       :: latitude(:)
 
@@ -82,7 +82,7 @@ contains
     allocate(this%active(iNumCols, iNumRows), stat=iStat )
     call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
 
-    allocate(this%dont_care(iNumCols, iNumRows), stat=iStat )
+    allocate(this%nodata_fill_value(iNumCols, iNumRows), stat=iStat )
     call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
 
     allocate(this%array_output(iNumCols, iNumRows), stat=iStat )

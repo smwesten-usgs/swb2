@@ -178,7 +178,7 @@ contains
       dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0,                  &
       sDirName=OUTPUT_DIRECTORY_NAME )
 
-      cells%dont_care = NC_FILL_FLOAT
+      cells%nodata_fill_value = NC_FILL_FLOAT
 
   end subroutine initialize_output
 
@@ -212,7 +212,7 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
             lMask=cells%active,                                                                  &
             rValues=cells%gross_precip,                                                          &
-            rField=cells%dont_care )
+            rField=cells%nodata_fill_value )
 
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_RAINFALL )%ncfile,                &
             iVarID=NC_OUT( NCDF_RAINFALL )%ncfile%iVarID(NC_Z),                                 &
@@ -222,7 +222,7 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
             lMask=cells%active,                                                                 &
             rValues=cells%rainfall,                                                             &
-            rField=cells%dont_care )
+            rField=cells%nodata_fill_value )
 
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_INTERCEPTION )%ncfile,            &
             iVarID=NC_OUT( NCDF_INTERCEPTION )%ncfile%iVarID(NC_Z),                             &
@@ -232,7 +232,7 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
             lMask=cells%active,                                                                  &
             rValues=cells%interception,                                                          &
-            rField=cells%dont_care )
+            rField=cells%nodata_fill_value )
 
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_RUNOFF )%ncfile,                  &
             iVarID=NC_OUT( NCDF_RUNOFF )%ncfile%iVarID(NC_Z),                                   &
@@ -242,7 +242,7 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
             lMask=cells%active,                                                                  &
             rValues=cells%runoff,                                                                &
-            rField=cells%dont_care )
+            rField=cells%nodata_fill_value )
 
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_RUNOFF_OUTSIDE )%ncfile,          &
             iVarID=NC_OUT( NCDF_RUNOFF_OUTSIDE )%ncfile%iVarID(NC_Z),                           &
@@ -252,7 +252,7 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
             lMask=cells%active,                                                                  &
             rValues=cells%runoff_outside,                                                        &
-            rField=cells%dont_care )
+            rField=cells%nodata_fill_value )
 
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_RUNON )%ncfile,                   &
             iVarID=NC_OUT( NCDF_RUNON )%ncfile%iVarID(NC_Z),                                    &
@@ -262,7 +262,7 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
             lMask=cells%active,                                                                  &
             rValues=cells%runon,                                                                 &
-            rField=cells%dont_care )
+            rField=cells%nodata_fill_value )
 
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_INFILTRATION )%ncfile,            &
             iVarID=NC_OUT( NCDF_INFILTRATION )%ncfile%iVarID(NC_Z),                             &
@@ -272,7 +272,7 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
             lMask=cells%active,                                                                  &
             rValues=cells%infiltration,                                                          &
-            rField=cells%dont_care )
+            rField=cells%nodata_fill_value )
 
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_SNOWFALL )%ncfile,                &
             iVarID=NC_OUT( NCDF_SNOWFALL )%ncfile%iVarID(NC_Z),                                 &
@@ -282,7 +282,7 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
             lMask=cells%active,                                                                  &
             rValues=cells%snowfall,                                                              &
-            rField=cells%dont_care )
+            rField=cells%nodata_fill_value )
 
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_SNOWMELT )%ncfile,                &
             iVarID=NC_OUT( NCDF_SNOWMELT )%ncfile%iVarID(NC_Z),                                 &
@@ -292,7 +292,7 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
             lMask=cells%active,                                                                  &
             rValues=cells%snowmelt,                                                              &
-            rField=cells%dont_care )
+            rField=cells%nodata_fill_value )
 
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_SNOW_STORAGE )%ncfile,            &
             iVarID=NC_OUT( NCDF_SNOW_STORAGE )%ncfile%iVarID(NC_Z),                             &
@@ -302,7 +302,7 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
             lMask=cells%active,                                                                  &
             rValues=cells%snow_storage,                                                          &
-            rField=cells%dont_care )
+            rField=cells%nodata_fill_value )
 
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_SOIL_STORAGE )%ncfile,            &
             iVarID=NC_OUT( NCDF_SOIL_STORAGE )%ncfile%iVarID(NC_Z),                             &
@@ -312,7 +312,7 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
             lMask=cells%active,                                                                  &
             rValues=cells%soil_storage,                                                          &
-            rField=cells%dont_care )
+            rField=cells%nodata_fill_value )
 
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_POTENTIAL_RECHARGE )%ncfile,      &
             iVarID=NC_OUT( NCDF_POTENTIAL_RECHARGE )%ncfile%iVarID(NC_Z),                       &
@@ -322,7 +322,7 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
             lMask=cells%active,                                                                  &
             rValues=cells%potential_recharge,                                                    &
-            rField=cells%dont_care )
+            rField=cells%nodata_fill_value )
 
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_REFERENCE_ET0 )%ncfile,           &
             iVarID=NC_OUT( NCDF_REFERENCE_ET0 )%ncfile%iVarID(NC_Z),                            &
@@ -332,7 +332,7 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
             lMask=cells%active,                                                                  &
             rValues=cells%reference_ET0,                                                         &
-            rField=cells%dont_care )
+            rField=cells%nodata_fill_value )
 
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_ACTUAL_ET )%ncfile,               &
             iVarID=NC_OUT( NCDF_ACTUAL_ET )%ncfile%iVarID(NC_Z),                                &
@@ -342,7 +342,7 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
             lMask=cells%active,                                                                  &
             rValues=cells%actual_et,                                                             &
-            rField=cells%dont_care )
+            rField=cells%nodata_fill_value )
 
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_TMIN )%ncfile,                    &
             iVarID=NC_OUT( NCDF_TMIN )%ncfile%iVarID(NC_Z),                                     &
@@ -352,7 +352,7 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
             lMask=cells%active,                                                                  &
             rValues=cells%tmin,                                                                  &
-            rField=cells%dont_care )
+            rField=cells%nodata_fill_value )
 
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_TMAX )%ncfile,                    &
             iVarID=NC_OUT( NCDF_TMAX )%ncfile%iVarID(NC_Z),                                     &
@@ -362,7 +362,7 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
             lMask=cells%active,                                                                  &
             rValues=cells%tmax,                                                                  &
-            rField=cells%dont_care )
+            rField=cells%nodata_fill_value )
 
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_IRRIGATION )%ncfile,              &
             iVarID=NC_OUT( NCDF_IRRIGATION )%ncfile%iVarID(NC_Z),                               &
@@ -372,7 +372,7 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
             lMask=cells%active,                                                                  &
             rValues=cells%irrigation,                                                            &
-            rField=cells%dont_care )
+            rField=cells%nodata_fill_value )
 
     call cells%output_GDD()
 

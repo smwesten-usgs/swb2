@@ -39,7 +39,7 @@ module model_domain
     real (kind=c_double)               :: gridcellsize
 
     logical (kind=c_bool), allocatable     :: active(:,:)
-    real (kind=c_float), allocatable       :: dont_care(:,:)
+    real (kind=c_float), allocatable       :: nodata_fill_value(:,:)
     real (kind=c_float), allocatable       :: array_output(:,:)
 
     integer (kind=c_int), allocatable      :: landuse_code(:)
@@ -48,6 +48,12 @@ module model_domain
     integer (kind=c_int), allocatable      :: soil_group(:)
     integer (kind=c_int), allocatable      :: num_upslope_connections(:)
     integer (kind=c_int), allocatable      :: sum_upslope_cells(:)
+
+    integer (kind=c_int), allocatable      :: col_num_2D(:,:)
+    integer (kind=c_int), allocatable      :: row_num_2D(:,:)    
+
+    integer (kind=c_int), allocatable      :: col_num_1D(:)
+    integer (kind=c_int), allocatable      :: row_num_1D(:)    
 
     real (kind=c_float), allocatable       :: pervious_fraction(:)
     real (kind=c_float), allocatable       :: canopy_cover_fraction(:)
@@ -184,6 +190,12 @@ module model_domain
 
     procedure :: summarize_state_variables_sub
     generic   :: summarize => summarize_state_variables_sub
+
+    procedure :: initialize_row_column_indices_sub
+    generic   :: initialize_row_column_indices => initialize_row_column_indices_sub
+
+    procedure :: row_column_to_index_fn
+    generic   :: row_column_to_index => row_column_to_index_fn
   
   end type MODEL_DOMAIN_T
 
@@ -264,18 +276,23 @@ contains
     allocate(this%active(iNumCols, iNumRows), stat=iStat )
     call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
 
-    allocate(this%dont_care(iNumCols, iNumRows), stat=iStat )
+    allocate(this%nodata_fill_value(iNumCols, iNumRows), stat=iStat )
     call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
 
     allocate(this%array_output(iNumCols, iNumRows), stat=iStat )
+    call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
+
+    allocate(this%col_num_2D(iNumCols, iNumRows), stat=iStat )
+    call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
+
+    allocate(this%row_num_2D(iNumCols, iNumRows), stat=iStat )
     call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
 
     this%pGrdOut => grid_CreateSimple( iNX=iNumCols, iNY=iNumRows,        &
                       rX0=dX_ll, rY0=dY_ll, rGridCellSize=dGridCellSize,  &
                       iDataType=GRID_DATATYPE_REAL )
 
-    !! @TODO rename 'dont_care' to 'no_data' or similar
-    this%dont_care = NC_FILL_FLOAT
+    this%nodata_fill_value = NC_FILL_FLOAT
 
   end subroutine initialize_grid_sub
 
@@ -288,7 +305,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: iStat(47)
+    integer (kind=c_int)  :: iStat(49)
 
     iCount = count( this%active )
 
@@ -339,6 +356,8 @@ contains
     allocate( this%crop_etc( iCount ), stat=iStat(45) )
     allocate( this%direct_recharge( iCount ), stat=iStat(46) )     
     allocate( this%number_of_days_since_planting( iCount ), stat=iStat(47) )   
+    allocate( this%col_num_1D( iCount ), stat=iStat(48) )
+    allocate( this%row_num_1D( iCount ), stat=iStat(49) )    
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="  &
@@ -402,6 +421,60 @@ contains
 !$OMP END PARALLEL WORKSHARE
 
   end subroutine initialize_arrays_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine initialize_row_column_indices_sub( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)   :: this
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: row_num, col_num
+    integer (kind=c_int) :: status
+
+    do row_num=lbound( this%row_num_2D, 2), ubound( this%row_num_2D, 2)
+      this%row_num_2D( :, row_num ) = row_num
+    enddo  
+
+    do col_num=lbound( this%col_num_2D, 2), ubound( this%col_num_2D, 2)
+      this%col_num_2D( col_num, : ) = col_num
+    enddo  
+
+    this%col_num_1D = pack( this%col_num_2D, this%active )
+    this%row_num_1D = pack( this%row_num_2D, this%active )
+
+    deallocate( this%col_num_2D, stat=status )
+    deallocate( this%row_num_2D, stat=status )
+
+  end subroutine initialize_row_column_indices_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  function row_column_to_index_fn( this, col_num, row_num )   result( indexval )
+
+    class (MODEL_DOMAIN_T), intent(inout)   :: this
+    integer (kind=c_int), intent(in)        :: col_num
+    integer (kind=c_int), intent(in)        :: row_num    
+    integer (kind=c_int)                    :: indexval
+
+    ! [ LOCALS ]
+    logical (kind=c_bool)   :: found_match
+
+    found_match = FALSE
+
+    do indexval=lbound( this%col_num_1D, 1 ), ubound( this%col_num_1D, 1 )
+
+      if (     ( this%col_num_1D( indexval ) == col_num )            &
+         .and. ( this%row_num_1D( indexval ) == row_num ) ) then
+        found_match = TRUE
+        exit
+      endif  
+
+    enddo
+
+    if ( .not. found_match )  indexval = -9999
+
+  end function row_column_to_index_fn
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1397,7 +1470,7 @@ contains
         rX0=this%X_ll, rY0=this%Y_ll, &
         rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
 
-    pTempGrd%rData = unpack( this%soil_storage_max, this%active, this%dont_care )
+    pTempGrd%rData = unpack( this%soil_storage_max, this%active, this%nodata_fill_value )
 
     call grid_WriteArcGrid( sFilename="Soil_Storage_Maximum__as_calculated_inches.asc", pGrd=pTempGrd )
 
@@ -1432,7 +1505,7 @@ contains
 
     this%soil_storage_max = pack( pSOIL_STORAGE_MAX_GRID%pGrdBase%rData, this%active )
 
-    pTempGrd%rData = unpack( this%soil_storage_max, this%active, this%dont_care )
+    pTempGrd%rData = unpack( this%soil_storage_max, this%active, this%nodata_fill_value )
 
     ! back-calculate awc to make it consistent with rooting_depth_max and given
     ! soil_storage_max gridded values
@@ -1451,7 +1524,7 @@ contains
    
     call grid_WriteArcGrid( sFilename="Maximum_Soil_Storage__as_read_in_inches.asc", pGrd=pTempGrd )
     
-    pTempGrd%rData = unpack( this%rooting_depth_max, this%active, this%dont_care )    
+    pTempGrd%rData = unpack( this%rooting_depth_max, this%active, this%nodata_fill_value )    
 
     call grid_WriteArcGrid( sFilename="Available_water_content__as_RECALCULATED_in_inches_per_foot.asc", pGrd=pTempGrd )
 
@@ -1578,7 +1651,7 @@ contains
     call awc_gridded_values_initialize( lActive=this%active,  &
                                         fAWC=this%awc )
 
-    pTempGrd%rData = unpack( this%awc, this%active, this%dont_care )
+    pTempGrd%rData = unpack( this%awc, this%active, this%nodata_fill_value )
 
     call grid_WriteArcGrid( sFilename="Available_water_content__as_read_in_inches_per_foot.asc", pGrd=pTempGrd )
 
@@ -1622,7 +1695,7 @@ contains
                                       fAWC=this%awc,                              &
                                       iSoils_Code=this%soil_code )
 
-    pTempGrd%rData = unpack( this%awc, this%active, this%dont_care )
+    pTempGrd%rData = unpack( this%awc, this%active, this%nodata_fill_value )
 
     call grid_WriteArcGrid( sFilename="Available_water_content__as_calculated_inches_per_foot.asc", pGrd=pTempGrd )
 
@@ -1820,7 +1893,7 @@ contains
     call direct_recharge_calculate( direct_recharge = this%direct_recharge,      &
                                     iLanduse_Index=this%landuse_index,           &
                                     lActive=this%active,                         &
-                                    fDont_Care=this%dont_care )
+                                    nodata_fill_value=this%nodata_fill_value )
 
   end subroutine model_calculate_direct_recharge_gridded
 
@@ -1932,7 +2005,7 @@ contains
 
     call fog_monthly_grid_calculate( fRainfall=this%rainfall, fFog=this%fog,          &
       iLanduse_Index=this%landuse_index, lActive=this%active,                         &
-      fDont_Care=this%dont_care )
+      nodata_fill_value=this%nodata_fill_value )
 
   end subroutine model_calculate_fog_monthly_grid  
 
@@ -2086,6 +2159,8 @@ contains
     integer (kind=c_int) ::iMonth
     integer (kind=c_int) ::iDay
     integer (kind=c_int) ::iYear
+    integer (kind=c_int) :: targetindex
+    integer (kind=c_int) :: indexval
 
     ! in this usage, it is assumed that the precipitation grids that are being read in represent
     ! MONTHLY sum of precipitation
@@ -2107,12 +2182,34 @@ contains
     end associate
 
     if (.not. associated(pPRCP%pGrdBase) ) &
-      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer.", __FILE__, __LINE__)
 
     call precipitation_method_of_fragments_calculate( this%active )
 
     this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * FRAGMENT_VALUE * RAINFALL_ADJUST_FACTOR
     this%monthly_gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * RAINFALL_ADJUST_FACTOR
+
+    ! print *, "*****************************************************************"
+    ! do indexval=8,10
+
+    !   targetindex = this%row_column_to_index_fn( indexval, 214 )
+
+    !   if ( targetindex > 0 ) then
+
+    !     print *, " row 214, col ", indexval
+    !     print *, "----------------"
+    !     print *, "active?:        ", this%active( indexval,214 )
+    !     print *, "gross_precip:   ", this%gross_precip( targetindex )
+    !     print *, "FRAGMENT_VALUE: ", FRAGMENT_VALUE( targetindex )
+    !     print *, "RAIN_ADJST_FAC: ", RAINFALL_ADJUST_FACTOR( targetindex )     
+    !     print *, "Raw PRCP grid:  ", pPRCP%pGrdBase%rData( indexval, 214 )
+    !     print *, "Rain Gage ID:   ", RAIN_GAGE_ID( targetindex )
+    !     print *, " "
+    !   endif  
+
+    ! enddo  
+
+    ! print *, "*****************************************************************"
 
   end subroutine model_get_precip_method_of_fragments 
 
