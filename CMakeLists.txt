@@ -22,8 +22,11 @@ message("Processing top-level CMakelists.txt for project swb2")
 
 include( CMakeForceCompiler )
 
-CMAKE_FORCE_C_COMPILER( gcc GNU )
-CMAKE_FORCE_Fortran_COMPILER( gfortran GNU )
+#CMAKE_FORCE_C_COMPILER ( ${CC} ${GCC_VERSION} )
+#CMAKE_FORCE_Fortran_COMPILER ( ${FC} ${GCC_VERSION} )
+
+#CMAKE_FORCE_C_COMPILER( gcc GNU )
+#CMAKE_FORCE_Fortran_COMPILER( gfortran GNU )
 
 #------------------------------------------------------------------------------------#
 #                           Build directory check                                    #
@@ -58,9 +61,6 @@ set(PACKAGE_TARNAME "swb2")
 set(PACKAGE_VERSION "2.0 ALPHA")
 
 cmake_minimum_required(VERSION 2.8)
-
-CMAKE_FORCE_C_COMPILER ( ${CC} ${GCC_VERSION} )
-CMAKE_FORCE_Fortran_COMPILER ( ${FC} ${GCC_VERSION} )
 
 include( cmake/version_control.cmake )
 include( cmake/options_and_targets.cmake )

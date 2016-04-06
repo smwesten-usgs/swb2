@@ -6,13 +6,13 @@ rm -f *.txt
 
 # set CMAKE-related and build-related variables
 export CMAKEROOT=/usr/bin/cmake
-export COMPILER_VERSION=5.2.0
+export COMPILER_VERSION=5.3.0
 export COMPILER_MAJ_VERSION=5
 export COMPILER_TRIPLET=x86_64-apple-darwin15.0.0
 export COMPILER_DIR=/usr/local
 export LIB_PATH1="/usr/local/lib/gcc/$COMPILER_MAJ_VERSION/gcc/$COMPILER_TRIPLET/$COMPILER_VERSION"
 export LIB_PATH2=/opt/X11/lib
-export LIB_PATH3=/usr/local/lib
+export LIB_PATH3=/usr/local/Cellar/gcc5/5.3.0/lib/gcc/5/gcc/x86_64-apple-darwin15.3.0/5.3.0
 export LIB_PATH4="/usr/local/lib/gcc/$COMPILER_MAJ_VERSION"
 export Fortran_COMPILER_NAME=gfortran
 export R_HOME=/usr/bin/R
@@ -24,7 +24,7 @@ export INSTALL_PREFIX=/usr/local/bin
 
 # define other variables for use in the CMakeList.txt file
 # options are "Release" or "Debug"
-export BUILD_TYPE="Release"
+export BUILD_TYPE="Debug"
 # options are "x86" (32-bit) or "x64" (64-bit)
 export OS="mac_osx"
 
@@ -34,11 +34,11 @@ export TARGET__SWB_LIBRARY="FALSE"
 export TARGET__SWBSTATS="FALSE"
 
 # define platform and compiler specific compilation flags
-export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -Wall -fcheck=all -fexceptions -fbackslash -ffree-line-length-none"
+export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -Wall -fcheck=all -fexceptions -fsanitize=null -fsanitize=leak -fbackslash -ffree-line-length-none"
 #set CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -floop-parallelize-all -flto -ffree-line-length-none -static-libgcc -static-libgfortran"
 #export CMAKE_Fortran_FLAGS_RELEASE="-O3 -mtune=native -ffree-line-length-none -ffpe-summary='none' -fopenmp"
 
-export CMAKE_Fortran_FLAGS_RELEASE="-O3 -mtune=native -ffree-line-length-none -fbackslash -ffpe-summary='none' -fopenmp"
+export CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -ffree-line-length-none -fbackslash -ffpe-summary='none' -fopenmp"
 
 
 # set important environment variables

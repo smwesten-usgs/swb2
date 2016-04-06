@@ -160,7 +160,7 @@ contains
     ! [ LOCALS ]
     real (kind=c_float) :: fDelta
 
-    if ( SIM_DT%iDOY >= iGDD_Reset_DOY ) fGDD = 0.0_c_float
+    if ( SIM_DT%iDOY == iGDD_Reset_DOY ) fGDD = 0.0_c_float
 
     fDelta = min(fTMean, fT_GDD_Max) - fT_GDD_Base
 
