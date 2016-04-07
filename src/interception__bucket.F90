@@ -12,9 +12,9 @@ module interception__bucket
 
   private
 
-  public interception_bucket_initialize
-  public interception_bucket_calculate
-  public IS_GROWING_SEASON
+  public :: interception_bucket_initialize, interception_bucket_calculate
+  public :: interception_bucket_update_growing_season
+  public :: IS_GROWING_SEASON
 
   logical (kind=c_bool) :: GROWING_SEASON = .true._c_bool
 
@@ -68,14 +68,9 @@ contains
 
     call PARAMS%get_parameters( slKeys=sl_temp_list,                                  &
                                 fValues=temp_values,                                  &
-                                lFatal=.true._c_bool )
+                                lFatal=TRUE )
 
-    if (all( temp_values <= fTINYVAL) ) then
-
-      call warn( sMessage="Did not find any data column pertaining to 'Growing_season_interception'.",              &
-           sModule=__FILE__, iLine=__LINE__, lFatal=TRUE )
-
-    else
+    if (all( temp_values > fTINYVAL) ) then
 
       lAreLengthsEqual = ( ubound(temp_values,1) == ubound(iLanduseCodes,1) )
       
@@ -102,8 +97,6 @@ contains
 
       allocate(INTERCEPTION_B_VALUE_GROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
       INTERCEPTION_B_VALUE_GROWING_SEASON = 0.0_c_float
-      call warn( sMessage="Did not find any data column pertaining to 'Growing_season_interception_b'.",              &
-           sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
 
     else
 
@@ -132,8 +125,6 @@ contains
 
       allocate(INTERCEPTION_N_VALUE_GROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
       INTERCEPTION_N_VALUE_GROWING_SEASON = 1.0_c_float
-      call warn( sMessage="Did not find any data column pertaining to 'Growing_season_interception_n'.",    &
-           sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
 
     else
 
@@ -150,20 +141,15 @@ contains
 
     !> retrieve nongrowing season interception amount: 'a' term
     call sl_temp_list%clear()
-    call sl_temp_list%append("Nongrowing_season_interception_a")
-    call sl_temp_list%append("Interception_nongrowing_a_term")
+    call sl_temp_list%append("Nongrowing_season_interception")
+    call sl_temp_list%append("Interception_nongrowing")
     call sl_temp_list%append("Interception_a_term_nongrowing_season")
 
-    call PARAMS%get_parameters( slKeys=sl_temp_list,                                  &
+    call PARAMS%get_parameters( slKeys=sl_temp_list,          &
                                 fValues=temp_values,          &
-                                lFatal=FALSE ) 
+                                lFatal=TRUE ) 
 
-    if (all( temp_values <= fTINYVAL) ) then
-
-      call warn( sMessage="Did not find any data column pertaining to 'Nongrowing_season_interception_a'.",              &
-           sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
-
-    else
+    if (all( temp_values > fTINYVAL) ) then
 
       lAreLengthsEqual = ( ubound(temp_values,1) == ubound(iLanduseCodes,1) )
       
@@ -190,9 +176,6 @@ contains
 
       allocate(INTERCEPTION_B_VALUE_NONGROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
       INTERCEPTION_B_VALUE_NONGROWING_SEASON = 0.0_c_float
-      call warn( sMessage="Did not find any data column pertaining to 'Nongrowing_season_interception_b'. "  &
-                        //"Assuming all values are zero.",                                                   &
-           sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
 
     else
 
@@ -221,9 +204,6 @@ contains
 
       allocate(INTERCEPTION_N_VALUE_NONGROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
       INTERCEPTION_N_VALUE_NONGROWING_SEASON = 1.0_c_float
-      call warn( sMessage="Did not find any data column pertaining to 'Nongrowing_season_interception_n'. "  &
-                        //"Assuming all values are 1.0",                                                     &
-           sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
 
     else
 
@@ -288,6 +268,65 @@ contains
         LAST_DAY_OF_GROWING_SEASON( indx ) = asInt( str_buffer )  
       endif  
     enddo  
+
+
+
+    !> GDD for first day of growing season
+    call sl_temp_list%clear()
+    call sl_temp_list%append("GDD_first_day_of_growing_season")
+    call sl_temp_list%append("GDD_start_of_growing_season")
+
+    call PARAMS%get_parameters( slKeys=sl_temp_list,          &
+                                fValues=temp_values,          &
+                                lFatal=FALSE ) 
+
+    lAreLengthsEqual = ( ubound(temp_values,1) == ubound(iLanduseCodes,1) )
+    
+    if ( lAreLengthsEqual ) then
+
+      call move_alloc( temp_values, GDD_FIRST_DAY_OF_GROWING_SEASON )
+
+    else
+
+      call warn( sMessage="The number of landuses does not match the number of GDD values "  &
+                        //"specified for defining the beginning of the growing season.",     &
+                 sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
+
+      allocate( GDD_FIRST_DAY_OF_GROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
+      call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__)
+
+      GDD_FIRST_DAY_OF_GROWING_SEASON = NODATA_VALUE
+
+    endif
+
+    !> Air temperature defining last day of growing season
+    call sl_temp_list%clear()
+    call sl_temp_list%append("Killing_frost_temperature")
+    call sl_temp_list%append("Air_temperature_end_of_growing_season")
+
+    call PARAMS%get_parameters( slKeys=sl_temp_list,          &
+                                fValues=temp_values,          &
+                                lFatal=FALSE ) 
+
+    lAreLengthsEqual = ( ubound(temp_values,1) == ubound(iLanduseCodes,1) )
+    
+    if ( lAreLengthsEqual ) then
+
+      call move_alloc( temp_values, KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON )
+
+    else
+
+      call warn( sMessage="The number of landuses does not match the number of killing frost values "  &
+                        //"specified to define the end of the growing season.",                        &
+                 sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
+
+      allocate( KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
+      call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__)
+
+      KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON = NODATA_VALUE
+
+    endif
+
 
     allocate( IS_GROWING_SEASON( count( active_cells ) ), stat=status )
     call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
@@ -369,7 +408,7 @@ contains
 
     endif
 
-    fInterception = min( fPotentialInterception, fPrecip + fFog ) * fCanopy_Cover_Fraction
+    fInterception = min( fPotentialInterception, fPrecip + fFog )  * fCanopy_Cover_Fraction
 
  
   end function interception_bucket_calculate

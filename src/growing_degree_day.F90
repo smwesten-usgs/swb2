@@ -140,8 +140,9 @@ contains
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
 
     call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE, sVariableName="growing_degree_day", &
-      sVariableUnits="degree-days Fahrenheit", iNX=ubound(lActive, 1), iNY=ubound(lActive, 2), &
-      fX=dX, fY=dY, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=dY_lat, dpLon=dX_lon, &
+      sVariableUnits="degree-days Fahrenheit", iNX=ubound(lActive, 1), iNY=ubound(lActive, 2),  &
+      fX=dX, fY=dY, sXY_units=trim( XY_UNITS_STRING ),                                          &
+      StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=dY_lat, dpLon=dX_lon,                   &
       fValidMin=0.0, fValidMax=7000.0, sDirName=output_directory_name )
 
   end subroutine growing_degree_day_initialize

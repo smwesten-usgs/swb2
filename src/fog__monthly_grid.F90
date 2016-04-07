@@ -102,8 +102,9 @@ contains
     iNY = ubound(lActive, 2)
 
     call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE, sVariableName="fog", &
-      sVariableUnits="inches", iNX=iNX, iNY=iNY, &
-      fX=dX, fY=dY, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=dY_lat, dpLon=dX_lon, &
+      sVariableUnits="inches", iNX=iNX, iNY=iNY,                                 &
+      fX=dX, fY=dY, sXY_units=trim( XY_UNITS_STRING ),                           &
+      StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=dY_lat, dpLon=dX_lon,    &
       fValidMin=0.0, fValidMax=2000.0, sDirName=output_directory_name )
 
 

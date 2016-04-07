@@ -18,6 +18,8 @@ module constants_and_conversions
   integer (kind=c_int), parameter :: DATATYPE_DOUBLE  = 3
   integer (kind=c_int), parameter :: DATATYPE_NA      = -9999
 
+  character (len=64)   :: XY_UNITS_STRING       = "meters"
+
   ! [ common mathematical constants ]
   public :: PI, TWOPI, HALFPI
   real (kind=c_double), parameter    :: PI = 3.1415926535897932384626433_c_double
@@ -70,25 +72,6 @@ module constants_and_conversions
   real (kind=c_double), parameter :: C_PER_F    = 5.0_c_double / 9.0_c_double
   real (kind=c_double), parameter :: F_PER_C    = 9.0_c_double / 5.0_c_double  
   real (kind=c_double), parameter :: M_PER_FOOT = 0.3048_c_double 
-
-
-! this type is still needed for the grid module
-type T_CELL
-      integer (kind=c_int) :: iFlowDir = iZERO    ! Flow direction from flow-dir grid
-      integer (kind=c_int) :: iSoilGroup = iZERO  ! Soil type from soil-type grid
-      integer (kind=c_int) :: iLandUseIndex       ! Index (row num) of land use table
-      integer (kind=c_int) :: iLandUse = iZERO    ! Land use from land-use grid
-      integer (kind=c_int) :: iIrrigationTableIndex = iZERO  ! Index (row num) of irrigation table
-      real (kind=c_float) :: rElevation =rZERO            ! Ground elevation
-      real (kind=c_float) :: rSoilWaterCapInput = rZERO   ! Soil water capacity from grid file
-      real (kind=c_float) :: rSoilWaterCap = rZERO        ! Soil water capacity adjusted for LU/LC
-      real (kind=c_float) :: rSoilMoisture = rZERO        ! Soil moisture in inches of water
-      real (kind=c_float) :: rCurrentRootingDepth = 0.2   ! Current rooting depth for use w FAO56 calculations
-      real (kind=c_float) :: rKcb = rZERO                 ! crop coefficient for this cell
-      real (kind=c_float) :: rTotalAvailableWater = rZERO
-      real (kind=c_float) :: rReadilyAvailableWater = rZERO
-
-  end type T_CELL
 
   type BOUNDS_T
     character (len=:), allocatable  :: sPROJ4_string

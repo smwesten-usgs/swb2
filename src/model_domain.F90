@@ -1071,9 +1071,15 @@ contains
 
   subroutine model_calculate_interception_bucket(this)
 
-    use interception__bucket, only  : interception_bucket_calculate, IS_GROWING_SEASON
+    use interception__bucket, only  : interception_bucket_calculate, IS_GROWING_SEASON, &
+                                      interception_bucket_update_growing_season
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call interception_bucket_update_growing_season( landuse_index=this%landuse_index,        &
+                                                    GDD=this%GDD,                            &
+                                                    mean_air_temp=this%tmean,                &
+                                                    it_is_growing_season=IS_GROWING_SEASON )
 
     this%interception = interception_bucket_calculate( this%landuse_index, this%rainfall, this%fog, &
                                                          this%canopy_cover_fraction, IS_GROWING_SEASON )
@@ -1813,17 +1819,17 @@ contains
                                                   precipitation=this%infiltration,                  &
                                                   crop_etc=this%crop_etc )
 
-    do indx=1,ubound( this%actual_et_soil,1) 
-      if ( actual_et_2( indx ) > 0.0 ) then  
-        diff = this%actual_et_soil(indx) - actual_et_2(indx) 
-        if ( abs(diff) > 1.0e-3 )                                                 &                                        
-        print *, indx, this%actual_et_soil( indx ), actual_et_2( indx ),          &
-          actual_et_3(indx),                                                      &
-          diff,                                                                   &
-          this%soil_storage( indx ), this%soil_storage_max( indx ),               &
-          this%infiltration( indx ), this%crop_etc( indx ), this%landuse_code( indx )
-      endif    
-    enddo  
+!     do indx=1,ubound( this%actual_et_soil,1) 
+!       if ( actual_et_2( indx ) > 0.0 ) then  
+!         diff = this%actual_et_soil(indx) - actual_et_2(indx) 
+!         if ( abs(diff) > 1.0e-3 )                                                 &                                        
+!         print *, indx, this%actual_et_soil( indx ), actual_et_2( indx ),          &
+!           actual_et_3(indx),                                                      &
+!           diff,                                                                   &
+!           this%soil_storage( indx ), this%soil_storage_max( indx ),               &
+!           this%infiltration( indx ), this%crop_etc( indx ), this%landuse_code( indx )
+!       endif    
+!     enddo  
 
 
   end subroutine model_calculate_actual_et_thornthwaite_mather

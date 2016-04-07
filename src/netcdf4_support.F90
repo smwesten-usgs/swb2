@@ -837,8 +837,9 @@ end subroutine netcdf_open_and_prepare_as_output_archive
 
 
 
-subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUnits, &
-   iNX, iNY, fX, fY, StartDate, EndDate, dpLat, dpLon, fValidMin, fValidMax, sDirName )
+subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUnits,    &
+   iNX, iNY, fX, fY, sXY_units, StartDate, EndDate, dpLat, dpLon, fValidMin, fValidMax, &
+   sDirName )
 
   type (T_NETCDF4_FILE ), pointer            :: NCFILE
   character (len=*), intent(in)              :: sVariableName
@@ -847,6 +848,7 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   integer (kind=c_int), intent(in)           :: iNY
   real (kind=c_double), intent(in)           :: fX(:)
   real (kind=c_double), intent(in)           :: fY(:)
+  character (len=*), intent(in)              :: sXY_units
   type (DATETIME_T), intent(in)              :: StartDate
   type (DATETIME_T), intent(in)              :: EndDate
   real (kind=c_double), intent(in), optional :: dpLat(:,:)
@@ -896,8 +898,8 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   call nf_set_standard_dimensions(NCFILE=NCFILE, iNX=iNX, iNY=iNY)
   
   !> @todo implement more flexible method of assigning units
-  NCFILE%sVarUnits(NC_X)    = "meters"  
-  NCFILE%sVarUnits(NC_Y)    = "meters"  
+  NCFILE%sVarUnits(NC_X)    = sXY_units 
+  NCFILE%sVarUnits(NC_Y)    = sXY_units 
   NCFILE%sVarUnits(NC_Z)    = sVariableUnits  
   
   !> transfer dimension values to NetCDF file
