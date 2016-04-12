@@ -2189,25 +2189,25 @@ contains
     this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * FRAGMENT_VALUE * RAINFALL_ADJUST_FACTOR
     this%monthly_gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * RAINFALL_ADJUST_FACTOR
 
-    ! print *, "*****************************************************************"
-    ! do indexval=8,10
+    print *, "*****************************************************************"
+    do indexval=5,7
 
-    !   targetindex = this%row_column_to_index_fn( indexval, 214 )
+      targetindex = this%row_column_to_index_fn( indexval, 151 )
 
-    !   if ( targetindex > 0 ) then
+      if ( targetindex > 0 ) then
 
-    !     print *, " row 214, col ", indexval
-    !     print *, "----------------"
-    !     print *, "active?:        ", this%active( indexval,214 )
-    !     print *, "gross_precip:   ", this%gross_precip( targetindex )
-    !     print *, "FRAGMENT_VALUE: ", FRAGMENT_VALUE( targetindex )
-    !     print *, "RAIN_ADJST_FAC: ", RAINFALL_ADJUST_FACTOR( targetindex )     
-    !     print *, "Raw PRCP grid:  ", pPRCP%pGrdBase%rData( indexval, 214 )
-    !     print *, "Rain Gage ID:   ", RAIN_GAGE_ID( targetindex )
-    !     print *, " "
-    !   endif  
+        print *, " row 151, col ", indexval
+        print *, "----------------"
+        print *, "active?:        ", this%active( indexval,151 )
+        print *, "gross_precip:   ", this%gross_precip( targetindex )
+        print *, "FRAGMENT_VALUE: ", FRAGMENT_VALUE( targetindex )
+        print *, "RAIN_ADJST_FAC: ", RAINFALL_ADJUST_FACTOR( targetindex )     
+        print *, "Raw PRCP grid:  ", pPRCP%pGrdBase%rData( indexval, 151 )
+        print *, "Rain Gage ID:   ", RAIN_GAGE_ID( targetindex )
+        print *, " "
+      endif  
 
-    ! enddo  
+    enddo  
 
     ! print *, "*****************************************************************"
 
