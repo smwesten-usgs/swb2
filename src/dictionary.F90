@@ -473,7 +473,7 @@ contains
 
     class (DICT_T)                                     :: this
     type (STRING_LIST_T), intent(inout)                :: slKeys
-    logical (kind=c_bool), allocatable, intent(inout)   :: lValues(:)
+    logical (kind=c_bool), allocatable, intent(out)    :: lValues(:)
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
@@ -629,7 +629,7 @@ contains
 
     class (DICT_T)                                     :: this
     type (STRING_LIST_T), intent(inout)                :: slKeys
-    integer (kind=c_int), allocatable, intent(inout)   :: iValues(:)
+    integer (kind=c_int), allocatable, intent(out)     :: iValues(:)
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
@@ -686,7 +686,7 @@ contains
 
     class (DICT_T)                                    :: this
     type (STRING_LIST_T), intent(inout)               :: slKeys
-    real (kind=c_float), allocatable, intent(inout)   :: fValues(:)
+    real (kind=c_float), allocatable, intent(out)     :: fValues(:)
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
@@ -735,7 +735,7 @@ contains
 
     class (DICT_T)                                    :: this
     character (len=*), intent(in)                     :: sKey
-    real (kind=c_float), allocatable, intent(inout)   :: fValues(:)
+    real (kind=c_float), allocatable, intent(out)     :: fValues(:)
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget

@@ -33,11 +33,13 @@ module grid
   !> C code; no pointers are returned to fortran
   public :: pj_init_and_transform
   interface
-    function pj_init_and_transform(from_projection, to_projection, point_count, x, y) &
-     bind(c,name='pj_init_and_transform')
+    function pj_init_and_transform(from_projection, to_projection, caller_name,                             &
+                                   caller_linenum, point_count, x, y) bind(c,name='pj_init_and_transform')
     import
     character(kind=c_char) :: from_projection(*)
     character(kind=c_char) :: to_projection(*)
+    character(kind=c_char) :: caller_name(*)
+    integer(kind=c_int),value  :: caller_linenum
     integer(kind=c_long),value :: point_count
     real(kind=c_double) :: x(*)
     real(kind=c_double) :: y(*)
@@ -1493,7 +1495,9 @@ subroutine grid_Transform(pGrd, sFromPROJ4, sToPROJ4 )
   endif
 
   iRetVal = pj_init_and_transform(csFromPROJ4//C_NULL_CHAR, &
-                                  csToPROJ4//C_NULL_CHAR, &
+                                  csToPROJ4//C_NULL_CHAR,   &
+                                  trim(__FILE__)//C_NULL_CHAR,    &
+                                  __LINE__,                 &
                                   int(pGrd%iNumGridCells, kind=c_long), pGrd%rX, pGrd%rY)
 
   call grid_CheckForPROJ4Error(iRetVal, sFromPROJ4, sToPROJ4)
@@ -1513,19 +1517,10 @@ subroutine grid_Transform(pGrd, sFromPROJ4, sToPROJ4 )
   pGrd%rGridCellSize = ( maxval(pGrd%rX) - minval(pGrd%rX) ) &
              / real(pGrd%iNX - 1, kind=c_double)
 
-  print *, "Gridcell size (calculated): ", pGrd%rGridCellSize
-  print *, "minval(rX): ", minval(pGrd%rX)
-  print *, "minval(rY): ", minval(pGrd%rY)
-
   pGrd%rX0 = minval(pGrd%rX) - pGrd%rGridCellSize / 2_c_float
   pGrd%rX1 = maxval(pGrd%rX) + pGrd%rGridCellSize / 2_c_float
   pGrd%rY0 = minval(pGrd%rY) - pGrd%rGridCellSize / 2_c_float
   pGrd%rY1 = maxval(pGrd%rY) + pGrd%rGridCellSize / 2_c_float
-
-  print *, "pGrd%rX0 = minval(pGrd%rX) - pGrd%rGridCellSize / 2_c_float: ", pGrd%rX0
-  print *, "pGrd%rX1 = maxval(pGrd%rX) + pGrd%rGridCellSize / 2_c_float: ", pGrd%rX1 
-  print *, "pGrd%rY0 = minval(pGrd%rY) - pGrd%rGridCellSize / 2_c_float: ", pGrd%rY0
-  print *, "pGrd%rY1 = maxval(pGrd%rY) + pGrd%rGridCellSize / 2_c_float: ", pGrd%rY1
 
   ! finally, change the projection string to reflect the new coordinate system
   pGrd%sPROJ4_string = trim(sToPROJ4)

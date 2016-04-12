@@ -972,7 +972,8 @@ contains
 
     elseif ( sCmdText .contains. "PRECIPITATION" ) then
 
-      if ( ( sMethodName .strequal. "NORMAL" ) &
+      if ( ( sMethodName .strequal. "NORMAL" )                &
+           .or. ( sMethodName .strequal. "GRIDDED" )            &
            .or. ( sMethodName .strequal. "STANDARD" ) ) then
 
         this%init_precipitation_data => model_initialize_precip_normal
@@ -1008,6 +1009,10 @@ contains
         call LOGS%WRITE( "==> GRIDDED values for water main leakage (etc.) will be used.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
+      elseif ( sMethodName .strequal. "NONE") then
+
+        ! no action needed; defaults to null method
+
       else
 
         call warn("Your control file specifies an unknown or unsupported DIRECT_RECHARGE method.", &
@@ -1017,7 +1022,8 @@ contains
 
     elseif ( sCmdText .contains. "SOIL_MOISTURE" ) then
 
-      if ( ( sMethodName .strequal. "T-M" ) .or. ( sMethodName .strequal. "THORNTHWAITE-MATHER" ) ) then
+      if ( ( sMethodName .strequal. "T-M" ) .or. ( sMethodName .strequal. "THORNTHWAITE-MATHER" )      &
+             .or. ( sMethodName .strequal. "THORNTHWAITE") ) then
 
         this%init_actual_et => model_initialize_actual_et_thornthwaite_mather
         this%calc_actual_et => model_calculate_actual_et_thornthwaite_mather
@@ -1057,7 +1063,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call interception_bucket_initialize( )
+    call interception_bucket_initialize( this%active )
 
   end subroutine model_initialize_interception_bucket
 
@@ -1065,12 +1071,18 @@ contains
 
   subroutine model_calculate_interception_bucket(this)
 
-    use interception__bucket
+    use interception__bucket, only  : interception_bucket_calculate, IS_GROWING_SEASON, &
+                                      interception_bucket_update_growing_season
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
+    call interception_bucket_update_growing_season( landuse_index=this%landuse_index,        &
+                                                    GDD=this%GDD,                            &
+                                                    mean_air_temp=this%tmean,                &
+                                                    it_is_growing_season=IS_GROWING_SEASON )
+
     this%interception = interception_bucket_calculate( this%landuse_index, this%rainfall, this%fog, &
-                                                         this%canopy_cover_fraction )
+                                                         this%canopy_cover_fraction, IS_GROWING_SEASON )
 
   end subroutine model_calculate_interception_bucket
 
@@ -1807,17 +1819,17 @@ contains
                                                   precipitation=this%infiltration,                  &
                                                   crop_etc=this%crop_etc )
 
-    do indx=1,ubound( this%actual_et_soil,1) 
-      if ( actual_et_2( indx ) > 0.0 ) then  
-        diff = this%actual_et_soil(indx) - actual_et_2(indx) 
-        if ( abs(diff) > 1.0e-3 )                                                 &                                        
-        print *, indx, this%actual_et_soil( indx ), actual_et_2( indx ),          &
-          actual_et_3(indx),                                                      &
-          diff,                                                                   &
-          this%soil_storage( indx ), this%soil_storage_max( indx ),               &
-          this%infiltration( indx ), this%crop_etc( indx ), this%landuse_code( indx )
-      endif    
-    enddo  
+!     do indx=1,ubound( this%actual_et_soil,1) 
+!       if ( actual_et_2( indx ) > 0.0 ) then  
+!         diff = this%actual_et_soil(indx) - actual_et_2(indx) 
+!         if ( abs(diff) > 1.0e-3 )                                                 &                                        
+!         print *, indx, this%actual_et_soil( indx ), actual_et_2( indx ),          &
+!           actual_et_3(indx),                                                      &
+!           diff,                                                                   &
+!           this%soil_storage( indx ), this%soil_storage_max( indx ),               &
+!           this%infiltration( indx ), this%crop_etc( indx ), this%landuse_code( indx )
+!       endif    
+!     enddo  
 
 
   end subroutine model_calculate_actual_et_thornthwaite_mather

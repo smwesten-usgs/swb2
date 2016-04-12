@@ -12,7 +12,7 @@ module model_initialize
 !  use loop_iterate
   use logfiles
   use model_domain, only                 : MODEL, minmaxmean
-  use output, only                       : initialize_output, set_output_directory
+  use output, only                       : initialize_output, set_output_directory, set_xy_units
   use parameters
   use precipitation__method_of_fragments
   use simulation_datetime, only          : SIM_DT
@@ -95,7 +95,7 @@ contains
 
   subroutine initialize_all( output_directory_name, data_directory_name )
 
-    use polygon_summarize, only : initialize_polygon_summarize
+!    use polygon_summarize, only : initialize_polygon_summarize
 
     character (len=256), intent(inout) :: output_directory_name, data_directory_name
 
@@ -159,7 +159,7 @@ contains
     ! open and prepare NetCDF files for output
     call initialize_output( MODEL )
 
-    call initialize_polygon_summarize()
+!    call initialize_polygon_summarize()
 
     call check_for_fatal_warnings()
 
@@ -204,7 +204,7 @@ contains
     call MODEL%initialize_row_column_indices()
 
     ! read_polygon matches HWB polygon attributes with the corresponding gridcells in SWB
-    call read_polygon_id()
+!    call read_polygon_id()
 
     ! now that we know which cells are active, pack the 2D array in to 1D vector of AWC values
     call MODEL%init_AWC()
@@ -503,7 +503,7 @@ contains
     !> Determine how many soil groups are present
 
     ! retrieve a string list of all keys associated with root zone depth (i.e. RZ_1, RZ_2, RZ_3, etc.)
-    slRZ = PARAMS_DICT%grep_keys("RZ")
+    slRZ = PARAMS%grep_name("RZ", lFatal=TRUE )
     ! Convert the string list to an vector of integers; MODEL call strips off the "RZ_" part of label
     iRZ_SeqNums = slRZ%asInt()
     ! count how many items are present in the vector; MODEL should equal the number of soils groups
@@ -835,7 +835,7 @@ contains
     ! open the control file and define the comment characters and delimiters to be used in 
     ! parsing the ASCII text
     call CF%open( sFilename = sFilename, &
-                  sCommentChars = "#%!", &
+                  sCommentChars = "#%!+=|[{(", &
                   sDelimiters = "WHITESPACE", &
                   lHasHeader = .false._c_bool )
 
@@ -1228,6 +1228,12 @@ contains
     ! For MODEL directive, obtain the associated dictionary entries
     call CF_DICT%get_values( "BASE_PROJECTION_DEFINITION", myOptions )
 
+    if ( myOptions%get(1) .strequal. "<NA>" ) then
+      call die(sMessage="Your control file is missing a BASE_PROJECTION_DEFINITION entry.",            &
+         sHints="This version of SWB requires that you add a BASE_PROJECTION_DEFINITION entry "        &
+         //"to your control file." )
+    endif  
+
     ! dictionary entries are initially space-delimited; sArgText contains
     ! all dictionary entries present, concatenated, with a space between entries
     sArgText = myOptions%get(1, myOptions%count )
@@ -1247,6 +1253,28 @@ contains
     BNDS%sPROJ4_string = trim(sArgText)
 
     MODEL%PROJ4_string = trim(sArgText)
+
+    if ( index( MODEL%PROJ4_string, "units=m" ) > 0 ) then
+      call set_xy_units("meters")
+    elseif ( index( MODEL%PROJ4_string, "units=ft" ) > 0 ) then
+      call set_xy_units("feet")
+    elseif ( index( MODEL%PROJ4_string, "units=us-ft" ) > 0 ) then
+      call set_xy_units("U.S. Surveyor's feet")
+    elseif ( index( MODEL%PROJ4_string, "to_meter=0.3048 " ) > 0 ) then
+      call set_xy_units("feet")
+    elseif ( index( MODEL%PROJ4_string, "to_meter=0.304800609601219" ) > 0 ) then
+      call set_xy_units("U.S. Surveyor's feet")
+    elseif ( index( MODEL%PROJ4_string, "latlon" ) > 0 ) then
+      call set_xy_units("decimal degrees")
+    elseif ( index( MODEL%PROJ4_string, "lonlat" ) > 0 ) then
+      call set_xy_units("decimal degrees")
+    elseif ( index( MODEL%PROJ4_string, "units=us-ft" ) > 0 ) then
+      call set_xy_units("U.S. Surveyor's feet")      
+    else
+      call warn("Could not determine the units associated with the base grid.",             &
+        sHints="Check your PROJ4 string and make sure you have the length units defined.",  &
+        lFatal=TRUE)
+    endif  
 
   end subroutine initialize_grid_options
 
@@ -1538,6 +1566,10 @@ contains
   end subroutine initialize_latitude
 
 !--------------------------------------------------------------------------------------------------
+ 
+  !> Match landuse codes from table with those contained in the gridded landuse.
+  !!
+  !! This routine loops through all known 
 
   subroutine initialize_landuse_codes()
 
@@ -1557,7 +1589,7 @@ contains
     call slList%append("LULC_Code")
     
     !> Determine how many landuse codes are present
-    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCodes )
+    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCodes, lFatal=TRUE )
 
     ! obtain a pointer to the LAND_USE grid
     pLULC => DAT%find("LAND_USE")
@@ -1576,39 +1608,45 @@ contains
 
     MODEL%landuse_index = -9999
     iCount = 0
-    
 
-    do iIndex = 1, ubound(MODEL%landuse_code,1)
+    ! only run through matching process if we've found a LU_Code entry in the 
+    ! parameter dictionary   
+    if ( all( iLandUseCodes >= 0 ) ) then
 
-      lMatch = lFALSE
+      do iIndex = 1, ubound(MODEL%landuse_code,1)
 
-      do iIndex2=1, ubound(iLandUseCodes, 1)
+        lMatch = lFALSE
 
-        if (MODEL%landuse_code(iIndex) == iLandUseCodes(iIndex2) ) then
-          MODEL%landuse_index(iIndex) = iIndex2
-          iCount = iCount + 1
-          lMatch = lTRUE
-          exit
-        endif
+        do iIndex2=1, ubound(iLandUseCodes, 1)
 
-      enddo
+          if (MODEL%landuse_code(iIndex) == iLandUseCodes(iIndex2) ) then
+            MODEL%landuse_index(iIndex) = iIndex2
+            iCount = iCount + 1
+            lMatch = lTRUE
+            exit
+          endif
 
-      if ( .not. lMatch ) &
-        call LOGS%write("Failed to match landuse code "//asCharacter(MODEL%landuse_code(iIndex) ) &
-          //" with a corresponding landuse code from lookup tables.", iLogLevel=LOG_ALL )
+        enddo
 
-    enddo    
+        if ( .not. lMatch ) &
+          call LOGS%write("Failed to match landuse code "//asCharacter(MODEL%landuse_code(iIndex) ) &
+            //" with a corresponding landuse code from lookup tables.", iLogLevel=LOG_ALL )
 
-    call LOGS%write("Matches were found between landuse grid value and table value for " &
-      //asCharacter(iCount)//" cells out of a total of "//asCharacter(ubound(MODEL%landuse_code,1))//" active cells.", &
-      iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_ALL)
+      enddo    
+
+      call LOGS%write("Matches were found between landuse grid value and table value for " &
+        //asCharacter(iCount)//" cells out of a total of "//asCharacter(ubound(MODEL%landuse_code,1))//" active cells.", &
+        iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_ALL)
+
+      call slList%clear()
+
+    endif  
 
     if ( count(MODEL%landuse_index < 0) > 0 ) &
       call warn(asCharacter(count(MODEL%landuse_index < 0))//" negative values are present" &
       //" in the landuse_index vector.", lFatal=lTRUE, sHints="Negative landuse INDEX values are the " &
       //"result of landuse values for which no match can be found between the grid file and lookup table.")
 
-    call slList%clear()
 
   end subroutine initialize_landuse_codes 
 
@@ -1638,7 +1676,9 @@ contains
     call slList%append("Surface_Storage_Max")
     call slList%append("Surface_Storage_Maximum")
 
-    call PARAMS%get_parameters( slKeys=slList, fValues=SURFACE_STORAGE_MAXIMUM, lFatal=lTRUE )
+    MODEL%surface_storage_max = 0.0_c_float
+
+    call PARAMS%get_parameters( slKeys=slList, fValues=SURFACE_STORAGE_MAXIMUM, lFatal=FALSE )
 
     do iIndex=1, ubound( SURFACE_STORAGE_MAXIMUM, 1)
 

@@ -73,7 +73,7 @@ contains
 
   subroutine add_filename_to_list_sub( this, sFilename, sDelimiters, sCommentChars )
 
-    class (PARAMETERS_T)                     :: this
+    class (PARAMETERS_T)                          :: this
     character (len=*), intent(in)                 :: sFilename
     character (len=*), intent(in), optional       :: sDelimiters
     character (len=*), intent(in), optional       :: sCommentChars
@@ -276,13 +276,31 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function grep_parameter_name( this, sKey )      result( slList )
+  function grep_parameter_name( this, sKey, lFatal )      result( slList )
 
     class (PARAMETERS_T)                                       :: this
     character (len=*), intent(in)                              :: sKey
+    logical (kind=c_bool), intent(in), optional                :: lFatal
     type ( STRING_LIST_T )                                     :: slList
 
-    slList = PARAMS_DICT%grep_keys( sKey )  
+    ! [ LOCALS ]
+    logical (kind=c_bool) :: lFatal_
+
+    if ( present (lFatal) ) then
+      lFatal_ = lFatal
+    else
+      lFatal_ = lFALSE
+    endif 
+
+    slList = PARAMS_DICT%grep_keys( sKey ) 
+
+    if ( lFatal_ ) then
+
+       if ( slList%get(1) .strequal. "<NA>" )                              &
+         call warn( "Failed to find a lookup table column whose name contains "        &
+           //dQuote( sKey )//".", lFatal = lFatal_ )
+
+    endif 
 
   end function grep_parameter_name  
 
@@ -310,7 +328,7 @@ contains
       call PARAMS_DICT%get_values( slKeys=slKeys, lValues=lValues )
 
 !       if ( any( iValues <= iTINYVAL ) ) &
-!         call warn( "Failed to find any lookup table columns with headers containing the string(s) " &
+!         call warn( "Failed to find a lookup table column named " &
 !           //dQuote( slKeys%listall() )//".", lFatal = lFatal_ )
 
     else if ( present( sKey) ) then
@@ -318,7 +336,7 @@ contains
       call PARAMS_DICT%get_values( sKey=sKey, lValues=lValues )
 
 !       if ( any( iValues <= iTINYVAL ) ) &
-!         call warn( "Failed to find any lookup table columns with headers containing the string " &
+!         call warn( "Failed to find a lookup table column named " &
 !           //dQuote( sKey )//".", lFatal = lFatal_ )
 
     endif
@@ -348,17 +366,17 @@ contains
 
       call PARAMS_DICT%get_values( slKeys=slKeys, slString=slValues )
 
-!       if ( any( iValues <= iTINYVAL ) ) &
-!         call warn( "Failed to find any lookup table columns with headers containing the string(s) " &
-!           //dQuote( slKeys%listall() )//".", lFatal = lFatal_ )
+       if ( slValues%get(1) .strequal. "<NA>" )                              &
+         call warn( "Failed to find a lookup table column named "        &
+           //dQuote( slKeys%listall() )//".", lFatal = lFatal_ )
 
     else if ( present( sKey) ) then
 
       call PARAMS_DICT%get_values( sKey=sKey, slString=slValues )
 
-!       if ( any( iValues <= iTINYVAL ) ) &
-!         call warn( "Failed to find any lookup table columns with headers containing the string " &
-!           //dQuote( sKey )//".", lFatal = lFatal_ )
+       if ( slValues%get(1) .strequal. "<NA>"  )                              &
+         call warn( "Failed to find a lookup table column named "         &
+           //dQuote( sKey )//".", lFatal = lFatal_ )
 
     endif
 
@@ -390,7 +408,7 @@ contains
       call PARAMS_DICT%get_values( slKeys=slKeys, iValues=iValues )
 
       if ( any( iValues <= iTINYVAL ) ) &
-        call warn( "Failed to find any lookup table columns with headers containing the string(s) " &
+        call warn( "Failed to find a lookup table column named " &
           //dQuote( slKeys%listall() )//".", lFatal = lFatal_ )
 
     else if ( present( sKey) ) then
@@ -398,7 +416,7 @@ contains
       call PARAMS_DICT%get_values( sKey=sKey, iValues=iValues )
 
       if ( any( iValues <= iTINYVAL ) ) &
-        call warn( "Failed to find any lookup table columns with headers containing the string " &
+        call warn( "Failed to find a lookup table column named " &
           //dQuote( sKey )//".", lFatal = lFatal_ )
 
     endif
@@ -429,7 +447,7 @@ contains
       call PARAMS_DICT%get_values( slKeys=slKeys, fValues=fValues )
 
       if ( any( fValues <= fTINYVAL ) ) &
-        call warn( "Failed to find any lookup table columns with headers containing the string(s) " &
+        call warn( "Failed to find a lookup table column named " &
           //dQuote( slKeys%listall() )//".", lFatal = lFatal_ )
 
     else if ( present( sKey) ) then
@@ -437,7 +455,7 @@ contains
       call PARAMS_DICT%get_values( sKey=sKey, fValues=fValues )
 
       if ( any( fValues <= fTINYVAL ) ) &
-        call warn( "Failed to find any lookup table columns with headers containing the string " &
+        call warn( "Failed to find a lookup table column named " &
           //dQuote( sKey )//".", lFatal = lFatal_ )
 
     endif
@@ -475,7 +493,7 @@ contains
 
     if ( iNumCols == 0 ) then
 
-      call warn( "Failed to find any lookup table columns with headers containing the string " &
+      call warn( "Failed to find a lookup table column named " &
         //dQuote( sPrefix )//".", lFatal = lFatal_ )
 
     else
