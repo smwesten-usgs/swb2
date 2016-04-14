@@ -1,11 +1,12 @@
 module runoff__curve_number
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
+  use constants_and_conversions, only     : FALSE, TRUE 
   use continuous_frozen_ground_index
   use exceptions
   use strings
   use string_list
-  use parameters, only     : PARAMS, PARAMS_DICT
+  use parameters, only                    : PARAMS, PARAMS_DICT
   implicit none
 
   private
