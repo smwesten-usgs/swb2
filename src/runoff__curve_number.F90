@@ -42,7 +42,7 @@ contains
     !> Determine how many soil groups are present
 
     ! retrieve a string list of all keys associated with curve number (i.e. "CN_1", "CN_2", "CN_3", etc)
-    slCurveNumber = PARAMS_DICT%grep_keys("CN")
+    slCurveNumber = PARAMS%grep_name( "CN", lFatal=TRUE )
     ! Convert the string list to an vector of integers; this call strips off the "CN_" part of label
     iCurveNumberSeqNums = slCurveNumber%asInt()
     ! count how many items are present in the vector; this should equal the number of soils groups
