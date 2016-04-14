@@ -594,9 +594,9 @@ contains
 
       endif
 
-    !  call LOGS%write("frag: "//asCharacter(iIndex)//"  day: "//asCharacter(iDay) &
-    !     //"  value: "//asCharacter( CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay ) ), &
-    !     lEcho=lTRUE )
+      call LOGS%write("frag: "//asCharacter(iIndex)//"  day: "//asCharacter(iDay) &
+         //"  value: "//asCharacter( CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay ) ), &
+         lEcho=lFALSE )
 
       where ( RAIN_GAGE_ID == iIndex )
 
