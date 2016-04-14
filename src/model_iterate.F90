@@ -30,6 +30,8 @@ contains
       call write_output( cells )
 !      call perform_polygon_summarize( cells )
       
+      call cells%dump_model_values_by_cell( colnum=67, rownum=251 )
+
       call SIM_DT%addDay( )
 
     enddo 

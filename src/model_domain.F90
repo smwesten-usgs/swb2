@@ -196,6 +196,9 @@ module model_domain
 
     procedure :: row_column_to_index_fn
     generic   :: row_column_to_index => row_column_to_index_fn
+
+    procedure :: dump_model_values_by_cell_sub
+    generic   :: dump_model_values_by_cell => dump_model_values_by_cell_sub
   
   end type MODEL_DOMAIN_T
 
@@ -490,6 +493,8 @@ contains
 
     call this%init_fog
 
+    call this%init_precipitation_data
+
     call this%init_runoff
 
     call this%init_soil_storage_max
@@ -499,8 +504,6 @@ contains
     call this%init_actual_et
 
     call this%init_reference_et
-
-    call this%init_precipitation_data
 
     call this%init_GDD
 
@@ -1424,6 +1427,13 @@ contains
     call assert( status==0, "Problem allicating memory", __FILE__, __LINE__ )
 
     call runoff_gridded_values_initialize( this%active )
+    call runoff_gridded_values_update_ratios( )
+
+    print *, __FILE__, ": ", __LINE__
+    call minmaxmean( RUNOFF_RATIOS, "RUNOFF_RATIOS" ) 
+    call minmaxmean( this%monthly_runoff, "MONTHLY_RUNOFF")
+    call minmaxmean( this%monthly_gross_precip, "MONTHLY_RAINFALL")
+
 
   end subroutine model_initialize_runoff_gridded_values
 
@@ -1615,6 +1625,9 @@ contains
                                   num_days_since_planting=this%number_of_days_since_planting,    &
                                   monthly_rainfall=this%monthly_gross_precip,                    &
                                   monthly_runoff=this%monthly_runoff )
+
+      call minmaxmean( this%monthly_runoff, "MONTHLY_RUNOFF")
+      call minmaxmean( this%monthly_gross_precip, "MONTHLY_RAINFALL")
 
     else
 
@@ -2154,6 +2167,7 @@ contains
     call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
 
     call precipitation_method_of_fragments_initialize( this%active )
+    call this%get_precipitation_data()
 
   end subroutine model_initialize_precip_method_of_fragments
 
@@ -2201,25 +2215,29 @@ contains
     this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * FRAGMENT_VALUE * RAINFALL_ADJUST_FACTOR
     this%monthly_gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * RAINFALL_ADJUST_FACTOR
 
-    print *, "*****************************************************************"
-    do indexval=5,7
+      print *, __FILE__, ": ", __LINE__
+      call minmaxmean( this%monthly_gross_precip, "MONTHLY_RAINFALL")
 
-      targetindex = this%row_column_to_index_fn( indexval, 151 )
 
-      if ( targetindex > 0 ) then
+    ! print *, "*****************************************************************"
+    ! do indexval=5,7
 
-        print *, " row 151, col ", indexval
-        print *, "----------------"
-        print *, "active?:        ", this%active( indexval,151 )
-        print *, "gross_precip:   ", this%gross_precip( targetindex )
-        print *, "FRAGMENT_VALUE: ", FRAGMENT_VALUE( targetindex )
-        print *, "RAIN_ADJST_FAC: ", RAINFALL_ADJUST_FACTOR( targetindex )     
-        print *, "Raw PRCP grid:  ", pPRCP%pGrdBase%rData( indexval, 151 )
-        print *, "Rain Gage ID:   ", RAIN_GAGE_ID( targetindex )
-        print *, " "
-      endif  
+    !   targetindex = this%row_column_to_index_fn( indexval, 151 )
 
-    enddo  
+    !   if ( targetindex > 0 ) then
+
+    !     print *, " row 151, col ", indexval
+    !     print *, "----------------"
+    !     print *, "active?:        ", this%active( indexval,151 )
+    !     print *, "gross_precip:   ", this%gross_precip( targetindex )
+    !     print *, "FRAGMENT_VALUE: ", FRAGMENT_VALUE( targetindex )
+    !     print *, "RAIN_ADJST_FAC: ", RAINFALL_ADJUST_FACTOR( targetindex )     
+    !     print *, "Raw PRCP grid:  ", pPRCP%pGrdBase%rData( indexval, 151 )
+    !     print *, "Rain Gage ID:   ", RAIN_GAGE_ID( targetindex )
+    !     print *, " "
+    !   endif  
+
+    ! enddo  
 
     ! print *, "*****************************************************************"
 
@@ -2366,5 +2384,82 @@ contains
     call minmaxmean( this%potential_recharge, "potential_recharge")
 
   end subroutine summarize_state_variables_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine dump_model_values_by_cell_sub( this, colnum, rownum )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    integer (kind=c_int), intent(in)       :: colnum
+    integer (kind=c_int), intent(in)       :: rownum    
+
+    ! [ LOCALS ]
+    integer (kind=c_int)   :: indx
+
+    indx = this%row_column_to_index( col_num=colnum, row_num=rownum)
+
+    if ( (indx > lbound( this%landuse_code, 1) ) .and. ( indx <= ubound( this%landuse_code, 1) ) ) then
+
+      write(*,fmt="('Dump of variable values for cell: ',i8,'  row: ',i8,'   col: ',i8)") indx, rownum, colnum
+      write(*,fmt="(a)") repeat('-',80)
+      write(*,fmt="('LU code:',t25,i8)") this%landuse_code( indx )                     
+      write(*,fmt="('LU index:',t25,i8)")this%landuse_index( indx )
+      write(*,fmt="('index order:',t25,i8)") this%index_order( indx )               
+      write(*,fmt="('soil group:',t25,i8)")this%soil_group( indx )            
+      write(*,fmt="('# upslope connections:',t25,i8)")this%num_upslope_connections( indx )
+      write(*,fmt="('# upslope cells:',t25,i8)")this%sum_upslope_cells( indx )  
+
+      write(*,fmt="('avail. water. capy.:',t25,f14.3)")this%awc( indx )        
+      write(*,fmt="('Latitude:',t25,f14.3)")this%latitude( indx )                      
+      write(*,fmt="('Reference ET0:',t25,f14.3)")this%reference_ET0( indx )                 
+      write(*,fmt="('Actual ET:',t25,f14.3)")this%actual_ET( indx )            
+      write(*,fmt="('inflow:',t25,f14.3)")this%inflow( indx )                
+      write(*,fmt="('runon:',t25,f14.3)")this%runon( indx )                   
+      write(*,fmt="('runoff:',t25,f14.3)")this%runoff( indx )                    
+      write(*,fmt="('outflow:',t25,f14.3)") this%outflow( indx )                   
+      write(*,fmt="('infiltration:',t25,f14.3)") this%infiltration( indx )                  
+      write(*,fmt="('snowfall:',t25,f14.3)") this%snowfall( indx )             
+      write(*,fmt="('potential snowmelt:',t25,f14.3)") this%potential_snowmelt( indx )     
+      write(*,fmt="('snowmelt:',t25,f14.3)") this%snowmelt( indx )                 
+
+      write(*,fmt="('interception:',t25,f14.3)") this%interception( indx )                 
+      write(*,fmt="('rainfall:',t25,f14.3)") this%rainfall( indx )             
+      write(*,fmt="('intercept. stor.:',t25,f14.3)") this%interception_storage( indx )
+      write(*,fmt="('tmax:',t25,f14.3)") this%tmax( indx )
+      write(*,fmt="('tmin:',t25,f14.3)") this%tmin( indx )
+      write(*,fmt="('tmean:',t25,f14.3)") this%tmean( indx )            
+      write(*,fmt="('snow storage:',t25,f14.3)") this%snow_storage( indx )     
+      write(*,fmt="('soil storage:',t25,f14.3)") this%soil_storage( indx )             
+      write(*,fmt="('soil storage max:',t25,f14.3)") this%soil_storage_max( indx )             
+      write(*,fmt="('surface storage:',t25,f14.3)") this%surface_storage( indx )        
+      write(*,fmt="('surface storage excess:',t25,f14.3)") this%surface_storage_excess( indx )          
+      write(*,fmt="('surface storage max:',t25,f14.3)") this%surface_storage_max( indx )   
+
+      write(*,fmt="('potential recharge:',t25,f14.3)") this%potential_recharge( indx )         
+      write(*,fmt="('fog:',t25,f14.3)") this%fog( indx )       
+      write(*,fmt="('irrigation:',t25,f14.3)") this%irrigation( indx )                      
+      write(*,fmt="('GDD:',t25,f14.3)") this%gdd( indx )              
+      write(*,fmt="('runoff outside:',t25,f14.3)") this%runoff_outside( indx )
+      write(*,fmt="('pervious fraction:',t25,f14.3)") this%pervious_fraction( indx )           
+      write(*,fmt="('storm drain capture:',t25,f14.3)") this%storm_drain_capture( indx )      
+      write(*,fmt="('canopy cover fraction:',t25,f14.3)") this%canopy_cover_fraction( indx )      
+      write(*,fmt="('crop coefficient Kcb:',t25,f14.3)") this%crop_coefficient_kcb( indx )    
+      write(*,fmt="('CFGI:',t25,f14.3)") this%continuous_frozen_ground_index( indx )
+      write(*,fmt="('rooting depth max:',t25,f14.3)") this%rooting_depth_max( indx )
+      write(*,fmt="('current rooting depth',t25,f14.3)") this%current_rooting_depth( indx )        
+      write(*,fmt="('polygon id:',t25,i8)") this%polygon_id( indx )    
+      write(*,fmt="('actual_et_soil:',t25,f14.3)") this%actual_et_soil( indx )               
+      write(*,fmt="('actual_et_impervious:',t25,f14.3)") this%actual_et_impervious( indx )           
+      write(*,fmt="('actual_et_interception:',t25,f14.3)") this%actual_et_interception( indx )     
+      write(*,fmt="('adjusted depletion frac p:',t25,f14.3)") this%adjusted_depletion_fraction_p( indx )   
+      write(*,fmt="('crop Etc:',t25,f14.3)") this%crop_etc( indx )    
+      write(*,fmt="('direct recharge:',t25,f14.3)") this%direct_recharge( indx )                 
+      write(*,fmt="('days since planting:',t25,i8)") this%number_of_days_since_planting( indx )
+      
+    endif  
+
+  end subroutine dump_model_values_by_cell_sub
+
+!--------------------------------------------------------------------------------------------------
 
 end module model_domain
