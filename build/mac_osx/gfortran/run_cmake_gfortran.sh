@@ -34,7 +34,7 @@ export TARGET__SWB_LIBRARY="FALSE"
 export TARGET__SWBSTATS="FALSE"
 
 # define platform and compiler specific compilation flags
-export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -Wall -fcheck=all -fexceptions -fsanitize=null -fsanitize=leak -fbackslash -ffree-line-length-none"
+export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -Wuninitialized -fcheck=all -fexceptions -fsanitize=null -fsanitize=leak -fbackslash -ffree-line-length-none"
 #set CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -floop-parallelize-all -flto -ffree-line-length-none -static-libgcc -static-libgfortran"
 #export CMAKE_Fortran_FLAGS_RELEASE="-O3 -mtune=native -ffree-line-length-none -ffpe-summary='none' -fopenmp"
 

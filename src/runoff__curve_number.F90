@@ -1,11 +1,12 @@
 module runoff__curve_number
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
+  use constants_and_conversions, only     : FALSE, TRUE 
   use continuous_frozen_ground_index
   use exceptions
   use strings
   use string_list
-  use parameters, only     : PARAMS, PARAMS_DICT
+  use parameters, only                    : PARAMS, PARAMS_DICT
   implicit none
 
   private
@@ -42,7 +43,7 @@ contains
     !> Determine how many soil groups are present
 
     ! retrieve a string list of all keys associated with curve number (i.e. "CN_1", "CN_2", "CN_3", etc)
-    slCurveNumber = PARAMS_DICT%grep_keys("CN")
+    slCurveNumber = PARAMS%grep_name( "CN", lFatal=TRUE )
     ! Convert the string list to an vector of integers; this call strips off the "CN_" part of label
     iCurveNumberSeqNums = slCurveNumber%asInt()
     ! count how many items are present in the vector; this should equal the number of soils groups

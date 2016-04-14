@@ -439,7 +439,7 @@ contains
       this%row_num_2D( :, row_num ) = row_num
     enddo  
 
-    do col_num=lbound( this%col_num_2D, 2), ubound( this%col_num_2D, 2)
+    do col_num=lbound( this%col_num_2D, 1), ubound( this%col_num_2D, 1 )
       this%col_num_2D( col_num, : ) = col_num
     enddo  
 
