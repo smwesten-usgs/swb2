@@ -199,10 +199,6 @@ module runoff__gridded_values
       
     enddo
 
-    print *, __FILE__, ": ", __LINE__
-    print *, "RUNOFF RATIOS ASSIGNED: ", iCount
-    print *, "sizeof(RUNOFF_RATIOS): ", sizeof( RUNOFF_RATIOS)
-
   end subroutine runoff_gridded_values_update_ratios
 
 end module runoff__gridded_values
