@@ -2215,10 +2215,6 @@ contains
     this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * FRAGMENT_VALUE * RAINFALL_ADJUST_FACTOR
     this%monthly_gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * RAINFALL_ADJUST_FACTOR
 
-      print *, __FILE__, ": ", __LINE__
-      call minmaxmean( this%monthly_gross_precip, "MONTHLY_RAINFALL")
-
-
     ! print *, "*****************************************************************"
     ! do indexval=5,7
 

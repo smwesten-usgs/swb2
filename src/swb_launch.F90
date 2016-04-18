@@ -167,7 +167,6 @@ program swb_launch
       iCount = iCount + 1
       indexXY( 2, iCount ) = iIndex1
       indexXY( 1, iCount ) = iIndex2
-      print *, iCount, iIndex1, iIndex2
     enddo
   enddo  
 
