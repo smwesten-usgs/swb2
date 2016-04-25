@@ -2914,7 +2914,7 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, sSourceFile )
   sDateTime = DT%prettydatetime()
 
 
-  NCFILE%iNumberOfAttributes = 3
+  NCFILE%iNumberOfAttributes = 4
 
   allocate( NCFILE%pNC_ATT(0:NCFILE%iNumberOfAttributes-1), stat=iStat)
   call assert(iStat == 0, "Could not allocate memory for NC_ATT member of NC_FILE", &
@@ -2934,24 +2934,35 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, sSourceFile )
 
       NCFILE%pNC_ATT(0)%sAttributeName = "source"
       allocate(NCFILE%pNC_ATT(0)%sAttValue(0:0))
-      NCFILE%pNC_ATT(0)%sAttValue(0) = trim(sDataType)//" data from SWB2 run (version "//SWB_VERSION &
-        //", compiled on: "//COMPILATION_TIMESTAMP//")"
+      NCFILE%pNC_ATT(0)%sAttValue(0) = trim(sDataType)//" output from SWB run "   &
+        //"started on "//trim(sDateTime)//"."
       NCFILE%pNC_ATT(0)%iNC_AttType = NC_CHAR
       NCFILE%pNC_ATT(0)%iNC_AttSize = 1_c_size_t
 
     endif  
 
-    NCFILE%pNC_ATT(1)%sAttributeName = "conventions"
+    NCFILE%pNC_ATT(1)%sAttributeName = "swb_version"
     allocate(NCFILE%pNC_ATT(1)%sAttValue(0:0))
-    NCFILE%pNC_ATT(1)%sAttValue(0) = "CF-1.6"
+
+    NCFILE%pNC_ATT(1)%sAttValue(0) = "SWB version "//trim(SWB_VERSION)          &
+      //", Git branch: "//trim(GIT_BRANCH_STRING)//", Git commit hash string: "   &
+      //trim(GIT_COMMIT_HASH_STRING)//", compiled on: "//trim(COMPILE_DATE)       &
+      //" "//trim(COMPILE_TIME)//"."
+
     NCFILE%pNC_ATT(1)%iNC_AttType = NC_CHAR
     NCFILE%pNC_ATT(1)%iNC_AttSize = 1_c_size_t
 
-    NCFILE%pNC_ATT(2)%sAttributeName = "history"
+    NCFILE%pNC_ATT(2)%sAttributeName = "conventions"
     allocate(NCFILE%pNC_ATT(2)%sAttValue(0:0))
-    NCFILE%pNC_ATT(2)%sAttValue(0) = trim(sDateTime)//": Soil-Water-Balance model run started."
+    NCFILE%pNC_ATT(2)%sAttValue(0) = "CF-1.6"
     NCFILE%pNC_ATT(2)%iNC_AttType = NC_CHAR
     NCFILE%pNC_ATT(2)%iNC_AttSize = 1_c_size_t
+
+    NCFILE%pNC_ATT(3)%sAttributeName = "history"
+    allocate(NCFILE%pNC_ATT(3)%sAttValue(0:0))
+    NCFILE%pNC_ATT(3)%sAttValue(0) = trim(sDateTime)//": Soil-Water-Balance model run started."
+    NCFILE%pNC_ATT(3)%iNC_AttType = NC_CHAR
+    NCFILE%pNC_ATT(3)%iNC_AttSize = 1_c_size_t
 
   end block
 
