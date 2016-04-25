@@ -1769,6 +1769,7 @@ contains
 
     call growing_degree_day_initialize( lActive=this%active,                               &
                                         iLanduseIndex=this%landuse_index,                  &
+                                        PROJ4_string=this%PROJ4_string,                    &
                                         dX=this%X,                                         & 
                                         dY=this%Y,                                         &
                                         dX_lon=this%X_lon,                                 &
@@ -1901,8 +1902,8 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call direct_recharge_initialize( lActive=this%active, iLandUseIndex=this%landuse_index,   &
-                                     dX=this%X, dY=this%Y,                                    &
+    call direct_recharge_initialize( lActive=this%active, iLandUseIndex=this%landuse_index,     &
+                                     PROJ4_string=this%PROJ4_string, dX=this%X, dY=this%Y,      &
                                      dX_lon=this%X_lon , dY_lat=this%Y_lat )
 
   end subroutine model_initialize_direct_recharge_gridded
@@ -1997,8 +1998,9 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call fog_monthly_grid_initialize( lActive=this%active, dX=this%X, dY=this%Y,                &
-      dX_lon=this%X_lon , dY_lat=this%Y_lat, output_directory_name=this%output_directory_name )
+    call fog_monthly_grid_initialize( lActive=this%active, PROJ4_string=this%PROJ4_string,  &
+      dX=this%X, dY=this%Y, dX_lon=this%X_lon , dY_lat=this%Y_lat,                          &
+      output_directory_name=this%output_directory_name )
 
   end subroutine model_initialize_fog_monthly_grid
 

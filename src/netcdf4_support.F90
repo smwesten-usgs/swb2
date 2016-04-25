@@ -30,6 +30,8 @@ module netcdf4_support
   use logfiles
   use netcdf_c_api_interfaces
   use strings
+  use string_list, only           : STRING_LIST_T
+  use PROJ4_support, only         : create_attributes_from_proj4_string
   use datetime
 
   use version_control, only  : SWB_VERSION, GIT_COMMIT_HASH_STRING,           &
@@ -108,8 +110,9 @@ module netcdf4_support
   integer (c_int), public, parameter :: NC_Y       = 1
   integer (c_int), public, parameter :: NC_X       = 2
   integer (c_int), public, parameter :: NC_Z       = 3
-  integer (c_int), public, parameter :: NC_LAT     = 4
-  integer (c_int), public, parameter :: NC_LON     = 5  
+  integer (c_int), public, parameter :: NC_CRS     = 4
+  integer (c_int), public, parameter :: NC_LAT     = 5
+  integer (c_int), public, parameter :: NC_LON     = 6  
 
   integer (kind=c_int), parameter :: NC_FIRST = 0
   integer (kind=c_int), parameter :: NC_LAST  = 1
@@ -838,8 +841,8 @@ end subroutine netcdf_open_and_prepare_as_output_archive
 
 
 subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUnits,    &
-   iNX, iNY, fX, fY, sXY_units, StartDate, EndDate, dpLat, dpLon, fValidMin, fValidMax, &
-   sDirName )
+   iNX, iNY, fX, fY, sXY_units, StartDate, EndDate, PROJ4_string,                       &
+   dpLat, dpLon, fValidMin, fValidMax, sDirName )
 
   type (T_NETCDF4_FILE ), pointer            :: NCFILE
   character (len=*), intent(in)              :: sVariableName
@@ -851,6 +854,7 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   character (len=*), intent(in)              :: sXY_units
   type (DATETIME_T), intent(in)              :: StartDate
   type (DATETIME_T), intent(in)              :: EndDate
+  character (len=*), intent(in)              :: PROJ4_string
   real (kind=c_double), intent(in), optional :: dpLat(:,:)
   real (kind=c_double), intent(in), optional :: dpLon(:,:)
   real (kind=c_float), intent(in), optional  :: fValidMin
@@ -913,8 +917,8 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   
   call nf_get_variable_id_and_type( NCFILE=NCFILE )
   
-  call nf_set_standard_attributes(NCFILE=NCFILE, sOriginText=sOriginText, lLatLon=lTRUE, &
-      fValidMin=fValidMin, fValidMax=fValidMax )
+  call nf_set_standard_attributes(NCFILE=NCFILE, sOriginText=sOriginText,                    &
+      PROJ4_string=PROJ4_string, lLatLon=lTRUE, fValidMin=fValidMin, fValidMax=fValidMax )
   
   call nf_set_global_attributes(NCFILE=NCFILE, &
      sDataType=trim(NCFILE%sVarName(NC_Z)) )
@@ -2835,9 +2839,9 @@ subroutine nf_set_standard_variables(NCFILE, sVarName_z, lLatLon)
   iStat = 0
 
   if ( lLatLon_ ) then
-    NCFILE%iNumberOfVariables = 6
+    NCFILE%iNumberOfVariables = 7
   else
-    NCFILE%iNumberOfVariables = 4
+    NCFILE%iNumberOfVariables = 5
   endif    
 
   if (associated(NCFILE%pNC_VAR) ) deallocate(NCFILE%pNC_VAR, stat=iStat)
@@ -2862,6 +2866,10 @@ subroutine nf_set_standard_variables(NCFILE, sVarName_z, lLatLon)
   NCFILE%pNC_VAR(NC_X)%iNC_VarType = NC_DOUBLE
   NCFILE%pNC_VAR(NC_X)%iNumberOfDimensions = 1
   NCFILE%pNC_VAR(NC_X)%iNC_DimID = NCFILE%pNC_DIM(NC_X)%iNC_DimID  
+
+  NCFILE%pNC_VAR(NC_CRS)%sVariableName = "crs"
+  NCFILE%pNC_VAR(NC_CRS)%iNC_VarType = NC_INT
+  NCFILE%pNC_VAR(NC_CRS)%iNumberOfDimensions = 0
 
   NCFILE%pNC_VAR(NC_Z)%sVariableName = trim(sVarName_z)
   NCFILE%pNC_VAR(NC_Z)%iNC_VarType = NC_FLOAT
@@ -2951,10 +2959,12 @@ end subroutine nf_set_global_attributes
 
 !----------------------------------------------------------------------
 
-subroutine nf_set_standard_attributes(NCFILE, sOriginText, lLatLon, fValidMin, fValidMax )
+subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
+                                      lLatLon, fValidMin, fValidMax )
 
   type (T_NETCDF4_FILE )             :: NCFILE
   character (len=*)                  :: sOriginText
+  character (len=*), optional        :: PROJ4_string
   logical (kind=c_bool), optional    :: lLatLon
   real (kind=c_float), optional      :: fValidMin
   real (kind=c_float), optional      :: fValidMax
@@ -2964,6 +2974,10 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, lLatLon, fValidMin, f
   integer (kind=c_int)                             :: iNumAttributes
   type (T_NETCDF_ATTRIBUTE), dimension(:), pointer :: pNC_ATT
   logical (kind=c_bool)                            :: lLatLon_
+  type (STRING_LIST_T)                             :: attribute_name_list
+  type (STRING_LIST_T)                             :: attribute_value_list   
+  character (len=:), allocatable                   :: tempstring 
+  integer (kind=c_int)                             :: indx
 
   if (present( lLatLon ) ) then
     lLatLon_ = lLatLon
@@ -2971,6 +2985,58 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, lLatLon, fValidMin, f
     lLatLon_ = lFALSE
   endif  
 
+  if (present( PROJ4_string ) ) then
+    call create_attributes_from_proj4_string( PROJ4_string, attribute_name_list,   &
+                                              attribute_value_list )
+
+    ! Define attributes for the coordinate reference system (CRS)
+    iNumAttributes = attribute_name_list%count
+
+    allocate( NCFILE%pNC_VAR(NC_CRS)%pNC_ATT(0:iNumAttributes-1), stat=iStat)
+    call assert(iStat == 0, "Could not allocate memory for NC_ATT member in NC_VAR struct of NC_FILE", &
+      trim(__FILE__), __LINE__)
+    NCFILE%pNC_VAR(NC_CRS)%iNumberOfAttributes = iNumAttributes
+
+    pNC_ATT => NCFILE%pNC_VAR(NC_CRS)%pNC_ATT
+
+    do indx=0, iNumAttributes-1
+
+      tempstring = attribute_name_list%get( indx + 1 )
+      pNC_ATT(indx)%sAttributeName = tempstring
+
+      select case ( tempstring )
+
+        case ( "datum", "spheroid", "grid_mapping_name", "units" )
+
+          allocate(pNC_ATT(indx)%sAttValue(0:0))  
+          pNC_ATT(indx)%sAttValue(0) = attribute_value_list%get( indx + 1 )
+          pNC_ATT(indx)%iNC_AttType = NC_CHAR
+          pNC_ATT(indx)%iNC_AttSize = 1_c_size_t
+
+        case ( "UTM_zone" )
+
+          allocate(pNC_ATT(indx)%iAttValue(0:0))
+          pNC_ATT(indx)%iAttValue(0) = asInt( attribute_value_list%get( indx + 1 ) )
+          pNC_ATT(indx)%iNC_AttType = NC_INT
+          pNC_ATT(indx)%iNC_AttSize = 1_c_size_t
+
+        case default
+
+          allocate(pNC_ATT(indx)%rAttValue(0:0))
+          pNC_ATT(indx)%rAttValue(0) = asFloat( attribute_value_list%get( indx + 1 ) )
+          pNC_ATT(indx)%iNC_AttType = NC_FLOAT
+          pNC_ATT(indx)%iNC_AttSize = 1_c_size_t
+
+      end select 
+      
+    enddo   
+
+    call attribute_name_list%clear()
+    call attribute_value_list%clear()
+
+  endif
+
+  !! define attributes associated with TIME variable
   iNumAttributes = 3
   allocate( NCFILE%pNC_VAR(NC_TIME)%pNC_ATT(0:iNumAttributes-1), stat=iStat)
   call assert(iStat == 0, "Could not allocate memory for NC_ATT member in NC_VAR struct of NC_FILE", &
@@ -2979,7 +3045,6 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, lLatLon, fValidMin, f
 
   pNC_ATT => NCFILE%pNC_VAR(NC_TIME)%pNC_ATT
 
-  !! define attributes associated with TIME variable
   block
 
     pNC_ATT(0)%sAttributeName = "units"
@@ -3005,7 +3070,7 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, lLatLon, fValidMin, f
 
   if (present( fValidMin ) .and. present( fValidMax) ) then
 
-    iNumAttributes = 5
+    iNumAttributes = 7
     allocate( NCFILE%pNC_VAR(NC_Z)%pNC_ATT(0:iNumAttributes-1), stat=iStat)
     call assert(iStat == 0, "Could not allocate memory for NC_ATT member in NC_VAR struct of NC_FILE", &
       trim(__FILE__), __LINE__)
@@ -3044,9 +3109,21 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, lLatLon, fValidMin, f
     pNC_ATT(4)%iNC_AttType = NC_FLOAT
     pNC_ATT(4)%iNC_AttSize = 1_c_size_t
 
+    pNC_ATT(5)%sAttributeName = "coordinates"
+    allocate(pNC_ATT(5)%sAttValue(0:0))
+    pNC_ATT(5)%sAttValue(0) = "lat lon"
+    pNC_ATT(5)%iNC_AttType = NC_CHAR
+    pNC_ATT(5)%iNC_AttSize = 1_c_size_t
+
+    pNC_ATT(6)%sAttributeName = "grid_mapping"
+    allocate(pNC_ATT(6)%sAttValue(0:0))
+    pNC_ATT(6)%sAttValue(0) = "crs"
+    pNC_ATT(6)%iNC_AttType = NC_CHAR
+    pNC_ATT(6)%iNC_AttSize = 1_c_size_t
+
   else  
 
-    iNumAttributes = 1
+    iNumAttributes = 3
     allocate( NCFILE%pNC_VAR(NC_Z)%pNC_ATT(0:iNumAttributes-1), stat=iStat)
     call assert(iStat == 0, "Could not allocate memory for NC_ATT member in NC_VAR struct of NC_FILE", &
       trim(__FILE__), __LINE__)
@@ -3059,6 +3136,18 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, lLatLon, fValidMin, f
     pNC_ATT(0)%sAttValue(0) = NCFILE%sVarUnits(NC_Z)
     pNC_ATT(0)%iNC_AttType = NC_CHAR
     pNC_ATT(0)%iNC_AttSize = 1_c_size_t
+
+    pNC_ATT(1)%sAttributeName = "coordinates"
+    allocate(pNC_ATT(1)%sAttValue(0:0))
+    pNC_ATT(1)%sAttValue(0) = "lat lon"
+    pNC_ATT(1)%iNC_AttType = NC_CHAR
+    pNC_ATT(1)%iNC_AttSize = 1_c_size_t
+
+    pNC_ATT(2)%sAttributeName = "grid_mapping"
+    allocate(pNC_ATT(2)%sAttValue(0:0))
+    pNC_ATT(2)%sAttValue(0) = "crs"
+    pNC_ATT(2)%iNC_AttType = NC_CHAR
+    pNC_ATT(2)%iNC_AttSize = 1_c_size_t
 
   endif
 

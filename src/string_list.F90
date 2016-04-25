@@ -416,18 +416,21 @@ contains
 
   function list_from_delimited_string_fn(sText1)    result( newList )
 
-    character (len=*), intent(inout)   :: sText1
+    character (len=*), intent(in)      :: sText1
     type (STRING_LIST_T)               :: newList
 
     ! [ LOCALS ]
     character ( len=len_trim(sText1) ) :: sTempText
+    character ( len=len_trim(sText1) ) :: sTempArg
+
+    sTempText = sText1
 
     do
 
-      call chomp( sText1=sText1, sText2=sTempText )
+      call chomp( sText1=sTempText, sText2=sTempArg )
 
-      if (len_trim(sTempText) > 0) then
-        call newList%append( trim(sTempText ) )
+      if (len_trim(sTempArg) > 0) then
+        call newList%append( trim(sTempArg ) )
       else
         exit
       endif

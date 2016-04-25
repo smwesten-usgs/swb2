@@ -99,6 +99,7 @@ contains
             sXY_units=trim( XY_UNITS_STRING ),                                       &
             StartDate=SIM_DT%start,                                                  &
             EndDate=SIM_DT%end,                                                      &
+            PROJ4_string=cells%PROJ4_string,                                         &
             dpLat=cells%Y_lat,                                                       &
             dpLon=cells%X_lon,                                                       &
             fValidMin=0.0,                                                           &

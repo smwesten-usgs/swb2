@@ -64,10 +64,12 @@ contains
   !! @param[in] dX_lon 2D array of longitude values.
   !! @param[in] dY_lat 2D array of latitude values.
 
-  subroutine direct_recharge_initialize( lActive, iLandUseIndex, dX, dY, dX_lon, dY_lat )
+  subroutine direct_recharge_initialize( lActive, iLandUseIndex, PROJ4_string,      &
+                                         dX, dY, dX_lon, dY_lat )
 
     logical (kind=c_bool), intent(in)     :: lActive(:,:)
     integer (kind=c_int), intent(in)      :: iLandUseIndex(:)
+    character (len=*), intent(inout)      :: PROJ4_string
     real (kind=c_double), intent(in)      :: dX(:)
     real (kind=c_double), intent(in)      :: dY(:)
     real (kind=c_double), intent(in)      :: dX_lon(:,:)
@@ -297,10 +299,10 @@ contains
     allocate ( pNCFILE, stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE, sVariableName="direct_recharge", &
-      sVariableUnits="inches", iNX=iNX, iNY=iNY, sXY_units=trim( XY_UNITS_STRING ), &
-      fX=dX, fY=dY, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=dY_lat, dpLon=dX_lon, &
-      fValidMin=0.0, fValidMax=2000.0   )
+    call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE, sVariableName="direct_recharge",  &
+      sVariableUnits="inches", iNX=iNX, iNY=iNY, sXY_units=trim( XY_UNITS_STRING ),           &
+      fX=dX, fY=dY, StartDate=SIM_DT%start, EndDate=SIM_DT%end, PROJ4_string=PROJ4_string,    &
+      dpLat=dY_lat, dpLon=dX_lon, fValidMin=0.0, fValidMax=2000.0   )
 
   end subroutine direct_recharge_initialize
 

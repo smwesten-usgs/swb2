@@ -46,6 +46,7 @@ if(TARGET__SWB_EXECUTABLE)
             output.F90
             parameters.F90
             precipitation__method_of_fragments.F90
+            proj4_support.F90
             routing__D8.F90
             runoff__curve_number.F90 
             runoff__gridded_values.F90        
