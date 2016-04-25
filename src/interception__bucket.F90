@@ -347,24 +347,55 @@ contains
     real (kind=c_float), intent(in)       :: mean_air_temp
     logical (kind=c_bool), intent(inout)  :: it_is_growing_season
 
-    if ( it_is_growing_season ) then
+    ! first growing season day > last if we're growing a winter crop, winter wheat for example
+    if ( FIRST_DAY_OF_GROWING_SEASON(landuse_index) > LAST_DAY_OF_GROWING_SEASON (landuse_index) ) then
 
-      if ( KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON( landuse_index ) > NODATA_VALUE ) then 
-        if ( mean_air_temp <= KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON( landuse_index ) )      &
-             it_is_growing_season = FALSE
-      else
-        if ( SIM_DT%iDOY > LAST_DAY_OF_GROWING_SEASON( landuse_index ) )  &
-             it_is_growing_season = FALSE
+      if ( it_is_growing_season ) then
+
+        if ( KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON( landuse_index ) > NODATA_VALUE ) then 
+       
+          if ( mean_air_temp <= KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON( landuse_index ) ) &
+                 it_is_growing_season = FALSE
+        elseif (    SIM_DT%iDOY > LAST_DAY_OF_GROWING_SEASON( landuse_index )  ) then
+                 it_is_growing_season = FALSE
+        endif  
+               
+      else  ! not growing season; should it be?
+
+        if ( GDD_FIRST_DAY_OF_GROWING_SEASON( landuse_index ) > 0. ) then 
+          
+          if ( GDD >= GDD_FIRST_DAY_OF_GROWING_SEASON( landuse_index ) ) &
+               it_is_growing_season = TRUE
+        elseif ( ( SIM_DT%iDOY <= LAST_DAY_OF_GROWING_SEASON( landuse_index ) )          &
+            .or. ( SIM_DT%iDOY >= FIRST_DAY_OF_GROWING_SEASON( landuse_index ) ) )  then
+               it_is_growing_season = TRUE
+        endif  
+
       endif
-             
-    else  ! not growing season; should it be?
 
-      if ( GDD_FIRST_DAY_OF_GROWING_SEASON( landuse_index ) > 0. ) then 
-        if ( GDD >= GDD_FIRST_DAY_OF_GROWING_SEASON( landuse_index ) )      &
-             it_is_growing_season = TRUE
-      else
-        if ( SIM_DT%iDOY >= FIRST_DAY_OF_GROWING_SEASON( landuse_index ) )  &
-             it_is_growing_season = TRUE
+    else
+
+      if ( it_is_growing_season ) then
+
+        if ( KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON( landuse_index ) > NODATA_VALUE ) then 
+         
+          if ( mean_air_temp <= KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON( landuse_index ) ) &
+               it_is_growing_season = FALSE
+        elseif (    SIM_DT%iDOY > LAST_DAY_OF_GROWING_SEASON( landuse_index ) )  then
+               it_is_growing_season = FALSE
+        endif
+               
+      else  ! not growing season; should it be?
+
+        if ( GDD_FIRST_DAY_OF_GROWING_SEASON( landuse_index ) > 0. ) then 
+          if ( GDD >= GDD_FIRST_DAY_OF_GROWING_SEASON( landuse_index ) ) &
+               it_is_growing_season = TRUE
+        elseif (    SIM_DT%iDOY <= LAST_DAY_OF_GROWING_SEASON( landuse_index )          &
+            .and. SIM_DT%iDOY >= FIRST_DAY_OF_GROWING_SEASON( landuse_index )  )  then
+               it_is_growing_season = TRUE
+       
+        endif
+
       endif
 
     endif

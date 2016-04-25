@@ -9,13 +9,17 @@ module string_list
 
   private
 
-  public :: STRING_LIST_T
+  public :: STRING_LIST_T, create_list
 
   public :: assignment(=)
   interface assignment(=)
     module procedure :: assign_string_list_to_string_list_sub
   end interface assignment(=)
     
+  interface create_list
+    procedure :: list_from_delimited_string_fn
+  end interface create_list
+
   type STRING_LIST_ELEMENT_T
 
     character (len=:), allocatable               :: s
@@ -67,10 +71,8 @@ module string_list
 
   end type STRING_LIST_T
 
-
 contains
 
-  
   subroutine list_append_int_sub( this, iValue )
 
     class (STRING_LIST_T), intent(inout)   :: this
@@ -412,10 +414,10 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function break_string_into_list_fn(sText1)    result( newList )
+  function list_from_delimited_string_fn(sText1)    result( newList )
 
-    character (len=*), intent(inout)  :: sText1
-    type (STRING_LIST_T)              :: newList
+    character (len=*), intent(inout)   :: sText1
+    type (STRING_LIST_T)               :: newList
 
     ! [ LOCALS ]
     character ( len=len_trim(sText1) ) :: sTempText
@@ -432,7 +434,7 @@ contains
 
     end do
 
-  end function break_string_into_list_fn
+  end function list_from_delimited_string_fn
 
 !--------------------------------------------------------------------------------------------------
 
@@ -546,7 +548,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function list_subset_partial_matches_fn(this, sChar)     result(newList)
+  function list_subset_partial_matches_fn( this, sChar )     result(newList)
 
     class (STRING_LIST_T), intent(in)                    :: this
     character (len=*), intent(in)                        :: sChar

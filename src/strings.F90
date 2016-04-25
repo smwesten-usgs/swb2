@@ -93,7 +93,111 @@ module strings
       procedure :: char_to_lowercase_sub
     end interface toLowercase  
 
+    public :: right
+    interface right
+      procedure :: return_right_part_of_string_fn
+    end interface right 
+
+    public :: left
+    interface left
+      procedure :: return_left_part_of_string_fn
+    end interface left
+
 contains
+
+  function return_left_part_of_string_fn( string, indx, substring )   result( left_part )
+
+    character (len=*), intent(in)              :: string
+    integer (kind=c_int), intent(in), optional :: indx
+    character (len=*), intent(in), optional    :: substring
+    character (len=:), allocatable             :: left_part
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: position
+
+    if ( present( indx ) ) then
+
+      if ( ( indx > 0 ) .and. ( indx < len_trim( string ) ) ) then
+
+        left_part = string( 1:indx )
+
+      else
+
+        left_part = "<NA>"
+
+      endif
+
+    elseif ( present( substring ) ) then
+
+      position = index( string, substring )
+
+      if ( position > 0 ) then
+
+        left_part = string( 1:(position-1) )
+
+      else
+
+        left_part = "<NA>"
+
+      endif
+
+    else
+
+      left_part = "<NA>"
+
+    endif
+
+
+  end function return_left_part_of_string_fn
+
+ !--------------------------------------------------------------------------------------------------
+
+  function return_right_part_of_string_fn( string, indx, substring )   result( right_part )
+
+    character (len=*), intent(in)              :: string
+    integer (kind=c_int), intent(in), optional :: indx
+    character (len=*), intent(in), optional    :: substring
+    character (len=:), allocatable             :: right_part
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: position
+
+    if ( present( indx ) ) then
+
+      if ( ( indx > 0 ) .and. ( indx < len_trim( string ) ) ) then
+
+        right_part = string( (indx+1):len_trim(string) )
+
+      else
+
+        right_part = "<NA>"
+
+      endif
+
+    elseif ( present( substring ) ) then
+
+      position = index( string, substring, back=TRUE )
+
+      if ( position > 0 ) then
+
+        right_part = string( (position+1):len_trim(string) )
+
+      else
+
+        right_part = "<NA>"
+
+      endif
+
+    else
+
+      right_part = "<NA>"
+
+    endif
+
+
+  end function return_right_part_of_string_fn
+
+ !--------------------------------------------------------------------------------------------------
 
   function is_string2_present_in_string1_fn(sText1, sText2)   result(lBool)
 
