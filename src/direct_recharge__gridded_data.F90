@@ -300,7 +300,7 @@ contains
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
 
     call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE, sVariableName="direct_recharge",  &
-      sVariableUnits="inches", iNX=iNX, iNY=iNY, sXY_units=trim( XY_UNITS_STRING ),           &
+      sVariableUnits="inches", iNX=iNX, iNY=iNY,                                              &
       fX=dX, fY=dY, StartDate=SIM_DT%start, EndDate=SIM_DT%end, PROJ4_string=PROJ4_string,    &
       dpLat=dY_lat, dpLon=dX_lon, fValidMin=0.0, fValidMax=2000.0   )
 

@@ -18,8 +18,6 @@ module constants_and_conversions
   integer (kind=c_int), parameter :: DATATYPE_DOUBLE  = 3
   integer (kind=c_int), parameter :: DATATYPE_NA      = -9999
 
-  character (len=64)   :: XY_UNITS_STRING       = "meters"
-
   ! [ common mathematical constants ]
   public :: PI, TWOPI, HALFPI
   real (kind=c_double), parameter    :: PI = 3.1415926535897932384626433_c_double

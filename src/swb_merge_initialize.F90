@@ -24,6 +24,26 @@ module swb_merge_initialize
 
   type (GENERAL_GRID_T), pointer    :: pCOORD_GRD
 
+  type :: BOUNDING_BOX_T
+    integer (kind=c_int)           :: number_of_columns
+    integer (kind=c_int)           :: number_of_rows    
+    real (kind=c_double)           :: Xmin
+    real (kind=c_double)           :: Xmax
+    real (kind=c_double)           :: Ymin
+    real (kind=c_double)           :: Ymax
+    real (kind=c_double)           :: Xll
+    real (kind=c_double)           :: Xur
+    real (kind=c_double)           :: Yll
+    real (kind=c_double)           :: Yur
+    integer (kind=c_int)           :: origin_column
+    integer (kind=c_int)           :: origin_row
+    real (kind=c_double)           :: Xgridcellsize 
+    real (kind=c_double)           :: Ygridcellsize 
+    character (len=:), allocatable :: PROJ4_string
+  end type BOUNDING_BOX_T
+  
+  type (BOUNDING_BOX_T), allocatable :: bbox(:)             
+
 contains
 
   subroutine initialize_all( filelist )
@@ -33,14 +53,22 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)                :: indx, jndx
     type (STRING_LIST_T)                :: variable_list
+    type (STRING_LIST_T)                :: name_list
+    type (STRING_LIST_T)                :: value_list 
+    character (len=:), allocatable      :: PROJ4_string     
     character (len=:), allocatable      :: sBuf
     type (T_NETCDF4_FILE ), allocatable :: NCFILES(:)
     integer (kind=c_int)                :: status
     integer (kind=c_int)                :: num_files
+    real (kind=c_double)                :: cellsize_x, cellsize_y
+    real (kind=c_double)                :: start_jd, end_jd
+    type (BOUNDING_BOX_T)               :: merge_bnds
 
     num_files = filelist%count
 
     allocate( NCFILES( num_files ), stat=status )
+    allocate( bbox( num_files ), stat=status )
+    allocate( MODEL%NCFILE, stat=status )
 
     do indx=1, num_files-1
 
@@ -48,29 +76,96 @@ contains
                                                sFilename=filelist%get( indx ) )
       call netcdf_get_variable_list(NCFILE=NCFILES( indx ), variable_list=variable_list )
 
-      do jndx=1,variable_list%count
-        print *, jndx, variable_list%get( jndx )
+      call netcdf_get_attribute_list_for_variable( NCFILE=NCFILES( indx ),           &
+                                                   variable_name="crs",              &
+                                                   attribute_name_list=name_list,    &
+                                                   attribute_value_list=value_list )
+      MODEL%NCFILE%iVarID(NC_Z)=4
+
+      do jndx=1,name_list%count
+        if ( name_list%get( jndx ) .contains. "proj4" )     &
+          bbox( indx )%PROJ4_string = value_list%get( jndx )
       enddo  
+
+      ! capture bounding box for each netCDF file
+      bbox( indx )%number_of_rows = NCFILES( indx )%iNY
+      bbox( indx )%number_of_columns = NCFILES( indx )%iNX      
+      bbox( indx )%Xgridcellsize = NCFILES( indx )%rGridCellSizeX
+      bbox( indx )%Ygridcellsize = NCFILES( indx )%rGridCellSizeY
+      cellsize_x = bbox( indx )%Xgridcellsize
+      cellsize_y = bbox( indx )%Ygridcellsize
+
+      ! Xmin, Ymin, etc. are coordinates at the center of gridcells
+      bbox( indx )%Xmin = minval( NCFILES( indx )%rX_coords )
+      bbox( indx )%Xmax = maxval( NCFILES( indx )%rX_coords )
+      bbox( indx )%Ymin = minval( NCFILES( indx )%rY_coords )
+      bbox( indx )%Ymax = maxval( NCFILES( indx )%rY_coords )
+
+      ! Xll, Xur, etc. represent coordinates at the extreme corners of
+      ! the respective gridcells
+      bbox( indx )%Xll = bbox( indx )%Xmin - cellsize_x / 2.0_c_double
+      bbox( indx )%Xur = bbox( indx )%Xmax + cellsize_x / 2.0_c_double
+      bbox( indx )%Yll = bbox( indx )%Ymin - cellsize_y / 2.0_c_double
+      bbox( indx )%Yur = bbox( indx )%Xmax + cellsize_y / 2.0_c_double      
+
+      start_jd = NCFILES( indx )%iFirstDayJD
+      end_jd = NCFILES( indx )%iLastDayJD      
 
     enddo
 
-!!  read metadata from each netcdf file
+    ! at this point we should have the spatial information necessary to 
+    ! create an all-encompassing bounding box
 
-!! calculate bounding box around all netcdf files
+    merge_bnds%Xmin = minval( bbox(:)%Xmin )
+    merge_bnds%Xmax = maxval( bbox(:)%Xmax )
+    merge_bnds%Ymin = minval( bbox(:)%Ymin )
+    merge_bnds%Ymax = maxval( bbox(:)%Ymax )
+    merge_bnds%number_of_rows =                                               &
+      ( ( merge_bnds%Ymax - merge_bnds%Ymin ) + cellsize_x ) / cellsize_x
+    merge_bnds%number_of_columns =                                            &
+      ( ( merge_bnds%Xmax - merge_bnds%Xmin ) + cellsize_y ) / cellsize_y
 
+    merge_bnds%Xll = merge_bnds%Xmin - cellsize_x / 2.0_c_double
+    merge_bnds%Xur = merge_bnds%Xmax + cellsize_x / 2.0_c_double
+    merge_bnds%Yll = merge_bnds%Ymin - cellsize_y / 2.0_c_double
+    merge_bnds%Yur = merge_bnds%Xmax + cellsize_y / 2.0_c_double  
+    merge_bnds%Xgridcellsize = bbox(1)%Xgridcellsize
+    merge_bnds%PROJ4_string = bbox(1)%PROJ4_string
 
-
-
+  
 
     ! define SWB project boundary and geographic projection
     
     !call initialize_grid_options( xll, yll, xur, yur, resolution, proj4 )
 
     ! define the start and end date for the simulation
-    call initialize_start_and_end_dates()
-        
+    call initialize_start_and_end_dates( start_jd, end_jd )
+    print *, "Start date: ", SIM_DT%start%prettydate()
+    print *, "End date: ", SIM_DT%end%prettydate()    
+
+    call initialize_grid_options( xll=merge_bnds%Xll,                    &
+                                  yll=merge_bnds%Yll,                    &
+                                  xur=merge_bnds%Xur,                    &
+                                  yur=merge_bnds%Yur,                    &
+                                  nx=merge_bnds%number_of_columns,       &
+                                  ny=merge_bnds%number_of_rows,          &
+                                  gridcellsize=merge_bnds%Xgridcellsize, &
+                                  proj4_string=merge_bnds%PROJ4_string )
 
     call initialize_latitude()
+
+    call netcdf_open_and_prepare_as_output( NCFILE=MODEL%NCFILE,              &
+                                            sVariableName="tmax",             &
+                                            sVariableUnits="degrees F",       &
+                                            iNX=merge_bnds%number_of_columns,    &
+                                            iNY=merge_bnds%number_of_rows,       &
+                                            fX=MODEL%X,                       &
+                                            fY=MODEL%Y,                       &
+                                            StartDate=SIM_DT%start,           &
+                                            EndDate=SIM_DT%end,               &
+                                            PROJ4_string=merge_bnds%PROJ4_string,&
+                                            dpLat=MODEL%Y_lat,                &
+                                            dpLon=MODEL%X_lon )
 
 !    call netcdf_open_and_prepare_as_output()
 
@@ -78,109 +173,34 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine initialize_grid_options()
+  subroutine initialize_grid_options( xll, yll, xur, yur, nx, ny, gridcellsize, proj4_string )
 
-    ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myOptions  
-    integer (kind=c_int)             :: iIndex
-    character (len=:), allocatable   :: sArgText
-    integer (kind=c_int)             :: iStat
-    real (kind=c_double)             :: rX0, rX1, rY0, rY1, rGridCellSize
-    integer (kind=c_int)             :: iNX, iNY
-    real (kind=c_float)              :: fTempVal
+    real (kind=c_double), intent(inout) :: xll
+    real (kind=c_double), intent(inout) :: yll
+    real (kind=c_double), intent(inout) :: xur
+    real (kind=c_double), intent(inout) :: yur
+    integer (kind=c_int), intent(inout) :: nx
+    integer (kind=c_int), intent(inout) :: ny
+    real (kind=c_double), intent(inout) :: gridcellsize
+    character (len=*), intent(inout)    :: proj4_string
 
-
-    ! For MODEL directive, obtain the associated dictionary entries
-    call CF_DICT%get_values( "GRID", myOptions )
-
-    ! dictionary entries are initially space-delimited; sArgText contains
-    ! all dictionary entries present, concatenated, with a space between entries
-    sArgText = myOptions%get(1, myOptions%count )
-
-    ! echo the original directive and dictionary entries to the logfile
-    call LOGS%write("> GRID "//sArgText, iLinesBefore=1 )
-
-    iNX = asInt( myOptions%get(1) )
-    iNY = asInt( myOptions%get(2) )
-    rX0 = asDouble( myOptions%get(3) )
-    rY0 = asDouble( myOptions%get(4) )
-    
-    if ( myOptions%count == 5 ) then
-
-      rGridCellSize = asDouble( myOptions%get(5) )
-
-      call MODEL%initialize_grid(iNX, iNY, rX0, rY0, rGridCellSize)
-
-      rX1 = rX0 + rGridCellSize * real(iNX, kind=c_double)
-      rY1 = rY0 + rGridCellSize * real(iNY, kind=c_double)
-
-    elseif ( myOptions%count == 7 ) then
-
-      rX1 = asDouble( myOptions%get(5) )
-      rY1 = asDouble( myOptions%get(6) )
-      rGridCellSize = asDouble( myOptions%get(7) )
-
-      fTempVal = ( rX1 - rX0 ) / real(iNX, kind=c_double)
-
-      call MODEL%initialize_grid(iNX, iNY, rX0, rY0, rGridCellSize)
-
-    else
-
-      call warn("Grid specification is flawed or missing.", lFatal=lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
-
-    endif
-
-    call myOptions%clear()
-
-    ! For MODEL directive, obtain the associated dictionary entries
-    call CF_DICT%get_values( "BASE_PROJECTION_DEFINITION", myOptions )
-
-    ! dictionary entries are initially space-delimited; sArgText contains
-    ! all dictionary entries present, concatenated, with a space between entries
-    sArgText = myOptions%get(1, myOptions%count )
-
-    ! echo the original directive and dictionary entries to the logfile
-    call LOGS%write("> BASE_PROJECTION_DEFINITION "//sArgText, iLinesBefore=1)
+    call MODEL%initialize_grid(iNumCols=nx, iNumRows=ny, dX_ll=xll, dY_ll=yll, &
+      dGridCellSize=gridcellsize )
 
     ! BNDS is a module-level data structure that will be used in other modules to 
     ! supply bounding box information for the SWB project area
-    BNDS%iNumCols = iNX
-    BNDS%iNumRows = iNY
-    BNDS%fX_ll = rX0
-    BNDS%fY_ll = rY0
-    BNDS%fY_ur = rY1
-    BNDS%fX_ur = rX1
-    BNDS%fGridCellSize = rGridCellSize
-    BNDS%sPROJ4_string = trim(sArgText)
+    BNDS%iNumCols = nx
+    BNDS%iNumRows = ny
+    BNDS%fX_ll = xll
+    BNDS%fY_ll = yll
+    BNDS%fY_ur = yur
+    BNDS%fX_ur = xur
+    BNDS%fGridCellSize = gridcellsize
+    BNDS%sPROJ4_string = proj4_string
 
-    MODEL%PROJ4_string = trim(sArgText)
+    MODEL%PROJ4_string = proj4_string
 
   end subroutine initialize_grid_options
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine initialize_start_and_end_dates()
-
-    ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions  
-    integer (kind=c_int)             :: iIndex
-    character (len=:), allocatable   :: sCmdText
-    character (len=:), allocatable   :: sOptionText
-    character (len=:), allocatable   :: sArgText
-    integer (kind=c_int)             :: iStat
-
-    SIM_DT%curr = SIM_DT%start
-    SIM_DT%iDOY = day_of_year( SIM_DT%curr%getJulianDay() )
-
-    SIM_DT%iDaysInMonth = SIM_DT%curr%dayspermonth()
-    SIM_DT%iDaysInYear = SIM_DT%curr%daysperyear()
-    SIM_DT%lIsLeapYear = SIM_DT%curr%isLeapYear()
-
-    call LOGS%write("Model run start date set to: "//SIM_DT%start%prettydate(), iTab=4)
-    call LOGS%write("Model run end date set to:   "//SIM_DT%end%prettydate(), iTab=4)
-
-  end subroutine initialize_start_and_end_dates 
 
 !--------------------------------------------------------------------------------------------------
 
@@ -220,5 +240,20 @@ contains
     call grid_Destroy( pCOORD_GRD )
 
   end subroutine initialize_latitude
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine initialize_start_and_end_dates( start_jd, end_jd )
+
+    real (kind=c_double), intent(inout)  :: start_jd
+    real (kind=c_double), intent(inout)  :: end_jd
+
+    call SIM_DT%start%setJulianDate( start_jd )
+    call SIM_DT%start%calcGregorianDate()
+
+    call SIM_DT%end%setJulianDate( end_jd )
+    call SIM_DT%end%calcGregorianDate()
+
+  end subroutine initialize_start_and_end_dates
 
 end module swb_merge_initialize

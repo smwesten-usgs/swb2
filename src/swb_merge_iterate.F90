@@ -47,7 +47,7 @@ contains
       sVariableName=pENTRY%sVariableName_z, sVariableUnits="inches_per_day",       &
       iNX=cells%number_of_columns, iNY=cells%number_of_rows,                       &
       fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,          &
-      PROJ4_string=cells%PROJ4_string, sXY_units="meters",                         &
+      PROJ4_string=cells%PROJ4_string,                                             &
       dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0 )
 
     cells%nodata_fill_value = NC_FILL_FLOAT

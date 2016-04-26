@@ -143,7 +143,7 @@ contains
 
     call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE, sVariableName="growing_degree_day", &
       sVariableUnits="degree-days Fahrenheit", iNX=ubound(lActive, 1), iNY=ubound(lActive, 2),  &
-      fX=dX, fY=dY, sXY_units=trim( XY_UNITS_STRING ),                                          &
+      fX=dX, fY=dY,                                                                             &
       StartDate=SIM_DT%start, EndDate=SIM_DT%end, PROJ4_string=PROJ4_string,                    &
       dpLat=dY_lat, dpLon=dX_lon, fValidMin=0.0, fValidMax=9000.0,                              &
       sDirName=output_directory_name )

@@ -12,7 +12,7 @@ module model_initialize
 !  use loop_iterate
   use logfiles
   use model_domain, only                 : MODEL, minmaxmean
-  use output, only                       : initialize_output, set_output_directory, set_xy_units
+  use output, only                       : initialize_output, set_output_directory
   use parameters
   use precipitation__method_of_fragments
   use simulation_datetime, only          : SIM_DT
@@ -1253,28 +1253,6 @@ contains
     BNDS%sPROJ4_string = trim(sArgText)
 
     MODEL%PROJ4_string = trim(sArgText)
-
-    if ( index( MODEL%PROJ4_string, "units=m" ) > 0 ) then
-      call set_xy_units("meters")
-    elseif ( index( MODEL%PROJ4_string, "units=ft" ) > 0 ) then
-      call set_xy_units("feet")
-    elseif ( index( MODEL%PROJ4_string, "units=us-ft" ) > 0 ) then
-      call set_xy_units("U.S. Surveyor's feet")
-    elseif ( index( MODEL%PROJ4_string, "to_meter=0.3048 " ) > 0 ) then
-      call set_xy_units("feet")
-    elseif ( index( MODEL%PROJ4_string, "to_meter=0.304800609601219" ) > 0 ) then
-      call set_xy_units("U.S. Surveyor's feet")
-    elseif ( index( MODEL%PROJ4_string, "latlon" ) > 0 ) then
-      call set_xy_units("decimal degrees")
-    elseif ( index( MODEL%PROJ4_string, "lonlat" ) > 0 ) then
-      call set_xy_units("decimal degrees")
-    elseif ( index( MODEL%PROJ4_string, "units=us-ft" ) > 0 ) then
-      call set_xy_units("U.S. Surveyor's feet")      
-    else
-      call warn("Could not determine the units associated with the base grid.",             &
-        sHints="Check your PROJ4 string and make sure you have the length units defined.",  &
-        lFatal=TRUE)
-    endif  
 
   end subroutine initialize_grid_options
 

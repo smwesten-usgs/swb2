@@ -6,7 +6,7 @@ module swb_merge_domain
   use exceptions
   use string_list, only      : STRING_LIST_T
   use grid
-  use netcdf4_support, only  : NC_FILL_FLOAT
+  use netcdf4_support, only  : NC_FILL_FLOAT, T_NETCDF4_FILE
   implicit none
 
   private
@@ -36,6 +36,7 @@ module swb_merge_domain
     real (kind=c_float), allocatable       :: latitude(:)
 
     type (GENERAL_GRID_T), pointer         :: pGrdOut
+    type (T_NETCDF4_FILE), pointer         :: NCFILE
     
   contains
 

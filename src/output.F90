@@ -10,7 +10,7 @@ module output
 
   private
 
-  public :: initialize_output, set_output_directory, write_output, set_xy_units
+  public :: initialize_output, set_output_directory, write_output
   public :: OUTPUT_DIRECTORY_NAME
 
   type, public :: NETCDF_FILE_COLLECTION_T
@@ -64,16 +64,6 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine set_xy_units( xy_units_name )
-
-    character (len=*), intent(in)  :: xy_units_name
-
-    XY_UNITS_STRING = xy_units_name
-
-  end subroutine set_xy_units  
-
-!--------------------------------------------------------------------------------------------------
-
   subroutine initialize_output(cells)
 
     class (MODEL_DOMAIN_T), intent(inout)   :: cells
@@ -96,7 +86,6 @@ contains
             iNY=cells%number_of_rows,                                                &
             fX=cells%X,                                                              &
             fY=cells%Y,                                                              &
-            sXY_units=trim( XY_UNITS_STRING ),                                       &
             StartDate=SIM_DT%start,                                                  &
             EndDate=SIM_DT%end,                                                      &
             PROJ4_string=cells%PROJ4_string,                                         &
