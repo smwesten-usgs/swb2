@@ -41,10 +41,13 @@ contains
     cells%pGrdOut%rData = NC_FILL_FLOAT
     call grid_set_nodata_value( pGrd=cells%pGrdOut, fValue=NC_FILL_FLOAT )
 
-    call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE,                         &
+    !! @TODO Fix ugly kludge: sXY_units unnecessary; obtain units from PROJ4 string
+
+    call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE,                        &
       sVariableName=pENTRY%sVariableName_z, sVariableUnits="inches_per_day",       &
       iNX=cells%number_of_columns, iNY=cells%number_of_rows,                       &
       fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,          &
+      PROJ4_string=cells%PROJ4_string, sXY_units="meters",                         &
       dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0 )
 
     cells%nodata_fill_value = NC_FILL_FLOAT

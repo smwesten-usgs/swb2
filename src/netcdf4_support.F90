@@ -242,6 +242,7 @@ module netcdf4_support
   public :: T_NETCDF_DIMENSION, T_NETCDF_VARIABLE, T_NETCDF_ATTRIBUTE
   public :: T_NETCDF4_FILE
 
+  public :: netcdf_open_and_prepare_for_merging
   public :: netcdf_open_and_prepare_as_input
   public :: netcdf_open_and_prepare_as_output_archive
   public :: netcdf_open_and_prepare_as_output
@@ -251,6 +252,7 @@ module netcdf4_support
   public :: netcdf_dump_cdl
   public :: netcdf_open_file
   public :: netcdf_close_file
+  public :: netcdf_get_variable_list
   public :: netcdf_get_variable_slice
   public :: netcdf_update_time_starting_index
   public :: netcdf_put_variable_array
@@ -572,6 +574,70 @@ function nf_return_DimSize( NCFILE, iDimID)   result(iDimSize)
   iDimSize = pNC_DIM%iNC_DimSize
 
 end function nf_return_DimSize
+
+!--------------------------------------------------------------------------------------------------
+
+subroutine netcdf_open_and_prepare_for_merging( NCFILE, sFilename )
+
+  type (T_NETCDF4_FILE ) :: NCFILE
+  character (len=*) :: sFilename
+
+  ! [ LOCALS ]
+  type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
+  type (T_NETCDF_DIMENSION), pointer :: pNC_DIM
+  logical (kind=c_bool) :: lFileOpen
+  integer (kind=c_int), dimension(2) :: iColRow_ll, iColRow_ur, iColRow_lr, iColRow_ul
+  integer (kind=c_int) :: iColmin, iColmax, iRowmin, iRowmax
+  integer (kind=c_int) :: iIndex
+
+  call nf_open_file(NCFILE=NCFILE, sFilename=sFilename)
+
+  call nf_populate_dimension_struct( NCFILE )
+  call nf_populate_variable_struct( NCFILE )
+
+  call nf_get_variable_id_and_type( NCFILE, strict_asserts=FALSE )
+
+  ! OK. We only want to attempt to call functions that
+  ! process the time variable if a time variable actually exists!!
+  if ( NCFILE%iVarID(NC_TIME) >= 0 ) then
+
+    NCFILE%dpFirstAndLastTimeValues = nf_get_first_and_last(NCFILE=NCFILE, &
+        iVarIndex=NCFILE%iVarIndex(NC_TIME) )
+
+    !> look for and process the "days since MM-D-YYYY" attribute
+    call nf_get_time_units(NCFILE=NCFILE)
+
+    call nf_calculate_time_range(NCFILE)
+
+    !> retrieve the time values as included in the NetCDF file
+    call nf_get_time_vals(NCFILE)
+
+  endif
+
+  !> retrieve the X and Y coordinates from the NetCDF file...
+  call nf_get_x_and_y(NCFILE)
+
+  !> define the entire grid area as the AOI
+  NCFILE%iColBounds(NC_LEFT) = lbound(NCFILE%rX_Coords,1)
+  NCFILE%iColBounds(NC_RIGHT) = ubound(NCFILE%rX_Coords,1)
+
+  NCFILE%iRowBounds(NC_TOP) = lbound(NCFILE%rY_Coords,1)
+  NCFILE%iRowBounds(NC_BOTTOM) = ubound(NCFILE%rY_Coords,1)
+
+  !> based on the subset of the NetCDF file as determined above, set the
+  !> start, count, and stride parameters for use in all further data
+  !> retrievals
+  call nf_set_start_count_stride(NCFILE)
+
+  !> establish the bounds to iterate over; this can enable horiz or vert flipping
+  call nf_set_iteration_bounds(NCFILE)
+
+  !> now that we have (possibly) created a subset, need to get the
+  !> **NATIVE** coordinate bounds so that the intermediate grid file
+  !> can be created
+  call nf_return_native_coord_bounds(NCFILE)
+
+end subroutine netcdf_open_and_prepare_for_merging
 
 !----------------------------------------------------------------------
 
@@ -1066,6 +1132,8 @@ subroutine nf_return_native_coord_bounds(NCFILE)
   NCFILE%rY(NC_BOTTOM) = rYmin - NCFILE%rGridCellSizeY * 0.5_c_double
 
 !#ifdef DEBUG_PRINT
+  print *, ""
+  print *, repeat("-", 80)
   print *, "Filename: ", NCFILE%sFilename
   print *, "Grid cell size (X): ", NCFILE%rGridCellSizeX
   print *, "Grid cell size (Y): ", NCFILE%rGridCellSizeY
@@ -1075,6 +1143,7 @@ subroutine nf_return_native_coord_bounds(NCFILE)
   print *, "X (right): ", NCFILE%rX(NC_RIGHT)
   print *, "Y (top): ", NCFILE%rY(NC_TOP)
   print *, "Y (bottom): ", NCFILE%rY(NC_BOTTOM)
+  print *, ""
 !#endif
 
 end subroutine nf_return_native_coord_bounds
@@ -1632,6 +1701,27 @@ subroutine nf_populate_attribute_struct( NCFILE, pNC_ATT, iNC_VarID, iAttNum )
   end select
 
 end subroutine nf_populate_attribute_struct
+
+!----------------------------------------------------------------------
+
+subroutine netcdf_get_variable_list( NCFILE, variable_list )
+
+  type (T_NETCDF4_FILE) :: NCFILE
+  type (STRING_LIST_T)  :: variable_list
+
+  ! [ LOCALS ]
+  integer (kind=c_int) :: indx
+  type (T_NETCDF_ATTRIBUTE), pointer :: pNC_ATT
+  type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
+
+  call variable_list%clear
+
+  do indx=0, NCFILE%iNumberOfVariables-1
+    pNC_VAR => NCFILE%pNC_VAR( indx )
+    if ( associated( pNC_VAR ) )  call variable_list%append( pNC_VAR%sVariableName )
+  enddo
+
+end subroutine netcdf_get_variable_list  
 
 !----------------------------------------------------------------------
 
@@ -2501,61 +2591,73 @@ end subroutine nf_get_scale_and_offset
 
 !----------------------------------------------------------------------
 
-subroutine nf_get_variable_id_and_type( NCFILE )
-  type (T_NETCDF4_FILE), intent(inout) :: NCFILE
+subroutine nf_get_variable_id_and_type( NCFILE, strict_asserts )
+  type (T_NETCDF4_FILE), intent(inout)          :: NCFILE
+  logical (kind=c_bool), intent(in), optional   :: strict_asserts
 
-   ! [ LOCALS ]
-   integer (kind=c_int) :: iIndex
-   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
+  ! [ LOCALS ]
+  integer (kind=c_int)              :: iIndex
+  type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
+  logical (kind=c_bool)             :: strict_asserts_
 
-   NCFILE%iVarID = -9999
+  if ( present( strict_asserts ) ) then
+    strict_asserts_ = strict_asserts
+  else
+    strict_asserts_ = TRUE 
+  endif
 
-   do iIndex=0, NCFILE%iNumberOfVariables - 1
+  NCFILE%iVarID = -9999
 
-     pNC_VAR => NCFILE%pNC_VAR(iIndex)
+  do iIndex=0, NCFILE%iNumberOfVariables - 1
 
-     if ( pNC_VAR%sVariableName .strequal. NCFILE%sVarName(NC_X)  ) then
-       NCFILE%iVarIndex(NC_X) = iIndex
-       NCFILE%iVarID(NC_X) = pNC_VAR%iNC_VarID
-       NCFILE%iVarType(NC_X) = pNC_VAR%iNC_VarType
-       NCFILE%iVar_DimID(NC_X,:) = pNC_VAR%iNC_DimID
+    pNC_VAR => NCFILE%pNC_VAR(iIndex)
 
-     elseif ( pNC_VAR%sVariableName .strequal. NCFILE%sVarName(NC_Y) ) then
-       NCFILE%iVarIndex(NC_Y) = iIndex
-       NCFILE%iVarID(NC_Y) = pNC_VAR%iNC_VarID
-       NCFILE%iVarType(NC_Y) = pNC_VAR%iNC_VarType
-       NCFILE%iVar_DimID(NC_Y,:) = pNC_VAR%iNC_DimID
+    if ( pNC_VAR%sVariableName .strequal. NCFILE%sVarName(NC_X)  ) then
+     NCFILE%iVarIndex(NC_X) = iIndex
+     NCFILE%iVarID(NC_X) = pNC_VAR%iNC_VarID
+     NCFILE%iVarType(NC_X) = pNC_VAR%iNC_VarType
+     NCFILE%iVar_DimID(NC_X,:) = pNC_VAR%iNC_DimID
 
-     elseif ( pNC_VAR%sVariableName .strequal. NCFILE%sVarName(NC_Z) ) then
-       NCFILE%iVarIndex(NC_Z) = iIndex
-       NCFILE%iVarID(NC_Z) = pNC_VAR%iNC_VarID
-       NCFILE%iVarType(NC_Z) = pNC_VAR%iNC_VarType
-       NCFILE%iVar_DimID(NC_Z,:) = pNC_VAR%iNC_DimID
+    elseif ( pNC_VAR%sVariableName .strequal. NCFILE%sVarName(NC_Y) ) then
+     NCFILE%iVarIndex(NC_Y) = iIndex
+     NCFILE%iVarID(NC_Y) = pNC_VAR%iNC_VarID
+     NCFILE%iVarType(NC_Y) = pNC_VAR%iNC_VarType
+     NCFILE%iVar_DimID(NC_Y,:) = pNC_VAR%iNC_DimID
 
-     elseif ( pNC_VAR%sVariableName .strequal. NCFILE%sVarName(NC_TIME) ) then
-       NCFILE%iVarIndex(NC_TIME) = iIndex
-       NCFILE%iVarID(NC_TIME) = pNC_VAR%iNC_VarID
-       NCFILE%iVarType(NC_TIME) = pNC_VAR%iNC_VarType
-       NCFILE%iVar_DimID(NC_TIME,:) = pNC_VAR%iNC_DimID
-     endif
+    elseif ( pNC_VAR%sVariableName .strequal. NCFILE%sVarName(NC_Z) ) then
+     NCFILE%iVarIndex(NC_Z) = iIndex
+     NCFILE%iVarID(NC_Z) = pNC_VAR%iNC_VarID
+     NCFILE%iVarType(NC_Z) = pNC_VAR%iNC_VarType
+     NCFILE%iVar_DimID(NC_Z,:) = pNC_VAR%iNC_DimID
 
-   enddo
+    elseif ( pNC_VAR%sVariableName .strequal. NCFILE%sVarName(NC_TIME) ) then
+     NCFILE%iVarIndex(NC_TIME) = iIndex
+     NCFILE%iVarID(NC_TIME) = pNC_VAR%iNC_VarID
+     NCFILE%iVarType(NC_TIME) = pNC_VAR%iNC_VarType
+     NCFILE%iVar_DimID(NC_TIME,:) = pNC_VAR%iNC_DimID
+    endif
 
-   call assert(NCFILE%iVarID(NC_X) >= 0, &
+  enddo
+
+  if ( strict_asserts_ ) then
+
+    call assert(NCFILE%iVarID(NC_X) >= 0, &
      "Unable to find the variable named "//dquote(NCFILE%sVarName(NC_X) )//" in " &
      //"file "//dquote(NCFILE%sFilename), trim(__FILE__), __LINE__)
 
-   call assert(NCFILE%iVarID(NC_Y) >= 0, &
+    call assert(NCFILE%iVarID(NC_Y) >= 0, &
      "Unable to find the variable named "//dquote(NCFILE%sVarName(NC_Y))//" in " &
      //"file "//dquote(NCFILE%sFilename), trim(__FILE__), __LINE__)
 
-   call assert(NCFILE%iVarID(NC_Z) >= 0, &
+    call assert(NCFILE%iVarID(NC_Z) >= 0, &
      "Unable to find the variable named "//dquote(NCFILE%sVarName(NC_Z))//" in " &
      //"file "//dquote(NCFILE%sFilename), trim(__FILE__), __LINE__)
 
-   if ( NCFILE%iVarID(NC_TIME) < 0 )  &
+    if ( NCFILE%iVarID(NC_TIME) < 0 )  &
      call warn("Unable to find the variable named "//dquote(NCFILE%sVarName(NC_TIME))//" in " &
        //"file "//dquote(NCFILE%sFilename) )
+
+  endif
 
 end subroutine nf_get_variable_id_and_type
 

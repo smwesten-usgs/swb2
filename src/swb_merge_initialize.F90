@@ -10,6 +10,7 @@ module swb_merge_initialize
   use logfiles, only                     : LOGS, LOG_ALL, LOG_DEBUG
   use file_operations
   use grid
+  use netcdf4_support
   use output, only                       : initialize_output
   use swb_merge_domain
   use simulation_datetime, only : SIM_DT
@@ -21,6 +22,8 @@ module swb_merge_initialize
 
   public :: initialize_all
 
+  type (GENERAL_GRID_T), pointer    :: pCOORD_GRD
+
 contains
 
   subroutine initialize_all( filelist )
@@ -28,10 +31,28 @@ contains
     type (STRING_LIST_T), intent(in)    :: filelist
 
     ! [ LOCALS ]
-    integer (kind=c_int)            :: iIndex
-    type (STRING_LIST_T)            :: slList
-    character (len=:), allocatable  :: sBuf
+    integer (kind=c_int)                :: indx, jndx
+    type (STRING_LIST_T)                :: variable_list
+    character (len=:), allocatable      :: sBuf
+    type (T_NETCDF4_FILE ), allocatable :: NCFILES(:)
+    integer (kind=c_int)                :: status
+    integer (kind=c_int)                :: num_files
 
+    num_files = filelist%count
+
+    allocate( NCFILES( num_files ), stat=status )
+
+    do indx=1, num_files-1
+
+      call netcdf_open_and_prepare_for_merging(NCFILE=NCFILES( indx ),             &
+                                               sFilename=filelist%get( indx ) )
+      call netcdf_get_variable_list(NCFILE=NCFILES( indx ), variable_list=variable_list )
+
+      do jndx=1,variable_list%count
+        print *, jndx, variable_list%get( jndx )
+      enddo  
+
+    enddo
 
 !!  read metadata from each netcdf file
 
@@ -42,13 +63,16 @@ contains
 
 
     ! define SWB project boundary and geographic projection
-    call initialize_grid_options( xll, yll, xur, yur, resolution, proj4 )
+    
+    !call initialize_grid_options( xll, yll, xur, yur, resolution, proj4 )
 
     ! define the start and end date for the simulation
     call initialize_start_and_end_dates()
         
 
     call initialize_latitude()
+
+!    call netcdf_open_and_prepare_as_output()
 
   end subroutine initialize_all
 
@@ -145,87 +169,16 @@ contains
     character (len=:), allocatable   :: sOptionText
     character (len=:), allocatable   :: sArgText
     integer (kind=c_int)             :: iStat
-    logical (kind=c_bool)            :: lHaveStartDate
-    logical (kind=c_bool)            :: lHaveEndDate
 
-    lHaveStartDate = lFALSE
-    lHaveEndDate = lFALSE
+    SIM_DT%curr = SIM_DT%start
+    SIM_DT%iDOY = day_of_year( SIM_DT%curr%getJulianDay() )
 
-    myDirectives = CF_DICT%grep_keys("DATE")
-      
-!     if ( myDirectives%count < 2 ) then
+    SIM_DT%iDaysInMonth = SIM_DT%curr%dayspermonth()
+    SIM_DT%iDaysInYear = SIM_DT%curr%daysperyear()
+    SIM_DT%lIsLeapYear = SIM_DT%curr%isLeapYear()
 
-!       call warn(sMessage="Your control file seems to be missing START_DATE and/or END_DATE", &
-!         sHints="Add a START_DATE and/or END_DATE directive to your control file. Date "      &
-!         //"~should be specified as mm/dd/yyyy.", lFatal = lTRUE, iLogLevel = LOG_ALL,        &
-!         lEcho = lTRUE )
-
-  
-    call LOGS%set_loglevel( LOG_ALL )
-    call LOGS%set_echo( lFALSE )
-
-    do iIndex = 1, myDirectives%count
-
-      ! myDirectives is a string list of all SWB directives that contain the string "DATE"
-      ! sCmdText contains an individual directive
-      sCmdText = myDirectives%get(iIndex)
-
-      ! For MODEL directive, obtain the associated dictionary entries
-      call CF_DICT%get_values(sCmdText, myOptions )
-
-      ! dictionary entries are initially space-delimited; sArgText contains
-      ! all dictionary entries present, concatenated, with a space between entries
-      sArgText = myOptions%get(1, myOptions%count )
-
-      ! echo the original directive and dictionary entries to the logfile
-      call LOGS%write("> "//sCmdText//" "//sArgText, iLinesBefore=1 )
-
-      ! most of the time, we only care about the first dictionary entry, obtained below
-      sOptionText = myOptions%get(1)
-
-      select case ( sCmdText )
-
-        case ( "START_DATE", "STARTDATE", "BEGIN_DATE" )
-
-          lHaveStartDate = lTRUE
-          call SIM_DT%start%parseDate( sOptionText )
-          call SIM_DT%start%calcJulianDay()
-
-        case ( "END_DATE", "ENDDATE", "STOP_DATE" )
-
-          lHaveEndDate = lTRUE
-          call SIM_DT%end%parseDate( sOptionText )
-          call SIM_DT%end%calcJulianDay()
-
-        case default
-
-          call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
-            //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
-
-      end select
-
-    enddo
-
-    if ( lHaveStartDate .and. lHaveEndDate ) then
-
-      SIM_DT%curr = SIM_DT%start
-      SIM_DT%iDOY = day_of_year( SIM_DT%curr%getJulianDay() )
-
-      SIM_DT%iDaysInMonth = SIM_DT%curr%dayspermonth()
-      SIM_DT%iDaysInYear = SIM_DT%curr%daysperyear()
-      SIM_DT%lIsLeapYear = SIM_DT%curr%isLeapYear()
-
-      call LOGS%write("Model run start date set to: "//SIM_DT%start%prettydate(), iTab=4)
-      call LOGS%write("Model run end date set to:   "//SIM_DT%end%prettydate(), iTab=4)
-
-    else
-    
-      call warn(sMessage="Your control file seems to be missing START_DATE and/or END_DATE", &
-        sHints="Add a START_DATE and/or END_DATE directive to your control file. Date "      &
-        //"~should be specified as mm/dd/yyyy.", lFatal = lTRUE, iLogLevel = LOG_ALL,        &
-        lEcho = lTRUE )
-  
-    endif
+    call LOGS%write("Model run start date set to: "//SIM_DT%start%prettydate(), iTab=4)
+    call LOGS%write("Model run end date set to:   "//SIM_DT%end%prettydate(), iTab=4)
 
   end subroutine initialize_start_and_end_dates 
 
