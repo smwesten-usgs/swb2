@@ -259,6 +259,8 @@ module netcdf4_support
   public :: netcdf_put_variable_array
   public :: netcdf_put_packed_variable_array
   public :: netcdf_put_variable_vector
+  public :: netcdf_coord_to_col_row
+  public :: netcdf_get_variable_id_for_variable
 
 contains
 
@@ -740,19 +742,19 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
     !> need all four corner points since it is likely that
     !> the AOI rectangle is rotated relative to the base
     !> projection
-    iColRow_ll = nf_coord_to_col_row(NCFILE=NCFILE, &
+    iColRow_ll = netcdf_coord_to_col_row(NCFILE=NCFILE, &
                                      rX=tGridBounds%rXll, &
                                      rY=tGridBounds%rYll)
 
-    iColRow_lr = nf_coord_to_col_row(NCFILE=NCFILE, &
+    iColRow_lr = netcdf_coord_to_col_row(NCFILE=NCFILE, &
                                      rX=tGridBounds%rXlr, &
                                      rY=tGridBounds%rYlr)
 
-    iColRow_ul = nf_coord_to_col_row(NCFILE=NCFILE, &
+    iColRow_ul = netcdf_coord_to_col_row(NCFILE=NCFILE, &
                                      rX=tGridBounds%rXul, &
                                      rY=tGridBounds%rYul)
 
-    iColRow_ur = nf_coord_to_col_row(NCFILE=NCFILE, &
+    iColRow_ur = netcdf_coord_to_col_row(NCFILE=NCFILE, &
                                      rX=tGridBounds%rXur, &
                                      rY=tGridBounds%rYur)
 #ifdef DEBUG_PRINT
@@ -908,7 +910,7 @@ end subroutine netcdf_open_and_prepare_as_output_archive
 
 
 subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUnits,    &
-   iNX, iNY, fX, fY, StartDate, EndDate, PROJ4_string,                                  &
+   iNX, iNY, fX, fY, StartDate, EndDate, PROJ4_string, history_list, executable_name,   &
    dpLat, dpLon, fValidMin, fValidMax, sDirName )
 
   type (T_NETCDF4_FILE ), pointer            :: NCFILE
@@ -921,6 +923,8 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   type (DATETIME_T), intent(in)              :: StartDate
   type (DATETIME_T), intent(in)              :: EndDate
   character (len=*), intent(in)              :: PROJ4_string
+  type (STRING_LIST_T), intent(in), pointer, optional :: history_list
+  character (len=*), intent(in), optional    :: executable_name
   real (kind=c_double), intent(in), optional :: dpLat(:,:)
   real (kind=c_double), intent(in), optional :: dpLon(:,:)
   real (kind=c_float), intent(in), optional  :: fValidMin
@@ -935,12 +939,37 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   character (len=10)                                :: sOriginText
   character (len=256)                               :: sFilename
   character (len=64)                                :: sDirName_
+  type (STRING_LIST_T), pointer                     :: history_list_
+  character (len=:), allocatable                    :: executable_name_
+  type (DATETIME_T)                                 :: DT
+  character (len=:), allocatable                    :: date_time_text
+  call DT%systime()
+  date_time_text = DT%prettydatetime()
+
 
   if (present( sDirName ) ) then
     sDirName_ = sDirName
   else
     sDirName_ = ""
   endif   
+
+  if ( present( executable_name ) ) then
+    executable_name_ = executable_name
+  else
+    executable_name_ = "SWB"
+  endif  
+
+  if ( present( history_list) ) then
+    history_list_ => history_list
+  else
+    allocate( history_list_ )
+    call history_list_%append(date_time_text//": Soil-Water-Balance run started.")
+  endif  
+
+  call history_list_%set_autocleanup( FALSE )
+
+  print *, associated( history_list_ )
+  print *, history_list_%autocleanup
 
 
 !    integer (kind=c_int)            :: iNX                   ! Number of cells in the x-direction
@@ -985,10 +1014,11 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   
   call nf_set_standard_attributes(NCFILE=NCFILE, sOriginText=sOriginText,                    &
       PROJ4_string=PROJ4_string, lLatLon=lTRUE, fValidMin=fValidMin, fValidMax=fValidMax )
-  
+
   call nf_set_global_attributes(NCFILE=NCFILE, &
-     sDataType=trim(NCFILE%sVarName(NC_Z)) )
-  
+     sDataType=trim(NCFILE%sVarName(NC_Z)), history_list=history_list_, &
+     executable_name=executable_name_ )
+
   call nf_put_attributes(NCFILE=NCFILE)
 
   !> enable a low level of data compression for the variable of interest
@@ -1005,6 +1035,11 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   call nf_put_x_and_y(NCFILE=NCFILE, &
        dpX=fX, &
        dpY=fY )
+
+!  allocate( NCFILE%rX_Coords( size( fX) ), stat=iStat )
+!  allocate( NCFILE%rY_Coords( size( fY) ), stat=iStat )  
+  NCFILE%rX_Coords = fX
+  NCFILE%rY_Coords = fY
 
   if (present( dpLat ) .and. present( dpLon ) ) then
 
@@ -1131,7 +1166,7 @@ subroutine nf_return_native_coord_bounds(NCFILE)
   NCFILE%rY(NC_TOP) = rYmax + NCFILE%rGridCellSizeY * 0.5_c_double
   NCFILE%rY(NC_BOTTOM) = rYmin - NCFILE%rGridCellSizeY * 0.5_c_double
 
-!#ifdef DEBUG_PRINT
+#ifdef DEBUG_PRINT
   print *, ""
   print *, repeat("-", 80)
   print *, "Filename: ", NCFILE%sFilename
@@ -1144,7 +1179,7 @@ subroutine nf_return_native_coord_bounds(NCFILE)
   print *, "Y (top): ", NCFILE%rY(NC_TOP)
   print *, "Y (bottom): ", NCFILE%rY(NC_BOTTOM)
   print *, ""
-!#endif
+#endif
 
 end subroutine nf_return_native_coord_bounds
 
@@ -1703,6 +1738,46 @@ subroutine nf_populate_attribute_struct( NCFILE, pNC_ATT, iNC_VarID, iAttNum )
 end subroutine nf_populate_attribute_struct
 
 !----------------------------------------------------------------------
+
+
+subroutine netcdf_get_variable_id_for_variable( NCFILE, variable_name, &
+                                                variable_id      )
+
+  type (T_NETCDF4_FILE), intent(inout) :: NCFILE
+  character (len=*), intent(in)        :: variable_name
+  integer (kind=c_int), intent(out)    :: variable_id
+
+  ! [ LOCALS ]
+  integer (kind=c_int) :: indx
+  type (T_NETCDF_VARIABLE), pointer  :: pNC_VAR
+  logical (kind=c_bool)              :: variable_was_found
+  character (len=256)                :: tempstring
+
+  variable_was_found = FALSE
+
+  do indx=0, NCFILE%iNumberOfVariables-1
+    pNC_VAR => NCFILE%pNC_VAR( indx )
+    if ( associated( pNC_VAR ) ) then 
+      if ( pNC_VAR%sVariableName .strequal. variable_name ) then
+        variable_was_found = TRUE
+        exit
+      endif
+    endif
+  enddo
+
+  if ( variable_was_found ) then
+
+    variable_id = pNC_VAR%iNC_VarID
+
+  else
+
+    variable_id = -9999
+
+  endif
+
+end subroutine netcdf_get_variable_id_for_variable
+
+!--------------------------------------------------------------------------------------------------
 
 subroutine netcdf_get_attribute_list_for_variable( NCFILE, variable_name, &
                                                    attribute_name_list,   &
@@ -2780,16 +2855,18 @@ end function nf_return_index_double
 
 !----------------------------------------------------------------------
 
-function nf_coord_to_col_row(NCFILE, rX, rY)  result(iColRow)
+function netcdf_coord_to_col_row(NCFILE, rX, rY)  result(iColRow)
 
   type (T_NETCDF4_FILE ) :: NCFILE
   real (kind=c_double) :: rX
   real (kind=c_double) :: rY
   integer (kind=c_size_t), dimension(2) :: iColRow
 
-
   ! [ LOCALS ]
   integer (kind=c_int) :: iColNum, iRowNum
+
+  call assert( allocated( NCFILE%rX_Coords ), "Internal programming error -- attempt " &
+  //"to access unallocated array rX_Coords.", __FILE__, __LINE__ )
 
   if (rX < minval(NCFILE%rX_Coords) ) &
     call die( "X coordinate value "//asCharacter(rX)//" is less than the minimum X coordinate " &
@@ -2798,7 +2875,7 @@ function nf_coord_to_col_row(NCFILE, rX, rY)  result(iColRow)
 
   if (rX > maxval(NCFILE%rX_Coords) ) &
     call die( "X coordinate value "//asCharacter(rX)//" is greater than the maximum X coordinate " &
-      //"value ("//asCharacter(minval(NCFILE%rX_Coords))//") contained in the NetCDF file " &
+      //"value ("//asCharacter(maxval(NCFILE%rX_Coords))//") contained in the NetCDF file " &
       //dquote(NCFILE%sFilename) )
 
   if (rY < minval(NCFILE%rY_Coords) ) &
@@ -2808,7 +2885,7 @@ function nf_coord_to_col_row(NCFILE, rX, rY)  result(iColRow)
 
   if (rY > maxval(NCFILE%rY_Coords) ) &
     call die( "Y coordinate value "//asCharacter(rY)//" is greater than the maximum Y coordinate " &
-      //"value ("//asCharacter(minval(NCFILE%rY_Coords))//") contained in the NetCDF file " &
+      //"value ("//asCharacter(maxval(NCFILE%rY_Coords))//") contained in the NetCDF file " &
       //dquote(NCFILE%sFilename) )
 
   iColNum = nf_return_index_double(NCFILE%rX_Coords, rX)
@@ -2817,7 +2894,7 @@ function nf_coord_to_col_row(NCFILE, rX, rY)  result(iColRow)
   iColRow(COLUMN) = iColNum
   iColRow(ROW) = iRowNum
 
-end function nf_coord_to_col_row
+end function netcdf_coord_to_col_row
 
 !----------------------------------------------------------------------
 
@@ -3083,20 +3160,39 @@ end subroutine nf_set_standard_variables
 
 !----------------------------------------------------------------------
 
-subroutine nf_set_global_attributes(NCFILE, sDataType, sSourceFile )
+subroutine nf_set_global_attributes(NCFILE, sDataType, executable_name, &
+                                    history_list, sSourceFile )
 
   type (T_NETCDF4_FILE ) :: NCFILE
   character (len=*), intent(in) :: sDataType
-  character (len=*), intent(in), optional :: sSourceFile
+  character (len=*), intent(in), optional    :: executable_name
+  type (STRING_LIST_T), intent(in), pointer, optional :: history_list
+  character (len=*), intent(in), optional    :: sSourceFile
 
   ! [ LOCALS ]
-  integer (kind=c_int) :: iStat
-  type (DATETIME_T)    :: DT
-  character (len=20)   :: sDateTime
+  integer (kind=c_int)           :: iStat
+  type (DATETIME_T)              :: DT
+  character (len=20)             :: sDateTime
+  character (len=:), allocatable :: executable_name_
+  type (STRING_LIST_T), pointer           :: history_list_
+  integer (kind=c_int)           :: indx
+  integer (kind=c_int)  :: records
+
+  if (present( executable_name) ) then
+    executable_name_ = trim( executable_name )
+  else
+    executable_name_ = "SWB"
+  endif
+
+  if ( present( history_list ) ) then
+    history_list_ => history_list
+  else
+    allocate( history_list_ )
+    call history_list_%append(trim(sDateTime)//": Soil-Water-Balance model run started.")
+  endif
 
   call DT%systime()
   sDateTime = DT%prettydatetime()
-
 
   NCFILE%iNumberOfAttributes = 4
 
@@ -3118,21 +3214,20 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, sSourceFile )
 
       NCFILE%pNC_ATT(0)%sAttributeName = "source"
       allocate(NCFILE%pNC_ATT(0)%sAttValue(0:0))
-      NCFILE%pNC_ATT(0)%sAttValue(0) = trim(sDataType)//" output from SWB run "   &
+      NCFILE%pNC_ATT(0)%sAttValue(0) = trim(sDataType)//" output from " &
+        //executable_name_//" run "   &
         //"started on "//trim(sDateTime)//"."
       NCFILE%pNC_ATT(0)%iNC_AttType = NC_CHAR
       NCFILE%pNC_ATT(0)%iNC_AttSize = 1_c_size_t
 
     endif  
 
-    NCFILE%pNC_ATT(1)%sAttributeName = "swb_version"
+    NCFILE%pNC_ATT(1)%sAttributeName = "executable_version"
     allocate(NCFILE%pNC_ATT(1)%sAttValue(0:0))
-
-    NCFILE%pNC_ATT(1)%sAttValue(0) = "SWB version "//trim(SWB_VERSION)          &
+    NCFILE%pNC_ATT(1)%sAttValue(0) = "version "//trim(SWB_VERSION)          &
       //", Git branch: "//trim(GIT_BRANCH_STRING)//", Git commit hash string: "   &
       //trim(GIT_COMMIT_HASH_STRING)//", compiled on: "//trim(COMPILE_DATE)       &
       //" "//trim(COMPILE_TIME)//"."
-
     NCFILE%pNC_ATT(1)%iNC_AttType = NC_CHAR
     NCFILE%pNC_ATT(1)%iNC_AttSize = 1_c_size_t
 
@@ -3142,11 +3237,24 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, sSourceFile )
     NCFILE%pNC_ATT(2)%iNC_AttType = NC_CHAR
     NCFILE%pNC_ATT(2)%iNC_AttSize = 1_c_size_t
 
+    records = history_list_%count - 1
+
+    print *, __FILE__, ": ", __LINE__
+    print *, records
+
     NCFILE%pNC_ATT(3)%sAttributeName = "history"
-    allocate(NCFILE%pNC_ATT(3)%sAttValue(0:0))
-    NCFILE%pNC_ATT(3)%sAttValue(0) = trim(sDateTime)//": Soil-Water-Balance model run started."
+    allocate(NCFILE%pNC_ATT(3)%sAttValue( 0:(records) ) )
     NCFILE%pNC_ATT(3)%iNC_AttType = NC_CHAR
     NCFILE%pNC_ATT(3)%iNC_AttSize = 1_c_size_t
+
+!    do indx=0, records
+!      print *, indx, history_list_%get( indx + 1 )
+!      NCFILE%pNC_ATT(3)%sAttValue( indx ) = trim(history_list_%get( indx + 1 ))//C_NULL_CHAR
+!    enddo
+
+    NCFILE%pNC_ATT(3)%sAttValue = history_list_%asCharacter()
+
+    print *, history_list_%asCharacter( null_terminated=TRUE )
 
   end block
 

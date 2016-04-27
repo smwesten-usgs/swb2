@@ -82,10 +82,8 @@ program main
 
   ! open and initialize logfiles
   call LOGS%initialize( iLogLevel = LOG_DEBUG )
-
   call initialize_all( filelist )
-
-!  call iterate_over_simulation_days( MODEL )
+  call iterate_over_simulation_days( MODEL )
    
   call LOGS%close()
 

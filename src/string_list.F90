@@ -1,7 +1,7 @@
 module string_list
 
-  use iso_c_binding, only             : c_int, c_float, c_bool
-  use constants_and_conversions, only : asInt, asFloat, asLogical, lTRUE, lFALSE
+  use iso_c_binding, only             : c_int, c_float, c_bool, c_null_char
+  use constants_and_conversions, only : asInt, asFloat, asLogical, lTRUE, lFALSE, TRUE, FALSE
   use strings
   use logfiles, only                  : LOG_DEBUG
   use exceptions
@@ -30,9 +30,10 @@ module string_list
 
   type STRING_LIST_T
 
-    type (STRING_LIST_ELEMENT_T), pointer        :: first   => null()
-    type (STRING_LIST_ELEMENT_T), pointer        :: last    => null()
-    integer (kind=c_int)                         :: count   = 0
+    type (STRING_LIST_ELEMENT_T), pointer        :: first        => null()
+    type (STRING_LIST_ELEMENT_T), pointer        :: last         => null()
+    logical (kind=c_bool)                        :: autocleanup  = TRUE
+    integer (kind=c_int)                         :: count        = 0
 
   contains
 
@@ -51,12 +52,14 @@ module string_list
     procedure :: list_return_all_as_logical_fn
     procedure :: list_return_all_as_character_fn
     procedure :: list_subset_partial_matches_fn
+    procedure :: list_set_auto_cleanup_sub
     final     :: list_finalize_sub
 
     generic :: append        => list_append_string_sub, &
                                 list_append_int_sub
     generic :: get           => list_get_value_at_index_fn, &
                                 list_get_values_in_range_fn
+    generic :: set_autocleanup  => list_set_auto_cleanup_sub
     generic :: print         => list_print_sub
     generic :: listall       => list_all_fn
     generic :: grep          => list_subset_partial_matches_fn
@@ -82,6 +85,18 @@ contains
 
   end subroutine list_append_int_sub
 
+!--------------------------------------------------------------------------------------------------
+
+  subroutine list_set_auto_cleanup_sub( this, autocleanup )
+
+    class (STRING_LIST_T), intent(inout)    :: this
+    logical (kind=c_bool), intent(in)       :: autocleanup
+
+    this%autocleanup = autocleanup
+
+  end subroutine list_set_auto_cleanup_sub
+
+!--------------------------------------------------------------------------------------------------
   
   subroutine assign_string_list_to_string_list_sub(slList2, slList1)
 
@@ -127,8 +142,10 @@ contains
       if (this%count == 0)  call die("Internal logic error: count should *not* be zero in this block", &
              __FILE__, __LINE__)
 
-      pOldLastElement => this%last
-      pOldLastElement%next => pNewElement
+!      pOldLastElement => this%last
+!      pOldLastElement%next => pNewElement
+
+      this%last%next => pNewElement
       this%last      => pNewElement
       this%last%next => null()
 
@@ -325,15 +342,23 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function list_return_all_as_character_fn(this)    result(sValues)
+  function list_return_all_as_character_fn(this, null_terminated )    result(sValues)
 
     class (STRING_LIST_T), intent(in)     :: this
     character (len=64), allocatable       :: sValues(:)
+    logical (kind=c_bool), optional       :: null_terminated
 
     ! [ LOCALS ]
     class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
     integer (kind=c_int)                      :: iStat
     integer (kind=c_int)                      :: iIndex
+    logical (kind=c_bool)                     :: null_terminated_
+
+    if ( present( null_terminated) ) then
+      null_terminated_ = null_terminated
+    else
+      null_terminated_ = FALSE
+    endif
 
     allocate( sValues( 1:this%count ), stat=iStat )
     if (iStat /= 0)  call die("Failed to allocate memory for list conversion", __FILE__, __LINE__)
@@ -344,7 +369,12 @@ contains
     do while ( associated( current ) .and. iIndex < ubound(sValues,1) )
 
       iIndex = iIndex + 1
-      sValues(iIndex) = current%s
+
+      if ( null_terminated_ ) then
+        sValues(iIndex) = trim(current%s)//c_null_char
+      else
+        sValues(iIndex) = current%s
+      endif
 
       current => current%next
 
@@ -591,7 +621,7 @@ contains
 
     type (STRING_LIST_T) :: this
 
-    call this%clear()
+      if ( this%autocleanup )  call this%clear()
 
   end subroutine list_finalize_sub  
 
@@ -615,9 +645,11 @@ contains
       do while ( associated( current ) )
 
         toremove => current
+
         current => current%next
 
         if ( allocated( toremove%s ) )    deallocate( toremove%s )
+
         if ( associated( toremove ) )  deallocate( toremove )
 
       enddo  
@@ -625,9 +657,10 @@ contains
     endif
 
     this%count = 0
-    this%first => null()
-    this%last => null()
 
+    this%first => null()
+
+    this%last => null()
 
   end subroutine list_items_deallocate_all_sub
 

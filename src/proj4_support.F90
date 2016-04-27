@@ -44,6 +44,8 @@ contains
           select case ( valuestring )
             case ( "latlon", "lonlat", "latlong", "longlat" )
               call attribute_value_list%append("latitude_longitude")
+              call attribute_name_list%append("units")
+              call attribute_value_list%append("decimal_degrees")
             case ( "aea" )
               call attribute_value_list%append("albers_conical_equal_area")
             case ( "aeqd" ) 

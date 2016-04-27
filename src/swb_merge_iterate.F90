@@ -8,6 +8,7 @@ module swb_merge_iterate
   use grid
   use logfiles, only              : LOGS, LOG_ALL
   use swb_merge_domain, only      : MODEL_DOMAIN_T
+  use swb_merge_initialize, only  : NCFILES, bbox
   use simulation_datetime, only   : SIM_DT
   use string_list, only           : STRING_LIST_T
   use strings
@@ -26,82 +27,57 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: cells
 
     ! [ LOCALS ]
-    type (DATA_CATALOG_ENTRY_T), pointer   :: pENTRY
-    integer (kind=c_int)                   :: index_val
-    character (len=256)                    :: sBuf
-
-    type (T_NETCDF4_FILE ), pointer        :: pNCFILE
     integer (kind=c_int)                   :: row, col
+    integer (kind=c_int)                   :: mcol, mrow
+    integer (kind=c_int)                   :: indx
+    integer (kind=c_int)                   :: julian_day
+    logical (kind=c_bool)                  :: found_date
 
-
-    allocate( pNCFILE )
-
-    pENTRY => DAT%get(1)
 
     cells%pGrdOut%rData = NC_FILL_FLOAT
     call grid_set_nodata_value( pGrd=cells%pGrdOut, fValue=NC_FILL_FLOAT )
-
-    !! @TODO Fix ugly kludge: sXY_units unnecessary; obtain units from PROJ4 string
-
-    call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE,                        &
-      sVariableName=pENTRY%sVariableName_z, sVariableUnits="inches_per_day",       &
-      iNX=cells%number_of_columns, iNY=cells%number_of_rows,                       &
-      fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,          &
-      PROJ4_string=cells%PROJ4_string,                                             &
-      dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0 )
-
     cells%nodata_fill_value = NC_FILL_FLOAT
 
     do while ( SIM_DT%curr <= SIM_DT%end )
 
+      julian_day = nint( SIM_DT%curr%dJulianDate, kind=c_int )
+
       call LOGS%write("Merging grids: "//SIM_DT%curr%prettydate(), iLogLevel=LOG_ALL, lEcho=.true._c_bool )
 
-      call netcdf_put_variable_vector(NCFILE=pNCFILE, &
-         iVarID=pNCFILE%iVarID(NC_TIME), &
+      call netcdf_put_variable_vector(NCFILE=cells%NCFILE, &
+         iVarID=cells%NCFILE%iVarID(NC_TIME), &
          iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t)], &
          iCount=[1_c_size_t], &
          iStride=[1_c_ptrdiff_t], &
          dpValues=[real(SIM_DT%iNumDaysFromOrigin, kind=c_double)])
 
-      index_val = 1
-
-      pENTRY => DAT%get(1)
+!      $omp parallel private( col, row, pENTRY )
 
       cells%pGrdOut%rData = NC_FILL_FLOAT
 
-!      $omp parallel private( col, row, pENTRY )
+      do indx=1, ubound( NCFILES, 1)
 
-      do while ( associated( pENTRY ) )
+        found_date = netcdf_update_time_starting_index(NCFILE=NCFILES( indx ),     &
+                                               iJulianDay=julian_day  ) 
 
-        call pENTRY%getvalues( iMonth=int(SIM_DT%curr%iMonth), iDay=int(SIM_DT%curr%iDay),   &
-          iYear=SIM_DT%curr%iYear, iJulianDay=SIM_DT%curr%getJulianDay() )
+        call netcdf_get_variable_slice(NCFILE=NCFILES( indx ), rValues=bbox( indx )%data_grid )
 
-!        $omp single
-        do col=1, cells%number_of_columns
-          do row=1, cells%number_of_rows
-
-!               if ( pENTRY%pGrdNative%rData(col, row) > 0.0 ) &
-!               print *, col, row, pENTRY%pGrdBase%rData(col, row), pENTRY%pGrdNative%rData(col, row)
-
-            if ( .not. ieee_is_nan( pENTRY%pGrdBase%rData(col, row) ) ) then
-
-              if ( pENTRY%pGrdBase%rData(col, row) < NC_FILL_FLOAT )               &
-                cells%pGrdOut%rData(col, row) = pENTRY%pGrdBase%rData(col, row)
-
-            endif
+        do col=1, ubound( bbox(indx)%merge_column, 1 )
+          do row=1, ubound( bbox(indx)%merge_column, 2 )
+            if ( bbox( indx )%data_grid(col,row) > NC_FILL_FLOAT ) then
+              mcol = bbox(indx)%merge_column(col,row)
+              mrow = bbox(indx)%merge_row(col,row)              
+              cells%pGrdOut%rData( mcol, mrow ) = bbox( indx )%data_grid(col,row)
+            endif  
           enddo  
         enddo
-!        $omp end single
-
-        index_val = index_val + 1
-        pENTRY => DAT%get( index_val )
 
       enddo  
 
 !      $omp end parallel
 
-      call netcdf_put_variable_array(NCFILE=pNCFILE,                                            &
-            iVarID=pNCFILE%iVarID(NC_Z),                                                        &
+      call netcdf_put_variable_array(NCFILE=cells%NCFILE,                                            &
+            iVarID=cells%NCFILE%iVarID(NC_Z),                                                        &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
             iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                       &
                                 int(cells%number_of_columns, kind=c_size_t) ],                   &
