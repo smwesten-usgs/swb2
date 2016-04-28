@@ -13,7 +13,7 @@ add_executable(test__file_utils
 set_target_properties(test__file_utils
           PROPERTIES COMPILE_DEFINITIONS "${PREPROCESSOR_DEFINES}")
 
-add_executable(test__PROJ4_support
+add_executable(test__proj4_support
           ${PROJECT_SOURCE_DIR}/src/constants_and_conversions.F90
           ${PROJECT_SOURCE_DIR}/src/logfiles.F90
           ${PROJECT_SOURCE_DIR}/src/exceptions.F90
@@ -22,8 +22,8 @@ add_executable(test__PROJ4_support
           ${PROJECT_SOURCE_DIR}/src/proj4_support.F90          
 
 
-          test__PROJ4_support.F90
+          test__proj4_support.F90
           )
 
-set_target_properties(test__PROJ4_support
+set_target_properties(test__proj4_support
           PROPERTIES COMPILE_DEFINITIONS "${PREPROCESSOR_DEFINES}")

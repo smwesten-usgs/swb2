@@ -23,24 +23,31 @@ module output
 
   integer (kind=c_int), parameter   :: NCDF_NUM_OUTPUTS = 17
 
-  character (len=32), parameter :: NCDF_OUTPUT_NAMES( NCDF_NUM_OUTPUTS ) = [   &
-              "gross_precipitation             ",                              &
-              "rainfall                        ",                              &
-              "snowfall                        ",                              &
-              "interception                    ",                              &
-              "runon                           ",                              &
-              "runoff                          ",                              &              
-              "snow_storage                    ",                              &
-              "soil_storage                    ",                              &
-              "reference_ET0                   ",                              &
-              "actual_et                       ",                              &
-              "snowmelt                        ",                              &
-              "tmin                            ",                              &
-              "tmax                            ",                              &
-              "potential_recharge              ",                              &
-              "infiltration                    ",                              &
-              "irrigation                      ",                              &
-              "runoff_outside                  "  ]
+  type OUTPUT_SPECS_T
+    character (len=24)          :: variable_name
+    character (len=20)          :: variable_units
+    real (kind=c_float)         :: valid_minimum
+    real (kind=c_float)         :: valid_maximum
+  end type OUTPUT_SPECS_T
+  
+  type (OUTPUT_SPECS_T)    :: OUTSPECS(NCDF_NUM_OUTPUTS) = [                                &
+    OUTPUT_SPECS_T( "gross_precipitation     ", "inches_per_day      ", 0.0, 60.0 ),        & 
+    OUTPUT_SPECS_T( "rainfall                ", "inches_per_day      ", 0.0, 60.0 ),        &
+    OUTPUT_SPECS_T( "snowfall                ", "inches_per_day      ", 0.0, 60.0 ),        &
+    OUTPUT_SPECS_T( "interception            ", "inches_per_day      ", 0.0, 60.0 ),        &
+    OUTPUT_SPECS_T( "runon                   ", "inches_per_day      ", 0.0, 10000.0 ),     &
+    OUTPUT_SPECS_T( "runoff                  ", "inches_per_day      ", 0.0, 10000.0 ),     &
+    OUTPUT_SPECS_T( "snow_storage            ", "inches_per_day      ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "soil_storage            ", "inches_per_day      ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "reference_ET0           ", "inches_per_day      ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "actual_et               ", "inches_per_day      ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "snowmelt                ", "inches_per_day      ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "tmin                    ", "degrees_fahrenheit  ", -100.0, 150.0 ),    &
+    OUTPUT_SPECS_T( "tmax                    ", "degrees_fahrenheit  ", -100.0, 150.0 ),    &  
+    OUTPUT_SPECS_T( "potential_recharge      ", "inches_per_day      ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "infiltration            ", "inches_per_day      ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "irrigation              ", "inches_per_day      ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "runoff_outside          ", "inches_per_day      ", 0.0, 10000.0 ) ]
 
   enum, bind(c)
     enumerator :: NCDF_GROSS_PRECIPITATION=1, NCDF_RAINFALL, NCDF_SNOWFALL, &
@@ -80,8 +87,8 @@ contains
 
       call netcdf_open_and_prepare_as_output(                                        &
             NCFILE=NC_OUT( iIndex )%ncfile,                                          &
-            sVariableName=trim( NCDF_OUTPUT_NAMES( iIndex ) ),                       &
-            sVariableUnits="inches_per_day",                                         &
+            sVariableName=trim( OUTSPECS( iIndex )%variable_name ),                  &
+            sVariableUnits=trim( OUTSPECS( iIndex )%variable_units ),                &
             iNX=cells%number_of_columns,                                             &
             iNY=cells%number_of_rows,                                                &
             fX=cells%X,                                                              &
@@ -91,8 +98,8 @@ contains
             PROJ4_string=cells%PROJ4_string,                                         &
             dpLat=cells%Y_lat,                                                       &
             dpLon=cells%X_lon,                                                       &
-            fValidMin=0.0,                                                           &
-            fValidMax=2000.0,                                                        &
+            fValidMin=OUTSPECS( iIndex )%valid_minimum,                              &
+            fValidMax=OUTSPECS( iIndex )%valid_maximum,                              &
             sDirName=OUTPUT_DIRECTORY_NAME )
 
     enddo  
