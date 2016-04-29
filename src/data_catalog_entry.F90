@@ -500,7 +500,7 @@ end subroutine initialize_netcdf_data_object_sub
     ! scale and offset values
     if ( this%lGridHasChanged ) then
 
-      !> Now apply te user scale and offset amounts
+      !> Now apply the user scale and offset amounts
       if (this%iTargetDataType == DATATYPE_REAL) then
 
         call apply_scale_and_offset(fResult=this%pGrdBase%rData, fValue=this%pGrdBase%rData,          &
@@ -1335,6 +1335,7 @@ end subroutine set_constant_value_real
         endif
 
         call netcdf_get_variable_slice(NCFILE=this%NCFILE, rValues=this%pGrdNative%rData)
+        this%lGridHasChanged = lTRUE
 
         this%pGrdNative%rData = this%pGrdNative%rData * dScaleFactor + dAddOffset
 
