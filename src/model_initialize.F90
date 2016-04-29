@@ -1055,11 +1055,15 @@ contains
 
           pENTRY%iFilename_Monthname_Capitalization_Rule = FILE_TEMPLATE_UPPERCASE_MONTHNAME
 
-        elseif ( index( string=sCmdText, substring="_SCALE_FACTOR" ) > 0 ) then
+        elseif ( index( string=sCmdText, substring="_CONVERSION_FACTOR" ) > 0 ) then
 
           call pENTRY%set_scale(asFloat(sArgText_1))
 
-        elseif ( index( string=sCmdText, substring="_ADD_OFFSET" ) > 0 ) then
+        elseif ( index( string=sCmdText, substring="_SCALE" ) > 0 ) then
+
+          call pENTRY%set_scale(asFloat(sArgText_1))
+
+        elseif ( index( string=sCmdText, substring="_OFFSET" ) > 0 ) then
 
           call pENTRY%set_offset(asFloat(sArgText_1))
 
