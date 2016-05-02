@@ -98,6 +98,7 @@ module model_domain
     real (kind=c_float), allocatable       :: direct_recharge(:)    
     real (kind=c_float), allocatable       :: current_rooting_depth(:)
     integer (kind=c_int), allocatable      :: number_of_days_since_planting(:)
+    logical (kind=c_bool), allocatable     :: it_is_growing_season(:)
          
     real (kind=c_float), allocatable       :: gross_precip(:)
     real (kind=c_float), allocatable       :: monthly_gross_precip(:)    
@@ -308,7 +309,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: iStat(49)
+    integer (kind=c_int)  :: iStat(50)
 
     iCount = count( this%active )
 
@@ -361,6 +362,7 @@ contains
     allocate( this%number_of_days_since_planting( iCount ), stat=iStat(47) )   
     allocate( this%col_num_1D( iCount ), stat=iStat(48) )
     allocate( this%row_num_1D( iCount ), stat=iStat(49) )    
+    allocate( this%it_is_growing_season( iCount ), stat=iStat(50)
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="  &
@@ -420,6 +422,7 @@ contains
     this%crop_etc                            = 0.0_c_float
     this%direct_recharge                     = 0.0_c_float
     this%number_of_days_since_planting       = 0_c_int
+    this%it_is_growing_season                = FALSE
     
 !$OMP END PARALLEL WORKSHARE
 

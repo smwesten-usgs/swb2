@@ -41,7 +41,7 @@ contains
     call LOGS%write( "error condition:  "//trim(sMessage), iTab=12 )
 
     if ( present( sCalledBy ) )  &
-      call LOGS%write( "called by:  "//trim(sModule), iTab=18 )
+      call LOGS%write( "called by:  "//trim(sCalledBy), iTab=18 )
 
     if (present(iCalledByLine)) then
       write(sLineNum, fmt="(i0)") iCalledByLine
