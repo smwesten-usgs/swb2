@@ -3726,16 +3726,8 @@ subroutine nf_put_attribute(NCFILE, iVarID, sAttributeName, &
   if (present(sAttributeValue) ) then
 
     iNumberOfAttributes = size( sAttributeValue, 1)
-
-    print *, __FILE__, ": ", __LINE__
-    print *, iNumberOfAttributes
-    print *, ubound(sAttributeValue,1)
-    print *, repeat("-", 80)
-    print *, sAttributeValue
-
     iNumberOfAttributes = int(len_trim(sAttributeValue(1)), kind=c_size_t)
 
-    print *, "redefined: ", iNumberOfAttributes
     call nf_trap( nc_put_att_text(ncid=NCFILE%iNCID, &
                     varid=iVarID, &
                     name=trim(sAttributeName), &
@@ -3797,7 +3789,7 @@ subroutine nf_put_attributes(NCFILE)
   integer (kind=c_int) :: iIndex
   integer (kind=c_int) :: iIndex2
   integer (kind=c_int) :: iStat
-  integer (kind=c_int) :: indx 
+  integer (kind=c_int) :: indx
 
   ! loop over variables
   do iIndex = 0, NCFILE%iNumberOfVariables-1
@@ -3854,10 +3846,14 @@ subroutine nf_put_attributes(NCFILE)
               //"attribute name: "//dquote(pNC_ATT%sAttributeName), &
               trim(__FILE__), __LINE__)
 
-            call nf_put_attribute(NCFILE=NCFILE, &
-                iVarID=pNC_VAR%iNC_VarID, &
-                sAttributeName=trim(pNC_ATT%sAttributeName)//c_null_char, &
-                sAttributeValue=[trim(pNC_ATT%sAttValue(0))//c_null_char])
+            do indx=0,ubound(pNC_ATT%sAttValue, 1)
+
+              call nf_put_attribute(NCFILE=NCFILE, &
+                  iVarID=pNC_VAR%iNC_VarID, &
+                  sAttributeName=trim(pNC_ATT%sAttributeName)//c_null_char, &
+                  sAttributeValue=[trim(pNC_ATT%sAttValue(indx))//c_null_char])
+
+            enddo  
 
         end select
 
