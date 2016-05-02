@@ -43,6 +43,7 @@ module string_list
     procedure :: list_get_values_in_range_fn
     procedure :: list_print_sub
     procedure :: list_all_fn
+    procedure :: list_all_delimited_fn
     procedure :: list_return_position_of_matching_string_fn
     procedure :: list_return_count_of_matching_string_fn
     procedure :: list_is_string_in_list_fn
@@ -61,7 +62,8 @@ module string_list
                                 list_get_values_in_range_fn
     generic :: set_autocleanup  => list_set_auto_cleanup_sub
     generic :: print         => list_print_sub
-    generic :: listall       => list_all_fn
+    generic :: listall       => list_all_fn, &
+                                list_all_delimited_fn
     generic :: grep          => list_subset_partial_matches_fn
     generic :: which         => list_return_position_of_matching_string_fn
     generic :: countmatching => list_return_count_of_matching_string_fn
@@ -310,6 +312,53 @@ contains
     sListValues = adjustl( trim(sBuf) )
 
   end function list_all_fn
+
+!--------------------------------------------------------------------------------------------------
+
+  function list_all_delimited_fn(this, delimiter)  result( sListValues )
+
+    use iso_fortran_env, only : OUTPUT_UNIT
+
+    class (STRING_LIST_T), intent(in)     :: this
+    character (len=*), intent(in)         :: delimiter
+    character (len=:), allocatable        :: sListValues
+
+    ! [ LOCALS ]
+    class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
+    integer (kind=c_int)                      :: iLU_
+    integer (kind=c_int)                      :: iCount
+    character (len=2048)                      :: sBuf
+      
+    current => this%first
+    iCount = 0
+
+    sBuf = ""
+
+    do while ( associated( current ) .and. iCount <= this%count )
+
+      iCount = iCount + 1
+
+      if ( iCount == 1 ) then
+
+        sBuf = trim( current%s )
+
+      elseif( iCount == this%count ) then
+
+        sBuf = trim( sBuf )//trim( delimiter )//trim( current%s )//trim( delimiter )
+
+      else 
+
+        sBuf = trim( sBuf )//trim( delimiter )//trim( current%s )
+
+      endif  
+
+      current => current%next
+
+    enddo
+
+    sListValues = adjustl( trim(sBuf) )
+
+  end function list_all_delimited_fn
 
 !--------------------------------------------------------------------------------------------------
 

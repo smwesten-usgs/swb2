@@ -968,21 +968,6 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
 
   call history_list_%set_autocleanup( FALSE )
 
-  print *, associated( history_list_ )
-  print *, history_list_%autocleanup
-
-
-!    integer (kind=c_int)            :: iNX                   ! Number of cells in the x-direction
-!     integer (kind=c_int)            :: iNY                   ! Number of cells in the y-direction
-!     integer (kind=c_int)            :: iNumGridCells         ! Total number of grid cells
-!     integer (kind=c_int)            :: iDataType             ! Data type contained in the grid (integer, real, SWB cell)
-!     character (len=:), allocatable  :: sProj4_string         ! proj4 string defining coordinate system of grid
-!     character (len=:), allocatable  :: sFilename             ! original file name that the data was read from
-!     real (kind=c_double)            :: rGridCellSize         ! size of one side of a grid cell
-!     integer (kind=c_int)            :: iLengthUnits= -99999  ! length units code
-!     real (kind=c_double)            :: rX0, rX1              ! World-coordinate range in X
-!     real (kind=c_double)            :: rY0, rY1              ! World-coordinate range in Y
-
   write(sOriginText, fmt="(i4.4,'-',i2.2,'-',i2.2)") StartDate%iYear, StartDate%iMonth, StartDate%iDay
 
   sFilename = trim(sDirName)//trim(sVariableName)//"_"//trim(asCharacter(StartDate%iYear))   &
@@ -3252,9 +3237,9 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, executable_name, &
 !      NCFILE%pNC_ATT(3)%sAttValue( indx ) = trim(history_list_%get( indx + 1 ))//C_NULL_CHAR
 !    enddo
 
-    NCFILE%pNC_ATT(3)%sAttValue = history_list_%asCharacter()
+    NCFILE%pNC_ATT(3)%sAttValue = history_list_%listall( delimiter=c_null_char)
 
-    print *, history_list_%asCharacter( null_terminated=TRUE )
+    print *, history_list_%listall( delimiter=c_null_char )
 
   end block
 
@@ -3741,8 +3726,16 @@ subroutine nf_put_attribute(NCFILE, iVarID, sAttributeName, &
   if (present(sAttributeValue) ) then
 
     iNumberOfAttributes = size( sAttributeValue, 1)
+
+    print *, __FILE__, ": ", __LINE__
+    print *, iNumberOfAttributes
+    print *, ubound(sAttributeValue,1)
+    print *, repeat("-", 80)
+    print *, sAttributeValue
+
     iNumberOfAttributes = int(len_trim(sAttributeValue(1)), kind=c_size_t)
 
+    print *, "redefined: ", iNumberOfAttributes
     call nf_trap( nc_put_att_text(ncid=NCFILE%iNCID, &
                     varid=iVarID, &
                     name=trim(sAttributeName), &
@@ -3804,6 +3797,7 @@ subroutine nf_put_attributes(NCFILE)
   integer (kind=c_int) :: iIndex
   integer (kind=c_int) :: iIndex2
   integer (kind=c_int) :: iStat
+  integer (kind=c_int) :: indx 
 
   ! loop over variables
   do iIndex = 0, NCFILE%iNumberOfVariables-1
@@ -3921,10 +3915,14 @@ subroutine nf_put_attributes(NCFILE)
           //"attribute name: "//dquote(pNC_ATT%sAttributeName), &
           trim(__FILE__), __LINE__)
 
-        call nf_put_attribute(NCFILE=NCFILE, &
-            iVarID=NC_GLOBAL, &
-            sAttributeName=trim(pNC_ATT%sAttributeName)//c_null_char, &
-            sAttributeValue=[trim(pNC_ATT%sAttValue(0))//c_null_char])
+        do indx=0, ubound(pNC_ATT%sAttValue, 1)
+
+          call nf_put_attribute(NCFILE=NCFILE,                               &
+              iVarID=NC_GLOBAL,                                              &
+              sAttributeName=trim(pNC_ATT%sAttributeName)//c_null_char,      &
+              sAttributeValue=[trim(pNC_ATT%sAttValue(indx))//c_null_char])
+        
+        enddo
 
     end select
 
