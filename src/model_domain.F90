@@ -200,7 +200,13 @@ module model_domain
 
     procedure :: dump_model_values_by_cell_sub
     generic   :: dump_model_values_by_cell => dump_model_values_by_cell_sub
+
+    procedure :: model_initialize_growing_season
+    generic   :: initialize_growing_season => model_initialize_growing_season
   
+    procedure :: model_update_growing_season
+    generic   :: update_growing_season => model_update_growing_season
+
   end type MODEL_DOMAIN_T
 
 
@@ -362,7 +368,7 @@ contains
     allocate( this%number_of_days_since_planting( iCount ), stat=iStat(47) )   
     allocate( this%col_num_1D( iCount ), stat=iStat(48) )
     allocate( this%row_num_1D( iCount ), stat=iStat(49) )    
-    allocate( this%it_is_growing_season( iCount ), stat=iStat(50)
+    allocate( this%it_is_growing_season( iCount ), stat=iStat(50) )
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="  &
@@ -1370,7 +1376,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call runoff_curve_number_initialize()
+    call runoff_curve_number_initialize( this%active )
 
   end subroutine model_initialize_runoff_curve_number
 
@@ -1390,24 +1396,24 @@ contains
       interim_inflow = this%runon( index ) + this%rainfall( index )   &
                       + this%snowmelt( index ) - this%interception( index )
 
-      call runoff_curve_number_calculate(runoff=this%runoff( index ),                                    &
-                                                    landuse_index=this%landuse_index( index ),           &
-                                                    soil_group=this%soil_group( index ),                 &
-                                                    soil_storage=this%soil_storage( index ),             &
-                                                    soil_storage_max=this%soil_storage_max( index ),     & 
-                                                    inflow=interim_inflow,                               &
-                                                    continuous_frozen_ground_index=                      &
-                                                        this%continuous_frozen_ground_index( index ) ) 
+      call runoff_curve_number_calculate(runoff=this%runoff( index ),                                        &
+                                                    landuse_index=this%landuse_index( index ),               &
+                                                    soil_group=this%soil_group( index ),                     &
+                                                    soil_storage_max=this%soil_storage_max( index ),         & 
+                                                    inflow=interim_inflow,                                   &
+                                                    it_is_growing_season=this%it_is_growing_season( index ), &
+                                                    continuous_frozen_ground_index=                          &
+                                                    this%continuous_frozen_ground_index( index ) ) 
 
     else
 
       call runoff_curve_number_calculate(runoff=this%runoff,                                             &
                                                     landuse_index=this%landuse_index,                    &
                                                     soil_group=this%soil_group,                          &
-                                                    soil_storage=this%soil_storage,                      &
                                                     soil_storage_max=this%soil_storage_max,              & 
                                                     inflow=this%runon+this%rainfall                      &
                                                            +this%snowmelt-this%interception,             &
+                                                    it_is_growing_season=this%it_is_growing_season,      &
                                                     continuous_frozen_ground_index=                      &
                                                         this%continuous_frozen_ground_index ) 
 
@@ -1647,6 +1653,33 @@ contains
     endif  
 
   end subroutine model_calculate_irrigation
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_growing_season( this )
+
+    use growing_season
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call growing_season_initialize( )
+
+  end subroutine model_initialize_growing_season
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_update_growing_season( this )
+
+    use growing_season
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call growing_season_update( landuse_index=this%landuse_index,                                &
+                                              GDD=this%gdd,                                      &
+                                              mean_air_temp=this%tmean,                          &
+                                              it_is_growing_season=this%it_is_growing_season )
+
+  end subroutine model_update_growing_season
 
 !--------------------------------------------------------------------------------------------------
 

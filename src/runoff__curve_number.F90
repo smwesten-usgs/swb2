@@ -1,8 +1,8 @@
 module runoff__curve_number
 
-  use iso_c_binding, only : c_int, c_float, c_double, c_bool
-  use constants_and_conversions, only     : FALSE, TRUE 
-  use continuous_frozen_ground_index
+  use iso_c_binding, only                    : c_int, c_float, c_double, c_bool
+  use constants_and_conversions, only        : FALSE, TRUE 
+  use continuous_frozen_ground_index, only   : CFGI_LL, CFGI_UL
   use exceptions
   use strings
   use string_list
@@ -18,12 +18,17 @@ module runoff__curve_number
   real (kind=c_float), allocatable    :: PREV_5_DAYS_RAIN(:,:)
   integer (kind=c_int), allocatable   :: iLanduseCodes(:)
   integer (kind=c_int)                :: DAYCOUNT
-  integer (kind=c_int), parameter     :: 5DAY_SUM = 6
+  integer (kind=c_int), parameter     :: FIVE_DAY_SUM = 6
 
   public :: runoff_curve_number_initialize
   public :: runoff_curve_number_calculate
   public :: update_curve_number_fn
   public :: CN_ARCI, CN_ARCII, CN_ARCIII, Smax
+
+  real (kind=c_float), parameter :: AMC_DRY_GROWING = 1.40_c_float
+  real (kind=c_float), parameter :: AMC_DRY_DORMANT = 0.50_c_float
+  real (kind=c_float), parameter :: AMC_WET_GROWING = 2.10_c_float
+  real (kind=c_float), parameter :: AMC_WET_DORMANT = 1.10_c_float
 
 contains
 
@@ -82,7 +87,10 @@ contains
       CN_ARCII(:, iSoilsIndex) = CN
     enddo  
 
-    allocate( PREV_5_DAYS_RAIN( count(cell_is_active), 6 )
+    allocate( PREV_5_DAYS_RAIN( count(cell_is_active), 6 ), stat=iStat )
+    call assert( iStat == 0, "Failed to allocate memory for curve number PREV_5_DAYS_RAIN table", &
+      __FILE__, __LINE__)
+
     PREV_5_DAYS_RAIN = 0.0_c_float
 
     ! DAYCOUNT will vary from 1 to 5 and serve as the second index value for 
@@ -145,7 +153,7 @@ contains
     endif
 
     PREV_5_DAYS_RAIN( :, DAYCOUNT ) = infil
-    PREV_5_DAYS_RAIN( :, 5DAY_SUM ) = sum( PREV_5_DAYS_RAIN( :, 1:5 ) )
+    PREV_5_DAYS_RAIN( :, FIVE_DAY_SUM ) = sum( PREV_5_DAYS_RAIN( :, 1:5 ) )
 
   end subroutine 
 !--------------------------------------------------------------------------------------------------
@@ -223,17 +231,16 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  elemental function update_curve_number_fn( iLanduseIndex, iSoilsIndex, it_is_growing_season, &
-                          fSoilStorage_Max, fCFGI, LL_CFGI, UL_CFGI )  result( CN_adj )
+  elemental function update_curve_number_fn( iLanduseIndex, iSoilsIndex, fInflow,        &
+                                             it_is_growing_season, fSoilStorage_Max,     &
+                                             fCFGI )                                  result( CN_adj )
     
     integer (kind=c_int), intent(in)  :: iLanduseIndex
     integer (kind=c_int), intent(in)  :: iSoilsIndex
-    real (kind=c_float), intent(in)   :: fSoilStorage
+    real (kind=c_float), intent(in)   :: fInflow
     logical (kind=c_bool), intent(in) :: it_is_growing_season
     real (kind=c_float), intent(in)   :: fSoilStorage_Max
     real (kind=c_float), intent(in)   :: fCFGI
-    real (kind=c_float), intent(in)   :: LL_CFGI
-    real (kind=c_float), intent(in)   :: UL_CFGI
     real (kind=c_float)               :: CN_adj
 
     ! [ LOCALS ]
@@ -243,9 +250,9 @@ contains
 
     ! Correct the curve number...
 
-  if( ( fCFGI > LL_CFGI ) .and. ( fSoilStorage_Max > 0.0_c_float ) ) then
+  if( ( fCFGI > CFGI_LL ) .and. ( fSoilStorage_Max > 0.0_c_float ) ) then
 
-     Pf = prob_runoff_enhancement(fCFGI,LL_CFGI,UL_CFGI)
+     Pf = prob_runoff_enhancement( fCFGI )
 
      ! use probability of runoff enhancement to calculate a weighted
      ! average of curve number under Type II vs Type III antecedent
@@ -255,7 +262,7 @@ contains
 
   else if ( it_is_growing_season ) then
 
-    if ( rTotalInflow < AMC_DRY_GROWING ) then                     ! AMC I
+    if ( fInflow < AMC_DRY_GROWING ) then                     ! AMC I
 
 
 !      The following comes from page 192, eq. 3.145 of "SCS Curve Number
@@ -263,8 +270,8 @@ contains
 
       CN_adj = CN_base / (2.281 - 0.01281 * CN_base)
 
-    else if ( rTotalInflow >= AMC_DRY_GROWING                                  &
-        .and. rTotalInflow < AMC_WET_GROWING ) then                ! AMC II
+    else if ( fInflow >= AMC_DRY_GROWING                                  &
+        .and. fInflow < AMC_WET_GROWING ) then                ! AMC II
 
        CN_adj = real(CN_base)
 
@@ -275,12 +282,12 @@ contains
 
   else ! dormant (non-growing) season
 
-    if ( rTotalInflow < AMC_DRY_DORMANT ) then                     ! AMC I
+    if ( fInflow < AMC_DRY_DORMANT ) then                     ! AMC I
 
       CN_adj = CN_base / (2.281 - 0.01281 * CN_base)
 
-    else if ( rTotalInflow >= AMC_DRY_DORMANT                                  &
-        .and. rTotalInflow < AMC_WET_DORMANT ) then                ! AMC II
+    else if ( fInflow >= AMC_DRY_DORMANT                                  &
+        .and. fInflow < AMC_WET_DORMANT ) then                ! AMC II
 
       CN_adj = real(CN_base)
 
@@ -350,8 +357,8 @@ contains
   !!       In Conference Proceeding Paper, World Water and Environmental Resources Congress, 2003.
   elemental subroutine runoff_curve_number_calculate(runoff,                              &
                                                      landuse_index,                       &
-                                                     soil_group,                         &
-                                                     soil_storage,                        &
+                                                     soil_group,                          &
+                                                     it_is_growing_season,                &
                                                      soil_storage_max,                    & 
                                                      inflow,                              &
                                                      continuous_frozen_ground_index ) 
@@ -359,7 +366,7 @@ contains
     real (kind=c_float), intent(inout)  :: runoff
     integer (kind=c_int), intent(in)    :: landuse_index
     integer (kind=c_int), intent(in)    :: soil_group
-    real (kind=c_float), intent(in)     :: soil_storage
+    logical (kind=c_bool), intent(in)   :: it_is_growing_season
     real (kind=c_float), intent(in)     :: soil_storage_max
     real (kind=c_float), intent(in)     :: inflow
     real (kind=c_float), intent(in)     :: continuous_frozen_ground_index
@@ -369,8 +376,10 @@ contains
     real (kind=c_float) :: S
     real (kind=c_float) :: CN_adj
 
-    CN_adj = update_curve_number_fn( landuse_index, soil_group, soil_storage, &
-                          soil_storage_max, continuous_frozen_ground_index )
+    CN_adj = update_curve_number_fn( landuse_index, soil_group, inflow,                &
+                                     it_is_growing_season,                             &
+                                     soil_storage_max,                                 &
+                                     continuous_frozen_ground_index )
 
     S = ( 1000.0_c_float / CN_adj ) - 10.0_c_float
 

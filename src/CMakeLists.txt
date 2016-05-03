@@ -23,6 +23,7 @@ add_executable(swb2
       get_libc_error_number.c
       grid.F90
       growing_degree_day.F90
+      growing_season.F90
       interception__bucket.F90
       interception__gash.F90
       irrigation.F90

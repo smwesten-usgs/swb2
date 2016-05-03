@@ -238,6 +238,8 @@ contains
 
     call storm_drain_capture_initialize()
 
+    call MODEL%initialize_growing_season()
+
   end subroutine initialize_ancillary_values
 
 !--------------------------------------------------------------------------------------------------

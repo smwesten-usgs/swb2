@@ -3224,22 +3224,15 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, executable_name, &
 
     records = history_list_%count - 1
 
-    print *, __FILE__, ": ", __LINE__
-    print *, records
 
     NCFILE%pNC_ATT(3)%sAttributeName = "history"
     allocate(NCFILE%pNC_ATT(3)%sAttValue( 0:(records) ) )
     NCFILE%pNC_ATT(3)%iNC_AttType = NC_CHAR
     NCFILE%pNC_ATT(3)%iNC_AttSize = 1_c_size_t
 
-!    do indx=0, records
-!      print *, indx, history_list_%get( indx + 1 )
-!      NCFILE%pNC_ATT(3)%sAttValue( indx ) = trim(history_list_%get( indx + 1 ))//C_NULL_CHAR
-!    enddo
-
-    NCFILE%pNC_ATT(3)%sAttValue = history_list_%listall( delimiter=c_null_char)
-
-    print *, history_list_%listall( delimiter=c_null_char )
+    do indx=0, records
+      NCFILE%pNC_ATT(3)%sAttValue( indx ) = trim(history_list_%get( indx + 1 ))//C_NULL_CHAR
+    enddo
 
   end block
 
