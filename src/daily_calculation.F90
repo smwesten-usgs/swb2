@@ -27,8 +27,6 @@ contains
 
     call cells%calc_GDD()
 
-!    call minmaxmean_float( cells%crop_coefficient_kcb, "kcb, before call")
-
     call cells%update_crop_coefficient()
     call cells%calc_reference_et()
 

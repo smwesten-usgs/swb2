@@ -1229,19 +1229,19 @@ function mmddyyyy2julian(sMMDDYYYY)  result(iJD)
   sItem = sMMDDYYYY
 
   ! parse month value
-  call chomp(sItem, sBuf, "/")
+  call chomp(sItem, sBuf, "/-")
   read(sBuf,*,iostat = iStat) iMonth
   call Assert(iStat==0, "Problem reading month value from string "//TRIM(sMMDDYYYY), &
     TRIM(__FILE__),__LINE__)
 
   ! parse day value
-  call chomp(sItem, sBuf, "/")
+  call chomp(sItem, sBuf, "/-")
   read(sBuf,*,iostat=iStat) iDay
   call Assert(iStat==0, "Problem reading day value from string "//TRIM(sMMDDYYYY), &
     TRIM(__FILE__),__LINE__)
 
   ! parse year value
-  call chomp(sItem, sBuf, "/")
+  call chomp(sItem, sBuf, "/-")
   read(sBuf,*,iostat=iStat) iYear
   call Assert(iStat==0, "Problem reading year value from string "//TRIM(sMMDDYYYY), &
     TRIM(__FILE__),__LINE__)
@@ -1269,13 +1269,13 @@ function mmdd2doy(sMMDD)  result(iDOY)
   sItem = sMMDD
 
   ! parse month value
-  call chomp(sItem, sBuf, "/")
+  call chomp(sItem, sBuf, "/-")
   read(sBuf,*,iostat = iStat) iMonth
   call Assert(iStat==0, "Problem reading month value from string "//TRIM(sMMDD), &
     TRIM(__FILE__),__LINE__)
 
   ! parse day value
-  call chomp(sItem, sBuf, "/")
+  call chomp(sItem, sBuf, "/-")
   read(sBuf,*,iostat=iStat) iDay
   call Assert(iStat==0, "Problem reading day value from string "//TRIM(sMMDD), &
     TRIM(__FILE__),__LINE__)
@@ -1307,19 +1307,19 @@ function mmddyyyy2doy(sMMDDYYYY)  result(iDOY)
   sItem = sMMDDYYYY
 
   ! parse month value
-  call chomp(sItem, sBuf, "/")
+  call chomp(sItem, sBuf, "/-")
   read(sBuf,*,iostat = iStat) iMonth
   call assert(iStat==0, "Problem reading month value from string "//TRIM(sMMDDYYYY), &
     TRIM(__FILE__),__LINE__)
 
   ! parse day value
-  call chomp(sItem, sBuf, "/")
+  call chomp(sItem, sBuf, "/-")
   read(sBuf,*,iostat=iStat) iDay
   call assert(iStat==0, "Problem reading day value from string "//TRIM(sMMDDYYYY), &
     TRIM(__FILE__),__LINE__)
 
   ! parse year value
-  call chomp(sItem, sBuf, "/")
+  call chomp(sItem, sBuf, "/-")
   read(sBuf,*,iostat=iStat) iYear
   call assert(iStat==0, "Problem reading year value from string "//TRIM(sMMDDYYYY), &
     TRIM(__FILE__),__LINE__)

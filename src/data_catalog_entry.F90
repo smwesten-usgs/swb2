@@ -496,21 +496,27 @@ end subroutine initialize_netcdf_data_object_sub
 
     endif
 
-    !> Now apply te user scale and offset amounts
-    if (this%iTargetDataType == DATATYPE_REAL) then
+    ! if grid data hasn't changed this timestep, we don't want to *reapply* the 
+    ! scale and offset values
+    if ( this%lGridHasChanged ) then
 
-      call apply_scale_and_offset(fResult=this%pGrdBase%rData, fValue=this%pGrdBase%rData,          &
-            dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
+      !> Now apply the user scale and offset amounts
+      if (this%iTargetDataType == DATATYPE_REAL) then
+
+        call apply_scale_and_offset(fResult=this%pGrdBase%rData, fValue=this%pGrdBase%rData,          &
+              dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
 
 
-    elseif ( this%iTargetDataType == DATATYPE_INT ) then
+      elseif ( this%iTargetDataType == DATATYPE_INT ) then
 
-       call apply_scale_and_offset(iResult=this%pGrdBase%iData, iValue=this%pGrdBase%iData,          &
-            dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
+         call apply_scale_and_offset(iResult=this%pGrdBase%iData, iValue=this%pGrdBase%iData,          &
+              dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
 
-    else
+      else
 
-      call die("Unsupported data type specified", __FILE__, __LINE__)
+        call die("Unsupported data type specified", __FILE__, __LINE__)
+
+      endif
 
     endif
 
@@ -717,6 +723,10 @@ subroutine transform_grid_to_grid_sub(this)
   if (.not. associated(this%pGrdNative) )  &
     call die("INTERNAL PROGRAMMING ERROR--Null pointer detected.", __FILE__, __LINE__)
 
+  if ( .not. associated(this%pGrdBase) ) &
+    this%pGrdBase => grid_Create( iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, &
+      rGridCellSize=BNDS%fGridCellSize, iDataType=this%iTargetDataType )
+
   ! only invoke the transform procedure if the PROJ4 strings are different
   if (.not. ( this%pGrdNative%sPROJ4_string .strequal. this%pGrdBase%sPROJ4_string ) ) then
 
@@ -731,16 +741,12 @@ subroutine transform_grid_to_grid_sub(this)
     !! following this call, the pGrdNative%rX and pGrdNative%rY values will be given in the 
     !! base SWB project projection 
 
+    if ( this%lRequireCompleteSpatialCoverage )   &
+      call assert( grid_CompletelyCover( this%pGrdBase, this%pGrdNative ), &
+          "Transformed grid read from file "//dquote(this%sSourceFilename) &
+          //" doesn't completely cover your model domain.")
+
   endif
-
-  if ( .not. associated(this%pGrdBase) ) &
-    this%pGrdBase => grid_Create( iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, &
-      rGridCellSize=BNDS%fGridCellSize, iDataType=this%iTargetDataType )
-
-  if ( this%lRequireCompleteSpatialCoverage )   &
-    call assert( grid_CompletelyCover( this%pGrdBase, this%pGrdNative ), &
-      "Transformed grid read from file "//dquote(this%sSourceFilename) &
-      //" doesn't completely cover your model domain.")
 
   select case (this%iTargetDataType)
 
@@ -1186,7 +1192,8 @@ end subroutine set_constant_value_real
 
           if (this%lPerformFullInitialization ) then
 
-            if( len_trim( this%sSourcePROJ4_string ) > 0 ) then
+            if( ( len_trim( this%sSourcePROJ4_string ) > 0 )                    &
+              .and. ( .not. ( this%sSourcePROJ4_string .strequal. "<NA>") ) ) then
 
               ! calculate the project boundaries in the coordinate system of
               ! the native data file
@@ -1328,6 +1335,7 @@ end subroutine set_constant_value_real
         endif
 
         call netcdf_get_variable_slice(NCFILE=this%NCFILE, rValues=this%pGrdNative%rData)
+        this%lGridHasChanged = lTRUE
 
         this%pGrdNative%rData = this%pGrdNative%rData * dScaleFactor + dAddOffset
 
@@ -1424,7 +1432,8 @@ end subroutine set_constant_value_real
 
        if (this%lPerformFullInitialization ) then
 
-          if( len_trim( this%sSourcePROJ4_string ) > 0 ) then
+          if( ( len_trim( this%sSourcePROJ4_string ) > 0 )                    &
+            .and. ( .not. ( this%sSourcePROJ4_string .strequal. "<NA>") ) ) then
 
             ! calculate the project boundaries in the coordinate system of
             ! the native data file
@@ -1797,7 +1806,10 @@ end subroutine set_maximum_allowable_value_real_sub
     ! use the native coordinate boundaries to "cookie-cut" only the data
     ! pertinent to our project area.
     iRetVal = pj_init_and_transform(trim(pGrdBase%sPROJ4_string)//C_NULL_CHAR, &
-                trim(this%sSourcePROJ4_string)//C_NULL_CHAR, 4_c_long, &
+                trim(this%sSourcePROJ4_string)//C_NULL_CHAR,                   &
+                trim(__FILE__)//C_NULL_CHAR,                                   &
+                __LINE__,                                                      &
+                4_c_long,                                                      &
                 rX, rY )
 
   call grid_CheckForPROJ4Error(iRetVal=iRetVal, &

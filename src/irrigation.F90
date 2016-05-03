@@ -369,6 +369,9 @@ contains
 
     enddo  
 
+    IRRIGATION_FROM_GROUNDWATER(:)    = 0.0_c_float
+    IRRIGATION_FROM_SURFACE_WATER(:)  = 0.0_c_float
+   
   end subroutine irrigation__initialize
 
 !--------------------------------------------------------------------------------------------------  

@@ -1,7 +1,7 @@
 module string_list
 
-  use iso_c_binding, only             : c_int, c_float, c_bool
-  use constants_and_conversions, only : asInt, asFloat, asLogical, lTRUE, lFALSE
+  use iso_c_binding, only             : c_int, c_float, c_bool, c_null_char
+  use constants_and_conversions, only : asInt, asFloat, asLogical, lTRUE, lFALSE, TRUE, FALSE
   use strings
   use logfiles, only                  : LOG_DEBUG
   use exceptions
@@ -9,13 +9,17 @@ module string_list
 
   private
 
-  public :: STRING_LIST_T
+  public :: STRING_LIST_T, create_list
 
   public :: assignment(=)
   interface assignment(=)
     module procedure :: assign_string_list_to_string_list_sub
   end interface assignment(=)
     
+  interface create_list
+    procedure :: list_from_delimited_string_fn
+  end interface create_list
+
   type STRING_LIST_ELEMENT_T
 
     character (len=:), allocatable               :: s
@@ -26,9 +30,10 @@ module string_list
 
   type STRING_LIST_T
 
-    type (STRING_LIST_ELEMENT_T), pointer        :: first   => null()
-    type (STRING_LIST_ELEMENT_T), pointer        :: last    => null()
-    integer (kind=c_int)                         :: count   = 0
+    type (STRING_LIST_ELEMENT_T), pointer        :: first        => null()
+    type (STRING_LIST_ELEMENT_T), pointer        :: last         => null()
+    logical (kind=c_bool)                        :: autocleanup  = TRUE
+    integer (kind=c_int)                         :: count        = 0
 
   contains
 
@@ -38,6 +43,7 @@ module string_list
     procedure :: list_get_values_in_range_fn
     procedure :: list_print_sub
     procedure :: list_all_fn
+    procedure :: list_all_delimited_fn
     procedure :: list_return_position_of_matching_string_fn
     procedure :: list_return_count_of_matching_string_fn
     procedure :: list_is_string_in_list_fn
@@ -47,14 +53,17 @@ module string_list
     procedure :: list_return_all_as_logical_fn
     procedure :: list_return_all_as_character_fn
     procedure :: list_subset_partial_matches_fn
+    procedure :: list_set_auto_cleanup_sub
     final     :: list_finalize_sub
 
     generic :: append        => list_append_string_sub, &
                                 list_append_int_sub
     generic :: get           => list_get_value_at_index_fn, &
                                 list_get_values_in_range_fn
+    generic :: set_autocleanup  => list_set_auto_cleanup_sub
     generic :: print         => list_print_sub
-    generic :: listall       => list_all_fn
+    generic :: listall       => list_all_fn, &
+                                list_all_delimited_fn
     generic :: grep          => list_subset_partial_matches_fn
     generic :: which         => list_return_position_of_matching_string_fn
     generic :: countmatching => list_return_count_of_matching_string_fn
@@ -67,10 +76,8 @@ module string_list
 
   end type STRING_LIST_T
 
-
 contains
 
-  
   subroutine list_append_int_sub( this, iValue )
 
     class (STRING_LIST_T), intent(inout)   :: this
@@ -80,6 +87,18 @@ contains
 
   end subroutine list_append_int_sub
 
+!--------------------------------------------------------------------------------------------------
+
+  subroutine list_set_auto_cleanup_sub( this, autocleanup )
+
+    class (STRING_LIST_T), intent(inout)    :: this
+    logical (kind=c_bool), intent(in)       :: autocleanup
+
+    this%autocleanup = autocleanup
+
+  end subroutine list_set_auto_cleanup_sub
+
+!--------------------------------------------------------------------------------------------------
   
   subroutine assign_string_list_to_string_list_sub(slList2, slList1)
 
@@ -125,8 +144,10 @@ contains
       if (this%count == 0)  call die("Internal logic error: count should *not* be zero in this block", &
              __FILE__, __LINE__)
 
-      pOldLastElement => this%last
-      pOldLastElement%next => pNewElement
+!      pOldLastElement => this%last
+!      pOldLastElement%next => pNewElement
+
+      this%last%next => pNewElement
       this%last      => pNewElement
       this%last%next => null()
 
@@ -294,6 +315,53 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  function list_all_delimited_fn(this, delimiter)  result( sListValues )
+
+    use iso_fortran_env, only : OUTPUT_UNIT
+
+    class (STRING_LIST_T), intent(in)     :: this
+    character (len=*), intent(in)         :: delimiter
+    character (len=:), allocatable        :: sListValues
+
+    ! [ LOCALS ]
+    class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
+    integer (kind=c_int)                      :: iLU_
+    integer (kind=c_int)                      :: iCount
+    character (len=2048)                      :: sBuf
+      
+    current => this%first
+    iCount = 0
+
+    sBuf = ""
+
+    do while ( associated( current ) .and. iCount <= this%count )
+
+      iCount = iCount + 1
+
+      if ( iCount == 1 ) then
+
+        sBuf = trim( current%s )
+
+      elseif( iCount == this%count ) then
+
+        sBuf = trim( sBuf )//trim( delimiter )//trim( current%s )//trim( delimiter )
+
+      else 
+
+        sBuf = trim( sBuf )//trim( delimiter )//trim( current%s )
+
+      endif  
+
+      current => current%next
+
+    enddo
+
+    sListValues = adjustl( trim(sBuf) )
+
+  end function list_all_delimited_fn
+
+!--------------------------------------------------------------------------------------------------
+
   function list_return_all_as_float_fn(this)    result(rValues)
 
     class (STRING_LIST_T), intent(in)     :: this
@@ -323,15 +391,23 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function list_return_all_as_character_fn(this)    result(sValues)
+  function list_return_all_as_character_fn(this, null_terminated )    result(sValues)
 
     class (STRING_LIST_T), intent(in)     :: this
     character (len=64), allocatable       :: sValues(:)
+    logical (kind=c_bool), optional       :: null_terminated
 
     ! [ LOCALS ]
     class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
     integer (kind=c_int)                      :: iStat
     integer (kind=c_int)                      :: iIndex
+    logical (kind=c_bool)                     :: null_terminated_
+
+    if ( present( null_terminated) ) then
+      null_terminated_ = null_terminated
+    else
+      null_terminated_ = FALSE
+    endif
 
     allocate( sValues( 1:this%count ), stat=iStat )
     if (iStat /= 0)  call die("Failed to allocate memory for list conversion", __FILE__, __LINE__)
@@ -342,7 +418,12 @@ contains
     do while ( associated( current ) .and. iIndex < ubound(sValues,1) )
 
       iIndex = iIndex + 1
-      sValues(iIndex) = current%s
+
+      if ( null_terminated_ ) then
+        sValues(iIndex) = trim(current%s)//c_null_char
+      else
+        sValues(iIndex) = current%s
+      endif
 
       current => current%next
 
@@ -412,27 +493,30 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function break_string_into_list_fn(sText1)    result( newList )
+  function list_from_delimited_string_fn(sText1)    result( newList )
 
-    character (len=*), intent(inout)  :: sText1
-    type (STRING_LIST_T)              :: newList
+    character (len=*), intent(in)      :: sText1
+    type (STRING_LIST_T)               :: newList
 
     ! [ LOCALS ]
     character ( len=len_trim(sText1) ) :: sTempText
+    character ( len=len_trim(sText1) ) :: sTempArg
+
+    sTempText = sText1
 
     do
 
-      call chomp( sText1=sText1, sText2=sTempText )
+      call chomp( sText1=sTempText, sText2=sTempArg )
 
-      if (len_trim(sTempText) > 0) then
-        call newList%append( trim(sTempText ) )
+      if (len_trim(sTempArg) > 0) then
+        call newList%append( trim(sTempArg ) )
       else
         exit
       endif
 
     end do
 
-  end function break_string_into_list_fn
+  end function list_from_delimited_string_fn
 
 !--------------------------------------------------------------------------------------------------
 
@@ -546,7 +630,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function list_subset_partial_matches_fn(this, sChar)     result(newList)
+  function list_subset_partial_matches_fn( this, sChar )     result(newList)
 
     class (STRING_LIST_T), intent(in)                    :: this
     character (len=*), intent(in)                        :: sChar
@@ -586,7 +670,7 @@ contains
 
     type (STRING_LIST_T) :: this
 
-    call this%clear()
+      if ( this%autocleanup )  call this%clear()
 
   end subroutine list_finalize_sub  
 
@@ -610,9 +694,11 @@ contains
       do while ( associated( current ) )
 
         toremove => current
+
         current => current%next
 
         if ( allocated( toremove%s ) )    deallocate( toremove%s )
+
         if ( associated( toremove ) )  deallocate( toremove )
 
       enddo  
@@ -620,9 +706,10 @@ contains
     endif
 
     this%count = 0
-    this%first => null()
-    this%last => null()
 
+    this%first => null()
+
+    this%last => null()
 
   end subroutine list_items_deallocate_all_sub
 

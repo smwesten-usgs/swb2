@@ -10,12 +10,12 @@ program test_file_utils
   call mkdir( "testdir")
 
   call get_cwd( mydir )
+  print *, "Current directory is: "//dquote( mydir )
 
   call chdir( trim(mydir)//"/testdir" )
 
   call get_cwd( mydir )
 
-  print *, dquote( mydir )
-
+  print *, "Changed directories. Current directory is: "//dquote( mydir )
 
 end program test_file_utils

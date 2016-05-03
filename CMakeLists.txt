@@ -22,8 +22,11 @@ message("Processing top-level CMakelists.txt for project swb2")
 
 include( CMakeForceCompiler )
 
-CMAKE_FORCE_C_COMPILER( gcc GNU )
-CMAKE_FORCE_Fortran_COMPILER( gfortran GNU )
+#CMAKE_FORCE_C_COMPILER ( ${CC} ${GCC_VERSION} )
+#CMAKE_FORCE_Fortran_COMPILER ( ${FC} ${GCC_VERSION} )
+
+#CMAKE_FORCE_C_COMPILER( gcc GNU )
+#CMAKE_FORCE_Fortran_COMPILER( gfortran GNU )
 
 #------------------------------------------------------------------------------------#
 #                           Build directory check                                    #
@@ -59,9 +62,6 @@ set(PACKAGE_VERSION "2.0 ALPHA")
 
 cmake_minimum_required(VERSION 2.8)
 
-CMAKE_FORCE_C_COMPILER ( ${CC} ${GCC_VERSION} )
-CMAKE_FORCE_Fortran_COMPILER ( ${FC} ${GCC_VERSION} )
-
 include( cmake/version_control.cmake )
 include( cmake/options_and_targets.cmake )
 
@@ -87,23 +87,15 @@ if ("${OS}" STREQUAL "win_x64" OR "${OS}" STREQUAL "win_x86")
   add_custom_target(copy 
   	                COMMAND 
   	                ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2.exe ${CMAKE_INSTALL_PREFIX}/swb2.exe
-  	                COMMAND 
-  	                ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb_launch.exe ${CMAKE_INSTALL_PREFIX}/swb_launch.exe
-  	                COMMAND
+                     COMMAND
                     ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb_merge.exe ${CMAKE_INSTALL_PREFIX}/swb_merge.exe
-                    COMMAND
-                    ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb_replicate.exe ${CMAKE_INSTALL_PREFIX}/swb_replicate.exe                    
   	                )
 else()
   add_custom_target(copy 
   	                COMMAND 
   	                ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2 ${CMAKE_INSTALL_PREFIX}/swb2
-  	                COMMAND 
-  	                ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb_launch ${CMAKE_INSTALL_PREFIX}/swb_launch
-  	                COMMAND
-                    ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb_merge ${CMAKE_INSTALL_PREFIX}/swb_merge
                     COMMAND
-                    ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb_replicate ${CMAKE_INSTALL_PREFIX}/swb_replicate                    
+                    ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb_merge ${CMAKE_INSTALL_PREFIX}/swb_merge
   	                )
 endif()
 

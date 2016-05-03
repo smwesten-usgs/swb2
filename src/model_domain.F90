@@ -98,6 +98,7 @@ module model_domain
     real (kind=c_float), allocatable       :: direct_recharge(:)    
     real (kind=c_float), allocatable       :: current_rooting_depth(:)
     integer (kind=c_int), allocatable      :: number_of_days_since_planting(:)
+    logical (kind=c_bool), allocatable     :: it_is_growing_season(:)
          
     real (kind=c_float), allocatable       :: gross_precip(:)
     real (kind=c_float), allocatable       :: monthly_gross_precip(:)    
@@ -196,6 +197,9 @@ module model_domain
 
     procedure :: row_column_to_index_fn
     generic   :: row_column_to_index => row_column_to_index_fn
+
+    procedure :: dump_model_values_by_cell_sub
+    generic   :: dump_model_values_by_cell => dump_model_values_by_cell_sub
   
   end type MODEL_DOMAIN_T
 
@@ -305,7 +309,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: iStat(49)
+    integer (kind=c_int)  :: iStat(50)
 
     iCount = count( this%active )
 
@@ -358,6 +362,7 @@ contains
     allocate( this%number_of_days_since_planting( iCount ), stat=iStat(47) )   
     allocate( this%col_num_1D( iCount ), stat=iStat(48) )
     allocate( this%row_num_1D( iCount ), stat=iStat(49) )    
+    allocate( this%it_is_growing_season( iCount ), stat=iStat(50)
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="  &
@@ -417,6 +422,7 @@ contains
     this%crop_etc                            = 0.0_c_float
     this%direct_recharge                     = 0.0_c_float
     this%number_of_days_since_planting       = 0_c_int
+    this%it_is_growing_season                = FALSE
     
 !$OMP END PARALLEL WORKSHARE
 
@@ -436,7 +442,7 @@ contains
       this%row_num_2D( :, row_num ) = row_num
     enddo  
 
-    do col_num=lbound( this%col_num_2D, 2), ubound( this%col_num_2D, 2)
+    do col_num=lbound( this%col_num_2D, 1), ubound( this%col_num_2D, 1 )
       this%col_num_2D( col_num, : ) = col_num
     enddo  
 
@@ -490,6 +496,8 @@ contains
 
     call this%init_fog
 
+    call this%init_precipitation_data
+
     call this%init_runoff
 
     call this%init_soil_storage_max
@@ -499,8 +507,6 @@ contains
     call this%init_actual_et
 
     call this%init_reference_et
-
-    call this%init_precipitation_data
 
     call this%init_GDD
 
@@ -972,7 +978,8 @@ contains
 
     elseif ( sCmdText .contains. "PRECIPITATION" ) then
 
-      if ( ( sMethodName .strequal. "NORMAL" ) &
+      if ( ( sMethodName .strequal. "NORMAL" )                &
+           .or. ( sMethodName .strequal. "GRIDDED" )            &
            .or. ( sMethodName .strequal. "STANDARD" ) ) then
 
         this%init_precipitation_data => model_initialize_precip_normal
@@ -1008,6 +1015,10 @@ contains
         call LOGS%WRITE( "==> GRIDDED values for water main leakage (etc.) will be used.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
+      elseif ( sMethodName .strequal. "NONE") then
+
+        ! no action needed; defaults to null method
+
       else
 
         call warn("Your control file specifies an unknown or unsupported DIRECT_RECHARGE method.", &
@@ -1017,7 +1028,8 @@ contains
 
     elseif ( sCmdText .contains. "SOIL_MOISTURE" ) then
 
-      if ( ( sMethodName .strequal. "T-M" ) .or. ( sMethodName .strequal. "THORNTHWAITE-MATHER" ) ) then
+      if ( ( sMethodName .strequal. "T-M" ) .or. ( sMethodName .strequal. "THORNTHWAITE-MATHER" )      &
+             .or. ( sMethodName .strequal. "THORNTHWAITE") ) then
 
         this%init_actual_et => model_initialize_actual_et_thornthwaite_mather
         this%calc_actual_et => model_calculate_actual_et_thornthwaite_mather
@@ -1057,7 +1069,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call interception_bucket_initialize( )
+    call interception_bucket_initialize( this%active )
 
   end subroutine model_initialize_interception_bucket
 
@@ -1065,12 +1077,18 @@ contains
 
   subroutine model_calculate_interception_bucket(this)
 
-    use interception__bucket
+    use interception__bucket, only  : interception_bucket_calculate, IS_GROWING_SEASON, &
+                                      interception_bucket_update_growing_season
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
+    call interception_bucket_update_growing_season( landuse_index=this%landuse_index,        &
+                                                    GDD=this%GDD,                            &
+                                                    mean_air_temp=this%tmean,                &
+                                                    it_is_growing_season=IS_GROWING_SEASON )
+
     this%interception = interception_bucket_calculate( this%landuse_index, this%rainfall, this%fog, &
-                                                         this%canopy_cover_fraction )
+                                                         this%canopy_cover_fraction, IS_GROWING_SEASON )
 
   end subroutine model_calculate_interception_bucket
 
@@ -1412,6 +1430,13 @@ contains
     call assert( status==0, "Problem allicating memory", __FILE__, __LINE__ )
 
     call runoff_gridded_values_initialize( this%active )
+    call runoff_gridded_values_update_ratios( )
+
+    print *, __FILE__, ": ", __LINE__
+    call minmaxmean( RUNOFF_RATIOS, "RUNOFF_RATIOS" ) 
+    call minmaxmean( this%monthly_runoff, "MONTHLY_RUNOFF")
+    call minmaxmean( this%monthly_gross_precip, "MONTHLY_RAINFALL")
+
 
   end subroutine model_initialize_runoff_gridded_values
 
@@ -1604,6 +1629,9 @@ contains
                                   monthly_rainfall=this%monthly_gross_precip,                    &
                                   monthly_runoff=this%monthly_runoff )
 
+      call minmaxmean( this%monthly_runoff, "MONTHLY_RUNOFF")
+      call minmaxmean( this%monthly_gross_precip, "MONTHLY_RAINFALL")
+
     else
 
 
@@ -1744,6 +1772,7 @@ contains
 
     call growing_degree_day_initialize( lActive=this%active,                               &
                                         iLanduseIndex=this%landuse_index,                  &
+                                        PROJ4_string=this%PROJ4_string,                    &
                                         dX=this%X,                                         & 
                                         dY=this%Y,                                         &
                                         dX_lon=this%X_lon,                                 &
@@ -1807,17 +1836,17 @@ contains
                                                   precipitation=this%infiltration,                  &
                                                   crop_etc=this%crop_etc )
 
-    do indx=1,ubound( this%actual_et_soil,1) 
-      if ( actual_et_2( indx ) > 0.0 ) then  
-        diff = this%actual_et_soil(indx) - actual_et_2(indx) 
-        if ( abs(diff) > 1.0e-3 )                                                 &                                        
-        print *, indx, this%actual_et_soil( indx ), actual_et_2( indx ),          &
-          actual_et_3(indx),                                                      &
-          diff,                                                                   &
-          this%soil_storage( indx ), this%soil_storage_max( indx ),               &
-          this%infiltration( indx ), this%crop_etc( indx ), this%landuse_code( indx )
-      endif    
-    enddo  
+!     do indx=1,ubound( this%actual_et_soil,1) 
+!       if ( actual_et_2( indx ) > 0.0 ) then  
+!         diff = this%actual_et_soil(indx) - actual_et_2(indx) 
+!         if ( abs(diff) > 1.0e-3 )                                                 &                                        
+!         print *, indx, this%actual_et_soil( indx ), actual_et_2( indx ),          &
+!           actual_et_3(indx),                                                      &
+!           diff,                                                                   &
+!           this%soil_storage( indx ), this%soil_storage_max( indx ),               &
+!           this%infiltration( indx ), this%crop_etc( indx ), this%landuse_code( indx )
+!       endif    
+!     enddo  
 
 
   end subroutine model_calculate_actual_et_thornthwaite_mather
@@ -1876,8 +1905,8 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call direct_recharge_initialize( lActive=this%active, iLandUseIndex=this%landuse_index,   &
-                                     dX=this%X, dY=this%Y,                                    &
+    call direct_recharge_initialize( lActive=this%active, iLandUseIndex=this%landuse_index,     &
+                                     PROJ4_string=this%PROJ4_string, dX=this%X, dY=this%Y,      &
                                      dX_lon=this%X_lon , dY_lat=this%Y_lat )
 
   end subroutine model_initialize_direct_recharge_gridded
@@ -1972,8 +2001,9 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call fog_monthly_grid_initialize( lActive=this%active, dX=this%X, dY=this%Y,                &
-      dX_lon=this%X_lon , dY_lat=this%Y_lat, output_directory_name=this%output_directory_name )
+    call fog_monthly_grid_initialize( lActive=this%active, PROJ4_string=this%PROJ4_string,  &
+      dX=this%X, dY=this%Y, dX_lon=this%X_lon , dY_lat=this%Y_lat,                          &
+      output_directory_name=this%output_directory_name )
 
   end subroutine model_initialize_fog_monthly_grid
 
@@ -2142,6 +2172,7 @@ contains
     call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
 
     call precipitation_method_of_fragments_initialize( this%active )
+    call this%get_precipitation_data()
 
   end subroutine model_initialize_precip_method_of_fragments
 
@@ -2190,19 +2221,19 @@ contains
     this%monthly_gross_precip = pack( pPRCP%pGrdBase%rData, this%active ) * RAINFALL_ADJUST_FACTOR
 
     ! print *, "*****************************************************************"
-    ! do indexval=8,10
+    ! do indexval=5,7
 
-    !   targetindex = this%row_column_to_index_fn( indexval, 214 )
+    !   targetindex = this%row_column_to_index_fn( indexval, 151 )
 
     !   if ( targetindex > 0 ) then
 
-    !     print *, " row 214, col ", indexval
+    !     print *, " row 151, col ", indexval
     !     print *, "----------------"
-    !     print *, "active?:        ", this%active( indexval,214 )
+    !     print *, "active?:        ", this%active( indexval,151 )
     !     print *, "gross_precip:   ", this%gross_precip( targetindex )
     !     print *, "FRAGMENT_VALUE: ", FRAGMENT_VALUE( targetindex )
     !     print *, "RAIN_ADJST_FAC: ", RAINFALL_ADJUST_FACTOR( targetindex )     
-    !     print *, "Raw PRCP grid:  ", pPRCP%pGrdBase%rData( indexval, 214 )
+    !     print *, "Raw PRCP grid:  ", pPRCP%pGrdBase%rData( indexval, 151 )
     !     print *, "Rain Gage ID:   ", RAIN_GAGE_ID( targetindex )
     !     print *, " "
     !   endif  
@@ -2354,5 +2385,82 @@ contains
     call minmaxmean( this%potential_recharge, "potential_recharge")
 
   end subroutine summarize_state_variables_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine dump_model_values_by_cell_sub( this, colnum, rownum )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    integer (kind=c_int), intent(in)       :: colnum
+    integer (kind=c_int), intent(in)       :: rownum    
+
+    ! [ LOCALS ]
+    integer (kind=c_int)   :: indx
+
+    indx = this%row_column_to_index( col_num=colnum, row_num=rownum)
+
+    if ( (indx > lbound( this%landuse_code, 1) ) .and. ( indx <= ubound( this%landuse_code, 1) ) ) then
+
+      write(*,fmt="('Dump of variable values for cell: ',i8,'  row: ',i8,'   col: ',i8)") indx, rownum, colnum
+      write(*,fmt="(a)") repeat('-',80)
+      write(*,fmt="('LU code:',t25,i8)") this%landuse_code( indx )                     
+      write(*,fmt="('LU index:',t25,i8)")this%landuse_index( indx )
+      write(*,fmt="('index order:',t25,i8)") this%index_order( indx )               
+      write(*,fmt="('soil group:',t25,i8)")this%soil_group( indx )            
+      write(*,fmt="('# upslope connections:',t25,i8)")this%num_upslope_connections( indx )
+      write(*,fmt="('# upslope cells:',t25,i8)")this%sum_upslope_cells( indx )  
+
+      write(*,fmt="('avail. water. capy.:',t25,f14.3)")this%awc( indx )        
+      write(*,fmt="('Latitude:',t25,f14.3)")this%latitude( indx )                      
+      write(*,fmt="('Reference ET0:',t25,f14.3)")this%reference_ET0( indx )                 
+      write(*,fmt="('Actual ET:',t25,f14.3)")this%actual_ET( indx )            
+      write(*,fmt="('inflow:',t25,f14.3)")this%inflow( indx )                
+      write(*,fmt="('runon:',t25,f14.3)")this%runon( indx )                   
+      write(*,fmt="('runoff:',t25,f14.3)")this%runoff( indx )                    
+      write(*,fmt="('outflow:',t25,f14.3)") this%outflow( indx )                   
+      write(*,fmt="('infiltration:',t25,f14.3)") this%infiltration( indx )                  
+      write(*,fmt="('snowfall:',t25,f14.3)") this%snowfall( indx )             
+      write(*,fmt="('potential snowmelt:',t25,f14.3)") this%potential_snowmelt( indx )     
+      write(*,fmt="('snowmelt:',t25,f14.3)") this%snowmelt( indx )                 
+
+      write(*,fmt="('interception:',t25,f14.3)") this%interception( indx )                 
+      write(*,fmt="('rainfall:',t25,f14.3)") this%rainfall( indx )             
+      write(*,fmt="('intercept. stor.:',t25,f14.3)") this%interception_storage( indx )
+      write(*,fmt="('tmax:',t25,f14.3)") this%tmax( indx )
+      write(*,fmt="('tmin:',t25,f14.3)") this%tmin( indx )
+      write(*,fmt="('tmean:',t25,f14.3)") this%tmean( indx )            
+      write(*,fmt="('snow storage:',t25,f14.3)") this%snow_storage( indx )     
+      write(*,fmt="('soil storage:',t25,f14.3)") this%soil_storage( indx )             
+      write(*,fmt="('soil storage max:',t25,f14.3)") this%soil_storage_max( indx )             
+      write(*,fmt="('surface storage:',t25,f14.3)") this%surface_storage( indx )        
+      write(*,fmt="('surface storage excess:',t25,f14.3)") this%surface_storage_excess( indx )          
+      write(*,fmt="('surface storage max:',t25,f14.3)") this%surface_storage_max( indx )   
+
+      write(*,fmt="('potential recharge:',t25,f14.3)") this%potential_recharge( indx )         
+      write(*,fmt="('fog:',t25,f14.3)") this%fog( indx )       
+      write(*,fmt="('irrigation:',t25,f14.3)") this%irrigation( indx )                      
+      write(*,fmt="('GDD:',t25,f14.3)") this%gdd( indx )              
+      write(*,fmt="('runoff outside:',t25,f14.3)") this%runoff_outside( indx )
+      write(*,fmt="('pervious fraction:',t25,f14.3)") this%pervious_fraction( indx )           
+      write(*,fmt="('storm drain capture:',t25,f14.3)") this%storm_drain_capture( indx )      
+      write(*,fmt="('canopy cover fraction:',t25,f14.3)") this%canopy_cover_fraction( indx )      
+      write(*,fmt="('crop coefficient Kcb:',t25,f14.3)") this%crop_coefficient_kcb( indx )    
+      write(*,fmt="('CFGI:',t25,f14.3)") this%continuous_frozen_ground_index( indx )
+      write(*,fmt="('rooting depth max:',t25,f14.3)") this%rooting_depth_max( indx )
+      write(*,fmt="('current rooting depth',t25,f14.3)") this%current_rooting_depth( indx )        
+      write(*,fmt="('polygon id:',t25,i8)") this%polygon_id( indx )    
+      write(*,fmt="('actual_et_soil:',t25,f14.3)") this%actual_et_soil( indx )               
+      write(*,fmt="('actual_et_impervious:',t25,f14.3)") this%actual_et_impervious( indx )           
+      write(*,fmt="('actual_et_interception:',t25,f14.3)") this%actual_et_interception( indx )     
+      write(*,fmt="('adjusted depletion frac p:',t25,f14.3)") this%adjusted_depletion_fraction_p( indx )   
+      write(*,fmt="('crop Etc:',t25,f14.3)") this%crop_etc( indx )    
+      write(*,fmt="('direct recharge:',t25,f14.3)") this%direct_recharge( indx )                 
+      write(*,fmt="('days since planting:',t25,i8)") this%number_of_days_since_planting( indx )
+      
+    endif  
+
+  end subroutine dump_model_values_by_cell_sub
+
+!--------------------------------------------------------------------------------------------------
 
 end module model_domain

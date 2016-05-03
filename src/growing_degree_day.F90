@@ -25,12 +25,14 @@ module growing_degree_day
  
 contains
 
-  subroutine growing_degree_day_initialize( lActive, iLanduseIndex, dX, dY,  &
+  subroutine growing_degree_day_initialize( lActive, iLanduseIndex,          & 
+                                            PROJ4_string, dX, dY,            &
                                             dX_lon, dY_lat,                  &
                                             output_directory_name )
 
     logical (kind=c_bool), intent(in)     :: lActive(:,:)
     integer (kind=c_int), intent(in)      :: iLanduseIndex(:)
+    character (len=*), intent(inout)      :: PROJ4_string
     real (kind=c_double), intent(in)      :: dX(:)
     real (kind=c_double), intent(in)      :: dY(:)
     real (kind=c_double), intent(in)      :: dX_lon(:,:)
@@ -140,9 +142,11 @@ contains
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
 
     call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE, sVariableName="growing_degree_day", &
-      sVariableUnits="degree-days Fahrenheit", iNX=ubound(lActive, 1), iNY=ubound(lActive, 2), &
-      fX=dX, fY=dY, StartDate=SIM_DT%start, EndDate=SIM_DT%end, dpLat=dY_lat, dpLon=dX_lon, &
-      fValidMin=0.0, fValidMax=7000.0, sDirName=output_directory_name )
+      sVariableUnits="degree-days Fahrenheit", iNX=ubound(lActive, 1), iNY=ubound(lActive, 2),  &
+      fX=dX, fY=dY,                                                                             &
+      StartDate=SIM_DT%start, EndDate=SIM_DT%end, PROJ4_string=PROJ4_string,                    &
+      dpLat=dY_lat, dpLon=dX_lon, fValidMin=0.0, fValidMax=9000.0,                              &
+      sDirName=output_directory_name )
 
   end subroutine growing_degree_day_initialize
 
@@ -160,7 +164,7 @@ contains
     ! [ LOCALS ]
     real (kind=c_float) :: fDelta
 
-    if ( SIM_DT%iDOY >= iGDD_Reset_DOY ) fGDD = 0.0_c_float
+    if ( SIM_DT%iDOY == iGDD_Reset_DOY ) fGDD = 0.0_c_float
 
     fDelta = min(fTMean, fT_GDD_Max) - fT_GDD_Base
 

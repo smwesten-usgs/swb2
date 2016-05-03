@@ -10,7 +10,8 @@ module output
 
   private
 
-  public :: initialize_output, set_output_directory, write_output, OUTPUT_DIRECTORY_NAME
+  public :: initialize_output, set_output_directory, write_output
+  public :: OUTPUT_DIRECTORY_NAME
 
   type, public :: NETCDF_FILE_COLLECTION_T
     type (T_NETCDF4_FILE), pointer, public :: ncfile
@@ -21,6 +22,32 @@ module output
   character (len=64)   :: OUTPUT_DIRECTORY_NAME = ""
 
   integer (kind=c_int), parameter   :: NCDF_NUM_OUTPUTS = 17
+
+  type OUTPUT_SPECS_T
+    character (len=24)          :: variable_name
+    character (len=20)          :: variable_units
+    real (kind=c_float)         :: valid_minimum
+    real (kind=c_float)         :: valid_maximum
+  end type OUTPUT_SPECS_T
+  
+  type (OUTPUT_SPECS_T)    :: OUTSPECS(NCDF_NUM_OUTPUTS) = [                                &
+    OUTPUT_SPECS_T( "gross_precipitation     ", "inches_per_day      ", 0.0, 60.0 ),        & 
+    OUTPUT_SPECS_T( "rainfall                ", "inches_per_day      ", 0.0, 60.0 ),        &
+    OUTPUT_SPECS_T( "snowfall                ", "inches_per_day      ", 0.0, 60.0 ),        &
+    OUTPUT_SPECS_T( "interception            ", "inches_per_day      ", 0.0, 60.0 ),        &
+    OUTPUT_SPECS_T( "runon                   ", "inches_per_day      ", 0.0, 10000.0 ),     &
+    OUTPUT_SPECS_T( "runoff                  ", "inches_per_day      ", 0.0, 10000.0 ),     &
+    OUTPUT_SPECS_T( "snow_storage            ", "inches_per_day      ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "soil_storage            ", "inches_per_day      ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "reference_ET0           ", "inches_per_day      ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "actual_et               ", "inches_per_day      ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "snowmelt                ", "inches_per_day      ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "tmin                    ", "degrees_fahrenheit  ", -100.0, 150.0 ),    &
+    OUTPUT_SPECS_T( "tmax                    ", "degrees_fahrenheit  ", -100.0, 150.0 ),    &  
+    OUTPUT_SPECS_T( "potential_recharge      ", "inches_per_day      ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "infiltration            ", "inches_per_day      ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "irrigation              ", "inches_per_day      ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "runoff_outside          ", "inches_per_day      ", 0.0, 10000.0 ) ]
 
   enum, bind(c)
     enumerator :: NCDF_GROSS_PRECIPITATION=1, NCDF_RAINFALL, NCDF_SNOWFALL, &
@@ -57,126 +84,25 @@ contains
 
     do iIndex = 1, ubound(NC_OUT, 1)
       allocate ( NC_OUT(iIndex)%ncfile )
+
+      call netcdf_open_and_prepare_as_output(                                        &
+            NCFILE=NC_OUT( iIndex )%ncfile,                                          &
+            sVariableName=trim( OUTSPECS( iIndex )%variable_name ),                  &
+            sVariableUnits=trim( OUTSPECS( iIndex )%variable_units ),                &
+            iNX=cells%number_of_columns,                                             &
+            iNY=cells%number_of_rows,                                                &
+            fX=cells%X,                                                              &
+            fY=cells%Y,                                                              &
+            StartDate=SIM_DT%start,                                                  &
+            EndDate=SIM_DT%end,                                                      &
+            PROJ4_string=cells%PROJ4_string,                                         &
+            dpLat=cells%Y_lat,                                                       &
+            dpLon=cells%X_lon,                                                       &
+            fValidMin=OUTSPECS( iIndex )%valid_minimum,                              &
+            fValidMax=OUTSPECS( iIndex )%valid_maximum,                              &
+            sDirName=OUTPUT_DIRECTORY_NAME )
+
     enddo  
-
-    call netcdf_open_and_prepare_as_output( NCFILE=NC_OUT( NCDF_GROSS_PRECIPITATION )%ncfile, &
-      sVariableName="gross_precipitation", sVariableUnits="inches_per_day",                   &
-      iNX=cells%number_of_columns, iNY=cells%number_of_rows,                                  &
-      fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                     &
-      dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0,                  &
-      sDirName=OUTPUT_DIRECTORY_NAME )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=NC_OUT( NCDF_RAINFALL )%ncfile,            &
-      sVariableName="rainfall", sVariableUnits="inches_per_day",                              &
-      iNX=cells%number_of_columns, iNY=cells%number_of_rows,                                    &
-      fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0,                  &
-      sDirName=OUTPUT_DIRECTORY_NAME )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=NC_OUT( NCDF_INTERCEPTION )%ncfile,        &
-      sVariableName="interception", sVariableUnits="inches_per_day",                          &
-      iNX=cells%number_of_columns, iNY=cells%number_of_rows,                                    &
-      fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0,                  &
-      sDirName=OUTPUT_DIRECTORY_NAME )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=NC_OUT( NCDF_RUNOFF )%ncfile,              &
-      sVariableName="runoff", sVariableUnits="inches_per_day",                                &
-      iNX=cells%number_of_columns, iNY=cells%number_of_rows,                                    &
-      fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0,                  &
-      sDirName=OUTPUT_DIRECTORY_NAME )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=NC_OUT( NCDF_RUNOFF_OUTSIDE )%ncfile,      &
-      sVariableName="runoff_outside", sVariableUnits="inches_per_day",                        &
-      iNX=cells%number_of_columns, iNY=cells%number_of_rows,                                    &
-      fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0,                  &
-      sDirName=OUTPUT_DIRECTORY_NAME )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=NC_OUT( NCDF_RUNON )%ncfile,               &
-      sVariableName="runon", sVariableUnits="inches_per_day",                                 &
-      iNX=cells%number_of_columns, iNY=cells%number_of_rows,                                    &
-      fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0,                  &
-      sDirName=OUTPUT_DIRECTORY_NAME )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=NC_OUT( NCDF_INFILTRATION )%ncfile,        &
-      sVariableName="infiltration", sVariableUnits="inches_per_day",                          &
-      iNX=cells%number_of_columns, iNY=cells%number_of_rows,                                    &
-      fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0,                  &
-      sDirName=OUTPUT_DIRECTORY_NAME )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=NC_OUT( NCDF_SNOWFALL )%ncfile,            &
-      sVariableName="snowfall", sVariableUnits="inches_per_day",                              &
-      iNX=cells%number_of_columns, iNY=cells%number_of_rows,                                    &
-      fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0,                  &
-      sDirName=OUTPUT_DIRECTORY_NAME )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=NC_OUT( NCDF_SNOWMELT )%ncfile,            &
-      sVariableName="snowmelt", sVariableUnits="inches_per_day",                              &
-      iNX=cells%number_of_columns, iNY=cells%number_of_rows,                                    &
-      fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0,                  &
-      sDirName=OUTPUT_DIRECTORY_NAME )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=NC_OUT( NCDF_SNOW_STORAGE )%ncfile,        &
-      sVariableName="snow_storage", sVariableUnits="inches",                                  &
-      iNX=cells%number_of_columns, iNY=cells%number_of_rows,                                    &
-      fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0,                  &
-      sDirName=OUTPUT_DIRECTORY_NAME )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=NC_OUT( NCDF_SOIL_STORAGE )%ncfile,        &
-      sVariableName="soil_storage", sVariableUnits="inches",                                  &
-      iNX=cells%number_of_columns, iNY=cells%number_of_rows,                                    &
-      fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0,                  &
-      sDirName=OUTPUT_DIRECTORY_NAME )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=NC_OUT( NCDF_POTENTIAL_RECHARGE )%ncfile,  &
-      sVariableName="potential_recharge", sVariableUnits="inches",                            &
-      iNX=cells%number_of_columns, iNY=cells%number_of_rows,                                    &
-      fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0,                  &
-      sDirName=OUTPUT_DIRECTORY_NAME )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=NC_OUT( NCDF_REFERENCE_ET0 )%ncfile,       &
-      sVariableName="reference_ET0", sVariableUnits="inches",                                 &
-      iNX=cells%number_of_columns, iNY=cells%number_of_rows,                                    &
-      fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0,                  &
-      sDirName=OUTPUT_DIRECTORY_NAME)
-
-    call netcdf_open_and_prepare_as_output( NCFILE=NC_OUT( NCDF_ACTUAL_ET )%ncfile,           &
-      sVariableName="actual_ET", sVariableUnits="inches",                                     &
-      iNX=cells%number_of_columns, iNY=cells%number_of_rows,                                    &
-      fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0,                  &
-      sDirName=OUTPUT_DIRECTORY_NAME )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=NC_OUT( NCDF_TMIN )%ncfile,                &
-      sVariableName="tmin", sVariableUnits="degrees Fahrenheit",                              &
-      iNX=cells%number_of_columns, iNY=cells%number_of_rows,                                    &
-      fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0,                  &
-      sDirName=OUTPUT_DIRECTORY_NAME )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=NC_OUT( NCDF_TMAX )%ncfile,                &
-      sVariableName="tmax", sVariableUnits="degrees Fahrenheit",                              &
-      iNX=cells%number_of_columns, iNY=cells%number_of_rows,                                    &
-      fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0,                  &
-      sDirName=OUTPUT_DIRECTORY_NAME )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=NC_OUT( NCDF_IRRIGATION )%ncfile,          &
-      sVariableName="irrigation", sVariableUnits="inches_per_day",                            &
-      iNX=cells%number_of_columns, iNY=cells%number_of_rows,                                    &
-      fX=cells%X, fY=cells%Y, StartDate=SIM_DT%start, EndDate=SIM_DT%end,                       &
-      dpLat=cells%Y_lat, dpLon=cells%X_lon, fValidMin=0.0, fValidMax=2000.0,                  &
-      sDirName=OUTPUT_DIRECTORY_NAME )
 
       cells%nodata_fill_value = NC_FILL_FLOAT
 

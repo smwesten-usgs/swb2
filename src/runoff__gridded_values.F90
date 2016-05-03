@@ -181,7 +181,7 @@ module runoff__gridded_values
           exit
       endif    
 
-    enddo  
+    enddo
 
     if ( .not. lMatch )   &
       call die( "Failed to find an appropriate date value in the RUNOFF_RATIO file.", &
@@ -197,7 +197,7 @@ module runoff__gridded_values
 
       end where
       
-    enddo    
+    enddo
 
   end subroutine runoff_gridded_values_update_ratios
 
