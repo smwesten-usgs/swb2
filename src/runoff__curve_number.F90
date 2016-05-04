@@ -22,8 +22,10 @@ module runoff__curve_number
 
   public :: runoff_curve_number_initialize
   public :: runoff_curve_number_calculate
+  public :: update_previous_5_day_rainfall
   public :: update_curve_number_fn
   public :: CN_ARCI, CN_ARCII, CN_ARCIII, Smax
+  public :: FIVE_DAY_SUM, PREV_5_DAYS_RAIN
 
   real (kind=c_float), parameter :: AMC_DRY_GROWING = 1.40_c_float
   real (kind=c_float), parameter :: AMC_DRY_DORMANT = 0.50_c_float
@@ -142,9 +144,10 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine update_previous_5_day_rainfall( infil ) 
+  subroutine update_previous_5_day_rainfall( infil, indx ) 
 
-    real (kind=c_float), intent(in) :: infil(:)
+    real (kind=c_float), intent(in)            :: infil(:)
+    integer (kind=c_int), intent(in), optional :: indx
 
     if ( DAYCOUNT < 5 ) then
       DAYCOUNT = DAYCOUNT + 1
@@ -152,8 +155,17 @@ contains
       DAYCOUNT = 1
     endif
 
-    PREV_5_DAYS_RAIN( :, DAYCOUNT ) = infil
-    PREV_5_DAYS_RAIN( :, FIVE_DAY_SUM ) = sum( PREV_5_DAYS_RAIN( :, 1:5 ) )
+    if ( present( indx) ) then
+
+      PREV_5_DAYS_RAIN( indx, DAYCOUNT ) = infil(1)
+      PREV_5_DAYS_RAIN( indx, FIVE_DAY_SUM ) = sum( PREV_5_DAYS_RAIN( indx, 1:5 ) )
+
+    else
+
+      PREV_5_DAYS_RAIN( :, DAYCOUNT ) = infil
+      PREV_5_DAYS_RAIN( :, FIVE_DAY_SUM ) = sum( PREV_5_DAYS_RAIN( :, 1:5 ) )
+
+    endif
 
   end subroutine 
 !--------------------------------------------------------------------------------------------------
@@ -234,75 +246,78 @@ contains
   elemental function update_curve_number_fn( iLanduseIndex, iSoilsIndex, fInflow,        &
                                              it_is_growing_season, fSoilStorage_Max,     &
                                              fCFGI )                                  result( CN_adj )
-    
-    integer (kind=c_int), intent(in)  :: iLanduseIndex
-    integer (kind=c_int), intent(in)  :: iSoilsIndex
-    real (kind=c_float), intent(in)   :: fInflow
-    logical (kind=c_bool), intent(in) :: it_is_growing_season
-    real (kind=c_float), intent(in)   :: fSoilStorage_Max
-    real (kind=c_float), intent(in)   :: fCFGI
-    real (kind=c_float)               :: CN_adj
+  
+  integer (kind=c_int), intent(in)  :: iLanduseIndex
+  integer (kind=c_int), intent(in)  :: iSoilsIndex
+  real (kind=c_float), intent(in)   :: fInflow
+  logical (kind=c_bool), intent(in) :: it_is_growing_season
+  real (kind=c_float), intent(in)   :: fSoilStorage_Max
+  real (kind=c_float), intent(in)   :: fCFGI
+  real (kind=c_float)               :: CN_adj
 
-    ! [ LOCALS ]
-    real (kind=c_float) :: Pf
-    real (kind=c_float) :: CN_base
-    real (kind=c_float) :: frac
+  ! [ LOCALS ]
+  real (kind=c_float) :: Pf
+  real (kind=c_float) :: frac
+
+
+
+  associate ( CN_I   => CN_ARCI( iLanduseIndex, iSoilsIndex ),        &
+              CN_II  => CN_ARCII( iLanduseIndex, iSoilsIndex ),       &
+              CN_III => CN_ARCIII( iLanduseIndex, iSoilsIndex ) )
 
     ! Correct the curve number...
 
-  if( ( fCFGI > CFGI_LL ) .and. ( fSoilStorage_Max > 0.0_c_float ) ) then
+    if( ( fCFGI > CFGI_LL ) .and. ( fSoilStorage_Max > 0.0_c_float ) ) then
 
-     Pf = prob_runoff_enhancement( fCFGI )
+       Pf = prob_runoff_enhancement( fCFGI )
 
-     ! use probability of runoff enhancement to calculate a weighted
-     ! average of curve number under Type II vs Type III antecedent
-     ! runoff conditions
-     CN_adj = CN_base * (1-Pf) + &
-                  (CN_base / (0.427 + 0.00573 * CN_base) * Pf)
+       ! use probability of runoff enhancement to calculate a weighted
+       ! average of curve number under Type II vs Type III antecedent
+       ! runoff conditions
+       CN_adj = CN_II * (1-Pf) +  CN_III * Pf
 
-  else if ( it_is_growing_season ) then
+    else if ( it_is_growing_season ) then
 
-    if ( fInflow < AMC_DRY_GROWING ) then                     ! AMC I
+      if ( fInflow < AMC_DRY_GROWING ) then
 
+        CN_adj = CN_I
 
-!      The following comes from page 192, eq. 3.145 of "SCS Curve Number
-!      Methodology"
+      else if ( fInflow >= AMC_DRY_GROWING                                  &
+          .and. fInflow < AMC_WET_GROWING ) then
 
-      CN_adj = CN_base / (2.281 - 0.01281 * CN_base)
+         CN_adj = CN_II
 
-    else if ( fInflow >= AMC_DRY_GROWING                                  &
-        .and. fInflow < AMC_WET_GROWING ) then                ! AMC II
+      else
 
-       CN_adj = real(CN_base)
+        CN_adj = CN_III
 
-    else                                                           ! AMC III
+      end if
 
-      CN_adj = CN_base / (0.427 + 0.00573 * CN_base)
-    end if
+    else ! dormant (non-growing) season
 
-  else ! dormant (non-growing) season
+      if ( fInflow < AMC_DRY_DORMANT ) then
 
-    if ( fInflow < AMC_DRY_DORMANT ) then                     ! AMC I
+        CN_adj = CN_I
 
-      CN_adj = CN_base / (2.281 - 0.01281 * CN_base)
+      else if ( fInflow >= AMC_DRY_DORMANT                                  &
+          .and. fInflow < AMC_WET_DORMANT ) then
 
-    else if ( fInflow >= AMC_DRY_DORMANT                                  &
-        .and. fInflow < AMC_WET_DORMANT ) then                ! AMC II
+        CN_adj = CN_II
 
-      CN_adj = real(CN_base)
+      else
 
-    else                                                           ! AMC III
+        CN_adj = CN_III
 
-      CN_adj = CN_base / (0.427 + 0.00573 * CN_base)
+      end if
 
     end if
 
-  end if
+  end associate  
 
   ! ensure that whatever modification have been made to the curve number
   ! remain within reasonable bounds
   CN_adj = MIN(CN_adj,100.0_c_float)
-  CN_adj = MAX(CN_adj,0.0_c_float)
+  CN_adj = MAX(CN_adj,30.0_c_float)
 
 
   end function update_curve_number_fn
@@ -316,7 +331,7 @@ contains
 
     CN_III = CN_II / ( 0.427_c_float + 0.00573_c_float * CN_II )
 
-    CN_III = max( CN_III,0.0_c_float )
+    CN_III = max( CN_III, 30.0_c_float )
     CN_III = min( CN_III, 100.0_c_float )
 
   end function CN_II_to_CN_III
@@ -330,7 +345,7 @@ contains
 
     CN_I = CN_II / (2.281_c_float - 0.01281_c_float * CN_II )
 
-    CN_I = max( CN_I,0.0_c_float )
+    CN_I = max( CN_I, 30.0_c_float )
     CN_I = min( CN_I, 100.0_c_float )
 
   end function CN_II_to_CN_I

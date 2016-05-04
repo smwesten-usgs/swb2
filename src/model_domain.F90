@@ -1384,35 +1384,44 @@ contains
 
   subroutine model_calculate_runoff_curve_number(this, index )
 
-    use runoff__curve_number, only  : runoff_curve_number_calculate
+    use runoff__curve_number, only  : runoff_curve_number_calculate,     &
+                                      update_previous_5_day_rainfall,    &
+                                      FIVE_DAY_SUM,                      &
+                                      PREV_5_DAYS_RAIN
 
-    class (MODEL_DOMAIN_T), intent(inout)       :: this
-    integer (kind=c_int), intent(in), optional  :: index
+    class (MODEL_DOMAIN_T), intent(inout)          :: this
+    integer (kind=c_int), intent(in), optional     :: index
 
-    real (kind=c_float) :: interim_inflow
+    ! [ LOCALS ]
+    real (kind=c_float)  :: interim_inflow(1)
+    integer (kind=c_int) :: indx
 
     if ( present(index) ) then
 
-      interim_inflow = this%runon( index ) + this%rainfall( index )   &
+      indx = index
+      interim_inflow(1) = this%runon( index ) + this%rainfall( index )   &
                       + this%snowmelt( index ) - this%interception( index )
 
+      call update_previous_5_day_rainfall( interim_inflow, indx )
+
       call runoff_curve_number_calculate(runoff=this%runoff( index ),                                        &
-                                                    landuse_index=this%landuse_index( index ),               &
-                                                    soil_group=this%soil_group( index ),                     &
-                                                    soil_storage_max=this%soil_storage_max( index ),         & 
-                                                    inflow=interim_inflow,                                   &
-                                                    it_is_growing_season=this%it_is_growing_season( index ), &
-                                                    continuous_frozen_ground_index=                          &
-                                                    this%continuous_frozen_ground_index( index ) ) 
+                                         landuse_index=this%landuse_index( index ),               &
+                                         soil_group=this%soil_group( index ),                     &
+                                         soil_storage_max=this%soil_storage_max( index ),         & 
+                                         inflow=PREV_5_DAYS_RAIN( index, FIVE_DAY_SUM ),          &
+                                         it_is_growing_season=this%it_is_growing_season( index ), &
+                                         continuous_frozen_ground_index=                          &
+                                           this%continuous_frozen_ground_index( index ) ) 
 
     else
+
+      call update_previous_5_day_rainfall( this%runon + this%rainfall + this%snowmelt - this%interception )
 
       call runoff_curve_number_calculate(runoff=this%runoff,                                             &
                                                     landuse_index=this%landuse_index,                    &
                                                     soil_group=this%soil_group,                          &
                                                     soil_storage_max=this%soil_storage_max,              & 
-                                                    inflow=this%runon+this%rainfall                      &
-                                                           +this%snowmelt-this%interception,             &
+                                                    inflow=PREV_5_DAYS_RAIN( :, FIVE_DAY_SUM ),      &
                                                     it_is_growing_season=this%it_is_growing_season,      &
                                                     continuous_frozen_ground_index=                      &
                                                         this%continuous_frozen_ground_index ) 
@@ -1437,12 +1446,6 @@ contains
 
     call runoff_gridded_values_initialize( this%active )
     call runoff_gridded_values_update_ratios( )
-
-    print *, __FILE__, ": ", __LINE__
-    call minmaxmean( RUNOFF_RATIOS, "RUNOFF_RATIOS" ) 
-    call minmaxmean( this%monthly_runoff, "MONTHLY_RUNOFF")
-    call minmaxmean( this%monthly_gross_precip, "MONTHLY_RAINFALL")
-
 
   end subroutine model_initialize_runoff_gridded_values
 
