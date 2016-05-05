@@ -25,6 +25,7 @@ module direct_recharge__gridded_data
   private
 
   public :: direct_recharge_initialize, direct_recharge_calculate
+  public :: DIRECT_RECHARGE_ACTIVE_FRACTION
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pCESSPOOL
   type (DATA_CATALOG_ENTRY_T), pointer :: pDISPOSAL_WELL
@@ -40,12 +41,16 @@ module direct_recharge__gridded_data
   real (kind=c_float), allocatable     :: fWATER_MAIN(:)
   real (kind=c_float), allocatable     :: fANNUAL_RECHARGE_RATE(:)
 
+  ! ****_TABLE variables: will have same number of values as there are landuses
   real (kind=c_float), allocatable     :: fCESSPOOL_TABLE(:)
   real (kind=c_float), allocatable     :: fDISPOSAL_WELL_TABLE(:)
   real (kind=c_float), allocatable     :: fSTORM_DRAIN_TABLE(:)
   real (kind=c_float), allocatable     :: fWATER_BODY_RECHARGE_TABLE(:)
   real (kind=c_float), allocatable     :: fWATER_MAIN_TABLE(:)
   real (kind=c_float), allocatable     :: fANNUAL_RECHARGE_RATE_TABLE(:)
+
+  real (kind=c_float), allocatable     :: DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE(:)
+  real (kind=c_float), allocatable     :: DIRECT_RECHARGE_ACTIVE_FRACTION(:)
 
   type (T_NETCDF4_FILE), pointer       :: pNCFILE
 
@@ -154,6 +159,35 @@ contains
 
     pDISPOSAL_WELL => DAT%find( "DISPOSAL_WELL_DISCHARGE" )
 
+
+    call PARAMS%get_parameters( sKey="Direct_recharge_active_fraction",        &
+                                fValues=DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE )
+
+
+    if ( DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE(1) > fTINYVAL ) then
+
+      lAreLengthsEqual = ( ubound(DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE,1)         &
+                                 == ubound(iLanduseCodes,1) )
+
+      if ( .not. lAreLengthsEqual )     &
+        call warn( sMessage="The number of landuses does not match the number of direct"   &
+          //" recharge active fraction values.", sModule=__FILE__, iLine=__LINE__, lFatal=TRUE )
+
+      allocate( DIRECT_RECHARGE_ACTIVE_FRACTION( count( lActive ) ), stat=iStat )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+
+      do iIndex=lbound( iLandUseIndex, 1 ), ubound( iLandUseIndex, 1 )
+        DIRECT_RECHARGE_ACTIVE_FRACTION( iIndex ) = DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE( iLandUseIndex( iIndex ) )
+      enddo  
+
+    else
+
+      allocate( DIRECT_RECHARGE_ACTIVE_FRACTION( count( lActive ) ), stat=iStat )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+
+      DIRECT_RECHARGE_ACTIVE_FRACTION = 0.0_c_float
+
+    endif
 
     if ( associated( pANNUAL_RECHARGE_RATE ) ) then
 

@@ -15,7 +15,8 @@ module growing_degree_day
   private
 
   public :: GDD, GDD_BASE, GDD_MAX, GDD_RESET_DATE
-  public growing_degree_day_calculate, growing_degree_day_initialize
+  public :: growing_degree_day_calculate, growing_degree_day_initialize
+  public :: growing_degree_day_output
 
   real (kind=c_float), allocatable  :: GDD(:)
   real (kind=c_float), allocatable  :: GDD_BASE(:)

@@ -267,16 +267,19 @@ contains
 
     ! Correct the curve number...
 
-    if( ( fCFGI > CFGI_LL ) .and. ( fSoilStorage_Max > 0.0_c_float ) ) then
+!!!!!! ***** TEMPORARILY TAKING THIS OUT FOR COMPARISON W ASPEN'S OUTPUT
 
-       Pf = prob_runoff_enhancement( fCFGI )
+!     if( ( fCFGI > CFGI_LL ) .and. ( fSoilStorage_Max > 0.0_c_float ) ) then
 
-       ! use probability of runoff enhancement to calculate a weighted
-       ! average of curve number under Type II vs Type III antecedent
-       ! runoff conditions
-       CN_adj = CN_II * (1-Pf) +  CN_III * Pf
+!        Pf = prob_runoff_enhancement( fCFGI )
 
-    else if ( it_is_growing_season ) then
+!        ! use probability of runoff enhancement to calculate a weighted
+!        ! average of curve number under Type II vs Type III antecedent
+!        ! runoff conditions
+!        CN_adj = CN_II * (1-Pf) +  CN_III * Pf
+
+!    else if ( it_is_growing_season ) then
+    if ( it_is_growing_season ) then
 
       if ( fInflow < AMC_DRY_GROWING ) then
 
@@ -388,7 +391,7 @@ contains
     
     ! [ LOCALS ]
     real (kind=c_float) :: CN_05
-    real (kind=c_float) :: S
+    real (kind=c_float) :: Smax
     real (kind=c_float) :: CN_adj
 
     CN_adj = update_curve_number_fn( landuse_index, soil_group, inflow,                &
@@ -396,18 +399,19 @@ contains
                                      soil_storage_max,                                 &
                                      continuous_frozen_ground_index )
 
-    S = ( 1000.0_c_float / CN_adj ) - 10.0_c_float
+    Smax = ( 1000.0_c_float / CN_adj ) - 10.0_c_float
 
-    ! Equation 9, Hawkins and others, 2002
-    CN_05 = 100_c_float / &
-            ((1.879_c_float * ((100.0_c_float / CN_adj ) - 1.0_c_float )**1.15_c_float) + 1.0_c_float)
+!     ! Equation 9, Hawkins and others, 2002
+!     CN_05 = 100_c_float / &
+!             ((1.879_c_float * ((100.0_c_float / CN_adj ) - 1.0_c_float )**1.15_c_float) + 1.0_c_float)
 
     ! Equation 8, Hawkins and others, 2002
-    S = 1.33_c_float * ( S ) ** 1.15_c_float
+    ! adjust Smax for alternate initial abstraction amount
+    Smax = 1.33_c_float * ( Smax ) ** 1.15_c_float
 
     ! now consider runoff if Ia ~ 0.05S
-    if ( inflow > 0.05_c_float * S ) then
-      runoff = ( inflow - 0.05_c_float * S )**2  / ( inflow + 0.95_c_float * S )
+    if ( inflow > 0.05_c_float * Smax ) then
+      runoff = ( inflow - 0.05_c_float * Smax )**2  / ( inflow + 0.95_c_float * Smax )
     else
       runoff = 0.0_c_float
     end if

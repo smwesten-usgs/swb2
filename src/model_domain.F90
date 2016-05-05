@@ -95,7 +95,8 @@ module model_domain
     real (kind=c_float), allocatable       :: soil_storage(:)
     real (kind=c_float), allocatable       :: soil_storage_max(:)
     real (kind=c_float), allocatable       :: potential_recharge(:)
-    real (kind=c_float), allocatable       :: direct_recharge(:)    
+    real (kind=c_float), allocatable       :: direct_recharge(:) 
+    real (kind=c_float), allocatable       :: direct_soil_moisture(:)   
     real (kind=c_float), allocatable       :: current_rooting_depth(:)
     integer (kind=c_int), allocatable      :: number_of_days_since_planting(:)
     logical (kind=c_bool), allocatable     :: it_is_growing_season(:)
@@ -122,23 +123,24 @@ module model_domain
     real (kind=c_float), allocatable       :: irrigation_mask(:)
 
     !> declare and initialize procedure pointers such that the default methods are in place
-    procedure ( simple_method ), pointer         :: init_interception       => model_initialize_interception_bucket
-    procedure ( simple_method ), pointer         :: init_runoff             => model_initialize_runoff_curve_number
-    procedure ( simple_method ), pointer         :: init_reference_et       => model_initialize_et_hargreaves
-    procedure ( simple_method ), pointer         :: init_actual_et          => model_initialize_actual_et_thornthwaite_mather
-    procedure ( simple_method ), pointer         :: init_routing            => model_initialize_routing_D8
-    procedure ( simple_method ), pointer         :: init_soil_storage_max   => model_initialize_soil_storage_max_internally_calculated
-    procedure ( simple_method ), pointer         :: init_snowfall           => model_initialize_snowfall_original
-    procedure ( simple_method ), pointer         :: init_snowmelt           => model_initialize_snowmelt_original
-    procedure ( simple_method ), pointer         :: init_precipitation_data => model_initialize_precip_normal
-    procedure ( simple_method ), pointer         :: init_fog                => model_initialize_fog_none
-    procedure ( simple_method ), pointer         :: init_irrigation         => model_initialize_irrigation_none
-    procedure ( simple_method ), pointer         :: init_direct_recharge    => model_initialize_direct_recharge_none
-    procedure ( simple_method ), pointer         :: init_GDD                => model_initialize_GDD_none
-    procedure ( simple_method ), pointer         :: init_AWC                => model_initialize_available_water_content_gridded
-    procedure ( simple_method ), pointer         :: init_crop_coefficient   => model_initialize_crop_coefficient_none
-    procedure ( simple_method ), pointer         :: calc_interception       => model_calculate_interception_bucket
-    procedure ( simple_method ), pointer         :: update_crop_coefficient => model_update_crop_coefficient_none    
+    procedure ( simple_method ), pointer         :: init_interception         => model_initialize_interception_bucket
+    procedure ( simple_method ), pointer         :: init_runoff               => model_initialize_runoff_curve_number
+    procedure ( simple_method ), pointer         :: init_reference_et         => model_initialize_et_hargreaves
+    procedure ( simple_method ), pointer         :: init_actual_et            => model_initialize_actual_et_thornthwaite_mather
+    procedure ( simple_method ), pointer         :: init_routing              => model_initialize_routing_D8
+    procedure ( simple_method ), pointer         :: init_soil_storage_max     => model_initialize_soil_storage_max_internally_calculated
+    procedure ( simple_method ), pointer         :: init_snowfall             => model_initialize_snowfall_original
+    procedure ( simple_method ), pointer         :: init_snowmelt             => model_initialize_snowmelt_original
+    procedure ( simple_method ), pointer         :: init_precipitation_data   => model_initialize_precip_normal
+    procedure ( simple_method ), pointer         :: init_fog                  => model_initialize_fog_none
+    procedure ( simple_method ), pointer         :: init_irrigation           => model_initialize_irrigation_none
+    procedure ( simple_method ), pointer         :: init_direct_recharge      => model_initialize_direct_recharge_none
+    procedure ( simple_method ), pointer         :: init_direct_soil_moisture => model_initialize_direct_soil_moisture_none    
+    procedure ( simple_method ), pointer         :: init_GDD                  => model_initialize_GDD_none
+    procedure ( simple_method ), pointer         :: init_AWC                  => model_initialize_available_water_content_gridded
+    procedure ( simple_method ), pointer         :: init_crop_coefficient     => model_initialize_crop_coefficient_none
+    procedure ( simple_method ), pointer         :: calc_interception         => model_calculate_interception_bucket
+    procedure ( simple_method ), pointer         :: update_crop_coefficient   => model_update_crop_coefficient_none    
 
     procedure ( simple_method_w_optional ), pointer   :: calc_runoff       => model_calculate_runoff_curve_number
     
@@ -151,9 +153,10 @@ module model_domain
     procedure ( simple_method ), pointer         :: calc_fog               => model_calculate_fog_none
     procedure ( simple_method ), pointer         :: calc_irrigation        => model_calculate_irrigation_none
     procedure ( simple_method ), pointer         :: calc_GDD               => model_calculate_GDD_none
-    procedure ( simple_method ), pointer         :: calc_direct_recharge => model_calculate_direct_recharge_none    
+    procedure ( simple_method ), pointer         :: calc_direct_recharge      => model_calculate_direct_recharge_none    
+    procedure ( simple_method ), pointer         :: calc_direct_soil_moisture => model_calculate_direct_soil_moisture_none        
 
-    procedure (simple_method), pointer           :: output_GDD             => model_output_GDD_none
+    procedure (simple_method), pointer           :: output_GDD             => model_output_GDD
     procedure (simple_method), pointer           :: output_soil_moisture   => model_output_irrigation_none
     procedure (simple_method), pointer           :: output_irrigation      => model_output_irrigation_none
 
@@ -315,7 +318,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: iStat(50)
+    integer (kind=c_int)  :: iStat(51)
 
     iCount = count( this%active )
 
@@ -365,10 +368,11 @@ contains
     allocate( this%adjusted_depletion_fraction_p( iCount ), stat=iStat(44) )
     allocate( this%crop_etc( iCount ), stat=iStat(45) )
     allocate( this%direct_recharge( iCount ), stat=iStat(46) )     
-    allocate( this%number_of_days_since_planting( iCount ), stat=iStat(47) )   
-    allocate( this%col_num_1D( iCount ), stat=iStat(48) )
-    allocate( this%row_num_1D( iCount ), stat=iStat(49) )    
-    allocate( this%it_is_growing_season( iCount ), stat=iStat(50) )
+    allocate( this%direct_soil_moisture( iCount ), stat=iStat(47) )         
+    allocate( this%number_of_days_since_planting( iCount ), stat=iStat(48) )   
+    allocate( this%col_num_1D( iCount ), stat=iStat(49) )
+    allocate( this%row_num_1D( iCount ), stat=iStat(50) )    
+    allocate( this%it_is_growing_season( iCount ), stat=iStat(51) )
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="  &
@@ -427,6 +431,7 @@ contains
     this%adjusted_depletion_fraction_p       = 0.0_c_float
     this%crop_etc                            = 0.0_c_float
     this%direct_recharge                     = 0.0_c_float
+    this%direct_soil_moisture                = 0.0_c_float
     this%number_of_days_since_planting       = 0_c_int
     this%it_is_growing_season                = FALSE
     
@@ -1012,25 +1017,19 @@ contains
 
     elseif ( sCmdText .contains. "DIRECT_RECHARGE" ) then
 
-      if ( ( sMethodName .strequal. "EXTERNAL" )                                               &
-           .or. ( sMethodName .strequal. "GRIDDED" ) ) then
+      this%init_direct_recharge => model_initialize_direct_recharge_gridded
+      this%calc_direct_recharge => model_calculate_direct_recharge_gridded
 
-        this%init_direct_recharge => model_initialize_direct_recharge_gridded
-        this%calc_direct_recharge => model_calculate_direct_recharge_gridded
+      call LOGS%WRITE( "==> GRIDDED or TABULAR values for water main leakage and other direct " &
+        //"recharge will be used.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-        call LOGS%WRITE( "==> GRIDDED values for water main leakage (etc.) will be used.", &
-            iLogLevel = LOG_ALL, lEcho = lFALSE )
+    elseif ( sCmdText .contains. "DIRECT_SOIL_MOISTURE" ) then
 
-      elseif ( sMethodName .strequal. "NONE") then
+      this%init_direct_soil_moisture => model_initialize_direct_soil_moisture_gridded
+      this%calc_direct_soil_moisture => model_calculate_direct_soil_moisture_gridded
 
-        ! no action needed; defaults to null method
-
-      else
-
-        call warn("Your control file specifies an unknown or unsupported DIRECT_RECHARGE method.", &
-            lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
-
-      endif
+      call LOGS%WRITE( "==> GRIDDED or TABULAR values for septic drainage and other direct " &
+        //"inputs to the root zone will be used.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
     elseif ( sCmdText .contains. "SOIL_MOISTURE" ) then
 
@@ -1837,8 +1836,11 @@ contains
 
   subroutine model_output_GDD( this )
 
+    use growing_degree_day, only : growing_degree_day_output
+
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    !> Nothing here to see. 
+
+    call growing_degree_day_output( lActive=this%active, nodata_fill_value=this%nodata_fill_value )
 
   end subroutine model_output_GDD
 
@@ -1962,6 +1964,50 @@ contains
 
   end subroutine model_calculate_direct_recharge_gridded
 
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_direct_soil_moisture_none ( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_initialize_direct_soil_moisture_none
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_direct_soil_moisture_none ( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_calculate_direct_soil_moisture_none
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_direct_soil_moisture_gridded ( this )
+
+    use direct_soil_moisture__gridded_data
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call direct_soil_moisture_initialize( lActive=this%active, iLandUseIndex=this%landuse_index,     &
+                                     PROJ4_string=this%PROJ4_string, dX=this%X, dY=this%Y,      &
+                                     dX_lon=this%X_lon , dY_lat=this%Y_lat )
+
+  end subroutine model_initialize_direct_soil_moisture_gridded
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_direct_soil_moisture_gridded ( this )
+
+    use direct_soil_moisture__gridded_data
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call direct_soil_moisture_calculate( direct_soil_moisture = this%direct_soil_moisture,      &
+                                    iLanduse_Index=this%landuse_index,           &
+                                    lActive=this%active,                         &
+                                    nodata_fill_value=this%nodata_fill_value )
+
+  end subroutine model_calculate_direct_soil_moisture_gridded
 
 !--------------------------------------------------------------------------------------------------
 

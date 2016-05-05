@@ -4,6 +4,7 @@ module daily_calculation
   use model_domain, only                     : MODEL_DOMAIN_T
   use storm_drain_capture, only              : storm_drain_capture_calculate,             &
                                                STORM_DRAIN_CAPTURE_FRACTION
+  use direct_recharge__gridded_data, only    : DIRECT_RECHARGE_ACTIVE_FRACTION  
   use iso_c_binding, only                    : c_short, c_int, c_float, c_double, c_bool
 
   use mass_balance__impervious_surface, only : calculate_impervious_surface_mass_balance
@@ -109,6 +110,9 @@ contains
 
     end where
 
+    ! e.g. septic system discharge enters here...
+    call cells%calc_direct_soil_moisture()
+
     ! irrigation not considered to be a contributor to runoff...in addition, infiltration
     ! term is calculated with respect to the pervious fraction of the cell
     cells%infiltration = max( 0.0_c_float,                                                           &
@@ -119,6 +123,7 @@ contains
                    + cells%snowmelt                                                                  &
                    - cells%interception                                                              &
                    + cells%irrigation                                                                &
+                   + cells%direct_soil_moisture                                                      &
                    - cells%runoff )
 
     ! the following call updates bound variable actual_et_soil
@@ -155,9 +160,17 @@ contains
     ! line 146: cells%potential_recharge = cells%potential_recharge * cells%pervious_fraction + cells%direct_recharge
 
     ! modify potential recharge and irrigation terms 
-    cells%potential_recharge = cells%potential_recharge * cells%pervious_fraction + cells%direct_recharge
-    cells%irrigation = cells%irrigation * cells%pervious_fraction
 
+    associate ( recharge             => cells%potential_recharge,                    &
+                perv_fraction        => cells%pervious_fraction,                     &
+                irr                  => cells%irrigation,                            &
+                dir_recharge         => cells%direct_recharge,                       &
+                f                    => DIRECT_RECHARGE_ACTIVE_FRACTION )
+
+      recharge = recharge * min( perv_fraction, (1.0_c_float - f) ) + f * dir_recharge
+      irr      = irr * perv_fraction
+
+    end associate
 
   end subroutine perform_daily_calculation
 
