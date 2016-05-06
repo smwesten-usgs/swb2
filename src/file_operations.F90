@@ -167,8 +167,8 @@ contains
     if (.not. this%isOpen() ) then
 
       open(newunit=this%iUnitNum, file=fully_qualified_filename( sFilename ), iostat=this%iStat, action='READ')
-      call assert(this%iStat == 0, "Failed to open file "//dquote( fully_qualified_filename( sFilename ) )//".", &
-                  __FILE__, __LINE__)
+      call assert(this%iStat == 0, "Failed to open file "//dquote( fully_qualified_filename( sFilename ) )//"."  &
+        //" Exit code: "//asCharacter( this%iStat )//".", __FILE__, __LINE__)
 
       if (this%iStat == 0) this%lIsOpen = lTRUE
       this%lEOF = lFALSE
