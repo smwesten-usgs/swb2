@@ -45,7 +45,7 @@ program main
   write(UNIT=*,FMT="(a)") trim( sGitHashString )  
   write(unit=*, fmt="(a,/)") repeat("-",iCount + 2)  
 
-  if(iNumArgs <= 2) then
+  if(iNumArgs < 2) then
 
 #ifdef __GFORTRAN__
     sCompilerFlags = COMPILER_OPTIONS()
@@ -67,7 +67,7 @@ program main
       //TRIM(int2char(__G95_MINOR__))
 #endif
 
-    write(UNIT=*,FMT="(/,/,a,/)")    "Usage: swb_merge input_file_1 input_file_2 [input_file_n] output_file"
+    write(UNIT=*,FMT="(/,/,a,/)")    "Usage: swb_merge input_file_1 input_file_2 [input_file_n]"
 
     stop
 

@@ -3222,13 +3222,12 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, executable_name, &
     NCFILE%pNC_ATT(2)%iNC_AttType = NC_CHAR
     NCFILE%pNC_ATT(2)%iNC_AttSize = 1_c_size_t
 
+    ! special case: history may have meny records
     records = history_list_%count - 1
-
-
     NCFILE%pNC_ATT(3)%sAttributeName = "history"
     allocate(NCFILE%pNC_ATT(3)%sAttValue( 0:(records) ) )
     NCFILE%pNC_ATT(3)%iNC_AttType = NC_CHAR
-    NCFILE%pNC_ATT(3)%iNC_AttSize = 1_c_size_t
+    NCFILE%pNC_ATT(3)%iNC_AttSize = int( records, kind=c_size_t )
 
     do indx=0, records
       NCFILE%pNC_ATT(3)%sAttValue( indx ) = trim(history_list_%get( indx + 1 ))//C_NULL_CHAR

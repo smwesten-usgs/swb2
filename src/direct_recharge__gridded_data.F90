@@ -176,18 +176,23 @@ contains
       allocate( DIRECT_RECHARGE_ACTIVE_FRACTION( count( lActive ) ), stat=iStat )
       call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
 
+      print *, __FILE__, ": ", __LINE__
+
       do iIndex=lbound( iLandUseIndex, 1 ), ubound( iLandUseIndex, 1 )
         DIRECT_RECHARGE_ACTIVE_FRACTION( iIndex ) = DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE( iLandUseIndex( iIndex ) )
       enddo  
-
+      print *, __FILE__, ": ", __LINE__
     else
 
       allocate( DIRECT_RECHARGE_ACTIVE_FRACTION( count( lActive ) ), stat=iStat )
       call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
-
+      print *, __FILE__, ": ", __LINE__
       DIRECT_RECHARGE_ACTIVE_FRACTION = 0.0_c_float
 
     endif
+
+
+
 
     if ( associated( pANNUAL_RECHARGE_RATE ) ) then
 

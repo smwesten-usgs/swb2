@@ -134,7 +134,7 @@ module model_domain
     procedure ( simple_method ), pointer         :: init_precipitation_data   => model_initialize_precip_normal
     procedure ( simple_method ), pointer         :: init_fog                  => model_initialize_fog_none
     procedure ( simple_method ), pointer         :: init_irrigation           => model_initialize_irrigation_none
-    procedure ( simple_method ), pointer         :: init_direct_recharge      => model_initialize_direct_recharge_none
+    procedure ( simple_method ), pointer         :: init_direct_recharge      => model_initialize_direct_recharge_gridded
     procedure ( simple_method ), pointer         :: init_direct_soil_moisture => model_initialize_direct_soil_moisture_none    
     procedure ( simple_method ), pointer         :: init_GDD                  => model_initialize_GDD_none
     procedure ( simple_method ), pointer         :: init_AWC                  => model_initialize_available_water_content_gridded

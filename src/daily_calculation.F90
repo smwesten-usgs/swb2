@@ -5,6 +5,7 @@ module daily_calculation
   use storm_drain_capture, only              : storm_drain_capture_calculate,             &
                                                STORM_DRAIN_CAPTURE_FRACTION
   use direct_recharge__gridded_data, only    : DIRECT_RECHARGE_ACTIVE_FRACTION  
+  use exceptions, only                       : assert
   use iso_c_binding, only                    : c_short, c_int, c_float, c_double, c_bool
 
   use mass_balance__impervious_surface, only : calculate_impervious_surface_mass_balance
@@ -12,6 +13,7 @@ module daily_calculation
   use mass_balance__snow, only               : calculate_snow_mass_balance
   use mass_balance__soil, only               : calculate_soil_mass_balance
 
+  use strings
   use logfiles
 
   implicit none
@@ -25,6 +27,10 @@ contains
   subroutine perform_daily_calculation(cells)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: cells
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: indx
+    real (kind=c_float)  :: fraction
 
     ! calls elemental
     call cells%calc_GDD()
@@ -167,8 +173,21 @@ contains
                 dir_recharge         => cells%direct_recharge,                       &
                 f                    => DIRECT_RECHARGE_ACTIVE_FRACTION )
 
-      recharge = recharge * min( perv_fraction, (1.0_c_float - f) ) + f * dir_recharge
-      irr      = irr * perv_fraction
+      call assert( ubound( perv_fraction, 1) == ubound( f, 1), "INTERNAL PROGRAMMING ERROR--"    &
+        //"unequal vector lengths 'perv_fraction' and 'f'."                                      &
+        //" length 'perv_fraction'="//asCharacter( ubound( perv_fraction, 1))                    &
+        //"; length f="//asCharacter(ubound(f,1)), __FILE__, __LINE__)
+
+      ! running into weird segfault issues when attempting this using whole-array operations
+
+      do indx=1, ubound( f, 1)
+
+        fraction= min( perv_fraction( indx ), 1.0_c_float - f( indx) ) 
+
+        recharge( indx ) = recharge( indx ) * fraction + f( indx ) * dir_recharge( indx )
+        irr( indx )      = irr( indx ) * perv_fraction( indx )
+
+      enddo
 
     end associate
 
