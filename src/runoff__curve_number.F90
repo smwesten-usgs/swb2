@@ -1,8 +1,8 @@
 module runoff__curve_number
 
-  use iso_c_binding, only : c_int, c_float, c_double, c_bool
-  use constants_and_conversions, only     : FALSE, TRUE 
-  use continuous_frozen_ground_index
+  use iso_c_binding, only                    : c_int, c_float, c_double, c_bool
+  use constants_and_conversions, only        : FALSE, TRUE 
+  use continuous_frozen_ground_index, only   : CFGI_LL, CFGI_UL
   use exceptions
   use strings
   use string_list
@@ -15,16 +15,29 @@ module runoff__curve_number
   real (kind=c_float), allocatable    :: CN_ARCII(:,:)
   real (kind=c_float), allocatable    :: CN_ARCI(:,:)
   real (kind=c_float), allocatable    :: Smax(:,:)
+  real (kind=c_float), allocatable    :: PREV_5_DAYS_RAIN(:,:)
   integer (kind=c_int), allocatable   :: iLanduseCodes(:)
+  integer (kind=c_int)                :: DAYCOUNT
+  integer (kind=c_int), parameter     :: FIVE_DAY_SUM = 6
 
   public :: runoff_curve_number_initialize
   public :: runoff_curve_number_calculate
+  public :: update_previous_5_day_rainfall
   public :: update_curve_number_fn
   public :: CN_ARCI, CN_ARCII, CN_ARCIII, Smax
+  public :: FIVE_DAY_SUM, PREV_5_DAYS_RAIN
+
+  real (kind=c_float), parameter :: AMC_DRY_GROWING = 1.40_c_float
+  real (kind=c_float), parameter :: AMC_DRY_DORMANT = 0.50_c_float
+  real (kind=c_float), parameter :: AMC_WET_GROWING = 2.10_c_float
+  real (kind=c_float), parameter :: AMC_WET_DORMANT = 1.10_c_float
 
 contains
 
-  subroutine runoff_curve_number_initialize( )
+  subroutine runoff_curve_number_initialize( cell_is_active )
+ 
+    logical (kind=c_bool), intent(in)   :: cell_is_active(:,:)
+    
 
     ! [ LOCALS ]
     integer (kind=c_int)              :: iNumberOfLanduses
@@ -76,6 +89,16 @@ contains
       CN_ARCII(:, iSoilsIndex) = CN
     enddo  
 
+    allocate( PREV_5_DAYS_RAIN( count(cell_is_active), 6 ), stat=iStat )
+    call assert( iStat == 0, "Failed to allocate memory for curve number PREV_5_DAYS_RAIN table", &
+      __FILE__, __LINE__)
+
+    PREV_5_DAYS_RAIN = 0.0_c_float
+
+    ! DAYCOUNT will vary from 1 to 5 and serve as the second index value for 
+    ! PREV_5_DAYS_RAIN
+    DAYCOUNT = 1
+
     ! calculate SMax based on CN for AMC I
     CN_ARCI = CN_II_to_CN_I( CN_ARCII )
     CN_ARCIII = CN_II_to_CN_III( CN_ARCII )
@@ -121,74 +144,184 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  elemental function update_curve_number_fn( iLanduseIndex, iSoilsIndex, fSoilStorage, &
-                          fSoilStorage_Max, fCFGI )  result( CN_adj )
-    
-    integer (kind=c_int), intent(in)  :: iLanduseIndex
-    integer (kind=c_int), intent(in)  :: iSoilsIndex
-    real (kind=c_float), intent(in)   :: fSoilStorage
-    real (kind=c_float), intent(in)   :: fSoilStorage_Max
-    real (kind=c_float), intent(in)   :: fCFGI
-    real (kind=c_float)               :: CN_adj
+  subroutine update_previous_5_day_rainfall( infil, indx ) 
 
-    ! [ LOCALS ]
-    real (kind=c_float) :: Pf
-    real (kind=c_float) :: CN_base
-    real (kind=c_float) :: fFraction_FC   ! fraction of field capacity
-    real (kind=c_float) :: frac
+    real (kind=c_float), intent(in)            :: infil(:)
+    integer (kind=c_int), intent(in), optional :: indx
 
-    fFraction_FC = 0.0
-    if (fSoilStorage_Max > 0.0) fFraction_FC = min( 1.0_c_float, fSoilStorage / fSoilStorage_Max )
+    if ( DAYCOUNT < 5 ) then
+      DAYCOUNT = DAYCOUNT + 1
+    else
+      DAYCOUNT = 1
+    endif
 
-    ! Correct the curve number...
-    !
-    ! current thinking on this: if the soil moisture is at average levels or *greater*
-    ! *and* the CFGI indicates frozen ground conditions, assume that runoff enhancement
-    ! is probable. If the soils froze under relatively dry conditions, assume that some pore
-    ! space is open in the frozen ground.
-    if( fCFGI > CFGI_LL .and. fFraction_FC > 0.5 ) then
+    if ( present( indx) ) then
 
-      Pf = prob_runoff_enhancement( fCFGI )
-
-      ! use probability of runoff enhancement to calculate a weighted
-      ! average of curve number under Type II vs Type III antecedent
-      ! runoff conditions
-      CN_adj = CN_ARCII(iLanduseIndex, iSoilsIndex) * ( 1.0_c_float - Pf ) &
-                + CN_ARCIII(iLanduseIndex, iSoilsIndex) * Pf 
-
-    elseif ( fFraction_FC > 0.5_c_float ) then   ! adjust upward toward AMC III
-
-      ! we want a number ranging from 0 to 1 indicating the relative split
-      ! between CN AMCII and CN AMCIII
-      frac = ( fFraction_FC - 0.5_c_float ) / 0.5_c_float
-
-      CN_adj = CN_ARCII(iLanduseIndex, iSoilsIndex) * ( 1.0_c_float - frac ) &
-                + CN_ARCIII(iLanduseIndex, iSoilsIndex) * frac 
-
-    elseif ( fFraction_FC < 0.5_c_float ) then   ! adjust downward toward AMC I
-
-      ! we want a number ranging from 0 to 1 indicating the relative split
-      ! between CN AMCII and CN AMCI 
-      !
-      ! ex. fFraction_FC = 0.48; frac = 2.0 * 0.48 = 0.96
-      !     CN_adj = 0.96 ( CN_ARCII ) + ( 1.0 - 0.96 ) * CN_ARCIII
-      !
-      frac = fFraction_FC / 0.5_c_float
-
-      CN_adj = CN_ARCI(iLanduseIndex, iSoilsIndex) * ( 1.0_c_float - frac ) &
-                + CN_ARCII(iLanduseIndex, iSoilsIndex) * frac 
+      PREV_5_DAYS_RAIN( indx, DAYCOUNT ) = infil(1)
+      PREV_5_DAYS_RAIN( indx, FIVE_DAY_SUM ) = sum( PREV_5_DAYS_RAIN( indx, 1:5 ) )
 
     else
 
-      CN_adj = CN_ARCII(iLanduseIndex, iSoilsIndex)
+      PREV_5_DAYS_RAIN( :, DAYCOUNT ) = infil
+      PREV_5_DAYS_RAIN( :, FIVE_DAY_SUM ) = sum( PREV_5_DAYS_RAIN( :, 1:5 ) )
 
-    endif  
+    endif
+
+  end subroutine 
+!--------------------------------------------------------------------------------------------------
+
+!   elemental function update_curve_number_fn( iLanduseIndex, iSoilsIndex, fSoilStorage, &
+!                           fSoilStorage_Max, fCFGI )  result( CN_adj )
+    
+!     integer (kind=c_int), intent(in)  :: iLanduseIndex
+!     integer (kind=c_int), intent(in)  :: iSoilsIndex
+!     real (kind=c_float), intent(in)   :: fSoilStorage
+!     real (kind=c_float), intent(in)   :: fSoilStorage_Max
+!     real (kind=c_float), intent(in)   :: fCFGI
+!     real (kind=c_float)               :: CN_adj
+
+!     ! [ LOCALS ]
+!     real (kind=c_float) :: Pf
+!     real (kind=c_float) :: CN_base
+!     real (kind=c_float) :: fFraction_FC   ! fraction of field capacity
+!     real (kind=c_float) :: frac
+
+!     fFraction_FC = 0.0
+!     if (fSoilStorage_Max > 0.0) fFraction_FC = min( 1.0_c_float, fSoilStorage / fSoilStorage_Max )
+
+!     ! Correct the curve number...
+!     !
+!     ! current thinking on this: if the soil moisture is at average levels or *greater*
+!     ! *and* the CFGI indicates frozen ground conditions, assume that runoff enhancement
+!     ! is probable. If the soils froze under relatively dry conditions, assume that some pore
+!     ! space is open in the frozen ground.
+!     if( fCFGI > CFGI_LL .and. fFraction_FC > 0.5 ) then
+
+!       Pf = prob_runoff_enhancement( fCFGI )
+
+!       ! use probability of runoff enhancement to calculate a weighted
+!       ! average of curve number under Type II vs Type III antecedent
+!       ! runoff conditions
+!       CN_adj = CN_ARCII(iLanduseIndex, iSoilsIndex) * ( 1.0_c_float - Pf ) &
+!                 + CN_ARCIII(iLanduseIndex, iSoilsIndex) * Pf 
+
+!     elseif ( fFraction_FC > 0.5_c_float ) then   ! adjust upward toward AMC III
+
+!       ! we want a number ranging from 0 to 1 indicating the relative split
+!       ! between CN AMCII and CN AMCIII
+!       frac = ( fFraction_FC - 0.5_c_float ) / 0.5_c_float
+
+!       CN_adj = CN_ARCII(iLanduseIndex, iSoilsIndex) * ( 1.0_c_float - frac ) &
+!                 + CN_ARCIII(iLanduseIndex, iSoilsIndex) * frac 
+
+!     elseif ( fFraction_FC < 0.5_c_float ) then   ! adjust downward toward AMC I
+
+!       ! we want a number ranging from 0 to 1 indicating the relative split
+!       ! between CN AMCII and CN AMCI 
+!       !
+!       ! ex. fFraction_FC = 0.48; frac = 2.0 * 0.48 = 0.96
+!       !     CN_adj = 0.96 ( CN_ARCII ) + ( 1.0 - 0.96 ) * CN_ARCIII
+!       !
+!       frac = fFraction_FC / 0.5_c_float
+
+!       CN_adj = CN_ARCI(iLanduseIndex, iSoilsIndex) * ( 1.0_c_float - frac ) &
+!                 + CN_ARCII(iLanduseIndex, iSoilsIndex) * frac 
+
+!     else
+
+!       CN_adj = CN_ARCII(iLanduseIndex, iSoilsIndex)
+
+!     endif  
 
 
-    ! ensure that whatever modification have been made to the curve number
-    ! remain within reasonable bounds
-    CN_adj = MIN( CN_adj, 100.0_c_float ) 
-    CN_adj = MAX( CN_adj, 0.0_c_float )
+!     ! ensure that whatever modification have been made to the curve number
+!     ! remain within reasonable bounds
+!     CN_adj = MIN( CN_adj, 100.0_c_float ) 
+!     CN_adj = MAX( CN_adj, 0.0_c_float )
+
+!   end function update_curve_number_fn
+
+!--------------------------------------------------------------------------------------------------
+
+  elemental function update_curve_number_fn( iLanduseIndex, iSoilsIndex, fInflow,        &
+                                             it_is_growing_season, fSoilStorage_Max,     &
+                                             fCFGI )                                  result( CN_adj )
+  
+  integer (kind=c_int), intent(in)  :: iLanduseIndex
+  integer (kind=c_int), intent(in)  :: iSoilsIndex
+  real (kind=c_float), intent(in)   :: fInflow
+  logical (kind=c_bool), intent(in) :: it_is_growing_season
+  real (kind=c_float), intent(in)   :: fSoilStorage_Max
+  real (kind=c_float), intent(in)   :: fCFGI
+  real (kind=c_float)               :: CN_adj
+
+  ! [ LOCALS ]
+  real (kind=c_float) :: Pf
+  real (kind=c_float) :: frac
+
+
+
+  associate ( CN_I   => CN_ARCI( iLanduseIndex, iSoilsIndex ),        &
+              CN_II  => CN_ARCII( iLanduseIndex, iSoilsIndex ),       &
+              CN_III => CN_ARCIII( iLanduseIndex, iSoilsIndex ) )
+
+    ! Correct the curve number...
+
+!!!!!! ***** TEMPORARILY TAKING THIS OUT FOR COMPARISON W ASPEN'S OUTPUT
+
+!     if( ( fCFGI > CFGI_LL ) .and. ( fSoilStorage_Max > 0.0_c_float ) ) then
+
+!        Pf = prob_runoff_enhancement( fCFGI )
+
+!        ! use probability of runoff enhancement to calculate a weighted
+!        ! average of curve number under Type II vs Type III antecedent
+!        ! runoff conditions
+!        CN_adj = CN_II * (1-Pf) +  CN_III * Pf
+
+!    else if ( it_is_growing_season ) then
+    if ( it_is_growing_season ) then
+
+      if ( fInflow < AMC_DRY_GROWING ) then
+
+        CN_adj = CN_I
+
+      else if ( fInflow >= AMC_DRY_GROWING                                  &
+          .and. fInflow < AMC_WET_GROWING ) then
+
+         CN_adj = CN_II
+
+      else
+
+        CN_adj = CN_III
+
+      end if
+
+    else ! dormant (non-growing) season
+
+      if ( fInflow < AMC_DRY_DORMANT ) then
+
+        CN_adj = CN_I
+
+      else if ( fInflow >= AMC_DRY_DORMANT                                  &
+          .and. fInflow < AMC_WET_DORMANT ) then
+
+        CN_adj = CN_II
+
+      else
+
+        CN_adj = CN_III
+
+      end if
+
+    end if
+
+  end associate  
+
+  ! ensure that whatever modification have been made to the curve number
+  ! remain within reasonable bounds
+  CN_adj = MIN(CN_adj,100.0_c_float)
+  CN_adj = MAX(CN_adj,30.0_c_float)
+
 
   end function update_curve_number_fn
 
@@ -201,7 +334,7 @@ contains
 
     CN_III = CN_II / ( 0.427_c_float + 0.00573_c_float * CN_II )
 
-    CN_III = max( CN_III,0.0_c_float )
+    CN_III = max( CN_III, 30.0_c_float )
     CN_III = min( CN_III, 100.0_c_float )
 
   end function CN_II_to_CN_III
@@ -215,7 +348,7 @@ contains
 
     CN_I = CN_II / (2.281_c_float - 0.01281_c_float * CN_II )
 
-    CN_I = max( CN_I,0.0_c_float )
+    CN_I = max( CN_I, 30.0_c_float )
     CN_I = min( CN_I, 100.0_c_float )
 
   end function CN_II_to_CN_I
@@ -242,8 +375,8 @@ contains
   !!       In Conference Proceeding Paper, World Water and Environmental Resources Congress, 2003.
   elemental subroutine runoff_curve_number_calculate(runoff,                              &
                                                      landuse_index,                       &
-                                                     soil_group,                         &
-                                                     soil_storage,                        &
+                                                     soil_group,                          &
+                                                     it_is_growing_season,                &
                                                      soil_storage_max,                    & 
                                                      inflow,                              &
                                                      continuous_frozen_ground_index ) 
@@ -251,31 +384,34 @@ contains
     real (kind=c_float), intent(inout)  :: runoff
     integer (kind=c_int), intent(in)    :: landuse_index
     integer (kind=c_int), intent(in)    :: soil_group
-    real (kind=c_float), intent(in)     :: soil_storage
+    logical (kind=c_bool), intent(in)   :: it_is_growing_season
     real (kind=c_float), intent(in)     :: soil_storage_max
     real (kind=c_float), intent(in)     :: inflow
     real (kind=c_float), intent(in)     :: continuous_frozen_ground_index
     
     ! [ LOCALS ]
     real (kind=c_float) :: CN_05
-    real (kind=c_float) :: S
+    real (kind=c_float) :: Smax
     real (kind=c_float) :: CN_adj
 
-    CN_adj = update_curve_number_fn( landuse_index, soil_group, soil_storage, &
-                          soil_storage_max, continuous_frozen_ground_index )
+    CN_adj = update_curve_number_fn( landuse_index, soil_group, inflow,                &
+                                     it_is_growing_season,                             &
+                                     soil_storage_max,                                 &
+                                     continuous_frozen_ground_index )
 
-    S = ( 1000.0_c_float / CN_adj ) - 10.0_c_float
+    Smax = ( 1000.0_c_float / CN_adj ) - 10.0_c_float
 
-    ! Equation 9, Hawkins and others, 2002
-    CN_05 = 100_c_float / &
-            ((1.879_c_float * ((100.0_c_float / CN_adj ) - 1.0_c_float )**1.15_c_float) + 1.0_c_float)
+!     ! Equation 9, Hawkins and others, 2002
+!     CN_05 = 100_c_float / &
+!             ((1.879_c_float * ((100.0_c_float / CN_adj ) - 1.0_c_float )**1.15_c_float) + 1.0_c_float)
 
     ! Equation 8, Hawkins and others, 2002
-    S = 1.33_c_float * ( S ) ** 1.15_c_float
+    ! adjust Smax for alternate initial abstraction amount
+    Smax = 1.33_c_float * ( Smax ) ** 1.15_c_float
 
     ! now consider runoff if Ia ~ 0.05S
-    if ( inflow > 0.05_c_float * S ) then
-      runoff = ( inflow - 0.05_c_float * S )**2  / ( inflow + 0.95_c_float * S )
+    if ( inflow > 0.05_c_float * Smax ) then
+      runoff = ( inflow - 0.05_c_float * Smax )**2  / ( inflow + 0.95_c_float * Smax )
     else
       runoff = 0.0_c_float
     end if

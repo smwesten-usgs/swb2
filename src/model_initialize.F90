@@ -37,7 +37,10 @@ module model_initialize
     logical (kind=c_bool)  :: lOptional
   end type METHODS_LIST_T
 
-  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS(35) = &
+  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 37
+  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 13
+
+  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS( NUMBER_OF_KNOWN_GRIDS ) =       &
 
     [ GRIDDED_DATASETS_T("PRECIPITATION                ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("TMIN                         ", lFALSE, DATATYPE_FLOAT ),     &
@@ -68,27 +71,32 @@ module model_initialize
       GRIDDED_DATASETS_T("WATER_BODY_LEAKAGE           ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("WATER_MAIN_LEAKAGE           ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("DISPOSAL_WELL_DISCHARGE      ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("ANNUAL_DIRECT_RECHARGE_RATE  ", lTRUE, DATATYPE_FLOAT ),      &      
+      GRIDDED_DATASETS_T("ANNUAL_DIRECT_RECHARGE_RATE  ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("ANNUAL_SEPTIC_DISCHARGE      ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("SEPTIC_DISCHARGE             ", lTRUE, DATATYPE_FLOAT ),      &      
       GRIDDED_DATASETS_T("RUNOFF_ZONE                  ", lTRUE, DATATYPE_INT ),        & 
       GRIDDED_DATASETS_T("POLYGON_ID                   ", lTRUE, DATATYPE_INT ),        & 
       GRIDDED_DATASETS_T("SOIL_STORAGE_MAX             ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("IRRIGATION_MASK              ", lTRUE, DATATYPE_INT),         &                
       GRIDDED_DATASETS_T("RELATIVE_HUMIDITY            ", lTRUE, DATATYPE_FLOAT )   ]
 
-  type (METHODS_LIST_T), parameter  :: KNOWN_METHODS(12) =   &
-    [ METHODS_LIST_T("INTERCEPTION           ", lFALSE),    &
-      METHODS_LIST_T("EVAPOTRANSPIRATION     ", lFALSE),    &
-      METHODS_LIST_T("RUNOFF                 ", lFALSE),    &
-      METHODS_LIST_T("PRECIPITATION          ", lFALSE),    &
-      METHODS_LIST_T("FOG                    ", lTRUE),     &
-      METHODS_LIST_T("AVAILABLE_WATER_CONTENT", lTRUE),     &
-      METHODS_LIST_T("SOIL_STORAGE_MAX       ", lTRUE),     &
-      METHODS_LIST_T("SOIL_MOISTURE          ", lFALSE),    &
-      METHODS_LIST_T("IRRIGATION             ", lTRUE),     &
-      METHODS_LIST_T("CROP_COEFFICIENT       ", lTRUE),     &
-      METHODS_LIST_T("DIRECT_RECHARGE        ", lTRUE),     &
+  type (METHODS_LIST_T), parameter  :: KNOWN_METHODS( NUMBER_OF_KNOWN_METHODS ) =   &
+
+    [ METHODS_LIST_T("INTERCEPTION           ", lFALSE),                            &
+      METHODS_LIST_T("EVAPOTRANSPIRATION     ", lFALSE),                            &
+      METHODS_LIST_T("RUNOFF                 ", lFALSE),                            &
+      METHODS_LIST_T("PRECIPITATION          ", lFALSE),                            &
+      METHODS_LIST_T("FOG                    ", lTRUE),                             &
+      METHODS_LIST_T("AVAILABLE_WATER_CONTENT", lTRUE),                             &
+      METHODS_LIST_T("SOIL_STORAGE_MAX       ", lTRUE),                             &
+      METHODS_LIST_T("SOIL_MOISTURE          ", lFALSE),                            &
+      METHODS_LIST_T("IRRIGATION             ", lTRUE),                             &
+      METHODS_LIST_T("CROP_COEFFICIENT       ", lTRUE),                             &
+      METHODS_LIST_T("DIRECT_RECHARGE        ", lTRUE),                             &
+      METHODS_LIST_T("DIRECT_SOIL_MOISTURE   ", lTRUE),                             &      
       METHODS_LIST_T("FLOW_ROUTING           ", lFALSE)  ]
 
+  ! grid that will be used in the calculation of cell latitudes
   type (GENERAL_GRID_T), pointer    :: pCOORD_GRD
 
 contains
@@ -148,8 +156,6 @@ contains
     ! and pack that data into vectors for active grid cells only
     call initialize_soils_landuse_awc_flowdir_values()
 
-    ! temporary diagnostic: dump statistics on each of the state variables
-!    call MODEL%summarize()
 
     call initialize_ancillary_values()
 
@@ -161,6 +167,8 @@ contains
 
 !    call initialize_polygon_summarize()
 
+    ! if any fatal warnings have been issued to this point, this
+    ! is the end of the simulation!
     call check_for_fatal_warnings()
 
   end subroutine initialize_all
@@ -237,6 +245,8 @@ contains
     call initialize_surface_storage_max()
 
     call storm_drain_capture_initialize()
+
+    call MODEL%initialize_growing_season()
 
   end subroutine initialize_ancillary_values
 

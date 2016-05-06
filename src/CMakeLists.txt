@@ -12,6 +12,7 @@ add_executable(swb2
 	datetime.F90
       dictionary.F90
       direct_recharge__gridded_data.F90
+      direct_soil_moisture__gridded_data.F90
       #et_FAO56_crop_coefficients.F90
       et__gridded_values.F90
       et__hargreaves_samani.F90
@@ -23,6 +24,7 @@ add_executable(swb2
       get_libc_error_number.c
       grid.F90
       growing_degree_day.F90
+      growing_season.F90
       interception__bucket.F90
       interception__gash.F90
       irrigation.F90

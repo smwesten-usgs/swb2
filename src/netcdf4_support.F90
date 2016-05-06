@@ -968,21 +968,6 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
 
   call history_list_%set_autocleanup( FALSE )
 
-  print *, associated( history_list_ )
-  print *, history_list_%autocleanup
-
-
-!    integer (kind=c_int)            :: iNX                   ! Number of cells in the x-direction
-!     integer (kind=c_int)            :: iNY                   ! Number of cells in the y-direction
-!     integer (kind=c_int)            :: iNumGridCells         ! Total number of grid cells
-!     integer (kind=c_int)            :: iDataType             ! Data type contained in the grid (integer, real, SWB cell)
-!     character (len=:), allocatable  :: sProj4_string         ! proj4 string defining coordinate system of grid
-!     character (len=:), allocatable  :: sFilename             ! original file name that the data was read from
-!     real (kind=c_double)            :: rGridCellSize         ! size of one side of a grid cell
-!     integer (kind=c_int)            :: iLengthUnits= -99999  ! length units code
-!     real (kind=c_double)            :: rX0, rX1              ! World-coordinate range in X
-!     real (kind=c_double)            :: rY0, rY1              ! World-coordinate range in Y
-
   write(sOriginText, fmt="(i4.4,'-',i2.2,'-',i2.2)") StartDate%iYear, StartDate%iMonth, StartDate%iDay
 
   sFilename = trim(sDirName)//trim(sVariableName)//"_"//trim(asCharacter(StartDate%iYear))   &
@@ -3239,22 +3224,15 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, executable_name, &
 
     records = history_list_%count - 1
 
-    print *, __FILE__, ": ", __LINE__
-    print *, records
 
     NCFILE%pNC_ATT(3)%sAttributeName = "history"
     allocate(NCFILE%pNC_ATT(3)%sAttValue( 0:(records) ) )
     NCFILE%pNC_ATT(3)%iNC_AttType = NC_CHAR
     NCFILE%pNC_ATT(3)%iNC_AttSize = 1_c_size_t
 
-!    do indx=0, records
-!      print *, indx, history_list_%get( indx + 1 )
-!      NCFILE%pNC_ATT(3)%sAttValue( indx ) = trim(history_list_%get( indx + 1 ))//C_NULL_CHAR
-!    enddo
-
-    NCFILE%pNC_ATT(3)%sAttValue = history_list_%asCharacter()
-
-    print *, history_list_%asCharacter( null_terminated=TRUE )
+    do indx=0, records
+      NCFILE%pNC_ATT(3)%sAttValue( indx ) = trim(history_list_%get( indx + 1 ))//C_NULL_CHAR
+    enddo
 
   end block
 
@@ -3926,10 +3904,14 @@ subroutine nf_put_attributes(NCFILE)
           //"attribute name: "//dquote(pNC_ATT%sAttributeName), &
           trim(__FILE__), __LINE__)
 
-        call nf_put_attribute(NCFILE=NCFILE, &
-            iVarID=NC_GLOBAL, &
-            sAttributeName=trim(pNC_ATT%sAttributeName)//c_null_char, &
-            sAttributeValue=[trim(pNC_ATT%sAttValue(0))//c_null_char])
+        do indx=0, ubound(pNC_ATT%sAttValue, 1)
+
+          call nf_put_attribute(NCFILE=NCFILE,                               &
+              iVarID=NC_GLOBAL,                                              &
+              sAttributeName=trim(pNC_ATT%sAttributeName)//c_null_char,      &
+              sAttributeValue=[trim(pNC_ATT%sAttValue(indx))//c_null_char])
+        
+        enddo
 
     end select
 
