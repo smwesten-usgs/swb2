@@ -12,7 +12,7 @@ module model_initialize
 !  use loop_iterate
   use logfiles
   use model_domain, only                 : MODEL, minmaxmean
-  use output, only                       : initialize_output, set_output_directory
+  use output, only                       : initialize_output, set_output_directory, set_output_prefix
   use parameters
   use precipitation__method_of_fragments
   use simulation_datetime, only          : SIM_DT
@@ -101,21 +101,22 @@ module model_initialize
 
 contains
 
-  subroutine initialize_all( output_directory_name, data_directory_name )
+  subroutine initialize_all( output_prefix, output_dirname, data_dirname )
 
 !    use polygon_summarize, only : initialize_polygon_summarize
 
-    character (len=256), intent(inout) :: output_directory_name, data_directory_name
+    character (len=256), intent(in) :: output_prefix, output_dirname, data_dirname
 
     
     ! [ LOCALS ]
     integer (kind=c_int) :: iIndex
 
     ! set output directory names for NetCDF and Surfer/Arc ASCII grid output
-    call grid_set_output_directory_name( output_directory_name )
-    call set_data_directory( data_directory_name)
-    call set_output_directory( output_directory_name )
-    call MODEL%set_output_directory( output_directory_name )
+    call grid_set_output_directory_name( output_dirname )
+    call set_data_directory( data_dirname)
+    call set_output_directory( output_dirname )
+    call MODEL%set_output_directory( output_dirname )
+    call set_output_prefix( output_prefix )
 
     ! define SWB project boundary and geographic projection
     call initialize_grid_options()
@@ -252,12 +253,12 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine set_data_directory( data_directory_name )
+  subroutine set_data_directory( data_dirname )
 
-    character(len=*), intent(inout) :: data_directory_name
+    character(len=*), intent(in) :: data_dirname
 
-    ! setting the MODULE variable DATA_DIRECTORY, module = file_operations
-    DATA_DIRECTORY = data_directory_name
+    ! setting the MODULE variable DATA_DIRECTORY_NAME, module = file_operations
+    DATA_DIRECTORY_NAME = data_dirname
 
   end subroutine set_data_directory
 

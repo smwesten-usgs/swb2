@@ -10,8 +10,8 @@ module output
 
   private
 
-  public :: initialize_output, set_output_directory, write_output
-  public :: OUTPUT_DIRECTORY_NAME
+  public :: initialize_output, set_output_directory, write_output, set_output_prefix
+  public :: OUTPUT_DIRECTORY_NAME, OUTPUT_PREFIX_NAME
 
   type, public :: NETCDF_FILE_COLLECTION_T
     type (T_NETCDF4_FILE), pointer, public :: ncfile
@@ -19,7 +19,8 @@ module output
 
   type (NETCDF_FILE_COLLECTION_T), allocatable, public :: NC_OUT(:)
 
-  character (len=64)   :: OUTPUT_DIRECTORY_NAME = ""
+  character (len=256)   :: OUTPUT_DIRECTORY_NAME = ""
+  character (len=256)   :: OUTPUT_PREFIX_NAME    = ""
 
   integer (kind=c_int), parameter   :: NCDF_NUM_OUTPUTS = 17
 
@@ -63,11 +64,23 @@ contains
 
   subroutine set_output_directory( output_dir_name )
 
-    character (len=*), intent(in)  :: output_dir_name
+    character (len=256), intent(in)  :: output_dir_name
 
-    OUTPUT_DIRECTORY_NAME = output_dir_name
+    OUTPUT_DIRECTORY_NAME = trim( output_dir_name )
 
   end subroutine set_output_directory  
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine set_output_prefix( output_prefix )
+
+    character (len=256), intent(in)  :: output_prefix
+
+    OUTPUT_PREFIX_NAME = trim( output_prefix )
+
+    print *, "OUTPUT_PREFIX_NAME set to '"//trim(OUTPUT_PREFIX_NAME)//"'"
+
+  end subroutine set_output_prefix
 
 !--------------------------------------------------------------------------------------------------
 
@@ -100,6 +113,7 @@ contains
             dpLon=cells%X_lon,                                                       &
             fValidMin=OUTSPECS( iIndex )%valid_minimum,                              &
             fValidMax=OUTSPECS( iIndex )%valid_maximum,                              &
+            sPrefixName=OUTPUT_PREFIX_NAME,                                          &
             sDirName=OUTPUT_DIRECTORY_NAME )
 
     enddo  

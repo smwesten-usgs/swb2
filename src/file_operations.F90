@@ -14,7 +14,7 @@ module file_operations
   public :: fully_qualified_filename
   
   integer (kind=c_int), parameter         :: MAX_STR_LEN    = 65536
-  character (len=256), public             :: DATA_DIRECTORY = ""
+  character (len=256), public             :: DATA_DIRECTORY_NAME = ""
   
   type, public :: ASCII_FILE_T
 
@@ -393,7 +393,7 @@ contains
     character(len=*), intent(in)    :: filename
     character(len=:), allocatable   :: fully_qualified_filename
 
-    fully_qualified_filename = trim( DATA_DIRECTORY )//trim(filename)
+    fully_qualified_filename = trim( DATA_DIRECTORY_NAME )//trim(filename)
 
   end function fully_qualified_filename
 

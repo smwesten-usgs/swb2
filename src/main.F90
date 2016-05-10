@@ -23,8 +23,9 @@ program main
   type (STRING_LIST_T)           :: slControlFiles
 
   character (len=256)            :: sBuf
-  character (len=256)            :: sOutputDirectoryName = ""
-  character (len=256)            :: sDataDirectoryName   = ""
+  character (len=256)            :: sOutputPrefixName
+  character (len=256)            :: sOutputDirectoryName
+  character (len=256)            :: sDataDirectoryName
   integer (kind=c_int)           :: iNumArgs
   character (len=1024)           :: sCompilerFlags       = ""
   character (len=256)            :: sCompilerVersion     = ""
@@ -35,6 +36,8 @@ program main
   integer (kind=c_int)           :: iLen
 
   iNumArgs = COMMAND_ARGUMENT_COUNT()
+
+print *, "NUMBER OF ARGUMENTS: ", iNumArgs
 
   sVersionString = "  Soil Water Balance Code version "//trim( SWB_VERSION )    &
       //" -- compiled on: "//trim(COMPILE_DATE)//" "//trim(COMPILE_TIME)
@@ -71,13 +74,17 @@ program main
       //TRIM(int2char(__G95_MINOR__))
 #endif
 
-    write(UNIT=*,FMT="(/,/,a,/,a,/,a,/)")  "Usage: swb2 [control file name] [--output_dir=][--data_dir=]", &
-                                           "                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~", &
-                                           "                                    (flags are optional)"
+    write(UNIT=*,FMT="(/,/,a,/,a,/,a,/)")  "Usage: swb2 [control file name] [--output_prefix=][--output_dir=][--data_dir=]", &
+                                           "                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", &
+                                           "                                                   (optional)"
 
     stop
 
   end if
+
+  sOutputPrefixName    = ""
+  sOutputDirectoryName = ""
+  sDataDirectoryName   = ""
 
   do iIndex=1, iNumArgs
 
@@ -85,25 +92,35 @@ program main
 
     if ( sBuf(1:13) .eq. "--output_dir=" ) then
 
-      sOutputDirectoryName = sBuf(14:)
+      sOutputDirectoryName = trim( sBuf(14:) )
       iLen = len_trim( sOutputDirectoryName )
+
+      ! if there is no trailing "/", append one so we can form (more) fully 
+      ! qualified filenames later
       if ( .not. sOutputDirectoryName(iLen:iLen) .eq. "/" )  &
         sOutputDirectoryName = trim(sOutputDirectoryName)//"/"
 
       call LOGS%set_output_directory( sOutputDirectoryName )
 
+    elseif ( sBuf(1:16) .eq. "--output_prefix=" ) then
+
+      sOutputPrefixName = trim( sBuf(17:) )
+      iLen = len_trim( sOutputPrefixName )
 
     elseif ( sBuf(1:11) .eq. "--data_dir=" ) then
 
       sDataDirectoryName = sBuf(12:)
       iLen = len_trim( sDataDirectoryName )
+
+      ! if there is no trailing "/", append one so we can form (more) fully 
+      ! qualified filenames later
       if ( .not. sDataDirectoryName(iLen:iLen) .eq. "/" )  &
         sDataDirectoryName = trim(sDataDirectoryName)//"/"
 
     else
 
       ! no match on the command-line argument flags; this must be a control file
-      call slControlFiles%append( sBuf )
+      call slControlFiles%append( trim( sBuf ) )
 
     endif
 
@@ -112,6 +129,8 @@ program main
   ! open and initialize logfiles
   call LOGS%initialize( iLogLevel = LOG_DEBUG )
   call LOGS%write( sMessage='Base data directory name set to: "'//trim( sDataDirectoryName )//'"', &
+                   lEcho=.TRUE._c_bool )
+  call LOGS%write( sMessage='Output file prefix set to: "'//trim( sOutputPrefixName )//'"', &
                    lEcho=.TRUE._c_bool )
 
   do iIndex=1, slControlFiles%count
@@ -123,7 +142,7 @@ program main
 
   call slControlFiles%clear()
 
-  call initialize_all( sOutputDirectoryName, sDataDirectoryName )
+  call initialize_all( sOutputPrefixName, sOutputDirectoryName, sDataDirectoryName )
 
   call iterate_over_simulation_days( MODEL )
    
