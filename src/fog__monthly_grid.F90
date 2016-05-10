@@ -54,7 +54,7 @@ contains
     real (kind=c_double), intent(in)      :: dY(:)
     real (kind=c_double), intent(in)      :: dX_lon(:,:)
     real (kind=c_double), intent(in)      :: dY_lat(:,:)
-    character (len=*), intent(in)         :: output_directory_name
+    character (len=*), intent(inout)      :: output_directory_name
 
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iStat

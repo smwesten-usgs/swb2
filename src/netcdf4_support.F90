@@ -911,7 +911,7 @@ end subroutine netcdf_open_and_prepare_as_output_archive
 
 subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUnits,    &
    iNX, iNY, fX, fY, StartDate, EndDate, PROJ4_string, history_list, executable_name,   &
-   dpLat, dpLon, fValidMin, fValidMax, sDirName )
+   dpLat, dpLon, fValidMin, fValidMax, sPrefixName, sDirName )
 
   type (T_NETCDF4_FILE ), pointer            :: NCFILE
   character (len=*), intent(in)              :: sVariableName
@@ -929,8 +929,8 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   real (kind=c_double), intent(in), optional :: dpLon(:,:)
   real (kind=c_float), intent(in), optional  :: fValidMin
   real (kind=c_float), intent(in), optional  :: fValidMax
-  character (len=*), intent(in), optional    :: sDirName
-
+  character (len=256), intent(in), optional  :: sPrefixName  
+  character (len=256), intent(in), optional  :: sDirName
 
 !   ! [ LOCALS ]
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
@@ -938,7 +938,8 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   integer (kind=c_int) :: iIndex
   character (len=10)                                :: sOriginText
   character (len=256)                               :: sFilename
-  character (len=64)                                :: sDirName_
+  character (len=256)                               :: sDirName_
+  character (len=256)                               :: sPrefixName_  
   type (STRING_LIST_T), pointer                     :: history_list_
   character (len=:), allocatable                    :: executable_name_
   type (DATETIME_T)                                 :: DT
@@ -948,13 +949,19 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
 
 
   if (present( sDirName ) ) then
-    sDirName_ = sDirName
+    sDirName_ = trim( sDirName )
   else
     sDirName_ = ""
   endif   
 
+  if (present( sPrefixName ) ) then
+    if ( len_trim( sPrefixName ) > 0 )  sPrefixName_ = trim( sPrefixName )//"_"
+  else
+    sPrefixName_ = ""
+  endif   
+
   if ( present( executable_name ) ) then
-    executable_name_ = executable_name
+    executable_name_ = trim( executable_name )
   else
     executable_name_ = "SWB"
   endif  
@@ -970,7 +977,7 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
 
   write(sOriginText, fmt="(i4.4,'-',i2.2,'-',i2.2)") StartDate%iYear, StartDate%iMonth, StartDate%iDay
 
-  sFilename = trim(sDirName)//trim(sVariableName)//"_"//trim(asCharacter(StartDate%iYear))   &
+  sFilename = trim(sDirName_)//trim(sPrefixName_)//trim(sVariableName)//"_"//trim(asCharacter(StartDate%iYear))   &
     //"_"//trim(asCharacter(EndDate%iYear))//"__"//trim(asCharacter(iNY))                    &
     //"_by_"//trim(asCharacter(iNX))//".nc"
 
@@ -3160,7 +3167,7 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, executable_name, &
   character (len=20)             :: sDateTime
   character (len=:), allocatable :: executable_name_
   type (STRING_LIST_T), pointer           :: history_list_
-  integer (kind=c_int)           :: indx
+  integer (kind=c_int)           :: indx, jndx
   integer (kind=c_int)  :: records
 
   if (present( executable_name) ) then
@@ -3171,15 +3178,15 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, executable_name, &
 
   if ( present( history_list ) ) then
     history_list_ => history_list
+    NCFILE%iNumberOfAttributes = 3 + history_list_%count
   else
     allocate( history_list_ )
     call history_list_%append(trim(sDateTime)//": Soil-Water-Balance model run started.")
+    NCFILE%iNumberOfAttributes = 4
   endif
 
   call DT%systime()
   sDateTime = DT%prettydatetime()
-
-  NCFILE%iNumberOfAttributes = 4
 
   allocate( NCFILE%pNC_ATT(0:NCFILE%iNumberOfAttributes-1), stat=iStat)
   call assert(iStat == 0, "Could not allocate memory for NC_ATT member of NC_FILE", &
@@ -3223,14 +3230,17 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, executable_name, &
     NCFILE%pNC_ATT(2)%iNC_AttSize = 1_c_size_t
 
     ! special case: history may have meny records
-    records = history_list_%count - 1
-    NCFILE%pNC_ATT(3)%sAttributeName = "history"
-    allocate(NCFILE%pNC_ATT(3)%sAttValue( 0:(records) ) )
-    NCFILE%pNC_ATT(3)%iNC_AttType = NC_CHAR
-    NCFILE%pNC_ATT(3)%iNC_AttSize = int( records, kind=c_size_t )
+    records = history_list_%count
 
-    do indx=0, records
-      NCFILE%pNC_ATT(3)%sAttValue( indx ) = trim(history_list_%get( indx + 1 ))//C_NULL_CHAR
+    do indx=1, records
+
+      jndx = indx + 2
+      NCFILE%pNC_ATT( jndx )%sAttributeName = "history"
+      allocate(NCFILE%pNC_ATT(jndx)%sAttValue( 0:0 ) )
+      NCFILE%pNC_ATT(jndx)%iNC_AttType = NC_CHAR
+      NCFILE%pNC_ATT(jndx)%iNC_AttSize = int( records, kind=c_size_t )
+      NCFILE%pNC_ATT(jndx)%sAttValue( 0 ) = trim(history_list_%get( indx ))//C_NULL_CHAR
+
     enddo
 
   end block
