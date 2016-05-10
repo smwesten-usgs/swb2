@@ -58,6 +58,7 @@ module model_domain
     real (kind=c_float), allocatable       :: pervious_fraction(:)
     real (kind=c_float), allocatable       :: canopy_cover_fraction(:)
     real (kind=c_float), allocatable       :: awc(:)
+    real (kind=c_float), allocatable       :: curve_num_adj(:)
     real (kind=c_float), allocatable       :: gdd(:)
     real (kind=c_float), allocatable       :: crop_coefficient_kcb(:)
     real (kind=c_float), allocatable       :: continuous_frozen_ground_index(:)    
@@ -157,8 +158,8 @@ module model_domain
     procedure ( simple_method ), pointer         :: calc_direct_soil_moisture => model_calculate_direct_soil_moisture_none        
 
     procedure (simple_method), pointer           :: output_GDD             => model_output_GDD
-    procedure (simple_method), pointer           :: output_soil_moisture   => model_output_irrigation_none
     procedure (simple_method), pointer           :: output_irrigation      => model_output_irrigation_none
+    procedure (simple_method), pointer           :: dump_variables         => model_dump_variables_none    
 
     procedure ( simple_method ), pointer         :: read_awc_data           => model_read_available_water_content_gridded
     procedure ( simple_method ), pointer         :: get_precipitation_data => model_get_precip_normal
@@ -201,8 +202,8 @@ module model_domain
     procedure :: row_column_to_index_fn
     generic   :: row_column_to_index => row_column_to_index_fn
 
-    procedure :: dump_model_values_by_cell_sub
-    generic   :: dump_model_values_by_cell => dump_model_values_by_cell_sub
+!     procedure :: dump_model_values_by_cell_sub
+!     generic   :: dump_model_values_by_cell => dump_model_values_by_cell_sub
 
     procedure :: model_initialize_growing_season
     generic   :: initialize_growing_season => model_initialize_growing_season
@@ -218,7 +219,7 @@ module model_domain
     integer (kind=c_int) :: row
   end type CELL_COL_ROW_T
 
-  type ( CELL_COL_ROW_T ) :: DUMP
+  type ( CELL_COL_ROW_T ) :: DUMP(5)
 
   abstract interface
     subroutine simple_method( this )
@@ -325,7 +326,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: iStat(51)
+    integer (kind=c_int)  :: iStat(52)
 
     iCount = count( this%active )
 
@@ -380,6 +381,7 @@ contains
     allocate( this%col_num_1D( iCount ), stat=iStat(49) )
     allocate( this%row_num_1D( iCount ), stat=iStat(50) )    
     allocate( this%it_is_growing_season( iCount ), stat=iStat(51) )
+    allocate( this%curve_num_adj( iCount ), stat=iStat(52) )
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="  &
@@ -419,6 +421,7 @@ contains
     this%irrigation                          = 0.0_c_float
     this%index_order                         = 0_c_int
     this%gdd                                 = 0.0_c_float
+    this%curve_num_adj                       = 0.0_c_float
     this%runoff_outside                      = 0.0_c_float
     this%pervious_fraction                   = 0.0_c_float
     this%surface_storage                     = 0.0_c_float
@@ -742,16 +745,25 @@ contains
 
   !------------------------------------------------------------------------------------------------
 
-  subroutine set_method_pointers_sub(this, sCmdText, sMethodName)
+  subroutine set_method_pointers_sub(this, sCmdText, argv_list )
 
     class (MODEL_DOMAIN_T), intent(inout)   :: this
     character (len=*), intent(in)           :: sCmdText
-    character (len=*), intent(in)           :: sMethodName
+    type (STRING_LIST_T), intent(in)        :: argv_list
 
+    ! [ LOCALS ]
+    integer (kind=c_int)            :: indx
+    integer (kind=c_int)            :: iostat
+    integer (kind=c_int)            :: unitnum
+    character (len=256)             :: filename
+    character (len=:), allocatable  :: Method_Name
+    character (len=:), allocatable  :: col, row
+
+    Method_Name = argv_list%get(1)
 
     if ( sCmdText .contains. "INTERCEPTION" ) then
 
-      if ( sMethodName .strequal. "BUCKET" ) then
+      if ( Method_Name .strequal. "BUCKET" ) then
 
         this%init_interception => model_initialize_interception_bucket
         this%calc_interception => model_calculate_interception_bucket
@@ -763,7 +775,7 @@ contains
 
         call LOGS%WRITE( "==> BUCKET INTERCEPTION submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( sMethodName .strequal. "GASH" ) then
+      elseif ( Method_Name .strequal. "GASH" ) then
 
         this%init_interception => model_initialize_interception_gash
         this%calc_interception => model_calculate_interception_gash
@@ -779,14 +791,14 @@ contains
 
     elseif ( sCmdText .contains. "RUNOFF" ) then
 
-      if ( ( sMethodName .strequal. "C-N" ) .or. ( sMethodName .strequal. "CURVE_NUMBER" ) ) then
+      if ( ( Method_Name .strequal. "C-N" ) .or. ( Method_Name .strequal. "CURVE_NUMBER" ) ) then
 
         this%init_runoff => model_initialize_runoff_curve_number
         this%calc_runoff => model_calculate_runoff_curve_number
 
         call LOGS%WRITE( "==> CURVE NUMBER RUNOFF submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( ( sMethodName .strequal. "RUNOFF_RATIO" ) .or. ( sMethodName .strequal. "MONTHLY_GRID" ) ) then
+      elseif ( ( Method_Name .strequal. "RUNOFF_RATIO" ) .or. ( Method_Name .strequal. "MONTHLY_GRID" ) ) then
 
         this%init_runoff => model_initialize_runoff_gridded_values
         this%calc_runoff => model_calculate_runoff_gridded_values
@@ -802,14 +814,14 @@ contains
 
     elseif ( sCmdText .contains. "SNOWFALL" ) then
 
-      if ( ( sMethodName .strequal. "ORIGINAL" ) .or. ( sMethodName .strequal. "ORIGINAL_SWB_METHOD" ) ) then
+      if ( ( Method_Name .strequal. "ORIGINAL" ) .or. ( Method_Name .strequal. "ORIGINAL_SWB_METHOD" ) ) then
 
         this%init_snowfall => model_initialize_snowfall_original
         this%calc_snowfall => model_calculate_snowfall_original
 
         call LOGS%WRITE( "==> ORIGINAL SNOWFALL submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( sMethodName .strequal. "PRMS" ) then
+      elseif ( Method_Name .strequal. "PRMS" ) then
 
         this%init_snowfall => model_initialize_snowfall_prms
         this%calc_snowfall => model_calculate_snowfall_prms
@@ -825,14 +837,14 @@ contains
 
     elseif ( sCmdText .contains. "AVAILABLE_WATER_CONTENT" ) then
 
-      if ( ( sMethodName .strequal. "TABLE" ) ) then
+      if ( ( Method_Name .strequal. "TABLE" ) ) then
 
         this%init_awc => model_initialize_available_water_content_table
         this%read_awc_data => model_read_available_water_content_table
 
         call LOGS%WRITE( "==> TABLE method for populating AVAILABLE_WATER_CONTENT selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( ( sMethodName .strequal. "GRID" ) .or. ( sMethodName .strequal. "GRIDDED" ) ) then
+      elseif ( ( Method_Name .strequal. "GRID" ) .or. ( Method_Name .strequal. "GRIDDED" ) ) then
 
         this%init_awc => model_initialize_available_water_content_gridded
         this%read_awc_data => model_read_available_water_content_gridded
@@ -848,7 +860,7 @@ contains
 
     elseif ( sCmdText .contains. "FLOW_ROUTING" ) then
 
-      if ( sMethodName .strequal. "D8" ) then
+      if ( Method_Name .strequal. "D8" ) then
 
         this%init_routing => model_initialize_routing_D8
         this%calc_routing => model_calculate_routing_D8
@@ -868,8 +880,8 @@ contains
     elseif ( ( sCmdText .contains. "CROP_COEFFICIENT" )    &
         .or. ( sCmdText .contains. "CROP_COEF" ) )  then
 
-      if ( ( sMethodName .strequal. "FAO56" )  &
-             .or. ( sMethodName .strequal. "FAO-56" ) ) then
+      if ( ( Method_Name .strequal. "FAO56" )  &
+             .or. ( Method_Name .strequal. "FAO-56" ) ) then
 
         this%init_crop_coefficient => model_initialize_crop_coefficient_FAO56
         this%update_crop_coefficient => model_update_crop_coefficient_FAO56
@@ -889,7 +901,7 @@ contains
 
     elseif ( sCmdText .contains. "FOG" ) then
 
-      if ( sMethodName .strequal. "MONTHLY_GRID" ) then
+      if ( Method_Name .strequal. "MONTHLY_GRID" ) then
 
         this%init_fog => model_initialize_fog_monthly_grid
         this%calc_fog => model_calculate_fog_monthly_grid
@@ -907,8 +919,8 @@ contains
 
     elseif ( sCmdText .contains. "IRRIGATION" ) then
 
-      if ( ( sMethodName .strequal. "FAO56" )  &
-             .or. ( sMethodName .strequal. "FAO-56" ) ) then
+      if ( ( Method_Name .strequal. "FAO56" )  &
+             .or. ( Method_Name .strequal. "FAO-56" ) ) then
 
         this%init_irrigation => model_initialize_irrigation
         this%calc_irrigation => model_calculate_irrigation
@@ -932,7 +944,7 @@ contains
 
     elseif ( sCmdText .contains. "SOIL_STORAGE_MAX" ) then
 
-      if ( sMethodName .strequal. "GRIDDED" ) then
+      if ( Method_Name .strequal. "GRIDDED" ) then
 
         this%init_soil_storage_max => model_initialize_soil_storage_max_gridded
 
@@ -951,8 +963,8 @@ contains
 
     elseif ( sCmdText .contains. "EVAPOTRANSPIRATION" ) then
 
-      if ( ( sMethodName .strequal. "HARGREAVES" ) &
-           .or. ( sMethodName .strequal. "HARGREAVES-SAMANI" ) ) then
+      if ( ( Method_Name .strequal. "HARGREAVES" ) &
+           .or. ( Method_Name .strequal. "HARGREAVES-SAMANI" ) ) then
 
         this%init_reference_et => model_initialize_et_hargreaves
         this%calc_reference_et => model_calculate_et_hargreaves
@@ -960,8 +972,8 @@ contains
         call LOGS%WRITE( "==> HARGREAVES-SAMANI EVAPOTRANSPIRATION submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( ( sMethodName .strequal. "JENSEN-HAISE" ) &
-           .or. ( sMethodName .strequal. "JH" ) ) then
+      elseif ( ( Method_Name .strequal. "JENSEN-HAISE" ) &
+           .or. ( Method_Name .strequal. "JH" ) ) then
 
         this%init_reference_et => model_initialize_et_jensen_haise
         this%calc_reference_et => model_calculate_et_jensen_haise
@@ -969,8 +981,8 @@ contains
         call LOGS%WRITE( "==> JENSEN_HAISE EVAPOTRANSPIRATION submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( ( sMethodName .strequal. "MONTHLY_GRID" ) &
-           .or. ( sMethodName .strequal. "MONTHLY_GRIDDED" ) ) then
+      elseif ( ( Method_Name .strequal. "MONTHLY_GRID" ) &
+           .or. ( Method_Name .strequal. "MONTHLY_GRIDDED" ) ) then
 
         this%init_reference_et => model_initialize_et_monthly_grid
         this%calc_reference_et => model_calculate_et_monthly_grid
@@ -978,8 +990,8 @@ contains
         call LOGS%WRITE( "==> MONTHLY_GRID EVAPOTRANSPIRATION submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( ( sMethodName .strequal. "DAILY_GRID" ) &
-           .or. ( sMethodName .strequal. "DAILY_GRIDDED" ) ) then
+      elseif ( ( Method_Name .strequal. "DAILY_GRID" ) &
+           .or. ( Method_Name .strequal. "DAILY_GRIDDED" ) ) then
 
         this%init_reference_et => model_initialize_et_daily_grid
         this%calc_reference_et => model_calculate_et_daily_grid
@@ -996,9 +1008,9 @@ contains
 
     elseif ( sCmdText .contains. "PRECIPITATION" ) then
 
-      if ( ( sMethodName .strequal. "NORMAL" )                &
-           .or. ( sMethodName .strequal. "GRIDDED" )            &
-           .or. ( sMethodName .strequal. "STANDARD" ) ) then
+      if ( ( Method_Name .strequal. "NORMAL" )                &
+           .or. ( Method_Name .strequal. "GRIDDED" )            &
+           .or. ( Method_Name .strequal. "STANDARD" ) ) then
 
         this%init_precipitation_data => model_initialize_precip_normal
         this%get_precipitation_data => model_get_precip_normal
@@ -1006,8 +1018,8 @@ contains
         call LOGS%WRITE( "==> STANDARD PRECIPITATION submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( ( sMethodName .strequal. "METHOD_OF_FRAGMENTS" ) &
-           .or. ( sMethodName .strequal. "FRAGMENTS" ) ) then
+      elseif ( ( Method_Name .strequal. "METHOD_OF_FRAGMENTS" ) &
+           .or. ( Method_Name .strequal. "FRAGMENTS" ) ) then
 
         this%init_precipitation_data => model_initialize_precip_method_of_fragments
         this%get_precipitation_data => model_get_precip_method_of_fragments
@@ -1040,8 +1052,8 @@ contains
 
     elseif ( sCmdText .contains. "SOIL_MOISTURE" ) then
 
-      if ( ( sMethodName .strequal. "T-M" ) .or. ( sMethodName .strequal. "THORNTHWAITE-MATHER" )      &
-             .or. ( sMethodName .strequal. "THORNTHWAITE") ) then
+      if ( ( Method_Name .strequal. "T-M" ) .or. ( Method_Name .strequal. "THORNTHWAITE-MATHER" )      &
+             .or. ( Method_Name .strequal. "THORNTHWAITE") ) then
 
         this%init_actual_et => model_initialize_actual_et_thornthwaite_mather
         this%calc_actual_et => model_calculate_actual_et_thornthwaite_mather
@@ -1049,7 +1061,7 @@ contains
         call LOGS%WRITE( "==> THORNTHWAITE-MATHER SOIL MOISTURE RETENTION submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( ( sMethodName .strequal. "FAO56" ) .or. ( sMethodName .strequal. "FAO-56" ) ) then
+      elseif ( ( Method_Name .strequal. "FAO56" ) .or. ( Method_Name .strequal. "FAO-56" ) ) then
 
         this%init_actual_et => model_initialize_actual_et_fao56
         this%calc_actual_et => model_calculate_actual_et_fao56
@@ -1063,6 +1075,49 @@ contains
           lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
       endif
+
+    elseif ( sCmdText .contains. "DUMP_VARIABLES" ) then
+
+        this%dump_variables => model_dump_variables_by_cell
+
+        if ( argv_list%count == 2 ) then
+
+          col = argv_list%get(1)
+          row = argv_list%get(2)
+
+          call LOGS%WRITE( "==> SWB will dump variables for cell ("//trim(col)//","      &
+            //trim(row)//").", iLogLevel = LOG_ALL, lEcho = lFALSE )
+
+          do indx=1, ubound( DUMP, 1)
+            if (DUMP( indx )%col /= 0 )  cycle
+
+            DUMP( indx )%col = asInt( col )
+            DUMP( indx )%row = asInt( row )
+            
+            filename = "SWB_variable_values__col_"//trim( col )//"__row_"//trim( row )//".csv"
+
+            open( newunit=unitnum, file=trim(filename), iostat=iostat )
+            call assert( iostat == 0, "Could not open variable dump file for writing." )
+            DUMP( indx )%unitnum = unitnum
+
+            write( unit=DUMP( indx )%unitnum, fmt="(a)")                                                          &
+              "month, day, year,landuse_code, landuse_index, index_order, soil_group, num_upslope_connections, "  &
+              //"sum_upslope_cells, awc, latitude, reference_ET0, actual_ET, curve_num_adj, inflow, runon, "      &
+              //"runoff, outflow, infiltration, snowfall, potential_snowmelt, snowmelt, interception, "           &
+              //"rainfall, interception_storage, tmax, tmin, tmean, snow_storage, "                               &
+              //"soil_storage, soil_storage_max, surface_storage, surface_storage_excess, "                       &
+              //"surface_storage_max, potential_recharge, fog, irrigation, gdd, runoff_outside, "                 &
+              //"pervious_fraction, storm_drain_capture, canopy_cover_fraction, crop_coefficient_kcb, "           &
+              //"cfgi, rooting_depth_max, current_rooting_depth, actual_et_soil, actual_et_impervious, "          &
+              //"actual_et_interception, adjusted_depletion_fraction_p, crop_etc, direct_recharge, "              &
+              //"direct_soil_moisture"
+
+
+            exit
+
+          enddo  
+
+        endif
 
     else
 
@@ -1410,7 +1465,8 @@ contains
 
       call update_previous_5_day_rainfall( interim_inflow, indx )
 
-      call runoff_curve_number_calculate(runoff=this%runoff( index ),                                        &
+      call runoff_curve_number_calculate(runoff=this%runoff( index ),                             &
+                                        curve_num_adj=this%curve_num_adj( index ),                &
                                          landuse_index=this%landuse_index( index ),               &
                                          soil_group=this%soil_group( index ),                     &
                                          soil_storage_max=this%soil_storage_max( index ),         & 
@@ -1424,10 +1480,11 @@ contains
       call update_previous_5_day_rainfall( this%runon + this%rainfall + this%snowmelt - this%interception )
 
       call runoff_curve_number_calculate(runoff=this%runoff,                                             &
+                                                    curve_num_adj=this%curve_num_adj,                    &
                                                     landuse_index=this%landuse_index,                    &
                                                     soil_group=this%soil_group,                          &
                                                     soil_storage_max=this%soil_storage_max,              & 
-                                                    inflow=PREV_5_DAYS_RAIN( :, FIVE_DAY_SUM ),      &
+                                                    inflow=PREV_5_DAYS_RAIN( :, FIVE_DAY_SUM ),          &
                                                     it_is_growing_season=this%it_is_growing_season,      &
                                                     continuous_frozen_ground_index=                      &
                                                         this%continuous_frozen_ground_index ) 
@@ -1818,8 +1875,7 @@ contains
                                         dX=this%X,                                         & 
                                         dY=this%Y,                                         &
                                         dX_lon=this%X_lon,                                 &
-                                        dY_lat=this%Y_lat,                                 &
-                                        output_directory_name=this%output_directory_name )
+                                        dY_lat=this%Y_lat )
 
   end subroutine model_initialize_GDD
 
@@ -1850,6 +1906,58 @@ contains
     call growing_degree_day_output( lActive=this%active, nodata_fill_value=this%nodata_fill_value )
 
   end subroutine model_output_GDD
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_dump_variables_none( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    !> Nothing here to see. 
+
+  end subroutine model_dump_variables_none
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_dump_variables_by_cell( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    ! [ LOCALS ]
+    integer (kind=c_int)   :: indx, jndx
+
+    do jndx=lbound( DUMP, 1), ubound( DUMP, 1)
+
+      indx = this%row_column_to_index( col_num=DUMP( jndx )%col, row_num=DUMP( jndx )%row)
+
+      if ( (indx > lbound( this%landuse_code, 1) ) .and. ( indx <= ubound( this%landuse_code, 1) ) ) then
+
+        write( unit=DUMP( jndx )%unitnum, fmt="(i2,',',i2,',',i4,',',6(i6,','),43(f12.3,','),f12.3)")     &
+          SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                        &
+          this%landuse_code( indx ), this%landuse_index( indx ), this%index_order( indx ),                &
+          this%soil_group( indx ), this%num_upslope_connections( indx ), this%sum_upslope_cells( indx ),  &  
+          this%awc( indx ), this%latitude( indx ), this%reference_ET0( indx ), this%actual_ET( indx ),    &            
+          this%curve_num_adj( indx ), this%inflow( indx ), this%runon( indx ), this%runoff( indx ),       &
+          this%outflow( indx ),                                                                           &
+          this%infiltration( indx ), this%snowfall( indx ), this%potential_snowmelt( indx ),              &
+          this%snowmelt( indx ), this%interception( indx ), this%rainfall( indx ),                        &
+          this%interception_storage( indx ), this%tmax( indx ), this%tmin( indx ), this%tmean( indx ),    &            
+          this%snow_storage( indx ), this%soil_storage( indx ), this%soil_storage_max( indx ),            &
+          this%surface_storage( indx ), this%surface_storage_excess( indx ),                              &      
+          this%surface_storage_max( indx ), this%potential_recharge( indx ), this%fog( indx ),            &
+          this%irrigation( indx ), this%gdd( indx ), this%runoff_outside( indx ),                         &
+          this%pervious_fraction( indx ), this%storm_drain_capture( indx ),                               &
+          this%canopy_cover_fraction( indx ), this%crop_coefficient_kcb( indx ),                          &
+          this%continuous_frozen_ground_index( indx ), this%rooting_depth_max( indx ),                    &
+          this%current_rooting_depth( indx ), this%actual_et_soil( indx ),                                &
+          this%actual_et_impervious( indx ), this%actual_et_interception( indx ),                         &
+          this%adjusted_depletion_fraction_p( indx ), this%crop_etc( indx ), this%direct_recharge( indx ),&
+          this%direct_soil_moisture( indx )
+        
+      endif  
+
+    enddo
+
+  end subroutine model_dump_variables_by_cell
 
 !--------------------------------------------------------------------------------------------------
 
@@ -2091,8 +2199,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     call fog_monthly_grid_initialize( lActive=this%active, PROJ4_string=this%PROJ4_string,  &
-      dX=this%X, dY=this%Y, dX_lon=this%X_lon , dY_lat=this%Y_lat,                          &
-      output_directory_name=this%output_directory_name )
+      dX=this%X, dY=this%Y, dX_lon=this%X_lon , dY_lat=this%Y_lat )
 
   end subroutine model_initialize_fog_monthly_grid
 
@@ -2474,44 +2581,6 @@ contains
     call minmaxmean( this%potential_recharge, "potential_recharge")
 
   end subroutine summarize_state_variables_sub
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine dump_model_values_by_cell_sub( this, colnum, rownum, unitnum )
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-    integer (kind=c_int), intent(in)       :: colnum
-    integer (kind=c_int), intent(in)       :: rownum    
-
-    ! [ LOCALS ]
-    integer (kind=c_int)   :: indx
-
-    indx = this%row_column_to_index( col_num=colnum, row_num=rownum)
-
-    if ( (indx > lbound( this%landuse_code, 1) ) .and. ( indx <= ubound( this%landuse_code, 1) ) ) then
-
-      write( unitnum, fmt="(i2,',',i2,',',i4,',',6(i6,','),39(f12.3,','),f12.3)")                       &
-        this%landuse_code( indx ), this%landuse_index( indx ), this%index_order( indx ),                &
-        this%soil_group( indx ), this%num_upslope_connections( indx ), this%sum_upslope_cells( indx ),  &  
-        this%awc( indx ), this%latitude( indx ), this%reference_ET0( indx ), this%actual_ET( indx ),    &            
-        this%inflow( indx ), this%runon( indx ), this%runoff( indx ), this%outflow( indx ),             &
-        this%infiltration( indx ), this%snowfall( indx ), this%potential_snowmelt( indx ),              &
-        this%snowmelt( indx ), this%interception( indx ), this%rainfall( indx ),                        &
-        this%interception_storage( indx ), this%tmax( indx ), this%tmin( indx ), this%tmean( indx ),    &            
-        this%snow_storage( indx ), this%soil_storage( indx ), this%soil_storage_max( indx ),            &
-        this%surface_storage( indx ), this%surface_storage_excess( indx ),                              &      
-        this%surface_storage_max( indx ) this%potential_recharge( indx ), this%fog( indx ),             &
-        this%irrigation( indx ), this%gdd( indx ),  this%runoff_outside( indx ),                        &
-        this%pervious_fraction( indx ), this%storm_drain_capture( indx ),                               &
-        this%canopy_cover_fraction( indx ), this%crop_coefficient_kcb( indx ),                          &
-        this%continuous_frozen_ground_index( indx ), this%rooting_depth_max( indx ),                    &
-        this%current_rooting_depth( indx ), this%actual_et_soil( indx ),                                &
-        this%actual_et_impervious( indx ), this%actual_et_interception( indx ),                         &
-        this%adjusted_depletion_fraction_p( indx ), this%crop_etc( indx ), this%direct_recharge( indx )
-      
-    endif  
-
-  end subroutine dump_model_values_by_cell_sub
 
 !--------------------------------------------------------------------------------------------------
 

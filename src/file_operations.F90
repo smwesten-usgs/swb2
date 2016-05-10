@@ -14,7 +14,6 @@ module file_operations
   public :: fully_qualified_filename
   
   integer (kind=c_int), parameter         :: MAX_STR_LEN    = 65536
-  character (len=256), public             :: DATA_DIRECTORY_NAME = ""
   
   type, public :: ASCII_FILE_T
 

@@ -38,7 +38,7 @@ module model_initialize
   end type METHODS_LIST_T
 
   integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 37
-  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 13
+  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 14
 
   type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS( NUMBER_OF_KNOWN_GRIDS ) =       &
 
@@ -94,7 +94,8 @@ module model_initialize
       METHODS_LIST_T("CROP_COEFFICIENT       ", lTRUE),                             &
       METHODS_LIST_T("DIRECT_RECHARGE        ", lTRUE),                             &
       METHODS_LIST_T("DIRECT_SOIL_MOISTURE   ", lTRUE),                             &      
-      METHODS_LIST_T("FLOW_ROUTING           ", lFALSE)  ]
+      METHODS_LIST_T("FLOW_ROUTING           ", lFALSE),                            &
+      METHODS_LIST_T("DUMP_VARIABLES         ", lTRUE)   ]
 
   ! grid that will be used in the calculation of cell latitudes
   type (GENERAL_GRID_T), pointer    :: pCOORD_GRD
@@ -105,7 +106,7 @@ contains
 
 !    use polygon_summarize, only : initialize_polygon_summarize
 
-    character (len=256), intent(in) :: output_prefix, output_dirname, data_dirname
+    character (len=*), intent(in) :: output_prefix, output_dirname, data_dirname
 
     
     ! [ LOCALS ]
@@ -1465,11 +1466,15 @@ contains
     type (STRING_LIST_T)             :: myDirectives
     type (STRING_LIST_T)             :: myOptions  
     integer (kind=c_int)             :: iIndex
+    integer (kind=c_int)             :: indx
     character (len=:), allocatable   :: sCmdText
-    character (len=:), allocatable   :: sOptionText
+!    character (len=:), allocatable   :: sOptionText
+    type (STRING_LIST_T)             :: argv_list
     character (len=:), allocatable   :: sArgText
     integer (kind=c_int)             :: iStat
+    integer (kind=c_int)             :: status
     logical (kind=c_bool)            :: lFatal
+    integer (kind=c_int)             :: num_elements
 
     ! obtain a list of control file directives whose key values contain the string sKey
     myDirectives = CF_DICT%grep_keys( trim(sKey) )
@@ -1503,14 +1508,25 @@ contains
         call LOGS%write("> "//sCmdText//" "//sArgText, iLinesBefore=1 )
 
         ! most of the time, we only care about the first dictionary entry, obtained below
-        sOptionText = myOptions%get(1)
+!        sOptionText = myOptions%get(1)
+
+        num_elements = myOptions%count
+
+        call argv_list%clear()
+
+        call assert( status==0, "Failed to allocate memory. Exit status code was "//asCharacter( status )//".",  &
+           __FILE__, __LINE__ )
+
+        do indx=1, myOptions%count
+          call argv_list%append( myOptions%get( indx ) )
+        enddo
 
         ! Any entry in the control file that contains the substring "METHOD" will be
         ! handed to the "set_method_pointers" subroutine in an attempt to wire up the correct
         ! process modules
-        if ( ( sCmdText .contains. "METHOD" ) ) then
+        if ( ( sCmdText .contains. "METHOD" ) .or. ( sCmdText .contains. "DUMP" ) ) then
 
-          call MODEL%set_method_pointers( trim(sCmdText), trim(sOptionText) )
+          call MODEL%set_method_pointers( trim(sCmdText), argv_list )
 
         endif
         

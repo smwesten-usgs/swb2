@@ -237,6 +237,7 @@ add_executable(swb_merge
       datetime.F90
       dictionary.F90
       exceptions.F90
+      logfiles.F90
       file_operations.F90
       grid.F90
       logfiles.F90
@@ -247,6 +248,7 @@ add_executable(swb_merge
       swb_merge_domain.F90
       netcdf4_support.F90
       netcdf_c_api_interfaces.F90
+#      output.F90
       simulation_datetime.F90
       strings.F90
       string_list.F90

@@ -338,6 +338,8 @@ contains
     allocate ( pNCFILE, stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
 
+    !> @TODO: move this call to output.F90
+
     call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE, sVariableName="direct_recharge",  &
       sVariableUnits="inches", iNX=iNX, iNY=iNY,                                              &
       fX=dX, fY=dY, StartDate=SIM_DT%start, EndDate=SIM_DT%end, PROJ4_string=PROJ4_string,    &

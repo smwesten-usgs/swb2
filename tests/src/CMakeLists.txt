@@ -20,7 +20,7 @@ add_executable(test__proj4_support
           ${PROJECT_SOURCE_DIR}/src/string_list.F90
           ${PROJECT_SOURCE_DIR}/src/strings.F90
           ${PROJECT_SOURCE_DIR}/src/proj4_support.F90          
-
+          ${PROJECT_SOURCE_DIR}/src/generated/version_control.F90
 
           test__proj4_support.F90
           )

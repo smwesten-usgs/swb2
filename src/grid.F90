@@ -162,7 +162,7 @@ module grid
   !> @todo change these global (module) variables to local variables
   integer (kind=c_int) :: LU_TEMP, LU_GRID
 
-  character (len=64) :: OUTPUT_DIRECTORY_NAME = ""
+  character (len=64) :: OUTPUT_GRID_DIRECTORY_NAME = ""
 
 contains
 
@@ -171,10 +171,10 @@ contains
 
     character (len=*), intent(in)               :: sDirName
 
-    OUTPUT_DIRECTORY_NAME = trim(sDirName)
+    OUTPUT_GRID_DIRECTORY_NAME = trim(sDirName)
 
     call LOGS%write("ASCII grids will be written to subdirectory "             &
-      //dquote( OUTPUT_DIRECTORY_NAME ), iLogLevel=LOG_ALL,                    &
+      //dquote( OUTPUT_GRID_DIRECTORY_NAME ), iLogLevel=LOG_ALL,                    &
       iLinesBefore=1, lEcho=lTRUE )
 
   end subroutine grid_set_output_directory_name  
@@ -1007,11 +1007,11 @@ subroutine grid_WriteGrid(sFilename, pGrd, iOutputFormat)
 
   if ( iOutputFormat == OUTPUT_ARC ) then
 
-    call grid_WriteArcGrid(trim(OUTPUT_DIRECTORY_NAME)//sFilename, pGrd)
+    call grid_WriteArcGrid(trim(OUTPUT_GRID_DIRECTORY_NAME)//sFilename, pGrd)
 
   elseif ( iOutputFormat == OUTPUT_SURFER ) then
 
-    call grid_WriteSurferGrid(trim(OUTPUT_DIRECTORY_NAME)//sFilename, pGrd)
+    call grid_WriteSurferGrid(trim(OUTPUT_GRID_DIRECTORY_NAME)//sFilename, pGrd)
 
   endif
 
@@ -1046,7 +1046,7 @@ subroutine grid_WriteArcGrid(sFilename, pGrd)
   ! dynamically create the Fortran output format
   write(sBuf,FMT="(a,a,a)") '(',TRIM( asCharacter(iNumCols)),'(a,1x))'
 
-  open ( LU_TEMP, file=trim(OUTPUT_DIRECTORY_NAME)//sFilename, iostat=istat, status="REPLACE" )
+  open ( LU_TEMP, file=trim(OUTPUT_GRID_DIRECTORY_NAME)//sFilename, iostat=istat, status="REPLACE" )
   call assert( istat==0, "Could not open output file "//dQuote(sFilename), &
       TRIM(__FILE__),__LINE__)
 
@@ -1124,7 +1124,7 @@ subroutine grid_WriteSurferGrid(sFilename, pGrd)
   ! dynamically create the Fortran output format
   write(sBuf,FMT="(a,a,a)") '(',TRIM( asCharacter(iNumCols)),'(a,1x))'
 
-  open ( LU_TEMP, file=trim(OUTPUT_DIRECTORY_NAME)//sFilename, iostat=istat, status="REPLACE" )
+  open ( LU_TEMP, file=trim(OUTPUT_GRID_DIRECTORY_NAME)//sFilename, iostat=istat, status="REPLACE" )
   call assert( istat==0, "Could not open output file "//dQuote(sFilename), &
       TRIM(__FILE__),__LINE__)
 

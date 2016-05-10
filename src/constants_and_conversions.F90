@@ -71,6 +71,10 @@ module constants_and_conversions
   real (kind=c_double), parameter :: F_PER_C    = 9.0_c_double / 5.0_c_double  
   real (kind=c_double), parameter :: M_PER_FOOT = 0.3048_c_double 
 
+  character (len=:), allocatable    :: OUTPUT_DIRECTORY_NAME
+  character (len=:), allocatable    :: OUTPUT_PREFIX_NAME 
+  character (len=:), allocatable    :: DATA_DIRECTORY_NAME
+
   type BOUNDS_T
     character (len=:), allocatable  :: sPROJ4_string
     integer (kind=c_int)            :: iNumCols

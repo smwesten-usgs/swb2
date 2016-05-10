@@ -13,7 +13,7 @@ module swb_merge_iterate
   use string_list, only           : STRING_LIST_T
   use strings
   use netcdf4_support
-  use output, only                : write_output
+!  use output, only                : write_output
   implicit none
 
   private

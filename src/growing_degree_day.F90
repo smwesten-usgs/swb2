@@ -28,8 +28,7 @@ contains
 
   subroutine growing_degree_day_initialize( lActive, iLanduseIndex,          & 
                                             PROJ4_string, dX, dY,            &
-                                            dX_lon, dY_lat,                  &
-                                            output_directory_name )
+                                            dX_lon, dY_lat )
 
     logical (kind=c_bool), intent(in)     :: lActive(:,:)
     integer (kind=c_int), intent(in)      :: iLanduseIndex(:)
@@ -38,7 +37,6 @@ contains
     real (kind=c_double), intent(in)      :: dY(:)
     real (kind=c_double), intent(in)      :: dX_lon(:,:)
     real (kind=c_double), intent(in)      :: dY_lat(:,:)
-    character (len=256), intent(in)       :: output_directory_name
 
     ! [ LOCALS ]
     integer (kind=c_int)              :: iStat
@@ -146,8 +144,7 @@ contains
       sVariableUnits="degree-days Fahrenheit", iNX=ubound(lActive, 1), iNY=ubound(lActive, 2),  &
       fX=dX, fY=dY,                                                                             &
       StartDate=SIM_DT%start, EndDate=SIM_DT%end, PROJ4_string=PROJ4_string,                    &
-      dpLat=dY_lat, dpLon=dX_lon, fValidMin=0.0, fValidMax=9000.0,                              &
-      sDirName=output_directory_name )
+      dpLat=dY_lat, dpLon=dX_lon, fValidMin=0.0, fValidMax=9000.0 )
 
   end subroutine growing_degree_day_initialize
 

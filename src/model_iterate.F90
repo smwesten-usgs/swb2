@@ -7,7 +7,7 @@ module model_iterate
   use logfiles, only                  : LOGS, LOG_ALL
   use model_domain, only              : MODEL_DOMAIN_T
   use simulation_datetime, only       : SIM_DT
-  use output, only                    : write_output, OUTPUT_DIRECTORY_NAME
+  use output, only                    : write_output
   use polygon_summarize, only         : perform_polygon_summarize
   implicit none
 
@@ -31,7 +31,7 @@ contains
       call cells%output_GDD()
 !      call perform_polygon_summarize( cells )
       
-      call cells%dump_model_values_by_cell( colnum=67, rownum=251 )
+      call cells%dump_variables( )
 
       call SIM_DT%addDay( )
 

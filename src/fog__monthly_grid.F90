@@ -46,7 +46,7 @@ contains
   !! @param[in] dY_lat 2D array of latitude values.
 
   subroutine fog_monthly_grid_initialize( lActive, PROJ4_string, dX, dY,            &
-                                          dX_lon, dY_lat, output_directory_name )
+                                          dX_lon, dY_lat )
 
     logical (kind=c_bool), intent(in)     :: lActive(:,:)
     character (len=*), intent(inout)      :: PROJ4_string
@@ -54,7 +54,6 @@ contains
     real (kind=c_double), intent(in)      :: dY(:)
     real (kind=c_double), intent(in)      :: dX_lon(:,:)
     real (kind=c_double), intent(in)      :: dY_lat(:,:)
-    character (len=*), intent(inout)      :: output_directory_name
 
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iStat
@@ -106,8 +105,7 @@ contains
       sVariableUnits="inches", iNX=iNX, iNY=iNY,                                 &
       fX=dX, fY=dY,                                                              &
       StartDate=SIM_DT%start, EndDate=SIM_DT%end, PROJ4_string=PROJ4_string,     &
-      dpLat=dY_lat, dpLon=dX_lon, fValidMin=0.0, fValidMax=2000.0,               &
-      sDirName=output_directory_name )
+      dpLat=dY_lat, dpLon=dX_lon, fValidMin=0.0, fValidMax=2000.0 ) 
 
 
   end subroutine fog_monthly_grid_initialize

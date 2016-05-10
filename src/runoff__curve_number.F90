@@ -374,6 +374,7 @@ contains
   !!       and Q. D. Quan. “Runoff Curve Number Method: Examination of the Initial Abstraction Ratio.”
   !!       In Conference Proceeding Paper, World Water and Environmental Resources Congress, 2003.
   elemental subroutine runoff_curve_number_calculate(runoff,                              &
+                                                     curve_num_adj,                       &
                                                      landuse_index,                       &
                                                      soil_group,                          &
                                                      it_is_growing_season,                &
@@ -382,6 +383,7 @@ contains
                                                      continuous_frozen_ground_index ) 
 
     real (kind=c_float), intent(inout)  :: runoff
+    real (kind=c_float), intent(inout)  :: curve_num_adj
     integer (kind=c_int), intent(in)    :: landuse_index
     integer (kind=c_int), intent(in)    :: soil_group
     logical (kind=c_bool), intent(in)   :: it_is_growing_season
@@ -394,12 +396,12 @@ contains
     real (kind=c_float) :: Smax
     real (kind=c_float) :: CN_adj
 
-    CN_adj = update_curve_number_fn( landuse_index, soil_group, inflow,                &
-                                     it_is_growing_season,                             &
-                                     soil_storage_max,                                 &
-                                     continuous_frozen_ground_index )
+    curve_num_adj = update_curve_number_fn( landuse_index, soil_group, inflow,                &
+                                            it_is_growing_season,                             &
+                                            soil_storage_max,                                 &
+                                            continuous_frozen_ground_index )
 
-    Smax = ( 1000.0_c_float / CN_adj ) - 10.0_c_float
+    Smax = ( 1000.0_c_float / curve_num_adj ) - 10.0_c_float
 
 !     ! Equation 9, Hawkins and others, 2002
 !     CN_05 = 100_c_float / &

@@ -911,7 +911,7 @@ end subroutine netcdf_open_and_prepare_as_output_archive
 
 subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUnits,    &
    iNX, iNY, fX, fY, StartDate, EndDate, PROJ4_string, history_list, executable_name,   &
-   dpLat, dpLon, fValidMin, fValidMax, sPrefixName, sDirName )
+   dpLat, dpLon, fValidMin, fValidMax )
 
   type (T_NETCDF4_FILE ), pointer            :: NCFILE
   character (len=*), intent(in)              :: sVariableName
@@ -929,17 +929,13 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   real (kind=c_double), intent(in), optional :: dpLon(:,:)
   real (kind=c_float), intent(in), optional  :: fValidMin
   real (kind=c_float), intent(in), optional  :: fValidMax
-  character (len=256), intent(in), optional  :: sPrefixName  
-  character (len=256), intent(in), optional  :: sDirName
 
 !   ! [ LOCALS ]
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
   type (T_NETCDF_DIMENSION), pointer :: pNC_DIM
   integer (kind=c_int) :: iIndex
   character (len=10)                                :: sOriginText
-  character (len=256)                               :: sFilename
-  character (len=256)                               :: sDirName_
-  character (len=256)                               :: sPrefixName_  
+  character (len=:), allocatable                    :: sFilename
   type (STRING_LIST_T), pointer                     :: history_list_
   character (len=:), allocatable                    :: executable_name_
   type (DATETIME_T)                                 :: DT
@@ -947,18 +943,6 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   call DT%systime()
   date_time_text = DT%prettydatetime()
 
-
-  if (present( sDirName ) ) then
-    sDirName_ = trim( sDirName )
-  else
-    sDirName_ = ""
-  endif   
-
-  if (present( sPrefixName ) ) then
-    if ( len_trim( sPrefixName ) > 0 )  sPrefixName_ = trim( sPrefixName )//"_"
-  else
-    sPrefixName_ = ""
-  endif   
 
   if ( present( executable_name ) ) then
     executable_name_ = trim( executable_name )
@@ -977,8 +961,8 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
 
   write(sOriginText, fmt="(i4.4,'-',i2.2,'-',i2.2)") StartDate%iYear, StartDate%iMonth, StartDate%iDay
 
-  sFilename = trim(sDirName_)//trim(sPrefixName_)//trim(sVariableName)//"_"//trim(asCharacter(StartDate%iYear))   &
-    //"_"//trim(asCharacter(EndDate%iYear))//"__"//trim(asCharacter(iNY))                    &
+  sFilename = trim(OUTPUT_DIRECTORY_NAME)//trim(OUTPUT_PREFIX_NAME)//trim(sVariableName)//"_"                    &
+    //trim(asCharacter(StartDate%iYear))//"_"//trim(asCharacter(EndDate%iYear))//"__"//trim(asCharacter(iNY))    &
     //"_by_"//trim(asCharacter(iNX))//".nc"
 
   call LOGS%write("Attempting to open NetCDF file for writing with filename "//dquote(sFilename))

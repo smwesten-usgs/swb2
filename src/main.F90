@@ -23,21 +23,23 @@ program main
   type (STRING_LIST_T)           :: slControlFiles
 
   character (len=256)            :: sBuf
-  character (len=256)            :: sOutputPrefixName
-  character (len=256)            :: sOutputDirectoryName
-  character (len=256)            :: sDataDirectoryName
+  character (len=:), allocatable :: sOutputPrefixName
+  character (len=:), allocatable :: sOutputDirectoryName
+  character (len=:), allocatable :: sDataDirectoryName
   integer (kind=c_int)           :: iNumArgs
-  character (len=1024)           :: sCompilerFlags       = ""
-  character (len=256)            :: sCompilerVersion     = ""
-  character (len=256)            :: sVersionString       = ""
-  character (len=256)            :: sGitHashString       = ""
+  character (len=1024)           :: sCompilerFlags
+  character (len=256)            :: sCompilerVersion
+  character (len=256)            :: sVersionString
+  character (len=256)            :: sGitHashString
   integer (kind=c_int)           :: iCount
   integer (kind=c_int)           :: iIndex
   integer (kind=c_int)           :: iLen
 
-  iNumArgs = COMMAND_ARGUMENT_COUNT()
+  sOutputPrefixName    = ""
+  sOutputDirectoryName = ""
+  sDataDirectoryName   = ""
 
-print *, "NUMBER OF ARGUMENTS: ", iNumArgs
+  iNumArgs = COMMAND_ARGUMENT_COUNT()
 
   sVersionString = "  Soil Water Balance Code version "//trim( SWB_VERSION )    &
       //" -- compiled on: "//trim(COMPILE_DATE)//" "//trim(COMPILE_TIME)
@@ -77,14 +79,9 @@ print *, "NUMBER OF ARGUMENTS: ", iNumArgs
     write(UNIT=*,FMT="(/,/,a,/,a,/,a,/)")  "Usage: swb2 [control file name] [--output_prefix=][--output_dir=][--data_dir=]", &
                                            "                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", &
                                            "                                                   (optional)"
-
     stop
 
   end if
-
-  sOutputPrefixName    = ""
-  sOutputDirectoryName = ""
-  sDataDirectoryName   = ""
 
   do iIndex=1, iNumArgs
 

@@ -11,7 +11,7 @@ module swb_merge_initialize
   use file_operations
   use grid
   use netcdf4_support
-  use output, only                       : initialize_output
+!  use output, only                       : initialize_output
   use swb_merge_domain
   use simulation_datetime, only : SIM_DT
   use strings
@@ -50,7 +50,7 @@ contains
 
   subroutine initialize_all( filelist )
 
-    type (STRING_LIST_T), intent(in)    :: filelist
+    type (STRING_LIST_T), intent(inout)    :: filelist
 
     ! [ LOCALS ]
     real (kind=c_double),parameter      :: num_cells_as_buffer = 2.0
@@ -84,7 +84,7 @@ contains
     allocate( MODEL%NCFILE, stat=status )
     allocate( history_list )
 
-    call history_list%append(date_time_text//": Begin merge of "//asCharacter( num_files ) &
+    call history_list%append(trim(date_time_text)//": Begin merge of "//asCharacter( num_files ) &
       //" netCDF files.")
 
     do indx=1, num_files
