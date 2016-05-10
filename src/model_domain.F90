@@ -212,6 +212,13 @@ module model_domain
 
   end type MODEL_DOMAIN_T
 
+  type :: CELL_COL_ROW_T
+    integer (kind=c_int) :: unitnum
+    integer (kind=c_int) :: col
+    integer (kind=c_int) :: row
+  end type CELL_COL_ROW_T
+
+  type ( CELL_COL_ROW_T ) :: DUMP
 
   abstract interface
     subroutine simple_method( this )
@@ -1441,7 +1448,7 @@ contains
     integer (kind=c_int) :: status
 
     allocate( this%monthly_runoff( count( this%active ) ), stat=status)
-    call assert( status==0, "Problem allicating memory", __FILE__, __LINE__ )
+    call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
 
     call runoff_gridded_values_initialize( this%active )
     call runoff_gridded_values_update_ratios( )
@@ -2470,7 +2477,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine dump_model_values_by_cell_sub( this, colnum, rownum )
+  subroutine dump_model_values_by_cell_sub( this, colnum, rownum, unitnum )
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     integer (kind=c_int), intent(in)       :: colnum
@@ -2483,61 +2490,24 @@ contains
 
     if ( (indx > lbound( this%landuse_code, 1) ) .and. ( indx <= ubound( this%landuse_code, 1) ) ) then
 
-      write(*,fmt="('Dump of variable values for cell: ',i8,'  row: ',i8,'   col: ',i8)") indx, rownum, colnum
-      write(*,fmt="(a)") repeat('-',80)
-      write(*,fmt="('LU code:',t25,i8)") this%landuse_code( indx )                     
-      write(*,fmt="('LU index:',t25,i8)")this%landuse_index( indx )
-      write(*,fmt="('index order:',t25,i8)") this%index_order( indx )               
-      write(*,fmt="('soil group:',t25,i8)")this%soil_group( indx )            
-      write(*,fmt="('# upslope connections:',t25,i8)")this%num_upslope_connections( indx )
-      write(*,fmt="('# upslope cells:',t25,i8)")this%sum_upslope_cells( indx )  
-
-      write(*,fmt="('avail. water. capy.:',t25,f14.3)")this%awc( indx )        
-      write(*,fmt="('Latitude:',t25,f14.3)")this%latitude( indx )                      
-      write(*,fmt="('Reference ET0:',t25,f14.3)")this%reference_ET0( indx )                 
-      write(*,fmt="('Actual ET:',t25,f14.3)")this%actual_ET( indx )            
-      write(*,fmt="('inflow:',t25,f14.3)")this%inflow( indx )                
-      write(*,fmt="('runon:',t25,f14.3)")this%runon( indx )                   
-      write(*,fmt="('runoff:',t25,f14.3)")this%runoff( indx )                    
-      write(*,fmt="('outflow:',t25,f14.3)") this%outflow( indx )                   
-      write(*,fmt="('infiltration:',t25,f14.3)") this%infiltration( indx )                  
-      write(*,fmt="('snowfall:',t25,f14.3)") this%snowfall( indx )             
-      write(*,fmt="('potential snowmelt:',t25,f14.3)") this%potential_snowmelt( indx )     
-      write(*,fmt="('snowmelt:',t25,f14.3)") this%snowmelt( indx )                 
-
-      write(*,fmt="('interception:',t25,f14.3)") this%interception( indx )                 
-      write(*,fmt="('rainfall:',t25,f14.3)") this%rainfall( indx )             
-      write(*,fmt="('intercept. stor.:',t25,f14.3)") this%interception_storage( indx )
-      write(*,fmt="('tmax:',t25,f14.3)") this%tmax( indx )
-      write(*,fmt="('tmin:',t25,f14.3)") this%tmin( indx )
-      write(*,fmt="('tmean:',t25,f14.3)") this%tmean( indx )            
-      write(*,fmt="('snow storage:',t25,f14.3)") this%snow_storage( indx )     
-      write(*,fmt="('soil storage:',t25,f14.3)") this%soil_storage( indx )             
-      write(*,fmt="('soil storage max:',t25,f14.3)") this%soil_storage_max( indx )             
-      write(*,fmt="('surface storage:',t25,f14.3)") this%surface_storage( indx )        
-      write(*,fmt="('surface storage excess:',t25,f14.3)") this%surface_storage_excess( indx )          
-      write(*,fmt="('surface storage max:',t25,f14.3)") this%surface_storage_max( indx )   
-
-      write(*,fmt="('potential recharge:',t25,f14.3)") this%potential_recharge( indx )         
-      write(*,fmt="('fog:',t25,f14.3)") this%fog( indx )       
-      write(*,fmt="('irrigation:',t25,f14.3)") this%irrigation( indx )                      
-      write(*,fmt="('GDD:',t25,f14.3)") this%gdd( indx )              
-      write(*,fmt="('runoff outside:',t25,f14.3)") this%runoff_outside( indx )
-      write(*,fmt="('pervious fraction:',t25,f14.3)") this%pervious_fraction( indx )           
-      write(*,fmt="('storm drain capture:',t25,f14.3)") this%storm_drain_capture( indx )      
-      write(*,fmt="('canopy cover fraction:',t25,f14.3)") this%canopy_cover_fraction( indx )      
-      write(*,fmt="('crop coefficient Kcb:',t25,f14.3)") this%crop_coefficient_kcb( indx )    
-      write(*,fmt="('CFGI:',t25,f14.3)") this%continuous_frozen_ground_index( indx )
-      write(*,fmt="('rooting depth max:',t25,f14.3)") this%rooting_depth_max( indx )
-      write(*,fmt="('current rooting depth',t25,f14.3)") this%current_rooting_depth( indx )        
-      write(*,fmt="('polygon id:',t25,i8)") this%polygon_id( indx )    
-      write(*,fmt="('actual_et_soil:',t25,f14.3)") this%actual_et_soil( indx )               
-      write(*,fmt="('actual_et_impervious:',t25,f14.3)") this%actual_et_impervious( indx )           
-      write(*,fmt="('actual_et_interception:',t25,f14.3)") this%actual_et_interception( indx )     
-      write(*,fmt="('adjusted depletion frac p:',t25,f14.3)") this%adjusted_depletion_fraction_p( indx )   
-      write(*,fmt="('crop Etc:',t25,f14.3)") this%crop_etc( indx )    
-      write(*,fmt="('direct recharge:',t25,f14.3)") this%direct_recharge( indx )                 
-      write(*,fmt="('days since planting:',t25,i8)") this%number_of_days_since_planting( indx )
+      write( unitnum, fmt="(i2,',',i2,',',i4,',',6(i6,','),39(f12.3,','),f12.3)")                       &
+        this%landuse_code( indx ), this%landuse_index( indx ), this%index_order( indx ),                &
+        this%soil_group( indx ), this%num_upslope_connections( indx ), this%sum_upslope_cells( indx ),  &  
+        this%awc( indx ), this%latitude( indx ), this%reference_ET0( indx ), this%actual_ET( indx ),    &            
+        this%inflow( indx ), this%runon( indx ), this%runoff( indx ), this%outflow( indx ),             &
+        this%infiltration( indx ), this%snowfall( indx ), this%potential_snowmelt( indx ),              &
+        this%snowmelt( indx ), this%interception( indx ), this%rainfall( indx ),                        &
+        this%interception_storage( indx ), this%tmax( indx ), this%tmin( indx ), this%tmean( indx ),    &            
+        this%snow_storage( indx ), this%soil_storage( indx ), this%soil_storage_max( indx ),            &
+        this%surface_storage( indx ), this%surface_storage_excess( indx ),                              &      
+        this%surface_storage_max( indx ) this%potential_recharge( indx ), this%fog( indx ),             &
+        this%irrigation( indx ), this%gdd( indx ),  this%runoff_outside( indx ),                        &
+        this%pervious_fraction( indx ), this%storm_drain_capture( indx ),                               &
+        this%canopy_cover_fraction( indx ), this%crop_coefficient_kcb( indx ),                          &
+        this%continuous_frozen_ground_index( indx ), this%rooting_depth_max( indx ),                    &
+        this%current_rooting_depth( indx ), this%actual_et_soil( indx ),                                &
+        this%actual_et_impervious( indx ), this%actual_et_interception( indx ),                         &
+        this%adjusted_depletion_fraction_p( indx ), this%crop_etc( indx ), this%direct_recharge( indx )
       
     endif  
 
