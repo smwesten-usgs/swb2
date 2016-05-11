@@ -27,7 +27,7 @@ module model_initialize
   public :: check_for_fatal_warnings
 
   type GRIDDED_DATASETS_T
-    character (len=29)     :: sName
+    character (len=38)     :: sName
     logical (kind=c_bool)  :: lOptional
     integer (kind=c_int)   :: iDataType 
   end type GRIDDED_DATASETS_T
@@ -37,48 +37,49 @@ module model_initialize
     logical (kind=c_bool)  :: lOptional
   end type METHODS_LIST_T
 
-  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 37
+  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 38
   integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 14
 
   type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS( NUMBER_OF_KNOWN_GRIDS ) =       &
 
-    [ GRIDDED_DATASETS_T("PRECIPITATION                ", lFALSE, DATATYPE_FLOAT ),     &
-      GRIDDED_DATASETS_T("TMIN                         ", lFALSE, DATATYPE_FLOAT ),     &
-      GRIDDED_DATASETS_T("TMAX                         ", lFALSE, DATATYPE_FLOAT ),     &
-      GRIDDED_DATASETS_T("AVAILABLE_WATER_CONTENT      ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("POTENTIAL_ET                 ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("SOLAR_RADIATION              ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("WIND_SPEED                   ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("RAINFALL_ZONE                ", lTRUE, DATATYPE_INT ),        &
-      GRIDDED_DATASETS_T("FLOW_DIRECTION               ", lTRUE, DATATYPE_INT),         &
-      GRIDDED_DATASETS_T("FOG_RATIO                    ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("LAND_USE                     ", lFALSE, DATATYPE_INT ),       &
-      GRIDDED_DATASETS_T("SOILS_CODE                   ", lTRUE, DATATYPE_INT ),        &
-      GRIDDED_DATASETS_T("HYDROLOGIC_SOILS_GROUP       ", lFALSE, DATATYPE_INT ),       &
-      GRIDDED_DATASETS_T("INITIAL_PERCENT_SOIL_MOISTURE", lFALSE, DATATYPE_FLOAT),      &
-      GRIDDED_DATASETS_T("INITIAL_SNOW_COVER_STORAGE   ", lFALSE, DATATYPE_FLOAT),      &
-      GRIDDED_DATASETS_T("PERCENT_CANOPY_COVER         ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("PERCENT_PERVIOUS_COVER       ", lTRUE, DATATYPE_FLOAT ),      &      
-      GRIDDED_DATASETS_T("PERCENT_IMPERVIOUS_COVER     ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("FRACTION_CANOPY_COVER        ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("FRACTION_PERVIOUS_COVER      ", lTRUE, DATATYPE_FLOAT ),      &      
-      GRIDDED_DATASETS_T("FRACTION_IMPERVIOUS_COVER    ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("STEMFLOW_FRACTION            ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("EVAPORATION_TO_RAINFALL_RATIO", lTRUE, DATATYPE_FLOAT ),      & 
-      GRIDDED_DATASETS_T("RAINFALL_ADJUST_FACTOR       ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("CESSPOOL_LEAKAGE             ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("STORM_DRAIN_LEAKAGE          ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("WATER_BODY_LEAKAGE           ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("WATER_MAIN_LEAKAGE           ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("DISPOSAL_WELL_DISCHARGE      ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("ANNUAL_DIRECT_RECHARGE_RATE  ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("ANNUAL_SEPTIC_DISCHARGE      ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("SEPTIC_DISCHARGE             ", lTRUE, DATATYPE_FLOAT ),      &      
-      GRIDDED_DATASETS_T("RUNOFF_ZONE                  ", lTRUE, DATATYPE_INT ),        & 
-      GRIDDED_DATASETS_T("POLYGON_ID                   ", lTRUE, DATATYPE_INT ),        & 
-      GRIDDED_DATASETS_T("SOIL_STORAGE_MAX             ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("IRRIGATION_MASK              ", lTRUE, DATATYPE_INT),         &                
-      GRIDDED_DATASETS_T("RELATIVE_HUMIDITY            ", lTRUE, DATATYPE_FLOAT )   ]
+    [ GRIDDED_DATASETS_T("PRECIPITATION                         ", lFALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("TMIN                                  ", lFALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("TMAX                                  ", lFALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("AVAILABLE_WATER_CONTENT               ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("POTENTIAL_ET                          ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("SOLAR_RADIATION                       ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("WIND_SPEED                            ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("RAINFALL_ZONE                         ", lTRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("FLOW_DIRECTION                        ", lTRUE, DATATYPE_INT),         &
+      GRIDDED_DATASETS_T("FOG_RATIO                             ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("LAND_USE                              ", lFALSE, DATATYPE_INT ),       &
+      GRIDDED_DATASETS_T("SOILS_CODE                            ", lTRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("HYDROLOGIC_SOILS_GROUP                ", lFALSE, DATATYPE_INT ),       &
+      GRIDDED_DATASETS_T("INITIAL_PERCENT_SOIL_MOISTURE         ", lFALSE, DATATYPE_FLOAT),      &
+      GRIDDED_DATASETS_T("INITIAL_SNOW_COVER_STORAGE            ", lTRUE, DATATYPE_FLOAT),      &
+      GRIDDED_DATASETS_T("INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX", lTRUE, DATATYPE_FLOAT),      &      
+      GRIDDED_DATASETS_T("PERCENT_CANOPY_COVER                  ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("PERCENT_PERVIOUS_COVER                ", lTRUE, DATATYPE_FLOAT ),      &      
+      GRIDDED_DATASETS_T("PERCENT_IMPERVIOUS_COVER              ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("FRACTION_CANOPY_COVER                 ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("FRACTION_PERVIOUS_COVER               ", lTRUE, DATATYPE_FLOAT ),      &      
+      GRIDDED_DATASETS_T("FRACTION_IMPERVIOUS_COVER             ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("STEMFLOW_FRACTION                     ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("EVAPORATION_TO_RAINFALL_RATIO         ", lTRUE, DATATYPE_FLOAT ),      & 
+      GRIDDED_DATASETS_T("RAINFALL_ADJUST_FACTOR                ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("CESSPOOL_LEAKAGE                      ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("STORM_DRAIN_LEAKAGE                   ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("WATER_BODY_LEAKAGE                    ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("WATER_MAIN_LEAKAGE                    ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("DISPOSAL_WELL_DISCHARGE               ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("ANNUAL_DIRECT_RECHARGE_RATE           ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("ANNUAL_SEPTIC_DISCHARGE               ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("SEPTIC_DISCHARGE                      ", lTRUE, DATATYPE_FLOAT ),      &      
+      GRIDDED_DATASETS_T("RUNOFF_ZONE                           ", lTRUE, DATATYPE_INT ),        & 
+      GRIDDED_DATASETS_T("POLYGON_ID                            ", lTRUE, DATATYPE_INT ),        & 
+      GRIDDED_DATASETS_T("SOIL_STORAGE_MAX                      ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("IRRIGATION_MASK                       ", lTRUE, DATATYPE_INT),         &                
+      GRIDDED_DATASETS_T("RELATIVE_HUMIDITY                     ", lTRUE, DATATYPE_FLOAT )   ]
 
   type (METHODS_LIST_T), parameter  :: KNOWN_METHODS( NUMBER_OF_KNOWN_METHODS ) =   &
 
@@ -173,6 +174,10 @@ contains
     ! is the end of the simulation!
     call check_for_fatal_warnings()
 
+    ! dump details about all gridded datasets currently in the data_catalog
+    call DAT%print()
+    call CF_DICT%print_all( iLogLevel=LOG_DEBUG)
+
   end subroutine initialize_all
 
 !--------------------------------------------------------------------------------------------------
@@ -244,6 +249,10 @@ contains
 
     call initialize_soil_storage()
 
+    call initialize_snow_storage()
+
+    call MODEL%init_continuous_frozen_ground_index()
+
     call initialize_surface_storage_max()
 
     call storm_drain_capture_initialize()
@@ -262,6 +271,46 @@ contains
     DATA_DIRECTORY_NAME = data_dirname
 
   end subroutine set_data_directory
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine initialize_snow_storage()
+
+    type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_SNOW_COVER_STORAGE
+
+    ! [ LOCALS ]
+    real (kind=c_float), allocatable  :: fInitial_Snow_Cover_Storage(:)
+    integer (kind=c_int)              :: iStat 
+
+    allocate ( fInitial_Snow_Cover_Storage( count( MODEL%active ) ), stat=iStat )
+
+    ! locate the data structure associated with the gridded initial_snow_cover_storage
+    pINITIAL_SNOW_COVER_STORAGE => DAT%find("INITIAL_SNOW_COVER_STORAGE")
+
+    if ( .not. associated( pINITIAL_SNOW_COVER_STORAGE ) ) then
+        call warn(sMessage="An INITIAL_SNOW_COVER_STORAGE grid (or constant) was not found.",    &
+        sHints="Check your control file to see that a valid INITIAL_SNOW_COVER_STORAGE grid or"  &
+          //" constant is specified.", lFatal=lFALSE )
+  
+      MODEL%snow_storage = 0.0_c_float
+
+    else    
+
+      call pINITIAL_SNOW_COVER_STORAGE%getvalues()
+ 
+      ! map the 2D array of INITIAL_PERCENT_SOIL_MOISTURE values to the vector of active cells
+      fInitial_Snow_Cover_Storage = pack( pINITIAL_SNOW_COVER_STORAGE%pGrdBase%rData, MODEL%active )
+
+     if ( minval( fInitial_Snow_Cover_Storage ) < fZERO &
+        .or. maxval( fInitial_Snow_Cover_Storage ) > 300.0_c_float )  &
+       call warn(sMessage="One or more initial snow cover storage values outside of " &
+         //"valid range (0 to 300)", lFatal=lTRUE )
+
+     MODEL%snow_storage = fInitial_Snow_Cover_Storage
+    
+    endif
+
+  end subroutine initialize_snow_storage
 
 !--------------------------------------------------------------------------------------------------
 
@@ -896,8 +945,6 @@ contains
     call CF%close()
 
   end subroutine read_control_file
-
-  
 
 !--------------------------------------------------------------------------------------------------
 

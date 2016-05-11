@@ -37,16 +37,16 @@ module data_catalog_entry
     integer (kind=c_int)               :: iSourceFileType  ! Arc ASCII, Surfer, NetCDF
     integer (kind=c_int)               :: iTargetDataType = DATATYPE_NA  ! Fortran real, integer, etc.
     
-    character (len=256)       :: sDescription
-    character (len=256)       :: sSourcePROJ4_string
-    character (len=256)       :: sTargetPROJ4_string
-    character (len=256)       :: sSourceFileType
-    character (len=512)       :: sSourceFilename      ! e.g. 1980_00_prcp.nc
-    character (len=512)       :: sFilenameTemplate
+    character (len=256)       :: sDescription           = ""
+    character (len=256)       :: sSourcePROJ4_string    = ""
+    character (len=256)       :: sTargetPROJ4_string    = ""
+    character (len=256)       :: sSourceFileType        = ""
+    character (len=512)       :: sSourceFilename        = ""
+    character (len=512)       :: sFilenameTemplate      = ""
     integer (kind=c_int)      :: iFilename_Monthname_Capitalization_Rule = FILE_TEMPLATE_CAPITALIZED_MONTHNAME
-    character (len=512)       :: sOldFilename        
-    character (len=256)       :: sDateColumnName
-    character (len=256)       :: sValueColumnName
+    character (len=512)       :: sOldFilename           = ""
+    character (len=256)       :: sDateColumnName        = ""
+    character (len=256)       :: sValueColumnName       = ""
 
     integer (kind=c_int)      :: iFileCount = -1
     integer (kind=c_int)      :: iFileCountYear = -9999
@@ -59,8 +59,8 @@ module data_catalog_entry
     character (len=2)         :: sMissingValuesOperator = "&&"
     integer (kind=c_int)      :: iMissingValuesAction = 0
     
-    real (kind=c_double)               :: rUserScaleFactor = 1_c_double
-    real (kind=c_double)               :: rUserAddOffset = 0_c_double
+    real (kind=c_double)      :: rUserScaleFactor = 1_c_double
+    real (kind=c_double)      :: rUserAddOffset = 0_c_double
 
     logical (kind=c_bool)     :: lAllowMissingFiles = lFALSE
     logical (kind=c_bool)     :: lFlipHorizontal = lFALSE
@@ -92,17 +92,17 @@ module data_catalog_entry
     type (T_NETCDF4_FILE)    :: NCFILE_ARCHIVE
     integer (kind=c_size_t)  :: iNCFILE_RECNUM = 0
 
-    integer (kind=c_int)     :: iConstantValue
-    real (kind=c_float)      :: rConstantValue
+    integer (kind=c_int)     :: iConstantValue = 0
+    real (kind=c_float)      :: rConstantValue = 0.0
 
     ! pGrdNative is a grid created to serve as an intermediary between
     ! the native coordinate of the data source file and the project coordinates
     ! in use by swb
-    type (GENERAL_GRID_T), pointer :: pGrdNative => null()
-    logical (kind=c_bool)          :: lGridIsPersistent = lFALSE
-    logical (kind=c_bool)          :: lGridHasChanged = lFALSE
+    type (GENERAL_GRID_T), pointer :: pGrdNative                 => null()
+    logical (kind=c_bool)          :: lGridIsPersistent          = lFALSE
+    logical (kind=c_bool)          :: lGridHasChanged            = lFALSE
     logical (kind=c_bool)          :: lPerformFullInitialization = lTRUE
-    logical (kind=c_bool)          :: lCreateLocalNetCDFArchive = lFALSE
+    logical (kind=c_bool)          :: lCreateLocalNetCDFArchive  = lFALSE
      
     ! pGrdBase takes the coordinate system and dimensions as defined
     ! for the overall SWB project (i.e. BASE_PROJECTION_DEFINITION )
@@ -176,6 +176,7 @@ module data_catalog_entry
     procedure         :: set_make_local_archive => set_archive_local_sub
     procedure         :: put_values_to_archive => put_values_to_local_NetCDF_sub
     procedure         :: transform_native_to_base => transform_grid_to_grid_sub
+    procedure         :: nullify_pointers => nullify_pointers_sub
 
     procedure, private :: data_GridEnforceLimits_real
     procedure, private :: data_GridEnforceLimits_int
@@ -206,7 +207,7 @@ module data_catalog_entry
   integer (kind=c_int), parameter :: FILETYPE_NETCDF = 2
   integer (kind=c_int), parameter :: FILETYPE_NONE = 3
 
-  type (GENERAL_GRID_T), public, pointer :: pGrd
+  type (GENERAL_GRID_T), public, pointer :: pGrd => null()
 
   interface apply_scale_and_offset
     module procedure :: apply_scale_and_offset_float
@@ -214,6 +215,21 @@ module data_catalog_entry
   end interface apply_scale_and_offset
 
 contains
+
+  subroutine nullify_pointers_sub(this)
+
+    class (DATA_CATALOG_ENTRY_T)         :: this
+
+    nullify(this%pGrdNative)
+    nullify(this%pGrdBase)
+    nullify( pGrd )
+
+    call netcdf_nullify_data_struct( NCFILE=this%NCFILE )
+    call netcdf_nullify_data_struct( NCFILE=this%NCFILE_ARCHIVE )
+
+  end subroutine nullify_pointers_sub
+
+!--------------------------------------------------------------------------------------------------
 
   subroutine set_keyword_sub(this, sKeyword)
     
@@ -280,13 +296,13 @@ contains
     this%iTargetDataType = DATATYPE_REAL
     this%iSourceFileType = FILETYPE_NONE
 
+    call this%nullify_pointers()
+
     this%pGrdBase => grid_Create(iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, &
       rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, rGridCellSize=BNDS%fGridCellSize, iDataType=DATATYPE_REAL)
 
-    this%pGrdBase%sPROJ4_string = BNDS%sPROJ4_string
-
-    call netcdf_nullify_data_struct( NCFILE=this%NCFILE )
-    call netcdf_nullify_data_struct( NCFILE=this%NCFILE_ARCHIVE )
+    this%pGrdBase%sPROJ4_string = trim( BNDS%sPROJ4_string )
+    this%pGrdBase%sFilename = "None: constant value entered from control file."
 
   end subroutine initialize_constant_real_data_object_sub
 
@@ -307,13 +323,13 @@ contains
     this%iTargetDataType = DATATYPE_INT
     this%iSourceFileType = FILETYPE_NONE
 
+    call this%nullify_pointers()
+
     this%pGrdBase => grid_Create(iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, &
       rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, rGridCellSize=BNDS%fGridCellSize, iDataType=DATATYPE_INT)
 
     this%pGrdBase%sPROJ4_string = BNDS%sPROJ4_string
-
-    call netcdf_nullify_data_struct( NCFILE=this%NCFILE )
-    call netcdf_nullify_data_struct( NCFILE=this%NCFILE_ARCHIVE )
+    this%pGrdBase%sFilename = "None: constant value entered from control file."
 
   end subroutine initialize_constant_int_data_object_sub
 
@@ -376,16 +392,13 @@ subroutine initialize_gridded_data_object_sub( this, &
     //"real data types are supported as static grid inputs.", &
     trim(__FILE__), __LINE__)
 
+  call this%nullify_pointers()
 
   this%pGrdBase => grid_Create(iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, &
     rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, rGridCellSize=BNDS%fGridCellSize, iDataType=iDataType)
 
   this%pGrdBase%sPROJ4_string = BNDS%sPROJ4_string
-
-  nullify(this%pGrdNative)
-
-  call netcdf_nullify_data_struct( NCFILE=this%NCFILE )
-  call netcdf_nullify_data_struct( NCFILE=this%NCFILE_ARCHIVE )
+  this%pGrdBase%sFilename = this%sSourceFilename
 
 end subroutine initialize_gridded_data_object_sub
 
@@ -440,19 +453,19 @@ subroutine initialize_netcdf_data_object_sub( this, &
 
 !   endif
 
-   this%pGrdBase => grid_Create(iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, &
+    call this%nullify_pointers()
+
+    this%pGrdBase => grid_Create(iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, &
      rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, rGridCellSize=BNDS%fGridCellSize, iDataType=iDataType)
 
-   this%pGrdBase%sPROJ4_string = BNDS%sPROJ4_string
+    this%pGrdBase%sPROJ4_string = BNDS%sPROJ4_string
+    this%pGrdBase%sFilename = this%sSourceFilename    
 
-   this%sSourceFileType = "NETCDF"
-   this%iSourceFileType = this%get_filetype()
+    this%sSourceFileType = "NETCDF"
+    this%iSourceFileType = this%get_filetype()
 
-   this%iTargetDataType = iDataType
-   this%iNC_FILE_STATUS = NETCDF_FILE_CLOSED
-
-   call netcdf_nullify_data_struct( NCFILE=this%NCFILE )
-   call netcdf_nullify_data_struct( NCFILE=this%NCFILE_ARCHIVE )
+    this%iTargetDataType = iDataType
+    this%iNC_FILE_STATUS = NETCDF_FILE_CLOSED
 
 end subroutine initialize_netcdf_data_object_sub
 
@@ -620,9 +633,6 @@ subroutine getvalues_constant_sub( this  )
     integer (kind=c_int), optional :: iYear
     logical (kind=c_bool) :: lExist
     logical (kind=c_bool) :: lOpened
-
-    if ( .not. associated(this%pGrdBase) ) &
-      call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
 
     this%lGridHasChanged = lFALSE
 

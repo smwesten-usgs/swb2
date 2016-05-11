@@ -11,7 +11,7 @@
 module data_catalog
 
   use iso_c_binding, only : c_int, c_float, c_bool, c_double
-  use logfiles, only      : LOGS, LOG_ALL
+  use logfiles, only      : LOGS, LOG_ALL, LOG_DEBUG
   use strings
   use data_catalog_entry
   implicit none
@@ -313,7 +313,7 @@ contains
       do while ( associated(current) )
 
         call LOGS%write("Catalog key: "//dquote(current%sKeyword), iLinesBefore=1,   &
-          iLinesAfter=1, iLogLevel=LOG_ALL)
+          iLinesAfter=1, iLogLevel=LOG_DEBUG)
 
         call current%dump_data_structure()
 

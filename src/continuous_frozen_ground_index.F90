@@ -1,43 +1,56 @@
 module continuous_frozen_ground_index
 
-  use iso_c_binding, only : c_short, c_int, c_float, c_double, c_long_long
+  use iso_c_binding, only          : c_short, c_int, c_float, c_double, c_long_long
   use constants_and_conversions
+  use data_catalog, only           : DAT
+  use data_catalog_entry, only     : DATA_CATALOG_ENTRY_T
+
   use exceptions
   implicit none
 
   private
 
   public :: CFGI_LL, CFGI_UL
-  public :: CFGI
   public update_continuous_frozen_ground_index, initialize_continuous_frozen_ground_index
 
 
+  !> @TODO: make these into user-accessible variables
   real (kind=c_float)               :: CFGI_LL = 55.
   real (kind=c_float)               :: CFGI_UL = 83.
   
-  real (kind=c_float), allocatable  :: CFGI(:)
-
-  ! concept: any necessary state or ancillary variables that may not be of use in all
-  !          applications should be kept in the module where they are used. In other words,
-  !          the "model_domain" object will contain just the bare minimum state and ancillary
-  !          variables needed to calculate a soil moisture mass balance. Any other variables that are
-  !          of use only to specific modules will be kept in the modules where they are used.
-  !
-  !          CFGI is one of these variables.
-
 contains  
 
-  subroutine initialize_continuous_frozen_ground_index( iNumActiveCells )
+  subroutine initialize_continuous_frozen_ground_index( cfgi, active_cells )
 
-    integer (kind=c_int), intent(in)  :: iNumActiveCells
+    real (kind=c_float), intent(inout)  :: cfgi(:)
+    logical (kind=c_bool), intent(in)   :: active_cells(:,:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)  :: iStat
+    type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_CFGI
 
-    allocate( CFGI( iNumActiveCells ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+    ! locate the data structure associated with the gridded initial_cfgi
+    pINITIAL_CFGI => DAT%find("INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX")
 
-    CFGI = 0.0_c_float 
+    if ( .not. associated( pINITIAL_CFGI ) ) then
+        call warn(sMessage="An INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX grid (or constant) was not found.",    &
+        sHints="Check your control file to see that a valid INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX grid or"  &
+          //" constant is specified.", lFatal=lFALSE )
+  
+      cfgi = 0.0_c_float
+
+    else    
+
+      call pINITIAL_CFGI%getvalues()
+ 
+      ! map the 2D array of INITIAL_CFGI values to the vector of active cells
+      cfgi = pack( pINITIAL_CFGI%pGrdBase%rData, active_cells )
+
+     if ( minval( cfgi ) < fZERO &
+        .or. maxval( cfgi ) > 300.0_c_float )  &
+       call warn(sMessage="One or more initial continuous frozen ground values outside of " &
+         //"valid range (0 to 300)", lFatal=lTRUE )
+    
+    endif
 
   end subroutine initialize_continuous_frozen_ground_index
   
@@ -67,6 +80,7 @@ contains
     real (kind=c_float), parameter    :: fSnow_Reduction_Coefficient_Freezing      = 0.08_c_float
     real (kind=c_float), parameter    :: fSnow_Reduction_Coefficient_Thawing       = 0.5_c_float     
     real (kind=c_float), parameter    :: fCM_PER_INCH                              = 2.54_c_float
+    real (kind=c_float), parameter    :: FREEZING_POINT_DEG_C                      = 0.0_c_float
 
     real (kind=c_float) :: fTAvg_C              ! temporary variable holding avg temp in C
     real (kind=c_float) :: fSnowDepthCM         ! snow depth in centimeters
@@ -83,7 +97,7 @@ contains
                K_freeze => fSnow_Reduction_Coefficient_Freezing,             &
                K_thaw => fSnow_Reduction_Coefficient_Thawing )
 
-      if( Tavg > 0.0_c_float ) then
+      if( Tavg > FREEZING_POINT_DEG_C ) then
 
         CFGI = max( A * CFGI - Tavg * exp ( -0.4_c_float * K_thaw * fSnowDepthCM ), 0.0_c_float )
 

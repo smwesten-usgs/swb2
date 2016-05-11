@@ -141,7 +141,10 @@ module model_domain
     procedure ( simple_method ), pointer         :: init_AWC                  => model_initialize_available_water_content_gridded
     procedure ( simple_method ), pointer         :: init_crop_coefficient     => model_initialize_crop_coefficient_none
     procedure ( simple_method ), pointer         :: calc_interception         => model_calculate_interception_bucket
-    procedure ( simple_method ), pointer         :: update_crop_coefficient   => model_update_crop_coefficient_none    
+    procedure ( simple_method ), pointer         :: update_crop_coefficient   => model_update_crop_coefficient_none  
+
+    procedure ( simple_method ), pointer         :: init_continuous_frozen_ground_index => model_initialize_continuous_frozen_ground_index  
+    procedure ( simple_method ), pointer         :: calc_continuous_frozen_ground_index => model_calculate_continuous_frozen_ground_index      
 
     procedure ( simple_method_w_optional ), pointer   :: calc_runoff       => model_calculate_runoff_curve_number
     
@@ -1094,7 +1097,7 @@ contains
             DUMP( indx )%col = asInt( col )
             DUMP( indx )%row = asInt( row )
             
-            filename = "SWB_variable_values__col_"//trim( col )//"__row_"//trim( row )//".csv"
+            filename = "SWB2_variable_values__col_"//trim( col )//"__row_"//trim( row )//".csv"
 
             open( newunit=unitnum, file=trim(filename), iostat=iostat )
             call assert( iostat == 0, "Could not open variable dump file for writing." )
@@ -1258,6 +1261,31 @@ contains
     enddo
 
   end subroutine model_calculate_routing_D8  
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_continuous_frozen_ground_index(this)
+
+    use continuous_frozen_ground_index, only   : initialize_continuous_frozen_ground_index
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call initialize_continuous_frozen_ground_index( this%continuous_frozen_ground_index, this%active )
+
+  end subroutine model_initialize_continuous_frozen_ground_index
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_continuous_frozen_ground_index(this)
+
+    use continuous_frozen_ground_index, only   : update_continuous_frozen_ground_index
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call update_continuous_frozen_ground_index( this%continuous_frozen_ground_index, this%tmin,    &
+                                                this%tmax, this%snow_storage )
+
+  end subroutine model_calculate_continuous_frozen_ground_index
 
 !--------------------------------------------------------------------------------------------------
 

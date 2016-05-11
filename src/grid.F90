@@ -2135,20 +2135,31 @@ subroutine grid_DumpGridExtent(pGrd)
 
   type ( GENERAL_GRID_T ),pointer :: pGrd
 
-  call LOGS%write("---------------------------------------------------")
-  call LOGS%write("GRID DETAILS:")
-  call LOGS%write("---------------------------------------------------")
-  call LOGS%write("file: "//dquote(pGrd%sFilename) )
-  call LOGS%write("nx: "//trim( asCharacter(pGrd%iNX) ) )
-  call LOGS%write("ny: "//trim( asCharacter(pGrd%iNY) ) )
-  call LOGS%write("cellsize: "//trim(asCharacter(pGrd%rGridCellSize) ) )
-  call LOGS%write("X0: "//trim(asCharacter(pGrd%rX0) ) )
-  call LOGS%write("Y0: "//trim(asCharacter(pGrd%rY0) ) )
-  call LOGS%write("X1: "//trim(asCharacter(pGrd%rX1) ) )
-  call LOGS%write("Y1: "//trim(asCharacter(pGrd%rY1) ) )
-  call LOGS%write("Type: "//trim(asCharacter(pGrd%iDataType) ) )
-  call LOGS%write("PROJ4 string: "//dquote(pGrd%sPROJ4_string) )
-  call LOGS%write("---------------------------------------------------")
+  if ( associated( pGrd) ) then
+
+    call LOGS%write("---------------------------------------------------")
+    call LOGS%write("GRID DETAILS:")
+    call LOGS%write("---------------------------------------------------")
+    call LOGS%write("file: "//dquote(pGrd%sFilename) )
+    call LOGS%write("nx: "//trim( asCharacter(pGrd%iNX) ) )
+    call LOGS%write("ny: "//trim( asCharacter(pGrd%iNY) ) )
+    call LOGS%write("cellsize: "//trim(asCharacter(pGrd%rGridCellSize) ) )
+    call LOGS%write("X0: "//trim(asCharacter(pGrd%rX0) ) )
+    call LOGS%write("Y0: "//trim(asCharacter(pGrd%rY0) ) )
+    call LOGS%write("X1: "//trim(asCharacter(pGrd%rX1) ) )
+    call LOGS%write("Y1: "//trim(asCharacter(pGrd%rY1) ) )
+    call LOGS%write("Type: "//trim(asCharacter(pGrd%iDataType) ) )
+    call LOGS%write("PROJ4 string: "//dquote(pGrd%sPROJ4_string) )
+    call LOGS%write("---------------------------------------------------")
+
+  else
+
+    call LOGS%write("---------------------------------------------------")
+    call LOGS%write("   ** grid not allocated **                        ")
+    call LOGS%write("---------------------------------------------------")
+
+  endif
+
 
 end subroutine grid_DumpGridExtent
 
