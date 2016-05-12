@@ -4,6 +4,34 @@
 		"selected_items":
 		[
 			[
+				"LOG",
+				"LOG_DEBUG"
+			],
+			[
+				"source",
+				"sSourceFilename"
+			],
+			[
+				"null",
+				"nullify_pointers"
+			],
+			[
+				"nullify",
+				"nullify_pointers_sub"
+			],
+			[
+				"con",
+				"continuous_frozen_ground_index"
+			],
+			[
+				"fIniti",
+				"fInitial_Snow_Cover_Storage"
+			],
+			[
+				"DE",
+				"FREEZING_POINT_DEG_F"
+			],
+			[
 				"curve",
 				"curve_num_adj"
 			],
@@ -486,34 +514,6 @@
 			[
 				"calc_r",
 				"calc_routing"
-			],
-			[
-				"__",
-				"__LINE__"
-			],
-			[
-				"deple",
-				"depletion_fraction_p"
-			],
-			[
-				"imp",
-				"impervious_fraction"
-			],
-			[
-				"calculate",
-				"calculate_soil_mass_balance"
-			],
-			[
-				"calcul",
-				"calculate_snow_mass_balance"
-			],
-			[
-				"calcula",
-				"calculate_interception_mass_balance"
-			],
-			[
-				"contin",
-				"update_continuous_frozen_ground_index"
 			]
 		]
 	},
@@ -523,7 +523,7 @@
 			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/model_domain.F90",
 			"settings":
 			{
-				"buffer_size": 104228,
+				"buffer_size": 105550,
 				"line_ending": "Unix"
 			}
 		},
@@ -539,7 +539,7 @@
 			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/model_initialize.F90",
 			"settings":
 			{
-				"buffer_size": 64451,
+				"buffer_size": 66724,
 				"line_ending": "Unix"
 			}
 		},
@@ -556,6 +556,14 @@
 			"settings":
 			{
 				"buffer_size": 12062,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/dictionary.F90",
+			"settings":
+			{
+				"buffer_size": 25500,
 				"line_ending": "Unix"
 			}
 		},
@@ -592,18 +600,58 @@
 			}
 		},
 		{
-			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/fog__monthly_grid.F90",
+			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/continuous_frozen_ground_index.F90",
 			"settings":
 			{
-				"buffer_size": 6898,
+				"buffer_size": 4566,
 				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/data_catalog_entry.F90",
+			"settings":
+			{
+				"buffer_size": 72649,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/data_catalog.F90",
+			"settings":
+			{
+				"buffer_size": 8011,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/daily_calculation.F90",
+			"settings":
+			{
+				"buffer_size": 11621,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/smwesten/SMWData/Active_Projects/Aspen_Anderson/sp_control__SWB2.ctl",
+			"settings":
+			{
+				"buffer_size": 2527,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/irrigation.F90",
+			"settings":
+			{
+				"buffer_size": 23625,
+				"line_ending": "Windows"
 			}
 		},
 		{
 			"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/grid.F90",
 			"settings":
 			{
-				"buffer_size": 93224,
+				"buffer_size": 93529,
 				"line_ending": "Windows"
 			}
 		},
@@ -703,6 +751,9 @@
 	],
 	"file_history":
 	[
+		"/Users/smwesten/SMWData/Source_Code/swb2/src/fog__monthly_grid.F90",
+		"/Users/smwesten/SMWData/Active_Projects/Aspen_Anderson/sp_control__SWB2.ctl",
+		"/Users/smwesten/SMWData/Source_Code/swb/src/model.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/model_initialize.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/CMakeLists.txt",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/crop_coefficients__fao56.F90",
@@ -726,7 +777,6 @@
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/swb_merge_iterate.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/data_catalog_entry.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/main.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb2/src/fog__monthly_grid.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/growing_degree_day.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/actual_et__thornthwaite_mather.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/model_domain.F90",
@@ -807,7 +857,6 @@
 		"/Users/smwesten/SMWData/Source_Code/Hawaii_Water_Budget_Code/HI_WB_3_1__SMW_annotations.f",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/soil_moisture__FAO56.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb2/src/infiltration__curve_number.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb/src/model.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb/src/control.F90",
 		"/usr/local/texlive/texmf-local/tex/latex/local/usgslatex2/usgsprotcode.tex",
 		"/Users/smwesten/SMWData/Active_Projects/Glacial_Aquifer_Study/basinchar_and_report_sept_2011/spreadsheets-in-csv-format/conterm_bas_classif.csvt",
@@ -829,8 +878,7 @@
 		"/Users/smwesten/SMWData/Source_Code/swb/src/data_frame.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb/src/test_landuse_table.F90",
 		"/Users/smwesten/SMWData/Source_Code/swb/src/logfiles.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb/src/data_file.F90",
-		"/Users/smwesten/SMWData/Source_Code/swb/src/constants_and_conversions.F90"
+		"/Users/smwesten/SMWData/Source_Code/swb/src/data_file.F90"
 	],
 	"find":
 	{
@@ -850,6 +898,17 @@
 		"case_sensitive": true,
 		"find_history":
 		[
+			"%%%",
+			"&&&&&",
+			"|",
+			"&&&&&",
+			"@@@",
+			"CF_ENTRY",
+			"dump",
+			"ontrol file to see that a valid INITIAL_CFGI",
+			"update_continuous_frozen_ground_index",
+			"SNOW_COVER_STORAGE",
+			"snow_storage",
 			"METHOD",
 			"OUTPUT_DIRECTORY_NAME",
 			"iostat",
@@ -966,25 +1025,16 @@
 			"golfirr",
 			"dont_care",
 			"max_rooting_depth",
-			"MAX_ROOTING_DEPTH",
-			"max_soil_storage",
-			"MAX_SOIL_STORAGE",
-			"SOIL_STORAGE_MAX",
-			"set_method",
-			"set_method_sub",
-			"this",
-			"actual_et",
-			"Summary of integer grid ",
-			"LOG_DEBUG",
-			"iLanduseIndex",
-			"crop_co"
+			"MAX_ROOTING_DEPTH"
 		],
 		"highlight": true,
-		"in_selection": true,
+		"in_selection": false,
 		"preserve_case": false,
 		"regex": false,
 		"replace_history":
 		[
+			"CFGI",
+			"continuous_frozen_ground_index",
 			"OUTPUT_GRID_DIRECTORY_NAME",
 			"Method_Name",
 			"STORM_DRAIN_CAPTURE_FRACTION",
@@ -1110,9 +1160,7 @@
 			"KCB_MID",
 			"KCB_INI",
 			"L_LATE",
-			"L_MID",
-			"L_INI",
-			"L_PLANT"
+			"L_MID"
 		],
 		"reverse": false,
 		"show_context": false,
@@ -1123,7 +1171,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 22,
 			"sheets":
 			[
 				{
@@ -1132,29 +1180,29 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 104228,
+						"buffer_size": 105550,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								78910,
-								78910
+								14194,
+								14213
 							]
 						],
 						"settings":
 						{
-							"function_name_status_row": -1,
+							"function_name_status_row": 281,
 							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 34521.0,
+						"translation.y": 5026.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 0,
+					"stack_index": 11,
 					"type": "text"
 				},
 				{
@@ -1185,7 +1233,7 @@
 						"translation.y": 6907.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 1,
+					"stack_index": 15,
 					"type": "text"
 				},
 				{
@@ -1194,29 +1242,29 @@
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 64451,
+						"buffer_size": 66724,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								58415,
-								58415
+								39181,
+								39181
 							]
 						],
 						"settings":
 						{
-							"function_name_status_row": 1526,
+							"function_name_status_row": 985,
 							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 27106.0,
+						"translation.y": 17009.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 2,
+					"stack_index": 4,
 					"type": "text"
 				},
 				{
@@ -1240,14 +1288,14 @@
 						{
 							"function_name_status_row": 91,
 							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
-							"tab_size": 2,
+							"tab_size": 4,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
 						"translation.y": 1419.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 9,
+					"stack_index": 17,
 					"type": "text"
 				},
 				{
@@ -1275,14 +1323,45 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 723.0,
+						"translation.y": 877.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 8,
+					"stack_index": 7,
 					"type": "text"
 				},
 				{
 					"buffer": 5,
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/dictionary.F90",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 25500,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								3911,
+								3911
+							]
+						],
+						"settings":
+						{
+							"function_name_status_row": 95,
+							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 12936.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 6,
+					"type": "text"
+				},
+				{
+					"buffer": 6,
 					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/constants_and_conversions.F90",
 					"semi_transient": false,
 					"settings":
@@ -1309,11 +1388,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 10,
+					"stack_index": 18,
 					"type": "text"
 				},
 				{
-					"buffer": 6,
+					"buffer": 7,
 					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/direct_recharge__gridded_data.F90",
 					"semi_transient": false,
 					"settings":
@@ -1325,26 +1404,26 @@
 						"selection":
 						[
 							[
-								13102,
-								13102
+								349,
+								393
 							]
 						],
 						"settings":
 						{
-							"function_name_status_row": 340,
+							"function_name_status_row": 11,
 							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 6522.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 11,
+					"stack_index": 12,
 					"type": "text"
 				},
 				{
-					"buffer": 7,
+					"buffer": 8,
 					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/growing_degree_day.F90",
 					"semi_transient": false,
 					"settings":
@@ -1368,14 +1447,14 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 343.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 4,
+					"stack_index": 13,
 					"type": "text"
 				},
 				{
-					"buffer": 8,
+					"buffer": 9,
 					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/netcdf4_support.F90",
 					"semi_transient": false,
 					"settings":
@@ -1399,76 +1478,229 @@
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 16827.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 6,
+					"stack_index": 14,
 					"type": "text"
 				},
 				{
-					"buffer": 9,
-					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/fog__monthly_grid.F90",
+					"buffer": 10,
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/continuous_frozen_ground_index.F90",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 6898,
+						"buffer_size": 4566,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								4164,
-								4164
+								786,
+								786
 							]
 						],
 						"settings":
 						{
-							"function_name_status_row": 108,
+							"function_name_status_row": 26,
 							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1168.0,
+						"translation.y": 206.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 9,
+					"type": "text"
+				},
+				{
+					"buffer": 11,
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/data_catalog_entry.F90",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 72649,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								18656,
+								18656
+							]
+						],
+						"settings":
+						{
+							"function_name_status_row": 458,
+							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 7388.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 8,
+					"type": "text"
+				},
+				{
+					"buffer": 12,
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/data_catalog.F90",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 8011,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								6442,
+								6442
+							]
+						],
+						"settings":
+						{
+							"function_name_status_row": 261,
+							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 4066.0,
 						"zoom_level": 1.0
 					},
 					"stack_index": 5,
 					"type": "text"
 				},
 				{
-					"buffer": 10,
-					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/grid.F90",
+					"buffer": 13,
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/daily_calculation.F90",
 					"semi_transient": false,
 					"settings":
 					{
-						"buffer_size": 93224,
+						"buffer_size": 11621,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								9239,
-								9260
+								1600,
+								1600
 							]
 						],
 						"settings":
 						{
-							"function_name_status_row": 164,
+							"function_name_status_row": 49,
 							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1264.0,
+						"translation.y": 544.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 7,
+					"stack_index": 3,
 					"type": "text"
 				},
 				{
-					"buffer": 11,
+					"buffer": 14,
+					"file": "/Users/smwesten/SMWData/Active_Projects/Aspen_Anderson/sp_control__SWB2.ctl",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 2527,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1927,
+								1927
+							]
+						],
+						"settings":
+						{
+							"function_name_status_row": 46,
+							"syntax": "Packages/Text/Plain text.tmLanguage"
+						},
+						"translation.x": 0.0,
+						"translation.y": 488.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 2,
+					"type": "text"
+				},
+				{
+					"buffer": 15,
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/irrigation.F90",
+					"semi_transient": true,
+					"settings":
+					{
+						"buffer_size": 23625,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"function_name_status_row": 0,
+							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 1,
+					"type": "text"
+				},
+				{
+					"buffer": 16,
+					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/grid.F90",
+					"semi_transient": false,
+					"settings":
+					{
+						"buffer_size": 93529,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								82918,
+								82920
+							]
+						],
+						"settings":
+						{
+							"function_name_status_row": 2180,
+							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
+							"tab_size": 2,
+							"translate_tabs_to_spaces": true
+						},
+						"translation.x": 0.0,
+						"translation.y": 36182.0,
+						"zoom_level": 1.0
+					},
+					"stack_index": 10,
+					"type": "text"
+				},
+				{
+					"buffer": 17,
 					"file": "/Users/smwesten/SMWData/Source_Code/swb2/build/mac_osx/gfortran/run_cmake_gfortran.sh",
 					"semi_transient": false,
 					"settings":
@@ -1493,11 +1725,11 @@
 						"translation.y": 211.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 12,
+					"stack_index": 19,
 					"type": "text"
 				},
 				{
-					"buffer": 12,
+					"buffer": 18,
 					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/model_iterate.F90",
 					"semi_transient": false,
 					"settings":
@@ -1524,11 +1756,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 3,
+					"stack_index": 16,
 					"type": "text"
 				},
 				{
-					"buffer": 13,
+					"buffer": 19,
 					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/swb_merge_initialize.F90",
 					"semi_transient": false,
 					"settings":
@@ -1555,11 +1787,11 @@
 						"translation.y": 696.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 15,
+					"stack_index": 21,
 					"type": "text"
 				},
 				{
-					"buffer": 14,
+					"buffer": 20,
 					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/swb_merge_iterate.F90",
 					"semi_transient": false,
 					"settings":
@@ -1586,11 +1818,11 @@
 						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 14,
+					"stack_index": 20,
 					"type": "text"
 				},
 				{
-					"buffer": 15,
+					"buffer": 21,
 					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/CMakeLists.txt",
 					"semi_transient": false,
 					"settings":
@@ -1617,11 +1849,11 @@
 						"translation.y": 4134.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 16,
+					"stack_index": 22,
 					"type": "text"
 				},
 				{
-					"buffer": 16,
+					"buffer": 22,
 					"file": "/Users/smwesten/SMWData/Source_Code/swb2/src/main.F90",
 					"semi_transient": false,
 					"settings":
@@ -1633,22 +1865,22 @@
 						"selection":
 						[
 							[
-								3273,
-								3273
+								4910,
+								4927
 							]
 						],
 						"settings":
 						{
-							"function_name_status_row": 80,
+							"function_name_status_row": 135,
 							"syntax": "Packages/User/fortran.tmbundle-master/Syntaxes/Fortran - Modern.tmLanguage",
 							"tab_size": 2,
 							"translate_tabs_to_spaces": true
 						},
 						"translation.x": 0.0,
-						"translation.y": 1904.0,
+						"translation.y": 1735.0,
 						"zoom_level": 1.0
 					},
-					"stack_index": 13,
+					"stack_index": 0,
 					"type": "text"
 				}
 			]
@@ -1656,7 +1888,7 @@
 	],
 	"incremental_find":
 	{
-		"height": 23.0
+		"height": 25.0
 	},
 	"input":
 	{
@@ -1743,7 +1975,7 @@
 	"show_open_files": true,
 	"show_tabs": true,
 	"side_bar_visible": true,
-	"side_bar_width": 288.0,
+	"side_bar_width": 246.0,
 	"status_bar_visible": true,
 	"template_settings":
 	{

@@ -47,8 +47,7 @@ contains
     call cells%calc_snowfall()
     call cells%calc_snowmelt()
 
-    call update_continuous_frozen_ground_index( cells%continuous_frozen_ground_index, cells%tmin,    &
-                                                cells%tmax, cells%snow_storage )
+    call cells%calc_continuous_frozen_ground_index()
 
     
     ! fog calculation does not explicitly consider canopy fraction   

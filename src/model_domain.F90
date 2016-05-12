@@ -156,11 +156,10 @@ module model_domain
     procedure ( simple_method ), pointer         :: calc_snowmelt          => model_calculate_snowmelt_original  
     procedure ( simple_method ), pointer         :: calc_fog               => model_calculate_fog_none
     procedure ( simple_method ), pointer         :: calc_irrigation        => model_calculate_irrigation_none
-    procedure ( simple_method ), pointer         :: calc_GDD               => model_calculate_GDD_none
+    procedure ( simple_method ), pointer         :: calc_GDD               => model_calculate_GDD
     procedure ( simple_method ), pointer         :: calc_direct_recharge      => model_calculate_direct_recharge_none    
     procedure ( simple_method ), pointer         :: calc_direct_soil_moisture => model_calculate_direct_soil_moisture_none        
 
-    procedure (simple_method), pointer           :: output_GDD             => model_output_GDD
     procedure (simple_method), pointer           :: output_irrigation      => model_output_irrigation_none
     procedure (simple_method), pointer           :: dump_variables         => model_dump_variables_none    
 
@@ -329,9 +328,11 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
+    integer (kind=c_int)  :: indx
     integer (kind=c_int)  :: iStat(52)
 
     iCount = count( this%active )
+    iStat = 0
 
     allocate( this%landuse_code(iCount), stat=iStat(1) )
     allocate( this%landuse_index(iCount), stat=iStat(2) )
@@ -359,7 +360,6 @@ contains
     allocate( this%fog(iCount), stat=iStat(24) )
     allocate( this%irrigation(iCount), stat=iStat(25) )
     allocate( this%index_order(iCount), stat=iStat(26) )
-    allocate( this%gdd(iCount), stat=iStat(27) )
     allocate( this%runoff_outside( iCount ), stat=iStat(28) )
     allocate( this%pervious_fraction( iCount ), stat=iStat(29) )
     allocate( this%surface_storage( iCount ), stat=iStat(30) ) 
@@ -422,8 +422,6 @@ contains
     this%potential_recharge                  = 0.0_c_float
     this%fog                                 = 0.0_c_float
     this%irrigation                          = 0.0_c_float
-    this%index_order                         = 0_c_int
-    this%gdd                                 = 0.0_c_float
     this%curve_num_adj                       = 0.0_c_float
     this%runoff_outside                      = 0.0_c_float
     this%pervious_fraction                   = 0.0_c_float
@@ -448,6 +446,10 @@ contains
     this%number_of_days_since_planting       = 0_c_int
     this%it_is_growing_season                = FALSE
     
+    do indx=1, iCount
+      this%index_order( indx ) = indx
+    enddo
+
 !$OMP END PARALLEL WORKSHARE
 
   end subroutine initialize_arrays_sub
@@ -1113,7 +1115,7 @@ contains
               //"pervious_fraction, storm_drain_capture, canopy_cover_fraction, crop_coefficient_kcb, "           &
               //"cfgi, rooting_depth_max, current_rooting_depth, actual_et_soil, actual_et_impervious, "          &
               //"actual_et_interception, adjusted_depletion_fraction_p, crop_etc, direct_recharge, "              &
-              //"direct_soil_moisture"
+              //"direct_soil_moisture, inflowbuf1, inflowbuf2, inflowbuf3, inflowbuf4, inflowbuf5, inflowbuf_sum"
 
 
             exit
@@ -1474,9 +1476,7 @@ contains
   subroutine model_calculate_runoff_curve_number(this, index )
 
     use runoff__curve_number, only  : runoff_curve_number_calculate,     &
-                                      update_previous_5_day_rainfall,    &
-                                      FIVE_DAY_SUM,                      &
-                                      PREV_5_DAYS_RAIN
+                                      update_previous_5_day_rainfall
 
     class (MODEL_DOMAIN_T), intent(inout)          :: this
     integer (kind=c_int), intent(in), optional     :: index
@@ -1485,37 +1485,41 @@ contains
     real (kind=c_float)  :: interim_inflow(1)
     integer (kind=c_int) :: indx
 
+
     if ( present(index) ) then
 
       indx = index
       interim_inflow(1) = this%runon( index ) + this%rainfall( index )   &
                       + this%snowmelt( index ) - this%interception( index )
 
+      call runoff_curve_number_calculate(runoff=this%runoff( index ),                              &
+                                         curve_num_adj=this%curve_num_adj( index ),                &
+                                         landuse_index=this%landuse_index( index ),                &
+                                         cell_index=indx,                                          &
+                                         soil_group=this%soil_group( index ),                      &
+                                         soil_storage_max=this%soil_storage_max( index ),          & 
+                                         inflow=interim_inflow(1),                                 &
+                                         it_is_growing_season=this%it_is_growing_season( index ),  &
+                                         continuous_frozen_ground_index=                           &
+                                         this%continuous_frozen_ground_index( index ) ) 
+
       call update_previous_5_day_rainfall( interim_inflow, indx )
 
-      call runoff_curve_number_calculate(runoff=this%runoff( index ),                             &
-                                        curve_num_adj=this%curve_num_adj( index ),                &
-                                         landuse_index=this%landuse_index( index ),               &
-                                         soil_group=this%soil_group( index ),                     &
-                                         soil_storage_max=this%soil_storage_max( index ),         & 
-                                         inflow=PREV_5_DAYS_RAIN( index, FIVE_DAY_SUM ),          &
-                                         it_is_growing_season=this%it_is_growing_season( index ), &
-                                         continuous_frozen_ground_index=                          &
-                                           this%continuous_frozen_ground_index( index ) ) 
 
     else
 
-      call update_previous_5_day_rainfall( this%runon + this%rainfall + this%snowmelt - this%interception )
+      call runoff_curve_number_calculate(runoff=this%runoff,                                  &
+                                         curve_num_adj=this%curve_num_adj,                    &
+                                         landuse_index=this%landuse_index,                    &
+                                         soil_group=this%soil_group,                          &
+                                         cell_index=this%index_order,                         &
+                                         soil_storage_max=this%soil_storage_max,              & 
+                                         inflow=this%inflow,                                  &
+                                         it_is_growing_season=this%it_is_growing_season,      &
+                                         continuous_frozen_ground_index=                      &
+                                         this%continuous_frozen_ground_index ) 
 
-      call runoff_curve_number_calculate(runoff=this%runoff,                                             &
-                                                    curve_num_adj=this%curve_num_adj,                    &
-                                                    landuse_index=this%landuse_index,                    &
-                                                    soil_group=this%soil_group,                          &
-                                                    soil_storage_max=this%soil_storage_max,              & 
-                                                    inflow=PREV_5_DAYS_RAIN( :, FIVE_DAY_SUM ),          &
-                                                    it_is_growing_season=this%it_is_growing_season,      &
-                                                    continuous_frozen_ground_index=                      &
-                                                        this%continuous_frozen_ground_index ) 
+      call update_previous_5_day_rainfall( this%runon + this%rainfall + this%snowmelt - this%interception )
 
     endif
 
@@ -1873,8 +1877,6 @@ contains
 
   subroutine model_calculate_GDD_none( this )
 
-    use growing_degree_day, only : GDD, GDD_BASE, GDD_MAX, growing_degree_day_calculate
-
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     !> Nothing here to see. 
 
@@ -1882,28 +1884,22 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_output_GDD_none( this )
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-    !> Nothing here to see. 
-
-  end subroutine model_output_GDD_none
-
-!--------------------------------------------------------------------------------------------------
-
   subroutine model_initialize_GDD( this )
 
-    use growing_degree_day
+    use growing_degree_day, only           : growing_degree_day_initialize
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call growing_degree_day_initialize( lActive=this%active,                               &
-                                        iLanduseIndex=this%landuse_index,                  &
-                                        PROJ4_string=this%PROJ4_string,                    &
-                                        dX=this%X,                                         & 
-                                        dY=this%Y,                                         &
-                                        dX_lon=this%X_lon,                                 &
-                                        dY_lat=this%Y_lat )
+    ! [ LOCALS ]
+    integer (kind=c_int)  :: status
+
+    allocate( this%gdd( count( this%active ) ), stat=status )
+    call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
+
+    this%gdd = 0.0_c_float
+
+    call growing_degree_day_initialize( is_cell_active=this%active,                           &
+                                        landuse_index=this%landuse_index )
 
   end subroutine model_initialize_GDD
 
@@ -1911,29 +1907,15 @@ contains
 
   subroutine model_calculate_GDD( this )
 
-    use growing_degree_day, only : GDD, GDD_BASE, GDD_MAX, GDD_RESET_DATE, growing_degree_day_calculate
+    use growing_degree_day, only           : growing_degree_day_calculate
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call growing_degree_day_calculate( fGDD=GDD,                                            &
-                                       iGDD_Reset_DOY=GDD_RESET_DATE( this%landuse_index ), &
-                                       fTMean=this%tmean,                                   &
-                                       fT_GDD_Base=GDD_BASE,                                &
-                                       fT_GDD_Max=GDD_MAX      )
+    call growing_degree_day_calculate( gdd=this%gdd,                                        &
+                                       tmean=this%tmean,                                    &
+                                       order=this%index_order )
 
   end subroutine model_calculate_GDD
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine model_output_GDD( this )
-
-    use growing_degree_day, only : growing_degree_day_output
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-    call growing_degree_day_output( lActive=this%active, nodata_fill_value=this%nodata_fill_value )
-
-  end subroutine model_output_GDD
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1948,10 +1930,12 @@ contains
 
   subroutine model_dump_variables_by_cell( this )
 
+    use runoff__curve_number, only   : PREV_5_DAYS_RAIN
+
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int)   :: indx, jndx
+    integer (kind=c_int)   :: indx, jndx, kndx
 
     do jndx=lbound( DUMP, 1), ubound( DUMP, 1)
 
@@ -1959,7 +1943,7 @@ contains
 
       if ( (indx > lbound( this%landuse_code, 1) ) .and. ( indx <= ubound( this%landuse_code, 1) ) ) then
 
-        write( unit=DUMP( jndx )%unitnum, fmt="(i2,',',i2,',',i4,',',6(i6,','),43(f12.3,','),f12.3)")     &
+        write( unit=DUMP( jndx )%unitnum, fmt="(i2,',',i2,',',i4,',',6(i6,','),49(f12.3,','),f12.3)")     &
           SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                        &
           this%landuse_code( indx ), this%landuse_index( indx ), this%index_order( indx ),                &
           this%soil_group( indx ), this%num_upslope_connections( indx ), this%sum_upslope_cells( indx ),  &  
@@ -1979,7 +1963,7 @@ contains
           this%current_rooting_depth( indx ), this%actual_et_soil( indx ),                                &
           this%actual_et_impervious( indx ), this%actual_et_interception( indx ),                         &
           this%adjusted_depletion_fraction_p( indx ), this%crop_etc( indx ), this%direct_recharge( indx ),&
-          this%direct_soil_moisture( indx )
+          this%direct_soil_moisture( indx ), (PREV_5_DAYS_RAIN( indx, kndx), kndx=1,6) 
         
       endif  
 

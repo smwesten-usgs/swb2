@@ -14,11 +14,9 @@ module growing_degree_day
 
   private
 
-  public :: GDD, GDD_BASE, GDD_MAX, GDD_RESET_DATE
+  public :: GDD_BASE, GDD_MAX, GDD_RESET_DATE
   public :: growing_degree_day_calculate, growing_degree_day_initialize
-  public :: growing_degree_day_output
 
-  real (kind=c_float), allocatable  :: GDD(:)
   real (kind=c_float), allocatable  :: GDD_BASE(:)
   real (kind=c_float), allocatable  :: GDD_MAX(:) 
   integer (kind=c_int), allocatable :: GDD_RESET_DATE(:)
@@ -26,78 +24,72 @@ module growing_degree_day
  
 contains
 
-  subroutine growing_degree_day_initialize( lActive, iLanduseIndex,          & 
-                                            PROJ4_string, dX, dY,            &
-                                            dX_lon, dY_lat )
+  subroutine growing_degree_day_initialize( is_cell_active, landuse_index )
 
-    logical (kind=c_bool), intent(in)     :: lActive(:,:)
-    integer (kind=c_int), intent(in)      :: iLanduseIndex(:)
-    character (len=*), intent(inout)      :: PROJ4_string
-    real (kind=c_double), intent(in)      :: dX(:)
-    real (kind=c_double), intent(in)      :: dY(:)
-    real (kind=c_double), intent(in)      :: dX_lon(:,:)
-    real (kind=c_double), intent(in)      :: dY_lat(:,:)
+    logical (kind=c_bool), intent(in)     :: is_cell_active(:,:)
+    integer (kind=c_int), intent(in)      :: landuse_index(:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)              :: iStat
-    integer (kind=c_int)              :: iIndex
-    type (STRING_LIST_T)              :: slList
-    type (STRING_LIST_T)              :: slGDD_Reset
+    integer (kind=c_int)              :: status
+    integer (kind=c_int)              :: indx
+    type (STRING_LIST_T)              :: parameter_list
+    type (STRING_LIST_T)              :: gdd_reset_val_list
     character (len=32)                :: sBuf
-    real (kind=c_float), allocatable  :: fGDD_Base_(:)
-    real (kind=c_float), allocatable  :: fGDD_Max_(:)
-    integer (kind=c_int)              :: iNumberOfLanduses
-    integer (kind=c_int), allocatable :: iLanduseCode(:)
+    real (kind=c_float), allocatable  :: gdd_base_(:)
+    real (kind=c_float), allocatable  :: gdd_max_(:)
+    integer (kind=c_int)              :: number_of_landuse_codes
+    integer (kind=c_int), allocatable :: landuse_code(:)
 
-    allocate( GDD( count( lActive ) ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+    allocate( GDD_BASE( count( is_cell_active ) ), stat=status )
+    call assert( status == 0, "Problem allocating memory", __FILE__, __LINE__ )
 
-    allocate( GDD_BASE( count( lActive ) ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
-
-    allocate( GDD_MAX( count( lActive ) ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+    allocate( GDD_MAX( count( is_cell_active ) ), stat=status )
+    call assert( status == 0, "Problem allocating memory", __FILE__, __LINE__ )
 
     !> create string list that allows for alternate heading identifiers for the landuse code
-    call slList%append("LU_Code")
-    call slList%append("Landuse_Code") 
-    call slList%append("Landuse_Lookup_Code")
+    call parameter_list%append("LU_Code")
+    call parameter_list%append("Landuse_Code") 
+    call parameter_list%append("Landuse_Lookup_Code")
 
     !> Determine how many landuse codes are present
-    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCode )
-    iNumberOfLanduses = count( iLanduseCode >= 0 )
-    call slList%clear()
+    call PARAMS%get_parameters( slKeys=parameter_list, iValues=landuse_code )
+    number_of_landuse_codes = count( landuse_code >= 0 )
+    call parameter_list%clear()
 
-    call slList%append("GDD_Base_Temp")
-    call slList%append("GDD_Base_Temperature")
-    call slList%append("GDD_Base")
+    call parameter_list%append("GDD_Base_Temp")
+    call parameter_list%append("GDD_Base_Temperature")
+    call parameter_list%append("GDD_Base")
 
-    call PARAMS%get_parameters( slKeys=slList, fValues=fGDD_Base_ )
-    call slList%clear()
+    call PARAMS%get_parameters( slKeys=parameter_list, fValues=gdd_base_ )
+    call parameter_list%clear()
 
-    call slList%append("GDD_Max_Temp")
-    call slList%append("GDD_Maximum_Temperature")
-    call slList%append("GDD_Maximum_Temp")
-    call slList%append("GDD_Max")
+    call parameter_list%append("GDD_Max_Temp")
+    call parameter_list%append("GDD_Maximum_Temperature")
+    call parameter_list%append("GDD_Maximum_Temp")
+    call parameter_list%append("GDD_Max")
 
-    call PARAMS%get_parameters( slKeys=slList, fValues=fGDD_Max_ )
-    call slList%clear()
+    call PARAMS%get_parameters( slKeys=parameter_list, fValues=gdd_max_ )
+    call parameter_list%clear()
 
-    call slList%append("GDD_Reset_Date")
-    call slList%append("GDD_Reset")
+    call parameter_list%append("GDD_Reset_Date")
+    call parameter_list%append("GDD_Reset")
 
-    call PARAMS%get_parameters( slKeys=slList, slValues=slGDD_Reset ) 
-    call slList%clear()
+    call PARAMS%get_parameters( slKeys=parameter_list, slValues=gdd_reset_val_list ) 
+    call parameter_list%clear()
 
-    allocate( GDD_RESET_DATE( iNumberOfLanduses ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
+    allocate( GDD_RESET_DATE( count( is_cell_active ) ), stat=status )
+    call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
 
+    if ( gdd_reset_val_list%count == number_of_landuse_codes ) then
 
-    if ( slGDD_Reset%count == iNumberOfLanduses ) then
+      ! retrieve gdd reset values; convert mm/dd to DOY
+      do indx=1, gdd_reset_val_list%count
+        sBuf = gdd_reset_val_list%get( indx )
 
-      do iIndex=1, slGDD_Reset%count
-        sBuf = slGDD_Reset%get( iIndex )
-        GDD_RESET_DATE( iIndex ) = mmdd2doy( sBuf )
+        where ( landuse_index == indx )
+          GDD_RESET_DATE = mmdd2doy( sBuf )
+        end where
+          
       enddo 
       
     else
@@ -108,10 +100,10 @@ contains
     endif   
 
     
-    if ( ubound( fGDD_Max_, 1 ) == iNumberOfLanduses ) then
+    if ( ubound( gdd_max_, 1 ) == number_of_landuse_codes ) then
 
-      do iIndex=1, ubound( iLanduseIndex, 1)
-        GDD_MAX( iIndex ) = fGDD_Max_( iLanduseIndex( iIndex ) )
+      do indx=1, ubound( landuse_index, 1)
+        GDD_MAX( indx ) = gdd_max_( landuse_index( indx ) )
       enddo 
       
     else
@@ -122,10 +114,10 @@ contains
     endif   
 
 
-    if ( ubound( fGDD_Base_, 1 ) == iNumberOfLanduses ) then
+    if ( ubound( gdd_base_, 1 ) == number_of_landuse_codes ) then
 
-      do iIndex=1, ubound( iLanduseIndex, 1)
-        GDD_BASE( iIndex ) = fGDD_Base_( iLanduseIndex( iIndex ) )
+      do indx=1, ubound( landuse_index, 1)
+        GDD_BASE( indx ) = gdd_base_( landuse_index( indx ) )
       enddo 
       
     else
@@ -135,89 +127,34 @@ contains
 
     endif   
 
-    GDD = 0.0_c_float 
-
-    allocate ( pNCFILE, stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE, sVariableName="growing_degree_day", &
-      sVariableUnits="degree-days Fahrenheit", iNX=ubound(lActive, 1), iNY=ubound(lActive, 2),  &
-      fX=dX, fY=dY,                                                                             &
-      StartDate=SIM_DT%start, EndDate=SIM_DT%end, PROJ4_string=PROJ4_string,                    &
-      dpLat=dY_lat, dpLon=dX_lon, fValidMin=0.0, fValidMax=9000.0 )
-
   end subroutine growing_degree_day_initialize
 
 !--------------------------------------------------------------------------------------------------
 
-  elemental subroutine growing_degree_day_calculate( fGDD, iGDD_Reset_DOY, fTMean, fT_GDD_Base, fT_GDD_Max )
+  elemental subroutine growing_degree_day_calculate( gdd, tmean, order )
 
     ! [ ARGUMENTS ]
-    real (kind=c_float), intent(inout)       :: fGDD
-    integer (kind=c_int), intent(in)         :: iGDD_Reset_DOY
-    real (kind=c_float), intent(in)          :: fTMean
-    real (kind=c_float), intent(in)          :: fT_GDD_Base
-    real (kind=c_float), intent(in)          :: fT_GDD_Max
+    real (kind=c_float), intent(inout)       :: gdd
+    real (kind=c_float), intent(in)          :: tmean
+    integer (kind=c_int), intent(in)         :: order
 
     ! [ LOCALS ]
-    real (kind=c_float) :: fDelta
+    real (kind=c_float)    :: delta
 
-    if ( SIM_DT%iDOY == iGDD_Reset_DOY ) fGDD = 0.0_c_float
+    associate( doy_to_reset_gdd => GDD_RESET_DATE( order ),      &
+               gdd_max_ => GDD_MAX( order ),                     &
+               gdd_base_ => GDD_BASE( order ) )
 
-    fDelta = min(fTMean, fT_GDD_Max) - fT_GDD_Base
+      if ( SIM_DT%iDOY == doy_to_reset_gdd )  gdd = 0.0_c_float
 
-    if ( fDelta > 0.0_c_float ) fGDD = fGDD + fDelta
+      delta = min(tmean, gdd_max_) - gdd_base_
+
+      if ( delta > 0.0_c_float ) gdd = gdd + delta
+
+    end associate
 
   end subroutine growing_degree_day_calculate 
 
 !--------------------------------------------------------------------------------------------------
-
-  subroutine growing_degree_day_output( lActive, nodata_fill_value )
-
-    logical (kind=c_bool), intent(in)      :: lActive(:,:)
-    real (kind=c_float), intent(in)        :: nodata_fill_value(:,:)
-
-    ! [ LOCALS ] 
-    integer (kind=c_int) :: iJulianDay
-    integer (kind=c_int) :: iMonth
-    integer (kind=c_int) :: iDay
-    integer (kind=c_int) :: iYear
-    integer (kind=c_int) :: iDaysInMonth
-    integer (kind=c_int) :: iNumDaysFromOrigin
-    integer (kind=c_int)                 :: iNX
-    integer (kind=c_int)                 :: iNY
-    integer (kind=c_int) :: iIndex
-    real (kind=c_float)  :: fFactor
-
-    iNX = ubound(nodata_fill_value, 1)
-    iNY = ubound(nodata_fill_value, 2)
-
-    associate ( dt => SIM_DT%curr )
-
-!       iJulianDay = dt%getJulianDay()
-!       iMonth = asInt( dt%iMonth )
-!       iDay = asInt( dt%iDay )
-!       iYear = dt%iYear
-      iDaysInMonth = SIM_DT%iDaysInMonth
-      iNumDaysFromOrigin = SIM_DT%iNumDaysFromOrigin
-
-        ! write timestamp to NetCDF file
-      call netcdf_put_variable_vector(NCFILE=pNCFILE, &
-        iVarID=pNCFILE%iVarID(NC_TIME), &
-        iStart=[int( iNumDaysFromOrigin, kind=c_size_t)], &
-        iCount=[1_c_size_t], &
-        iStride=[1_c_ptrdiff_t], &
-        dpValues=[real( iNumDaysFromOrigin, kind=c_double)])
-
-      call netcdf_put_packed_variable_array(NCFILE=pNCFILE, &
-                   iVarID=pNCFILE%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(iNY, kind=c_size_t), int(iNX, kind=c_size_t)],              &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=GDD, lMask=lActive, rField=nodata_fill_value )
-
-    end associate
-
-  end subroutine growing_degree_day_output
 
 end module growing_degree_day

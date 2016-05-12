@@ -18,33 +18,34 @@ module output
 
   type (NETCDF_FILE_COLLECTION_T), allocatable, public :: NC_OUT(:)
 
-  integer (kind=c_int), parameter   :: NCDF_NUM_OUTPUTS = 17
+  integer (kind=c_int), parameter   :: NCDF_NUM_OUTPUTS = 18
 
   type OUTPUT_SPECS_T
     character (len=24)          :: variable_name
-    character (len=20)          :: variable_units
+    character (len=21)          :: variable_units
     real (kind=c_float)         :: valid_minimum
     real (kind=c_float)         :: valid_maximum
   end type OUTPUT_SPECS_T
   
-  type (OUTPUT_SPECS_T)    :: OUTSPECS(NCDF_NUM_OUTPUTS) = [                                &
-    OUTPUT_SPECS_T( "gross_precipitation     ", "inches_per_day      ", 0.0, 60.0 ),        & 
-    OUTPUT_SPECS_T( "rainfall                ", "inches_per_day      ", 0.0, 60.0 ),        &
-    OUTPUT_SPECS_T( "snowfall                ", "inches_per_day      ", 0.0, 60.0 ),        &
-    OUTPUT_SPECS_T( "interception            ", "inches_per_day      ", 0.0, 60.0 ),        &
-    OUTPUT_SPECS_T( "runon                   ", "inches_per_day      ", 0.0, 10000.0 ),     &
-    OUTPUT_SPECS_T( "runoff                  ", "inches_per_day      ", 0.0, 10000.0 ),     &
-    OUTPUT_SPECS_T( "snow_storage            ", "inches_per_day      ", 0.0, 2000.0 ),      &
-    OUTPUT_SPECS_T( "soil_storage            ", "inches_per_day      ", 0.0, 2000.0 ),      &
-    OUTPUT_SPECS_T( "reference_ET0           ", "inches_per_day      ", 0.0, 2000.0 ),      &
-    OUTPUT_SPECS_T( "actual_et               ", "inches_per_day      ", 0.0, 2000.0 ),      &
-    OUTPUT_SPECS_T( "snowmelt                ", "inches_per_day      ", 0.0, 2000.0 ),      &
-    OUTPUT_SPECS_T( "tmin                    ", "degrees_fahrenheit  ", -100.0, 150.0 ),    &
-    OUTPUT_SPECS_T( "tmax                    ", "degrees_fahrenheit  ", -100.0, 150.0 ),    &  
-    OUTPUT_SPECS_T( "potential_recharge      ", "inches_per_day      ", 0.0, 2000.0 ),      &
-    OUTPUT_SPECS_T( "infiltration            ", "inches_per_day      ", 0.0, 2000.0 ),      &
-    OUTPUT_SPECS_T( "irrigation              ", "inches_per_day      ", 0.0, 2000.0 ),      &
-    OUTPUT_SPECS_T( "runoff_outside          ", "inches_per_day      ", 0.0, 10000.0 ) ]
+  type (OUTPUT_SPECS_T)    :: OUTSPECS(NCDF_NUM_OUTPUTS) = [                                 &
+    OUTPUT_SPECS_T( "gross_precipitation     ", "inches_per_day       ", 0.0, 60.0 ),        & 
+    OUTPUT_SPECS_T( "rainfall                ", "inches_per_day       ", 0.0, 60.0 ),        &
+    OUTPUT_SPECS_T( "snowfall                ", "inches_per_day       ", 0.0, 60.0 ),        &
+    OUTPUT_SPECS_T( "interception            ", "inches_per_day       ", 0.0, 60.0 ),        &
+    OUTPUT_SPECS_T( "runon                   ", "inches_per_day       ", 0.0, 10000.0 ),     &
+    OUTPUT_SPECS_T( "runoff                  ", "inches_per_day       ", 0.0, 10000.0 ),     &
+    OUTPUT_SPECS_T( "snow_storage            ", "inches_per_day       ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "soil_storage            ", "inches_per_day       ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "reference_ET0           ", "inches_per_day       ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "actual_et               ", "inches_per_day       ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "snowmelt                ", "inches_per_day       ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "tmin                    ", "degrees_fahrenheit   ", -100.0, 150.0 ),    &
+    OUTPUT_SPECS_T( "tmax                    ", "degrees_fahrenheit   ", -100.0, 150.0 ),    &  
+    OUTPUT_SPECS_T( "potential_recharge      ", "inches_per_day       ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "infiltration            ", "inches_per_day       ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "irrigation              ", "inches_per_day       ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "runoff_outside          ", "inches_per_day       ", 0.0, 10000.0 ),     &
+    OUTPUT_SPECS_T( "gdd                     ", "degree_day_fahrenheit", 0.0, 10000.0 )   ]
 
   enum, bind(c)
     enumerator :: NCDF_GROSS_PRECIPITATION=1, NCDF_RAINFALL, NCDF_SNOWFALL, &
@@ -53,7 +54,7 @@ module output
                   NCDF_REFERENCE_ET0,                                       &
                   NCDF_ACTUAL_ET, NCDF_SNOWMELT, NCDF_TMIN, NCDF_TMAX,      &
                   NCDF_POTENTIAL_RECHARGE, NCDF_INFILTRATION,               &
-                  NCDF_IRRIGATION, NCDF_RUNOFF_OUTSIDE
+                  NCDF_IRRIGATION, NCDF_RUNOFF_OUTSIDE, NCDF_GDD
   end enum 
 
 contains
@@ -93,6 +94,7 @@ contains
     if ( .not. allocated( OUTPUT_PREFIX_NAME ) ) OUTPUT_PREFIX_NAME       = ""
 
     do iIndex = 1, ubound(NC_OUT, 1)
+
       allocate ( NC_OUT(iIndex)%ncfile )
 
       call netcdf_open_and_prepare_as_output(                                        &
@@ -309,7 +311,15 @@ contains
             rValues=cells%irrigation,                                                            &
             rField=cells%nodata_fill_value )
 
-    call cells%output_GDD()
+    call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_GDD )%ncfile,                      &
+            iVarID=NC_OUT( NCDF_GDD )%ncfile%iVarID(NC_Z),                                       &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+            iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                       &
+                                int(cells%number_of_columns, kind=c_size_t) ],                   &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+            lMask=cells%active,                                                                  &
+            rValues=cells%gdd,                                                                   &
+            rField=cells%nodata_fill_value )
 
   end subroutine write_output
 

@@ -500,4 +500,31 @@ main_loop: do
 
   end subroutine routing_D8_determine_solution_order
 
+  !------------------------------------------------------------------------------------------------
+
+!   subroutine calculate_routing_D8()
+
+
+!     ! [ LOCALS ]
+!     integer (kind=c_int) :: index
+
+!     this%runon=0.0_c_float
+
+!     do index=lbound( ORDER_INDEX, 1 ), ubound( ORDER_INDEX, 1 )
+
+!       call this%calc_runoff( index )
+
+!       if ( (    TARGET_INDEX( index ) >= lbound( ORDER_INDEX, 1) ) &
+!         .and. ( TARGET_INDEX( index ) <= ubound( ORDER_INDEX, 1) ) ) then
+
+!         this%runon( TARGET_INDEX( index ) ) = this%runoff( ORDER_INDEX( index ) )
+
+!       endif  
+      
+!     enddo
+
+!   end subroutine calculate_routing_D8  
+
+
+
 end module routing__D8

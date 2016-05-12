@@ -14,7 +14,6 @@ module runoff__curve_number
   real (kind=c_float), allocatable    :: CN_ARCIII(:,:)
   real (kind=c_float), allocatable    :: CN_ARCII(:,:)
   real (kind=c_float), allocatable    :: CN_ARCI(:,:)
-  real (kind=c_float), allocatable    :: Smax(:,:)
   real (kind=c_float), allocatable    :: PREV_5_DAYS_RAIN(:,:)
   integer (kind=c_int), allocatable   :: iLanduseCodes(:)
   integer (kind=c_int)                :: DAYCOUNT
@@ -24,7 +23,7 @@ module runoff__curve_number
   public :: runoff_curve_number_calculate
   public :: update_previous_5_day_rainfall
   public :: update_curve_number_fn
-  public :: CN_ARCI, CN_ARCII, CN_ARCIII, Smax
+  public :: CN_ARCI, CN_ARCII, CN_ARCIII
   public :: FIVE_DAY_SUM, PREV_5_DAYS_RAIN
 
   real (kind=c_float), parameter :: AMC_DRY_GROWING = 1.40_c_float
@@ -78,10 +77,6 @@ contains
     call assert( iStat == 0, "Failed to allocate memory for curve number table - AMC I", &
       __FILE__, __LINE__)
 
-    allocate( Smax(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
-    call assert( iStat == 0, "Failed to allocate memory for curve number SMax table", &
-      __FILE__, __LINE__)
-
     ! we should have the curve number table fully filled out following this block
     do iSoilsIndex = 1, iNumberOfSoilGroups
       sText = "CN_"//asCharacter(iSoilsIndex)
@@ -97,12 +92,11 @@ contains
 
     ! DAYCOUNT will vary from 1 to 5 and serve as the second index value for 
     ! PREV_5_DAYS_RAIN
-    DAYCOUNT = 1
+    DAYCOUNT = 0
 
-    ! calculate SMax based on CN for AMC I
+    ! calculate curve numbers for antecedent runof conditions I and III
     CN_ARCI = CN_II_to_CN_I( CN_ARCII )
     CN_ARCIII = CN_II_to_CN_III( CN_ARCII )
-    Smax = ( 1000.0_c_float / CN_ARCI ) - 10.0_c_float
     
   end subroutine runoff_curve_number_initialize
 
@@ -149,6 +143,9 @@ contains
     real (kind=c_float), intent(in)            :: infil(:)
     integer (kind=c_int), intent(in), optional :: indx
 
+    ! [ LOCALS ]
+    integer (kind=c_int) :: jndx
+
     if ( DAYCOUNT < 5 ) then
       DAYCOUNT = DAYCOUNT + 1
     else
@@ -163,7 +160,10 @@ contains
     else
 
       PREV_5_DAYS_RAIN( :, DAYCOUNT ) = infil
-      PREV_5_DAYS_RAIN( :, FIVE_DAY_SUM ) = sum( PREV_5_DAYS_RAIN( :, 1:5 ) )
+
+      do jndx=1, ubound( PREV_5_DAYS_RAIN, 1) 
+        PREV_5_DAYS_RAIN( :, FIVE_DAY_SUM ) = sum( PREV_5_DAYS_RAIN( jndx, 1:5 ) )
+      enddo  
 
     endif
 
@@ -243,13 +243,13 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  elemental function update_curve_number_fn( iLanduseIndex, iSoilsIndex, fInflow,        &
-                                             it_is_growing_season, fSoilStorage_Max,     &
-                                             fCFGI )                                  result( CN_adj )
+  elemental function update_curve_number_fn( iLanduseIndex, iSoilsIndex, cell_index,   &
+                                             it_is_growing_season, fSoilStorage_Max,   &
+                                             fCFGI )                                      result( CN_adj )
   
   integer (kind=c_int), intent(in)  :: iLanduseIndex
   integer (kind=c_int), intent(in)  :: iSoilsIndex
-  real (kind=c_float), intent(in)   :: fInflow
+  integer (kind=c_int), intent(in)  :: cell_index
   logical (kind=c_bool), intent(in) :: it_is_growing_season
   real (kind=c_float), intent(in)   :: fSoilStorage_Max
   real (kind=c_float), intent(in)   :: fCFGI
@@ -258,8 +258,9 @@ contains
   ! [ LOCALS ]
   real (kind=c_float) :: Pf
   real (kind=c_float) :: frac
+  real (kind=c_float) :: fInflow
 
-
+  fInflow = PREV_5_DAYS_RAIN( cell_index, FIVE_DAY_SUM )
 
   associate ( CN_I   => CN_ARCI( iLanduseIndex, iSoilsIndex ),        &
               CN_II  => CN_ARCII( iLanduseIndex, iSoilsIndex ),       &
@@ -375,15 +376,17 @@ contains
   !!       In Conference Proceeding Paper, World Water and Environmental Resources Congress, 2003.
   elemental subroutine runoff_curve_number_calculate(runoff,                              &
                                                      curve_num_adj,                       &
+                                                     cell_index,                          &
                                                      landuse_index,                       &
                                                      soil_group,                          &
                                                      it_is_growing_season,                &
                                                      soil_storage_max,                    & 
                                                      inflow,                              &
                                                      continuous_frozen_ground_index ) 
-
+  
     real (kind=c_float), intent(inout)  :: runoff
     real (kind=c_float), intent(inout)  :: curve_num_adj
+    integer (kind=c_int), intent(in)    :: cell_index
     integer (kind=c_int), intent(in)    :: landuse_index
     integer (kind=c_int), intent(in)    :: soil_group
     logical (kind=c_bool), intent(in)   :: it_is_growing_season
@@ -392,11 +395,12 @@ contains
     real (kind=c_float), intent(in)     :: continuous_frozen_ground_index
     
     ! [ LOCALS ]
-    real (kind=c_float) :: CN_05
+!    real (kind=c_float) :: CN_05
     real (kind=c_float) :: Smax
     real (kind=c_float) :: CN_adj
 
-    curve_num_adj = update_curve_number_fn( landuse_index, soil_group, inflow,                &
+    curve_num_adj = update_curve_number_fn( landuse_index, soil_group,                        &
+                                            cell_index,                                       &
                                             it_is_growing_season,                             &
                                             soil_storage_max,                                 &
                                             continuous_frozen_ground_index )
