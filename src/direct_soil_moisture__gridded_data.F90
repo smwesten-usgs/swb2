@@ -9,6 +9,7 @@ module direct_soil_moisture__gridded_data
 
   use iso_c_binding, only       : c_short, c_int, c_float, c_double, c_size_t, c_ptrdiff_t
   use constants_and_conversions
+  use datetime
   use data_catalog
   use data_catalog_entry
   use dictionary
@@ -37,6 +38,8 @@ module direct_soil_moisture__gridded_data
 
   type (T_NETCDF4_FILE), pointer       :: pNCFILE
 
+  type ( DATETIME_T ), pointer         :: DATE_OF_LAST_RETRIEVAL
+
 contains
 
   !> Initialize the routine to enable input/output of arbitrary sources/sink terms 
@@ -53,20 +56,14 @@ contains
   !! @param[in] dX_lon 2D array of longitude values.
   !! @param[in] dY_lat 2D array of latitude values.
 
-  subroutine direct_soil_moisture_initialize( lActive, iLandUseIndex, PROJ4_string,      &
-                                         dX, dY, dX_lon, dY_lat )
+  subroutine direct_soil_moisture_initialize( is_cell_active, landuse_index )
 
-    logical (kind=c_bool), intent(in)     :: lActive(:,:)
-    integer (kind=c_int), intent(in)      :: iLandUseIndex(:)
-    character (len=*), intent(inout)      :: PROJ4_string
-    real (kind=c_double), intent(in)      :: dX(:)
-    real (kind=c_double), intent(in)      :: dY(:)
-    real (kind=c_double), intent(in)      :: dX_lon(:,:)
-    real (kind=c_double), intent(in)      :: dY_lat(:,:)
+    logical (kind=c_bool), intent(in)     :: is_cell_active(:,:)
+    integer (kind=c_int), intent(in)      :: landuse_index(:)
 
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iStat
-    type (STRING_LIST_T)                 :: slString
+    type (STRING_LIST_T)                 :: parameter_list
     integer (kind=c_int)                 :: iIndex 
     integer (kind=c_int)                 :: iNX
     integer (kind=c_int)                 :: iNY
@@ -76,18 +73,18 @@ contains
 
 
     !> Determine how many landuse codes are present
-    call slString%append( "LU_Code" )
-    call slString%append( "Landuse_Code" )
+    call parameter_list%append( "LU_Code" )
+    call parameter_list%append( "Landuse_Code" )
 
-    call PARAMS%get_parameters( slKeys=slString, iValues=iLanduseCodes )
+    call PARAMS%get_parameters( slKeys=parameter_list, iValues=iLanduseCodes )
     iNumberOfLanduses = count( iLanduseCodes > 0 )
 
-    call slString%clear()
-    call slString%append( "Septic_system_discharge" )
-    call slString%append( "SEPTIC_DISCHARGE" )
-    call slString%append( "Daily_septic_discharge" )
+    call parameter_list%clear()
+    call parameter_list%append( "Septic_system_discharge" )
+    call parameter_list%append( "SEPTIC_DISCHARGE" )
+    call parameter_list%append( "Daily_septic_discharge" )
 
-    call PARAMS%get_parameters( slKeys=slString , fValues=fSEPTIC_DISCHARGE_TABLE )
+    call PARAMS%get_parameters( slKeys=parameter_list , fValues=fSEPTIC_DISCHARGE_TABLE )
 
     ! attempt to find a source of GRIDDED SEPTIC DISCHARGE data
     pSEPTIC_DISCHARGE => DAT%find( "ANNUAL_direct_soil_moisture_RATE" )
@@ -95,7 +92,7 @@ contains
     ! look for data in the form of a grid
     if ( associated( pSEPTIC_DISCHARGE ) ) then
 
-      allocate( fSEPTIC_DISCHARGE( count( lActive ) ), stat=iStat )
+      allocate( fSEPTIC_DISCHARGE( count( is_cell_active ) ), stat=iStat )
       call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
 
     ! no grid? then look for a table version; values > TINYVAL indicate that 
@@ -108,23 +105,23 @@ contains
         call warn( sMessage="The number of landuses does not match the number of annual direct"   &
           //" recharge rate values.", sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
 
-      allocate( fSEPTIC_DISCHARGE( count( lActive ) ), stat=iStat )
+      allocate( fSEPTIC_DISCHARGE( count( is_cell_active ) ), stat=iStat )
       call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
 
       ! now populate the vector of cell values
-      do iIndex=lbound( iLandUseIndex, 1 ), ubound( iLandUseIndex, 1 )
-        fSEPTIC_DISCHARGE( iIndex ) = fSEPTIC_DISCHARGE_TABLE( iLandUseIndex( iIndex ) )
+      do iIndex=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
+        fSEPTIC_DISCHARGE( iIndex ) = fSEPTIC_DISCHARGE_TABLE( landuse_index( iIndex ) )
       enddo  
 
      endif
 
 
-    call slString%clear()
-    call slString%append( "ANNUAL_septic_system_discharge" )
-    call slString%append( "ANNUAL_SEPTIC_DISCHARGE" )
-    call slString%append( "ANNUAL_septic_discharge" )
+    call parameter_list%clear()
+    call parameter_list%append( "ANNUAL_septic_system_discharge" )
+    call parameter_list%append( "ANNUAL_SEPTIC_DISCHARGE" )
+    call parameter_list%append( "ANNUAL_septic_discharge" )
 
-    call PARAMS%get_parameters( slKeys=slString , fValues=fANNUAL_SEPTIC_DISCHARGE_TABLE )
+    call PARAMS%get_parameters( slKeys=parameter_list , fValues=fANNUAL_SEPTIC_DISCHARGE_TABLE )
 
     ! attempt to find a source of GRIDDED ANNUAL SEPTIC DISCHARGE data
     pANNUAL_SEPTIC_DISCHARGE => DAT%find( "ANNUAL_SEPTIC_DISCHARGE" )
@@ -132,7 +129,7 @@ contains
     ! look for data in the form of a grid
     if ( associated( pANNUAL_SEPTIC_DISCHARGE ) ) then
 
-      allocate( fANNUAL_SEPTIC_DISCHARGE( count( lActive ) ), stat=iStat )
+      allocate( fANNUAL_SEPTIC_DISCHARGE( count( is_cell_active ) ), stat=iStat )
       call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
 
     ! no grid? then look for a table version; values > TINYVAL indicate that 
@@ -145,38 +142,29 @@ contains
         call warn( sMessage="The number of landuses does not match the number of annual direct"   &
           //" recharge rate values.", sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
 
-      allocate( fANNUAL_SEPTIC_DISCHARGE( count( lActive ) ), stat=iStat )
+      allocate( fANNUAL_SEPTIC_DISCHARGE( count( is_cell_active ) ), stat=iStat )
       call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
 
       ! now populate the vector of cell values
-      do iIndex=lbound( iLandUseIndex, 1 ), ubound( iLandUseIndex, 1 )
-        fANNUAL_SEPTIC_DISCHARGE( iIndex ) = fANNUAL_SEPTIC_DISCHARGE_TABLE( iLandUseIndex( iIndex ) )
+      do iIndex=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
+        fANNUAL_SEPTIC_DISCHARGE( iIndex ) = fANNUAL_SEPTIC_DISCHARGE_TABLE( landuse_index( iIndex ) )
       enddo  
 
      endif
 
-    !> open another netCDF file to hold total direct recharge
-    iNX = ubound(lActive, 1)
-    iNY = ubound(lActive, 2)
-
-    allocate ( pNCFILE, stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
-
-    call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE, sVariableName="direct_soil_moisture",  &
-      sVariableUnits="inches", iNX=iNX, iNY=iNY,                                              &
-      fX=dX, fY=dY, StartDate=SIM_DT%start, EndDate=SIM_DT%end, PROJ4_string=PROJ4_string,    &
-      dpLat=dY_lat, dpLon=dX_lon, fValidMin=0.0, fValidMax=2000.0   )
+     ! initialize last retrieval date to something implausibly low to trigger initial read
+     ! in the calculate procedure
+     call DATE_OF_LAST_RETRIEVAL%parseDate("01/01/1000")
 
   end subroutine direct_soil_moisture_initialize
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine direct_soil_moisture_calculate( direct_soil_moisture, iLanduse_Index, lActive, nodata_fill_value )
+  subroutine direct_soil_moisture_calculate( direct_soil_moisture, is_cell_active, indx )
 
-    real (kind=c_float), intent(inout)     :: direct_soil_moisture(:)
-    integer (kind=c_int), intent(in)       :: iLanduse_Index(:)
-    logical (kind=c_bool), intent(in)      :: lActive(:,:)
-    real (kind=c_float), intent(in)        :: nodata_fill_value(:,:)
+    real (kind=c_float), intent(inout)     :: direct_soil_moisture
+    logical (kind=c_bool), intent(in)      :: is_cell_active(:,:)
+    integer (kind=c_int), intent(in)       :: indx
 
     ! [ LOCALS ] 
     integer (kind=c_int) :: iJulianDay
@@ -185,56 +173,42 @@ contains
     integer (kind=c_int) :: iYear
     integer (kind=c_int) :: iDaysInMonth
     integer (kind=c_int) :: iNumDaysFromOrigin
-    integer (kind=c_int)                 :: iNX
-    integer (kind=c_int)                 :: iNY
     integer (kind=c_int) :: iIndex
     real (kind=c_float)  :: fFactor
 
-    iNX = ubound(nodata_fill_value, 1)
-    iNY = ubound(nodata_fill_value, 2)
+    if ( .not. DATE_OF_LAST_RETRIEVAL == SIM_DT%curr ) then
 
-    associate ( dt => SIM_DT%curr )
+      associate ( dt => SIM_DT%curr )
 
-      iJulianDay = dt%getJulianDay()
-      iMonth = asInt( dt%iMonth )
-      iDay = asInt( dt%iDay )
-      iYear = dt%iYear
-      iDaysInMonth = SIM_DT%iDaysInMonth
-      iNumDaysFromOrigin = SIM_DT%iNumDaysFromOrigin
+        iJulianDay = dt%getJulianDay()
+        iMonth = asInt( dt%iMonth )
+        iDay = asInt( dt%iDay )
+        iYear = dt%iYear
+        iDaysInMonth = SIM_DT%iDaysInMonth
+        iNumDaysFromOrigin = SIM_DT%iNumDaysFromOrigin
 
-      if ( associated( pSEPTIC_DISCHARGE ) ) then
-        call pSEPTIC_DISCHARGE%getvalues( iMonth, iDay, iYear, iJulianDay )
-        if ( pSEPTIC_DISCHARGE%lGridHasChanged ) fSEPTIC_DISCHARGE = pack( pSEPTIC_DISCHARGE%pGrdBase%rData, lActive )
-      endif      
+        if ( associated( pSEPTIC_DISCHARGE ) ) then
+          call pSEPTIC_DISCHARGE%getvalues( iMonth, iDay, iYear, iJulianDay )
+          if ( pSEPTIC_DISCHARGE%lGridHasChanged ) fSEPTIC_DISCHARGE = pack( pSEPTIC_DISCHARGE%pGrdBase%rData, is_cell_active )
+        endif      
 
-      if ( associated( pANNUAL_SEPTIC_DISCHARGE ) ) then
-        call pANNUAL_SEPTIC_DISCHARGE%getvalues( iMonth, iDay, iYear, iJulianDay )
-        if ( pANNUAL_SEPTIC_DISCHARGE%lGridHasChanged ) fANNUAL_SEPTIC_DISCHARGE = pack( pANNUAL_SEPTIC_DISCHARGE%pGrdBase%rData, lActive )
-      endif      
+        if ( associated( pANNUAL_SEPTIC_DISCHARGE ) ) then
+          call pANNUAL_SEPTIC_DISCHARGE%getvalues( iMonth, iDay, iYear, iJulianDay )
+          if ( pANNUAL_SEPTIC_DISCHARGE%lGridHasChanged ) fANNUAL_SEPTIC_DISCHARGE =     &
+              pack( pANNUAL_SEPTIC_DISCHARGE%pGrdBase%rData, is_cell_active )
+        endif      
 
-      direct_soil_moisture = 0.0_c_float
+      end associate
 
-      if ( allocated( fSEPTIC_DISCHARGE) )  direct_soil_moisture = direct_soil_moisture + fSEPTIC_DISCHARGE
-      if ( allocated( fANNUAL_SEPTIC_DISCHARGE) )  direct_soil_moisture = direct_soil_moisture + fANNUAL_SEPTIC_DISCHARGE
+      DATE_OF_LAST_RETRIEVAL = SIM_DT%curr
 
+    endif
 
-      ! write timestamp to NetCDF file
-      call netcdf_put_variable_vector(NCFILE=pNCFILE, &
-        iVarID=pNCFILE%iVarID(NC_TIME), &
-        iStart=[int( iNumDaysFromOrigin, kind=c_size_t)], &
-        iCount=[1_c_size_t], &
-        iStride=[1_c_ptrdiff_t], &
-        dpValues=[real( iNumDaysFromOrigin, kind=c_double)])
+    direct_soil_moisture = 0.0_c_float
 
-      call netcdf_put_packed_variable_array(NCFILE=pNCFILE, &
-                   iVarID=pNCFILE%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(iNY, kind=c_size_t), int(iNX, kind=c_size_t)],         &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=direct_soil_moisture, lMask=lActive, rField=nodata_fill_value )
+    if ( allocated( fSEPTIC_DISCHARGE) )  direct_soil_moisture = direct_soil_moisture + fSEPTIC_DISCHARGE( indx )
+    if ( allocated( fANNUAL_SEPTIC_DISCHARGE) )  direct_soil_moisture = direct_soil_moisture + fANNUAL_SEPTIC_DISCHARGE( indx ) / 365.25
 
-
-    end associate
 
   end subroutine direct_soil_moisture_calculate
 

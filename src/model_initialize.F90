@@ -37,7 +37,7 @@ module model_initialize
     logical (kind=c_bool)  :: lOptional
   end type METHODS_LIST_T
 
-  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 38
+  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 39
   integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 14
 
   type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS( NUMBER_OF_KNOWN_GRIDS ) =       &
@@ -78,6 +78,7 @@ module model_initialize
       GRIDDED_DATASETS_T("RUNOFF_ZONE                           ", lTRUE, DATATYPE_INT ),        & 
       GRIDDED_DATASETS_T("POLYGON_ID                            ", lTRUE, DATATYPE_INT ),        & 
       GRIDDED_DATASETS_T("SOIL_STORAGE_MAX                      ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("MAXIMUM_POTENTIAL_RECHARGE            ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("IRRIGATION_MASK                       ", lTRUE, DATATYPE_INT),         &                
       GRIDDED_DATASETS_T("RELATIVE_HUMIDITY                     ", lTRUE, DATATYPE_FLOAT )   ]
 

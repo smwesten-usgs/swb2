@@ -96,6 +96,7 @@ module model_domain
     real (kind=c_float), allocatable       :: soil_storage(:)
     real (kind=c_float), allocatable       :: soil_storage_max(:)
     real (kind=c_float), allocatable       :: potential_recharge(:)
+    real (kind=c_float), allocatable       :: rejected_potential_recharge(:)
     real (kind=c_float), allocatable       :: direct_recharge(:) 
     real (kind=c_float), allocatable       :: direct_soil_moisture(:)   
     real (kind=c_float), allocatable       :: current_rooting_depth(:)
@@ -124,52 +125,55 @@ module model_domain
     real (kind=c_float), allocatable       :: irrigation_mask(:)
 
     !> declare and initialize procedure pointers such that the default methods are in place
-    procedure ( simple_method ), pointer         :: init_interception         => model_initialize_interception_bucket
-    procedure ( simple_method ), pointer         :: init_runoff               => model_initialize_runoff_curve_number
-    procedure ( simple_method ), pointer         :: init_reference_et         => model_initialize_et_hargreaves
-    procedure ( simple_method ), pointer         :: init_actual_et            => model_initialize_actual_et_thornthwaite_mather
-    procedure ( simple_method ), pointer         :: init_routing              => model_initialize_routing_D8
-    procedure ( simple_method ), pointer         :: init_soil_storage_max     => model_initialize_soil_storage_max_internally_calculated
-    procedure ( simple_method ), pointer         :: init_snowfall             => model_initialize_snowfall_original
-    procedure ( simple_method ), pointer         :: init_snowmelt             => model_initialize_snowmelt_original
-    procedure ( simple_method ), pointer         :: init_precipitation_data   => model_initialize_precip_normal
-    procedure ( simple_method ), pointer         :: init_fog                  => model_initialize_fog_none
-    procedure ( simple_method ), pointer         :: init_irrigation           => model_initialize_irrigation_none
-    procedure ( simple_method ), pointer         :: init_direct_recharge      => model_initialize_direct_recharge_gridded
-    procedure ( simple_method ), pointer         :: init_direct_soil_moisture => model_initialize_direct_soil_moisture_none    
-    procedure ( simple_method ), pointer         :: init_GDD                  => model_initialize_GDD_none
-    procedure ( simple_method ), pointer         :: init_AWC                  => model_initialize_available_water_content_gridded
-    procedure ( simple_method ), pointer         :: init_crop_coefficient     => model_initialize_crop_coefficient_none
-    procedure ( simple_method ), pointer         :: calc_interception         => model_calculate_interception_bucket
-    procedure ( simple_method ), pointer         :: update_crop_coefficient   => model_update_crop_coefficient_none  
+    procedure ( array_method ), pointer         :: init_interception         => model_initialize_interception_bucket
+    procedure ( array_method ), pointer         :: init_runoff               => model_initialize_runoff_curve_number
+    procedure ( array_method ), pointer         :: init_reference_et         => model_initialize_et_hargreaves
+    procedure ( array_method ), pointer         :: init_actual_et            => model_initialize_actual_et_thornthwaite_mather
+    procedure ( array_method ), pointer         :: init_routing              => model_initialize_routing_D8
+    procedure ( array_method ), pointer         :: init_soil_storage_max     => model_initialize_soil_storage_max_internally_calculated
+    procedure ( array_method ), pointer         :: init_snowfall             => model_initialize_snowfall_original
+    procedure ( array_method ), pointer         :: init_snowmelt             => model_initialize_snowmelt_original
+    procedure ( array_method ), pointer         :: init_precipitation_data   => model_initialize_precip_normal
+    procedure ( array_method ), pointer         :: init_fog                  => model_initialize_fog_none
+    procedure ( array_method ), pointer         :: init_irrigation           => model_initialize_irrigation_none
+    procedure ( array_method ), pointer         :: init_direct_recharge      => model_initialize_direct_recharge_gridded
+    procedure ( array_method ), pointer         :: init_direct_soil_moisture => model_initialize_direct_soil_moisture_none    
+    procedure ( array_method ), pointer         :: init_GDD                  => model_initialize_GDD_none
+    procedure ( array_method ), pointer         :: init_AWC                  => model_initialize_available_water_content_gridded
+    procedure ( array_method ), pointer         :: init_crop_coefficient     => model_initialize_crop_coefficient_none
+    procedure ( array_method ), pointer         :: calc_interception         => model_calculate_interception_bucket
+    procedure ( array_method ), pointer         :: update_crop_coefficient   => model_update_crop_coefficient_none  
 
-    procedure ( simple_method ), pointer         :: init_continuous_frozen_ground_index => model_initialize_continuous_frozen_ground_index  
-    procedure ( simple_method ), pointer         :: calc_continuous_frozen_ground_index => model_calculate_continuous_frozen_ground_index      
+    procedure ( array_method ), pointer         :: init_continuous_frozen_ground_index => model_initialize_continuous_frozen_ground_index  
+    procedure ( array_method ), pointer         :: calc_continuous_frozen_ground_index => model_calculate_continuous_frozen_ground_index      
 
-    procedure ( simple_method_w_optional ), pointer   :: calc_runoff       => model_calculate_runoff_curve_number
+    procedure ( array_method ), pointer         :: init_maximum_potential_recharge => model_initialize_maximum_potential_recharge_gridded  
+    procedure ( indexed_method ), pointer       :: calc_maximum_potential_recharge => model_calculate_maximum_potential_recharge_gridded      
+
+    procedure ( indexed_method ), pointer       :: calc_runoff            => model_calculate_runoff_curve_number
     
-    procedure ( simple_method ), pointer         :: calc_reference_et      => model_calculate_et_hargreaves
-    procedure ( simple_method ), pointer         :: calc_routing           => model_calculate_routing_D8
+    procedure ( array_method ), pointer         :: calc_reference_et      => model_calculate_et_hargreaves
+    procedure ( indexed_method ), pointer       :: calc_routing           => model_calculate_routing_D8
 
-    procedure ( simple_method ), pointer         :: calc_actual_et         => model_calculate_actual_et_thornthwaite_mather
-    procedure ( simple_method ), pointer         :: calc_snowfall          => model_calculate_snowfall_original
-    procedure ( simple_method ), pointer         :: calc_snowmelt          => model_calculate_snowmelt_original  
-    procedure ( simple_method ), pointer         :: calc_fog               => model_calculate_fog_none
-    procedure ( simple_method ), pointer         :: calc_irrigation        => model_calculate_irrigation_none
-    procedure ( simple_method ), pointer         :: calc_GDD               => model_calculate_GDD
-    procedure ( simple_method ), pointer         :: calc_direct_recharge      => model_calculate_direct_recharge_none    
-    procedure ( simple_method ), pointer         :: calc_direct_soil_moisture => model_calculate_direct_soil_moisture_none        
+    procedure ( indexed_method ), pointer       :: calc_actual_et         => model_calculate_actual_et_thornthwaite_mather
+    procedure ( array_method ), pointer         :: calc_snowfall          => model_calculate_snowfall_original
+    procedure ( array_method ), pointer         :: calc_snowmelt          => model_calculate_snowmelt_original  
+    procedure ( array_method ), pointer         :: calc_fog               => model_calculate_fog_none
+    procedure ( array_method ), pointer         :: calc_irrigation        => model_calculate_irrigation_none
+    procedure ( array_method ), pointer         :: calc_GDD               => model_calculate_GDD
+    procedure ( indexed_method ), pointer       :: calc_direct_recharge      => model_calculate_direct_recharge_none    
+    procedure ( indexed_method ), pointer       :: calc_direct_soil_moisture => model_calculate_direct_soil_moisture_none        
 
-    procedure (simple_method), pointer           :: output_irrigation      => model_output_irrigation_none
-    procedure (simple_method), pointer           :: dump_variables         => model_dump_variables_none    
+    procedure (array_method), pointer           :: output_irrigation      => model_output_irrigation_none
+    procedure (array_method), pointer           :: dump_variables         => model_dump_variables_none    
 
-    procedure ( simple_method ), pointer         :: read_awc_data           => model_read_available_water_content_gridded
-    procedure ( simple_method ), pointer         :: get_precipitation_data => model_get_precip_normal
-    procedure ( simple_method ), pointer         :: get_minimum_air_temperature_data                                       &     
+    procedure ( array_method ), pointer         :: read_awc_data           => model_read_available_water_content_gridded
+    procedure ( array_method ), pointer         :: get_precipitation_data => model_get_precip_normal
+    procedure ( array_method ), pointer         :: get_minimum_air_temperature_data                                       &     
                                                                            => model_get_minimum_air_temperature_normal
-    procedure ( simple_method ), pointer         :: get_maximum_air_temperature_data                                       &     
+    procedure ( array_method ), pointer         :: get_maximum_air_temperature_data                                       &     
                                                                            => model_get_maximum_air_temperature_normal
-    procedure ( simple_method ), pointer         :: calculate_mean_air_temperature                                       &     
+    procedure ( array_method ), pointer         :: calculate_mean_air_temperature                                       &     
                                                                            => model_calculate_mean_air_temperature
 
   contains
@@ -204,9 +208,6 @@ module model_domain
     procedure :: row_column_to_index_fn
     generic   :: row_column_to_index => row_column_to_index_fn
 
-!     procedure :: dump_model_values_by_cell_sub
-!     generic   :: dump_model_values_by_cell => dump_model_values_by_cell_sub
-
     procedure :: model_initialize_growing_season
     generic   :: initialize_growing_season => model_initialize_growing_season
   
@@ -223,22 +224,23 @@ module model_domain
 
   type ( CELL_COL_ROW_T ) :: DUMP(5)
 
+  ! array method: designed to be called using whole-array notation
   abstract interface
-    subroutine simple_method( this )
+    subroutine array_method( this )
       import :: MODEL_DOMAIN_T
       class ( MODEL_DOMAIN_T ), intent(inout)  :: this
-    end subroutine simple_method
+    end subroutine array_method
   end interface  
 
-
+  ! indexed method: designed to be called sequentially with explicit
+  ! index values provided
   abstract interface
-    subroutine simple_method_w_optional( this, index )
+    subroutine indexed_method( this, index )
       import :: MODEL_DOMAIN_T, c_int
       class ( MODEL_DOMAIN_T ), intent(inout)       :: this
-      integer (kind=c_int), intent(in), optional    :: index
-    end subroutine simple_method_w_optional
+      integer (kind=c_int), intent(in)              :: index
+    end subroutine indexed_method
   end interface  
-
 
   interface minmaxmean
     procedure :: minmaxmean_float
@@ -329,7 +331,7 @@ contains
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
     integer (kind=c_int)  :: indx
-    integer (kind=c_int)  :: iStat(52)
+    integer (kind=c_int)  :: iStat(53)
 
     iCount = count( this%active )
     iStat = 0
@@ -385,6 +387,7 @@ contains
     allocate( this%row_num_1D( iCount ), stat=iStat(50) )    
     allocate( this%it_is_growing_season( iCount ), stat=iStat(51) )
     allocate( this%curve_num_adj( iCount ), stat=iStat(52) )
+    allocate( this%rejected_potential_recharge( iCount ), stat=iStat(53) )
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="  &
@@ -420,6 +423,7 @@ contains
     this%soil_storage_max                    = 0.0_c_float
 
     this%potential_recharge                  = 0.0_c_float
+    this%rejected_potential_recharge         = 0.0_c_float
     this%fog                                 = 0.0_c_float
     this%irrigation                          = 0.0_c_float
     this%curve_num_adj                       = 0.0_c_float
@@ -539,6 +543,8 @@ contains
     call this%init_irrigation
 
     call this%init_direct_recharge
+
+    call this%init_maximum_potential_recharge
 
     call this%init_crop_coefficient
 
@@ -1210,17 +1216,18 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
+    this%runon = 0.0_c_float
+
   end subroutine model_initialize_routing_none  
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_routing_none(this)
+  subroutine model_calculate_routing_none(this, indx)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+    integer (kind=c_int), intent(in)       :: indx
 
-    ! no routing to be done; just call the runoff calculation routine and move on
-    this%runon = 0.0_c_float
-    call this%calc_runoff()
+    ! nothing to be done
 
   end subroutine model_calculate_routing_none  
 
@@ -1238,29 +1245,24 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_routing_D8(this)
+  subroutine model_calculate_routing_D8( this, indx )
 
-    use routing__D8, only   : TARGET_INDEX, ORDER_INDEX
+    use routing__D8, only   : TARGET_INDEX
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+    integer (kind=c_int), intent(in)       :: indx
 
-    ! [ LOCALS ]
-    integer (kind=c_int) :: index
+    this%runon( indx ) = 0.0_c_float
 
-    this%runon=0.0_c_float
+    if ( (    TARGET_INDEX( indx ) >= lbound( this%runon, 1) )               &
+      .and. ( TARGET_INDEX( indx ) <= ubound( this%runon, 1) ) ) then
 
-    do index=lbound( ORDER_INDEX, 1 ), ubound( ORDER_INDEX, 1 )
+      this%runon( TARGET_INDEX( indx ) ) = this%runoff( indx )
 
-      call this%calc_runoff( index )
-
-      if ( (    TARGET_INDEX( index ) >= lbound( ORDER_INDEX, 1) ) &
-        .and. ( TARGET_INDEX( index ) <= ubound( ORDER_INDEX, 1) ) ) then
-
-        this%runon( TARGET_INDEX( index ) ) = this%runoff( ORDER_INDEX( index ) )
-
-      endif  
+    endif  
       
-    enddo
+    !> @TODO: what about cases where target is outside of grid?
+    !!        what about flow pointing to open water feature?
 
   end subroutine model_calculate_routing_D8  
 
@@ -1473,55 +1475,35 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_runoff_curve_number(this, index )
+  subroutine model_calculate_runoff_curve_number(this, indx )
 
     use runoff__curve_number, only  : runoff_curve_number_calculate,     &
                                       update_previous_5_day_rainfall
 
     class (MODEL_DOMAIN_T), intent(inout)          :: this
-    integer (kind=c_int), intent(in), optional     :: index
+    integer (kind=c_int), intent(in)               :: indx
 
     ! [ LOCALS ]
     real (kind=c_float)  :: interim_inflow(1)
-    integer (kind=c_int) :: indx
 
+    !> @TODO: Should interception term be part of this? Initial abstraction should include
+    !!        some of this interception...
 
-    if ( present(index) ) then
+    interim_inflow(1) = this%runon( indx ) + this%rainfall( indx )   &
+                    + this%snowmelt( indx ) - this%interception( indx )
 
-      indx = index
-      interim_inflow(1) = this%runon( index ) + this%rainfall( index )   &
-                      + this%snowmelt( index ) - this%interception( index )
+    call runoff_curve_number_calculate(runoff=this%runoff( indx ),                              &
+                                       curve_num_adj=this%curve_num_adj( indx ),                &
+                                       landuse_index=this%landuse_index( indx ),                &
+                                       cell_index=indx,                                          &
+                                       soil_group=this%soil_group( indx ),                      &
+                                       soil_storage_max=this%soil_storage_max( indx ),          & 
+                                       inflow=interim_inflow(1),                                 &
+                                       it_is_growing_season=this%it_is_growing_season( indx ),  &
+                                       continuous_frozen_ground_index=                           &
+                                       this%continuous_frozen_ground_index( indx ) ) 
 
-      call runoff_curve_number_calculate(runoff=this%runoff( index ),                              &
-                                         curve_num_adj=this%curve_num_adj( index ),                &
-                                         landuse_index=this%landuse_index( index ),                &
-                                         cell_index=indx,                                          &
-                                         soil_group=this%soil_group( index ),                      &
-                                         soil_storage_max=this%soil_storage_max( index ),          & 
-                                         inflow=interim_inflow(1),                                 &
-                                         it_is_growing_season=this%it_is_growing_season( index ),  &
-                                         continuous_frozen_ground_index=                           &
-                                         this%continuous_frozen_ground_index( index ) ) 
-
-      call update_previous_5_day_rainfall( interim_inflow, indx )
-
-
-    else
-
-      call runoff_curve_number_calculate(runoff=this%runoff,                                  &
-                                         curve_num_adj=this%curve_num_adj,                    &
-                                         landuse_index=this%landuse_index,                    &
-                                         soil_group=this%soil_group,                          &
-                                         cell_index=this%index_order,                         &
-                                         soil_storage_max=this%soil_storage_max,              & 
-                                         inflow=this%inflow,                                  &
-                                         it_is_growing_season=this%it_is_growing_season,      &
-                                         continuous_frozen_ground_index=                      &
-                                         this%continuous_frozen_ground_index ) 
-
-      call update_previous_5_day_rainfall( this%runon + this%rainfall + this%snowmelt - this%interception )
-
-    endif
+    call update_previous_5_day_rainfall( interim_inflow, indx )
 
   end subroutine model_calculate_runoff_curve_number
 
@@ -1546,13 +1528,13 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_runoff_gridded_values(this, index )
+  subroutine model_calculate_runoff_gridded_values(this, indx )
 
     use runoff__gridded_values
     use datetime, only           : DATETIME_T
 
     class (MODEL_DOMAIN_T), intent(inout)       :: this
-    integer (kind=c_int), intent(in), optional  :: index
+    integer (kind=c_int), intent(in)            :: indx
 
     ! [ LOCALS ]
     type (DATETIME_T), save     :: date_of_last_grid_update
@@ -1563,20 +1545,12 @@ contains
       date_of_last_grid_update = SIM_DT%curr
     endif
 
-    if ( present( index ) ) then
-  
-      interim_inflow = this%rainfall( index ) + this%snowmelt( index ) 
+    interim_inflow = this%rainfall( indx ) + this%snowmelt( indx ) 
 
-      this%runoff( index ) = interim_inflow * RUNOFF_RATIOS( index )
+    this%runoff( indx ) = interim_inflow * RUNOFF_RATIOS( indx )
 
-    else
-
-      this%runoff = ( this%rainfall + this%snowmelt ) * RUNOFF_RATIOS
-
-    endif
-
-    if ( allocated( this%monthly_gross_precip ) )  &
-      this%monthly_runoff = this%monthly_gross_precip * RUNOFF_RATIOS
+    if ( allocated( this%monthly_gross_precip ) )                                                &
+      this%monthly_runoff( indx ) = this%monthly_gross_precip( indx ) * RUNOFF_RATIOS( indx )
 
   end subroutine model_calculate_runoff_gridded_values
 
@@ -1982,24 +1956,24 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_actual_et_thornthwaite_mather( this )
+  subroutine model_calculate_actual_et_thornthwaite_mather( this, indx )
 
     use actual_et__thornthwaite_mather
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+    integer (kind=c_int), intent(in)       :: indx
 
     real (kind=c_float)   :: actual_et_2( ubound( this%actual_et_soil,1 ) )
     real (kind=c_float)   :: actual_et_3( ubound( this%actual_et_soil,1 ) )    
     real (kind=c_float)   :: diff
-    integer (kind=c_int)  :: indx
 
-    call calculate_actual_et_thornthwaite_mather( actual_et=this%actual_et_soil,                    &
-                                                  actual_et_2=actual_et_2,  &  
-                                                  actual_et_3=actual_et_3,  &
-                                                  soil_storage=this%soil_storage,                   &
-                                                  soil_storage_max=this%soil_storage_max,           &
-                                                  precipitation=this%infiltration,                  &
-                                                  crop_etc=this%crop_etc )
+    call calculate_actual_et_thornthwaite_mather( actual_et=this%actual_et_soil( indx ),            &
+                                                  actual_et_2=actual_et_2( indx ),                  &  
+                                                  actual_et_3=actual_et_3( indx ),                  &
+                                                  soil_storage=this%soil_storage( indx ),           &
+                                                  soil_storage_max=this%soil_storage_max( indx ),   &
+                                                  precipitation=this%infiltration( indx ),          &
+                                                  crop_etc=this%crop_etc( indx ) )
 
 !     do indx=1,ubound( this%actual_et_soil,1) 
 !       if ( actual_et_2( indx ) > 0.0 ) then  
@@ -2030,19 +2004,25 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_actual_et_fao56( this )
+  subroutine model_calculate_actual_et_fao56( this, indx )
 
     use actual_et__fao56
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+    integer (kind=c_int), intent(in)       :: indx
 
-    call calculate_actual_et_fao56( actual_et=this%actual_et_soil,                                    &
-                                    adjusted_depletion_fraction_p=this%adjusted_depletion_fraction_p, &
-                                    soil_storage=this%soil_storage,                                   &
-                                    soil_storage_max=this%soil_storage_max,                           &
-                                    infiltration=this%infiltration,                                   &
-                                    crop_etc=this%crop_etc,                                           &
-                                    depletion_fraction_p=DEPLETION_FRACTION( this%landuse_index ) )
+    ! [ LOCALS ]
+    integer (kind=c_int) :: landuse_index
+
+    landuse_index = this%landuse_index( indx )
+
+    call calculate_actual_et_fao56( actual_et=this%actual_et_soil( indx ),                                    &
+                                    adjusted_depletion_fraction_p=this%adjusted_depletion_fraction_p( indx ), &
+                                    soil_storage=this%soil_storage( indx ),                                   &
+                                    soil_storage_max=this%soil_storage_max( indx ),                           &
+                                    infiltration=this%infiltration( indx ),                                   &
+                                    crop_etc=this%crop_etc( indx ),                                           &
+                                    depletion_fraction_p=DEPLETION_FRACTION( landuse_index ) )
 
   end subroutine model_calculate_actual_et_fao56
 
@@ -2056,9 +2036,10 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_direct_recharge_none ( this )
+  subroutine model_calculate_direct_recharge_none ( this, indx )
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+    integer ( kind=c_int ), intent(in)     :: indx
 
   end subroutine model_calculate_direct_recharge_none
 
@@ -2070,23 +2051,23 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call direct_recharge_initialize( lActive=this%active, iLandUseIndex=this%landuse_index,     &
-                                     PROJ4_string=this%PROJ4_string, dX=this%X, dY=this%Y,      &
-                                     dX_lon=this%X_lon , dY_lat=this%Y_lat )
+    call direct_recharge_initialize( is_cell_active=this%active,                  &
+                                     landuse_index=this%landuse_index )
 
   end subroutine model_initialize_direct_recharge_gridded
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_direct_recharge_gridded ( this )
+  subroutine model_calculate_direct_recharge_gridded ( this, indx )
 
     use direct_recharge__gridded_data
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+    integer ( kind=c_int ), intent(in)     :: indx
 
-    call direct_recharge_calculate( direct_recharge = this%direct_recharge,      &
-                                    iLanduse_Index=this%landuse_index,           &
-                                    lActive=this%active,                         &
+    call direct_recharge_calculate( direct_recharge = this%direct_recharge( indx ),      &
+                                    indx=indx,                                           &
+                                    is_cell_active=this%active,                          &
                                     nodata_fill_value=this%nodata_fill_value )
 
   end subroutine model_calculate_direct_recharge_gridded
@@ -2101,9 +2082,10 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_direct_soil_moisture_none ( this )
+  subroutine model_calculate_direct_soil_moisture_none ( this, indx )
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+    integer ( kind=c_int ), intent(in)     :: indx
 
   end subroutine model_calculate_direct_soil_moisture_none
 
@@ -2115,26 +2097,70 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call direct_soil_moisture_initialize( lActive=this%active, iLandUseIndex=this%landuse_index,     &
-                                     PROJ4_string=this%PROJ4_string, dX=this%X, dY=this%Y,      &
-                                     dX_lon=this%X_lon , dY_lat=this%Y_lat )
+    call direct_soil_moisture_initialize( is_cell_active=this%active,                 &
+                                          landuse_index=this%landuse_index )
 
   end subroutine model_initialize_direct_soil_moisture_gridded
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_direct_soil_moisture_gridded ( this )
+  subroutine model_calculate_direct_soil_moisture_gridded ( this, indx )
 
     use direct_soil_moisture__gridded_data
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+    integer ( kind=c_int ), intent(in)     :: indx
 
-    call direct_soil_moisture_calculate( direct_soil_moisture = this%direct_soil_moisture,      &
-                                    iLanduse_Index=this%landuse_index,           &
-                                    lActive=this%active,                         &
-                                    nodata_fill_value=this%nodata_fill_value )
+    call direct_soil_moisture_calculate( direct_soil_moisture = this%direct_soil_moisture( indx ),   &
+                                         indx=indx,                                                  &
+                                         is_cell_active=this%active  ) 
 
   end subroutine model_calculate_direct_soil_moisture_gridded
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_maximum_potential_recharge_none ( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_initialize_maximum_potential_recharge_none
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_maximum_potential_recharge_none ( this, indx )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    integer ( kind=c_int ), intent(in)     :: indx
+
+  end subroutine model_calculate_maximum_potential_recharge_none
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_maximum_potential_recharge_gridded ( this )
+
+    use maximum_potential_recharge__gridded_data
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call maximum_potential_recharge_initialize( is_cell_active=this%active,                 &
+                                                landuse_index=this%landuse_index )
+
+  end subroutine model_initialize_maximum_potential_recharge_gridded
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_maximum_potential_recharge_gridded ( this, indx )
+
+    use maximum_potential_recharge__gridded_data
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    integer ( kind=c_int ), intent(in)     :: indx
+
+    call maximum_potential_recharge_calculate( potential_recharge = this%potential_recharge( indx ),                    &
+                                               rejected_potential_recharge = this%rejected_potential_recharge( indx ),  &
+                                               indx=indx ) 
+
+  end subroutine model_calculate_maximum_potential_recharge_gridded
 
 !--------------------------------------------------------------------------------------------------
 

@@ -30,7 +30,8 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int) :: indx
-    real (kind=c_float)  :: fraction
+    real (kind=c_float)  :: recharge_fraction
+    integer (kind=c_int) :: landuse_index
 
     ! calls elemental
     call cells%calc_GDD()
@@ -69,126 +70,123 @@ contains
                                       snowmelt=cells%snowmelt,                         &
                                       snowfall=cells%snowfall )
 
-    call calculate_impervious_surface_mass_balance(                                        &
-        surface_storage=cells%surface_storage,                                             & 
-        actual_et=cells%actual_et_impervious,                                              &   
-        surface_storage_excess=cells%surface_storage_excess,                               &
-        surface_storage_max=cells%surface_storage_max,                                     &
-        storm_drain_capture=cells%storm_drain_capture,                                     &
-        storm_drain_capture_fraction=STORM_DRAIN_CAPTURE_FRACTION( cells%landuse_index ),  &
-        rainfall=cells%rainfall,                                                           &
-        snowmelt=cells%snowmelt,                                                           &
-        runoff=cells%runoff,                                                               &
-        fog=cells%fog,                                                                     &
-        interception=cells%interception,                                                   &
-        reference_et0=cells%reference_et0 )
 
-    ! modify the surface storage in inches as if the amount calculated for the impervious area
-    ! were to be redistributed uniformly over the total area of the cell
-    cells%surface_storage_excess = cells%surface_storage_excess * ( 1.0_c_float - cells%pervious_fraction )  
+    !> if flow routing is enabled, the calculations will be made in order from upslope to downslope; 
+    !! otherwise, the calculations are made in the natural packing order of the data structure
+    do indx=1, ubound( cells%index_order, 1 )
 
-!                                                  / cells%pervious_fraction                             
+      landuse_index = cells%landuse_index( indx )
 
-! ***** NOTE: removed the division by pervious_fraction; original code does not appear to divide by pervious fraction
-!             ( see line 2090, HI_WB_3_3.f )
+      associate ( recharge                     => cells%potential_recharge( indx ),                      &
+                  pervious_fraction            => cells%pervious_fraction( indx ),                       &
+                  irrigation                   => cells%irrigation( indx ),                              &
+                  direct_recharge              => cells%direct_recharge( indx ),                         &
+                  direct_soil_moisture         => cells%direct_soil_moisture( indx ),                    &
+                  direct_recharge_fraction     => DIRECT_RECHARGE_ACTIVE_FRACTION( indx ),               &
+                  surface_storage              => cells%surface_storage( indx ),                         & 
+                  actual_et_impervious         => cells%actual_et_impervious( indx ),                    &   
+                  actual_et_soil               => cells%actual_et_soil( indx ),                          &                     
+                  surface_storage_excess       => cells%surface_storage_excess( indx ),                  &
+                  surface_storage_max          => cells%surface_storage_max( indx ),                     &
+                  soil_storage_max             => cells%soil_storage_max( indx ),                        &
+                  soil_storage                 => cells%soil_storage( indx ),                            &
+                  storm_drain_capture          => cells%storm_drain_capture( indx ),                     &
+                  storm_drain_capture_fraction => STORM_DRAIN_CAPTURE_FRACTION( landuse_index ),         &
+                  rainfall                     => cells%rainfall( indx ),                                &
+                  snowmelt                     => cells%snowmelt( indx ),                                &
+                  runon                        => cells%runon( indx ),                                   &
+                  runoff                       => cells%runoff( indx ),                                  &
+                  inflow                       => cells%inflow( indx ),                                  &
+                  infiltration                 => cells%infiltration( indx ),                            &
+                  fog                          => cells%fog( indx ),                                     &
+                  interception                 => cells%interception( indx ),                            &
+                  reference_et0                => cells%reference_et0( indx ) )
 
+        call cells%calc_runoff( indx )
 
-    ! call to calc_routing also triggers an embedded call to calc_runoff
-    ! NOTE: only way for "runon" to be positive is if D8 flow routing 
-    !       is enabled.
-    call cells%calc_routing()
+        call calculate_impervious_surface_mass_balance(                                         &
+          surface_storage=surface_storage,                                                      & 
+          actual_et=actual_et_impervious,                                                       &   
+          surface_storage_excess=surface_storage_excess,                                        &
+          surface_storage_max=surface_storage_max,                                              &
+          storm_drain_capture=storm_drain_capture,                                              &
+          storm_drain_capture_fraction=storm_drain_capture_fraction,                            &
+          rainfall=rainfall,                                                                    &
+          snowmelt=snowmelt,                                                                    &
+          runoff=runoff,                                                                        &
+          fog=fog,                                                                              &
+          interception=interception,                                                            &
+          reference_et0=reference_et0 )
 
-    ! inflow calculated over the entire cell (pervious + impervious) area
-    ! surface_storage_excess is commented out because it represents an *internal* transfer of water, 
-    ! it is not a true 'inflow' in sense that water is crossing the cell boundary
-    cells%inflow = cells%runon                                                                       &
-                   + cells%rainfall                                                                  &
-                   + cells%fog                                                                       &
-!                   + cells%surface_storage_excess * ( 1.0_c_float - cells%pervious_fraction )        &
-                   + cells%snowmelt                                                                  &
-                   - cells%interception
+        ! modify the surface storage in inches as if the amount calculated for the impervious area
+        ! were to be redistributed uniformly over the total area of the cell
+        surface_storage_excess = surface_storage_excess * ( 1.0_c_float - pervious_fraction )  
 
-    ! prevent calculated runoff from exceeding the day's inflow
-    where ( cells%inflow - cells%runoff < 0.0_c_float )
+        ! inflow calculated over the entire cell (pervious + impervious) area
+        ! surface_storage_excess is commented out because it represents an *internal* transfer of water, 
+        ! it is not a true 'inflow' in sense that water is crossing the cell boundary
+        cells%inflow = runon                                                                       &
+                       + rainfall                                                                  &
+                       + fog                                                                       &
+  !                     + cells%surface_storage_excess * ( 1.0_c_float - cells%pervious_fraction )        &
+                       + snowmelt                                                                  &
+                       - interception
 
-      cells%runoff = cells%inflow
+        ! prevent calculated runoff from exceeding the day's inflow
+        if ( inflow - runoff < 0.0_c_float )   runoff = inflow
 
-    end where
+        ! e.g. septic system discharge enters here...
+        call cells%calc_direct_soil_moisture( indx )
 
-    ! e.g. septic system discharge enters here...
-    call cells%calc_direct_soil_moisture()
+        ! irrigation not considered to be a contributor to runoff...in addition, infiltration
+        ! term is calculated with respect to the pervious fraction of the cell
+        infiltration = max( 0.0_c_float,                                                                &
+                            runon                                                                       &
+                            + rainfall                                                                  &
+                            + fog                                                                       &
+                            + surface_storage_excess                                                    &
+                            + snowmelt                                                                  &
+                            - interception                                                              &
+                            + irrigation                                                                &
+                            + direct_soil_moisture                                                      &
+                            - runoff )
 
-    ! irrigation not considered to be a contributor to runoff...in addition, infiltration
-    ! term is calculated with respect to the pervious fraction of the cell
-    cells%infiltration = max( 0.0_c_float,                                                           &
-                     cells%runon                                                                     &
-                   + cells%rainfall                                                                  &
-                   + cells%fog                                                                       &
-                   + cells%surface_storage_excess                                                    &
-                   + cells%snowmelt                                                                  &
-                   - cells%interception                                                              &
-                   + cells%irrigation                                                                &
-                   + cells%direct_soil_moisture                                                      &
-                   - cells%runoff )
+        ! the following call updates bound variable actual_et_soil
+        call cells%calc_actual_et( indx )
 
-    ! the following call updates bound variable actual_et_soil
-    call cells%calc_actual_et()
+        ! actual et for the entire cell is the weighted average of the ET for pervious and impervious
+        ! fractions of the cell
+        cells%actual_et = actual_et_soil * pervious_fraction                            &
+    !                      + cells%actual_et_interception * cells%canopy_cover_fraction             &
+                          + actual_et_impervious * ( 1.0_c_float - pervious_fraction )
 
-    ! actual et for the entire cell is the weighted average of the ET for pervious and impervious
-    ! fractions of the cell
-    cells%actual_et = cells%actual_et_soil * cells%pervious_fraction                            &
-!                      + cells%actual_et_interception * cells%canopy_cover_fraction             &
-                      + cells%actual_et_impervious * ( 1.0_c_float - cells%pervious_fraction )
+        call calculate_soil_mass_balance( potential_recharge=recharge,                 &
+                                          soil_storage=soil_storage,                   &
+                                          soil_storage_max=soil_storage_max,           &
+                                          actual_et=actual_et_soil,                    &
+                                          infiltration=infiltration )
 
-    call calculate_soil_mass_balance( potential_recharge=cells%potential_recharge,       &
-                                      soil_storage=cells%soil_storage,                   &
-                                      soil_storage_max=cells%soil_storage_max,           &
-                                      actual_et=cells%actual_et_soil,                    &
-                                      infiltration=cells%infiltration )
+        call cells%calc_direct_recharge( indx )
+        
+        ! reporting of potential recharge and irrigation must be adjusted to account for zero
+        ! irrigation and potential recharge associated with the impervious areas
 
-    ! reporting of potential recharge and irrigation must be adjusted to account for zero
-    ! irrigation and potential recharge associated with the impervious areas
+        ! modify potential recharge and irrigation terms 
 
-!    cells%potential_recharge = cells%potential_recharge * cells%pervious_fraction
+        recharge_fraction= min( pervious_fraction, 1.0_c_float - direct_recharge_fraction )
 
-    call cells%calc_direct_recharge()
-    
-    ! reporting of potential recharge and irrigation must be adjusted to account for zero
-    ! irrigation and potential recharge associated with the impervious areas
+        recharge = recharge * recharge_fraction + direct_recharge_fraction * direct_recharge
+        irrigation = irrigation * pervious_fraction
 
-    !
-    ! ***** John, check the calculation below please...it seems that we were multiplying the calculated 
-    ! potential recharge by the pervious fraction *twice*
-    !
-    ! OLD CALCULATION:
-    ! line 133: cells%potential_recharge = cells%potential_recharge * cells%pervious_fraction
-    ! line 146: cells%potential_recharge = cells%potential_recharge * cells%pervious_fraction + cells%direct_recharge
+        call cells%calc_maximum_potential_recharge( indx )
 
-    ! modify potential recharge and irrigation terms 
+        ! NOTE: only way for "runon" to be positive is if D8 flow routing 
+        !       is enabled.
+        call cells%calc_routing( indx )
 
-    associate ( recharge             => cells%potential_recharge,                    &
-                perv_fraction        => cells%pervious_fraction,                     &
-                irr                  => cells%irrigation,                            &
-                dir_recharge         => cells%direct_recharge,                       &
-                f                    => DIRECT_RECHARGE_ACTIVE_FRACTION )
+      end associate
 
-      call assert( ubound( perv_fraction, 1) == ubound( f, 1), "INTERNAL PROGRAMMING ERROR--"    &
-        //"unequal vector lengths 'perv_fraction' and 'f'."                                      &
-        //" length 'perv_fraction'="//asCharacter( ubound( perv_fraction, 1))                    &
-        //"; length f="//asCharacter(ubound(f,1)), __FILE__, __LINE__)
-
-      ! running into weird segfault issues when attempting this using whole-array operations
-
-      do indx=1, ubound( f, 1)
-
-        fraction= min( perv_fraction( indx ), 1.0_c_float - f( indx) ) 
-
-        recharge( indx ) = recharge( indx ) * fraction + f( indx ) * dir_recharge( indx )
-        irr( indx )      = irr( indx ) * perv_fraction( indx )
-
-      enddo
-
-    end associate
+    enddo  
 
   end subroutine perform_daily_calculation
 
