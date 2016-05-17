@@ -1902,12 +1902,10 @@ contains
 
   subroutine model_dump_variables_by_cell( this )
 
-    use runoff__curve_number, only   : PREV_5_DAYS_RAIN
-
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int)   :: indx, jndx, kndx
+    integer (kind=c_int)   :: indx, jndx
 
     do jndx=lbound( DUMP, 1), ubound( DUMP, 1)
 
@@ -1915,7 +1913,51 @@ contains
 
       if ( (indx > lbound( this%landuse_code, 1) ) .and. ( indx <= ubound( this%landuse_code, 1) ) ) then
 
-        write( unit=DUMP( jndx )%unitnum, fmt="(i2,',',i2,',',i4,',',6(i6,','),50(f12.3,','),f12.3)")     &
+        call model_dump_variables( this=this, unitnum=DUMP( jndx )%unitnum, indx=indx )
+        
+      endif  
+
+    enddo
+
+  end subroutine model_dump_variables_by_cell
+
+!--------------------------------------------------------------------------------------------------
+
+!   subroutine model_dump_variables_by_row( this )
+
+!     class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+!     ! [ LOCALS ]
+!     integer (kind=c_int)   :: indx, jndx
+
+!     do jndx=lbound( DUMP, 1), ubound( DUMP, 1)
+
+!       indx = this%row_column_to_index( col_num=DUMP( jndx )%col, row_num=DUMP( jndx )%row)
+
+!       if ( (indx > lbound( this%landuse_code, 1) ) .and. ( indx <= ubound( this%landuse_code, 1) ) ) then
+
+!         call model_dump_variables( this=this, unitnum=DUMP( jndx )%unitnum, indx=indx )
+        
+!       endif  
+
+!     enddo
+
+!   end subroutine model_dump_variables_by_cell
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_dump_variables( this, unitnum, indx )
+
+    use runoff__curve_number, only   : PREV_5_DAYS_RAIN
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    integer (kind=c_int), intent(in)       :: unitnum
+    integer (kind=c_int), intent(in)       :: indx
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: kndx
+
+        write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',6(i6,','),50(f12.3,','),f12.3)")                  &
           SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                        &
           this%landuse_code( indx ), this%landuse_index( indx ), this%order_index( indx ),                &
           this%soil_group( indx ), this%num_upslope_connections( indx ), this%sum_upslope_cells( indx ),  &  
@@ -1937,12 +1979,8 @@ contains
           this%actual_et_impervious( indx ), this%actual_et_interception( indx ),                         &
           this%adjusted_depletion_fraction_p( indx ), this%crop_etc( indx ), this%direct_recharge( indx ),&
           this%direct_soil_moisture( indx ), (PREV_5_DAYS_RAIN( indx, kndx), kndx=1,6) 
-        
-      endif  
 
-    enddo
-
-  end subroutine model_dump_variables_by_cell
+  end subroutine model_dump_variables
 
 !--------------------------------------------------------------------------------------------------
 
