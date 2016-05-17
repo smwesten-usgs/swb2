@@ -1117,7 +1117,8 @@ contains
               //"runoff, outflow, infiltration, snowfall, potential_snowmelt, snowmelt, interception, "           &
               //"rainfall, interception_storage, tmax, tmin, tmean, snow_storage, "                               &
               //"soil_storage, soil_storage_max, surface_storage, surface_storage_excess, "                       &
-              //"surface_storage_max, potential_recharge, fog, irrigation, gdd, runoff_outside, "                 &
+              //"surface_storage_max, potential_recharge, rejected_recharge, fog, irrigation, gdd, "              &
+              //" runoff_outside, "                                                                               &
               //"pervious_fraction, storm_drain_capture, canopy_cover_fraction, crop_coefficient_kcb, "           &
               //"cfgi, rooting_depth_max, current_rooting_depth, actual_et_soil, actual_et_impervious, "          &
               //"actual_et_interception, adjusted_depletion_fraction_p, crop_etc, direct_recharge, "              &
@@ -1257,7 +1258,7 @@ contains
     if ( (    TARGET_INDEX( indx ) >= lbound( this%runon, 1) )               &
       .and. ( TARGET_INDEX( indx ) <= ubound( this%runon, 1) ) ) then
 
-      this%runon( TARGET_INDEX( indx ) ) = this%runoff( indx )
+      this%runon( TARGET_INDEX( indx ) ) = this%runoff( indx ) + this%rejected_potential_recharge( indx )
 
     endif  
       
@@ -1917,7 +1918,7 @@ contains
 
       if ( (indx > lbound( this%landuse_code, 1) ) .and. ( indx <= ubound( this%landuse_code, 1) ) ) then
 
-        write( unit=DUMP( jndx )%unitnum, fmt="(i2,',',i2,',',i4,',',6(i6,','),49(f12.3,','),f12.3)")     &
+        write( unit=DUMP( jndx )%unitnum, fmt="(i2,',',i2,',',i4,',',6(i6,','),50(f12.3,','),f12.3)")     &
           SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                        &
           this%landuse_code( indx ), this%landuse_index( indx ), this%index_order( indx ),                &
           this%soil_group( indx ), this%num_upslope_connections( indx ), this%sum_upslope_cells( indx ),  &  
@@ -1929,7 +1930,8 @@ contains
           this%interception_storage( indx ), this%tmax( indx ), this%tmin( indx ), this%tmean( indx ),    &            
           this%snow_storage( indx ), this%soil_storage( indx ), this%soil_storage_max( indx ),            &
           this%surface_storage( indx ), this%surface_storage_excess( indx ),                              &      
-          this%surface_storage_max( indx ), this%potential_recharge( indx ), this%fog( indx ),            &
+          this%surface_storage_max( indx ), this%potential_recharge( indx ),                              &
+          this%rejected_potential_recharge( indx ), this%fog( indx ),                                     &
           this%irrigation( indx ), this%gdd( indx ), this%runoff_outside( indx ),                         &
           this%pervious_fraction( indx ), this%storm_drain_capture( indx ),                               &
           this%canopy_cover_fraction( indx ), this%crop_coefficient_kcb( indx ),                          &

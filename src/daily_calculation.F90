@@ -29,7 +29,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: cells
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: indx
+    integer (kind=c_int) :: indx, jndx
     real (kind=c_float)  :: recharge_fraction
     integer (kind=c_int) :: landuse_index
 
@@ -73,7 +73,9 @@ contains
 
     !> if flow routing is enabled, the calculations will be made in order from upslope to downslope; 
     !! otherwise, the calculations are made in the natural packing order of the data structure
-    do indx=1, ubound( cells%index_order, 1 )
+    do jndx=1, ubound( cells%index_order, 1 )
+
+      indx = cells%index_order( jndx )
 
       landuse_index = cells%landuse_index( indx )
 
@@ -182,6 +184,8 @@ contains
 
         ! NOTE: only way for "runon" to be positive is if D8 flow routing 
         !       is enabled.
+
+        ! rejected recharge + runoff will be routed downslope if routing option is turned on
         call cells%calc_routing( indx )
 
       end associate

@@ -96,6 +96,9 @@ contains
     ! attempt to find a source of GRIDDED MAXIMUM_POTENTIAL_RECHARGE data
     pMAXIMUM_POTENTIAL_RECHARGE => DAT%find( "MAXIMUM_POTENTIAL_RECHARGE" )
 
+    ! retrieve a string list of all keys associated with Max_recharge (i.e. Max_recharge_1, Max_recharge_2, etc.)
+    max_recharge_list = PARAMS%grep_name("Max_recharge", lFatal=FALSE )
+
     ! look for data in the form of a grid
     if ( associated( pMAXIMUM_POTENTIAL_RECHARGE ) ) then
 
@@ -113,7 +116,7 @@ contains
 
       end associate
 
-    else  ! no gridded data; read from TABLE values
+    elseif ( max_recharge_list%get(1) /= "<NA>" ) then  ! no gridded data; read from TABLE values
 
 !      iNumActiveCells = count( is_cell_active,1 )
 
@@ -182,6 +185,14 @@ contains
       deallocate( fMAXIMUM_POTENTIAL_RECHARGE_TABLE )
 
       call parameter_list%clear()
+
+    else  ! neither TABLE nor GRIDDED Maximum Potential Recharge values were given;
+          ! default to ridiculously high maximum potential recharge
+
+      allocate( fMAXIMUM_POTENTIAL_RECHARGE( count( is_cell_active ) ), stat=iStat )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+
+      fMAXIMUM_POTENTIAL_RECHARGE = 9999.0
 
     endif
 

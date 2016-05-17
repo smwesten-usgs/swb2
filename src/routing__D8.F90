@@ -502,11 +502,7 @@ main_loop: do
 
   !------------------------------------------------------------------------------------------------
 
-!   subroutine calculate_routing_D8()
-
-
-!     ! [ LOCALS ]
-!     integer (kind=c_int) :: index
+!   subroutine calculate_routing_D8( indx )
 
 !     this%runon=0.0_c_float
 
