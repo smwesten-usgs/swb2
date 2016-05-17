@@ -116,7 +116,7 @@ module model_domain
 
     real (kind=c_float), allocatable       :: routing_fraction(:)
 
-    integer (kind=c_int), allocatable      :: index_order(:)
+    integer (kind=c_int), allocatable      :: order_index(:)
 
     real (kind=c_float), allocatable       :: adjusted_depletion_fraction_p(:)
 
@@ -128,7 +128,7 @@ module model_domain
     procedure ( array_method ), pointer         :: init_interception         => model_initialize_interception_bucket
     procedure ( array_method ), pointer         :: init_runoff               => model_initialize_runoff_curve_number
     procedure ( array_method ), pointer         :: init_reference_et         => model_initialize_et_hargreaves
-    procedure ( array_method ), pointer         :: init_actual_et            => model_initialize_actual_et_thornthwaite_mather
+    procedure ( array_method ), pointer         :: init_actual_et            => model_initialize_actual_et_thornthwaite_mather_eqns
     procedure ( array_method ), pointer         :: init_routing              => model_initialize_routing_D8
     procedure ( array_method ), pointer         :: init_soil_storage_max     => model_initialize_soil_storage_max_internally_calculated
     procedure ( array_method ), pointer         :: init_snowfall             => model_initialize_snowfall_original
@@ -155,7 +155,7 @@ module model_domain
     procedure ( array_method ), pointer         :: calc_reference_et      => model_calculate_et_hargreaves
     procedure ( indexed_method ), pointer       :: calc_routing           => model_calculate_routing_D8
 
-    procedure ( indexed_method ), pointer       :: calc_actual_et         => model_calculate_actual_et_thornthwaite_mather
+    procedure ( indexed_method ), pointer       :: calc_actual_et         => model_calculate_actual_et_thornthwaite_mather_eqns
     procedure ( array_method ), pointer         :: calc_snowfall          => model_calculate_snowfall_original
     procedure ( array_method ), pointer         :: calc_snowmelt          => model_calculate_snowmelt_original  
     procedure ( array_method ), pointer         :: calc_fog               => model_calculate_fog_none
@@ -361,7 +361,7 @@ contains
     allocate( this%potential_recharge(iCount), stat=iStat(23) )
     allocate( this%fog(iCount), stat=iStat(24) )
     allocate( this%irrigation(iCount), stat=iStat(25) )
-    allocate( this%index_order(iCount), stat=iStat(26) )
+    allocate( this%order_index(iCount), stat=iStat(26) )
     allocate( this%runoff_outside( iCount ), stat=iStat(28) )
     allocate( this%pervious_fraction( iCount ), stat=iStat(29) )
     allocate( this%surface_storage( iCount ), stat=iStat(30) ) 
@@ -451,7 +451,7 @@ contains
     this%it_is_growing_season                = FALSE
     
     do indx=1, iCount
-      this%index_order( indx ) = indx
+      this%order_index( indx ) = indx
     enddo
 
 !$OMP END PARALLEL WORKSHARE
@@ -1240,7 +1240,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call routing_D8_initialize( this%active )
+    call routing_D8_initialize( this%active, this%order_index )
 
   end subroutine model_initialize_routing_D8  
 
@@ -1252,8 +1252,6 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     integer (kind=c_int), intent(in)       :: indx
-
-    this%runon( indx ) = 0.0_c_float
 
     if ( (    TARGET_INDEX( indx ) >= lbound( this%runon, 1) )               &
       .and. ( TARGET_INDEX( indx ) <= ubound( this%runon, 1) ) ) then
@@ -1485,13 +1483,12 @@ contains
     integer (kind=c_int), intent(in)               :: indx
 
     ! [ LOCALS ]
-    real (kind=c_float)  :: interim_inflow(1)
+    real (kind=c_float)  :: inflow_
+
+    inflow_ = this%inflow( indx )
 
     !> @TODO: Should interception term be part of this? Initial abstraction should include
     !!        some of this interception...
-
-    interim_inflow(1) = this%runon( indx ) + this%rainfall( indx )   &
-                    + this%snowmelt( indx ) - this%interception( indx )
 
     call runoff_curve_number_calculate(runoff=this%runoff( indx ),                              &
                                        curve_num_adj=this%curve_num_adj( indx ),                &
@@ -1499,12 +1496,12 @@ contains
                                        cell_index=indx,                                          &
                                        soil_group=this%soil_group( indx ),                      &
                                        soil_storage_max=this%soil_storage_max( indx ),          & 
-                                       inflow=interim_inflow(1),                                 &
+                                       inflow=this%inflow( indx ),                              &
                                        it_is_growing_season=this%it_is_growing_season( indx ),  &
                                        continuous_frozen_ground_index=                           &
                                        this%continuous_frozen_ground_index( indx ) ) 
 
-    call update_previous_5_day_rainfall( interim_inflow, indx )
+    call update_previous_5_day_rainfall( inflow_, indx )
 
   end subroutine model_calculate_runoff_curve_number
 
@@ -1888,7 +1885,7 @@ contains
 
     call growing_degree_day_calculate( gdd=this%gdd,                                        &
                                        tmean=this%tmean,                                    &
-                                       order=this%index_order )
+                                       order=this%order_index )
 
   end subroutine model_calculate_GDD
 
@@ -1920,7 +1917,7 @@ contains
 
         write( unit=DUMP( jndx )%unitnum, fmt="(i2,',',i2,',',i4,',',6(i6,','),50(f12.3,','),f12.3)")     &
           SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                        &
-          this%landuse_code( indx ), this%landuse_index( indx ), this%index_order( indx ),                &
+          this%landuse_code( indx ), this%landuse_index( indx ), this%order_index( indx ),                &
           this%soil_group( indx ), this%num_upslope_connections( indx ), this%sum_upslope_cells( indx ),  &  
           this%awc( indx ), this%latitude( indx ), this%reference_ET0( indx ), this%actual_ET( indx ),    &            
           this%curve_num_adj( indx ), this%inflow( indx ), this%runon( indx ), this%runoff( indx ),       &
@@ -1949,10 +1946,41 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_initialize_actual_et_thornthwaite_mather(this)
+  subroutine model_initialize_actual_et_thornthwaite_mather_eqns(this)
+
+    use actual_et__thornthwaite_mather_eqns, only : initialize_actual_et_thornthwaite_mather_eqns
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
+    call initialize_actual_et_thornthwaite_mather_eqns( soil_moisture=this%soil_storage,    &
+                                                        max_soil_moisture=this%soil_storage_max )
+
+  end subroutine model_initialize_actual_et_thornthwaite_mather_eqns   
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_actual_et_thornthwaite_mather_eqns( this, indx )
+
+    use actual_et__thornthwaite_mather_eqns, only : calculate_actual_et_thornthwaite_mather_eqns
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    integer (kind=c_int), intent(in)       :: indx
+
+    call calculate_actual_et_thornthwaite_mather_eqns(                                               &
+                                                  actual_et=this%actual_et( indx ),                  &
+                                                  soil_moisture=this%soil_storage( indx ),           &
+                                                  max_soil_moisture=this%soil_storage_max( indx ),   &
+                                                  precipitation=this%infiltration( indx ),           &
+                                                  crop_etc=this%crop_etc( indx ),                    &
+                                                  indx=indx )
+
+  end subroutine model_calculate_actual_et_thornthwaite_mather_eqns
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_actual_et_thornthwaite_mather(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
 
   end subroutine model_initialize_actual_et_thornthwaite_mather    
 
@@ -1965,30 +1993,11 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     integer (kind=c_int), intent(in)       :: indx
 
-    real (kind=c_float)   :: actual_et_2( ubound( this%actual_et_soil,1 ) )
-    real (kind=c_float)   :: actual_et_3( ubound( this%actual_et_soil,1 ) )    
-    real (kind=c_float)   :: diff
-
     call calculate_actual_et_thornthwaite_mather( actual_et=this%actual_et_soil( indx ),            &
-                                                  actual_et_2=actual_et_2( indx ),                  &  
-                                                  actual_et_3=actual_et_3( indx ),                  &
                                                   soil_storage=this%soil_storage( indx ),           &
                                                   soil_storage_max=this%soil_storage_max( indx ),   &
                                                   precipitation=this%infiltration( indx ),          &
                                                   crop_etc=this%crop_etc( indx ) )
-
-!     do indx=1,ubound( this%actual_et_soil,1) 
-!       if ( actual_et_2( indx ) > 0.0 ) then  
-!         diff = this%actual_et_soil(indx) - actual_et_2(indx) 
-!         if ( abs(diff) > 1.0e-3 )                                                 &                                        
-!         print *, indx, this%actual_et_soil( indx ), actual_et_2( indx ),          &
-!           actual_et_3(indx),                                                      &
-!           diff,                                                                   &
-!           this%soil_storage( indx ), this%soil_storage_max( indx ),               &
-!           this%infiltration( indx ), this%crop_etc( indx ), this%landuse_code( indx )
-!       endif    
-!     enddo  
-
 
   end subroutine model_calculate_actual_et_thornthwaite_mather
 

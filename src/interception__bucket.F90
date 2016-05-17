@@ -30,6 +30,8 @@ module interception__bucket
   real (kind=c_float), allocatable  :: GDD_FIRST_DAY_OF_GROWING_SEASON(:)
   real (kind=c_float), allocatable  :: KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON(:) 
 
+  !> Form of the bucket interception: I = A + P*B^n
+
   logical (kind=c_bool), allocatable :: IS_GROWING_SEASON(:)
 
   character( len=2 ), parameter     :: DATE_DELIMS = "/-"
@@ -425,17 +427,17 @@ contains
 
     if ( it_is_growing_season ) then
 
-      fPotentialInterception =   INTERCEPTION_A_VALUE_GROWING_SEASON( iLanduseIndex )    &
-                               + INTERCEPTION_B_VALUE_GROWING_SEASON( iLanduseIndex )    &
-                               * precip_plus_fog                                         &
-                               ** INTERCEPTION_N_VALUE_GROWING_SEASON( iLanduseIndex )
+      fPotentialInterception =   INTERCEPTION_A_VALUE_GROWING_SEASON( iLanduseIndex )   ! &
+!                               + INTERCEPTION_B_VALUE_GROWING_SEASON( iLanduseIndex )    &
+!                               * precip_plus_fog                                         &
+!                               ** INTERCEPTION_N_VALUE_GROWING_SEASON( iLanduseIndex )
 
     else
 
-      fPotentialInterception =   INTERCEPTION_A_VALUE_NONGROWING_SEASON( iLanduseIndex )    &
-                               + INTERCEPTION_B_VALUE_NONGROWING_SEASON( iLanduseIndex )    &
-                               * precip_plus_fog                                            &
-                               ** INTERCEPTION_N_VALUE_NONGROWING_SEASON( iLanduseIndex )
+      fPotentialInterception =   INTERCEPTION_A_VALUE_NONGROWING_SEASON( iLanduseIndex )   ! &
+ !                              + INTERCEPTION_B_VALUE_NONGROWING_SEASON( iLanduseIndex )    &
+ !                              * precip_plus_fog                                            &
+ !                              ** INTERCEPTION_N_VALUE_NONGROWING_SEASON( iLanduseIndex )
 
     endif
 

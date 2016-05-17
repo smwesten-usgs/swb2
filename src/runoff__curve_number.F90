@@ -3,7 +3,9 @@ module runoff__curve_number
   use iso_c_binding, only                    : c_int, c_float, c_double, c_bool
   use constants_and_conversions, only        : FALSE, TRUE 
   use continuous_frozen_ground_index, only   : CFGI_LL, CFGI_UL
+  use datetime
   use exceptions
+  use simulation_datetime
   use strings
   use string_list
   use parameters, only                    : PARAMS, PARAMS_DICT
@@ -19,6 +21,7 @@ module runoff__curve_number
   integer (kind=c_int)                :: DAYCOUNT
   integer (kind=c_int), parameter     :: FIVE_DAY_SUM = 6
 
+
   public :: runoff_curve_number_initialize
   public :: runoff_curve_number_calculate
   public :: update_previous_5_day_rainfall
@@ -30,6 +33,8 @@ module runoff__curve_number
   real (kind=c_float), parameter :: AMC_DRY_DORMANT = 0.50_c_float
   real (kind=c_float), parameter :: AMC_WET_GROWING = 2.10_c_float
   real (kind=c_float), parameter :: AMC_WET_DORMANT = 1.10_c_float
+
+  type (DATETIME_T) :: DATE_LAST_UPDATED
 
 contains
 
@@ -97,6 +102,8 @@ contains
     ! calculate curve numbers for antecedent runof conditions I and III
     CN_ARCI = CN_II_to_CN_I( CN_ARCII )
     CN_ARCIII = CN_II_to_CN_III( CN_ARCII )
+
+    call DATE_LAST_UPDATED%parsedate("01/01/1000")
     
   end subroutine runoff_curve_number_initialize
 
@@ -140,32 +147,26 @@ contains
 
   subroutine update_previous_5_day_rainfall( infil, indx ) 
 
-    real (kind=c_float), intent(in)            :: infil(:)
-    integer (kind=c_int), intent(in), optional :: indx
+    real (kind=c_float), intent(in)            :: infil
+    integer (kind=c_int), intent(in)           :: indx
 
     ! [ LOCALS ]
     integer (kind=c_int) :: jndx
 
-    if ( DAYCOUNT < 5 ) then
-      DAYCOUNT = DAYCOUNT + 1
-    else
-      DAYCOUNT = 1
-    endif
+    if ( .not. DATE_LAST_UPDATED == SIM_DT%curr ) then
 
-    if ( present( indx) ) then
+      if ( DAYCOUNT < 5 ) then
+        DAYCOUNT = DAYCOUNT + 1
+      else
+        DAYCOUNT = 1
+      endif
 
-      PREV_5_DAYS_RAIN( indx, DAYCOUNT ) = infil(1)
-      PREV_5_DAYS_RAIN( indx, FIVE_DAY_SUM ) = sum( PREV_5_DAYS_RAIN( indx, 1:5 ) )
-
-    else
-
-      PREV_5_DAYS_RAIN( :, DAYCOUNT ) = infil
-
-      do jndx=1, ubound( PREV_5_DAYS_RAIN, 1) 
-        PREV_5_DAYS_RAIN( :, FIVE_DAY_SUM ) = sum( PREV_5_DAYS_RAIN( jndx, 1:5 ) )
-      enddo  
+      DATE_LAST_UPDATED = SIM_DT%curr
 
     endif
+
+    PREV_5_DAYS_RAIN( indx, DAYCOUNT ) = infil
+    PREV_5_DAYS_RAIN( indx, FIVE_DAY_SUM ) = sum( PREV_5_DAYS_RAIN( indx, 1:5 ) )
 
   end subroutine 
 !--------------------------------------------------------------------------------------------------
@@ -268,19 +269,16 @@ contains
 
     ! Correct the curve number...
 
-!!!!!! ***** TEMPORARILY TAKING THIS OUT FOR COMPARISON W ASPEN'S OUTPUT
+    if( ( fCFGI > CFGI_LL ) .and. ( fSoilStorage_Max > 0.0_c_float ) ) then
 
-!     if( ( fCFGI > CFGI_LL ) .and. ( fSoilStorage_Max > 0.0_c_float ) ) then
+       Pf = prob_runoff_enhancement( fCFGI )
 
-!        Pf = prob_runoff_enhancement( fCFGI )
+       ! use probability of runoff enhancement to calculate a weighted
+       ! average of curve number under Type II vs Type III antecedent
+       ! runoff conditions
+       CN_adj = CN_II * (1-Pf) +  CN_III * Pf
 
-!        ! use probability of runoff enhancement to calculate a weighted
-!        ! average of curve number under Type II vs Type III antecedent
-!        ! runoff conditions
-!        CN_adj = CN_II * (1-Pf) +  CN_III * Pf
-
-!    else if ( it_is_growing_season ) then
-    if ( it_is_growing_season ) then
+    else if ( it_is_growing_season ) then
 
       if ( fInflow < AMC_DRY_GROWING ) then
 

@@ -71,11 +71,14 @@ contains
                                       snowfall=cells%snowfall )
 
 
+     cells%runon = 0.0_c_float
+     cells%runoff = 0.0_c_float
+
     !> if flow routing is enabled, the calculations will be made in order from upslope to downslope; 
     !! otherwise, the calculations are made in the natural packing order of the data structure
-    do jndx=1, ubound( cells%index_order, 1 )
+    do jndx=1, ubound( cells%order_index, 1 )
 
-      indx = cells%index_order( jndx )
+      indx = cells%order_index( jndx )
 
       landuse_index = cells%landuse_index( indx )
 
@@ -104,6 +107,13 @@ contains
                   interception                 => cells%interception( indx ),                            &
                   reference_et0                => cells%reference_et0( indx ) )
 
+        ! inflow calculated over the entire cell (pervious + impervious) area
+        cells%inflow = runon                                                                       &
+                       + rainfall                                                                  &
+                       + fog                                                                       &
+                       + snowmelt                                                                  &
+                       - interception
+
         call cells%calc_runoff( indx )
 
         call calculate_impervious_surface_mass_balance(                                         &
@@ -123,16 +133,6 @@ contains
         ! modify the surface storage in inches as if the amount calculated for the impervious area
         ! were to be redistributed uniformly over the total area of the cell
         surface_storage_excess = surface_storage_excess * ( 1.0_c_float - pervious_fraction )  
-
-        ! inflow calculated over the entire cell (pervious + impervious) area
-        ! surface_storage_excess is commented out because it represents an *internal* transfer of water, 
-        ! it is not a true 'inflow' in sense that water is crossing the cell boundary
-        cells%inflow = runon                                                                       &
-                       + rainfall                                                                  &
-                       + fog                                                                       &
-  !                     + cells%surface_storage_excess * ( 1.0_c_float - cells%pervious_fraction )        &
-                       + snowmelt                                                                  &
-                       - interception
 
         ! prevent calculated runoff from exceeding the day's inflow
         if ( inflow - runoff < 0.0_c_float )   runoff = inflow
@@ -166,7 +166,8 @@ contains
                                           soil_storage=soil_storage,                   &
                                           soil_storage_max=soil_storage_max,           &
                                           actual_et=actual_et_soil,                    &
-                                          infiltration=infiltration )
+                                          infiltration=infiltration,                   &
+                                          runoff=runoff )
 
         call cells%calc_direct_recharge( indx )
         

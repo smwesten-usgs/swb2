@@ -53,9 +53,10 @@ module routing__D8
 
 contains
 
-  subroutine routing_D8_initialize( lActive )
+  subroutine routing_D8_initialize( lActive, cell_order_index )
 
     logical (kind=c_bool), intent(in)    :: lActive(:,:)
+    integer (kind=c_int), intent(inout)  :: cell_order_index(:)
 
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iNX
@@ -189,6 +190,8 @@ contains
       end associate
 
     enddo
+
+    cell_order_index = ORDER_INDEX
 
     close ( iUnitNum )
 
