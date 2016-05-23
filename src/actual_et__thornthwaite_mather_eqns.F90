@@ -119,9 +119,13 @@ subroutine calculate_actual_et_thornthwaite_mather_eqns(                        
       if ( P_minus_PE >= 0.0_c_float ) then
 
         actual_et = crop_etc
-        temp_soil_moisture = soil_moisture + P_minus_PE
-        call thornthwaite_mather_APWL( APWL, max_soil_moisture, soil_moisture )
+        
+        if ( max_soil_moisture > NEAR_ZERO ) then
 
+          temp_soil_moisture = min( max_soil_moisture, soil_moisture + P_minus_PE )
+          call thornthwaite_mather_APWL( APWL, max_soil_moisture, temp_soil_moisture )
+
+        endif
 
       elseif ( P_minus_PE < 0.0_c_float ) then
 
@@ -135,7 +139,7 @@ subroutine calculate_actual_et_thornthwaite_mather_eqns(                        
 
         else
         
-          actual_et = crop_etc - precipitation
+          actual_et = precipitation
 
         endif     
 

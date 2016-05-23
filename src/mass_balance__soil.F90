@@ -34,7 +34,7 @@ contains
     if ( soil_storage_max < NEAR_ZERO ) then
 
       potential_recharge = 0.0_c_float
-      runoff = max( 0.0_c_float, runoff + infiltration - actual_et )
+      runoff = max( 0.0_c_float, infiltration - actual_et )
       actual_et = infiltration - runoff
 
     elseif ( new_soil_storage < 0.0_c_float ) then

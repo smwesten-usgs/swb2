@@ -13,10 +13,9 @@ module interception__bucket
   private
 
   public :: interception_bucket_initialize, interception_bucket_calculate
-  public :: interception_bucket_update_growing_season
-  public :: IS_GROWING_SEASON
+!  public :: IS_GROWING_SEASON
 
-  logical (kind=c_bool) :: GROWING_SEASON = .true._c_bool
+!  logical (kind=c_bool) :: GROWING_SEASON = .true._c_bool
 
   integer (kind=c_int), allocatable :: iLanduseCodes(:)
   real (kind=c_float), allocatable  :: INTERCEPTION_A_VALUE_GROWING_SEASON(:)
@@ -32,7 +31,7 @@ module interception__bucket
 
   !> Form of the bucket interception: I = A + P*B^n
 
-  logical (kind=c_bool), allocatable :: IS_GROWING_SEASON(:)
+!  logical (kind=c_bool), allocatable :: IS_GROWING_SEASON(:)
 
   character( len=2 ), parameter     :: DATE_DELIMS = "/-"
   real (kind=c_float), parameter    :: NODATA_VALUE = -9999._c_float
@@ -221,188 +220,121 @@ contains
     endif  
 
 
-    !> retrieve first day of growing season
-    call sl_temp_list%clear()
-    call sl_temp_list%append("First_day_of_growing_season")
-    call sl_temp_list%append("First_DOY_growing_season")
-    call sl_temp_list%append("Growing_season_start")
+!     !> retrieve first day of growing season
+!     call sl_temp_list%clear()
+!     call sl_temp_list%append("First_day_of_growing_season")
+!     call sl_temp_list%append("First_DOY_growing_season")
+!     call sl_temp_list%append("Growing_season_start")
 
-    call PARAMS%get_parameters( slKeys=sl_temp_list,                                  &
-                                slValues=sl_growing_season_begin,                     &
-                                lFatal=.true._c_bool ) 
+!     call PARAMS%get_parameters( slKeys=sl_temp_list,                                  &
+!                                 slValues=sl_growing_season_begin,                     &
+!                                 lFatal=.true._c_bool ) 
 
-    !> retrieve last day of growing season
-    call sl_temp_list%clear()
-    call sl_temp_list%append("Last_day_of_growing_season")
-    call sl_temp_list%append("Last_DOY_growing_season")
-    call sl_temp_list%append("Growing_season_end")
+!     !> retrieve last day of growing season
+!     call sl_temp_list%clear()
+!     call sl_temp_list%append("Last_day_of_growing_season")
+!     call sl_temp_list%append("Last_DOY_growing_season")
+!     call sl_temp_list%append("Growing_season_end")
 
-    call PARAMS%get_parameters( slKeys=sl_temp_list,                                  &
-                                slValues=sl_growing_season_end,                       &
-                                lFatal=.true._c_bool ) 
+!     call PARAMS%get_parameters( slKeys=sl_temp_list,                                  &
+!                                 slValues=sl_growing_season_end,                       &
+!                                 lFatal=.true._c_bool ) 
 
-    call sl_temp_list%clear()
+!     call sl_temp_list%clear()
 
-    !> process first day of growing season. retrieved as a list of strings; 
-    !! must convert the strings from mm/dd to DOY
-    allocate( FIRST_DAY_OF_GROWING_SEASON( sl_growing_season_begin%count ), stat=status )
-    call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
+!     !> process first day of growing season. retrieved as a list of strings; 
+!     !! must convert the strings from mm/dd to DOY
+!     allocate( FIRST_DAY_OF_GROWING_SEASON( sl_growing_season_begin%count ), stat=status )
+!     call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
 
-    do indx = 1, sl_growing_season_begin%count
-      str_buffer = sl_growing_season_begin%get( indx )
-      if ( scan( str_buffer, DATE_DELIMS ) > 0 ) then
-        FIRST_DAY_OF_GROWING_SEASON( indx ) = mmdd2doy( str_buffer )
-      else
-        FIRST_DAY_OF_GROWING_SEASON( indx ) = asInt( str_buffer )
-      endif  
-    enddo  
+!     do indx = 1, sl_growing_season_begin%count
+!       str_buffer = sl_growing_season_begin%get( indx )
+!       if ( scan( str_buffer, DATE_DELIMS ) > 0 ) then
+!         FIRST_DAY_OF_GROWING_SEASON( indx ) = mmdd2doy( str_buffer )
+!       else
+!         FIRST_DAY_OF_GROWING_SEASON( indx ) = asInt( str_buffer )
+!       endif  
+!     enddo  
 
-    !> process last day of growing season. retrieved as a list of strings; 
-    !! must convert the strings from mm/dd to DOY
-    allocate( LAST_DAY_OF_GROWING_SEASON( sl_growing_season_end%count ), stat=status )
-    call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
+!     !> process last day of growing season. retrieved as a list of strings; 
+!     !! must convert the strings from mm/dd to DOY
+!     allocate( LAST_DAY_OF_GROWING_SEASON( sl_growing_season_end%count ), stat=status )
+!     call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
 
-    do indx = 1, sl_growing_season_end%count
-      str_buffer = sl_growing_season_end%get( indx )
-      if ( scan( str_buffer, DATE_DELIMS ) > 0 ) then
-        LAST_DAY_OF_GROWING_SEASON( indx ) = mmdd2doy( str_buffer )
-      else
-        LAST_DAY_OF_GROWING_SEASON( indx ) = asInt( str_buffer )  
-      endif  
-    enddo  
+!     do indx = 1, sl_growing_season_end%count
+!       str_buffer = sl_growing_season_end%get( indx )
+!       if ( scan( str_buffer, DATE_DELIMS ) > 0 ) then
+!         LAST_DAY_OF_GROWING_SEASON( indx ) = mmdd2doy( str_buffer )
+!       else
+!         LAST_DAY_OF_GROWING_SEASON( indx ) = asInt( str_buffer )  
+!       endif  
+!     enddo  
 
 
 
-    !> GDD for first day of growing season
-    call sl_temp_list%clear()
-    call sl_temp_list%append("GDD_first_day_of_growing_season")
-    call sl_temp_list%append("GDD_start_of_growing_season")
+!     !> GDD for first day of growing season
+!     call sl_temp_list%clear()
+!     call sl_temp_list%append("GDD_first_day_of_growing_season")
+!     call sl_temp_list%append("GDD_start_of_growing_season")
 
-    call PARAMS%get_parameters( slKeys=sl_temp_list,          &
-                                fValues=temp_values,          &
-                                lFatal=FALSE ) 
+!     call PARAMS%get_parameters( slKeys=sl_temp_list,          &
+!                                 fValues=temp_values,          &
+!                                 lFatal=FALSE ) 
 
-    lAreLengthsEqual = ( ubound(temp_values,1) == ubound(iLanduseCodes,1) )
+!     lAreLengthsEqual = ( ubound(temp_values,1) == ubound(iLanduseCodes,1) )
     
-    if ( lAreLengthsEqual ) then
+!     if ( lAreLengthsEqual ) then
 
-      call move_alloc( temp_values, GDD_FIRST_DAY_OF_GROWING_SEASON )
+!       call move_alloc( temp_values, GDD_FIRST_DAY_OF_GROWING_SEASON )
 
-    else
+!     else
 
-      call warn( sMessage="The number of landuses does not match the number of GDD values "  &
-                        //"specified for defining the beginning of the growing season.",     &
-                 sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
+!       call warn( sMessage="The number of landuses does not match the number of GDD values "  &
+!                         //"specified for defining the beginning of the growing season.",     &
+!                  sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
 
-      allocate( GDD_FIRST_DAY_OF_GROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
-      call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__)
+!       allocate( GDD_FIRST_DAY_OF_GROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
+!       call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__)
 
-      GDD_FIRST_DAY_OF_GROWING_SEASON = NODATA_VALUE
+!       GDD_FIRST_DAY_OF_GROWING_SEASON = NODATA_VALUE
 
-    endif
+!     endif
 
-    !> Air temperature defining last day of growing season
-    call sl_temp_list%clear()
-    call sl_temp_list%append("Killing_frost_temperature")
-    call sl_temp_list%append("Air_temperature_end_of_growing_season")
+!     !> Air temperature defining last day of growing season
+!     call sl_temp_list%clear()
+!     call sl_temp_list%append("Killing_frost_temperature")
+!     call sl_temp_list%append("Air_temperature_end_of_growing_season")
 
-    call PARAMS%get_parameters( slKeys=sl_temp_list,          &
-                                fValues=temp_values,          &
-                                lFatal=FALSE ) 
+!     call PARAMS%get_parameters( slKeys=sl_temp_list,          &
+!                                 fValues=temp_values,          &
+!                                 lFatal=FALSE ) 
 
-    lAreLengthsEqual = ( ubound(temp_values,1) == ubound(iLanduseCodes,1) )
+!     lAreLengthsEqual = ( ubound(temp_values,1) == ubound(iLanduseCodes,1) )
     
-    if ( lAreLengthsEqual ) then
+!     if ( lAreLengthsEqual ) then
 
-      call move_alloc( temp_values, KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON )
+!       call move_alloc( temp_values, KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON )
 
-    else
+!     else
 
-      call warn( sMessage="The number of landuses does not match the number of killing frost values "  &
-                        //"specified to define the end of the growing season.",                        &
-                 sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
+!       call warn( sMessage="The number of landuses does not match the number of killing frost values "  &
+!                         //"specified to define the end of the growing season.",                        &
+!                  sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
 
-      allocate( KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
-      call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__)
+!       allocate( KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
+!       call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__)
 
-      KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON = NODATA_VALUE
+!       KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON = NODATA_VALUE
 
-    endif
+!     endif
 
 
-    allocate( IS_GROWING_SEASON( count( active_cells ) ), stat=status )
-    call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
+!     allocate( IS_GROWING_SEASON( count( active_cells ) ), stat=status )
+!     call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
 
-    IS_GROWING_SEASON = FALSE
+!     IS_GROWING_SEASON = FALSE
 
   end subroutine interception_bucket_initialize
-
-!--------------------------------------------------------------------------------------------------
-
-  elemental subroutine interception_bucket_update_growing_season( landuse_index,         &
-                                                                  GDD,                   &
-                                                                  mean_air_temp,         &
-                                                                  it_is_growing_season )     
-
-    integer (kind=c_int), intent(in)      :: landuse_index
-    real (kind=c_float), intent(in)       :: GDD
-    real (kind=c_float), intent(in)       :: mean_air_temp
-    logical (kind=c_bool), intent(inout)  :: it_is_growing_season
-
-    ! first growing season day > last if we're growing a winter crop, winter wheat for example
-    if ( FIRST_DAY_OF_GROWING_SEASON(landuse_index) > LAST_DAY_OF_GROWING_SEASON (landuse_index) ) then
-
-      if ( it_is_growing_season ) then
-
-        if ( KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON( landuse_index ) > NODATA_VALUE ) then 
-       
-          if ( mean_air_temp <= KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON( landuse_index ) ) &
-                 it_is_growing_season = FALSE
-        elseif (    SIM_DT%iDOY > LAST_DAY_OF_GROWING_SEASON( landuse_index )  ) then
-                 it_is_growing_season = FALSE
-        endif  
-               
-      else  ! not growing season; should it be?
-
-        if ( GDD_FIRST_DAY_OF_GROWING_SEASON( landuse_index ) > 0. ) then 
-          
-          if ( GDD >= GDD_FIRST_DAY_OF_GROWING_SEASON( landuse_index ) ) &
-               it_is_growing_season = TRUE
-        elseif ( ( SIM_DT%iDOY <= LAST_DAY_OF_GROWING_SEASON( landuse_index ) )          &
-            .or. ( SIM_DT%iDOY >= FIRST_DAY_OF_GROWING_SEASON( landuse_index ) ) )  then
-               it_is_growing_season = TRUE
-        endif  
-
-      endif
-
-    else
-
-      if ( it_is_growing_season ) then
-
-        if ( KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON( landuse_index ) > NODATA_VALUE ) then 
-         
-          if ( mean_air_temp <= KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON( landuse_index ) ) &
-               it_is_growing_season = FALSE
-        elseif (    SIM_DT%iDOY > LAST_DAY_OF_GROWING_SEASON( landuse_index ) )  then
-               it_is_growing_season = FALSE
-        endif
-               
-      else  ! not growing season; should it be?
-
-        if ( GDD_FIRST_DAY_OF_GROWING_SEASON( landuse_index ) > 0. ) then 
-          if ( GDD >= GDD_FIRST_DAY_OF_GROWING_SEASON( landuse_index ) ) &
-               it_is_growing_season = TRUE
-        elseif (    SIM_DT%iDOY <= LAST_DAY_OF_GROWING_SEASON( landuse_index )          &
-            .and. SIM_DT%iDOY >= FIRST_DAY_OF_GROWING_SEASON( landuse_index )  )  then
-               it_is_growing_season = TRUE
-       
-        endif
-
-      endif
-
-    endif
-
-  end subroutine interception_bucket_update_growing_season
 
 !--------------------------------------------------------------------------------------------------  
 

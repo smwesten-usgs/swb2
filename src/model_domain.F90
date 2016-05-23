@@ -1156,18 +1156,12 @@ contains
 
   subroutine model_calculate_interception_bucket(this)
 
-    use interception__bucket, only  : interception_bucket_calculate, IS_GROWING_SEASON, &
-                                      interception_bucket_update_growing_season
+    use interception__bucket, only  : interception_bucket_calculate
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call interception_bucket_update_growing_season( landuse_index=this%landuse_index,        &
-                                                    GDD=this%GDD,                            &
-                                                    mean_air_temp=this%tmean,                &
-                                                    it_is_growing_season=IS_GROWING_SEASON )
-
-    this%interception = interception_bucket_calculate( this%landuse_index, this%rainfall, this%fog, &
-                                                         this%canopy_cover_fraction, IS_GROWING_SEASON )
+    this%interception = interception_bucket_calculate( this%landuse_index, this%gross_precip, this%fog,   &
+                                                         this%canopy_cover_fraction, this%it_is_growing_season )
 
   end subroutine model_calculate_interception_bucket
 
@@ -1489,6 +1483,8 @@ contains
 
     !> @TODO: Should interception term be part of this? Initial abstraction should include
     !!        some of this interception...
+
+!    call update_previous_5_day_rainfall( inflow_, indx )
 
     call runoff_curve_number_calculate(runoff=this%runoff( indx ),                              &
                                        curve_num_adj=this%curve_num_adj( indx ),                &
