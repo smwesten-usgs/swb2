@@ -29,11 +29,6 @@ set BUILD_TYPE="Debug"
 :: options are "x86" (32-bit) or "x64" (64-bit)
 set OS="win_x64"
 
-:: define which portions of swb to build (i.e. swbstats? as library?)
-set TARGET__SWB_EXECUTABLE="TRUE"
-set TARGET__SWB_LIBRARY="FALSE"
-set TARGET__SWBSTATS="TRUE"
-
 :: define platform and compiler specific compilation flags
 set CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -fcheck=all -fstack-usage -fexceptions -ffree-line-length-none -static -static-libgcc -static-libgfortran -DCURL_STATICLIB -fdiagnostics-color=auto"
 set CMAKE_Fortran_FLAGS_RELEASE="-O3 -mtune=core2 -march=core2 -ffree-line-length-none -static -static-libgcc -static-libgfortran -DCURL_STATICLIB -ffpe-summary=none -fopenmp -fdiagnostics-color=auto"
@@ -59,7 +54,7 @@ set AR=%COMPILER_TRIPLET%-ar.exe
 :: set compiler-specific link and compile flags
 set LDFLAGS="-flto"
 set CFLAGS="-DCURL_STATICLIB"
-set CPPFLAGS="DgFortran -DCURL_STATICLIB"
+set CPPFLAGS="-DgFortran -DCURL_STATICLIB"
 
 set COMPILER_LIB_PATH1=%COMPILER_DIR%/lib/gcc/%COMPILER_TRIPLET%/%COMPILER_VERSION% 
 set COMPILER_LIB_PATH2=%COMPILER_DIR%/%COMPILER_TRIPLET%/lib

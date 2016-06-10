@@ -1,7 +1,7 @@
 module swb_merge_iterate
 
   use iso_c_binding, only         : c_bool, c_int, c_size_t, c_ptrdiff_t
-  use ieee_arithmetic, only       : ieee_is_nan
+ ! use ieee_arithmetic, only       : ieee_is_nan
   use constants_and_conversions
   use data_catalog, only          : DATA_CATALOG_T, DAT
   use data_catalog_entry, only    : DATA_CATALOG_ENTRY_T

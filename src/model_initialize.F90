@@ -1562,9 +1562,6 @@ contains
 
         call argv_list%clear()
 
-        call assert( status==0, "Failed to allocate memory. Exit status code was "//asCharacter( status )//".",  &
-           __FILE__, __LINE__ )
-
         do indx=1, myOptions%count
           call argv_list%append( myOptions%get( indx ) )
         enddo

@@ -390,13 +390,10 @@ contains
     allocate( this%rejected_potential_recharge( iCount ), stat=iStat(53) )
 
     do iIndex = 1, ubound( iStat, 1)
-      if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="  &
-        //asCharacter(iIndex), __FILE__, __LINE__ )
+      if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="//asCharacter(iIndex), __FILE__, __LINE__ )
     enddo
     
     if (any( iStat /= 0) ) call die ( "Unable to allocate memory for one or more arrays.", __FILE__, __LINE__ )  
-
-!$OMP PARALLEL WORKSHARE
 
     this%landuse_code                        = 0_c_int
     this%landuse_index                       = 0_c_int
@@ -448,13 +445,11 @@ contains
     this%direct_recharge                     = 0.0_c_float
     this%direct_soil_moisture                = 0.0_c_float
     this%number_of_days_since_planting       = 0_c_int
-    this%it_is_growing_season                = FALSE
+    this%it_is_growing_season                = lFALSE
     
-    do indx=1, iCount
-      this%order_index( indx ) = indx
+    do iIndex=1, iCount
+      this%order_index( iIndex ) = iIndex
     enddo
-
-!$OMP END PARALLEL WORKSHARE
 
   end subroutine initialize_arrays_sub
 
