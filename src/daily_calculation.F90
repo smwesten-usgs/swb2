@@ -147,19 +147,19 @@ contains
         ! prevent calculated runoff from exceeding the day's inflow
         if ( inflow - runoff < 0.0_c_float ) then
 
-           call LOGS%write( "line "//asCharacter(__LINE__)//": runoff > inflow?, indx= "//asCharacter(indx)//" col, row= "    &
-           //asCharacter(cells%col_num_1D( indx ))//", "//asCharacter( cells%row_num_1D( indx ) ) )
-           call LOGS%write("          runoff: "//asCharacter(runoff))
-           call LOGS%write("          inflow: "//asCharacter(inflow))
-           call LOGS%write("           runon: "//asCharacter(runon))
-           call LOGS%write("        snowmelt: "//asCharacter(snowmelt)) 
-           call LOGS%write("        snowfall: "//asCharacter(snowfall))
-           call LOGS%write("    interception: "//asCharacter(interception))
-           call LOGS%write("             fog: "//asCharacter(fog)) 
-           call LOGS%write("        rainfall: "//asCharacter(rainfall))                     
-           call LOGS%write("    gross_precip: "//asCharacter(gross_precipitation))
-           call LOGS%write("   curve_num_adj: "//asCharacter( cells%curve_num_adj( indx )))
-           call LOGS%write("    landuse_code: "//asCharacter( cells%landuse_code( indx ) ) )
+           ! call LOGS%write( "line "//asCharacter(__LINE__)//": runoff > inflow?, indx= "//asCharacter(indx)//" col, row= "    &
+           ! //asCharacter(cells%col_num_1D( indx ))//", "//asCharacter( cells%row_num_1D( indx ) ) )
+           ! call LOGS%write("          runoff: "//asCharacter(runoff))
+           ! call LOGS%write("          inflow: "//asCharacter(inflow))
+           ! call LOGS%write("           runon: "//asCharacter(runon))
+           ! call LOGS%write("        snowmelt: "//asCharacter(snowmelt)) 
+           ! call LOGS%write("        snowfall: "//asCharacter(snowfall))
+           ! call LOGS%write("    interception: "//asCharacter(interception))
+           ! call LOGS%write("             fog: "//asCharacter(fog)) 
+           ! call LOGS%write("        rainfall: "//asCharacter(rainfall))                     
+           ! call LOGS%write("    gross_precip: "//asCharacter(gross_precipitation))
+           ! call LOGS%write("   curve_num_adj: "//asCharacter( cells%curve_num_adj( indx )))
+           ! call LOGS%write("    landuse_code: "//asCharacter( cells%landuse_code( indx ) ) )
            runoff = inflow
          endif
                                    
