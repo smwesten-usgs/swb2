@@ -48,7 +48,7 @@ contains
 
    !> check: number of STORM_DRAIN_CAPTURE_FRACTION values == number of landuse codes?
     num_records = ubound(STORM_DRAIN_CAPTURE_FRACTION, 1)
-    are_lengths_unequal = ( num_records /= number_of_landuse_codes ) 
+    are_lengths_unequal = ( num_records /= number_of_landuse_codes )
 
     if ( are_lengths_unequal ) then
       call warn( sMessage="The number of values specifying storm drain capture"            &
@@ -57,7 +57,7 @@ contains
         //asCharacter( number_of_landuse_codes )//"). Setting default storm drain"        &
         //" capture to 0.0 (ZERO).", iLogLevel=LOG_ALL,                                    &
         sModule=__FILE__, iLine=__LINE__, lFatal=.false._c_bool )
-      
+
       deallocate(STORM_DRAIN_CAPTURE_FRACTION, stat=status)
       call assert( status==0, "Problem deallocating STORM_DRAIN_CAPTURE_FRACTION", &
         __FILE__, __LINE__ )
@@ -67,9 +67,9 @@ contains
         __FILE__, __LINE__ )
 
       STORM_DRAIN_CAPTURE_FRACTION = 0.0_c_float
-    endif  
+    endif
 
-  end subroutine storm_drain_capture_initialize    
+  end subroutine storm_drain_capture_initialize
 
 !--------------------------------------------------------------------------------------------------
 
@@ -83,4 +83,3 @@ contains
   end function storm_drain_capture_calculate
 
 end module storm_drain_capture
-
