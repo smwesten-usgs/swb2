@@ -5,6 +5,10 @@ rm -fr CMake*
 rm -f *.txt
 
 # set CMAKE-related and build-related variables
+export GCCBINDIR=/usr/local/Cellar/gcc5/5.3.0/bin
+#export LIBGFORTRANDIR=$(find /usr/local/Cellar/gcc5/5.3.0 -name "libgfortran.a" | sed -e 's/\/libgfortran.a//')
+export LIBGFORTRANDIR=/usr/local/Cellar/gcc5/5.3.0/lib/gcc/5
+export GCCDIR=/usr/local/Cellar/gcc5/5.3.0
 export CMAKEROOT=/usr/bin/cmake
 export COMPILER_VERSION=5.3.0
 export COMPILER_MAJ_VERSION=5
@@ -17,21 +21,16 @@ export LIB_PATH4="/usr/local/lib/gcc/$COMPILER_MAJ_VERSION"
 export Fortran_COMPILER_NAME=gfortran
 export R_HOME=/usr/bin/R
 
-export PATH=/usr/bin:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:/usr/local/opt
+export PATH=/usr/bin:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:/usr/local/opt:$GCCBINDIR
 
 # define where 'make copy' will place executables
 export INSTALL_PREFIX=/usr/local/bin
 
 # define other variables for use in the CMakeList.txt file
 # options are "Release" or "Debug"
-export BUILD_TYPE="Debug"
+export BUILD_TYPE="DEBUG"
 # options are "x86" (32-bit) or "x64" (64-bit)
 export OS="mac_osx"
-
-# define which portions of swb to build (i.e. swbstats? as library?)
-export TARGET__SWB_EXECUTABLE="TRUE"
-export TARGET__SWB_LIBRARY="FALSE"
-export TARGET__SWBSTATS="FALSE"
 
 # define platform and compiler specific compilation flags
 export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -Wuninitialized -fbacktrace -fcheck=all -fexceptions -fsanitize=null -fsanitize=leak -fmax-errors=6 -fbackslash -ffree-line-length-none"
@@ -54,24 +53,17 @@ export CMAKE_RANLIB=gcc-ranlib-$COMPILER_MAJ_VERSION
 cmake ../../.. -G "Unix Makefiles" \
 -DCOMPILER_DIR="$COMPILER_DIR " \
 -DCOMPILER_TRIPLET="$COMPILER_TRIPLET " \
+-DCMAKE_Fortran_COMPILER="$GCCBINDIR/$FC" \
 -DFortran_COMPILER_NAME="$Fortran_COMPILER_NAME" \
 -DCOMPILER_VERSION="$COMPILER_VERSION " \
 -DLIB_PATH1="$LIB_PATH1 " \
 -DLIB_PATH2="$LIB_PATH2 " \
 -DLIB_PATH3="$LIB_PATH3 " \
 -DLIB_PATH4="$LIB_PATH4 " \
+-DLIBGFORTRAN_PATH="$LIBGFORTRANDIR" \
 -DCMAKE_EXE_LINKER_FLAGS="$LINKER_FLAGS " \
 -DOS="$OS " \
--DBUILD_TYPE="$BUILD_TYPE " \
+-DCMAKE_BUILD_TYPE="$BUILD_TYPE " \
 -DCMAKE_INSTALL_PREFIX:PATH="$INSTALL_PREFIX " \
--DTARGET__SWB_EXECUTABLE:BOOLEAN="$TARGET__SWB_EXECUTABLE " \
--DTARGET__SWB_LIBRARY:BOOLEAN="$TARGET__SWB_LIBRARY " \
--DTARGET__SWBSTATS:BOOLEAN="$TARGET__SWBSTATS " \
--DOPTION__GRAPHICS_SUPPORT="$OPTION__GRAPHICS_SUPPORT " \
--DOPTION__STREAM_INTERACTIONS="$OPTION__STREAM_INTERACTIONS " \
--DOPTION__NETCDF_SUPPORT="$OPTION__NETCDF_SUPPORT" \
--DOPTION__STRICT_DATE_CHECKING="$OPTION__STRICT_DATE_CHECKING " \
--DOPTION__DEBUG_PRINT="$OPTION__DEBUG_PRINT " \
 -DCMAKE_Fortran_FLAGS_DEBUG="$CMAKE_Fortran_FLAGS_DEBUG " \
 -DCMAKE_Fortran_FLAGS_RELEASE="$CMAKE_Fortran_FLAGS_RELEASE"
-
