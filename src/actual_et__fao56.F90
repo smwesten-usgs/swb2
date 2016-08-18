@@ -9,8 +9,6 @@ module actual_et__fao56
   real (kind=c_float), allocatable   :: DEPLETION_FRACTION(:)
   real (kind=c_float), parameter     :: NEAR_ZERO = 3.0_c_float * tiny( 0.0_c_float )
 
-#define FILENAME (strrchr(__FILE__, '/') ? strrchr(__FILE__, '/') + 1 : strrchr(__FILE__, '\\') ? strrchr(__FILE__, '\\') + 1 : __FILE__)
-
 contains
 
   subroutine initialize_actual_et_FAO56( )

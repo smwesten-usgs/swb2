@@ -56,15 +56,15 @@ contains
         //asCharacter( num_records )//") does not match the number of landuse values ("    &
         //asCharacter( number_of_landuse_codes )//"). Setting default storm drain"        &
         //" capture to 0.0 (ZERO).", iLogLevel=LOG_ALL,                                    &
-        sModule=__FILE__, iLine=__LINE__, lFatal=.false._c_bool )
+        sModule=__SRCNAME__, iLine=__LINE__, lFatal=.false._c_bool )
 
       deallocate(STORM_DRAIN_CAPTURE_FRACTION, stat=status)
       call assert( status==0, "Problem deallocating STORM_DRAIN_CAPTURE_FRACTION", &
-        __FILE__, __LINE__ )
+        __SRCNAME__, __LINE__ )
 
       allocate( STORM_DRAIN_CAPTURE_FRACTION( number_of_landuse_codes ), stat=status )
       call assert( status==0, "Problem allocating STORM_DRAIN_CAPTURE_FRACTION", &
-        __FILE__, __LINE__ )
+        __SRCNAME__, __LINE__ )
 
       STORM_DRAIN_CAPTURE_FRACTION = 0.0_c_float
     endif

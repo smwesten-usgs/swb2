@@ -8,11 +8,12 @@ rm -f *.txt
 export GCCBINDIR=/usr/local/Cellar/gcc5/5.3.0/bin
 #export LIBGFORTRANDIR=$(find /usr/local/Cellar/gcc5/5.3.0 -name "libgfortran.a" | sed -e 's/\/libgfortran.a//')
 export LIBGFORTRANDIR=/usr/local/Cellar/gcc5/5.3.0/lib/gcc/5
+export LIBGCCDIR=/usr/local/Cellar/gcc5/5.3.0/lib/gcc/5/gcc/x86_64-apple-darwin15.3.0/5.3.0
 export GCCDIR=/usr/local/Cellar/gcc5/5.3.0
 export CMAKEROOT=/usr/bin/cmake
 export COMPILER_VERSION=5.3.0
 export COMPILER_MAJ_VERSION=5
-export COMPILER_TRIPLET=x86_64-apple-darwin15.0.0
+export COMPILER_TRIPLET=x86_64-apple-darwin15.3.0
 export COMPILER_DIR=/usr/local
 export LIB_PATH1="/usr/local/lib/gcc/$COMPILER_MAJ_VERSION/gcc/$COMPILER_TRIPLET/$COMPILER_VERSION"
 export LIB_PATH2=/opt/X11/lib
@@ -21,14 +22,14 @@ export LIB_PATH4="/usr/local/lib/gcc/$COMPILER_MAJ_VERSION"
 export Fortran_COMPILER_NAME=gfortran
 export R_HOME=/usr/bin/R
 
-export PATH=/usr/bin:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:/usr/local/opt:$GCCBINDIR
+export PATH=/usr/bin:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:$GCCBINDIR
 
 # define where 'make copy' will place executables
 export INSTALL_PREFIX=/usr/local/bin
 
 # define other variables for use in the CMakeList.txt file
 # options are "Release" or "Debug"
-export BUILD_TYPE="DEBUG"
+export BUILD_TYPE="RELEASE"
 # options are "x86" (32-bit) or "x64" (64-bit)
 export OS="mac_osx"
 
@@ -60,6 +61,7 @@ cmake ../../.. -G "Unix Makefiles" \
 -DLIB_PATH2="$LIB_PATH2 " \
 -DLIB_PATH3="$LIB_PATH3 " \
 -DLIB_PATH4="$LIB_PATH4 " \
+-DLIBGCC_PATH="$LIBGCCDIR " \
 -DLIBGFORTRAN_PATH="$LIBGFORTRANDIR" \
 -DCMAKE_EXE_LINKER_FLAGS="$LINKER_FLAGS " \
 -DOS="$OS " \

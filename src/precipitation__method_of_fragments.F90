@@ -141,10 +141,10 @@ contains
     ! locate the data structure associated with the gridded rainfall zone entries
     pRAINFALL_ZONE => DAT%find("RAINFALL_ZONE")
     if ( .not. associated(pRAINFALL_ZONE) ) &
-        call die("A RAINFALL_ZONE grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
+        call die("A RAINFALL_ZONE grid must be supplied in order to make use of this option.", __SRCNAME__, __LINE__)
 
     allocate( RAIN_GAGE_ID( count(lActive) ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
  
     call pRAINFALL_ZONE%getvalues()
  
@@ -152,10 +152,10 @@ contains
     RAIN_GAGE_ID = pack( pRAINFALL_ZONE%pGrdBase%iData, lActive )
 
     allocate( RAINFALL_ADJUST_FACTOR( count(lActive) ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     allocate( FRAGMENT_VALUE( count(lActive) ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
 
     ! look up the name of the fragments file in the control file dictionary
@@ -173,7 +173,7 @@ contains
       call read_fragments_sequence( slString%get(1) )
       RANDOM_FRAGMENT_SEQUENCES = .false._c_bool
       allocate ( SEQUENCE_SELECTION( count(FRAGMENTS_SEQUENCE%sim_month > 0) ), stat=iStat )
-      call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )      
+      call assert( iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )      
     endif  
 
     !> Now the fragments file is in memory. Create an ancillary data structure
@@ -182,13 +182,13 @@ contains
     iMaxRainZones = maxval(FRAGMENTS%iRainGageZone)
 
     allocate ( FRAGMENTS_SETS( iMaxRainZones ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     allocate (CURRENT_FRAGMENTS( iMaxRainZones ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     allocate (RANDOM_VALUES( iMaxRainZones ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     call process_fragment_sets()
 
@@ -294,7 +294,7 @@ contains
     iNumLines = FRAGMENTS_FILE%numLines()
 
     allocate(  FRAGMENTS( iNumLines ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory for fragments table", __FILE__, __LINE__ )
+    call assert( iStat == 0, "Problem allocating memory for fragments table", __SRCNAME__, __LINE__ )
 
     iCount = 0
 
@@ -312,7 +312,7 @@ contains
 
       if ( len_trim(sSubstring) == 0 ) &
       call die( "Missing month number in the daily fragments file", &
-        __FILE__, __LINE__, "Problem occured on line number "//asCharacter(FRAGMENTS_FILE%currentLineNum() ) &
+        __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(FRAGMENTS_FILE%currentLineNum() ) &
         //" of file "//dquote(sFilename) )
 
       FRAGMENTS(iCount)%iMonth = asInt(sSubString)
@@ -322,7 +322,7 @@ contains
 
       if ( len_trim(sSubstring) == 0 ) &
       call die( "Missing rain gage zone number in the daily fragments file", &
-        __FILE__, __LINE__, "Problem occured on line number "//asCharacter(FRAGMENTS_FILE%currentLineNum() ) &
+        __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(FRAGMENTS_FILE%currentLineNum() ) &
         //" of file "//dquote(sFilename) )
 
       FRAGMENTS(iCount)%iRainGageZone = asInt(sSubString)
@@ -332,7 +332,7 @@ contains
 
       if ( len_trim(sSubstring) == 0 ) &
       call die( "Missing fragment set number in the daily fragments file", &
-        __FILE__, __LINE__, "Problem occured on line number "//asCharacter(FRAGMENTS_FILE%currentLineNum() ) &
+        __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(FRAGMENTS_FILE%currentLineNum() ) &
         //" of file "//dquote(sFilename) )
 
       FRAGMENTS(iCount)%iFragmentSet = asInt(sSubString)
@@ -344,7 +344,7 @@ contains
 
         if ( len_trim(sSubstring) == 0 ) &
         call die( "Missing fragment value in the daily fragments file", &
-          __FILE__, __LINE__, "Problem occured on line number "//asCharacter(FRAGMENTS_FILE%currentLineNum() ) &
+          __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(FRAGMENTS_FILE%currentLineNum() ) &
           //" of file "//dquote(sFilename) )
 
         fTempValue = asFloat( sSubstring )
@@ -399,7 +399,7 @@ contains
     iNumLines = SEQUENCE_FILE%numLines()
 
     allocate(  FRAGMENTS_SEQUENCE( iNumLines ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory for fragments sequence table", __FILE__, __LINE__ )
+    call assert( iStat == 0, "Problem allocating memory for fragments sequence table", __SRCNAME__, __LINE__ )
 
     iCount = 0
 
@@ -417,7 +417,7 @@ contains
 
       if ( len_trim(sSubstring) == 0 ) &
         call die( "Missing simulation number in the fragments sequence file", &
-          __FILE__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
+          __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
           //" of file "//dquote(sFilename) )
 
       FRAGMENTS_SEQUENCE(iCount)%sim_number = asInt(sSubString)
@@ -427,7 +427,7 @@ contains
 
       if ( len_trim(sSubstring) == 0 ) &
         call die( "Missing month number in the fragments sequence file", &
-          __FILE__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
+          __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
           //" of file "//dquote(sFilename) )
 
       FRAGMENTS_SEQUENCE(iCount)%sim_month = asInt(sSubString)
@@ -437,7 +437,7 @@ contains
 
       if ( len_trim(sSubstring) == 0 ) &
         call die( "Missing rainfall zone number in the fragments sequence file", &
-          __FILE__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
+          __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
           //" of file "//dquote(sFilename) )
 
       FRAGMENTS_SEQUENCE(iCount)%sim_rainfall_zone = asInt(sSubString)
@@ -448,7 +448,7 @@ contains
 
       if ( len_trim(sSubstring) == 0 ) &
         call die( "Missing year number in the fragments sequence file", &
-          __FILE__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
+          __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
           //" of file "//dquote(sFilename) )
 
       FRAGMENTS_SEQUENCE(iCount)%sim_year = asInt(sSubString)
@@ -458,7 +458,7 @@ contains
 
       if ( len_trim(sSubstring) == 0 ) &
         call die( "Missing simulation random number in the fragments sequence file", &
-          __FILE__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
+          __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
           //" of file "//dquote(sFilename) )
 
       FRAGMENTS_SEQUENCE(iCount)%sim_random_number = asFloat(sSubString)
@@ -468,7 +468,7 @@ contains
 
       if ( len_trim(sSubstring) == 0 ) &
         call die( "Missing selected fragment set number in the fragments sequence file", &
-          __FILE__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
+          __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
           //" of file "//dquote(sFilename) )
 
       FRAGMENTS_SEQUENCE(iCount)%sim_selected_set = asInt(sSubString)
@@ -563,7 +563,7 @@ contains
           call LOGS%write("ubound(FRAGMENTS, 1): "//asCharacter(iUBOUND_FRAGMENTS), iTab=3 )                    
           call LOGS%write("RANDOM_VALUES(iIndex): "//asCharacter(RANDOM_VALUES(iIndex)), iTab=3 )
           call die( "Miscalculation in target record: calculated record index is out of bounds", &
-            __FILE__, __LINE__ )
+            __SRCNAME__, __LINE__ )
         endif
           
         CURRENT_FRAGMENTS(iIndex)%pFragment => FRAGMENTS( iTargetRecord )
@@ -676,7 +676,7 @@ contains
     pRAINFALL_ADJUST_FACTOR => DAT%find("RAINFALL_ADJUST_FACTOR")
 
     if ( .not. associated(pRAINFALL_ADJUST_FACTOR) ) &
-        call die("A RAINFALL_ADJUST_FACTOR grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
+        call die("A RAINFALL_ADJUST_FACTOR grid must be supplied in order to make use of this option.", __SRCNAME__, __LINE__)
 
     call pRAINFALL_ADJUST_FACTOR%getvalues(iMonth=iMonth, iDay=iDay, iYear=iYear  )
 

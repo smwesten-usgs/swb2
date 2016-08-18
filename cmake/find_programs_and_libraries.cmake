@@ -1,7 +1,7 @@
 
 set(CMAKE_FIND_LIBRARY_PREFIXES "lib")
 
-set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" ".so" ".a")
+set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" ".so" ".a" )
 
 find_program( R_SCRIPT Rscript.exe Rscript
     PATHS
@@ -77,7 +77,7 @@ find_library(LIBCURL
         ${LIB_PATH} )
 
 find_library(LIBGCC
-        NAMES gcc libgcc libgcc.a
+        NAMES gcc libgcc libgcc.a libgcc.dylib
         PATHS
         /usr/local/lib64
         ${LIBGCC_PATH}

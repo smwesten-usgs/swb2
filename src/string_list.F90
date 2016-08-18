@@ -15,7 +15,7 @@ module string_list
   interface assignment(=)
     module procedure :: assign_string_list_to_string_list_sub
   end interface assignment(=)
-    
+
   interface create_list
     procedure :: list_from_delimited_string_fn
   end interface create_list
@@ -99,7 +99,7 @@ contains
   end subroutine list_set_auto_cleanup_sub
 
 !--------------------------------------------------------------------------------------------------
-  
+
   subroutine assign_string_list_to_string_list_sub(slList2, slList1)
 
     type (STRING_LIST_T), intent(out)   :: slList2
@@ -115,8 +115,8 @@ contains
         call slList2%append( slList1%get(iIndex) )
 
       enddo
-      
-    endif     
+
+    endif
 
   end subroutine assign_string_list_to_string_list_sub
 
@@ -127,14 +127,14 @@ contains
     class (STRING_LIST_T), intent(inout)   :: this
     character (len=*), intent(in)          :: sText
 
-    ! [ LOCALS ] 
+    ! [ LOCALS ]
     class (STRING_LIST_ELEMENT_T), pointer   :: pNewElement => null()
     class (STRING_LIST_ELEMENT_T), pointer   :: pOldLastElement => null()
     integer (kind=c_int)                     :: iStat
 
-    allocate(pNewElement, stat=iStat)  
+    allocate(pNewElement, stat=iStat)
     call assert(iStat == 0, "There was a problem allocating memory for a new string list element", &
-      __FILE__, __LINE__)
+      __SRCNAME__, __LINE__)
 
     pNewElement%s    = trim(sText)
     pNewElement%next => null()
@@ -142,7 +142,7 @@ contains
     if (associated( this%first ) ) then
 
       if (this%count == 0)  call die("Internal logic error: count should *not* be zero in this block", &
-             __FILE__, __LINE__)
+             __SRCNAME__, __LINE__)
 
 !      pOldLastElement => this%last
 !      pOldLastElement%next => pNewElement
@@ -152,11 +152,11 @@ contains
       this%last%next => null()
 
     else
-    
+
       this%first => pNewElement
       this%last  => pNewElement
 
-    endif    
+    endif
 
     this%count = this%count + 1
 
@@ -187,17 +187,17 @@ contains
       current => current%next
 
     enddo
-    
+
     if (associated(current) ) then
       sText = current%s
     else
       sText = "<NA>"
 !      call warn(sMessage="Unable to find a pointer associated with index: "//asCharacter(iIndex),  &
 !                iLogLevel=LOG_DEBUG,                                                               &
-!                sModule=__FILE__,                                                                  &
+!                sModule=__SRCNAME__,                                                                  &
 !                iLine=__LINE__ )
-    endif  
-   
+    endif
+
 
   end function list_get_value_at_index_fn
 
@@ -226,21 +226,21 @@ contains
 
       if (iCount == iStartIndex ) then
         sText = current%s
-      elseif (iCount > iStartIndex .and. iCount <= iEndIndex ) then  
+      elseif (iCount > iStartIndex .and. iCount <= iEndIndex ) then
         sText = sText//" "//current%s
       endif
-        
+
       current => current%next
 
     enddo
-    
+
     if ( len_trim(sText) == 0 ) then
       sText = "<NA>"
 !      call warn("Unable to find a pointer associated with index range: " &
 !          //asCharacter(iStartIndex)//" to "//asCharacter(iEndIndex), &
-!          __FILE__, __LINE__ )
-    endif  
-   
+!          __SRCNAME__, __LINE__ )
+    endif
+
 
   end function list_get_values_in_range_fn
 
@@ -263,7 +263,7 @@ contains
     else
       iLU_ = OUTPUT_UNIT
     endif
-      
+
     current => this%first
     iCount = 0
 
@@ -293,7 +293,7 @@ contains
     integer (kind=c_int)                      :: iLU_
     integer (kind=c_int)                      :: iCount
     character (len=2048)                      :: sBuf
-      
+
     current => this%first
     iCount = 0
 
@@ -328,7 +328,7 @@ contains
     integer (kind=c_int)                      :: iLU_
     integer (kind=c_int)                      :: iCount
     character (len=2048)                      :: sBuf
-      
+
     current => this%first
     iCount = 0
 
@@ -346,11 +346,11 @@ contains
 
         sBuf = trim( sBuf )//trim( delimiter )//trim( current%s )//trim( delimiter )
 
-      else 
+      else
 
         sBuf = trim( sBuf )//trim( delimiter )//trim( current%s )
 
-      endif  
+      endif
 
       current => current%next
 
@@ -373,7 +373,7 @@ contains
     integer (kind=c_int)                      :: iIndex
 
     allocate( rValues( 1:this%count ), stat=iStat )
-    if (iStat /= 0)  call die("Failed to allocate memory for list conversion", __FILE__, __LINE__)
+    if (iStat /= 0)  call die("Failed to allocate memory for list conversion", __SRCNAME__, __LINE__)
 
     current => this%first
     iIndex = 0
@@ -410,7 +410,7 @@ contains
     endif
 
     allocate( sValues( 1:this%count ), stat=iStat )
-    if (iStat /= 0)  call die("Failed to allocate memory for list conversion", __FILE__, __LINE__)
+    if (iStat /= 0)  call die("Failed to allocate memory for list conversion", __SRCNAME__, __LINE__)
 
     current => this%first
     iIndex = 0
@@ -444,7 +444,7 @@ contains
     integer (kind=c_int)                      :: iIndex
 
     allocate( iValues(this%count ), stat=iStat )
-    if (iStat /= 0)  call die("Failed to allocate memory for list conversion", __FILE__, __LINE__)
+    if (iStat /= 0)  call die("Failed to allocate memory for list conversion", __SRCNAME__, __LINE__)
 
     current => this%first
     iIndex = 0
@@ -454,7 +454,7 @@ contains
       iIndex = iIndex + 1
 
       iValues(iIndex) = asInt( current%s )
-      
+
       current => current%next
 
     enddo
@@ -474,7 +474,7 @@ contains
     integer (kind=c_int)                      :: iIndex
 
     allocate( lValues( this%count ), stat=iStat )
-    if (iStat /= 0)  call die("Failed to allocate memory for list conversion", __FILE__, __LINE__)
+    if (iStat /= 0)  call die("Failed to allocate memory for list conversion", __SRCNAME__, __LINE__)
 
     current => this%first
     iIndex = 0
@@ -484,7 +484,7 @@ contains
       iIndex = iIndex + 1
 
       lValues(iIndex) = asLogical( current%s )
-      
+
       current => current%next
 
     enddo
@@ -524,7 +524,7 @@ contains
 
     class (STRING_LIST_T), intent(in) :: this
     character (len=*), intent(in)     :: sChar
-    logical (kind=c_bool)             :: lResult    
+    logical (kind=c_bool)             :: lResult
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iCount
@@ -608,24 +608,24 @@ contains
 
       current => current%next
 
-    enddo  
+    enddo
 
     if (iCount == 0) then
 
       allocate(iResult(1), stat=iStat)
-      if (iStat /= 0)   call die("Problem allocating memory", __FILE__, __LINE__)
+      if (iStat /= 0)   call die("Problem allocating memory", __SRCNAME__, __LINE__)
 
       iResult(1) = -9999
 
     else
-    
+
       allocate(iResult(iCount), stat=iStat)
-      if (iStat /= 0)   call die("Problem allocating memory", __FILE__, __LINE__)
+      if (iStat /= 0)   call die("Problem allocating memory", __SRCNAME__, __LINE__)
 
       iResult(1:iCount) = iTempResult(1:iCount)
 
-    endif  
-   
+    endif
+
   end function list_return_position_of_matching_string_fn
 
 !--------------------------------------------------------------------------------------------------
@@ -649,7 +649,7 @@ contains
     current => this%first
 
     do while ( associated(current) .and. iCount < this%count )
-    
+
       if ( (current%s .strequal. sChar) .or. &
              (index(string=asUppercase(current%s), substring=asUppercase(sChar) ) > 0 ) ) then
 
@@ -660,7 +660,7 @@ contains
 
       current => current%next
 
-    enddo  
+    enddo
 
   end function list_subset_partial_matches_fn
 
@@ -672,14 +672,14 @@ contains
 
       if ( this%autocleanup )  call this%clear()
 
-  end subroutine list_finalize_sub  
+  end subroutine list_finalize_sub
 
 !--------------------------------------------------------------------------------------------------
 
   subroutine list_items_deallocate_all_sub(this)
 
     class (STRING_LIST_T), intent(inout) :: this
-    
+
     ! [ LOCALS ]
     type (STRING_LIST_ELEMENT_T), pointer :: current
     type (STRING_LIST_ELEMENT_T), pointer :: toremove
@@ -701,7 +701,7 @@ contains
 
         if ( associated( toremove ) )  deallocate( toremove )
 
-      enddo  
+      enddo
 
     endif
 

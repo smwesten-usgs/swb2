@@ -299,19 +299,19 @@ contains
     this%gridcellsize = dGridcellSize
 
     allocate(this%active(iNumCols, iNumRows), stat=iStat )
-    call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
+    call assert (iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__)
 
     allocate(this%nodata_fill_value(iNumCols, iNumRows), stat=iStat )
-    call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
+    call assert (iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__)
 
     allocate(this%array_output(iNumCols, iNumRows), stat=iStat )
-    call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
+    call assert (iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__)
 
     allocate(this%col_num_2D(iNumCols, iNumRows), stat=iStat )
-    call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
+    call assert (iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__)
 
     allocate(this%row_num_2D(iNumCols, iNumRows), stat=iStat )
-    call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
+    call assert (iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__)
 
     this%pGrdOut => grid_CreateSimple( iNX=iNumCols, iNY=iNumRows,        &
                       rX0=dX_ll, rY0=dY_ll, rGridCellSize=dGridCellSize,  &
@@ -390,10 +390,10 @@ contains
     allocate( this%rejected_potential_recharge( iCount ), stat=iStat(53) )
 
     do iIndex = 1, ubound( iStat, 1)
-      if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="//asCharacter(iIndex), __FILE__, __LINE__ )
+      if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="//asCharacter(iIndex), __SRCNAME__, __LINE__ )
     enddo
     
-    if (any( iStat /= 0) ) call die ( "Unable to allocate memory for one or more arrays.", __FILE__, __LINE__ )  
+    if (any( iStat /= 0) ) call die ( "Unable to allocate memory for one or more arrays.", __SRCNAME__, __LINE__ )  
 
     this%landuse_code                        = 0_c_int
     this%landuse_index                       = 0_c_int
@@ -562,31 +562,31 @@ contains
     pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
     
     if ( .not. associated(pHSG) ) &
-      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
     if ( .not. associated(pHSG%pGrdBase) ) &
-      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
     if ( .not. allocated(pHSG%pGrdBase%iData) ) &
-      call die("INTERNAL PROGRAMMING ERROR: attempted use of UNALLOCATED variable", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of UNALLOCATED variable", __SRCNAME__, __LINE__)
 
 !     if ( .not. associated(pAWC) ) &
-!       call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+!       call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
 !     if ( .not. associated(pAWC%pGrdBase) ) &
-!       call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+!       call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
 !     if ( .not. allocated(pAWC%pGrdBase%rData) ) &
-!       call die("INTERNAL PROGRAMMING ERROR: attempted use of UNALLOCATED variable", __FILE__, __LINE__)
+!       call die("INTERNAL PROGRAMMING ERROR: attempted use of UNALLOCATED variable", __SRCNAME__, __LINE__)
 
     if ( .not. associated(pLULC) ) &
-      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
     if ( .not. associated(pLULC%pGrdBase) ) &
-      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
     if ( .not. allocated(pLULC%pGrdBase%iData) ) &
-      call die("INTERNAL PROGRAMMING ERROR: attempted use of UNALLOCATED variable", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of UNALLOCATED variable", __SRCNAME__, __LINE__)
 
     this%active = .true._c_bool
 
@@ -613,7 +613,7 @@ contains
     else
 
       call die( "Found neither gridded nor tabular data to use in initializing available water capacity.", &
-        __FILE__, __LINE__ )
+        __SRCNAME__, __LINE__ )
 
     endif
 
@@ -691,61 +691,61 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)   :: this
 
     if (.not. associated( this%init_interception) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
     if (.not. associated( this%calc_interception) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ ) 
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ ) 
 
     if (.not. associated( this%init_irrigation) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
     if (.not. associated( this%calc_irrigation) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%init_runoff) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
     if (.not. associated( this%calc_runoff) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%init_reference_et) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
     if (.not. associated( this%calc_reference_et) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%init_snowmelt) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
     if (.not. associated( this%calc_snowmelt) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%init_snowfall) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
     if (.not. associated( this%calc_snowfall) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%init_GDD) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
     if (.not. associated( this%calc_GDD) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%init_routing) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )    
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )    
     if (.not. associated( this%calc_routing) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%init_direct_recharge) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
     if (.not. associated( this%calc_direct_recharge) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%init_soil_storage_max) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%get_precipitation_data ) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%get_minimum_air_temperature_data ) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%get_maximum_air_temperature_data ) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
   end subroutine preflight_check_method_pointers
 
@@ -1508,7 +1508,7 @@ contains
     integer (kind=c_int) :: status
 
     allocate( this%monthly_runoff( count( this%active ) ), stat=status)
-    call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     call runoff_gridded_values_initialize( this%active )
     call runoff_gridded_values_update_ratios( )
@@ -1591,7 +1591,7 @@ contains
     pSOIL_STORAGE_MAX_GRID => DAT%find("SOIL_STORAGE_MAX")
     if ( .not. associated(pSOIL_STORAGE_MAX_GRID) ) &
         call die("A SOIL_STORAGE_MAX grid must be supplied in order to make use of this option.", &
-           __FILE__, __LINE__)
+           __SRCNAME__, __LINE__)
 
     call pSOIL_STORAGE_MAX_GRID%getvalues( )
 
@@ -1665,7 +1665,7 @@ contains
 
     allocate( this%irrigation_mask( count( this%active ) ), stat=status )
     call assert( status==0, "Problem allocating memory.", &
-      __FILE__, __LINE__ )
+      __SRCNAME__, __LINE__ )
 
     call irrigation__initialize( this%irrigation_mask, this%active )
 
@@ -1857,7 +1857,7 @@ contains
     integer (kind=c_int)  :: status
 
     allocate( this%gdd( count( this%active ) ), stat=status )
-    call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
+    call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
     this%gdd = 0.0_c_float
 
@@ -2339,7 +2339,7 @@ contains
 
     pTMAX => DAT%find("TMAX")
     if ( .not. associated(pTMAX) ) &
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
     associate ( dt => SIM_DT%curr )
 
@@ -2353,7 +2353,7 @@ contains
     end associate
 
     if (.not. associated(pTMAX%pGrdBase) ) &
-      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __SRCNAME__, __LINE__)
 
     this%tmax = pack( pTMAX%pGrdBase%rData, this%active )
 
@@ -2375,7 +2375,7 @@ contains
 
     pTMIN => DAT%find("TMIN")
     if ( .not. associated(pTMIN) ) &
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
     associate ( dt => SIM_DT%curr )
 
@@ -2389,7 +2389,7 @@ contains
     end associate
 
     if (.not. associated(pTMIN%pGrdBase) ) &
-      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __SRCNAME__, __LINE__)
 
     this%tmin = pack( pTMIN%pGrdBase%rData, this%active )
 
@@ -2410,7 +2410,7 @@ contains
 
     pPRCP => DAT%find("PRECIPITATION")
     if ( .not. associated(pPRCP) ) &
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
     associate ( dt => SIM_DT%curr )
 
@@ -2425,7 +2425,7 @@ contains
     end associate
 
     if (.not. associated(pPRCP%pGrdBase) ) &
-      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __SRCNAME__, __LINE__)
 
     this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active )
 
@@ -2443,7 +2443,7 @@ contains
     integer (kind=c_int) :: status
 
     allocate( this%monthly_gross_precip( count( this%active ) ), stat=status)
-    call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     call precipitation_method_of_fragments_initialize( this%active )
     call this%get_precipitation_data()
@@ -2471,7 +2471,7 @@ contains
     ! MONTHLY sum of precipitation
     pPRCP => DAT%find("PRECIPITATION")
     if ( .not. associated(pPRCP) ) &
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
     associate ( dt => SIM_DT%curr )
 
@@ -2487,7 +2487,7 @@ contains
     end associate
 
     if (.not. associated(pPRCP%pGrdBase) ) &
-      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer.", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer.", __SRCNAME__, __LINE__)
 
     call precipitation_method_of_fragments_calculate( this%active )
 

@@ -1,4 +1,4 @@
-set(SRCS 
+set(SRCS
       actual_et__fao56.F90
       actual_et__thornthwaite_mather.F90
       actual_et__thornthwaite_mather_eqns.F90
@@ -230,7 +230,7 @@ set(SRCS
 foreach(f IN LISTS SRCS)
   get_filename_component(b ${f} NAME)
   set_source_files_properties(${f} PROPERTIES
-    COMPILE_DEFINITIONS "SRCNAME=${b}")
+    COMPILE_DEFINITIONS "__SRCNAME__=\"${b}\"")
 endforeach()
 
 add_executable(swb2 ${SRCS})
