@@ -41,10 +41,10 @@ contains
     integer (kind=c_int), allocatable :: landuse_code(:)
 
     allocate( GDD_BASE( count( is_cell_active ) ), stat=status )
-    call assert( status == 0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( status == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     allocate( GDD_MAX( count( is_cell_active ) ), stat=status )
-    call assert( status == 0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( status == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     !> create string list that allows for alternate heading identifiers for the landuse code
     call parameter_list%append("LU_Code")
@@ -78,7 +78,7 @@ contains
     call parameter_list%clear()
 
     allocate( GDD_RESET_DATE( count( is_cell_active ) ), stat=status )
-    call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
+    call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
     if ( gdd_reset_val_list%count == number_of_landuse_codes ) then
 

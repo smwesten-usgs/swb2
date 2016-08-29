@@ -68,10 +68,10 @@ contains
     ! locate the data structure associated with the gridded fog ratio entries
     pFOG_RATIO => DAT%find("FOG_RATIO")
     if ( .not. associated(pFOG_RATIO) ) &
-        call die("A FOG_RATIO grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
+        call die("A FOG_RATIO grid must be supplied in order to make use of this option.", __SRCNAME__, __LINE__)
 
     allocate ( pNCFILE, stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     !> Determine how many landuse codes are present
     call slString%append("LU_Code")
@@ -95,7 +95,7 @@ contains
 
     if ( .not. lAreLengthsEqual )     &
       call warn( sMessage="The number of landuses does not match the number of fog catch efficiency values.",   &
-        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+        sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
     !> open another netCDF file to hold fog interception
     iNX = ubound(lActive, 1)
@@ -145,10 +145,10 @@ contains
       iNumDaysFromOrigin = SIM_DT%iNumDaysFromOrigin
 
       if ( .not. associated(pFOG_RATIO) ) &
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
       if ( .not. allocated(pFOG_RATIO%pGrdBase%rData) ) &
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of unallocated variable", __FILE__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of unallocated variable", __SRCNAME__, __LINE__)
 
       call pFOG_RATIO%getvalues( iMonth, iDay, iYear, iJulianDay )
 

@@ -88,10 +88,10 @@ contains
     character (len=31)                :: temp_str    
 
     allocate( IRRIGATION_FROM_GROUNDWATER( count( is_active ) ), stat=status )
-    call assert( status==0, "Failed to allocate memory.", __FILE__, __LINE__ )
+    call assert( status==0, "Failed to allocate memory.", __SRCNAME__, __LINE__ )
 
     allocate( IRRIGATION_FROM_SURFACE_WATER( count( is_active ) ), stat=status )
-    call assert( status==0, "Failed to allocate memory.", __FILE__, __LINE__ )
+    call assert( status==0, "Failed to allocate memory.", __SRCNAME__, __LINE__ )
 
     ! create list of possible table headings to look for...
     call sl_temp_list%append( "LU_Code" )
@@ -179,13 +179,13 @@ contains
         //" efficiency ("                                                                  &
         //asCharacter( num_records )//") does not match the number of landuse values ("    &
         //asCharacter( number_of_landuse_codes )//").",                                    &
-        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+        sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
 
     !> process first day of irrigation. retrieved as a list of strings; 
     !! must convert the strings from mm/dd to DOY
     allocate( FIRST_DAY_OF_IRRIGATION( sl_irrigation_begin%count ), stat=status )
-    call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
+    call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
     do index = 1, sl_irrigation_begin%count
       str_buffer = sl_irrigation_begin%get( index )
@@ -195,7 +195,7 @@ contains
     !> process last day of irrigation. retrieved as a list of strings; 
     !! must convert the strings from mm/dd to DOY
     allocate( LAST_DAY_OF_IRRIGATION( sl_irrigation_end%count ), stat=status )
-    call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
+    call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
     do index = 1, sl_irrigation_end%count
       str_buffer = sl_irrigation_end%get( index )
@@ -205,7 +205,7 @@ contains
     !> process number of days of irrigation. retrieved as a list of strings; 
     !! must convert the strings from mm/dd to DOY
     allocate( NUM_DAYS_OF_IRRIGATION( sl_irrigation_days%count ), stat=status )
-    call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
+    call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
     NUM_DAYS_OF_IRRIGATION = sl_irrigation_days%asInt()
 
@@ -227,7 +227,7 @@ contains
     call sl_temp_list%clear()
 
     allocate( APPLICATION_METHOD_CODE( sl_application_method%count ), stat=status )
-    call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
+    call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
  
     !> retrieve application amount. not used if "field capacity" option is active.
     !! value represents deficit fraction or constant amount depending on application option active.
@@ -247,7 +247,7 @@ contains
         //"irrigation application ("                                                      &
         //asCharacter( num_records )//") does not match the number of landuse values ("   &
         //asCharacter( number_of_landuse_codes )//").",                                   &
-        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+        sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
     num_records = ubound(LAST_DAY_OF_IRRIGATION,1)
     are_lengths_unequal = ( num_records /= number_of_landuse_codes ) 
@@ -257,7 +257,7 @@ contains
         //" application ("                                                                &
         //asCharacter( num_records )//") does not match the number of landuse values ("   &
         //asCharacter( number_of_landuse_codes )//").",                                   &
-        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+        sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
     num_records = ubound(FRACTION_OF_IRRIGATION_FROM_GW,1)
     are_lengths_unequal = ( num_records /= number_of_landuse_codes ) 
@@ -267,7 +267,7 @@ contains
         //" from groundwater ("                                                           &
         //asCharacter( num_records )//") does not match the number of landuse values ("   &
         //asCharacter( number_of_landuse_codes )//").",                                   &
-        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+        sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
     num_records = ubound(MAXIMUM_ALLOWABLE_DEPLETION_FRACTION,1)
     are_lengths_unequal = ( num_records /= number_of_landuse_codes ) 
@@ -277,7 +277,7 @@ contains
         //" fraction ("                                                                   &
         //asCharacter( num_records )//") does not match the number of landuse values ("   &
         //asCharacter( number_of_landuse_codes )//").",                                   &
-        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+        sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
 
     num_records = sl_monthly_irrigation_schedule%count
@@ -291,7 +291,7 @@ contains
         //" timing ("//asCharacter( num_records )//")~does not match the number of"       &
         //" landuse codes ("//asCharacter( number_of_landuse_codes )//"). ~Assuming"      &
         //" that irrigation is applied *every* day [default].",                           &
-        sModule=__FILE__, iLine=__LINE__, lEcho=.true._c_bool, iLogLevel=LOG_ALL )
+        sModule=__SRCNAME__, iLine=__LINE__, lEcho=.true._c_bool, iLogLevel=LOG_ALL )
 
       MONTHLY_IRRIGATION_SCHEDULE = 1_c_int
 
@@ -316,7 +316,7 @@ contains
       call warn( sMessage="The number of values for the irrigation application option ("  &
         //asCharacter( num_records )//") does not match the number of landuse values ("   &
         //asCharacter( number_of_landuse_codes )//").",                                   &
-        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+        sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
 
     num_records = ubound(APPLICATION_AMOUNT,1)
@@ -326,7 +326,7 @@ contains
       call warn( sMessage="The number of values for the irrigation application amount ("  &
         //asCharacter( num_records )//") does not match the number of landuse values ("   &
         //asCharacter( number_of_landuse_codes )//").",                                   &
-        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+        sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
 
     ! locate the data structure associated with the gridded irrigation mask entries

@@ -30,7 +30,7 @@ contains
     pAWC_GRID => DAT%find("AVAILABLE_WATER_CONTENT")
     if ( .not. associated(pAWC_GRID) ) &
         call warn("An AVAILABLE_WATER_CONTENT grid must be supplied in order to make use of this option.", &
-           __FILE__, __LINE__)
+           __SRCNAME__, __LINE__)
 
     call pAWC_GRID%getvalues( )
     

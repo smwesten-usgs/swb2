@@ -60,7 +60,7 @@ contains
     !> process first day of growing season. retrieved as a list of strings; 
     !! must convert the strings from mm/dd to DOY
     allocate( FIRST_DAY_OF_GROWING_SEASON( iNumberOfLanduses ), stat=status )
-    call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
+    call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
     if ( sl_growing_season_begin%count == iNumberOfLanduses ) then
 
@@ -93,7 +93,7 @@ contains
     !> process last day of growing season. retrieved as a list of strings; 
     !! must convert the strings from mm/dd to DOY
     allocate( LAST_DAY_OF_GROWING_SEASON( iNumberOfLanduses ), stat=status )
-    call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
+    call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
     if ( sl_growing_season_end%count == iNumberOfLanduses ) then
 
@@ -131,10 +131,10 @@ contains
 
       call warn( sMessage="The number of landuses does not match the number of GDD values "  &
                         //"specified for defining the beginning of the growing season.",     &
-                 sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
+                 sModule=__SRCNAME__, iLine=__LINE__, lFatal=FALSE )
 
       allocate( GDD_FIRST_DAY_OF_GROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
-      call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__)
+      call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__)
 
       GDD_FIRST_DAY_OF_GROWING_SEASON = NODATA_VALUE
 
@@ -159,10 +159,10 @@ contains
 
       call warn( sMessage="The number of landuses does not match the number of killing frost values "  &
                         //"specified to define the end of the growing season.",                        &
-                 sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
+                 sModule=__SRCNAME__, iLine=__LINE__, lFatal=FALSE )
 
       allocate( KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
-      call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__)
+      call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__)
 
       KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON = NODATA_VALUE
 
@@ -177,7 +177,7 @@ contains
           //"(e.g. 'Growing_season_start', 'Growing_season_end').",                  &
           sHints="Make sure you have the first and last day of the growing season "  &
           //"specified in one of your lookup tables.",                               &
-          sModule=__FILE__, iLine=__LINE__, lFatal=TRUE )
+          sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
 
 
   end subroutine growing_season_initialize

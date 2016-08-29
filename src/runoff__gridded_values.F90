@@ -51,17 +51,17 @@ module runoff__gridded_values
     ! locate the data structure associated with the gridded fog ratio entries
     pRUNOFF_ZONE => DAT%find("RUNOFF_ZONE")
     if ( .not. associated(pRUNOFF_ZONE) ) &
-        call die("A RUNOFF_ZONE grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
+        call die("A RUNOFF_ZONE grid must be supplied in order to make use of this option.", __SRCNAME__, __LINE__)
 
     call pRUNOFF_ZONE%getvalues( )
 
     allocate ( RUNOFF_ZONE( count( lActive ) ), stat=iStat )
-    call assert(iStat==0, "Failed to allocate memory for the RUNOFF_ZONE variable", __FILE__, __LINE__)
+    call assert(iStat==0, "Failed to allocate memory for the RUNOFF_ZONE variable", __SRCNAME__, __LINE__)
 
     RUNOFF_ZONE = pack( pRUNOFF_ZONE%pGrdBase%iData, lActive )
 
     allocate ( RUNOFF_RATIOS( count( lActive ) ), stat=iStat)
-    call assert(iStat==0, "Failed to allocate memory for the RUNOFF_RATIOS variable", __FILE__, __LINE__)
+    call assert(iStat==0, "Failed to allocate memory for the RUNOFF_RATIOS variable", __SRCNAME__, __LINE__)
 
 
     ! look up the name of the fragments file in the control file dictionary
@@ -103,11 +103,11 @@ module runoff__gridded_values
 
     allocate(  RUNOFF_TABLE_VALUES( iNumLines, iNumFields -1 ), stat=iStat )
     call assert( iStat == 0, "Problem allocating memory for runoff ratio table values", &
-      __FILE__, __LINE__ )
+      __SRCNAME__, __LINE__ )
 
     allocate(  RUNOFF_TABLE_DATES( iNumLines ), stat=iStat )
     call assert( iStat == 0, "Problem allocating memory for runoff ratio table date values vector", &
-      __FILE__, __LINE__ )
+      __SRCNAME__, __LINE__ )
 
 
     iLineNum = 0
@@ -128,7 +128,7 @@ module runoff__gridded_values
 
       if ( len_trim(sSubstring) == 0 ) &
       call die( "Missing date in the monthly runoff ratio file", &
-        __FILE__, __LINE__, "Problem occured on line number "//asCharacter(RUNOFF_RATIO_FILE%currentLineNum() ) &
+        __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(RUNOFF_RATIO_FILE%currentLineNum() ) &
         //" of file "//dquote(sFilename) )
 
       call RUNOFF_TABLE_DATES( iLineNum )%parseDate( sSubString ) 
@@ -140,7 +140,7 @@ module runoff__gridded_values
 
          if ( len_trim(sSubstring) == 0 ) &
            call die( "Missing or corrupt value in the runoff ratio file", &
-             __FILE__, __LINE__, "Problem occured on line number "//asCharacter(RUNOFF_RATIO_FILE%currentLineNum() ) &
+             __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(RUNOFF_RATIO_FILE%currentLineNum() ) &
              //" of file "//dquote(sFilename) )
 
          RUNOFF_TABLE_VALUES(iLineNum, iIndex - 1 ) = asFloat( sSubstring )
@@ -185,7 +185,7 @@ module runoff__gridded_values
 
     if ( .not. lMatch )   &
       call die( "Failed to find an appropriate date value in the RUNOFF_RATIO file.", &
-        __FILE__, __LINE__ )
+        __SRCNAME__, __LINE__ )
 
     do iFieldNum = lbound(RUNOFF_TABLE_VALUES, 2), ubound(RUNOFF_TABLE_VALUES, 2)
 

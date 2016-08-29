@@ -375,7 +375,7 @@ contains
       if (associated( pPERCENT_IMPERVIOUS%pGrdBase) ) then
         MODEL%pervious_fraction = pack( 1.0_c_float - pPERCENT_IMPERVIOUS%pGrdBase%rData/100.0_c_float, MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
       endif  
 
     elseif ( associated( pPERCENT_PERVIOUS ) ) then
@@ -385,7 +385,7 @@ contains
       if (associated( pPERCENT_PERVIOUS%pGrdBase) ) then
         MODEL%pervious_fraction = pack( (pPERCENT_PERVIOUS%pGrdBase%rData/100.0_c_float), MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
       endif  
 
     elseif ( associated(pFRACTION_IMPERVIOUS) ) then
@@ -395,7 +395,7 @@ contains
       if (associated( pFRACTION_IMPERVIOUS%pGrdBase) ) then
         MODEL%pervious_fraction = pack( 1.0_c_float - pFRACTION_IMPERVIOUS%pGrdBase%rData, MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
       endif  
 
     elseif ( associated( pFRACTION_PERVIOUS ) ) then
@@ -405,7 +405,7 @@ contains
       if (associated( pFRACTION_PERVIOUS%pGrdBase) ) then
         MODEL%pervious_fraction = pack( pFRACTION_PERVIOUS%pGrdBase%rData, MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
       endif  
 
     else
@@ -458,7 +458,7 @@ contains
       if (associated( pPERCENT_CANOPY_COVER%pGrdBase) ) then
         MODEL%canopy_cover_fraction = pack( pPERCENT_CANOPY_COVER%pGrdBase%rData/100.0_c_float, MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
       endif  
 
     elseif ( associated(pFRACTION_CANOPY_COVER) ) then
@@ -468,7 +468,7 @@ contains
       if (associated( pFRACTION_CANOPY_COVER%pGrdBase) ) then
         MODEL%canopy_cover_fraction = pack( pFRACTION_CANOPY_COVER%pGrdBase%rData, MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
       endif  
 
     else
@@ -534,22 +534,22 @@ contains
     pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
     
     call assert( associated( pLULC), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pLULC", &
-      __FILE__, __LINE__ )
+      __SRCNAME__, __LINE__ )
 
     call assert( associated( pLULC%pGrdBase ),   &
-      "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pLULC%pGrdBase", __FILE__, __LINE__ )
+      "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pLULC%pGrdBase", __SRCNAME__, __LINE__ )
 
     call assert( allocated( pLULC%pGrdBase%iData ),   &
-      "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pLULC%pGrdBase%iData", __FILE__, __LINE__ )
+      "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pLULC%pGrdBase%iData", __SRCNAME__, __LINE__ )
 
     call assert( associated( pHSG), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pHSG", &
-      __FILE__, __LINE__ )
+      __SRCNAME__, __LINE__ )
 
     call assert( associated( pHSG%pGrdBase ),      & 
-      "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pHSG%pGrdBase", __FILE__, __LINE__ )
+      "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pHSG%pGrdBase", __SRCNAME__, __LINE__ )
 
     call assert( allocated( pHSG%pGrdBase%iData ),      & 
-      "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pHSG%pGrdBase%iData", __FILE__, __LINE__ )
+      "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pHSG%pGrdBase%iData", __SRCNAME__, __LINE__ )
 
 
     pRooting_Depth => grid_Create( iNX=MODEL%number_of_columns, iNY=MODEL%number_of_rows, &
@@ -577,7 +577,7 @@ contains
 
     allocate( fMax_Rooting_Depth(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
     call assert( iStat == 0, "Failed to allocate memory for maximum rooting depth table", &
-      __FILE__, __LINE__)
+      __SRCNAME__, __LINE__)
 
     ! we should have the max rooting depth table fully filled out following MODEL block
     do iSoilsIndex = 1, iNumberOfSoilGroups
@@ -637,13 +637,13 @@ contains
       if (associated( pHSG%pGrdBase) ) then
         MODEL%soil_group = pack( pHSG%pGrdBase%iData, MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
       endif  
 
     else
 
       call die("Attempted use of NULL pointer. Failed to find HYDROLOGIC_SOILS_GROUP data element.", &
-        __FILE__, __LINE__)
+        __SRCNAME__, __LINE__)
 
     endif
 
@@ -755,7 +755,7 @@ contains
 !     call minmaxmean( rooting_depth_inches, "Rooting_depth_inches")
 
 !     call assert( .not. any_problems, "One or more steps failed while processing POLYGON_ID.", &
-!       __FILE__, __LINE__ )
+!       __SRCNAME__, __LINE__ )
 
 ! !$OMP PARALLEL DO
 
@@ -851,7 +851,7 @@ contains
       call CF_DICT%get_value(sText, "GRID")
       pDict => CF_DICT%get_next_entry()
       call assert( associated( pDict ), "INTERNAL PROGRAMMING ERROR -- Attempted use of null poitner", &
-        __FILE__, __LINE__ )
+        __SRCNAME__, __LINE__ )
       call CF%writeLine( trim( sGridSpecification ) )
     
     else
@@ -912,7 +912,7 @@ contains
       CF_ENTRY => null()
       allocate( CF_ENTRY, stat=iStat )
       call assert(iStat == 0, "Failed to allocate memory for dictionary object", &
-            __FILE__, __LINE__ )
+            __SRCNAME__, __LINE__ )
 
       ! break off key value for the current record
       call chomp(sRecord, sSubstring, CF%sDelimiters )
@@ -1011,7 +1011,7 @@ contains
       ! allocate memory for a generic data_catalog_entry
       allocate(pENTRY, stat=iStat)
       call assert( iStat == 0, "Failed to allocate memory for the "//dquote(sKey)//" data structure", &
-        __FILE__, __LINE__ )
+        __SRCNAME__, __LINE__ )
 
       ! process all known directives associated with key word
       do iIndex = 1, myDirectives%count
@@ -1063,7 +1063,7 @@ contains
             case default
 
               call die( "INTERNAL PROGRAMMING ERROR: Unhandled data type selected.", &
-                __FILE__, __LINE__ )
+                __SRCNAME__, __LINE__ )
 
             end select
             
@@ -1213,7 +1213,7 @@ contains
 
         else
 
-          call warn("Unknown directive detected in code at line "//asCharacter(__LINE__)//", file "//__FILE__ &
+          call warn("Unknown directive detected in code at line "//asCharacter(__LINE__)//", file "//__SRCNAME__ &
             //". ~Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
  
         endif
@@ -1386,7 +1386,7 @@ contains
 
         case default
 
-          call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
+          call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__SRCNAME__ &
             //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
 
       end select
@@ -1485,7 +1485,7 @@ contains
 
         else
 
-            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
+            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__SRCNAME__ &
               //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
         
         endif
@@ -1653,11 +1653,11 @@ contains
       if (associated( pLULC%pGrdBase) ) then
         MODEL%landuse_code = pack( pLULC%pGrdBase%iData, MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
       endif  
     else
       call die("Attempted use of NULL pointer. Failed to find LAND_USE data element.", &
-        __FILE__, __LINE__)
+        __SRCNAME__, __LINE__)
     endif
 
     MODEL%landuse_index = -9999

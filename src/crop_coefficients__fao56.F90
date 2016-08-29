@@ -199,27 +199,27 @@ contains
 
     allocate( GROWTH_STAGE_SHIFT_DAYS( iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_SHIFT_DAYS array", &
-      __FILE__, __LINE__ )    
+      __SRCNAME__, __LINE__ )    
 
     allocate( GROWTH_STAGE_DOY( 5, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_DOY array", &
-      __FILE__, __LINE__ )
+      __SRCNAME__, __LINE__ )
 
     allocate( GROWTH_STAGE_GDD( 5, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_GDD array", &
-      __FILE__, __LINE__ )
+      __SRCNAME__, __LINE__ )
 
     allocate( GROWTH_STAGE_DATE( 6, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for DATE_GROWTH array", &
-      __FILE__, __LINE__ )
+      __SRCNAME__, __LINE__ )
 
     allocate( KCB( 16, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for KCB array", &
-      __FILE__, __LINE__ )
+      __SRCNAME__, __LINE__ )
 
     allocate( KCB_METHOD( iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for KCB_METHOD vector", &
-      __FILE__, __LINE__ )
+      __SRCNAME__, __LINE__ )
 
     KCB_METHOD = iTINYVAL
     KCB = fTINYVAL
@@ -283,7 +283,7 @@ contains
 
         sMMDDYYYY = trim(slPlantingDate%get( iIndex ))//"/"//asCharacter( SIM_DT%start%iYear ) 
 
-        call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)%parsedate( sMMDDYYYY, __FILE__, __LINE__ )
+        call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)%parsedate( sMMDDYYYY, __SRCNAME__, __LINE__ )
    
         GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) &
                                                     + GROWTH_STAGE_SHIFT_DAYS( iIndex )

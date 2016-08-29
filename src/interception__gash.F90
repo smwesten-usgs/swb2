@@ -64,12 +64,12 @@ contains
     iCount = count( lActive )
 
     allocate( EVAPORATION_TO_RAINFALL_RATIO( iCount ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory.", __FILE__, __LINE__ )
+    call assert( iStat==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
     ! locate the data structure associated with the gridded evaporation to rainfall ratio
     pEVAPORATION_TO_RAINFALL_RATIO => DAT%find("EVAPORATION_TO_RAINFALL_RATIO")
     if ( .not. associated( pEVAPORATION_TO_RAINFALL_RATIO ) ) &
-        call die("A EVAPORATION_TO_RAINFALL_RATIO grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
+        call die("A EVAPORATION_TO_RAINFALL_RATIO grid must be supplied in order to make use of this option.", __SRCNAME__, __LINE__)
 
 
     call pEVAPORATION_TO_RAINFALL_RATIO%getvalues()
@@ -113,7 +113,7 @@ contains
       call warn( sMessage="The number of canopy storage capacity values ("              &
         //asCharacter( iNumRecs )//") does not match the number of landuse values ("    &
         //asCharacter( iNumberOfLanduses )//").",                                       &
-        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+        sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
 
     iNumRecs = ubound(TRUNK_STORAGE_CAPACITY_TABLE_VALUES,1)
@@ -123,7 +123,7 @@ contains
       call warn( sMessage="The number of trunk storage capacity values ("                &
         //asCharacter( iNumRecs )//") does not match the number of landuse values ("     &
         //asCharacter( iNumberOfLanduses )//").",                                        &
-        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+        sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
 
     iNumRecs = ubound(STEMFLOW_FRACTION_TABLE_VALUES,1)
@@ -133,11 +133,11 @@ contains
       call warn( sMessage="The number of stemflow fraction values ("                &
         //asCharacter( iNumRecs )//") does not match the number of landuse values ("     &
         //asCharacter( iNumberOfLanduses )//").",                                        &
-        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+        sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
 
     allocate( P_SAT( count( lActive ) ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory for P_SAT.", __FILE__, __LINE__ )
+    call assert( iStat==0, "Problem allocating memory for P_SAT.", __SRCNAME__, __LINE__ )
 
     P_SAT = precipitation_at_saturation( EVAPORATION_TO_RAINFALL_RATIO,    &
       CANOPY_STORAGE_CAPACITY_TABLE_VALUES( iLanduseIndex ), &

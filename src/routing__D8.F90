@@ -86,49 +86,49 @@ contains
     iNY = ubound(lActive, 2)
 
     allocate( iTargetRow( iNX, iNY ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     allocate( iTargetCol( iNX, iNY ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
 
     allocate( lDownhillMarked( iNX, iNY ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     allocate( COL2D( iNX, iNY ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     allocate( ROW2D( iNX, iNY ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     allocate( COL1D( count( lActive) ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     allocate( ROW1D( count( lActive) ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     allocate( iSumOfUpslopeCells( iNX, iNY ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     allocate( iNumberOfUpslopeConnections( iNX, iNY ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     allocate( ROW_INDEX( count( lActive) ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     allocate( COLUMN_INDEX( count( lActive) ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     allocate( TARGET_INDEX( count( lActive) ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     allocate( ORDER_INDEX( count( lActive) ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     ! locate the data structure associated with the gridded flow direction entries
     pD8_FLOWDIR => DAT%find("FLOW_DIRECTION")
     if ( .not. associated(pD8_FLOWDIR) ) &
-        call die("A FLOW_DIRECTION grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
+        call die("A FLOW_DIRECTION grid must be supplied in order to make use of this option.", __SRCNAME__, __LINE__)
 
     call pD8_FLOWDIR%getvalues()
 
@@ -223,7 +223,7 @@ contains
     enddo
 
 !    if ( .not. lFound ) call warn("Did not find matching column and row number; col=" &
-!      //asCharacter(iCol)//"; row="//asCharacter(iRow), __FILE__, __LINE__ )
+!      //asCharacter(iCol)//"; row="//asCharacter(iRow), __SRCNAME__, __LINE__ )
 
   end function routing_D8_get_index
 

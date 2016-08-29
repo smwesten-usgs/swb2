@@ -168,10 +168,10 @@ contains
 
       if ( .not. are_lengths_equal )     &
         call warn( sMessage="The number of landuses does not match the number of direct"   &
-          //" recharge active fraction values.", sModule=__FILE__, iLine=__LINE__, lFatal=TRUE )
+          //" recharge active fraction values.", sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
 
       allocate( DIRECT_RECHARGE_ACTIVE_FRACTION( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
       do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
         DIRECT_RECHARGE_ACTIVE_FRACTION( indx ) = DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE( landuse_index( indx ) )
@@ -179,7 +179,7 @@ contains
     else
 
       allocate( DIRECT_RECHARGE_ACTIVE_FRACTION( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
       DIRECT_RECHARGE_ACTIVE_FRACTION = 0.0_c_float
 
     endif
@@ -188,7 +188,7 @@ contains
     if ( associated( pANNUAL_RECHARGE_RATE ) ) then
 
       allocate( fANNUAL_RECHARGE_RATE( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     elseif ( fANNUAL_RECHARGE_RATE_TABLE(1) > fTINYVAL ) then
 
@@ -196,10 +196,10 @@ contains
 
       if ( .not. are_lengths_equal )     &
         call warn( sMessage="The number of landuses does not match the number of annual direct"   &
-          //" recharge rate values.", sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+          //" recharge rate values.", sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
       allocate( fANNUAL_RECHARGE_RATE( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
       do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
         fANNUAL_RECHARGE_RATE( indx ) = fANNUAL_RECHARGE_RATE_TABLE( landuse_index( indx ) )
@@ -211,7 +211,7 @@ contains
     if ( associated( pCESSPOOL ) ) then
 
       allocate( fCESSPOOL( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     elseif ( fCESSPOOL_TABLE(1) > fTINYVAL ) then
 
@@ -219,10 +219,10 @@ contains
 
       if ( .not. are_lengths_equal )     &
         call warn( sMessage="The number of landuses does not match the number of cesspool discharge/leakage values.",   &
-          sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+          sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
       allocate( fCESSPOOL( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
       do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
         fCESSPOOL( indx ) = fCESSPOOL_TABLE( landuse_index( indx ) )
@@ -234,7 +234,7 @@ contains
     if ( associated( pSTORM_DRAIN ) ) then
 
       allocate( fSTORM_DRAIN( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     elseif ( fSTORM_DRAIN_TABLE(1) > fTINYVAL ) then
 
@@ -242,10 +242,10 @@ contains
 
       if ( .not. are_lengths_equal )     &
         call warn( sMessage="The number of landuses does not match the number of storm drain discharge/leakage values.",   &
-          sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+          sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
       allocate( fSTORM_DRAIN( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
       do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
         fSTORM_DRAIN( indx ) = fSTORM_DRAIN_TABLE( landuse_index( indx ) )
@@ -257,7 +257,7 @@ contains
     if ( associated( pWATER_BODY_RECHARGE ) ) then
 
       allocate( fWATER_BODY_RECHARGE( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     elseif ( fWATER_BODY_RECHARGE_TABLE(1) > fTINYVAL ) then
 
@@ -265,10 +265,10 @@ contains
 
       if ( .not. are_lengths_equal )     &
         call warn( sMessage="The number of landuses does not match the number of water body recharge/leakage values.",   &
-          sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+          sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
       allocate( fWATER_BODY_RECHARGE( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
       do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
         fWATER_BODY_RECHARGE( indx ) = fWATER_BODY_RECHARGE_TABLE( landuse_index( indx ) )
@@ -280,7 +280,7 @@ contains
     if ( associated( pWATER_MAIN ) ) then
 
       allocate( fWATER_MAIN( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     elseif ( fWATER_MAIN_TABLE(1) > fTINYVAL ) then
 
@@ -288,10 +288,10 @@ contains
 
       if ( .not. are_lengths_equal )     &
         call warn( sMessage="The number of landuses does not match the number of water main leakage values.",   &
-          sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+          sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
       allocate( fWATER_MAIN( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
       do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
         fWATER_MAIN( indx ) = fWATER_MAIN_TABLE( landuse_index( indx ) )
@@ -303,7 +303,7 @@ contains
     if ( associated( pDISPOSAL_WELL ) ) then
 
       allocate( fDISPOSAL_WELL( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     elseif ( fDISPOSAL_WELL_TABLE(1) > fTINYVAL ) then
 
@@ -311,10 +311,10 @@ contains
 
       if ( .not. are_lengths_equal )     &
         call warn( sMessage="The number of landuses does not match the number of discharge well values.",   &
-          sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+          sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
       allocate( fDISPOSAL_WELL( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
       do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
         fDISPOSAL_WELL( indx ) = fDISPOSAL_WELL_TABLE( landuse_index( indx ) )
@@ -324,7 +324,7 @@ contains
 
     ! initialize last retrieval date to something implausibly low to trigger initial read
     ! in the calculate procedure
-    call DATE_OF_LAST_RETRIEVAL%parseDate("01/01/1000", __FILE__, __LINE__)
+    call DATE_OF_LAST_RETRIEVAL%parseDate("01/01/1000", __SRCNAME__, __LINE__)
 
   end subroutine direct_recharge_initialize
 
