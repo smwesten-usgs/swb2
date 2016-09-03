@@ -20,3 +20,13 @@ Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper
 #### Turc {#et_turc}
 
 $E{T_0} = {a_T}0.013\frac{{{T_{mean}}}}{{{T_{mean}} + 15}}\frac{{23.8856{R_s} + 50}}{\lambda }$
+
+#### Thornthwaite-Mather
+
+${I_{monthly}} = {\left( {\frac{{\bar T}}{5}} \right)^{1.514}}$
+
+$I = \sum {{I_{monthly}}}$
+
+$a = 6.75 \times {10^{ - 7}} \cdot {I^3} - 7.71 \times {10^{ - 5}} \cdot {I^2} + 1.7921 \times {10^{ - 2}} \cdot I + 0.49239$
+
+$E{T_p} = \frac{{16}}{{30}}{\left( {\frac{{10T}}{I}} \right)^a}$
