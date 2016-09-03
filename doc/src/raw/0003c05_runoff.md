@@ -5,7 +5,7 @@
 
 #### Soil Conservation Service Curve Number {#curve\_number}
 
-The curve number method defines runoff in relation to the difference between precipitation and an initial abstraction term. Conceptually, this initial abstraction term represents the summation of all processes that might act to reduce runoff, including interception by plants and fallen leaves, depression storage, and infiltration [[@woodward\_runoff\_2003](). Equation 2 is used to calculate runoff volumes [@woodward\_curve\_2002]:
+The curve number method defines runoff in relation to the difference between precipitation and an initial abstraction term. Conceptually, this initial abstraction term represents the summation of all processes that might act to reduce runoff, including interception by plants and fallen leaves, depression storage, and infiltration [[@woodward_runoff_2003](). Equation 2 is used to calculate runoff volumes [@woodward_curve_2002]:
 
 
 $R =  \dfrac{(P - I\_a)^2}{(P + [S\_{max} - I\_a])}$

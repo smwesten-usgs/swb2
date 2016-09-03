@@ -135,5 +135,5 @@ rm -f ../to_doxygen/*.mde
 
 # run Doxygen to regenerate HTML output
 cd  ../../
-#doxygen Doxyfile.mac_osx
+doxygen Doxyfile.mac_osx
 cd src/raw
