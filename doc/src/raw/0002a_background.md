@@ -1,6 +1,6 @@
 # Background {#background}
 
-A note regarding nomenclature: [@healy_estimating_2010] gives clear definitions for a number of recharge-related terms:
+A note regarding nomenclature: Healy [-@healy_estimating_2010] gives clear definitions for a number of recharge-related terms:
 
 * potential recharge: water that has infiltrated into the root zone; this water may leave the bottom of the root zone, eventually becoming recharge, or it may be removed from the soil column by means of evaporation and transpiration.
 * deep percolation or net infiltration: water that has escaped the root zone and will eventually find its way to the groundwater table.
