@@ -29,7 +29,9 @@ Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper
 
 $E{T_0} = {a_T}0.013\frac{{{T_{mean}}}}{{{T_{mean}} + 15}}\frac{{23.8856{R_s} + 50}}{\lambda }$
 
+
 #### Thornthwaite-Mather
+
 
 ${I_{monthly}} = {\left( {\frac{{\bar T}}{5}} \right)^{1.514}}$
 

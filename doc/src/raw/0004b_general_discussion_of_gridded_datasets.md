@@ -55,6 +55,84 @@ Note that SWB does not really handle the NODATA_value codes as given in the ESRI
 
 #### NetCDF
 
+NetCDF, or Network Common Data File, is a file format commonly used by researchers in atmospheric and oceanic sciences. One of the key benefits of NetCDF files is that they are designed to be platform-independent; in other words, a NetCDF file generated on a Macintosh by an application compiled with the PGI compiler should be able to be read by an application compiled with the Intel compiler and running on Windows. In addition, NetCDF files are able to store arbitrary combinations of data. This allows for substantial metadata to be stored in the NetCDF file along with the variable of interest.
+
+A set of conventions, known as the Climate and Forecast Metadata Conventions, gives recommendations regarding the kind and nature of metadata to be included along with the primary variable within a NetCDF file [@eaton_netcdf_2011]. SWB outputs written to NetCDF files attempt to adhere to the Climate and Forecast Metadata Conventions version 1.6 (CF 1.6) in order to maximize the number of third-party NetCDF tools that will work with SWB output.
+
+In addition to these benefits of NetCDF file use, the fact that there are dozens of open-source tools available to read, write, and visualize NetCDF files makes them a good candidate for use with SWB. One of the most basic tools, distributed by Unidata, the maintainer of NetCDF file format, is called ncdump—a program to “dump” the contents of a NetCDF file.
+If we take a recent Daymet file containing daily precipitation values for 2014, we can see the stored metadata in the file:
+
+```
+> ncdump -h prcp_2014.nc4
+The following metadata is returned:
+netcdf prcp_2014 {
+dimensions:
+	x = 5268 ;
+	y = 4823 ;
+	time = UNLIMITED ; // (365 currently)
+	nv = 2 ;
+variables:
+	float x(x) ;
+		x:units = "m" ;
+		x:long_name = "x coordinate of projection" ;
+		x:standard_name = "projection_x_coordinate" ;
+	float y(y) ;
+		y:units = "m" ;
+		y:long_name = "y coordinate of projection" ;
+		y:standard_name = "projection_y_coordinate" ;
+	float lat(y, x) ;
+		lat:units = "degrees_north" ;
+		lat:long_name = "latitude coordinate" ;
+		lat:standard_name = "latitude" ;
+	float lon(y, x) ;
+		lon:units = "degrees_east" ;
+		lon:long_name = "longitude coordinate" ;
+		lon:standard_name = "longitude" ;
+	float time(time) ;
+		time:long_name = "time" ;
+		time:calendar = "standard" ;
+		time:units = "days since 1980-01-01 00:00:00 UTC" ;
+		time:bounds = "time_bnds" ;
+	short yearday(time) ;
+		yearday:long_name = "yearday" ;
+		yearday:valid_range = 1s, 365s ;
+	float time_bnds(time, nv) ;
+	short lambert_conformal_conic ;
+		lambert_conformal_conic:grid_mapping_name = "lambert_conformal_conic" ;
+		lambert_conformal_conic:longitude_of_central_meridian = -100. ;
+		lambert_conformal_conic:latitude_of_projection_origin = 42.5 ;
+		lambert_conformal_conic:false_easting = 0. ;
+		lambert_conformal_conic:false_northing = 0. ;
+		lambert_conformal_conic:standard_parallel = 25., 60. ;
+	float prcp(time, y, x) ;
+		prcp:_FillValue = -9999.f ;
+		prcp:cell_methods = "area: sum time: sum" ;
+		prcp:coordinates = "lat lon" ;
+		prcp:grid_mapping = "lambert_conformal_conic" ;
+		prcp:long_name = "daily total precipitation" ;
+		prcp:missing_value = -9999.f ;
+		prcp:units = "mm/day" ;
+		prcp:valid_range = 0.f, 200.f ;
+
+// global attributes:
+		:start_year = 2014s ;
+		:source = "Daymet Software Version 2.0" ;
+		:Version_software = "Daymet Software Version 2.0" ;
+		:Version_data = "Daymet Data Version 2.1" ;
+		:Conventions = "CF-1.4" ;
+		:citation = "Please see http://daymet.ornl.gov/ for current Daymet data citation information" ;
+		:references = "Please see http://daymet.ornl.gov/ for current information on Daymet references" ;
+}
+```
+
+This particular file contains three classes of metadata: dimensions, variables, and global attributes. As can be seen above, the file contains data about 4 “dimensions”: x, y, time, and nv. Nine variables are defined, each of which is references in terms of the dimensions. The key variable in the file is “prcp”—the daily precipitation value. prcp is defined at each time (day) in the file for all values of x and y. Note the way that dates and times are specified in the NetCDF file: as a real-valued number of days since 1980-01-01 00:00:00 UTC.
+
+SWB does not have the ability to make sense of much of this metadata. It is the user’s responsibility to be aware of the physical units that each of the datasets is stored in. Control file directives may be used to convert precipitation in metric units (mm/day) to inches per day. We recommend examining the output values of air temperature and precipitation in order to verify that any such unit conversions have been done correctly.
+
+In addition, SWB cannot parse the variables and attributes associated with any map projection that may have been used when the NetCDF file was created. The user needs to be aware of the geographic projection (if any) that was used. If the gridded data do not match the SWB project bounds exactly, a “PROJ4 string” must be provided to enable SWB to translate between project coordinates and the NetCDF file coordinates.
+
 ### Geographic Projections
+
+Later versions of SWB are linked to the PROJ4 library, originally written by a USGS scientist [@evenden_cartographic_1990]. PROJ4 is used by many commonly used mapping applications, both open source and proprietary. The library provides a set of routines that may be used to calculate forward and backward coordinate transformations. SWB make use of this library in order to translate coordinates found in external data files to the coordinates in use by the SWB project.
 
 ### Treatment of Missing Values
