@@ -53,12 +53,13 @@ for filename in 0*.md; do
     # now create a Doxygen version of the Markdown files, processing the bibliography
     # using Pandoc
 #    pandoc --from=markdown_mmd+tex_math_dollars+pipe_tables+backtick_code_blocks+citations    \
-    pandoc --from=markdown_github+citations+backtick_code_blocks               \
-       --to=markdown_github+backtick_code_blocks                               \
-       --filter pandoc-citeproc                                         \
-       --bibliography=../resources/Zotero_Output.bib                    \
-       --csl=../resources/us-geological-survey.csl                      \
-       --output=../to_doxygen/$filename                                 \
+    pandoc --from=markdown_github+citations+backtick_code_blocks            \
+       --to=markdown_github+backtick_code_blocks                            \
+       --variable fignos-caption-name=Figure                                \
+       --variable fignos-plus-name=Fig                                      \
+       --bibliography=../resources/Zotero_Output.bib                        \
+       --csl=../resources/us-geological-survey.csl                          \
+       --output=../to_doxygen/$filename                                     \
        tempfile.md
 
     # modify the output for the Doxygen version:
@@ -84,8 +85,12 @@ done
 
 # now use Pandoc to assemble the 'docx' fragments into a single docx file for MS Word
 #pandoc --from=markdown+tex_math_dollars+header_attributes+pipe_tables+backtick_code_blocks+citations   \
-pandoc --from=markdown+tex_math_dollars+header_attributes+backtick_code_blocks+implicit_figures+citations  \
+#pandoc --from=markdown+example_lists+tex_math_dollars+header_attributes+backtick_code_blocks+implicit_figures+citations+link_attributes  \
+pandoc --from=markdown                                                      \
        --to=docx                                                            \
+       --variable fignos-caption-name=Figure                                \
+       --variable fignos-plus-name=Fig                                      \
+       --filter pandoc-fignos                                               \
        --filter pandoc-citeproc                                             \
        --toc                                                                \
        --reference-docx=../resources/usgs_report_template.docx              \
@@ -107,9 +112,10 @@ pandoc --from=markdown+tex_math_dollars+header_attributes+backtick_code_blocks+i
 #    `ls ../to_docx/0*.md`
 
 #          --template=../resources/xetex.template                    \
+#--from=markdown+example_lists+citations+header_attributes+backtick_code_blocks+tex_math_dollars+link_attributes       \
 
 pandoc    -N                                                        \
-          --from=markdown+citations+header_attributes+backtick_code_blocks+tex_math_dollars        \
+          --from=markdown                                           \
           --template=../resources/xetex.template                    \
           --variable language="$language"                           \
           --variable mainfont="$mainfont"                           \
@@ -120,6 +126,9 @@ pandoc    -N                                                        \
           --variable nohyphenation="$nohyphenation"                 \
           --variable links="$links"                                 \
           --variable toc="$toc"                                     \
+          --variable fignos-caption-name=Figure                     \
+          --variable fignos-plus-name=Fig                           \
+          --filter pandoc-fignos                                    \
           --filter pandoc-citeproc                                  \
           --bibliography=../resources/Zotero_Output.bib             \
           --csl=../resources/us-geological-survey.csl               \
@@ -135,5 +144,5 @@ rm -f ../to_doxygen/*.mde
 
 # run Doxygen to regenerate HTML output
 cd  ../../
-doxygen Doxyfile.mac_osx
+#doxygen Doxyfile.mac_osx
 cd src/raw

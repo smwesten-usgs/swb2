@@ -4,7 +4,7 @@
 
 #### FAO-56 {#irrigation_FAO_56}
 
-When the irrigation demand is simulated in SWB, the underlying soil-moisture module is automatically changed to the FAO-56 
+When the irrigation demand is simulated in SWB, the underlying soil-moisture module is automatically changed to the FAO-56
 The calculation under 'nonstandard' conditions includes the transpiration-limiting effects of soil water stress on plants. When this option is invoked in swb, the Thornthwaite-Mather soil moisture retention tables are **not** consulted. Rather, the crop evapotranspiration amount $(E{T_{c,adj}})$ is adjusted by incorporation of a water stress factor $({K_s})$ whose value may range between 0.0 and 1.0:
 
 $E{T_{c,adj}} = {K_s}{K_c}E{T_{\rm{o}}}$
@@ -20,8 +20,8 @@ $TAW = AWC \cdot (rooting\;depth)$
 where:
 
 &nbsp;&nbsp;$AWC$ is the Available Water Capacity, in inches per foot, and   
-&nbsp;&nbsp; $root\;depth$ is the current rooting depth of vegetation in feet
-  
+&nbsp;&nbsp; $root\;depth$ is the current rooting depth of vegetation in feet.
+
 Readily Available Water $(RAW)$ is defined as the amount of water that can be withdrawn by a plant from soil moisture storage without the plant suffering water stress. $RAW$ may be defined as some fraction of the Total Available Water:
 
 $RAW = p \cdot TAW$
@@ -29,10 +29,9 @@ $RAW = p \cdot TAW$
 where:
 
 &nbsp;&nbsp; $p$ is the fraction of Total Available Water $TAW$ that can be removed from soil moisture storage before a plant begins suffering from water stress. $p$ is called the "plant stress depletion fraction" in the swb irrigation lookup table.
-  
+
 The figure below, taken from FAO-56 [@allen_crop_1998], shows how the water stress factor changes with changing soil moisture deficit amounts.
 
-![Figure placeholder: Parameters__Depletion_Fraction.png]( ../images/Parameters__Depletion_Fraction.png ) 
+![Parameters__Depletion_Fraction.png](../images/Parameters__Depletion_Fraction.png){#fig:depletion_frac}
 
-
-  
+As shown in +@fig:depletion_frac, the depletion parameter defines the soil moisture conditions below which the actual to potential ET ratio drops toward zero.

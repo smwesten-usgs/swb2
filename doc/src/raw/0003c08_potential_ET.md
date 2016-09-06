@@ -1,15 +1,23 @@
-
 ### Potential Evapotranspiration {#potential_et}
 
 [TOC]
 
 #### Jensen-Haise {#et_jensen_haise}
 
-$E{T_{pot}} = {C_T}\left( {{T_{mean}} - {T_x}} \right){R_s}$
 
 #### Hargreaves-Samani {#et_hargreaves_samani}
 
 $E{T_0} = 0.0023\,\,\left( {{T_{mean}} + 17.8} \right)\sqrt {{T_{\max }} - {T_{\min }}} \;{R_a}$
+
+where:
+
+$E{T_0}$ is the grass-reference evapotranspiration, in mm per day,
+
+$T$ is the (minimum/mean/maximum) air temperature in degrees Celcius, and
+
+$R_a$ is extraterrestrial solar radiation, in mm per day.
+
+Extraterrestrial solar radiation is calculated using the latitude and longitude of each grid cell for each day of the year. The equations used to calculate solar radiation may be found in Meeus [-@meeus_astronomical_1991].
 
 #### Monthly Potential Evapotranspiration Grid {#et_monthly_grid}
 
