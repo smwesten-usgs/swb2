@@ -2,7 +2,7 @@
 
 The SWB code uses a modified Thornthwaite-Mather soil-moisture accounting method [@thornthwaite_instructions_1957] to calculate recharge; recharge is calculated separately for each grid cell in the model domain. Sources and sinks of water within each grid cell are determined on the basis of input climate data and landscape characteristics; recharge is calculated as the difference between the change in soil moisture and these sources and sinks.
 
-![Conceptual_diagram_SWB_simplified__300dpi.png](../images/Conceptual_diagram_SWB_simplified__300dpi.png){#fig:figure0}
+![Conceptual_diagram_SWB_simplified__300dpi.png](../images/Conceptual_diagram_SWB_simplified__300dpi.png){width=3in #fig:figure0}
 
 The water balance components used to calculate potential recharge amounts are shown schematically in +@fig:figure0.
 

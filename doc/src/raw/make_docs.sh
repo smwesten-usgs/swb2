@@ -6,10 +6,16 @@ mkdir -p ../to_doxygen
 mkdir -p ../../doxygen/html/images
 rm -f ../../doxygen/html/images/*.*
 
-export paper=a4paper
-export hmargin=3cm
-export vmargin=3.5cm
-export fontsize=10pt
+export BIB_FILE='../resources/Zotero_Output.bib'
+export REFERENCE_DOCX='../resources/usgs_report_template.docx'
+export CSL_FILE='../resources/us-geological-survey.csl'
+#export REFERENCE_TEX='../resources/xetex.template'
+export REFERENCE_TEX='../resources/xetex_kjhealy.template'
+
+export paper=letter
+export documentclass=article
+export geometry="left=1.25in, top=1.5in, bottom=1.5in"
+export fontsize=14pt
 export mainfont=Times
 export sansfont=Univers
 export monofont=Menlo
@@ -30,8 +36,25 @@ rm -f ../to_doxygen/*.*
 
 filelist=""
 
+function make_doc() {
+
+  MASK=$1
+  OUTPUT_FILE=$2
+
+  pandoc --from=markdown                                                      \
+         --filter pandoc-fignos                                               \
+         --filter pandoc-citeproc                                             \
+         --reference-docx="$REFERENCE_DOCX"                                   \
+         --bibliography="$BIB_FILE"                                           \
+         --csl="$CSL_FILE"                                                    \
+         -m                                                                   \
+         --output="$OUTPUT_FILE"                                              \
+         metadata.yaml `ls $MASK`
+
+}
+
 # iterate over all files in 'raw' directory, in sort order
-for filename in 0*.md; do
+for filename in ?0*.md; do
     cat $filename  > tempfile.md
 
     filelist="$filelist $filename"
@@ -55,8 +78,6 @@ for filename in 0*.md; do
 #    pandoc --from=markdown_mmd+tex_math_dollars+pipe_tables+backtick_code_blocks+citations    \
     pandoc --from=markdown_github+citations+backtick_code_blocks            \
        --to=markdown_github+backtick_code_blocks                            \
-       --variable fignos-caption-name=Figure                                \
-       --variable fignos-plus-name=Fig                                      \
        --bibliography=../resources/Zotero_Output.bib                        \
        --csl=../resources/us-geological-survey.csl                          \
        --output=../to_doxygen/$filename                                     \
@@ -83,83 +104,38 @@ for filename in 0*.md; do
     sed -Eie 's/\\\]/\]/g' ../to_doxygen/$filename
 done
 
-# now use Pandoc to assemble the 'docx' fragments into a single docx file for MS Word
-#pandoc --from=markdown+tex_math_dollars+header_attributes+pipe_tables+backtick_code_blocks+citations   \
-#pandoc --from=markdown+example_lists+tex_math_dollars+header_attributes+backtick_code_blocks+implicit_figures+citations+link_attributes  \
+make_doc '../to_docx/?0*.md' '../report.docx'
+
+# process just the appendices; output is LaTeX
 pandoc --from=markdown                                                      \
-       --to=docx                                                            \
-       --variable fignos-caption-name=Figure                                \
-       --variable fignos-plus-name=Fig                                      \
-       --filter pandoc-fignos                                               \
-       --filter pandoc-citeproc                                             \
-       --toc                                                                \
-       --reference-docx=../resources/usgs_report_template.docx              \
-       --bibliography=../resources/Zotero_Output.bib                        \
-       --csl=../resources/us-geological-survey.csl                          \
+       --latex-engine=xelatex                                               \
        -m                                                                   \
-       --output=../draft_report.docx                                        \
-       `ls ../to_docx/0*.md`
+       --output="../appendices.tex"                                         \
+       metadata.yaml `ls ../to_docx/A0*.md`
 
-# pandoc --from=markdown+citations+header_attributes+backtick_code_blocks+tex_math_dollars        \
-#    --to=html                                                        \
-#    --filter pandoc-citeproc                                         \
-#    --bibliography=../resources/Zotero_Output.bib                    \
-#    --csl=../resources/us-geological-survey.csl                      \
-#    --standalone                                                     \
-#    -m                                                               \
-#    --mathjax                                                        \
-#    --output=../draft_report.html                                    \
-#    `ls ../to_docx/0*.md`
+# now produce the complete LaTeX file; appendices are tacked on after the bibliography
+pandoc --from=markdown                                                     \
+      --filter pandoc-fignos                                               \
+      --filter pandoc-citeproc                                             \
+      --bibliography="$BIB_FILE"                                           \
+      --csl="$CSL_FILE"                                                    \
+      --latex-engine=xelatex                                               \
+      --include-after-body=../appendices.tex                               \
+      -m                                                                   \
+      --output="../report.tex"                                             \
+      metadata.yaml `ls ../to_docx/0*.md`
 
-#          --template=../resources/xetex.template                    \
-#--from=markdown+example_lists+citations+header_attributes+backtick_code_blocks+tex_math_dollars+link_attributes       \
-
-pandoc    -N                                                        \
-          --from=markdown                                           \
-          --template=../resources/xetex.template                    \
-          --variable language="$language"                           \
-          --variable mainfont="$mainfont"                           \
-          --variable sansfont="$sansfont"                           \
-          --variable monofont="$monofont"                           \
-          --variable columns="$columns"                             \
-          --variable fontsize="$fontsize"                           \
-          --variable nohyphenation="$nohyphenation"                 \
-          --variable links="$links"                                 \
-          --variable toc="$toc"                                     \
-          --variable fignos-caption-name=Figure                     \
-          --variable fignos-plus-name=Fig                           \
-          --filter pandoc-fignos                                    \
-          --filter pandoc-citeproc                                  \
-          --bibliography=../resources/Zotero_Output.bib             \
-          --csl=../resources/us-geological-survey.csl               \
-          -m                                                        \
-          --latex-engine=xelatex                                    \
-          -o ../draft_report.pdf                                    \
-          `ls ../to_docx/0*.md`
-
-
-pandoc    -N                                                        \
-          --from=markdown                                           \
-          --template=../resources/xetex.template                    \
-          --variable language="$language"                           \
-          --variable mainfont="$mainfont"                           \
-          --variable sansfont="$sansfont"                           \
-          --variable monofont="$monofont"                           \
-          --variable columns="$columns"                             \
-          --variable fontsize="$fontsize"                           \
-          --variable nohyphenation="$nohyphenation"                 \
-          --variable links="$links"                                 \
-          --variable toc="$toc"                                     \
-          --variable fignos-caption-name=Figure                     \
-          --variable fignos-plus-name=Fig                           \
-          --filter pandoc-fignos                                    \
-          --filter pandoc-citeproc                                  \
-          --bibliography=../resources/Zotero_Output.bib             \
-          --csl=../resources/us-geological-survey.csl               \
-          -m                                                        \
-          --latex-engine=xelatex                                    \
-          -o ../draft_report.tex                                    \
-          `ls ../to_docx/0*.md`
+# finally produce a PDF version
+pandoc --from=markdown                                                     \
+      --filter pandoc-fignos                                               \
+      --filter pandoc-citeproc                                             \
+      --bibliography="$BIB_FILE"                                           \
+      --csl="$CSL_FILE"                                                    \
+      --latex-engine=xelatex                                               \
+      --include-after-body=../appendices.tex                               \
+      -m                                                                   \
+      --output="../report.pdf"                                             \
+      metadata.yaml `ls ../to_docx/0*.md`
 
 # remove temporary working files from directories
 rm -f tempfile.*
