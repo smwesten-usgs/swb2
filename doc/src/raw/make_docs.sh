@@ -137,6 +137,30 @@ pandoc    -N                                                        \
           -o ../draft_report.pdf                                    \
           `ls ../to_docx/0*.md`
 
+
+pandoc    -N                                                        \
+          --from=markdown                                           \
+          --template=../resources/xetex.template                    \
+          --variable language="$language"                           \
+          --variable mainfont="$mainfont"                           \
+          --variable sansfont="$sansfont"                           \
+          --variable monofont="$monofont"                           \
+          --variable columns="$columns"                             \
+          --variable fontsize="$fontsize"                           \
+          --variable nohyphenation="$nohyphenation"                 \
+          --variable links="$links"                                 \
+          --variable toc="$toc"                                     \
+          --variable fignos-caption-name=Figure                     \
+          --variable fignos-plus-name=Fig                           \
+          --filter pandoc-fignos                                    \
+          --filter pandoc-citeproc                                  \
+          --bibliography=../resources/Zotero_Output.bib             \
+          --csl=../resources/us-geological-survey.csl               \
+          -m                                                        \
+          --latex-engine=xelatex                                    \
+          -o ../draft_report.tex                                    \
+          `ls ../to_docx/0*.md`
+
 # remove temporary working files from directories
 rm -f tempfile.*
 rm -f ../to_docx/*.mde

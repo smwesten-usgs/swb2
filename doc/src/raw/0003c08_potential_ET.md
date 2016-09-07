@@ -4,6 +4,23 @@
 
 #### Jensen-Haise {#et_jensen_haise}
 
+$E{T_{pot}} = {C_T}\left( {{T_{mean}} - {T_x}} \right){R_s}$
+
+where:
+
+$C_T$ is an air temperature coefficient, and constant for a given area,
+
+$T_mean$ is the daily mean air temperature in degrees Fahrenheit,
+
+$T_x$ is a constant for a given area,
+
+$R_s$ is the daily solar radiation, expressed as equivalent depth of evaporation in inches,
+
+$C_T$ is $\frac{1}{{68 + 13{C_H}}}$
+
+$C_H$ is a humidity index given by $\frac{{37.5\;{\text{mm}}\;{\text{HG}}}}{{{e_2} - {e_1}}}$, and
+
+$e_1$, $e_2$ are the maximum and minimum saturation vapor pressures for the warmest month.
 
 #### Hargreaves-Samani {#et_hargreaves_samani}
 

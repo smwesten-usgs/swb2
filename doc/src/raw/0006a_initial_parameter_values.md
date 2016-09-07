@@ -1,4 +1,4 @@
-# Initial Parameter Values {#initial_parameter_values} 
+## Initial Parameter Values {#initial_parameter_values}
 
 [TOC]
 
@@ -23,5 +23,3 @@ $CN_B =  CN_B$
 $CN_C =  34.0  +  0.6600 CN_B$
 
 $CN_D =  47.2  +  0.5283 CN_B$
-
-
