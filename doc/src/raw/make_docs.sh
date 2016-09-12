@@ -9,8 +9,8 @@ rm -f ../../doxygen/html/images/*.*
 export BIB_FILE='../resources/Zotero_Output.bib'
 export REFERENCE_DOCX='../resources/usgs_report_template.docx'
 export CSL_FILE='../resources/us-geological-survey.csl'
-#export REFERENCE_TEX='../resources/xetex.template'
-export REFERENCE_TEX='../resources/xetex_kjhealy.template'
+export REFERENCE_TEX='../resources/xetex.template'
+#export REFERENCE_TEX='../resources/xetex_kjhealy.template'
 
 export paper=letter
 export documentclass=article

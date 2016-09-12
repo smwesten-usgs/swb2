@@ -18,7 +18,9 @@ $if(tables)$
 \usepackage{longtable}
 $endif$
 
-\RequirePackage{indentfirst} 
+\RequirePackage{indentfirst}
+
+\setmainfont( Universe )
 
 $if(graphics)$
 \usepackage{graphicx}
