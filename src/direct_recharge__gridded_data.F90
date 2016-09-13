@@ -91,6 +91,7 @@ contains
     !> Determine how many landuse codes are present
     call parameter_list%append( "LU_Code" )
     call parameter_list%append( "Landuse_Code" )
+    call parameter_list%append( "Landuse_Lookup_Code" )    
 
     call PARAMS%get_parameters( slKeys=parameter_list, iValues=landuse_codes )
     number_of_landuses = count( landuse_codes > 0 )

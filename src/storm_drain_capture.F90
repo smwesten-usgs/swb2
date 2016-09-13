@@ -31,6 +31,7 @@ contains
     integer (kind=c_int)              :: status
 
     call string_list%append("LU_Code")
+    call string_list%append("Landuse_Code")    
     call string_list%append("Landuse_Lookup_Code")
 
     !> Determine how many landuse codes are present
