@@ -15,7 +15,7 @@ When $P-PE$ is positive, the new soil-moisture value is found by adding this $P-
 
 When $P-PE$ is negative, the new soil-moisture term is found by looking up the soil-moisture value associated with the current accumulated potential water-loss value in the Thornthwaite-Mather tables.
 
-*Actual ET*. When $P-PE$ is positive, the actual evapotranspiration equals the potential evapotranspiration. When $P-PE$ is negative, the actual evapotranspiration is equal only to the amount of water that can be extracted from the soil ($\Delta$ soil moisture). 
+*Actual ET*. When $P-PE$ is positive, the actual evapotranspiration equals the potential evapotranspiration. When $P-PE$ is negative, the actual evapotranspiration is equal only to the amount of water that can be extracted from the soil ($\Delta$ soil moisture).
 
 ##### Calculation Procedure
 
@@ -27,14 +27,15 @@ During the course of a model run, the soil layer is considered to be in one of t
 |  > 0        | wetting *and* $SM_{t-1} + (P - PE) < SM_{max}$  | $SM_{t-1} + (P-PE)$| $APWL$ from tables   | $PE$ |   0.0         |
 |  > 0        | wetting *and* $SM_{t-1} + (P - PE) > SM_{max}$  | $SM_{max}$  | 0.0  | $PE$   | $SM_{t-1} + (P - PE) - SM_{max}$    |
 
+Table: Soil moisture states. {#tbl:sm_states}
 
 ##### Relation between Accumulated Potential Water Loss and Extractable Water
 
 Version 1.0 of the SWB model reads in digitized versions of the Thornthwaite-Mather soil-moisture retention tables. The amount of computing involved in negotiating the lookup tables and interpolating a result was significant enough to warrant generalization; in addition, small roundoff errors were accumulated in the course of repeated conversions between accumulated potential water loss and the corresponding soil moisture values. In order to avoid the use of lookup tables altogether a generalized equation was developed, using the Thornthwaite and Mather [-@thornthwaite_instructions_1957] table values as the basis for the equations.
 
-There are at least two articles in the literature that describe simple relations that can be used to summarize the Thornthwaite-Mather table values. They are essentially the same, varying only in the choice to use the base-10 or natural logarithm in the calculation. 
+There are at least two articles in the literature that describe simple relations that can be used to summarize the Thornthwaite-Mather table values. They are essentially the same, varying only in the choice to use the base-10 or natural logarithm in the calculation.
 
-The first form of the generalized equation is suggested by Pastor and Post [-@pastor_calculating_1984]: 
+The first form of the generalized equation is suggested by Pastor and Post [-@pastor_calculating_1984]:
 
 $soil\,moisture = SWC \cdot {e^{\left( {constant - {\textstyle{{factor} \over {SWC}}}} \right)APWL}}$
 
@@ -69,14 +70,13 @@ CONTROL_FILE_STATEMENT 1
 CONTROL_FILE_STATEMENT_2
 ~~~~~~~~
 
-Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. 
+Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus.
 
 #### FAO-56 {#sm_fao_56}
 
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.
 
-Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus. 
+Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus.
 
 
 #### Zahner {#sm_zahner}
-

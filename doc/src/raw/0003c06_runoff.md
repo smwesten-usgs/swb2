@@ -22,12 +22,13 @@ $S_{max} = \left( \dfrac{1000}{CN}\right) - 10$
 
 Curve numbers are adjusted upward or downward depending on how much precipitation has occurred in the previous 5-day period. The amount of precipitation that has fallen in the previous 5-day period is used to describe soil-moisture conditions; three classes of moisture conditions are defined and are called antecedent runoff condition I, II, and III, defined as shown in table ###.
 
-Table: Antecedent Runoff Conditions
-
 | Runoff condition number | Description | Nongrowing Season | Growing Season |
 | ----------|-----------------------|------------|--------------------|
 |    I     |    Dry                | 0.05       | 1.4                 |
 |    II    |    Average            | 0.5 -- 1.1 | 1.4 -- 2.1          |
 |    III   |    Near Saturation    | 1.1        | 2.1                 |
+
+Table: Antecedent Runoff Conditions. {#tbl:antecedent_runoff_conditions}
+
 
 #### Monthly Runoff Fraction Grid {#monthly\_runoff\_grid}

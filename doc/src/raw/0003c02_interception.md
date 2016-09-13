@@ -13,7 +13,7 @@ Another option in SWB for calculating canopy interception is a modified version 
 
 To calculate canopy interception, the first step is to determine the minimum depth of precipitation necessary to saturate the forest canopy, P’, which is calculated on the basis of equation 2 in Gash and others (1995) as:
 
-$P' =  - \frac{S}{{c \cdot V}}\ln \left( {1 - V} \right)$,
+$P' =  - \frac{S}{{c \cdot V}}\ln \left( {1 - V} \right)$, {#eq:gash01}
 
 where
 
@@ -50,6 +50,8 @@ Advantages of the Gash model are: (1) it accounts for gaps in the forest canopy,
 #### Horton {#horton}
 
 Robert Horton made countless observations at his hydrologic laboratory in the early 1900's. One of the hydrologic processes to receive his attention is that of canopy interception. The Horton model begins with a "bucket" that must be filled regardless of total storm volume, and adds a linear relation that produces an increasing canopy interception value proportional to increasing storm volume [@horton_rainfall_1919].
+
+Table: Horton's working equations for estimating intercepted rainfall. {#tbl:horton_intcp}
 
 Vegetation Type                     | Working Equation
 ------------------------------------|----------------------------------:

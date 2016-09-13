@@ -43,6 +43,8 @@ function make_doc() {
 
   pandoc --from=markdown                                                      \
          --filter pandoc-fignos                                               \
+         --filter pandoc-tablenos                                             \
+         --filter pandoc-eqnos                                                \
          --filter pandoc-citeproc                                             \
          --reference-docx="$REFERENCE_DOCX"                                   \
          --bibliography="$BIB_FILE"                                           \
@@ -104,35 +106,39 @@ for filename in ?0*.md; do
     sed -Eie 's/\\\]/\]/g' ../to_doxygen/$filename
 done
 
-make_doc '../to_docx/?0*.md' '../report.docx'
+make_doc '../to_docx/?0*.md' 'report.docx'
 
 # process just the appendices; output is LaTeX
 pandoc --from=markdown                                                      \
        --latex-engine=xelatex                                               \
        -m                                                                   \
-       --output="../appendices.tex"                                         \
+       --output="appendices.tex"                                         \
        metadata.yaml `ls ../to_docx/A0*.md`
+
+
+#       --filter pandoc-tablenos                                             \
+#       --filter pandoc-eqnos                                                \
 
 # now produce the complete LaTeX file; appendices are tacked on after the bibliography
 pandoc --from=markdown                                                     \
-      --filter pandoc-fignos                                               \
+      --filter pandoc-crossref                                             \
       --filter pandoc-citeproc                                             \
       --bibliography="$BIB_FILE"                                           \
       --csl="$CSL_FILE"                                                    \
       --latex-engine=xelatex                                               \
-      --include-after-body=../appendices.tex                               \
+      --include-after-body=appendices.tex                                  \
       -m                                                                   \
-      --output="../report.tex"                                             \
+      --output="report.tex"                                                \
       metadata.yaml `ls ../to_docx/0*.md`
 
 # finally produce a PDF version
 pandoc --from=markdown                                                     \
-      --filter pandoc-fignos                                               \
+      --filter pandoc-crossref                                             \
       --filter pandoc-citeproc                                             \
       --bibliography="$BIB_FILE"                                           \
       --csl="$CSL_FILE"                                                    \
       --latex-engine=xelatex                                               \
-      --include-after-body=../appendices.tex                               \
+      --include-after-body=appendices.tex                                  \
       -m                                                                   \
       --output="../report.pdf"                                             \
       metadata.yaml `ls ../to_docx/0*.md`

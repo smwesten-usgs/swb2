@@ -172,3 +172,24 @@ This module handles all processes associated with simulating the growth and sene
 ### Gash
 
 ## Process: Irrigation
+
+## Process Support: Precipitation
+
+### Table Values
+
+### Gridded Values
+
+### Method of Fragments
+
+## Process: Storm Drain Capture
+
+------------------------------------------------------------------------------------------------
+     Parameter                    Allowable Lookup                               Note
+    Description                   Table headers
+---------------------------- -------------------------------------- ----------------------------
+  Landuse code                  LU_Code
+                                Landuse_Code
+                                Landuse_Lookup_Code
+
+                                Storm_drain_capture
+                                Storm_drain_capture_fraction

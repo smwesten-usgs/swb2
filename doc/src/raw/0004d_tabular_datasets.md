@@ -10,8 +10,8 @@ precipitation	gridded        |		--
 potential evapotranspiration |	Hargreaves-Samani		      | control file          |
 runoff                       |	SCS curve number	        | landuse and soil type |	curve number
 actual evapotranspiration    |	Thornthwaite              |	landuse and soil type |	rooting depth
-canopy interception	         |bucket                      |	landuse	               |growing and nongrowing season interception values
---                           |	--                        | 	landuse and soil type |	maximum recharge rate
+canopy interception	         |  bucket                    |	landuse	              | growing and nongrowing season interception values
+--                           |	--                        | landuse and soil type |	maximum recharge rate
 
 
 In the original version of the SWB model, the parameters given above were “hard-wired”; in other words, SWB required the lookup table to be structured such that the parameters were supplied in a non-flexible column order. In this way, parameter values for curve numbers would be supplied in the first columns, followed by the maximum recharge rates, interception values, and rooting depths. In addition, the original version of SWB required that the number of soil types and landuses be specified, and did not allow nor require a table header.
@@ -31,4 +31,4 @@ LU code  | Description               |   Surface Storage Max |     CN 1|    CN 2
 9        | Developed Medium intensity|   0.25                |     70  |      82 |       88 |       91
 10       | Developed High intensity  |   0.25                |     81  |      88 |       92 |       94
 
-In SWB 2.0, it is critical that each column be clearly identified so that the proper parameters may be linked to their respective process modules. 
+In SWB 2.0, it is critical that each column be clearly identified so that the proper parameters may be linked to their respective process modules.
