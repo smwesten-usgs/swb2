@@ -12,21 +12,6 @@ export CSL_FILE='../resources/us-geological-survey.csl'
 export REFERENCE_TEX='../resources/xetex.template'
 #export REFERENCE_TEX='../resources/xetex_kjhealy.template'
 
-export paper=letter
-export documentclass=article
-export geometry="left=1.25in, top=1.5in, bottom=1.5in"
-export fontsize=14pt
-export mainfont=Times
-export sansfont=Univers
-export monofont=Menlo
-export language=english
-export nohyphenation=false
-export columns=onecolumn
-export geometry=portrait
-export alignment=flushleft
-export toc=true
-export links=true
-
 # copy over fresh batch of images for HTML documentation
 cp ../images/*.* ../../doxygen/html/images
 
@@ -42,9 +27,7 @@ function make_doc() {
   OUTPUT_FILE=$2
 
   pandoc --from=markdown                                                      \
-         --filter pandoc-fignos                                               \
-         --filter pandoc-tablenos                                             \
-         --filter pandoc-eqnos                                                \
+         --filter pandoc-crossref                                             \
          --filter pandoc-citeproc                                             \
          --reference-docx="$REFERENCE_DOCX"                                   \
          --bibliography="$BIB_FILE"                                           \
@@ -126,6 +109,7 @@ pandoc --from=markdown                                                     \
       --bibliography="$BIB_FILE"                                           \
       --csl="$CSL_FILE"                                                    \
       --latex-engine=xelatex                                               \
+      --template="../resources/xetex.template"                       \
       --include-after-body=appendices.tex                                  \
       -m                                                                   \
       --output="report.tex"                                                \
@@ -138,9 +122,10 @@ pandoc --from=markdown                                                     \
       --bibliography="$BIB_FILE"                                           \
       --csl="$CSL_FILE"                                                    \
       --latex-engine=xelatex                                               \
+      --template="../resources/xetex.template"                       \
       --include-after-body=appendices.tex                                  \
       -m                                                                   \
-      --output="../report.pdf"                                             \
+      --output="report.pdf"                                                \
       metadata.yaml `ls ../to_docx/0*.md`
 
 # remove temporary working files from directories

@@ -4,7 +4,7 @@
 When the irrigation demand is simulated in SWB, the underlying soil-moisture module is automatically changed to the FAO-56
 The calculation under 'nonstandard' conditions includes the transpiration-limiting effects of soil water stress on plants. When this option is invoked in swb, the Thornthwaite-Mather soil moisture retention tables are **not** consulted. Rather, the crop evapotranspiration amount $(E{T_{c,adj}})$ is adjusted by incorporation of a water stress factor $({K_s})$ whose value may range between 0.0 and 1.0:
 
-$E{T_{c,adj}} = {K_s}{K_c}E{T_{\rm{o}}}$
+$E{T_{c,adj}} = {K_s}{K_c}E{T_{o}}$
 
 ${K_s}$ is defined by the doil moisture deficit relative to two soil moisture amounts: the Readily Available Water (RAW) and Total Available Water (TAW) amounts. At soil moisture deficits less than the RAW amount, it is assumed that plants have adequate available moisture for growth; plants are assumed to be under no water stress. The value of ${K_s}$ is one under these conditions.
 

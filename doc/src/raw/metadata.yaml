@@ -15,4 +15,5 @@ lot:                 true
 lof:                 true
 links:               true
 tables:              true
+documentclass:       usgsreport
 ---

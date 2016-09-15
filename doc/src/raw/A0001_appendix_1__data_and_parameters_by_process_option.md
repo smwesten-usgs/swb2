@@ -14,6 +14,12 @@ Three actual ET modules are available. The actual ET modules are responsible for
 
 ### FAO-56
 
+
+*Control File Entry*
+```
+SOIL_MOISTURE_METHOD  FAO-56
+```
+
 -------------------------------------------------------------------
  Parameter                    Allowable Lookup
  Description                   Table headers
@@ -22,6 +28,11 @@ Three actual ET modules are available. The actual ET modules are responsible for
 -------------------------------------------------------------------
 
 ### Thornthwaite-Mather
+
+*Control File Entry*
+```
+SOIL_MOISTURE_METHOD  THORNTHWAITE-MATHER
+```
 
 -------------------------------------------------------------------
   Parameter                    Allowable Lookup
@@ -98,7 +109,18 @@ Three actual ET modules are available. The actual ET modules are responsible for
 
 ## Process: Crop Coefficients (FAO-56)
 
-This module handles all processes associated with simulating the growth and senescence of plants and their effect on soil moisture.
+This module handles all processes associated with simulating the growth and senescence of plants and their effect on soil moisture. There are three ways in which crop coefficient curves may be specified; each landuse code may use one of the three methods. The three methods that may be used to specify the crop coefficient curves are:
+
+1. Time-based: specified in terms of the number of days that have elapsed since planting;
+2. Growing degree-day based: specified in terms of the number of growing degree-days that have passed since planting;
+3. Monthly: specific crop coefficients may be supplied with a single value per month.
+
+
+
+*Control File Entry*
+```
+CROP_COEFFICIENT_METHOD  FAO-56
+```
 
 ------------------------------------------------------------------------------------------------
      Parameter                    Allowable Lookup                               Note
@@ -142,6 +164,7 @@ This module handles all processes associated with simulating the growth and sene
                                 Kcb_Oct
                                 Kcb_Nov
                                 Kcb_Dec
+------------------------------------------------------------------------------------------------            
 
 ## Process: Direct Additions
 
