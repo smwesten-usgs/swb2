@@ -1067,6 +1067,16 @@ contains
         call LOGS%WRITE( "==> THORNTHWAITE-MATHER SOIL MOISTURE RETENTION submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
+      elseif ( ( Method_Name .strequal. "T-M_EQUATIONS" )                           &
+             .or. ( Method_Name .strequal. "THORNTHWAITE-MATHER_EQUATIONS" )        &
+             .or. ( Method_Name .strequal. "THORNTHWAITE_MATHER_EQUATIONS") ) then
+
+        this%init_actual_et => model_initialize_actual_et_thornthwaite_mather_eqns
+        this%calc_actual_et => model_calculate_actual_et_thornthwaite_mather_eqns
+
+        call LOGS%WRITE( "==> THORNTHWAITE-MATHER SOIL MOISTURE RETENTION (SWB 1.0 equations) submodel selected.", &
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
+
       elseif ( ( Method_Name .strequal. "FAO56" ) .or. ( Method_Name .strequal. "FAO-56" ) ) then
 
         this%init_actual_et => model_initialize_actual_et_fao56
