@@ -69,7 +69,8 @@ contains
     ! locate the data structure associated with the gridded evaporation to rainfall ratio
     pEVAPORATION_TO_RAINFALL_RATIO => DAT%find("EVAPORATION_TO_RAINFALL_RATIO")
     if ( .not. associated( pEVAPORATION_TO_RAINFALL_RATIO ) ) &
-        call die("A EVAPORATION_TO_RAINFALL_RATIO grid must be supplied in order to make use of this option.", __SRCNAME__, __LINE__)
+        call die("A EVAPORATION_TO_RAINFALL_RATIO grid must be supplied in order to"      & 
+                 //" make use of this option.", __SRCNAME__, __LINE__)
 
 
     call pEVAPORATION_TO_RAINFALL_RATIO%getvalues()

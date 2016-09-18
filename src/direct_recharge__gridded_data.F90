@@ -365,7 +365,8 @@ contains
 
         if ( associated( pDISPOSAL_WELL ) ) then
           call pDISPOSAL_WELL%getvalues( iMonth, iDay, iYear, iJulianDay )
-          if ( pDISPOSAL_WELL%lGridHasChanged ) fDISPOSAL_WELL = pack( pDISPOSAL_WELL%pGrdBase%rData, is_cell_active )
+          if ( pDISPOSAL_WELL%lGridHasChanged ) fDISPOSAL_WELL =                                      &
+               pack( pDISPOSAL_WELL%pGrdBase%rData, is_cell_active )
         endif
 
         if ( associated( pSTORM_DRAIN ) ) then
@@ -375,7 +376,8 @@ contains
 
         if ( associated( pWATER_BODY_RECHARGE ) ) then
           call pWATER_BODY_RECHARGE%getvalues( iMonth, iDay, iYear, iJulianDay )
-          if ( pWATER_BODY_RECHARGE%lGridHasChanged ) fWATER_BODY_RECHARGE = pack( pWATER_BODY_RECHARGE%pGrdBase%rData, is_cell_active )
+          if ( pWATER_BODY_RECHARGE%lGridHasChanged ) fWATER_BODY_RECHARGE =                          &
+               pack( pWATER_BODY_RECHARGE%pGrdBase%rData, is_cell_active )
         endif
 
         if ( associated( pWATER_MAIN ) ) then
@@ -385,7 +387,8 @@ contains
 
         if ( associated( pANNUAL_RECHARGE_RATE ) ) then
           call pANNUAL_RECHARGE_RATE%getvalues( iMonth, iDay, iYear, iJulianDay )
-          if ( pANNUAL_RECHARGE_RATE%lGridHasChanged ) fANNUAL_RECHARGE_RATE = pack( pANNUAL_RECHARGE_RATE%pGrdBase%rData, is_cell_active )
+          if ( pANNUAL_RECHARGE_RATE%lGridHasChanged ) fANNUAL_RECHARGE_RATE =                        &
+               pack( pANNUAL_RECHARGE_RATE%pGrdBase%rData, is_cell_active )
         endif      
 
         DATE_OF_LAST_RETRIEVAL = SIM_DT%curr

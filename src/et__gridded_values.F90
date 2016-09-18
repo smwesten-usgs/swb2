@@ -42,7 +42,8 @@ contains
     if ( .not. associated(pET_GRID) ) then
       pET_GRID => DAT%find("REFERENCE_ET")
       if (.not. associated(pET_GRID) ) &
-        call die("A POTENTIAL_ET or REFERENCE_ET grid must be supplied in order to make use of this option.", __SRCNAME__, __LINE__)
+        call die("A POTENTIAL_ET or REFERENCE_ET grid must be supplied in order to make"   &
+                 //" use of this option.", __SRCNAME__, __LINE__)
 
     endif
 

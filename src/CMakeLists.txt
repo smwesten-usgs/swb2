@@ -3,7 +3,7 @@ set(SRCS
       actual_et__thornthwaite_mather.F90
       actual_et__thornthwaite_mather_eqns.F90
       awc__gridded_values.F90
-      awc__table_values.F90
+      awc__depth_integrated.F90
       constants_and_conversions.F90
       continuous_frozen_ground_index.F90
       crop_coefficients__fao56.F90

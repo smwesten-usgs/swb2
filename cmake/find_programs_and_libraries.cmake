@@ -15,11 +15,11 @@ include_directories( ${INC_PATH} "${PROJECT_SOURCE_DIR}/src/proj4")
 
 if ("${OS}" STREQUAL "win_x64" OR "${OS}" STREQUAL "win_x86")
 
-  set( SWB_EXECUTABLE ${CMAKE_INSTALL_PREFIX}/swb.exe )
+  set( SWB_EXECUTABLE ${CMAKE_INSTALL_PREFIX}/swb2.exe )
 
 else()
 
-  set( SWB_EXECUTABLE ${CMAKE_INSTALL_PREFIX}/swb )
+  set( SWB_EXECUTABLE ${CMAKE_INSTALL_PREFIX}/swb2 )
 
 endif()
 

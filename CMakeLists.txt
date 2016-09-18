@@ -22,18 +22,11 @@ message("Processing top-level CMakelists.txt for project swb2")
 
 include( CMakeForceCompiler )
 
-#CMAKE_FORCE_C_COMPILER ( ${CC} ${GCC_VERSION} )
-#CMAKE_FORCE_Fortran_COMPILER ( ${FC} ${GCC_VERSION} )
-
-#CMAKE_FORCE_C_COMPILER( gcc GNU )
-#CMAKE_FORCE_Fortran_COMPILER( gfortran GNU )
-
 #------------------------------------------------------------------------------------#
 #                           Build directory check                                    #
 #------------------------------------------------------------------------------------#
 if(${CMAKE_SOURCE_DIR}/src STREQUAL ${CMAKE_BINARY_DIR})
-  message(FATAL_ERROR "Cannot be built in the source directory. Use
-  out-of-source build instead.")
+  message(FATAL_ERROR "Cannot be built in the source directory. Use out-of-source build instead.")
   message(FATAL_ERROR "  cd /some/work/dir/build")
   message(FATAL_ERROR "  cmake -i /path/to/source")
 endif()

@@ -125,56 +125,93 @@ module model_domain
     real (kind=c_float), allocatable       :: irrigation_mask(:)
 
     !> declare and initialize procedure pointers such that the default methods are in place
-    procedure ( array_method ), pointer         :: init_interception         => model_initialize_interception_bucket
-    procedure ( array_method ), pointer         :: init_runoff               => model_initialize_runoff_curve_number
-    procedure ( array_method ), pointer         :: init_reference_et         => model_initialize_et_hargreaves
-    procedure ( array_method ), pointer         :: init_actual_et            => model_initialize_actual_et_thornthwaite_mather_eqns
-    procedure ( array_method ), pointer         :: init_routing              => model_initialize_routing_D8
-    procedure ( array_method ), pointer         :: init_soil_storage_max     => model_initialize_soil_storage_max_internally_calculated
-    procedure ( array_method ), pointer         :: init_snowfall             => model_initialize_snowfall_original
-    procedure ( array_method ), pointer         :: init_snowmelt             => model_initialize_snowmelt_original
-    procedure ( array_method ), pointer         :: init_precipitation_data   => model_initialize_precip_normal
-    procedure ( array_method ), pointer         :: init_fog                  => model_initialize_fog_none
-    procedure ( array_method ), pointer         :: init_irrigation           => model_initialize_irrigation_none
-    procedure ( array_method ), pointer         :: init_direct_recharge      => model_initialize_direct_recharge_gridded
-    procedure ( array_method ), pointer         :: init_direct_soil_moisture => model_initialize_direct_soil_moisture_none    
-    procedure ( array_method ), pointer         :: init_GDD                  => model_initialize_GDD_none
-    procedure ( array_method ), pointer         :: init_AWC                  => model_initialize_available_water_content_gridded
-    procedure ( array_method ), pointer         :: init_crop_coefficient     => model_initialize_crop_coefficient_none
-    procedure ( array_method ), pointer         :: calc_interception         => model_calculate_interception_bucket
-    procedure ( array_method ), pointer         :: update_crop_coefficient   => model_update_crop_coefficient_none  
+    procedure ( array_method ), pointer  :: init_interception                                                &
+                                                => model_initialize_interception_bucket
+    procedure ( array_method ), pointer  :: init_runoff                                                      &
+                                                => model_initialize_runoff_curve_number
+    procedure ( array_method ), pointer  :: init_reference_et                                                &
+                                                => model_initialize_et_hargreaves
+    procedure ( array_method ), pointer  :: init_actual_et                                                   &
+                                                => model_initialize_actual_et_thornthwaite_mather_eqns
+    procedure ( array_method ), pointer  :: init_routing                                                     &
+                                                => model_initialize_routing_D8
+    procedure ( array_method ), pointer  :: init_soil_storage_max                                            &
+                                                => model_initialize_soil_storage_max_internally_calculated
+    procedure ( array_method ), pointer  :: init_snowfall                                                    &
+                                                => model_initialize_snowfall_original
+    procedure ( array_method ), pointer  :: init_snowmelt                                                    &
+                                                => model_initialize_snowmelt_original
+    procedure ( array_method ), pointer  :: init_precipitation_data                                          &
+                                                => model_initialize_precip_normal
+    procedure ( array_method ), pointer  :: init_fog                                                         &
+                                                => model_initialize_fog_none
+    procedure ( array_method ), pointer  :: init_irrigation                                                  &
+                                                => model_initialize_irrigation_none
+    procedure ( array_method ), pointer  :: init_direct_recharge                                             &
+                                                => model_initialize_direct_recharge_gridded
+    procedure ( array_method ), pointer  :: init_direct_soil_moisture                                        &
+                                                => model_initialize_direct_soil_moisture_none    
+    procedure ( array_method ), pointer  :: init_GDD                                                         &
+                                                => model_initialize_GDD_none
+    procedure ( array_method ), pointer  :: init_AWC                                                         &
+                                                => model_initialize_available_water_content_gridded
+    procedure ( array_method ), pointer  :: init_crop_coefficient                                            &
+                                                => model_initialize_crop_coefficient_none
+    procedure ( array_method ), pointer  :: calc_interception                                                &
+                                                => model_calculate_interception_bucket
+    procedure ( array_method ), pointer  :: update_crop_coefficient                                          &
+                                                => model_update_crop_coefficient_none  
 
-    procedure ( array_method ), pointer         :: init_continuous_frozen_ground_index => model_initialize_continuous_frozen_ground_index  
-    procedure ( array_method ), pointer         :: calc_continuous_frozen_ground_index => model_calculate_continuous_frozen_ground_index      
+    procedure ( array_method ), pointer  :: init_continuous_frozen_ground_index                              &
+                                                => model_initialize_continuous_frozen_ground_index  
+    procedure ( array_method ), pointer  :: calc_continuous_frozen_ground_index                              &
+                                                => model_calculate_continuous_frozen_ground_index      
 
-    procedure ( array_method ), pointer         :: init_maximum_potential_recharge => model_initialize_maximum_potential_recharge_gridded  
-    procedure ( indexed_method ), pointer       :: calc_maximum_potential_recharge => model_calculate_maximum_potential_recharge_gridded      
+    procedure ( array_method ), pointer  :: init_maximum_potential_recharge                                  &
+                                                => model_initialize_maximum_potential_recharge_gridded  
+    procedure ( index_method ), pointer  :: calc_maximum_potential_recharge                                  &
+                                                => model_calculate_maximum_potential_recharge_gridded      
 
-    procedure ( indexed_method ), pointer       :: calc_runoff            => model_calculate_runoff_curve_number
+    procedure ( index_method ), pointer  :: calc_runoff                                                      &
+                                                => model_calculate_runoff_curve_number
     
-    procedure ( array_method ), pointer         :: calc_reference_et      => model_calculate_et_hargreaves
-    procedure ( indexed_method ), pointer       :: calc_routing           => model_calculate_routing_D8
+    procedure ( array_method ), pointer  :: calc_reference_et                                                &
+                                                => model_calculate_et_hargreaves
+    procedure ( index_method ), pointer  :: calc_routing                                                     &
+                                                => model_calculate_routing_D8
 
-    procedure ( indexed_method ), pointer       :: calc_actual_et         => model_calculate_actual_et_thornthwaite_mather_eqns
-    procedure ( array_method ), pointer         :: calc_snowfall          => model_calculate_snowfall_original
-    procedure ( array_method ), pointer         :: calc_snowmelt          => model_calculate_snowmelt_original  
-    procedure ( array_method ), pointer         :: calc_fog               => model_calculate_fog_none
-    procedure ( array_method ), pointer         :: calc_irrigation        => model_calculate_irrigation_none
-    procedure ( array_method ), pointer         :: calc_GDD               => model_calculate_GDD
-    procedure ( indexed_method ), pointer       :: calc_direct_recharge      => model_calculate_direct_recharge_none    
-    procedure ( indexed_method ), pointer       :: calc_direct_soil_moisture => model_calculate_direct_soil_moisture_none        
+    procedure ( index_method ), pointer  :: calc_actual_et                                                   &
+                                                => model_calculate_actual_et_thornthwaite_mather_eqns
+    procedure ( array_method ), pointer  :: calc_snowfall                                                    &
+                                                => model_calculate_snowfall_original
+    procedure ( array_method ), pointer  :: calc_snowmelt                                                    &
+                                                => model_calculate_snowmelt_original  
+    procedure ( array_method ), pointer  :: calc_fog                                                         &
+                                                => model_calculate_fog_none
+    procedure ( array_method ), pointer  :: calc_irrigation                                                  &
+                                                => model_calculate_irrigation_none
+    procedure ( array_method ), pointer  :: calc_GDD                                                         &
+                                                => model_calculate_GDD
+    procedure ( index_method ), pointer  :: calc_direct_recharge                                             &
+                                                => model_calculate_direct_recharge_none    
+    procedure ( index_method ), pointer  :: calc_direct_soil_moisture                                        &
+                                                => model_calculate_direct_soil_moisture_none        
 
-    procedure (array_method), pointer           :: output_irrigation      => model_output_irrigation_none
-    procedure (array_method), pointer           :: dump_variables         => model_dump_variables_none    
+    procedure (array_method), pointer    :: output_irrigation                                                &
+                                                => model_output_irrigation_none
+    procedure (array_method), pointer    :: dump_variables                                                   &
+                                                => model_dump_variables_none    
 
-    procedure ( array_method ), pointer         :: read_awc_data           => model_read_available_water_content_gridded
-    procedure ( array_method ), pointer         :: get_precipitation_data => model_get_precip_normal
-    procedure ( array_method ), pointer         :: get_minimum_air_temperature_data                                       &     
-                                                                           => model_get_minimum_air_temperature_normal
-    procedure ( array_method ), pointer         :: get_maximum_air_temperature_data                                       &     
-                                                                           => model_get_maximum_air_temperature_normal
-    procedure ( array_method ), pointer         :: calculate_mean_air_temperature                                       &     
-                                                                           => model_calculate_mean_air_temperature
+    procedure ( array_method ), pointer  :: read_awc_data                                                    &
+                                                => model_read_available_water_content_gridded
+    procedure ( array_method ), pointer  :: get_precipitation_data                                           &
+                                                => model_get_precip_normal
+    procedure ( array_method ), pointe   :: get_minimum_air_temperature_data                                 &     
+                                                => model_get_minimum_air_temperature_normal
+    procedure ( array_method ), pointer  :: get_maximum_air_temperature_data                                 &     
+                                                => model_get_maximum_air_temperature_normal
+    procedure ( array_method ), pointer  :: calculate_mean_air_temperature                                   &     
+                                                => model_calculate_mean_air_temperature
 
   contains
 
@@ -235,11 +272,11 @@ module model_domain
   ! indexed method: designed to be called sequentially with explicit
   ! index values provided
   abstract interface
-    subroutine indexed_method( this, index )
+    subroutine index_method( this, index )
       import :: MODEL_DOMAIN_T, c_int
       class ( MODEL_DOMAIN_T ), intent(inout)       :: this
       integer (kind=c_int), intent(in)              :: index
-    end subroutine indexed_method
+    end subroutine index_method
   end interface  
 
   interface minmaxmean
@@ -549,7 +586,7 @@ contains
   
   subroutine set_inactive_cells_sub(this)
 
-    use awc__table_values, only  : AVAILABLE_WATER_CONTENT
+    use awc__depth_integrated, only  : AVAILABLE_WATER_CONTENT
 
     class (MODEL_DOMAIN_T), intent(inout)   :: this
     type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
@@ -560,6 +597,8 @@ contains
     pLULC => DAT%find("LAND_USE")
     pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
     pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
+
+    if( .not. associated( pAWC ) )  pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
     
     if ( .not. associated(pHSG) ) &
       call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
@@ -841,26 +880,30 @@ contains
 
       endif
 
-    elseif ( sCmdText .contains. "AVAILABLE_WATER_CONTENT" ) then
+    elseif ( sCmdText .contains. "AVAILABLE_WATER_CONTENT"            &
+        .or. sCmdTxtx .contains. "AVAILABLE_WATER_CAPACITY") then
 
       if ( ( Method_Name .strequal. "TABLE" ) ) then
 
-        this%init_awc => model_initialize_available_water_content_table
-        this%read_awc_data => model_read_available_water_content_table
+        this%init_awc => model_initialize_available_water_content_depth_integrated
+        this%read_awc_data => model_read_available_water_content_depth_integrated
 
-        call LOGS%WRITE( "==> TABLE method for populating AVAILABLE_WATER_CONTENT selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        call LOGS%WRITE( "==> TABLE method for populating AVAILABLE_WATER_CONTENT/AVAILABLE_WATER_CAPACITY selected.",     &
+                         iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( Method_Name .strequal. "GRID" ) .or. ( Method_Name .strequal. "GRIDDED" ) ) then
 
         this%init_awc => model_initialize_available_water_content_gridded
         this%read_awc_data => model_read_available_water_content_gridded
 
-        call LOGS%WRITE( "==> GRIDDED VALUES method for populating AVAILABLE_WATER_CONTENT selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        call LOGS%WRITE( "==> GRIDDED VALUES method for populating AVAILABLE_WATER_CONTENT/AVAILABLE_WATER_CAPACITY selected.",   &
+                         iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
-        call warn("Your control file specifies an unknown or unsupported AVAILABLE_WATER_CONTENT method.", &
-            lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+        call warn("Your control file specifies an unknown or unsupported AVAILABLE_WATER_CONTENT/"    &
+                  //"AVAILABLE_WATER_CAPACITY method.",                                               &
+                  lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
       endif
 
@@ -1794,21 +1837,21 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_read_available_water_content_table( this )
+  subroutine model_read_available_water_content_depth_integrated( this )
 
-    use awc__table_values
+    use awc__depth_integrated
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     call awc_table_values_read( fRooting_Depth=ROOTING_DEPTH_MAX )
 
-  end subroutine model_read_available_water_content_table  
+  end subroutine model_read_available_water_content_depth_integrated  
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_initialize_available_water_content_table( this )
+  subroutine model_initialize_available_water_content_depth_integrated( this )
 
-    use awc__table_values
+    use awc__depth_integrated
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
@@ -1833,7 +1876,7 @@ contains
 
     call grid_Destroy( pTempGrd )
 
-  end subroutine model_initialize_available_water_content_table  
+  end subroutine model_initialize_available_water_content_depth_integrated  
 
 !--------------------------------------------------------------------------------------------------
 

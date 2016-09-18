@@ -141,7 +141,8 @@ contains
     ! locate the data structure associated with the gridded rainfall zone entries
     pRAINFALL_ZONE => DAT%find("RAINFALL_ZONE")
     if ( .not. associated(pRAINFALL_ZONE) ) &
-        call die("A RAINFALL_ZONE grid must be supplied in order to make use of this option.", __SRCNAME__, __LINE__)
+        call die("A RAINFALL_ZONE grid must be supplied in order to make use of this option.",    &
+          __SRCNAME__, __LINE__)
 
     allocate( RAIN_GAGE_ID( count(lActive) ), stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
@@ -263,7 +264,8 @@ contains
         write (sBuf1, fmt="(i10)") iMonth
         write (sBuf2, fmt="(i12)") FRAGMENTS_SETS(iIndex)%iStartRecord(iMonth)
         write (sBuf3, fmt="(i10)") FRAGMENTS_SETS(iIndex)%iNumberOfFragments(iMonth)
-        write (sBuf4, fmt="(a10,'  | ', a10,' | ', a12,' | ',a10)") adjustl(sBuf0), adjustl(sBuf1), adjustl(sBuf2), adjustl(sBuf3)
+        write (sBuf4, fmt="(a10,'  | ', a10,' | ', a12,' | ',a10)") adjustl(sBuf0),     &
+               adjustl(sBuf1), adjustl(sBuf2), adjustl(sBuf3)
         call LOGS%write( sBuf4 )
       enddo  
     end do
@@ -310,30 +312,33 @@ contains
       ! read in month number
       call chomp(sRecord, sSubstring, FRAGMENTS_FILE%sDelimiters )
 
-      if ( len_trim(sSubstring) == 0 ) &
-      call die( "Missing month number in the daily fragments file", &
-        __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(FRAGMENTS_FILE%currentLineNum() ) &
-        //" of file "//dquote(sFilename) )
+      if ( len_trim(sSubstring) == 0 )                                    &
+        call die( "Missing month number in the daily fragments file",     &
+          __SRCNAME__, __LINE__, "Problem occured on line number "        &
+          //asCharacter(FRAGMENTS_FILE%currentLineNum() )                 &
+          //" of file "//dquote(sFilename) )
 
       FRAGMENTS(iCount)%iMonth = asInt(sSubString)
 
       ! read in rain gage zone
       call chomp(sRecord, sSubstring, FRAGMENTS_FILE%sDelimiters )
 
-      if ( len_trim(sSubstring) == 0 ) &
-      call die( "Missing rain gage zone number in the daily fragments file", &
-        __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(FRAGMENTS_FILE%currentLineNum() ) &
-        //" of file "//dquote(sFilename) )
+      if ( len_trim(sSubstring) == 0 )                                         &
+        call die( "Missing rain gage zone number in the daily fragments file", &
+          __SRCNAME__, __LINE__, "Problem occured on line number "             &
+          //asCharacter(FRAGMENTS_FILE%currentLineNum() )                      &
+          //" of file "//dquote(sFilename) )
 
       FRAGMENTS(iCount)%iRainGageZone = asInt(sSubString)
 
       ! read in fragment set number for this zone
       call chomp(sRecord, sSubstring, FRAGMENTS_FILE%sDelimiters )
 
-      if ( len_trim(sSubstring) == 0 ) &
-      call die( "Missing fragment set number in the daily fragments file", &
-        __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(FRAGMENTS_FILE%currentLineNum() ) &
-        //" of file "//dquote(sFilename) )
+      if ( len_trim(sSubstring) == 0 )                                         &
+        call die( "Missing fragment set number in the daily fragments file",   &
+          __SRCNAME__, __LINE__, "Problem occured on line number "             &
+          //asCharacter(FRAGMENTS_FILE%currentLineNum() )                      &
+          //" of file "//dquote(sFilename) )
 
       FRAGMENTS(iCount)%iFragmentSet = asInt(sSubString)
       
@@ -342,10 +347,11 @@ contains
         ! read in fragment for given day of month
         call chomp(sRecord, sSubstring, FRAGMENTS_FILE%sDelimiters )
 
-        if ( len_trim(sSubstring) == 0 ) &
-        call die( "Missing fragment value in the daily fragments file", &
-          __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(FRAGMENTS_FILE%currentLineNum() ) &
-          //" of file "//dquote(sFilename) )
+        if ( len_trim(sSubstring) == 0 )                                       &
+          call die( "Missing fragment value in the daily fragments file",      &
+            __SRCNAME__, __LINE__, "Problem occured on line number "           &
+            //asCharacter(FRAGMENTS_FILE%currentLineNum() )                    &
+            //" of file "//dquote(sFilename) )
 
         fTempValue = asFloat( sSubstring )
 
@@ -399,7 +405,8 @@ contains
     iNumLines = SEQUENCE_FILE%numLines()
 
     allocate(  FRAGMENTS_SEQUENCE( iNumLines ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory for fragments sequence table", __SRCNAME__, __LINE__ )
+    call assert( iStat == 0, "Problem allocating memory for fragments sequence table",    &
+      __SRCNAME__, __LINE__ )
 
     iCount = 0
 
@@ -415,19 +422,21 @@ contains
       ! read in simulation number
       call chomp(sRecord, sSubstring, SEQUENCE_FILE%sDelimiters )
 
-      if ( len_trim(sSubstring) == 0 ) &
-        call die( "Missing simulation number in the fragments sequence file", &
-          __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
-          //" of file "//dquote(sFilename) )
+      if ( len_trim(sSubstring) == 0 )                                              &
+          call die( "Missing simulation number in the fragments sequence file",     &
+            __SRCNAME__, __LINE__, "Problem occured on line number "                &
+            //asCharacter(SEQUENCE_FILE%currentLineNum() )                          &
+            //" of file "//dquote(sFilename) )
 
       FRAGMENTS_SEQUENCE(iCount)%sim_number = asInt(sSubString)
 
       ! read in month
       call chomp(sRecord, sSubstring, SEQUENCE_FILE%sDelimiters )
 
-      if ( len_trim(sSubstring) == 0 ) &
-        call die( "Missing month number in the fragments sequence file", &
-          __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
+      if ( len_trim(sSubstring) == 0 )                                              &
+        call die( "Missing month number in the fragments sequence file",            &
+          __SRCNAME__, __LINE__, "Problem occured on line number "                  &
+          //asCharacter(SEQUENCE_FILE%currentLineNum() )                            &
           //" of file "//dquote(sFilename) )
 
       FRAGMENTS_SEQUENCE(iCount)%sim_month = asInt(sSubString)
@@ -435,9 +444,10 @@ contains
       ! read in rainfall zone
       call chomp(sRecord, sSubstring, SEQUENCE_FILE%sDelimiters )
 
-      if ( len_trim(sSubstring) == 0 ) &
-        call die( "Missing rainfall zone number in the fragments sequence file", &
-          __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
+      if ( len_trim(sSubstring) == 0 )                                              &
+        call die( "Missing rainfall zone number in the fragments sequence file",    &
+          __SRCNAME__, __LINE__, "Problem occured on line number "                  &
+          //asCharacter(SEQUENCE_FILE%currentLineNum() )                            &
           //" of file "//dquote(sFilename) )
 
       FRAGMENTS_SEQUENCE(iCount)%sim_rainfall_zone = asInt(sSubString)
@@ -446,9 +456,10 @@ contains
       ! read in sim_year
       call chomp(sRecord, sSubstring, SEQUENCE_FILE%sDelimiters )
 
-      if ( len_trim(sSubstring) == 0 ) &
-        call die( "Missing year number in the fragments sequence file", &
-          __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
+      if ( len_trim(sSubstring) == 0 )                                              &
+        call die( "Missing year number in the fragments sequence file",             &
+          __SRCNAME__, __LINE__, "Problem occured on line number "                  &
+          //asCharacter(SEQUENCE_FILE%currentLineNum() )                            &
           //" of file "//dquote(sFilename) )
 
       FRAGMENTS_SEQUENCE(iCount)%sim_year = asInt(sSubString)
@@ -456,9 +467,10 @@ contains
       ! read in sim_random_number
       call chomp(sRecord, sSubstring, SEQUENCE_FILE%sDelimiters )
 
-      if ( len_trim(sSubstring) == 0 ) &
-        call die( "Missing simulation random number in the fragments sequence file", &
-          __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
+      if ( len_trim(sSubstring) == 0 )                                                   &
+        call die( "Missing simulation random number in the fragments sequence file",     &
+          __SRCNAME__, __LINE__, "Problem occured on line number "                       &
+          //asCharacter(SEQUENCE_FILE%currentLineNum() )                                 &
           //" of file "//dquote(sFilename) )
 
       FRAGMENTS_SEQUENCE(iCount)%sim_random_number = asFloat(sSubString)
@@ -466,9 +478,10 @@ contains
       ! read in simulation selected set
       call chomp(sRecord, sSubstring, SEQUENCE_FILE%sDelimiters )
 
-      if ( len_trim(sSubstring) == 0 ) &
+      if ( len_trim(sSubstring) == 0 )                                                   &
         call die( "Missing selected fragment set number in the fragments sequence file", &
-          __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(SEQUENCE_FILE%currentLineNum() ) &
+          __SRCNAME__, __LINE__, "Problem occured on line number "                       &
+          //asCharacter(SEQUENCE_FILE%currentLineNum() )                                 &
           //" of file "//dquote(sFilename) )
 
       FRAGMENTS_SEQUENCE(iCount)%sim_selected_set = asInt(sSubString)
@@ -550,16 +563,17 @@ contains
         iEndRecord = iStartRecord + iNumberOfFragments - 1
         iTargetRecord = iStartRecord + int(RANDOM_VALUES(iIndex) * real( iNumberOfFragments ))
 
-        if ( ( iIndex > iUBOUND_CURRENT_FRAGMENTS ) .or. ( iTargetRecord > iUBOUND_FRAGMENTS ) &
+        if ( ( iIndex > iUBOUND_CURRENT_FRAGMENTS ) .or. ( iTargetRecord > iUBOUND_FRAGMENTS )   &
             .or. ( iIndex < 1 ) .or. ( iTargetRecord < 1) ) then
-          call LOGS%write("Error detected in method of fragments routine; dump of current variables follows:", &
-              iLinesBefore=1)
+          call LOGS%write("Error detected in method of fragments routine; dump of current"       &
+                          //" variables follows:", iLinesBefore=1)
           call LOGS%write("iIndex: "//asCharacter(iIndex), iTab=3 )
           call LOGS%write("iStartRecord: "//asCharacter(iStartRecord), iTab=3 )
           call LOGS%write("iNumberOfFragments: "//asCharacter(iNumberOfFragments), iTab=3 )
           call LOGS%write("iEndRecord: "//asCharacter(iEndRecord), iTab=3 )
           call LOGS%write("iTargetRecord: "//asCharacter(iTargetRecord), iTab=3 )
-          call LOGS%write("ubound(CURRENT_FRAGMENTS, 1): "//asCharacter(iUBOUND_CURRENT_FRAGMENTS), iTab=3 )
+          call LOGS%write("ubound(CURRENT_FRAGMENTS, 1): "//asCharacter(iUBOUND_CURRENT_FRAGMENTS), &
+                          iTab=3 )
           call LOGS%write("ubound(FRAGMENTS, 1): "//asCharacter(iUBOUND_FRAGMENTS), iTab=3 )                    
           call LOGS%write("RANDOM_VALUES(iIndex): "//asCharacter(RANDOM_VALUES(iIndex)), iTab=3 )
           call die( "Miscalculation in target record: calculated record index is out of bounds", &
@@ -584,8 +598,8 @@ contains
       if ( ( CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay ) < 0.0 ) &
          .or. ( CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay ) > 1.0 ) ) then
 
-        call LOGS%write("Error detected in method of fragments routine; dump of current variables follows:", &
-              iLinesBefore=1, iLogLevel=LOG_ALL )
+        call LOGS%write("Error detected in method of fragments routine; dump of current variables"  & 
+                        //" follows:", iLinesBefore=1, iLogLevel=LOG_ALL )
         call LOGS%write("iIndex:"//asCharacter(iIndex), iTab=3 )
         call LOGS%write("iDay: "//asCharacter(iDay), iTab=3 )
         call LOGS%write("iRainGageZone: "//asCharacter(FRAGMENTS( iTargetRecord)%iRainGageZone), iTab=3 )      
@@ -676,7 +690,8 @@ contains
     pRAINFALL_ADJUST_FACTOR => DAT%find("RAINFALL_ADJUST_FACTOR")
 
     if ( .not. associated(pRAINFALL_ADJUST_FACTOR) ) &
-        call die("A RAINFALL_ADJUST_FACTOR grid must be supplied in order to make use of this option.", __SRCNAME__, __LINE__)
+        call die("A RAINFALL_ADJUST_FACTOR grid must be supplied in order to make use"     &
+                 //" of this option.", __SRCNAME__, __LINE__)
 
     call pRAINFALL_ADJUST_FACTOR%getvalues(iMonth=iMonth, iDay=iDay, iYear=iYear  )
 

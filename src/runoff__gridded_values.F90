@@ -127,9 +127,10 @@ module runoff__gridded_values
       call chomp(sRecord, sSubstring, RUNOFF_RATIO_FILE%sDelimiters )
 
       if ( len_trim(sSubstring) == 0 ) &
-      call die( "Missing date in the monthly runoff ratio file", &
-        __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(RUNOFF_RATIO_FILE%currentLineNum() ) &
-        //" of file "//dquote(sFilename) )
+      call die( "Missing date in the monthly runoff ratio file",              &
+               __SRCNAME__, __LINE__, "Problem occured on line number "       &
+               //asCharacter(RUNOFF_RATIO_FILE%currentLineNum() )             &
+               //" of file "//dquote(sFilename) )
 
       call RUNOFF_TABLE_DATES( iLineNum )%parseDate( sSubString ) 
 
@@ -139,9 +140,10 @@ module runoff__gridded_values
          call chomp(sRecord, sSubstring, RUNOFF_RATIO_FILE%sDelimiters )
 
          if ( len_trim(sSubstring) == 0 ) &
-           call die( "Missing or corrupt value in the runoff ratio file", &
-             __SRCNAME__, __LINE__, "Problem occured on line number "//asCharacter(RUNOFF_RATIO_FILE%currentLineNum() ) &
-             //" of file "//dquote(sFilename) )
+           call die( "Missing or corrupt value in the runoff ratio file",        &
+                     __SRCNAME__, __LINE__, "Problem occured on line number "    &
+                     //asCharacter(RUNOFF_RATIO_FILE%currentLineNum() )          &
+                     //" of file "//dquote(sFilename) )
 
          RUNOFF_TABLE_VALUES(iLineNum, iIndex - 1 ) = asFloat( sSubstring )
 

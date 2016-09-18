@@ -74,23 +74,27 @@ contains
     pLULC => DAT%find("LAND_USE")
     pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
     
-    call assert( associated( pLULC), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pLULC", &
-      __SRCNAME__, __LINE__ )
+    call assert( associated( pLULC), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer"          &
+      //" detected for pLULC", __SRCNAME__, __LINE__ )
 
     call assert( associated( pLULC%pGrdBase ),   &
-      "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pLULC%pGrdBase", __SRCNAME__, __LINE__ )
+      "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pLULC%pGrdBase",            &
+       __SRCNAME__, __LINE__ )
 
     call assert( allocated( pLULC%pGrdBase%iData ),   &
-      "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pLULC%pGrdBase%iData", __SRCNAME__, __LINE__ )
-
-    call assert( associated( pHSG), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pHSG", &
+      "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pLULC%pGrdBase%iData", &
       __SRCNAME__, __LINE__ )
 
+    call assert( associated( pHSG), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer"           &
+      //" detected for pHSG", __SRCNAME__, __LINE__ )
+
     call assert( associated( pHSG%pGrdBase ),      & 
-      "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pHSG%pGrdBase", __SRCNAME__, __LINE__ )
+      "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pHSG%pGrdBase",             &
+       __SRCNAME__, __LINE__ )
 
     call assert( allocated( pHSG%pGrdBase%iData ),      & 
-      "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pHSG%pGrdBase%iData", __SRCNAME__, __LINE__ )
+      "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pHSG%pGrdBase%iData",  &
+       __SRCNAME__, __LINE__ )
 
 
     ! attempt to find a source of GRIDDED MAXIMUM_POTENTIAL_RECHARGE data

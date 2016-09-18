@@ -43,6 +43,12 @@ SOIL_MOISTURE_METHOD  THORNTHWAITE-MATHER
 
 ### Thornthwaite-Mather Equations
 
+```
+SOIL_MOISTURE_METHOD  THORNTHWAITE-MATHER_EQUATIONS
+                     -or-
+SOIL_MOISTURE_METHOD THORNTHWAITE_MATHER_EQUATIONS
+```
+
 -------------------------------------------------------------------
      Parameter                    Allowable Lookup
     Description                   Table headers
@@ -52,7 +58,17 @@ SOIL_MOISTURE_METHOD  THORNTHWAITE-MATHER
 
 ## Process: Available Water Capacity / Available Water Content
 
-### Gridded Data
+
+
+### Gridded Values
+
+```
+AVAILABLE_WATER_CONTENT GRIDDED
+                     -or-
+AVAILABLE_WATER_CAPACITY GRIDDED
+```
+
+
 -------------------------------------------------------------------
       Parameter                    Allowable Lookup
      Description                    Table headers
@@ -61,6 +77,30 @@ SOIL_MOISTURE_METHOD  THORNTHWAITE-MATHER
 -------------------------------------------------------------------
 
 ### Table Values
+
+```
+AVAILABLE_WATER_CONTENT TABLE
+                     -or-
+AVAILABLE_WATER_CAPACITY TABLE
+```
+
+-------------------------------------------------------------------
+      Parameter                    Allowable Lookup
+     Description                    Table headers
+---------------------------- --------------------------------------
+   Available water capacity,    AWC
+   in inches per foot
+-------------------------------------------------------------------
+
+
+### Table Values, Depth-Integrated
+
+
+```
+AVAILABLE_WATER_CONTENT DEPTH_INTEGRATED
+                     -or-
+AVAILABLE_WATER_CAPACITY DEPTH_INTEGRATED
+```
 
 ------------------------------------------------------------------------------------------------
      Parameter                    Allowable Lookup                               Note

@@ -189,7 +189,8 @@ contains
 
         if ( associated( pSEPTIC_DISCHARGE ) ) then
           call pSEPTIC_DISCHARGE%getvalues( iMonth, iDay, iYear, iJulianDay )
-          if ( pSEPTIC_DISCHARGE%lGridHasChanged ) fSEPTIC_DISCHARGE = pack( pSEPTIC_DISCHARGE%pGrdBase%rData, is_cell_active )
+          if ( pSEPTIC_DISCHARGE%lGridHasChanged ) fSEPTIC_DISCHARGE =                   &
+               pack( pSEPTIC_DISCHARGE%pGrdBase%rData, is_cell_active )
         endif      
 
         if ( associated( pANNUAL_SEPTIC_DISCHARGE ) ) then
@@ -206,8 +207,10 @@ contains
 
     direct_soil_moisture = 0.0_c_float
 
-    if ( allocated( fSEPTIC_DISCHARGE) )  direct_soil_moisture = direct_soil_moisture + fSEPTIC_DISCHARGE( indx )
-    if ( allocated( fANNUAL_SEPTIC_DISCHARGE) )  direct_soil_moisture = direct_soil_moisture + fANNUAL_SEPTIC_DISCHARGE( indx ) / 365.25
+    if ( allocated( fSEPTIC_DISCHARGE) )  direct_soil_moisture = direct_soil_moisture           &
+                                            + fSEPTIC_DISCHARGE( indx )
+    if ( allocated( fANNUAL_SEPTIC_DISCHARGE) )  direct_soil_moisture = direct_soil_moisture    &
+                                            + fANNUAL_SEPTIC_DISCHARGE( indx ) / 365.25
 
 
   end subroutine direct_soil_moisture_calculate
