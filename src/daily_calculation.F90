@@ -166,8 +166,10 @@ contains
         ! e.g. septic system discharge enters here...
         call cells%calc_direct_soil_moisture( indx )
 
-        if ( runoff < 0.)  call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "//asCharacter(indx)//" col, row= "    &
-           //asCharacter(cells%col_num_1D( indx ))//", "//asCharacter( cells%row_num_1D( indx ) ) )
+        if ( runoff < 0.)  call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "   &
+                                            //asCharacter(indx)//" col, row= "                            &
+                                            //asCharacter(cells%col_num_1D( indx ))//", "                 &
+                                            //asCharacter( cells%row_num_1D( indx ) ) )
 
         ! irrigation not considered to be a contributor to runoff...in addition, infiltration
         ! term is calculated with respect to the pervious fraction of the cell
@@ -186,8 +188,10 @@ contains
         call cells%calc_actual_et( indx )
 
 
-        if ( runoff < 0.)  call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "//asCharacter(indx)//" col, row= "    &
-           //asCharacter(cells%col_num_1D( indx ))//", "//asCharacter( cells%row_num_1D( indx ) ) )
+        if ( runoff < 0.)                                                                               &
+          call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
+                           //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
+                           //", "//asCharacter( cells%row_num_1D( indx ) ) )
 
         ! actual et for the entire cell is the weighted average of the ET for pervious and impervious
         ! fractions of the cell
@@ -203,8 +207,10 @@ contains
                                           runoff=runoff )
 
 
-        if ( runoff < 0.)  call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "//asCharacter(indx)//" col, row= "    &
-           //asCharacter(cells%col_num_1D( indx ))//", "//asCharacter( cells%row_num_1D( indx ) ) )
+        if ( runoff < 0.)                                                                               &
+          call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
+                           //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
+                           //", "//asCharacter( cells%row_num_1D( indx ) ) )
 
         call cells%calc_direct_recharge( indx )
         
@@ -217,8 +223,10 @@ contains
 
         recharge = recharge * recharge_fraction + direct_recharge_fraction * direct_recharge
 
-        if ( runoff < 0.)  call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "//asCharacter(indx)//" col, row= "    &
-           //asCharacter(cells%col_num_1D( indx ))//", "//asCharacter( cells%row_num_1D( indx ) ) )
+        if ( runoff < 0.)                                                                               &
+          call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
+                           //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
+                           //", "//asCharacter( cells%row_num_1D( indx ) ) )
 
         irrigation = irrigation * pervious_fraction
 
@@ -230,8 +238,10 @@ contains
         ! rejected recharge + runoff will be routed downslope if routing option is turned on
         call cells%calc_routing( indx )
 
-        if ( runoff < 0.)  call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "//asCharacter(indx)//" col, row= "    &
-           //asCharacter(cells%col_num_1D( indx ))//", "//asCharacter( cells%row_num_1D( indx ) ) )
+        if ( runoff < 0.)                                                                               &
+          call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
+                           //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
+                           //", "//asCharacter( cells%row_num_1D( indx ) ) )
 
 
       end associate

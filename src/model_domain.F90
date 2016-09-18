@@ -206,7 +206,7 @@ module model_domain
                                                 => model_read_available_water_content_gridded
     procedure ( array_method ), pointer  :: get_precipitation_data                                           &
                                                 => model_get_precip_normal
-    procedure ( array_method ), pointe   :: get_minimum_air_temperature_data                                 &     
+    procedure ( array_method ), pointer  :: get_minimum_air_temperature_data                                 &     
                                                 => model_get_minimum_air_temperature_normal
     procedure ( array_method ), pointer  :: get_maximum_air_temperature_data                                 &     
                                                 => model_get_maximum_air_temperature_normal
@@ -427,10 +427,13 @@ contains
     allocate( this%rejected_potential_recharge( iCount ), stat=iStat(53) )
 
     do iIndex = 1, ubound( iStat, 1)
-      if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="//asCharacter(iIndex), __SRCNAME__, __LINE__ )
+      if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR"                    &
+                                              //"--Problem allocating memory; iIndex="        &
+                                              //asCharacter(iIndex), __SRCNAME__, __LINE__ )
     enddo
     
-    if (any( iStat /= 0) ) call die ( "Unable to allocate memory for one or more arrays.", __SRCNAME__, __LINE__ )  
+    if (any( iStat /= 0) ) call die ( "Unable to allocate memory for one or more arrays.",    &
+                                      __SRCNAME__, __LINE__ )  
 
     this%landuse_code                        = 0_c_int
     this%landuse_index                       = 0_c_int
@@ -880,8 +883,8 @@ contains
 
       endif
 
-    elseif ( sCmdText .contains. "AVAILABLE_WATER_CONTENT"            &
-        .or. sCmdTxtx .contains. "AVAILABLE_WATER_CAPACITY") then
+    elseif ( ( sCmdText .contains. "AVAILABLE_WATER_CONTENT" )           &
+        .or. ( sCmdText .contains. "AVAILABLE_WATER_CAPACITY") ) then
 
       if ( ( Method_Name .strequal. "TABLE" ) ) then
 
@@ -1843,7 +1846,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call awc_table_values_read( fRooting_Depth=ROOTING_DEPTH_MAX )
+    call awc_depth_integrated_read( fRooting_Depth=ROOTING_DEPTH_MAX )
 
   end subroutine model_read_available_water_content_depth_integrated  
 
@@ -1866,7 +1869,7 @@ contains
 
     allocate ( this%soil_code (count( this%active ) ), stat=iStat )
 
-    call awc_table_values_initialize( lActive=this%active,                        &
+    call awc_depth_integrated_initialize( lActive=this%active,                        &
                                       fAWC=this%awc,                              &
                                       iSoils_Code=this%soil_code )
 
