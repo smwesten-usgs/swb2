@@ -11,9 +11,14 @@
   \setsansfont{$sansfont$}
   \setmonofont{$monofont$}
   \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
+  \usepackage{amsmath}
+  \usepackage{amsfonts}
+  \usepackage{amstex}
 \else
-  \usepackage[mathletters]{ucs}
-  \usepackage[utf8x]{inputenc}
+%  \usepackage[mathletters]{ucs}
+  \usepackage{amsmath}
+  \usepackage{amssymb}
+  \usepackage[T1]{fontenc}
 \fi
 
 

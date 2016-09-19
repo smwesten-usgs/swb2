@@ -43,6 +43,7 @@ SOIL_MOISTURE_METHOD  THORNTHWAITE-MATHER
 
 ### Thornthwaite-Mather Equations
 
+*Control File Entry*
 ```
 SOIL_MOISTURE_METHOD  THORNTHWAITE-MATHER_EQUATIONS
                      -or-
@@ -62,9 +63,10 @@ SOIL_MOISTURE_METHOD THORNTHWAITE_MATHER_EQUATIONS
 
 ### Gridded Values
 
+*Control File Entry*
 ```
 AVAILABLE_WATER_CONTENT GRIDDED
-                     -or-
+           -or-
 AVAILABLE_WATER_CAPACITY GRIDDED
 ```
 
@@ -78,9 +80,10 @@ AVAILABLE_WATER_CAPACITY GRIDDED
 
 ### Table Values
 
+*Control File Entry*
 ```
 AVAILABLE_WATER_CONTENT TABLE
-                     -or-
+            -or-
 AVAILABLE_WATER_CAPACITY TABLE
 ```
 
@@ -95,10 +98,10 @@ AVAILABLE_WATER_CAPACITY TABLE
 
 ### Table Values, Depth-Integrated
 
-
+*Control File Entry*
 ```
 AVAILABLE_WATER_CONTENT DEPTH_INTEGRATED
-                     -or-
+                  -or-
 AVAILABLE_WATER_CAPACITY DEPTH_INTEGRATED
 ```
 
@@ -146,6 +149,27 @@ AVAILABLE_WATER_CAPACITY DEPTH_INTEGRATED
                                 AWC
 ------------------------------------------------------------------------------------------------
 
+## Process: Runoff
+
+### Soil Conservation Service Curve Number
+
+*Control File Entry*
+```
+RUNOFF_METHOD CURVE_NUMBER
+          -or-
+RUNOFF_METHOD C-N          
+```
+
+
+### Monthly Runoff Ratio
+
+*Control File Entry*
+```
+RUNOFF_METHOD RUNOFF_RATIO
+          -or-
+RUNOFF_METHOD MONTHLY_GRID
+```
+
 
 ## Process: Crop Coefficients (FAO-56)
 
@@ -172,33 +196,37 @@ CROP_COEFFICIENT_METHOD  FAO-56
 
                                 Planting_date
 
-                                L_shift
-                                L_ini
-                                L_dev
-                                L_mid
-                                L_late
-                                L_fallow
+  Inflection points on the     L_ini                                  Day values may be specified
+  Kcb curve, defined in terms  L_dev                                  as the integer number of
+  of time (days) elapsed        L_mid                                  days elapsed since planting,
+  since the start of plant     L_late                                 *or* may be specified as a
+  growth.                      L_fallow                               date in mm/dd format.
 
-                                GDD_plant
-                                GDD_ini
-                                GDD_dev
-                                GDD_mid
+  Inflection points on the      GDD_plant                                
+  Kcb curve, defined in terms   GDD_ini                                
+  of growing degree-days.       GDD_dev                                
+                                GDD_mid                                
                                 GDD_late
 
-                                Kcb_ini
-                                Kcb_mid
-                                Kcb_end
-                                Kcb_min
+  These values are typically    Kcb_ini                                
+  used along with the GDD       Kcb_mid                                
+  or day length values to       Kcb_end                                
+  define a simple K_{cb}        Kcb_min
+  curve.
 
-                                Mean_plant_height
+  Mean plant height is used      Mean_plant_height
+  to determine how much bare
+  soil might be exposed to
+  evaporation at various
+  growth stages.
 
-                                Kcb_Jan                   
-                                Kcb_Feb
-                                Kcb_Mar
-                                Kcb_Apr
-                                Kcb_May
-                                Kcb_Jun
-                                Kcb_Jul
+  Monthly values to define      Kcb_Jan
+  the Kcb curve more            Kcb_Feb
+  completely. This may be       Kcb_Mar
+  useful for a crop that        Kcb_Apr
+  has multiple plantings        Kcb_May
+  and harvests in the           Kcb_Jun
+  course of a year.             Kcb_Jul
                                 Kcb_Aug
                                 Kcb_Sep
                                 Kcb_Oct
@@ -216,33 +244,118 @@ CROP_COEFFICIENT_METHOD  FAO-56
 
 ### Gridded
 
+*Control File Entry*
+```
+POTENTIAL_EVAPOTRANSPIRATION_METHOD GRIDDED
+                     -or-
+REFERENCE_EVAPOTRANSPIRATION_METHOD GRIDDED
+
+                     ...
+
+POTENTIAL_ET ARC_GRID              Common_Data/input/gr0_in_month_ascii/gr0_in_%b.asc
+POTENTIAL_ET_PROJECTION_DEFINITION +proj=lonlat +datum=WGS84 +no_defs                     
+```
+
 ### Jensen-Haise
 
+*Control File Entry*
+```
+POTENTIAL_EVAPOTRANSPIRATION_METHOD JENSEN-HAISE
+                     -or-
+REFERENCE_EVAPOTRANSPIRATION_METHOD JENSEN-HAISE
+                     -or-
+POTENTIAL_EVAPOTRANSPIRATION_METHOD JENSEN_HAISE
+                     -or-
+REFERENCE_EVAPOTRANSPIRATION_METHOD JENSEN_HAISE
+```
+
 ### Hargreaves-Samani
+
+SWB 1.0 required that the northern and southern latitudes of the project area be supplied by the user. Since SWB 2.0 requires that a project grid is established along with a PROJ.4 string, the northern and southern latitudes can be calculated by SWB 2.0; the user need not enter these values in the control file.
+
+*Control File Entry*
+```
+POTENTIAL_EVAPOTRANSPIRATION_METHOD HARGREAVES_SAMANI
+                     -or-
+REFERENCE_EVAPOTRANSPIRATION_METHOD HARGREAVES_SAMANI
+                     -or-
+POTENTIAL_EVAPOTRANSPIRATION_METHOD HARGREAVES-SAMANI
+                     -or-
+REFERENCE_EVAPOTRANSPIRATION_METHOD HARGREAVES-SAMANI                     
+```
+
 
 ## Process: Fog Interception
 
 ## Process Support: Growing Degree-Day
 
+*Control File Entry*
+```
+*
+```
+
+
 ## Process Support: Growing Season
+
+*Control File Entry*
+```
+*
+```
 
 ## Process: Interception
 
 ### Bucket
 
+*Control File Entry*
+```
+INTERCEPTION_METHOD BUCKET
+```
+
 ### Horton
 
+*Control File Entry*
+```
+INTERCEPTION_METHOD HORTON
+```
+
 ### Gash
+*Control File Entry*
+```
+INTERCEPTION_METHOD GASH
+```
 
 ## Process: Irrigation
+
+*Control File Entry*
+```
+IRRIGATION_METHOD FAO-56
+```
 
 ## Process Support: Precipitation
 
 ### Table Values
 
+*Control File Entry*
+```
+PRECIPITATION_METHOD TABLE
+```
+
+
 ### Gridded Values
 
+*Control File Entry*
+```
+PRECIPITATION_METHOD NORMAL
+         -or-
+PRECIPITATION_METHOD GRIDDED
+```
+
 ### Method of Fragments
+
+```
+PRECIPITATION_METHOD METHOD_OF_FRAGMENTS
+```
+
 
 ## Process: Storm Drain Capture
 

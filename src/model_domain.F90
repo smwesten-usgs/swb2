@@ -932,9 +932,10 @@ contains
     elseif ( ( sCmdText .contains. "CROP_COEFFICIENT" )    &
         .or. ( sCmdText .contains. "CROP_COEF" ) )  then
 
-      if ( ( Method_Name .strequal. "FAO56" )  &
-             .or. ( Method_Name .strequal. "FAO-56" ) ) then
-
+      if ( ( Method_Name .strequal. "FAO56" )                   &
+             .or. ( Method_Name .strequal. "FAO-56" )           &
+             .or. ( Method_Name .strequal. "FAO_56" ) ) then
+      
         this%init_crop_coefficient => model_initialize_crop_coefficient_FAO56
         this%update_crop_coefficient => model_update_crop_coefficient_FAO56
 
@@ -971,8 +972,9 @@ contains
 
     elseif ( sCmdText .contains. "IRRIGATION" ) then
 
-      if ( ( Method_Name .strequal. "FAO56" )  &
-             .or. ( Method_Name .strequal. "FAO-56" ) ) then
+      if ( ( Method_Name .strequal. "FAO56" )                   &
+             .or. ( Method_Name .strequal. "FAO-56" )           &
+             .or. ( Method_Name .strequal. "FAO_56" ) ) then
 
         this%init_irrigation => model_initialize_irrigation
         this%calc_irrigation => model_calculate_irrigation
@@ -1015,8 +1017,9 @@ contains
 
     elseif ( sCmdText .contains. "EVAPOTRANSPIRATION" ) then
 
-      if ( ( Method_Name .strequal. "HARGREAVES" ) &
-           .or. ( Method_Name .strequal. "HARGREAVES-SAMANI" ) ) then
+      if (   ( Method_Name .strequal. "HARGREAVES" )                 &
+        .or. ( Method_Name .strequal. "HARGREAVES-SAMANI" )          &
+        .or. ( Method_Name .strequal. "HARGREAVES_SAMANI" ) ) then
 
         this%init_reference_et => model_initialize_et_hargreaves
         this%calc_reference_et => model_calculate_et_hargreaves

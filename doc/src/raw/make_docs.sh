@@ -9,7 +9,7 @@ rm -f ../../doxygen/html/images/*.*
 export BIB_FILE='../resources/Zotero_Output.bib'
 export REFERENCE_DOCX='../resources/usgs_report_template.docx'
 export CSL_FILE='../resources/us-geological-survey.csl'
-export REFERENCE_TEX='../resources/xetex.template'
+export REFERENCE_TEX='../resources/latex.template'
 #export REFERENCE_TEX='../resources/xetex_kjhealy.template'
 
 # copy over fresh batch of images for HTML documentation
@@ -109,7 +109,7 @@ pandoc --from=markdown                                                     \
       --bibliography="$BIB_FILE"                                           \
       --csl="$CSL_FILE"                                                    \
       --latex-engine=xelatex                                               \
-      --template="../resources/xetex.template"                       \
+      --template="$REFERENCE_TEX"                                          \
       --include-after-body=appendices.tex                                  \
       -m                                                                   \
       --output="report.tex"                                                \
@@ -122,7 +122,7 @@ pandoc --from=markdown                                                     \
       --bibliography="$BIB_FILE"                                           \
       --csl="$CSL_FILE"                                                    \
       --latex-engine=xelatex                                               \
-      --template="../resources/xetex.template"                       \
+      --template="$REFERENCE_TEX"                                          \
       --include-after-body=appendices.tex                                  \
       -m                                                                   \
       --output="report.pdf"                                                \
