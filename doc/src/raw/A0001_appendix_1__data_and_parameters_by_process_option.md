@@ -187,6 +187,12 @@ RUNOFF_METHOD MONTHLY_GRID
 ```
 
 
+## Process: Runoff from Impervious surfaces
+
+Runoff from impervious surfaces may be simulated in a more detailed manner by including a gridded dataset defining the proportion of each gridcell that is comprised of impervious materials. Data may be supplied as either a fraction (0.0-1.0) or percentage (0-100%) of either pervious or *im*pervious surface area.
+
+
+
 ## Process: Crop Coefficients (FAO-56)
 
 This module handles all processes associated with simulating the growth and senescence of plants and their effect on soil moisture. There are three ways in which crop coefficient curves may be specified; each landuse code may use one of the three methods. The three methods that may be used to specify the crop coefficient curves are:
@@ -363,6 +369,9 @@ REFERENCE_EVAPOTRANSPIRATION_METHOD HARGREAVES-SAMANI
 FOG_METHOD MONTHLY_GRID
          -or-
 FOG_METHOD GRIDDED
+         ...
+FOG_RATIO ARC_GRID ../../Maui_Common_Data/input/fog_fraction_grids/maui_fog_ratio_monthly_%0m.asc
+FOG_RATIO_PROJECTION_DEFINITION +proj=utm +zone=4 +ellps=WGS84 +datum=WGS84 +units=m +no_defs
 ```
 
 
@@ -401,6 +410,12 @@ INTERCEPTION_METHOD HORTON
 *Control File Entry*
 ```
 INTERCEPTION_METHOD GASH
+         ...
+FRACTION_CANOPY_COVER ARC_GRID Common_Data/input/CANOPY_COVER_FRACTION.asc
+FRACTION_CANOPY_COVER_PROJECTION_DEFINITION +proj=utm +zone=4 +ellps=WGS84 +datum=WGS84 +units=m +no_defs
+
+EVAPORATION_TO_RAINFALL_RATIO ARC_GRID Common_Data/input/EVAPORATION_TO_RAINFALL_RATIO.asc
+EVAPORATION_TO_RAINFALL_RATIO_PROJECTION_DEFINITION +proj=utm +zone=4 +ellps=WGS84 +datum=WGS84 +units=m +no_defs
 ```
 
 ## Process: Irrigation
@@ -433,6 +448,12 @@ PRECIPITATION_METHOD GRIDDED
 
 ```
 PRECIPITATION_METHOD METHOD_OF_FRAGMENTS
+                  ...
+RAINFALL_ZONE ARC_GRID Common_Data/input/maui_RAIN_ZONE__10m.asc
+RAINFALL_ZONE_PROJECTION_DEFINITION +proj=utm +zone=4 +ellps=WGS84 +datum=WGS84 +units=m +no_defs
+
+RAINFALL_ADJUST_FACTOR ARC_GRID Common_Data/input/Maui_RF_adj_factors/maui_RF_adj_%b.asc
+RAINFALL_ADJUST_FACTOR_PROJECTION_DEFINITION  +proj=utm +zone=4 +ellps=WGS84 +datum=WGS84 +units=m +no_defs
 ```
 
 
