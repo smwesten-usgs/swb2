@@ -60,7 +60,6 @@ module crop_coefficients__FAO56
   real (kind=c_float), allocatable   :: TEW(:,:)
   real (kind=c_float), allocatable   :: KCB(:,:)
   integer (kind=c_int), allocatable  :: KCB_METHOD(:)
-  real (kind=c_float), allocatable   :: GROWTH_STAGE_SHIFT_DAYS(:)
   real (kind=c_float), allocatable   :: GROWTH_STAGE_DOY(:,:)
   real (kind=c_float), allocatable   :: GROWTH_STAGE_GDD(:,:)
   type (DATETIME_T), allocatable     :: GROWTH_STAGE_DATE(:,:)
@@ -99,7 +98,6 @@ contains
 
     type (STRING_LIST_T)             :: slPlantingDate
 
-    real (kind=c_float), allocatable :: L_shift_days_(:)
 
     real (kind=c_float), allocatable :: L_ini_(:)
     real (kind=c_float), allocatable :: L_dev_(:)
@@ -164,7 +162,6 @@ contains
 
    call PARAMS%get_parameters( sKey="Planting_date", slValues=slPlantingDate, lFatal=lTRUE )
 
-   call PARAMS%get_parameters( sKey="L_shift", fValues=L_shift_days_, lFatal=lFALSE )
    call PARAMS%get_parameters( sKey="L_ini", fValues=L_ini_, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="L_dev", fValues=L_dev_, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="L_mid", fValues=L_mid_, lFatal=lTRUE )
@@ -197,10 +194,6 @@ contains
 
    call PARAMS%get_parameters( sKey="Mean_Plant_Height", fValues=MEAN_PLANT_HEIGHT, lFatal=lTRUE )
 
-    allocate( GROWTH_STAGE_SHIFT_DAYS( iNumberOfLanduses ), stat=iStat )
-    call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_SHIFT_DAYS array", &
-      __SRCNAME__, __LINE__ )    
-
     allocate( GROWTH_STAGE_DOY( 5, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_DOY array", &
       __SRCNAME__, __LINE__ )
@@ -225,14 +218,6 @@ contains
     KCB = fTINYVAL
     GROWTH_STAGE_GDD = fTINYVAL
     GROWTH_STAGE_DOY = fTINYVAL
-    GROWTH_STAGE_SHIFT_DAYS = 0.0_c_float
-
-    if ( ubound(L_shift_days_,1) == iNumberOfLanduses ) then
-      GROWTH_STAGE_SHIFT_DAYS = L_shift_days_
-    else
-      call warn(sMessage="L_shift_days has "//asCharacter(ubound(L_shift_days_,1))//" entries; there are "  &
-        //asCharacter(iNumberOfLanduses)//" landuse codes. Assuming value of zero." )
-    endif      
 
     if ( ubound(L_ini_,1) == iNumberOfLanduses ) then
       GROWTH_STAGE_DOY( L_DOY_INI,  : ) = L_ini_
@@ -285,8 +270,8 @@ contains
 
         call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)%parsedate( sMMDDYYYY, __SRCNAME__, __LINE__ )
    
-        GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) &
-                                                    + GROWTH_STAGE_SHIFT_DAYS( iIndex )
+        GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)  !&
+                                                    ! + GROWTH_STAGE_SHIFT_DAYS( iIndex )
 
         ! march forward through time calculating the various dates on the Kcb curve
 

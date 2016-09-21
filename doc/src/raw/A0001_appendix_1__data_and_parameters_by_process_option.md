@@ -149,6 +149,22 @@ AVAILABLE_WATER_CAPACITY DEPTH_INTEGRATED
                                 AWC
 ------------------------------------------------------------------------------------------------
 
+## Process: Soil Storage Maximum / Plant Available Water
+
+The original way to parameterize the total volume of soil moisture storage (or plant available water) was to specify an available water capacity grid, plus a set of effective plant rooting depths in the lookup table. SWB would multiply these two values to come up with the size of the soil storage reservoir.
+
+In some cases it may be useful to calculate the size of the soil moisture reservoir outside of the SWB framework. This may be accomplished by specifying that the soil storage maximum will be read into SWB from an external grid file. *Specifying the soil storage maximum this way will cause the rooting depths and available water capacity values to be ignored.*
+
+*Control File Entry*
+```
+SOIL_STORAGE_MAXIMUM GRIDDED
+            -or-
+PLANT_AVAILABLE_WATER GRIDDED
+            ...
+SOIL_STORAGE_MAX ARC_GRID Common_Data/input/soil_moisture_storage__10m.asc
+SOIL_STORAGE_MAX_PROJECTION_DEFINITION +proj=utm +zone=4 +ellps=WGS84 +datum=WGS84 +units=m +no_defs
+```
+
 ## Process: Runoff
 
 ### Soil Conservation Service Curve Number
@@ -287,6 +303,14 @@ REFERENCE_EVAPOTRANSPIRATION_METHOD HARGREAVES-SAMANI
 
 ## Process: Fog Interception
 
+*Control File Entry*
+```
+FOG_METHOD MONTHLY_GRID
+         -or-
+FOG_METHOD GRIDDED
+```
+
+
 ## Process Support: Growing Degree-Day
 
 *Control File Entry*
@@ -358,6 +382,8 @@ PRECIPITATION_METHOD METHOD_OF_FRAGMENTS
 
 
 ## Process: Storm Drain Capture
+
+
 
 ------------------------------------------------------------------------------------------------
      Parameter                    Allowable Lookup                               Note

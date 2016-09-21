@@ -996,7 +996,8 @@ contains
       endif
 
 
-    elseif ( sCmdText .contains. "SOIL_STORAGE_MAX" ) then
+    elseif ( ( sCmdText .contains. "SOIL_STORAGE_MAX" )            &
+        .or. ( sCmdText .contains. "PLANT_AVAILABLE_WATER" ) ) then
 
       if ( Method_Name .strequal. "GRIDDED" ) then
 
@@ -1649,8 +1650,11 @@ contains
     ! locate the data structure associated with the gridded rainfall zone entries
     pSOIL_STORAGE_MAX_GRID => DAT%find("SOIL_STORAGE_MAX")
     if ( .not. associated(pSOIL_STORAGE_MAX_GRID) ) &
-        call die("A SOIL_STORAGE_MAX grid must be supplied in order to make use of this option.", &
-           __SRCNAME__, __LINE__)
+      pSOIL_STORAGE_MAX_GRID => DAT%find("PLANT_AVAILABLE_WATER")
+    
+    if ( .not. associated(pSOIL_STORAGE_MAX_GRID) ) &
+        call die("A SOIL_STORAGE_MAX or PLANT_AVAILABLE_WATER grid must be supplied in order"    &
+        //" to make use of this option.", __SRCNAME__, __LINE__ )
 
     call pSOIL_STORAGE_MAX_GRID%getvalues( )
 

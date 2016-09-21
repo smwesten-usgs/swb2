@@ -12,8 +12,7 @@
   \setmonofont{$monofont$}
   \defaultfontfeatures{Mapping=tex-text,Scale=MatchLowercase}
   \usepackage{amsmath}
-  \usepackage{amsfonts}
-  \usepackage{amstex}
+  \usepackage{amssymb}
 \else
 %  \usepackage[mathletters]{ucs}
   \usepackage{amsmath}
@@ -132,5 +131,27 @@ $body$
 $if(alignment)$
 \end{$alignment$}
 $endif$
+
+$if(natbib)$
+  $if(biblio-files)$
+    $if(biblio-title)$
+      $if(book-class)$
+        \renewcommand\bibname{Bibliography}
+      $else$
+        \renewcommand\refname{References}
+      $endif$
+    $endif$
+    \bibliography{$biblio-files$}
+  $endif$
+$endif$
+
+$if(biblatex)$
+  \printbibliography$if(biblio-title)$[title=References]$endif$
+$endif$
+
+$for(include-after)$
+  $include-after$
+$endfor$
+
 
 \end{document}
