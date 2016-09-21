@@ -252,9 +252,64 @@ CROP_COEFFICIENT_METHOD  FAO-56
 
 ## Process: Direct Additions
 
-### Direct Additions to Recharge
+External estimates for important components of the water budget may be supplied as supplemental grids or as table values. These additional water sources may be applied to the soil storage reservoir or added directly as potential recharge (deep percolation).
+
+For both direct addition types, either gridded or table data may be supplied. SWB will always look for gridded data first. If no gridded data are found, SWB will look for table values. Table values are expected to correspond to the landuse codes contained in the main landuse grid.
+
+### Direct Additions to Potential Recharge
+
+The grid or table values supplied as direct recharge may represent any source of water that is not simulated as part of SWB's normal water budget accounting. For convenience, a number of data types are defined:
+
+* cesspool leakage
+* disposal well injection
+* storm drain leakage
+* water body or reservoir leakage
+* water main leakage
+* other direct recharge
+
+* Control File Entry *
+
+```
+CESSPOOL_LEAKAGE ARC_GRID Common_Data/input/cesspool_effluent_inches_day.asc
+CESSPOOL_LEAKAGE_PROJECTION_DEFINITION +proj=utm +zone=4 +ellps=WGS84 +datum=WGS84 +units=m +no_defs
+```
+
+------------------------------------------------------------------------------------------------
+     Parameter                    Allowable Lookup                               Note
+    Description                   Table headers
+---------------------------- -------------------------------------- ----------------------------
+  Landuse code                  LU_Code
+                                Landuse_Code
+                                Landuse_Lookup_Code
+
+  Generic direct recharge       Annual_direct_recharge_rate           direct recharge expressed
+                                Annual_recharge_rate                  as an _ANNUAL SUM_
+                                Annual_direct_recharge
+
+  Cesspool leakage              Cesspool_direct_recharge              direct recharge expressed as
+                                Cesspool_recharge                     a _DAILY SUM_
+                                Cesspool_discharge
+                                Cesspool_leakage
+
+  Storm drain leakage           Storm_drain_discharge                 direct recharge expressed as
+                                Storm_drain_recharge                  a _DAILY SUM_
+                                Storm_drain_leakage
+
+  Water body / reservoir        Water_body_recharge                   direct recharge expressed as
+  leakage                       Water_body_discharge                  a _DAILY SUM_
+                                Water_body_leakage
+
+  Water main leakage            Water_main_recharge                   direct recharge expressed as
+                                Water_main_discharge                  a _DAILY SUM_
+                                Water_main_leakage
+
+  Disposal well                 Disposal_well_recharge                direct recharge expressed as
+                                Disposal_well_discharge               a _DAILY SUM_
+------------------------------------------------------------------------------------------------     
 
 ### Direct Additions to Soil Moisture
+
+Additional sources of water may also be supplied directly to the soil moisture reservoir. Currently the named data types include daily and annual septic system discharge.
 
 ## Process: Potential evapotranspiration
 

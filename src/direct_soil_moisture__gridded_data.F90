@@ -87,7 +87,7 @@ contains
     call PARAMS%get_parameters( slKeys=parameter_list , fValues=fSEPTIC_DISCHARGE_TABLE )
 
     ! attempt to find a source of GRIDDED SEPTIC DISCHARGE data
-    pSEPTIC_DISCHARGE => DAT%find( "ANNUAL_direct_soil_moisture_RATE" )
+    pSEPTIC_DISCHARGE => DAT%find( "SEPTIC_DISCHARGE" )
 
     ! look for data in the form of a grid
     if ( associated( pSEPTIC_DISCHARGE ) ) then
@@ -114,7 +114,6 @@ contains
       enddo  
 
      endif
-
 
     call parameter_list%clear()
     call parameter_list%append( "ANNUAL_septic_system_discharge" )

@@ -50,8 +50,8 @@ module direct_recharge__gridded_data
   real (kind=c_float), allocatable     :: fWATER_MAIN_TABLE(:)
   real (kind=c_float), allocatable     :: fANNUAL_RECHARGE_RATE_TABLE(:)
 
-  real (kind=c_float), allocatable     :: DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE(:)
-  real (kind=c_float), allocatable     :: DIRECT_RECHARGE_ACTIVE_FRACTION(:)
+!   real (kind=c_float), allocatable     :: DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE(:)
+!   real (kind=c_float), allocatable     :: DIRECT_RECHARGE_ACTIVE_FRACTION(:)
 
   type (T_NETCDF4_FILE), pointer       :: pNCFILE
 
@@ -158,32 +158,32 @@ contains
     pDISPOSAL_WELL => DAT%find( "DISPOSAL_WELL_DISCHARGE" )
 
 
-    call PARAMS%get_parameters( sKey="Direct_recharge_active_fraction",        &
-                                fValues=DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE )
+!     call PARAMS%get_parameters( sKey="Direct_recharge_active_fraction",        &
+!                                 fValues=DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE )
 
 
-    if ( DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE(1) > fTINYVAL ) then
+!     if ( DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE(1) > fTINYVAL ) then
 
-      are_lengths_equal = ( ubound(DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE,1)         &
-                                 == ubound(landuse_codes,1) )
+!       are_lengths_equal = ( ubound(DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE,1)         &
+!                                  == ubound(landuse_codes,1) )
 
-      if ( .not. are_lengths_equal )     &
-        call warn( sMessage="The number of landuses does not match the number of direct"   &
-          //" recharge active fraction values.", sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
+!       if ( .not. are_lengths_equal )     &
+!         call warn( sMessage="The number of landuses does not match the number of direct"   &
+!           //" recharge active fraction values.", sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
 
-      allocate( DIRECT_RECHARGE_ACTIVE_FRACTION( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
+!       allocate( DIRECT_RECHARGE_ACTIVE_FRACTION( count( is_cell_active ) ), stat=status )
+!       call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
-      do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
-        DIRECT_RECHARGE_ACTIVE_FRACTION( indx ) = DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE( landuse_index( indx ) )
-      enddo  
-    else
+!       do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
+!         DIRECT_RECHARGE_ACTIVE_FRACTION( indx ) = DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE( landuse_index( indx ) )
+!       enddo  
+!     else
 
-      allocate( DIRECT_RECHARGE_ACTIVE_FRACTION( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
-      DIRECT_RECHARGE_ACTIVE_FRACTION = 0.0_c_float
+!       allocate( DIRECT_RECHARGE_ACTIVE_FRACTION( count( is_cell_active ) ), stat=status )
+!       call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
+!       DIRECT_RECHARGE_ACTIVE_FRACTION = 0.0_c_float
 
-    endif
+!     endif
 
 
     if ( associated( pANNUAL_RECHARGE_RATE ) ) then
