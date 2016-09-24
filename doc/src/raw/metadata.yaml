@@ -1,6 +1,7 @@
 ---
-fignos-caption-name: 'Figure'
-fignos-plus-name:    'Fig.'
+figPrefix:
+  - "Fig."
+  - "Figs."
 geometry:            'left=1.25in, top=1.5in, bottom=1.5in'
 fontsize:            '12pt'
 mainfont:            'Times New Roman'

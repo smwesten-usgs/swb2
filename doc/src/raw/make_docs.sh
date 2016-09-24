@@ -13,7 +13,12 @@ export REFERENCE_TEX='../resources/latex.template'
 #export REFERENCE_TEX='../resources/xetex_kjhealy.template'
 
 # copy over fresh batch of images for HTML documentation
-cp ../images/*.* ../../doxygen/html/images
+#cp ../images/*.* ../../doxygen/html/images
+
+for imgfile in $( ls ../images/*.png ); do
+  convert ../images/$imgfile -resize 25% ../../doxygen/html/images/$imgfile
+  echo "Resizing and copying file: $imgfile"
+done
 
 # remove leftover cruft from previous documentation builds
 rm -f ../to_docx/*.*
@@ -63,8 +68,10 @@ for filename in ?0*.md; do
 #    pandoc --from=markdown_mmd+tex_math_dollars+pipe_tables+backtick_code_blocks+citations    \
     pandoc --from=markdown_github+citations+backtick_code_blocks            \
        --to=markdown_github+backtick_code_blocks                            \
-       --bibliography=../resources/Zotero_Output.bib                        \
-       --csl=../resources/us-geological-survey.csl                          \
+       --filter pandoc-crossref                                             \
+       --filter pandoc-citeproc                                             \
+       --bibliography="$BIB_FILE"                                           \
+       --csl="$CSL_FILE"                                                    \
        --output=../to_doxygen/$filename                                     \
        tempfile.md
 
@@ -95,12 +102,8 @@ make_doc '../to_docx/?0*.md' 'report.docx'
 pandoc --from=markdown                                                      \
        --latex-engine=xelatex                                               \
        -m                                                                   \
-       --output="appendices.tex"                                         \
+       --output="appendices.tex"                                            \
        metadata.yaml `ls ../to_docx/A0*.md`
-
-
-#       --filter pandoc-tablenos                                             \
-#       --filter pandoc-eqnos                                                \
 
 # now produce the complete LaTeX file; appendices are tacked on after the bibliography
 pandoc --from=markdown                                                     \
@@ -135,5 +138,5 @@ rm -f ../to_doxygen/*.mde
 
 # run Doxygen to regenerate HTML output
 cd  ../../
-#doxygen Doxyfile.mac_osx
+doxygen Doxyfile.mac_osx
 cd src/raw

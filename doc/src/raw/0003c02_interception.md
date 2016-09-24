@@ -13,7 +13,7 @@ Another option in SWB for calculating canopy interception is a modified version 
 
 To calculate canopy interception, the first step is to determine the minimum depth of precipitation necessary to saturate the forest canopy, P’, which is calculated on the basis of equation 2 in Gash and others (1995) as:
 
-$P' =  - \frac{S}{{c \cdot V}}\ln \left( {1 - V} \right)$, {#eq:gash01}
+$$P' =  - \frac{S}{{c \cdot V}}\ln \left( {1 - V} \right)$$ {#eq:gash01}
 
 where
 
