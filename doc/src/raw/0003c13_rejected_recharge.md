@@ -1,4 +1,4 @@
-### Rejected recharge
+### Rejected recharge {#rejected_recharge}
 
 Specification of maximum daily recharge amounts is a crude but effective way of preventing SWB from calculating unreasonably high potential recharge values. With flow routing enabled, downslope cells can have significant amounts of water diverted to them. The resulting calculated potential recharge values sometimes greatly exceed the values that might be reasonable given the soils and underlying geology. Setting a maximum daily recharge value will prevent these cells from taking on unrealistic recharge values.
 

@@ -16,7 +16,7 @@ export REFERENCE_TEX='../resources/latex.template'
 #cp ../images/*.* ../../doxygen/html/images
 
 for imgfile in $( ls ../images/*.png ); do
-  convert ../images/$imgfile -resize 25% ../../doxygen/html/images/$imgfile
+  convert ../images/$imgfile -resize 25% ../to_doxygen/images/$imgfile
   echo "Resizing and copying file: $imgfile"
 done
 
@@ -44,7 +44,7 @@ function make_doc() {
 }
 
 # iterate over all files in 'raw' directory, in sort order
-for filename in ?0*.md; do
+for filename in [0,A]?*.md; do
     cat $filename  > tempfile.md
 
     filelist="$filelist $filename"
@@ -66,14 +66,23 @@ for filename in ?0*.md; do
     # now create a Doxygen version of the Markdown files, processing the bibliography
     # using Pandoc
 #    pandoc --from=markdown_mmd+tex_math_dollars+pipe_tables+backtick_code_blocks+citations    \
-    pandoc --from=markdown_github+citations+backtick_code_blocks            \
-       --to=markdown_github+backtick_code_blocks                            \
-       --filter pandoc-crossref                                             \
-       --filter pandoc-citeproc                                             \
+#    pandoc --from=markdown_github+citations+backtick_code_blocks            \
+#     pandoc --from=markdown_github+backtick_code_blocks+citations+link_attributes           \
+
+    pandoc                                                                 \
+      --filter pandoc-crossref                                             \
+      --output=tempfile2.md                                                \
+      tempfile.md
+
+    # remove the pandoc image info ({fig:})
+    sed -Eie 's/\{\#fig\:[[:print:]]*\}//g' tempfile2.md
+
+     pandoc                                                                 \
        --bibliography="$BIB_FILE"                                           \
        --csl="$CSL_FILE"                                                    \
+       --filter pandoc-citeproc                                             \
        --output=../to_doxygen/$filename                                     \
-       tempfile.md
+       tempfile2.md
 
     # modify the output for the Doxygen version:
 
@@ -82,6 +91,9 @@ for filename in ?0*.md; do
 
     # remove the escaped ("{\#") pound sign in the header identifiers
     sed -Eie 's/\{\\#/\{#/g' ../to_doxygen/$filename
+
+    # remove the pandoc image info ({width=5in})
+#    sed -Eie 's/\{width[[:print:]]*\}//g' ../to_doxygen/$filename
 
     # next, remove the escaped underscore ("\_")
     sed -Eie 's/\\\_/\_/g' ../to_doxygen/$filename
@@ -96,8 +108,11 @@ for filename in ?0*.md; do
     sed -Eie 's/\\\]/\]/g' ../to_doxygen/$filename
 done
 
+# For Word, supply main text + appendix filenames to pandoc
 make_doc '../to_docx/?0*.md' 'report.docx'
 
+# For LaTeX: process main text and appendices separately;
+# tack on appendices with "include_after_body" flag.
 # process just the appendices; output is LaTeX
 pandoc --from=markdown                                                      \
        --latex-engine=xelatex                                               \
@@ -116,7 +131,7 @@ pandoc --from=markdown                                                     \
       --include-after-body=appendices.tex                                  \
       -m                                                                   \
       --output="report.tex"                                                \
-      metadata.yaml `ls ../to_docx/0*.md`
+      metadata.yaml `ls ../to_docx/00.md`
 
 # finally produce a PDF version
 pandoc --from=markdown                                                     \
@@ -129,12 +144,12 @@ pandoc --from=markdown                                                     \
       --include-after-body=appendices.tex                                  \
       -m                                                                   \
       --output="report.pdf"                                                \
-      metadata.yaml `ls ../to_docx/0*.md`
+      metadata.yaml `ls ../to_docx/00.md`
 
 # remove temporary working files from directories
-rm -f tempfile.*
-rm -f ../to_docx/*.mde
-rm -f ../to_doxygen/*.mde
+#rm -f tempfile.*
+#rm -f ../to_docx/*.mde
+#rm -f ../to_doxygen/*.mde
 
 # run Doxygen to regenerate HTML output
 cd  ../../

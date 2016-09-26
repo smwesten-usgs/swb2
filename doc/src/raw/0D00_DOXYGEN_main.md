@@ -18,7 +18,3 @@ External libraries are required if NetCDF file access or plotting capabilities a
 
  - NetCDF: http://www.unidata.ucar.edu/software/netcdf/
  - DISLIN: http://www.mps.mpg.de/dislin/
-
-```
-fortran code here
-```

@@ -70,7 +70,6 @@ contains
 
     endif  
 
-
     ! now allow for evaporation
     if (surface_storage > reference_et0) then
 

@@ -62,7 +62,7 @@ Calculating the amount of soil moisture that can be extracted for a given accumu
 
 The relation that Thornthwaite and Mather tabulated in their reports and others later represented by fitted equations is depicted graphically in the figure below.
 
-![Figure placeholder: Actual_ET__Thornthwaite__300dpi.png]( ../images/Actual_ET__Thornthwaite__72dpi.png )
+![Figure placeholder: Actual_ET__Thornthwaite.png]( ../images/Actual_ET__Thornthwaite.png )
 
 
 ~~~~~~~~
@@ -75,6 +75,9 @@ Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper
 #### FAO-56 {#sm_fao_56}
 
 Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.
+
+![Figure placeholder: Actual_ET__FAO56.png]( ../images/Actual_ET__FAO56.png )
+
 
 Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus.
 
