@@ -44,7 +44,13 @@ function make_doc() {
 }
 
 # iterate over all files in 'raw' directory, in sort order
+
+echo "Modifying raw files for use with Doxygen:"
+
 for filename in [0,A]?*.md; do
+
+    echo "Doxygen preprocessing: $filename"
+
     cat $filename  > tempfile.md
 
     filelist="$filelist $filename"
@@ -54,8 +60,9 @@ for filename in [0,A]?*.md; do
     sed -Ee 's/\[TOC\]//' tempfile.md > ../to_docx/$filename
 
     # tack on a "References" header to the current Doxygen version of the file
-    echo "References" >> tempfile.md
+    echo -e "\nReferences"  >> tempfile.md
     echo "----------------" >> tempfile.md
+    echo -e "\n"            >> tempfile.md
 
     # remove markdown headers at third and fourth level; Doxygen doesn't
     # behave nicely when it encounters third and fourth level headers at the
@@ -69,7 +76,9 @@ for filename in [0,A]?*.md; do
 #    pandoc --from=markdown_github+citations+backtick_code_blocks            \
 #     pandoc --from=markdown_github+backtick_code_blocks+citations+link_attributes           \
 
+    echo "  stage 1: cross-references"
     pandoc                                                                 \
+      --from=--from=markdown_github+backtick_code_blocks+citations+link_attributes           \
       --filter pandoc-crossref                                             \
       --output=tempfile2.md                                                \
       tempfile.md
@@ -77,12 +86,25 @@ for filename in [0,A]?*.md; do
     # remove the pandoc image info ({fig:})
     sed -Eie 's/\{\#fig\:[[:print:]]*\}//g' tempfile2.md
 
-     pandoc                                                                 \
+    echo "  stage 2: citations"
+     pandoc --from=markdown_github+citations-auto_identifiers               \
+       --to=markdown_strict                                                 \
+       --filter pandoc-citeproc                                             \
        --bibliography="$BIB_FILE"                                           \
        --csl="$CSL_FILE"                                                    \
-       --filter pandoc-citeproc                                             \
        --output=../to_doxygen/$filename                                     \
        tempfile2.md
+
+# pandoc --from=markdown_mmd+citations                                   \
+#   --to=markdown_github                                                 \
+#   --filter pandoc-crossref                                             \
+#   --filter pandoc-citeproc                                             \
+#   --bibliography="$BIB_FILE"                                           \
+#   --csl="$CSL_FILE"                                                    \
+#   --output=../to_doxygen/$filename                                     \
+#   tempfile.md
+#
+
 
     # modify the output for the Doxygen version:
 
@@ -109,11 +131,13 @@ for filename in [0,A]?*.md; do
 done
 
 # For Word, supply main text + appendix filenames to pandoc
+echo "Creating Word version of the documentation."
 make_doc '../to_docx/?0*.md' 'report.docx'
 
 # For LaTeX: process main text and appendices separately;
 # tack on appendices with "include_after_body" flag.
 # process just the appendices; output is LaTeX
+echo "Creating LaTeX version of documentation: stage 1 - APPENDICES"
 pandoc --from=markdown                                                      \
        --latex-engine=xelatex                                               \
        -m                                                                   \
@@ -121,6 +145,7 @@ pandoc --from=markdown                                                      \
        metadata.yaml `ls ../to_docx/A0*.md`
 
 # now produce the complete LaTeX file; appendices are tacked on after the bibliography
+echo "Creating LaTeX version of documentation: stage 2 - MAIN DOCUMENT"
 pandoc --from=markdown                                                     \
       --filter pandoc-crossref                                             \
       --filter pandoc-citeproc                                             \
@@ -131,9 +156,10 @@ pandoc --from=markdown                                                     \
       --include-after-body=appendices.tex                                  \
       -m                                                                   \
       --output="report.tex"                                                \
-      metadata.yaml `ls ../to_docx/00.md`
+      metadata.yaml `ls ../to_docx/00*.md`
 
 # finally produce a PDF version
+echo "Creating a PDF version of the documentation."
 pandoc --from=markdown                                                     \
       --filter pandoc-crossref                                             \
       --filter pandoc-citeproc                                             \
@@ -141,10 +167,10 @@ pandoc --from=markdown                                                     \
       --csl="$CSL_FILE"                                                    \
       --latex-engine=xelatex                                               \
       --template="$REFERENCE_TEX"                                          \
-      --include-after-body=appendices.tex                                  \
       -m                                                                   \
+      --include-after-body=appendices.tex                                  \
       --output="report.pdf"                                                \
-      metadata.yaml `ls ../to_docx/00.md`
+      metadata.yaml `ls ../to_docx/00*.md`
 
 # remove temporary working files from directories
 #rm -f tempfile.*

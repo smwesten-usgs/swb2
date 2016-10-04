@@ -713,7 +713,7 @@ LAYOUT_FILE            = src/resources/DoxygenLayout.xml
 # LATEX_BIB_STYLE. To use this feature you need bibtex and perl available in the
 # search path. See also \cite for info how to create references.
 
-CITE_BIB_FILES         = src/resources/Zotero_July_2015.bib
+CITE_BIB_FILES         = 
 
 #---------------------------------------------------------------------------
 # Configuration options related to warning and progress messages
@@ -1097,7 +1097,7 @@ GENERATE_HTML          = YES
 # The default directory is: html.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_OUTPUT            = html
+HTML_OUTPUT            = ../../docs
 
 # The HTML_FILE_EXTENSION tag can be used to specify the file extension for each
 # generated HTML page (for example: .htm, .php, .asp).
