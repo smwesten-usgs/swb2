@@ -67,21 +67,24 @@ for filename in [0,A]?*.md; do
     # remove markdown headers at third and fourth level; Doxygen doesn't
     # behave nicely when it encounters third and fourth level headers at the
     # beginning of a file snippet.
-    sed -iEe 's/####/#/g' tempfile.md
-    sed -iEe 's/###/#/g' tempfile.md
+    #sed -iEe 's/####/#/g' tempfile.md
+    #sed -iEe 's/###/#/g' tempfile.md
 
     # now create a Doxygen version of the Markdown files, processing the bibliography
     # using Pandoc
 #    pandoc --from=markdown_mmd+tex_math_dollars+pipe_tables+backtick_code_blocks+citations    \
 #    pandoc --from=markdown_github+citations+backtick_code_blocks            \
 #     pandoc --from=markdown_github+backtick_code_blocks+citations+link_attributes           \
+#--from=markdown_strict+citations+intraword_underscores+link_attributes+header_attributes                \
 
     echo "  stage 1: cross-references"
     pandoc                                                                 \
-      --from=--from=markdown_github+backtick_code_blocks+citations+link_attributes           \
+      --from=markdown-header_attributes                                    \
       --filter pandoc-crossref                                             \
       --output=tempfile2.md                                                \
       tempfile.md
+
+    #cp tempfile2.md ../to_doxygen/temp1_$filename
 
     # remove the pandoc image info ({fig:})
     sed -Eie 's/\{\#fig\:[[:print:]]*\}//g' tempfile2.md
