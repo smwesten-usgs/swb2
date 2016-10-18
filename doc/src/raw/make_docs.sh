@@ -16,7 +16,7 @@ export REFERENCE_TEX='../resources/latex.template'
 #cp ../images/*.* ../../doxygen/html/images
 
 for imgfile in $( ls ../images/*.png ); do
-  convert ../images/$imgfile -resize 25% ../to_doxygen/images/$imgfile
+  convert ../images/$imgfile -resize 40% ../to_doxygen/images/$imgfile
   echo "Resizing and copying file: $imgfile"
 done
 
@@ -67,8 +67,9 @@ for filename in [0,A]?*.md; do
     # remove markdown headers at third and fourth level; Doxygen doesn't
     # behave nicely when it encounters third and fourth level headers at the
     # beginning of a file snippet.
-    #sed -iEe 's/####/#/g' tempfile.md
-    #sed -iEe 's/###/#/g' tempfile.md
+    sed -iEe 's/#####/##/g' tempfile.md
+    sed -iEe 's/####/#/g' tempfile.md
+    sed -iEe 's/###/#/g' tempfile.md
 
     # now create a Doxygen version of the Markdown files, processing the bibliography
     # using Pandoc

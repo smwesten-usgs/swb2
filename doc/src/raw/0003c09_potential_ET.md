@@ -1,4 +1,4 @@
-### Potential Evapotranspiration {#potential_et}
+### Potential / Reference Evapotranspiration {#potential_et}
 
 [TOC]
 

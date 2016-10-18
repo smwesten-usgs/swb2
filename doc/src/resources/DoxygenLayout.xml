@@ -61,7 +61,7 @@
        <tab type="user" url="@ref appendix_2_control_file_directives_original_swb" title="Complete List of Control File Directives: Version 1.0"/>
        <tab type="user" url="@ref appendix_2_control_file_directives_version_2" title="Complete List of Control File Directives: Version 2.0"/>
        <tab type="user" url="@ref appendix_4_control_file_settings_for_specific_datasets" title="Control File Settings for Specific Gridded Datasets"/>
-       <tab type="user" url="@ref appendix_5_example_python_scripts" title="Example Python Scripts for Output Data Summary and Analysis"/>
+       <tab type="user" url="@ref appendix_5_earlier_SM_relations" title="Previous implementations of soil-moisture retention relations."/>
     </tab>
 
 
