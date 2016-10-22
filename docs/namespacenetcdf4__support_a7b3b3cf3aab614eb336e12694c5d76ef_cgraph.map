@@ -1,0 +1,23 @@
+<map id="netcdf4_support::netcdf_open_file" name="netcdf4_support::netcdf_open_file">
+<area shape="rect" id="node2" href="$namespacenetcdf4__support.html#ad118f90a290289cde5043fc1ec23bca1" title="netcdf4_support::nf\l_calculate_time_range" alt="" coords="242,93,411,134"/>
+<area shape="rect" id="node4" href="$namespacenetcdf4__support.html#a3f9a545cd24a2c66040977e333152f3e" title="netcdf4_support::nf\l_get_first_and_last" alt="" coords="253,253,400,294"/>
+<area shape="rect" id="node13" href="$namespacenetcdf4__support.html#ac2c621acfe944c1f5078aa90139612d9" title="netcdf4_support::nf\l_get_scale_and_offset" alt="" coords="242,694,411,735"/>
+<area shape="rect" id="node14" href="$namespacenetcdf4__support.html#ae16cf16a822cf8bd9d17ec5459b5f2bb" title="netcdf4_support::nf\l_get_time_units" alt="" coords="253,759,400,801"/>
+<area shape="rect" id="node15" href="$namespacenetcdf4__support.html#aad34f129a575be1774b4b709d5efba6c" title="netcdf4_support::nf\l_get_time_vals" alt="" coords="253,394,400,435"/>
+<area shape="rect" id="node16" href="$namespacenetcdf4__support.html#aa2e8f7506c9fd50f984f1de77bfdc55d" title="netcdf4_support::nf\l_get_variable_id_and_type" alt="" coords="228,329,425,370"/>
+<area shape="rect" id="node17" href="$namespacenetcdf4__support.html#a35f14663565a2db3b4cb3fc4d626fb11" title="netcdf4_support::nf\l_open_file" alt="" coords="253,459,400,501"/>
+<area shape="rect" id="node19" href="$namespacenetcdf4__support.html#acde440e1ad302ddd5efacb2aa46e4020" title="netcdf4_support::nf\l_populate_dimension\l_struct" alt="" coords="492,567,653,623"/>
+<area shape="rect" id="node21" href="$namespacenetcdf4__support.html#a714886913deafdad6415f01eaab9bf39" title="netcdf4_support::nf\l_populate_variable_struct" alt="" coords="232,629,421,670"/>
+<area shape="rect" id="node3" href="$namespacedatetime.html#a9ac1a0a808a83a072ebc08cf0b3b4d8a" title="datetime::julian_day" alt="" coords="497,5,648,32"/>
+<area shape="rect" id="node5" href="$namespacenetcdf4__support.html#a7138fa9ca363dd10d3601c64e7063f6a" title="netcdf4_support::nf\l_return_dimsize" alt="" coords="499,57,646,98"/>
+<area shape="rect" id="node6" href="$namespacenetcdf4__support.html#a15a33a5fbda012f0797b71099650b68d" title="netcdf4_support::nf\l_get_variable_vector_short" alt="" coords="473,122,672,163"/>
+<area shape="rect" id="node9" href="$namespacenetcdf4__support.html#a075e4dfd64b2fa4af0d5412bb8d764b7" title="netcdf4_support::nf\l_get_variable_vector_int" alt="" coords="482,187,663,229"/>
+<area shape="rect" id="node10" href="$namespacenetcdf4__support.html#a4714332166c986eb4acc7dda0aabe551" title="netcdf4_support::nf\l_get_variable_vector_float" alt="" coords="476,253,669,294"/>
+<area shape="rect" id="node11" href="$namespacenetcdf4__support.html#a8e61a749fc18f3f802e6b886cdfb4f6c" title="netcdf4_support::nf\l_get_variable_vector\l_double" alt="" coords="494,369,651,425"/>
+<area shape="rect" id="node12" href="$namespaceexceptions.html#a84dd04476b06e0a398bfe6d106a82a4d" title="exceptions::warn" alt="" coords="507,319,638,345"/>
+<area shape="rect" id="node7" href="$namespacenetcdf4__support.html#ac8c7276a5849ae6d17ffef1787e3f234" title="netcdf4_support::nf_trap" alt="" coords="731,451,911,477"/>
+<area shape="rect" id="node8" href="$namespaceconstants__and__conversions.html#ac13fba285229deab77131132e6f62caf" title="constants_and_conversions\l::char_ptr_to_fortran_string" alt="" coords="971,443,1174,485"/>
+<area shape="rect" id="node18" href="$namespacenetcdf4__support.html#ae3647a050723866e061cd0b58a013985" title="netcdf4_support::netcdf\l_dump_cdl" alt="" coords="485,450,660,491"/>
+<area shape="rect" id="node20" href="$namespaceconstants__and__conversions.html#adeac78899e44bc3d58e26397fa64e4a7" title="constants_and_conversions\l::c_to_fortran_string" alt="" coords="720,705,923,746"/>
+<area shape="rect" id="node22" href="$namespacenetcdf4__support.html#aa2d6e99c4cd59ef92c2878aa06c4a67e" title="netcdf4_support::nf\l_populate_attribute\l_struct" alt="" coords="499,697,646,753"/>
+</map>

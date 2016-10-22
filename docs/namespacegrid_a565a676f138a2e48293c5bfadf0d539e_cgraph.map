@@ -1,0 +1,10 @@
+<map id="grid::grid_gridtopoint_int" name="grid::grid_gridtopoint_int">
+<area shape="rect" id="node2" href="$namespaceexceptions.html#a22a1bf2808fdc249e6b378ee3f221156" title="exceptions::die" alt="" coords="274,5,393,32"/>
+<area shape="rect" id="node3" href="$namespacegrid.html#a54795390c62b55fd83c35818f8cd4ce3" title="grid::grid_getgridcolrownum" alt="" coords="232,56,434,83"/>
+<area shape="rect" id="node6" href="$namespacegrid.html#aad55d9adaeb57f8da93ceee8597869f9" title="grid::grid_majorityfilter_int" alt="" coords="239,107,428,133"/>
+<area shape="rect" id="node7" href="$namespacegrid.html#ace8ea960868faf40cf79d5303f881ed8" title="grid::grid_populatexy" alt="" coords="254,157,412,184"/>
+<area shape="rect" id="node4" href="$namespacegrid.html#a6b5506d49fb44b008286c59a82e98c1e" title="grid::grid_getgridcolnum" alt="" coords="485,19,663,45"/>
+<area shape="rect" id="node5" href="$namespacegrid.html#a9aa473ecf87cf6e11795f2b6e78c920e" title="grid::grid_getgridrownum" alt="" coords="482,69,666,96"/>
+<area shape="rect" id="node8" href="$namespacegrid.html#ad3fbf6446fa8a58df8888c05b7165324" title="grid::grid_getgridx" alt="" coords="505,132,643,159"/>
+<area shape="rect" id="node9" href="$namespacegrid.html#a93d74de05bc5c8aee4cb556f461be266" title="grid::grid_getgridy" alt="" coords="505,183,643,209"/>
+</map>

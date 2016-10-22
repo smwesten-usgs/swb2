@@ -10,11 +10,8 @@ export BIB_FILE='../resources/Zotero_Output.bib'
 export REFERENCE_DOCX='../resources/usgs_report_template.docx'
 export CSL_FILE='../resources/us-geological-survey.csl'
 export REFERENCE_TEX='../resources/latex.template'
-#export REFERENCE_TEX='../resources/xetex_kjhealy.template'
 
-# copy over fresh batch of images for HTML documentation
-#cp ../images/*.* ../../doxygen/html/images
-
+# resize images to more appropriate size for webpages
 for imgfile in $( ls ../images/*.png ); do
   convert ../images/$imgfile -resize 40% ../to_doxygen/images/$imgfile
   echo "Resizing and copying file: $imgfile"
@@ -47,7 +44,10 @@ function make_doc() {
 
 echo "Modifying raw files for use with Doxygen:"
 
-for filename in [0,A]?*.md; do
+# Doxygen MAINFILE doesn't need any preprocessing
+cp 0D*.md ../to_doxygen
+
+for filename in [0,A]0*.md; do
 
     echo "Doxygen preprocessing: $filename"
 
@@ -59,17 +59,17 @@ for filename in [0,A]?*.md; do
     # that is needed to make Doxygen insert a TOC item.
     sed -Ee 's/\[TOC\]//' tempfile.md > ../to_docx/$filename
 
-    # tack on a "References" header to the current Doxygen version of the file
-    echo -e "\nReferences"  >> tempfile.md
-    echo "----------------" >> tempfile.md
-    echo -e "\n"            >> tempfile.md
-
     # remove markdown headers at third and fourth level; Doxygen doesn't
     # behave nicely when it encounters third and fourth level headers at the
     # beginning of a file snippet.
     sed -iEe 's/#####/##/g' tempfile.md
     sed -iEe 's/####/#/g' tempfile.md
     sed -iEe 's/###/#/g' tempfile.md
+
+    # tack on a "References" header to the current Doxygen version of the file
+    echo -e "\nReferences\n--------------------\n"  >> tempfile.md
+#    echo "----------------" >> tempfile.md
+#    echo -e "\n"            >> tempfile.md
 
     # now create a Doxygen version of the Markdown files, processing the bibliography
     # using Pandoc
@@ -184,5 +184,5 @@ pandoc --from=markdown                                                     \
 
 # run Doxygen to regenerate HTML output
 cd  ../../
-doxygen Doxyfile.mac_osx
+doxygen Doxyfile
 cd src/raw

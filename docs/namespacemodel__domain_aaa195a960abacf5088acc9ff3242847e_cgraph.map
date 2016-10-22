@@ -1,0 +1,6 @@
+<map id="model_domain::model_calculate_et_jensen_haise" name="model_domain::model_calculate_et_jensen_haise">
+<area shape="rect" id="node2" href="$namespaceet____jensen__haise.html#a7de54d9f265eb6dd1857ed2e18f98d2a" title="et__jensen_haise::et\l_jh_calculate" alt="" coords="256,93,412,134"/>
+<area shape="rect" id="node3" href="$namespacesolar__calculations.html#a7f8fe8507c901504b1f5e77fc91701f1" title="Estimate percent of possible sunshine. " alt="" coords="460,5,659,61"/>
+<area shape="rect" id="node4" href="$namespacesolar__calculations.html#a474867a73dd025f53cde7f7e2b871b47" title="Calculate the inverse relative Earth&#45;Sun distance for a given day of the year. " alt="" coords="484,85,635,141"/>
+<area shape="rect" id="node5" href="$namespacesolar__calculations.html#a24590af8aedbf0702f0cb6d188edb1f2" title="Calculate the solar declination for a given day of the year. " alt="" coords="490,165,629,221"/>
+</map>

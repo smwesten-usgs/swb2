@@ -1,0 +1,5 @@
+<map id="netcdf4_support::netcdf_open_and_prepare_as_output" name="netcdf4_support::netcdf_open_and_prepare_as_output">
+<area shape="rect" id="node2" href="$namespacefog____monthly__grid.html#a8e7386e0dfea998459a45c270e0afecc" title="Initialize the fog drip algorithm. " alt="" coords="279,5,474,47"/>
+<area shape="rect" id="node3" href="$namespacemodel__domain.html#ad24a97a20a893d728e39930306e8b1d4" title="model_domain::model\l_initialize_fog_monthly_grid" alt="" coords="522,5,724,47"/>
+<area shape="rect" id="node4" href="$namespacemodel__domain.html#aac78dbf26ba37cf86ebed4edd7acf89b" title="model_domain::set_method\l_pointers_sub" alt="" coords="772,5,974,47"/>
+</map>

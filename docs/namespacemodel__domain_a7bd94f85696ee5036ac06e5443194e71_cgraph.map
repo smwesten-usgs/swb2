@@ -1,0 +1,4 @@
+<map id="model_domain::model_initialize_direct_recharge_gridded" name="model_domain::model_initialize_direct_recharge_gridded">
+<area shape="rect" id="node2" href="$namespacedirect__recharge____gridded__data.html#a0ee82768174b55911b15e24aa80e3560" title="Initialize the routine to enable input/output of arbitrary sources/sink terms. " alt="" coords="245,5,434,61"/>
+<area shape="rect" id="node3" href="$namespaceexceptions.html#a84dd04476b06e0a398bfe6d106a82a4d" title="exceptions::warn" alt="" coords="482,20,613,47"/>
+</map>

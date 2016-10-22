@@ -1,0 +1,9 @@
+<map id="model_initialize::initialize_latitude" name="model_initialize::initialize_latitude">
+<area shape="rect" id="node2" href="$namespacegrid.html#adfcb9064d9b58a49eb61093cd4809a43" title="grid::grid_destroy" alt="" coords="249,5,384,32"/>
+<area shape="rect" id="node3" href="$namespacegrid.html#ace8ea960868faf40cf79d5303f881ed8" title="grid::grid_populatexy" alt="" coords="470,56,627,83"/>
+<area shape="rect" id="node6" href="$namespacegrid.html#a6eb75c46ff6156376f88e567ac0e5271" title="Call PROJ4 to transform coordinates. " alt="" coords="242,107,391,133"/>
+<area shape="rect" id="node8" href="$namespacegrid.html#a02803f7fe27d0354d3d16a15bd1338da" title="grid::grid_writearcgrid" alt="" coords="235,157,398,184"/>
+<area shape="rect" id="node4" href="$namespacegrid.html#ad3fbf6446fa8a58df8888c05b7165324" title="grid::grid_getgridx" alt="" coords="699,31,838,57"/>
+<area shape="rect" id="node5" href="$namespacegrid.html#a93d74de05bc5c8aee4cb556f461be266" title="grid::grid_getgridy" alt="" coords="699,81,838,108"/>
+<area shape="rect" id="node7" href="$namespacegrid.html#a4e234a7e1a3a1ba76a7c92bab7114bf7" title="grid::grid_checkforproj4error" alt="" coords="446,107,651,133"/>
+</map>

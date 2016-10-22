@@ -1,0 +1,8 @@
+<map id="model_domain::model_calculate_fog_monthly_grid" name="model_domain::model_calculate_fog_monthly_grid">
+<area shape="rect" id="node2" href="$namespacefog____monthly__grid.html#acef2be3cd8295a3fb9bbeae7706207f7" title="fog__monthly_grid::\lfog_monthly_grid_calculate" alt="" coords="261,57,461,98"/>
+<area shape="rect" id="node3" href="$namespaceexceptions.html#a22a1bf2808fdc249e6b378ee3f221156" title="exceptions::die" alt="" coords="553,5,672,32"/>
+<area shape="rect" id="node4" href="$namespacenetcdf4__support.html#aefc710195262d3f517b4224bb99b6728" title="netcdf4_support::netcdf\l_put_packed_variable_array" alt="" coords="509,57,716,98"/>
+<area shape="rect" id="node7" href="$namespacenetcdf4__support.html#a0c16d0db4e8e316fe30746454db8d269" title="netcdf4_support::netcdf\l_put_variable_vector" alt="" coords="525,122,700,163"/>
+<area shape="rect" id="node5" href="$namespacenetcdf4__support.html#ac8c7276a5849ae6d17ffef1787e3f234" title="netcdf4_support::nf_trap" alt="" coords="764,97,944,124"/>
+<area shape="rect" id="node6" href="$namespaceconstants__and__conversions.html#ac13fba285229deab77131132e6f62caf" title="constants_and_conversions\l::char_ptr_to_fortran_string" alt="" coords="992,90,1195,131"/>
+</map>
