@@ -170,6 +170,7 @@ pandoc --from=markdown                                                     \
       --bibliography="$BIB_FILE"                                           \
       --csl="$CSL_FILE"                                                    \
       --latex-engine=xelatex                                               \
+      --verbose                                                            \
       --template="$REFERENCE_TEX"                                          \
       -m                                                                   \
       --include-after-body=appendices.tex                                  \

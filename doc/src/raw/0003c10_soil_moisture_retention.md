@@ -13,7 +13,7 @@ where
 $AET$ is the actual evapotranspiration,
 $PET$ is the potential evapotranspiration,
 $\theta$ is the current soil-moisture amount [L], and
-$\theta_{fc} is the soil field-capacity.
+$\theta_{fc}$ is the soil field-capacity.
 
 This section discusses the two soil-moisture retention functions implemented in SWB, one developed by Thornthwaite [-@thornthwaite_approach_1948] and the other included in the FAO-56 approach [-@allen_crop_1998].
 
@@ -25,29 +25,34 @@ The first versions of SWB included full tabularized versions of the soil-moistur
 
 Daily soil moisture may be estimated from this relation by first defining the instantaneous soil evapotranspiration as equal to the change in storage:
 
-$$ET_a^' =  - \frac{{d\theta }}{{dt}}$$ {#eq:SM_TM_deriv_001}
+$$et_a =  - \frac{{d\theta }}{{dt}}$$ {#eq:SM_TM_deriv_001}
 
 where
-$ET_a^'$ is the instantaneous actual evapotranspiration, and
+$et_a$ is the instantaneous actual evapotranspiration, and
 $\frac{{d\theta }}{{dt}}$ is the rate of change in soil moisture relative to time.
 
 The relation shown in +@fig:aet_to_pet_thornthwaite can be used to define a function relating actual and potential evapotranspiration as:
 
-$$ET_a^' = ET_p^' \cdot \frac{\theta }{{{\theta _{fc}}}}$$
+$$et_a = et_p \cdot \frac{\theta }{{{\theta _{fc}}}}$$
 
 where
-$ET_a^'$ is the instantaneous actual evapotranspiration,
-$ET_p^'$ is the instantaneous potential evapotranspiration,
+$et_a$ is the instantaneous actual evapotranspiration,
+$et_p$ is the instantaneous potential evapotranspiration,
 $\theta$ is the soil moisture, and
 $\theta_{fc}$ is the soil moisture value at field capacity.
 
+$$ - \frac{{d\theta }}{{dt}} = et_p \cdot \frac{\theta }{{{\theta _{fc}}}}$$
 
+$$ - \frac{{d\theta }}{\theta } = \frac{{et_p}}{{{\theta _{fc}}}}dt$$
+
+$$ - \int{\frac{{d\theta }}{\theta }}  = \frac{1}{{{\theta _{fc}}}}\int {et_p dt} $$
+
+$$ \left. { - \ln \theta } \right|_{{\theta _{t - 1}}}^{{\theta _t}} = \frac{1}{{{\theta _{fc}}}}E{T_p}$$
+
+$$ {\theta _t} = {\theta _{t - 1}} \cdot {e^{\left( { - \frac{{E{T_p}}}{{{\theta _{fc}}}}} \right)}}$$
 
 #### FAO-56 {#sm_fao_56}
 
-Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis dis parturient montes, nascetur ridiculus mus. Donec quam felis, ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget, arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo. Nullam dictum felis eu pede mollis pretium.
+
 
 ![FAO-56 [-@allen_crop_1998] soil-moisture retention function. file: Actual_ET__FAO56.png]( ../images/Actual_ET__FAO56.png )
-
-
-Etiam rhoncus. Maecenas tempus, tellus eget condimentum rhoncus, sem quam semper libero, sit amet adipiscing sem neque sed ipsum. Nam quam nunc, blandit vel, luctus pulvinar, hendrerit id, lorem. Maecenas nec odio et ante tincidunt tempus.
