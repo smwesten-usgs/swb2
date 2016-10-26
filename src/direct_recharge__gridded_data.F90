@@ -180,7 +180,7 @@ contains
 
       allocate( DIRECT_RECHARGE_ACTIVE_FRACTION( count( is_cell_active ) ), stat=status )
       call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
-      DIRECT_RECHARGE_ACTIVE_FRACTION = 1.0_c_float
+      DIRECT_RECHARGE_ACTIVE_FRACTION = 0.0_c_float
 
     endif
 
