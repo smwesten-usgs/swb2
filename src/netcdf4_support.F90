@@ -112,7 +112,7 @@ module netcdf4_support
   integer (c_int), public, parameter :: NC_Z       = 3
   integer (c_int), public, parameter :: NC_CRS     = 4
   integer (c_int), public, parameter :: NC_LAT     = 5
-  integer (c_int), public, parameter :: NC_LON     = 6  
+  integer (c_int), public, parameter :: NC_LON     = 6
 
   integer (kind=c_int), parameter :: NC_FIRST = 0
   integer (kind=c_int), parameter :: NC_LAST  = 1
@@ -948,14 +948,14 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
     executable_name_ = trim( executable_name )
   else
     executable_name_ = "SWB"
-  endif  
+  endif
 
   if ( present( history_list) ) then
     history_list_ => history_list
   else
     allocate( history_list_ )
     call history_list_%append(date_time_text//": Soil-Water-Balance run started.")
-  endif  
+  endif
 
   call history_list_%set_autocleanup( FALSE )
 
@@ -971,25 +971,35 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
 
   !> set dimension values in the NCFILE struct
   call nf_set_standard_dimensions(NCFILE=NCFILE, iNX=iNX, iNY=iNY)
-  
+
   !> @todo implement more flexible method of assigning units
-!   NCFILE%sVarUnits(NC_X)    = sXY_units 
-!   NCFILE%sVarUnits(NC_Y)    = sXY_units 
-  NCFILE%sVarUnits(NC_Z)    = sVariableUnits  
-  
+!   NCFILE%sVarUnits(NC_X)    = sXY_units
+!   NCFILE%sVarUnits(NC_Y)    = sXY_units
+  NCFILE%sVarUnits(NC_Z)    = sVariableUnits
+
   !> transfer dimension values to NetCDF file
   call nf_define_dimensions( NCFILE=NCFILE )
-  
+
   !> set variable values in the NCFILE struct
-  call nf_set_standard_variables(NCFILE=NCFILE, sVarName_z = sVariableName, lLatLon=lTRUE )
-  
+  call nf_set_standard_variables(NCFILE=NCFILE, sVarName_z = sVariableName,    &
+    lLatLon=logical( present( dpLat ) .and. present( dpLon ), kind=c_bool ) )
+
   !> transfer variable values to NetCDF file
   call nf_define_variables(NCFILE=NCFILE)
-  
+
   call nf_get_variable_id_and_type( NCFILE=NCFILE )
-  
-  call nf_set_standard_attributes(NCFILE=NCFILE, sOriginText=sOriginText,                    &
-      PROJ4_string=PROJ4_string, lLatLon=lTRUE, fValidMin=fValidMin, fValidMax=fValidMax )
+
+  if (present( dpLat ) .and. present( dpLon ) ) then
+
+    call nf_set_standard_attributes(NCFILE=NCFILE, sOriginText=sOriginText,                    &
+        PROJ4_string=PROJ4_string, lLatLon=lTRUE, fValidMin=fValidMin, fValidMax=fValidMax )
+
+  else
+
+    call nf_set_standard_attributes(NCFILE=NCFILE, sOriginText=sOriginText,                    &
+        PROJ4_string=PROJ4_string, lLatLon=lFALSE, fValidMin=fValidMin, fValidMax=fValidMax )
+
+  endif
 
   call nf_set_global_attributes(NCFILE=NCFILE, &
      sDataType=trim(NCFILE%sVarName(NC_Z)), history_list=history_list_, &
@@ -1013,7 +1023,7 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
        dpY=fY )
 
 !  allocate( NCFILE%rX_Coords( size( fX) ), stat=iStat )
-!  allocate( NCFILE%rY_Coords( size( fY) ), stat=iStat )  
+!  allocate( NCFILE%rY_Coords( size( fY) ), stat=iStat )
   NCFILE%rX_Coords = fX
   NCFILE%rY_Coords = fY
 
@@ -1023,7 +1033,7 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
        dpLat=dpLat, &
        dpLon=dpLon )
 
-  endif  
+  endif
 
 end subroutine netcdf_open_and_prepare_as_output
 
@@ -1733,7 +1743,7 @@ subroutine netcdf_get_variable_id_for_variable( NCFILE, variable_name, &
 
   do indx=0, NCFILE%iNumberOfVariables-1
     pNC_VAR => NCFILE%pNC_VAR( indx )
-    if ( associated( pNC_VAR ) ) then 
+    if ( associated( pNC_VAR ) ) then
       if ( pNC_VAR%sVariableName .strequal. variable_name ) then
         variable_was_found = TRUE
         exit
@@ -1762,7 +1772,7 @@ subroutine netcdf_get_attribute_list_for_variable( NCFILE, variable_name, &
   type (T_NETCDF4_FILE), intent(inout) :: NCFILE
   character (len=*), intent(in)        :: variable_name
   type (STRING_LIST_T), intent(out)    :: attribute_name_list
-  type (STRING_LIST_T), intent(out)    :: attribute_value_list    
+  type (STRING_LIST_T), intent(out)    :: attribute_value_list
 
   ! [ LOCALS ]
   integer (kind=c_int) :: indx
@@ -1774,11 +1784,11 @@ subroutine netcdf_get_attribute_list_for_variable( NCFILE, variable_name, &
   variable_was_found = FALSE
 
   call attribute_name_list%clear
-  call attribute_value_list%clear  
+  call attribute_value_list%clear
 
   do indx=0, NCFILE%iNumberOfVariables-1
     pNC_VAR => NCFILE%pNC_VAR( indx )
-    if ( associated( pNC_VAR ) ) then 
+    if ( associated( pNC_VAR ) ) then
       if ( pNC_VAR%sVariableName .strequal. variable_name ) then
         variable_was_found = TRUE
         exit
@@ -1794,7 +1804,7 @@ subroutine netcdf_get_attribute_list_for_variable( NCFILE, variable_name, &
 
         tempstring = pNC_ATT%sAttributeName
         call attribute_name_list%append( trim( tempstring ) )
-        
+
         select case ( pNC_ATT%iNC_AttType )
 
           case ( NC_CHAR )
@@ -1815,23 +1825,23 @@ subroutine netcdf_get_attribute_list_for_variable( NCFILE, variable_name, &
           case ( NC_FLOAT )
 
             tempstring = asCharacter( pNC_ATT%rAttValue(0) )
-            call attribute_value_list%append( trim( tempstring ) )          
+            call attribute_value_list%append( trim( tempstring ) )
 
           case ( NC_DOUBLE )
 
             tempstring = asCharacter( pNC_ATT%dpAttValue(0) )
-            call attribute_value_list%append( trim( tempstring ) )          
+            call attribute_value_list%append( trim( tempstring ) )
 
         end select
-  
+
       endif
 
     enddo
-      
+
   else
 
     call attribute_name_list%append("<NA>")
-    call attribute_value_list%append("<NA>")    
+    call attribute_value_list%append("<NA>")
 
   endif
 
@@ -1854,7 +1864,7 @@ subroutine netcdf_get_variable_list( NCFILE, variable_list )
     if ( associated( pNC_VAR ) )  call variable_list%append( pNC_VAR%sVariableName )
   enddo
 
-end subroutine netcdf_get_variable_list  
+end subroutine netcdf_get_variable_list
 
 !----------------------------------------------------------------------
 
@@ -1887,7 +1897,7 @@ subroutine netcdf_get_variable_slice(NCFILE, rValues, iValues)
   real (kind=c_float), dimension(:,:), optional :: rValues
   integer (kind=c_int), dimension(:,:), optional :: iValues
 
-  !> @todo expand this to cover more variable types 
+  !> @todo expand this to cover more variable types
 
   if (NCFILE%iVarType(NC_Z) == NC_SHORT) then
 
@@ -1902,8 +1912,8 @@ subroutine netcdf_get_variable_slice(NCFILE, rValues, iValues)
     if (present(rValues) ) call nf_get_variable_slice_float(NCFILE, rValues)
 
   else
-  
-    call warn("Failed to find a method to retrieve data of the given type.", __SRCNAME__, __LINE__)  
+
+    call warn("Failed to find a method to retrieve data of the given type.", __SRCNAME__, __LINE__)
 
   endif
 
@@ -1973,7 +1983,7 @@ subroutine nf_get_variable_slice_short(NCFILE, rValues)
           enddo
         enddo
 
-    case default    
+    case default
 
       call warn("INTERNAL PROGRAMMING ERROR: Unhandled select case. Program will probably fail.", __SRCNAME__, __LINE__)
 
@@ -2045,7 +2055,7 @@ subroutine nf_get_variable_slice_int(NCFILE, rValues)
           enddo
         enddo
 
-    case default    
+    case default
 
       call warn("INTERNAL PROGRAMMING ERROR: Unhandled select case. Program will probably fail.", __SRCNAME__, __LINE__)
 
@@ -2115,7 +2125,7 @@ subroutine nf_get_variable_slice_float(NCFILE, rValues)
         enddo
       enddo
 
-    case default    
+    case default
 
       call warn("INTERNAL PROGRAMMING ERROR: Unhandled select case. Program will probably fail.", __SRCNAME__, __LINE__)
 
@@ -2546,7 +2556,7 @@ function nf_get_first_and_last(NCFILE, iVarIndex)  result(dpValues)
         iNC_Stride=iStride, &
         dpNC_Vars=dpValues)
 
-    case default    
+    case default
 
       call warn("INTERNAL PROGRAMMING ERROR: Unhandled select case. Program will probably fail.", __SRCNAME__, __LINE__)
 
@@ -2618,7 +2628,7 @@ subroutine nf_get_time_units(NCFILE)
   call chomp(sDateTime, sItem, "/-")
   read(sItem, *) NCFILE%iOriginMonth
 
-  !> @todo this does not appear to have the fix that was applied to the master swb branch to 
+  !> @todo this does not appear to have the fix that was applied to the master swb branch to
   !!       deal with cases where no time values are given at all
 
   read(sDateTime, *) NCFILE%iOriginDay
@@ -2736,7 +2746,7 @@ subroutine nf_get_variable_id_and_type( NCFILE, strict_asserts )
   if ( present( strict_asserts ) ) then
     strict_asserts_ = strict_asserts
   else
-    strict_asserts_ = TRUE 
+    strict_asserts_ = TRUE
   endif
 
   NCFILE%iVarID = -9999
@@ -2919,8 +2929,8 @@ subroutine nf_create(NCFILE, sFilename, iLU)
 !
 ! had read somewhere that the interface:
 ! character (kind=c_char)   :: varname(*)
-! 
-! would properly pass fortran string to c; however, 
+!
+! would properly pass fortran string to c; however,
 ! this does not appear ot be the case.
 !
 
@@ -3071,7 +3081,7 @@ subroutine nf_set_standard_variables(NCFILE, sVarName_z, lLatLon)
     lLatLon_ = lLatLon
   else
     lLatLon_ = lFALSE
-  endif   
+  endif
 
   iStat = 0
 
@@ -3079,7 +3089,7 @@ subroutine nf_set_standard_variables(NCFILE, sVarName_z, lLatLon)
     NCFILE%iNumberOfVariables = 7
   else
     NCFILE%iNumberOfVariables = 5
-  endif    
+  endif
 
   if (associated(NCFILE%pNC_VAR) ) deallocate(NCFILE%pNC_VAR, stat=iStat)
   call assert(iStat == 0, "Could not deallocate memory for NC_VAR member in NC_FILE defined type", &
@@ -3102,7 +3112,7 @@ subroutine nf_set_standard_variables(NCFILE, sVarName_z, lLatLon)
   NCFILE%pNC_VAR(NC_X)%sVariableName = "x"
   NCFILE%pNC_VAR(NC_X)%iNC_VarType = NC_DOUBLE
   NCFILE%pNC_VAR(NC_X)%iNumberOfDimensions = 1
-  NCFILE%pNC_VAR(NC_X)%iNC_DimID = NCFILE%pNC_DIM(NC_X)%iNC_DimID  
+  NCFILE%pNC_VAR(NC_X)%iNC_DimID = NCFILE%pNC_DIM(NC_X)%iNC_DimID
 
   NCFILE%pNC_VAR(NC_CRS)%sVariableName = "crs"
   NCFILE%pNC_VAR(NC_CRS)%iNC_VarType = NC_INT
@@ -3196,7 +3206,7 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, executable_name, &
       NCFILE%pNC_ATT(0)%iNC_AttType = NC_CHAR
       NCFILE%pNC_ATT(0)%iNC_AttSize = 1_c_size_t
 
-    endif  
+    endif
 
     NCFILE%pNC_ATT(1)%sAttributeName = "executable_version"
     allocate(NCFILE%pNC_ATT(1)%sAttValue(0:0))
@@ -3249,16 +3259,16 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
   type (T_NETCDF_ATTRIBUTE), dimension(:), pointer :: pNC_ATT
   logical (kind=c_bool)                            :: lLatLon_
   type (STRING_LIST_T)                             :: attribute_name_list
-  type (STRING_LIST_T)                             :: attribute_value_list   
+  type (STRING_LIST_T)                             :: attribute_value_list
   character (len=:), allocatable                   :: tempstring
-  character (len=:), allocatable                   :: value_string 
+  character (len=:), allocatable                   :: value_string
   integer (kind=c_int)                             :: indx
 
   if (present( lLatLon ) ) then
     lLatLon_ = lLatLon
   else
     lLatLon_ = lFALSE
-  endif  
+  endif
 
   if (present( PROJ4_string ) ) then
     call create_attributes_from_proj4_string( PROJ4_string, attribute_name_list,   &
@@ -3287,14 +3297,14 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
           NCFILE%sVarUnits(NC_X) = value_string
           NCFILE%sVarUnits(NC_Y) = value_string
 
-          allocate(pNC_ATT(indx)%sAttValue(0:0))  
+          allocate(pNC_ATT(indx)%sAttValue(0:0))
           pNC_ATT(indx)%sAttValue(0) = value_string
           pNC_ATT(indx)%iNC_AttType = NC_CHAR
           pNC_ATT(indx)%iNC_AttSize = 1_c_size_t
 
         case ( "datum", "spheroid", "grid_mapping_name" )
 
-          allocate(pNC_ATT(indx)%sAttValue(0:0))  
+          allocate(pNC_ATT(indx)%sAttValue(0:0))
           pNC_ATT(indx)%sAttValue(0) = attribute_value_list%get( indx + 1 )
           pNC_ATT(indx)%iNC_AttType = NC_CHAR
           pNC_ATT(indx)%iNC_AttSize = 1_c_size_t
@@ -3313,9 +3323,9 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
           pNC_ATT(indx)%iNC_AttType = NC_FLOAT
           pNC_ATT(indx)%iNC_AttSize = 1_c_size_t
 
-      end select 
-      
-    enddo   
+      end select
+
+    enddo
 
     ! last, store the actual PROJ4 string
     pNC_ATT(indx)%sAttributeName = "proj4_string"
@@ -3414,7 +3424,7 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
     pNC_ATT(6)%iNC_AttType = NC_CHAR
     pNC_ATT(6)%iNC_AttSize = 1_c_size_t
 
-  else  
+  else
 
     iNumAttributes = 3
     allocate( NCFILE%pNC_VAR(NC_Z)%pNC_ATT(0:iNumAttributes-1), stat=iStat)
@@ -3839,7 +3849,7 @@ subroutine nf_put_attributes(NCFILE)
                   sAttributeName=trim(pNC_ATT%sAttributeName)//c_null_char, &
                   sAttributeValue=[trim(pNC_ATT%sAttValue(indx))//c_null_char])
 
-            enddo  
+            enddo
 
         end select
 
@@ -3903,7 +3913,7 @@ subroutine nf_put_attributes(NCFILE)
               iVarID=NC_GLOBAL,                                              &
               sAttributeName=trim(pNC_ATT%sAttributeName)//c_null_char,      &
               sAttributeValue=[trim(pNC_ATT%sAttValue(indx))//c_null_char])
-        
+
         enddo
 
     end select

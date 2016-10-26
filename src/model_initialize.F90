@@ -12,12 +12,13 @@ module model_initialize
 !  use loop_iterate
   use logfiles
   use model_domain, only                 : MODEL, minmaxmean
-  use output, only                       : initialize_output, set_output_directory, set_output_prefix
+  use output, only                       : initialize_output, set_output_directory,      &
+                                           set_output_prefix, set_output_latlon_option
   use parameters
   use precipitation__method_of_fragments
   use simulation_datetime, only          : SIM_DT
   use strings
-  use string_list  
+  use string_list
   use storm_drain_capture, only          : storm_drain_capture_initialize
   implicit none
 
@@ -29,7 +30,7 @@ module model_initialize
   type GRIDDED_DATASETS_T
     character (len=38)     :: sName
     logical (kind=c_bool)  :: lOptional
-    integer (kind=c_int)   :: iDataType 
+    integer (kind=c_int)   :: iDataType
   end type GRIDDED_DATASETS_T
 
   type METHODS_LIST_T
@@ -57,15 +58,15 @@ module model_initialize
       GRIDDED_DATASETS_T("HYDROLOGIC_SOILS_GROUP                ", lFALSE, DATATYPE_INT ),       &
       GRIDDED_DATASETS_T("INITIAL_PERCENT_SOIL_MOISTURE         ", lFALSE, DATATYPE_FLOAT),      &
       GRIDDED_DATASETS_T("INITIAL_SNOW_COVER_STORAGE            ", lTRUE, DATATYPE_FLOAT),      &
-      GRIDDED_DATASETS_T("INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX", lTRUE, DATATYPE_FLOAT),      &      
+      GRIDDED_DATASETS_T("INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX", lTRUE, DATATYPE_FLOAT),      &
       GRIDDED_DATASETS_T("PERCENT_CANOPY_COVER                  ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("PERCENT_PERVIOUS_COVER                ", lTRUE, DATATYPE_FLOAT ),      &      
+      GRIDDED_DATASETS_T("PERCENT_PERVIOUS_COVER                ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("PERCENT_IMPERVIOUS_COVER              ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("FRACTION_CANOPY_COVER                 ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("FRACTION_PERVIOUS_COVER               ", lTRUE, DATATYPE_FLOAT ),      &      
+      GRIDDED_DATASETS_T("FRACTION_PERVIOUS_COVER               ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("FRACTION_IMPERVIOUS_COVER             ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("STEMFLOW_FRACTION                     ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("EVAPORATION_TO_RAINFALL_RATIO         ", lTRUE, DATATYPE_FLOAT ),      & 
+      GRIDDED_DATASETS_T("EVAPORATION_TO_RAINFALL_RATIO         ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("RAINFALL_ADJUST_FACTOR                ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("CESSPOOL_LEAKAGE                      ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("STORM_DRAIN_LEAKAGE                   ", lTRUE, DATATYPE_FLOAT ),      &
@@ -74,13 +75,13 @@ module model_initialize
       GRIDDED_DATASETS_T("DISPOSAL_WELL_DISCHARGE               ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("ANNUAL_DIRECT_RECHARGE_RATE           ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("ANNUAL_SEPTIC_DISCHARGE               ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("SEPTIC_DISCHARGE                      ", lTRUE, DATATYPE_FLOAT ),      &      
-      GRIDDED_DATASETS_T("RUNOFF_ZONE                           ", lTRUE, DATATYPE_INT ),        & 
-      GRIDDED_DATASETS_T("POLYGON_ID                            ", lTRUE, DATATYPE_INT ),        & 
+      GRIDDED_DATASETS_T("SEPTIC_DISCHARGE                      ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("RUNOFF_ZONE                           ", lTRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("POLYGON_ID                            ", lTRUE, DATATYPE_INT ),        &
       GRIDDED_DATASETS_T("SOIL_STORAGE_MAX                      ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("PLANT_AVAILABLE_WATER                 ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("MAXIMUM_POTENTIAL_RECHARGE            ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("IRRIGATION_MASK                       ", lTRUE, DATATYPE_INT),         &                
+      GRIDDED_DATASETS_T("IRRIGATION_MASK                       ", lTRUE, DATATYPE_INT),         &
       GRIDDED_DATASETS_T("RELATIVE_HUMIDITY                     ", lTRUE, DATATYPE_FLOAT )   ]
 
   type (METHODS_LIST_T), parameter  :: KNOWN_METHODS( NUMBER_OF_KNOWN_METHODS ) =   &
@@ -96,7 +97,7 @@ module model_initialize
       METHODS_LIST_T("IRRIGATION             ", lTRUE),                             &
       METHODS_LIST_T("CROP_COEFFICIENT       ", lTRUE),                             &
       METHODS_LIST_T("DIRECT_RECHARGE        ", lTRUE),                             &
-      METHODS_LIST_T("DIRECT_SOIL_MOISTURE   ", lTRUE),                             &      
+      METHODS_LIST_T("DIRECT_SOIL_MOISTURE   ", lTRUE),                             &
       METHODS_LIST_T("FLOW_ROUTING           ", lFALSE),                            &
       METHODS_LIST_T("DUMP_VARIABLES         ", lTRUE)   ]
 
@@ -111,7 +112,7 @@ contains
 
     character (len=*), intent(in) :: output_prefix, output_dirname, data_dirname
 
-    
+
     ! [ LOCALS ]
     integer (kind=c_int) :: iIndex
 
@@ -130,19 +131,19 @@ contains
 
     ! read in and munge all tables that have been defined in the control file as ***_LOOKUP_TABLE
     call initialize_parameter_tables()
-    
+
     ! scan input file entries for keywords associated with known gridded datasets
     ! (e.g. PRECIPITATION, TMIN, TMAX, FOG_ZONE, etc.)
-    
-    ! if the grid is mentioned in the control file, call the bound "initialize" method that 
-    ! will wire in the type of data file. all associated methods will also be acted upon if 
+
+    ! if the grid is mentioned in the control file, call the bound "initialize" method that
+    ! will wire in the type of data file. all associated methods will also be acted upon if
     ! present in the control file (e.g. TMAX_ADD_OFFSET, TMAX_NETCDF_X_VAR, etc.)
     do iIndex = 1, ubound(KNOWN_GRIDS, 1)
 
       call initialize_generic_grid( sKey=KNOWN_GRIDS(iIndex)%sName,            &
                                     lOptional=KNOWN_GRIDS(iIndex)%lOptional,   &
                                     iDataType=KNOWN_GRIDS(iIndex)%iDataType )
-   
+
     enddo
 
     ! scan the control file input for method specifications
@@ -151,12 +152,12 @@ contains
 
       call initialize_generic_method( sKey=KNOWN_METHODS( iIndex )%sName,              &
                                       lOptional=KNOWN_METHODS( iIndex )%lOptional )
-   
+
     enddo
 
     ! check to see that there are no NULL method pointers
     call MODEL%preflight_check_method_pointers()
-    
+
     ! bring in soils (HSG, AWC), landuse, and flow direction data from native grids
     ! and pack that data into vectors for active grid cells only
     call initialize_soils_landuse_awc_flowdir_values()
@@ -166,6 +167,9 @@ contains
 
     ! call each of the initialization routines associated with the chosen methods
     call MODEL%initialize_methods()
+
+    ! find general program options and process
+    call initialize_program_options( )
 
     ! open and prepare NetCDF files for output
     call initialize_output( MODEL )
@@ -186,14 +190,14 @@ contains
 
   !> Initialize soils, landuse, and available water content values.
   !!
-  !! @NOTE Rather than read the raw values and initialize the SWB 
-  !! variables in one step, we have two steps: 
+  !! @NOTE Rather than read the raw values and initialize the SWB
+  !! variables in one step, we have two steps:
   !! 1. read raw;
   !! 2. initialize SWB variables.
   !!
   !! Two steps are needed because the call to "set_inactive_cells" requires access to the "raw"
-  !! values, not the SWB variables. Basically any cell with negative values found in the landuse, soils groups, 
-  !! or awc grids results in that cell being inactivated. Once the complete collection of active cells is 
+  !! values, not the SWB variables. Basically any cell with negative values found in the landuse, soils groups,
+  !! or awc grids results in that cell being inactivated. Once the complete collection of active cells is
   !! found, the SWB variables can be initialized.
   !!
 
@@ -210,7 +214,7 @@ contains
     ! read in the 2D array of AWC values; needed so that we can use it to set inactive cells
     call MODEL%read_AWC_data()
 
-    ! determine which grid cells should be inactive on the basis of available water content, 
+    ! determine which grid cells should be inactive on the basis of available water content,
     ! hudrologic soils group, and/or soils group grids
     call MODEL%set_inactive_cells()
 
@@ -226,7 +230,7 @@ contains
     ! now that we know which cells are active, pack the 2D array in to 1D vector of AWC values
     call MODEL%init_AWC()
 
-    ! to this point, rooting depths 
+    ! to this point, rooting depths
     MODEL%rooting_depth_max = pack( ROOTING_DEPTH_MAX, MODEL%active )
 
     ! if the method selected reads these directly from a grid, the rooting depths previously
@@ -282,7 +286,7 @@ contains
 
     ! [ LOCALS ]
     real (kind=c_float), allocatable  :: fInitial_Snow_Cover_Storage(:)
-    integer (kind=c_int)              :: iStat 
+    integer (kind=c_int)              :: iStat
 
     allocate ( fInitial_Snow_Cover_Storage( count( MODEL%active ) ), stat=iStat )
 
@@ -293,13 +297,13 @@ contains
         call warn(sMessage="An INITIAL_SNOW_COVER_STORAGE grid (or constant) was not found.",    &
         sHints="Check your control file to see that a valid INITIAL_SNOW_COVER_STORAGE grid or"  &
           //" constant is specified.", lFatal=lFALSE )
-  
+
       MODEL%snow_storage = 0.0_c_float
 
-    else    
+    else
 
       call pINITIAL_SNOW_COVER_STORAGE%getvalues()
- 
+
       ! map the 2D array of INITIAL_PERCENT_SOIL_MOISTURE values to the vector of active cells
       fInitial_Snow_Cover_Storage = pack( pINITIAL_SNOW_COVER_STORAGE%pGrdBase%rData, MODEL%active )
 
@@ -309,7 +313,7 @@ contains
          //"valid range (0 to 300)", lFatal=lTRUE )
 
      MODEL%snow_storage = fInitial_Snow_Cover_Storage
-    
+
     endif
 
   end subroutine initialize_snow_storage
@@ -322,7 +326,7 @@ contains
 
     ! [ LOCALS ]
     real (kind=c_float), allocatable  :: fInitial_Percent_Soil_Moisture(:)
-    integer (kind=c_int)              :: iStat 
+    integer (kind=c_int)              :: iStat
 
     allocate ( fInitial_Percent_Soil_Moisture( count( MODEL%active ) ), stat=iStat )
 
@@ -333,10 +337,10 @@ contains
         call warn(sMessage="An INITIAL_PERCENT_SOIL_MOISTURE grid (or constant) was not found.",    &
         sHints="Check your control file to see that a valid INITIAL_PERCENT_SOIL_MOISTURE grid or"  &
           //" constant is specified.", lFatal=lTRUE )
-    else    
+    else
 
       call pINITIAL_PERCENT_SOIL_MOISTURE%getvalues()
- 
+
       ! map the 2D array of INITIAL_PERCENT_SOIL_MOISTURE values to the vector of active cells
       fInitial_Percent_Soil_Moisture = pack( pINITIAL_PERCENT_SOIL_MOISTURE%pGrdBase%rData, MODEL%active )
 
@@ -345,8 +349,8 @@ contains
        call warn(sMessage="One or more initial percent soils moisture values outside of " &
          //"valid range (0% to 100%)", lFatal=lTRUE )
 
-     MODEL%soil_storage = fInitial_Percent_Soil_Moisture / 100.0_c_float * MODEL%soil_storage_max  
-    
+     MODEL%soil_storage = fInitial_Percent_Soil_Moisture / 100.0_c_float * MODEL%soil_storage_max
+
     endif
 
   end subroutine initialize_soil_storage
@@ -361,7 +365,7 @@ contains
     type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_IMPERVIOUS
     type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_PERVIOUS
     type (DATA_CATALOG_ENTRY_T), pointer :: pFRACTION_IMPERVIOUS
-    type (DATA_CATALOG_ENTRY_T), pointer :: pFRACTION_PERVIOUS      
+    type (DATA_CATALOG_ENTRY_T), pointer :: pFRACTION_PERVIOUS
     type ( GENERAL_GRID_T ), pointer     :: pTempGrd
 
     pPERCENT_IMPERVIOUS => DAT%find("PERCENT_IMPERVIOUS_COVER")
@@ -377,7 +381,7 @@ contains
         MODEL%pervious_fraction = pack( 1.0_c_float - pPERCENT_IMPERVIOUS%pGrdBase%rData/100.0_c_float, MODEL%active )
       else
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
-      endif  
+      endif
 
     elseif ( associated( pPERCENT_PERVIOUS ) ) then
 
@@ -387,7 +391,7 @@ contains
         MODEL%pervious_fraction = pack( (pPERCENT_PERVIOUS%pGrdBase%rData/100.0_c_float), MODEL%active )
       else
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
-      endif  
+      endif
 
     elseif ( associated(pFRACTION_IMPERVIOUS) ) then
 
@@ -397,7 +401,7 @@ contains
         MODEL%pervious_fraction = pack( 1.0_c_float - pFRACTION_IMPERVIOUS%pGrdBase%rData, MODEL%active )
       else
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
-      endif  
+      endif
 
     elseif ( associated( pFRACTION_PERVIOUS ) ) then
 
@@ -407,7 +411,7 @@ contains
         MODEL%pervious_fraction = pack( pFRACTION_PERVIOUS%pGrdBase%rData, MODEL%active )
       else
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
-      endif  
+      endif
 
     else
 
@@ -428,7 +432,7 @@ contains
 
     pTempGrd => grid_Create( iNX=MODEL%number_of_columns, iNY=MODEL%number_of_rows, &
         rX0=MODEL%X_ll, rY0=MODEL%Y_ll, &
-        rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+        rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )
 
     pTempGrd%rData = unpack( MODEL%pervious_fraction, MODEL%active, MODEL%nodata_fill_value )
 
@@ -436,7 +440,7 @@ contains
 
     call grid_Destroy( pTempGrd )
 
-  end subroutine initialize_percent_pervious  
+  end subroutine initialize_percent_pervious
 
 !--------------------------------------------------------------------------------------------------
 
@@ -446,7 +450,7 @@ contains
     integer (kind=c_int)                 :: iStat
     integer (kind=c_int)                 :: iIndex
     type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_CANOPY_COVER
-    type (DATA_CATALOG_ENTRY_T), pointer :: pFRACTION_CANOPY_COVER      
+    type (DATA_CATALOG_ENTRY_T), pointer :: pFRACTION_CANOPY_COVER
     type ( GENERAL_GRID_T ), pointer     :: pTempGrd
 
     pPERCENT_CANOPY_COVER => DAT%find("PERCENT_CANOPY_COVER")
@@ -460,7 +464,7 @@ contains
         MODEL%canopy_cover_fraction = pack( pPERCENT_CANOPY_COVER%pGrdBase%rData/100.0_c_float, MODEL%active )
       else
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
-      endif  
+      endif
 
     elseif ( associated(pFRACTION_CANOPY_COVER) ) then
 
@@ -470,7 +474,7 @@ contains
         MODEL%canopy_cover_fraction = pack( pFRACTION_CANOPY_COVER%pGrdBase%rData, MODEL%active )
       else
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
-      endif  
+      endif
 
     else
 
@@ -494,7 +498,7 @@ contains
 
     pTempGrd => grid_Create( iNX=MODEL%number_of_columns, iNY=MODEL%number_of_rows, &
         rX0=MODEL%X_ll, rY0=MODEL%Y_ll, &
-        rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+        rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )
 
     pTempGrd%rData = unpack( MODEL%canopy_cover_fraction, MODEL%active, MODEL%nodata_fill_value )
 
@@ -520,7 +524,7 @@ contains
     integer (kind=c_int), allocatable :: iLanduseCodes(:)
     type (STRING_LIST_T)              :: slList
     type (STRING_LIST_T)              :: slRZ
-    integer (kind=c_int), allocatable :: iRZ_SeqNums(:) 
+    integer (kind=c_int), allocatable :: iRZ_SeqNums(:)
     real (kind=c_float), allocatable  :: RZ(:)
     character (len=:), allocatable    :: sText
     real (kind=c_float), allocatable  :: water_capacity(:)
@@ -533,7 +537,7 @@ contains
 
     pLULC => DAT%find("LAND_USE")
     pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
-    
+
     call assert( associated( pLULC), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pLULC", &
       __SRCNAME__, __LINE__ )
 
@@ -546,16 +550,16 @@ contains
     call assert( associated( pHSG), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pHSG", &
       __SRCNAME__, __LINE__ )
 
-    call assert( associated( pHSG%pGrdBase ),      & 
+    call assert( associated( pHSG%pGrdBase ),      &
       "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pHSG%pGrdBase", __SRCNAME__, __LINE__ )
 
-    call assert( allocated( pHSG%pGrdBase%iData ),      & 
+    call assert( allocated( pHSG%pGrdBase%iData ),      &
       "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pHSG%pGrdBase%iData", __SRCNAME__, __LINE__ )
 
 
     pRooting_Depth => grid_Create( iNX=MODEL%number_of_columns, iNY=MODEL%number_of_rows, &
         rX0=MODEL%X_ll, rY0=MODEL%Y_ll, &
-        rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+        rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )
 
     iNumActiveCells = ubound(MODEL%soil_storage_max,1)
 
@@ -585,7 +589,7 @@ contains
       sText = "RZ_"//asCharacter(iSoilsIndex)
       call PARAMS%get_parameters( sKey=sText, fValues=RZ )
       fMax_Rooting_Depth(:, iSoilsIndex) = RZ
-    enddo  
+    enddo
 
     call LOGS%WRITE( "Landuse Code |  Soils Code  | Number of Matches | Rooting Depth (ft)",   &
       iLogLevel = LOG_DEBUG, lEcho = lFALSE )
@@ -606,7 +610,7 @@ contains
 
            pRooting_Depth%rData = fMax_Rooting_Depth( iLUIndex, iSoilsIndex )
 
-         endwhere 
+         endwhere
 
       enddo
 
@@ -632,14 +636,14 @@ contains
     type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
 
     pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
-    
+
     if ( associated(pHSG) ) then
 
       if (associated( pHSG%pGrdBase) ) then
         MODEL%soil_group = pack( pHSG%pGrdBase%iData, MODEL%active )
       else
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
-      endif  
+      endif
 
     else
 
@@ -654,14 +658,14 @@ contains
 
       call LOGS%write( asCharacter(count(MODEL%soil_group == iIndex) )//" cells belong to soils group " &
         //asCharacter(iIndex), iLogLevel=LOG_DEBUG )
-      
-    end do    
+
+    end do
 
     call LOGS%write("", iLinesBefore=1, iLogLevel=LOG_DEBUG)
 
   end subroutine initialize_hydrologic_soil_groups
 
-!--------------------------------------------------------------------------------------------------  
+!--------------------------------------------------------------------------------------------------
 
   subroutine read_hydrologic_soil_groups
 
@@ -669,24 +673,24 @@ contains
     type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
 
     pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
-    
+
     if ( associated(pHSG) ) then
 
       call pHSG%getvalues()
       call grid_WriteArcGrid("Hydrologic_soil_groups__as_read_into_SWB.asc", pHSG%pGrdBase )
 
     else
-    
+
       call warn(sMessage="HYDROLOGIC_SOILS_GROUP dataset is flawed or missing.", lFatal=lTRUE,     &
         iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"  &
         //" been ~included in the control file for the HYDROLOGIC_SOILS_GROUP dataset.",           &
         lEcho = lTRUE )
 
-    endif    
+    endif
 
   end subroutine read_hydrologic_soil_groups
 
-!--------------------------------------------------------------------------------------------------  
+!--------------------------------------------------------------------------------------------------
 
   subroutine read_polygon_id()
 
@@ -703,24 +707,24 @@ contains
     type (GENERAL_GRID_T), pointer       :: pTempGrd
     integer (kind=c_int)                 :: index
 
-    
+
 
     pTempGrd => grid_Create( iNX=MODEL%number_of_columns, iNY=MODEL%number_of_rows, &
         rX0=MODEL%X_ll, rY0=MODEL%Y_ll, &
-        rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+        rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )
 
     any_problems = lTRUE
 
     do
 
       pPOLYGON_ID => DAT%find("POLYGON_ID")
-    
+
       if ( .not. associated( pPOLYGON_ID ) ) exit
 
       call pPOLYGON_ID%getvalues()
       call grid_WriteArcGrid("Polygon_ID__as_read_into_SWB.asc", pPOLYGON_ID%pGrdBase )
 
-      MODEL%polygon_id = pack( pPOLYGON_ID%pGrdBase%iData, MODEL%active )      
+      MODEL%polygon_id = pack( pPOLYGON_ID%pGrdBase%iData, MODEL%active )
 
       exit
 
@@ -747,9 +751,9 @@ contains
 
 !       if ( ubound( soil_moisture_storage, 1) == ubound( polygon_id, 1 ) )  any_problems = lFALSE
 
-!       exit     
+!       exit
 
-!     enddo    
+!     enddo
 
 !     print *, any_problems, ubound( polygon_id, 1), ubound( soil_moisture_storage, 1), ubound( rooting_depth_inches, 1 )
 !     call minmaxmean( soil_moisture_storage, "Max_soil_storage")
@@ -777,11 +781,11 @@ contains
 
 ! !$OMP END PARALLEL DO
 
-!     where ( MODEL%hwb_rooting_depth > 0.0_c_float ) 
+!     where ( MODEL%hwb_rooting_depth > 0.0_c_float )
 
 !       MODEL%hwb_awc_in_per_ft = MODEL%hwb_soil_storage_max / MODEL%hwb_rooting_depth
 
-!     end where  
+!     end where
 
 !     pTempGrd%rData = unpack( MODEL%hwb_rooting_depth, MODEL%active, MODEL%nodata_fill_value )
 
@@ -797,11 +801,11 @@ contains
 
 !     call grid_WriteArcGrid("Available_water_content__as_read_in_from_HWB_input__inches_per_foot.asc", pTempGrd )
 
-     call grid_Destroy( pTempGrd )  
+     call grid_Destroy( pTempGrd )
 
   end subroutine read_polygon_id
 
-!--------------------------------------------------------------------------------------------------  
+!--------------------------------------------------------------------------------------------------
 
   subroutine read_landuse_codes
 
@@ -809,20 +813,20 @@ contains
     type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
 
     pLULC => DAT%find("LAND_USE")
-    
+
     if ( associated(pLULC) ) then
 
       call pLULC%getvalues()
       call grid_WriteArcGrid("Landuse_land_cover__as_read_into_SWB.asc", pLULC%pGrdBase )
 
     else
-    
+
       call warn(sMessage="LAND_USE dataset is flawed or missing.", lFatal=lTRUE,         &
         iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"   &
         //" been ~included in the control file for the LAND_USE dataset.",               &
         lEcho = lTRUE )
 
-    endif    
+    endif
 
   end subroutine read_landuse_codes
 
@@ -854,12 +858,12 @@ contains
       call assert( associated( pDict ), "INTERNAL PROGRAMMING ERROR -- Attempted use of null poitner", &
         __SRCNAME__, __LINE__ )
       call CF%writeLine( trim( sGridSpecification ) )
-    
+
     else
 
       pDict => CF_DICT%get_entry(1)
 
-    endif  
+    endif
 
     do while ( associated( pDict ) )
 
@@ -867,7 +871,7 @@ contains
       call CF%writeLine( trim(pDict%key)//" "//sText )
       pDict => CF_DICT%get_next_entry()
 
-    enddo 
+    enddo
 
     if ( present( slExtraDirectives ) ) then
 
@@ -877,16 +881,16 @@ contains
 
         call CF%writeLine( trim( slExtraDirectives%get( iIndex ) ) )
 
-      enddo  
+      enddo
 
-    endif  
+    endif
 
-    call CF%close()      
+    call CF%close()
 
-  end subroutine write_control_file  
+  end subroutine write_control_file
 
 
-  subroutine read_control_file( sFilename ) 
+  subroutine read_control_file( sFilename )
 
     character (len=*), intent(in)    :: sFilename
 
@@ -895,14 +899,14 @@ contains
     integer (kind=c_int)  :: iStat
     type (ASCII_FILE_T) :: CF
 
-    ! open the control file and define the comment characters and delimiters to be used in 
+    ! open the control file and define the comment characters and delimiters to be used in
     ! parsing the ASCII text
     call CF%open( sFilename = sFilename, &
                   sCommentChars = "#%!+=|[{(", &
                   sDelimiters = "WHITESPACE", &
                   lHasHeader = .false._c_bool )
 
-    do 
+    do
 
       ! read in next line of the control file
       sRecord = CF%readLine()
@@ -927,20 +931,20 @@ contains
         call chomp( sRecord, sSubstring, CF%sDelimiters )
 
         do while ( len_trim( sSubString ) > 0 )
-          
+
           ! add the next directive snippet to dictionary entry data structure
           call CF_ENTRY%add_string( sSubstring )
 
           ! break off next directive for the current record
           call chomp( sRecord, sSubstring, CF%sDelimiters )
 
-        enddo  
+        enddo
 
         ! add the final entry to the dictionary data structure
         call CF_DICT%add_entry( CF_ENTRY )
 
-      endif  
-      
+      endif
+
     enddo
 
     ! close the control file
@@ -953,7 +957,7 @@ contains
 
 
   !> Generic routine to handle intake of gridded data.
-  !! 
+  !!
   !! @param[in]  sKey        Name for the data type being processed.
   !! @param[in]  lOptional   If lOptional is TRUE, kill model run eventually IF sKey
   !!                         does not match a known data type.
@@ -973,7 +977,7 @@ contains
 
     ! [ LOCALS ]
     type (STRING_LIST_T)                 :: myDirectives
-    type (STRING_LIST_T)                 :: myOptions  
+    type (STRING_LIST_T)                 :: myOptions
     integer (kind=c_int)                 :: iIndex
     character (len=:), allocatable       :: sCmdText
     character (len=:), allocatable       :: sArgText
@@ -997,18 +1001,18 @@ contains
     ! call myDirectives%print
 
     if ( myDirectives%count == 0 ) then
-    
+
       call LOGS%write("Your control file is missing gridded data relating to "//dquote(sKey)//".", &
         iLogLevel=LOG_ALL, lEcho=lFALSE )
-    
+
       if (.not. lOptional) then
         call warn("Your control file is missing gridded data relating to "//dquote(sKey)//".", &
           lFatal = lTRUE )
 
       endif
 
-    else  
-    
+    else
+
       ! allocate memory for a generic data_catalog_entry
       allocate(pENTRY, stat=iStat)
       call assert( iStat == 0, "Failed to allocate memory for the "//dquote(sKey)//" data structure", &
@@ -1035,7 +1039,7 @@ contains
         sArgText_1 = myOptions%get(1)
         sArgText_2 = myOptions%get(2)
 
-        ! first option is that the key value and directive are the same 
+        ! first option is that the key value and directive are the same
         ! (.e.g. "PRECIPITATION"; no trailing underscores or modifiers )
         ! MODEL is a grid definition directive
         if ( sCmdText .strequal. sKey ) then
@@ -1051,15 +1055,15 @@ contains
 
               call pENTRY%initialize(            &
                 sDescription=trim(sCmdText),     &
-                rConstant=asFloat(sArgText_2)  ) 
-              lGridPresent = lTRUE   
+                rConstant=asFloat(sArgText_2)  )
+              lGridPresent = lTRUE
 
             case ( DATATYPE_INT )
 
               call pENTRY%initialize(            &
                 sDescription=trim(sCmdText),     &
-                iConstant=asInt(sArgText_2)  ) 
-              lGridPresent = lTRUE   
+                iConstant=asInt(sArgText_2)  )
+              lGridPresent = lTRUE
 
             case default
 
@@ -1067,7 +1071,7 @@ contains
                 __SRCNAME__, __LINE__ )
 
             end select
-            
+
           elseif ( (sArgText_1 .strequal. "ARC_ASCII")              &
               .or. (sArgText_1 .strequal. "SURFER")                 &
               .or. (sArgText_1 .strequal. "ARC_GRID") ) then
@@ -1080,7 +1084,7 @@ contains
             lGridPresent = lTRUE
 
           elseif ( sArgText_1 .strequal. "NETCDF" ) then
-            
+
             call pENTRY%initialize_netcdf(    &
               sDescription=trim(sCmdText),    &
               sFilename = trim(sArgText_2),   &
@@ -1097,22 +1101,22 @@ contains
               lFatal = lTRUE, sHints="Valid options include "//dquote("ARC_ASCII")//", "//dquote("ARC_GRID") &
               //", "//dquote("SURFER")//", or "//dquote("NETCDF") )
 
-          endif  
+          endif
 
 
         elseif ( index( string=sCmdText, substring="_USE_MAJORITY_FILTER" ) > 0 ) then
 
           call pENTRY%set_majority_filter_flag( lTRUE )
 
-        elseif ( index( string=sCmdText, substring="_MONTHNAMES_CAPITALIZED" ) > 0 ) then          
+        elseif ( index( string=sCmdText, substring="_MONTHNAMES_CAPITALIZED" ) > 0 ) then
 
           pENTRY%iFilename_Monthname_Capitalization_Rule = FILE_TEMPLATE_CAPITALIZED_MONTHNAME
 
-        elseif ( index( string=sCmdText, substring="_MONTHNAMES_LOWERCASE" ) > 0 ) then          
+        elseif ( index( string=sCmdText, substring="_MONTHNAMES_LOWERCASE" ) > 0 ) then
 
           pENTRY%iFilename_Monthname_Capitalization_Rule = FILE_TEMPLATE_LOWERCASE_MONTHNAME
 
-        elseif ( index( string=sCmdText, substring="_MONTHNAMES_UPPERCASE" ) > 0 ) then          
+        elseif ( index( string=sCmdText, substring="_MONTHNAMES_UPPERCASE" ) > 0 ) then
 
           pENTRY%iFilename_Monthname_Capitalization_Rule = FILE_TEMPLATE_UPPERCASE_MONTHNAME
 
@@ -1160,7 +1164,7 @@ contains
 
           call pENTRY%set_make_local_archive(lTRUE)
 
-        elseif ( index( string=sCmdText, substring="_PROJECTION_DEFINITION" ) > 0 ) then 
+        elseif ( index( string=sCmdText, substring="_PROJECTION_DEFINITION" ) > 0 ) then
 
           call pENTRY%set_PROJ4( trim(sArgText) )
 
@@ -1191,32 +1195,32 @@ contains
           pENTRY%sMissingValuesOperator = trim(sArgText_1)
 
         elseif ( index( string=sCmdText, substring= "_MISSING_VALUES_ACTION") > 0 ) then
-          
+
           if (sArgText_1 .strequal. "ZERO") then
 
             pENTRY%iMissingValuesAction = MISSING_VALUES_ZERO_OUT
-          
+
           elseif (sArgText_1 .strequal. "MEAN" ) then
-          
+
             pENTRY%iMissingValuesAction = MISSING_VALUES_REPLACE_WITH_MEAN
-          
+
           else
-          
+
             call warn("Unknown missing value action supplied for " &
               //dquote(sKey)//" data: "//dquote(sArgText_1) )
-          
+
           endif
 
         elseif ( index( string=sCmdText, substring="_METHOD") > 0 ) then
 
           ! no operation; just keep SWB quiet about METHOD and it will be included in the
-          ! methods initialization section. 
+          ! methods initialization section.
 
         else
 
           call warn("Unknown directive detected in code at line "//asCharacter(__LINE__)//", file "//__SRCNAME__ &
             //". ~Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
- 
+
         endif
 
       enddo
@@ -1239,7 +1243,7 @@ contains
   subroutine initialize_grid_options()
 
     ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myOptions  
+    type (STRING_LIST_T)             :: myOptions
     integer (kind=c_int)             :: iIndex
     character (len=:), allocatable   :: sArgText
     integer (kind=c_int)             :: iStat
@@ -1262,7 +1266,7 @@ contains
     iNY = asInt( myOptions%get(2) )
     rX0 = asDouble( myOptions%get(3) )
     rY0 = asDouble( myOptions%get(4) )
-    
+
     if ( myOptions%count == 5 ) then
 
       rGridCellSize = asDouble( myOptions%get(5) )
@@ -1297,7 +1301,7 @@ contains
       call die(sMessage="Your control file is missing a BASE_PROJECTION_DEFINITION entry.",            &
          sHints="This version of SWB requires that you add a BASE_PROJECTION_DEFINITION entry "        &
          //"to your control file." )
-    endif  
+    endif
 
     ! dictionary entries are initially space-delimited; sArgText contains
     ! all dictionary entries present, concatenated, with a space between entries
@@ -1306,7 +1310,7 @@ contains
     ! echo the original directive and dictionary entries to the logfile
     call LOGS%write("> BASE_PROJECTION_DEFINITION "//sArgText, iLinesBefore=1)
 
-    ! BNDS is a module-level data structure that will be used in other modules to 
+    ! BNDS is a module-level data structure that will be used in other modules to
     ! supply bounding box information for the SWB project area
     BNDS%iNumCols = iNX
     BNDS%iNumRows = iNY
@@ -1327,7 +1331,7 @@ contains
 
     ! [ LOCALS ]
     type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions  
+    type (STRING_LIST_T)             :: myOptions
     integer (kind=c_int)             :: iIndex
     character (len=:), allocatable   :: sCmdText
     character (len=:), allocatable   :: sOptionText
@@ -1340,7 +1344,7 @@ contains
     lHaveEndDate = lFALSE
 
     myDirectives = CF_DICT%grep_keys("DATE")
-      
+
 !     if ( myDirectives%count < 2 ) then
 
 !       call warn(sMessage="Your control file seems to be missing START_DATE and/or END_DATE", &
@@ -1348,7 +1352,7 @@ contains
 !         //"~should be specified as mm/dd/yyyy.", lFatal = lTRUE, iLogLevel = LOG_ALL,        &
 !         lEcho = lTRUE )
 
-  
+
     call LOGS%set_loglevel( LOG_ALL )
     call LOGS%set_echo( lFALSE )
 
@@ -1407,25 +1411,25 @@ contains
       call LOGS%write("Model run end date set to:   "//SIM_DT%end%prettydate(), iTab=4, lEcho=lTRUE)
 
     else
-    
+
       call warn(sMessage="Your control file seems to be missing START_DATE and/or END_DATE", &
         sHints="Add a START_DATE and/or END_DATE directive to your control file. Date "      &
         //"~should be specified as mm/dd/yyyy.", lFatal = lTRUE, iLogLevel = LOG_ALL,        &
         lEcho = lTRUE )
-  
+
     endif
 
-  end subroutine initialize_start_and_end_dates 
+  end subroutine initialize_start_and_end_dates
 
 !--------------------------------------------------------------------------------------------------
 
   !> Find any parameter tables specified in the control file; process and store contents.
   !!
   !! Any control file entry that contains the text "LOOKUP_TABLE" is assumed to specify a parameter table
-  !! that needs to be read in and processed. 
+  !! that needs to be read in and processed.
   !!
   !! @note The entries given in the files are implicitly assumed to be in sorted order. For example, if the parameters
-  !! pertain to landuse codes, it is assumed that all table values are given in order from lowest to highest 
+  !! pertain to landuse codes, it is assumed that all table values are given in order from lowest to highest
   !! landuse code.
 
   subroutine initialize_parameter_tables()
@@ -1433,7 +1437,7 @@ contains
     ! [ LOCALS ]
     type (STRING_LIST_T)             :: myDirectives
     type (STRING_LIST_T)             :: myOptions
-    type (STRING_LIST_T)             :: slString  
+    type (STRING_LIST_T)             :: slString
     integer (kind=c_int)             :: iIndex
     character (len=:), allocatable   :: sCmdText
     character (len=:), allocatable   :: sOptionText
@@ -1449,14 +1453,14 @@ contains
     iCount = 0
 
     myDirectives = CF_DICT%grep_keys("LOOKUP_TABLE")
-      
+
     if ( myDirectives%count == 0 ) then
 
       call warn("Your control file seems to be missing the required lookup table(s).", &
         lFatal = lTRUE )
 
-    else  
-    
+    else
+
       call LOGS%set_loglevel( LOG_ALL )
       call LOGS%set_echo( lFALSE )
 
@@ -1488,15 +1492,15 @@ contains
 
             call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__SRCNAME__ &
               //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
-        
+
         endif
 
-      enddo  
+      enddo
 
       if ( iCount > 0 ) then
 
         call PARAMS%munge_file()
-        call PARAMS_DICT%print_all(iLogLevel=LOG_DEBUG, lEcho=lFALSE)       
+        call PARAMS_DICT%print_all(iLogLevel=LOG_DEBUG, lEcho=lFALSE)
 
       endif
 
@@ -1513,7 +1517,7 @@ contains
 
     ! [ LOCALS ]
     type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions  
+    type (STRING_LIST_T)             :: myOptions
     integer (kind=c_int)             :: iIndex
     integer (kind=c_int)             :: indx
     character (len=:), allocatable   :: sCmdText
@@ -1527,7 +1531,7 @@ contains
 
     ! obtain a list of control file directives whose key values contain the string sKey
     myDirectives = CF_DICT%grep_keys( trim(sKey) )
-      
+
     lFatal = .not. lOptional
 
     if ( myDirectives%count == 0 ) then
@@ -1535,8 +1539,8 @@ contains
       call warn("Your control file is missing any of the required directives relating to "//dquote(sKey)//" method.", &
         lFatal = lFatal, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
-    else  
-    
+    else
+
       call LOGS%set_loglevel( LOG_ALL )
       call LOGS%set_echo( lFALSE )
 
@@ -1575,12 +1579,88 @@ contains
           call MODEL%set_method_pointers( trim(sCmdText), argv_list )
 
         endif
-        
+
       enddo
-      
+
     endif
 
   end subroutine initialize_generic_method
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine initialize_program_options( )
+
+    ! [ LOCALS ]
+    type (STRING_LIST_T)             :: myDirectives
+    type (STRING_LIST_T)             :: myOptions
+    integer (kind=c_int)             :: iIndex
+    integer (kind=c_int)             :: indx
+    character (len=:), allocatable   :: sCmdText
+!    character (len=:), allocatable   :: sOptionText
+    type (STRING_LIST_T)             :: argv_list
+    character (len=:), allocatable   :: sArgText
+    integer (kind=c_int)             :: iStat
+    integer (kind=c_int)             :: status
+    logical (kind=c_bool)            :: lFatal
+    integer (kind=c_int)             :: num_elements
+    character (len=:), allocatable   :: Option_Name
+
+    ! obtain a list of control file directives whose key values contain the string sKey
+    myDirectives = CF_DICT%grep_keys( "OPTION" )
+
+    call LOGS%set_loglevel( LOG_ALL )
+    call LOGS%set_echo( lFALSE )
+
+    ! repeat MODEL process for each control file directive in list
+    do iIndex = 1, myDirectives%count
+
+      ! sCmdText contains an individual directive (e.g. TMAX NETCDF input/tmax_%0m_%0d_%0Y.nc )
+      sCmdText = myDirectives%get(iIndex)
+
+      ! For MODEL directive, obtain the associated dictionary entries
+      call CF_DICT%get_values(sCmdText, myOptions )
+
+      ! dictionary entries are initially space-delimited; sArgText contains
+      ! all dictionary entries present, concatenated, with a space between entries
+      sArgText = myOptions%get(1, myOptions%count )
+
+      ! echo the original directive and dictionary entries to the logfile
+      call LOGS%write("> "//sCmdText//" "//sArgText, iLinesBefore=1 )
+
+      ! most of the time, we only care about the first dictionary entry, obtained below
+!        sOptionText = myOptions%get(1)
+
+      num_elements = myOptions%count
+
+      call argv_list%clear()
+
+      do indx=1, myOptions%count
+        call argv_list%append( myOptions%get( indx ) )
+      enddo
+
+      ! Any entry in the control file that contains the substring "OPTION" will be
+      ! processed directly
+      if ( ( sCmdText .contains. "OPTION" ) ) then
+
+        Option_Name = argv_list%get(1)
+
+        select case ( Option_Name )
+
+          case ( "NO_LATLON_IN_OUTPUT" )
+
+            call set_output_latlon_option( lFALSE )
+            call LOGS%write("==> LATITUDE and LONGITUDE will *not* be included in output NetCDF files.", iLinesBefore=1 )
+
+        end select
+
+      endif
+
+    enddo
+
+  end subroutine initialize_program_options
+
+
+!--------------------------------------------------------------------------------------------------
 
 
   subroutine initialize_latitude()
@@ -1590,7 +1670,7 @@ contains
 
     pCOORD_GRD => grid_Create( iNX=MODEL%number_of_columns, iNY=MODEL%number_of_rows, &
         rX0=MODEL%X_ll, rY0=MODEL%Y_ll, &
-        rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+        rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )
 
     allocate ( MODEL%X(MODEL%number_of_columns ) )
     allocate ( MODEL%Y(MODEL%number_of_rows ) )
@@ -1600,12 +1680,12 @@ contains
 
     ! populating these in order to have them available later for use in writing results to NetCDF
     MODEL%X = pCOORD_GRD%rX( :, 1 )
-    MODEL%Y = pCOORD_GRD%rY( 1, : ) 
+    MODEL%Y = pCOORD_GRD%rY( 1, : )
 
     ! transform to unprojected (lat/lon) coordinate system
     call grid_Transform(pGrd=pCOORD_GRD, sFromPROJ4=MODEL%PROJ4_string, &
         sToPROJ4="+proj=lonlat +ellps=GRS80 +datum=WGS84 +no_defs" )
-    
+
     MODEL%latitude = pack( pCOORD_GRD%rY, MODEL%active )
 
     MODEL%X_lon = pCOORD_GRD%rX
@@ -1621,10 +1701,10 @@ contains
   end subroutine initialize_latitude
 
 !--------------------------------------------------------------------------------------------------
- 
+
   !> Match landuse codes from table with those contained in the gridded landuse.
   !!
-  !! This routine loops through all known 
+  !! This routine loops through all known
 
   subroutine initialize_landuse_codes()
 
@@ -1642,7 +1722,7 @@ contains
     call slList%append("LU_code")
     call slList%append("Landuse_Code")
     call slList%append("LULC_Code")
-    
+
     !> Determine how many landuse codes are present
     call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCodes, lFatal=TRUE )
 
@@ -1655,7 +1735,7 @@ contains
         MODEL%landuse_code = pack( pLULC%pGrdBase%iData, MODEL%active )
       else
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
-      endif  
+      endif
     else
       call die("Attempted use of NULL pointer. Failed to find LAND_USE data element.", &
         __SRCNAME__, __LINE__)
@@ -1664,8 +1744,8 @@ contains
     MODEL%landuse_index = -9999
     iCount = 0
 
-    ! only run through matching process if we've found a LU_Code entry in the 
-    ! parameter dictionary   
+    ! only run through matching process if we've found a LU_Code entry in the
+    ! parameter dictionary
     if ( all( iLandUseCodes >= 0 ) ) then
 
       do iIndex = 1, ubound(MODEL%landuse_code,1)
@@ -1687,7 +1767,7 @@ contains
           call LOGS%write("Failed to match landuse code "//asCharacter(MODEL%landuse_code(iIndex) ) &
             //" with a corresponding landuse code from lookup tables.", iLogLevel=LOG_ALL )
 
-      enddo    
+      enddo
 
       call LOGS%write("Matches were found between landuse grid value and table value for " &
         //asCharacter(iCount)//" cells out of a total of "//asCharacter(ubound(MODEL%landuse_code,1))//" active cells.", &
@@ -1695,7 +1775,7 @@ contains
 
       call slList%clear()
 
-    endif  
+    endif
 
     if ( count(MODEL%landuse_index < 0) > 0 ) &
       call warn(asCharacter(count(MODEL%landuse_index < 0))//" landuse codes had no match "        &
@@ -1703,7 +1783,7 @@ contains
       //"entry in the landuse lookup table for each unique code contained in your landuse grid." )
 
 
-  end subroutine initialize_landuse_codes 
+  end subroutine initialize_landuse_codes
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1744,8 +1824,8 @@ contains
         model%surface_storage_max = current_surface_storage_max
 
       end where
-      
-    enddo    
+
+    enddo
 
   end subroutine initialize_surface_storage_max
 

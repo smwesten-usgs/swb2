@@ -9,11 +9,11 @@ rm -f CPack*
 rm -f *.txt
 
 # set CMAKE-related and build-related variables
-export COMPILER_VERSION=5.3.0
+export COMPILER_VERSION=5.4.0
 export COMPILER_MAJ_VERSION=5
 export GCCBINDIR=$(locate bin/gcc-5 | grep "$COMPILER_VERSION")
 export LIBGFORTRANDIR=$(locate 5/libgfortran.a | grep "$COMPILER_VERSION")
-export LIBGCCDIR=$(locate "$COMPILER_VERSION"/libgcc.a)
+export LIBGCCDIR=$(locate "$COMPILER_VERSION/libgcc.a" | sed -e 's/\/libgcc.a//')
 export GCCDIR=$(locate bin/gfortran-5 | grep "$COMPILER_VERSION")
 export CMAKEROOT=/usr/bin/cmake
 export COMPILER_TRIPLET=x86_64-apple-darwin15.3.0
