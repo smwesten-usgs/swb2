@@ -9,15 +9,15 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 84)">
 <title>solar_calculations::relative_earth_sun_distance__d_r</title>
 <polygon fill="white" stroke="none" points="-4,4 -4,-84 670.103,-84 670.103,4 -4,4"/>
-<!-- Node20 -->
-<g id="node1" class="node"><title>Node20</title>
+<!-- Node1 -->
+<g id="node1" class="node"><title>Node1</title>
 <polygon fill="#bfbfbf" stroke="black" points="0,-19 0,-60 112.615,-60 112.615,-19 0,-19"/>
 <text text-anchor="start" x="8" y="-47.2" font-family="Helvetica,sans-Serif" font-size="11.00">solar_calculations</text>
 <text text-anchor="start" x="8" y="-36.2" font-family="Helvetica,sans-Serif" font-size="11.00">::relative_earth_sun</text>
 <text text-anchor="middle" x="56.3076" y="-25.2" font-family="Helvetica,sans-Serif" font-size="11.00">_distance__d_r</text>
 </g>
-<!-- Node21 -->
-<g id="node2" class="node"><title>Node21</title>
+<!-- Node2 -->
+<g id="node2" class="node"><title>Node2</title>
 <g id="a_node2"><a xlink:href="namespaceet____hargreaves__samani.html#a7e98ab45c36ffcbbd21626348162801c" target="_top" xlink:title="et__hargreaves_samani\l::et_hargreaves_calculate">
 <polygon fill="white" stroke="black" points="148.615,-49.5 148.615,-79.5 290.583,-79.5 290.583,-49.5 148.615,-49.5"/>
 <text text-anchor="start" x="156.615" y="-66.7" font-family="Helvetica,sans-Serif" font-size="11.00">et__hargreaves_samani</text>
@@ -25,27 +25,27 @@
 </a>
 </g>
 </g>
-<!-- Node20&#45;&gt;Node21 -->
-<g id="edge1" class="edge"><title>Node20&#45;&gt;Node21</title>
+<!-- Node1&#45;&gt;Node2 -->
+<g id="edge1" class="edge"><title>Node1&#45;&gt;Node2</title>
 <path fill="none" stroke="midnightblue" d="M122.935,-49.6722C131.345,-50.9757 139.981,-52.3143 148.459,-53.6284"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="123.233,-46.1767 112.815,-48.1036 122.161,-53.0941 123.233,-46.1767"/>
 </g>
-<!-- Node24 -->
-<g id="node5" class="node"><title>Node24</title>
-<g id="a_node5"><a xlink:href="namespaceet____jensen__haise.html#a7de54d9f265eb6dd1857ed2e18f98d2a" target="_top" xlink:title="et__jensen_haise::et\l_jh_calculate">
+<!-- Node5 -->
+<g id="node5" class="node"><title>Node5</title>
+<g id="a_node5"><a xlink:href="namespaceet____jensen__haise.html#a0f89e1d331fb1f00a6623dee62758dde" target="_top" xlink:title="et__jensen_haise::et\l_jh_calculate">
 <polygon fill="white" stroke="black" points="160.837,-0.5 160.837,-30.5 278.362,-30.5 278.362,-0.5 160.837,-0.5"/>
 <text text-anchor="start" x="168.837" y="-17.7" font-family="Helvetica,sans-Serif" font-size="11.00">et__jensen_haise::et</text>
 <text text-anchor="middle" x="219.599" y="-6.7" font-family="Helvetica,sans-Serif" font-size="11.00">_jh_calculate</text>
 </a>
 </g>
 </g>
-<!-- Node20&#45;&gt;Node24 -->
-<g id="edge4" class="edge"><title>Node20&#45;&gt;Node24</title>
+<!-- Node1&#45;&gt;Node5 -->
+<g id="edge4" class="edge"><title>Node1&#45;&gt;Node5</title>
 <path fill="none" stroke="midnightblue" d="M122.777,-29.7582C135.366,-27.885 148.467,-25.9355 160.793,-24.1015"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="122.191,-26.3068 112.815,-31.2406 123.221,-33.2306 122.191,-26.3068"/>
 </g>
-<!-- Node22 -->
-<g id="node3" class="node"><title>Node22</title>
+<!-- Node3 -->
+<g id="node3" class="node"><title>Node3</title>
 <g id="a_node3"><a xlink:href="namespacemodel__domain.html#a37864c313f4ed6b63b5e90f4ef3f2e1f" target="_top" xlink:title="model_domain::model\l_calculate_et_hargreaves">
 <polygon fill="white" stroke="black" points="331.482,-49.5 331.482,-79.5 473.456,-79.5 473.456,-49.5 331.482,-49.5"/>
 <text text-anchor="start" x="339.482" y="-66.7" font-family="Helvetica,sans-Serif" font-size="11.00">model_domain::model</text>
@@ -53,13 +53,13 @@
 </a>
 </g>
 </g>
-<!-- Node21&#45;&gt;Node22 -->
-<g id="edge2" class="edge"><title>Node21&#45;&gt;Node22</title>
+<!-- Node2&#45;&gt;Node3 -->
+<g id="edge2" class="edge"><title>Node2&#45;&gt;Node3</title>
 <path fill="none" stroke="midnightblue" d="M300.863,-64.5C311.016,-64.5 321.342,-64.5 331.32,-64.5"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="300.787,-61.0001 290.787,-64.5 300.787,-68.0001 300.787,-61.0001"/>
 </g>
-<!-- Node23 -->
-<g id="node4" class="node"><title>Node23</title>
+<!-- Node4 -->
+<g id="node4" class="node"><title>Node4</title>
 <g id="a_node4"><a xlink:href="namespacemodel__domain.html#aac78dbf26ba37cf86ebed4edd7acf89b" target="_top" xlink:title="model_domain::set_method\l_pointers_sub">
 <polygon fill="white" stroke="black" points="514.354,-24.5 514.354,-54.5 666.103,-54.5 666.103,-24.5 514.354,-24.5"/>
 <text text-anchor="start" x="522.354" y="-41.7" font-family="Helvetica,sans-Serif" font-size="11.00">model_domain::set_method</text>
@@ -67,13 +67,13 @@
 </a>
 </g>
 </g>
-<!-- Node22&#45;&gt;Node23 -->
-<g id="edge3" class="edge"><title>Node22&#45;&gt;Node23</title>
+<!-- Node3&#45;&gt;Node4 -->
+<g id="edge3" class="edge"><title>Node3&#45;&gt;Node4</title>
 <path fill="none" stroke="midnightblue" d="M483.741,-53.6967C493.873,-52.3332 504.208,-50.9423 514.252,-49.5905"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="483.14,-50.246 473.697,-55.0486 484.074,-57.1834 483.14,-50.246"/>
 </g>
-<!-- Node25 -->
-<g id="node6" class="node"><title>Node25</title>
+<!-- Node6 -->
+<g id="node6" class="node"><title>Node6</title>
 <g id="a_node6"><a xlink:href="namespacemodel__domain.html#aaa195a960abacf5088acc9ff3242847e" target="_top" xlink:title="model_domain::model\l_calculate_et_jensen_haise">
 <polygon fill="white" stroke="black" points="326.583,-0.5 326.583,-30.5 478.354,-30.5 478.354,-0.5 326.583,-0.5"/>
 <text text-anchor="start" x="334.583" y="-17.7" font-family="Helvetica,sans-Serif" font-size="11.00">model_domain::model</text>
@@ -81,13 +81,13 @@
 </a>
 </g>
 </g>
-<!-- Node24&#45;&gt;Node25 -->
-<g id="edge5" class="edge"><title>Node24&#45;&gt;Node25</title>
+<!-- Node5&#45;&gt;Node6 -->
+<g id="edge5" class="edge"><title>Node5&#45;&gt;Node6</title>
 <path fill="none" stroke="midnightblue" d="M288.964,-15.5C301.223,-15.5 314.059,-15.5 326.492,-15.5"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="288.823,-12.0001 278.823,-15.5 288.823,-19.0001 288.823,-12.0001"/>
 </g>
-<!-- Node25&#45;&gt;Node23 -->
-<g id="edge6" class="edge"><title>Node25&#45;&gt;Node23</title>
+<!-- Node6&#45;&gt;Node4 -->
+<g id="edge6" class="edge"><title>Node6&#45;&gt;Node4</title>
 <path fill="none" stroke="midnightblue" d="M488.506,-26.4867C497.09,-27.5957 505.763,-28.7163 514.23,-29.8103"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="488.855,-23.0028 478.489,-25.1925 487.958,-29.9451 488.855,-23.0028"/>
 </g>

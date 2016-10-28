@@ -4,7 +4,7 @@
 <area shape="rect" id="node4" href="$namespacenetcdf4__support.html#aa3df85f14e6fa58f3366e4985b2c1022" title="netcdf4_support::netcdf\l_close_file" alt="" coords="230,107,404,149"/>
 <area shape="rect" id="node7" href="$namespacenetcdf4__support.html#afc19e82781e3f11162bcc6ee0c244500" title="netcdf4_support::netcdf\l_date_within_range" alt="" coords="230,611,404,653"/>
 <area shape="rect" id="node8" href="$namespacenetcdf4__support.html#a997d4ec63d37cb56378ab434c9b3075b" title="netcdf4_support::netcdf\l_get_variable_slice" alt="" coords="230,341,404,382"/>
-<area shape="rect" id="node17" href="$namespacenetcdf4__support.html#a6d3d402059d71a8bd24a01dc6116ff7d" title="netcdf4_support::netcdf\l_open_and_prepare_as_input" alt="" coords="208,931,425,973"/>
+<area shape="rect" id="node17" href="$namespacenetcdf4__support.html#a137d06ed171ec8d77e5af2fbb44b0c4c" title="netcdf4_support::netcdf\l_open_and_prepare_as_input" alt="" coords="208,931,425,973"/>
 <area shape="rect" id="node43" href="$namespacenetcdf4__support.html#a7b3b3cf3aab614eb336e12694c5d76ef" title="netcdf4_support::netcdf\l_open_file" alt="" coords="230,677,404,718"/>
 <area shape="rect" id="node44" href="$namespacenetcdf4__support.html#a58a573e1ab72881162967438f2f16416" title="netcdf4_support::netcdf\l_update_time_starting_index" alt="" coords="212,1566,422,1607"/>
 <area shape="rect" id="node5" href="$namespacenetcdf4__support.html#ac8c7276a5849ae6d17ffef1787e3f234" title="netcdf4_support::nf_trap" alt="" coords="977,607,1157,633"/>
@@ -14,9 +14,9 @@
 <area shape="rect" id="node13" href="$namespacenetcdf4__support.html#a03478999542c85e3a93b618472e57409" title="netcdf4_support::nf\l_get_variable_slice_int" alt="" coords="487,311,657,353"/>
 <area shape="rect" id="node15" href="$namespacenetcdf4__support.html#a67ae6168c1f09c755c4e314978ec9ecf" title="netcdf4_support::nf\l_get_variable_slice_float" alt="" coords="481,246,664,287"/>
 <area shape="rect" id="node10" href="$namespacenetcdf4__support.html#a26ac7fa9681548ec954f9cec8fbfa3b2" title="netcdf4_support::nf\l_return_varindex" alt="" coords="745,238,891,279"/>
-<area shape="rect" id="node11" href="$namespacenetcdf4__support.html#a4c2bcc3b3c61e95a042b4ccd0455330a" title="netcdf4_support::nf\l_get_variable_array\l_as_vector_short" alt="" coords="743,77,894,133"/>
-<area shape="rect" id="node14" href="$namespacenetcdf4__support.html#adf0b3c18448e867fe9997beb238e34fd" title="netcdf4_support::nf\l_get_variable_array\l_as_vector_int" alt="" coords="743,304,894,360"/>
-<area shape="rect" id="node16" href="$namespacenetcdf4__support.html#ac3c409eb9f982ba5d379b805a6477d03" title="netcdf4_support::nf\l_get_variable_array\l_as_vector_float" alt="" coords="743,157,894,213"/>
+<area shape="rect" id="node11" href="$namespacenetcdf4__support.html#a39ec664145f0d0a54d69abafd51a4226" title="netcdf4_support::nf\l_get_variable_array\l_as_vector_short" alt="" coords="743,77,894,133"/>
+<area shape="rect" id="node14" href="$namespacenetcdf4__support.html#a766a0f03c04ffa213abf8311ba8f9f85" title="netcdf4_support::nf\l_get_variable_array\l_as_vector_int" alt="" coords="743,304,894,360"/>
+<area shape="rect" id="node16" href="$namespacenetcdf4__support.html#ad8273174f9f1c33842425cb4a46a4339" title="netcdf4_support::nf\l_get_variable_array\l_as_vector_float" alt="" coords="743,157,894,213"/>
 <area shape="rect" id="node18" href="$namespacenetcdf4__support.html#a35f14663565a2db3b4cb3fc4d626fb11" title="netcdf4_support::nf\l_open_file" alt="" coords="499,873,646,914"/>
 <area shape="rect" id="node19" href="$namespacenetcdf4__support.html#ae3647a050723866e061cd0b58a013985" title="netcdf4_support::netcdf\l_dump_cdl" alt="" coords="731,1262,905,1303"/>
 <area shape="rect" id="node20" href="$namespacenetcdf4__support.html#acde440e1ad302ddd5efacb2aa46e4020" title="netcdf4_support::nf\l_populate_dimension\l_struct" alt="" coords="738,828,898,884"/>
@@ -36,10 +36,10 @@
 <area shape="rect" id="node21" href="$namespaceconstants__and__conversions.html#adeac78899e44bc3d58e26397fa64e4a7" title="constants_and_conversions\l::c_to_fortran_string" alt="" coords="965,966,1168,1007"/>
 <area shape="rect" id="node23" href="$namespacenetcdf4__support.html#aa2d6e99c4cd59ef92c2878aa06c4a67e" title="netcdf4_support::nf\l_populate_attribute\l_struct" alt="" coords="745,959,891,1015"/>
 <area shape="rect" id="node26" href="$namespacenetcdf4__support.html#a7138fa9ca363dd10d3601c64e7063f6a" title="netcdf4_support::nf\l_return_dimsize" alt="" coords="745,435,891,477"/>
-<area shape="rect" id="node27" href="$namespacenetcdf4__support.html#a15a33a5fbda012f0797b71099650b68d" title="netcdf4_support::nf\l_get_variable_vector_short" alt="" coords="719,501,917,542"/>
-<area shape="rect" id="node28" href="$namespacenetcdf4__support.html#a075e4dfd64b2fa4af0d5412bb8d764b7" title="netcdf4_support::nf\l_get_variable_vector_int" alt="" coords="727,566,909,607"/>
-<area shape="rect" id="node29" href="$namespacenetcdf4__support.html#a4714332166c986eb4acc7dda0aabe551" title="netcdf4_support::nf\l_get_variable_vector_float" alt="" coords="721,631,915,673"/>
-<area shape="rect" id="node30" href="$namespacenetcdf4__support.html#a8e61a749fc18f3f802e6b886cdfb4f6c" title="netcdf4_support::nf\l_get_variable_vector\l_double" alt="" coords="739,697,897,753"/>
+<area shape="rect" id="node27" href="$namespacenetcdf4__support.html#a71b923d03b66bdff21911ff7a745a326" title="netcdf4_support::nf\l_get_variable_vector_short" alt="" coords="719,501,917,542"/>
+<area shape="rect" id="node28" href="$namespacenetcdf4__support.html#a4324282002ee25b651a7cc12fb78bb51" title="netcdf4_support::nf\l_get_variable_vector_int" alt="" coords="727,566,909,607"/>
+<area shape="rect" id="node29" href="$namespacenetcdf4__support.html#a67f676d85d4d9212060053851fec7f22" title="netcdf4_support::nf\l_get_variable_vector_float" alt="" coords="721,631,915,673"/>
+<area shape="rect" id="node30" href="$namespacenetcdf4__support.html#a2aef556f129131e1afd5987ceda97c21" title="netcdf4_support::nf\l_get_variable_vector\l_double" alt="" coords="739,697,897,753"/>
 <area shape="rect" id="node33" href="$namespacedatetime.html#a9ac1a0a808a83a072ebc08cf0b3b4d8a" title="datetime::julian_day" alt="" coords="742,1089,894,1116"/>
 <area shape="rect" id="node39" href="$namespacenetcdf4__support.html#ac89586ef72d4dd0782811b6742e87270" title="netcdf4_support::nf\l_return_index_double" alt="" coords="736,1449,900,1490"/>
 <area shape="rect" id="node45" href="$namespacenetcdf4__support.html#ad9dc27ce4aee42f95a7cfc0f8c74166f" title="netcdf4_support::nf\l_julian_day_to_index_adj" alt="" coords="479,1566,666,1607"/>

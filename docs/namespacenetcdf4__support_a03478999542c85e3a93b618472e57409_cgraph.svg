@@ -55,15 +55,15 @@ var sectionId = 'dynsection-42';
 <g id="viewport">
 <title>netcdf4_support::nf_get_variable_slice_int</title>
 <polygon fill="white" stroke="none" points="-4,4 -4,-134 640.75,-134 640.75,4 -4,4"/>
-<!-- Node377 -->
-<g id="node1" class="node"><title>Node377</title>
+<!-- Node1 -->
+<g id="node1" class="node"><title>Node1</title>
 <polygon fill="#bfbfbf" stroke="black" points="0,-39 0,-69 127.907,-69 127.907,-39 0,-39"/>
 <text text-anchor="start" x="8" y="-56.2" font-family="Helvetica,sans-Serif" font-size="11.00">netcdf4_support::nf</text>
 <text text-anchor="middle" x="63.9534" y="-45.2" font-family="Helvetica,sans-Serif" font-size="11.00">_get_variable_slice_int</text>
 </g>
-<!-- Node378 -->
-<g id="node2" class="node"><title>Node378</title>
-<g id="a_node2"><a xlink:href="namespacenetcdf4__support.html#adf0b3c18448e867fe9997beb238e34fd" target="_top" xlink:title="netcdf4_support::nf\l_get_variable_array\l_as_vector_int">
+<!-- Node2 -->
+<g id="node2" class="node"><title>Node2</title>
+<g id="a_node2"><a xlink:href="namespacenetcdf4__support.html#a766a0f03c04ffa213abf8311ba8f9f85" target="_top" xlink:title="netcdf4_support::nf\l_get_variable_array\l_as_vector_int">
 <polygon fill="white" stroke="black" points="163.907,-88.5 163.907,-129.5 277.134,-129.5 277.134,-88.5 163.907,-88.5"/>
 <text text-anchor="start" x="171.907" y="-116.7" font-family="Helvetica,sans-Serif" font-size="11.00">netcdf4_support::nf</text>
 <text text-anchor="start" x="171.907" y="-105.7" font-family="Helvetica,sans-Serif" font-size="11.00">_get_variable_array</text>
@@ -71,13 +71,13 @@ var sectionId = 'dynsection-42';
 </a>
 </g>
 </g>
-<!-- Node377&#45;&gt;Node378 -->
-<g id="edge1" class="edge"><title>Node377&#45;&gt;Node378</title>
+<!-- Node1&#45;&gt;Node2 -->
+<g id="edge1" class="edge"><title>Node1&#45;&gt;Node2</title>
 <path fill="none" stroke="midnightblue" d="M107.19,-69.029C121.624,-74.1651 138.127,-80.0375 153.959,-85.6709"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="153.11,-89.0839 163.705,-89.1389 155.457,-82.4889 153.11,-89.0839"/>
 </g>
-<!-- Node381 -->
-<g id="node5" class="node"><title>Node381</title>
+<!-- Node5 -->
+<g id="node5" class="node"><title>Node5</title>
 <g id="a_node5"><a xlink:href="namespacenetcdf4__support.html#a26ac7fa9681548ec954f9cec8fbfa3b2" target="_top" xlink:title="netcdf4_support::nf\l_return_varindex">
 <polygon fill="white" stroke="black" points="165.432,-39 165.432,-69 275.609,-69 275.609,-39 165.432,-39"/>
 <text text-anchor="start" x="173.432" y="-56.2" font-family="Helvetica,sans-Serif" font-size="11.00">netcdf4_support::nf</text>
@@ -85,39 +85,39 @@ var sectionId = 'dynsection-42';
 </a>
 </g>
 </g>
-<!-- Node377&#45;&gt;Node381 -->
-<g id="edge4" class="edge"><title>Node377&#45;&gt;Node381</title>
+<!-- Node1&#45;&gt;Node5 -->
+<g id="edge4" class="edge"><title>Node1&#45;&gt;Node5</title>
 <path fill="none" stroke="midnightblue" d="M128.268,-54C137.016,-54 146.012,-54 154.786,-54"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="154.956,-57.5001 164.956,-54 154.956,-50.5001 154.956,-57.5001"/>
 </g>
-<!-- Node382 -->
-<g id="node6" class="node"><title>Node382</title>
+<!-- Node6 -->
+<g id="node6" class="node"><title>Node6</title>
 <g id="a_node6"><a xlink:href="namespaceexceptions.html#a84dd04476b06e0a398bfe6d106a82a4d" target="_top" xlink:title="exceptions::warn">
 <polygon fill="white" stroke="black" points="171.249,-0.5 171.249,-19.5 269.792,-19.5 269.792,-0.5 171.249,-0.5"/>
 <text text-anchor="middle" x="220.521" y="-6.7" font-family="Helvetica,sans-Serif" font-size="11.00">exceptions::warn</text>
 </a>
 </g>
 </g>
-<!-- Node377&#45;&gt;Node382 -->
-<g id="edge5" class="edge"><title>Node377&#45;&gt;Node382</title>
+<!-- Node1&#45;&gt;Node6 -->
+<g id="edge5" class="edge"><title>Node1&#45;&gt;Node6</title>
 <path fill="none" stroke="midnightblue" d="M117.714,-38.9808C136.752,-33.5613 158.005,-27.5114 176.148,-22.3468"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="177.213,-25.6825 185.873,-19.5783 175.297,-18.95 177.213,-25.6825"/>
 </g>
-<!-- Node379 -->
-<g id="node3" class="node"><title>Node379</title>
+<!-- Node3 -->
+<g id="node3" class="node"><title>Node3</title>
 <g id="a_node3"><a xlink:href="namespacenetcdf4__support.html#ac8c7276a5849ae6d17ffef1787e3f234" target="_top" xlink:title="netcdf4_support::nf_trap">
 <polygon fill="white" stroke="black" points="313.134,-99.5 313.134,-118.5 448.383,-118.5 448.383,-99.5 313.134,-99.5"/>
 <text text-anchor="middle" x="380.759" y="-105.7" font-family="Helvetica,sans-Serif" font-size="11.00">netcdf4_support::nf_trap</text>
 </a>
 </g>
 </g>
-<!-- Node378&#45;&gt;Node379 -->
-<g id="edge2" class="edge"><title>Node378&#45;&gt;Node379</title>
+<!-- Node2&#45;&gt;Node3 -->
+<g id="edge2" class="edge"><title>Node2&#45;&gt;Node3</title>
 <path fill="none" stroke="midnightblue" d="M277.309,-109C285.623,-109 294.315,-109 302.969,-109"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="303.087,-112.5 313.087,-109 303.087,-105.5 303.087,-112.5"/>
 </g>
-<!-- Node380 -->
-<g id="node4" class="node"><title>Node380</title>
+<!-- Node4 -->
+<g id="node4" class="node"><title>Node4</title>
 <g id="a_node4"><a xlink:href="namespaceconstants__and__conversions.html#ac13fba285229deab77131132e6f62caf" target="_top" xlink:title="constants_and_conversions\l::char_ptr_to_fortran_string">
 <polygon fill="white" stroke="black" points="484.383,-94 484.383,-124 636.75,-124 636.75,-94 484.383,-94"/>
 <text text-anchor="start" x="492.383" y="-111.2" font-family="Helvetica,sans-Serif" font-size="11.00">constants_and_conversions</text>
@@ -125,8 +125,8 @@ var sectionId = 'dynsection-42';
 </a>
 </g>
 </g>
-<!-- Node379&#45;&gt;Node380 -->
-<g id="edge3" class="edge"><title>Node379&#45;&gt;Node380</title>
+<!-- Node3&#45;&gt;Node4 -->
+<g id="edge3" class="edge"><title>Node3&#45;&gt;Node4</title>
 <path fill="none" stroke="midnightblue" d="M448.474,-109C456.831,-109 465.468,-109 474.063,-109"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="474.114,-112.5 484.114,-109 474.114,-105.5 474.114,-112.5"/>
 </g>

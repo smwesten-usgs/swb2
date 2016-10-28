@@ -9,14 +9,14 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 95.5)">
 <title>netcdf4_support::nf_return_index_double</title>
 <polygon fill="white" stroke="none" points="-4,4 -4,-95.5 834.681,-95.5 834.681,4 -4,4"/>
-<!-- Node559 -->
-<g id="node1" class="node"><title>Node559</title>
+<!-- Node1 -->
+<g id="node1" class="node"><title>Node1</title>
 <polygon fill="#bfbfbf" stroke="black" points="0,-27.5 0,-57.5 122.417,-57.5 122.417,-27.5 0,-27.5"/>
 <text text-anchor="start" x="8" y="-44.7" font-family="Helvetica,sans-Serif" font-size="11.00">netcdf4_support::nf</text>
 <text text-anchor="middle" x="61.2087" y="-33.7" font-family="Helvetica,sans-Serif" font-size="11.00">_return_index_double</text>
 </g>
-<!-- Node560 -->
-<g id="node2" class="node"><title>Node560</title>
+<!-- Node2 -->
+<g id="node2" class="node"><title>Node2</title>
 <g id="a_node2"><a xlink:href="namespacenetcdf4__support.html#ada0e720ee940ec9c0ec0f5f8b0de4fcd" target="_top" xlink:title="netcdf4_support::netcdf\l_coord_to_col_row">
 <polygon fill="white" stroke="black" points="158.417,-27.5 158.417,-57.5 289.386,-57.5 289.386,-27.5 158.417,-27.5"/>
 <text text-anchor="start" x="166.417" y="-44.7" font-family="Helvetica,sans-Serif" font-size="11.00">netcdf4_support::netcdf</text>
@@ -24,27 +24,27 @@
 </a>
 </g>
 </g>
-<!-- Node559&#45;&gt;Node560 -->
-<g id="edge1" class="edge"><title>Node559&#45;&gt;Node560</title>
+<!-- Node1&#45;&gt;Node2 -->
+<g id="edge1" class="edge"><title>Node1&#45;&gt;Node2</title>
 <path fill="none" stroke="midnightblue" d="M132.744,-42.5C141.222,-42.5 149.848,-42.5 158.237,-42.5"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="132.502,-39.0001 122.502,-42.5 132.502,-46.0001 132.502,-39.0001"/>
 </g>
-<!-- Node561 -->
-<g id="node3" class="node"><title>Node561</title>
-<g id="a_node3"><a xlink:href="namespacenetcdf4__support.html#a6d3d402059d71a8bd24a01dc6116ff7d" target="_top" xlink:title="netcdf4_support::netcdf\l_open_and_prepare_as_input">
+<!-- Node3 -->
+<g id="node3" class="node"><title>Node3</title>
+<g id="a_node3"><a xlink:href="namespacenetcdf4__support.html#a137d06ed171ec8d77e5af2fbb44b0c4c" target="_top" xlink:title="netcdf4_support::netcdf\l_open_and_prepare_as_input">
 <polygon fill="white" stroke="black" points="325.386,-27.5 325.386,-57.5 488.183,-57.5 488.183,-27.5 325.386,-27.5"/>
 <text text-anchor="start" x="333.386" y="-44.7" font-family="Helvetica,sans-Serif" font-size="11.00">netcdf4_support::netcdf</text>
 <text text-anchor="middle" x="406.784" y="-33.7" font-family="Helvetica,sans-Serif" font-size="11.00">_open_and_prepare_as_input</text>
 </a>
 </g>
 </g>
-<!-- Node560&#45;&gt;Node561 -->
-<g id="edge2" class="edge"><title>Node560&#45;&gt;Node561</title>
+<!-- Node2&#45;&gt;Node3 -->
+<g id="edge2" class="edge"><title>Node2&#45;&gt;Node3</title>
 <path fill="none" stroke="midnightblue" d="M299.603,-42.5C308.029,-42.5 316.643,-42.5 325.141,-42.5"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="299.438,-39.0001 289.438,-42.5 299.438,-46.0001 299.438,-39.0001"/>
 </g>
-<!-- Node562 -->
-<g id="node4" class="node"><title>Node562</title>
+<!-- Node4 -->
+<g id="node4" class="node"><title>Node4</title>
 <g id="a_node4"><a xlink:href="namespacedata__catalog__entry.html#aeb285131f87ed64deba0a9041a9c6405" target="_top" xlink:title="data_catalog_entry\l::getvalues_dynamic\l_netcdf_sub">
 <polygon fill="white" stroke="black" points="546.508,-50 546.508,-91 662.786,-91 662.786,-50 546.508,-50"/>
 <text text-anchor="start" x="554.508" y="-78.2" font-family="Helvetica,sans-Serif" font-size="11.00">data_catalog_entry</text>
@@ -53,13 +53,13 @@
 </a>
 </g>
 </g>
-<!-- Node561&#45;&gt;Node562 -->
-<g id="edge3" class="edge"><title>Node561&#45;&gt;Node562</title>
+<!-- Node3&#45;&gt;Node4 -->
+<g id="edge3" class="edge"><title>Node3&#45;&gt;Node4</title>
 <path fill="none" stroke="midnightblue" d="M498.43,-55.4585C514.787,-57.7968 531.417,-60.1741 546.48,-62.3275"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="498.692,-51.9604 488.297,-54.0099 497.701,-58.8899 498.692,-51.9604"/>
 </g>
-<!-- Node564 -->
-<g id="node6" class="node"><title>Node564</title>
+<!-- Node6 -->
+<g id="node6" class="node"><title>Node6</title>
 <g id="a_node6"><a xlink:href="namespacedata__catalog__entry.html#ac3e1f0d9d9e146fbb77c0084e1e9fc14" target="_top" xlink:title="data_catalog_entry\l::getvalues_static_netcdf_sub">
 <polygon fill="white" stroke="black" points="524.183,-0.5 524.183,-30.5 685.111,-30.5 685.111,-0.5 524.183,-0.5"/>
 <text text-anchor="start" x="532.183" y="-17.7" font-family="Helvetica,sans-Serif" font-size="11.00">data_catalog_entry</text>
@@ -67,13 +67,13 @@
 </a>
 </g>
 </g>
-<!-- Node561&#45;&gt;Node564 -->
-<g id="edge5" class="edge"><title>Node561&#45;&gt;Node564</title>
+<!-- Node3&#45;&gt;Node6 -->
+<g id="edge5" class="edge"><title>Node3&#45;&gt;Node6</title>
 <path fill="none" stroke="midnightblue" d="M498.335,-30.0175C506.929,-28.8327 515.6,-27.6375 524.079,-26.4686"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="497.726,-26.5683 488.297,-31.4012 498.682,-33.5027 497.726,-26.5683"/>
 </g>
-<!-- Node563 -->
-<g id="node5" class="node"><title>Node563</title>
+<!-- Node5 -->
+<g id="node5" class="node"><title>Node5</title>
 <g id="a_node5"><a xlink:href="namespacedata__catalog__entry.html#a9e0a89ab19a5bfd61f2dfb8265648234" target="_top" xlink:title="data_catalog_entry\l::getvalues_sub">
 <polygon fill="white" stroke="black" points="721.111,-27.5 721.111,-57.5 830.681,-57.5 830.681,-27.5 721.111,-27.5"/>
 <text text-anchor="start" x="729.111" y="-44.7" font-family="Helvetica,sans-Serif" font-size="11.00">data_catalog_entry</text>
@@ -81,13 +81,13 @@
 </a>
 </g>
 </g>
-<!-- Node562&#45;&gt;Node563 -->
-<g id="edge4" class="edge"><title>Node562&#45;&gt;Node563</title>
+<!-- Node4&#45;&gt;Node5 -->
+<g id="edge4" class="edge"><title>Node4&#45;&gt;Node5</title>
 <path fill="none" stroke="midnightblue" d="M673.25,-59.3161C689.149,-56.6858 705.884,-53.9172 721.083,-51.4027"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="672.242,-55.9351 662.947,-61.0205 673.384,-62.8413 672.242,-55.9351"/>
 </g>
-<!-- Node564&#45;&gt;Node563 -->
-<g id="edge6" class="edge"><title>Node564&#45;&gt;Node563</title>
+<!-- Node6&#45;&gt;Node5 -->
+<g id="edge6" class="edge"><title>Node6&#45;&gt;Node5</title>
 <path fill="none" stroke="midnightblue" d="M695.454,-29.8267C704.08,-31.2028 712.634,-32.5674 720.756,-33.8631"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="695.742,-26.3285 685.316,-28.2094 694.64,-33.2411 695.742,-26.3285"/>
 </g>

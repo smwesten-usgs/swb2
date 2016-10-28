@@ -57,11 +57,12 @@
     </tab>tab>
 
     <tab type="usergroup" url="@ref appendixes" title="SWB Reference">
-       <tab type="user" url="@ref appendix_1_data_and_param_requirements" title="Data and Parameter Requirements by Process Option"/>
-       <tab type="user" url="@ref appendix_2_control_file_directives_original_swb" title="Complete List of Control File Directives: Version 1.0"/>
-       <tab type="user" url="@ref appendix_2_control_file_directives_version_2" title="Complete List of Control File Directives: Version 2.0"/>
-       <tab type="user" url="@ref appendix_4_control_file_settings_for_specific_datasets" title="Control File Settings for Specific Gridded Datasets"/>
-       <tab type="user" url="@ref appendix_5_earlier_SM_relations" title="Previous implementations of soil-moisture retention relations."/>
+       <tab type="user" url="@ref appendix_1_data_and_param_requirements" title="Data and parameter requirements by process option"/>
+       <tab type="user" url="@ref appendix_2_control_file_directives_original_swb" title="Complete list of control file directives: Version 1.0"/>
+       <tab type="user" url="@ref appendix_2_control_file_directives_version_2" title="Complete List of control file directives: Version 2.0"/>
+       <tab type="user" url="@ref appendix_3_definition_of_SWB2_parameters" title="Definition of SWB 2.0 parameters"/>
+       <tab type="user" url="@ref appendix_4_example_new_climate_data_source" title="Example control file directives for a new climate data source"/>
+       <tab type="user" url="@ref appendix_5_earlier_SM_relations" title="Previous implementations of soil-moisture retention relations"/>
     </tab>
 
 

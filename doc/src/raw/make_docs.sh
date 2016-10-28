@@ -28,11 +28,12 @@ function make_doc() {
   MASK=$1
   OUTPUT_FILE=$2
 
-  pandoc --from=markdown                                                      \
+  pandoc                                                                      \
          --filter pandoc-crossref                                             \
          --filter pandoc-citeproc                                             \
          --reference-docx="$REFERENCE_DOCX"                                   \
          --bibliography="$BIB_FILE"                                           \
+         --include-after-body=appendices.md                                   \
          --csl="$CSL_FILE"                                                    \
          -m                                                                   \
          --output="$OUTPUT_FILE"                                              \
@@ -134,19 +135,20 @@ for filename in [0,A]0*.md; do
     sed -Eie 's/\\\]/\]/g' ../to_doxygen/$filename
 done
 
+
+# Process main text and appendices separately;
+# tack on appendices with "include_after_body" flag.
+# process just the appendices; output is Markdown
+echo "Creating Markdown version of documentation: stage 1 - APPENDICES"
+pandoc                                                                      \
+       -m                                                                   \
+       --output="appendices.md"                                             \
+       metadata.yaml `ls ../to_docx/A0*.md`
+
+
 # For Word, supply main text + appendix filenames to pandoc
 echo "Creating Word version of the documentation."
 make_doc '../to_docx/?0*.md' 'report.docx'
-
-# For LaTeX: process main text and appendices separately;
-# tack on appendices with "include_after_body" flag.
-# process just the appendices; output is LaTeX
-echo "Creating LaTeX version of documentation: stage 1 - APPENDICES"
-pandoc --from=markdown                                                      \
-       --latex-engine=xelatex                                               \
-       -m                                                                   \
-       --output="appendices.tex"                                            \
-       metadata.yaml `ls ../to_docx/A0*.md`
 
 # now produce the complete LaTeX file; appendices are tacked on after the bibliography
 echo "Creating LaTeX version of documentation: stage 2 - MAIN DOCUMENT"
@@ -157,7 +159,7 @@ pandoc --from=markdown                                                     \
       --csl="$CSL_FILE"                                                    \
       --latex-engine=xelatex                                               \
       --template="$REFERENCE_TEX"                                          \
-      --include-after-body=appendices.tex                                  \
+      --include-after-body=appendices.md                                   \
       -m                                                                   \
       --output="report.tex"                                                \
       metadata.yaml `ls ../to_docx/00*.md`
@@ -173,7 +175,7 @@ pandoc --from=markdown                                                     \
       --verbose                                                            \
       --template="$REFERENCE_TEX"                                          \
       -m                                                                   \
-      --include-after-body=appendices.tex                                  \
+      --include-after-body=appendices.md                                   \
       --output="report.pdf"                                                \
       metadata.yaml `ls ../to_docx/00*.md`
 

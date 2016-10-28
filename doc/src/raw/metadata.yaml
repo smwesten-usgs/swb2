@@ -2,6 +2,7 @@
 figPrefix:
   - "Fig."
   - "Figs."
+titleDelim:          '.'
 geometry:            'left=1.25in, top=1.5in, bottom=1.5in'
 fontsize:            '12pt'
 mainfont:            'Times New Roman'

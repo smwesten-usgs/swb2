@@ -2,7 +2,7 @@ var structfile__operations_1_1ascii__file__t =
 [
     [ "open_file_read_access_sub", "structfile__operations_1_1ascii__file__t.html#abfe8ce1d5f84b529c31635eb2dbd8457", null ],
     [ "open_file_write_access_sub", "structfile__operations_1_1ascii__file__t.html#ad19c62536815c486639e7f33b887b988", null ],
-    [ "open", "structfile__operations_1_1ascii__file__t.html#a36be8f8c91a5af7770e795f7f1564ab3", null ],
+    [ "open", "structfile__operations_1_1ascii__file__t.html#ac55a54c4d6d0bd2e1e0f9377d40452c9", null ],
     [ "close_file_sub", "structfile__operations_1_1ascii__file__t.html#a7c2f8d52a5b286384c23d353070bfc1b", null ],
     [ "close", "structfile__operations_1_1ascii__file__t.html#ac095c221541bb093e12635eb1efccfad", null ],
     [ "is_file_open_fn", "structfile__operations_1_1ascii__file__t.html#acbf202debddc10a0a78915cdf52ac3de", null ],

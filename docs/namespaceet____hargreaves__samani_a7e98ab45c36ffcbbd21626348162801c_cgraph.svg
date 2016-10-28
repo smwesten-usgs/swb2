@@ -9,14 +9,14 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 313.5)">
 <title>et__hargreaves_samani::et_hargreaves_calculate</title>
 <polygon fill="white" stroke="none" points="-4,4 -4,-313.5 344.707,-313.5 344.707,4 -4,4"/>
-<!-- Node2 -->
-<g id="node1" class="node"><title>Node2</title>
+<!-- Node1 -->
+<g id="node1" class="node"><title>Node1</title>
 <polygon fill="#bfbfbf" stroke="black" points="0,-153 0,-183 141.968,-183 141.968,-153 0,-153"/>
 <text text-anchor="start" x="8" y="-170.2" font-family="Helvetica,sans-Serif" font-size="11.00">et__hargreaves_samani</text>
 <text text-anchor="middle" x="70.9841" y="-159.2" font-family="Helvetica,sans-Serif" font-size="11.00">::et_hargreaves_calculate</text>
 </g>
-<!-- Node3 -->
-<g id="node2" class="node"><title>Node3</title>
+<!-- Node2 -->
+<g id="node2" class="node"><title>Node2</title>
 <g id="a_node2"><a xlink:href="namespacemeteorological__calculations.html#a009361cfc8abf0bb0e40a04ff5f57043" target="_top" xlink:title="meteorological_calculations\l::equivalent_evaporation">
 <polygon fill="white" stroke="black" points="183.772,-279 183.772,-309 334.903,-309 334.903,-279 183.772,-279"/>
 <text text-anchor="start" x="191.772" y="-296.2" font-family="Helvetica,sans-Serif" font-size="11.00">meteorological_calculations</text>
@@ -24,13 +24,13 @@
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node3 -->
-<g id="edge1" class="edge"><title>Node2&#45;&gt;Node3</title>
+<!-- Node1&#45;&gt;Node2 -->
+<g id="edge1" class="edge"><title>Node1&#45;&gt;Node2</title>
 <path fill="none" stroke="midnightblue" d="M83.6644,-183.136C101.595,-205.361 138.046,-246.704 177.968,-270 180.951,-271.741 184.072,-273.365 187.278,-274.879"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="185.932,-278.11 196.5,-278.861 188.707,-271.684 185.932,-278.11"/>
 </g>
-<!-- Node4 -->
-<g id="node3" class="node"><title>Node4</title>
+<!-- Node3 -->
+<g id="node3" class="node"><title>Node3</title>
 <g id="a_node3"><a xlink:href="namespaceet____hargreaves__samani.html#a3e3e065378cd6ead7b71c9ba4e603ff0" target="_top" xlink:title="et__hargreaves_samani\l::et0_hargreaves">
 <polygon fill="white" stroke="black" points="192.328,-230 192.328,-260 326.347,-260 326.347,-230 192.328,-230"/>
 <text text-anchor="start" x="200.328" y="-247.2" font-family="Helvetica,sans-Serif" font-size="11.00">et__hargreaves_samani</text>
@@ -38,13 +38,13 @@
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node4 -->
-<g id="edge2" class="edge"><title>Node2&#45;&gt;Node4</title>
+<!-- Node1&#45;&gt;Node3 -->
+<g id="edge2" class="edge"><title>Node1&#45;&gt;Node3</title>
 <path fill="none" stroke="midnightblue" d="M98.838,-183.059C119.915,-194.475 150.233,-210.02 177.968,-221 183.046,-223.01 188.36,-224.946 193.733,-226.787"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="192.836,-230.177 203.429,-229.993 195.033,-223.53 192.836,-230.177"/>
 </g>
-<!-- Node5 -->
-<g id="node4" class="node"><title>Node5</title>
+<!-- Node4 -->
+<g id="node4" class="node"><title>Node4</title>
 <g id="a_node4"><a xlink:href="namespacesolar__calculations.html#aa61d6954b032ce851013718b57cd6b2d" target="_top" xlink:title="Calculate extraterrestrial radiation given latitude and time of year. ">
 <polygon fill="white" stroke="black" points="177.968,-181 177.968,-211 340.707,-211 340.707,-181 177.968,-181"/>
 <text text-anchor="start" x="185.968" y="-198.2" font-family="Helvetica,sans-Serif" font-size="11.00">solar_calculations</text>
@@ -52,13 +52,13 @@
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node5 -->
-<g id="edge3" class="edge"><title>Node2&#45;&gt;Node5</title>
+<!-- Node1&#45;&gt;Node4 -->
+<g id="edge3" class="edge"><title>Node1&#45;&gt;Node4</title>
 <path fill="none" stroke="midnightblue" d="M142.171,-178.546C150.55,-179.805 159.195,-181.104 167.809,-182.398"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="167.481,-185.888 177.89,-183.913 168.521,-178.965 167.481,-185.888"/>
 </g>
-<!-- Node6 -->
-<g id="node5" class="node"><title>Node6</title>
+<!-- Node5 -->
+<g id="node5" class="node"><title>Node5</title>
 <g id="a_node5"><a xlink:href="namespacesolar__calculations.html#a474867a73dd025f53cde7f7e2b871b47" target="_top" xlink:title="Calculate the inverse relative Earth&#45;Sun distance for a given day of the year. ">
 <polygon fill="white" stroke="black" points="203.03,-120.5 203.03,-161.5 315.645,-161.5 315.645,-120.5 203.03,-120.5"/>
 <text text-anchor="start" x="211.03" y="-148.7" font-family="Helvetica,sans-Serif" font-size="11.00">solar_calculations</text>
@@ -67,13 +67,13 @@
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node6 -->
-<g id="edge4" class="edge"><title>Node2&#45;&gt;Node6</title>
+<!-- Node1&#45;&gt;Node5 -->
+<g id="edge4" class="edge"><title>Node1&#45;&gt;Node5</title>
 <path fill="none" stroke="midnightblue" d="M142.171,-157.831C158.832,-155.417 176.539,-152.851 192.975,-150.47"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="193.629,-153.912 203.024,-149.014 192.625,-146.984 193.629,-153.912"/>
 </g>
-<!-- Node7 -->
-<g id="node6" class="node"><title>Node7</title>
+<!-- Node6 -->
+<g id="node6" class="node"><title>Node6</title>
 <g id="a_node6"><a xlink:href="namespacesolar__calculations.html#a24590af8aedbf0702f0cb6d188edb1f2" target="_top" xlink:title="Calculate the solar declination for a given day of the year. ">
 <polygon fill="white" stroke="black" points="207.004,-60.5 207.004,-101.5 311.67,-101.5 311.67,-60.5 207.004,-60.5"/>
 <text text-anchor="start" x="215.004" y="-88.7" font-family="Helvetica,sans-Serif" font-size="11.00">solar_calculations</text>
@@ -82,13 +82,13 @@
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node7 -->
-<g id="edge5" class="edge"><title>Node2&#45;&gt;Node7</title>
+<!-- Node1&#45;&gt;Node6 -->
+<g id="edge5" class="edge"><title>Node1&#45;&gt;Node6</title>
 <path fill="none" stroke="midnightblue" d="M97.6187,-152.938C118.781,-140.816 149.803,-123.759 177.968,-111 184.166,-108.192 190.712,-105.431 197.284,-102.789"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="198.866,-105.928 206.893,-99.0131 196.306,-99.4133 198.866,-105.928"/>
 </g>
-<!-- Node8 -->
-<g id="node7" class="node"><title>Node8</title>
+<!-- Node7 -->
+<g id="node7" class="node"><title>Node7</title>
 <g id="a_node7"><a xlink:href="namespacesolar__calculations.html#a323a4fc9e85d45fc9de7ed1dcd9018e0" target="_top" xlink:title="Calculate sunrise/sunset angle, in RADIANS. ">
 <polygon fill="white" stroke="black" points="194.772,-0.5 194.772,-41.5 323.903,-41.5 323.903,-0.5 194.772,-0.5"/>
 <text text-anchor="start" x="202.772" y="-28.7" font-family="Helvetica,sans-Serif" font-size="11.00">solar_calculations</text>
@@ -97,8 +97,8 @@
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node8 -->
-<g id="edge6" class="edge"><title>Node2&#45;&gt;Node8</title>
+<!-- Node1&#45;&gt;Node7 -->
+<g id="edge6" class="edge"><title>Node1&#45;&gt;Node7</title>
 <path fill="none" stroke="midnightblue" d="M81.9603,-152.959C98.9484,-128.413 135.78,-79.616 177.968,-51 180.395,-49.3541 182.924,-47.7839 185.524,-46.2875"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="187.401,-49.2542 194.601,-41.4814 184.125,-43.0679 187.401,-49.2542"/>
 </g>

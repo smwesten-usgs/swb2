@@ -9,27 +9,27 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 73.5)">
 <title>polygon_summarize::perform_polygon_summarize</title>
 <polygon fill="white" stroke="none" points="-4,4 -4,-73.5 346.517,-73.5 346.517,4 -4,4"/>
-<!-- Node2 -->
-<g id="node1" class="node"><title>Node2</title>
+<!-- Node1 -->
+<g id="node1" class="node"><title>Node1</title>
 <polygon fill="#bfbfbf" stroke="black" points="0,-22.5 0,-52.5 158.452,-52.5 158.452,-22.5 0,-22.5"/>
 <text text-anchor="start" x="8" y="-39.7" font-family="Helvetica,sans-Serif" font-size="11.00">polygon_summarize::</text>
 <text text-anchor="middle" x="79.2261" y="-28.7" font-family="Helvetica,sans-Serif" font-size="11.00">perform_polygon_summarize</text>
 </g>
-<!-- Node3 -->
-<g id="node2" class="node"><title>Node3</title>
+<!-- Node2 -->
+<g id="node2" class="node"><title>Node2</title>
 <g id="a_node2"><a xlink:href="namespacepolygon__summarize.html#a6bc1dfa76f55b817c108fc2c6138b701" target="_top" xlink:title="polygon_summarize::mean">
 <polygon fill="white" stroke="black" points="194.452,-50 194.452,-69 342.517,-69 342.517,-50 194.452,-50"/>
 <text text-anchor="middle" x="268.484" y="-56.2" font-family="Helvetica,sans-Serif" font-size="11.00">polygon_summarize::mean</text>
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node3 -->
-<g id="edge1" class="edge"><title>Node2&#45;&gt;Node3</title>
+<!-- Node1&#45;&gt;Node2 -->
+<g id="edge1" class="edge"><title>Node1&#45;&gt;Node2</title>
 <path fill="none" stroke="midnightblue" d="M158.555,-46.7025C167.056,-47.7011 175.729,-48.7201 184.284,-49.7252"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="183.916,-53.2059 194.256,-50.8967 184.732,-46.2537 183.916,-53.2059"/>
 </g>
-<!-- Node4 -->
-<g id="node3" class="node"><title>Node4</title>
+<!-- Node3 -->
+<g id="node3" class="node"><title>Node3</title>
 <g id="a_node3"><a xlink:href="namespacepolygon__summarize.html#a601fe81c50acea7e8d5e7ba92e3cacb1" target="_top" xlink:title="polygon_summarize::\lmost_common_value">
 <polygon fill="white" stroke="black" points="208.21,-0.5 208.21,-30.5 328.759,-30.5 328.759,-0.5 208.21,-0.5"/>
 <text text-anchor="start" x="216.21" y="-17.7" font-family="Helvetica,sans-Serif" font-size="11.00">polygon_summarize::</text>
@@ -37,8 +37,8 @@
 </a>
 </g>
 </g>
-<!-- Node2&#45;&gt;Node4 -->
-<g id="edge2" class="edge"><title>Node2&#45;&gt;Node4</title>
+<!-- Node1&#45;&gt;Node3 -->
+<g id="edge2" class="edge"><title>Node1&#45;&gt;Node3</title>
 <path fill="none" stroke="midnightblue" d="M158.555,-28.2975C171.604,-26.7645 185.06,-25.1836 197.872,-23.6784"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="198.466,-27.1328 207.989,-22.4897 197.649,-20.1806 198.466,-27.1328"/>
 </g>

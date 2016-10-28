@@ -9,61 +9,61 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 81)">
 <title>model_initialize::initialize_start_and_end_dates</title>
 <polygon fill="white" stroke="none" points="-4,4 -4,-81 475.597,-81 475.597,4 -4,4"/>
-<!-- Node155 -->
-<g id="node1" class="node"><title>Node155</title>
+<!-- Node1 -->
+<g id="node1" class="node"><title>Node1</title>
 <polygon fill="#bfbfbf" stroke="black" points="0,-14 0,-44 136.447,-44 136.447,-14 0,-14"/>
 <text text-anchor="start" x="8" y="-31.2" font-family="Helvetica,sans-Serif" font-size="11.00">model_initialize::initialize</text>
 <text text-anchor="middle" x="68.2234" y="-20.2" font-family="Helvetica,sans-Serif" font-size="11.00">_start_and_end_dates</text>
 </g>
-<!-- Node156 -->
-<g id="node2" class="node"><title>Node156</title>
+<!-- Node2 -->
+<g id="node2" class="node"><title>Node2</title>
 <g id="a_node2"><a xlink:href="namespacedatetime.html#a9575f695885d806cc658b68cbdb75a70" target="_top" xlink:title="datetime::day_of_year">
 <polygon fill="white" stroke="black" points="172.447,-38.5 172.447,-57.5 297.292,-57.5 297.292,-38.5 172.447,-38.5"/>
 <text text-anchor="middle" x="234.869" y="-44.7" font-family="Helvetica,sans-Serif" font-size="11.00">datetime::day_of_year</text>
 </a>
 </g>
 </g>
-<!-- Node155&#45;&gt;Node156 -->
-<g id="edge1" class="edge"><title>Node155&#45;&gt;Node156</title>
+<!-- Node1&#45;&gt;Node2 -->
+<g id="edge1" class="edge"><title>Node1&#45;&gt;Node2</title>
 <path fill="none" stroke="midnightblue" d="M136.666,-36.7828C145.156,-37.7625 153.863,-38.7674 162.412,-39.7539"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="162.017,-43.2314 172.352,-40.9009 162.819,-36.2775 162.017,-43.2314"/>
 </g>
-<!-- Node159 -->
-<g id="node5" class="node"><title>Node159</title>
+<!-- Node5 -->
+<g id="node5" class="node"><title>Node5</title>
 <g id="a_node5"><a xlink:href="namespaceexceptions.html#a84dd04476b06e0a398bfe6d106a82a4d" target="_top" xlink:title="exceptions::warn">
 <polygon fill="white" stroke="black" points="185.598,-0.5 185.598,-19.5 284.141,-19.5 284.141,-0.5 185.598,-0.5"/>
 <text text-anchor="middle" x="234.869" y="-6.7" font-family="Helvetica,sans-Serif" font-size="11.00">exceptions::warn</text>
 </a>
 </g>
 </g>
-<!-- Node155&#45;&gt;Node159 -->
-<g id="edge4" class="edge"><title>Node155&#45;&gt;Node159</title>
+<!-- Node1&#45;&gt;Node5 -->
+<g id="edge4" class="edge"><title>Node1&#45;&gt;Node5</title>
 <path fill="none" stroke="midnightblue" d="M136.666,-21.2172C149.432,-19.744 162.692,-18.2138 175.162,-16.7748"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="175.89,-20.214 185.423,-15.5907 175.088,-13.2602 175.89,-20.214"/>
 </g>
-<!-- Node157 -->
-<g id="node3" class="node"><title>Node157</title>
+<!-- Node3 -->
+<g id="node3" class="node"><title>Node3</title>
 <g id="a_node3"><a xlink:href="namespacedatetime.html#a9d8dbfe179e1cc628e1b7ccec684e13a" target="_top" xlink:title="datetime::gregorian_date">
 <polygon fill="white" stroke="black" points="333.292,-57.5 333.292,-76.5 471.597,-76.5 471.597,-57.5 333.292,-57.5"/>
 <text text-anchor="middle" x="402.445" y="-63.7" font-family="Helvetica,sans-Serif" font-size="11.00">datetime::gregorian_date</text>
 </a>
 </g>
 </g>
-<!-- Node156&#45;&gt;Node157 -->
-<g id="edge2" class="edge"><title>Node156&#45;&gt;Node157</title>
+<!-- Node2&#45;&gt;Node3 -->
+<g id="edge2" class="edge"><title>Node2&#45;&gt;Node3</title>
 <path fill="none" stroke="midnightblue" d="M297.523,-55.0749C305.85,-56.0304 314.483,-57.021 323.052,-58.0043"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="322.727,-61.4899 333.061,-59.1528 323.525,-54.5355 322.727,-61.4899"/>
 </g>
-<!-- Node158 -->
-<g id="node4" class="node"><title>Node158</title>
+<!-- Node4 -->
+<g id="node4" class="node"><title>Node4</title>
 <g id="a_node4"><a xlink:href="namespacedatetime.html#a9ac1a0a808a83a072ebc08cf0b3b4d8a" target="_top" xlink:title="datetime::julian_day">
 <polygon fill="white" stroke="black" points="345.525,-19.5 345.525,-38.5 459.365,-38.5 459.365,-19.5 345.525,-19.5"/>
 <text text-anchor="middle" x="402.445" y="-25.7" font-family="Helvetica,sans-Serif" font-size="11.00">datetime::julian_day</text>
 </a>
 </g>
 </g>
-<!-- Node156&#45;&gt;Node158 -->
-<g id="edge3" class="edge"><title>Node156&#45;&gt;Node158</title>
+<!-- Node2&#45;&gt;Node4 -->
+<g id="edge3" class="edge"><title>Node2&#45;&gt;Node4</title>
 <path fill="none" stroke="midnightblue" d="M297.523,-40.9251C309.807,-39.5156 322.755,-38.0297 335.185,-36.6034"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="335.943,-40.0395 345.479,-35.4222 335.145,-33.0851 335.943,-40.0395"/>
 </g>

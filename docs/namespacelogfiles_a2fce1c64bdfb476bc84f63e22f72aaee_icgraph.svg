@@ -9,26 +9,26 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 35)">
 <title>logfiles::split</title>
 <polygon fill="white" stroke="none" points="-4,4 -4,-35 366.709,-35 366.709,4 -4,4"/>
-<!-- Node24 -->
-<g id="node1" class="node"><title>Node24</title>
+<!-- Node1 -->
+<g id="node1" class="node"><title>Node1</title>
 <polygon fill="#bfbfbf" stroke="black" points="0,-6 0,-25 75.9146,-25 75.9146,-6 0,-6"/>
 <text text-anchor="middle" x="37.9573" y="-12.2" font-family="Helvetica,sans-Serif" font-size="11.00">logfiles::split</text>
 </g>
-<!-- Node25 -->
-<g id="node2" class="node"><title>Node25</title>
+<!-- Node2 -->
+<g id="node2" class="node"><title>Node2</title>
 <g id="a_node2"><a xlink:href="namespacelogfiles.html#ae807d3b84516a40194bbe44ae47ef553" target="_top" xlink:title="Write multiple lines of output to Fortran logical unit. ">
 <polygon fill="white" stroke="black" points="111.915,-6 111.915,-25 231.84,-25 231.84,-6 111.915,-6"/>
 <text text-anchor="middle" x="171.877" y="-12.2" font-family="Helvetica,sans-Serif" font-size="11.00">logfiles::writemultiline</text>
 </a>
 </g>
 </g>
-<!-- Node24&#45;&gt;Node25 -->
-<g id="edge1" class="edge"><title>Node24&#45;&gt;Node25</title>
+<!-- Node1&#45;&gt;Node2 -->
+<g id="edge1" class="edge"><title>Node1&#45;&gt;Node2</title>
 <path fill="none" stroke="midnightblue" d="M86.2817,-15.5C94.5704,-15.5 103.287,-15.5 111.846,-15.5"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="86.0554,-12.0001 76.0554,-15.5 86.0554,-19.0001 86.0554,-12.0001"/>
 </g>
-<!-- Node26 -->
-<g id="node3" class="node"><title>Node26</title>
+<!-- Node3 -->
+<g id="node3" class="node"><title>Node3</title>
 <g id="a_node3"><a xlink:href="namespacelogfiles.html#a024cd0c9a38412fe0d2c7d83b5e7f908" target="_top" xlink:title="logfiles::write_to\l_logfiles_sub">
 <polygon fill="white" stroke="black" points="267.84,-0.5 267.84,-30.5 362.709,-30.5 362.709,-0.5 267.84,-0.5"/>
 <text text-anchor="start" x="275.84" y="-17.7" font-family="Helvetica,sans-Serif" font-size="11.00">logfiles::write_to</text>
@@ -36,8 +36,8 @@
 </a>
 </g>
 </g>
-<!-- Node25&#45;&gt;Node26 -->
-<g id="edge2" class="edge"><title>Node25&#45;&gt;Node26</title>
+<!-- Node2&#45;&gt;Node3 -->
+<g id="edge2" class="edge"><title>Node2&#45;&gt;Node3</title>
 <path fill="none" stroke="midnightblue" d="M242.188,-15.5C250.884,-15.5 259.609,-15.5 267.835,-15.5"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="242.023,-12.0001 232.023,-15.5 242.023,-19.0001 242.023,-12.0001"/>
 </g>

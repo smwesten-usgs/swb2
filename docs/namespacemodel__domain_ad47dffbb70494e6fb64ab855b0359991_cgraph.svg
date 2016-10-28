@@ -9,15 +9,15 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 46)">
 <title>model_domain::model_calculate_continuous_frozen_ground_index</title>
 <polygon fill="white" stroke="none" points="-4,4 -4,-46 312.969,-46 312.969,4 -4,4"/>
-<!-- Node217 -->
-<g id="node1" class="node"><title>Node217</title>
+<!-- Node1 -->
+<g id="node1" class="node"><title>Node1</title>
 <polygon fill="#bfbfbf" stroke="black" points="0,-0.5 0,-41.5 125.474,-41.5 125.474,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-28.7" font-family="Helvetica,sans-Serif" font-size="11.00">model_domain::model</text>
 <text text-anchor="start" x="8" y="-17.7" font-family="Helvetica,sans-Serif" font-size="11.00">_calculate_continuous</text>
 <text text-anchor="middle" x="62.7368" y="-6.7" font-family="Helvetica,sans-Serif" font-size="11.00">_frozen_ground_index</text>
 </g>
-<!-- Node218 -->
-<g id="node2" class="node"><title>Node218</title>
+<!-- Node2 -->
+<g id="node2" class="node"><title>Node2</title>
 <g id="a_node2"><a xlink:href="namespacecontinuous__frozen__ground__index.html#abcebec8cde74a0b86953ea3b5e118755" target="_top" xlink:title="Update the continuous frozen ground index (CFGI) for a cell. ">
 <polygon fill="white" stroke="black" points="161.474,-0.5 161.474,-41.5 308.969,-41.5 308.969,-0.5 161.474,-0.5"/>
 <text text-anchor="start" x="169.474" y="-28.7" font-family="Helvetica,sans-Serif" font-size="11.00">continuous_frozen_ground</text>
@@ -26,8 +26,8 @@
 </a>
 </g>
 </g>
-<!-- Node217&#45;&gt;Node218 -->
-<g id="edge1" class="edge"><title>Node217&#45;&gt;Node218</title>
+<!-- Node1&#45;&gt;Node2 -->
+<g id="edge1" class="edge"><title>Node1&#45;&gt;Node2</title>
 <path fill="none" stroke="midnightblue" d="M125.768,-21C134.048,-21 142.644,-21 151.21,-21"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="151.232,-24.5001 161.232,-21 151.232,-17.5001 151.232,-24.5001"/>
 </g>

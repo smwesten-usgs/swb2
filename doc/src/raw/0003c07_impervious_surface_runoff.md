@@ -4,4 +4,4 @@ Runoff from impervious surfaces may be simulated in a more detailed manner by in
 
 Any cell that is assigned an impervious surface fraction or percent that is greater than zero will operate in a fundamentally different way than the original SWB code did; in these cells, mass balance calculations will be performed on an additional "impervious surface storage" reservoir ([@fig:impervious_schematic]).
 
-![Detailed_soil_reservoir_schematic.png](../images/Detailed_soil_reservoir_schematic.png){width=5in #fig:impervious_schematic}
+![Detailed_soil_reservoir_schematic.png](../images/Detailed_soil_reservoir_schematic.png){width=4in #fig:impervious_schematic}

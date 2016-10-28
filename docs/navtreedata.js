@@ -46,11 +46,12 @@ var NAVTREE =
     ] ],
     [ "Glossary", "glossary.html", null ],
     [ "SWB Reference", "@ref appendixes", [
-      [ "Data and Parameter Requirements by Process Option", "appendix_1_data_and_param_requirements.html", null ],
-      [ "Complete List of Control File Directives: Version 1.0", "appendix_2_control_file_directives_original_swb.html", null ],
-      [ "Complete List of Control File Directives: Version 2.0", "appendix_2_control_file_directives_version_2.html", null ],
-      [ "Control File Settings for Specific Gridded Datasets", "@ref appendix_4_control_file_settings_for_specific_datasets", null ],
-      [ "Previous implementations of soil-moisture retention relations.", "appendix_5_earlier_SM_relations.html", null ]
+      [ "Data and parameter requirements by process option", "appendix_1_data_and_param_requirements.html", null ],
+      [ "Complete list of control file directives: Version 1.0", "appendix_2_control_file_directives_original_swb.html", null ],
+      [ "Complete List of control file directives: Version 2.0", "appendix_2_control_file_directives_version_2.html", null ],
+      [ "Definition of SWB 2.0 parameters", "appendix_3_definition_of_SWB2_parameters.html", null ],
+      [ "Example control file directives for a new climate data source", "appendix_4_example_new_climate_data_source.html", null ],
+      [ "Previous implementations of soil-moisture retention relations", "appendix_5_earlier_SM_relations.html", null ]
     ] ],
     [ "Code Development and Documentation", "usergroup1.html", [
       [ "Coding Conventions", "@ref conventions", null ],
@@ -76,15 +77,15 @@ var NAVTREE =
 
 var NAVTREEINDEX =
 [
-"@ref appendix_4_control_file_settings_for_specific_datasets",
-"datetime_8F90.html#a079fdfd4eb98b603a7476fa1bb73f8e2",
-"functions_vars_v.html",
-"interfacenetcdf__c__api__interfaces_1_1nc__inq__natts.html#a22e2dd5e16335940d92af3ae0f215605",
-"model__initialize_8F90.html#ac7a4106cec2a5f9f5fc824cc58ee003c",
-"parameters_8F90.html#a9f45afb7f3087ef18de2450409ea9f97",
-"structdata__catalog__entry_1_1data__catalog__entry__t.html#a23f28aa94ace5c5386fe2e46f004b30c",
-"structgrid_1_1general__grid__t.html#a047ec920f7e9d6bbf9a9f5b55d5ebdc3",
-"structnetcdf4__support_1_1t__netcdf4__file.html#ac4210539e92f7acaa7678751c3329633"
+"@ref appendixes",
+"datetime_8F90.html#a070e3ddfa8403643fe6eed2a47e3154f",
+"functions_vars_s.html",
+"interfacenetcdf__c__api__interfaces_1_1nc__inq__format.html",
+"model__initialize_8F90.html#ab49ae17bd43bb22a0cf05309c4301607",
+"parameters_8F90.html#a2a6f4d98e75c290d093edbf95d0be310",
+"structdata__catalog__entry_1_1data__catalog__entry__t.html#a14d0c77f25f3100f9cbaca21ad11a982",
+"structfile__operations_1_1ascii__file__t.html#afbd1ddb53298ccb32ca1be0d29aa5ce6",
+"structnetcdf4__support_1_1t__netcdf4__file.html#aa85187548702b6f8f5ff398e9dd27ad1"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

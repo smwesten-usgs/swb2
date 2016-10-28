@@ -9,14 +9,14 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 84)">
 <title>netcdf4_support::nf_julian_day_to_index_adj</title>
 <polygon fill="white" stroke="none" points="-4,4 -4,-84 317.255,-84 317.255,4 -4,4"/>
-<!-- Node18 -->
-<g id="node1" class="node"><title>Node18</title>
+<!-- Node1 -->
+<g id="node1" class="node"><title>Node1</title>
 <polygon fill="#bfbfbf" stroke="black" points="0,-24.5 0,-54.5 140.158,-54.5 140.158,-24.5 0,-24.5"/>
 <text text-anchor="start" x="8" y="-41.7" font-family="Helvetica,sans-Serif" font-size="11.00">netcdf4_support::nf</text>
 <text text-anchor="middle" x="70.0791" y="-30.7" font-family="Helvetica,sans-Serif" font-size="11.00">_julian_day_to_index_adj</text>
 </g>
-<!-- Node19 -->
-<g id="node2" class="node"><title>Node19</title>
+<!-- Node2 -->
+<g id="node2" class="node"><title>Node2</title>
 <g id="a_node2"><a xlink:href="namespacenetcdf4__support.html#a3a1accdd19941a5d2c392b5b390b29be" target="_top" xlink:title="netcdf4_support::nf\l_dayvalue_to_julian_day">
 <polygon fill="white" stroke="black" points="176.158,-49.5 176.158,-79.5 313.255,-79.5 313.255,-49.5 176.158,-49.5"/>
 <text text-anchor="start" x="184.158" y="-66.7" font-family="Helvetica,sans-Serif" font-size="11.00">netcdf4_support::nf</text>
@@ -24,13 +24,13 @@
 </a>
 </g>
 </g>
-<!-- Node18&#45;&gt;Node19 -->
-<g id="edge1" class="edge"><title>Node18&#45;&gt;Node19</title>
+<!-- Node1&#45;&gt;Node2 -->
+<g id="edge1" class="edge"><title>Node1&#45;&gt;Node2</title>
 <path fill="none" stroke="midnightblue" d="M140.299,-49.5244C148.793,-50.7546 157.519,-52.0182 166.126,-53.2648"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="165.758,-56.7479 176.157,-54.7174 166.762,-49.8202 165.758,-56.7479"/>
 </g>
-<!-- Node20 -->
-<g id="node3" class="node"><title>Node20</title>
+<!-- Node3 -->
+<g id="node3" class="node"><title>Node3</title>
 <g id="a_node3"><a xlink:href="namespacenetcdf4__support.html#a161159dc3269ec364e9f52f1162c8830" target="_top" xlink:title="This was so clear the other day. ">
 <polygon fill="white" stroke="black" points="185.026,-0.5 185.026,-30.5 304.387,-30.5 304.387,-0.5 185.026,-0.5"/>
 <text text-anchor="start" x="193.026" y="-17.7" font-family="Helvetica,sans-Serif" font-size="11.00">netcdf4_support::nf</text>
@@ -38,8 +38,8 @@
 </a>
 </g>
 </g>
-<!-- Node18&#45;&gt;Node20 -->
-<g id="edge2" class="edge"><title>Node18&#45;&gt;Node20</title>
+<!-- Node1&#45;&gt;Node3 -->
+<g id="edge2" class="edge"><title>Node1&#45;&gt;Node3</title>
 <path fill="none" stroke="midnightblue" d="M140.299,-29.8766C151.761,-28.2829 163.643,-26.631 175.091,-25.0395"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="175.595,-28.5031 185.018,-23.6593 174.631,-21.5698 175.595,-28.5031"/>
 </g>

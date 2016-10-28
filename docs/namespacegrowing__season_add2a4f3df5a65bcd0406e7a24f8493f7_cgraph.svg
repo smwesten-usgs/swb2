@@ -9,48 +9,48 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 62)">
 <title>growing_season::growing_season_initialize</title>
 <polygon fill="white" stroke="none" points="-4,4 -4,-62 449.3,-62 449.3,4 -4,4"/>
-<!-- Node0 -->
-<g id="node1" class="node"><title>Node0</title>
+<!-- Node1 -->
+<g id="node1" class="node"><title>Node1</title>
 <polygon fill="#bfbfbf" stroke="black" points="0,-14 0,-44 140.744,-44 140.744,-14 0,-14"/>
 <text text-anchor="start" x="8" y="-31.2" font-family="Helvetica,sans-Serif" font-size="11.00">growing_season::growing</text>
 <text text-anchor="middle" x="70.3718" y="-20.2" font-family="Helvetica,sans-Serif" font-size="11.00">_season_initialize</text>
 </g>
-<!-- Node1 -->
-<g id="node2" class="node"><title>Node1</title>
+<!-- Node2 -->
+<g id="node2" class="node"><title>Node2</title>
 <g id="a_node2"><a xlink:href="namespacedatetime.html#a45ad8eb2d0529ecfc6bcb3671ebc8415" target="_top" xlink:title="datetime::mmdd2doy">
 <polygon fill="white" stroke="black" points="176.744,-38.5 176.744,-57.5 295.46,-57.5 295.46,-38.5 176.744,-38.5"/>
 <text text-anchor="middle" x="236.102" y="-44.7" font-family="Helvetica,sans-Serif" font-size="11.00">datetime::mmdd2doy</text>
 </a>
 </g>
 </g>
-<!-- Node0&#45;&gt;Node1 -->
-<g id="edge1" class="edge"><title>Node0&#45;&gt;Node1</title>
+<!-- Node1&#45;&gt;Node2 -->
+<g id="edge1" class="edge"><title>Node1&#45;&gt;Node2</title>
 <path fill="none" stroke="midnightblue" d="M140.808,-37.0577C149.39,-38.0536 158.159,-39.0712 166.726,-40.0653"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="166.328,-43.5426 176.665,-41.2187 167.135,-36.5893 166.328,-43.5426"/>
 </g>
-<!-- Node3 -->
-<g id="node4" class="node"><title>Node3</title>
+<!-- Node4 -->
+<g id="node4" class="node"><title>Node4</title>
 <g id="a_node4"><a xlink:href="namespaceexceptions.html#a84dd04476b06e0a398bfe6d106a82a4d" target="_top" xlink:title="exceptions::warn">
 <polygon fill="white" stroke="black" points="186.831,-0.5 186.831,-19.5 285.374,-19.5 285.374,-0.5 186.831,-0.5"/>
 <text text-anchor="middle" x="236.102" y="-6.7" font-family="Helvetica,sans-Serif" font-size="11.00">exceptions::warn</text>
 </a>
 </g>
 </g>
-<!-- Node0&#45;&gt;Node3 -->
-<g id="edge3" class="edge"><title>Node0&#45;&gt;Node3</title>
+<!-- Node1&#45;&gt;Node4 -->
+<g id="edge3" class="edge"><title>Node1&#45;&gt;Node4</title>
 <path fill="none" stroke="midnightblue" d="M140.808,-20.9423C152.673,-19.5655 164.893,-18.1473 176.443,-16.8071"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="176.863,-20.2819 186.393,-15.6524 176.056,-13.3285 176.863,-20.2819"/>
 </g>
-<!-- Node2 -->
-<g id="node3" class="node"><title>Node2</title>
+<!-- Node3 -->
+<g id="node3" class="node"><title>Node3</title>
 <g id="a_node3"><a xlink:href="namespacedatetime.html#a9ac1a0a808a83a072ebc08cf0b3b4d8a" target="_top" xlink:title="datetime::julian_day">
 <polygon fill="white" stroke="black" points="331.46,-38.5 331.46,-57.5 445.3,-57.5 445.3,-38.5 331.46,-38.5"/>
 <text text-anchor="middle" x="388.38" y="-44.7" font-family="Helvetica,sans-Serif" font-size="11.00">datetime::julian_day</text>
 </a>
 </g>
 </g>
-<!-- Node1&#45;&gt;Node2 -->
-<g id="edge2" class="edge"><title>Node1&#45;&gt;Node2</title>
+<!-- Node2&#45;&gt;Node3 -->
+<g id="edge2" class="edge"><title>Node2&#45;&gt;Node3</title>
 <path fill="none" stroke="midnightblue" d="M295.634,-48C303.954,-48 312.56,-48 321.015,-48"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="321.225,-51.5001 331.225,-48 321.225,-44.5001 321.225,-51.5001"/>
 </g>

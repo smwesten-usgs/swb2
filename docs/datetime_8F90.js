@@ -9,7 +9,7 @@ var datetime_8F90 =
     [ "parse_text_to_date_sub", "datetime_8F90.html#a6ba366beea462b03744897b6b74956b6", null ],
     [ "parse_text_to_time_sub", "datetime_8F90.html#ae911f0afb3d6d2f93e35ec0dcc04c600", null ],
     [ "calc_water_year_sub", "datetime_8F90.html#a50faff3e126061b0875dd49a787fecd1", null ],
-    [ "calc_julian_day_sub", "datetime_8F90.html#a69d09bad23803d1c3b41eac94de7417c", null ],
+    [ "calc_julian_day_sub", "datetime_8F90.html#a61e08861ad387fba94a1015dabec898b", null ],
     [ "calc_gregorian_date_sub", "datetime_8F90.html#ae5d2fd012d07fb0dfc273d2b0ff2a4eb", null ],
     [ "gregorian_date", "datetime_8F90.html#a9d8dbfe179e1cc628e1b7ccec684e13a", null ],
     [ "julian_day", "datetime_8F90.html#a9ac1a0a808a83a072ebc08cf0b3b4d8a", null ],

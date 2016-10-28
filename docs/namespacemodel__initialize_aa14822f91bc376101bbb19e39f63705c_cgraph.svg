@@ -9,35 +9,35 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 62)">
 <title>model_initialize::create_rooting_depth_table</title>
 <polygon fill="white" stroke="none" points="-4,4 -4,-62 289.653,-62 289.653,4 -4,4"/>
-<!-- Node107 -->
-<g id="node1" class="node"><title>Node107</title>
+<!-- Node1 -->
+<g id="node1" class="node"><title>Node1</title>
 <polygon fill="#bfbfbf" stroke="black" points="0,-14 0,-44 127.891,-44 127.891,-14 0,-14"/>
 <text text-anchor="start" x="8" y="-31.2" font-family="Helvetica,sans-Serif" font-size="11.00">model_initialize::create</text>
 <text text-anchor="middle" x="63.9453" y="-20.2" font-family="Helvetica,sans-Serif" font-size="11.00">_rooting_depth_table</text>
 </g>
-<!-- Node108 -->
-<g id="node2" class="node"><title>Node108</title>
+<!-- Node2 -->
+<g id="node2" class="node"><title>Node2</title>
 <g id="a_node2"><a xlink:href="namespacegrid.html#adfcb9064d9b58a49eb61093cd4809a43" target="_top" xlink:title="grid::grid_destroy">
 <polygon fill="white" stroke="black" points="174.278,-38.5 174.278,-57.5 275.265,-57.5 275.265,-38.5 174.278,-38.5"/>
 <text text-anchor="middle" x="224.772" y="-44.7" font-family="Helvetica,sans-Serif" font-size="11.00">grid::grid_destroy</text>
 </a>
 </g>
 </g>
-<!-- Node107&#45;&gt;Node108 -->
-<g id="edge1" class="edge"><title>Node107&#45;&gt;Node108</title>
+<!-- Node1&#45;&gt;Node2 -->
+<g id="edge1" class="edge"><title>Node1&#45;&gt;Node2</title>
 <path fill="none" stroke="midnightblue" d="M128.174,-36.5639C139.95,-37.9726 152.221,-39.4406 163.893,-40.8368"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="163.622,-44.3294 173.967,-42.042 164.454,-37.3789 163.622,-44.3294"/>
 </g>
-<!-- Node109 -->
-<g id="node3" class="node"><title>Node109</title>
+<!-- Node3 -->
+<g id="node3" class="node"><title>Node3</title>
 <g id="a_node3"><a xlink:href="namespacegrid.html#a02803f7fe27d0354d3d16a15bd1338da" target="_top" xlink:title="grid::grid_writearcgrid">
 <polygon fill="white" stroke="black" points="163.891,-0.5 163.891,-19.5 285.653,-19.5 285.653,-0.5 163.891,-0.5"/>
 <text text-anchor="middle" x="224.772" y="-6.7" font-family="Helvetica,sans-Serif" font-size="11.00">grid::grid_writearcgrid</text>
 </a>
 </g>
 </g>
-<!-- Node107&#45;&gt;Node109 -->
-<g id="edge2" class="edge"><title>Node107&#45;&gt;Node109</title>
+<!-- Node1&#45;&gt;Node3 -->
+<g id="edge2" class="edge"><title>Node1&#45;&gt;Node3</title>
 <path fill="none" stroke="midnightblue" d="M128.174,-21.4361C136.63,-20.4245 145.342,-19.3824 153.903,-18.3582"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="154.347,-21.8301 163.861,-17.167 153.516,-14.8797 154.347,-21.8301"/>
 </g>

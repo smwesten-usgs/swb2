@@ -22,6 +22,7 @@ var model__initialize_8F90 =
     [ "initialize_start_and_end_dates", "model__initialize_8F90.html#aa901fa3beec7f5be635326923f7cd49b", null ],
     [ "initialize_parameter_tables", "model__initialize_8F90.html#a0863607ebbc266b8dc8c030ef1a3d439", null ],
     [ "initialize_generic_method", "model__initialize_8F90.html#a94f4260dea1a53022457f36dc8326134", null ],
+    [ "initialize_program_options", "model__initialize_8F90.html#a6a792d9c66f628aea81a05e8656d5bac", null ],
     [ "initialize_latitude", "model__initialize_8F90.html#a63c6e7946b13f1ffe90ca3e2d7df1387", null ],
     [ "initialize_landuse_codes", "model__initialize_8F90.html#a18de5456cd8bede53f6d00a60e97a9a0", null ],
     [ "initialize_surface_storage_max", "model__initialize_8F90.html#ac12913a30e9785d1a4f9c4595dc9565d", null ],

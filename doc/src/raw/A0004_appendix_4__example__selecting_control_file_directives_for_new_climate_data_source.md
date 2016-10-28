@@ -1,4 +1,4 @@
-# Appendix 4. Example of control file setting selection for a new climate data source.
+# Appendix 4. Example of control file setting selection for a new climate data source. {#appendix_4_example_new_climate_data_source}
 
 New sources of gridded climate data are continuing to come online. Inevitably, these new climate data sources will require that the SWB control file directives be modified in order to work properly. This example shows the process used to configure SWB control file parameters for a set of downscaled climate model results produced by a consortium of agencies including USGS, BLM, NCAR, U.S. Army Corps. of Engineers, and others (Brekke and others, 2013), available here:
 

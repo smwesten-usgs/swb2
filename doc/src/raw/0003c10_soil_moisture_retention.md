@@ -5,7 +5,7 @@
 
 In the days following a rainstorm, soil moisture is close to field capacity, and moisture is evaporated from bare soil and transpired by plants at rates close to the maximum rate sustainable given climatic conditions. Assuming no further precipitation, in subsequent days the evaporation and transpiration rates decrease as remaining soil-moisture is held more tightly within the soil matrix [@dunne_water_1978].
 
-One simple way of simulating decreasing rates of soil-moisture evapotranspiration is to assume that the actual evapotranspiration is some function of the potential or reference evapotranspiration and the current soil-moisture amount +@eq:SM_function_AET_to_PET.
+One simple way of simulating decreasing rates of soil-moisture evapotranspiration is to assume that the actual evapotranspiration is some function of the potential or reference evapotranspiration and the current soil-moisture amount @eq:SM_function_AET_to_PET.
 
 $$AET = PET \cdot f\left( {\frac{\theta }{{{\theta _{fc}}}}} \right)$$ {#eq:SM_function_AET_to_PET}
 
@@ -21,7 +21,7 @@ This section discusses the two soil-moisture retention functions implemented in 
 
 The first versions of SWB included full tabularized versions of the soil-moisture retention function, along with methods to interpolate between the various table values. The original published Thornthwaite-Mather [-@thornthwaite_instructions_1957] method also introduces a variable (accumulated potential water loss, APWL) to track the cumulative unmet potential evapotranspiration as a way to make calculation simpler. Ultimately, the many steps involved in the published method are designed to estimate actual evapotranspiration as directly proportional to the soil moisture relative to field capacity +@fig:aet_to_pet_thornthwaite.
 
-![ Thornthwaite [-@thornthwaite_approach_1948] soil-moisture retention function. file: Actual_ET__FAO56.png]( ../images/Actual_ET__Thornthwaite.png ) {#fig:aet_to_pet_thornthwaite}
+![ Thornthwaite [-@thornthwaite_approach_1948] soil-moisture retention function. file: Actual_ET__FAO56.png]( ../images/Actual_ET__Thornthwaite.png ) {width=4.5in #fig:aet_to_pet_thornthwaite}
 
 Daily soil moisture may be estimated from this relation by first defining the instantaneous soil evapotranspiration as equal to the change in storage:
 
@@ -53,6 +53,6 @@ $$ {\theta _t} = {\theta _{t - 1}} \cdot {e^{\left( { - \frac{{E{T_p}}}{{{\theta
 
 #### FAO-56 {#sm_fao_56}
 
-The FAO-56 framework for evaluating plant water requirements contains another
+The FAO-56 framework for evaluating plant water requirements contains a variation on the Thornthwaite soil-moisture retention scheme. In the FAO-56 calculations, soil-moisture is assumed to be completely available to evaporation and transpiration until it reaches some critical soil-moisture level ($\theta_{crit}$). Thereafter, the relation between actual ET and potential ET is linear with slope $\frac{1}{\theta_{crit}}$ +@Fig:fao56_soil_moisture.
 
-![FAO-56 [-@allen_crop_1998] soil-moisture retention function. file: Actual_ET__FAO56.png]( ../images/Actual_ET__FAO56.png )
+![FAO-56 [-@allen_crop_1998] soil-moisture retention function. file: Actual_ET__FAO56.png]( ../images/Actual_ET__FAO56.png )  {width=4.5in #fig:fao56_soil_moisture}

@@ -1,6 +1,6 @@
 <map id="runoff__curve_number::prob_runoff_enhancement" name="runoff__curve_number::prob_runoff_enhancement">
-<area shape="rect" id="node2" href="$namespacerunoff____curve__number.html#a72b4da037428312946ee9c28a6790b92" title="runoff__curve_number\l::update_curve_number_fn" alt="" coords="255,13,451,54"/>
-<area shape="rect" id="node3" href="$namespacerunoff____curve__number.html#aae766175dfa1f5c369ce3fb79fba8ce4" title="Calculate the runoff by means of the curve number method. " alt="" coords="499,5,668,61"/>
+<area shape="rect" id="node2" href="$namespacerunoff____curve__number.html#ac49765624e824387e5851155cfc2a52b" title="runoff__curve_number\l::update_curve_number_fn" alt="" coords="255,13,451,54"/>
+<area shape="rect" id="node3" href="$namespacerunoff____curve__number.html#ae9da818d0a188e22ab1cb6210cb254f8" title="Calculate the runoff by means of the curve number method. " alt="" coords="499,5,668,61"/>
 <area shape="rect" id="node4" href="$namespacemodel__domain.html#a4cf0da1e10aa8b3c8105cf8e636da443" title="model_domain::model\l_calculate_runoff_curve\l_number" alt="" coords="716,5,893,61"/>
 <area shape="rect" id="node5" href="$namespacemodel__domain.html#aac78dbf26ba37cf86ebed4edd7acf89b" title="model_domain::set_method\l_pointers_sub" alt="" coords="941,13,1143,54"/>
 </map>

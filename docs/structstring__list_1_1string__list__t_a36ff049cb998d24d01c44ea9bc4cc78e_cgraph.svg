@@ -9,22 +9,22 @@
 <g id="graph0" class="graph" transform="scale(1 1) rotate(0) translate(4 35)">
 <title>string_list::string_list_t::list_finalize_sub</title>
 <polygon fill="white" stroke="none" points="-4,4 -4,-35 314.73,-35 314.73,4 -4,4"/>
-<!-- Node34 -->
-<g id="node1" class="node"><title>Node34</title>
+<!-- Node1 -->
+<g id="node1" class="node"><title>Node1</title>
 <polygon fill="#bfbfbf" stroke="black" points="0,-0.5 0,-30.5 128.503,-30.5 128.503,-0.5 0,-0.5"/>
 <text text-anchor="start" x="8" y="-17.7" font-family="Helvetica,sans-Serif" font-size="11.00">string_list::string</text>
 <text text-anchor="middle" x="64.2515" y="-6.7" font-family="Helvetica,sans-Serif" font-size="11.00">_list_t::list_finalize_sub</text>
 </g>
-<!-- Node35 -->
-<g id="node2" class="node"><title>Node35</title>
+<!-- Node2 -->
+<g id="node2" class="node"><title>Node2</title>
 <g id="a_node2"><a xlink:href="namespacestring__list.html#a2eff25853b6a1cd61a69780980e2d4ec" target="_top" xlink:title="string_list::list_finalize_sub">
 <polygon fill="white" stroke="black" points="164.503,-6 164.503,-25 310.73,-25 310.73,-6 164.503,-6"/>
 <text text-anchor="middle" x="237.617" y="-12.2" font-family="Helvetica,sans-Serif" font-size="11.00">string_list::list_finalize_sub</text>
 </a>
 </g>
 </g>
-<!-- Node34&#45;&gt;Node35 -->
-<g id="edge1" class="edge"><title>Node34&#45;&gt;Node35</title>
+<!-- Node1&#45;&gt;Node2 -->
+<g id="edge1" class="edge"><title>Node1&#45;&gt;Node2</title>
 <path fill="none" stroke="midnightblue" d="M128.575,-15.5C136.935,-15.5 145.601,-15.5 154.222,-15.5"/>
 <polygon fill="midnightblue" stroke="midnightblue" points="154.301,-19.0001 164.301,-15.5 154.301,-12.0001 154.301,-19.0001"/>
 </g>

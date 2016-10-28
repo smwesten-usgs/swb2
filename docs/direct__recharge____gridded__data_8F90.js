@@ -20,6 +20,8 @@ var direct__recharge____gridded__data_8F90 =
     [ "fwater_body_recharge_table", "direct__recharge____gridded__data_8F90.html#ac76393356779322bcf506847c70d81d5", null ],
     [ "fwater_main_table", "direct__recharge____gridded__data_8F90.html#ab3dbad9ce951e8aca6cc7f981a226e79", null ],
     [ "fannual_recharge_rate_table", "direct__recharge____gridded__data_8F90.html#a3da84272edfb13c908040b55ed9db3a4", null ],
+    [ "direct_recharge_active_fraction_table", "direct__recharge____gridded__data_8F90.html#ad180a9a18f3c51647c784f64a83423e0", null ],
+    [ "direct_recharge_active_fraction", "direct__recharge____gridded__data_8F90.html#a0ef29d98730d7e1ae1e217fb33c582cc", null ],
     [ "pncfile", "direct__recharge____gridded__data_8F90.html#a3ef56300f490cc50d31a98b6e1187fc8", null ],
     [ "date_of_last_retrieval", "direct__recharge____gridded__data_8F90.html#ae9899247aac74ba8e7d389f804e8ae5d", null ]
 ];
