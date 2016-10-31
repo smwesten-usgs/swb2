@@ -140,7 +140,7 @@ contains
           pDict => null()
           allocate( pDict, stat=iStat )
           call assert(iStat == 0, "Failed to allocate memory for dictionary object", &
-              __FILE__, __LINE__ )
+              __SRCNAME__, __LINE__ )
 
           ! add dictionary entry to dictionary
           call pDict%add_key( DF%slColNames%get(iColIndex) )
@@ -178,7 +178,7 @@ contains
             
               call warn("Internal programming error: null pointer detected" &
                 //" -- was trying to find pointer associated with column "//dquote(DF%slColNames%get(iColIndex)), &
-                __FILE__, __LINE__)  
+                __SRCNAME__, __LINE__)  
             
             endif 
           
@@ -222,7 +222,7 @@ contains
       allocate( pCurrentDict, stat=iStat )
 
       call assert(iStat == 0, "Failed to allocate memory for dictionary object", &
-          __FILE__, __LINE__ )
+          __SRCNAME__, __LINE__ )
 
       ! add dictionary entry to dictionary
       call pCurrentDict%add_key( sKey )
@@ -497,12 +497,12 @@ contains
     else
 
       allocate( fTempVal( iNumRows ), stat=iStat )
-      call assert( iStat == 0, "Problem allocating memory.", __FILE__, __LINE__ )
+      call assert( iStat == 0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
       allocate( fValues( iNumRows, iNumCols ), stat=iStat )
       call assert( iStat == 0, "Problem allocating memory."                            &
         //"~iNumCols: "//asCharacter(iNumCols)//"; iNumRows: "//asCharacter(iNumRows)  &
-        //" sPrefix: "//dQuote(sPrefix), __FILE__, __LINE__ )
+        //" sPrefix: "//dQuote(sPrefix), __SRCNAME__, __LINE__ )
 
       do iIndex = 1, iNumCols
         sText = trim(sPrefix)//asCharacter(iIndex)

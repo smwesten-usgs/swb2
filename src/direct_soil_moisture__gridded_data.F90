@@ -87,13 +87,13 @@ contains
     call PARAMS%get_parameters( slKeys=parameter_list , fValues=fSEPTIC_DISCHARGE_TABLE )
 
     ! attempt to find a source of GRIDDED SEPTIC DISCHARGE data
-    pSEPTIC_DISCHARGE => DAT%find( "ANNUAL_direct_soil_moisture_RATE" )
+    pSEPTIC_DISCHARGE => DAT%find( "SEPTIC_DISCHARGE" )
 
     ! look for data in the form of a grid
     if ( associated( pSEPTIC_DISCHARGE ) ) then
 
       allocate( fSEPTIC_DISCHARGE( count( is_cell_active ) ), stat=iStat )
-      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     ! no grid? then look for a table version; values > TINYVAL indicate that 
     ! something is present
@@ -103,10 +103,10 @@ contains
 
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of annual direct"   &
-          //" recharge rate values.", sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+          //" recharge rate values.", sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
       allocate( fSEPTIC_DISCHARGE( count( is_cell_active ) ), stat=iStat )
-      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
       ! now populate the vector of cell values
       do iIndex=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
@@ -114,7 +114,6 @@ contains
       enddo  
 
      endif
-
 
     call parameter_list%clear()
     call parameter_list%append( "ANNUAL_septic_system_discharge" )
@@ -130,7 +129,7 @@ contains
     if ( associated( pANNUAL_SEPTIC_DISCHARGE ) ) then
 
       allocate( fANNUAL_SEPTIC_DISCHARGE( count( is_cell_active ) ), stat=iStat )
-      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     ! no grid? then look for a table version; values > TINYVAL indicate that 
     ! something is present
@@ -140,10 +139,10 @@ contains
 
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of annual direct"   &
-          //" recharge rate values.", sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+          //" recharge rate values.", sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
       allocate( fANNUAL_SEPTIC_DISCHARGE( count( is_cell_active ) ), stat=iStat )
-      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
       ! now populate the vector of cell values
       do iIndex=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
@@ -189,7 +188,8 @@ contains
 
         if ( associated( pSEPTIC_DISCHARGE ) ) then
           call pSEPTIC_DISCHARGE%getvalues( iMonth, iDay, iYear, iJulianDay )
-          if ( pSEPTIC_DISCHARGE%lGridHasChanged ) fSEPTIC_DISCHARGE = pack( pSEPTIC_DISCHARGE%pGrdBase%rData, is_cell_active )
+          if ( pSEPTIC_DISCHARGE%lGridHasChanged ) fSEPTIC_DISCHARGE =                   &
+               pack( pSEPTIC_DISCHARGE%pGrdBase%rData, is_cell_active )
         endif      
 
         if ( associated( pANNUAL_SEPTIC_DISCHARGE ) ) then
@@ -206,8 +206,10 @@ contains
 
     direct_soil_moisture = 0.0_c_float
 
-    if ( allocated( fSEPTIC_DISCHARGE) )  direct_soil_moisture = direct_soil_moisture + fSEPTIC_DISCHARGE( indx )
-    if ( allocated( fANNUAL_SEPTIC_DISCHARGE) )  direct_soil_moisture = direct_soil_moisture + fANNUAL_SEPTIC_DISCHARGE( indx ) / 365.25
+    if ( allocated( fSEPTIC_DISCHARGE) )  direct_soil_moisture = direct_soil_moisture           &
+                                            + fSEPTIC_DISCHARGE( indx )
+    if ( allocated( fANNUAL_SEPTIC_DISCHARGE) )  direct_soil_moisture = direct_soil_moisture    &
+                                            + fANNUAL_SEPTIC_DISCHARGE( indx ) / 365.25
 
 
   end subroutine direct_soil_moisture_calculate

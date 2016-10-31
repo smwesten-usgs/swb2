@@ -35,7 +35,8 @@ module et__jensen_haise
 
 contains
 
-elemental function et_jh_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax, fAlbedo, fAs, fBs, fSunPct )  result(fReferenceET0)
+elemental function et_jh_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax,    &
+                                    fAlbedo, fAs, fBs, fSunPct )  result(fReferenceET0)
 
   integer (kind=c_int), intent(in)          :: iDayOfYear
   integer (kind=c_int), intent(in)          :: iNumDaysInYear

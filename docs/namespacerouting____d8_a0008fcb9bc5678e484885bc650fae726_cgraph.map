@@ -1,0 +1,8 @@
+<map id="routing__d8::routing_d8_initialize" name="routing__d8::routing_d8_initialize">
+<area shape="rect" id="node2" href="$namespaceexceptions.html#a22a1bf2808fdc249e6b378ee3f221156" title="exceptions::die" alt="" coords="256,5,375,32"/>
+<area shape="rect" id="node3" href="$namespacegrid.html#a02803f7fe27d0354d3d16a15bd1338da" title="grid::grid_writearcgrid" alt="" coords="473,81,636,108"/>
+<area shape="rect" id="node4" href="$namespacerouting____d8.html#a4ffeb4be9d01e7cae56e0886d9161b18" title="routing__d8::routing\l_d8_assign_downstream\l_row_col" alt="" coords="223,107,407,163"/>
+<area shape="rect" id="node5" href="$namespacerouting____d8.html#ae2756c01d52d156a1b6c7ce48ca1e941" title="routing__d8::routing\l_d8_determine_solution_order" alt="" coords="205,187,425,229"/>
+<area shape="rect" id="node6" href="$namespacerouting____d8.html#a8ff5176982b0ac8b08696510dad5b894" title="routing__d8::routing\l_d8_get_index" alt="" coords="479,158,630,199"/>
+<area shape="rect" id="node7" href="$namespacegrid.html#adfcb9064d9b58a49eb61093cd4809a43" title="grid::grid_destroy" alt="" coords="487,224,622,251"/>
+</map>

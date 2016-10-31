@@ -72,15 +72,15 @@ contains
 
     allocate( CN_ARCIII(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
     call assert( iStat == 0, "Failed to allocate memory for curve number table - AMC III", &
-      __FILE__, __LINE__)
+      __SRCNAME__, __LINE__)
 
     allocate( CN_ARCII(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
     call assert( iStat == 0, "Failed to allocate memory for curve number table - AMC II", &
-      __FILE__, __LINE__)
+      __SRCNAME__, __LINE__)
 
     allocate( CN_ARCI(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
     call assert( iStat == 0, "Failed to allocate memory for curve number table - AMC I", &
-      __FILE__, __LINE__)
+      __SRCNAME__, __LINE__)
 
     ! we should have the curve number table fully filled out following this block
     do iSoilsIndex = 1, iNumberOfSoilGroups
@@ -91,7 +91,7 @@ contains
 
     allocate( PREV_5_DAYS_RAIN( count(cell_is_active), 6 ), stat=iStat )
     call assert( iStat == 0, "Failed to allocate memory for curve number PREV_5_DAYS_RAIN table", &
-      __FILE__, __LINE__)
+      __SRCNAME__, __LINE__)
 
     PREV_5_DAYS_RAIN = 0.0_c_float
 

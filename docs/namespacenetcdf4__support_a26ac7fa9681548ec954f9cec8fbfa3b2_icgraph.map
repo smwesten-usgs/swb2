@@ -1,0 +1,9 @@
+<map id="netcdf4_support::nf_return_varindex" name="netcdf4_support::nf_return_varindex">
+<area shape="rect" id="node2" href="$namespacenetcdf4__support.html#a67ae6168c1f09c755c4e314978ec9ecf" title="netcdf4_support::nf\l_get_variable_slice_float" alt="" coords="203,5,385,47"/>
+<area shape="rect" id="node7" href="$namespacenetcdf4__support.html#a03478999542c85e3a93b618472e57409" title="netcdf4_support::nf\l_get_variable_slice_int" alt="" coords="209,71,379,112"/>
+<area shape="rect" id="node8" href="$namespacenetcdf4__support.html#a01e484c5f5d08b52dc1a21a37fe8f82b" title="netcdf4_support::nf\l_get_variable_slice_short" alt="" coords="200,136,388,177"/>
+<area shape="rect" id="node3" href="$namespacenetcdf4__support.html#a997d4ec63d37cb56378ab434c9b3075b" title="netcdf4_support::netcdf\l_get_variable_slice" alt="" coords="436,71,611,112"/>
+<area shape="rect" id="node4" href="$namespacedata__catalog__entry.html#aeb285131f87ed64deba0a9041a9c6405" title="data_catalog_entry\l::getvalues_dynamic\l_netcdf_sub" alt="" coords="688,26,843,82"/>
+<area shape="rect" id="node6" href="$namespacedata__catalog__entry.html#ac3e1f0d9d9e146fbb77c0084e1e9fc14" title="data_catalog_entry\l::getvalues_static_netcdf_sub" alt="" coords="659,107,873,148"/>
+<area shape="rect" id="node5" href="$namespacedata__catalog__entry.html#a9e0a89ab19a5bfd61f2dfb8265648234" title="data_catalog_entry\l::getvalues_sub" alt="" coords="921,71,1067,112"/>
+</map>

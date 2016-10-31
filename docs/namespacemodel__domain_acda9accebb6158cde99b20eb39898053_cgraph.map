@@ -1,0 +1,5 @@
+<map id="model_domain::model_initialize_gdd" name="model_domain::model_initialize_gdd">
+<area shape="rect" id="node2" href="$namespacegrowing__degree__day.html#a0e7f6a6149d6eb2f4aa96cadc1dc86de" title="growing_degree_day\l::growing_degree_day\l_initialize" alt="" coords="219,5,385,61"/>
+<area shape="rect" id="node3" href="$namespacedatetime.html#a45ad8eb2d0529ecfc6bcb3671ebc8415" title="datetime::mmdd2doy" alt="" coords="433,20,592,47"/>
+<area shape="rect" id="node4" href="$namespacedatetime.html#a9ac1a0a808a83a072ebc08cf0b3b4d8a" title="datetime::julian_day" alt="" coords="640,20,792,47"/>
+</map>

@@ -1,0 +1,21 @@
+---
+figPrefix:
+  - "Fig."
+  - "Figs."
+titleDelim:          '.'
+geometry:            'left=1.25in, top=1.5in, bottom=1.5in'
+fontsize:            '12pt'
+mainfont:            'Times New Roman'
+sansfont:            Univers
+monofont:            Menlo
+language:            english
+nohyphenation:       false
+columns:             onecolumn
+alignment:           flushleft
+toc:                 true
+lot:                 true
+lof:                 true
+links:               true
+tables:              true
+documentclass:       usgsreport
+---

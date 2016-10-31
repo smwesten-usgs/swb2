@@ -1,0 +1,24 @@
+<map id="datetime::julian_day" name="datetime::julian_day">
+<area shape="rect" id="node2" href="$namespacedatetime.html#a9575f695885d806cc658b68cbdb75a70" title="datetime::day_of_year" alt="" coords="221,110,387,137"/>
+<area shape="rect" id="node8" href="$namespacedatetime.html#a45ad8eb2d0529ecfc6bcb3671ebc8415" title="datetime::mmdd2doy" alt="" coords="225,246,383,273"/>
+<area shape="rect" id="node14" href="$namespacedatetime.html#a2e198eedb86c02c720b30c84186b7af6" title="datetime::mmddyyyy2doy" alt="" coords="210,297,398,323"/>
+<area shape="rect" id="node15" href="$namespacedatetime.html#ac7d7f4ca4c13b5a5b0f768bdb3f30331" title="datetime::mmddyyyy2julian" alt="" coords="205,347,403,374"/>
+<area shape="rect" id="node16" href="$namespacenetcdf4__support.html#ad118f90a290289cde5043fc1ec23bca1" title="netcdf4_support::nf\l_calculate_time_range" alt="" coords="220,399,389,440"/>
+<area shape="rect" id="node23" href="$namespacedatetime.html#a6ba366beea462b03744897b6b74956b6" title="datetime::parse_text\l_to_date_sub" alt="" coords="227,464,381,505"/>
+<area shape="rect" id="node3" href="$namespacedatetime.html#a5e943042ca778d305fabbbe6f8d96aac" title="datetime::get_day_of\l_year_fn" alt="" coords="481,5,639,47"/>
+<area shape="rect" id="node4" href="$namespacemodel__initialize.html#aa901fa3beec7f5be635326923f7cd49b" title="model_initialize::initialize\l_start_and_end_dates" alt="" coords="469,71,651,112"/>
+<area shape="rect" id="node7" href="$namespacesimulation__datetime.html#a614317d68d6d6e98353e087670dc7a98" title="simulation_datetime\l::increment_by_one_day_sub" alt="" coords="453,136,667,177"/>
+<area shape="rect" id="node5" href="$namespacemodel__initialize.html#a46370bf2e9ea112d1f219277ba7fd3ce" title="model_initialize::initialize_all" alt="" coords="721,78,926,105"/>
+<area shape="rect" id="node6" href="$main_8F90.html#a8ec2266d83cd6c0b762cbcbc92c0af3d" title="Main program which references all other modules; execution begins here. " alt="" coords="1054,78,1107,105"/>
+<area shape="rect" id="node9" href="$namespacegrowing__degree__day.html#a0e7f6a6149d6eb2f4aa96cadc1dc86de" title="growing_degree_day\l::growing_degree_day\l_initialize" alt="" coords="477,202,643,258"/>
+<area shape="rect" id="node12" href="$namespacegrowing__season.html#add2a4f3df5a65bcd0406e7a24f8493f7" title="growing_season::growing\l_season_initialize" alt="" coords="466,283,654,324"/>
+<area shape="rect" id="node10" href="$namespacemodel__domain.html#acda9accebb6158cde99b20eb39898053" title="model_domain::model\l_initialize_gdd" alt="" coords="741,209,907,251"/>
+<area shape="rect" id="node11" href="$namespacemodel__domain.html#aac78dbf26ba37cf86ebed4edd7acf89b" title="model_domain::set_method\l_pointers_sub" alt="" coords="979,209,1181,251"/>
+<area shape="rect" id="node13" href="$namespacemodel__domain.html#ae57b872047925a2673ad1c369a759d42" title="model_domain::model\l_initialize_growing\l_season" alt="" coords="741,275,907,331"/>
+<area shape="rect" id="node17" href="$namespacenetcdf4__support.html#a8be734b602e654816c17b5e27d0fbffb" title="netcdf4_support::netcdf\l_open_and_prepare_for\l_merging" alt="" coords="471,349,649,405"/>
+<area shape="rect" id="node18" href="$namespacenetcdf4__support.html#a137d06ed171ec8d77e5af2fbb44b0c4c" title="netcdf4_support::netcdf\l_open_and_prepare_as_input" alt="" coords="451,429,668,471"/>
+<area shape="rect" id="node22" href="$namespacenetcdf4__support.html#a7b3b3cf3aab614eb336e12694c5d76ef" title="netcdf4_support::netcdf\l_open_file" alt="" coords="473,495,647,536"/>
+<area shape="rect" id="node19" href="$namespacedata__catalog__entry.html#aeb285131f87ed64deba0a9041a9c6405" title="data_catalog_entry\l::getvalues_dynamic\l_netcdf_sub" alt="" coords="746,418,901,474"/>
+<area shape="rect" id="node21" href="$namespacedata__catalog__entry.html#ac3e1f0d9d9e146fbb77c0084e1e9fc14" title="data_catalog_entry\l::getvalues_static_netcdf_sub" alt="" coords="716,499,931,540"/>
+<area shape="rect" id="node20" href="$namespacedata__catalog__entry.html#a9e0a89ab19a5bfd61f2dfb8265648234" title="data_catalog_entry\l::getvalues_sub" alt="" coords="1007,461,1153,503"/>
+</map>

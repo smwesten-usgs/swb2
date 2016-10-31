@@ -1,5 +1,4 @@
-
-## Potential Limitations to Application of the SWB Code {#potential_limitations}
+# Potential Limitations to Application of the SWB Code {#potential_limitations}
 
 The original concept behind the SWB code was to allow for the spatial distribution of groundwater recharge to be quickly and easily calculated on the basis of readily available data and a standardized set of parameters [@dripps_spatial_2003]. The version of the SWB model described here retains most of the features that made the original model attractive from the standpoint of practical application [@dripps_spatial_2003; @dripps_simple_2007]. Despite the possible limitations given below, the SWB model approach is capable of generating reasonable annual or monthly mean groundwater recharge estimates at the scale of a small catchment [@dripps_simple_2007]. In order to do so, however, the user will have to upscale the daily results offered by the SWB model and average or filter the results over a larger area. The relative spatial variability and pattern of recharge between catchments should also be of great value, particularly if these estimates can be corroborated with recharge estimates generated from streamgages or observation wells. Comparing SWB-calculated recharge estimates to those estimated from streamflow records, or from a groundwater model calibrated to stream fluxes is recommended.
 
@@ -15,9 +14,9 @@ In areas with wetlands, springs, lakes, or other landscape features where the wa
 
 **Curve number method.** In the current version of the SWB model, it is assumed that infiltration is the sum of net precipitation, snowmelt, and inflow, minus the runoff calculated by means of the NRCS curve number method. Runoff calculation at a plot or field scale in a continuous simulation by means of the curve number method may be beyond the limits of the method. The list of perceived limitations associated with the curve number method includes the following [@garen_curve_2005]:
 
-* method cannot be used to identify runoff processes, source areas, or flow paths;
-* method is a watershed-scale method that should not be applied at a plot or field (or grid cell) scale; and
-* method was developed to evaluate floods and was not designed to simulate daily flows of ordinary magnitude.
+- method cannot be used to identify runoff processes, source areas, or flow paths;
+- method is a watershed-scale method that should not be applied at a plot or field (or grid cell) scale; and
+- method was developed to evaluate floods and was not designed to simulate daily flows of ordinary magnitude.
 
 In addition, it has been suggested that the curve number itself is not constant but varies from event to event and that the antecedent-runoff condition explains only some of this variability [@hjelmfelt_jr_investigation_1991]. Given variability in the curve numbers themselves, as well as the other limitations of the curve number method, it is reasonable to treat the standard curve number table values merely as starting points; ideally, the curve numbers should be verified by use of observed paired precipitation-runoff data [@hawkins_asymptotic_1993].
 
@@ -32,4 +31,3 @@ Other modelers have altered the curve number in an attempt to simulate runoff fr
 Because the CFGI is based on air temperatures, the SWB code is unable to resolve differences in snowmelt timing between grid cells with differing ground-surface orientation relative to the sun (aspect).
 
 **Climate variability.** Year-to-year climate variability causes corresponding variability in calculated recharge values. Use of multiple years of climate data should help to minimize the effect of year-to-year climate variability on estimated recharge values.
-

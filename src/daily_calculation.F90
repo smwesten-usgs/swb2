@@ -4,7 +4,7 @@ module daily_calculation
   use model_domain, only                     : MODEL_DOMAIN_T
   use storm_drain_capture, only              : storm_drain_capture_calculate,             &
                                                STORM_DRAIN_CAPTURE_FRACTION
-  use direct_recharge__gridded_data, only    : DIRECT_RECHARGE_ACTIVE_FRACTION  
+  use direct_recharge__gridded_data, only    : DIRECT_RECHARGE_ACTIVE_FRACTION
   use exceptions, only                       : assert
   use iso_c_binding, only                    : c_short, c_int, c_float, c_double, c_bool
 
@@ -50,8 +50,8 @@ contains
 
     call cells%calc_continuous_frozen_ground_index()
 
-    
-    ! fog calculation does not explicitly consider canopy fraction   
+
+    ! fog calculation does not explicitly consider canopy fraction
     call cells%calc_fog()
 
     ! interception calculation *does* reflect the canopy fraction
@@ -74,7 +74,7 @@ contains
      cells%runon = 0.0_c_float
      cells%runoff = 0.0_c_float
 
-    !> if flow routing is enabled, the calculations will be made in order from upslope to downslope; 
+    !> if flow routing is enabled, the calculations will be made in order from upslope to downslope;
     !! otherwise, the calculations are made in the natural packing order of the data structure
     do jndx=1, ubound( cells%order_index, 1 )
 
@@ -88,20 +88,20 @@ contains
                   direct_recharge              => cells%direct_recharge( indx ),                         &
                   direct_soil_moisture         => cells%direct_soil_moisture( indx ),                    &
                   direct_recharge_fraction     => DIRECT_RECHARGE_ACTIVE_FRACTION( indx ),               &
-                  surface_storage              => cells%surface_storage( indx ),                         & 
-                  actual_et_impervious         => cells%actual_et_impervious( indx ),                    &   
-                  actual_et_soil               => cells%actual_et_soil( indx ),                          &  
-                  actual_et                    => cells%actual_et( indx ),                               &                   
+                  surface_storage              => cells%surface_storage( indx ),                         &
+                  actual_et_impervious         => cells%actual_et_impervious( indx ),                    &
+                  actual_et_soil               => cells%actual_et_soil( indx ),                          &
+                  actual_et                    => cells%actual_et( indx ),                               &
                   surface_storage_excess       => cells%surface_storage_excess( indx ),                  &
                   surface_storage_max          => cells%surface_storage_max( indx ),                     &
                   soil_storage_max             => cells%soil_storage_max( indx ),                        &
                   soil_storage                 => cells%soil_storage( indx ),                            &
                   storm_drain_capture          => cells%storm_drain_capture( indx ),                     &
                   storm_drain_capture_fraction => STORM_DRAIN_CAPTURE_FRACTION( landuse_index ),         &
-                  gross_precipitation          => cells%gross_precip( indx ),                            &                     
+                  gross_precipitation          => cells%gross_precip( indx ),                            &
                   rainfall                     => cells%rainfall( indx ),                                &
                   snowmelt                     => cells%snowmelt( indx ),                                &
-                  snowfall                     => cells%snowfall( indx ),                                &                  
+                  snowfall                     => cells%snowfall( indx ),                                &
                   runon                        => cells%runon( indx ),                                   &
                   runoff                       => cells%runoff( indx ),                                  &
                   inflow                       => cells%inflow( indx ),                                  &
@@ -116,18 +116,33 @@ contains
 
           inflow = runon + rainfall + fog + snowmelt - interception
 
-        else 
-        
-          inflow = runon + fog + snowmelt 
+        else
+
+          inflow = runon + fog + snowmelt
 
         endif
-          
+
+        if ( inflow < 0.0 ) then
+          call LOGS%write( "line "//asCharacter(__LINE__)//": runoff > inflow?, indx= "//asCharacter(indx)//" col, row= "    &
+          //asCharacter(cells%col_num_1D( indx ))//", "//asCharacter( cells%row_num_1D( indx ) ) )
+          call LOGS%write("          runoff: "//asCharacter(runoff))
+          call LOGS%write("          inflow: "//asCharacter(inflow))
+          call LOGS%write("           runon: "//asCharacter(runon))
+          call LOGS%write("        snowmelt: "//asCharacter(snowmelt))
+          call LOGS%write("        snowfall: "//asCharacter(snowfall))
+          call LOGS%write("    interception: "//asCharacter(interception))
+          call LOGS%write("             fog: "//asCharacter(fog))
+          call LOGS%write("        rainfall: "//asCharacter(rainfall))
+          call LOGS%write("    gross_precip: "//asCharacter(gross_precipitation))
+          call LOGS%write("   curve_num_adj: "//asCharacter( cells%curve_num_adj( indx )))
+          call LOGS%write("    landuse_code: "//asCharacter( cells%landuse_code( indx ) ) )
+        endif          
 
         call cells%calc_runoff( indx )
 
         call calculate_impervious_surface_mass_balance(                                         &
-          surface_storage=surface_storage,                                                      & 
-          actual_et=actual_et_impervious,                                                       &   
+          surface_storage=surface_storage,                                                      &
+          actual_et=actual_et_impervious,                                                       &
           surface_storage_excess=surface_storage_excess,                                        &
           surface_storage_max=surface_storage_max,                                              &
           storm_drain_capture=storm_drain_capture,                                              &
@@ -141,7 +156,7 @@ contains
 
         ! modify the surface storage in inches as if the amount calculated for the impervious area
         ! were to be redistributed uniformly over the total area of the cell
-        surface_storage_excess = surface_storage_excess * ( 1.0_c_float - pervious_fraction )  
+        surface_storage_excess = surface_storage_excess * ( 1.0_c_float - pervious_fraction )
 
 
         ! prevent calculated runoff from exceeding the day's inflow
@@ -152,22 +167,24 @@ contains
            ! call LOGS%write("          runoff: "//asCharacter(runoff))
            ! call LOGS%write("          inflow: "//asCharacter(inflow))
            ! call LOGS%write("           runon: "//asCharacter(runon))
-           ! call LOGS%write("        snowmelt: "//asCharacter(snowmelt)) 
+           ! call LOGS%write("        snowmelt: "//asCharacter(snowmelt))
            ! call LOGS%write("        snowfall: "//asCharacter(snowfall))
            ! call LOGS%write("    interception: "//asCharacter(interception))
-           ! call LOGS%write("             fog: "//asCharacter(fog)) 
-           ! call LOGS%write("        rainfall: "//asCharacter(rainfall))                     
+           ! call LOGS%write("             fog: "//asCharacter(fog))
+           ! call LOGS%write("        rainfall: "//asCharacter(rainfall))
            ! call LOGS%write("    gross_precip: "//asCharacter(gross_precipitation))
            ! call LOGS%write("   curve_num_adj: "//asCharacter( cells%curve_num_adj( indx )))
            ! call LOGS%write("    landuse_code: "//asCharacter( cells%landuse_code( indx ) ) )
            runoff = inflow
          endif
-                                   
+
         ! e.g. septic system discharge enters here...
         call cells%calc_direct_soil_moisture( indx )
 
-        if ( runoff < 0.)  call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "//asCharacter(indx)//" col, row= "    &
-           //asCharacter(cells%col_num_1D( indx ))//", "//asCharacter( cells%row_num_1D( indx ) ) )
+        if ( runoff < 0.)  call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "   &
+                                            //asCharacter(indx)//" col, row= "                            &
+                                            //asCharacter(cells%col_num_1D( indx ))//", "                 &
+                                            //asCharacter( cells%row_num_1D( indx ) ) )
 
         ! irrigation not considered to be a contributor to runoff...in addition, infiltration
         ! term is calculated with respect to the pervious fraction of the cell
@@ -186,8 +203,10 @@ contains
         call cells%calc_actual_et( indx )
 
 
-        if ( runoff < 0.)  call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "//asCharacter(indx)//" col, row= "    &
-           //asCharacter(cells%col_num_1D( indx ))//", "//asCharacter( cells%row_num_1D( indx ) ) )
+        if ( runoff < 0.)                                                                               &
+          call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
+                           //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
+                           //", "//asCharacter( cells%row_num_1D( indx ) ) )
 
         ! actual et for the entire cell is the weighted average of the ET for pervious and impervious
         ! fractions of the cell
@@ -203,40 +222,46 @@ contains
                                           runoff=runoff )
 
 
-        if ( runoff < 0.)  call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "//asCharacter(indx)//" col, row= "    &
-           //asCharacter(cells%col_num_1D( indx ))//", "//asCharacter( cells%row_num_1D( indx ) ) )
+        if ( runoff < 0.)                                                                               &
+          call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
+                           //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
+                           //", "//asCharacter( cells%row_num_1D( indx ) ) )
 
         call cells%calc_direct_recharge( indx )
-        
+
         ! reporting of potential recharge and irrigation must be adjusted to account for zero
         ! irrigation and potential recharge associated with the impervious areas
 
-        ! modify potential recharge and irrigation terms 
+        ! modify potential recharge and irrigation terms
 
         recharge_fraction= min( pervious_fraction, 1.0_c_float - direct_recharge_fraction )
 
         recharge = recharge * recharge_fraction + direct_recharge_fraction * direct_recharge
 
-        if ( runoff < 0.)  call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "//asCharacter(indx)//" col, row= "    &
-           //asCharacter(cells%col_num_1D( indx ))//", "//asCharacter( cells%row_num_1D( indx ) ) )
+        if ( runoff < 0.)                                                                               &
+          call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
+                           //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
+                           //", "//asCharacter( cells%row_num_1D( indx ) ) )
 
         irrigation = irrigation * pervious_fraction
 
         call cells%calc_maximum_potential_recharge( indx )
 
-        ! NOTE: only way for "runon" to be positive is if D8 flow routing 
+        ! NOTE: only way for "runon" to be positive is if D8 flow routing
         !       is enabled.
 
         ! rejected recharge + runoff will be routed downslope if routing option is turned on
         call cells%calc_routing( indx )
 
-        if ( runoff < 0.)  call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "//asCharacter(indx)//" col, row= "    &
-           //asCharacter(cells%col_num_1D( indx ))//", "//asCharacter( cells%row_num_1D( indx ) ) )
+        if ( runoff < 0.)                                                                               &
+          call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
+                           //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
+                           //", "//asCharacter( cells%row_num_1D( indx ) ) )
 
 
       end associate
 
-    enddo  
+    enddo
 
   end subroutine perform_daily_calculation
 
@@ -248,7 +273,7 @@ contains
     character (len=*), intent(in)               :: varname
     logical, intent(in), optional               :: logical_vector(:)
 
-    ! [ LOCALS ] 
+    ! [ LOCALS ]
     integer (kind=c_int) :: iCount
     character (len=30)   :: sVarname
     character (len=14)   :: sMin

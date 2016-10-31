@@ -91,7 +91,8 @@ contains
       call LOGS%set_echo( .true._c_bool )
 
       write(unit=sNumWarnings, fmt="(i0)") NUMBER_OF_FATAL_WARNINGS
-      call LOGS%write( "** "//trim(adjustl(sNumWarnings))//" FATAL WARNING"//trim(sBigS)//" DETECTED IN INPUT **", iLinesBefore=1, iLinesAfter=1 )
+      call LOGS%write( "** "//trim(adjustl(sNumWarnings))//" FATAL WARNING"//trim(sBigS)     &
+                       //" DETECTED IN INPUT **", iLinesBefore=1, iLinesAfter=1 )
    
       call LOGS%write( "# Summary of fatal warning"//trim(sLittleS)//" #" )
       call LOGS%write( "-------------------------------", iLinesAfter=1 )

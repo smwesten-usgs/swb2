@@ -78,7 +78,7 @@ contains
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of interception values "  &
                           //"specified for the 'a' term for use during the growing season.",              &
-                   sModule=__FILE__, iLine=__LINE__, lFatal=TRUE )
+                   sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
 
       call move_alloc( temp_values, INTERCEPTION_A_VALUE_GROWING_SEASON )
 
@@ -106,7 +106,7 @@ contains
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of interception values "  &
                           //"specified for the 'b' term for use during the growing season.",              &
-                   sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
+                   sModule=__SRCNAME__, iLine=__LINE__, lFatal=FALSE )
 
       call move_alloc( temp_values, INTERCEPTION_B_VALUE_GROWING_SEASON )
 
@@ -134,7 +134,7 @@ contains
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of interception values "  &
                           //"specified for the 'n' term for use during the growing season.",              &
-                   sModule=__FILE__, iLine=__LINE__, lFatal=TRUE )
+                   sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
 
       call move_alloc( temp_values, INTERCEPTION_N_VALUE_GROWING_SEASON )
 
@@ -157,7 +157,7 @@ contains
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of interception values "  &
                           //"specified for the 'a' term for use during the nongrowing season.",              &
-                   sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
+                   sModule=__SRCNAME__, iLine=__LINE__, lFatal=FALSE )
 
       call move_alloc( temp_values, INTERCEPTION_A_VALUE_NONGROWING_SEASON )
 
@@ -185,7 +185,7 @@ contains
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of interception values "  &
                           //"specified for the 'b' term for use during the nongrowing season.",              &
-                   sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
+                   sModule=__SRCNAME__, iLine=__LINE__, lFatal=FALSE )
 
       call move_alloc( temp_values, INTERCEPTION_B_VALUE_NONGROWING_SEASON )
 
@@ -213,7 +213,7 @@ contains
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of interception values "  &
                           //"specified for the 'n' term for use during the nongrowing season.",              &
-                   sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
+                   sModule=__SRCNAME__, iLine=__LINE__, lFatal=FALSE )
 
       call move_alloc( temp_values, INTERCEPTION_N_VALUE_NONGROWING_SEASON )
 
@@ -245,7 +245,7 @@ contains
 !     !> process first day of growing season. retrieved as a list of strings; 
 !     !! must convert the strings from mm/dd to DOY
 !     allocate( FIRST_DAY_OF_GROWING_SEASON( sl_growing_season_begin%count ), stat=status )
-!     call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
+!     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
 !     do indx = 1, sl_growing_season_begin%count
 !       str_buffer = sl_growing_season_begin%get( indx )
@@ -259,7 +259,7 @@ contains
 !     !> process last day of growing season. retrieved as a list of strings; 
 !     !! must convert the strings from mm/dd to DOY
 !     allocate( LAST_DAY_OF_GROWING_SEASON( sl_growing_season_end%count ), stat=status )
-!     call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
+!     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
 !     do indx = 1, sl_growing_season_end%count
 !       str_buffer = sl_growing_season_end%get( indx )
@@ -291,10 +291,10 @@ contains
 
 !       call warn( sMessage="The number of landuses does not match the number of GDD values "  &
 !                         //"specified for defining the beginning of the growing season.",     &
-!                  sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
+!                  sModule=__SRCNAME__, iLine=__LINE__, lFatal=FALSE )
 
 !       allocate( GDD_FIRST_DAY_OF_GROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
-!       call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__)
+!       call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__)
 
 !       GDD_FIRST_DAY_OF_GROWING_SEASON = NODATA_VALUE
 
@@ -319,10 +319,10 @@ contains
 
 !       call warn( sMessage="The number of landuses does not match the number of killing frost values "  &
 !                         //"specified to define the end of the growing season.",                        &
-!                  sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
+!                  sModule=__SRCNAME__, iLine=__LINE__, lFatal=FALSE )
 
 !       allocate( KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
-!       call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__)
+!       call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__)
 
 !       KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON = NODATA_VALUE
 
@@ -330,7 +330,7 @@ contains
 
 
 !     allocate( IS_GROWING_SEASON( count( active_cells ) ), stat=status )
-!     call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
+!     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
 !     IS_GROWING_SEASON = FALSE
 

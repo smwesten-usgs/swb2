@@ -33,7 +33,7 @@ module direct_recharge__gridded_data
   type (DATA_CATALOG_ENTRY_T), pointer :: pSTORM_DRAIN
   type (DATA_CATALOG_ENTRY_T), pointer :: pWATER_BODY_RECHARGE
   type (DATA_CATALOG_ENTRY_T), pointer :: pWATER_MAIN
-  type (DATA_CATALOG_ENTRY_T), pointer :: pANNUAL_RECHARGE_RATE    
+  type (DATA_CATALOG_ENTRY_T), pointer :: pANNUAL_RECHARGE_RATE
 
   real (kind=c_float), allocatable     :: fCESSPOOL(:)
   real (kind=c_float), allocatable     :: fDISPOSAL_WELL(:)
@@ -56,10 +56,10 @@ module direct_recharge__gridded_data
   type (T_NETCDF4_FILE), pointer       :: pNCFILE
 
   type ( DATETIME_T )                  :: DATE_OF_LAST_RETRIEVAL
-  
+
 contains
 
-  !> Initialize the routine to enable input/output of arbitrary sources/sink terms. 
+  !> Initialize the routine to enable input/output of arbitrary sources/sink terms.
   !!
   !! Open gridded data file.
   !! Open a NetCDF output file to hold variable output.
@@ -80,7 +80,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)                 :: status
     type (STRING_LIST_T)                 :: parameter_list
-    integer (kind=c_int)                 :: indx 
+    integer (kind=c_int)                 :: indx
     integer (kind=c_int)                 :: iNX
     integer (kind=c_int)                 :: iNY
     integer (kind=c_int), allocatable    :: landuse_codes(:)
@@ -91,6 +91,7 @@ contains
     !> Determine how many landuse codes are present
     call parameter_list%append( "LU_Code" )
     call parameter_list%append( "Landuse_Code" )
+    call parameter_list%append( "Landuse_Lookup_Code" )
 
     call PARAMS%get_parameters( slKeys=parameter_list, iValues=landuse_codes )
     number_of_landuses = count( landuse_codes > 0 )
@@ -110,8 +111,8 @@ contains
     call parameter_list%append( "Cesspool_direct_recharge" )
     call parameter_list%append( "Cesspool_recharge" )
     call parameter_list%append( "Cesspool_discharge" )
-    call parameter_list%append( "Cesspool_leakage" )    
-    
+    call parameter_list%append( "Cesspool_leakage" )
+
     call PARAMS%get_parameters( slKeys=parameter_list , fValues=fCESSPOOL_TABLE )
 
     ! attempt to find a source of GRIDDED CESSPOOL data
@@ -121,8 +122,8 @@ contains
     call parameter_list%clear()
     call parameter_list%append( "Storm_drain_discharge" )
     call parameter_list%append( "Storm_drain_recharge" )
-    call parameter_list%append( "Storm_drain_leakage" )    
-    
+    call parameter_list%append( "Storm_drain_leakage" )
+
     call PARAMS%get_parameters( slKeys=parameter_list , fValues=fSTORM_DRAIN_TABLE )
 
     pSTORM_DRAIN => DAT%find( "STORM_DRAIN" )
@@ -131,8 +132,8 @@ contains
     call parameter_list%clear()
     call parameter_list%append( "Water_body_recharge" )
     call parameter_list%append( "Water_body_discharge" )
-    call parameter_list%append( "Water_body_leakage" )    
-    
+    call parameter_list%append( "Water_body_leakage" )
+
     call PARAMS%get_parameters( slKeys=parameter_list , fValues=fWATER_BODY_RECHARGE_TABLE )
 
     pWATER_BODY_RECHARGE => DAT%find( "WATER_BODY_RECHARGE" )
@@ -142,7 +143,7 @@ contains
     call parameter_list%append( "Water_main_recharge" )
     call parameter_list%append( "Water_main_discharge" )
     call parameter_list%append( "Water_main_leakage" )
-    
+
     call PARAMS%get_parameters( slKeys=parameter_list , fValues=fWATER_MAIN_TABLE )
 
     pWATER_MAIN => DAT%find( "WATER_MAIN_LEAKAGE" )
@@ -151,7 +152,7 @@ contains
     call parameter_list%clear()
     call parameter_list%append( "Disposal_well_recharge" )
     call parameter_list%append( "Disposal_well_discharge" )
-    
+
     call PARAMS%get_parameters( slKeys=parameter_list , fValues=fDISPOSAL_WELL_TABLE )
 
     pDISPOSAL_WELL => DAT%find( "DISPOSAL_WELL_DISCHARGE" )
@@ -160,7 +161,6 @@ contains
     call PARAMS%get_parameters( sKey="Direct_recharge_active_fraction",        &
                                 fValues=DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE )
 
-
     if ( DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE(1) > fTINYVAL ) then
 
       are_lengths_equal = ( ubound(DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE,1)         &
@@ -168,27 +168,26 @@ contains
 
       if ( .not. are_lengths_equal )     &
         call warn( sMessage="The number of landuses does not match the number of direct"   &
-          //" recharge active fraction values.", sModule=__FILE__, iLine=__LINE__, lFatal=TRUE )
+          //" recharge active fraction values.", sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
 
       allocate( DIRECT_RECHARGE_ACTIVE_FRACTION( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
       do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
         DIRECT_RECHARGE_ACTIVE_FRACTION( indx ) = DIRECT_RECHARGE_ACTIVE_FRACTION_TABLE( landuse_index( indx ) )
-      enddo  
+      enddo
     else
 
       allocate( DIRECT_RECHARGE_ACTIVE_FRACTION( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
       DIRECT_RECHARGE_ACTIVE_FRACTION = 0.0_c_float
 
     endif
 
-
     if ( associated( pANNUAL_RECHARGE_RATE ) ) then
 
       allocate( fANNUAL_RECHARGE_RATE( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     elseif ( fANNUAL_RECHARGE_RATE_TABLE(1) > fTINYVAL ) then
 
@@ -196,14 +195,14 @@ contains
 
       if ( .not. are_lengths_equal )     &
         call warn( sMessage="The number of landuses does not match the number of annual direct"   &
-          //" recharge rate values.", sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+          //" recharge rate values.", sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
       allocate( fANNUAL_RECHARGE_RATE( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
       do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
         fANNUAL_RECHARGE_RATE( indx ) = fANNUAL_RECHARGE_RATE_TABLE( landuse_index( indx ) )
-      enddo  
+      enddo
 
      endif
 
@@ -211,7 +210,7 @@ contains
     if ( associated( pCESSPOOL ) ) then
 
       allocate( fCESSPOOL( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     elseif ( fCESSPOOL_TABLE(1) > fTINYVAL ) then
 
@@ -219,14 +218,14 @@ contains
 
       if ( .not. are_lengths_equal )     &
         call warn( sMessage="The number of landuses does not match the number of cesspool discharge/leakage values.",   &
-          sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+          sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
       allocate( fCESSPOOL( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
       do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
         fCESSPOOL( indx ) = fCESSPOOL_TABLE( landuse_index( indx ) )
-      enddo  
+      enddo
 
      endif
 
@@ -234,7 +233,7 @@ contains
     if ( associated( pSTORM_DRAIN ) ) then
 
       allocate( fSTORM_DRAIN( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     elseif ( fSTORM_DRAIN_TABLE(1) > fTINYVAL ) then
 
@@ -242,14 +241,14 @@ contains
 
       if ( .not. are_lengths_equal )     &
         call warn( sMessage="The number of landuses does not match the number of storm drain discharge/leakage values.",   &
-          sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+          sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
       allocate( fSTORM_DRAIN( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
       do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
         fSTORM_DRAIN( indx ) = fSTORM_DRAIN_TABLE( landuse_index( indx ) )
-      enddo  
+      enddo
 
      endif
 
@@ -257,7 +256,7 @@ contains
     if ( associated( pWATER_BODY_RECHARGE ) ) then
 
       allocate( fWATER_BODY_RECHARGE( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     elseif ( fWATER_BODY_RECHARGE_TABLE(1) > fTINYVAL ) then
 
@@ -265,14 +264,14 @@ contains
 
       if ( .not. are_lengths_equal )     &
         call warn( sMessage="The number of landuses does not match the number of water body recharge/leakage values.",   &
-          sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+          sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
       allocate( fWATER_BODY_RECHARGE( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
       do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
         fWATER_BODY_RECHARGE( indx ) = fWATER_BODY_RECHARGE_TABLE( landuse_index( indx ) )
-      enddo  
+      enddo
 
      endif
 
@@ -280,7 +279,7 @@ contains
     if ( associated( pWATER_MAIN ) ) then
 
       allocate( fWATER_MAIN( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     elseif ( fWATER_MAIN_TABLE(1) > fTINYVAL ) then
 
@@ -288,14 +287,14 @@ contains
 
       if ( .not. are_lengths_equal )     &
         call warn( sMessage="The number of landuses does not match the number of water main leakage values.",   &
-          sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+          sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
       allocate( fWATER_MAIN( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
       do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
         fWATER_MAIN( indx ) = fWATER_MAIN_TABLE( landuse_index( indx ) )
-      enddo  
+      enddo
 
      endif
 
@@ -303,7 +302,7 @@ contains
     if ( associated( pDISPOSAL_WELL ) ) then
 
       allocate( fDISPOSAL_WELL( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     elseif ( fDISPOSAL_WELL_TABLE(1) > fTINYVAL ) then
 
@@ -311,20 +310,20 @@ contains
 
       if ( .not. are_lengths_equal )     &
         call warn( sMessage="The number of landuses does not match the number of discharge well values.",   &
-          sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+          sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
       allocate( fDISPOSAL_WELL( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
       do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
         fDISPOSAL_WELL( indx ) = fDISPOSAL_WELL_TABLE( landuse_index( indx ) )
-      enddo  
+      enddo
 
      endif
 
     ! initialize last retrieval date to something implausibly low to trigger initial read
     ! in the calculate procedure
-    call DATE_OF_LAST_RETRIEVAL%parseDate("01/01/1000", __FILE__, __LINE__)
+    call DATE_OF_LAST_RETRIEVAL%parseDate("01/01/1000", __SRCNAME__, __LINE__)
 
   end subroutine direct_recharge_initialize
 
@@ -337,7 +336,7 @@ contains
     logical (kind=c_bool), intent(in)      :: is_cell_active(:,:)
     real (kind=c_float), intent(in)        :: nodata_fill_value(:,:)
 
-    ! [ LOCALS ] 
+    ! [ LOCALS ]
     integer (kind=c_int) :: iJulianDay
     integer (kind=c_int) :: iMonth
     integer (kind=c_int) :: iDay
@@ -364,7 +363,8 @@ contains
 
         if ( associated( pDISPOSAL_WELL ) ) then
           call pDISPOSAL_WELL%getvalues( iMonth, iDay, iYear, iJulianDay )
-          if ( pDISPOSAL_WELL%lGridHasChanged ) fDISPOSAL_WELL = pack( pDISPOSAL_WELL%pGrdBase%rData, is_cell_active )
+          if ( pDISPOSAL_WELL%lGridHasChanged ) fDISPOSAL_WELL =                                      &
+               pack( pDISPOSAL_WELL%pGrdBase%rData, is_cell_active )
         endif
 
         if ( associated( pSTORM_DRAIN ) ) then
@@ -374,18 +374,20 @@ contains
 
         if ( associated( pWATER_BODY_RECHARGE ) ) then
           call pWATER_BODY_RECHARGE%getvalues( iMonth, iDay, iYear, iJulianDay )
-          if ( pWATER_BODY_RECHARGE%lGridHasChanged ) fWATER_BODY_RECHARGE = pack( pWATER_BODY_RECHARGE%pGrdBase%rData, is_cell_active )
+          if ( pWATER_BODY_RECHARGE%lGridHasChanged ) fWATER_BODY_RECHARGE =                          &
+               pack( pWATER_BODY_RECHARGE%pGrdBase%rData, is_cell_active )
         endif
 
         if ( associated( pWATER_MAIN ) ) then
           call pWATER_MAIN%getvalues( iMonth, iDay, iYear, iJulianDay )
           if ( pWATER_MAIN%lGridHasChanged ) fWATER_MAIN = pack( pWATER_MAIN%pGrdBase%rData, is_cell_active )
-        endif      
+        endif
 
         if ( associated( pANNUAL_RECHARGE_RATE ) ) then
           call pANNUAL_RECHARGE_RATE%getvalues( iMonth, iDay, iYear, iJulianDay )
-          if ( pANNUAL_RECHARGE_RATE%lGridHasChanged ) fANNUAL_RECHARGE_RATE = pack( pANNUAL_RECHARGE_RATE%pGrdBase%rData, is_cell_active )
-        endif      
+          if ( pANNUAL_RECHARGE_RATE%lGridHasChanged ) fANNUAL_RECHARGE_RATE =                        &
+               pack( pANNUAL_RECHARGE_RATE%pGrdBase%rData, is_cell_active )
+        endif
 
         DATE_OF_LAST_RETRIEVAL = SIM_DT%curr
 

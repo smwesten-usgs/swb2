@@ -32,6 +32,7 @@ contains
     character (len=256)               :: sBuf
 
     call string_list%append("LU_Code")
+    call string_list%append("Landuse_Code")    
     call string_list%append("Landuse_Lookup_Code")
 
     !> Determine how many landuse codes are present
@@ -49,13 +50,14 @@ contains
 
    !> check: number of STORM_DRAIN_CAPTURE_FRACTION values == number of landuse codes?
     num_records = ubound(STORM_DRAIN_CAPTURE_FRACTION, 1)
-    are_lengths_unequal = ( num_records /= number_of_landuse_codes ) 
+    are_lengths_unequal = ( num_records /= number_of_landuse_codes )
 
     if ( are_lengths_unequal ) then
 
       sBuf = "The number of values specifying storm drain capture"                         &
         //" fraction ("                                                                    &
         //asCharacter( num_records )//") does not match the number of landuse values ("    &
+<<<<<<< HEAD
         //asCharacter( number_of_landuse_codes )//"). Setting default storm drain"         &
         //" capture to 0.0 (ZERO)."
 
@@ -69,19 +71,24 @@ contains
     ! logical (kind=c_bool), intent(in), optional :: lEcho
 
       call warn( sMessage=trim(sBuf), sModule=__FILE__, iLine=__LINE__, lFatal=.false._c_bool, iLogLevel=LOG_ALL )
+=======
+        //asCharacter( number_of_landuse_codes )//"). Setting default storm drain"        &
+        //" capture to 0.0 (ZERO).", iLogLevel=LOG_ALL,                                    &
+        sModule=__SRCNAME__, iLine=__LINE__, lFatal=.false._c_bool )
+>>>>>>> e6ccd93f1fab827d30c5099a8e27f897364f2e69
 
       deallocate(STORM_DRAIN_CAPTURE_FRACTION, stat=status)
       call assert( status==0, "Problem deallocating STORM_DRAIN_CAPTURE_FRACTION", &
-        __FILE__, __LINE__ )
+        __SRCNAME__, __LINE__ )
 
       allocate( STORM_DRAIN_CAPTURE_FRACTION( number_of_landuse_codes ), stat=status )
       call assert( status==0, "Problem allocating STORM_DRAIN_CAPTURE_FRACTION", &
-        __FILE__, __LINE__ )
+        __SRCNAME__, __LINE__ )
 
       STORM_DRAIN_CAPTURE_FRACTION = 0.0_c_float
-    endif  
+    endif
 
-  end subroutine storm_drain_capture_initialize    
+  end subroutine storm_drain_capture_initialize
 
 !--------------------------------------------------------------------------------------------------
 
@@ -95,4 +102,3 @@ contains
   end function storm_drain_capture_calculate
 
 end module storm_drain_capture
-

@@ -308,7 +308,7 @@ contains
 
     if ( slString%count == 0 )  &
       call warn(sMessage="Failed to find a dictionary entry associated with a key value of " &
-        //dquote(sKey)//".", sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE )
+        //dquote(sKey)//".", sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE )
 
   end function grep_dictionary_key_names_fn
 
@@ -346,7 +346,7 @@ contains
     else
 
       call warn( sMessage="Internal programming error: dictionary entry is null",   &
-          sModule=__FILE__, iLine=__LINE__ )
+          sModule=__SRCNAME__, iLine=__LINE__ )
 
     endif  
 
@@ -413,10 +413,10 @@ contains
 
       allocate(iValues(1), stat=iStat)
       call assert(iStat == 0, "Failed to allocate memory to iValues array", &
-        __FILE__, __LINE__)
+        __SRCNAME__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
-        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
 
       iValues = iTINYVAL
 
@@ -447,10 +447,10 @@ contains
 
       allocate(lValues(1), stat=iStat)
       call assert(iStat == 0, "Failed to allocate memory to lValues array", &
-        __FILE__, __LINE__)
+        __SRCNAME__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
-        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
 
       lValues = lFALSE
 
@@ -503,10 +503,10 @@ contains
 
       allocate(lValues(1), stat=iStat)
       call assert(iStat == 0, "Failed to allocate memory to lValues array", &
-        __FILE__, __LINE__)
+        __SRCNAME__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
-        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
 
       lValues = lFALSE
 
@@ -550,7 +550,7 @@ contains
 
       call slString%append("<NA>")
       call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
-        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
 
     endif  
 
@@ -607,7 +607,7 @@ contains
 
       call slString%append("<NA>")
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
-        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
 
     endif  
 
@@ -659,10 +659,10 @@ contains
 
       allocate(iValues(1), stat=iStat)
       call assert(iStat == 0, "Failed to allocate memory to iValues array", &
-        __FILE__, __LINE__)
+        __SRCNAME__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
-        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
 
       iValues = iTINYVAL
 
@@ -716,10 +716,10 @@ contains
 
       allocate(fValues(1), stat=iStat)
       call assert(iStat == 0, "Failed to allocate memory to fValues array", &
-        __FILE__, __LINE__)
+        __SRCNAME__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
-        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
 
 
       fValues = fTINYVAL
@@ -751,10 +751,10 @@ contains
 
       allocate(fValues(1), stat=iStat)
       call assert(iStat == 0, "Failed to allocate memory to iValues array", &
-        __FILE__, __LINE__)
+        __SRCNAME__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
-        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
 
       fValues = fTINYVAL
 

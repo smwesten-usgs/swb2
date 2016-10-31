@@ -1,0 +1,18 @@
+<map id="model_initialize::initialize_ancillary_values" name="model_initialize::initialize_ancillary_values">
+<area shape="rect" id="node2" href="$namespacemodel__initialize.html#a63c6e7946b13f1ffe90ca3e2d7df1387" title="model_initialize::initialize\l_latitude" alt="" coords="235,87,417,129"/>
+<area shape="rect" id="node10" href="$namespacemodel__initialize.html#ad4626f16ba0b3e433a90f89e29e4e491" title="model_initialize::initialize\l_percent_canopy_cover" alt="" coords="235,218,417,259"/>
+<area shape="rect" id="node13" href="$namespacemodel__initialize.html#a98c8d4a3d9a346ffe0e344d86e7588f5" title="model_initialize::initialize\l_percent_pervious" alt="" coords="235,153,417,194"/>
+<area shape="rect" id="node14" href="$namespacemodel__initialize.html#a8d619df0ba0b259eec3d25e213fdd8e9" title="model_initialize::initialize\l_snow_storage" alt="" coords="235,283,417,325"/>
+<area shape="rect" id="node15" href="$namespacemodel__initialize.html#a9d4f137d95280c733253bbc4ce713bbd" title="model_initialize::initialize\l_soil_storage" alt="" coords="235,349,417,390"/>
+<area shape="rect" id="node16" href="$namespacemodel__initialize.html#ac12913a30e9785d1a4f9c4595dc9565d" title="model_initialize::initialize\l_surface_storage_max" alt="" coords="235,495,417,537"/>
+<area shape="rect" id="node17" href="$namespacestorm__drain__capture.html#a93fceb05bd4d89fa81567c2b79df9811" title="storm_drain_capture\l::storm_drain_capture\l_initialize" alt="" coords="244,415,408,471"/>
+<area shape="rect" id="node3" href="$namespacegrid.html#ace8ea960868faf40cf79d5303f881ed8" title="grid::grid_populatexy" alt="" coords="700,31,857,57"/>
+<area shape="rect" id="node6" href="$namespacegrid.html#a6eb75c46ff6156376f88e567ac0e5271" title="Call PROJ4 to transform coordinates. " alt="" coords="472,81,621,108"/>
+<area shape="rect" id="node8" href="$namespacegrid.html#a02803f7fe27d0354d3d16a15bd1338da" title="grid::grid_writearcgrid" alt="" coords="465,132,628,159"/>
+<area shape="rect" id="node9" href="$namespacegrid.html#adfcb9064d9b58a49eb61093cd4809a43" title="grid::grid_destroy" alt="" coords="479,183,614,209"/>
+<area shape="rect" id="node4" href="$namespacegrid.html#ad3fbf6446fa8a58df8888c05b7165324" title="grid::grid_getgridx" alt="" coords="929,5,1068,32"/>
+<area shape="rect" id="node5" href="$namespacegrid.html#a93d74de05bc5c8aee4cb556f461be266" title="grid::grid_getgridy" alt="" coords="929,56,1068,83"/>
+<area shape="rect" id="node7" href="$namespacegrid.html#a4e234a7e1a3a1ba76a7c92bab7114bf7" title="grid::grid_checkforproj4error" alt="" coords="676,81,881,108"/>
+<area shape="rect" id="node11" href="$namespaceexceptions.html#a22a1bf2808fdc249e6b378ee3f221156" title="exceptions::die" alt="" coords="487,233,606,260"/>
+<area shape="rect" id="node12" href="$namespaceexceptions.html#a84dd04476b06e0a398bfe6d106a82a4d" title="exceptions::warn" alt="" coords="481,291,612,317"/>
+</map>

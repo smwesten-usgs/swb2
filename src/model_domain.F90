@@ -125,56 +125,93 @@ module model_domain
     real (kind=c_float), allocatable       :: irrigation_mask(:)
 
     !> declare and initialize procedure pointers such that the default methods are in place
-    procedure ( array_method ), pointer         :: init_interception         => model_initialize_interception_bucket
-    procedure ( array_method ), pointer         :: init_runoff               => model_initialize_runoff_curve_number
-    procedure ( array_method ), pointer         :: init_reference_et         => model_initialize_et_hargreaves
-    procedure ( array_method ), pointer         :: init_actual_et            => model_initialize_actual_et_thornthwaite_mather_eqns
-    procedure ( array_method ), pointer         :: init_routing              => model_initialize_routing_D8
-    procedure ( array_method ), pointer         :: init_soil_storage_max     => model_initialize_soil_storage_max_internally_calculated
-    procedure ( array_method ), pointer         :: init_snowfall             => model_initialize_snowfall_original
-    procedure ( array_method ), pointer         :: init_snowmelt             => model_initialize_snowmelt_original
-    procedure ( array_method ), pointer         :: init_precipitation_data   => model_initialize_precip_normal
-    procedure ( array_method ), pointer         :: init_fog                  => model_initialize_fog_none
-    procedure ( array_method ), pointer         :: init_irrigation           => model_initialize_irrigation_none
-    procedure ( array_method ), pointer         :: init_direct_recharge      => model_initialize_direct_recharge_gridded
-    procedure ( array_method ), pointer         :: init_direct_soil_moisture => model_initialize_direct_soil_moisture_none    
-    procedure ( array_method ), pointer         :: init_GDD                  => model_initialize_GDD_none
-    procedure ( array_method ), pointer         :: init_AWC                  => model_initialize_available_water_content_gridded
-    procedure ( array_method ), pointer         :: init_crop_coefficient     => model_initialize_crop_coefficient_none
-    procedure ( array_method ), pointer         :: calc_interception         => model_calculate_interception_bucket
-    procedure ( array_method ), pointer         :: update_crop_coefficient   => model_update_crop_coefficient_none  
+    procedure ( array_method ), pointer  :: init_interception                                                &
+                                                => model_initialize_interception_bucket
+    procedure ( array_method ), pointer  :: init_runoff                                                      &
+                                                => model_initialize_runoff_curve_number
+    procedure ( array_method ), pointer  :: init_reference_et                                                &
+                                                => model_initialize_et_hargreaves
+    procedure ( array_method ), pointer  :: init_actual_et                                                   &
+                                                => model_initialize_actual_et_thornthwaite_mather_eqns
+    procedure ( array_method ), pointer  :: init_routing                                                     &
+                                                => model_initialize_routing_D8
+    procedure ( array_method ), pointer  :: init_soil_storage_max                                            &
+                                                => model_initialize_soil_storage_max_internally_calculated
+    procedure ( array_method ), pointer  :: init_snowfall                                                    &
+                                                => model_initialize_snowfall_original
+    procedure ( array_method ), pointer  :: init_snowmelt                                                    &
+                                                => model_initialize_snowmelt_original
+    procedure ( array_method ), pointer  :: init_precipitation_data                                          &
+                                                => model_initialize_precip_normal
+    procedure ( array_method ), pointer  :: init_fog                                                         &
+                                                => model_initialize_fog_none
+    procedure ( array_method ), pointer  :: init_irrigation                                                  &
+                                                => model_initialize_irrigation_none
+    procedure ( array_method ), pointer  :: init_direct_recharge                                             &
+                                                => model_initialize_direct_recharge_gridded
+    procedure ( array_method ), pointer  :: init_direct_soil_moisture                                        &
+                                                => model_initialize_direct_soil_moisture_none    
+    procedure ( array_method ), pointer  :: init_GDD                                                         &
+                                                => model_initialize_GDD_none
+    procedure ( array_method ), pointer  :: init_AWC                                                         &
+                                                => model_initialize_available_water_content_gridded
+    procedure ( array_method ), pointer  :: init_crop_coefficient                                            &
+                                                => model_initialize_crop_coefficient_none
+    procedure ( array_method ), pointer  :: calc_interception                                                &
+                                                => model_calculate_interception_bucket
+    procedure ( array_method ), pointer  :: update_crop_coefficient                                          &
+                                                => model_update_crop_coefficient_none  
 
-    procedure ( array_method ), pointer         :: init_continuous_frozen_ground_index => model_initialize_continuous_frozen_ground_index  
-    procedure ( array_method ), pointer         :: calc_continuous_frozen_ground_index => model_calculate_continuous_frozen_ground_index      
+    procedure ( array_method ), pointer  :: init_continuous_frozen_ground_index                              &
+                                                => model_initialize_continuous_frozen_ground_index  
+    procedure ( array_method ), pointer  :: calc_continuous_frozen_ground_index                              &
+                                                => model_calculate_continuous_frozen_ground_index      
 
-    procedure ( array_method ), pointer         :: init_maximum_potential_recharge => model_initialize_maximum_potential_recharge_gridded  
-    procedure ( indexed_method ), pointer       :: calc_maximum_potential_recharge => model_calculate_maximum_potential_recharge_gridded      
+    procedure ( array_method ), pointer  :: init_maximum_potential_recharge                                  &
+                                                => model_initialize_maximum_potential_recharge_gridded  
+    procedure ( index_method ), pointer  :: calc_maximum_potential_recharge                                  &
+                                                => model_calculate_maximum_potential_recharge_gridded      
 
-    procedure ( indexed_method ), pointer       :: calc_runoff            => model_calculate_runoff_curve_number
+    procedure ( index_method ), pointer  :: calc_runoff                                                      &
+                                                => model_calculate_runoff_curve_number
     
-    procedure ( array_method ), pointer         :: calc_reference_et      => model_calculate_et_hargreaves
-    procedure ( indexed_method ), pointer       :: calc_routing           => model_calculate_routing_D8
+    procedure ( array_method ), pointer  :: calc_reference_et                                                &
+                                                => model_calculate_et_hargreaves
+    procedure ( index_method ), pointer  :: calc_routing                                                     &
+                                                => model_calculate_routing_D8
 
-    procedure ( indexed_method ), pointer       :: calc_actual_et         => model_calculate_actual_et_thornthwaite_mather_eqns
-    procedure ( array_method ), pointer         :: calc_snowfall          => model_calculate_snowfall_original
-    procedure ( array_method ), pointer         :: calc_snowmelt          => model_calculate_snowmelt_original  
-    procedure ( array_method ), pointer         :: calc_fog               => model_calculate_fog_none
-    procedure ( array_method ), pointer         :: calc_irrigation        => model_calculate_irrigation_none
-    procedure ( array_method ), pointer         :: calc_GDD               => model_calculate_GDD
-    procedure ( indexed_method ), pointer       :: calc_direct_recharge      => model_calculate_direct_recharge_none    
-    procedure ( indexed_method ), pointer       :: calc_direct_soil_moisture => model_calculate_direct_soil_moisture_none        
+    procedure ( index_method ), pointer  :: calc_actual_et                                                   &
+                                                => model_calculate_actual_et_thornthwaite_mather_eqns
+    procedure ( array_method ), pointer  :: calc_snowfall                                                    &
+                                                => model_calculate_snowfall_original
+    procedure ( array_method ), pointer  :: calc_snowmelt                                                    &
+                                                => model_calculate_snowmelt_original  
+    procedure ( array_method ), pointer  :: calc_fog                                                         &
+                                                => model_calculate_fog_none
+    procedure ( array_method ), pointer  :: calc_irrigation                                                  &
+                                                => model_calculate_irrigation_none
+    procedure ( array_method ), pointer  :: calc_GDD                                                         &
+                                                => model_calculate_GDD
+    procedure ( index_method ), pointer  :: calc_direct_recharge                                             &
+                                                => model_calculate_direct_recharge_none    
+    procedure ( index_method ), pointer  :: calc_direct_soil_moisture                                        &
+                                                => model_calculate_direct_soil_moisture_none        
 
-    procedure (array_method), pointer           :: output_irrigation      => model_output_irrigation_none
-    procedure (array_method), pointer           :: dump_variables         => model_dump_variables_none    
+    procedure (array_method), pointer    :: output_irrigation                                                &
+                                                => model_output_irrigation_none
+    procedure (array_method), pointer    :: dump_variables                                                   &
+                                                => model_dump_variables_none    
 
-    procedure ( array_method ), pointer         :: read_awc_data           => model_read_available_water_content_gridded
-    procedure ( array_method ), pointer         :: get_precipitation_data => model_get_precip_normal
-    procedure ( array_method ), pointer         :: get_minimum_air_temperature_data                                       &     
-                                                                           => model_get_minimum_air_temperature_normal
-    procedure ( array_method ), pointer         :: get_maximum_air_temperature_data                                       &     
-                                                                           => model_get_maximum_air_temperature_normal
-    procedure ( array_method ), pointer         :: calculate_mean_air_temperature                                       &     
-                                                                           => model_calculate_mean_air_temperature
+    procedure ( array_method ), pointer  :: read_awc_data                                                    &
+                                                => model_read_available_water_content_gridded
+    procedure ( array_method ), pointer  :: get_precipitation_data                                           &
+                                                => model_get_precip_normal
+    procedure ( array_method ), pointer  :: get_minimum_air_temperature_data                                 &     
+                                                => model_get_minimum_air_temperature_normal
+    procedure ( array_method ), pointer  :: get_maximum_air_temperature_data                                 &     
+                                                => model_get_maximum_air_temperature_normal
+    procedure ( array_method ), pointer  :: calculate_mean_air_temperature                                   &     
+                                                => model_calculate_mean_air_temperature
 
   contains
 
@@ -235,11 +272,11 @@ module model_domain
   ! indexed method: designed to be called sequentially with explicit
   ! index values provided
   abstract interface
-    subroutine indexed_method( this, index )
+    subroutine index_method( this, index )
       import :: MODEL_DOMAIN_T, c_int
       class ( MODEL_DOMAIN_T ), intent(inout)       :: this
       integer (kind=c_int), intent(in)              :: index
-    end subroutine indexed_method
+    end subroutine index_method
   end interface  
 
   interface minmaxmean
@@ -299,19 +336,19 @@ contains
     this%gridcellsize = dGridcellSize
 
     allocate(this%active(iNumCols, iNumRows), stat=iStat )
-    call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
+    call assert (iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__)
 
     allocate(this%nodata_fill_value(iNumCols, iNumRows), stat=iStat )
-    call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
+    call assert (iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__)
 
     allocate(this%array_output(iNumCols, iNumRows), stat=iStat )
-    call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
+    call assert (iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__)
 
     allocate(this%col_num_2D(iNumCols, iNumRows), stat=iStat )
-    call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
+    call assert (iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__)
 
     allocate(this%row_num_2D(iNumCols, iNumRows), stat=iStat )
-    call assert (iStat == 0, "Problem allocating memory", __FILE__, __LINE__)
+    call assert (iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__)
 
     this%pGrdOut => grid_CreateSimple( iNX=iNumCols, iNY=iNumRows,        &
                       rX0=dX_ll, rY0=dY_ll, rGridCellSize=dGridCellSize,  &
@@ -390,10 +427,13 @@ contains
     allocate( this%rejected_potential_recharge( iCount ), stat=iStat(53) )
 
     do iIndex = 1, ubound( iStat, 1)
-      if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR--Problem allocating memory; iIndex="//asCharacter(iIndex), __FILE__, __LINE__ )
+      if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR"                    &
+                                              //"--Problem allocating memory; iIndex="        &
+                                              //asCharacter(iIndex), __SRCNAME__, __LINE__ )
     enddo
     
-    if (any( iStat /= 0) ) call die ( "Unable to allocate memory for one or more arrays.", __FILE__, __LINE__ )  
+    if (any( iStat /= 0) ) call die ( "Unable to allocate memory for one or more arrays.",    &
+                                      __SRCNAME__, __LINE__ )  
 
     this%landuse_code                        = 0_c_int
     this%landuse_index                       = 0_c_int
@@ -549,7 +589,7 @@ contains
   
   subroutine set_inactive_cells_sub(this)
 
-    use awc__table_values, only  : AVAILABLE_WATER_CONTENT
+    use awc__depth_integrated, only  : AVAILABLE_WATER_CONTENT
 
     class (MODEL_DOMAIN_T), intent(inout)   :: this
     type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
@@ -560,33 +600,35 @@ contains
     pLULC => DAT%find("LAND_USE")
     pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
     pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
+
+    if( .not. associated( pAWC ) )  pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
     
     if ( .not. associated(pHSG) ) &
-      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
     if ( .not. associated(pHSG%pGrdBase) ) &
-      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
     if ( .not. allocated(pHSG%pGrdBase%iData) ) &
-      call die("INTERNAL PROGRAMMING ERROR: attempted use of UNALLOCATED variable", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of UNALLOCATED variable", __SRCNAME__, __LINE__)
 
 !     if ( .not. associated(pAWC) ) &
-!       call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+!       call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
 !     if ( .not. associated(pAWC%pGrdBase) ) &
-!       call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+!       call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
 !     if ( .not. allocated(pAWC%pGrdBase%rData) ) &
-!       call die("INTERNAL PROGRAMMING ERROR: attempted use of UNALLOCATED variable", __FILE__, __LINE__)
+!       call die("INTERNAL PROGRAMMING ERROR: attempted use of UNALLOCATED variable", __SRCNAME__, __LINE__)
 
     if ( .not. associated(pLULC) ) &
-      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
     if ( .not. associated(pLULC%pGrdBase) ) &
-      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
     if ( .not. allocated(pLULC%pGrdBase%iData) ) &
-      call die("INTERNAL PROGRAMMING ERROR: attempted use of UNALLOCATED variable", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of UNALLOCATED variable", __SRCNAME__, __LINE__)
 
     this%active = .true._c_bool
 
@@ -613,7 +655,7 @@ contains
     else
 
       call die( "Found neither gridded nor tabular data to use in initializing available water capacity.", &
-        __FILE__, __LINE__ )
+        __SRCNAME__, __LINE__ )
 
     endif
 
@@ -691,61 +733,61 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)   :: this
 
     if (.not. associated( this%init_interception) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
     if (.not. associated( this%calc_interception) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ ) 
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ ) 
 
     if (.not. associated( this%init_irrigation) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
     if (.not. associated( this%calc_irrigation) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%init_runoff) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
     if (.not. associated( this%calc_runoff) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%init_reference_et) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
     if (.not. associated( this%calc_reference_et) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%init_snowmelt) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
     if (.not. associated( this%calc_snowmelt) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%init_snowfall) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
     if (.not. associated( this%calc_snowfall) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%init_GDD) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
     if (.not. associated( this%calc_GDD) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%init_routing) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )    
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )    
     if (.not. associated( this%calc_routing) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%init_direct_recharge) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
     if (.not. associated( this%calc_direct_recharge) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%init_soil_storage_max) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%get_precipitation_data ) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%get_minimum_air_temperature_data ) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%get_maximum_air_temperature_data ) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __FILE__, __LINE__ )
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
   end subroutine preflight_check_method_pointers
 
@@ -841,26 +883,30 @@ contains
 
       endif
 
-    elseif ( sCmdText .contains. "AVAILABLE_WATER_CONTENT" ) then
+    elseif ( ( sCmdText .contains. "AVAILABLE_WATER_CONTENT" )           &
+        .or. ( sCmdText .contains. "AVAILABLE_WATER_CAPACITY") ) then
 
       if ( ( Method_Name .strequal. "TABLE" ) ) then
 
-        this%init_awc => model_initialize_available_water_content_table
-        this%read_awc_data => model_read_available_water_content_table
+        this%init_awc => model_initialize_available_water_content_depth_integrated
+        this%read_awc_data => model_read_available_water_content_depth_integrated
 
-        call LOGS%WRITE( "==> TABLE method for populating AVAILABLE_WATER_CONTENT selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        call LOGS%WRITE( "==> TABLE method for populating AVAILABLE_WATER_CONTENT/AVAILABLE_WATER_CAPACITY selected.",     &
+                         iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( Method_Name .strequal. "GRID" ) .or. ( Method_Name .strequal. "GRIDDED" ) ) then
 
         this%init_awc => model_initialize_available_water_content_gridded
         this%read_awc_data => model_read_available_water_content_gridded
 
-        call LOGS%WRITE( "==> GRIDDED VALUES method for populating AVAILABLE_WATER_CONTENT selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        call LOGS%WRITE( "==> GRIDDED VALUES method for populating AVAILABLE_WATER_CONTENT/AVAILABLE_WATER_CAPACITY selected.",   &
+                         iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
-        call warn("Your control file specifies an unknown or unsupported AVAILABLE_WATER_CONTENT method.", &
-            lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+        call warn("Your control file specifies an unknown or unsupported AVAILABLE_WATER_CONTENT/"    &
+                  //"AVAILABLE_WATER_CAPACITY method.",                                               &
+                  lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
       endif
 
@@ -886,9 +932,10 @@ contains
     elseif ( ( sCmdText .contains. "CROP_COEFFICIENT" )    &
         .or. ( sCmdText .contains. "CROP_COEF" ) )  then
 
-      if ( ( Method_Name .strequal. "FAO56" )  &
-             .or. ( Method_Name .strequal. "FAO-56" ) ) then
-
+      if ( ( Method_Name .strequal. "FAO56" )                   &
+             .or. ( Method_Name .strequal. "FAO-56" )           &
+             .or. ( Method_Name .strequal. "FAO_56" ) ) then
+      
         this%init_crop_coefficient => model_initialize_crop_coefficient_FAO56
         this%update_crop_coefficient => model_update_crop_coefficient_FAO56
 
@@ -925,8 +972,9 @@ contains
 
     elseif ( sCmdText .contains. "IRRIGATION" ) then
 
-      if ( ( Method_Name .strequal. "FAO56" )  &
-             .or. ( Method_Name .strequal. "FAO-56" ) ) then
+      if ( ( Method_Name .strequal. "FAO56" )                   &
+             .or. ( Method_Name .strequal. "FAO-56" )           &
+             .or. ( Method_Name .strequal. "FAO_56" ) ) then
 
         this%init_irrigation => model_initialize_irrigation
         this%calc_irrigation => model_calculate_irrigation
@@ -948,7 +996,8 @@ contains
       endif
 
 
-    elseif ( sCmdText .contains. "SOIL_STORAGE_MAX" ) then
+    elseif ( ( sCmdText .contains. "SOIL_STORAGE_MAX" )            &
+        .or. ( sCmdText .contains. "PLANT_AVAILABLE_WATER" ) ) then
 
       if ( Method_Name .strequal. "GRIDDED" ) then
 
@@ -969,8 +1018,9 @@ contains
 
     elseif ( sCmdText .contains. "EVAPOTRANSPIRATION" ) then
 
-      if ( ( Method_Name .strequal. "HARGREAVES" ) &
-           .or. ( Method_Name .strequal. "HARGREAVES-SAMANI" ) ) then
+      if (   ( Method_Name .strequal. "HARGREAVES" )                 &
+        .or. ( Method_Name .strequal. "HARGREAVES-SAMANI" )          &
+        .or. ( Method_Name .strequal. "HARGREAVES_SAMANI" ) ) then
 
         this%init_reference_et => model_initialize_et_hargreaves
         this%calc_reference_et => model_calculate_et_hargreaves
@@ -1065,6 +1115,16 @@ contains
         this%calc_actual_et => model_calculate_actual_et_thornthwaite_mather
 
         call LOGS%WRITE( "==> THORNTHWAITE-MATHER SOIL MOISTURE RETENTION submodel selected.", &
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
+
+      elseif ( ( Method_Name .strequal. "T-M_EQUATIONS" )                           &
+             .or. ( Method_Name .strequal. "THORNTHWAITE-MATHER_EQUATIONS" )        &
+             .or. ( Method_Name .strequal. "THORNTHWAITE_MATHER_EQUATIONS") ) then
+
+        this%init_actual_et => model_initialize_actual_et_thornthwaite_mather_eqns
+        this%calc_actual_et => model_calculate_actual_et_thornthwaite_mather_eqns
+
+        call LOGS%WRITE( "==> THORNTHWAITE-MATHER SOIL MOISTURE RETENTION (SWB 1.0 equations) submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( Method_Name .strequal. "FAO56" ) .or. ( Method_Name .strequal. "FAO-56" ) ) then
@@ -1508,7 +1568,7 @@ contains
     integer (kind=c_int) :: status
 
     allocate( this%monthly_runoff( count( this%active ) ), stat=status)
-    call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     call runoff_gridded_values_initialize( this%active )
     call runoff_gridded_values_update_ratios( )
@@ -1590,8 +1650,11 @@ contains
     ! locate the data structure associated with the gridded rainfall zone entries
     pSOIL_STORAGE_MAX_GRID => DAT%find("SOIL_STORAGE_MAX")
     if ( .not. associated(pSOIL_STORAGE_MAX_GRID) ) &
-        call die("A SOIL_STORAGE_MAX grid must be supplied in order to make use of this option.", &
-           __FILE__, __LINE__)
+      pSOIL_STORAGE_MAX_GRID => DAT%find("PLANT_AVAILABLE_WATER")
+    
+    if ( .not. associated(pSOIL_STORAGE_MAX_GRID) ) &
+        call die("A SOIL_STORAGE_MAX or PLANT_AVAILABLE_WATER grid must be supplied in order"    &
+        //" to make use of this option.", __SRCNAME__, __LINE__ )
 
     call pSOIL_STORAGE_MAX_GRID%getvalues( )
 
@@ -1665,7 +1728,7 @@ contains
 
     allocate( this%irrigation_mask( count( this%active ) ), stat=status )
     call assert( status==0, "Problem allocating memory.", &
-      __FILE__, __LINE__ )
+      __SRCNAME__, __LINE__ )
 
     call irrigation__initialize( this%irrigation_mask, this%active )
 
@@ -1784,21 +1847,21 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_read_available_water_content_table( this )
+  subroutine model_read_available_water_content_depth_integrated( this )
 
-    use awc__table_values
+    use awc__depth_integrated
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call awc_table_values_read( fRooting_Depth=ROOTING_DEPTH_MAX )
+    call awc_depth_integrated_read( fRooting_Depth=ROOTING_DEPTH_MAX )
 
-  end subroutine model_read_available_water_content_table  
+  end subroutine model_read_available_water_content_depth_integrated  
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_initialize_available_water_content_table( this )
+  subroutine model_initialize_available_water_content_depth_integrated( this )
 
-    use awc__table_values
+    use awc__depth_integrated
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
@@ -1813,7 +1876,7 @@ contains
 
     allocate ( this%soil_code (count( this%active ) ), stat=iStat )
 
-    call awc_table_values_initialize( lActive=this%active,                        &
+    call awc_depth_integrated_initialize( lActive=this%active,                        &
                                       fAWC=this%awc,                              &
                                       iSoils_Code=this%soil_code )
 
@@ -1823,7 +1886,7 @@ contains
 
     call grid_Destroy( pTempGrd )
 
-  end subroutine model_initialize_available_water_content_table  
+  end subroutine model_initialize_available_water_content_depth_integrated  
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1857,7 +1920,7 @@ contains
     integer (kind=c_int)  :: status
 
     allocate( this%gdd( count( this%active ) ), stat=status )
-    call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
+    call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
     this%gdd = 0.0_c_float
 
@@ -2339,7 +2402,7 @@ contains
 
     pTMAX => DAT%find("TMAX")
     if ( .not. associated(pTMAX) ) &
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
     associate ( dt => SIM_DT%curr )
 
@@ -2353,7 +2416,7 @@ contains
     end associate
 
     if (.not. associated(pTMAX%pGrdBase) ) &
-      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __SRCNAME__, __LINE__)
 
     this%tmax = pack( pTMAX%pGrdBase%rData, this%active )
 
@@ -2375,7 +2438,7 @@ contains
 
     pTMIN => DAT%find("TMIN")
     if ( .not. associated(pTMIN) ) &
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
     associate ( dt => SIM_DT%curr )
 
@@ -2389,7 +2452,7 @@ contains
     end associate
 
     if (.not. associated(pTMIN%pGrdBase) ) &
-      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __SRCNAME__, __LINE__)
 
     this%tmin = pack( pTMIN%pGrdBase%rData, this%active )
 
@@ -2410,7 +2473,7 @@ contains
 
     pPRCP => DAT%find("PRECIPITATION")
     if ( .not. associated(pPRCP) ) &
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
     associate ( dt => SIM_DT%curr )
 
@@ -2425,7 +2488,7 @@ contains
     end associate
 
     if (.not. associated(pPRCP%pGrdBase) ) &
-      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: Call to NULL pointer.", __SRCNAME__, __LINE__)
 
     this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active )
 
@@ -2443,7 +2506,7 @@ contains
     integer (kind=c_int) :: status
 
     allocate( this%monthly_gross_precip( count( this%active ) ), stat=status)
-    call assert( status==0, "Problem allocating memory", __FILE__, __LINE__ )
+    call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     call precipitation_method_of_fragments_initialize( this%active )
     call this%get_precipitation_data()
@@ -2471,7 +2534,7 @@ contains
     ! MONTHLY sum of precipitation
     pPRCP => DAT%find("PRECIPITATION")
     if ( .not. associated(pPRCP) ) &
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
     associate ( dt => SIM_DT%curr )
 
@@ -2487,7 +2550,7 @@ contains
     end associate
 
     if (.not. associated(pPRCP%pGrdBase) ) &
-      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer.", __FILE__, __LINE__)
+      call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer.", __SRCNAME__, __LINE__)
 
     call precipitation_method_of_fragments_calculate( this%active )
 
