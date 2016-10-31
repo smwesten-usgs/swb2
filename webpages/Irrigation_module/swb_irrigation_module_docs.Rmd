@@ -1,9 +1,12 @@
+---
+output: pdf_document
+---
 Soil-Water-Balance Model Irrigation Module: FAO-56 Modes
 ========================================================
 
 ```{r, echo=FALSE, cache=TRUE}
 
-setwd("D:/SMWData/Source_Code/swb/webpages/Irrigation_module")
+setwd("D:/SMWData/Source_Code/swb2/webpages/Irrigation_module")
 
 sm <- read.table("one_factor_standard/SOIL_MOISTURE_2_2.ssf", colClasses=c("character","character","character","numeric"))
 colnames(sm) <- c("row_col", "date", "time", "value")
@@ -82,9 +85,10 @@ print(mygtable, "chart")
 
 In the following sections, each of the four swb modes of implementing the FAO-56 calculations is compared to a standard test case that was prepared and run through the FAO's CROPWAT irrigation analysis software (http://www.fao.org/nr/water/infores_databases_cropwat.html).
 
-*****
-1. SINGLE COEFFICIENT UNDER STANDARD CONDITIONS
 -----------------------
+
+## 1. SINGLE COEFFICIENT UNDER STANDARD CONDITIONS
+
 
 By 'single coefficient', we mean that evaporation from bare soil is not evaluated separately; the potential evapotranspiration to which the soil is subjected is estimated as the 'crop evapotranspiration', the product of the grass reference evapotranspiration \(E{T_{\rm{o}}}\) and a crop coefficient \({K_c}\):
 
@@ -132,9 +136,10 @@ with(cw_msb, points( eta_in_day ~ date, col="blue"))
 ```
 The plots of reference and crop ET are very similar for the remaining FAO-56 calculation options and are not shown in the remaining comparison plots.
 
-*****
-2. SINGLE COEFFICIENT UNDER NONSTANDARD CONDITIONS
 -----------------------
+
+## 2. SINGLE COEFFICIENT UNDER NONSTANDARD CONDITIONS
+
 
 The calculation under 'nonstandard' conditions includes the transpiration-limiting effects of soil water stress on plants. When this option is invoked in swb, the Thornthwaite-Mather soil moisture retention tables are **not** consulted. Rather, the crop evapotranspiration amount is adjusted (\(E{T_{c,adj}}\)) by incorporation of a water stress factor (\({K_s}\)) whose value may range between 0.0 and 1.0:
 
@@ -225,9 +230,11 @@ legend(x="left",inset=c(0.02,0.02),legend=c("swb soil mois","swb irr amnt",
        pch=c(-1,-1,-1,-1,-1,-1,19),cex=0.8)
 
 ```
-*****
-3. DUAL COEFFICIENT UNDER STANDARD CONDITIONS
+
+
 -----------------------
+
+## 3. DUAL COEFFICIENT UNDER STANDARD CONDITIONS
 
 The dual coefficient version of the FAO-56 methodology splits the crop coefficient into two coefficients, one to account for soil evaporation, and the other to account for crop transpiration. This modification to the methodology is recommended when more frequent irrigation applications are likely, and the irrigation scheduling is to be done on a daily basis (Allen and others, 1998). Since swb is already performing soil water balance calculations on a daily basis, the dual-coefficient methodology is probably the preferred method when simulating land subject to frequent irrigation. The dual coefficient method for calculating crop evapotranspiration is shown below:
 
@@ -312,10 +319,9 @@ legend(x="left",inset=c(0.02,0.02),legend=c("swb soil mois","swb irr amnt",
 ```
 
 
-
-*****
-4. DUAL COEFFICIENT UNDER NONSTANDARD CONDITIONS
 -----------------------
+
+## 4. DUAL COEFFICIENT UNDER NONSTANDARD CONDITIONS
 
 The last option for application of the FAO-56 methodology uses the dual-coefficient approach discussed in the last section. Further, this option **disables** the Thornthwaite-Mather soil moisture retention tables and **enables** the reduction of crop evaportanspiration due to water stress. 
 

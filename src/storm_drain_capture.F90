@@ -29,6 +29,7 @@ contains
     logical                           :: are_lengths_unequal
     type (STRING_LIST_T)              :: string_list
     integer (kind=c_int)              :: status
+    character (len=256)               :: sBuf
 
     call string_list%append("LU_Code")
     call string_list%append("Landuse_Lookup_Code")
@@ -51,13 +52,24 @@ contains
     are_lengths_unequal = ( num_records /= number_of_landuse_codes ) 
 
     if ( are_lengths_unequal ) then
-      call warn( sMessage="The number of values specifying storm drain capture"            &
+
+      sBuf = "The number of values specifying storm drain capture"                         &
         //" fraction ("                                                                    &
         //asCharacter( num_records )//") does not match the number of landuse values ("    &
-        //asCharacter( number_of_landuse_codes )//"). Setting default storm drain"        &
-        //" capture to 0.0 (ZERO).", iLogLevel=LOG_ALL,                                    &
-        sModule=__FILE__, iLine=__LINE__, lFatal=.false._c_bool )
-      
+        //asCharacter( number_of_landuse_codes )//"). Setting default storm drain"         &
+        //" capture to 0.0 (ZERO)."
+
+
+    ! character (len=*), intent(in)               :: sMessage
+    ! character (len=*), intent(in), optional     :: sModule
+    ! integer (kind=c_int), intent(in), optional  :: iLine 
+    ! character (len=*), intent(in), optional     :: sHints
+    ! logical (kind=c_bool), intent(in), optional :: lFatal
+    ! integer (kind=c_int), intent(in), optional  :: iLogLevel
+    ! logical (kind=c_bool), intent(in), optional :: lEcho
+
+      call warn( sMessage=trim(sBuf), sModule=__FILE__, iLine=__LINE__, lFatal=.false._c_bool, iLogLevel=LOG_ALL )
+
       deallocate(STORM_DRAIN_CAPTURE_FRACTION, stat=status)
       call assert( status==0, "Problem deallocating STORM_DRAIN_CAPTURE_FRACTION", &
         __FILE__, __LINE__ )
