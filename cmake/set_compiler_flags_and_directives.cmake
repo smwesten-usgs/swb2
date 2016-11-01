@@ -1,5 +1,5 @@
 if (Fortran_COMPILER_NAME MATCHES "gfortran.*")
-  set (CMAKE_Fortran_FLAGS_RELEASE "-O2 -cpp -mtune=native -ffree-line-length-none -fbackslash -ffpe-summary='none'")
+  set (CMAKE_Fortran_FLAGS_RELEASE "-O2 -cpp -mtune=native -ffree-line-length-none -fbackslash")
   set (CMAKE_Fortran_FLAGS_DEBUG   "-O0 -cpp -g -ggdb -Wuninitialized -fbacktrace -fcheck=all -fexceptions -fsanitize=null -fsanitize=leak -fmax-errors=6 -fbackslash -ffree-line-length-none")
 elseif (Fortran_COMPILER_NAME MATCHES "ifort.*")
   set (CMAKE_Fortran_FLAGS_RELEASE "-O2")

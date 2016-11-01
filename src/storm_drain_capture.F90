@@ -32,7 +32,7 @@ contains
     character (len=256)               :: sBuf
 
     call string_list%append("LU_Code")
-    call string_list%append("Landuse_Code")    
+    call string_list%append("Landuse_Code")
     call string_list%append("Landuse_Lookup_Code")
 
     !> Determine how many landuse codes are present
@@ -57,25 +57,10 @@ contains
       sBuf = "The number of values specifying storm drain capture"                         &
         //" fraction ("                                                                    &
         //asCharacter( num_records )//") does not match the number of landuse values ("    &
-<<<<<<< HEAD
         //asCharacter( number_of_landuse_codes )//"). Setting default storm drain"         &
         //" capture to 0.0 (ZERO)."
 
-
-    ! character (len=*), intent(in)               :: sMessage
-    ! character (len=*), intent(in), optional     :: sModule
-    ! integer (kind=c_int), intent(in), optional  :: iLine 
-    ! character (len=*), intent(in), optional     :: sHints
-    ! logical (kind=c_bool), intent(in), optional :: lFatal
-    ! integer (kind=c_int), intent(in), optional  :: iLogLevel
-    ! logical (kind=c_bool), intent(in), optional :: lEcho
-
       call warn( sMessage=trim(sBuf), sModule=__FILE__, iLine=__LINE__, lFatal=.false._c_bool, iLogLevel=LOG_ALL )
-=======
-        //asCharacter( number_of_landuse_codes )//"). Setting default storm drain"        &
-        //" capture to 0.0 (ZERO).", iLogLevel=LOG_ALL,                                    &
-        sModule=__SRCNAME__, iLine=__LINE__, lFatal=.false._c_bool )
->>>>>>> e6ccd93f1fab827d30c5099a8e27f897364f2e69
 
       deallocate(STORM_DRAIN_CAPTURE_FRACTION, stat=status)
       call assert( status==0, "Problem deallocating STORM_DRAIN_CAPTURE_FRACTION", &
