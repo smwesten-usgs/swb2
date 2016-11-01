@@ -1777,10 +1777,12 @@ contains
 
     endif
 
-    if ( count(MODEL%landuse_index < 0) > 0 ) &
-      call warn(asCharacter(count(MODEL%landuse_index < 0))//" landuse codes had no match "        &
-      //" in the landuse_index vector.", lFatal=lTRUE, sHints="Make sure that you have an "        &
+    ! if we have more than one cell for which an index value could not be assigned, trigger fatal error
+    if ( count(MODEL%landuse_index < 0) > 0 ) then
+      call warn(asCharacter(count(MODEL%landuse_index < 0))//" landuse codes could not be "        &
+      //" assigned a landuse index value.", lFatal=lTRUE, sHints="Make sure that you have an "        &
       //"entry in the landuse lookup table for each unique code contained in your landuse grid." )
+    endif
 
 
   end subroutine initialize_landuse_codes

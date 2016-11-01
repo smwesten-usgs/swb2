@@ -11,7 +11,7 @@ module model_domain
   use snowfall__original
   use string_list, only      : STRING_LIST_T
   use grid
-  use parameters, only       : PARAMS, PARAMS_DICT 
+  use parameters, only       : PARAMS, PARAMS_DICT
   use netcdf4_support, only  : NC_FILL_FLOAT
   use strings
   implicit none
@@ -50,10 +50,10 @@ module model_domain
     integer (kind=c_int), allocatable      :: sum_upslope_cells(:)
 
     integer (kind=c_int), allocatable      :: col_num_2D(:,:)
-    integer (kind=c_int), allocatable      :: row_num_2D(:,:)    
+    integer (kind=c_int), allocatable      :: row_num_2D(:,:)
 
     integer (kind=c_int), allocatable      :: col_num_1D(:)
-    integer (kind=c_int), allocatable      :: row_num_1D(:)    
+    integer (kind=c_int), allocatable      :: row_num_1D(:)
 
     real (kind=c_float), allocatable       :: pervious_fraction(:)
     real (kind=c_float), allocatable       :: canopy_cover_fraction(:)
@@ -61,10 +61,10 @@ module model_domain
     real (kind=c_float), allocatable       :: curve_num_adj(:)
     real (kind=c_float), allocatable       :: gdd(:)
     real (kind=c_float), allocatable       :: crop_coefficient_kcb(:)
-    real (kind=c_float), allocatable       :: continuous_frozen_ground_index(:)    
+    real (kind=c_float), allocatable       :: continuous_frozen_ground_index(:)
 
     real (kind=c_float), allocatable       :: rooting_depth_max(:)
-     
+
     integer (kind=c_int), allocatable      :: polygon_id(:)
     real (kind=c_float), allocatable       :: latitude(:)
     real (kind=c_float), allocatable       :: reference_et0(:)
@@ -72,9 +72,9 @@ module model_domain
 
     real (kind=c_float), allocatable       :: actual_et_interception(:)
     real (kind=c_float), allocatable       :: actual_et_impervious(:)
-    real (kind=c_float), allocatable       :: actual_et_soil(:)        
+    real (kind=c_float), allocatable       :: actual_et_soil(:)
     real (kind=c_float), allocatable       :: actual_et(:)
-    
+
     real (kind=c_float), allocatable       :: inflow(:)
     real (kind=c_float), allocatable       :: runon(:)
     real (kind=c_float), allocatable       :: runoff(:)
@@ -85,7 +85,7 @@ module model_domain
     real (kind=c_float), allocatable       :: potential_snowmelt(:)
     real (kind=c_float), allocatable       :: snowmelt(:)
     type (GENERAL_GRID_T), pointer         :: pGrdOut
-    real (kind=c_float), allocatable       :: interception(:)     
+    real (kind=c_float), allocatable       :: interception(:)
     real (kind=c_float), allocatable       :: interception_storage(:)
 
     real (kind=c_float), allocatable       :: snow_storage(:)
@@ -97,14 +97,14 @@ module model_domain
     real (kind=c_float), allocatable       :: soil_storage_max(:)
     real (kind=c_float), allocatable       :: potential_recharge(:)
     real (kind=c_float), allocatable       :: rejected_potential_recharge(:)
-    real (kind=c_float), allocatable       :: direct_recharge(:) 
-    real (kind=c_float), allocatable       :: direct_soil_moisture(:)   
+    real (kind=c_float), allocatable       :: direct_recharge(:)
+    real (kind=c_float), allocatable       :: direct_soil_moisture(:)
     real (kind=c_float), allocatable       :: current_rooting_depth(:)
     integer (kind=c_int), allocatable      :: number_of_days_since_planting(:)
     logical (kind=c_bool), allocatable     :: it_is_growing_season(:)
-         
+
     real (kind=c_float), allocatable       :: gross_precip(:)
-    real (kind=c_float), allocatable       :: monthly_gross_precip(:)    
+    real (kind=c_float), allocatable       :: monthly_gross_precip(:)
     real (kind=c_float), allocatable       :: fog(:)
     real (kind=c_float), allocatable       :: rainfall(:)
     real (kind=c_float), allocatable       :: snowfall(:)
@@ -150,7 +150,7 @@ module model_domain
     procedure ( array_method ), pointer  :: init_direct_recharge                                             &
                                                 => model_initialize_direct_recharge_gridded
     procedure ( array_method ), pointer  :: init_direct_soil_moisture                                        &
-                                                => model_initialize_direct_soil_moisture_none    
+                                                => model_initialize_direct_soil_moisture_none
     procedure ( array_method ), pointer  :: init_GDD                                                         &
                                                 => model_initialize_GDD_none
     procedure ( array_method ), pointer  :: init_AWC                                                         &
@@ -160,21 +160,21 @@ module model_domain
     procedure ( array_method ), pointer  :: calc_interception                                                &
                                                 => model_calculate_interception_bucket
     procedure ( array_method ), pointer  :: update_crop_coefficient                                          &
-                                                => model_update_crop_coefficient_none  
+                                                => model_update_crop_coefficient_none
 
     procedure ( array_method ), pointer  :: init_continuous_frozen_ground_index                              &
-                                                => model_initialize_continuous_frozen_ground_index  
+                                                => model_initialize_continuous_frozen_ground_index
     procedure ( array_method ), pointer  :: calc_continuous_frozen_ground_index                              &
-                                                => model_calculate_continuous_frozen_ground_index      
+                                                => model_calculate_continuous_frozen_ground_index
 
     procedure ( array_method ), pointer  :: init_maximum_potential_recharge                                  &
-                                                => model_initialize_maximum_potential_recharge_gridded  
+                                                => model_initialize_maximum_potential_recharge_gridded
     procedure ( index_method ), pointer  :: calc_maximum_potential_recharge                                  &
-                                                => model_calculate_maximum_potential_recharge_gridded      
+                                                => model_calculate_maximum_potential_recharge_gridded
 
     procedure ( index_method ), pointer  :: calc_runoff                                                      &
                                                 => model_calculate_runoff_curve_number
-    
+
     procedure ( array_method ), pointer  :: calc_reference_et                                                &
                                                 => model_calculate_et_hargreaves
     procedure ( index_method ), pointer  :: calc_routing                                                     &
@@ -185,7 +185,7 @@ module model_domain
     procedure ( array_method ), pointer  :: calc_snowfall                                                    &
                                                 => model_calculate_snowfall_original
     procedure ( array_method ), pointer  :: calc_snowmelt                                                    &
-                                                => model_calculate_snowmelt_original  
+                                                => model_calculate_snowmelt_original
     procedure ( array_method ), pointer  :: calc_fog                                                         &
                                                 => model_calculate_fog_none
     procedure ( array_method ), pointer  :: calc_irrigation                                                  &
@@ -193,24 +193,24 @@ module model_domain
     procedure ( array_method ), pointer  :: calc_GDD                                                         &
                                                 => model_calculate_GDD
     procedure ( index_method ), pointer  :: calc_direct_recharge                                             &
-                                                => model_calculate_direct_recharge_none    
+                                                => model_calculate_direct_recharge_none
     procedure ( index_method ), pointer  :: calc_direct_soil_moisture                                        &
-                                                => model_calculate_direct_soil_moisture_none        
+                                                => model_calculate_direct_soil_moisture_none
 
     procedure (array_method), pointer    :: output_irrigation                                                &
                                                 => model_output_irrigation_none
     procedure (array_method), pointer    :: dump_variables                                                   &
-                                                => model_dump_variables_none    
+                                                => model_dump_variables_none
 
     procedure ( array_method ), pointer  :: read_awc_data                                                    &
                                                 => model_read_available_water_content_gridded
     procedure ( array_method ), pointer  :: get_precipitation_data                                           &
                                                 => model_get_precip_normal
-    procedure ( array_method ), pointer  :: get_minimum_air_temperature_data                                 &     
+    procedure ( array_method ), pointer  :: get_minimum_air_temperature_data                                 &
                                                 => model_get_minimum_air_temperature_normal
-    procedure ( array_method ), pointer  :: get_maximum_air_temperature_data                                 &     
+    procedure ( array_method ), pointer  :: get_maximum_air_temperature_data                                 &
                                                 => model_get_maximum_air_temperature_normal
-    procedure ( array_method ), pointer  :: calculate_mean_air_temperature                                   &     
+    procedure ( array_method ), pointer  :: calculate_mean_air_temperature                                   &
                                                 => model_calculate_mean_air_temperature
 
   contains
@@ -228,7 +228,7 @@ module model_domain
     generic   :: set_inactive_cells => set_inactive_cells_sub
 
     procedure :: preflight_check_method_pointers
-    
+
     procedure :: get_climate_data
 
     procedure :: set_output_directory => set_output_directory_sub
@@ -247,7 +247,7 @@ module model_domain
 
     procedure :: model_initialize_growing_season
     generic   :: initialize_growing_season => model_initialize_growing_season
-  
+
     procedure :: model_update_growing_season
     generic   :: update_growing_season => model_update_growing_season
 
@@ -267,7 +267,7 @@ module model_domain
       import :: MODEL_DOMAIN_T
       class ( MODEL_DOMAIN_T ), intent(inout)  :: this
     end subroutine array_method
-  end interface  
+  end interface
 
   ! indexed method: designed to be called sequentially with explicit
   ! index values provided
@@ -277,7 +277,7 @@ module model_domain
       class ( MODEL_DOMAIN_T ), intent(inout)       :: this
       integer (kind=c_int), intent(in)              :: index
     end subroutine index_method
-  end interface  
+  end interface
 
   interface minmaxmean
     procedure :: minmaxmean_float
@@ -313,7 +313,7 @@ contains
 
     this%output_directory_name = output_dir_name
 
-  end subroutine set_output_directory_sub  
+  end subroutine set_output_directory_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -401,27 +401,27 @@ contains
     allocate( this%order_index(iCount), stat=iStat(26) )
     allocate( this%runoff_outside( iCount ), stat=iStat(28) )
     allocate( this%pervious_fraction( iCount ), stat=iStat(29) )
-    allocate( this%surface_storage( iCount ), stat=iStat(30) ) 
+    allocate( this%surface_storage( iCount ), stat=iStat(30) )
     allocate( this%surface_storage_excess( iCount ), stat=iStat(31) )
-    allocate( this%surface_storage_max( iCount ), stat=iStat(32) ) 
-    allocate( this%storm_drain_capture( iCount ), stat=iStat(33) )          
-    allocate( this%canopy_cover_fraction( iCount ), stat=iStat(34) ) 
-    allocate( this%crop_coefficient_kcb( iCount ), stat=iStat(35) )   
-    allocate( this%potential_snowmelt( iCount ), stat=iStat(36) )  
-    allocate( this%continuous_frozen_ground_index( iCount ), stat=iStat(37) ) 
+    allocate( this%surface_storage_max( iCount ), stat=iStat(32) )
+    allocate( this%storm_drain_capture( iCount ), stat=iStat(33) )
+    allocate( this%canopy_cover_fraction( iCount ), stat=iStat(34) )
+    allocate( this%crop_coefficient_kcb( iCount ), stat=iStat(35) )
+    allocate( this%potential_snowmelt( iCount ), stat=iStat(36) )
+    allocate( this%continuous_frozen_ground_index( iCount ), stat=iStat(37) )
     allocate( this%rooting_depth_max( iCount ), stat=iStat(38) )
     allocate( this%current_rooting_depth( iCount ), stat=iStat(39) )
-    allocate( this%polygon_id( iCount ), stat=iStat(40) )    
-    allocate( this%actual_et_soil( iCount ), stat=iStat(41) )        
+    allocate( this%polygon_id( iCount ), stat=iStat(40) )
+    allocate( this%actual_et_soil( iCount ), stat=iStat(41) )
     allocate( this%actual_et_impervious( iCount ), stat=iStat(42) )
-    allocate( this%actual_et_interception( iCount ), stat=iStat(43) )        
+    allocate( this%actual_et_interception( iCount ), stat=iStat(43) )
     allocate( this%adjusted_depletion_fraction_p( iCount ), stat=iStat(44) )
     allocate( this%crop_etc( iCount ), stat=iStat(45) )
-    allocate( this%direct_recharge( iCount ), stat=iStat(46) )     
-    allocate( this%direct_soil_moisture( iCount ), stat=iStat(47) )         
-    allocate( this%number_of_days_since_planting( iCount ), stat=iStat(48) )   
+    allocate( this%direct_recharge( iCount ), stat=iStat(46) )
+    allocate( this%direct_soil_moisture( iCount ), stat=iStat(47) )
+    allocate( this%number_of_days_since_planting( iCount ), stat=iStat(48) )
     allocate( this%col_num_1D( iCount ), stat=iStat(49) )
-    allocate( this%row_num_1D( iCount ), stat=iStat(50) )    
+    allocate( this%row_num_1D( iCount ), stat=iStat(50) )
     allocate( this%it_is_growing_season( iCount ), stat=iStat(51) )
     allocate( this%curve_num_adj( iCount ), stat=iStat(52) )
     allocate( this%rejected_potential_recharge( iCount ), stat=iStat(53) )
@@ -431,9 +431,9 @@ contains
                                               //"--Problem allocating memory; iIndex="        &
                                               //asCharacter(iIndex), __SRCNAME__, __LINE__ )
     enddo
-    
+
     if (any( iStat /= 0) ) call die ( "Unable to allocate memory for one or more arrays.",    &
-                                      __SRCNAME__, __LINE__ )  
+                                      __SRCNAME__, __LINE__ )
 
     this%landuse_code                        = 0_c_int
     this%landuse_index                       = 0_c_int
@@ -486,7 +486,7 @@ contains
     this%direct_soil_moisture                = 0.0_c_float
     this%number_of_days_since_planting       = 0_c_int
     this%it_is_growing_season                = lFALSE
-    
+
     do iIndex=1, iCount
       this%order_index( iIndex ) = iIndex
     enddo
@@ -505,11 +505,11 @@ contains
 
     do row_num=lbound( this%row_num_2D, 2), ubound( this%row_num_2D, 2)
       this%row_num_2D( :, row_num ) = row_num
-    enddo  
+    enddo
 
     do col_num=lbound( this%col_num_2D, 1), ubound( this%col_num_2D, 1 )
       this%col_num_2D( col_num, : ) = col_num
-    enddo  
+    enddo
 
     this%col_num_1D = pack( this%col_num_2D, this%active )
     this%row_num_1D = pack( this%row_num_2D, this%active )
@@ -525,7 +525,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)   :: this
     integer (kind=c_int), intent(in)        :: col_num
-    integer (kind=c_int), intent(in)        :: row_num    
+    integer (kind=c_int), intent(in)        :: row_num
     integer (kind=c_int)                    :: indexval
 
     ! [ LOCALS ]
@@ -539,7 +539,7 @@ contains
          .and. ( this%row_num_1D( indexval ) == row_num ) ) then
         found_match = TRUE
         exit
-      endif  
+      endif
 
     enddo
 
@@ -586,15 +586,15 @@ contains
   end subroutine initialize_methods_sub
 
 !--------------------------------------------------------------------------------------------------
-  
+
   subroutine set_inactive_cells_sub(this)
 
     use awc__depth_integrated, only  : AVAILABLE_WATER_CONTENT
 
     class (MODEL_DOMAIN_T), intent(inout)   :: this
     type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
-    type (DATA_CATALOG_ENTRY_T), pointer :: pLULC      
-    type (DATA_CATALOG_ENTRY_T), pointer :: pAWC      
+    type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
+    type (DATA_CATALOG_ENTRY_T), pointer :: pAWC
 
 
     pLULC => DAT%find("LAND_USE")
@@ -602,7 +602,7 @@ contains
     pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
 
     if( .not. associated( pAWC ) )  pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
-    
+
     if ( .not. associated(pHSG) ) &
       call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
 
@@ -651,7 +651,7 @@ contains
         this%active = .false._c_bool
 
       end where
-      
+
     else
 
       call die( "Found neither gridded nor tabular data to use in initializing available water capacity.", &
@@ -664,7 +664,7 @@ contains
 
   end subroutine set_inactive_cells_sub
 
-!--------------------------------------------------------------------------------------------------  
+!--------------------------------------------------------------------------------------------------
 
 !   subroutine read_in_available_water_content_sub( this )
 
@@ -676,20 +676,20 @@ contains
 !     type (DATA_CATALOG_ENTRY_T), pointer :: pAWC
 
 !     pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
-    
+
 !     if ( associated(pAWC) ) then
 
 !       call pAWC%getvalues()
 !       call grid_WriteArcGrid("Available_Water_Content__as_read_in_by_SWB.asc", pAWC%pGrdBase )
 
 !     else
-    
+
 !       call warn(sMessage="AVAILABLE_WATER_CONTENT dataset is flawed or missing.", lFatal=lFALSE,    &
 !         iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"              &
 !         //" been ~included in the control file for the AVAILABLE_WATER_CONTENT dataset.",           &
 !         lEcho = lTRUE )
 
-!     endif    
+!     endif
 
 !   end subroutine read_in_available_water_content_sub
 
@@ -711,9 +711,9 @@ contains
       iMonth = asInt( dt%iMonth )
       iDay = asInt( dt%iDay )
       iYear = dt%iYear
-  
 
-      ! the following statements process the raw data in order to get it into the 
+
+      ! the following statements process the raw data in order to get it into the
       ! right units or properly pack the data
 
       call this%get_precipitation_data()
@@ -735,7 +735,7 @@ contains
     if (.not. associated( this%init_interception) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
     if (.not. associated( this%calc_interception) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ ) 
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%init_irrigation) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
@@ -768,7 +768,7 @@ contains
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%init_routing) ) &
-      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )    
+      call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
     if (.not. associated( this%calc_routing) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
@@ -816,7 +816,7 @@ contains
         this%init_interception => model_initialize_interception_bucket
         this%calc_interception => model_calculate_interception_bucket
 
-        ! when the "bucket" model is used, it requires some means of determining 
+        ! when the "bucket" model is used, it requires some means of determining
         ! "growing" vs. "non-growing" season
         this%init_GDD => model_initialize_GDD
         this%calc_GDD => model_calculate_GDD
@@ -935,7 +935,7 @@ contains
       if ( ( Method_Name .strequal. "FAO56" )                   &
              .or. ( Method_Name .strequal. "FAO-56" )           &
              .or. ( Method_Name .strequal. "FAO_56" ) ) then
-      
+
         this%init_crop_coefficient => model_initialize_crop_coefficient_FAO56
         this%update_crop_coefficient => model_update_crop_coefficient_FAO56
 
@@ -1159,7 +1159,7 @@ contains
 
             DUMP( indx )%col = asInt( col )
             DUMP( indx )%row = asInt( row )
-            
+
             filename = "SWB2_variable_values__col_"//trim( col )//"__row_"//trim( row )//".csv"
 
             open( newunit=unitnum, file=trim(filename), iostat=iostat )
@@ -1182,7 +1182,7 @@ contains
 
             exit
 
-          enddo  
+          enddo
 
         endif
 
@@ -1191,7 +1191,7 @@ contains
       call warn("Your control file references an unknown or unsupported method: "//dquote(sCmdText), &
           lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
-    endif 
+    endif
 
   end subroutine set_method_pointers_sub
 
@@ -1246,7 +1246,7 @@ contains
 
     fTrunk_Storage_Capacity = TRUNK_STORAGE_CAPACITY_TABLE_VALUES( this%landuse_index )
     fStemflow_Fraction = STEMFLOW_FRACTION_TABLE_VALUES( this%landuse_index )
-    
+
     call interception_gash_calculate( this%rainfall,                                      &
                                this%fog,                                                  &
                                this%canopy_cover_fraction,                                &
@@ -1268,7 +1268,7 @@ contains
 
     this%runon = 0.0_c_float
 
-  end subroutine model_initialize_routing_none  
+  end subroutine model_initialize_routing_none
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1279,7 +1279,7 @@ contains
 
     ! nothing to be done
 
-  end subroutine model_calculate_routing_none  
+  end subroutine model_calculate_routing_none
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1291,7 +1291,7 @@ contains
 
     call routing_D8_initialize( this%active, this%order_index )
 
-  end subroutine model_initialize_routing_D8  
+  end subroutine model_initialize_routing_D8
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1307,12 +1307,12 @@ contains
 
       this%runon( TARGET_INDEX( indx ) ) = this%runoff( indx ) + this%rejected_potential_recharge( indx )
 
-    endif  
-      
+    endif
+
     !> @TODO: what about cases where target is outside of grid?
     !!        what about flow pointing to open water feature?
 
-  end subroutine model_calculate_routing_D8  
+  end subroutine model_calculate_routing_D8
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1494,7 +1494,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-  end subroutine model_initialize_et_jensen_haise 
+  end subroutine model_initialize_et_jensen_haise
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1507,7 +1507,7 @@ contains
      this%reference_ET0 = et_jh_calculate( iDayOfYear=SIM_DT%iDOY, iNumDaysInYear=SIM_DT%iDaysInYear, &
        fLatitude=this%latitude, fTMin=this%Tmin, fTMax=this%Tmax )
 
-  end subroutine model_calculate_et_jensen_haise 
+  end subroutine model_calculate_et_jensen_haise
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1546,11 +1546,11 @@ contains
                                        landuse_index=this%landuse_index( indx ),                &
                                        cell_index=indx,                                          &
                                        soil_group=this%soil_group( indx ),                      &
-                                       soil_storage_max=this%soil_storage_max( indx ),          & 
+                                       soil_storage_max=this%soil_storage_max( indx ),          &
                                        inflow=this%inflow( indx ),                              &
                                        it_is_growing_season=this%it_is_growing_season( indx ),  &
                                        continuous_frozen_ground_index=                           &
-                                       this%continuous_frozen_ground_index( indx ) ) 
+                                       this%continuous_frozen_ground_index( indx ) )
 
     call update_previous_5_day_rainfall( inflow_, indx )
 
@@ -1594,7 +1594,7 @@ contains
       date_of_last_grid_update = SIM_DT%curr
     endif
 
-    interim_inflow = this%rainfall( indx ) + this%snowmelt( indx ) 
+    interim_inflow = this%rainfall( indx ) + this%snowmelt( indx )
 
     this%runoff( indx ) = interim_inflow * RUNOFF_RATIOS( indx )
 
@@ -1620,7 +1620,7 @@ contains
 
     pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
         rX0=this%X_ll, rY0=this%Y_ll, &
-        rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+        rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )
 
     pTempGrd%rData = unpack( this%soil_storage_max, this%active, this%nodata_fill_value )
 
@@ -1628,7 +1628,7 @@ contains
 
     call grid_Destroy( pTempGrd )
 
-  end subroutine model_initialize_soil_storage_max_internally_calculated  
+  end subroutine model_initialize_soil_storage_max_internally_calculated
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1645,13 +1645,13 @@ contains
 
     pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
     rX0=this%X_ll, rY0=this%Y_ll, &
-    rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+    rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )
 
     ! locate the data structure associated with the gridded rainfall zone entries
     pSOIL_STORAGE_MAX_GRID => DAT%find("SOIL_STORAGE_MAX")
     if ( .not. associated(pSOIL_STORAGE_MAX_GRID) ) &
       pSOIL_STORAGE_MAX_GRID => DAT%find("PLANT_AVAILABLE_WATER")
-    
+
     if ( .not. associated(pSOIL_STORAGE_MAX_GRID) ) &
         call die("A SOIL_STORAGE_MAX or PLANT_AVAILABLE_WATER grid must be supplied in order"    &
         //" to make use of this option.", __SRCNAME__, __LINE__ )
@@ -1671,15 +1671,15 @@ contains
 
     else where
 
-      this%awc = 0.0_c_float      
+      this%awc = 0.0_c_float
 
     end where
 
     this%current_rooting_depth = this%rooting_depth_max
-   
+
     call grid_WriteArcGrid( sFilename="Maximum_Soil_Storage__as_read_in_inches.asc", pGrd=pTempGrd )
-    
-    pTempGrd%rData = unpack( this%rooting_depth_max, this%active, this%nodata_fill_value )    
+
+    pTempGrd%rData = unpack( this%rooting_depth_max, this%active, this%nodata_fill_value )
 
     call grid_WriteArcGrid( sFilename="Available_water_content__as_RECALCULATED_in_inches_per_foot.asc", pGrd=pTempGrd )
 
@@ -1702,7 +1702,7 @@ contains
   subroutine model_calculate_irrigation_none( this )
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    !> Nothing here to see. 
+    !> Nothing here to see.
 
   end subroutine model_calculate_irrigation_none
 
@@ -1711,7 +1711,7 @@ contains
   subroutine model_output_irrigation_none( this )
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    !> Nothing here to see. 
+    !> Nothing here to see.
 
   end subroutine model_output_irrigation_none
 
@@ -1722,7 +1722,7 @@ contains
     use irrigation
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-   
+
     ! [ LOCALS ]
     integer (kind=c_int) :: status
 
@@ -1749,7 +1749,7 @@ contains
 
       call irrigation__calculate( irrigation_amount=this%irrigation,                             &
                                   landuse_index=this%landuse_index,                              &
-                                  soil_storage=this%soil_storage,                                & 
+                                  soil_storage=this%soil_storage,                                &
                                   soil_storage_max=this%soil_storage_max,                        &
                                   rainfall=this%rainfall,                                        &
                                   runoff=this%runoff,                                            &
@@ -1759,22 +1759,22 @@ contains
                                   monthly_rainfall=this%monthly_gross_precip,                    &
                                   monthly_runoff=this%monthly_runoff )
 
-      call minmaxmean( this%monthly_runoff, "MONTHLY_RUNOFF")
-      call minmaxmean( this%monthly_gross_precip, "MONTHLY_RAINFALL")
+!      call minmaxmean( this%monthly_runoff, "MONTHLY_RUNOFF")
+!      call minmaxmean( this%monthly_gross_precip, "MONTHLY_RAINFALL")
 
     else
 
 
       call irrigation__calculate( irrigation_amount=this%irrigation,                             &
                                   landuse_index=this%landuse_index,                              &
-                                  soil_storage=this%soil_storage,                                & 
+                                  soil_storage=this%soil_storage,                                &
                                   soil_storage_max=this%soil_storage_max,                        &
                                   rainfall=this%rainfall,                                        &
                                   runoff=this%runoff,                                            &
                                   crop_etc=this%crop_etc,                                        &
                                   irrigation_mask=this%irrigation_mask,                          &
                                   num_days_since_planting=this%number_of_days_since_planting )
-    endif  
+    endif
 
   end subroutine model_calculate_irrigation
 
@@ -1815,7 +1815,7 @@ contains
 
     call awc_gridded_values_read( )
 
-  end subroutine model_read_available_water_content_gridded  
+  end subroutine model_read_available_water_content_gridded
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1830,7 +1830,7 @@ contains
 
     pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
       rX0=this%X_ll, rY0=this%Y_ll, &
-      rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+      rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )
 
 
     call awc_gridded_values_initialize( lActive=this%active,  &
@@ -1843,7 +1843,7 @@ contains
     call grid_Destroy( pTempGrd )
 
 
-  end subroutine model_initialize_available_water_content_gridded  
+  end subroutine model_initialize_available_water_content_gridded
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1855,7 +1855,7 @@ contains
 
     call awc_depth_integrated_read( fRooting_Depth=ROOTING_DEPTH_MAX )
 
-  end subroutine model_read_available_water_content_depth_integrated  
+  end subroutine model_read_available_water_content_depth_integrated
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1871,7 +1871,7 @@ contains
 
     pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
       rX0=this%X_ll, rY0=this%Y_ll, &
-      rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )  
+      rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )
 
 
     allocate ( this%soil_code (count( this%active ) ), stat=iStat )
@@ -1886,7 +1886,7 @@ contains
 
     call grid_Destroy( pTempGrd )
 
-  end subroutine model_initialize_available_water_content_depth_integrated  
+  end subroutine model_initialize_available_water_content_depth_integrated
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1895,7 +1895,7 @@ contains
     use growing_degree_day
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    !> Nothing here to see. 
+    !> Nothing here to see.
 
   end subroutine model_initialize_GDD_none
 
@@ -1904,7 +1904,7 @@ contains
   subroutine model_calculate_GDD_none( this )
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    !> Nothing here to see. 
+    !> Nothing here to see.
 
   end subroutine model_calculate_GDD_none
 
@@ -1948,7 +1948,7 @@ contains
   subroutine model_dump_variables_none( this )
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    !> Nothing here to see. 
+    !> Nothing here to see.
 
   end subroutine model_dump_variables_none
 
@@ -1968,8 +1968,8 @@ contains
       if ( (indx > lbound( this%landuse_code, 1) ) .and. ( indx <= ubound( this%landuse_code, 1) ) ) then
 
         call model_dump_variables( this=this, unitnum=DUMP( jndx )%unitnum, indx=indx )
-        
-      endif  
+
+      endif
 
     enddo
 
@@ -1991,8 +1991,8 @@ contains
 !       if ( (indx > lbound( this%landuse_code, 1) ) .and. ( indx <= ubound( this%landuse_code, 1) ) ) then
 
 !         call model_dump_variables( this=this, unitnum=DUMP( jndx )%unitnum, indx=indx )
-        
-!       endif  
+
+!       endif
 
 !     enddo
 
@@ -2014,15 +2014,15 @@ contains
         write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',6(i6,','),50(f12.3,','),f12.3)")                  &
           SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                        &
           this%landuse_code( indx ), this%landuse_index( indx ), this%order_index( indx ),                &
-          this%soil_group( indx ), this%num_upslope_connections( indx ), this%sum_upslope_cells( indx ),  &  
-          this%awc( indx ), this%latitude( indx ), this%reference_ET0( indx ), this%actual_ET( indx ),    &            
+          this%soil_group( indx ), this%num_upslope_connections( indx ), this%sum_upslope_cells( indx ),  &
+          this%awc( indx ), this%latitude( indx ), this%reference_ET0( indx ), this%actual_ET( indx ),    &
           this%curve_num_adj( indx ), this%inflow( indx ), this%runon( indx ), this%runoff( indx ),       &
           this%outflow( indx ),                                                                           &
           this%infiltration( indx ), this%snowfall( indx ), this%potential_snowmelt( indx ),              &
           this%snowmelt( indx ), this%interception( indx ), this%rainfall( indx ),                        &
-          this%interception_storage( indx ), this%tmax( indx ), this%tmin( indx ), this%tmean( indx ),    &            
+          this%interception_storage( indx ), this%tmax( indx ), this%tmin( indx ), this%tmean( indx ),    &
           this%snow_storage( indx ), this%soil_storage( indx ), this%soil_storage_max( indx ),            &
-          this%surface_storage( indx ), this%surface_storage_excess( indx ),                              &      
+          this%surface_storage( indx ), this%surface_storage_excess( indx ),                              &
           this%surface_storage_max( indx ), this%potential_recharge( indx ),                              &
           this%rejected_potential_recharge( indx ), this%fog( indx ),                                     &
           this%irrigation( indx ), this%gdd( indx ), this%runoff_outside( indx ),                         &
@@ -2032,7 +2032,7 @@ contains
           this%current_rooting_depth( indx ), this%actual_et_soil( indx ),                                &
           this%actual_et_impervious( indx ), this%actual_et_interception( indx ),                         &
           this%adjusted_depletion_fraction_p( indx ), this%crop_etc( indx ), this%direct_recharge( indx ),&
-          this%direct_soil_moisture( indx ), (PREV_5_DAYS_RAIN( indx, kndx), kndx=1,6) 
+          this%direct_soil_moisture( indx ), (PREV_5_DAYS_RAIN( indx, kndx), kndx=1,6)
 
   end subroutine model_dump_variables
 
@@ -2047,7 +2047,7 @@ contains
     call initialize_actual_et_thornthwaite_mather_eqns( soil_moisture=this%soil_storage,    &
                                                         max_soil_moisture=this%soil_storage_max )
 
-  end subroutine model_initialize_actual_et_thornthwaite_mather_eqns   
+  end subroutine model_initialize_actual_et_thornthwaite_mather_eqns
 
 !--------------------------------------------------------------------------------------------------
 
@@ -2074,7 +2074,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-  end subroutine model_initialize_actual_et_thornthwaite_mather    
+  end subroutine model_initialize_actual_et_thornthwaite_mather
 
 !--------------------------------------------------------------------------------------------------
 
@@ -2103,7 +2103,7 @@ contains
 
     call initialize_actual_et_fao56()
 
-  end subroutine model_initialize_actual_et_fao56    
+  end subroutine model_initialize_actual_et_fao56
 
 !--------------------------------------------------------------------------------------------------
 
@@ -2216,7 +2216,7 @@ contains
 
     call direct_soil_moisture_calculate( direct_soil_moisture = this%direct_soil_moisture( indx ),   &
                                          indx=indx,                                                  &
-                                         is_cell_active=this%active  ) 
+                                         is_cell_active=this%active  )
 
   end subroutine model_calculate_direct_soil_moisture_gridded
 
@@ -2261,7 +2261,7 @@ contains
 
     call maximum_potential_recharge_calculate( potential_recharge = this%potential_recharge( indx ),                    &
                                                rejected_potential_recharge = this%rejected_potential_recharge( indx ),  &
-                                               indx=indx ) 
+                                               indx=indx )
 
   end subroutine model_calculate_maximum_potential_recharge_gridded
 
@@ -2308,7 +2308,7 @@ contains
                                          GROWTH_STAGE_DATE, PLANTING_DATE
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    
+
     call crop_coefficients_FAO56_update_growth_stage_dates( )
 
     this%number_of_days_since_planting = SIM_DT%curr                            &
@@ -2335,7 +2335,7 @@ contains
 
   subroutine model_initialize_fog_monthly_grid(this)
 
-    use fog__monthly_grid 
+    use fog__monthly_grid
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
@@ -2355,12 +2355,12 @@ contains
   end subroutine model_initialize_precip_normal
 
 !--------------------------------------------------------------------------------------------------
- 
+
   subroutine model_calculate_fog_none(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-  end subroutine model_calculate_fog_none  
+  end subroutine model_calculate_fog_none
 
 !--------------------------------------------------------------------------------------------------
 
@@ -2374,10 +2374,10 @@ contains
       iLanduse_Index=this%landuse_index, lActive=this%active,                         &
       nodata_fill_value=this%nodata_fill_value )
 
-  end subroutine model_calculate_fog_monthly_grid  
+  end subroutine model_calculate_fog_monthly_grid
 
 !--------------------------------------------------------------------------------------------------
- 
+
   subroutine model_calculate_mean_air_temperature(this)
 
      class ( MODEL_DOMAIN_T ), intent(inout)   :: this
@@ -2385,8 +2385,8 @@ contains
      this%tmean = ( this%tmin + this%tmax ) / 2.0_c_float
 
   end subroutine model_calculate_mean_air_temperature
-  
-!--------------------------------------------------------------------------------------------------    
+
+!--------------------------------------------------------------------------------------------------
 
   subroutine model_get_maximum_air_temperature_normal(this)
 
@@ -2410,7 +2410,7 @@ contains
       iMonth = asInt( dt%iMonth )
       iDay = asInt( dt%iDay )
       iYear = dt%iYear
-  
+
       call pTMAX%getvalues( iMonth, iDay, iYear, iJulianDay )
 
     end associate
@@ -2420,10 +2420,10 @@ contains
 
     this%tmax = pack( pTMAX%pGrdBase%rData, this%active )
 
-  end subroutine model_get_maximum_air_temperature_normal  
+  end subroutine model_get_maximum_air_temperature_normal
 
 !--------------------------------------------------------------------------------------------------
- 
+
   subroutine model_get_minimum_air_temperature_normal(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
@@ -2446,7 +2446,7 @@ contains
       iMonth = asInt( dt%iMonth )
       iDay = asInt( dt%iDay )
       iYear = dt%iYear
-  
+
       call pTMIN%getvalues( iMonth, iDay, iYear, iJulianDay )
 
     end associate
@@ -2456,10 +2456,10 @@ contains
 
     this%tmin = pack( pTMIN%pGrdBase%rData, this%active )
 
-  end subroutine model_get_minimum_air_temperature_normal  
+  end subroutine model_get_minimum_air_temperature_normal
 
 !--------------------------------------------------------------------------------------------------
- 
+
   subroutine model_get_precip_normal(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
@@ -2481,7 +2481,7 @@ contains
       iMonth = asInt( dt%iMonth )
       iDay = asInt( dt%iDay )
       iYear = dt%iYear
-  
+
       ! next three statements retrieve the data from the raw or native form
       call pPRCP%getvalues( iMonth, iDay, iYear, iJulianDay )
 
@@ -2492,7 +2492,7 @@ contains
 
     this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active )
 
-  end subroutine model_get_precip_normal  
+  end subroutine model_get_precip_normal
 
 !--------------------------------------------------------------------------------------------------
 
@@ -2514,7 +2514,7 @@ contains
   end subroutine model_initialize_precip_method_of_fragments
 
 !--------------------------------------------------------------------------------------------------
- 
+
   subroutine model_get_precip_method_of_fragments(this)
 
     use precipitation__method_of_fragments
@@ -2542,8 +2542,8 @@ contains
       iMonth = asInt( dt%iMonth )
       iDay = asInt( dt%iDay )
       iYear = dt%iYear
-  
-      ! get current grid value for precip; in the design case, this is a grid of MONTHLY 
+
+      ! get current grid value for precip; in the design case, this is a grid of MONTHLY
       ! mean precipitation totals in inches
       call pPRCP%getvalues( iMonth, iDay, iYear, iJulianDay )
 
@@ -2569,17 +2569,17 @@ contains
     !     print *, "active?:        ", this%active( indexval,151 )
     !     print *, "gross_precip:   ", this%gross_precip( targetindex )
     !     print *, "FRAGMENT_VALUE: ", FRAGMENT_VALUE( targetindex )
-    !     print *, "RAIN_ADJST_FAC: ", RAINFALL_ADJUST_FACTOR( targetindex )     
+    !     print *, "RAIN_ADJST_FAC: ", RAINFALL_ADJUST_FACTOR( targetindex )
     !     print *, "Raw PRCP grid:  ", pPRCP%pGrdBase%rData( indexval, 151 )
     !     print *, "Rain Gage ID:   ", RAIN_GAGE_ID( targetindex )
     !     print *, " "
-    !   endif  
+    !   endif
 
-    ! enddo  
+    ! enddo
 
     ! print *, "*****************************************************************"
 
-  end subroutine model_get_precip_method_of_fragments 
+  end subroutine model_get_precip_method_of_fragments
 
 !--------------------------------------------------------------------------------------------------
 
@@ -2589,7 +2589,7 @@ contains
     character (len=*), intent(in)      :: varname
     logical, dimension(:), optional    :: active_cells
 
-    ! [ LOCALS ] 
+    ! [ LOCALS ]
     integer (kind=c_int) :: iCount
     character (len=20)   :: sVarname
     character (len=14)   :: sMin
@@ -2613,7 +2613,7 @@ contains
         write (sCount, fmt="(i10)")       0
       endif
 
-    else  
+    else
 
       if (size( variable, 1) > 0 ) then
         write (sMin, fmt="(g14.3)")   minval(variable)
@@ -2627,7 +2627,7 @@ contains
         write (sCount, fmt="(i10)")       0
       endif
 
-    endif  
+    endif
 
     call LOGS%write( adjustl(sVarname)//" | "//adjustl(sMin)//" | "//adjustl(sMax) &
        //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_ALL, lEcho=lTRUE )
@@ -2642,7 +2642,7 @@ contains
     character (len=*), intent(in)       :: varname
     logical, dimension(:), optional     :: active_cells
 
-    ! [ LOCALS ] 
+    ! [ LOCALS ]
     integer (kind=c_int) :: iCount
     character (len=20)   :: sVarname
     character (len=14)   :: sMin
@@ -2701,7 +2701,7 @@ contains
     call minmaxmean( this%sum_upslope_cells, "sum_upslope")
 
     call minmaxmean( this%awc, "AWC")
-    
+
     call minmaxmean( this%latitude, "Lat")
     call minmaxmean( this%reference_ET0, "ET0")
     call minmaxmean( this%actual_ET, "actET")
@@ -2714,7 +2714,7 @@ contains
     call minmaxmean( this%snowmelt, "snowmelt")
     call minmaxmean( this%interception, "intercept")
     call minmaxmean( this%rainfall, "rainfall")
-    
+
     call minmaxmean( this%interception_storage, "intcp_stor")
     call minmaxmean( this%snow_storage, "snow_stor")
     call minmaxmean( this%soil_storage, "soil_stor")
