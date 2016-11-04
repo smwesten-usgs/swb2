@@ -35,3 +35,5 @@ The calculation proceeds as follows:
 In some cases it might be useful to simulate recharge in urban areas in a more detailed manner. This option is triggered in SWB 2.0 when a percent or fraction impervious area grid is supplied to the code ([@fig:swb_conceptual]). When this option is active, an additional storage reservoir is created: "impervious surface storage". In addition, it is possible to take storm drains into account by supplying the fraction of impervious surface storage that is intercepted by storm drains.
 
 ![Conceptual_diagram_SWB.png](../images/Conceptual_diagram_SWB.png){width=5in #fig:swb_conceptual}
+
+Implementation details regarding the storage reservoirs and process options are discussed in the next section.

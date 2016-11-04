@@ -53,6 +53,22 @@ $$ {\theta _t} = {\theta _{t - 1}} \cdot {e^{\left( { - \frac{{E{T_p}}}{{{\theta
 
 #### FAO-56 {#sm_fao_56}
 
-The FAO-56 framework for evaluating plant water requirements contains a variation on the Thornthwaite soil-moisture retention scheme. In the FAO-56 calculations, soil-moisture is assumed to be completely available to evaporation and transpiration until it reaches some critical soil-moisture level ($\theta_{crit}$). Thereafter, the relation between actual ET and potential ET is linear with slope $\frac{1}{\theta_{crit}}$ +@Fig:fao56_soil_moisture.
+The FAO-56 method for determining actual evapotranspiration considers the process in two phases @fig:fao56_soil_moisture. In the first phase, soil moisture levels are between a threshold soil moisture level and field capacity, and the actual ET is assumed to be equal to the potential ET. At soil moisture levels below the threshold level, the ratio between actual and potential ET is assumed to decrease linearly, with the ratio having a value of zero as the soil moisture reaches the permanent wilting point.
 
-![FAO-56 [-@allen_crop_1998] soil-moisture retention function. file: Actual_ET__FAO56.png]( ../images/Actual_ET__FAO56.png )  {width=4.5in #fig:fao56_soil_moisture}
+![FAO-56 soil-moisture retention function. filename is Actual_ET__FAO56.png]( ../images/Actual_ET__FAO56.png )  {#fig:fao56_soil_moisture width=4.5in}
+
+The relation shown in figure 6 may be used to update the current soil moisture by considering three cases:
+
+1. $\theta{t-1}$ and $\theta_{interim}$ are both greater than the threshold soil moisture $\theta_{threshold}$,
+2. $\theta{t-1}$ exceeds $\theta_{interim}$, but $\theta_{interim}$ is less than $\theta_{threshold}$, or
+3. $\theta{t-1}$ and $\theta_{interim}$ are both less than $\theta_{threshold}$.
+
+In the first case where both the previous days’ and interim soil moistures lie on the horizontal portion of the line in figure 6, evapotranspiration proceeds at the rate of the potential ET value, and soil moisture is calculated:
+
+$$\theta_t = \theta_{interim} - ET_p$$
+
+In the third case, both the previous days’ and interim soil moistures lie on the sloped portion of the line in @fig:fao56_soil_moisture, and evapotranspiration is some fraction of the potential ET value. The derivation of the equation describing this case is similar to that shown in the previous section, except that   replaces  :	 
+
+The second case is simply a linear combination of the first and third cases. We can define  as the fraction of the soil moisture band between  and  that exceeds the threshold soil moisture:
+
+The new soil moisture for the second case can then be found as:

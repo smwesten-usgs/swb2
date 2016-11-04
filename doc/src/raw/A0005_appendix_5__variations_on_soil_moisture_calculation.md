@@ -23,8 +23,8 @@ During the course of a model run, the soil layer is considered to be in one of t
 | $P - PE$    | Soil Status                                     |     $SM_{t}$       | $APWL_{t}$  |  $AET_{t}$   |  Excess (potential recharge) |
 |-------------:|-------------------------------------------------:|--------------------:|-------------:|----------:|---------------------:|
 |  < 0        | drying                                          | SM from T-M tables | $APWL_{t-1} + (P-PE)$ | $SM_{t-1} - SM_{t}$  | 0.0     |
-|  > 0        | wetting *and* $SM_{t-1} + (P - PE) < SM_{max}$  | $SM_{t-1} + (P-PE)$| $APWL$ from tables   | $PE$ |   0.0         |
-|  > 0        | wetting *and* $SM_{t-1} + (P - PE) > SM_{max}$  | $SM_{max}$  | 0.0  | $PE$   | $SM_{t-1} + (P - PE) - SM_{max}$    |
+|  > 0        | wetting *and* \n $SM_{t-1} + (P - PE) < SM_{max}$  | $SM_{t-1} + (P-PE)$| $APWL$ from tables   | $PE$ |   0.0         |
+|  > 0        | wetting *and* \n $SM_{t-1} + (P - PE) > SM_{max}$  | $SM_{max}$  | 0.0  | $PE$   | $SM_{t-1} + (P - PE) - SM_{max}$    |
 
 Table: Soil moisture states. {#tbl:sm_states}
 

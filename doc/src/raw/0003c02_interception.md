@@ -53,10 +53,33 @@ Robert Horton made countless observations at his hydrologic laboratory in the ea
 
 : Horton's working equations for estimating intercepted rainfall. {#tbl:horton_intcp}
 
-Vegetation Type                     | Working Equation
-------------------------------------|----------------------------------:
-Orchard                             | $J=0.04 + 0.18P_s$
-Chestnut, hedge and open            | $J=0.04+0.20P_s$
-Chestnut, in woods                  | $J=0.06+0.15P_s$
-Ash, hedges and open                | $J=0.015+0.23P_s$
-Ash, in woods                       | $J=0.02+0.18P_s$
+Vegetation Type	                    |  Working Equation
+------------------------------------|------------------------
+Orchard	                            | $J = 0.04 + 0.18{P_s}$
+Chestnut, hedge and open	          | $J = 0.04 + 0.20{P_s}$
+Chestnut, in woods	                | $J = 0.06 + 0.15{P_s}$
+Ash, hedges and open	              | $J = 0.015 + 0.23{P_s}$
+Ash, in woods	                      | $J = 0.02 + 0.18{P_s}$
+Beech, hedges and open	            | $J = 0.03 + 0.23{P_s}$
+Beech, woods	                      | $J = 0.04 + 0.18{P_s}$
+Oak, hedges and open	              | $J = 0.03 + 0.22{P_s}$
+Oak, woods	                        | $J = 0.05 + 0.18{P_s}$
+Maple, hedges and open	            | $J = 0.03 + 0.23{P_s}$
+Maple, woods	                      | $J = 0.04 + 0.18{P_s}$
+Willow shrubs	                      | $J = 0.02 + 0.4{P_s}$
+Elm, hedges and open	              | $J = 0.03 + 0.23P_S^{0.5}$
+Elm, woods	                        | $J = 0.04 + 0.18P_S^{0.5}$
+Basswood, hedges and open	          | $J = 0.03 + 0.13P_S^{0.5}$
+Basswood, woods	                    | $J = 0.05 + 0.1P_S^{0.5}$
+Hemlock and pine, hedges and open	  | $J = 0.03 + 0.2P_S^{0.5}$  
+Hemlock and pine, woods	            | $J = 0.05 + 0.2P_S^{0.5}$
+Clover and meadow grass	            | $J = \left( {0.005 + 0.08{P_S}} \right)h$
+Forage, alfalfa, vetch, millet, etc.| $J = \left( {0.01 + 0.1{P_S}} \right)h$  
+Beans, potatoes, cabbage, and other small-hilled crops       | $J = \left( {0.02 + 0.15{P_S}} \right)h$
+Tobacco	                            | $J = \left( {0.01 + 0.08{P_S}} \right)h$
+Cotton	                            | $J = \left( {0.015 + 0.1{P_S}} \right)h$
+Buckwheat	                          | $J = \left( {0.01 + 0.12{P_S}} \right)h$
+Corn, planted in hills or rows	    | $J = \left( {0.005 + 0.005{P_S}} \right)h$
+Fodder corn, sorghum, Kaffir corn, etc., sowed in drills	| $J = \left( {0.007 + 0.006{P_S}} \right)h$
+
+In order to use Horton’s working equations in a SWB simulation, the user must supply the constant, slope, and exponent as given in the table above. No attempt is made to incorporate plant height; the user must modify the equation with the approximate plant height. Thus, the equation for 8-foot tall corn would be $J = \left( {0.005 + 0.08{P_S}} \right) \cdot 8 = 0.04 + 0.04{P_S}$; the constant, slope, and exponent supplied to SWB would be 0.04, 0.04, and 1.0, respectively.
