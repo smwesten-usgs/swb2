@@ -3,9 +3,9 @@
 
 [TOC]
 
-In the days following a rainstorm, soil moisture is close to field capacity, and moisture is evaporated from bare soil and transpired by plants at rates close to the maximum rate sustainable given climatic conditions. Assuming no further precipitation, in subsequent days the evaporation and transpiration rates decrease as remaining soil-moisture is held more tightly within the soil matrix [@dunne_water_1978].
+Actual evapotranspiration is the soil moisture that can be extracted from a soil of a given soil moisture condition; by definition, actual evapotranspiration will be equal to or less than the potential evapotranspiration. In the days following a rainstorm, soil moisture is close to field capacity, and moisture is evaporated from bare soil and transpired by plants at rates close to the maximum rate sustainable given climatic conditions. Assuming no further precipitation, in subsequent days the evaporation and transpiration rates decrease as remaining soil-moisture is held more tightly within the soil matrix [@dunne_water_1978].
 
-One simple way of simulating decreasing rates of soil-moisture evapotranspiration is to assume that the actual evapotranspiration is some function of the potential or reference evapotranspiration and the current soil-moisture amount @eq:SM_function_AET_to_PET.
+One simple way of simulating decreasing rates of soil-moisture evapotranspiration is to assume that the actual evapotranspiration is some function of the potential or reference evapotranspiration and the current soil-moisture amount (@eq:SM_function_AET_to_PET).
 
 $$AET = PET \cdot f\left( {\frac{\theta }{{{\theta _{fc}}}}} \right)$$ {#eq:SM_function_AET_to_PET}
 
@@ -19,11 +19,13 @@ This section discusses the two soil-moisture retention functions implemented in 
 
 #### Thornthwaite-Mather {#sm_thornthwaite_mather}
 
-The first versions of SWB included full tabularized versions of the soil-moisture retention function, along with methods to interpolate between the various table values. The original published Thornthwaite-Mather [-@thornthwaite_instructions_1957] method also introduces a variable (accumulated potential water loss, APWL) to track the cumulative unmet potential evapotranspiration as a way to make calculation simpler. Ultimately, the many steps involved in the published method are designed to estimate actual evapotranspiration as directly proportional to the soil moisture relative to field capacity +@fig:aet_to_pet_thornthwaite.
+In the late 1940s and early 1950s, C.W. Thornthwaite and his associates studied plant growth, and water utilization. As a result of this work, Thornthwaite observed that the relation between the actual ET to potential ET ratio and the soil moisture was linear [@fig:aet_to_pet_thornthwaite].
 
-![ Thornthwaite [-@thornthwaite_approach_1948] soil-moisture retention function. file: Actual_ET__FAO56.png]( ../images/Actual_ET__Thornthwaite.png ) {width=4.5in #fig:aet_to_pet_thornthwaite}
+The first versions of SWB included full tabularized versions of the soil-moisture retention function, along with methods to interpolate between the various table values. The original published Thornthwaite-Mather [-@thornthwaite_instructions_1957] method also introduces a variable (accumulated potential water loss, APWL) to track the cumulative unmet potential evapotranspiration; this term was developed in an age before easy access to computers and calculators, and, when used with the table values, made calculation of the daily water balance simpler.
 
-Daily soil moisture may be estimated from this relation by first defining the instantaneous soil evapotranspiration as equal to the change in storage:
+![ Thornthwaite [-@thornthwaite_approach_1948] soil-moisture retention function. file: Actual_ET__FAO56.png]( ../images/Actual_ET__Thornthwaite.png ) {#fig:aet_to_pet_thornthwaite width=4.5in}
+
+The process of calculating daily soil moisture by means of tabular values and by use of fitted equations is given in the appendix. Current versions of the code update the soil moisture value by means of the relation derived below. Daily soil moisture may be estimated from this relation by first defining the instantaneous soil evapotranspiration as equal to the change in storage:
 
 $$et_a =  - \frac{{d\theta }}{{dt}}$$ {#eq:SM_TM_deriv_001}
 
@@ -31,9 +33,9 @@ where
 $et_a$ is the instantaneous actual evapotranspiration, and
 $\frac{{d\theta }}{{dt}}$ is the rate of change in soil moisture relative to time.
 
-The relation shown in +@fig:aet_to_pet_thornthwaite can be used to define a function relating actual and potential evapotranspiration as:
+The relation shown in @fig:aet_to_pet_thornthwaite can be used to define a function relating actual and potential evapotranspiration as:
 
-$$et_a = et_p \cdot \frac{\theta }{{{\theta _{fc}}}}$$
+$$et_a = et_p \cdot \frac{\theta }{{{\theta _{fc}}}}$$ {#eq:SM_TM_deriv_002}
 
 where
 $et_a$ is the instantaneous actual evapotranspiration,
@@ -41,15 +43,23 @@ $et_p$ is the instantaneous potential evapotranspiration,
 $\theta$ is the soil moisture, and
 $\theta_{fc}$ is the soil moisture value at field capacity.
 
+@eq:SM_TM_deriv_001 and @eq:SM_TM_deriv_002 can be set equal to one another, the terms rearranged and integrated to yield an estimate of the current daily soil moisture:
+
 $$ - \frac{{d\theta }}{{dt}} = et_p \cdot \frac{\theta }{{{\theta _{fc}}}}$$
 
-$$ - \frac{{d\theta }}{\theta } = \frac{{et_p}}{{{\theta _{fc}}}}dt$$
+$$ \frac{{d\theta }}{\theta } = - \frac{{et_p}}{{{\theta _{fc}}}}dt$$
 
-$$ - \int{\frac{{d\theta }}{\theta }}  = \frac{1}{{{\theta _{fc}}}}\int {et_p dt} $$
+$$ \int{\frac{{d\theta }}{\theta }}  = - \frac{1}{{{\theta _{fc}}}}\int {et_p dt} $$
 
-$$ \left. { - \ln \theta } \right|_{{\theta _{t - 1}}}^{{\theta _t}} = \frac{1}{{{\theta _{fc}}}}E{T_p}$$
+The integral of the instantaneous potential ET over the course of a day is just the daily  value. The integral of soil moisture is evaluated from $\theta_{interim}$ to $\theta_t$, with $\theta_{interim}=\theta_{t-1}+rainfall+irrigation+snowmelt+runon-interception-runoff$, where $\theta_t$ and $\theta_{t-1}$ represent the soil moisture on the current and previous days, respectively:
 
-$$ {\theta _t} = {\theta _{t - 1}} \cdot {e^{\left( { - \frac{{E{T_p}}}{{{\theta _{fc}}}}} \right)}}$$
+$$ \left. { \ln \theta } \right|_{{\theta _{t - 1}}}^{{\theta _t}} = - \frac{1}{{{\theta_{fc}}}}et_p$$
+
+$$ {\theta _t} = {\theta_{interim}} \cdot {e^{\left( { - \frac{{E{T_p}}}{{{\theta_{fc}}}}} \right)}}$$
+
+
+
+
 
 #### FAO-56 {#sm_fao_56}
 
