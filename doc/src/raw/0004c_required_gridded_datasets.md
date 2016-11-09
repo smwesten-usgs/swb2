@@ -5,9 +5,16 @@ SWB can ingest gridded data in three formats: Surfer, ESRI Arc ASCII, or netCDF.
 
 ### Hydrologic Soils Group
 
-The U.S. Department of Agrigulture, Natural Resources Conservation Service (NRCS), formerly the Soil Conservation Service (SCS), has categorized more than 14,000 soil series within the United States into one of four hydrologic soil groups (A - D) on the basis of infiltration capacity. NRCS hydrologic soil group information may be input to the model as an Arc ASCII or Surfer integer grid with values ranging from 1 (soil group A) to 4 (soil group D). The NRCS hydrologic soil group A soils have a high infiltration capacity and, consequently, a low overland flow potential. Group D soils, in contrast, have a very low infiltration capacity and, consequently, a high overland flow potential (table 6).
+The U.S. Department of Agrigulture, Natural Resources Conservation Service (NRCS), formerly the Soil Conservation Service (SCS), has categorized more than 14,000 soil series within the United States into one of four hydrologic soil groups (A - D) on the basis of infiltration capacity. NRCS hydrologic soil group information may be input to the model as an Arc ASCII or Surfer integer grid with values ranging from 1 (soil group A) to 4 (soil group D). The NRCS hydrologic soil group A soils have a high infiltration capacity and, consequently, a low overland flow potential. Group D soils, in contrast, have a very low infiltration capacity and, consequently, a high overland flow potential ([@tbl:hydrologic_soils_groups]).
 
+: Infiltration rates for Natural Resources Conservation Service hydrologic soils groups [@cronshey_urban_1986]. {#tbl:hydrologic_soils_groups}
 
+Soil Group          | Infiltration rate
+--------------------|--------------------------------
+A                   | >0.3 inch per hour
+B                   | 0.15--0.3 inch per hour
+C                   | 0.05--0.15 inch per hour
+D                   | <0.05 inch per hour
 
 ### Available Water Capacity
 

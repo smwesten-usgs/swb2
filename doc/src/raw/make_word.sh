@@ -50,5 +50,5 @@ pandoc                                                                      \
        --include-after-body=appendices.md                                   \
        --csl="$CSL_FILE"                                                    \
        -m                                                                   \
-       --output="DRAFT_swb_tm_report__$(timestamp).docx"                    \
+       --output="../../latest_doc_output/DRAFT_swb_tm_report__$(timestamp).docx"                    \
        metadata.yaml `ls ../to_docx/?0*.md`

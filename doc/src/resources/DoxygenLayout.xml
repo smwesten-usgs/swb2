@@ -37,6 +37,7 @@
        <tab type="user" url="@ref required_gridded_datasets" title="Required Gridded Datasets"/>
   	   <tab type="user" url="@ref variable_descriptions" title="Output Variable Descriptions"/>
   	   <tab type="user" url="@ref specific_datasets" title="Gridded Climate Datasets"/>
+       <tab type="user" url="@ref directory_structure" title="Directory Structure"/>
        <tab type="user" url="@ref faq" title="Frequently Asked Questions"/>
     </tab>
 

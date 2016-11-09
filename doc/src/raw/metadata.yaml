@@ -10,7 +10,6 @@ tblPrefix:
   - "tables"
 loftitle: "# List of figures"
 lotTitle: "# List of tables"
-
 titleDelim:          '.'
 geometry:            'left=1.25in, top=1.5in, bottom=1.5in'
 fontsize:            '12pt'
