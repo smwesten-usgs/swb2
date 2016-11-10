@@ -1,9 +1,54 @@
 ## General Discussion of Gridded Datasets {#general_discussion_of_gridded_datasets}
 
-SWB can ingest gridded data in three formats: Surfer, ESRI Arc ASCII, or netCDF.
+SWB can ingest gridded data in three formats: Surfer, ESRI Arc ASCII, or netCDF. Often one or more files constituting a time series of gridded data are required in order to perform a simulation. In addition, missing values are often a feature of these gridded datasets. All of these topics are discussed further in the following sections.
+
+### Specifying Grid Filenames
+
+SWB can ingest gridded data in three formats: Surfer, ESRI Arc ASCII, or netCDF. Often one or more files constituting a time series of gridded data are required in order to perform a simulation. The way to do this is to supply a filename 'template' to SWB.
+
+For example, over 43,000 individual Arc/Info ASCII grids were supplied in order to make a 100-year model run for the Lake Michigan Pilot Water Availability Study. The files were all given names with the pattern 'precip-*month*-*day*-*year*.asc', for example, *precip-03-12-1967.asc*.The syntax required to inform SWB of the file naming convention was (for precipitation):
+
+`PRECIPITATION ARC_GRID precip-%0m-%0d-%Y.asc`
+
+The characters immediately following '%' in the filename template shown above represent the following: `%0m`, the month number (1-12), padded by a leading zero, `%0d`, the day of the month, padded by a leading zero, and `%Y`, the 4-digit year value.
+
+: Filename template values understood by SWB. {tbl:filename_template_values}
+
+Template value         |  Meaning
+-----------------------|----------------------------------------------
+`%Y` or `%y`           | 4-digit year value
+`%m`                   | month number, *not* zero padded (1-12)
+`%0m`                  | month number, zero padded (01-12)
+`%b`                   | abbreviated (3-letter) month name (jan-dec)
+`%B`                   | full month name (january-december)
+`%d`                   | day of month, *not* zero padded (1-31)
+`%0d`                  | day of month, zero padded (01-31)
+`#`                    | simple file counter, reset each year (1-n)
+`#000`                 | simple file counter with three positions of zero padding, reset each year (1-n)
+
+In addition, three modifiers may be specified in the control file in the event that SWB is being run on a non-Windows platform where capitalization matters:
+
+`_MONTHNAMES_CAPITALIZED`
+`_MONTHNAMES_UPPERCASE`
+`_MONTHNAMES_LOWERCASE`
+
+The modifiers are to be used in the control file prefixed by the data name. For example, to ensure uppercase monthnames are used in conjunction with precipitation data files, `PRECIPITATION_MONTHNAMES_UPPERCASE` can be added to the control file. These modifiers may be used for precipitation and temperature with the SWB 1.0 code, while they may be used with any known data type with SWB 2.0.
+
+When used together, SWB can find and use a variety of files without required that they be renamed. Some examples:
+
+: Examples showing the use of filename templates. {#tbl:filename_template_examples}
+
+Example filename            | Template                | Control file modifier entry
+----------------------------|-------------------------|--------------------------------------
+prcp09Jan2010.asc           |   prcp%0m%b%Y.asc       | PRECIPITATION_MONTHNAMES_CAPITALIZED
+tmin_2011.nc4               |   tmin_%Y.nc4           | *none*
+tasmax-03-23-1977.asc       |   tasmax-%0m-%0d-%Y.asc | *none*
+precip_january_1981.nc      |   precip_%B_%Y.nc       | PRECIPITATION_MONTHNAMES_LOWERCASE
 
 
 ### Supported File Types
+
+Three file formats are supported as input to SWB: Surfer ASCII grids, Arc/Info ASCII grids, and NetCDF files. Each format is discussed further in the following sections.
 
 #### Surfer ASCII Grid
 
@@ -127,7 +172,7 @@ variables:
 
 This particular file contains three classes of metadata: dimensions, variables, and global attributes. As can be seen above, the file contains data about 4 “dimensions”: x, y, time, and nv. Nine variables are defined, each of which is references in terms of the dimensions. The key variable in the file is “prcp”—the daily precipitation value. prcp is defined at each time (day) in the file for all values of x and y. Note the way that dates and times are specified in the NetCDF file: as a real-valued number of days since 1980-01-01 00:00:00 UTC.
 
-SWB does not have the ability to make sense of much of this metadata. It is the user’s responsibility to be aware of the physical units that each of the datasets is stored in. Control file directives may be used to convert precipitation in metric units (mm/day) to inches per day. We recommend examining the output values of air temperature and precipitation in order to verify that any such unit conversions have been done correctly.
+SWB does not have the ability to make sense of much of this metadata. It is the user’s responsibility to be aware of the physical units that each of the datasets is stored in. Control file directives may be used to convert precipitation in metric units (mm/day) to inches per day. __We recommend examining the SWB output values of air temperature and precipitation in order to verify that any such unit conversions have been done correctly.__ It is particularly easy to get the temperature conversion wrong; SWB will run happily, air temperatures will never make it very high, resulting in unrealistically elevated potential recharge values.
 
 In addition, SWB cannot parse the variables and attributes associated with any map projection that may have been used when the NetCDF file was created. The user needs to be aware of the geographic projection (if any) that was used. If the gridded data do not match the SWB project bounds exactly, a “PROJ4 string” must be provided to enable SWB to translate between project coordinates and the NetCDF file coordinates.
 
