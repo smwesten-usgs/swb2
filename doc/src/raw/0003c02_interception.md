@@ -3,11 +3,13 @@
 
 [TOC]
 
+The interception process is sometimes overlooked in hydrological models, but can amount to a significant part of the water budget [@gerrits_role_2010; @savenije_importance_2004]. The original SWB code used a simple “bucket” model to estimate the amount of recharge. This approach ignores the relation between precipitation amounts and total intercepted (and evaporated) water in the canopy. Two additional interception process formulations have been added in an attempt to model this part of the water budget more accurately.
+
 #### Bucket {#bucket}
 
 The "bucket" model of interception is the original interception process module that was coded into SWB. The bucket model simply assumes that a set and constant amount of rainfall or snowfall must fall before the soil will receive any precipitation.
 
-#### Gash {#gash}
+#### Gash [SWB 2.0 only]{#gash}
 
 Another option in SWB for calculating canopy interception is a modified version of the model described by Gash and others [-@gash_analytical_1979], herein referred to as the Gash model. Using this approach, canopy evaporation for a given day and location depends on precipitation, forest structure, and the mean rates of evaporation and precipitation. The Gash model was modified so that (1) precipitation includes rainfall and fog interception, instead of rain only, and (2) water cannot be stored on the forest canopy for more than a day. The forest structure is characterized in terms of canopy cover, canopy capacity, trunk-storage capacity, and the proportion of precipitation diverted to stemflow. Canopy cover, $c$ , is the fraction of a forested area that is covered by leaves, stems, and branches of trees. Canopy capacity, $S$, is the depth of water left on the canopy when rainfall and throughfall have ceased [@gash_application_1978]. Evaporation of water from tree trunks is accounted for using the proportion of precipitation that is diverted to stemflow, $p$, and trunk-storage capacity, $k$, which is considered in terms of an equivalent depth of precipitation. The last parameter needed for the Gash model is the ratio of the mean evaporation rate to the mean precipitation rate during saturated conditions, $V$.
 
