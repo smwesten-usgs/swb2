@@ -1,37 +1,5 @@
-SWB Technical Reference {#appendices}
-=======================
-
-Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo
-ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis
-dis parturient montes, nascetur ridiculus mus. Donec quam felis,
-ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa
-quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget,
-arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.
-Nullam dictum felis eu pede mollis pretium.
-
-Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo
-ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis
-dis parturient montes, nascetur ridiculus mus. Donec quam felis,
-ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa
-quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget,
-arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.
-Nullam dictum felis eu pede mollis pretium.
-
-Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo
-ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis
-dis parturient montes, nascetur ridiculus mus. Donec quam felis,
-ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa
-quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget,
-arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.
-Nullam dictum felis eu pede mollis pretium.
-
-Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo
-ligula eget dolor. Aenean massa. Cum sociis natoque penatibus et magnis
-dis parturient montes, nascetur ridiculus mus. Donec quam felis,
-ultricies nec, pellentesque eu, pretium quis, sem. Nulla consequat massa
-quis enim. Donec pede justo, fringilla vel, aliquet nec, vulputate eget,
-arcu. In enim justo, rhoncus ut, imperdiet a, venenatis vitae, justo.
-Nullam dictum felis eu pede mollis pretium.
+Appendices
+==========
 
 Appendix 1. Data, Parameter, and Control File Requirements by Process Option {\#appendix\_1\_data\_and\_param\_requirements}
 ============================================================================================================================
@@ -547,32 +515,21 @@ domain exactly, the program will end.
 
 *Syntax:*
 
-    GRID nx ny x0 y0 x1 y1 cellsize
+`GRID nx ny x0 y0 x1 y1 cellsize`
 
 -or-
 
-    GRID nx ny X0 Y0 cellsize
+`GRID nx ny X0 Y0 cellsize`
 
-where
-
-    nx
-
-is the number of columns in the grid domain,
-
-    ny
-
-is the number of rows in the grid domain, `x0, y0` are the coordinates
-for the lower, left-hand corner of the model domain `x1, y1` are the
+where `nx` is the number of columns in the grid domain, `ny` is the
+number of rows in the grid domain,`x0, y0` are the coordinates for the
+lower, left-hand corner of the model domain, `x1, y1` are the
 coordinates for the upper, right-hand corner of the model domain, and
 `cellsize` is the grid cell size in meters or feet.
 
 *Example:*
 
-<div custom-style="Source_Code">
-
-GRID 344 320 528093. 274821. 100.0
-
-</div>
+`GRID 344 320 528093. 274821.  100.0`
 
 In the example shown above, nx (344) is the number of grid cells in the
 x direction, ny (320) is the number of grid cells in the y direction, X0
@@ -713,7 +670,7 @@ control file.
 
 *Example:*
 
-`LAND_USE_LOOKUP_TABLE std_input\LU_lookup.txt` \`\`\`\`\`\` \#\#\#\#
+`LAND_USE_LOOKUP_TABLE std_input\LU_lookup.txt` \`\` \#\#\#\#
 WATER\_CAPACITY \#\#\#\#
 
 *Specify a soil-water capacity grid.*
@@ -983,148 +940,277 @@ adjusted water capacity is disabled in the model.
 
 `ADJUSTED_WATER_CAPACITY ARC_GRID input\MAX_SM_STORAGE.asc`
 
-UPPER\_LIMIT\_CFGI\LOWER\_LIMIT\_CFGI The upper and lower
-continuous-frozen-ground indices may be set with the UPPER\_LIMIT\_CFGI
-and LOWER\_LIMIT\_CFGI statements. As discussed elsewhere, these values
-define the boundaries between completely frozen soil (the upper limit)
-and completely unfrozen soil (the lower limit). The CFGI threshold
-values are expressed in degree-Celcius-days. \*Example:
-UPPER\_LIMIT\_CFGI 83\
-LOWER\_LIMIT\_CFGI 56
+#### UPPER\_LIMIT\_CFGI\LOWER\_LIMIT\_CFGI \#\#\#\#
 
-Values for \\texttt{UPPER\_LIMIT\_CFGI and \\texttt{LOWER\_LIMIT\_CFGI
-were reported as 83 and 56, respectively, by Molnau and Bissell (1983);
-their work was conducted in the Pacific Northwest of the United States.
+*Set the threshold defining frozen ground.*
 
-INITIAL\_FROZEN\_GROUND\_INDEX This statement sets the initial (year 1)
-continuous-frozen-ground index. This may be supplied as a constant
-(\\texttt{CONSTANT) or as a gridded data set (\\texttt{ARC\_GRID or
-\\texttt{SURFER). *Example: INITIAL\_FROZEN\_GROUND\_INDEX CONSTANT
-100.0 --or-- *Example: INITIAL\_FROZEN\_GROUND\_INDEX ARC\_GRID
-input\INIT\_CFGI.asc
+The upper and lower continuous-frozen-ground indices may be set with the
+UPPER\_LIMIT\_CFGI and LOWER\_LIMIT\_CFGI statements. As discussed
+elsewhere, these values define the boundaries between completely frozen
+soil (the upper limit) and completely unfrozen soil (the lower limit).
+The CFGI threshold values are expressed in degree-Celcius-days.
 
-INITIAL\_ABSTRACTION\_METHOD The method for calculating the initial
-abstraction within the NRCS curve number method may be specified in one
-of two ways: 1, TR--55: Ia is assumed equal to 0.2 S, 2, Woodward and
-others (2003): Ia is assumed equal to 0.05 S.
+*Example:*
+
+`UPPER_LIMIT_CFGI 83` `LOWER_LIMIT_CFGI 56`
+
+Values for `UPPER_LIMIT_CFGI` and `LOWER_LIMIT_CFGI` were reported as 83
+and 56, respectively, by Molnau and Bissell (1983); their work was
+conducted in the Pacific Northwest of the United States.
+
+#### INITIAL\_FROZEN\_GROUND\_INDEX
+
+*Set the CFGI value for the beginning of the simulation.*
+
+This statement sets the initial (year 1) continuous-frozen-ground index.
+This may be supplied as a constant (`CONSTANT`) or as a gridded data set
+(`ARC_GRID` or `SURFER`).
+
+*Example--constant value:*
+
+`INITIAL_FROZEN_GROUND_INDEX CONSTANT 100.0`
+
+--or--
+
+*Example--gridded value:*
+
+`INITIAL_FROZEN_GROUND_INDEX ARC_GRID input\INIT_CFGI.asc`
+
+#### INITIAL\_ABSTRACTION\_METHOD
+
+*Set the amount of rainfall needed to initiate runoff.*
+
+The method for calculating the initial abstraction within the NRCS curve
+number method may be specified in one of two ways:
+
+1.  TR-55: Ia is assumed equal to 0.2 S, or
+2.  Woodward and others [-@woodward_runoff_2003]\]: Ia is assumed equal
+    to 0.05 S.
 
 If the Hawkins method is used, curve numbers are adjusted as given in
-equation 9 of \\citet{woodward\_runoff\_2003. The overall effect should
-be to increase runoff for smaller precipitation events. This method has
-been suggested to be more appropriate to long-term simulation model
-applications.
+equation 9 of Woodward and others [-@woodward_runoff_2003]. The overall
+effect is to increase runoff for smaller precipitation events. This
+method has been suggested to be more appropriate to long-term simulation
+model applications.
 
-*Example -- original TR-55 method: INITIAL\_ABSTRACTION\_METHOD TR55
---or-- *Example -- Hawkins modified method: INITIAL\_ABSTRACTION\_METHOD
-HAWKINS
+*Example--original TR-55 method:*
 
-OUTPUT\_FORMAT (file format for gridded data output) This option allows
-the user to choose the format of grid output. Currently two formats are
-supported: ESRI ASCII Grid, and Golden Software Surfer. The default is
-\\texttt{ARC\_GRID. *Example--Arc Grid output: OUTPUT\_FORMAT ARC\_GRID
---or-- *Example--Surfer format: OUTPUT\_FORMAT SURFER
+`INITIAL_ABSTRACTION_METHOD TR55`
 
-OUTPUT\_GRID\_PREFIX This option sets the output grid filename prefix.
-If no value is supplied, output file names will begin with an underscore
-(\_).
+--or--
 
-\*Example: OUTPUT\_GRID\_PREFIX BlkErth
+*Example--Hawkins modified method:*
 
-OUTPUT\_GRID\_SUFFIX This option sets the output grid filename suffix.
-The default value is asc. \*Example: OUTPUT\_GRID\_SUFFIX txt
+`INITIAL_ABSTRACTION_METHOD HAWKINS`
 
-OUTPUT\_OPTIONS The code will write out gridded data files or image
-files (portable network graphics, Adobe Portable Document Format, or
-bitmap) for any of 24 internal and state variables simulated in the
-model (see table 11). The required syntax of this option is
+#### OUTPUT\_FORMAT
 
--   OUTPUT\_OPTIONS variable\_name daily\_output monthly\_output
-    annual\_output
+*Set the file format for gridded data output.*
 
-The list of valid output types is \\texttt{NONE, \\texttt{GRAPH,
-\\texttt{GRID, or \\texttt{BOTH.
+This option allows the user to choose the format of grid output.
+Currently two formats are supported: ESRI ASCII Grid, and Golden
+Software Surfer. The default is `ARC_GRID`.
+
+*Example--Arc Grid output:*
+
+`OUTPUT_FORMAT ARC_GRID`
+
+--or--
+
+*Example--Surfer format:*
+
+`OUTPUT_FORMAT SURFER`
+
+#### OUTPUT\_GRID\_PREFIX
+
+*Set the prefix to be used when writing output grid files.*
+
+This option sets the output grid filename prefix. If no value is
+supplied, output file names will begin with an underscore (\_).
+
+*Example:*
+
+`OUTPUT_GRID_PREFIX BlkErth`
+
+#### OUTPUT\_GRID\_SUFFIX
+
+*Set the suffix to be used when writing output grid files.*
+
+This option sets the output grid filename suffix. The default value is
+asc. *Example:*
+
+`OUTPUT_GRID_SUFFIX txt`
+
+#### OUTPUT\_OPTIONS
+
+*Choose the form and frequency of output.*
+
+The code will write out gridded data files or image files (portable
+network graphics, Adobe Portable Document Format, or bitmap) for any of
+the internal and state variables simulated in the model (see
+[@tab:swb1_output_variables]). The required syntax of this option is
+
+`OUTPUT_OPTIONS` *variable\_name daily\_output monthly\_output
+annual\_output*
+
+The list of valid output types is `NONE`, `GRAPH` (or `PLOT`), `GRID`,
+or `BOTH`.
 
 For example, if one wished to produce output for actual
 evapotranspiration, the following would yield no daily output, graphical
-monthly output, and both gridded and graphical annual output. \*Example:
-OUTPUT\_OPTIONS ACT\_ET NONE GRAPH BOTH
+monthly output, and both gridded and graphical annual output.
+
+*Example:*
+
+`OUTPUT_OPTIONS ACT_ET NONE GRAPH BOTH`
 
 Note that the monthly and annual output types represent the summation of
 the simulated daily values and may not have any physical meaning. For
-example, although annual gridded \\texttt{SNOWFALL output will represent
-the annual snowfall amount as water equivalent precipitation, the annual
-gridded \\texttt{SNOWCOVER output represents the summation of the daily
-amount of snow storage. It is unclear what utility this summation would
-have. Also note that the graphical output is not publication quality but
-is rather included as a quick way to visualize changes in key variables
+example, although annual gridded `SNOWFALL` output will represent the
+annual snowfall amount as water equivalent precipitation, the annual
+gridded `SNOWCOVER` output represents the summation of the daily amount
+of snow storage. SWB will create both a `mean` grid or plot and a `sum`
+grid or plot if the user has selected annual output.
+
+Also note that the graphical output is not publication quality but is
+rather included as a quick way to visualize changes in key variables
 over space and through time.
 
-DISLIN\_PARAMETERS (graphical output options) Plots of any of the
-variables listed in the ?Output Variables? section above are created by
-use of the DISLIN plotting library (Michels, 2007). The plots created by
-the SWB code are quite basic. The plotting functionality in the SWB code
-is included primarily as a quick diagnostic tool for users.
+  Output name             Notes
+  ----------------------- -------
+  SNOWMELT                
+  INFLOW                  
+  IRRIGATION              
+  SNOWFALL\_SWE           
+  INTERCEPTION            
+  OUTFLOW                 
+  RUNOFF\_OUTSIDE         
+  ACT\_ET                 
+  CHG\_IN\_SOIL\_MOIST    
+  RECHARGE                
+  REJECTED\_RECHARGE      
+  ACT\_ET\_SOIL           
+  ACT\_ET\_INTERCEPTION   
+  SNOWCOVER               
+  CFGI                    
+  MIN\_TEMP               
+  MAX\_TEMP               
+  AVG\_TEMP               
+  CHG\_IN\_SNOW\_COV      
+  NET\_RAINFALL           
+  NET\_INFLOW             
+  NET\_INFIL              
+  REFERENCE\_ET           
+  REFERENCE\_ET\_ADJ      
+  CROP\_ET                
+  BARE\_SOIL\_EVAP        
+  P\_MINUS\_PET           
+  SM\_DEFICIT             
+  SM\_SURPLUS             
+  SM\_APWL                
+  SOIL\_MOISTURE          
+  GDD                     
+  ROOTING\_DEPTH          
+  CROP\_COEFFICIENT       
+  IRRIGATION\_FROM\_GW    
+  IRRIGATION\_FROM\_SW    
+  GROWING\_SEASON         
+
+  : List of internal and state variables that can be requested as SWB
+  output. {\#tab:swb1\_output\_variables}
+
+#### DISLIN\_PARAMETERS
+
+Plots of any of the variables listed in the `OUTPUT_OPTIONS` section
+above are created by use of the DISLIN plotting library (Michels, 2007).
+The plots created by the SWB code are quite basic. The plotting
+functionality in the SWB code is included primarily as a quick
+diagnostic tool for users.
 
 SWB enables use of some of the more important DISLIN parameters. These
 parameters control how the DISLIN plotting library formats each plot.
 The syntax is DISLIN\_PARAMETERS SWB Output Variable Name, followed on
 the next lines by one or more of the following statements:
-SET\_Z\_AXIS\_RANGE, SET\_DEVICE, SET\_FONT, or Z\_AXIS\_TITLE. The
-SET\_Z\_AXIS\_RANGE statement allows the user to specify the range of
+`SET_Z_AXIS_RANGE`, `SET_DEVICE`, `SET_FONT`, or `Z_AXIS_TITLE`.
+
+The `SET_Z_AXIS_RANGE` statement allows the user to specify the range of
 values that will be plotted. Three sets of ranges may be specified for
 plots of daily, monthly, and annual values. The minimum, maximum, and
-increment size must be specified each time the SET\_Z\_AXIS\_RANGE
-statement is used. \*Example: DISLIN\_PARAMETERS RECHARGE
-\SET\_Z\_AXIS\_RANGE DAILY 0 1.5 0.1 \SET\_Z\_AXIS\_RANGE MONTHLY 0 7
-1.0 \SET\_Z\_AXIS\_RANGE ANNUAL 0 20 2. \SET\_DEVICE PDF \SET\_FONT
-Times-Bold \Z\_AXIS\_TITLE RECHARGE, IN IN.
+increment size must be specified each time the `SET_Z_AXIS_RANGE`
+statement is used.
+
+*Example:*
+
+`DISLIN_PARAMETERS RECHARGE` `SET_Z_AXIS_RANGE DAILY 0 1.5 0.1`
+`SET_Z_AXIS_RANGE MONTHLY 0 7 1.0` `SET_Z_AXIS_RANGE ANNUAL 0 20 2.`
+`SET_DEVICE PDF` `SET_FONT Times-Bold`
+`Z_AXIS_TITLE RECHARGE, IN INCHES`
 
 In the second line of the example above, the plotting range for the
-\\texttt{RECHARGE output variable on a daily time scale is specified
-with a minimum of 0 in., a maximum of 1.5 in., and a plotting increment
-of 0.1 in.
+`RECHARGE` output variable on a daily time scale is specified with a
+minimum of 0 in., a maximum of 1.5 in., and a plotting increment of 0.1
+in.
 
-The \\texttt{SET\_DEVICE statement can be used to change the output file
-format. The default value is \\texttt{PNG, for Portable Network
-Graphics. This format is compact and is supported by most modern
-applications. Other possible output types include Windows Metafile
-(WMF), Adobe Postscript (PS), Adobe Encapsulated Postscript (EPS), Adobe
-Portable Document Format (PDF), Scalable Vector Graphics (SVG), and
-Windows Bitmap (BMP).
+The `SET_DEVICE` statement can be used to change the output file format.
+The default value is `PNG`, for Portable Network Graphics. This format
+is compact and is supported by most modern applications. Other possible
+output types include Windows Metafile (`WMF`), Adobe Postscript (`PS`),
+Adobe Encapsulated Postscript (`EPS`), Adobe Portable Document Format
+(`PDF`), Scalable Vector Graphics (`SVG`), and Windows Bitmap (`BMP`).
 
-The \\texttt{SET\_FONT statement can be used to alter the font used to
-annotate the plots. For plot device type \\texttt{PS, \\texttt{EPS,
-\\texttt{PDF, and \\texttt{SVG, the following subset of fonts should
-work: \\texttt{ \Times-Roman Courier Helvetica AvantGarde-Book
-Helvetica-Narrow Bookman-Light NewCenturySchlbk-Roman Palatino-Roman
-NewCenturySchlbk-Italic Palatino-Italic
+The `SET_FONT` statement can be used to alter the font used to annotate
+the plots. For plot device types `PS`, `EPS`, `PDF`, and `SVG`, the
+following subset of fonts should work:
+
+`Times-Roman` `Courier` `Helvetica`
 
 For more details about supported fonts, see the DISLIN documentation
-(http:/\slash www.dislin.de\slash ). The statement
-\\texttt{Z\_AXIS\_TITLE sets the text that is used for the plot legend.
-Text does not need to be enclosed by quotes and may include punctuation.
+(http:\\www.dislin.de). The statement `Z_AXIS_TITLE` sets the text that
+is used for the plot legend. Text does not need to be enclosed by quotes
+and may include punctuation.
 
-ITERATIVE METHOD TOLERANCE \[OPTIONAL\] The iterative method sometimes
-fails to converge for small solution tolerances (that is, less than
-1.0E--6 change in calculated runoff in a cell from one iteration to the
-next). Increasing this value will improve convergence, but at the
-potential cost of also increasing mass-balance errors in the overall
-water balance. The default value is 1E--6. Example:
-ITERATIVE\_METHOD\_TOLERANCE 1.0E--4 UNITS OF LENGTH \[OPTIONAL\] The
-SWB code is written with default units of meters to define the gridded
-model domain. If units of feet are desired instead, the
-GRID\_LENGTH\_UNITS statement may be used. The only place in the code
+#### ITERATIVE METHOD TOLERANCE
+
+*Set exit criteria for iterative method.*
+
+**This method is deprecated.** New SWB applications should instead used
+the `DOWNHILL` solution method.
+
+The iterative method sometimes fails to converge for small solution
+tolerances (that is, less than 1.0E--6 change in calculated runoff in a
+cell from one iteration to the next). Increasing this value will improve
+convergence, but at the potential cost of also increasing mass-balance
+errors in the overall water balance. The default value is 1E--6.
+
+*Example:*
+
+`ITERATIVE_METHOD_TOLERANCE 1.0E--4`
+
+#### GRID\_LENGTH\_UNITS
+
+*Set the units used in the calculation of the mass balance output
+table.*
+
+The SWB code is written with default units of meters to define the
+gridded model domain. If units of feet are desired instead, the
+GRID\_LENGTH\_UNITS statement may be used. **The only place in the code
 where this is important is with regard to the mass balance as expressed
-in units of acre-feet. If the grid length units are feet while the code
-treats them as meters, there will be a corresponding error in the values
-of the mass-balance terms. Example: GRID\_LENGTH\_UNITS FEET
+in units of acre-feet.** If the grid length units are feet while the
+code treats them as meters, there will be a corresponding error in the
+values of the mass-balance terms.
 
-### Gridded Datasets
+*Example:*
+
+`GRID_LENGTH_UNITS FEET`
+
+### Gridded Dataset Modifiers
+
+*Refine how gridded data are treated by SWB.*
 
 For each of the three major climate datasets (precipitation, minimum and
 maximum air temperature), a standard set of suffixes may be added to the
 dataset name to control how SWB treats the dataset. The list of suffixes
-understood by SWB is long:
+understood by SWB includes:
 
   --------------------------------------------------------------------------
   Suffix                    Argument      Description                   Defa

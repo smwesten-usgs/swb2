@@ -43,6 +43,7 @@ pandoc                                                                      \
 echo "Creating Word version of the documentation."
 
 pandoc                                                                      \
+       --from=markdown+backtick_code_blocks                                 \
        --filter pandoc-crossref                                             \
        --filter pandoc-citeproc                                             \
        --reference-docx="$REFERENCE_DOCX"                                   \
