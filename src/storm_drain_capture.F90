@@ -60,7 +60,11 @@ contains
         //asCharacter( number_of_landuse_codes )//"). Setting default storm drain"         &
         //" capture to 0.0 (ZERO)."
 
-      call warn( sMessage=trim(sBuf), sModule=__FILE__, iLine=__LINE__, lFatal=.false._c_bool, iLogLevel=LOG_ALL )
+      call warn( sMessage=trim(sBuf),                                                      &
+                 sModule=__SRCNAME__,                                                         &
+                 iLine=__LINE__,                                                           &
+                 lFatal=.false._c_bool,                                                    &
+                 iLogLevel=LOG_ALL )
 
       deallocate(STORM_DRAIN_CAPTURE_FRACTION, stat=status)
       call assert( status==0, "Problem deallocating STORM_DRAIN_CAPTURE_FRACTION", &
