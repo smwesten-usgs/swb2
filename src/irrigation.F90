@@ -332,7 +332,6 @@ contains
     pIRRIGATION_MASK => DAT%find("IRRIGATION_MASK")
     if ( associated(pIRRIGATION_MASK) ) call pIRRIGATION_MASK%getvalues( )
 
-
     if ( associated(pIRRIGATION_MASK) ) then
 
       irrigation_mask = pack( real(pIRRIGATION_MASK%pGrdBase%iData, kind=c_float), is_active )

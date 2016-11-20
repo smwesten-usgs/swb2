@@ -19,7 +19,7 @@ module output
 
   type (NETCDF_FILE_COLLECTION_T), allocatable, public :: NC_OUT(:)
 
-  integer (kind=c_int), parameter   :: NCDF_NUM_OUTPUTS = 19
+  integer (kind=c_int), parameter   :: NCDF_NUM_OUTPUTS = 20
 
   type OUTPUT_SPECS_T
     character (len=27)          :: variable_name
@@ -47,17 +47,19 @@ module output
     OUTPUT_SPECS_T( "infiltration               ", "inches_per_day       ", 0.0, 2000.0 ),      &
     OUTPUT_SPECS_T( "irrigation                 ", "inches_per_day       ", 0.0, 2000.0 ),      &
     OUTPUT_SPECS_T( "runoff_outside             ", "inches_per_day       ", 0.0, 10000.0 ),     &
+    OUTPUT_SPECS_T( "crop_et                    ", "inches_per_day       ", 0.0, 10000.0 ),     &
     OUTPUT_SPECS_T( "gdd                        ", "degree_day_fahrenheit", 0.0, 10000.0 )   ]
 
   enum, bind(c)
-    enumerator :: NCDF_GROSS_PRECIPITATION=1, NCDF_RAINFALL, NCDF_SNOWFALL, &
-                  NCDF_INTERCEPTION, NCDF_RUNON, NCDF_RUNOFF,               &
-                  NCDF_SNOW_STORAGE, NCDF_SOIL_STORAGE,                     &
-                  NCDF_REFERENCE_ET0,                                       &
-                  NCDF_ACTUAL_ET, NCDF_SNOWMELT, NCDF_TMIN, NCDF_TMAX,      &
-                  NCDF_POTENTIAL_RECHARGE, NCDF_INFILTRATION,               &
-                  NCDF_IRRIGATION, NCDF_RUNOFF_OUTSIDE, NCDF_GDD,           &
-                  NCDF_REJECTED_POTENTIAL_RECHARGE
+    enumerator :: NCDF_GROSS_PRECIPITATION=1, NCDF_RAINFALL, NCDF_SNOWFALL,   &
+                  NCDF_INTERCEPTION, NCDF_RUNON, NCDF_RUNOFF,                 &
+                  NCDF_SNOW_STORAGE, NCDF_SOIL_STORAGE,                       &
+                  NCDF_REFERENCE_ET0,                                         &
+                  NCDF_ACTUAL_ET, NCDF_SNOWMELT, NCDF_TMIN, NCDF_TMAX,        &
+                  NCDF_POTENTIAL_RECHARGE, NCDF_REJECTED_POTENTIAL_RECHARGE,  &
+                  NCDF_INFILTRATION,                                          &
+                  NCDF_IRRIGATION, NCDF_RUNOFF_OUTSIDE,                       &
+                  NCDF_CROP_ET, NCDF_GDD
   end enum
 
   logical ( kind=c_bool ) :: OUTPUT_INCLUDES_LATLON = lTRUE
@@ -354,10 +356,10 @@ contains
 
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_GDD )%ncfile,                      &
             iVarID=NC_OUT( NCDF_GDD )%ncfile%iVarID(NC_Z),                                       &
-            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],     &
             iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                       &
                                 int(cells%number_of_columns, kind=c_size_t) ],                   &
-            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                             &
             lMask=cells%active,                                                                  &
             rValues=cells%gdd,                                                                   &
             rField=cells%nodata_fill_value )
@@ -370,6 +372,17 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                                &
             lMask=cells%active,                                                                     &
             rValues=cells%rejected_potential_recharge,                                              &
+            rField=cells%nodata_fill_value )
+
+
+    call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_CROP_ET )%ncfile,                     &
+            iVarID=NC_OUT( NCDF_CROP_ET )%ncfile%iVarID(NC_Z),                                      &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],        &
+            iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                          &
+                                int(cells%number_of_columns, kind=c_size_t) ],                      &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                                &
+            lMask=cells%active,                                                                     &
+            rValues=cells%crop_etc,                                                                 &
             rField=cells%nodata_fill_value )
 
   end subroutine write_output
