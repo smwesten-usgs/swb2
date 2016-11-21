@@ -293,6 +293,11 @@ contains
     ! locate the data structure associated with the gridded initial_snow_cover_storage
     pINITIAL_SNOW_COVER_STORAGE => DAT%find("INITIAL_SNOW_COVER_STORAGE")
 
+    ! OK, now try the old SWB 1.0 syntax
+    if ( .not. associated( pINITIAL_SNOW_COVER_STORAGE ) )   &
+    ! locate the data structure associated with the gridded initial_snow_cover_storage
+      pINITIAL_SNOW_COVER_STORAGE => DAT%find("INITIAL_SNOW_COVER")
+
     if ( .not. associated( pINITIAL_SNOW_COVER_STORAGE ) ) then
         call warn(sMessage="An INITIAL_SNOW_COVER_STORAGE grid (or constant) was not found.",    &
         sHints="Check your control file to see that a valid INITIAL_SNOW_COVER_STORAGE grid or"  &
@@ -332,6 +337,10 @@ contains
 
     ! locate the data structure associated with the gridded initial_percent_soil_moisture entries
     pINITIAL_PERCENT_SOIL_MOISTURE => DAT%find("INITIAL_PERCENT_SOIL_MOISTURE")
+
+    ! OK, now try the old SWB 1.0 syntax
+    if ( .not. associated( pINITIAL_PERCENT_SOIL_MOISTURE ) )   &
+      pINITIAL_PERCENT_SOIL_MOISTURE => DAT%find("INITIAL_SOIL_MOISTURE")
 
     if ( .not. associated( pINITIAL_PERCENT_SOIL_MOISTURE ) ) then
         call warn(sMessage="An INITIAL_PERCENT_SOIL_MOISTURE grid (or constant) was not found.",    &
@@ -897,7 +906,10 @@ contains
     ! [ LOCALS ]
     character (len=256)   :: sRecord, sSubstring
     integer (kind=c_int)  :: iStat
-    type (ASCII_FILE_T) :: CF
+    type (ASCII_FILE_T)   :: CF
+    integer (kind=c_int)  :: dumpfile_count
+
+    dumpfile_count = 0
 
     ! open the control file and define the comment characters and delimiters to be used in
     ! parsing the ASCII text
@@ -923,6 +935,13 @@ contains
       call chomp(sRecord, sSubstring, CF%sDelimiters )
 
       if ( len_trim( sSubstring ) > 0 ) then
+
+        ! there can be more than one instance of 'DUMP_VARIABLES'
+        ! need to make the key unique; tack on an instance number
+        if ( sSubstring .strequal. "DUMP_VARIABLES" ) then
+          dumpfile_count = dumpfile_count + 1
+          sSubstring = trim(sSubstring)//"_"//asCharacter(dumpfile_count)
+        endif
 
         ! first add the key value to the directory entry data structure
         call CF_ENTRY%add_key( sSubstring )

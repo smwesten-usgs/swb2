@@ -800,12 +800,13 @@ contains
     type (STRING_LIST_T), intent(in)        :: argv_list
 
     ! [ LOCALS ]
-    integer (kind=c_int)            :: indx
-    integer (kind=c_int)            :: iostat
-    integer (kind=c_int)            :: unitnum
-    character (len=256)             :: filename
-    character (len=:), allocatable  :: Method_Name
-    character (len=:), allocatable  :: col, row
+    integer (kind=c_int)              :: indx
+    integer (kind=c_int)              :: iostat
+    integer (kind=c_int)              :: unitnum
+    character (len=256)               :: filename
+    character (len=:), allocatable    :: Method_Name
+    integer (kind=c_int)              :: col, row
+    real (kind=c_double)              :: xcoord, ycoord
 
     Method_Name = argv_list%get(1)
 
@@ -1144,42 +1145,61 @@ contains
 
     elseif ( sCmdText .contains. "DUMP_VARIABLES" ) then
 
+        row = 0; col = 0
+
         this%dump_variables => model_dump_variables_by_cell
 
-        if ( argv_list%count == 2 ) then
+        if ( argv_list%count == 3 ) then
 
-          col = argv_list%get(1)
-          row = argv_list%get(2)
+          xcoord = asFloat( argv_list%get(2) )
+          ycoord = asFloat( argv_list%get(3) )
+          row = grid_GetGridRowNum( this%pGrdOut, ycoord )
+          col = grid_GetGridColNum( this%pGrdOut, xcoord )
 
-          call LOGS%WRITE( "==> SWB will dump variables for cell ("//trim(col)//","      &
-            //trim(row)//").", iLogLevel = LOG_ALL, lEcho = lFALSE )
+          if ( .not. ( Method_Name .contains. "COORD") )                       &
+            call warn("Unknown option supplied to DUMP_VARIABLES method.", &
+              sHints="The only known option keyword is 'COORD'.",          &
+              lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+
+        elseif ( argv_list%count == 2 ) then
+
+          col = asInt( argv_list%get(1) )
+          row = asInt( argv_list%get(2) )
+
+        endif
+
+        if ( ( col > 0 ) .and. ( row > 0 ) ) then
+
+          call LOGS%WRITE( "==> SWB will dump variables for cell ("//asCharacter(col)//","      &
+            //asCharacter(row)//").", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
           do indx=1, ubound( DUMP, 1)
             if (DUMP( indx )%col /= 0 )  cycle
 
-            DUMP( indx )%col = asInt( col )
-            DUMP( indx )%row = asInt( row )
+            DUMP( indx )%col = col
+            DUMP( indx )%row = row
 
-            filename = "SWB2_variable_values__col_"//trim( col )//"__row_"//trim( row )//".csv"
+            filename = "SWB2_variable_values__col_"//asCharacter( col )//"__row_"//asCharacter( row )//".csv"
 
-            open( newunit=unitnum, file=trim(filename), iostat=iostat )
-            call assert( iostat == 0, "Could not open variable dump file for writing." )
+            open( newunit=unitnum, file=trim(filename), iostat=iostat, action="write", status="replace" )
+
+            call assert( iostat == 0, "Could not open variable dump file "//sQuote(filename)     &
+              //" for writing. iostat = "//asCharacter( iostat ) )
             DUMP( indx )%unitnum = unitnum
 
-            write( unit=DUMP( indx )%unitnum, fmt="(a)")                                                          &
-              "month, day, year,landuse_code, landuse_index, index_order, soil_group, num_upslope_connections, "  &
-              //"sum_upslope_cells, awc, latitude, reference_ET0, actual_ET, curve_num_adj, inflow, runon, "      &
-              //"runoff, outflow, infiltration, snowfall, potential_snowmelt, snowmelt, interception, "           &
-              //"rainfall, interception_storage, tmax, tmin, tmean, snow_storage, "                               &
-              //"soil_storage, soil_storage_max, surface_storage, surface_storage_excess, "                       &
-              //"surface_storage_max, potential_recharge, rejected_recharge, fog, irrigation, gdd, "              &
-              //" runoff_outside, "                                                                               &
-              //"pervious_fraction, storm_drain_capture, canopy_cover_fraction, crop_coefficient_kcb, "           &
-              //"cfgi, rooting_depth_max, current_rooting_depth, actual_et_soil, actual_et_impervious, "          &
-              //"actual_et_interception, adjusted_depletion_fraction_p, crop_etc, direct_recharge, "              &
-              //"direct_soil_moisture, inflowbuf1, inflowbuf2, inflowbuf3, inflowbuf4, inflowbuf5, inflowbuf_sum"
-
-
+            write( unit=DUMP( indx )%unitnum, fmt="(a)")                                                           &
+              "month, day, year,landuse_code, landuse_index, index_order, soil_group, num_upslope_connections, "   &
+              //"sum_upslope_cells, awc, latitude, reference_ET0, actual_ET, curve_num_adj, inflow, runon, "       &
+              //"runoff, outflow, infiltration, snowfall, potential_snowmelt, snowmelt, interception, "            &
+              //"rainfall, interception_storage, tmax, tmin, tmean, snow_storage, "                                &
+              //"soil_storage, soil_storage_max, surface_storage, surface_storage_excess, "                        &
+              //"surface_storage_max, potential_recharge, rejected_recharge, fog, irrigation, gdd, "               &
+              //" runoff_outside, "                                                                                &
+              //"pervious_fraction, storm_drain_capture, canopy_cover_fraction, crop_coefficient_kcb, "            &
+              //"cfgi, rooting_depth_max, current_rooting_depth, actual_et_soil, actual_et_impervious, "           &
+              //"actual_et_interception, adjusted_depletion_fraction_p, crop_etc, direct_recharge, "               &
+              //"direct_soil_moisture, inflowbuf1, inflowbuf2, inflowbuf3, inflowbuf4, inflowbuf5, inflowbuf_sum, "&
+              //"crop_coefficient_kcb"
             exit
 
           enddo
@@ -2011,7 +2031,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int) :: kndx
 
-        write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',6(i6,','),50(f12.3,','),f12.3)")                  &
+        write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',6(i6,','),51(f12.3,','),f12.3)")                  &
           SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                        &
           this%landuse_code( indx ), this%landuse_index( indx ), this%order_index( indx ),                &
           this%soil_group( indx ), this%num_upslope_connections( indx ), this%sum_upslope_cells( indx ),  &
@@ -2032,7 +2052,8 @@ contains
           this%current_rooting_depth( indx ), this%actual_et_soil( indx ),                                &
           this%actual_et_impervious( indx ), this%actual_et_interception( indx ),                         &
           this%adjusted_depletion_fraction_p( indx ), this%crop_etc( indx ), this%direct_recharge( indx ),&
-          this%direct_soil_moisture( indx ), (PREV_5_DAYS_RAIN( indx, kndx), kndx=1,6)
+          this%direct_soil_moisture( indx ), (PREV_5_DAYS_RAIN( indx, kndx), kndx=1,6),                   &
+          this%crop_coefficient_kcb( indx )
 
   end subroutine model_dump_variables
 
