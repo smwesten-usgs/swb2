@@ -38,7 +38,9 @@ contains
 
     ! calls elemental
     call cells%update_growing_season()
+
     call cells%update_crop_coefficient()
+
     call cells%calc_reference_et()
 
 
@@ -46,7 +48,9 @@ contains
     cells%crop_etc = cells%reference_et0 * cells%crop_coefficient_kcb
 
     call cells%calc_snowfall()
+
     call cells%calc_snowmelt()
+    
 
     call cells%calc_continuous_frozen_ground_index()
 
@@ -136,7 +140,7 @@ contains
           call LOGS%write("    gross_precip: "//asCharacter(gross_precipitation))
           call LOGS%write("   curve_num_adj: "//asCharacter( cells%curve_num_adj( indx )))
           call LOGS%write("    landuse_code: "//asCharacter( cells%landuse_code( indx ) ) )
-        endif          
+        endif
 
         call cells%calc_runoff( indx )
 

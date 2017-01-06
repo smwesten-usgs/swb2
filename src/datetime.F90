@@ -39,7 +39,7 @@ module datetime
     procedure  :: calcWaterYear => calc_water_year_sub
     procedure  :: parseDate => parse_text_to_date_sub
     procedure  :: parseTime => parse_text_to_time_sub
-    procedure  :: isLeapYear => is_leap_year_fn    
+    procedure  :: isLeapYear => is_leap_year_fn
 
     procedure  :: setTimeFormat => set_time_format_indices
     procedure  :: setDateFormat => set_Date_format_indices
@@ -48,25 +48,25 @@ module datetime
     !> ">" operator for comparing two date objects; see @ref is_date_greater_than for implementation details.
     generic   :: operator( > ) => is_date_greater_than
 
-    procedure :: is_date_less_than    
+    procedure :: is_date_less_than
     !> "<" operator for comparing two date objects
     generic   :: operator( < ) => is_date_less_than
 
-    procedure :: is_date_GT_or_equal_to 
+    procedure :: is_date_GT_or_equal_to
     !> ">=" operator for comparing two date objects
     generic   :: operator( >= ) => is_date_GT_or_equal_to
 
-    procedure :: is_date_LT_or_equal_to    
+    procedure :: is_date_LT_or_equal_to
     !> "<=" operator for comparing two date objects
     generic   :: operator( <= ) => is_date_LT_or_equal_to
 
-    procedure :: is_date_equal_to  
+    procedure :: is_date_equal_to
     !> "==" operator for comparing two date objects
     generic   :: operator( == ) => is_date_equal_to
 
-    procedure :: date_minus_date_fn   
+    procedure :: date_minus_date_fn
     procedure :: date_minus_float_fn
-    procedure :: date_minus_int_fn     
+    procedure :: date_minus_int_fn
     !> "-" operator for subtracting two date objects
     generic   :: operator( - ) => date_minus_date_fn,   &
                                   date_minus_float_fn,  &
@@ -77,25 +77,25 @@ module datetime
 
     procedure  :: setDay => date_set_day_sub
     procedure  :: setMonth => date_set_month_sub
-    procedure  :: setYear => date_set_year_sub        
+    procedure  :: setYear => date_set_year_sub
     procedure  :: addDay => date_plus_day_sub
-    procedure  :: subtractDay => date_minus_day_sub    
+    procedure  :: subtractDay => date_minus_day_sub
     procedure  :: addYear => date_plus_year_sub
-    procedure  :: subtractYear => date_minus_year_sub    
+    procedure  :: subtractYear => date_minus_year_sub
     procedure  :: prettydate => write_pretty_date_fn
     procedure  :: prettydatetime => write_pretty_datetime_fn
     procedure  :: listdatetime => write_list_datetime_fn
     procedure  :: listdate => write_list_date_fn
-    procedure  :: listtime => write_list_time_fn    
+    procedure  :: listtime => write_list_time_fn
     procedure  :: systime => system_time_to_date_sub
     procedure  :: getDayOfYear => get_day_of_year_fn
     procedure  :: getJulianDay => get_julian_day_fn
     procedure  :: setJulianDate => set_julian_date_sub
-    procedure  :: getFractionOfDay => get_fraction_of_day_fn    
+    procedure  :: getFractionOfDay => get_fraction_of_day_fn
 
   end type DATETIME_T
 
- 
+
   ! the following values are determined by the date format string; defaults to MM/DD/YYYY
   character (len=14), private :: sDATE_FORMAT = "MM/DD/YYYY"
   character (len=14), public  :: sDEFAULT_DATE_FORMAT = "MM/DD/YYYY"
@@ -256,7 +256,7 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
   character (len=256)  :: sStr
   character (len=256)  :: sMonth, sDay, sYear, sBuf
   character (len=256)  :: sFilename_
-  integer (kind=c_int) :: iLinenumber_ 
+  integer (kind=c_int) :: iLinenumber_
 
   if ( present( sFilename) ) then
     sFilename_ = sFilename
@@ -268,7 +268,7 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
     iLinenumber_ = iLinenumber
   else
     iLinenumber_ = -9999
-  endif    
+  endif
 
   ! these offset amounts have value of 1 if the program detects a single-digit date value
   iMonthOffset = 0; iDayOffset = 0
@@ -284,12 +284,12 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
   read(sMonth,fmt=*, iostat = iStat) iMonth
 
   if ( .not. (iStat==0 .and. (iMonth > 0 .and. iMonth <= 12) ) ) then
-    
+
     call Assert(lFALSE, &
       "Error parsing month value - got "//trim(sMonth)//";"// &
       " date text: "//trim(sStr),sFilename_, iLinenumber_, __SRCNAME__, __LINE__ )
 
-  endif  
+  endif
 
   sDay = sStr( iScanDD1 - iMonthOffset : iScanDD2 -iMonthOffset )
   sBuf = clean(sDay)
@@ -300,23 +300,23 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
   read(sDay, fmt=*, iostat = iStat) iDay
 
   if ( .not. (iStat==0 .and. (iDay > 0 .and. iDay <= 31) ) ) then
-    
+
     call Assert(lFALSE, &
       "Error parsing day value - got "//trim(sDay)//";"// &
       " date text: "//trim(sStr),sFilename_, iLinenumber_, __SRCNAME__, __LINE__ )
 
-  endif  
+  endif
 
   sYear = sStr( iScanYYYY1 - iMonthOffset - iDayOffset: iScanYYYY2 - iMonthOffset - iDayOffset)
   read(sYear,fmt=*, iostat = iStat) iYear
 
   if ( iStat/=0 ) then
-    
+
     call Assert(lFALSE, &
       "Error parsing year value - got "//trim(sYear)//";"// &
       " date text: "//trim(sStr),sFilename_, iLinenumber_, __SRCNAME__, __LINE__ )
 
-  endif  
+  endif
 
 !  if(iYear <= 99 ) iYear = iYear + 1900    ! this might be a lethal assumption
 
@@ -1084,7 +1084,7 @@ elemental function get_fraction_of_day_fn(this)           result(dFractionOfDay)
 
   dFractionOfDay = this%dJulianDate - real( int(this%dJulianDate, kind=c_int ), kind=c_double)
 
-end function get_fraction_of_day_fn  
+end function get_fraction_of_day_fn
 
 !------------------------------------------------------------------------------
 
@@ -1252,9 +1252,11 @@ end function mmddyyyy2julian
 
 !------------------------------------------------------------------------------
 
-function mmdd2doy(sMMDD)  result(iDOY)
+function mmdd2doy(sMMDD, sInputItemName )  result(iDOY)
 
-  character (len=*) :: sMMDD
+  character (len=*)               :: sMMDD
+  character (len=*), optional     :: sInputItemName
+
   integer (kind=c_int) :: iDOY
 
   ! [ LOCALS ]
@@ -1265,22 +1267,33 @@ function mmdd2doy(sMMDD)  result(iDOY)
   integer (kind=c_int) :: iStat
   integer (kind=c_int) :: iJD
   integer (kind=c_int) :: iStartingJD
+  character (len=256)  :: sInputItemName_
 
   sItem = sMMDD
+
+  if ( present( sInputItemName ) ) then
+    sInputItemName_ = trim( sInputItemName )
+  else
+    sInputItemName_ = "unknown"
+  endif
 
   ! parse month value
   call chomp(sItem, sBuf, "/-")
   read(sBuf,*,iostat = iStat) iMonth
-  call Assert(iStat==0, "Problem reading month value from string "//TRIM(sMMDD), &
-    __SRCNAME__,__LINE__)
+  call Assert(iStat==0, "Problem reading month value from string "//TRIM(sMMDD),   &
+    __SRCNAME__,__LINE__,                                                          &
+    sHints="The offending string was "//sQuote(sMMDD)//", which was encountered "   &
+           //"while attempting to read in "//sQuote( sInputItemName_ ) )
 
   ! parse day value
   call chomp(sItem, sBuf, "/-")
   read(sBuf,*,iostat=iStat) iDay
-  call Assert(iStat==0, "Problem reading day value from string "//TRIM(sMMDD), &
-    __SRCNAME__,__LINE__)
+  call Assert(iStat==0, "Problem reading day value from string "//TRIM(sMMDD),   &
+    __SRCNAME__,__LINE__,                                                          &
+    sHints="The offending string was "//sQuote(sMMDD)//", which was encountered "   &
+           //"while attempting to read in "//sQuote( sInputItemName_ ) )
 
-
+  ! we don't really care about the year value here; any year value could have been used
   iStartingJD = julian_day ( 1999, 1, 1)
   iJD = julian_day ( 1999, iMonth, iDay)
 
@@ -1339,7 +1352,7 @@ function get_day_of_year_fn(this)  result(iDOY)
   integer (kind=c_int) :: iDOY
 
   iDOY = day_of_year( int( this%dJulianDate, kind=c_int) )
-  
+
 end function get_day_of_year_fn
 
 !--------------------------------------------------------------------------

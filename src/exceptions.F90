@@ -24,13 +24,13 @@ contains
 
     character (len=*), intent(in)               :: sMessage
     character (len=*), intent(in), optional     :: sModule
-    integer (kind=c_int), intent(in), optional  :: iLine 
+    integer (kind=c_int), intent(in), optional  :: iLine
     character (len=*), intent(in), optional     :: sHints
     character (len=*), intent(in), optional     :: sCalledBy
     integer (kind=c_int), intent(in), optional  :: iCalledByLine
-    
+
 !    integer (kind=c_int), intent(in), optional  :: iLU
-    
+
     ! [ LOCALS ]
     character (len=6) :: sLineNum
 
@@ -46,7 +46,7 @@ contains
     if (present(iCalledByLine)) then
       write(sLineNum, fmt="(i0)") iCalledByLine
       call LOGS%write( "line number:  "//trim(sLineNum), iTab=16 )
-    endif  
+    endif
 
     if (present(sModule))  &
       call LOGS%write( "module:  "//trim(sModule), iTab=21 )
@@ -54,15 +54,17 @@ contains
     if (present(iLine)) then
       write(sLineNum, fmt="(i0)") iLine
       call LOGS%write( "line number:  "//trim(sLineNum), iTab=16 )
-    endif  
+    endif
 
-    if (present(sHints)) &
-      call LOGS%write( "==> "//trim(sHints), iTab=12 )
+    if (present(sHints)) then
+      if ( len_trim(sHints) > 0 )  &
+        call LOGS%write( "==> "//trim(sHints), iTab=12 )
+    endif
 
     call LOGS%write("", iLinesAfter=1)
 
     stop
- 
+
   end subroutine die
 
   !------------------------------------------------------------------------------------------------
@@ -93,7 +95,7 @@ contains
       write(unit=sNumWarnings, fmt="(i0)") NUMBER_OF_FATAL_WARNINGS
       call LOGS%write( "** "//trim(adjustl(sNumWarnings))//" FATAL WARNING"//trim(sBigS)     &
                        //" DETECTED IN INPUT **", iLinesBefore=1, iLinesAfter=1 )
-   
+
       call LOGS%write( "# Summary of fatal warning"//trim(sLittleS)//" #" )
       call LOGS%write( "-------------------------------", iLinesAfter=1 )
 
@@ -108,15 +110,15 @@ contains
         write(unit=sMaxWarnings, fmt="(i0)") MAX_FATAL_WARNINGS
         call LOGS%write( "*There were more than "//trim(adjustl(sMaxWarnings))//" fatal warnings. " &
           //" Only a partial list of warnings is shown above.*", iLinesBefore=1, iLinesAfter=1, iTab=2 )
-      endif  
+      endif
 
       call die( sMessage="Fatal warning"//trim(sLittleS)//" associated with input.", &
                 sHints="Address the problem"//trim(sLittleS)//" listed above and try again." )
-  
-    endif  
+
+    endif
 
 
-  end subroutine check_for_fatal_warnings  
+  end subroutine check_for_fatal_warnings
 
 !------------------------------------------------------------------------------------------------
 
@@ -124,13 +126,13 @@ contains
 
     character (len=*), intent(in)               :: sMessage
     character (len=*), intent(in), optional     :: sModule
-    integer (kind=c_int), intent(in), optional  :: iLine 
+    integer (kind=c_int), intent(in), optional  :: iLine
     character (len=*), intent(in), optional     :: sHints
     logical (kind=c_bool), intent(in), optional :: lFatal
     integer (kind=c_int), intent(in), optional  :: iLogLevel
     logical (kind=c_bool), intent(in), optional :: lEcho
 !    integer (kind=c_int), intent(in), optional  :: iLU
-    
+
     ! [ LOCALS ]
     character (len=32)   :: sBuf
 
@@ -149,7 +151,7 @@ contains
     else
       call LOGS%write(" ** WARNING possible error: **", iTab=10, iLinesBefore=1)
       call LOGS%write( trim(sMessage), iTab=16 )
-    endif  
+    endif
 
     if (present(sModule))  &
       call LOGS%write("module:  "//trim(sModule), iTab=18 )
@@ -157,72 +159,92 @@ contains
     if (present(iLine)) then
       write(sBuf, fmt="(i0)") iLine
       call LOGS%write("line no:  "//trim(sBuf), iTab=18 )
-    endif  
+    endif
 
-    if (present(sHints)) &
-      call LOGS%write("   ==> "//trim(sHints), iTab=9, iLinesBefore=1 )
+    if (present(sHints)) then
+      if ( len_trim(sHints) > 0 )  &
+        call LOGS%write("   ==> "//trim(sHints), iTab=9, iLinesBefore=1 )
+    endif
 
-    call LOGS%write("", iLinesAfter=1)  
+    call LOGS%write("", iLinesAfter=1)
 
   end subroutine warn
 
 !------------------------------------------------------------------------------------------------
 
-  subroutine assert_1bit(lCondition, sMessage, sModule, iLine, sCalledBy, iCalledByLine )
+  subroutine assert_1bit(lCondition, sMessage, sModule, iLine, sCalledBy, iCalledByLine, sHints )
 
     logical (kind=c_bool), intent(in)           :: lCondition
     character (len=*), intent(in)               :: sMessage
+    character (len=*), intent(in), optional     :: sHints
     character (len=*), intent(in), optional     :: sCalledBy
     integer (kind=c_int), intent(in), optional  :: iCalledByLine
     character (len=*), intent(in), optional     :: sModule
-    integer (kind=c_int), intent(in), optional  :: iLine 
+    integer (kind=c_int), intent(in), optional  :: iLine
+
+    character (len=256) :: sHints_
 
     if (.not. lCondition) then
+
+      if ( present( sHints ) ) then
+        sHints_ = trim( sHints )
+      else
+        sHints_ = ""
+      endif
 
       if (present( sCalledBy ) .and. present( iCalledByLine ) &
         .and. present(sModule) .and. present(iLine) ) then
         call die( sMessage=sMessage, sCalledBy=sCalledBy, iCalledByLine=iCalledByLine, &
-          sModule=sModule, iLine=iLine ) 
+          sModule=sModule, iLine=iLine, sHints=sHints_ )
       elseif ( present(sModule) .and. present(iLine) ) then
-        call die( sMessage=sMessage, sModule=sModule, iLine=iLine )
+        call die( sMessage=sMessage, sModule=sModule, iLine=iLine, sHints=sHints_ )
       elseif ( present(sModule) ) then
-        call die( sMessage=sMessage, sModule=sModule )  
+        call die( sMessage=sMessage, sModule=sModule, sHints=sHints_ )
       else
-        call die( sMessage=sMessage )  
+        call die( sMessage=sMessage, sHints=sHints_ )
       endif
 
-    endif      
+    endif
 
   end subroutine assert_1bit
 
 !------------------------------------------------------------------------------------------------
 
-  subroutine assert_4bit(lCondition, sMessage, sModule, iLine, sCalledBy, iCalledByLine )
+subroutine assert_4bit(lCondition, sMessage, sModule, iLine, sCalledBy, iCalledByLine, sHints )
 
-    logical (kind=4), intent(in)                :: lCondition
-    character (len=*), intent(in)               :: sMessage
-    character (len=*), intent(in), optional     :: sCalledBy
-    integer (kind=c_int), intent(in), optional  :: iCalledByLine
-    character (len=*), intent(in), optional     :: sModule
-    integer (kind=c_int), intent(in), optional  :: iLine 
+  logical (kind=4), intent(in)                :: lCondition
+  character (len=*), intent(in)               :: sMessage
+  character (len=*), intent(in), optional     :: sHints
+  character (len=*), intent(in), optional     :: sCalledBy
+  integer (kind=c_int), intent(in), optional  :: iCalledByLine
+  character (len=*), intent(in), optional     :: sModule
+  integer (kind=c_int), intent(in), optional  :: iLine
 
-    if (.not. lCondition) then
+  character (len=256) :: sHints_
 
-      if (present( sCalledBy ) .and. present( iCalledByLine ) &
-        .and. present(sModule) .and. present(iLine) ) then
-        call die( sMessage=sMessage, sCalledBy=sCalledBy, iCalledByLine=iCalledByLine, &
-          sModule=sModule, iLine=iLine ) 
-      elseif ( present(sModule) .and. present(iLine) ) then
-        call die( sMessage=sMessage, sModule=sModule, iLine=iLine )
-      elseif ( present(sModule) ) then
-        call die( sMessage=sMessage, sModule=sModule )  
-      else
-        call die( sMessage=sMessage )  
-      endif
+  if (.not. lCondition) then
 
-    endif      
+    if ( present( sHints ) ) then
+      sHints_ = trim( sHints )
+    else
+      sHints_ = ""
+    endif
 
-  end subroutine assert_4bit
+    if (present( sCalledBy ) .and. present( iCalledByLine ) &
+      .and. present(sModule) .and. present(iLine) ) then
+      call die( sMessage=sMessage, sCalledBy=sCalledBy, iCalledByLine=iCalledByLine, &
+        sModule=sModule, iLine=iLine, sHints=sHints_ )
+    elseif ( present(sModule) .and. present(iLine) ) then
+      call die( sMessage=sMessage, sModule=sModule, iLine=iLine, sHints=sHints_ )
+    elseif ( present(sModule) ) then
+      call die( sMessage=sMessage, sModule=sModule, sHints=sHints_ )
+    else
+      call die( sMessage=sMessage, sHints=sHints_ )
+    endif
+
+  endif
+
+end subroutine assert_4bit
 
 !------------------------------------------------------------------------------------------------
 
