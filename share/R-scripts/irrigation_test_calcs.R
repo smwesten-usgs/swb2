@@ -40,13 +40,13 @@ swb1_filename <- "/Users/smwesten/SMWData/SWB2_course_slides/swb_examples/irriga
 swb2_filename <- "/Users/smwesten/SMWData/SWB2_course_slides/swb_examples/irrigation_simple/swb2/SWB2_variable_values__col_1__row_1.csv"
 
 swb1 <- read.csv( swb1_filename )
-#swb2 <- read.csv( swb2_filename )
+swb2 <- read.csv( swb2_filename )
 
 swb1$date <- lubridate::mdy( paste( swb1$month, swb1$day, swb1$year,sep="-") )
-#swb2$date <- lubridate::mdy( paste( swb2$month, swb2$day, swb2$year,sep="-") )
+swb2$date <- lubridate::mdy( paste( swb2$month, swb2$day, swb2$year,sep="-") )
 
 swb1names <- names(swb1)
-#swb2names <- names(swb2)
+swb2names <- names(swb2)
 
 swb1names[swb1names=="recharge"] <- "potential_recharge"
 swb1names[swb1names=="actual_et"] <- "actual_ET"
@@ -54,6 +54,7 @@ swb1names[swb1names=="ref_et0"] <- "reference_ET0"
 swb1names[swb1names=="kcb"] <- "crop_coefficient_kcb"
 
 swb1 <- subset( swb1, swb1$year==2011 )
+swb2 <- subset( swb2, swb2$year==2011 )
 
 swb1$net_available_water <- swb1$net_rainfall + swb1$snowmelt + swb1$irrigation + swb1$runon
                         -swb1$runoff
@@ -862,6 +863,42 @@ makeplot( x1=mydates[366:730], y1=tmeanvals[366:730],
           title="Mean air temperature",
           units="degrees Fahrenheit",
           xlim=c(ymd("2011-01-01"),ymd("2011-12-31") ) )
+
+###
+
+makeplot( x1=mydates[366:730], y1=rainfall[366:730],
+          x2=swb2$date, y2=swb2$rainfall,
+          title="Rainfall",
+          xlim=c(ymd("2011-01-01"),ymd("2011-12-31") ),
+          y2_label="SWB 2.0")
+
+makeplot( x1=mydates[366:730], y1=snowmelt[366:730],
+          x2=swb2$date, y2=swb2$snowmelt,
+          title="Snowmelt",
+          xlim=c(ymd("2011-01-01"),ymd("2011-12-31") ),
+          y2_label="SWB 2.0")
+
+makeplot( x1=mydates[366:730], y1=runoff[366:730],
+          x2=swb2$date, y2=swb2$runoff,
+          title="Runoff",
+          xlim=c(ymd("2011-01-01"),ymd("2011-12-31") ),
+          y2_label="SWB 2.0")
+
+makeplot( x1=mydates[366:730], y1=S[366:730],
+          x2=swb2$date, y2=swb2$soil_storage,
+          title="Soil moisture",
+          xlim=c(ymd("2011-01-01"),ymd("2011-12-31") ),
+          y2_label="SWB 2.0")
+
+
+makeplot( x1=mydates[366:730], y1=net_infil[366:730],
+          x2=swb2$date, y2=swb2$potential_recharge,
+          title="Net infiltration (formerly called 'potential recharge')",
+          xlim=c(ymd("2011-01-01"),ymd("2011-12-31") ),
+          ymin_diff=-0.1, ymax_diff=0.1,
+          y2_label="SWB 2.0")
+
+
 
 # reset for a single plot per page
 par( mfrow=c(1,1) )

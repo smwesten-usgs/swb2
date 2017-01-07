@@ -366,17 +366,21 @@ contains
 
       call PARAMS_DICT%get_values( slKeys=slKeys, slString=slValues )
 
-       if ( slValues%get(1) .strequal. "<NA>" )                              &
+       if ( slValues%get(1) .strequal. "<NA>" ) then
          call warn( "Failed to find a lookup table column named "        &
            //dQuote( slKeys%listall() )//".", lFatal = lFatal_ )
+         slValues%is_populated = FALSE
+       end if
 
     else if ( present( sKey) ) then
 
       call PARAMS_DICT%get_values( sKey=sKey, slString=slValues )
 
-       if ( slValues%get(1) .strequal. "<NA>"  )                              &
-         call warn( "Failed to find a lookup table column named "         &
-           //dQuote( sKey )//".", lFatal = lFatal_ )
+      if ( slValues%get(1) .strequal. "<NA>" ) then
+        call warn( "Failed to find a lookup table column named "        &
+          //dQuote( sKey )//".", lFatal = lFatal_ )
+        slValues%is_populated = FALSE
+      end if
 
     endif
 

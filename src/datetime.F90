@@ -287,7 +287,7 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
 
     call Assert(lFALSE, &
       "Error parsing month value - got "//trim(sMonth)//";"// &
-      " date text: "//trim(sStr),sFilename_, iLinenumber_, __SRCNAME__, __LINE__ )
+      " date text: "//trim(sStr), __SRCNAME__, __LINE__, sFilename_, iLinenumber_ )
 
   endif
 

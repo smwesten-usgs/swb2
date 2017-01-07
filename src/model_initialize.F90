@@ -1836,17 +1836,21 @@ contains
 
     call PARAMS%get_parameters( slKeys=slList, fValues=SURFACE_STORAGE_MAXIMUM, lFatal=FALSE )
 
-    do iIndex=1, ubound( SURFACE_STORAGE_MAXIMUM, 1)
+    if ( all( SURFACE_STORAGE_MAXIMUM > rTINYVAL ) ) then
 
-      current_surface_storage_max = SURFACE_STORAGE_MAXIMUM( iIndex )
+      do iIndex=1, ubound( SURFACE_STORAGE_MAXIMUM, 1)
 
-      where( MODEL%landuse_index == iIndex )
+        current_surface_storage_max = SURFACE_STORAGE_MAXIMUM( iIndex )
 
-        model%surface_storage_max = current_surface_storage_max
+        where( MODEL%landuse_index == iIndex )
 
-      end where
+          model%surface_storage_max = current_surface_storage_max
 
-    enddo
+        end where
+
+      enddo
+
+    endif  
 
   end subroutine initialize_surface_storage_max
 

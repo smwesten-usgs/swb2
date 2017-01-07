@@ -512,7 +512,7 @@ contains
     if ( present( delimiters ) ) then
       delimiters_ = delimiters
     else
-      delimiters_ = WHITESPACE
+      delimiters_ = PUNCTUATION
     endif
 
     sTempText = sText1

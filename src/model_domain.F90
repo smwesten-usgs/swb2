@@ -1985,7 +1985,7 @@ contains
 
       indx = this%row_column_to_index( col_num=DUMP( jndx )%col, row_num=DUMP( jndx )%row)
 
-      if ( (indx > lbound( this%landuse_code, 1) ) .and. ( indx <= ubound( this%landuse_code, 1) ) ) then
+      if ( (indx >= lbound( this%landuse_code, 1) ) .and. ( indx <= ubound( this%landuse_code, 1) ) ) then
 
         call model_dump_variables( this=this, unitnum=DUMP( jndx )%unitnum, indx=indx )
 
