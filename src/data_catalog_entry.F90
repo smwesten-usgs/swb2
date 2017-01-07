@@ -1050,10 +1050,10 @@ end subroutine set_constant_value_real
 
     enddo
 
-    if( index(string=sCWD, substring=sFORWARDSLASH) > 0 ) then
-      sDelimiter = sFORWARDSLASH
+    if( index(string=sCWD, substring=FORWARDSLASH) > 0 ) then
+      sDelimiter = FORWARDSLASH
     else
-      sDelimiter = sBACKSLASH
+      sDelimiter = BACKSLASH
     endif
 
 !    this%sSourceFilename = trim(sCWD)//trim(sDelimiter)//trim(sNewFilename)

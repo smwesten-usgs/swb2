@@ -80,7 +80,8 @@ contains
     allocate( GDD_RESET_DATE( count( is_cell_active ) ), stat=status )
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
-    if ( gdd_reset_val_list%count == number_of_landuse_codes ) then
+    if ( gdd_reset_val_list%count == number_of_landuse_codes      &
+         .and. gdd_reset_val_list%countmatching("<NA>") == 0 ) then
 
       ! retrieve gdd reset values; convert mm/dd to DOY
       do indx=1, gdd_reset_val_list%count
@@ -100,7 +101,8 @@ contains
     endif
 
 
-    if ( ubound( gdd_max_, 1 ) == number_of_landuse_codes ) then
+    if ( ubound( gdd_max_, 1 ) == number_of_landuse_codes        &
+        .and. gdd_max_(1) > rTINYVAL ) then
 
       do indx=1, ubound( landuse_index, 1)
         GDD_MAX( indx ) = gdd_max_( landuse_index( indx ) )
@@ -114,7 +116,8 @@ contains
     endif
 
 
-    if ( ubound( gdd_base_, 1 ) == number_of_landuse_codes ) then
+    if ( ubound( gdd_base_, 1 ) == number_of_landuse_codes        &
+        .and. gdd_base_(1) > rTINYVAL  ) then
 
       do indx=1, ubound( landuse_index, 1)
         GDD_BASE( indx ) = gdd_base_( landuse_index( indx ) )

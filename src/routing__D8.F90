@@ -157,8 +157,8 @@ contains
 
     open( newunit=iUnitNum, file="D8_routing_table.txt", iostat=iStat, status="REPLACE")
 
-    write(iUnitNum,*) "ORDER_INDEX"//sTAB//"TARGET_INDEX"//sTAB//"From_COL"//sTAB//"From_ROW" &
-      //sTAB//"To_COL"//sTAB//"To_ROW"//sTAB//"D8_flowdir"//sTAB//"Num_Adjacent_Upslope_Connections"//sTAB &
+    write(iUnitNum,*) "ORDER_INDEX"//TAB//"TARGET_INDEX"//TAB//"From_COL"//TAB//"From_ROW" &
+      //TAB//"To_COL"//TAB//"To_ROW"//TAB//"D8_flowdir"//TAB//"Num_Adjacent_Upslope_Connections"//TAB &
       //"Sum_of_Upslope_Contributing_Cells"
 
     do iIndex = 1, ubound(COL1D,1)
@@ -176,14 +176,14 @@ contains
                  Sum_upslope => iSumOfUpslopeCells( COL1D( ORDER_INDEX( iIndex ) ),           &
                                      ROW1D( ORDER_INDEX( iIndex ) ) )  )
 
-        write(sBuf,*)  Order_index,sTAB, Target_index
-        write(sBuf,*) trim(sBuf)//sTab//asCharacter( Colnum )//sTAB &
+        write(sBuf,*)  Order_index,TAB, Target_index
+        write(sBuf,*) trim(sBuf)//TAB//asCharacter( Colnum )//TAB &
           //asCharacter( Rownum )
 
         if ( Target_index > 0 ) &
-          write(sBuf,*) trim(sBuf)//sTab//asCharacter( Colnum )//sTAB &
-          //asCharacter( Rownum )//sTAB//asCharacter( D8_flowdir )//sTAB &
-          //asCharacter( Num_adjacent )//sTAB//asCharacter( Sum_upslope )
+          write(sBuf,*) trim(sBuf)//TAB//asCharacter( Colnum )//TAB &
+          //asCharacter( Rownum )//TAB//asCharacter( D8_flowdir )//TAB &
+          //asCharacter( Num_adjacent )//TAB//asCharacter( Sum_upslope )
 
         write(iUnitNum,*)  trim(sBuf)  
 

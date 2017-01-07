@@ -29,13 +29,13 @@ module dictionary
     procedure   :: add_integer_sub
     procedure   :: add_float_sub
     procedure   :: add_double_sub
-    procedure   :: add_logical_sub    
-    generic     :: add_string => add_string_sub,   &
+    procedure   :: add_logical_sub
+    generic     :: add_entry  => add_string_sub,   &
                                  add_integer_sub,  &
                                  add_float_sub,    &
                                  add_double_sub,   &
                                  add_logical_sub
-  end type DICT_ENTRY_T 
+  end type DICT_ENTRY_T
 
 
   type, public :: DICT_T
@@ -46,8 +46,8 @@ module dictionary
     integer (kind=c_int)           :: count   = 0
 
   contains
-  
-    procedure, private   :: get_entry_by_key_fn 
+
+    procedure, private   :: get_entry_by_key_fn
     procedure, private   :: get_entry_by_index_fn
     generic              :: get_entry => get_entry_by_key_fn,    &
                                          get_entry_by_index_fn
@@ -90,15 +90,15 @@ module dictionary
 
   end type DICT_T
 
-  ! CF = "Control File"; this dictionary will be populated elsewhere with all of the 
+  ! CF = "Control File"; this dictionary will be populated elsewhere with all of the
   !                      directives found in the SWB control file.
-  type (DICT_T), public                     :: CF_DICT 
+  type (DICT_T), public                     :: CF_DICT
   type (DICT_ENTRY_T), public, pointer      :: CF_ENTRY
 
 contains
 
  !!
- !! This section contains methods bound to the DICT_ENTRY_T class 
+ !! This section contains methods bound to the DICT_ENTRY_T class
  !!
 
  subroutine add_key_sub(this, sKey)
@@ -108,7 +108,7 @@ contains
 
      this%key = sKey
 
-  end subroutine add_key_sub  
+  end subroutine add_key_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -167,9 +167,9 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  !! 
-  !! The methods in the section below are bound to the DICT_T type, which is essentially a 
-  !! linked list of DICT_ENTRY_T objects 
+  !!
+  !! The methods in the section below are bound to the DICT_T type, which is essentially a
+  !! linked list of DICT_ENTRY_T objects
   !!
 
   function get_entry_by_key_fn(this, sKey)   result( pDict )
@@ -177,14 +177,14 @@ contains
     class (DICT_T)                :: this
     character (len=*), intent(in) :: sKey
     type (DICT_ENTRY_T), pointer  :: pDict
-    
+
     pDict => this%first
     this%current => this%first
 
     do while ( associated( pDict ) )
 
       if ( pDict%key .strequal. sKey )  exit
-      
+
       pDict => pDict%next
       this%current => pDict
 
@@ -192,7 +192,7 @@ contains
 
     if (.not. associated( pDict ) )  &
       call warn( sMessage="Failed to find a dictionary entry with a key value of "//dquote(sKey),   &
-                 iLogLevel=LOG_DEBUG,                                                               & 
+                 iLogLevel=LOG_DEBUG,                                                               &
                  lEcho=lFALSE )
 
   end function get_entry_by_key_fn
@@ -203,7 +203,7 @@ contains
     class (DICT_T)                   :: this
     integer (kind=c_int), intent(in) :: iIndex
     type (DICT_ENTRY_T), pointer     :: pDict
-    
+
     ! [ LOCALS ]
     integer (kind=c_int)  :: iCurrentIndex
 
@@ -212,12 +212,12 @@ contains
     pDict => this%first
     this%current => this%first
 
-    do 
+    do
 
       if ( .not. associated( pDict ) ) exit
 
       if ( iCurrentIndex == iIndex )  exit
-      
+
       pDict => pDict%next
       this%current => pDict
       iCurrentIndex = iCurrentIndex + 1
@@ -227,27 +227,27 @@ contains
     if (.not. associated( pDict ) )  &
       call warn( sMessage="Failed to find a dictionary entry with a index value of "   &
         //asCharacter(iIndex),                                                         &
-                 iLogLevel=LOG_DEBUG,                                                  & 
+                 iLogLevel=LOG_DEBUG,                                                  &
                  lEcho=lFALSE )
 
   end function get_entry_by_index_fn
 
-!-------------------------------------------------------------------------------------------------- 
+!--------------------------------------------------------------------------------------------------
 
   function get_next_entry_by_key_fn(this, sKey)   result( pDict )
 
     class (DICT_T)                :: this
     character (len=*), intent(in) :: sKey
     type (DICT_ENTRY_T), pointer  :: pDict
-    
-    ! if "current" location is not null, it will point to the location of the 
+
+    ! if "current" location is not null, it will point to the location of the
     ! last key value found. move forward by one before examining the next key...
     if (associated( this%current) ) pDict => this%current%next
 
     do while ( associated( pDict ) )
 
       if ( pDict%key .strequal. sKey )  exit
-      
+
       pDict => pDict%next
       this%current => pDict
 
@@ -255,7 +255,7 @@ contains
 
     if (.not. associated( pDict ) )  &
       call warn( sMessage="Failed to find another dictionary entry with a key value of "//dquote(sKey),   &
-                 iLogLevel=LOG_DEBUG,                                                               & 
+                 iLogLevel=LOG_DEBUG,                                                               &
                  lEcho=lFALSE )
 
   end function get_next_entry_by_key_fn
@@ -266,19 +266,19 @@ contains
 
     class (DICT_T)                :: this
     type (DICT_ENTRY_T), pointer  :: pDict
-    
+
     pDict => null()
 
-    ! if "current" location is not null, it will point to the location of the 
+    ! if "current" location is not null, it will point to the location of the
     ! last key value found. move forward by one before examining the next key...
     if (associated( this%current) ) then
       pDict => this%current%next
       this%current => this%current%next
-    endif  
+    endif
 
     if (.not. associated( pDict ) )  &
       call warn( sMessage="Reached end of dictionary.",                    &
-                 iLogLevel=LOG_DEBUG,                                      & 
+                 iLogLevel=LOG_DEBUG,                                      &
                  lEcho=lFALSE )
 
   end function get_next_entry_fn
@@ -293,7 +293,7 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int)             :: iIndex
-    
+
     this%current => this%first
 
     do while ( associated(this%current ) )
@@ -301,7 +301,7 @@ contains
       iIndex = index(string=this%current%key, substring=trim(sKey) )
 
       if ( iIndex > 0 )  call slString%append(this%current%key)
-      
+
       this%current => this%current%next
 
     enddo
@@ -317,7 +317,7 @@ contains
   subroutine add_entry_to_dict_sub(this, dict_entry)
 
     class (DICT_T)                :: this
-    type (DICT_ENTRY_T), pointer  :: dict_entry  
+    type (DICT_ENTRY_T), pointer  :: dict_entry
 
     if ( associated(dict_entry) ) then
 
@@ -348,9 +348,9 @@ contains
       call warn( sMessage="Internal programming error: dictionary entry is null",   &
           sModule=__SRCNAME__, iLine=__LINE__ )
 
-    endif  
+    endif
 
-  end subroutine add_entry_to_dict_sub  
+  end subroutine add_entry_to_dict_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -376,18 +376,18 @@ contains
         pTarget%next%previous => pTemp
 
       else
-      
-        pTemp => pTarget%next  
+
+        pTemp => pTarget%next
         this%first => pTemp
 
-      endif  
+      endif
 
       ! set "current" pointer to entry that was just before the now-deleted entry
       this%current => pTemp
 
       call pTarget%sl%clear()
 
-    endif  
+    endif
 
   end subroutine delete_entry_by_key_sub
 
@@ -402,7 +402,7 @@ contains
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
-    
+
     pTarget => this%get_entry(sKey)
 
     if ( associated( pTarget ) ) then
@@ -420,7 +420,7 @@ contains
 
       iValues = iTINYVAL
 
-    endif  
+    endif
 
 
   end subroutine get_values_as_int_sub
@@ -436,7 +436,7 @@ contains
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
-    
+
     pTarget => this%get_entry(sKey)
 
     if ( associated( pTarget ) ) then
@@ -454,7 +454,7 @@ contains
 
       lValues = lFALSE
 
-    endif  
+    endif
 
   end subroutine get_values_as_logical_sub
 
@@ -462,7 +462,7 @@ contains
 
   !> Search through keys for a match; return logical values.
   !!
-  !! THis routine allows for multiple header values to be supplied 
+  !! THis routine allows for multiple header values to be supplied
   !! in the search for the appropriate column.
   !! @param[in]  this  Object of DICT_T class.
   !! @param[in]  slKeys String list containing one or more possible key values to
@@ -480,7 +480,7 @@ contains
     integer (kind=c_int)           :: iStat
     integer (kind=c_int)           :: iCount
     character (len=:), allocatable :: sText
-    
+
     iCount = 0
 
     do while ( iCount < slKeys%count )
@@ -510,7 +510,7 @@ contains
 
       lValues = lFALSE
 
-    endif  
+    endif
 
   end subroutine get_values_as_logical_given_list_of_keys_sub
 
@@ -527,7 +527,7 @@ contains
     integer (kind=c_int)           :: iStat
     integer (kind=c_int)           :: iCount
     character (len=:), allocatable :: sText
-    
+
     iCount = 0
 
     do while ( iCount < slKeys%count )
@@ -552,7 +552,7 @@ contains
       call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
         sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
 
-    endif  
+    endif
 
   end subroutine get_values_as_string_list_given_list_of_keys_sub
 
@@ -568,7 +568,7 @@ contains
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
-    
+
     if ( present( sKey ) )  this%current => this%get_entry(sKey)
 
     if ( present( iIndex ) )  this%current => this%get_entry( iIndex )
@@ -581,11 +581,11 @@ contains
 
       sText= ""
 
-    endif  
+    endif
 
   end subroutine get_value_as_string_sub
-  
-!--------------------------------------------------------------------------------------------------  
+
+!--------------------------------------------------------------------------------------------------
 
   subroutine get_values_as_string_list_sub(this, sKey, slString)
 
@@ -596,7 +596,7 @@ contains
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
-    
+
     pTarget => this%get_entry(sKey)
 
     if ( associated( pTarget ) ) then
@@ -609,7 +609,7 @@ contains
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
         sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
 
-    endif  
+    endif
 
 
   end subroutine get_values_as_string_list_sub
@@ -618,7 +618,7 @@ contains
 
   !> Search through keys for a match; return integer values.
   !!
-  !! THis routine allows for multiple header values to be supplied 
+  !! THis routine allows for multiple header values to be supplied
   !! in the search for the appropriate column.
   !! @param[in]  this  Object of DICT_T class.
   !! @param[in]  slKeys String list containing one or more possible key values to
@@ -636,7 +636,7 @@ contains
     integer (kind=c_int)           :: iStat
     integer (kind=c_int)           :: iCount
     character (len=256)            :: sText
-    
+
     iCount = 0
 
     do while ( iCount < slKeys%count )
@@ -666,7 +666,7 @@ contains
 
       iValues = iTINYVAL
 
-    endif  
+    endif
 
 
   end subroutine get_values_as_int_given_list_of_keys_sub
@@ -675,7 +675,7 @@ contains
 
   !> Search through keys for a match; return float values.
   !!
-  !! THis routine allows for multiple header values to be supplied 
+  !! THis routine allows for multiple header values to be supplied
   !! in the search for the appropriate column.
   !! @param[in]  this  Object of DICT_T class.
   !! @param[in]  slKeys String list containing one or more possible key values to
@@ -693,13 +693,13 @@ contains
     integer (kind=c_int)           :: iStat
     integer (kind=c_int)           :: iCount
     character (len=:), allocatable :: sText
-    
+
     iCount = 0
 
     do while ( iCount < slKeys%count )
 
       iCount = iCount + 1
-     
+
       sText = slKeys%get( iCount)
 
       pTarget => this%get_entry( sText )
@@ -724,7 +724,7 @@ contains
 
       fValues = fTINYVAL
 
-    endif  
+    endif
 
 
   end subroutine get_values_as_float_given_list_of_keys_sub
@@ -740,7 +740,7 @@ contains
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
-    
+
     pTarget => this%get_entry(sKey)
 
     if ( associated( pTarget ) ) then
@@ -758,7 +758,7 @@ contains
 
       fValues = fTINYVAL
 
-    endif  
+    endif
 
   end subroutine get_values_as_float_sub
 
@@ -782,17 +782,17 @@ contains
       iLogLevel_ = iLogLevel
     else
       iLogLevel_ = LOGS%iLogLevel
-    end if  
+    end if
 
     if ( present( lEcho ) ) then
       lEcho_ = lEcho
     else
       lEcho_ = lFALSE
-    end if  
+    end if
 
     current => this%first
     iCount = 0
-   
+
     do while ( associated( current ) )
 
       iCount = iCount + 1
@@ -803,7 +803,7 @@ contains
       call LOGS%write( " --ENTRIES--:", iTab=5 )
 
       select case ( iLogLevel_ )
-  
+
         case ( LOG_GENERAL )
 
           call current%sl%print( iLU=LOGS%iUnitNum( LOG_GENERAL ) )
@@ -819,14 +819,14 @@ contains
 
         case default
 
-      end select  
-      
-      if ( lEcho_ )   call current%sl%print()  
+      end select
+
+      if ( lEcho_ )   call current%sl%print()
 
       current => current%next
 
-    enddo  
+    enddo
 
   end subroutine print_all_dictionary_entries_sub
- 
+
 end module dictionary

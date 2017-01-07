@@ -186,32 +186,58 @@ contains
     allocate( FIRST_DAY_OF_IRRIGATION( sl_irrigation_begin%count ), stat=status )
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
-    do index = 1, sl_irrigation_begin%count
-      str_buffer = sl_irrigation_begin%get( index )
-      FIRST_DAY_OF_IRRIGATION( index ) = mmdd2doy( str_buffer )
-    enddo
+    if ( sl_irrigation_begin%countmatching("<NA>") == 0 ) then
+
+      do index = 1, sl_irrigation_begin%count
+        str_buffer = sl_irrigation_begin%get( index )
+        FIRST_DAY_OF_IRRIGATION( index ) = mmdd2doy( str_buffer, "FIRST_DAY_OF_IRRIGATION" )
+      enddo
+
+    else
+
+      FIRST_DAY_OF_IRRIGATION = 90
+      call warn("No value was found to define the first day of irrigation.",      &
+           sHints="Make sure there is a lookup table with the column name "       &
+           //"'First_day_of_irrigation'.", lFatal=TRUE )
+    endif
 
     !> process last day of irrigation. retrieved as a list of strings;
     !! must convert the strings from mm/dd to DOY
     allocate( LAST_DAY_OF_IRRIGATION( sl_irrigation_end%count ), stat=status )
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
-    do index = 1, sl_irrigation_end%count
-      str_buffer = sl_irrigation_end%get( index )
-      LAST_DAY_OF_IRRIGATION( index ) = mmdd2doy( str_buffer )
-    enddo
+    if ( sl_irrigation_end%countmatching("<NA>") == 0 ) then
 
-    !> process number of days of irrigation. retrieved as a list of strings;
-    !! must convert the strings from mm/dd to DOY
+      do index = 1, sl_irrigation_end%count
+        str_buffer = sl_irrigation_end%get( index )
+        LAST_DAY_OF_IRRIGATION( index ) = mmdd2doy( str_buffer, "LAST_DAY_OF_IRRIGATION" )
+      enddo
+
+    else
+
+      LAST_DAY_OF_IRRIGATION = 90
+      call warn("No value was found to define the last day of irrigation.",      &
+           sHints="Make sure there is a lookup table with the column name "       &
+           //"'Last_day_of_irrigation'.", lFatal=TRUE )
+    endif
+
+    !> process number of days of irrigation. retrieved as a list of strings
     allocate( NUM_DAYS_OF_IRRIGATION( sl_irrigation_days%count ), stat=status )
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
     NUM_DAYS_OF_IRRIGATION = sl_irrigation_days%asInt()
 
+    if ( sl_irrigation_days%countmatching("<NA>") == 0 ) then
 
-    where ( NUM_DAYS_OF_IRRIGATION == 0 )
+      where ( NUM_DAYS_OF_IRRIGATION == 0 )
+        NUM_DAYS_OF_IRRIGATION = 9999
+      end where
+
+    else
+
       NUM_DAYS_OF_IRRIGATION = 9999
-    end where
+
+    endif  
 
     !> retrieve application option (i.e. to field capacity, to defined deficit amount, as constant amount)
     call sl_temp_list%clear()

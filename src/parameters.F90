@@ -15,11 +15,11 @@ module parameters
   !! module to provide a single POC for storage and retrieval of parameter scalars and vectors
   !! need to provide a method for storing, finding, and retrieving parameters.
   !! dictionary: keyword, string_list
-  
+
   !! first create list of files. parse through each file, adding to the param dictionary.
   !! once complete, allow other modules to interrogate the dictionary. return matches in the
   !! data type required for the parameter. once all params are in place, the data structures can be
-  !! deallocated. 
+  !! deallocated.
 
   type, public :: PARAMETERS_T
 
@@ -58,11 +58,11 @@ module parameters
     !  * retrieve parameter list:
     !      1) input = single string
     !      2) input = string list
-    !  * basic error checking re: number of params in list 
+    !  * basic error checking re: number of params in list
 
 
 
-  end type PARAMETERS_T    
+  end type PARAMETERS_T
 
   type (PARAMETERS_T), public :: PARAMS
   type (DICT_T), public       :: PARAMS_DICT
@@ -81,25 +81,25 @@ contains
     ! [ LOCALS ]
     character (len=:), allocatable  :: sDelimiters_
     character (len=:), allocatable  :: sCommentChars_
-    
+
     if (present(sDelimiters) ) then
       sDelimiters_ = sDelimiters
-    else 
-      sDelimiters_ = sTAB
+    else
+      sDelimiters_ = TAB
     endif
 
     if ( present(sCommentChars) ) then
       sCommentChars_ = sCommentChars
     else
       sCommentChars_ = "#!"
-    endif  
+    endif
 
     this%count = this%count + 1
-    
+
     call this%filenames%append( sFilename )
     call this%delimiters%append( sDelimiters_ )
     call this%comment_chars%append( sCommentChars_ )
-    
+
   end subroutine add_filename_to_list_sub
 
 !--------------------------------------------------------------------------------------------------
@@ -146,7 +146,7 @@ contains
           call pDict%add_key( DF%slColNames%get(iColIndex) )
           call PARAMS_DICT%add_entry( pDict )
 
-        enddo  
+        enddo
 
         ! now read in the remainder of the file
         do while ( .not. DF%isEOF() )
@@ -169,21 +169,21 @@ contains
 
             ! must avoid manipulating null pointers at all costs
             if ( associated( pCurrentDict )) then
-            
+
               ! if not null, it means that we were able to return a pointer
               ! associated with the current column heading
-              call pCurrentDict%add_string( sItem ) 
-            
+              call pCurrentDict%add_entry( sItem )
+
             else
-            
+
               call warn("Internal programming error: null pointer detected" &
                 //" -- was trying to find pointer associated with column "//dquote(DF%slColNames%get(iColIndex)), &
-                __SRCNAME__, __LINE__)  
-            
-            endif 
-          
-          enddo  
-        
+                __SRCNAME__, __LINE__)
+
+            endif
+
+          enddo
+
         enddo
 
         call DF%close()
@@ -203,7 +203,7 @@ contains
     integer (kind=c_int), intent(in), optional   :: iValues(:)
     real (kind=c_float), intent(in), optional    :: fValues(:)
     real (kind=c_double), intent(in), optional   :: dValues(:)
-    logical (kind=c_bool), intent(in), optional  :: lValues(:)        
+    logical (kind=c_bool), intent(in), optional  :: lValues(:)
 
     ! [ LOCALS ]
     integer (kind=c_int)         :: iStat
@@ -229,36 +229,36 @@ contains
       call PARAMS_DICT%add_entry( pCurrentDict )
 
     endif
-     
+
     if ( present( sValues ) ) then
 
       do iIndex = lbound(sValues,1), ubound(sValues,1)
 
-        call pCurrentDict%add_string( sValues( iIndex ) )
+        call pCurrentDict%add_entry( sValues( iIndex ) )
 
-      enddo   
-    
+      enddo
+
     else if ( present ( iValues ) ) then
 
       do iIndex = lbound(iValues,1), ubound(iValues,1)
 
-        call pCurrentDict%add_string( iValues( iIndex ) )
+        call pCurrentDict%add_entry( iValues( iIndex ) )
 
       enddo
-    
+
     else if ( present ( fValues ) ) then
 
       do iIndex = lbound(fValues,1), ubound(fValues,1)
 
-        call pCurrentDict%add_string( fValues( iIndex ) )
+        call pCurrentDict%add_entry( fValues( iIndex ) )
 
-      enddo  
+      enddo
 
     else if ( present ( dValues ) ) then
 
       do iIndex = lbound(dValues,1), ubound(dValues,1)
 
-        call pCurrentDict%add_string( dValues( iIndex ) )
+        call pCurrentDict%add_entry( dValues( iIndex ) )
 
       enddo
 
@@ -266,11 +266,11 @@ contains
 
       do iIndex = lbound(lValues,1), ubound(lValues,1)
 
-        call pCurrentDict%add_string( lValues( iIndex ) )
+        call pCurrentDict%add_entry( lValues( iIndex ) )
 
       enddo
-    
-    endif 
+
+    endif
 
   end subroutine add_to_param_list_sub
 
@@ -290,9 +290,9 @@ contains
       lFatal_ = lFatal
     else
       lFatal_ = lFALSE
-    endif 
+    endif
 
-    slList = PARAMS_DICT%grep_keys( sKey ) 
+    slList = PARAMS_DICT%grep_keys( sKey )
 
     if ( lFatal_ ) then
 
@@ -300,16 +300,16 @@ contains
          call warn( "Failed to find a lookup table column whose name contains "        &
            //dQuote( sKey )//".", lFatal = lFatal_ )
 
-    endif 
+    endif
 
-  end function grep_parameter_name  
+  end function grep_parameter_name
 
 !--------------------------------------------------------------------------------------------------
 
   subroutine get_parameter_values_logical( this, lValues, slKeys, sKey, lFatal )
 
     class (PARAMETERS_T)                                        :: this
-    logical (kind=c_bool), intent(in out), allocatable          :: lValues(:)  
+    logical (kind=c_bool), intent(in out), allocatable          :: lValues(:)
     type (STRING_LIST_T), intent(in out),              optional :: slKeys
     character (len=*),    intent(in ),                 optional :: sKey
     logical (kind=c_bool), intent(in),                 optional :: lFatal
@@ -321,7 +321,7 @@ contains
       lFatal_ = lFatal
     else
       lFatal_ = lFALSE
-    endif 
+    endif
 
     if ( present( slKeys) ) then
 
@@ -348,7 +348,7 @@ contains
   subroutine get_parameter_values_string_list( this, slValues, slKeys, sKey, lFatal )
 
     class (PARAMETERS_T)                                        :: this
-    type (STRING_LIST_T), intent(in out)                        :: slValues  
+    type (STRING_LIST_T), intent(in out)                        :: slValues
     type (STRING_LIST_T), intent(in out),              optional :: slKeys
     character (len=*),    intent(in ),                 optional :: sKey
     logical (kind=c_bool), intent(in),                 optional :: lFatal
@@ -360,7 +360,7 @@ contains
       lFatal_ = lFatal
     else
       lFatal_ = lFALSE
-    endif 
+    endif
 
     if ( present( slKeys) ) then
 
@@ -387,7 +387,7 @@ contains
   subroutine get_parameter_values_int( this, iValues, slKeys, sKey, lFatal )
 
     class (PARAMETERS_T)                                       :: this
-    integer (kind=c_int), intent(in out), allocatable          :: iValues(:)  
+    integer (kind=c_int), intent(in out), allocatable          :: iValues(:)
     type (STRING_LIST_T), intent(in out),             optional :: slKeys
     character (len=*),    intent(in ),                optional :: sKey
     logical (kind=c_bool), intent(in),                optional :: lFatal
@@ -399,7 +399,7 @@ contains
       lFatal_ = lFatal
     else
       lFatal_ = lFALSE
-    endif 
+    endif
 
     if ( present( slKeys) ) then
 
@@ -426,7 +426,7 @@ contains
   subroutine get_parameter_values_float( this, fValues, slKeys, sKey, lFatal )
 
     class (PARAMETERS_T)                                       :: this
-    real (kind=c_float),  intent(in out), allocatable          :: fValues(:)  
+    real (kind=c_float),  intent(in out), allocatable          :: fValues(:)
     type (STRING_LIST_T), intent(in out),             optional :: slKeys
     character (len=*),    intent(in ),                optional :: sKey
     logical (kind=c_bool), intent(in),                optional :: lFatal
@@ -438,7 +438,7 @@ contains
       lFatal_ = lFatal
     else
       lFatal_ = lFALSE
-    endif 
+    endif
 
     if ( present( slKeys) ) then
 
@@ -471,19 +471,19 @@ contains
     logical (kind=c_bool), intent(in),                optional :: lFatal
 
     ! [ LOCALS ]
-    integer (kind=c_int)             :: iIndex   
+    integer (kind=c_int)             :: iIndex
     integer (kind=c_int)             :: iStat
     character (len=256)              :: sText
     integer (kind=c_int)             :: iNumCols
     type (STRING_LIST_T)             :: slList
-    real (kind=c_float), allocatable :: fTempVal(:) 
+    real (kind=c_float), allocatable :: fTempVal(:)
     logical (kind=c_bool) :: lFatal_
 
     if ( present (lFatal) ) then
       lFatal_ = lFatal
     else
       lFatal_ = lFALSE
-    endif 
+    endif
 
     slList = PARAMS%grep_name( sPrefix )
 
@@ -509,7 +509,7 @@ contains
         call PARAMS_DICT%get_values( sKey=sText, fValues=fTempVal )
 
         fValues(:,iIndex) = fTempVal
-      enddo  
+      enddo
 
     endif
 

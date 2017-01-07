@@ -137,9 +137,12 @@ contains
     type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_PERCENT_SOIL_MOISTURE
 
    !> create string list that allows for alternate heading identifiers for the landuse code
-   call slList%append("LU_Code")
-   call slList%append("Landuse_Code")
-   call slList%append("Landuse_Lookup_Code")
+!   call slList%append("LU_Code")
+!   call slList%append("Landuse_Code")
+!   call slList%append("Landuse_Lookup_Code")
+   call slList%create_list("LU_Code; Landuse_Code; Landuse_Lookup_Code")
+
+   call slList%print()
 
    !> Determine how many landuse codes are present
    call PARAMS%get_parameters( slKeys=slList, iValues=LANDUSE_CODE )

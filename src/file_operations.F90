@@ -321,7 +321,7 @@ contains
 
       call replace(sSubString, " ", "_")
       call replace(sSubString, ".", "_")
-      sSubStringClean = trim( clean( sSubString, sDOUBLE_QUOTE ) )
+      sSubStringClean = trim( clean( sSubString, DOUBLE_QUOTE ) )
       call stList%append( trim( adjustl( sSubStringClean ) ) )
     enddo
 

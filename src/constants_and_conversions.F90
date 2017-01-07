@@ -2,7 +2,7 @@
 !! Contains a single module, @ref constants_and_conversions, which contains useful
 !! physical constants and basic conversion utilities
 
-!> This module contains physical constants and convenience functions aimed at 
+!> This module contains physical constants and convenience functions aimed at
 !! performing unit conversions. The functions included in this module perform
 !! conversions between various temperature and distance units.
 module constants_and_conversions
@@ -10,7 +10,7 @@ module constants_and_conversions
   use iso_c_binding, only : c_short, c_int, c_float, c_double, c_bool
   implicit none
 
-  ! 
+  !
   integer (kind=c_int), parameter :: DATATYPE_INT     = 0
   integer (kind=c_int), parameter :: DATATYPE_FLOAT   = 1
   integer (kind=c_int), parameter :: DATATYPE_REAL    = 1
@@ -28,7 +28,7 @@ module constants_and_conversions
   public :: DEGREES_TO_RADIANS, RADIANS_TO_DEGREES
   real (kind=c_double), parameter    :: DEGREES_TO_RADIANS = TWOPI / 360.0_c_double
   real (kind=c_double), parameter    :: RADIANS_TO_DEGREES = 360.0_c_double / TWOPI
- 
+
   ! [ common 'magic' numbers and logicals ]
   public :: lTRUE, lFALSE
   public :: rBIGVAL, iBIGVAL, dBIGVAL, iTINYVAL, rTINYVAL, dTINYVAL
@@ -44,7 +44,7 @@ module constants_and_conversions
   real (kind=c_double), parameter    :: dBIGVAL = HUGE(0.0_c_double)
   integer(kind=c_int), parameter     :: iBIGVAL = HUGE(0_c_int)
   real (kind=c_float), parameter     :: rTINYVAL = -(HUGE(0.0_c_float) - 1.0)
-  real (kind=c_double), parameter    :: dTINYVAL = -(HUGE(0.0_c_double) - 1.0)  
+  real (kind=c_double), parameter    :: dTINYVAL = -(HUGE(0.0_c_double) - 1.0)
   real (kind=c_float), parameter     :: fTINYVAL = -(HUGE(0.0_c_float) - 1.0)
   integer(kind=c_int), parameter     :: iTINYVAL = -(HUGE(0_c_int) - 1)
   real (kind=c_float), parameter     :: rFREEZING = 32.0_c_float
@@ -57,22 +57,24 @@ module constants_and_conversions
 
 
   ! [ special ASCII characters ]
-  public :: sTAB, sWHITESPACE, sBACKSLASH, sFORWARDSLASH, sRETURN, sCOMMENT_CHARS
-  character (len=1), parameter :: sTAB = achar(9)
-  character (len=2), parameter :: sWHITESPACE = achar(9)//" "
-  character (len=1), parameter :: sBACKSLASH = achar(92)
-  character (len=1), parameter :: sFORWARDSLASH = achar(47)
-  character (len=1), parameter :: sRETURN = achar(13)
-  character (len=3), parameter :: sCOMMENT_CHARS = "#!%"
-  character (len=1), parameter :: sDOUBLE_QUOTE = achar(34)
+  public :: TAB, WHITESPACE, BACKSLASH, FORWARDSLASH, CARRIAGE_RETURN, COMMENT_CHARS, &
+            PUNCTUATION
+  character (len=1), parameter :: TAB = achar(9)
+  character (len=2), parameter :: WHITESPACE = achar(9)//" "
+  character (len=1), parameter :: BACKSLASH = achar(92)
+  character (len=1), parameter :: FORWARDSLASH = achar(47)
+  character (len=1), parameter :: CARRIAGE_RETURN = achar(13)
+  character (len=3), parameter :: COMMENT_CHARS = "#!%"
+  character (len=1), parameter :: DOUBLE_QUOTE = achar(34)
+  character (len=3), parameter :: PUNCTUATION = ",;:"
 
   ! [ select conversion factors ]
   real (kind=c_double), parameter :: C_PER_F    = 5.0_c_double / 9.0_c_double
-  real (kind=c_double), parameter :: F_PER_C    = 9.0_c_double / 5.0_c_double  
-  real (kind=c_double), parameter :: M_PER_FOOT = 0.3048_c_double 
+  real (kind=c_double), parameter :: F_PER_C    = 9.0_c_double / 5.0_c_double
+  real (kind=c_double), parameter :: M_PER_FOOT = 0.3048_c_double
 
   character (len=:), allocatable    :: OUTPUT_DIRECTORY_NAME
-  character (len=:), allocatable    :: OUTPUT_PREFIX_NAME 
+  character (len=:), allocatable    :: OUTPUT_PREFIX_NAME
   character (len=:), allocatable    :: DATA_DIRECTORY_NAME
 
   type BOUNDS_T
@@ -91,7 +93,7 @@ module constants_and_conversions
     module procedure approx_equal_float_float
     module procedure approx_equal_double_double
     module procedure approx_equal_float_double
-  end interface operator(.approxequal.)  
+  end interface operator(.approxequal.)
 
 
 
@@ -169,13 +171,13 @@ module constants_and_conversions
   interface mm_to_in
     module procedure mm_to_inches_sgl_fn
     module procedure mm_to_inches_dbl_fn
-  end interface mm_to_in    
+  end interface mm_to_in
 
   public :: in_to_mm
   interface in_to_mm
     module procedure inches_to_mm_sgl_fn
     module procedure inches_to_mm_dbl_fn
-  end interface in_to_mm    
+  end interface in_to_mm
 
   public :: char_ptr_to_fortran_string
   public :: c_to_fortran_string
@@ -243,7 +245,7 @@ contains
   !! @param[in]  degrees     String value.
   !! @retval     is_numeric  True if any numeric values are present in the string.
 
-  logical ( kind=c_bool ) elemental function is_numeric( value ) 
+  logical ( kind=c_bool ) elemental function is_numeric( value )
 
     character (len=*), intent(in)    :: value
 
@@ -273,7 +275,7 @@ contains
 
     radians = degrees * DEGREES_TO_RADIANS
 
-  end function deg_to_rad_sgl_fn    
+  end function deg_to_rad_sgl_fn
 
 
 !--------------------------------------------------------------------------------------------------
@@ -289,7 +291,7 @@ contains
 
     radians = degrees * DEGREES_TO_RADIANS
 
-  end function deg_to_rad_dbl_fn    
+  end function deg_to_rad_dbl_fn
 
 
 !--------------------------------------------------------------------------------------------------
@@ -305,7 +307,7 @@ contains
 
     degrees = radians * RADIANS_TO_DEGREES
 
-  end function rad_to_deg_sgl_fn    
+  end function rad_to_deg_sgl_fn
 
 !--------------------------------------------------------------------------------------------------
 
@@ -320,7 +322,7 @@ contains
 
     degrees = radians * RADIANS_TO_DEGREES
 
-  end function rad_to_deg_dbl_fn    
+  end function rad_to_deg_dbl_fn
 
 
 !--------------------------------------------------------------------------------------------------
@@ -330,7 +332,7 @@ contains
   !! @retval     degrees_C   Temperature in degrees Celcius.
 
   elemental function FtoC_sgl_fn(degrees_F)   result(degrees_C)
- 
+
     real (kind=c_float),intent(in) :: degrees_F
     real (kind=c_float) :: degrees_C
 
@@ -346,7 +348,7 @@ contains
   !! @retval degrees_C Temperature in degrees Celcius.
 
   elemental function FtoC_dbl_fn( degrees_F )   result( degrees_C )
-   
+
     real (kind=c_double),intent(in) :: degrees_F
     real (kind=c_double) :: degrees_C
 
@@ -525,7 +527,7 @@ contains
       lValue = lTRUE
     endif
 
-  end function short2logical  
+  end function short2logical
 
 !--------------------------------------------------------------------------------------------------
 
@@ -542,7 +544,7 @@ contains
       lValue = lTRUE
     endif
 
-  end function int2logical  
+  end function int2logical
 
 !--------------------------------------------------------------------------------------------------
 
@@ -562,7 +564,7 @@ contains
       lValue = lTRUE
     endif
 
-  end function real2logical  
+  end function real2logical
 
 !--------------------------------------------------------------------------------------------------
 
@@ -582,7 +584,7 @@ contains
       lValue = lTRUE
     endif
 
-  end function dbl2logical  
+  end function dbl2logical
 
 !--------------------------------------------------------------------------------------------------
 
@@ -603,9 +605,9 @@ contains
 
         lValue = lFALSE
 
-    end select    
+    end select
 
-  end function char2logical  
+  end function char2logical
 
 !--------------------------------------------------------------------------------------------------
 
@@ -618,7 +620,7 @@ contains
 
     iValue = int( iShortVal, kind=c_int )
 
-  end function short2int  
+  end function short2int
 
 !--------------------------------------------------------------------------------------------------
 
@@ -631,12 +633,12 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iStat
-    character (len=:), allocatable :: sTempVal 
+    character (len=:), allocatable :: sTempVal
     real (kind=c_float)  :: rValue
 
-    sTempVal = keepnumeric(sValue)  
+    sTempVal = keepnumeric(sValue)
 
-    ! if the cleaned up string appears to be a real value, 
+    ! if the cleaned up string appears to be a real value,
     ! attempt to read as real and convert to int
     if ( scan(sTempVal, ".") /= 0 ) then
 
@@ -644,7 +646,7 @@ contains
 
       if (iStat == 0)  iValue = int(rValue, kind=c_int)
 
-    else  
+    else
 
       read(unit=sTempVal, fmt=*, iostat=iStat) iValue
 
@@ -887,7 +889,7 @@ end function fortran_to_c_string
     ! TargetCharacter omits the period ("."): don't want a real value returned
     ! as a funky integer (e.g. string "3.141" returned as integer 3141 )
     sTargetCharacters_ = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM" &
-      //"!@#$%^&*()_+-={}[]|\:;'<,>?/~`'"//sDOUBLE_QUOTE
+      //"!@#$%^&*()_+-={}[]|\:;'<,>?/~`'"//DOUBLE_QUOTE
 
     ! eliminate any leading spaces
     sTemp = adjustl(sText1)
@@ -897,7 +899,7 @@ end function fortran_to_c_string
     do iIndex1 = 1,len_trim(sText1)
 
       iR = SCAN(sTemp(iIndex1:iIndex1), sTargetCharacters_)
-  
+
       if(iR==0) then
         iIndex2 = iIndex2 + 1
         sBuf(iIndex2:iIndex2) = sTemp(iIndex1:iIndex1)

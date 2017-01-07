@@ -952,7 +952,7 @@ contains
         do while ( len_trim( sSubString ) > 0 )
 
           ! add the next directive snippet to dictionary entry data structure
-          call CF_ENTRY%add_string( sSubstring )
+          call CF_ENTRY%add_entry( sSubstring )
 
           ! break off next directive for the current record
           call chomp( sRecord, sSubstring, CF%sDelimiters )
