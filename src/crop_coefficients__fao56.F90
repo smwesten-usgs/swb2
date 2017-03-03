@@ -27,6 +27,9 @@ module crop_coefficients__FAO56
   public :: crop_coefficients_FAO56_update_growth_stage_dates
   public :: update_crop_coefficient_date_as_threshold, update_crop_coefficient_GDD_as_threshold
   public :: GROWTH_STAGE_DATE, PLANTING_DATE
+  public :: KCB_MIN, KCB_INI, KCB_MID, KCB_END
+  public :: KCB
+  public ::
 
   enum, bind(c)
     enumerator :: L_DOY_INI=1, L_DOY_DEV, L_DOY_MID, L_DOY_LATE, L_DOY_FALLOW
@@ -56,16 +59,13 @@ module crop_coefficients__FAO56
   ! Private, module level variables
   ! kept at a landuse code level (i.e. same value applies to all cells with same LU codes)
   integer (kind=c_int), allocatable  :: LANDUSE_CODE(:)
-  real (kind=c_float), allocatable   :: REW(:,:)
-  real (kind=c_float), allocatable   :: TEW(:,:)
+!  real (kind=c_float), allocatable   :: REW(:,:)
+!  real (kind=c_float), allocatable   :: TEW(:,:)
   real (kind=c_float), allocatable   :: KCB(:,:)
   integer (kind=c_int), allocatable  :: KCB_METHOD(:)
   real (kind=c_float), allocatable   :: GROWTH_STAGE_DOY(:,:)
   real (kind=c_float), allocatable   :: GROWTH_STAGE_GDD(:,:)
   type (DATETIME_T), allocatable     :: GROWTH_STAGE_DATE(:,:)
-
-  !real (kind=c_float),
-  real (kind=c_float), allocatable   :: MEAN_PLANT_HEIGHT(:)
 
   integer (kind=c_int)               :: LU_SOILS_CSV
 
@@ -81,12 +81,12 @@ contains
     logical (kind=c_bool), intent(in)    :: lActive(:,:)
 
     ! [ LOCALS ]
-    type (STRING_LIST_T)              :: slREW, slTEW
+    ! type (STRING_LIST_T)              :: slREW, slTEW
     type (STRING_LIST_T)              :: slList
     type (DATETIME_T)                 :: DT
     type (DATETIME_T)                 :: temp_date
-    integer (kind=c_int), allocatable :: iTEWSeqNums(:)
-    integer (kind=c_int), allocatable :: iREWSeqNums(:)
+    ! integer (kind=c_int), allocatable :: iTEWSeqNums(:)
+    ! integer (kind=c_int), allocatable :: iREWSeqNums(:)
     integer (kind=c_int)              :: iNumberOfTEW, iNumberOfREW
     integer (kind=c_int)              :: iNumberOfLanduses
     integer (kind=c_int)              :: iIndex, iIndex2
@@ -148,10 +148,10 @@ contains
    !> is soil suffix vector continuous?
 
    ! Retrieve and populate the Readily Evaporable Water (REW) table values
-   CALL PARAMS%get_parameters( fValues=REW, sPrefix="REW_", iNumRows=iNumberOfLanduses )
+  !  CALL PARAMS%get_parameters( fValues=REW, sPrefix="REW_", iNumRows=iNumberOfLanduses )
 
    ! Retrieve and populate the Total Evaporable Water (TEW) table values
-   CALL PARAMS%get_parameters( fValues=TEW, sPrefix="TEW_", iNumRows=iNumberOfLanduses )
+  !  CALL PARAMS%get_parameters( fValues=TEW, sPrefix="TEW_", iNumRows=iNumberOfLanduses )
 
    !> @TODO What should happen if the TEW / REW header entries do *not* fall in a
    !!       logical sequence of values? In other words, if the user has columns named
@@ -189,8 +189,8 @@ contains
    call PARAMS%get_parameters( sKey="Kcb_Oct", fValues=KCB_oct )
    call PARAMS%get_parameters( sKey="Kcb_Nov", fValues=KCB_nov )
    call PARAMS%get_parameters( sKey="Kcb_Dec", fValues=KCB_dec )
-
-   call PARAMS%get_parameters( sKey="Mean_Plant_Height", fValues=MEAN_PLANT_HEIGHT, lFatal=lTRUE )
+   !
+  !  call PARAMS%get_parameters( sKey="Mean_Plant_Height", fValues=MEAN_PLANT_HEIGHT, lFatal=lTRUE )
 
     allocate( GROWTH_STAGE_DOY( 5, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_DOY array", &
@@ -561,73 +561,74 @@ end function update_crop_coefficient_GDD_as_threshold
   end subroutine crop_coefficients_FAO56_update_growth_stage_dates
 
 
-!> Calculate the effective root zone depth.
-!!
-!! Calculate the effective root zone depth given the current stage
-!! of plant growth, the soil type, and the crop type.
-!!
-!! @param[in] pIRRIGATION pointer to a specific line of the irrigation
-!!     lookup data structure.
-!! @param[in] rZr_max The maximum rooting depth for this crop; currently this
-!!     is supplied to this function as the rooting depth associated with the
-!!     landuse/soil type found in the landuse lookup table.
-!! @param[in] iThreshold Numeric value (either the GDD or the DOY) defining
-!!     the time that the crop is planted.
-!! @retval rZr_i current active rooting depth.
-!! @note Implemented as equation 8-1 (Annex 8), FAO-56, Allen and others.
-
-elemental function calc_effective_root_depth( iLanduseIndex, fZr_max, fKCB )  result(fZr_i)
-
-  integer (kind=c_int), intent(in)    :: iLanduseIndex
-  real (kind=c_float), intent(in)     :: fZr_max
-  real (kind=c_float), intent(in)     :: fKCB
-
-  ! [ RESULT ]
-  real (kind=c_float) :: fZr_i
-
-  ! [ LOCALS ]
-  ! 0.3048 feet equals 0.1 meters, which is seems to be the standard
-  ! initial rooting depth in the FAO-56 methodology
-  real (kind=c_float), parameter :: fZr_min = 0.3048
-  real (kind=c_float)            :: fMaxKCB
-  real (kind=c_float)            :: fMinKCB
-
-  if ( KCB_METHOD( iLanduseIndex ) == KCB_METHOD_MONTHLY_VALUES ) then
-    fMaxKCB = maxval( KCB( JAN:DEC, iLanduseIndex ) )
-    fMinKCB = minval( KCB( JAN:DEC, iLanduseIndex ) )
-  else
-    fMaxKCB = maxval( KCB( KCB_INI:KCB_MIN, iLanduseIndex ) )
-    fMinKCB = minval( KCB( KCB_INI:KCB_MIN, iLanduseIndex ) )
-  endif
-
-  ! if there is not much difference between the MAX Kcb and MIN Kcb, assume that
-  ! we are dealing with an area such as a forest, where we assume that the rooting
-  ! depths are constant year-round
-   if ( ( fMaxKCB - fMinKCB ) < 0.1_c_float ) then
-
-     fZr_i = fZr_max
-
-   elseif ( fMaxKCB > 0.0_C_float ) then
-
-     fZr_i = fZr_min + (fZr_max - fZr_min) * fKCB / fMaxKCB
-
-   else
-
-     fZr_i = fZr_min
-
-   endif
-
-!  fZr_i = fZr_max
-
-end function calc_effective_root_depth
-
+! !> Calculate the effective root zone depth.
+! !!
+! !! Calculate the effective root zone depth given the current stage
+! !! of plant growth, the soil type, and the crop type.
+! !!
+! !! @param[in] pIRRIGATION pointer to a specific line of the irrigation
+! !!     lookup data structure.
+! !! @param[in] rZr_max The maximum rooting depth for this crop; currently this
+! !!     is supplied to this function as the rooting depth associated with the
+! !!     landuse/soil type found in the landuse lookup table.
+! !! @param[in] iThreshold Numeric value (either the GDD or the DOY) defining
+! !!     the time that the crop is planted.
+! !! @retval rZr_i current active rooting depth.
+! !! @note Implemented as equation 8-1 (Annex 8), FAO-56, Allen and others.
+!
+! elemental function calc_effective_root_depth( iLanduseIndex, fZr_max, fKCB )  result(fZr_i)
+!
+!   integer (kind=c_int), intent(in)    :: iLanduseIndex
+!   real (kind=c_float), intent(in)     :: fZr_max
+!   real (kind=c_float), intent(in)     :: fKCB
+!
+!   ! [ RESULT ]
+!   real (kind=c_float) :: fZr_i
+!
+!   ! [ LOCALS ]
+!   ! 0.3048 feet equals 0.1 meters, which is seems to be the standard
+!   ! initial rooting depth in the FAO-56 methodology
+!   real (kind=c_float), parameter :: fZr_min = 0.3048
+!   real (kind=c_float)            :: fMaxKCB
+!   real (kind=c_float)            :: fMinKCB
+!
+!   if ( KCB_METHOD( iLanduseIndex ) == KCB_METHOD_MONTHLY_VALUES ) then
+!     fMaxKCB = maxval( KCB( JAN:DEC, iLanduseIndex ) )
+!     fMinKCB = minval( KCB( JAN:DEC, iLanduseIndex ) )
+!   else
+!     fMaxKCB = maxval( KCB( KCB_INI:KCB_MIN, iLanduseIndex ) )
+!     fMinKCB = minval( KCB( KCB_INI:KCB_MIN, iLanduseIndex ) )
+!   endif
+!
+!   ! if there is not much difference between the MAX Kcb and MIN Kcb, assume that
+!   ! we are dealing with an area such as a forest, where we assume that the rooting
+!   ! depths are constant year-round
+!    if ( ( fMaxKCB - fMinKCB ) < 0.1_c_float ) then
+!
+!      fZr_i = fZr_max
+!
+!    elseif ( fMaxKCB > 0.0_C_float ) then
+!
+!      fZr_i = fZr_min + (fZr_max - fZr_min) * fKCB / fMaxKCB
+!
+!    else
+!
+!      fZr_i = fZr_min
+!
+!    endif
+!
+! !  fZr_i = fZr_max
+!
+! end function calc_effective_root_depth
+!
 !--------------------------------------------------------------------------------------------------
 
-  elemental subroutine crop_coefficients_FAO56_calculate( Kcb, GDD, landuse_index )
+  elemental subroutine crop_coefficients_FAO56_calculate( Kcb, landuse_index, GDD )
 
-    real (kind=c_float), intent(inout)   :: Kcb
-    real (kind=c_float), intent(in)      :: GDD
-    integer (kind=c_int), intent(in)     :: landuse_index
+    real (kind=c_float), intent(inout)          :: Kcb
+    integer (kind=c_int), intent(in)            :: landuse_index
+    real (kind=c_float), intent(in), optional   :: GDD
+
 
     if ( KCB_METHOD( landuse_index )  == KCB_METHOD_FAO56  &
       .or. KCB_METHOD( landuse_index ) == KCB_METHOD_MONTHLY_VALUES ) then

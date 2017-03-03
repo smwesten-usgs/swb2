@@ -878,6 +878,12 @@ makeplot( x1=mydates[366:730], y1=snowmelt[366:730],
           xlim=c(ymd("2011-01-01"),ymd("2011-12-31") ),
           y2_label="SWB 2.0")
 
+makeplot( x1=mydates[366:730], y1=CFGI[366:730],
+          x2=swb2$date, y2=swb2$cfgi,
+          title="Continuous frozen ground index (CFGI)",
+          xlim=c(ymd("2011-01-01"),ymd("2011-12-31") ),
+          y2_label="SWB 2.0")
+
 makeplot( x1=mydates[366:730], y1=runoff[366:730],
           x2=swb2$date, y2=swb2$runoff,
           title="Runoff",

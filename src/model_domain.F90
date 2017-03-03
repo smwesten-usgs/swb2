@@ -2292,6 +2292,8 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
+    this%crop_coefficient_kcb = 1.0_c_float
+
   end subroutine model_initialize_crop_coefficient_none
 
 !--------------------------------------------------------------------------------------------------
@@ -2299,8 +2301,6 @@ contains
   subroutine model_update_crop_coefficient_none(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-    this%crop_coefficient_kcb = 1.0_c_float
 
   end subroutine model_update_crop_coefficient_none
 
