@@ -39,7 +39,7 @@ module model_initialize
   end type METHODS_LIST_T
 
   integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 40
-  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 14
+  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 15
 
   type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS( NUMBER_OF_KNOWN_GRIDS ) =       &
 
@@ -98,7 +98,8 @@ module model_initialize
       METHODS_LIST_T("CROP_COEFFICIENT       ", lTRUE),                             &
       METHODS_LIST_T("DIRECT_RECHARGE        ", lTRUE),                             &
       METHODS_LIST_T("DIRECT_SOIL_MOISTURE   ", lTRUE),                             &
-      METHODS_LIST_T("FLOW_ROUTING           ", lFALSE),                            &
+      METHODS_LIST_T("FLOW_ROUTING           ", lTRUE),                             &
+      METHODS_LIST_T("ROOTING_DEPTH          ", lTRUE),                             &
       METHODS_LIST_T("DUMP_VARIABLES         ", lTRUE)   ]
 
   ! grid that will be used in the calculation of cell latitudes
@@ -1850,7 +1851,7 @@ contains
 
       enddo
 
-    endif  
+    endif
 
   end subroutine initialize_surface_storage_max
 

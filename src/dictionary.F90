@@ -416,7 +416,7 @@ contains
         __SRCNAME__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
 
       iValues = iTINYVAL
 
@@ -450,7 +450,7 @@ contains
         __SRCNAME__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
 
       lValues = lFALSE
 
@@ -506,7 +506,7 @@ contains
         __SRCNAME__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
 
       lValues = lFALSE
 
@@ -550,7 +550,7 @@ contains
 
       call slString%append("<NA>")
       call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
 
     endif
 
@@ -607,7 +607,7 @@ contains
 
       call slString%append("<NA>")
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
 
     endif
 
@@ -662,7 +662,7 @@ contains
         __SRCNAME__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
 
       iValues = iTINYVAL
 
@@ -719,7 +719,7 @@ contains
         __SRCNAME__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
 
 
       fValues = fTINYVAL
@@ -754,7 +754,7 @@ contains
         __SRCNAME__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_ALL, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG , lEcho=lFALSE)
 
       fValues = fTINYVAL
 

@@ -25,11 +25,11 @@ module crop_coefficients__FAO56
 
   public :: crop_coefficients_FAO56_initialize, crop_coefficients_FAO56_calculate
   public :: crop_coefficients_FAO56_update_growth_stage_dates
+  public :: crop_coefficients_FAO56_update_rooting_depth
   public :: update_crop_coefficient_date_as_threshold, update_crop_coefficient_GDD_as_threshold
   public :: GROWTH_STAGE_DATE, PLANTING_DATE
   public :: KCB_MIN, KCB_INI, KCB_MID, KCB_END
-  public :: KCB
-  public ::
+  public :: KCB_
 
   enum, bind(c)
     enumerator :: L_DOY_INI=1, L_DOY_DEV, L_DOY_MID, L_DOY_LATE, L_DOY_FALLOW
@@ -61,11 +61,12 @@ module crop_coefficients__FAO56
   integer (kind=c_int), allocatable  :: LANDUSE_CODE(:)
 !  real (kind=c_float), allocatable   :: REW(:,:)
 !  real (kind=c_float), allocatable   :: TEW(:,:)
-  real (kind=c_float), allocatable   :: KCB(:,:)
+  real (kind=c_float), allocatable   :: KCB_(:,:)
   integer (kind=c_int), allocatable  :: KCB_METHOD(:)
   real (kind=c_float), allocatable   :: GROWTH_STAGE_DOY(:,:)
   real (kind=c_float), allocatable   :: GROWTH_STAGE_GDD(:,:)
   type (DATETIME_T), allocatable     :: GROWTH_STAGE_DATE(:,:)
+  real (kind=c_float), allocatable   :: MEAN_PLANT_HEIGHT(:)
 
   integer (kind=c_int)               :: LU_SOILS_CSV
 
@@ -190,7 +191,7 @@ contains
    call PARAMS%get_parameters( sKey="Kcb_Nov", fValues=KCB_nov )
    call PARAMS%get_parameters( sKey="Kcb_Dec", fValues=KCB_dec )
    !
-  !  call PARAMS%get_parameters( sKey="Mean_Plant_Height", fValues=MEAN_PLANT_HEIGHT, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="Mean_Plant_Height", fValues=MEAN_PLANT_HEIGHT, lFatal=lFALSE )
 
     allocate( GROWTH_STAGE_DOY( 5, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_DOY array", &
@@ -204,8 +205,8 @@ contains
     call assert( iStat==0, "Failed to allocate memory for DATE_GROWTH array", &
       __SRCNAME__, __LINE__ )
 
-    allocate( KCB( 16, iNumberOfLanduses ), stat=iStat )
-    call assert( iStat==0, "Failed to allocate memory for KCB array", &
+    allocate( KCB_( 16, iNumberOfLanduses ), stat=iStat )
+    call assert( iStat==0, "Failed to allocate memory for KCB_ array", &
       __SRCNAME__, __LINE__ )
 
     allocate( KCB_METHOD( iNumberOfLanduses ), stat=iStat )
@@ -213,7 +214,7 @@ contains
       __SRCNAME__, __LINE__ )
 
     KCB_METHOD = iTINYVAL
-    KCB = fTINYVAL
+    KCB_ = fTINYVAL
     GROWTH_STAGE_GDD = fTINYVAL
     GROWTH_STAGE_DOY = fTINYVAL
 
@@ -296,38 +297,38 @@ contains
     if (ubound(GDD_mid_,1) == iNumberOfLanduses)    GROWTH_STAGE_GDD( GDD_MID,  : ) = GDD_mid_
     if (ubound(GDD_late_,1) == iNumberOfLanduses)   GROWTH_STAGE_GDD( GDD_LATE, : ) = GDD_late_
 
-    if (ubound(KCB_ini_,1) == iNumberOfLanduses)  KCB( KCB_INI, :) = KCB_ini_
-    if (ubound(KCB_mid_,1) == iNumberOfLanduses)  KCB( KCB_MID, :) = KCB_mid_
-    if (ubound(KCB_end_,1) == iNumberOfLanduses)  KCB( KCB_END, :) = KCB_end_
-    if (ubound(KCB_min_,1) == iNumberOfLanduses)  KCB( KCB_MIN, :) = KCB_min_
+    if (ubound(KCB_ini_,1) == iNumberOfLanduses)  KCB_( KCB_INI, :) = KCB_ini_
+    if (ubound(KCB_mid_,1) == iNumberOfLanduses)  KCB_( KCB_MID, :) = KCB_mid_
+    if (ubound(KCB_end_,1) == iNumberOfLanduses)  KCB_( KCB_END, :) = KCB_end_
+    if (ubound(KCB_min_,1) == iNumberOfLanduses)  KCB_( KCB_MIN, :) = KCB_min_
 
-    if (ubound(KCB_jan,1) == iNumberOfLanduses)   KCB( JAN, :) = KCB_jan
-    if (ubound(KCB_feb,1) == iNumberOfLanduses)   KCB( FEB, :) = KCB_feb
-    if (ubound(KCB_mar,1) == iNumberOfLanduses)   KCB( MAR, :) = KCB_mar
-    if (ubound(KCB_apr,1) == iNumberOfLanduses)   KCB( APR, :) = KCB_apr
-    if (ubound(KCB_may,1) == iNumberOfLanduses)   KCB( MAY, :) = KCB_may
-    if (ubound(KCB_jun,1) == iNumberOfLanduses)   KCB( JUN, :) = KCB_jun
-    if (ubound(KCB_jul,1) == iNumberOfLanduses)   KCB( JUL, :) = KCB_jul
-    if (ubound(KCB_aug,1) == iNumberOfLanduses)   KCB( AUG, :) = KCB_aug
-    if (ubound(KCB_sep,1) == iNumberOfLanduses)   KCB( SEP, :) = KCB_sep
-    if (ubound(KCB_oct,1) == iNumberOfLanduses)   KCB( OCT, :) = KCB_oct
-    if (ubound(KCB_nov,1) == iNumberOfLanduses)   KCB( NOV, :) = KCB_nov
-    if (ubound(KCB_dec,1) == iNumberOfLanduses)   KCB( DEC, :) = KCB_dec
+    if (ubound(KCB_jan,1) == iNumberOfLanduses)   KCB_( JAN, :) = KCB_jan
+    if (ubound(KCB_feb,1) == iNumberOfLanduses)   KCB_( FEB, :) = KCB_feb
+    if (ubound(KCB_mar,1) == iNumberOfLanduses)   KCB_( MAR, :) = KCB_mar
+    if (ubound(KCB_apr,1) == iNumberOfLanduses)   KCB_( APR, :) = KCB_apr
+    if (ubound(KCB_may,1) == iNumberOfLanduses)   KCB_( MAY, :) = KCB_may
+    if (ubound(KCB_jun,1) == iNumberOfLanduses)   KCB_( JUN, :) = KCB_jun
+    if (ubound(KCB_jul,1) == iNumberOfLanduses)   KCB_( JUL, :) = KCB_jul
+    if (ubound(KCB_aug,1) == iNumberOfLanduses)   KCB_( AUG, :) = KCB_aug
+    if (ubound(KCB_sep,1) == iNumberOfLanduses)   KCB_( SEP, :) = KCB_sep
+    if (ubound(KCB_oct,1) == iNumberOfLanduses)   KCB_( OCT, :) = KCB_oct
+    if (ubound(KCB_nov,1) == iNumberOfLanduses)   KCB_( NOV, :) = KCB_nov
+    if (ubound(KCB_dec,1) == iNumberOfLanduses)   KCB_( DEC, :) = KCB_dec
 
 
     ! go through the table values and try to figure out how Kcb curves should be constructed:
     ! Monthly Kcb, GDD-based, or DOY-based
     do iIndex = lbound( KCB_METHOD, 1), ubound( KCB_METHOD, 1)
 
-      if ( all( KCB( JAN:DEC, iIndex ) > NEAR_ZERO ) ) then
+      if ( all( KCB_( JAN:DEC, iIndex ) > NEAR_ZERO ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_MONTHLY_VALUES
 
       elseif ( all( GROWTH_STAGE_GDD( :, iIndex ) > NEAR_ZERO )              &
-         .and. all( KCB( KCB_INI:KCB_MIN, iIndex ) > NEAR_ZERO ) ) then
+         .and. all( KCB_( KCB_INI:KCB_MIN, iIndex ) > NEAR_ZERO ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_GDD
 
       elseif ( all( GROWTH_STAGE_DOY( :, iIndex ) > NEAR_ZERO )              &
-         .and. all( KCB( KCB_INI:KCB_MIN, iIndex ) > NEAR_ZERO ) ) then
+         .and. all( KCB_( KCB_INI:KCB_MIN, iIndex ) > NEAR_ZERO ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_FAO56
       endif
 
@@ -339,17 +340,19 @@ contains
 
     enddo
 
-!     do iIndex = lbound( fSoilStorage, 1 ), ubound( fSoilStorage,1 )
+    do iIndex = lbound( fSoilStorage, 1 ), ubound( fSoilStorage,1 )
 
-!       fKcb_initial = update_crop_coefficient_date_as_threshold( iLanduseIndex( iIndex ) )
-!       fRz_initial = calc_effective_root_depth( iLanduseIndex=iLanduseIndex( iIndex ),                &
-!                                                fZr_max=fMax_Rooting_Depths( iLanduseIndex( iIndex ), &
-!                                                                             iSoilGroup( iIndex ) ),  &
-!                                                fKCB=fKcb_initial )
-!       fSoilStorage( iIndex ) = INITIAL_PERCENT_SOIL_MOISTURE( iIndex ) / 100.0_c_float    &
-!                                * fRz_initial * fAvailable_Water_Content( iIndex )
+      fKcb_initial = update_crop_coefficient_date_as_threshold( iLanduseIndex( iIndex ) )
 
-!     enddo
+      ! call calc_effective_root_depth( fRz_i=fRz_initial, iLanduseIndex=iLanduseIndex( iIndex ),    &
+      !                                 fZr_max=fMax_Rooting_Depths( iLanduseIndex( iIndex ),        &
+      !                                 iSoilGroup( iIndex ) ),                                      &
+      !                                 Kcb=fKcb_initial )
+      !
+      ! fSoilStorage( iIndex ) = INITIAL_PERCENT_SOIL_MOISTURE( iIndex ) / 100.0_c_float             &
+      !                          * fRz_initial * fAvailable_Water_Content( iIndex )
+
+    enddo
 
   !> @TODO Add more logic here to perform checks on the validity of this data.
 
@@ -369,17 +372,17 @@ contains
  !!         current threshold values.
 
  elemental function update_crop_coefficient_date_as_threshold( iLanduseIndex )           &
-                                                                          result(fKcb)
+                                                                          result(Kcb)
 
   integer (kind=c_int), intent(in)   :: iLanduseIndex
-  real (kind=c_float)                :: fKcb
+  real (kind=c_float)                :: Kcb
 
   ! [ LOCALS ]
   real (kind=c_float) :: fFrac
 
   if ( KCB_METHOD( iLanduseIndex ) == KCB_METHOD_MONTHLY_VALUES ) then
 
-    fKCB = KCB( SIM_DT%curr%iMonth, iLanduseIndex )
+    Kcb = KCB_( SIM_DT%curr%iMonth, iLanduseIndex )
 
   else
 
@@ -389,42 +392,42 @@ contains
                 Date_mid => GROWTH_STAGE_DATE( ENDDATE_MID, iLanduseIndex ),         &
                 Date_late => GROWTH_STAGE_DATE( ENDDATE_LATE, iLanduseIndex ),       &
                 Date_fallow => GROWTH_STAGE_DATE( ENDDATE_FALLOW, iLanduseIndex ),   &
-                Kcb_ini => KCB(KCB_INI, iLanduseIndex),                              &
-                Kcb_mid => KCB(KCB_MID, iLanduseIndex),                              &
-                Kcb_min => KCB(KCB_MIN, iLanduseIndex),                              &
+                Kcb_ini => KCB_(KCB_INI, iLanduseIndex),                              &
+                Kcb_mid => KCB_(KCB_MID, iLanduseIndex),                              &
+                Kcb_min => KCB_(KCB_MIN, iLanduseIndex),                              &
                 PlantingDate => GROWTH_STAGE_DATE( PLANTING_DATE, iLanduseIndex),    &
-                Kcb_end => KCB(KCB_END, iLanduseIndex),                              &
+                Kcb_end => KCB_(KCB_END, iLanduseIndex),                              &
                 current_date => SIM_DT%curr )
 
       ! now calculate Kcb for the given landuse
 
       if( current_date > Date_late ) then
 
-        fKcb = Kcb_min
+        Kcb = Kcb_min
 
       elseif ( current_date > Date_mid ) then
 
         fFrac = ( current_date - Date_mid ) / ( Date_late - Date_mid )
 
-        fKcb =  Kcb_mid * (1_c_float - fFrac) + Kcb_end * fFrac
+        Kcb =  Kcb_mid * (1_c_float - fFrac) + Kcb_end * fFrac
 
       elseif ( current_date > Date_dev ) then
 
-        fKcb = Kcb_mid
+        Kcb = Kcb_mid
 
       elseif ( current_date > Date_ini ) then
 
         fFrac = ( current_date - Date_ini ) / ( Date_dev - Date_ini )
 
-        fKcb = Kcb_ini * (1_c_float - fFrac) + Kcb_mid * fFrac
+        Kcb = Kcb_ini * (1_c_float - fFrac) + Kcb_mid * fFrac
 
       elseif ( current_date >= PlantingDate ) then
 
-        fKcb = Kcb_ini
+        Kcb = Kcb_ini
 
       else
 
-        fKcb = Kcb_min
+        Kcb = Kcb_min
 
       endif
 
@@ -457,11 +460,11 @@ end function update_crop_coefficient_date_as_threshold
               GDD_dev_ => GROWTH_STAGE_GDD( GDD_DEV, iLanduseIndex ),         &
               GDD_mid_ => GROWTH_STAGE_GDD( GDD_MID, iLanduseIndex ),         &
               GDD_late_ => GROWTH_STAGE_GDD( GDD_LATE, iLanduseIndex ),       &
-              Kcb_ini => KCB(KCB_INI, iLanduseIndex),                         &
-              Kcb_mid => KCB(KCB_MID, iLanduseIndex),                         &
-              Kcb_min => KCB(KCB_MIN, iLanduseIndex),                         &
+              Kcb_ini => KCB_(KCB_INI, iLanduseIndex),                         &
+              Kcb_mid => KCB_(KCB_MID, iLanduseIndex),                         &
+              Kcb_min => KCB_(KCB_MIN, iLanduseIndex),                         &
               GDD_plant_ => GROWTH_STAGE_GDD( GDD_PLANT, iLanduseIndex),      &
-              Kcb_end => KCB(KCB_END, iLanduseIndex) )
+              Kcb_end => KCB_(KCB_END, iLanduseIndex) )
 
     ! now calculate Kcb for the given landuse
     if( fGDD > GDD_late_ ) then
@@ -561,66 +564,63 @@ end function update_crop_coefficient_GDD_as_threshold
   end subroutine crop_coefficients_FAO56_update_growth_stage_dates
 
 
-! !> Calculate the effective root zone depth.
-! !!
-! !! Calculate the effective root zone depth given the current stage
-! !! of plant growth, the soil type, and the crop type.
-! !!
-! !! @param[in] pIRRIGATION pointer to a specific line of the irrigation
-! !!     lookup data structure.
-! !! @param[in] rZr_max The maximum rooting depth for this crop; currently this
-! !!     is supplied to this function as the rooting depth associated with the
-! !!     landuse/soil type found in the landuse lookup table.
-! !! @param[in] iThreshold Numeric value (either the GDD or the DOY) defining
-! !!     the time that the crop is planted.
-! !! @retval rZr_i current active rooting depth.
-! !! @note Implemented as equation 8-1 (Annex 8), FAO-56, Allen and others.
-!
-! elemental function calc_effective_root_depth( iLanduseIndex, fZr_max, fKCB )  result(fZr_i)
-!
-!   integer (kind=c_int), intent(in)    :: iLanduseIndex
-!   real (kind=c_float), intent(in)     :: fZr_max
-!   real (kind=c_float), intent(in)     :: fKCB
-!
-!   ! [ RESULT ]
-!   real (kind=c_float) :: fZr_i
-!
-!   ! [ LOCALS ]
-!   ! 0.3048 feet equals 0.1 meters, which is seems to be the standard
-!   ! initial rooting depth in the FAO-56 methodology
-!   real (kind=c_float), parameter :: fZr_min = 0.3048
-!   real (kind=c_float)            :: fMaxKCB
-!   real (kind=c_float)            :: fMinKCB
-!
-!   if ( KCB_METHOD( iLanduseIndex ) == KCB_METHOD_MONTHLY_VALUES ) then
-!     fMaxKCB = maxval( KCB( JAN:DEC, iLanduseIndex ) )
-!     fMinKCB = minval( KCB( JAN:DEC, iLanduseIndex ) )
-!   else
-!     fMaxKCB = maxval( KCB( KCB_INI:KCB_MIN, iLanduseIndex ) )
-!     fMinKCB = minval( KCB( KCB_INI:KCB_MIN, iLanduseIndex ) )
-!   endif
-!
-!   ! if there is not much difference between the MAX Kcb and MIN Kcb, assume that
-!   ! we are dealing with an area such as a forest, where we assume that the rooting
-!   ! depths are constant year-round
-!    if ( ( fMaxKCB - fMinKCB ) < 0.1_c_float ) then
-!
-!      fZr_i = fZr_max
-!
-!    elseif ( fMaxKCB > 0.0_C_float ) then
-!
-!      fZr_i = fZr_min + (fZr_max - fZr_min) * fKCB / fMaxKCB
-!
-!    else
-!
-!      fZr_i = fZr_min
-!
-!    endif
-!
-! !  fZr_i = fZr_max
-!
-! end function calc_effective_root_depth
-!
+!> Calculate the effective root zone depth.
+!!
+!! Calculate the effective root zone depth given the current stage
+!! of plant growth, the soil type, and the crop type.
+!!
+!! @param[in] pIRRIGATION pointer to a specific line of the irrigation
+!!     lookup data structure.
+!! @param[in] rZr_max The maximum rooting depth for this crop; currently this
+!!     is supplied to this function as the rooting depth associated with the
+!!     landuse/soil type found in the landuse lookup table.
+!! @param[in] iThreshold Numeric value (either the GDD or the DOY) defining
+!!     the time that the crop is planted.
+!! @retval rZr_i current active rooting depth.
+!! @note Implemented as equation 8-1 (Annex 8), FAO-56, Allen and others.
+
+elemental subroutine crop_coefficients_FAO56_update_rooting_depth( Zr_i, landuse_index, Kcb )
+
+  real (kind=c_float), intent(inout)  :: Zr_i
+  integer (kind=c_int), intent(in)    :: landuse_index
+  real (kind=c_float), intent(in)     :: Kcb
+
+  ! [ LOCALS ]
+  ! 0.3048 feet equals 0.1 meters, which is seems to be the standard
+  ! initial rooting depth in the FAO-56 methodology
+  real (kind=c_float), parameter :: Zr_min = 0.3048
+  real (kind=c_float)            :: MaxKCB
+  real (kind=c_float)            :: MinKCB
+
+  if ( KCB_METHOD( landuse_index ) == KCB_METHOD_MONTHLY_VALUES ) then
+    MaxKCB = maxval( KCB_( JAN:DEC, landuse_index ) )
+    MinKCB = minval( KCB_( JAN:DEC, landuse_index ) )
+  else
+    MaxKCB = maxval( KCB_( KCB_INI:KCB_MIN, landuse_index ) )
+    MinKCB = minval( KCB_( KCB_INI:KCB_MIN, landuse_index ) )
+  endif
+
+  ! if there is not much difference between the MAX Kcb and MIN Kcb, assume that
+  ! we are dealing with an area such as a forest, where we assume that the rooting
+  ! depths are constant year-round
+   if ( ( MaxKCB - MinKCB ) < 0.1_c_float ) then
+
+     Zr_i = MaxKCB
+
+   elseif ( MaxKCB > 0.0_C_float ) then
+
+     Zr_i = MinKCB + (MaxKCB - MinKCB) * Kcb / MaxKCB
+
+   else
+
+     Zr_i = MinKCB
+
+   endif
+
+!  fZr_i = fZr_max
+
+end subroutine crop_coefficients_FAO56_update_rooting_depth
+
 !--------------------------------------------------------------------------------------------------
 
   elemental subroutine crop_coefficients_FAO56_calculate( Kcb, landuse_index, GDD )
@@ -637,9 +637,7 @@ end function update_crop_coefficient_GDD_as_threshold
 
     else
 
-    !  fKcb = sm_FAO56_UpdateCropCoefficient( landuse_index, INT(fGDD, kind=c_int), asInt(SIM_DT%curr%iMonth)  )
-
-    !					 cel%rSoilWaterCap = cel%rCurrentRootingDepth * cel%rSoilWaterCapInput
+      Kcb = update_crop_coefficient_GDD_as_threshold( landuse_index, GDD )
 
     endif
 

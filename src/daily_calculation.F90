@@ -38,11 +38,9 @@ contains
 
     ! calls elemental
     call cells%update_growing_season()
-
     call cells%update_crop_coefficient()
-
+    call cells%update_rooting_depth()
     call cells%calc_reference_et()
-
 
     ! update crop evapotranspiration; crop_coefficient_kcb defaults to 1.0
     cells%crop_etc = cells%reference_et0 * cells%crop_coefficient_kcb
@@ -50,7 +48,7 @@ contains
     call cells%calc_snowfall()
 
     call cells%calc_snowmelt()
-    
+
 
     call cells%calc_continuous_frozen_ground_index()
 

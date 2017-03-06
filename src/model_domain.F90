@@ -162,6 +162,9 @@ module model_domain
     procedure ( array_method ), pointer  :: update_crop_coefficient                                          &
                                                 => model_update_crop_coefficient_none
 
+    procedure ( array_method ), pointer  :: update_rooting_depth                                          &
+                                                => model_update_rooting_depth_none
+
     procedure ( array_method ), pointer  :: init_continuous_frozen_ground_index                              &
                                                 => model_initialize_continuous_frozen_ground_index
     procedure ( array_method ), pointer  :: calc_continuous_frozen_ground_index                              &
@@ -858,6 +861,20 @@ contains
 
         call warn("Your control file specifies an unknown or unsupported RUNOFF method.", &
             lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+
+      endif
+
+    elseif ( sCmdText .contains. "ROOTING" ) then
+
+      if ( ( Method_Name .strequal. "DYNAMIC" ) .or. ( Method_Name .strequal. "FAO56" ) ) then
+
+        this%update_rooting_depth => model_update_rooting_depth_FAO56
+        call LOGS%WRITE( "==> DYNAMIC rooting depth submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+
+      else
+
+        this%update_rooting_depth => model_update_rooting_depth_none
+        call LOGS%WRITE( "==> STATIC rooting depth submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       endif
 
@@ -2286,6 +2303,29 @@ contains
 
   end subroutine model_calculate_maximum_potential_recharge_gridded
 
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine model_update_rooting_depth_none(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_update_rooting_depth_none
+
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine model_update_rooting_depth_FAO56(this)
+
+    use crop_coefficients__FAO56, only : crop_coefficients_FAO56_update_rooting_depth
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call crop_coefficients_FAO56_update_rooting_depth(        &
+                       Zr_i=this%current_rooting_depth,       &
+                       landuse_index=this%landuse_index,      &
+                       Kcb=this%crop_coefficient_kcb )
+
+  end subroutine model_update_rooting_depth_FAO56
+
 !--------------------------------------------------------------------------------------------------
 
   subroutine model_initialize_crop_coefficient_none(this)
@@ -2335,8 +2375,8 @@ contains
     this%number_of_days_since_planting = SIM_DT%curr                            &
               - GROWTH_STAGE_DATE( PLANTING_DATE, this%landuse_index )
 
-    call crop_coefficients_FAO56_calculate( Kcb=this%crop_coefficient_kcb,      &
-                                            GDD=this%gdd,                       &
+    call crop_coefficients_FAO56_calculate( Kcb=this%crop_coefficient_kcb,             &
+                                            GDD=this%gdd,                              &
                                             landuse_index=this%landuse_index )
 
   end subroutine model_update_crop_coefficient_FAO56
