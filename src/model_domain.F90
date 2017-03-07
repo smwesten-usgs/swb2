@@ -2321,6 +2321,7 @@ contains
 
     call crop_coefficients_FAO56_update_rooting_depth(        &
                        Zr_i=this%current_rooting_depth,       &
+                       Zr_max=this%rooting_depth_max,         &
                        landuse_index=this%landuse_index,      &
                        Kcb=this%crop_coefficient_kcb )
 

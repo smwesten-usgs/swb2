@@ -579,9 +579,11 @@ end function update_crop_coefficient_GDD_as_threshold
 !! @retval rZr_i current active rooting depth.
 !! @note Implemented as equation 8-1 (Annex 8), FAO-56, Allen and others.
 
-elemental subroutine crop_coefficients_FAO56_update_rooting_depth( Zr_i, landuse_index, Kcb )
+elemental subroutine crop_coefficients_FAO56_update_rooting_depth( Zr_i, Zr_max,          &
+                                                                   landuse_index, Kcb )
 
   real (kind=c_float), intent(inout)  :: Zr_i
+  real (kind=c_float), intent(in)     :: Zr_max
   integer (kind=c_int), intent(in)    :: landuse_index
   real (kind=c_float), intent(in)     :: Kcb
 
@@ -605,15 +607,17 @@ elemental subroutine crop_coefficients_FAO56_update_rooting_depth( Zr_i, landuse
   ! depths are constant year-round
    if ( ( MaxKCB - MinKCB ) < 0.1_c_float ) then
 
-     Zr_i = MaxKCB
+     Zr_i = Zr_max
 
    elseif ( MaxKCB > 0.0_C_float ) then
 
-     Zr_i = MinKCB + (MaxKCB - MinKCB) * Kcb / MaxKCB
+     Zr_i = Zr_min + ( Kcb - MinKCB ) / ( MaxKCB - MinKCB ) * ( Zr_max - Zr_min )
+
+!     Zr_i = ( MinKCB + (Kcb - MinKCB) / (MaxKCB - MinKCB) ) * Zr_max
 
    else
 
-     Zr_i = MinKCB
+     Zr_i = Zr_min
 
    endif
 
