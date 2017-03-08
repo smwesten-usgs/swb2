@@ -342,6 +342,7 @@ contains
     real (kind=c_float), intent(in)  :: CN_II
     real (kind=c_float)              :: CN_I
 
+    ! The following comes from page 192, eq. 3.145 of "SCS Curve Number Methodology"
     CN_I = CN_II / (2.281_c_float - 0.01281_c_float * CN_II )
 
     CN_I = max( CN_I, 30.0_c_float )
@@ -408,7 +409,7 @@ contains
 
     ! Equation 8, Hawkins and others, 2002
     ! adjust Smax for alternate initial abstraction amount
-    Smax = 1.33_c_float * ( Smax ) ** 1.15_c_float
+    Smax = 1.33_c_float * ( Smax**1.15_c_float )
 
     ! ! now consider runoff if Ia ~ 0.05S
     ! if ( inflow > 0.05_c_float * Smax ) then
@@ -425,6 +426,5 @@ contains
     end if
 
   end subroutine runoff_curve_number_calculate
-
 
 end module runoff__curve_number

@@ -1,7 +1,7 @@
 module dictionary
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
-  use constants_and_conversions, only : iTINYVAL, fTINYVAL, lTRUE, lFALSE
+  use constants_and_conversions, only : iTINYVAL, fTINYVAL, TRUE, FALSE
   use exceptions
   use logfiles
   use strings
@@ -59,6 +59,9 @@ module dictionary
 
     procedure, private   :: add_entry_to_dict_sub
     generic              :: add_entry => add_entry_to_dict_sub
+
+    procedure, private   :: key_name_already_in_use_fn
+    generic              :: key_already_in_use => key_name_already_in_use_fn
 
     procedure, private   :: delete_entry_by_key_sub
     generic              :: delete_entry => delete_entry_by_key_sub
@@ -193,7 +196,7 @@ contains
     if (.not. associated( pDict ) )  &
       call warn( sMessage="Failed to find a dictionary entry with a key value of "//dquote(sKey),   &
                  iLogLevel=LOG_DEBUG,                                                               &
-                 lEcho=lFALSE )
+                 lEcho=FALSE )
 
   end function get_entry_by_key_fn
 
@@ -228,7 +231,7 @@ contains
       call warn( sMessage="Failed to find a dictionary entry with a index value of "   &
         //asCharacter(iIndex),                                                         &
                  iLogLevel=LOG_DEBUG,                                                  &
-                 lEcho=lFALSE )
+                 lEcho=FALSE )
 
   end function get_entry_by_index_fn
 
@@ -256,7 +259,7 @@ contains
     if (.not. associated( pDict ) )  &
       call warn( sMessage="Failed to find another dictionary entry with a key value of "//dquote(sKey),   &
                  iLogLevel=LOG_DEBUG,                                                               &
-                 lEcho=lFALSE )
+                 lEcho=FALSE )
 
   end function get_next_entry_by_key_fn
 
@@ -279,7 +282,7 @@ contains
     if (.not. associated( pDict ) )  &
       call warn( sMessage="Reached end of dictionary.",                    &
                  iLogLevel=LOG_DEBUG,                                      &
-                 lEcho=lFALSE )
+                 lEcho=FALSE )
 
   end function get_next_entry_fn
 
@@ -308,9 +311,45 @@ contains
 
     if ( slString%count == 0 )  &
       call warn(sMessage="Failed to find a dictionary entry associated with a key value of " &
-        //dquote(sKey)//".", sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE )
+        //dquote(sKey)//".", sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE )
 
   end function grep_dictionary_key_names_fn
+
+!--------------------------------------------------------------------------------------------------
+
+function key_name_already_in_use_fn(this, sKey)   result( in_use )
+
+  class (DICT_T)                   :: this
+  character (len=*), intent(in)    :: sKey
+  logical (kind=c_bool)            :: in_use
+
+  ! [ LOCALS ]
+  integer (kind=c_int)             :: iIndex
+  type (STRING_LIST_T)             :: slString
+
+  this%current => this%first
+
+  do while ( associated(this%current ) )
+
+    iIndex = index(string=this%current%key, substring=trim(sKey) )
+
+    if ( iIndex > 0 )  call slString%append(this%current%key)
+
+    this%current => this%current%next
+
+  enddo
+
+  if ( slString%count == 0 ) then
+
+    in_use = FALSE
+
+  else
+
+    in_use = TRUE
+
+  endif
+
+end function key_name_already_in_use_fn
 
 !--------------------------------------------------------------------------------------------------
 
@@ -416,7 +455,7 @@ contains
         __SRCNAME__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
       iValues = iTINYVAL
 
@@ -450,9 +489,9 @@ contains
         __SRCNAME__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
-      lValues = lFALSE
+      lValues = FALSE
 
     endif
 
@@ -506,9 +545,9 @@ contains
         __SRCNAME__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
-      lValues = lFALSE
+      lValues = FALSE
 
     endif
 
@@ -550,7 +589,7 @@ contains
 
       call slString%append("<NA>")
       call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
     endif
 
@@ -607,7 +646,7 @@ contains
 
       call slString%append("<NA>")
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
     endif
 
@@ -662,7 +701,7 @@ contains
         __SRCNAME__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
       iValues = iTINYVAL
 
@@ -719,7 +758,7 @@ contains
         __SRCNAME__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
 
       fValues = fTINYVAL
@@ -754,7 +793,7 @@ contains
         __SRCNAME__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG , lEcho=lFALSE)
+        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG , lEcho=FALSE)
 
       fValues = fTINYVAL
 
@@ -787,7 +826,7 @@ contains
     if ( present( lEcho ) ) then
       lEcho_ = lEcho
     else
-      lEcho_ = lFALSE
+      lEcho_ = FALSE
     end if
 
     current => this%first

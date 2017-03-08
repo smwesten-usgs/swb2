@@ -39,6 +39,10 @@ contains
     real (kind=c_float), allocatable  :: temp_values(:)
     integer (kind=c_int)              :: indx
     integer (kind=c_int)              :: status
+    integer (kind=c_int)              :: count_gdd_start
+    integer (kind=c_int)              :: count_killing_frost_end
+    integer (kind=c_int)              :: count_grow_start
+    integer (kind=c_int)              :: count_grow_end
 
     !> Determine how many landuse codes are present
     sTemp = "LU_Code"
@@ -170,17 +174,25 @@ contains
 
     endif
 
+    count_gdd_start = count( GDD_FIRST_DAY_OF_GROWING_SEASON > 0 )
+    count_killing_frost_end = count( KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON > 0 )
+    count_grow_start = count( FIRST_DAY_OF_GROWING_SEASON > 0 )
+    count_grow_end = count( LAST_DAY_OF_GROWING_SEASON > 0 )
 
-    if (    all( KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON  == NODATA_VALUE ) &
-      .and. all( GDD_FIRST_DAY_OF_GROWING_SEASON  == NODATA_VALUE )               &
-      .and. all( FIRST_DAY_OF_GROWING_SEASON == NODATA_VALUE )                    &
-      .and. all( LAST_DAY_OF_GROWING_SEASON == NODATA_VALUE ) )                   &
-        call warn( sMessage="No entries found to assist in defining growing season " &
-          //"(e.g. 'Growing_season_start', 'Growing_season_end').",                  &
-          sHints="Make sure you have the first and last day of the growing season "  &
-          //"specified in one of your lookup tables.",                               &
-          sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
+    if ( count_gdd_start /= count_killing_frost_end )                                     &
+      call warn( sMessage="Unequal numbers of values given for defining the "             &
+        //"start (GDD_first_day_of_growing_season) and end (Killing_frost_temperature) "  &
+        //"of the growing season.", sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
 
+    if ( count_grow_start /= count_grow_end )                                             &
+      call warn( sMessage="Unequal numbers of values given for defining the "             &
+        //"start (Growing_season_start) and end (Growing season end) of the "             &
+        //"growing season.", sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
+
+    if ( count_gdd_start + count_grow_start /= ubound( iLanduseCodes, 1) )                &
+      call warn( sMessage="A pair of values must be given to define the "                 &
+        //"start and end of the growing season for each landuse present "                 &
+        //"in the lookup table.", sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
 
   end subroutine growing_season_initialize
 
@@ -222,7 +234,7 @@ contains
 
       endif
 
-    else
+    else    ! normal situation where FIRST day of growing season < LAST day of growing season
 
       if ( it_is_growing_season ) then
 
@@ -237,10 +249,13 @@ contains
       else  ! not growing season; should it be?
 
         if ( GDD_FIRST_DAY_OF_GROWING_SEASON( landuse_index ) > 0. ) then
-          if ( GDD >= GDD_FIRST_DAY_OF_GROWING_SEASON( landuse_index ) ) &
+
+          if ( GDD >= GDD_FIRST_DAY_OF_GROWING_SEASON( landuse_index ) )              &
                it_is_growing_season = TRUE
-        elseif (    SIM_DT%iDOY <= LAST_DAY_OF_GROWING_SEASON( landuse_index )          &
-            .and. SIM_DT%iDOY >= FIRST_DAY_OF_GROWING_SEASON( landuse_index )  )  then
+        else
+
+          if (    SIM_DT%iDOY <= LAST_DAY_OF_GROWING_SEASON( landuse_index )          &
+            .and. SIM_DT%iDOY >= FIRST_DAY_OF_GROWING_SEASON( landuse_index )  )      &
                it_is_growing_season = TRUE
 
         endif

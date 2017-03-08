@@ -13,6 +13,8 @@ module daily_calculation
   use mass_balance__snow, only               : calculate_snow_mass_balance
   use mass_balance__soil, only               : calculate_soil_mass_balance
 
+  use simulation_datetime, only       : SIM_DT
+
   use strings
   use logfiles
 

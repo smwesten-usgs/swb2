@@ -142,9 +142,21 @@ contains
           call assert(iStat == 0, "Failed to allocate memory for dictionary object", &
               __SRCNAME__, __LINE__ )
 
-          ! add dictionary entry to dictionary
-          call pDict%add_key( DF%slColNames%get(iColIndex) )
-          call PARAMS_DICT%add_entry( pDict )
+          if ( .not. PARAMS_DICT%key_already_in_use( DF%slColNames%get(iColIndex) ) ) then
+
+            ! add dictionary entry to dictionary
+            call pDict%add_key( DF%slColNames%get(iColIndex) )
+            call PARAMS_DICT%add_entry( pDict )
+
+          else
+
+            call warn( sMessage="Found a duplicate dictionary entry in file "        &
+              //squote( this%filenames%get(iFileIndex) )//"; column name: "          &
+              //squote( DF%slColNames%get(iColIndex) ),                              &
+              sHints="Eliminate the duplicate column of information and try again.", &
+              lFatal=TRUE )
+
+          endif
 
         enddo
 
