@@ -204,7 +204,6 @@ contains
         ! the following call updates bound variable actual_et_soil
         call cells%calc_actual_et( indx )
 
-
         if ( runoff < 0.)                                                                               &
           call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
                            //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &

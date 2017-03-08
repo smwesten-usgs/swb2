@@ -1,4 +1,5 @@
 set(SRCS
+      actual_et__fao56__two_stage.F90
       actual_et__fao56.F90
       actual_et__thornthwaite_mather.F90
       actual_et__thornthwaite_mather_eqns.F90
@@ -48,6 +49,7 @@ set(SRCS
       parameters.F90
       precipitation__method_of_fragments.F90
       proj4_support.F90
+      rooting_depth__FAO56.F90
       routing__D8.F90
       runoff__curve_number.F90
       runoff__gridded_values.F90
