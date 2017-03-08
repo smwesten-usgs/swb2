@@ -11,12 +11,12 @@ module mass_balance__impervious_surface
 contains
 
    elemental subroutine calculate_impervious_surface_mass_balance(      &
-                                          surface_storage,              & 
-                                          actual_et,                    &   
+                                          surface_storage,              &
+                                          actual_et,                    &
    	                                      surface_storage_excess,       &
    	                                      surface_storage_max,          &
                                           storm_drain_capture,          &
-                                          storm_drain_capture_fraction, &                                                                   
+                                          storm_drain_capture_fraction, &
    	                                      rainfall,                     &
    	                                      snowmelt,                     &
                                           runoff,                       &
@@ -32,7 +32,7 @@ contains
     real (kind=c_float), intent(in)         :: surface_storage_max
     real (kind=c_float), intent(in)         :: rainfall
     real (kind=c_float), intent(in)         :: snowmelt
-    real (kind=c_float), intent(in)         :: runoff    
+    real (kind=c_float), intent(in)         :: runoff
     real (kind=c_float), intent(in)         :: fog
     real (kind=c_float), intent(in)         :: interception
     real (kind=c_float), intent(in)         :: reference_et0
@@ -41,49 +41,59 @@ contains
     real (kind=c_float) :: difference
 
 
-    surface_storage = surface_storage               &
-                      + rainfall                    &
-                      + fog                         &
-                      + snowmelt                    &
-                      - interception                &
-                      - runoff
+    if ( storm_drain_capture_fraction >= 0.0_c_float ) then
 
-    ! first determine if surface inputs exceed storage capacity
-    if ( surface_storage > surface_storage_max ) then
- 
-      difference = surface_storage - surface_storage_max
-      storm_drain_capture = difference * storm_drain_capture_fraction
-      surface_storage_excess = difference - storm_drain_capture
+      surface_storage = surface_storage               &
+                        + rainfall                    &
+                        + fog                         &
+                        + snowmelt                    &
+                        - interception                &
+                        - runoff
 
-      surface_storage = surface_storage_max
+      ! first determine if surface inputs exceed storage capacity
+      if ( surface_storage > surface_storage_max ) then
 
-    elseif ( surface_storage < 0.0_c_float ) then
+        difference = surface_storage - surface_storage_max
+        storm_drain_capture = difference * storm_drain_capture_fraction
+        surface_storage_excess = difference - storm_drain_capture
 
+        surface_storage = surface_storage_max
+
+      elseif ( surface_storage < 0.0_c_float ) then
+
+        surface_storage = 0.0_c_float
+        surface_storage_excess = 0.0_c_float
+        storm_drain_capture = 0.0_c_float
+
+      else
+
+        surface_storage_excess = 0.0_c_float
+        storm_drain_capture = 0.0_c_float
+
+      endif
+
+      ! now allow for evaporation
+      if (surface_storage > reference_et0) then
+
+        actual_et = reference_et0
+        surface_storage = surface_storage - reference_et0
+
+      else
+
+        actual_et = surface_storage
+        surface_storage = 0.0
+
+      endif
+
+    else
+
+      ! no valid storm drain capture fraction; assume no impervious surface calcs desired
       surface_storage = 0.0_c_float
-      surface_storage_excess = 0.0_c_float
       storm_drain_capture = 0.0_c_float
-
-    else
-
       surface_storage_excess = 0.0_c_float
-      storm_drain_capture = 0.0_c_float
-
-    endif  
-
-    ! now allow for evaporation
-    if (surface_storage > reference_et0) then
-
-      actual_et = reference_et0
-      surface_storage = surface_storage - reference_et0
-
-    else
-
-      actual_et = surface_storage
-      surface_storage = 0.0
 
     endif
 
-    
-  end subroutine calculate_impervious_surface_mass_balance    
+  end subroutine calculate_impervious_surface_mass_balance
 
 end module mass_balance__impervious_surface

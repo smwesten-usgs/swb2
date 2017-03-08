@@ -1605,28 +1605,23 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)          :: this
     integer (kind=c_int), intent(in)               :: indx
 
-    ! [ LOCALS ]
-    real (kind=c_float)  :: inflow_
-
-    inflow_ = this%inflow( indx )
-
     !> @TODO: Should interception term be part of this? Initial abstraction should include
     !!        some of this interception...
 
-!    call update_previous_5_day_rainfall( inflow_, indx )
+!    call update_previous_5_day_rainfall( this%inflow( indx ), indx )
 
-    call runoff_curve_number_calculate(runoff=this%runoff( indx ),                              &
-                                       curve_num_adj=this%curve_num_adj( indx ),                &
-                                       landuse_index=this%landuse_index( indx ),                &
+    call runoff_curve_number_calculate(runoff=this%runoff( indx ),                               &
+                                       curve_num_adj=this%curve_num_adj( indx ),                 &
+                                       landuse_index=this%landuse_index( indx ),                 &
                                        cell_index=indx,                                          &
-                                       soil_group=this%soil_group( indx ),                      &
-                                       soil_storage_max=this%soil_storage_max( indx ),          &
-                                       inflow=this%inflow( indx ),                              &
-                                       it_is_growing_season=this%it_is_growing_season( indx ),  &
+                                       soil_group=this%soil_group( indx ),                       &
+                                       soil_storage_max=this%soil_storage_max( indx ),           &
+                                       it_is_growing_season=this%it_is_growing_season( indx ),   &
+                                       inflow=this%inflow( indx ),                               &
                                        continuous_frozen_ground_index=                           &
-                                       this%continuous_frozen_ground_index( indx ) )
+                                           this%continuous_frozen_ground_index( indx ) )
 
-    call update_previous_5_day_rainfall( inflow_, indx )
+    call update_previous_5_day_rainfall( this%inflow( indx ), indx )
 
   end subroutine model_calculate_runoff_curve_number
 

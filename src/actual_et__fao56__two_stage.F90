@@ -266,7 +266,7 @@ elemental function calculate_water_stress_coefficient_ks( taw, raw,             
 
   elseif ( deficit <  taw ) then
 
-    Ks = ( taw - deficit ) / ( taw - raw + 1.0e-8_c_float )
+    Ks = ( taw - deficit ) / ( taw - raw )
 
   else
 
