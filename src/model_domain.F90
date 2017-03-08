@@ -484,7 +484,7 @@ contains
     this%irrigation                          = 0.0_c_float
     this%curve_num_adj                       = 0.0_c_float
     this%runoff_outside                      = 0.0_c_float
-    this%pervious_fraction                   = 0.0_c_float
+    this%pervious_fraction                   = 1.0_c_float     ! note: default is 100% pervious area
     this%surface_storage                     = 0.0_c_float
     this%surface_storage_excess              = 0.0_c_float
     this%surface_storage_max                 = 0.0_c_float
@@ -888,7 +888,8 @@ contains
 
     elseif ( sCmdText .contains. "ROOTING" ) then
 
-      if ( ( Method_Name .strequal. "DYNAMIC" ) .or. ( Method_Name .strequal. "FAO56" ) ) then
+      if ( ( Method_Name .strequal. "DYNAMIC" ) .or. ( Method_Name .strequal. "FAO_56" )   &
+          .or. ( Method_Name .strequal. "FAO-56" ) )                                          then
 
         this%update_rooting_depth => model_update_rooting_depth_FAO56
         call LOGS%WRITE( "==> DYNAMIC rooting depth submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
@@ -1812,7 +1813,8 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: index
+    integer (kind=c_int)               :: index
+    real (kind=c_float), allocatable   :: deficit(:)
 
     if ( allocated( this%monthly_gross_precip ) .and. allocated( this%monthly_runoff ) ) then
 
@@ -1843,6 +1845,14 @@ contains
                                   crop_etc=this%crop_etc,                                        &
                                   irrigation_mask=this%irrigation_mask,                          &
                                   num_days_since_planting=this%number_of_days_since_planting )
+
+      print *, this%irrigation, "    irrigate > 0?  ", this%irrigation > 0.
+      print *, this%irrigation_mask
+      print *, this%soil_storage, this%soil_storage_max
+      deficit = 1.0 - this%soil_storage/this%soil_storage_max
+      print *, deficit, "  need to irrigate?  ", deficit > 0.5
+      print *, this%number_of_days_since_planting
+
     endif
 
   end subroutine model_calculate_irrigation

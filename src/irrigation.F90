@@ -237,7 +237,7 @@ contains
 
       NUM_DAYS_OF_IRRIGATION = 9999
 
-    endif  
+    endif
 
     !> retrieve application option (i.e. to field capacity, to defined deficit amount, as constant amount)
     call sl_temp_list%clear()
@@ -396,6 +396,10 @@ contains
     IRRIGATION_FROM_GROUNDWATER(:)    = 0.0_c_float
     IRRIGATION_FROM_SURFACE_WATER(:)  = 0.0_c_float
 
+    print *, "**** IRRIGATION INITIALIZATION ****"
+    print *, "MAD:     ", MAXIMUM_ALLOWABLE_DEPLETION_FRACTION
+    print *, "Method:  ", APPLICATION_METHOD_CODE
+
   end subroutine irrigation__initialize
 
 !--------------------------------------------------------------------------------------------------
@@ -483,7 +487,7 @@ contains
 
       irrigation_amount = 0.0_c_float
 
-      if ( MONTHLY_IRRIGATION_SCHEDULE( landuse_index, day ) == 0 ) exit
+      !if ( MONTHLY_IRRIGATION_SCHEDULE( landuse_index, day ) == 0 ) exit
 
       if ( ( day_of_year < FIRST_DAY_OF_IRRIGATION( landuse_index ) ) &
         .or. ( day_of_year > LAST_DAY_OF_IRRIGATION( landuse_index ) ) )  exit
