@@ -1846,13 +1846,6 @@ contains
                                   irrigation_mask=this%irrigation_mask,                          &
                                   num_days_since_planting=this%number_of_days_since_planting )
 
-      print *, this%irrigation, "    irrigate > 0?  ", this%irrigation > 0.
-      print *, this%irrigation_mask
-      print *, this%soil_storage, this%soil_storage_max
-      deficit = 1.0 - this%soil_storage/this%soil_storage_max
-      print *, deficit, "  need to irrigate?  ", deficit > 0.5
-      print *, this%number_of_days_since_planting
-
     endif
 
   end subroutine model_calculate_irrigation

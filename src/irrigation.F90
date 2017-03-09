@@ -396,10 +396,6 @@ contains
     IRRIGATION_FROM_GROUNDWATER(:)    = 0.0_c_float
     IRRIGATION_FROM_SURFACE_WATER(:)  = 0.0_c_float
 
-    print *, "**** IRRIGATION INITIALIZATION ****"
-    print *, "MAD:     ", MAXIMUM_ALLOWABLE_DEPLETION_FRACTION
-    print *, "Method:  ", APPLICATION_METHOD_CODE
-
   end subroutine irrigation__initialize
 
 !--------------------------------------------------------------------------------------------------
