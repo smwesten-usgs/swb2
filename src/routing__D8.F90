@@ -183,8 +183,8 @@ contains
           //asCharacter( Rownum )
 
         if ( Target_index > 0 ) &
-          write(sBuf,*) trim(sBuf)//TAB//asCharacter( Colnum )//TAB &
-          //asCharacter( Rownum )//TAB//asCharacter( D8_flowdir )//TAB &
+          write(sBuf,*) trim(sBuf)//TAB//asCharacter( Target_col )//TAB &
+          //asCharacter( Target_row )//TAB//asCharacter( D8_flowdir )//TAB &
           //asCharacter( Num_adjacent )//TAB//asCharacter( Sum_upslope )
 
         write(iUnitNum,*)  trim(sBuf)
