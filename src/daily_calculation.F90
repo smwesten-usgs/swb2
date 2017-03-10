@@ -142,7 +142,7 @@ contains
           call LOGS%write("    landuse_code: "//asCharacter( cells%landuse_code( indx ) ) )
         endif
 
-        call cells%calc_runoff( indx )
+        call cells%calc_runoff( jndx )
 
         call calculate_impervious_surface_mass_balance(                                         &
           surface_storage=surface_storage,                                                      &

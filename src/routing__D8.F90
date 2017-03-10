@@ -150,6 +150,13 @@ contains
       enddo
     enddo
 
+    ! pTempGrid%iData = COL2D
+    ! call grid_WriteArcGrid("COL2D_Grid.asc", pTempGrid)
+    !
+    ! pTempGrid%iData = ROW2D
+    ! call grid_WriteArcGrid("ROW2D_Grid.asc", pTempGrid)
+
+    ! create 1D vectors of column and row numbers for full grid
     COL1D = pack( COL2D, lActive )
     ROW1D = pack( ROW2D, lActive )
 
@@ -157,10 +164,12 @@ contains
 
     open( newunit=iUnitNum, file="D8_routing_table.txt", iostat=iStat, status="REPLACE")
 
-    write(iUnitNum,*) "ORDER_INDEX"//TAB//"TARGET_INDEX"//TAB//"From_COL"//TAB//"From_ROW" &
+    write(iUnitNum,*) "INDEX"//TAB//"ORDER_INDEX"//TAB//"TARGET_INDEX"//TAB//"From_COL"//TAB//"From_ROW" &
       //TAB//"To_COL"//TAB//"To_ROW"//TAB//"D8_flowdir"//TAB//"Num_Adjacent_Upslope_Connections"//TAB &
       //"Sum_of_Upslope_Contributing_Cells"
 
+     ! solution order has been determined; remaining code simply writes a summary to a
+     ! file for further analysis
     do iIndex = 1, ubound(COL1D,1)
 
       sBuf = ""
@@ -178,7 +187,7 @@ contains
                  Sum_upslope => iSumOfUpslopeCells( COL1D( ORDER_INDEX( iIndex ) ),           &
                                      ROW1D( ORDER_INDEX( iIndex ) ) )  )
 
-        write(sBuf,*)  Order_index,TAB, Target_index
+        write(sBuf,*)  iIndex, TAB, Order_index, TAB, Target_index
         write(sBuf,*) trim(sBuf)//TAB//asCharacter( Colnum )//TAB &
           //asCharacter( Rownum )
 
@@ -214,6 +223,7 @@ contains
     iIndex = -999
     lFound = lFALSE
 
+    ! iterate over 1D vector of column numbers
     do iOrderIndex = lbound(COL1D,1), ubound(COL1D,1)
 
       if( COL1D( iOrderIndex ) == iCol  .and.  ROW1D( iOrderIndex ) == iRow ) then
@@ -330,7 +340,7 @@ contains
     logical (kind=c_bool) :: lAnyUnmarkedUpslopeCells
     logical (kind=c_bool) :: lCircular
     integer (kind=c_int)  :: iNumberRemaining
-    integer (kind=c_int)  :: iIndex, k, iCount
+    integer (kind=c_int)  :: iStorageIndex, k, iCount
     integer (kind=c_int)  :: iDelta
     integer (kind=c_int)  :: iPasses
     integer (kind=c_int)  :: iPassesWithoutChange
@@ -345,7 +355,7 @@ contains
     lDownhillMarked = lFALSE
     iSumOfUpslopeCells = 0_c_int
 
-    iIndex = 0
+    iStorageIndex = 0
     iPasses = 0
     iPassesWithoutChange = 0
 
@@ -424,14 +434,14 @@ main_loop: do
 	                iSumOfUpslopeCells( iColnum, iRownum ) = iUpslopeSum
 	                iNumberOfUpslopeConnections( iColnum, iRownum ) = iUpslopeConnections
 	                lDownhillMarked( iColnum, iRownum ) = lTRUE
-                  iIndex = iIndex + 1
-                  COLUMN_INDEX( iIndex ) = iColnum
-                  ROW_INDEX( iIndex ) = iRownum
-                  ORDER_INDEX( iIndex ) = routing_D8_get_index( iColnum, iRownum )
-                  TARGET_INDEX( iIndex ) = routing_D8_get_index( iTargetCol( iColNum, iRowNum ), &
+                  iStorageIndex = iStorageIndex + 1
+                  COLUMN_INDEX( iStorageIndex ) = iColnum
+                  ROW_INDEX( iStorageIndex ) = iRownum
+                  ORDER_INDEX( iStorageIndex ) = routing_D8_get_index( iColnum, iRownum )
+                  TARGET_INDEX( iStorageIndex ) = routing_D8_get_index( iTargetCol( iColNum, iRowNum ), &
                     iTargetRow( iColNum, iRowNum ) )
 
-                  if ( lCircular )  TARGET_INDEX( iIndex ) = D8_UNDETERMINED
+                  if ( lCircular )  TARGET_INDEX( iStorageIndex ) = D8_UNDETERMINED
 
                 elseif ( iPassesWithoutChange > 10 ) then
 
@@ -439,12 +449,12 @@ main_loop: do
                   iSumOfUpslopeCells( iColnum, iRownum ) = iUpslopeSum
                   iNumberOfUpslopeConnections( iColnum, iRownum ) = iUpslopeConnections
                   lDownhillMarked( iColnum, iRownum ) = lTRUE
-                  iIndex = iIndex + 1
-                  COLUMN_INDEX( iIndex ) = iColnum
-                  ROW_INDEX( iIndex ) = iRownum
-                  ORDER_INDEX( iIndex ) = routing_D8_get_index( iColnum, iRownum )
+                  iStorageIndex = iStorageIndex + 1
+                  COLUMN_INDEX( iStorageIndex ) = iColnum
+                  ROW_INDEX( iStorageIndex ) = iRownum
+                  ORDER_INDEX( iStorageIndex ) = routing_D8_get_index( iColnum, iRownum )
 
-                  TARGET_INDEX( iIndex ) = D8_UNDETERMINED
+                  TARGET_INDEX( iStorageIndex ) = D8_UNDETERMINED
 
                 endif
 
@@ -507,25 +517,17 @@ main_loop: do
 
   !------------------------------------------------------------------------------------------------
 
-!   subroutine calculate_routing_D8( indx )
-
-!     this%runon=0.0_c_float
-
-!     do index=lbound( ORDER_INDEX, 1 ), ubound( ORDER_INDEX, 1 )
-
-!       call this%calc_runoff( index )
-
-!       if ( (    TARGET_INDEX( index ) >= lbound( ORDER_INDEX, 1) ) &
-!         .and. ( TARGET_INDEX( index ) <= ubound( ORDER_INDEX, 1) ) ) then
-
-!         this%runon( TARGET_INDEX( index ) ) = this%runoff( ORDER_INDEX( index ) )
-
-!       endif
-
-!     enddo
-
-!   end subroutine calculate_routing_D8
-
-
+  ! subroutine calculate_routing_D8( indx )
+  !
+  !     if ( (    TARGET_INDEX( indx ) >= lbound( ORDER_INDEX, 1) ) &
+  !       .and. ( TARGET_INDEX( indx ) <= ubound( ORDER_INDEX, 1) ) ) then
+  !
+  !       this%runon( TARGET_INDEX( index ) ) = this%runoff( ORDER_INDEX( index ) )
+  !
+  !     endif
+  !
+  !   enddo
+  !
+  ! end subroutine calculate_routing_D8
 
 end module routing__D8

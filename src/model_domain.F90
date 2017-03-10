@@ -1370,6 +1370,8 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+! indx values should be fed in ordered according to ORDER_INDEX()
+
   subroutine model_calculate_routing_D8( this, indx )
 
     use routing__D8, only   : TARGET_INDEX
@@ -1380,12 +1382,16 @@ contains
     if ( (    TARGET_INDEX( indx ) >= lbound( this%runon, 1) )               &
       .and. ( TARGET_INDEX( indx ) <= ubound( this%runon, 1) ) ) then
 
-      this%runon( TARGET_INDEX( indx ) ) = this%runoff( indx ) + this%rejected_potential_recharge( indx )
+        this%runon( TARGET_INDEX( indx ) ) = this%runoff( this%order_index( indx ) )             &
+                                + this%rejected_potential_recharge( this%order_index( indx ) )
+
+    else
+
+      this%runoff_outside( this%order_index( indx ) ) = this%runoff( this%order_index( indx ) )  &
+              + this%rejected_potential_recharge( this%order_index( indx ) )
+      this%runon( TARGET_INDEX( indx ) ) = 0.0_c_float
 
     endif
-
-    !> @TODO: what about cases where target is outside of grid?
-    !!        what about flow pointing to open water feature?
 
   end subroutine model_calculate_routing_D8
 

@@ -98,7 +98,7 @@ elemental function calculate_evaporation_reduction_coefficient_Kr( landuse_index
     if ( deficit < REW ) then
       Kr = 1._c_float
     elseif ( deficit < TEW ) then
-      Kr = ( TEW - deficit ) / ( TEW - REW + 1.0E+8)
+      Kr = ( TEW - deficit ) / ( TEW - REW + 1.0E-8)
     else
       Kr = 0._c_float
     endif
