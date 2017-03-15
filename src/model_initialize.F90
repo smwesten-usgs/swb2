@@ -39,7 +39,7 @@ module model_initialize
   end type METHODS_LIST_T
 
   integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 40
-  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 15
+  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 16
 
   type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS( NUMBER_OF_KNOWN_GRIDS ) =       &
 
@@ -96,6 +96,7 @@ module model_initialize
       METHODS_LIST_T("SOIL_MOISTURE          ", lFALSE),                            &
       METHODS_LIST_T("IRRIGATION             ", lTRUE),                             &
       METHODS_LIST_T("CROP_COEFFICIENT       ", lTRUE),                             &
+      METHODS_LIST_T("GROWING_DEGREE_DAY     ", lTRUE),                             &
       METHODS_LIST_T("DIRECT_RECHARGE        ", lTRUE),                             &
       METHODS_LIST_T("DIRECT_SOIL_MOISTURE   ", lTRUE),                             &
       METHODS_LIST_T("FLOW_ROUTING           ", lTRUE),                             &

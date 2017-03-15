@@ -160,7 +160,7 @@ module model_domain
     procedure ( array_method ), pointer  :: init_direct_soil_moisture                                        &
                                                 => model_initialize_direct_soil_moisture_none
     procedure ( array_method ), pointer  :: init_GDD                                                         &
-                                                => model_initialize_GDD_none
+                                                => model_initialize_GDD
     procedure ( array_method ), pointer  :: init_AWC                                                         &
                                                 => model_initialize_available_water_content_gridded
     procedure ( array_method ), pointer  :: init_crop_coefficient                                            &
@@ -842,11 +842,6 @@ contains
         this%init_interception => model_initialize_interception_bucket
         this%calc_interception => model_calculate_interception_bucket
 
-        ! when the "bucket" model is used, it requires some means of determining
-        ! "growing" vs. "non-growing" season
-        this%init_GDD => model_initialize_GDD
-        this%calc_GDD => model_calculate_GDD
-
         call LOGS%WRITE( "==> BUCKET INTERCEPTION submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( Method_Name .strequal. "GASH" ) then
@@ -1011,6 +1006,26 @@ contains
 
       endif
 
+    elseif ( sCmdText .contains. "GROWING_DEGREE_DAY" ) then
+
+      if ( ( Method_Name .strequal. "BASKERVILLE_EMIN" )       &
+             .or. ( Method_Name .strequal. "BE" )              &
+             .or. ( Method_Name .strequal. "SINUSOIDAL" )  )        then
+
+        this%init_GDD => model_initialize_GDD_be
+        this%calc_GDD => model_calculate_GDD_be
+        call LOGS%WRITE( "==> Growing degree-day (GDD) will be calculated as described "  &
+          //"in Baskerville and Emin (1969)", iLogLevel = LOG_ALL, lEcho = lFALSE )
+
+      else
+
+        this%init_GDD => model_initialize_GDD
+        this%calc_GDD => model_calculate_GDD
+        call LOGS%WRITE( "==> Growing degree-day (GDD) will be calculated using "  &
+          //"simple averaging of TMAX and TMIN.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+
+      endif
+
     elseif ( sCmdText .contains. "IRRIGATION" ) then
 
       if ( ( Method_Name .strequal. "FAO56" )                   &
@@ -1019,11 +1034,6 @@ contains
 
         this%init_irrigation => model_initialize_irrigation
         this%calc_irrigation => model_calculate_irrigation
-
-        ! when irrigation is invoked, we need to track GDD as a possible means
-        ! by which to update and model the seasonal change in crop coefficient (Kcb)
-        this%init_GDD => model_initialize_GDD
-        this%calc_GDD => model_calculate_GDD
 
         call LOGS%WRITE( "==> IRRIGATION will be calculated and applied as needed.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
@@ -1970,8 +1980,6 @@ contains
 
   subroutine model_initialize_GDD_none( this )
 
-    use growing_degree_day
-
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     !> Nothing here to see.
 
@@ -2020,6 +2028,43 @@ contains
                                        order=this%order_index )
 
   end subroutine model_calculate_GDD
+
+  !--------------------------------------------------------------------------------------------------
+
+    subroutine model_initialize_GDD_be( this )
+
+      use growing_degree_day_baskerville_emin, only : growing_degree_day_be_initialize
+
+      class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+      ! [ LOCALS ]
+      integer (kind=c_int)  :: status
+
+      allocate( this%gdd( count( this%active ) ), stat=status )
+      call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
+
+      this%gdd = 0.0_c_float
+
+      call growing_degree_day_be_initialize( is_cell_active=this%active,                           &
+                                             landuse_index=this%landuse_index )
+
+    end subroutine model_initialize_GDD_be
+
+  !--------------------------------------------------------------------------------------------------
+
+    subroutine model_calculate_GDD_be( this )
+
+      use growing_degree_day_baskerville_emin, only    : growing_degree_day_be_calculate
+
+      class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+      call growing_degree_day_be_calculate( gdd=this%gdd,                                          &
+                                                 tmean=this%tmean,                                      &
+                                                 tmin=this%tmin,                                        &
+                                                 tmax=this%tmax,                                        &
+                                                 order=this%order_index )
+
+    end subroutine model_calculate_GDD_be
 
 !--------------------------------------------------------------------------------------------------
 

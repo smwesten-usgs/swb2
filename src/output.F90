@@ -11,7 +11,9 @@ module output
   private
 
   public :: initialize_output, set_output_directory, write_output, set_output_prefix, &
-            set_output_latlon_option
+            set_output_latlon_option, RECHARGE_ARRAY
+
+  real( kind=c_double ), allocatable      :: RECHARGE_ARRAY(:)
 
   type, public :: NETCDF_FILE_COLLECTION_T
     type (T_NETCDF4_FILE), pointer, public :: ncfile
@@ -159,6 +161,8 @@ contains
     endif
 
     cells%nodata_fill_value = NC_FILL_FLOAT
+
+    allocate( RECHARGE_ARRAY( size( cells%potential_recharge, 1 ) ) )
 
   end subroutine initialize_output
 
@@ -384,6 +388,8 @@ contains
             lMask=cells%active,                                                                     &
             rValues=cells%crop_etc,                                                                 &
             rField=cells%nodata_fill_value )
+
+    RECHARGE_ARRAY = RECHARGE_ARRAY + cells%potential_recharge
 
   end subroutine write_output
 

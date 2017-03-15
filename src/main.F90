@@ -49,10 +49,10 @@ program main
 
   iCount = max( len_trim( sVersionString ), len_trim( sGitHashString ) )
 
-  write(unit=*, fmt="(/,a)") repeat("-",iCount + 2)  
+  write(unit=*, fmt="(/,a)") repeat("-",iCount + 2)
   write(UNIT=*,FMT="(a)") trim( sVersionString )
-  write(UNIT=*,FMT="(a)") trim( sGitHashString )  
-  write(unit=*, fmt="(a,/)") repeat("-",iCount + 2)  
+  write(UNIT=*,FMT="(a)") trim( sGitHashString )
+  write(unit=*, fmt="(a,/)") repeat("-",iCount + 2)
 
   if(iNumArgs == 0 ) then
 
@@ -76,9 +76,10 @@ program main
       //TRIM(int2char(__G95_MINOR__))
 #endif
 
-    write(UNIT=*,FMT="(/,/,a,/,a,/,a,/)")  "Usage: swb2 [control file name] [--output_prefix=][--output_dir=][--data_dir=]", &
-                                           "                                ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~", &
-                                           "                                                   (optional)"
+    write(UNIT=*,FMT="(/,a,/,/,5(a,/))")  "Usage: swb2 control_file_name ",                       &
+             "[ --output_prefix= ]  :: text to use as a prefix for output filenames",               &
+             "[ --output_dir= ]     :: directory to place output in (may be relative or absolute)", &
+             "[ --data_dir= ]       :: directory to search for input grids or lookup tables"
     stop
 
   end if
@@ -92,7 +93,7 @@ program main
       sOutputDirectoryName = trim( sBuf(14:) )
       iLen = len_trim( sOutputDirectoryName )
 
-      ! if there is no trailing "/", append one so we can form (more) fully 
+      ! if there is no trailing "/", append one so we can form (more) fully
       ! qualified filenames later
       if ( .not. sOutputDirectoryName(iLen:iLen) .eq. "/" )  &
         sOutputDirectoryName = trim(sOutputDirectoryName)//"/"
@@ -109,7 +110,7 @@ program main
       sDataDirectoryName = sBuf(12:)
       iLen = len_trim( sDataDirectoryName )
 
-      ! if there is no trailing "/", append one so we can form (more) fully 
+      ! if there is no trailing "/", append one so we can form (more) fully
       ! qualified filenames later
       if ( .not. sDataDirectoryName(iLen:iLen) .eq. "/" )  &
         sDataDirectoryName = trim(sDataDirectoryName)//"/"
@@ -121,8 +122,8 @@ program main
 
     endif
 
-  enddo 
- 
+  enddo
+
   ! open and initialize logfiles
   call LOGS%initialize( iLogLevel = LOG_DEBUG )
   call LOGS%write( sMessage='Base data directory name set to: "'//trim( sDataDirectoryName )//'"', &
@@ -135,14 +136,14 @@ program main
     ! read control file
     call read_control_file( slControlFiles%get( iIndex ) )
 
-  enddo  
+  enddo
 
   call slControlFiles%clear()
 
   call initialize_all( sOutputPrefixName, sOutputDirectoryName, sDataDirectoryName )
 
   call iterate_over_simulation_days( MODEL )
-   
+
   call LOGS%close()
 
 end program main

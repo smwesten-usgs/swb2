@@ -26,6 +26,7 @@ set(SRCS
       get_libc_error_number.c
       grid.F90
       growing_degree_day.F90
+      growing_degree_day_baskerville_emin.F90
       growing_season.F90
       interception__bucket.F90
       interception__gash.F90
