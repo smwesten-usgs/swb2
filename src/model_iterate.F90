@@ -1,14 +1,15 @@
 module model_iterate
 
   use iso_c_binding, only             : c_bool, c_float, c_int
-  use constants_and_conversions, only : lTRUE
+  use constants_and_conversions, only : lTRUE, BNDS
   use daily_calculation, only         : perform_daily_calculation
   use file_operations, only           : ASCII_FILE_T
   use logfiles, only                  : LOGS, LOG_ALL
   use model_domain, only              : MODEL_DOMAIN_T
   use simulation_datetime, only       : SIM_DT
-  use output, only                    : write_output
+  use output, only                    : write_output, RECHARGE_ARRAY
   use polygon_summarize, only         : perform_polygon_summarize
+  use grid
   implicit none
 
   private
@@ -21,6 +22,8 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: cells
 
+    type (GENERAL_GRID_T), pointer  :: pTempGrid
+
     do while ( SIM_DT%curr <= SIM_DT%end )
 
       call LOGS%write("Calculating: "//SIM_DT%curr%prettydate(), iLogLevel=LOG_ALL, lEcho=.true._c_bool )
@@ -29,12 +32,20 @@ contains
       call perform_daily_calculation( cells )
       call write_output( cells )
 !      call perform_polygon_summarize( cells )
-      
+
       call cells%dump_variables( )
 
       call SIM_DT%addDay( )
 
-    enddo 
+    enddo
+
+    pTempGrid=>grid_Create( BNDS%iNumCols, BNDS%iNumRows, BNDS%fX_ll, BNDS%fY_ll, &
+      BNDS%fX_ur, BNDS%fY_ur, GRID_DATATYPE_REAL )
+
+    pTempGrid%rData = unpack( real( RECHARGE_ARRAY, kind=c_float), cells%active, cells%nodata_fill_value )
+
+    call grid_WriteArcGrid("SUM_of_RECHARGE.asc", pTempGrid)
+
 
   end subroutine iterate_over_simulation_days
 

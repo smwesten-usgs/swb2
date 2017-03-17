@@ -2,7 +2,7 @@
 
 The SWB code uses a modified Thornthwaite-Mather soil-moisture accounting method [@thornthwaite_instructions_1957] to calculate recharge; recharge is calculated separately for each grid cell in the model domain. Sources and sinks of water within each grid cell are determined on the basis of input climate data and landscape characteristics; recharge is calculated as the difference between the change in soil moisture and these sources and sinks.
 
-![Conceptual_diagram_SWB_simplified.png](../images/Conceptual_diagram_SWB_simplified.png){#fig:swb_simple_conceptual}
+![Conceptual_diagram_SWB_simplified.png](../images/Conceptual_diagram_SWB_simplified.png){width=5in #fig:swb_simple_conceptual}
 
 The water balance components used to calculate potential recharge amounts are shown schematically in [@fig:swb_simple_conceptual].
 
@@ -35,3 +35,5 @@ The calculation proceeds as follows:
 In some cases it might be useful to simulate recharge in urban areas in a more detailed manner. This option is triggered in SWB 2.0 when a percent or fraction impervious area grid is supplied to the code ([@fig:swb_conceptual]). When this option is active, an additional storage reservoir is created: "impervious surface storage". In addition, it is possible to take storm drains into account by supplying the fraction of impervious surface storage that is intercepted by storm drains.
 
 ![Conceptual_diagram_SWB.png](../images/Conceptual_diagram_SWB.png){width=5in #fig:swb_conceptual}
+
+Implementation details regarding the storage reservoirs and process options are discussed in the next section.

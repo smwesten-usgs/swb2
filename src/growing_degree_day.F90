@@ -18,10 +18,10 @@ module growing_degree_day
   public :: growing_degree_day_calculate, growing_degree_day_initialize
 
   real (kind=c_float), allocatable  :: GDD_BASE(:)
-  real (kind=c_float), allocatable  :: GDD_MAX(:) 
+  real (kind=c_float), allocatable  :: GDD_MAX(:)
   integer (kind=c_int), allocatable :: GDD_RESET_DATE(:)
   type (T_NETCDF4_FILE), pointer    :: pNCFILE
- 
+
 contains
 
   subroutine growing_degree_day_initialize( is_cell_active, landuse_index )
@@ -48,7 +48,7 @@ contains
 
     !> create string list that allows for alternate heading identifiers for the landuse code
     call parameter_list%append("LU_Code")
-    call parameter_list%append("Landuse_Code") 
+    call parameter_list%append("Landuse_Code")
     call parameter_list%append("Landuse_Lookup_Code")
 
     !> Determine how many landuse codes are present
@@ -74,58 +74,61 @@ contains
     call parameter_list%append("GDD_Reset_Date")
     call parameter_list%append("GDD_Reset")
 
-    call PARAMS%get_parameters( slKeys=parameter_list, slValues=gdd_reset_val_list ) 
+    call PARAMS%get_parameters( slKeys=parameter_list, slValues=gdd_reset_val_list )
     call parameter_list%clear()
 
     allocate( GDD_RESET_DATE( count( is_cell_active ) ), stat=status )
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
-    if ( gdd_reset_val_list%count == number_of_landuse_codes ) then
+    if ( gdd_reset_val_list%count == number_of_landuse_codes      &
+         .and. gdd_reset_val_list%countmatching("<NA>") == 0 ) then
 
       ! retrieve gdd reset values; convert mm/dd to DOY
       do indx=1, gdd_reset_val_list%count
         sBuf = gdd_reset_val_list%get( indx )
 
         where ( landuse_index == indx )
-          GDD_RESET_DATE = mmdd2doy( sBuf )
+          GDD_RESET_DATE = mmdd2doy( sBuf, "GDD_RESET_DATE" )
         end where
-          
-      enddo 
-      
+
+      enddo
+
     else
-    
+
       ! if no GDD_RESET_DATE found in parameter tables, assign the default: reset GDD at end of calendar year
-      GDD_RESET_DATE = 365_c_int  
+      GDD_RESET_DATE = 365_c_int
 
-    endif   
+    endif
 
-    
-    if ( ubound( gdd_max_, 1 ) == number_of_landuse_codes ) then
+
+    if ( ubound( gdd_max_, 1 ) == number_of_landuse_codes        &
+        .and. gdd_max_(1) > rTINYVAL ) then
 
       do indx=1, ubound( landuse_index, 1)
         GDD_MAX( indx ) = gdd_max_( landuse_index( indx ) )
-      enddo 
-      
+      enddo
+
     else
-    
+
       ! if no GDD_MAX found in parameter tables, assign the default FAO-56 value
-      GDD_MAX = 86.0_c_float  
+      GDD_MAX = 86.0_c_float
 
-    endif   
+    endif
 
 
-    if ( ubound( gdd_base_, 1 ) == number_of_landuse_codes ) then
+    if ( ubound( gdd_base_, 1 ) == number_of_landuse_codes        &
+        .and. gdd_base_(1) > rTINYVAL  ) then
 
       do indx=1, ubound( landuse_index, 1)
         GDD_BASE( indx ) = gdd_base_( landuse_index( indx ) )
-      enddo 
-      
-    else
-    
-      ! if no GDD_Base found in parameter tables, assign the default FAO-56 value
-      GDD_BASE = 50.0_c_float  
+      enddo
 
-    endif   
+    else
+
+      ! if no GDD_Base found in parameter tables, assign the default FAO-56 value
+      GDD_BASE = 50.0_c_float
+
+    endif
 
   end subroutine growing_degree_day_initialize
 
@@ -153,7 +156,7 @@ contains
 
     end associate
 
-  end subroutine growing_degree_day_calculate 
+  end subroutine growing_degree_day_calculate
 
 !--------------------------------------------------------------------------------------------------
 

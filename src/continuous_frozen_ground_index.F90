@@ -17,8 +17,8 @@ module continuous_frozen_ground_index
   !> @TODO: make these into user-accessible variables
   real (kind=c_float)               :: CFGI_LL = 55.
   real (kind=c_float)               :: CFGI_UL = 83.
-  
-contains  
+
+contains
 
   subroutine initialize_continuous_frozen_ground_index( cfgi, active_cells )
 
@@ -32,16 +32,22 @@ contains
     pINITIAL_CFGI => DAT%find("INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX")
 
     if ( .not. associated( pINITIAL_CFGI ) ) then
+      pINITIAL_CFGI => DAT%find("INITIAL_FROZEN_GROUND_INDEX")
+
+      if ( .not. associated( pINITIAL_CFGI ) ) then
+
         call warn(sMessage="An INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX grid (or constant) was not found.",    &
         sHints="Check your control file to see that a valid INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX grid or"  &
           //" constant is specified.", lFatal=lFALSE )
-  
-      cfgi = 0.0_c_float
 
-    else    
+        cfgi = 0.0_c_float
+
+      endif  
+
+    else
 
       call pINITIAL_CFGI%getvalues()
- 
+
       ! map the 2D array of INITIAL_CFGI values to the vector of active cells
       cfgi = pack( pINITIAL_CFGI%pGrdBase%rData, active_cells )
 
@@ -49,23 +55,23 @@ contains
         .or. maxval( cfgi ) > 300.0_c_float )  &
        call warn(sMessage="One or more initial continuous frozen ground values outside of " &
          //"valid range (0 to 300)", lFatal=lTRUE )
-    
+
     endif
 
   end subroutine initialize_continuous_frozen_ground_index
-  
-!--------------------------------------------------------------------------------------------------     
+
+!--------------------------------------------------------------------------------------------------
 
   !> Update the continuous frozen ground index (CFGI) for a cell.
   !!
-  !! Computes the continuous frozen ground index 
+  !! Computes the continuous frozen ground index
   !! @param[inout] rCFGI   Continuous frozen ground index to be updated.
   !! @param[in]    rTAvg_F Mean daily air temperature, in \degF
   !!
   !! @note Implemented as per Molnau and Bissel (1983).
   !!
-  !! @note Molnau, M. and Bissell, V.C., 1983, A continuous frozen ground index for 
-  !! flood forecasting: In Proceedings 51st Annual Meeting Western Snow Conference, 
+  !! @note Molnau, M. and Bissell, V.C., 1983, A continuous frozen ground index for
+  !! flood forecasting: In Proceedings 51st Annual Meeting Western Snow Conference,
   !! 109–119, Canadian Water Resources Assoc. Cambridge, Ont.
   elemental subroutine update_continuous_frozen_ground_index( fCFGI, fTMax_F, fTMin_F, fSnowCover )
 
@@ -78,7 +84,7 @@ contains
     ! [ LOCALS ]
     real (kind=c_float), parameter    :: fDecay_Coefficient_A                      = 0.97_c_float
     real (kind=c_float), parameter    :: fSnow_Reduction_Coefficient_Freezing      = 0.08_c_float
-    real (kind=c_float), parameter    :: fSnow_Reduction_Coefficient_Thawing       = 0.5_c_float     
+    real (kind=c_float), parameter    :: fSnow_Reduction_Coefficient_Thawing       = 0.5_c_float
     real (kind=c_float), parameter    :: fCM_PER_INCH                              = 2.54_c_float
     real (kind=c_float), parameter    :: FREEZING_POINT_DEG_C                      = 0.0_c_float
 
@@ -102,12 +108,12 @@ contains
         CFGI = max( A * CFGI - Tavg * exp ( -0.4_c_float * K_thaw * fSnowDepthCM ), 0.0_c_float )
 
       else ! temperature is below freezing
-        
+
         CFGI = max( A * CFGI - Tavg * exp ( -0.4_c_float * K_freeze * fSnowDepthCM ), 0.0_c_float )
 
       end if
 
-    end associate  
+    end associate
 
   end subroutine update_continuous_frozen_ground_index
 

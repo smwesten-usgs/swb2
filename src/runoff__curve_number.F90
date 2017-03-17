@@ -1,7 +1,7 @@
 module runoff__curve_number
 
   use iso_c_binding, only                    : c_int, c_float, c_double, c_bool
-  use constants_and_conversions, only        : FALSE, TRUE 
+  use constants_and_conversions, only        : FALSE, TRUE
   use continuous_frozen_ground_index, only   : CFGI_LL, CFGI_UL
   use datetime
   use exceptions
@@ -39,9 +39,9 @@ module runoff__curve_number
 contains
 
   subroutine runoff_curve_number_initialize( cell_is_active )
- 
+
     logical (kind=c_bool), intent(in)   :: cell_is_active(:,:)
-    
+
 
     ! [ LOCALS ]
     integer (kind=c_int)              :: iNumberOfLanduses
@@ -87,7 +87,7 @@ contains
       sText = "CN_"//asCharacter(iSoilsIndex)
       call PARAMS%get_parameters( sKey=sText, fValues=CN )
       CN_ARCII(:, iSoilsIndex) = CN
-    enddo  
+    enddo
 
     allocate( PREV_5_DAYS_RAIN( count(cell_is_active), 6 ), stat=iStat )
     call assert( iStat == 0, "Failed to allocate memory for curve number PREV_5_DAYS_RAIN table", &
@@ -95,7 +95,7 @@ contains
 
     PREV_5_DAYS_RAIN = 0.0_c_float
 
-    ! DAYCOUNT will vary from 1 to 5 and serve as the second index value for 
+    ! DAYCOUNT will vary from 1 to 5 and serve as the second index value for
     ! PREV_5_DAYS_RAIN
     DAYCOUNT = 0
 
@@ -104,7 +104,7 @@ contains
     CN_ARCIII = CN_II_to_CN_III( CN_ARCII )
 
     call DATE_LAST_UPDATED%parsedate("01/01/1000")
-    
+
   end subroutine runoff_curve_number_initialize
 
 !--------------------------------------------------------------------------------------------------
@@ -121,7 +121,7 @@ contains
       iLanduseIndex = iLanduseIndex + 1
 
       if (iLanduseCode == iLanduseCodes(iLanduseIndex) ) exit
-      
+
     end do
 
   end function return_landuse_index_fn
@@ -145,13 +145,10 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine update_previous_5_day_rainfall( infil, indx ) 
+  subroutine update_previous_5_day_rainfall( infil, indx )
 
     real (kind=c_float), intent(in)            :: infil
     integer (kind=c_int), intent(in)           :: indx
-
-    ! [ LOCALS ]
-    integer (kind=c_int) :: jndx
 
     if ( .not. DATE_LAST_UPDATED == SIM_DT%curr ) then
 
@@ -168,12 +165,12 @@ contains
     PREV_5_DAYS_RAIN( indx, DAYCOUNT ) = infil
     PREV_5_DAYS_RAIN( indx, FIVE_DAY_SUM ) = sum( PREV_5_DAYS_RAIN( indx, 1:5 ) )
 
-  end subroutine 
+  end subroutine
 !--------------------------------------------------------------------------------------------------
 
 !   elemental function update_curve_number_fn( iLanduseIndex, iSoilsIndex, fSoilStorage, &
 !                           fSoilStorage_Max, fCFGI )  result( CN_adj )
-    
+
 !     integer (kind=c_int), intent(in)  :: iLanduseIndex
 !     integer (kind=c_int), intent(in)  :: iSoilsIndex
 !     real (kind=c_float), intent(in)   :: fSoilStorage
@@ -204,7 +201,7 @@ contains
 !       ! average of curve number under Type II vs Type III antecedent
 !       ! runoff conditions
 !       CN_adj = CN_ARCII(iLanduseIndex, iSoilsIndex) * ( 1.0_c_float - Pf ) &
-!                 + CN_ARCIII(iLanduseIndex, iSoilsIndex) * Pf 
+!                 + CN_ARCIII(iLanduseIndex, iSoilsIndex) * Pf
 
 !     elseif ( fFraction_FC > 0.5_c_float ) then   ! adjust upward toward AMC III
 
@@ -213,12 +210,12 @@ contains
 !       frac = ( fFraction_FC - 0.5_c_float ) / 0.5_c_float
 
 !       CN_adj = CN_ARCII(iLanduseIndex, iSoilsIndex) * ( 1.0_c_float - frac ) &
-!                 + CN_ARCIII(iLanduseIndex, iSoilsIndex) * frac 
+!                 + CN_ARCIII(iLanduseIndex, iSoilsIndex) * frac
 
 !     elseif ( fFraction_FC < 0.5_c_float ) then   ! adjust downward toward AMC I
 
 !       ! we want a number ranging from 0 to 1 indicating the relative split
-!       ! between CN AMCII and CN AMCI 
+!       ! between CN AMCII and CN AMCI
 !       !
 !       ! ex. fFraction_FC = 0.48; frac = 2.0 * 0.48 = 0.96
 !       !     CN_adj = 0.96 ( CN_ARCII ) + ( 1.0 - 0.96 ) * CN_ARCIII
@@ -226,18 +223,18 @@ contains
 !       frac = fFraction_FC / 0.5_c_float
 
 !       CN_adj = CN_ARCI(iLanduseIndex, iSoilsIndex) * ( 1.0_c_float - frac ) &
-!                 + CN_ARCII(iLanduseIndex, iSoilsIndex) * frac 
+!                 + CN_ARCII(iLanduseIndex, iSoilsIndex) * frac
 
 !     else
 
 !       CN_adj = CN_ARCII(iLanduseIndex, iSoilsIndex)
 
-!     endif  
+!     endif
 
 
 !     ! ensure that whatever modification have been made to the curve number
 !     ! remain within reasonable bounds
-!     CN_adj = MIN( CN_adj, 100.0_c_float ) 
+!     CN_adj = MIN( CN_adj, 100.0_c_float )
 !     CN_adj = MAX( CN_adj, 0.0_c_float )
 
 !   end function update_curve_number_fn
@@ -247,7 +244,7 @@ contains
   elemental function update_curve_number_fn( iLanduseIndex, iSoilsIndex, cell_index,   &
                                              it_is_growing_season, fSoilStorage_Max,   &
                                              fCFGI )                                      result( CN_adj )
-  
+
   integer (kind=c_int), intent(in)  :: iLanduseIndex
   integer (kind=c_int), intent(in)  :: iSoilsIndex
   integer (kind=c_int), intent(in)  :: cell_index
@@ -314,7 +311,7 @@ contains
 
     end if
 
-  end associate  
+  end associate
 
   ! ensure that whatever modification have been made to the curve number
   ! remain within reasonable bounds
@@ -345,6 +342,7 @@ contains
     real (kind=c_float), intent(in)  :: CN_II
     real (kind=c_float)              :: CN_I
 
+    ! The following comes from page 192, eq. 3.145 of "SCS Curve Number Methodology"
     CN_I = CN_II / (2.281_c_float - 0.01281_c_float * CN_II )
 
     CN_I = max( CN_I, 30.0_c_float )
@@ -355,10 +353,10 @@ contains
 !--------------------------------------------------------------------------------------------------
   !> Calculate the runoff by means of the curve number method.
   !!
-  !! Runoff is calculated using a modification of the curve number method. 
+  !! Runoff is calculated using a modification of the curve number method.
   !! Specifically, the initial abstraction is defined as 0.05 * SMax rather than the
   !! standard 0.20 * SMax of the original method. This redefinition of the initial abstraction
-  !! term was found to be more appropriate for long-term continuous simulations than the 
+  !! term was found to be more appropriate for long-term continuous simulations than the
   !! standard 0.2 * SMax of the original.
   !! @param[in]  iLanduseIndex  Pre-configured index number corresponding to a line in the landuse lookup table.
   !! @param[in]  iSoilsGroup   The numerical index associated with the soils group of interest.
@@ -378,20 +376,20 @@ contains
                                                      landuse_index,                       &
                                                      soil_group,                          &
                                                      it_is_growing_season,                &
-                                                     soil_storage_max,                    & 
                                                      inflow,                              &
-                                                     continuous_frozen_ground_index ) 
-  
+                                                     soil_storage_max,                    &
+                                                     continuous_frozen_ground_index )
+
     real (kind=c_float), intent(inout)  :: runoff
     real (kind=c_float), intent(inout)  :: curve_num_adj
     integer (kind=c_int), intent(in)    :: cell_index
     integer (kind=c_int), intent(in)    :: landuse_index
     integer (kind=c_int), intent(in)    :: soil_group
     logical (kind=c_bool), intent(in)   :: it_is_growing_season
-    real (kind=c_float), intent(in)     :: soil_storage_max
     real (kind=c_float), intent(in)     :: inflow
+    real (kind=c_float), intent(in)     :: soil_storage_max
     real (kind=c_float), intent(in)     :: continuous_frozen_ground_index
-    
+
     ! [ LOCALS ]
 !    real (kind=c_float) :: CN_05
     real (kind=c_float) :: Smax
@@ -411,7 +409,14 @@ contains
 
     ! Equation 8, Hawkins and others, 2002
     ! adjust Smax for alternate initial abstraction amount
-    Smax = 1.33_c_float * ( Smax ) ** 1.15_c_float
+    Smax = 1.33_c_float * ( Smax**1.15_c_float )
+
+    ! ! now consider runoff if Ia ~ 0.05S
+    ! if ( inflow > 0.05_c_float * Smax ) then
+    !   runoff = ( inflow - 0.05_c_float * Smax )**2  / ( inflow + 0.95_c_float * Smax )
+    ! else
+    !   runoff = 0.0_c_float
+    ! end if
 
     ! now consider runoff if Ia ~ 0.05S
     if ( inflow > 0.05_c_float * Smax ) then
@@ -421,6 +426,5 @@ contains
     end if
 
   end subroutine runoff_curve_number_calculate
-
 
 end module runoff__curve_number

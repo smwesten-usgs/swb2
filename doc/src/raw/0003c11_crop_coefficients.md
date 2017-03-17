@@ -33,4 +33,4 @@ The figure below, taken from FAO-56 [@allen_crop_1998], shows how the water stre
 
 ![Parameters__Depletion_Fraction.png](../images/Parameters__Depletion_Fraction.png){#fig:depletion_frac}
 
-As shown in +@fig:depletion_frac, the depletion parameter defines the soil moisture conditions below which the actual to potential ET ratio drops toward zero.
+As shown in @fig:depletion_frac, the depletion parameter defines the soil moisture conditions below which the actual to potential ET ratio drops toward zero.

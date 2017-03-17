@@ -211,19 +211,19 @@ if ("${OS}" STREQUAL "win_x64" OR "${OS}" STREQUAL "win_x86")
 #
 elseif ("${OS}" STREQUAL "mac_osx" )
 #
-  set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" "*.a")
+  set(CMAKE_FIND_LIBRARY_SUFFIXES "*.dylib" "*.a")
 
-  find_library(LIBXM
-          NAMES Xm libXm libXm.dylib
-          PATHS
-          /usr/OpenMotif/lib
-          ${LIBXM_PATH}
-          ${LIB_PATH} )
+#  find_library(LIBXM
+#          NAMES Xm libXm libXm.dylib
+#          PATHS
+#          /usr/local/lib
+#          ${LIBXM_PATH}
+#          ${LIB_PATH} )
 
   set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" ".dylib")
 
-#  set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIBXM} )
-#
+  set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIBXM} )
+
 
 ### NOTE: the libraries defined below will be needed for linking to libcurl.
 
@@ -232,11 +232,11 @@ elseif ("${OS}" STREQUAL "mac_osx" )
 #          PATHS
 #          ${LIB_PATH} )
 
-  find_library(LIBSASL2
-          NAMES gsasl libgsasl sasl2 libsasl2 libsasl2.dylib
-          PATHS /usr/local/opt/gsasl/lib
+#  find_library(LIBSASL2
+#          NAMES gsasl libgsasl sasl2 libsasl2 libsasl2.dylib
+#          PATHS /usr/local/opt/gsasl/lib
 #          ${SWB_PATH}
-          NO_CMAKE_SYSTEM_PATH )
+#          NO_CMAKE_SYSTEM_PATH )
 
 #  find_library(LIBLBER
 #          NAMES lber liblber liblber.dylib
@@ -244,25 +244,27 @@ elseif ("${OS}" STREQUAL "mac_osx" )
 #          ${LIB_PATH}
 #          NO_CMAKE_SYSTEM_PATH )
 
-  find_library(LIBSSH2
-          NAMES ssh2 libssh2 libssh2.dylib
-          PATHS
-          /usr/local/opt/libssh2/lib
+#  find_library(LIBSSH2
+#          NAMES ssh2 libssh2 libssh2.dylib
+#          PATHS
+#          /usr/local/opt/libssh2/lib
 #          ${SWB_PATH}
-          ${LIB_PATH})
+#          ${LIB_PATH})
 
-  find_library(LIBSSL
-          NAMES ssl libssl libssl.dylib
-          PATHS
-          /usr/local/opt/openssl/lib
+#  find_library(LIBSSL
+#          NAMES ssl libssl libssl.dylib
+#          PATHS
+#          /usr/local/opt/openssl/lib
 #          ${SWB_PATH}
-          ${LIB_PATH} )
+#          ${LIB_PATH} )
 
   find_library(LIBXT
           NAMES Xt libXt.dylib
           PATHS
           /opt/X11/lib
           ${LIB_PATH})
+
+  set( LIBXM /usr/local/Cellar/openmotif/2.3.6/lib/libXm.dylib )
 
 else()
 
@@ -282,6 +284,6 @@ endif()
 
 set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIBIDN} ${LIBINTL} ${LIBICONV} ${LIBSSH2} ${LIBSSH2} ${LIBCRYPTO} ${LIBSSL} ${LIBLBER} ${LIBLDAP}
       ${LIBGCRYPT} ${LIBGPG_ERROR} ${LIBNETTLE} ${LIBGMP} ${LIBCRYPT32} ${LIBGNUTLS} ${LIBNETTLE} ${LIBHOGWEED} ${LIBCRYPT32} ${LIBWLDAP32}
-      ${LIBWS2_32} ${LIBDL} ${LIBC} )
+      ${LIBWS2_32} ${LIBDL} ${LIBC} ${LIBXM})
 
 link_libraries( ${EXTERNAL_LIBS} )

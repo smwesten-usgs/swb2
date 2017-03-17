@@ -1,7 +1,8 @@
 module string_list
 
   use iso_c_binding, only             : c_int, c_float, c_bool, c_null_char
-  use constants_and_conversions, only : asInt, asFloat, asLogical, lTRUE, lFALSE, TRUE, FALSE
+  use constants_and_conversions, only : asInt, asFloat, asLogical, lTRUE, lFALSE, TRUE, FALSE,   &
+                                        WHITESPACE, PUNCTUATION
   use strings
   use logfiles, only                  : LOG_DEBUG
   use exceptions
@@ -34,11 +35,13 @@ module string_list
     type (STRING_LIST_ELEMENT_T), pointer        :: last         => null()
     logical (kind=c_bool)                        :: autocleanup  = TRUE
     integer (kind=c_int)                         :: count        = 0
+    logical (kind=c_bool)                        :: is_populated = FALSE
 
   contains
 
     procedure :: list_append_string_sub
     procedure :: list_append_int_sub
+    procedure :: list_from_delimited_string_sub
     procedure :: list_get_value_at_index_fn
     procedure :: list_get_values_in_range_fn
     procedure :: list_print_sub
@@ -60,6 +63,7 @@ module string_list
                                 list_append_int_sub
     generic :: get           => list_get_value_at_index_fn, &
                                 list_get_values_in_range_fn
+    generic :: create_list   => list_from_delimited_string_sub
     generic :: set_autocleanup  => list_set_auto_cleanup_sub
     generic :: print         => list_print_sub
     generic :: listall       => list_all_fn, &
@@ -159,6 +163,7 @@ contains
     endif
 
     this%count = this%count + 1
+    this%is_populated = TRUE
 
   end subroutine list_append_string_sub
 
@@ -493,23 +498,31 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function list_from_delimited_string_fn(sText1)    result( newList )
+  function list_from_delimited_string_fn(sText1, delimiters)    result( newList )
 
-    character (len=*), intent(in)      :: sText1
-    type (STRING_LIST_T)               :: newList
+    character (len=*), intent(in)           :: sText1
+    character (len=*), intent(in), optional :: delimiters
+    type (STRING_LIST_T)                    :: newList
 
     ! [ LOCALS ]
     character ( len=len_trim(sText1) ) :: sTempText
     character ( len=len_trim(sText1) ) :: sTempArg
+    character (len=256)                :: delimiters_
+
+    if ( present( delimiters ) ) then
+      delimiters_ = delimiters
+    else
+      delimiters_ = PUNCTUATION
+    endif
 
     sTempText = sText1
 
     do
 
-      call chomp( sText1=sTempText, sText2=sTempArg )
+      call chomp( sText1=sTempText, sText2=sTempArg, sDelimiters=delimiters_ )
 
       if (len_trim(sTempArg) > 0) then
-        call newList%append( trim(sTempArg ) )
+        call newList%append( trim( adjustl( sTempArg ) ) )
       else
         exit
       endif
@@ -517,6 +530,43 @@ contains
     end do
 
   end function list_from_delimited_string_fn
+
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine list_from_delimited_string_sub(this, sText, delimiters)
+
+    class (STRING_LIST_T)                   :: this
+    character (len=*), intent(in)           :: sText
+    character (len=*), intent(in), optional :: delimiters
+
+    ! [ LOCALS ]
+    character ( len=len_trim(sText) ) :: sTempText
+    character ( len=len_trim(sText) ) :: sTempArg
+    character (len=256)                :: delimiters_
+
+    if ( present( delimiters ) ) then
+      delimiters_ = delimiters
+    else
+      delimiters_ = PUNCTUATION
+    endif
+
+    sTempText = sText
+
+    call this%clear()
+
+    do
+
+      call chomp( sText1=sTempText, sText2=sTempArg, sDelimiters=trim(delimiters_) )
+
+      if (len_trim(sTempArg) > 0) then
+        call this%append( trim( adjustl( sTempArg ) ) )
+      else
+        exit
+      endif
+
+    end do
+
+  end subroutine list_from_delimited_string_sub
 
 !--------------------------------------------------------------------------------------------------
 

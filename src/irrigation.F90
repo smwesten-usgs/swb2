@@ -21,13 +21,13 @@ module irrigation
 
   implicit none
 
-  private 
+  private
 
   public :: irrigation__initialize, irrigation__calculate, irrigation__output_schedule_values
 
   enum, bind(c)
     enumerator :: APP_NONE=0, APP_FIELD_CAPACITY, APP_DEFINED_DEFICIT, APP_CONSTANT_AMOUNT, &
-                  APP_HWB_DEMAND_BASED 
+                  APP_HWB_DEMAND_BASED
   end enum
 
   character (len=35), parameter :: APP_OPTION_NAME(0:4) = &
@@ -39,9 +39,9 @@ module irrigation
 
   real (kind=c_float), allocatable     :: MAXIMUM_ALLOWABLE_DEPLETION_FRACTION(:)
   real (kind=c_float), allocatable     :: IRRIGATION_FROM_GROUNDWATER(:)
-  real (kind=c_float), allocatable     :: IRRIGATION_FROM_SURFACE_WATER(:) 
-  
-  real (kind=c_float), allocatable     :: FRACTION_OF_IRRIGATION_FROM_GW(:)   
+  real (kind=c_float), allocatable     :: IRRIGATION_FROM_SURFACE_WATER(:)
+
+  real (kind=c_float), allocatable     :: FRACTION_OF_IRRIGATION_FROM_GW(:)
   real (kind=c_float), allocatable     :: IRRIGATION_EFFICIENCY(:)
   integer (kind=c_int), allocatable    :: NUM_DAYS_OF_IRRIGATION(:)
   integer (kind=c_int), allocatable    :: FIRST_DAY_OF_IRRIGATION(:)
@@ -51,7 +51,6 @@ module irrigation
   real (kind=c_float), allocatable     :: APPLICATION_AMOUNT(:)
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pIRRIGATION_MASK
-  real (kind=c_float), allocatable     :: IRRIGATION_MASK(:)
 
 contains
 
@@ -80,12 +79,12 @@ contains
     integer (kind=c_int)              :: i
     integer (kind=c_int)              :: status
     character (len=256)               :: str_buffer
-    type (STRING_LIST_T)              :: sl_irrigation_days    
+    type (STRING_LIST_T)              :: sl_irrigation_days
     type (STRING_LIST_T)              :: sl_irrigation_begin
-    type (STRING_LIST_T)              :: sl_irrigation_end  
-    type (STRING_LIST_T)              :: sl_application_method 
-    type (STRING_LIST_T)              :: sl_monthly_irrigation_schedule 
-    character (len=31)                :: temp_str    
+    type (STRING_LIST_T)              :: sl_irrigation_end
+    type (STRING_LIST_T)              :: sl_application_method
+    type (STRING_LIST_T)              :: sl_monthly_irrigation_schedule
+    character (len=31)                :: temp_str
 
     allocate( IRRIGATION_FROM_GROUNDWATER( count( is_active ) ), stat=status )
     call assert( status==0, "Failed to allocate memory.", __SRCNAME__, __LINE__ )
@@ -105,8 +104,8 @@ contains
     call sl_temp_list%clear()
     call sl_temp_list%append( "Monthly_Irrigation_Schedule" )
     call sl_temp_list%append( "Monthly_Irr_Schedule" )
-    call sl_temp_list%append( "Irrigation_Application_Schedule" )    
-    call sl_temp_list%append( "Monthly_Application_Schedule" )    
+    call sl_temp_list%append( "Irrigation_Application_Schedule" )
+    call sl_temp_list%append( "Monthly_Application_Schedule" )
 
     !> determine how many landuse codes are present
     call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_monthly_irrigation_schedule )
@@ -130,16 +129,16 @@ contains
 
     call PARAMS%get_parameters( slKeys=sl_temp_list,                            &
                                 fValues=MAXIMUM_ALLOWABLE_DEPLETION_FRACTION,   &
-                                lFatal=lTRUE ) 
+                                lFatal=lTRUE )
 
-    
+
     !> retrieve length (in days since planting) of irrigation
     call sl_temp_list%clear()
     call sl_temp_list%append("Irrigation_length")
     call sl_temp_list%append("Irrigation_days")
     call sl_temp_list%append("Irrigation_days_since_planting")
 
-    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_irrigation_days, lFatal=lTRUE ) 
+    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_irrigation_days, lFatal=lTRUE )
 
 
     !> retrieve first day of irrigation
@@ -148,7 +147,7 @@ contains
     call sl_temp_list%append("First_DOY_irrigation")
     call sl_temp_list%append("Irrigation_start")
 
-    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_irrigation_begin, lFatal=lTRUE ) 
+    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_irrigation_begin, lFatal=lTRUE )
 
 
     !> retrieve last day of irrigation
@@ -157,7 +156,7 @@ contains
     call sl_temp_list%append("Last_DOY_irrigation")
     call sl_temp_list%append("Irrigation_end")
 
-    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_irrigation_end, lFatal=lTRUE ) 
+    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_irrigation_end, lFatal=lTRUE )
     call sl_temp_list%clear()
 
 
@@ -168,11 +167,11 @@ contains
 
     call PARAMS%get_parameters( slKeys=sl_temp_list,                     &
                                 fValues=IRRIGATION_EFFICIENCY,           &
-                                lFatal=lTRUE ) 
+                                lFatal=lTRUE )
 
     !> check: number of irrigation efficiency values == number of landuse codes?
     num_records = ubound(IRRIGATION_EFFICIENCY,1)
-    are_lengths_unequal = ( num_records /= number_of_landuse_codes ) 
+    are_lengths_unequal = ( num_records /= number_of_landuse_codes )
 
     if ( are_lengths_unequal )                                                             &
       call warn( sMessage="The number of values specifying irrigation application"         &
@@ -182,65 +181,91 @@ contains
         sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
 
-    !> process first day of irrigation. retrieved as a list of strings; 
+    !> process first day of irrigation. retrieved as a list of strings;
     !! must convert the strings from mm/dd to DOY
     allocate( FIRST_DAY_OF_IRRIGATION( sl_irrigation_begin%count ), stat=status )
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
-    do index = 1, sl_irrigation_begin%count
-      str_buffer = sl_irrigation_begin%get( index )
-      FIRST_DAY_OF_IRRIGATION( index ) = mmdd2doy( str_buffer )
-    enddo  
+    if ( sl_irrigation_begin%countmatching("<NA>") == 0 ) then
 
-    !> process last day of irrigation. retrieved as a list of strings; 
+      do index = 1, sl_irrigation_begin%count
+        str_buffer = sl_irrigation_begin%get( index )
+        FIRST_DAY_OF_IRRIGATION( index ) = mmdd2doy( str_buffer, "FIRST_DAY_OF_IRRIGATION" )
+      enddo
+
+    else
+
+      FIRST_DAY_OF_IRRIGATION = 90
+      call warn("No value was found to define the first day of irrigation.",      &
+           sHints="Make sure there is a lookup table with the column name "       &
+           //"'First_day_of_irrigation'.", lFatal=TRUE )
+    endif
+
+    !> process last day of irrigation. retrieved as a list of strings;
     !! must convert the strings from mm/dd to DOY
     allocate( LAST_DAY_OF_IRRIGATION( sl_irrigation_end%count ), stat=status )
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
-    do index = 1, sl_irrigation_end%count
-      str_buffer = sl_irrigation_end%get( index )
-      LAST_DAY_OF_IRRIGATION( index ) = mmdd2doy( str_buffer )
-    enddo  
+    if ( sl_irrigation_end%countmatching("<NA>") == 0 ) then
 
-    !> process number of days of irrigation. retrieved as a list of strings; 
-    !! must convert the strings from mm/dd to DOY
+      do index = 1, sl_irrigation_end%count
+        str_buffer = sl_irrigation_end%get( index )
+        LAST_DAY_OF_IRRIGATION( index ) = mmdd2doy( str_buffer, "LAST_DAY_OF_IRRIGATION" )
+      enddo
+
+    else
+
+      LAST_DAY_OF_IRRIGATION = 90
+      call warn("No value was found to define the last day of irrigation.",      &
+           sHints="Make sure there is a lookup table with the column name "       &
+           //"'Last_day_of_irrigation'.", lFatal=TRUE )
+    endif
+
+    !> process number of days of irrigation. retrieved as a list of strings
     allocate( NUM_DAYS_OF_IRRIGATION( sl_irrigation_days%count ), stat=status )
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
     NUM_DAYS_OF_IRRIGATION = sl_irrigation_days%asInt()
 
-    
-    where ( NUM_DAYS_OF_IRRIGATION == 0 )
+    if ( sl_irrigation_days%countmatching("<NA>") == 0 ) then
+
+      where ( NUM_DAYS_OF_IRRIGATION == 0 )
+        NUM_DAYS_OF_IRRIGATION = 9999
+      end where
+
+    else
+
       NUM_DAYS_OF_IRRIGATION = 9999
-    end where
+
+    endif
 
     !> retrieve application option (i.e. to field capacity, to defined deficit amount, as constant amount)
     call sl_temp_list%clear()
     call sl_temp_list%append("Irrigation_application_method")
     call sl_temp_list%append("Irrigation_application_scheme")
-    call sl_temp_list%append("Irrigation_application_option")    
+    call sl_temp_list%append("Irrigation_application_option")
     call sl_temp_list%append("Application_method")
     call sl_temp_list%append("Application_scheme")
-    call sl_temp_list%append("Application_option")        
+    call sl_temp_list%append("Application_option")
 
-    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_application_method, lFatal=lTRUE ) 
+    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_application_method, lFatal=lTRUE )
     call sl_temp_list%clear()
 
     allocate( APPLICATION_METHOD_CODE( sl_application_method%count ), stat=status )
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
- 
+
     !> retrieve application amount. not used if "field capacity" option is active.
     !! value represents deficit fraction or constant amount depending on application option active.
     call sl_temp_list%clear()
     call sl_temp_list%append("Application_amount")
     call sl_temp_list%append("Irrigation_amount")
 
-    call PARAMS%get_parameters( slKeys=sl_temp_list, fValues=APPLICATION_AMOUNT, lFatal=lTRUE ) 
+    call PARAMS%get_parameters( slKeys=sl_temp_list, fValues=APPLICATION_AMOUNT, lFatal=lTRUE )
     call sl_temp_list%clear()
 
     !> basic checks to see whether the number of parameters equals the number of lu codes
     num_records = ubound(FIRST_DAY_OF_IRRIGATION,1)
-    are_lengths_unequal = ( num_records /= number_of_landuse_codes ) 
+    are_lengths_unequal = ( num_records /= number_of_landuse_codes )
 
     if ( are_lengths_unequal )                                                            &
       call warn( sMessage="The number of values specifying date of first "                &
@@ -250,7 +275,7 @@ contains
         sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
     num_records = ubound(LAST_DAY_OF_IRRIGATION,1)
-    are_lengths_unequal = ( num_records /= number_of_landuse_codes ) 
+    are_lengths_unequal = ( num_records /= number_of_landuse_codes )
 
     if ( are_lengths_unequal )                                                            &
       call warn( sMessage="The number of values specifying date of last irrigation"       &
@@ -260,7 +285,7 @@ contains
         sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
     num_records = ubound(FRACTION_OF_IRRIGATION_FROM_GW,1)
-    are_lengths_unequal = ( num_records /= number_of_landuse_codes ) 
+    are_lengths_unequal = ( num_records /= number_of_landuse_codes )
 
     if ( are_lengths_unequal )                                                            &
       call warn( sMessage="The number of values specifying the fraction of irrigation"    &
@@ -270,7 +295,7 @@ contains
         sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
     num_records = ubound(MAXIMUM_ALLOWABLE_DEPLETION_FRACTION,1)
-    are_lengths_unequal = ( num_records /= number_of_landuse_codes ) 
+    are_lengths_unequal = ( num_records /= number_of_landuse_codes )
 
     if ( are_lengths_unequal )                                                            &
       call warn( sMessage="The number of values for the maximum allowable depletion "     &
@@ -281,7 +306,7 @@ contains
 
 
     num_records = sl_monthly_irrigation_schedule%count
-    are_lengths_unequal = ( num_records /= number_of_landuse_codes ) 
+    are_lengths_unequal = ( num_records /= number_of_landuse_codes )
 
     allocate( MONTHLY_IRRIGATION_SCHEDULE( number_of_landuse_codes, 31 ), stat=status )
     call assert( status==0, "Problem allocating memory")
@@ -304,13 +329,13 @@ contains
         if ( is_numeric( temp_str ) ) then
           do i=1, ubound(MONTHLY_IRRIGATION_SCHEDULE, 2)
             MONTHLY_IRRIGATION_SCHEDULE( index, i ) = asInt( temp_str(i:i) )
-          enddo  
-        endif  
-      enddo  
-    endif  
+          enddo
+        endif
+      enddo
+    endif
 
     num_records = ubound(APPLICATION_METHOD_CODE,1)
-    are_lengths_unequal = ( num_records /= number_of_landuse_codes ) 
+    are_lengths_unequal = ( num_records /= number_of_landuse_codes )
 
     if ( are_lengths_unequal )                                                            &
       call warn( sMessage="The number of values for the irrigation application option ("  &
@@ -320,7 +345,7 @@ contains
 
 
     num_records = ubound(APPLICATION_AMOUNT,1)
-    are_lengths_unequal = ( num_records /= number_of_landuse_codes ) 
+    are_lengths_unequal = ( num_records /= number_of_landuse_codes )
 
     if ( are_lengths_unequal )                                                            &
       call warn( sMessage="The number of values for the irrigation application amount ("  &
@@ -333,14 +358,13 @@ contains
     pIRRIGATION_MASK => DAT%find("IRRIGATION_MASK")
     if ( associated(pIRRIGATION_MASK) ) call pIRRIGATION_MASK%getvalues( )
 
-
     if ( associated(pIRRIGATION_MASK) ) then
 
-      IRRIGATION_MASK = pack( real(pIRRIGATION_MASK%pGrdBase%iData, kind=c_float), is_active )
+      irrigation_mask = pack( real(pIRRIGATION_MASK%pGrdBase%iData, kind=c_float), is_active )
 
     else
 
-      IRRIGATION_MASK = 1.0_c_float
+      irrigation_mask = 1.0_c_float
 
     endif
 
@@ -358,7 +382,7 @@ contains
       elseif ( str_buffer .contains. "constant") then
         APPLICATION_METHOD_CODE( index ) = APP_CONSTANT_AMOUNT
       elseif ( str_buffer .contains. "demand") then
-        APPLICATION_METHOD_CODE( index ) = APP_HWB_DEMAND_BASED        
+        APPLICATION_METHOD_CODE( index ) = APP_HWB_DEMAND_BASED
       else
         APPLICATION_METHOD_CODE( index ) = APP_NONE
       endif
@@ -367,14 +391,14 @@ contains
       call LOGS%write("  landuse "//asCharacter( landuse_table_codes( index ) )//": " &
         //trim(APP_OPTION_NAME( APPLICATION_METHOD_CODE( index ) ) ), iLogLevel=LOG_ALL )
 
-    enddo  
+    enddo
 
     IRRIGATION_FROM_GROUNDWATER(:)    = 0.0_c_float
     IRRIGATION_FROM_SURFACE_WATER(:)  = 0.0_c_float
-   
+
   end subroutine irrigation__initialize
 
-!--------------------------------------------------------------------------------------------------  
+!--------------------------------------------------------------------------------------------------
 
   function irrigation__output_schedule_values( landuse_index )  result( values )
 
@@ -383,13 +407,13 @@ contains
 
     values = MONTHLY_IRRIGATION_SCHEDULE( landuse_index, : )
 
-  end function irrigation__output_schedule_values  
+  end function irrigation__output_schedule_values
 
-!--------------------------------------------------------------------------------------------------  
+!--------------------------------------------------------------------------------------------------
 
   elemental subroutine irrigation__calculate( irrigation_amount,            &
                                               landuse_index,                &
-                                              soil_storage,                 & 
+                                              soil_storage,                 &
                                               soil_storage_max,             &
                                               rainfall,                     &
                                               runoff,                       &
@@ -410,7 +434,7 @@ contains
     real (kind=c_float), intent(in)             :: irrigation_mask
     integer (kind=c_int), intent(in)            :: num_days_since_planting
     real (kind=c_float), intent(in), optional   :: monthly_rainfall
-    real (kind=c_float), intent(in), optional   :: monthly_runoff    
+    real (kind=c_float), intent(in), optional   :: monthly_runoff
 
     ! [ LOCALS ]
     real (kind=c_float)        :: depletion_fraction
@@ -444,7 +468,7 @@ contains
       day_of_year = SIM_DT%iDOY
       num_days_from_origin = SIM_DT%iNumDaysFromOrigin
 
-    end associate  
+    end associate
 
 !     call pIRRIGATION_MASK%getvalues( month, day, year, julian_day )
 !     iIrrigation_Mask = pack( pIRRIGATION_MASK%pGrdBase%iData, is_active )
@@ -459,14 +483,14 @@ contains
 
       irrigation_amount = 0.0_c_float
 
-      if ( MONTHLY_IRRIGATION_SCHEDULE( landuse_index, day ) == 0 ) exit
+      !if ( MONTHLY_IRRIGATION_SCHEDULE( landuse_index, day ) == 0 ) exit
 
       if ( ( day_of_year < FIRST_DAY_OF_IRRIGATION( landuse_index ) ) &
         .or. ( day_of_year > LAST_DAY_OF_IRRIGATION( landuse_index ) ) )  exit
 
       if ( MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( landuse_index ) > 0.99 )  exit
       if ( soil_storage_max <= 0.0_c_float ) exit
-      if ( IRRIGATION_MASK < 1.0e-6_c_float ) exit 
+      if ( IRRIGATION_MASK < 1.0e-6_c_float ) exit
       if ( num_days_since_planting > NUM_DAYS_OF_IRRIGATION( landuse_index ) ) exit
 
       depletion_fraction = 1.0_c_float - soil_storage / soil_storage_max
@@ -484,12 +508,12 @@ contains
             interim_irrigation_amount = max( 0.0_c_float, soil_storage_max - soil_storage )
 
           case ( APP_DEFINED_DEFICIT )
-          
+
             interim_irrigation_amount = max( 0.0_c_float, APPLICATION_AMOUNT( landuse_index )                                   &
-                                          * soil_storage_max - soil_storage )  
+                                          * soil_storage_max - soil_storage )
 
           case ( APP_CONSTANT_AMOUNT )
-          
+
             interim_irrigation_amount = APPLICATION_AMOUNT( landuse_index )
 
 
@@ -501,27 +525,27 @@ contains
 
               if ( irrigation_days_per_month <= 0 ) then
                 interim_irrigation_amount = 0.0_c_float
-              else  
+              else
                 interim_irrigation_amount = max( 0.0_c_float,    &
                 ( crop_etc * real( days_in_month, kind=c_float) + monthly_runoff - monthly_rainfall ) )  &
                   / real( irrigation_days_per_month, kind=c_float )
               endif
 
             else
-            
+
               interim_irrigation_amount = max( 0.0_c_float, crop_etc + runoff - rainfall )
 
-            endif  
+            endif
 
           case default
 
             interim_irrigation_amount = 0.0_c_float
 
-        end select  
+        end select
 
         irrigation_amount =  interim_irrigation_amount                                    &
-                                       * IRRIGATION_MASK                                  &
-                                       / efficiency 
+                                       * irrigation_mask                                  &
+                                       / efficiency
 
       endif
 

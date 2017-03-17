@@ -61,6 +61,12 @@ module model_domain
     real (kind=c_float), allocatable       :: curve_num_adj(:)
     real (kind=c_float), allocatable       :: gdd(:)
     real (kind=c_float), allocatable       :: crop_coefficient_kcb(:)
+    real (kind=c_float), allocatable       :: surf_evap_coef_ke(:)
+    real (kind=c_float), allocatable       :: plant_stress_coef_ks(:)
+    real (kind=c_float), allocatable       :: evap_reduction_coef_kr(:)
+    real (kind=c_float), allocatable       :: total_available_water_taw(:)
+    real (kind=c_float), allocatable       :: readily_available_water_raw(:)
+
     real (kind=c_float), allocatable       :: continuous_frozen_ground_index(:)
 
     real (kind=c_float), allocatable       :: rooting_depth_max(:)
@@ -74,6 +80,7 @@ module model_domain
     real (kind=c_float), allocatable       :: actual_et_impervious(:)
     real (kind=c_float), allocatable       :: actual_et_soil(:)
     real (kind=c_float), allocatable       :: actual_et(:)
+    real (kind=c_float), allocatable       :: bare_soil_evap(:)
 
     real (kind=c_float), allocatable       :: inflow(:)
     real (kind=c_float), allocatable       :: runon(:)
@@ -119,6 +126,7 @@ module model_domain
     integer (kind=c_int), allocatable      :: order_index(:)
 
     real (kind=c_float), allocatable       :: adjusted_depletion_fraction_p(:)
+    real (kind=c_float), allocatable       :: fraction_exposed_and_wetted_soil(:)
 
     ! member variables that are only allocated if particular optional methods are invoked
 
@@ -152,7 +160,7 @@ module model_domain
     procedure ( array_method ), pointer  :: init_direct_soil_moisture                                        &
                                                 => model_initialize_direct_soil_moisture_none
     procedure ( array_method ), pointer  :: init_GDD                                                         &
-                                                => model_initialize_GDD_none
+                                                => model_initialize_GDD
     procedure ( array_method ), pointer  :: init_AWC                                                         &
                                                 => model_initialize_available_water_content_gridded
     procedure ( array_method ), pointer  :: init_crop_coefficient                                            &
@@ -161,6 +169,9 @@ module model_domain
                                                 => model_calculate_interception_bucket
     procedure ( array_method ), pointer  :: update_crop_coefficient                                          &
                                                 => model_update_crop_coefficient_none
+
+    procedure ( array_method ), pointer  :: update_rooting_depth                                          &
+                                                => model_update_rooting_depth_none
 
     procedure ( array_method ), pointer  :: init_continuous_frozen_ground_index                              &
                                                 => model_initialize_continuous_frozen_ground_index
@@ -368,7 +379,7 @@ contains
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
     integer (kind=c_int)  :: indx
-    integer (kind=c_int)  :: iStat(53)
+    integer (kind=c_int)  :: iStat(60)
 
     iCount = count( this%active )
     iStat = 0
@@ -425,6 +436,13 @@ contains
     allocate( this%it_is_growing_season( iCount ), stat=iStat(51) )
     allocate( this%curve_num_adj( iCount ), stat=iStat(52) )
     allocate( this%rejected_potential_recharge( iCount ), stat=iStat(53) )
+    allocate( this%evap_reduction_coef_kr( iCount ), stat=iStat(54) )
+    allocate( this%surf_evap_coef_ke( iCount ), stat=iStat(55) )
+    allocate( this%plant_stress_coef_ks( iCount ), stat=iStat(56) )
+    allocate( this%total_available_water_taw( iCount ), stat=iStat(57) )
+    allocate( this%readily_available_water_raw( iCount ), stat=iStat(58) )
+    allocate( this%bare_soil_evap( iCount ), stat=iStat(59) )
+    allocate( this%fraction_exposed_and_wetted_soil( iCount ), stat=iStat(60) )
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR"                    &
@@ -444,6 +462,7 @@ contains
     this%latitude                            = 0.0_c_float
     this%reference_ET0                       = 0.0_c_float
     this%actual_ET                           = 0.0_c_float
+    this%bare_soil_evap                      = 0.0_c_float
     this%inflow                              = 0.0_c_float
     this%runon                               = 0.0_c_float
     this%runoff                              = 0.0_c_float
@@ -465,7 +484,7 @@ contains
     this%irrigation                          = 0.0_c_float
     this%curve_num_adj                       = 0.0_c_float
     this%runoff_outside                      = 0.0_c_float
-    this%pervious_fraction                   = 0.0_c_float
+    this%pervious_fraction                   = 1.0_c_float     ! note: default is 100% pervious area
     this%surface_storage                     = 0.0_c_float
     this%surface_storage_excess              = 0.0_c_float
     this%surface_storage_max                 = 0.0_c_float
@@ -485,6 +504,12 @@ contains
     this%direct_recharge                     = 0.0_c_float
     this%direct_soil_moisture                = 0.0_c_float
     this%number_of_days_since_planting       = 0_c_int
+    this%evap_reduction_coef_kr              = 0.0_c_float
+    this%surf_evap_coef_ke                   = 0.0_c_float
+    this%plant_stress_coef_ks                = 0.0_c_float
+    this%total_available_water_taw           = 0.0_c_float
+    this%readily_available_water_raw         = 0.0_c_float
+    this%fraction_exposed_and_wetted_soil    = 0.0_c_float
     this%it_is_growing_season                = lFALSE
 
     do iIndex=1, iCount
@@ -800,12 +825,13 @@ contains
     type (STRING_LIST_T), intent(in)        :: argv_list
 
     ! [ LOCALS ]
-    integer (kind=c_int)            :: indx
-    integer (kind=c_int)            :: iostat
-    integer (kind=c_int)            :: unitnum
-    character (len=256)             :: filename
-    character (len=:), allocatable  :: Method_Name
-    character (len=:), allocatable  :: col, row
+    integer (kind=c_int)              :: indx
+    integer (kind=c_int)              :: iostat
+    integer (kind=c_int)              :: unitnum
+    character (len=256)               :: filename
+    character (len=:), allocatable    :: Method_Name
+    integer (kind=c_int)              :: col, row
+    real (kind=c_double)              :: xcoord, ycoord
 
     Method_Name = argv_list%get(1)
 
@@ -815,11 +841,6 @@ contains
 
         this%init_interception => model_initialize_interception_bucket
         this%calc_interception => model_calculate_interception_bucket
-
-        ! when the "bucket" model is used, it requires some means of determining
-        ! "growing" vs. "non-growing" season
-        this%init_GDD => model_initialize_GDD
-        this%calc_GDD => model_calculate_GDD
 
         call LOGS%WRITE( "==> BUCKET INTERCEPTION submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
@@ -857,6 +878,21 @@ contains
 
         call warn("Your control file specifies an unknown or unsupported RUNOFF method.", &
             lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+
+      endif
+
+    elseif ( sCmdText .contains. "ROOTING" ) then
+
+      if ( ( Method_Name .strequal. "DYNAMIC" ) .or. ( Method_Name .strequal. "FAO_56" )   &
+          .or. ( Method_Name .strequal. "FAO-56" ) )                                          then
+
+        this%update_rooting_depth => model_update_rooting_depth_FAO56
+        call LOGS%WRITE( "==> DYNAMIC rooting depth submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+
+      else
+
+        this%update_rooting_depth => model_update_rooting_depth_none
+        call LOGS%WRITE( "==> STATIC rooting depth submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       endif
 
@@ -970,6 +1006,26 @@ contains
 
       endif
 
+    elseif ( sCmdText .contains. "GROWING_DEGREE_DAY" ) then
+
+      if ( ( Method_Name .strequal. "BASKERVILLE_EMIN" )       &
+             .or. ( Method_Name .strequal. "BE" )              &
+             .or. ( Method_Name .strequal. "SINUSOIDAL" )  )        then
+
+        this%init_GDD => model_initialize_GDD_be
+        this%calc_GDD => model_calculate_GDD_be
+        call LOGS%WRITE( "==> Growing degree-day (GDD) will be calculated as described "  &
+          //"in Baskerville and Emin (1969)", iLogLevel = LOG_ALL, lEcho = lFALSE )
+
+      else
+
+        this%init_GDD => model_initialize_GDD
+        this%calc_GDD => model_calculate_GDD
+        call LOGS%WRITE( "==> Growing degree-day (GDD) will be calculated using "  &
+          //"simple averaging of TMAX and TMIN.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+
+      endif
+
     elseif ( sCmdText .contains. "IRRIGATION" ) then
 
       if ( ( Method_Name .strequal. "FAO56" )                   &
@@ -978,11 +1034,6 @@ contains
 
         this%init_irrigation => model_initialize_irrigation
         this%calc_irrigation => model_calculate_irrigation
-
-        ! when irrigation is invoked, we need to track GDD as a possible means
-        ! by which to update and model the seasonal change in crop coefficient (Kcb)
-        this%init_GDD => model_initialize_GDD
-        this%calc_GDD => model_calculate_GDD
 
         call LOGS%WRITE( "==> IRRIGATION will be calculated and applied as needed.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
@@ -1127,6 +1178,14 @@ contains
         call LOGS%WRITE( "==> THORNTHWAITE-MATHER SOIL MOISTURE RETENTION (SWB 1.0 equations) submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
+      elseif ( ( Method_Name .strequal. "FAO56_TWO_STAGE" ) .or. ( Method_Name .strequal. "FAO-56_TWO_STAGE" ) ) then
+
+        this%init_actual_et => model_initialize_actual_et_fao56__two_stage
+        this%calc_actual_et => model_calculate_actual_et_fao56__two_stage
+
+        call LOGS%WRITE( "==> **TWO-STAGE** FAO-56 SOIL MOISTURE RETENTION submodel selected.", &
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
+
       elseif ( ( Method_Name .strequal. "FAO56" ) .or. ( Method_Name .strequal. "FAO-56" ) ) then
 
         this%init_actual_et => model_initialize_actual_et_fao56
@@ -1144,42 +1203,68 @@ contains
 
     elseif ( sCmdText .contains. "DUMP_VARIABLES" ) then
 
+        row = 0; col = 0
+
         this%dump_variables => model_dump_variables_by_cell
 
-        if ( argv_list%count == 2 ) then
+        if ( argv_list%count == 3 ) then
 
-          col = argv_list%get(1)
-          row = argv_list%get(2)
+          xcoord = asFloat( argv_list%get(2) )
+          ycoord = asFloat( argv_list%get(3) )
+          row = grid_GetGridRowNum( this%pGrdOut, ycoord )
+          col = grid_GetGridColNum( this%pGrdOut, xcoord )
 
-          call LOGS%WRITE( "==> SWB will dump variables for cell ("//trim(col)//","      &
-            //trim(row)//").", iLogLevel = LOG_ALL, lEcho = lFALSE )
+          if ( .not. ( Method_Name .contains. "COORD") )                       &
+            call warn("Unknown option supplied to DUMP_VARIABLES method.", &
+              sHints="The only known option keyword is 'COORD'.",          &
+              lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+
+        elseif ( argv_list%count == 2 ) then
+
+          col = asInt( argv_list%get(1) )
+          row = asInt( argv_list%get(2) )
+
+        endif
+
+        if ( ( col > 0 ) .and. ( row > 0 ) ) then
+
+          call LOGS%WRITE( "==> SWB will dump variables for cell ("//asCharacter(col)//","      &
+            //asCharacter(row)//").", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
           do indx=1, ubound( DUMP, 1)
             if (DUMP( indx )%col /= 0 )  cycle
 
-            DUMP( indx )%col = asInt( col )
-            DUMP( indx )%row = asInt( row )
+            DUMP( indx )%col = col
+            DUMP( indx )%row = row
 
-            filename = "SWB2_variable_values__col_"//trim( col )//"__row_"//trim( row )//".csv"
+            filename = "SWB2_variable_values__col_"//asCharacter( col )//"__row_"//asCharacter( row )//".csv"
 
-            open( newunit=unitnum, file=trim(filename), iostat=iostat )
-            call assert( iostat == 0, "Could not open variable dump file for writing." )
+            open( newunit=unitnum, file=trim(filename), iostat=iostat, action="write", status="replace" )
+
+            call assert( iostat == 0, "Could not open variable dump file "//sQuote(filename)     &
+              //" for writing. iostat = "//asCharacter( iostat ) )
             DUMP( indx )%unitnum = unitnum
 
-            write( unit=DUMP( indx )%unitnum, fmt="(a)")                                                          &
-              "month, day, year,landuse_code, landuse_index, index_order, soil_group, num_upslope_connections, "  &
-              //"sum_upslope_cells, awc, latitude, reference_ET0, actual_ET, curve_num_adj, inflow, runon, "      &
-              //"runoff, outflow, infiltration, snowfall, potential_snowmelt, snowmelt, interception, "           &
-              //"rainfall, interception_storage, tmax, tmin, tmean, snow_storage, "                               &
-              //"soil_storage, soil_storage_max, surface_storage, surface_storage_excess, "                       &
-              //"surface_storage_max, potential_recharge, rejected_recharge, fog, irrigation, gdd, "              &
-              //" runoff_outside, "                                                                               &
-              //"pervious_fraction, storm_drain_capture, canopy_cover_fraction, crop_coefficient_kcb, "           &
-              //"cfgi, rooting_depth_max, current_rooting_depth, actual_et_soil, actual_et_impervious, "          &
-              //"actual_et_interception, adjusted_depletion_fraction_p, crop_etc, direct_recharge, "              &
+            ! this%current_rooting_depth( indx ), this%actual_et_soil( indx ),                                &
+            ! this%readily_available_water_raw( indx ), this%total_available_water_taw( indx ),               &
+            ! this%plant_stress_coef_ks( indx ), this%evap_reduction_coef_kr( indx ),                         &
+            ! this%surf_evap_coef_ke( indx ), this%fraction_exposed_and_wetted_soil( indx ),                  &
+            !
+            write( unit=DUMP( indx )%unitnum, fmt="(a)")                                                           &
+              "month, day, year,landuse_code, landuse_index, index_order, soil_group, num_upslope_connections, "   &
+              //"sum_upslope_cells, awc, latitude, reference_ET0, actual_ET, curve_num_adj, inflow, runon, "       &
+              //"runoff, outflow, infiltration, snowfall, potential_snowmelt, snowmelt, interception, "            &
+              //"rainfall, interception_storage, tmax, tmin, tmean, snow_storage, "                                &
+              //"soil_storage, soil_storage_max, surface_storage, surface_storage_excess, "                        &
+              //"surface_storage_max, potential_recharge, rejected_recharge, fog, irrigation, gdd, "               &
+              //" runoff_outside, "                                                                                &
+              //"pervious_fraction, storm_drain_capture, canopy_cover_fraction, crop_coefficient_kcb, "            &
+              //"cfgi, rooting_depth_max, current_rooting_depth, actual_et_soil, "                                 &
+              //"readily_available_water, total_available_water, plant_stress_coef_ks, "                           &
+              //"evap_reduction_coef_kr, surf_evap_coef_ke, fraction_exposed_and_wetted_soil, "                    &
+              //"actual_et_impervious, actual_et_interception, adjusted_depletion_fraction_p, crop_etc, "          &
+              //" bare_soil_evap, direct_recharge, "                                                               &
               //"direct_soil_moisture, inflowbuf1, inflowbuf2, inflowbuf3, inflowbuf4, inflowbuf5, inflowbuf_sum"
-
-
             exit
 
           enddo
@@ -1295,6 +1380,8 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+! indx values should be fed in ordered according to ORDER_INDEX()
+
   subroutine model_calculate_routing_D8( this, indx )
 
     use routing__D8, only   : TARGET_INDEX
@@ -1305,12 +1392,16 @@ contains
     if ( (    TARGET_INDEX( indx ) >= lbound( this%runon, 1) )               &
       .and. ( TARGET_INDEX( indx ) <= ubound( this%runon, 1) ) ) then
 
-      this%runon( TARGET_INDEX( indx ) ) = this%runoff( indx ) + this%rejected_potential_recharge( indx )
+        this%runon( TARGET_INDEX( indx ) ) = this%runoff( this%order_index( indx ) )             &
+                                + this%rejected_potential_recharge( this%order_index( indx ) )
+
+    else
+
+      this%runoff_outside( this%order_index( indx ) ) = this%runoff( this%order_index( indx ) )  &
+              + this%rejected_potential_recharge( this%order_index( indx ) )
+      this%runon( TARGET_INDEX( indx ) ) = 0.0_c_float
 
     endif
-
-    !> @TODO: what about cases where target is outside of grid?
-    !!        what about flow pointing to open water feature?
 
   end subroutine model_calculate_routing_D8
 
@@ -1531,28 +1622,23 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)          :: this
     integer (kind=c_int), intent(in)               :: indx
 
-    ! [ LOCALS ]
-    real (kind=c_float)  :: inflow_
-
-    inflow_ = this%inflow( indx )
-
     !> @TODO: Should interception term be part of this? Initial abstraction should include
     !!        some of this interception...
 
-!    call update_previous_5_day_rainfall( inflow_, indx )
+!    call update_previous_5_day_rainfall( this%inflow( indx ), indx )
 
-    call runoff_curve_number_calculate(runoff=this%runoff( indx ),                              &
-                                       curve_num_adj=this%curve_num_adj( indx ),                &
-                                       landuse_index=this%landuse_index( indx ),                &
+    call runoff_curve_number_calculate(runoff=this%runoff( indx ),                               &
+                                       curve_num_adj=this%curve_num_adj( indx ),                 &
+                                       landuse_index=this%landuse_index( indx ),                 &
                                        cell_index=indx,                                          &
-                                       soil_group=this%soil_group( indx ),                      &
-                                       soil_storage_max=this%soil_storage_max( indx ),          &
-                                       inflow=this%inflow( indx ),                              &
-                                       it_is_growing_season=this%it_is_growing_season( indx ),  &
+                                       soil_group=this%soil_group( indx ),                       &
+                                       soil_storage_max=this%soil_storage_max( indx ),           &
+                                       it_is_growing_season=this%it_is_growing_season( indx ),   &
+                                       inflow=this%inflow( indx ),                               &
                                        continuous_frozen_ground_index=                           &
-                                       this%continuous_frozen_ground_index( indx ) )
+                                           this%continuous_frozen_ground_index( indx ) )
 
-    call update_previous_5_day_rainfall( inflow_, indx )
+    call update_previous_5_day_rainfall( this%inflow( indx ), indx )
 
   end subroutine model_calculate_runoff_curve_number
 
@@ -1743,7 +1829,8 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: index
+    integer (kind=c_int)               :: index
+    real (kind=c_float), allocatable   :: deficit(:)
 
     if ( allocated( this%monthly_gross_precip ) .and. allocated( this%monthly_runoff ) ) then
 
@@ -1774,6 +1861,7 @@ contains
                                   crop_etc=this%crop_etc,                                        &
                                   irrigation_mask=this%irrigation_mask,                          &
                                   num_days_since_planting=this%number_of_days_since_planting )
+
     endif
 
   end subroutine model_calculate_irrigation
@@ -1892,8 +1980,6 @@ contains
 
   subroutine model_initialize_GDD_none( this )
 
-    use growing_degree_day
-
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     !> Nothing here to see.
 
@@ -1943,6 +2029,43 @@ contains
 
   end subroutine model_calculate_GDD
 
+  !--------------------------------------------------------------------------------------------------
+
+    subroutine model_initialize_GDD_be( this )
+
+      use growing_degree_day_baskerville_emin, only : growing_degree_day_be_initialize
+
+      class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+      ! [ LOCALS ]
+      integer (kind=c_int)  :: status
+
+      allocate( this%gdd( count( this%active ) ), stat=status )
+      call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
+
+      this%gdd = 0.0_c_float
+
+      call growing_degree_day_be_initialize( is_cell_active=this%active,                           &
+                                             landuse_index=this%landuse_index )
+
+    end subroutine model_initialize_GDD_be
+
+  !--------------------------------------------------------------------------------------------------
+
+    subroutine model_calculate_GDD_be( this )
+
+      use growing_degree_day_baskerville_emin, only    : growing_degree_day_be_calculate
+
+      class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+      call growing_degree_day_be_calculate( gdd=this%gdd,                                          &
+                                                 tmean=this%tmean,                                      &
+                                                 tmin=this%tmin,                                        &
+                                                 tmax=this%tmax,                                        &
+                                                 order=this%order_index )
+
+    end subroutine model_calculate_GDD_be
+
 !--------------------------------------------------------------------------------------------------
 
   subroutine model_dump_variables_none( this )
@@ -1965,7 +2088,7 @@ contains
 
       indx = this%row_column_to_index( col_num=DUMP( jndx )%col, row_num=DUMP( jndx )%row)
 
-      if ( (indx > lbound( this%landuse_code, 1) ) .and. ( indx <= ubound( this%landuse_code, 1) ) ) then
+      if ( (indx >= lbound( this%landuse_code, 1) ) .and. ( indx <= ubound( this%landuse_code, 1) ) ) then
 
         call model_dump_variables( this=this, unitnum=DUMP( jndx )%unitnum, indx=indx )
 
@@ -2011,7 +2134,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int) :: kndx
 
-        write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',6(i6,','),50(f12.3,','),f12.3)")                  &
+        write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',6(i6,','),57(f12.3,','),f12.3)")                  &
           SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                        &
           this%landuse_code( indx ), this%landuse_index( indx ), this%order_index( indx ),                &
           this%soil_group( indx ), this%num_upslope_connections( indx ), this%sum_upslope_cells( indx ),  &
@@ -2030,8 +2153,12 @@ contains
           this%canopy_cover_fraction( indx ), this%crop_coefficient_kcb( indx ),                          &
           this%continuous_frozen_ground_index( indx ), this%rooting_depth_max( indx ),                    &
           this%current_rooting_depth( indx ), this%actual_et_soil( indx ),                                &
+          this%readily_available_water_raw( indx ), this%total_available_water_taw( indx ),               &
+          this%plant_stress_coef_ks( indx ), this%evap_reduction_coef_kr( indx ),                         &
+          this%surf_evap_coef_ke( indx ), this%fraction_exposed_and_wetted_soil( indx ),                  &
           this%actual_et_impervious( indx ), this%actual_et_interception( indx ),                         &
-          this%adjusted_depletion_fraction_p( indx ), this%crop_etc( indx ), this%direct_recharge( indx ),&
+          this%adjusted_depletion_fraction_p( indx ), this%crop_etc( indx ), this%bare_soil_evap( indx ), &
+          this%direct_recharge( indx ),                                                                   &
           this%direct_soil_moisture( indx ), (PREV_5_DAYS_RAIN( indx, kndx), kndx=1,6)
 
   end subroutine model_dump_variables
@@ -2128,6 +2255,54 @@ contains
                                     depletion_fraction_p=DEPLETION_FRACTION( landuse_index ) )
 
   end subroutine model_calculate_actual_et_fao56
+
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_actual_et_fao56__two_stage(this)
+
+    use actual_et__fao56__two_stage
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call actual_et_FAO56_two_stage_initialize( ubound( this%landuse_index, 1) )
+
+  end subroutine model_initialize_actual_et_fao56__two_stage
+
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_actual_et_fao56__two_stage( this, indx )
+
+    use actual_et__fao56__two_stage
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    integer (kind=c_int), intent(in)       :: indx
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: landuse_index
+
+    landuse_index = this%landuse_index( indx )
+
+    call calculate_actual_et_fao56_two_stage(                                                   &
+              actual_et=this%actual_et_soil( indx ),                                                &
+              crop_etc=this%crop_etc( indx ),                                                   &
+              bare_soil_evap=this%bare_soil_evap( indx ),                                       &
+              taw=this%total_available_water_taw( indx ),                                       &
+              raw=this%readily_available_water_raw( indx ),                                     &
+              fraction_exposed_and_wetted_soil=this%fraction_exposed_and_wetted_soil( indx ),   &
+              Kr=this%evap_reduction_coef_kr( indx ),                                           &
+              Ke=this%surf_evap_coef_ke( indx ),                                                &
+              Ks=this%plant_stress_coef_ks( indx ),                                             &
+              adjusted_depletion_fraction_p=this%adjusted_depletion_fraction_p( indx ),         &
+              Kcb=this%crop_coefficient_kcb( indx ),                                            &
+              landuse_index=this%landuse_index( indx ),                                         &
+              soil_group=this%soil_group( indx ),                                               &
+              awc=this%awc( indx ),                                                             &
+              current_rooting_depth=this%current_rooting_depth( indx ),                         &
+              soil_storage=this%soil_storage( indx ),                                           &
+              soil_storage_max=this%soil_storage_max( indx ),                                   &
+              reference_et0=this%reference_et0( indx ) )
+
+  end subroutine model_calculate_actual_et_fao56__two_stage
 
 !--------------------------------------------------------------------------------------------------
 
@@ -2265,11 +2440,37 @@ contains
 
   end subroutine model_calculate_maximum_potential_recharge_gridded
 
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine model_update_rooting_depth_none(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_update_rooting_depth_none
+
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine model_update_rooting_depth_FAO56(this)
+
+    use rooting_depth__FAO56, only : update_rooting_depth
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call update_rooting_depth(        &
+                       Zr_i=this%current_rooting_depth,       &
+                       Zr_max=this%rooting_depth_max,         &
+                       landuse_index=this%landuse_index,      &
+                       Kcb=this%crop_coefficient_kcb )
+
+  end subroutine model_update_rooting_depth_FAO56
+
 !--------------------------------------------------------------------------------------------------
 
   subroutine model_initialize_crop_coefficient_none(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    this%crop_coefficient_kcb = 1.0_c_float
 
   end subroutine model_initialize_crop_coefficient_none
 
@@ -2278,8 +2479,6 @@ contains
   subroutine model_update_crop_coefficient_none(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-    this%crop_coefficient_kcb = 1.0_c_float
 
   end subroutine model_update_crop_coefficient_none
 
@@ -2314,8 +2513,8 @@ contains
     this%number_of_days_since_planting = SIM_DT%curr                            &
               - GROWTH_STAGE_DATE( PLANTING_DATE, this%landuse_index )
 
-    call crop_coefficients_FAO56_calculate( Kcb=this%crop_coefficient_kcb,      &
-                                            GDD=this%gdd,                       &
+    call crop_coefficients_FAO56_calculate( Kcb=this%crop_coefficient_kcb,             &
+                                            GDD=this%gdd,                              &
                                             landuse_index=this%landuse_index )
 
   end subroutine model_update_crop_coefficient_FAO56

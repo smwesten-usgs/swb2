@@ -13,6 +13,8 @@ module daily_calculation
   use mass_balance__snow, only               : calculate_snow_mass_balance
   use mass_balance__soil, only               : calculate_soil_mass_balance
 
+  use simulation_datetime, only       : SIM_DT
+
   use strings
   use logfiles
 
@@ -39,14 +41,16 @@ contains
     ! calls elemental
     call cells%update_growing_season()
     call cells%update_crop_coefficient()
+    call cells%update_rooting_depth()
     call cells%calc_reference_et()
-
 
     ! update crop evapotranspiration; crop_coefficient_kcb defaults to 1.0
     cells%crop_etc = cells%reference_et0 * cells%crop_coefficient_kcb
 
     call cells%calc_snowfall()
+
     call cells%calc_snowmelt()
+
 
     call cells%calc_continuous_frozen_ground_index()
 
@@ -136,9 +140,9 @@ contains
           call LOGS%write("    gross_precip: "//asCharacter(gross_precipitation))
           call LOGS%write("   curve_num_adj: "//asCharacter( cells%curve_num_adj( indx )))
           call LOGS%write("    landuse_code: "//asCharacter( cells%landuse_code( indx ) ) )
-        endif          
+        endif
 
-        call cells%calc_runoff( indx )
+        call cells%calc_runoff( jndx )
 
         call calculate_impervious_surface_mass_balance(                                         &
           surface_storage=surface_storage,                                                      &
@@ -158,23 +162,21 @@ contains
         ! were to be redistributed uniformly over the total area of the cell
         surface_storage_excess = surface_storage_excess * ( 1.0_c_float - pervious_fraction )
 
-
         ! prevent calculated runoff from exceeding the day's inflow
         if ( inflow - runoff < 0.0_c_float ) then
-
-           ! call LOGS%write( "line "//asCharacter(__LINE__)//": runoff > inflow?, indx= "//asCharacter(indx)//" col, row= "    &
-           ! //asCharacter(cells%col_num_1D( indx ))//", "//asCharacter( cells%row_num_1D( indx ) ) )
-           ! call LOGS%write("          runoff: "//asCharacter(runoff))
-           ! call LOGS%write("          inflow: "//asCharacter(inflow))
-           ! call LOGS%write("           runon: "//asCharacter(runon))
-           ! call LOGS%write("        snowmelt: "//asCharacter(snowmelt))
-           ! call LOGS%write("        snowfall: "//asCharacter(snowfall))
-           ! call LOGS%write("    interception: "//asCharacter(interception))
-           ! call LOGS%write("             fog: "//asCharacter(fog))
-           ! call LOGS%write("        rainfall: "//asCharacter(rainfall))
-           ! call LOGS%write("    gross_precip: "//asCharacter(gross_precipitation))
-           ! call LOGS%write("   curve_num_adj: "//asCharacter( cells%curve_num_adj( indx )))
-           ! call LOGS%write("    landuse_code: "//asCharacter( cells%landuse_code( indx ) ) )
+            !  call LOGS%write( "line "//asCharacter(__LINE__)//": indx= "//asCharacter(indx)//" col, row= "    &
+            !    //asCharacter(cells%col_num_1D( indx ))//", "//asCharacter( cells%row_num_1D( indx ) ) )
+            !  call LOGS%write("          runoff: "//asCharacter(runoff))
+            !  call LOGS%write("          inflow: "//asCharacter(inflow))
+            !  call LOGS%write("           runon: "//asCharacter(runon))
+            !  call LOGS%write("        snowmelt: "//asCharacter(snowmelt))
+            !  call LOGS%write("        snowfall: "//asCharacter(snowfall))
+            !  call LOGS%write("    interception: "//asCharacter(interception))
+            !  call LOGS%write("             fog: "//asCharacter(fog))
+            !  call LOGS%write("        rainfall: "//asCharacter(rainfall))
+            !  call LOGS%write("    gross_precip: "//asCharacter(gross_precipitation))
+            !  call LOGS%write("   curve_num_adj: "//asCharacter( cells%curve_num_adj( indx )))
+            !  call LOGS%write("    landuse_code: "//asCharacter( cells%landuse_code( indx ) ) )
            runoff = inflow
          endif
 
@@ -202,7 +204,6 @@ contains
         ! the following call updates bound variable actual_et_soil
         call cells%calc_actual_et( indx )
 
-
         if ( runoff < 0.)                                                                               &
           call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
                            //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
@@ -220,7 +221,6 @@ contains
                                           actual_et=actual_et_soil,                    &
                                           infiltration=infiltration,                   &
                                           runoff=runoff )
-
 
         if ( runoff < 0.)                                                                               &
           call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &

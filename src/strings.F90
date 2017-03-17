@@ -671,7 +671,7 @@ contains
     if ( present(sDelimiters) ) then
       sDelimiters_ = sDelimiters_
     else
-      sDelimiters_ = sWHITESPACE
+      sDelimiters_ = WHITESPACE
     endif    
 
     iCount = 0
@@ -705,9 +705,9 @@ contains
 
       select case (sDelimiters)
         case ("WHITESPACE")
-          sDelimiters_ = sWHITESPACE
+          sDelimiters_ = WHITESPACE
         case ("TAB", "TABS")  
-          sDelimiters_ = sTAB
+          sDelimiters_ = TAB
         case ("COMMA", "CSV")  
           sDelimiters_ = ","
         case default
@@ -716,7 +716,7 @@ contains
 
     else
 
-      sDelimiters_ = sWHITESPACE
+      sDelimiters_ = WHITESPACE
 
     endif
 

@@ -5,7 +5,7 @@
 
 #### No Routing {#routing_none}
 
-This process option is self-explanatory: when active, all runoff generated within a cell is assumed to reach an unmodeled surface water feature and then exit the model domain.
+Downhill routing may be disabled altogether. Cell-to-cell routing becomes increasingly hard to imagine in a meaningful way as gridcell sizes exceed 1km or so; in any system with a well-developed drainage system, overland flow would almost certainly encounter some type of surface water feature over that distance. With flow routing disabled, all cell runoff is assumed to reach a surface water feature and leave the model domain.
 
 #### Downhill Routing {#routing_downhill}
 

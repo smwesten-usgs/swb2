@@ -20,13 +20,13 @@ module routing__D8
   logical (kind=c_bool), allocatable    :: lDownhillMarked(:,:)
   integer (kind=c_int), allocatable     :: iSumOfUpslopeCells(:,:)
   integer (kind=c_int), allocatable     :: iNumberOfUpslopeConnections(:,:)
-  
+
   !> @TODO remove redundant data elements; row1d, col1d, etc. are now also stored in the model data structure.
 
   integer (kind=c_int), allocatable     :: ROW2D(:,:)
-  integer (kind=c_int), allocatable     :: COL2D(:,:) 
+  integer (kind=c_int), allocatable     :: COL2D(:,:)
   integer (kind=c_int), allocatable     :: ROW1D(:)
-  integer (kind=c_int), allocatable     :: COL1D(:) 
+  integer (kind=c_int), allocatable     :: COL1D(:)
 
   integer (kind=c_int), allocatable     :: ROW_INDEX(:)
   integer (kind=c_int), allocatable     :: COLUMN_INDEX(:)
@@ -44,7 +44,7 @@ module routing__D8
 
   integer (kind=c_int), parameter       :: D8_UNDETERMINED = -999
 
-  ! idea here is to create an array of row and column numbers, then use the 
+  ! idea here is to create an array of row and column numbers, then use the
   ! PACK statement to create a vector of row-column numbers in the same order that
   ! the rest of the vectors are packed.
 
@@ -63,8 +63,8 @@ contains
     integer (kind=c_int)                 :: iNY
     integer (kind=c_int)                 :: iStat
     integer (kind=c_int)                 :: iColnum
-    integer (kind=c_int)                 :: iRownum  
-    integer (kind=c_int)                 :: iIndex 
+    integer (kind=c_int)                 :: iRownum
+    integer (kind=c_int)                 :: iIndex
     integer (kind=c_int)                 :: iCount
     character (len=256)                  :: sBuf
 
@@ -141,26 +141,35 @@ contains
 
     call routing_D8_assign_downstream_row_col( lActive )
 
-    do iRownum=iRow_lbound, iRow_ubound    
-      do iColnum=iCol_lbound, iCol_ubound  
- 
+    do iRownum=iRow_lbound, iRow_ubound
+      do iColnum=iCol_lbound, iCol_ubound
+
         COL2D( iColnum, iRownum ) = iColNum   ! right-most index should vary slowest
         ROW2D( iColnum, iRownum ) = iRownum
 
       enddo
     enddo
 
-    COL1D = pack( COL2D, lActive )
-    ROW1D = pack( ROW2D, lActive )	
+    ! pTempGrid%iData = COL2D
+    ! call grid_WriteArcGrid("COL2D_Grid.asc", pTempGrid)
+    !
+    ! pTempGrid%iData = ROW2D
+    ! call grid_WriteArcGrid("ROW2D_Grid.asc", pTempGrid)
 
-    call routing_D8_determine_solution_order( lActive )    
+    ! create 1D vectors of column and row numbers for full grid
+    COL1D = pack( COL2D, lActive )
+    ROW1D = pack( ROW2D, lActive )
+
+    call routing_D8_determine_solution_order( lActive )
 
     open( newunit=iUnitNum, file="D8_routing_table.txt", iostat=iStat, status="REPLACE")
 
-    write(iUnitNum,*) "ORDER_INDEX"//sTAB//"TARGET_INDEX"//sTAB//"From_COL"//sTAB//"From_ROW" &
-      //sTAB//"To_COL"//sTAB//"To_ROW"//sTAB//"D8_flowdir"//sTAB//"Num_Adjacent_Upslope_Connections"//sTAB &
+    write(iUnitNum,*) "INDEX"//TAB//"ORDER_INDEX"//TAB//"TARGET_INDEX"//TAB//"From_COL"//TAB//"From_ROW" &
+      //TAB//"To_COL"//TAB//"To_ROW"//TAB//"D8_flowdir"//TAB//"Num_Adjacent_Upslope_Connections"//TAB &
       //"Sum_of_Upslope_Contributing_Cells"
 
+     ! solution order has been determined; remaining code simply writes a summary to a
+     ! file for further analysis
     do iIndex = 1, ubound(COL1D,1)
 
       sBuf = ""
@@ -169,6 +178,8 @@ contains
                  Target_index => TARGET_INDEX( iIndex ),                                      &
                  Rownum => ROW1D( ORDER_INDEX( iIndex ) ),                                    &
                  Colnum => COL1D( ORDER_INDEX( iIndex ) ),                                    &
+                 Target_row => ROW1D( TARGET_INDEX( iIndex ) ),                                &
+                 Target_col => COL1D( TARGET_INDEX( iIndex ) ),                                    &
                  D8_flowdir => pD8_FLOWDIR%pGrdBase%iData( COL1D( ORDER_INDEX( iIndex ) ),    &
                                   ROW1D( ORDER_INDEX( iIndex ) ) ),                           &
                  Num_adjacent => iNumberOfUpslopeConnections( COL1D( ORDER_INDEX( iIndex ) ), &
@@ -176,16 +187,16 @@ contains
                  Sum_upslope => iSumOfUpslopeCells( COL1D( ORDER_INDEX( iIndex ) ),           &
                                      ROW1D( ORDER_INDEX( iIndex ) ) )  )
 
-        write(sBuf,*)  Order_index,sTAB, Target_index
-        write(sBuf,*) trim(sBuf)//sTab//asCharacter( Colnum )//sTAB &
+        write(sBuf,*)  iIndex, TAB, Order_index, TAB, Target_index
+        write(sBuf,*) trim(sBuf)//TAB//asCharacter( Colnum )//TAB &
           //asCharacter( Rownum )
 
         if ( Target_index > 0 ) &
-          write(sBuf,*) trim(sBuf)//sTab//asCharacter( Colnum )//sTAB &
-          //asCharacter( Rownum )//sTAB//asCharacter( D8_flowdir )//sTAB &
-          //asCharacter( Num_adjacent )//sTAB//asCharacter( Sum_upslope )
+          write(sBuf,*) trim(sBuf)//TAB//asCharacter( Target_col )//TAB &
+          //asCharacter( Target_row )//TAB//asCharacter( D8_flowdir )//TAB &
+          //asCharacter( Num_adjacent )//TAB//asCharacter( Sum_upslope )
 
-        write(iUnitNum,*)  trim(sBuf)  
+        write(iUnitNum,*)  trim(sBuf)
 
       end associate
 
@@ -212,7 +223,8 @@ contains
     iIndex = -999
     lFound = lFALSE
 
-    do iOrderIndex = lbound(COL1D,1), ubound(COL1D,1) 
+    ! iterate over 1D vector of column numbers
+    do iOrderIndex = lbound(COL1D,1), ubound(COL1D,1)
 
       if( COL1D( iOrderIndex ) == iCol  .and.  ROW1D( iOrderIndex ) == iRow ) then
       	iIndex = iOrderIndex
@@ -256,54 +268,54 @@ contains
 
               iTargetCol(iColnum, iRownum) = iColnum + 1
               iTargetRow(iColnum, iRownum) = iRownum
-        
+
             case ( D8_SOUTHEAST )
 
               iTargetCol(iColnum, iRownum) = iColnum + 1
               iTargetRow(iColnum, iRownum) = iRownum + 1
-        
+
             case ( D8_SOUTH )
 
               iTargetCol(iColnum, iRownum) = iColnum
               iTargetRow(iColnum, iRownum) = iRownum + 1
-        
+
             case ( D8_SOUTHWEST )
 
               iTargetCol(iColnum, iRownum) = iColnum - 1
               iTargetRow(iColnum, iRownum) = iRownum + 1
-        
+
             case ( D8_WEST )
 
               iTargetCol(iColnum, iRownum) = iColnum - 1
               iTargetRow(iColnum, iRownum) = iRownum
-        
+
             case ( D8_NORTHWEST )
 
               iTargetCol(iColnum, iRownum) = iColnum - 1
               iTargetRow(iColnum, iRownum) = iRownum - 1
-        
+
             case ( D8_NORTH )
 
               iTargetCol(iColnum, iRownum) = iColnum
               iTargetRow(iColnum, iRownum) = iRownum - 1
-        
+
             case ( D8_NORTHEAST )
 
               iTargetCol(iColnum, iRownum) = iColnum + 1
               iTargetRow(iColnum, iRownum) = iRownum - 1
-        
+
             case default
 
               iTargetCol(iColnum, iRownum) = D8_UNDETERMINED
               iTargetRow(iColnum, iRownum) = D8_UNDETERMINED
 
-          end select 
-          
+          end select
+
         enddo
 
       enddo
 
-    end associate   
+    end associate
 
 
   end subroutine routing_D8_assign_downstream_row_col
@@ -326,9 +338,9 @@ contains
     integer (kind=c_int)  :: iRow_lbound, iRow_ubound
     integer (kind=c_int)  :: iUpslopeSum, iUpslopeConnections
     logical (kind=c_bool) :: lAnyUnmarkedUpslopeCells
-    logical (kind=c_bool) :: lCircular 
+    logical (kind=c_bool) :: lCircular
     integer (kind=c_int)  :: iNumberRemaining
-    integer (kind=c_int)  :: iIndex, k, iCount
+    integer (kind=c_int)  :: iStorageIndex, k, iCount
     integer (kind=c_int)  :: iDelta
     integer (kind=c_int)  :: iPasses
     integer (kind=c_int)  :: iPassesWithoutChange
@@ -343,7 +355,7 @@ contains
     lDownhillMarked = lFALSE
     iSumOfUpslopeCells = 0_c_int
 
-    iIndex = 0
+    iStorageIndex = 0
     iPasses = 0
     iPassesWithoutChange = 0
 
@@ -371,19 +383,19 @@ main_loop: do
           lCircular = lFALSE
 
           ! search the 8 cells immediately adjacent to the current cell
-	local_search: do iRowsrch=max( iRowNum-1, iRow_lbound),min( iRownum+1, iRow_ubound) 
-                  do iColsrch=max( iColNum-1, iCol_lbound),min( iColnum+1, iCol_ubound)      
+	local_search: do iRowsrch=max( iRowNum-1, iRow_lbound),min( iRownum+1, iRow_ubound)
+                  do iColsrch=max( iColNum-1, iCol_lbound),min( iColnum+1, iCol_ubound)
 
-	 			            ! if adjacent cell points to current cell, determine what to do with runoff	
+	 			            ! if adjacent cell points to current cell, determine what to do with runoff
 	 			            if ( ( iTargetCol(iColsrch, iRowsrch) == iColnum ) &
 	 			            	.and. ( iTargetRow(iColsrch, iRowsrch) == iRownum ) ) then
 
                       ! if adjacent cell falls outside the area of active cells,
-                      ! ignore it and move on                    
+                      ! ignore it and move on
                       if ( .not. lActive( iColsrch, iRowsrch ) )  cycle
-	 			               			
+
                       ! if the target of the current cell points back at the adjacent
-                      ! cell, mark current cell as having a "circular" connection      
+                      ! cell, mark current cell as having a "circular" connection
                       if ( ( iTargetCol( iColNum, iRowNum ) == iColsrch )                &
                         .and. ( iTargetRow( iColNum, iRowNum ) == iRowsrch ) )  lCircular = lTRUE
 
@@ -394,16 +406,16 @@ main_loop: do
 	 			              if(	lDownhillMarked( iColsrch, iRowsrch ) ) then
 
                         iUpslopeSum = iUpslopeSum + iSumOfUpslopeCells(iColsrch, iRowsrch) + 1
-                        iUpslopeConnections = iUpslopeConnections + 1 
-	 			           	  
+                        iUpslopeConnections = iUpslopeConnections + 1
+
                       ! add number of upslope cells and connections to temporary variables
                       ! if we get to the end of the search and find no unmarked adjacent cells,
                       ! we have determined the number of upslope contributing cells and will
-                      ! be able to mark the current cell 
+                      ! be able to mark the current cell
 	 			           	  else
 
                         lAnyUnmarkedUpslopeCells = lTRUE
-	 			           	  
+
 	 			           	  endif
 
 	 			            endif
@@ -422,14 +434,14 @@ main_loop: do
 	                iSumOfUpslopeCells( iColnum, iRownum ) = iUpslopeSum
 	                iNumberOfUpslopeConnections( iColnum, iRownum ) = iUpslopeConnections
 	                lDownhillMarked( iColnum, iRownum ) = lTRUE
-                  iIndex = iIndex + 1
-                  COLUMN_INDEX( iIndex ) = iColnum
-                  ROW_INDEX( iIndex ) = iRownum
-                  ORDER_INDEX( iIndex ) = routing_D8_get_index( iColnum, iRownum )
-                  TARGET_INDEX( iIndex ) = routing_D8_get_index( iTargetCol( iColNum, iRowNum ), &
+                  iStorageIndex = iStorageIndex + 1
+                  COLUMN_INDEX( iStorageIndex ) = iColnum
+                  ROW_INDEX( iStorageIndex ) = iRownum
+                  ORDER_INDEX( iStorageIndex ) = routing_D8_get_index( iColnum, iRownum )
+                  TARGET_INDEX( iStorageIndex ) = routing_D8_get_index( iTargetCol( iColNum, iRowNum ), &
                     iTargetRow( iColNum, iRowNum ) )
 
-                  if ( lCircular )  TARGET_INDEX( iIndex ) = D8_UNDETERMINED
+                  if ( lCircular )  TARGET_INDEX( iStorageIndex ) = D8_UNDETERMINED
 
                 elseif ( iPassesWithoutChange > 10 ) then
 
@@ -437,16 +449,16 @@ main_loop: do
                   iSumOfUpslopeCells( iColnum, iRownum ) = iUpslopeSum
                   iNumberOfUpslopeConnections( iColnum, iRownum ) = iUpslopeConnections
                   lDownhillMarked( iColnum, iRownum ) = lTRUE
-                  iIndex = iIndex + 1
-                  COLUMN_INDEX( iIndex ) = iColnum
-                  ROW_INDEX( iIndex ) = iRownum
-                  ORDER_INDEX( iIndex ) = routing_D8_get_index( iColnum, iRownum )
+                  iStorageIndex = iStorageIndex + 1
+                  COLUMN_INDEX( iStorageIndex ) = iColnum
+                  ROW_INDEX( iStorageIndex ) = iRownum
+                  ORDER_INDEX( iStorageIndex ) = routing_D8_get_index( iColnum, iRownum )
 
-                  TARGET_INDEX( iIndex ) = D8_UNDETERMINED
+                  TARGET_INDEX( iStorageIndex ) = D8_UNDETERMINED
 
                 endif
 
-	      enddo  		
+	      enddo
 	  	enddo
 
 !      if (iNumberOfChangedCells == 0) exit main_loop
@@ -456,7 +468,7 @@ main_loop: do
       if ( iNumberRemaining==0 )   exit main_loop
 
       print *, "### determining solution order... ", count( lDownhillMarked ), " cells marked so far " &
-        //"out of ", count( lActive ), " active cells." 
+        //"out of ", count( lActive ), " active cells."
 
 
       if ( iDelta==0 ) then
@@ -505,25 +517,17 @@ main_loop: do
 
   !------------------------------------------------------------------------------------------------
 
-!   subroutine calculate_routing_D8( indx )
-
-!     this%runon=0.0_c_float
-
-!     do index=lbound( ORDER_INDEX, 1 ), ubound( ORDER_INDEX, 1 )
-
-!       call this%calc_runoff( index )
-
-!       if ( (    TARGET_INDEX( index ) >= lbound( ORDER_INDEX, 1) ) &
-!         .and. ( TARGET_INDEX( index ) <= ubound( ORDER_INDEX, 1) ) ) then
-
-!         this%runon( TARGET_INDEX( index ) ) = this%runoff( ORDER_INDEX( index ) )
-
-!       endif  
-      
-!     enddo
-
-!   end subroutine calculate_routing_D8  
-
-
+  ! subroutine calculate_routing_D8( indx )
+  !
+  !     if ( (    TARGET_INDEX( indx ) >= lbound( ORDER_INDEX, 1) ) &
+  !       .and. ( TARGET_INDEX( indx ) <= ubound( ORDER_INDEX, 1) ) ) then
+  !
+  !       this%runon( TARGET_INDEX( index ) ) = this%runoff( ORDER_INDEX( index ) )
+  !
+  !     endif
+  !
+  !   enddo
+  !
+  ! end subroutine calculate_routing_D8
 
 end module routing__D8

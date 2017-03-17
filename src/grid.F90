@@ -59,7 +59,7 @@ module grid
     integer (kind=c_int)            :: iLengthUnits= -99999  ! length units code
     real (kind=c_double)            :: rX0, rX1              ! World-coordinate range in X
     real (kind=c_double)            :: rY0, rY1              ! World-coordinate range in Y
-    
+
     integer (kind=c_int), dimension(:,:), allocatable   :: iData ! Integer data
     real (kind=c_float), dimension(:,:), allocatable    :: rData    ! Real data
     real (kind=c_float), dimension(:,:), allocatable    :: fData    ! Float data
@@ -145,7 +145,8 @@ module grid
      grid_Conform, grid_Transform, grid_Interpolate, grid_PopulateXY,                       &
      grid_set_nodata_value,                                                                 &
      grid_CreateComplete, grid_CreateSimple, grid_WriteGrid,                                &
-     grid_WriteArcGrid, grid_WriteSurferGrid, grid_set_output_directory_name
+     grid_WriteArcGrid, grid_WriteSurferGrid, grid_set_output_directory_name,               &
+     grid_GetGridRowNum, grid_GetGridColNum
 
   interface grid_Create
     module procedure grid_CreateSimple
@@ -177,7 +178,7 @@ contains
       //dquote( OUTPUT_GRID_DIRECTORY_NAME ), iLogLevel=LOG_ALL,                    &
       iLinesBefore=1, lEcho=lTRUE )
 
-  end subroutine grid_set_output_directory_name  
+  end subroutine grid_set_output_directory_name
 
 
 !--------------------------------------------------------------------------
@@ -622,7 +623,7 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
 
           pGrd%rGridCellSize = rCellSize
           ! Go back to the top, skip the header...
-          rewind ( unit=LU_GRID, iostat=iStat ) 
+          rewind ( unit=LU_GRID, iostat=iStat )
           call assert ( iStat == 0, "Failed to rewind grid file" )
           do iCol=1,iHdrRecs
               read ( unit=LU_GRID, fmt="(a256)", iostat=iStat ) sInputRecord
@@ -725,7 +726,7 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
   lXLLCenter = lFALSE
   lYLLCenter = lFALSE
   sNoDataValue = ""
-  
+
   do
       read ( unit=LU_GRID, fmt="(a256)", iostat=iStat ) sInputRecord
       call assert ( iStat == 0, &
@@ -1460,7 +1461,7 @@ end subroutine grid_LookupRow
 !! the projection system of the input data set. These coordinate values are
 !! then fed to PROJ4, which modifies the values and returns the coordinate
 !! values in the projection system of the base grid. Thereafter, mapping
-!! source to target is a matter of finding the value of the cell closest to 
+!! source to target is a matter of finding the value of the cell closest to
 !! a SWB grid coordinate pair.
 !! @param[inout] pGrd
 !! @param[in] sFromPROJ4
@@ -1843,7 +1844,7 @@ function grid_SearchColumn(pGrd,rXval,rZval,rNoData) result ( rValue )
           rValue = v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1
           exit
         else if ( iRow == pGrd%iNY ) then
-          v =  1.0_c_float 
+          v =  1.0_c_float
           rValue = v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1
           exit
         end if
@@ -2055,7 +2056,7 @@ function grid_GetGridColRowNum(pGrd, rX, rY)    result(iColRow)
 
     iColRow(COLUMN) = iStartingColNum
     iColRow(ROW) = iStartingRowNum
-  endif  
+  endif
 end function grid_GetGridColRowNum
 
 
@@ -2068,7 +2069,7 @@ subroutine grid_set_nodata_value( pGrd, iValue, fValue )
   if ( present( iValue ) )  pGrd%iNoDataValue = iValue
   if ( present( fValue ) )  pGrd%rNoDataValue = fValue
 end subroutine grid_set_nodata_value
-!--------------------------------------------------------------------------------------------------  
+!--------------------------------------------------------------------------------------------------
 
 function grid_GetGridX(pGrd,iColumnNumber)  result(rX)
 
@@ -2256,7 +2257,7 @@ subroutine grid_GridToGrid_int( pGrdFrom, pGrdTo, lUseMajorityFilter )
              iTargetCol=iColRow(COLUMN),                                              &
              iTargetRow=iColRow(ROW),                                                 &
              iNoDataValue=pGrdFrom%iNoDataValue,                                      &
-             iSpread=iSpread) 
+             iSpread=iSpread)
 
       enddo
     enddo
@@ -2385,7 +2386,7 @@ function grid_MajorityFilter_int(pGrdFrom, iTargetCol, &
            exit
          endif
        enddo
-       
+
        ! this integer value has not been found previously; add the value to the next position
        ! and increment counter
        if (.not. lMatch) then

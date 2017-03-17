@@ -1,7 +1,7 @@
 program test_params
 
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
-!  use constants_and_conversions, only :sWHITESPACE
+!  use constants_and_conversions, only :WHITESPACE
   use exceptions
 !  use strings
   use string_list
