@@ -20,14 +20,14 @@ module interception__bucket
   integer (kind=c_int), allocatable :: iLanduseCodes(:)
   real (kind=c_float), allocatable  :: INTERCEPTION_A_VALUE_GROWING_SEASON(:)
   real (kind=c_float), allocatable  :: INTERCEPTION_B_VALUE_GROWING_SEASON(:)
-  real (kind=c_float), allocatable  :: INTERCEPTION_N_VALUE_GROWING_SEASON(:)  
+  real (kind=c_float), allocatable  :: INTERCEPTION_N_VALUE_GROWING_SEASON(:)
   real (kind=c_float), allocatable  :: INTERCEPTION_A_VALUE_NONGROWING_SEASON(:)
   real (kind=c_float), allocatable  :: INTERCEPTION_B_VALUE_NONGROWING_SEASON(:)
-  real (kind=c_float), allocatable  :: INTERCEPTION_N_VALUE_NONGROWING_SEASON(:) 
+  real (kind=c_float), allocatable  :: INTERCEPTION_N_VALUE_NONGROWING_SEASON(:)
   real (kind=c_float), allocatable  :: FIRST_DAY_OF_GROWING_SEASON(:)
   real (kind=c_float), allocatable  :: LAST_DAY_OF_GROWING_SEASON(:)
   real (kind=c_float), allocatable  :: GDD_FIRST_DAY_OF_GROWING_SEASON(:)
-  real (kind=c_float), allocatable  :: KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON(:) 
+  real (kind=c_float), allocatable  :: KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON(:)
 
   !> Form of the bucket interception: I = A + P*B^n
 
@@ -36,7 +36,7 @@ module interception__bucket
   character( len=2 ), parameter     :: DATE_DELIMS = "/-"
   real (kind=c_float), parameter    :: NODATA_VALUE = -9999._c_float
 
-contains   
+contains
 
   subroutine interception_bucket_initialize( active_cells )
 
@@ -48,7 +48,7 @@ contains
     character (len=:), allocatable    :: sTemp
     type (STRING_LIST_T)              :: sl_temp_list
     type (STRING_LIST_T)              :: sl_growing_season_begin
-    type (STRING_LIST_T)              :: sl_growing_season_end  
+    type (STRING_LIST_T)              :: sl_growing_season_end
     character (len=32)                :: str_buffer
     real (kind=c_float), allocatable  :: temp_values(:)
     integer (kind=c_int)              :: indx
@@ -64,6 +64,7 @@ contains
     !> retrieve growing season interception amount: 'a' term
     call sl_temp_list%clear()
     call sl_temp_list%append("Growing_season_interception")
+    call sl_temp_list%append("Growing_season_interception_a")
     call sl_temp_list%append("Interception_growing")
     call sl_temp_list%append("Interception_a_term_growing_season")
 
@@ -74,7 +75,7 @@ contains
     if (all( temp_values > fTINYVAL) ) then
 
       lAreLengthsEqual = ( ubound(temp_values,1) == ubound(iLanduseCodes,1) )
-      
+
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of interception values "  &
                           //"specified for the 'a' term for use during the growing season.",              &
@@ -82,8 +83,8 @@ contains
 
       call move_alloc( temp_values, INTERCEPTION_A_VALUE_GROWING_SEASON )
 
-    endif  
-    
+    endif
+
     !> retrieve growing season interception amount: 'b' term
     call sl_temp_list%clear()
     call sl_temp_list%append("Growing_season_interception_b")
@@ -92,7 +93,7 @@ contains
 
     call PARAMS%get_parameters( slKeys=sl_temp_list,                       &
                                 fValues=temp_values,                       &
-                                lFatal=FALSE ) 
+                                lFatal=FALSE )
 
     if (all( temp_values <= fTINYVAL) ) then
 
@@ -102,7 +103,7 @@ contains
     else
 
       lAreLengthsEqual = ( ubound(temp_values,1) == ubound(iLanduseCodes,1) )
-      
+
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of interception values "  &
                           //"specified for the 'b' term for use during the growing season.",              &
@@ -110,7 +111,7 @@ contains
 
       call move_alloc( temp_values, INTERCEPTION_B_VALUE_GROWING_SEASON )
 
-    endif  
+    endif
 
     !> retrieve growing season interception amount: 'n' term
     call sl_temp_list%clear()
@@ -120,7 +121,7 @@ contains
 
     call PARAMS%get_parameters( slKeys=sl_temp_list,                                  &
                                 fValues=temp_values,                                  &
-                                lFatal=FALSE ) 
+                                lFatal=FALSE )
 
     if (all( temp_values <= fTINYVAL) ) then
 
@@ -130,7 +131,7 @@ contains
     else
 
       lAreLengthsEqual = ( ubound(temp_values,1) == ubound(iLanduseCodes,1) )
-      
+
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of interception values "  &
                           //"specified for the 'n' term for use during the growing season.",              &
@@ -138,7 +139,7 @@ contains
 
       call move_alloc( temp_values, INTERCEPTION_N_VALUE_GROWING_SEASON )
 
-    endif  
+    endif
 
     !> retrieve nongrowing season interception amount: 'a' term
     call sl_temp_list%clear()
@@ -148,12 +149,12 @@ contains
 
     call PARAMS%get_parameters( slKeys=sl_temp_list,          &
                                 fValues=temp_values,          &
-                                lFatal=TRUE ) 
+                                lFatal=TRUE )
 
     if (all( temp_values > fTINYVAL) ) then
 
       lAreLengthsEqual = ( ubound(temp_values,1) == ubound(iLanduseCodes,1) )
-      
+
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of interception values "  &
                           //"specified for the 'a' term for use during the nongrowing season.",              &
@@ -161,7 +162,7 @@ contains
 
       call move_alloc( temp_values, INTERCEPTION_A_VALUE_NONGROWING_SEASON )
 
-    endif  
+    endif
 
     !> retrieve nongrowing season interception amount: 'b' term
     call sl_temp_list%clear()
@@ -171,7 +172,7 @@ contains
 
     call PARAMS%get_parameters( slKeys=sl_temp_list,                       &
                                 fValues=temp_values,                       &
-                                lFatal=FALSE ) 
+                                lFatal=FALSE )
 
     if (all( temp_values <= fTINYVAL) ) then
 
@@ -181,7 +182,7 @@ contains
     else
 
       lAreLengthsEqual = ( ubound(temp_values,1) == ubound(iLanduseCodes,1) )
-      
+
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of interception values "  &
                           //"specified for the 'b' term for use during the nongrowing season.",              &
@@ -189,7 +190,7 @@ contains
 
       call move_alloc( temp_values, INTERCEPTION_B_VALUE_NONGROWING_SEASON )
 
-    endif  
+    endif
 
     !> retrieve nongrowing season interception amount: 'n' term
     call sl_temp_list%clear()
@@ -199,7 +200,7 @@ contains
 
     call PARAMS%get_parameters( slKeys=sl_temp_list,                                  &
                                 fValues=temp_values,                                  &
-                                lFatal=FALSE ) 
+                                lFatal=FALSE )
 
     if (all( temp_values <= fTINYVAL) ) then
 
@@ -209,7 +210,7 @@ contains
     else
 
       lAreLengthsEqual = ( ubound(temp_values,1) == ubound(iLanduseCodes,1) )
-      
+
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of interception values "  &
                           //"specified for the 'n' term for use during the nongrowing season.",              &
@@ -217,7 +218,7 @@ contains
 
       call move_alloc( temp_values, INTERCEPTION_N_VALUE_NONGROWING_SEASON )
 
-    endif  
+    endif
 
 
 !     !> retrieve first day of growing season
@@ -228,7 +229,7 @@ contains
 
 !     call PARAMS%get_parameters( slKeys=sl_temp_list,                                  &
 !                                 slValues=sl_growing_season_begin,                     &
-!                                 lFatal=.true._c_bool ) 
+!                                 lFatal=.true._c_bool )
 
 !     !> retrieve last day of growing season
 !     call sl_temp_list%clear()
@@ -238,11 +239,11 @@ contains
 
 !     call PARAMS%get_parameters( slKeys=sl_temp_list,                                  &
 !                                 slValues=sl_growing_season_end,                       &
-!                                 lFatal=.true._c_bool ) 
+!                                 lFatal=.true._c_bool )
 
 !     call sl_temp_list%clear()
 
-!     !> process first day of growing season. retrieved as a list of strings; 
+!     !> process first day of growing season. retrieved as a list of strings;
 !     !! must convert the strings from mm/dd to DOY
 !     allocate( FIRST_DAY_OF_GROWING_SEASON( sl_growing_season_begin%count ), stat=status )
 !     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
@@ -253,10 +254,10 @@ contains
 !         FIRST_DAY_OF_GROWING_SEASON( indx ) = mmdd2doy( str_buffer )
 !       else
 !         FIRST_DAY_OF_GROWING_SEASON( indx ) = asInt( str_buffer )
-!       endif  
-!     enddo  
+!       endif
+!     enddo
 
-!     !> process last day of growing season. retrieved as a list of strings; 
+!     !> process last day of growing season. retrieved as a list of strings;
 !     !! must convert the strings from mm/dd to DOY
 !     allocate( LAST_DAY_OF_GROWING_SEASON( sl_growing_season_end%count ), stat=status )
 !     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
@@ -266,9 +267,9 @@ contains
 !       if ( scan( str_buffer, DATE_DELIMS ) > 0 ) then
 !         LAST_DAY_OF_GROWING_SEASON( indx ) = mmdd2doy( str_buffer )
 !       else
-!         LAST_DAY_OF_GROWING_SEASON( indx ) = asInt( str_buffer )  
-!       endif  
-!     enddo  
+!         LAST_DAY_OF_GROWING_SEASON( indx ) = asInt( str_buffer )
+!       endif
+!     enddo
 
 
 
@@ -279,10 +280,10 @@ contains
 
 !     call PARAMS%get_parameters( slKeys=sl_temp_list,          &
 !                                 fValues=temp_values,          &
-!                                 lFatal=FALSE ) 
+!                                 lFatal=FALSE )
 
 !     lAreLengthsEqual = ( ubound(temp_values,1) == ubound(iLanduseCodes,1) )
-    
+
 !     if ( lAreLengthsEqual ) then
 
 !       call move_alloc( temp_values, GDD_FIRST_DAY_OF_GROWING_SEASON )
@@ -307,10 +308,10 @@ contains
 
 !     call PARAMS%get_parameters( slKeys=sl_temp_list,          &
 !                                 fValues=temp_values,          &
-!                                 lFatal=FALSE ) 
+!                                 lFatal=FALSE )
 
 !     lAreLengthsEqual = ( ubound(temp_values,1) == ubound(iLanduseCodes,1) )
-    
+
 !     if ( lAreLengthsEqual ) then
 
 !       call move_alloc( temp_values, KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON )
@@ -336,7 +337,7 @@ contains
 
   end subroutine interception_bucket_initialize
 
-!--------------------------------------------------------------------------------------------------  
+!--------------------------------------------------------------------------------------------------
 
   elemental function interception_bucket_calculate( iLanduseIndex,                                     &
                                                     fPrecip,                                           &
@@ -375,7 +376,7 @@ contains
 
     fInterception = min( fPotentialInterception, fPrecip + fFog )  * fCanopy_Cover_Fraction
 
- 
+
   end function interception_bucket_calculate
 
 end module interception__bucket
