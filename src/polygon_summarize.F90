@@ -78,7 +78,7 @@ contains
       crop_et0 = mean( cells%reference_et0 * cells%crop_coefficient_kcb, belongs_to_poly )
       actual_et_soil = mean( cells%actual_et_soil, belongs_to_poly )
       actual_et = mean( cells%actual_et, belongs_to_poly )
-      recharge = mean( cells%potential_recharge, belongs_to_poly )
+      recharge = mean( cells%net_infiltration, belongs_to_poly )
       sms_end = mean( cells%soil_storage, belongs_to_poly )
       surface_storage_excess = mean( cells%surface_storage_excess, belongs_to_poly )
       surface_storage = mean( cells%surface_storage, belongs_to_poly )

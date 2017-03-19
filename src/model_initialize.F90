@@ -80,7 +80,7 @@ module model_initialize
       GRIDDED_DATASETS_T("POLYGON_ID                            ", lTRUE, DATATYPE_INT ),        &
       GRIDDED_DATASETS_T("SOIL_STORAGE_MAX                      ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("PLANT_AVAILABLE_WATER                 ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("MAXIMUM_POTENTIAL_RECHARGE            ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("MAXIMUM_NET_INFILTRATION            ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("IRRIGATION_MASK                       ", lTRUE, DATATYPE_INT),         &
       GRIDDED_DATASETS_T("RELATIVE_HUMIDITY                     ", lTRUE, DATATYPE_FLOAT )   ]
 

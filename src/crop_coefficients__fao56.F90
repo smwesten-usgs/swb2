@@ -298,12 +298,7 @@ contains
     if (ubound(GDD_late_,1) == iNumberOfLanduses)   GROWTH_STAGE_GDD( GDD_LATE, : ) = GDD_late_
 
     if (ubound(KCB_ini_,1) == iNumberOfLanduses)  KCB_( KCB_INI, :) = KCB_ini_
-    if (ubound(KCB_mid_,1) == iNumberOfLanduses)  then
-       KCB_( KCB_MID, :) = KCB_mid_
-       print *, Kcb_mid_
-       print *, "=="
-       print *, KCB_(KCB_MID, : )
-    endif
+    if (ubound(KCB_mid_,1) == iNumberOfLanduses)  KCB_( KCB_MID, :) = KCB_mid_
     if (ubound(KCB_end_,1) == iNumberOfLanduses)  KCB_( KCB_END, :) = KCB_end_
     if (ubound(KCB_min_,1) == iNumberOfLanduses)  KCB_( KCB_MIN, :) = KCB_min_
 
