@@ -915,9 +915,9 @@ contains
 
     ! open the control file and define the comment characters and delimiters to be used in
     ! parsing the ASCII text
-    call CF%open( sFilename = sFilename, &
-                  sCommentChars = "#%!+=|[{(", &
-                  sDelimiters = "WHITESPACE", &
+    call CF%open( sFilename = sFilename,            &
+                  sCommentChars = "#%!+=|[{(-*$",   &
+                  sDelimiters = "WHITESPACE",       &
                   lHasHeader = .false._c_bool )
 
     do
