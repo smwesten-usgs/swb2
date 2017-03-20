@@ -322,8 +322,8 @@ contains
 
       if ( all( KCB_( JAN:DEC, iIndex ) > NEAR_ZERO ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_MONTHLY_VALUES
-        KCB_( KCB_MIN, :) = minval( KCB_(JAN:DEC, :) )
-        KCB_( KCB_MID, :) = minval( KCB_(JAN:DEC, :) )
+        KCB_( KCB_MIN, iIndex ) = minval( KCB_(JAN:DEC, iIndex) )
+        KCB_( KCB_MID, iIndex) = minval( KCB_(JAN:DEC, iIndex) )
 
       elseif ( all( GROWTH_STAGE_GDD( :, iIndex ) > NEAR_ZERO )              &
          .and. all( KCB_( KCB_INI:KCB_MIN, iIndex ) > NEAR_ZERO ) ) then
@@ -334,11 +334,12 @@ contains
         KCB_METHOD( iIndex ) = KCB_METHOD_FAO56
       endif
 
-      if ( KCB_METHOD( iIndex ) < 0 )  &
+      if ( KCB_METHOD( iIndex ) < 0 ) then
         call warn("There are missing day-of-year (L_ini, L_dev, L_mid, L_late, L_fallow), " &
           //"growing degree-day ~(GDD_plant, GDD_ini, GDD_dev, GDD_mid, GDD_late)," &
           //" or monthly crop ~coefficients (Kcb_jan...Kcb_dec) for" &
           //" landuse "//asCharacter( LANDUSE_CODE( iIndex ) ), lFatal=lTRUE )
+      endif
 
     enddo
 

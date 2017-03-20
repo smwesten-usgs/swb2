@@ -102,8 +102,8 @@ module model_domain
     real (kind=c_float), allocatable       :: storm_drain_capture(:)
     real (kind=c_float), allocatable       :: soil_storage(:)
     real (kind=c_float), allocatable       :: soil_storage_max(:)
-    real (kind=c_float), allocatable       :: potential_recharge(:)
-    real (kind=c_float), allocatable       :: rejected_potential_recharge(:)
+    real (kind=c_float), allocatable       :: net_infiltration(:)
+    real (kind=c_float), allocatable       :: rejected_net_infiltration(:)
     real (kind=c_float), allocatable       :: direct_recharge(:)
     real (kind=c_float), allocatable       :: direct_soil_moisture(:)
     real (kind=c_float), allocatable       :: current_rooting_depth(:)
@@ -178,10 +178,10 @@ module model_domain
     procedure ( array_method ), pointer  :: calc_continuous_frozen_ground_index                              &
                                                 => model_calculate_continuous_frozen_ground_index
 
-    procedure ( array_method ), pointer  :: init_maximum_potential_recharge                                  &
-                                                => model_initialize_maximum_potential_recharge_gridded
-    procedure ( index_method ), pointer  :: calc_maximum_potential_recharge                                  &
-                                                => model_calculate_maximum_potential_recharge_gridded
+    procedure ( array_method ), pointer  :: init_maximum_net_infiltration                                  &
+                                                => model_initialize_maximum_net_infiltration_gridded
+    procedure ( index_method ), pointer  :: calc_maximum_net_infiltration                                  &
+                                                => model_calculate_maximum_net_infiltration_gridded
 
     procedure ( index_method ), pointer  :: calc_runoff                                                      &
                                                 => model_calculate_runoff_curve_number
@@ -406,7 +406,7 @@ contains
     allocate( this%snow_storage(iCount), stat=iStat(20) )
     allocate( this%soil_storage(iCount), stat=iStat(21) )
     allocate( this%soil_storage_max(iCount), stat=iStat(22) )
-    allocate( this%potential_recharge(iCount), stat=iStat(23) )
+    allocate( this%net_infiltration(iCount), stat=iStat(23) )
     allocate( this%fog(iCount), stat=iStat(24) )
     allocate( this%irrigation(iCount), stat=iStat(25) )
     allocate( this%order_index(iCount), stat=iStat(26) )
@@ -435,7 +435,7 @@ contains
     allocate( this%row_num_1D( iCount ), stat=iStat(50) )
     allocate( this%it_is_growing_season( iCount ), stat=iStat(51) )
     allocate( this%curve_num_adj( iCount ), stat=iStat(52) )
-    allocate( this%rejected_potential_recharge( iCount ), stat=iStat(53) )
+    allocate( this%rejected_net_infiltration( iCount ), stat=iStat(53) )
     allocate( this%evap_reduction_coef_kr( iCount ), stat=iStat(54) )
     allocate( this%surf_evap_coef_ke( iCount ), stat=iStat(55) )
     allocate( this%plant_stress_coef_ks( iCount ), stat=iStat(56) )
@@ -478,8 +478,8 @@ contains
     this%soil_storage                        = 0.0_c_float
     this%soil_storage_max                    = 0.0_c_float
 
-    this%potential_recharge                  = 0.0_c_float
-    this%rejected_potential_recharge         = 0.0_c_float
+    this%net_infiltration                  = 0.0_c_float
+    this%rejected_net_infiltration         = 0.0_c_float
     this%fog                                 = 0.0_c_float
     this%irrigation                          = 0.0_c_float
     this%curve_num_adj                       = 0.0_c_float
@@ -604,7 +604,7 @@ contains
 
     call this%init_direct_recharge
 
-    call this%init_maximum_potential_recharge
+    call this%init_maximum_net_infiltration
 
     call this%init_crop_coefficient
 
@@ -1257,7 +1257,7 @@ contains
               //"runoff, outflow, infiltration, snowfall, potential_snowmelt, snowmelt, interception, "            &
               //"rainfall, interception_storage, tmax, tmin, tmean, snow_storage, "                                &
               //"soil_storage, soil_storage_max, surface_storage, surface_storage_excess, "                        &
-              //"surface_storage_max, potential_recharge, rejected_recharge, fog, irrigation, gdd, "               &
+              //"surface_storage_max, net_infiltration, rejected_recharge, fog, irrigation, gdd, "               &
               //" runoff_outside, "                                                                                &
               //"pervious_fraction, storm_drain_capture, canopy_cover_fraction, crop_coefficient_kcb, "            &
               //"cfgi, rooting_depth_max, current_rooting_depth, actual_et_soil, "                                 &
@@ -1394,12 +1394,12 @@ contains
       .and. ( TARGET_INDEX( indx ) <= ubound( this%runon, 1) ) ) then
 
         this%runon( TARGET_INDEX( indx ) ) = this%runoff( this%order_index( indx ) )             &
-                                + this%rejected_potential_recharge( this%order_index( indx ) )
+                                + this%rejected_net_infiltration( this%order_index( indx ) )
 
     else
 
       this%runoff_outside( this%order_index( indx ) ) = this%runoff( this%order_index( indx ) )  &
-              + this%rejected_potential_recharge( this%order_index( indx ) )
+              + this%rejected_net_infiltration( this%order_index( indx ) )
       this%runon( TARGET_INDEX( indx ) ) = 0.0_c_float
 
     endif
@@ -2147,8 +2147,8 @@ contains
           this%interception_storage( indx ), this%tmax( indx ), this%tmin( indx ), this%tmean( indx ),    &
           this%snow_storage( indx ), this%soil_storage( indx ), this%soil_storage_max( indx ),            &
           this%surface_storage( indx ), this%surface_storage_excess( indx ),                              &
-          this%surface_storage_max( indx ), this%potential_recharge( indx ),                              &
-          this%rejected_potential_recharge( indx ), this%fog( indx ),                                     &
+          this%surface_storage_max( indx ), this%net_infiltration( indx ),                              &
+          this%rejected_net_infiltration( indx ), this%fog( indx ),                                     &
           this%irrigation( indx ), this%gdd( indx ), this%runoff_outside( indx ),                         &
           this%pervious_fraction( indx ), this%storm_drain_capture( indx ),                               &
           this%canopy_cover_fraction( indx ), this%crop_coefficient_kcb( indx ),                          &
@@ -2398,48 +2398,48 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_initialize_maximum_potential_recharge_none ( this )
+  subroutine model_initialize_maximum_net_infiltration_none ( this )
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-  end subroutine model_initialize_maximum_potential_recharge_none
+  end subroutine model_initialize_maximum_net_infiltration_none
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_maximum_potential_recharge_none ( this, indx )
+  subroutine model_calculate_maximum_net_infiltration_none ( this, indx )
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     integer ( kind=c_int ), intent(in)     :: indx
 
-  end subroutine model_calculate_maximum_potential_recharge_none
+  end subroutine model_calculate_maximum_net_infiltration_none
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_initialize_maximum_potential_recharge_gridded ( this )
+  subroutine model_initialize_maximum_net_infiltration_gridded ( this )
 
-    use maximum_potential_recharge__gridded_data
+    use maximum_net_infiltration__gridded_data
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call maximum_potential_recharge_initialize( is_cell_active=this%active,                 &
+    call maximum_net_infiltration_initialize( is_cell_active=this%active,                 &
                                                 landuse_index=this%landuse_index )
 
-  end subroutine model_initialize_maximum_potential_recharge_gridded
+  end subroutine model_initialize_maximum_net_infiltration_gridded
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_maximum_potential_recharge_gridded ( this, indx )
+  subroutine model_calculate_maximum_net_infiltration_gridded ( this, indx )
 
-    use maximum_potential_recharge__gridded_data
+    use maximum_net_infiltration__gridded_data
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     integer ( kind=c_int ), intent(in)     :: indx
 
-    call maximum_potential_recharge_calculate( potential_recharge = this%potential_recharge( indx ),                    &
-                                               rejected_potential_recharge = this%rejected_potential_recharge( indx ),  &
+    call maximum_net_infiltration_calculate( net_infiltration = this%net_infiltration( indx ),                    &
+                                               rejected_net_infiltration = this%rejected_net_infiltration( indx ),  &
                                                indx=indx )
 
-  end subroutine model_calculate_maximum_potential_recharge_gridded
+  end subroutine model_calculate_maximum_net_infiltration_gridded
 
   !--------------------------------------------------------------------------------------------------
 
@@ -2919,7 +2919,7 @@ contains
     call minmaxmean( this%snow_storage, "snow_stor")
     call minmaxmean( this%soil_storage, "soil_stor")
     call minmaxmean( this%soil_storage_max, "soil_stor_max")
-    call minmaxmean( this%potential_recharge, "potential_recharge")
+    call minmaxmean( this%net_infiltration, "net_infiltration")
 
   end subroutine summarize_state_variables_sub
 

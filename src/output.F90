@@ -44,8 +44,8 @@ module output
     OUTPUT_SPECS_T( "snowmelt                   ", "inches_per_day       ", 0.0, 2000.0 ),      &
     OUTPUT_SPECS_T( "tmin                       ", "degrees_fahrenheit   ", -100.0, 150.0 ),    &
     OUTPUT_SPECS_T( "tmax                       ", "degrees_fahrenheit   ", -100.0, 150.0 ),    &
-    OUTPUT_SPECS_T( "potential_recharge         ", "inches_per_day       ", 0.0, 2000.0 ),      &
-    OUTPUT_SPECS_T( "rejected_potential_recharge", "inches_per_day       ", 0.0, 5000.0 ),      &
+    OUTPUT_SPECS_T( "net_infiltration         ", "inches_per_day       ", 0.0, 2000.0 ),      &
+    OUTPUT_SPECS_T( "rejected_net_infiltration", "inches_per_day       ", 0.0, 5000.0 ),      &
     OUTPUT_SPECS_T( "infiltration               ", "inches_per_day       ", 0.0, 2000.0 ),      &
     OUTPUT_SPECS_T( "irrigation                 ", "inches_per_day       ", 0.0, 2000.0 ),      &
     OUTPUT_SPECS_T( "runoff_outside             ", "inches_per_day       ", 0.0, 10000.0 ),     &
@@ -58,7 +58,7 @@ module output
                   NCDF_SNOW_STORAGE, NCDF_SOIL_STORAGE,                       &
                   NCDF_REFERENCE_ET0,                                         &
                   NCDF_ACTUAL_ET, NCDF_SNOWMELT, NCDF_TMIN, NCDF_TMAX,        &
-                  NCDF_POTENTIAL_RECHARGE, NCDF_REJECTED_POTENTIAL_RECHARGE,  &
+                  NCDF_NET_INFILTRATION, NCDF_REJECTED_NET_INFILTRATION,  &
                   NCDF_INFILTRATION,                                          &
                   NCDF_IRRIGATION, NCDF_RUNOFF_OUTSIDE,                       &
                   NCDF_CROP_ET, NCDF_GDD
@@ -162,7 +162,7 @@ contains
 
     cells%nodata_fill_value = NC_FILL_FLOAT
 
-    allocate( RECHARGE_ARRAY( size( cells%potential_recharge, 1 ) ) )
+    allocate( RECHARGE_ARRAY( size( cells%net_infiltration, 1 ) ) )
 
   end subroutine initialize_output
 
@@ -298,14 +298,14 @@ contains
             rValues=cells%soil_storage,                                                          &
             rField=cells%nodata_fill_value )
 
-    call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_POTENTIAL_RECHARGE )%ncfile,      &
-            iVarID=NC_OUT( NCDF_POTENTIAL_RECHARGE )%ncfile%iVarID(NC_Z),                       &
+    call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_NET_INFILTRATION )%ncfile,      &
+            iVarID=NC_OUT( NCDF_NET_INFILTRATION )%ncfile%iVarID(NC_Z),                       &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
             iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                       &
                                 int(cells%number_of_columns, kind=c_size_t) ],                   &
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
             lMask=cells%active,                                                                  &
-            rValues=cells%potential_recharge,                                                    &
+            rValues=cells%net_infiltration,                                                    &
             rField=cells%nodata_fill_value )
 
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_REFERENCE_ET0 )%ncfile,           &
@@ -368,14 +368,14 @@ contains
             rValues=cells%gdd,                                                                   &
             rField=cells%nodata_fill_value )
 
-    call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_REJECTED_POTENTIAL_RECHARGE )%ncfile, &
-            iVarID=NC_OUT( NCDF_REJECTED_POTENTIAL_RECHARGE )%ncfile%iVarID(NC_Z),                  &
+    call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_REJECTED_NET_INFILTRATION )%ncfile, &
+            iVarID=NC_OUT( NCDF_REJECTED_NET_INFILTRATION )%ncfile%iVarID(NC_Z),                  &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],        &
             iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                          &
                                 int(cells%number_of_columns, kind=c_size_t) ],                      &
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                                &
             lMask=cells%active,                                                                     &
-            rValues=cells%rejected_potential_recharge,                                              &
+            rValues=cells%rejected_net_infiltration,                                              &
             rField=cells%nodata_fill_value )
 
 
@@ -389,7 +389,7 @@ contains
             rValues=cells%crop_etc,                                                                 &
             rField=cells%nodata_fill_value )
 
-    RECHARGE_ARRAY = RECHARGE_ARRAY + cells%potential_recharge
+    RECHARGE_ARRAY = RECHARGE_ARRAY + cells%net_infiltration
 
   end subroutine write_output
 

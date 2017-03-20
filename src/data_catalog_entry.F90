@@ -1,6 +1,6 @@
 !
-! concept: for each significant gridded data input, keep track of the 
-!          native coordinates, the transformed base (project) coordinates, 
+! concept: for each significant gridded data input, keep track of the
+!          native coordinates, the transformed base (project) coordinates,
 !          and provide methods for extracting data from appropriate locations
 !          as needed.
 !
@@ -36,7 +36,7 @@ module data_catalog_entry
     integer (kind=c_int)               :: iSourceDataType = DATATYPE_NA  ! real, short, integer, etc.
     integer (kind=c_int)               :: iSourceFileType  ! Arc ASCII, Surfer, NetCDF
     integer (kind=c_int)               :: iTargetDataType = DATATYPE_NA  ! Fortran real, integer, etc.
-    
+
     character (len=256)       :: sDescription           = ""
     character (len=256)       :: sSourcePROJ4_string    = ""
     character (len=256)       :: sTargetPROJ4_string    = ""
@@ -58,7 +58,7 @@ module data_catalog_entry
     integer (kind=c_int)      :: iMissingValuesCode = -iBIGVAL
     character (len=2)         :: sMissingValuesOperator = "&&"
     integer (kind=c_int)      :: iMissingValuesAction = 0
-    
+
     real (kind=c_double)      :: rUserScaleFactor = 1_c_double
     real (kind=c_double)      :: rUserAddOffset = 0_c_double
 
@@ -74,6 +74,7 @@ module data_catalog_entry
     integer (kind=c_int)  :: iEndYear = -9999
     logical (kind=c_bool) :: lPadReplaceWithZero = lFALSE
     logical (kind=c_bool) :: lPadValues = lFALSE
+    logical (kind=c_bool) :: lIsAnnualGrid = lFALSE
 
     ! the following are only used if data are being read from a NetCDF file
     character (len=32)       :: sVariableName_x = "x"
@@ -103,7 +104,7 @@ module data_catalog_entry
     logical (kind=c_bool)          :: lGridHasChanged            = lFALSE
     logical (kind=c_bool)          :: lPerformFullInitialization = lTRUE
     logical (kind=c_bool)          :: lCreateLocalNetCDFArchive  = lFALSE
-     
+
     ! pGrdBase takes the coordinate system and dimensions as defined
     ! for the overall SWB project (i.e. BASE_PROJECTION_DEFINITION )
     type (GENERAL_GRID_T), pointer :: pGrdBase => null()
@@ -232,7 +233,7 @@ contains
 !--------------------------------------------------------------------------------------------------
 
   subroutine set_keyword_sub(this, sKeyword)
-    
+
     class (DATA_CATALOG_ENTRY_T)         :: this
     character (len=*), intent(in)        :: sKeyword
 
@@ -255,7 +256,7 @@ contains
     else
       call die ("Row/column indices out of bounds: ~row: "//asCharacter(iRow)//"~ col:"//asCharacter(iCol), &
         __SRCNAME__, __LINE__ )
-    endif      
+    endif
 
   end subroutine get_value_int_sub
 
@@ -275,7 +276,7 @@ contains
     else
       call die ("Row/column indices out of bounds: ~row: "//asCharacter(iRow)//"~ col:"//asCharacter(iCol), &
         __SRCNAME__, __LINE__ )
-    endif      
+    endif
 
   end subroutine get_value_float_sub
 
@@ -435,7 +436,7 @@ subroutine initialize_netcdf_data_object_sub( this, &
 !  if ( scan(string=sFilename, set="%#") > 0 ) then
 
 
-!> @TODO Implement a way to read variables in via "static" NetCDF grid. 
+!> @TODO Implement a way to read variables in via "static" NetCDF grid.
 !!    In other words, a NetCDF grid having no "time" dimension or variable.
 
 
@@ -459,7 +460,7 @@ subroutine initialize_netcdf_data_object_sub( this, &
      rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, rGridCellSize=BNDS%fGridCellSize, iDataType=iDataType)
 
     this%pGrdBase%sPROJ4_string = BNDS%sPROJ4_string
-    this%pGrdBase%sFilename = this%sSourceFilename    
+    this%pGrdBase%sFilename = this%sSourceFilename
 
     this%sSourceFileType = "NETCDF"
     this%iSourceFileType = this%get_filetype()
@@ -509,7 +510,7 @@ end subroutine initialize_netcdf_data_object_sub
 
     endif
 
-    ! if grid data hasn't changed this timestep, we don't want to *reapply* the 
+    ! if grid data hasn't changed this timestep, we don't want to *reapply* the
     ! scale and offset values
     if ( this%lGridHasChanged ) then
 
@@ -714,7 +715,7 @@ subroutine getvalues_constant_sub( this  )
 
       end select
 
-      call this%transform_native_to_base() 
+      call this%transform_native_to_base()
 
       if ( .not. this%lGridIsPersistent )  call grid_Destroy( this%pGrdNative )
 
@@ -748,8 +749,8 @@ subroutine transform_grid_to_grid_sub(this)
                       sFromPROJ4=this%sSourcePROJ4_string, &
                       sToPROJ4=BNDS%sPROJ4_string )
 
-    !! following this call, the pGrdNative%rX and pGrdNative%rY values will be given in the 
-    !! base SWB project projection 
+    !! following this call, the pGrdNative%rX and pGrdNative%rY values will be given in the
+    !! base SWB project projection
 
     if ( this%lRequireCompleteSpatialCoverage )   &
       call assert( grid_CompletelyCover( this%pGrdBase, this%pGrdNative ), &
@@ -779,7 +780,7 @@ subroutine transform_grid_to_grid_sub(this)
 
   end select
 
-    
+
 end subroutine transform_grid_to_grid_sub
 
 !--------------------------------------------------------------------------------------------------
@@ -874,8 +875,10 @@ end subroutine set_constant_value_real
     character (len=12) :: sNumber
     character (len=1) :: sDelimiter
     integer (kind=c_int) :: iStatus
+    logical (kind=c_bool) :: lAnnual
 
     iPos_Y = 0; iPos_M = 0; iPos_D = 0; iPos = 0; iPos_B = 0; iPos_BF = 0; sNumber = ""
+    lAnnual = lFALSE
 
     ! EXAMPLES of the kinds of templates that we need to be able to understand:
     ! tars1980\prcp.nc   template => "tars%Y\prcp.nc"
@@ -895,7 +898,7 @@ end subroutine set_constant_value_real
       lMatch = lFALSE
 
       if (present(iYear) ) then
-        
+
         iPos_Y = max(index(sNewFilename, "%Y"), index(sNewFilename, "%y") )
 
         if (iPos_Y > 0) then
@@ -904,9 +907,11 @@ end subroutine set_constant_value_real
           sNewFilename = sNewFilename(1:iPos_Y - 1)//trim(asCharacter(iYear)) &
                          //sNewFilename(iPos_Y + 2:iLen)
 
+          lAnnual = lTRUE
+
         endif
 
-      endif  
+      endif
 
       ! evaluate template string for "#" characters
       iPos = index(sNewFilename, "#")
@@ -927,6 +932,7 @@ end subroutine set_constant_value_real
         endif
 
         lMatch = lTRUE
+        lAnnual = lFALSE
         iLen=len_trim(sNewFilename)
         sNewFilename = sNewFilename(1:iPos-2-iNumZeros)//trim(sNumber) &
                        //sNewFilename(iPos+1:iLen)
@@ -944,6 +950,7 @@ end subroutine set_constant_value_real
         if ( iPos_0M > 0 ) then
 
           lMatch = lTRUE
+          lAnnual = lFALSE
           write (unit=sBuf, fmt="(i2.2)") iMonth
 
           iLen=len_trim(sNewFilename)
@@ -953,6 +960,7 @@ end subroutine set_constant_value_real
         elseif ( iPos_M > 0 ) then
 
           lMatch = lTRUE
+          lAnnual = lFALSE
           sBuf = asCharacter( iMonth )
 
           iLen=len_trim(sNewFilename)
@@ -962,6 +970,7 @@ end subroutine set_constant_value_real
         elseif ( iPos_B > 0 ) then
 
           lMatch = lTRUE
+          lAnnual = lFALSE
 
           select case ( this% iFilename_Monthname_Capitalization_Rule )
 
@@ -980,7 +989,7 @@ end subroutine set_constant_value_real
               sBuf = MONTHS( iMonth )%sName
 
           end select
-            
+
           iLen=len_trim(sNewFilename)
           sNewFilename = sNewFilename(1:iPos_B - 1)//trim(sBuf) &
                          //sNewFilename(iPos_B + 2:iLen)
@@ -988,6 +997,7 @@ end subroutine set_constant_value_real
         elseif ( iPos_BF > 0 ) then
 
           lMatch = lTRUE
+          lAnnual = lFALSE
 
           select case ( this% iFilename_Monthname_Capitalization_Rule )
 
@@ -999,7 +1009,7 @@ end subroutine set_constant_value_real
             case ( FILE_TEMPLATE_LOWERCASE_MONTHNAME )
 
               sBuf = MONTHS( iMonth )%sFullName
-              call toLowercase( sBuf )              
+              call toLowercase( sBuf )
 
             case default
 
@@ -1009,7 +1019,7 @@ end subroutine set_constant_value_real
 
           iLen=len_trim(sNewFilename)
           sNewFilename = sNewFilename(1:iPos_BF - 1)//trim(sBuf) &
-                         //sNewFilename( ( iPos_BF + len_trim(sBuf) - 1):iLen)                         
+                         //sNewFilename( ( iPos_BF + len_trim(sBuf) - 1):iLen)
 
         endif
 
@@ -1023,6 +1033,7 @@ end subroutine set_constant_value_real
 
         if (iPos_0D > 0) then
           lMatch = lTRUE
+          lAnnual = lFALSE
           write (unit=sBuf, fmt="(i2.2)") iDay
           iLen=len_trim(sNewFilename)
           sNewFilename = sNewFilename(1:iPos_0D - 1)//trim(sBuf) &
@@ -1031,6 +1042,7 @@ end subroutine set_constant_value_real
         elseif ( iPos_D > 0 ) then
 
           lMatch = lTRUE
+          lAnnual = lFALSE
           sBuf = asCharacter( iDay )
 
           iLen=len_trim(sNewFilename)
@@ -1058,6 +1070,8 @@ end subroutine set_constant_value_real
 
 !    this%sSourceFilename = trim(sCWD)//trim(sDelimiter)//trim(sNewFilename)
     this%sSourceFilename = trim(sNewFilename)
+
+    this%lIsAnnualGrid = lAnnual
 
   end subroutine make_filename_from_template
 
@@ -1092,8 +1106,10 @@ end subroutine set_constant_value_real
         ! does this file actually exist?
         inquire( file=this%sSourceFilename, exist=lExist )
 
-        ! if the file exists, don't bother with padding any values
-        if (lExist) exit
+        ! if the file exists, don't bother with padding any values, unless
+        ! we're dealing with a file that does exist but drops the last day
+        ! or two of data (looking at you, DayMet)
+        if ( lExist .and. ( .not. this%lIsAnnualGrid ) )   exit
 
         ! if file doesn't exist, and we're close to the end of the year,
         ! assume that we should pad values at the end of the year
@@ -1163,7 +1179,7 @@ end subroutine set_constant_value_real
     ! call once at start of run...
     if ( this%iFileCountYear < 0 ) call this%set_filecount(-1, iYear)
 
-    do 
+    do
 
       if (this%iNC_FILE_STATUS == NETCDF_FILE_OPEN) then
 
@@ -1172,7 +1188,7 @@ end subroutine set_constant_value_real
 
         if ( netcdf_date_within_range(NCFILE=this%NCFILE, iJulianDay=iJulianDay ) ) then
           exit
-        else  
+        else
           call netcdf_close_file( NCFILE=this%NCFILE )
           this%iNC_FILE_STATUS = NETCDF_FILE_CLOSED
         endif
@@ -1306,7 +1322,7 @@ end subroutine set_constant_value_real
             exit
 
           elseif ( scan(this%sSourceFilename, "#") /= 0 ) then
-            
+
             call netcdf_close_file( NCFILE=this%NCFILE )
             this%iNC_FILE_STATUS = NETCDF_FILE_CLOSED
             call LOGS%write("Did not find the current date in the file "//dquote(this%sSourceFilename)//"~" &
@@ -1314,10 +1330,12 @@ end subroutine set_constant_value_real
               //"~current JD: "//asCharacter(iJulianDay)//"~ Will increment sequential file number and try again.", &
               iLinesBefore=1, iLinesAfter=1 )
 
-          else  
+          else
 
             call LOGS%write("Valid date range (NetCDF): "//trim(asCharacter(this%NCFILE%iFirstDayJD)) &
               //" to "//trim(asCharacter(this%NCFILE%iLastDayJD)) )
+
+            print *, this%lIsAnnualGrid
 
             call LOGS%write("Current Julian Day value: "//trim(asCharacter(iJulianDay)) )
 
@@ -1328,6 +1346,8 @@ end subroutine set_constant_value_real
           endif
 
         endif   ! if(lPadValues)
+
+        exit
 
       endif  ! If (NC_FILE_STATUS == NETCDF_CLOSED)
 
@@ -1392,7 +1412,7 @@ end subroutine set_constant_value_real
     character (len=*), intent(in)        :: varname
     real (kind=c_float), intent(in)      :: nodata_value
 
-    ! [ LOCALS ] 
+    ! [ LOCALS ]
     integer (kind=c_int) :: iCount
     character (len=20)   :: sVarname
     character (len=14)   :: sMin

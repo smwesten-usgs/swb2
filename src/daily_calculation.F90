@@ -86,7 +86,7 @@ contains
 
       landuse_index = cells%landuse_index( indx )
 
-      associate ( recharge                     => cells%potential_recharge( indx ),                      &
+      associate ( recharge                     => cells%net_infiltration( indx ),                      &
                   pervious_fraction            => cells%pervious_fraction( indx ),                       &
                   irrigation                   => cells%irrigation( indx ),                              &
                   direct_recharge              => cells%direct_recharge( indx ),                         &
@@ -215,7 +215,7 @@ contains
     !                      + cells%actual_et_interception * cells%canopy_cover_fraction             &
                           + actual_et_impervious * ( 1.0_c_float - pervious_fraction )
 
-        call calculate_soil_mass_balance( potential_recharge=recharge,                 &
+        call calculate_soil_mass_balance( net_infiltration=recharge,                 &
                                           soil_storage=soil_storage,                   &
                                           soil_storage_max=soil_storage_max,           &
                                           actual_et=actual_et_soil,                    &
@@ -245,7 +245,7 @@ contains
 
         irrigation = irrigation * pervious_fraction
 
-        call cells%calc_maximum_potential_recharge( indx )
+        call cells%calc_maximum_net_infiltration( indx )
 
         ! NOTE: only way for "runon" to be positive is if D8 flow routing
         !       is enabled.

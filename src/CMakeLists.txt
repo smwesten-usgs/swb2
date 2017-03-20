@@ -38,7 +38,7 @@ set(SRCS
       mass_balance__interception.F90
       mass_balance__snow.F90
       mass_balance__soil.F90
-      maximum_potential_recharge.F90
+      maximum_net_infiltration.F90
       meteorological_calculations.F90
       model_domain.F90
       model_initialize.F90
