@@ -1079,7 +1079,8 @@ contains
         call LOGS%WRITE( "==> HARGREAVES-SAMANI EVAPOTRANSPIRATION submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( ( Method_Name .strequal. "JENSEN-HAISE" ) &
+      elseif ( ( Method_Name .strequal. "JENSEN-HAISE" )             &
+           .or. ( Method_Name .strequal. "JENSEN_HAISE" )            &        
            .or. ( Method_Name .strequal. "JH" ) ) then
 
         this%init_reference_et => model_initialize_et_jensen_haise
