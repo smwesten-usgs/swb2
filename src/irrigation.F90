@@ -138,7 +138,7 @@ contains
     call sl_temp_list%append("Irrigation_days")
     call sl_temp_list%append("Irrigation_days_since_planting")
 
-    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_irrigation_days, lFatal=lTRUE )
+    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_irrigation_days, lFatal=lFALSE )
 
 
     !> retrieve first day of irrigation

@@ -38,7 +38,7 @@ module model_initialize
     logical (kind=c_bool)  :: lOptional
   end type METHODS_LIST_T
 
-  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 40
+  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 41
   integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 16
 
   type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS( NUMBER_OF_KNOWN_GRIDS ) =       &
@@ -47,6 +47,7 @@ module model_initialize
       GRIDDED_DATASETS_T("TMIN                                  ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("TMAX                                  ", lFALSE, DATATYPE_FLOAT ),     &
       GRIDDED_DATASETS_T("AVAILABLE_WATER_CONTENT               ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("REFERENCE_ET0                         ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("POTENTIAL_ET                          ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("SOLAR_RADIATION                       ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("WIND_SPEED                            ", lTRUE, DATATYPE_FLOAT ),      &
@@ -57,8 +58,8 @@ module model_initialize
       GRIDDED_DATASETS_T("SOILS_CODE                            ", lTRUE, DATATYPE_INT ),        &
       GRIDDED_DATASETS_T("HYDROLOGIC_SOILS_GROUP                ", lFALSE, DATATYPE_INT ),       &
       GRIDDED_DATASETS_T("INITIAL_PERCENT_SOIL_MOISTURE         ", lFALSE, DATATYPE_FLOAT),      &
-      GRIDDED_DATASETS_T("INITIAL_SNOW_COVER_STORAGE            ", lTRUE, DATATYPE_FLOAT),      &
-      GRIDDED_DATASETS_T("INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX", lTRUE, DATATYPE_FLOAT),      &
+      GRIDDED_DATASETS_T("INITIAL_SNOW_COVER_STORAGE            ", lTRUE, DATATYPE_FLOAT),       &
+      GRIDDED_DATASETS_T("INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX", lTRUE, DATATYPE_FLOAT),       &
       GRIDDED_DATASETS_T("PERCENT_CANOPY_COVER                  ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("PERCENT_PERVIOUS_COVER                ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("PERCENT_IMPERVIOUS_COVER              ", lTRUE, DATATYPE_FLOAT ),      &
@@ -73,14 +74,14 @@ module model_initialize
       GRIDDED_DATASETS_T("WATER_BODY_LEAKAGE                    ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("WATER_MAIN_LEAKAGE                    ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("DISPOSAL_WELL_DISCHARGE               ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("ANNUAL_DIRECT_NET_INFILTRATION_RATE           ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("ANNUAL_DIRECT_NET_INFILTRATION_RATE   ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("ANNUAL_SEPTIC_DISCHARGE               ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("SEPTIC_DISCHARGE                      ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("RUNOFF_ZONE                           ", lTRUE, DATATYPE_INT ),        &
       GRIDDED_DATASETS_T("POLYGON_ID                            ", lTRUE, DATATYPE_INT ),        &
       GRIDDED_DATASETS_T("SOIL_STORAGE_MAX                      ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("PLANT_AVAILABLE_WATER                 ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("MAXIMUM_NET_INFILTRATION            ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("MAXIMUM_NET_INFILTRATION              ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("IRRIGATION_MASK                       ", lTRUE, DATATYPE_INT),         &
       GRIDDED_DATASETS_T("RELATIVE_HUMIDITY                     ", lTRUE, DATATYPE_FLOAT )   ]
 

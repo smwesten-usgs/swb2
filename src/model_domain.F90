@@ -1090,7 +1090,7 @@ contains
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( Method_Name .strequal. "MONTHLY_GRID" ) &
-           .or. ( Method_Name .strequal. "MONTHLY_GRIDDED" ) ) then
+           .or. ( Method_Name .strequal. "MONTHLY_GRID" ) ) then
 
         this%init_reference_et => model_initialize_et_monthly_grid
         this%calc_reference_et => model_calculate_et_monthly_grid
@@ -1099,7 +1099,7 @@ contains
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( Method_Name .strequal. "DAILY_GRID" ) &
-           .or. ( Method_Name .strequal. "DAILY_GRIDDED" ) ) then
+           .or. ( Method_Name .strequal. "DAILY_GRID" ) ) then
 
         this%init_reference_et => model_initialize_et_daily_grid
         this%calc_reference_et => model_calculate_et_daily_grid
@@ -1142,7 +1142,7 @@ contains
 
       endif
 
-    elseif ( sCmdText .contains. "DIRECT_NET_INFILTRATION" )  &
+    elseif ( (sCmdText .contains. "DIRECT_NET_INFILTRATION" )       &
            .or. ( sCmdText .contains. "DIRECT_NET_INFILTRATION" ) )        then
 
       this%init_direct_net_infiltration => model_initialize_direct_net_infiltration_gridded

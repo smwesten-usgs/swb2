@@ -3,7 +3,7 @@
 !>  populates the reference et by applying the monthly value obtained from a reference grid.
 
 
-!>  Populate potential evapotranspiration by substituting in 
+!>  Populate potential evapotranspiration by substituting in
 !>  the daily average ET from a gridded data source.
 
 module et__gridded_values
@@ -34,15 +34,15 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iStat
     type (STRING_LIST_T)                 :: slString
-    integer (kind=c_int)                 :: iIndex 
+    integer (kind=c_int)                 :: iIndex
 
 
     ! locate the data structure associated with the gridded rainfall zone entries
     pET_GRID => DAT%find("POTENTIAL_ET")
     if ( .not. associated(pET_GRID) ) then
-      pET_GRID => DAT%find("REFERENCE_ET")
+      pET_GRID => DAT%find("REFERENCE_ET0")
       if (.not. associated(pET_GRID) ) &
-        call die("A POTENTIAL_ET or REFERENCE_ET grid must be supplied in order to make"   &
+        call die("A POTENTIAL_ET or REFERENCE_ET0 grid must be supplied in order to make"   &
                  //" use of this option.", __SRCNAME__, __LINE__)
 
     endif
@@ -53,7 +53,7 @@ contains
 
   subroutine et_gridded_values_calculate()
 
-    ! [ LOCALS ] 
+    ! [ LOCALS ]
     integer (kind=c_int) :: iJulianDay
     integer (kind=c_int) :: iMonth
     integer (kind=c_int) :: iDay
@@ -65,7 +65,7 @@ contains
       iMonth = asInt( dt%iMonth )
       iDay = asInt( dt%iDay )
       iYear = dt%iYear
-  
+
       call pET_GRID%getvalues( iMonth, iDay, iYear, iJulianDay )
 
     end associate

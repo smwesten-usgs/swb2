@@ -39,7 +39,7 @@ endif()
 #       toolchain
 #
 
-project (swb Fortran C)
+project (swb2 Fortran C)
 enable_language (Fortran C)
 
 SET(CPACK_GENERATOR "TGZ")
@@ -55,37 +55,20 @@ set(PACKAGE_VERSION "2.0 ALPHA")
 
 cmake_minimum_required(VERSION 2.8)
 
-include( cmake/set_compiler_flags_and_directives.cmake )
 include( cmake/version_control.cmake )
 
-#------------------------------------------------------------------------
-# Locate utility programs
-#------------------------------------------------------------------------
+set( EXTERNAL_LIBS ${LIB_NETCDF} ${LIB_HDF5_HL} ${LIB_HDF5} ${LIB_SZ} ${LIB_Z} ${LIB_DL} )
+set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIB_GFORTRAN} ${LIB_GCC} )
 
-# search for programs in the build host directories
-SET(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)
-# for libraries and headers in the target directories
-#SET(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)
-#SET(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)
+link_libraries( ${EXTERNAL_LIBS} )
+include_directories( ${INCLUDE_DIRECTORIES} ${DISLIN_MODULE_DIR} "${PROJECT_SOURCE_DIR}/src/proj4" )
 
-set(LIB_PATH ${LIB_PATH1} ${LIB_PATH2} ${LIB_PATH3} ${LIB_PATH4} )
-
-set(CMAKE_LIBRARY_PATH ${SWB_LIBPATH} ${LIB_PATH} )
-
-include( cmake/find_programs_and_libraries.cmake )
-
-#set(MODULE_DIR ${INCLUDE_DIR} ${PROJECT_SOURCE_DIR}/include/${OS}/${Fortran_COMPILER_NAME} )
-
-if ("${OS}" STREQUAL "win_x64" OR "${OS}" STREQUAL "win_x86")
-  add_custom_target(copy
-  	                COMMAND
-  	                ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2.exe ${CMAKE_INSTALL_PREFIX}/swb2.exe
-  	                )
+if ("${SYSTEM_TYPE}" STREQUAL "win_x64" OR "${SYSTEM_TYPE}" STREQUAL "win_x86")
+  add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2.exe ${CMAKE_INSTALL_PREFIX}/swb2.exe
+  )
 else()
-  add_custom_target(copy
-  	                COMMAND
-  	                ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2 ${CMAKE_INSTALL_PREFIX}/swb2
-  	                )
+  add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2 ${CMAKE_INSTALL_PREFIX}/swb2
+  )
 endif()
 
 include( cmake/print_summary.cmake )
@@ -94,4 +77,3 @@ enable_testing()
 add_subdirectory(src)
 #add_subdirectory(tests/general)
 #add_subdirectory(tests/irrigation)
-add_subdirectory(tests/src)
