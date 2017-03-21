@@ -104,7 +104,7 @@ module model_domain
     real (kind=c_float), allocatable       :: soil_storage_max(:)
     real (kind=c_float), allocatable       :: net_infiltration(:)
     real (kind=c_float), allocatable       :: rejected_net_infiltration(:)
-    real (kind=c_float), allocatable       :: direct_recharge(:)
+    real (kind=c_float), allocatable       :: direct_net_infiltration(:)
     real (kind=c_float), allocatable       :: direct_soil_moisture(:)
     real (kind=c_float), allocatable       :: current_rooting_depth(:)
     integer (kind=c_int), allocatable      :: number_of_days_since_planting(:)
@@ -155,8 +155,8 @@ module model_domain
                                                 => model_initialize_fog_none
     procedure ( array_method ), pointer  :: init_irrigation                                                  &
                                                 => model_initialize_irrigation_none
-    procedure ( array_method ), pointer  :: init_direct_recharge                                             &
-                                                => model_initialize_direct_recharge_gridded
+    procedure ( array_method ), pointer  :: init_direct_net_infiltration                                             &
+                                                => model_initialize_direct_net_infiltration_gridded
     procedure ( array_method ), pointer  :: init_direct_soil_moisture                                        &
                                                 => model_initialize_direct_soil_moisture_none
     procedure ( array_method ), pointer  :: init_GDD                                                         &
@@ -203,8 +203,8 @@ module model_domain
                                                 => model_calculate_irrigation_none
     procedure ( array_method ), pointer  :: calc_GDD                                                         &
                                                 => model_calculate_GDD
-    procedure ( index_method ), pointer  :: calc_direct_recharge                                             &
-                                                => model_calculate_direct_recharge_none
+    procedure ( index_method ), pointer  :: calc_direct_net_infiltration                                             &
+                                                => model_calculate_direct_net_infiltration_none
     procedure ( index_method ), pointer  :: calc_direct_soil_moisture                                        &
                                                 => model_calculate_direct_soil_moisture_none
 
@@ -428,7 +428,7 @@ contains
     allocate( this%actual_et_interception( iCount ), stat=iStat(43) )
     allocate( this%adjusted_depletion_fraction_p( iCount ), stat=iStat(44) )
     allocate( this%crop_etc( iCount ), stat=iStat(45) )
-    allocate( this%direct_recharge( iCount ), stat=iStat(46) )
+    allocate( this%direct_net_infiltration( iCount ), stat=iStat(46) )
     allocate( this%direct_soil_moisture( iCount ), stat=iStat(47) )
     allocate( this%number_of_days_since_planting( iCount ), stat=iStat(48) )
     allocate( this%col_num_1D( iCount ), stat=iStat(49) )
@@ -501,7 +501,7 @@ contains
     this%actual_et_interception              = 0.0_c_float
     this%adjusted_depletion_fraction_p       = 0.0_c_float
     this%crop_etc                            = 0.0_c_float
-    this%direct_recharge                     = 0.0_c_float
+    this%direct_net_infiltration                     = 0.0_c_float
     this%direct_soil_moisture                = 0.0_c_float
     this%number_of_days_since_planting       = 0_c_int
     this%evap_reduction_coef_kr              = 0.0_c_float
@@ -602,7 +602,7 @@ contains
 
     call this%init_irrigation
 
-    call this%init_direct_recharge
+    call this%init_direct_net_infiltration
 
     call this%init_maximum_net_infiltration
 
@@ -797,9 +797,9 @@ contains
     if (.not. associated( this%calc_routing) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
-    if (.not. associated( this%init_direct_recharge) ) &
+    if (.not. associated( this%init_direct_net_infiltration) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
-    if (.not. associated( this%calc_direct_recharge) ) &
+    if (.not. associated( this%calc_direct_net_infiltration) ) &
       call die("INTERNAL PROGRAMMING ERROR--Null procedure pointer.", __SRCNAME__, __LINE__ )
 
     if (.not. associated( this%init_soil_storage_max) ) &
@@ -1080,7 +1080,7 @@ contains
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( ( Method_Name .strequal. "JENSEN-HAISE" )             &
-           .or. ( Method_Name .strequal. "JENSEN_HAISE" )            &        
+           .or. ( Method_Name .strequal. "JENSEN_HAISE" )            &
            .or. ( Method_Name .strequal. "JH" ) ) then
 
         this%init_reference_et => model_initialize_et_jensen_haise
@@ -1142,10 +1142,11 @@ contains
 
       endif
 
-    elseif ( sCmdText .contains. "DIRECT_RECHARGE" ) then
+    elseif ( sCmdText .contains. "DIRECT_NET_INFILTRATION" )  &
+           .or. ( sCmdText .contains. "DIRECT_NET_INFILTRATION" ) )        then
 
-      this%init_direct_recharge => model_initialize_direct_recharge_gridded
-      this%calc_direct_recharge => model_calculate_direct_recharge_gridded
+      this%init_direct_net_infiltration => model_initialize_direct_net_infiltration_gridded
+      this%calc_direct_net_infiltration => model_calculate_direct_net_infiltration_gridded
 
       call LOGS%WRITE( "==> GRIDDED or TABULAR values for water main leakage and other direct " &
         //"recharge will be used.", iLogLevel = LOG_ALL, lEcho = lFALSE )
@@ -1264,7 +1265,7 @@ contains
               //"readily_available_water, total_available_water, plant_stress_coef_ks, "                           &
               //"evap_reduction_coef_kr, surf_evap_coef_ke, fraction_exposed_and_wetted_soil, "                    &
               //"actual_et_impervious, actual_et_interception, adjusted_depletion_fraction_p, crop_etc, "          &
-              //" bare_soil_evap, direct_recharge, "                                                               &
+              //" bare_soil_evap, direct_net_infiltration, "                                                               &
               //"direct_soil_moisture, inflowbuf1, inflowbuf2, inflowbuf3, inflowbuf4, inflowbuf5, inflowbuf_sum"
             exit
 
@@ -2159,7 +2160,7 @@ contains
           this%surf_evap_coef_ke( indx ), this%fraction_exposed_and_wetted_soil( indx ),                  &
           this%actual_et_impervious( indx ), this%actual_et_interception( indx ),                         &
           this%adjusted_depletion_fraction_p( indx ), this%crop_etc( indx ), this%bare_soil_evap( indx ), &
-          this%direct_recharge( indx ),                                                                   &
+          this%direct_net_infiltration( indx ),                                                                   &
           this%direct_soil_moisture( indx ), (PREV_5_DAYS_RAIN( indx, kndx), kndx=1,6)
 
   end subroutine model_dump_variables
@@ -2307,49 +2308,49 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_initialize_direct_recharge_none ( this )
+  subroutine model_initialize_direct_net_infiltration_none ( this )
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-  end subroutine model_initialize_direct_recharge_none
+  end subroutine model_initialize_direct_net_infiltration_none
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_direct_recharge_none ( this, indx )
+  subroutine model_calculate_direct_net_infiltration_none ( this, indx )
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     integer ( kind=c_int ), intent(in)     :: indx
 
-  end subroutine model_calculate_direct_recharge_none
+  end subroutine model_calculate_direct_net_infiltration_none
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_initialize_direct_recharge_gridded ( this )
+  subroutine model_initialize_direct_net_infiltration_gridded ( this )
 
-    use direct_recharge__gridded_data
+    use direct_net_infiltration__gridded_data
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call direct_recharge_initialize( is_cell_active=this%active,                  &
+    call direct_net_infiltration_initialize( is_cell_active=this%active,                  &
                                      landuse_index=this%landuse_index )
 
-  end subroutine model_initialize_direct_recharge_gridded
+  end subroutine model_initialize_direct_net_infiltration_gridded
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_direct_recharge_gridded ( this, indx )
+  subroutine model_calculate_direct_net_infiltration_gridded ( this, indx )
 
-    use direct_recharge__gridded_data
+    use direct_net_infiltration__gridded_data
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     integer ( kind=c_int ), intent(in)     :: indx
 
-    call direct_recharge_calculate( direct_recharge = this%direct_recharge( indx ),      &
+    call direct_net_infiltration_calculate( direct_net_infiltration = this%direct_net_infiltration( indx ),      &
                                     indx=indx,                                           &
                                     is_cell_active=this%active,                          &
                                     nodata_fill_value=this%nodata_fill_value )
 
-  end subroutine model_calculate_direct_recharge_gridded
+  end subroutine model_calculate_direct_net_infiltration_gridded
 
 !--------------------------------------------------------------------------------------------------
 

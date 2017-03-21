@@ -73,7 +73,7 @@ module model_initialize
       GRIDDED_DATASETS_T("WATER_BODY_LEAKAGE                    ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("WATER_MAIN_LEAKAGE                    ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("DISPOSAL_WELL_DISCHARGE               ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("ANNUAL_DIRECT_RECHARGE_RATE           ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("ANNUAL_DIRECT_NET_INFILTRATION_RATE           ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("ANNUAL_SEPTIC_DISCHARGE               ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("SEPTIC_DISCHARGE                      ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("RUNOFF_ZONE                           ", lTRUE, DATATYPE_INT ),        &
@@ -97,7 +97,7 @@ module model_initialize
       METHODS_LIST_T("IRRIGATION             ", lTRUE),                             &
       METHODS_LIST_T("CROP_COEFFICIENT       ", lTRUE),                             &
       METHODS_LIST_T("GROWING_DEGREE_DAY     ", lTRUE),                             &
-      METHODS_LIST_T("DIRECT_RECHARGE        ", lTRUE),                             &
+      METHODS_LIST_T("DIRECT_NET_INFILTRATION        ", lTRUE),                             &
       METHODS_LIST_T("DIRECT_SOIL_MOISTURE   ", lTRUE),                             &
       METHODS_LIST_T("FLOW_ROUTING           ", lTRUE),                             &
       METHODS_LIST_T("ROOTING_DEPTH          ", lTRUE),                             &

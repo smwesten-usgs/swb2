@@ -4,7 +4,7 @@ module daily_calculation
   use model_domain, only                     : MODEL_DOMAIN_T
   use storm_drain_capture, only              : storm_drain_capture_calculate,             &
                                                STORM_DRAIN_CAPTURE_FRACTION
-  use direct_recharge__gridded_data, only    : DIRECT_RECHARGE_ACTIVE_FRACTION
+  use direct_net_infiltration__gridded_data, only    : DIRECT_NET_INFILTRATION_ACTIVE_FRACTION
   use exceptions, only                       : assert
   use iso_c_binding, only                    : c_short, c_int, c_float, c_double, c_bool
 
@@ -89,9 +89,9 @@ contains
       associate ( recharge                     => cells%net_infiltration( indx ),                      &
                   pervious_fraction            => cells%pervious_fraction( indx ),                       &
                   irrigation                   => cells%irrigation( indx ),                              &
-                  direct_recharge              => cells%direct_recharge( indx ),                         &
+                  direct_net_infiltration              => cells%direct_net_infiltration( indx ),                         &
                   direct_soil_moisture         => cells%direct_soil_moisture( indx ),                    &
-                  direct_recharge_fraction     => DIRECT_RECHARGE_ACTIVE_FRACTION( indx ),               &
+                  direct_net_infiltration_fraction     => DIRECT_NET_INFILTRATION_ACTIVE_FRACTION( indx ),               &
                   surface_storage              => cells%surface_storage( indx ),                         &
                   actual_et_impervious         => cells%actual_et_impervious( indx ),                    &
                   actual_et_soil               => cells%actual_et_soil( indx ),                          &
@@ -227,16 +227,16 @@ contains
                            //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
                            //", "//asCharacter( cells%row_num_1D( indx ) ) )
 
-        call cells%calc_direct_recharge( indx )
+        call cells%calc_direct_net_infiltration( indx )
 
         ! reporting of potential recharge and irrigation must be adjusted to account for zero
         ! irrigation and potential recharge associated with the impervious areas
 
         ! modify potential recharge and irrigation terms
 
-        recharge_fraction= min( pervious_fraction, 1.0_c_float - direct_recharge_fraction )
+        recharge_fraction= min( pervious_fraction, 1.0_c_float - direct_net_infiltration_fraction )
 
-        recharge = recharge * recharge_fraction + direct_recharge_fraction * direct_recharge
+        recharge = recharge * recharge_fraction + direct_net_infiltration_fraction * direct_net_infiltration
 
         if ( runoff < 0.)                                                                               &
           call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &

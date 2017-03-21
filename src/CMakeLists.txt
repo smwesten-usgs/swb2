@@ -13,7 +13,7 @@ set(SRCS
       data_catalog_entry.F90
       datetime.F90
       dictionary.F90
-      direct_recharge__gridded_data.F90
+      direct_net_infiltration__gridded_data.F90
       direct_soil_moisture__gridded_data.F90
       #et_FAO56_crop_coefficients.F90
       et__gridded_values.F90

@@ -66,7 +66,6 @@ module crop_coefficients__FAO56
   real (kind=c_float), allocatable   :: GROWTH_STAGE_DOY(:,:)
   real (kind=c_float), allocatable   :: GROWTH_STAGE_GDD(:,:)
   type (DATETIME_T), allocatable     :: GROWTH_STAGE_DATE(:,:)
-  real (kind=c_float), allocatable   :: MEAN_PLANT_HEIGHT(:)
 
   integer (kind=c_int)               :: LU_SOILS_CSV
 
@@ -190,8 +189,6 @@ contains
    call PARAMS%get_parameters( sKey="Kcb_Oct", fValues=KCB_oct )
    call PARAMS%get_parameters( sKey="Kcb_Nov", fValues=KCB_nov )
    call PARAMS%get_parameters( sKey="Kcb_Dec", fValues=KCB_dec )
-   !
-   call PARAMS%get_parameters( sKey="Mean_Plant_Height", fValues=MEAN_PLANT_HEIGHT, lFatal=lFALSE )
 
     allocate( GROWTH_STAGE_DOY( 5, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_DOY array", &
