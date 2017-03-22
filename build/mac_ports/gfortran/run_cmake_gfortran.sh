@@ -18,8 +18,9 @@ export R_HOME=/usr/bin/R
 export LIB_HDF5_HL=$( locate hdf5_hl.a | grep opt )
 export LIB_HDF5=$( locate hdf5.a | grep opt )
 export LIB_NETCDF=$( locate netcdf.dylib | grep opt )
-
-
+export LIB_Z=$( locate libz.a | grep opt )
+export LIB_GCC=$( locate libgcc.a | grep opt )
+export LIB_GFORTRAN=$( locate libgfortran.a | grep opt )
 
 export PATH=/opt/local:/opt/local/bin:/opt/local/lib:$PATH
 
@@ -53,9 +54,7 @@ cmake ../../.. -G "Unix Makefiles"                           \
 -DOS="$OS "                                                  \
 -DLIB_HDF5_HL=$LIB_HDF5_HL                                   \
 -DLIB_HDF5=$LIB_HDF5                                         \
--DLIB_SZ=$LIB_SZ                                             \
 -DLIB_Z=$LIB_Z                                               \
--DLIB_DL=$LIB_DL                                             \
 -DLIB_NETCDF=$LIB_NETCDF                                     \
 -DLIB_GCC=$LIB_GCC                                           \
 -DLIB_GFORTRAN=$LIB_GFORTRAN                                 \
