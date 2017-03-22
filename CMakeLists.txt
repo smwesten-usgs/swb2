@@ -61,7 +61,7 @@ set( EXTERNAL_LIBS ${LIB_NETCDF} ${LIB_HDF5_HL} ${LIB_HDF5} ${LIB_SZ} ${LIB_Z} $
 set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIB_GFORTRAN} ${LIB_GCC} )
 
 link_libraries( ${EXTERNAL_LIBS} )
-include_directories( ${INCLUDE_DIRECTORIES} ${DISLIN_MODULE_DIR} "${PROJECT_SOURCE_DIR}/src/proj4" )
+include_directories( ${INCLUDE_DIRECTORIES} "${PROJECT_SOURCE_DIR}/src/proj4" )
 
 if ("${SYSTEM_TYPE}" STREQUAL "win_x64" OR "${SYSTEM_TYPE}" STREQUAL "win_x86")
   add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2.exe ${CMAKE_INSTALL_PREFIX}/swb2.exe
