@@ -33,3 +33,5 @@ sudo make copy
 ```
 
 SWB 2.0 will be compiled and copied to /usr/local/bin/swb2.
+
+The shell script assumes that you have installed Mac Ports in the standard directory, e.g. /opt/local. If this is not the case, the configuration script will fail. You'll need to edit this configuration file so that the locate command is able to produce a single correct filename for each of the libraries.
