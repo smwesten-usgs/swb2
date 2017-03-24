@@ -162,7 +162,8 @@ contains
 
     call routing_D8_determine_solution_order( lActive )
 
-    open( newunit=iUnitNum, file="D8_routing_table.txt", iostat=iStat, status="REPLACE")
+    open( newunit=iUnitNum, file=trim(OUTPUT_DIRECTORY_NAME)//trim("D8_routing_table.txt"),   &
+      iostat=iStat, status="REPLACE")
 
     write(iUnitNum,*) "INDEX"//TAB//"ORDER_INDEX"//TAB//"TARGET_INDEX"//TAB//"From_COL"//TAB//"From_ROW" &
       //TAB//"To_COL"//TAB//"To_ROW"//TAB//"D8_flowdir"//TAB//"Num_Adjacent_Upslope_Connections"//TAB &

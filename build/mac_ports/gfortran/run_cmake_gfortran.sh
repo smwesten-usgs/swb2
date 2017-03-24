@@ -51,13 +51,13 @@ export STRIP=/usr/bin/strip
 export CMAKE_RANLIB=gcc-ranlib-$COMPILER_MAJ_VERSION
 
 cmake ../../.. -G "Unix Makefiles"                           \
--DOS="$OS "                                                  \
--DLIB_HDF5_HL=$LIB_HDF5_HL                                   \
--DLIB_HDF5=$LIB_HDF5                                         \
--DLIB_Z=$LIB_Z                                               \
--DLIB_NETCDF=$LIB_NETCDF                                     \
--DLIB_GCC=$LIB_GCC                                           \
--DLIB_GFORTRAN=$LIB_GFORTRAN                                 \
+-DSYSTEM_TYPE="$SYSTEM_TYPE "                                \
+-DLIB_HDF5_HL="$LIB_HDF5_HL "                                \
+-DLIB_HDF5="$LIB_HDF5 "                                      \
+-DLIB_Z="$LIB_Z "                                            \
+-DLIB_NETCDF="$LIB_NETCDF "                                  \
+-DLIB_GCC="$LIB_GCC "                                        \
+-DLIB_GFORTRAN="$LIB_GFORTRAN "                              \
 -DCMAKE_BUILD_TYPE="$BUILD_TYPE "                            \
 -DCMAKE_INSTALL_PREFIX:PATH="$INSTALL_PREFIX "               \
 -DCMAKE_Fortran_FLAGS_DEBUG="$CMAKE_Fortran_FLAGS_DEBUG "    \

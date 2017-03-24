@@ -37,7 +37,7 @@ module maximum_net_infiltration__gridded_data
 
 contains
 
-  !> Initialize the routine to establish maximum potential recharge rates. 
+  !> Initialize the routine to establish maximum potential recharge rates.
   !!
   !! Open gridded data file.
   !! Open a NetCDF output file to hold variable output.
@@ -54,13 +54,13 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iStat
     type (STRING_LIST_T)                 :: parameter_list
-    type (STRING_LIST_T)                 :: max_recharge_list
-    real (kind=c_float), allocatable     :: max_recharge_vector(:)
+    type (STRING_LIST_T)                 :: max_net_infiltration_list
+    real (kind=c_float), allocatable     :: max_net_infiltration_vector(:)
     integer (kind=c_int), allocatable    :: sequence_nums(:)
     integer (kind=c_int), allocatable    :: landuse_codes(:)
     logical (kind=c_bool)                :: lAreLengthsEqual
     integer (kind=c_int)                 :: soils_indx
-    integer (kind=c_int)                 :: landuse_indx    
+    integer (kind=c_int)                 :: landuse_indx
     integer (kind=c_int)                 :: number_of_landuses
     integer (kind=c_int)                 :: number_of_soils
     real (kind=c_float)                  :: value
@@ -73,7 +73,7 @@ contains
 
     pLULC => DAT%find("LAND_USE")
     pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
-    
+
     call assert( associated( pLULC), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer"          &
       //" detected for pLULC", __SRCNAME__, __LINE__ )
 
@@ -88,11 +88,11 @@ contains
     call assert( associated( pHSG), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer"           &
       //" detected for pHSG", __SRCNAME__, __LINE__ )
 
-    call assert( associated( pHSG%pGrdBase ),      & 
+    call assert( associated( pHSG%pGrdBase ),      &
       "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pHSG%pGrdBase",             &
        __SRCNAME__, __LINE__ )
 
-    call assert( allocated( pHSG%pGrdBase%iData ),      & 
+    call assert( allocated( pHSG%pGrdBase%iData ),      &
       "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pHSG%pGrdBase%iData",  &
        __SRCNAME__, __LINE__ )
 
@@ -101,7 +101,7 @@ contains
     pMAXIMUM_NET_INFILTRATION => DAT%find( "MAXIMUM_NET_INFILTRATION" )
 
     ! retrieve a string list of all keys associated with Max_recharge (i.e. Max_recharge_1, Max_recharge_2, etc.)
-    max_recharge_list = PARAMS%grep_name("Max_recharge", lFatal=FALSE )
+    max_net_infiltration_list = PARAMS%grep_name("net_infil", lFatal=TRUE )
 
     ! look for data in the form of a grid
     if ( associated( pMAXIMUM_NET_INFILTRATION ) ) then
@@ -112,48 +112,32 @@ contains
       associate ( dt => SIM_DT%curr )
 
         if ( associated( pMAXIMUM_NET_INFILTRATION ) ) then
-          ! NB: maximum potential recharge 
+          ! NB: maximum potential recharge
           call pMAXIMUM_NET_INFILTRATION%getvalues( )
           if ( pMAXIMUM_NET_INFILTRATION%lGridHasChanged )     &
             fMAXIMUM_NET_INFILTRATION = pack( pMAXIMUM_NET_INFILTRATION%pGrdBase%rData, is_cell_active )
-        endif      
+        endif
 
       end associate
 
-    elseif ( max_recharge_list%get(1) /= "<NA>" ) then  ! no gridded data; read from TABLE values
-
-!      iNumActiveCells = count( is_cell_active,1 )
+    elseif ( max_net_infiltration_list%get(1) /= "<NA>" ) then  ! no gridded data; read from TABLE values
 
       call parameter_list%append("LU_Code")
       call parameter_list%append("Landuse_Code")
       call parameter_list%append("Landuse_Lookup_Code")
 
-      !> Determine how many soil groups are present
-
-      ! retrieve a string list of all keys associated with Max_recharge (i.e. Max_recharge_1, Max_recharge_2, etc.)
-      max_recharge_list = PARAMS%grep_name("Max_recharge", lFatal=FALSE )
-      ! Convert the string list to an vector of integers; MODEL call strips off the "RZ_" part of label
-      sequence_nums = max_recharge_list%asInt()
-
-      ! count how many items are present in the vector; MODEL should equal the number of soils groups
-      number_of_soils = count( sequence_nums > 0 )
-
       !> Determine how many landuse codes are present
       call PARAMS%get_parameters( slKeys=parameter_list, iValues=landuse_codes )
       number_of_landuses = count( landuse_codes >= 0 )
 
-      allocate( fMAXIMUM_NET_INFILTRATION_TABLE(number_of_landuses, number_of_soils), stat=iStat )
-      call assert( iStat == 0, "Failed to allocate memory for maximum potential recharge table", &
-        __SRCNAME__, __LINE__)
+      call PARAMS%get_parameters( fValues=fMAXIMUM_NET_INFILTRATION_TABLE,     &
+                                  sPrefix="net_infil",                         &
+                                  iNumRows=number_of_landuses,                 &
+                                  lFatal=TRUE )
 
-      ! we should have the max potential recharge table fully filled out following MODEL block
-      do soils_indx = 1, number_of_soils
-        text_str = "Max_recharge_"//asCharacter(soils_indx)
-        call PARAMS%get_parameters( sKey=text_str, fValues=max_recharge_vector )
-        fMAXIMUM_NET_INFILTRATION_TABLE(:, soils_indx) = max_recharge_vector
-      enddo  
+      number_of_soils = ubound( fMAXIMUM_NET_INFILTRATION_TABLE, 2 )
 
-      call LOGS%WRITE( "Landuse Code |  Soils Code  | Number of Matches | Maximum potential recharge (in)",   &
+      call LOGS%WRITE( "Landuse Code |  Soils Code  | Number of Matches | Maximum net infiltration (in)",   &
         iLogLevel = LOG_DEBUG, lEcho = lFALSE )
       call LOGS%WRITE( "-------------|--------------|-------------------|-------------------------------- ",  &
         iLogLevel = LOG_DEBUG, lEcho = lFALSE )
@@ -177,7 +161,7 @@ contains
 
              fMAXIMUM_NET_INFILTRATION_ARRAY = value
 
-           endwhere 
+           endwhere
 
         enddo
 
@@ -198,6 +182,9 @@ contains
 
       fMAXIMUM_NET_INFILTRATION = 9999.0
 
+      call warn( "Did not find any valid maximum net infiltration rate parameters.",    &
+        lFatal = lTRUE )
+
     endif
 
   end subroutine maximum_net_infiltration_initialize
@@ -216,12 +203,12 @@ contains
       net_infiltration = fMAXIMUM_NET_INFILTRATION( indx )
 
     else
-    
+
       rejected_net_infiltration = 0.0_c_float
 
     endif
 
-  end subroutine maximum_net_infiltration_calculate  
+  end subroutine maximum_net_infiltration_calculate
 
 
 end module maximum_net_infiltration__gridded_data

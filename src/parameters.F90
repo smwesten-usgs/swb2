@@ -521,7 +521,8 @@ contains
         //" sPrefix: "//dQuote(sPrefix), __SRCNAME__, __LINE__ )
 
       do iIndex = 1, iNumCols
-        sText = trim(sPrefix)//asCharacter(iIndex)
+
+        sText = trim( slList%get( iIndex ) )
         call PARAMS_DICT%get_values( sKey=sText, fValues=fTempVal )
 
         fValues(:,iIndex) = fTempVal

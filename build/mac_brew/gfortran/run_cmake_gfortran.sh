@@ -8,24 +8,28 @@ rm -rf tests
 rm -f CPack*
 rm -f *.txt
 
+export GCC_VERSION=5.4.0
 # set CMAKE-related and build-related variables
-export COMPILER_VERSION=5.4.0
-export COMPILER_MAJ_VERSION=5
-export GCCBINDIR=$(locate bin/gcc-5 | grep "$COMPILER_VERSION")
-export LIBGFORTRANDIR=$(locate 5/libgfortran.a | grep "$COMPILER_VERSION")
-export LIBGCCDIR=$(locate "$COMPILER_VERSION/libgcc.a" | sed -e 's/\/libgcc.a//')
-export GCCDIR=$(locate bin/gfortran-5 | grep "$COMPILER_VERSION")
+export GCCLIST=$( locate gcc-5 | grep Cellar | grep bin | grep $GCC_VERSION )
+export GCCARR=($GCCLIST)
+export GCC=${GCCARR[1]}
+export GFORTRANLIST=$( locate gfortran-5 | grep Cellar | grep bin | grep $GCC_VERSION )
+export GFORTRANARR=($GFORTRANLIST)
+export GFORTRAN=${GFORTRANARR[1]}
+
+export GPP=/opt/local/bin/g++-mp-5
 export CMAKEROOT=/usr/bin/cmake
-export COMPILER_TRIPLET=x86_64-apple-darwin15.4.0
-export COMPILER_DIR=/usr/local
-export LIB_PATH1=$(locate "$COMPILER_VERSION/libgcc.a" | sed -e 's/\/libgcc.a//')
-export LIB_PATH2=/opt/X11/lib
-export LIB_PATH3=$(locate 5/libgfortran.a | grep "$COMPILER_VERSION")
-export LIB_PATH4="/usr/local/lib/gcc/$COMPILER_MAJ_VERSION"
-export Fortran_COMPILER_NAME=gfortran
 export R_HOME=/usr/bin/R
 
-export PATH=/usr/bin:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:$GCCBINDIR
+export LIB_HDF5_HL=$( locate hdf5_hl.a | grep Cellar )
+export LIB_HDF5=$( locate hdf5.a | grep Cellar )
+export LIB_NETCDF=$( locate netcdf.dylib | grep Cellar )
+export LIB_Z=$( locate libz.a | grep Cellar )
+export LIB_SZ=$( locate libsz.a | grep Cellar )
+export LIB_GCC=$( locate libgcc.a | grep Cellar | grep $GCC_VERSION | grep -v i386 )
+export LIB_GFORTRAN=$( locate libgfortran.a | grep Cellar | grep $GCC_VERSION | grep -v i386 )
+
+export PATH=/usr/local:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:$PATH
 
 # define where 'make copy' will place executables
 export INSTALL_PREFIX=/usr/local/bin
@@ -33,39 +37,27 @@ export INSTALL_PREFIX=/usr/local/bin
 # define other variables for use in the CMakeList.txt file
 # options are "Release" or "Debug"
 export BUILD_TYPE="RELEASE"
-export OS="mac_osx"
+export SYSTEM_TYPE="MacOS"
 
 # define platform and compiler specific compilation flags
 export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -Wuninitialized -fbacktrace -fcheck=all -fexceptions -fsanitize=null -fsanitize=leak -fmax-errors=6 -fbackslash -ffree-line-length-none"
-#set CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -floop-parallelize-all -flto -ffree-line-length-none -static-libgcc -static-libgfortran"
-#export CMAKE_Fortran_FLAGS_RELEASE="-O3 -mtune=native -ffree-line-length-none -ffpe-summary='none' -fopenmp"
-
 export CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -ffree-line-length-512 -fbackslash -ffpe-summary='none'"
 
-
 # set important environment variables
-export FC=/usr/local/bin/gfortran-"$COMPILER_MAJ_VERSION"
-export CC=/usr/local/bin/gcc-"$COMPILER_MAJ_VERSION"
-export CXX=/usr/local/bin/g++-"$COMPILER_MAJ_VERSION"
-export AR=gcc-ar-$COMPILER_MAJ_VERSION
-export NM=gcc-nm-$COMPILER_MAJ_VERSION
-export LD=/usr/bin/ld
-export STRIP=/usr/bin/strip
-export CMAKE_RANLIB=gcc-ranlib-$COMPILER_MAJ_VERSION
+export FC=$GFORTRAN
+export CC=$GCC
+export CXX=$GPP
 
-cmake ../../.. -G "Unix Makefiles"                           \
--DCOMPILER_DIR="$COMPILER_DIR "                              \
--DCOMPILER_TRIPLET="$COMPILER_TRIPLET "                      \
--DCMAKE_Fortran_COMPILER="$FC"                               \
--DLIB_PATH1="$LIB_PATH1 "                                    \
--DLIB_PATH2="$LIB_PATH2 "                                    \
--DLIB_PATH3="$LIB_PATH3 "                                    \
--DLIB_PATH4="$LIB_PATH4 "                                    \
--DLIBGCC_PATH="$LIBGCCDIR "                                  \
--DLIBGFORTRAN_PATH="$LIBGFORTRANDIR"                         \
--DCMAKE_EXE_LINKER_FLAGS="$LINKER_FLAGS "                    \
--DOS="$OS "                                                  \
+cmake "../../.." -G "Unix Makefiles"                         \
+-DSYSTEM_TYPE="$SYSTEM_TYPE "                                \
 -DCMAKE_BUILD_TYPE="$BUILD_TYPE "                            \
+-DLIB_HDF5_HL="$LIB_HDF5_HL "                                \
+-DLIB_HDF5="$LIB_HDF5 "                                      \
+-DLIB_Z="$LIB_Z "                                            \
+-DLIB_SZ="$LIB_SZ "                                          \
+-DLIB_NETCDF="$LIB_NETCDF "                                  \
+-DLIB_GCC="$LIB_GCC "                                        \
+-DLIB_GFORTRAN="$LIB_GFORTRAN "                              \
 -DCMAKE_INSTALL_PREFIX:PATH="$INSTALL_PREFIX "               \
 -DCMAKE_Fortran_FLAGS_DEBUG="$CMAKE_Fortran_FLAGS_DEBUG "    \
 -DCMAKE_Fortran_FLAGS_RELEASE="$CMAKE_Fortran_FLAGS_RELEASE"
