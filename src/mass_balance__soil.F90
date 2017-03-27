@@ -9,23 +9,25 @@ module mass_balance__soil
 
 contains
 
-   elemental subroutine calculate_soil_mass_balance( net_infiltration,    &
+   elemental subroutine calculate_soil_mass_balance( net_infiltration,      &
                                                      soil_storage,          &
-                                                     actual_et,             &
+                                                     actual_et_soil,        &
                                                      runoff,                &
+                                                     reference_et0,         &
                                                      soil_storage_max,      &
                                                      infiltration )
 
     real (kind=c_float), intent(inout)      :: net_infiltration
     real (kind=c_float), intent(inout)      :: soil_storage
-    real (kind=c_float), intent(inout)      :: actual_et
+    real (kind=c_float), intent(inout)      :: actual_et_soil
     real (kind=c_float), intent(inout)      :: runoff
+    real (kind=c_float), intent(in)         :: reference_et0
     real (kind=c_float), intent(in)         :: soil_storage_max
     real (kind=c_float), intent(in)         :: infiltration
 
-    real (kind=c_float), parameter          :: NEAR_ZERO = 1.0E-9_c_float
+    real (kind=c_float), parameter          :: NEAR_ZERO = 1.0E-6_c_float
 
- 
+
     ! [ LOCALS ]
     real (kind=c_float) :: new_soil_storage
 
@@ -33,13 +35,15 @@ contains
 
     if ( soil_storage_max < NEAR_ZERO ) then
 
+      actual_et_soil = reference_et0
       net_infiltration = 0.0_c_float
-      runoff = max( 0.0_c_float, infiltration - actual_et )
-      actual_et = infiltration - runoff
+      runoff = max( 0.0_c_float, infiltration - actual_et_soil )
+!      actual_et = infiltration - runoff
+      soil_storage = 0.0_c_float
 
     elseif ( new_soil_storage < 0.0_c_float ) then
 
-      actual_et = max( 0.0_c_float, soil_storage + infiltration )
+      actual_et_soil = max( 0.0_c_float, soil_storage + infiltration )
       soil_storage = 0.0_c_float
       net_infiltration = 0.0_c_float
 

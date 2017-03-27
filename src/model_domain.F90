@@ -1401,7 +1401,7 @@ contains
 
       this%runoff_outside( this%order_index( indx ) ) = this%runoff( this%order_index( indx ) )  &
               + this%rejected_net_infiltration( this%order_index( indx ) )
-      this%runon( TARGET_INDEX( indx ) ) = 0.0_c_float
+!      this%runon( TARGET_INDEX( indx ) ) = 0.0_c_float
 
     endif
 
