@@ -150,12 +150,6 @@ contains
       enddo
     enddo
 
-    ! pTempGrid%iData = COL2D
-    ! call grid_WriteArcGrid("COL2D_Grid.asc", pTempGrid)
-    !
-    ! pTempGrid%iData = ROW2D
-    ! call grid_WriteArcGrid("ROW2D_Grid.asc", pTempGrid)
-
     ! create 1D vectors of column and row numbers for full grid
     COL1D = pack( COL2D, lActive )
     ROW1D = pack( ROW2D, lActive )
@@ -165,9 +159,9 @@ contains
     open( newunit=iUnitNum, file=trim(OUTPUT_DIRECTORY_NAME)//trim("D8_routing_table.txt"),   &
       iostat=iStat, status="REPLACE")
 
-    write(iUnitNum,*) "INDEX"//TAB//"ORDER_INDEX"//TAB//"TARGET_INDEX"//TAB//"From_COL"//TAB//"From_ROW" &
-      //TAB//"To_COL"//TAB//"To_ROW"//TAB//"D8_flowdir"//TAB//"Num_Adjacent_Upslope_Connections"//TAB &
-      //"Sum_of_Upslope_Contributing_Cells"
+    write(iUnitNum,*) "NATURAL_INDEX"//TAB//"ORDER_INDEX"//TAB//"TARGET_INDEX"//TAB//"From_COL"    &
+      // TAB//"From_ROW"//TAB//"To_COL"//TAB//"To_ROW"//TAB//"D8_flowdir"//TAB                     &
+      //"Num_Adjacent_Upslope_Connections"//TAB//"Sum_of_Upslope_Contributing_Cells"
 
      ! solution order has been determined; remaining code simply writes a summary to a
      ! file for further analysis
@@ -211,24 +205,24 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function routing_D8_get_index( iCol, iRow )   result( iIndex )
+  function routing_D8_get_index( iCol, iRow )   result( natural_index )
 
     integer (kind=c_int), intent(in)   :: iCol
     integer (kind=c_int), intent(in)   :: iRow
-    integer (kind=c_int)               :: iIndex
+    integer (kind=c_int)               :: natural_index
 
     ! [ LOCALS ]
-    integer (kind=c_int)   :: iOrderIndex
+    integer (kind=c_int)   :: iIndex
     logical (kind=c_bool)  :: lFound
 
-    iIndex = -999
+    iIndex = -9999
     lFound = lFALSE
 
     ! iterate over 1D vector of column numbers
-    do iOrderIndex = lbound(COL1D,1), ubound(COL1D,1)
+    do iIndex = lbound(COL1D,1), ubound(COL1D,1)
 
-      if( COL1D( iOrderIndex ) == iCol  .and.  ROW1D( iOrderIndex ) == iRow ) then
-      	iIndex = iOrderIndex
+      if( COL1D( iIndex ) == iCol  .and.  ROW1D( iIndex ) == iRow ) then
+      	natural_index = iIndex
         lFound = lTRUE
       	exit
       endif
@@ -341,7 +335,7 @@ contains
     logical (kind=c_bool) :: lAnyUnmarkedUpslopeCells
     logical (kind=c_bool) :: lCircular
     integer (kind=c_int)  :: iNumberRemaining
-    integer (kind=c_int)  :: iStorageIndex, k, iCount
+    integer (kind=c_int)  :: natural_index, k, iCount
     integer (kind=c_int)  :: iDelta
     integer (kind=c_int)  :: iPasses
     integer (kind=c_int)  :: iPassesWithoutChange
@@ -356,7 +350,7 @@ contains
     lDownhillMarked = lFALSE
     iSumOfUpslopeCells = 0_c_int
 
-    iStorageIndex = 0
+    natural_index = 0
     iPasses = 0
     iPassesWithoutChange = 0
 
@@ -435,14 +429,14 @@ main_loop: do
 	                iSumOfUpslopeCells( iColnum, iRownum ) = iUpslopeSum
 	                iNumberOfUpslopeConnections( iColnum, iRownum ) = iUpslopeConnections
 	                lDownhillMarked( iColnum, iRownum ) = lTRUE
-                  iStorageIndex = iStorageIndex + 1
-                  COLUMN_INDEX( iStorageIndex ) = iColnum
-                  ROW_INDEX( iStorageIndex ) = iRownum
-                  ORDER_INDEX( iStorageIndex ) = routing_D8_get_index( iColnum, iRownum )
-                  TARGET_INDEX( iStorageIndex ) = routing_D8_get_index( iTargetCol( iColNum, iRowNum ), &
+                  natural_index = natural_index + 1
+                  COLUMN_INDEX( natural_index ) = iColnum
+                  ROW_INDEX( natural_index ) = iRownum
+                  ORDER_INDEX( natural_index ) = routing_D8_get_index( iColnum, iRownum )
+                  TARGET_INDEX( natural_index ) = routing_D8_get_index( iTargetCol( iColNum, iRowNum ), &
                     iTargetRow( iColNum, iRowNum ) )
 
-                  if ( lCircular )  TARGET_INDEX( iStorageIndex ) = D8_UNDETERMINED
+                  if ( lCircular )  TARGET_INDEX( natural_index ) = D8_UNDETERMINED
 
                 elseif ( iPassesWithoutChange > 10 ) then
 
@@ -450,12 +444,12 @@ main_loop: do
                   iSumOfUpslopeCells( iColnum, iRownum ) = iUpslopeSum
                   iNumberOfUpslopeConnections( iColnum, iRownum ) = iUpslopeConnections
                   lDownhillMarked( iColnum, iRownum ) = lTRUE
-                  iStorageIndex = iStorageIndex + 1
-                  COLUMN_INDEX( iStorageIndex ) = iColnum
-                  ROW_INDEX( iStorageIndex ) = iRownum
-                  ORDER_INDEX( iStorageIndex ) = routing_D8_get_index( iColnum, iRownum )
+                  natural_index = natural_index + 1
+                  COLUMN_INDEX( natural_index ) = iColnum
+                  ROW_INDEX( natural_index ) = iRownum
+                  ORDER_INDEX( natural_index ) = routing_D8_get_index( iColnum, iRownum )
 
-                  TARGET_INDEX( iStorageIndex ) = D8_UNDETERMINED
+                  TARGET_INDEX( natural_index ) = D8_UNDETERMINED
 
                 endif
 

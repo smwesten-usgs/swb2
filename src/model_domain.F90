@@ -272,6 +272,8 @@ module model_domain
 
   type ( CELL_COL_ROW_T ) :: DUMP(5)
 
+  integer (kind=c_int) :: DUMP_INDX_UNITNUM
+
   ! array method: designed to be called using whole-array notation
   abstract interface
     subroutine array_method( this )
@@ -1209,7 +1211,15 @@ contains
 
         this%dump_variables => model_dump_variables_by_cell
 
-        if ( argv_list%count == 3 ) then
+        if ( argv_list%count == 4 ) then
+
+          if ( .not. ( Method_Name .contains. "ORDER_INDEX_RANGE") )            &
+            call warn("Unknown option supplied to DUMP_VARIABLES method.",      &
+              sHints="The only known option keyword with this number of "       &
+              //"arguments is 'ORDER_INDEX_RANGE'.",                            &
+              lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+
+        elseif ( argv_list%count == 3 ) then
 
           xcoord = asFloat( argv_list%get(2) )
           ycoord = asFloat( argv_list%get(3) )
@@ -1217,8 +1227,9 @@ contains
           col = grid_GetGridColNum( this%pGrdOut, xcoord )
 
           if ( .not. ( Method_Name .contains. "COORD") )                       &
-            call warn("Unknown option supplied to DUMP_VARIABLES method.", &
-              sHints="The only known option keyword is 'COORD'.",          &
+            call warn("Unknown option supplied to DUMP_VARIABLES method.",     &
+              sHints="The only known option keyword with this number of "      &
+              //"arguments is 'COORD'.",                                       &
               lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
 
         elseif ( argv_list%count == 2 ) then
@@ -1253,12 +1264,13 @@ contains
             ! this%surf_evap_coef_ke( indx ), this%fraction_exposed_and_wetted_soil( indx ),                  &
             !
             write( unit=DUMP( indx )%unitnum, fmt="(a)")                                                           &
-              "month, day, year,landuse_code, landuse_index, index_order, soil_group, num_upslope_connections, "   &
-              //"sum_upslope_cells, awc, latitude, reference_ET0, actual_ET, curve_num_adj, inflow, runon, "       &
+              "month, day, year,landuse_code, landuse_index, soil_group, num_upslope_connections, "                &
+              //"sum_upslope_cells, natural_index, order_index, target_index, awc, latitude, reference_ET0, "      &
+              //"actual_ET, curve_num_adj, inflow, runon, "                                                        &
               //"runoff, outflow, infiltration, snowfall, potential_snowmelt, snowmelt, interception, "            &
               //"rainfall, interception_storage, tmax, tmin, tmean, snow_storage, "                                &
               //"soil_storage, soil_storage_max, surface_storage, surface_storage_excess, "                        &
-              //"surface_storage_max, net_infiltration, rejected_recharge, fog, irrigation, gdd, "               &
+              //"surface_storage_max, net_infiltration, rejected_recharge, fog, irrigation, gdd, "                 &
               //" runoff_outside, "                                                                                &
               //"pervious_fraction, storm_drain_capture, canopy_cover_fraction, crop_coefficient_kcb, "            &
               //"cfgi, rooting_depth_max, current_rooting_depth, actual_et_soil, "                                 &
@@ -1384,26 +1396,32 @@ contains
 
 ! indx values should be fed in ordered according to ORDER_INDEX()
 
-  subroutine model_calculate_routing_D8( this, indx )
+  subroutine model_calculate_routing_D8( this, index )
 
-    use routing__D8, only   : TARGET_INDEX
+    use routing__D8, only   : TARGET_INDEX, ORDER_INDEX
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    integer (kind=c_int), intent(in)       :: indx
+    integer (kind=c_int), intent(in)       :: index
 
-    if ( (    TARGET_INDEX( indx ) >= lbound( this%runon, 1) )               &
-      .and. ( TARGET_INDEX( indx ) <= ubound( this%runon, 1) ) ) then
+    associate( natural_index => index )
 
-        this%runon( TARGET_INDEX( indx ) ) = this%runoff( this%order_index( indx ) )             &
-                                + this%rejected_net_infiltration( this%order_index( indx ) )
+      ! if the target cell is within valid bounds, move the water downslope
+      if ( (    TARGET_INDEX( natural_index ) >= lbound( this%runon, 1) )                            &
+        .and. ( TARGET_INDEX( natural_index ) <= ubound( this%runon, 1) ) ) then
 
-    else
+          this%runon( TARGET_INDEX( natural_index ) ) = this%runoff( ORDER_INDEX( natural_index ) )  &
+              + this%rejected_net_infiltration( ORDER_INDEX( natural_index ) )
 
-      this%runoff_outside( this%order_index( indx ) ) = this%runoff( this%order_index( indx ) )  &
-              + this%rejected_net_infiltration( this%order_index( indx ) )
-!      this%runon( TARGET_INDEX( indx ) ) = 0.0_c_float
+      else
 
-    endif
+        ! move the water out of grid
+        this%runoff_outside( ORDER_INDEX( natural_index ) ) =                                        &
+          this%runoff(  ORDER_INDEX( natural_index ) )                                               &
+          + this%rejected_net_infiltration( ORDER_INDEX( natural_index ) )
+
+      endif
+
+    end associate
 
   end subroutine model_calculate_routing_D8
 
@@ -2092,13 +2110,23 @@ contains
 
       if ( (indx >= lbound( this%landuse_code, 1) ) .and. ( indx <= ubound( this%landuse_code, 1) ) ) then
 
-        call model_dump_variables( this=this, unitnum=DUMP( jndx )%unitnum, indx=indx )
+        call model_dump_variables( this=this, unitnum=DUMP( jndx )%unitnum, indx_start=indx )
 
       endif
 
     enddo
 
   end subroutine model_dump_variables_by_cell
+
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine model_dump_variables_by_index_range( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call model_dump_variables( this=this, unitnum=DUMP_INDX_UNITNUM, indx_start=1, indx_end=2 )
+
+  end subroutine model_dump_variables_by_index_range
 
 !--------------------------------------------------------------------------------------------------
 
@@ -2125,43 +2153,66 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_dump_variables( this, unitnum, indx )
+  subroutine model_dump_variables( this, unitnum, indx_start, indx_end )
 
     use runoff__curve_number, only   : PREV_5_DAYS_RAIN
+    use routing__D8, only            : TARGET_INDEX, ORDER_INDEX
 
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-    integer (kind=c_int), intent(in)       :: unitnum
-    integer (kind=c_int), intent(in)       :: indx
+    class (MODEL_DOMAIN_T), intent(inout)       :: this
+    integer (kind=c_int), intent(in)            :: unitnum
+    integer (kind=c_int), intent(in)            :: indx_start
+    integer (kind=c_int), intent(in), optional  :: indx_end
 
     ! [ LOCALS ]
     integer (kind=c_int) :: kndx
+    integer (kind=c_int) :: target_indx
+    integer (kind=c_int) :: order_indx
+    integer (kind=c_int) :: indx_end_
+    integer (kind=c_int) :: indx
 
-        write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',6(i6,','),57(f12.3,','),f12.3)")                  &
-          SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                        &
-          this%landuse_code( indx ), this%landuse_index( indx ), this%order_index( indx ),                &
-          this%soil_group( indx ), this%num_upslope_connections( indx ), this%sum_upslope_cells( indx ),  &
-          this%awc( indx ), this%latitude( indx ), this%reference_ET0( indx ), this%actual_ET( indx ),    &
-          this%curve_num_adj( indx ), this%inflow( indx ), this%runon( indx ), this%runoff( indx ),       &
-          this%outflow( indx ),                                                                           &
-          this%infiltration( indx ), this%snowfall( indx ), this%potential_snowmelt( indx ),              &
-          this%snowmelt( indx ), this%interception( indx ), this%rainfall( indx ),                        &
-          this%interception_storage( indx ), this%tmax( indx ), this%tmin( indx ), this%tmean( indx ),    &
-          this%snow_storage( indx ), this%soil_storage( indx ), this%soil_storage_max( indx ),            &
-          this%surface_storage( indx ), this%surface_storage_excess( indx ),                              &
-          this%surface_storage_max( indx ), this%net_infiltration( indx ),                              &
-          this%rejected_net_infiltration( indx ), this%fog( indx ),                                     &
-          this%irrigation( indx ), this%gdd( indx ), this%runoff_outside( indx ),                         &
-          this%pervious_fraction( indx ), this%storm_drain_capture( indx ),                               &
-          this%canopy_cover_fraction( indx ), this%crop_coefficient_kcb( indx ),                          &
-          this%continuous_frozen_ground_index( indx ), this%rooting_depth_max( indx ),                    &
-          this%current_rooting_depth( indx ), this%actual_et_soil( indx ),                                &
-          this%readily_available_water_raw( indx ), this%total_available_water_taw( indx ),               &
-          this%plant_stress_coef_ks( indx ), this%evap_reduction_coef_kr( indx ),                         &
-          this%surf_evap_coef_ke( indx ), this%fraction_exposed_and_wetted_soil( indx ),                  &
-          this%actual_et_impervious( indx ), this%actual_et_interception( indx ),                         &
-          this%adjusted_depletion_fraction_p( indx ), this%crop_etc( indx ), this%bare_soil_evap( indx ), &
-          this%direct_net_infiltration( indx ),                                                                   &
-          this%direct_soil_moisture( indx ), (PREV_5_DAYS_RAIN( indx, kndx), kndx=1,6)
+    if ( present( indx_end ) ) then
+      indx_end_ = indx_end
+    else
+      indx_end_ = indx_start
+    endif
+
+    do indx=indx_start, indx_end_
+
+      target_indx = -9999
+      order_indx  = -9999
+
+      if ( allocated( TARGET_INDEX ) )  target_indx = TARGET_INDEX( indx )
+      if ( allocated( ORDER_INDEX ) )   order_indx = ORDER_INDEX( indx )
+
+      write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',8(i6,','),57(f12.3,','),f12.3)")                  &
+        SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                        &
+        this%landuse_code( indx ), this%landuse_index( indx ),                                          &
+        this%soil_group( indx ), this%num_upslope_connections( indx ), this%sum_upslope_cells( indx ),  &
+        indx, order_indx, target_indx,                                                                  &
+        this%awc( indx ), this%latitude( indx ), this%reference_ET0( indx ), this%actual_ET( indx ),    &
+        this%curve_num_adj( indx ), this%inflow( indx ), this%runon( indx ), this%runoff( indx ),       &
+        this%outflow( indx ),                                                                           &
+        this%infiltration( indx ), this%snowfall( indx ), this%potential_snowmelt( indx ),              &
+        this%snowmelt( indx ), this%interception( indx ), this%rainfall( indx ),                        &
+        this%interception_storage( indx ), this%tmax( indx ), this%tmin( indx ), this%tmean( indx ),    &
+        this%snow_storage( indx ), this%soil_storage( indx ), this%soil_storage_max( indx ),            &
+        this%surface_storage( indx ), this%surface_storage_excess( indx ),                              &
+        this%surface_storage_max( indx ), this%net_infiltration( indx ),                                &
+        this%rejected_net_infiltration( indx ), this%fog( indx ),                                       &
+        this%irrigation( indx ), this%gdd( indx ), this%runoff_outside( indx ),                         &
+        this%pervious_fraction( indx ), this%storm_drain_capture( indx ),                               &
+        this%canopy_cover_fraction( indx ), this%crop_coefficient_kcb( indx ),                          &
+        this%continuous_frozen_ground_index( indx ), this%rooting_depth_max( indx ),                    &
+        this%current_rooting_depth( indx ), this%actual_et_soil( indx ),                                &
+        this%readily_available_water_raw( indx ), this%total_available_water_taw( indx ),               &
+        this%plant_stress_coef_ks( indx ), this%evap_reduction_coef_kr( indx ),                         &
+        this%surf_evap_coef_ke( indx ), this%fraction_exposed_and_wetted_soil( indx ),                  &
+        this%actual_et_impervious( indx ), this%actual_et_interception( indx ),                         &
+        this%adjusted_depletion_fraction_p( indx ), this%crop_etc( indx ), this%bare_soil_evap( indx ), &
+        this%direct_net_infiltration( indx ),                                                                   &
+        this%direct_soil_moisture( indx ), (PREV_5_DAYS_RAIN( indx, kndx), kndx=1,6)
+
+    enddo
 
   end subroutine model_dump_variables
 

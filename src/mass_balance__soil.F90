@@ -31,22 +31,26 @@ contains
     ! [ LOCALS ]
     real (kind=c_float) :: new_soil_storage
 
-    new_soil_storage = soil_storage + infiltration - actual_et
+    new_soil_storage = soil_storage + infiltration - actual_et_soil
 
+    ! open water cell
     if ( soil_storage_max < NEAR_ZERO ) then
 
       actual_et_soil = reference_et0
       net_infiltration = 0.0_c_float
-      runoff = max( 0.0_c_float, infiltration - actual_et_soil )
-!      actual_et = infiltration - runoff
+      ! **** infiltration term includes the previously calculated runoff; add this back in
+      !      before adjusting the runoff value
+      runoff = max( 0.0_c_float, infiltration + runoff - actual_et_soil )
       soil_storage = 0.0_c_float
 
+    ! guard against numerical issues relating to soil storage: no negative values
     elseif ( new_soil_storage < 0.0_c_float ) then
 
       actual_et_soil = max( 0.0_c_float, soil_storage + infiltration )
       soil_storage = 0.0_c_float
       net_infiltration = 0.0_c_float
 
+    ! new soil storage value exceeds soil_storage_max; net infiltration event
     elseif ( new_soil_storage > soil_storage_max ) then
 
       net_infiltration = new_soil_storage - soil_storage_max
