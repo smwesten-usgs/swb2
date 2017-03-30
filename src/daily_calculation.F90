@@ -79,12 +79,12 @@ contains
 
     !> if flow routing is enabled, the calculations will be made in order from upslope to downslope;
     !! otherwise, the calculations are made in the natural packing order of the data structure
-    do jndx=1, ubound( cells%order_index, 1 )
+    do jndx=1, ubound( cells%sort_order, 1 )
 
-      ! jndx is a simple series of index values from 1 to # active cells
+      ! sort_order is a simple series of index values from 1 to # active cells
       ! indx represents the index of the cell if processed in upstream to downstream order
 
-      indx = cells%order_index( jndx )
+      indx = cells%sort_order( jndx )
 
       landuse_index = cells%landuse_index( indx )
 
@@ -218,7 +218,7 @@ contains
         !       is enabled.
 
         ! rejected net_infiltration + runoff will be routed downslope if routing option is turned on
-        call cells%calc_routing( index=jndx )
+        call cells%calc_routing( index=indx )
 
         if ( runoff < 0.)                                                                               &
           call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &

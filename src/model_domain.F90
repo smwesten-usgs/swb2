@@ -123,7 +123,7 @@ module model_domain
 
     real (kind=c_float), allocatable       :: routing_fraction(:)
 
-    integer (kind=c_int), allocatable      :: order_index(:)
+    integer (kind=c_int), allocatable      :: sort_order(:)
 
     real (kind=c_float), allocatable       :: adjusted_depletion_fraction_p(:)
     real (kind=c_float), allocatable       :: fraction_exposed_and_wetted_soil(:)
@@ -268,11 +268,11 @@ module model_domain
     integer (kind=c_int) :: unitnum
     integer (kind=c_int) :: col
     integer (kind=c_int) :: row
+    integer (kind=c_int) :: indx_start
+    integer (kind=c_int) :: indx_end
   end type CELL_COL_ROW_T
 
   type ( CELL_COL_ROW_T ) :: DUMP(5)
-
-  integer (kind=c_int) :: DUMP_INDX_UNITNUM
 
   ! array method: designed to be called using whole-array notation
   abstract interface
@@ -411,7 +411,7 @@ contains
     allocate( this%net_infiltration(iCount), stat=iStat(23) )
     allocate( this%fog(iCount), stat=iStat(24) )
     allocate( this%irrigation(iCount), stat=iStat(25) )
-    allocate( this%order_index(iCount), stat=iStat(26) )
+    allocate( this%sort_order(iCount), stat=iStat(26) )
     allocate( this%runoff_outside( iCount ), stat=iStat(28) )
     allocate( this%pervious_fraction( iCount ), stat=iStat(29) )
     allocate( this%surface_storage( iCount ), stat=iStat(30) )
@@ -515,7 +515,7 @@ contains
     this%it_is_growing_season                = lFALSE
 
     do iIndex=1, iCount
-      this%order_index( iIndex ) = iIndex
+      this%sort_order( iIndex ) = iIndex
     enddo
 
   end subroutine initialize_arrays_sub
@@ -833,6 +833,7 @@ contains
     character (len=256)               :: filename
     character (len=:), allocatable    :: Method_Name
     integer (kind=c_int)              :: col, row
+    integer (kind=c_int)              :: indx_start, indx_end
     real (kind=c_double)              :: xcoord, ycoord
 
     Method_Name = argv_list%get(1)
@@ -1207,50 +1208,59 @@ contains
 
     elseif ( sCmdText .contains. "DUMP_VARIABLES" ) then
 
-        row = 0; col = 0
+        row = 0; col = 0; indx_start = 0; indx_end = 0
 
         this%dump_variables => model_dump_variables_by_cell
 
-        if ( argv_list%count == 4 ) then
+        if ( ( Method_Name .contains. "INDEX_RANGE") .and. ( argv_list%count == 3 ) ) then
 
-          if ( .not. ( Method_Name .contains. "ORDER_INDEX_RANGE") )            &
-            call warn("Unknown option supplied to DUMP_VARIABLES method.",      &
-              sHints="The only known option keyword with this number of "       &
-              //"arguments is 'ORDER_INDEX_RANGE'.",                            &
-              lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+          indx_start = asInt( argv_list%get(2) )
+          indx_end   = asInt( argv_list%get(3) )
 
-        elseif ( argv_list%count == 3 ) then
+        elseif ( ( Method_Name .contains. "COORD") .and. ( argv_list%count == 3 ) ) then
 
           xcoord = asFloat( argv_list%get(2) )
           ycoord = asFloat( argv_list%get(3) )
           row = grid_GetGridRowNum( this%pGrdOut, ycoord )
           col = grid_GetGridColNum( this%pGrdOut, xcoord )
 
-          if ( .not. ( Method_Name .contains. "COORD") )                       &
-            call warn("Unknown option supplied to DUMP_VARIABLES method.",     &
-              sHints="The only known option keyword with this number of "      &
-              //"arguments is 'COORD'.",                                       &
-              lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
-
         elseif ( argv_list%count == 2 ) then
 
           col = asInt( argv_list%get(1) )
           row = asInt( argv_list%get(2) )
 
+        else
+
+          call warn("Unknown option and/or arguments supplied to DUMP_VARIABLES method.",          &
+            sHints="The only known option keywords are 'COORD' and 'INDEX_RANGE'.",                &
+            lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+
         endif
 
-        if ( ( col > 0 ) .and. ( row > 0 ) ) then
-
-          call LOGS%WRITE( "==> SWB will dump variables for cell ("//asCharacter(col)//","      &
-            //asCharacter(row)//").", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        if ( ( ( col > 0 ) .and. ( row > 0 ) )                                                  &
+            .or. ( ( indx_start > 0 ) .and. ( indx_end > 0 ) ) ) then
 
           do indx=1, ubound( DUMP, 1)
             if (DUMP( indx )%col /= 0 )  cycle
 
             DUMP( indx )%col = col
             DUMP( indx )%row = row
+            DUMP( indx )%indx_start = indx_start
+            DUMP( indx )%indx_end   = indx_end
 
-            filename = "SWB2_variable_values__col_"//asCharacter( col )//"__row_"//asCharacter( row )//".csv"
+            if ( ( col > 0 ) .and. ( row > 0 ) ) then
+              call LOGS%WRITE( "==> SWB will dump variables for cell ("//asCharacter(col)//","     &
+                //asCharacter(row)//").", iLogLevel = LOG_ALL, lEcho = lFALSE )
+                filename = "SWB2_variable_values__col_"//asCharacter( col )//"__row_"              &
+                           //asCharacter( row )//".csv"
+
+            else
+              call LOGS%WRITE( "==> SWB will dump variables for cell indices ranging from "        &
+                //asCharacter(indx_start)//" to "//asCharacter(indx_end)//").",                    &
+                iLogLevel = LOG_ALL, lEcho = lFALSE )
+                filename = "SWB2_variable_values__start_index_"//asCharacter( indx_start )         &
+                           //"__end_index_"//asCharacter( indx_end )//".csv"
+            endif
 
             open( newunit=unitnum, file=trim(filename), iostat=iostat, action="write", status="replace" )
 
@@ -1258,14 +1268,9 @@ contains
               //" for writing. iostat = "//asCharacter( iostat ) )
             DUMP( indx )%unitnum = unitnum
 
-            ! this%current_rooting_depth( indx ), this%actual_et_soil( indx ),                                &
-            ! this%readily_available_water_raw( indx ), this%total_available_water_taw( indx ),               &
-            ! this%plant_stress_coef_ks( indx ), this%evap_reduction_coef_kr( indx ),                         &
-            ! this%surf_evap_coef_ke( indx ), this%fraction_exposed_and_wetted_soil( indx ),                  &
-            !
             write( unit=DUMP( indx )%unitnum, fmt="(a)")                                                           &
               "month, day, year,landuse_code, landuse_index, soil_group, num_upslope_connections, "                &
-              //"sum_upslope_cells, natural_index, order_index, target_index, awc, latitude, reference_ET0, "      &
+              //"sum_upslope_cells, sort_order, cell_index, target_index, awc, latitude, reference_ET0, "      &
               //"actual_ET, curve_num_adj, inflow, runon, "                                                        &
               //"runoff, outflow, infiltration, snowfall, potential_snowmelt, snowmelt, interception, "            &
               //"rainfall, interception_storage, tmax, tmin, tmean, snow_storage, "                                &
@@ -1388,7 +1393,9 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call routing_D8_initialize( this%active, this%order_index )
+    call routing_D8_initialize( this%active, this%sort_order )
+    this%num_upslope_connections = pack( NUMBER_OF_UPSLOPE_CONNECTIONS, this%active )
+    this%sum_upslope_cells = pack( SUM_OF_UPSLOPE_CELLS, this%active )
 
   end subroutine model_initialize_routing_D8
 
@@ -1398,26 +1405,26 @@ contains
 
   subroutine model_calculate_routing_D8( this, index )
 
-    use routing__D8, only   : TARGET_INDEX, ORDER_INDEX
+    use routing__D8, only   : TARGET_INDEX, SORT_INDEX
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     integer (kind=c_int), intent(in)       :: index
 
-    associate( natural_index => index )
+    associate( sort_order => index )
 
       ! if the target cell is within valid bounds, move the water downslope
-      if ( (    TARGET_INDEX( natural_index ) >= lbound( this%runon, 1) )                            &
-        .and. ( TARGET_INDEX( natural_index ) <= ubound( this%runon, 1) ) ) then
+      if ( (    TARGET_INDEX( sort_order ) >= lbound( this%runon, 1) )                            &
+        .and. ( TARGET_INDEX( sort_order ) <= ubound( this%runon, 1) ) ) then
 
-          this%runon( TARGET_INDEX( natural_index ) ) = this%runoff( ORDER_INDEX( natural_index ) )  &
-              + this%rejected_net_infiltration( ORDER_INDEX( natural_index ) )
+          this%runon( TARGET_INDEX( sort_order ) ) = this%runoff( SORT_INDEX( sort_order ) )  &
+              + this%rejected_net_infiltration( SORT_INDEX( sort_order ) )
 
       else
 
         ! move the water out of grid
-        this%runoff_outside( ORDER_INDEX( natural_index ) ) =                                        &
-          this%runoff(  ORDER_INDEX( natural_index ) )                                               &
-          + this%rejected_net_infiltration( ORDER_INDEX( natural_index ) )
+        this%runoff_outside( SORT_INDEX( sort_order ) ) =                                        &
+          this%runoff(  SORT_INDEX( sort_order ) )                                               &
+          + this%rejected_net_infiltration( SORT_INDEX( sort_order ) )
 
       endif
 
@@ -2045,7 +2052,7 @@ contains
 
     call growing_degree_day_calculate( gdd=this%gdd,                                        &
                                        tmean=this%tmean,                                    &
-                                       order=this%order_index )
+                                       order=this%sort_order )
 
   end subroutine model_calculate_GDD
 
@@ -2082,7 +2089,7 @@ contains
                                                  tmean=this%tmean,                                      &
                                                  tmin=this%tmin,                                        &
                                                  tmax=this%tmax,                                        &
-                                                 order=this%order_index )
+                                                 order=this%sort_order )
 
     end subroutine model_calculate_GDD_be
 
@@ -2102,31 +2109,35 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int)   :: indx, jndx
+    integer (kind=c_int)   :: jndx, indx_start, indx_end
 
     do jndx=lbound( DUMP, 1), ubound( DUMP, 1)
 
-      indx = this%row_column_to_index( col_num=DUMP( jndx )%col, row_num=DUMP( jndx )%row)
+      indx_start = DUMP( jndx )%indx_start
+      indx_end   = DUMP( jndx )%indx_end
 
-      if ( (indx >= lbound( this%landuse_code, 1) ) .and. ( indx <= ubound( this%landuse_code, 1) ) ) then
+      if ( (indx_start >= lbound( this%landuse_code, 1) )                                        &
+         .and. ( indx_start <= ubound( this%landuse_code, 1) )                                   &
+         .and. (indx_start >= lbound( this%landuse_code, 1) )                                    &
+         .and. (indx_start >= lbound( this%landuse_code, 1) ) ) then
 
-        call model_dump_variables( this=this, unitnum=DUMP( jndx )%unitnum, indx_start=indx )
+         call model_dump_variables( this=this, unitnum=DUMP( jndx )%unitnum,                     &
+                                    indx_start=indx_start, indx_end=indx_end )
+
+      else
+
+        indx_start = this%row_column_to_index( col_num=DUMP( jndx )%col, row_num=DUMP( jndx )%row)
+
+        if ( (indx_start >= lbound( this%landuse_code, 1) )                                        &
+           .and. ( indx_start <= ubound( this%landuse_code, 1) ) )                                 &
+
+          call model_dump_variables( this=this, unitnum=DUMP( jndx )%unitnum, indx_start=indx_start )
 
       endif
 
     enddo
 
   end subroutine model_dump_variables_by_cell
-
-  !--------------------------------------------------------------------------------------------------
-
-  subroutine model_dump_variables_by_index_range( this )
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-    call model_dump_variables( this=this, unitnum=DUMP_INDX_UNITNUM, indx_start=1, indx_end=2 )
-
-  end subroutine model_dump_variables_by_index_range
 
 !--------------------------------------------------------------------------------------------------
 
@@ -2156,7 +2167,7 @@ contains
   subroutine model_dump_variables( this, unitnum, indx_start, indx_end )
 
     use runoff__curve_number, only   : PREV_5_DAYS_RAIN
-    use routing__D8, only            : TARGET_INDEX, ORDER_INDEX
+    use routing__D8, only            : TARGET_INDEX, SORT_INDEX
 
     class (MODEL_DOMAIN_T), intent(inout)       :: this
     integer (kind=c_int), intent(in)            :: unitnum
@@ -2166,7 +2177,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int) :: kndx
     integer (kind=c_int) :: target_indx
-    integer (kind=c_int) :: order_indx
+    integer (kind=c_int) :: cell_indx
     integer (kind=c_int) :: indx_end_
     integer (kind=c_int) :: indx
 
@@ -2179,16 +2190,16 @@ contains
     do indx=indx_start, indx_end_
 
       target_indx = -9999
-      order_indx  = -9999
+      cell_indx  = -9999
 
       if ( allocated( TARGET_INDEX ) )  target_indx = TARGET_INDEX( indx )
-      if ( allocated( ORDER_INDEX ) )   order_indx = ORDER_INDEX( indx )
+      if ( allocated( SORT_INDEX ) )   cell_indx = SORT_INDEX( indx )
 
-      write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',8(i6,','),57(f12.3,','),f12.3)")                  &
+      write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',8(i6,','),57(g14.6,','),g14.6)")                  &
         SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                        &
         this%landuse_code( indx ), this%landuse_index( indx ),                                          &
         this%soil_group( indx ), this%num_upslope_connections( indx ), this%sum_upslope_cells( indx ),  &
-        indx, order_indx, target_indx,                                                                  &
+        indx, cell_indx, target_indx,                                                                  &
         this%awc( indx ), this%latitude( indx ), this%reference_ET0( indx ), this%actual_ET( indx ),    &
         this%curve_num_adj( indx ), this%inflow( indx ), this%runon( indx ), this%runoff( indx ),       &
         this%outflow( indx ),                                                                           &
