@@ -48,12 +48,9 @@ contains
     cells%crop_etc = cells%reference_et0 * cells%crop_coefficient_kcb
 
     call cells%calc_snowfall()
-
     call cells%calc_snowmelt()
 
-
     call cells%calc_continuous_frozen_ground_index()
-
 
     ! fog calculation does not explicitly consider canopy fraction
     call cells%calc_fog()
@@ -74,8 +71,9 @@ contains
                                       snowmelt=cells%snowmelt,                         &
                                       snowfall=cells%snowfall )
 
-     cells%runon = 0.0_c_float
-     cells%runoff = 0.0_c_float
+     cells%runon          = 0.0_c_float
+     cells%runoff         = 0.0_c_float
+     cells%runoff_outside = 0.0_c_float
 
     !> if flow routing is enabled, the calculations will be made in order from upslope to downslope;
     !! otherwise, the calculations are made in the natural packing order of the data structure
@@ -120,7 +118,7 @@ contains
         ! inflow is calculated over the entire cell (pervious + impervious) area
         inflow = max( 0.0_c_float, runon + rainfall + fog + snowmelt - interception )
 
-        call cells%calc_runoff( indx )
+        call cells%calc_runoff( jndx )
 
         ! prevent calculated runoff from exceeding the day's inflow;
         ! this can happen when using the monthly runoff fraction method
