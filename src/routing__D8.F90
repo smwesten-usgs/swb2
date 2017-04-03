@@ -269,6 +269,8 @@ end function get_target_index
       cell_index = get_cell_index( iteration_index )
       target_index = get_target_index( iteration_index )
 
+      sort_order(iteration_index) = cell_index
+
       associate(                                                               &
         Rownum => ROW1D( cell_index ),                                         &
         Colnum => COL1D( cell_index ),                                         &
@@ -430,7 +432,7 @@ end function get_target_index
     integer (kind=c_int)  :: col_lbound, col_ubound
     integer (kind=c_int)  :: row_lbound, row_ubound
     integer (kind=c_int)  :: iUpslopeSum, iUpslopeConnections
-    logical (kind=c_bool) :: lAnumber_of_rowsUnmarkedUpslopeCells
+    logical (kind=c_bool) :: are_there_unmarked_upslope_cells
     logical (kind=c_bool) :: lCircular
     integer (kind=c_int)  :: iNumberRemaining
     integer (kind=c_int)  :: indx, k, iCount
@@ -462,13 +464,9 @@ main_loop: do
       num_cells_marked_this_iteration = 0_c_int
       iPasses = iPasses + 1
 
-      print *, "**** PASS NUMBER "//asCharacter(iPasses)//" ****"
-
       ! iterate over entire model domain
 	    do row_num=row_lbound, row_ubound
         do column_num=col_lbound, col_ubound
-
-          print *, "cell ("//asCharacter(row_num)//", "//asCharacter(column_num), ") is marked? ", IS_DOWNSLOPE_TARGET_MARKED( column_num, row_num )
 
 	        if ( .not. lActive(column_num, row_num) ) cycle
 
@@ -478,7 +476,7 @@ main_loop: do
           iNumberOfChangedCells = iNumberOfChangedCells + 1
 	        iUpslopeSum = 0_c_int
 	        iUpslopeConnections = 0_c_int
-	        lAnumber_of_rowsUnmarkedUpslopeCells = lFALSE
+	        are_there_unmarked_upslope_cells = lFALSE
           lCircular = lFALSE
 
           ! search the 8 cells immediately adjacent to the current cell
@@ -513,17 +511,9 @@ main_loop: do
                       ! be able to mark the current cell
 	 			           	  else
 
-                        lAnumber_of_rowsUnmarkedUpslopeCells = lTRUE
+                        are_there_unmarked_upslope_cells = lTRUE
 
 	 			           	  endif
-
-                      print *, "  ==> found adjacent cell that targets current cell"
-                      print *, "    searching adjacent cell: ("//asCharacter(iColsrch)  &
-                         //", "//asCharacter(iRowsrch)//")"
-                      print *, "    adjacent cell points to current cell and is marked: ", &
-                              IS_DOWNSLOPE_TARGET_MARKED( iColsrch, iRowsrch )
-                      print *, "    circular connection? ", lCircular
-                      print *, "    anumber_of_rows unmarked upslope cells? ", lAnumber_of_rowsUnmarkedUpslopeCells
 
 	 			            endif
 
@@ -534,7 +524,7 @@ main_loop: do
 	              ! contributing flow to the current cell? if so, ignore and move on. otherwise,
 	              ! mark current cell as marked, update stats, and continue with next cell
 
-	              if ( .not. lAnumber_of_rowsUnmarkedUpslopeCells ) then
+	              if ( .not. are_there_unmarked_upslope_cells ) then
 !                  .or. (iUpslopeConnections == 1 .and. lCircular ) ) then
 
                   num_cells_marked_this_iteration = num_cells_marked_this_iteration + 1
@@ -551,11 +541,11 @@ main_loop: do
                   TARGET_INDEX_( indx )  = routing_D8_get_index( TARGET_COL( column_num, row_num ), &
                                                                                    TARGET_ROW( column_num, row_num ) )
 
-                  print *, "   ===> assigning order number: "
-                  print *, "        indx                =",indx
-                  print *, "        sort_order                =", SORT_ORDER_( indx )
-                  print *, "        target_index              =", TARGET_INDEX_( indx )
-                  print *, "        target_index(SORT_ORDER_) =", TARGET_INDEX_( SORT_ORDER_( indx ) )
+                  ! print *, "   ===> assigning order number: "
+                  ! print *, "        indx                =",indx
+                  ! print *, "        sort_order                =", SORT_ORDER_( indx )
+                  ! print *, "        target_index              =", TARGET_INDEX_( indx )
+                  ! print *, "        target_index(SORT_ORDER_) =", TARGET_INDEX_( SORT_ORDER_( indx ) )
 
                   if ( lCircular )  TARGET_INDEX_( SORT_ORDER_( indx ) ) = D8_UNDETERMINED
 

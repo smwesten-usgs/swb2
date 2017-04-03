@@ -411,13 +411,6 @@ contains
     ! adjust Smax for alternate initial abstraction amount
     Smax = 1.33_c_float * ( Smax**1.15_c_float )
 
-    ! ! now consider runoff if Ia ~ 0.05S
-    ! if ( inflow > 0.05_c_float * Smax ) then
-    !   runoff = ( inflow - 0.05_c_float * Smax )**2  / ( inflow + 0.95_c_float * Smax )
-    ! else
-    !   runoff = 0.0_c_float
-    ! end if
-
     ! now consider runoff if Ia ~ 0.05S
     if ( inflow > 0.05_c_float * Smax ) then
       runoff = ( inflow - 0.05_c_float * Smax )**2  / ( inflow + 0.95_c_float * Smax )

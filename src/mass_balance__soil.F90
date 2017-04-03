@@ -13,6 +13,7 @@ contains
                                                      soil_storage,          &
                                                      actual_et_soil,        &
                                                      runoff,                &
+                                                     delta_soil_storage,    &
                                                      reference_et0,         &
                                                      soil_storage_max,      &
                                                      infiltration )
@@ -21,6 +22,7 @@ contains
     real (kind=c_float), intent(inout)      :: soil_storage
     real (kind=c_float), intent(inout)      :: actual_et_soil
     real (kind=c_float), intent(inout)      :: runoff
+    real (kind=c_float), intent(inout)      :: delta_soil_storage
     real (kind=c_float), intent(in)         :: reference_et0
     real (kind=c_float), intent(in)         :: soil_storage_max
     real (kind=c_float), intent(in)         :: infiltration
@@ -42,22 +44,19 @@ contains
       !      before adjusting the runoff value
       runoff = max( 0.0_c_float, infiltration + runoff - actual_et_soil )
       soil_storage = 0.0_c_float
-
-    ! guard against numerical issues relating to soil storage: no negative values
-    elseif ( new_soil_storage < 0.0_c_float ) then
-
-      actual_et_soil = max( 0.0_c_float, soil_storage + infiltration )
-      soil_storage = 0.0_c_float
-      net_infiltration = 0.0_c_float
+      delta_soil_storage = 0.0_c_float
 
     ! new soil storage value exceeds soil_storage_max; net infiltration event
     elseif ( new_soil_storage > soil_storage_max ) then
 
-      net_infiltration = new_soil_storage - soil_storage_max
-      soil_storage = soil_storage_max
+      net_infiltration    = new_soil_storage - soil_storage_max
+      delta_soil_storage  = soil_storage - soil_storage_max
+!      actual_et_soil      = max( 0.0_c_float, soil_storage + infiltration - net_infiltration )
+      soil_storage        = soil_storage_max
 
     else
 
+      delta_soil_storage  = soil_storage - new_soil_storage
       soil_storage = new_soil_storage
       net_infiltration = 0.0_c_float
 

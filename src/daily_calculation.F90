@@ -110,6 +110,7 @@ contains
         runon                             => cells%runon( indx ),                                   &
         runoff                            => cells%runoff( indx ),                                  &
         inflow                            => cells%inflow( indx ),                                  &
+        delta_soil_storage                => cells%delta_soil_storage( indx ),                      &
         infiltration                      => cells%infiltration( indx ),                            &
         fog                               => cells%fog( indx ),                                     &
         interception                      => cells%interception( indx ),                            &
@@ -118,11 +119,11 @@ contains
         ! inflow is calculated over the entire cell (pervious + impervious) area
         inflow = max( 0.0_c_float, runon + rainfall + fog + snowmelt - interception )
 
-        call cells%calc_runoff( jndx )
+        call cells%calc_runoff( indx )
 
         ! prevent calculated runoff from exceeding the day's inflow;
         ! this can happen when using the monthly runoff fraction method
-        runoff = max( min( inflow, runoff ), 0.0_c_float )
+        !runoff = max( min( inflow, runoff ), 0.0_c_float )
 
         call calculate_impervious_surface_mass_balance(                                         &
           surface_storage=surface_storage,                                                      &
@@ -175,6 +176,7 @@ contains
         call calculate_soil_mass_balance( net_infiltration=net_infiltration,           &
                                           soil_storage=soil_storage,                   &
                                           soil_storage_max=soil_storage_max,           &
+                                          delta_soil_storage=delta_soil_storage,       &
                                           actual_et_soil=actual_et_soil,               &
                                           reference_et0=reference_et0,                 &
                                           infiltration=infiltration,                   &
@@ -200,7 +202,6 @@ contains
         ! modify net_infiltration and irrigation terms
 
         net_infiltration_fraction= min( pervious_fraction, 1.0_c_float - direct_net_infiltration_fraction )
-
         net_infiltration = net_infiltration * net_infiltration_fraction + direct_net_infiltration_fraction * direct_net_infiltration
 
         if ( runoff < 0.)                                                                               &
@@ -216,13 +217,12 @@ contains
         !       is enabled.
 
         ! rejected net_infiltration + runoff will be routed downslope if routing option is turned on
-        call cells%calc_routing( index=indx )
+        call cells%calc_routing( index=jndx )
 
         if ( runoff < 0.)                                                                               &
           call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
                            //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
                            //", "//asCharacter( cells%row_num_1D( indx ) ) )
-
 
       end associate
 

@@ -100,6 +100,7 @@ module model_domain
     real (kind=c_float), allocatable       :: surface_storage_max(:)
     real (kind=c_float), allocatable       :: surface_storage_excess(:)
     real (kind=c_float), allocatable       :: storm_drain_capture(:)
+    real (kind=c_float), allocatable       :: delta_soil_storage(:)
     real (kind=c_float), allocatable       :: soil_storage(:)
     real (kind=c_float), allocatable       :: soil_storage_max(:)
     real (kind=c_float), allocatable       :: net_infiltration(:)
@@ -381,7 +382,7 @@ contains
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
     integer (kind=c_int)  :: indx
-    integer (kind=c_int)  :: iStat(60)
+    integer (kind=c_int)  :: iStat(61)
 
     iCount = count( this%active )
     iStat = 0
@@ -445,6 +446,7 @@ contains
     allocate( this%readily_available_water_raw( iCount ), stat=iStat(58) )
     allocate( this%bare_soil_evap( iCount ), stat=iStat(59) )
     allocate( this%fraction_exposed_and_wetted_soil( iCount ), stat=iStat(60) )
+    allocate( this%delta_soil_storage( iCount ), stat=iStat(60) )
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR"                    &
@@ -479,6 +481,7 @@ contains
     this%snow_storage                        = 0.0_c_float
     this%soil_storage                        = 0.0_c_float
     this%soil_storage_max                    = 0.0_c_float
+    this%delta_soil_storage                  = 0.0_c_float
 
     this%net_infiltration                  = 0.0_c_float
     this%rejected_net_infiltration         = 0.0_c_float
@@ -1274,15 +1277,15 @@ contains
               //"actual_ET, curve_num_adj, inflow, runon, "                                                        &
               //"runoff, outflow, infiltration, snowfall, potential_snowmelt, snowmelt, interception, "            &
               //"rainfall, interception_storage, tmax, tmin, tmean, snow_storage, "                                &
-              //"soil_storage, soil_storage_max, surface_storage, surface_storage_excess, "                        &
-              //"surface_storage_max, net_infiltration, rejected_net_infiltration, fog, irrigation, gdd, "         &
-              //" runoff_outside, "                                                                                &
+              //"soil_storage, soil_storage_max, delta_soil_storage, surface_storage, "                            &
+              //"surface_storage_excess, surface_storage_max, net_infiltration, "                                  &
+              //"rejected_net_infiltration, fog, irrigation, gdd, runoff_outside, "                                &
               //"pervious_fraction, storm_drain_capture, canopy_cover_fraction, crop_coefficient_kcb, "            &
               //"cfgi, rooting_depth_max, current_rooting_depth, actual_et_soil, "                                 &
               //"readily_available_water, total_available_water, plant_stress_coef_ks, "                           &
               //"evap_reduction_coef_kr, surf_evap_coef_ke, fraction_exposed_and_wetted_soil, "                    &
               //"actual_et_impervious, actual_et_interception, adjusted_depletion_fraction_p, crop_etc, "          &
-              //" bare_soil_evap, direct_net_infiltration, "                                                               &
+              //" bare_soil_evap, direct_net_infiltration, "                                                       &
               //"direct_soil_moisture, inflowbuf1, inflowbuf2, inflowbuf3, inflowbuf4, inflowbuf5, inflowbuf_sum"
             exit
 
@@ -1405,17 +1408,25 @@ contains
 
   subroutine model_calculate_routing_D8( this, indx )
 
-    use routing__D8, only   : get_cell_index, get_target_index
+    use routing__D8, only   : get_target_index, get_cell_index
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     integer (kind=c_int), intent(in)       :: indx
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: cell_index
     integer (kind=c_int) :: target_index
+    integer (kind=c_int) :: cell_index
+    real (kind=c_float)  :: msb
+
+    integer (kind=c_int) :: cell_row, cell_col, targ_row, targ_col
 
     cell_index    = get_cell_index( indx )
     target_index  = get_target_index( indx )
+
+    cell_row=this%row_num_1D(cell_index)
+    cell_col=this%col_num_1D(cell_index)
+    targ_row=this%row_num_1D(target_index)
+    targ_col=this%col_num_1D(target_index)
 
     ! if the target cell is within valid bounds, move the water downslope
     if ( (    target_index >= lbound( this%runon, 1) )                            &
@@ -1426,12 +1437,33 @@ contains
             + this%runoff( cell_index )                                           &
             + this%rejected_net_infiltration( cell_index )
 
-        if ( this%runoff( cell_index ) > 0.0 ) then
-          print *, "moving water from ",cell_index, " to ", target_index, "."
-          print *, "   cell runoff             = ", this%runoff( cell_index )
-          print *, "   cell rejected net infil = ", this%rejected_net_infiltration( cell_index )
-          print *, "   target runon            = ", this%runon( target_index )
-        endif
+        ! msb = this%rainfall( cell_index ) + this%snowmelt( cell_index ) + this%runon( cell_index )   &
+        !       - this%runoff( cell_index ) + this%delta_soil_storage( cell_index )     &
+        !       - this%net_infiltration( cell_index ) - this%actual_et( cell_index )   &
+        !       - this%rejected_net_infiltration( cell_index )
+        !
+        ! if ( this%net_infiltration( indx ) > 1.e-2 ) then
+        !   print *, "moving water from "//asCharacter(cell_index)//" to "//asCharacter(target_index)//"."
+        !   print *, "                      ("//asCharacter( cell_col )//","//asCharacter( cell_row )//")"  &
+        !          //" to ("//asCharacter( targ_col )//","//asCharacter( targ_row )//")"
+        !   print *, "   cell runon              = ", this%runon( cell_index )
+        !   print *, "   cell rainfall           = ", this%rainfall( cell_index )
+        !   print *, "   cell snowmelt           = ", this%snowmelt( cell_index )
+        !   print *, "   cell fog                = ", this%fog( cell_index )
+        !   print *, "   cell irrigation         = ", this%irrigation( cell_index )
+        !   print *, "   surface storage excess  = ", this%surface_storage_excess( cell_index )
+        !   print *, "   direct_soil_moisture    = ", this%direct_soil_moisture( cell_index )
+        !   print *, "   cell infiltration       =", this%infiltration( cell_index )
+        !   print *, "   cell runoff             = ", this%runoff( cell_index )
+        !   print *, "   cell rejected net infil = ", this%rejected_net_infiltration( cell_index )
+        !   print *, "   cell delta_soil_storage = ", this%delta_soil_storage( cell_index )
+        !   print *, "   cell act_et             = ", this%actual_et( cell_index )
+        !   print *, "   cell net_infiltration           =", this%net_infiltration( cell_index )
+        !   print *, "   cell rejected_net_infiltration  =", this%rejected_net_infiltration( cell_index )
+        !   print *, "   target runon            = ", this%runon( target_index )
+        !   print *, "   cell msb                = ", msb
+        ! endif
+
     else
 
       ! move the water out of grid
@@ -1653,31 +1685,31 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_runoff_curve_number(this, indx )
+  subroutine model_calculate_runoff_curve_number(this, cell_index )
 
     use runoff__curve_number, only  : runoff_curve_number_calculate,     &
                                       update_previous_5_day_rainfall
 
     class (MODEL_DOMAIN_T), intent(inout)          :: this
-    integer (kind=c_int), intent(in)               :: indx
+    integer (kind=c_int), intent(in)               :: cell_index
 
     !> @TODO: Should interception term be part of this? Initial abstraction should include
     !!        some of this interception...
 
-!    call update_previous_5_day_rainfall( this%inflow( indx ), indx )
+!    call update_previous_5_day_rainfall( this%inflow( cell_index ), cell_index )
 
-    call runoff_curve_number_calculate(runoff=this%runoff( indx ),                               &
-                                       curve_num_adj=this%curve_num_adj( indx ),                 &
-                                       landuse_index=this%landuse_index( indx ),                 &
-                                       cell_index=indx,                                          &
-                                       soil_group=this%soil_group( indx ),                       &
-                                       soil_storage_max=this%soil_storage_max( indx ),           &
-                                       it_is_growing_season=this%it_is_growing_season( indx ),   &
-                                       inflow=this%inflow( indx ),                               &
+    call runoff_curve_number_calculate(runoff=this%runoff( cell_index ),                               &
+                                       curve_num_adj=this%curve_num_adj( cell_index ),                 &
+                                       landuse_index=this%landuse_index( cell_index ),                 &
+                                       cell_index=cell_index,                                          &
+                                       soil_group=this%soil_group( cell_index ),                       &
+                                       soil_storage_max=this%soil_storage_max( cell_index ),           &
+                                       it_is_growing_season=this%it_is_growing_season( cell_index ),   &
+                                       inflow=this%inflow( cell_index ),                               &
                                        continuous_frozen_ground_index=                           &
-                                           this%continuous_frozen_ground_index( indx ) )
+                                           this%continuous_frozen_ground_index( cell_index ) )
 
-    call update_previous_5_day_rainfall( this%inflow( indx ), indx )
+    call update_previous_5_day_rainfall( this%inflow( cell_index ), cell_index )
 
   end subroutine model_calculate_runoff_curve_number
 
@@ -2212,7 +2244,7 @@ contains
       target_indx = get_target_index( indx )
       cell_indx   = get_cell_index( indx )
 
-      write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',8(i6,','),57(g14.6,','),g14.6)")                  &
+      write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',8(i6,','),58(g14.7,','),g14.7)")                  &
         SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                        &
         this%landuse_code( cell_indx ), this%landuse_index( cell_indx ),                                          &
         this%soil_group( cell_indx ), this%num_upslope_connections( cell_indx ), this%sum_upslope_cells( cell_indx ),  &
@@ -2224,6 +2256,7 @@ contains
         this%snowmelt( cell_indx ), this%interception( cell_indx ), this%rainfall( cell_indx ),                        &
         this%interception_storage( cell_indx ), this%tmax( cell_indx ), this%tmin( cell_indx ), this%tmean( cell_indx ),    &
         this%snow_storage( cell_indx ), this%soil_storage( cell_indx ), this%soil_storage_max( cell_indx ),            &
+        this%delta_soil_storage( cell_indx ),                                                                                   &
         this%surface_storage( cell_indx ), this%surface_storage_excess( cell_indx ),                              &
         this%surface_storage_max( cell_indx ), this%net_infiltration( cell_indx ),                                &
         this%rejected_net_infiltration( cell_indx ), this%fog( cell_indx ),                                       &
