@@ -44,7 +44,7 @@ set INSTALL_PREFIX=d:/DOS
 set BUILD_TYPE="Release"
 
 :: options are "x86" (32-bit) or "x64" (64-bit)
-set OS="win_x64"
+set SYSTEM_TYPE="win_x64"
 
 :: define platform and compiler specific compilation flags
 set CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -cpp -fcheck=all -fstack-usage -fexceptions -ffree-line-length-none -static -static-libgcc -static-libgfortran"
