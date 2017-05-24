@@ -1,6 +1,6 @@
 module solar_calculations
 
-  use iso_c_binding 
+  use iso_c_binding
   use constants_and_conversions
   use meteorological_calculations
   use exceptions
@@ -9,10 +9,10 @@ module solar_calculations
   real (kind=c_float) :: EARTH_SUN_DIST_Dr
   real (kind=c_float) :: SOLAR_DECLINATION_Delta
 
-contains  
+contains
 
   !> Calculate the number of daylight hours at a location.
-  !! 
+  !!
   !! @param[in]  dOmega_s   Sunset hour angle in Radians.
   !! @retval           rN   Number of daylight hours.
   !!
@@ -41,9 +41,9 @@ contains
 ! may be modified to force values to be passed by value rather than by reference:
 !
 !  subroutine daylight_hours_c(dOmega_s, dN)  bind(c, name="daylight_hours_c")
-!    
+!
 !    real (kind=c_double), intent(in), value        :: dOmega_s
-!    real (kind=c_double), intent(out)              :: dN 
+!    real (kind=c_double), intent(out)              :: dN
 !
 !    dN = daylight_hours(dOmega_s)
 !
@@ -63,7 +63,7 @@ contains
   !! @note  1 MJ = 1e6 Joules; 1 Joule = 1 Watt / sec.
   !! @note   Therefore, multiply by 1e6 and divide by 86400 to get W/m*2-day.
   !!
-  !! @note Source 
+  !! @note Source
   !!        Equation 21, Allen and others (1998).
   !!
   !! @note Reference
@@ -162,7 +162,7 @@ contains
   !!       the reported accuracy drops to 0.0035 radians.
   !!
   !! @note Reference:
-  !!       Iqbal, Muhammad (1983-09-28). An Introduction To Solar Radiation (p. 10). Elsevier Science. Kindle Edition. 
+  !!       Iqbal, Muhammad (1983-09-28). An Introduction To Solar Radiation (p. 10). Elsevier Science. Kindle Edition.
 
   elemental function solar_declination__delta(iDayOfYear, iNumDaysInYear) result(dDelta)
 
@@ -174,7 +174,7 @@ contains
     real (kind=c_double) :: dGamma
 
     dGamma = day_angle__gamma( iDayOfYear, iNumDaysInYear )
-    
+
     dDelta =   0.006918_c_double                                       &
              - 0.399912_c_double * cos( dGamma )                       &
              + 0.070257_c_double * sin( dGamma )                       &
@@ -207,11 +207,11 @@ contains
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
   !!
   !! @note Duffie, J.A., Beckman, W.A. Solar Engineering of Thermal Processes.”. New York: Wiley, 1980.
-  !! 
+  !!
   !! @note Equation 1.2.3 in Iqbal, Muhammad (1983-09-28). An Introduction To Solar Radiation (p. 28).
-  !!       Elsevier Science. Kindle Edition. 
+  !!       Elsevier Science. Kindle Edition.
 
-  elemental function relative_earth_sun_distance__D_r( iDayOfYear, iNumDaysInYear )   result( dDsubR ) 
+  elemental function relative_earth_sun_distance__D_r( iDayOfYear, iNumDaysInYear )   result( dDsubR )
 
     ! [ ARGUMENTS ]
     integer (kind=c_int), intent(in) :: iDayOfYear
@@ -234,7 +234,7 @@ contains
   !!
   !! @note Implementation follows equation 25, Allen and others (1998).
   !!
-  !! @note Hour angle is zero at solar noon. Definition in Iqbal (1983) yields positive values before solar noon, 
+  !! @note Hour angle is zero at solar noon. Definition in Iqbal (1983) yields positive values before solar noon,
   !!       and negative values following solar noon.
   !!
   !! @note   Reference:
@@ -242,7 +242,7 @@ contains
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
 
-   elemental function sunrise_sunset_angle__omega_s( dLatitude, dDelta ) result( dOmega_s ) 
+   elemental function sunrise_sunset_angle__omega_s( dLatitude, dDelta ) result( dOmega_s )
 
     real (kind=c_double), intent(in) :: dLatitude
     real (kind=c_double), intent(in) :: dDelta
@@ -288,27 +288,27 @@ contains
   !------------------------------------------------------------------------------------------------
 
   !> Estimate percent of possible sunshine.
-  !! 
+  !!
   !! This function follows from equation 5 in "The Rational Use of the FAO Blaney-Criddle
   !! substituting the rearranged Hargreaves solar radiation formula into
   !! equation 5 results in the formulation below
   !!
-  !! @param[in]  fTMax   Maximum daily air temperature, in &deg;C
-  !! @param[in]  fTMin   Minimum daily air temperature, in &deg;C
+  !! @param[in]  fTMax   Maximum daily air temperature, in &deg;K
+  !! @param[in]  fTMin   Minimum daily air temperature, in &deg;K
   !! @retval     fPsun   Percentage of possible sunshine, dimensionless percentage
   !!
   !! @todo [Need to add reference here...]
 
   elemental function estimate_percent_of_possible_sunshine__psun(fTMax, fTMin)  result(fPsun)
 
-    real (kind=c_float), intent(in) :: fTMax
-    real (kind=c_float), intent(in) :: fTMin
+    real (kind=c_float), intent(in) :: fTMax   ! Kelvin degrees
+    real (kind=c_float), intent(in) :: fTMin   ! Kelvin degrees
     real (kind=c_float) :: fPsun
 
     ! [ LOCALS ]
     real (kind=c_float), parameter :: fKRs = 0.175
 
-    fPsun = ( 2_c_float * fKRs * sqrt( C_to_K( fTMAX ) - C_to_K( fTMIN ) ) ) - 0.5_c_float
+    fPsun = ( 2_c_float * fKRs * sqrt( fTMAX - fTMIN ) ) - 0.5_c_float
 
     if ( fPsun < 0_c_float ) then
       fPsun = 0_c_float
@@ -483,7 +483,7 @@ contains
   !> Calculate the day angle in RADIANS.
   !!
   !! This function expresses the integer day number as an angle (in
-  !! radians). Output values range from 0 (on January 1st) to 
+  !! radians). Output values range from 0 (on January 1st) to
   !! just less than @f$ 2\pi @f$ on December 31st.
   !!
   !! @param[in]        iDayOfYear   Current day of the year.
@@ -491,9 +491,9 @@ contains
   !! @retval               dGamma   Day angle in RADIANS.
   !!
   !! @note Implementation follows equation 1.2.2 in Iqbal (1983)
-  !! 
-  !! @note Reference: 
-  !!       Iqbal, Muhammad (1983-09-28). An Introduction To Solar Radiation (p. 3). Elsevier Science. Kindle Edition. 
+  !!
+  !! @note Reference:
+  !!       Iqbal, Muhammad (1983-09-28). An Introduction To Solar Radiation (p. 3). Elsevier Science. Kindle Edition.
 
   elemental function day_angle__gamma(iDayOfYear, iNumDaysInYear)     result(dGamma)
 
@@ -503,7 +503,7 @@ contains
 
     dGamma = TWOPI * ( iDayOfYear - 1 ) / iNumDaysInYear
 
-  end function day_angle__gamma  
+  end function day_angle__gamma
 
   !------------------------------------------------------------------------------------------------
 
@@ -512,7 +512,7 @@ contains
   !!
   !! @param[in]      rTheta_z   Solar zenith angle for given location and time, in RADIANS
   !!
-  !! @retval           rAlpha   Solar altitude angle for given location and time, in RADIANS  
+  !! @retval           rAlpha   Solar altitude angle for given location and time, in RADIANS
 
   function solar_altitude__alpha( dTheta_z )    result( dAlpha )   bind(c)
 
@@ -521,11 +521,11 @@ contains
 
     call assert( dTheta_z >= 0.0_c_double .and. dTheta_z <= HALFPI, &
       "Internal programming error: solar zenith angle must be in radians and in the range 0 to pi/2", &
-      __SRCNAME__, __LINE__) 
+      __SRCNAME__, __LINE__)
 
     dAlpha = HALFPI - dAlpha
 
-  end function solar_altitude__alpha  
+  end function solar_altitude__alpha
 
 
   !------------------------------------------------------------------------------------------------
@@ -538,8 +538,8 @@ contains
   !! @param[in]     rLatitude   Latitude of location for which estimate is being made, in RADIANS
 	!! @param[in]        rDelta   Solar declination angle, in RADIANS
   !! @param[in]        rOmega   [OPTIONAL] Hour angle, measured at the celestial pole between the observer's meridian
-  !!                            and the solar meridian, in RADIANS. 
-  !! 
+  !!                            and the solar meridian, in RADIANS.
+  !!
 	!! @retval         rTheta_z   Solar zenith angle for given location and time, in RADIANS
 	!!
   !! @note Implementation follows equation 9.67, Jacobson, 2005
@@ -563,7 +563,7 @@ contains
       dOmega_ = dOmega_
     else
       dOmega_ = 0.0_c_double
-    endif 
+    endif
 
 	  call assert( dLatitude <= HALFPI .and. dLatitude >= -HALFPI , &
 	    "Internal programming error: Latitude must be expressed in RADIANS and range from -pi/2 to pi/2", &
@@ -586,9 +586,9 @@ contains
   !!
   !! @note   Implementation follows equation 1.5.2a in Iqbal (1983).
   !!
-  !! @note Reference: 
-  !!       Iqbal, Muhammad (1983-09-28). An Introduction To Solar Radiation (p. 15). Elsevier Science. Kindle Edition. 
-  
+  !! @note Reference:
+  !!       Iqbal, Muhammad (1983-09-28). An Introduction To Solar Radiation (p. 15). Elsevier Science. Kindle Edition.
+
   function azimuth_angle__psi(rAlpha, rLatitude, rDelta)   result(rPsi)    bind(c)
 
     real (kind=c_double), intent(in)      :: rAlpha

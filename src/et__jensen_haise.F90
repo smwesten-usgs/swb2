@@ -61,7 +61,7 @@ elemental function et_jh_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin
   real (kind=c_float) :: fAs_
   real (kind=c_float) :: fBs_
   real (kind=c_float) :: fSunPct_
-  
+
   ! [ CONSTANTS ]
   real (kind=c_float),parameter :: UNIT_CONV = 0.41_c_float / 25.4_c_float
 
@@ -69,25 +69,25 @@ elemental function et_jh_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin
     fAlbedo_ = fAlbedo
   else
     fAlbedo_ = 0.23_c_float
-  endif    
+  endif
 
   if (present( fAs ) ) then
     fAs_ = fAs
   else
     fAs_ = 0.25_c_float
-  endif    
+  endif
 
   if (present( fBs ) ) then
     fBs_ = fBs
   else
     fBs_ = 0.5_c_float
-  endif    
+  endif
 
   if (present( fSunPct ) ) then
     fSunPct_ = fSunPct
   else
-    fSunPct_ = estimate_percent_of_possible_sunshine__psun(fTMax=fTMax, fTMin=fTMin)
-  endif    
+    fSunPct_ = estimate_percent_of_possible_sunshine__psun(fTMax=F_to_K( fTMax ), fTMin=F_to_K( fTMin ) )
+  endif
 
 
 
@@ -121,7 +121,7 @@ elemental function et_jh_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin
 
 !! Etp = ( 0.014 * Tavg - 0.37 ) * Rs
 !
-! where Rs is the solar radiation in inches per day 
+! where Rs is the solar radiation in inches per day
 
 end function et_jh_calculate
 

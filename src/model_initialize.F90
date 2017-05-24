@@ -133,7 +133,7 @@ contains
     call initialize_start_and_end_dates()
 
     ! read in and munge all tables that have been defined in the control file as ***_LOOKUP_TABLE
-    call initialize_parameter_tables()
+    call initialize_lookup_tables()
 
     ! scan input file entries for keywords associated with known gridded datasets
     ! (e.g. PRECIPITATION, TMIN, TMAX, FOG_ZONE, etc.)
@@ -1454,7 +1454,7 @@ contains
   !! pertain to landuse codes, it is assumed that all table values are given in order from lowest to highest
   !! landuse code.
 
-  subroutine initialize_parameter_tables()
+  subroutine initialize_lookup_tables()
 
     ! [ LOCALS ]
     type (STRING_LIST_T)             :: myDirectives
@@ -1528,7 +1528,7 @@ contains
 
     endif
 
-  end subroutine initialize_parameter_tables
+  end subroutine initialize_lookup_tables
 
 !--------------------------------------------------------------------------------------------------
 
