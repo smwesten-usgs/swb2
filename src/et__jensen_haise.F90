@@ -23,9 +23,15 @@ module et__jensen_haise
 !
 !!***
 
-  use iso_c_binding, only : c_short, c_int, c_float, c_double
-  use solar_calculations
-  use constants_and_conversions
+  use iso_c_binding,               only : c_short, c_int, c_float, c_double
+  use solar_calculations,          only : estimate_percent_of_possible_sunshine__psun,   &
+                                          relative_earth_sun_distance__D_r,              &
+                                          extraterrestrial_radiation__Ra,                &
+                                          solar_declination_simple__delta,               &
+                                          sunrise_sunset_angle__omega_s,                 &
+                                          solar_radiation__Rs
+  use meteorological_calculations, only : equivalent_evaporation
+  use constants_and_conversions,   only : F_to_K, rFREEZING, MM_PER_IN
 
   implicit none
 
@@ -36,83 +42,82 @@ module et__jensen_haise
 contains
 
 elemental function et_jh_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax,    &
-                                    fAlbedo, fAs, fBs, fSunPct )  result(fReferenceET0)
+                                    fAs, fBs, fSunPct )                      result(fReferenceET0)
 
   integer (kind=c_int), intent(in)          :: iDayOfYear
   integer (kind=c_int), intent(in)          :: iNumDaysInYear
   real (kind=c_float), intent(in)           :: fLatitude
   real (kind=c_float), intent(in)           :: fTMin
   real (kind=c_float), intent(in)           :: fTMax
-  real (kind=c_float), intent(in), optional :: fAlbedo
   real (kind=c_float), intent(in), optional :: fAs
   real (kind=c_float), intent(in), optional :: fBs
   real (kind=c_float), intent(in), optional :: fSunPct
   real (kind=c_float)                       :: fReferenceET0
 
   ! [ LOCALS ]
-  real (kind=c_float) :: fSo
-  real (kind=c_float) :: fDelta
-  real (kind=c_float) :: fOmega_s
-  real (kind=c_float) :: fD_r
-  real (kind=c_float) :: fSn
-  real (kind=c_float) :: fTAvg
+  real (kind=c_double) :: dRa
+  real (kind=c_double) :: dDelta
+  real (kind=c_double) :: dOmega_s
+  real (kind=c_double) :: dD_r
+  real (kind=c_double) :: dRs
+  real (kind=c_float)  :: fTAvg
 
-  real (kind=c_float) :: fAlbedo_
-  real (kind=c_float) :: fAs_
-  real (kind=c_float) :: fBs_
-  real (kind=c_float) :: fSunPct_
-
-  ! [ CONSTANTS ]
-  real (kind=c_float),parameter :: UNIT_CONV = 0.41_c_float / 25.4_c_float
-
-  if (present( fAlbedo ) ) then
-    fAlbedo_ = fAlbedo
-  else
-    fAlbedo_ = 0.23_c_float
-  endif
+  real (kind=c_double) :: dAs_
+  real (kind=c_double) :: dBs_
+  real (kind=c_double) :: dSunPct_
 
   if (present( fAs ) ) then
-    fAs_ = fAs
+    dAs_ = fAs
   else
-    fAs_ = 0.25_c_float
+    dAs_ = 0.25_c_double
   endif
 
   if (present( fBs ) ) then
-    fBs_ = fBs
+    dBs_ = fBs
   else
-    fBs_ = 0.5_c_float
+    dBs_ = 0.5_c_double
   endif
 
   if (present( fSunPct ) ) then
-    fSunPct_ = fSunPct
+    dSunPct_ = fSunPct
   else
-    fSunPct_ = estimate_percent_of_possible_sunshine__psun(fTMax=F_to_K( fTMax ), fTMin=F_to_K( fTMin ) )
+    dSunPct_ = estimate_percent_of_possible_sunshine__psun(fTMax=F_to_K( fTMax ), fTMin=F_to_K( fTMin ) )
   endif
-
 
 
   fTAvg = ( fTMin + fTMax ) / 2_c_float
 
 !  fD_r = 1.0_c_float + 0.033_c_float * cos( TWOPI * iDayOfYear / iNumDaysInYear )
 
-  fD_r = relative_earth_sun_distance__D_r( iDayOfYear=iDayOfYear, iNumDaysInYear=iNumDaysInYear )
+  dD_r = relative_earth_sun_distance__D_r( iDayOfYear=iDayOfYear, iNumDaysInYear=iNumDaysInYear )
 
 !  fDelta = 0.4093_c_float * sin( (TWOPI * iDayOfYear / iNumDaysInYear ) - 1.405_c_float )
 
-  fDelta = solar_declination_simple__delta( iDayOfYear=iDayOfYear, iNumDaysInYear=iNumDaysInYear )
+  dDelta = solar_declination_simple__delta( iDayOfYear=iDayOfYear, iNumDaysInYear=iNumDaysInYear )
 
-  fOmega_s = acos( -tan(fLatitude) * tan(fDelta) )
+!  fOmega_s = acos( -tan(fLatitude) * tan(fDelta) )
 
-  fSo = 2.44722_c_float * 15.392_c_float * fD_r * (     fOmega_s  * sin(fLatitude) * sin(fDelta) + &
-                                                  sin(fOmega_s) * cos(fLatitude) * cos(fDelta) )
+  dOmega_s = sunrise_sunset_angle__omega_s( real( fLatitude, kind=c_double), dDelta )
 
-  fSn = fSo * ( 1.0_c_float - fAlbedo_ ) * ( fAs_ + fBs_ * fSunPct_ / 100.0_c_float )
+!  dSo = 2.44722_c_float * 15.392_c_float * dD_r * (     dOmega_s  * sin(dLatitude) * sin(dDelta) + &
+!                                                  sin(dOmega_s) * cos(dLatitude) * cos(dDelta) )
 
+  dRa =  extraterrestrial_radiation__Ra(dLatitude=real( fLatitude, kind=c_double),    &
+                                                        dDelta=dDelta,                &
+                                                        dOmega_s=dOmega_s,            &
+                                                        dDsubR=dD_r )
+
+!  dSn = dSo * ( 1.0_c_float - fAlbedo_ ) * ( fAs_ + fBs_ * fSunPct_ / 100.0_c_float )
+
+  dRs = solar_radiation__Rs(dRa=dRa, dAs=dAs_, dBs=dBs_, fPctSun=dSunPct_)
 
   if ( fTAvg <= rFREEZING ) then
     fReferenceET0 = 0.0_c_float
   else
-    fReferenceET0 = UNIT_CONV * ( 0.025_c_float * fTAvg + 0.078_c_float ) * fSn
+    ! 'equivalent_evaporation' yields the depth of water that could be evaporated for the
+    ! given solar radiation in mm
+    fReferenceET0 = ( 0.014_c_float * fTavg - 0.37_c_float ) * equivalent_evaporation( dRs ) / MM_PER_IN
+!    fReferenceET0 = UNIT_CONV * ( 0.025_c_float * fTAvg + 0.078_c_float ) * fSn
   end if
 
 !> @todo Check these equations against original paper.

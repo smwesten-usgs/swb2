@@ -420,7 +420,7 @@ contains
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
 
-  function solar_radiation__Rs(dRa, dAs, dBs, fPctSun) result(dRs)
+  elemental function solar_radiation__Rs(dRa, dAs, dBs, fPctSun) result(dRs)
 
     real (kind=c_double), intent(in) :: dRa
     real (kind=c_double), intent(in) :: dAs
@@ -451,7 +451,7 @@ contains
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
 
-  function net_longwave_radiation__Rnl(fTMin, fTMax, dRs, dRso)  result(dRnl)
+  elemental function net_longwave_radiation__Rnl(fTMin, fTMax, dRs, dRso)  result(dRnl)
 
     real(kind=c_float), intent(in)  :: fTMin
     real(kind=c_float), intent(in)  :: fTMax
