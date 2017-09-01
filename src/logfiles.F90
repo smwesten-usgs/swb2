@@ -20,7 +20,7 @@ module logfiles
 
   enum, bind(c)
     enumerator :: LOG_NONE = 0, LOG_GENERAL = 1, LOG_DEBUG = 2, LOG_ALL = 3
-  end enum   
+  end enum
 
   type LOGFILE_T
     character (len=:), allocatable  :: sFilePrefix
@@ -29,7 +29,7 @@ module logfiles
     integer (kind=c_int)            :: iUnitNum(2)
     integer (kind=c_int)            :: iStat(2)
     integer (kind=c_int)            :: iLogLevel        = LOG_GENERAL
- 
+
   contains
 
     procedure, private :: initialize_logfiles_sub
@@ -73,9 +73,9 @@ contains
 
     OUTPUT_DIRECTORY_NAME = trim(sDirName)
 
-  end subroutine set_output_directory_name_sub  
+  end subroutine set_output_directory_name_sub
 
-!--------------------------------------------------------------------------------------------------  
+!--------------------------------------------------------------------------------------------------
 
   subroutine set_log_level_sub( this, iLogLevel )
 
@@ -86,7 +86,7 @@ contains
 
   end subroutine set_log_level_sub
 
-!--------------------------------------------------------------------------------------------------  
+!--------------------------------------------------------------------------------------------------
 
   subroutine set_screen_echo_sub( this, lEcho )
 
@@ -107,7 +107,7 @@ contains
     logical (kind=c_bool), intent(in), optional  :: lWrite_SWB_Info
 
 
-    ! [ LOCALS ] 
+    ! [ LOCALS ]
     integer (kind=c_int)    :: iLogLevel_
     logical (kind=c_bool)   :: lWrite_SWB_Info_
 
@@ -115,20 +115,20 @@ contains
       lWrite_SWB_Info_ = lWrite_SWB_Info
     else
       lWrite_SWB_Info_ = .true._c_bool
-    endif    
+    endif
 
     if (present(iLogLevel) ) then
       iLogLevel_ = iLogLevel
     else
       iLogLevel_ = LOG_GENERAL
-    endif    
+    endif
 
     if ( present( sFilePrefix) ) then
       this%sFilePrefix = sFilePrefix
-    else  
+    else
       call this%make_prefix()
     endif
-      
+
     this%iLogLevel = iLogLevel_
     call this%open( lWrite_SWB_Info=lWrite_SWB_Info_ )
 
@@ -152,7 +152,7 @@ contains
       lWrite_SWB_Info_ = lWrite_SWB_Info
     else
       lWrite_SWB_Info_ = .true._c_bool
-    endif    
+    endif
 
     if ( this%iLogLevel /= LOG_NONE ) then
 
@@ -164,9 +164,9 @@ contains
 
           open(newunit=this%iUnitNum(iIndex), file=sFilename, iostat=this%iStat(iIndex), action='WRITE', encoding='UTF-8')
           if (this%iStat(iIndex) /= 0) then
-            write(unit=OUTPUT_UNIT, fmt="(a)") "Failed to open logfile "//'"'//trim(sFilename)//'".' 
+            write(unit=OUTPUT_UNIT, fmt="(a)") "Failed to open logfile "//'"'//trim(sFilename)//'".'
             stop
-          endif  
+          endif
 
           if (this%iStat(iIndex) == 0) this%lIsOpen(iIndex) = .true._c_bool
 
@@ -176,24 +176,24 @@ contains
 
             write(this%iUnitNum(iIndex), fmt="(a)") "# USGS Soil Water Balance Code run log #"
             write(this%iUnitNum(iIndex), fmt="(a,/)") repeat("-", 80)
-            write(this%iUnitNum(iIndex), fmt="(a,/)") "## Model run started on "//sDatetime//" ##"          
+            write(this%iUnitNum(iIndex), fmt="(a,/)") "## Model run started on "//sDatetime//" ##"
             write(this%iUnitNum(iIndex), fmt="(a)") "## SWB version "//SWB_VERSION//" compiled on "  &
-              //COMPILATION_TIMESTAMP//" ##"   
+              //COMPILATION_TIMESTAMP//" ##"
             write(this%iUnitNum(iIndex), fmt="(a,/)") "Git branch and commit hash: " &
-              //trim( GIT_BRANCH_STRING)//"  "//trim(GIT_COMMIT_HASH_STRING)         
-   
+              //trim( GIT_BRANCH_STRING)//"  "//trim(GIT_COMMIT_HASH_STRING)
+
           endif
 
         else
 
-          stop( "Failed to open file logfile." )
+          stop ( "Failed to open file logfile." )
 
         endif
 
       enddo
-      
+
     endif
-        
+
 
   end subroutine open_files_write_access_sub
 
@@ -230,7 +230,7 @@ contains
     character (len=2)    :: sHour
     character (len=2)    :: sMinutes
     character (len=2)    :: sSeconds
-    
+
     character (len=2)    :: sDay
     character (len=2)    :: sMonth
     character (len=4)    :: sYear
@@ -266,7 +266,7 @@ contains
     integer (kind=c_int)  :: iTab_
     integer (kind=c_int)  :: iLinesBefore_
     integer (kind=c_int)  :: iLinesAfter_
-    
+
     if (present(iLogLevel) )   call this%set_loglevel( iLogLevel )
     if (present(lEcho) )       call this%set_echo( lEcho )
 
@@ -302,7 +302,7 @@ contains
         if ( this%iLogLevel >= LOG_GENERAL ) &
           call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_GENERAL ), &
             iTab=iTab_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
-        flush(this%iUnitNum( LOG_GENERAL ))  
+        flush(this%iUnitNum( LOG_GENERAL ))
 
       case ( LOG_DEBUG )
 
@@ -325,7 +325,7 @@ contains
 
       case default
 
-    end select  
+    end select
 
   end subroutine write_to_logfiles_sub
 
@@ -364,7 +364,7 @@ contains
         do iIndex=1, iLinesBefore
           write(UNIT=iLU, FMT="(a,2x)" ) ""
         enddo
-      endif    
+      endif
 
       do
 
@@ -379,7 +379,7 @@ contains
         do iIndex=1, iLinesAfter
           write(UNIT=iLU,FMT="(a,2x)" ) ""
         enddo
-      endif    
+      endif
 
 
     endif
@@ -402,7 +402,7 @@ contains
     sText1 = adjustl(sText1)
 
     iIndex = scan( string = sText1, set = sDelimiter )
-        
+
     if (iIndex == 0) then
       ! no delimiter found; return string as was supplied originally
       sText2 = sText1
@@ -410,9 +410,9 @@ contains
     else
       ! delimiters were found; split and return the chunks of text
       sText2 = trim( sText1(1:iIndex-1) )
-      sText1 = trim( sText1(iIndex + 1:) ) 
+      sText1 = trim( sText1(iIndex + 1:) )
     endif
-    
+
   end subroutine split
 
 !--------------------------------------------------------------------------------------------------
@@ -437,7 +437,7 @@ contains
     character (len=2)    :: sHour
     character (len=2)    :: sMinutes
     character (len=2)    :: sSeconds
-    
+
     character (len=2)    :: sDay
     character (len=2)    :: sMonth
     character (len=4)    :: sYear
@@ -455,12 +455,12 @@ contains
     write(sMonth, fmt="(i0.2)") iValues( DT_MONTH )
     write(sDay, fmt="(i0.2)") iValues( DT_DAY )
     write(sYear, fmt="(i0.4)") iValues( DT_YEAR )
-  
+
     sMonthName = MONTHS( iValues( DT_MONTH ) )
 
     sDatetime = trim(sMonthName)//" "//sDay//" "//sYear//" "//sHour//":"//sMinutes//":"//sSeconds
 
-  end function make_timestamp                                                   
+  end function make_timestamp
 
 
 end module logfiles

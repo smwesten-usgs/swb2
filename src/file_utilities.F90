@@ -127,7 +127,7 @@ contains
     call c_f_pointer( c_error_str_pointer, f_error_str_pointer )
 
     if (.not. associated( f_error_str_pointer ) ) &
-      stop("Routine returned a null pointer")
+      stop ("Routine returned a null pointer")
 
     libc_err_string_temp = "" 
 

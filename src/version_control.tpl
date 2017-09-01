@@ -1,7 +1,7 @@
 module version_control
-  
+
   implicit none
-  
+
 #ifndef VERSION_H
 #define VERSION_H
 
@@ -14,11 +14,10 @@ module version_control
   character (len=20), parameter :: GIT_COMMIT_HASH_STRING = GIT_COMMIT_HASH_VALUE
   character (len=30), parameter :: GIT_BRANCH_STRING = GIT_BRANCH_VALUE
 
-  character(len=:), parameter :: SWB_VERSION = "2.0 ALPHA"
-  character (len=:), parameter :: COMPILE_DATE = trim(__DATE__)
-  character (len=:), parameter :: COMPILE_TIME = trim(__TIME__)
-  character (len=:), parameter :: COMPILATION_TIMESTAMP =            &
-    trim(COMPILE_DATE)//"  "//trim(COMPILE_TIME)
+  character(len=*), parameter  :: SWB_VERSION = "2.0 Beta"
+  character (len=*), parameter :: COMPILE_DATE = trim(__DATE__)
+  character (len=*), parameter :: COMPILE_TIME = trim(__TIME__)
+  character (len=*), parameter :: COMPILATION_TIMESTAMP = trim(COMPILE_DATE)//"  "//trim(COMPILE_TIME)
 
 #endif
 

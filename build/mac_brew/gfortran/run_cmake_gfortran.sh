@@ -8,12 +8,12 @@ rm -rf tests
 rm -f CPack*
 rm -f *.txt
 
-export GCC_VERSION=5.4.0
+export GCC_VERSION=7.2.0
 # set CMAKE-related and build-related variables
-export GCCLIST=$( locate gcc-5 | grep Cellar | grep bin | grep $GCC_VERSION )
+export GCCLIST=$( locate gcc-7 | grep Cellar | grep bin | grep $GCC_VERSION )
 export GCCARR=($GCCLIST)
 export GCC=${GCCARR[1]}
-export GFORTRANLIST=$( locate gfortran-5 | grep Cellar | grep bin | grep $GCC_VERSION )
+export GFORTRANLIST=$( locate gfortran-7 | grep Cellar | grep bin | grep $GCC_VERSION )
 export GFORTRANARR=($GFORTRANLIST)
 export GFORTRAN=${GFORTRANARR[1]}
 
