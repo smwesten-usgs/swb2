@@ -625,11 +625,12 @@ contains
     type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
     type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
     type (DATA_CATALOG_ENTRY_T), pointer :: pAWC
-
+    type (DATA_CATALOG_ENTRY_T), pointer :: pD8_FLOWDIR
 
     pLULC => DAT%find("LAND_USE")
     pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
     pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
+    pD8_FLOWDIR => DAT%find("FLOW_DIRECTION")
 
     if( .not. associated( pAWC ) )  pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
 
@@ -662,10 +663,17 @@ contains
 
     this%active = .true._c_bool
 
+    if ( associated( pD8_FLOWDIR ) ) then
+
+      call pD8_FLOWDIR%getvalues()
+      where ( pD8_FLOWDIR%pGrdBase%iData < 0 )   this%active = .false._c_bool
+
+    endif
+
     if ( associated( pAWC) ) then
 
-      where (       ( pHSG%pGrdBase%iData  < 1 )      &
-              .or.  ( pLULC%pGrdBase%iData < 0 )      &
+      where (       ( pHSG%pGrdBase%iData  < 1 )                  &
+              .or.  ( pLULC%pGrdBase%iData < 0 )                  &
               .or.  ( pAWC%pGrdBase%rData < 0.0 ) )
 
         this%active = .false._c_bool
@@ -674,8 +682,8 @@ contains
 
     elseif ( allocated( AVAILABLE_WATER_CONTENT ) ) then
 
-      where (       ( pHSG%pGrdBase%iData  < 1 )      &
-              .or.  ( pLULC%pGrdBase%iData < 0 )      &
+      where (       ( pHSG%pGrdBase%iData  < 1 )                  &
+              .or.  ( pLULC%pGrdBase%iData < 0 )                  &
               .or.  ( AVAILABLE_WATER_CONTENT < 0.0 ) )
 
         this%active = .false._c_bool

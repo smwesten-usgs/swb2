@@ -162,6 +162,7 @@ end function get_target_index
     integer (kind=c_int) :: row_lbound, row_ubound
     integer (kind=c_int) :: cell_index, target_index
     integer (kind=c_int) :: iUnitNum
+    integer (kind=c_int) :: Target_row_num, Target_col_num
 
     type (GENERAL_GRID_T), pointer  :: pTempGrid
 
@@ -274,8 +275,8 @@ end function get_target_index
       associate(                                                               &
         Rownum => ROW1D( cell_index ),                                         &
         Colnum => COL1D( cell_index ),                                         &
-        Target_row => ROW1D( target_index ),                                   &
-        Target_col => COL1D( target_index ),                                   &
+!        Target_row => ROW1D( target_index ),                                   &
+!        Target_col => COL1D( target_index ),                                   &
         D8_flowdir => pD8_FLOWDIR%pGrdBase%iData( COL1D( cell_index ),         &
                         ROW1D( cell_index ) ),                                 &
         Num_adjacent => NUMBER_OF_UPSLOPE_CONNECTIONS( COL1D( cell_index ),    &
@@ -287,9 +288,16 @@ end function get_target_index
         write(sBuf,*) trim(sBuf)//TAB//asCharacter( Colnum )//TAB              &
           //asCharacter( Rownum )
 
-        if ( get_target_index( iteration_index ) > 0 )                         &
-          write(sBuf,*) trim(sBuf)//TAB//asCharacter( Target_col )//TAB        &
-          //asCharacter( Target_row )//TAB//asCharacter( D8_flowdir )//TAB     &
+        if ( target_index > 0 .and. target_index <= ubound(COL1D,1) ) then
+          Target_row_num = ROW1D( target_index )
+          Target_col_num = COL1D( target_index )
+        else
+          Target_row_num = -9999
+          Target_col_num = -9999
+        endif
+
+        write(sBuf,*) trim(sBuf)//TAB//asCharacter( Target_col_num )//TAB    &
+          //asCharacter( Target_row_num )//TAB//asCharacter( D8_flowdir )//TAB &
           //asCharacter( Num_adjacent )//TAB//asCharacter( Sum_upslope )
 
         write(iUnitNum,*)  trim(sBuf)
