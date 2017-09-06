@@ -55,9 +55,22 @@ contains
 
 !------------------------------------------------------------------------------
 
-  subroutine actual_et_FAO56_two_stage_initialize( number_of_landuses )
+  subroutine actual_et_FAO56_two_stage_initialize( )
 
-    integer (kind=c_int), intent(in)   :: number_of_landuses
+    use parameters, only        : PARAMS, PARAMS_DICT
+
+    integer (kind=c_int)               :: number_of_landuses
+    type(STRING_LIST_T)                :: slList
+    integer (kind=c_int), allocatable  ::  landuse_table_codes(:)
+
+    ! create list of possible table headings to look for...
+    call slList%append( "LU_Code" )
+    call slList%append( "Landuse_Lookup_Code" )
+
+    !> Determine how many landuse codes are present
+    call PARAMS%get_parameters( slKeys=slList, iValues=landuse_table_codes )
+    number_of_landuses = count( landuse_table_codes >= 0 )
+    call slList%clear()
 
    ! Retrieve and populate the Readily Evaporable Water (REW_) table values
    CALL PARAMS%get_parameters( fValues=REW_, sPrefix="REW_", iNumRows=number_of_landuses, lFatal=TRUE )

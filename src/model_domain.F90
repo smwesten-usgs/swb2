@@ -598,20 +598,29 @@ contains
     call this%init_soil_storage_max
 
     call this%init_routing
+    print *, __SRCNAME__, ": ", __LINE__
 
     call this%init_actual_et
+    print *, __SRCNAME__, ": ", __LINE__
 
     call this%init_reference_et
+    print *, __SRCNAME__, ": ", __LINE__
 
     call this%init_GDD
+    print *, __SRCNAME__, ": ", __LINE__
 
     call this%init_irrigation
+    print *, __SRCNAME__, ": ", __LINE__
 
     call this%init_direct_net_infiltration
+    print *, __SRCNAME__, ": ", __LINE__
 
     call this%init_maximum_net_infiltration
+    print *, __SRCNAME__, ": ", __LINE__
 
     call this%init_crop_coefficient
+
+    print *, __SRCNAME__, ": ", __LINE__
 
   end subroutine initialize_methods_sub
 
@@ -2386,7 +2395,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call actual_et_FAO56_two_stage_initialize( ubound( this%landuse_index, 1) )
+    call actual_et_FAO56_two_stage_initialize( )
 
   end subroutine model_initialize_actual_et_fao56__two_stage
 

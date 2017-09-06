@@ -124,23 +124,33 @@ contains
 
   end subroutine assign_string_list_to_string_list_sub
 
-
+!------------------------------------------------------------------------------
 
   subroutine list_append_string_sub( this, sText )
 
     class (STRING_LIST_T), intent(inout)   :: this
-    character (len=*), intent(in)          :: sText
+    character (len=*), intent(in) :: sText
 
     ! [ LOCALS ]
-    class (STRING_LIST_ELEMENT_T), pointer   :: pNewElement => null()
-    class (STRING_LIST_ELEMENT_T), pointer   :: pOldLastElement => null()
+    class (STRING_LIST_ELEMENT_T), pointer   :: pNewElement
     integer (kind=c_int)                     :: iStat
+    character (len=:), allocatable           :: temp_text
+
+    pNewElement => null()
+
+    print *, __SRCNAME__, ": ", __LINE__
+
+    temp_text = sText
 
     allocate(pNewElement, stat=iStat)
+    print *, __SRCNAME__, ": ", __LINE__
+
     call assert(iStat == 0, "There was a problem allocating memory for a new string list element", &
       __SRCNAME__, __LINE__)
 
-    pNewElement%s    = trim(sText)
+
+    print *, __SRCNAME__, ": ", __LINE__, " | txt = ", squote(temp_text)
+    pNewElement%s    = temp_text
     pNewElement%next => null()
 
     if (associated( this%first ) ) then
@@ -150,9 +160,14 @@ contains
 
 !      pOldLastElement => this%last
 !      pOldLastElement%next => pNewElement
+print *, __SRCNAME__, ": ", __LINE__
 
       this%last%next => pNewElement
+      print *, __SRCNAME__, ": ", __LINE__
+
       this%last      => pNewElement
+      print *, __SRCNAME__, ": ", __LINE__
+
       this%last%next => null()
 
     else
@@ -509,6 +524,8 @@ contains
     character ( len=len_trim(sText1) ) :: sTempArg
     character (len=256)                :: delimiters_
 
+    print *, __SRCNAME__, ": ", __LINE__
+
     if ( present( delimiters ) ) then
       delimiters_ = delimiters
     else
@@ -517,17 +534,25 @@ contains
 
     sTempText = sText1
 
+    print *, __SRCNAME__, ": ", __LINE__
+
     do
 
       call chomp( sText1=sTempText, sText2=sTempArg, sDelimiters=delimiters_ )
 
       if (len_trim(sTempArg) > 0) then
+        print *, newlist%count, newList%is_populated
+
         call newList%append( trim( adjustl( sTempArg ) ) )
+        print *, newlist%count, newList%is_populated
+
       else
         exit
       endif
 
     end do
+
+    print *, __SRCNAME__, ": ", __LINE__
 
   end function list_from_delimited_string_fn
 
@@ -540,9 +565,12 @@ contains
     character (len=*), intent(in), optional :: delimiters
 
     ! [ LOCALS ]
-    character ( len=len_trim(sText) ) :: sTempText
-    character ( len=len_trim(sText) ) :: sTempArg
+    character (len=512) :: sTempText
+    character (len=512) :: sTempArg
     character (len=256)                :: delimiters_
+
+    print *, __SRCNAME__, ": ", __LINE__
+    print *, squote( sText )
 
     if ( present( delimiters ) ) then
       delimiters_ = delimiters
@@ -551,15 +579,31 @@ contains
     endif
 
     sTempText = sText
+    print *, squote(sTempText)
+    print *, squote(sText)
+    print *, __SRCNAME__, ": ", __LINE__
 
     call this%clear()
+    print *, __SRCNAME__, ": ", __LINE__
 
     do
 
       call chomp( sText1=sTempText, sText2=sTempArg, sDelimiters=trim(delimiters_) )
 
+      print *, squote( sTempText ), " | ", squote( sTempArg ), " | ", squote( delimiters_ )
+
       if (len_trim(sTempArg) > 0) then
-        call this%append( trim( adjustl( sTempArg ) ) )
+        print *, __SRCNAME__, ": ", __LINE__, "  | ", squote( sTempArg )
+        print *, this%count, this%is_populated, associated( this%first ), associated( this%last )
+        if( associated( this%first )) print *, "first%next: ",associated( this%first%next )
+        if ( associated( this%last ) )  print *, "last%next: ", associated( this%last%next )
+
+        call this%append( sTempArg )
+        print *, __SRCNAME__, ": ", __LINE__
+        print *, this%count, this%is_populated, associated( this%first ), associated( this%last )
+        if( associated( this%first )) print *, "first%next: ",associated( this%first%next )
+        if( associated( this%last ) )  print *, "last%next: ", associated( this%last%next )
+
       else
         exit
       endif

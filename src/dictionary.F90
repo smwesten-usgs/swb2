@@ -511,7 +511,7 @@ end function key_name_already_in_use_fn
   subroutine get_values_as_logical_given_list_of_keys_sub(this, slKeys, lValues)
 
     class (DICT_T)                                     :: this
-    type (STRING_LIST_T), intent(inout)                :: slKeys
+    type (STRING_LIST_T), intent(in)                   :: slKeys
     logical (kind=c_bool), allocatable, intent(out)    :: lValues(:)
 
     ! [ LOCALS ]
@@ -558,7 +558,7 @@ end function key_name_already_in_use_fn
   subroutine get_values_as_string_list_given_list_of_keys_sub(this, slKeys, slString )
 
     class (DICT_T)                                     :: this
-    type (STRING_LIST_T), intent(inout)                :: slKeys
+    type (STRING_LIST_T), intent(in)                   :: slKeys
     type ( STRING_LIST_T ), intent(out)                :: slString
 
     ! [ LOCALS ]
@@ -667,7 +667,7 @@ end function key_name_already_in_use_fn
   subroutine get_values_as_int_given_list_of_keys_sub(this, slKeys, iValues)
 
     class (DICT_T)                                     :: this
-    type (STRING_LIST_T), intent(inout)                :: slKeys
+    type (STRING_LIST_T), intent(in)                   :: slKeys
     integer (kind=c_int), allocatable, intent(out)     :: iValues(:)
 
     ! [ LOCALS ]
@@ -677,6 +677,8 @@ end function key_name_already_in_use_fn
     character (len=256)            :: sText
 
     iCount = 0
+
+    pTarget => null()
 
     do while ( iCount < slKeys%count )
 
@@ -691,6 +693,8 @@ end function key_name_already_in_use_fn
     enddo
 
     if ( associated( pTarget ) ) then
+
+      print *, __SRCNAME__, ": ", __LINE__, "  |  ", squote( sText )
 
       iValues = pTarget%sl%asInt()
 
@@ -724,7 +728,7 @@ end function key_name_already_in_use_fn
   subroutine get_values_as_float_given_list_of_keys_sub(this, slKeys, fValues)
 
     class (DICT_T)                                    :: this
-    type (STRING_LIST_T), intent(inout)               :: slKeys
+    type (STRING_LIST_T), intent(in)                  :: slKeys
     real (kind=c_float), allocatable, intent(out)     :: fValues(:)
 
     ! [ LOCALS ]

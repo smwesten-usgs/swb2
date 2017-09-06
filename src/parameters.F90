@@ -360,8 +360,8 @@ contains
   subroutine get_parameter_values_string_list( this, slValues, slKeys, sKey, lFatal )
 
     class (PARAMETERS_T)                                        :: this
-    type (STRING_LIST_T), intent(in out)                        :: slValues
-    type (STRING_LIST_T), intent(in out),              optional :: slKeys
+    type (STRING_LIST_T), intent(out)                           :: slValues
+    type (STRING_LIST_T), intent(in),                  optional :: slKeys
     character (len=*),    intent(in ),                 optional :: sKey
     logical (kind=c_bool), intent(in),                 optional :: lFatal
 
@@ -403,7 +403,7 @@ contains
   subroutine get_parameter_values_int( this, iValues, slKeys, sKey, lFatal )
 
     class (PARAMETERS_T)                                       :: this
-    integer (kind=c_int), intent(in out), allocatable          :: iValues(:)
+    integer (kind=c_int), intent(out), allocatable             :: iValues(:)
     type (STRING_LIST_T), intent(in out),             optional :: slKeys
     character (len=*),    intent(in ),                optional :: sKey
     logical (kind=c_bool), intent(in),                optional :: lFatal
@@ -417,9 +417,15 @@ contains
       lFatal_ = lFALSE
     endif
 
+    print *, __SRCNAME__, ": ", __LINE__
+
     if ( present( slKeys) ) then
 
+      print *, __SRCNAME__, ": ", __LINE__
+
       call PARAMS_DICT%get_values( slKeys=slKeys, iValues=iValues )
+
+      print *, __SRCNAME__, ": ", __LINE__
 
       if ( any( iValues <= iTINYVAL ) ) &
         call warn( "Failed to find a lookup table column named " &
@@ -434,6 +440,8 @@ contains
           //dQuote( sKey )//".", lFatal = lFatal_ )
 
     endif
+
+    print *, __SRCNAME__, ": ", __LINE__
 
   end subroutine get_parameter_values_int
 
@@ -458,6 +466,8 @@ contains
 
     if ( present( slKeys) ) then
 
+      print *, __SRCNAME__, ": ", __LINE__
+
       call PARAMS_DICT%get_values( slKeys=slKeys, fValues=fValues )
 
       if ( any( fValues <= fTINYVAL ) ) &
@@ -474,11 +484,15 @@ contains
 
     endif
 
+      print *, __SRCNAME__, ": ", __LINE__
+
   end subroutine get_parameter_values_float
 
 !--------------------------------------------------------------------------------------------------
 
   subroutine get_parameter_table_float( this, fValues, sPrefix, iNumRows, lFatal )
+
+    use strings
 
     class (PARAMETERS_T)                                       :: this
     real (kind=c_float),  intent(in out), allocatable          :: fValues(:,:)
@@ -524,6 +538,12 @@ contains
 
         sText = trim( slList%get( iIndex ) )
         call PARAMS_DICT%get_values( sKey=sText, fValues=fTempVal )
+
+        call assert( size( fTempVal, 1) == size( fValues, 1),                 &
+          "Mismatch in array size. Dictionary key: "//squote( sText )         &
+          //"  expected size: "//asCharacter( size( fValues, 1) )             &
+          //"  size of items in dictionary: "                                 &
+          //asCharacter( size( fTempVal, 1) )   )
 
         fValues(:,iIndex) = fTempVal
       enddo

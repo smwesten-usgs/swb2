@@ -136,13 +136,17 @@ contains
 
     type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_PERCENT_SOIL_MOISTURE
 
+   print *, __SRCNAME__, ": ", __LINE__
+
    !> create string list that allows for alternate heading identifiers for the landuse code
    call slList%create_list("LU_Code; Landuse_Code; Landuse_Lookup_Code")
+
+   print *, __SRCNAME__, ": ", __LINE__
 
    !> Determine how many landuse codes are present
    call PARAMS%get_parameters( slKeys=slList, iValues=LANDUSE_CODE )
    iNumberOfLanduses = count( LANDUSE_CODE >= 0 )
-
+   print *, __SRCNAME__, ": ", __LINE__, "  | num_landuses = ", iNumberOfLanduses
    !> @todo Implement thorough input error checking:
    !! are all soils in grid included in table values?
    !> is soil suffix vector continuous?
@@ -165,7 +169,7 @@ contains
    call PARAMS%get_parameters( sKey="L_mid", fValues=L_mid_, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="L_late", fValues=L_late_, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="L_fallow", fValues=L_fallow_, lFatal=lTRUE )
-
+   print *, __SRCNAME__, ": ", __LINE__
    call PARAMS%get_parameters( sKey="GDD_plant", fValues=GDD_plant_, lFatal=lFALSE )
    call PARAMS%get_parameters( sKey="GDD_ini", fValues=GDD_ini_, lFatal=lFALSE )
    call PARAMS%get_parameters( sKey="GDD_dev", fValues=GDD_dev_, lFatal=lFALSE )
@@ -176,7 +180,7 @@ contains
    call PARAMS%get_parameters( sKey="Kcb_mid", fValues=KCB_mid_, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="Kcb_end", fValues=KCB_end_, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="Kcb_min", fValues=KCB_min_, lFatal=lTRUE )
-
+   print *, __SRCNAME__, ": ", __LINE__
    call PARAMS%get_parameters( sKey="Kcb_Jan", fValues=KCB_jan )
    call PARAMS%get_parameters( sKey="Kcb_Feb", fValues=KCB_feb )
    call PARAMS%get_parameters( sKey="Kcb_Mar", fValues=KCB_mar )
@@ -189,6 +193,8 @@ contains
    call PARAMS%get_parameters( sKey="Kcb_Oct", fValues=KCB_oct )
    call PARAMS%get_parameters( sKey="Kcb_Nov", fValues=KCB_nov )
    call PARAMS%get_parameters( sKey="Kcb_Dec", fValues=KCB_dec )
+
+   print *, __SRCNAME__, ": ", __LINE__
 
     allocate( GROWTH_STAGE_DOY( 5, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_DOY array", &
@@ -214,6 +220,8 @@ contains
     KCB_ = fTINYVAL
     GROWTH_STAGE_GDD = fTINYVAL
     GROWTH_STAGE_DOY = fTINYVAL
+
+   print *, __SRCNAME__, ": ", __LINE__
 
     if ( ubound(L_ini_,1) == iNumberOfLanduses ) then
       GROWTH_STAGE_DOY( L_DOY_INI,  : ) = L_ini_
@@ -249,6 +257,9 @@ contains
       call warn(sMessage="L_fallow has "//asCharacter(ubound(L_fallow_,1))//" entries; there are "  &
         //asCharacter(iNumberOfLanduses)//" landuse codes.", lFatal=lTRUE)
     endif
+
+
+   print *, __SRCNAME__, ": ", __LINE__
 
     call LOGS%write(" ## Crop Kcb Curve Summary ##", iLinesAfter=1)
     call LOGS%write(" _only meaningful for landuses where the Kcb curve is defined " &
