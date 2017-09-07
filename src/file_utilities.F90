@@ -60,12 +60,12 @@ module file_utilities
     function c_get_libc_err_string( error_num ) bind(c,name="strerror")  result(error_str_ptr)
       use iso_c_binding
       integer,value,intent(in)                 :: error_num
-      type(c_ptr)                              :: error_str_ptr            
+      type(c_ptr)                              :: error_str_ptr
     end function
   end interface
 
   interface
-    integer function c_execv( filename, argv )  bind(c,name="execv")  
+    integer function c_execv( filename, argv )  bind(c,name="execv")
       use iso_c_binding
       character(kind=c_char), intent(in)  :: filename(*)
       type(c_ptr)                         :: argv
@@ -90,7 +90,6 @@ contains
     argv_copy = ""
 
     do indx=1, ubound(argv,1)
-      print *, squote( argv( indx ) )
       argv_copy( indx + 1 )      = trim( argv( indx ) )//c_null_char
       argv_cptr( indx + 1 )      = C_LOC( argv_copy( indx + 1 ) )
     enddo
@@ -106,7 +105,7 @@ contains
 
   end subroutine execv
 
-!--------------------------------------------------------------------------------------------------  
+!--------------------------------------------------------------------------------------------------
 
   subroutine get_libc_err_string( libc_err_string, libc_err_code )
 
@@ -129,24 +128,24 @@ contains
     if (.not. associated( f_error_str_pointer ) ) &
       stop ("Routine returned a null pointer")
 
-    libc_err_string_temp = "" 
+    libc_err_string_temp = ""
 
     do index=1, len( f_error_str_pointer )
       if ( f_error_str_pointer(index:index) .eq. c_null_char ) exit
       libc_err_string_temp(index:index) = f_error_str_pointer(index:index)
-    enddo  
+    enddo
 
     libc_err_string = libc_err_string_temp( 1:len_trim( libc_err_string_temp ) )
 
   end subroutine get_libc_err_string
 
-!--------------------------------------------------------------------------------------------------  
+!--------------------------------------------------------------------------------------------------
 
   subroutine mkdir(dirname, err)
-    
+
     character(*) :: dirname
     integer, optional, intent(out) :: err
-    
+
     ! [ LOCALS ]
     integer :: loc_err
     character(len=:), allocatable :: err_string
@@ -161,18 +160,18 @@ contains
         write(*, fmt="(a, i0)") "call to 'mkdir' failed. err=", loc_err
         write(*, fmt="(a,i0)") "libc errno=",get_libc_errno()
         write(*, fmt="(a)") "libc error msg: "//trim(err_string)
-      endif  
-    endif      
+      endif
+    endif
 
   end subroutine
 
 !--------------------------------------------------------------------------------------------------
 
   subroutine chdir(dirname, err)
-    
+
     character(*) :: dirname
     integer, optional, intent(out) :: err
-    
+
     ! [ LOCALS ]
     integer :: loc_err
 
@@ -184,19 +183,19 @@ contains
       if ( loc_err /= 0 )  then
         write(*, fmt="(a, i0)") "call to 'chdir' failed. err=", loc_err
         write(*, fmt="(a)") "dirname: '"//trim(dirname)//"'"
-        write(*, fmt="(a,i0)") "libc errno=",get_libc_errno()        
-      endif  
-    endif 
+        write(*, fmt="(a,i0)") "libc errno=",get_libc_errno()
+      endif
+    endif
 
   end subroutine
 
 !--------------------------------------------------------------------------------------------------
 
   subroutine rmdir(dirname, err)
-    
+
     character(*) :: dirname
     integer, optional, intent(out) :: err
-    
+
     ! [ LOCALS ]
     integer :: loc_err
 
@@ -208,19 +207,19 @@ contains
       if ( loc_err /= 0 )  then
         write(*, fmt="(a, i0)") "call to 'rmdir' failed. err=", loc_err
         write(*, fmt="(a)") "dirname: '"//trim(dirname)//"'"
-        write(*, fmt="(a,i0)") "libc errno=",get_libc_errno()        
+        write(*, fmt="(a,i0)") "libc errno=",get_libc_errno()
       endif
-    endif 
+    endif
 
   end subroutine
 
 !--------------------------------------------------------------------------------------------------
 
   subroutine remove(filename, err)
-    
+
     character(*) :: filename
     integer, optional, intent(out) :: err
-    
+
     ! [ LOCALS ]
     integer :: loc_err
 
@@ -232,9 +231,9 @@ contains
       if ( loc_err /= 0 )  then
         write(*, fmt="(a, i0)") "call to 'remove' failed. err=", loc_err
         write(*, fmt="(a)") "filename: '"//trim(filename)//"'"
-        write(*, fmt="(a,i0)") "libc errno=",get_libc_errno()        
+        write(*, fmt="(a,i0)") "libc errno=",get_libc_errno()
       endif
-    endif 
+    endif
 
   end subroutine
 
@@ -248,13 +247,13 @@ contains
     integer(c_long) :: i
     type(c_ptr) :: buffer
     character(kind=c_char, len=256) :: tempchar
- 
+
     buffer=c_getcwd(tempchar, 256_c_size_t)
 
     dirname = c_to_fortran_string( tempchar )
-    
- 
-  end subroutine get_cwd  
+
+
+  end subroutine get_cwd
 
 !--------------------------------------------------------------------------------------------------
 
@@ -269,15 +268,15 @@ contains
     buffer=c_getcwd(tempchar, 256_c_size_t)
 
     dirname = c_to_fortran_string( tempchar )
-    
- 
-  end function getcwd  
+
+
+  end function getcwd
 
   subroutine unlink(filename, err)
-    
+
     character(*) :: filename
     integer, optional, intent(out) :: err
-    
+
     ! [ LOCALS ]
     integer :: loc_err
 
@@ -289,9 +288,9 @@ contains
       if ( loc_err /= 0 )  then
         write(*, fmt="(a, i0)") "call to 'unlink' failed. err=", loc_err
         write(*, fmt="(a)") "filename: '"//trim(filename)//"'"
-        write(*, fmt="(a,i0)") "libc errno=",get_libc_errno()        
+        write(*, fmt="(a,i0)") "libc errno=",get_libc_errno()
       endif
-    endif 
+    endif
 
   end subroutine
 

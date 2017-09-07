@@ -694,8 +694,6 @@ end function key_name_already_in_use_fn
 
     if ( associated( pTarget ) ) then
 
-      print *, __SRCNAME__, ": ", __LINE__, "  |  ", squote( sText )
-
       iValues = pTarget%sl%asInt()
 
     else
@@ -710,7 +708,6 @@ end function key_name_already_in_use_fn
       iValues = iTINYVAL
 
     endif
-
 
   end subroutine get_values_as_int_given_list_of_keys_sub
 

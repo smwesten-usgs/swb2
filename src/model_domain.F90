@@ -598,29 +598,20 @@ contains
     call this%init_soil_storage_max
 
     call this%init_routing
-    print *, __SRCNAME__, ": ", __LINE__
 
     call this%init_actual_et
-    print *, __SRCNAME__, ": ", __LINE__
 
     call this%init_reference_et
-    print *, __SRCNAME__, ": ", __LINE__
 
     call this%init_GDD
-    print *, __SRCNAME__, ": ", __LINE__
 
     call this%init_irrigation
-    print *, __SRCNAME__, ": ", __LINE__
 
     call this%init_direct_net_infiltration
-    print *, __SRCNAME__, ": ", __LINE__
 
     call this%init_maximum_net_infiltration
-    print *, __SRCNAME__, ": ", __LINE__
 
     call this%init_crop_coefficient
-
-    print *, __SRCNAME__, ": ", __LINE__
 
   end subroutine initialize_methods_sub
 
@@ -1442,12 +1433,15 @@ contains
 
     cell_row=this%row_num_1D(cell_index)
     cell_col=this%col_num_1D(cell_index)
-    targ_row=this%row_num_1D(target_index)
-    targ_col=this%col_num_1D(target_index)
+    targ_row=-9999
+    targ_col=-9999
 
     ! if the target cell is within valid bounds, move the water downslope
     if ( (    target_index >= lbound( this%runon, 1) )                            &
       .and. ( target_index <= ubound( this%runon, 1) ) ) then
+
+        targ_row=this%row_num_1D(target_index)
+        targ_col=this%col_num_1D(target_index)
 
         this%runon( target_index ) =                                              &
               this%runon( target_index )                                          &

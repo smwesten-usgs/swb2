@@ -417,15 +417,10 @@ contains
       lFatal_ = lFALSE
     endif
 
-    print *, __SRCNAME__, ": ", __LINE__
 
     if ( present( slKeys) ) then
 
-      print *, __SRCNAME__, ": ", __LINE__
-
       call PARAMS_DICT%get_values( slKeys=slKeys, iValues=iValues )
-
-      print *, __SRCNAME__, ": ", __LINE__
 
       if ( any( iValues <= iTINYVAL ) ) &
         call warn( "Failed to find a lookup table column named " &
@@ -440,8 +435,6 @@ contains
           //dQuote( sKey )//".", lFatal = lFatal_ )
 
     endif
-
-    print *, __SRCNAME__, ": ", __LINE__
 
   end subroutine get_parameter_values_int
 
@@ -466,8 +459,6 @@ contains
 
     if ( present( slKeys) ) then
 
-      print *, __SRCNAME__, ": ", __LINE__
-
       call PARAMS_DICT%get_values( slKeys=slKeys, fValues=fValues )
 
       if ( any( fValues <= fTINYVAL ) ) &
@@ -483,8 +474,6 @@ contains
           //dQuote( sKey )//".", lFatal = lFatal_ )
 
     endif
-
-      print *, __SRCNAME__, ": ", __LINE__
 
   end subroutine get_parameter_values_float
 

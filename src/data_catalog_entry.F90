@@ -1335,8 +1335,6 @@ end subroutine set_constant_value_real
             call LOGS%write("Valid date range (NetCDF): "//trim(asCharacter(this%NCFILE%iFirstDayJD)) &
               //" to "//trim(asCharacter(this%NCFILE%iLastDayJD)) )
 
-            print *, this%lIsAnnualGrid
-
             call LOGS%write("Current Julian Day value: "//trim(asCharacter(iJulianDay)) )
 
             call assert (lFALSE, "Date range for currently open NetCDF file" &

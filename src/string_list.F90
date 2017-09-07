@@ -134,23 +134,14 @@ contains
     ! [ LOCALS ]
     class (STRING_LIST_ELEMENT_T), pointer   :: pNewElement
     integer (kind=c_int)                     :: iStat
-    character (len=:), allocatable           :: temp_text
 
     pNewElement => null()
 
-    print *, __SRCNAME__, ": ", __LINE__
-
-    temp_text = sText
-
     allocate(pNewElement, stat=iStat)
-    print *, __SRCNAME__, ": ", __LINE__
-
     call assert(iStat == 0, "There was a problem allocating memory for a new string list element", &
       __SRCNAME__, __LINE__)
 
-
-    print *, __SRCNAME__, ": ", __LINE__, " | txt = ", squote(temp_text)
-    pNewElement%s    = temp_text
+    pNewElement%s    = trim( sText )
     pNewElement%next => null()
 
     if (associated( this%first ) ) then
@@ -160,14 +151,9 @@ contains
 
 !      pOldLastElement => this%last
 !      pOldLastElement%next => pNewElement
-print *, __SRCNAME__, ": ", __LINE__
 
       this%last%next => pNewElement
-      print *, __SRCNAME__, ": ", __LINE__
-
       this%last      => pNewElement
-      print *, __SRCNAME__, ": ", __LINE__
-
       this%last%next => null()
 
     else
@@ -520,11 +506,9 @@ print *, __SRCNAME__, ": ", __LINE__
     type (STRING_LIST_T)                    :: newList
 
     ! [ LOCALS ]
-    character ( len=len_trim(sText1) ) :: sTempText
-    character ( len=len_trim(sText1) ) :: sTempArg
+    character (len=:), allocatable :: sTempText
+    character (len=:), allocatable :: sTempArg
     character (len=256)                :: delimiters_
-
-    print *, __SRCNAME__, ": ", __LINE__
 
     if ( present( delimiters ) ) then
       delimiters_ = delimiters
@@ -533,44 +517,38 @@ print *, __SRCNAME__, ": ", __LINE__
     endif
 
     sTempText = sText1
-
-    print *, __SRCNAME__, ": ", __LINE__
+    sTempArg = sText1
 
     do
 
       call chomp( sText1=sTempText, sText2=sTempArg, sDelimiters=delimiters_ )
 
       if (len_trim(sTempArg) > 0) then
-        print *, newlist%count, newList%is_populated
-
         call newList%append( trim( adjustl( sTempArg ) ) )
-        print *, newlist%count, newList%is_populated
-
       else
         exit
       endif
 
     end do
 
-    print *, __SRCNAME__, ": ", __LINE__
-
   end function list_from_delimited_string_fn
 
   !--------------------------------------------------------------------------------------------------
-
+  !!
+  !!
+  !! @TODO: investigate why calling this routine leads to seg faults under
+  !!        certain circumstances... may just be compiler issue?
+  !!
   subroutine list_from_delimited_string_sub(this, sText, delimiters)
 
-    class (STRING_LIST_T)                   :: this
+    class (STRING_LIST_T), intent(inout)    :: this
     character (len=*), intent(in)           :: sText
     character (len=*), intent(in), optional :: delimiters
 
     ! [ LOCALS ]
-    character (len=512) :: sTempText
-    character (len=512) :: sTempArg
-    character (len=256)                :: delimiters_
-
-    print *, __SRCNAME__, ": ", __LINE__
-    print *, squote( sText )
+    character (len=:), allocatable    :: sTempText
+    character (len=:), allocatable    :: sTempArg
+    character (len=256)    :: delimiters_
 
     if ( present( delimiters ) ) then
       delimiters_ = delimiters
@@ -579,31 +557,16 @@ print *, __SRCNAME__, ": ", __LINE__
     endif
 
     sTempText = sText
-    print *, squote(sTempText)
-    print *, squote(sText)
-    print *, __SRCNAME__, ": ", __LINE__
+    sTempArg = ""
 
     call this%clear()
-    print *, __SRCNAME__, ": ", __LINE__
 
     do
 
       call chomp( sText1=sTempText, sText2=sTempArg, sDelimiters=trim(delimiters_) )
 
-      print *, squote( sTempText ), " | ", squote( sTempArg ), " | ", squote( delimiters_ )
-
-      if (len_trim(sTempArg) > 0) then
-        print *, __SRCNAME__, ": ", __LINE__, "  | ", squote( sTempArg )
-        print *, this%count, this%is_populated, associated( this%first ), associated( this%last )
-        if( associated( this%first )) print *, "first%next: ",associated( this%first%next )
-        if ( associated( this%last ) )  print *, "last%next: ", associated( this%last%next )
-
+      if (len_trim(sTempArg ) > 0) then
         call this%append( sTempArg )
-        print *, __SRCNAME__, ": ", __LINE__
-        print *, this%count, this%is_populated, associated( this%first ), associated( this%last )
-        if( associated( this%first )) print *, "first%next: ",associated( this%first%next )
-        if( associated( this%last ) )  print *, "last%next: ", associated( this%last%next )
-
       else
         exit
       endif

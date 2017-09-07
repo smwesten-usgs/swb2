@@ -31,7 +31,7 @@ module strings
     public :: operator( .contains. )
     interface operator( .contains. )
       procedure :: is_string2_present_in_string1_fn
-    end interface operator(.contains.)  
+    end interface operator(.contains.)
 
     public :: asCharacter
     interface asCharacter
@@ -51,7 +51,7 @@ module strings
     public :: fieldCount
     interface fieldCount
       procedure :: count_number_of_fields_fn
-    end interface fieldCount  
+    end interface fieldCount
 
     public :: clean
     interface clean
@@ -76,27 +76,27 @@ module strings
     public :: asUppercase
     interface asUppercase
       procedure :: char_to_uppercase_fn
-    end interface asUppercase  
+    end interface asUppercase
 
     public :: asLowercase
     interface asLowercase
       procedure :: char_to_lowercase_fn
-    end interface asLowercase  
+    end interface asLowercase
 
     public :: toUppercase
     interface toUppercase
       procedure :: char_to_uppercase_sub
-    end interface toUppercase  
+    end interface toUppercase
 
     public :: toLowercase
     interface toLowercase
       procedure :: char_to_lowercase_sub
-    end interface toLowercase  
+    end interface toLowercase
 
     public :: right
     interface right
       procedure :: return_right_part_of_string_fn
-    end interface right 
+    end interface right
 
     public :: left
     interface left
@@ -202,7 +202,7 @@ contains
   function is_string2_present_in_string1_fn(sText1, sText2)   result(lBool)
 
     character (len=*), intent(in)      :: sText1
-    character (len=*), intent(in)      :: sText2    
+    character (len=*), intent(in)      :: sText2
     logical (kind=c_bool)              :: lBool
 
     ! [ LOCALS ]
@@ -215,15 +215,15 @@ contains
     sTemp2 = asUppercase(sText2)
 
     if ( index(sTemp1, sTemp2) /= 0 ) lBool = lTRUE
-    
-  end function is_string2_present_in_string1_fn    
+
+  end function is_string2_present_in_string1_fn
 
 !--------------------------------------------------------------------------------------------------
 
   elemental function is_char_equal_to_char_fn(sText1, sText2)   result(lBool)
 
     character (len=*), intent(in)      :: sText1
-    character (len=*), intent(in)      :: sText2    
+    character (len=*), intent(in)      :: sText2
     logical (kind=c_bool)              :: lBool
 
     ! [ LOCALS ]
@@ -237,14 +237,14 @@ contains
 
     if (trim(adjustl( sTemp1 ) )  .eq. trim(adjustl( sTemp2) ) ) lBool = lTRUE
 
-  end function is_char_equal_to_char_fn  
+  end function is_char_equal_to_char_fn
 
 !--------------------------------------------------------------------------------------------------
 
   function concatenate_char_char_fn(sText1, sText2)   result(sText)
 
     character (len=*), intent(in)      :: sText1
-    character (len=*), intent(in)      :: sText2    
+    character (len=*), intent(in)      :: sText2
     character (len=:), allocatable     :: sText
 
     sText = sText1 // sText2
@@ -256,7 +256,7 @@ contains
   function concatenate_char_int_fn(sText1, iValue1)   result(sText)
 
     character (len=*), intent(in)        :: sText1
-    integer (kind=c_int), intent(in)     :: iValue1    
+    integer (kind=c_int), intent(in)     :: iValue1
     character (len=:), allocatable       :: sText
 
     sText = sText1 // asCharacter( iValue1 )
@@ -268,7 +268,7 @@ contains
   function concatenate_char_float_fn(sText1, fValue1)   result(sText)
 
     character (len=*), intent(in)        :: sText1
-    real (kind=c_float), intent(in)      :: fValue1    
+    real (kind=c_float), intent(in)      :: fValue1
     character (len=:), allocatable       :: sText
 
     sText = sText1 // asCharacter( fValue1 )
@@ -280,7 +280,7 @@ contains
   function concatenate_char_double_fn(sText1, dValue1)   result(sText)
 
     character (len=*), intent(in)        :: sText1
-    real (kind=c_double), intent(in)     :: dValue1    
+    real (kind=c_double), intent(in)     :: dValue1
     character (len=:), allocatable       :: sText
 
     sText = sText1 // asCharacter( dValue1 )
@@ -304,7 +304,7 @@ contains
       sText = trim( adjustl(sBuf) )
     else
       sText = "NA"
-    endif  
+    endif
 
   end function short_to_char_fn
 
@@ -325,7 +325,7 @@ contains
       sText = trim( adjustl(sBuf) )
     else
       sText = "NA"
-    endif  
+    endif
 
   end function int_to_char_fn
 
@@ -346,7 +346,7 @@ contains
       sText = trim( adjustl(sBuf) )
     else
       sText = "NA"
-    endif  
+    endif
 
   end function long_long_to_char_fn
 
@@ -369,10 +369,10 @@ contains
     elseif (present(iNumDigits) ) then
       write(sFmt, fmt="('(G0.',i0,')')") iNumdigits
     elseif (present(iFieldWidth) ) then
-      write(sFmt, fmt="('(G',i0,'.4)')") iNumdigits      
+      write(sFmt, fmt="('(G',i0,'.4)')") iNumdigits
     else
       sFmt = "(G0.4)"
-    endif    
+    endif
 
     write(sBuf, fmt=trim(sFmt), iostat=iStat)  fValue
 
@@ -380,7 +380,7 @@ contains
       sText = trim( adjustl(sBuf) )
     else
       sText = "NA"
-    endif  
+    endif
 
   end function float_to_char_fn
 
@@ -401,7 +401,7 @@ contains
       write(sFmt, fmt="('(G0.',i0,')')") iNumdigits
     else
       sFmt = "(G0.12)"
-    endif    
+    endif
 
     write(sBuf, fmt=sFmt, iostat=iStat)  dValue
 
@@ -409,7 +409,7 @@ contains
       sText = trim( adjustl(sBuf) )
     else
       sText = "NA"
-    endif  
+    endif
 
   end function double_to_char_fn
 
@@ -424,9 +424,9 @@ contains
       sText = "TRUE"
     else
       sText = "FALSE"
-    endif 
-    
-  end function logical_to_char_fn   
+    endif
+
+  end function logical_to_char_fn
 
 !--------------------------------------------------------------------------------------------------
 
@@ -464,7 +464,7 @@ contains
     ! CONSTANTS
     integer (kind=c_int), parameter :: LOWER_TO_UPPER = -32
     integer (kind=c_int), parameter :: ASCII_SMALL_A = ichar("a")
-    integer (kind=c_int), parameter :: ASCII_SMALL_Z = ichar("z")    
+    integer (kind=c_int), parameter :: ASCII_SMALL_Z = ichar("z")
 
     sText = s
 
@@ -489,7 +489,7 @@ contains
     ! CONSTANTS
     integer (kind=c_int), parameter :: UPPER_TO_LOWER = 32
     integer (kind=c_int), parameter :: ASCII_A = ichar("A")
-    integer (kind=c_int), parameter :: ASCII_Z = ichar("Z")    
+    integer (kind=c_int), parameter :: ASCII_Z = ichar("Z")
 
     sText = s
 
@@ -511,7 +511,7 @@ contains
     ! CONSTANTS
     integer (kind=c_int), parameter :: LOWER_TO_UPPER = -32
     integer (kind=c_int), parameter :: ASCII_SMALL_A = ichar("a")
-    integer (kind=c_int), parameter :: ASCII_SMALL_Z = ichar("z")    
+    integer (kind=c_int), parameter :: ASCII_SMALL_Z = ichar("z")
 
     do i=1,len_trim(s)
         if ( ichar(s(i:i) ) >= ASCII_SMALL_A .and. ichar(s(i:i)) <= ASCII_SMALL_Z ) then
@@ -531,7 +531,7 @@ contains
     ! CONSTANTS
     integer (kind=c_int), parameter :: UPPER_TO_LOWER = 32
     integer (kind=c_int), parameter :: ASCII_A = ichar("A")
-    integer (kind=c_int), parameter :: ASCII_Z = ichar("Z")    
+    integer (kind=c_int), parameter :: ASCII_Z = ichar("Z")
 
     ! UPPER_TO_LOWER = ichar( "a" ) - ichar( "A" )
 
@@ -574,14 +574,14 @@ contains
 
     if (present(sTargetCharacters) ) then
       sTargetCharacters_ = sTargetCharacters
-    else  
+    else
       sTargetCharacters_ = ":/;,"
     endif
 
     do iIndex1 = 1,len_trim(sText1)
 
       iR = SCAN(sText1(iIndex1:iIndex1), sTargetCharacters_)
-  
+
       if(iR==0) then
         iIndex2 = iIndex2 + 1
         sBuf(iIndex2:iIndex2) = sText1(iIndex1:iIndex1)
@@ -621,14 +621,14 @@ contains
 
     if (present(sChar) ) then
       sChar_ = sChar
-    else  
+    else
       sChar_ = " "
     endif
 
     do iIndex1 = 1,len_trim(sText1)
 
       iR = SCAN(sText1(iIndex1:iIndex1), sChar_)
-  
+
       if(iR==0) then
         ! sChar_ was not found
         iIndex2 = iIndex2 + 1
@@ -672,7 +672,7 @@ contains
       sDelimiters_ = sDelimiters_
     else
       sDelimiters_ = WHITESPACE
-    endif    
+    endif
 
     iCount = 0
 
@@ -686,15 +686,15 @@ contains
       iCount = iCount + 1
 
     enddo
-    
-  end function count_number_of_fields_fn  
+
+  end function count_number_of_fields_fn
 
 !--------------------------------------------------------------------------------------------------
 
   subroutine split_and_return_text_sub(sText1, sText2, sDelimiters)
 
     character (len=*), intent(inout)                     :: sText1
-    character (len=*), intent(inout)                     :: sText2
+    character (len=*), intent(out)                       :: sText2
     character (len=*), intent(in), optional              :: sDelimiters
 
     ! [ LOCALS ]
@@ -706,13 +706,13 @@ contains
       select case (sDelimiters)
         case ("WHITESPACE")
           sDelimiters_ = WHITESPACE
-        case ("TAB", "TABS")  
+        case ("TAB", "TABS")
           sDelimiters_ = TAB
-        case ("COMMA", "CSV")  
+        case ("COMMA", "CSV")
           sDelimiters_ = ","
         case default
-          sDelimiters_ = sDelimiters        
-      end select    
+          sDelimiters_ = sDelimiters
+      end select
 
     else
 
@@ -723,7 +723,7 @@ contains
     sText1 = adjustl(sText1)
 
     iIndex = scan( string = sText1, set = sDelimiters_ )
-        
+
     if (iIndex == 0) then
       ! no delimiters found; return string as was supplied originally
       sText2 = sText1
@@ -731,9 +731,9 @@ contains
     else
       ! delimiters were found; split and return the chunks of text
       sText2 = trim( sText1(1:iIndex-1) )
-      sText1 = trim( adjustl( sText1(iIndex + 1:) ) ) 
+      sText1 = trim( adjustl( sText1(iIndex + 1:) ) )
     endif
-    
+
   end subroutine split_and_return_text_sub
 
 !--------------------------------------------------------------------------------------------------
@@ -796,6 +796,6 @@ contains
   sText1 = trim(sTemp)
 
 end function remove_multiple_characters_fn
-    
+
 
 end module strings

@@ -1190,7 +1190,6 @@ contains
 
           call pENTRY%set_PROJ4( trim(sArgText) )
 
-
         elseif ( index( string=sCmdText, substring="_DATE_COLUMN" ) > 0 ) then
 
           pENTRY%sDateColumnName = trim( sArgText_1 )
