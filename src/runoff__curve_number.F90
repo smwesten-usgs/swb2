@@ -150,6 +150,7 @@ contains
     real (kind=c_float), intent(in)            :: infil
     integer (kind=c_int), intent(in)           :: indx
 
+    ! we only want to increment DAYCOUNT 1x per day!
     if ( .not. DATE_LAST_UPDATED == SIM_DT%curr ) then
 
       if ( DAYCOUNT < 5 ) then

@@ -159,11 +159,11 @@ contains
 
       tmax_ = min( tmax, gdd_max_ )
 
-      if ( tmax < gdd_base_ ) then
+      if ( tmax_ <= gdd_base_ ) then
 
         dd = 0.0_c_float
 
-      elseif ( tmin > gdd_base_ ) then
+      elseif ( tmin >= gdd_base_ ) then
 
         dd = min(tmean, gdd_max_) - gdd_base_
 

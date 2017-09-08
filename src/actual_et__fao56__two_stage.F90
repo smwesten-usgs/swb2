@@ -246,7 +246,7 @@ elemental subroutine calculate_total_available_water( taw, raw,                 
 
   real (kind=c_float), intent(inout)   :: raw
   real (kind=c_float), intent(inout)   :: taw
-  real (kind=c_float), intent(inout)   :: adjusted_depletion_fraction_p
+  real (kind=c_float), intent(in)      :: adjusted_depletion_fraction_p
   real (kind=c_float), intent(in)      :: current_rooting_depth
   real (kind=c_float), intent(in)      :: awc
 

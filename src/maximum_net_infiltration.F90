@@ -101,7 +101,7 @@ contains
     pMAXIMUM_NET_INFILTRATION => DAT%find( "MAXIMUM_NET_INFILTRATION" )
 
     ! retrieve a string list of all keys associated with Max_recharge (i.e. Max_recharge_1, Max_recharge_2, etc.)
-    max_net_infiltration_list = PARAMS%grep_name("net_infil", lFatal=TRUE )
+    max_net_infiltration_list = PARAMS%grep_name("max_net_infil", lFatal=TRUE )
 
     ! look for data in the form of a grid
     if ( associated( pMAXIMUM_NET_INFILTRATION ) ) then
@@ -131,7 +131,7 @@ contains
       number_of_landuses = count( landuse_codes >= 0 )
 
       call PARAMS%get_parameters( fValues=fMAXIMUM_NET_INFILTRATION_TABLE,     &
-                                  sPrefix="net_infil",                         &
+                                  sPrefix="max_net_infil",                         &
                                   iNumRows=number_of_landuses,                 &
                                   lFatal=TRUE )
 

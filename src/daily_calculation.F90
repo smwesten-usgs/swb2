@@ -217,7 +217,7 @@ contains
         !       is enabled.
 
         ! rejected net_infiltration + runoff will be routed downslope if routing option is turned on
-        call cells%calc_routing( index=jndx )
+        call cells%calc_routing( index=indx )
 
         if ( runoff < 0.)                                                                               &
           call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &

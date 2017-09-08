@@ -415,6 +415,7 @@ contains
                                               landuse_index,                &
                                               soil_storage,                 &
                                               soil_storage_max,             &
+                                              total_available_water,        &
                                               rainfall,                     &
                                               runoff,                       &
                                               crop_etc,                     &
@@ -428,6 +429,7 @@ contains
     integer (kind=c_int), intent(in)            :: landuse_index
     real (kind=c_float), intent(in)             :: soil_storage
     real (kind=c_float), intent(in)             :: soil_storage_max
+    real (kind=c_float), intent(in)             :: total_available_water
     real (kind=c_float), intent(in)             :: rainfall
     real (kind=c_float), intent(in)             :: runoff
     real (kind=c_float), intent(in)             :: crop_etc
@@ -493,7 +495,10 @@ contains
       if ( IRRIGATION_MASK < 1.0e-6_c_float ) exit
       if ( num_days_since_planting > NUM_DAYS_OF_IRRIGATION( landuse_index ) ) exit
 
-      depletion_fraction = 1.0_c_float - soil_storage / soil_storage_max
+      !depletion_fraction = 1.0_c_float - soil_storage / soil_storage_max
+
+      depletion_fraction = min( ( soil_storage_max - soil_storage ) / total_available_water, &
+                                1.0_c_float )
 
       option = APPLICATION_METHOD_CODE( landuse_index )
 

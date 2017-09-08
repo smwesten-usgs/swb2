@@ -1920,6 +1920,7 @@ contains
                                   landuse_index=this%landuse_index,                              &
                                   soil_storage=this%soil_storage,                                &
                                   soil_storage_max=this%soil_storage_max,                        &
+                                  total_available_water=this%total_available_water_taw,          &
                                   rainfall=this%rainfall,                                        &
                                   runoff=this%runoff,                                            &
                                   crop_etc=this%crop_etc,                                        &
@@ -1938,6 +1939,7 @@ contains
                                   landuse_index=this%landuse_index,                              &
                                   soil_storage=this%soil_storage,                                &
                                   soil_storage_max=this%soil_storage_max,                        &
+                                  total_available_water=this%total_available_water_taw,          &
                                   rainfall=this%rainfall,                                        &
                                   runoff=this%runoff,                                            &
                                   crop_etc=this%crop_etc,                                        &
