@@ -2767,7 +2767,7 @@ subroutine nf_get_variable_id_and_type( NCFILE, strict_asserts )
      NCFILE%iVarType(NC_Y) = pNC_VAR%iNC_VarType
      NCFILE%iVar_DimID(NC_Y,:) = pNC_VAR%iNC_DimID
 
-    elseif ( pNC_VAR%sVariableName .strequal. NCFILE%sVarName(NC_Z) ) then
+   elseif ( pNC_VAR%sVariableName .strequal. NCFILE%sVarName(NC_Z) ) then
      NCFILE%iVarIndex(NC_Z) = iIndex
      NCFILE%iVarID(NC_Z) = pNC_VAR%iNC_VarID
      NCFILE%iVarType(NC_Z) = pNC_VAR%iNC_VarType

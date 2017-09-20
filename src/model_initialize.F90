@@ -109,18 +109,21 @@ module model_initialize
 
 contains
 
-  subroutine initialize_all( output_prefix, output_dirname, data_dirname )
+  subroutine initialize_all( output_prefix, output_dirname, data_dirname,         &
+                             weather_data_dirname )
 
 !    use polygon_summarize, only : initialize_polygon_summarize
 
-    character (len=*), intent(in) :: output_prefix, output_dirname, data_dirname
+    character (len=*), intent(in) :: output_prefix, output_dirname, data_dirname, &
+                                     weather_data_dirname
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iIndex
 
     ! set output directory names for NetCDF and Surfer/Arc ASCII grid output
     call grid_set_output_directory_name( output_dirname )
-    call set_data_directory( data_dirname)
+    call set_data_directory( data_dirname )
+    call set_weather_data_directory( weather_data_dirname )
     call set_output_directory( output_dirname )
     call MODEL%set_output_directory( output_dirname )
     call set_output_prefix( output_prefix )
@@ -281,6 +284,17 @@ contains
     DATA_DIRECTORY_NAME = data_dirname
 
   end subroutine set_data_directory
+
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine set_weather_data_directory( weather_data_dirname )
+
+    character(len=*), intent(in) :: weather_data_dirname
+
+    ! setting the MODULE variable WEATHER_DATA_DIRECTORY_NAME, module = XXXX
+    !WEATHER_DATA_DIRECTORY_NAME = data_dirname
+
+  end subroutine set_weather_data_directory
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1021,7 +1035,7 @@ contains
     ! the loop below then handles the specific directives in turn
     myDirectives = CF_DICT%grep_keys( sKey )
 
-    ! call myDirectives%print
+    call myDirectives%print
 
     if ( myDirectives%count == 0 ) then
 
@@ -1065,12 +1079,12 @@ contains
         ! first option is that the key value and directive are the same
         ! (.e.g. "PRECIPITATION"; no trailing underscores or modifiers )
         ! MODEL is a grid definition directive
-        if ( sCmdText .strequal. sKey ) then
+        if ( sCmdText .strapprox. sKey ) then
 
           pENTRY%sVariableName_z = asLowercase( sKey )
 
           ! determine the type of grid and act appropriately
-          if (sArgText_1 .strequal. "CONSTANT" ) then
+          if (sArgText_1 .strapprox. "CONSTANT" ) then
 
             select case ( iDataType )
 
@@ -1095,9 +1109,9 @@ contains
 
             end select
 
-          elseif ( (sArgText_1 .strequal. "ARC_ASCII")              &
-              .or. (sArgText_1 .strequal. "SURFER")                 &
-              .or. (sArgText_1 .strequal. "ARC_GRID") ) then
+          elseif ( (sArgText_1 .strapprox. "ARC_ASCII")              &
+              .or. (sArgText_1 .strapprox. "SURFER")                 &
+              .or. (sArgText_1 .strapprox. "ARC_GRID") ) then
 
             call pENTRY%initialize(           &
               sDescription=trim(sCmdText),    &
@@ -1106,7 +1120,7 @@ contains
               iDataType=iDataType )
             lGridPresent = lTRUE
 
-          elseif ( sArgText_1 .strequal. "NETCDF" ) then
+          elseif ( sArgText_1 .strapprox. "NETCDF" ) then
 
             call pENTRY%initialize_netcdf(    &
               sDescription=trim(sCmdText),    &
@@ -1114,7 +1128,7 @@ contains
               iDataType=iDataType )
             lGridPresent = lTRUE
 
-          elseif ( sArgText_1 .strequal. "TABLE" ) then
+          elseif ( sArgText_1 .strapprox. "TABLE" ) then
 
             ! add code to get the table header name and table values
 
@@ -1127,43 +1141,43 @@ contains
           endif
 
 
-        elseif ( index( string=sCmdText, substring="_USE_MAJORITY_FILTER" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "_USE_MAJORITY_FILTER" ) then
 
           call pENTRY%set_majority_filter_flag( lTRUE )
 
-        elseif ( index( string=sCmdText, substring="_MONTHNAMES_CAPITALIZED" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "_MONTHNAMES_CAPITALIZED" ) then
 
           pENTRY%iFilename_Monthname_Capitalization_Rule = FILE_TEMPLATE_CAPITALIZED_MONTHNAME
 
-        elseif ( index( string=sCmdText, substring="_MONTHNAMES_LOWERCASE" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "_MONTHNAMES_LOWERCASE" ) then
 
           pENTRY%iFilename_Monthname_Capitalization_Rule = FILE_TEMPLATE_LOWERCASE_MONTHNAME
 
-        elseif ( index( string=sCmdText, substring="_MONTHNAMES_UPPERCASE" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "_MONTHNAMES_UPPERCASE" ) then
 
           pENTRY%iFilename_Monthname_Capitalization_Rule = FILE_TEMPLATE_UPPERCASE_MONTHNAME
 
-        elseif ( index( string=sCmdText, substring="_CONVERSION_FACTOR" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "_CONVERSION_FACTOR" ) then
 
           call pENTRY%set_scale(asFloat(sArgText_1))
 
-        elseif ( index( string=sCmdText, substring="_SCALE" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "_SCALE" ) then
 
           call pENTRY%set_scale(asFloat(sArgText_1))
 
-        elseif ( index( string=sCmdText, substring="_OFFSET" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "_OFFSET" ) then
 
           call pENTRY%set_offset(asFloat(sArgText_1))
 
-        elseif ( index( string=sCmdText, substring="NETCDF_X_VAR" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "NETCDF_X_VAR" ) then
 
           pENTRY%sVariableName_x = trim(sArgText_1)
 
-        elseif ( index( string=sCmdText, substring="NETCDF_Y_VAR" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "NETCDF_Y_VAR" ) then
 
           pENTRY%sVariableName_y = trim(sArgText_1)
 
-        elseif ( index( string=sCmdText, substring="NETCDF_Z_VAR" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "NETCDF_Z_VAR" ) then
 
           pENTRY%sVariableName_z = trim(sArgText_1)
 

@@ -33,8 +33,13 @@ module strings
 
   public :: operator( .contains. )
   interface operator( .contains. )
-    procedure :: is_string2_present_in_string1_case_insensitive_fn
+    procedure :: is_string2_present_in_string1_case_sensitive_fn
   end interface operator( .contains. )
+
+  public :: operator( .containssimilar. )
+  interface operator( .containssimilar. )
+    procedure :: is_string2_present_in_string1_case_insensitive_fn
+  end interface operator( .containssimilar. )
 
   public :: asCharacter
   interface asCharacter

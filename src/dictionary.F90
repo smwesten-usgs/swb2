@@ -301,15 +301,14 @@ contains
 
     do while ( associated(this%current ) )
 
-      iIndex = index(string=this%current%key, substring=asUppercase(sKey) )
-
-      if ( iIndex > 0 )  call slString%append(this%current%key)
+      if ( this%current%key .containssimilar. sKey )         &
+         call slString%append(this%current%key)
 
       this%current => this%current%next
 
     enddo
 
-    if ( slString%count == 0 )  &
+    if ( slString%get(1) == '<NA>' )            &
       call warn(sMessage="Failed to find a dictionary entry associated with a key value of " &
         //dquote(sKey)//".", sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE )
 

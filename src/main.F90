@@ -26,6 +26,7 @@ program main
   character (len=:), allocatable :: sOutputPrefixName
   character (len=:), allocatable :: sOutputDirectoryName
   character (len=:), allocatable :: sDataDirectoryName
+  character (len=:), allocatable :: sWeatherDataDirectoryName
   integer (kind=c_int)           :: iNumArgs
   character (len=1024)           :: sCompilerFlags
   character (len=256)            :: sCompilerVersion
@@ -35,9 +36,10 @@ program main
   integer (kind=c_int)           :: iIndex
   integer (kind=c_int)           :: iLen
 
-  sOutputPrefixName    = ""
-  sOutputDirectoryName = ""
-  sDataDirectoryName   = ""
+  sOutputPrefixName         = ""
+  sOutputDirectoryName      = ""
+  sDataDirectoryName        = ""
+  sWeatherDataDirectoryName = ""
 
   iNumArgs = COMMAND_ARGUMENT_COUNT()
 
@@ -76,10 +78,11 @@ program main
       //TRIM(int2char(__G95_MINOR__))
 #endif
 
-    write(UNIT=*,FMT="(/,a,/,/,5(a,/))")  "Usage: swb2 control_file_name ",                       &
-             "[ --output_prefix= ]  :: text to use as a prefix for output filenames",               &
-             "[ --output_dir= ]     :: directory to place output in (may be relative or absolute)", &
-             "[ --data_dir= ]       :: directory to search for input grids or lookup tables"
+    write(UNIT=*,FMT="(/,a,/,/,5(a,/))")  "Usage: swb2 control_file_name ",                         &
+             "[ --output_prefix= ]     :: text to use as a prefix for output filenames",               &
+             "[ --output_dir= ]        :: directory to place output in (may be relative or absolute)", &
+             "[ --data_dir= ]          :: directory to search for input grids or lookup tables",       &
+             "[ --weather_data_dir = ] :: directory to search for weather data grids"
     stop
 
   end if
@@ -115,6 +118,16 @@ program main
       if ( .not. sDataDirectoryName(iLen:iLen) .eq. "/" )  &
         sDataDirectoryName = trim(sDataDirectoryName)//"/"
 
+    elseif ( sBuf(1:11) .eq. "--weather_data_dir=" ) then
+
+      sWeatherDataDirectoryName = sBuf(20:)
+      iLen = len_trim( sWeatherDataDirectoryName )
+
+      ! if there is no trailing "/", append one so we can form (more) fully
+      ! qualified filenames later
+      if ( .not. sWeatherDataDirectoryName(iLen:iLen) .eq. "/" )  &
+        sWeatherDataDirectoryName = trim(sWeatherDataDirectoryName)//"/"
+
     else
 
       ! no match on the command-line argument flags; this must be a control file
@@ -128,6 +141,9 @@ program main
   call LOGS%initialize( iLogLevel = LOG_DEBUG )
   call LOGS%write( sMessage='Base data directory name set to: "'//trim( sDataDirectoryName )//'"', &
                    lEcho=.TRUE._c_bool )
+  call LOGS%write( sMessage='Weather data directory name set to: "'//trim( sWeatherDataDirectoryName )//'"', &
+                   lEcho=.TRUE._c_bool )
+
   call LOGS%write( sMessage='Output file prefix set to: "'//trim( sOutputPrefixName )//'"', &
                    lEcho=.TRUE._c_bool )
 
@@ -140,7 +156,8 @@ program main
 
   call slControlFiles%clear()
 
-  call initialize_all( sOutputPrefixName, sOutputDirectoryName, sDataDirectoryName )
+  call initialize_all( sOutputPrefixName, sOutputDirectoryName, sDataDirectoryName, &
+                       sWeatherDataDirectoryName )
 
   call iterate_over_simulation_days( MODEL )
 
