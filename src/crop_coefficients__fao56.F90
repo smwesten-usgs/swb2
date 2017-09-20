@@ -138,7 +138,6 @@ contains
 
    !> create string list that allows for alternate heading identifiers for the landuse code
    slList = create_list("LU_Code; Landuse_Code; Landuse_Lookup_Code")
-   call slList%print()
 
    !> Determine how many landuse codes are present
    call PARAMS%get_parameters( slKeys=slList, iValues=LANDUSE_CODE )
@@ -210,10 +209,10 @@ contains
     call assert( iStat==0, "Failed to allocate memory for KCB_METHOD vector", &
       __SRCNAME__, __LINE__ )
 
-    KCB_METHOD = iTINYVAL
-    KCB_ = fTINYVAL
-    GROWTH_STAGE_GDD = fTINYVAL
-    GROWTH_STAGE_DOY = fTINYVAL
+    KCB_METHOD = -9999
+    KCB_ = -9999.
+    GROWTH_STAGE_GDD = -9999.
+    GROWTH_STAGE_DOY = -9999.
 
     if ( ubound(L_ini_,1) == iNumberOfLanduses ) then
       GROWTH_STAGE_DOY( L_DOY_INI,  : ) = L_ini_
@@ -316,17 +315,17 @@ contains
     ! Monthly Kcb, GDD-based, or DOY-based
     do iIndex = lbound( KCB_METHOD, 1), ubound( KCB_METHOD, 1)
 
-      if ( all( KCB_( JAN:DEC, iIndex ) > NEAR_ZERO ) ) then
+      if ( all( KCB_( JAN:DEC, iIndex ) >= 0.0_c_float ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_MONTHLY_VALUES
         KCB_( KCB_MIN, iIndex ) = minval( KCB_(JAN:DEC, iIndex) )
         KCB_( KCB_MID, iIndex) = minval( KCB_(JAN:DEC, iIndex) )
 
-      elseif ( all( GROWTH_STAGE_GDD( :, iIndex ) > NEAR_ZERO )              &
-         .and. all( KCB_( KCB_INI:KCB_MIN, iIndex ) > NEAR_ZERO ) ) then
+      elseif ( all( GROWTH_STAGE_GDD( :, iIndex ) >= 0.0_c_float )              &
+         .and. all( KCB_( KCB_INI:KCB_MIN, iIndex ) >= 0.0_c_float ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_GDD
 
-      elseif ( all( GROWTH_STAGE_DOY( :, iIndex ) > NEAR_ZERO )              &
-         .and. all( KCB_( KCB_INI:KCB_MIN, iIndex ) > NEAR_ZERO ) ) then
+      elseif ( all( GROWTH_STAGE_DOY( :, iIndex ) >= 0.0_c_float )              &
+         .and. all( KCB_( KCB_INI:KCB_MIN, iIndex ) >= 0.0_c_float ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_FAO56
       endif
 

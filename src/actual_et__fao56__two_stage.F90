@@ -10,7 +10,7 @@ module actual_et__fao56__two_stage
 
   use iso_c_binding, only              : c_short, c_int, c_float, c_double
   use constants_and_conversions, only  : TRUE, M_PER_FOOT, in_to_mm
-  use string_list, only                : STRING_LIST_T
+  use string_list, only                : STRING_LIST_T, create_list
   use parameters, only                 : PARAMS
   use crop_coefficients__FAO56, only   : KCB_, KCB_MIN, KCB_INI, KCB_MID, KCB_END,    &
                                          JAN, DEC, KCB_METHOD_MONTHLY_VALUES,         &
@@ -80,7 +80,10 @@ contains
 
    call PARAMS%get_parameters( sKey="Mean_Plant_Height", fValues=MEAN_PLANT_HEIGHT, lFatal=TRUE )
 
-   call PARAMS%get_parameters( sKey="Depletion_Fraction", fValues=DEPLETION_FRACTION, lFatal=TRUE )
+   slList = create_list("Depletion_fraction; Plant_stress_depletion_fraction")
+
+   call PARAMS%get_parameters( slKeys=slList, fValues=DEPLETION_FRACTION, lFatal=TRUE )
+   call slList%clear()
 
  end subroutine actual_et_FAO56_two_stage_initialize
 

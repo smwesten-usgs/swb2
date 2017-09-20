@@ -116,6 +116,7 @@ contains
     type (DICT_ENTRY_T), pointer :: pCurrentDict
     integer (kind=c_int)         :: iNumberOfHeaderLines
     character (len=:), allocatable :: sNumberOfHeaderLines
+    character (len=:), allocatable :: tempstr
     character (len=MAX_TABLE_RECORD_LEN) :: sRecord, sItem
 
     if ( this%count > 0 ) then
@@ -142,19 +143,26 @@ contains
           call assert(iStat == 0, "Failed to allocate memory for dictionary object", &
               __SRCNAME__, __LINE__ )
 
-          if ( .not. PARAMS_DICT%key_already_in_use( DF%slColNames%get(iColIndex) ) ) then
+          if ( PARAMS_DICT%key_already_in_use( DF%slColNames%get(iColIndex) ) ) then
 
-            ! add dictionary entry to dictionary
-            call pDict%add_key( DF%slColNames%get(iColIndex) )
+            ! add dictionary entry to dictionary, tack "DUP" on end of name
+            tempstr = trim( DF%slColNames%get(iColIndex) )//"_DUP"
+            ! update the string list to reflect duplicate entry
+            call DF%slColNames%replace( iColIndex, tempstr )
+            call pDict%add_key( asUppercase( tempstr ) )
             call PARAMS_DICT%add_entry( pDict )
 
           else
 
-            call warn( sMessage="Found a duplicate dictionary entry in file "        &
-              //squote( this%filenames%get(iFileIndex) )//"; column name: "          &
-              //squote( DF%slColNames%get(iColIndex) ),                              &
-              sHints="Eliminate the duplicate column of information and try again.", &
-              lFatal=TRUE )
+            ! call warn( sMessage="Found a duplicate dictionary entry in file "        &
+            !   //squote( this%filenames%get(iFileIndex) )//"; column name: "          &
+            !   //squote( DF%slColNames%get(iColIndex) ),                              &
+            !   sHints="Eliminate the duplicate column of information and try again.", &
+            !   lFatal=TRUE )
+
+            ! add dictionary entry to dictionary
+            call pDict%add_key( asUppercase( DF%slColNames%get(iColIndex) ) )
+            call PARAMS_DICT%add_entry( pDict )
 
           endif
 
@@ -304,7 +312,7 @@ contains
       lFatal_ = lFALSE
     endif
 
-    slList = PARAMS_DICT%grep_keys( sKey )
+    slList = PARAMS_DICT%grep_keys( asUppercase( sKey ) )
 
     if ( lFatal_ ) then
 

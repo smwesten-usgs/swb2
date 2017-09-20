@@ -186,7 +186,7 @@ contains
 
     do while ( associated( pDict ) )
 
-      if ( pDict%key .strequal. sKey )  exit
+      if ( pDict%key .strapprox. sKey )  exit
 
       pDict => pDict%next
       this%current => pDict
@@ -301,7 +301,7 @@ contains
 
     do while ( associated(this%current ) )
 
-      iIndex = index(string=this%current%key, substring=trim(sKey) )
+      iIndex = index(string=this%current%key, substring=asUppercase(sKey) )
 
       if ( iIndex > 0 )  call slString%append(this%current%key)
 
@@ -331,7 +331,7 @@ function key_name_already_in_use_fn(this, sKey)   result( in_use )
 
   do while ( associated(this%current ) )
 
-    iIndex = index(string=this%current%key, substring=trim(sKey) )
+    iIndex = index(string=this%current%key, substring=asUppercase(sKey) )
 
     if ( iIndex > 0 )  call slString%append(this%current%key)
 

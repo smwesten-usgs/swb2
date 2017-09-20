@@ -15,93 +15,96 @@ module strings
     procedure :: concatenate_char_double_fn
   end interface operator(+)
 
-!   interface assignment(=)
-!     procedure :: integer_to_char_sub
-!     procedure :: float_to_char_sub
-!     procedure :: double_to_char_sub
-!   end interface assignment(=)
+  !   interface assignment(=)
+  !     procedure :: integer_to_char_sub
+  !     procedure :: float_to_char_sub
+  !     procedure :: double_to_char_sub
+  !   end interface assignment(=)
 
-   public :: operator( .strequal. )
-   interface operator( .strequal. )
-     procedure :: is_char_equal_to_char_fn
-!     procedure :: is_logical4_equal_to_logical1_fn
-!     procedure :: is_logical1_equal_to_logical4_fn
-   end interface operator(.strequal.)
+  public :: operator( .strequal. )
+  interface operator( .strequal. )
+    procedure :: is_char_equal_to_char_case_sensitive_fn
+  end interface operator( .strequal. )
 
-    public :: operator( .contains. )
-    interface operator( .contains. )
-      procedure :: is_string2_present_in_string1_fn
-    end interface operator(.contains.)
+  public :: operator( .strapprox. )
+  interface operator( .strapprox. )
+    procedure :: is_char_equal_to_char_case_insensitive_fn
+  end interface operator( .strapprox. )
 
-    public :: asCharacter
-    interface asCharacter
-      procedure :: short_to_char_fn
-      procedure :: int_to_char_fn
-      procedure :: long_long_to_char_fn
-      procedure :: float_to_char_fn
-      procedure :: double_to_char_fn
-      procedure :: logical_to_char_fn
-    end interface asCharacter
+  public :: operator( .contains. )
+  interface operator( .contains. )
+    procedure :: is_string2_present_in_string1_case_insensitive_fn
+  end interface operator( .contains. )
 
-    public :: chomp
-    interface chomp
-      procedure :: split_and_return_text_sub
-    end interface chomp
+  public :: asCharacter
+  interface asCharacter
+    procedure :: short_to_char_fn
+    procedure :: int_to_char_fn
+    procedure :: long_long_to_char_fn
+    procedure :: float_to_char_fn
+    procedure :: double_to_char_fn
+    procedure :: logical_to_char_fn
+  end interface asCharacter
 
-    public :: fieldCount
-    interface fieldCount
-      procedure :: count_number_of_fields_fn
-    end interface fieldCount
+  public :: chomp
+  interface chomp
+    procedure :: split_and_return_text_sub
+  end interface chomp
 
-    public :: clean
-    interface clean
-      procedure :: remove_multiple_characters_fn
-    end interface clean
+  public :: fieldCount
+  interface fieldCount
+    procedure :: count_number_of_fields_fn
+  end interface fieldCount
 
-    public :: squote
-    interface squote
-      procedure :: squote_char_fn
-    end interface squote
+  public :: clean
+  interface clean
+    procedure :: remove_multiple_characters_fn
+  end interface clean
 
-    public :: dquote
-    interface dquote
-      procedure :: dquote_char_fn
-    end interface dquote
+  public :: squote
+  interface squote
+    procedure :: squote_char_fn
+  end interface squote
 
-    public :: replace
-    interface replace
-      procedure :: replace_character_sub
-    end interface replace
+  public :: dquote
+  interface dquote
+    procedure :: dquote_char_fn
+  end interface dquote
 
-    public :: asUppercase
-    interface asUppercase
-      procedure :: char_to_uppercase_fn
-    end interface asUppercase
+  public :: replace
+  interface replace
+    procedure :: replace_character_sub
+  end interface replace
 
-    public :: asLowercase
-    interface asLowercase
-      procedure :: char_to_lowercase_fn
-    end interface asLowercase
+  public :: asUppercase
+  interface asUppercase
+    procedure :: char_to_uppercase_fn
+  end interface asUppercase
 
-    public :: toUppercase
-    interface toUppercase
-      procedure :: char_to_uppercase_sub
-    end interface toUppercase
+  public :: asLowercase
+  interface asLowercase
+    procedure :: char_to_lowercase_fn
+  end interface asLowercase
 
-    public :: toLowercase
-    interface toLowercase
-      procedure :: char_to_lowercase_sub
-    end interface toLowercase
+  public :: toUppercase
+  interface toUppercase
+    procedure :: char_to_uppercase_sub
+  end interface toUppercase
 
-    public :: right
-    interface right
-      procedure :: return_right_part_of_string_fn
-    end interface right
+  public :: toLowercase
+  interface toLowercase
+    procedure :: char_to_lowercase_sub
+  end interface toLowercase
 
-    public :: left
-    interface left
-      procedure :: return_left_part_of_string_fn
-    end interface left
+  public :: right
+  interface right
+    procedure :: return_right_part_of_string_fn
+  end interface right
+
+  public :: left
+  interface left
+    procedure :: return_left_part_of_string_fn
+  end interface left
 
 contains
 
@@ -150,7 +153,7 @@ contains
 
   end function return_left_part_of_string_fn
 
- !--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   function return_right_part_of_string_fn( string, indx, substring )   result( right_part )
 
@@ -197,9 +200,9 @@ contains
 
   end function return_right_part_of_string_fn
 
- !--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
-  function is_string2_present_in_string1_fn(sText1, sText2)   result(lBool)
+  function is_string2_present_in_string1_case_insensitive_fn(sText1, sText2)   result(lBool)
 
     character (len=*), intent(in)      :: sText1
     character (len=*), intent(in)      :: sText2
@@ -216,11 +219,53 @@ contains
 
     if ( index(sTemp1, sTemp2) /= 0 ) lBool = lTRUE
 
-  end function is_string2_present_in_string1_fn
+  end function is_string2_present_in_string1_case_insensitive_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
-  elemental function is_char_equal_to_char_fn(sText1, sText2)   result(lBool)
+  function is_string2_present_in_string1_case_sensitive_fn(sText1, sText2)   result(lBool)
+
+    character (len=*), intent(in)      :: sText1
+    character (len=*), intent(in)      :: sText2
+    logical (kind=c_bool)              :: lBool
+
+    ! [ LOCALS ]
+    character (len=len_trim(sText1))  :: sTemp1
+    character (len=len_trim(sText2))  :: sTemp2
+
+    lBool = lFALSE
+
+    sTemp1 = trim( sText1 )
+    sTemp2 = trim( sText2 )
+
+    if ( index(sTemp1, sTemp2) /= 0 ) lBool = lTRUE
+
+  end function is_string2_present_in_string1_case_sensitive_fn
+
+  !--------------------------------------------------------------------------------------------------
+
+  elemental function is_char_equal_to_char_case_sensitive_fn(sText1, sText2)   result(lBool)
+
+    character (len=*), intent(in)      :: sText1
+    character (len=*), intent(in)      :: sText2
+    logical (kind=c_bool)              :: lBool
+
+    ! [ LOCALS ]
+    character (len=:), allocatable    :: sTemp1
+    character (len=:), allocatable    :: sTemp2
+
+    lBool = lFALSE
+
+    sTemp1 = trim( sText1 )
+    sTemp2 = trim( sText2 )
+
+    if (trim(adjustl( sTemp1 ) )  .eq. trim(adjustl( sTemp2) ) ) lBool = lTRUE
+
+  end function is_char_equal_to_char_case_sensitive_fn
+
+  !--------------------------------------------------------------------------------------------------
+
+  elemental function is_char_equal_to_char_case_insensitive_fn(sText1, sText2)   result(lBool)
 
     character (len=*), intent(in)      :: sText1
     character (len=*), intent(in)      :: sText2
@@ -237,9 +282,9 @@ contains
 
     if (trim(adjustl( sTemp1 ) )  .eq. trim(adjustl( sTemp2) ) ) lBool = lTRUE
 
-  end function is_char_equal_to_char_fn
+  end function is_char_equal_to_char_case_insensitive_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   function concatenate_char_char_fn(sText1, sText2)   result(sText)
 
@@ -251,7 +296,7 @@ contains
 
   end function concatenate_char_char_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   function concatenate_char_int_fn(sText1, iValue1)   result(sText)
 
@@ -263,7 +308,7 @@ contains
 
   end function concatenate_char_int_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   function concatenate_char_float_fn(sText1, fValue1)   result(sText)
 
@@ -275,7 +320,7 @@ contains
 
   end function concatenate_char_float_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   function concatenate_char_double_fn(sText1, dValue1)   result(sText)
 
@@ -287,7 +332,7 @@ contains
 
   end function concatenate_char_double_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   elemental function short_to_char_fn(iValue)    result(sText)
 
@@ -308,7 +353,7 @@ contains
 
   end function short_to_char_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   elemental function int_to_char_fn(iValue)    result(sText)
 
@@ -329,7 +374,7 @@ contains
 
   end function int_to_char_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   elemental function long_long_to_char_fn(iValue)    result(sText)
 
@@ -350,7 +395,7 @@ contains
 
   end function long_long_to_char_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   elemental function float_to_char_fn(fValue, iFieldWidth, iNumdigits)    result(sText)
 
@@ -384,7 +429,7 @@ contains
 
   end function float_to_char_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   elemental function double_to_char_fn(dValue, iNumdigits)    result(sText)
 
@@ -413,7 +458,7 @@ contains
 
   end function double_to_char_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   elemental function logical_to_char_fn(lValue)    result(sText)
 
@@ -428,7 +473,7 @@ contains
 
   end function logical_to_char_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   elemental function squote_char_fn(sText1)    result(sText)
 
@@ -439,7 +484,7 @@ contains
 
   end function squote_char_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   elemental function dquote_char_fn(sText1)    result(sText)
 
@@ -450,7 +495,7 @@ contains
 
   end function dquote_char_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   elemental function char_to_uppercase_fn ( s )                    result(sText)
 
@@ -469,14 +514,14 @@ contains
     sText = s
 
     do i=1,len_trim(sText)
-        if ( ichar(sText(i:i) ) >= ASCII_SMALL_A .and. ichar(sText(i:i)) <= ASCII_SMALL_Z ) then
-            sText(i:i) = char( ichar( sText(i:i) ) + LOWER_TO_UPPER )
-        end if
+      if ( ichar(sText(i:i) ) >= ASCII_SMALL_A .and. ichar(sText(i:i)) <= ASCII_SMALL_Z ) then
+        sText(i:i) = char( ichar( sText(i:i) ) + LOWER_TO_UPPER )
+      end if
     end do
 
   end function char_to_uppercase_fn
 
-!--------------------------------------------------------------------------
+  !--------------------------------------------------------------------------
 
   elemental function char_to_lowercase_fn ( s )                               result(sText)
 
@@ -494,9 +539,9 @@ contains
     sText = s
 
     do i=1,len_trim(sText)
-        if ( ichar(sText(i:i) ) >= ASCII_A .and. ichar(sText(i:i)) <= ASCII_Z ) then
-            sText(i:i) = char( ichar( sText(i:i) ) + UPPER_TO_LOWER )
-        end if
+      if ( ichar(sText(i:i) ) >= ASCII_A .and. ichar(sText(i:i)) <= ASCII_Z ) then
+        sText(i:i) = char( ichar( sText(i:i) ) + UPPER_TO_LOWER )
+      end if
     end do
 
   end function char_to_lowercase_fn
@@ -514,9 +559,9 @@ contains
     integer (kind=c_int), parameter :: ASCII_SMALL_Z = ichar("z")
 
     do i=1,len_trim(s)
-        if ( ichar(s(i:i) ) >= ASCII_SMALL_A .and. ichar(s(i:i)) <= ASCII_SMALL_Z ) then
-            s(i:i) = char( ichar( s(i:i) ) + LOWER_TO_UPPER )
-        end if
+      if ( ichar(s(i:i) ) >= ASCII_SMALL_A .and. ichar(s(i:i)) <= ASCII_SMALL_Z ) then
+        s(i:i) = char( ichar( s(i:i) ) + LOWER_TO_UPPER )
+      end if
     end do
 
   end subroutine char_to_uppercase_sub
@@ -536,9 +581,9 @@ contains
     ! UPPER_TO_LOWER = ichar( "a" ) - ichar( "A" )
 
     do i=1,len_trim( s )
-        if ( ichar(s(i:i) ) >= ASCII_A .and. ichar(s(i:i)) <= ASCII_Z ) then
-            s(i:i) = char( ichar( s(i:i) ) + UPPER_TO_LOWER )
-        end if
+      if ( ichar(s(i:i) ) >= ASCII_A .and. ichar(s(i:i)) <= ASCII_Z ) then
+        s(i:i) = char( ichar( s(i:i) ) + UPPER_TO_LOWER )
+      end if
     end do
 
   end subroutine char_to_lowercase_sub
@@ -547,7 +592,7 @@ contains
 
 
 
-!--------------------------------------------------------------------------
+  !--------------------------------------------------------------------------
 
 
   !> Strip offending characters from a text string.
@@ -580,7 +625,7 @@ contains
 
     do iIndex1 = 1,len_trim(sText1)
 
-      iR = SCAN(sText1(iIndex1:iIndex1), sTargetCharacters_)
+      iR = scan(sText1(iIndex1:iIndex1), sTargetCharacters_)
 
       if(iR==0) then
         iIndex2 = iIndex2 + 1
@@ -593,7 +638,7 @@ contains
 
   end function clean
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   !> Strip repeated characters from string.
   !!
@@ -627,7 +672,7 @@ contains
 
     do iIndex1 = 1,len_trim(sText1)
 
-      iR = SCAN(sText1(iIndex1:iIndex1), sChar_)
+      iR = scan(sText1(iIndex1:iIndex1), sChar_)
 
       if(iR==0) then
         ! sChar_ was not found
@@ -655,7 +700,7 @@ contains
 
   end function remove_repeats
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   function count_number_of_fields_fn( sText, sDelimiters )     result( iCount )
 
@@ -689,7 +734,7 @@ contains
 
   end function count_number_of_fields_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   subroutine split_and_return_text_sub(sText1, sText2, sDelimiters)
 
@@ -704,14 +749,14 @@ contains
     if ( present(sDelimiters) ) then
 
       select case (sDelimiters)
-        case ("WHITESPACE")
-          sDelimiters_ = WHITESPACE
-        case ("TAB", "TABS")
-          sDelimiters_ = TAB
-        case ("COMMA", "CSV")
-          sDelimiters_ = ","
-        case default
-          sDelimiters_ = sDelimiters
+      case ("WHITESPACE")
+        sDelimiters_ = WHITESPACE
+      case ("TAB", "TABS")
+        sDelimiters_ = TAB
+      case ("COMMA", "CSV")
+        sDelimiters_ = ","
+      case default
+        sDelimiters_ = sDelimiters
       end select
 
     else
@@ -736,9 +781,9 @@ contains
 
   end subroutine split_and_return_text_sub
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
-   subroutine replace_character_sub(sText1, sFind, sReplace)
+  subroutine replace_character_sub(sText1, sFind, sReplace)
 
     character (len=*), intent(inout)    :: sText1
     character (len=1), intent(in)       :: sFind
@@ -759,43 +804,43 @@ contains
 
   end subroutine replace_character_sub
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   function remove_multiple_characters_fn(sText, sDelimiters)                result(sText1)
 
-  ! ARGUMENTS
-  character (len=*), intent(inout)           :: sText
-  character (len=*), intent(in), optional    :: sDelimiters
-  character (len=:), allocatable             :: sText1
+    ! ARGUMENTS
+    character (len=*), intent(inout)           :: sText
+    character (len=*), intent(in), optional    :: sDelimiters
+    character (len=:), allocatable             :: sText1
 
-  ! LOCALS
-  character ( len=len_trim(sText) ) :: sTemp
-  integer (kind=c_int) :: iR                 ! Index in sRecord
-  integer (kind=c_int) :: i, j
+    ! LOCALS
+    character ( len=len_trim(sText) ) :: sTemp
+    integer (kind=c_int) :: iR                 ! Index in sRecord
+    integer (kind=c_int) :: i, j
 
-  ! eliminate any leading spaces
-  sText = adjustl(sText)
-  sTemp = ""
-  j = 0
+    ! eliminate any leading spaces
+    sText = adjustl(sText)
+    sTemp = ""
+    j = 0
 
-  do i = 1,len_trim(sText)
+    do i = 1,len_trim(sText)
 
-    if(present(sDelimiters)) then
-      iR = SCAN(sText(i:i), sDelimiters)
-    else
-      iR = SCAN(sText(i:i),":/;,")
-    endif
+      if(present(sDelimiters)) then
+        iR = scan(sText(i:i), sDelimiters)
+      else
+        iR = scan(sText(i:i),":/;,")
+      endif
 
-    if(iR==0) then
-      j = j + 1
-      sTemp(j:j) = sText(i:i)
-    end if
+      if(iR==0) then
+        j = j + 1
+        sTemp(j:j) = sText(i:i)
+      end if
 
-  enddo
+    enddo
 
-  sText1 = trim(sTemp)
+    sText1 = trim(sTemp)
 
-end function remove_multiple_characters_fn
+  end function remove_multiple_characters_fn
 
 
 end module strings

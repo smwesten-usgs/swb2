@@ -146,6 +146,7 @@ contains
     call sl_temp_list%append("First_day_of_irrigation")
     call sl_temp_list%append("First_DOY_irrigation")
     call sl_temp_list%append("Irrigation_start")
+    call sl_temp_list%append("Irrigation_start_date")
 
     call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_irrigation_begin, lFatal=lTRUE )
 
@@ -155,6 +156,7 @@ contains
     call sl_temp_list%append("Last_day_of_irrigation")
     call sl_temp_list%append("Last_DOY_irrigation")
     call sl_temp_list%append("Irrigation_end")
+    call sl_temp_list%append("Irrigation_end_date")
 
     call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_irrigation_end, lFatal=lTRUE )
     call sl_temp_list%clear()

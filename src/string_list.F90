@@ -2,7 +2,7 @@ module string_list
 
   use iso_c_binding, only             : c_int, c_float, c_bool, c_null_char
   use constants_and_conversions, only : asInt, asFloat, asLogical, lTRUE, lFALSE, TRUE, FALSE,   &
-                                        WHITESPACE, PUNCTUATION
+      WHITESPACE, PUNCTUATION
   use strings
   use logfiles, only                  : LOG_DEBUG
   use exceptions
@@ -44,6 +44,7 @@ module string_list
     procedure :: list_from_delimited_string_sub
     procedure :: list_get_value_at_index_fn
     procedure :: list_get_values_in_range_fn
+    procedure :: list_replace_value_at_index_sub
     procedure :: list_print_sub
     procedure :: list_all_fn
     procedure :: list_all_delimited_fn
@@ -60,14 +61,15 @@ module string_list
     final     :: list_finalize_sub
 
     generic :: append        => list_append_string_sub, &
-                                list_append_int_sub
+        list_append_int_sub
     generic :: get           => list_get_value_at_index_fn, &
-                                list_get_values_in_range_fn
+        list_get_values_in_range_fn
+    generic :: replace       => list_replace_value_at_index_sub
     generic :: create_list   => list_from_delimited_string_sub
     generic :: set_autocleanup  => list_set_auto_cleanup_sub
     generic :: print         => list_print_sub
     generic :: listall       => list_all_fn, &
-                                list_all_delimited_fn
+        list_all_delimited_fn
     generic :: grep          => list_subset_partial_matches_fn
     generic :: which         => list_return_position_of_matching_string_fn
     generic :: countmatching => list_return_count_of_matching_string_fn
@@ -91,7 +93,7 @@ contains
 
   end subroutine list_append_int_sub
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   subroutine list_set_auto_cleanup_sub( this, autocleanup )
 
@@ -102,7 +104,7 @@ contains
 
   end subroutine list_set_auto_cleanup_sub
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   subroutine assign_string_list_to_string_list_sub(slList2, slList1)
 
@@ -124,7 +126,7 @@ contains
 
   end subroutine assign_string_list_to_string_list_sub
 
-!------------------------------------------------------------------------------
+  !------------------------------------------------------------------------------
 
   subroutine list_append_string_sub( this, sText )
 
@@ -139,7 +141,7 @@ contains
 
     allocate(pNewElement, stat=iStat)
     call assert(iStat == 0, "There was a problem allocating memory for a new string list element", &
-      __SRCNAME__, __LINE__)
+        __SRCNAME__, __LINE__)
 
     pNewElement%s    = trim( sText )
     pNewElement%next => null()
@@ -147,10 +149,10 @@ contains
     if (associated( this%first ) ) then
 
       if (this%count == 0)  call die("Internal logic error: count should *not* be zero in this block", &
-             __SRCNAME__, __LINE__)
+          __SRCNAME__, __LINE__)
 
-!      pOldLastElement => this%last
-!      pOldLastElement%next => pNewElement
+      !      pOldLastElement => this%last
+      !      pOldLastElement%next => pNewElement
 
       this%last%next => pNewElement
       this%last      => pNewElement
@@ -168,7 +170,44 @@ contains
 
   end subroutine list_append_string_sub
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine list_replace_value_at_index_sub(this, iIndex, sText)
+
+    class (STRING_LIST_T), intent(in)        :: this
+    integer (kind=c_int), intent(in)         :: iIndex
+    character (len=*), intent(in)            :: sText
+
+    ! [ LOCALS ]
+    integer (kind=c_int)                      :: iCount
+    class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
+
+    iCount = 0
+
+    current => this%first
+
+    do while ( associated( current ) .and. iCount < this%count )
+
+      iCount = iCount + 1
+
+      if (iCount == iIndex)  exit
+
+      current => current%next
+
+    enddo
+
+    if (associated(current) ) then
+      current%s = trim( sText )
+    else
+      !      call warn(sMessage="Unable to find a pointer associated with index: "//asCharacter(iIndex),  &
+      !                iLogLevel=LOG_DEBUG,                                                               &
+      !                sModule=__SRCNAME__,                                                                  &
+      !                iLine=__LINE__ )
+    endif
+
+  end subroutine list_replace_value_at_index_sub
+
+  !--------------------------------------------------------------------------------------------------
 
   function list_get_value_at_index_fn(this, iIndex)   result(sText)
 
@@ -198,16 +237,16 @@ contains
       sText = current%s
     else
       sText = "<NA>"
-!      call warn(sMessage="Unable to find a pointer associated with index: "//asCharacter(iIndex),  &
-!                iLogLevel=LOG_DEBUG,                                                               &
-!                sModule=__SRCNAME__,                                                                  &
-!                iLine=__LINE__ )
+      !      call warn(sMessage="Unable to find a pointer associated with index: "//asCharacter(iIndex),  &
+      !                iLogLevel=LOG_DEBUG,                                                               &
+      !                sModule=__SRCNAME__,                                                                  &
+      !                iLine=__LINE__ )
     endif
 
 
   end function list_get_value_at_index_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   !> Iterate over a range of indices; return a space-delimited string comprised of the values.
   function list_get_values_in_range_fn(this, iStartIndex, iEndIndex)   result(sText)
@@ -242,15 +281,15 @@ contains
 
     if ( len_trim(sText) == 0 ) then
       sText = "<NA>"
-!      call warn("Unable to find a pointer associated with index range: " &
-!          //asCharacter(iStartIndex)//" to "//asCharacter(iEndIndex), &
-!          __SRCNAME__, __LINE__ )
+      !      call warn("Unable to find a pointer associated with index range: " &
+      !          //asCharacter(iStartIndex)//" to "//asCharacter(iEndIndex), &
+      !          __SRCNAME__, __LINE__ )
     endif
 
 
   end function list_get_values_in_range_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   subroutine list_print_sub(this, iLU)
 
@@ -285,7 +324,7 @@ contains
 
   end subroutine list_print_sub
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   function list_all_fn(this)  result( sListValues )
 
@@ -319,7 +358,7 @@ contains
 
   end function list_all_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   function list_all_delimited_fn(this, delimiter)  result( sListValues )
 
@@ -366,7 +405,7 @@ contains
 
   end function list_all_delimited_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   function list_return_all_as_float_fn(this)    result(rValues)
 
@@ -395,7 +434,7 @@ contains
 
   end function list_return_all_as_float_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   function list_return_all_as_character_fn(this, null_terminated )    result(sValues)
 
@@ -437,7 +476,7 @@ contains
 
   end function list_return_all_as_character_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   function list_return_all_as_int_fn(this)    result(iValues)
 
@@ -467,7 +506,7 @@ contains
 
   end function list_return_all_as_int_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   function list_return_all_as_logical_fn(this)    result(lValues)
 
@@ -497,7 +536,7 @@ contains
 
   end function list_return_all_as_logical_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   function list_from_delimited_string_fn(sText1, delimiters)    result( newList )
 
@@ -575,7 +614,7 @@ contains
 
   end subroutine list_from_delimited_string_sub
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   function list_is_string_in_list_fn(this, sChar)  result( lResult )
 
@@ -598,7 +637,7 @@ contains
 
   end function list_is_string_in_list_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   function list_return_count_of_matching_string_fn(this, sChar) result(iCount)
 
@@ -633,9 +672,9 @@ contains
 
   end function list_return_count_of_matching_string_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
- function list_return_position_of_matching_string_fn(this, sChar)     result(iResult)
+  function list_return_position_of_matching_string_fn(this, sChar)     result(iResult)
 
     class (STRING_LIST_T), intent(in)                    :: this
     character (len=*), intent(in)                        :: sChar
@@ -685,7 +724,7 @@ contains
 
   end function list_return_position_of_matching_string_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   function list_subset_partial_matches_fn( this, sChar )     result(newList)
 
@@ -708,7 +747,7 @@ contains
     do while ( associated(current) .and. iCount < this%count )
 
       if ( (current%s .strequal. sChar) .or. &
-             (index(string=asUppercase(current%s), substring=asUppercase(sChar) ) > 0 ) ) then
+          (index(string=asUppercase(current%s), substring=asUppercase(sChar) ) > 0 ) ) then
 
         iCount = iCount + 1
         call newList%append(current%s)
@@ -721,17 +760,17 @@ contains
 
   end function list_subset_partial_matches_fn
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   subroutine list_finalize_sub(this)
 
     type (STRING_LIST_T) :: this
 
-      if ( this%autocleanup )  call this%clear()
+    if ( this%autocleanup )  call this%clear()
 
   end subroutine list_finalize_sub
 
-!--------------------------------------------------------------------------------------------------
+  !--------------------------------------------------------------------------------------------------
 
   subroutine list_items_deallocate_all_sub(this)
 

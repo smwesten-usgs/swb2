@@ -98,7 +98,7 @@ module model_initialize
       METHODS_LIST_T("IRRIGATION             ", lTRUE),                             &
       METHODS_LIST_T("CROP_COEFFICIENT       ", lTRUE),                             &
       METHODS_LIST_T("GROWING_DEGREE_DAY     ", lTRUE),                             &
-      METHODS_LIST_T("DIRECT_NET_INFILTRATION        ", lTRUE),                             &
+      METHODS_LIST_T("DIRECT_NET_INFILTRATION", lTRUE),                             &
       METHODS_LIST_T("DIRECT_SOIL_MOISTURE   ", lTRUE),                             &
       METHODS_LIST_T("FLOW_ROUTING           ", lTRUE),                             &
       METHODS_LIST_T("ROOTING_DEPTH          ", lTRUE),                             &
@@ -114,7 +114,6 @@ contains
 !    use polygon_summarize, only : initialize_polygon_summarize
 
     character (len=*), intent(in) :: output_prefix, output_dirname, data_dirname
-
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iIndex
@@ -185,6 +184,8 @@ contains
 
     ! dump details about all gridded datasets currently in the data_catalog
     call DAT%print()
+
+    ! dump details about all dictionary keys and values to the debug logfile
     call CF_DICT%print_all( iLogLevel=LOG_DEBUG)
 
   end subroutine initialize_all
