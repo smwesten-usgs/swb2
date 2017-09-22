@@ -849,16 +849,16 @@ contains
 
     Method_Name = argv_list%get(1)
 
-    if ( sCmdText .contains. "INTERCEPTION" ) then
+    if ( sCmdText .containssimilar. "INTERCEPTION" ) then
 
-      if ( Method_Name .strequal. "BUCKET" ) then
+      if ( Method_Name .strapprox. "BUCKET" ) then
 
         this%init_interception => model_initialize_interception_bucket
         this%calc_interception => model_calculate_interception_bucket
 
         call LOGS%WRITE( "==> BUCKET INTERCEPTION submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( Method_Name .strequal. "GASH" ) then
+      elseif ( Method_Name .strapprox. "GASH" ) then
 
         this%init_interception => model_initialize_interception_gash
         this%calc_interception => model_calculate_interception_gash
@@ -872,16 +872,16 @@ contains
 
       endif
 
-    elseif ( sCmdText .contains. "RUNOFF" ) then
+    elseif ( sCmdText .containssimilar. "RUNOFF" ) then
 
-      if ( ( Method_Name .strequal. "C-N" ) .or. ( Method_Name .strequal. "CURVE_NUMBER" ) ) then
+      if ( ( Method_Name .strapprox. "C-N" ) .or. ( Method_Name .strapprox. "CURVE_NUMBER" ) ) then
 
         this%init_runoff => model_initialize_runoff_curve_number
         this%calc_runoff => model_calculate_runoff_curve_number
 
         call LOGS%WRITE( "==> CURVE NUMBER RUNOFF submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( ( Method_Name .strequal. "RUNOFF_RATIO" ) .or. ( Method_Name .strequal. "MONTHLY_GRID" ) ) then
+      elseif ( ( Method_Name .strapprox. "RUNOFF_RATIO" ) .or. ( Method_Name .strapprox. "MONTHLY_GRID" ) ) then
 
         this%init_runoff => model_initialize_runoff_gridded_values
         this%calc_runoff => model_calculate_runoff_gridded_values
@@ -895,10 +895,10 @@ contains
 
       endif
 
-    elseif ( sCmdText .contains. "ROOTING" ) then
+    elseif ( sCmdText .containssimilar. "ROOTING" ) then
 
-      if ( ( Method_Name .strequal. "DYNAMIC" ) .or. ( Method_Name .strequal. "FAO_56" )   &
-          .or. ( Method_Name .strequal. "FAO-56" ) )                                          then
+      if ( ( Method_Name .strapprox. "DYNAMIC" ) .or. ( Method_Name .strapprox. "FAO_56" )   &
+          .or. ( Method_Name .strapprox. "FAO-56" ) )                                          then
 
         this%update_rooting_depth => model_update_rooting_depth_FAO56
         call LOGS%WRITE( "==> DYNAMIC rooting depth submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
@@ -910,16 +910,16 @@ contains
 
       endif
 
-    elseif ( sCmdText .contains. "SNOWFALL" ) then
+    elseif ( sCmdText .containssimilar. "SNOWFALL" ) then
 
-      if ( ( Method_Name .strequal. "ORIGINAL" ) .or. ( Method_Name .strequal. "ORIGINAL_SWB_METHOD" ) ) then
+      if ( ( Method_Name .strapprox. "ORIGINAL" ) .or. ( Method_Name .strapprox. "ORIGINAL_SWB_METHOD" ) ) then
 
         this%init_snowfall => model_initialize_snowfall_original
         this%calc_snowfall => model_calculate_snowfall_original
 
         call LOGS%WRITE( "==> ORIGINAL SNOWFALL submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( Method_Name .strequal. "PRMS" ) then
+      elseif ( Method_Name .strapprox. "PRMS" ) then
 
         this%init_snowfall => model_initialize_snowfall_prms
         this%calc_snowfall => model_calculate_snowfall_prms
@@ -933,10 +933,10 @@ contains
 
       endif
 
-    elseif ( ( sCmdText .contains. "AVAILABLE_WATER_CONTENT" )           &
-        .or. ( sCmdText .contains. "AVAILABLE_WATER_CAPACITY") ) then
+    elseif ( ( sCmdText .containssimilar. "AVAILABLE_WATER_CONTENT" )           &
+        .or. ( sCmdText .containssimilar. "AVAILABLE_WATER_CAPACITY") ) then
 
-      if ( ( Method_Name .strequal. "TABLE" ) ) then
+      if ( ( Method_Name .strapprox. "TABLE" ) ) then
 
         this%init_awc => model_initialize_available_water_content_depth_integrated
         this%read_awc_data => model_read_available_water_content_depth_integrated
@@ -944,7 +944,7 @@ contains
         call LOGS%WRITE( "==> TABLE method for populating AVAILABLE_WATER_CONTENT/AVAILABLE_WATER_CAPACITY selected.",     &
                          iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( ( Method_Name .strequal. "GRID" ) .or. ( Method_Name .strequal. "GRIDDED" ) ) then
+      elseif ( ( Method_Name .strapprox. "GRID" ) .or. ( Method_Name .strapprox. "GRIDDED" ) ) then
 
         this%init_awc => model_initialize_available_water_content_gridded
         this%read_awc_data => model_read_available_water_content_gridded
@@ -960,9 +960,10 @@ contains
 
       endif
 
-    elseif ( sCmdText .contains. "FLOW_ROUTING" ) then
+    elseif ( sCmdText .containssimilar. "FLOW_ROUTING" ) then
 
-      if ( Method_Name .strequal. "D8" ) then
+      if ( ( Method_Name .strapprox. "D8" )                       &
+          .or. ( Method_Name .strapprox. "DOWNHILL" ) ) then
 
         this%init_routing => model_initialize_routing_D8
         this%calc_routing => model_calculate_routing_D8
@@ -979,12 +980,12 @@ contains
 
       endif
 
-    elseif ( ( sCmdText .contains. "CROP_COEFFICIENT" )    &
-        .or. ( sCmdText .contains. "CROP_COEF" ) )  then
+    elseif ( ( sCmdText .containssimilar. "CROP_COEFFICIENT" )    &
+        .or. ( sCmdText .containssimilar. "CROP_COEF" ) )  then
 
-      if ( ( Method_Name .strequal. "FAO56" )                   &
-             .or. ( Method_Name .strequal. "FAO-56" )           &
-             .or. ( Method_Name .strequal. "FAO_56" ) ) then
+      if ( ( Method_Name .strapprox. "FAO56" )                   &
+             .or. ( Method_Name .strapprox. "FAO-56" )           &
+             .or. ( Method_Name .strapprox. "FAO_56" ) ) then
 
         this%init_crop_coefficient => model_initialize_crop_coefficient_FAO56
         this%update_crop_coefficient => model_update_crop_coefficient_FAO56
@@ -1002,9 +1003,9 @@ contains
 
       endif
 
-    elseif ( sCmdText .contains. "FOG" ) then
+    elseif ( sCmdText .containssimilar. "FOG" ) then
 
-      if ( Method_Name .strequal. "MONTHLY_GRID" ) then
+      if ( Method_Name .strapprox. "MONTHLY_GRID" ) then
 
         this%init_fog => model_initialize_fog_monthly_grid
         this%calc_fog => model_calculate_fog_monthly_grid
@@ -1020,11 +1021,11 @@ contains
 
       endif
 
-    elseif ( sCmdText .contains. "GROWING_DEGREE_DAY" ) then
+    elseif ( sCmdText .containssimilar. "GROWING_DEGREE_DAY" ) then
 
-      if ( ( Method_Name .strequal. "BASKERVILLE_EMIN" )       &
-             .or. ( Method_Name .strequal. "BE" )              &
-             .or. ( Method_Name .strequal. "SINUSOIDAL" )  )        then
+      if ( ( Method_Name .strapprox. "BASKERVILLE_EMIN" )       &
+             .or. ( Method_Name .strapprox. "BE" )              &
+             .or. ( Method_Name .strapprox. "SINUSOIDAL" )  )        then
 
         this%init_GDD => model_initialize_GDD_be
         this%calc_GDD => model_calculate_GDD_be
@@ -1040,11 +1041,11 @@ contains
 
       endif
 
-    elseif ( sCmdText .contains. "IRRIGATION" ) then
+    elseif ( sCmdText .containssimilar. "IRRIGATION" ) then
 
-      if ( ( Method_Name .strequal. "FAO56" )                   &
-             .or. ( Method_Name .strequal. "FAO-56" )           &
-             .or. ( Method_Name .strequal. "FAO_56" ) ) then
+      if ( ( Method_Name .strapprox. "FAO56" )                   &
+             .or. ( Method_Name .strapprox. "FAO-56" )           &
+             .or. ( Method_Name .strapprox. "FAO_56" ) ) then
 
         this%init_irrigation => model_initialize_irrigation
         this%calc_irrigation => model_calculate_irrigation
@@ -1061,10 +1062,10 @@ contains
       endif
 
 
-    elseif ( ( sCmdText .contains. "SOIL_STORAGE_MAX" )            &
-        .or. ( sCmdText .contains. "PLANT_AVAILABLE_WATER" ) ) then
+    elseif ( ( sCmdText .containssimilar. "SOIL_STORAGE_MAX" )            &
+        .or. ( sCmdText .containssimilar. "PLANT_AVAILABLE_WATER" ) ) then
 
-      if ( Method_Name .strequal. "GRIDDED" ) then
+      if ( Method_Name .strapprox. "GRIDDED" ) then
 
         this%init_soil_storage_max => model_initialize_soil_storage_max_gridded
 
@@ -1081,11 +1082,11 @@ contains
       endif
 
 
-    elseif ( sCmdText .contains. "EVAPOTRANSPIRATION" ) then
+    elseif ( sCmdText .containssimilar. "EVAPOTRANSPIRATION" ) then
 
-      if (   ( Method_Name .strequal. "HARGREAVES" )                 &
-        .or. ( Method_Name .strequal. "HARGREAVES-SAMANI" )          &
-        .or. ( Method_Name .strequal. "HARGREAVES_SAMANI" ) ) then
+      if (   ( Method_Name .strapprox. "HARGREAVES" )                 &
+        .or. ( Method_Name .strapprox. "HARGREAVES-SAMANI" )          &
+        .or. ( Method_Name .strapprox. "HARGREAVES_SAMANI" ) ) then
 
         this%init_reference_et => model_initialize_et_hargreaves
         this%calc_reference_et => model_calculate_et_hargreaves
@@ -1093,9 +1094,9 @@ contains
         call LOGS%WRITE( "==> HARGREAVES-SAMANI EVAPOTRANSPIRATION submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( ( Method_Name .strequal. "JENSEN-HAISE" )             &
-           .or. ( Method_Name .strequal. "JENSEN_HAISE" )            &
-           .or. ( Method_Name .strequal. "JH" ) ) then
+      elseif ( ( Method_Name .strapprox. "JENSEN-HAISE" )             &
+           .or. ( Method_Name .strapprox. "JENSEN_HAISE" )            &
+           .or. ( Method_Name .strapprox. "JH" ) ) then
 
         this%init_reference_et => model_initialize_et_jensen_haise
         this%calc_reference_et => model_calculate_et_jensen_haise
@@ -1103,8 +1104,8 @@ contains
         call LOGS%WRITE( "==> JENSEN_HAISE EVAPOTRANSPIRATION submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( ( Method_Name .strequal. "MONTHLY_GRID" ) &
-           .or. ( Method_Name .strequal. "MONTHLY_GRID" ) ) then
+      elseif ( ( Method_Name .strapprox. "MONTHLY_GRID" ) &
+           .or. ( Method_Name .strapprox. "MONTHLY_GRID" ) ) then
 
         this%init_reference_et => model_initialize_et_monthly_grid
         this%calc_reference_et => model_calculate_et_monthly_grid
@@ -1112,8 +1113,8 @@ contains
         call LOGS%WRITE( "==> MONTHLY_GRID EVAPOTRANSPIRATION submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( ( Method_Name .strequal. "DAILY_GRID" ) &
-           .or. ( Method_Name .strequal. "DAILY_GRID" ) ) then
+      elseif ( ( Method_Name .strapprox. "DAILY_GRID" ) &
+           .or. ( Method_Name .strapprox. "DAILY_GRID" ) ) then
 
         this%init_reference_et => model_initialize_et_daily_grid
         this%calc_reference_et => model_calculate_et_daily_grid
@@ -1128,11 +1129,11 @@ contains
 
       endif
 
-    elseif ( sCmdText .contains. "PRECIPITATION" ) then
+    elseif ( sCmdText .containssimilar. "PRECIPITATION" ) then
 
-      if ( ( Method_Name .strequal. "NORMAL" )                &
-           .or. ( Method_Name .strequal. "GRIDDED" )            &
-           .or. ( Method_Name .strequal. "STANDARD" ) ) then
+      if ( ( Method_Name .strapprox. "NORMAL" )                &
+           .or. ( Method_Name .strapprox. "GRIDDED" )            &
+           .or. ( Method_Name .strapprox. "STANDARD" ) ) then
 
         this%init_precipitation_data => model_initialize_precip_normal
         this%get_precipitation_data => model_get_precip_normal
@@ -1140,8 +1141,8 @@ contains
         call LOGS%WRITE( "==> STANDARD PRECIPITATION submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( ( Method_Name .strequal. "METHOD_OF_FRAGMENTS" ) &
-           .or. ( Method_Name .strequal. "FRAGMENTS" ) ) then
+      elseif ( ( Method_Name .strapprox. "METHOD_OF_FRAGMENTS" ) &
+           .or. ( Method_Name .strapprox. "FRAGMENTS" ) ) then
 
         this%init_precipitation_data => model_initialize_precip_method_of_fragments
         this%get_precipitation_data => model_get_precip_method_of_fragments
@@ -1156,8 +1157,8 @@ contains
 
       endif
 
-    elseif ( (sCmdText .contains. "DIRECT_NET_INFILTRATION" )       &
-           .or. ( sCmdText .contains. "DIRECT_NET_INFILTRATION" ) )        then
+    elseif ( (sCmdText .containssimilar. "DIRECT_NET_INFILTRATION" )       &
+           .or. ( sCmdText .containssimilar. "DIRECT_NET_INFILTRATION" ) )        then
 
       this%init_direct_net_infiltration => model_initialize_direct_net_infiltration_gridded
       this%calc_direct_net_infiltration => model_calculate_direct_net_infiltration_gridded
@@ -1165,7 +1166,7 @@ contains
       call LOGS%WRITE( "==> GRIDDED or TABULAR values for water main leakage and other direct " &
         //"recharge will be used.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-    elseif ( sCmdText .contains. "DIRECT_SOIL_MOISTURE" ) then
+    elseif ( sCmdText .containssimilar. "DIRECT_SOIL_MOISTURE" ) then
 
       this%init_direct_soil_moisture => model_initialize_direct_soil_moisture_gridded
       this%calc_direct_soil_moisture => model_calculate_direct_soil_moisture_gridded
@@ -1173,10 +1174,10 @@ contains
       call LOGS%WRITE( "==> GRIDDED or TABULAR values for septic drainage and other direct " &
         //"inputs to the root zone will be used.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-    elseif ( sCmdText .contains. "SOIL_MOISTURE" ) then
+    elseif ( sCmdText .containssimilar. "SOIL_MOISTURE" ) then
 
-      if ( ( Method_Name .strequal. "T-M" ) .or. ( Method_Name .strequal. "THORNTHWAITE-MATHER" )      &
-             .or. ( Method_Name .strequal. "THORNTHWAITE") ) then
+      if ( ( Method_Name .strapprox. "T-M" ) .or. ( Method_Name .strapprox. "THORNTHWAITE-MATHER" )      &
+             .or. ( Method_Name .strapprox. "THORNTHWAITE") ) then
 
         this%init_actual_et => model_initialize_actual_et_thornthwaite_mather
         this%calc_actual_et => model_calculate_actual_et_thornthwaite_mather
@@ -1184,9 +1185,9 @@ contains
         call LOGS%WRITE( "==> THORNTHWAITE-MATHER SOIL MOISTURE RETENTION submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( ( Method_Name .strequal. "T-M_EQUATIONS" )                           &
-             .or. ( Method_Name .strequal. "THORNTHWAITE-MATHER_EQUATIONS" )        &
-             .or. ( Method_Name .strequal. "THORNTHWAITE_MATHER_EQUATIONS") ) then
+      elseif ( ( Method_Name .strapprox. "T-M_EQUATIONS" )                           &
+             .or. ( Method_Name .strapprox. "THORNTHWAITE-MATHER_EQUATIONS" )        &
+             .or. ( Method_Name .strapprox. "THORNTHWAITE_MATHER_EQUATIONS") ) then
 
         this%init_actual_et => model_initialize_actual_et_thornthwaite_mather_eqns
         this%calc_actual_et => model_calculate_actual_et_thornthwaite_mather_eqns
@@ -1194,7 +1195,7 @@ contains
         call LOGS%WRITE( "==> THORNTHWAITE-MATHER SOIL MOISTURE RETENTION (SWB 1.0 equations) submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( ( Method_Name .strequal. "FAO56_TWO_STAGE" ) .or. ( Method_Name .strequal. "FAO-56_TWO_STAGE" ) ) then
+      elseif ( ( Method_Name .strapprox. "FAO56_TWO_STAGE" ) .or. ( Method_Name .strapprox. "FAO-56_TWO_STAGE" ) ) then
 
         this%init_actual_et => model_initialize_actual_et_fao56__two_stage
         this%calc_actual_et => model_calculate_actual_et_fao56__two_stage
@@ -1202,7 +1203,7 @@ contains
         call LOGS%WRITE( "==> **TWO-STAGE** FAO-56 SOIL MOISTURE RETENTION submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
-      elseif ( ( Method_Name .strequal. "FAO56" ) .or. ( Method_Name .strequal. "FAO-56" ) ) then
+      elseif ( ( Method_Name .strapprox. "FAO56" ) .or. ( Method_Name .strapprox. "FAO-56" ) ) then
 
         this%init_actual_et => model_initialize_actual_et_fao56
         this%calc_actual_et => model_calculate_actual_et_fao56
@@ -1217,18 +1218,18 @@ contains
 
       endif
 
-    elseif ( sCmdText .contains. "DUMP_VARIABLES" ) then
+    elseif ( sCmdText .containssimilar. "DUMP_VARIABLES" ) then
 
         row = 0; col = 0; indx_start = 0; indx_end = 0
 
         this%dump_variables => model_dump_variables_by_cell
 
-        if ( ( Method_Name .contains. "INDEX_RANGE") .and. ( argv_list%count == 3 ) ) then
+        if ( ( Method_Name .containssimilar. "INDEX_RANGE") .and. ( argv_list%count == 3 ) ) then
 
           indx_start = asInt( argv_list%get(2) )
           indx_end   = asInt( argv_list%get(3) )
 
-        elseif ( ( Method_Name .contains. "COORD") .and. ( argv_list%count == 3 ) ) then
+        elseif ( ( Method_Name .containssimilar. "COORD") .and. ( argv_list%count == 3 ) ) then
 
           xcoord = asFloat( argv_list%get(2) )
           ycoord = asFloat( argv_list%get(3) )
