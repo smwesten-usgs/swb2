@@ -3,7 +3,7 @@
 !>  populates awc by reading available water content directly from a gridded input.
 
 
-!>  Populate available water content by reading in 
+!>  Populate available water content by reading in
 !>  the available water content from a gridded data source.
 
 module awc__gridded_values
@@ -26,14 +26,18 @@ contains
 
   subroutine awc_gridded_values_read( )
 
-    ! locate the data structure associated with the gridded rainfall zone entries
+    ! locate the data structure associated with the gridded available water content entries
     pAWC_GRID => DAT%find("AVAILABLE_WATER_CONTENT")
-    if ( .not. associated(pAWC_GRID) ) &
+    if ( .not. associated(pAWC_GRID) ) then
         call warn("An AVAILABLE_WATER_CONTENT grid must be supplied in order to make use of this option.", &
            __SRCNAME__, __LINE__)
 
-    call pAWC_GRID%getvalues( )
-    
+    else
+
+      call pAWC_GRID%getvalues( )
+
+    end if
+
   end subroutine awc_gridded_values_read
 
 !--------------------------------------------------------------------------------------------------
@@ -43,8 +47,16 @@ contains
     logical (kind=c_bool), intent(in)     :: lActive(:,:)
     real (kind=c_float), intent(inout)    :: fAWC(:)
 
-    fAWC = pack( pAWC_GRID%pGrdBase%rData, lActive )
-    
+    if ( associated( pAWC_GRID ) ) then
+
+      fAWC = pack( pAWC_GRID%pGrdBase%rData, lActive )
+
+    else
+
+      fAWC = -9999.0
+
+    endif
+
   end subroutine awc_gridded_values_initialize
 
 end module awc__gridded_values

@@ -27,14 +27,26 @@ module data_catalog_entry
   integer (kind=c_int), parameter, public :: FILE_TEMPLATE_LOWERCASE_MONTHNAME   = 1
   integer (kind=c_int), parameter, public :: FILE_TEMPLATE_UPPERCASE_MONTHNAME   = 2
 
+  integer (kind=c_int), parameter :: CONSTANT_GRID = 0
+  integer (kind=c_int), parameter :: STATIC_GRID = 1
+  integer (kind=c_int), parameter :: STATIC_NETCDF_GRID = 2
+  integer (kind=c_int), parameter :: DYNAMIC_GRID = 3
+  integer (kind=c_int), parameter :: DYNAMIC_NETCDF_GRID = 4
+  integer (kind=c_int), parameter :: NO_GRID = 5
+
+  integer (kind=c_int), parameter :: FILETYPE_ARC_ASCII = 0
+  integer (kind=c_int), parameter :: FILETYPE_SURFER = 1
+  integer (kind=c_int), parameter :: FILETYPE_NETCDF = 2
+  integer (kind=c_int), parameter :: FILETYPE_NONE = 3
+
   type, public :: DATA_CATALOG_ENTRY_T
     character (len=:), allocatable :: sKeyword
     type (DATA_CATALOG_ENTRY_T), pointer :: previous => null()
     type (DATA_CATALOG_ENTRY_T), pointer :: next     => null()
 
-    integer (kind=c_int)               :: iSourceDataForm    ! constant, static grid, dynamic grid
+    integer (kind=c_int)               :: iSourceDataForm = NO_GRID   ! constant, static grid, dynamic grid
     integer (kind=c_int)               :: iSourceDataType = DATATYPE_NA  ! real, short, integer, etc.
-    integer (kind=c_int)               :: iSourceFileType  ! Arc ASCII, Surfer, NetCDF
+    integer (kind=c_int)               :: iSourceFileType = FILETYPE_NONE  ! Arc ASCII, Surfer, NetCDF
     integer (kind=c_int)               :: iTargetDataType = DATATYPE_NA  ! Fortran real, integer, etc.
 
     character (len=256)       :: sDescription           = ""
@@ -196,17 +208,6 @@ module data_catalog_entry
 
   integer (kind=c_int), parameter, public :: MISSING_VALUES_ZERO_OUT = 0
   integer (kind=c_int), parameter, public :: MISSING_VALUES_REPLACE_WITH_MEAN = 1
-
-  integer (kind=c_int), parameter :: CONSTANT_GRID = 0
-  integer (kind=c_int), parameter :: STATIC_GRID = 1
-  integer (kind=c_int), parameter :: STATIC_NETCDF_GRID = 2
-  integer (kind=c_int), parameter :: DYNAMIC_GRID = 3
-  integer (kind=c_int), parameter :: DYNAMIC_NETCDF_GRID = 4
-
-  integer (kind=c_int), parameter :: FILETYPE_ARC_ASCII = 0
-  integer (kind=c_int), parameter :: FILETYPE_SURFER = 1
-  integer (kind=c_int), parameter :: FILETYPE_NETCDF = 2
-  integer (kind=c_int), parameter :: FILETYPE_NONE = 3
 
   type (GENERAL_GRID_T), public, pointer :: pGrd => null()
 

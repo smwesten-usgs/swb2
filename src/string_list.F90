@@ -134,7 +134,7 @@ contains
     character (len=*), intent(in) :: sText
 
     ! [ LOCALS ]
-    class (STRING_LIST_ELEMENT_T), pointer   :: pNewElement
+    type (STRING_LIST_ELEMENT_T), pointer   :: pNewElement
     integer (kind=c_int)                     :: iStat
 
     pNewElement => null()
@@ -180,7 +180,7 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int)                      :: iCount
-    class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
+    type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
 
     iCount = 0
 
@@ -217,7 +217,7 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int)                      :: iCount
-    class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
+    type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
 
     iCount = 0
 
@@ -258,7 +258,7 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int)                      :: iCount
-    class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
+    type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
 
     iCount = 0
     sText = " "
@@ -299,7 +299,7 @@ contains
     integer (kind=c_int), optional        :: iLU
 
     ! [ LOCALS ]
-    class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
+    type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
     integer (kind=c_int)                      :: iLU_
     integer (kind=c_int)                      :: iCount
 
@@ -334,7 +334,7 @@ contains
     character (len=:), allocatable        :: sListValues
 
     ! [ LOCALS ]
-    class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
+    type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
     integer (kind=c_int)                      :: iLU_
     integer (kind=c_int)                      :: iCount
     character (len=2048)                      :: sBuf
@@ -369,7 +369,7 @@ contains
     character (len=:), allocatable        :: sListValues
 
     ! [ LOCALS ]
-    class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
+    type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
     integer (kind=c_int)                      :: iLU_
     integer (kind=c_int)                      :: iCount
     character (len=2048)                      :: sBuf
@@ -413,7 +413,7 @@ contains
     real (kind=c_float), allocatable      :: rValues(:)
 
     ! [ LOCALS ]
-    class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
+    type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
     integer (kind=c_int)                      :: iStat
     integer (kind=c_int)                      :: iIndex
 
@@ -443,7 +443,7 @@ contains
     logical (kind=c_bool), optional       :: null_terminated
 
     ! [ LOCALS ]
-    class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
+    type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
     integer (kind=c_int)                      :: iStat
     integer (kind=c_int)                      :: iIndex
     logical (kind=c_bool)                     :: null_terminated_
@@ -484,7 +484,7 @@ contains
     integer (kind=c_int), allocatable     :: iValues(:)
 
     ! [ LOCALS ]
-    class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
+    type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
     integer (kind=c_int)                      :: iStat
     integer (kind=c_int)                      :: iIndex
 
@@ -514,7 +514,7 @@ contains
     logical (kind=c_bool), allocatable     :: lValues(:)
 
     ! [ LOCALS ]
-    class (STRING_LIST_ELEMENT_T), pointer    :: current => null()
+    type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
     integer (kind=c_int)                      :: iStat
     integer (kind=c_int)                      :: iIndex
 
@@ -808,6 +808,5 @@ contains
     this%last => null()
 
   end subroutine list_items_deallocate_all_sub
-
 
 end module string_list

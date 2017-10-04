@@ -625,11 +625,13 @@ contains
     type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
     type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
     type (DATA_CATALOG_ENTRY_T), pointer :: pAWC
+    type (DATA_CATALOG_ENTRY_T), pointer :: pSoil_Storage_Max
     type (DATA_CATALOG_ENTRY_T), pointer :: pD8_FLOWDIR
 
-    pLULC => DAT%find("LAND_USE")
-    pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
-    pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
+    pLULC             => DAT%find("LAND_USE")
+    pHSG              => DAT%find("HYDROLOGIC_SOILS_GROUP")
+    pAWC              => DAT%find("AVAILABLE_WATER_CONTENT")
+    pSoil_Storage_Max => DAT%find("SOIL_STORAGE_MAX")
     pD8_FLOWDIR => DAT%find("FLOW_DIRECTION")
 
     if( .not. associated( pAWC ) )  pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
@@ -690,9 +692,20 @@ contains
 
       end where
 
+    elseif ( associated( pSoil_Storage_Max ) ) then
+
+      where (       ( pHSG%pGrdBase%iData  < 1 )                  &
+              .or.  ( pLULC%pGrdBase%iData < 0 )                  &
+              .or.  ( pSoil_Storage_Max%pGrdBase%rData < 0.0 ) )
+
+        this%active = .false._c_bool
+
+      end where
+
     else
 
-      call die( "Found neither gridded nor tabular data to use in initializing available water capacity.", &
+      call die( "Failed to find gridded or tabular data to use in initializing " &
+               //"available water capacity or soil storage.", &
         __SRCNAME__, __LINE__ )
 
     endif

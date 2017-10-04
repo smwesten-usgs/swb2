@@ -17,7 +17,7 @@ export GFORTRANLIST=$( locate gfortran-7 | grep Cellar | grep bin | grep $GCC_VE
 export GFORTRANARR=($GFORTRANLIST)
 export GFORTRAN=${GFORTRANARR[1]}
 
-export GPP=/opt/local/bin/g++-mp-5
+export GPP=/opt/local/bin/g++-mp-7
 export CMAKEROOT=/usr/bin/cmake
 export R_HOME=/usr/bin/R
 
@@ -36,12 +36,12 @@ export INSTALL_PREFIX=/usr/local/bin
 
 # define other variables for use in the CMakeList.txt file
 # options are "Release" or "Debug"
-export BUILD_TYPE="RELEASE"
+export BUILD_TYPE="DEBUG"
 export SYSTEM_TYPE="MacOS"
 
 # define platform and compiler specific compilation flags
-export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -Wuninitialized -fbacktrace -fcheck=all -fexceptions -fsanitize=null -fsanitize=leak -fmax-errors=6 -fbackslash -ffree-line-length-none"
-export CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -ffree-line-length-512 -fbackslash -ffpe-summary='none'"
+export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -Wuninitialized -fbacktrace -fcheck=all -fexceptions -fsanitize=null -fsanitize=leak -fmax-errors=6 -fbackslash -ffree-line-length-none -Wno-maybe-uninitialized"
+export CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -ffree-line-length-512 -fbackslash -ffpe-summary='none' -Wno-maybe-uninitialized"
 
 # set important environment variables
 export FC=$GFORTRAN
