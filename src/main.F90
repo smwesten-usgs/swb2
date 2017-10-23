@@ -82,7 +82,7 @@ program main
              "[ --output_prefix= ]     :: text to use as a prefix for output filenames",               &
              "[ --output_dir= ]        :: directory to place output in (may be relative or absolute)", &
              "[ --data_dir= ]          :: directory to search for input grids or lookup tables",       &
-             "[ --weather_data_dir = ] :: directory to search for weather data grids"
+             "[ --weather_data_dir= ]  :: directory to search for weather data grids"
     stop
 
   end if
