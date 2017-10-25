@@ -1777,6 +1777,9 @@ contains
         __SRCNAME__, __LINE__)
     endif
 
+    ! setting this to a value that is likely valid; if this is set to a negative value, a landuse
+    ! code that is present in the grid but not in the lookup table will trigger a fatal error, however,
+    ! processing will continue until a bounds error is triggered somewhere else in the code,
     MODEL%landuse_index = -9999
     iCount = 0
 
@@ -1799,10 +1802,15 @@ contains
 
         enddo
 
-        if ( .not. lMatch ) &
-          call LOGS%write("Failed to match landuse code "//asCharacter(MODEL%landuse_code(iIndex) ) &
-            //" with a corresponding landuse code from lookup tables.", iLogLevel=LOG_ALL )
-
+        if ( .not. lMatch ) then
+          call warn(sMessage="Failed to match landuse code "//asCharacter(MODEL%landuse_code(iIndex) ) &
+            //" with a corresponding landuse code from lookup tables.",                                &
+            sHints="Make sure your lookup table(s) have landuse codes corresponding to all values in " &
+            //"the land-use grid.", lFatal=TRUE, iLogLevel=LOG_ALL, lEcho=TRUE)
+          ! we're setting this value to a valid value. this shouldn't cause problems with any
+          ! calculations because we've already thrown a fatal error
+          MODEL%landuse_index(iIndex) = 1
+        endif
       enddo
 
       call LOGS%write("Matches were found between landuse grid value and table value for " &
