@@ -1467,27 +1467,24 @@ contains
         !       - this%net_infiltration( cell_index ) - this%actual_et( cell_index )   &
         !       - this%rejected_net_infiltration( cell_index )
         !
-        ! if ( this%net_infiltration( indx ) > 1.e-2 ) then
-        !   print *, "moving water from "//asCharacter(cell_index)//" to "//asCharacter(target_index)//"."
-        !   print *, "                      ("//asCharacter( cell_col )//","//asCharacter( cell_row )//")"  &
-        !          //" to ("//asCharacter( targ_col )//","//asCharacter( targ_row )//")"
-        !   print *, "   cell runon              = ", this%runon( cell_index )
-        !   print *, "   cell rainfall           = ", this%rainfall( cell_index )
-        !   print *, "   cell snowmelt           = ", this%snowmelt( cell_index )
-        !   print *, "   cell fog                = ", this%fog( cell_index )
-        !   print *, "   cell irrigation         = ", this%irrigation( cell_index )
-        !   print *, "   surface storage excess  = ", this%surface_storage_excess( cell_index )
-        !   print *, "   direct_soil_moisture    = ", this%direct_soil_moisture( cell_index )
-        !   print *, "   cell infiltration       =", this%infiltration( cell_index )
-        !   print *, "   cell runoff             = ", this%runoff( cell_index )
-        !   print *, "   cell rejected net infil = ", this%rejected_net_infiltration( cell_index )
-        !   print *, "   cell delta_soil_storage = ", this%delta_soil_storage( cell_index )
-        !   print *, "   cell act_et             = ", this%actual_et( cell_index )
-        !   print *, "   cell net_infiltration           =", this%net_infiltration( cell_index )
-        !   print *, "   cell rejected_net_infiltration  =", this%rejected_net_infiltration( cell_index )
-        !   print *, "   target runon            = ", this%runon( target_index )
-        !   print *, "   cell msb                = ", msb
-        ! endif
+        ! print *, "moving water from "//asCharacter(cell_index)//" to "//asCharacter(target_index)//"."
+        ! print *, "                      ("//asCharacter( cell_col )//","//asCharacter( cell_row )//")"  &
+        !        //" to ("//asCharacter( targ_col )//","//asCharacter( targ_row )//")"
+        ! print *, "   cell runon              = ", this%runon( cell_index )
+        ! print *, "   cell rainfall           = ", this%rainfall( cell_index )
+        ! print *, "   cell snowmelt           = ", this%snowmelt( cell_index )
+        ! print *, "   cell fog                = ", this%fog( cell_index )
+        ! print *, "   cell irrigation         = ", this%irrigation( cell_index )
+        ! print *, "   surface storage excess  = ", this%surface_storage_excess( cell_index )
+        ! print *, "   direct_soil_moisture    = ", this%direct_soil_moisture( cell_index )
+        ! print *, "   cell infiltration       =", this%infiltration( cell_index )
+        ! print *, "   cell runoff             = ", this%runoff( cell_index )
+        ! print *, "   cell delta_soil_storage = ", this%delta_soil_storage( cell_index )
+        ! print *, "   cell act_et             = ", this%actual_et( cell_index )
+        ! print *, "   cell net_infiltration           =", this%net_infiltration( cell_index )
+        ! print *, "   cell rejected_net_infiltration  =", this%rejected_net_infiltration( cell_index )
+        ! print *, "   target runon            = ", this%runon( target_index )
+        ! print *, "   cell msb                = ", msb
 
     else
 
@@ -1712,11 +1709,14 @@ contains
 
   subroutine model_calculate_runoff_curve_number(this, cell_index )
 
+    use ieee_arithmetic,      only  : ieee_is_nan, ieee_is_finite
     use runoff__curve_number, only  : runoff_curve_number_calculate,     &
                                       update_previous_5_day_rainfall
 
     class (MODEL_DOMAIN_T), intent(inout)          :: this
     integer (kind=c_int), intent(in)               :: cell_index
+
+    integer (kind=c_int)  :: indx
 
     !> @TODO: Should interception term be part of this? Initial abstraction should include
     !!        some of this interception...
@@ -1735,6 +1735,22 @@ contains
                                            this%continuous_frozen_ground_index( cell_index ) )
 
     call update_previous_5_day_rainfall( this%inflow( cell_index ), cell_index )
+
+    ! if ( ieee_is_nan( this%runoff( cell_index ) )                               &
+    !   .or. ( .not. ieee_is_finite( this%runoff( cell_index ) ) ) ) then
+    !
+    !   print *, "*** NaN or infinite runoff value detected ***"
+    !   print *, "            LU: ", this%landuse_code( cell_index )
+    !   print *, "          soil: ", this%soil_group( cell_index )
+    !   print *, "           col: ", this%col_num_1D( cell_index )
+    !   print *, "           row: ", this%row_num_1D( cell_index )
+    !   print *, "         runon: ", this%runon( cell_index )
+    !   print *, "        inflow: ", this%inflow( cell_index )
+    !   print *, " soil_stor_max: ", this%soil_storage_max( cell_index )
+    !   print *, "     soil_stor: ", this%soil_storage( cell_index )
+    !   print *, " curve_num_adj: ", this%curve_num_adj( cell_index )
+    !
+    ! endif
 
   end subroutine model_calculate_runoff_curve_number
 

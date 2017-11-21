@@ -345,7 +345,8 @@ contains
 
     if ( present( slKeys) ) then
 
-      call PARAMS_DICT%get_values( slKeys=slKeys, lValues=lValues )
+      call PARAMS_DICT%get_values( slKeys=slKeys, lValues=lValues,            &
+        is_fatal=lFatal_ )
 
 !       if ( any( iValues <= iTINYVAL ) ) &
 !         call warn( "Failed to find a lookup table column named " &
@@ -384,7 +385,8 @@ contains
 
     if ( present( slKeys) ) then
 
-      call PARAMS_DICT%get_values( slKeys=slKeys, slString=slValues )
+      call PARAMS_DICT%get_values( slKeys=slKeys, slString=slValues,          &
+        is_fatal=lFatal_ )
 
        if ( slValues%get(1) .strequal. "<NA>" ) then
          call warn( "Failed to find a lookup table column named "        &
@@ -428,7 +430,8 @@ contains
 
     if ( present( slKeys) ) then
 
-      call PARAMS_DICT%get_values( slKeys=slKeys, iValues=iValues )
+      call PARAMS_DICT%get_values( slKeys=slKeys, iValues=iValues,            &
+        is_fatal=lFatal_ )
 
       if ( any( iValues <= iTINYVAL ) ) &
         call warn( "Failed to find a lookup table column named " &
@@ -436,7 +439,8 @@ contains
 
     else if ( present( sKey) ) then
 
-      call PARAMS_DICT%get_values( sKey=sKey, iValues=iValues )
+      call PARAMS_DICT%get_values( sKey=sKey, iValues=iValues,                &
+        is_fatal=lFatal_ )
 
       if ( any( iValues <= iTINYVAL ) ) &
         call warn( "Failed to find a lookup table column named " &
@@ -475,7 +479,8 @@ contains
 
     else if ( present( sKey) ) then
 
-      call PARAMS_DICT%get_values( sKey=sKey, fValues=fValues )
+      call PARAMS_DICT%get_values( sKey=sKey, fValues=fValues,                &
+        is_fatal=lFatal_ )
 
       if ( any( fValues <= fTINYVAL ) ) &
         call warn( "Failed to find a lookup table column named " &
@@ -534,7 +539,8 @@ contains
       do iIndex = 1, iNumCols
 
         sText = trim( slList%get( iIndex ) )
-        call PARAMS_DICT%get_values( sKey=sText, fValues=fTempVal )
+        call PARAMS_DICT%get_values( sKey=sText, fValues=fTempVal,            &
+          is_fatal=lFatal_ )
 
         call assert( size( fTempVal, 1) == size( fValues, 1),                 &
           "Mismatch in array size. Dictionary key: "//squote( sText )         &

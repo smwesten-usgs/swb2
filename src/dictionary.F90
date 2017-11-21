@@ -431,19 +431,35 @@ end function key_name_already_in_use_fn
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine get_values_as_int_sub(this, sKey, iValues)
+  subroutine get_values_as_int_sub(this, sKey, iValues, is_fatal )
 
     class (DICT_T)                                  :: this
     character (len=*), intent(in)                   :: sKey
     integer (kind=c_int), allocatable, intent(out)  :: iValues(:)
+    logical (kind=c_bool), optional                 :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
+    logical (kind=c_bool)          :: is_fatal_
+    logical (kind=c_bool)          :: empty_entries
+
+    if ( present( is_fatal ) ) then
+      is_fatal_ = is_fatal
+    else
+      is_fatal_ = FALSE
+    endif
 
     pTarget => this%get_entry(sKey)
 
     if ( associated( pTarget ) ) then
+
+      if ( is_fatal_ ) then
+        empty_entries = pTarget%sl%empty_entries_present()
+        if( empty_entries )  call warn(sMessage="There are missing values associated" &
+          //" with the key value of "//dquote(sKey),                                  &
+          iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
+      endif
 
       iValues = pTarget%sl%asInt()
 
@@ -460,24 +476,39 @@ end function key_name_already_in_use_fn
 
     endif
 
-
   end subroutine get_values_as_int_sub
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine get_values_as_logical_sub(this, sKey, lValues)
+  subroutine get_values_as_logical_sub(this, sKey, lValues, is_fatal)
 
     class (DICT_T)                                   :: this
     character (len=*), intent(in)                    :: sKey
     logical (kind=c_bool), allocatable, intent(out)  :: lValues(:)
+    logical (kind=c_bool), optional                 :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
+    logical (kind=c_bool)          :: is_fatal_
+    logical (kind=c_bool)          :: empty_entries
+
+    if ( present( is_fatal ) ) then
+      is_fatal_ = is_fatal
+    else
+      is_fatal_ = FALSE
+    endif
 
     pTarget => this%get_entry(sKey)
 
     if ( associated( pTarget ) ) then
+
+      if ( is_fatal_ ) then
+        empty_entries = pTarget%sl%empty_entries_present()
+        if( empty_entries )  call warn(sMessage="There are missing values associated" &
+          //" with the key value of "//dquote(sKey),                                  &
+          iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
+      endif
 
       lValues = pTarget%sl%asLogical()
 
@@ -507,17 +538,26 @@ end function key_name_already_in_use_fn
   !!                    search for.
   !! @param[out] iValues Integer vector of values associated with one of the provided keys.
 
-  subroutine get_values_as_logical_given_list_of_keys_sub(this, slKeys, lValues)
+  subroutine get_values_as_logical_given_list_of_keys_sub(this, slKeys, lValues, is_fatal)
 
     class (DICT_T)                                     :: this
     type (STRING_LIST_T), intent(in)                   :: slKeys
     logical (kind=c_bool), allocatable, intent(out)    :: lValues(:)
+    logical (kind=c_bool), optional                    :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
     integer (kind=c_int)           :: iCount
     character (len=:), allocatable :: sText
+    logical (kind=c_bool)          :: is_fatal_
+    logical (kind=c_bool)          :: empty_entries
+
+    if ( present( is_fatal ) ) then
+      is_fatal_ = is_fatal
+    else
+      is_fatal_ = FALSE
+    endif
 
     iCount = 0
 
@@ -534,6 +574,13 @@ end function key_name_already_in_use_fn
     enddo
 
     if ( associated( pTarget ) ) then
+
+      if ( is_fatal_ ) then
+        empty_entries = pTarget%sl%empty_entries_present()
+        if( empty_entries )  call warn(sMessage="There are missing values associated" &
+          //" with the key values of "//slKeys%listall(),                             &
+          iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
+      endif
 
       lValues = pTarget%sl%asLogical()
 
@@ -554,17 +601,26 @@ end function key_name_already_in_use_fn
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine get_values_as_string_list_given_list_of_keys_sub(this, slKeys, slString )
+  subroutine get_values_as_string_list_given_list_of_keys_sub(this, slKeys, slString, is_fatal )
 
     class (DICT_T)                                     :: this
     type (STRING_LIST_T), intent(in)                   :: slKeys
     type ( STRING_LIST_T ), intent(out)                :: slString
+    logical (kind=c_bool), optional                    :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
     integer (kind=c_int)           :: iCount
     character (len=:), allocatable :: sText
+    logical (kind=c_bool)          :: is_fatal_
+    logical (kind=c_bool)          :: empty_entries
+
+    if ( present( is_fatal ) ) then
+      is_fatal_ = is_fatal
+    else
+      is_fatal_ = FALSE
+    endif
 
     iCount = 0
 
@@ -582,6 +638,13 @@ end function key_name_already_in_use_fn
 
     if ( associated( pTarget ) ) then
 
+      if ( is_fatal_ ) then
+        empty_entries = pTarget%sl%empty_entries_present()
+        if( empty_entries )  call warn(sMessage="There are missing values associated" &
+          //" with the key values of "//slKeys%listall(),                             &
+          iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
+      endif
+
       slString = pTarget%sl
 
     else
@@ -596,16 +659,25 @@ end function key_name_already_in_use_fn
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine get_value_as_string_sub(this, sText, sKey, iIndex )
+  subroutine get_value_as_string_sub(this, sText, sKey, iIndex, is_fatal )
 
     class (DICT_T)                                  :: this
     character(len=:), allocatable, intent(out)      :: sText
     character (len=*), intent(in), optional         :: sKey
     integer (kind=c_int), intent(in), optional      :: iIndex
+    logical (kind=c_bool), optional                 :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
+    logical (kind=c_bool)          :: is_fatal_
+    logical (kind=c_bool)          :: empty_entries
+
+    if ( present( is_fatal ) ) then
+      is_fatal_ = is_fatal
+    else
+      is_fatal_ = FALSE
+    endif
 
     if ( present( sKey ) )  this%current => this%get_entry(sKey)
 
@@ -625,19 +697,29 @@ end function key_name_already_in_use_fn
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine get_values_as_string_list_sub(this, sKey, slString)
+  subroutine get_values_as_string_list_sub(this, sKey, slString, is_fatal)
 
     class (DICT_T)                                  :: this
     character (len=*), intent(in)                   :: sKey
     type (STRING_LIST_T), intent(out)               :: slString
+    logical (kind=c_bool), optional                 :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
+    logical (kind=c_bool)          :: is_fatal_
+    logical (kind=c_bool)          :: empty_entries
 
     pTarget => this%get_entry(sKey)
 
     if ( associated( pTarget ) ) then
+
+      if ( is_fatal_ ) then
+        empty_entries = pTarget%sl%empty_entries_present()
+        if( empty_entries )  call warn(sMessage="There are missing values associated" &
+          //" with the key value of "//dquote(sKey),                                  &
+          iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
+      endif
 
       slString = pTarget%sl
 
@@ -663,17 +745,26 @@ end function key_name_already_in_use_fn
   !!                    search for.
   !! @param[out] iValues Integer vector of values associated with one of the provided keys.
 
-  subroutine get_values_as_int_given_list_of_keys_sub(this, slKeys, iValues)
+  subroutine get_values_as_int_given_list_of_keys_sub(this, slKeys, iValues, is_fatal)
 
     class (DICT_T)                                     :: this
     type (STRING_LIST_T), intent(in)                   :: slKeys
     integer (kind=c_int), allocatable, intent(out)     :: iValues(:)
+    logical (kind=c_bool), optional                    :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
     integer (kind=c_int)           :: iCount
     character (len=256)            :: sText
+    logical (kind=c_bool)          :: is_fatal_
+    logical (kind=c_bool)          :: empty_entries
+
+    if ( present( is_fatal ) ) then
+      is_fatal_ = is_fatal
+    else
+      is_fatal_ = FALSE
+    endif
 
     iCount = 0
 
@@ -692,6 +783,13 @@ end function key_name_already_in_use_fn
     enddo
 
     if ( associated( pTarget ) ) then
+
+      if ( is_fatal_ ) then
+        empty_entries = pTarget%sl%empty_entries_present()
+        if( empty_entries )  call warn(sMessage="There are missing values associated" &
+          //" with the key values of "//slKeys%listall(),                             &
+          iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
+      endif
 
       iValues = pTarget%sl%asInt()
 
@@ -721,17 +819,26 @@ end function key_name_already_in_use_fn
   !!                    search for.
   !! @param[out] fValues Float vector of values associated with one of the provided keys.
 
-  subroutine get_values_as_float_given_list_of_keys_sub(this, slKeys, fValues)
+  subroutine get_values_as_float_given_list_of_keys_sub(this, slKeys, fValues, is_fatal)
 
     class (DICT_T)                                    :: this
     type (STRING_LIST_T), intent(in)                  :: slKeys
     real (kind=c_float), allocatable, intent(out)     :: fValues(:)
+    logical (kind=c_bool), optional                   :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
     integer (kind=c_int)           :: iCount
     character (len=:), allocatable :: sText
+    logical (kind=c_bool)          :: is_fatal_
+    logical (kind=c_bool)          :: empty_entries
+
+    if ( present( is_fatal ) ) then
+      is_fatal_ = is_fatal
+    else
+      is_fatal_ = FALSE
+    endif
 
     iCount = 0
 
@@ -748,6 +855,13 @@ end function key_name_already_in_use_fn
     enddo
 
     if ( associated( pTarget ) ) then
+
+      if ( is_fatal_ ) then
+        empty_entries = pTarget%sl%empty_entries_present()
+        if( empty_entries )  call warn(sMessage="There are missing values associated" &
+          //" with the key values of "//slKeys%listall(),                             &
+          iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
+      endif
 
       fValues = pTarget%sl%asFloat()
 
@@ -770,19 +884,29 @@ end function key_name_already_in_use_fn
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine get_values_as_float_sub(this, sKey, fValues)
+  subroutine get_values_as_float_sub(this, sKey, fValues, is_fatal)
 
     class (DICT_T)                                    :: this
     character (len=*), intent(in)                     :: sKey
     real (kind=c_float), allocatable, intent(out)     :: fValues(:)
+    logical (kind=c_bool), optional                   :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
+    logical (kind=c_bool)          :: is_fatal_
+    logical (kind=c_bool)          :: empty_entries
 
     pTarget => this%get_entry(sKey)
 
     if ( associated( pTarget ) ) then
+
+      if ( is_fatal_ ) then
+        empty_entries = pTarget%sl%empty_entries_present()
+        if( empty_entries )  call warn(sMessage="There are missing values associated" &
+          //" with the key value of "//dquote(sKey),                                  &
+          iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
+      endif
 
       fValues = pTarget%sl%asFloat()
 

@@ -189,7 +189,7 @@ contains
     call DAT%print()
 
     ! dump details about all dictionary keys and values to the debug logfile
-    call CF_DICT%print_all( iLogLevel=LOG_DEBUG)
+    call CF_DICT%print_all( iLogLevel=LOG_DEBUG, lEcho=FALSE )
 
   end subroutine initialize_all
 
@@ -1035,7 +1035,7 @@ contains
     ! the loop below then handles the specific directives in turn
     myDirectives = CF_DICT%grep_keys( sKey )
 
-    call myDirectives%print
+!    call myDirectives%print
 
     if ( myDirectives%count == 0 ) then
 

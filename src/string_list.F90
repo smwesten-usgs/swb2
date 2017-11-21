@@ -50,6 +50,7 @@ module string_list
     procedure :: list_all_delimited_fn
     procedure :: list_return_position_of_matching_string_fn
     procedure :: list_return_count_of_matching_string_fn
+    procedure :: list_are_there_empty_entries_fn
     procedure :: list_is_string_in_list_fn
     procedure :: list_items_deallocate_all_sub
     procedure :: list_return_all_as_float_fn
@@ -60,25 +61,26 @@ module string_list
     procedure :: list_set_auto_cleanup_sub
     final     :: list_finalize_sub
 
-    generic :: append        => list_append_string_sub, &
-        list_append_int_sub
-    generic :: get           => list_get_value_at_index_fn, &
-        list_get_values_in_range_fn
-    generic :: replace       => list_replace_value_at_index_sub
-    generic :: create_list   => list_from_delimited_string_sub
-    generic :: set_autocleanup  => list_set_auto_cleanup_sub
-    generic :: print         => list_print_sub
-    generic :: listall       => list_all_fn, &
-        list_all_delimited_fn
-    generic :: grep          => list_subset_partial_matches_fn
-    generic :: which         => list_return_position_of_matching_string_fn
-    generic :: countmatching => list_return_count_of_matching_string_fn
-    generic :: iselement     => list_is_string_in_list_fn
-    generic :: clear         => list_items_deallocate_all_sub
-    generic :: asFloat       => list_return_all_as_float_fn
-    generic :: asInt         => list_return_all_as_int_fn
-    generic :: asLogical     => list_return_all_as_logical_fn
-    generic :: asCharacter   => list_return_all_as_character_fn
+    generic :: append            => list_append_string_sub,                   &
+                                    list_append_int_sub
+    generic :: get               => list_get_value_at_index_fn,               &
+                                    list_get_values_in_range_fn
+    generic :: replace           => list_replace_value_at_index_sub
+    generic :: create_list       => list_from_delimited_string_sub
+    generic :: set_autocleanup   => list_set_auto_cleanup_sub
+    generic :: print             => list_print_sub
+    generic :: listall           => list_all_fn,                              &
+                                    list_all_delimited_fn
+    generic :: grep              => list_subset_partial_matches_fn
+    generic :: which             => list_return_position_of_matching_string_fn
+    generic :: countmatching     => list_return_count_of_matching_string_fn
+    generic :: iselement         => list_is_string_in_list_fn
+    generic :: empty_entries_present => list_are_there_empty_entries_fn
+    generic :: clear             => list_items_deallocate_all_sub
+    generic :: asFloat           => list_return_all_as_float_fn
+    generic :: asInt             => list_return_all_as_int_fn
+    generic :: asLogical         => list_return_all_as_logical_fn
+    generic :: asCharacter       => list_return_all_as_character_fn
 
   end type STRING_LIST_T
 
@@ -615,6 +617,41 @@ contains
   end subroutine list_from_delimited_string_sub
 
   !--------------------------------------------------------------------------------------------------
+
+  function list_are_there_empty_entries_fn( this )  result( lResult )
+
+    class (STRING_LIST_T), intent(in)       :: this
+    logical (kind=c_bool)                   :: lResult
+
+    ! [ LOCALS ]
+    integer (kind=c_int)                        :: iIndex
+    integer (kind=c_int)                        :: iStat
+    integer (kind=c_int)                        :: iCount
+    type (STRING_LIST_ELEMENT_T), pointer       :: current
+
+    iCount = 0
+    iIndex = 0
+    lResult = FALSE
+
+    current => this%first
+
+    do while ( associated(current) .and. iCount < this%count )
+
+      iIndex = iIndex + 1
+
+      if ( len_trim( current%s ) == 0 ) then
+        iCount = iCount + 1
+      endif
+
+      current => current%next
+
+    enddo
+
+    if ( iCount > 0 )  lResult = TRUE
+
+  end function list_are_there_empty_entries_fn
+
+!--------------------------------------------------------------------------------------------------
 
   function list_is_string_in_list_fn(this, sChar)  result( lResult )
 

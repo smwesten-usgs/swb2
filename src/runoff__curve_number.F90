@@ -40,6 +40,8 @@ contains
 
   subroutine runoff_curve_number_initialize( cell_is_active )
 
+   use ieee_arithmetic, only : ieee_is_nan, ieee_is_finite
+
     logical (kind=c_bool), intent(in)   :: cell_is_active(:,:)
 
 
