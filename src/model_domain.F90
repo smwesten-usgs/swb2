@@ -160,6 +160,8 @@ module model_domain
                                                 => model_initialize_direct_net_infiltration_gridded
     procedure ( array_method ), pointer  :: init_direct_soil_moisture                                        &
                                                 => model_initialize_direct_soil_moisture_none
+    procedure ( array_method ), pointer  :: update_landuse_codes                                             &
+                                                => model_update_landuse_codes_none
     procedure ( array_method ), pointer  :: init_GDD                                                         &
                                                 => model_initialize_GDD
     procedure ( array_method ), pointer  :: init_AWC                                                         &
@@ -2089,6 +2091,24 @@ contains
     call grid_Destroy( pTempGrd )
 
   end subroutine model_initialize_available_water_content_depth_integrated
+
+  !--------------------------------------------------------------------------------------------------
+
+    subroutine model_update_landuse_codes_none ( this )
+
+      class (MODEL_DOMAIN_T), intent(inout)  :: this
+      !> Nothing here to see.
+
+    end subroutine model_update_landuse_codes_none
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_update_landuse_codes_dynamic ( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    !> Nothing here to see.
+
+  end subroutine model_update_landuse_codes_dynamic
 
 !--------------------------------------------------------------------------------------------------
 
