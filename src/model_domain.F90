@@ -307,7 +307,7 @@ module model_domain
 
   type (GENERAL_GRID_T), pointer            :: pROOTING_DEPTH
 
-  public :: minmaxmean
+  public :: minmaxmean, initialize_landuse_codes, read_landuse_codes
 
 contains
 
@@ -716,6 +716,126 @@ contains
       //asCharacter(size(this%active)), iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_ALL)
 
   end subroutine set_inactive_cells_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine read_landuse_codes
+
+    ! [ LOCALS ]
+    type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
+
+    pLULC => DAT%find("LAND_USE")
+
+    if ( associated(pLULC) ) then
+
+      call pLULC%getvalues()
+      call grid_WriteArcGrid("Landuse_land_cover__as_read_into_SWB.asc", pLULC%pGrdBase )
+
+    else
+
+      call warn(sMessage="LAND_USE dataset is flawed or missing.", lFatal=lTRUE,         &
+        iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"   &
+        //" been ~included in the control file for the LAND_USE dataset.",               &
+        lEcho = lTRUE )
+
+    endif
+
+  end subroutine read_landuse_codes
+
+!--------------------------------------------------------------------------------------------------
+
+  !> Match landuse codes from table with those contained in the gridded landuse.
+  !!
+  !! This routine loops through all known
+
+  subroutine initialize_landuse_codes()
+
+    ! [ LOCALS ]
+    integer (kind=c_int)                 :: iIndex
+    integer (kind=c_int), allocatable    :: iLandUseCodes(:)
+    type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
+    integer (kind=c_int)                 :: iIndex2
+    integer (kind=c_int)                 :: iCount
+    integer (kind=c_int)                 :: iStat
+    logical (kind=c_bool)                :: lMatch
+    type (STRING_LIST_T)                 :: slList
+
+    call slList%append("LU_Code")
+    call slList%append("LU_code")
+    call slList%append("Landuse_Code")
+    call slList%append("LULC_Code")
+
+    !> Determine how many landuse codes are present
+    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCodes, lFatal=TRUE )
+
+    ! obtain a pointer to the LAND_USE grid
+    pLULC => DAT%find("LAND_USE")
+
+    if ( associated(pLULC) ) then
+
+      if (associated( pLULC%pGrdBase) ) then
+        MODEL%landuse_code = pack( pLULC%pGrdBase%iData, MODEL%active )
+      else
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
+      endif
+    else
+      call die("Attempted use of NULL pointer. Failed to find LAND_USE data element.", &
+        __SRCNAME__, __LINE__)
+    endif
+
+    ! setting this to a value that is likely valid; if this is set to a negative value, a landuse
+    ! code that is present in the grid but not in the lookup table will trigger a fatal error, however,
+    ! processing will continue until a bounds error is triggered somewhere else in the code,
+    MODEL%landuse_index = -9999
+    iCount = 0
+
+    ! only run through matching process if we've found a LU_Code entry in the
+    ! parameter dictionary
+    if ( all( iLandUseCodes >= 0 ) ) then
+
+      do iIndex = 1, ubound(MODEL%landuse_code,1)
+
+        lMatch = lFALSE
+
+        do iIndex2=1, ubound(iLandUseCodes, 1)
+
+          if (MODEL%landuse_code(iIndex) == iLandUseCodes(iIndex2) ) then
+            MODEL%landuse_index(iIndex) = iIndex2
+            iCount = iCount + 1
+            lMatch = lTRUE
+            exit
+          endif
+
+        enddo
+
+        if ( .not. lMatch ) then
+          call warn(sMessage="Failed to match landuse code "//asCharacter(MODEL%landuse_code(iIndex) ) &
+            //" with a corresponding landuse code from lookup tables.",                                &
+            sHints="Make sure your lookup table(s) have landuse codes corresponding to all values in " &
+            //"the land-use grid.", lFatal=TRUE, iLogLevel=LOG_ALL, lEcho=TRUE)
+          ! we're setting this value to a valid value. this shouldn't cause problems with any
+          ! calculations because we've already thrown a fatal error
+          MODEL%landuse_index(iIndex) = 1
+        endif
+      enddo
+
+      call LOGS%write("Matches were found between landuse grid value and table value for " &
+        //asCharacter(iCount)//" cells out of a total of "//asCharacter(ubound(MODEL%landuse_code,1))//" active cells.", &
+        iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_ALL)
+
+      call slList%clear()
+
+    endif
+
+    ! if we have more than one cell for which an index value could not be assigned, trigger fatal error
+    if ( count(MODEL%landuse_index < 0) > 0 ) then
+      call warn(asCharacter(count(MODEL%landuse_index < 0))//" landuse codes could not be "        &
+      //" assigned a landuse index value.", lFatal=lTRUE, sHints="Make sure that you have an "        &
+      //"entry in the landuse lookup table for each unique code contained in your landuse grid." )
+    endif
+
+
+  end subroutine initialize_landuse_codes
 
 !--------------------------------------------------------------------------------------------------
 
