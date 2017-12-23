@@ -832,8 +832,8 @@ function write_pretty_date_fn(this)     result(sDateText)
   class(DATETIME_T) :: this
   character (len=10) :: sDateText
 
-  write(sDateText, fmt="(i2.2,'/',i2.2,'/',i4.4)") &
-    this%iMonth, this%iDay, this%iYear
+  write(sDateText, fmt="(i4.4,'-',i2.2,'-',i2.2)") &
+    this%iYear, this%iMonth, this%iDay
 
 end function write_pretty_date_fn
 

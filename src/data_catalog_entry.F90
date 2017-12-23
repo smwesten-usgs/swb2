@@ -27,12 +27,12 @@ module data_catalog_entry
   integer (kind=c_int), parameter, public :: FILE_TEMPLATE_LOWERCASE_MONTHNAME   = 1
   integer (kind=c_int), parameter, public :: FILE_TEMPLATE_UPPERCASE_MONTHNAME   = 2
 
-  integer (kind=c_int), parameter :: CONSTANT_GRID = 0
-  integer (kind=c_int), parameter :: STATIC_GRID = 1
-  integer (kind=c_int), parameter :: STATIC_NETCDF_GRID = 2
-  integer (kind=c_int), parameter :: DYNAMIC_GRID = 3
-  integer (kind=c_int), parameter :: DYNAMIC_NETCDF_GRID = 4
-  integer (kind=c_int), parameter :: NO_GRID = 5
+  integer (kind=c_int), parameter         :: CONSTANT_GRID = 0
+  integer (kind=c_int), parameter         :: STATIC_GRID = 1
+  integer (kind=c_int), parameter         :: STATIC_NETCDF_GRID = 2
+  integer (kind=c_int), public, parameter :: DYNAMIC_GRID = 3
+  integer (kind=c_int), parameter         :: DYNAMIC_NETCDF_GRID = 4
+  integer (kind=c_int), parameter         :: NO_GRID = 5
 
   integer (kind=c_int), parameter :: FILETYPE_ARC_ASCII = 0
   integer (kind=c_int), parameter :: FILETYPE_SURFER = 1

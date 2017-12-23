@@ -723,13 +723,30 @@ contains
 
     ! [ LOCALS ]
     type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
+    character (len=10)                   :: date_str
 
     pLULC => DAT%find("LAND_USE")
 
     if ( associated(pLULC) ) then
 
-      call pLULC%getvalues()
-      call grid_WriteArcGrid("Landuse_land_cover__as_read_into_SWB.asc", pLULC%pGrdBase )
+      if (pLULC%iSourceDataForm == DYNAMIC_GRID) then
+
+        call pLULC%getvalues(iMonth=int(SIM_DT%curr%iMonth, kind=c_int),      &
+                             iDay=int(SIM_DT%curr%iDay, kind=c_int),          &
+                             iYear=SIM_DT%curr%iYear )
+
+        if ( pLULC%lGridHasChanged ) then
+          date_str = SIM_DT%curr%prettydate()
+          call grid_WriteArcGrid("Landuse_land_cover__as_read_into_SWB__"     &
+                                //trim(date_str)//".asc", pLULC%pGrdBase )
+        endif
+
+      else
+
+        call pLULC%getvalues()
+        call grid_WriteArcGrid("Landuse_land_cover__as_read_into_SWB.asc", pLULC%pGrdBase )
+
+      endif
 
     else
 
@@ -2227,6 +2244,9 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     !> Nothing here to see.
+
+    call read_landuse_codes()
+    call initialize_landuse_codes()
 
   end subroutine model_update_landuse_codes_dynamic
 
