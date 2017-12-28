@@ -15,7 +15,7 @@ module model_initialize
                                            minmaxmean,                                   &
                                            initialize_landuse_codes,                     &
                                            read_landuse_codes
-                                           
+
   use output, only                       : initialize_output, set_output_directory,      &
                                            set_output_prefix, set_output_latlon_option
   use parameters
@@ -43,7 +43,7 @@ module model_initialize
   end type METHODS_LIST_T
 
   integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 41
-  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 16
+  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 17
 
   type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS( NUMBER_OF_KNOWN_GRIDS ) =       &
 
@@ -102,6 +102,7 @@ module model_initialize
       METHODS_LIST_T("IRRIGATION             ", lTRUE),                             &
       METHODS_LIST_T("CROP_COEFFICIENT       ", lTRUE),                             &
       METHODS_LIST_T("GROWING_DEGREE_DAY     ", lTRUE),                             &
+      METHODS_LIST_T("DYNAMIC_LANDUSE        ", lTRUE),                             &
       METHODS_LIST_T("DIRECT_NET_INFILTRATION", lTRUE),                             &
       METHODS_LIST_T("DIRECT_SOIL_MOISTURE   ", lTRUE),                             &
       METHODS_LIST_T("FLOW_ROUTING           ", lTRUE),                             &

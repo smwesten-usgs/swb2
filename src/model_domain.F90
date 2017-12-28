@@ -1062,6 +1062,14 @@ contains
 
       endif
 
+    elseif ( sCmdText .containssimilar. "DYNAMIC_LANDUSE" ) then
+
+        this%update_landuse_codes => model_update_landuse_codes_dynamic
+
+    elseif ( sCmdText .containssimilar. "STATIC_LANDUSE" ) then
+
+        this%update_landuse_codes => model_update_landuse_codes_static
+
     elseif ( sCmdText .containssimilar. "SNOWFALL" ) then
 
       if ( ( Method_Name .strapprox. "ORIGINAL" ) .or. ( Method_Name .strapprox. "ORIGINAL_SWB_METHOD" ) ) then
@@ -2231,22 +2239,30 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-    subroutine model_update_landuse_codes_none ( this )
+    subroutine model_update_landuse_codes_static ( this )
 
       class (MODEL_DOMAIN_T), intent(inout)  :: this
       !> Nothing here to see.
 
-    end subroutine model_update_landuse_codes_none
+    end subroutine model_update_landuse_codes_static
 
 !--------------------------------------------------------------------------------------------------
 
   subroutine model_update_landuse_codes_dynamic ( this )
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    !> Nothing here to see.
+    ! [ LOCALS ]
+    type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
 
-    call read_landuse_codes()
-    call initialize_landuse_codes()
+    pLULC => DAT%find("LAND_USE")
+
+    if ( associated(pLULC) ) then
+
+      call read_landuse_codes()
+
+      if ( pLULC%lGridHasChanged )    call initialize_landuse_codes()
+
+    endif
 
   end subroutine model_update_landuse_codes_dynamic
 
