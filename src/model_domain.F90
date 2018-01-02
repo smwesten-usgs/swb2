@@ -229,6 +229,9 @@ module model_domain
 
   contains
 
+    procedure :: model_update_rooting_depth_table_sub
+    procedure :: update_rooting_depth_table => model_update_rooting_depth_table_sub
+
     procedure :: initialize_arrays_sub
     generic   :: initialize_arrays => initialize_arrays_sub
 
@@ -1954,7 +1957,7 @@ contains
 
 
 
-  subroutine model_update_rooting_depth_table(this)
+  subroutine model_update_rooting_depth_table_sub(this)
 
     class (MODEL_DOMAIN_T), intent(inout)       :: this
 
@@ -1975,7 +1978,7 @@ contains
     integer (kind=c_int)              :: iIndex
     type (GENERAL_GRID_T), pointer    :: pRooting_Depth
     real (kind=c_float), allocatable  :: fMax_Rooting_Depth(:,:)
-    character (len=:), allocatable    :: date_str
+    character (len=10)                :: date_str
 
     type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
     type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
@@ -2065,13 +2068,16 @@ contains
 
     call slList%clear()
 
-    call grid_WriteArcGrid("Maximum_rooting_depth__as_assembled_from_table.asc", pRooting_Depth )
+    date_str = SIM_DT%curr%prettydate()
+
+    call grid_WriteArcGrid("Maximum_rooting_depth__as_assembled_from_table__"   &
+      //trim(date_str)//".asc", pRooting_Depth )
 
     ROOTING_DEPTH_MAX = pRooting_Depth%rData
 
     call grid_Destroy( pRooting_Depth )
 
-  end subroutine model_update_rooting_depth_table
+  end subroutine model_update_rooting_depth_table_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -2081,6 +2087,7 @@ contains
 
     ! [ LOCALS ]
     type ( GENERAL_GRID_T ), pointer :: pTempGrd
+    character (len=10)               :: date_str
 
     !> @todo this should be in its own routine...
     this%current_rooting_depth = pack( ROOTING_DEPTH_MAX, MODEL%active )
@@ -2094,7 +2101,10 @@ contains
 
     pTempGrd%rData = unpack( this%soil_storage_max, this%active, this%nodata_fill_value )
 
-    call grid_WriteArcGrid( sFilename="Soil_Storage_Maximum__as_calculated_inches.asc", pGrd=pTempGrd )
+    date_str = SIM_DT%curr%prettydate()
+
+    call grid_WriteArcGrid( sFilename="Soil_Storage_Maximum__as_calculated_inches__" &
+      //trim(date_str)//".asc", pGrd=pTempGrd )
 
     call grid_Destroy( pTempGrd )
 
@@ -2387,6 +2397,10 @@ contains
 
       if ( pLULC%lGridHasChanged ) then
         call initialize_landuse_codes()
+
+        ! update the rooting depths by landuse and hydrologic soil group
+        call this%update_rooting_depth_table()
+        call this%init_soil_storage_max()
 
       endif
 

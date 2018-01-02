@@ -2590,11 +2590,12 @@ subroutine nf_get_time_units(NCFILE)
 
   ! [ LOCALS ]
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
-  character (len=256) :: sDateTime
-  character (len=256) :: sItem
-  integer (kind=c_int) :: iIndex
+  character (len=256)   :: sDateTime
+  character (len=256)   :: sItem
+  integer (kind=c_int)  :: iIndex
   logical (kind=c_bool) :: lFound
-  integer (kind=c_int) :: iStat
+  integer (kind=c_int)  :: iStat
+  real (kind=c_float)   :: fTempVal
 
   call assert(NCFILE%iVarID(NC_TIME) >= 0, "INTERNAL PROGRAMMING ERROR -- " &
     //"nf_get_time_units must be called only after a call is made to ~" &
@@ -2639,7 +2640,10 @@ subroutine nf_get_time_units(NCFILE)
   call chomp(sDateTime, sItem, ":")
   read(sItem, *) NCFILE%iOriginMM
 
-  read(sDateTime, *) NCFILE%iOriginSS
+  ! changed this to a real value, since some data providers encode the date and
+  ! time as YYYY-MM-DD HH-MM-SS.S
+  read(sDateTime, *) fTempVal
+  NCFILE%iOriginSS = int(fTempVal, kind=c_int)
 
 end subroutine nf_get_time_units
 
