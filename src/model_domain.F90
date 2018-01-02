@@ -161,7 +161,7 @@ module model_domain
     procedure ( array_method ), pointer  :: init_direct_soil_moisture                                        &
                                                 => model_initialize_direct_soil_moisture_none
     procedure ( array_method ), pointer  :: update_landuse_codes                                             &
-                                                => model_update_landuse_codes_none
+                                                => model_update_landuse_codes_static
     procedure ( array_method ), pointer  :: init_GDD                                                         &
                                                 => model_initialize_GDD
     procedure ( array_method ), pointer  :: init_AWC                                                         &
@@ -1948,6 +1948,131 @@ contains
 
   end subroutine model_calculate_runoff_gridded_values
 
+
+
+
+
+
+
+  subroutine model_update_rooting_depth_table(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)       :: this
+
+    ! [ LOCALS ]
+    integer (kind=c_int)              :: iNumActiveCells
+    integer (kind=c_int)              :: iStat
+    integer (kind=c_int)              :: iNumberOfLanduses
+    integer (kind=c_int)              :: iNumberOfSoilGroups
+    integer (kind=c_int)              :: iSoilsIndex
+    integer (kind=c_int)              :: iLUIndex
+    integer (kind=c_int), allocatable :: iLanduseCodes(:)
+    type (STRING_LIST_T)              :: slList
+    type (STRING_LIST_T)              :: slRZ
+    integer (kind=c_int), allocatable :: iRZ_SeqNums(:)
+    real (kind=c_float), allocatable  :: RZ(:)
+    character (len=:), allocatable    :: sText
+    real (kind=c_float), allocatable  :: water_capacity(:)
+    integer (kind=c_int)              :: iIndex
+    type (GENERAL_GRID_T), pointer    :: pRooting_Depth
+    real (kind=c_float), allocatable  :: fMax_Rooting_Depth(:,:)
+    character (len=:), allocatable    :: date_str
+
+    type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
+    type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
+
+    pLULC => DAT%find("LAND_USE")
+    pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
+
+    date_str = SIM_DT%curr%prettydate()
+
+    call assert( associated( pLULC), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pLULC", &
+      __SRCNAME__, __LINE__ )
+
+    call assert( associated( pLULC%pGrdBase ),   &
+      "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pLULC%pGrdBase", __SRCNAME__, __LINE__ )
+
+    call assert( allocated( pLULC%pGrdBase%iData ),   &
+      "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pLULC%pGrdBase%iData", __SRCNAME__, __LINE__ )
+
+    call assert( associated( pHSG), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pHSG", &
+      __SRCNAME__, __LINE__ )
+
+    call assert( associated( pHSG%pGrdBase ),      &
+      "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pHSG%pGrdBase", __SRCNAME__, __LINE__ )
+
+    call assert( allocated( pHSG%pGrdBase%iData ),      &
+      "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pHSG%pGrdBase%iData", __SRCNAME__, __LINE__ )
+
+
+    pRooting_Depth => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
+        rX0=this%X_ll, rY0=this%Y_ll, &
+        rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )
+
+    iNumActiveCells = ubound(this%soil_storage_max,1)
+
+    call slList%append("LU_Code")
+    call slList%append("Landuse_Code")
+    call slList%append("Landuse_Lookup_Code")
+
+    !> Determine how many soil groups are present
+
+    ! retrieve a string list of all keys associated with root zone depth (i.e. RZ_1, RZ_2, RZ_3, etc.)
+    slRZ = PARAMS%grep_name("RZ", lFatal=TRUE )
+    ! Convert the string list to an vector of integers; MODEL call strips off the "RZ_" part of label
+    iRZ_SeqNums = slRZ%asInt()
+    ! count how many items are present in the vector; MODEL should equal the number of soils groups
+    iNumberOfSoilGroups = count( iRZ_SeqNums > 0 )
+
+    !> Determine how many landuse codes are present
+    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCodes )
+    iNumberOfLanduses = count( iLanduseCodes >= 0 )
+
+    allocate( fMax_Rooting_Depth(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
+    call assert( iStat == 0, "Failed to allocate memory for maximum rooting depth table", &
+      __SRCNAME__, __LINE__)
+
+    ! we should have the max rooting depth table fully filled out following MODEL block
+    do iSoilsIndex = 1, iNumberOfSoilGroups
+      sText = "RZ_"//asCharacter(iSoilsIndex)
+      call PARAMS%get_parameters( sKey=sText, fValues=RZ )
+      fMax_Rooting_Depth(:, iSoilsIndex) = RZ
+    enddo
+
+    call LOGS%WRITE( "Landuse Code |  Soils Code  | Number of Matches | Rooting Depth (ft)",   &
+      iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+    call LOGS%WRITE( "-------------|--------------|-------------------|------------------ ",   &
+      iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
+    do iSoilsIndex = 1, iNumberOfSoilGroups
+      do iLUIndex = 1, iNumberOfLanduses
+
+        call LOGS%WRITE( asCharacter(iLanduseCodes( iLUIndex) )//" | "//asCharacter(iSoilsIndex)//" | "//    &
+            asCharacter(count( pLULC%pGrdBase%iData == iLanduseCodes( iLUIndex)               &
+                                 .and. pHSG%pGrdBase%iData == iSoilsIndex ) )//" | "          &
+                                 //asCharacter( fMax_Rooting_Depth( iLUIndex, iSoilsIndex) ), &
+                                 iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+
+
+         where ( pLULC%pGrdBase%iData == iLanduseCodes( iLUIndex) .and. pHSG%pGrdBase%iData == iSoilsIndex )
+
+           pRooting_Depth%rData = fMax_Rooting_Depth( iLUIndex, iSoilsIndex )
+
+         endwhere
+
+      enddo
+
+    enddo
+
+    call slList%clear()
+
+    call grid_WriteArcGrid("Maximum_rooting_depth__as_assembled_from_table.asc", pRooting_Depth )
+
+    ROOTING_DEPTH_MAX = pRooting_Depth%rData
+
+    call grid_Destroy( pRooting_Depth )
+
+  end subroutine model_update_rooting_depth_table
+
 !--------------------------------------------------------------------------------------------------
 
   subroutine model_initialize_soil_storage_max_internally_calculated(this)
@@ -2260,7 +2385,10 @@ contains
 
       call read_landuse_codes()
 
-      if ( pLULC%lGridHasChanged )    call initialize_landuse_codes()
+      if ( pLULC%lGridHasChanged ) then
+        call initialize_landuse_codes()
+
+      endif
 
     endif
 
