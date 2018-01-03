@@ -156,6 +156,7 @@ module data_catalog_entry
 
     procedure  :: set_grid_flip_horizontal => set_grid_flip_horizontal_sub
     procedure  :: set_grid_flip_vertical => set_grid_flip_vertical_sub
+    procedure  :: allow_missing_files => set_allow_missing_files_flag_sub
     procedure  :: do_not_allow_netcdf_grid_data_flipping                      &
                      => set_do_not_allow_netcdf_grid_data_flipping_sub
 
@@ -1703,6 +1704,16 @@ end subroutine set_constant_value_real
     this%lFlipVertical = lTRUE
 
   end subroutine set_grid_flip_vertical_sub
+
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine set_allow_missing_files_flag_sub(this)
+
+    class (DATA_CATALOG_ENTRY_T) :: this
+
+    this%lAllowMissingFiles = TRUE
+
+  end subroutine set_allow_missing_files_flag_sub
 
 !--------------------------------------------------------------------------------------------------
 

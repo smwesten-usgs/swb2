@@ -1099,6 +1099,10 @@ contains
 
           call pENTRY%do_not_allow_netcdf_grid_data_flipping()
 
+        elseif ( index( string=sCmdText, substring="ALLOW_MISSING_FILES" ) > 0 ) then
+
+          call pENTRY%allow_missing_files()
+
         elseif ( index( string=sCmdText, substring="NETCDF_MAKE_LOCAL_ARCHIVE" ) > 0 ) then
 
           call pENTRY%set_make_local_archive(lTRUE)
