@@ -216,6 +216,8 @@ module netcdf4_support
 
     real (kind=c_double), allocatable, dimension(:) :: rX_Coords
     real (kind=c_double), allocatable, dimension(:) :: rY_Coords
+    real (kind=c_double)                            :: rX_Coord_AddOffset = 0.0_c_double
+    real (kind=c_double)                            :: rY_Coord_AddOffset = 0.0_c_double
     real (kind=c_double), allocatable, dimension(:) :: rDateTimeValues
     real (kind=c_double) :: rGridCellSizeX
     real (kind=c_double) :: rGridCellSizeY
@@ -287,13 +289,11 @@ end function netcdf_date_within_range
 
 !----------------------------------------------------------------------
 
-!> This was so clear the other day. Basically, I think we need
-!> two functions to convert from index to timeval, and timeval to JD;
+!> We need two functions to convert from index to timeval, and timeval to JD;
 !> note that timeval refers to the number of days from the origin
 !> of the NetCDF file
 
 !> return the day value (number of days since origin
-
 function nf_julian_day_to_index(NCFILE, rJulianDay)  result (iIndex)
 
   type (T_NETCDF4_FILE) :: NCFILE
@@ -304,6 +304,7 @@ function nf_julian_day_to_index(NCFILE, rJulianDay)  result (iIndex)
 
 end function nf_julian_day_to_index
 
+!----------------------------------------------------------------------
 
 function nf_index_to_dayvalue(NCFILE, iIndex)   result(rDayValue)
 
@@ -318,6 +319,7 @@ function nf_index_to_dayvalue(NCFILE, iIndex)   result(rDayValue)
 
 end function nf_index_to_dayvalue
 
+!----------------------------------------------------------------------
 
 function nf_dayvalue_to_julian_day(NCFILE, rDayValue)   result(rJulianDay)
 
@@ -333,6 +335,7 @@ function nf_dayvalue_to_julian_day(NCFILE, rDayValue)   result(rJulianDay)
 
 end function nf_dayvalue_to_julian_day
 
+!----------------------------------------------------------------------
 
 function nf_julian_day_to_index_adj( NCFILE, rJulianDay )  result(iStart)
 
@@ -646,6 +649,7 @@ end subroutine netcdf_open_and_prepare_for_merging
 
 subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
     lFlipHorizontal, lFlipVertical, &
+    rX_Coord_AddOffset, rY_Coord_AddOffset, &
     sVariableOrder, sVarName_x, &
     sVarName_y, sVarName_z, sVarName_time, &
     tGridBounds, iLU)
@@ -655,6 +659,8 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
   logical (kind=c_bool), optional :: lFlipHorizontal
   logical (kind=c_bool), optional :: lFlipVertical
   character (len=*), optional :: sVariableOrder
+  real (kind=c_double), optional    :: rX_Coord_AddOffset
+  real (kind=c_double), optional    :: rY_Coord_AddOffset
   character (len=*), optional :: sVarName_x
   character (len=*), optional :: sVarName_y
   character (len=*), optional :: sVarName_z
@@ -677,6 +683,8 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
 
   if (present(lFlipHorizontal) ) NCFILE%lFlipHorizontal = lFlipHorizontal
   if (present(lFlipVertical) ) NCFILE%lFlipVertical = lFlipVertical
+  if (present(rX_Coord_AddOffset))  NCFILE%rX_Coord_AddOffset = rX_Coord_AddOffset
+  if (present(rY_Coord_AddOffset))  NCFILE%rY_Coord_AddOffset = rY_Coord_AddOffset
 
   if (present(sVariableOrder) )  NCFILE%sVariableOrder = sVariableOrder
 
@@ -742,22 +750,31 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
     !> need all four corner points since it is likely that
     !> the AOI rectangle is rotated relative to the base
     !> projection
+
+print *, trim(__FILE__), ": ", __LINE__
+write(*, fmt="(a)") "      column     row              X              Y"
+write(*, fmt="(a,i6,i6,a,f14.3,f14.3)") "LL: ", iColRow_ll(COLUMN), iColRow_ll(ROW), " <==> ", tGridBounds%rXll, tGridBounds%rYll
+write(*, fmt="(a,i6,i6,a,f14.3,f14.3)") "LR: ", iColRow_lr(COLUMN), iColRow_lr(ROW), " <==> ", tGridBounds%rXlr, tGridBounds%rYlr
+write(*, fmt="(a,i6,i6,a,f14.3,f14.3)") "UL: ", iColRow_ul(COLUMN), iColRow_ul(ROW), " <==> ", tGridBounds%rXul, tGridBounds%rYul
+write(*, fmt="(a,i6,i6,a,f14.3,f14.3)") "UR: ", iColRow_ur(COLUMN), iColRow_ur(ROW), " <==> ", tGridBounds%rXur, tGridBounds%rYur
+
     iColRow_ll = netcdf_coord_to_col_row(NCFILE=NCFILE, &
                                      rX=tGridBounds%rXll, &
                                      rY=tGridBounds%rYll)
-
+print *, trim(__FILE__), ": ", __LINE__
     iColRow_lr = netcdf_coord_to_col_row(NCFILE=NCFILE, &
                                      rX=tGridBounds%rXlr, &
                                      rY=tGridBounds%rYlr)
-
+print *, trim(__FILE__), ": ", __LINE__
     iColRow_ul = netcdf_coord_to_col_row(NCFILE=NCFILE, &
                                      rX=tGridBounds%rXul, &
                                      rY=tGridBounds%rYul)
-
+print *, trim(__FILE__), ": ", __LINE__
     iColRow_ur = netcdf_coord_to_col_row(NCFILE=NCFILE, &
                                      rX=tGridBounds%rXur, &
                                      rY=tGridBounds%rYur)
-#ifdef DEBUG_PRINT
+print *, trim(__FILE__), ": ", __LINE__
+!! #ifdef DEBUG_PRINT
     write(*, fmt="(a,a,i6)") "Find correspondence between project bounds (in native projection) and row, col of dataset |", &
       __SRCNAME__, __LINE__
     write(*, fmt="(a)") "      column     row              X              Y"
@@ -765,7 +782,7 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
     write(*, fmt="(a,i6,i6,a,f14.3,f14.3)") "LR: ", iColRow_lr(COLUMN), iColRow_lr(ROW), " <==> ", tGridBounds%rXlr, tGridBounds%rYlr
     write(*, fmt="(a,i6,i6,a,f14.3,f14.3)") "UL: ", iColRow_ul(COLUMN), iColRow_ul(ROW), " <==> ", tGridBounds%rXul, tGridBounds%rYul
     write(*, fmt="(a,i6,i6,a,f14.3,f14.3)") "UR: ", iColRow_ur(COLUMN), iColRow_ur(ROW), " <==> ", tGridBounds%rXur, tGridBounds%rYur
-#endif
+!! #endif
 
     NCFILE%iColBounds(NC_LEFT) = &
       max( min( iColRow_ul(COLUMN), iColRow_ur(COLUMN), iColRow_ll(COLUMN), iColRow_lr(COLUMN) ) - 4, &
@@ -1269,6 +1286,9 @@ subroutine nf_get_x_and_y(NCFILE)
        iNC_Count=pNC_DIM_y%iNC_DimSize, &
        iNC_Stride=1_c_size_t, &
        dpNC_Vars=NCFILE%rY_Coords)
+
+  NCFILE%rX_Coords = NCFILE%rX_Coords + NCFILE%rX_Coord_AddOffset
+  NCFILE%rY_Coords = NCFILE%rY_Coords + NCFILE%rY_Coord_AddOffset
 
   iLowerBound = lbound(NCFILE%rX_Coords, 1)
   iUpperBound = ubound(NCFILE%rX_Coords, 1)

@@ -73,6 +73,8 @@ module data_catalog_entry
 
     real (kind=c_double)      :: rUserScaleFactor = 1_c_double
     real (kind=c_double)      :: rUserAddOffset = 0_c_double
+    real (kind=c_double)      :: rX_Coord_AddOffset = 0.0_c_double
+    real (kind=c_double)      :: rY_Coord_AddOffset = 0.0_c_double
 
     logical (kind=c_bool)     :: lAllowMissingFiles = lFALSE
     logical (kind=c_bool)     :: lFlipHorizontal = lFALSE
@@ -134,8 +136,10 @@ module data_catalog_entry
 
     procedure  :: initialize_netcdf => initialize_netcdf_data_object_sub
 
-    procedure  :: set_scale => set_scale_sub
-    procedure  :: set_offset => set_offset_sub
+    procedure  :: set_scale    => set_scale_sub
+    procedure  :: set_offset   => set_offset_sub
+    procedure  :: set_X_offset => set_X_coord_offset_sub
+    procedure  :: set_Y_offset => set_Y_coord_offset_sub
 
     procedure  :: set_majority_filter_flag => set_majority_filter_flag_sub
 
@@ -242,6 +246,8 @@ contains
 
   end subroutine set_keyword_sub
 
+!--------------------------------------------------------------------------------------------------
+
   subroutine get_value_int_sub(this, iCol, iRow, iValue)
 
     class (DATA_CATALOG_ENTRY_T), intent(in)  :: this
@@ -261,6 +267,7 @@ contains
 
   end subroutine get_value_int_sub
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine get_value_float_sub(this, iCol, iRow, fValue)
 
@@ -1232,6 +1239,8 @@ end subroutine set_constant_value_real
                   sFilename=this%sSourceFilename, &
                   lFlipHorizontal=this%lFlipHorizontal, &
                   lFlipVertical=this%lFlipVertical, &
+                  rX_Coord_AddOffset = this%rX_Coord_AddOffset, &
+                  rY_Coord_AddOffset = this%rY_Coord_AddOffset, &
                   sVariableOrder=this%sVariableOrder, &
                   sVarName_x=this%sVariableName_x, &
                   sVarName_y=this%sVariableName_y, &
@@ -1245,6 +1254,8 @@ end subroutine set_constant_value_real
                   sFilename=this%sSourceFilename, &
                   lFlipHorizontal=this%lFlipHorizontal, &
                   lFlipVertical=this%lFlipVertical, &
+                  rX_Coord_AddOffset = this%rX_Coord_AddOffset, &
+                  rY_Coord_AddOffset = this%rY_Coord_AddOffset, &
                   sVariableOrder=this%sVariableOrder, &
                   sVarName_x=this%sVariableName_x, &
                   sVarName_y=this%sVariableName_y, &
@@ -1704,7 +1715,7 @@ end subroutine set_scale_sub
 subroutine set_archive_local_sub(this, lValue)
 
    class (DATA_CATALOG_ENTRY_T) :: this
-   logical (kind=c_bool) :: lValue
+   logical (kind=c_bool)        :: lValue
 
    this%lCreateLocalNetCDFArchive = lValue
 
@@ -1712,10 +1723,32 @@ end subroutine set_archive_local_sub
 
 !--------------------------------------------------------------------------------------------------
 
+subroutine set_X_coord_offset_sub(this, rXOffset)
+
+   class (DATA_CATALOG_ENTRY_T) :: this
+   real (kind=c_double)         :: rXOffset
+
+   this%rX_Coord_AddOffset = rXOffset
+
+end subroutine set_X_coord_offset_sub
+
+!----------------------------------------------------------------------
+
+subroutine set_Y_coord_offset_sub(this, rYOffset)
+
+   class (DATA_CATALOG_ENTRY_T) :: this
+   real (kind=c_double)         :: rYOffset
+
+   this%rY_Coord_AddOffset = rYOffset
+
+end subroutine set_Y_coord_offset_sub
+
+!----------------------------------------------------------------------
+
 subroutine set_offset_sub(this, rAddOffset)
 
    class (DATA_CATALOG_ENTRY_T) :: this
-   real (kind=c_float) :: rAddOffset
+   real (kind=c_float)          :: rAddOffset
 
    this%rUserAddOffset = rAddOffset
 
@@ -1737,7 +1770,7 @@ end subroutine set_majority_filter_flag_sub
 subroutine set_missing_value_int_sub(this, iMissingVal)
 
   class (DATA_CATALOG_ENTRY_T) :: this
-  integer (kind=c_int) :: iMissingVal
+  integer (kind=c_int)         :: iMissingVal
 
   this%iMissingValuesCode = iMissingVal
 
@@ -1748,7 +1781,7 @@ end subroutine set_missing_value_int_sub
 subroutine set_missing_value_real_sub(this, rMissingVal)
 
   class (DATA_CATALOG_ENTRY_T) :: this
-  integer (kind=c_int) :: rMissingVal
+  integer (kind=c_int)         :: rMissingVal
 
   this%rMissingValuesCode = rMissingVal
 
@@ -1848,8 +1881,13 @@ end subroutine set_maximum_allowable_value_real_sub
   ! because PROJ4 works in RADIANS if data are unprojected (i.e. GEOGRAPHIC),
   ! we need to convert back to degrees on the assumption that the coordinates
   ! referenced in the file will also be i degrees
-  if( index(string=trim(this%sSourcePROJ4_string), substring="latlon") > 0 &
-      .or. index(string=trim(this%sSourcePROJ4_string), substring="lonlat") > 0 ) then
+!  if( index(string=trim(this%sSourcePROJ4_string), substring="latlon") > 0 &
+!      .or. index(string=trim(this%sSourcePROJ4_string), substring="lonlat") > 0 ) then
+
+  if (      ( this%sSourcePROJ4_string .containssimilar. "latlon" )            &
+       .or. ( this%sSourcePROJ4_string .containssimilar. "latlong" )           &
+       .or. ( this%sSourcePROJ4_string .containssimilar. "lonlat" )            &
+       .or. ( this%sSourcePROJ4_string .containssimilar. "longlat" ) ) then
 
     rX = rad_to_deg(rX)
     rY = rad_to_deg(rY)
@@ -1863,6 +1901,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
 #ifdef DEBUG_PRINT
    print *, " "
+   print *, trim(__FILE__), ": ", __LINE__
    print *, "--  BASE GRID BOUNDS projected to DATA NATIVE COORDS"
    print *, "FROM: ", dquote(pGrdBase%sPROJ4_string)
    print *, "TO:   ", dquote(this%sSourcePROJ4_string)

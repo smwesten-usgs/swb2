@@ -1071,6 +1071,14 @@ contains
 
           pENTRY%sVariableName_z = trim(sArgText_1)
 
+        elseif ( sCmdText .containssimilar. "NETCDF_X_VAR_ADD_OFFSET" ) then
+
+          call pENTRY%set_X_offset( asDouble( sArgText_1 ) )
+
+        elseif ( sCmdText .containssimilar. "NETCDF_Y_VAR_ADD_OFFSET" ) then
+
+          call pENTRY%set_Y_offset( asDouble( sArgText_1 ) )
+
         elseif ( index( string=sCmdText, substring="NETCDF_TIME_VAR" ) > 0 ) then
 
           pENTRY%sVariableName_time = trim(sArgText_1)
