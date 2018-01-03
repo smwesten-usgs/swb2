@@ -77,6 +77,7 @@ module data_catalog_entry
     real (kind=c_double)      :: rY_Coord_AddOffset = 0.0_c_double
 
     logical (kind=c_bool)     :: lAllowMissingFiles = lFALSE
+    logical (kind=c_bool)     :: lAllowAutomaticDataFlipping = TRUE
     logical (kind=c_bool)     :: lFlipHorizontal = lFALSE
     logical (kind=c_bool)     :: lFlipVertical = lFALSE
     logical (kind=c_bool)     :: lUseMajorityFilter = lFALSE
@@ -155,6 +156,8 @@ module data_catalog_entry
 
     procedure  :: set_grid_flip_horizontal => set_grid_flip_horizontal_sub
     procedure  :: set_grid_flip_vertical => set_grid_flip_vertical_sub
+    procedure  :: do_not_allow_netcdf_grid_data_flipping                      &
+                     => set_do_not_allow_netcdf_grid_data_flipping_sub
 
     procedure  :: getvalues_constant => getvalues_constant_sub
     procedure  :: getvalues_gridded => getvalues_gridded_sub
@@ -1239,6 +1242,7 @@ end subroutine set_constant_value_real
                   sFilename=this%sSourceFilename, &
                   lFlipHorizontal=this%lFlipHorizontal, &
                   lFlipVertical=this%lFlipVertical, &
+                  lAllowAutomaticDataFlipping=this%lAllowAutomaticDataFlipping, &
                   rX_Coord_AddOffset = this%rX_Coord_AddOffset, &
                   rY_Coord_AddOffset = this%rY_Coord_AddOffset, &
                   sVariableOrder=this%sVariableOrder, &
@@ -1254,6 +1258,7 @@ end subroutine set_constant_value_real
                   sFilename=this%sSourceFilename, &
                   lFlipHorizontal=this%lFlipHorizontal, &
                   lFlipVertical=this%lFlipVertical, &
+                  lAllowAutomaticDataFlipping=this%lAllowAutomaticDataFlipping, &
                   rX_Coord_AddOffset = this%rX_Coord_AddOffset, &
                   rY_Coord_AddOffset = this%rY_Coord_AddOffset, &
                   sVariableOrder=this%sVariableOrder, &
@@ -1272,6 +1277,7 @@ end subroutine set_constant_value_real
                 sFilename=this%sSourceFilename, &
                 lFlipHorizontal=this%lFlipHorizontal, &
                 lFlipVertical=this%lFlipVertical, &
+                lAllowAutomaticDataFlipping=this%lAllowAutomaticDataFlipping, &
                 sVariableOrder=this%sVariableOrder, &
                 sVarName_x=this%sVariableName_x, &
                 sVarName_y=this%sVariableName_y, &
@@ -1667,6 +1673,16 @@ end subroutine set_constant_value_real
      this%sSourcePROJ4_string = sPROJ4_string
 
   end subroutine set_PROJ4_string_sub
+
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine set_do_not_allow_netcdf_grid_data_flipping_sub(this)
+
+    class (DATA_CATALOG_ENTRY_T) :: this
+
+    this%lAllowAutomaticDataFlipping = FALSE
+
+  end subroutine set_do_not_allow_netcdf_grid_data_flipping_sub
 
 !--------------------------------------------------------------------------------------------------
 

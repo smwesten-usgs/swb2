@@ -64,6 +64,7 @@ module netcdf4_support
   integer(kind=c_int), parameter :: NC_FILL_BYTE    = -127
   integer(kind=c_int), parameter :: NC_FILL_SHORT   = -32767
   integer(kind=c_int), parameter :: NC_FILL_INT     = -2147483647
+  integer(kind=c_int), parameter :: NC_NA_INT       = -9999
 
   real(kind=c_float),  parameter :: NC_FILL_FLOAT   = -9.9e-20_c_float
   real(kind=c_double), parameter :: NC_FILL_DOUBLE  = -9.9e-20_c_double
@@ -143,7 +144,7 @@ module netcdf4_support
 
   type T_NETCDF_DIMENSION
     character (len=64) :: sDimensionName
-    integer (kind=c_int) :: iNC_DimID = -9999
+    integer (kind=c_int) :: iNC_DimID = NC_NA_INT
     integer (kind=c_size_t) :: iNC_DimSize
     logical (kind=c_bool) :: lUnlimited = lFALSE
   end type T_NETCDF_DIMENSION
@@ -161,10 +162,10 @@ module netcdf4_support
 
   type T_NETCDF_VARIABLE
     character (len=64) :: sVariableName
-    integer (kind=c_int) :: iNC_VarID = -9999
+    integer (kind=c_int) :: iNC_VarID = NC_NA_INT
     integer (kind=c_int) :: iNC_VarType
     integer (kind=c_int) :: iNumberOfDimensions
-    integer (kind=c_int), dimension(0:3) :: iNC_DimID = -9999
+    integer (kind=c_int), dimension(0:3) :: iNC_DimID = NC_NA_INT
     integer (kind=c_int) :: iNumberOfAttributes
     type (T_NETCDF_ATTRIBUTE), dimension(:), pointer :: pNC_ATT => null()
   end type T_NETCDF_VARIABLE
@@ -177,9 +178,9 @@ module netcdf4_support
     integer (kind=c_int) :: iNumberOfVariables
     integer (kind=c_int) :: iNumberOfAttributes
     integer (kind=c_int) :: iNC3_UnlimitedDimensionNumber
-    integer (kind=c_int) :: iOriginJD   = -99999
-    integer (kind=c_int) :: iFirstDayJD = -99999
-    integer (kind=c_int) :: iLastDayJD  = -99999
+    integer (kind=c_int) :: iOriginJD   = NC_NA_INT
+    integer (kind=c_int) :: iFirstDayJD = NC_NA_INT
+    integer (kind=c_int) :: iLastDayJD  = NC_NA_INT
     integer (kind=c_int) :: iOriginMonth
     integer (kind=c_int) :: iOriginDay
     integer (kind=c_int) :: iOriginYear
@@ -197,16 +198,17 @@ module netcdf4_support
     character (len=3) :: sVariableOrder = "tyx"
     real (kind=c_double), dimension(0:1) :: rX
     real (kind=c_double), dimension(0:1) :: rY
-    logical (kind=c_bool) :: lX_IncreasesWithIndex = lTRUE
-    logical (kind=c_bool) :: lY_IncreasesWithIndex = lFALSE
+    logical (kind=c_bool)  :: lX_IncreasesWithIndex = lTRUE
+    logical (kind=c_bool)  :: lY_IncreasesWithIndex = lFALSE
+    logical (kind=c_bool)  :: lAllowAutomaticDataFlipping = TRUE
 
     real (kind=c_double), dimension(0:1) :: dpFirstAndLastTimeValues
     character (len=64), dimension(0:3) :: sVarName = ["time","y   ","x   ","z   "]
-    integer (kind=c_int), dimension(0:3) :: iVarID = -9999
-    integer (kind=c_int), dimension(0:3) :: iVarIndex = -9999
-    integer (kind=c_int), dimension(0:3) :: iVarType = -9999
+    integer (kind=c_int), dimension(0:3) :: iVarID = NC_NA_INT
+    integer (kind=c_int), dimension(0:3) :: iVarIndex = NC_NA_INT
+    integer (kind=c_int), dimension(0:3) :: iVarType = NC_NA_INT
     character (len=64), dimension(0:3) :: sVarUnits = "NA"
-    integer (kind=c_int), dimension(0:3, 0:3) :: iVar_DimID = -9999
+    integer (kind=c_int), dimension(0:3, 0:3) :: iVar_DimID = NC_NA_INT
     real (kind=c_double), dimension(0:3) :: rScaleFactor = 1.0_c_double
     real (kind=c_double), dimension(0:3) :: rAddOffset = 0.0_c_double
     integer (kind=c_int), dimension(0:2) :: iRowIter
@@ -223,10 +225,18 @@ module netcdf4_support
     real (kind=c_double) :: rGridCellSizeY
 
     type (T_NETCDF_DIMENSION), dimension(:), pointer :: pNC_DIM => null()
-    type (T_NETCDF_VARIABLE), dimension(:), pointer :: pNC_VAR => null()
+    type (T_NETCDF_VARIABLE), dimension(:), pointer  :: pNC_VAR => null()
     type (T_NETCDF_ATTRIBUTE), dimension(:), pointer :: pNC_ATT => null()
   end type T_NETCDF4_FILE
 
+!
+! For a netCDF file to be read successfully, the reader must have a way to
+! tie coordinate values to index values. By default the code assumes that coordinates
+! decrease while the indices increase (i.e. read the file in as rows from top to bottom).
+!
+! If this is not the case, the data/coordinates must be 'flipped' relative to one another.
+!
+! DEFAULT ASSUMPTION REGARDING VERTICAL COORDINATES
 !
 !                  /\
 !  coordinates     |   |
@@ -238,7 +248,6 @@ module netcdf4_support
 !                  |   |
 !                  |   |
 !                      \/
-!
 !
 
   public :: T_NETCDF_DIMENSION, T_NETCDF_VARIABLE, T_NETCDF_ATTRIBUTE
@@ -648,16 +657,18 @@ end subroutine netcdf_open_and_prepare_for_merging
 !----------------------------------------------------------------------
 
 subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
-    lFlipHorizontal, lFlipVertical, &
-    rX_Coord_AddOffset, rY_Coord_AddOffset, &
-    sVariableOrder, sVarName_x, &
-    sVarName_y, sVarName_z, sVarName_time, &
+    lFlipHorizontal, lFlipVertical,                            &
+    lAllowAutomaticDataFlipping,                               &
+    rX_Coord_AddOffset, rY_Coord_AddOffset,                    &
+    sVariableOrder, sVarName_x,                                &
+    sVarName_y, sVarName_z, sVarName_time,                     &
     tGridBounds, iLU)
 
   type (T_NETCDF4_FILE ) :: NCFILE
   character (len=*) :: sFilename
   logical (kind=c_bool), optional :: lFlipHorizontal
   logical (kind=c_bool), optional :: lFlipVertical
+  logical (kind=c_bool), optional :: lAllowAutomaticDataFlipping
   character (len=*), optional :: sVariableOrder
   real (kind=c_double), optional    :: rX_Coord_AddOffset
   real (kind=c_double), optional    :: rY_Coord_AddOffset
@@ -683,6 +694,8 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
 
   if (present(lFlipHorizontal) ) NCFILE%lFlipHorizontal = lFlipHorizontal
   if (present(lFlipVertical) ) NCFILE%lFlipVertical = lFlipVertical
+  if (present( lAllowAutomaticDataFlipping) )                                 &
+      NCFILE%lAllowAutomaticDataFlipping = lAllowAutomaticDataFlipping
   if (present(rX_Coord_AddOffset))  NCFILE%rX_Coord_AddOffset = rX_Coord_AddOffset
   if (present(rY_Coord_AddOffset))  NCFILE%rY_Coord_AddOffset = rY_Coord_AddOffset
 
@@ -1288,17 +1301,37 @@ subroutine nf_get_x_and_y(NCFILE)
 
   if (NCFILE%rX_Coords(iUpperBound) > NCFILE%rX_Coords(iLowerBound) ) then
     NCFILE%lX_IncreasesWithIndex = lTRUE
+    if ( NCFILE%lAllowAutomaticDataFlipping ) NCFILE%lFlipHorizontal = FALSE
   else
     NCFILE%lX_IncreasesWithIndex = lFALSE
+    if ( NCFILE%lAllowAutomaticDataFlipping ) then
+      NCFILE%lFlipHorizontal       = TRUE
+      call LOGS%write( "** Horizontal coordinates decrease with index values **", &
+                       iLinesBefore=1,                                            &
+                       iLogLevel=LOG_ALL )
+      call LOGS%write( "  ==> flipping grid horizontally",                        &
+                       iLinesAfter=1,                                             &
+                       iLogLevel=LOG_ALL )
+    endif
   endif
 
   iLowerBound = lbound(NCFILE%rY_Coords, 1)
   iUpperBound = ubound(NCFILE%rY_Coords, 1)
 
   if (NCFILE%rY_Coords(iUpperBound) > NCFILE%rY_Coords(iLowerBound) ) then
-    NCFILE%lY_IncreasesWithIndex = lTRUE
+    NCFILE%lY_IncreasesWithIndex = TRUE
+    if ( NCFILE%lAllowAutomaticDataFlipping ) then
+      NCFILE%lFlipVertical         = TRUE
+      call LOGS%write( "** Vertical coordinates increase with index values **", &
+                       iLinesBefore=1,                                          &
+                       iLogLevel=LOG_ALL )
+      call LOGS%write( "  ==> flipping grid vertically",                        &
+                       iLinesAfter=1,                                           &
+                       iLogLevel=LOG_ALL )
+    endif
   else
     NCFILE%lY_IncreasesWithIndex = lFALSE
+    if ( NCFILE%lAllowAutomaticDataFlipping ) NCFILE%lFlipVertical = FALSE
   endif
 
   call assert(pNC_DIM_x%iNC_DimSize > 2, "INTERNAL PROGRAMMING ERROR - " &
@@ -2853,6 +2886,10 @@ function nf_return_index_double(rValues, rTargetValue)  result(iIndex)
     endif
 
   enddo
+
+!  print *, trim(__FILE__), ": ", __LINE__
+!  print *, "index: ", iIndex, "  value: ", rValues(iIndex),           &
+!           "  target value: ", rTargetValue
 
 end function nf_return_index_double
 

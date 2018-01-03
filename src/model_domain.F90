@@ -734,6 +734,8 @@ contains
 
       if (pLULC%iSourceDataForm == DYNAMIC_GRID) then
 
+        MODEL%update_landuse_codes => model_update_landuse_codes_dynamic
+
         call pLULC%getvalues(iMonth=int(SIM_DT%curr%iMonth, kind=c_int),      &
                              iDay=int(SIM_DT%curr%iDay, kind=c_int),          &
                              iYear=SIM_DT%curr%iYear )

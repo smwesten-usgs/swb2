@@ -16,6 +16,10 @@ module grid
   implicit none
 
   private
+
+  integer (kind=c_int), public, parameter :: GRID_NODATA_INT  = -9999
+  real (kind=c_float), public, parameter  :: GRID_NODATA_REAL = -9999.
+
   integer (kind=c_int), public, parameter :: GRID_DATATYPE_INT = 0
   integer (kind=c_int), public, parameter :: GRID_DATATYPE_REAL = 1
 !   integer (kind=c_int), public, parameter :: GRID_DATATYPE_CELL_GRID = 2
@@ -25,8 +29,8 @@ module grid
   integer (kind=c_int), public, parameter :: OUTPUT_ARC = 1
 
   integer (kind=c_int), public, parameter :: GRID_ACTIVE_CELL = 1
-  integer(kind=c_int), parameter :: NC_FILL_INT     = -2147483647
-  real(kind=c_float),  parameter :: NC_FILL_FLOAT   = 9.9692099683868690e+36_c_float
+  integer(kind=c_int), parameter :: NC_FILL_INT     = GRID_NODATA_INT
+  real(kind=c_float),  parameter :: NC_FILL_FLOAT   = GRID_NODATA_REAL
 
   !> interface to C code that provides a simplified entry point to PROJ4
   !> capabilities: it has been modified so that all C pointers are kept within the

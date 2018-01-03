@@ -1095,6 +1095,10 @@ contains
 
           call pENTRY%set_grid_flip_horizontal()
 
+        elseif ( index( string=sCmdText, substring="NETCDF_NO_AUTOMATIC_GRID_FLIPPING" ) > 0 ) then
+
+          call pENTRY%do_not_allow_netcdf_grid_data_flipping()
+
         elseif ( index( string=sCmdText, substring="NETCDF_MAKE_LOCAL_ARCHIVE" ) > 0 ) then
 
           call pENTRY%set_make_local_archive(lTRUE)
