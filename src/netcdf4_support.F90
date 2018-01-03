@@ -751,30 +751,23 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
     !> the AOI rectangle is rotated relative to the base
     !> projection
 
-print *, trim(__FILE__), ": ", __LINE__
-write(*, fmt="(a)") "      column     row              X              Y"
-write(*, fmt="(a,i6,i6,a,f14.3,f14.3)") "LL: ", iColRow_ll(COLUMN), iColRow_ll(ROW), " <==> ", tGridBounds%rXll, tGridBounds%rYll
-write(*, fmt="(a,i6,i6,a,f14.3,f14.3)") "LR: ", iColRow_lr(COLUMN), iColRow_lr(ROW), " <==> ", tGridBounds%rXlr, tGridBounds%rYlr
-write(*, fmt="(a,i6,i6,a,f14.3,f14.3)") "UL: ", iColRow_ul(COLUMN), iColRow_ul(ROW), " <==> ", tGridBounds%rXul, tGridBounds%rYul
-write(*, fmt="(a,i6,i6,a,f14.3,f14.3)") "UR: ", iColRow_ur(COLUMN), iColRow_ur(ROW), " <==> ", tGridBounds%rXur, tGridBounds%rYur
-
     iColRow_ll = netcdf_coord_to_col_row(NCFILE=NCFILE, &
                                      rX=tGridBounds%rXll, &
                                      rY=tGridBounds%rYll)
-print *, trim(__FILE__), ": ", __LINE__
+
     iColRow_lr = netcdf_coord_to_col_row(NCFILE=NCFILE, &
                                      rX=tGridBounds%rXlr, &
                                      rY=tGridBounds%rYlr)
-print *, trim(__FILE__), ": ", __LINE__
+
     iColRow_ul = netcdf_coord_to_col_row(NCFILE=NCFILE, &
                                      rX=tGridBounds%rXul, &
                                      rY=tGridBounds%rYul)
-print *, trim(__FILE__), ": ", __LINE__
+
     iColRow_ur = netcdf_coord_to_col_row(NCFILE=NCFILE, &
                                      rX=tGridBounds%rXur, &
                                      rY=tGridBounds%rYur)
-print *, trim(__FILE__), ": ", __LINE__
-!! #ifdef DEBUG_PRINT
+
+#ifdef DEBUG_PRINT
     write(*, fmt="(a,a,i6)") "Find correspondence between project bounds (in native projection) and row, col of dataset |", &
       __SRCNAME__, __LINE__
     write(*, fmt="(a)") "      column     row              X              Y"
@@ -782,7 +775,7 @@ print *, trim(__FILE__), ": ", __LINE__
     write(*, fmt="(a,i6,i6,a,f14.3,f14.3)") "LR: ", iColRow_lr(COLUMN), iColRow_lr(ROW), " <==> ", tGridBounds%rXlr, tGridBounds%rYlr
     write(*, fmt="(a,i6,i6,a,f14.3,f14.3)") "UL: ", iColRow_ul(COLUMN), iColRow_ul(ROW), " <==> ", tGridBounds%rXul, tGridBounds%rYul
     write(*, fmt="(a,i6,i6,a,f14.3,f14.3)") "UR: ", iColRow_ur(COLUMN), iColRow_ur(ROW), " <==> ", tGridBounds%rXur, tGridBounds%rYur
-!! #endif
+#endif
 
     NCFILE%iColBounds(NC_LEFT) = &
       max( min( iColRow_ul(COLUMN), iColRow_ur(COLUMN), iColRow_ll(COLUMN), iColRow_lr(COLUMN) ) - 4, &

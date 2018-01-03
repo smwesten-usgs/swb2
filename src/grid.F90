@@ -1487,8 +1487,11 @@ subroutine grid_Transform(pGrd, sFromPROJ4, sToPROJ4 )
 
   !> PROJ4 expects unprojected coordinates (i.e. lat lon) to be provided
   !> in RADIANS. Therefore, we convert to radians prior to the call...
-  if( index(string=csFromPROJ4, substring="latlon") > 0 &
-      .or. index(string=csFromPROJ4, substring="lonlat") > 0 ) then
+
+  if (      ( csFromPROJ4 .containssimilar. "latlon" )            &
+       .or. ( csFromPROJ4 .containssimilar. "latlong" )           &
+       .or. ( csFromPROJ4 .containssimilar. "lonlat" )            &
+       .or. ( csFromPROJ4 .containssimilar. "longlat" ) ) then
 
     pGrd%rX = pGrd%rX * DEGREES_TO_RADIANS
     pGrd%rY = pGrd%rY * DEGREES_TO_RADIANS
