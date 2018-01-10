@@ -143,19 +143,19 @@ module netcdf4_support
      "double" ]
 
   type T_NETCDF_DIMENSION
-    character (len=64) :: sDimensionName
-    integer (kind=c_int) :: iNC_DimID = NC_NA_INT
+    character (len=64)      :: sDimensionName
+    integer (kind=c_int)    :: iNC_DimID = NC_NA_INT
     integer (kind=c_size_t) :: iNC_DimSize
-    logical (kind=c_bool) :: lUnlimited = lFALSE
+    logical (kind=c_bool)   :: lUnlimited = lFALSE
   end type T_NETCDF_DIMENSION
 
   type T_NETCDF_ATTRIBUTE
     character (len=64) :: sAttributeName
-    character (len=256), dimension(:), allocatable :: sAttValue
+    character (len=256), dimension(:), allocatable    :: sAttValue
     integer (kind=c_short), dimension(:), allocatable :: i2AttValue
-    integer (kind=c_int), dimension(:), allocatable :: iAttValue
-    real (kind=c_float), dimension(:), allocatable :: rAttValue
-    real (kind=c_double), dimension(:), allocatable :: dpAttValue
+    integer (kind=c_int), dimension(:), allocatable   :: iAttValue
+    real (kind=c_float), dimension(:), allocatable    :: rAttValue
+    real (kind=c_double), dimension(:), allocatable   :: dpAttValue
     integer (kind=c_int) :: iNC_AttType
     integer (kind=c_size_t) :: iNC_AttSize
   end type T_NETCDF_ATTRIBUTE
@@ -172,7 +172,7 @@ module netcdf4_support
 
   type T_NETCDF4_FILE
     integer (kind=c_int) :: iNCID
-    character (len=256) :: sFilename
+    character (len=256)  :: sFilename
     integer (kind=c_int) :: iFileFormat
     integer (kind=c_int) :: iNumberOfDimensions
     integer (kind=c_int) :: iNumberOfVariables
@@ -1937,10 +1937,11 @@ end function netcdf_update_time_starting_index
 
 !----------------------------------------------------------------------
 
-subroutine netcdf_get_variable_slice(NCFILE, rValues, iValues)
+subroutine netcdf_get_variable_slice(NCFILE, rValues, dpValues, iValues)
 
   type (T_NETCDF4_FILE) :: NCFILE
   real (kind=c_float), dimension(:,:), optional :: rValues
+  real (kind=c_double), dimension(:,:), optional :: dpValues
   integer (kind=c_int), dimension(:,:), optional :: iValues
 
   !> @todo expand this to cover more variable types
@@ -1956,6 +1957,10 @@ subroutine netcdf_get_variable_slice(NCFILE, rValues, iValues)
   elseif (NCFILE%iVarType(NC_Z) == NC_FLOAT) then
 
     if (present(rValues) ) call nf_get_variable_slice_float(NCFILE, rValues)
+
+  elseif (NCFILE%iVarType(NC_Z) == NC_DOUBLE) then
+
+    if (present(dpValues) ) call nf_get_variable_slice_double(NCFILE, dpValues)
 
   else
 
@@ -2178,6 +2183,75 @@ subroutine nf_get_variable_slice_float(NCFILE, rValues)
   end select
 
 end subroutine nf_get_variable_slice_float
+
+!----------------------------------------------------------------------
+
+subroutine nf_get_variable_slice_double(NCFILE, dpValues)
+
+  type (T_NETCDF4_FILE) :: NCFILE
+  real (kind=c_double), dimension(:,:) :: dpValues
+
+  ! [ LOCALS ]
+  type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
+  real (kind=c_double), dimension(size(dpValues,2) * size(dpValues,1)) :: dpTemp
+  integer (kind=c_int) :: iStat
+  integer (kind=c_int) :: iRow, iCol, iIndex
+  integer (kind=c_int) :: iFromRow, iToRow, iByRow
+  integer (kind=c_int) :: iFromCol, iToCol, iByCol
+
+  iFromRow = NCFILE%iRowIter(NC_FIRST)
+  iToRow = NCFILE%iRowIter(NC_LAST)
+  iByRow = NCFILE%iRowIter(NC_BY)
+
+  iFromCol = NCFILE%iColIter(NC_FIRST)
+  iToCol = NCFILE%iColIter(NC_LAST)
+  iByCol = NCFILE%iColIter(NC_BY)
+
+  pNC_VAR => NCFILE%pNC_VAR(nf_return_VarIndex( NCFILE, NCFILE%iVarID(NC_Z)) )
+
+  select case (NCFILE%sVariableOrder)
+
+    case ("txy")    ! time, col, row
+
+      call nf_get_variable_array_as_vector_double(NCFILE=NCFILE, &
+        iNC_VarID=NCFILE%iVarID(NC_Z), &
+        iNC_Start=[NCFILE%iStart(NC_TIME), NCFILE%iStart(NC_X), NCFILE%iStart(NC_Y)], &
+        iNC_Count=[NCFILE%iCount(NC_TIME), NCFILE%iCount(NC_X), NCFILE%iCount(NC_Y)], &
+        iNC_Stride=[NCFILE%iStride(NC_TIME), NCFILE%iStride(NC_X), NCFILE%iStride(NC_Y)], &
+        dpNC_Vars=dpTemp)
+
+      iIndex = 0
+      do iCol=iFromCol, iToCol, iByCol
+        do iRow=iFromRow, iToRow, iByRow
+          iIndex = iIndex + 1
+          dpValues(iCol,iRow) = dpTemp(iIndex)
+        enddo
+      enddo
+
+    case ("tyx")    ! time, row, col
+
+      call nf_get_variable_array_as_vector_double(NCFILE=NCFILE, &
+        iNC_VarID=NCFILE%iVarID(NC_Z), &
+        iNC_Start=[NCFILE%iStart(NC_TIME), NCFILE%iStart(NC_Y), NCFILE%iStart(NC_X)], &
+        iNC_Count=[NCFILE%iCount(NC_TIME), NCFILE%iCount(NC_Y), NCFILE%iCount(NC_X)], &
+        iNC_Stride=[NCFILE%iStride(NC_TIME), NCFILE%iStride(NC_Y), NCFILE%iStride(NC_X)], &
+        dpNC_Vars=dpTemp)
+
+      iIndex = 0
+      do iRow=iFromRow, iToRow, iByRow
+        do iCol=iFromCol, iToCol, iByCol
+          iIndex = iIndex + 1
+          dpValues(iCol,iRow) = dpTemp(iIndex)
+        enddo
+      enddo
+
+    case default
+
+      call warn("INTERNAL PROGRAMMING ERROR: Unhandled select case. Program will probably fail.", __SRCNAME__, __LINE__)
+
+  end select
+
+end subroutine nf_get_variable_slice_double
 
 !----------------------------------------------------------------------
 

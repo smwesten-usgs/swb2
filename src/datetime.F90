@@ -42,7 +42,7 @@ module datetime
     procedure  :: isLeapYear => is_leap_year_fn
 
     procedure  :: setTimeFormat => set_time_format_indices
-    procedure  :: setDateFormat => set_Date_format_indices
+    procedure  :: setDateFormat => set_date_format_indices
 
     procedure :: is_date_greater_than
     !> ">" operator for comparing two date objects; see @ref is_date_greater_than for implementation details.
