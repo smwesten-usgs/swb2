@@ -107,13 +107,15 @@ module netcdf4_support
   integer(kind=c_int),  parameter :: NC_UNLIMITED = 0
   integer(kind=c_int),  parameter :: NC_GLOBAL    = -1
 
-  integer (c_int), public, parameter :: NC_TIME    = 0
-  integer (c_int), public, parameter :: NC_Y       = 1
-  integer (c_int), public, parameter :: NC_X       = 2
-  integer (c_int), public, parameter :: NC_Z       = 3
-  integer (c_int), public, parameter :: NC_CRS     = 4
-  integer (c_int), public, parameter :: NC_LAT     = 5
-  integer (c_int), public, parameter :: NC_LON     = 6
+  integer (c_int), public, parameter :: NC_TIME      = 0
+  integer (c_int), public, parameter :: NC_Y         = 1
+  integer (c_int), public, parameter :: NC_X         = 2
+  integer (c_int), public, parameter :: NC_Z         = 3
+  integer (c_int), public, parameter :: NC_AUX       = 3
+  integer (c_int), public, parameter :: NC_CRS       = 4
+  integer (c_int), public, parameter :: NC_LAT       = 5
+  integer (c_int), public, parameter :: NC_LON       = 6
+  integer (c_int), public            :: NC_TIME_BNDS = 7
 
   integer (kind=c_int), parameter :: NC_FIRST = 0
   integer (kind=c_int), parameter :: NC_LAST  = 1
@@ -592,10 +594,40 @@ end function nf_return_DimSize
 
 !--------------------------------------------------------------------------------------------------
 
-subroutine netcdf_open_and_prepare_for_merging( NCFILE, sFilename )
+subroutine nf_guess_z_variable_name(NCFILE)
 
   type (T_NETCDF4_FILE ) :: NCFILE
-  character (len=*) :: sFilename
+
+  ! [ LOCALS ]
+  integer (kind=c_int) :: iIndex
+  integer (kind=c_int) :: iCount
+  type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
+
+  do iIndex=lbound(NCFILE%pNC_VAR,1),ubound(NCFILE%pNC_VAR,1)
+
+    pNC_VAR => NCFILE%pNC_VAR(iIndex)
+
+    if (       ( pNC_VAR%sVariableName .strapprox. 'time')             &
+         .or.  ( pNC_VAR%sVariableName .strapprox. 'x')                &
+         .or.  ( pNC_VAR%sVariableName .strapprox. 'y')                &
+         .or.  ( pNC_VAR%sVariableName .strapprox. 'time_bnds')        &
+         .or.  ( pNC_VAR%sVariableName .strapprox. 'lat')              &
+         .or.  ( pNC_VAR%sVariableName .strapprox. 'lon') )  cycle
+
+    NCFILE%sVarName(NC_Z) = pNC_VAR%sVariableName
+    exit
+
+  enddo
+
+end subroutine nf_guess_z_variable_name
+
+!--------------------------------------------------------------------------------------------------
+
+subroutine netcdf_open_and_prepare_for_merging( NCFILE, sFilename, guess_z_var_name )
+
+  type (T_NETCDF4_FILE ), intent(inout)       :: NCFILE
+  character (len=*), intent(in)               :: sFilename
+  logical (kind=c_bool), intent(in), optional :: guess_z_var_name
 
   ! [ LOCALS ]
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
@@ -604,13 +636,23 @@ subroutine netcdf_open_and_prepare_for_merging( NCFILE, sFilename )
   integer (kind=c_int), dimension(2) :: iColRow_ll, iColRow_ur, iColRow_lr, iColRow_ul
   integer (kind=c_int) :: iColmin, iColmax, iRowmin, iRowmax
   integer (kind=c_int) :: iIndex
+  logical (kind=c_bool) :: guess_z_var_name_
+
+  if (present( guess_z_var_name) ) then
+    guess_z_var_name_ = guess_z_var_name
+  else
+    guess_z_var_name_ = FALSE
+  endif
 
   call nf_open_file(NCFILE=NCFILE, sFilename=sFilename)
 
   call nf_populate_dimension_struct( NCFILE )
+
   call nf_populate_variable_struct( NCFILE )
 
-  call nf_get_variable_id_and_type( NCFILE, strict_asserts=FALSE )
+  if (guess_z_var_name_)  call nf_guess_z_variable_name(NCFILE)
+
+  call nf_get_variable_id_and_type( NCFILE, strict_asserts=TRUE )
 
   ! OK. We only want to attempt to call functions that
   ! process the time variable if a time variable actually exists!!
@@ -619,7 +661,7 @@ subroutine netcdf_open_and_prepare_for_merging( NCFILE, sFilename )
     NCFILE%dpFirstAndLastTimeValues = nf_get_first_and_last(NCFILE=NCFILE, &
         iVarIndex=NCFILE%iVarIndex(NC_TIME) )
 
-    !> look for and process the "days since MM-D-YYYY" attribute
+    !> look for and process the "days since MM-DD-YYYY" attribute
     call nf_get_time_units(NCFILE=NCFILE)
 
     call nf_calculate_time_range(NCFILE)
@@ -934,24 +976,26 @@ end subroutine netcdf_open_and_prepare_as_output_archive
 
 subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUnits,    &
    iNX, iNY, fX, fY, StartDate, EndDate, PROJ4_string, history_list, executable_name,   &
-   dpLat, dpLon, fValidMin, fValidMax )
+   dpLat, dpLon, fValidMin, fValidMax, write_time_bounds, filename_modifier)
 
-  type (T_NETCDF4_FILE ), pointer            :: NCFILE
-  character (len=*), intent(in)              :: sVariableName
-  character (len=*), intent(in)              :: sVariableUnits
-  integer (kind=c_int), intent(in)           :: iNX
-  integer (kind=c_int), intent(in)           :: iNY
-  real (kind=c_double), intent(in)           :: fX(:)
-  real (kind=c_double), intent(in)           :: fY(:)
-  type (DATETIME_T), intent(in)              :: StartDate
-  type (DATETIME_T), intent(in)              :: EndDate
-  character (len=*), intent(in)              :: PROJ4_string
+  type (T_NETCDF4_FILE ), pointer                     :: NCFILE
+  character (len=*), intent(in)                       :: sVariableName
+  character (len=*), intent(in)                       :: sVariableUnits
+  integer (kind=c_int), intent(in)                    :: iNX
+  integer (kind=c_int), intent(in)                    :: iNY
+  real (kind=c_double), intent(in)                    :: fX(:)
+  real (kind=c_double), intent(in)                    :: fY(:)
+  type (DATETIME_T), intent(in)                       :: StartDate
+  type (DATETIME_T), intent(in)                       :: EndDate
+  character (len=*), intent(in)                       :: PROJ4_string
   type (STRING_LIST_T), intent(in), pointer, optional :: history_list
-  character (len=*), intent(in), optional    :: executable_name
-  real (kind=c_double), intent(in), optional :: dpLat(:,:)
-  real (kind=c_double), intent(in), optional :: dpLon(:,:)
-  real (kind=c_float), intent(in), optional  :: fValidMin
-  real (kind=c_float), intent(in), optional  :: fValidMax
+  character (len=*), intent(in), optional             :: executable_name
+  real (kind=c_double), intent(in), optional          :: dpLat(:,:)
+  real (kind=c_double), intent(in), optional          :: dpLon(:,:)
+  real (kind=c_float), intent(in), optional           :: fValidMin
+  real (kind=c_float), intent(in), optional           :: fValidMax
+  logical (kind=c_bool), intent(in), optional         :: write_time_bounds
+  character (len=*), intent(in), optional             :: filename_modifier
 
 !   ! [ LOCALS ]
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
@@ -960,9 +1004,12 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   character (len=10)                                :: sOriginText
   character (len=:), allocatable                    :: sFilename
   type (STRING_LIST_T), pointer                     :: history_list_
+  logical (kind=c_bool)                             :: write_time_bounds_
   character (len=:), allocatable                    :: executable_name_
+  logical (kind=c_bool)                             :: include_latlon
   type (DATETIME_T)                                 :: DT
   character (len=:), allocatable                    :: date_time_text
+  character (len=:), allocatable                    :: filename_modifier_
   call DT%systime()
   date_time_text = DT%prettydatetime()
 
@@ -973,6 +1020,12 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
     executable_name_ = "SWB"
   endif
 
+  if ( present( filename_modifier ) ) then
+    filename_modifier_ = "_"//trim( filename_modifier )//"_"
+  else
+    filename_modifier_ = "_"
+  endif
+
   if ( present( history_list) ) then
     history_list_ => history_list
   else
@@ -980,20 +1033,30 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
     call history_list_%append(date_time_text//": Soil-Water-Balance run started.")
   endif
 
+  if ( present( write_time_bounds ) ) then
+    write_time_bounds_ = write_time_bounds
+  else
+    write_time_bounds_ = FALSE
+  endif
+
+  include_latlon = logical( present( dpLat ) .and. present( dpLon ), kind=c_bool )
+
   call history_list_%set_autocleanup( FALSE )
 
   write(sOriginText, fmt="(i4.4,'-',i2.2,'-',i2.2)") StartDate%iYear, StartDate%iMonth, StartDate%iDay
 
-  sFilename = trim(OUTPUT_DIRECTORY_NAME)//trim(OUTPUT_PREFIX_NAME)//trim(sVariableName)//"_"                    &
-    //trim(asCharacter(StartDate%iYear))//"_"//trim(asCharacter(EndDate%iYear))//"__"//trim(asCharacter(iNY))    &
-    //"_by_"//trim(asCharacter(iNX))//".nc"
+  sFilename = trim(OUTPUT_DIRECTORY_NAME)//trim(OUTPUT_PREFIX_NAME)           &
+    //trim(sVariableName)//"_"//filename_modifier_                            &
+    //StartDate%prettydate()//"_"//EndDate%prettydate()//"__"                 &
+    //trim(asCharacter(iNY))//"_by_"//trim(asCharacter(iNX))//".nc"
 
   call LOGS%write("Attempting to open NetCDF file for writing with filename "//dquote(sFilename))
 
   call nf_create(NCFILE=NCFILE, sFilename=trim(sFilename) )
 
   !> set dimension values in the NCFILE struct
-  call nf_set_standard_dimensions(NCFILE=NCFILE, iNX=iNX, iNY=iNY)
+  call nf_set_standard_dimensions(NCFILE=NCFILE, iNX=iNX, iNY=iNY,            &
+                                  write_time_bounds=write_time_bounds_ )
 
   !> @todo implement more flexible method of assigning units
 !   NCFILE%sVarUnits(NC_X)    = sXY_units
@@ -1004,25 +1067,17 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   call nf_define_dimensions( NCFILE=NCFILE )
 
   !> set variable values in the NCFILE struct
-  call nf_set_standard_variables(NCFILE=NCFILE, sVarName_z = sVariableName,    &
-    lLatLon=logical( present( dpLat ) .and. present( dpLon ), kind=c_bool ) )
+  call nf_set_standard_variables(NCFILE=NCFILE, sVarName_z = sVariableName,   &
+    lLatLon=include_latlon, write_time_bounds=write_time_bounds_ )
 
   !> transfer variable values to NetCDF file
   call nf_define_variables(NCFILE=NCFILE)
 
   call nf_get_variable_id_and_type( NCFILE=NCFILE )
 
-  if (present( dpLat ) .and. present( dpLon ) ) then
-
-    call nf_set_standard_attributes(NCFILE=NCFILE, sOriginText=sOriginText,                    &
-        PROJ4_string=PROJ4_string, lLatLon=lTRUE, fValidMin=fValidMin, fValidMax=fValidMax )
-
-  else
-
-    call nf_set_standard_attributes(NCFILE=NCFILE, sOriginText=sOriginText,                    &
-        PROJ4_string=PROJ4_string, lLatLon=lFALSE, fValidMin=fValidMin, fValidMax=fValidMax )
-
-  endif
+  call nf_set_standard_attributes(NCFILE=NCFILE, sOriginText=sOriginText,     &
+      PROJ4_string=PROJ4_string, lLatLon=include_latlon, fValidMin=fValidMin, &
+      fValidMax=fValidMax, write_time_bounds=write_time_bounds_ )
 
   call nf_set_global_attributes(NCFILE=NCFILE, &
      sDataType=trim(NCFILE%sVarName(NC_Z)), history_list=history_list_, &
@@ -1542,7 +1597,6 @@ subroutine nf_populate_dimension_struct( NCFILE )
   integer (kind=c_int) :: iIndex
   character (len=256) :: sDimName
 
-
   call nf_trap( nc_inq_ndims(ncid=NCFILE%iNCID, ndimsp=NCFILE%iNumberOfDimensions), &
                 __SRCNAME__, __LINE__ )
 
@@ -1939,10 +1993,10 @@ end function netcdf_update_time_starting_index
 
 subroutine netcdf_get_variable_slice(NCFILE, rValues, dpValues, iValues)
 
-  type (T_NETCDF4_FILE) :: NCFILE
-  real (kind=c_float), dimension(:,:), optional :: rValues
-  real (kind=c_double), dimension(:,:), optional :: dpValues
-  integer (kind=c_int), dimension(:,:), optional :: iValues
+  type (T_NETCDF4_FILE), intent(inout)            :: NCFILE
+  real (kind=c_float), dimension(:,:), optional   :: rValues
+  real (kind=c_double), dimension(:,:), optional  :: dpValues
+  integer (kind=c_int), dimension(:,:), optional  :: iValues
 
   !> @todo expand this to cover more variable types
 
@@ -1965,6 +2019,8 @@ subroutine netcdf_get_variable_slice(NCFILE, rValues, dpValues, iValues)
   else
 
     call warn("Failed to find a method to retrieve data of the given type.", __SRCNAME__, __LINE__)
+
+    print *, 'var type: ',NCFILE%iVarType(NC_Z)
 
   endif
 
@@ -3158,18 +3214,32 @@ end subroutine nf_define_dimensions
 
 !----------------------------------------------------------------------
 
-subroutine nf_set_standard_dimensions(NCFILE, iNX, iNY)
+subroutine nf_set_standard_dimensions(NCFILE, iNX, iNY, write_time_bounds )
 
-  type (T_NETCDF4_FILE ) :: NCFILE
-  integer (kind=c_int) :: iNX
-  integer (kind=c_int) :: iNY
+  type (T_NETCDF4_FILE )           :: NCFILE
+  integer (kind=c_int)             :: iNX
+  integer (kind=c_int)             :: iNY
+  logical (kind=c_bool), optional  :: write_time_bounds
 
   ! [ LOCALS ]
-  integer (kind=c_int) :: iStat
+  integer (kind=c_int)   :: iStat
+  logical (kind=c_bool)  :: write_time_bounds_
 
   iStat = 0
 
   NCFILE%iNumberOfDimensions = 3
+
+  if ( present( write_time_bounds ) ) then
+
+    write_time_bounds_ = write_time_bounds
+
+  else
+
+    write_time_bounds_ = FALSE
+
+  endif
+
+  if ( write_time_bounds_ ) NCFILE%iNumberOfDimensions = 4
 
   if (associated(NCFILE%pNC_DIM) ) deallocate(NCFILE%pNC_DIM, stat=iStat)
   call assert(iStat == 0, "Could not deallocate memory for NC_DIM member in NC_FILE defined type", &
@@ -3191,19 +3261,27 @@ subroutine nf_set_standard_dimensions(NCFILE, iNX, iNY)
   NCFILE%pNC_DIM(NC_X)%sDimensionName = "x"
   NCFILE%pNC_DIM(NC_X)%iNC_DimSize = iNX
 
+  if ( write_time_bounds_ ) then
+    !> define the auxiliary dimension;
+    NCFILE%pNC_DIM(NC_AUX)%sDimensionName = "nv"
+    NCFILE%pNC_DIM(NC_AUX)%iNC_DimSize = 2
+  endif
+
 end subroutine nf_set_standard_dimensions
 
 !----------------------------------------------------------------------
 
-subroutine nf_set_standard_variables(NCFILE, sVarName_z, lLatLon)
+subroutine nf_set_standard_variables(NCFILE, sVarName_z, lLatLon, write_time_bounds )
 
   type (T_NETCDF4_FILE )            :: NCFILE
   character (len=*)                 :: sVarName_z
   logical (kind=c_bool), optional   :: lLatLon
+  logical (kind=c_bool), optional   :: write_time_bounds
 
   ! [ LOCALS ]
   integer (kind=c_int) :: iStat
   logical (kind=c_bool) :: lLatLon_
+  logical (kind=c_bool) :: write_time_bounds_
 
   if (present( lLatLon) ) then
     lLatLon_ = lLatLon
@@ -3211,13 +3289,22 @@ subroutine nf_set_standard_variables(NCFILE, sVarName_z, lLatLon)
     lLatLon_ = lFALSE
   endif
 
+  if (present(write_time_bounds) ) then
+    write_time_bounds_ = write_time_bounds
+  else
+    write_time_bounds_ = FALSE
+  endif
+
   iStat = 0
 
-  if ( lLatLon_ ) then
-    NCFILE%iNumberOfVariables = 7
-  else
-    NCFILE%iNumberOfVariables = 5
-  endif
+  NCFILE%iNumberOfVariables = 5
+
+  if ( lLatLon_ ) NCFILE%iNumberOfVariables = 6
+  if ( write_time_bounds_ )  NCFILE%iNumberOfVariables =                       &
+                               NCFILE%iNumberOfVariables + 1
+
+  ! reset the ID for TIME BNDS to the last varid
+  NC_TIME_BNDS = NCFILE%iNumberOfVariables - 1
 
   if (associated(NCFILE%pNC_VAR) ) deallocate(NCFILE%pNC_VAR, stat=iStat)
   call assert(iStat == 0, "Could not deallocate memory for NC_VAR member in NC_FILE defined type", &
@@ -3268,6 +3355,16 @@ subroutine nf_set_standard_variables(NCFILE, sVarName_z, lLatLon)
     NCFILE%pNC_VAR(NC_LON)%iNumberOfDimensions = 2
     NCFILE%pNC_VAR(NC_LON)%iNC_DimID = [NCFILE%pNC_DIM(NC_Y)%iNC_DimID, &
                                         NCFILE%pNC_DIM(NC_X)%iNC_DimID,0,0]
+  endif
+
+  if ( write_time_bounds_ ) then
+
+    NCFILE%pNC_VAR(NC_TIME_BNDS)%sVariableName = "time_bnds"
+    NCFILE%pNC_VAR(NC_TIME_BNDS)%iNC_VarType = NC_DOUBLE
+    NCFILE%pNC_VAR(NC_TIME_BNDS)%iNumberOfDimensions = 1
+    NCFILE%pNC_VAR(NC_TIME_BNDS)%iNC_DimID = [NCFILE%pNC_DIM(NC_TIME)%iNC_DimID,       &
+                                              NCFILE%pNC_DIM(NC_AUX)%iNC_DimID,0,0]
+
   endif
 
 end subroutine nf_set_standard_variables
@@ -3372,7 +3469,8 @@ end subroutine nf_set_global_attributes
 !----------------------------------------------------------------------
 
 subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
-                                      lLatLon, fValidMin, fValidMax )
+                                      lLatLon, fValidMin, fValidMax,        &
+                                      write_time_bounds )
 
   type (T_NETCDF4_FILE )             :: NCFILE
   character (len=*)                  :: sOriginText
@@ -3380,12 +3478,14 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
   logical (kind=c_bool), optional    :: lLatLon
   real (kind=c_float), optional      :: fValidMin
   real (kind=c_float), optional      :: fValidMax
+  logical (kind=c_bool), optional    :: write_time_bounds
 
   ! [ LOCALS ]
   integer (kind=c_int)                             :: iStat
   integer (kind=c_int)                             :: iNumAttributes
   type (T_NETCDF_ATTRIBUTE), dimension(:), pointer :: pNC_ATT
   logical (kind=c_bool)                            :: lLatLon_
+  logical (kind=c_bool)                            :: write_time_bounds_
   type (STRING_LIST_T)                             :: attribute_name_list
   type (STRING_LIST_T)                             :: attribute_value_list
   character (len=:), allocatable                   :: tempstring
@@ -3396,6 +3496,12 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
     lLatLon_ = lLatLon
   else
     lLatLon_ = lFALSE
+  endif
+
+  if ( present( write_time_bounds ) ) then
+    write_time_bounds_ = write_time_bounds
+  else
+    write_time_bounds_ = FALSE
   endif
 
   if (present( PROJ4_string ) ) then
@@ -3412,6 +3518,8 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
 
     pNC_ATT => NCFILE%pNC_VAR(NC_CRS)%pNC_ATT
 
+    ! the following block of code parses the PROJ4 string and rips standard
+    ! CF attributes from the string
     do indx=0, iNumAttributes-2
 
       tempstring = attribute_name_list%get( indx + 1 )
@@ -3469,6 +3577,7 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
 
   !! define attributes associated with TIME variable
   iNumAttributes = 3
+  if ( write_time_bounds_ ) iNumAttributes=4
   allocate( NCFILE%pNC_VAR(NC_TIME)%pNC_ATT(0:iNumAttributes-1), stat=iStat)
   call assert(iStat == 0, "Could not allocate memory for NC_ATT member in NC_VAR struct of NC_FILE", &
     __SRCNAME__, __LINE__)
@@ -3476,28 +3585,31 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
 
   pNC_ATT => NCFILE%pNC_VAR(NC_TIME)%pNC_ATT
 
-  block
+  pNC_ATT(0)%sAttributeName = "units"
+  allocate(pNC_ATT(0)%sAttValue(0:0))
+  pNC_ATT(0)%sAttValue(0) = "days since "//trim(sOriginText)//" 00:00:00"
+  pNC_ATT(0)%iNC_AttType = NC_CHAR
+  pNC_ATT(0)%iNC_AttSize = 1_c_size_t
 
-    pNC_ATT(0)%sAttributeName = "units"
-    allocate(pNC_ATT(0)%sAttValue(0:0))
-    pNC_ATT(0)%sAttValue(0) = "days since "//trim(sOriginText)//" 00:00:00"
-    pNC_ATT(0)%iNC_AttType = NC_CHAR
-    pNC_ATT(0)%iNC_AttSize = 1_c_size_t
+  pNC_ATT(1)%sAttributeName = "calendar"
+  allocate(pNC_ATT(1)%sAttValue(0:0))
+  pNC_ATT(1)%sAttValue(0) = "standard"
+  pNC_ATT(1)%iNC_AttType = NC_CHAR
+  pNC_ATT(1)%iNC_AttSize = 1_c_size_t
 
-    pNC_ATT(1)%sAttributeName = "calendar"
-    allocate(pNC_ATT(1)%sAttValue(0:0))
-    pNC_ATT(1)%sAttValue(0) = "standard"
-    pNC_ATT(1)%iNC_AttType = NC_CHAR
-    pNC_ATT(1)%iNC_AttSize = 1_c_size_t
+  pNC_ATT(2)%sAttributeName = "long_name"
+  allocate(pNC_ATT(2)%sAttValue(0:0))
+  pNC_ATT(2)%sAttValue(0) = "time"
+  pNC_ATT(2)%iNC_AttType = NC_CHAR
+  pNC_ATT(2)%iNC_AttSize = 1_c_size_t
 
-    pNC_ATT(2)%sAttributeName = "long_name"
-    allocate(pNC_ATT(2)%sAttValue(0:0))
-    pNC_ATT(2)%sAttValue(0) = "time"
-    pNC_ATT(2)%iNC_AttType = NC_CHAR
-    pNC_ATT(2)%iNC_AttSize = 1_c_size_t
-
-
-  end block
+  if ( write_time_bounds_ ) then
+    pNC_ATT(3)%sAttributeName = "bounds"
+    allocate(pNC_ATT(3)%sAttValue(0:0))
+    pNC_ATT(3)%sAttValue(0) = "time_bounds"
+    pNC_ATT(3)%iNC_AttType = NC_CHAR
+    pNC_ATT(3)%iNC_AttSize = 1_c_size_t
+  endif
 
   if (present( fValidMin ) .and. present( fValidMax) ) then
 

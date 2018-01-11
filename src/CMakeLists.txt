@@ -265,6 +265,7 @@ set(SRCS_SWBSTATS2
       netcdf4_support.F90
       netcdf_c_api_interfaces.F90
       proj4_support.F90
+      simulation_datetime.F90
       strings.F90
       string_list.F90
       swbstats2.F90
