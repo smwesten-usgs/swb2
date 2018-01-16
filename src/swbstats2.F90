@@ -28,6 +28,8 @@ program swbstats2
   integer (kind=c_int), parameter  :: STATS_MEAN = 2
   integer (kind=c_int), parameter  :: STATS_BOTH = 3
 
+  integer (kind=c_size_t)          :: RECNUM = 0
+
   integer (kind=c_int) :: STATS_OPTION = STATS_SUM
   integer (kind=c_int) :: SLICE_OPTION = SINGLE_SLICE
 
@@ -172,17 +174,11 @@ program swbstats2
       start_date_dbl = real( ncfile_in%iFirstDayJD, kind=c_double )
       end_date_dbl = real( ncfile_in%iLastDayJD, kind=c_double )
 
-      print *, "NETCDF START AND END JD:"
-      print *, "      ",start_date_dbl, end_date_dbl
-
       ! populate datetime data structure
       call data_start_date%setJulianDate(start_date_dbl)
       call data_start_date%calcGregorianDate()
       call data_end_date%setJulianDate(end_date_dbl)
       call data_end_date%calcGregorianDate()
-
-      print *, 'start: ',data_start_date%prettydate()
-      print *, 'end: ',data_end_date%prettydate()
 
     endif
 
@@ -308,6 +304,9 @@ program swbstats2
                                 start_date=slice_start_date,                      &
                                 end_date=slice_end_date)
 
+      ! icky hack; need to advance the record number for the multiple slice calc
+      RECNUM = RECNUM + 1
+
     enddo
 
   endif
@@ -332,21 +331,22 @@ contains
 
     call netcdf_put_variable_vector(NCFILE=ncfile_out,                          &
        iVarID=ncfile_out%iVarID(NC_TIME),                                       &
-       iStart=[0_c_size_t],                                                     &
+       iStart=[ RECNUM ],                                                     &
        iCount=[1_c_size_t],                                                     &
        iStride=[1_c_ptrdiff_t],                                                 &
-       dpValues=[ real( SIM_DT%iNumDaysFromOrigin, kind=c_double) ] )
+       dpValues=[ ( start_bnd + end_bnd ) / 2.0_c_double ] )
+!       dpValues=[ real( SIM_DT%iNumDaysFromOrigin, kind=c_double) ] )
 
     call netcdf_put_variable_vector(NCFILE=ncfile_out,                          &
       iVarID=time_bnds_varid,                                                   &
-      iStart=[0_c_size_t,0_c_size_t],                                           &
+      iStart=[ RECNUM ,0_c_size_t],                                           &
       iCount=[1_c_size_t,2_c_size_t],                                           &
       iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t],                                   &
       dpValues=[ start_bnd, end_bnd ] )
 
     call netcdf_put_variable_array(NCFILE=ncfile_out,                         &
        iVarID=ncfile_out%iVarID(NC_Z),                                        &
-       iStart=[0_c_size_t, 0_c_size_t, 0_c_size_t],                           &
+       iStart=[ RECNUM , 0_c_size_t, 0_c_size_t],                           &
        iCount=[ 1_c_size_t, iNY, iNX ],                                       &
        iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                 &
        rValues=grid_sum%rData )
@@ -384,7 +384,7 @@ contains
     if ( start_date < data_start_date )  start_date = data_start_date
     if ( end_date > data_end_date )      end_date = data_end_date
 
-    call SIM_DT%initialize( start_date, end_date )
+!    call SIM_DT%initialize( start_date, end_date )
 
     grid_sum%rData = 0.0_c_float
 
