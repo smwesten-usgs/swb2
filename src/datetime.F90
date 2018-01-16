@@ -18,6 +18,16 @@ module datetime
 
   public :: gregorian_date, julian_day, isLeap, day_of_year, mmdd2doy
 
+  public :: assignment(=)
+  interface assignment(=)
+    module procedure :: assign_value_to_sub
+  end interface assignment(=)
+
+  public :: operator(>)
+  interface operator(>)
+    module procedure :: is_date_greater_than
+  end interface operator(>)
+
   type, public :: DATETIME_T
 
     integer (kind=c_short)  :: iMonth = 1
@@ -43,10 +53,6 @@ module datetime
 
     procedure  :: setTimeFormat => set_time_format_indices
     procedure  :: setDateFormat => set_date_format_indices
-
-    procedure :: is_date_greater_than
-    !> ">" operator for comparing two date objects; see @ref is_date_greater_than for implementation details.
-    generic   :: operator( > ) => is_date_greater_than
 
     procedure :: is_date_less_than
     !> "<" operator for comparing two date objects
@@ -324,7 +330,8 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
   this%iYear = iYear
   this%iDay = iDay
 
-  this%dJulianDate = this%dJulianDate + julian_day( iMonth=iMonth, iDay=iDay, iYear=iYear )
+!  this%dJulianDate = this%dJulianDate + julian_day( iMonth=iMonth, iDay=iDay, iYear=iYear )
+  this%dJulianDate = julian_day( iMonth=iMonth, iDay=iDay, iYear=iYear )
 
 end subroutine parse_text_to_date_sub
 
@@ -660,10 +667,10 @@ end function julian_day
 
 !------------------------------------------------------------------------------
 
-elemental function is_date_greater_than(date1, date2)   result(lResult)
+ elemental function is_date_greater_than(date1, date2)   result(lResult)
 
-  class(DATETIME_T), intent(in) :: date1
-  class(DATETIME_T), intent(in) :: date2
+  type(DATETIME_T), intent(in) :: date1
+  type(DATETIME_T), intent(in) :: date2
 
   ! [ LOCALS ]
   logical(kind=c_bool ) :: lResult
@@ -758,6 +765,25 @@ elemental function is_date_equal_to(date1, date2)   result(lResult)
   endif
 
 end function is_date_equal_to
+
+!------------------------------------------------------------------------------
+
+subroutine assign_value_to_sub( date2, date1 )
+
+  type(DATETIME_T), intent(out)    :: date2
+  type(DATETIME_T), intent(in)     :: date1
+
+  date2%iMonth = date1%iMonth
+  date2%iDay = date1%iDay
+  date2%iYear = date1%iYear
+  date2%iHour = date1%iHour
+  date2%iMinute = date1%iMinute
+  date2%iSecond = date1%iSecond
+  date2%iWaterYearHigh = date1%iWaterYearHigh
+  date2%iWaterYearLow = date1%iWaterYearLow
+  date2%dJulianDate = date1%dJulianDate
+
+end subroutine assign_value_to_sub
 
 !------------------------------------------------------------------------------
 

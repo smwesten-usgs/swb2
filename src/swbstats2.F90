@@ -3,8 +3,9 @@ program swbstats2
   use iso_c_binding, only             : c_int, c_float, c_double, c_bool,      &
                                         c_size_t, c_ptrdiff_t, c_long
   use constants_and_conversions, only : TRUE, FALSE
+  use file_operations, only           : ASCII_FILE_T
   use data_catalog_entry, only        : DATA_CATALOG_ENTRY_T
-  use datetime, only                  : DATETIME_T
+  use datetime, only                  : DATETIME_T, assignment(=), operator(>)
   use grid
   use netcdf4_support
   use simulation_datetime, only       : SIM_DT
@@ -20,9 +21,20 @@ program swbstats2
 
   implicit none
 
+  integer (kind=c_int), parameter  :: SINGLE_SLICE = 1
+  integer (kind=c_int), parameter  :: MANY_SLICES = 2
+
+  integer (kind=c_int), parameter  :: STATS_SUM  = 1
+  integer (kind=c_int), parameter  :: STATS_MEAN = 2
+  integer (kind=c_int), parameter  :: STATS_BOTH = 3
+
+  integer (kind=c_int) :: STATS_OPTION = STATS_SUM
+  integer (kind=c_int) :: SLICE_OPTION = SINGLE_SLICE
+
   character (len=256)            :: temp_str, temp_str2, temp_str3
   character (len=:), allocatable :: netcdf_filename_str
   character (len=:), allocatable :: statistic_str
+  character (len=:), allocatable :: stress_period_filename_str
   character (len=:), allocatable :: slice_str
   character (len=:), allocatable :: start_date_str
   character (len=:), allocatable :: end_date_str
@@ -49,13 +61,17 @@ program swbstats2
   type (STRING_LIST_T)           :: name_list
   type (STRING_LIST_T)           :: value_list
 
+  type (STRING_LIST_T)           :: start_date_list
+  type (STRING_LIST_T)           :: end_date_list
+  type (STRING_LIST_T)           :: stress_period_id_list
+
   type (T_NETCDF4_FILE), pointer          :: ncfile_in
   type (T_NETCDF4_FILE), pointer          :: ncfile_out
 
   type (DATA_CATALOG_ENTRY_T)    :: input_data_obj
   type (GENERAL_GRID_T), pointer :: pGrdNative
-  type (GENERAL_GRID_T), pointer :: pGrdTemp
-  integer (kind=c_int)           :: julian_day_number
+  type (GENERAL_GRID_T), pointer :: pGrdSum
+  type (GENERAL_GRID_T), pointer :: pGrdMean
   integer (kind=c_size_t)        :: iNX, iNY
 
   allocate( ncfile_in )
@@ -112,6 +128,9 @@ program swbstats2
 
   end if
 
+  call slice_start_date%setDateFormat("YYYY-MM-DD")
+  call slice_end_date%setDateFormat("YYYY-MM-DD")
+
   do iIndex=1, iNumArgs
 
     call GET_COMMAND_ARGUMENT( iIndex, temp_str )
@@ -120,17 +139,24 @@ program swbstats2
 
       statistic_str = right(temp_str, substring="=")
 
+    elseif ( temp_str .containssimilar. "stress_period_file" ) then
+
+      SLICE_OPTION = MANY_SLICES
+      stress_period_filename_str = right(temp_str, substring="=")
+      call read_stress_period_file( csv_filename=stress_period_filename_str,     &
+                                    stress_period_id_list=stress_period_id_list, &
+                                    start_date_list=start_date_list,             &
+                                    end_date_list=end_date_list )
+
     elseif ( temp_str .containssimilar. "slice" ) then
 
       slice_str       = right(temp_str, substring="=")
       start_date_str  = left(slice_str, substring=",")
       end_date_str    = right(slice_str, substring=",")
 
-      call slice_start_date%setDateFormat("YYYY-MM-DD")
       call slice_start_date%parseDate(start_date_str)
       call slice_start_date%calcGregorianDate()
 
-      call slice_end_date%setDateFormat("YYYY-MM-DD")
       call slice_end_date%parseDate(end_date_str)
       call slice_end_date%calcGregorianDate()
 
@@ -146,44 +172,21 @@ program swbstats2
       start_date_dbl = real( ncfile_in%iFirstDayJD, kind=c_double )
       end_date_dbl = real( ncfile_in%iLastDayJD, kind=c_double )
 
+      print *, "NETCDF START AND END JD:"
+      print *, "      ",start_date_dbl, end_date_dbl
+
       ! populate datetime data structure
       call data_start_date%setJulianDate(start_date_dbl)
-      print *, __LINE__
       call data_start_date%calcGregorianDate()
-            print *, __LINE__
       call data_end_date%setJulianDate(end_date_dbl)
-            print *, __LINE__
       call data_end_date%calcGregorianDate()
-            print *, __LINE__
+
+      print *, 'start: ',data_start_date%prettydate()
+      print *, 'end: ',data_end_date%prettydate()
 
     endif
 
   enddo
-
-
-  ! force slice dates to honor bounds of data dates
-  if ( slice_start_date < data_start_date )  slice_start_date = data_start_date
-  if ( slice_end_date > data_end_date ) slice_end_date = data_end_date
-
-  call SIM_DT%initialize( slice_start_date, slice_end_date )
-
-
-  print *, "filename:   ", netcdf_filename_str
-  print *, "slice:      ", slice_str
-  print *, "model_start_date: ", data_start_date%prettydate()
-  print *, "model_end_date:   ", data_end_date%prettydate()
-  print *, "slice_start_date: ", slice_start_date%prettydate()
-  print *, "slice_end_date:   ", slice_end_date%prettydate()
-  print *, "statistic:  ", statistic_str
-
-  call netcdf_dump_cdl( ncfile_in, OUTPUT_UNIT )
-
-  print *, ncfile_in%rX(NC_LEFT)
-  print *, ncfile_in%rY(NC_BOTTOM)
-  print *, ncfile_in%rGridCellSizeX, ncfile_in%rGridCellSizeY
-
-  print *, ncfile_in%iFirstDayJD, ncfile_in%iLastDayJD
-
 
   call netcdf_get_attribute_list_for_variable( NCFILE=ncfile_in,              &
                                                variable_name="crs",  &
@@ -196,11 +199,6 @@ program swbstats2
 
   temp_str2 = trim(ncfile_in%pNC_VAR(NC_Z)%sVariableName)
 
-  ! need to set the variable name so that the netCDF routine can process
-  ! the file correctly
-  !ncfile_in%sVarName(NC_Z) = trim(temp_str2)
-  !ncfile_in%iVarType(NC_Z) = NC_FLOAT
-
   call netcdf_get_attribute_list_for_variable( NCFILE=ncfile_in,                &
                                                variable_name=temp_str2,         &
                                                attribute_name_list=name_list,   &
@@ -210,24 +208,44 @@ program swbstats2
   iIndex_array = name_list%which("units")
   temp_str3 = value_list%get( iIndex_array(1) )
 
-
-  pGrdNative => grid_Create ( iNX=ncfile_in%iNX, &
-            iNY=ncfile_in%iNY, &
-            rX0=ncfile_in%rX(NC_LEFT), &
-            rY0=ncfile_in%rY(NC_BOTTOM), &
-            rX1=ncfile_in%rX(NC_RIGHT), &
-            rY1=ncfile_in%rY(NC_TOP), &
+  ! create some working grids to hold raw and summed values
+  pGrdNative => grid_Create ( iNX=ncfile_in%iNX,           &
+            iNY=ncfile_in%iNY,                             &
+            rX0=ncfile_in%rX(NC_LEFT),                     &
+            rY0=ncfile_in%rY(NC_BOTTOM),                   &
+            rX1=ncfile_in%rX(NC_RIGHT),                    &
+            rY1=ncfile_in%rY(NC_TOP),                      &
             iDataType=GRID_DATATYPE_REAL )
 
-  pGrdTemp => grid_Create ( iNX=ncfile_in%iNX, &
-            iNY=ncfile_in%iNY, &
-            rX0=ncfile_in%rX(NC_LEFT), &
-            rY0=ncfile_in%rY(NC_BOTTOM), &
-            rX1=ncfile_in%rX(NC_RIGHT), &
-            rY1=ncfile_in%rY(NC_TOP), &
+  pGrdSum => grid_Create ( iNX=ncfile_in%iNX,              &
+            iNY=ncfile_in%iNY,                             &
+            rX0=ncfile_in%rX(NC_LEFT),                     &
+            rY0=ncfile_in%rY(NC_BOTTOM),                   &
+            rX1=ncfile_in%rX(NC_RIGHT),                    &
+            rY1=ncfile_in%rY(NC_TOP),                      &
             iDataType=GRID_DATATYPE_REAL )
 
-  pGrdTemp%rData = 0.0_c_float
+  pGrdMean => grid_Create ( iNX=ncfile_in%iNX,             &
+            iNY=ncfile_in%iNY,                             &
+            rX0=ncfile_in%rX(NC_LEFT),                     &
+            rY0=ncfile_in%rY(NC_BOTTOM),                   &
+            rX1=ncfile_in%rX(NC_RIGHT),                    &
+            rY1=ncfile_in%rY(NC_TOP),                      &
+            iDataType=GRID_DATATYPE_REAL )
+
+  iNX = int( size(pGrdMean%rData, 1), kind=c_size_t)
+  iNY = int( size(pGrdMean%rData, 2), kind=c_size_t)
+
+  if ( SLICE_OPTION == SINGLE_SLICE ) then
+    ! force slice dates to honor bounds of data dates
+    if ( slice_start_date < data_start_date )  slice_start_date = data_start_date
+    if ( slice_end_date > data_end_date ) slice_end_date = data_end_date
+
+    call SIM_DT%initialize( slice_start_date, slice_end_date )
+
+  else
+    call SIM_DT%initialize( data_start_date, data_end_date )
+  endif
 
   call netcdf_open_and_prepare_as_output(                                     &
         NCFILE=ncfile_out,                                                    &
@@ -249,51 +267,199 @@ program swbstats2
   !       !        fValidMin=OUTSPECS( iIndex )%valid_minimum,                              &
   !       !        fValidMax=OUTSPECS( iIndex )%valid_maximum,                         &
 
-  do
-
-    print *, SIM_DT%curr%prettydate()
-
-    call SIM_DT%addDay
-    if ( SIM_DT%curr > slice_end_date )  exit
-    julian_day_number = int( SIM_DT%curr%dJulianDate, kind=c_int)
-
-    if ( netcdf_update_time_starting_index(ncfile_in, julian_day_number ) )   then
-      call netcdf_get_variable_slice(NCFILE=ncfile_in, rValues=pGrdNative%rData )
-    endif
-
-    pGrdTemp%rData = pGrdTemp%rData + pGrdNative%rData
-
-  end do
-
-  call netcdf_put_variable_vector(NCFILE=ncfile_out,                          &
-     iVarID=ncfile_out%iVarID(NC_TIME),                                       &
-     iStart=[0_c_size_t],                                                     &
-     iCount=[1_c_size_t],                                                     &
-     iStride=[1_c_ptrdiff_t],                                                 &
-     dpValues=[ 0.0_c_double ] )
-
   call netcdf_get_variable_id_for_variable( NCFILE=ncfile_out,                &
                                             variable_name="time_bnds",        &
                                             variable_id=time_bnds_varid      )
 
-  call netcdf_put_variable_vector(NCFILE=ncfile_out,                          &
-    iVarID=time_bnds_varid,                                                   &
-    iStart=[0_c_size_t,0_c_size_t],                                           &
-    iCount=[1_c_size_t,2_c_size_t],                                           &
-    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t],                                   &
-    dpValues=[ 0.0_c_double, real( SIM_DT%iNumDaysFromOrigin, kind=c_double) ] )
+  if ( SLICE_OPTION == SINGLE_SLICE ) then
+
+    call iterate_over_slice(grid_sum=pGrdSum, grid_mean=pGrdMean,               &
+                            start_date=slice_start_date,                        &
+                            end_date=slice_end_date)
 
 
-  iNX = int( size(pGrdTemp%rData, 1), kind=c_size_t)
-  iNY = int( size(pGrdTemp%rData, 2), kind=c_size_t)
+    call write_stats_to_files(grid_sum=pGrdSum, grid_mean=pGrdMean,             &
+                              start_date=slice_start_date,                      &
+                              end_date=slice_end_date)
 
-  call netcdf_put_variable_array(NCFILE=ncfile_out,                           &
-     iVarID=ncfile_out%iVarID(NC_Z),                                          &
-     iStart=[0_c_size_t, 0_c_size_t, 0_c_size_t],                             &
-     iCount=[ 1_c_size_t, iNY, iNX ],                                         &
-     iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                   &
-     rValues=pGrdTemp%rData )
+  elseif ( SLICE_OPTION == MANY_SLICES ) then
+
+    do iIndex=1, stress_period_id_list%count
+
+      start_date_str = start_date_list%get( iIndex )
+      end_date_str = end_date_list%get( iIndex )
+
+      call slice_start_date%setDateFormat("YYYY-MM-DD")
+      call slice_end_date%setDateFormat("YYYY-MM-DD")
+
+      call slice_start_date%parseDate( start_date_str )
+      call slice_end_date%parseDate( end_date_str )
+
+
+      print *, ""
+      print *, "Processing slice: ", slice_start_date%prettydate(), " to ", slice_end_date%prettydate()
+      print *, repeat("-", 70)
+
+      call iterate_over_slice(grid_sum=pGrdSum, grid_mean=pGrdMean,               &
+                              start_date=slice_start_date,                        &
+                              end_date=slice_end_date)
+
+      call write_stats_to_files(grid_sum=pGrdSum, grid_mean=pGrdMean,             &
+                                start_date=slice_start_date,                      &
+                                end_date=slice_end_date)
+
+    enddo
+
+  endif
 
   call netcdf_close_file(NCFILE=ncfile_out)
+
+contains
+
+  subroutine write_stats_to_files( grid_sum, grid_mean, start_date, end_date )
+
+    type (GENERAL_GRID_T), pointer          :: grid_sum
+    type (GENERAL_GRID_T), pointer          :: grid_mean
+    type (DATETIME_T), intent(inout)        :: start_date
+    type (DATETIME_T), intent(inout)        :: end_date
+
+    ! [ LOCALS ]
+    real (kind=c_double) :: start_bnd
+    real (kind=c_double) :: end_bnd
+
+    start_bnd = SIM_DT%days_from_origin( start_date )
+    end_bnd   = SIM_DT%days_from_origin( end_date )
+
+    call netcdf_put_variable_vector(NCFILE=ncfile_out,                          &
+       iVarID=ncfile_out%iVarID(NC_TIME),                                       &
+       iStart=[0_c_size_t],                                                     &
+       iCount=[1_c_size_t],                                                     &
+       iStride=[1_c_ptrdiff_t],                                                 &
+       dpValues=[ real( SIM_DT%iNumDaysFromOrigin, kind=c_double) ] )
+
+    call netcdf_put_variable_vector(NCFILE=ncfile_out,                          &
+      iVarID=time_bnds_varid,                                                   &
+      iStart=[0_c_size_t,0_c_size_t],                                           &
+      iCount=[1_c_size_t,2_c_size_t],                                           &
+      iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t],                                   &
+      dpValues=[ start_bnd, end_bnd ] )
+
+    call netcdf_put_variable_array(NCFILE=ncfile_out,                         &
+       iVarID=ncfile_out%iVarID(NC_Z),                                        &
+       iStart=[0_c_size_t, 0_c_size_t, 0_c_size_t],                           &
+       iCount=[ 1_c_size_t, iNY, iNX ],                                       &
+       iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                 &
+       rValues=grid_sum%rData )
+
+  end subroutine write_stats_to_files
+
+!------------------------------------------------------------------------------
+
+  subroutine iterate_over_slices( grid_sum, grid_mean, stress_period_id_list, &
+                                  start_date_list, end_date_list )
+
+    type (GENERAL_GRID_T), pointer          :: grid_sum
+    type (GENERAL_GRID_T), pointer          :: grid_mean
+    type (STRING_LIST_T), intent(in)        :: stress_period_id_list
+    type (STRING_LIST_T), intent(in)        :: start_date_list
+    type (STRING_LIST_T), intent(in)        :: end_date_list
+
+
+
+
+
+  end subroutine iterate_over_slices
+
+  subroutine iterate_over_slice( grid_sum, grid_mean, start_date, end_date )
+
+    type (GENERAL_GRID_T), pointer          :: grid_sum
+    type (GENERAL_GRID_T), pointer          :: grid_mean
+    type (DATETIME_T), intent(inout)        :: start_date
+    type (DATETIME_T), intent(inout)        :: end_date
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: julian_day_number
+
+    ! force slice dates to honor bounds of data dates
+    if ( start_date < data_start_date )  start_date = data_start_date
+    if ( end_date > data_end_date )      end_date = data_end_date
+
+    call SIM_DT%initialize( start_date, end_date )
+
+    grid_sum%rData = 0.0_c_float
+
+    do
+
+      call SIM_DT%addDay
+      if ( SIM_DT%curr > end_date )  exit
+      julian_day_number = int( SIM_DT%curr%dJulianDate, kind=c_int)
+
+      if ( netcdf_update_time_starting_index(ncfile_in, julian_day_number ) )   then
+        call netcdf_get_variable_slice(NCFILE=ncfile_in, rValues=pGrdNative%rData )
+      endif
+
+      where ( pGrdNative%rData > NC_FILL_FLOAT )
+        grid_sum%rData = grid_sum%rData + pGrdNative%rData
+      end where
+
+    end do
+
+    grid_mean%rData = grid_sum%rData / ( end_date - start_date + 1.0_c_double)
+
+    where ( pGrdNative%rData <= NC_FILL_FLOAT )
+      grid_mean%rData = NC_FILL_FLOAT
+      grid_sum%rData = NC_FILL_FLOAT
+    end where
+
+  end subroutine iterate_over_slice
+
+!------------------------------------------------------------------------------
+
+  subroutine read_stress_period_file( csv_filename,                           &
+                                      stress_period_id_list,                  &
+                                      start_date_list,                        &
+                                      end_date_list )
+
+    character (len=*), intent(inout)   :: csv_filename
+    type (STRING_LIST_T), intent(out)  :: stress_period_id_list
+    type (STRING_LIST_T), intent(out)  :: start_date_list
+    type (STRING_LIST_T), intent(out)  :: end_date_list
+
+    ! [ LOCALS ]
+    integer (kind=c_int)           :: iFileIndex, iColIndex
+    integer (kind=c_int)           :: iStat
+    type (ASCII_FILE_T)            :: DF
+    character (len=256)            :: sRecord, sItem
+
+   ! open the file associated with current file index value
+    call DF%open(sFilename = csv_filename,                               &
+                 sDelimiters=",",                                        &
+                 sCommentChars = "%#!",                                  &
+                 lHasHeader=TRUE         )
+
+    ! read in and throw away header of file
+    sRecord = DF%readLine()
+
+    ! now read in the remainder of the file
+    do while ( .not. DF%isEOF() )
+
+      ! read in next line of file
+      sRecord = DF%readLine()
+
+      ! skip blank lines
+      if ( len_trim(sRecord) == 0 ) cycle
+
+      call chomp( sRecord, sItem, sDelimiters="," )
+      call stress_period_id_list%append( sItem )
+
+      call chomp( sRecord, sItem, sDelimiters="," )
+      call start_date_list%append( sItem )
+      call end_date_list%append( sRecord )
+
+    enddo
+
+    call DF%close()
+
+  end subroutine read_stress_period_file
 
 end program swbstats2

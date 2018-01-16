@@ -3361,7 +3361,7 @@ subroutine nf_set_standard_variables(NCFILE, sVarName_z, lLatLon, write_time_bou
 
     NCFILE%pNC_VAR(NC_TIME_BNDS)%sVariableName = "time_bnds"
     NCFILE%pNC_VAR(NC_TIME_BNDS)%iNC_VarType = NC_DOUBLE
-    NCFILE%pNC_VAR(NC_TIME_BNDS)%iNumberOfDimensions = 1
+    NCFILE%pNC_VAR(NC_TIME_BNDS)%iNumberOfDimensions = 2
     NCFILE%pNC_VAR(NC_TIME_BNDS)%iNC_DimID = [NCFILE%pNC_DIM(NC_TIME)%iNC_DimID,       &
                                               NCFILE%pNC_DIM(NC_AUX)%iNC_DimID,0,0]
 

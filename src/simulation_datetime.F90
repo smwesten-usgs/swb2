@@ -22,6 +22,9 @@ module simulation_datetime
     procedure :: initialize_datetimes_sub
     generic   :: initialize => initialize_datetimes_sub
 
+    procedure :: days_from_origin_fn
+    generic   :: days_from_origin => days_from_origin_fn
+
     procedure :: increment_by_one_day_sub
     generic   :: addDay => increment_by_one_day_sub
 
@@ -36,23 +39,33 @@ contains
   subroutine initialize_datetimes_sub( this, start_date, end_date )
 
     class (DATE_RANGE_T), intent(inout)   :: this
-    type (DATETIME_T), intent(in)         :: start_date
-    type (DATETIME_T), intent(in)         :: end_date
+    type (DATETIME_T), intent(inout)         :: start_date
+    type (DATETIME_T), intent(inout)         :: end_date
 
-    SIM_DT%start = start_date
-    SIM_DT%end = end_date
-    SIM_DT%curr = start_date
+    this%start = start_date
+    this%end = end_date
+    this%curr = start_date
 
   end subroutine initialize_datetimes_sub
 
 !------------------------------------------------------------------------------
+
+  function days_from_origin_fn(this, datetime )    result( num_days_from_origin )
+
+    class (DATE_RANGE_T), intent(inout)   :: this
+    type (DATETIME_T), intent(in)         :: datetime
+    real (kind=c_double)                  :: num_days_from_origin
+
+    num_days_from_origin = real( datetime - this%start, kind=c_double)
+
+  end function days_from_origin_fn
 
   function percent_complete_fn( this )   result( percent_complete )
 
     class (DATE_RANGE_T), intent(inout)   :: this
     real (kind=c_float)                   :: percent_complete
 
-    percent_complete = real(this%curr - this%start) / real( this%end - this%start + 1) * 100.
+    percent_complete = real(this%curr - this%start) / real( this%end - this%start ) * 100.
 
   end function percent_complete_fn
 
