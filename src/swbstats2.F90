@@ -40,6 +40,11 @@ program swbstats2
   character (len=:), allocatable :: slice_str
   character (len=:), allocatable :: start_date_str
   character (len=:), allocatable :: end_date_str
+  character (len=:), allocatable :: stress_period_str
+  character (len=:), allocatable :: nc_variable_name_str
+  character (len=:), allocatable :: nx_str
+  character (len=:), allocatable :: ny_str
+
   integer (kind=c_int)           :: iNumArgs
   character (len=1024)           :: sCompilerFlags
   character (len=256)            :: sCompilerVersion
@@ -243,9 +248,11 @@ program swbstats2
     call SIM_DT%initialize( data_start_date, data_end_date )
   endif
 
+  nc_variable_name_str = trim(ncfile_in%pNC_VAR(NC_Z)%sVariableName)
+
   call netcdf_open_and_prepare_as_output(                                     &
         NCFILE=ncfile_out,                                                    &
-        sVariableName=trim(ncfile_in%pNC_VAR(NC_Z)%sVariableName),            &
+        sVariableName=trim(nc_variable_name_str),                             &
         sVariableUnits=trim(temp_str3),                                       &
         iNX=ncfile_in%iNX,                                                    &
         iNY=ncfile_in%iNY,                                                    &
@@ -269,14 +276,18 @@ program swbstats2
 
   if ( SLICE_OPTION == SINGLE_SLICE ) then
 
-    call iterate_over_slice(grid_sum=pGrdSum, grid_mean=pGrdMean,               &
-                            start_date=slice_start_date,                        &
+    call iterate_over_slice(grid_sum=pGrdSum, grid_mean=pGrdMean,             &
+                            start_date=slice_start_date,                      &
                             end_date=slice_end_date)
 
 
-    call write_stats_to_files(grid_sum=pGrdSum, grid_mean=pGrdMean,             &
-                              start_date=slice_start_date,                      &
+    call write_stats_to_files(grid_sum=pGrdSum, grid_mean=pGrdMean,           &
+                              start_date=slice_start_date,                    &
                               end_date=slice_end_date)
+
+    call write_stats_to_arcgrid(grid_sum=pGrdSum, grid_mean=pGrdMean,         &
+                                start_date=slice_start_date,                  &
+                                end_date=slice_end_date )
 
   elseif ( SLICE_OPTION == MANY_SLICES ) then
 
@@ -284,6 +295,7 @@ program swbstats2
 
       start_date_str = start_date_list%get( iIndex )
       end_date_str = end_date_list%get( iIndex )
+      stress_period_str = stress_period_id_list%get( iIndex )
 
       call slice_start_date%setDateFormat("YYYY-MM-DD")
       call slice_end_date%setDateFormat("YYYY-MM-DD")
@@ -296,13 +308,18 @@ program swbstats2
       print *, "Processing slice: ", slice_start_date%prettydate(), " to ", slice_end_date%prettydate()
       print *, repeat("-", 70)
 
-      call iterate_over_slice(grid_sum=pGrdSum, grid_mean=pGrdMean,               &
-                              start_date=slice_start_date,                        &
+      call iterate_over_slice(grid_sum=pGrdSum, grid_mean=pGrdMean,           &
+                              start_date=slice_start_date,                    &
                               end_date=slice_end_date)
 
-      call write_stats_to_files(grid_sum=pGrdSum, grid_mean=pGrdMean,             &
-                                start_date=slice_start_date,                      &
+      call write_stats_to_files(grid_sum=pGrdSum, grid_mean=pGrdMean,         &
+                                start_date=slice_start_date,                  &
                                 end_date=slice_end_date)
+
+      call write_stats_to_arcgrid(grid_sum=pGrdSum, grid_mean=pGrdMean,       &
+                                  start_date=slice_start_date,                &
+                                  end_date=slice_end_date,                    &
+                                  stress_period=stress_period_str)
 
       ! icky hack; need to advance the record number for the multiple slice calc
       RECNUM = RECNUM + 1
@@ -349,26 +366,64 @@ contains
        iStart=[ RECNUM , 0_c_size_t, 0_c_size_t],                           &
        iCount=[ 1_c_size_t, iNY, iNX ],                                       &
        iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                 &
-       rValues=grid_sum%rData )
+       rValues=grid_mean%rData )
 
   end subroutine write_stats_to_files
 
-!------------------------------------------------------------------------------
 
-  subroutine iterate_over_slices( grid_sum, grid_mean, stress_period_id_list, &
-                                  start_date_list, end_date_list )
+
+
+
+  subroutine write_stats_to_arcgrid( grid_sum, grid_mean, start_date,         &
+                                     end_date, stress_period )
 
     type (GENERAL_GRID_T), pointer          :: grid_sum
     type (GENERAL_GRID_T), pointer          :: grid_mean
-    type (STRING_LIST_T), intent(in)        :: stress_period_id_list
-    type (STRING_LIST_T), intent(in)        :: start_date_list
-    type (STRING_LIST_T), intent(in)        :: end_date_list
+    type (DATETIME_T), intent(inout)        :: start_date
+    type (DATETIME_T), intent(inout)        :: end_date
+    character (len=*), intent(in), optional :: stress_period
 
+    ! [ LOCALS ]
+    character (len=:), allocatable  :: filename
 
+    if ( present(stress_period) ) then
+      !@todo: change filename depending on the desired output statistic
+      filename = trim(stress_period_str)//"__"//trim(nc_variable_name_str)      &
+                 //"__"//start_date%prettydate()//"_to_"//end_date%prettydate() &
+                 //"__"//asCharacter(iNX)//"_by_"//asCharacter(iNY)             &
+                 //"__MEAN_ANNUAL.asc"
+    else
+      filename = trim(nc_variable_name_str)                                     &
+                 //"__"//start_date%prettydate()//"_to_"//end_date%prettydate() &
+                 //"__"//asCharacter(iNX)//"_by_"//asCharacter(iNY)             &
+                 //"__MEAN_ANNUAL.asc"
+    endif
 
+    ! ugly hack to make the output match the default NODATA value
+    where ( pGrdNative%rData <= NC_FILL_FLOAT )
+      grid_mean%rData = -9999.
+    end where
 
+    call grid_WriteArcGrid( filename, grid_mean )
 
-  end subroutine iterate_over_slices
+  end subroutine write_stats_to_arcgrid
+
+!------------------------------------------------------------------------------
+  !
+  ! subroutine iterate_over_slices( grid_sum, grid_mean, stress_period_id_list, &
+  !                                 start_date_list, end_date_list )
+  !
+  !   type (GENERAL_GRID_T), pointer          :: grid_sum
+  !   type (GENERAL_GRID_T), pointer          :: grid_mean
+  !   type (STRING_LIST_T), intent(in)        :: stress_period_id_list
+  !   type (STRING_LIST_T), intent(in)        :: start_date_list
+  !   type (STRING_LIST_T), intent(in)        :: end_date_list
+  !
+  !
+  !
+  !
+  !
+  ! end subroutine iterate_over_slices
 
   subroutine iterate_over_slice( grid_sum, grid_mean, start_date, end_date )
 
@@ -404,7 +459,7 @@ contains
 
     end do
 
-    grid_mean%rData = grid_sum%rData / ( end_date - start_date + 1.0_c_double)
+    grid_mean%rData = grid_sum%rData / ( end_date - start_date + 1.0_c_double) * 365.25
 
     where ( pGrdNative%rData <= NC_FILL_FLOAT )
       grid_mean%rData = NC_FILL_FLOAT
