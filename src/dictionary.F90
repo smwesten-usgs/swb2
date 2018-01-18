@@ -63,6 +63,9 @@ module dictionary
     procedure, private   :: key_name_already_in_use_fn
     generic              :: key_already_in_use => key_name_already_in_use_fn
 
+    procedure            :: find_dict_entry_fn
+    generic              :: find_dict_entry => find_dict_entry_fn
+
     procedure, private   :: delete_entry_by_key_sub
     generic              :: delete_entry => delete_entry_by_key_sub
 
@@ -324,21 +327,22 @@ function key_name_already_in_use_fn(this, sKey)   result( in_use )
 
   ! [ LOCALS ]
   integer (kind=c_int)             :: iIndex
-  type (STRING_LIST_T)             :: slString
+  integer (kind=c_int)             :: iCount
 
   this%current => this%first
+  iCount = 0
 
   do while ( associated(this%current ) )
 
     iIndex = index(string=this%current%key, substring=asUppercase(sKey) )
 
-    if ( iIndex > 0 )  call slString%append(this%current%key)
+    if ( iIndex > 0 ) iCount = iCount + 1
 
     this%current => this%current%next
 
   enddo
 
-  if ( slString%count == 0 ) then
+  if ( iCount == 0 ) then
 
     in_use = FALSE
 
@@ -350,6 +354,38 @@ function key_name_already_in_use_fn(this, sKey)   result( in_use )
 
 end function key_name_already_in_use_fn
 
+
+!--------------------------------------------------------------------------------------------------
+
+function find_dict_entry_fn(this, sSearchKey)   result( pDict )
+
+  class (DICT_T)                   :: this
+  character (len=*), intent(in)    :: sSearchKey
+  type (DICT_ENTRY_T), pointer  :: pDict
+
+  ! [ LOCALS ]
+  integer (kind=c_int)             :: iIndex
+
+  pDict => null()
+  this%current => this%first
+
+  do while ( associated(this%current ) )
+
+    iIndex = index(string=this%current%key, substring=asUppercase(sSearchKey) )
+
+    if ( iIndex > 0 ) then
+
+      pDict => this%current
+      exit
+
+    endif
+
+    this%current => this%current%next
+
+  enddo
+
+end function find_dict_entry_fn
+
 !--------------------------------------------------------------------------------------------------
 
   subroutine add_entry_to_dict_sub(this, dict_entry)
@@ -357,27 +393,48 @@ end function key_name_already_in_use_fn
     class (DICT_T)                :: this
     type (DICT_ENTRY_T), pointer  :: dict_entry
 
-    if ( associated(dict_entry) ) then
+    type (DICT_ENTRY_T), pointer  :: temp_dict_entry
+    integer (kind=c_int)          :: iIndex
 
-      this%count = this%count + 1
+    temp_dict_entry => null()
 
-      if ( associated( this%last) ) then
+    if ( associated(dict_entry) ) then   ! add list values to existing key
 
-      ! dictionary has at least one entry
+      temp_dict_entry => this%find_dict_entry( dict_entry%key )
 
-        dict_entry%previous  => this%last
-        dict_entry%next      => null()
-        this%last%next       => dict_entry
-        this%last            => dict_entry
-        this%current         => dict_entry
+      if ( associated( temp_dict_entry ) ) then
 
-      else  ! this is the first dictionary entry
+        do iIndex=1, dict_entry%sl%count
 
-        this%first => dict_entry
-        this%last  => dict_entry
-        this%current => dict_entry
-        dict_entry%previous => null()
-        dict_entry%next     => null()
+          call temp_dict_entry%sl%append( dict_entry%sl%get( iIndex ) )
+
+        enddo
+
+        temp_dict_entry => null()
+
+      else
+
+        this%count = this%count + 1
+
+        if ( associated( this%last) ) then
+
+        ! dictionary has at least one entry
+
+          dict_entry%previous  => this%last
+          dict_entry%next      => null()
+          this%last%next       => dict_entry
+          this%last            => dict_entry
+          this%current         => dict_entry
+
+        else  ! this is the first dictionary entry
+
+          this%first => dict_entry
+          this%last  => dict_entry
+          this%current => dict_entry
+          dict_entry%previous => null()
+          dict_entry%next     => null()
+
+        endif
 
       endif
 

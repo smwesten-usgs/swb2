@@ -3299,7 +3299,7 @@ subroutine nf_set_standard_variables(NCFILE, sVarName_z, lLatLon, write_time_bou
 
   NCFILE%iNumberOfVariables = 5
 
-  if ( lLatLon_ ) NCFILE%iNumberOfVariables = 6
+  if ( lLatLon_ ) NCFILE%iNumberOfVariables = 7
   if ( write_time_bounds_ )  NCFILE%iNumberOfVariables =                       &
                                NCFILE%iNumberOfVariables + 1
 

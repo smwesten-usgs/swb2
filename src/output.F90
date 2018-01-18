@@ -11,7 +11,7 @@ module output
   private
 
   public :: initialize_output, set_output_directory, write_output, set_output_prefix, &
-            set_output_latlon_option, RECHARGE_ARRAY
+            set_output_latlon_option, RECHARGE_ARRAY, OUTSPECS
 
   real( kind=c_double ), allocatable      :: RECHARGE_ARRAY(:)
 
@@ -28,30 +28,31 @@ module output
     character (len=21)          :: variable_units
     real (kind=c_float)         :: valid_minimum
     real (kind=c_float)         :: valid_maximum
+    logical (kind=c_bool)       :: is_active
   end type OUTPUT_SPECS_T
 
-  type (OUTPUT_SPECS_T)    :: OUTSPECS(NCDF_NUM_OUTPUTS) = [                                 &
-    OUTPUT_SPECS_T( "gross_precipitation        ", "inches_per_day       ", 0.0, 60.0 ),        &
-    OUTPUT_SPECS_T( "rainfall                   ", "inches_per_day       ", 0.0, 60.0 ),        &
-    OUTPUT_SPECS_T( "snowfall                   ", "inches_per_day       ", 0.0, 60.0 ),        &
-    OUTPUT_SPECS_T( "interception               ", "inches_per_day       ", 0.0, 60.0 ),        &
-    OUTPUT_SPECS_T( "runon                      ", "inches_per_day       ", 0.0, 10000.0 ),     &
-    OUTPUT_SPECS_T( "runoff                     ", "inches_per_day       ", 0.0, 10000.0 ),     &
-    OUTPUT_SPECS_T( "snow_storage               ", "inches_per_day       ", 0.0, 2000.0 ),      &
-    OUTPUT_SPECS_T( "soil_storage               ", "inches               ", 0.0, 2000.0 ),      &
-    OUTPUT_SPECS_T( "delta_soil_storage         ", "inches_per_day       ", 0.0, 5.0 ),         &
-    OUTPUT_SPECS_T( "reference_ET0              ", "inches_per_day       ", 0.0, 2000.0 ),      &
-    OUTPUT_SPECS_T( "actual_et                  ", "inches_per_day       ", 0.0, 2000.0 ),      &
-    OUTPUT_SPECS_T( "snowmelt                   ", "inches_per_day       ", 0.0, 2000.0 ),      &
-    OUTPUT_SPECS_T( "tmin                       ", "degrees_fahrenheit   ", -100.0, 150.0 ),    &
-    OUTPUT_SPECS_T( "tmax                       ", "degrees_fahrenheit   ", -100.0, 150.0 ),    &
-    OUTPUT_SPECS_T( "net_infiltration           ", "inches_per_day       ", 0.0, 2000.0 ),      &
-    OUTPUT_SPECS_T( "rejected_net_infiltration  ", "inches_per_day       ", 0.0, 5000.0 ),      &
-    OUTPUT_SPECS_T( "infiltration               ", "inches_per_day       ", 0.0, 2000.0 ),      &
-    OUTPUT_SPECS_T( "irrigation                 ", "inches_per_day       ", 0.0, 2000.0 ),      &
-    OUTPUT_SPECS_T( "runoff_outside             ", "inches_per_day       ", 0.0, 10000.0 ),     &
-    OUTPUT_SPECS_T( "crop_et                    ", "inches_per_day       ", 0.0, 10000.0 ),     &
-    OUTPUT_SPECS_T( "gdd                        ", "degree_day_fahrenheit", 0.0, 10000.0 )   ]
+  type (OUTPUT_SPECS_T)    :: OUTSPECS(NCDF_NUM_OUTPUTS) = [                                       &
+    OUTPUT_SPECS_T( "gross_precipitation        ", "inches_per_day       ", 0.0, 60.0, TRUE ),     &
+    OUTPUT_SPECS_T( "rainfall                   ", "inches_per_day       ", 0.0, 60.0, TRUE  ),    &
+    OUTPUT_SPECS_T( "snowfall                   ", "inches_per_day       ", 0.0, 60.0, TRUE  ),    &
+    OUTPUT_SPECS_T( "interception               ", "inches_per_day       ", 0.0, 60.0, TRUE  ),    &
+    OUTPUT_SPECS_T( "runon                      ", "inches_per_day       ", 0.0, 10000.0, TRUE  ), &
+    OUTPUT_SPECS_T( "runoff                     ", "inches_per_day       ", 0.0, 10000.0, TRUE  ), &
+    OUTPUT_SPECS_T( "snow_storage               ", "inches_per_day       ", 0.0, 2000.0, TRUE  ),  &
+    OUTPUT_SPECS_T( "soil_storage               ", "inches               ", 0.0, 2000.0, TRUE  ),  &
+    OUTPUT_SPECS_T( "delta_soil_storage         ", "inches_per_day       ", 0.0, 5.0, TRUE  ),     &
+    OUTPUT_SPECS_T( "reference_ET0              ", "inches_per_day       ", 0.0, 2000.0, TRUE  ),  &
+    OUTPUT_SPECS_T( "actual_et                  ", "inches_per_day       ", 0.0, 2000.0, TRUE  ),  &
+    OUTPUT_SPECS_T( "snowmelt                   ", "inches_per_day       ", 0.0, 2000.0, TRUE  ),  &
+    OUTPUT_SPECS_T( "tmin                       ", "degrees_fahrenheit   ", -100.0, 150.0, TRUE  ),&
+    OUTPUT_SPECS_T( "tmax                       ", "degrees_fahrenheit   ", -100.0, 150.0, TRUE  ),&
+    OUTPUT_SPECS_T( "net_infiltration           ", "inches_per_day       ", 0.0, 2000.0, TRUE  ),  &
+    OUTPUT_SPECS_T( "rejected_net_infiltration  ", "inches_per_day       ", 0.0, 5000.0, TRUE  ),  &
+    OUTPUT_SPECS_T( "infiltration               ", "inches_per_day       ", 0.0, 2000.0, TRUE  ),  &
+    OUTPUT_SPECS_T( "irrigation                 ", "inches_per_day       ", 0.0, 2000.0, TRUE  ),  &
+    OUTPUT_SPECS_T( "runoff_outside             ", "inches_per_day       ", 0.0, 10000.0, TRUE  ), &
+    OUTPUT_SPECS_T( "crop_et                    ", "inches_per_day       ", 0.0, 10000.0, TRUE  ), &
+    OUTPUT_SPECS_T( "gdd                        ", "degree_day_fahrenheit", 0.0, 10000.0, TRUE  )   ]
 
   enum, bind(c)
     enumerator :: NCDF_GROSS_PRECIPITATION=1, NCDF_RAINFALL, NCDF_SNOWFALL,   &
@@ -118,23 +119,27 @@ contains
 
       do iIndex = 1, ubound(NC_OUT, 1)
 
-        allocate ( NC_OUT(iIndex)%ncfile )
+        if ( OUTSPECS(iIndex)%is_active ) then
 
-        call netcdf_open_and_prepare_as_output(                                        &
-              NCFILE=NC_OUT( iIndex )%ncfile,                                          &
-              sVariableName=trim( OUTSPECS( iIndex )%variable_name ),                  &
-              sVariableUnits=trim( OUTSPECS( iIndex )%variable_units ),                &
-              iNX=cells%number_of_columns,                                             &
-              iNY=cells%number_of_rows,                                                &
-              fX=cells%X,                                                              &
-              fY=cells%Y,                                                              &
-              StartDate=SIM_DT%start,                                                  &
-              EndDate=SIM_DT%end,                                                      &
-              PROJ4_string=cells%PROJ4_string,                                         &
-              dpLat=cells%Y_lat,                                                       &
-              dpLon=cells%X_lon,                                                       &
-              fValidMin=OUTSPECS( iIndex )%valid_minimum,                              &
-              fValidMax=OUTSPECS( iIndex )%valid_maximum )
+          allocate ( NC_OUT(iIndex)%ncfile )
+
+          call netcdf_open_and_prepare_as_output(                                        &
+                NCFILE=NC_OUT( iIndex )%ncfile,                                          &
+                sVariableName=trim( OUTSPECS( iIndex )%variable_name ),                  &
+                sVariableUnits=trim( OUTSPECS( iIndex )%variable_units ),                &
+                iNX=cells%number_of_columns,                                             &
+                iNY=cells%number_of_rows,                                                &
+                fX=cells%X,                                                              &
+                fY=cells%Y,                                                              &
+                StartDate=SIM_DT%start,                                                  &
+                EndDate=SIM_DT%end,                                                      &
+                PROJ4_string=cells%PROJ4_string,                                         &
+                dpLat=cells%Y_lat,                                                       &
+                dpLon=cells%X_lon,                                                       &
+                fValidMin=OUTSPECS( iIndex )%valid_minimum,                              &
+                fValidMax=OUTSPECS( iIndex )%valid_maximum )
+
+        endif
 
       enddo
 
@@ -142,21 +147,25 @@ contains
 
       do iIndex = 1, ubound(NC_OUT, 1)
 
-        allocate ( NC_OUT(iIndex)%ncfile )
+        if ( OUTSPECS(iIndex)%is_active ) then
 
-        call netcdf_open_and_prepare_as_output(                                        &
-              NCFILE=NC_OUT( iIndex )%ncfile,                                          &
-              sVariableName=trim( OUTSPECS( iIndex )%variable_name ),                  &
-              sVariableUnits=trim( OUTSPECS( iIndex )%variable_units ),                &
-              iNX=cells%number_of_columns,                                             &
-              iNY=cells%number_of_rows,                                                &
-              fX=cells%X,                                                              &
-              fY=cells%Y,                                                              &
-              StartDate=SIM_DT%start,                                                  &
-              EndDate=SIM_DT%end,                                                      &
-              PROJ4_string=cells%PROJ4_string,                                         &
-              fValidMin=OUTSPECS( iIndex )%valid_minimum,                              &
-              fValidMax=OUTSPECS( iIndex )%valid_maximum )
+          allocate ( NC_OUT(iIndex)%ncfile )
+
+          call netcdf_open_and_prepare_as_output(                                        &
+                NCFILE=NC_OUT( iIndex )%ncfile,                                          &
+                sVariableName=trim( OUTSPECS( iIndex )%variable_name ),                  &
+                sVariableUnits=trim( OUTSPECS( iIndex )%variable_units ),                &
+                iNX=cells%number_of_columns,                                             &
+                iNY=cells%number_of_rows,                                                &
+                fX=cells%X,                                                              &
+                fY=cells%Y,                                                              &
+                StartDate=SIM_DT%start,                                                  &
+                EndDate=SIM_DT%end,                                                      &
+                PROJ4_string=cells%PROJ4_string,                                         &
+                fValidMin=OUTSPECS( iIndex )%valid_minimum,                              &
+                fValidMax=OUTSPECS( iIndex )%valid_maximum )
+
+        endif
 
       enddo
 
@@ -180,27 +189,32 @@ contains
     ! first put out the current time variable for all open NetCDF files
     do iIndex = 1, ubound( NC_OUT, 1 )
 
+      if ( OUTSPECS(iIndex)%is_active ) then
 
-      call netcdf_put_variable_vector(NCFILE=NC_OUT(iIndex)%ncfile, &
-         iVarID=NC_OUT(iIndex)%ncfile%iVarID(NC_TIME), &
-         iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t)], &
-         iCount=[1_c_size_t], &
-         iStride=[1_c_ptrdiff_t], &
-         dpValues=[real(SIM_DT%iNumDaysFromOrigin, kind=c_double)])
+        call netcdf_put_variable_vector(NCFILE=NC_OUT(iIndex)%ncfile, &
+           iVarID=NC_OUT(iIndex)%ncfile%iVarID(NC_TIME), &
+           iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t)], &
+           iCount=[1_c_size_t], &
+           iStride=[1_c_ptrdiff_t], &
+           dpValues=[real(SIM_DT%iNumDaysFromOrigin, kind=c_double)])
+
+      endif
 
     enddo
 
-    call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_GROSS_PRECIPITATION )%ncfile,     &
+    if ( OUTSPECS( NCDF_GROSS_PRECIPITATION )%is_active ) &
+      call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_GROSS_PRECIPITATION )%ncfile,   &
             iVarID=NC_OUT( NCDF_GROSS_PRECIPITATION )%ncfile%iVarID(NC_Z),                      &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                       &
-                                int(cells%number_of_columns, kind=c_size_t) ],                   &
+            iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                      &
+                                int(cells%number_of_columns, kind=c_size_t) ],                  &
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=cells%active,                                                                  &
-            rValues=cells%gross_precip,                                                          &
+            lMask=cells%active,                                                                 &
+            rValues=cells%gross_precip,                                                         &
             rField=cells%nodata_fill_value )
 
-    call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_RAINFALL )%ncfile,                &
+    if ( OUTSPECS( NCDF_RAINFALL )%is_active ) &
+      call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_RAINFALL )%ncfile,              &
             iVarID=NC_OUT( NCDF_RAINFALL )%ncfile%iVarID(NC_Z),                                 &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
             iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                      &
@@ -210,6 +224,7 @@ contains
             rValues=cells%rainfall,                                                             &
             rField=cells%nodata_fill_value )
 
+    if ( OUTSPECS( NCDF_INTERCEPTION )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_INTERCEPTION )%ncfile,            &
             iVarID=NC_OUT( NCDF_INTERCEPTION )%ncfile%iVarID(NC_Z),                             &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
@@ -220,6 +235,7 @@ contains
             rValues=cells%interception,                                                          &
             rField=cells%nodata_fill_value )
 
+    if ( OUTSPECS( NCDF_RUNOFF )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_RUNOFF )%ncfile,                  &
             iVarID=NC_OUT( NCDF_RUNOFF )%ncfile%iVarID(NC_Z),                                   &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
@@ -230,6 +246,7 @@ contains
             rValues=cells%runoff,                                                                &
             rField=cells%nodata_fill_value )
 
+    if ( OUTSPECS( NCDF_RUNOFF_OUTSIDE )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_RUNOFF_OUTSIDE )%ncfile,          &
             iVarID=NC_OUT( NCDF_RUNOFF_OUTSIDE )%ncfile%iVarID(NC_Z),                           &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
@@ -240,6 +257,7 @@ contains
             rValues=cells%runoff_outside,                                                        &
             rField=cells%nodata_fill_value )
 
+    if ( OUTSPECS( NCDF_RUNON )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_RUNON )%ncfile,                   &
             iVarID=NC_OUT( NCDF_RUNON )%ncfile%iVarID(NC_Z),                                    &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
@@ -250,6 +268,7 @@ contains
             rValues=cells%runon,                                                                 &
             rField=cells%nodata_fill_value )
 
+    if ( OUTSPECS( NCDF_INFILTRATION )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_INFILTRATION )%ncfile,            &
             iVarID=NC_OUT( NCDF_INFILTRATION )%ncfile%iVarID(NC_Z),                             &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
@@ -260,6 +279,7 @@ contains
             rValues=cells%infiltration,                                                          &
             rField=cells%nodata_fill_value )
 
+    if ( OUTSPECS( NCDF_SNOWFALL )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_SNOWFALL )%ncfile,                &
             iVarID=NC_OUT( NCDF_SNOWFALL )%ncfile%iVarID(NC_Z),                                 &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
@@ -270,6 +290,7 @@ contains
             rValues=cells%snowfall,                                                              &
             rField=cells%nodata_fill_value )
 
+    if ( OUTSPECS( NCDF_SNOWMELT )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_SNOWMELT )%ncfile,                &
             iVarID=NC_OUT( NCDF_SNOWMELT )%ncfile%iVarID(NC_Z),                                 &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
@@ -280,6 +301,7 @@ contains
             rValues=cells%snowmelt,                                                              &
             rField=cells%nodata_fill_value )
 
+    if ( OUTSPECS( NCDF_SNOW_STORAGE )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_SNOW_STORAGE )%ncfile,            &
             iVarID=NC_OUT( NCDF_SNOW_STORAGE )%ncfile%iVarID(NC_Z),                             &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
@@ -290,6 +312,7 @@ contains
             rValues=cells%snow_storage,                                                          &
             rField=cells%nodata_fill_value )
 
+    if ( OUTSPECS( NCDF_SOIL_STORAGE )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_SOIL_STORAGE )%ncfile,             &
             iVarID=NC_OUT( NCDF_SOIL_STORAGE )%ncfile%iVarID(NC_Z),                              &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],     &
@@ -300,6 +323,7 @@ contains
             rValues=cells%soil_storage,                                                          &
             rField=cells%nodata_fill_value )
 
+    if ( OUTSPECS( NCDF_DELTA_SOIL_STORAGE )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_DELTA_SOIL_STORAGE )%ncfile,       &
             iVarID=NC_OUT( NCDF_SOIL_STORAGE )%ncfile%iVarID(NC_Z),                              &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],     &
@@ -310,6 +334,7 @@ contains
             rValues=cells%delta_soil_storage,                                                    &
             rField=cells%nodata_fill_value )
 
+    if ( OUTSPECS( NCDF_NET_INFILTRATION )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_NET_INFILTRATION )%ncfile,      &
             iVarID=NC_OUT( NCDF_NET_INFILTRATION )%ncfile%iVarID(NC_Z),                       &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
@@ -320,6 +345,7 @@ contains
             rValues=cells%net_infiltration,                                                    &
             rField=cells%nodata_fill_value )
 
+    if ( OUTSPECS( NCDF_REFERENCE_ET0 )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_REFERENCE_ET0 )%ncfile,           &
             iVarID=NC_OUT( NCDF_REFERENCE_ET0 )%ncfile%iVarID(NC_Z),                            &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
@@ -330,6 +356,7 @@ contains
             rValues=cells%reference_ET0,                                                         &
             rField=cells%nodata_fill_value )
 
+    if ( OUTSPECS( NCDF_ACTUAL_ET )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_ACTUAL_ET )%ncfile,               &
             iVarID=NC_OUT( NCDF_ACTUAL_ET )%ncfile%iVarID(NC_Z),                                &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
@@ -340,6 +367,7 @@ contains
             rValues=cells%actual_et,                                                             &
             rField=cells%nodata_fill_value )
 
+    if ( OUTSPECS( NCDF_TMIN )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_TMIN )%ncfile,                    &
             iVarID=NC_OUT( NCDF_TMIN )%ncfile%iVarID(NC_Z),                                     &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
@@ -350,6 +378,7 @@ contains
             rValues=cells%tmin,                                                                  &
             rField=cells%nodata_fill_value )
 
+    if ( OUTSPECS( NCDF_TMAX )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_TMAX )%ncfile,                    &
             iVarID=NC_OUT( NCDF_TMAX )%ncfile%iVarID(NC_Z),                                     &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
@@ -360,6 +389,7 @@ contains
             rValues=cells%tmax,                                                                  &
             rField=cells%nodata_fill_value )
 
+    if ( OUTSPECS( NCDF_IRRIGATION )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_IRRIGATION )%ncfile,              &
             iVarID=NC_OUT( NCDF_IRRIGATION )%ncfile%iVarID(NC_Z),                               &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
@@ -370,6 +400,7 @@ contains
             rValues=cells%irrigation,                                                            &
             rField=cells%nodata_fill_value )
 
+    if ( OUTSPECS( NCDF_GDD )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_GDD )%ncfile,                      &
             iVarID=NC_OUT( NCDF_GDD )%ncfile%iVarID(NC_Z),                                       &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],     &
@@ -380,6 +411,7 @@ contains
             rValues=cells%gdd,                                                                   &
             rField=cells%nodata_fill_value )
 
+    if ( OUTSPECS( NCDF_REJECTED_NET_INFILTRATION )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_REJECTED_NET_INFILTRATION )%ncfile, &
             iVarID=NC_OUT( NCDF_REJECTED_NET_INFILTRATION )%ncfile%iVarID(NC_Z),                  &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],        &
@@ -390,7 +422,7 @@ contains
             rValues=cells%rejected_net_infiltration,                                              &
             rField=cells%nodata_fill_value )
 
-
+    if ( OUTSPECS( NCDF_CROP_ET )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_CROP_ET )%ncfile,                     &
             iVarID=NC_OUT( NCDF_CROP_ET )%ncfile%iVarID(NC_Z),                                      &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],        &

@@ -17,7 +17,8 @@ module model_initialize
                                            read_landuse_codes
 
   use output, only                       : initialize_output, set_output_directory,      &
-                                           set_output_prefix, set_output_latlon_option
+                                           set_output_prefix, set_output_latlon_option,  &
+                                           OUTSPECS
   use parameters
   use precipitation__method_of_fragments
   use simulation_datetime, only          : SIM_DT
@@ -180,6 +181,9 @@ contains
 
     ! find general program options and process
     call initialize_program_options( )
+
+    ! allow user to enable or disable specific output files
+    call initialize_output_options()
 
     ! open and prepare NetCDF files for output
     call initialize_output( MODEL )
@@ -1266,6 +1270,63 @@ contains
     MODEL%PROJ4_string = trim(sArgText)
 
   end subroutine initialize_grid_options
+
+!--------------------------------------------------------------------------------------------------
+
+    subroutine initialize_output_options()
+
+      ! [ LOCALS ]
+      type (STRING_LIST_T)             :: myOptions
+      integer (kind=c_int)             :: iIndex
+      integer (kind=c_int)             :: jIndex
+      character (len=:), allocatable   :: sArgText
+      character (len=:), allocatable   :: sAction
+      character (len=:), allocatable   :: sOutput
+      integer (kind=c_int)             :: iStat
+      logical (kind=c_bool)            :: enable_output
+
+      enable_output = TRUE
+
+      ! For MODEL directive, obtain the associated dictionary entries
+      call CF_DICT%get_values( "OUTPUT", myOptions )
+
+      ! dictionary entries are initially space-delimited; sArgText contains
+      ! all dictionary entries present, concatenated, with a space between entries
+      sArgText = myOptions%get(1, myOptions%count )
+
+      ! echo the original directive and dictionary entries to the logfile
+      call LOGS%write("> OUTPUT"//sArgText, iLinesBefore=1 )
+
+      ! iterate over all dictionary entries
+      do iIndex=1,myOptions%count
+
+        sOutput = myOptions%get( iIndex )
+
+        if ( ( sOutput .strapprox. "ENABLE") .or. ( sOutput .strapprox. "ACTIVE") ) then
+
+          enable_output = TRUE
+
+        elseif ( ( sOutput .strapprox. "DISABLE") .or. ( sOutput .strapprox. "INACTIVE") ) then
+
+          enable_output = FALSE
+
+        endif
+
+
+        do jIndex=lbound( OUTSPECS, 1), ubound( OUTSPECS, 1)
+
+          if ( OUTSPECS( jIndex )%variable_name .strapprox. sOutput ) then
+             OUTSPECS( jIndex )%is_active = enable_output
+             if ( enable_output ) call LOGS%write("> Enabling output for "//squote(sOutput), iLinesBefore=1 )
+             if ( .not. enable_output ) call LOGS%write("> Disabling output for "//squote(sOutput), iLinesBefore=1 )
+          endif
+        enddo
+
+      enddo
+
+      call myOptions%clear()
+
+    end subroutine initialize_output_options
 
 !--------------------------------------------------------------------------------------------------
 
