@@ -12,9 +12,9 @@ module file_operations
   private
 
   public :: fully_qualified_filename
-  
+
   integer (kind=c_int), parameter         :: MAX_STR_LEN    = 65536
-  
+
   type, public :: ASCII_FILE_T
 
     character (len=:), allocatable  :: sFilename
@@ -120,7 +120,7 @@ contains
 
     lIsEOF = this%lEOF
 
-  end function have_we_reached_the_EOF_fn  
+  end function have_we_reached_the_EOF_fn
 
 !--------------------------------------------------------------------------------------------------
 
@@ -134,17 +134,17 @@ contains
     integer (kind=c_int) :: iLen
     character (len=1)   :: sBufTemp
 
-    iLen = len_trim( this%sBuf ) 
+    iLen = len_trim( this%sBuf )
 
     sBufTemp = adjustl(this%sBuf)
 
     iIndex = verify( sBufTemp , this%sCommentChars )
-    
+
     lIsComment = lFALSE
 
     if ( iIndex == 0 .or. len_trim(this%sBuf) == 0 ) lIsComment = lTRUE
-        
-  end function is_current_line_a_comment_fn  
+
+  end function is_current_line_a_comment_fn
 
 !--------------------------------------------------------------------------------------------------
 
@@ -155,7 +155,7 @@ contains
     character (len=*), intent(in)               :: sCommentChars
     character (len=*), intent(in)               :: sDelimiters
     logical (kind=c_bool), intent(in), optional :: lHasHeader
-    
+
     this%sCommentChars = sCommentChars
     this%sDelimiters = sDelimiters
 
@@ -205,7 +205,7 @@ contains
       lQuiet_ = lQuiet
     else
       lQuiet_ = lFALSE
-    endif  
+    endif
 
     if (.not. this%isOpen() ) then
 
@@ -269,7 +269,7 @@ contains
     integer (kind=c_int) :: iStat
     integer (kind=c_int) :: iNumLines
     integer (kind=c_int) :: iNumRecords
-    integer (kind=c_int) :: iIndex    
+    integer (kind=c_int) :: iIndex
 
     iNumLines = 0
     iNumRecords = 0
@@ -308,7 +308,7 @@ contains
     type (STRING_LIST_T) :: stList
 
     ! [ LOCALS ]
-    character (len=MAX_STR_LEN)           :: sString 
+    character (len=MAX_STR_LEN)           :: sString
     character (len=MAX_STR_LEN)           :: sSubString
     character (len=:), allocatable        :: sSubStringClean
 
@@ -340,7 +340,7 @@ contains
     call assert( .not. this%lReadOnly, "INTERNAL ERROR -- File "  &
       //dquote( fully_qualified_filename( this%sFilename ) )      &
       //" was opened as READONLY.", __SRCNAME__, __LINE__ )
-    
+
     if (this%isOpen() ) then
 
       write ( unit = this%iUnitNum, fmt = "(a)", iostat = iStat ) trim(sText)
@@ -359,7 +359,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int) :: iStat
     logical (kind=c_bool)                 :: lIsComment
-    
+
     lIsComment = lTRUE
 
     do while ( lIsComment .and. this%isOpen() )

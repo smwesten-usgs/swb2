@@ -1,4 +1,4 @@
-module file_utilities
+module libc_utilities
 
   use iso_c_binding
   use constants_and_conversions
@@ -304,4 +304,4 @@ contains
 
   end function get_libc_errno
 
-end module file_utilities
+end module libc_utilities

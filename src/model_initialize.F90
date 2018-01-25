@@ -1162,6 +1162,11 @@ contains
           ! no operation; just keep SWB quiet about METHOD and it will be included in the
           ! methods initialization section.
 
+        elseif ( index( string=sCmdText, substring="_LOOKUP_TABLE") > 0 ) then
+
+          ! no operation; just keep SWB quiet about LOOKUP_TABLE and it will be included in the
+          ! lookup table initialization section.
+
         else
 
           call warn("Unknown directive detected in code at line "//asCharacter(__LINE__)//", file "//__SRCNAME__ &
