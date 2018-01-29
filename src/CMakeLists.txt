@@ -22,7 +22,6 @@ set(SRCS
       exceptions.F90
       fog__monthly_grid.F90
       file_operations.F90
-      file_utilities.F90
       get_libc_error_number.c
       grid.F90
       growing_degree_day.F90
@@ -31,6 +30,7 @@ set(SRCS
       interception__bucket.F90
       interception__gash.F90
       irrigation.F90
+      libc_utilities.F90
       logfiles.F90
       #loop_iterate.F90
       main.F90
@@ -258,9 +258,9 @@ set(SRCS_SWBSTATS2
       dictionary.F90
       exceptions.F90
       file_operations.F90
-      file_utilities.F90
       get_libc_error_number.c
       grid.F90
+      libc_utilities.F90
       logfiles.F90
       netcdf4_support.F90
       netcdf_c_api_interfaces.F90

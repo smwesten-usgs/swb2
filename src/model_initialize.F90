@@ -1113,7 +1113,7 @@ contains
 
         elseif ( index( string=sCmdText, substring="_PROJECTION_DEFINITION" ) > 0 ) then
 
-          call pENTRY%set_PROJ4( trim(sArgText) )
+          call pENTRY%set_source_PROJ4( trim(sArgText) )
 
         elseif ( index( string=sCmdText, substring="_DATE_COLUMN" ) > 0 ) then
 

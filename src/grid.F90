@@ -2274,16 +2274,16 @@ subroutine grid_GridToGrid_int( pGrdFrom, pGrdTo, lUseMajorityFilter )
     do iRow=1,pGrdTo%iNY
       do iCol=1,pGrdTo%iNX
 
-        iColRow = grid_GetGridColRowNum(pGrd=pGrdFrom, &
-                   rX=real(pGrdTo%rX(iCol, iRow), kind=c_double), &
+        iColRow = grid_GetGridColRowNum(pGrd=pGrdFrom,                        &
+                   rX=real(pGrdTo%rX(iCol, iRow), kind=c_double),             &
                    rY=real(pGrdTo%rY(iCol, iRow), kind=c_double))
 
-        call assert(iColRow(COLUMN) > 0 .and. iColRow(COLUMN) <= pGrdFrom%iNX, &
+        call assert(iColRow(COLUMN) > 0 .and. iColRow(COLUMN) <= pGrdFrom%iNX,    &
           "Illegal column number supplied: "//trim(asCharacter(iColRow(COLUMN))), &
           __SRCNAME__, __LINE__)
 
-        call assert(iColRow(ROW) > 0 .and. iColRow(ROW) <= pGrdFrom%iNY, &
-          "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))), &
+        call assert(iColRow(ROW) > 0 .and. iColRow(ROW) <= pGrdFrom%iNY,      &
+          "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))),   &
           __SRCNAME__, __LINE__)
 
         pGrdTo%iData(iCol,iRow) = pGrdFrom%iData( iColRow(COLUMN), iColRow(ROW) )

@@ -190,7 +190,8 @@ module data_catalog_entry
                                   set_constant_value_real
 
     procedure  :: make_filename => make_filename_from_template
-    procedure  :: set_PROJ4 => set_PROJ4_string_sub
+    procedure  :: set_target_PROJ4 => set_target_PROJ4_string_sub
+    procedure  :: set_source_PROJ4 => set_source_PROJ4_string_sub
     procedure  :: set_variable_order => set_variable_order_sub
     procedure  :: set_complete_spatial_coverage_flag => set_complete_spatial_coverage_flag_sub
     procedure  :: dump_data_structure => dump_data_structure_sub
@@ -1666,16 +1667,27 @@ end subroutine set_constant_value_real
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine set_PROJ4_string_sub(this, sPROJ4_string)
+  subroutine set_source_PROJ4_string_sub(this, sPROJ4_string)
 
      class (DATA_CATALOG_ENTRY_T) :: this
      character (len=*), optional :: sPROJ4_string
 
      this%sSourcePROJ4_string = sPROJ4_string
 
-  end subroutine set_PROJ4_string_sub
+  end subroutine set_source_PROJ4_string_sub
 
-  !--------------------------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
+
+  subroutine set_target_PROJ4_string_sub(this, sPROJ4_string)
+
+     class (DATA_CATALOG_ENTRY_T) :: this
+     character (len=*), optional :: sPROJ4_string
+
+     this%sTargetPROJ4_string = sPROJ4_string
+
+  end subroutine set_target_PROJ4_string_sub
+
+!--------------------------------------------------------------------------------------------------
 
   subroutine set_do_not_allow_netcdf_grid_data_flipping_sub(this)
 

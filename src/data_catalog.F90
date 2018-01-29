@@ -23,7 +23,7 @@ module data_catalog
   type DATA_CATALOG_T
     type (DATA_CATALOG_ENTRY_T), pointer            :: first    => null()
     type (DATA_CATALOG_ENTRY_T), pointer            :: last     => null()
-    type (DATA_CATALOG_ENTRY_T), pointer            :: current  => null()      
+    type (DATA_CATALOG_ENTRY_T), pointer            :: current  => null()
     integer (kind=c_int)                            :: count    = 0
   contains
 
@@ -46,7 +46,7 @@ module data_catalog
     generic :: set_PROJ4 => catalog_set_all_PROJ4_string_sub
     generic :: set_EndYear => catalog_set_all_end_year_sub
     generic :: set_StartYear => catalog_set_all_start_year_sub
- 
+
   end type DATA_CATALOG_T
 
   public :: DAT
@@ -63,7 +63,7 @@ contains
 
     class (DATA_CATALOG_T)              :: this
     integer (kind=c_int), intent(in)    :: iStartYear
-  
+
     ! [ LOCALS ]
     type (DATA_CATALOG_ENTRY_T), pointer :: current
 
@@ -90,7 +90,7 @@ contains
 
     class (DATA_CATALOG_T)              :: this
     integer (kind=c_int), intent(in)    :: iEndYear
-  
+
     ! [ LOCALS ]
     type (DATA_CATALOG_ENTRY_T), pointer :: current
 
@@ -117,7 +117,7 @@ contains
 
     class (DATA_CATALOG_T)           :: this
     character (len=*), intent(in)    :: PROJ4_string
-  
+
     ! [ LOCALS ]
     type (DATA_CATALOG_ENTRY_T), pointer :: current
 
@@ -127,7 +127,7 @@ contains
 
       do while ( associated(current) )
 
-        call current%set_PROJ4( PROJ4_string )
+        call current%set_source_PROJ4( PROJ4_string )
 
         current => current%next
 
