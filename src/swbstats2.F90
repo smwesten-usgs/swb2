@@ -2,6 +2,7 @@ program swbstats2
 
   use iso_c_binding, only             : c_int, c_float, c_double, c_bool,      &
                                         c_size_t, c_ptrdiff_t, c_long
+  use iso_fortran_env, only           : OUTPUT_UNIT
   use constants_and_conversions, only : TRUE, FALSE, DATATYPE_INT, BNDS
   use file_operations, only           : ASCII_FILE_T
   use data_catalog_entry, only        : DATA_CATALOG_ENTRY_T
@@ -24,21 +25,21 @@ program swbstats2
   integer (kind=c_int), parameter  :: SINGLE_SLICE = 1
   integer (kind=c_int), parameter  :: MANY_SLICES = 2
 
-  integer (kind=c_int), parameter  :: STATS_SUM  = 1
-  integer (kind=c_int), parameter  :: STATS_MEAN = 2
-  integer (kind=c_int), parameter  :: STATS_BOTH = 3
+  integer (kind=c_int), parameter  :: OUTPUT_TYPE_BOTH  = 1
+  integer (kind=c_int), parameter  :: OUTPUT_TYPE_CSV_ONLY = 2
 
   integer (kind=c_size_t)          :: RECNUM = 0
 
-  integer (kind=c_int) :: STATS_OPTION = STATS_SUM
+  integer (kind=c_int) :: OUTPUT_TYPE_OPTION = OUTPUT_TYPE_BOTH
   integer (kind=c_int) :: SLICE_OPTION = SINGLE_SLICE
   logical (c_bool)     :: ZONE_STATS = FALSE
+  logical (c_bool)     :: ANNUALIZE_MEANS = TRUE
 
   character (len=256)            :: temp_str, temp_str2, temp_str3
   character (len=:), allocatable :: target_proj4_str
   character (len=:), allocatable :: netcdf_filename_str
   character (len=:), allocatable :: zone_grid_filename_str
-  character (len=:), allocatable :: statistic_str
+  character (len=:), allocatable :: output_type_str
   character (len=:), allocatable :: stress_period_filename_str
   character (len=:), allocatable :: slice_str
   character (len=:), allocatable :: start_date_str
@@ -47,6 +48,8 @@ program swbstats2
   character (len=:), allocatable :: nc_variable_name_str
   character (len=:), allocatable :: nx_str
   character (len=:), allocatable :: ny_str
+
+  type (DATA_CATALOG_ENTRY_T), pointer :: pZONE_GRID
 
   integer (kind=c_int)           :: iNumArgs
   character (len=1024)           :: sCompilerFlags
@@ -74,6 +77,7 @@ program swbstats2
   type (STRING_LIST_T)           :: start_date_list
   type (STRING_LIST_T)           :: end_date_list
   type (STRING_LIST_T)           :: stress_period_id_list
+  type (STRING_LIST_T)           :: unique_zone_list
 
   type (T_NETCDF4_FILE), pointer          :: ncfile_in
   type (T_NETCDF4_FILE), pointer          :: ncfile_out
@@ -88,7 +92,7 @@ program swbstats2
   allocate( ncfile_in )
   allocate( ncfile_out )
 
-  statistic_str = ""
+  output_type_str = ""
   slice_str = ""
   start_date_str = ""
   end_date_str = ""
@@ -131,8 +135,8 @@ program swbstats2
       //TRIM(int2char(__G95_MINOR__))
 #endif
 
-    write(UNIT=*,FMT="(/,a,/,/,15(a,/))")  "Usage: swbstats2 netcdf_file_name ",                         &
-             "[ --statistic= ]          summary statistic to calculate: sum, mean, both",               &
+    write(UNIT=*,FMT="(/,a,/,/,15(a,/))")  "Usage: swbstats2 netcdf_file_name ",                        &
+             "[ --output_type= ]        form of output: CSV_ONLY, BOTH (default)",                      &
              "[ --slice= ]              dates over which statistics should be calculated:",             &
              "                            start date and end date formatted as yyyy-mm-dd,yyyy-mm-dd",  &
              "[ --stress_period_file= ] comma-delimited file containing stress period start and ",      &
@@ -142,6 +146,8 @@ program swbstats2
              "                              5,1920-01-01,1925-12-31",                                   &
              "                              6,1925-01-01,1930-12-31",                                   &
              "[ --zone_grid= ]          name of integer-valued grid for which zonal statistics are desired"
+
+!             "[ --annualize_means ]     report mean values on an annual basis",                         &
     stop
 
   end if
@@ -153,9 +159,18 @@ program swbstats2
 
     call GET_COMMAND_ARGUMENT( iIndex, temp_str )
 
-    if ( temp_str .containssimilar. "statistic" ) then
+    if ( temp_str .containssimilar. "output_type" ) then
 
-      statistic_str = right(temp_str, substring="=")
+      output_type_str = right(temp_str, substring="=")
+      if (output_type_str .containssimilar. "CSV_ONLY") then
+
+        OUTPUT_TYPE_OPTION = OUTPUT_TYPE_CSV_ONLY
+
+      endif
+
+    elseif ( temp_str .containssimilar. "annualize_means" ) then
+
+      ANNUALIZE_MEANS = TRUE
 
     elseif ( temp_str .containssimilar. "stress_period_file" ) then
 
@@ -188,6 +203,7 @@ program swbstats2
 
       ! no match on the command-line argument flags; this must be the netCDF file
       netcdf_filename_str = trim(temp_str)
+
       call netcdf_open_and_prepare_for_merging( ncfile_in,                    &
                                                 netcdf_filename_str,          &
                                                 guess_z_var_name=TRUE )
@@ -210,7 +226,6 @@ program swbstats2
 
   if (.not. netcdf_active)     &
     stop ("No netCDF file was specified or there was an error opening the file.")
-
 
   call netcdf_get_attribute_list_for_variable( NCFILE=ncfile_in,              &
                                                variable_name="crs",  &
@@ -266,15 +281,13 @@ program swbstats2
   yur = pGrdNative%rY1
   gridcell_size = pGrdNative%rGridCellSize
 
-  print *, nx, ny
-  print *, xll, yll
-  print *, xur, yur
-  print *, gridcell_size
-
   call set_project_projection_params()
-  
 
-  if (ZONE_STATS) call initialize_zone_grid(grid_filename=zone_grid_filename_str)
+
+  if (ZONE_STATS) then
+    call initialize_zone_grid(grid_filename=zone_grid_filename_str)
+    call get_unique_int(pZONE_GRID%pGrdBase%iData, unique_zone_list)
+  endif
 
   if ( SLICE_OPTION == SINGLE_SLICE ) then
     ! force slice dates to honor bounds of data dates
@@ -289,29 +302,33 @@ program swbstats2
 
   nc_variable_name_str = trim(ncfile_in%pNC_VAR(NC_Z)%sVariableName)
 
-  call netcdf_open_and_prepare_as_output(                                     &
-        NCFILE=ncfile_out,                                                    &
-        sVariableName=trim(nc_variable_name_str),                             &
-        sVariableUnits=trim(temp_str3),                                       &
-        iNX=ncfile_in%iNX,                                                    &
-        iNY=ncfile_in%iNY,                                                    &
-        fX=ncfile_in%rX_Coords,                                               &
-        fY=ncfile_in%rY_Coords,                                               &
-        PROJ4_string=trim(temp_str),                                          &
-        StartDate=SIM_DT%start,                                               &
-        EndDate=SIM_DT%end,                                                   &
-        write_time_bounds=TRUE,                                               &
-        filename_modifier=statistic_str )
+  if (OUTPUT_TYPE_OPTION /= OUTPUT_TYPE_CSV_ONLY) then
 
-  !       !        PROJ4_string=ncfile_in%PROJ4_string,                                  &
-  !       !        dpLat=cells%Y_lat,                                                       &
-  !       !        dpLon=cells%X_lon,                                                       &
-  !       !        fValidMin=OUTSPECS( iIndex )%valid_minimum,                              &
-  !       !        fValidMax=OUTSPECS( iIndex )%valid_maximum,                         &
+    call netcdf_open_and_prepare_as_output(                                     &
+          NCFILE=ncfile_out,                                                    &
+          sVariableName=trim(nc_variable_name_str),                             &
+          sVariableUnits=trim(temp_str3),                                       &
+          iNX=ncfile_in%iNX,                                                    &
+          iNY=ncfile_in%iNY,                                                    &
+          fX=ncfile_in%rX_Coords,                                               &
+          fY=ncfile_in%rY_Coords,                                               &
+          PROJ4_string=trim(temp_str),                                          &
+          StartDate=SIM_DT%start,                                               &
+          EndDate=SIM_DT%end,                                                   &
+          write_time_bounds=TRUE,                                               &
+          filename_modifier=output_type_str )
 
-  call netcdf_get_variable_id_for_variable( NCFILE=ncfile_out,                &
-                                            variable_name="time_bnds",        &
-                                            variable_id=time_bnds_varid      )
+    !       !        PROJ4_string=ncfile_in%PROJ4_string,                                  &
+    !       !        dpLat=cells%Y_lat,                                                       &
+    !       !        dpLon=cells%X_lon,                                                       &
+    !       !        fValidMin=OUTSPECS( iIndex )%valid_minimum,                              &
+    !       !        fValidMax=OUTSPECS( iIndex )%valid_maximum,                         &
+
+    call netcdf_get_variable_id_for_variable( NCFILE=ncfile_out,                &
+                                              variable_name="time_bnds",        &
+                                              variable_id=time_bnds_varid      )
+
+  endif
 
   if ( SLICE_OPTION == SINGLE_SLICE ) then
 
@@ -319,13 +336,23 @@ program swbstats2
                             start_date=slice_start_date,                      &
                             end_date=slice_end_date)
 
-    call write_stats_to_files(grid_sum=pGrdSum, grid_mean=pGrdMean,           &
-                              start_date=slice_start_date,                    &
-                              end_date=slice_end_date)
+    if (OUTPUT_TYPE_OPTION /= OUTPUT_TYPE_CSV_ONLY) then
+      call write_stats_to_files(grid_sum=pGrdSum, grid_mean=pGrdMean,           &
+                                start_date=slice_start_date,                    &
+                                end_date=slice_end_date)
 
-    call write_stats_to_arcgrid(grid_sum=pGrdSum, grid_mean=pGrdMean,         &
-                                start_date=slice_start_date,                  &
-                                end_date=slice_end_date )
+      call write_stats_to_arcgrid(grid_sum=pGrdSum, grid_mean=pGrdMean,         &
+                                  start_date=slice_start_date,                  &
+                                  end_date=slice_end_date )
+
+    endif
+
+    if (ZONE_STATS)  &
+      call output_zonal_stats( start_date=slice_start_date,                 &
+                               end_date=slice_end_date,                     &
+                               values=pGrdMean%rData,                       &
+                               zone_ids=pZONE_GRID%pGrdBase%iData,          &
+                               unique_zone_list=unique_zone_list)
 
     call netcdf_close_file(NCFILE=ncfile_out)
 
@@ -352,21 +379,31 @@ program swbstats2
                               start_date=slice_start_date,                    &
                               end_date=slice_end_date)
 
-      call write_stats_to_files(grid_sum=pGrdSum, grid_mean=pGrdMean,         &
-                                start_date=slice_start_date,                  &
-                                end_date=slice_end_date)
+      if (OUTPUT_TYPE_OPTION /= OUTPUT_TYPE_CSV_ONLY) then
+        call write_stats_to_files(grid_sum=pGrdSum, grid_mean=pGrdMean,         &
+                                  start_date=slice_start_date,                  &
+                                  end_date=slice_end_date)
 
-      call write_stats_to_arcgrid(grid_sum=pGrdSum, grid_mean=pGrdMean,       &
-                                  start_date=slice_start_date,                &
-                                  end_date=slice_end_date,                    &
-                                  stress_period=stress_period_str)
+        call write_stats_to_arcgrid(grid_sum=pGrdSum, grid_mean=pGrdMean,       &
+                                    start_date=slice_start_date,                &
+                                    end_date=slice_end_date,                    &
+                                    stress_period=stress_period_str)
+      endif
+
+      if (ZONE_STATS)  &
+        call output_zonal_stats( start_date=slice_start_date,                 &
+                                 end_date=slice_end_date,                     &
+                                 values=pGrdMean%rData,                       &
+                                 zone_ids=pZONE_GRID%pGrdBase%iData,          &
+                                 unique_zone_list=unique_zone_list)
 
       ! icky hack; need to advance the record number for the multiple slice calc
       RECNUM = RECNUM + 1
 
     enddo
 
-    call netcdf_close_file(NCFILE=ncfile_out)
+    if (OUTPUT_TYPE_OPTION /= OUTPUT_TYPE_CSV_ONLY)  &
+      call netcdf_close_file(NCFILE=ncfile_out)
 
   endif
 
@@ -473,7 +510,8 @@ contains
     type (DATETIME_T), intent(inout)        :: end_date
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: julian_day_number
+    integer (kind=c_int)              :: julian_day_number
+    real (kind=c_float), allocatable  :: tempvals(:)
 
     ! force slice dates to honor bounds of data dates
     if ( start_date < data_start_date )  start_date = data_start_date
@@ -482,6 +520,7 @@ contains
 !    call SIM_DT%initialize( start_date, end_date )
 
     grid_sum%rData = 0.0_c_float
+    grid_mean%rData = 0.0_c_float
 
     do
 
@@ -493,18 +532,35 @@ contains
         call netcdf_get_variable_slice(NCFILE=ncfile_in, rValues=pGrdNative%rData )
       endif
 
+!      print *, "ncdat: ", minval(pGrdNative%rData,  mask=pGrdNative%rData > NC_FILL_FLOAT), &
+!          maxval(pGrdNative%rData,  mask=pGrdNative%rData > NC_FILL_FLOAT)
+
       where ( pGrdNative%rData > NC_FILL_FLOAT )
         grid_sum%rData = grid_sum%rData + pGrdNative%rData
       end where
 
-    end do
+!      print *, "gridsum: ", minval(grid_sum%rData,  mask=pGrdNative%rData > NC_FILL_FLOAT), &
+!          maxval(grid_sum%rData,  mask=pGrdNative%rData > NC_FILL_FLOAT)
 
-    grid_mean%rData = grid_sum%rData / ( end_date - start_date + 1.0_c_double) * 365.25
+    end do
 
     where ( pGrdNative%rData <= NC_FILL_FLOAT )
       grid_mean%rData = NC_FILL_FLOAT
       grid_sum%rData = NC_FILL_FLOAT
-    end where
+    endwhere
+
+    if (ANNUALIZE_MEANS) then
+      where ( pGrdNative%rData > NC_FILL_FLOAT )
+        grid_mean%rData = grid_sum%rData / ( end_date - start_date + 1.0_c_double) * 365.25
+      end where
+    else
+      where ( pGrdNative%rData > NC_FILL_FLOAT )
+        grid_mean%rData = grid_sum%rData / ( end_date - start_date + 1.0_c_double)
+      end where
+    endif
+
+!    print *, "gridsum: ", minval(grid_sum%rData,  mask=pGrdNative%rData > NC_FILL_FLOAT), &
+!        maxval(grid_sum%rData,  mask=pGrdNative%rData > NC_FILL_FLOAT)
 
   end subroutine iterate_over_slice
 
@@ -566,42 +622,144 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iIndex
     integer (kind=c_int)                 :: iStat
-    type (DATA_CATALOG_ENTRY_T), pointer :: pZONE_GRID
 
     pZONE_GRID => null()
 
     ! allocate memory for a generic data_catalog_entry
     allocate(pZONE_GRID, stat=iStat)
-print *, __LINE__
-    call pZONE_GRID%set_target_PROJ4(target_proj4_str)
 
-print *, __LINE__
+    call pZONE_GRID%set_target_PROJ4(target_proj4_str)
 
     call pZONE_GRID%initialize(          &
       sDescription="Zone Grid",          &
       sFileType="ARC_GRID",              &
       sFilename=trim(grid_filename),     &
       iDataType=DATATYPE_INT )
-print *, __LINE__
+
     call pZONE_GRID%getvalues()
-print *, __LINE__
+
     call grid_WriteArcGrid("Zone_grid__as_read_into_SWBSTATS2.asc", pZONE_GRID%pGrdBase )
 
   end subroutine initialize_zone_grid
 
+!------------------------------------------------------------------------------
+
   subroutine set_project_projection_params()
 
-  ! BNDS is a module-level data structure that will be used in other modules to
-  ! supply bounding box information for the SWB project area
-  BNDS%iNumCols = nx
-  BNDS%iNumRows = ny
-  BNDS%fX_ll = xll
-  BNDS%fY_ll = yll
-  BNDS%fY_ur = yur
-  BNDS%fX_ur = xur
-  BNDS%fGridCellSize = gridcell_size
-  BNDS%sPROJ4_string = trim(target_proj4_str)
+    ! BNDS is a module-level data structure that will be used in other modules to
+    ! supply bounding box information for the SWB project area
+    BNDS%iNumCols = nx
+    BNDS%iNumRows = ny
+    BNDS%fX_ll = xll
+    BNDS%fY_ll = yll
+    BNDS%fY_ur = yur
+    BNDS%fX_ur = xur
+    BNDS%fGridCellSize = gridcell_size
+    BNDS%sPROJ4_string = trim(target_proj4_str)
 
-end subroutine set_project_projection_params
+  end subroutine set_project_projection_params
+
+!------------------------------------------------------------------------------
+
+  subroutine output_zonal_stats(start_date, end_date, values, zone_ids,       &
+                                 unique_zone_list, funit)
+
+    type (DATETIME_T), intent(in)         :: start_date
+    type (DATETIME_T), intent(in)         :: end_date
+    real (c_float), intent(inout)         :: values(:,:)
+    integer (c_int), intent(inout)        :: zone_ids(:,:)
+    type (STRING_LIST_T), intent(in)      :: unique_zone_list
+    integer (c_int), intent(in), optional :: funit
+
+    ! [ LOCALS ]
+    integer (c_int)                :: n
+    integer (c_int), allocatable   :: tempvals(:)
+    integer (c_int)                :: number_of_matches
+    real (c_float)                 :: stats(4)
+    integer (c_int)                :: funit_
+
+    if (present(funit)) then
+      funit_ = funit
+    else
+      funit_ = OUTPUT_UNIT
+    endif
+
+    tempvals = unique_zone_list%asInt()
+
+    do n=minval(tempvals,1), maxval(tempvals,1)
+      if ( any(tempvals==n) ) then
+        call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats)
+        write(unit=funit_, fmt="(2(a,', '),i8,', ',3(f12.3,', '),i8)")         &
+          start_date%prettydate(),end_date%prettydate(), n, stats(1:3),int(stats(4))
+      endif
+    enddo
+
+  end subroutine output_zonal_stats
+
+!------------------------------------------------------------------------------
+
+  subroutine calc_zonal_stats(values, zone_ids, target_id, result_vector)
+
+    real (c_float), intent(inout)    :: values(:,:)
+    integer (c_int), intent(inout)   :: zone_ids(:,:)
+    integer (c_int), intent(inout)   :: target_id
+    real (c_float), intent(inout)    :: result_vector(4)
+
+    ! [ LOCALS ]
+    real (c_float)  :: min_val
+    real (c_float)  :: max_val
+    real (c_float)  :: mean_val
+    real (c_double) :: sum_val
+    real (c_float)  :: n_val
+    integer (c_int) :: ix, iy
+
+    mean_val = 0.0
+    max_val = -9.9e-23
+    min_val = 9.9e+23
+    n_val = 0
+
+    min_val = minval( values, zone_ids==target_id .and. values > NC_FILL_FLOAT )
+    max_val = maxval( values, zone_ids==target_id .and. values > NC_FILL_FLOAT )
+    sum_val = sum( values, zone_ids==target_id .and. values > NC_FILL_FLOAT )
+    n_val = count( zone_ids==target_id .and. values > NC_FILL_FLOAT )
+
+    if ( n_val > 0 ) mean_val = sum_val / n_val
+
+    result_vector(1) = min_val
+    result_vector(2) = max_val
+    result_vector(3) = mean_val
+    result_vector(4) = n_val
+
+  end subroutine calc_zonal_stats
+
+!------------------------------------------------------------------------------
+
+  subroutine get_unique_int(grid_values, unique_val_list)
+
+    integer (c_int), intent(in)           :: grid_values(:,:)
+    type (STRING_LIST_T), intent(inout)   :: unique_val_list
+
+    ! [ LOCALS ]
+    integer (c_int)       :: ix, iy
+    character (len=20)    :: sval
+
+    do ix=1,nx
+      do iy=1,ny
+
+        if (grid_values(ix, iy) <= 0 )  cycle
+
+        sval = asCharacter( grid_values(ix,iy) )
+
+        if ( unique_val_list%count == 0) then
+          call unique_val_list%append(sval)
+        else
+          if ( unique_val_list%countmatching( sval ) > 0 )  cycle
+          call unique_val_list%append(sval)
+        endif
+
+      enddo
+    enddo
+
+  end subroutine get_unique_int
 
 end program swbstats2
