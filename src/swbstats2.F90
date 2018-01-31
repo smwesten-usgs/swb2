@@ -54,6 +54,7 @@ program swbstats2
   character (len=:), allocatable :: nc_variable_name_str
   character (len=:), allocatable :: nx_str
   character (len=:), allocatable :: ny_str
+  character (len=:), allocatable :: help_fmt_str
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pZONE_GRID       => null()
   type (DATA_CATALOG_ENTRY_T), pointer :: pCOMPARISON_GRID => null()
@@ -142,18 +143,34 @@ program swbstats2
       //TRIM(int2char(__G95_MINOR__))
 #endif
 
-    write(UNIT=*,FMT="(/,a,/,/,15(a,/))")  "Usage: swbstats2 netcdf_file_name ",                        &
-             "[ --output_type= ]        form of output: CSV_ONLY, BOTH (default)",                      &
-             "[ --slice= ]              dates over which statistics should be calculated:",             &
-             "                            start date and end date formatted as yyyy-mm-dd,yyyy-mm-dd",  &
-             "[ --stress_period_file= ] comma-delimited file containing stress period start and ",      &
-             "                            end date, with header labels and comments starting with'#':", &
-             "                              stress_period,start_date,end_date",                         &
-             "                              #2,1870-01-01,1898-12-31",                                  &
-             "                              5,1920-01-01,1925-12-31",                                   &
-             "                              6,1925-01-01,1930-12-31",                                   &
-             "[ --zone_grid= ]          name of integer-valued grid for which zonal statistics are desired", &
-             "[ --comparison_grid= ]    name of real-valued grid to compare SWB output against"
+    help_fmt_str = "(/,a,/,/,"            &     ! usage
+      //"a,t36,a,/,"                      &     ! --output_type
+      //"a,t36,a,/,t36,a,/,"              &     ! --slice
+      //"a,t36,a,/,t36,a,/,4(t43,a,/),"   &     ! --stress_period_file
+      //"3(a,t36,a,/))"                         ! --zone_grid,
+                                                ! --comparison_conversion_factor,
+                                                ! --comparison_grid
+
+    write(UNIT=*,FMT=help_fmt_str)                                             &
+      "usage: swbstats2 [options] netcdf_file_name ",                          &
+     "[ --output_type= ]",                                                     &
+       "form of output: CSV_ONLY, BOTH (default)",                             &
+     "[ --slice= ]",                                                           &
+       "dates over which statistics should be calculated, ",                   &
+       "with start date and end date formatted as yyyy-mm-dd,yyyy-mm-dd",      &
+     "[ --stress_period_file= ]",                                              &
+       "comma-delimited file containing stress period start and ",             &
+       "end date, with header labels and comments starting with'#':",          &
+         "stress_period,start_date,end_date",                                  &
+         "#2,1870-01-01,1898-12-31",                                           &
+         "5,1920-01-01,1925-12-31",                                            &
+         "6,1925-01-01,1930-12-31",                                            &
+     "[ --zone_grid= ]",                                                       &
+       "name of integer-valued grid for which zonal statistics are desired",   &
+     "[ --comparison_conversion_factor=]",                                     &
+     "value to multiply comparison grid by before calculating statistics",     &
+     "[ --comparison_grid= ]",                                                 &
+       "name of real-valued grid to compare SWB output against"
 
 !             "[ --annualize_means ]     report mean values on an annual basis",                         &
     stop
