@@ -36,21 +36,23 @@ program swbstats2
   logical (c_bool)     :: ZONE_STATS = FALSE
   logical (c_bool)     :: ANNUALIZE_MEANS = TRUE
   logical (c_bool)     :: COMPARISON_GRID = FALSE
-  real (kind=c_float)  :: COMPARISON_GRID_CONVERSION_FACTOR = 1.0_c_float
+  logical (c_bool)     :: MULTIPLE_COMPARISON_GRIDS = FALSE
+  real (kind=c_float)  :: COMPARISON_GRID_SCALE_FACTOR = 1.0_c_float
 
   character (len=256)            :: temp_str, temp_str2, temp_str3
   character (len=:), allocatable :: target_proj4_str
   character (len=:), allocatable :: netcdf_filename_str
   character (len=:), allocatable :: zone_grid_filename_str
   character (len=:), allocatable :: comparison_grid_filename_str
-  character (len=:), allocatable :: conversion_factor_str
+  character (len=:), allocatable :: comparison_period_filename_str
+  character (len=:), allocatable :: scale_factor_str
   character (len=:), allocatable :: output_type_str
-  character (len=:), allocatable :: stress_period_filename_str
+  character (len=:), allocatable :: date_range_filename_str
   character (len=:), allocatable :: annualize_means_str
   character (len=:), allocatable :: slice_str
   character (len=:), allocatable :: start_date_str
   character (len=:), allocatable :: end_date_str
-  character (len=:), allocatable :: stress_period_str
+  character (len=:), allocatable :: date_range_str
   character (len=:), allocatable :: nc_variable_name_str
   character (len=:), allocatable :: nx_str
   character (len=:), allocatable :: ny_str
@@ -84,8 +86,9 @@ program swbstats2
 
   type (STRING_LIST_T)           :: start_date_list
   type (STRING_LIST_T)           :: end_date_list
-  type (STRING_LIST_T)           :: stress_period_id_list
+  type (STRING_LIST_T)           :: date_range_id_list
   type (STRING_LIST_T)           :: unique_zone_list
+  type (STRING_LIST_T)           :: comparison_grid_file_list
 
   type (T_NETCDF4_FILE), pointer          :: ncfile_in
   type (T_NETCDF4_FILE), pointer          :: ncfile_out
@@ -147,6 +150,7 @@ program swbstats2
       //"a,t36,a,/,"                      &     ! --output_type
       //"a,t36,a,/,t36,a,/,"              &     ! --slice
       //"a,t36,a,/,t36,a,/,4(t43,a,/),"   &     ! --stress_period_file
+      //"a,t36,a,/,t36,a,/,4(t43,a,/),"   &     ! --comparison_period_file
       //"3(a,t36,a,/))"                         ! --zone_grid,
                                                 ! --comparison_conversion_factor,
                                                 ! --comparison_grid
@@ -161,13 +165,20 @@ program swbstats2
      "[ --stress_period_file= ]",                                              &
        "comma-delimited file containing stress period start and ",             &
        "end date, with header labels and comments starting with'#':",          &
-         "stress_period,start_date,end_date",                                  &
+         "id,start_date,end_date",                                             &
          "#2,1870-01-01,1898-12-31",                                           &
          "5,1920-01-01,1925-12-31",                                            &
          "6,1925-01-01,1930-12-31",                                            &
+     "[ --comparison_period_file= ]",                                          &
+       "comma-delimited file containing comparison period start and ",         &
+       "end date, with header labels and comments starting with'#':",          &
+         "id,start_date,end_date,comparison_grid_filename",                    &
+         "#2,1870-01-01,1898-12-31,comparison_file_period_2.asc",              &
+         "5,1920-01-01,1925-12-31,comparison_file_period_5.asc",               &
+         "6,1925-01-01,1930-12-31,comparison_file_period_6.asc",               &
      "[ --zone_grid= ]",                                                       &
        "name of integer-valued grid for which zonal statistics are desired",   &
-     "[ --comparison_conversion_factor=]",                                     &
+     "[ --comparison_scale_factor=]",                                          &
      "value to multiply comparison grid by before calculating statistics",     &
      "[ --comparison_grid= ]",                                                 &
        "name of real-valued grid to compare SWB output against"
@@ -193,11 +204,11 @@ program swbstats2
 
       endif
 
-    elseif ( temp_str .containssimilar. "comparison_conversion_factor" ) then
+    elseif ( temp_str .containssimilar. "comparison_scale_factor" ) then
 
-      conversion_factor_str = right(temp_str, substring="=")
+      scale_factor_str = right(temp_str, substring="=")
 
-      COMPARISON_GRID_CONVERSION_FACTOR = asFloat(conversion_factor_str)
+      COMPARISON_GRID_SCALE_FACTOR = asFloat(scale_factor_str)
 
     elseif ( temp_str .containssimilar. "annualize_means" ) then
 
@@ -215,11 +226,22 @@ program swbstats2
     elseif ( temp_str .containssimilar. "stress_period_file" ) then
 
       SLICE_OPTION = MANY_SLICES
-      stress_period_filename_str = right(temp_str, substring="=")
-      call read_stress_period_file( csv_filename=stress_period_filename_str,     &
-                                    stress_period_id_list=stress_period_id_list, &
-                                    start_date_list=start_date_list,             &
+      date_range_filename_str = right(temp_str, substring="=")
+      call read_date_range_file( csv_filename=date_range_filename_str,        &
+                                    date_range_id_list=date_range_id_list,    &
+                                    start_date_list=start_date_list,          &
                                     end_date_list=end_date_list )
+
+    elseif ( temp_str .containssimilar. "comparison_period_file" ) then
+
+      SLICE_OPTION = MANY_SLICES
+      MULTIPLE_COMPARISON_GRIDS = TRUE
+      comparison_period_filename_str = right(temp_str, substring="=")
+      call read_comparison_period_file( csv_filename=comparison_period_filename_str, &
+                                    date_range_id_list=date_range_id_list,    &
+                                    start_date_list=start_date_list,          &
+                                    end_date_list=end_date_list,              &
+                                    comparison_grid_file_list=comparison_grid_file_list )
 
     elseif ( temp_str .containssimilar. "slice" ) then
 
@@ -391,11 +413,11 @@ program swbstats2
 
   elseif ( SLICE_OPTION == MANY_SLICES ) then
 
-    do iIndex=1, stress_period_id_list%count
+    do iIndex=1, date_range_id_list%count
 
       start_date_str = start_date_list%get( iIndex )
       end_date_str = end_date_list%get( iIndex )
-      stress_period_str = stress_period_id_list%get( iIndex )
+      date_range_str = date_range_id_list%get( iIndex )
 
       call slice_start_date%setDateFormat("YYYY-MM-DD")
       call slice_end_date%setDateFormat("YYYY-MM-DD")
@@ -412,6 +434,11 @@ program swbstats2
                               start_date=slice_start_date,                    &
                               end_date=slice_end_date)
 
+      if (MULTIPLE_COMPARISON_GRIDS) then
+        comparison_grid_filename_str = comparison_grid_file_list%get( iIndex )
+        call initialize_comparison_grid(grid_filename=comparison_grid_filename_str)
+      endif
+
       if (OUTPUT_TYPE_OPTION /= OUTPUT_TYPE_CSV_ONLY) then
         call write_stats_to_files(grid_sum=pGrdSum, grid_mean=pGrdMean,         &
                                   start_date=slice_start_date,                  &
@@ -420,7 +447,7 @@ program swbstats2
         call write_stats_to_arcgrid(grid_sum=pGrdSum, grid_mean=pGrdMean,       &
                                     start_date=slice_start_date,                &
                                     end_date=slice_end_date,                    &
-                                    stress_period=stress_period_str)
+                                    date_range=date_range_str)
       endif
 
       if (ZONE_STATS) then
@@ -497,20 +524,20 @@ contains
 
 
   subroutine write_stats_to_arcgrid( grid_sum, grid_mean, start_date,         &
-                                     end_date, stress_period )
+                                     end_date, date_range )
 
     type (GENERAL_GRID_T), pointer          :: grid_sum
     type (GENERAL_GRID_T), pointer          :: grid_mean
     type (DATETIME_T), intent(inout)        :: start_date
     type (DATETIME_T), intent(inout)        :: end_date
-    character (len=*), intent(in), optional :: stress_period
+    character (len=*), intent(in), optional :: date_range
 
     ! [ LOCALS ]
     character (len=:), allocatable  :: filename
 
-    if ( present(stress_period) ) then
+    if ( present(date_range) ) then
       !@todo: change filename depending on the desired output statistic
-      filename = trim(stress_period_str)//"__"//trim(nc_variable_name_str)      &
+      filename = trim(date_range_str)//"__"//trim(nc_variable_name_str)      &
                  //"__"//start_date%prettydate()//"_to_"//end_date%prettydate() &
                  //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)             &
                  //"__MEAN_ANNUAL.asc"
@@ -532,12 +559,12 @@ contains
 
 !------------------------------------------------------------------------------
   !
-  ! subroutine iterate_over_slices( grid_sum, grid_mean, stress_period_id_list, &
+  ! subroutine iterate_over_slices( grid_sum, grid_mean, date_range_id_list, &
   !                                 start_date_list, end_date_list )
   !
   !   type (GENERAL_GRID_T), pointer          :: grid_sum
   !   type (GENERAL_GRID_T), pointer          :: grid_mean
-  !   type (STRING_LIST_T), intent(in)        :: stress_period_id_list
+  !   type (STRING_LIST_T), intent(in)        :: date_range_id_list
   !   type (STRING_LIST_T), intent(in)        :: start_date_list
   !   type (STRING_LIST_T), intent(in)        :: end_date_list
   !
@@ -569,8 +596,11 @@ contains
 
     do
 
-      call SIM_DT%addDay
-      if ( SIM_DT%curr > end_date )  exit
+      if ( SIM_DT%curr < start_date ) then
+        call SIM_DT%addDay()
+        cycle
+      endif
+
       julian_day_number = int( SIM_DT%curr%dJulianDate, kind=c_int)
 
       if ( netcdf_update_time_starting_index(ncfile_in, julian_day_number ) )   then
@@ -586,6 +616,9 @@ contains
 
 !      print *, "gridsum: ", minval(grid_sum%rData,  mask=pGrdNative%rData > NC_FILL_FLOAT), &
 !          maxval(grid_sum%rData,  mask=pGrdNative%rData > NC_FILL_FLOAT)
+
+      call SIM_DT%addDay
+      if ( SIM_DT%curr > end_date )  exit
 
     end do
 
@@ -611,13 +644,13 @@ contains
 
 !------------------------------------------------------------------------------
 
-  subroutine read_stress_period_file( csv_filename,                           &
-                                      stress_period_id_list,                  &
+  subroutine read_date_range_file( csv_filename,                           &
+                                      date_range_id_list,                  &
                                       start_date_list,                        &
                                       end_date_list )
 
     character (len=*), intent(inout)   :: csv_filename
-    type (STRING_LIST_T), intent(out)  :: stress_period_id_list
+    type (STRING_LIST_T), intent(out)  :: date_range_id_list
     type (STRING_LIST_T), intent(out)  :: start_date_list
     type (STRING_LIST_T), intent(out)  :: end_date_list
 
@@ -646,7 +679,7 @@ contains
       if ( len_trim(sRecord) == 0 ) cycle
 
       call chomp( sRecord, sItem, sDelimiters="," )
-      call stress_period_id_list%append( sItem )
+      call date_range_id_list%append( sItem )
 
       call chomp( sRecord, sItem, sDelimiters="," )
       call start_date_list%append( sItem )
@@ -656,7 +689,63 @@ contains
 
     call DF%close()
 
-  end subroutine read_stress_period_file
+  end subroutine read_date_range_file
+
+
+  !------------------------------------------------------------------------------
+
+  subroutine read_comparison_period_file( csv_filename,                       &
+                                          date_range_id_list,                 &
+                                          start_date_list,                    &
+                                          end_date_list,                      &
+                                          comparison_grid_file_list)
+
+    character (len=*), intent(inout)   :: csv_filename
+    type (STRING_LIST_T), intent(out)  :: date_range_id_list
+    type (STRING_LIST_T), intent(out)  :: start_date_list
+    type (STRING_LIST_T), intent(out)  :: end_date_list
+    type (STRING_LIST_T), intent(out)  :: comparison_grid_file_list
+
+    ! [ LOCALS ]
+    integer (kind=c_int)           :: iFileIndex, iColIndex
+    integer (kind=c_int)           :: iStat
+    type (ASCII_FILE_T)            :: DF
+    character (len=256)            :: sRecord, sItem
+
+   ! open the file associated with current file index value
+    call DF%open(sFilename = csv_filename,                               &
+                 sDelimiters=",",                                        &
+                 sCommentChars = "%#!",                                  &
+                 lHasHeader=TRUE         )
+
+    ! read in and throw away header of file
+    sRecord = DF%readLine()
+
+    ! now read in the remainder of the file
+    do while ( .not. DF%isEOF() )
+
+      ! read in next line of file
+      sRecord = DF%readLine()
+
+      ! skip blank lines
+      if ( len_trim(sRecord) == 0 ) cycle
+
+      call chomp( sRecord, sItem, sDelimiters="," )
+      call date_range_id_list%append( sItem )
+
+      call chomp( sRecord, sItem, sDelimiters="," )
+      call start_date_list%append( sItem )
+
+      call chomp( sRecord, sItem, sDelimiters="," )
+      call end_date_list%append( sItem )
+
+      call comparison_grid_file_list%append( sRecord )
+
+    enddo
+
+    call DF%close()
+
+  end subroutine read_comparison_period_file
 
 !------------------------------------------------------------------------------
 
@@ -696,14 +785,14 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iIndex
     integer (kind=c_int)                 :: iStat
-    character (len=:), allocatable       :: left_str
+    character (len=:), allocatable       :: description_str
     character (len=:), allocatable       :: output_filename_str
 
-    pCOMPARISON_GRID => null()
+    description_str = left( grid_filename, substring=".")
+    if (description_str .contains. "/") description_str = right( description_str, substring="/")
+    if (description_str .contains. "\") description_str = right( description_str, substring="\")
 
-    left_str = left( grid_filename, substring=".")
-
-    output_filename_str = "Comparison_grid__"//trim(left_str)//"__as_read_into_SWBSTATS2.asc"
+    output_filename_str = "Comparison_grid__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
 
     ! allocate memory for a generic data_catalog_entry
     if (.not. associated(pCOMPARISON_GRID))  allocate(pCOMPARISON_GRID, stat=iStat)
@@ -718,8 +807,12 @@ contains
 
     call pCOMPARISON_GRID%getvalues()
 
-    pCOMPARISON_GRID%pGrdBase%rData = pCOMPARISON_GRID%pGrdBase%rData         &
-                                      * COMPARISON_GRID_CONVERSION_FACTOR
+    where ( pGrdNative%rData <= NC_FILL_FLOAT )
+      pCOMPARISON_GRID%pGrdBase%rData = NC_FILL_FLOAT
+    elsewhere
+      pCOMPARISON_GRID%pGrdBase%rData = pCOMPARISON_GRID%pGrdBase%rData       &
+                                      * COMPARISON_GRID_SCALE_FACTOR
+    end where
 
     call grid_WriteArcGrid(output_filename_str, pCOMPARISON_GRID%pGrdBase )
 

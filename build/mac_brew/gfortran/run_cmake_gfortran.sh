@@ -36,7 +36,7 @@ export INSTALL_PREFIX=/usr/local/bin
 
 # define other variables for use in the CMakeList.txt file
 # options are "Release" or "Debug"
-export BUILD_TYPE="DEBUG"
+export BUILD_TYPE="Release"
 export SYSTEM_TYPE="MacOS"
 
 # define platform and compiler specific compilation flags

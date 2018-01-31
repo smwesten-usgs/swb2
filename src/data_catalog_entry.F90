@@ -231,6 +231,10 @@ contains
 
     class (DATA_CATALOG_ENTRY_T)         :: this
 
+    if (associated(this%pGrdNative))  call grid_Destroy(this%pGrdNative)
+    if (associated(this%pGrdBase))  call grid_Destroy(this%pGrdBase)
+    if (associated(pGrd))  call grid_Destroy(pGrd)
+
     nullify(this%pGrdNative)
     nullify(this%pGrdBase)
     nullify( pGrd )
