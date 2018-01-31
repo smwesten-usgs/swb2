@@ -3,7 +3,8 @@ program swbstats2
   use iso_c_binding, only             : c_int, c_float, c_double, c_bool,      &
                                         c_size_t, c_ptrdiff_t, c_long
   use iso_fortran_env, only           : OUTPUT_UNIT
-  use constants_and_conversions, only : TRUE, FALSE, DATATYPE_INT, BNDS
+  use constants_and_conversions, only : TRUE, FALSE, DATATYPE_INT,            &
+                                        DATATYPE_FLOAT, BNDS, asFloat
   use file_operations, only           : ASCII_FILE_T
   use data_catalog_entry, only        : DATA_CATALOG_ENTRY_T
   use datetime, only                  : DATETIME_T, assignment(=), operator(>)
@@ -34,13 +35,18 @@ program swbstats2
   integer (kind=c_int) :: SLICE_OPTION = SINGLE_SLICE
   logical (c_bool)     :: ZONE_STATS = FALSE
   logical (c_bool)     :: ANNUALIZE_MEANS = TRUE
+  logical (c_bool)     :: COMPARISON_GRID = FALSE
+  real (kind=c_float)  :: COMPARISON_GRID_CONVERSION_FACTOR = 1.0_c_float
 
   character (len=256)            :: temp_str, temp_str2, temp_str3
   character (len=:), allocatable :: target_proj4_str
   character (len=:), allocatable :: netcdf_filename_str
   character (len=:), allocatable :: zone_grid_filename_str
+  character (len=:), allocatable :: comparison_grid_filename_str
+  character (len=:), allocatable :: conversion_factor_str
   character (len=:), allocatable :: output_type_str
   character (len=:), allocatable :: stress_period_filename_str
+  character (len=:), allocatable :: annualize_means_str
   character (len=:), allocatable :: slice_str
   character (len=:), allocatable :: start_date_str
   character (len=:), allocatable :: end_date_str
@@ -49,7 +55,8 @@ program swbstats2
   character (len=:), allocatable :: nx_str
   character (len=:), allocatable :: ny_str
 
-  type (DATA_CATALOG_ENTRY_T), pointer :: pZONE_GRID
+  type (DATA_CATALOG_ENTRY_T), pointer :: pZONE_GRID       => null()
+  type (DATA_CATALOG_ENTRY_T), pointer :: pCOMPARISON_GRID => null()
 
   integer (kind=c_int)           :: iNumArgs
   character (len=1024)           :: sCompilerFlags
@@ -145,7 +152,8 @@ program swbstats2
              "                              #2,1870-01-01,1898-12-31",                                  &
              "                              5,1920-01-01,1925-12-31",                                   &
              "                              6,1925-01-01,1930-12-31",                                   &
-             "[ --zone_grid= ]          name of integer-valued grid for which zonal statistics are desired"
+             "[ --zone_grid= ]          name of integer-valued grid for which zonal statistics are desired", &
+             "[ --comparison_grid= ]    name of real-valued grid to compare SWB output against"
 
 !             "[ --annualize_means ]     report mean values on an annual basis",                         &
     stop
@@ -168,9 +176,24 @@ program swbstats2
 
       endif
 
+    elseif ( temp_str .containssimilar. "comparison_conversion_factor" ) then
+
+      conversion_factor_str = right(temp_str, substring="=")
+
+      COMPARISON_GRID_CONVERSION_FACTOR = asFloat(conversion_factor_str)
+
     elseif ( temp_str .containssimilar. "annualize_means" ) then
 
-      ANNUALIZE_MEANS = TRUE
+      annualize_means_str = right(temp_str, substring="=")
+      if (annualize_means_str .containssimilar. "TRUE") then
+
+        ANNUALIZE_MEANS = TRUE
+
+      elseif (annualize_means_str .containssimilar. "FALSE") then
+
+        ANNUALIZE_MEANS = FALSE
+
+      endif
 
     elseif ( temp_str .containssimilar. "stress_period_file" ) then
 
@@ -198,6 +221,11 @@ program swbstats2
 
       zone_grid_filename_str       = right(temp_str, substring="=")
       ZONE_STATS = TRUE
+
+    elseif ( temp_str .containssimilar. "comparison_grid" ) then
+
+      comparison_grid_filename_str       = right(temp_str, substring="=")
+      COMPARISON_GRID = TRUE
 
     else
 
@@ -289,6 +317,10 @@ program swbstats2
     call get_unique_int(pZONE_GRID%pGrdBase%iData, unique_zone_list)
   endif
 
+  if (COMPARISON_GRID) then
+    call initialize_comparison_grid(grid_filename=comparison_grid_filename_str)
+  endif
+
   if ( SLICE_OPTION == SINGLE_SLICE ) then
     ! force slice dates to honor bounds of data dates
     if ( slice_start_date < data_start_date )  slice_start_date = data_start_date
@@ -300,35 +332,7 @@ program swbstats2
     call SIM_DT%initialize( data_start_date, data_end_date )
   endif
 
-  nc_variable_name_str = trim(ncfile_in%pNC_VAR(NC_Z)%sVariableName)
-
-  if (OUTPUT_TYPE_OPTION /= OUTPUT_TYPE_CSV_ONLY) then
-
-    call netcdf_open_and_prepare_as_output(                                     &
-          NCFILE=ncfile_out,                                                    &
-          sVariableName=trim(nc_variable_name_str),                             &
-          sVariableUnits=trim(temp_str3),                                       &
-          iNX=ncfile_in%iNX,                                                    &
-          iNY=ncfile_in%iNY,                                                    &
-          fX=ncfile_in%rX_Coords,                                               &
-          fY=ncfile_in%rY_Coords,                                               &
-          PROJ4_string=trim(temp_str),                                          &
-          StartDate=SIM_DT%start,                                               &
-          EndDate=SIM_DT%end,                                                   &
-          write_time_bounds=TRUE,                                               &
-          filename_modifier=output_type_str )
-
-    !       !        PROJ4_string=ncfile_in%PROJ4_string,                                  &
-    !       !        dpLat=cells%Y_lat,                                                       &
-    !       !        dpLon=cells%X_lon,                                                       &
-    !       !        fValidMin=OUTSPECS( iIndex )%valid_minimum,                              &
-    !       !        fValidMax=OUTSPECS( iIndex )%valid_maximum,                         &
-
-    call netcdf_get_variable_id_for_variable( NCFILE=ncfile_out,                &
-                                              variable_name="time_bnds",        &
-                                              variable_id=time_bnds_varid      )
-
-  endif
+  call open_output_netcdf_files()
 
   if ( SLICE_OPTION == SINGLE_SLICE ) then
 
@@ -347,12 +351,24 @@ program swbstats2
 
     endif
 
-    if (ZONE_STATS)  &
-      call output_zonal_stats( start_date=slice_start_date,                 &
-                               end_date=slice_end_date,                     &
-                               values=pGrdMean%rData,                       &
-                               zone_ids=pZONE_GRID%pGrdBase%iData,          &
-                               unique_zone_list=unique_zone_list)
+    if (ZONE_STATS) then
+      if ( associated(pCOMPARISON_GRID) ) then
+
+        call output_zonal_stats( start_date=slice_start_date,                 &
+                                 end_date=slice_end_date,                     &
+                                 values=pGrdMean%rData,                       &
+                                 zone_ids=pZONE_GRID%pGrdBase%iData,          &
+                                 unique_zone_list=unique_zone_list,           &
+                                 comparison_values=pCOMPARISON_GRID%pGrdBase%rData)
+      else
+
+        call output_zonal_stats( start_date=slice_start_date,                 &
+                                 end_date=slice_end_date,                     &
+                                 values=pGrdMean%rData,                       &
+                                 zone_ids=pZONE_GRID%pGrdBase%iData,          &
+                                 unique_zone_list=unique_zone_list)
+      endif
+    endif
 
     call netcdf_close_file(NCFILE=ncfile_out)
 
@@ -390,12 +406,24 @@ program swbstats2
                                     stress_period=stress_period_str)
       endif
 
-      if (ZONE_STATS)  &
-        call output_zonal_stats( start_date=slice_start_date,                 &
-                                 end_date=slice_end_date,                     &
-                                 values=pGrdMean%rData,                       &
-                                 zone_ids=pZONE_GRID%pGrdBase%iData,          &
-                                 unique_zone_list=unique_zone_list)
+      if (ZONE_STATS) then
+        if ( associated(pCOMPARISON_GRID) ) then
+
+          call output_zonal_stats( start_date=slice_start_date,                 &
+                                   end_date=slice_end_date,                     &
+                                   values=pGrdMean%rData,                       &
+                                   zone_ids=pZONE_GRID%pGrdBase%iData,          &
+                                   unique_zone_list=unique_zone_list,           &
+                                   comparison_values=pCOMPARISON_GRID%pGrdBase%rData)
+        else
+
+          call output_zonal_stats( start_date=slice_start_date,                 &
+                                   end_date=slice_end_date,                     &
+                                   values=pGrdMean%rData,                       &
+                                   zone_ids=pZONE_GRID%pGrdBase%iData,          &
+                                   unique_zone_list=unique_zone_list)
+        endif
+      endif
 
       ! icky hack; need to advance the record number for the multiple slice calc
       RECNUM = RECNUM + 1
@@ -644,6 +672,44 @@ contains
 
 !------------------------------------------------------------------------------
 
+  subroutine initialize_comparison_grid( grid_filename )
+
+    character (len=*), intent(inout)   :: grid_filename
+
+    ! [ LOCALS ]
+    integer (kind=c_int)                 :: iIndex
+    integer (kind=c_int)                 :: iStat
+    character (len=:), allocatable       :: left_str
+    character (len=:), allocatable       :: output_filename_str
+
+    pCOMPARISON_GRID => null()
+
+    left_str = left( grid_filename, substring=".")
+
+    output_filename_str = "Comparison_grid__"//trim(left_str)//"__as_read_into_SWBSTATS2.asc"
+
+    ! allocate memory for a generic data_catalog_entry
+    if (.not. associated(pCOMPARISON_GRID))  allocate(pCOMPARISON_GRID, stat=iStat)
+
+    call pCOMPARISON_GRID%set_target_PROJ4(target_proj4_str)
+
+    call pCOMPARISON_GRID%initialize(          &
+      sDescription="Comparison Grid",          &
+      sFileType="ARC_GRID",                    &
+      sFilename=trim(grid_filename),           &
+      iDataType=DATATYPE_FLOAT )
+
+    call pCOMPARISON_GRID%getvalues()
+
+    pCOMPARISON_GRID%pGrdBase%rData = pCOMPARISON_GRID%pGrdBase%rData         &
+                                      * COMPARISON_GRID_CONVERSION_FACTOR
+
+    call grid_WriteArcGrid(output_filename_str, pCOMPARISON_GRID%pGrdBase )
+
+  end subroutine initialize_comparison_grid
+
+!------------------------------------------------------------------------------
+
   subroutine set_project_projection_params()
 
     ! BNDS is a module-level data structure that will be used in other modules to
@@ -662,20 +728,21 @@ contains
 !------------------------------------------------------------------------------
 
   subroutine output_zonal_stats(start_date, end_date, values, zone_ids,       &
-                                 unique_zone_list, funit)
+                                 unique_zone_list, funit, comparison_values)
 
-    type (DATETIME_T), intent(in)         :: start_date
-    type (DATETIME_T), intent(in)         :: end_date
-    real (c_float), intent(inout)         :: values(:,:)
-    integer (c_int), intent(inout)        :: zone_ids(:,:)
-    type (STRING_LIST_T), intent(in)      :: unique_zone_list
-    integer (c_int), intent(in), optional :: funit
+    type (DATETIME_T), intent(in)            :: start_date
+    type (DATETIME_T), intent(in)            :: end_date
+    real (c_float), intent(inout)            :: values(:,:)
+    integer (c_int), intent(inout)           :: zone_ids(:,:)
+    type (STRING_LIST_T), intent(in)         :: unique_zone_list
+    integer (c_int), intent(in), optional    :: funit
+    real (c_float), intent(inout), optional  :: comparison_values(:,:)
 
     ! [ LOCALS ]
     integer (c_int)                :: n
     integer (c_int), allocatable   :: tempvals(:)
     integer (c_int)                :: number_of_matches
-    real (c_float)                 :: stats(4)
+    real (c_float), allocatable    :: stats(:)
     integer (c_int)                :: funit_
 
     if (present(funit)) then
@@ -688,9 +755,17 @@ contains
 
     do n=minval(tempvals,1), maxval(tempvals,1)
       if ( any(tempvals==n) ) then
-        call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats)
-        write(unit=funit_, fmt="(2(a,', '),i8,', ',3(f12.3,', '),i8)")         &
-          start_date%prettydate(),end_date%prettydate(), n, stats(1:3),int(stats(4))
+        if (present(comparison_values)) then
+          call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats, &
+                comparison_values=comparison_values)
+          write(unit=funit_, fmt="(2(a,', '),i8,', ',2(3(f12.3,', '),i8))")            &
+            start_date%prettydate(),end_date%prettydate(), n, stats(1:3),int(stats(4)), &
+            stats(5:7),int(stats(8))
+        else
+          call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats)
+          write(unit=funit_, fmt="(2(a,', '),i8,', ',3(f12.3,', '),i8)")         &
+            start_date%prettydate(),end_date%prettydate(), n, stats(1:3),int(stats(4))
+        endif
       endif
     enddo
 
@@ -698,12 +773,13 @@ contains
 
 !------------------------------------------------------------------------------
 
-  subroutine calc_zonal_stats(values, zone_ids, target_id, result_vector)
+  subroutine calc_zonal_stats(values, zone_ids, target_id, result_vector, comparison_values)
 
-    real (c_float), intent(inout)    :: values(:,:)
-    integer (c_int), intent(inout)   :: zone_ids(:,:)
-    integer (c_int), intent(inout)   :: target_id
-    real (c_float), intent(inout)    :: result_vector(4)
+    real (c_float), intent(inout)                 :: values(:,:)
+    integer (c_int), intent(inout)                :: zone_ids(:,:)
+    integer (c_int), intent(inout)                :: target_id
+    real (c_float), intent(inout), allocatable    :: result_vector(:)
+    real (c_float), intent(inout), optional       :: comparison_values(:,:)
 
     ! [ LOCALS ]
     real (c_float)  :: min_val
@@ -711,7 +787,12 @@ contains
     real (c_float)  :: mean_val
     real (c_double) :: sum_val
     real (c_float)  :: n_val
-    integer (c_int) :: ix, iy
+
+    real (c_float)  :: min_val_comp
+    real (c_float)  :: max_val_comp
+    real (c_float)  :: mean_val_comp
+    real (c_double) :: sum_val_comp
+    real (c_float)  :: n_val_comp
 
     mean_val = 0.0
     max_val = -9.9e-23
@@ -724,6 +805,25 @@ contains
     n_val = count( zone_ids==target_id .and. values > NC_FILL_FLOAT )
 
     if ( n_val > 0 ) mean_val = sum_val / n_val
+
+    min_val_comp = minval( comparison_values, zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
+    max_val_comp = maxval( comparison_values, zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
+    sum_val_comp = sum( comparison_values, zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
+    n_val_comp = count( zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
+
+    if ( n_val_comp > 0 ) mean_val_comp = sum_val_comp / n_val_comp
+
+    if ( allocated(result_vector) )  deallocate(result_vector)
+
+    if ( present( comparison_values ) ) then
+      allocate( result_vector(10) )
+      result_vector(5) = min_val_comp
+      result_vector(6) = max_val_comp
+      result_vector(7) = mean_val_comp
+      result_vector(8) = n_val_comp
+    else
+      allocate (result_vector(4))
+    endif
 
     result_vector(1) = min_val
     result_vector(2) = max_val
@@ -761,5 +861,33 @@ contains
     enddo
 
   end subroutine get_unique_int
+
+  subroutine open_output_netcdf_files()
+
+    nc_variable_name_str = trim(ncfile_in%pNC_VAR(NC_Z)%sVariableName)
+
+    if (OUTPUT_TYPE_OPTION /= OUTPUT_TYPE_CSV_ONLY) then
+
+      call netcdf_open_and_prepare_as_output(                                     &
+            NCFILE=ncfile_out,                                                    &
+            sVariableName=trim(nc_variable_name_str),                             &
+            sVariableUnits=trim(temp_str3),                                       &
+            iNX=ncfile_in%iNX,                                                    &
+            iNY=ncfile_in%iNY,                                                    &
+            fX=ncfile_in%rX_Coords,                                               &
+            fY=ncfile_in%rY_Coords,                                               &
+            PROJ4_string=trim(temp_str),                                          &
+            StartDate=SIM_DT%start,                                               &
+            EndDate=SIM_DT%end,                                                   &
+            write_time_bounds=TRUE,                                               &
+            filename_modifier=output_type_str )
+
+      call netcdf_get_variable_id_for_variable( NCFILE=ncfile_out,                &
+                                                variable_name="time_bnds",        &
+                                                variable_id=time_bnds_varid      )
+
+    endif
+
+  end subroutine open_output_netcdf_files
 
 end program swbstats2
