@@ -39,15 +39,20 @@ program swbstats2
   logical (c_bool)     :: MULTIPLE_COMPARISON_GRIDS = FALSE
   real (kind=c_float)  :: COMPARISON_GRID_SCALE_FACTOR = 1.0_c_float
 
-  character (len=256)            :: temp_str, temp_str2, temp_str3
+  character (len=256)            :: temp_str, temp_str2
   character (len=:), allocatable :: target_proj4_str
+
   character (len=:), allocatable :: netcdf_filename_str
   character (len=:), allocatable :: zone_grid_filename_str
   character (len=:), allocatable :: comparison_grid_filename_str
   character (len=:), allocatable :: comparison_period_filename_str
+  character (len=:), allocatable :: output_csv_filename_str
+  character (len=:), allocatable :: date_range_filename_str
+
+  character (len=:), allocatable :: netcdf_variable_units_str
+  character (len=:), allocatable :: netcdf_variable_name_str
   character (len=:), allocatable :: scale_factor_str
   character (len=:), allocatable :: output_type_str
-  character (len=:), allocatable :: date_range_filename_str
   character (len=:), allocatable :: annualize_means_str
   character (len=:), allocatable :: slice_str
   character (len=:), allocatable :: start_date_str
@@ -89,6 +94,8 @@ program swbstats2
   type (STRING_LIST_T)           :: date_range_id_list
   type (STRING_LIST_T)           :: unique_zone_list
   type (STRING_LIST_T)           :: comparison_grid_file_list
+
+  type (ASCII_FILE_T)            :: csv_output_file
 
   type (T_NETCDF4_FILE), pointer          :: ncfile_in
   type (T_NETCDF4_FILE), pointer          :: ncfile_out
@@ -304,16 +311,17 @@ program swbstats2
   temp_str = value_list%get( iIndex_array(1) )
   target_proj4_str = trim(temp_str)
 
-  temp_str2 = trim(ncfile_in%pNC_VAR(NC_Z)%sVariableName)
+  netcdf_variable_name_str = trim(ncfile_in%pNC_VAR(NC_Z)%sVariableName)
 
-  call netcdf_get_attribute_list_for_variable( NCFILE=ncfile_in,                &
-                                               variable_name=temp_str2,         &
-                                               attribute_name_list=name_list,   &
-                                               attribute_value_list=value_list )
+  call netcdf_get_attribute_list_for_variable(                                &
+                   NCFILE=ncfile_in,                                          &
+                   variable_name=netcdf_variable_name_str,                    &
+                   attribute_name_list=name_list,                             &
+                   attribute_value_list=value_list )
 
   ! extract PROJ4 string from netCDF file
   iIndex_array = name_list%which("units")
-  temp_str3 = value_list%get( iIndex_array(1) )
+  netcdf_variable_units_str = value_list%get( iIndex_array(1) )
 
   ! create some working grids to hold raw and summed values
   pGrdNative => grid_Create ( iNX=ncfile_in%iNX,           &
@@ -351,11 +359,6 @@ program swbstats2
   call set_project_projection_params()
 
 
-  if (ZONE_STATS) then
-    call initialize_zone_grid(grid_filename=zone_grid_filename_str)
-    call get_unique_int(pZONE_GRID%pGrdBase%iData, unique_zone_list)
-  endif
-
   if (COMPARISON_GRID) then
     call initialize_comparison_grid(grid_filename=comparison_grid_filename_str)
   endif
@@ -369,6 +372,13 @@ program swbstats2
 
   else
     call SIM_DT%initialize( data_start_date, data_end_date )
+  endif
+
+  if (ZONE_STATS) then
+    call initialize_zone_grid(grid_filename=zone_grid_filename_str)
+    call get_unique_int(pZONE_GRID%pGrdBase%iData, unique_zone_list)
+    output_csv_filename_str = "zonal_stats_"//trim(netcdf_variable_name_str)//".csv"
+    call open_output_csv_file(output_csv_filename_str)
   endif
 
   call open_output_netcdf_files()
@@ -393,19 +403,25 @@ program swbstats2
     if (ZONE_STATS) then
       if ( associated(pCOMPARISON_GRID) ) then
 
-        call output_zonal_stats( start_date=slice_start_date,                 &
-                                 end_date=slice_end_date,                     &
-                                 values=pGrdMean%rData,                       &
-                                 zone_ids=pZONE_GRID%pGrdBase%iData,          &
-                                 unique_zone_list=unique_zone_list,           &
-                                 comparison_values=pCOMPARISON_GRID%pGrdBase%rData)
+        call output_zonal_stats(                                            &
+             start_date=slice_start_date,                                   &
+             end_date=slice_end_date,                                       &
+             values=pGrdMean%rData,                                         &
+             zone_ids=pZONE_GRID%pGrdBase%iData,                            &
+             unique_zone_list=unique_zone_list,                             &
+             comparison_values=pCOMPARISON_GRID%pGrdBase%rData,             &
+             funit=csv_output_file%unit() )
+
       else
 
-        call output_zonal_stats( start_date=slice_start_date,                 &
-                                 end_date=slice_end_date,                     &
-                                 values=pGrdMean%rData,                       &
-                                 zone_ids=pZONE_GRID%pGrdBase%iData,          &
-                                 unique_zone_list=unique_zone_list)
+        call output_zonal_stats(                                            &
+             start_date=slice_start_date,                                   &
+             end_date=slice_end_date,                                       &
+             values=pGrdMean%rData,                                         &
+             zone_ids=pZONE_GRID%pGrdBase%iData,                            &
+             unique_zone_list=unique_zone_list,                             &
+             funit=csv_output_file%unit() )
+
       endif
     endif
 
@@ -433,12 +449,12 @@ program swbstats2
       call iterate_over_slice(grid_sum=pGrdSum, grid_mean=pGrdMean,           &
                               start_date=slice_start_date,                    &
                               end_date=slice_end_date)
-
+print *, __LINE__
       if (MULTIPLE_COMPARISON_GRIDS) then
         comparison_grid_filename_str = comparison_grid_file_list%get( iIndex )
         call initialize_comparison_grid(grid_filename=comparison_grid_filename_str)
       endif
-
+print *, __LINE__
       if (OUTPUT_TYPE_OPTION /= OUTPUT_TYPE_CSV_ONLY) then
         call write_stats_to_files(grid_sum=pGrdSum, grid_mean=pGrdMean,         &
                                   start_date=slice_start_date,                  &
@@ -453,29 +469,38 @@ program swbstats2
       if (ZONE_STATS) then
         if ( associated(pCOMPARISON_GRID) ) then
 
-          call output_zonal_stats( start_date=slice_start_date,                 &
-                                   end_date=slice_end_date,                     &
-                                   values=pGrdMean%rData,                       &
-                                   zone_ids=pZONE_GRID%pGrdBase%iData,          &
-                                   unique_zone_list=unique_zone_list,           &
-                                   comparison_values=pCOMPARISON_GRID%pGrdBase%rData)
-        else
+          call output_zonal_stats(                                            &
+               start_date=slice_start_date,                                   &
+               end_date=slice_end_date,                                       &
+               values=pGrdMean%rData,                                         &
+               zone_ids=pZONE_GRID%pGrdBase%iData,                            &
+               unique_zone_list=unique_zone_list,                             &
+               comparison_values=pCOMPARISON_GRID%pGrdBase%rData,             &
+               funit=csv_output_file%unit() )
 
-          call output_zonal_stats( start_date=slice_start_date,                 &
-                                   end_date=slice_end_date,                     &
-                                   values=pGrdMean%rData,                       &
-                                   zone_ids=pZONE_GRID%pGrdBase%iData,          &
-                                   unique_zone_list=unique_zone_list)
+        else
+print *, __LINE__
+print *, associated(pZONE_GRID)
+          call output_zonal_stats(                                            &
+               start_date=slice_start_date,                                   &
+               end_date=slice_end_date,                                       &
+               values=pGrdMean%rData,                                         &
+               zone_ids=pZONE_GRID%pGrdBase%iData,                            &
+               unique_zone_list=unique_zone_list,                             &
+               funit=csv_output_file%unit() )
+
         endif
       endif
 
       ! icky hack; need to advance the record number for the multiple slice calc
       RECNUM = RECNUM + 1
-
+print *, __LINE__
     enddo
-
+print *, __LINE__
     if (OUTPUT_TYPE_OPTION /= OUTPUT_TYPE_CSV_ONLY)  &
       call netcdf_close_file(NCFILE=ncfile_out)
+
+    if (ZONE_STATS) call csv_output_file%close()
 
   endif
 
@@ -855,6 +880,14 @@ contains
     real (c_float), allocatable    :: stats(:)
     integer (c_int)                :: funit_
 
+print *, __LINE__
+
+print *, funit
+call unique_zone_list%print()
+print *, present( comparison_values)
+print *, allocated(stats)
+
+
     if (present(funit)) then
       funit_ = funit
     else
@@ -868,9 +901,10 @@ contains
         if (present(comparison_values)) then
           call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats, &
                 comparison_values=comparison_values)
-          write(unit=funit_, fmt="(2(a,', '),i8,', ',2(3(f12.3,', '),i8))")            &
-            start_date%prettydate(),end_date%prettydate(), n, stats(1:3),int(stats(4)), &
-            stats(5:7),int(stats(8))
+          write(unit=funit_, fmt="(2(a,', '),i8,', ',3(f12.3,', '),i8,', ',"  &
+            //"3(f12.3,', '),i8)")                                            &
+            start_date%prettydate(),end_date%prettydate(), n, stats(1:3),     &
+            int(stats(4)), stats(5:7),int(stats(8))
         else
           call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats)
           write(unit=funit_, fmt="(2(a,', '),i8,', ',3(f12.3,', '),i8)")         &
@@ -981,7 +1015,7 @@ contains
       call netcdf_open_and_prepare_as_output(                                     &
             NCFILE=ncfile_out,                                                    &
             sVariableName=trim(nc_variable_name_str),                             &
-            sVariableUnits=trim(temp_str3),                                       &
+            sVariableUnits=trim(netcdf_variable_units_str),                                       &
             iNX=ncfile_in%iNX,                                                    &
             iNY=ncfile_in%iNY,                                                    &
             fX=ncfile_in%rX_Coords,                                               &
@@ -999,5 +1033,27 @@ contains
     endif
 
   end subroutine open_output_netcdf_files
+
+  subroutine open_output_csv_file(filename)
+
+    character (len=*)   :: filename
+
+    ! [ LOCALS ]
+    character (len=256)    :: header_str
+
+    call csv_output_file%open(filename)
+
+    if (MULTIPLE_COMPARISON_GRIDS .or. COMPARISON_GRID) then
+      header_str = "start_date,end_date,zone_id,minimum_swb,maximum_swb,"     &
+        //"mean_swb,count_swb,minimum_obs,maximum_obs,"                       &
+        //"mean_obs,count_obs"
+    else
+      header_str = "start_date,end_date,zone_id,minimum_swb,maximum_swb,"     &
+        //"mean_swb,count_swb"
+    endif
+
+    call csv_output_file%writeLine(trim(header_str))
+
+  end subroutine open_output_csv_file
 
 end program swbstats2

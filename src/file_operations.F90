@@ -67,6 +67,9 @@ module file_operations
     procedure, private :: return_current_linenum_fn
     generic :: currentLineNum => return_current_linenum_fn
 
+    procedure, private :: return_fortran_unit_number_fn
+    generic :: unit => return_fortran_unit_number_fn
+
     procedure, private :: read_header_fn
     generic, public    :: readHeader => read_header_fn
 
@@ -79,6 +82,17 @@ module file_operations
   end type ASCII_FILE_T
 
 contains
+
+  function return_fortran_unit_number_fn(this)   result(iUnitNum)
+
+    class (ASCII_FILE_T)   :: this
+    integer (kind=c_int)   :: iUnitNum
+
+    iUnitNum = this%iUnitNum
+
+  end function return_fortran_unit_number_fn
+
+!--------------------------------------------------------------------------------------------------
 
   function return_num_lines_fn(this)    result(iNumLines)
 
@@ -200,7 +214,6 @@ contains
     ! [ LOCALS ]
     logical :: lQuiet_
 
-
     if ( present( lQuiet ) ) then
       lQuiet_ = lQuiet
     else
@@ -215,6 +228,7 @@ contains
       this%lIsOpen = lTRUE
       this%lEOF = lFALSE
       this%lReadOnly = lFALSE
+      this%sFilename = trim(sFilename)
 
       if ( .not. lQuiet_ ) &
         call LOGS%write( "Opened file with write access: "//dquote(sFilename) )
