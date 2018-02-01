@@ -8,7 +8,7 @@
 
 module datetime
 
-  use iso_c_binding, only : c_short, c_int, c_float, c_double, c_bool
+  use iso_c_binding, only : c_short, c_int, c_long, c_float, c_double, c_bool
   use strings
   use exceptions
   use constants_and_conversions
@@ -479,10 +479,10 @@ subroutine calc_julian_day_sub(this, iMonth, iDay, iYear, &
 
   this%dJulianDate = real( julian_day( int(this%iYear, kind=c_int), &
                           int(this%iMonth, kind=c_int), &
-                          int(this%iDay, kind=c_int) ), kind=c_double) + &
-                          real(this%iHour, kind=c_double) / 24_c_double + &
-                          real(this%iMinute, kind=c_double) / 1440_c_double + &
-                          real(this%iSecond, kind=c_double) / 86400_c_double
+                          int(this%iDay, kind=c_int) ), kind=c_double) +       &
+                          real(this%iHour, kind=c_double) / 24._c_double +     &
+                          real(this%iMinute, kind=c_double) / 1440._c_double + &
+                          real(this%iSecond, kind=c_double) / 86400._c_double
 
 !  this%rJulianDay = real(iJulianDay, kind=c_double) + rFractionOfDay ! - 2400000.5_c_double
 
@@ -503,7 +503,7 @@ elemental subroutine calc_gregorian_date_sub(this)
   integer (kind=c_int) :: iSecond
   integer (kind=c_int) :: iJulianDay
 
-  real(kind=c_float) :: rHour, rMinute, rSecond
+  real(kind=c_double) :: rHour, rMinute, rSecond
 
   iJulianDay = this%getJulianDay()
 
@@ -513,13 +513,15 @@ elemental subroutine calc_gregorian_date_sub(this)
   this%iMonth = iMonth
   this%iDay = iDay
 
-  rHour = this%getFractionOfDay() * 24_c_double
-  iHour = iHour
+  rHour = this%getFractionOfDay() * 24._c_double
+  iHour = int(rHour, kind=c_int)
 
-  rMinute = (rHour - real(iHour, kind=c_float) ) * 1440_c_double
+!  rMinute = (rHour - real(iHour, kind=c_float) ) * 1440_c_double
+  rMinute = (rHour - real(iHour, kind=c_double) ) * 60._c_double
   iMinute = int(rMinute, kind=c_int)
 
-  rSecond = ( rMinute - real(iMinute, kind=c_float) ) * 86400_c_double
+!  rSecond = ( rMinute - real(iMinute, kind=c_float) ) * 86400_c_double
+  rSecond = ( rMinute - real(iMinute, kind=c_double) ) * 60._c_double
   iSecond = int(rSecond, kind=c_int)
 
   this%iHour = iHour
@@ -1108,7 +1110,7 @@ elemental function get_fraction_of_day_fn(this)           result(dFractionOfDay)
   class(DATETIME_T), intent(in)      :: this
   real (kind=c_double)               :: dFractionOfDay
 
-  dFractionOfDay = this%dJulianDate - real( int(this%dJulianDate, kind=c_int ), kind=c_double)
+  dFractionOfDay = this%dJulianDate - real( int(this%dJulianDate, kind=c_long ), kind=c_double)
 
 end function get_fraction_of_day_fn
 
@@ -1210,7 +1212,7 @@ subroutine date_plus_day_sub(this)
 
   class(DATETIME_T) :: this
 
-  this%dJulianDate = this%dJulianDate + 1_c_double
+  this%dJulianDate = this%dJulianDate + 1._c_double
   call this%calcGregorianDate()
 
 end subroutine date_plus_day_sub
@@ -1221,7 +1223,7 @@ subroutine date_minus_day_sub(this)
 
   class(DATETIME_T) :: this
 
-  this%dJulianDate = this%dJulianDate - 1_c_double
+  this%dJulianDate = this%dJulianDate - 1._c_double
   call this%calcGregorianDate()
 
 end subroutine date_minus_day_sub

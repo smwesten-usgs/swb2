@@ -10,7 +10,7 @@ program swbstats2
   use datetime, only                  : DATETIME_T, assignment(=), operator(>)
   use grid
   use netcdf4_support
-  use simulation_datetime, only       : SIM_DT
+  use simulation_datetime, only       : SIM_DT, DATE_RANGE_T
   use string_list, only               : STRING_LIST_T,                          &
                                         create_list
   use strings
@@ -36,6 +36,7 @@ program swbstats2
   logical (c_bool)     :: ZONE_STATS = FALSE
   logical (c_bool)     :: ANNUALIZE_MEANS = TRUE
   logical (c_bool)     :: COMPARISON_GRID = FALSE
+  logical (c_bool)     :: ANNUAL_STATISTICS = FALSE
   logical (c_bool)     :: MULTIPLE_COMPARISON_GRIDS = FALSE
   real (kind=c_float)  :: COMPARISON_GRID_SCALE_FACTOR = 1.0_c_float
 
@@ -217,6 +218,11 @@ program swbstats2
 
       COMPARISON_GRID_SCALE_FACTOR = asFloat(scale_factor_str)
 
+    elseif ( temp_str .containssimilar. "annual_statistics" ) then
+
+      ANNUAL_STATISTICS = TRUE
+      SLICE_OPTION = MANY_SLICES
+
     elseif ( temp_str .containssimilar. "annualize_means" ) then
 
       annualize_means_str = right(temp_str, substring="=")
@@ -306,6 +312,8 @@ program swbstats2
                                                attribute_name_list=name_list, &
                                                attribute_value_list=value_list )
 
+
+
   ! extract PROJ4 string from netCDF file
   iIndex_array = name_list%which("proj4_string")
   temp_str = value_list%get( iIndex_array(1) )
@@ -358,6 +366,11 @@ program swbstats2
 
   call set_project_projection_params()
 
+  if (ANNUAL_STATISTICS) then
+
+    call create_date_list_for_annual_statistics()
+
+  endif
 
   if (COMPARISON_GRID) then
     call initialize_comparison_grid(grid_filename=comparison_grid_filename_str)
@@ -1046,5 +1059,34 @@ contains
     call csv_output_file%writeLine(trim(header_str))
 
   end subroutine open_output_csv_file
+
+!------------------------------------------------------------------------------
+
+  subroutine create_date_list_for_annual_statistics()
+
+    type (DATE_RANGE_T)  :: ANN_DT
+
+    ! [ LOCALS ]
+    integer (c_int)  :: indx
+
+    indx = 0
+
+    call ANN_DT%initialize( data_start_date, data_end_date )
+
+    do
+      indx = indx + 1
+      call start_date_list%append( ANN_DT%curr%prettydate() )
+      call ANN_DT%advance_to_last_doy()
+      call date_range_id_list%append( asCharacter(indx) )
+      if ( ANN_DT%curr < ANN_DT%end ) then
+        call end_date_list%append( ANN_DT%curr%prettydate() )
+        call ANN_DT%addDay()
+      else
+        call end_date_list%append( ANN_DT%end%prettydate() )
+        exit
+      endif
+    enddo
+
+  end subroutine create_date_list_for_annual_statistics
 
 end program swbstats2
