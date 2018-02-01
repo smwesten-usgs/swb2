@@ -449,12 +449,12 @@ program swbstats2
       call iterate_over_slice(grid_sum=pGrdSum, grid_mean=pGrdMean,           &
                               start_date=slice_start_date,                    &
                               end_date=slice_end_date)
-print *, __LINE__
+
       if (MULTIPLE_COMPARISON_GRIDS) then
         comparison_grid_filename_str = comparison_grid_file_list%get( iIndex )
         call initialize_comparison_grid(grid_filename=comparison_grid_filename_str)
       endif
-print *, __LINE__
+
       if (OUTPUT_TYPE_OPTION /= OUTPUT_TYPE_CSV_ONLY) then
         call write_stats_to_files(grid_sum=pGrdSum, grid_mean=pGrdMean,         &
                                   start_date=slice_start_date,                  &
@@ -479,8 +479,6 @@ print *, __LINE__
                funit=csv_output_file%unit() )
 
         else
-print *, __LINE__
-print *, associated(pZONE_GRID)
           call output_zonal_stats(                                            &
                start_date=slice_start_date,                                   &
                end_date=slice_end_date,                                       &
@@ -494,9 +492,9 @@ print *, associated(pZONE_GRID)
 
       ! icky hack; need to advance the record number for the multiple slice calc
       RECNUM = RECNUM + 1
-print *, __LINE__
+
     enddo
-print *, __LINE__
+
     if (OUTPUT_TYPE_OPTION /= OUTPUT_TYPE_CSV_ONLY)  &
       call netcdf_close_file(NCFILE=ncfile_out)
 
@@ -880,14 +878,6 @@ contains
     real (c_float), allocatable    :: stats(:)
     integer (c_int)                :: funit_
 
-print *, __LINE__
-
-print *, funit
-call unique_zone_list%print()
-print *, present( comparison_values)
-print *, allocated(stats)
-
-
     if (present(funit)) then
       funit_ = funit
     else
@@ -950,16 +940,17 @@ print *, allocated(stats)
 
     if ( n_val > 0 ) mean_val = sum_val / n_val
 
-    min_val_comp = minval( comparison_values, zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
-    max_val_comp = maxval( comparison_values, zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
-    sum_val_comp = sum( comparison_values, zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
-    n_val_comp = count( zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
-
-    if ( n_val_comp > 0 ) mean_val_comp = sum_val_comp / n_val_comp
-
     if ( allocated(result_vector) )  deallocate(result_vector)
 
     if ( present( comparison_values ) ) then
+
+      min_val_comp = minval( comparison_values, zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
+      max_val_comp = maxval( comparison_values, zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
+      sum_val_comp = sum( comparison_values, zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
+      n_val_comp = count( zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
+
+      if ( n_val_comp > 0 ) mean_val_comp = sum_val_comp / n_val_comp
+
       allocate( result_vector(10) )
       result_vector(5) = min_val_comp
       result_vector(6) = max_val_comp
