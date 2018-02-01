@@ -38,6 +38,7 @@ program swbstats2
   logical (c_bool)     :: COMPARISON_GRID = FALSE
   logical (c_bool)     :: ANNUAL_STATISTICS = FALSE
   logical (c_bool)     :: MULTIPLE_COMPARISON_GRIDS = FALSE
+  logical (c_bool)     :: MULTIPLE_ZONE_GRIDS = FALSE
   real (kind=c_float)  :: COMPARISON_GRID_SCALE_FACTOR = 1.0_c_float
 
   character (len=256)            :: temp_str, temp_str2
@@ -95,6 +96,7 @@ program swbstats2
   type (STRING_LIST_T)           :: date_range_id_list
   type (STRING_LIST_T)           :: unique_zone_list
   type (STRING_LIST_T)           :: comparison_grid_file_list
+  type (STRING_LIST_T)           :: zonal_stats_grid_file_list
 
   type (ASCII_FILE_T)            :: csv_output_file
 
@@ -245,6 +247,20 @@ program swbstats2
                                     start_date_list=start_date_list,          &
                                     end_date_list=end_date_list )
 
+    elseif ( temp_str .containssimilar. "zone_period_file" ) then
+
+      SLICE_OPTION = MANY_SLICES
+      MULTIPLE_ZONE_GRIDS = TRUE
+      ZONE_STATS = TRUE
+
+      date_range_filename_str = right(temp_str, substring="=")
+      call read_zone_period_file( csv_filename=date_range_filename_str,        &
+                                    date_range_id_list=date_range_id_list,    &
+                                    start_date_list=start_date_list,          &
+                                    end_date_list=end_date_list,              &
+                                    zonal_stats_grid_file_list=zonal_stats_grid_file_list )
+
+
     elseif ( temp_str .containssimilar. "comparison_period_file" ) then
 
       SLICE_OPTION = MANY_SLICES
@@ -388,8 +404,10 @@ program swbstats2
   endif
 
   if (ZONE_STATS) then
-    call initialize_zone_grid(grid_filename=zone_grid_filename_str)
-    call get_unique_int(pZONE_GRID%pGrdBase%iData, unique_zone_list)
+    if (.not. MULTIPLE_ZONE_GRIDS) then
+      call initialize_zone_grid(grid_filename=zone_grid_filename_str)
+      call get_unique_int(pZONE_GRID%pGrdBase%iData, unique_zone_list)
+    endif
     output_csv_filename_str = "zonal_stats_"//trim(netcdf_variable_name_str)//".csv"
     call open_output_csv_file(output_csv_filename_str)
   endif
@@ -466,6 +484,12 @@ program swbstats2
       if (MULTIPLE_COMPARISON_GRIDS) then
         comparison_grid_filename_str = comparison_grid_file_list%get( iIndex )
         call initialize_comparison_grid(grid_filename=comparison_grid_filename_str)
+      endif
+
+      if ( MULTIPLE_ZONE_GRIDS ) then
+        zone_grid_filename_str = zonal_stats_grid_file_list%get( iIndex )
+        call initialize_zone_grid(grid_filename=zone_grid_filename_str)
+        call get_unique_int(pZONE_GRID%pGrdBase%iData, unique_zone_list)
       endif
 
       if (OUTPUT_TYPE_OPTION /= OUTPUT_TYPE_CSV_ONLY) then
@@ -728,7 +752,7 @@ contains
   end subroutine read_date_range_file
 
 
-  !------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
   subroutine read_comparison_period_file( csv_filename,                       &
                                           date_range_id_list,                 &
@@ -785,6 +809,61 @@ contains
 
 !------------------------------------------------------------------------------
 
+  subroutine read_zone_period_file( csv_filename,                             &
+                                          date_range_id_list,                 &
+                                          start_date_list,                    &
+                                          end_date_list,                      &
+                                          zonal_stats_grid_file_list)
+
+    character (len=*), intent(inout)   :: csv_filename
+    type (STRING_LIST_T), intent(out)  :: date_range_id_list
+    type (STRING_LIST_T), intent(out)  :: start_date_list
+    type (STRING_LIST_T), intent(out)  :: end_date_list
+    type (STRING_LIST_T), intent(out)  :: zonal_stats_grid_file_list
+
+    ! [ LOCALS ]
+    integer (kind=c_int)           :: iFileIndex, iColIndex
+    integer (kind=c_int)           :: iStat
+    type (ASCII_FILE_T)            :: DF
+    character (len=256)            :: sRecord, sItem
+
+   ! open the file associated with current file index value
+    call DF%open(sFilename = csv_filename,                               &
+                 sDelimiters=",",                                        &
+                 sCommentChars = "%#!",                                  &
+                 lHasHeader=TRUE         )
+
+    ! read in and throw away header of file
+    sRecord = DF%readLine()
+
+    ! now read in the remainder of the file
+    do while ( .not. DF%isEOF() )
+
+      ! read in next line of file
+      sRecord = DF%readLine()
+
+      ! skip blank lines
+      if ( len_trim(sRecord) == 0 ) cycle
+
+      call chomp( sRecord, sItem, sDelimiters="," )
+      call date_range_id_list%append( sItem )
+
+      call chomp( sRecord, sItem, sDelimiters="," )
+      call start_date_list%append( sItem )
+
+      call chomp( sRecord, sItem, sDelimiters="," )
+      call end_date_list%append( sItem )
+
+      call zonal_stats_grid_file_list%append( sRecord )
+
+    enddo
+
+    call DF%close()
+
+  end subroutine read_zone_period_file
+
+!------------------------------------------------------------------------------
+
   subroutine initialize_zone_grid( grid_filename )
 
     character (len=*), intent(inout)   :: grid_filename
@@ -792,11 +871,19 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iIndex
     integer (kind=c_int)                 :: iStat
+    character (len=:), allocatable       :: description_str
+    character (len=:), allocatable       :: output_filename_str
 
-    pZONE_GRID => null()
+    description_str = left( grid_filename, substring=".")
+    if (description_str .contains. "/") description_str = right( description_str, substring="/")
+    if (description_str .contains. "\") description_str = right( description_str, substring="\")
+
+    output_filename_str = "Zone_grid__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
 
     ! allocate memory for a generic data_catalog_entry
-    allocate(pZONE_GRID, stat=iStat)
+    if (associated(pZONE_GRID))  deallocate(pZONE_GRID)
+    nullify(pZONE_GRID)
+    allocate(pZONE_GRID)
 
     call pZONE_GRID%set_target_PROJ4(target_proj4_str)
 
@@ -808,7 +895,11 @@ contains
 
     call pZONE_GRID%getvalues()
 
-    call grid_WriteArcGrid("Zone_grid__as_read_into_SWBSTATS2.asc", pZONE_GRID%pGrdBase )
+    where ( pGrdNative%rData <= NC_FILL_FLOAT )
+      pZONE_GRID%pGrdBase%iData = NC_FILL_INT
+    end where
+
+    call grid_WriteArcGrid(output_filename_str, pZONE_GRID%pGrdBase )
 
   end subroutine initialize_zone_grid
 
@@ -942,27 +1033,32 @@ contains
     real (c_float)  :: n_val_comp
 
     mean_val = 0.0
-    max_val = -9.9e-23
-    min_val = 9.9e+23
+    max_val = 0.0
+    min_val = 0.0
     n_val = 0
 
-    min_val = minval( values, zone_ids==target_id .and. values > NC_FILL_FLOAT )
-    max_val = maxval( values, zone_ids==target_id .and. values > NC_FILL_FLOAT )
-    sum_val = sum( values, zone_ids==target_id .and. values > NC_FILL_FLOAT )
     n_val = count( zone_ids==target_id .and. values > NC_FILL_FLOAT )
 
-    if ( n_val > 0 ) mean_val = sum_val / n_val
+    if ( n_val > 0 ) then
+      sum_val = sum( values, zone_ids==target_id .and. values > NC_FILL_FLOAT )
+      mean_val = sum_val / n_val
+      min_val = minval( values, zone_ids==target_id .and. values > NC_FILL_FLOAT )
+      max_val = maxval( values, zone_ids==target_id .and. values > NC_FILL_FLOAT )
+    endif
 
     if ( allocated(result_vector) )  deallocate(result_vector)
 
     if ( present( comparison_values ) ) then
 
-      min_val_comp = minval( comparison_values, zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
-      max_val_comp = maxval( comparison_values, zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
-      sum_val_comp = sum( comparison_values, zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
       n_val_comp = count( zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
 
-      if ( n_val_comp > 0 ) mean_val_comp = sum_val_comp / n_val_comp
+      if ( n_val_comp > 0 ) then
+        n_val_comp = count( zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
+        sum_val_comp = sum( comparison_values, zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
+        mean_val_comp = sum_val_comp / n_val_comp
+        min_val_comp = minval( comparison_values, zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
+        max_val_comp = maxval( comparison_values, zone_ids==target_id .and. comparison_values > NC_FILL_FLOAT )
+      endif
 
       allocate( result_vector(10) )
       result_vector(5) = min_val_comp
