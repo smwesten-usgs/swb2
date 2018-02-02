@@ -26,7 +26,6 @@ module direct_net_infiltration__gridded_data
   private
 
   public :: direct_net_infiltration_initialize, direct_net_infiltration_calculate
-  public :: DIRECT_NET_INFILTRATION_ACTIVE_FRACTION
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pCESSPOOL
   type (DATA_CATALOG_ENTRY_T), pointer :: pDISPOSAL_WELL
@@ -49,9 +48,6 @@ module direct_net_infiltration__gridded_data
   real (kind=c_float), allocatable     :: fWATER_BODY_RECHARGE_TABLE(:)
   real (kind=c_float), allocatable     :: fWATER_MAIN_TABLE(:)
   real (kind=c_float), allocatable     :: fANNUAL_RECHARGE_RATE_TABLE(:)
-
-  real (kind=c_float), allocatable     :: DIRECT_NET_INFILTRATION_ACTIVE_FRACTION_TABLE(:)
-  real (kind=c_float), allocatable     :: DIRECT_NET_INFILTRATION_ACTIVE_FRACTION(:)
 
   type (T_NETCDF4_FILE), pointer       :: pNCFILE
 
@@ -156,36 +152,6 @@ contains
     call PARAMS%get_parameters( slKeys=parameter_list , fValues=fDISPOSAL_WELL_TABLE )
 
     pDISPOSAL_WELL => DAT%find( "DISPOSAL_WELL_DISCHARGE" )
-
-    call parameter_list%clear()
-    call parameter_list%append( "Direct_recharge_active_fraction" )
-    call parameter_list%append( "Direct_net_infiltration_active_fraction" )
-
-    call PARAMS%get_parameters( slKeys=parameter_list,                                             &
-                                fValues=DIRECT_NET_INFILTRATION_ACTIVE_FRACTION_TABLE )
-
-    if ( DIRECT_NET_INFILTRATION_ACTIVE_FRACTION_TABLE(1) > fTINYVAL ) then
-
-      are_lengths_equal = ( ubound(DIRECT_NET_INFILTRATION_ACTIVE_FRACTION_TABLE,1)         &
-                                 == ubound(landuse_codes,1) )
-
-      if ( .not. are_lengths_equal )     &
-        call warn( sMessage="The number of landuses does not match the number of direct"   &
-          //" recharge active fraction values.", sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
-
-      allocate( DIRECT_NET_INFILTRATION_ACTIVE_FRACTION( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
-
-      do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
-        DIRECT_NET_INFILTRATION_ACTIVE_FRACTION( indx ) = DIRECT_NET_INFILTRATION_ACTIVE_FRACTION_TABLE( landuse_index( indx ) )
-      enddo
-    else
-
-      allocate( DIRECT_NET_INFILTRATION_ACTIVE_FRACTION( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
-      DIRECT_NET_INFILTRATION_ACTIVE_FRACTION = 1.0_c_float
-
-    endif
 
     if ( associated( pANNUAL_RECHARGE_RATE ) ) then
 

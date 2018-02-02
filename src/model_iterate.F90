@@ -33,7 +33,7 @@ contains
       call cells%get_climate_data( )
       call perform_daily_calculation( cells )
       call write_output( cells )
-!      call perform_polygon_summarize( cells )
+      call perform_polygon_summarize( cells )
 
       call cells%dump_variables( )
 

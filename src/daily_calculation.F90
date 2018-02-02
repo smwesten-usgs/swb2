@@ -4,7 +4,6 @@ module daily_calculation
   use model_domain, only                     : MODEL_DOMAIN_T
   use storm_drain_capture, only              : storm_drain_capture_calculate,             &
                                                STORM_DRAIN_CAPTURE_FRACTION
-  use direct_net_infiltration__gridded_data, only    : DIRECT_NET_INFILTRATION_ACTIVE_FRACTION
   use exceptions, only                       : assert
   use iso_c_binding, only                    : c_short, c_int, c_float, c_double, c_bool
 
@@ -32,7 +31,6 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int) :: indx, jndx
-    real (kind=c_float)  :: net_infiltration_fraction
     integer (kind=c_int) :: landuse_index
 
     ! calls elemental
@@ -92,7 +90,6 @@ contains
         irrigation                        => cells%irrigation( indx ),                              &
         direct_net_infiltration           => cells%direct_net_infiltration( indx ),                 &
         direct_soil_moisture              => cells%direct_soil_moisture( indx ),                    &
-        direct_net_infiltration_fraction  => DIRECT_NET_INFILTRATION_ACTIVE_FRACTION( indx ),       &
         surface_storage                   => cells%surface_storage( indx ),                         &
         actual_et_impervious              => cells%actual_et_impervious( indx ),                    &
         actual_et_soil                    => cells%actual_et_soil( indx ),                          &
@@ -201,8 +198,7 @@ contains
 
         ! modify net_infiltration and irrigation terms
 
-        net_infiltration_fraction= min( pervious_fraction, 1.0_c_float - direct_net_infiltration_fraction )
-        net_infiltration = net_infiltration * net_infiltration_fraction + direct_net_infiltration_fraction * direct_net_infiltration
+        net_infiltration = net_infiltration * pervious_fraction + direct_net_infiltration
 
         if ( runoff < 0.)                                                                               &
           call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
