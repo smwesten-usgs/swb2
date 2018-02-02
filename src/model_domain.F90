@@ -1953,11 +1953,7 @@ contains
 
   end subroutine model_calculate_runoff_gridded_values
 
-
-
-
-
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine model_update_rooting_depth_table_sub(this)
 
