@@ -157,8 +157,11 @@ contains
 
     pDISPOSAL_WELL => DAT%find( "DISPOSAL_WELL_DISCHARGE" )
 
+    call parameter_list%clear()
+    call parameter_list%append( "Direct_recharge_active_fraction" )
+    call parameter_list%append( "Direct_net_infiltration_active_fraction" )
 
-    call PARAMS%get_parameters( sKey="Direct_recharge_active_fraction",        &
+    call PARAMS%get_parameters( slKeys=parameter_list,                                             &
                                 fValues=DIRECT_NET_INFILTRATION_ACTIVE_FRACTION_TABLE )
 
     if ( DIRECT_NET_INFILTRATION_ACTIVE_FRACTION_TABLE(1) > fTINYVAL ) then
@@ -180,7 +183,7 @@ contains
 
       allocate( DIRECT_NET_INFILTRATION_ACTIVE_FRACTION( count( is_cell_active ) ), stat=status )
       call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
-      DIRECT_NET_INFILTRATION_ACTIVE_FRACTION = 0.0_c_float
+      DIRECT_NET_INFILTRATION_ACTIVE_FRACTION = 1.0_c_float
 
     endif
 
