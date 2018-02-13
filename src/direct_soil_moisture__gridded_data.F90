@@ -31,19 +31,19 @@ module direct_soil_moisture__gridded_data
   type (DATA_CATALOG_ENTRY_T), pointer :: pANNUAL_SEPTIC_DISCHARGE
 
   real (kind=c_float), allocatable     :: fSEPTIC_DISCHARGE(:)
-  real (kind=c_float), allocatable     :: fANNUAL_SEPTIC_DISCHARGE(:)  
+  real (kind=c_float), allocatable     :: fANNUAL_SEPTIC_DISCHARGE(:)
 
   real (kind=c_float), allocatable     :: fSEPTIC_DISCHARGE_TABLE(:)
-  real (kind=c_float), allocatable     :: fANNUAL_SEPTIC_DISCHARGE_TABLE(:)  
+  real (kind=c_float), allocatable     :: fANNUAL_SEPTIC_DISCHARGE_TABLE(:)
 
   type (T_NETCDF4_FILE), pointer       :: pNCFILE
 
-  type ( DATETIME_T ), pointer         :: DATE_OF_LAST_RETRIEVAL
+  type ( DATETIME_T )                  :: DATE_OF_LAST_RETRIEVAL
 
 contains
 
-  !> Initialize the routine to enable input/output of arbitrary sources/sink terms 
-  !! to be added directly to SOIL MOISTURE. 
+  !> Initialize the routine to enable input/output of arbitrary sources/sink terms
+  !! to be added directly to SOIL MOISTURE.
   !!
   !! Open gridded data file.
   !! Open a NetCDF output file to hold variable output.
@@ -64,7 +64,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iStat
     type (STRING_LIST_T)                 :: parameter_list
-    integer (kind=c_int)                 :: iIndex 
+    integer (kind=c_int)                 :: iIndex
     integer (kind=c_int)                 :: iNX
     integer (kind=c_int)                 :: iNY
     integer (kind=c_int), allocatable    :: iLanduseCodes(:)
@@ -95,7 +95,7 @@ contains
       allocate( fSEPTIC_DISCHARGE( count( is_cell_active ) ), stat=iStat )
       call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
-    ! no grid? then look for a table version; values > TINYVAL indicate that 
+    ! no grid? then look for a table version; values > TINYVAL indicate that
     ! something is present
     elseif ( fSEPTIC_DISCHARGE_TABLE(1) > fTINYVAL ) then
 
@@ -111,7 +111,7 @@ contains
       ! now populate the vector of cell values
       do iIndex=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
         fSEPTIC_DISCHARGE( iIndex ) = fSEPTIC_DISCHARGE_TABLE( landuse_index( iIndex ) )
-      enddo  
+      enddo
 
      endif
 
@@ -131,7 +131,7 @@ contains
       allocate( fANNUAL_SEPTIC_DISCHARGE( count( is_cell_active ) ), stat=iStat )
       call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
-    ! no grid? then look for a table version; values > TINYVAL indicate that 
+    ! no grid? then look for a table version; values > TINYVAL indicate that
     ! something is present
     elseif ( fANNUAL_SEPTIC_DISCHARGE_TABLE(1) > fTINYVAL ) then
 
@@ -147,7 +147,7 @@ contains
       ! now populate the vector of cell values
       do iIndex=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
         fANNUAL_SEPTIC_DISCHARGE( iIndex ) = fANNUAL_SEPTIC_DISCHARGE_TABLE( landuse_index( iIndex ) )
-      enddo  
+      enddo
 
      endif
 
@@ -165,7 +165,7 @@ contains
     logical (kind=c_bool), intent(in)      :: is_cell_active(:,:)
     integer (kind=c_int), intent(in)       :: indx
 
-    ! [ LOCALS ] 
+    ! [ LOCALS ]
     integer (kind=c_int) :: iJulianDay
     integer (kind=c_int) :: iMonth
     integer (kind=c_int) :: iDay
@@ -190,13 +190,13 @@ contains
           call pSEPTIC_DISCHARGE%getvalues( iMonth, iDay, iYear, iJulianDay )
           if ( pSEPTIC_DISCHARGE%lGridHasChanged ) fSEPTIC_DISCHARGE =                   &
                pack( pSEPTIC_DISCHARGE%pGrdBase%rData, is_cell_active )
-        endif      
+        endif
 
         if ( associated( pANNUAL_SEPTIC_DISCHARGE ) ) then
           call pANNUAL_SEPTIC_DISCHARGE%getvalues( iMonth, iDay, iYear, iJulianDay )
           if ( pANNUAL_SEPTIC_DISCHARGE%lGridHasChanged ) fANNUAL_SEPTIC_DISCHARGE =     &
               pack( pANNUAL_SEPTIC_DISCHARGE%pGrdBase%rData, is_cell_active )
-        endif      
+        endif
 
       end associate
 

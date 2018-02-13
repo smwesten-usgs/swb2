@@ -44,7 +44,7 @@ module model_initialize
   end type METHODS_LIST_T
 
   integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 41
-  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 17
+  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 18
 
   type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS( NUMBER_OF_KNOWN_GRIDS ) =       &
 
@@ -104,6 +104,7 @@ module model_initialize
       METHODS_LIST_T("CROP_COEFFICIENT       ", lTRUE),                             &
       METHODS_LIST_T("GROWING_DEGREE_DAY     ", lTRUE),                             &
       METHODS_LIST_T("DYNAMIC_LANDUSE        ", lTRUE),                             &
+      METHODS_LIST_T("DIRECT_RECHARGE        ", lTRUE),                             &
       METHODS_LIST_T("DIRECT_NET_INFILTRATION", lTRUE),                             &
       METHODS_LIST_T("DIRECT_SOIL_MOISTURE   ", lTRUE),                             &
       METHODS_LIST_T("FLOW_ROUTING           ", lTRUE),                             &
@@ -1083,70 +1084,69 @@ contains
 
           call pENTRY%set_Y_offset( asDouble( sArgText_1 ) )
 
-        elseif ( index( string=sCmdText, substring="NETCDF_TIME_VAR" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "NETCDF_TIME_VAR" ) then
 
           pENTRY%sVariableName_time = trim(sArgText_1)
 
-        elseif ( index( string=sCmdText, substring="NETCDF_VARIABLE_ORDER" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "NETCDF_VARIABLE_ORDER" ) then
 
           call pENTRY%set_variable_order( asLowercase(sArgText_1) )
 
-        elseif ( index( string=sCmdText, substring="NETCDF_FLIP_VERTICAL" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "NETCDF_FLIP_VERTICAL") then
 
           call pENTRY%set_grid_flip_vertical()
 
-        elseif ( index( string=sCmdText, substring="NETCDF_FLIP_HORIZONTAL" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "NETCDF_FLIP_HORIZONTAL" ) then
 
           call pENTRY%set_grid_flip_horizontal()
 
-        elseif ( index( string=sCmdText, substring="NETCDF_NO_AUTOMATIC_GRID_FLIPPING" ) > 0 ) then
+        elseif ( sCmdText .containssimilar."NETCDF_NO_AUTOMATIC_GRID_FLIPPING" ) then
 
           call pENTRY%do_not_allow_netcdf_grid_data_flipping()
 
-        elseif ( index( string=sCmdText, substring="ALLOW_MISSING_FILES" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "ALLOW_MISSING_FILES" ) then
 
           call pENTRY%allow_missing_files()
 
-        elseif ( index( string=sCmdText, substring="NETCDF_MAKE_LOCAL_ARCHIVE" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "NETCDF_MAKE_LOCAL_ARCHIVE" ) then
 
           call pENTRY%set_make_local_archive(lTRUE)
 
-        elseif ( index( string=sCmdText, substring="_PROJECTION_DEFINITION" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "_PROJECTION_DEFINITION" ) then
 
           call pENTRY%set_source_PROJ4( trim(sArgText) )
 
-        elseif ( index( string=sCmdText, substring="_DATE_COLUMN" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "_DATE_COLUMN" ) then
 
           pENTRY%sDateColumnName = trim( sArgText_1 )
 
-        elseif ( index( string=sCmdText, substring="_VALUE_COLUMN" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "_VALUE_COLUMN" ) then
 
           pENTRY%sValueColumnName = trim( sArgText_1 )
 
-
-        elseif ( index( string=sCmdText, substring="_MINIMUM_ALLOWED_VALUE" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "_MINIMUM_ALLOWED_VALUE" ) then
 
           pENTRY%rMinAllowedValue = asFloat(sArgText_1)
 
-        elseif ( index( string=sCmdText, substring="_MAXIMUM_ALLOWED_VALUE" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "_MAXIMUM_ALLOWED_VALUE" ) then
 
           pENTRY%rMaxAllowedValue = asFloat(sArgText_1)
 
-        elseif ( index( string=sCmdText, substring="_MISSING_VALUES_CODE" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "_MISSING_VALUES_CODE" ) then
 
           pENTRY%rMissingValuesCode = asFloat(sArgText_1)
 
-        elseif ( index( string=sCmdText, substring="_MISSING_VALUES_OPERATOR" ) > 0 ) then
+        elseif ( sCmdText .containssimilar. "_MISSING_VALUES_OPERATOR" ) then
 
           pENTRY%sMissingValuesOperator = trim(sArgText_1)
 
-        elseif ( index( string=sCmdText, substring= "_MISSING_VALUES_ACTION") > 0 ) then
+        elseif ( sCmdText .containssimilar. "_MISSING_VALUES_ACTION" ) then
 
-          if (sArgText_1 .strequal. "ZERO") then
+          if (sArgText_1 .strapprox. "ZERO") then
 
             pENTRY%iMissingValuesAction = MISSING_VALUES_ZERO_OUT
 
-          elseif (sArgText_1 .strequal. "MEAN" ) then
+          elseif (sArgText_1 .strapprox. "MEAN" ) then
 
             pENTRY%iMissingValuesAction = MISSING_VALUES_REPLACE_WITH_MEAN
 
@@ -1157,12 +1157,12 @@ contains
 
           endif
 
-        elseif ( index( string=sCmdText, substring="_METHOD") > 0 ) then
+        elseif ( sCmdText .containssimilar. "_METHOD" ) then
 
           ! no operation; just keep SWB quiet about METHOD and it will be included in the
           ! methods initialization section.
 
-        elseif ( index( string=sCmdText, substring="_LOOKUP_TABLE") > 0 ) then
+        elseif ( sCmdText .containssimilar. "_LOOKUP_TABLE" ) then
 
           ! no operation; just keep SWB quiet about LOOKUP_TABLE and it will be included in the
           ! lookup table initialization section.

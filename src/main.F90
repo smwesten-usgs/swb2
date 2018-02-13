@@ -23,10 +23,10 @@ program main
   type (STRING_LIST_T)           :: slControlFiles
 
   character (len=256)            :: sBuf
-  character (len=:), allocatable :: sOutputPrefixName
-  character (len=:), allocatable :: sOutputDirectoryName
-  character (len=:), allocatable :: sDataDirectoryName
-  character (len=:), allocatable :: sWeatherDataDirectoryName
+  character (len=256)            :: sOutputPrefixName
+  character (len=256)            :: sOutputDirectoryName
+  character (len=256)            :: sDataDirectoryName
+  character (len=256)            :: sWeatherDataDirectoryName
   integer (kind=c_int)           :: iNumArgs
   character (len=1024)           :: sCompilerFlags
   character (len=256)            :: sCompilerVersion

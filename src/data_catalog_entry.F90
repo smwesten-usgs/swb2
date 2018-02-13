@@ -2047,29 +2047,25 @@ end subroutine set_maximum_allowable_value_real_sub
 
           case ("<=")
 
-            rMean = sum(rValues, rValues > rMissing ) &
-               / count(rValues > rMissing )
+            rMean = sum(rValues, rValues > rMissing ) / count(rValues > rMissing )
 
             where (rValues <= rMissing) rValues = rMean
 
           case ("<")
 
-            rMean = sum(rValues, rValues >= rMissing ) &
-               / count(rValues >= rMissing )
+            rMean = sum(rValues, rValues >= rMissing ) / count(rValues >= rMissing )
 
             where (rValues < rMissing) rValues = rMean
 
           case (">=")
 
-            rMean = sum(rValues, rValues < rMissing ) &
-               / count(rValues < rMissing )
+            rMean = sum(rValues, rValues < rMissing ) / count(rValues < rMissing )
 
             where (rValues >= rMissing) rValues = rMean
 
           case (">")
 
-            rMean = sum(rValues, rValues <= rMissing ) &
-               / count(rValues <= rMissing )
+            rMean = sum(rValues, rValues <= rMissing ) / count(rValues <= rMissing )
 
             where (rValues > rMissing) rValues = rMean
 

@@ -94,7 +94,8 @@ contains
 
     call parameter_list%clear()
     call parameter_list%append( "Annual_direct_net_infiltration_rate" )
-    call parameter_list%append( "Annual_recharge_rate" )
+    call parameter_list%append( "Annual_direct_recharge_rate" )
+    call parameter_list%append( "Annual_direct_recharge" )
     call parameter_list%append( "Annual_direct_net_infiltration" )
 
     call PARAMS%get_parameters( slKeys=parameter_list , fValues=fANNUAL_RECHARGE_RATE_TABLE )

@@ -60,9 +60,10 @@ module logfiles
 
   type (LOGFILE_T), public :: LOGS
 
-  integer (kind=c_int)  :: CURRENT_LOG_LEVEL     = LOG_GENERAL
-  logical (kind=c_bool) :: CURRENT_LOG_ECHO      = .false._c_bool
-  character (len=64)    :: OUTPUT_DIRECTORY_NAME = ""
+  integer (kind=c_int)               :: CURRENT_LOG_LEVEL     = LOG_GENERAL
+  logical (kind=c_bool)              :: CURRENT_LOG_ECHO      = .false._c_bool
+  character (len=64)                 :: OUTPUT_DIRECTORY_NAME = ""
+  logical (kind=c_bool), parameter   :: TRUE = .true._c_bool
 
 contains
 

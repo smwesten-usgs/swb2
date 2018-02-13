@@ -614,6 +614,8 @@ contains
 
     call this%init_direct_net_infiltration
 
+    call this%init_direct_soil_moisture
+
     call this%init_maximum_net_infiltration
 
     call this%init_crop_coefficient
@@ -677,6 +679,8 @@ contains
 
     endif
 
+    ! this is the 'normal'case, where user specifies both a maximum rooting depth
+    ! in the lookup table and a grid of available water content (in/ft)
     if ( associated( pAWC) ) then
 
       where (       ( pHSG%pGrdBase%iData  < 1 )                  &
@@ -687,6 +691,8 @@ contains
 
       end where
 
+    ! user specifies both a maximum rooting depth and available water content (in/ft)
+    ! in a lookup table
     elseif ( allocated( AVAILABLE_WATER_CONTENT ) ) then
 
       where (       ( pHSG%pGrdBase%iData  < 1 )                  &
@@ -697,7 +703,10 @@ contains
 
       end where
 
+    ! user specifies maximum soil storage (inches) directly via grid
     elseif ( associated( pSoil_Storage_Max ) ) then
+
+      call pSoil_Storage_Max%getvalues()
 
       where (       ( pHSG%pGrdBase%iData  < 1 )                  &
               .or.  ( pLULC%pGrdBase%iData < 0 )                  &
@@ -809,10 +818,12 @@ contains
     ! code that is present in the grid but not in the lookup table will trigger a fatal error, however,
     ! processing will continue until a bounds error is triggered somewhere else in the code,
     MODEL%landuse_index = -9999
+
     iCount = 0
 
     ! only run through matching process if we've found a LU_Code entry in the
     ! parameter dictionary
+
     if ( all( iLandUseCodes >= 0 ) ) then
 
       do iIndex = 1, ubound(MODEL%landuse_code,1)
@@ -1322,8 +1333,8 @@ contains
 
       endif
 
-    elseif ( (sCmdText .containssimilar. "DIRECT_NET_INFILTRATION" )       &
-           .or. ( sCmdText .containssimilar. "DIRECT_NET_INFILTRATION" ) )        then
+    elseif ( (sCmdText .containssimilar. "DIRECT_NET_INFILTRATION" )          &
+           .or. ( sCmdText .containssimilar. "DIRECT_RECHARGE" ) ) then
 
       this%init_direct_net_infiltration => model_initialize_direct_net_infiltration_gridded
       this%calc_direct_net_infiltration => model_calculate_direct_net_infiltration_gridded

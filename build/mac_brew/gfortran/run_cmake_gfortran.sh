@@ -8,7 +8,8 @@ rm -rf tests
 rm -f CPack*
 rm -f *.txt
 
-export GCC_VERSION=7.2.0
+export GCC_VERSION=7.3.0
+export NETCDF_VERSION=4.6.0
 # set CMAKE-related and build-related variables
 export GCCLIST=$( glocate gcc-7 | grep Cellar | grep bin | grep $GCC_VERSION )
 export GCCARR=($GCCLIST)
@@ -23,11 +24,12 @@ export R_HOME=/usr/bin/R
 
 export LIB_HDF5_HL=$( glocate hdf5_hl.a | grep Cellar )
 export LIB_HDF5=$( glocate hdf5.a | grep Cellar )
-export LIB_NETCDF=$( glocate netcdf.dylib | grep Cellar )
+export LIB_NETCDF=$( glocate libnetcdf.dylib | grep Cellar | grep $NETCDF_VERSION )
 export LIB_Z=$( glocate libz.a | grep Cellar )
 export LIB_SZ=$( glocate libsz.a | grep Cellar )
 export LIB_GCC=$( glocate libgcc.a | grep Cellar | grep $GCC_VERSION | grep -v i386 )
 export LIB_GFORTRAN=$( glocate libgfortran.a | grep Cellar | grep $GCC_VERSION | grep -v i386 )
+export NC_CONFIG=$(glocate nc-config | grep Cellar | grep $NETCDF_VERSION )
 
 export PATH=/usr/local:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:$PATH
 

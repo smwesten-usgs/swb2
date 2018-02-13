@@ -21,7 +21,7 @@ module output
 
   type (NETCDF_FILE_COLLECTION_T), allocatable, public :: NC_OUT(:)
 
-  integer (kind=c_int), parameter   :: NCDF_NUM_OUTPUTS = 21
+  integer (kind=c_int), parameter   :: NCDF_NUM_OUTPUTS = 23
 
   type OUTPUT_SPECS_T
     character (len=27)          :: variable_name
@@ -32,27 +32,29 @@ module output
   end type OUTPUT_SPECS_T
 
   type (OUTPUT_SPECS_T)    :: OUTSPECS(NCDF_NUM_OUTPUTS) = [                                       &
-    OUTPUT_SPECS_T( "gross_precipitation        ", "inches_per_day       ", 0.0, 60.0, TRUE ),     &
-    OUTPUT_SPECS_T( "rainfall                   ", "inches_per_day       ", 0.0, 60.0, TRUE  ),    &
-    OUTPUT_SPECS_T( "snowfall                   ", "inches_per_day       ", 0.0, 60.0, TRUE  ),    &
-    OUTPUT_SPECS_T( "interception               ", "inches_per_day       ", 0.0, 60.0, TRUE  ),    &
-    OUTPUT_SPECS_T( "runon                      ", "inches_per_day       ", 0.0, 10000.0, TRUE  ), &
-    OUTPUT_SPECS_T( "runoff                     ", "inches_per_day       ", 0.0, 10000.0, TRUE  ), &
-    OUTPUT_SPECS_T( "snow_storage               ", "inches_per_day       ", 0.0, 2000.0, TRUE  ),  &
-    OUTPUT_SPECS_T( "soil_storage               ", "inches               ", 0.0, 2000.0, TRUE  ),  &
-    OUTPUT_SPECS_T( "delta_soil_storage         ", "inches_per_day       ", 0.0, 5.0, TRUE  ),     &
-    OUTPUT_SPECS_T( "reference_ET0              ", "inches_per_day       ", 0.0, 2000.0, TRUE  ),  &
-    OUTPUT_SPECS_T( "actual_et                  ", "inches_per_day       ", 0.0, 2000.0, TRUE  ),  &
-    OUTPUT_SPECS_T( "snowmelt                   ", "inches_per_day       ", 0.0, 2000.0, TRUE  ),  &
+    OUTPUT_SPECS_T( "gross_precipitation        ", "inches               ", 0.0, 60.0, TRUE ),     &
+    OUTPUT_SPECS_T( "rainfall                   ", "inches               ", 0.0, 60.0, TRUE  ),    &
+    OUTPUT_SPECS_T( "snowfall                   ", "inches               ", 0.0, 60.0, TRUE  ),    &
+    OUTPUT_SPECS_T( "interception               ", "inches               ", 0.0, 60.0, TRUE  ),    &
+    OUTPUT_SPECS_T( "runon                      ", "inches               ", 0.0, 10000.0, TRUE  ), &
+    OUTPUT_SPECS_T( "runoff                     ", "inches               ", 0.0, 10000.0, TRUE  ), &
+    OUTPUT_SPECS_T( "snow_storage               ", "inches               ", 0.0, 2000.0, FALSE ),  &
+    OUTPUT_SPECS_T( "soil_storage               ", "inches               ", 0.0, 2000.0, FALSE ),  &
+    OUTPUT_SPECS_T( "delta_soil_storage         ", "inches               ", 0.0, 5.0, FALSE  ),    &
+    OUTPUT_SPECS_T( "reference_ET0              ", "inches               ", 0.0, 2000.0, TRUE  ),  &
+    OUTPUT_SPECS_T( "actual_et                  ", "inches               ", 0.0, 2000.0, TRUE  ),  &
+    OUTPUT_SPECS_T( "snowmelt                   ", "inches               ", 0.0, 2000.0, FALSE ),  &
     OUTPUT_SPECS_T( "tmin                       ", "degrees_fahrenheit   ", -100.0, 150.0, TRUE  ),&
     OUTPUT_SPECS_T( "tmax                       ", "degrees_fahrenheit   ", -100.0, 150.0, TRUE  ),&
-    OUTPUT_SPECS_T( "net_infiltration           ", "inches_per_day       ", 0.0, 2000.0, TRUE  ),  &
-    OUTPUT_SPECS_T( "rejected_net_infiltration  ", "inches_per_day       ", 0.0, 5000.0, TRUE  ),  &
-    OUTPUT_SPECS_T( "infiltration               ", "inches_per_day       ", 0.0, 2000.0, TRUE  ),  &
-    OUTPUT_SPECS_T( "irrigation                 ", "inches_per_day       ", 0.0, 2000.0, TRUE  ),  &
-    OUTPUT_SPECS_T( "runoff_outside             ", "inches_per_day       ", 0.0, 10000.0, TRUE  ), &
-    OUTPUT_SPECS_T( "crop_et                    ", "inches_per_day       ", 0.0, 10000.0, TRUE  ), &
-    OUTPUT_SPECS_T( "gdd                        ", "degree_day_fahrenheit", 0.0, 10000.0, TRUE  )   ]
+    OUTPUT_SPECS_T( "net_infiltration           ", "inches               ", 0.0, 2000.0, TRUE  ),  &
+    OUTPUT_SPECS_T( "rejected_net_infiltration  ", "inches               ", 0.0, 5000.0, TRUE  ),  &
+    OUTPUT_SPECS_T( "infiltration               ", "inches               ", 0.0, 2000.0, FALSE  ), &
+    OUTPUT_SPECS_T( "irrigation                 ", "inches               ", 0.0, 2000.0, TRUE  ),  &
+    OUTPUT_SPECS_T( "runoff_outside             ", "inches               ", 0.0, 10000.0, TRUE  ), &
+    OUTPUT_SPECS_T( "crop_et                    ", "inches               ", 0.0, 10000.0, FALSE ), &
+    OUTPUT_SPECS_T( "gdd                        ", "degree_day_fahrenheit", 0.0, 10000.0, FALSE ), &
+    OUTPUT_SPECS_T( "direct_net_infiltation     ", "inches               ", 0.0, 100.0, FALSE ),   &
+    OUTPUT_SPECS_T( "direct_soil_moisture       ", "inches               ", 0.0, 100.0, FALSE )    ]
 
   enum, bind(c)
     enumerator :: NCDF_GROSS_PRECIPITATION=1, NCDF_RAINFALL, NCDF_SNOWFALL,   &
@@ -64,7 +66,8 @@ module output
                   NCDF_NET_INFILTRATION, NCDF_REJECTED_NET_INFILTRATION,      &
                   NCDF_INFILTRATION,                                          &
                   NCDF_IRRIGATION, NCDF_RUNOFF_OUTSIDE,                       &
-                  NCDF_CROP_ET, NCDF_GDD
+                  NCDF_CROP_ET, NCDF_GDD, NCDF_DIRECT_NET_INFILTRATION,       &
+                  NCDF_DIRECT_SOIL_MOISTURE
   end enum
 
   logical ( kind=c_bool ) :: OUTPUT_INCLUDES_LATLON = lTRUE
@@ -431,6 +434,28 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                                &
             lMask=cells%active,                                                                     &
             rValues=cells%crop_etc,                                                                 &
+            rField=cells%nodata_fill_value )
+
+    if ( OUTSPECS( NCDF_DIRECT_NET_INFILTRATION )%is_active ) &
+    call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_DIRECT_NET_INFILTRATION )%ncfile,     &
+            iVarID=NC_OUT( NCDF_DIRECT_NET_INFILTRATION)%ncfile%iVarID(NC_Z),                       &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],        &
+            iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                          &
+                                int(cells%number_of_columns, kind=c_size_t) ],                      &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                                &
+            lMask=cells%active,                                                                     &
+            rValues=cells%direct_net_infiltration,                                                  &
+            rField=cells%nodata_fill_value )
+
+    if ( OUTSPECS( NCDF_DIRECT_SOIL_MOISTURE )%is_active ) &
+    call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_DIRECT_SOIL_MOISTURE )%ncfile,        &
+            iVarID=NC_OUT( NCDF_DIRECT_SOIL_MOISTURE )%ncfile%iVarID(NC_Z),                         &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],        &
+            iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                          &
+                                int(cells%number_of_columns, kind=c_size_t) ],                      &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                                &
+            lMask=cells%active,                                                                     &
+            rValues=cells%direct_soil_moisture,                                                     &
             rField=cells%nodata_fill_value )
 
     RECHARGE_ARRAY = RECHARGE_ARRAY + cells%net_infiltration
