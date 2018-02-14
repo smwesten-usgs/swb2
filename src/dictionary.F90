@@ -1013,14 +1013,16 @@ end function find_dict_entry_fn
     current => this%first
     iCount = 0
 
+    call LOGS%write( "### Summary of all items stored in SWB parameter dictionary",                &
+      iLogLevel=iLogLevel_, lEcho=lEcho_ )
+
     do while ( associated( current ) )
 
       iCount = iCount + 1
       sTempBuf = current%key
 
       call LOGS%write( asCharacter(iCount)//")  KEY: "//dquote(sTempBuf),    &
-        iLogLevel=iLogLevel_, lEcho=lEcho_, iTab=2 )
-      call LOGS%write( " --ENTRIES--:", iTab=5 )
+        iLogLevel=iLogLevel_, lEcho=lEcho_, iTab=2, iLinesBefore=1, iLinesAfter=1 )
 
       select case ( iLogLevel_ )
 

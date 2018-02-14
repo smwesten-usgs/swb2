@@ -314,11 +314,14 @@ contains
     current => this%first
     iCount = 0
 
+    write(iLU_, fmt="('|',a,t21,'|',a,t62,'|')") "Index","Value"
+    write(iLU_, fmt="('|',a,t21,'|',a,t62,'|')") repeat("-",18)//":", repeat("-",39)//":"
+
     do while ( associated( current ) .and. iCount < this%count )
 
       iCount = iCount + 1
 
-      write(iLU_, fmt="(t10,a,t20,a)") "["//asCharacter(iCount)//"] ", current%s
+      write(iLU_, fmt="('|',a,t21,'|',a,t62,'|')") asCharacter(iCount), current%s
 
       current => current%next
 

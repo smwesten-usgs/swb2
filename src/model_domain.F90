@@ -1340,7 +1340,7 @@ contains
       this%calc_direct_net_infiltration => model_calculate_direct_net_infiltration_gridded
 
       call LOGS%WRITE( "==> GRIDDED or TABULAR values for water main leakage and other direct " &
-        //"recharge will be used.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        //"net infiltration will be used.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
     elseif ( sCmdText .containssimilar. "DIRECT_SOIL_MOISTURE" ) then
 

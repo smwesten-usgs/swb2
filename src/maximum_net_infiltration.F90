@@ -137,9 +137,9 @@ contains
 
       number_of_soils = ubound( fMAXIMUM_NET_INFILTRATION_TABLE, 2 )
 
-      call LOGS%WRITE( "Landuse Code |  Soils Code  | Number of Matches | Maximum net infiltration (in)",   &
+      call LOGS%WRITE( "| Landuse Code |  Soils Code  | Number of Matches | Maximum net infiltration (in) |",   &
         iLogLevel = LOG_DEBUG, lEcho = lFALSE )
-      call LOGS%WRITE( "-------------|--------------|-------------------|-------------------------------- ",  &
+      call LOGS%WRITE( "|-------------|--------------|-------------------|--------------------------------| ",  &
         iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
       allocate( fMAXIMUM_NET_INFILTRATION_ARRAY( ubound(is_cell_active,1),ubound(is_cell_active,2) ), stat=iStat )
@@ -149,10 +149,10 @@ contains
       do soils_indx = 1, number_of_soils
         do landuse_indx = 1, number_of_landuses
 
-          call LOGS%WRITE( asCharacter(landuse_codes( landuse_indx) )//" | "//asCharacter(soils_indx)//" | "//    &
+          call LOGS%WRITE( "| "//asCharacter(landuse_codes( landuse_indx) )//" | "//asCharacter(soils_indx)//" | "//    &
               asCharacter(count( pLULC%pGrdBase%iData == landuse_codes( landuse_indx)               &
                                    .and. pHSG%pGrdBase%iData == soils_indx ) )//" | "          &
-                                   //asCharacter( fMAXIMUM_NET_INFILTRATION_TABLE( landuse_indx, soils_indx) ), &
+                                   //asCharacter( fMAXIMUM_NET_INFILTRATION_TABLE( landuse_indx, soils_indx))//" |", &
                                    iLogLevel = LOG_DEBUG, lEcho = lFALSE )
 
            value = fMAXIMUM_NET_INFILTRATION_TABLE( landuse_indx, soils_indx )

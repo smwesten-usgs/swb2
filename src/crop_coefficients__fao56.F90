@@ -315,17 +315,17 @@ contains
     ! Monthly Kcb, GDD-based, or DOY-based
     do iIndex = lbound( KCB_METHOD, 1), ubound( KCB_METHOD, 1)
 
-      if ( all( KCB_( JAN:DEC, iIndex ) >= 0.0_c_float ) ) then
+      if ( all( KCB_( JAN:DEC, iIndex ) > 0.0_c_float ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_MONTHLY_VALUES
         KCB_( KCB_MIN, iIndex ) = minval( KCB_(JAN:DEC, iIndex) )
         KCB_( KCB_MID, iIndex) = minval( KCB_(JAN:DEC, iIndex) )
 
       elseif ( all( GROWTH_STAGE_GDD( :, iIndex ) >= 0.0_c_float )              &
-         .and. all( KCB_( KCB_INI:KCB_MIN, iIndex ) >= 0.0_c_float ) ) then
+         .and. all( KCB_( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_GDD
 
       elseif ( all( GROWTH_STAGE_DOY( :, iIndex ) >= 0.0_c_float )              &
-         .and. all( KCB_( KCB_INI:KCB_MIN, iIndex ) >= 0.0_c_float ) ) then
+         .and. all( KCB_( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_FAO56
       endif
 
