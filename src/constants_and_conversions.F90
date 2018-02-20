@@ -68,6 +68,8 @@ module constants_and_conversions
   character (len=1), parameter :: DOUBLE_QUOTE = achar(34)
   character (len=3), parameter :: PUNCTUATION = ",;:"
 
+  character (len=1)            :: OS_NATIVE_PATH_DELIMITER
+
   ! [ select conversion factors ]
   real (kind=c_double), parameter, public :: C_PER_F    = 5.0_c_double / 9.0_c_double
   real (kind=c_double), parameter, public :: F_PER_C    = 9.0_c_double / 5.0_c_double
@@ -189,6 +191,34 @@ module constants_and_conversions
   real (kind=c_double), parameter :: TOLERANCE_DOUBLE = 1.0e-9_c_double
 
 contains
+
+  function fix_pathname( input_pathname )    result( output_pathname )
+
+    character (len=*), intent(in)            :: input_pathname
+    character (len=len(input_pathname))      :: output_pathname
+
+    ! [ LOCALS ]
+    integer (kind=c_int) :: indx, jndx
+
+    do indx=1,len_trim(input_pathname)
+
+      jndx = min( indx+1, len_trim(input_pathname) )
+      ! allow for escaping of spaces in pathnames
+      if (     ( (input_pathname(indx:indx) == '/')                            &
+                .or. (input_pathname(indx:indx) == '\') )                      &
+          .and. (input_pathname(jndx:jndx) /= ' ' ) ) then
+
+        output_pathname(indx:indx) = OS_NATIVE_PATH_DELIMITER
+
+      else
+
+        output_pathname(indx:indx) = input_pathname(indx:indx)
+
+      endif
+
+    enddo
+
+  end function fix_pathname
 
 
   elemental function approx_equal_float_float(fValue1, fValue2)  result(lBool)

@@ -8,14 +8,17 @@
 !> to the control_setModelOptions routine in module \ref control.
 program main
 
-  use iso_c_binding, only    : c_short, c_int, c_float, c_double, c_bool
-  use logfiles, only         : LOGS, LOG_DEBUG
-  use model_initialize, only : initialize_all, read_control_file
-  use model_domain, only     : MODEL
-  use model_iterate, only    : iterate_over_simulation_days
-  use version_control, only  : SWB_VERSION, GIT_COMMIT_HASH_STRING, &
-                               GIT_BRANCH_STRING, COMPILE_DATE, COMPILE_TIME
-  use string_list, only      : STRING_LIST_T
+  use iso_c_binding, only             : c_short, c_int, c_float, c_double, c_bool
+  use constants_and_conversions, only : OS_NATIVE_PATH_DELIMITER
+  use logfiles, only                  : LOGS, LOG_DEBUG
+  use model_initialize, only          : initialize_all, read_control_file
+  use model_domain, only              : MODEL
+  use model_iterate, only             : iterate_over_simulation_days
+  use strings, only                   : operator(.containssimilar.)
+  use version_control, only           : SWB_VERSION, GIT_COMMIT_HASH_STRING,    &
+                                        GIT_BRANCH_STRING, COMPILE_DATE,        &
+                                        COMPILE_TIME, SYSTEM_NAME
+  use string_list, only               : STRING_LIST_T
   use iso_fortran_env
 
   implicit none
@@ -44,7 +47,15 @@ program main
   iNumArgs = COMMAND_ARGUMENT_COUNT()
 
   sVersionString = "  Soil Water Balance Code version "//trim( SWB_VERSION )    &
-      //" -- compiled on: "//trim(COMPILE_DATE)//" "//trim(COMPILE_TIME)
+      //" -- compiled on: "//trim(COMPILE_DATE)//" "//trim(COMPILE_TIME)        &
+      //", system name="//trim(SYSTEM_NAME)
+
+  if (     (SYSTEM_NAME .containssimilar. "Windows")                            &
+      .or. (SYSTEM_NAME .containssimilar. "Mingw") ) then
+    OS_NATIVE_PATH_DELIMITER = "\"
+  else
+    OS_NATIVE_PATH_DELIMITER = "/"
+  endif
 
   sGitHashString = "    [ Git branch and commit hash: "//trim( GIT_BRANCH_STRING )    &
      //", "//trim( GIT_COMMIT_HASH_STRING )//" ]"
@@ -67,10 +78,10 @@ program main
     write(UNIT=*,FMT="(a,/)") TRIM(sCompilerFlags)
 #endif
 
-#ifdef __INTEL_COMPILER
+#ifdef __INTEL_COMPILER__
     write(UNIT=*,FMT="(a)") "Compiled with: Intel Fortran version " &
-      //TRIM(int2char(__INTEL_COMPILER))
-      write(UNIT=*,FMT="(a,/)") "Compiler build date:"//TRIM(int2char(__INTEL_COMPILER_BUILD_DATE))
+      //TRIM(int2char(__INTEL_COMPILER__))
+      write(UNIT=*,FMT="(a,/)") "Compiler build date:"//TRIM(int2char(__INTEL_COMPILER_BUILD_DATE__))
 #endif
 
 #ifdef __G95__
@@ -98,8 +109,8 @@ program main
 
       ! if there is no trailing "/", append one so we can form (more) fully
       ! qualified filenames later
-      if ( .not. sOutputDirectoryName(iLen:iLen) .eq. "/" )  &
-        sOutputDirectoryName = trim(sOutputDirectoryName)//"/"
+      if ( .not. sOutputDirectoryName(iLen:iLen) .eq. OS_NATIVE_PATH_DELIMITER )  &
+        sOutputDirectoryName = trim(sOutputDirectoryName)//OS_NATIVE_PATH_DELIMITER
 
       call LOGS%set_output_directory( sOutputDirectoryName )
 
@@ -115,8 +126,8 @@ program main
 
       ! if there is no trailing "/", append one so we can form (more) fully
       ! qualified filenames later
-      if ( .not. sDataDirectoryName(iLen:iLen) .eq. "/" )  &
-        sDataDirectoryName = trim(sDataDirectoryName)//"/"
+      if ( .not. sDataDirectoryName(iLen:iLen) .eq. OS_NATIVE_PATH_DELIMITER )  &
+        sDataDirectoryName = trim(sDataDirectoryName)//OS_NATIVE_PATH_DELIMITER
 
     elseif ( sBuf(1:11) .eq. "--weather_data_dir=" ) then
 
@@ -125,8 +136,8 @@ program main
 
       ! if there is no trailing "/", append one so we can form (more) fully
       ! qualified filenames later
-      if ( .not. sWeatherDataDirectoryName(iLen:iLen) .eq. "/" )  &
-        sWeatherDataDirectoryName = trim(sWeatherDataDirectoryName)//"/"
+      if ( .not. sWeatherDataDirectoryName(iLen:iLen) .eq. OS_NATIVE_PATH_DELIMITER )  &
+        sWeatherDataDirectoryName = trim(sWeatherDataDirectoryName)//OS_NATIVE_PATH_DELIMITER
 
     else
 

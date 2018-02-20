@@ -1008,18 +1008,18 @@ contains
               .or. (sArgText_1 .strapprox. "SURFER")                 &
               .or. (sArgText_1 .strapprox. "ARC_GRID") ) then
 
-            call pENTRY%initialize(           &
-              sDescription=trim(sCmdText),    &
-              sFileType=trim(sArgText_1),     &
-              sFilename=trim(sArgText_2),     &
+            call pENTRY%initialize(                   &
+              sDescription=trim(sCmdText),            &
+              sFileType=trim(sArgText_1),             &
+              sFilename=fix_pathname(sArgText_2),     &
               iDataType=iDataType )
             lGridPresent = lTRUE
 
           elseif ( sArgText_1 .strapprox. "NETCDF" ) then
 
-            call pENTRY%initialize_netcdf(    &
-              sDescription=trim(sCmdText),    &
-              sFilename = trim(sArgText_2),   &
+            call pENTRY%initialize_netcdf(            &
+              sDescription=trim(sCmdText),            &
+              sFilename = fix_pathname(sArgText_2),   &
               iDataType=iDataType )
             lGridPresent = lTRUE
 
@@ -1489,7 +1489,7 @@ contains
         call LOGS%write("> "//sCmdText//" "//sArgText, iLinesBefore=1 )
 
         ! most of the time, we only care about the first dictionary entry, obtained below
-        sOptionText = myOptions%get(1)
+        sOptionText = fix_pathname( myOptions%get(1) )
 
         if ( index(string=sCmdText, substring="LOOKUP_TABLE" ) > 0 ) then
 

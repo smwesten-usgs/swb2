@@ -266,9 +266,7 @@ contains
     character(kind=c_char,len=:), allocatable :: dirname
 
     buffer=c_getcwd(tempchar, 256_c_size_t)
-
     dirname = c_to_fortran_string( tempchar )
-
 
   end function getcwd
 
