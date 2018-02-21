@@ -3,22 +3,23 @@ program swbstats2
   use iso_c_binding, only             : c_int, c_float, c_double, c_bool,      &
                                         c_size_t, c_ptrdiff_t, c_long
   use iso_fortran_env, only           : OUTPUT_UNIT
-  use constants_and_conversions, only : TRUE, FALSE, DATATYPE_INT,            &
-                                        DATATYPE_FLOAT, BNDS, asFloat
+  use constants_and_conversions, only : TRUE, FALSE, DATATYPE_INT,             &
+                                        DATATYPE_FLOAT, BNDS, asFloat,         &
+                                        OS_NATIVE_PATH_DELIMITER
   use file_operations, only           : ASCII_FILE_T
   use data_catalog_entry, only        : DATA_CATALOG_ENTRY_T
   use datetime, only                  : DATETIME_T, assignment(=), operator(>)
   use grid
   use netcdf4_support
   use simulation_datetime, only       : SIM_DT, DATE_RANGE_T
-  use string_list, only               : STRING_LIST_T,                          &
+  use string_list, only               : STRING_LIST_T,                         &
                                         create_list
   use strings
-  use version_control, only           : SWB_VERSION, GIT_COMMIT_HASH_STRING,    &
-                                        GIT_BRANCH_STRING, COMPILE_DATE,        &
-                                        COMPILE_TIME
+  use version_control, only           : SWB_VERSION, GIT_COMMIT_HASH_STRING,   &
+                                        GIT_BRANCH_STRING, COMPILE_DATE,       &
+                                        COMPILE_TIME, SYSTEM_NAME
 
-  use iso_fortran_env, only           : OUTPUT_UNIT, COMPILER_OPTIONS,          &
+  use iso_fortran_env, only           : OUTPUT_UNIT, COMPILER_OPTIONS,         &
                                         COMPILER_VERSION
 
   implicit none
@@ -41,28 +42,8 @@ program swbstats2
   logical (c_bool)     :: MULTIPLE_ZONE_GRIDS = FALSE
   real (kind=c_float)  :: COMPARISON_GRID_SCALE_FACTOR = 1.0_c_float
 
-  character (len=256)            :: temp_str, temp_str2
-  character (len=:), allocatable :: target_proj4_str
+  character (len=256)            :: temp_string, sub_string
 
-  character (len=:), allocatable :: netcdf_filename_str
-  character (len=:), allocatable :: zone_grid_filename_str
-  character (len=:), allocatable :: comparison_grid_filename_str
-  character (len=:), allocatable :: comparison_period_filename_str
-  character (len=:), allocatable :: output_csv_filename_str
-  character (len=:), allocatable :: date_range_filename_str
-
-  character (len=:), allocatable :: netcdf_variable_units_str
-  character (len=:), allocatable :: netcdf_variable_name_str
-  character (len=:), allocatable :: scale_factor_str
-  character (len=:), allocatable :: output_type_str
-  character (len=:), allocatable :: annualize_means_str
-  character (len=:), allocatable :: slice_str
-  character (len=:), allocatable :: start_date_str
-  character (len=:), allocatable :: end_date_str
-  character (len=:), allocatable :: date_range_str
-  character (len=:), allocatable :: nc_variable_name_str
-  character (len=:), allocatable :: nx_str
-  character (len=:), allocatable :: ny_str
   character (len=:), allocatable :: help_fmt_str
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pZONE_GRID       => null()
@@ -73,6 +54,8 @@ program swbstats2
   character (len=256)            :: sCompilerVersion
   character (len=256)            :: sVersionString
   character (len=256)            :: sGitHashString
+  character (len=:), allocatable :: start_date_string
+  character (len=:), allocatable :: end_date_string
   integer (kind=c_int)           :: iCount
   integer (kind=c_int)           :: iIndex
   integer (kind=c_int), allocatable           ::iIndex_array(:)
@@ -83,20 +66,8 @@ program swbstats2
 
   logical (kind=c_bool)          :: netcdf_active = FALSE
 
-  type (DATETIME_T)              :: data_start_date
-  type (DATETIME_T)              :: data_end_date
-  type (DATETIME_T)              :: slice_start_date
-  type (DATETIME_T)              :: slice_end_date
-
   type (STRING_LIST_T)           :: name_list
   type (STRING_LIST_T)           :: value_list
-
-  type (STRING_LIST_T)           :: start_date_list
-  type (STRING_LIST_T)           :: end_date_list
-  type (STRING_LIST_T)           :: date_range_id_list
-  type (STRING_LIST_T)           :: unique_zone_list
-  type (STRING_LIST_T)           :: comparison_grid_file_list
-  type (STRING_LIST_T)           :: zonal_stats_grid_file_list
 
   type (ASCII_FILE_T)            :: csv_output_file
 
@@ -108,24 +79,68 @@ program swbstats2
   type (GENERAL_GRID_T), pointer :: pGrdSum
   type (GENERAL_GRID_T), pointer :: pGrdMean
   integer (kind=c_size_t)        :: nx, ny
-  real (kind=c_float)             :: xll, yll, xur, yur, gridcell_size
+  real (kind=c_float)            :: xll, yll, xur, yur, gridcell_size
+
+  integer (kind=c_int), parameter  :: OPT_NO_TIME_SLICE        = 1
+  integer (kind=c_int), parameter  :: OPT_SINGLE_TIME_SLICE    = 2
+  integer (kind=c_int), parameter  :: OPT_MULTIPLE_TIME_SLICES = 3
+
+  type SWBSTATS_OPTIONS_T
+    logical (kind=c_bool)          :: write_csv             = FALSE
+    logical (kind=c_bool)          :: write_netcdf          = TRUE
+    logical (kind=c_bool)          :: calc_annual_stats     = FALSE
+    logical (kind=c_bool)          :: calc_zonal_stats      = FALSE
+    logical (kind=c_bool)          :: compare_to_obs_values = FALSE
+    logical (kind=c_bool)          :: annualize_mean_stats  = TRUE
+    character (len=:), allocatable :: target_proj4_string
+    type (DATETIME_T)              :: data_start_date
+    type (DATETIME_T)              :: data_end_date
+    type (DATETIME_T)              :: slice_start_date
+    type (DATETIME_T)              :: slice_end_date
+    character (len=:), allocatable :: date_range_string
+    integer (kind=c_int)           :: slice_option      = OPT_NO_TIME_SLICE
+    character (len=:), allocatable :: stress_period_filename
+    character (len=:), allocatable :: comparison_period_filename
+    character (len=:), allocatable :: zone_period_filename
+    character (len=:), allocatable :: comparison_grid_filename
+    character (len=:), allocatable :: zone_grid_filename
+    character (len=:), allocatable :: netcdf_input_filename
+    character (len=:), allocatable :: netcdf_variable_units_string
+    character (len=:), allocatable :: netcdf_variable_name_string
+    logical (kind=c_bool)          :: netcdf_input_file_is_open = FALSE
+    logical (kind=c_bool)          :: multiple_zone_grids       = FALSE
+    logical (kind=c_bool)          :: multiple_comparison_grids = FALSE
+    real (kind=c_double)           :: comparison_grid_conversion_factor = 1.0_c_double
+    type (STRING_LIST_T)           :: start_date_list
+    type (STRING_LIST_T)           :: end_date_list
+    type (STRING_LIST_T)           :: date_range_id_list
+    type (STRING_LIST_T)           :: unique_zone_list
+    type (STRING_LIST_T)           :: comparison_grid_file_list
+    type (STRING_LIST_T)           :: zone_grid_file_list
+  end type SWBSTATS_OPTIONS_T
+
+  type (SWBSTATS_OPTIONS_T)   :: options
 
   allocate( ncfile_in )
   allocate( ncfile_out )
 
-  output_type_str = ""
-  slice_str = ""
-  start_date_str = ""
-  end_date_str = ""
-  netcdf_filename_str = ""
-
   iNumArgs = COMMAND_ARGUMENT_COUNT()
 
-  sVersionString = "  SWBSTATS2 - Soil Water Balance Statistics Code version "//trim( SWB_VERSION )    &
-      //" -- compiled on: "//trim(COMPILE_DATE)//" "//trim(COMPILE_TIME)
+  sVersionString = "  SWBSTATS2 - Soil Water Balance Statistics Code, SWB2 version " &
+      //trim( SWB_VERSION )                                                          &
+      //" -- compiled on: "//trim(COMPILE_DATE)//" "//trim(COMPILE_TIME)             &
+      //", system name="//trim(SYSTEM_NAME)
 
   sGitHashString = "    [ Git branch and commit hash: "//trim( GIT_BRANCH_STRING )    &
      //", "//trim( GIT_COMMIT_HASH_STRING )//" ]"
+
+   if (     (SYSTEM_NAME .containssimilar. "Windows")                            &
+       .or. (SYSTEM_NAME .containssimilar. "Mingw") ) then
+     OS_NATIVE_PATH_DELIMITER = "\"
+   else
+     OS_NATIVE_PATH_DELIMITER = "/"
+   endif
+
 
   iCount = max( len_trim( sVersionString ), len_trim( sGitHashString ) )
 
@@ -198,110 +213,109 @@ program swbstats2
 
   end if
 
-  call slice_start_date%setDateFormat("YYYY-MM-DD")
-  call slice_end_date%setDateFormat("YYYY-MM-DD")
+  call options%slice_start_date%setDateFormat("YYYY-MM-DD")
+  call options%slice_end_date%setDateFormat("YYYY-MM-DD")
 
   do iIndex=1, iNumArgs
 
-    call GET_COMMAND_ARGUMENT( iIndex, temp_str )
+    call GET_COMMAND_ARGUMENT( iIndex, temp_string )
 
-    if ( temp_str .containssimilar. "output_type" ) then
+    if ( temp_string .containssimilar. "output_type" ) then
 
-      output_type_str = right(temp_str, substring="=")
-      if (output_type_str .containssimilar. "CSV_ONLY") then
+      sub_string = right(temp_string, substring="=")
+      if (sub_string .containssimilar. "CSV_ONLY") then
 
-        OUTPUT_TYPE_OPTION = OUTPUT_TYPE_CSV_ONLY
-
-      endif
-
-    elseif ( temp_str .containssimilar. "comparison_scale_factor" ) then
-
-      scale_factor_str = right(temp_str, substring="=")
-
-      COMPARISON_GRID_SCALE_FACTOR = asFloat(scale_factor_str)
-
-    elseif ( temp_str .containssimilar. "annual_statistics" ) then
-
-      ANNUAL_STATISTICS = TRUE
-      SLICE_OPTION = MANY_SLICES
-
-    elseif ( temp_str .containssimilar. "annualize_means" ) then
-
-      annualize_means_str = right(temp_str, substring="=")
-      if (annualize_means_str .containssimilar. "TRUE") then
-
-        ANNUALIZE_MEANS = TRUE
-
-      elseif (annualize_means_str .containssimilar. "FALSE") then
-
-        ANNUALIZE_MEANS = FALSE
+        options%write_csv = TRUE
+        options%write_netcdf = FALSE
 
       endif
 
-    elseif ( temp_str .containssimilar. "stress_period_file" ) then
+    elseif ( temp_string .containssimilar. "comparison_scale_factor" ) then
 
-      SLICE_OPTION = MANY_SLICES
-      date_range_filename_str = right(temp_str, substring="=")
-      call read_date_range_file( csv_filename=date_range_filename_str,        &
-                                    date_range_id_list=date_range_id_list,    &
-                                    start_date_list=start_date_list,          &
-                                    end_date_list=end_date_list )
+      sub_string = right(temp_string, substring="=")
 
-    elseif ( temp_str .containssimilar. "zone_period_file" ) then
+      options%comparison_grid_conversion_factor = asFloat(sub_string)
 
-      SLICE_OPTION = MANY_SLICES
-      MULTIPLE_ZONE_GRIDS = TRUE
-      ZONE_STATS = TRUE
+    elseif ( temp_string .containssimilar. "annual_statistics" ) then
 
-      date_range_filename_str = right(temp_str, substring="=")
-      call read_zone_period_file( csv_filename=date_range_filename_str,        &
-                                    date_range_id_list=date_range_id_list,    &
-                                    start_date_list=start_date_list,          &
-                                    end_date_list=end_date_list,              &
-                                    zonal_stats_grid_file_list=zonal_stats_grid_file_list )
+      options%calc_annual_stats = TRUE
+      options%slice_option      = OPT_MULTIPLE_TIME_SLICES
+
+    elseif ( temp_string .containssimilar. "annualize_means" ) then
+
+      sub_string = right(temp_string, substring="=")
+      if (sub_string .containssimilar. "TRUE") then
+
+        options%annualize_mean_stats = TRUE
+
+      endif
+
+    elseif ( temp_string .containssimilar. "stress_period_file" ) then
+
+      options%slice_option = OPT_MULTIPLE_TIME_SLICES
+      options%stress_period_filename = right(temp_string, substring="=")
+      call read_date_range_file( csv_filename=options%stress_period_filename,       &
+                                    date_range_id_list=options%date_range_id_list,  &
+                                    start_date_list=options%start_date_list,        &
+                                    end_date_list=options%end_date_list )
+
+    elseif ( temp_string .containssimilar. "zone_period_file" ) then
+
+      options%slice_option        = OPT_MULTIPLE_TIME_SLICES
+      options%multiple_zone_grids = TRUE
+      options%calc_zonal_stats    = TRUE
+
+      options%zone_period_filename = right(temp_string, substring="=")
+      call read_zone_period_file( csv_filename=options%zone_period_filename , &
+                                    date_range_id_list=options%date_range_id_list,    &
+                                    start_date_list=options%start_date_list,          &
+                                    end_date_list=options%end_date_list,              &
+                                    zonal_stats_grid_file_list=options%zone_grid_file_list )
+
+    elseif ( temp_string .containssimilar. "comparison_period_file" ) then
+
+      options%slice_option              = OPT_MULTIPLE_TIME_SLICES
+      options%multiple_comparison_grids = TRUE
+      options%compare_to_obs_values     = TRUE
 
 
-    elseif ( temp_str .containssimilar. "comparison_period_file" ) then
+      options%comparison_period_filename = right(temp_string, substring="=")
+      call read_comparison_period_file( csv_filename=options%comparison_period_filename,         &
+                                    date_range_id_list=options%date_range_id_list,               &
+                                    start_date_list=options%start_date_list,                     &
+                                    end_date_list=options%end_date_list,                         &
+                                    comparison_grid_file_list=options%comparison_grid_file_list )
 
-      SLICE_OPTION = MANY_SLICES
-      MULTIPLE_COMPARISON_GRIDS = TRUE
-      comparison_period_filename_str = right(temp_str, substring="=")
-      call read_comparison_period_file( csv_filename=comparison_period_filename_str, &
-                                    date_range_id_list=date_range_id_list,    &
-                                    start_date_list=start_date_list,          &
-                                    end_date_list=end_date_list,              &
-                                    comparison_grid_file_list=comparison_grid_file_list )
+    elseif ( temp_string .containssimilar. "slice" ) then
 
-    elseif ( temp_str .containssimilar. "slice" ) then
+      sub_string          = right(temp_string, substring="=")
+      start_date_string   = left(sub_string, substring=",")
+      end_date_string     = right(sub_string, substring=",")
 
-      slice_str       = right(temp_str, substring="=")
-      start_date_str  = left(slice_str, substring=",")
-      end_date_str    = right(slice_str, substring=",")
+      call options%slice_start_date%parseDate(start_date_string)
+      call options%slice_start_date%calcGregorianDate()
 
-      call slice_start_date%parseDate(start_date_str)
-      call slice_start_date%calcGregorianDate()
-
-      call slice_end_date%parseDate(end_date_str)
-      call slice_end_date%calcGregorianDate()
+      call options%slice_end_date%parseDate(end_date_string)
+      call options%slice_end_date%calcGregorianDate()
 
 
-    elseif ( temp_str .containssimilar. "zone_grid" ) then
+    elseif ( temp_string .containssimilar. "zone_grid" ) then
 
-      zone_grid_filename_str       = right(temp_str, substring="=")
-      ZONE_STATS = TRUE
+      options%zone_grid_filename = right(temp_string, substring="=")
+      options%calc_zonal_stats   = TRUE
 
-    elseif ( temp_str .containssimilar. "comparison_grid" ) then
+    elseif ( temp_string .containssimilar. "comparison_grid" ) then
 
-      comparison_grid_filename_str       = right(temp_str, substring="=")
-      COMPARISON_GRID = TRUE
+      options%comparison_grid_filename = right(temp_string, substring="=")
+      options%compare_to_obs_values    = TRUE
 
     else
 
       ! no match on the command-line argument flags; this must be the netCDF file
-      netcdf_filename_str = trim(temp_str)
+      options%netcdf_input_filename = trim(temp_string)
 
-      call netcdf_open_and_prepare_for_merging( ncfile_in,                    &
-                                                netcdf_filename_str,          &
+      call netcdf_open_and_prepare_for_merging( ncfile_in,                     &
+                                                options%netcdf_input_filename, &
                                                 guess_z_var_name=TRUE )
 
       ! extract integer start and end Julian dates from netCDF file
@@ -309,18 +323,18 @@ program swbstats2
       end_date_dbl = real( ncfile_in%iLastDayJD, kind=c_double )
 
       ! populate datetime data structure
-      call data_start_date%setJulianDate(start_date_dbl)
-      call data_start_date%calcGregorianDate()
-      call data_end_date%setJulianDate(end_date_dbl)
-      call data_end_date%calcGregorianDate()
+      call options%data_start_date%setJulianDate(start_date_dbl)
+      call options%data_start_date%calcGregorianDate()
+      call options%data_end_date%setJulianDate(end_date_dbl)
+      call options%data_end_date%calcGregorianDate()
 
-      netcdf_active = TRUE
+      options%netcdf_input_file_is_open = TRUE
 
     endif
 
   enddo
 
-  if (.not. netcdf_active)     &
+  if (.not. options%netcdf_input_file_is_open)                                   &
     stop ("No netCDF file was specified or there was an error opening the file.")
 
   call netcdf_get_attribute_list_for_variable( NCFILE=ncfile_in,              &
@@ -332,20 +346,20 @@ program swbstats2
 
   ! extract PROJ4 string from netCDF file
   iIndex_array = name_list%which("proj4_string")
-  temp_str = value_list%get( iIndex_array(1) )
-  target_proj4_str = trim(temp_str)
+  temp_string = value_list%get( iIndex_array(1) )
+  options%target_proj4_string = trim(temp_string)
 
-  netcdf_variable_name_str = trim(ncfile_in%pNC_VAR(NC_Z)%sVariableName)
+  options%netcdf_variable_name_string = trim(ncfile_in%pNC_VAR(NC_Z)%sVariableName)
 
   call netcdf_get_attribute_list_for_variable(                                &
                    NCFILE=ncfile_in,                                          &
-                   variable_name=netcdf_variable_name_str,                    &
+                   variable_name=options%netcdf_variable_name_string,         &
                    attribute_name_list=name_list,                             &
                    attribute_value_list=value_list )
 
   ! extract PROJ4 string from netCDF file
   iIndex_array = name_list%which("units")
-  netcdf_variable_units_str = value_list%get( iIndex_array(1) )
+  options%netcdf_variable_units_string = value_list%get( iIndex_array(1) )
 
   ! create some working grids to hold raw and summed values
   pGrdNative => grid_Create ( iNX=ncfile_in%iNX,           &
@@ -372,85 +386,88 @@ program swbstats2
             rY1=ncfile_in%rY(NC_TOP),                      &
             iDataType=GRID_DATATYPE_REAL )
 
-  nx = pGrdNative%iNX
-  ny = pGrdNative%iNY
-  xll = pGrdNative%rX0
-  yll = pGrdNative%rY0
-  xur = pGrdNative%rX1
-  yur = pGrdNative%rY1
-  gridcell_size = pGrdNative%rGridCellSize
+  ! extract basic information about the SWB computational grid
+  BNDS%iNumCols = pGrdNative%iNX
+  BNDS%iNumRows = pGrdNative%iNY
+  BNDS%fX_ll = pGrdNative%rX0
+  BNDS%fY_ll = pGrdNative%rY0
+  BNDS%fX_ur = pGrdNative%rX1
+  BNDS%fY_ur = pGrdNative%rY1
+  BNDS%fGridCellSize = pGrdNative%rGridCellSize
+  BNDS%sPROJ4_string = options%target_proj4_string
 
-  call set_project_projection_params()
+  if (options%calc_annual_stats) then
 
-  if (ANNUAL_STATISTICS) then
-
-    call create_date_list_for_annual_statistics()
+    call create_date_list_for_annual_statistics(options)
 
   endif
 
-  if (COMPARISON_GRID) then
-    call initialize_comparison_grid(grid_filename=comparison_grid_filename_str)
+  if (options%compare_to_obs_values) then
+    call initialize_comparison_grid(grid_filename=options%comparison_grid_filename)
   endif
 
-  if ( SLICE_OPTION == SINGLE_SLICE ) then
+  if (options%slice_option == OPT_SINGLE_TIME_SLICE) then
     ! force slice dates to honor bounds of data dates
-    if ( slice_start_date < data_start_date )  slice_start_date = data_start_date
-    if ( slice_end_date > data_end_date ) slice_end_date = data_end_date
+    if ( options%slice_start_date < options%data_start_date )                  &
+      options%slice_start_date = options%data_start_date
+    if ( options%slice_end_date > options%data_end_date )                      &
+      options%slice_end_date = options%data_end_date
 
-    call SIM_DT%initialize( slice_start_date, slice_end_date )
+    call SIM_DT%initialize( options%slice_start_date, options%slice_end_date )
 
   else
-    call SIM_DT%initialize( data_start_date, data_end_date )
+    call SIM_DT%initialize( options%data_start_date, options%data_end_date )
   endif
 
-  if (ZONE_STATS) then
-    if (.not. MULTIPLE_ZONE_GRIDS) then
-      call initialize_zone_grid(grid_filename=zone_grid_filename_str)
-      call get_unique_int(pZONE_GRID%pGrdBase%iData, unique_zone_list)
+  if (options%calc_zonal_stats) then
+    if (.not. options%multiple_zone_grids) then
+      call initialize_zone_grid(grid_filename=options%zone_grid_filename)
+      call get_unique_int(pZONE_GRID%pGrdBase%iData, options%unique_zone_list)
     endif
-    output_csv_filename_str = "zonal_stats_"//trim(netcdf_variable_name_str)//".csv"
-    call open_output_csv_file(output_csv_filename_str)
+    temp_string = "zonal_stats_"//trim(options%netcdf_variable_name_string)//".csv"
+    call open_output_csv_file(temp_string)
   endif
 
-  call open_output_netcdf_files()
+  call open_output_netcdf_files(options)
 
-  if ( SLICE_OPTION == SINGLE_SLICE ) then
+  if ( options%slice_option == OPT_SINGLE_TIME_SLICE ) then
 
-    call iterate_over_slice(grid_sum=pGrdSum, grid_mean=pGrdMean,             &
-                            start_date=slice_start_date,                      &
-                            end_date=slice_end_date)
+    call iterate_over_slice(grid_sum=pGrdSum, grid_mean=pGrdMean,              &
+                            start_date=options%slice_start_date,               &
+                            end_date=options%slice_end_date)
 
-    if (OUTPUT_TYPE_OPTION /= OUTPUT_TYPE_CSV_ONLY) then
-      call write_stats_to_files(grid_sum=pGrdSum, grid_mean=pGrdMean,           &
-                                start_date=slice_start_date,                    &
-                                end_date=slice_end_date)
+    if (options%write_csv) then
 
-      call write_stats_to_arcgrid(grid_sum=pGrdSum, grid_mean=pGrdMean,         &
-                                  start_date=slice_start_date,                  &
-                                  end_date=slice_end_date )
+      call write_stats_to_files(grid_sum=pGrdSum, grid_mean=pGrdMean,          &
+                                start_date=options%slice_start_date,           &
+                                end_date=options%slice_end_date)
+
+      call write_stats_to_arcgrid(grid_sum=pGrdSum, grid_mean=pGrdMean,        &
+                                  start_date=options%slice_start_date,         &
+                                  end_date=options%slice_end_date )
 
     endif
 
-    if (ZONE_STATS) then
+    if (options%calc_zonal_stats) then
       if ( associated(pCOMPARISON_GRID) ) then
 
         call output_zonal_stats(                                            &
-             start_date=slice_start_date,                                   &
-             end_date=slice_end_date,                                       &
+             start_date=options%slice_start_date,                           &
+             end_date=options%slice_end_date,                               &
              values=pGrdMean%rData,                                         &
              zone_ids=pZONE_GRID%pGrdBase%iData,                            &
-             unique_zone_list=unique_zone_list,                             &
+             unique_zone_list=options%unique_zone_list,                     &
              comparison_values=pCOMPARISON_GRID%pGrdBase%rData,             &
              funit=csv_output_file%unit() )
 
       else
 
         call output_zonal_stats(                                            &
-             start_date=slice_start_date,                                   &
-             end_date=slice_end_date,                                       &
+             start_date=options%slice_start_date,                           &
+             end_date=options%slice_end_date,                               &
              values=pGrdMean%rData,                                         &
              zone_ids=pZONE_GRID%pGrdBase%iData,                            &
-             unique_zone_list=unique_zone_list,                             &
+             unique_zone_list=options%unique_zone_list,                     &
              funit=csv_output_file%unit() )
 
       endif
@@ -458,70 +475,73 @@ program swbstats2
 
     call netcdf_close_file(NCFILE=ncfile_out)
 
-  elseif ( SLICE_OPTION == MANY_SLICES ) then
+  elseif (options%slice_option == OPT_MULTIPLE_TIME_SLICES) then
 
-    do iIndex=1, date_range_id_list%count
+    do iIndex=1, options%date_range_id_list%count
 
-      start_date_str = start_date_list%get( iIndex )
-      end_date_str = end_date_list%get( iIndex )
-      date_range_str = date_range_id_list%get( iIndex )
+      start_date_string = options%start_date_list%get( iIndex )
+      end_date_string = options%end_date_list%get( iIndex )
+!      options%date_range_string = options%date_range_id_list%get( iIndex )
 
-      call slice_start_date%setDateFormat("YYYY-MM-DD")
-      call slice_end_date%setDateFormat("YYYY-MM-DD")
+      call options%slice_start_date%setDateFormat("YYYY-MM-DD")
+      call options%slice_end_date%setDateFormat("YYYY-MM-DD")
 
-      call slice_start_date%parseDate( start_date_str )
-      call slice_end_date%parseDate( end_date_str )
+      call options%slice_start_date%parseDate( start_date_string )
+      call options%slice_end_date%parseDate( end_date_string )
 
+      options%date_range_string = options%slice_start_date%prettydate()    &
+         //"_to_"//options%slice_end_date%prettydate()
 
       print *, ""
-      print *, "Processing slice: ", slice_start_date%prettydate(), " to ", slice_end_date%prettydate()
+      print *, "Processing slice: ", options%slice_start_date%prettydate()    &
+         //" to "//options%slice_end_date%prettydate()
       print *, repeat("-", 70)
 
       call iterate_over_slice(grid_sum=pGrdSum, grid_mean=pGrdMean,           &
-                              start_date=slice_start_date,                    &
-                              end_date=slice_end_date)
+                              start_date=options%slice_start_date,            &
+                              end_date=options%slice_end_date)
 
-      if (MULTIPLE_COMPARISON_GRIDS) then
-        comparison_grid_filename_str = comparison_grid_file_list%get( iIndex )
-        call initialize_comparison_grid(grid_filename=comparison_grid_filename_str)
+      if (options%multiple_comparison_grids) then
+        options%comparison_grid_filename = options%comparison_grid_file_list%get( iIndex )
+        call initialize_comparison_grid(grid_filename=options%comparison_grid_filename)
       endif
 
-      if ( MULTIPLE_ZONE_GRIDS ) then
-        zone_grid_filename_str = zonal_stats_grid_file_list%get( iIndex )
-        call initialize_zone_grid(grid_filename=zone_grid_filename_str)
-        call get_unique_int(pZONE_GRID%pGrdBase%iData, unique_zone_list)
+      if (options%multiple_zone_grids) then
+        options%zone_grid_filename = options%zone_grid_file_list%get( iIndex )
+        call initialize_zone_grid(grid_filename=options%zone_grid_filename)
+        call get_unique_int(pZONE_GRID%pGrdBase%iData, options%unique_zone_list)
       endif
 
-      if (OUTPUT_TYPE_OPTION /= OUTPUT_TYPE_CSV_ONLY) then
+      if (options%write_csv) then
         call write_stats_to_files(grid_sum=pGrdSum, grid_mean=pGrdMean,         &
-                                  start_date=slice_start_date,                  &
-                                  end_date=slice_end_date)
+                                  start_date=options%slice_start_date,          &
+                                  end_date=options%slice_end_date)
 
         call write_stats_to_arcgrid(grid_sum=pGrdSum, grid_mean=pGrdMean,       &
-                                    start_date=slice_start_date,                &
-                                    end_date=slice_end_date,                    &
-                                    date_range=date_range_str)
+                                    start_date=options%slice_start_date,        &
+                                    end_date=options%slice_end_date,            &
+                                    date_range_string=options%date_range_string)
       endif
 
-      if (ZONE_STATS) then
+      if (options%calc_zonal_stats) then
         if ( associated(pCOMPARISON_GRID) ) then
 
           call output_zonal_stats(                                            &
-               start_date=slice_start_date,                                   &
-               end_date=slice_end_date,                                       &
+               start_date=options%slice_start_date,                           &
+               end_date=options%slice_end_date,                               &
                values=pGrdMean%rData,                                         &
                zone_ids=pZONE_GRID%pGrdBase%iData,                            &
-               unique_zone_list=unique_zone_list,                             &
+               unique_zone_list=options%unique_zone_list,                     &
                comparison_values=pCOMPARISON_GRID%pGrdBase%rData,             &
                funit=csv_output_file%unit() )
 
         else
           call output_zonal_stats(                                            &
-               start_date=slice_start_date,                                   &
-               end_date=slice_end_date,                                       &
+               start_date=options%slice_start_date,                           &
+               end_date=options%slice_end_date,                               &
                values=pGrdMean%rData,                                         &
                zone_ids=pZONE_GRID%pGrdBase%iData,                            &
-               unique_zone_list=unique_zone_list,                             &
+               unique_zone_list=options%unique_zone_list,                     &
                funit=csv_output_file%unit() )
 
         endif
@@ -532,10 +552,9 @@ program swbstats2
 
     enddo
 
-    if (OUTPUT_TYPE_OPTION /= OUTPUT_TYPE_CSV_ONLY)  &
-      call netcdf_close_file(NCFILE=ncfile_out)
+    if (options%write_netcdf)  call netcdf_close_file(NCFILE=ncfile_out)
 
-    if (ZONE_STATS) call csv_output_file%close()
+    if (options%write_csv)  call csv_output_file%close()
 
   endif
 
@@ -584,27 +603,33 @@ contains
 
 
   subroutine write_stats_to_arcgrid( grid_sum, grid_mean, start_date,         &
-                                     end_date, date_range )
+                                     end_date, date_range_string )
 
     type (GENERAL_GRID_T), pointer          :: grid_sum
     type (GENERAL_GRID_T), pointer          :: grid_mean
     type (DATETIME_T), intent(inout)        :: start_date
     type (DATETIME_T), intent(inout)        :: end_date
-    character (len=*), intent(in), optional :: date_range
+    character (len=*), intent(in), optional :: date_range_string
 
     ! [ LOCALS ]
     character (len=:), allocatable  :: filename
+    integer (kind=c_int)            :: nx, ny
 
-    if ( present(date_range) ) then
+    nx = BNDS%iNumCols
+    ny = BNDS%iNumRows
+
+    if ( present(date_range_string) ) then
       !@todo: change filename depending on the desired output statistic
-      filename = trim(date_range_str)//"__"//trim(nc_variable_name_str)      &
-                 //"__"//start_date%prettydate()//"_to_"//end_date%prettydate() &
-                 //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)             &
+      filename = trim(date_range_string)//"__"                                 &
+                 //trim(options%netcdf_variable_name_string)                   &
+                 //"__"//start_date%prettydate()//"_to_"                       &
+                 //end_date%prettydate()                                       &
+                 //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)              &
                  //"__MEAN_ANNUAL.asc"
     else
-      filename = trim(nc_variable_name_str)                                     &
+      filename = trim(options%netcdf_variable_name_string)                      &
                  //"__"//start_date%prettydate()//"_to_"//end_date%prettydate() &
-                 //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)             &
+                 //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)               &
                  //"__MEAN_ANNUAL.asc"
     endif
 
@@ -646,8 +671,8 @@ contains
     real (kind=c_float), allocatable  :: tempvals(:)
 
     ! force slice dates to honor bounds of data dates
-    if ( start_date < data_start_date )  start_date = data_start_date
-    if ( end_date > data_end_date )      end_date = data_end_date
+    if ( start_date < options%data_start_date )  start_date = options%data_start_date
+    if ( end_date > options%data_end_date )      end_date = options%data_end_date
 
 !    call SIM_DT%initialize( start_date, end_date )
 
@@ -687,7 +712,7 @@ contains
       grid_sum%rData = NC_FILL_FLOAT
     endwhere
 
-    if (ANNUALIZE_MEANS) then
+    if (options%annualize_mean_stats) then
       where ( pGrdNative%rData > NC_FILL_FLOAT )
         grid_mean%rData = grid_sum%rData / ( end_date - start_date + 1.0_c_double) * 365.25
       end where
@@ -739,11 +764,11 @@ contains
       if ( len_trim(sRecord) == 0 ) cycle
 
       call chomp( sRecord, sItem, sDelimiters="," )
-      call date_range_id_list%append( sItem )
+      call options%date_range_id_list%append( sItem )
 
       call chomp( sRecord, sItem, sDelimiters="," )
-      call start_date_list%append( sItem )
-      call end_date_list%append( sRecord )
+      call options%start_date_list%append( sItem )
+      call options%end_date_list%append( sRecord )
 
     enddo
 
@@ -791,15 +816,15 @@ contains
       if ( len_trim(sRecord) == 0 ) cycle
 
       call chomp( sRecord, sItem, sDelimiters="," )
-      call date_range_id_list%append( sItem )
+      call options%date_range_id_list%append( sItem )
 
       call chomp( sRecord, sItem, sDelimiters="," )
-      call start_date_list%append( sItem )
+      call options%start_date_list%append( sItem )
 
       call chomp( sRecord, sItem, sDelimiters="," )
-      call end_date_list%append( sItem )
+      call options%end_date_list%append( sItem )
 
-      call comparison_grid_file_list%append( sRecord )
+      call options%comparison_grid_file_list%append( sRecord )
 
     enddo
 
@@ -846,15 +871,15 @@ contains
       if ( len_trim(sRecord) == 0 ) cycle
 
       call chomp( sRecord, sItem, sDelimiters="," )
-      call date_range_id_list%append( sItem )
+      call options%date_range_id_list%append( sItem )
 
       call chomp( sRecord, sItem, sDelimiters="," )
-      call start_date_list%append( sItem )
+      call options%start_date_list%append( sItem )
 
       call chomp( sRecord, sItem, sDelimiters="," )
-      call end_date_list%append( sItem )
+      call options%end_date_list%append( sItem )
 
-      call zonal_stats_grid_file_list%append( sRecord )
+      call options%zone_grid_file_list%append( sRecord )
 
     enddo
 
@@ -885,7 +910,7 @@ contains
     nullify(pZONE_GRID)
     allocate(pZONE_GRID)
 
-    call pZONE_GRID%set_target_PROJ4(target_proj4_str)
+    call pZONE_GRID%set_target_PROJ4(options%target_proj4_string)
 
     call pZONE_GRID%initialize(          &
       sDescription="Zone Grid",          &
@@ -924,7 +949,7 @@ contains
     ! allocate memory for a generic data_catalog_entry
     if (.not. associated(pCOMPARISON_GRID))  allocate(pCOMPARISON_GRID, stat=iStat)
 
-    call pCOMPARISON_GRID%set_target_PROJ4(target_proj4_str)
+    call pCOMPARISON_GRID%set_target_PROJ4(options%target_proj4_string)
 
     call pCOMPARISON_GRID%initialize(          &
       sDescription="Comparison Grid",          &
@@ -937,30 +962,13 @@ contains
     where ( pGrdNative%rData <= NC_FILL_FLOAT )
       pCOMPARISON_GRID%pGrdBase%rData = NC_FILL_FLOAT
     elsewhere
-      pCOMPARISON_GRID%pGrdBase%rData = pCOMPARISON_GRID%pGrdBase%rData       &
-                                      * COMPARISON_GRID_SCALE_FACTOR
+      pCOMPARISON_GRID%pGrdBase%rData = pCOMPARISON_GRID%pGrdBase%rData           &
+                                      * options%comparison_grid_conversion_factor
     end where
 
     call grid_WriteArcGrid(output_filename_str, pCOMPARISON_GRID%pGrdBase )
 
   end subroutine initialize_comparison_grid
-
-!------------------------------------------------------------------------------
-
-  subroutine set_project_projection_params()
-
-    ! BNDS is a module-level data structure that will be used in other modules to
-    ! supply bounding box information for the SWB project area
-    BNDS%iNumCols = nx
-    BNDS%iNumRows = ny
-    BNDS%fX_ll = xll
-    BNDS%fY_ll = yll
-    BNDS%fY_ur = yur
-    BNDS%fX_ur = xur
-    BNDS%fGridCellSize = gridcell_size
-    BNDS%sPROJ4_string = trim(target_proj4_str)
-
-  end subroutine set_project_projection_params
 
 !------------------------------------------------------------------------------
 
@@ -1106,25 +1114,25 @@ contains
 
   end subroutine get_unique_int
 
-  subroutine open_output_netcdf_files()
+  subroutine open_output_netcdf_files(options)
 
-    nc_variable_name_str = trim(ncfile_in%pNC_VAR(NC_Z)%sVariableName)
+    type (SWBSTATS_OPTIONS_T), intent(inout)     :: options
 
-    if (OUTPUT_TYPE_OPTION /= OUTPUT_TYPE_CSV_ONLY) then
+    if (options%write_netcdf) then
 
       call netcdf_open_and_prepare_as_output(                                     &
             NCFILE=ncfile_out,                                                    &
-            sVariableName=trim(nc_variable_name_str),                             &
-            sVariableUnits=trim(netcdf_variable_units_str),                                       &
+            sVariableName=trim(options%netcdf_variable_name_string),              &
+            sVariableUnits=trim(options%netcdf_variable_units_string),            &
             iNX=ncfile_in%iNX,                                                    &
             iNY=ncfile_in%iNY,                                                    &
             fX=ncfile_in%rX_Coords,                                               &
             fY=ncfile_in%rY_Coords,                                               &
-            PROJ4_string=trim(temp_str),                                          &
+            PROJ4_string=trim(options%target_proj4_string),                       &
             StartDate=SIM_DT%start,                                               &
             EndDate=SIM_DT%end,                                                   &
-            write_time_bounds=TRUE,                                               &
-            filename_modifier=output_type_str )
+            write_time_bounds=TRUE)
+            !filename_modifier=output_type_str )
 
       call netcdf_get_variable_id_for_variable( NCFILE=ncfile_out,                &
                                                 variable_name="time_bnds",        &
@@ -1143,7 +1151,7 @@ contains
 
     call csv_output_file%open(filename)
 
-    if (MULTIPLE_COMPARISON_GRIDS .or. COMPARISON_GRID) then
+    if (options%multiple_comparison_grids .or. options%compare_to_obs_values) then
       header_str = "start_date,end_date,zone_id,minimum_swb,maximum_swb,"     &
         //"mean_swb,count_swb,minimum_obs,maximum_obs,"                       &
         //"mean_obs,count_obs"
@@ -1158,27 +1166,28 @@ contains
 
 !------------------------------------------------------------------------------
 
-  subroutine create_date_list_for_annual_statistics()
+  subroutine create_date_list_for_annual_statistics(options)
 
-    type (DATE_RANGE_T)  :: ANN_DT
+    type (SWBSTATS_OPTIONS_T), intent(inout)  :: options
 
     ! [ LOCALS ]
-    integer (c_int)  :: indx
+    integer (c_int)      :: indx
+    type (DATE_RANGE_T)  :: ANN_DT
 
     indx = 0
 
-    call ANN_DT%initialize( data_start_date, data_end_date )
+    call ANN_DT%initialize( options%data_start_date, options%data_end_date )
 
     do
       indx = indx + 1
-      call start_date_list%append( ANN_DT%curr%prettydate() )
+      call options%start_date_list%append( ANN_DT%curr%prettydate() )
       call ANN_DT%advance_to_last_doy()
-      call date_range_id_list%append( asCharacter(indx) )
+      call options%date_range_id_list%append( asCharacter(indx) )
       if ( ANN_DT%curr < ANN_DT%end ) then
-        call end_date_list%append( ANN_DT%curr%prettydate() )
+        call options%end_date_list%append( ANN_DT%curr%prettydate() )
         call ANN_DT%addDay()
       else
-        call end_date_list%append( ANN_DT%end%prettydate() )
+        call options%end_date_list%append( ANN_DT%end%prettydate() )
         exit
       endif
     enddo
