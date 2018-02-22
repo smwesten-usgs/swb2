@@ -367,7 +367,6 @@ subroutine initialize_gridded_data_object_sub( this, &
   integer (kind=c_int)                     :: iDataType
   character (len=*), intent(in), optional  :: sPROJ4_string
 
-
   if (present(sPROJ4_string) ) then
     this%sSourcePROJ4_string = trim(sPROJ4_string)
   else
