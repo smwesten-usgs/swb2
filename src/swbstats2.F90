@@ -221,6 +221,7 @@ program swbstats2
 
       options%calc_annual_stats = TRUE
       options%slice_option      = OPT_MULTIPLE_TIME_SLICES
+      options%write_grids = TRUE
 
     elseif ( temp_string .containssimilar. "dump_options" ) then
 
@@ -389,6 +390,7 @@ program swbstats2
             rY1=ncfile_in%rY(NC_TOP),                      &
             iDataType=GRID_DATATYPE_REAL )
 
+  ! delta, delta2 are temporary work grids used in calculating variance
   pGrdDelta   =>  grid_Create ( iNX=ncfile_in%iNX,               &
                   iNY=ncfile_in%iNY,                             &
                   rX0=ncfile_in%rX(NC_LEFT),                     &
@@ -406,7 +408,7 @@ program swbstats2
                   iDataType=GRID_DATATYPE_REAL )
 
   ! extract basic information about the SWB computational grid
-
+  ! 'BNDS' is defined in module constants_and_conversions
   BNDS%iNumCols = ncfile_in%iNX
   BNDS%iNumRows = ncfile_in%iNY
   BNDS%fX_ll = pGrdNative%rX0
@@ -442,6 +444,9 @@ program swbstats2
     ! corresponding to the start/end date of the data bounds
     options%slice_option = OPT_SINGLE_TIME_SLICE
     call SIM_DT%initialize( options%data_start_date, options%data_end_date )
+  else
+    ! default time slice = all data in netcdf file
+    call SIM_DT%initialize( options%data_start_date, options%data_end_date )
   endif
 
   if (options%calc_zonal_stats) then
@@ -454,6 +459,8 @@ program swbstats2
   endif
 
   if (options%write_grids)  call open_output_netcdf_files(options)
+
+  ! Done with preliminaries (opening files, setting options, etc.); begin calcs
 
   if ( options%slice_option == OPT_SINGLE_TIME_SLICE ) then
 
@@ -504,14 +511,16 @@ program swbstats2
 
   elseif (options%slice_option == OPT_MULTIPLE_TIME_SLICES) then
 
+    call SIM_DT%initialize( options%data_start_date, options%data_end_date )
+
     do iIndex=1, options%date_range_id_list%count
+
+      call options%slice_start_date%setDateFormat("YYYY-MM-DD")
+      call options%slice_end_date%setDateFormat("YYYY-MM-DD")
 
       start_date_string = options%start_date_list%get( iIndex )
       end_date_string = options%end_date_list%get( iIndex )
 !      options%date_range_string = options%date_range_id_list%get( iIndex )
-
-      call options%slice_start_date%setDateFormat("YYYY-MM-DD")
-      call options%slice_end_date%setDateFormat("YYYY-MM-DD")
 
       call options%slice_start_date%parseDate( start_date_string )
       call options%slice_end_date%parseDate( end_date_string )
@@ -524,7 +533,7 @@ program swbstats2
          //" to "//options%slice_end_date%prettydate()
       write(*,fmt="(a)") repeat("-", 70)
 
-      call calculate_slice_statistics(grid_sum=pGrdSum, grid_mean=pGrdMean,           &
+      call calculate_slice_statistics(grid_sum=pGrdSum, grid_mean=pGrdMean,   &
                               grid_variance=pGrdVar, grid_delta=pGrdDelta,    &
                               grid_delta2=pGrdDelta2,                         &
                               start_date=options%slice_start_date,            &
@@ -541,7 +550,7 @@ program swbstats2
         call get_unique_int(pZONE_GRID%pGrdBase%iData, options%unique_zone_list)
       endif
 
-      if (options%write_csv) then
+      if (options%write_grids) then
         call write_stats_to_netcdf(grid_sum=pGrdSum, grid_mean=pGrdMean,         &
                                   start_date=options%slice_start_date,          &
                                   end_date=options%slice_end_date)
@@ -651,7 +660,7 @@ contains
     call options%start_date_list%print()
     write(*,fmt=fmt_string) "End date list"
     call options%end_date_list%print()
-    write(*,fmt=fmt_string) "Date range list"
+    write(*,fmt=fmt_string) "Date index list"
     call options%date_range_id_list%print()
     write(*,fmt=fmt_string) "Unique zone id list"
     call options%unique_zone_list%print()
@@ -825,12 +834,16 @@ contains
 
         else
 
+          ! where ( local_mask )
+          !   delta = grd_new - grd_mean
+          !   grd_sum = grd_sum + grd_new
+          !   grd_mean = grd_mean + delta / real( counter, kind=c_float )
+          !   delta2 = grd_new - grd_mean
+          !   grd_var = grd_var + delta * delta2
+          ! end where
+
           where ( local_mask )
-            delta = grd_new - grd_mean
             grd_sum = grd_sum + grd_new
-            grd_mean = grd_mean + delta / real( counter, kind=c_float )
-            delta2 = grd_new - grd_mean
-            grd_var = grd_var + delta * delta2
           end where
 
         endif
@@ -847,14 +860,19 @@ contains
         grd_mean = NC_FILL_FLOAT
         grd_sum = NC_FILL_FLOAT
         grd_var = NC_FILL_FLOAT
-      elsewhere
-        grd_var = grd_var / (counter - 1)
+      ! elsewhere
+      !   grd_var = grd_var / (counter - 1)
       endwhere
 
       if (options%annualize_mean_stats) then
         where ( local_mask )
-          grd_mean = grd_mean * 365.25
-          grd_var = grd_var * 365.25
+          ! grd_mean = grd_mean * 365.25
+          ! grd_var = grd_var * 365.25
+          grd_mean = grd_sum / real( counter, kind=c_float ) * 365.25
+        end where
+      else
+        where ( local_mask )
+          grd_mean = grd_sum / real( counter, kind=c_float )
         end where
       endif
 
@@ -1122,6 +1140,7 @@ contains
 
     ! [ LOCALS ]
     integer (c_int)                :: n
+    integer (c_int)                :: indx
     integer (c_int), allocatable   :: tempvals(:)
     integer (c_int)                :: number_of_matches
     real (c_float), allocatable    :: stats(:)
@@ -1135,20 +1154,19 @@ contains
 
     tempvals = unique_zone_list%asInt()
 
-    do n=minval(tempvals,1), maxval(tempvals,1)
-      if ( any(tempvals==n) ) then
-        if (present(comparison_values)) then
-          call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats, &
-                comparison_values=comparison_values)
-          write(unit=funit_, fmt="(2(a,', '),i0,', ',3(f14.4,', '),i0,', ',"  &
-            //"3(f14.4,', '),i0)")                                            &
-            start_date%prettydate(),end_date%prettydate(), n, stats(1:3),     &
-            int(stats(4)), stats(5:7),int(stats(8))
-        else
-          call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats)
-          write(unit=funit_, fmt="(2(a,', '),i0,', ',3(f14.4,', '),i0)")         &
-            start_date%prettydate(),end_date%prettydate(), n, stats(1:3),int(stats(4))
-        endif
+    do indx=1,ubound(tempvals,1)
+      n = tempvals(indx)
+      if (present(comparison_values)) then
+        call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats, &
+              comparison_values=comparison_values)
+        write(unit=funit_, fmt="(2(a,', '),i0,', ',3(f14.4,', '),i0,', ',"  &
+          //"3(f14.4,', '),i0)")                                            &
+          start_date%prettydate(),end_date%prettydate(), n, stats(1:3),     &
+          int(stats(4)), stats(5:7),int(stats(8))
+      else
+        call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats)
+        write(unit=funit_, fmt="(2(a,', '),i0,', ',3(f14.4,', '),i0)")         &
+          start_date%prettydate(),end_date%prettydate(), n, stats(1:3),int(stats(4))
       endif
     enddo
 

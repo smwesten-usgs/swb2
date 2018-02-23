@@ -38,12 +38,12 @@ export INSTALL_PREFIX=/usr/local/bin
 
 # define other variables for use in the CMakeList.txt file
 # options are "Release" or "Debug"
-export BUILD_TYPE="Debug"
+export BUILD_TYPE="Release"
 export SYSTEM_TYPE="MacOS"
 
 # define platform and compiler specific compilation flags
-export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -Wuninitialized -fbacktrace -fcheck=all -fexceptions -fsanitize=null -fsanitize=leak -fmax-errors=6 -fbackslash -ffree-line-length-none -Wno-maybe-uninitialized"
-export CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -ffree-line-length-512 -fbackslash -ffpe-summary='none' -Wno-maybe-uninitialized"
+export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -gfull -ggdb -Wuninitialized -fbacktrace -fcheck=all -fexceptions -fsanitize=null -fsanitize=leak -fmax-errors=6 -fbackslash -ffree-line-length-none -Wno-maybe-uninitialized"
+export CMAKE_Fortran_FLAGS_RELEASE="-O1 -g -march=native -ffree-line-length-512 -fbackslash -ffpe-summary='none' -Wno-maybe-uninitialized"
 
 # set important environment variables
 export FC=$GFORTRAN
