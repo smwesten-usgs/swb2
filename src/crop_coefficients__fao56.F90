@@ -8,8 +8,8 @@
 module crop_coefficients__FAO56
 
   use iso_c_binding, only             : c_bool, c_short, c_int, c_float, c_double
-  use constants_and_conversions, only : M_PER_FOOT, lTRUE, lFALSE, fTINYVAL, &
-                                        iTINYVAL, asInt, fZERO, in_to_mm
+  use constants_and_conversions, only : M_PER_FOOT, lTRUE, lFALSE, fTINYVAL,       &
+                                        iTINYVAL, asInt, asFloat, fZERO, in_to_mm
   use data_catalog, only              : DAT
   use data_catalog_entry, only        : DATA_CATALOG_ENTRY_T
   use datetime
@@ -17,7 +17,7 @@ module crop_coefficients__FAO56
   use exceptions, only                : assert, warn, die
   use parameters, only                : PARAMS
   use simulation_datetime, only       : SIM_DT
-  use strings, only                   : asCharacter, sQuote
+  use strings, only                   : asCharacter, sQuote, operator(.contains.)
   use string_list
   implicit none
 
@@ -97,6 +97,8 @@ contains
     character (len=:), allocatable   :: sText
 
     type (STRING_LIST_T)             :: slPlantingDate
+    type (DATETIME_T)                :: dtPlantingDate
+    character (len=:), allocatable   :: PlantingDate_str
 
 
     real (kind=c_float), allocatable :: L_ini_(:)
@@ -261,15 +263,25 @@ contains
 
       do iIndex=1, slPlantingDate%count
 
-        sMMDDYYYY = trim(slPlantingDate%get( iIndex ))//"/"//asCharacter( SIM_DT%start%iYear )
+        PlantingDate_str = slPlantingDate%get( iIndex )
 
-        call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)%parsedate( sMMDDYYYY, __SRCNAME__, __LINE__ )
+        if ( PlantingDate_str .contains. "/" ) then
 
-        GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)  !&
-                                                    ! + GROWTH_STAGE_SHIFT_DAYS( iIndex )
+          ! append current year to the end of the user-entered planting date in mm/dd
+          sMMDDYYYY = trim(PlantingDate_str)//"/"//asCharacter( SIM_DT%start%iYear )
+          call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)%parsedate( sMMDDYYYY, __SRCNAME__, __LINE__ )
+
+        else
+
+          dtPlantingDate = SIM_DT%start + asFloat( PlantingDate_str)
+          call dtPlantingDate%calcJulianDay()
+          GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = dtPlantingDate
+        endif
+
+!        GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)  &
+!                                                     + GROWTH_STAGE_SHIFT_DAYS( iIndex )
 
         ! march forward through time calculating the various dates on the Kcb curve
-
         GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) + L_ini_( iIndex )
         GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) + L_dev_( iIndex )
         GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) + L_mid_( iIndex )

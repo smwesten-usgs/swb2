@@ -1019,12 +1019,12 @@ contains
 
     if ( sCmdText .containssimilar. "INTERCEPTION" ) then
 
-      if ( Method_Name .strapprox. "BUCKET" ) then
+      if ( (Method_Name .strapprox. "BUCKET") .or. (Method_Name .strapprox. "HORTON")) then
 
         this%init_interception => model_initialize_interception_bucket
         this%calc_interception => model_calculate_interception_bucket
 
-        call LOGS%WRITE( "==> BUCKET INTERCEPTION submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        call LOGS%WRITE( "==> BUCKET/HORTON INTERCEPTION submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       elseif ( Method_Name .strapprox. "GASH" ) then
 

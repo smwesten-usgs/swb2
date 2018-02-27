@@ -1152,6 +1152,7 @@ contains
       funit_ = OUTPUT_UNIT
     endif
 
+    ! obtain list of unique integers present in the zone grid
     tempvals = unique_zone_list%asInt()
 
     do indx=1,ubound(tempvals,1)

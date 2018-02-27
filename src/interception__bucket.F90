@@ -144,6 +144,7 @@ contains
     !> retrieve nongrowing season interception amount: 'a' term
     call sl_temp_list%clear()
     call sl_temp_list%append("Nongrowing_season_interception")
+    call sl_temp_list%append("Nongrowing_season_interception_a")    
     call sl_temp_list%append("Interception_nongrowing")
     call sl_temp_list%append("Interception_a_term_nongrowing_season")
 
