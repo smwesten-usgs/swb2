@@ -28,7 +28,7 @@ program swbstats2
 
   character (len=256)            :: temp_string, sub_string
 
-  character (len=68), allocatable :: usage_string(:)
+  character (len=70), allocatable :: usage_string(:)
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pZONE_GRID       => null()
   type (DATA_CATALOG_ENTRY_T), pointer :: pCOMPARISON_GRID => null()
@@ -93,6 +93,7 @@ program swbstats2
     character (len=:), allocatable :: netcdf_input_filename
     character (len=:), allocatable :: netcdf_variable_units_string
     character (len=:), allocatable :: netcdf_variable_name_string
+    character (len=:), allocatable :: filename_modifier_string
     logical (kind=c_bool)          :: netcdf_input_file_is_open = FALSE
     logical (kind=c_bool)          :: multiple_zone_grids       = FALSE
     logical (kind=c_bool)          :: multiple_comparison_grids = FALSE
@@ -157,13 +158,15 @@ program swbstats2
       //TRIM(int2char(__G95_MINOR__))
 #endif
 
-    allocate(usage_string(34))
+    allocate(usage_string(36))
 
     usage_string = [                                                           &
      "usage: swbstats2 [options] netcdf_file_name                           ", &
      "                                                                      ", &
      "  options:                                                            ", &
      "                                                                      ", &
+     "  [ --annual_statistics= ]                                            ", &
+     "    calculate statistics for every calendar year between start and end", &
      "  [ --slice= ]                                                        ", &
      "    dates over which statistics should be calculated,                 ", &
      "    with start date and end date formatted as yyyy-mm-dd,yyyy-mm-dd   ", &
@@ -206,6 +209,7 @@ program swbstats2
 
   call options%slice_start_date%setDateFormat("YYYY-MM-DD")
   call options%slice_end_date%setDateFormat("YYYY-MM-DD")
+  options%filename_modifier_string = "PERIOD_STATS"//"_"
 
   do iIndex=1, iNumArgs
 
@@ -222,6 +226,7 @@ program swbstats2
       options%calc_annual_stats = TRUE
       options%slice_option      = OPT_MULTIPLE_TIME_SLICES
       options%write_grids = TRUE
+      options%filename_modifier_string = "YEARLY_STATS"//"_"
 
     elseif ( temp_string .containssimilar. "dump_options" ) then
 
@@ -245,6 +250,7 @@ program swbstats2
                                     date_range_id_list=options%date_range_id_list,  &
                                     start_date_list=options%start_date_list,        &
                                     end_date_list=options%end_date_list )
+      options%filename_modifier_string = "STRESS_PERIOD_STATS"//"_"
 
     elseif ( temp_string .containssimilar. "zone_period_file" ) then
 
@@ -266,7 +272,7 @@ program swbstats2
       options%multiple_comparison_grids = TRUE
       options%compare_to_obs_values     = TRUE
       options%write_csv                 = TRUE
-
+      options%filename_modifier_string = "COMPARISON_PERIOD_STATS"//"_"
 
       options%comparison_period_filename = right(temp_string, substring="=")
       call read_comparison_period_file( csv_filename=options%comparison_period_filename,         &
@@ -289,7 +295,9 @@ program swbstats2
 
       call options%slice_end_date%parseDate(end_date_string)
       call options%slice_end_date%calcGregorianDate()
-
+      options%filename_modifier_string = "SLICE_STATS--"                     &
+        //options%slice_start_date%prettydate()//"_to_"                        &
+        //options%slice_end_date%prettydate()//"_"
 
     elseif ( temp_string .containssimilar. "zone_grid" ) then
 
@@ -1289,8 +1297,8 @@ contains
             PROJ4_string=trim(options%target_proj4_string),                       &
             StartDate=SIM_DT%start,                                               &
             EndDate=SIM_DT%end,                                                   &
-            write_time_bounds=TRUE)
-            !filename_modifier=output_type_str )
+            write_time_bounds=TRUE,                                               &
+            filename_modifier=options%filename_modifier_string )
 
       call netcdf_get_variable_id_for_variable( NCFILE=ncfile_out,                &
                                                 variable_name="time_bnds",        &
