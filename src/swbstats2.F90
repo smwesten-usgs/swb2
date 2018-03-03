@@ -515,7 +515,7 @@ program swbstats2
       endif
     endif
 
-    call netcdf_close_file(NCFILE=ncfile_out)
+    !call netcdf_close_file(NCFILE=ncfile_out)
 
   elseif (options%slice_option == OPT_MULTIPLE_TIME_SLICES) then
 
