@@ -1187,7 +1187,7 @@ contains
         call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats, &
               comparison_values=comparison_values)
         write(unit=funit_, fmt="(2(a,', '),i0,', ',4(f14.5,', '),i0,', ',"  &
-          //"3(f14.4,', '),i0)")                                            &
+          //"4(f14.5,', '),i0)")                                            &
           start_date%prettydate(),end_date%prettydate(), n, stats(1:4),     &
           int(stats(5)), stats(6:9),int(stats(10))
       else
