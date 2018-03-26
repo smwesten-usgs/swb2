@@ -31,6 +31,9 @@ module simulation_datetime
     procedure :: advance_curr_to_last_day_of_year_sub
     generic   :: advance_to_last_doy => advance_curr_to_last_day_of_year_sub
 
+    procedure :: advance_curr_to_last_day_of_month_sub
+    generic   :: advance_to_last_day_of_month => advance_curr_to_last_day_of_month_sub
+
     procedure :: percent_complete => percent_complete_fn
 
   end type DATE_RANGE_T
@@ -70,6 +73,23 @@ contains
     this%iNumDaysFromOrigin = this%iNumDaysFromOrigin + 1
 
   end subroutine advance_curr_to_last_day_of_year_sub
+
+!------------------------------------------------------------------------------
+
+  subroutine advance_curr_to_last_day_of_month_sub(this)
+
+    class (DATE_RANGE_T), intent(inout)   :: this
+
+    call this%curr%advanceLastDayOfMonth()
+
+!    this%iDaysInMonth = this%curr%dayspermonth()
+!    this%iDaysInYear = this%curr%daysperyear()
+!    this%lIsLeapYear = this%curr%isLeapYear()
+    this%iDOY = day_of_year( this%curr%getJulianDay() )
+    this%iYearOfSimulation = this%curr%iYear - this%start%iYear + 1
+    this%iNumDaysFromOrigin = this%iNumDaysFromOrigin + 1
+
+  end subroutine advance_curr_to_last_day_of_month_sub
 
 !------------------------------------------------------------------------------
 

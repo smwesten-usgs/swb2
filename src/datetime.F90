@@ -85,6 +85,7 @@ module datetime
     procedure  :: setMonth => date_set_month_sub
     procedure  :: setYear => date_set_year_sub
     procedure  :: addDay => date_plus_day_sub
+    procedure  :: advanceLastDayOfMonth => date_advance_to_last_day_of_month_sub
     procedure  :: subtractDay => date_minus_day_sub
     procedure  :: addYear => date_plus_year_sub
     procedure  :: subtractYear => date_minus_year_sub
@@ -1194,6 +1195,29 @@ subroutine date_set_year_sub(this, newyear)
   call this%calcJulianDay()
 
 end subroutine date_set_year_sub
+
+!------------------------------------------------------------------------------
+
+subroutine date_advance_to_last_day_of_month_sub(this)
+
+  class(DATETIME_T) :: this
+
+  this%iDay = 1_c_int
+
+  if (this%iMonth < 12) then
+    this%iMonth = this%iMonth + 1
+  else
+    this%iMonth = 1
+    this%iYear = this%iYear + 1
+  endif
+
+  call this%calcJulianDay()
+
+  ! now step back a day to obtain the date for the last day of the month
+  this%dJulianDate = this%dJulianDate - 1.0_c_double
+  call this%calcGregorianDate()
+
+end subroutine date_advance_to_last_day_of_month_sub
 
 !------------------------------------------------------------------------------
 

@@ -75,9 +75,10 @@ program swbstats2
     logical (kind=c_bool)          :: write_csv              = FALSE
     logical (kind=c_bool)          :: write_grids            = FALSE
     logical (kind=c_bool)          :: calc_annual_stats      = FALSE
+    logical (kind=c_bool)          :: calc_monthly_stats     = FALSE
     logical (kind=c_bool)          :: calc_zonal_stats       = FALSE
     logical (kind=c_bool)          :: compare_to_obs_values  = FALSE
-    logical (kind=c_bool)          :: annualize_mean_stats   = TRUE
+    logical (kind=c_bool)          :: annualize_stats        = FALSE
     character (len=:), allocatable :: target_proj4_string
     type (DATETIME_T)              :: data_start_date
     type (DATETIME_T)              :: data_end_date
@@ -165,8 +166,10 @@ program swbstats2
      "                                                                      ", &
      "  options:                                                            ", &
      "                                                                      ", &
-     "  [ --annual_statistics= ]                                            ", &
+     "  [ --annual_statistics ]                                             ", &
      "    calculate statistics for every calendar year between start and end", &
+     "  [ --monthly_statistics ]                                            ", &
+     "    calculate statistics for every month between start and end        ", &
      "  [ --slice= ]                                                        ", &
      "    dates over which statistics should be calculated,                 ", &
      "    with start date and end date formatted as yyyy-mm-dd,yyyy-mm-dd   ", &
@@ -225,8 +228,15 @@ program swbstats2
 
       options%calc_annual_stats = TRUE
       options%slice_option      = OPT_MULTIPLE_TIME_SLICES
-      options%write_grids = TRUE
+      options%write_grids       = TRUE
       options%filename_modifier_string = "YEARLY_STATS"//"_"
+
+    elseif ( temp_string .containssimilar. "monthly_statistics" ) then
+
+      options%calc_monthly_stats = TRUE
+      options%slice_option       = OPT_MULTIPLE_TIME_SLICES
+      options%write_grids        = TRUE
+      options%filename_modifier_string = "MONTHLY_STATS"//"_"
 
     elseif ( temp_string .containssimilar. "dump_options" ) then
 
@@ -237,7 +247,7 @@ program swbstats2
       sub_string = right(temp_string, substring="=")
       if (sub_string .containssimilar. "TRUE") then
 
-        options%annualize_mean_stats = TRUE
+        options%annualize_stats = TRUE
 
       endif
 
@@ -434,6 +444,12 @@ program swbstats2
 
   endif
 
+  if (options%calc_monthly_stats) then
+
+    call create_date_list_for_monthly_statistics(options)
+
+  endif
+
   if (options%compare_to_obs_values) then
     call initialize_comparison_grid(grid_filename=options%comparison_grid_filename)
   endif
@@ -541,6 +557,8 @@ program swbstats2
          //" to "//options%slice_end_date%prettydate()
       write(*,fmt="(a)") repeat("-", 70)
 
+      ! grid_sum = simple addition over stack of grids;
+      ! grid_mean is the grid_sum divided by number of days = daily mean
       call calculate_slice_statistics(grid_sum=pGrdSum, grid_mean=pGrdMean,   &
                               grid_variance=pGrdVar, grid_delta=pGrdDelta,    &
                               grid_delta2=pGrdDelta2,                         &
@@ -575,7 +593,7 @@ program swbstats2
           call output_zonal_stats(                                            &
                start_date=options%slice_start_date,                           &
                end_date=options%slice_end_date,                               &
-               values=pGrdMean%rData,                                         &
+               values=pGrdSum%rData,                                          &
                zone_ids=pZONE_GRID%pGrdBase%iData,                            &
                unique_zone_list=options%unique_zone_list,                     &
                comparison_values=pCOMPARISON_GRID%pGrdBase%rData,             &
@@ -585,7 +603,7 @@ program swbstats2
           call output_zonal_stats(                                            &
                start_date=options%slice_start_date,                           &
                end_date=options%slice_end_date,                               &
-               values=pGrdMean%rData,                                         &
+               values=pGrdSum%rData,                                          &
                zone_ids=pZONE_GRID%pGrdBase%iData,                            &
                unique_zone_list=options%unique_zone_list,                     &
                funit=csv_output_file%unit() )
@@ -624,7 +642,7 @@ contains
     write(*,fmt=fmt_string) "calc_annual_stats", options%calc_annual_stats
     write(*,fmt=fmt_string) "calc_zonal_stats", options%calc_zonal_stats
     write(*,fmt=fmt_string) "compare_to_obs_values", options%compare_to_obs_values
-    write(*,fmt=fmt_string) "annualize_mean_stats", options%annualize_mean_stats
+    write(*,fmt=fmt_string) "annualize_stats", options%annualize_stats
 
     fmt_string = "(a,t30,': ',a)"
     write(*,fmt=fmt_string) "target_proj4_string", options%target_proj4_string
@@ -796,7 +814,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)               :: julian_day_number
     real (kind=c_float), allocatable   :: tempvals(:)
-    integer (kind=c_int)               :: counter
+    integer (kind=c_int)               :: day_count
     logical (kind=c_bool), allocatable :: local_mask(:,:)
 
     ! force slice dates to honor bounds of data dates
@@ -811,7 +829,7 @@ contains
 
       allocate(local_mask(ubound(grd_sum,1),ubound(grd_sum,2)))
 
-      counter = 0
+      day_count = 0
 
       do
 
@@ -822,13 +840,13 @@ contains
 
         julian_day_number = int( SIM_DT%curr%dJulianDate, kind=c_int)
 
-        counter = counter + 1
+        day_count = day_count + 1
 
         if ( netcdf_update_time_starting_index(ncfile_in, julian_day_number ) )   then
           call netcdf_get_variable_slice(NCFILE=ncfile_in, rValues=grd_new )
         endif
 
-        if (counter == 1) then
+        if (day_count == 1) then
 
           if (present(grid_mask)) then
             local_mask = (grd_new > NC_FILL_FLOAT) .and. grid_mask
@@ -872,15 +890,15 @@ contains
       !   grd_var = grd_var / (counter - 1)
       endwhere
 
-      if (options%annualize_mean_stats) then
+      if (options%annualize_stats) then
         where ( local_mask )
           ! grd_mean = grd_mean * 365.25
           ! grd_var = grd_var * 365.25
-          grd_mean = grd_sum / real( counter, kind=c_float ) * 365.25
+          grd_mean = grd_sum / real( day_count, kind=c_float ) * 365.25
         end where
       else
         where ( local_mask )
-          grd_mean = grd_sum / real( counter, kind=c_float )
+          grd_mean = grd_sum / real( day_count, kind=c_float )
         end where
       endif
 
@@ -1168,14 +1186,14 @@ contains
       if (present(comparison_values)) then
         call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats, &
               comparison_values=comparison_values)
-        write(unit=funit_, fmt="(2(a,', '),i0,', ',3(f14.4,', '),i0,', ',"  &
-          //"3(f14.4,', '),i0)")                                            &
-          start_date%prettydate(),end_date%prettydate(), n, stats(1:3),     &
-          int(stats(4)), stats(5:7),int(stats(8))
+        write(unit=funit_, fmt="(2(a,', '),i0,', ',4(f14.5,', '),i0,', ',"  &
+          //"4(f14.5,', '),i0)")                                            &
+          start_date%prettydate(),end_date%prettydate(), n, stats(1:4),     &
+          int(stats(5)), stats(6:9),int(stats(10))
       else
         call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats)
-        write(unit=funit_, fmt="(2(a,', '),i0,', ',3(f14.4,', '),i0)")         &
-          start_date%prettydate(),end_date%prettydate(), n, stats(1:3),int(stats(4))
+        write(unit=funit_, fmt="(2(a,', '),i0,', ',4(f14.5,', '),i0)")         &
+          start_date%prettydate(),end_date%prettydate(), n, stats(1:4),int(stats(5))
       endif
     enddo
 
@@ -1192,22 +1210,23 @@ contains
     real (c_float), intent(inout), optional       :: comparison_values(:,:)
 
     ! [ LOCALS ]
-    real (c_float)  :: min_val
-    real (c_float)  :: max_val
-    real (c_float)  :: mean_val
+    real (c_double)  :: min_val
+    real (c_double)  :: max_val
+    real (c_double)  :: mean_val
     real (c_double) :: sum_val
-    real (c_float)  :: n_val
+    real (c_double)  :: n_val
 
-    real (c_float)  :: min_val_comp
-    real (c_float)  :: max_val_comp
-    real (c_float)  :: mean_val_comp
+    real (c_double)  :: min_val_comp
+    real (c_double)  :: max_val_comp
+    real (c_double)  :: mean_val_comp
     real (c_double) :: sum_val_comp
-    real (c_float)  :: n_val_comp
+    real (c_double)  :: n_val_comp
 
-    mean_val = 0.0
-    max_val = 0.0
-    min_val = 0.0
-    n_val = 0
+    mean_val = 0.0; mean_val_comp = 0.0
+    max_val = 0.0; max_val_comp = 0.0
+    min_val = 0.0; min_val_comp = 0.0
+    sum_val = 0.0; sum_val = 0.0
+    n_val = 0.0; n_val_comp = 0.0
 
     n_val = count( zone_ids==target_id .and. values > NC_FILL_FLOAT )
 
@@ -1233,18 +1252,20 @@ contains
       endif
 
       allocate( result_vector(10) )
-      result_vector(5) = min_val_comp
-      result_vector(6) = max_val_comp
-      result_vector(7) = mean_val_comp
-      result_vector(8) = n_val_comp
+      result_vector(6) = min_val_comp
+      result_vector(7) = max_val_comp
+      result_vector(8) = mean_val_comp
+      result_vector(9) = sum_val_comp
+      result_vector(10) = n_val_comp
     else
-      allocate (result_vector(4))
+      allocate (result_vector(5))
     endif
 
     result_vector(1) = min_val
     result_vector(2) = max_val
     result_vector(3) = mean_val
-    result_vector(4) = n_val
+    result_vector(4) = sum_val
+    result_vector(5) = n_val
 
   end subroutine calc_zonal_stats
 
@@ -1319,11 +1340,11 @@ contains
 
     if (options%multiple_comparison_grids .or. options%compare_to_obs_values) then
       header_str = "start_date,end_date,zone_id,minimum_swb,maximum_swb,"     &
-        //"mean_swb,count_swb,minimum_obs,maximum_obs,"                       &
-        //"mean_obs,count_obs"
+        //"mean_swb,sum_swb,count_swb,minimum_obs,maximum_obs,"               &
+        //"mean_obs,sum_obs,count_obs"
     else
       header_str = "start_date,end_date,zone_id,minimum_swb,maximum_swb,"     &
-        //"mean_swb,count_swb"
+        //"mean_swb,sum_swb,count_swb"
     endif
 
     call csv_output_file%writeLine(trim(header_str))
@@ -1359,5 +1380,33 @@ contains
     enddo
 
   end subroutine create_date_list_for_annual_statistics
+
+  subroutine create_date_list_for_monthly_statistics(options)
+
+    type (SWBSTATS_OPTIONS_T), intent(inout)  :: options
+
+    ! [ LOCALS ]
+    integer (c_int)      :: indx
+    type (DATE_RANGE_T)  :: MON_DT
+
+    indx = 0
+
+    call MON_DT%initialize( options%data_start_date, options%data_end_date )
+
+    do
+      indx = indx + 1
+      call options%start_date_list%append( MON_DT%curr%prettydate() )
+      call MON_DT%advance_to_last_day_of_month()
+      call options%date_range_id_list%append( asCharacter(indx) )
+      if ( MON_DT%curr < MON_DT%end ) then
+        call options%end_date_list%append( MON_DT%curr%prettydate() )
+        call MON_DT%addDay()
+      else
+        call options%end_date_list%append( MON_DT%end%prettydate() )
+        exit
+      endif
+    enddo
+
+  end subroutine create_date_list_for_monthly_statistics
 
 end program swbstats2
