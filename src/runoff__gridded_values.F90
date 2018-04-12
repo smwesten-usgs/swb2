@@ -5,7 +5,7 @@
 !!  Module \ref runoff__gridded_values
 !!  provides support for estimating fog drip given a gridded map
 !!  of RUNOFF_ZONE, and a table containing monthly
-!!  fog factors. 
+!!  fog factors.
 module runoff__gridded_values
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double, c_bool
@@ -31,12 +31,12 @@ module runoff__gridded_values
 
   type (DATA_CATALOG_ENTRY_T), pointer       :: pRUNOFF_ZONE
   integer (kind=c_int), allocatable          :: RUNOFF_ZONE(:)
- 
+
   real (kind=c_float), allocatable, public   :: RUNOFF_RATIOS(:)
 
  contains
 
-  !> Initialize the infiltration grid. 
+  !> Initialize the infiltration grid.
   !!
   !! Read in a runoff zone grid.
   !!
@@ -85,9 +85,9 @@ module runoff__gridded_values
     integer (kind=c_int)    :: iLineNum
     integer (kind=c_int)    :: iFieldNum
     integer (kind=c_int)    :: iIndex
-    integer (kind=c_int)    :: iNumLines  
+    integer (kind=c_int)    :: iNumLines
     integer (kind=c_int)    :: iNumFields
-    type (ASCII_FILE_T)     :: RUNOFF_RATIO_FILE    
+    type (ASCII_FILE_T)     :: RUNOFF_RATIO_FILE
 
     call RUNOFF_RATIO_FILE%open( sFilename = sFilename, &
                   sCommentChars = "#%!", &
@@ -113,12 +113,12 @@ module runoff__gridded_values
     iLineNum = 0
     iFieldNum = 0
 
-    do 
+    do
 
       ! read in next line of file
       sRecord = RUNOFF_RATIO_FILE%readLine()
 
-      if ( RUNOFF_RATIO_FILE%isEOF() ) exit 
+      if ( RUNOFF_RATIO_FILE%isEOF() ) exit
 
       iLineNum = iLineNum + 1
       iFieldNum = 0
@@ -132,7 +132,7 @@ module runoff__gridded_values
                //asCharacter(RUNOFF_RATIO_FILE%currentLineNum() )             &
                //" of file "//dquote(sFilename) )
 
-      call RUNOFF_TABLE_DATES( iLineNum )%parseDate( sSubString ) 
+      call RUNOFF_TABLE_DATES( iLineNum )%parseDate( sSubString )
 
        do iIndex = 2, iNumFields
 
@@ -148,8 +148,8 @@ module runoff__gridded_values
          RUNOFF_TABLE_VALUES(iLineNum, iIndex - 1 ) = asFloat( sSubstring )
 
       enddo
-      
-    enddo    
+
+    enddo
 
 
   end subroutine read_runoff_ratio_table
@@ -158,7 +158,7 @@ module runoff__gridded_values
 
   subroutine runoff_gridded_values_update_ratios( )
 
-    ! [ LOCALS ] 
+    ! [ LOCALS ]
     integer (kind=c_int)  :: iJulianDay
     integer (kind=c_int)  :: iMonth
     integer (kind=c_int)  :: iDay
@@ -178,10 +178,10 @@ module runoff__gridded_values
 
       if (     ( RUNOFF_TABLE_DATES( iLineNum ) <= SIM_DT%curr )   &
         .and.  ( RUNOFF_TABLE_DATES( iLineNum + 1 ) > SIM_DT%curr ) )  then
-          
+
           lMatch = lTRUE
           exit
-      endif    
+      endif
 
     enddo
 
@@ -198,7 +198,7 @@ module runoff__gridded_values
         RUNOFF_RATIOS = RUNOFF_TABLE_VALUES( iLineNum, iFieldNum )
 
       end where
-      
+
     enddo
 
   end subroutine runoff_gridded_values_update_ratios
