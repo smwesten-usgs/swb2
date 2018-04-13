@@ -176,6 +176,7 @@ module runoff__gridded_values
 
     do iLineNum = lbound( RUNOFF_TABLE_DATES, 1), ubound( RUNOFF_TABLE_DATES, 1) - 1
 
+      ! locate the relevant line in the runoff table in the basis of the date range
       if (     ( RUNOFF_TABLE_DATES( iLineNum ) <= SIM_DT%curr )   &
         .and.  ( RUNOFF_TABLE_DATES( iLineNum + 1 ) > SIM_DT%curr ) )  then
 
@@ -188,6 +189,11 @@ module runoff__gridded_values
     if ( .not. lMatch )   &
       call die( "Failed to find an appropriate date value in the RUNOFF_RATIO file.", &
         __SRCNAME__, __LINE__ )
+
+    ! now that we have the relevant line of data, distribute values, assuming that
+    ! the runoff zone ids is sequential and corresponds to the field numbers
+
+    RUNOFF_RATIOS = 0.0_c_float
 
     do iFieldNum = lbound(RUNOFF_TABLE_VALUES, 2), ubound(RUNOFF_TABLE_VALUES, 2)
 
