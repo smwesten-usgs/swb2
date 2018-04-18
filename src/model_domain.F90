@@ -2603,6 +2603,10 @@ contains
     integer (kind=c_int) :: indx_end_
     integer (kind=c_int) :: indx
 
+    real (kind=c_float)  :: previous_5_day_rain(6)
+
+    previous_5_day_rain = -9999.0
+
     if ( present( indx_end ) ) then
       indx_end_ = indx_end
     else
@@ -2610,9 +2614,10 @@ contains
     endif
 
     do indx=indx_start, indx_end_
-
       target_indx = get_target_index( indx )
       cell_indx   = get_cell_index( indx )
+
+    if (allocated(PREV_5_DAYS_RAIN) )  previous_5_day_rain = PREV_5_DAYS_RAIN(cell_indx,:)
 
       write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',8(i6,','),58(g14.7,','),g14.7)")                  &
         SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                        &
@@ -2641,7 +2646,7 @@ contains
         this%actual_et_impervious( cell_indx ), this%actual_et_interception( cell_indx ),                         &
         this%adjusted_depletion_fraction_p( cell_indx ), this%crop_etc( cell_indx ), this%bare_soil_evap( cell_indx ), &
         this%direct_net_infiltration( cell_indx ),                                                                   &
-        this%direct_soil_moisture( cell_indx ), (PREV_5_DAYS_RAIN( cell_indx, kndx), kndx=1,6)
+        this%direct_soil_moisture( cell_indx ), (previous_5_day_rain(kndx), kndx=1,6)
 
     enddo
 
