@@ -323,7 +323,9 @@ program swbstats2
 
     elseif ( temp_string .contains. "--" ) then
 
-      stop ("Unknown swbstats2 option: "//sQuote(temp_string)//".")
+       ! ??? gfortran 5.4 doesn't support variables within the stop statement???
+       print *, "Unknown swbstats2 option: "//sQuote(temp_string)//"."
+      stop
 
     else
 
