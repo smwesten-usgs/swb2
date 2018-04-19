@@ -485,14 +485,13 @@ contains
 
     do
 
-      irrigation_amount = 0.0_c_float
-
-      !if ( MONTHLY_IRRIGATION_SCHEDULE( landuse_index, day ) == 0 ) exit
+      irrigation_amount         = 0.0_c_float
+      interim_irrigation_amount = 0.0_c_float
 
       if ( ( day_of_year < FIRST_DAY_OF_IRRIGATION( landuse_index ) ) &
         .or. ( day_of_year > LAST_DAY_OF_IRRIGATION( landuse_index ) ) )  exit
 
-      if ( MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( landuse_index ) > 0.99 )  exit
+!      if ( MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( landuse_index ) > 0.99 )  exit
       if ( soil_storage_max <= 0.0_c_float ) exit
       if ( IRRIGATION_MASK < 1.0e-6_c_float ) exit
       if ( num_days_since_planting > NUM_DAYS_OF_IRRIGATION( landuse_index ) ) exit
@@ -504,57 +503,59 @@ contains
 
       option = APPLICATION_METHOD_CODE( landuse_index )
 
-      efficiency = max( IRRIGATION_EFFICIENCY( landuse_index ), 0.20_c_float )
+      select case ( option )
 
-      if ( depletion_fraction >= MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( landuse_index ) ) then
+        case ( APP_FIELD_CAPACITY )
 
-        select case ( option )
-
-          case ( APP_FIELD_CAPACITY )
-
+          if ( depletion_fraction >= MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( landuse_index ) )      &
             interim_irrigation_amount = max( 0.0_c_float, soil_storage_max - soil_storage )
 
-          case ( APP_DEFINED_DEFICIT )
+        case ( APP_DEFINED_DEFICIT )
 
-            interim_irrigation_amount = max( 0.0_c_float, APPLICATION_AMOUNT( landuse_index )                                   &
-                                          * soil_storage_max - soil_storage )
+          ! @TODO check this calculation
 
-          case ( APP_CONSTANT_AMOUNT )
+          if ( depletion_fraction >= MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( landuse_index ) )      &
+            interim_irrigation_amount = max( 0.0_c_float, APPLICATION_AMOUNT( landuse_index )     &
+                                        * soil_storage_max - soil_storage )
 
+        case ( APP_CONSTANT_AMOUNT )
+
+          if ( depletion_fraction >= MAXIMUM_ALLOWABLE_DEPLETION_FRACTION( landuse_index ) )      &
             interim_irrigation_amount = APPLICATION_AMOUNT( landuse_index )
 
+        case ( APP_HWB_DEMAND_BASED )
 
-          case ( APP_HWB_DEMAND_BASED )
+          if ( MONTHLY_IRRIGATION_SCHEDULE( landuse_index, day ) == 0 ) exit
 
-            if (present( monthly_runoff ) .and. present( monthly_rainfall ) ) then
+          if (present( monthly_runoff ) .and. present( monthly_rainfall ) ) then
 
-              irrigation_days_per_month = count( MONTHLY_IRRIGATION_SCHEDULE( landuse_index, 1:days_in_month ) == 1 )
+            irrigation_days_per_month = count( MONTHLY_IRRIGATION_SCHEDULE( landuse_index, 1:days_in_month ) == 1 )
 
-              if ( irrigation_days_per_month <= 0 ) then
-                interim_irrigation_amount = 0.0_c_float
-              else
-                interim_irrigation_amount = max( 0.0_c_float,    &
-                ( crop_etc * real( days_in_month, kind=c_float) + monthly_runoff - monthly_rainfall ) )  &
-                  / real( irrigation_days_per_month, kind=c_float )
-              endif
-
+            if ( irrigation_days_per_month <= 0 ) then
+              interim_irrigation_amount = 0.0_c_float
             else
-
-              interim_irrigation_amount = max( 0.0_c_float, crop_etc + runoff - rainfall )
-
+              interim_irrigation_amount = max( 0.0_c_float,    &
+              ( crop_etc * real( days_in_month, kind=c_float) + monthly_runoff - monthly_rainfall ) )  &
+                / real( irrigation_days_per_month, kind=c_float )
             endif
 
-          case default
+          else
 
-            interim_irrigation_amount = 0.0_c_float
+            interim_irrigation_amount = max( 0.0_c_float, crop_etc + runoff - rainfall )
 
-        end select
+          endif
 
-        irrigation_amount =  interim_irrigation_amount                                    &
-                                       * irrigation_mask                                  &
-                                       / efficiency
+        case default
 
-      endif
+          interim_irrigation_amount = 0.0_c_float
+
+      end select
+
+      efficiency = max( IRRIGATION_EFFICIENCY( landuse_index ), 0.20_c_float )
+
+      irrigation_amount =  interim_irrigation_amount                                    &
+                                     * irrigation_mask                                  &
+                                     / efficiency
 
       exit
 

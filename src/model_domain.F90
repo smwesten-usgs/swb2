@@ -2619,7 +2619,7 @@ contains
 
     if (allocated(PREV_5_DAYS_RAIN) )  previous_5_day_rain = PREV_5_DAYS_RAIN(cell_indx,:)
 
-      write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',8(i6,','),58(g14.7,','),g14.7)")                  &
+      write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',8(i6,','),58(g16.9,','),g16.9)")                  &
         SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                        &
         this%landuse_code( cell_indx ), this%landuse_index( cell_indx ),                                          &
         this%soil_group( cell_indx ), this%num_upslope_connections( cell_indx ), this%sum_upslope_cells( cell_indx ),  &
