@@ -4,9 +4,13 @@ module storm_drain_capture
                             c_size_t, c_ptrdiff_t
 
   use constants_and_conversions
+  use data_catalog
+  use data_catalog_entry
+  use datetime, only                 : DATETIME_T
   use logfiles, only                 : LOGS, LOG_ALL
   use exceptions, only               : warn, assert
   use parameters, only               : PARAMS
+  use simulation_datetime, only      : SIM_DT
   use string_list, only              : STRING_LIST_T
   use strings, only                  : asCharacter
   implicit none
@@ -16,15 +20,22 @@ module storm_drain_capture
   public :: STORM_DRAIN_CAPTURE_FRACTION
   public :: storm_drain_capture_initialize, storm_drain_capture_calculate
 
+  type (DATA_CATALOG_ENTRY_T), pointer :: pSTORM_DRAIN_CAPTURE_FRACTION
   real (kind=c_float), allocatable   :: STORM_DRAIN_CAPTURE_FRACTION(:)
+  real (kind=c_float), allocatable   :: STORM_DRAIN_CAPTURE_FRACTION_TABLE(:)
+  type ( DATETIME_T )                  :: DATE_OF_LAST_RETRIEVAL
 
 contains
 
-  subroutine storm_drain_capture_initialize( )
+  subroutine storm_drain_capture_initialize( is_cell_active, landuse_index )
+
+    logical (kind=c_bool), intent(in)     :: is_cell_active(:,:)
+    integer (kind=c_int), intent(in)      :: landuse_index(:)
 
     ! [ LOCALS ]
     integer (kind=c_int)              :: number_of_landuse_codes
     integer (kind=c_int), allocatable :: lu_codes(:)
+    integer (kind=c_int)              :: indx
     integer (kind=c_int)              :: num_records
     logical                           :: are_lengths_unequal
     type (STRING_LIST_T)              :: string_list
@@ -35,7 +46,7 @@ contains
     call string_list%append("Landuse_Code")
     call string_list%append("Landuse_Lookup_Code")
 
-    !> Determine how many landuse codes are present
+    !> Determine how many UNIQUE landuse codes are present
     call PARAMS%get_parameters( slKeys=string_list, iValues=lu_codes )
     number_of_landuse_codes = count( lu_codes >= 0 )
 
@@ -44,50 +55,102 @@ contains
     call string_list%append("Storm_drain_capture_fraction")
 
     !> Determine how many storm_drain_capture codes are present
-    call PARAMS%get_parameters( slKeys=string_list, fValues=STORM_DRAIN_CAPTURE_FRACTION )
+    call PARAMS%get_parameters( slKeys=string_list, fValues=STORM_DRAIN_CAPTURE_FRACTION_TABLE )
 
     call string_list%clear()
 
-   !> check: number of STORM_DRAIN_CAPTURE_FRACTION values == number of landuse codes?
-    num_records = ubound(STORM_DRAIN_CAPTURE_FRACTION, 1)
-    are_lengths_unequal = ( num_records /= number_of_landuse_codes )
+    ! attempt to locate storm drain capture information in gridded format
+    pSTORM_DRAIN_CAPTURE_FRACTION => DAT%find( "STORM_DRAIN_CAPTURE_FRACTION" )
 
-    if ( are_lengths_unequal ) then
+    allocate( STORM_DRAIN_CAPTURE_FRACTION( number_of_landuse_codes ), stat=status )
+    call assert( status==0, "Problem allocating STORM_DRAIN_CAPTURE_FRACTION", &
+      __SRCNAME__, __LINE__ )
 
-      sBuf = "The number of values specifying storm drain capture"                         &
-        //" fraction ("                                                                    &
-        //asCharacter( num_records )//") does not match the number of landuse values ("    &
-        //asCharacter( number_of_landuse_codes )//"). Setting default storm drain"         &
-        //" capture to 0.0 (ZERO)."
+   if ( associated( pSTORM_DRAIN_CAPTURE_FRACTION ) ) then
 
-      call warn( sMessage=trim(sBuf),                                                      &
-                 sModule=__SRCNAME__,                                                         &
+     ! nothing to do...
+
+   elseif ( STORM_DRAIN_CAPTURE_FRACTION_TABLE(1) > fTINYVAL ) then
+
+     !> check: number of STORM_DRAIN_CAPTURE_FRACTION_TABLE values == number of landuse codes?
+     num_records = ubound(STORM_DRAIN_CAPTURE_FRACTION_TABLE, 1)
+     are_lengths_unequal = ( num_records /= number_of_landuse_codes )
+
+     if ( are_lengths_unequal ) then
+
+       sBuf = "The number of values specifying storm drain capture"                         &
+         //" fraction ("                                                                    &
+         //asCharacter( num_records )//") does not match the number of landuse values ("    &
+         //asCharacter( number_of_landuse_codes )//"). Setting default storm drain"         &
+         //" capture to 0.0 (ZERO)."
+
+       call warn( sMessage=trim(sBuf),                                                      &
+                 sModule=__SRCNAME__,                                                      &
                  iLine=__LINE__,                                                           &
                  lFatal=.false._c_bool,                                                    &
                  iLogLevel=LOG_ALL )
 
-      deallocate(STORM_DRAIN_CAPTURE_FRACTION, stat=status)
-      call assert( status==0, "Problem deallocating STORM_DRAIN_CAPTURE_FRACTION", &
+       STORM_DRAIN_CAPTURE_FRACTION = 0.0_c_float
+
+     else
+
+       do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
+         STORM_DRAIN_CAPTURE_FRACTION( indx ) = STORM_DRAIN_CAPTURE_FRACTION_TABLE( landuse_index( indx ) )
+       enddo
+
+      endif
+
+      deallocate( STORM_DRAIN_CAPTURE_FRACTION_TABLE, stat=status )
+      call assert( status==0, "Problem allocating STORM_DRAIN_CAPTURE_FRACTION_TABLE", &
         __SRCNAME__, __LINE__ )
 
-      allocate( STORM_DRAIN_CAPTURE_FRACTION( number_of_landuse_codes ), stat=status )
-      call assert( status==0, "Problem allocating STORM_DRAIN_CAPTURE_FRACTION", &
-        __SRCNAME__, __LINE__ )
-
-      STORM_DRAIN_CAPTURE_FRACTION = 0.0_c_float
     endif
 
   end subroutine storm_drain_capture_initialize
 
 !--------------------------------------------------------------------------------------------------
 
-  elemental function storm_drain_capture_calculate( landuse_index )  result( capture_fraction )
+  subroutine storm_drain_capture_calculate( capture_fraction, indx, is_cell_active )
 
-    integer (kind=c_int), intent(in)   :: landuse_index
-    real (kind=c_float)                :: capture_fraction
+    real (kind=c_float), intent(inout)     :: capture_fraction
+    integer (kind=c_int), intent(in)       :: indx
+    logical (kind=c_bool), intent(in)      :: is_cell_active(:,:)
 
-    capture_fraction = STORM_DRAIN_CAPTURE_FRACTION( landuse_index )
+    ! [ LOCALS ]
+    integer (kind=c_int) :: iJulianDay
+    integer (kind=c_int) :: iMonth
+    integer (kind=c_int) :: iDay
+    integer (kind=c_int) :: iYear
+    integer (kind=c_int) :: iDaysInMonth
+    integer (kind=c_int) :: iNumDaysFromOrigin
 
-  end function storm_drain_capture_calculate
+    ! attempt to update values from gridded source, if active
+    if ( .not. DATE_OF_LAST_RETRIEVAL == SIM_DT%curr ) then
+
+      associate ( dt => SIM_DT%curr )
+
+        iJulianDay = dt%getJulianDay()
+        iMonth = asInt( dt%iMonth )
+        iDay = asInt( dt%iDay )
+        iYear = dt%iYear
+        iDaysInMonth = SIM_DT%iDaysInMonth
+        iNumDaysFromOrigin = SIM_DT%iNumDaysFromOrigin
+
+        if ( associated( pSTORM_DRAIN_CAPTURE_FRACTION ) ) then
+          call pSTORM_DRAIN_CAPTURE_FRACTION%getvalues( iMonth, iDay, iYear, iJulianDay )
+          if ( pSTORM_DRAIN_CAPTURE_FRACTION%lGridHasChanged )                     &
+            STORM_DRAIN_CAPTURE_FRACTION = pack( pSTORM_DRAIN_CAPTURE_FRACTION%pGrdBase%rData, is_cell_active )
+        endif
+
+        DATE_OF_LAST_RETRIEVAL = SIM_DT%curr
+
+      end associate
+
+    endif
+
+    if ( allocated( STORM_DRAIN_CAPTURE_FRACTION ) )                           &
+      capture_fraction = STORM_DRAIN_CAPTURE_FRACTION( indx )
+
+  end subroutine storm_drain_capture_calculate
 
 end module storm_drain_capture

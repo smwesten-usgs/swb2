@@ -29,14 +29,12 @@ module direct_net_infiltration__gridded_data
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pCESSPOOL
   type (DATA_CATALOG_ENTRY_T), pointer :: pDISPOSAL_WELL
-  type (DATA_CATALOG_ENTRY_T), pointer :: pSTORM_DRAIN
   type (DATA_CATALOG_ENTRY_T), pointer :: pWATER_BODY_RECHARGE
   type (DATA_CATALOG_ENTRY_T), pointer :: pWATER_MAIN
   type (DATA_CATALOG_ENTRY_T), pointer :: pANNUAL_RECHARGE_RATE
 
   real (kind=c_float), allocatable     :: fCESSPOOL(:)
   real (kind=c_float), allocatable     :: fDISPOSAL_WELL(:)
-  real (kind=c_float), allocatable     :: fSTORM_DRAIN(:)
   real (kind=c_float), allocatable     :: fWATER_BODY_RECHARGE(:)
   real (kind=c_float), allocatable     :: fWATER_MAIN(:)
   real (kind=c_float), allocatable     :: fANNUAL_RECHARGE_RATE(:)
@@ -44,7 +42,6 @@ module direct_net_infiltration__gridded_data
   ! ****_TABLE variables: will have same number of values as there are landuses
   real (kind=c_float), allocatable     :: fCESSPOOL_TABLE(:)
   real (kind=c_float), allocatable     :: fDISPOSAL_WELL_TABLE(:)
-  real (kind=c_float), allocatable     :: fSTORM_DRAIN_TABLE(:)
   real (kind=c_float), allocatable     :: fWATER_BODY_RECHARGE_TABLE(:)
   real (kind=c_float), allocatable     :: fWATER_MAIN_TABLE(:)
   real (kind=c_float), allocatable     :: fANNUAL_RECHARGE_RATE_TABLE(:)
@@ -116,15 +113,15 @@ contains
     pCESSPOOL => DAT%find( "CESSPOOL_LEAKAGE" )
 
 
-    call parameter_list%clear()
-    call parameter_list%append( "Storm_drain_discharge" )
-    call parameter_list%append( "Storm_drain_recharge" )
-    call parameter_list%append( "Storm_drain_leakage" )
-
-    call PARAMS%get_parameters( slKeys=parameter_list , fValues=fSTORM_DRAIN_TABLE )
-
-    pSTORM_DRAIN => DAT%find( "STORM_DRAIN" )
-
+    ! call parameter_list%clear()
+    ! call parameter_list%append( "Storm_drain_discharge" )
+    ! call parameter_list%append( "Storm_drain_recharge" )
+    ! call parameter_list%append( "Storm_drain_leakage" )
+    !
+    ! call PARAMS%get_parameters( slKeys=parameter_list , fValues=fSTORM_DRAIN_TABLE )
+    !
+    ! pSTORM_DRAIN => DAT%find( "STORM_DRAIN" )
+    !
 
     call parameter_list%clear()
     call parameter_list%append( "Water_body_recharge" )
@@ -199,29 +196,27 @@ contains
 
      endif
 
-
-    if ( associated( pSTORM_DRAIN ) ) then
-
-      allocate( fSTORM_DRAIN( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
-
-    elseif ( fSTORM_DRAIN_TABLE(1) > fTINYVAL ) then
-
-      are_lengths_equal = ( ( ubound(fSTORM_DRAIN_TABLE,1) == ubound(landuse_codes,1) )  )
-
-      if ( .not. are_lengths_equal )     &
-        call warn( sMessage="The number of landuses does not match the number of storm drain discharge/leakage values.",   &
-          sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
-
-      allocate( fSTORM_DRAIN( count( is_cell_active ) ), stat=status )
-      call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
-
-      do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
-        fSTORM_DRAIN( indx ) = fSTORM_DRAIN_TABLE( landuse_index( indx ) )
-      enddo
-
-     endif
-
+    ! if ( associated( pSTORM_DRAIN ) ) then
+    !
+    !   allocate( fSTORM_DRAIN( count( is_cell_active ) ), stat=status )
+    !   call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
+    !
+    ! elseif ( fSTORM_DRAIN_TABLE(1) > fTINYVAL ) then
+    !
+    !   are_lengths_equal = ( ( ubound(fSTORM_DRAIN_TABLE,1) == ubound(landuse_codes,1) )  )
+    !
+    !   if ( .not. are_lengths_equal )     &
+    !     call warn( sMessage="The number of landuses does not match the number of storm drain discharge/leakage values.",   &
+    !       sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
+    !
+    !   allocate( fSTORM_DRAIN( count( is_cell_active ) ), stat=status )
+    !   call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
+    !
+    !   do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
+    !     fSTORM_DRAIN( indx ) = fSTORM_DRAIN_TABLE( landuse_index( indx ) )
+    !   enddo
+    !
+    !  endif
 
     if ( associated( pWATER_BODY_RECHARGE ) ) then
 
@@ -337,10 +332,10 @@ contains
                pack( pDISPOSAL_WELL%pGrdBase%rData, is_cell_active )
         endif
 
-        if ( associated( pSTORM_DRAIN ) ) then
-          call pSTORM_DRAIN%getvalues( iMonth, iDay, iYear, iJulianDay )
-          if ( pSTORM_DRAIN%lGridHasChanged ) fSTORM_DRAIN = pack( pSTORM_DRAIN%pGrdBase%rData, is_cell_active )
-        endif
+        ! if ( associated( pSTORM_DRAIN ) ) then
+        !   call pSTORM_DRAIN%getvalues( iMonth, iDay, iYear, iJulianDay )
+        !   if ( pSTORM_DRAIN%lGridHasChanged ) fSTORM_DRAIN = pack( pSTORM_DRAIN%pGrdBase%rData, is_cell_active )
+        ! endif
 
         if ( associated( pWATER_BODY_RECHARGE ) ) then
           call pWATER_BODY_RECHARGE%getvalues( iMonth, iDay, iYear, iJulianDay )
@@ -375,7 +370,7 @@ contains
 
     if ( allocated( fWATER_BODY_RECHARGE ) )  direct_net_infiltration = direct_net_infiltration + fWATER_BODY_RECHARGE( indx )
 
-    if ( allocated( fSTORM_DRAIN ) )  direct_net_infiltration = direct_net_infiltration + fSTORM_DRAIN( indx )
+!    if ( allocated( fSTORM_DRAIN ) )  direct_net_infiltration = direct_net_infiltration + fSTORM_DRAIN( indx )
 
     if ( allocated( fANNUAL_RECHARGE_RATE) )  direct_net_infiltration = direct_net_infiltration + fANNUAL_RECHARGE_RATE( indx ) / 365.25_c_float
 

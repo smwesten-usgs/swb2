@@ -99,7 +99,7 @@ contains
         soil_storage_max                  => cells%soil_storage_max( indx ),                        &
         soil_storage                      => cells%soil_storage( indx ),                            &
         storm_drain_capture               => cells%storm_drain_capture( indx ),                     &
-        storm_drain_capture_fraction      => STORM_DRAIN_CAPTURE_FRACTION( landuse_index ),         &
+        storm_drain_capture_fraction      => STORM_DRAIN_CAPTURE_FRACTION( indx ),                  &
         gross_precipitation               => cells%gross_precip( indx ),                            &
         rainfall                          => cells%rainfall( indx ),                                &
         snowmelt                          => cells%snowmelt( indx ),                                &
@@ -117,6 +117,11 @@ contains
         inflow = max( 0.0_c_float, runon + rainfall + fog + snowmelt - interception )
 
         call cells%calc_runoff( indx )
+
+        ! this is a convoluted call: we're getting an individual capture fraction,
+        ! but supplying a pointer to the active cells sp that the first time through,
+        ! gridded data (if supplied) are updated
+        call storm_drain_capture_calculate( storm_drain_capture, indx, cells%active )
 
         ! prevent calculated runoff from exceeding the day's inflow;
         ! this can happen when using the monthly runoff fraction method

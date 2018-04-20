@@ -75,7 +75,7 @@ module model_initialize
       GRIDDED_DATASETS_T("EVAPORATION_TO_RAINFALL_RATIO         ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("RAINFALL_ADJUST_FACTOR                ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("CESSPOOL_LEAKAGE                      ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("STORM_DRAIN_LEAKAGE                   ", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("STORM_DRAIN_CAPTURE_FRACTION          ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("WATER_BODY_LEAKAGE                    ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("WATER_MAIN_LEAKAGE                    ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("DISPOSAL_WELL_DISCHARGE               ", lTRUE, DATATYPE_FLOAT ),      &
@@ -281,7 +281,7 @@ contains
 
     call initialize_surface_storage_max()
 
-    call storm_drain_capture_initialize()
+    call storm_drain_capture_initialize(MODEL%active, MODEL%landuse_index)
 
     call MODEL%initialize_growing_season()
 
