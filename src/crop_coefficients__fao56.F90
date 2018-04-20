@@ -63,6 +63,7 @@ module crop_coefficients__FAO56
 !  real (kind=c_float), allocatable   :: TEW(:,:)
   real (kind=c_float), allocatable   :: KCB_(:,:)
   integer (kind=c_int), allocatable  :: KCB_METHOD(:)
+  real (kind=c_float), allocatable   :: GROWTH_STAGE_SHIFT_DAYS(:)
   real (kind=c_float), allocatable   :: GROWTH_STAGE_DOY(:,:)
   real (kind=c_float), allocatable   :: GROWTH_STAGE_GDD(:,:)
   type (DATETIME_T), allocatable     :: GROWTH_STAGE_DATE(:,:)
@@ -100,6 +101,7 @@ contains
     type (DATETIME_T)                :: dtPlantingDate
     character (len=:), allocatable   :: PlantingDate_str
 
+    real (kind=c_float), allocatable :: L_shift_days_(:)
 
     real (kind=c_float), allocatable :: L_ini_(:)
     real (kind=c_float), allocatable :: L_dev_(:)
@@ -161,6 +163,7 @@ contains
 
    call PARAMS%get_parameters( sKey="Planting_date", slValues=slPlantingDate, lFatal=lTRUE )
 
+   call PARAMS%get_parameters( sKey="L_shift", fValues=L_shift_days_, lFatal=lFALSE )
    call PARAMS%get_parameters( sKey="L_ini", fValues=L_ini_, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="L_dev", fValues=L_dev_, lFatal=lTRUE )
    call PARAMS%get_parameters( sKey="L_mid", fValues=L_mid_, lFatal=lTRUE )
@@ -191,6 +194,7 @@ contains
    call PARAMS%get_parameters( sKey="Kcb_Nov", fValues=KCB_nov )
    call PARAMS%get_parameters( sKey="Kcb_Dec", fValues=KCB_dec )
 
+
     allocate( GROWTH_STAGE_DOY( 5, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_DOY array", &
       __SRCNAME__, __LINE__ )
@@ -200,7 +204,11 @@ contains
       __SRCNAME__, __LINE__ )
 
     allocate( GROWTH_STAGE_DATE( 6, iNumberOfLanduses ), stat=iStat )
-    call assert( iStat==0, "Failed to allocate memory for DATE_GROWTH array", &
+    call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_DATE array", &
+      __SRCNAME__, __LINE__ )
+
+    allocate( GROWTH_STAGE_SHIFT_DAYS( iNumberOfLanduses ), stat=iStat )
+    call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_SHIFT_DAYS array", &
       __SRCNAME__, __LINE__ )
 
     allocate( KCB_( 16, iNumberOfLanduses ), stat=iStat )
@@ -215,6 +223,15 @@ contains
     KCB_ = -9999.
     GROWTH_STAGE_GDD = -9999.
     GROWTH_STAGE_DOY = -9999.
+    GROWTH_STAGE_SHIFT_DAYS = 0.0_c_float
+
+    if ( ubound(L_shift_days_,1) == iNumberOfLanduses ) then
+      GROWTH_STAGE_SHIFT_DAYS = L_shift_days_
+    else
+      call warn(sMessage="L_shift_days has "//asCharacter(ubound(L_shift_days_,1))//" entries; there are "  &
+        //asCharacter(iNumberOfLanduses)//" landuse codes. Assuming value of zero." )
+    endif
+
 
     if ( ubound(L_ini_,1) == iNumberOfLanduses ) then
       GROWTH_STAGE_DOY( L_DOY_INI,  : ) = L_ini_
@@ -271,15 +288,15 @@ contains
           sMMDDYYYY = trim(PlantingDate_str)//"/"//asCharacter( SIM_DT%start%iYear )
           call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)%parsedate( sMMDDYYYY, __SRCNAME__, __LINE__ )
 
+          GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) &
+                                                      + GROWTH_STAGE_SHIFT_DAYS( iIndex )
+
         else
 
-          dtPlantingDate = SIM_DT%start + asFloat( PlantingDate_str)
+          dtPlantingDate = SIM_DT%start + asFloat( PlantingDate_str) + GROWTH_STAGE_SHIFT_DAYS( iIndex )
           call dtPlantingDate%calcJulianDay()
           GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = dtPlantingDate
         endif
-
-!        GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)  &
-!                                                     + GROWTH_STAGE_SHIFT_DAYS( iIndex )
 
         ! march forward through time calculating the various dates on the Kcb curve
         GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) + L_ini_( iIndex )
@@ -526,20 +543,26 @@ end function update_crop_coefficient_GDD_as_threshold
   !     print *, SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate()
 
       ! if we have not yet reached the enddate associated with the fallow period, skip
-      if ( SIM_DT%curr <= GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) ) cycle
+      if ( SIM_DT%curr < GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) ) cycle
 
       if ( KCB_METHOD( iIndex ) /= KCB_METHOD_FAO56 ) cycle
 
       ! current date is beyond the enddate associated with fallow period;
       ! update Kcb curve and dates
 
+      print *, "a) ",SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate()
+
       ! it's possible that the planting date might be later in the current calendar year
       call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%setYear( SIM_DT%curr%iYear )
+
+      print *, "b) ",SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate()
 
       ! however, if we're already past that point in the year, planting date must be
       ! next celendar year
       if ( SIM_DT%iDOY > GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%getDayOfYear() )  &
         call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%addYear()
+
+      print *, "c) ",SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate()
 
       ! now calculate dates associated with the rest of the Kcb curve
       GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) &

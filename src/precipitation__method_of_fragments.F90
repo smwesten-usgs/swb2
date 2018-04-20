@@ -5,14 +5,14 @@
 !!  Module @ref precipitation__method_of_fragments
 !!  provides support for creating synthetic daily precipitation
 !!  given grids of monthly sum precipitation and a "fragments" file.
-!!  The fragments file is generated from observations at discrete locations, 
+!!  The fragments file is generated from observations at discrete locations,
 !!  the values of which range from 0 to 1, and the sum of which is 1.
 !!  The fragment value is simply the daily observed precipitation value divided
 !!  by the monthly sum of all observed precipitation values for that station.
 !!
-!!  In addition, this routine accepts another set of rainfall adjustment grids, 
-!!  needed in order to ensure the resulting precipitation totals fall in line with 
-!!  other published values, in the development case, the Rainfall Atlas of Hawaii. 
+!!  In addition, this routine accepts another set of rainfall adjustment grids,
+!!  needed in order to ensure the resulting precipitation totals fall in line with
+!!  other published values, in the development case, the Rainfall Atlas of Hawaii.
 
 module precipitation__method_of_fragments
 
@@ -88,7 +88,7 @@ module precipitation__method_of_fragments
 
   !> Subset of rainfall fragments file pointing to the currently active fragments.
   type (PTR_FRAGMENTS_T), allocatable                   :: CURRENT_FRAGMENTS(:)
-  
+
   !> Array of fragments sets; fragments sets include indices to the start record
   !! associated with the fragment for each month
   type (FRAGMENTS_SET_T), allocatable, public           :: FRAGMENTS_SETS(:)
@@ -97,7 +97,7 @@ module precipitation__method_of_fragments
   type, public :: FRAGMENTS_SEQUENCE_T
     integer (kind=c_int) :: sim_number
     integer (kind=c_int) :: sim_month
-    integer (kind=c_int) :: sim_rainfall_zone    
+    integer (kind=c_int) :: sim_rainfall_zone
     integer (kind=c_int) :: sim_year
     real (kind=c_float)  :: sim_random_number
     integer (kind=c_int) :: sim_selected_set
@@ -109,7 +109,7 @@ module precipitation__method_of_fragments
   !> Array of fragment sequence sets
   type (FRAGMENTS_SEQUENCE_T), allocatable, public  :: FRAGMENTS_SEQUENCE(:)
 
-  type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ADJUST_FACTOR      
+  type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ADJUST_FACTOR
 
   integer (kind=c_int) :: LU_FRAGMENTS_ECHO
 
@@ -117,7 +117,7 @@ contains
 
   !> Initialize method of fragments.
   !!
-  !! This routine accesses the "RAINFALL_ZONE" gridded data object and 
+  !! This routine accesses the "RAINFALL_ZONE" gridded data object and
   !! calls the routine to read in the rainfall fragments file. Values of RAINFALL_ZONE are stored
   !! in a module variable @ref RAIN_GAGE_ID for future reference.
   !!
@@ -146,9 +146,9 @@ contains
 
     allocate( RAIN_GAGE_ID( count(lActive) ), stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
- 
+
     call pRAINFALL_ZONE%getvalues()
- 
+
     ! map the 2D array of RAINFALL_ZONE values to the vector of active cells
     RAIN_GAGE_ID = pack( pRAINFALL_ZONE%pGrdBase%iData, lActive )
 
@@ -169,13 +169,13 @@ contains
 
     ! look up the name of the fragments SEQUENCE file in the control file dictionary
     call CF_DICT%get_values( sKey="FRAGMENTS_SEQUENCE_FILE", slString=slString )
-   
+
     if ( .not. ( slString%get(1) .strequal. "<NA>" ) )  then
       call read_fragments_sequence( slString%get(1) )
       RANDOM_FRAGMENT_SEQUENCES = .false._c_bool
       allocate ( SEQUENCE_SELECTION( count(FRAGMENTS_SEQUENCE%sim_month > 0) ), stat=iStat )
-      call assert( iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )      
-    endif  
+      call assert( iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
+    endif
 
     !> Now the fragments file is in memory. Create an ancillary data structure
     !> to keep track of which records correspond to various rain zones
@@ -205,8 +205,8 @@ contains
 
     integer (kind=c_int)   :: iCount
     integer (kind=c_int)   :: iIndex
-    integer (kind=c_int)   :: iRainGageZone 
-    integer (kind=c_int)   :: iPreviousRainGageZone   
+    integer (kind=c_int)   :: iRainGageZone
+    integer (kind=c_int)   :: iPreviousRainGageZone
     integer (kind=c_int)   :: iFragmentChunk
     integer (kind=c_int)   :: iMonth
     integer (kind=c_int)   :: iPreviousMonth
@@ -216,9 +216,9 @@ contains
     character (len=10)     :: sBuf3
     character (len=52)     :: sBuf4
 
-    ! this counter is used to accumulate the number of fragments associated with the 
+    ! this counter is used to accumulate the number of fragments associated with the
     ! current raingage zone/month combination
-    iCount = 0 
+    iCount = 0
 
     iRainGageZone = FRAGMENTS( lbound( FRAGMENTS, 1) )%iRainGageZone
     iPreviousRainGageZone = iRainGageZone
@@ -228,31 +228,31 @@ contains
     FRAGMENTS_SETS( iRainGageZone )%iRainGageZone = iRainGageZone
     FRAGMENTS_SETS( iRainGageZone )%iStartRecord(iPreviousMonth) = lbound( FRAGMENTS, 1)
 
-    
-    ! now iterate through *all* fragments, keeping track of the starting record for each new rainfall gage 
+
+    ! now iterate through *all* fragments, keeping track of the starting record for each new rainfall gage
     ! zone number
     do iIndex = lbound( FRAGMENTS, 1) + 1, ubound( FRAGMENTS, 1 )
- 
+
       iRainGageZone = FRAGMENTS(iIndex)%iRainGageZone
       iMonth = FRAGMENTS(iIndex)%iMonth
 
       iCount = iCount + 1
 
       if ( iRainGageZone /= iPreviousRainGageZone ) then
-        
+
         FRAGMENTS_SETS( iPreviousRainGageZone )%iNumberOfFragments(iPreviousMonth) = iCount
         FRAGMENTS_SETS( iRainGageZone )%iRainGageZone = iRainGageZone
-        FRAGMENTS_SETS( iRainGageZone )%iStartRecord(iMonth) = iIndex   
+        FRAGMENTS_SETS( iRainGageZone )%iStartRecord(iMonth) = iIndex
         ! need to handle the last fragment set as a special case
         FRAGMENTS_SETS( iRainGageZone )%iNumberOfFragments(iMonth) = iCount
         iCount = 0
 
       endif
-      
-      iPreviousMonth = iMonth
-      iPreviousRainGageZone = iRainGageZone  
 
-    enddo  
+      iPreviousMonth = iMonth
+      iPreviousRainGageZone = iRainGageZone
+
+    enddo
 
     call LOGS%write("### Summary of fragment sets in memory ###", &
        iLogLevel=LOG_ALL, iLinesBefore=1, iLinesAfter=1, lEcho=lFALSE )
@@ -267,7 +267,7 @@ contains
         write (sBuf4, fmt="(a10,'  | ', a10,' | ', a12,' | ',a10)") adjustl(sBuf0),     &
                adjustl(sBuf1), adjustl(sBuf2), adjustl(sBuf3)
         call LOGS%write( sBuf4 )
-      enddo  
+      enddo
     end do
 
   end subroutine process_fragment_sets
@@ -283,7 +283,7 @@ contains
     integer (kind=c_int)  :: iStat
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: iNumLines  
+    integer (kind=c_int)  :: iNumLines
     real (kind=c_float)   :: fTempValue
     type (ASCII_FILE_T)   :: FRAGMENTS_FILE
 
@@ -300,12 +300,12 @@ contains
 
     iCount = 0
 
-    do 
+    do
 
       ! read in next line of file
       sRecord = FRAGMENTS_FILE%readLine()
 
-      if ( FRAGMENTS_FILE%isEOF() ) exit 
+      if ( FRAGMENTS_FILE%isEOF() ) exit
 
       iCount = iCount + 1
 
@@ -341,7 +341,7 @@ contains
           //" of file "//dquote(sFilename) )
 
       FRAGMENTS(iCount)%iFragmentSet = asInt(sSubString)
-      
+
       do iIndex = 1, 31
 
         ! read in fragment for given day of month
@@ -361,12 +361,12 @@ contains
         if ( ( fTempValue < 0.0_c_float ) .or. ( fTempValue > 1.0_c_float ) ) then
           FRAGMENTS(iCount)%fFragmentValue(iIndex) = 0.0_c_float
         else
-          FRAGMENTS(iCount)%fFragmentValue(iIndex) = fTempValue          
-        endif          
+          FRAGMENTS(iCount)%fFragmentValue(iIndex) = fTempValue
+        endif
 
       enddo
-      
-    enddo    
+
+    enddo
 
     call LOGS%write("Maximum rain gage zone number: "//asCharacter(maxval(FRAGMENTS%iRainGageZone)), &
       iTab=31, iLinesAfter=1, iLogLevel=LOG_ALL)
@@ -384,14 +384,14 @@ contains
     integer (kind=c_int)  :: iStat
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: iNumLines  
+    integer (kind=c_int)  :: iNumLines
     type (ASCII_FILE_T)   :: SEQUENCE_FILE
     character (len=10)     :: sBuf0
     character (len=10)     :: sBuf1
     character (len=12)     :: sBuf2
     character (len=10)     :: sBuf3
     character (len=10)     :: sBuf4
-    character (len=256)     :: sBuf5    
+    character (len=256)     :: sBuf5
     type (STRING_LIST_T)   :: slHeader
 
 
@@ -410,12 +410,12 @@ contains
 
     iCount = 0
 
-    do 
+    do
 
       ! read in next line of file
       sRecord = SEQUENCE_FILE%readLine()
 
-      if ( SEQUENCE_FILE%isEOF() ) exit 
+      if ( SEQUENCE_FILE%isEOF() ) exit
 
       iCount = iCount + 1
 
@@ -451,7 +451,7 @@ contains
           //" of file "//dquote(sFilename) )
 
       FRAGMENTS_SEQUENCE(iCount)%sim_rainfall_zone = asInt(sSubString)
-      
+
 
       ! read in sim_year
       call chomp(sRecord, sSubstring, SEQUENCE_FILE%sDelimiters )
@@ -507,7 +507,7 @@ contains
   end subroutine read_fragments_sequence
 
 !--------------------------------------------------------------------------------------------------
-  
+
   !> Update rainfall fragments on daily basis.
   !!
   !! If called when lShuffle is TRUE:
@@ -515,7 +515,7 @@ contains
   !! 2) random values are used to select the next active fragment set
   !!    for the current RainGageZone
   !!
-  !! *Each* time the routine is called, the appropriate fragment is 
+  !! *Each* time the routine is called, the appropriate fragment is
   !! selected from the current active fragement set and is assigned
   !! to all cells that share a common RainGageZone
 
@@ -549,16 +549,16 @@ contains
     iUBOUND_CURRENT_FRAGMENTS = ubound( CURRENT_FRAGMENTS, 1)
 
     ! if by chance a mismatch in shape-to-grid results in an active cell with *NO* valid
-    ! rain gage ID, we need to set the entire array to zero to quash any spurious values getting in 
+    ! rain gage ID, we need to set the entire array to zero to quash any spurious values getting in
     FRAGMENT_VALUE = 0.0_c_float
 
     do iIndex = 1, iMaxRainZones
- 
+
       if ( lShuffle ) then
 
         call update_random_values()
 
-        iStartRecord = FRAGMENTS_SETS( iIndex )%iStartRecord(iMonth)   
+        iStartRecord = FRAGMENTS_SETS( iIndex )%iStartRecord(iMonth)
         iNumberOfFragments = FRAGMENTS_SETS(iIndex)%iNumberOfFragments(iMonth)
         iEndRecord = iStartRecord + iNumberOfFragments - 1
         iTargetRecord = iStartRecord + int(RANDOM_VALUES(iIndex) * real( iNumberOfFragments ))
@@ -574,18 +574,18 @@ contains
           call LOGS%write("iTargetRecord: "//asCharacter(iTargetRecord), iTab=3 )
           call LOGS%write("ubound(CURRENT_FRAGMENTS, 1): "//asCharacter(iUBOUND_CURRENT_FRAGMENTS), &
                           iTab=3 )
-          call LOGS%write("ubound(FRAGMENTS, 1): "//asCharacter(iUBOUND_FRAGMENTS), iTab=3 )                    
+          call LOGS%write("ubound(FRAGMENTS, 1): "//asCharacter(iUBOUND_FRAGMENTS), iTab=3 )
           call LOGS%write("RANDOM_VALUES(iIndex): "//asCharacter(RANDOM_VALUES(iIndex)), iTab=3 )
           call die( "Miscalculation in target record: calculated record index is out of bounds", &
             __SRCNAME__, __LINE__ )
         endif
-          
+
         CURRENT_FRAGMENTS(iIndex)%pFragment => FRAGMENTS( iTargetRecord )
 
          write(LU_FRAGMENTS_ECHO,fmt="(4(i5,','),f10.6,',',i5,',',30(f8.3,','),f8.3)")   &
                      iIndex,                                                             &
                      FRAGMENTS( iTargetRecord)%iMonth,                                   &
-                     FRAGMENTS( iTargetRecord)%iRainGageZone,                            &                     
+                     FRAGMENTS( iTargetRecord)%iRainGageZone,                            &
                      iYearOfSimulation,                                                  &
                      RANDOM_VALUES(iIndex),                                              &
                      FRAGMENTS( iTargetRecord)%iFragmentSet,                             &
@@ -598,27 +598,27 @@ contains
       if ( ( CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay ) < 0.0 ) &
          .or. ( CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay ) > 1.0 ) ) then
 
-        call LOGS%write("Error detected in method of fragments routine; dump of current variables"  & 
+        call LOGS%write("Error detected in method of fragments routine; dump of current variables"  &
                         //" follows:", iLinesBefore=1, iLogLevel=LOG_ALL )
         call LOGS%write("iIndex:"//asCharacter(iIndex), iTab=3 )
         call LOGS%write("iDay: "//asCharacter(iDay), iTab=3 )
-        call LOGS%write("iRainGageZone: "//asCharacter(FRAGMENTS( iTargetRecord)%iRainGageZone), iTab=3 )      
+        call LOGS%write("iRainGageZone: "//asCharacter(FRAGMENTS( iTargetRecord)%iRainGageZone), iTab=3 )
         call LOGS%write("iFragmentSet: "//asCharacter(FRAGMENTS( iTargetRecord)%iFragmentSet), iTab=3 )
         call LOGS%write("fFragmentValue: "//asCharacter(FRAGMENTS( iTargetRecord)%fFragmentValue(iDay) ), iTab=3 )
 
       endif
 
-      call LOGS%write("frag: "//asCharacter(iIndex)//"  day: "//asCharacter(iDay) &
-         //"  value: "//asCharacter( CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay ) ), &
-         lEcho=lFALSE )
+      ! call LOGS%write("frag: "//asCharacter(iIndex)//"  day: "//asCharacter(iDay) &
+      !    //"  value: "//asCharacter( CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay ) ), &
+      !    lEcho=lFALSE )
 
       where ( RAIN_GAGE_ID == iIndex )
 
         FRAGMENT_VALUE = CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay )
 
-      endwhere  
+      endwhere
 
-    enddo  
+    enddo
 
   end subroutine update_fragments
 
@@ -638,7 +638,7 @@ contains
 
       RANDOM_VALUES = -9999999.9
 
-      do iIndex=1, size(FRAGMENTS_SEQUENCE%sim_month, 1) 
+      do iIndex=1, size(FRAGMENTS_SEQUENCE%sim_month, 1)
 
         lSequenceSelection =       ( FRAGMENTS_SEQUENCE(iIndex)%sim_month == SIM_DT%curr%iMonth )            &
                              .and. ( FRAGMENTS_SEQUENCE(iIndex)%sim_year == SIM_DT%iYearOfSimulation )       &
@@ -655,9 +655,9 @@ contains
 
           endif
 
-        enddo  
+        enddo
 
-      enddo  
+      enddo
 
     endif
 
@@ -679,7 +679,7 @@ contains
     integer (kind=c_int) :: iMonth
     integer (kind=c_int) :: iDay
     integer (kind=c_int) :: iYear
-    type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ADJUST_FACTOR      
+    type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ADJUST_FACTOR
 
 
     iMonth = SIM_DT%curr%iMonth
@@ -703,11 +703,11 @@ contains
       call update_fragments( lShuffle = lTRUE)
       lFirstCall = lFALSE
 
-    else 
+    else
 
       call update_fragments( lShuffle = lFALSE )
 
-    endif  
+    endif
 
   end subroutine precipitation_method_of_fragments_calculate
 
