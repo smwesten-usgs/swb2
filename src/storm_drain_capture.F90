@@ -21,8 +21,8 @@ module storm_drain_capture
   public :: storm_drain_capture_initialize, storm_drain_capture_calculate
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pSTORM_DRAIN_CAPTURE_FRACTION
-  real (kind=c_float), allocatable   :: STORM_DRAIN_CAPTURE_FRACTION(:)
-  real (kind=c_float), allocatable   :: STORM_DRAIN_CAPTURE_FRACTION_TABLE(:)
+  real (kind=c_float), allocatable     :: STORM_DRAIN_CAPTURE_FRACTION(:)
+  real (kind=c_float), allocatable     :: STORM_DRAIN_CAPTURE_FRACTION_TABLE(:)
   type ( DATETIME_T )                  :: DATE_OF_LAST_RETRIEVAL
 
 contains

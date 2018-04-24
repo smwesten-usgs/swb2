@@ -61,7 +61,7 @@ set(SRCS
       strings.F90
       string_list.F90
       storm_drain_capture.F90
-      polygon_summarize.F90
+      #summary_statistics.F90
 
       generated/version_control.F90
 

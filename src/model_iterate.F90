@@ -7,8 +7,8 @@ module model_iterate
   use logfiles, only                  : LOGS, LOG_ALL
   use model_domain, only              : MODEL_DOMAIN_T
   use simulation_datetime, only       : SIM_DT
-  use output, only                    : write_output, RECHARGE_ARRAY
-  use polygon_summarize, only         : perform_polygon_summarize
+  use output, only                    : write_output
+!  use summary_statistics, only        : perform_polygon_summarize
   use grid
   implicit none
 
@@ -40,14 +40,6 @@ contains
       call SIM_DT%addDay( )
 
     enddo
-
-    pTempGrid=>grid_Create( BNDS%iNumCols, BNDS%iNumRows, BNDS%fX_ll, BNDS%fY_ll, &
-      BNDS%fX_ur, BNDS%fY_ur, GRID_DATATYPE_REAL )
-
-    pTempGrid%rData = unpack( real( RECHARGE_ARRAY, kind=c_float), cells%active, cells%nodata_fill_value )
-
-    call grid_WriteArcGrid("SUM_of_RECHARGE.asc", pTempGrid)
-
 
   end subroutine iterate_over_simulation_days
 
