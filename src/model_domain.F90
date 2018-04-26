@@ -202,7 +202,7 @@ module model_domain
                                                 => model_calculate_snowmelt_original
     procedure ( array_method ), pointer  :: calc_fog                                                         &
                                                 => model_calculate_fog_none
-    procedure ( array_method ), pointer  :: calc_irrigation                                                  &
+    procedure ( index_method ), pointer  :: calc_irrigation                                                  &
                                                 => model_calculate_irrigation_none
     procedure ( array_method ), pointer  :: calc_GDD                                                         &
                                                 => model_calculate_GDD
@@ -1461,8 +1461,8 @@ contains
               //"sum_upslope_cells, solution_order, cell_index, target_index, awc, latitude, reference_ET0, "      &
               //"actual_ET, curve_num_adj, inflow, runon, "                                                        &
               //"runoff, outflow, infiltration, snowfall, potential_snowmelt, snowmelt, interception, "            &
-              //"rainfall, interception_storage, tmax, tmin, tmean, snow_storage, "                                &
-              //"soil_storage, soil_storage_max, delta_soil_storage, surface_storage, "                            &
+              //"rainfall, monthly_gross_precip, monthly_runoff, interception_storage, tmax, tmin, tmean, "        &
+              //"snow_storage, soil_storage, soil_storage_max, delta_soil_storage, surface_storage, "              &
               //"surface_storage_excess, surface_storage_max, net_infiltration, "                                  &
               //"rejected_net_infiltration, fog, irrigation, gdd, runoff_outside, "                                &
               //"pervious_fraction, storm_drain_capture, canopy_cover_fraction, crop_coefficient_kcb, "            &
@@ -2188,9 +2188,10 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_irrigation_none( this )
+  subroutine model_calculate_irrigation_none( this, indx )
 
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    class (MODEL_DOMAIN_T), intent(inout)      :: this
+    integer (kind=c_int), intent(in)           :: indx
     !> Nothing here to see.
 
   end subroutine model_calculate_irrigation_none
@@ -2225,49 +2226,82 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_calculate_irrigation( this )
+  subroutine model_calculate_irrigation( this, indx )
 
   use irrigation
 
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    class (MODEL_DOMAIN_T), intent(inout)      :: this
+    integer (kind=c_int), intent(in)           :: indx
 
     ! [ LOCALS ]
     integer (kind=c_int)               :: index
     real (kind=c_float), allocatable   :: deficit(:)
 
-    if ( allocated( this%monthly_gross_precip ) .and. allocated( this%monthly_runoff ) ) then
+    ! if ( present(indx) ) then
 
-      call irrigation__calculate( irrigation_amount=this%irrigation,                             &
-                                  landuse_index=this%landuse_index,                              &
-                                  soil_storage=this%soil_storage,                                &
-                                  soil_storage_max=this%soil_storage_max,                        &
-                                  total_available_water=this%total_available_water_taw,          &
-                                  rainfall=this%rainfall,                                        &
-                                  runoff=this%runoff,                                            &
-                                  crop_etc=this%crop_etc,                                        &
-                                  irrigation_mask=this%irrigation_mask,                          &
-                                  num_days_since_planting=this%number_of_days_since_planting,    &
-                                  monthly_rainfall=this%monthly_gross_precip,                    &
-                                  monthly_runoff=this%monthly_runoff )
+      if ( allocated( this%monthly_gross_precip ) .and. allocated( this%monthly_runoff ) ) then
 
-!      call minmaxmean( this%monthly_runoff, "MONTHLY_RUNOFF")
-!      call minmaxmean( this%monthly_gross_precip, "MONTHLY_RAINFALL")
+        call irrigation__calculate( irrigation_amount=this%irrigation(indx),                             &
+                                    landuse_index=this%landuse_index(indx),                              &
+                                    soil_storage=this%soil_storage(indx),                                &
+                                    soil_storage_max=this%soil_storage_max(indx),                        &
+                                    total_available_water=this%total_available_water_taw(indx),          &
+                                    rainfall=this%rainfall(indx),                                        &
+                                    runoff=this%runoff(indx),                                            &
+                                    crop_etc=this%crop_etc(indx),                                        &
+                                    irrigation_mask=this%irrigation_mask(indx),                          &
+                                    num_days_since_planting=this%number_of_days_since_planting(indx),    &
+                                    monthly_rainfall=this%monthly_gross_precip(indx),                    &
+                                    monthly_runoff=this%monthly_runoff(indx) )
 
-    else
+      else
 
+        call irrigation__calculate( irrigation_amount=this%irrigation(indx),                             &
+                                    landuse_index=this%landuse_index(indx),                              &
+                                    soil_storage=this%soil_storage(indx),                                &
+                                    soil_storage_max=this%soil_storage_max(indx),                        &
+                                    total_available_water=this%total_available_water_taw(indx),          &
+                                    rainfall=this%rainfall(indx),                                        &
+                                    runoff=this%runoff(indx),                                            &
+                                    crop_etc=this%crop_etc(indx),                                        &
+                                    irrigation_mask=this%irrigation_mask(indx),                          &
+                                    num_days_since_planting=this%number_of_days_since_planting(indx) )
 
-      call irrigation__calculate( irrigation_amount=this%irrigation,                             &
-                                  landuse_index=this%landuse_index,                              &
-                                  soil_storage=this%soil_storage,                                &
-                                  soil_storage_max=this%soil_storage_max,                        &
-                                  total_available_water=this%total_available_water_taw,          &
-                                  rainfall=this%rainfall,                                        &
-                                  runoff=this%runoff,                                            &
-                                  crop_etc=this%crop_etc,                                        &
-                                  irrigation_mask=this%irrigation_mask,                          &
-                                  num_days_since_planting=this%number_of_days_since_planting )
+      endif
 
-    endif
+    ! else
+    !
+    !   if ( allocated( this%monthly_gross_precip ) .and. allocated( this%monthly_runoff ) ) then
+    !
+    !     call irrigation__calculate( irrigation_amount=this%irrigation,                             &
+    !                                 landuse_index=this%landuse_index,                              &
+    !                                 soil_storage=this%soil_storage,                                &
+    !                                 soil_storage_max=this%soil_storage_max,                        &
+    !                                 total_available_water=this%total_available_water_taw,          &
+    !                                 rainfall=this%rainfall,                                        &
+    !                                 runoff=this%runoff,                                            &
+    !                                 crop_etc=this%crop_etc,                                        &
+    !                                 irrigation_mask=this%irrigation_mask,                          &
+    !                                 num_days_since_planting=this%number_of_days_since_planting,    &
+    !                                 monthly_rainfall=this%monthly_gross_precip,                    &
+    !                                 monthly_runoff=this%monthly_runoff )
+    !
+    !   else
+    !
+    !     call irrigation__calculate( irrigation_amount=this%irrigation,                             &
+    !                                 landuse_index=this%landuse_index,                              &
+    !                                 soil_storage=this%soil_storage,                                &
+    !                                 soil_storage_max=this%soil_storage_max,                        &
+    !                                 total_available_water=this%total_available_water_taw,          &
+    !                                 rainfall=this%rainfall,                                        &
+    !                                 runoff=this%runoff,                                            &
+    !                                 crop_etc=this%crop_etc,                                        &
+    !                                 irrigation_mask=this%irrigation_mask,                          &
+    !                                 num_days_since_planting=this%number_of_days_since_planting )
+    !
+    !   endif
+    !
+    ! endif
 
   end subroutine model_calculate_irrigation
 
@@ -2604,8 +2638,12 @@ contains
     integer (kind=c_int) :: indx
 
     real (kind=c_float)  :: previous_5_day_rain(6)
+    real (kind=c_float)  :: monthly_runoff
+    real (kind=c_float)  :: monthly_gross_precip
 
-    previous_5_day_rain = -9999.0
+    previous_5_day_rain     = -9999.0
+    monthly_runoff          = -9999.0
+    monthly_gross_precip    = -9999.0
 
     if ( present( indx_end ) ) then
       indx_end_ = indx_end
@@ -2618,34 +2656,37 @@ contains
       cell_indx   = get_cell_index( indx )
 
     if (allocated(PREV_5_DAYS_RAIN) )  previous_5_day_rain = PREV_5_DAYS_RAIN(cell_indx,:)
+    if (allocated(this%monthly_runoff) )  monthly_runoff = this%monthly_runoff( cell_indx )
+    if (allocated(this%monthly_gross_precip) )  monthly_gross_precip = this%monthly_gross_precip( cell_indx )
 
-      write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',8(i6,','),58(g16.9,','),g16.9)")                  &
-        SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                        &
-        this%landuse_code( cell_indx ), this%landuse_index( cell_indx ),                                          &
-        this%soil_group( cell_indx ), this%num_upslope_connections( cell_indx ), this%sum_upslope_cells( cell_indx ),  &
-        indx, cell_indx, target_indx,                                                                  &
+      write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',8(i6,','),60(g16.9,','),g16.9)")                                      &
+        SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                                            &
+        this%landuse_code( cell_indx ), this%landuse_index( cell_indx ),                                                    &
+        this%soil_group( cell_indx ), this%num_upslope_connections( cell_indx ), this%sum_upslope_cells( cell_indx ),       &
+        indx, cell_indx, target_indx,                                                                                       &
         this%awc( cell_indx ), this%latitude( cell_indx ), this%reference_ET0( cell_indx ), this%actual_ET( cell_indx ),    &
         this%curve_num_adj( cell_indx ), this%inflow( cell_indx ), this%runon( cell_indx ), this%runoff( cell_indx ),       &
-        this%outflow( cell_indx ),                                                                           &
-        this%infiltration( cell_indx ), this%snowfall( cell_indx ), this%potential_snowmelt( cell_indx ),              &
-        this%snowmelt( cell_indx ), this%interception( cell_indx ), this%rainfall( cell_indx ),                        &
+        this%outflow( cell_indx ),                                                                                          &
+        this%infiltration( cell_indx ), this%snowfall( cell_indx ), this%potential_snowmelt( cell_indx ),                   &
+        this%snowmelt( cell_indx ), this%interception( cell_indx ), this%rainfall( cell_indx ),                             &
+        monthly_gross_precip, monthly_runoff,                                                                                   &
         this%interception_storage( cell_indx ), this%tmax( cell_indx ), this%tmin( cell_indx ), this%tmean( cell_indx ),    &
-        this%snow_storage( cell_indx ), this%soil_storage( cell_indx ), this%soil_storage_max( cell_indx ),            &
-        this%delta_soil_storage( cell_indx ),                                                                                   &
-        this%surface_storage( cell_indx ), this%surface_storage_excess( cell_indx ),                              &
-        this%surface_storage_max( cell_indx ), this%net_infiltration( cell_indx ),                                &
-        this%rejected_net_infiltration( cell_indx ), this%fog( cell_indx ),                                       &
-        this%irrigation( cell_indx ), this%gdd( cell_indx ), this%runoff_outside( cell_indx ),                         &
-        this%pervious_fraction( cell_indx ), this%storm_drain_capture( cell_indx ),                               &
-        this%canopy_cover_fraction( cell_indx ), this%crop_coefficient_kcb( cell_indx ),                          &
-        this%continuous_frozen_ground_index( cell_indx ), this%rooting_depth_max( cell_indx ),                    &
-        this%current_rooting_depth( cell_indx ), this%actual_et_soil( cell_indx ),                                &
-        this%readily_available_water_raw( cell_indx ), this%total_available_water_taw( cell_indx ),               &
-        this%plant_stress_coef_ks( cell_indx ), this%evap_reduction_coef_kr( cell_indx ),                         &
-        this%surf_evap_coef_ke( cell_indx ), this%fraction_exposed_and_wetted_soil( cell_indx ),                  &
-        this%actual_et_impervious( cell_indx ), this%actual_et_interception( cell_indx ),                         &
-        this%adjusted_depletion_fraction_p( cell_indx ), this%crop_etc( cell_indx ), this%bare_soil_evap( cell_indx ), &
-        this%direct_net_infiltration( cell_indx ),                                                                   &
+        this%snow_storage( cell_indx ), this%soil_storage( cell_indx ), this%soil_storage_max( cell_indx ),                 &
+        this%delta_soil_storage( cell_indx ),                                                                               &
+        this%surface_storage( cell_indx ), this%surface_storage_excess( cell_indx ),                                        &
+        this%surface_storage_max( cell_indx ), this%net_infiltration( cell_indx ),                                          &
+        this%rejected_net_infiltration( cell_indx ), this%fog( cell_indx ),                                                 &
+        this%irrigation( cell_indx ), this%gdd( cell_indx ), this%runoff_outside( cell_indx ),                              &
+        this%pervious_fraction( cell_indx ), this%storm_drain_capture( cell_indx ),                                         &
+        this%canopy_cover_fraction( cell_indx ), this%crop_coefficient_kcb( cell_indx ),                                    &
+        this%continuous_frozen_ground_index( cell_indx ), this%rooting_depth_max( cell_indx ),                              &
+        this%current_rooting_depth( cell_indx ), this%actual_et_soil( cell_indx ),                                          &
+        this%readily_available_water_raw( cell_indx ), this%total_available_water_taw( cell_indx ),                         &
+        this%plant_stress_coef_ks( cell_indx ), this%evap_reduction_coef_kr( cell_indx ),                                   &
+        this%surf_evap_coef_ke( cell_indx ), this%fraction_exposed_and_wetted_soil( cell_indx ),                            &
+        this%actual_et_impervious( cell_indx ), this%actual_et_interception( cell_indx ),                                   &
+        this%adjusted_depletion_fraction_p( cell_indx ), this%crop_etc( cell_indx ), this%bare_soil_evap( cell_indx ),      &
+        this%direct_net_infiltration( cell_indx ),                                                                          &
         this%direct_soil_moisture( cell_indx ), (previous_5_day_rain(kndx), kndx=1,6)
 
     enddo

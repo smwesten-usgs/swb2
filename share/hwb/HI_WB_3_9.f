@@ -27,7 +27,7 @@ c  (7) fog-catch efficiency factor, based on land cover, is used
 c  (8) three canopy-interception options are offered for forested areas
 c  (9) pervious ratio is input for every polygon instead of by land cover
 c (10) crop-irrigation parameters can be tailored to a wider range of crops
-c (11) temporally varibale monthly runoff:rainfall ratios can be used
+c (11) temporally variable monthly runoff:rainfall ratios can be used
 c (12) recharge beneath taro lo'i is estimated using a constant rate
 c (13) near-coastal or estuarine water bodies can be set to zero recharge
 c
@@ -309,7 +309,7 @@ c                   i=1,nsoil; j=1,nseq(i); l=1,nlay(i,j)
       dimension rd(50),df5mm(50),pancoef(50,12),idaypan(50,5),isd(50),
      1   icd(50,5),rrr(50,12),awc(500,5,8),pct(500,5,8),zt(500,5,8),
      2   zb(500,5,8),nlay(500,5),nseq(500),smca(500,100),fogeff(50),
-	3   rfw(10,25),spancoef(50,4),cancap(50),tcap(50),rfwt(50000,12)
+     3   rfw(10,25),spancoef(50,4),cancap(50),tcap(50),rfwt(50000,12)
       dimension nfr(12,100),frg(12,100,500,31),jfr(12,100,500)
       dimension rfwtmon(50,100,12),etmwf(50000,12)
       dimension icrst(500000)
@@ -317,11 +317,16 @@ c                   i=1,nsoil; j=1,nseq(i); l=1,nlay(i,j)
       dimension idemsup(20),supirr(20),rmltirr(20),effirr(20),
      1          irrday(20,31),nirrdays(20,12),irrsug(50000)
 
+      integer target_polys(4)
+
+      ! natural forest, corn, golf course, diverse ag
+      data target_polys/60515,63533,277684,79940/
+
       data idays/31,28,31,30,31,30,31,31,30,31,30,31/
 
       common /consti/nsim,nyrs,ndirr,ndunirr,ndfallow,id1,irfweights,
      1    nddrip,iddrip,ndfurrow,idfurrow,ndsug,istartyr,iendyr,nilusug,
-	2	  isugarirr,ipineirr,imacirr,istormdrain,iluper,icim,irfnorm,
+     2    isugarirr,ipineirr,imacirr,istormdrain,iluper,icim,irfnorm,
      3    ilusug,ilupine,ilumac,iludag,ilucoff,ilucorn,iluwater,ilures,
      4    irechyrly,irotype,ilutaro,iluzrwb
       common /constr/sm0,rd0,tol1,pavint,wbrc,dripeff,furreff,
@@ -329,7 +334,7 @@ c                   i=1,nsoil; j=1,nseq(i); l=1,nlay(i,j)
      2   watermain,canstore,dcif,constAC,constBD,tarofrac
       common /poly/ipoly,area,rfmon,ilu,ifld,smc,iasys,
      1   iro,isoil,panann,ifog,ietzone,irfzone,iplant,npoly,nplant,
-	2   ifogelev,iwatmain,idispwell,icpsepsewer,irfcell,ilup,
+     2   ifogelev,iwatmain,idispwell,icpsepsewer,irfcell,ilup,
      3   perv,cprate,isdrain,canfrac,tfrac,cerf
       common /landi/nlu,idaypan,icd,irrcode,isd
       common /landr/rd,df5mm,pancoef,fogeff,spancoef,cancap,tcap
@@ -337,7 +342,7 @@ c                   i=1,nsoil; j=1,nseq(i); l=1,nlay(i,j)
       common /soili/nlay,nseq,nsoil
       common /soilr/awc,pct,zt,zb,smca
       common /fragi/nmbrrfz,nfr,jfr
-	common /fragr/frg
+      common /fragr/frg
       common /rain/rfwtmon,nrfzcro,rfw,rfwt,rfnorm,irfstyr
       common /evap/etmwf
       common /fogdrip/fdrfratio
@@ -345,6 +350,7 @@ c                   i=1,nsoil; j=1,nseq(i); l=1,nlay(i,j)
       common /seeder/iseed
       common /field/icrst
       common /nprint/jprint,iprint
+      common /polys/target_polys
 
       open(1,file='output/hi_wb1.out')
       open(2,file='output/hi_wb2.out')
@@ -430,12 +436,15 @@ c........determine field configuration (furrow, drip, nonirrigated)
         endif
 
 c........select fragments to use for current simulation
-         call fraguse
+         call fraguse(i)
          write(*,9100)i
 
 c........compute water budget by polygon for desired number of years
 
-         do 200 j=1,npoly
+!         do 200 j=1,npoly
+
+          do 200 jndx=1,ubound(target_polys,1)
+            j=target_polys(jndx)
             call rech(i,j,zrf,zfd,zir,zro,ae1,rc1,
      1        ae2,rc2,ae3,rc3,ae4,rc4,direct,zpnet,zcanint,zrfadj,
      2        zseptic,zsd)
@@ -523,7 +532,9 @@ c........write yearly averages to hi_wb1.out
 
 c.....output rainfall, fog drip, irrigation, runoff, AE, and recharge
 c     by polygon (average of nsim runs in inches)
-      do 400 j=1,npoly
+!      do 400 j=1,npoly
+       do 400 jndx=1,ubound(target_polys,1)
+         j=target_polys(jndx)
        do m=1,12
 		write(2,2100)m,ipoly(j),ilu(j),irfcell(j),iasys(j),area(j),
      1	  avrf(j,m),avfd(j,m),avir(j,m),avro(j,m),avdirect(j,m),
@@ -608,7 +619,7 @@ c----------------------------------------------------------------------------
      1   ilu(500000),ifld(500000),smc(500000),perv(500000),
      2   iro(500000),isoil(500000),panann(500000),ifog(500000),
      3   ietzone(500000),irfzone(500000),iplant(500000),
-	4   ifogelev(500000),iwatmain(500000),idispwell(500000),
+     4   ifogelev(500000),iwatmain(500000),idispwell(500000),
      5   icpsepsewer(500000),iasys(500000),cprate(500000),
      6   irfcell(500000),ilup(500000,12),irrcode(50),rfnorm(500000,12),
      7   isdrain(500000),canfrac(500000),tfrac(500000),cerf(500000),
@@ -616,7 +627,7 @@ c----------------------------------------------------------------------------
       dimension rd(50),df5mm(50),pancoef(50,12),idaypan(50,5),isd(50),
      1   icd(50,5),rrr(50,12),awc(500,5,8),pct(500,5,8),zt(500,5,8),
      2   zb(500,5,8),nlay(500,5),nseq(500),smca(500,100),fogeff(50),
-	3   rfw(10,25),spancoef(50,4),cancap(50),tcap(50),rfwt(50000,12)
+     3   rfw(10,25),spancoef(50,4),cancap(50),tcap(50),rfwt(50000,12)
       dimension nfr(12,100),frg(12,100,500,31),jfr(12,100,500)
       dimension rfwtmon(50,100,12),etmwf(50000,12)
       dimension idemsup(20),supirr(20),rmltirr(20),effirr(20),
@@ -629,7 +640,7 @@ c----------------------------------------------------------------------------
 
       common /consti/nsim,nyrs,ndirr,ndunirr,ndfallow,id1,irfweights,
      1    nddrip,iddrip,ndfurrow,idfurrow,ndsug,istartyr,iendyr,nilusug,
-	2	  isugarirr,ipineirr,imacirr,istormdrain,iluper,icim,irfnorm,
+     2    isugarirr,ipineirr,imacirr,istormdrain,iluper,icim,irfnorm,
      3    ilusug,ilupine,ilumac,iludag,ilucoff,ilucorn,iluwater,ilures,
      4    irechyrly,irotype,ilutaro,iluzrwb
       common /constr/sm0,rd0,tol1,pavint,wbrc,dripeff,furreff,
@@ -637,7 +648,7 @@ c----------------------------------------------------------------------------
      2   watermain,canstore,dcif,constAC,constBD,tarofrac
       common /poly/ipoly,area,rfmon,ilu,ifld,smc,iasys,
      1   iro,isoil,panann,ifog,ietzone,irfzone,iplant,npoly,nplant,
-	2   ifogelev,iwatmain,idispwell,icpsepsewer,irfcell,ilup,
+     2   ifogelev,iwatmain,idispwell,icpsepsewer,irfcell,ilup,
      3   perv,cprate,isdrain,canfrac,tfrac,cerf
       common /landi/nlu,idaypan,icd,irrcode,isd
       common /landr/rd,df5mm,pancoef,fogeff,spancoef,cancap,tcap
@@ -645,7 +656,7 @@ c----------------------------------------------------------------------------
       common /soili/nlay,nseq,nsoil
       common /soilr/awc,pct,zt,zb,smca
       common /fragi/nmbrrfz,nfr,jfr
-	common /fragr/frg
+      common /fragr/frg
       common /rain/rfwtmon,nrfzcro,rfw,rfwt,rfnorm,irfstyr
       common /evap/etmwf
       common /fogdrip/fdrfratio
@@ -661,36 +672,52 @@ c.....open main input file
 c.....open error message file
 	open(8,file='error.out')
 
-C        .oooooo.   ooooooooo.   oooooooooooo ooooo      ooo
-C       d8P'  `Y8b  `888   `Y88. `888'     `8 `888b.     `8'
-C      888      888  888   .d88'  888          8 `88b.    8
-C      888      888  888ooo88P'   888oooo8     8   `88b.  8
-C      888      888  888          888    "     8     `88b.8
-C      `88b    d88'  888          888       o  8       `888
-C       `Y8bood8P'  o888o        o888ooooood8 o8o        `8
 C
-C      oooooo   oooooo     oooo oooooooooo.
-C       `888.    `888.     .8'  `888'   `Y8b
-C        `888.   .8888.   .8'    888     888
-C         `888  .8'`888. .8'     888oooo888'
-C          `888.8'  `888.8'      888    `88b
-C           `888'    `888'       888    .88P
-C            `8'      `8'       o888bood8P'
+C   .ooooo.  oo.ooooo.   .ooooo.  ooo. .oo.
+C  d88' `88b  888' `88b d88' `88b `888P"Y88b
+C  888   888  888   888 888ooo888  888   888
+C  888   888  888   888 888    .o  888   888
+C  `Y8bod8P'  888bod8P' `Y8bod8P' o888o o888o
+C             888
+C            o888o
 C
-C        .oooooo.   ooooo     ooo ooooooooooooo ooooooooo.   ooooo     ooo ooooooooooooo
-C       d8P'  `Y8b  `888'     `8' 8'   888   `8 `888   `Y88. `888'     `8' 8'   888   `8
-C      888      888  888       8       888       888   .d88'  888       8       888
-C      888      888  888       8       888       888ooo88P'   888       8       888
-C      888      888  888       8       888       888          888       8       888
-C      `88b    d88'  `88.    .8'       888       888          `88.    .8'       888
-C       `Y8bood8P'     `YbodP'        o888o     o888o           `YbodP'        o888o
+C  oooooo   oooooo     oooo oooooooooo.
+C   `888.    `888.     .8'  `888'   `Y8b
+C    `888.   .8888.   .8'    888     888
+C     `888  .8'`888. .8'     888oooo888'
+C      `888.8'  `888.8'      888    `88b
+C       `888'    `888'       888    .88P .o.
+C        `8'      `8'       o888bood8P'  Y8P
+C                                         '
 C
-
+C
+C   .oooo.o  .ooooo.   .ooooo oo oooo  oooo   .ooooo.  ooo. .oo.    .ooooo.   .ooooo.
+C  d88(  "8 d88' `88b d88' `888  `888  `888  d88' `88b `888P"Y88b  d88' `"Y8 d88' `88b
+C  `"Y88b.  888ooo888 888   888   888   888  888ooo888  888   888  888       888ooo888
+C  o.  )88b 888    .o 888   888   888   888  888    .o  888   888  888   .o8 888    .o
+C  8""888P' `Y8bod8P' `V8bod888   `V88V"V8P' `Y8bod8P' o888o o888o `Y8bod8P' `Y8bod8P'
+C                           888.
+C                           8P'
+C                           "
+C
+C                            .                              .
+C                          .o8                            .o8
+C   .ooooo.  oooo  oooo  .o888oo oo.ooooo.  oooo  oooo  .o888oo
+C  d88' `88b `888  `888    888    888' `88b `888  `888    888
+C  888   888  888   888    888    888   888  888   888    888
+C  888   888  888   888    888 .  888   888  888   888    888 .
+C  `Y8bod8P'  `V88V"V8P'   "888"  888bod8P'  `V88V"V8P'   "888"
+C                                 888
+C                                o888o
 
       open(169, file="hwb_daily_water_budget_components.csv")
-      write(169,"(a)") "polynum, month, day, year, daily_rf_frag, daily_rf,"
-     1  //"net_daily_rf, irrigation, runoff, fog, crop_et, pot_et, act_et, "
-     2  //"crop_coef, can_intercept, soil_moist, recharge"
+      write(169,"(a)") "polynum, month, day, year, daily_rf_frag, monthly_rf, "
+     1  //"daily_rf, net_daily_rf, irrigation, runoff, fog, crop_et, pot_et, act_et, "
+     2  //"crop_coef, can_intercept, soil_moist, recharge, landuse_code, aquifer_code, "
+     3  //"surf_area"
+
+      open(269, file="hwb_calculated_rainfall_sequences.txt")
+      write(269,"(a)") "simulation  month  frag_zone  year  random_number  selected_set"
 
 c.....read information from main input file
 
@@ -916,7 +943,6 @@ c.....read in name of modified Gash model file
 	  write(1,2091)fgash
 	endif
 
-
       open(106,file='output/rainfiles.out')
 
       write(1,*)
@@ -989,6 +1015,17 @@ c.....read in rainfall month-year grid data
             read(35,*,end=10)j,(rfmon(j,m),m=k-35,k)
         endif
         goto 9
+
+
+C        ooooo              .o.       oooooooooo.  oooooooooooo ooooo                .o    .oooo.
+C        `888'             .888.      `888'   `Y8b `888'     `8 `888'              o888   d8P'`Y8b
+C         888             .8"888.      888     888  888          888                888  888    888
+C         888            .8' `888.     888oooo888'  888oooo8     888                888  888    888
+C         888           .88ooo8888.    888    `88b  888    "     888                888  888    888
+C         888       o  .8'     `888.   888    .88P  888       o  888       o        888  `88b  d88'
+C        o888ooooood8 o88o     o8888o o888bood8P'  o888ooooood8 o888ooooood8       o888o  `Y8bd8P'
+
+
 10      continue
         close(35)
         goto 8
@@ -1332,13 +1369,13 @@ c      1 = drip- or furrow-irrigated sugarcane
 
       implicit real*8 (a-h,o-z)
 
- 	dimension id1(2),iddrip(28),idfurrow(28),ilusug(3)
+      dimension id1(2),iddrip(28),idfurrow(28),ilusug(3)
       dimension idemsup(20),supirr(20),rmltirr(20),effirr(20),
      1          irrday(20,31),nirrdays(20,12),irrsug(50000)
 
       common /consti/nsim,nyrs,ndirr,ndunirr,ndfallow,id1,irfweights,
      1    nddrip,iddrip,ndfurrow,idfurrow,ndsug,istartyr,iendyr,nilusug,
-	2	  isugarirr,ipineirr,imacirr,istormdrain,iluper,icim,irfnorm,
+     2    isugarirr,ipineirr,imacirr,istormdrain,iluper,icim,irfnorm,
      3    ilusug,ilupine,ilumac,iludag,ilucoff,ilucorn,iluwater,ilures,
      4    irechyrly,irotype,ilutaro,iluzrwb
       common /constr/sm0,rd0,tol1,pavint,wbrc,dripeff,furreff,
@@ -1382,7 +1419,7 @@ c  deepest AWC value is extrapolated to the desired root depth
      1   ilu(500000),ifld(500000),smc(500000),perv(500000),
      2   iro(500000),isoil(500000),panann(500000),ifog(500000),
      3   ietzone(500000),irfzone(500000),iplant(500000),
-	4   ifogelev(500000),iwatmain(500000),idispwell(500000),
+     4   ifogelev(500000),iwatmain(500000),idispwell(500000),
      5   icpsepsewer(500000),iasys(500000),cprate(500000),
      6   irfcell(500000),ilup(500000,12),irrcode(50),rfnorm(500000,12),
      7   isdrain(500000),canfrac(500000),tfrac(500000),cerf(500000),
@@ -1390,11 +1427,11 @@ c  deepest AWC value is extrapolated to the desired root depth
       dimension rd(50),df5mm(50),pancoef(50,12),
      1   awc(500,5,8),pct(500,5,8),zt(500,5,8),
      2   zb(500,5,8),nlay(500,5),nseq(500),smca(500,100),fogeff(50),
-	3   rfw(10,25),spancoef(50,4),cancap(50),tcap(50),rfwt(50000,12)
+     3   rfw(10,25),spancoef(50,4),cancap(50),tcap(50),rfwt(50000,12)
 
       common /poly/ipoly,area,rfmon,ilu,ifld,smc,iasys,
      1   iro,isoil,panann,ifog,ietzone,irfzone,iplant,npoly,nplant,
-	2   ifogelev,iwatmain,idispwell,icpsepsewer,irfcell,ilup,
+     2   ifogelev,iwatmain,idispwell,icpsepsewer,irfcell,ilup,
      3   perv,cprate,isdrain,canfrac,tfrac,cerf
       common /landr/rd,df5mm,pancoef,fogeff,s ,cancap,tcap
       common /soili/nlay,nseq,nsoil
@@ -1475,7 +1512,7 @@ c  must know how many fields of each type, area of each field
      1   ilu(500000),ifld(500000),smc(500000),perv(500000),
      2   iro(500000),isoil(500000),panann(500000),ifog(500000),
      3   ietzone(500000),irfzone(500000),iplant(500000),
-	4   ifogelev(500000),iwatmain(500000),idispwell(500000),
+     4   ifogelev(500000),iwatmain(500000),idispwell(500000),
      5   icpsepsewer(500000),iasys(500000),cprate(500000),
      6   irfcell(500000),ilup(500000,12),irrcode(50),rfnorm(500000,12),
      7   isdrain(500000),canfrac(500000),tfrac(500000),cerf(500000),
@@ -1487,15 +1524,15 @@ c  must know how many fields of each type, area of each field
 
       common /consti/nsim,nyrs,ndirr,ndunirr,ndfallow,id1,irfweights,
      1    nddrip,iddrip,ndfurrow,idfurrow,ndsug,istartyr,iendyr,nilusug,
-	2	  isugarirr,ipineirr,imacirr,istormdrain,iluper,icim,irfnorm,
+     2    isugarirr,ipineirr,imacirr,istormdrain,iluper,icim,irfnorm,
      3    ilusug,ilupine,ilumac,iludag,ilucoff,ilucorn,iluwater,ilures,
      4    irechyrly,irotype,ilutaro,iluzrwb
-      common /constr/sm0,rd0,tol1,pavint,wbrc,dripeff,furreff
+      common /constr/sm0,rd0,tol1,pavint,wbrc,dripeff,furreff,
      1   wateravail,resrc,wmleak,dwrate,sprayeff,tarorc,
      2   watermain,canstore,dcif,constAC,constBD,tarofrac
       common /poly/ipoly,area,rfmon,ilu,ifld,smc,iasys,
      1   iro,isoil,panann,ifog,ietzone,irfzone,iplant,npoly,nplant,
-	2   ifogelev,iwatmain,idispwell,icpsepsewer,irfcell,ilup,
+     2   ifogelev,iwatmain,idispwell,icpsepsewer,irfcell,ilup,
      3   perv,cprate,isdrain,canfrac,tfrac,cerf
       common /seeder/iseed
       common /field/icrst
@@ -1615,7 +1652,7 @@ c.....determine crop stage by polygon
 
 c----------------------------------------------------------------------------
 
-      subroutine fraguse
+      subroutine fraguse(simulation_number)
 
 c  subroutine to select fragments to be used in water-budget simulation
 c
@@ -1624,35 +1661,48 @@ c  fragment zone and month
 
       implicit real*8 (a-h,o-z)
 
+      integer simulation_number
       real*4 rn
+      integer yr
+      integer array_size
+      integer, allocatable :: ino(:)
 
  	dimension id1(2),iddrip(28),idfurrow(28),ilusug(3)
       dimension nfr(12,100),frg(12,100,500,31),jfr(12,100,500)
 
+
       common /consti/nsim,nyrs,ndirr,ndunirr,ndfallow,id1,irfweights,
      1    nddrip,iddrip,ndfurrow,idfurrow,ndsug,istartyr,iendyr,nilusug,
-	2	  isugarirr,ipineirr,imacirr,istormdrain,iluper,icim,irfnorm,
+     2    isugarirr,ipineirr,imacirr,istormdrain,iluper,icim,irfnorm,
      3    ilusug,ilupine,ilumac,iludag,ilucoff,ilucorn,iluwater,ilures,
      4    irechyrly,irotype,ilutaro,iluzrwb
       common /constr/sm0,rd0,tol1,pavint,wbrc,dripeff,furreff,
      1   wateravail,resrc,wmleak,dwrate,sprayeff,tarorc,
      2   watermain,canstore,dcif,constAC,constBD,tarofrac
       common /fragi/nmbrrfz,nfr,jfr
-	common /fragr/frg
+      common /fragr/frg
       common /seeder/iseed
 
 c.....select fragment set for each month, fragment zone, and year of simulation.
 c     for a given month and fragment zone, a particular fragment set can
 c     be selected more than once
+      call random_seed(size=array_size)
+      if (allocated(ino) )  deallocate(ino)
+      allocate(ino(array_size))
       ino=iseed-1
 
-      do 100 m=1,12
-      do 100 j=1,nmbrrfz
-      do 100 i=1,nyrs
+      do 100 m=1,12          ! number of months
+      do 100 j=1,nmbrrfz     ! number of zones
+      do 100 yr=1,nyrs        ! number of years
          ino=ino+1
-         rn=ran(ino)
-	   if(rn.gt.0.99999999)rn=0.9999
-         jfr(m,j,i)=int(nfr(m,j)*rn)+1
+
+         call random_seed(put=ino)
+         !rn=rand(ino)
+         call random_number(rn)
+         if(rn.gt.0.99999999)rn=0.9999
+         jfr(m,j,yr)=int(nfr(m,j)*rn)+1
+         write(269,fmt="(4(i10,1x),f14.8,1x,i10)")  simulation_number,
+     1     m, j, yr, rn, jfr(m,j,yr)
  100  continue
 
       return
@@ -1671,7 +1721,7 @@ c  land cover and day of cycle
      1   ilu(500000),ifld(500000),smc(500000),perv(500000),
      2   iro(500000),isoil(500000),panann(500000),ifog(500000),
      3   ietzone(500000),irfzone(500000),iplant(500000),
-	4   ifogelev(500000),iwatmain(500000),idispwell(500000),
+     4   ifogelev(500000),iwatmain(500000),idispwell(500000),
      5   icpsepsewer(500000),iasys(500000),cprate(500000),
      6   irfcell(500000),ilup(500000,12),irrcode(50),rfnorm(500000,12),
      7   isdrain(500000),canfrac(500000),tfrac(500000),cerf(500000),
@@ -1679,11 +1729,11 @@ c  land cover and day of cycle
       dimension rd(50),df5mm(50),pancoef(50,12),idaypan(50,5),isd(50),
      1   icd(50,5),rrr(50,12),awc(500,5,8),pct(500,5,8),zt(500,5,8),
      2   zb(500,5,8),nlay(500,5),nseq(500),smca(500,100),fogeff(50),
-	3   rfw(10,25),spancoef(50,4),cancap(50),tcap(50),rfwt(50000,12)
+     3   rfw(10,25),spancoef(50,4),cancap(50),tcap(50),rfwt(50000,12)
 
       common /poly/ipoly,area,rfmon,ilu,ifld,smc,iasys,
      1   iro,isoil,panann,ifog,ietzone,irfzone,iplant,npoly,nplant,
-	2   ifogelev,iwatmain,idispwell,icpsepsewer,irfcell,ilup,
+     2   ifogelev,iwatmain,idispwell,icpsepsewer,irfcell,ilup,
      3   perv,cprate,isdrain,canfrac,tfrac,cerf
       common /landi/nlu,idaypan,icd,irrcode,isd
       common /landr/rd,df5mm,pancoef,fogeff,spancoef,cancap,tcap
@@ -1766,10 +1816,11 @@ c    pan coefficient is not temporally variable
       character*256 temp_string
       real daily_aet2
       real daily_rc2
+      integer target_polys(4)
 
       common /consti/nsim,nyrs,ndirr,ndunirr,ndfallow,id1,irfweights,
      1    nddrip,iddrip,ndfurrow,idfurrow,ndsug,istartyr,iendyr,nilusug,
-	2	  isugarirr,ipineirr,imacirr,istormdrain,iluper,icim,irfnorm,
+     2    isugarirr,ipineirr,imacirr,istormdrain,iluper,icim,irfnorm,
      3    ilusug,ilupine,ilumac,iludag,ilucoff,ilucorn,iluwater,ilures,
      4    irechyrly,irotype,ilutaro,iluzrwb
       common /constr/sm0,rd0,tol1,pavint,wbrc,dripeff,furreff,
@@ -1777,7 +1828,7 @@ c    pan coefficient is not temporally variable
      2   watermain,canstore,dcif,constAC,constBD,tarofrac
       common /poly/ipoly,area,rfmon,ilu,ifld,smc,iasys,
      1   iro,isoil,panann,ifog,ietzone,irfzone,iplant,npoly,nplant,
-	2   ifogelev,iwatmain,idispwell,icpsepsewer,irfcell,ilup,
+     2   ifogelev,iwatmain,idispwell,icpsepsewer,irfcell,ilup,
      3   perv,cprate,isdrain,canfrac,tfrac,cerf
       common /landi/nlu,idaypan,icd,irrcode,isd
       common /landr/rd,df5mm,pancoef,fogeff,spancoef,cancap,tcap
@@ -1785,7 +1836,7 @@ c    pan coefficient is not temporally variable
       common /soili/nlay,nseq,nsoil
       common /soilr/awc,pct,zt,zb,smca
       common /fragi/nmbrrfz,nfr,jfr
-	common /fragr/frg
+      common /fragr/frg
       common /rain/rfwtmon,nrfzcro,rfw,rfwt,rfnorm,irfstyr
       common /evap/etmwf
       common /fogdrip/fdrfratio
@@ -1795,6 +1846,7 @@ c    pan coefficient is not temporally variable
       common /npfog/slpnpfog,yintnpfog
       common /canint/gashcal,ceint,ifm
       common /nprint/jprint,iprint
+      common /polys/target_polys
 
       data idays/31,28,31,30,31,30,31,31,30,31,30,31/
 
@@ -1803,6 +1855,14 @@ c    pan coefficient is not temporally variable
       endif
 
       icorncheck=1
+
+C      ooooo              .o.       oooooooooo.  oooooooooooo ooooo                    .o    .oooo.
+C      `888'             .888.      `888'   `Y8b `888'     `8 `888'                  o888   d8P'`Y8b
+C       888             .8"888.      888     888  888          888                    888  888    888
+C       888            .8' `888.     888oooo888'  888oooo8     888                    888  888    888
+C       888           .88ooo8888.    888    `88b  888    "     888                    888  888    888
+C       888       o  .8'     `888.   888    .88P  888       o  888       o            888  `88b  d88'
+C      o888ooooood8 o88o     o8888o o888bood8P'  o888ooooood8 o888ooooood8           o888o  `Y8bd8P'
 
 c.....initialize total water budget arrays for each polygon
 10	do 20 m=1,12
@@ -2080,6 +2140,9 @@ c...........compute daily canopy interception
             dcanint=0.d0
 c            dcanint=frg(m,irfzone(ip),jfr(m,irfzone(ip),i),k)*canint
             dcanint=drf+dfog-dpnet
+
+            ! if landuse is corn, the first time through this code, corncheck=1,
+            ! and pe will be set to 0.25 * pan
 
 c...........determine mean daily potential et
             if(ilu(ip).eq.ilucorn.and.icorncheck.eq.1)then
@@ -2770,10 +2833,19 @@ C     `888.8'       .88ooo8888.    888`88b.     888    .88ooo8888.    888    `88
 C      `888'       .8'     `888.   888  `88b.   888   .8'     `888.   888    .88P  888       o  888       o oo     .d8P
 C       `8'       o88o     o8888o o888o  o888o o888o o88o     o8888o o888bood8P'  o888ooooood8 o888ooooood8 8""88888P'
 
-            write(169,*) ip,",",m,",",k,",",i,",",frg(m,irfzone(ip),jfr(m,irfzone(ip),i),k),
-     1        ",",drf,",",dpnet,",",agirr*perv(ip),",",dro, ",", dfog, ",", pe, ",", pan, ",",
-     2        daily_aet2,",",pancoef(ilu(ip),m),",",dcanint,",",sm2,",",daily_rc2
+           do indx=1,ubound(target_polys,1)
 
+             if ( ilu(ip) == ilucorn .and. icorncheck /= 2) cycle
+
+             if ( ip == target_polys(indx) ) then
+
+               write(169,*) ip,",",m,",",k,",",i,",",frg(m,irfzone(ip),jfr(m,irfzone(ip),i),k),
+     1            ",",mrf,",",drf,",",dpnet,",",agirr*perv(ip),",",dro, ",", dfog, ",", pe, ",", pan, ",",
+     2            daily_aet2,",",pancoef(ilu(ip),m),",",dcanint,",",sm2,",",daily_rc2,",",
+     3            ilu(ip),",",iasys(ip),",",area(ip)
+             endif
+
+           enddo
 
  300     continue
 

@@ -56,8 +56,8 @@ contains
     ! interception calculation *does* reflect the canopy fraction
     call cells%calc_interception()
 
-    ! irrigation calculated as though entire cell is to be irrigated
-    call cells%calc_irrigation()
+    ! ! irrigation calculated as though entire cell is to be irrigated
+    ! call cells%calc_irrigation()
 
     call calculate_interception_mass_balance( interception_storage=cells%interception_storage,     &
                                               actual_et_interception=cells%actual_et_interception, &
@@ -117,6 +117,13 @@ contains
         inflow = max( 0.0_c_float, runon + rainfall + fog + snowmelt - interception )
 
         call cells%calc_runoff( indx )
+
+        ! calculating irrigation here because the Hawaii Water Budget method
+        ! needs an updated monthly runoff value to accurately calculate the
+        ! estimated irrigation demand; previously this value was wrong on the
+        ! first day of each month, since the previous month's runoff value was
+        ! being used to estimate the current month's irrigation demand
+        call cells%calc_irrigation( indx )
 
         ! this is a convoluted call: we're getting an individual capture fraction,
         ! but supplying a pointer to the active cells sp that the first time through,
