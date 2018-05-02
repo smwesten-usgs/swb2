@@ -57,7 +57,7 @@ cmake_minimum_required(VERSION 2.8)
 
 include( cmake/version_control.cmake )
 
-set( EXTERNAL_LIBS ${LIB_NETCDF} ${LIB_HDF5_HL} ${LIB_HDF5} ${LIB_SZ} ${LIB_Z} ${LIB_DL} ${NETCDF_DEPS})
+set( EXTERNAL_LIBS ${LIB_NETCDF} ${LIB_HDF5_HL} ${LIB_HDF5} ${LIB_SZ} ${LIB_DL} ${LIB_Z} ${NETCDF_DEPS})
 set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIB_GFORTRAN} ${LIB_GCC} )
 
 link_libraries( ${EXTERNAL_LIBS} )
