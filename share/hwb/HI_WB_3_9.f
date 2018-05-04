@@ -320,7 +320,7 @@ c                   i=1,nsoil; j=1,nseq(i); l=1,nlay(i,j)
       integer target_polys(4)
 
       ! natural forest, corn, golf course, diverse ag
-      data target_polys/60515,63533,277684,79940/
+      data target_polys/60515,63533,277684,336981/
 
       data idays/31,28,31,30,31,30,31,31,30,31,30,31/
 
