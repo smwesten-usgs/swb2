@@ -8,7 +8,7 @@ rmdir /S /Q tests
 del /S /Q *.txt
 
 :: set CMAKE-related and build-related variables
-set CMAKEROOT=C:\Program Files (x86)\CMake\
+set CMAKEROOT=C:\Program Files\CMake\
 set COMPILER_DIR=C:\MinGW64
 set Fortran_COMPILER_NAME=gfortran
 set CMAKE_C_COMPILER=gcc
@@ -55,7 +55,7 @@ set CMAKE_Fortran_FLAGS_PROFILE="-O2 -pg -g -cpp -fno-omit-frame-pointer -DNDEBU
 :: recreate clean Windows environment
 set PATH=c:\windows;c:\windows\system32;c:\windows\system32\Wbem
 set PATH=%PATH%;C:\Program Files (x86)\7-Zip
-set PATH=%PATH%;C:\Program Files\Git\bin
+set PATH=%PATH%;C:\Program Files\Git\bin;c:\Program Files\CMake\bin
 set PATH=%PATH%;%CMAKEROOT%\bin;%CMAKEROOT%\share
 set PATH=%PATH%;C:\MinGW64\bin
 set PATH=%PATH%;C:\MinGW64\include;C:\MinGW64\lib
@@ -69,7 +69,6 @@ set PATH=%PATH%;D:\DOS\gnuwin32\bin
 :: invoke CMake; add --trace to see copious details re: CMAKE
 for %%f in ( "CodeBlocks - MinGW Makefiles" "MinGW Makefiles" ) do ^
 cmake ..\..\.. -G %%f ^
--DDISLIN_MODULE_DIR=%DISLIN_MODULE_DIR%    ^
 -DCMAKE_Fortran_COMPILER=%Fortran_COMPILER_NAME% ^
 -DCMAKE_C_COMPILER=%CMAKE_C_COMPILER% ^
 -DSWB_EXECUTABLE=%SWB_EXECUTABLE%      ^

@@ -293,15 +293,15 @@ c                   i=1,nsoil; j=1,nseq(i); l=1,nlay(i,j)
       dimension rc1mgd(500),rc2mgd(500),rc3mgd(500),rc4mgd(500),
      1   ae1mgd(500),ae2mgd(500),ae3mgd(500),ae4mgd(500),
      2   rfmgd(500),fdmgd(500),agmgd(500),romgd(500)
-	dimension zrf(12),zfd(12),zir(12),zro(12),ae1(12),rc1(12),
+      dimension zrf(12),zfd(12),zir(12),zro(12),ae1(12),rc1(12),
      1   ae2(12),rc2(12),ae3(12),rc3(12),ae4(12),rc4(12),direct(12),
      2   zpnet(12),zcanint(12),zrfadj(12),zseptic(12),zsd(12)
- 	dimension id1(2),iddrip(28),idfurrow(28),ilusug(3)
+      dimension id1(2),iddrip(28),idfurrow(28),ilusug(3)
       dimension ipoly(500000),area(500000),rfmon(50000,1200),
      1   ilu(500000),ifld(500000),smc(500000),perv(500000),
      2   iro(500000),isoil(500000),panann(500000),ifog(500000),
      3   ietzone(500000),irfzone(500000),iplant(500000),
-	4   ifogelev(500000),iwatmain(500000),idispwell(500000),
+     4   ifogelev(500000),iwatmain(500000),idispwell(500000),
      5   icpsepsewer(500000),iasys(500000),cprate(500000),
      6   irfcell(500000),ilup(500000,12),irrcode(50),rfnorm(500000,12),
      7   isdrain(500000),canfrac(500000),tfrac(500000),cerf(500000),
@@ -371,44 +371,44 @@ c.....compute soil-moisture storage capacity for root depths of 1-100 in.
 
 c.....initialize polygon recharge arrays
       do 100 j=1,npoly
-		do 50 m=1,12
-			avrf(j,m) =0.
-			avfd(j,m) =0.
-			avir(j,m) =0.
-			avro(j,m) =0.
-			av1ae(j,m)=0.
-			av2ae(j,m)=0.
-			av3ae(j,m)=0.
-			av4ae(j,m)=0.
-			av1rc(j,m)=0.
-			av2rc(j,m)=0.
-			av3rc(j,m)=0.
-			av4rc(j,m)=0.
-		    avdirect(j,m)=0.
-			avpnet(j,m)=0.
-		    avcanint(j,m)=0.
-		    avseptic(j,m)=0.
-		    avstrmdrn(j,m)=0.
-		    avrfadj(j,m)=0.
-			zrf(m)=0.
-			zfd(m)=0.
-			zir(m)=0.
-			zro(m)=0.
-			ae1(m)=0.
-			ae2(m)=0.
-			ae3(m)=0.
-			ae4(m)=0.
-			rc1(m)=0.
-			rc2(m)=0.
-			rc3(m)=0.
-			rc4(m)=0.
-		    direct(m)=0.
-		    zpnet(m)=0.
-		    zcanint(m)=0.
-		    zrfadj(m)=0.
-		    zseptic(m)=0.
-		    zsd(m)=0.
- 50		continue
+      do 50 m=1,12
+      avrf(j,m) =0.
+      avfd(j,m) =0.
+      avir(j,m) =0.
+      avro(j,m) =0.
+      av1ae(j,m)=0.
+      av2ae(j,m)=0.
+      av3ae(j,m)=0.
+      av4ae(j,m)=0.
+      av1rc(j,m)=0.
+      av2rc(j,m)=0.
+      av3rc(j,m)=0.
+      av4rc(j,m)=0.
+      avdirect(j,m)=0.
+      avpnet(j,m)=0.
+      avcanint(j,m)=0.
+      avseptic(j,m)=0.
+      avstrmdrn(j,m)=0.
+      avrfadj(j,m)=0.
+      zrf(m)=0.
+      zfd(m)=0.
+      zir(m)=0.
+      zro(m)=0.
+      ae1(m)=0.
+      ae2(m)=0.
+      ae3(m)=0.
+      ae4(m)=0.
+      rc1(m)=0.
+      rc2(m)=0.
+      rc3(m)=0.
+      rc4(m)=0.
+      direct(m)=0.
+      zpnet(m)=0.
+      zcanint(m)=0.
+      zrfadj(m)=0.
+      zseptic(m)=0.
+      zsd(m)=0.
+ 50   continue
  100  continue
 
 
@@ -451,53 +451,53 @@ c........compute water budget by polygon for desired number of years
 
 
 c...........keep running yearly averages
-	      do m=1,12
-			rfmgd(i)=rfmgd(i)+zrf(m)*area(j)*7.481/
+        do m=1,12
+      rfmgd(i)=rfmgd(i)+zrf(m)*area(j)*7.481/
      1            (0.3048*0.3048*12*365.*1000000)
-			fdmgd(i)=fdmgd(i)+zfd(m)*area(j)*7.481/
+      fdmgd(i)=fdmgd(i)+zfd(m)*area(j)*7.481/
      1            (0.3048*0.3048*12*365.*1000000)
-			agmgd(i)=agmgd(i)+zir(m)*area(j)*7.481/
+      agmgd(i)=agmgd(i)+zir(m)*area(j)*7.481/
      1            (0.3048*0.3048*12*365.*1000000)
-			romgd(i)=romgd(i)+zro(m)*area(j)*7.481/
+      romgd(i)=romgd(i)+zro(m)*area(j)*7.481/
      1            (0.3048*0.3048*12*365.*1000000)
-			ae1mgd(i)=ae1mgd(i)+ae1(m)*area(j)*7.481/
+      ae1mgd(i)=ae1mgd(i)+ae1(m)*area(j)*7.481/
      1            (0.3048*0.3048*12*365.*1000000)
-			ae2mgd(i)=ae2mgd(i)+ae2(m)*area(j)*7.481/
+      ae2mgd(i)=ae2mgd(i)+ae2(m)*area(j)*7.481/
      1            (0.3048*0.3048*12*365.*1000000)
-			ae3mgd(i)=ae3mgd(i)+ae3(m)*area(j)*7.481/
+      ae3mgd(i)=ae3mgd(i)+ae3(m)*area(j)*7.481/
      1            (0.3048*0.3048*12*365.*1000000)
-			ae4mgd(i)=ae4mgd(i)+ae4(m)*area(j)*7.481/
+      ae4mgd(i)=ae4mgd(i)+ae4(m)*area(j)*7.481/
      1            (0.3048*0.3048*12*365.*1000000)
-			rc1mgd(i)=rc1mgd(i)+rc1(m)*area(j)*7.481/
+      rc1mgd(i)=rc1mgd(i)+rc1(m)*area(j)*7.481/
      1            (0.3048*0.3048*12*365.*1000000)
-			rc2mgd(i)=rc2mgd(i)+rc2(m)*area(j)*7.481/
+      rc2mgd(i)=rc2mgd(i)+rc2(m)*area(j)*7.481/
      1            (0.3048*0.3048*12*365.*1000000)
-			rc3mgd(i)=rc3mgd(i)+rc3(m)*area(j)*7.481/
+      rc3mgd(i)=rc3mgd(i)+rc3(m)*area(j)*7.481/
      1            (0.3048*0.3048*12*365.*1000000)
-			rc4mgd(i)=rc4mgd(i)+rc4(m)*area(j)*7.481/
+      rc4mgd(i)=rc4mgd(i)+rc4(m)*area(j)*7.481/
      1            (0.3048*0.3048*12*365.*1000000)
 
 c...........keep average polygon values (inches/mo)
-			avrf(j,m)=avrf(j,m)+zrf(m)/dfloat(nsim)
-			avfd(j,m)=avfd(j,m)+zfd(m)/dfloat(nsim)
-			avir(j,m)=avir(j,m)+zir(m)/dfloat(nsim)
-			avro(j,m)=avro(j,m)+zro(m)/dfloat(nsim)
-			av1ae(j,m)=av1ae(j,m)+ae1(m)/dfloat(nsim)
-			av2ae(j,m)=av2ae(j,m)+ae2(m)/dfloat(nsim)
-			av3ae(j,m)=av3ae(j,m)+ae3(m)/dfloat(nsim)
-			av4ae(j,m)=av4ae(j,m)+ae4(m)/dfloat(nsim)
-			av1rc(j,m)=av1rc(j,m)+rc1(m)/dfloat(nsim)
-			av2rc(j,m)=av2rc(j,m)+rc2(m)/dfloat(nsim)
-			av3rc(j,m)=av3rc(j,m)+rc3(m)/dfloat(nsim)
-			av4rc(j,m)=av4rc(j,m)+rc4(m)/dfloat(nsim)
-            avdirect(j,m)=avdirect(j,m)+direct(m)/dfloat(nsim)
-            avpnet(j,m)=avpnet(j,m)+zpnet(m)/dfloat(nsim)
-            avcanint(j,m)=avcanint(j,m)+zcanint(m)/dfloat(nsim)
-            avrfadj(j,m)=avrfadj(j,m)+zrfadj(m)/dfloat(nsim)
-            avseptic(j,m)=avseptic(j,m)+zseptic(m)/dfloat(nsim)
-            avstrmdrn(j,m)=avstrmdrn(j,m)+zsd(m)/dfloat(nsim)
+      avrf(j,m)=avrf(j,m)+zrf(m)/dfloat(nsim)
+      avfd(j,m)=avfd(j,m)+zfd(m)/dfloat(nsim)
+      avir(j,m)=avir(j,m)+zir(m)/dfloat(nsim)
+      avro(j,m)=avro(j,m)+zro(m)/dfloat(nsim)
+      av1ae(j,m)=av1ae(j,m)+ae1(m)/dfloat(nsim)
+      av2ae(j,m)=av2ae(j,m)+ae2(m)/dfloat(nsim)
+      av3ae(j,m)=av3ae(j,m)+ae3(m)/dfloat(nsim)
+      av4ae(j,m)=av4ae(j,m)+ae4(m)/dfloat(nsim)
+      av1rc(j,m)=av1rc(j,m)+rc1(m)/dfloat(nsim)
+      av2rc(j,m)=av2rc(j,m)+rc2(m)/dfloat(nsim)
+      av3rc(j,m)=av3rc(j,m)+rc3(m)/dfloat(nsim)
+      av4rc(j,m)=av4rc(j,m)+rc4(m)/dfloat(nsim)
+      avdirect(j,m)=avdirect(j,m)+direct(m)/dfloat(nsim)
+      avpnet(j,m)=avpnet(j,m)+zpnet(m)/dfloat(nsim)
+      avcanint(j,m)=avcanint(j,m)+zcanint(m)/dfloat(nsim)
+      avrfadj(j,m)=avrfadj(j,m)+zrfadj(m)/dfloat(nsim)
+      avseptic(j,m)=avseptic(j,m)+zseptic(m)/dfloat(nsim)
+      avstrmdrn(j,m)=avstrmdrn(j,m)+zsd(m)/dfloat(nsim)
 
-		  end do
+      end do
 
 c...........output status to screen every 1000 polygons completed
             if(mod(j,1000).eq.0)write(*,9200)i,j,npoly
@@ -509,18 +509,18 @@ c...........output status to screen every 1000 polygons completed
 
 c........divide running yearly averages by number of simulations completed
 
-			trfmgd=(trfmgd*(i-1)+rfmgd(i))/dfloat(i)
-			tfdmgd=(tfdmgd*(i-1)+fdmgd(i))/dfloat(i)
-			tagmgd=(tagmgd*(i-1)+agmgd(i))/dfloat(i)
-			tromgd=(tromgd*(i-1)+romgd(i))/dfloat(i)
-			tae1mgd=(tae1mgd*(i-1)+ae1mgd(i))/dfloat(i)
-			tae2mgd=(tae2mgd*(i-1)+ae2mgd(i))/dfloat(i)
-			tae3mgd=(tae3mgd*(i-1)+ae3mgd(i))/dfloat(i)
-			tae4mgd=(tae4mgd*(i-1)+ae4mgd(i))/dfloat(i)
-			trc1mgd=(trc1mgd*(i-1)+rc1mgd(i))/dfloat(i)
-			trc2mgd=(trc2mgd*(i-1)+rc2mgd(i))/dfloat(i)
-			trc3mgd=(trc3mgd*(i-1)+rc3mgd(i))/dfloat(i)
-			trc4mgd=(trc4mgd*(i-1)+rc4mgd(i))/dfloat(i)
+      trfmgd=(trfmgd*(i-1)+rfmgd(i))/dfloat(i)
+      tfdmgd=(tfdmgd*(i-1)+fdmgd(i))/dfloat(i)
+      tagmgd=(tagmgd*(i-1)+agmgd(i))/dfloat(i)
+      tromgd=(tromgd*(i-1)+romgd(i))/dfloat(i)
+      tae1mgd=(tae1mgd*(i-1)+ae1mgd(i))/dfloat(i)
+      tae2mgd=(tae2mgd*(i-1)+ae2mgd(i))/dfloat(i)
+      tae3mgd=(tae3mgd*(i-1)+ae3mgd(i))/dfloat(i)
+      tae4mgd=(tae4mgd*(i-1)+ae4mgd(i))/dfloat(i)
+      trc1mgd=(trc1mgd*(i-1)+rc1mgd(i))/dfloat(i)
+      trc2mgd=(trc2mgd*(i-1)+rc2mgd(i))/dfloat(i)
+      trc3mgd=(trc3mgd*(i-1)+rc3mgd(i))/dfloat(i)
+      trc4mgd=(trc4mgd*(i-1)+rc4mgd(i))/dfloat(i)
 
 c........write yearly averages to hi_wb1.out
 
@@ -532,33 +532,34 @@ c........write yearly averages to hi_wb1.out
 
 c.....output rainfall, fog drip, irrigation, runoff, AE, and recharge
 c     by polygon (average of nsim runs in inches)
-!      do 400 j=1,npoly
-       do 400 jndx=1,ubound(target_polys,1)
-         j=target_polys(jndx)
+       do 400 j=1,npoly
+!       do 400 jndx=1,ubound(target_polys,1)      ! SMW - these lines cause HWB to run for only the target polys
+!         j=target_polys(jndx)
        do m=1,12
-		write(2,2100)m,ipoly(j),ilu(j),irfcell(j),iasys(j),area(j),
+         write(2,2100)m,ipoly(j),ilu(j),irfcell(j),iasys(j),area(j),
      1	  avrf(j,m),avfd(j,m),avir(j,m),avro(j,m),avdirect(j,m),
      2    av1ae(j,m),av1rc(j,m),av2ae(j,m),av2rc(j,m),av3ae(j,m),
      3    av3rc(j,m),av4ae(j,m),av4rc(j,m),avpnet(j,m),avcanint(j,m),
      4    avrfadj(j,m),avseptic(j,m),avstrmdrn(j,m)
 
-		do n=1,nilusug
-		 if(ilu(j).eq.ilusug(n))then
-     			write(3,3100)m,ipoly(j),ilu(j),ifld(j),icrst(j),area(j),
-     1		avrf(j,m),avfd(j,m),avir(j,m),avro(j,m),av1ae(j,m),
-     2      av1rc(j,m),av2ae(j,m),av2rc(j,m),av3ae(j,m),av3rc(j,m),
-     3      av4ae(j,m),av4rc(j,m)
-         endif
-	  end do
-	 end do
+          do n=1,nilusug
+            if(ilu(j).eq.ilusug(n))then
+     			    write(3,3100)m,ipoly(j),ilu(j),ifld(j),icrst(j),area(j),
+     1		      avrf(j,m),avfd(j,m),avir(j,m),avro(j,m),av1ae(j,m),
+     2          av1rc(j,m),av2ae(j,m),av2rc(j,m),av3ae(j,m),av3rc(j,m),
+     3          av4ae(j,m),av4rc(j,m)
+            endif
+          end do
+        end do
  400  continue
 
 C     close daily output file (SMW)
       close(169)
+      close(269)
 
       call FAO_post
 
- 1000 format('Output file generated by HI_WB.f version 3.9 - SMW modified 17 Apr 2018',/)
+ 1000 format('Output file generated by HI_WB.f version 3.9 - SMW modified 27 Apr 2018',/)
 
  1100 format(/,
      1       'Water-budget summary (Mgal/d) for 4 AE/PE models',//,
@@ -614,7 +615,7 @@ c----------------------------------------------------------------------------
       character*60 c,txt,fmt
       character*120 rainfile,rofile
 
- 	dimension id1(2),iddrip(28),idfurrow(28),ilusug(3)
+      dimension id1(2),iddrip(28),idfurrow(28),ilusug(3)
       dimension ipoly(500000),area(500000),rfmon(50000,1200),
      1   ilu(500000),ifld(500000),smc(500000),perv(500000),
      2   iro(500000),isoil(500000),panann(500000),ifog(500000),
@@ -670,7 +671,7 @@ c.....open main input file
       open(10,file='HI_wb.in')
 
 c.....open error message file
-	open(8,file='error.out')
+      open(8,file='error.out')
 
 C
 C   .ooooo.  oo.ooooo.   .ooooo.  ooo. .oo.
@@ -730,8 +731,8 @@ c.....read in number of years desired for each simulation
       write(1,1010)nyrs
 
 c.....read in start year
-	read(10,*)istartyr
-	iendyr=istartyr+nyrs-1
+      read(10,*)istartyr
+      iendyr=istartyr+nyrs-1
       write(1,1011)istartyr,iendyr
 
 c.....read in land-cover period code
@@ -795,7 +796,7 @@ c.....read in "root depth" to use for unvegetated surfaces
 
 c.....read in storm drain active code (0-drains inactive, 1-drains active)
       read(10,*)istormdrain
- 	write(1,1158)istormdrain
+      write(1,1158)istormdrain
 
 c.....read in paved surface interception capacity (in)
       read(10,*)pavint
@@ -806,24 +807,24 @@ c.....read in constant water-body recharge rate (in/yr)
       write(1,1170)wbrc
 
 c.....read in constant reservoir recharge rate (in/yr)
-	read(10,*)resrc
+      read(10,*)resrc
       write(1,1180)resrc
 
 c.....read in constant taro recharge rate (in/yr)
-	read(10,*)tarorc
+      read(10,*)tarorc
       write(1,1190)tarorc
 
 c.....read in water main leakage rate (in/day)
-	read(10,*)wmleak
-	write(1,1200)wmleak
+      read(10,*)wmleak
+      write(1,1200)wmleak
 
 c.....read in disposal well discharge rate (MGD)
-	read(10,*)dwrate
-	write(1,1210)dwrate
+      read(10,*)dwrate
+      write(1,1210)dwrate
 
 c.....read in canopy-interception method
-	read(10,*)icim
-	write(1,1220)icim
+      read(10,*)icim
+      write(1,1220)icim
 
 c.....read in constant A or C in canopy-interception simulating equation
       read(10,*)constAC
@@ -904,8 +905,8 @@ c.....read in name of monthly crop irrigation file
 c.....read in name of monthly rainfall normals file if being used
       if(irfnorm.eq.0)then
 c.......read in name of file with complete month-year rainfall grid filenames
-	  read(10,'(a50)')frainnames
-	  write(1,2097)frainnames
+      read(10,'(a50)')frainnames
+      write(1,2097)frainnames
 c.......read in name of monthly rainfall coefficients for month-year grids
         read(10,'(a50)')frfweights
         write(1,2098)frfweights
@@ -917,7 +918,7 @@ c.....read in name of file with monthly observed-to-normal rainfall ratios
         write(1,2098)frfw
       else
         write(8,*)'ABORTING--RAINFALL DATA TYPE CODE MUST BE 1 OR 0'
-		stop
+      stop
       endif
 
 c.....read in name(s) of runoff files
@@ -934,14 +935,14 @@ c.....read in name of constant monthly rainfall-runoff ratio file
 c.....read in name of sugarcane file if sugarcane is present
       if(nilusug.ne.0)then
       	read(10,'(a50)')fsug
-	  write(1,2096)fsug
-	endif
+      write(1,2096)fsug
+      endif
 
 c.....read in name of modified Gash model file
-	if(icim.eq.2)then
-	  read(10,'(a50)')fgash
-	  write(1,2091)fgash
-	endif
+      if(icim.eq.2)then
+        read(10,'(a50)')fgash
+        write(1,2091)fgash
+      endif
 
       open(106,file='output/rainfiles.out')
 
@@ -959,7 +960,7 @@ c     open(13,file=frunoff)
       open(17,file=fpan)
       open(18,file=ffog)
       open(19,file=firr)
-	if(nilusug.ne.0)open(21,file=fsug)
+      if(nilusug.ne.0)open(21,file=fsug)
       if(irfnorm.eq.1)then
         open(24,file=frfnorm)
         open(16,file=frfw)
@@ -994,11 +995,11 @@ c.....initialize monthly rainfall weighting factor arrays
         rfwt(k,m)=1.
  259  continue
 
-	do 260 i=1,50
-	do 260 j=1,100
-	do 260 k=1,12
-		rfwtmon(i,j,k)=-9999.
- 260	continue
+      do 260 i=1,50
+      do 260 j=1,100
+      do 260 k=1,12
+      rfwtmon(i,j,k)=-9999.
+ 260  continue
 
 c.....read in rainfall data based on format of data
       if(irfnorm.eq.0)then
@@ -1008,7 +1009,7 @@ c.....read in rainfall month-year grid data
         write(106,*)rainfile
         open(35,file=rainfile)
         icount=icount+1
-  	  k=36*icount
+        k=36*icount
   9     if(icount.eq.irfnf) then
             read(35,*,end=10)j,(rfmon(j,m),m=k-35,irfnm)
         else
@@ -1036,7 +1037,7 @@ c.......read monthly rainfall weighting factors
   20        read(23,*,end=320)irc,(rfwt(irc,j),j=1,12)
             goto 20
  320        continue
-	      write(*,*)'mwf read'
+        write(*,*)'mwf read'
         endif
       elseif(irfnorm.eq.1)then
 c.....read in polygon-based rainfall normal data....................................................................................................................................
@@ -1047,22 +1048,22 @@ c.....read in polygon-based rainfall normal data................................
 c.......read monthly rainfall weighting factors
   16        maxrfyr=0
             read(23,*,end=916)irc,nrfyr,(wf(m),m=1,12)
-	      if(nrfyr.ge.istartyr.and.nrfyr.le.iendyr)then
-		        iseqyr=nrfyr-istartyr+1
-		        m=1
-		        do m=1,12
-	      		rfwtmon(irc,iseqyr,m)=wf(m)
-		        end do
-	      endif
-	      if(nrfyr.gt.maxrfyr)maxrfyr=nrfyr
-	      goto 16
+        if(nrfyr.ge.istartyr.and.nrfyr.le.iendyr)then
+          iseqyr=nrfyr-istartyr+1
+          m=1
+          do m=1,12
+        		rfwtmon(irc,iseqyr,m)=wf(m)
+          end do
+        endif
+        if(nrfyr.gt.maxrfyr)maxrfyr=nrfyr
+        goto 16
  916	      continue
             if(iendyr.gt.maxrfyr)then
                write(8,*)'ABORTING--NOT ENOUGH MONTHLY RAINFALL WEIGHTS'
                stop
             endif
-	      write(*,*)'mwf read'
-	  endif
+        write(*,*)'mwf read'
+      endif
       endif
 
 c.....read in land-cover codes and associated information
@@ -1072,9 +1073,9 @@ c.....read in land-cover codes and associated information
      2     (idaypan(i,k),k=1,5)
 
       if(i.ne.j)then
-		write(8,*)'ABORTING--SORT LANDCOVER FILE BY LANDCOVER CODE'
-		stop
-	endif
+      write(8,*)'ABORTING--SORT LANDCOVER FILE BY LANDCOVER CODE'
+      stop
+      endif
 
       icd(i,1)=idaypan(i,1)
       icd(i,2)=icd(i,1)+idaypan(i,2)
@@ -1082,7 +1083,7 @@ c.....read in land-cover codes and associated information
       icd(i,4)=icd(i,3)+idaypan(i,4)
       icd(i,5)=icd(i,4)+idaypan(i,5)
 
-	i=i+1
+      i=i+1
       goto 12
 
  912  nlu=i-1
@@ -1094,7 +1095,7 @@ c.....read in variable runoff month-year grid data
         write(26,*)rofile
         open(99,file=rofile)
         icount=icount+1
-  	  k=36*icount
+        k=36*icount
 109     if(icount.eq.irfnf) then
             read(99,*,end=110)j,(romon(j,m),m=k-35,irfnm)
         else
@@ -1111,10 +1112,10 @@ c.....read in constant monthly runoff-to-rainfall ratios by runoff-zone code
         i=1
  13     read(13,*,end=913)j,(rrr(j,m),m=1,12)
         if(i.ne.j)then
-		    write(8,*)'ABORTING--SORT RUNOFF FILE BY RO:RF-ZONE CODE'
-		    stop
-	  endif
-	  i=i+1
+      write(8,*)'ABORTING--SORT RUNOFF FILE BY RO:RF-ZONE CODE'
+      stop
+      endif
+      i=i+1
         goto 13
  913    nrrr=i-1
       endif
@@ -1169,30 +1170,30 @@ c.....initialize fragment arrays and then read in fragments
 
 
 c.....read monthly:annual pan evaporation ratios for each ET zone
- 17	read(17,*,end=917)netz,(etwt(m),m=1,12)
-	do m=1,12
-		etmwf(netz,m)=etwt(m)
-	end do
-	goto 17
+  17  read(17,*,end=917)netz,(etwt(m),m=1,12)
+       do m=1,12
+       etmwf(netz,m)=etwt(m)
+       end do
+       goto 17
  917  continue
 
 
 c.....read 12 monthly fog drip parameters
 c.....daily fog=fdrfratio*fogeff*daily rainfall, in/d per in/d
 
-	m=1
- 18	read(18,*,end=318)ifz,ifelev,(fdrfratio(ifz,ifelev,m),m=1,12)
-		goto 18
+      m=1
+ 18   read(18,*,end=318)ifz,ifelev,(fdrfratio(ifz,ifelev,m),m=1,12)
+      goto 18
  318  continue
 
 c.....read irrigation file
- 19		read(19,*,end=319)ic,idemsup(ic),supirr(ic),rmltirr(ic),effirr(ic),
-	1        	  (irrday(ic,id),id=1,31)
+ 19   read(19,*,end=319)ic,idemsup(ic),supirr(ic),rmltirr(ic),effirr(ic),
+     1       (irrday(ic,id),id=1,31)
 
-	  if(idemsup(ic).eq.1.and.supirr(ic).ne.0)then
-			write(8,*)'ABORTING--CHECK IRRIGATION FILE'
-			stop
-		endif
+      if(idemsup(ic).eq.1.and.supirr(ic).ne.0)then
+        write(8,*)'ABORTING--CHECK IRRIGATION FILE'
+        stop
+      endif
         goto 19
   319   continue
 
@@ -1290,8 +1291,8 @@ c	end do
  1155 format(i10,t60, ': Mac nut irrigation status (1-irr,0-unirr)')
  1156 format(i10,t60, ': Maalaea fields status (1-WAg,2-HCS)')
  1157 format(f10.3,t60,
-     1	': Water availability for non-groundwater-supplied fields as
-	2fraction of demand (0-1)')
+     1   ': Water availability for non-groundwater-supplied fields as',
+     2   'fraction of demand (0-1)')
  1158 format(i10,t60, ': Storm drain code (0-no storm drains)')
  1160 format(f10.3,t60,
      1   ': Interception capacity of paved surfaces, in.')
@@ -1471,25 +1472,25 @@ c...........exit if bottom of root zone is above current layer
 
  500  continue
  520  continue
-	write(*,*)'depth-varying AWC routine complete'
+      write(*,*)'depth-varying AWC routine complete'
 c.....compute soil-moisture storage capacity by polygon
       do 600 ip=1,npoly
-         root=rd(ilu(ip))
-	   smc(ip)=smca(isoil(ip),nint(root))
+        root=rd(ilu(ip))
+        smc(ip)=smca(isoil(ip),nint(root))
  600  continue
 
       write(*,*)'smccalc ran'
 
       open (50,file='output/smc.out')
-	ip=0
+      ip=0
 
-	do 700 ip=1,npoly
-	write(50,1650)ip,smc(ip)
+      do 700 ip=1,npoly
+        write(50,1650)ip,smc(ip)
  700  continue
 
  1650 format(i6,2x,f7.2)
 
-	return
+      return
       end
 
 c----------------------------------------------------------------------------
@@ -1507,7 +1508,7 @@ c  must know how many fields of each type, area of each field
 
       real*4 rn,rnuse(10000)
 
- 	dimension id1(2),iddrip(28),idfurrow(28),ilusug(3)
+      dimension id1(2),iddrip(28),idfurrow(28),ilusug(3)
       dimension ipoly(500000),area(500000),rfmon(50000,1200),
      1   ilu(500000),ifld(500000),smc(500000),perv(500000),
      2   iro(500000),isoil(500000),panann(500000),ifog(500000),
@@ -1558,7 +1559,7 @@ c.....determine number and area of fields of each sugarcane plantation
       do 125 j=1,nfld(i)
          write(5,'(2i6,2x,f12.2)')i,j,afld(i,j)
  125  continue
-	write(5,*)'field number and area calc complete'
+      write(5,*)'field number and area calc complete'
 
 c.....select ~50% (by area) of fields (within prescribed tolerance) of
 c     each irrigation type.
@@ -1581,7 +1582,7 @@ c........initialize variables
          do 340 j=1,nfld(i)
             ileft(j)=j
             icrop1(i,j)=0
-		  ahalf=0
+      ahalf=0
  340     continue
 
          do 380 j=1,nfld(i)
@@ -1589,26 +1590,26 @@ c...........randomly select a field
  3          ino=ino+9999
             rn=ran(ino)
             if(rn.gt.0.99999999)rn=0.9999
-			iuse=int(nleft*rn)+1
-			icrop1(i,j)=ileft(iuse)
-			nleft=nleft-1
-			do 360 jj=iuse,nleft
+      iuse=int(nleft*rn)+1
+      icrop1(i,j)=ileft(iuse)
+      nleft=nleft-1
+      do 360 jj=iuse,nleft
                ileft(jj)=ileft(jj+1)
- 360			continue
+ 360  continue
 c...........	check if ~50% of field area selected
-			ahalf=ahalf+afld(i,icrop1(i,j))
-			if(ahalf.gt.(0.5-tol)*aplant(i).and.
+      ahalf=ahalf+afld(i,icrop1(i,j))
+      if(ahalf.gt.(0.5-tol)*aplant(i).and.
      1         ahalf.lt.(0.5+tol)*aplant(i))then
 c..............exit loop, about 50% of area (within tolerance) selected
                write(5,'(i1,2x,2f12.1,2x,f5.3)')i,ahalf,aplant(i),tol
                goto 385
-			elseif(ahalf.ge.(0.5+tol)*aplant(i))then
+      elseif(ahalf.ge.(0.5+tol)*aplant(i))then
 c..............more than 50% (plus tolerance) of area selected
                if(nretry1.le.100)then
 c..............reselect fields, less than 100 tries so far
                   nretry1=nretry1+1
                   goto 2
-			elseif(nretry1.gt.100)then
+      elseif(nretry1.gt.100)then
 c.................reset tolerance (double) and restart field selection
 c                 note that if tol>0.5, then loop will be exited after only
 c                 one field is selected
@@ -1622,9 +1623,9 @@ c              of area selected
  380     continue
  385     continue
 
-	   do 386 j=1,nfld(i)
-		write(5,'(3i6)')i,j,icrop1(i,j)
- 386	   continue
+      do 386 j=1,nfld(i)
+        write(5,'(3i6)')i,j,icrop1(i,j)
+ 386   continue
 
 
  400  continue
@@ -1667,7 +1668,7 @@ c  fragment zone and month
       integer array_size
       integer, allocatable :: ino(:)
 
- 	dimension id1(2),iddrip(28),idfurrow(28),ilusug(3)
+      dimension id1(2),iddrip(28),idfurrow(28),ilusug(3)
       dimension nfr(12,100),frg(12,100,500,31),jfr(12,100,500)
 
 
@@ -1786,12 +1787,12 @@ c    pan coefficient is not temporally variable
 
       real*8 mrf,mrfa,Psat
 
- 	dimension id1(2),iddrip(28),idfurrow(28),ilusug(3)
+      dimension id1(2),iddrip(28),idfurrow(28),ilusug(3)
       dimension ipoly(500000),area(500000),rfmon(50000,1200),
      1   ilu(500000),ifld(500000),smc(500000),perv(500000),
      2   iro(500000),isoil(500000),panann(500000),ifog(500000),
      3   ietzone(500000),irfzone(500000),iplant(500000),
-	4   ifogelev(500000),iwatmain(500000),idispwell(500000),
+     4   ifogelev(500000),iwatmain(500000),idispwell(500000),
      5   icpsepsewer(500000),iasys(500000),cprate(500000),
      6   irfcell(500000),ilup(500000,12),irrcode(50),rfnorm(500000,12),
      7   isdrain(500000),canfrac(500000),tfrac(500000),cerf(500000),
@@ -1799,12 +1800,12 @@ c    pan coefficient is not temporally variable
       dimension rd(50),df5mm(50),pancoef(50,12),idaypan(50,5),isd(50),
      1   icd(50,5),rrr(50,12),awc(500,5,8),pct(500,5,8),zt(500,5,8),
      2   zb(500,5,8),nlay(500,5),nseq(500),smca(500,100),fogeff(50),
-	3   rfw(10,25),spancoef(50,4),cancap(50),tcap(50),rfwt(50000,12)
+     3   rfw(10,25),spancoef(50,4),cancap(50),tcap(50),rfwt(50000,12)
       dimension nfr(12,100),frg(12,100,500,31),jfr(12,100,500)
       dimension rfwtmon(50,100,12),etmwf(50000,12),af(12),bf(12)
       dimension idays(12),f(32)
       dimension icrst(500000),nrfzcro(12,50,50)
-	dimension totrf(12),totfog(12),totirr(12),totro(12),
+      dimension totrf(12),totfog(12),totirr(12),totro(12),
      1   totae1(12),totrc1(12),totae2(12),totrc2(12),totae3(12),
      2   totrc3(12),totae4(12),totrc4(12),totpe(12),totdirect(12),
      3   totpnet(12),totcanint(12),totrfadj(12),totae1a(12),totrc1a(12),
@@ -1865,38 +1866,38 @@ C       888       o  .8'     `888.   888    .88P  888       o  888       o      
 C      o888ooooood8 o88o     o8888o o888bood8P'  o888ooooood8 o888ooooood8           o888o  `Y8bd8P'
 
 c.....initialize total water budget arrays for each polygon
-10	do 20 m=1,12
-		totrf(m)=0.
-		totfog(m)=0.
-		totirr(m)=0.
-		totro(m)=0.
-		totpe(m)=0.
-		totae1(m)=0.
-		totae2(m)=0.
-		totae3(m)=0.
-		totae4(m)=0.
-		totrc1(m)=0.
-		totrc2(m)=0.
-		totrc3(m)=0.
-		totrc4(m)=0.
-	  totdirect(m)=0.
-        totpnet(m)=0.
-        totcanint(m)=0.
-        totrfadj(m)=0.
-        totseptic(m)=0.
-        totsd(m)=0.
-20   	continue
+10      do 20 m=1,12
+          totrf(m)=0.
+          totfog(m)=0.
+          totirr(m)=0.
+          totro(m)=0.
+          totpe(m)=0.
+          totae1(m)=0.
+          totae2(m)=0.
+          totae3(m)=0.
+          totae4(m)=0.
+          totrc1(m)=0.
+          totrc2(m)=0.
+          totrc3(m)=0.
+          totrc4(m)=0.
+          totdirect(m)=0.
+          totpnet(m)=0.
+          totcanint(m)=0.
+          totrfadj(m)=0.
+          totseptic(m)=0.
+          totsd(m)=0.
+20    continue
 
-	polypan=0.
+      polypan=0.
       rechann=0.
 
 c.....initialize direct-recharge totals
-	watermain=0.
-	dispwell=0.
+      watermain=0.
+      dispwell=0.
       cesspool=0.
 
 c.....initialize storm-drain capture
-	wstormdrain=0.
+      wstormdrain=0.
 
 c.....initialize root depth
       root=rd(ilu(ip))
@@ -1948,10 +1949,10 @@ c.....initialize values for Thornthwaite model
 
 c.....determine initial day in the initial sugarcane irrigation cycle
       do n=1,3
-       if(ilu(ip).eq.ilusug(n))then
- 		ndicyc=id1(icrst(ip))
- 		nicyc=1
-	 endif
+        if(ilu(ip).eq.ilusug(n))then
+          ndicyc=id1(icrst(ip))
+          nicyc=1
+        endif
       end do
 
 c.....assume pan coefficient cycle starts on initial day, except if sugar
@@ -2001,8 +2002,8 @@ c........determine runoff for current month
 c...........determine monthly fog drip for current polygon (ratio varies by elevation)
           fog=0.d0
           if(ifog(ip).gt.0)then
-			fog=fdrfratio(ifog(ip),ifogelev(ip),m)*fogeff(ilu(ip))*mrf
-		  endif
+      fog=fdrfratio(ifog(ip),ifogelev(ip),m)*fogeff(ilu(ip))*mrf
+      endif
 
 c...........determine monthly net precipitation if canopy-interception method 1 is selected
           pnet=0.d0
@@ -2059,7 +2060,7 @@ c...........check if rainfall is above limit for canopy evaporation to occur
 
 c........determine daily pan evaporation rate for current month
 
-	   pan=panann(ip)*etmwf(ietzone(ip),m)/dfloat(nd)
+      pan=panann(ip)*etmwf(ietzone(ip),m)/dfloat(nd)
 
 C oooooooooo.         .o.       ooooo ooooo        oooooo   oooo
 C `888'   `Y8b       .888.      `888' `888'         `888.   .8'
@@ -2087,8 +2088,8 @@ c...........synthesize daily rainfall
 c...........determine fog drip for current polygon
             dfog=0.d0
             if(ifog(ip).gt.0)then
-			dfog=frg(m,irfzone(ip),jfr(m,irfzone(ip),i),k)*fog
-		    endif
+      dfog=frg(m,irfzone(ip),jfr(m,irfzone(ip),i),k)*fog
+      endif
 
 c...........determine daily net precipitation and canopy interception..........................................................................................................................
             dpnet=0.d0
@@ -2213,7 +2214,7 @@ c...........update cumulative water-budget component totals
             totfog(m)=totfog(m)+dfog
             totirr(m)=totirr(m)+agirr*perv(ip)
             totro(m)=totro(m)+dro
-		    totpe(m)=totpe(m)+pe
+      totpe(m)=totpe(m)+pe
             totpnet(m)=totpnet(m)+dpnet
             totcanint(m)=totcanint(m)+dcanint
             polypan=polypan+pan
@@ -2234,8 +2235,8 @@ c..............initialize yearly totals
                   sm4=0.
                   totro(m)=0.
                   if(ilu(ip).eq.iluwater)totrc1(m)=wbrc*nyrs/12.0
-				  if(ilu(ip).eq.ilures)totrc1(m)=resrc*nyrs/12.0
-				  if(ilu(ip).eq.iluzrwb)totrc1(m)=0.0
+                  if(ilu(ip).eq.ilures)totrc1(m)=resrc*nyrs/12.0
+                  if(ilu(ip).eq.iluzrwb)totrc1(m)=0.0
                   totae1(m)=totpe(m)
                   totrc2(m)=totrc1(m)
                   totrc3(m)=totrc1(m)
@@ -2251,20 +2252,20 @@ c..............initialize yearly totals
             endif
 
 c...........account for recharge from leaking water mains
-	      if(iwatmain(ip).eq.1)then
-		    watermain=watermain+wmleak
-	      totrc1(m)=totrc1(m)+wmleak
+        if(iwatmain(ip).eq.1)then
+      watermain=watermain+wmleak
+        totrc1(m)=totrc1(m)+wmleak
             totrc2(m)=totrc2(m)+wmleak
             totrc3(m)=totrc3(m)+wmleak
             totrc4(m)=totrc4(m)+wmleak
-	      totdirect(m)=totdirect(m)+wmleak
-	      endif
+        totdirect(m)=totdirect(m)+wmleak
+        endif
 
 c...........account for recharge from disposal wells
-		  if(idispwell(ip).eq.1)then
+      if(idispwell(ip).eq.1)then
      	      dw=(dwrate*0.00379/area(ip))*39.37
-		    dispwell=dispwell+dw
-	      totrc1(m)=totrc1(m)+dw
+      dispwell=dispwell+dw
+        totrc1(m)=totrc1(m)+dw
             totrc2(m)=totrc2(m)+dw
             totrc3(m)=totrc3(m)+dw
             totrc4(m)=totrc4(m)+dw
@@ -2272,10 +2273,10 @@ c...........account for recharge from disposal wells
             endif
 
 c...........account for recharge from cesspools
-		  if(icpsepsewer(ip).eq.1)then
+      if(icpsepsewer(ip).eq.1)then
             cp=cprate(ip)
-	      cesspool=cesspool+cp
-		    totrc1(m)=totrc1(m)+cp
+        cesspool=cesspool+cp
+      totrc1(m)=totrc1(m)+cp
             totrc2(m)=totrc2(m)+cp
             totrc3(m)=totrc3(m)+cp
             totrc4(m)=totrc4(m)+cp
@@ -2296,116 +2297,114 @@ c...........account for water on paved areas (no irrigation on paved areas)
             aepaved=0.
             wstormdrain=0.
 
-		  if(perv(ip).lt.0.999)then
-				x1=smp+dpnet-dro
-                if(x1.lt.0)x1=0
-				if(x1.gt.pavint)then
-c.................water contribution from paved to unpaved areas
-					smp=pavint
-					wadd=(x1-pavint)*(1-perv(ip))
-c.....................account for presence of storm drains in urban areas
-					if(istormdrain.eq.1.and.isdrain(ip).eq.1.and.
-	1				   isd(ilu(ip)).eq.1)then
-                        wstormdrain=wadd
-						wadd=0.
-						totsd(m)=totsd(m)+wstormdrain
-					endif
-				else
-c.................precipitation on paved areas fully intercepted
-					smp=x1
-				endif
+      if(perv(ip).lt.0.999)then
+        x1=smp+dpnet-dro
+        if(x1.lt.0)x1=0
+        if(x1.gt.pavint)then
+c. .......water contribution from paved to unpaved areas
+          smp=pavint
+          wadd=(x1-pavint)*(1-perv(ip))
+c.........account for presence of storm drains in urban areas
+          if(istormdrain .eq. 1.and. isdrain(ip) .eq. 1 .and. isd(ilu(ip)) .eq. 1) then
+            wstormdrain=wadd
+            wadd=0.
+            totsd(m)=totsd(m)+wstormdrain
+          endif
+        else
+
+c.........precipitation on paved areas fully intercepted
+          smp=x1
+
+        endif
 c.................update intercepted moisture depth
-				if(smp.gt.pan)then
-					aepaved=pan
-					smp=smp-pan
-				else
-					aepaved=smp
-					smp=0.
-				endif
-		  endif
+        if(smp.gt.pan)then
+          aepaved=pan
+          smp=smp-pan
+        else
+          aepaved=smp
+          smp=0.
+        endif
+      endif
 
 c...........update run-on total over entire area
-            polyron=polyron+wadd
+      polyron=polyron+wadd
 
 c...........special irrigation rate for taro
-            if(ilu(ip).eq.ilutaro)then
-                totirr(m)=totirr(m)+tarorc*tarofrac/365.0
-            endif
+      if(ilu(ip).eq.ilutaro)then
+        totirr(m)=totirr(m)+tarorc*tarofrac/365.0
+      endif
 
-c...........VEIHMEYER'S MODEL
+c.....VEIHMEYER'S MODEL
 
-            sm1hold=sm1
-c...........compute budget for pervious area
-            if(root.lt.0.99*rd(ilu(ip)).or.
-     1         root.gt.1.01*rd(ilu(ip)))then
-c..............fallow period, use 2-layer model
-               x1=sm1t+agirr+ septic+((dpnet-dro)*perv(ip)
-     1            + wadd ) / perv(ip)
-               if(x1.lt.0)x1=0
-               if(pe.le.x1)then
-                  ae=pe
-                  x2=x1-ae
-               else
-                  ae=x1
-                  x2=0.
-               endif
-               if(x2.gt.smct)then
-                  rct=x2-smct
-                  sm1t=smct
-               else
-                  rct=0.
-                  sm1t=x2
-               endif
-               x2=sm1b+rct
-               if(x2.gt.smcb)then
-                  rc=x2-smcb
-                  sm1b=smcb
-               else
-                  rc=0.
-                  sm1b=x2
-               endif
-               sm1=sm1t+sm1b
-            else
+      sm1hold=sm1
+c.....compute budget for pervious area
+      if(root .lt. 0.99*rd(ilu(ip)) .or. root .gt. 1.01*rd(ilu(ip) ) ) then
+c.......fallow period, use 2-layer model
+        x1=sm1t+agirr+ septic+((dpnet-dro)*perv(ip) + wadd ) / perv(ip)
+         if(x1.lt.0)x1=0
+         if(pe.le.x1)then
+            ae=pe
+            x2=x1-ae
+         else
+            ae=x1
+            x2=0.
+         endif
+         if(x2.gt.smct)then
+            rct=x2-smct
+            sm1t=smct
+         else
+            rct=0.
+            sm1t=x2
+         endif
+         x2=sm1b+rct
+         if(x2.gt.smcb)then
+            rc=x2-smcb
+            sm1b=smcb
+         else
+            rc=0.
+            sm1b=x2
+         endif
+         sm1=sm1t+sm1b
+      else
 c..............planted period, use 1-layer model
-               x1=sm1+agirr+septic+((dpnet-dro)*perv(ip)
-     1            + wadd ) / perv(ip)
-               if(x1.lt.0)x1=0
-               if(pe.le.x1)then
-                  ae=pe
-                  x2=x1-ae
-               else
-                  ae=x1
-                  x2=0.
-               endif
-               if(x2.gt.smctb)then
-                  rc=x2-smctb
-                  sm1=smctb
-               else
-                  rc=0.
-                  sm1=x2
-               endif
-               if(smctb.ne.0)then
-                  sm1t=sm1*(smct/smctb)
-                  sm1b=sm1*(smcb/smctb)
-               else
-                  sm1t=0.
-                  sm1b=0.
-               endif
-            endif
+        x1=sm1 + agirr + septic + ((dpnet-dro)*perv(ip) + wadd ) / perv(ip)
+        if(x1.lt.0)x1=0
+        if(pe.le.x1)then
+          ae=pe
+          x2=x1-ae
+        else
+          ae=x1
+          x2=0.
+        endif
+        if(x2.gt.smctb)then
+          rc=x2-smctb
+          sm1=smctb
+        else
+          rc=0.
+          sm1=x2
+        endif
+        if(smctb.ne.0)then
+          sm1t=sm1*(smct/smctb)
+          sm1b=sm1*(smcb/smctb)
+        else
+          sm1t=0.
+          sm1b=0.
+        endif
+      endif
 
-c...........adjust budget components for total area
-            ae=ae*perv(ip)
-            rc=rc*perv(ip)
+c.....adjust budget components for total area
+      ae=ae*perv(ip)
+      rc=rc*perv(ip)
 
-c...........special water-budget calculations for taro..................................................................................
-            if(ilu(ip).eq.ilutaro)then
-                ae=ae*(1.0-tarofrac)+pan*tarofrac
-                rc=rc*(1.0-tarofrac)+tarorc*tarofrac/365.0
-            endif
+c.....special water-budget calculations for taro..................................................................................
+      if(ilu(ip).eq.ilutaro)then
+          ae=ae*(1.0-tarofrac)+pan*tarofrac
+          rc=rc*(1.0-tarofrac)+tarorc*tarofrac/365.0
+      endif
 
-c...........update totals over entire area
-            totae1(m)=totae1(m)+ae+aepaved*(1-perv(ip))
-            totrc1(m)=totrc1(m)+rc
+c.....update totals over entire area
+      totae1(m)=totae1(m)+ae+aepaved*(1-perv(ip))
+      totrc1(m)=totrc1(m)+rc
 
 c...........ignore following 10 lines that are for debugging purposes only
 c            if(ip.eq.6498)then
@@ -2418,7 +2417,6 @@ c     4   dro,ae+aepaved*(1-perv(ip)),rc,sm1,wb
 c 4100 format(i3,1x,i5,1x,f10.2,1x,f5.2,1x,i2,1x,i3,1x,5i3,1x,i4,1x,
 c     1   2f5.1,i4,1x,f4.2,1x,2f6.2,4x,9f6.2,2x,f6.3)
 c            endif
-
 
 c...........FAO 56 ROOT CONSTANT MODEL
 
@@ -2927,58 +2925,58 @@ c.....write yearly FAO recharge estimates during last simulation if not water bo
       sm4end=smp*(1-perv(ip))+sm4*perv(ip)
 
 c.....initialize polygon totals
-	polyrf=0
-	polyfog=0
-	polyirr=0
+      polyrf=0
+      polyfog=0
+      polyirr=0
       polysep=0
-	polyro=0
-	polycint=0
-	polysd=0
-	polyae1=0
-	polyrc1=0
-	polyae2=0
-	polyrc2=0
-	polyae3=0
-	polyrc3=0
-	polyae4=0
-	polyrc4=0
-	polype=0
+      polyro=0
+      polycint=0
+      polysd=0
+      polyae1=0
+      polyrc1=0
+      polyae2=0
+      polyrc2=0
+      polyae3=0
+      polyrc3=0
+      polyae4=0
+      polyrc4=0
+      polype=0
 
 c.....sum direct recharge sources
       directrc=watermain+dispwell+cesspool
 
 c.....total monthly values for current polygon and simulation
       do 700 m=1,12
-		polyrf=polyrf+totrf(m)
-		polyfog=polyfog+totfog(m)
-		polyirr=polyirr+totirr(m)
+        polyrf=polyrf+totrf(m)
+        polyfog=polyfog+totfog(m)
+        polyirr=polyirr+totirr(m)
         polysep=polysep+totseptic(m)
-		polyro=polyro+totro(m)
-		polycint=polycint+totcanint(m)
+        polyro=polyro+totro(m)
+        polycint=polycint+totcanint(m)
         polysd=polysd+totsd(m)
-		polyae1=polyae1+totae1(m)
-		polyrc1=polyrc1+totrc1(m)
-		polyae2=polyae2+totae2(m)
-		polyrc2=polyrc2+totrc2(m)
-		polyae3=polyae3+totae3(m)
-		polyrc3=polyrc3+totrc3(m)
-		polyae4=polyae4+totae4(m)
-		polyrc4=polyrc4+totrc4(m)
-		polype=polype+totpe(m)
+        polyae1=polyae1+totae1(m)
+        polyrc1=polyrc1+totrc1(m)
+        polyae2=polyae2+totae2(m)
+        polyrc2=polyrc2+totrc2(m)
+        polyae3=polyae3+totae3(m)
+        polyrc3=polyrc3+totrc3(m)
+        polyae4=polyae4+totae4(m)
+        polyrc4=polyrc4+totrc4(m)
+        polype=polype+totpe(m)
  700  continue
 
 c.....compute water balance on current simulation totals for each method
-	wb1=sm1begin+polyrf+polyfog+polyirr-polyro-polyae1-polyrc1-sm1end
-     1-polysd-polycint+directrc+polysep
+      wb1=sm1begin+polyrf+polyfog+polyirr-polyro-polyae1-polyrc1-sm1end
+     1    -polysd-polycint+directrc+polysep
 
       wb2=sm2begin+polyrf+polyfog+polyirr-polyro-polyae2-polyrc2-sm2end
-     1-polysd-polycint+directrc+polysep
+     1    -polysd-polycint+directrc+polysep
 
       wb3=sm3begin+polyrf+polyfog+polyirr-polyro-polyae3-polyrc3-sm3end
-     1-polysd-polycint+directrc+polysep
+     1    -polysd-polycint+directrc+polysep
 
       wb4=sm4begin+polyrf+polyfog+polyirr-polyro-polyae4-polyrc4-sm4end
-     1-polysd-polycint+directrc+polysep
+     1    -polysd-polycint+directrc+polysep
 
 c.....water balance does not apply to water bodies, reservoirs, or taro
       if(ilu(ip).eq.iluwater.or.ilu(ip).eq.ilures.or.
@@ -2992,7 +2990,7 @@ c.....water balance does not apply to water bodies, reservoirs, or taro
 c.....output polygon information for current simulation
       if(ip.eq.1)jprint=1
       if(ip.eq.jprint)then
-	   write(4,4100)isim,nyrs,ip,area(ip),ilu(ip),isoil(ip),
+      write(4,4100)isim,nyrs,ip,area(ip),ilu(ip),isoil(ip),
      1      smc(ip),perv(ip),polyrf,polyfog,polyirr,polysep,directrc,
      2      polyron,polyro,polycint,polypan,polysd,polype/polypan,
      3      sm1begin,polyae1,polyrc1,sm1end,wb1,
@@ -3004,24 +3002,24 @@ c.....output polygon information for current simulation
 
 c.....determine monthly average values for current polygon and simulation
       do 800 m=1,12
-		totrf(m)=totrf(m)/dfloat(nyrs)
-		totfog(m)=totfog(m)/dfloat(nyrs)
-		totirr(m)=totirr(m)/dfloat(nyrs)
-		totro(m)=totro(m)/dfloat(nyrs)
-		totae1(m)=totae1(m)/dfloat(nyrs)
-		totrc1(m)=totrc1(m)/dfloat(nyrs)
-		totae2(m)=totae2(m)/dfloat(nyrs)
-		totrc2(m)=totrc2(m)/dfloat(nyrs)
-		totae3(m)=totae3(m)/dfloat(nyrs)
-		totrc3(m)=totrc3(m)/dfloat(nyrs)
-		totae4(m)=totae4(m)/dfloat(nyrs)
-		totrc4(m)=totrc4(m)/dfloat(nyrs)
-		totdirect(m)=totdirect(m)/dfloat(nyrs)
-		totpnet(m)=totpnet(m)/dfloat(nyrs)
-		totcanint(m)=totcanint(m)/dfloat(nyrs)
-		totrfadj(m)=totrfadj(m)/dfloat(nyrs)
- 		totseptic(m)=totseptic(m)/dfloat(nyrs)
-		totsd(m)=totsd(m)/dfloat(nyrs)
+        totrf(m)=totrf(m)/dfloat(nyrs)
+        totfog(m)=totfog(m)/dfloat(nyrs)
+        totirr(m)=totirr(m)/dfloat(nyrs)
+        totro(m)=totro(m)/dfloat(nyrs)
+        totae1(m)=totae1(m)/dfloat(nyrs)
+        totrc1(m)=totrc1(m)/dfloat(nyrs)
+        totae2(m)=totae2(m)/dfloat(nyrs)
+        totrc2(m)=totrc2(m)/dfloat(nyrs)
+        totae3(m)=totae3(m)/dfloat(nyrs)
+        totrc3(m)=totrc3(m)/dfloat(nyrs)
+        totae4(m)=totae4(m)/dfloat(nyrs)
+        totrc4(m)=totrc4(m)/dfloat(nyrs)
+        totdirect(m)=totdirect(m)/dfloat(nyrs)
+        totpnet(m)=totpnet(m)/dfloat(nyrs)
+        totcanint(m)=totcanint(m)/dfloat(nyrs)
+        totrfadj(m)=totrfadj(m)/dfloat(nyrs)
+        totseptic(m)=totseptic(m)/dfloat(nyrs)
+        totsd(m)=totsd(m)/dfloat(nyrs)
 800   continue
 
       polyron=polyron/dfloat(nyrs)
@@ -3041,15 +3039,15 @@ c.....determine monthly average values for current polygon and simulation
 
 c----------------------------------------------------------------------------
 
-	subroutine FAO_post
+      subroutine FAO_post
 
 c.....This subroutine will take one output file from the Hawaii Water Budget Model,
 c.....hi_wb.ou2, which consists of monthly water budget values, and create files
 c.....more easily imported into spreadsheet and Arc products than the .ou2 file. Results
 c.....using the FAO method summarized.
 
-	real area(12),rf(12),fog(12),wirr(12),ro(12),ae1(12),rc1(12),
-	1	   ae2(12),rc2(12),ae3(12),rc3(12),ae4(12),rc4(12),pnet(12),
+      real area(12),rf(12),fog(12),wirr(12),ro(12),ae1(12),rc1(12),
+     1     ae2(12),rc2(12),ae3(12),rc3(12),ae4(12),rc4(12),pnet(12),
      1     cint(12),rfadj(12),septic(12),sdrn(12),
      1     janrf,janfog,janirr,janro,janae,janrc,janpnet,jancint,
      1     febrf,febfog,febirr,febro,febae,febrc,febpnet,febcint,
@@ -3067,16 +3065,16 @@ c.....using the FAO method summarized.
      1     maysep,maysd,junsep,junsd,julsep,julsd,augsep,augsd,
      1     sepsep,sepsd,octsep,octsd,novsep,novsd,decsep,decsd
 
-	real*8 direct(12),totrf,totfog,totirr,totro,totae,totrc,
+      real*8 direct(12),totrf,totfog,totirr,totro,totae,totrc,
      1       totdirect,totpnet,totcint,totrfadj,totseptic,totsdrn,
      1       vtotrf,vtotfog,vtotirr,vtotro,vtotae,vtotrc,vtotdirect,
      1       vtotpnet,vtotcint,vtotrfadj,vtotseptic,vtotsdrn
 
-	integer mo,poly,ilu(12),irfcell(12),itest,iasys(12),iasysz
+      integer mo,poly,ilu(12),irfcell(12),itest,iasys(12),iasysz
 
-	character*120 junk
+      character*120 junk
 
-	data janrf,janfog,janirr,janro,janae,janrc,janpnet,jancint,
+      data janrf,janfog,janirr,janro,janae,janrc,janpnet,jancint,
      1     febrf,febfog,febirr,febro,febae,febrc,febpnet,febcint,
      1     marrf,marfog,marirr,marro,marae,marrc,marpnet,marcint,
      1     aprrf,aprfog,aprirr,aprro,aprae,aprrc,aprpnet,aprcint,
@@ -3097,68 +3095,67 @@ c.....using the FAO method summarized.
 
 
 
-	open(36,file='output/FAO_subarea_mo_in.csv')
+      open(36,file='output/FAO_subarea_mo_in.csv')
       open(37,file='output/FAO_subarea_ann_in.csv')
       open(38,file='output/FAO_tot_area_mo_MGD.out')
       open(40,file='output/FAO_tot_area_ann_MGD.out')
-	open(41,file='output/postcalc_error.out')
+      open(41,file='output/postcalc_error.out')
       close(2)
       open(42,file='output/hi_wb2.out')
 
-	write(36,3100)
+      write(36,3100)
       write(37,3200)
       write(38,3300)
       write(40,3400)
       write(*,9500)
 
-	read(42,*)junk
+      read(42,*)junk
       read(42,*)junk
 
-	itest=1
+      itest=1
 
-100	do m=1,12
-	ilu(m)=0
-	area(m)=0.
-	rf(m)=0.
-      fog(m)=0.
-	wirr(m)=0.
-	ro(m)=0.
-	ae1(m)=0.
-	rc1(m)=0.
-	ae2(m)=0.
-	rc2(m)=0.
-      ae3(m)=0.
-      rc3(m)=0.
-      ae4(m)=0.
-      rc4(m)=0.
-	direct(m)=0.
-	pnet(m)=0.
-	cint(m)=0.
-	rfadj(m)=0.
-	septic(m)=0.
-	sdrn(m)=0.
-
+100	  do m=1,12
+        ilu(m)=0
+        area(m)=0.
+        rf(m)=0.
+        fog(m)=0.
+        wirr(m)=0.
+        ro(m)=0.
+        ae1(m)=0.
+        rc1(m)=0.
+        ae2(m)=0.
+        rc2(m)=0.
+        ae3(m)=0.
+        rc3(m)=0.
+        ae4(m)=0.
+        rc4(m)=0.
+        direct(m)=0.
+        pnet(m)=0.
+        cint(m)=0.
+        rfadj(m)=0.
+        septic(m)=0.
+        sdrn(m)=0.
 c	if(itest.eq.1)write(m,1000)
+      end do
 
-	end do
-
-	do m=1,12
-	read(42,*,end=200)mo,poly,ilu(mo),irfcell(mo),iasys(mo),
+      do m=1,12
+        read(42,*,end=200)mo,poly,ilu(mo),irfcell(mo),iasys(mo),
      1	  area(mo),rf(mo),fog(mo),wirr(mo),ro(mo),direct(mo),ae1(mo),
      2    rc1(mo),ae2(mo),rc2(mo),ae3(mo),rc3(mo),ae4(mo),rc4(mo),
      3    pnet(mo),cint(mo),rfadj(mo),septic(mo),sdrn(mo)
 
-	if(m.ne.mo)then
-		write(41,*)'ABORTING--organize by month'
-		stop
-	endif
+      if(m.ne.mo)then
+        write(41,*)'ABORTING--organize by month'
+        stop
+      endif
+
       if(m.eq.1)then
-	  totrf=0.
-		totfog=0.
-		totirr=0.
-		totro=0.
-		totae=0.
-		totrc=0.
+        totrf=0.
+        totfog=0.
+        totirr=0.
+        totro=0.
+        totae=0.
+        totrc=0.
         totdirect=0.
         totpnet=0.
         totcint=0.
@@ -3166,197 +3163,197 @@ c	if(itest.eq.1)write(m,1000)
         totseptic=0.
         totsdrn=0.
 
-	janrf=janrf+rf(m)*area(m)*6.71E-6/31
-	janfog=janfog+fog(m)*area(m)*6.71E-6/31
-	janirr=janirr+wirr(m)*area(m)*6.71E-6/31
-	janro=janro+ro(m)*area(m)*6.71E-6/31
-	janae=janae+ae2(m)*area(m)*6.71E-6/31
-	janrc=janrc+rc2(m)*area(m)*6.71E-6/31
-	janpnet=janpnet+pnet(m)*area(m)*6.71E-6/31
-	jancint=jancint+cint(m)*area(m)*6.71E-6/31
-	jansep=jansep+septic(m)*area(m)*6.71E-6/31
-	jansd=jansd+sdrn(m)*area(m)*6.71E-6/31
+        janrf=janrf+rf(m)*area(m)*6.71E-6/31
+        janfog=janfog+fog(m)*area(m)*6.71E-6/31
+        janirr=janirr+wirr(m)*area(m)*6.71E-6/31
+        janro=janro+ro(m)*area(m)*6.71E-6/31
+        janae=janae+ae2(m)*area(m)*6.71E-6/31
+        janrc=janrc+rc2(m)*area(m)*6.71E-6/31
+        janpnet=janpnet+pnet(m)*area(m)*6.71E-6/31
+        jancint=jancint+cint(m)*area(m)*6.71E-6/31
+        jansep=jansep+septic(m)*area(m)*6.71E-6/31
+        jansd=jansd+sdrn(m)*area(m)*6.71E-6/31
 
       elseif(m.eq.2)then
-      febrf=febrf+rf(m)*area(m)*6.71E-6/28
-	febfog=febfog+fog(m)*area(m)*6.71E-6/28
-	febirr=febirr+wirr(m)*area(m)*6.71E-6/28
-	febro=febro+ro(m)*area(m)*6.71E-6/28
-	febae=febae+ae2(m)*area(m)*6.71E-6/28
-	febrc=febrc+rc2(m)*area(m)*6.71E-6/28
-	febpnet=febpnet+pnet(m)*area(m)*6.71E-6/28
-	febcint=febcint+cint(m)*area(m)*6.71E-6/28
-	febsep=febsep+septic(m)*area(m)*6.71E-6/31
-	febsd=febsd+sdrn(m)*area(m)*6.71E-6/31
+        febrf=febrf+rf(m)*area(m)*6.71E-6/28
+        febfog=febfog+fog(m)*area(m)*6.71E-6/28
+        febirr=febirr+wirr(m)*area(m)*6.71E-6/28
+        febro=febro+ro(m)*area(m)*6.71E-6/28
+        febae=febae+ae2(m)*area(m)*6.71E-6/28
+        febrc=febrc+rc2(m)*area(m)*6.71E-6/28
+        febpnet=febpnet+pnet(m)*area(m)*6.71E-6/28
+        febcint=febcint+cint(m)*area(m)*6.71E-6/28
+        febsep=febsep+septic(m)*area(m)*6.71E-6/31
+        febsd=febsd+sdrn(m)*area(m)*6.71E-6/31
 
       elseif(m.eq.3)then
-      marrf=marrf+rf(m)*area(m)*6.71E-6/31
-	marfog=marfog+fog(m)*area(m)*6.71E-6/31
-	marirr=marirr+wirr(m)*area(m)*6.71E-6/31
-	marro=marro+ro(m)*area(m)*6.71E-6/31
-	marae=marae+ae2(m)*area(m)*6.71E-6/31
-	marrc=marrc+rc2(m)*area(m)*6.71E-6/31
-	marpnet=marpnet+pnet(m)*area(m)*6.71E-6/31
-	marcint=marcint+cint(m)*area(m)*6.71E-6/31
-	marsep=marsep+septic(m)*area(m)*6.71E-6/31
-	marsd=marsd+sdrn(m)*area(m)*6.71E-6/31
+        marrf=marrf+rf(m)*area(m)*6.71E-6/31
+        marfog=marfog+fog(m)*area(m)*6.71E-6/31
+        marirr=marirr+wirr(m)*area(m)*6.71E-6/31
+        marro=marro+ro(m)*area(m)*6.71E-6/31
+        marae=marae+ae2(m)*area(m)*6.71E-6/31
+        marrc=marrc+rc2(m)*area(m)*6.71E-6/31
+        marpnet=marpnet+pnet(m)*area(m)*6.71E-6/31
+        marcint=marcint+cint(m)*area(m)*6.71E-6/31
+        marsep=marsep+septic(m)*area(m)*6.71E-6/31
+        marsd=marsd+sdrn(m)*area(m)*6.71E-6/31
 
       elseif(m.eq.4)then
-      aprrf=aprrf+rf(m)*area(m)*6.71E-6/30
-	aprfog=aprfog+fog(m)*area(m)*6.71E-6/30
-	aprirr=aprirr+wirr(m)*area(m)*6.71E-6/30
-	aprro=aprro+ro(m)*area(m)*6.71E-6/30
-	aprae=aprae+ae2(m)*area(m)*6.71E-6/30
-	aprrc=aprrc+rc2(m)*area(m)*6.71E-6/30
-	aprpnet=aprpnet+pnet(m)*area(m)*6.71E-6/30
-	aprcint=aprcint+cint(m)*area(m)*6.71E-6/30
-	aprsep=aprsep+septic(m)*area(m)*6.71E-6/31
-	aprsd=aprsd+sdrn(m)*area(m)*6.71E-6/31
+        aprrf=aprrf+rf(m)*area(m)*6.71E-6/30
+        aprfog=aprfog+fog(m)*area(m)*6.71E-6/30
+        aprirr=aprirr+wirr(m)*area(m)*6.71E-6/30
+        aprro=aprro+ro(m)*area(m)*6.71E-6/30
+        aprae=aprae+ae2(m)*area(m)*6.71E-6/30
+        aprrc=aprrc+rc2(m)*area(m)*6.71E-6/30
+        aprpnet=aprpnet+pnet(m)*area(m)*6.71E-6/30
+        aprcint=aprcint+cint(m)*area(m)*6.71E-6/30
+        aprsep=aprsep+septic(m)*area(m)*6.71E-6/31
+        aprsd=aprsd+sdrn(m)*area(m)*6.71E-6/31
 
       elseif(m.eq.5)then
-      mayrf=mayrf+rf(m)*area(m)*6.71E-6/31
-	mayfog=mayfog+fog(m)*area(m)*6.71E-6/31
-	mayirr=mayirr+wirr(m)*area(m)*6.71E-6/31
-	mayro=mayro+ro(m)*area(m)*6.71E-6/31
-	mayae=mayae+ae2(m)*area(m)*6.71E-6/31
-	mayrc=mayrc+rc2(m)*area(m)*6.71E-6/31
-	maypnet=maypnet+pnet(m)*area(m)*6.71E-6/31
-	maycint=maycint+cint(m)*area(m)*6.71E-6/31
-	maysep=maysep+septic(m)*area(m)*6.71E-6/31
-	maysd=maysd+sdrn(m)*area(m)*6.71E-6/31
+        mayrf=mayrf+rf(m)*area(m)*6.71E-6/31
+        mayfog=mayfog+fog(m)*area(m)*6.71E-6/31
+        mayirr=mayirr+wirr(m)*area(m)*6.71E-6/31
+        mayro=mayro+ro(m)*area(m)*6.71E-6/31
+        mayae=mayae+ae2(m)*area(m)*6.71E-6/31
+        mayrc=mayrc+rc2(m)*area(m)*6.71E-6/31
+        maypnet=maypnet+pnet(m)*area(m)*6.71E-6/31
+        maycint=maycint+cint(m)*area(m)*6.71E-6/31
+        maysep=maysep+septic(m)*area(m)*6.71E-6/31
+        maysd=maysd+sdrn(m)*area(m)*6.71E-6/31
 
       elseif(m.eq.6)then
-      junrf=junrf+rf(m)*area(m)*6.71E-6/30
-	junfog=junfog+fog(m)*area(m)*6.71E-6/30
-	junirr=junirr+wirr(m)*area(m)*6.71E-6/30
-	junro=junro+ro(m)*area(m)*6.71E-6/30
-	junae=junae+ae2(m)*area(m)*6.71E-6/30
-	junrc=junrc+rc2(m)*area(m)*6.71E-6/30
-	junpnet=junpnet+pnet(m)*area(m)*6.71E-6/30
-	juncint=juncint+cint(m)*area(m)*6.71E-6/30
-	junsep=junsep+septic(m)*area(m)*6.71E-6/31
-	junsd=junsd+sdrn(m)*area(m)*6.71E-6/31
+        junrf=junrf+rf(m)*area(m)*6.71E-6/30
+        junfog=junfog+fog(m)*area(m)*6.71E-6/30
+        junirr=junirr+wirr(m)*area(m)*6.71E-6/30
+        junro=junro+ro(m)*area(m)*6.71E-6/30
+        junae=junae+ae2(m)*area(m)*6.71E-6/30
+        junrc=junrc+rc2(m)*area(m)*6.71E-6/30
+        junpnet=junpnet+pnet(m)*area(m)*6.71E-6/30
+        juncint=juncint+cint(m)*area(m)*6.71E-6/30
+        junsep=junsep+septic(m)*area(m)*6.71E-6/31
+        junsd=junsd+sdrn(m)*area(m)*6.71E-6/31
 
       elseif(m.eq.7)then
-      julrf=julrf+rf(m)*area(m)*6.71E-6/31
-	julfog=julfog+fog(m)*area(m)*6.71E-6/31
-	julirr=julirr+wirr(m)*area(m)*6.71E-6/31
-	julro=julro+ro(m)*area(m)*6.71E-6/31
-	julae=julae+ae2(m)*area(m)*6.71E-6/31
-	julrc=julrc+rc2(m)*area(m)*6.71E-6/31
-	julpnet=julpnet+pnet(m)*area(m)*6.71E-6/31
-	julcint=julcint+cint(m)*area(m)*6.71E-6/31
-	julsep=julsep+septic(m)*area(m)*6.71E-6/31
-	julsd=julsd+sdrn(m)*area(m)*6.71E-6/31
+        julrf=julrf+rf(m)*area(m)*6.71E-6/31
+        julfog=julfog+fog(m)*area(m)*6.71E-6/31
+        julirr=julirr+wirr(m)*area(m)*6.71E-6/31
+        julro=julro+ro(m)*area(m)*6.71E-6/31
+        julae=julae+ae2(m)*area(m)*6.71E-6/31
+        julrc=julrc+rc2(m)*area(m)*6.71E-6/31
+        julpnet=julpnet+pnet(m)*area(m)*6.71E-6/31
+        julcint=julcint+cint(m)*area(m)*6.71E-6/31
+        julsep=julsep+septic(m)*area(m)*6.71E-6/31
+        julsd=julsd+sdrn(m)*area(m)*6.71E-6/31
 
       elseif(m.eq.8)then
-      augrf=augrf+rf(m)*area(m)*6.71E-6/31
-	augfog=augfog+fog(m)*area(m)*6.71E-6/31
-	augirr=augirr+wirr(m)*area(m)*6.71E-6/31
-	augro=augro+ro(m)*area(m)*6.71E-6/31
-	augae=augae+ae2(m)*area(m)*6.71E-6/31
-	augrc=augrc+rc2(m)*area(m)*6.71E-6/31
-	augpnet=augpnet+pnet(m)*area(m)*6.71E-6/31
-	augcint=augcint+cint(m)*area(m)*6.71E-6/31
-	augsep=augsep+septic(m)*area(m)*6.71E-6/31
-	augsd=augsd+sdrn(m)*area(m)*6.71E-6/31
+        augrf=augrf+rf(m)*area(m)*6.71E-6/31
+        augfog=augfog+fog(m)*area(m)*6.71E-6/31
+        augirr=augirr+wirr(m)*area(m)*6.71E-6/31
+        augro=augro+ro(m)*area(m)*6.71E-6/31
+        augae=augae+ae2(m)*area(m)*6.71E-6/31
+        augrc=augrc+rc2(m)*area(m)*6.71E-6/31
+        augpnet=augpnet+pnet(m)*area(m)*6.71E-6/31
+        augcint=augcint+cint(m)*area(m)*6.71E-6/31
+        augsep=augsep+septic(m)*area(m)*6.71E-6/31
+        augsd=augsd+sdrn(m)*area(m)*6.71E-6/31
 
       elseif(m.eq.9)then
-      seprf=seprf+rf(m)*area(m)*6.71E-6/30
-	sepfog=sepfog+fog(m)*area(m)*6.71E-6/30
-	sepirr=sepirr+wirr(m)*area(m)*6.71E-6/30
-	sepro=sepro+ro(m)*area(m)*6.71E-6/30
-	sepae=sepae+ae2(m)*area(m)*6.71E-6/30
-	seprc=seprc+rc2(m)*area(m)*6.71E-6/30
-	seppnet=seppnet+pnet(m)*area(m)*6.71E-6/30
-	sepcint=sepcint+cint(m)*area(m)*6.71E-6/30
-	sepsep=sepsep+septic(m)*area(m)*6.71E-6/31
-	sepsd=sepsd+sdrn(m)*area(m)*6.71E-6/31
+        seprf=seprf+rf(m)*area(m)*6.71E-6/30
+        sepfog=sepfog+fog(m)*area(m)*6.71E-6/30
+        sepirr=sepirr+wirr(m)*area(m)*6.71E-6/30
+        sepro=sepro+ro(m)*area(m)*6.71E-6/30
+        sepae=sepae+ae2(m)*area(m)*6.71E-6/30
+        seprc=seprc+rc2(m)*area(m)*6.71E-6/30
+        seppnet=seppnet+pnet(m)*area(m)*6.71E-6/30
+        sepcint=sepcint+cint(m)*area(m)*6.71E-6/30
+        sepsep=sepsep+septic(m)*area(m)*6.71E-6/31
+        sepsd=sepsd+sdrn(m)*area(m)*6.71E-6/31
 
       elseif(m.eq.10)then
-      octrf=octrf+rf(m)*area(m)*6.71E-6/31
-	octfog=octfog+fog(m)*area(m)*6.71E-6/31
-	octirr=octirr+wirr(m)*area(m)*6.71E-6/31
-	octro=octro+ro(m)*area(m)*6.71E-6/31
-	octae=octae+ae2(m)*area(m)*6.71E-6/31
-	octrc=octrc+rc2(m)*area(m)*6.71E-6/31
-	octpnet=octpnet+pnet(m)*area(m)*6.71E-6/31
-	octcint=octcint+cint(m)*area(m)*6.71E-6/31
-	octsep=octsep+septic(m)*area(m)*6.71E-6/31
-	octsd=octsd+sdrn(m)*area(m)*6.71E-6/31
+        octrf=octrf+rf(m)*area(m)*6.71E-6/31
+        octfog=octfog+fog(m)*area(m)*6.71E-6/31
+        octirr=octirr+wirr(m)*area(m)*6.71E-6/31
+        octro=octro+ro(m)*area(m)*6.71E-6/31
+        octae=octae+ae2(m)*area(m)*6.71E-6/31
+        octrc=octrc+rc2(m)*area(m)*6.71E-6/31
+        octpnet=octpnet+pnet(m)*area(m)*6.71E-6/31
+        octcint=octcint+cint(m)*area(m)*6.71E-6/31
+        octsep=octsep+septic(m)*area(m)*6.71E-6/31
+        octsd=octsd+sdrn(m)*area(m)*6.71E-6/31
 
       elseif(m.eq.11)then
-      novrf=novrf+rf(m)*area(m)*6.71E-6/30
-	novfog=novfog+fog(m)*area(m)*6.71E-6/30
-	novirr=novirr+wirr(m)*area(m)*6.71E-6/30
-	novro=novro+ro(m)*area(m)*6.71E-6/30
-	novae=novae+ae2(m)*area(m)*6.71E-6/30
-	novrc=novrc+rc2(m)*area(m)*6.71E-6/30
-	novpnet=novpnet+pnet(m)*area(m)*6.71E-6/30
-	novcint=novcint+cint(m)*area(m)*6.71E-6/30
-	novsep=novsep+septic(m)*area(m)*6.71E-6/31
-	novsd=novsd+sdrn(m)*area(m)*6.71E-6/31
+        novrf=novrf+rf(m)*area(m)*6.71E-6/30
+        novfog=novfog+fog(m)*area(m)*6.71E-6/30
+        novirr=novirr+wirr(m)*area(m)*6.71E-6/30
+        novro=novro+ro(m)*area(m)*6.71E-6/30
+        novae=novae+ae2(m)*area(m)*6.71E-6/30
+        novrc=novrc+rc2(m)*area(m)*6.71E-6/30
+        novpnet=novpnet+pnet(m)*area(m)*6.71E-6/30
+        novcint=novcint+cint(m)*area(m)*6.71E-6/30
+        novsep=novsep+septic(m)*area(m)*6.71E-6/31
+        novsd=novsd+sdrn(m)*area(m)*6.71E-6/31
 
       elseif(m.eq.12)then
-      decrf=decrf+rf(m)*area(m)*6.71E-6/31
-	decfog=decfog+fog(m)*area(m)*6.71E-6/31
-	decirr=decirr+wirr(m)*area(m)*6.71E-6/31
-	decro=decro+ro(m)*area(m)*6.71E-6/31
-	decae=decae+ae2(m)*area(m)*6.71E-6/31
-	decrc=decrc+rc2(m)*area(m)*6.71E-6/31
-	decpnet=decpnet+pnet(m)*area(m)*6.71E-6/31
-	deccint=deccint+cint(m)*area(m)*6.71E-6/31
-	decsep=decsep+septic(m)*area(m)*6.71E-6/31
-	decsd=decsd+sdrn(m)*area(m)*6.71E-6/31
+        decrf=decrf+rf(m)*area(m)*6.71E-6/31
+        decfog=decfog+fog(m)*area(m)*6.71E-6/31
+        decirr=decirr+wirr(m)*area(m)*6.71E-6/31
+        decro=decro+ro(m)*area(m)*6.71E-6/31
+        decae=decae+ae2(m)*area(m)*6.71E-6/31
+        decrc=decrc+rc2(m)*area(m)*6.71E-6/31
+        decpnet=decpnet+pnet(m)*area(m)*6.71E-6/31
+        deccint=deccint+cint(m)*area(m)*6.71E-6/31
+        decsep=decsep+septic(m)*area(m)*6.71E-6/31
+        decsd=decsd+sdrn(m)*area(m)*6.71E-6/31
       endif
 
 
 c.....totalizing in in/yr by polygon
       totrf=totrf+rf(m)
-	totfog=totfog+fog(m)
-	totirr=totirr+wirr(m)
-	totro=totro+ro(m)
-	totae=totae+ae2(m)
-	totrc=totrc+rc2(m)
-	totdirect=totdirect+direct(m)
-	totpnet=totpnet+pnet(m)
-	totcint=totcint+cint(m)
-	totrfadj=totrfadj+rfadj(m)
-	totseptic=totseptic+septic(m)
-	totsdrn=totsdrn+sdrn(m)
-	iasysz=iasys(m)
+      totfog=totfog+fog(m)
+      totirr=totirr+wirr(m)
+      totro=totro+ro(m)
+      totae=totae+ae2(m)
+      totrc=totrc+rc2(m)
+      totdirect=totdirect+direct(m)
+      totpnet=totpnet+pnet(m)
+      totcint=totcint+cint(m)
+      totrfadj=totrfadj+rfadj(m)
+      totseptic=totseptic+septic(m)
+      totsdrn=totsdrn+sdrn(m)
+      iasysz=iasys(m)
 
 
 c.....totalizing in MGD for entire model area
-	vtotrf=vtotrf+rf(m)*area(m)*0.018383*1E-6
-	vtotfog=vtotfog+fog(m)*area(m)*0.018383*1E-6
-	vtotirr=vtotirr+wirr(m)*area(m)*0.018383*1E-6
-	vtotro=vtotro+ro(m)*area(m)*0.018383*1E-6
-	vtotae=vtotae+ae2(m)*area(m)*0.018383*1E-6
-	vtotrc=vtotrc+rc2(m)*area(m)*0.018383*1E-6
-	vtotdirect=vtotdirect+direct(m)*area(m)*0.018383*1E-6
-	vtotpnet=vtotpnet+pnet(m)*area(m)*0.018383*1E-6
-	vtotcint=vtotcint+cint(m)*area(m)*0.018383*1E-6
-	vtotrfadj=vtotrfadj+rfadj(m)*area(m)*0.018383*1E-6
-	vtotseptic=vtotseptic+septic(m)*area(m)*0.018383*1E-6
-	vtotsdrn=vtotsdrn+sdrn(m)*area(m)*0.018383*1E-6
+      vtotrf=vtotrf+rf(m)*area(m)*0.018383*1E-6
+      vtotfog=vtotfog+fog(m)*area(m)*0.018383*1E-6
+      vtotirr=vtotirr+wirr(m)*area(m)*0.018383*1E-6
+      vtotro=vtotro+ro(m)*area(m)*0.018383*1E-6
+      vtotae=vtotae+ae2(m)*area(m)*0.018383*1E-6
+      vtotrc=vtotrc+rc2(m)*area(m)*0.018383*1E-6
+      vtotdirect=vtotdirect+direct(m)*area(m)*0.018383*1E-6
+      vtotpnet=vtotpnet+pnet(m)*area(m)*0.018383*1E-6
+      vtotcint=vtotcint+cint(m)*area(m)*0.018383*1E-6
+      vtotrfadj=vtotrfadj+rfadj(m)*area(m)*0.018383*1E-6
+      vtotseptic=vtotseptic+septic(m)*area(m)*0.018383*1E-6
+      vtotsdrn=vtotsdrn+sdrn(m)*area(m)*0.018383*1E-6
 
-	if(m.eq.12)then
+      if(m.eq.12)then
 c.........write all 12 months for all 4 methods to one file
 c		write(35,4000)poly,(rf(k),fog(k),wirr(k),ro(k),ae1(k),
 c	1	rc1(k),ae2(k),rc2(k),ae3(k),rc3(k),ae4(k),rc4(k),k=1,12)
 c.........write all 12 months for FAO method only to one file
-		write(36,5000)poly,(rf(k),fog(k),wirr(k),ro(k),
-	1	ae2(k),rc2(k),pnet(k),cint(k),septic(k),sdrn(k),k=1,12)
+      write(36,5000)poly,(rf(k),fog(k),wirr(k),ro(k),
+     1  ae2(k),rc2(k),pnet(k),cint(k),septic(k),sdrn(k),k=1,12)
 c.........write annual mean values for each polygon to one file (FAO method)
-      	write(37,6000)poly,totrf,totfog,totirr,totdirect,totro,totae,
-     1	totrc,totpnet,totcint,totrfadj,totseptic,totsdrn
-	endif
-	end do
+      write(37,6000)poly,totrf,totfog,totirr,totdirect,totro,totae,
+     1  totrc,totpnet,totcint,totrfadj,totseptic,totsdrn
+      endif
+      end do
 
-	itest=2
-	goto 100
-200	continue
+      itest=2
+      goto 100
+200	  continue
 
       write(38,7000)janrf,janfog,janirr,janro,janae,janrc,janpnet,
      1     jancint,jansep,jansd,
@@ -3392,27 +3389,27 @@ c.........write annual mean values for each polygon to one file (FAO method)
 
 3000	format('Poly ID  1Rain    1Fog    1Irr  1Runoff   1AE1    1RC1',
      1'    1AE2    1RC2    1AE3    1RC3    1AE4    1RC4',
-	2'   2Rain    2Fog    2Irr  2Runoff   2AE1    2RC1',
+     2'   2Rain    2Fog    2Irr  2Runoff   2AE1    2RC1',
      3'    2AE2    2RC2    2AE3    2RC3    2AE4    2RC4',
-	2'   3Rain    3Fog    3Irr  3Runoff   3AE1    3RC1',
+     2'   3Rain    3Fog    3Irr  3Runoff   3AE1    3RC1',
      3'    3AE2    3RC2    3AE3    3RC3    3AE4    3RC4',
-	2'   4Rain    4Fog    4Irr  4Runoff   4AE1    4RC1',
+     2'   4Rain    4Fog    4Irr  4Runoff   4AE1    4RC1',
      3'    4AE2    4RC2    4AE3    4RC3    4AE4    4RC4',
-	2'   5Rain    5Fog    5Irr  5Runoff   5AE1    5RC1',
+     2'   5Rain    5Fog    5Irr  5Runoff   5AE1    5RC1',
      3'    5AE2    5RC2    5AE3    5RC3    5AE4    5RC4',
-	2'   6Rain    6Fog    6Irr  6Runoff   6AE1    6RC1',
+     2'   6Rain    6Fog    6Irr  6Runoff   6AE1    6RC1',
      3'    6AE2    6RC2    6AE3    6RC3    6AE4    6RC4',
-	2'   7Rain    7Fog    7Irr  7Runoff   7AE1    7RC1',
+     2'   7Rain    7Fog    7Irr  7Runoff   7AE1    7RC1',
      3'    7AE2	   7RC2    7AE3    7RC3    7AE4    7RC4',
-	2'   8Rain    8Fog    8Irr  8Runoff   8AE1    8RC1',
+     2'   8Rain    8Fog    8Irr  8Runoff   8AE1    8RC1',
      3'    8AE2    8RC2    8AE3    8RC3    8AE4    8RC4',
-	2'   9Rain    9Fog    9Irr  9Runoff   9AE1    9RC1',
+     2'   9Rain    9Fog    9Irr  9Runoff   9AE1    9RC1',
      3'    9AE2    9RC2    9AE3    9RC3    9AE4    9RC4',
-	2'  10Rain   10Fog   10Irr 10Runoff  10AE1   10RC1',
+     2'  10Rain   10Fog   10Irr 10Runoff  10AE1   10RC1',
      3'   10AE2   10RC2   10AE3   10RC3   10AE4   10RC4',
-	2'  11Rain   11Fog   11Irr 11Runoff  11AE1   11RC1',
+     2'  11Rain   11Fog   11Irr 11Runoff  11AE1   11RC1',
      3'   11AE2   11RC2   11AE3   11RC3   11AE4   11RC4',
-	2'  12Rain   12Fog   12Irr 12Runoff  12AE1   12RC1',
+     2'  12Rain   12Fog   12Irr 12Runoff  12AE1   12RC1',
      3'   12AE2   12RC2   12AE3   12RC3   12AE4   12RC4')
 
 3100  format('Poly_ID,1Rain,1Fog,1Irr,1Runoff,1AE,1Rech,',
@@ -3449,5 +3446,5 @@ c.........write annual mean values for each polygon to one file (FAO method)
 9000  format(12(f8.2,1x))
 9500  format('writing FAO-method output files...')
 
-	return
-	end
+      return
+      end

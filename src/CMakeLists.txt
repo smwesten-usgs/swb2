@@ -19,6 +19,7 @@ set(SRCS
       et__gridded_values.F90
       et__hargreaves_samani.F90
       et__jensen_haise.F90
+      et__zone_values.F90
       exceptions.F90
       fog__monthly_grid.F90
       file_operations.F90

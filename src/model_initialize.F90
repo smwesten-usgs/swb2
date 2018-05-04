@@ -43,7 +43,7 @@ module model_initialize
     logical (kind=c_bool)  :: lOptional
   end type METHODS_LIST_T
 
-  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 41
+  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 43
   integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 18
 
   type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS( NUMBER_OF_KNOWN_GRIDS ) =       &
@@ -57,6 +57,8 @@ module model_initialize
       GRIDDED_DATASETS_T("SOLAR_RADIATION                       ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("WIND_SPEED                            ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("RAINFALL_ZONE                         ", lTRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("REFERENCE_ET_ZONE                     ", lTRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("POTENTIAL_ET_ZONE                     ", lTRUE, DATATYPE_INT ),        &
       GRIDDED_DATASETS_T("FLOW_DIRECTION                        ", lTRUE, DATATYPE_INT),         &
       GRIDDED_DATASETS_T("FOG_RATIO                             ", lTRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("LAND_USE                              ", lFALSE, DATATYPE_INT ),       &

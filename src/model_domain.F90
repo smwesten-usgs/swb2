@@ -1289,6 +1289,15 @@ contains
         call LOGS%WRITE( "==> MONTHLY_GRID EVAPOTRANSPIRATION submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
+      elseif ( ( Method_Name .strapprox. "MONTHLY_ZONE" ) &
+           .or. ( Method_Name .strapprox. "MONTHLY_ZONE_GRID" ) ) then
+
+        this%init_reference_et => model_initialize_et_monthly_zone_grid
+        this%calc_reference_et => model_calculate_et_monthly_zone_grid
+
+        call LOGS%WRITE( "==> MONTHLY_GRID EVAPOTRANSPIRATION submodel selected.", &
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
+
       elseif ( ( Method_Name .strapprox. "DAILY_GRID" ) &
            .or. ( Method_Name .strapprox. "DAILY_GRID" ) ) then
 
@@ -1805,6 +1814,33 @@ contains
     this%reference_ET0 = pack( pET_GRID%pGrdBase%rData, this%active )
 
   end subroutine model_calculate_et_daily_grid
+
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_et_monthly_zone_grid(this)
+
+    use et__zone_values
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call et_zone_values_initialize( this%active )
+
+  end subroutine model_initialize_et_monthly_zone_grid
+
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_et_monthly_zone_grid(this)
+
+    use et__zone_values
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call et_zone_values_calculate( )
+
+    ! as with HWB, multiply ANNUAL ET grid by a monthly to annual RATIO, then divide by number of days
+    this%reference_ET0 = pack( pET_GRID%pGrdBase%rData, this%active ) * ET_RATIOS / real( SIM_DT%iDaysInMonth, kind=c_float)
+
+  end subroutine model_calculate_et_monthly_zone_grid
 
   !--------------------------------------------------------------------------------------------------
 
