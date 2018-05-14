@@ -24,7 +24,8 @@ contains
                                           runoff,                       &
                                           fog,                          &
                                           interception,                 &
-                                          reference_et0 )
+                                          reference_et0,                &
+                                          pervious_fraction )
 
     real (kind=c_float), intent(inout)      :: surface_storage
     real (kind=c_float), intent(inout)      :: actual_et_impervious
@@ -38,9 +39,10 @@ contains
     real (kind=c_float), intent(in)         :: fog
     real (kind=c_float), intent(in)         :: interception
     real (kind=c_float), intent(in)         :: reference_et0
+    real (kind=c_float), intent(in)         :: pervious_fraction
 
     ! [ LOCALS ]
-    real (kind=c_float) :: difference
+    real (kind=c_float) :: paved_to_unpaved   ! 'wadd' in HWB
 
 !    if ( storm_drain_capture_fraction >= 0.0_c_float ) then
     if ( surface_storage_max > NEAR_ZERO ) then
@@ -52,10 +54,15 @@ contains
                         - interception                &
                         - runoff
 
-      difference = max( 0.0_c_float, surface_storage - surface_storage_max )
-      storm_drain_capture = difference * storm_drain_capture_fraction
-      surface_storage_excess = difference - storm_drain_capture
       surface_storage = min( surface_storage, surface_storage_max )
+
+      ! amount is reduced proportional to amount of impervious surface present
+      paved_to_unpaved = max( 0.0_c_float,                                     &
+                             ( surface_storage - surface_storage_max )         &
+                              * ( 1.0_c_float - pervious_fraction)      )
+      storm_drain_capture = paved_to_unpaved * storm_drain_capture_fraction
+      surface_storage_excess = max( 0.0_c_float,                               &
+                                    paved_to_unpaved - storm_drain_capture )
 
       ! now allow for evaporation
       actual_et_impervious = min( reference_et0, surface_storage )

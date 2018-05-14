@@ -126,7 +126,7 @@ contains
         call cells%calc_irrigation( indx )
 
         ! this is a convoluted call: we're getting an individual capture fraction,
-        ! but supplying a pointer to the active cells sp that the first time through,
+        ! but supplying a pointer to the active cells so that the first time through,
         ! gridded data (if supplied) are updated
         call storm_drain_capture_calculate( storm_drain_capture, indx, cells%active )
 
@@ -146,11 +146,14 @@ contains
           runoff=runoff,                                                                        &
           fog=fog,                                                                              &
           interception=interception,                                                            &
-          reference_et0=reference_et0 )
+          reference_et0=reference_et0,                                                          &
+          pervious_fraction=pervious_fraction )
 
+        ! ** this statement commented out since pervious fraction correction is
+        !    now being performed in the 'mass_balance__impervious_surface' directly
         ! modify the surface storage in inches as if the amount calculated for the impervious area
         ! were to be redistributed uniformly over the total area of the cell
-        surface_storage_excess = surface_storage_excess * ( 1.0_c_float - pervious_fraction )
+        !surface_storage_excess = surface_storage_excess * ( 1.0_c_float - pervious_fraction )
 
         ! e.g. septic system discharge enters here...
         call cells%calc_direct_soil_moisture( indx )

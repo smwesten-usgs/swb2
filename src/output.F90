@@ -21,7 +21,7 @@ module output
 
   type (NETCDF_FILE_COLLECTION_T), allocatable, public :: NC_OUT(:)
 
-  integer (kind=c_int), parameter   :: NCDF_NUM_OUTPUTS = 23
+  integer (kind=c_int), parameter   :: NCDF_NUM_OUTPUTS = 24
 
   type OUTPUT_SPECS_T
     character (len=27)          :: variable_name
@@ -54,7 +54,8 @@ module output
     OUTPUT_SPECS_T( "crop_et                    ", "inches               ", 0.0, 10000.0, FALSE ), &
     OUTPUT_SPECS_T( "gdd                        ", "degree_day_fahrenheit", 0.0, 10000.0, FALSE ), &
     OUTPUT_SPECS_T( "direct_net_infiltation     ", "inches               ", 0.0, 100.0, FALSE ),   &
-    OUTPUT_SPECS_T( "direct_soil_moisture       ", "inches               ", 0.0, 100.0, FALSE )    ]
+    OUTPUT_SPECS_T( "direct_soil_moisture       ", "inches               ", 0.0, 100.0, FALSE ),   &
+    OUTPUT_SPECS_T( "storm_drain_capture        ", "inches               ", 0.0, 100.0, FALSE )      ]
 
   enum, bind(c)
     enumerator :: NCDF_GROSS_PRECIPITATION=1, NCDF_RAINFALL, NCDF_SNOWFALL,   &
@@ -67,7 +68,7 @@ module output
                   NCDF_INFILTRATION,                                          &
                   NCDF_IRRIGATION, NCDF_RUNOFF_OUTSIDE,                       &
                   NCDF_CROP_ET, NCDF_GDD, NCDF_DIRECT_NET_INFILTRATION,       &
-                  NCDF_DIRECT_SOIL_MOISTURE
+                  NCDF_DIRECT_SOIL_MOISTURE, NCDF_STORM_DRAIN_CAPTURE
   end enum
 
   logical ( kind=c_bool ) :: OUTPUT_INCLUDES_LATLON = lTRUE
@@ -456,6 +457,17 @@ contains
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                                &
             lMask=cells%active,                                                                     &
             rValues=cells%direct_soil_moisture,                                                     &
+            rField=cells%nodata_fill_value )
+
+    if ( OUTSPECS( NCDF_STORM_DRAIN_CAPTURE )%is_active ) &
+    call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_STORM_DRAIN_CAPTURE )%ncfile,         &
+            iVarID=NC_OUT( NCDF_STORM_DRAIN_CAPTURE )%ncfile%iVarID(NC_Z),                          &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],        &
+            iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                          &
+                                int(cells%number_of_columns, kind=c_size_t) ],                      &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                                &
+            lMask=cells%active,                                                                     &
+            rValues=cells%storm_drain_capture,                                                     &
             rField=cells%nodata_fill_value )
 
     RECHARGE_ARRAY = RECHARGE_ARRAY + cells%net_infiltration

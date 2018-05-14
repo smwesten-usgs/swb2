@@ -147,6 +147,7 @@ module grid
      grid_CheckForPROJ4Error, grid_CompletelyCover,                                         &
      grid_ReadExisting, grid_DumpGridExtent,                                                &
      grid_Conform, grid_Transform, grid_Interpolate, grid_PopulateXY,                       &
+     grid_GetGridX, grid_GetGridY,                                                          &
      grid_set_nodata_value,                                                                 &
      grid_CreateComplete, grid_CreateSimple, grid_WriteGrid,                                &
      grid_WriteArcGrid, grid_WriteSurferGrid, grid_set_output_directory_name,               &

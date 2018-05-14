@@ -8,7 +8,7 @@ rm -rf tests
 rm -f CPack*
 rm -f *.txt
 
-export GCC_VERSION=6.4.0_1
+export GCC_VERSION=6.4.0_2
 export NETCDF_VERSION=4.6.0
 export LIBSZ_VERSION=2.1.1_1
 # set CMAKE-related and build-related variables

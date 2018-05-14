@@ -55,7 +55,7 @@ c
 c
 c  List of hardwired input/output files
 c
-c   hi_wb.in	   main input file
+c   hi_wb.in     main input file
 c   hi_wb1.out     main output file that relists input information and
 c                  summarizes recharge (Mgal/d) over the entire modeled area
 c                  for each of the simulations (1-nsim) using 4 AE/PE models
@@ -108,7 +108,7 @@ c  annrfwt(i)    annual rainfall weight for year i (i=1,nannrfwt)
 c  aplant(i)     irrigated sugarcane area for each plantation i (i=1,7)
 c  area(i)       area (m^2) of GIS polygon i (i=1,npoly)
 c  av1ae(i,m)    average evapotranspiration in polygon i (i=1,npoly) for month m
-c			      over nsim simulations using the Veihmeyer AE/PE model, in/mo
+c            over nsim simulations using the Veihmeyer AE/PE model, in/mo
 c  av1rc(i,m)    average recharge in polygon i (i=1,npoly) for month m over nsim
 c                   simulations using the Veihmeyer AE/PE model, in/mo
 c  av2ae(i,m)    average evapotranspiration in polygon i (i=1,npoly) for month m
@@ -153,13 +153,13 @@ c                3-macadamia nuts)
 c  df5mm(i)      FAO 56 depletion fraction at 5 mm/d ET for land cover i (i=1,nlu)
 c                   (see FAO 56, table 22)
 c  dispwell      total disposal-well discharge for polygon accumulated during nyrs
-c  dripeff	     drip irrigation efficiency (0-1)
+c  dripeff       drip irrigation efficiency (0-1)
 c  etmwf(i,m)    ratio of monthly-to-annual pan evaporation rate for
 c                   ET zone i and month m (m=1,12)
 c  fdmgd(i)      cumulative yearly average total fog drip for simulation i
 c                   (i=1,nsim), in Mgal/d
 c  fogeff(i)     fog-catch efficiency of vegetation; the ratio of the amount of fog
-c			     deposition on vegetation to the amount of fog deposition on a standard
+c           deposition on vegetation to the amount of fog deposition on a standard
 c                cylindrical fog gage (i=1,nlu)
 c  frg(m,i,j,k)  fragment for month m, rainfall zone i, fragment set j, and day k
 c                   m=1,12; i=1,nrfz(m); j=1,nmbrrfz; k=1,31
@@ -171,7 +171,7 @@ c  icrst(i)      sugarcane crop stage for polygon i (i=1,npoly)
 c                   note that this variable is ignored for non-sugarcane polys
 c                   1 = crop stage 1
 c                   2 = crop stage 2
-c  ietzone(i)	   pan evaporation variability zone for polygon i (i=1,npoly)
+c  ietzone(i)     pan evaporation variability zone for polygon i (i=1,npoly)
 c  id1(i)        initial day of planting and irrigation for each of 2
 c                   field groups (i=1,2)
 c  idaypan(i,j)  number of days for land cover i in each of the j stages of
@@ -184,12 +184,12 @@ c  ifld(i)       sugarcane field number for polygon i (i=1,npoly)
 c                   (note: ifld(i)=0 if not sugar)
 c  ifog(i)       fog-drip zone number for polygon i (i=1,npoly)
 c  ilu(i)        land-cover code for polygon i (i=1,npoly)
-c  imacirr	     macadamia nut irrigation code (0-unirrigated,1-irrigated)
+c  imacirr       macadamia nut irrigation code (0-unirrigated,1-irrigated)
 c  iplant(i)     sugar plantation code for each polygon i (i=1,npoly)
 c  ipoly         polygon identification number from GIS (i=1,npoly)
-c  ipineirr	     pineapple irrigation code (0-unirrigated,1-irrigated)
+c  ipineirr       pineapple irrigation code (0-unirrigated,1-irrigated)
 c  iro(i)        runoff zone number for polygon i (i=1,npoly)
-c  irfzone(i)	   rainfall gage zone for polygon i (i=i,npoly)
+c  irfzone(i)     rainfall gage zone for polygon i (i=i,npoly)
 c  irrday(i)     sugarcane irrigation code for day i (i=1,ndsug)
 c                   -1 = fallow (not planted)
 c                    0 = unirrigated sugarcane
@@ -217,7 +217,7 @@ c  nlay(i,j)     number of layers for soil code i and sequence number j
 c                   i=1,nsoil; j=1,nseq(i)
 c  nlu           number of different land-cover types
 c  nmbrrfz       number of rainfall gage zones in study area
-c  nplant		   number of sugar plantations
+c  nplant       number of sugar plantations
 c  npoly         total number of polygons
 c  nrfzcro(m,j,k) monthly rainfall zone correlation rankings for month,m, and rainfall zone,j
 c  nrrr          number of runoff zone
@@ -317,10 +317,17 @@ c                   i=1,nsoil; j=1,nseq(i); l=1,nlay(i,j)
       dimension idemsup(20),supirr(20),rmltirr(20),effirr(20),
      1          irrday(20,31),nirrdays(20,12),irrsug(50000)
 
-      integer target_polys(4)
+      integer target_polys(9)
 
+c      lc    polygon    storm_drain    swb-hwb
+c      8    36798    no    negative
+c      9    21336    no    negative
+c      9    278558    yes    positive
+c      10    24397    no    negative
+c      10    268541    yes    positive
       ! natural forest, corn, golf course, diverse ag
-      data target_polys/60515,63533,277684,336981/
+c      data target_polys/60515,63533,277684,336981,339872,342876,353812,345298/
+      data target_polys/60515,63533,277684,336981,36798,21336,278558,24397,268541/
 
       data idays/31,28,31,30,31,30,31,31,30,31,30,31/
 
@@ -442,7 +449,6 @@ c........select fragments to use for current simulation
 c........compute water budget by polygon for desired number of years
 
 !         do 200 j=1,npoly
-
           do 200 jndx=1,ubound(target_polys,1)
             j=target_polys(jndx)
             call rech(i,j,zrf,zfd,zir,zro,ae1,rc1,
@@ -537,15 +543,15 @@ c     by polygon (average of nsim runs in inches)
 !         j=target_polys(jndx)
        do m=1,12
          write(2,2100)m,ipoly(j),ilu(j),irfcell(j),iasys(j),area(j),
-     1	  avrf(j,m),avfd(j,m),avir(j,m),avro(j,m),avdirect(j,m),
+     1    avrf(j,m),avfd(j,m),avir(j,m),avro(j,m),avdirect(j,m),
      2    av1ae(j,m),av1rc(j,m),av2ae(j,m),av2rc(j,m),av3ae(j,m),
      3    av3rc(j,m),av4ae(j,m),av4rc(j,m),avpnet(j,m),avcanint(j,m),
      4    avrfadj(j,m),avseptic(j,m),avstrmdrn(j,m)
 
           do n=1,nilusug
             if(ilu(j).eq.ilusug(n))then
-     			    write(3,3100)m,ipoly(j),ilu(j),ifld(j),icrst(j),area(j),
-     1		      avrf(j,m),avfd(j,m),avir(j,m),avro(j,m),av1ae(j,m),
+               write(3,3100)m,ipoly(j),ilu(j),ifld(j),icrst(j),area(j),
+     1          avrf(j,m),avfd(j,m),avir(j,m),avro(j,m),av1ae(j,m),
      2          av1rc(j,m),av2ae(j,m),av2rc(j,m),av3ae(j,m),av3rc(j,m),
      3          av4ae(j,m),av4rc(j,m)
             endif
@@ -934,7 +940,7 @@ c.....read in name of constant monthly rainfall-runoff ratio file
 
 c.....read in name of sugarcane file if sugarcane is present
       if(nilusug.ne.0)then
-      	read(10,'(a50)')fsug
+        read(10,'(a50)')fsug
       write(1,2096)fsug
       endif
 
@@ -1052,12 +1058,12 @@ c.......read monthly rainfall weighting factors
           iseqyr=nrfyr-istartyr+1
           m=1
           do m=1,12
-        		rfwtmon(irc,iseqyr,m)=wf(m)
+            rfwtmon(irc,iseqyr,m)=wf(m)
           end do
         endif
         if(nrfyr.gt.maxrfyr)maxrfyr=nrfyr
         goto 16
- 916	      continue
+ 916        continue
             if(iendyr.gt.maxrfyr)then
                write(8,*)'ABORTING--NOT ENOUGH MONTHLY RAINFALL WEIGHTS'
                stop
@@ -1245,9 +1251,9 @@ c.... read modified Gash-model file if Gash method is selcted
       endif
 
 c.....close files
-c	do i=11,64
-c		close(i)
-c	end do
+c  do i=11,64
+c    close(i)
+c  end do
 
  1000 format(i10,t60,  ': Number of simulations')
  1010 format(i10,t60,  ': Number of years in each simulation')
@@ -1596,7 +1602,7 @@ c...........randomly select a field
       do 360 jj=iuse,nleft
                ileft(jj)=ileft(jj+1)
  360  continue
-c...........	check if ~50% of field area selected
+c...........  check if ~50% of field area selected
       ahalf=ahalf+afld(i,icrop1(i,j))
       if(ahalf.gt.(0.5-tol)*aplant(i).and.
      1         ahalf.lt.(0.5+tol)*aplant(i))then
@@ -1817,7 +1823,7 @@ c    pan coefficient is not temporally variable
       character*256 temp_string
       real daily_aet2
       real daily_rc2
-      integer target_polys(4)
+      integer target_polys(9)
 
       common /consti/nsim,nyrs,ndirr,ndunirr,ndfallow,id1,irfweights,
      1    nddrip,iddrip,ndfurrow,idfurrow,ndsug,istartyr,iendyr,nilusug,
@@ -2246,7 +2252,7 @@ c..............initialize yearly totals
                   totae4(m)=totae1(m)
                   totdirect(m)=totrc1(m)
                   if(m.eq.12) goto 600
-       			goto 400
+             goto 400
                endif
                goto 300
             endif
@@ -2263,7 +2269,7 @@ c...........account for recharge from leaking water mains
 
 c...........account for recharge from disposal wells
       if(idispwell(ip).eq.1)then
-     	      dw=(dwrate*0.00379/area(ip))*39.37
+             dw=(dwrate*0.00379/area(ip))*39.37
       dispwell=dispwell+dw
         totrc1(m)=totrc1(m)+dw
             totrc2(m)=totrc2(m)+dw
@@ -3087,7 +3093,7 @@ c.....using the FAO method summarized.
      1     novrf,novfog,novirr,novro,novae,novrc,novpnet,novcint,
      1     decrf,decfog,decirr,decro,decae,decrc,decpnet,deccint,
      1     vtotrf,vtotfog,vtotirr,vtotro,vtotae,vtotrc,
-     1	   vtotdirect,vtotpnet,vtotcint,vtotrfadj,vtotseptic,vtotsdrn,
+     1     vtotdirect,vtotpnet,vtotcint,vtotrfadj,vtotseptic,vtotsdrn,
      1     jansep,jansd,febsep,febsd,marsep,marsd,aprsep,aprsd,
      1     maysep,maysd,junsep,junsd,julsep,julsd,augsep,augsd,
      1     sepsep,sepsd,octsep,octsd,novsep,novsd,decsep,decsd
@@ -3114,7 +3120,7 @@ c.....using the FAO method summarized.
 
       itest=1
 
-100	  do m=1,12
+100    do m=1,12
         ilu(m)=0
         area(m)=0.
         rf(m)=0.
@@ -3135,12 +3141,12 @@ c.....using the FAO method summarized.
         rfadj(m)=0.
         septic(m)=0.
         sdrn(m)=0.
-c	if(itest.eq.1)write(m,1000)
+c  if(itest.eq.1)write(m,1000)
       end do
 
       do m=1,12
         read(42,*,end=200)mo,poly,ilu(mo),irfcell(mo),iasys(mo),
-     1	  area(mo),rf(mo),fog(mo),wirr(mo),ro(mo),direct(mo),ae1(mo),
+     1    area(mo),rf(mo),fog(mo),wirr(mo),ro(mo),direct(mo),ae1(mo),
      2    rc1(mo),ae2(mo),rc2(mo),ae3(mo),rc3(mo),ae4(mo),rc4(mo),
      3    pnet(mo),cint(mo),rfadj(mo),septic(mo),sdrn(mo)
 
@@ -3340,8 +3346,8 @@ c.....totalizing in MGD for entire model area
 
       if(m.eq.12)then
 c.........write all 12 months for all 4 methods to one file
-c		write(35,4000)poly,(rf(k),fog(k),wirr(k),ro(k),ae1(k),
-c	1	rc1(k),ae2(k),rc2(k),ae3(k),rc3(k),ae4(k),rc4(k),k=1,12)
+c    write(35,4000)poly,(rf(k),fog(k),wirr(k),ro(k),ae1(k),
+c  1  rc1(k),ae2(k),rc2(k),ae3(k),rc3(k),ae4(k),rc4(k),k=1,12)
 c.........write all 12 months for FAO method only to one file
       write(36,5000)poly,(rf(k),fog(k),wirr(k),ro(k),
      1  ae2(k),rc2(k),pnet(k),cint(k),septic(k),sdrn(k),k=1,12)
@@ -3353,7 +3359,7 @@ c.........write annual mean values for each polygon to one file (FAO method)
 
       itest=2
       goto 100
-200	  continue
+200    continue
 
       write(38,7000)janrf,janfog,janirr,janro,janae,janrc,janpnet,
      1     jancint,jansep,jansd,
@@ -3383,11 +3389,11 @@ c.........write annual mean values for each polygon to one file (FAO method)
       write(40,9000)vtotrf,vtotfog,vtotirr,vtotro,vtotae,vtotrc,
      1     vtotdirect,vtotpnet,vtotcint,vtotrfadj,vtotseptic,vtotsdrn
 
-1000	format('Poly_ID   Rain     Fog     Irr   Runoff    AE1     RC1',
+1000  format('Poly_ID   Rain     Fog     Irr   Runoff    AE1     RC1',
      1'     AE2     RC2     AE3     RC3     AE4     RC4')
-2000	format(i6,2x,12(f7.3,1x))
+2000  format(i6,2x,12(f7.3,1x))
 
-3000	format('Poly ID  1Rain    1Fog    1Irr  1Runoff   1AE1    1RC1',
+3000  format('Poly ID  1Rain    1Fog    1Irr  1Runoff   1AE1    1RC1',
      1'    1AE2    1RC2    1AE3    1RC3    1AE4    1RC4',
      2'   2Rain    2Fog    2Irr  2Runoff   2AE1    2RC1',
      3'    2AE2    2RC2    2AE3    2RC3    2AE4    2RC4',
@@ -3400,7 +3406,7 @@ c.........write annual mean values for each polygon to one file (FAO method)
      2'   6Rain    6Fog    6Irr  6Runoff   6AE1    6RC1',
      3'    6AE2    6RC2    6AE3    6RC3    6AE4    6RC4',
      2'   7Rain    7Fog    7Irr  7Runoff   7AE1    7RC1',
-     3'    7AE2	   7RC2    7AE3    7RC3    7AE4    7RC4',
+     3'    7AE2     7RC2    7AE3    7RC3    7AE4    7RC4',
      2'   8Rain    8Fog    8Irr  8Runoff   8AE1    8RC1',
      3'    8AE2    8RC2    8AE3    8RC3    8AE4    8RC4',
      2'   9Rain    9Fog    9Irr  9Runoff   9AE1    9RC1',
@@ -3439,8 +3445,8 @@ c.........write annual mean values for each polygon to one file (FAO method)
      1       '     Rech    DirRC     PNet   CanInt    RFAdj   Septic',
      2       '   SDrain')
 
-4000	format(i6,2x,144(f7.3,1x))
-5000	format(i6,',',120(f7.3,','))
+4000  format(i6,2x,144(f7.3,1x))
+5000  format(i6,',',120(f7.3,','))
 6000  format(i6,',',12(f10.3,','))
 7000  format(12(10(f9.3,1x),/))
 9000  format(12(f8.2,1x))

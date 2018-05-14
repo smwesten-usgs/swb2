@@ -274,11 +274,13 @@ module model_domain
     integer (kind=c_int) :: unitnum
     integer (kind=c_int) :: col
     integer (kind=c_int) :: row
+    real (kind=c_float)  :: x_coord
+    real (kind=c_float)  :: y_coord
     integer (kind=c_int) :: indx_start
     integer (kind=c_int) :: indx_end
   end type CELL_COL_ROW_T
 
-  type ( CELL_COL_ROW_T ) :: DUMP(5)
+  type ( CELL_COL_ROW_T ) :: DUMP(10)
 
   ! array method: designed to be called using whole-array notation
   abstract interface
@@ -1406,6 +1408,7 @@ contains
     elseif ( sCmdText .containssimilar. "DUMP_VARIABLES" ) then
 
         row = 0; col = 0; indx_start = 0; indx_end = 0
+        xcoord=99999.; ycoord=99999.
 
         this%dump_variables => model_dump_variables_by_cell
 
@@ -1425,6 +1428,8 @@ contains
 
           col = asInt( argv_list%get(1) )
           row = asInt( argv_list%get(2) )
+          xcoord = grid_GetGridX( this%pGrdOut, col )
+          ycoord = grid_GetGridY( this%pGrdOut, row )
 
         else
 
@@ -1444,12 +1449,15 @@ contains
             DUMP( indx )%row = row
             DUMP( indx )%indx_start = indx_start
             DUMP( indx )%indx_end   = indx_end
+            DUMP( indx )%x_coord = xcoord
+            DUMP( indx )%y_coord = ycoord
 
             if ( ( col > 0 ) .and. ( row > 0 ) ) then
               call LOGS%WRITE( "==> SWB will dump variables for cell ("//asCharacter(col)//","     &
                 //asCharacter(row)//").", iLogLevel = LOG_ALL, lEcho = lFALSE )
                 filename = "SWB2_variable_values__col_"//asCharacter( col )//"__row_"              &
-                           //asCharacter( row )//".csv"
+                           //asCharacter( row )//"__x_"//asCharacter(asInt(xcoord))                &
+                           //"__y_"//asCharacter(asInt(ycoord))//".csv"
 
             else
               call LOGS%WRITE( "==> SWB will dump variables for cell indices ranging from "        &
