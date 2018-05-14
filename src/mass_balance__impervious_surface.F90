@@ -21,6 +21,7 @@ contains
                                           storm_drain_capture_fraction, &
    	                                      rainfall,                     &
    	                                      snowmelt,                     &
+                                          runon,                        &
                                           runoff,                       &
                                           fog,                          &
                                           interception,                 &
@@ -35,6 +36,7 @@ contains
     real (kind=c_float), intent(in)         :: surface_storage_max
     real (kind=c_float), intent(in)         :: rainfall
     real (kind=c_float), intent(in)         :: snowmelt
+    real (kind=c_float), intent(in)         :: runon
     real (kind=c_float), intent(in)         :: runoff
     real (kind=c_float), intent(in)         :: fog
     real (kind=c_float), intent(in)         :: interception
@@ -43,26 +45,32 @@ contains
 
     ! [ LOCALS ]
     real (kind=c_float) :: paved_to_unpaved   ! 'wadd' in HWB
+    real (kind=c_float) :: impervious_fraction
+    real (kind=c_float) :: surface_storage_
 
 !    if ( storm_drain_capture_fraction >= 0.0_c_float ) then
     if ( surface_storage_max > NEAR_ZERO ) then
 
-      surface_storage = surface_storage               &
-                        + rainfall                    &
-                        + fog                         &
-                        + snowmelt                    &
-                        - interception                &
+      impervious_fraction = 1.0_c_float - pervious_fraction
+
+      surface_storage = surface_storage                                        &
+                        + rainfall                                             &
+                        + fog                                                  &
+                        + snowmelt                                             &
+                        - interception                                         &
                         - runoff
+
+      ! **amount is reduced proportional to amount of impervious surface present**
+      surface_storage_excess = max( 0.0_c_float,                               &
+                             ( surface_storage - surface_storage_max )         &
+                              * impervious_fraction                       )
 
       surface_storage = min( surface_storage, surface_storage_max )
 
-      ! amount is reduced proportional to amount of impervious surface present
-      paved_to_unpaved = max( 0.0_c_float,                                     &
-                             ( surface_storage - surface_storage_max )         &
-                              * ( 1.0_c_float - pervious_fraction)      )
-      storm_drain_capture = paved_to_unpaved * storm_drain_capture_fraction
-      surface_storage_excess = max( 0.0_c_float,                               &
-                                    paved_to_unpaved - storm_drain_capture )
+      storm_drain_capture = surface_storage_excess * storm_drain_capture_fraction
+
+      paved_to_unpaved = max( 0.0_c_float,                                         &
+                                    surface_storage_excess - storm_drain_capture )
 
       ! now allow for evaporation
       actual_et_impervious = min( reference_et0, surface_storage )
@@ -74,6 +82,7 @@ contains
       surface_storage = 0.0_c_float
       storm_drain_capture = 0.0_c_float
       surface_storage_excess = 0.0_c_float
+      actual_et_impervious = 0.0_c_float
 
     endif
 

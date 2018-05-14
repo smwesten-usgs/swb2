@@ -7,6 +7,7 @@ module storm_drain_capture
   use data_catalog
   use data_catalog_entry
   use datetime, only                 : DATETIME_T
+  use grid, only                     : grid_WriteArcGrid
   use logfiles, only                 : LOGS, LOG_ALL
   use exceptions, only               : warn, assert
   use parameters, only               : PARAMS
@@ -138,8 +139,11 @@ contains
 
         if ( associated( pSTORM_DRAIN_CAPTURE_FRACTION ) ) then
           call pSTORM_DRAIN_CAPTURE_FRACTION%getvalues( iMonth, iDay, iYear, iJulianDay )
-          if ( pSTORM_DRAIN_CAPTURE_FRACTION%lGridHasChanged )                     &
+          if ( pSTORM_DRAIN_CAPTURE_FRACTION%lGridHasChanged ) then
             STORM_DRAIN_CAPTURE_FRACTION = pack( pSTORM_DRAIN_CAPTURE_FRACTION%pGrdBase%rData, is_cell_active )
+            call grid_WriteArcGrid("Storm_drain_capture_fraction__as_read_into_SWB.asc", &
+              pSTORM_DRAIN_CAPTURE_FRACTION%pGrdBase )
+          endif
         endif
 
         DATE_OF_LAST_RETRIEVAL = SIM_DT%curr

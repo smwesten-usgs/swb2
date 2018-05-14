@@ -33,6 +33,7 @@ contains
     ! [ LOCALS ]
     real (kind=c_float) :: new_soil_storage
 
+    ! all of these entities have been previously corrected for pervious fraction
     new_soil_storage = soil_storage + infiltration - actual_et_soil
 
     ! open water cell

@@ -134,6 +134,7 @@ contains
         ! this can happen when using the monthly runoff fraction method
         !runoff = max( min( inflow, runoff ), 0.0_c_float )
 
+        ! this routine now generates *all* outputs CORRECTED FOR PERVIOUS AREA
         call calculate_impervious_surface_mass_balance(                                         &
           surface_storage=surface_storage,                                                      &
           actual_et_impervious=actual_et_impervious,                                            &
@@ -143,6 +144,7 @@ contains
           storm_drain_capture_fraction=storm_drain_capture_fraction,                            &
           rainfall=rainfall,                                                                    &
           snowmelt=snowmelt,                                                                    &
+          runon=runon,                                                                          &
           runoff=runoff,                                                                        &
           fog=fog,                                                                              &
           interception=interception,                                                            &
@@ -160,16 +162,16 @@ contains
 
         ! irrigation not considered to be a contributor to runoff...in addition, infiltration
         ! term is calculated with respect to the pervious fraction of the cell
-        infiltration = max( 0.0_c_float,                                                                &
-                            runon                                                                       &
-                            + rainfall                                                                  &
-                            + fog                                                                       &
-                            + surface_storage_excess                                                    &
-                            + snowmelt                                                                  &
-                            - interception                                                              &
-                            + irrigation                                                                &
-                            + direct_soil_moisture                                                      &
-                            - runoff )
+        infiltration = max( 0.0_c_float,                                       &
+                             ( ( runon                                         &
+                            + rainfall                                         &
+                            + fog                                              &
+                            + snowmelt                                         &
+                            - interception                                     &
+                            + irrigation                                       &
+                            + direct_soil_moisture                             &
+                            - runoff ) * pervious_fraction                     &
+                            + surface_storage_excess ) / pervious_fraction )
 
         ! the following call updates bound variable actual_et_soil
         call cells%calc_actual_et( indx )
@@ -185,21 +187,20 @@ contains
     ! !                      + cells%actual_et_interception * cells%canopy_cover_fraction             &
     !                       + actual_et_impervious * ( 1.0_c_float - pervious_fraction )
 
-        call calculate_soil_mass_balance( net_infiltration=net_infiltration,           &
-                                          soil_storage=soil_storage,                   &
-                                          soil_storage_max=soil_storage_max,           &
-                                          delta_soil_storage=delta_soil_storage,       &
-                                          actual_et_soil=actual_et_soil,               &
-                                          reference_et0=reference_et0,                 &
-                                          infiltration=infiltration,                   &
+        call calculate_soil_mass_balance( net_infiltration=net_infiltration,             &
+                                          soil_storage=soil_storage,                     &
+                                          soil_storage_max=soil_storage_max,             &
+                                          delta_soil_storage=delta_soil_storage,         &
+                                          actual_et_soil=actual_et_soil,                 &
+                                          reference_et0=reference_et0,                   &
+                                          infiltration=infiltration,                     &
                                           runoff=runoff )
 
         ! actual et for the entire cell is the weighted average of the ET for pervious and impervious
         ! fractions of the cell
-        actual_et = actual_et_soil * pervious_fraction                            &
+        actual_et = actual_et_soil * pervious_fraction                              &
+                   + actual_et_impervious * ( 1.0_c_float - pervious_fraction )
     !                      + cells%actual_et_interception * cells%canopy_cover_fraction             &
-                          + actual_et_impervious * ( 1.0_c_float - pervious_fraction )
-
 
         if ( runoff < 0.)                                                                               &
           call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
@@ -214,6 +215,7 @@ contains
         ! modify net_infiltration and irrigation terms
 
         net_infiltration = net_infiltration * pervious_fraction + direct_net_infiltration
+!        net_infiltration = net_infiltration + direct_net_infiltration
 
         if ( runoff < 0.)                                                                               &
           call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &

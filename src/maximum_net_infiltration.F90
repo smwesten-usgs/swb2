@@ -191,7 +191,9 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  elemental subroutine maximum_net_infiltration_calculate( net_infiltration, rejected_net_infiltration, indx )
+  elemental subroutine maximum_net_infiltration_calculate( net_infiltration,    &
+                                               rejected_net_infiltration,       &
+                                               indx )
 
     real ( kind=c_float), intent(inout)  :: net_infiltration
     real (kind=c_float), intent(inout)   :: rejected_net_infiltration

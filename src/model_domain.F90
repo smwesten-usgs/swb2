@@ -2403,9 +2403,8 @@ contains
       rX0=this%X_ll, rY0=this%Y_ll, &
       rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_REAL )
 
-
-    call awc_gridded_values_initialize( lActive=this%active,  &
-                                        fAWC=this%awc )
+    call awc_gridded_values_initialize( lActive=this%active, &
+                                        fAWC=this%awc           )
 
     pTempGrd%rData = unpack( this%awc, this%active, this%nodata_fill_value )
 
@@ -3008,7 +3007,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     integer ( kind=c_int ), intent(in)     :: indx
 
-    call maximum_net_infiltration_calculate( net_infiltration = this%net_infiltration( indx ),                    &
+    call maximum_net_infiltration_calculate( net_infiltration = this%net_infiltration( indx ),                      &
                                                rejected_net_infiltration = this%rejected_net_infiltration( indx ),  &
                                                indx=indx )
 
