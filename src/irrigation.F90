@@ -232,12 +232,12 @@ contains
     if ( sl_irrigation_days%countmatching("<NA>") == 0 ) then
 
       where ( NUM_DAYS_OF_IRRIGATION == 0 )
-        NUM_DAYS_OF_IRRIGATION = 9999
+        NUM_DAYS_OF_IRRIGATION = 999999
       end where
 
     else
 
-      NUM_DAYS_OF_IRRIGATION = 9999
+      NUM_DAYS_OF_IRRIGATION = 999999
 
     endif
 
