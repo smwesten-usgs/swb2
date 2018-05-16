@@ -448,9 +448,9 @@ c........select fragments to use for current simulation
 
 c........compute water budget by polygon for desired number of years
 
-!         do 200 j=1,npoly
-          do 200 jndx=1,ubound(target_polys,1)
-            j=target_polys(jndx)
+         do 200 j=1,npoly
+!          do 200 jndx=1,ubound(target_polys,1)
+!            j=target_polys(jndx)
             call rech(i,j,zrf,zfd,zir,zro,ae1,rc1,
      1        ae2,rc2,ae3,rc3,ae4,rc4,direct,zpnet,zcanint,zrfadj,
      2        zseptic,zsd)

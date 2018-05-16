@@ -138,7 +138,7 @@ contains
         call calculate_impervious_surface_mass_balance(                                         &
           surface_storage=surface_storage,                                                      &
           actual_et_impervious=actual_et_impervious,                                            &
-          surface_storage_excess=surface_storage_excess,                                        &
+          paved_to_unpaved=surface_storage_excess,                                              &
           surface_storage_max=surface_storage_max,                                              &
           storm_drain_capture=storm_drain_capture,                                              &
           storm_drain_capture_fraction=storm_drain_capture_fraction,                            &

@@ -15,7 +15,7 @@ contains
    elemental subroutine calculate_impervious_surface_mass_balance(      &
                                           surface_storage,              &
                                           actual_et_impervious,         &
-   	                                      surface_storage_excess,       &
+   	                                      paved_to_unpaved,             &
    	                                      surface_storage_max,          &
                                           storm_drain_capture,          &
                                           storm_drain_capture_fraction, &
@@ -30,7 +30,7 @@ contains
 
     real (kind=c_float), intent(inout)      :: surface_storage
     real (kind=c_float), intent(inout)      :: actual_et_impervious
-    real (kind=c_float), intent(inout)      :: surface_storage_excess
+    real (kind=c_float), intent(inout)      :: paved_to_unpaved           ! 'wadd' in HWB
     real (kind=c_float), intent(inout)      :: storm_drain_capture
     real (kind=c_float), intent(in)         :: storm_drain_capture_fraction
     real (kind=c_float), intent(in)         :: surface_storage_max
@@ -44,47 +44,46 @@ contains
     real (kind=c_float), intent(in)         :: pervious_fraction
 
     ! [ LOCALS ]
-    real (kind=c_float) :: paved_to_unpaved   ! 'wadd' in HWB
+    real (kind=c_float) :: surface_storage_excess
     real (kind=c_float) :: impervious_fraction
     real (kind=c_float) :: surface_storage_
 
 !    if ( storm_drain_capture_fraction >= 0.0_c_float ) then
-    if ( surface_storage_max > NEAR_ZERO ) then
 
-      impervious_fraction = 1.0_c_float - pervious_fraction
 
-      surface_storage = surface_storage                                        &
-                        + rainfall                                             &
-                        + fog                                                  &
-                        + snowmelt                                             &
-                        - interception                                         &
-                        - runoff
+    ! NOTE: removed this conditional 16 May 2018: it appears that
+    !       testing of this sort will underrepresent water in a cell
+    !       because although the surface storage may be zero, the
+    !       fraction impervious area may be nonzero and therefore will
+    !       intercept water that should be shunted to the pervious area of
+    !       the cell.
 
-      ! **amount is reduced proportional to amount of impervious surface present**
-      surface_storage_excess = max( 0.0_c_float,                               &
-                             ( surface_storage - surface_storage_max )         &
-                              * impervious_fraction                       )
+!    if ( surface_storage_max > NEAR_ZERO ) then
 
-      surface_storage = min( surface_storage, surface_storage_max )
+    impervious_fraction = 1.0_c_float - pervious_fraction
 
-      storm_drain_capture = surface_storage_excess * storm_drain_capture_fraction
+    surface_storage = surface_storage                                        &
+                      + rainfall                                             &
+                      + fog                                                  &
+                      + snowmelt                                             &
+                      - interception                                         &
+                      - runoff
 
-      paved_to_unpaved = max( 0.0_c_float,                                         &
-                                    surface_storage_excess - storm_drain_capture )
+    ! **amount is reduced proportional to amount of impervious surface present**
+    surface_storage_excess = max( 0.0_c_float,                               &
+                           ( surface_storage - surface_storage_max )         &
+                            * impervious_fraction )
 
-      ! now allow for evaporation
-      actual_et_impervious = min( reference_et0, surface_storage )
-      surface_storage = max( surface_storage - actual_et_impervious, 0.0_c_float )
+    surface_storage = min( surface_storage, surface_storage_max )
 
-    else
+    storm_drain_capture = surface_storage_excess * storm_drain_capture_fraction
 
-      ! no surface storage capacity; assume no impervious surface calcs desired
-      surface_storage = 0.0_c_float
-      storm_drain_capture = 0.0_c_float
-      surface_storage_excess = 0.0_c_float
-      actual_et_impervious = 0.0_c_float
+    paved_to_unpaved = max( 0.0_c_float,                                         &
+                                  surface_storage_excess - storm_drain_capture )
 
-    endif
+    ! now allow for evaporation
+    actual_et_impervious = min( reference_et0, surface_storage )
+    surface_storage = max( surface_storage - actual_et_impervious, 0.0_c_float )
 
   end subroutine calculate_impervious_surface_mass_balance
 
