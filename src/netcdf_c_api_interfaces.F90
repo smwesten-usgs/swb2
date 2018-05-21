@@ -43,7 +43,8 @@ module netcdf_c_api_interfaces
 
   implicit none
 
-!  integer, parameter :: c_ptrdiff_t = 8
+  integer, parameter :: c_ptrdiff_t = 8
+  integer, parameter :: c_diff_t = 8
 
   interface
     function nc_create(path, cmode, ncidp) bind(c)

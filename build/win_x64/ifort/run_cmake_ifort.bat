@@ -29,14 +29,14 @@ for /f "delims=" %%x in ('where /R "c:\Program Files" netcdf.lib') do call set L
 ::for /f %%x in ('dir /b /s c:\Program Files (x86)\*intel64_win*libifcorert.lib') do call set LIB_GFORTRAN=%%x
 
 :: substitute forward slash for backward slash
-set LIB_HDF5_HL=%LIB_HDF5_HL:\=/%
-set LIB_HDF5=%LIB_HDF5:\=/%
-set LIB_NETCDF=%LIB_NETCDF:\=/%
-set LIB_GCC=
-set LIB_GFORTRAN=
-set LIB_Z=%LIB_Z:\=/%
-set LIB_DL=
-set LIB_SZ=
+::set LIB_HDF5_HL=%LIB_HDF5_HL:\=/%
+::set LIB_HDF5=%LIB_HDF5:\=/%
+::set LIB_NETCDF=%LIB_NETCDF:\=/%
+::set LIB_GCC=
+::set LIB_GFORTRAN=
+::set LIB_Z=%LIB_Z:\=/%
+::set LIB_DL=
+::set LIB_SZ=
 
 echo NetCDF library: %LIB_NETCDF%
 echo HDF5 library: %LIB_HDF5%
@@ -44,7 +44,7 @@ echo HDF5_HL library: %LIB_HDF5_HL%
 
 
 :: define where 'make copy' will place executables
-set INSTALL_PREFIX=d:/DOS
+set INSTALL_PREFIX=d:\DOS
 
 :: define other variables for use in the CMakeList.txt file
 :: options are "Release", "Profile" or "Debug"
@@ -55,25 +55,19 @@ set SYSTEM_TYPE="win_x64"
 
 :: define platform and compiler specific compilation flags
 set CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -cpp -fcheck=all -fstack-usage -fexceptions -ffree-line-length-none -static -static-libgcc -static-libgfortran"
-set CMAKE_Fortran_FLAGS_RELEASE="-O2 -cpp -ffree-line-length-none -static -static-libgcc -static-libgfortran"
-set CMAKE_Fortran_FLAGS_PROFILE="-O2 -pg -g -cpp -fno-omit-frame-pointer -DNDEBUG -fno-inline-functions -fno-inline-functions-called-once -fno-optimize-sibling-calls -ffree-line-length-none -static -static-libgcc -static-libgfortran"
-::set CMAKE_Fortran_FLAGS_RELEASE="-O3 -mtune=native -fopenmp -flto -ffree-line-length-none -static-libgcc -static-libgfortran -DCURL_STATICLIB"
+set CMAKE_Fortran_FLAGS_RELEASE="/O2 /QxHost /static /fpp"
 
-:: invoke CMake; add --trace to see copious details re: CMAKE
-:: for %%f in ( "Visual Studio 15 2017" "NMake Makefiles" ) do ^
+echo "Running CMake..."
 cmake ..\..\.. -G "NMake Makefiles" ^
 -DCMAKE_Fortran_COMPILER=%Fortran_COMPILER_NAME% ^
 -DCMAKE_C_COMPILER=%CMAKE_C_COMPILER% ^
 -DSWB_EXECUTABLE=%SWB_EXECUTABLE%      ^
--DLIB_HDF5_HL=%LIB_HDF5_HL%     ^
--DLIB_HDF5=%LIB_HDF5%           ^
+-DLIB_HDF5_HL="%LIB_HDF5_HL%"   ^
+-DLIB_HDF5="%LIB_HDF5%"         ^
 -DLIB_SZ=%LIB_SZ%               ^
--DLIB_Z=%LIB_Z%                 ^
--DLIB_DL=%LIB_DL%               ^
--DLIB_NETCDF=%LIB_NETCDF%       ^
--DLIB_GCC=%LIB_GCC%             ^
--DLIB_GFORTRAN=%LIB_GFORTRAN%   ^
--DR_SCRIPT="%R_SCRIPT%"           ^
+-DLIB_Z="%LIB_Z%"               ^
+-DLIB_NETCDF="%LIB_NETCDF%"     ^
+-DR_SCRIPT=%R_SCRIPT%           ^
 -DCMAKE_EXE_LINKER_FLAGS=%LINKER_FLAGS%  ^
 -DSYSTEM_TYPE=%SYSTEM_TYPE%  ^
 -DCMAKE_BUILD_TYPE=%BUILD_TYPE%  ^

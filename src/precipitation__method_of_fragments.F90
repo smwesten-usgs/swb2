@@ -556,6 +556,7 @@ contains
 
       if ( lShuffle ) then
 
+        ! update the module variable RANDOM_VALUES
         call update_random_values()
 
         iStartRecord = FRAGMENTS_SETS( iIndex )%iStartRecord(iMonth)

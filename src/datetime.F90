@@ -491,7 +491,7 @@ end subroutine calc_julian_day_sub
 
 !--------------------------------------------------------------------------
 
-elemental subroutine calc_gregorian_date_sub(this)
+ subroutine calc_gregorian_date_sub(this)
 
   class (DATETIME_T), intent(inout) :: this
 
@@ -559,7 +559,7 @@ end subroutine calc_gregorian_date_sub
 !
 ! SOURCE
 
-elemental subroutine gregorian_date(iJD, iYear, iMonth, iDay, iOrigin)
+ subroutine gregorian_date(iJD, iYear, iMonth, iDay, iOrigin)
 
 !! COMPUTES THE GREGORIAN CALENDAR DATE (YEAR,MONTH,DAY)
 !! GIVEN THE JULIAN DATE (JD).
@@ -670,7 +670,7 @@ end function julian_day
 
 !------------------------------------------------------------------------------
 
- elemental function is_date_greater_than(date1, date2)   result(lResult)
+  function is_date_greater_than(date1, date2)   result(lResult)
 
   type(DATETIME_T), intent(in) :: date1
   type(DATETIME_T), intent(in) :: date2
@@ -693,7 +693,7 @@ end function is_date_greater_than
 
 !------------------------------------------------------------------------------
 
-elemental function is_date_less_than(date1, date2)   result(lResult)
+ function is_date_less_than(date1, date2)   result(lResult)
 
   class(DATETIME_T), intent(in) :: date1
   class(DATETIME_T), intent(in) :: date2
@@ -716,7 +716,7 @@ end function is_date_less_than
 
 !------------------------------------------------------------------------------
 
-elemental function is_date_LT_or_equal_to(date1, date2)   result(lResult)
+ function is_date_LT_or_equal_to(date1, date2)   result(lResult)
 
   class ( DATETIME_T ), intent(in) :: date1
   type ( DATETIME_T ), intent(in) :: date2
@@ -732,7 +732,7 @@ end function is_date_LT_or_equal_to
 
 !------------------------------------------------------------------------------
 
-elemental function is_date_GT_or_equal_to(date1, date2)   result(lResult)
+ function is_date_GT_or_equal_to(date1, date2)   result(lResult)
 
   class ( DATETIME_T), intent(in) :: date1
   type ( DATETIME_T), intent(in) :: date2
@@ -748,7 +748,7 @@ end function is_date_GT_or_equal_to
 
 !------------------------------------------------------------------------------
 
-elemental function is_date_equal_to(date1, date2)   result(lResult)
+ function is_date_equal_to(date1, date2)   result(lResult)
 
   class(DATETIME_T), intent(in) :: date1
   class(DATETIME_T), intent(in) :: date2
@@ -790,7 +790,7 @@ end subroutine assign_value_to_sub
 
 !------------------------------------------------------------------------------
 
-elemental function date_minus_date_fn(date1, date2)  result(rDelta)
+ function date_minus_date_fn(date1, date2)  result(rDelta)
 
   class(DATETIME_T), intent(in) :: date1
   class(DATETIME_T), intent(in) :: date2
@@ -802,7 +802,7 @@ end function date_minus_date_fn
 
 !------------------------------------------------------------------------------
 
-elemental function date_plus_float_fn(date1, fValue)  result(newdate)
+ function date_plus_float_fn(date1, fValue)  result(newdate)
 
   class(DATETIME_T), intent(in)   :: date1
   real (kind=c_float), intent(in) :: fValue
@@ -816,7 +816,7 @@ end function date_plus_float_fn
 
 !------------------------------------------------------------------------------
 
-elemental function date_minus_float_fn(date1, fValue)  result(newdate)
+ function date_minus_float_fn(date1, fValue)  result(newdate)
 
   class(DATETIME_T), intent(in)   :: date1
   real (kind=c_float), intent(in) :: fValue
@@ -830,7 +830,7 @@ end function date_minus_float_fn
 
 !-------------------------------------------------------------------------------
 
-elemental function date_minus_int_fn(date1, iValue)  result(newdate)
+ function date_minus_int_fn(date1, iValue)  result(newdate)
 
   class(DATETIME_T), intent(in)    :: date1
   integer (kind=c_int), intent(in) :: iValue
@@ -1082,7 +1082,7 @@ end subroutine system_time_to_date_sub
 
 !------------------------------------------------------------------------------
 
-elemental subroutine set_julian_date_sub(this, dValue)
+ subroutine set_julian_date_sub(this, dValue)
 
   class (DATETIME_T), intent(inout)      :: this
   real (kind=c_double), intent(out)   :: dValue
@@ -1095,7 +1095,7 @@ end subroutine set_julian_date_sub
 
 !------------------------------------------------------------------------------
 
-elemental function get_julian_day_fn(this)                   result(iJulianDay)
+ function get_julian_day_fn(this)                   result(iJulianDay)
 
   class(DATETIME_T), intent(in)    :: this
   integer (kind=c_int)             :: iJulianDay
@@ -1106,7 +1106,7 @@ end function get_julian_day_fn
 
 !------------------------------------------------------------------------------
 
-elemental function get_fraction_of_day_fn(this)           result(dFractionOfDay)
+ function get_fraction_of_day_fn(this)           result(dFractionOfDay)
 
   class(DATETIME_T), intent(in)      :: this
   real (kind=c_double)               :: dFractionOfDay
