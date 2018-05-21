@@ -9,7 +9,7 @@ rm -f CPack*
 rm -f *.txt
 
 export GCC_VERSION=6.4.0_2
-export NETCDF_VERSION=4.6.0
+export NETCDF_VERSION=4.6.1_2
 export LIBSZ_VERSION=2.1.1_1
 # set CMAKE-related and build-related variables
 export GCCLIST=$( glocate gcc-6 | grep Cellar | grep bin | grep $GCC_VERSION )

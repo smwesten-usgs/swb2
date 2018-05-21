@@ -317,7 +317,7 @@ c                   i=1,nsoil; j=1,nseq(i); l=1,nlay(i,j)
       dimension idemsup(20),supirr(20),rmltirr(20),effirr(20),
      1          irrday(20,31),nirrdays(20,12),irrsug(50000)
 
-      integer target_polys(9)
+      integer target_polys(12)
 
 c      lc    polygon    storm_drain    swb-hwb
 c      8    36798    no    negative
@@ -327,8 +327,8 @@ c      10    24397    no    negative
 c      10    268541    yes    positive
       ! natural forest, corn, golf course, diverse ag
 c      data target_polys/60515,63533,277684,336981,339872,342876,353812,345298/
-      data target_polys/60515,63533,277684,336981,36798,21336,278558,24397,268541/
-
+      data target_polys/60515,63533,277684,336981,36798,21336,278558,24397,
+     1   268541,300751,216547,107336/
       data idays/31,28,31,30,31,30,31,31,30,31,30,31/
 
       common /consti/nsim,nyrs,ndirr,ndunirr,ndfallow,id1,irfweights,
@@ -1823,7 +1823,7 @@ c    pan coefficient is not temporally variable
       character*256 temp_string
       real daily_aet2
       real daily_rc2
-      integer target_polys(9)
+      integer target_polys(12)
 
       common /consti/nsim,nyrs,ndirr,ndunirr,ndfallow,id1,irfweights,
      1    nddrip,iddrip,ndfurrow,idfurrow,ndsug,istartyr,iendyr,nilusug,

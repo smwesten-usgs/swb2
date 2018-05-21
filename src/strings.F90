@@ -249,7 +249,7 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-  elemental function is_char_equal_to_char_case_sensitive_fn(sText1, sText2)   result(lBool)
+   function is_char_equal_to_char_case_sensitive_fn(sText1, sText2)   result(lBool)
 
     character (len=*), intent(in)      :: sText1
     character (len=*), intent(in)      :: sText2
@@ -270,7 +270,7 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-  elemental function is_char_equal_to_char_case_insensitive_fn(sText1, sText2)   result(lBool)
+   function is_char_equal_to_char_case_insensitive_fn(sText1, sText2)   result(lBool)
 
     character (len=*), intent(in)      :: sText1
     character (len=*), intent(in)      :: sText2
@@ -339,7 +339,7 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-  elemental function short_to_char_fn(iValue)    result(sText)
+  function short_to_char_fn(iValue)    result(sText)
 
     integer (kind=c_short), intent(in)  :: iValue
     character (len=:), allocatable    :: sText
@@ -360,7 +360,7 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-  elemental function int_to_char_fn(iValue)    result(sText)
+   function int_to_char_fn(iValue)    result(sText)
 
     integer (kind=c_int), intent(in)  :: iValue
     character (len=:), allocatable    :: sText
@@ -381,7 +381,7 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-  elemental function long_long_to_char_fn(iValue)    result(sText)
+   function long_long_to_char_fn(iValue)    result(sText)
 
     integer (kind=c_long_long), intent(in)  :: iValue
     character (len=:), allocatable          :: sText
@@ -402,7 +402,7 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-  elemental function float_to_char_fn(fValue, iFieldWidth, iNumdigits)    result(sText)
+   function float_to_char_fn(fValue, iFieldWidth, iNumdigits)    result(sText)
 
     real (kind=c_float), intent(in)             :: fValue
     integer (kind=c_int), intent(in), optional  :: iFieldWidth
@@ -436,7 +436,7 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-  elemental function double_to_char_fn(dValue, iNumdigits)    result(sText)
+   function double_to_char_fn(dValue, iNumdigits)    result(sText)
 
     real (kind=c_double), intent(in)             :: dValue
     integer (kind=c_int), intent(in), optional  :: iNumdigits
@@ -465,7 +465,7 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-  elemental function logical_to_char_fn(lValue)    result(sText)
+   function logical_to_char_fn(lValue)    result(sText)
 
     logical (kind=c_bool), intent(in)    :: lValue
     character (len=:), allocatable       :: sText
@@ -480,7 +480,7 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-  elemental function squote_char_fn(sText1)    result(sText)
+   function squote_char_fn(sText1)    result(sText)
 
     character (len=*), intent(in)         :: sText1
     character (len=:), allocatable        :: sText
@@ -491,7 +491,7 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-  elemental function dquote_char_fn(sText1)    result(sText)
+   function dquote_char_fn(sText1)    result(sText)
 
     character (len=*), intent(in)         :: sText1
     character (len=:), allocatable        :: sText
@@ -502,7 +502,7 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-  elemental function char_to_uppercase_fn ( s )                    result(sText)
+   function char_to_uppercase_fn ( s )                    result(sText)
 
     ! ARGUMENTS
     character (len=*), intent(in) :: s
@@ -528,7 +528,7 @@ contains
 
   !--------------------------------------------------------------------------
 
-  elemental function char_to_lowercase_fn ( s )                               result(sText)
+   function char_to_lowercase_fn ( s )                               result(sText)
 
     ! ARGUMENTS
     character (len=*), intent(in) :: s
@@ -552,7 +552,7 @@ contains
   end function char_to_lowercase_fn
 
 
-  elemental subroutine char_to_uppercase_sub ( s )
+   subroutine char_to_uppercase_sub ( s )
 
     ! ARGUMENTS
     character (len=*), intent(inout) :: s
@@ -572,7 +572,7 @@ contains
   end subroutine char_to_uppercase_sub
 
 
-  elemental subroutine char_to_lowercase_sub ( s )
+   subroutine char_to_lowercase_sub ( s )
 
     ! ARGUMENTS
     character (len=*), intent(inout) :: s
@@ -604,7 +604,7 @@ contains
   !!
   !! Remove unwanted characters from a text string. The target characters may optionally be supplied.
   !! @param[in] sTextIn
-  function clean(sText1, sTargetCharacters)            result(sText)
+  impure function remove_multiple_characters_fn(sText1, sTargetCharacters)            result(sText)
 
     ! ARGUMENTS
     character (len=*), intent(inout)           :: sText1
@@ -641,7 +641,7 @@ contains
 
     sText = trim(sBuf)
 
-  end function clean
+  end function remove_multiple_characters_fn
 
   !--------------------------------------------------------------------------------------------------
 
@@ -810,42 +810,42 @@ contains
   end subroutine replace_character_sub
 
   !--------------------------------------------------------------------------------------------------
-
-  function remove_multiple_characters_fn(sText, sDelimiters)                result(sText1)
-
-    ! ARGUMENTS
-    character (len=*), intent(inout)           :: sText
-    character (len=*), intent(in), optional    :: sDelimiters
-    character (len=:), allocatable             :: sText1
-
-    ! LOCALS
-    character ( len=len_trim(sText) ) :: sTemp
-    integer (kind=c_int) :: iR                 ! Index in sRecord
-    integer (kind=c_int) :: i, j
-
-    ! eliminate any leading spaces
-    sText = adjustl(sText)
-    sTemp = ""
-    j = 0
-
-    do i = 1,len_trim(sText)
-
-      if(present(sDelimiters)) then
-        iR = scan(sText(i:i), sDelimiters)
-      else
-        iR = scan(sText(i:i),":/;,")
-      endif
-
-      if(iR==0) then
-        j = j + 1
-        sTemp(j:j) = sText(i:i)
-      end if
-
-    enddo
-
-    sText1 = trim(sTemp)
-
-  end function remove_multiple_characters_fn
+  !
+  ! function remove_multiple_characters_fn(sText, sDelimiters)                result(sText1)
+  !
+  !   ! ARGUMENTS
+  !   character (len=*), intent(inout)           :: sText
+  !   character (len=*), intent(in), optional    :: sDelimiters
+  !   character (len=:), allocatable             :: sText1
+  !
+  !   ! LOCALS
+  !   character ( len=len_trim(sText) ) :: sTemp
+  !   integer (kind=c_int) :: iR                 ! Index in sRecord
+  !   integer (kind=c_int) :: i, j
+  !
+  !   ! eliminate any leading spaces
+  !   sText = adjustl(sText)
+  !   sTemp = ""
+  !   j = 0
+  !
+  !   do i = 1,len_trim(sText)
+  !
+  !     if(present(sDelimiters)) then
+  !       iR = scan(sText(i:i), sDelimiters)
+  !     else
+  !       iR = scan(sText(i:i),":/;,")
+  !     endif
+  !
+  !     if(iR==0) then
+  !       j = j + 1
+  !       sTemp(j:j) = sText(i:i)
+  !     end if
+  !
+  !   enddo
+  !
+  !   sText1 = trim(sTemp)
+  !
+  ! end function remove_multiple_characters_fn
 
 
 end module strings

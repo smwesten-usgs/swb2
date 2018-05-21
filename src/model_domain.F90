@@ -280,7 +280,7 @@ module model_domain
     integer (kind=c_int) :: indx_end
   end type CELL_COL_ROW_T
 
-  type ( CELL_COL_ROW_T ) :: DUMP(10)
+  type ( CELL_COL_ROW_T ) :: DUMP(20)
 
   ! array method: designed to be called using whole-array notation
   abstract interface
