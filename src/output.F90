@@ -3,7 +3,7 @@ module output
   use constants_and_conversions
   use exceptions, only            : warn, assert, die
   use model_domain, only          : MODEL_DOMAIN_T
-  use iso_c_binding, only         : c_short, c_int, c_float, c_double, c_size_t, c_ptrdiff_t
+  use iso_c_binding
   use netcdf4_support
   use simulation_datetime, only   : SIM_DT
   implicit none
@@ -12,6 +12,12 @@ module output
 
   public :: initialize_output, set_output_directory, write_output, set_output_prefix, &
             set_output_latlon_option, RECHARGE_ARRAY, OUTSPECS
+
+! supply apparently missing parameter values from Intel implementation of ISO_C_BINDING
+#ifdef __INTEL_COMPILER
+  integer, parameter :: c_ptrdiff_t = 8
+  integer, parameter :: c_diff_t = 8
+#endif
 
   real( kind=c_double ), allocatable      :: RECHARGE_ARRAY(:)
 

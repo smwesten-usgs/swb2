@@ -7,7 +7,7 @@
 
 module direct_net_infiltration__gridded_data
 
-  use iso_c_binding, only       : c_short, c_int, c_float, c_double, c_size_t, c_ptrdiff_t
+  use iso_c_binding
   use constants_and_conversions
   use data_catalog
   use data_catalog_entry
@@ -26,6 +26,12 @@ module direct_net_infiltration__gridded_data
   private
 
   public :: direct_net_infiltration_initialize, direct_net_infiltration_calculate
+
+  ! supply apparently missing parameter values from Intel implementation of ISO_C_BINDING
+#ifdef __INTEL_COMPILER
+  integer, parameter :: c_ptrdiff_t = 8
+  integer, parameter :: c_diff_t = 8
+#endif
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pCESSPOOL
   type (DATA_CATALOG_ENTRY_T), pointer :: pDISPOSAL_WELL

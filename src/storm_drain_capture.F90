@@ -1,7 +1,6 @@
 module storm_drain_capture
 
-  use iso_c_binding, only : c_short, c_int, c_float, c_double, c_long_long,   &
-                            c_size_t, c_ptrdiff_t
+  use iso_c_binding
 
   use constants_and_conversions
   use data_catalog
@@ -20,6 +19,12 @@ module storm_drain_capture
 
   public :: STORM_DRAIN_CAPTURE_FRACTION
   public :: storm_drain_capture_initialize, storm_drain_capture_calculate
+
+  ! supply apparently missing parameter values from Intel implementation of ISO_C_BINDING
+#ifdef __INTEL_COMPILER
+  integer, parameter :: c_ptrdiff_t = 8
+  integer, parameter :: c_diff_t = 8
+#endif
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pSTORM_DRAIN_CAPTURE_FRACTION
   real (kind=c_float), allocatable     :: STORM_DRAIN_CAPTURE_FRACTION(:)

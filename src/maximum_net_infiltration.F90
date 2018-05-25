@@ -7,7 +7,7 @@
 
 module maximum_net_infiltration__gridded_data
 
-  use iso_c_binding, only       : c_short, c_int, c_float, c_double, c_size_t, c_ptrdiff_t
+  use iso_c_binding
   use constants_and_conversions
   use datetime
   use data_catalog
@@ -28,6 +28,12 @@ module maximum_net_infiltration__gridded_data
   private
 
   public :: maximum_net_infiltration_initialize, maximum_net_infiltration_calculate
+
+  ! supply apparently missing parameter values from Intel implementation of ISO_C_BINDING
+#ifdef __INTEL_COMPILER
+  integer, parameter :: c_ptrdiff_t = 8
+  integer, parameter :: c_diff_t = 8
+#endif
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pMAXIMUM_NET_INFILTRATION
   real (kind=c_float), allocatable     :: fMAXIMUM_NET_INFILTRATION(:)

@@ -7,7 +7,7 @@
 
 module direct_soil_moisture__gridded_data
 
-  use iso_c_binding, only       : c_short, c_int, c_float, c_double, c_size_t, c_ptrdiff_t
+  use iso_c_binding
   use constants_and_conversions
   use datetime
   use data_catalog
@@ -26,6 +26,12 @@ module direct_soil_moisture__gridded_data
   private
 
   public :: direct_soil_moisture_initialize, direct_soil_moisture_calculate
+
+  ! supply apparently missing parameter values from Intel implementation of ISO_C_BINDING
+#ifdef __INTEL_COMPILER
+  integer, parameter :: c_ptrdiff_t = 8
+  integer, parameter :: c_diff_t = 8
+#endif
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pSEPTIC_DISCHARGE
   type (DATA_CATALOG_ENTRY_T), pointer :: pANNUAL_SEPTIC_DISCHARGE

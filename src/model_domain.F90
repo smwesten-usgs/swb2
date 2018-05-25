@@ -5,6 +5,7 @@ module model_domain
   use continuous_frozen_ground_index
   use data_catalog
   use data_catalog_entry
+  use datetime
   use exceptions
   use logfiles
   use simulation_datetime
@@ -3081,10 +3082,17 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
+    ! [ LOCALS ]
+    integer (kind=c_int) :: indx
+
     call crop_coefficients_FAO56_update_growth_stage_dates( )
 
-    this%number_of_days_since_planting = SIM_DT%curr                            &
-              - GROWTH_STAGE_DATE( PLANTING_DATE, this%landuse_index )
+    do indx=1,ubound(this%number_of_days_since_planting,1)
+
+      this%number_of_days_since_planting(indx) = SIM_DT%curr                   &
+              - GROWTH_STAGE_DATE( PLANTING_DATE, this%landuse_index(indx) )
+    enddo
+
 
     call crop_coefficients_FAO56_calculate( Kcb=this%crop_coefficient_kcb,             &
                                             GDD=this%gdd,                              &

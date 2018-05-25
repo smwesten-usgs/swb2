@@ -8,18 +8,18 @@ rm -rf tests
 rm -f CPack*
 rm -f *.txt
 
-export GCC_VERSION=6.4.0_2
+export GCC_VERSION=8.1.0
+export GCC_MAJ_VERSION=8
 export NETCDF_VERSION=4.6.1_2
 export LIBSZ_VERSION=2.1.1_1
 # set CMAKE-related and build-related variables
-export GCCLIST=$( glocate gcc-6 | grep Cellar | grep bin | grep $GCC_VERSION )
+export GCCLIST=$( glocate gcc-$GCC_MAJ_VERSION | grep Cellar | grep bin | grep $GCC_VERSION )
 export GCCARR=($GCCLIST)
 export GCC=${GCCARR[1]}
-export GFORTRANLIST=$( glocate gfortran-6 | grep Cellar | grep bin | grep $GCC_VERSION )
+export GFORTRANLIST=$( glocate gfortran-$GCC_MAJ_VERSION | grep Cellar | grep bin | grep $GCC_VERSION )
 export GFORTRANARR=($GFORTRANLIST)
 export GFORTRAN=${GFORTRANARR[1]}
 
-export GPP=/opt/local/bin/g++-mp-6
 export CMAKEROOT=/usr/bin/cmake
 export R_HOME=/usr/bin/R
 

@@ -909,7 +909,7 @@ end function fortran_to_c_string
 
     ! ARGUMENTS
     character (len=*), intent(in)           :: sText1
-    character (len=len_trim(sText1))        :: sText
+    character (len=len(sText1))             :: sText
 
     ! LOCALS
     character (len=512)            :: sTemp

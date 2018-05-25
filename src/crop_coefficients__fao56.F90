@@ -398,7 +398,7 @@ contains
  !! @retval rKcb Basal crop coefficient given the irrigation table entries and the
  !!         current threshold values.
 
- elemental function update_crop_coefficient_date_as_threshold( iLanduseIndex )           &
+ impure elemental function update_crop_coefficient_date_as_threshold( iLanduseIndex )           &
                                                                           result(Kcb)
 
   integer (kind=c_int), intent(in)   :: iLanduseIndex
@@ -472,7 +472,7 @@ end function update_crop_coefficient_date_as_threshold
  !! @retval fKcb Basal crop coefficient given the irrigation table entries and the
  !!         current threshold values.
 
- elemental function update_crop_coefficient_GDD_as_threshold( iLanduseIndex, fGDD )   &
+ impure elemental function update_crop_coefficient_GDD_as_threshold( iLanduseIndex, fGDD )   &
                                                                          result(fKcb)
 
   integer (kind=c_int), intent(in)   :: iLanduseIndex
@@ -598,7 +598,7 @@ end function update_crop_coefficient_GDD_as_threshold
 
 !--------------------------------------------------------------------------------------------------
 
-  elemental subroutine crop_coefficients_FAO56_calculate( Kcb, landuse_index, GDD )
+  impure elemental subroutine crop_coefficients_FAO56_calculate( Kcb, landuse_index, GDD )
 
     real (kind=c_float), intent(inout)          :: Kcb
     integer (kind=c_int), intent(in)            :: landuse_index

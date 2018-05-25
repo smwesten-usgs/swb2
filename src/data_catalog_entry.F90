@@ -20,6 +20,12 @@ module data_catalog_entry
 
   private
 
+  ! supply apparently missing parameter values from Intel implementation of ISO_C_BINDING
+#ifdef __INTEL_COMPILER
+  integer, parameter :: c_ptrdiff_t = 8
+  integer, parameter :: c_diff_t = 8
+#endif
+
   integer (kind=c_int), public, parameter :: NETCDF_FILE_OPEN = 27
   integer (kind=c_int), public, parameter :: NETCDF_FILE_CLOSED = 42
 
@@ -900,10 +906,10 @@ end subroutine set_constant_value_real
     ! tars1980\prcp.nc   template => "tars%Y\prcp.nc"
     ! prcp_1980_00.nc    template => "prcp_%Y_%m.nc"
 
-    iStatus = getcwd(sCWD )
+!    iStatus = getcwd(sCWD )
 
-    call assert(iStatus==0, "Problem detemining what the current working" &
-      //" directory is", __SRCNAME__, __LINE__)
+!    call assert(iStatus==0, "Problem detemining what the current working" &
+!      //" directory is", __SRCNAME__, __LINE__)
 
     sNewFilename = this%sFilenameTemplate
 

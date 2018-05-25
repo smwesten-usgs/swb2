@@ -8,7 +8,7 @@
 
 module fog__monthly_grid
 
-  use iso_c_binding, only       : c_short, c_int, c_float, c_double, c_size_t, c_ptrdiff_t
+  use iso_c_binding
   use constants_and_conversions
   use data_catalog
   use data_catalog_entry
@@ -28,13 +28,19 @@ module fog__monthly_grid
 
   public :: fog_monthly_grid_initialize, fog_monthly_grid_calculate, pFOG_RATIO
 
+  ! supply apparently missing parameter values from Intel implementation of ISO_C_BINDING
+#ifdef __INTEL_COMPILER
+  integer, parameter :: c_ptrdiff_t = 8
+  integer, parameter :: c_diff_t = 8
+#endif
+
   type (DATA_CATALOG_ENTRY_T), pointer :: pFOG_RATIO
   real (kind=c_float), allocatable     :: fFOG_CATCH_EFFICIENCY(:)
   type (T_NETCDF4_FILE), pointer       :: pNCFILE
 
 contains
 
-  !> Initialize the fog drip algorithm. 
+  !> Initialize the fog drip algorithm.
   !!
   !! Read in a fog ratio grid.
   !! Open a NetCDF output file to hold fog variable output.
@@ -58,7 +64,7 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iStat
     type (STRING_LIST_T)                 :: slString
-    integer (kind=c_int)                 :: iIndex 
+    integer (kind=c_int)                 :: iIndex
     integer (kind=c_int)                 :: iNX
     integer (kind=c_int)                 :: iNY
     integer (kind=c_int), allocatable    :: iLanduseCodes(:)
@@ -76,7 +82,7 @@ contains
     !> Determine how many landuse codes are present
     call slString%append("LU_Code")
     call slString%append("Landuse_Code")
-    
+
     call PARAMS%get_parameters( slKeys=slString, iValues=iLanduseCodes )
     iNumberOfLanduses = count( iLanduseCodes > 0 )
 
@@ -84,7 +90,7 @@ contains
 
     call slString%append("Fog_catch_eff")
     call slString%append("Fog_catch_efficiency")
-    
+
     call PARAMS%get_parameters( slKeys=slString , fValues=fFOG_CATCH_EFFICIENCY )
 
     if ( fFOG_CATCH_EFFICIENCY(1) <= fTINYVAL )  &
@@ -105,7 +111,7 @@ contains
       sVariableUnits="inches", iNX=iNX, iNY=iNY,                                 &
       fX=dX, fY=dY,                                                              &
       StartDate=SIM_DT%start, EndDate=SIM_DT%end, PROJ4_string=PROJ4_string,     &
-      dpLat=dY_lat, dpLon=dX_lon, fValidMin=0.0, fValidMax=2000.0 ) 
+      dpLat=dY_lat, dpLon=dX_lon, fValidMin=0.0, fValidMax=2000.0 )
 
 
   end subroutine fog_monthly_grid_initialize
@@ -120,7 +126,7 @@ contains
     logical (kind=c_bool), intent(in)      :: lActive(:,:)
     real (kind=c_float), intent(in)        :: nodata_fill_value(:,:)
 
-    ! [ LOCALS ] 
+    ! [ LOCALS ]
     integer (kind=c_int) :: iJulianDay
     integer (kind=c_int) :: iMonth
     integer (kind=c_int) :: iDay

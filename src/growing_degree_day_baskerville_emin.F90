@@ -1,7 +1,6 @@
 module growing_degree_day_baskerville_emin
 
-  use iso_c_binding, only : c_short, c_int, c_float, c_double, c_long_long,   &
-                            c_size_t, c_ptrdiff_t
+  use iso_c_binding
 
   use constants_and_conversions
   use datetime                   , only : mmdd2doy
@@ -16,6 +15,12 @@ module growing_degree_day_baskerville_emin
 
   public :: GDD_BASE, GDD_MAX, GDD_RESET_DATE
   public :: growing_degree_day_be_calculate, growing_degree_day_be_initialize
+
+  ! supply apparently missing parameter values from Intel implementation of ISO_C_BINDING
+#ifdef __INTEL_COMPILER
+  integer, parameter :: c_ptrdiff_t = 8
+  integer, parameter :: c_diff_t = 8
+#endif
 
   real (kind=c_float), allocatable  :: GDD_BASE(:)
   real (kind=c_float), allocatable  :: GDD_MAX(:)

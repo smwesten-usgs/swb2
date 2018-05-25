@@ -25,8 +25,10 @@ for /f "delims=" %%x in ('where /R "c:\Program Files" libhdf5.lib') do call set 
 for /f "delims=" %%x in ('where /R "c:\Program Files" zlibstatic.lib') do call set LIB_Z=%%x
 for /f "delims=" %%x in ('where /R "c:\Program Files" netcdf.lib') do call set LIB_NETCDF=%%x
 
-::for /f %%x in ('dir /b /s c:\Program Files (x86)\*intel64_win*libifcore.lib') do call set LIB_GCC=%%x
-::for /f %%x in ('dir /b /s c:\Program Files (x86)\*intel64_win*libifcorert.lib') do call set LIB_GFORTRAN=%%x
+::for /f "delims=" %%x in ('where /R "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\compiler\lib\intel64_win" libvcruntime.lib') do call set LIB_VCRUNTIME=%%x
+::for /f "delims=" %%x in ('where /R "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\compiler\lib\intel64_win" libucrt.lib') do call set LIB_UCRT=%%x
+::for /f "delims=" %%x in ('where /R "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\compiler\lib\intel64_win" libifcore.lib') do call set LIB_GCC=%%x
+::for /f "delims=" %%x in ('where /R "C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\compiler\lib\intel64_win" libifcorert.lib') do call set LIB_GFORTRAN=%%x
 
 :: substitute forward slash for backward slash
 ::set LIB_HDF5_HL=%LIB_HDF5_HL:\=/%
@@ -41,6 +43,8 @@ for /f "delims=" %%x in ('where /R "c:\Program Files" netcdf.lib') do call set L
 echo NetCDF library: %LIB_NETCDF%
 echo HDF5 library: %LIB_HDF5%
 echo HDF5_HL library: %LIB_HDF5_HL%
+echo GCC library: %LIB_GCC%
+echo GFORTRAN library: %LIB_GFORTRAN%
 
 
 :: define where 'make copy' will place executables
@@ -48,14 +52,18 @@ set INSTALL_PREFIX=d:\DOS
 
 :: define other variables for use in the CMakeList.txt file
 :: options are "Release", "Profile" or "Debug"
-set BUILD_TYPE="Release"
+set BUILD_TYPE="Debug"
 
 :: options are "x86" (32-bit) or "x64" (64-bit)
 set SYSTEM_TYPE="win_x64"
 
 :: define platform and compiler specific compilation flags
-set CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -cpp -fcheck=all -fstack-usage -fexceptions -ffree-line-length-none -static -static-libgcc -static-libgfortran"
-set CMAKE_Fortran_FLAGS_RELEASE="/O2 /QxHost /static /fpp"
+set CMAKE_Fortran_FLAGS_DEBUG="/Od /debug:all /libs:static /MTd /fpp"
+set CMAKE_Fortran_FLAGS_RELEASE="/O2 /QxHost /static /fpp /MT"
+set CMAKE_C_FLAGS_DEBUG="/Od /MTd"
+set CMAKE_C_FLAGS_RELEASE="/O2 /QxHost /static /fpp /MT"
+
+::set LINKER_FLAGS="/nodefaultlib:vcomp"
 
 echo "Running CMake..."
 cmake ..\..\.. -G "NMake Makefiles" ^
@@ -66,11 +74,14 @@ cmake ..\..\.. -G "NMake Makefiles" ^
 -DLIB_HDF5="%LIB_HDF5%"         ^
 -DLIB_SZ=%LIB_SZ%               ^
 -DLIB_Z="%LIB_Z%"               ^
+-DLIB_GCC="%LIB_GCC%"           ^
+-DLIB_GFORTRAN="%LIB_GFORTRAN%" ^
 -DLIB_NETCDF="%LIB_NETCDF%"     ^
 -DR_SCRIPT=%R_SCRIPT%           ^
--DCMAKE_EXE_LINKER_FLAGS=%LINKER_FLAGS%  ^
 -DSYSTEM_TYPE=%SYSTEM_TYPE%  ^
 -DCMAKE_BUILD_TYPE=%BUILD_TYPE%  ^
 -DCMAKE_INSTALL_PREFIX:PATH=%INSTALL_PREFIX% ^
 -DCMAKE_Fortran_FLAGS_DEBUG=%CMAKE_Fortran_FLAGS_DEBUG%  ^
--DCMAKE_Fortran_FLAGS_RELEASE=%CMAKE_Fortran_FLAGS_RELEASE%
+-DCMAKE_Fortran_FLAGS_RELEASE=%CMAKE_Fortran_FLAGS_RELEASE% ^
+-DCMAKE_C_FLAGS_DEBUG=%CMAKE_C_FLAGS_DEBUG%  ^
+-DCMAKE_C_FLAGS_RELEASE=%CMAKE_C_FLAGS_RELEASE%

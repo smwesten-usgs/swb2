@@ -35,10 +35,6 @@ endif()
 # Set basic project settings
 #------------------------------------------------------------------------
 #
-# NOTE: must enable CXX as a language in order to use the GNU compiler
-#       toolchain
-#
-
 project (swb2 Fortran C)
 enable_language (Fortran C)
 
@@ -59,6 +55,8 @@ include( cmake/version_control.cmake )
 
 set( EXTERNAL_LIBS ${LIB_NETCDF} ${LIB_HDF5_HL} ${LIB_HDF5} ${LIB_SZ} ${LIB_DL} ${LIB_Z} ${NETCDF_DEPS})
 set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIB_GFORTRAN} ${LIB_GCC} )
+
+#libvcruntime.lib libucrt.lib libifport.lib
 
 link_libraries( ${EXTERNAL_LIBS} )
 include_directories( ${INCLUDE_DIRECTORIES} "${PROJECT_SOURCE_DIR}/src/proj4" )

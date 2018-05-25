@@ -413,7 +413,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  elemental subroutine irrigation__calculate( irrigation_amount,            &
+  impure elemental subroutine irrigation__calculate( irrigation_amount,     &
                                               landuse_index,                &
                                               soil_storage,                 &
                                               soil_storage_max,             &

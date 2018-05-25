@@ -43,8 +43,11 @@ module netcdf_c_api_interfaces
 
   implicit none
 
+! supply apparently missing parameter values from Intel implementation of ISO_C_BINDING
+#ifdef __INTEL_COMPILER
   integer, parameter :: c_ptrdiff_t = 8
   integer, parameter :: c_diff_t = 8
+#endif
 
   interface
     function nc_create(path, cmode, ncidp) bind(c)

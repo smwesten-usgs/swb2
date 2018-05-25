@@ -1085,7 +1085,7 @@ end subroutine system_time_to_date_sub
  subroutine set_julian_date_sub(this, dValue)
 
   class (DATETIME_T), intent(inout)      :: this
-  real (kind=c_double), intent(out)   :: dValue
+  real (kind=c_double), intent(in)       :: dValue
 
   this%dJulianDate = dValue
 

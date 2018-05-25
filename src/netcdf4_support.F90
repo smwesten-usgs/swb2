@@ -1775,7 +1775,9 @@ subroutine nf_populate_attribute_struct( NCFILE, pNC_ATT, iNC_VarID, iAttNum )
         name=sAttName, &
         ip=pNC_ATT%i2AttValue), __SRCNAME__, __LINE__ )
 
-      pNC_ATT%sAttValue = asCharacter(pNC_ATT%i2AttValue)
+      do iIndex=1,ubound(pNC_ATT%i2AttValue,1)
+        pNC_ATT%sAttValue(iIndex) = asCharacter(pNC_ATT%i2AttValue(iIndex))
+      enddo
 
     case (NC_INT)
 
@@ -1788,7 +1790,9 @@ subroutine nf_populate_attribute_struct( NCFILE, pNC_ATT, iNC_VarID, iAttNum )
         name=sAttName, &
         ip=pNC_ATT%iAttValue), __SRCNAME__, __LINE__ )
 
-      pNC_ATT%sAttValue = asCharacter(pNC_ATT%iAttValue)
+      do iIndex=1,ubound(pNC_ATT%iAttValue,1)
+        pNC_ATT%sAttValue(iIndex) = asCharacter(pNC_ATT%iAttValue(iIndex))
+      enddo
 
     case (NC_FLOAT)
 
@@ -1802,7 +1806,9 @@ subroutine nf_populate_attribute_struct( NCFILE, pNC_ATT, iNC_VarID, iAttNum )
         name=sAttName, &
         ip=pNC_ATT%rAttValue), __SRCNAME__, __LINE__ )
 
-      pNC_ATT%sAttValue = asCharacter(pNC_ATT%rAttValue)
+      do iIndex=1,ubound(pNC_ATT%rAttValue,1)
+        pNC_ATT%sAttValue(iIndex) = asCharacter(pNC_ATT%rAttValue(iIndex))
+      enddo
 
     case (NC_DOUBLE)
 
@@ -1815,7 +1821,9 @@ subroutine nf_populate_attribute_struct( NCFILE, pNC_ATT, iNC_VarID, iAttNum )
         name=sAttName, &
         ip=pNC_ATT%dpAttValue), __SRCNAME__, __LINE__ )
 
-      pNC_ATT%sAttValue = asCharacter(pNC_ATT%dpAttValue)
+      do iIndex=1,ubound(pNC_ATT%dpAttValue,1)
+        pNC_ATT%sAttValue(iIndex) = asCharacter(pNC_ATT%dpAttValue(iIndex))
+      enddo
 
     case default
 
