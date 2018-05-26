@@ -1,5 +1,7 @@
       program HI_WB
 
+      use kiss_random_number_generator
+
 c  Recharge Computation Program for the Hawaiian Islands
 c  version 3.9, 2/6/14
 c  authors: J.A. Engott and D.S. Oki
@@ -1666,10 +1668,11 @@ c
 c  assume that the same fragment sets are to be used for a particular
 c  fragment zone and month
 
+      use kiss_random_number_generator
       implicit real*8 (a-h,o-z)
 
       integer simulation_number
-      real*4 rn
+      real (kind=selected_real_kind(18)) ::  rn
       integer yr
       integer array_size
       integer, allocatable :: ino(:)
@@ -1693,19 +1696,22 @@ c  fragment zone and month
 c.....select fragment set for each month, fragment zone, and year of simulation.
 c     for a given month and fragment zone, a particular fragment set can
 c     be selected more than once
-      call random_seed(size=array_size)
-      if (allocated(ino) )  deallocate(ino)
-      allocate(ino(array_size))
-      ino=iseed-1
+      !call random_seed(size=array_size)
+      !call initialize_kiss_rng( int(iseed, kind=selected_int_kind(18)) )
+      call initialize_kiss_rng()
+      !if (allocated(ino) )  deallocate(ino)
+      !allocate(ino(array_size))
+      !ino=iseed-1
 
       do 100 m=1,12          ! number of months
       do 100 j=1,nmbrrfz     ! number of zones
       do 100 yr=1,nyrs        ! number of years
-         ino=ino+1
+         !ino=ino+1
 
-         call random_seed(put=ino)
+         !!call random_seed(put=ino)
          !rn=rand(ino)
-         call random_number(rn)
+         !!call random_number(rn)
+         rn = kiss64_uniform_rng()
          if(rn.gt.0.99999999)rn=0.9999
          jfr(m,j,yr)=int(nfr(m,j)*rn)+1
          write(269,fmt="(4(i10,1x),f14.8,1x,i10)")  simulation_number,

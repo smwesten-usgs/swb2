@@ -23,6 +23,7 @@ module precipitation__method_of_fragments
   use dictionary
   use exceptions
   use file_operations
+  use kiss_random_number_generator
   use logfiles, only            : LOGS, LOG_ALL, LOG_DEBUG
   use parameters
   use strings
@@ -190,6 +191,8 @@ contains
 
     allocate (RANDOM_VALUES( iMaxRainZones ), stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
+
+    if ( RANDOM_FRAGMENT_SEQUENCES ) call initialize_kiss_rng()
 
     call process_fragment_sets()
 
@@ -633,7 +636,12 @@ contains
 
     if ( RANDOM_FRAGMENT_SEQUENCES ) then
 
-      call random_number( RANDOM_VALUES )
+      do iIndex2=1,size(RANDOM_VALUES,1)
+
+      !call random_number( RANDOM_VALUES )
+        RANDOM_VALUES(iIndex2) = kiss64_uniform_rng()
+
+      enddo
 
     else
 

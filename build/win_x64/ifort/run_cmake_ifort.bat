@@ -58,7 +58,7 @@ set BUILD_TYPE="Debug"
 set SYSTEM_TYPE="win_x64"
 
 :: define platform and compiler specific compilation flags
-set CMAKE_Fortran_FLAGS_DEBUG="/Od /debug:all /libs:static /MTd /fpp"
+set CMAKE_Fortran_FLAGS_DEBUG="/Od /fpp"
 set CMAKE_Fortran_FLAGS_RELEASE="/O2 /QxHost /static /fpp /MT"
 set CMAKE_C_FLAGS_DEBUG="/Od /MTd"
 set CMAKE_C_FLAGS_RELEASE="/O2 /QxHost /static /fpp /MT"
