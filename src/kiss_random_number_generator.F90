@@ -3,10 +3,10 @@ module kiss_random_number_generator
 
   implicit none
 
-  integer,parameter :: I8=selected_int_kind(18)
-  integer,parameter :: I10=selected_int_kind(21)
-  integer,parameter :: R8=selected_real_kind(18,18)
-  integer,parameter :: R10=selected_real_kind(21,12)
+  integer,parameter :: I8=8
+  integer,parameter :: I16=16
+  integer,parameter :: R8=8
+  integer,parameter :: R16=16
 
   integer(kind=I8)  :: Q(20632)
   integer(kind=I8)  :: carry=36243678541_I8
@@ -15,10 +15,13 @@ module kiss_random_number_generator
   integer(kind=I8)  :: indx=20633_I8
 
   integer(kind=I8)  :: I8_max = huge(xs)
-  integer(kind=I8)  :: I8_min = -(huge(xs) + 1)
-  integer(kind=I10)  :: I10_range = 2*huge(xs) + 1
+  integer(kind=I8)  :: I8_min = -(huge(xs))
+  integer(kind=I16)  :: I16_range = 2*huge(xs)+1
 
 contains
+
+! original post found here:
+! https://www.thecodingforums.com/threads/64-bit-kiss-rngs.673657/
 
 ! 64-bit KISS RNGs
 !
@@ -214,7 +217,302 @@ contains
 !
 ! George Marsaglia
 
+
+!   from
+!   https://www.thecodingforums.com/threads/superkiss-for-32-and-64-bit-rngs-in-both-c-and-fortran.706893/
+
+!   On Nov 3 I posted
 !
+!   RNGs: A Super KISS sci.math, comp.lang.c, sci.crypt
+!
+!   a KISS (Keep-It-Simple-Stupid) RNG combining,
+!   by addition mod 2^32, three simple RNGs:
+!   CMWC(Complementary-Multiply-With-Carry)+CNG(Congruential)
+!   +XS(Xorshift)
+!   with resulting period greater than 10^402575.
+!
+!   The extreme period comes from finding a prime p=a*b^r+1 for
+!   which the order of b has magnitude near p-1, then use
+!   the CMWC method, the mathematics of which I outline here:
+!
+!   Let Z be the set of all "vectors" of the form
+!   [x_1,...,x_r;c] with 0<=x_i<b and 0<=c<a.
+!   Then Z has ab^r elements, and if the function f() on Z is
+!   f([x_1,x2,...,x_r;c])=
+!   [x_2,...,x_r,b-1-(t mod b);trunc((t/b)], t=a*x_1+c
+!   then f() has an inverse on Z: for each z in Z there is exactly
+!   one w in Z for which f(w)=z:
+!   f^{-1}([x_1,x2,...,x_r;c])=
+!   [trunc((v/a),x_1,...,x_{r-1}; v mod a], v=cb+(b-1)-x_r
+!
+!   Thus a directed graph based on z->f(z) will consist only
+!   of disjoint loops of size s=order(b,p) and there will be
+!   L=ab^r/s such loops.
+!
+!   A random uniform choice of z from Z is equally likely to
+!   fall in any one of the L loops, and then each "vector" in
+!   the sequence obtained by iterating f:
+!   f(z), f(f(z)), f(f(f(z))),...
+!   will have a uniform distribution over that loop, and the sequence
+!   determined by taking the r'th element from each "vector",
+!   (the output of the CMWC RNG) will be periodic with period
+!   the order of b for the prime p=ab^r+1, and that sequence
+!   will produce, in reverse order, the base-b expansion of a
+!   rational k/p for some k determined by choice of the seed z.
+!
+!   For that Nov 3 post, I had found that the order of b=2^32
+!   for the prime p=7010176*b^41790+1 is 54767*2^1337279, about
+!   10^402566, thus providing an easily-implemented
+!   KISS=CMWC+CNG+XS RNG with immense period and
+!   excellent performance on tests of randomness.
+!
+!   That easy implementation required carrying out the essential
+!   parts of the CMWC function f(): form t=7010176*x+c in 64 bits,
+!   extract the top 32 bits for the new c, the bottom 32 for
+!   the new x---easy to do in C, not easy in Fortran.
+!   And if we want 64-bit random numbers, with B=2^64, our prime
+!   becomes 7010176*B^20985+1, for which the period of B is
+!   54767*2^1337278, still immense, but in C, with 64-bit x,c
+!   there seems no easy way to form t=7010176*x+c in 128 bits,
+!   then extract the top and bottom 64 bit halves.
+!
+!   So base b=2^32 works for C but not Fortran,
+!   and base B=2^64 works for neither C nor Fortran.
+!
+!   I offer here is a prime that provides CMWC RNGs for both
+!   32- and 64-bits, and for both C and Fortran, and with
+!   equally massive periods, again greater than 2^(1.3million):
+!
+!   p=640*b^41265+1 = 2748779069440*B^20632+1 = 5*2^1320487+1.
+!
+!   That prime came from the many who have dedicated their
+!   efforts and computer time to prime searches. After some
+!   three weeks of dedicated computer time using pfgw with
+!   scrypt, I found the orders of b and B:
+!   5*2^1320481 for b=2^32, 5*2^1320480 for B=2^64.
+!
+!   It is the choice of the "a" that makes it feasible to get
+!   the top and bottom valves of t=a*x+c, yet stay within the
+!   integer sizes the C or Fortran compilers are set for.
+!   In the above prime: a=640=2^9+2^7 for b=2^32 and
+!   a=2748779069440=2^41+2^39 for B=2^64.
+!   Thus, for example with b=2^32 and using only 32-bit C code,
+!   with a supposed 128-bit t=(2^9+2^7)*x+c, the top and bottom
+!   32-bits of t may be obtained by setting, say,
+!   h=(c&1); z=(x<<9)>>1 + (x<<7)>>1 + c>>1;
+!   then the top half of that t would be
+!   c=(x>>23)+(x>>25)+(z>>31);
+!   and the bottom half, before being complemented, would be
+!   x=(z<<1)+h;
+!
+!   When B=2^64 we need only change to
+!   h=(c&1); z=(x<<41)>>1 + (x<<39)>>1 + c>>1;
+!   c=(x>>23)+(x>>25)+(z>>63);
+!
+!   These C operations all have Fortran equivalents, and will
+!   produce the required bit patterns, whether integers are
+!   considered signed or unsigned. (In C, one must make sure
+!   that the >> operation performs a logical right shift,
+!   perhaps best done via "unsigned" declarations.)
+!
+!   The CMWC z "vector" elements [x_1,x_2,...,x_r] are kept in
+!   an array, Q[] in C, Q() in Fortran, with a separate current
+!   "carry". This is all spelled out in the following examples:
+!   code for 32- and 64-bit SuperKiss RNGs for C and Fortran.
+!
+!   Note that in these sample listings, the Q array is seeded
+!   by CNG+XS, based on the seed values specified in the
+!   initial declarations. For many simulation studies, the
+!   73 bits needed to seed the initial xcng, xs and carry<a
+!   for the 32-bit version, or 169 bits needed for the 64-bit
+!   version, may be adequate.
+!   But more demanding applications may require a significant
+!   portion of the >1.3 million seed bits that Q requires.
+!   See text and comments from the Nov 3 posting.
+!
+!   I am indebted to an anonymous mecej4 for providing the basic
+!   form and KIND declarations of the Fortran versions.
+!
+!   Please let me and other readers know if the results are not
+!   as specified when run with your compilers, or if you can
+!   provide equivalent versions in other programming languages.
+!
+!   George Marsaglia
+!
+!   --------------------------------------------------------
+!   Here is SUPRKISS64.c, the immense-period 64-bit RNG. I
+!   invite you to cut, paste, compile and run to see if you
+!   get the result I do. It should take around 20 seconds.
+!   --------------------------------------------------------
+!   /* SUPRKISS64.c, period 5*2^1320480*(2^64-1) */
+!   #include <stdio.h>
+!   static unsigned long long Q[20632],carry=36243678541LL,
+!   xcng=12367890123456LL,xs=521288629546311LL,indx=20632;
+!
+!   #define CNG ( xcng=6906969069LL*xcng+123 )
+!   #define XS ( xs^=xs<<13,xs^=xs>>17,xs^=xs<<43 )
+!   #define SUPR ( indx<20632 ? Q[indx++] : refill() )
+!   #define KISS SUPR+CNG+XS
+!
+!   unsigned long long refill( )
+!   {int i; unsigned long long z,h;
+!   for(i=0;i<20632;i++){ h=(carry&1);
+!   z=((Q<<41)>>1)+((Q<<39)>>1)+(carry>>1);
+!   carry=(Q>>23)+(Q>>25)+(z>>63);
+!   Q=~((z<<1)+h); }
+!   indx=1; return (Q[0]);
+!   }
+!
+!   int main()
+!   {int i; unsigned long long x;
+!   for(i=0;i<20632;i++) Q=CNG+XS;
+!   for(i=0;i<1000000000;i++) x=KISS;
+!   printf("Does x=4013566000157423768\n x=%LLd.\n",x);
+!   }
+!   ---------------------------------------------------------
+!
+!   Here is SUPRKISS32.c, the immense-period 32-bit RNG. I
+!   invite you to cut, paste, compile and run to see if you
+!   get the result I do. It should take around 10 seconds.
+!   ---------------------------------------------------------
+!   /*suprkiss64.c
+!   b=2^64; x[n]=(b-1)-[(2^41+2^39)*x[n-20632]+carry mod b]
+!   period 5*2^1320480>10^397505
+!   This version of SUPRKISS doesn't use t=a*x+c in 128 bits,
+!   but uses only 64-bit stuff, takes 20 nanos versus 7.5 for
+!   the 32-bit unsigned long long t=a*x+c version.
+!   */
+!
+!   /* SUPRKISS64.c, period 5*2^1320480*(2^64-1) */
+!   #include <stdio.h>
+!   static unsigned long long Q[20632],carry=36243678541LL,
+!   xcng=12367890123456LL,xs=521288629546311LL,indx=20632;
+!
+!   #define CNG ( xcng=6906969069LL*xcng+123 )
+!   #define XS ( xs^=xs<<13,xs^=xs>>17,xs^=xs<<43 )
+!   #define SUPR ( indx<20632 ? Q[indx++] : refill() )
+!   #define KISS SUPR+CNG+XS
+!
+!   unsigned long long refill( )
+!   {int i; unsigned long long z,h;
+!   for(i=0;i<20632;i++){ h=(carry&1);
+!   z=((Q<<41)>>1)+((Q<<39)>>1)+(carry>>1);
+!   carry=(Q>>23)+(Q>>25)+(z>>63);
+!   Q=~((z<<1)+h); }
+!   indx=1; return (Q[0]);
+!   }
+!
+!   int main()
+!   {int i; unsigned long long x;
+!   for(i=0;i<20632;i++) Q=CNG+XS;
+!   for(i=0;i<1000000000;i++) x=KISS;
+!   printf("Does x=4013566000157423768\n x=%LLd.\n",x);
+!   }
+!
+!   -----------------------------------------------------------
+!
+!   And here are equivalent Fortran versions, which, absent
+!   C's inline features, seem to need ~10% more run time.
+!
+!   -----------------------------------------------------------
+!   module suprkiss64_M ! period 5*2^1320480*(2^64-1)
+!   integer,parameter :: I8=selected_int_kind(18)
+!   integer(kind=I8) :: Q(20632),carry=36243678541_I8, &
+!   xcng=12367890123456_I8,xs=521288629546311_I8,indx=20633_I8
+!   contains
+!   function KISS64() result(x)
+!   integer(kind=I8) :: x
+!   if(indx <= 20632)then; x=Q(indx); indx=indx+1
+!   else; x=refill(); endif
+!   xcng=xcng*6906969069_I8+123
+!   xs=ieor(xs,ishft(xs,13))
+!   xs=ieor(xs,ishft(xs,-17))
+!   xs=ieor(xs,ishft(xs,43))
+!   x=x+xcng+xs
+!   return; end function KISS64
+!
+!   function refill() result(s)
+!   integer(kind=I8) :: i,s,z,h
+!   do i=1,20632
+!   h=iand(carry,1_I8)
+!   z = ishft(ishft(Q(i),41),-1)+ &
+!   ishft(ishft(Q(i),39),-1)+ &
+!   ishft(carry,-1)
+!   carry=ishft(Q(i),-23)+ishft(Q(i),-25)+ishft(z,-63)
+!   Q(i)=not(ishft(z,1)+h)
+!   end do
+!   indx=2; s=Q(1)
+!   return; end function refill
+!
+!   end module suprkiss64_M
+!
+!   program testKISS64
+!   use suprkiss64_M
+!   integer(kind=I8) :: i,x
+!   do i=1,20632 !fill Q with Congruential+Xorshift
+!   xcng=xcng*6906969069_I8+123
+!   xs=ieor(xs,ishft(xs,13))
+!   xs=ieor(xs,ishft(xs,-17))
+!   xs=ieor(xs,ishft(xs,43))
+!   Q(i)=xcng+xs
+!   end do
+!   do i=1,1000000000_I8; x=KISS64(); end do
+!   write(*,10) x
+!   10 format(' Does x = 4013566000157423768 ?',/,6x,'x = ',I20)
+!   end program testKISS64
+!   -------------------------------------------------------------
+!
+!   module suprkiss32_M ! period 5*2^1320481*(2^32-1)
+!   integer,parameter :: I4=selected_int_kind(9)
+!   integer(kind=I4) :: Q(41265),carry=362_I4, &
+!   xcng=1236789_I4,xs=521288629_I4,indx=41266_I4
+!   contains
+!   function KISS32() result(x)
+!   integer(kind=I4):: x
+!   if(indx <= 41265)then;x=Q(indx); indx=indx+1
+!   else; x=refill(); endif
+!   xcng=xcng*69069_I4+123
+!   xs=ieor(xs,ishft(xs,13))
+!   xs=ieor(xs,ishft(xs,-17));
+!   xs=ieor(xs,ishft(xs,5))
+!   x=x+xcng+xs
+!   return; end function KISS32
+!
+!   function refill() result(s)
+!   integer(kind=I4) :: i,s,z,h
+!   do i = 1,41265
+!   h = iand(carry,1_I4)
+!   z = ishft(ishft(Q(i),9),-1)+ &
+!   ishft(ishft(Q(i),7),-1)+ &
+!   ishft(carry,-1)
+!   carry=ishft(Q(i),-23)+ishft(Q(i),-25)+ishft(z,-31)
+!   Q(i)=not(ishft(z,1)+h)
+!   end do
+!   indx=2; s=Q(1)
+!   return; end function refill
+!
+!   end module suprkiss32_M
+!
+!   program testKISS32
+!   use suprkiss32_M
+!   integer(kind=I4) :: i,x
+!   do i=1,41265 !fill Q with Congruential+Xorshift
+!   xcng=xcng*69069_I4+123
+!   xs=ieor(xs,ishft(xs,13))
+!   xs=ieor(xs,ishft(xs,-17))
+!   xs=ieor(xs,ishft(xs,5))
+!   Q(i)=xcng+xs
+!   end do
+!   do i=1,1000000000_I4; x=KISS32(); end do
+!   write(*,10) x
+!   10 format(' Does x = 1809478889 ?',/,6x,'x =',I11)
+!   end program testKISS32
+!
+!   ---------------------------------------------------------------
+!
+!
+! geo, Nov 27, 2009
+! #1
 
 !-------------------------------------------------------------------------------
 
@@ -226,7 +524,7 @@ contains
     integer (kind=I8)   :: x
 
     x = kiss64_rng()
-    unif = ( real(x, kind=R8) - real(I8_min, kind=R8) ) / real(I10_range,kind=R10)
+    unif = ( real(x, kind=R8) - real(I8_min, kind=R8) ) / real(I16_range,kind=R16)
 
   end function kiss64_uniform_rng
 

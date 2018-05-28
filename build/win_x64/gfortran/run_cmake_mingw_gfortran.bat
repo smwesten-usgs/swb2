@@ -9,7 +9,7 @@ del /S /Q *.txt
 
 :: set CMAKE-related and build-related variables
 set CMAKEROOT=C:\Program Files\CMake\
-set COMPILER_DIR=C:\MinGW64
+set COMPILER_DIR=C:\mingw64
 set Fortran_COMPILER_NAME=gfortran
 set CMAKE_C_COMPILER=gcc
 
@@ -17,14 +17,14 @@ set MAKE_EXECUTABLE_NAME=mingw32-make.exe
 set R_HOME=C:\Program Files\R\R-3.3.1\bin
 
 :: explicitly locate each key library
-for /f %%x in ('dir /b /s c:\MinGW64\*libhdf5_hl.a') do call set LIB_HDF5_HL=%%x
-for /f %%x in ('dir /b /s c:\MinGW64\*libhdf5.a') do call set LIB_HDF5=%%x
-for /f %%x in ('dir /b /s c:\MinGW64\*libsz.a') do call set LIB_SZ=%%x
-for /f %%x in ('dir /b /s c:\MinGW64\*libdl.a') do call set LIB_DL=%%x
-for /f %%x in ('dir /b /s c:\MinGW64\*libz.a') do call set LIB_Z=%%x
-for /f %%x in ('dir /b /s c:\MinGW64\*libnetcdf.a') do call set LIB_NETCDF=%%x
-for /f %%x in ('dir /b /s c:\MinGW64\*libgcc.a') do call set LIB_GCC=%%x
-for /f %%x in ('dir /b /s c:\MinGW64\*libgfortran.a') do call set LIB_GFORTRAN=%%x
+for /f %%x in ('dir /b /s c:\mingw64\*libhdf5_hl.a') do call set LIB_HDF5_HL=%%x
+for /f %%x in ('dir /b /s c:\mingw64\*libhdf5.a') do call set LIB_HDF5=%%x
+for /f %%x in ('dir /b /s c:\mingw64\*libsz.a') do call set LIB_SZ=%%x
+for /f %%x in ('dir /b /s c:\mingw64\*libdl.a') do call set LIB_DL=%%x
+for /f %%x in ('dir /b /s c:\mingw64\*libz.a') do call set LIB_Z=%%x
+for /f %%x in ('dir /b /s c:\mingw64\*libnetcdf.a') do call set LIB_NETCDF=%%x
+for /f %%x in ('dir /b /s c:\mingw64\*libgcc.a') do call set LIB_GCC=%%x
+for /f %%x in ('dir /b /s c:\mingw64\*libgfortran.a') do call set LIB_GFORTRAN=%%x
 
 :: substitute forward slash for backward slash
 set LIB_HDF5_HL=%LIB_HDF5_HL:\=/%
@@ -57,8 +57,8 @@ set PATH=c:\windows;c:\windows\system32;c:\windows\system32\Wbem
 set PATH=%PATH%;C:\Program Files (x86)\7-Zip
 set PATH=%PATH%;C:\Program Files\Git\bin;c:\Program Files\CMake\bin
 set PATH=%PATH%;%CMAKEROOT%\bin;%CMAKEROOT%\share
-set PATH=%PATH%;C:\MinGW64\bin
-set PATH=%PATH%;C:\MinGW64\include;C:\MinGW64\lib
+set PATH=%PATH%;c:\mingw64\bin
+set PATH=%PATH%;c:\mingw64\include;c:\mingw64\lib
 
 :: set a useful alias for make
 echo %COMPILER_DIR%\bin\%MAKE_EXECUTABLE_NAME% %%1 > make.bat
