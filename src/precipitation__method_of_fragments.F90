@@ -286,6 +286,9 @@ contains
     integer (kind=c_int)  :: iStat
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
+    integer (kind=c_int)  :: last_zone
+    integer (kind=c_int)  :: last_fragment
+    integer (kind=c_int)  :: last_month
     integer (kind=c_int)  :: iNumLines
     real (kind=c_float)   :: fTempValue
     type (ASCII_FILE_T)   :: FRAGMENTS_FILE
@@ -302,6 +305,9 @@ contains
     call assert( iStat == 0, "Problem allocating memory for fragments table", __SRCNAME__, __LINE__ )
 
     iCount = 0
+    last_zone = 1
+    last_fragment = 0
+    last_month = 1
 
     do
 
@@ -323,6 +329,20 @@ contains
 
       FRAGMENTS(iCount)%iMonth = asInt(sSubString)
 
+      ! reset the counter tracking the previous fragment ID
+      if ( FRAGMENTS(iCount)%iMonth == (last_month + 1) ) then
+        last_fragment = 0
+        last_zone = 0
+      endif  
+
+      if ( FRAGMENTS(iCount)%iMonth < last_month )                             &
+        call die( "Out-of-order month value in the daily fragments file",      &
+          __SRCNAME__, __LINE__, "Problem occured on line number "             &
+          //asCharacter(FRAGMENTS_FILE%currentLineNum() )                      &
+          //" of file "//dquote(sFilename) )
+
+      last_month = FRAGMENTS(iCount)%iMonth
+
       ! read in rain gage zone
       call chomp(sRecord, sSubstring, FRAGMENTS_FILE%sDelimiters )
 
@@ -333,6 +353,18 @@ contains
           //" of file "//dquote(sFilename) )
 
       FRAGMENTS(iCount)%iRainGageZone = asInt(sSubString)
+
+      if ( FRAGMENTS(iCount)%iRainGageZone < last_zone )                            &
+        call die( "Rain gage zone number out of order in the daily fragments file", &
+          __SRCNAME__, __LINE__, "Problem occured on line number "                  &
+          //asCharacter(FRAGMENTS_FILE%currentLineNum() )                           &
+          //" of file "//dquote(sFilename) )
+
+      ! reset the counter tracking the previous fragment ID
+      if ( FRAGMENTS(iCount)%iRainGageZone == (last_zone + 1) )                &
+        last_fragment = 0
+
+      last_zone = FRAGMENTS(iCount)%iRainGageZone
 
       ! read in fragment set number for this zone
       call chomp(sRecord, sSubstring, FRAGMENTS_FILE%sDelimiters )
@@ -345,6 +377,15 @@ contains
 
       FRAGMENTS(iCount)%iFragmentSet = asInt(sSubString)
 
+      if ( FRAGMENTS(iCount)%iFragmentSet /= (last_fragment + 1) )                           &
+        call die( "Missing or out-of-order fragment value in the daily fragments file",      &
+          __SRCNAME__, __LINE__, "Problem occured on line number "                           &
+          //asCharacter(FRAGMENTS_FILE%currentLineNum() )                                    &
+          //" of file "//dquote(sFilename) )
+
+      last_fragment = FRAGMENTS(iCount)%iFragmentSet
+
+      ! read in fragments for each day of the current month
       do iIndex = 1, 31
 
         ! read in fragment for given day of month
@@ -666,6 +707,17 @@ contains
 
         enddo
 
+      enddo
+
+    endif
+
+    if (any( RANDOM_VALUES < 0.0 ) ) then
+
+      call LOGS%write("Error detected in method of fragments routine - random values " &
+        //" not found in sequence file for rainfall zone(s):", iLinesBefore=1)
+      do iIndex=1,size(RANDOM_VALUES, 1)
+        if ( RANDOM_VALUES(iIndex) < 0.0 )  &
+          call LOGS%write("iIndex (~rainfall zone): "//asCharacter(iIndex), iTab=3 )
       enddo
 
     endif
