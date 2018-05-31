@@ -33,6 +33,8 @@ export LIB_GCC=$( glocate libgcc.a | grep Cellar | grep $GCC_VERSION | grep -v i
 export LIB_GFORTRAN=$( glocate libgfortran.a | grep Cellar | grep $GCC_VERSION | grep -v i386 )
 export NC_CONFIG=$(glocate nc-config | grep Cellar | grep $NETCDF_VERSION )
 
+export SWB_EXTERNAL_LIBS="$LIB_HDF5_HL $LIB_HDF5 $LIB_NETCDF $LIB_SZ $LIBZ $LIBDL $LIB_GCC $LIB_GFORTRAN"
+
 export PATH=/usr/local:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:$PATH
 
 # define where 'make copy' will place executables
@@ -55,13 +57,7 @@ export CXX=$GPP
 cmake "../../.." -G "Unix Makefiles"                         \
 -DSYSTEM_TYPE="$SYSTEM_TYPE "                                \
 -DCMAKE_BUILD_TYPE="$BUILD_TYPE "                            \
--DLIB_HDF5_HL="$LIB_HDF5_HL "                                \
--DLIB_HDF5="$LIB_HDF5 "                                      \
--DLIB_Z="$LIB_Z "                                            \
--DLIB_SZ="$LIB_SZ "                                          \
--DLIB_NETCDF="$LIB_NETCDF "                                  \
--DLIB_GCC="$LIB_GCC "                                        \
--DLIB_GFORTRAN="$LIB_GFORTRAN "                              \
+-DSWB_EXTERNAL_LIBS="$SWB_EXTERNAL_LIBS "                    \
 -DCMAKE_INSTALL_PREFIX:PATH="$INSTALL_PREFIX "               \
 -DCMAKE_Fortran_FLAGS_DEBUG="$CMAKE_Fortran_FLAGS_DEBUG "    \
 -DCMAKE_Fortran_FLAGS_RELEASE="$CMAKE_Fortran_FLAGS_RELEASE"

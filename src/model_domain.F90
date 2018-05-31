@@ -17,7 +17,7 @@ module model_domain
   use strings
   implicit none
 
-  private
+  public
 
   ! concept: the only state variables that should appear in this module should be
   !          those that are required regardless of what other program options are active
@@ -27,7 +27,7 @@ module model_domain
   !               a soil moisture balance; the pointer may be set to a different procedure thus changing
   !               the behavior and mechanisms within the model
 
-  type, public :: MODEL_DOMAIN_T
+  type :: MODEL_DOMAIN_T
 
     character (len=:), allocatable     :: output_directory_name
     character (len=:), allocatable     :: PROJ4_string
@@ -102,7 +102,7 @@ module model_domain
     real (kind=c_float), allocatable       :: surface_storage_excess(:)
     real (kind=c_float), allocatable       :: storm_drain_capture(:)
     real (kind=c_float), allocatable       :: delta_soil_storage(:)
-    real (kind=c_float), allocatable       :: soil_storage(:)
+    real (kind=c_double), allocatable      :: soil_storage(:)
     real (kind=c_float), allocatable       :: soil_storage_max(:)
     real (kind=c_float), allocatable       :: net_infiltration(:)
     real (kind=c_float), allocatable       :: rejected_net_infiltration(:)
@@ -134,99 +134,49 @@ module model_domain
 
     real (kind=c_float), allocatable       :: irrigation_mask(:)
 
-    !> declare and initialize procedure pointers such that the default methods are in place
-    procedure ( array_method ), pointer  :: init_interception                                                &
-                                                => model_initialize_interception_bucket
-    procedure ( array_method ), pointer  :: init_runoff                                                      &
-                                                => model_initialize_runoff_curve_number
-    procedure ( array_method ), pointer  :: init_reference_et                                                &
-                                                => model_initialize_et_hargreaves
-    procedure ( array_method ), pointer  :: init_actual_et                                                   &
-                                                => model_initialize_actual_et_thornthwaite_mather_eqns
-    procedure ( array_method ), pointer  :: init_routing                                                     &
-                                                => model_initialize_routing_D8
-    procedure ( array_method ), pointer  :: init_soil_storage_max                                            &
-                                                => model_initialize_soil_storage_max_internally_calculated
-    procedure ( array_method ), pointer  :: init_snowfall                                                    &
-                                                => model_initialize_snowfall_original
-    procedure ( array_method ), pointer  :: init_snowmelt                                                    &
-                                                => model_initialize_snowmelt_original
-    procedure ( array_method ), pointer  :: init_precipitation_data                                          &
-                                                => model_initialize_precip_normal
-    procedure ( array_method ), pointer  :: init_fog                                                         &
-                                                => model_initialize_fog_none
-    procedure ( array_method ), pointer  :: init_irrigation                                                  &
-                                                => model_initialize_irrigation_none
-    procedure ( array_method ), pointer  :: init_direct_net_infiltration                                             &
-                                                => model_initialize_direct_net_infiltration_gridded
-    procedure ( array_method ), pointer  :: init_direct_soil_moisture                                        &
-                                                => model_initialize_direct_soil_moisture_none
-    procedure ( array_method ), pointer  :: update_landuse_codes                                             &
-                                                => model_update_landuse_codes_static
-    procedure ( array_method ), pointer  :: init_GDD                                                         &
-                                                => model_initialize_GDD
-    procedure ( array_method ), pointer  :: init_AWC                                                         &
-                                                => model_initialize_available_water_content_gridded
-    procedure ( array_method ), pointer  :: init_crop_coefficient                                            &
-                                                => model_initialize_crop_coefficient_none
-    procedure ( array_method ), pointer  :: calc_interception                                                &
-                                                => model_calculate_interception_bucket
-    procedure ( array_method ), pointer  :: update_crop_coefficient                                          &
-                                                => model_update_crop_coefficient_none
-
-    procedure ( array_method ), pointer  :: update_rooting_depth                                          &
-                                                => model_update_rooting_depth_none
-
-    procedure ( array_method ), pointer  :: init_continuous_frozen_ground_index                              &
-                                                => model_initialize_continuous_frozen_ground_index
-    procedure ( array_method ), pointer  :: calc_continuous_frozen_ground_index                              &
-                                                => model_calculate_continuous_frozen_ground_index
-
-    procedure ( array_method ), pointer  :: init_maximum_net_infiltration                                  &
-                                                => model_initialize_maximum_net_infiltration_gridded
-    procedure ( index_method ), pointer  :: calc_maximum_net_infiltration                                  &
-                                                => model_calculate_maximum_net_infiltration_gridded
-
-    procedure ( index_method ), pointer  :: calc_runoff                                                      &
-                                                => model_calculate_runoff_curve_number
-
-    procedure ( array_method ), pointer  :: calc_reference_et                                                &
-                                                => model_calculate_et_hargreaves
-    procedure ( index_method ), pointer  :: calc_routing                                                     &
-                                                => model_calculate_routing_D8
-
-    procedure ( index_method ), pointer  :: calc_actual_et                                                   &
-                                                => model_calculate_actual_et_thornthwaite_mather_eqns
-    procedure ( array_method ), pointer  :: calc_snowfall                                                    &
-                                                => model_calculate_snowfall_original
-    procedure ( array_method ), pointer  :: calc_snowmelt                                                    &
-                                                => model_calculate_snowmelt_original
-    procedure ( array_method ), pointer  :: calc_fog                                                         &
-                                                => model_calculate_fog_none
-    procedure ( index_method ), pointer  :: calc_irrigation                                                  &
-                                                => model_calculate_irrigation_none
-    procedure ( array_method ), pointer  :: calc_GDD                                                         &
-                                                => model_calculate_GDD
-    procedure ( index_method ), pointer  :: calc_direct_net_infiltration                                             &
-                                                => model_calculate_direct_net_infiltration_none
-    procedure ( index_method ), pointer  :: calc_direct_soil_moisture                                        &
-                                                => model_calculate_direct_soil_moisture_none
-
-    procedure (array_method), pointer    :: output_irrigation                                                &
-                                                => model_output_irrigation_none
-    procedure (array_method), pointer    :: dump_variables                                                   &
-                                                => model_dump_variables_none
-
-    procedure ( array_method ), pointer  :: read_awc_data                                                    &
-                                                => model_read_available_water_content_gridded
-    procedure ( array_method ), pointer  :: get_precipitation_data                                           &
-                                                => model_get_precip_normal
-    procedure ( array_method ), pointer  :: get_minimum_air_temperature_data                                 &
-                                                => model_get_minimum_air_temperature_normal
-    procedure ( array_method ), pointer  :: get_maximum_air_temperature_data                                 &
-                                                => model_get_maximum_air_temperature_normal
-    procedure ( array_method ), pointer  :: calculate_mean_air_temperature                                   &
-                                                => model_calculate_mean_air_temperature
+    !> declare procedure pointers - these will have to be initialized elsewhere
+    procedure ( array_method ), pointer  :: init_interception
+    procedure ( array_method ), pointer  :: init_runoff
+    procedure ( array_method ), pointer  :: init_reference_et
+    procedure ( array_method ), pointer  :: init_actual_et
+    procedure ( array_method ), pointer  :: init_routing
+    procedure ( array_method ), pointer  :: init_soil_storage_max
+    procedure ( array_method ), pointer  :: init_snowfall
+    procedure ( array_method ), pointer  :: init_snowmelt
+    procedure ( array_method ), pointer  :: init_precipitation_data
+    procedure ( array_method ), pointer  :: init_fog
+    procedure ( array_method ), pointer  :: init_irrigation
+    procedure ( array_method ), pointer  :: init_direct_net_infiltration
+    procedure ( array_method ), pointer  :: init_direct_soil_moisture
+    procedure ( array_method ), pointer  :: update_landuse_codes
+    procedure ( array_method ), pointer  :: init_GDD
+    procedure ( array_method ), pointer  :: init_AWC
+    procedure ( array_method ), pointer  :: init_crop_coefficient
+    procedure ( array_method ), pointer  :: calc_interception
+    procedure ( array_method ), pointer  :: update_crop_coefficient
+    procedure ( array_method ), pointer  :: update_rooting_depth
+    procedure ( array_method ), pointer  :: init_continuous_frozen_ground_index
+    procedure ( array_method ), pointer  :: calc_continuous_frozen_ground_index
+    procedure ( array_method ), pointer  :: init_maximum_net_infiltration
+    procedure ( index_method ), pointer  :: calc_maximum_net_infiltration
+    procedure ( index_method ), pointer  :: calc_runoff
+    procedure ( array_method ), pointer  :: calc_reference_et
+    procedure ( index_method ), pointer  :: calc_routing
+    procedure ( index_method ), pointer  :: calc_actual_et
+    procedure ( array_method ), pointer  :: calc_snowfall
+    procedure ( array_method ), pointer  :: calc_snowmelt
+    procedure ( array_method ), pointer  :: calc_fog
+    procedure ( index_method ), pointer  :: calc_irrigation
+    procedure ( array_method ), pointer  :: calc_GDD
+    procedure ( index_method ), pointer  :: calc_direct_net_infiltration
+    procedure ( index_method ), pointer  :: calc_direct_soil_moisture
+    procedure (array_method), pointer    :: output_irrigation
+    procedure (array_method), pointer    :: dump_variables
+    procedure ( array_method ), pointer  :: read_awc_data
+    procedure ( array_method ), pointer  :: get_precipitation_data
+    procedure ( array_method ), pointer  :: get_minimum_air_temperature_data
+    procedure ( array_method ), pointer  :: get_maximum_air_temperature_data
+    procedure ( array_method ), pointer  :: calculate_mean_air_temperature
 
   contains
 
@@ -271,19 +221,8 @@ module model_domain
 
   end type MODEL_DOMAIN_T
 
-  type :: CELL_COL_ROW_T
-    integer (kind=c_int) :: unitnum
-    integer (kind=c_int) :: col
-    integer (kind=c_int) :: row
-    real (kind=c_float)  :: x_coord
-    real (kind=c_float)  :: y_coord
-    integer (kind=c_int) :: indx_start
-    integer (kind=c_int) :: indx_end
-  end type CELL_COL_ROW_T
-
-  type ( CELL_COL_ROW_T ) :: DUMP(20)
-
   ! array method: designed to be called using whole-array notation
+  ! public array_method
   abstract interface
     subroutine array_method( this )
       import :: MODEL_DOMAIN_T
@@ -293,6 +232,7 @@ module model_domain
 
   ! indexed method: designed to be called sequentially with explicit
   ! index values provided
+  ! public index_method
   abstract interface
     subroutine index_method( this, index )
       import :: MODEL_DOMAIN_T, c_int
@@ -305,6 +245,18 @@ module model_domain
     procedure :: minmaxmean_float
     procedure :: minmaxmean_int
   end interface minmaxmean
+
+  type :: CELL_COL_ROW_T
+    integer (kind=c_int) :: unitnum
+    integer (kind=c_int) :: col
+    integer (kind=c_int) :: row
+    real (kind=c_float)  :: x_coord
+    real (kind=c_float)  :: y_coord
+    integer (kind=c_int) :: indx_start
+    integer (kind=c_int) :: indx_end
+  end type CELL_COL_ROW_T
+
+  type ( CELL_COL_ROW_T ) :: DUMP(20)
 
   ! creating several module-level globals
   type (MODEL_DOMAIN_T), public             :: MODEL
@@ -2288,7 +2240,7 @@ contains
 
         call irrigation__calculate( irrigation_amount=this%irrigation(indx),                             &
                                     landuse_index=this%landuse_index(indx),                              &
-                                    soil_storage=this%soil_storage(indx),                                &
+                                    soil_storage=real(this%soil_storage(indx), kind=c_float),            &
                                     soil_storage_max=this%soil_storage_max(indx),                        &
                                     total_available_water=this%total_available_water_taw(indx),          &
                                     rainfall=this%rainfall(indx),                                        &
@@ -2303,7 +2255,7 @@ contains
 
         call irrigation__calculate( irrigation_amount=this%irrigation(indx),                             &
                                     landuse_index=this%landuse_index(indx),                              &
-                                    soil_storage=this%soil_storage(indx),                                &
+                                    soil_storage=real(this%soil_storage(indx), kind=c_float),            &
                                     soil_storage_max=this%soil_storage_max(indx),                        &
                                     total_available_water=this%total_available_water_taw(indx),          &
                                     rainfall=this%rainfall(indx),                                        &
@@ -2759,12 +2711,12 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     integer (kind=c_int), intent(in)       :: indx
 
-    call calculate_actual_et_thornthwaite_mather_eqns(                                               &
-                                                  actual_et=this%actual_et( indx ),                  &
-                                                  soil_moisture=this%soil_storage( indx ),           &
-                                                  max_soil_moisture=this%soil_storage_max( indx ),   &
-                                                  precipitation=this%infiltration( indx ),           &
-                                                  crop_etc=this%crop_etc( indx ),                    &
+    call calculate_actual_et_thornthwaite_mather_eqns(                                                          &
+                                                  actual_et=this%actual_et( indx ),                             &
+                                                  soil_moisture=this%soil_storage( indx ),                      &
+                                                  max_soil_moisture=this%soil_storage_max( indx ),              &
+                                                  precipitation=this%infiltration( indx ),                      &
+                                                  crop_etc=this%crop_etc( indx ),                               &
                                                   indx=indx )
 
   end subroutine model_calculate_actual_et_thornthwaite_mather_eqns
@@ -2786,10 +2738,10 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
     integer (kind=c_int), intent(in)       :: indx
 
-    call calculate_actual_et_thornthwaite_mather( actual_et=this%actual_et_soil( indx ),            &
-                                                  soil_storage=this%soil_storage( indx ),           &
-                                                  soil_storage_max=this%soil_storage_max( indx ),   &
-                                                  precipitation=this%infiltration( indx ),          &
+    call calculate_actual_et_thornthwaite_mather( actual_et=this%actual_et_soil( indx ),                        &
+                                                  soil_storage=real(this%soil_storage( indx ), kind=c_float),   &
+                                                  soil_storage_max=this%soil_storage_max( indx ),               &
+                                                  precipitation=this%infiltration( indx ),                      &
                                                   crop_etc=this%crop_etc( indx ) )
 
   end subroutine model_calculate_actual_et_thornthwaite_mather
@@ -2822,7 +2774,7 @@ contains
 
     call calculate_actual_et_fao56( actual_et=this%actual_et_soil( indx ),                                    &
                                     adjusted_depletion_fraction_p=this%adjusted_depletion_fraction_p( indx ), &
-                                    soil_storage=this%soil_storage( indx ),                                   &
+                                    soil_storage=real(this%soil_storage( indx ), kind=c_float),               &
                                     soil_storage_max=this%soil_storage_max( indx ),                           &
                                     infiltration=this%infiltration( indx ),                                   &
                                     crop_etc=this%crop_etc( indx ),                                           &
@@ -2872,7 +2824,7 @@ contains
               soil_group=this%soil_group( indx ),                                               &
               awc=this%awc( indx ),                                                             &
               current_rooting_depth=this%current_rooting_depth( indx ),                         &
-              soil_storage=this%soil_storage( indx ),                                           &
+              soil_storage=real(this%soil_storage( indx ), kind=c_float),                       &
               soil_storage_max=this%soil_storage_max( indx ),                                   &
               reference_et0=this%reference_et0( indx ) )
 
@@ -3064,10 +3016,10 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call crop_coefficients_FAO56_initialize( fSoilStorage=this%soil_storage,      &
-                                             iLanduseIndex=this%landuse_index,    &
-                                             iSoilGroup=this%soil_group,          &
-                                             fAvailable_Water_Content=this%awc,   &
+    call crop_coefficients_FAO56_initialize( fSoilStorage=real(this%soil_storage, kind=c_float),  &
+                                             iLanduseIndex=this%landuse_index,                    &
+                                             iSoilGroup=this%soil_group,                          &
+                                             fAvailable_Water_Content=this%awc,                   &
                                              lActive=this%active )
 
   end subroutine model_initialize_crop_coefficient_FAO56
@@ -3497,7 +3449,7 @@ contains
 
     call minmaxmean( this%interception_storage, "intcp_stor")
     call minmaxmean( this%snow_storage, "snow_stor")
-    call minmaxmean( this%soil_storage, "soil_stor")
+    call minmaxmean( real(this%soil_storage, kind=c_float), "soil_stor")
     call minmaxmean( this%soil_storage_max, "soil_stor_max")
     call minmaxmean( this%net_infiltration, "net_infiltration")
 

@@ -1,7 +1,6 @@
 program swbstats2
 
-  use iso_c_binding, only             : c_int, c_float, c_double, c_bool,      &
-                                        c_size_t, c_ptrdiff_t, c_long
+  use iso_c_binding
   use iso_fortran_env, only           : OUTPUT_UNIT
   use constants_and_conversions, only : TRUE, FALSE, DATATYPE_INT,             &
                                         DATATYPE_FLOAT, BNDS, asFloat,         &
@@ -23,6 +22,12 @@ program swbstats2
                                         COMPILER_VERSION
 
   implicit none
+
+! supply apparently missing parameter values from Intel implementation of ISO_C_BINDING
+#ifdef __INTEL_COMPILER
+  integer, parameter :: c_ptrdiff_t = 8
+  integer, parameter :: c_diff_t = 8
+#endif
 
   integer (kind=c_size_t)          :: RECNUM = 0
 
@@ -150,8 +155,8 @@ program swbstats2
 
 #ifdef __INTEL_COMPILER
     write(UNIT=*,FMT="(a)") "Compiled with: Intel Fortran version " &
-      //TRIM(int2char(__INTEL_COMPILER))
-      write(UNIT=*,FMT="(a,/)") "Compiler build date:"//TRIM(int2char(__INTEL_COMPILER_BUILD_DATE))
+      //TRIM(asCharacter(__INTEL_COMPILER))
+      write(UNIT=*,FMT="(a,/)") "Compiler build date:"//TRIM(asCharacter(__INTEL_COMPILER_BUILD_DATE))
 #endif
 
 #ifdef __G95__

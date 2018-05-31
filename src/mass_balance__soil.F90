@@ -1,6 +1,6 @@
 module mass_balance__soil
 
-  use iso_c_binding, only        : c_float
+  use iso_c_binding, only        : c_float, c_double
   implicit none
 
   private
@@ -19,7 +19,7 @@ contains
                                                      infiltration )
 
     real (kind=c_float), intent(inout)      :: net_infiltration
-    real (kind=c_float), intent(inout)      :: soil_storage
+    real (kind=c_double), intent(inout)     :: soil_storage
     real (kind=c_float), intent(inout)      :: actual_et_soil
     real (kind=c_float), intent(inout)      :: runoff
     real (kind=c_float), intent(inout)      :: delta_soil_storage

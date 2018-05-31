@@ -41,7 +41,7 @@ enable_language (Fortran C)
 SET(CPACK_GENERATOR "TGZ")
 include(CPack)
 
-set(CMAKE_INCLUDE_CURRENT_DIR ON)
+set(CMAKE_INCLUDE_CURRENT_DIR OFF)
 
 set(PACKAGE_BUGREPORT "smwesten@usgs.gov")
 set(PACKAGE_NAME "swb2")
@@ -53,8 +53,15 @@ cmake_minimum_required(VERSION 2.8)
 
 include( cmake/version_control.cmake )
 
-set( EXTERNAL_LIBS ${LIB_NETCDF} ${LIB_HDF5_HL} ${LIB_HDF5} ${LIB_SZ} ${LIB_DL} ${LIB_Z} ${NETCDF_DEPS})
-set( EXTERNAL_LIBS ${EXTERNAL_LIBS} ${LIB_GFORTRAN} ${LIB_GCC} )
+set( EXTERNAL_LIBS ${SWB_EXTERNAL_LIBS})
+
+#if(MSVC)
+  # Automatically adds compiler definitions to all subdirectories too.
+  add_definitions(/D_CRT_SECURE_NO_DEPRECATE /DWIN32_LEAN_AND_MEAN)
+  # # Disable all warnings
+  # string (REPLACE "/W3" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
+  # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /w")
+#endif(MSVC)
 
 #libvcruntime.lib libucrt.lib libifport.lib
 

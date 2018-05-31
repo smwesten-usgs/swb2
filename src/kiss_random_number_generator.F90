@@ -4,7 +4,6 @@ module kiss_random_number_generator
   implicit none
 
   integer,parameter :: I8=8
-  integer,parameter :: I16=16
   integer,parameter :: R8=8
   integer,parameter :: R16=16
 
@@ -16,7 +15,7 @@ module kiss_random_number_generator
 
   integer(kind=I8)  :: I8_max = huge(xs)
   integer(kind=I8)  :: I8_min = -(huge(xs))
-  integer(kind=I16)  :: I16_range = 2*huge(xs)+1
+  real(kind=R16)    :: I16_range = 2.*huge(xs)+1.
 
 contains
 
@@ -524,7 +523,7 @@ contains
     integer (kind=I8)   :: x
 
     x = kiss64_rng()
-    unif = ( real(x, kind=R8) - real(I8_min, kind=R8) ) / real(I16_range,kind=R16)
+    unif = ( real(x, kind=R8) - real(I8_min, kind=R8) ) / I16_range
 
   end function kiss64_uniform_rng
 

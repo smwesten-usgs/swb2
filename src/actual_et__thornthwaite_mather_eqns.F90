@@ -7,7 +7,7 @@ module actual_et__thornthwaite_mather_eqns
   private
 
   public :: initialize_actual_et_thornthwaite_mather_eqns
-  public :: calculate_actual_et_thornthwaite_mather_eqns 
+  public :: calculate_actual_et_thornthwaite_mather_eqns
 
   real (kind=c_float), parameter    :: NEAR_ZERO = 1.0e-9_c_float
   real (kind=c_float), allocatable  :: ACCUMULATED_POTENTIAL_WATER_LOSS(:)
@@ -19,7 +19,7 @@ contains
 
 subroutine initialize_actual_et_thornthwaite_mather_eqns ( soil_moisture, max_soil_moisture )
 
-  real (kind=c_float), intent(in)     :: soil_moisture(:)
+  real (kind=c_double), intent(in)     :: soil_moisture(:)
   real (kind=c_float), intent(in)     :: max_soil_moisture(:)
 
   ! [ LOCALS ]
@@ -35,11 +35,11 @@ end subroutine initialize_actual_et_thornthwaite_mather_eqns
 
 !--------------------------------------------------------------------------------------------------
 
-!> Return the current soil moisture given the max soil-water-capacity and current APWL. 
+!> Return the current soil moisture given the max soil-water-capacity and current APWL.
 
 elemental subroutine thornthwaite_mather_soil_moisture(soil_moisture, max_soil_moisture, APWL)
 
-  real (kind=c_float), intent(inout) :: soil_moisture
+  real (kind=c_double), intent(inout) :: soil_moisture
   real (kind=c_float), intent(in)    :: max_soil_moisture
   real (kind=c_float), intent(in)    :: APWL
 
@@ -53,13 +53,13 @@ elemental subroutine thornthwaite_mather_soil_moisture(soil_moisture, max_soil_m
 
     soil_moisture = 10_c_double**( log10( max_soil_moisture )        &
                       - ( abs( APWL ) * TM_SLOPE_TERM              &
-                      * max_soil_moisture**TM_EXPONENT_TERM ) ) 
+                      * max_soil_moisture**TM_EXPONENT_TERM ) )
 
   else
-  
+
     soil_moisture = 0.0_c_float
 
-  endif  
+  endif
 
 end subroutine thornthwaite_mather_soil_moisture
 
@@ -71,7 +71,7 @@ end subroutine thornthwaite_mather_soil_moisture
 
     real (kind=c_float), intent(inout)  :: APWL
     real (kind=c_float), intent(in)     :: max_soil_moisture
-    real (kind=c_float), intent(in)     :: soil_moisture
+    real (kind=c_double), intent(in)     :: soil_moisture
 
     ! equation as implemented in R;
     ! sm.df$y = maximum soil-water capacity
@@ -83,7 +83,7 @@ end subroutine thornthwaite_mather_soil_moisture
       APWL = -( log10( max_soil_moisture ) - log10( soil_moisture ) )            &
                   / ( TM_SLOPE_TERM * max_soil_moisture**TM_EXPONENT_TERM )
 
-    else 
+    else
 
       APWL = 0.0_c_float
 
@@ -102,7 +102,7 @@ subroutine calculate_actual_et_thornthwaite_mather_eqns(                        
                                                   indx )
 
     real (kind=c_float), intent(inout)             :: actual_et
-    real (kind=c_float), intent(in)                :: soil_moisture
+    real (kind=c_double), intent(in)               :: soil_moisture
     real (kind=c_float), intent(in)                :: max_soil_moisture
     real (kind=c_float), intent(in)                :: precipitation
     real (kind=c_float), intent(in)                :: crop_etc
@@ -110,7 +110,7 @@ subroutine calculate_actual_et_thornthwaite_mather_eqns(                        
 
     ! [ LOCALS ]
     real (kind=c_float)  :: P_minus_PE
-    real (kind=c_float)  :: temp_soil_moisture
+    real (kind=c_double)  :: temp_soil_moisture
 
     P_minus_PE = precipitation - crop_etc
 
@@ -119,7 +119,7 @@ subroutine calculate_actual_et_thornthwaite_mather_eqns(                        
       if ( P_minus_PE >= 0.0_c_float ) then
 
         actual_et = crop_etc
-        
+
         if ( max_soil_moisture > NEAR_ZERO ) then
 
           temp_soil_moisture = min( max_soil_moisture, soil_moisture + P_minus_PE )
@@ -138,14 +138,14 @@ subroutine calculate_actual_et_thornthwaite_mather_eqns(                        
           actual_et = soil_moisture - temp_soil_moisture
 
         else
-        
+
           actual_et = precipitation
 
-        endif     
+        endif
 
       endif
 
-    end associate  
+    end associate
 
   end subroutine calculate_actual_et_thornthwaite_mather_eqns
 

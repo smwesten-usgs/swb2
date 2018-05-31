@@ -1,8 +1,8 @@
 !> @file
 !!  Contain a single module, @ref netcdf4_support, which
-!!  provides support for use of NetCDF files as input or output.
+!!  provides support for use of netCDF files as input or output.
 !!
-!! Supports use of NetCDF files as input for time-varying,
+!! Supports use of netCDF files as input for time-varying,
 !! gridded meteorlogic data, or output for any SWB-generated variable.
 !!
 !! from the C API:
@@ -20,7 +20,7 @@
 !! varies fastest in the Fortran 90 interface.
 !! ^^^^^^ ^^^^^^^
 
-!> Provide support for use of NetCDF files as input for time-varying,
+!> Provide support for use of netCDF files as input for time-varying,
 !! gridded meteorlogic data, or output for any SWB-generated variable.
 module netcdf4_support
 
@@ -302,7 +302,7 @@ end function netcdf_date_within_range
 
 !> We need two functions to convert from index to timeval, and timeval to JD;
 !> note that timeval refers to the number of days from the origin
-!> of the NetCDF file
+!> of the netCDF file
 
 !> return the day value (number of days since origin
 function nf_julian_day_to_index(NCFILE, rJulianDay)  result (iIndex)
@@ -370,7 +370,7 @@ function nf_julian_day_to_index_adj( NCFILE, rJulianDay )  result(iStart)
   iCandidateIndex = nf_julian_day_to_index(NCFILE, rJulianDay)
 
   call assert(iCandidateIndex >=0, "Problem finding the index number of the time " &
-    //"variable in NetCDF file "//dquote(NCFILE%sFilename), __SRCNAME__, __LINE__)
+    //"variable in netCDF file "//dquote(NCFILE%sFilename), __SRCNAME__, __LINE__)
 
   iInitialCandidateIndex = iCandidateIndex
 
@@ -666,12 +666,12 @@ subroutine netcdf_open_and_prepare_for_merging( NCFILE, sFilename, guess_z_var_n
 
     call nf_calculate_time_range(NCFILE)
 
-    !> retrieve the time values as included in the NetCDF file
+    !> retrieve the time values as included in the netCDF file
     call nf_get_time_vals(NCFILE)
 
   endif
 
-  !> retrieve the X and Y coordinates from the NetCDF file...
+  !> retrieve the X and Y coordinates from the netCDF file...
   call nf_get_x_and_y(NCFILE)
 
   !> define the entire grid area as the AOI
@@ -681,7 +681,7 @@ subroutine netcdf_open_and_prepare_for_merging( NCFILE, sFilename, guess_z_var_n
   NCFILE%iRowBounds(NC_TOP) = lbound(NCFILE%rY_Coords,1)
   NCFILE%iRowBounds(NC_BOTTOM) = ubound(NCFILE%rY_Coords,1)
 
-  !> based on the subset of the NetCDF file as determined above, set the
+  !> based on the subset of the netCDF file as determined above, set the
   !> start, count, and stride parameters for use in all further data
   !> retrievals
   call nf_set_start_count_stride(NCFILE)
@@ -786,7 +786,7 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
 
     call nf_calculate_time_range(NCFILE)
 
-    !> retrieve the time values as included in the NetCDF file
+    !> retrieve the time values as included in the netCDF file
     call nf_get_time_vals(NCFILE)
 
   endif
@@ -796,7 +796,7 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
   !> establish scale_factor and add_offset values, if present
   call nf_get_scale_and_offset(NCFILE=NCFILE)
 
-  !> retrieve the X and Y coordinates from the NetCDF file...
+  !> retrieve the X and Y coordinates from the netCDF file...
   call nf_get_x_and_y(NCFILE)
 
   if (present(tGridBounds) ) then
@@ -860,7 +860,7 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
 
   endif
 
-  !> based on the subset of the NetCDF file as determined above, set the
+  !> based on the subset of the netCDF file as determined above, set the
   !> start, count, and stride parameters for use in all further data
   !> retrievals
   call nf_set_start_count_stride(NCFILE)
@@ -931,14 +931,14 @@ subroutine netcdf_open_and_prepare_as_output_archive(NCFILE, NCFILE_ARCHIVE, &
   NCFILE_ARCHIVE%sVarUnits(NC_Y) =   NCFILE%sVarUnits(NC_Y)
   NCFILE_ARCHIVE%sVarUnits(NC_Z) =   NCFILE%sVarUnits(NC_Z)
 
-  !> transfer dimension values to NetCDF file
+  !> transfer dimension values to netCDF file
   call nf_define_dimensions( NCFILE=NCFILE_ARCHIVE )
 
   !> set variable values in the NCFILE struct
   call nf_set_standard_variables(NCFILE=NCFILE_ARCHIVE, &
        sVarName_z = trim(NCFILE%sVarName(NC_Z)) )
 
-  !> transfer variable values to NetCDF file
+  !> transfer variable values to netCDF file
   call nf_define_variables(NCFILE=NCFILE_ARCHIVE)
 
   call nf_get_variable_id_and_type( NCFILE=NCFILE_ARCHIVE )
@@ -1050,7 +1050,7 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
     //StartDate%prettydate()//"_"//EndDate%prettydate()//"__"                 &
     //trim(asCharacter(iNY))//"_by_"//trim(asCharacter(iNX))//".nc"
 
-  call LOGS%write("Attempting to open NetCDF file for writing with filename "//dquote(sFilename))
+  call LOGS%write("Attempting to open netCDF file for writing with filename "//dquote(sFilename))
 
   call nf_create(NCFILE=NCFILE, sFilename=trim(sFilename) )
 
@@ -1063,14 +1063,14 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
 !   NCFILE%sVarUnits(NC_Y)    = sXY_units
   NCFILE%sVarUnits(NC_Z)    = sVariableUnits
 
-  !> transfer dimension values to NetCDF file
+  !> transfer dimension values to netCDF file
   call nf_define_dimensions( NCFILE=NCFILE )
 
   !> set variable values in the NCFILE struct
   call nf_set_standard_variables(NCFILE=NCFILE, sVarName_z = sVariableName,   &
     lLatLon=include_latlon, write_time_bounds=write_time_bounds_ )
 
-  !> transfer variable values to NetCDF file
+  !> transfer variable values to netCDF file
   call nf_define_variables(NCFILE=NCFILE)
 
   call nf_get_variable_id_and_type( NCFILE=NCFILE )
@@ -1173,7 +1173,7 @@ subroutine nf_set_start_count_stride(NCFILE)
       case (NC_X)
 
         !> need to subtract 1 from the start index: we're using the
-        !> NetCDF C API, in which index values are relative to zero
+        !> netCDF C API, in which index values are relative to zero
         NCFILE%iStart(iIndex) = minval(NCFILE%iColBounds) - 1
         NCFILE%iNX = maxval(NCFILE%iColBounds) - minval(NCFILE%iColBounds) + 1
         NCFILE%iCount(iIndex) = NCFILE%iNX
@@ -1390,10 +1390,10 @@ subroutine nf_get_x_and_y(NCFILE)
   endif
 
   call assert(pNC_DIM_x%iNC_DimSize > 2, "INTERNAL PROGRAMMING ERROR - " &
-    //"NetCDF X dimension size must be greater than 2.", __SRCNAME__, __LINE__)
+    //"netCDF X dimension size must be greater than 2.", __SRCNAME__, __LINE__)
 
   call assert(pNC_DIM_y%iNC_DimSize > 2, "INTERNAL PROGRAMMING ERROR - " &
-    //"NetCDF Y dimension size must be greater than 2.", __SRCNAME__, __LINE__)
+    //"netCDF Y dimension size must be greater than 2.", __SRCNAME__, __LINE__)
 
   NCFILE%rGridCellSizeX = ( maxval(NCFILE%rX_Coords) &
                                 - minval(NCFILE%rX_Coords) ) &
@@ -1416,7 +1416,7 @@ subroutine nf_open_file(NCFILE, sFilename, iLU)
   ! [ LOCALS ]
   logical (kind=c_bool) :: lFileOpen
 
-  call LOGS%write("Attempting to open READONLY NetCDF file: " &
+  call LOGS%write("Attempting to open READONLY netCDF file: " &
     //dquote(sFilename))
 
   call nf_trap( nc_open(trim(sFilename)//c_null_char, &
@@ -1491,11 +1491,12 @@ end subroutine netcdf_open_file
 
 !----------------------------------------------------------------------
 
-subroutine nf_trap( iResultCode, sFilename, iLineNumber )
+subroutine nf_trap( iResultCode, sFilename, iLineNumber, netcdf_filename )
 
   integer (kind=c_int) :: iResultCode
   character (len=*), optional :: sFilename
   integer (kind=c_int), optional :: iLineNumber
+  character (len=*), optional :: netcdf_filename
 
   ! [ LOCALS ]
   type(c_ptr) :: cpResult
@@ -1520,11 +1521,14 @@ subroutine nf_trap( iResultCode, sFilename, iLineNumber )
     cpResult = nc_strerror(iResultCode)
     sTextString = char_ptr_to_fortran_string( cpResult )
 
-    call LOGS%write("NetCDF ERROR: "//dquote( sTextString  )//" | error code was: " &
+    if (present( netcdf_filename ) )                                           &
+      call LOGS%write("netCDF filename: "//dquote( netcdf_filename  ) )
+
+    call LOGS%write("netCDF ERROR: "//dquote( sTextString  )//" | error code was: " &
       //trim(asCharacter(iResultCode)) )
 
     call assert(lFALSE, "SWB is stopping due to a problem reading or writing" &
-      //" a NetCDF file", trim(sFile), iLine)
+      //" a netCDF file", trim(sFile), iLine)
 
   endif
 
@@ -1536,7 +1540,7 @@ subroutine netcdf_close_file( NCFILE)
 
   type (T_NETCDF4_FILE ) :: NCFILE
 
-  call LOGS%write("Closing NetCDF file with name: "//dquote(NCFILE%sFilename))
+  call LOGS%write("Closing netCDF file with name: "//dquote(NCFILE%sFilename))
   call nf_trap( nc_close(NCFILE%iNCID), __SRCNAME__, __LINE__ )
 
 !  call nf_deallocate_data_struct( NCFILE=NCFILE )
@@ -1609,7 +1613,7 @@ subroutine nf_populate_dimension_struct( NCFILE )
   call assert(iStat == 0, "Could not allocate memory for NC_DIM member in NC_FILE defined type", &
     __SRCNAME__, __LINE__)
 
-  ! NetCDF 3 function
+  ! netCDF 3 function
   call nf_trap( nc_inq_unlimdim(ncid=NCFILE%iNCID, unlimdimidp=NCFILE%iNC3_UnlimitedDimensionNumber), &
                __SRCNAME__, __LINE__ )
 
@@ -2746,7 +2750,7 @@ function nf_get_first_and_last(NCFILE, iVarIndex)  result(dpValues)
 
   end select
 
-  !> if there is only one day of data in this NetCDF file, the
+  !> if there is only one day of data in this netCDF file, the
   !> first day equals the last day
   if (iCount == 1) dpValues(NC_LAST) = dpValues(NC_FIRST)
 
@@ -3048,22 +3052,22 @@ function netcdf_coord_to_col_row(NCFILE, rX, rY)  result(iColRow)
 
   if (rX < minval(NCFILE%rX_Coords) ) &
     call die( "X coordinate value "//asCharacter(rX)//" is less than the minimum X coordinate " &
-      //"value ("//asCharacter(minval(NCFILE%rX_Coords))//") contained in the NetCDF file " &
+      //"value ("//asCharacter(minval(NCFILE%rX_Coords))//") contained in the netCDF file " &
       //dquote(NCFILE%sFilename) )
 
   if (rX > maxval(NCFILE%rX_Coords) ) &
     call die( "X coordinate value "//asCharacter(rX)//" is greater than the maximum X coordinate " &
-      //"value ("//asCharacter(maxval(NCFILE%rX_Coords))//") contained in the NetCDF file " &
+      //"value ("//asCharacter(maxval(NCFILE%rX_Coords))//") contained in the netCDF file " &
       //dquote(NCFILE%sFilename) )
 
   if (rY < minval(NCFILE%rY_Coords) ) &
     call die( "Y coordinate value "//asCharacter(rY)//" is less than the minimum Y coordinate " &
-      //"value ("//asCharacter(minval(NCFILE%rY_Coords))//") contained in the NetCDF file " &
+      //"value ("//asCharacter(minval(NCFILE%rY_Coords))//") contained in the netCDF file " &
       //dquote(NCFILE%sFilename) )
 
   if (rY > maxval(NCFILE%rY_Coords) ) &
     call die( "Y coordinate value "//asCharacter(rY)//" is greater than the maximum Y coordinate " &
-      //"value ("//asCharacter(maxval(NCFILE%rY_Coords))//") contained in the NetCDF file " &
+      //"value ("//asCharacter(maxval(NCFILE%rY_Coords))//") contained in the netCDF file " &
       //dquote(NCFILE%sFilename) )
 
   iColNum = nf_return_index_double(NCFILE%rX_Coords, rX)
@@ -3136,7 +3140,7 @@ subroutine nf_create(NCFILE, sFilename, iLU)
   NCFILE%iFileFormat = NC_FORMAT_NETCDF4
 
   if (present(iLU) ) then
-    call LOGS%write("Created NetCDF file for output. Filename: " &
+    call LOGS%write("Created netCDF file for output. Filename: " &
       //dquote(NCFILE%sFilename)//"; NCID="//trim(asCharacter(NCFILE%iNCID) ) )
   endif
 
@@ -4345,7 +4349,7 @@ subroutine netcdf_put_variable_vector(NCFILE, iVarID, iStart, iCount, iStride, &
                        countp=iCount, &
                        stridep=iStride, &
                        vars=dpValues), &
-                       __SRCNAME__, __LINE__)
+                       __SRCNAME__, __LINE__, NCFILE%sFilename )
 
   endif
 

@@ -75,7 +75,7 @@ contains
   subroutine crop_coefficients_FAO56_initialize( fSoilStorage, iLanduseIndex, iSoilGroup, &
                                                  fAvailable_Water_Content, lActive )
 
-    real (kind=c_float), intent(inout)   :: fSoilStorage(:)
+    real (kind=c_float), intent(in)      :: fSoilStorage(:)
     integer (kind=c_int), intent(in)     :: iLanduseIndex(:)
     integer (kind=c_int), intent(in)     :: iSoilGroup(:)
     real (kind=c_float), intent(in)      :: fAvailable_Water_Content(:)

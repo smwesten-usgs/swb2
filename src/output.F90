@@ -330,7 +330,7 @@ contains
                                 int(cells%number_of_columns, kind=c_size_t) ],                   &
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                             &
             lMask=cells%active,                                                                  &
-            rValues=cells%soil_storage,                                                          &
+            rValues=real(cells%soil_storage, kind=c_float),                                      &
             rField=cells%nodata_fill_value )
 
     if ( OUTSPECS( NCDF_DELTA_SOIL_STORAGE )%is_active ) &
