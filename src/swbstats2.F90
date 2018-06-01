@@ -144,7 +144,7 @@ program swbstats2
 
   if(iNumArgs == 0 ) then
 
-#ifdef __GFORTRAN__
+#ifdef __GFORTRAN__l
     sCompilerFlags = COMPILER_OPTIONS()
     sCompilerVersion = COMPILER_VERSION()
     write(UNIT=*,FMT="(a,/)") "Compiled with: gfortran ("//TRIM(sCompilerVersion)//")"
@@ -159,7 +159,7 @@ program swbstats2
       write(UNIT=*,FMT="(a,/)") "Compiler build date:"//TRIM(asCharacter(__INTEL_COMPILER_BUILD_DATE))
 #endif
 
-#ifdef __G95__
+#ifdef __G95__l
     write(UNIT=*,FMT="(a,/)") "Compiled with: G95 minor version " &
       //TRIM(int2char(__G95_MINOR__))
 #endif
@@ -1177,12 +1177,12 @@ contains
     integer (c_int), allocatable   :: tempvals(:)
     integer (c_int)                :: number_of_matches
     real (c_float), allocatable    :: stats(:)
-    integer (c_int)                :: funit_
+    integer (c_int)                :: funit_l
 
     if (present(funit)) then
-      funit_ = funit
+      funit_l = funit
     else
-      funit_ = OUTPUT_UNIT
+      funit_l = OUTPUT_UNIT
     endif
 
     ! obtain list of unique integers present in the zone grid
@@ -1193,13 +1193,13 @@ contains
       if (present(comparison_values)) then
         call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats, &
               comparison_values=comparison_values)
-        write(unit=funit_, fmt="(2(a,', '),i0,', ',4(f14.5,', '),i0,', ',"  &
+        write(unit=funit_l, fmt="(2(a,', '),i0,', ',4(f14.5,', '),i0,', ',"  &
           //"4(f14.5,', '),i0)")                                            &
           start_date%prettydate(),end_date%prettydate(), n, stats(1:4),     &
           int(stats(5)), stats(6:9),int(stats(10))
       else
         call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats)
-        write(unit=funit_, fmt="(2(a,', '),i0,', ',4(f14.5,', '),i0)")         &
+        write(unit=funit_l, fmt="(2(a,', '),i0,', ',4(f14.5,', '),i0)")         &
           start_date%prettydate(),end_date%prettydate(), n, stats(1:4),int(stats(5))
       endif
     enddo

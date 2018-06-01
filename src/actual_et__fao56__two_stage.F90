@@ -12,13 +12,13 @@ module actual_et__fao56__two_stage
   use constants_and_conversions, only  : TRUE, M_PER_FOOT, in_to_mm
   use string_list, only                : STRING_LIST_T, create_list
   use parameters, only                 : PARAMS
-  use crop_coefficients__FAO56, only   : KCB_, KCB_MIN, KCB_INI, KCB_MID, KCB_END,    &
+  use crop_coefficients__FAO56, only   : KCB_l, KCB_MIN, KCB_INI, KCB_MID, KCB_END,    &
                                          JAN, DEC, KCB_METHOD_MONTHLY_VALUES,         &
                                          KCB_METHOD
   implicit none
 
-  real (kind=c_float), allocatable   :: REW_(:,:)
-  real (kind=c_float), allocatable   :: TEW_(:,:)
+  real (kind=c_float), allocatable   :: REW_l(:,:)
+  real (kind=c_float), allocatable   :: TEW_l(:,:)
   real (kind=c_float), allocatable   :: DEPLETION_FRACTION(:)
   real (kind=c_float), allocatable   :: MEAN_PLANT_HEIGHT(:)
 
@@ -72,11 +72,11 @@ contains
     number_of_landuses = count( landuse_table_codes >= 0 )
     call slList%clear()
 
-   ! Retrieve and populate the Readily Evaporable Water (REW_) table values
-   CALL PARAMS%get_parameters( fValues=REW_, sPrefix="REW_", iNumRows=number_of_landuses, lFatal=TRUE )
+   ! Retrieve and populate the Readily Evaporable Water (REW_l table values
+   CALL PARAMS%get_parameters( fValues=REW_l, sPrefix="REW_", iNumRows=number_of_landuses, lFatal=TRUE )
 
-   ! Retrieve and populate the Total Evaporable Water (TEW_) table values
-   CALL PARAMS%get_parameters( fValues=TEW_, sPrefix="TEW_", iNumRows=number_of_landuses, lFatal=TRUE )
+   ! Retrieve and populate the Total Evaporable Water (TEW_l table values
+   CALL PARAMS%get_parameters( fValues=TEW_l, sPrefix="TEW_", iNumRows=number_of_landuses, lFatal=TRUE )
 
    call PARAMS%get_parameters( sKey="Mean_Plant_Height", fValues=MEAN_PLANT_HEIGHT, lFatal=TRUE )
 
@@ -106,8 +106,8 @@ elemental function calculate_evaporation_reduction_coefficient_Kr( landuse_index
   ! [ LOCALS ]
   real (kind=c_float) :: deficit
 
-  associate( REW => REW_( landuse_index, soil_group ),         &
-             TEW => TEW_( landuse_index, soil_group ) )
+  associate( REW => REW_l( landuse_index, soil_group ),         &
+             TEW => TEW_l( landuse_index, soil_group ) )
 
     deficit = soil_storage_max - soil_storage
 
@@ -143,8 +143,8 @@ elemental function calculate_fraction_exposed_and_wetted_soil_fc( landuse_index,
   real (kind=c_float) :: denominator
   real (kind=c_float) :: exponent
 
-  numerator = Kcb - KCB_( KCB_MIN, landuse_index)
-  denominator =  KCB_( KCB_MID, landuse_index)  -  KCB_( KCB_MIN, landuse_index)
+  numerator = Kcb - KCB_l( KCB_MIN, landuse_index)
+  denominator =  KCB_l( KCB_MID, landuse_index)  -  KCB_l( KCB_MIN, landuse_index)
   exponent = 1.0 + 0.5 * MEAN_PLANT_HEIGHT( landuse_index ) * M_PER_FOOT
 
   if( denominator > 0.0_c_float ) then
@@ -192,11 +192,11 @@ elemental subroutine update_rooting_depth( Zr_i, Zr_max, landuse_index, Kcb )
   real (kind=c_float)            :: MinKCB
 
   if ( KCB_METHOD( landuse_index ) == KCB_METHOD_MONTHLY_VALUES ) then
-    MaxKCB = maxval( KCB_( JAN:DEC, landuse_index ) )
-    MinKCB = minval( KCB_( JAN:DEC, landuse_index ) )
+    MaxKCB = maxval( KCB_l( JAN:DEC, landuse_index ) )
+    MinKCB = minval( KCB_l( JAN:DEC, landuse_index ) )
   else
-    MaxKCB = maxval( KCB_( KCB_INI:KCB_MIN, landuse_index ) )
-    MinKCB = minval( KCB_( KCB_INI:KCB_MIN, landuse_index ) )
+    MaxKCB = maxval( KCB_l( KCB_INI:KCB_MIN, landuse_index ) )
+    MinKCB = minval( KCB_l( KCB_INI:KCB_MIN, landuse_index ) )
   endif
 
   ! if there is not much difference between the MAX Kcb and MIN Kcb, assume that
@@ -234,7 +234,7 @@ elemental function calculate_surface_evap_coefficient_ke( landuse_index, Kcb, Kr
   real (kind=c_float), intent(in)   :: Kr
   real (kind=c_float)               :: Ke
 
-  Ke = Kr * ( KCB_( KCB_MID, landuse_index ) - Kcb )
+  Ke = Kr * ( KCB_l( KCB_MID, landuse_index ) - Kcb )
 
 end function calculate_surface_evap_coefficient_ke
 
@@ -350,7 +350,7 @@ elemental subroutine calculate_actual_et_fao56_two_stage(                       
   fraction_exposed_and_wetted_soil = calculate_fraction_exposed_and_wetted_soil_fc( landuse_index, Kcb )
 
   Ke = min( calculate_surface_evap_coefficient_ke( landuse_index, Kcb, Kr ),       &
-            fraction_exposed_and_wetted_soil * KCB_( KCB_MID, landuse_index ) )
+            fraction_exposed_and_wetted_soil * KCB_l( KCB_MID, landuse_index ) )
 
   Ks = calculate_water_stress_coefficient_ks(taw, raw,soil_storage, soil_storage_max)
 

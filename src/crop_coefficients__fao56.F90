@@ -28,7 +28,7 @@ module crop_coefficients__FAO56
   public :: update_crop_coefficient_date_as_threshold, update_crop_coefficient_GDD_as_threshold
   public :: GROWTH_STAGE_DATE, PLANTING_DATE
   public :: KCB_MIN, KCB_INI, KCB_MID, KCB_END
-  public :: KCB_, JAN, DEC, KCB_METHOD, KCB_METHOD_GDD, KCB_METHOD_FAO56
+  public :: KCB_l, JAN, DEC, KCB_METHOD, KCB_METHOD_GDD, KCB_METHOD_FAO56
   public :: KCB_METHOD_MONTHLY_VALUES
 
   enum, bind(c)
@@ -61,7 +61,7 @@ module crop_coefficients__FAO56
   integer (kind=c_int), allocatable  :: LANDUSE_CODE(:)
 !  real (kind=c_float), allocatable   :: REW(:,:)
 !  real (kind=c_float), allocatable   :: TEW(:,:)
-  real (kind=c_float), allocatable   :: KCB_(:,:)
+  real (kind=c_float), allocatable   :: KCB_l(:,:)
   integer (kind=c_int), allocatable  :: KCB_METHOD(:)
   real (kind=c_float), allocatable   :: GROWTH_STAGE_SHIFT_DAYS(:)
   real (kind=c_float), allocatable   :: GROWTH_STAGE_DOY(:,:)
@@ -101,24 +101,24 @@ contains
     type (DATETIME_T)                :: dtPlantingDate
     character (len=:), allocatable   :: PlantingDate_str
 
-    real (kind=c_float), allocatable :: L_shift_days_(:)
+    real (kind=c_float), allocatable :: L_shift_days_l(:)
 
-    real (kind=c_float), allocatable :: L_ini_(:)
-    real (kind=c_float), allocatable :: L_dev_(:)
-    real (kind=c_float), allocatable :: L_mid_(:)
-    real (kind=c_float), allocatable :: L_late_(:)
-    real (kind=c_float), allocatable :: L_fallow_(:)
+    real (kind=c_float), allocatable :: L_ini_l(:)
+    real (kind=c_float), allocatable :: L_dev_l(:)
+    real (kind=c_float), allocatable :: L_mid_l(:)
+    real (kind=c_float), allocatable :: L_late_l(:)
+    real (kind=c_float), allocatable :: L_fallow_l(:)
 
-    real (kind=c_float), allocatable :: GDD_plant_(:)
-    real (kind=c_float), allocatable :: GDD_ini_(:)
-    real (kind=c_float), allocatable :: GDD_dev_(:)
-    real (kind=c_float), allocatable :: GDD_mid_(:)
-    real (kind=c_float), allocatable :: GDD_late_(:)
+    real (kind=c_float), allocatable :: GDD_plant_l(:)
+    real (kind=c_float), allocatable :: GDD_ini_l(:)
+    real (kind=c_float), allocatable :: GDD_dev_l(:)
+    real (kind=c_float), allocatable :: GDD_mid_l(:)
+    real (kind=c_float), allocatable :: GDD_late_l(:)
 
-    real (kind=c_float), allocatable :: Kcb_ini_(:)
-    real (kind=c_float), allocatable :: Kcb_mid_(:)
-    real (kind=c_float), allocatable :: Kcb_end_(:)
-    real (kind=c_float), allocatable :: Kcb_min_(:)
+    real (kind=c_float), allocatable :: Kcb_ini_l(:)
+    real (kind=c_float), allocatable :: Kcb_mid_l(:)
+    real (kind=c_float), allocatable :: Kcb_end_l(:)
+    real (kind=c_float), allocatable :: Kcb_min_l(:)
 
     real (kind=c_float), allocatable :: Kcb_jan(:)
     real (kind=c_float), allocatable :: Kcb_feb(:)
@@ -163,23 +163,23 @@ contains
 
    call PARAMS%get_parameters( sKey="Planting_date", slValues=slPlantingDate, lFatal=lTRUE )
 
-   call PARAMS%get_parameters( sKey="L_shift", fValues=L_shift_days_, lFatal=lFALSE )
-   call PARAMS%get_parameters( sKey="L_ini", fValues=L_ini_, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="L_dev", fValues=L_dev_, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="L_mid", fValues=L_mid_, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="L_late", fValues=L_late_, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="L_fallow", fValues=L_fallow_, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="L_shift", fValues=L_shift_days_l, lFatal=lFALSE )
+   call PARAMS%get_parameters( sKey="L_ini", fValues=L_ini_l, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="L_dev", fValues=L_dev_l, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="L_mid", fValues=L_mid_l, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="L_late", fValues=L_late_l, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="L_fallow", fValues=L_fallow_l, lFatal=lTRUE )
 
-   call PARAMS%get_parameters( sKey="GDD_plant", fValues=GDD_plant_, lFatal=lFALSE )
-   call PARAMS%get_parameters( sKey="GDD_ini", fValues=GDD_ini_, lFatal=lFALSE )
-   call PARAMS%get_parameters( sKey="GDD_dev", fValues=GDD_dev_, lFatal=lFALSE )
-   call PARAMS%get_parameters( sKey="GDD_mid", fValues=GDD_mid_, lFatal=lFALSE )
-   call PARAMS%get_parameters( sKey="GDD_late", fValues=GDD_late_, lFatal=lFALSE )
+   call PARAMS%get_parameters( sKey="GDD_plant", fValues=GDD_plant_l, lFatal=lFALSE )
+   call PARAMS%get_parameters( sKey="GDD_ini", fValues=GDD_ini_l, lFatal=lFALSE )
+   call PARAMS%get_parameters( sKey="GDD_dev", fValues=GDD_dev_l, lFatal=lFALSE )
+   call PARAMS%get_parameters( sKey="GDD_mid", fValues=GDD_mid_l, lFatal=lFALSE )
+   call PARAMS%get_parameters( sKey="GDD_late", fValues=GDD_late_l, lFatal=lFALSE )
 
-   call PARAMS%get_parameters( sKey="Kcb_ini", fValues=KCB_ini_, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="Kcb_mid", fValues=KCB_mid_, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="Kcb_end", fValues=KCB_end_, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="Kcb_min", fValues=KCB_min_, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="Kcb_ini", fValues=KCB_ini_l, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="Kcb_mid", fValues=KCB_mid_l, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="Kcb_end", fValues=KCB_end_l, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="Kcb_min", fValues=KCB_min_l, lFatal=lTRUE )
 
    call PARAMS%get_parameters( sKey="Kcb_Jan", fValues=KCB_jan )
    call PARAMS%get_parameters( sKey="Kcb_Feb", fValues=KCB_feb )
@@ -211,8 +211,8 @@ contains
     call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_SHIFT_DAYS array", &
       __SRCNAME__, __LINE__ )
 
-    allocate( KCB_( 16, iNumberOfLanduses ), stat=iStat )
-    call assert( iStat==0, "Failed to allocate memory for KCB_ array", &
+    allocate( KCB_l( 16, iNumberOfLanduses ), stat=iStat )
+    call assert( iStat==0, "Failed to allocate memory for KCB_l array", &
       __SRCNAME__, __LINE__ )
 
     allocate( KCB_METHOD( iNumberOfLanduses ), stat=iStat )
@@ -220,51 +220,51 @@ contains
       __SRCNAME__, __LINE__ )
 
     KCB_METHOD = -9999
-    KCB_ = -9999.
+    KCB_l = -9999.
     GROWTH_STAGE_GDD = -9999.
     GROWTH_STAGE_DOY = -9999.
     GROWTH_STAGE_SHIFT_DAYS = 0.0_c_float
 
-    if ( ubound(L_shift_days_,1) == iNumberOfLanduses ) then
-      GROWTH_STAGE_SHIFT_DAYS = L_shift_days_
+    if ( ubound(L_shift_days_l,1) == iNumberOfLanduses ) then
+      GROWTH_STAGE_SHIFT_DAYS = L_shift_days_l
     else
-      call warn(sMessage="L_shift_days has "//asCharacter(ubound(L_shift_days_,1))//" entries; there are "  &
+      call warn(sMessage="L_shift_days has "//asCharacter(ubound(L_shift_days_l,1))//" entries; there are "  &
         //asCharacter(iNumberOfLanduses)//" landuse codes. Assuming value of zero." )
     endif
 
 
-    if ( ubound(L_ini_,1) == iNumberOfLanduses ) then
-      GROWTH_STAGE_DOY( L_DOY_INI,  : ) = L_ini_
+    if ( ubound(L_ini_l,1) == iNumberOfLanduses ) then
+      GROWTH_STAGE_DOY( L_DOY_INI,  : ) = L_ini_l
     else
-      call warn(sMessage="L_ini has "//asCharacter(ubound(L_ini_,1))//" entries; there are "  &
+      call warn(sMessage="L_ini has "//asCharacter(ubound(L_ini_l,1))//" entries; there are "  &
         //asCharacter(iNumberOfLanduses)//" landuse codes.", lFatal=lTRUE)
     endif
 
-    if ( ubound(L_dev_,1) == iNumberOfLanduses ) then
-      GROWTH_STAGE_DOY( L_DOY_DEV,  : ) = L_dev_
+    if ( ubound(L_dev_l,1) == iNumberOfLanduses ) then
+      GROWTH_STAGE_DOY( L_DOY_DEV,  : ) = L_dev_l
     else
-      call warn(sMessage="L_dev has "//asCharacter(ubound(L_dev_,1))//" entries; there are "  &
+      call warn(sMessage="L_dev has "//asCharacter(ubound(L_dev_l,1))//" entries; there are "  &
         //asCharacter(iNumberOfLanduses)//" landuse codes.", lFatal=lTRUE)
     endif
 
-    if ( ubound(L_mid_,1) == iNumberOfLanduses ) then
-      GROWTH_STAGE_DOY( L_DOY_MID,  : ) = L_mid_
+    if ( ubound(L_mid_l,1) == iNumberOfLanduses ) then
+      GROWTH_STAGE_DOY( L_DOY_MID,  : ) = L_mid_l
     else
-      call warn(sMessage="L_mid has "//asCharacter(ubound(L_mid_,1))//" entries; there are "  &
+      call warn(sMessage="L_mid has "//asCharacter(ubound(L_mid_l,1))//" entries; there are "  &
         //asCharacter(iNumberOfLanduses)//" landuse codes.", lFatal=lTRUE)
     endif
 
-    if ( ubound(L_late_,1) == iNumberOfLanduses ) then
-      GROWTH_STAGE_DOY( L_DOY_LATE, : ) = L_late_
+    if ( ubound(L_late_l,1) == iNumberOfLanduses ) then
+      GROWTH_STAGE_DOY( L_DOY_LATE, : ) = L_late_l
     else
-      call warn(sMessage="L_late has "//asCharacter(ubound(L_late_,1))//" entries; there are "  &
+      call warn(sMessage="L_late has "//asCharacter(ubound(L_late_l,1))//" entries; there are "  &
         //asCharacter(iNumberOfLanduses)//" landuse codes.", lFatal=lTRUE)
     endif
 
-    if ( ubound(L_fallow_,1) == iNumberOfLanduses ) then
-      GROWTH_STAGE_DOY( L_DOY_FALLOW, : ) = L_fallow_
+    if ( ubound(L_fallow_l,1) == iNumberOfLanduses ) then
+      GROWTH_STAGE_DOY( L_DOY_FALLOW, : ) = L_fallow_l
     else
-      call warn(sMessage="L_fallow has "//asCharacter(ubound(L_fallow_,1))//" entries; there are "  &
+      call warn(sMessage="L_fallow has "//asCharacter(ubound(L_fallow_l,1))//" entries; there are "  &
         //asCharacter(iNumberOfLanduses)//" landuse codes.", lFatal=lTRUE)
     endif
 
@@ -299,11 +299,11 @@ contains
         endif
 
         ! march forward through time calculating the various dates on the Kcb curve
-        GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) + L_ini_( iIndex )
-        GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) + L_dev_( iIndex )
-        GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) + L_mid_( iIndex )
-        GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) + L_late_( iIndex )
-        GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) + L_fallow_( iIndex )
+        GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) + L_ini_l( iIndex )
+        GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) + L_dev_l( iIndex )
+        GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) + L_mid_l( iIndex )
+        GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) + L_late_l( iIndex )
+        GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) + L_fallow_l( iIndex )
 
         call LOGS%write( asCharacter( LANDUSE_CODE( iIndex ))//" | "                &
            //trim( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate() )//" | " &
@@ -316,45 +316,45 @@ contains
 
     endif
 
-    if (ubound(GDD_plant_,1) == iNumberOfLanduses)  GROWTH_STAGE_GDD( GDD_PLANT,  : ) = GDD_plant_
-    if (ubound(GDD_ini_,1) == iNumberOfLanduses)    GROWTH_STAGE_GDD( GDD_INI,  : ) = GDD_ini_
-    if (ubound(GDD_dev_,1) == iNumberOfLanduses)    GROWTH_STAGE_GDD( GDD_DEV,  : ) = GDD_dev_
-    if (ubound(GDD_mid_,1) == iNumberOfLanduses)    GROWTH_STAGE_GDD( GDD_MID,  : ) = GDD_mid_
-    if (ubound(GDD_late_,1) == iNumberOfLanduses)   GROWTH_STAGE_GDD( GDD_LATE, : ) = GDD_late_
+    if (ubound(GDD_plant_l,1) == iNumberOfLanduses)  GROWTH_STAGE_GDD( GDD_PLANT,  : ) = GDD_plant_l
+    if (ubound(GDD_ini_l,1) == iNumberOfLanduses)    GROWTH_STAGE_GDD( GDD_INI,  : ) = GDD_ini_l
+    if (ubound(GDD_dev_l,1) == iNumberOfLanduses)    GROWTH_STAGE_GDD( GDD_DEV,  : ) = GDD_dev_l
+    if (ubound(GDD_mid_l,1) == iNumberOfLanduses)    GROWTH_STAGE_GDD( GDD_MID,  : ) = GDD_mid_l
+    if (ubound(GDD_late_l,1) == iNumberOfLanduses)   GROWTH_STAGE_GDD( GDD_LATE, : ) = GDD_late_l
 
-    if (ubound(KCB_ini_,1) == iNumberOfLanduses)  KCB_( KCB_INI, :) = KCB_ini_
-    if (ubound(KCB_mid_,1) == iNumberOfLanduses)  KCB_( KCB_MID, :) = KCB_mid_
-    if (ubound(KCB_end_,1) == iNumberOfLanduses)  KCB_( KCB_END, :) = KCB_end_
-    if (ubound(KCB_min_,1) == iNumberOfLanduses)  KCB_( KCB_MIN, :) = KCB_min_
+    if (ubound(KCB_ini_l,1) == iNumberOfLanduses)  KCB_l( KCB_INI, :) = KCB_ini_l
+    if (ubound(KCB_mid_l,1) == iNumberOfLanduses)  KCB_l( KCB_MID, :) = KCB_mid_l
+    if (ubound(KCB_end_l,1) == iNumberOfLanduses)  KCB_l( KCB_END, :) = KCB_end_l
+    if (ubound(KCB_min_l,1) == iNumberOfLanduses)  KCB_l( KCB_MIN, :) = KCB_min_l
 
-    if (ubound(KCB_jan,1) == iNumberOfLanduses)   KCB_( JAN, :) = KCB_jan
-    if (ubound(KCB_feb,1) == iNumberOfLanduses)   KCB_( FEB, :) = KCB_feb
-    if (ubound(KCB_mar,1) == iNumberOfLanduses)   KCB_( MAR, :) = KCB_mar
-    if (ubound(KCB_apr,1) == iNumberOfLanduses)   KCB_( APR, :) = KCB_apr
-    if (ubound(KCB_may,1) == iNumberOfLanduses)   KCB_( MAY, :) = KCB_may
-    if (ubound(KCB_jun,1) == iNumberOfLanduses)   KCB_( JUN, :) = KCB_jun
-    if (ubound(KCB_jul,1) == iNumberOfLanduses)   KCB_( JUL, :) = KCB_jul
-    if (ubound(KCB_aug,1) == iNumberOfLanduses)   KCB_( AUG, :) = KCB_aug
-    if (ubound(KCB_sep,1) == iNumberOfLanduses)   KCB_( SEP, :) = KCB_sep
-    if (ubound(KCB_oct,1) == iNumberOfLanduses)   KCB_( OCT, :) = KCB_oct
-    if (ubound(KCB_nov,1) == iNumberOfLanduses)   KCB_( NOV, :) = KCB_nov
-    if (ubound(KCB_dec,1) == iNumberOfLanduses)   KCB_( DEC, :) = KCB_dec
+    if (ubound(KCB_jan,1) == iNumberOfLanduses)   KCB_l( JAN, :) = KCB_jan
+    if (ubound(KCB_feb,1) == iNumberOfLanduses)   KCB_l( FEB, :) = KCB_feb
+    if (ubound(KCB_mar,1) == iNumberOfLanduses)   KCB_l( MAR, :) = KCB_mar
+    if (ubound(KCB_apr,1) == iNumberOfLanduses)   KCB_l( APR, :) = KCB_apr
+    if (ubound(KCB_may,1) == iNumberOfLanduses)   KCB_l( MAY, :) = KCB_may
+    if (ubound(KCB_jun,1) == iNumberOfLanduses)   KCB_l( JUN, :) = KCB_jun
+    if (ubound(KCB_jul,1) == iNumberOfLanduses)   KCB_l( JUL, :) = KCB_jul
+    if (ubound(KCB_aug,1) == iNumberOfLanduses)   KCB_l( AUG, :) = KCB_aug
+    if (ubound(KCB_sep,1) == iNumberOfLanduses)   KCB_l( SEP, :) = KCB_sep
+    if (ubound(KCB_oct,1) == iNumberOfLanduses)   KCB_l( OCT, :) = KCB_oct
+    if (ubound(KCB_nov,1) == iNumberOfLanduses)   KCB_l( NOV, :) = KCB_nov
+    if (ubound(KCB_dec,1) == iNumberOfLanduses)   KCB_l( DEC, :) = KCB_dec
 
     ! go through the table values and try to figure out how Kcb curves should be constructed:
     ! Monthly Kcb, GDD-based, or DOY-based
     do iIndex = lbound( KCB_METHOD, 1), ubound( KCB_METHOD, 1)
 
-      if ( all( KCB_( JAN:DEC, iIndex ) > 0.0_c_float ) ) then
+      if ( all( KCB_l( JAN:DEC, iIndex ) > 0.0_c_float ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_MONTHLY_VALUES
-        KCB_( KCB_MIN, iIndex ) = minval( KCB_(JAN:DEC, iIndex) )
-        KCB_( KCB_MID, iIndex) = minval( KCB_(JAN:DEC, iIndex) )
+        KCB_l( KCB_MIN, iIndex ) = minval( KCB_l(JAN:DEC, iIndex) )
+        KCB_l( KCB_MID, iIndex) = minval( KCB_l(JAN:DEC, iIndex) )
 
       elseif ( all( GROWTH_STAGE_GDD( :, iIndex ) >= 0.0_c_float )              &
-         .and. all( KCB_( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
+         .and. all( KCB_l( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_GDD
 
       elseif ( all( GROWTH_STAGE_DOY( :, iIndex ) >= 0.0_c_float )              &
-         .and. all( KCB_( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
+         .and. all( KCB_l( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_FAO56
       endif
 
@@ -409,7 +409,7 @@ contains
 
   if ( KCB_METHOD( iLanduseIndex ) == KCB_METHOD_MONTHLY_VALUES ) then
 
-    Kcb = KCB_( SIM_DT%curr%iMonth, iLanduseIndex )
+    Kcb = KCB_l( SIM_DT%curr%iMonth, iLanduseIndex )
 
   else
 
@@ -419,11 +419,11 @@ contains
                 Date_mid => GROWTH_STAGE_DATE( ENDDATE_MID, iLanduseIndex ),         &
                 Date_late => GROWTH_STAGE_DATE( ENDDATE_LATE, iLanduseIndex ),       &
                 Date_fallow => GROWTH_STAGE_DATE( ENDDATE_FALLOW, iLanduseIndex ),   &
-                Kcb_ini => KCB_(KCB_INI, iLanduseIndex),                              &
-                Kcb_mid => KCB_(KCB_MID, iLanduseIndex),                              &
-                Kcb_min => KCB_(KCB_MIN, iLanduseIndex),                              &
+                Kcb_ini => KCB_l(KCB_INI, iLanduseIndex),                              &
+                Kcb_mid => KCB_l(KCB_MID, iLanduseIndex),                              &
+                Kcb_min => KCB_l(KCB_MIN, iLanduseIndex),                              &
                 PlantingDate => GROWTH_STAGE_DATE( PLANTING_DATE, iLanduseIndex),    &
-                Kcb_end => KCB_(KCB_END, iLanduseIndex),                              &
+                Kcb_end => KCB_l(KCB_END, iLanduseIndex),                              &
                 current_date => SIM_DT%curr )
 
       ! now calculate Kcb for the given landuse
@@ -483,38 +483,38 @@ end function update_crop_coefficient_date_as_threshold
   real (kind=c_float) :: fFrac
 
   ! define shorthand variable names for remainder of function
-  associate ( GDD_ini_ => GROWTH_STAGE_GDD( GDD_INI, iLanduseIndex ),         &
-              GDD_dev_ => GROWTH_STAGE_GDD( GDD_DEV, iLanduseIndex ),         &
-              GDD_mid_ => GROWTH_STAGE_GDD( GDD_MID, iLanduseIndex ),         &
-              GDD_late_ => GROWTH_STAGE_GDD( GDD_LATE, iLanduseIndex ),       &
-              Kcb_ini => KCB_(KCB_INI, iLanduseIndex),                         &
-              Kcb_mid => KCB_(KCB_MID, iLanduseIndex),                         &
-              Kcb_min => KCB_(KCB_MIN, iLanduseIndex),                         &
-              GDD_plant_ => GROWTH_STAGE_GDD( GDD_PLANT, iLanduseIndex),      &
-              Kcb_end => KCB_(KCB_END, iLanduseIndex) )
+  associate ( GDD_ini_l => GROWTH_STAGE_GDD( GDD_INI, iLanduseIndex ),         &
+              GDD_dev_l => GROWTH_STAGE_GDD( GDD_DEV, iLanduseIndex ),         &
+              GDD_mid_l => GROWTH_STAGE_GDD( GDD_MID, iLanduseIndex ),         &
+              GDD_late_l => GROWTH_STAGE_GDD( GDD_LATE, iLanduseIndex ),       &
+              Kcb_ini => KCB_l(KCB_INI, iLanduseIndex),                         &
+              Kcb_mid => KCB_l(KCB_MID, iLanduseIndex),                         &
+              Kcb_min => KCB_l(KCB_MIN, iLanduseIndex),                         &
+              GDD_plant_l => GROWTH_STAGE_GDD( GDD_PLANT, iLanduseIndex),      &
+              Kcb_end => KCB_l(KCB_END, iLanduseIndex) )
 
     ! now calculate Kcb for the given landuse
-    if( fGDD > GDD_late_ ) then
+    if( fGDD > GDD_late_l ) then
 
       fKcb = Kcb_min
 
-    elseif ( fGDD > GDD_mid_ ) then
+    elseif ( fGDD > GDD_mid_l ) then
 
-      fFrac = ( fGDD - GDD_mid_ ) / ( GDD_late_ - GDD_mid_ )
+      fFrac = ( fGDD - GDD_mid_l ) / ( GDD_late_l - GDD_mid_l )
 
       fKcb =  Kcb_mid * (1_c_float - fFrac) + Kcb_end * fFrac
 
-    elseif ( fGDD > GDD_dev_ ) then
+    elseif ( fGDD > GDD_dev_l ) then
 
       fKcb = Kcb_mid
 
-    elseif ( fGDD > GDD_ini_ ) then
+    elseif ( fGDD > GDD_ini_l ) then
 
-      fFrac = ( fGDD - GDD_ini_ ) / ( GDD_dev_ - GDD_ini_ )
+      fFrac = ( fGDD - GDD_ini_l ) / ( GDD_dev_l - GDD_ini_l )
 
       fKcb = Kcb_ini * (1_c_float - fFrac) + Kcb_mid * fFrac
 
-    elseif ( fGDD >= GDD_plant_ ) then
+    elseif ( fGDD >= GDD_plant_l ) then
 
       fKcb = Kcb_ini
 

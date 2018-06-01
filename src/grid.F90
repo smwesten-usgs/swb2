@@ -1352,7 +1352,7 @@ end function grid_CompletelyCover
 !                 X=Max SM Capacity
 !
 !                0.50  1.00  1.50
-!               _________________
+!               _________________l 
 !          0.0 | 0.50  1.00  1.50
 !  Y=APWL  0.1 | 0.45  0.90  1.40
 !          0.2 | 0.40  0.80  1.30
@@ -1420,7 +1420,7 @@ end subroutine grid_LookupColumn
 !                 X=Max SM Capacity
 !
 !                0.50  1.00  1.50
-!               _________________
+!               _________________l 
 !          0.0 | 0.50  1.00  1.50
 !  Y=APWL  0.1 | 0.45  0.90  1.40
 !          0.2 | 0.40  0.80  1.30
@@ -1722,7 +1722,7 @@ end function grid_Interpolate
 ! SYNOPSIS
 !  Searches in the y-direction, given the x value and the table value
 !  z, and returns the value of y. Assumes that the row and
-!  column spacing are constant. The search begins at the _top_ of the
+!  column spacing are constant. The search begins at the _top_l of the
 !  table (y=pGrd%rY1). Applicable only to DATATYPE_REAL grids.
 !  Parameter 'rNoData' is the missing value code for the grid.
 
@@ -1746,7 +1746,7 @@ end function grid_Interpolate
 !                 X=Max SM Capacity
 !
 !                 0.50  1.00  1.50
-!                _________________
+!                _________________l 
 !         0.0 | 0.50  1.00  1.50
 !  Y=APWL 0.1 | 0.45  0.90  1.40
 !         0.2 | 0.40  0.80  1.30
@@ -1756,7 +1756,7 @@ end function grid_Interpolate
 function grid_SearchColumn(pGrd,rXval,rZval,rNoData) result ( rValue )
   !! Searches in the y-direction, given the x value 'xval', for the value
   !! 'zval', and returns the value of y in 'ry'. Assumes that the row and
-  !! column spacing are constant. The search begins at the _top_ of the
+  !! column spacing are constant. The search begins at the _top_l of the
   !! table (y=pGrd%rY1). Applicable only to DATATYPE_REAL grids.
   !! Parameter 'rmv' is the missing value code for the grid.
   ! [ ARGUMENTS ]

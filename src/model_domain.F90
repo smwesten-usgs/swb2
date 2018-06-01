@@ -189,6 +189,9 @@ module model_domain
     procedure :: initialize_grid_sub
     generic   :: initialize_grid => initialize_grid_sub
 
+    procedure :: set_default_procedure_pointers_sub
+    generic   :: set_default_method_pointers => set_default_procedure_pointers_sub
+
     procedure :: set_method_pointers_sub
     generic   :: set_method_pointers => set_method_pointers_sub
 
@@ -288,6 +291,68 @@ contains
     this%output_directory_name = output_dir_name
 
   end subroutine set_output_directory_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine set_default_procedure_pointers_sub(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)    :: this
+
+     !> initialize procedure pointers such that the default methods are in place
+     !! this routine necessary because Intel compiler doesn't support initialization
+     !! of defined type procedure pointers within the defined type definition
+     this%init_interception            => model_initialize_interception_bucket
+     this%init_runoff                  => model_initialize_runoff_curve_number
+     this%init_reference_et            => model_initialize_et_hargreaves
+     this%init_actual_et               => model_initialize_actual_et_thornthwaite_mather_eqns
+     this%init_routing                 => model_initialize_routing_D8
+     this%init_soil_storage_max        => model_initialize_soil_storage_max_internally_calculated
+     this%init_snowfall                => model_initialize_snowfall_original
+     this%init_snowmelt                => model_initialize_snowmelt_original
+     this%init_precipitation_data      => model_initialize_precip_normal
+     this%init_fog                     => model_initialize_fog_none
+     this%init_irrigation              => model_initialize_irrigation_none
+     this%init_direct_net_infiltration => model_initialize_direct_net_infiltration_gridded
+     this%init_direct_soil_moisture    => model_initialize_direct_soil_moisture_none
+     this%update_landuse_codes         => model_update_landuse_codes_static
+     this%init_GDD                     => model_initialize_GDD
+     this%init_AWC                     => model_initialize_available_water_content_gridded
+     this%init_crop_coefficient        => model_initialize_crop_coefficient_none
+     this%calc_interception            => model_calculate_interception_bucket
+     this%update_crop_coefficient      => model_update_crop_coefficient_none
+
+     this%update_rooting_depth         => model_update_rooting_depth_none
+
+     this%init_continuous_frozen_ground_index  => model_initialize_continuous_frozen_ground_index
+     this%calc_continuous_frozen_ground_index  => model_calculate_continuous_frozen_ground_index
+
+     this%init_maximum_net_infiltration => model_initialize_maximum_net_infiltration_gridded
+     this%calc_maximum_net_infiltration => model_calculate_maximum_net_infiltration_gridded
+
+     this%calc_runoff             => model_calculate_runoff_curve_number
+
+     this%calc_reference_et       => model_calculate_et_hargreaves
+     this%calc_routing            => model_calculate_routing_D8
+
+     this%calc_actual_et          => model_calculate_actual_et_thornthwaite_mather_eqns
+     this%calc_snowfall           => model_calculate_snowfall_original
+     this%calc_snowmelt           => model_calculate_snowmelt_original
+     this%calc_fog                => model_calculate_fog_none
+     this%calc_irrigation         => model_calculate_irrigation_none
+     this%calc_GDD                => model_calculate_GDD
+     this%calc_direct_net_infiltration => model_calculate_direct_net_infiltration_none
+     this%calc_direct_soil_moisture    => model_calculate_direct_soil_moisture_none
+
+     this%output_irrigation       => model_output_irrigation_none
+     this%dump_variables          => model_dump_variables_none
+
+     this%read_awc_data           => model_read_available_water_content_gridded
+     this%get_precipitation_data  => model_get_precip_normal
+     this%get_minimum_air_temperature_data => model_get_minimum_air_temperature_normal
+     this%get_maximum_air_temperature_data => model_get_maximum_air_temperature_normal
+     this%calculate_mean_air_temperature   => model_calculate_mean_air_temperature
+
+  end subroutine set_default_procedure_pointers_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -2630,7 +2695,7 @@ contains
     integer (kind=c_int) :: kndx
     integer (kind=c_int) :: target_indx
     integer (kind=c_int) :: cell_indx
-    integer (kind=c_int) :: indx_end_
+    integer (kind=c_int) :: indx_end_l
     integer (kind=c_int) :: indx
 
     real (kind=c_float)  :: previous_5_day_rain(6)
@@ -2642,12 +2707,12 @@ contains
     monthly_gross_precip    = -9999.0
 
     if ( present( indx_end ) ) then
-      indx_end_ = indx_end
+      indx_end_l = indx_end
     else
-      indx_end_ = indx_start
+      indx_end_l = indx_start
     endif
 
-    do indx=indx_start, indx_end_
+    do indx=indx_start, indx_end_l
       target_indx = get_target_index( indx )
       cell_indx   = get_cell_index( indx )
 

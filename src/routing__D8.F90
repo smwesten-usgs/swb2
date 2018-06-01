@@ -32,8 +32,8 @@ module routing__D8
 
   integer (kind=c_int), allocatable     :: ROW_INDEX(:)
   integer (kind=c_int), allocatable     :: COLUMN_INDEX(:)
-  integer (kind=c_int), allocatable     :: SORT_ORDER_(:)
-  integer (kind=c_int), allocatable     :: TARGET_INDEX_(:)
+  integer (kind=c_int), allocatable     :: SORT_ORDER_l(:)
+  integer (kind=c_int), allocatable     :: TARGET_INDEX_l(:)
 
   integer (kind=c_int), parameter       :: D8_EAST         = 1
   integer (kind=c_int), parameter       :: D8_SOUTHEAST    = 2
@@ -51,7 +51,7 @@ module routing__D8
   ! the rest of the vectors are packed.
 
   ! the vector of row-column numbers may then be used to make the required D8 routing connections.
-  ! there shouldn't be anumber_of_rows difference between ROW_INDEX, COL_INDEX, and SORT_ORDER_
+  ! there shouldn't be anumber_of_rows difference between ROW_INDEX, COL_INDEX, and SORT_ORDER_l 
 
 contains
 
@@ -84,7 +84,7 @@ contains
     ! if D8 flow routing has not been initialized, report back the iteration index
     cell_index = iteration_index
 
-    if ( allocated( SORT_ORDER_ ) )   cell_index = SORT_ORDER_( iteration_index )
+    if ( allocated( SORT_ORDER_l ) )   cell_index = SORT_ORDER_l( iteration_index )
 
 
   end function get_cell_index
@@ -96,9 +96,9 @@ elemental function get_target_index( iteration_index )  result( target_index )
   integer (kind=c_int), intent(in)    :: iteration_index
   integer (kind=c_int)                :: target_index
 
-   if ( allocated( TARGET_INDEX_ ) ) then
+   if ( allocated( TARGET_INDEX_l ) ) then
 
-     target_index = TARGET_INDEX_( iteration_index )
+     target_index = TARGET_INDEX_l( iteration_index )
 
   else
 
@@ -121,11 +121,11 @@ end function get_target_index
 
     found_match = FALSE
 
-    if ( allocated( SORT_ORDER_ ) ) then
+    if ( allocated( SORT_ORDER_l ) ) then
 
-      do iteration_index=1, ubound( SORT_ORDER_, 1 )
+      do iteration_index=1, ubound( SORT_ORDER_l, 1 )
 
-         current_cell_index = SORT_ORDER_( iteration_index )
+         current_cell_index = SORT_ORDER_l( iteration_index )
          if ( current_cell_index == cell_index ) then
            found_match = TRUE
           exit
@@ -211,10 +211,10 @@ end function get_target_index
     allocate( COLUMN_INDEX( count( lActive) ), stat=iStat )
     call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
-    allocate( TARGET_INDEX_( count( lActive) ), stat=iStat )
+    allocate( TARGET_INDEX_l( count( lActive) ), stat=iStat )
     call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
-    allocate( SORT_ORDER_( count( lActive) ), stat=iStat )
+    allocate( SORT_ORDER_l( count( lActive) ), stat=iStat )
     call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     ! locate the data structure associated with the gridded flow direction entries
@@ -545,17 +545,17 @@ main_loop: do
 	                IS_DOWNSLOPE_TARGET_MARKED( column_num, row_num ) = lTRUE
                   COLUMN_INDEX( indx )  = column_num
                   ROW_INDEX( indx )     = row_num
-                  SORT_ORDER_( indx )    = routing_D8_get_index( column_num, row_num )
-                  TARGET_INDEX_( indx )  = routing_D8_get_index( TARGET_COL( column_num, row_num ), &
+                  SORT_ORDER_l( indx )    = routing_D8_get_index( column_num, row_num )
+                  TARGET_INDEX_l( indx )  = routing_D8_get_index( TARGET_COL( column_num, row_num ), &
                                                                                    TARGET_ROW( column_num, row_num ) )
 
                   ! print *, "   ===> assigning order number: "
                   ! print *, "        indx                =",indx
-                  ! print *, "        sort_order                =", SORT_ORDER_( indx )
-                  ! print *, "        target_index              =", TARGET_INDEX_( indx )
-                  ! print *, "        target_index(SORT_ORDER_) =", TARGET_INDEX_( SORT_ORDER_( indx ) )
+                  ! print *, "        sort_order                =", SORT_ORDER_l( indx )
+                  ! print *, "        target_index              =", TARGET_INDEX_l( indx )
+                  ! print *, "        target_index(SORT_ORDER_l =", TARGET_INDEX_l( SORT_ORDER_l( indx ) )
 
-                  if ( lCircular )  TARGET_INDEX_( SORT_ORDER_( indx ) ) = D8_UNDETERMINED
+                  if ( lCircular )  TARGET_INDEX_l( SORT_ORDER_l( indx ) ) = D8_UNDETERMINED
 
                 ! if cells are not being marked, record cell as D8_UNDETERMINED
                 ! and move on
@@ -569,9 +569,9 @@ main_loop: do
                   IS_DOWNSLOPE_TARGET_MARKED( column_num, row_num ) = lTRUE
                   COLUMN_INDEX( indx ) = column_num
                   ROW_INDEX( indx ) = row_num
-                  SORT_ORDER_( indx ) = routing_D8_get_index( column_num, row_num )
+                  SORT_ORDER_l( indx ) = routing_D8_get_index( column_num, row_num )
 
-                  TARGET_INDEX_( SORT_ORDER_( indx ) ) = D8_UNDETERMINED
+                  TARGET_INDEX_l( SORT_ORDER_l( indx ) ) = D8_UNDETERMINED
 
                 endif
 
@@ -636,10 +636,10 @@ main_loop: do
 
   ! subroutine calculate_routing_D8( indx )
   !
-  !     if ( (    TARGET_INDEX_( indx ) >= lbound( SORT_ORDER_, 1) ) &
-  !       .and. ( TARGET_INDEX_( indx ) <= ubound( SORT_ORDER_, 1) ) ) then
+  !     if ( (    TARGET_INDEX_l( indx ) >= lbound( SORT_ORDER_l, 1) ) &
+  !       .and. ( TARGET_INDEX_l( indx ) <= ubound( SORT_ORDER_l, 1) ) ) then
   !
-  !       this%runon( TARGET_INDEX_( index ) ) = this%runoff( SORT_ORDER_( index ) )
+  !       this%runon( TARGET_INDEX_l( index ) ) = this%runoff( SORT_ORDER_l( index ) )
   !
   !     endif
   !

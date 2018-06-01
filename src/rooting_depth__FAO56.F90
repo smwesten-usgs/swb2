@@ -9,7 +9,7 @@ module rooting_depth__FAO56
   use iso_c_binding, only              : c_short, c_int, c_float, c_double
   use string_list, only                : STRING_LIST_T
   use parameters, only                 : PARAMS
-  use crop_coefficients__FAO56, only   : KCB_, KCB_MIN, KCB_INI, KCB_MID, KCB_END,               &
+  use crop_coefficients__FAO56, only   : KCB_l, KCB_MIN, KCB_INI, KCB_MID, KCB_END,               &
                                          KCB_METHOD, KCB_METHOD_GDD, KCB_METHOD_MONTHLY_VALUES,  &
                                          KCB_METHOD_FAO56, JAN, DEC
   implicit none
@@ -44,11 +44,11 @@ elemental subroutine update_rooting_depth( Zr_i, Zr_max, landuse_index, Kcb )
   real (kind=c_float)            :: MinKCB
 
   if ( KCB_METHOD( landuse_index ) == KCB_METHOD_MONTHLY_VALUES ) then
-    MaxKCB = maxval( KCB_( JAN:DEC, landuse_index ) )
-    MinKCB = minval( KCB_( JAN:DEC, landuse_index ) )
+    MaxKCB = maxval( KCB_l( JAN:DEC, landuse_index ) )
+    MinKCB = minval( KCB_l( JAN:DEC, landuse_index ) )
   else
-    MaxKCB = maxval( KCB_( KCB_INI:KCB_MIN, landuse_index ) )
-    MinKCB = minval( KCB_( KCB_INI:KCB_MIN, landuse_index ) )
+    MaxKCB = maxval( KCB_l( KCB_INI:KCB_MIN, landuse_index ) )
+    MinKCB = minval( KCB_l( KCB_INI:KCB_MIN, landuse_index ) )
   endif
 
   ! if there is not much difference between the MAX Kcb and MIN Kcb, assume that

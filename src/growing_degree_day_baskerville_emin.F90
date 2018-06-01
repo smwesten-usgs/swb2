@@ -40,8 +40,8 @@ contains
     type (STRING_LIST_T)              :: parameter_list
     type (STRING_LIST_T)              :: gdd_reset_val_list
     character (len=32)                :: sBuf
-    real (kind=c_float), allocatable  :: gdd_base_(:)
-    real (kind=c_float), allocatable  :: gdd_max_(:)
+    real (kind=c_float), allocatable  :: gdd_base_l(:)
+    real (kind=c_float), allocatable  :: gdd_max_l(:)
     integer (kind=c_int)              :: number_of_landuse_codes
     integer (kind=c_int), allocatable :: landuse_code(:)
 
@@ -65,7 +65,7 @@ contains
     call parameter_list%append("GDD_Base_Temperature")
     call parameter_list%append("GDD_Base")
 
-    call PARAMS%get_parameters( slKeys=parameter_list, fValues=gdd_base_ )
+    call PARAMS%get_parameters( slKeys=parameter_list, fValues=gdd_base_l )
     call parameter_list%clear()
 
     call parameter_list%append("GDD_Max_Temp")
@@ -73,7 +73,7 @@ contains
     call parameter_list%append("GDD_Maximum_Temp")
     call parameter_list%append("GDD_Max")
 
-    call PARAMS%get_parameters( slKeys=parameter_list, fValues=gdd_max_ )
+    call PARAMS%get_parameters( slKeys=parameter_list, fValues=gdd_max_l )
     call parameter_list%clear()
 
     call parameter_list%append("GDD_Reset_Date")
@@ -106,12 +106,12 @@ contains
     endif
 
 
-    if ( ubound( gdd_max_, 1 ) == number_of_landuse_codes        &
-        .and. gdd_max_(1) > rTINYVAL ) then
+    if ( ubound( gdd_max_l, 1 ) == number_of_landuse_codes        &
+        .and. gdd_max_l(1) > rTINYVAL ) then
 
       do indx=1, ubound( landuse_index, 1)
         if( landuse_index( indx ) >= lbound( GDD_MAX, 1) .and. landuse_index( indx ) <= ubound( GDD_MAX, 1) ) then
-          GDD_MAX( indx ) = gdd_max_( landuse_index( indx ) )
+          GDD_MAX( indx ) = gdd_max_l( landuse_index( indx ) )
         endif
       enddo
 
@@ -122,12 +122,12 @@ contains
 
     endif
 
-    if ( ubound( gdd_base_, 1 ) == number_of_landuse_codes        &
-        .and. gdd_base_(1) > rTINYVAL  ) then
+    if ( ubound( gdd_base_l, 1 ) == number_of_landuse_codes        &
+        .and. gdd_base_l(1) > rTINYVAL  ) then
 
       do indx=1, ubound( landuse_index, 1)
         if( landuse_index( indx ) >= lbound( GDD_BASE, 1) .and. landuse_index( indx ) <= ubound( GDD_BASE, 1) ) then
-          GDD_BASE( indx ) = gdd_base_( landuse_index( indx ) )
+          GDD_BASE( indx ) = gdd_base_l( landuse_index( indx ) )
         endif
       enddo
 
@@ -153,40 +153,40 @@ contains
 
     ! [ LOCALS ]
     real (kind=c_float)    :: delta
-    real (kind=c_float)    :: tmax_
+    real (kind=c_float)    :: tmax_l
     real (kind=c_float)    :: dd
     real (kind=c_float)    :: W
     real (kind=c_float)    :: At
     real (kind=c_float)    :: A
 
     associate( doy_to_reset_gdd => GDD_RESET_DATE( order ),      &
-               gdd_max_ => GDD_MAX( order ),                     &
-               gdd_base_ => GDD_BASE( order ) )
+               gdd_max => GDD_MAX( order ),                     &
+               gdd_base => GDD_BASE( order ) )
 
       if ( SIM_DT%iDOY == doy_to_reset_gdd )  gdd = 0.0_c_float
 
-      tmax_ = min( tmax, gdd_max_ )
+      tmax_l = min( tmax, gdd_max )
 
-      if ( tmax_ <= gdd_base_ ) then
+      if ( tmax_l <= gdd_base ) then
 
         dd = 0.0_c_float
 
-      elseif ( tmin >= gdd_base_ ) then
+      elseif ( tmin >= gdd_base ) then
 
-        dd = min(tmean, gdd_max_) - gdd_base_
+        dd = min(tmean, gdd_max - gdd_base )
 
       else
 
-        W = ( tmax_ -  tmin) / 2.0_c_float
+        W = ( tmax_l -  tmin) / 2.0_c_float
 
-        At = ( gdd_base_ - tmean ) / W
+        At = ( gdd_base - tmean ) / W
 
         if ( At > 1 ) At = 1.0_c_float
         if ( At < -1 ) At = -1._c_float
 
         A = asin( At )
 
-        dd = ( ( W * cos( A ) ) - ( ( gdd_base_ - tmean )                    &
+        dd = ( ( W * cos( A ) ) - ( ( gdd_base - tmean )                    &
                * ( real( PI / 2._c_double, kind=c_float ) - A ) ) ) / PI
 
       endif

@@ -1949,7 +1949,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
 #ifdef DEBUG_PRINT
    print *, " "
-   print *, trim(__FILE__), ": ", __LINE__
+   print *, trim(__FILE__), ": ", __LINE__ 
    print *, "--  BASE GRID BOUNDS projected to DATA NATIVE COORDS"
    print *, "FROM: ", dquote(pGrdBase%sPROJ4_string)
    print *, "TO:   ", dquote(this%sSourcePROJ4_string)

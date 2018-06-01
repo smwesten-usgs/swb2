@@ -615,7 +615,7 @@ contains
     character (len=512)            :: sBuf
     integer (kind=c_int)           :: iR                 ! Index in sRecord
     integer (kind=c_int)           :: iIndex1, iIndex2
-    character (len=:), allocatable :: sTargetCharacters_
+    character (len=:), allocatable :: sTargetCharacters_l 
 
     ! eliminate any leading spaces
     sText1 = adjustl(sText1)
@@ -623,14 +623,14 @@ contains
     iIndex2 = 0
 
     if (present(sTargetCharacters) ) then
-      sTargetCharacters_ = sTargetCharacters
+      sTargetCharacters_l = sTargetCharacters
     else
-      sTargetCharacters_ = ":/;,"
+      sTargetCharacters_l = ":/;,"
     endif
 
     do iIndex1 = 1,len_trim(sText1)
 
-      iR = scan(sText1(iIndex1:iIndex1), sTargetCharacters_)
+      iR = scan(sText1(iIndex1:iIndex1), sTargetCharacters_l)
 
       if(iR==0) then
         iIndex2 = iIndex2 + 1
@@ -660,7 +660,7 @@ contains
     character (len=256)            :: sBuf
     integer (kind=c_int)           :: iR                 ! Index in sRecord
     integer (kind=c_int)           :: iIndex1, iIndex2
-    character (len=1)              :: sChar_
+    character (len=1)              :: sChar_l 
     logical (kind=c_bool)          :: lPreviouslyFound
 
     ! eliminate any leading spaces
@@ -670,28 +670,28 @@ contains
     lPreviouslyFound = lFALSE
 
     if (present(sChar) ) then
-      sChar_ = sChar
+      sChar_l = sChar
     else
-      sChar_ = " "
+      sChar_l = " "
     endif
 
     do iIndex1 = 1,len_trim(sText1)
 
-      iR = scan(sText1(iIndex1:iIndex1), sChar_)
+      iR = scan(sText1(iIndex1:iIndex1), sChar_l)
 
       if(iR==0) then
-        ! sChar_ was not found
+        ! sChar_l was not found
         iIndex2 = iIndex2 + 1
         sBuf(iIndex2:iIndex2) = sText1(iIndex1:iIndex1)
         lPreviouslyFound = lFALSE
 
       elseif( lPreviouslyFound ) then
-        ! sChar_ was found, and was also found in the position preceding this one
+        ! sChar_l was found, and was also found in the position preceding this one
 
         ! No OP
 
       else
-        ! sChar_ was found, but was *not* found in the preceding position
+        ! sChar_l was found, but was *not* found in the preceding position
 
         iIndex2 = iIndex2 + 1
         sBuf(iIndex2:iIndex2) = sText1(iIndex1:iIndex1)
@@ -716,12 +716,12 @@ contains
     ! [ LOCALS ]
     character (len=len(sText))      :: sText1
     character (len=len(sText))      :: sText2
-    character (len=:), allocatable  :: sDelimiters_
+    character (len=:), allocatable  :: sDelimiters_l 
 
     if ( present(sDelimiters) ) then
-      sDelimiters_ = sDelimiters_
+      sDelimiters_l = sDelimiters_l 
     else
-      sDelimiters_ = WHITESPACE
+      sDelimiters_l = WHITESPACE
     endif
 
     iCount = 0
@@ -729,7 +729,7 @@ contains
     sText1 = sText
 
     do
-      call chomp(sText1=sText1, sText2=sText2, sDelimiters=sDelimiters_ )
+      call chomp(sText1=sText1, sText2=sText2, sDelimiters=sDelimiters_l )
 
       if ( len_trim( sText2 ) == 0 )  exit
 
@@ -748,31 +748,31 @@ contains
     character (len=*), intent(in), optional              :: sDelimiters
 
     ! [ LOCALS ]
-    character (len=:), allocatable :: sDelimiters_
+    character (len=:), allocatable :: sDelimiters_l 
     integer (kind=c_int) :: iIndex
 
     if ( present(sDelimiters) ) then
 
       select case (sDelimiters)
       case ("WHITESPACE")
-        sDelimiters_ = WHITESPACE
+        sDelimiters_l = WHITESPACE
       case ("TAB", "TABS")
-        sDelimiters_ = TAB
+        sDelimiters_l = TAB
       case ("COMMA", "CSV")
-        sDelimiters_ = ","
+        sDelimiters_l = ","
       case default
-        sDelimiters_ = sDelimiters
+        sDelimiters_l = sDelimiters
       end select
 
     else
 
-      sDelimiters_ = WHITESPACE
+      sDelimiters_l = WHITESPACE
 
     endif
 
     sText1 = adjustl(sText1)
 
-    iIndex = scan( string = sText1, set = sDelimiters_ )
+    iIndex = scan( string = sText1, set = sDelimiters_l )
 
     if (iIndex == 0) then
       ! no delimiters found; return string as was supplied originally

@@ -171,9 +171,9 @@ contains
     logical (kind=c_bool), intent(in), optional :: lHasHeader
 
     ! [ LOCALS ]
-    character (len=len(sFilename) ) :: sFilename_
+    character (len=len(sFilename) ) :: sFilename_l
 
-    sFilename_ = fix_pathname( sFilename )
+    sFilename_l = fix_pathname( sFilename )
 
     this%sCommentChars = sCommentChars
     this%sDelimiters = sDelimiters
@@ -184,8 +184,8 @@ contains
 
     if (.not. this%isOpen() ) then
 
-      open(newunit=this%iUnitNum, file=fully_qualified_filename( sFilename_ ), iostat=this%iStat, action='READ')
-      call assert(this%iStat == 0, "Failed to open file "//dquote( fully_qualified_filename( sFilename_ ) )//"."  &
+      open(newunit=this%iUnitNum, file=fully_qualified_filename( sFilename_l ), iostat=this%iStat, action='READ')
+      call assert(this%iStat == 0, "Failed to open file "//dquote( fully_qualified_filename( sFilename_l ) )//"."  &
         //" Exit code: "//asCharacter( this%iStat )//".", __SRCNAME__, __LINE__)
 
       if (this%iStat == 0) this%lIsOpen = lTRUE
@@ -193,7 +193,7 @@ contains
 
       call this%countLines()
 
-      call LOGS%write( sMessage="Opened file "//dquote( fully_qualified_filename( sFilename_ ) ), iTab=22, &
+      call LOGS%write( sMessage="Opened file "//dquote( fully_qualified_filename( sFilename_l ) ), iTab=22, &
                        iLinesBefore=1, iLogLevel=LOG_ALL )
       call LOGS%write( "Comment characters: "//dquote(sCommentChars), iTab=42 )
       call LOGS%write( "Number of lines in file: "//asCharacter( this%numLines() ), iTab=37 )
@@ -202,7 +202,7 @@ contains
 
     else
 
-      call die( "Failed to open file "//dquote( fully_qualified_filename( sFilename_ ) )//" with read access." )
+      call die( "Failed to open file "//dquote( fully_qualified_filename( sFilename_l ) )//" with read access." )
 
     endif
 
@@ -217,32 +217,32 @@ contains
     logical (kind=c_bool), intent(in), optional   :: lQuiet
 
     ! [ LOCALS ]
-    logical :: lQuiet_
-    character (len=len(sFilename) ) :: sFilename_
+    logical :: lQuiet_l
+    character (len=len(sFilename) ) :: sFilename_l
 
-    sFilename_ = fix_pathname( sFilename )
+    sFilename_l = fix_pathname( sFilename )
 
     if ( present( lQuiet ) ) then
-      lQuiet_ = lQuiet
+      lQuiet_l = lQuiet
     else
-      lQuiet_ = lFALSE
+      lQuiet_l = lFALSE
     endif
 
     if (.not. this%isOpen() ) then
 
-      open(newunit=this%iUnitNum, file=sFilename_, iostat=this%iStat, action='WRITE')
-      call assert(this%iStat == 0, "Failed to open file "//dquote(sFilename_)//".", __SRCNAME__, __LINE__)
+      open(newunit=this%iUnitNum, file=sFilename_l, iostat=this%iStat, action='WRITE')
+      call assert(this%iStat == 0, "Failed to open file "//dquote(sFilename_l)//".", __SRCNAME__, __LINE__)
 
       this%lIsOpen = lTRUE
       this%lEOF = lFALSE
       this%lReadOnly = lFALSE
-      this%sFilename = trim(sFilename_)
+      this%sFilename = trim(sFilename_l)
 
-      if ( .not. lQuiet_ ) &
-        call LOGS%write( "Opened file with write access: "//dquote(sFilename_) )
+      if ( .not. lQuiet_l ) &
+        call LOGS%write( "Opened file with write access: "//dquote(sFilename_l))
 
     else
-      call LOGS%write( "Failed to open file "//dquote(sFilename_)//" with WRITE access" )
+      call LOGS%write( "Failed to open file "//dquote(sFilename_l)//" with WRITE access" )
     endif
 
   end subroutine open_file_write_access_sub
@@ -414,7 +414,15 @@ contains
     character(len=*), intent(in)    :: filename
     character(len=:), allocatable   :: fully_qualified_filename
 
-    fully_qualified_filename = trim( DATA_DIRECTORY_NAME )//fix_pathname(filename)
+    if (.not. allocated( DATA_DIRECTORY_NAME ) ) then
+
+      fully_qualified_filename = fix_pathname(filename)
+
+    else
+
+      fully_qualified_filename = trim( DATA_DIRECTORY_NAME )//fix_pathname(filename)
+
+    endif
 
   end function fully_qualified_filename
 

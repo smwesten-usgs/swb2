@@ -62,26 +62,26 @@ elemental function et_jh_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin
   real (kind=c_double) :: dRs
   real (kind=c_float)  :: fTAvg
 
-  real (kind=c_double) :: dAs_
-  real (kind=c_double) :: dBs_
-  real (kind=c_double) :: dSunPct_
+  real (kind=c_double) :: dAs_l
+  real (kind=c_double) :: dBs_l
+  real (kind=c_double) :: dSunPct_l
 
   if (present( fAs ) ) then
-    dAs_ = fAs
+    dAs_l = fAs
   else
-    dAs_ = 0.25_c_double
+    dAs_l = 0.25_c_double
   endif
 
   if (present( fBs ) ) then
-    dBs_ = fBs
+    dBs_l = fBs
   else
-    dBs_ = 0.5_c_double
+    dBs_l = 0.5_c_double
   endif
 
   if (present( fSunPct ) ) then
-    dSunPct_ = fSunPct
+    dSunPct_l = fSunPct
   else
-    dSunPct_ = estimate_percent_of_possible_sunshine__psun(fTMax=F_to_K( fTMax ), fTMin=F_to_K( fTMin ) )
+    dSunPct_l = estimate_percent_of_possible_sunshine__psun(fTMax=F_to_K( fTMax ), fTMin=F_to_K( fTMin ) )
   endif
 
 
@@ -107,9 +107,9 @@ elemental function et_jh_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin
                                                         dOmega_s=dOmega_s,            &
                                                         dDsubR=dD_r )
 
-!  dSn = dSo * ( 1.0_c_float - fAlbedo_ ) * ( fAs_ + fBs_ * fSunPct_ / 100.0_c_float )
+!  dSn = dSo * ( 1.0_c_float - fAlbedo_l ) * ( fAs_l + fBs_l * fSunPct_l / 100.0_c_float )
 
-  dRs = solar_radiation__Rs(dRa=dRa, dAs=dAs_, dBs=dBs_, fPctSun=dSunPct_)
+  dRs = solar_radiation__Rs(dRa=dRa, dAs=dAs_l, dBs=dBs_l, fPctSun=dSunPct_l )
 
   if ( fTAvg <= rFREEZING ) then
     fReferenceET0 = 0.0_c_float

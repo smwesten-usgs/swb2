@@ -181,26 +181,26 @@ contains
     character (len=*), intent(in), optional     :: sModule
     integer (kind=c_int), intent(in), optional  :: iLine
 
-    character (len=256) :: sHints_
+    character (len=256) :: sHints_l 
 
     if (.not. lCondition) then
 
       if ( present( sHints ) ) then
-        sHints_ = trim( sHints )
+        sHints_l = trim( sHints )
       else
-        sHints_ = ""
+        sHints_l = ""
       endif
 
       if (present( sCalledBy ) .and. present( iCalledByLine ) &
         .and. present(sModule) .and. present(iLine) ) then
         call die( sMessage=sMessage, sCalledBy=sCalledBy, iCalledByLine=iCalledByLine, &
-          sModule=sModule, iLine=iLine, sHints=sHints_ )
+          sModule=sModule, iLine=iLine, sHints=sHints_l )
       elseif ( present(sModule) .and. present(iLine) ) then
-        call die( sMessage=sMessage, sModule=sModule, iLine=iLine, sHints=sHints_ )
+        call die( sMessage=sMessage, sModule=sModule, iLine=iLine, sHints=sHints_l )
       elseif ( present(sModule) ) then
-        call die( sMessage=sMessage, sModule=sModule, sHints=sHints_ )
+        call die( sMessage=sMessage, sModule=sModule, sHints=sHints_l )
       else
-        call die( sMessage=sMessage, sHints=sHints_ )
+        call die( sMessage=sMessage, sHints=sHints_l )
       endif
 
     endif
@@ -219,26 +219,26 @@ subroutine assert_4bit(lCondition, sMessage, sModule, iLine, sCalledBy, iCalledB
   character (len=*), intent(in), optional     :: sModule
   integer (kind=c_int), intent(in), optional  :: iLine
 
-  character (len=256) :: sHints_
+  character (len=256) :: sHints_l 
 
   if (.not. lCondition) then
 
     if ( present( sHints ) ) then
-      sHints_ = trim( sHints )
+      sHints_l = trim( sHints )
     else
-      sHints_ = ""
+      sHints_l = ""
     endif
 
     if (present( sCalledBy ) .and. present( iCalledByLine ) &
       .and. present(sModule) .and. present(iLine) ) then
       call die( sMessage=sMessage, sCalledBy=sCalledBy, iCalledByLine=iCalledByLine, &
-        sModule=sModule, iLine=iLine, sHints=sHints_ )
+        sModule=sModule, iLine=iLine, sHints=sHints_l )
     elseif ( present(sModule) .and. present(iLine) ) then
-      call die( sMessage=sMessage, sModule=sModule, iLine=iLine, sHints=sHints_ )
+      call die( sMessage=sMessage, sModule=sModule, iLine=iLine, sHints=sHints_l )
     elseif ( present(sModule) ) then
-      call die( sMessage=sMessage, sModule=sModule, sHints=sHints_ )
+      call die( sMessage=sMessage, sModule=sModule, sHints=sHints_l )
     else
-      call die( sMessage=sMessage, sHints=sHints_ )
+      call die( sMessage=sMessage, sHints=sHints_l )
     endif
 
   endif

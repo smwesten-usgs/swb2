@@ -195,7 +195,7 @@ contains
   function fix_pathname( input_pathname )    result( output_pathname )
 
     character (len=*), intent(in)            :: input_pathname
-    character (len=len(input_pathname))      :: output_pathname
+    character (len=len_trim(input_pathname)) :: output_pathname
 
     ! [ LOCALS ]
     integer (kind=c_int) :: indx, jndx
@@ -916,11 +916,11 @@ end function fortran_to_c_string
     character (len=512)            :: sBuf
     integer (kind=c_int)           :: iR                 ! Index in sRecord
     integer (kind=c_int)           :: iIndex1, iIndex2
-    character (len=:), allocatable :: sTargetCharacters_
+    character (len=:), allocatable :: sTargetCharacters_l
 
     ! TargetCharacter omits the period ("."): don't want a real value returned
     ! as a funky integer (e.g. string "3.141" returned as integer 3141 )
-    sTargetCharacters_ = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM" &
+    sTargetCharacters_l = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM" &
       //"!@#$%^&*()_+-={}[]|\:;'<,>?/~`'"//DOUBLE_QUOTE
 
     ! eliminate any leading spaces
@@ -930,7 +930,7 @@ end function fortran_to_c_string
 
     do iIndex1 = 1,len_trim(sText1)
 
-      iR = SCAN(sTemp(iIndex1:iIndex1), sTargetCharacters_)
+      iR = SCAN(sTemp(iIndex1:iIndex1), sTargetCharacters_l)
 
       if(iR==0) then
         iIndex2 = iIndex2 + 1

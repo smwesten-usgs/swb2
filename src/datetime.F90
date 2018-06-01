@@ -262,19 +262,19 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
   integer (kind=c_int) :: iMonthOffset, iDayOffset
   character (len=256)  :: sStr
   character (len=256)  :: sMonth, sDay, sYear, sBuf
-  character (len=256)  :: sFilename_
-  integer (kind=c_int) :: iLinenumber_
+  character (len=256)  :: sFilename_l 
+  integer (kind=c_int) :: iLinenumber_l 
 
   if ( present( sFilename) ) then
-    sFilename_ = sFilename
+    sFilename_l = sFilename
   else
-    sFilename_ = "<unknown>"
+    sFilename_l = "<unknown>"
   endif
 
   if ( present( iLinenumber ) ) then
-    iLinenumber_ = iLinenumber
+    iLinenumber_l = iLinenumber
   else
-    iLinenumber_ = -9999
+    iLinenumber_l = -9999
   endif
 
   ! these offset amounts have value of 1 if the program detects a single-digit date value
@@ -294,7 +294,7 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
 
     call Assert(lFALSE, &
       "Error parsing month value - got "//trim(sMonth)//";"// &
-      " date text: "//trim(sStr), __SRCNAME__, __LINE__, sFilename_, iLinenumber_ )
+      " date text: "//trim(sStr), __SRCNAME__, __LINE__, sFilename_l, iLinenumber_l )
 
   endif
 
@@ -310,7 +310,7 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
 
     call Assert(lFALSE, &
       "Error parsing day value - got "//trim(sDay)//";"// &
-      " date text: "//trim(sStr),sFilename_, iLinenumber_, __SRCNAME__, __LINE__ )
+      " date text: "//trim(sStr),sFilename_l, iLinenumber_l, __SRCNAME__, __LINE__ )
 
   endif
 
@@ -321,7 +321,7 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
 
     call Assert(lFALSE, &
       "Error parsing year value - got "//trim(sYear)//";"// &
-      " date text: "//trim(sStr),sFilename_, iLinenumber_, __SRCNAME__, __LINE__ )
+      " date text: "//trim(sStr),sFilename_l, iLinenumber_l, __SRCNAME__, __LINE__ )
 
   endif
 
@@ -1319,14 +1319,14 @@ function mmdd2doy(sMMDD, sInputItemName )  result(iDOY)
   integer (kind=c_int) :: iStat
   integer (kind=c_int) :: iJD
   integer (kind=c_int) :: iStartingJD
-  character (len=256)  :: sInputItemName_
+  character (len=256)  :: sInputItemName_l 
 
   sItem = sMMDD
 
   if ( present( sInputItemName ) ) then
-    sInputItemName_ = trim( sInputItemName )
+    sInputItemName_l = trim( sInputItemName )
   else
-    sInputItemName_ = "unknown"
+    sInputItemName_l = "unknown"
   endif
 
   ! parse month value
@@ -1335,7 +1335,7 @@ function mmdd2doy(sMMDD, sInputItemName )  result(iDOY)
   call Assert(iStat==0, "Problem reading month value from string "//TRIM(sMMDD),   &
     __SRCNAME__,__LINE__,                                                          &
     sHints="The offending string was "//sQuote(sMMDD)//", which was encountered "   &
-           //"while attempting to read in "//sQuote( sInputItemName_ ) )
+           //"while attempting to read in "//sQuote( sInputItemName_l ) )
 
   ! parse day value
   call chomp(sItem, sBuf, "/-")
@@ -1343,7 +1343,7 @@ function mmdd2doy(sMMDD, sInputItemName )  result(iDOY)
   call Assert(iStat==0, "Problem reading day value from string "//TRIM(sMMDD),   &
     __SRCNAME__,__LINE__,                                                          &
     sHints="The offending string was "//sQuote(sMMDD)//", which was encountered "   &
-           //"while attempting to read in "//sQuote( sInputItemName_ ) )
+           //"while attempting to read in "//sQuote( sInputItemName_l ) )
 
   ! we don't really care about the year value here; any year value could have been used
   iStartingJD = julian_day ( 1999, 1, 1)

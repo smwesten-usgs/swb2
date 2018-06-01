@@ -129,6 +129,8 @@ contains
     ! [ LOCALS ]
     integer (kind=c_int) :: iIndex
 
+    call MODEL%set_default_method_pointers()
+
     ! set output directory names for NetCDF and Surfer/Arc ASCII grid output
     call grid_set_output_directory_name( output_dirname )
     call set_data_directory( data_dirname )

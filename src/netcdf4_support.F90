@@ -6,7 +6,7 @@
 !! gridded meteorlogic data, or output for any SWB-generated variable.
 !!
 !! from the C API:
-!! The @c nc_get_vars_ type family of functions read a subsampled (strided)
+!! The @c nc_get_vars_l type family of functions read a subsampled (strided)
 !! array section of values from a netCDF variable of an open netCDF dataset.
 !! The subsampled array section is specified by giving a corner,
 !! a vector of edge lengths, and a stride vector. The values are read
@@ -636,12 +636,12 @@ subroutine netcdf_open_and_prepare_for_merging( NCFILE, sFilename, guess_z_var_n
   integer (kind=c_int), dimension(2) :: iColRow_ll, iColRow_ur, iColRow_lr, iColRow_ul
   integer (kind=c_int) :: iColmin, iColmax, iRowmin, iRowmax
   integer (kind=c_int) :: iIndex
-  logical (kind=c_bool) :: guess_z_var_name_
+  logical (kind=c_bool) :: guess_z_var_name_l
 
   if (present( guess_z_var_name) ) then
-    guess_z_var_name_ = guess_z_var_name
+    guess_z_var_name_l = guess_z_var_name
   else
-    guess_z_var_name_ = FALSE
+    guess_z_var_name_l = FALSE
   endif
 
   call nf_open_file(NCFILE=NCFILE, sFilename=sFilename)
@@ -650,7 +650,7 @@ subroutine netcdf_open_and_prepare_for_merging( NCFILE, sFilename, guess_z_var_n
 
   call nf_populate_variable_struct( NCFILE )
 
-  if (guess_z_var_name_)  call nf_guess_z_variable_name(NCFILE)
+  if (guess_z_var_name_l)  call nf_guess_z_variable_name(NCFILE)
 
   call nf_get_variable_id_and_type( NCFILE, strict_asserts=TRUE )
 
@@ -1003,50 +1003,50 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   integer (kind=c_int) :: iIndex
   character (len=10)                                :: sOriginText
   character (len=:), allocatable                    :: sFilename
-  type (STRING_LIST_T), pointer                     :: history_list_
-  logical (kind=c_bool)                             :: write_time_bounds_
-  character (len=:), allocatable                    :: executable_name_
+  type (STRING_LIST_T), pointer                     :: history_list_l
+  logical (kind=c_bool)                             :: write_time_bounds_l
+  character (len=:), allocatable                    :: executable_name_l
   logical (kind=c_bool)                             :: include_latlon
   type (DATETIME_T)                                 :: DT
   character (len=:), allocatable                    :: date_time_text
-  character (len=:), allocatable                    :: filename_modifier_
+  character (len=:), allocatable                    :: filename_modifier_l
   call DT%systime()
   date_time_text = DT%prettydatetime()
 
 
   if ( present( executable_name ) ) then
-    executable_name_ = trim( executable_name )
+    executable_name_l = trim( executable_name )
   else
-    executable_name_ = "SWB"
+    executable_name_l = "SWB"
   endif
 
   if ( present( filename_modifier ) ) then
-    filename_modifier_ = "_"//trim( filename_modifier )//"_"
+    filename_modifier_l = "_"//trim( filename_modifier )//"_"
   else
-    filename_modifier_ = "_"
+    filename_modifier_l = "_"
   endif
 
   if ( present( history_list) ) then
-    history_list_ => history_list
+    history_list_l => history_list
   else
-    allocate( history_list_ )
-    call history_list_%append(date_time_text//": Soil-Water-Balance run started.")
+    allocate( history_list_l )
+    call history_list_l%append(date_time_text//": Soil-Water-Balance run started.")
   endif
 
   if ( present( write_time_bounds ) ) then
-    write_time_bounds_ = write_time_bounds
+    write_time_bounds_l = write_time_bounds
   else
-    write_time_bounds_ = FALSE
+    write_time_bounds_l = FALSE
   endif
 
   include_latlon = logical( present( dpLat ) .and. present( dpLon ), kind=c_bool )
 
-  call history_list_%set_autocleanup( FALSE )
+  call history_list_l%set_autocleanup( FALSE )
 
   write(sOriginText, fmt="(i4.4,'-',i2.2,'-',i2.2)") StartDate%iYear, StartDate%iMonth, StartDate%iDay
 
   sFilename = trim(OUTPUT_DIRECTORY_NAME)//trim(OUTPUT_PREFIX_NAME)           &
-    //trim(sVariableName)//"_"//filename_modifier_                            &
+    //trim(sVariableName)//"_"//filename_modifier_l                            &
     //StartDate%prettydate()//"_"//EndDate%prettydate()//"__"                 &
     //trim(asCharacter(iNY))//"_by_"//trim(asCharacter(iNX))//".nc"
 
@@ -1056,7 +1056,7 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
 
   !> set dimension values in the NCFILE struct
   call nf_set_standard_dimensions(NCFILE=NCFILE, iNX=iNX, iNY=iNY,            &
-                                  write_time_bounds=write_time_bounds_ )
+                                  write_time_bounds=write_time_bounds_l )
 
   !> @todo implement more flexible method of assigning units
 !   NCFILE%sVarUnits(NC_X)    = sXY_units
@@ -1068,7 +1068,7 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
 
   !> set variable values in the NCFILE struct
   call nf_set_standard_variables(NCFILE=NCFILE, sVarName_z = sVariableName,   &
-    lLatLon=include_latlon, write_time_bounds=write_time_bounds_ )
+    lLatLon=include_latlon, write_time_bounds=write_time_bounds_l )
 
   !> transfer variable values to netCDF file
   call nf_define_variables(NCFILE=NCFILE)
@@ -1077,11 +1077,11 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
 
   call nf_set_standard_attributes(NCFILE=NCFILE, sOriginText=sOriginText,     &
       PROJ4_string=PROJ4_string, lLatLon=include_latlon, fValidMin=fValidMin, &
-      fValidMax=fValidMax, write_time_bounds=write_time_bounds_ )
+      fValidMax=fValidMax, write_time_bounds=write_time_bounds_l )
 
   call nf_set_global_attributes(NCFILE=NCFILE, &
-     sDataType=trim(NCFILE%sVarName(NC_Z)), history_list=history_list_, &
-     executable_name=executable_name_ )
+     sDataType=trim(NCFILE%sVarName(NC_Z)), history_list=history_list_l, &
+     executable_name=executable_name_l )
 
   call nf_put_attributes(NCFILE=NCFILE)
 
@@ -2933,12 +2933,12 @@ subroutine nf_get_variable_id_and_type( NCFILE, strict_asserts )
   ! [ LOCALS ]
   integer (kind=c_int)              :: iIndex
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
-  logical (kind=c_bool)             :: strict_asserts_
+  logical (kind=c_bool)             :: strict_asserts_l
 
   if ( present( strict_asserts ) ) then
-    strict_asserts_ = strict_asserts
+    strict_asserts_l = strict_asserts
   else
-    strict_asserts_ = TRUE
+    strict_asserts_l = TRUE
   endif
 
   NCFILE%iVarID = -9999
@@ -2974,7 +2974,7 @@ subroutine nf_get_variable_id_and_type( NCFILE, strict_asserts )
 
   enddo
 
-  if ( strict_asserts_ ) then
+  if ( strict_asserts_l ) then
 
     call assert(NCFILE%iVarID(NC_X) >= 0, &
      "Unable to find the variable named "//dquote(NCFILE%sVarName(NC_X) )//" in " &
@@ -3235,7 +3235,7 @@ subroutine nf_set_standard_dimensions(NCFILE, iNX, iNY, write_time_bounds )
 
   ! [ LOCALS ]
   integer (kind=c_int)   :: iStat
-  logical (kind=c_bool)  :: write_time_bounds_
+  logical (kind=c_bool)  :: write_time_bounds_l
 
   iStat = 0
 
@@ -3243,15 +3243,15 @@ subroutine nf_set_standard_dimensions(NCFILE, iNX, iNY, write_time_bounds )
 
   if ( present( write_time_bounds ) ) then
 
-    write_time_bounds_ = write_time_bounds
+    write_time_bounds_l = write_time_bounds
 
   else
 
-    write_time_bounds_ = FALSE
+    write_time_bounds_l = FALSE
 
   endif
 
-  if ( write_time_bounds_ ) NCFILE%iNumberOfDimensions = 4
+  if ( write_time_bounds_l ) NCFILE%iNumberOfDimensions = 4
 
   if (associated(NCFILE%pNC_DIM) ) deallocate(NCFILE%pNC_DIM, stat=iStat)
   call assert(iStat == 0, "Could not deallocate memory for NC_DIM member in NC_FILE defined type", &
@@ -3273,7 +3273,7 @@ subroutine nf_set_standard_dimensions(NCFILE, iNX, iNY, write_time_bounds )
   NCFILE%pNC_DIM(NC_X)%sDimensionName = "x"
   NCFILE%pNC_DIM(NC_X)%iNC_DimSize = iNX
 
-  if ( write_time_bounds_ ) then
+  if ( write_time_bounds_l ) then
     !> define the auxiliary dimension;
     NCFILE%pNC_DIM(NC_AUX)%sDimensionName = "nv"
     NCFILE%pNC_DIM(NC_AUX)%iNC_DimSize = 2
@@ -3292,27 +3292,27 @@ subroutine nf_set_standard_variables(NCFILE, sVarName_z, lLatLon, write_time_bou
 
   ! [ LOCALS ]
   integer (kind=c_int) :: iStat
-  logical (kind=c_bool) :: lLatLon_
-  logical (kind=c_bool) :: write_time_bounds_
+  logical (kind=c_bool) :: lLatLon_l
+  logical (kind=c_bool) :: write_time_bounds_l
 
   if (present( lLatLon) ) then
-    lLatLon_ = lLatLon
+    lLatLon_l = lLatLon
   else
-    lLatLon_ = lFALSE
+    lLatLon_l = lFALSE
   endif
 
   if (present(write_time_bounds) ) then
-    write_time_bounds_ = write_time_bounds
+    write_time_bounds_l = write_time_bounds
   else
-    write_time_bounds_ = FALSE
+    write_time_bounds_l = FALSE
   endif
 
   iStat = 0
 
   NCFILE%iNumberOfVariables = 5
 
-  if ( lLatLon_ ) NCFILE%iNumberOfVariables = 7
-  if ( write_time_bounds_ )  NCFILE%iNumberOfVariables =                       &
+  if ( lLatLon_l ) NCFILE%iNumberOfVariables = 7
+  if ( write_time_bounds_l )  NCFILE%iNumberOfVariables =                       &
                                NCFILE%iNumberOfVariables + 1
 
   ! reset the ID for TIME BNDS to the last varid
@@ -3354,7 +3354,7 @@ subroutine nf_set_standard_variables(NCFILE, sVarName_z, lLatLon, write_time_bou
 
   NCFILE%sVarName(NC_Z) = trim(sVarName_z)
 
-  if ( lLatLon_ ) then
+  if ( lLatLon_l ) then
 
     NCFILE%pNC_VAR(NC_LAT)%sVariableName = "lat"
     NCFILE%pNC_VAR(NC_LAT)%iNC_VarType = NC_DOUBLE
@@ -3369,7 +3369,7 @@ subroutine nf_set_standard_variables(NCFILE, sVarName_z, lLatLon, write_time_bou
                                         NCFILE%pNC_DIM(NC_X)%iNC_DimID,0,0]
   endif
 
-  if ( write_time_bounds_ ) then
+  if ( write_time_bounds_l ) then
 
     NCFILE%pNC_VAR(NC_TIME_BNDS)%sVariableName = "time_bnds"
     NCFILE%pNC_VAR(NC_TIME_BNDS)%iNC_VarType = NC_DOUBLE
@@ -3396,23 +3396,23 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, executable_name, &
   integer (kind=c_int)           :: iStat
   type (DATETIME_T)              :: DT
   character (len=20)             :: sDateTime
-  character (len=:), allocatable :: executable_name_
-  type (STRING_LIST_T), pointer           :: history_list_
+  character (len=:), allocatable :: executable_name_l
+  type (STRING_LIST_T), pointer           :: history_list_l
   integer (kind=c_int)           :: indx, jndx
   integer (kind=c_int)  :: records
 
   if (present( executable_name) ) then
-    executable_name_ = trim( executable_name )
+    executable_name_l = trim( executable_name )
   else
-    executable_name_ = "SWB"
+    executable_name_l = "SWB"
   endif
 
   if ( present( history_list ) ) then
-    history_list_ => history_list
-    NCFILE%iNumberOfAttributes = 3 + history_list_%count
+    history_list_l => history_list
+    NCFILE%iNumberOfAttributes = 3 + history_list_l%count
   else
-    allocate( history_list_ )
-    call history_list_%append(trim(sDateTime)//": Soil-Water-Balance model run started.")
+    allocate( history_list_l )
+    call history_list_l%append(trim(sDateTime)//": Soil-Water-Balance model run started.")
     NCFILE%iNumberOfAttributes = 4
   endif
 
@@ -3438,7 +3438,7 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, executable_name, &
       NCFILE%pNC_ATT(0)%sAttributeName = "source"
       allocate(NCFILE%pNC_ATT(0)%sAttValue(0:0))
       NCFILE%pNC_ATT(0)%sAttValue(0) = trim(sDataType)//" output from " &
-        //executable_name_//" run "   &
+        //executable_name_l//" run "   &
         //"started on "//trim(sDateTime)//"."
       NCFILE%pNC_ATT(0)%iNC_AttType = NC_CHAR
       NCFILE%pNC_ATT(0)%iNC_AttSize = 1_c_size_t
@@ -3461,7 +3461,7 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, executable_name, &
     NCFILE%pNC_ATT(2)%iNC_AttSize = 1_c_size_t
 
     ! special case: history may have meny records
-    records = history_list_%count
+    records = history_list_l%count
 
     do indx=1, records
 
@@ -3470,7 +3470,7 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, executable_name, &
       allocate(NCFILE%pNC_ATT(jndx)%sAttValue( 0:0 ) )
       NCFILE%pNC_ATT(jndx)%iNC_AttType = NC_CHAR
       NCFILE%pNC_ATT(jndx)%iNC_AttSize = int( records, kind=c_size_t )
-      NCFILE%pNC_ATT(jndx)%sAttValue( 0 ) = trim(history_list_%get( indx ))//C_NULL_CHAR
+      NCFILE%pNC_ATT(jndx)%sAttValue( 0 ) = trim(history_list_l%get( indx ))//C_NULL_CHAR
 
     enddo
 
@@ -3496,8 +3496,8 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
   integer (kind=c_int)                             :: iStat
   integer (kind=c_int)                             :: iNumAttributes
   type (T_NETCDF_ATTRIBUTE), dimension(:), pointer :: pNC_ATT
-  logical (kind=c_bool)                            :: lLatLon_
-  logical (kind=c_bool)                            :: write_time_bounds_
+  logical (kind=c_bool)                            :: lLatLon_l
+  logical (kind=c_bool)                            :: write_time_bounds_l
   type (STRING_LIST_T)                             :: attribute_name_list
   type (STRING_LIST_T)                             :: attribute_value_list
   character (len=:), allocatable                   :: tempstring
@@ -3505,15 +3505,15 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
   integer (kind=c_int)                             :: indx
 
   if (present( lLatLon ) ) then
-    lLatLon_ = lLatLon
+    lLatLon_l = lLatLon
   else
-    lLatLon_ = lFALSE
+    lLatLon_l = lFALSE
   endif
 
   if ( present( write_time_bounds ) ) then
-    write_time_bounds_ = write_time_bounds
+    write_time_bounds_l = write_time_bounds
   else
-    write_time_bounds_ = FALSE
+    write_time_bounds_l = FALSE
   endif
 
   if (present( PROJ4_string ) ) then
@@ -3589,7 +3589,7 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
 
   !! define attributes associated with TIME variable
   iNumAttributes = 3
-  if ( write_time_bounds_ ) iNumAttributes=4
+  if ( write_time_bounds_l ) iNumAttributes=4
   allocate( NCFILE%pNC_VAR(NC_TIME)%pNC_ATT(0:iNumAttributes-1), stat=iStat)
   call assert(iStat == 0, "Could not allocate memory for NC_ATT member in NC_VAR struct of NC_FILE", &
     __SRCNAME__, __LINE__)
@@ -3615,7 +3615,7 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
   pNC_ATT(2)%iNC_AttType = NC_CHAR
   pNC_ATT(2)%iNC_AttSize = 1_c_size_t
 
-  if ( write_time_bounds_ ) then
+  if ( write_time_bounds_l ) then
     pNC_ATT(3)%sAttributeName = "bounds"
     allocate(pNC_ATT(3)%sAttValue(0:0))
     pNC_ATT(3)%sAttValue(0) = "time_bounds"
@@ -3768,7 +3768,7 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
 
   end block
 
-  if ( lLatLon_) then
+  if ( lLatLon_l ) then
 
     iNumAttributes = 3
     allocate( NCFILE%pNC_VAR(NC_LAT)%pNC_ATT(0:iNumAttributes-1), stat=iStat)

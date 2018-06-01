@@ -302,26 +302,26 @@ contains
 
     ! [ LOCALS ]
     type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
-    integer (kind=c_int)                      :: iLU_
+    integer (kind=c_int)                      :: iLU_l
     integer (kind=c_int)                      :: iCount
 
     if (present(iLU) ) then
-      iLU_ = iLU
+      iLU_l = iLU
     else
-      iLU_ = OUTPUT_UNIT
+      iLU_l = OUTPUT_UNIT
     endif
 
     current => this%first
     iCount = 0
 
-    write(iLU_, fmt="('|',a,t21,'|',a,t62,'|')") "Index","Value"
-    write(iLU_, fmt="('|',a,t21,'|',a,t62,'|')") repeat("-",18)//":", repeat("-",39)//":"
+    write(iLU_l, fmt="('|',a,t21,'|',a,t62,'|')") "Index","Value"
+    write(iLU_l, fmt="('|',a,t21,'|',a,t62,'|')") repeat("-",18)//":", repeat("-",39)//":"
 
     do while ( associated( current ) .and. iCount < this%count )
 
       iCount = iCount + 1
 
-      write(iLU_, fmt="('|',a,t21,'|',a,t62,'|')") asCharacter(iCount), current%s
+      write(iLU_l, fmt="('|',a,t21,'|',a,t62,'|')") asCharacter(iCount), current%s
 
       current => current%next
 
@@ -340,7 +340,7 @@ contains
 
     ! [ LOCALS ]
     type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
-    integer (kind=c_int)                      :: iLU_
+    integer (kind=c_int)                      :: iLU_l
     integer (kind=c_int)                      :: iCount
     character (len=2048)                      :: sBuf
 
@@ -375,7 +375,7 @@ contains
 
     ! [ LOCALS ]
     type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
-    integer (kind=c_int)                      :: iLU_
+    integer (kind=c_int)                      :: iLU_l
     integer (kind=c_int)                      :: iCount
     character (len=2048)                      :: sBuf
 
@@ -451,12 +451,12 @@ contains
     type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
     integer (kind=c_int)                      :: iStat
     integer (kind=c_int)                      :: iIndex
-    logical (kind=c_bool)                     :: null_terminated_
+    logical (kind=c_bool)                     :: null_terminated_l
 
     if ( present( null_terminated) ) then
-      null_terminated_ = null_terminated
+      null_terminated_l = null_terminated
     else
-      null_terminated_ = FALSE
+      null_terminated_l = FALSE
     endif
 
     allocate( sValues( 1:this%count ), stat=iStat )
@@ -469,7 +469,7 @@ contains
 
       iIndex = iIndex + 1
 
-      if ( null_terminated_ ) then
+      if ( null_terminated_l ) then
         sValues(iIndex) = trim(current%s)//c_null_char
       else
         sValues(iIndex) = current%s
@@ -552,12 +552,12 @@ contains
     ! [ LOCALS ]
     character (len=:), allocatable :: sTempText
     character (len=:), allocatable :: sTempArg
-    character (len=256)                :: delimiters_
+    character (len=256)                :: delimiters_l
 
     if ( present( delimiters ) ) then
-      delimiters_ = delimiters
+      delimiters_l = delimiters
     else
-      delimiters_ = PUNCTUATION
+      delimiters_l = PUNCTUATION
     endif
 
     sTempText = sText1
@@ -565,7 +565,7 @@ contains
 
     do
 
-      call chomp( sText1=sTempText, sText2=sTempArg, sDelimiters=delimiters_ )
+      call chomp( sText1=sTempText, sText2=sTempArg, sDelimiters=delimiters_l )
 
       if (len_trim(sTempArg) > 0) then
         call newList%append( trim( adjustl( sTempArg ) ) )
@@ -592,12 +592,12 @@ contains
     ! [ LOCALS ]
     character (len=:), allocatable    :: sTempText
     character (len=:), allocatable    :: sTempArg
-    character (len=256)    :: delimiters_
+    character (len=256)    :: delimiters_l
 
     if ( present( delimiters ) ) then
-      delimiters_ = delimiters
+      delimiters_l = delimiters
     else
-      delimiters_ = PUNCTUATION
+      delimiters_l = PUNCTUATION
     endif
 
     sTempText = sText
@@ -607,7 +607,7 @@ contains
 
     do
 
-      call chomp( sText1=sTempText, sText2=sTempArg, sDelimiters=trim(delimiters_) )
+      call chomp( sText1=sTempText, sText2=sTempArg, sDelimiters=trim(delimiters_l))
 
       if (len_trim(sTempArg ) > 0) then
         call this%append( sTempArg )

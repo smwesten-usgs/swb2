@@ -81,11 +81,11 @@ module output
 
 contains
 
-  subroutine set_output_latlon_option( output_includes_latlon_ )
+  subroutine set_output_latlon_option( output_includes_latlon_l )
 
-    logical (kind=c_bool) :: output_includes_latlon_
+    logical (kind=c_bool) :: output_includes_latlon_l
 
-    OUTPUT_INCLUDES_LATLON = output_includes_latlon_
+    OUTPUT_INCLUDES_LATLON = output_includes_latlon_l
 
   end subroutine set_output_latlon_option
 

@@ -70,7 +70,7 @@ program main
 
   if(iNumArgs == 0 ) then
 
-#ifdef __GFORTRAN__
+#ifdef __GFORTRAN__l
     sCompilerFlags = COMPILER_OPTIONS()
     sCompilerVersion = COMPILER_VERSION()
     write(UNIT=*,FMT="(a,/)") "Compiled with: gfortran ("//TRIM(sCompilerVersion)//")"
@@ -85,7 +85,7 @@ program main
       write(UNIT=*,FMT="(a,/)") "Compiler build date:"//TRIM(asCharacter(__INTEL_COMPILER_BUILD_DATE))
 #endif
 
-#ifdef __G95__
+#ifdef __G95__l
     write(UNIT=*,FMT="(a,/)") "Compiled with: G95 minor version " &
       //TRIM(asCharacter(__G95_MINOR__))
 #endif

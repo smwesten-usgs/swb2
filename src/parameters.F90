@@ -79,26 +79,26 @@ contains
     character (len=*), intent(in), optional       :: sCommentChars
 
     ! [ LOCALS ]
-    character (len=:), allocatable  :: sDelimiters_
-    character (len=:), allocatable  :: sCommentChars_
+    character (len=:), allocatable  :: sDelimiters_l 
+    character (len=:), allocatable  :: sCommentChars_l 
 
     if (present(sDelimiters) ) then
-      sDelimiters_ = sDelimiters
+      sDelimiters_l = sDelimiters
     else
-      sDelimiters_ = TAB
+      sDelimiters_l = TAB
     endif
 
     if ( present(sCommentChars) ) then
-      sCommentChars_ = sCommentChars
+      sCommentChars_l = sCommentChars
     else
-      sCommentChars_ = "#!"
+      sCommentChars_l = "#!"
     endif
 
     this%count = this%count + 1
 
     call this%filenames%append( sFilename )
-    call this%delimiters%append( sDelimiters_ )
-    call this%comment_chars%append( sCommentChars_ )
+    call this%delimiters%append( sDelimiters_l )
+    call this%comment_chars%append( sCommentChars_l )
 
   end subroutine add_filename_to_list_sub
 
@@ -304,21 +304,21 @@ contains
     type ( STRING_LIST_T )                                     :: slList
 
     ! [ LOCALS ]
-    logical (kind=c_bool) :: lFatal_
+    logical (kind=c_bool) :: lFatal_l 
 
     if ( present (lFatal) ) then
-      lFatal_ = lFatal
+      lFatal_l = lFatal
     else
-      lFatal_ = lFALSE
+      lFatal_l = lFALSE
     endif
 
     slList = PARAMS_DICT%grep_keys( asUppercase( sKey ) )
 
-    if ( lFatal_ ) then
+    if ( lFatal_l ) then
 
        if ( slList%get(1) .strequal. "<NA>" )                              &
          call warn( "Failed to find a lookup table column whose name contains "        &
-           //dQuote( sKey )//".", lFatal = lFatal_ )
+           //dQuote( sKey )//".", lFatal = lFatal_l )
 
     endif
 
@@ -335,22 +335,22 @@ contains
     logical (kind=c_bool), intent(in),                 optional :: lFatal
 
     ! [ LOCALS ]
-    logical (kind=c_bool) :: lFatal_
+    logical (kind=c_bool) :: lFatal_l 
 
     if ( present (lFatal) ) then
-      lFatal_ = lFatal
+      lFatal_l = lFatal
     else
-      lFatal_ = lFALSE
+      lFatal_l = lFALSE
     endif
 
     if ( present( slKeys) ) then
 
       call PARAMS_DICT%get_values( slKeys=slKeys, lValues=lValues,            &
-        is_fatal=lFatal_ )
+        is_fatal=lFatal_l )
 
 !       if ( any( iValues <= iTINYVAL ) ) &
 !         call warn( "Failed to find a lookup table column named " &
-!           //dQuote( slKeys%listall() )//".", lFatal = lFatal_ )
+!           //dQuote( slKeys%listall() )//".", lFatal = lFatal_l )
 
     else if ( present( sKey) ) then
 
@@ -358,7 +358,7 @@ contains
 
 !       if ( any( iValues <= iTINYVAL ) ) &
 !         call warn( "Failed to find a lookup table column named " &
-!           //dQuote( sKey )//".", lFatal = lFatal_ )
+!           //dQuote( sKey )//".", lFatal = lFatal_l )
 
     endif
 
@@ -375,22 +375,22 @@ contains
     logical (kind=c_bool), intent(in),                 optional :: lFatal
 
     ! [ LOCALS ]
-    logical (kind=c_bool) :: lFatal_
+    logical (kind=c_bool) :: lFatal_l 
 
     if ( present (lFatal) ) then
-      lFatal_ = lFatal
+      lFatal_l = lFatal
     else
-      lFatal_ = lFALSE
+      lFatal_l = lFALSE
     endif
 
     if ( present( slKeys) ) then
 
       call PARAMS_DICT%get_values( slKeys=slKeys, slString=slValues,          &
-        is_fatal=lFatal_ )
+        is_fatal=lFatal_l )
 
        if ( slValues%get(1) .strequal. "<NA>" ) then
          call warn( "Failed to find a lookup table column named "        &
-           //dQuote( slKeys%listall() )//".", lFatal = lFatal_ )
+           //dQuote( slKeys%listall() )//".", lFatal = lFatal_l )
          slValues%is_populated = FALSE
        end if
 
@@ -400,7 +400,7 @@ contains
 
       if ( slValues%get(1) .strequal. "<NA>" ) then
         call warn( "Failed to find a lookup table column named "        &
-          //dQuote( sKey )//".", lFatal = lFatal_ )
+          //dQuote( sKey )//".", lFatal = lFatal_l )
         slValues%is_populated = FALSE
       end if
 
@@ -419,32 +419,32 @@ contains
     logical (kind=c_bool), intent(in),                optional :: lFatal
 
     ! [ LOCALS ]
-    logical (kind=c_bool) :: lFatal_
+    logical (kind=c_bool) :: lFatal_l 
 
     if ( present (lFatal) ) then
-      lFatal_ = lFatal
+      lFatal_l = lFatal
     else
-      lFatal_ = lFALSE
+      lFatal_l = lFALSE
     endif
 
 
     if ( present( slKeys) ) then
 
       call PARAMS_DICT%get_values( slKeys=slKeys, iValues=iValues,            &
-        is_fatal=lFatal_ )
+        is_fatal=lFatal_l )
 
       if ( any( iValues <= iTINYVAL ) ) &
         call warn( "Failed to find a lookup table column named " &
-          //dQuote( slKeys%listall() )//".", lFatal = lFatal_ )
+          //dQuote( slKeys%listall() )//".", lFatal = lFatal_l )
 
     else if ( present( sKey) ) then
 
       call PARAMS_DICT%get_values( sKey=sKey, iValues=iValues,                &
-        is_fatal=lFatal_ )
+        is_fatal=lFatal_l )
 
       if ( any( iValues <= iTINYVAL ) ) &
         call warn( "Failed to find a lookup table column named " &
-          //dQuote( sKey )//".", lFatal = lFatal_ )
+          //dQuote( sKey )//".", lFatal = lFatal_l )
 
     endif
 
@@ -461,12 +461,12 @@ contains
     logical (kind=c_bool), intent(in),                optional :: lFatal
 
     ! [ LOCALS ]
-    logical (kind=c_bool) :: lFatal_
+    logical (kind=c_bool) :: lFatal_l 
 
     if ( present (lFatal) ) then
-      lFatal_ = lFatal
+      lFatal_l = lFatal
     else
-      lFatal_ = lFALSE
+      lFatal_l = lFALSE
     endif
 
     if ( present( slKeys) ) then
@@ -475,16 +475,16 @@ contains
 
       if ( any( fValues <= fTINYVAL ) ) &
         call warn( "Failed to find a lookup table column named " &
-          //dQuote( slKeys%listall() )//".", lFatal = lFatal_ )
+          //dQuote( slKeys%listall() )//".", lFatal = lFatal_l )
 
     else if ( present( sKey) ) then
 
       call PARAMS_DICT%get_values( sKey=sKey, fValues=fValues,                &
-        is_fatal=lFatal_ )
+        is_fatal=lFatal_l )
 
       if ( any( fValues <= fTINYVAL ) ) &
         call warn( "Failed to find a lookup table column named " &
-          //dQuote( sKey )//".", lFatal = lFatal_ )
+          //dQuote( sKey )//".", lFatal = lFatal_l )
 
     endif
 
@@ -509,12 +509,12 @@ contains
     integer (kind=c_int)             :: iNumCols
     type (STRING_LIST_T)             :: slList
     real (kind=c_float), allocatable :: fTempVal(:)
-    logical (kind=c_bool) :: lFatal_
+    logical (kind=c_bool) :: lFatal_l 
 
     if ( present (lFatal) ) then
-      lFatal_ = lFatal
+      lFatal_l = lFatal
     else
-      lFatal_ = lFALSE
+      lFatal_l = lFALSE
     endif
 
     slList = PARAMS%grep_name( sPrefix )
@@ -524,7 +524,7 @@ contains
     if ( iNumCols == 0 ) then
 
       call warn( "Failed to find a lookup table column named " &
-        //dQuote( sPrefix )//".", lFatal = lFatal_ )
+        //dQuote( sPrefix )//".", lFatal = lFatal_l )
 
     else
 
@@ -540,7 +540,7 @@ contains
 
         sText = trim( slList%get( iIndex ) )
         call PARAMS_DICT%get_values( sKey=sText, fValues=fTempVal,            &
-          is_fatal=lFatal_ )
+          is_fatal=lFatal_l )
 
         call assert( size( fTempVal, 1) == size( fValues, 1),                 &
           "Mismatch in array size. Dictionary key: "//squote( sText )         &

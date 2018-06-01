@@ -109,19 +109,19 @@ contains
 
 
     ! [ LOCALS ]
-    integer (kind=c_int)    :: iLogLevel_
-    logical (kind=c_bool)   :: lWrite_SWB_Info_
+    integer (kind=c_int)    :: iLogLevel_l
+    logical (kind=c_bool)   :: lWrite_SWB_Info_l
 
     if ( present( lWrite_SWB_Info) ) then
-      lWrite_SWB_Info_ = lWrite_SWB_Info
+      lWrite_SWB_Info_l = lWrite_SWB_Info
     else
-      lWrite_SWB_Info_ = .true._c_bool
+      lWrite_SWB_Info_l = .true._c_bool
     endif
 
     if (present(iLogLevel) ) then
-      iLogLevel_ = iLogLevel
+      iLogLevel_l = iLogLevel
     else
-      iLogLevel_ = LOG_GENERAL
+      iLogLevel_l = LOG_GENERAL
     endif
 
     if ( present( sFilePrefix) ) then
@@ -130,8 +130,8 @@ contains
       call this%make_prefix()
     endif
 
-    this%iLogLevel = iLogLevel_
-    call this%open( lWrite_SWB_Info=lWrite_SWB_Info_ )
+    this%iLogLevel = iLogLevel_l
+    call this%open( lWrite_SWB_Info=lWrite_SWB_Info_l )
 
   end subroutine initialize_logfiles_sub
 
@@ -147,12 +147,12 @@ contains
     character (len=:), allocatable   :: sFilename
     character (len=:), allocatable   :: sDatetime
     character (len=12)               :: sDescriptor(2) = [ "         ", "_DEBUG   " ]
-    logical (kind=c_bool)            :: lWrite_SWB_Info_
+    logical (kind=c_bool)            :: lWrite_SWB_Info_l
 
     if ( present( lWrite_SWB_Info) ) then
-      lWrite_SWB_Info_ = lWrite_SWB_Info
+      lWrite_SWB_Info_l = lWrite_SWB_Info
     else
-      lWrite_SWB_Info_ = .true._c_bool
+      lWrite_SWB_Info_l = .true._c_bool
     endif
 
     if ( this%iLogLevel /= LOG_NONE ) then
@@ -173,7 +173,7 @@ contains
 
           sDatetime = make_timestamp()
 
-          if ( lWrite_SWB_Info_ ) then
+          if ( lWrite_SWB_Info_l ) then
 
             write(this%iUnitNum(iIndex), fmt="(a)") "# USGS Soil Water Balance Code run log #"
             write(this%iUnitNum(iIndex), fmt="(a,/)") repeat("-", 80)
@@ -264,35 +264,35 @@ contains
     logical (kind=c_bool), intent(in), optional  :: lEcho
 
     ! [ LOCALS ]
-    integer (kind=c_int)  :: iTab_
-    integer (kind=c_int)  :: iLinesBefore_
-    integer (kind=c_int)  :: iLinesAfter_
+    integer (kind=c_int)  :: iTab_l
+    integer (kind=c_int)  :: iLinesBefore_l
+    integer (kind=c_int)  :: iLinesAfter_l
 
     if (present(iLogLevel) )   call this%set_loglevel( iLogLevel )
     if (present(lEcho) )       call this%set_echo( lEcho )
 
     if (present(iTab) ) then
-      iTab_ = iTab
+      iTab_l = iTab
     else
-      iTab_ = 1
+      iTab_l = 1
     endif
 
     if (present(iLinesBefore) ) then
-      iLinesBefore_ = iLinesBefore
+      iLinesBefore_l = iLinesBefore
     else
-      iLinesBefore_ = 0
+      iLinesBefore_l = 0
     endif
 
     if (present(iLinesAfter) ) then
-      iLinesAfter_ = iLinesAfter
+      iLinesAfter_l = iLinesAfter
     else
-      iLinesAfter_ = 0
+      iLinesAfter_l = 0
     endif
 
     if ( CURRENT_LOG_ECHO ) then
 
       call writeMultiLine(sMessageText=sMessage, iLU=OUTPUT_UNIT, &
-        iTab=iTab_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
+        iTab=iTab_l, iLinesBefore=iLinesBefore_l, iLinesAfter=iLinesAfter_l )
 
     endif
 
@@ -302,23 +302,23 @@ contains
 
         if ( this%iLogLevel >= LOG_GENERAL ) &
           call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_GENERAL ), &
-            iTab=iTab_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
+            iTab=iTab_l, iLinesBefore=iLinesBefore_l, iLinesAfter=iLinesAfter_l )
 
       case ( LOG_DEBUG )
 
         if ( this%iLogLevel >= LOG_DEBUG ) &
           call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_DEBUG ), &
-            iTab=iTab_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
+            iTab=iTab_l, iLinesBefore=iLinesBefore_l, iLinesAfter=iLinesAfter_l )
 
       case ( LOG_ALL )
 
         if ( this%iLogLevel >= LOG_GENERAL ) &
           call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_GENERAL ), &
-            iTab=iTab_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
+            iTab=iTab_l, iLinesBefore=iLinesBefore_l, iLinesAfter=iLinesAfter_l )
 
         if ( this%iLogLevel >= LOG_DEBUG ) &
           call writeMultiLine(sMessageText=sMessage, iLU=this%iUnitNum( LOG_DEBUG ), &
-            iTab=iTab_, iLinesBefore=iLinesBefore_, iLinesAfter=iLinesAfter_ )
+            iTab=iTab_l, iLinesBefore=iLinesBefore_l, iLinesAfter=iLinesAfter_l )
 
       case default
 

@@ -349,24 +349,24 @@ contains
     real (kind=c_double)                       :: dRso
 
     ! [ LOCALS ]
-    real (kind=c_double) :: dAs_
-    real (kind=c_double) :: dBs_
+    real (kind=c_double) :: dAs_l
+    real (kind=c_double) :: dBs_l
 
     ! assign default value to As if none is provided
     if ( present( dAs ) ) then
-      dAs_ = dAs
+      dAs_l = dAs
     else
-      dAs_ = 0.25_c_double
+      dAs_l = 0.25_c_double
     end if
 
     ! assign default value to Bs if none is provided
     if ( present( dBs ) ) then
-      dBs_ = dBs
+      dBs_l = dBs
     else
-      dBs_ = 0.5_c_double
+      dBs_l = 0.5_c_double
     end if
 
-    dRso = (dAs_ + dBs_) * dRa
+    dRso = (dAs_l + dBs_l * dRa)
 
   end function clear_sky_solar_radiation__Rso
 
@@ -557,12 +557,12 @@ contains
 
 	  ! [ LOCALS ]
 	  real (kind=c_double) :: dTheta_z
-    real (kind=c_double) :: dOmega_
+    real (kind=c_double) :: dOmega_l
 
     if ( present( dOmega ) ) then
-      dOmega_ = dOmega_
+      dOmega_l = dOmega_l
     else
-      dOmega_ = 0.0_c_double
+      dOmega_l = 0.0_c_double
     endif
 
 	  call assert( dLatitude <= HALFPI .and. dLatitude >= -HALFPI , &
@@ -570,7 +570,7 @@ contains
 	    __SRCNAME__, __LINE__ )
 
 
-	  dTheta_z = acos( sin(dLatitude) * sin(dDelta) + cos(dLatitude) * cos(dDelta) * cos(dOmega_) )
+	  dTheta_z = acos( sin(dLatitude) * sin(dDelta) + cos(dLatitude) * cos(dDelta) * cos(dOmega_l ) )
 
 	end function zenith_angle__theta_z
 

@@ -498,20 +498,20 @@ end function find_dict_entry_fn
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
-    logical (kind=c_bool)          :: is_fatal_
+    logical (kind=c_bool)          :: is_fatal_l
     logical (kind=c_bool)          :: empty_entries
 
     if ( present( is_fatal ) ) then
-      is_fatal_ = is_fatal
+      is_fatal_l = is_fatal
     else
-      is_fatal_ = FALSE
+      is_fatal_l = FALSE
     endif
 
     pTarget => this%get_entry(sKey)
 
     if ( associated( pTarget ) ) then
 
-      if ( is_fatal_ ) then
+      if ( is_fatal_l ) then
         empty_entries = pTarget%sl%empty_entries_present()
         if( empty_entries )  call warn(sMessage="There are missing values associated" &
           //" with the key value of "//dquote(sKey),                                  &
@@ -547,20 +547,20 @@ end function find_dict_entry_fn
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
-    logical (kind=c_bool)          :: is_fatal_
+    logical (kind=c_bool)          :: is_fatal_l
     logical (kind=c_bool)          :: empty_entries
 
     if ( present( is_fatal ) ) then
-      is_fatal_ = is_fatal
+      is_fatal_l = is_fatal
     else
-      is_fatal_ = FALSE
+      is_fatal_l = FALSE
     endif
 
     pTarget => this%get_entry(sKey)
 
     if ( associated( pTarget ) ) then
 
-      if ( is_fatal_ ) then
+      if ( is_fatal_l ) then
         empty_entries = pTarget%sl%empty_entries_present()
         if( empty_entries )  call warn(sMessage="There are missing values associated" &
           //" with the key value of "//dquote(sKey),                                  &
@@ -607,13 +607,13 @@ end function find_dict_entry_fn
     integer (kind=c_int)           :: iStat
     integer (kind=c_int)           :: iCount
     character (len=:), allocatable :: sText
-    logical (kind=c_bool)          :: is_fatal_
+    logical (kind=c_bool)          :: is_fatal_l
     logical (kind=c_bool)          :: empty_entries
 
     if ( present( is_fatal ) ) then
-      is_fatal_ = is_fatal
+      is_fatal_l = is_fatal
     else
-      is_fatal_ = FALSE
+      is_fatal_l = FALSE
     endif
 
     iCount = 0
@@ -632,7 +632,7 @@ end function find_dict_entry_fn
 
     if ( associated( pTarget ) ) then
 
-      if ( is_fatal_ ) then
+      if ( is_fatal_l ) then
         empty_entries = pTarget%sl%empty_entries_present()
         if( empty_entries )  call warn(sMessage="There are missing values associated" &
           //" with the key values of "//slKeys%listall(),                             &
@@ -670,13 +670,13 @@ end function find_dict_entry_fn
     integer (kind=c_int)           :: iStat
     integer (kind=c_int)           :: iCount
     character (len=:), allocatable :: sText
-    logical (kind=c_bool)          :: is_fatal_
+    logical (kind=c_bool)          :: is_fatal_l
     logical (kind=c_bool)          :: empty_entries
 
     if ( present( is_fatal ) ) then
-      is_fatal_ = is_fatal
+      is_fatal_l = is_fatal
     else
-      is_fatal_ = FALSE
+      is_fatal_l = FALSE
     endif
 
     iCount = 0
@@ -695,7 +695,7 @@ end function find_dict_entry_fn
 
     if ( associated( pTarget ) ) then
 
-      if ( is_fatal_ ) then
+      if ( is_fatal_l ) then
         empty_entries = pTarget%sl%empty_entries_present()
         if( empty_entries )  call warn(sMessage="There are missing values associated" &
           //" with the key values of "//slKeys%listall(),                             &
@@ -727,13 +727,13 @@ end function find_dict_entry_fn
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
-    logical (kind=c_bool)          :: is_fatal_
+    logical (kind=c_bool)          :: is_fatal_l
     logical (kind=c_bool)          :: empty_entries
 
     if ( present( is_fatal ) ) then
-      is_fatal_ = is_fatal
+      is_fatal_l = is_fatal
     else
-      is_fatal_ = FALSE
+      is_fatal_l = FALSE
     endif
 
     if ( present( sKey ) )  this%current => this%get_entry(sKey)
@@ -764,14 +764,20 @@ end function find_dict_entry_fn
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
-    logical (kind=c_bool)          :: is_fatal_
+    logical (kind=c_bool)          :: is_fatal_l
     logical (kind=c_bool)          :: empty_entries
 
     pTarget => this%get_entry(sKey)
 
+    if ( present(is_fatal) ) then
+      is_fatal_l = False
+    else
+      is_fatal_l = is_fatal
+    endif
+
     if ( associated( pTarget ) ) then
 
-      if ( is_fatal_ ) then
+      if ( is_fatal_l ) then
         empty_entries = pTarget%sl%empty_entries_present()
         if( empty_entries )  call warn(sMessage="There are missing values associated" &
           //" with the key value of "//dquote(sKey),                                  &
@@ -814,13 +820,13 @@ end function find_dict_entry_fn
     integer (kind=c_int)           :: iStat
     integer (kind=c_int)           :: iCount
     character (len=256)            :: sText
-    logical (kind=c_bool)          :: is_fatal_
+    logical (kind=c_bool)          :: is_fatal_l
     logical (kind=c_bool)          :: empty_entries
 
     if ( present( is_fatal ) ) then
-      is_fatal_ = is_fatal
+      is_fatal_l = is_fatal
     else
-      is_fatal_ = FALSE
+      is_fatal_l = FALSE
     endif
 
     iCount = 0
@@ -841,7 +847,7 @@ end function find_dict_entry_fn
 
     if ( associated( pTarget ) ) then
 
-      if ( is_fatal_ ) then
+      if ( is_fatal_l ) then
         empty_entries = pTarget%sl%empty_entries_present()
         if( empty_entries )  call warn(sMessage="There are missing values associated" &
           //" with the key values of "//slKeys%listall(),                             &
@@ -888,13 +894,13 @@ end function find_dict_entry_fn
     integer (kind=c_int)           :: iStat
     integer (kind=c_int)           :: iCount
     character (len=:), allocatable :: sText
-    logical (kind=c_bool)          :: is_fatal_
+    logical (kind=c_bool)          :: is_fatal_l
     logical (kind=c_bool)          :: empty_entries
 
     if ( present( is_fatal ) ) then
-      is_fatal_ = is_fatal
+      is_fatal_l = is_fatal
     else
-      is_fatal_ = FALSE
+      is_fatal_l = FALSE
     endif
 
     iCount = 0
@@ -913,7 +919,7 @@ end function find_dict_entry_fn
 
     if ( associated( pTarget ) ) then
 
-      if ( is_fatal_ ) then
+      if ( is_fatal_l ) then
         empty_entries = pTarget%sl%empty_entries_present()
         if( empty_entries )  call warn(sMessage="There are missing values associated" &
           //" with the key values of "//slKeys%listall(),                             &
@@ -951,14 +957,14 @@ end function find_dict_entry_fn
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
     integer (kind=c_int)           :: iStat
-    logical (kind=c_bool)          :: is_fatal_
+    logical (kind=c_bool)          :: is_fatal_l
     logical (kind=c_bool)          :: empty_entries
 
     pTarget => this%get_entry(sKey)
 
     if ( associated( pTarget ) ) then
 
-      if ( is_fatal_ ) then
+      if ( is_fatal_l ) then
         empty_entries = pTarget%sl%empty_entries_present()
         if( empty_entries )  call warn(sMessage="There are missing values associated" &
           //" with the key value of "//dquote(sKey),                                  &
@@ -995,26 +1001,26 @@ end function find_dict_entry_fn
     character (len=512)            :: sTempBuf
     integer (kind=c_int)           :: iCount
     integer (kind=c_int)           :: iIndex
-    integer (kind=c_int)           :: iLogLevel_
-    logical (kind=c_bool)          :: lEcho_
+    integer (kind=c_int)           :: iLogLevel_l
+    logical (kind=c_bool)          :: lEcho_l 
 
     if ( present( iLogLevel ) ) then
-      iLogLevel_ = iLogLevel
+      iLogLevel_l = iLogLevel
     else
-      iLogLevel_ = LOGS%iLogLevel
+      iLogLevel_l = LOGS%iLogLevel
     end if
 
     if ( present( lEcho ) ) then
-      lEcho_ = lEcho
+      lEcho_l = lEcho
     else
-      lEcho_ = FALSE
+      lEcho_l = FALSE
     end if
 
     current => this%first
     iCount = 0
 
     call LOGS%write( "### Summary of all items stored in SWB parameter dictionary",                &
-      iLogLevel=iLogLevel_, lEcho=lEcho_ )
+      iLogLevel=iLogLevel_l, lEcho=lEcho_l )
 
     do while ( associated( current ) )
 
@@ -1022,9 +1028,9 @@ end function find_dict_entry_fn
       sTempBuf = current%key
 
       call LOGS%write( asCharacter(iCount)//")  KEY: "//dquote(sTempBuf),    &
-        iLogLevel=iLogLevel_, lEcho=lEcho_, iTab=2, iLinesBefore=1, iLinesAfter=1 )
+        iLogLevel=iLogLevel_l, lEcho=lEcho_l, iTab=2, iLinesBefore=1, iLinesAfter=1 )
 
-      select case ( iLogLevel_ )
+      select case ( iLogLevel_l )
 
         case ( LOG_GENERAL )
 
@@ -1043,7 +1049,7 @@ end function find_dict_entry_fn
 
       end select
 
-      if ( lEcho_ )   call current%sl%print()
+      if ( lEcho_l )   call current%sl%print()
 
       current => current%next
 
