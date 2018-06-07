@@ -60,6 +60,13 @@ contains
     call string_list%append("Storm_drain_capture")
     call string_list%append("Storm_drain_capture_fraction")
 
+    allocate( STORM_DRAIN_CAPTURE_FRACTION( count( is_cell_active ) ), stat=status )
+    call assert( status==0, "Problem allocating STORM_DRAIN_CAPTURE_FRACTION", &
+      __SRCNAME__, __LINE__ )
+
+    ! set default value for STORM_DRAIN_CAPTURE_FRACTION
+    STORM_DRAIN_CAPTURE_FRACTION = 0.0_c_float
+
     !> Determine how many storm_drain_capture codes are present
     call PARAMS%get_parameters( slKeys=string_list, fValues=STORM_DRAIN_CAPTURE_FRACTION_TABLE )
 
@@ -67,10 +74,6 @@ contains
 
     ! attempt to locate storm drain capture information in gridded format
     pSTORM_DRAIN_CAPTURE_FRACTION => DAT%find( "STORM_DRAIN_CAPTURE_FRACTION" )
-
-    allocate( STORM_DRAIN_CAPTURE_FRACTION( number_of_landuse_codes ), stat=status )
-    call assert( status==0, "Problem allocating STORM_DRAIN_CAPTURE_FRACTION", &
-      __SRCNAME__, __LINE__ )
 
    if ( associated( pSTORM_DRAIN_CAPTURE_FRACTION ) ) then
 

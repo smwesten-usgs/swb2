@@ -17,7 +17,7 @@
 module precipitation__method_of_fragments
 
   use iso_c_binding
-  use constants_and_conversions, only  : asInt, asFloat, lTRUE, lFALSE
+  use constants_and_conversions, only  : asInt, asFloat, lTRUE, lFALSE, RANDOM_START
   use data_catalog
   use data_catalog_entry
   use dictionary
@@ -165,6 +165,8 @@ contains
 
     ! use the first entry in the string list slString as the filename to open for
     ! use with the daily fragments routine
+
+
     call read_daily_fragments( slString%get(1) )
     call slString%clear()
 
@@ -192,7 +194,7 @@ contains
     allocate (RANDOM_VALUES( iMaxRainZones ), stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
-    if ( RANDOM_FRAGMENT_SEQUENCES ) call initialize_kiss_rng()
+    if ( RANDOM_FRAGMENT_SEQUENCES ) call initialize_kiss_rng( RANDOM_START )
 
     call process_fragment_sets()
 
@@ -333,7 +335,7 @@ contains
       if ( FRAGMENTS(iCount)%iMonth == (last_month + 1) ) then
         last_fragment = 0
         last_zone = 0
-      endif  
+      endif
 
       if ( FRAGMENTS(iCount)%iMonth < last_month )                             &
         call die( "Out-of-order month value in the daily fragments file",      &

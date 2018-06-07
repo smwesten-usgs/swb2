@@ -770,9 +770,9 @@ end function find_dict_entry_fn
     pTarget => this%get_entry(sKey)
 
     if ( present(is_fatal) ) then
-      is_fatal_l = False
-    else
       is_fatal_l = is_fatal
+    else
+      is_fatal_l = False
     endif
 
     if ( associated( pTarget ) ) then
@@ -1002,7 +1002,7 @@ end function find_dict_entry_fn
     integer (kind=c_int)           :: iCount
     integer (kind=c_int)           :: iIndex
     integer (kind=c_int)           :: iLogLevel_l
-    logical (kind=c_bool)          :: lEcho_l 
+    logical (kind=c_bool)          :: lEcho_l
 
     if ( present( iLogLevel ) ) then
       iLogLevel_l = iLogLevel
