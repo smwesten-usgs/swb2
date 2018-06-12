@@ -564,7 +564,8 @@ contains
     if ( present(seed) ) then
 
       ! 'seed' simply specifies where in our long string of pseudo-random
-      ! numbers we begin
+      ! numbers we begin; basically generating and throwing away the first 'seed' number
+      ! of pseudo-random numbers
       do i=1, seed
         x = kiss64_rng()
       enddo

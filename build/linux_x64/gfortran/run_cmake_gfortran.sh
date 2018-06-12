@@ -32,14 +32,14 @@ export LIB_GFORTRAN=$( locate libgfortran.a | grep $GCC_TRIPLET | grep -v 32 )
 
 export PATH=/usr/local:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:$PATH
 
-export SWB_EXTERNAL_LIBS="$LIB_HDF5_HL $LIB_HDF5 $LIB_NETCDF $LIBZ $LIBDL $LIB_GCC $LIB_GFORTRAN"
+export SWB_EXTERNAL_LIBS="$LIB_HDF5_HL;$LIB_HDF5;$LIB_NETCDF;$LIB_Z;$LIB_DL;$LIB_GCC;$LIB_GFORTRAN"
 
 # define where 'make copy' will place executables
 export INSTALL_PREFIX=/usr/local/bin
 
 # define other variables for use in the CMakeList.txt file
 # options are "Release" or "Debug"
-export BUILD_TYPE="Release"
+export BUILD_TYPE="Debug"
 export SYSTEM_TYPE="Linux"
 
 # define platform and compiler specific compilation flags

@@ -8,8 +8,8 @@
 !> to the control_setModelOptions routine in module \ref control.
 program main
 
-  use iso_c_binding, only             : c_short, c_int, c_float, c_double, c_bool
-  use constants_and_conversions, only : OS_NATIVE_PATH_DELIMITER
+  use iso_c_binding, only             : c_short, c_int, c_float, c_double, c_bool, c_long
+  use constants_and_conversions, only : OS_NATIVE_PATH_DELIMITER, RANDOM_START, asInt
   use logfiles, only                  : LOGS, LOG_DEBUG
   use model_initialize, only          : initialize_all, read_control_file
   use model_domain, only              : MODEL
@@ -90,11 +90,12 @@ program main
       //TRIM(asCharacter(__G95_MINOR__))
 #endif
 
-    write(UNIT=*,FMT="(/,a,/,/,5(a,/))")  "Usage: swb2 control_file_name ",                         &
-             "[ --output_prefix= ]     :: text to use as a prefix for output filenames",               &
-             "[ --output_dir= ]        :: directory to place output in (may be relative or absolute)", &
-             "[ --data_dir= ]          :: directory to search for input grids or lookup tables",       &
-             "[ --weather_data_dir= ]  :: directory to search for weather data grids"
+    write(UNIT=*,FMT="(/,a,/,/,6(a,/))")  "Usage: swb2 control_file_name ",                                &
+             "[ --output_prefix= ]     :: text to use as a prefix for output filenames",                   &
+             "[ --output_dir= ]        :: directory to place output in (may be relative or absolute)",     &
+             "[ --data_dir= ]          :: directory to search for input grids or lookup tables",           &
+             "[ --weather_data_dir= ]  :: directory to search for weather data grids",                     &
+             "[ --random_start= ]      :: advance random number generator to this position in the series"
     stop
 
   end if
@@ -114,6 +115,13 @@ program main
         sOutputDirectoryName = trim(sOutputDirectoryName)//OS_NATIVE_PATH_DELIMITER
 
       call LOGS%set_output_directory( sOutputDirectoryName )
+
+    elseif( sBuf(1:15) .eq."--random_start=" ) then
+
+      RANDOM_START = int( asInt( sBuf(16:) ), kind=c_long )
+      call LOGS%write(sMessage="Pseudo-random numbers will be pulled from index number "   &
+              //trim(asCharacter(RANDOM_START))//" in the generated series.",              &
+              lEcho=.true._c_bool )
 
     elseif ( sBuf(1:16) .eq. "--output_prefix=" ) then
 

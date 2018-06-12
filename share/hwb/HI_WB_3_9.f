@@ -1,6 +1,7 @@
       program HI_WB
 
       use kiss_random_number_generator
+      use iso_c_binding, only             : c_long
 
 c  Recharge Computation Program for the Hawaiian Islands
 c  version 3.9, 2/6/14
@@ -74,8 +75,6 @@ c                  nsim simulations)--CONTAINS ONLY SUGARCANE POLYGONS
 c   hi_wb4.out     polygon water-budget components for each polygon and
 c                  simulation (water-budget components are in total inches
 c                  accumulated over the nyrs of each simulation)
-c
-c
 c  List of subroutines:
 c
 c  input      reads input data from biwb01.in
@@ -319,7 +318,7 @@ c                   i=1,nsoil; j=1,nseq(i); l=1,nlay(i,j)
       dimension idemsup(20),supirr(20),rmltirr(20),effirr(20),
      1          irrday(20,31),nirrdays(20,12),irrsug(50000)
 
-      integer target_polys(12)
+!      integer target_polys(12)
 
 c      lc    polygon    storm_drain    swb-hwb
 c      8    36798    no    negative
@@ -329,8 +328,8 @@ c      10    24397    no    negative
 c      10    268541    yes    positive
       ! natural forest, corn, golf course, diverse ag
 c      data target_polys/60515,63533,277684,336981,339872,342876,353812,345298/
-      data target_polys/60515,63533,277684,336981,36798,21336,278558,24397,
-     1   268541,300751,216547,107336/
+!      data target_polys/60515,63533,277684,336981,36798,21336,278558,24397,
+!     1   268541,300751,216547,107336/
       data idays/31,28,31,30,31,30,31,31,30,31,30,31/
 
       common /consti/nsim,nyrs,ndirr,ndunirr,ndfallow,id1,irfweights,
@@ -431,12 +430,14 @@ c.....initialize polygon recharge arrays
       write(3,3000)
       write(4,4000)
 
+      call initialize_kiss_rng(int(seed,kind=c_long))
+
 c.....compute desired number of water-budget simulations
       do 300 i=1,nsim
 
 c........get new seed value for random number generator
-         iseed=iseed+1
-         if(mod(iseed,2).eq.0)iseed=iseed+1
+c         iseed=iseed+1
+c         if(mod(iseed,2).eq.0)iseed=iseed+1
 
 c........determine field configuration (furrow, drip, nonirrigated)
         if(nilusug.ne.0)then
@@ -719,11 +720,11 @@ C  `Y8bod8P'  `V88V"V8P'   "888"  888bod8P'  `V88V"V8P'   "888"
 C                                 888
 C                                o888o
 
-      open(169, file="hwb_daily_water_budget_components.csv")
-      write(169,"(a)") "polynum, month, day, year, daily_rf_frag, monthly_rf, "
-     1  //"daily_rf, net_daily_rf, irrigation, runoff, fog, crop_et, pot_et, act_et, "
-     2  //"crop_coef, can_intercept, soil_moist, recharge, landuse_code, aquifer_code, "
-     3  //"surf_area"
+!      open(169, file="hwb_daily_water_budget_components.csv")
+!      write(169,"(a)") "polynum, month, day, year, daily_rf_frag, monthly_rf, "
+!     1  //"daily_rf, net_daily_rf, irrigation, runoff, fog, crop_et, pot_et, act_et, "
+!     2  //"crop_coef, can_intercept, soil_moist, recharge, landuse_code, aquifer_code, "
+!     3  //"surf_area"
 
       open(269, file="hwb_calculated_rainfall_sequences.txt")
       write(269,"(a)") "simulation  month  frag_zone  year  random_number  selected_set"
@@ -1698,14 +1699,15 @@ c     for a given month and fragment zone, a particular fragment set can
 c     be selected more than once
       !call random_seed(size=array_size)
       !call initialize_kiss_rng( int(iseed, kind=selected_int_kind(18)) )
-      call initialize_kiss_rng()
+      !call initialize_kiss_rng()
       !if (allocated(ino) )  deallocate(ino)
       !allocate(ino(array_size))
       !ino=iseed-1
 
+      do 100 yr=1,nyrs        ! number of years
       do 100 m=1,12          ! number of months
       do 100 j=1,nmbrrfz     ! number of zones
-      do 100 yr=1,nyrs        ! number of years
+!      do 100 yr=1,nyrs        ! number of years
          !ino=ino+1
 
          !!call random_seed(put=ino)
@@ -1859,7 +1861,7 @@ c    pan coefficient is not temporally variable
       common /npfog/slpnpfog,yintnpfog
       common /canint/gashcal,ceint,ifm
       common /nprint/jprint,iprint
-      common /polys/target_polys
+!      common /polys/target_polys
 
       data idays/31,28,31,30,31,30,31,31,30,31,30,31/
 
@@ -2843,19 +2845,19 @@ C     `888.8'       .88ooo8888.    888`88b.     888    .88ooo8888.    888    `88
 C      `888'       .8'     `888.   888  `88b.   888   .8'     `888.   888    .88P  888       o  888       o oo     .d8P
 C       `8'       o88o     o8888o o888o  o888o o888o o88o     o8888o o888bood8P'  o888ooooood8 o888ooooood8 8""88888P'
 
-           do indx=1,ubound(target_polys,1)
+!           do indx=1,ubound(target_polys,1)
 
-             if ( ilu(ip) == ilucorn .and. icorncheck /= 2) cycle
+!             if ( ilu(ip) == ilucorn .and. icorncheck /= 2) cycle
 
-             if ( ip == target_polys(indx) ) then
+!             if ( ip == target_polys(indx) ) then
 
-               write(169,*) ip,",",m,",",k,",",i,",",frg(m,irfzone(ip),jfr(m,irfzone(ip),i),k),
-     1            ",",mrf,",",drf,",",dpnet,",",agirr*perv(ip),",",dro, ",", dfog, ",", pe, ",", pan, ",",
-     2            daily_aet2,",",pancoef(ilu(ip),m),",",dcanint,",",sm2,",",daily_rc2,",",
-     3            ilu(ip),",",iasys(ip),",",area(ip)
-             endif
+!               write(169,*) ip,",",m,",",k,",",i,",",frg(m,irfzone(ip),jfr(m,irfzone(ip),i),k),
+!     1            ",",mrf,",",drf,",",dpnet,",",agirr*perv(ip),",",dro, ",", dfog, ",", pe, ",", pan, ",",
+!     2            daily_aet2,",",pancoef(ilu(ip),m),",",dcanint,",",sm2,",",daily_rc2,",",
+!     3            ilu(ip),",",iasys(ip),",",area(ip)
+!             endif
 
-           enddo
+!           enddo
 
  300     continue
 

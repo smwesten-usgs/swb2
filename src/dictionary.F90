@@ -773,10 +773,10 @@ end function find_dict_entry_fn
 
     pTarget => this%get_entry(sKey)
 
-    if ( .not. present(is_fatal) ) then
-      is_fatal_l = False
-    else
+    if ( present(is_fatal) ) then
       is_fatal_l = is_fatal
+    else
+      is_fatal_l = False
     endif
 
     if ( associated( pTarget ) ) then
