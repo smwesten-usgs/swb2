@@ -33,7 +33,7 @@ export LIB_GCC=$( glocate libgcc.a | grep Cellar | grep $GCC_VERSION | grep -v i
 export LIB_GFORTRAN=$( glocate libgfortran.a | grep Cellar | grep $GCC_VERSION | grep -v i386 )
 export NC_CONFIG=$(glocate nc-config | grep Cellar | grep $NETCDF_VERSION )
 
-export SWB_EXTERNAL_LIBS="$LIB_HDF5_HL $LIB_HDF5 $LIB_NETCDF $LIB_SZ $LIBZ $LIBDL $LIB_GCC $LIB_GFORTRAN"
+export SWB_EXTERNAL_LIBS="$LIB_HDF5_HL;$LIB_HDF5;$LIB_NETCDF;$LIB_SZ;$LIBZ;$LIBDL;$LIB_GCC;$LIB_GFORTRAN"
 
 export PATH=/usr/local:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:$PATH
 
@@ -46,7 +46,7 @@ export BUILD_TYPE="Release"
 export SYSTEM_TYPE="MacOS"
 
 # define platform and compiler specific compilation flags
-export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -gfull -ggdb -Wuninitialized -fbacktrace -fcheck=all -fexceptions -fsanitize=null -fsanitize=leak -fmax-errors=6 -fbackslash -ffree-line-length-none -Wno-maybe-uninitialized"
+export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -gfull -ggdb -Wuninitialized -fbacktrace -fcheck=all -fexceptions -fsanitize=null -fsanitize=leak -fmax-errors=6 -fbackslash -ffree-line-length-none -Wno-maybe-uninitialized -ffpe-trap=overflow,underflow,zero"
 export CMAKE_Fortran_FLAGS_RELEASE="-O1 -g -march=native -ffree-line-length-512 -fbackslash -ffpe-summary='none' -Wno-maybe-uninitialized"
 
 # set important environment variables

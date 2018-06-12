@@ -550,19 +550,19 @@ end function update_crop_coefficient_GDD_as_threshold
       ! current date is beyond the enddate associated with fallow period;
       ! update Kcb curve and dates
 
-      print *, "a) ",SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate()
+!      print *, "a) ",SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate()
 
       ! it's possible that the planting date might be later in the current calendar year
       call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%setYear( SIM_DT%curr%iYear )
 
-      print *, "b) ",SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate()
+!      print *, "b) ",SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate()
 
       ! however, if we're already past that point in the year, planting date must be
       ! next celendar year
       if ( SIM_DT%iDOY > GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%getDayOfYear() )  &
         call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%addYear()
 
-      print *, "c) ",SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate()
+!      print *, "c) ",SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate()
 
       ! now calculate dates associated with the rest of the Kcb curve
       GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) &

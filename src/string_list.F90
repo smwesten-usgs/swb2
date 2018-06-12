@@ -221,30 +221,24 @@ contains
     integer (kind=c_int)                      :: iCount
     type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
 
-    iCount = 0
+    iCount = 1
 
     current => this%first
 
-    do while ( associated( current ) .and. iCount < this%count )
-
-      iCount = iCount + 1
+    do while ( associated( current ) .and. ( iCount <= this%count ) )
 
       if (iCount == iIndex)  exit
-
       current => current%next
-
+      iCount = iCount + 1
     enddo
 
-    if (associated(current) ) then
-      sText = current%s
-    else
-      sText = "<NA>"
-      !      call warn(sMessage="Unable to find a pointer associated with index: "//asCharacter(iIndex),  &
-      !                iLogLevel=LOG_DEBUG,                                                               &
-      !                sModule=__SRCNAME__,                                                                  &
-      !                iLine=__LINE__ )
-    endif
+    sText = "<NA>"
 
+    if (associated(current) ) then
+
+      if ( allocated( current%s) )  sText = current%s
+
+    endif
 
   end function list_get_value_at_index_fn
 

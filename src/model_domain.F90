@@ -97,7 +97,7 @@ module model_domain
     real (kind=c_float), allocatable       :: interception_storage(:)
 
     real (kind=c_float), allocatable       :: snow_storage(:)
-    real (kind=c_float), allocatable       :: surface_storage(:)
+    real (kind=c_double), allocatable      :: surface_storage(:)
     real (kind=c_float), allocatable       :: surface_storage_max(:)
     real (kind=c_float), allocatable       :: surface_storage_excess(:)
     real (kind=c_float), allocatable       :: storm_drain_capture(:)
@@ -3306,7 +3306,7 @@ contains
     call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     call precipitation_method_of_fragments_initialize( this%active )
-    call this%get_precipitation_data()
+    !call this%get_precipitation_data()
 
   end subroutine model_initialize_precip_method_of_fragments
 

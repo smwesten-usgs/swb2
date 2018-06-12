@@ -54,7 +54,7 @@ module precipitation__method_of_fragments
 
   !> Module variable that holds a sequence of random numbers associated with the selection
   !! of the fragment set to use
-  real (kind=c_float), allocatable :: RANDOM_VALUES(:)
+  real (kind=c_double), allocatable :: RANDOM_VALUES(:)
 
   !> Module level variable used to create subsets of the FRAGMENT_SEQUENCES file
   logical (kind=c_bool), allocatable :: SEQUENCE_SELECTION(:)
@@ -333,7 +333,7 @@ contains
       if ( FRAGMENTS(iCount)%iMonth == (last_month + 1) ) then
         last_fragment = 0
         last_zone = 0
-      endif  
+      endif
 
       if ( FRAGMENTS(iCount)%iMonth < last_month )                             &
         call die( "Out-of-order month value in the daily fragments file",      &
@@ -519,7 +519,7 @@ contains
 
       FRAGMENTS_SEQUENCE(iCount)%sim_random_number = asFloat(sSubString)
 
-      ! read in simulation selected set
+      ! read in simulation selected set (fragment set selected by HWB)
       call chomp(sRecord, sSubstring, SEQUENCE_FILE%sDelimiters )
 
       if ( len_trim(sSubstring) == 0 )                                                   &
@@ -533,7 +533,7 @@ contains
     enddo
 
     call LOGS%write("### Summary of fragment sequence sets in memory ###", &
-       iLogLevel=LOG_ALL, iLinesBefore=1, iLinesAfter=1, lEcho=lFALSE )
+       iLogLevel=LOG_DEBUG, iLinesBefore=1, iLinesAfter=1, lEcho=lFALSE )
     call LOGS%write("sim number | rainfall zone   | month  | year   | selected set ")
     call LOGS%write("----------- | ---------- | ------------ | ------------|------------")
     do iIndex=1, ubound( FRAGMENTS_SEQUENCE, 1)
@@ -599,6 +599,7 @@ contains
     do iIndex = 1, iMaxRainZones
 
       if ( lShuffle ) then
+        ! find next fragment *record*
 
         ! update the module variable RANDOM_VALUES
         call update_random_values()
@@ -657,6 +658,7 @@ contains
       !    //"  value: "//asCharacter( CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay ) ), &
       !    lEcho=lFALSE )
 
+      ! now place current days' fragment value into the matching cells
       where ( RAIN_GAGE_ID == iIndex )
 
         FRAGMENT_VALUE = CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay )
@@ -714,10 +716,10 @@ contains
     if (any( RANDOM_VALUES < 0.0 ) ) then
 
       call LOGS%write("Error detected in method of fragments routine - random values " &
-        //" not found in sequence file for rainfall zone(s):", iLinesBefore=1)
+        //"not found in sequence file for rainfall zone(s):", iLinesBefore=1)
       do iIndex=1,size(RANDOM_VALUES, 1)
         if ( RANDOM_VALUES(iIndex) < 0.0 )  &
-          call LOGS%write("iIndex (~rainfall zone): "//asCharacter(iIndex), iTab=3 )
+          call LOGS%write("iIndex (a.k.a. rainfall zone): "//trim(asCharacter(iIndex)), iTab=3 )
       enddo
 
     endif

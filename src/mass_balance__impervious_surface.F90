@@ -28,7 +28,7 @@ contains
                                           reference_et0,                &
                                           pervious_fraction )
 
-    real (kind=c_float), intent(inout)      :: surface_storage
+    real (kind=c_double), intent(inout)     :: surface_storage
     real (kind=c_float), intent(inout)      :: actual_et_impervious
     real (kind=c_float), intent(inout)      :: paved_to_unpaved           ! 'wadd' in HWB
     real (kind=c_float), intent(inout)      :: storm_drain_capture
@@ -46,7 +46,7 @@ contains
     ! [ LOCALS ]
     real (kind=c_float) :: surface_storage_excess
     real (kind=c_float) :: impervious_fraction
-    real (kind=c_float) :: surface_storage_l 
+    real (kind=c_float) :: surface_storage_l
 
 !    if ( storm_drain_capture_fraction >= 0.0_c_float ) then
 

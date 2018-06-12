@@ -216,6 +216,7 @@ contains
     iCurrentIndex = 1
 
     pDict => this%first
+
     this%current => this%first
 
     do
@@ -225,8 +226,11 @@ contains
       if ( iCurrentIndex == iIndex )  exit
 
       pDict => pDict%next
+
       this%current => pDict
+
       iCurrentIndex = iCurrentIndex + 1
+
 
     enddo
 
@@ -769,7 +773,7 @@ end function find_dict_entry_fn
 
     pTarget => this%get_entry(sKey)
 
-    if ( present(is_fatal) ) then
+    if ( .not. present(is_fatal) ) then
       is_fatal_l = False
     else
       is_fatal_l = is_fatal
@@ -1002,7 +1006,7 @@ end function find_dict_entry_fn
     integer (kind=c_int)           :: iCount
     integer (kind=c_int)           :: iIndex
     integer (kind=c_int)           :: iLogLevel_l
-    logical (kind=c_bool)          :: lEcho_l 
+    logical (kind=c_bool)          :: lEcho_l
 
     if ( present( iLogLevel ) ) then
       iLogLevel_l = iLogLevel

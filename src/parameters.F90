@@ -79,8 +79,8 @@ contains
     character (len=*), intent(in), optional       :: sCommentChars
 
     ! [ LOCALS ]
-    character (len=:), allocatable  :: sDelimiters_l 
-    character (len=:), allocatable  :: sCommentChars_l 
+    character (len=:), allocatable  :: sDelimiters_l
+    character (len=:), allocatable  :: sCommentChars_l
 
     if (present(sDelimiters) ) then
       sDelimiters_l = sDelimiters
@@ -143,10 +143,12 @@ contains
           call assert(iStat == 0, "Failed to allocate memory for dictionary object", &
               __SRCNAME__, __LINE__ )
 
-          if ( PARAMS_DICT%key_already_in_use( DF%slColNames%get(iColIndex) ) ) then
+          tempstr = DF%slColNames%get(iColIndex)
+
+          if ( PARAMS_DICT%key_already_in_use( tempstr ) ) then
 
             ! add dictionary entry to dictionary, tack "DUP" on end of name
-            tempstr = trim( DF%slColNames%get(iColIndex) )//"_DUP"
+            tempstr = tempstr//"_DUP"
             ! update the string list to reflect duplicate entry
             call DF%slColNames%replace( iColIndex, tempstr )
             call pDict%add_key( asUppercase( tempstr ) )
@@ -304,7 +306,7 @@ contains
     type ( STRING_LIST_T )                                     :: slList
 
     ! [ LOCALS ]
-    logical (kind=c_bool) :: lFatal_l 
+    logical (kind=c_bool) :: lFatal_l
 
     if ( present (lFatal) ) then
       lFatal_l = lFatal
@@ -335,7 +337,7 @@ contains
     logical (kind=c_bool), intent(in),                 optional :: lFatal
 
     ! [ LOCALS ]
-    logical (kind=c_bool) :: lFatal_l 
+    logical (kind=c_bool) :: lFatal_l
 
     if ( present (lFatal) ) then
       lFatal_l = lFatal
@@ -375,7 +377,7 @@ contains
     logical (kind=c_bool), intent(in),                 optional :: lFatal
 
     ! [ LOCALS ]
-    logical (kind=c_bool) :: lFatal_l 
+    logical (kind=c_bool) :: lFatal_l
 
     if ( present (lFatal) ) then
       lFatal_l = lFatal
@@ -419,7 +421,7 @@ contains
     logical (kind=c_bool), intent(in),                optional :: lFatal
 
     ! [ LOCALS ]
-    logical (kind=c_bool) :: lFatal_l 
+    logical (kind=c_bool) :: lFatal_l
 
     if ( present (lFatal) ) then
       lFatal_l = lFatal
@@ -461,7 +463,7 @@ contains
     logical (kind=c_bool), intent(in),                optional :: lFatal
 
     ! [ LOCALS ]
-    logical (kind=c_bool) :: lFatal_l 
+    logical (kind=c_bool) :: lFatal_l
 
     if ( present (lFatal) ) then
       lFatal_l = lFatal
@@ -509,7 +511,7 @@ contains
     integer (kind=c_int)             :: iNumCols
     type (STRING_LIST_T)             :: slList
     real (kind=c_float), allocatable :: fTempVal(:)
-    logical (kind=c_bool) :: lFatal_l 
+    logical (kind=c_bool) :: lFatal_l
 
     if ( present (lFatal) ) then
       lFatal_l = lFatal

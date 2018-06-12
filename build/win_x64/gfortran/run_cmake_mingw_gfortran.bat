@@ -36,7 +36,7 @@ set LIB_Z=%LIB_Z:\=/%
 set LIB_DL=%LIB_DL:\=/%
 set LIB_SZ=%LIB_SZ:\=/%
 
-set SWB_EXTERNAL_LIBS="%LIB_HDF5_HL% %LIB_HDF5% %LIB_NETCDF% %LIBZ% %LIBDL% %LIB_GCC% %LIB_GFORTRAN%"
+set SWB_EXTERNAL_LIBS="%LIB_HDF5_HL%;%LIB_HDF5%;%LIB_NETCDF%;%LIB_Z%;%LIB_DL%;%LIB_SZ%;%LIB_GCC%;%LIB_GFORTRAN%"
 
 
 :: define where 'make copy' will place executables
@@ -44,13 +44,13 @@ set INSTALL_PREFIX=d:/DOS
 
 :: define other variables for use in the CMakeList.txt file
 :: options are "Release", "Profile" or "Debug"
-set BUILD_TYPE="Release"
+set BUILD_TYPE="Debug"
 
 :: options are "x86" (32-bit) or "x64" (64-bit)
 set SYSTEM_TYPE="win_x64"
 
 :: define platform and compiler specific compilation flags
-set CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -cpp -fcheck=all -fstack-usage -fexceptions -ffree-line-length-none -static -static-libgcc -static-libgfortran -ffpe-trap=zero,overflow,underflow"
+set CMAKE_Fortran_FLAGS_DEBUG="-Og -g -ggdb -cpp -fcheck=all -fstack-usage -fexceptions -ffree-line-length-none -static -static-libgcc -static-libgfortran -ffpe-trap=zero,overflow,underflow"
 set CMAKE_Fortran_FLAGS_RELEASE="-O2 -cpp -ffree-line-length-none -static -static-libgcc -static-libgfortran"
 set CMAKE_Fortran_FLAGS_PROFILE="-O2 -pg -g -cpp -fno-omit-frame-pointer -DNDEBUG -fno-inline-functions -fno-inline-functions-called-once -fno-optimize-sibling-calls -ffree-line-length-none -static -static-libgcc -static-libgfortran"
 ::set CMAKE_Fortran_FLAGS_RELEASE="-O3 -mtune=native -fopenmp -flto -ffree-line-length-none -static-libgcc -static-libgfortran -DCURL_STATICLIB"
