@@ -77,10 +77,10 @@ module model_domain
     real (kind=c_float), allocatable       :: reference_et0(:)
     real (kind=c_float), allocatable       :: crop_etc(:)
 
-    real (kind=c_float), allocatable       :: actual_et_interception(:)
-    real (kind=c_float), allocatable       :: actual_et_impervious(:)
-    real (kind=c_float), allocatable       :: actual_et_soil(:)
-    real (kind=c_float), allocatable       :: actual_et(:)
+    real (kind=c_double), allocatable      :: actual_et_interception(:)
+    real (kind=c_double), allocatable      :: actual_et_impervious(:)
+    real (kind=c_double), allocatable      :: actual_et_soil(:)
+    real (kind=c_double), allocatable      :: actual_et(:)
     real (kind=c_float), allocatable       :: bare_soil_evap(:)
 
     real (kind=c_float), allocatable       :: inflow(:)
@@ -490,7 +490,7 @@ contains
     this%awc                                 = 0.0_c_float
     this%latitude                            = 0.0_c_float
     this%reference_ET0                       = 0.0_c_float
-    this%actual_ET                           = 0.0_c_float
+    this%actual_ET                           = 0.0_c_double
     this%bare_soil_evap                      = 0.0_c_float
     this%inflow                              = 0.0_c_float
     this%runon                               = 0.0_c_float
@@ -504,7 +504,7 @@ contains
     this%rainfall                            = 0.0_c_float
     this%interception_storage                = 0.0_c_float
     this%snow_storage                        = 0.0_c_float
-    this%soil_storage                        = 0.0_c_float
+    this%soil_storage                        = 0.0_c_double
     this%soil_storage_max                    = 0.0_c_float
     this%delta_soil_storage                  = 0.0_c_float
 
@@ -526,9 +526,9 @@ contains
     this%rooting_depth_max                   = 0.0_c_float
     this%current_rooting_depth               = 0.0_c_float
     this%polygon_id                          = 0_c_int
-    this%actual_et_soil                      = 0.0_c_float
-    this%actual_et_impervious                = 0.0_c_float
-    this%actual_et_interception              = 0.0_c_float
+    this%actual_et_soil                      = 0.0_c_double
+    this%actual_et_impervious                = 0.0_c_double
+    this%actual_et_interception              = 0.0_c_double
     this%adjusted_depletion_fraction_p       = 0.0_c_float
     this%crop_etc                            = 0.0_c_float
     this%direct_net_infiltration                     = 0.0_c_float
@@ -2305,7 +2305,7 @@ contains
 
         call irrigation__calculate( irrigation_amount=this%irrigation(indx),                             &
                                     landuse_index=this%landuse_index(indx),                              &
-                                    soil_storage=real(this%soil_storage(indx), kind=c_float),            &
+                                    soil_storage=this%soil_storage(indx),                                &
                                     soil_storage_max=this%soil_storage_max(indx),                        &
                                     total_available_water=this%total_available_water_taw(indx),          &
                                     rainfall=this%rainfall(indx),                                        &
@@ -2320,7 +2320,7 @@ contains
 
         call irrigation__calculate( irrigation_amount=this%irrigation(indx),                             &
                                     landuse_index=this%landuse_index(indx),                              &
-                                    soil_storage=real(this%soil_storage(indx), kind=c_float),            &
+                                    soil_storage=this%soil_storage(indx),                                &
                                     soil_storage_max=this%soil_storage_max(indx),                        &
                                     total_available_water=this%total_available_water_taw(indx),          &
                                     rainfall=this%rainfall(indx),                                        &
@@ -2804,7 +2804,7 @@ contains
     integer (kind=c_int), intent(in)       :: indx
 
     call calculate_actual_et_thornthwaite_mather( actual_et=this%actual_et_soil( indx ),                        &
-                                                  soil_storage=real(this%soil_storage( indx ), kind=c_float),   &
+                                                  soil_storage=this%soil_storage( indx ),                       &
                                                   soil_storage_max=this%soil_storage_max( indx ),               &
                                                   precipitation=this%infiltration( indx ),                      &
                                                   crop_etc=this%crop_etc( indx ) )
@@ -2839,7 +2839,7 @@ contains
 
     call calculate_actual_et_fao56( actual_et=this%actual_et_soil( indx ),                                    &
                                     adjusted_depletion_fraction_p=this%adjusted_depletion_fraction_p( indx ), &
-                                    soil_storage=real(this%soil_storage( indx ), kind=c_float),               &
+                                    soil_storage=this%soil_storage( indx ),                                   &
                                     soil_storage_max=this%soil_storage_max( indx ),                           &
                                     infiltration=this%infiltration( indx ),                                   &
                                     crop_etc=this%crop_etc( indx ),                                           &
@@ -2874,7 +2874,7 @@ contains
     landuse_index = this%landuse_index( indx )
 
     call calculate_actual_et_fao56_two_stage(                                                   &
-              actual_et=this%actual_et_soil( indx ),                                                &
+              actual_et=this%actual_et_soil( indx ),                                            &
               crop_etc=this%crop_etc( indx ),                                                   &
               bare_soil_evap=this%bare_soil_evap( indx ),                                       &
               taw=this%total_available_water_taw( indx ),                                       &
@@ -2889,7 +2889,7 @@ contains
               soil_group=this%soil_group( indx ),                                               &
               awc=this%awc( indx ),                                                             &
               current_rooting_depth=this%current_rooting_depth( indx ),                         &
-              soil_storage=real(this%soil_storage( indx ), kind=c_float),                       &
+              soil_storage=this%soil_storage( indx ),                                           &
               soil_storage_max=this%soil_storage_max( indx ),                                   &
               reference_et0=this%reference_et0( indx ) )
 
@@ -3501,7 +3501,7 @@ contains
 
     call minmaxmean( this%latitude, "Lat")
     call minmaxmean( this%reference_ET0, "ET0")
-    call minmaxmean( this%actual_ET, "actET")
+    call minmaxmean( real( this%actual_ET, kind=c_float), "actET")
     call minmaxmean( this%inflow, "inflow")
     call minmaxmean( this%runon, "runon")
     call minmaxmean( this%runoff, "runoff")

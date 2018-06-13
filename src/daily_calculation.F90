@@ -99,7 +99,6 @@ contains
         soil_storage_max                  => cells%soil_storage_max( indx ),                        &
         soil_storage                      => cells%soil_storage( indx ),                            &
         storm_drain_capture               => cells%storm_drain_capture( indx ),                     &
-        storm_drain_capture_fraction      => STORM_DRAIN_CAPTURE_FRACTION( indx ),                  &
         gross_precipitation               => cells%gross_precip( indx ),                            &
         rainfall                          => cells%rainfall( indx ),                                &
         snowmelt                          => cells%snowmelt( indx ),                                &
@@ -141,7 +140,7 @@ contains
           paved_to_unpaved=surface_storage_excess,                                              &
           surface_storage_max=surface_storage_max,                                              &
           storm_drain_capture=storm_drain_capture,                                              &
-          storm_drain_capture_fraction=storm_drain_capture_fraction,                            &
+          storm_drain_capture_fraction=STORM_DRAIN_CAPTURE_FRACTION(indx),                      &
           rainfall=rainfall,                                                                    &
           snowmelt=snowmelt,                                                                    &
           runon=runon,                                                                          &

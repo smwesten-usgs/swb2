@@ -97,19 +97,19 @@ elemental function calculate_evaporation_reduction_coefficient_Kr( landuse_index
   ! [ ARGUMENTS ]
   integer (kind=c_int), intent(in)  :: landuse_index
   integer (kind=c_int), intent(in)  :: soil_group
-  real (kind=c_float), intent(in)   :: soil_storage
+  real (kind=c_double), intent(in)  :: soil_storage
   real (kind=c_float), intent(in)   :: soil_storage_max
 
   ! [ RESULT ]
   real (kind=c_float) :: Kr
 
   ! [ LOCALS ]
-  real (kind=c_float) :: deficit
+  real (kind=c_double) :: deficit
 
   associate( REW => REW_l( landuse_index, soil_group ),         &
              TEW => TEW_l( landuse_index, soil_group ) )
 
-    deficit = soil_storage_max - soil_storage
+    deficit = real( soil_storage_max, kind=c_double) - soil_storage
 
     if ( deficit < REW ) then
       Kr = 1._c_float
@@ -268,11 +268,11 @@ elemental function calculate_water_stress_coefficient_ks( taw, raw,             
 
   real (kind=c_float), intent(in)      :: raw
   real (kind=c_float), intent(in)      :: taw
-  real (kind=c_float), intent(in)      :: soil_storage
+  real (kind=c_double), intent(in)     :: soil_storage
   real (kind=c_float), intent(in)      :: soil_storage_max
   real (kind=c_float)                  :: Ks
 
-  real (kind=c_float) :: deficit
+  real (kind=c_double) :: deficit
 
   deficit = soil_storage_max - soil_storage
 
@@ -314,7 +314,7 @@ elemental subroutine calculate_actual_et_fao56_two_stage(                       
                                                   soil_storage_max,                  &
                                                   reference_et0 )
 
-  real (kind=c_float), intent(inout)             :: actual_et
+  real (kind=c_double), intent(inout)            :: actual_et
   real (kind=c_float), intent(inout)             :: crop_etc
   real (kind=c_float), intent(inout)             :: bare_soil_evap
   real (kind=c_float), intent(inout)             :: taw
@@ -329,7 +329,7 @@ elemental subroutine calculate_actual_et_fao56_two_stage(                       
   integer (kind=c_int), intent(in)               :: soil_group
   real (kind=c_float), intent(in)                :: awc
   real (kind=c_float), intent(in)                :: current_rooting_depth
-  real (kind=c_float), intent(in)                :: soil_storage
+  real (kind=c_double), intent(in)               :: soil_storage
   real (kind=c_float), intent(in)                :: soil_storage_max
   real (kind=c_float), intent(in)                :: reference_et0
 

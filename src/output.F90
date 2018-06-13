@@ -347,34 +347,34 @@ contains
     if ( OUTSPECS( NCDF_NET_INFILTRATION )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_NET_INFILTRATION )%ncfile,      &
             iVarID=NC_OUT( NCDF_NET_INFILTRATION )%ncfile%iVarID(NC_Z),                       &
-            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                       &
-                                int(cells%number_of_columns, kind=c_size_t) ],                   &
-            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=cells%active,                                                                  &
-            rValues=cells%net_infiltration,                                                    &
+            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],  &
+            iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                    &
+                                int(cells%number_of_columns, kind=c_size_t) ],                &
+            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                          &
+            lMask=cells%active,                                                               &
+            rValues=cells%net_infiltration,                                                   &
             rField=cells%nodata_fill_value )
 
     if ( OUTSPECS( NCDF_REFERENCE_ET0 )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_REFERENCE_ET0 )%ncfile,           &
             iVarID=NC_OUT( NCDF_REFERENCE_ET0 )%ncfile%iVarID(NC_Z),                            &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                       &
-                                int(cells%number_of_columns, kind=c_size_t) ],                   &
+            iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                      &
+                                int(cells%number_of_columns, kind=c_size_t) ],                  &
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=cells%active,                                                                  &
-            rValues=cells%reference_ET0,                                                         &
+            lMask=cells%active,                                                                 &
+            rValues=cells%reference_ET0,                                                        &
             rField=cells%nodata_fill_value )
 
     if ( OUTSPECS( NCDF_ACTUAL_ET )%is_active ) &
     call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_ACTUAL_ET )%ncfile,               &
             iVarID=NC_OUT( NCDF_ACTUAL_ET )%ncfile%iVarID(NC_Z),                                &
             iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                       &
-                                int(cells%number_of_columns, kind=c_size_t) ],                   &
+            iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                      &
+                                int(cells%number_of_columns, kind=c_size_t) ],                  &
             iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=cells%active,                                                                  &
-            rValues=cells%actual_et,                                                             &
+            lMask=cells%active,                                                                 &
+            rValues=real(cells%actual_et, kind=c_float),                                        &
             rField=cells%nodata_fill_value )
 
     if ( OUTSPECS( NCDF_TMIN )%is_active ) &

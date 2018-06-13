@@ -29,7 +29,7 @@ contains
                                           pervious_fraction )
 
     real (kind=c_double), intent(inout)     :: surface_storage
-    real (kind=c_float), intent(inout)      :: actual_et_impervious
+    real (kind=c_double), intent(inout)     :: actual_et_impervious
     real (kind=c_float), intent(inout)      :: paved_to_unpaved           ! 'wadd' in HWB
     real (kind=c_float), intent(inout)      :: storm_drain_capture
     real (kind=c_float), intent(in)         :: storm_drain_capture_fraction
@@ -83,7 +83,7 @@ contains
 
     ! now allow for evaporation
     actual_et_impervious = min( reference_et0, surface_storage )
-    surface_storage = max( surface_storage - actual_et_impervious, 0.0_c_float )
+    surface_storage = max( surface_storage - actual_et_impervious, 0.0_c_double )
 
   end subroutine calculate_impervious_surface_mass_balance
 

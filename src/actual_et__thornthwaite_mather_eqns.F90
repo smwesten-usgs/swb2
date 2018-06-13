@@ -101,7 +101,7 @@ subroutine calculate_actual_et_thornthwaite_mather_eqns(                        
                                                   crop_etc,                          &
                                                   indx )
 
-    real (kind=c_float), intent(inout)             :: actual_et
+    real (kind=c_double), intent(inout)            :: actual_et
     real (kind=c_double), intent(in)               :: soil_moisture
     real (kind=c_float), intent(in)                :: max_soil_moisture
     real (kind=c_float), intent(in)                :: precipitation

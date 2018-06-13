@@ -7,7 +7,8 @@
 !! conversions between various temperature and distance units.
 module constants_and_conversions
 
-  use iso_c_binding, only : c_short, c_int, c_long, c_float, c_double, c_bool
+  use iso_c_binding, only : c_short, c_int, c_long, c_float, c_double, c_bool, &
+                            c_long_long
   implicit none
 
   !
@@ -70,7 +71,7 @@ module constants_and_conversions
 
   ! [ evil global variables ]
   character (len=1)            :: OS_NATIVE_PATH_DELIMITER
-  integer (kind=c_long)        :: RANDOM_START = 0
+  integer (kind=c_long_long)   :: RANDOM_START = 0
 
   ! [ select conversion factors ]
   real (kind=c_double), parameter, public :: C_PER_F    = 5.0_c_double / 9.0_c_double

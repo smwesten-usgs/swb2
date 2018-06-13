@@ -56,10 +56,10 @@ contains
                                                   crop_etc )
 
 
-    real (kind=c_float), intent(inout)             :: actual_et
+    real (kind=c_double), intent(inout)            :: actual_et
     real (kind=c_float), intent(inout)             :: adjusted_depletion_fraction_p
     real (kind=c_float), intent(in)                :: depletion_fraction_p
-    real (kind=c_float), intent(in)                :: soil_storage
+    real (kind=c_double), intent(in)               :: soil_storage
     real (kind=c_float), intent(in)                :: soil_storage_max
     real (kind=c_float), intent(in)                :: infiltration
     real (kind=c_float), intent(in)                :: crop_etc
@@ -68,7 +68,7 @@ contains
     real (kind=c_float)  :: Kcb
     real (kind=c_float)  :: depletion_amount
     real (kind=c_float)  :: p
-    real (kind=c_float)  :: interim_soil_storage
+    real (kind=c_double) :: interim_soil_storage
     real (kind=c_float)  :: fraction_full_PET
     real (kind=c_float)  :: root_constant_ci
 
@@ -121,7 +121,7 @@ contains
         else
 
           actual_et = crop_etc * fraction_full_PET                                                                &
-                      + root_constant_ci                                                                         &
+                      + root_constant_ci                                                                          &
                          * ( 1.0_c_float - exp( - crop_etc * ( 1.0_c_float - fraction_full_PET )                  &
                             / root_constant_ci ) )
 

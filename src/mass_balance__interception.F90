@@ -15,7 +15,7 @@ contains
  	                                                          reference_et0 )
 
     real (kind=c_float), intent(inout)      :: interception_storage
-    real (kind=c_float), intent(inout)      :: actual_et_interception
+    real (kind=c_double), intent(inout)     :: actual_et_interception
     real (kind=c_float), intent(in)         :: interception
     real (kind=c_float), intent(in)         :: reference_et0
 

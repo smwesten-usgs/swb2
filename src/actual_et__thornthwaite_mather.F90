@@ -15,15 +15,15 @@ contains
                                                   precipitation,                     &
                                                   crop_etc )
 
-    real (kind=c_float), intent(inout)             :: actual_et
-    real (kind=c_float), intent(in)                :: soil_storage
+    real (kind=c_double), intent(inout)            :: actual_et
+    real (kind=c_double), intent(in)               :: soil_storage
     real (kind=c_float), intent(in)                :: soil_storage_max
     real (kind=c_float), intent(in)                :: precipitation
     real (kind=c_float), intent(in)                :: crop_etc
 
     ! [ LOCALS ]
     real (kind=c_float)  :: P_minus_PE
-    real (kind=c_float)  :: soil_storage_temp
+    real (kind=c_double) :: soil_storage_temp
 
     P_minus_PE = precipitation - crop_etc
 
@@ -40,10 +40,10 @@ contains
         actual_et =  soil_storage_temp * ( 1.0_c_float - exp( -crop_etc / soil_storage_max ) )
 
       else
-      
+
         actual_et = crop_etc - precipitation
 
-      endif     
+      endif
 
     endif
 

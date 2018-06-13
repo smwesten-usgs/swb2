@@ -20,7 +20,7 @@ contains
 
     real (kind=c_float), intent(inout)      :: net_infiltration
     real (kind=c_double), intent(inout)     :: soil_storage
-    real (kind=c_float), intent(inout)      :: actual_et_soil
+    real (kind=c_double), intent(inout)     :: actual_et_soil
     real (kind=c_float), intent(inout)      :: runoff
     real (kind=c_float), intent(inout)      :: delta_soil_storage
     real (kind=c_float), intent(in)         :: reference_et0
@@ -31,7 +31,7 @@ contains
 
 
     ! [ LOCALS ]
-    real (kind=c_float) :: new_soil_storage
+    real (kind=c_double) :: new_soil_storage
 
     ! all of these entities have been previously corrected for pervious fraction
     new_soil_storage = soil_storage + infiltration - actual_et_soil
