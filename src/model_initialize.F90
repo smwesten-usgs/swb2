@@ -1299,6 +1299,16 @@ contains
       ! For MODEL directive, obtain the associated dictionary entries
       call CF_DICT%get_values( "OUTPUT", myOptions )
 
+      ! dictionary entry will look like this:
+      ! 1) ENABLE
+      ! 2) net_infiltration
+      ! 3) actual_evapotranspiration
+      ! etc.
+
+      ! in the logic that follows, it is assumed that the first entry in the
+      ! set of returned dictionary values will be an action verb ('ENABLE', 'DISABLE')
+      ! and the remaining values will be the variables to enable or disable
+
       ! dictionary entries are initially space-delimited; sArgText contains
       ! all dictionary entries present, concatenated, with a space between entries
       sArgText = myOptions%get(1, myOptions%count )
@@ -1321,15 +1331,22 @@ contains
 
         endif
 
+        if ( sOutput .strapprox. "ALL" ) then
 
-        do jIndex=lbound( OUTSPECS, 1), ubound( OUTSPECS, 1)
+          OUTSPECS(:)%is_active = enable_output
 
-          if ( OUTSPECS( jIndex )%variable_name .strapprox. sOutput ) then
-             OUTSPECS( jIndex )%is_active = enable_output
-             if ( enable_output ) call LOGS%write("> Enabling output for "//squote(sOutput), iLinesBefore=1 )
-             if ( .not. enable_output ) call LOGS%write("> Disabling output for "//squote(sOutput), iLinesBefore=1 )
-          endif
-        enddo
+        else
+
+          do jIndex=lbound( OUTSPECS, 1), ubound( OUTSPECS, 1)
+
+            if ( OUTSPECS( jIndex )%variable_name .strapprox. sOutput ) then
+               OUTSPECS( jIndex )%is_active = enable_output
+               if ( enable_output ) call LOGS%write("> Enabling output for "//squote(sOutput), iLinesBefore=1 )
+               if ( .not. enable_output ) call LOGS%write("> Disabling output for "//squote(sOutput), iLinesBefore=1 )
+            endif
+          enddo
+
+        endif
 
       enddo
 

@@ -2859,13 +2859,13 @@ C       `8'       o88o     o8888o o888o  o888o o888o o88o     o8888o o888bood8P'
 
 !           enddo
 
- 300     continue
+ 300     continue      ! end of loop over days in month
 
 c.....keep yearly FAO recharge estimates
           yrlyrech(ip,i)=yrlyrech(ip,i)+rechann/dfloat(nsim)
           rechann=0.
 
- 400  continue
+ 400  continue    ! end of loop over months
 
 c.....Check if land cover is seed corn and run simulation again for same polygon with fallow land properties.
 c.....Recharge and AE are then computed for 25% of polygon area seed corn and 75% fallow
@@ -2926,7 +2926,7 @@ c.....write yearly FAO recharge estimates during last simulation if not water bo
         endif
       endif
 
- 500  continue
+ 500  continue    ! end of loop over years
 
  600  sm1begin=sm0*pavint*(1-perv(ip))+sm1begin*perv(ip)
       sm2begin=sm0*pavint*(1-perv(ip))+sm2begin*perv(ip)

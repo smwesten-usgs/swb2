@@ -442,7 +442,6 @@ contains
 
     ! [ LOCALS ]
     real (kind=c_float)        :: depletion_fraction
-    real (kind=c_double)       :: depletion_amount
 
     integer (kind=c_int)       :: month
     integer (kind=c_int)       :: day
@@ -487,6 +486,7 @@ contains
 
       irrigation_amount         = 0.0_c_float
       interim_irrigation_amount = 0.0_c_float
+      depletion_fraction        = 0.0_c_float
 
       if ( ( day_of_year < FIRST_DAY_OF_IRRIGATION( landuse_index ) ) &
         .or. ( day_of_year > LAST_DAY_OF_IRRIGATION( landuse_index ) ) )  exit
@@ -495,12 +495,18 @@ contains
       if ( soil_storage_max <= 0.0_c_float ) exit
       if ( IRRIGATION_MASK < 1.0e-6_c_float ) exit
       if ( num_days_since_planting > NUM_DAYS_OF_IRRIGATION( landuse_index ) ) exit
-      if ( total_available_water <= 0.0_c_float ) exit
+      ! if ( total_available_water <= 0.0_c_float ) exit
 
       !depletion_fraction = 1.0_c_float - soil_storage / soil_storage_max
 
-      depletion_fraction = min( ( soil_storage_max - soil_storage ) / total_available_water, &
-                                1.0_c_float )
+      ! total_available_water is calculated only by the fao56_two_stage module, but
+      ! not by any other modules; need to just calculate depletion fraction based on
+      ! total soil moisture storage capacity in this case
+      if ( total_available_water > 0.0_c_float ) then
+        depletion_fraction = min( ( soil_storage_max - soil_storage ) / total_available_water, 1.0_c_float )
+      else
+        depletion_fraction = min( ( soil_storage_max - soil_storage ) / soil_storage_max, 1.0_c_float )
+      endif
 
       option = APPLICATION_METHOD_CODE( landuse_index )
 
