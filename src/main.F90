@@ -14,6 +14,9 @@ program main
   use model_initialize, only          : initialize_all, read_control_file
   use model_domain, only              : MODEL
   use model_iterate, only             : iterate_over_simulation_days
+
+  use model_iterate_multiple_simulations, only  : iterate_over_multiple_simulation_days
+
   use strings, only                   : operator(.containssimilar.),            &
                                           asCharacter
   use version_control, only           : SWB_VERSION, GIT_COMMIT_HASH_STRING,    &
@@ -39,11 +42,13 @@ program main
   integer (kind=c_int)           :: iCount
   integer (kind=c_int)           :: iIndex
   integer (kind=c_int)           :: iLen
+  integer (kind=c_int)           :: number_of_simulations
 
   sOutputPrefixName         = ""
   sOutputDirectoryName      = ""
   sDataDirectoryName        = ""
   sWeatherDataDirectoryName = ""
+  number_of_simulations = 1
 
   iNumArgs = COMMAND_ARGUMENT_COUNT()
 
@@ -90,12 +95,13 @@ program main
       //TRIM(asCharacter(__G95_MINOR__))
 #endif
 
-    write(UNIT=*,FMT="(/,a,/,/,6(a,/))")  "Usage: swb2 control_file_name ",                                &
+    write(UNIT=*,FMT="(/,a,/,/,7(a,/))")  "Usage: swb2 [ options ] control_file_name ",                    &
              "[ --output_prefix= ]     :: text to use as a prefix for output filenames",                   &
              "[ --output_dir= ]        :: directory to place output in (may be relative or absolute)",     &
              "[ --data_dir= ]          :: directory to search for input grids or lookup tables",           &
              "[ --weather_data_dir= ]  :: directory to search for weather data grids",                     &
-             "[ --random_start= ]      :: advance random number generator to this position in the series"
+             "[ --random_start= ]      :: advance random number generator to this position in the series", &
+             "[ --number_of_sims= ]    :: number of simulations to run when 'method of fragments' is used"
     stop
 
   end if
@@ -121,6 +127,13 @@ program main
       RANDOM_START = int( asInt( sBuf(16:) ), kind=c_long )
       call LOGS%write(sMessage="Pseudo-random numbers will be pulled from index number "   &
               //trim(asCharacter(RANDOM_START))//" in the generated series.",              &
+              lEcho=.true._c_bool )
+
+    elseif( sBuf(1:17) .eq."--number_of_sims=" ) then
+
+      number_of_simulations = asInt( sBuf(18:) )
+      call LOGS%write(sMessage="Running multiple simulations; assuming method of fragments "   &
+              //"was selected as the precipitation method.",                                   &
               lEcho=.true._c_bool )
 
     elseif ( sBuf(1:16) .eq. "--output_prefix=" ) then
@@ -179,7 +192,15 @@ program main
   call initialize_all( sOutputPrefixName, sOutputDirectoryName, sDataDirectoryName, &
                        sWeatherDataDirectoryName )
 
-  call iterate_over_simulation_days( MODEL )
+  if ( number_of_simulations > 1) then
+
+    call iterate_over_multiple_simulation_days(MODEL, number_of_simulations)
+
+  else
+
+    call iterate_over_simulation_days( MODEL )
+
+  endif
 
   call LOGS%close()
 

@@ -189,6 +189,34 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  subroutine output_2D_float_array( values, variable_id, cells )
+
+    real (kind=c_float), intent(in)     :: values(:)
+    integer (kind=c_int), intent(in)    :: variable_id
+    class (MODEL_DOMAIN_T), intent(in)  :: cells
+
+    call netcdf_put_variable_vector(NCFILE=NC_OUT(variable_id)%ncfile,         &
+       iVarID=NC_OUT(variable_id)%ncfile%iVarID(NC_TIME),                      &
+       iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t)],                 &
+       iCount=[1_c_size_t],                                                    &
+       iStride=[1_c_ptrdiff_t],                                                &
+       dpValues=[real(SIM_DT%iNumDaysFromOrigin, kind=c_double)])
+
+  call netcdf_put_packed_variable_array(NCFILE=NC_OUT( variable_id )%ncfile,   &
+        iVarID=NC_OUT( variable_id )%ncfile%iVarID(NC_Z),                      &
+        iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),                &
+                0_c_size_t, 0_c_size_t ],                                      &
+        iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),         &
+                int(cells%number_of_columns, kind=c_size_t) ],                 &
+        iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],               &
+        lMask=cells%active,                                                    &
+        rValues=values,                                                        &
+        rField=cells%nodata_fill_value )
+
+  end subroutine output_2D_float_array
+
+!--------------------------------------------------------------------------------------------------
+
   subroutine write_output(cells)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: cells
@@ -213,15 +241,20 @@ contains
     enddo
 
     if ( OUTSPECS( NCDF_GROSS_PRECIPITATION )%is_active ) &
-      call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_GROSS_PRECIPITATION )%ncfile,   &
-            iVarID=NC_OUT( NCDF_GROSS_PRECIPITATION )%ncfile%iVarID(NC_Z),                      &
-            iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
-            iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                      &
-                                int(cells%number_of_columns, kind=c_size_t) ],                  &
-            iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
-            lMask=cells%active,                                                                 &
-            rValues=cells%gross_precip,                                                         &
-            rField=cells%nodata_fill_value )
+
+      call output_2D_float_array( values=cells%gross_precip,            &
+                                  variable_id=NCDF_GROSS_PRECIPITATION, &
+                                  cells=cells )
+
+      ! call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_GROSS_PRECIPITATION )%ncfile,   &
+      !       iVarID=NC_OUT( NCDF_GROSS_PRECIPITATION )%ncfile%iVarID(NC_Z),                      &
+      !       iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t ],    &
+      !       iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),                      &
+      !                           int(cells%number_of_columns, kind=c_size_t) ],                  &
+      !       iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],                            &
+      !       lMask=cells%active,                                                                 &
+      !       rValues=cells%gross_precip,                                                         &
+      !       rField=cells%nodata_fill_value )
 
     if ( OUTSPECS( NCDF_RAINFALL )%is_active ) &
       call netcdf_put_packed_variable_array(NCFILE=NC_OUT( NCDF_RAINFALL )%ncfile,              &

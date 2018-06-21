@@ -1,7 +1,7 @@
       program HI_WB
 
       use kiss_random_number_generator
-      use iso_c_binding, only             : c_long
+      use iso_c_binding, only             : c_long_long
 
 c  Recharge Computation Program for the Hawaiian Islands
 c  version 3.9, 2/6/14
@@ -318,7 +318,7 @@ c                   i=1,nsoil; j=1,nseq(i); l=1,nlay(i,j)
       dimension idemsup(20),supirr(20),rmltirr(20),effirr(20),
      1          irrday(20,31),nirrdays(20,12),irrsug(50000)
 
-!      integer target_polys(12)
+      integer target_polys(12)
 
 c      lc    polygon    storm_drain    swb-hwb
 c      8    36798    no    negative
@@ -327,9 +327,9 @@ c      9    278558    yes    positive
 c      10    24397    no    negative
 c      10    268541    yes    positive
       ! natural forest, corn, golf course, diverse ag
-c      data target_polys/60515,63533,277684,336981,339872,342876,353812,345298/
-!      data target_polys/60515,63533,277684,336981,36798,21336,278558,24397,
-!     1   268541,300751,216547,107336/
+!      data target_polys/60515,63533,277684,336981,339872,342876,353812,345298/
+      data target_polys/60515,63533,277684,336981,36798,21336,278558,24397,
+     1   268541,300751,216547,107295/
       data idays/31,28,31,30,31,30,31,31,30,31,30,31/
 
       common /consti/nsim,nyrs,ndirr,ndunirr,ndfallow,id1,irfweights,
@@ -430,7 +430,7 @@ c.....initialize polygon recharge arrays
       write(3,3000)
       write(4,4000)
 
-      call initialize_kiss_rng(int(seed,kind=c_long))
+      call initialize_kiss_rng(int(seed,kind=c_long_long))
 
 c.....compute desired number of water-budget simulations
       do 300 i=1,nsim
@@ -458,7 +458,8 @@ c........compute water budget by polygon for desired number of years
      1        ae2,rc2,ae3,rc3,ae4,rc4,direct,zpnet,zcanint,zrfadj,
      2        zseptic,zsd)
 
-
+!      i = simulation number
+!      j = polygon number
 c...........keep running yearly averages
         do m=1,12
       rfmgd(i)=rfmgd(i)+zrf(m)*area(j)*7.481/
@@ -720,12 +721,12 @@ C  `Y8bod8P'  `V88V"V8P'   "888"  888bod8P'  `V88V"V8P'   "888"
 C                                 888
 C                                o888o
 
-!      open(169, file="hwb_daily_water_budget_components.csv")
-!      write(169,"(a)") "polynum, month, day, year, daily_rf_frag, monthly_rf, "
-!     1  //"daily_rf, net_daily_rf, irrigation, runoff, fog, crop_et, pot_et, act_et, "
-!     2  //"crop_coef, can_intercept, soil_moist, recharge, landuse_code, aquifer_code, "
-!     3  //"surf_area"
-
+      open(169, file="hwb_daily_water_budget_components.csv")
+      write(169,"(a)") "polynum, month, day, year, daily_rf_frag, monthly_rf, "
+     1  //"daily_rf, net_daily_rf, irrigation, runoff, fog, crop_et, pot_et, act_et, "
+     2  //"crop_coef, can_intercept, soil_moist, recharge, landuse_code, aquifer_code, "
+     3  //"surf_area"
+C
       open(269, file="hwb_calculated_rainfall_sequences.txt")
       write(269,"(a)") "simulation  month  frag_zone  year  random_number  selected_set"
 
@@ -1861,7 +1862,7 @@ c    pan coefficient is not temporally variable
       common /npfog/slpnpfog,yintnpfog
       common /canint/gashcal,ceint,ifm
       common /nprint/jprint,iprint
-!      common /polys/target_polys
+      common /polys/target_polys
 
       data idays/31,28,31,30,31,30,31,31,30,31,30,31/
 
@@ -2845,20 +2846,20 @@ C     `888.8'       .88ooo8888.    888`88b.     888    .88ooo8888.    888    `88
 C      `888'       .8'     `888.   888  `88b.   888   .8'     `888.   888    .88P  888       o  888       o oo     .d8P
 C       `8'       o88o     o8888o o888o  o888o o888o o88o     o8888o o888bood8P'  o888ooooood8 o888ooooood8 8""88888P'
 
-!           do indx=1,ubound(target_polys,1)
-
-!             if ( ilu(ip) == ilucorn .and. icorncheck /= 2) cycle
-
-!             if ( ip == target_polys(indx) ) then
-
-!               write(169,*) ip,",",m,",",k,",",i,",",frg(m,irfzone(ip),jfr(m,irfzone(ip),i),k),
-!     1            ",",mrf,",",drf,",",dpnet,",",agirr*perv(ip),",",dro, ",", dfog, ",", pe, ",", pan, ",",
-!     2            daily_aet2,",",pancoef(ilu(ip),m),",",dcanint,",",sm2,",",daily_rc2,",",
-!     3            ilu(ip),",",iasys(ip),",",area(ip)
-!             endif
-
-!           enddo
-
+           do indx=1,ubound(target_polys,1)
+C
+             if ( ilu(ip) == ilucorn .and. icorncheck /= 2) cycle
+C
+             if ( ip == target_polys(indx) ) then
+C
+               write(169,*) ip,",",m,",",k,",",i,",",frg(m,irfzone(ip),jfr(m,irfzone(ip),i),k),
+     1            ",",mrf,",",drf,",",dpnet,",",agirr*perv(ip),",",dro, ",", dfog, ",", pe, ",", pan, ",",
+     2            daily_aet2,",",pancoef(ilu(ip),m),",",dcanint,",",sm2,",",daily_rc2,",",
+     3            ilu(ip),",",iasys(ip),",",area(ip)
+             endif
+C
+           enddo
+C
  300     continue      ! end of loop over days in month
 
 c.....keep yearly FAO recharge estimates
@@ -2894,6 +2895,7 @@ c.....Recharge and AE are then computed for 25% of polygon area seed corn and 75
                 totrc4a(n)=totrc4(n)
             end do
             icorncheck=2
+            ! rerun from the start with icorncheck=2
             goto 10
         endif
       endif

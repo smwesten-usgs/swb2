@@ -213,6 +213,7 @@ set(SRCS
       model_domain.F90
       model_initialize.F90
       model_iterate.F90
+      model_iterate_multiple_simulations.F90
       #model.F90
       netcdf4_support.F90
       netcdf_c_api_interfaces.F90
