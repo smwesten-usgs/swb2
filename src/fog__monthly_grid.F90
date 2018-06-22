@@ -16,7 +16,6 @@ module fog__monthly_grid
   use exceptions
   use file_operations
   use logfiles, only            : LOGS, LOG_ALL
-  use netcdf4_support
   use parameters, only          : PARAMS
   use simulation_datetime
   use strings
@@ -36,7 +35,6 @@ module fog__monthly_grid
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pFOG_RATIO
   real (kind=c_float), allocatable     :: fFOG_CATCH_EFFICIENCY(:)
-  type (T_NETCDF4_FILE), pointer       :: pNCFILE
 
 contains
 
@@ -51,22 +49,14 @@ contains
   !! @param[in] dX_lon 2D array of longitude values.
   !! @param[in] dY_lat 2D array of latitude values.
 
-  subroutine fog_monthly_grid_initialize( lActive, PROJ4_string, dX, dY,            &
-                                          dX_lon, dY_lat )
+  subroutine fog_monthly_grid_initialize( lActive )
 
     logical (kind=c_bool), intent(in)     :: lActive(:,:)
-    character (len=*), intent(inout)      :: PROJ4_string
-    real (kind=c_double), intent(in)      :: dX(:)
-    real (kind=c_double), intent(in)      :: dY(:)
-    real (kind=c_double), intent(in)      :: dX_lon(:,:)
-    real (kind=c_double), intent(in)      :: dY_lat(:,:)
 
     ! [ LOCALS ]
     integer (kind=c_int)                 :: iStat
     type (STRING_LIST_T)                 :: slString
     integer (kind=c_int)                 :: iIndex
-    integer (kind=c_int)                 :: iNX
-    integer (kind=c_int)                 :: iNY
     integer (kind=c_int), allocatable    :: iLanduseCodes(:)
     integer (kind=c_int)                 :: iNumberOfLanduses
     logical (kind=c_bool)                :: lAreLengthsEqual
@@ -75,9 +65,6 @@ contains
     pFOG_RATIO => DAT%find("FOG_RATIO")
     if ( .not. associated(pFOG_RATIO) ) &
         call die("A FOG_RATIO grid must be supplied in order to make use of this option.", __SRCNAME__, __LINE__)
-
-    allocate ( pNCFILE, stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
 
     !> Determine how many landuse codes are present
     call slString%append("LU_Code")
@@ -103,17 +90,6 @@ contains
       call warn( sMessage="The number of landuses does not match the number of fog catch efficiency values.",   &
         sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
-    !> open another netCDF file to hold fog interception
-    iNX = ubound(lActive, 1)
-    iNY = ubound(lActive, 2)
-
-    call netcdf_open_and_prepare_as_output( NCFILE=pNCFILE, sVariableName="fog", &
-      sVariableUnits="inches", iNX=iNX, iNY=iNY,                                 &
-      fX=dX, fY=dY,                                                              &
-      StartDate=SIM_DT%start, EndDate=SIM_DT%end, PROJ4_string=PROJ4_string,     &
-      dpLat=dY_lat, dpLon=dX_lon, fValidMin=0.0, fValidMax=2000.0 )
-
-
   end subroutine fog_monthly_grid_initialize
 
 !--------------------------------------------------------------------------------------------------
@@ -133,13 +109,8 @@ contains
     integer (kind=c_int) :: iYear
     integer (kind=c_int) :: iDaysInMonth
     integer (kind=c_int) :: iNumDaysFromOrigin
-    integer (kind=c_int)                 :: iNX
-    integer (kind=c_int)                 :: iNY
     integer (kind=c_int) :: iIndex
     real (kind=c_float)  :: fFactor
-
-    iNX = ubound(nodata_fill_value, 1)
-    iNY = ubound(nodata_fill_value, 2)
 
     associate ( dt => SIM_DT%curr )
 
@@ -158,23 +129,8 @@ contains
 
       call pFOG_RATIO%getvalues( iMonth, iDay, iYear, iJulianDay )
 
-      ! write timestamp to NetCDF file
-      call netcdf_put_variable_vector(NCFILE=pNCFILE, &
-        iVarID=pNCFILE%iVarID(NC_TIME), &
-        iStart=[int( iNumDaysFromOrigin, kind=c_size_t)], &
-        iCount=[1_c_size_t], &
-        iStride=[1_c_ptrdiff_t], &
-        dpValues=[real( iNumDaysFromOrigin, kind=c_double)])
-
       fFog = fRainfall * pack( pFOG_RATIO%pGrdBase%rData, lActive )   &
                        * fFOG_CATCH_EFFICIENCY( iLanduse_Index )
-
-      call netcdf_put_packed_variable_array(NCFILE=pNCFILE, &
-                   iVarID=pNCFILE%iVarID(NC_Z), &
-                   iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),0_c_size_t, 0_c_size_t], &
-                   iCount=[1_c_size_t, int(iNY, kind=c_size_t), int(iNX, kind=c_size_t)],              &
-                   iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                         &
-                   rValues=fFog, lMask=lActive, rField=nodata_fill_value )
 
     end associate
 

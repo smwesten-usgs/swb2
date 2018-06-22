@@ -38,6 +38,8 @@ program main
   character (len=1024)           :: sCompilerFlags
   character (len=256)            :: sCompilerVersion
   character (len=256)            :: sVersionString
+  character (len=256)            :: sCompilationDateString
+  character (len=256)            :: sCompilationSystemString
   character (len=256)            :: sGitHashString
   integer (kind=c_int)           :: iCount
   integer (kind=c_int)           :: iIndex
@@ -52,46 +54,56 @@ program main
 
   iNumArgs = COMMAND_ARGUMENT_COUNT()
 
-  sVersionString = "  Soil Water Balance Code version "//trim( SWB_VERSION )    &
-      //" -- compiled on: "//trim(COMPILE_DATE)//" "//trim(COMPILE_TIME)        &
-      //", system name="//trim(SYSTEM_NAME)
+  sVersionString = "  Soil Water Balance Code version "//trim( SWB_VERSION )
+  sCompilationDateString   = "     compilation date           : "              &
+                               //trim(COMPILE_DATE)//" "//trim(COMPILE_TIME)
+  sCompilationSystemString = "     compiled on                : "//trim(SYSTEM_NAME)
 
-  if (     (SYSTEM_NAME .containssimilar. "Windows")                            &
+  if (     (SYSTEM_NAME .containssimilar. "Windows")                           &
       .or. (SYSTEM_NAME .containssimilar. "Mingw") ) then
     OS_NATIVE_PATH_DELIMITER = "\"
   else
     OS_NATIVE_PATH_DELIMITER = "/"
   endif
 
-  sGitHashString = "    [ Git branch and commit hash: "//trim( GIT_BRANCH_STRING )    &
-     //", "//trim( GIT_COMMIT_HASH_STRING )//" ]"
+  sGitHashString = "     Git branch and commit hash : "                        &
+                         //trim( adjustl(GIT_BRANCH_STRING ) )                 &
+                         //", "//trim( GIT_COMMIT_HASH_STRING )
 
-  iCount = max( len_trim( sVersionString ), len_trim( sGitHashString ) )
+  iCount = max( max( len_trim( sVersionString ), len_trim( sGitHashString ) ), &
+                len_trim( sCompilationSystemString) )
 
-  write(unit=*, fmt="(/,a)") repeat("-",iCount + 2)
-  write(UNIT=*,FMT="(a)") trim( sVersionString )
+  write(unit=*, fmt="(/,a)") repeat("-",iCount + 4)
+  write(UNIT=*,FMT="(a,/)") trim( sVersionString )
+  write(UNIT=*,FMT="(a)") trim( sCompilationDateString )
+  write(UNIT=*,FMT="(a)") trim( sCompilationSystemString )
   write(UNIT=*,FMT="(a)") trim( sGitHashString )
-  write(unit=*, fmt="(a,/)") repeat("-",iCount + 2)
+  write(unit=*, fmt="(a,/)") repeat("-",iCount + 4)
 
   if(iNumArgs == 0 ) then
 
 #ifdef __GFORTRAN__l
     sCompilerFlags = COMPILER_OPTIONS()
     sCompilerVersion = COMPILER_VERSION()
-    write(UNIT=*,FMT="(a,/)") "Compiled with: gfortran ("//TRIM(sCompilerVersion)//")"
-    write(UNIT=*,FMT="(a)") "Compiler flags:"
+    write(UNIT=*,FMT="(a,/)") "compiler name: gfortran, version ("//TRIM(sCompilerVersion)//")"
+    write(UNIT=*,FMT="(a)") "compiler flags:"
     write(UNIT=*,FMT="(a)") "-------------------------------"
     write(UNIT=*,FMT="(a,/)") TRIM(sCompilerFlags)
 #endif
 
 #ifdef __INTEL_COMPILER
-    write(UNIT=*,FMT="(a)") "Compiled with: Intel Fortran version " &
+    sCompilerFlags = COMPILER_OPTIONS()
+    sCompilerVersion = COMPILER_VERSION()
+    write(UNIT=*,FMT="(a)") "compiler name: Intel Fortran, version " &
       //TRIM(asCharacter(__INTEL_COMPILER))
-      write(UNIT=*,FMT="(a,/)") "Compiler build date:"//TRIM(asCharacter(__INTEL_COMPILER_BUILD_DATE))
+    write(UNIT=*,FMT="(a)") "compiler flags:"
+    write(UNIT=*,FMT="(a)") "-------------------------------"
+    write(UNIT=*,FMT="(a,/)") TRIM(sCompilerFlags)
+    write(UNIT=*,FMT="(a,/)") "compiler build date:"//TRIM(asCharacter(__INTEL_COMPILER_BUILD_DATE))
 #endif
 
 #ifdef __G95__l
-    write(UNIT=*,FMT="(a,/)") "Compiled with: G95 minor version " &
+    write(UNIT=*,FMT="(a,/)") "compiler name: G95, minor version " &
       //TRIM(asCharacter(__G95_MINOR__))
 #endif
 

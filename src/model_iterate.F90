@@ -7,7 +7,7 @@ module model_iterate
   use logfiles, only                  : LOGS, LOG_ALL
   use model_domain, only              : MODEL_DOMAIN_T
   use simulation_datetime, only       : SIM_DT
-  use output, only                    : write_output
+  use output, only                    : write_output, initialize_output
 !  use summary_statistics, only        : perform_polygon_summarize
   use grid
   implicit none
@@ -23,6 +23,13 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: cells
 
     type (GENERAL_GRID_T), pointer  :: pTempGrid
+
+
+    ! open and prepare NetCDF files for output
+    ! (this statement moved here so that files are opened and initialized
+    ! after all other routines have initialized; this was needed in order to
+    ! make the multiple simulation outputs work)
+    call initialize_output( cells )
 
     do while ( SIM_DT%curr <= SIM_DT%end )
 

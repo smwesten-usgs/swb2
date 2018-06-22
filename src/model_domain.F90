@@ -80,7 +80,7 @@ module model_domain
     real (kind=c_double), allocatable      :: actual_et_interception(:)
     real (kind=c_double), allocatable      :: actual_et_impervious(:)
     real (kind=c_double), allocatable      :: actual_et_soil(:)
-    real (kind=c_double), allocatable      :: actual_et(:)
+    real (kind=c_double), pointer          :: actual_et(:)
     real (kind=c_float), allocatable       :: bare_soil_evap(:)
 
     real (kind=c_float), allocatable       :: inflow(:)
@@ -94,17 +94,17 @@ module model_domain
     real (kind=c_float), allocatable       :: snowmelt(:)
     type (GENERAL_GRID_T), pointer         :: pGrdOut
     real (kind=c_float), allocatable       :: interception(:)
-    real (kind=c_float), allocatable       :: interception_storage(:)
+    real (kind=c_float), pointer           :: interception_storage(:)
 
     real (kind=c_float), pointer           :: snow_storage(:)
-    real (kind=c_double), allocatable      :: surface_storage(:)
+    real (kind=c_double), pointer          :: surface_storage(:)
     real (kind=c_float), allocatable       :: surface_storage_max(:)
     real (kind=c_float), allocatable       :: surface_storage_excess(:)
     real (kind=c_float), allocatable       :: storm_drain_capture(:)
     real (kind=c_float), allocatable       :: delta_soil_storage(:)
     real (kind=c_double), pointer          :: soil_storage(:)
     real (kind=c_float), allocatable       :: soil_storage_max(:)
-    real (kind=c_float), allocatable       :: net_infiltration(:)
+    real (kind=c_float), pointer           :: net_infiltration(:)
     real (kind=c_float), allocatable       :: rejected_net_infiltration(:)
     real (kind=c_float), allocatable       :: direct_net_infiltration(:)
     real (kind=c_float), allocatable       :: direct_soil_moisture(:)
@@ -3136,8 +3136,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call fog_monthly_grid_initialize( lActive=this%active, PROJ4_string=this%PROJ4_string,  &
-      dX=this%X, dY=this%Y, dX_lon=this%X_lon , dY_lat=this%Y_lat )
+    call fog_monthly_grid_initialize( lActive=this%active )
 
   end subroutine model_initialize_fog_monthly_grid
 

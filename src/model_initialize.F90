@@ -189,9 +189,9 @@ contains
 
     ! allow user to enable or disable specific output files
     call initialize_output_options()
-
-    ! open and prepare NetCDF files for output
-    call initialize_output( MODEL )
+    !
+    ! ! open and prepare NetCDF files for output
+    ! call initialize_output( MODEL )
 
 !    call initialize_polygon_summarize()
 
