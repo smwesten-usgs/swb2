@@ -1090,7 +1090,7 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
       iVarID=NCFILE%iVarID(NC_Z), &
       iShuffle=NC_SHUFFLE_YES, &
       iDeflate=NC_DEFLATE_YES, &
-      iDeflate_level=3 )
+      iDeflate_level=2 )
 
   call nf_enddef(NCFILE=NCFILE)
 
@@ -3178,8 +3178,7 @@ end subroutine nf_enddef
 
 !----------------------------------------------------------------------
 
-function nf_define_dimension(NCFILE, sDimensionName, iDimensionSize) &
-      result(iDimID)
+subroutine nf_define_dimension(NCFILE, sDimensionName, iDimensionSize)
 
   type (T_NETCDF4_FILE ) :: NCFILE
   character (len=*) :: sDimensionName
@@ -3187,6 +3186,7 @@ function nf_define_dimension(NCFILE, sDimensionName, iDimensionSize) &
   integer (kind=c_int) :: iDimID
 
   integer (kind=c_size_t) :: iDimSize
+  type (T_NETCDF_DIMENSION), pointer :: pNC_DIM
 
   iDimSize = int(iDimensionSize, kind=c_size_t)
 
@@ -3196,7 +3196,7 @@ function nf_define_dimension(NCFILE, sDimensionName, iDimensionSize) &
                           dimidp=iDimID), &
                           __SRCNAME__, __LINE__)
 
-end function nf_define_dimension
+end subroutine nf_define_dimension
 
 !----------------------------------------------------------------------
 

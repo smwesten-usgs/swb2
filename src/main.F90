@@ -137,16 +137,10 @@ program main
     elseif( sBuf(1:15) .eq."--random_start=" ) then
 
       RANDOM_START = int( asInt( sBuf(16:) ), kind=c_long )
-      call LOGS%write(sMessage="Pseudo-random numbers will be pulled from index number "   &
-              //trim(asCharacter(RANDOM_START))//" in the generated series.",              &
-              lEcho=.true._c_bool )
 
     elseif( sBuf(1:17) .eq."--number_of_sims=" ) then
 
       number_of_simulations = asInt( sBuf(18:) )
-      call LOGS%write(sMessage="Running multiple simulations; assuming method of fragments "   &
-              //"was selected as the precipitation method.",                                   &
-              lEcho=.true._c_bool )
 
     elseif ( sBuf(1:16) .eq. "--output_prefix=" ) then
 
@@ -191,6 +185,18 @@ program main
 
   call LOGS%write( sMessage='Output file prefix set to: "'//trim( sOutputPrefixName )//'"', &
                    lEcho=.TRUE._c_bool )
+
+  if (RANDOM_START >0)   &
+    call LOGS%write(sMessage="Pseudo-random numbers will be pulled from index number "   &
+           //trim(asCharacter(RANDOM_START))//" in the generated series.",               &
+           lEcho=.true._c_bool )
+
+  if ( number_of_simulations > 1)  &
+
+    call LOGS%write(sMessage="Running multiple simulations; assuming method of fragments "   &
+         //"was selected as the precipitation method.",                                      &
+         lEcho=.true._c_bool )
+
 
   do iIndex=1, slControlFiles%count
 

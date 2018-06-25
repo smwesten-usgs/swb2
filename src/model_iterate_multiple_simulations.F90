@@ -2,11 +2,14 @@ module model_iterate_multiple_simulations
 
   use iso_c_binding, only             : c_bool, c_float, c_int, c_double
   use constants_and_conversions, only : lTRUE, BNDS, TRUE
+  use datetime, only                  : MONTHS
   use daily_calculation, only         : perform_daily_calculation
   use file_operations, only           : ASCII_FILE_T
+  use grid
   use logfiles, only                  : LOGS, LOG_ALL
   use model_domain, only              : MODEL_DOMAIN_T
   use simulation_datetime, only       : SIM_DT
+  use strings, only                   : asCharacter
   use output, only                    : write_output,                          &
                                         initialize_output,                     &
                                         initialize_multiple_sim_output,        &
@@ -21,6 +24,11 @@ module model_iterate_multiple_simulations
   private
 
   public :: iterate_over_multiple_simulation_days
+
+  real (kind=c_float), allocatable   :: MONTHLY_NET_INFILTRATION_STATS(:,:)
+  real (kind=c_float), allocatable   :: ANNUAL_NET_INFILTRATION_STATS(:)
+  real (kind=c_float), allocatable   :: MONTHLY_ACTUAL_ET_STATS(:,:)
+  real (kind=c_float), allocatable   :: ANNUAL_ACTUAL_ET_STATS(:)
 
   real (kind=c_double), target, allocatable   :: SOIL_MOISTURE_STORAGE_PER_SIM(:,:)
   real (kind=c_float), target, allocatable    :: SNOW_STORAGE_PER_SIM(:,:)
@@ -54,6 +62,11 @@ contains
     allocate( INTERCEPTION_STORAGE_PER_SIM(length, number_of_simulations))
     allocate( NET_INFILTRATION_PER_SIM(length, number_of_simulations))
     allocate( ACTUAL_ET_PER_SIM(length, number_of_simulations))
+
+    allocate( MONTHLY_NET_INFILTRATION_STATS(length, 12) )
+    allocate( ANNUAL_NET_INFILTRATION_STATS(length) )
+    allocate( MONTHLY_ACTUAL_ET_STATS(length, 12) )
+    allocate( ANNUAL_ACTUAL_ET_STATS(length) )
 
     ! don't want or need this memory since we're going to swap out a
     ! different set of arrays for each simulation number
@@ -119,25 +132,30 @@ contains
 
     call allocate_space_for_simulation_storage_state_variables(cells, number_of_simulations)
 
-    ! open and prepare NetCDF files for output
-    call initialize_output( cells )
-    call initialize_multiple_sim_output(cells, number_of_simulations)
+    call reset_annual_accumulators()
+    call reset_monthly_accumulators()
+
+    !call initialize_multiple_sim_output(cells, number_of_simulations)
 
     do while ( SIM_DT%curr <= SIM_DT%end )
 
-      call LOGS%write("Calculating: "//SIM_DT%curr%prettydate(), iLogLevel=LOG_ALL, lEcho=.true._c_bool )
-
       call cells%update_landuse_codes()
-
-      write(*,fmt="(a)", advance="no") "  running multiple simulations: "
 
       do sim_number=1,number_of_simulations
 
+        call cells%get_climate_data( )
+
+        ! modifying module variable from precipitation__method_of_fragments
         SIMULATION_NUMBER = sim_number
 
-        write(*,fmt="(a)", advance="no") "."
+        if (sim_number==1) then
+          call LOGS%write("Calculating: "//SIM_DT%curr%prettydate(),  &
+                          iLogLevel=LOG_ALL, lEcho=.true._c_bool )
+          write(*,"(a,i0,a)", advance="no") "  running ",number_of_simulations, &
+                                            " simulations: "
+        endif
 
-        call cells%get_climate_data( )
+        write(*,fmt="(a)", advance="no") "."
 
         cells%snow_storage => SNOW_STORAGE_PER_SIM(:,sim_number)
         cells%soil_storage => SOIL_MOISTURE_STORAGE_PER_SIM(:,sim_number)
@@ -147,8 +165,10 @@ contains
         cells%actual_et => ACTUAL_ET_PER_SIM(:,sim_number)
 
         call perform_daily_calculation( cells )
+
         call write_output( cells )
-        call write_multi_sim_output( cells, sim_number)
+        call update_accumulators( cells, sim_number )
+!        call write_multi_sim_output( cells, sim_number)
   !      call perform_polygon_summarize( cells )
 
         call cells%dump_variables( )
@@ -161,6 +181,130 @@ contains
 
     enddo
 
+    call finalize_accumulators( cells, number_of_simulations )
+
   end subroutine iterate_over_multiple_simulation_days
+
+!------------------------------------------------------------------------------------------------
+
+  subroutine reset_monthly_accumulators( )
+
+    MONTHLY_ACTUAL_ET_STATS = 0.0_c_float
+    MONTHLY_NET_INFILTRATION_STATS = 0.0_c_float
+
+  end subroutine reset_monthly_accumulators
+
+!------------------------------------------------------------------------------------------------
+
+  subroutine reset_annual_accumulators( )
+
+    ANNUAL_ACTUAL_ET_STATS = 0.0_c_float
+    ANNUAL_NET_INFILTRATION_STATS = 0.0_c_float
+
+  end subroutine reset_annual_accumulators
+
+!------------------------------------------------------------------------------------------------
+
+  subroutine update_accumulators( cells, simulation_number )
+
+    class (MODEL_DOMAIN_T), intent(inout)     :: cells
+    integer (kind=c_int), intent(in)          :: simulation_number
+
+    ![ LOCALS ]
+    integer (kind=c_int)  :: month
+
+    month = SIM_DT%curr%iMonth
+
+    MONTHLY_NET_INFILTRATION_STATS(:,month) = MONTHLY_NET_INFILTRATION_STATS(:,month)    &
+                                               + cells%net_infiltration
+
+    MONTHLY_ACTUAL_ET_STATS(:,month) = MONTHLY_ACTUAL_ET_STATS(:,month)    &
+                                               + cells%actual_et
+
+    ! ANNUAL_NET_INFILTRATION_STATS(:,simulation_number) =                             &
+    !    ANNUAL_NET_INFILTRATION_STATS(:,simulation_number) + cells%net_infiltration
+    !
+    ! ANNUAL_ACTUAL_ET_STATS(:,simulation_number) =                                    &
+    !    ANNUAL_ACTUAL_ET_STATS(:,simulation_number) + cells%actual_et
+
+  end subroutine update_accumulators
+
+!------------------------------------------------------------------------------------------------
+
+  subroutine finalize_accumulators(cells, number_of_simulations)
+
+    class (MODEL_DOMAIN_T), intent(inout)     :: cells
+    integer (kind=c_int), intent(in)          :: number_of_simulations
+
+    ![ LOCALS ]
+    real (kind=c_float)   :: number_of_simulation_days
+    integer (kind=c_int)  :: month
+    integer (kind=c_int)  :: simulation_number
+    character (len=256)   :: filename, file_suffix
+    integer (kind=c_int)  :: start_year, end_year
+    integer (kind=c_int)  :: nx, ny
+    character (len=3)     :: month_abbrev
+
+    type (GENERAL_GRID_T), pointer  :: pTempGrid
+
+    start_year = SIM_DT%start%iYear
+    end_year = SIM_DT%end%iYear
+    nx = cells%number_of_columns
+    ny = cells%number_of_rows
+
+    file_suffix = "__"//trim(asCharacter(number_of_simulations))//"-simulations__"              &
+                  //trim(asCharacter(ny))//"_cols_by_"//trim(asCharacter(nx))//"_rows__"        &
+                  //trim(asCharacter(start_year))//"_to_"//trim(asCharacter(end_year))//".asc"
+
+    pTempGrid => grid_Create( iNX=cells%number_of_columns, iNY=cells%number_of_rows, &
+        rX0=cells%X_ll, rY0=cells%Y_ll, &
+        rGridCellSize=cells%gridcellsize, iDataType=GRID_DATATYPE_REAL )
+
+    number_of_simulation_days = real( SIM_DT%end - SIM_DT%start + 1.0, kind=c_float)
+
+    do month=1,12
+
+      month_abbrev = MONTHS(month)%sName
+
+      ANNUAL_NET_INFILTRATION_STATS(:) = ANNUAL_NET_INFILTRATION_STATS(:)              &
+                                         + MONTHLY_NET_INFILTRATION_STATS(:,month)
+
+      ANNUAL_ACTUAL_ET_STATS(:) = ANNUAL_ACTUAL_ET_STATS(:)             &
+                                  + MONTHLY_ACTUAL_ET_STATS(:,month)
+
+      MONTHLY_NET_INFILTRATION_STATS(:,month) = MONTHLY_NET_INFILTRATION_STATS(:,month)          &
+                                                / real(number_of_simulations, kind=c_float)
+
+      MONTHLY_ACTUAL_ET_STATS(:,month) = MONTHLY_ACTUAL_ET_STATS(:,month)                       &
+                                          / real(number_of_simulations, kind=c_float)
+
+      pTempGrid%rData = unpack( MONTHLY_ACTUAL_ET_STATS(:,month), cells%active, cells%nodata_fill_value )
+      filename = "MONTHLY_ANNUAL_SUM-"//trim(month_abbrev)//"__actual_evapotranspiration"//trim(file_suffix)
+      call grid_WriteArcGrid( sFilename=filename, pGrd=pTempGrid )
+
+      pTempGrid%rData = unpack( MONTHLY_NET_INFILTRATION_STATS(:,month), cells%active, cells%nodata_fill_value )
+      filename = "MONTHLY_ANNUAL_SUM-"//trim(month_abbrev)//"__net_infiltration"//trim(file_suffix)
+      call grid_WriteArcGrid( sFilename=filename, pGrd=pTempGrid )
+
+     enddo
+
+     ANNUAL_NET_INFILTRATION_STATS(:) = ANNUAL_NET_INFILTRATION_STATS(:)              &
+                                        / real(number_of_simulations, kind=c_float)
+
+     ANNUAL_ACTUAL_ET_STATS(:) = ANNUAL_ACTUAL_ET_STATS(:)             &
+                                 / real(number_of_simulations, kind=c_float)
+
+     pTempGrid%rData = unpack( ANNUAL_ACTUAL_ET_STATS, cells%active, cells%nodata_fill_value )
+     filename = "MEAN_ANNUAL_SUM__actual_evapotranspiration"//trim(file_suffix)
+     call grid_WriteArcGrid( sFilename=filename, pGrd=pTempGrid )
+
+     pTempGrid%rData = unpack( ANNUAL_NET_INFILTRATION_STATS, cells%active, cells%nodata_fill_value )
+     filename = "MEAN_ANNUAL_SUM__net_infiltration"//trim(file_suffix)
+     call grid_WriteArcGrid( sFilename=filename, pGrd=pTempGrid )
+
+     call grid_Destroy( pTempGrid )
+
+  end subroutine finalize_accumulators
+
 
 end module model_iterate_multiple_simulations

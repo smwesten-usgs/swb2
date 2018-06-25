@@ -196,8 +196,6 @@ contains
 
     cells%nodata_fill_value = NC_FILL_FLOAT
 
-    allocate( RECHARGE_ARRAY( size( cells%net_infiltration, 1 ) ) )
-
   end subroutine initialize_output
 
   !--------------------------------------------------------------------------------------------------
@@ -219,7 +217,7 @@ contains
 
     if ( OUTPUT_INCLUDES_LATLON ) then
 
-      do noutput = 1, ubound(NC_OUT, 1)
+      do noutput = 1, ubound(NC_MULTI_SIM_OUT, 1)
 
         ! do not initialize a series of output files unless explicitly called for
         if ( .not. OUTSPECS(noutput)%multisim_outputs ) cycle
@@ -245,7 +243,7 @@ contains
                   dpLon=cells%X_lon,                                                       &
                   fValidMin=OUTSPECS( noutput )%valid_minimum,                             &
                   fValidMax=OUTSPECS( noutput )%valid_maximum,                             &
-                  filename_modifier="simulation_"//asCharacter(nsim) )
+                  filename_modifier="simulation_"//trim(asCharacter(nsim)) )
 
           enddo
 
@@ -255,7 +253,7 @@ contains
 
     else
 
-      do noutput = 1, ubound(NC_OUT, 1)
+      do noutput = 1, ubound(NC_MULTI_SIM_OUT, 1)
 
         ! do not initialize a series of output files unless explicitly called for
         if ( .not. OUTSPECS(noutput)%multisim_outputs ) cycle
@@ -279,7 +277,7 @@ contains
                   PROJ4_string=cells%PROJ4_string,                                         &
                   fValidMin=OUTSPECS( noutput )%valid_minimum,                             &
                   fValidMax=OUTSPECS( noutput )%valid_maximum,                             &
-                  filename_modifier="simulation_"//asCharacter(nsim) )
+                  filename_modifier="simulation_"//trim(asCharacter(nsim)) )
 
           enddo
 
@@ -329,191 +327,204 @@ contains
     integer (kind=c_int)           :: iIndex
     type (T_NETCDF4_FILE), pointer :: ncfile_ptr
 
-    ! first put out the current time variable for all open NetCDF files
-    do iIndex = 1, ubound( NC_OUT, 1 )
+    do
 
-      if ( OUTSPECS(iIndex)%is_active ) then
 
-        call netcdf_put_variable_vector(NCFILE=NC_OUT(iIndex)%ncfile, &
-           iVarID=NC_OUT(iIndex)%ncfile%iVarID(NC_TIME), &
-           iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t)], &
-           iCount=[1_c_size_t], &
-           iStride=[1_c_ptrdiff_t], &
-           dpValues=[real(SIM_DT%iNumDaysFromOrigin, kind=c_double)])
 
-      endif
+      if (.not. allocated(NC_OUT) ) exit
+
+      ! first put out the current time variable for all open NetCDF files
+      do iIndex = 1, ubound( NC_OUT, 1 )
+
+        if ( OUTSPECS(iIndex)%multisim_outputs ) cycle
+
+        if ( OUTSPECS(iIndex)%is_active ) then
+
+          call netcdf_put_variable_vector(NCFILE=NC_OUT(iIndex)%ncfile, &
+             iVarID=NC_OUT(iIndex)%ncfile%iVarID(NC_TIME), &
+             iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t)], &
+             iCount=[1_c_size_t], &
+             iStride=[1_c_ptrdiff_t], &
+             dpValues=[real(SIM_DT%iNumDaysFromOrigin, kind=c_double)])
+
+        endif
+
+      enddo
+
+
+
+      if ( OUTSPECS( NCDF_GROSS_PRECIPITATION )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_GROSS_PRECIPITATION )%ncfile,      &
+                                    values=cells%gross_precip,                                 &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_RAINFALL )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_RAINFALL )%ncfile,       &
+                                    values=cells%rainfall,                           &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_INTERCEPTION )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_INTERCEPTION )%ncfile,   &
+                                    values=cells%interception,                       &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_INTERCEPTION )%is_active                                &
+           .and. (.not. OUTSPECS( NCDF_INTERCEPTION_STORAGE )%multisim_outputs ))  &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_INTERCEPTION )%ncfile,   &
+                                    values=cells%interception,                       &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_RUNOFF )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_RUNOFF )%ncfile,       &
+                                    values=cells%runoff,                           &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_RUNOFF_OUTSIDE )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_RUNOFF_OUTSIDE )%ncfile,   &
+                                    values=cells%runoff_outside,                       &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_RUNON )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_RUNON )%ncfile,       &
+                                    values=cells%runon,                           &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_INFILTRATION )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_INFILTRATION )%ncfile,       &
+                                    values=cells%infiltration,                           &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_SNOWFALL )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_SNOWFALL )%ncfile,       &
+                                    values=cells%snowfall,                           &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_SNOWMELT )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_SNOWMELT )%ncfile,       &
+                                    values=cells%snowmelt,                           &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_SNOW_STORAGE )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_SNOW_STORAGE )%ncfile,  &
+                                    values=cells%snow_storage,                      &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_SURFACE_STORAGE )%is_active                            &
+           .and. (.not. OUTSPECS( NCDF_SURFACE_STORAGE )%multisim_outputs) )     &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_SURFACE_STORAGE )%ncfile,  &
+                                    values=real(cells%surface_storage, kind=c_float),  &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_SOIL_STORAGE )%is_active                             &
+           .and. (.not. OUTSPECS( NCDF_SOIL_STORAGE )%multisim_outputs) )   &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_SOIL_STORAGE )%ncfile,  &
+                                    values=real(cells%soil_storage, kind=c_float),  &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_DELTA_SOIL_STORAGE )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_DELTA_SOIL_STORAGE )%ncfile,  &
+                                    values=cells%delta_soil_storage,                      &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_NET_INFILTRATION )%is_active                           &
+           .and. (.not. OUTSPECS( NCDF_NET_INFILTRATION )%multisim_outputs) )    &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_NET_INFILTRATION )%ncfile,  &
+                                    values=cells%net_infiltration,                      &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_REFERENCE_ET0 )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_REFERENCE_ET0 )%ncfile,  &
+                                    values=cells%reference_ET0,                      &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_ACTUAL_ET )%is_active                                 &
+           .and. (.not. OUTSPECS( NCDF_ACTUAL_ET )%multisim_outputs) )          &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_ACTUAL_ET )%ncfile,  &
+                                    values=real(cells%actual_et, kind=c_float),  &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_TMIN )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_TMIN )%ncfile,       &
+                                    values=cells%tmin,                           &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_TMAX )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_TMAX )%ncfile,       &
+                                    values=cells%tmax,                           &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_IRRIGATION )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_IRRIGATION )%ncfile,       &
+                                    values=cells%irrigation,                           &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_GDD )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_GDD )%ncfile,       &
+                                    values=cells%gdd,                           &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_REJECTED_NET_INFILTRATION )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_REJECTED_NET_INFILTRATION )%ncfile,       &
+                                    values=cells%rejected_net_infiltration,                           &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_CROP_ET )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_CROP_ET )%ncfile,       &
+                                    values=cells%crop_etc,                          &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_DIRECT_NET_INFILTRATION )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_DIRECT_NET_INFILTRATION )%ncfile,   &
+                                    values=cells%direct_net_infiltration,                       &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_DIRECT_SOIL_MOISTURE )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_DIRECT_SOIL_MOISTURE )%ncfile,       &
+                                    values=cells%direct_soil_moisture,                           &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_STORM_DRAIN_CAPTURE )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_STORM_DRAIN_CAPTURE )%ncfile,        &
+                                    values=cells%storm_drain_capture,                            &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_FOG )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_FOG )%ncfile,        &
+                                    values=cells%fog,                            &
+                                    cells=cells )
+
+
+
+      exit
 
     enddo
-
-    if ( OUTSPECS( NCDF_GROSS_PRECIPITATION )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_GROSS_PRECIPITATION )%ncfile,      &
-                                  values=cells%gross_precip,                                 &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_RAINFALL )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_RAINFALL )%ncfile,       &
-                                  values=cells%rainfall,                           &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_INTERCEPTION )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_INTERCEPTION )%ncfile,   &
-                                  values=cells%interception,                       &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_INTERCEPTION )%is_active                                &
-         .and. (.not. OUTSPECS( NCDF_INTERCEPTION_STORAGE )%multisim_outputs ))  &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_INTERCEPTION )%ncfile,   &
-                                  values=cells%interception,                       &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_RUNOFF )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_RUNOFF )%ncfile,       &
-                                  values=cells%runoff,                           &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_RUNOFF_OUTSIDE )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_RUNOFF_OUTSIDE )%ncfile,   &
-                                  values=cells%runoff_outside,                       &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_RUNON )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_RUNON )%ncfile,       &
-                                  values=cells%runon,                           &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_INFILTRATION )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_INFILTRATION )%ncfile,       &
-                                  values=cells%infiltration,                           &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_SNOWFALL )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_SNOWFALL )%ncfile,       &
-                                  values=cells%snowfall,                           &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_SNOWMELT )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_SNOWMELT )%ncfile,       &
-                                  values=cells%snowmelt,                           &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_SNOW_STORAGE )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_SNOW_STORAGE )%ncfile,  &
-                                  values=cells%snow_storage,                      &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_SURFACE_STORAGE )%is_active                            &
-         .and. (.not. OUTSPECS( NCDF_SURFACE_STORAGE )%multisim_outputs) )     &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_SURFACE_STORAGE )%ncfile,  &
-                                  values=real(cells%surface_storage, kind=c_float),  &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_SOIL_STORAGE )%is_active                             &
-         .and. (.not. OUTSPECS( NCDF_SOIL_STORAGE )%multisim_outputs) )   &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_SOIL_STORAGE )%ncfile,  &
-                                  values=real(cells%soil_storage, kind=c_float),  &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_DELTA_SOIL_STORAGE )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_DELTA_SOIL_STORAGE )%ncfile,  &
-                                  values=cells%delta_soil_storage,                      &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_NET_INFILTRATION )%is_active                           &
-         .and. (.not. OUTSPECS( NCDF_NET_INFILTRATION )%multisim_outputs) )    &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_NET_INFILTRATION )%ncfile,  &
-                                  values=cells%net_infiltration,                      &
-                                  cells=cells )
-
-
-    if ( OUTSPECS( NCDF_REFERENCE_ET0 )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_REFERENCE_ET0 )%ncfile,  &
-                                  values=cells%reference_ET0,                      &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_ACTUAL_ET )%is_active                                 &
-         .and. (.not. OUTSPECS( NCDF_ACTUAL_ET )%multisim_outputs) )          &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_ACTUAL_ET )%ncfile,  &
-                                  values=real(cells%actual_et, kind=c_float),  &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_TMIN )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_TMIN )%ncfile,       &
-                                  values=cells%tmin,                           &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_TMAX )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_TMAX )%ncfile,       &
-                                  values=cells%tmax,                           &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_IRRIGATION )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_IRRIGATION )%ncfile,       &
-                                  values=cells%irrigation,                           &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_GDD )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_GDD )%ncfile,       &
-                                  values=cells%gdd,                           &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_REJECTED_NET_INFILTRATION )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_REJECTED_NET_INFILTRATION )%ncfile,       &
-                                  values=cells%rejected_net_infiltration,                           &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_CROP_ET )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_CROP_ET )%ncfile,       &
-                                  values=cells%crop_etc,                          &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_DIRECT_NET_INFILTRATION )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_DIRECT_NET_INFILTRATION )%ncfile,   &
-                                  values=cells%direct_net_infiltration,                       &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_DIRECT_SOIL_MOISTURE )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_DIRECT_SOIL_MOISTURE )%ncfile,       &
-                                  values=cells%direct_soil_moisture,                           &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_STORM_DRAIN_CAPTURE )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_STORM_DRAIN_CAPTURE )%ncfile,        &
-                                  values=cells%storm_drain_capture,                            &
-                                  cells=cells )
-
-    if ( OUTSPECS( NCDF_FOG )%is_active ) &
-
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_FOG )%ncfile,        &
-                                  values=cells%fog,                            &
-                                  cells=cells )
-
-    RECHARGE_ARRAY = RECHARGE_ARRAY + cells%net_infiltration
 
   end subroutine write_output
 
@@ -528,60 +539,76 @@ contains
     integer (kind=c_int)           :: iIndex
     type (T_NETCDF4_FILE), pointer :: ncfile_ptr
 
+
+
     ! first put out the current time variable for all open NetCDF files
-    do iIndex = 1, ubound( NC_OUT, 1 )
+    do iIndex = 1, ubound( NC_MULTI_SIM_OUT, 1 )
 
       ! do not write output unless multisim flag has been set
       if ( .not. OUTSPECS(iIndex)%multisim_outputs ) cycle
 
       if ( OUTSPECS(iIndex)%is_active ) then
 
-        call netcdf_put_variable_vector(NCFILE=NC_OUT(iIndex)%ncfile, &
-           iVarID=NC_OUT(iIndex)%ncfile%iVarID(NC_TIME), &
-           iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t)], &
-           iCount=[1_c_size_t], &
-           iStride=[1_c_ptrdiff_t], &
+
+        call netcdf_put_variable_vector(NCFILE=                                        &
+           NC_MULTI_SIM_OUT(iIndex,simulation_number)%ncfile,                          &
+           iVarID=NC_MULTI_SIM_OUT(iIndex, simulation_number)%ncfile%iVarID(NC_TIME),  &
+           iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t)],                     &
+           iCount=[1_c_size_t],                                                        &
+           iStride=[1_c_ptrdiff_t],                                                    &
            dpValues=[real(SIM_DT%iNumDaysFromOrigin, kind=c_double)])
 
       endif
 
     enddo
 
-    if ( OUTSPECS( NCDF_SNOW_STORAGE )%is_active ) &
+    if ( OUTSPECS( NCDF_SNOW_STORAGE )%is_active                    &
+       .and. OUTSPECS(NCDF_SNOW_STORAGE)%multisim_outputs )         &
 
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_SNOW_STORAGE )%ncfile,  &
-                                  values=cells%snow_storage,                      &
-                                  cells=cells )
+      call output_2D_float_array(                                                    &
+        ncfile_ptr=NC_MULTI_SIM_OUT( NCDF_SNOW_STORAGE, simulation_number )%ncfile,  &
+        values=cells%snow_storage,                                                   &
+        cells=cells )
 
-    if ( OUTSPECS( NCDF_SOIL_STORAGE )%is_active ) &
+    if ( OUTSPECS( NCDF_SOIL_STORAGE )%is_active                    &
+       .and. OUTSPECS(NCDF_SOIL_STORAGE)%multisim_outputs )         &
 
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_SOIL_STORAGE )%ncfile,  &
-                                  values=real(cells%soil_storage, kind=c_float),  &
-                                  cells=cells )
+      call output_2D_float_array(                                                    &
+        ncfile_ptr=NC_MULTI_SIM_OUT( NCDF_SOIL_STORAGE, simulation_number )%ncfile,  &
+        values=real(cells%soil_storage, kind=c_float),                               &
+        cells=cells )
 
-    if ( OUTSPECS( NCDF_NET_INFILTRATION )%is_active ) &
+    if ( OUTSPECS( NCDF_NET_INFILTRATION )%is_active                    &
+       .and. OUTSPECS(NCDF_NET_INFILTRATION)%multisim_outputs )         &
 
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_NET_INFILTRATION )%ncfile,  &
-                                  values=cells%net_infiltration,                      &
-                                  cells=cells )
+      call output_2D_float_array(                                                        &
+        ncfile_ptr=NC_MULTI_SIM_OUT( NCDF_NET_INFILTRATION, simulation_number )%ncfile,  &
+        values=cells%net_infiltration,                                                   &
+        cells=cells )
 
-    if ( OUTSPECS( NCDF_ACTUAL_ET )%is_active ) &
+    if ( OUTSPECS( NCDF_ACTUAL_ET )%is_active                    &
+       .and. OUTSPECS(NCDF_ACTUAL_ET)%multisim_outputs )         &
 
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_ACTUAL_ET )%ncfile,  &
-                                  values=real(cells%actual_et, kind=c_float),  &
-                                  cells=cells )
+      call output_2D_float_array(                                                   &
+        ncfile_ptr=NC_MULTI_SIM_OUT( NCDF_ACTUAL_ET, simulation_number )%ncfile,    &
+        values=real(cells%actual_et, kind=c_float),                                 &
+        cells=cells )
 
-    if ( OUTSPECS( NCDF_INTERCEPTION_STORAGE )%is_active ) &
+    if ( OUTSPECS( NCDF_INTERCEPTION_STORAGE )%is_active                    &
+       .and. OUTSPECS(NCDF_INTERCEPTION_STORAGE)%multisim_outputs )         &
 
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_INTERCEPTION_STORAGE )%ncfile,  &
-                                  values=real(cells%interception_storage, kind=c_float),  &
-                                  cells=cells )
+      call output_2D_float_array(                                                            &
+        ncfile_ptr=NC_MULTI_SIM_OUT( NCDF_INTERCEPTION_STORAGE, simulation_number )%ncfile,  &
+        values=real(cells%interception_storage, kind=c_float),                               &
+        cells=cells )
 
-    if ( OUTSPECS( NCDF_SURFACE_STORAGE )%is_active ) &
+    if ( OUTSPECS( NCDF_SURFACE_STORAGE )%is_active                    &
+       .and. OUTSPECS(NCDF_SURFACE_STORAGE)%multisim_outputs )         &
 
-      call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_SURFACE_STORAGE )%ncfile,  &
-                                  values=real(cells%surface_storage, kind=c_float),  &
-                                  cells=cells )
+      call output_2D_float_array(                                                         &
+        ncfile_ptr=NC_MULTI_SIM_OUT( NCDF_SURFACE_STORAGE, simulation_number )%ncfile,    &
+        values=real(cells%surface_storage, kind=c_float),                                 &
+        cells=cells )
 
   end subroutine write_multi_sim_output
 
