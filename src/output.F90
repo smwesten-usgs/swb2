@@ -130,7 +130,7 @@ contains
     if ( .not. allocated( OUTPUT_PREFIX_NAME ) ) OUTPUT_PREFIX_NAME       = ""
 
     ! overrides to prevent unused variables from being written to output
-    if ( .not. allocated(cells%fog) ) OUTSPECS( NCDF_FOG)%is_active = FALSE
+    if ( .not. associated(cells%fog) ) OUTSPECS( NCDF_FOG)%is_active = FALSE
 
     if ( OUTPUT_INCLUDES_LATLON ) then
 

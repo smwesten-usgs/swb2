@@ -114,7 +114,7 @@ module model_domain
 
     real (kind=c_float), allocatable       :: gross_precip(:)
     real (kind=c_float), allocatable       :: monthly_gross_precip(:)
-    real (kind=c_float), allocatable       :: fog(:)
+    real (kind=c_float), pointer           :: fog(:)
     real (kind=c_float), allocatable       :: rainfall(:)
     real (kind=c_float), allocatable       :: snowfall(:)
     real (kind=c_float), allocatable       :: irrigation(:)
@@ -393,7 +393,7 @@ contains
                       rX0=dX_ll, rY0=dY_ll, rGridCellSize=dGridCellSize,  &
                       iDataType=GRID_DATATYPE_REAL )
 
-    this%nodata_fill_value = NC_FILL_FLOAT
+    this%nodata_fill_value = -999.0
 
   end subroutine initialize_grid_sub
 

@@ -36,8 +36,7 @@ module model_iterate_multiple_simulations
   real (kind=c_float), target, allocatable    :: INTERCEPTION_STORAGE_PER_SIM(:,:)
   real (kind=c_float), target, allocatable    :: NET_INFILTRATION_PER_SIM(:,:)
   real (kind=c_double), target, allocatable   :: ACTUAL_ET_PER_SIM(:,:)
-
-
+  real (kind=c_float), target, allocatable    :: FOG_PER_SIM(:,:)
 
 ! Concept: remap pointers to key state variables for each of X simulations,
 !          run the daily simulation given current landuse, soil type, etc.
@@ -62,6 +61,7 @@ contains
     allocate( INTERCEPTION_STORAGE_PER_SIM(length, number_of_simulations))
     allocate( NET_INFILTRATION_PER_SIM(length, number_of_simulations))
     allocate( ACTUAL_ET_PER_SIM(length, number_of_simulations))
+    allocate( FOG_PER_SIM(length, number_of_simulations))
 
     allocate( MONTHLY_NET_INFILTRATION_STATS(length, 12) )
     allocate( ANNUAL_NET_INFILTRATION_STATS(length) )
@@ -112,6 +112,13 @@ contains
       deallocate(cells%actual_et)
     endif
 
+    if (associated(cells%fog)) then
+      do indx=1,number_of_simulations
+        FOG_PER_SIM(:,indx) = cells%fog
+      enddo
+      deallocate(cells%fog)
+    endif
+
   end subroutine allocate_space_for_simulation_storage_state_variables
 
 !------------------------------------------------------------------------------------------------
@@ -143,10 +150,10 @@ contains
 
       do sim_number=1,number_of_simulations
 
-        call cells%get_climate_data( )
-
         ! modifying module variable from precipitation__method_of_fragments
         SIMULATION_NUMBER = sim_number
+
+        call cells%get_climate_data( )
 
         if (sim_number==1) then
           call LOGS%write("Calculating: "//SIM_DT%curr%prettydate(),  &
@@ -163,6 +170,7 @@ contains
         cells%surface_storage => SURFACE_STORAGE_PER_SIM(:,sim_number)
         cells%net_infiltration => NET_INFILTRATION_PER_SIM(:,sim_number)
         cells%actual_et => ACTUAL_ET_PER_SIM(:,sim_number)
+        cells%fog => FOG_PER_SIM(:,sim_number)
 
         call perform_daily_calculation( cells )
 
@@ -259,6 +267,8 @@ contains
     pTempGrid => grid_Create( iNX=cells%number_of_columns, iNY=cells%number_of_rows, &
         rX0=cells%X_ll, rY0=cells%Y_ll, &
         rGridCellSize=cells%gridcellsize, iDataType=GRID_DATATYPE_REAL )
+
+    call grid_set_nodata_value(pTempGrid, fValue=cells%nodata_fill_value(1,1))
 
     number_of_simulation_days = real( SIM_DT%end - SIM_DT%start + 1.0, kind=c_float)
 
