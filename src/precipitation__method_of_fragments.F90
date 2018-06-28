@@ -91,7 +91,8 @@ module precipitation__method_of_fragments
   type (PTR_FRAGMENTS_T), allocatable                   :: CURRENT_FRAGMENTS(:)
 
   !> Array of fragments sets; fragments sets include indices to the start record
-  !! associated with the fragment for each month
+  !! associated with the fragment for each month; FRAGMENTS_SETS will have a
+  !! number of elements equal to the number of rainfall gages in the model domain
   type (FRAGMENTS_SET_T), allocatable, public           :: FRAGMENTS_SETS(:)
 
   !> Data structure to hold static (pre-calculated) fragment selection numbers
@@ -206,6 +207,8 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  !> iterate over a set of rainfall fragments and keep track of the index
+  ! values that correspond with changes in month and rain gage numbers
   subroutine process_fragment_sets()
 
     integer (kind=c_int)   :: iCount
@@ -232,7 +235,6 @@ contains
     ! populate the first record of FRAGMENT_SETS
     FRAGMENTS_SETS( iRainGageZone )%iRainGageZone = iRainGageZone
     FRAGMENTS_SETS( iRainGageZone )%iStartRecord(iPreviousMonth) = lbound( FRAGMENTS, 1)
-
 
     ! now iterate through *all* fragments, keeping track of the starting record for each new rainfall gage
     ! zone number
@@ -412,6 +414,8 @@ contains
 
       enddo
 
+      if ( FRAGMENTS(iCount)%iMonth == 2 )  call normalize_february_fragment_sequence( iCount )
+
     enddo
 
     call LOGS%write("Maximum rain gage zone number: "//asCharacter(maxval(FRAGMENTS%iRainGageZone)), &
@@ -421,6 +425,29 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  !> eliminate rainfall on the 29th day of February; bump up all other values to ensure sum = 1
+  subroutine normalize_february_fragment_sequence( iCount )
+
+    integer (kind=c_int), intent(in)   :: iCount
+
+    ! [ LOCALS ]
+    real (kind=c_float) :: sum_fragments
+
+    sum_fragments = sum( FRAGMENTS(iCount)%fFragmentValue(1:28) )
+
+    ! bump up all February fragments so that their 28-day sum is 1
+    FRAGMENTS(iCount)%fFragmentValue(1:28) = FRAGMENTS(iCount)%fFragmentValue(1:28)   &
+                                               / sum_fragments
+    ! zero out remaining values
+    FRAGMENTS(iCount)%fFragmentValue(29:31) = 0.0_c_float
+
+  end subroutine normalize_february_fragment_sequence
+
+!--------------------------------------------------------------------------------------------------
+
+  ! in order to compare Hawaii Water Budget results to SWB results,
+  ! it is necessary to force SWB to use the same sequence of fragments
+  ! that was used in the HWB simulations
   subroutine read_fragments_sequence( sFilename )
 
     character (len=*), intent(in)    :: sFilename
@@ -437,7 +464,7 @@ contains
     character (len=12)     :: sBuf2
     character (len=10)     :: sBuf3
     character (len=10)     :: sBuf4
-    character (len=256)     :: sBuf5
+    character (len=256)    :: sBuf5
     type (STRING_LIST_T)   :: slHeader
 
 
@@ -562,7 +589,7 @@ contains
   !!    for the current RainGageZone
   !!
   !! *Each* time the routine is called, the appropriate fragment is
-  !! selected from the current active fragement set and is assigned
+  !! selected from the current active fragment set and is assigned
   !! to all cells that share a common RainGageZone
 
   subroutine update_fragments( lShuffle )
@@ -570,7 +597,7 @@ contains
     logical (kind=c_bool), intent(in) :: lShuffle
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iIndex
+    integer (kind=c_int) :: rain_zone
     integer (kind=c_int) :: iMaxRainZones
     integer (kind=c_int) :: iMonth
     integer (kind=c_int) :: iDay
@@ -591,14 +618,17 @@ contains
     iDay = SIM_DT%curr%iDay
     iYearOfSimulation=SIM_DT%iYearOfSimulation
 
+    ! equal the number of fragments are in memory
     iUBOUND_FRAGMENTS = ubound( FRAGMENTS, 1)
+
+    ! should equal the number of rainfall gages in model domain
     iUBOUND_CURRENT_FRAGMENTS = ubound( CURRENT_FRAGMENTS, 1)
 
     ! if by chance a mismatch in shape-to-grid results in an active cell with *NO* valid
     ! rain gage ID, we need to set the entire array to zero to quash any spurious values getting in
     FRAGMENT_VALUE = 0.0_c_float
 
-    do iIndex = 1, iMaxRainZones
+    do rain_zone = 1, iMaxRainZones
 
       if ( lShuffle ) then
         ! find next fragment *record*
@@ -606,16 +636,16 @@ contains
         ! update the module variable RANDOM_VALUES
         call update_random_values()
 
-        iStartRecord = FRAGMENTS_SETS( iIndex )%iStartRecord(iMonth)
-        iNumberOfFragments = FRAGMENTS_SETS(iIndex)%iNumberOfFragments(iMonth)
+        iStartRecord = FRAGMENTS_SETS( rain_zone )%iStartRecord(iMonth)
+        iNumberOfFragments = FRAGMENTS_SETS(rain_zone)%iNumberOfFragments(iMonth)
         iEndRecord = iStartRecord + iNumberOfFragments - 1
-        iTargetRecord = iStartRecord + int(RANDOM_VALUES(iIndex) * real( iNumberOfFragments ))
+        iTargetRecord = iStartRecord + int(RANDOM_VALUES(rain_zone) * real( iNumberOfFragments ))
 
-        if ( ( iIndex > iUBOUND_CURRENT_FRAGMENTS ) .or. ( iTargetRecord > iUBOUND_FRAGMENTS )   &
-            .or. ( iIndex < 1 ) .or. ( iTargetRecord < 1) ) then
+        if ( ( rain_zone > iUBOUND_CURRENT_FRAGMENTS ) .or. ( iTargetRecord > iUBOUND_FRAGMENTS )   &
+            .or. ( rain_zone < 1 ) .or. ( iTargetRecord < 1) ) then
           call LOGS%write("Error detected in method of fragments routine; dump of current"       &
                           //" variables follows:", iLinesBefore=1)
-          call LOGS%write("iIndex: "//asCharacter(iIndex), iTab=3 )
+          call LOGS%write("rain_zone: "//asCharacter(rain_zone), iTab=3 )
           call LOGS%write("iStartRecord: "//asCharacter(iStartRecord), iTab=3 )
           call LOGS%write("iNumberOfFragments: "//asCharacter(iNumberOfFragments), iTab=3 )
           call LOGS%write("iEndRecord: "//asCharacter(iEndRecord), iTab=3 )
@@ -623,19 +653,20 @@ contains
           call LOGS%write("ubound(CURRENT_FRAGMENTS, 1): "//asCharacter(iUBOUND_CURRENT_FRAGMENTS), &
                           iTab=3 )
           call LOGS%write("ubound(FRAGMENTS, 1): "//asCharacter(iUBOUND_FRAGMENTS), iTab=3 )
-          call LOGS%write("RANDOM_VALUES(iIndex): "//asCharacter(RANDOM_VALUES(iIndex)), iTab=3 )
+          call LOGS%write("RANDOM_VALUES(rain_zone): "//asCharacter(RANDOM_VALUES(rain_zone)), iTab=3 )
           call die( "Miscalculation in target record: calculated record index is out of bounds", &
             __SRCNAME__, __LINE__ )
         endif
 
-        CURRENT_FRAGMENTS(iIndex)%pFragment => FRAGMENTS( iTargetRecord )
+        ! reassign fragment pointer for this rain zone to the newly selected record
+        CURRENT_FRAGMENTS(rain_zone)%pFragment => FRAGMENTS( iTargetRecord )
 
          write(LU_FRAGMENTS_ECHO,fmt="(4(i5,','),f10.6,',',i5,',',30(f8.3,','),f8.3)")   &
-                     iIndex,                                                             &
+                     rain_zone,                                                             &
                      FRAGMENTS( iTargetRecord)%iMonth,                                   &
                      FRAGMENTS( iTargetRecord)%iRainGageZone,                            &
                      iYearOfSimulation,                                                  &
-                     RANDOM_VALUES(iIndex),                                              &
+                     RANDOM_VALUES(rain_zone),                                              &
                      FRAGMENTS( iTargetRecord)%iFragmentSet,                             &
                      FRAGMENTS( iTargetRecord)%fFragmentValue
 
@@ -643,12 +674,12 @@ contains
 
       endif
 
-      if ( ( CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay ) < 0.0 ) &
-         .or. ( CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay ) > 1.0 ) ) then
+      if ( ( CURRENT_FRAGMENTS( rain_zone )%pFragment%fFragmentValue( iDay ) < 0.0 ) &
+         .or. ( CURRENT_FRAGMENTS( rain_zone )%pFragment%fFragmentValue( iDay ) > 1.0 ) ) then
 
         call LOGS%write("Error detected in method of fragments routine; dump of current variables"  &
                         //" follows:", iLinesBefore=1, iLogLevel=LOG_ALL )
-        call LOGS%write("iIndex:"//asCharacter(iIndex), iTab=3 )
+        call LOGS%write("rain_zone:"//asCharacter(rain_zone), iTab=3 )
         call LOGS%write("iDay: "//asCharacter(iDay), iTab=3 )
         call LOGS%write("iRainGageZone: "//asCharacter(FRAGMENTS( iTargetRecord)%iRainGageZone), iTab=3 )
         call LOGS%write("iFragmentSet: "//asCharacter(FRAGMENTS( iTargetRecord)%iFragmentSet), iTab=3 )
@@ -656,14 +687,14 @@ contains
 
       endif
 
-      ! call LOGS%write("frag: "//asCharacter(iIndex)//"  day: "//asCharacter(iDay) &
-      !    //"  value: "//asCharacter( CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay ) ), &
+      ! call LOGS%write("frag: "//asCharacter(rain_zone)//"  day: "//asCharacter(iDay) &
+      !    //"  value: "//asCharacter( CURRENT_FRAGMENTS( rain_zone )%pFragment%fFragmentValue( iDay ) ), &
       !    lEcho=lFALSE )
 
       ! now place current days' fragment value into the matching cells
-      where ( RAIN_GAGE_ID == iIndex )
+      where ( RAIN_GAGE_ID == rain_zone )
 
-        FRAGMENT_VALUE = CURRENT_FRAGMENTS( iIndex )%pFragment%fFragmentValue( iDay )
+        FRAGMENT_VALUE = CURRENT_FRAGMENTS( rain_zone )%pFragment%fFragmentValue( iDay )
 
       endwhere
 

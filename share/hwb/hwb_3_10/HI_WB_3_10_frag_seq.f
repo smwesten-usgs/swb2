@@ -17,19 +17,19 @@ c  version 3.10_frag_seq 6/21/2018
 c     1. outputs fragments
 
 c  authors: J.A. Engott and D.S. Oki
-c  
+c
 c  Modified from Recharge Computation Program for Lihue Basin, Kauai
 c  program lihuewb02 by D.S. Oki
 c
 c  Computes daily water budget using 4 AE/PE methods:
-c    1.  Veihmeyer 
+c    1.  Veihmeyer
 c    2.  FAO56
-c    3.  Giambelluca 
-c    4.  Thornthwaite 
+c    3.  Giambelluca
+c    4.  Thornthwaite
 c
 c  Some differences from previous versions of this program:
 c
-c  (1) crop and urban irrigation is computed using a ratio of irrigation to 
+c  (1) crop and urban irrigation is computed using a ratio of irrigation to
 c      potential evapotranspiration and is applied daily.
 c  (2) historical monthly rainfall, in inches, from the period 1920-2007 (Frazier and Giambelluca,2012) is used
 c  (3) water mains, cesspools, and disposal wells can be included as sources of
@@ -41,9 +41,9 @@ c  (7) fog-catch efficiency factor, based on land cover, is used
 c  (8) three canopy-interception options are offered for forested areas
 c  (9) pervious ratio is input for every polygon instead of by land cover
 c (10) crop-irrigation parameters can be tailored to a wider range of crops
-c (11) temporally varibale monthly runoff:rainfall ratios can be used 
+c (11) temporally varibale monthly runoff:rainfall ratios can be used
 c (12) recharge beneath taro lo'i is estimated using a constant rate
-c (13) near-coastal or estuarine water bodies can be set to zero recharge 
+c (13) near-coastal or estuarine water bodies can be set to zero recharge
 c
 c  Assumptions:
 c
@@ -86,7 +86,7 @@ c                  nsim simulations)--CONTAINS ONLY SUGARCANE POLYGONS
 c   hi_wb4.out     polygon water-budget components for each polygon and
 c                  simulation (water-budget components are in total inches
 c                  accumulated over the nyrs of each simulation)
-c   
+c
 c
 c  List of subroutines:
 c
@@ -98,8 +98,8 @@ c  fraguse    selects fragment sets to be used for a simulation
 c  fields     selects initial sugarcane-field configuration for each plantation
 c  pcoef      determines daily pan coefficient for current sugarcane polygon
 c  rech       computes daily water budget using 4 different methods
-c  FAO_post   summarizes results calculated using the FAO method, creating files 
-c             more easily imported into spreadsheet and Arc products than 
+c  FAO_post   summarizes results calculated using the FAO method, creating files
+c             more easily imported into spreadsheet and Arc products than
 c             the .ou2 file.
 c
 c  List of selected variables (includes variables from alternate versions):
@@ -121,7 +121,7 @@ c                   (i=1,nsim), in Mgal/d
 c  annrfwt(i)    annual rainfall weight for year i (i=1,nannrfwt)
 c  aplant(i)     irrigated sugarcane area for each plantation i (i=1,7)
 c  area(i)       area (m^2) of GIS polygon i (i=1,npoly)
-c  av1ae(i,m)    average evapotranspiration in polygon i (i=1,npoly) for month m 
+c  av1ae(i,m)    average evapotranspiration in polygon i (i=1,npoly) for month m
 c                over nsim simulations using the Veihmeyer AE/PE model, in/mo
 c  av1rc(i,m)    average recharge in polygon i (i=1,npoly) for month m over nsim
 c                   simulations using the Veihmeyer AE/PE model, in/mo
@@ -129,11 +129,11 @@ c  av2ae(i,m)    average evapotranspiration in polygon i (i=1,npoly) for month m
 c                    over nsim simulations using the Giambelluca AE/PE model, in/mo
 c  av2rc(i,m)    average recharge in polygon i (i=1,npoly) for month m over nsim
 c                   simulations using the Giambelluca AE/PE model, in/mo
-c  av3ae(i,m)    average evapotranspiration in polygon i (i=1,npoly) for month m 
+c  av3ae(i,m)    average evapotranspiration in polygon i (i=1,npoly) for month m
 c                   over nsim simulations using the FAO 56 AE/PE model, in/mo
 c  av3rc(i,m)    average recharge in polygon i (i=1,npoly) for month m over nsim
 c                   simulations using the FAO 56 AE/PE model, in/mo
-c  av4ae(i,m)    average evapotranspiration in polygon i (i=1,npoly) for month m 
+c  av4ae(i,m)    average evapotranspiration in polygon i (i=1,npoly) for month m
 c                   over nsim  simulations using the Thornthwaite AE/PE model, in/mo
 c  av4rc(i,m)    average recharge in polygon i (i=1,npoly) for month m over nsim
 c                   simulations using the Thornthwaite AE/PE model, in/mo
@@ -149,11 +149,11 @@ c  avpnet(i,m)   average runoff in polygon i (i=1,npoly) for month m over nsim
 c                   simulations, in/mo
 c  avcanint(i,m) average runoff in polygon i (i=1,npoly) for month m over nsim
 c                   simulations, in/mo
-c  avrfadj(i,m)  average adjustment to rainfall in polygon i (i=1,npoly) for month m 
+c  avrfadj(i,m)  average adjustment to rainfall in polygon i (i=1,npoly) for month m
 c                   over nsim simulations, in/mo
-c  avseptic(i,m) average septic discharge to polygon i (i=1,npoly) for month m over 
+c  avseptic(i,m) average septic discharge to polygon i (i=1,npoly) for month m over
 c                   nsim simulations, in/mo
-c  avstrmdrn(i,m) average flow to storm drains from polygon i (i=1,npoly) for month 
+c  avstrmdrn(i,m) average flow to storm drains from polygon i (i=1,npoly) for month
 c                   m over nsim simulations, in/mo
 c  awc(i,j,l)    available water capacity (in/in) for soil code i,
 c                   sequence number j, and layer l
@@ -172,8 +172,8 @@ c  etmwf(i,m)    ratio of monthly-to-annual pan evaporation rate for
 c                   ET zone i and month m (m=1,12)
 c  fdmgd(i)      cumulative yearly average total fog drip for simulation i
 c                   (i=1,nsim), in Mgal/d
-c  fogeff(i)     fog-catch efficiency of vegetation; the ratio of the amount of fog 
-c                deposition on vegetation to the amount of fog deposition on a standard 
+c  fogeff(i)     fog-catch efficiency of vegetation; the ratio of the amount of fog
+c                deposition on vegetation to the amount of fog deposition on a standard
 c                cylindrical fog gage (i=1,nlu)
 c  frg(m,i,j,k)  fragment for month m, rainfall zone i, fragment set j, and day k
 c                   m=1,12; i=1,nrfz(m); j=1,nmbrrfz; k=1,31
@@ -372,8 +372,8 @@ c.....dso20180511 add next common statement for FAO output
       open(2,file='output\hi_wb2.out')
       open(3,file='output\hi_wb3.out')
       open(4,file='output\hi_wb4.out')
-      open(5,file='output\fields_selected.out')
-      open(7,file='output\frag_sequence.out')
+      open(55,file='output\fields_selected.out')
+      open(77,file='output\frag_sequence.out')
 
 c.....read input data
       call input
@@ -439,7 +439,7 @@ c.....dso20180509 add following ALLOCATE statement
       write(2,2000)
       write(3,3000)
       write(4,4000)
-      write(7,9300)
+      write(77,9300)
 
 c.....compute desired number of water-budget simulations
       do 300 i=1,nsim
@@ -453,7 +453,7 @@ c........determine field configuration (furrow, drip, nonirrigated)
             call fields
             write(*,9000)i
         endif
-        
+
 c........select fragments to use for current simulation
          call fraguse
          write(*,9100)i
@@ -465,7 +465,7 @@ c........compute water budget by polygon for desired number of years
      1        ae2,rc2,ae3,rc3,ae4,rc4,direct,zpnet,zcanint,zrfadj,
      2        zseptic,zsd,yrlyrech)
 
-            
+
 c...........keep running yearly averages
             do m=1,12
                rfmgd(i)=rfmgd(i)+zrf(m)*area(j)/
@@ -570,7 +570,7 @@ c     by polygon (average of nsim runs in inches)
       call FAO_post
 
  1000 format('Output file generated by HI_WB.f version 3.10',/)
- 
+
  1100 format(/,
      1       'Water-budget summary (Mgal/d) for 4 AE/PE models',//,
      2       137('-'),/,
@@ -579,25 +579,25 @@ c     by polygon (average of nsim runs in inches)
      4       'Sim.    Rainfall       Fog      Irrig.     Runoff      ',
      5       'AE      Recharge      AE      Recharge      AE      ',
      6       'Recharge      AE      Recharge',/,137('-'))
- 
+
  1200 format(i4,1x,12(2x,f9.3))
 
  2000 format('MO     POLY-ID  LC    IRC    AQSYS    AREA, m^2     ',
      1       '   RF',
 c    2       '     FOG      RO     IRR       DIR_RC     AE1     RC1',
      2       '     FOG     IRR      RO     DIR_RC     AE1     RC1',
-     3       '     AE2     RC2     AE3     RC3     AE4     RC4',     
+     3       '     AE2     RC2     AE3     RC3     AE4     RC4',
      4       '    PNET    CINT   RFADJ     SEP    SDRN')
- 
+
  2100 format(i2,2x,i10,2x,i2,2x,i6,2x,i6,2x,f11.2,2x,4(1x,f7.3),
      1       1x,f10.3,13(1x,f7.3))
  3000 format('MO     POLY-ID  LC FIELD STAGE    AREA, m^2     ',
      1       '  RF',
      2       '    FOG     IRR      RO     AE1     RC1',
      3       '    AE2     RC2     AE3     RC3     AE4     RC4')
- 
+
  3100 format(i2,2x,i10,2x,i2,2x,i4,2x,i4,2x,f11.2,2x,12(1x,f7.3))
- 
+
  4000 format('  SIM YRS     POLY    AREA,m^2  LU SOIL    SMC',
      1    '  PERV     RAINFALL     FOG DRIP       IRRIG.       SEPTIC',
      2    '     DIR RECH       RUN-ON       RUNOFF      CAN INT',
@@ -612,7 +612,7 @@ c    2       '     FOG      RO     IRR       DIR_RC     AE1     RC1',
  9200 format(' Simulation no. ',i3,', ',i6,' of ',i6,
      1       ' polygons complete')
  9300 format('simulation  month  frag_zone  year  random_number  '
-     1       'selected_set')      
+     1       'selected_set')
 
       stop
       end
@@ -648,10 +648,10 @@ c----------------------------------------------------------------------------
      1          irrday(20,31),nirrdays(20,12),irrsug(50000)
       dimension idays(12),f(32),wf(25),etwt(12),nrfzcro(12,50,50)
       dimension ceint(6)
-    
+
       data idays/31,28,31,30,31,30,31,31,30,31,30,31/
       data ilusug/3*0/
- 
+
       common /consti/nsim,nyrs,ndirr,ndunirr,ndfallow,id1,irfweights,
      1    nddrip,iddrip,ndfurrow,idfurrow,ndsug,istartyr,iendyr,nilusug,
      2    isugarirr,ipineirr,imacirr,istormdrain,iluper,icim,irfnorm,
@@ -679,7 +679,7 @@ c----------------------------------------------------------------------------
       common /npfog/slpnpfog,yintnpfog
       common /canint/gashcal,ceint,ifm
       common /nprint/jprint,iprint
-      
+
 c.....open main input file
       open(10,file='HI_wb.in')
 
@@ -692,7 +692,7 @@ c.....read information from main input file
 c.....read in number of simulations desired
       read(10,*)nsim
       write(1,1000)nsim
-      
+
 c.....read in number of years desired for each simulation
       read(10,*)nyrs
       write(1,1010)nyrs
@@ -702,17 +702,17 @@ c.....read in start year
       iendyr=istartyr+nyrs-1
       write(1,1011)istartyr,iendyr
 
-c.....read in land-cover period code    
+c.....read in land-cover period code
       read(10,*)iluper
       write(1,1012)iluper
 
 c.....read no. of sugarcane land-cover codes
       read(10,*)nilusug
       if(nilusug.gt.3)then
-        write(8,*)'ABORTING--NUMBER OF SUGARCANE LAND-COVER CODES', 
+        write(8,*)'ABORTING--NUMBER OF SUGARCANE LAND-COVER CODES',
      1            ' CANNOT EXCEED 3'
         stop
-      endif  
+      endif
       write(1,1013)nilusug
 
 c.....read in sugarcane land-cover codes, if any
@@ -723,7 +723,7 @@ c.....read in sugarcane land-cover codes, if any
         end do
       else
         read(10,*)junk1
-      endif       
+      endif
 
 c.....read in land-cover code for corn
       read(10,*)ilucorn
@@ -744,7 +744,7 @@ c.....read in land-cover code for zero-recharge water body
 c.....read in land-cover code for taro
       read(10,*)ilutaro
       write(1,1021)ilutaro
-      
+
 c.....read in fraction of taro land cover in production
       read(10,*)tarofrac
       write(1,1022)tarofrac
@@ -789,22 +789,22 @@ c.....read in disposal well discharge rate (MGD)
       read(10,*)dwrate
       write(1,1210)dwrate
 
-c.....read in canopy-interception method      
+c.....read in canopy-interception method
       read(10,*)icim
       write(1,1220)icim
 
 c.....read in constant A or C in canopy-interception simulating equation
       read(10,*)constAC
       write(1,1230)constAC
-      
+
 c.....read in constant B or D in canopy-interception simulating equation
       read(10,*)constBD
       write(1,1240)constBD
-         
+
 c.....read in rainfall data type code (0-month-year rainfall grids, 1-polygon-based normals)
       read(10,*)irfnorm
       write(1,1241)irfnorm
-      
+
 c.....read in number of rainfall grid files
       read(10,*)irfnf
       write(1,1242)irfnf
@@ -816,36 +816,36 @@ c.....read in number of months represented in rainfall grid files
 c.....read in start year of rainfall grid files
       read(10,*)irfstyr
       write(1,1244)irfstyr
-            
+
 c.....read in monthly rainfall coefficients indicator (0-no coefficients used, 1-coefficients used)
       read(10,*)irfweights
       write(1,1250)irfweights
-      
+
 c.....read in runoff data type (0-variable monthly RO:RF ratios, 1-constant monthly RO:RF ratios)
       read(10,*)irotype
       write(1,1251)irotype
-      
+
       if(irotype.eq.0.and.irfnorm.ne.0)then
-        write(8,*)'ABORTING--variable monthly rainfall must be used', 
+        write(8,*)'ABORTING--variable monthly rainfall must be used',
      1            ' with variable monthly runoff-to rainfall ratios'
         stop
-      endif        
+      endif
 
 c.....read in polygon print-out interval for every-simulation output file (hi_wb4.out)
       read(10,*)iprint
       write(1,1260)iprint
-      
+
 c.....read in yearly recharge output code (1-yearly output,0-no yearly output)(30 years max; modified to 200 max dso20180509)
       read(10,*)irechyrly
       write(1,1270)irechyrly
 
 c.....read in names of input files********************************************************************
 
-c.....read in name of main polygon input file 
+c.....read in name of main polygon input file
       read(10,'(a50)')fpoly
       write(1,2010)fpoly
 
-c.....read in name of land-cover input file 
+c.....read in name of land-cover input file
       read(10,'(a50)')fland
       write(1,2020)fland
 
@@ -887,17 +887,17 @@ c.....read in name of file with monthly observed-to-normal rainfall ratios
         write(8,*)'ABORTING--RAINFALL DATA TYPE CODE MUST BE 1 OR 0'
         stop
       endif
-      
+
 c.....read in name(s) of runoff files
       if(irotype.eq.0)then
 c.....read in the name of file variable monthly runoff filenames
         read(10,'(a50)')fronames
-        write(1,2101)fronames 
+        write(1,2101)fronames
       elseif(irotype.eq.1)then
-c.....read in name of constant monthly rainfall-runoff ratio file 
+c.....read in name of constant monthly rainfall-runoff ratio file
         read(10,'(a50)')frunoff
         write(1,2030)frunoff
-      endif          
+      endif
 
 c.....read in name of sugarcane file if sugarcane is present
       if(nilusug.ne.0)then
@@ -909,10 +909,10 @@ c.....read in name of modified Gash model file
       if(icim.eq.2)then
          read(10,'(a50)')fgash
          write(1,2091)fgash
-      endif  
- 
-  
-      open(6,file='output\rainfiles.out')
+      endif
+
+
+      open(66,file='output\rainfiles.out')
 
       write(1,*)
       write(1,*)
@@ -935,13 +935,13 @@ c     open(13,file=frunoff)
       else
         open(22,file=frainnames)
         open(23,file=frfweights)
-      endif    
+      endif
       if(icim.eq.2)open(20,file=fgash)
       if(irotype.eq.0)then
         open(25,file=fronames)
         open(26,file='output\rofiles.out')
       endif
-        
+
 c.....read polygon information
       i=1
       nplant=0
@@ -950,7 +950,7 @@ c.....read polygon information
      2   ifogelev(i),irfzone(i),iwatmain(i),idispwell(i),icpsepsewer(i),
      3   cprate(i),iasys(i),iplant(i),ifld(i),perv(i),isdrain(i),
      4   canfrac(i),tfrac(i),cerf(i)
-     
+
       if(iplant(i).gt.nplant)nplant=iplant(i)
       ilu(i)=ilup(i,iluper)
       i=i+1
@@ -961,8 +961,8 @@ c.....initialize monthly rainfall weighting factor arrays
       do 259 k=1,50000
       do 259 m=1,12
         rfwt(k,m)=1.
- 259  continue    
-      
+ 259  continue
+
         do 260 i=1,50
         do 260 j=1,100
         do 260 k=1,12
@@ -974,31 +974,31 @@ c.....read in rainfall data based on format of data
 c.....read in rainfall month-year grid data
         icount=0
   8     read(22,'(a)',end=911)rainfile
-        write(6,*)rainfile
+        write(66,*)rainfile
         open(35,file=rainfile)
         icount=icount+1
         k=36*icount
   9     if(icount.eq.irfnf) then
             read(35,*,end=10)j,(rfmon(j,m),m=k-35,irfnm)
-        else    
+        else
             read(35,*,end=10)j,(rfmon(j,m),m=k-35,k)
         endif
-        goto 9      
-10      continue       
-        close(35)  
+        goto 9
+10      continue
+        close(35)
         goto 8
-911     continue      
+911     continue
         nrfcells=j
         if(irfweights.eq.1)then
 c.......read monthly rainfall weighting factors
   20        read(23,*,end=320)irc,(rfwt(irc,j),j=1,12)
             goto 20
  320        continue
-            write(*,*)'mwf read'        
-        endif 
+            write(*,*)'mwf read'
+        endif
       elseif(irfnorm.eq.1)then
 c.....read in polygon-based rainfall normal data....................................................................................................................................
-  21    read(24,*,end=321)ipol,(rfnorm(ipol,k),k=1,12)    
+  21    read(24,*,end=321)ipol,(rfnorm(ipol,k),k=1,12)
         goto 21
  321    continue
         if(irfweights.eq.1)then
@@ -1018,10 +1018,10 @@ c.......read monthly rainfall weighting factors
             if(iendyr.gt.maxrfyr)then
                write(8,*)'ABORTING--NOT ENOUGH MONTHLY RAINFALL WEIGHTS'
                stop
-            endif   
-            write(*,*)'mwf read'        
-           endif           
-       endif    
+            endif
+            write(*,*)'mwf read'
+           endif
+       endif
 
 c.....read in land-cover codes and associated information
       i=1
@@ -1042,9 +1042,9 @@ c.....read in land-cover codes and associated information
 
       i=i+1
       goto 12
-      
+
  912  nlu=i-1
-      
+
       if(irotype.eq.0)then
 c.....read in variable runoff month-year grid data
         icount=0
@@ -1055,15 +1055,15 @@ c.....read in variable runoff month-year grid data
         k=36*icount
 109     if(icount.eq.irfnf) then
             read(99,*,end=110)j,(romon(j,m),m=k-35,irfnm)
-        else    
+        else
             read(99,*,end=110)j,(romon(j,m),m=k-35,k)
         endif
-        goto 109      
-110     continue       
-        close(26)  
+        goto 109
+110     continue
+        close(26)
         goto 108
-1911    continue      
-        nrocells=j      
+1911    continue
+        nrocells=j
       elseif(irotype.eq.1)then
 c.....read in constant monthly runoff-to-rainfall ratios by runoff-zone code
         i=1
@@ -1115,7 +1115,7 @@ c.....initialize fragment arrays and then read in fragments
          frg(m,i,j,k)=9999.
  220  continue
  15   read(15,*,end=915)mo,irfz,iseq,(f(k),k=1,31)
-      
+
       if(iseq.gt.nfr(mo,irfz))nfr(mo,irfz)=iseq
 c.....dso20180509 modify section for fragment adjustment
       frsum=0.d0
@@ -1146,7 +1146,7 @@ c.....read monthly:annual pan evaporation ratios for each ET zone
  17   read(17,*,end=917)netz,(etwt(m),m=1,12)
       do m=1,12
          etmwf(netz,m)=etwt(m)
-      end do 
+      end do
       goto 17
  917  continue
 
@@ -1159,7 +1159,7 @@ c.....daily fog=fdrfratio*fogeff*daily rainfall, in/d per in/d
       goto 18
  318  continue
 
-c.....read irrigation file 
+c.....read irrigation file
  19   read(19,*,end=319)ic,idemsup(ic),supirr(ic),rmltirr(ic),
      1   effirr(ic),(irrday(ic,id),id=1,31)
       if(idemsup(ic).eq.1.and.supirr(ic).ne.0)then
@@ -1167,20 +1167,20 @@ c.....read irrigation file
          stop
       endif
       goto 19
- 319  continue 
-        
+ 319  continue
+
         j=1
         k=1
         m=1
-        do j=1,20 
+        do j=1,20
             do m=1,12
                 ndays=idays(m)
                 do k=1,ndays
                      nirrdays(j,m)=nirrdays(j,m)+irrday(j,k)
                 end do
-            end do   
-        end do     
-        
+            end do
+        end do
+
 c.....read sugarcane file if sugarcane is present
       if(nilusug.ne.0)then
       do n=1,3
@@ -1208,19 +1208,19 @@ c.....read sugarcane file if sugarcane is present
         write(1,1080)ndfallow
       endif
       end do
-      endif  
+      endif
 
       i=1
 c.... read modified Gash-model file if Gash method is selcted
       if(icim.eq.2)then
         read(20,*)ifm,(ceint(i),i=1,6),gashcal
       endif
-      
+
 c.....close files
 c     do i=11,64
 c        close(i)
 c     end do
- 
+
  1000 format(i10,t60,  ': Number of simulations')
  1010 format(i10,t60,  ': Number of years in each simulation')
  1011 format(i10,t60,  ': Starting year of simulation',/,
@@ -1254,7 +1254,7 @@ c     end do
  1120 format(19i3,t60, ': Drip irrigation days in each month')
  1130 format(28i3)
  1140 format(i10,t60,  ': Number of furrow irrigation days per month',
-     1   '( list on next line)') 
+     1   '( list on next line)')
  1150 format(19i3,t60, ': Furrow irrigation days in each month')
  1151 format(f10.3,t60, ': Drip irrigation efficiency')
  1152 format(f10.3,t60, ': Furrow irrigation efficiency')
@@ -1281,7 +1281,7 @@ c     end do
  1210 format(f10.3,t60,
      1   ': Kealakehe disposal well discharge rate, MGD')
  1220 format(i10,t60,
-     1   ': canopy-interception method')    
+     1   ': canopy-interception method')
  1230 format(f10.5,t60,
      1   ': constant A or C in canopy-interception simulation equation')
  1240 format(f10.5,t60,
@@ -1294,7 +1294,7 @@ c     end do
  1243 format(i10,t60,
      1   ': number of months represented in rainfall grid files')
  1244 format(i10,t60,
-     1   ': start year of rainfall grid files') 
+     1   ': start year of rainfall grid files')
  1250 format(i10,t60,
      1   ': monthly RF weighting factor code (0-no weights,1-weights)')
  1251 format(i10,t60,
@@ -1450,7 +1450,7 @@ c.....compute soil-moisture storage capacity by polygon
          root=rd(ilu(ip))
          smc(ip)=smca(isoil(ip),nint(root))
  600  continue
- 
+
       write(*,*)'smccalc ran'
 
       open (50,file='output\smc.out')
@@ -1458,7 +1458,7 @@ c.....compute soil-moisture storage capacity by polygon
 
       do 700 ip=1,npoly
          write(50,1650)ip,smc(ip)
- 700  continue 
+ 700  continue
 
  1650 format(i6,2x,f7.2)
 
@@ -1470,7 +1470,7 @@ c----------------------------------------------------------------------------
 
 c  subroutine to select initial sugarcane-field configuration for each plantation
 c
-c  assumes approximately half of field area in each plantation is in one 
+c  assumes approximately half of field area in each plantation is in one
 c  stage of growth and the other half are in another stage of growth:
 c
 c  must know how many fields of each type, area of each field
@@ -1517,7 +1517,7 @@ c.....determine number and area of fields of each sugarcane plantation
          aplant(i)=0.
          nfld(i)=0
  100  continue
- 
+
       do 120 j=1,nilusug
       do 120 i=1,npoly
          if(ilu(i).eq.ilusug(j).and.iplant(i).ne.0)then
@@ -1529,9 +1529,9 @@ c.....determine number and area of fields of each sugarcane plantation
 
       do 125 i=1,nplant
       do 125 j=1,nfld(i)
-         write(5,'(2i6,2x,f12.2)')i,j,afld(i,j)
+         write(55,'(2i6,2x,f12.2)')i,j,afld(i,j)
  125  continue
-      write(5,*)'field number and area calc complete'
+      write(55,*)'field number and area calc complete'
 
 c.....select ~50% (by area) of fields (within prescribed tolerance) of
 c     each irrigation type.
@@ -1556,7 +1556,7 @@ c........initialize variables
             icrop1(i,j)=0
             ahalf=0
  340     continue
- 
+
          do 380 j=1,nfld(i)
 c...........randomly select a field
  3          ino=ino+9999
@@ -1573,7 +1573,7 @@ c...........check if ~50% of field area selected
             if(ahalf.gt.(0.5-tol)*aplant(i).and.
      1         ahalf.lt.(0.5+tol)*aplant(i))then
 c..............exit loop, about 50% of area (within tolerance) selected
-               write(5,'(i1,2x,2f12.1,2x,f5.3)')i,ahalf,aplant(i),tol
+               write(55,'(i1,2x,2f12.1,2x,f5.3)')i,ahalf,aplant(i),tol
                goto 385
             elseif(ahalf.ge.(0.5+tol)*aplant(i))then
 c..............more than 50% (plus tolerance) of area selected
@@ -1596,13 +1596,13 @@ c              of area selected
  385     continue
 
          do 386 j=1,nfld(i)
-            write(5,'(3i6)')i,j,icrop1(i,j)
+            write(55,'(3i6)')i,j,icrop1(i,j)
  386     continue
 
 
  400  continue
-      write(5,*)
-      write(5,*)
+      write(55,*)
+      write(55,*)
 
 c.....determine crop stage by polygon
       do 540 i=1,npoly
@@ -1631,7 +1631,7 @@ c  subroutine to select fragments to be used in water-budget simulation
 c
 c  assume that the same fragment sets are to be used for a particular
 c  fragment zone and month
-    
+
       implicit real*8 (a-h,o-z)
 
       real*4 rn
@@ -1663,15 +1663,15 @@ c     be selected more than once
          rn=ran(ino)
          if(rn.gt.0.99999999)rn=0.9999
          jfr(m,j,i)=int(nfr(m,j)*rn)+1
-         write(7,901)isimulation,m,j,i,rn,jfr(m,j,i)
+         write(77,901)isimulation,m,j,i,rn,jfr(m,j,i)
  100  continue
- 901  format(i2,1x,i2,1x,i3,1x,i2,1x,f10.8,1x,i4) 
-         
+ 901  format(i2,1x,i2,1x,i3,1x,i2,1x,f10.8,1x,i4)
+
       return
       end
 
 c----------------------------------------------------------------------------
-     
+
       subroutine pcoef(ip,ndc,pc)
 
 c  subroutine to determine daily pan coefficient for current polygon
@@ -1781,7 +1781,7 @@ c     5   totrc4a(12),totseptic(12),totsd(12),yrlyrech(590000,30)
 c.....dso20180509 add following dimension statement for lblyr array
       dimension lblyr(200)
 c.....dso20180509 add following dimension statement for yrlyrech array
-      dimension yrlyrech(npoly,nsim)
+      dimension yrlyrech(npoly,nyrs)
 
       common /consti/nsim,nyrs,ndirr,ndunirr,ndfallow,id1,irfweights,
      1    nddrip,iddrip,ndfurrow,idfurrow,ndsug,istartyr,iendyr,nilusug,
@@ -1812,7 +1812,7 @@ c.....dso20180509 add following dimension statement for yrlyrech array
       common /canint/gashcal,ceint,ifm
       common /nprint/jprint,iprint
 
-      data idays/31,28,31,30,31,30,31,31,30,31,30,31/      
+      data idays/31,28,31,30,31,30,31,31,30,31,30,31/
 
 c.....dso20180509 add following if-endif section
       if(irechyrly.eq.1.and.ip.eq.1.and.isim.eq.1)then
@@ -1826,9 +1826,9 @@ c.....dso20180509 add following if-endif section
  17      continue
          write(43,4200)(lblyr(iyrs),iyrs=istartyr,iendyr)
       endif
-      
+
       icorncheck=1
-      
+
 c.....initialize total water budget arrays for each polygon
 10    do 20 m=1,12
          totrf(m)=0.
@@ -1854,7 +1854,7 @@ c.....initialize total water budget arrays for each polygon
 
       polypan=0.
       rechann=0.
-      
+
 c.....initialize direct-recharge totals
       watermain=0.
       dispwell=0.
@@ -1869,12 +1869,12 @@ c.....initialize root depth
 c.....set previous day's rain and fog to zero (can affect canopy interception)
       drfy=0.d0
       dfogy=0.d0
-      
+
 c.....determine if polygon land cover is fog forest and adjust pan coefficient by changing land-cover code
 !      if(ilu(ip).eq.10.and.ifog(ip).eq.1)ilu(ip)=18
 !      if(ilu(ip).eq.11.and.ifog(ip).eq.1)ilu(ip)=19
 !      if(ilu(ip).eq.17.and.ifog(ip).eq.1)ilu(ip)=20
-      
+
 c.....determine soil-moisture storage capacity values
       smctb=smca(isoil(ip),nint(root))
       smct=smca(isoil(ip),nint(rd0))
@@ -1886,14 +1886,14 @@ c.....initialize values for Veihmeyer model
       sm1t=smct*sm0
       sm1b=sm1-sm1t
       sm1begin=sm1
-      
+
 
 c.....initialize values for FAO model
       sm2=smctb*sm0
       sm2t=smct*sm0
       sm2b=sm2-sm2t
       sm2begin=sm2
-      
+
 c.....determine FAO unadjusted root constant (see FAO 56, table 22)
 c     program adjusts below for crop PE (p. 162)
 c     user may consider adjustments for soil texture (p. 167)
@@ -1904,13 +1904,13 @@ c.....initialize values for Giambelluca model
       sm3t=smct*sm0
       sm3b=sm3-sm3t
       sm3begin=sm3
-      
+
 c.....initialize values for Thornthwaite model
       sm4=smctb*sm0
       sm4t=smct*sm0
       sm4b=sm4-sm4t
       sm4begin=sm4
- 
+
 c.....determine initial day in the initial sugarcane irrigation cycle
       do n=1,3
        if(ilu(ip).eq.ilusug(n))then
@@ -1921,7 +1921,7 @@ c.....determine initial day in the initial sugarcane irrigation cycle
 
 c.....assume pan coefficient cycle starts on initial day, except if sugar
       ndpcyc=1
-      
+
       do n=1,3
        if(ilu(ip).eq.ilusug(n))ndpcyc=ndicyc
       end do
@@ -1935,7 +1935,7 @@ c........determine number of days in the month (ignore leap year)
          nd=idays(m)
 c........to include leap year uncomment line below AND modify program
 c        if(m.eq.2.and.mod(i,4).eq.0)nd=nd+1
-          
+
           if(irfnorm.eq.0)then
 c........determine rainfall for current month from month-year rainfall grid data
           monthrf=m+(istartyr+(i-1)-irfstyr)*12
@@ -1949,13 +1949,13 @@ c.........apply monthly rainfall weighting factor if indicated
           elseif(irfnorm.eq.1)then
 c........determine rainfall for current month from rainfall normal data
             mrf=rfnorm(ip,m)
-          
+
 c.........apply monthly rainfall weighting factor if indicated
             if(irfweights.eq.1)then
                 mrf=mrf*rfwtmon(irfcell(ip),i,m)
             endif
-          endif  
-          
+          endif
+
 c........determine runoff for current month
           if(irotype.eq.0)then
             ro=romon(iro(ip),monthrf)*mrf
@@ -1993,13 +1993,13 @@ c...........determine monthly net precipitation if canopy-interception method 1 
 !     1              fdrfratio(ifog(ip),ifogelev(ip),m))
 !                fog=fdrfratio(ifog(ip),ifogelev(ip),m)*
 !     1              fogeff(ilu(ip))*mrfa
-!                
+!
 !c...........adjust rainfall for forested areas outside fog zone
 !              elseif(ilu(ip).eq.10.or.ilu(ip).eq.11
 !     1               .or.ilu(ip).eq.17)then
 !                mrfa=ro/yintnpfog
-!                
-!c...........adjust rainfall for all other circumstances                
+!
+!c...........adjust rainfall for all other circumstances
 !              else
 !                mrfa=ro
 !              endif
@@ -2011,7 +2011,7 @@ c...........compute canopy interception for month
 !          canint=mrf+fog-pnet
 
 c...........check if rainfall is above limit for canopy evaporation to occur
-!          if(ifog(ip).gt.0)then  
+!          if(ifog(ip).gt.0)then
 !            raincheck=(1+fdrfratio(ifog(ip),ifogelev(ip),m)-yintnpfog)/
 !     1                (slpnpfog*fdrfratio(ifog(ip),ifogelev(ip),m))
 !
@@ -2020,7 +2020,7 @@ c...........check if rainfall is above limit for canopy evaporation to occur
 !                canint=0.d0
 !                pnet=mrf+fog
 !            endif
-!          endif     
+!          endif
 
 c........determine daily pan evaporation rate for current month
 
@@ -2054,7 +2054,7 @@ c...........determine daily net precipitation and canopy interception...........
                             ceint2=1.
                         endif
                     elseif(ifm.eq.3)then
-                        ceint2=exp(ceint(6)*(drfy+dfogy))               
+                        ceint2=exp(ceint(6)*(drfy+dfogy))
                     else
                         ceint2=1.
                     endif
@@ -2076,7 +2076,7 @@ c...........determine daily net precipitation and canopy interception...........
                 dcanint=drf+dfog+dpnet
               else
                 dpnet=frg(m,irfzone(ip),jfr(m,irfzone(ip),i),k)*pnet
-              endif  
+              endif
             else
               dpnet=drf+dfog
             endif
@@ -2093,11 +2093,11 @@ c...........determine mean daily potential et
             if(ilu(ip).eq.ilucorn.and.icorncheck.eq.1)then
                 pe=0.25*pan
             elseif(ilu(ip).eq.ilusug(1).or.ilu(ip).eq.ilusug(2).or.
-     1             ilu(ip).eq.ilusug(3))then   
+     1             ilu(ip).eq.ilusug(3))then
                 call pcoef(ip,ndpcyc,pc)
                 pe=pc*pan
             else
-                pe=pancoef(ilu(ip),m)*pan   
+                pe=pancoef(ilu(ip),m)*pan
             endif
 
 c...........determine irrigation and root depth for current polygon
@@ -2105,7 +2105,7 @@ c...........determine irrigation and root depth for current polygon
 
             if(irrcode(ilu(ip)).gt.0)then
                 if(ilu(ip).eq.ilusug(1).or.ilu(ip).eq.ilusug(2).or.
-     1             ilu(ip).eq.ilusug(3))then   
+     1             ilu(ip).eq.ilusug(3))then
                     if(irrsug(ndicyc).eq.-1)then
                             root=rd0
                     elseif(irrsug(ndicyc).eq.1.and.
@@ -2117,23 +2117,23 @@ c...........determine irrigation and root depth for current polygon
                         elseif(idemsup(irrcode(ilu(ip))).eq.2)then
                             agirr=rmltirr(irrcode(ilu(ip)))*
      1                      supirr(irrcode(ilu(ip)))/
-     2                      (effirr(irrcode(ilu(ip)))* 
+     2                      (effirr(irrcode(ilu(ip)))*
      3                      dfloat(nirrdays(irrcode(ilu(ip)),m)))
                         endif
-                    endif    
+                    endif
                 else
                     if(irrday(irrcode(ilu(ip)),k).eq.1)then
                         if(idemsup(irrcode(ilu(ip))).eq.1)then
                             agirr=rmltirr(irrcode(ilu(ip)))*
-     1                      (pe*nd-mrf+ro)/(effirr(irrcode(ilu(ip)))* 
+     1                      (pe*nd-mrf+ro)/(effirr(irrcode(ilu(ip)))*
      2                      dfloat(nirrdays(irrcode(ilu(ip)),m)))
                         elseif(idemsup(irrcode(ilu(ip))).eq.2)then
                             agirr=rmltirr(irrcode(ilu(ip)))*
      1                      supirr(irrcode(ilu(ip)))/
-     2                      (effirr(irrcode(ilu(ip)))* 
+     2                      (effirr(irrcode(ilu(ip)))*
      3                      dfloat(nirrdays(irrcode(ilu(ip)),m)))
                         endif
-                    endif    
+                    endif
                 endif
             endif
 
@@ -2165,8 +2165,8 @@ c...........update cumulative water-budget component totals
 c...........check if current polygon is a water body or reservoir
             if(ilu(ip).eq.iluwater.or.ilu(ip).eq.ilures
      1         .or.ilu(ip).eq.iluzrwb)then
-    
-c..............initialize yearly totals    
+
+c..............initialize yearly totals
                if(i.eq.nyrs.and.k.eq.nd)then
                   sm1begin=0.
                   sm2begin=0.
@@ -2193,7 +2193,7 @@ c..............initialize yearly totals
                endif
                goto 300
             endif
-        
+
 c...........account for recharge from leaking water mains
             if(iwatmain(ip).eq.1)then
                watermain=watermain+wmleak
@@ -2253,7 +2253,7 @@ c.....................account for presence of storm drains in urban areas
                       if(istormdrain.eq.1.and.isdrain(ip).eq.1.and.
      1                isd(ilu(ip)).eq.1)then
                          wstormdrain=wadd
-                         wadd=0.  
+                         wadd=0.
                          totsd(m)=totsd(m)+wstormdrain
                       endif
                else
@@ -2276,7 +2276,7 @@ c...........update run-on total over entire area
 c...........special irrigation rate for taro
             if(ilu(ip).eq.ilutaro)then
                 totirr(m)=totirr(m)+tarorc*tarofrac/365.0
-            endif    
+            endif
 
 c...........VEIHMEYER'S MODEL
 
@@ -2347,7 +2347,7 @@ c...........special water-budget calculations for taro..........................
             if(ilu(ip).eq.ilutaro)then
                 ae=ae*(1.0-tarofrac)+pan*tarofrac
                 rc=rc*(1.0-tarofrac)+tarorc*tarofrac/365.0
-            endif    
+            endif
 
 c...........update totals over entire area
             totae1(m)=totae1(m)+ae+aepaved*(1-perv(ip))
@@ -2364,7 +2364,7 @@ c     4   dro,ae+aepaved*(1-perv(ip)),rc,sm1,wb
 c 4100 format(i3,1x,i5,1x,f10.2,1x,f5.2,1x,i2,1x,i3,1x,5i3,1x,i4,1x,
 c     1   2f5.1,i4,1x,f4.2,1x,2f6.2,4x,9f6.2,2x,f6.3)
 c            endif
-        
+
 
 c...........FAO 56 ROOT CONSTANT MODEL
 
@@ -2483,7 +2483,7 @@ c.................entire day at less than full pe
                   sm2b=0.
                endif
             endif
-            
+
 c...........adjust budget components for total area
             ae=ae*perv(ip)
             rc=rc*perv(ip)
@@ -2492,7 +2492,7 @@ c...........special water-budget calculations for taro..........................
             if(ilu(ip).eq.ilutaro)then
                 ae=ae*(1.0-tarofrac)+pan*tarofrac
                 rc=rc*(1.0-tarofrac)+tarorc*tarofrac/365.0
-            endif    
+            endif
 
 c...........update totals over entire area
             totae2(m)=totae2(m)+ae+aepaved*(1-perv(ip))
@@ -2633,7 +2633,7 @@ c...........special water-budget calculations for taro..........................
             if(ilu(ip).eq.ilutaro)then
                 ae=ae*(1.0-tarofrac)+pan*tarofrac
                 rc=rc*(1.0-tarofrac)+tarorc*tarofrac/365.0
-            endif    
+            endif
 
 c...........update totals over entire area
             totae3(m)=totae3(m)+ae+aepaved*(1-perv(ip))
@@ -2697,7 +2697,7 @@ c..............planted period, use 1-layer model
      1            + wadd ) / perv(ip)
                if(x1.lt.0)x1=0
                if(smctb.eq.0.0)then
-                  ae=0.0 
+                  ae=0.0
                elseif(x1.gt.smctb)then
 c.................compute time (d) for full pe
                   if(pe.gt.0.)then
@@ -2744,27 +2744,27 @@ c...........special water-budget calculations for taro..........................
             if(ilu(ip).eq.ilutaro)then
                 ae=ae*(1.0-tarofrac)+pan*tarofrac
                 rc=rc*(1.0-tarofrac)+tarorc*tarofrac/365.0
-            endif    
-                
+            endif
+
 c...........update totals over entire area
             totae4(m)=totae4(m)+ae+aepaved*(1-perv(ip))
             totrc4(m)=totrc4(m)+rc
 
 c...........reset root depth
-            root=rd(ilu(ip)) 
- 
+            root=rd(ilu(ip))
+
 c...........save today's rain and fog as yesterday's rain and fog
             drfy=drf
-            dfogy=dfog 
- 
+            dfogy=dfog
+
  300     continue
 
 c.....keep yearly FAO recharge estimates
           yrlyrech(ip,i)=yrlyrech(ip,i)+rechann/dfloat(nsim)
           rechann=0.
- 
+
  400  continue
- 
+
 c.....Check if land cover is seed corn and run simulation again for same polygon with fallow land properties.
 c.....Recharge and AE are then computed for 25% of polygon area seed corn and 75% fallow
       if(ilu(ip).eq.ilucorn.and.i.eq.nyrs)then
@@ -2780,7 +2780,7 @@ c.....Recharge and AE are then computed for 25% of polygon area seed corn and 75
                 totrc4(j)=0.75*totrc4a(j)+0.25*totrc4(j)
                 totirr(j)=0.25*totirr(j)
             end do
-        else       
+        else
             do n=1,12
                 totae1a(n)=totae1(n)
                 totrc1a(n)=totrc1(n)
@@ -2809,13 +2809,13 @@ c            if(ip.eq.1)write(43,4200)
             do j=1,nyrs
                 yrlyrech(ip,j)=resrc
             end do
-            write(43,4300)ip,(yrlyrech(ip,j),j=1,nyrs),resrc  
+            write(43,4300)ip,(yrlyrech(ip,j),j=1,nyrs),resrc
         elseif(ilu(ip).eq.ilutaro.and.i.eq.1.and.isim.eq.nsim)then
 c            if(ip.eq.1)write(43,4200)
             do j=1,nyrs
                 yrlyrech(ip,j)=tarorc
             end do
-            write(43,4300)ip,(yrlyrech(ip,j),j=1,nyrs),tarorc     
+            write(43,4300)ip,(yrlyrech(ip,j),j=1,nyrs),tarorc
 
 c.....write yearly FAO recharge estimates during last simulation if not water body
         elseif(isim.eq.nsim.and.i.eq.nyrs)then
@@ -2825,11 +2825,11 @@ c            if(ip.eq.1)write(43,4200)
                avgrech=avgrech+yrlyrech(ip,j)/dfloat(nyrs)
  420        continue
             write(43,4300)ip,(yrlyrech(ip,j),j=1,nyrs),avgrech
-        endif      
+        endif
       endif
-      
+
  500  continue
- 
+
  600  sm1begin=sm0*pavint*(1-perv(ip))+sm1begin*perv(ip)
       sm2begin=sm0*pavint*(1-perv(ip))+sm2begin*perv(ip)
       sm3begin=sm0*pavint*(1-perv(ip))+sm3begin*perv(ip)
@@ -2861,7 +2861,7 @@ c.....initialize polygon totals
 c.....sum direct recharge sources
       directrc=watermain+dispwell+cesspool
 
-c.....total monthly values for current polygon and simulation      
+c.....total monthly values for current polygon and simulation
       do 700 m=1,12
          polyrf=polyrf+totrf(m)
          polyfog=polyfog+totfog(m)
@@ -2881,7 +2881,7 @@ c.....total monthly values for current polygon and simulation
          polype=polype+totpe(m)
  700  continue
 
-c.....compute water balance on current simulation totals for each method 
+c.....compute water balance on current simulation totals for each method
       wb1=sm1begin+polyrf+polyfog+polyirr-polyro-polyae1-polyrc1-sm1end
      1-polysd-polycint+directrc+polysep
 
@@ -2901,12 +2901,12 @@ c.....water balance does not apply to water bodies, reservoirs, or taro
         wb2=0.
         wb3=0.
         wb4=0.
-      endif 
+      endif
 
 c.....output polygon information for current simulation
       if(ip.eq.1)jprint=1
       if(ip.eq.jprint)then
-         write(4,4100)isim,nyrs,ip,area(ip),ilu(ip),isoil(ip), 
+         write(4,4100)isim,nyrs,ip,area(ip),ilu(ip),isoil(ip),
      1      smc(ip),perv(ip),polyrf,polyfog,polyirr,polysep,directrc,
      2      polyron,polyro,polycint,polypan,polysd,polype/polypan,
      3      sm1begin,polyae1,polyrc1,sm1end,wb1,
@@ -2950,7 +2950,7 @@ c 4200 format('Poly_ID,Rech1,Rech2,Rech3,Rech4,Rech5,Rech6,Rech7,Rech8,',
 c     1       'Rech9,Rech10,Rech11,Rech12,Rech13,Rech14,Rech15,Rech16,',
 c     2       'Rech17,Rech18,Rech19,Rech20,Rech21,Rech22,Rech23,Rech24,',
 c     3       'Rech25,Rech26,Rech27,Rech28,Rech29,Rech30,')
- 4300 format(i7,300(',',f8.3))   
+ 4300 format(i7,300(',',f8.3))
 
       return
       end
@@ -2960,7 +2960,7 @@ c----------------------------------------------------------------------------
       subroutine FAO_post
 
 c.....This subroutine will take one output file from the Hawaii Water Budget Model,
-c.....hi_wb.ou2, which consists of monthly water budget values, and create files 
+c.....hi_wb.ou2, which consists of monthly water budget values, and create files
 c.....more easily imported into spreadsheet and Arc products than the .ou2 file. Results
 c.....using the FAO method summarized.
 
@@ -2987,7 +2987,7 @@ c     instead rely on internal values. Also used exact conversion factors.
      1     jansep,jansd,febsep,febsd,marsep,marsd,aprsep,aprsd,
      1     maysep,maysd,junsep,junsd,julsep,julsd,augsep,augsd,
      1     sepsep,sepsd,octsep,octsd,novsep,novsd,decsep,decsd
- 
+
       real*8 direct(12),totrf,totfog,totirr,totro,totae,totrc,
      1       totdirect,totpnet,totcint,totrfadj,totseptic,totsdrn,
      1       vtotrf,vtotfog,vtotirr,vtotro,vtotae,vtotrc,vtotdirect,
@@ -3016,7 +3016,7 @@ c     instead rely on internal values. Also used exact conversion factors.
      1     sepsep,sepsd,octsep,octsd,novsep,novsd,decsep,decsd
      1     /132*0.0/
 
-c.....dso20180511 added following dimension and common statements     
+c.....dso20180511 added following dimension and common statements
       dimension avrf(590000,12),avfd(590000,12),avir(590000,12),
      1   avro(590000,12),av1ae(590000,12),av2ae(590000,12),
      2   av3ae(590000,12),av4ae(590000,12),av1rc(590000,12),
@@ -3032,7 +3032,7 @@ c.....dso20180511 added following dimension and common statements
      6   irfcell(590000),ilup(590000,12),irrcode(50),rfnorm(590000,12),
      7   isdrain(590000),canfrac(590000),tfrac(590000),cerf(590000),
      8   romon(1000,1200),fdrfratio(500,100,12)
-     
+
       common /avgmo/avrf,avfd,avir,avro,av1ae,av2ae,av3ae,av4ae,
      1   av1rc,av2rc,av3rc,av4rc,avdirect,avpnet,avcanint,
      2   avrfadj,avseptic,avstrmdrn
@@ -3056,7 +3056,7 @@ c      open(42,file='output\hi_wb2.out')
 
 c      read(42,*)junk
 c      read(42,*)junk
-  
+
       itest=1
 
       convfac1=(0.0254d0*0.0254d0*231*1000000)
@@ -3098,7 +3098,7 @@ c         endif
             jancint=jancint+avcanint(j,m)*area(j)/(convfac1*31)
             jansep=jansep+avseptic(j,m)*area(j)/(convfac1*31)
             jansd=jansd+avstrmdrn(j,m)*area(j)/(convfac1*31)
- 
+
          elseif(m.eq.2)then
             febrf=febrf+avrf(j,m)*area(j)/(convfac1*28)
             febfog=febfog+avfd(j,m)*area(j)/(convfac1*28)
@@ -3179,7 +3179,7 @@ c            junsd=junsd+avstrmdrn(j,m)*area(j)*6.71E-6/31
             julcint=julcint+avcanint(j,m)*area(j)/(convfac1*31)
             julsep=julsep+avseptic(j,m)*area(j)/(convfac1*31)
             julsd=julsd+avstrmdrn(j,m)*area(j)/(convfac1*31)
-      
+
          elseif(m.eq.8)then
             augrf=augrf+avrf(j,m)*area(j)/(convfac1*31)
             augfog=augfog+avfd(j,m)*area(j)/(convfac1*31)
@@ -3274,9 +3274,9 @@ c.....totalizing in MGD for entire model area
       vtotdirect=vtotdirect+avdirect(j,m)*area(j)/convfac2
       vtotpnet=vtotpnet+avpnet(j,m)*area(j)/convfac2
       vtotcint=vtotcint+avcanint(j,m)*area(j)/convfac2
-      vtotrfadj=vtotrfadj+avrfadj(j,m)*area(j)/convfac2    
+      vtotrfadj=vtotrfadj+avrfadj(j,m)*area(j)/convfac2
       vtotseptic=vtotseptic+avseptic(j,m)*area(j)/convfac2
-      vtotsdrn=vtotsdrn+avstrmdrn(j,m)*area(j)/convfac2    
+      vtotsdrn=vtotsdrn+avstrmdrn(j,m)*area(j)/convfac2
 
       if(m.eq.12)then
 c.........write all 12 months for all 4 methods to one file
@@ -3301,7 +3301,7 @@ c        goto 100
 
       write(38,7000)janrf,janfog,janirr,janro,janae,janrc,janpnet,
      1     jancint,jansep,jansd,
-     1     febrf,febfog,febirr,febro,febae,febrc,febpnet,febcint, 
+     1     febrf,febfog,febirr,febro,febae,febrc,febpnet,febcint,
      1     febsep,febsd,
      1     marrf,marfog,marirr,marro,marae,marrc,marpnet,marcint,
      1     marsep,marsd,
@@ -3323,7 +3323,7 @@ c        goto 100
      1     novsep,novsd,
      1     decrf,decfog,decirr,decro,decae,decrc,decpnet,deccint,
      1     decsep,decsd
- 
+
       write(40,9000)vtotrf,vtotfog,vtotirr,vtotro,vtotae,vtotrc,
      1     vtotdirect,vtotpnet,vtotcint,vtotrfadj,vtotseptic,vtotsdrn
 
@@ -3374,21 +3374,21 @@ c        goto 100
      6'12Septic,12SDrn')
 
 3200  format('Poly_ID,Rain,Fog,Irr,Dir_RC,Runoff,AE,Rech,PNet,Can_Int,',
-     1       'RF_Adj,Septic,SDrain')     
+     1       'RF_Adj,Septic,SDrain')
 
 3300  format('     Rain       Fog       Irr    Runoff        AE      ',
-     1       'Rech      PNet   Can_Int    Septic    SDrain  ')         
+     1       'Rech      PNet   Can_Int    Septic    SDrain  ')
 
 3400  format('    Rain      Fog      Irr       RO       AE',
      1       '     Rech    DirRC     PNet   CanInt    RFAdj   Septic',
      2       '   SDrain')
 
-4000  format(i6,2x,144(f7.3,1x))	
+4000  format(i6,2x,144(f7.3,1x))
 5000  format(i6,',',120(f7.3,','))
 6000  format(i6,',',12(f10.3,','))
 7000  format(12(10(f9.3,1x),/))
 9000  format(12(f8.2,1x))
-9500  format('writing FAO-method output files...') 
+9500  format('writing FAO-method output files...')
 
       return
       end
