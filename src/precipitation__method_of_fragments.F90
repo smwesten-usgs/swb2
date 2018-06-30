@@ -441,13 +441,17 @@ contains
     ! [ LOCALS ]
     real (kind=c_float) :: sum_fragments
 
-    sum_fragments = sum( FRAGMENTS(iCount)%fFragmentValue(1:28) )
+    ! we only want to correct the fragment if it was actually generated during a
+    ! leap year
+    if (FRAGMENTS(iCount)%fFragmentValue(29) > 0.0_c_float) then
+      sum_fragments = sum( FRAGMENTS(iCount)%fFragmentValue(1:28) )
 
-    ! bump up all February fragments so that their 28-day sum is 1
-    FRAGMENTS(iCount)%fFragmentValue(1:28) = FRAGMENTS(iCount)%fFragmentValue(1:28)   &
-                                               / sum_fragments
-    ! zero out remaining values
-    FRAGMENTS(iCount)%fFragmentValue(29:31) = 0.0_c_float
+      ! bump up all February fragments so that their 28-day sum is 1
+      FRAGMENTS(iCount)%fFragmentValue(1:28) = FRAGMENTS(iCount)%fFragmentValue(1:28)   &
+                                                 / sum_fragments
+      ! zero out remaining values
+      FRAGMENTS(iCount)%fFragmentValue(29:31) = 0.0_c_float
+    endif
 
   end subroutine normalize_february_fragment_sequence
 
