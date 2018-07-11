@@ -29,6 +29,8 @@ module model_iterate_multiple_simulations
   real (kind=c_float), allocatable   :: ANNUAL_NET_INFILTRATION_STATS(:)
   real (kind=c_float), allocatable   :: MONTHLY_ACTUAL_ET_STATS(:,:)
   real (kind=c_float), allocatable   :: ANNUAL_ACTUAL_ET_STATS(:)
+  real (kind=c_float), allocatable   :: MONTHLY_RAINFALL_STATS(:,:)
+  real (kind=c_float), allocatable   :: ANNUAL_RAINFALL_STATS(:)
   integer (kind=c_int)               :: DAY_COUNT_BY_MONTH(12)
 
   real (kind=c_double), target, allocatable   :: SOIL_MOISTURE_STORAGE_PER_SIM(:,:)
@@ -68,6 +70,8 @@ contains
     allocate( ANNUAL_NET_INFILTRATION_STATS(length) )
     allocate( MONTHLY_ACTUAL_ET_STATS(length, 12) )
     allocate( ANNUAL_ACTUAL_ET_STATS(length) )
+    allocate( MONTHLY_RAINFALL_STATS(length, 12) )
+    allocate( ANNUAL_RAINFALL_STATS(length) )
 
     ! don't want or need this memory since we're going to swap out a
     ! different set of arrays for each simulation number
@@ -199,6 +203,7 @@ contains
   subroutine reset_monthly_accumulators( )
 
     MONTHLY_ACTUAL_ET_STATS = 0.0_c_float
+    MONTHLY_RAINFALL_STATS = 0.0_c_float
     MONTHLY_NET_INFILTRATION_STATS = 0.0_c_float
     DAY_COUNT_BY_MONTH(:) = 0
 
@@ -209,6 +214,7 @@ contains
   subroutine reset_annual_accumulators( )
 
     ANNUAL_ACTUAL_ET_STATS = 0.0_c_float
+    ANNUAL_RAINFALL_STATS = 0.0_c_float
     ANNUAL_NET_INFILTRATION_STATS = 0.0_c_float
 
   end subroutine reset_annual_accumulators
@@ -234,6 +240,9 @@ contains
 
     MONTHLY_ACTUAL_ET_STATS(:,month) = MONTHLY_ACTUAL_ET_STATS(:,month)    &
                                                + cells%actual_et
+
+    MONTHLY_RAINFALL_STATS(:,month) = MONTHLY_RAINFALL_STATS(:,month)    &
+                                               + cells%rainfall
 
     ! ANNUAL_NET_INFILTRATION_STATS(:,simulation_number) =                             &
     !    ANNUAL_NET_INFILTRATION_STATS(:,simulation_number) + cells%net_infiltration
@@ -288,6 +297,9 @@ contains
       ANNUAL_ACTUAL_ET_STATS(:) = ANNUAL_ACTUAL_ET_STATS(:)                          &
                                   + MONTHLY_ACTUAL_ET_STATS(:,month)
 
+      ANNUAL_RAINFALL_STATS(:) = ANNUAL_RAINFALL_STATS(:)                            &
+                                  + MONTHLY_RAINFALL_STATS(:,month)
+
       MONTHLY_NET_INFILTRATION_STATS(:,month) = MONTHLY_NET_INFILTRATION_STATS(:,month)          &
                                                 / real(number_of_simulations, kind=c_float)      &
                                                 * real(MONTHS(month)%iNumDays, kind=c_float)     &
@@ -298,12 +310,21 @@ contains
                                           * real(MONTHS(month)%iNumDays, kind=c_float)     &
                                           / real(DAY_COUNT_BY_MONTH(month), kind=c_float)
 
+      MONTHLY_RAINFALL_STATS(:,month) = MONTHLY_RAINFALL_STATS(:,month)                    &
+                                          / real(number_of_simulations, kind=c_float)      &
+                                          * real(MONTHS(month)%iNumDays, kind=c_float)     &
+                                          / real(DAY_COUNT_BY_MONTH(month), kind=c_float)
+
       pTempGrid%rData = unpack( MONTHLY_ACTUAL_ET_STATS(:,month), cells%active, cells%nodata_fill_value )
       filename = "MEAN_MONTHLY_SUM-"//trim(month_abbrev)//"__actual_evapotranspiration"//trim(file_suffix)
       call grid_WriteArcGrid( sFilename=filename, pGrd=pTempGrid )
 
       pTempGrid%rData = unpack( MONTHLY_NET_INFILTRATION_STATS(:,month), cells%active, cells%nodata_fill_value )
       filename = "MEAN_MONTHLY_SUM-"//trim(month_abbrev)//"__net_infiltration"//trim(file_suffix)
+      call grid_WriteArcGrid( sFilename=filename, pGrd=pTempGrid )
+
+      pTempGrid%rData = unpack( MONTHLY_RAINFALL_STATS(:,month), cells%active, cells%nodata_fill_value )
+      filename = "MEAN_MONTHLY_SUM-"//trim(month_abbrev)//"__rainfall"//trim(file_suffix)
       call grid_WriteArcGrid( sFilename=filename, pGrd=pTempGrid )
 
      enddo
@@ -318,12 +339,21 @@ contains
                                  * 365.0_c_float                                   &
                                  / real(number_of_simulation_days, kind=c_float)
 
+     ANNUAL_RAINFALL_STATS(:) = ANNUAL_RAINFALL_STATS(:)                           &
+                                 / real(number_of_simulations, kind=c_float)       &
+                                 * 365.0_c_float                                   &
+                                 / real(number_of_simulation_days, kind=c_float)
+
      pTempGrid%rData = unpack( ANNUAL_ACTUAL_ET_STATS, cells%active, cells%nodata_fill_value )
      filename = "MEAN_ANNUAL_SUM__actual_evapotranspiration"//trim(file_suffix)
      call grid_WriteArcGrid( sFilename=filename, pGrd=pTempGrid )
 
      pTempGrid%rData = unpack( ANNUAL_NET_INFILTRATION_STATS, cells%active, cells%nodata_fill_value )
      filename = "MEAN_ANNUAL_SUM__net_infiltration"//trim(file_suffix)
+     call grid_WriteArcGrid( sFilename=filename, pGrd=pTempGrid )
+
+     pTempGrid%rData = unpack( ANNUAL_RAINFALL_STATS, cells%active, cells%nodata_fill_value )
+     filename = "MEAN_ANNUAL_SUM__rainfall"//trim(file_suffix)
      call grid_WriteArcGrid( sFilename=filename, pGrd=pTempGrid )
 
      call grid_Destroy( pTempGrid )

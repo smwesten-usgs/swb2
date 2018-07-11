@@ -378,11 +378,14 @@ contains
 
     ! this counter is used to accumulate the number of fragments associated with the
     ! current raingage zone/month combination
-    iCount = 0
+    iCount = 1
 
     iRainGageZone = FRAGMENTS( lbound( FRAGMENTS, 1) )%iRainGageZone
     iPreviousRainGageZone = iRainGageZone
     iPreviousMonth = FRAGMENTS( lbound( FRAGMENTS, 1) )%iMonth
+
+    ! at this point, iRainGageZone should be 1, and iPreviousMonth should be 1,
+    ! assuming that the fragments were sorted properly upon input
 
     ! populate the first record of FRAGMENT_SETS
     FRAGMENTS_SETS( iRainGageZone )%iRainGageZone = iRainGageZone
@@ -395,23 +398,31 @@ contains
       iRainGageZone = FRAGMENTS(iIndex)%iRainGageZone
       iMonth = FRAGMENTS(iIndex)%iMonth
 
-      iCount = iCount + 1
-
       if ( iRainGageZone /= iPreviousRainGageZone ) then
+        ! the previous record was the last one associated with the previous
+        ! rainfall gage zone; don't count the current record as part of the
+        ! collection of records associated with previous zone
 
         FRAGMENTS_SETS( iPreviousRainGageZone )%iNumberOfFragments(iPreviousMonth) = iCount
+
+
         FRAGMENTS_SETS( iRainGageZone )%iRainGageZone = iRainGageZone
         FRAGMENTS_SETS( iRainGageZone )%iStartRecord(iMonth) = iIndex
-        ! need to handle the last fragment set as a special case
-        FRAGMENTS_SETS( iRainGageZone )%iNumberOfFragments(iMonth) = iCount
-        iCount = 0
+        ! ! need to handle the last fragment set as a special case
+        ! FRAGMENTS_SETS( iRainGageZone )%iNumberOfFragments(iMonth) = iCount
+        iCount = 1
 
+      else
+        iCount = iCount + 1
       endif
 
       iPreviousMonth = iMonth
       iPreviousRainGageZone = iRainGageZone
 
     enddo
+
+    ! need to handle the last month of the last fragment set as a special case
+    FRAGMENTS_SETS( iRainGageZone )%iNumberOfFragments(iMonth) = iCount
 
     call LOGS%write("### Summary of fragment sets in memory ###", &
        iLogLevel=LOG_ALL, iLinesBefore=1, iLinesAfter=1, lEcho=lFALSE )
