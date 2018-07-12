@@ -31,9 +31,9 @@ program swbstats2
 
   integer (kind=c_size_t)          :: RECNUM = 0
 
-  character (len=256)            :: temp_string, sub_string
+  character (len=256)              :: temp_string, sub_string
 
-  character (len=70), allocatable :: usage_string(:)
+  character (len=70), allocatable  :: usage_string(:)
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pZONE_GRID       => null()
   type (DATA_CATALOG_ENTRY_T), pointer :: pCOMPARISON_GRID => null()
@@ -378,7 +378,7 @@ program swbstats2
                    attribute_name_list=name_list,                             &
                    attribute_value_list=value_list )
 
-  ! extract PROJ4 string from netCDF file
+  ! extract units description string from netCDF file
   iIndex_array = name_list%which("units")
   options%netcdf_variable_units_string = value_list%get( iIndex_array(1) )
 
@@ -766,10 +766,8 @@ contains
 
     if ( present(date_range_string) ) then
       !@todo: change filename depending on the desired output statistic
-      filename = trim(date_range_string)//"__"                                 &
-                 //trim(options%netcdf_variable_name_string)                   &
-                 //"__"//start_date%prettydate()//"_to_"                       &
-                 //end_date%prettydate()                                       &
+      filename = trim(options%netcdf_variable_name_string)                     &
+                 //"__"//trim(date_range_string)                               &
                  //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)              &
                  //"__MEAN_ANNUAL.asc"
     else
