@@ -51,13 +51,16 @@ contains
     elseif ( new_soil_storage > soil_storage_max ) then
 
       net_infiltration    = new_soil_storage - soil_storage_max
-      delta_soil_storage  = soil_storage - soil_storage_max
+
+      ! should represent a positive change in storage
+      delta_soil_storage  = soil_storage_max - soil_storage
 !      actual_et_soil      = max( 0.0_c_float, soil_storage + infiltration - net_infiltration )
       soil_storage        = soil_storage_max
 
     else
 
-      delta_soil_storage  = soil_storage - new_soil_storage
+      ! should be negative to reflect drying of soil
+      delta_soil_storage  = new_soil_storage - soil_storage
       soil_storage = new_soil_storage
       net_infiltration = 0.0_c_float
 

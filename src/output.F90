@@ -41,13 +41,13 @@ module output
     OUTPUT_SPECS_T( "rainfall                   ", "inches               ", 0.0, 60.0, TRUE, FALSE  ),    &
     OUTPUT_SPECS_T( "snowfall                   ", "inches               ", 0.0, 60.0, TRUE, FALSE  ),    &
     OUTPUT_SPECS_T( "interception               ", "inches               ", 0.0, 60.0, TRUE, FALSE  ),    &
-    OUTPUT_SPECS_T( "interception_storage       ", "inches               ", 0.0, 60.0, FALSE, FALSE  ),    &
+    OUTPUT_SPECS_T( "interception_storage       ", "inches               ", 0.0, 60.0, FALSE, FALSE  ),   &
     OUTPUT_SPECS_T( "runon                      ", "inches               ", 0.0, 10000.0, TRUE, FALSE  ), &
     OUTPUT_SPECS_T( "runoff                     ", "inches               ", 0.0, 10000.0, TRUE, FALSE  ), &
     OUTPUT_SPECS_T( "snow_storage               ", "inches               ", 0.0, 2000.0, FALSE, FALSE ),  &
     OUTPUT_SPECS_T( "surface_storage            ", "inches               ", 0.0, 2000.0, FALSE, FALSE ),  &
     OUTPUT_SPECS_T( "soil_storage               ", "inches               ", 0.0, 2000.0, FALSE, FALSE ),  &
-    OUTPUT_SPECS_T( "delta_soil_storage         ", "inches               ", 0.0, 5.0, FALSE, FALSE  ),    &
+    OUTPUT_SPECS_T( "delta_soil_storage         ", "inches               ", -5.0, 5.0, FALSE, FALSE  ),   &
     OUTPUT_SPECS_T( "reference_ET0              ", "inches               ", 0.0, 2000.0, TRUE, FALSE  ),  &
     OUTPUT_SPECS_T( "actual_et                  ", "inches               ", 0.0, 2000.0, TRUE, FALSE  ),  &
     OUTPUT_SPECS_T( "snowmelt                   ", "inches               ", 0.0, 2000.0, FALSE, FALSE ),  &

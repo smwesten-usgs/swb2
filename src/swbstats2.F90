@@ -5,6 +5,7 @@ program swbstats2
   use constants_and_conversions, only : TRUE, FALSE, DATATYPE_INT,             &
                                         DATATYPE_FLOAT, BNDS, asFloat,         &
                                         OS_NATIVE_PATH_DELIMITER
+  use exceptions, only                : assert
   use file_operations, only           : ASCII_FILE_T
   use data_catalog_entry, only        : DATA_CATALOG_ENTRY_T
   use datetime, only                  : DATETIME_T, assignment(=), operator(>)
@@ -43,6 +44,9 @@ program swbstats2
   character (len=256)            :: sCompilerVersion
   character (len=256)            :: sVersionString
   character (len=256)            :: sGitHashString
+  character (len=256)            :: sProgramName
+  character (len=256)            :: sCompilationDateString
+  character (len=256)            :: sCompilationSystemString
   character (len=:), allocatable :: start_date_string
   character (len=:), allocatable :: end_date_string
   integer (kind=c_int)           :: iCount
@@ -51,23 +55,34 @@ program swbstats2
   integer (kind=c_int)           :: iLen
   real (kind=c_double)           :: start_date_dbl
   real (kind=c_double)           :: end_date_dbl
-  integer (kind=c_int)           :: time_bnds_varid
+  integer (kind=c_int)           :: TIME_BNDS_VARID
 
   logical (kind=c_bool)          :: netcdf_active = FALSE
 
   type (STRING_LIST_T)           :: name_list
   type (STRING_LIST_T)           :: value_list
 
-  type (ASCII_FILE_T)            :: csv_output_file
+  type (ASCII_FILE_T)            :: csv_output_files
 
   type (T_NETCDF4_FILE), pointer          :: ncfile_in
-  type (T_NETCDF4_FILE), pointer          :: ncfile_out
+
+  type FILE_COLLECTION_T
+    type (T_NETCDF4_FILE), pointer        :: nc_ptr => null()
+    type (GENERAL_GRID_T), pointer        :: grid_ptr => null()
+    character (len=8)                     :: stats_description
+    logical (kind=c_bool)                 :: write_netcdf     = TRUE
+    logical (kind=c_bool)                 :: write_arcgrid    = FALSE
+    logical (kind=c_bool)                 :: output_active    = FALSE
+  end type FILE_COLLECTION_T
+
+  enum, bind(c)
+    enumerator :: STATS_MEAN=1, STATS_SUM, STATS_VARIANCE
+  end enum
+
+  type (FILE_COLLECTION_T)       :: output_files(3)
 
   type (DATA_CATALOG_ENTRY_T)    :: input_data_obj
   type (GENERAL_GRID_T), pointer :: pGrdNative
-  type (GENERAL_GRID_T), pointer :: pGrdSum
-  type (GENERAL_GRID_T), pointer :: pGrdMean
-  type (GENERAL_GRID_T), pointer :: pGrdVar
   type (GENERAL_GRID_T), pointer :: pGrdDelta
   type (GENERAL_GRID_T), pointer :: pGrdDelta2
 
@@ -78,7 +93,6 @@ program swbstats2
   type SWBSTATS_OPTIONS_T
     logical (kind=c_bool)          :: dump_options_to_screen = FALSE
     logical (kind=c_bool)          :: write_csv              = FALSE
-    logical (kind=c_bool)          :: write_grids            = FALSE
     logical (kind=c_bool)          :: calc_annual_stats      = FALSE
     logical (kind=c_bool)          :: calc_monthly_stats     = FALSE
     logical (kind=c_bool)          :: calc_zonal_stats       = FALSE
@@ -115,32 +129,46 @@ program swbstats2
   type (SWBSTATS_OPTIONS_T)   :: options
 
   allocate( ncfile_in )
-  allocate( ncfile_out )
+
+  output_files(STATS_SUM)%stats_description = "SUM"
+  output_files(STATS_MEAN)%stats_description = "MEAN"
+  output_files(STATS_VARIANCE)%stats_description = "VARIANCE"
+
+  output_files(STATS_SUM)%output_active = TRUE
+  output_files(STATS_MEAN)%output_active = FALSE
+  output_files(STATS_VARIANCE)%output_active = FALSE
+
 
   iNumArgs = COMMAND_ARGUMENT_COUNT()
 
-  sVersionString = "  SWBSTATS2 - Soil Water Balance Statistics Code, SWB2 version " &
-      //trim( SWB_VERSION )                                                          &
-      //" -- compiled on: "//trim(COMPILE_DATE)//" "//trim(COMPILE_TIME)             &
-      //", system name="//trim(SYSTEM_NAME)
+  sProgramName = "  SWB Statistics Calculator (SWBSTATS2), a companion to"
+  sVersionString = "  Soil Water Balance Code version "//trim( SWB_VERSION )
+  sCompilationDateString   = "     compilation date           : "              &
+                               //trim(COMPILE_DATE)//" "//trim(COMPILE_TIME)
+  sCompilationSystemString = "     compiled on                : "//trim(SYSTEM_NAME)
 
-  sGitHashString = "    [ Git branch and commit hash: "//trim( GIT_BRANCH_STRING )    &
-     //", "//trim( GIT_COMMIT_HASH_STRING )//" ]"
+  if (     (SYSTEM_NAME .containssimilar. "Windows")                           &
+      .or. (SYSTEM_NAME .containssimilar. "Mingw") ) then
+    OS_NATIVE_PATH_DELIMITER = "\"
+  else
+    OS_NATIVE_PATH_DELIMITER = "/"
+  endif
 
-   if (     (SYSTEM_NAME .containssimilar. "Windows")                            &
-       .or. (SYSTEM_NAME .containssimilar. "Mingw") ) then
-     OS_NATIVE_PATH_DELIMITER = "\"
-   else
-     OS_NATIVE_PATH_DELIMITER = "/"
-   endif
-
+  sGitHashString = "     Git branch and commit hash : "                        &
+                         //trim( adjustl(GIT_BRANCH_STRING ) )                 &
+                         //", "//trim( GIT_COMMIT_HASH_STRING )
 
   iCount = max( len_trim( sVersionString ), len_trim( sGitHashString ) )
+  iCount = max( iCount, len_trim( sCompilationSystemString ) )
+  iCount = max( iCount, len_trim( sProgramName) )
 
-  write(unit=*, fmt="(/,a)") repeat("-",iCount + 2)
-  write(UNIT=*,FMT="(a)") trim( sVersionString )
+  write(unit=*, fmt="(/,a)") repeat("-",iCount + 4)
+  write(unit=*, fmt="(a,/)") trim( sProgramName )
+  write(UNIT=*,FMT="(a,/)") trim( sVersionString )
+  write(UNIT=*,FMT="(a)") trim( sCompilationDateString )
+  write(UNIT=*,FMT="(a)") trim( sCompilationSystemString )
   write(UNIT=*,FMT="(a)") trim( sGitHashString )
-  write(unit=*, fmt="(a,/)") repeat("-",iCount + 2)
+  write(unit=*, fmt="(a,/)") repeat("-",iCount + 4)
 
   if(iNumArgs == 0 ) then
 
@@ -217,7 +245,7 @@ program swbstats2
 
   call options%slice_start_date%setDateFormat("YYYY-MM-DD")
   call options%slice_end_date%setDateFormat("YYYY-MM-DD")
-  options%filename_modifier_string = "PERIOD_STATS"//"_"
+  options%filename_modifier_string = ""
 
   do iIndex=1, iNumArgs
 
@@ -233,15 +261,13 @@ program swbstats2
 
       options%calc_annual_stats = TRUE
       options%slice_option      = OPT_MULTIPLE_TIME_SLICES
-      options%write_grids       = TRUE
-      options%filename_modifier_string = "YEARLY_STATS"//"_"
+      options%filename_modifier_string = "YEARLY"
 
     elseif ( temp_string .containssimilar. "monthly_statistics" ) then
 
       options%calc_monthly_stats = TRUE
       options%slice_option       = OPT_MULTIPLE_TIME_SLICES
-      options%write_grids        = TRUE
-      options%filename_modifier_string = "MONTHLY_STATS"//"_"
+      options%filename_modifier_string = "MONTHLY"
 
     elseif ( temp_string .containssimilar. "dump_options" ) then
 
@@ -259,13 +285,12 @@ program swbstats2
     elseif ( temp_string .containssimilar. "stress_period_file" ) then
 
       options%slice_option = OPT_MULTIPLE_TIME_SLICES
-      options%write_grids = TRUE
       options%stress_period_filename = right(temp_string, substring="=")
       call read_date_range_file( csv_filename=options%stress_period_filename,       &
                                     date_range_id_list=options%date_range_id_list,  &
                                     start_date_list=options%start_date_list,        &
                                     end_date_list=options%end_date_list )
-      options%filename_modifier_string = "STRESS_PERIOD_STATS"//"_"
+      options%filename_modifier_string = "STRESS_PERIOD_STATS"
 
     elseif ( temp_string .containssimilar. "zone_period_file" ) then
 
@@ -275,11 +300,11 @@ program swbstats2
       options%write_csv           = TRUE
 
       options%zone_period_filename = right(temp_string, substring="=")
-      call read_zone_period_file( csv_filename=options%zone_period_filename , &
-                                    date_range_id_list=options%date_range_id_list,    &
-                                    start_date_list=options%start_date_list,          &
-                                    end_date_list=options%end_date_list,              &
-                                    zonal_stats_grid_file_list=options%zone_grid_file_list )
+      call read_zone_period_file( csv_filename=options%zone_period_filename ,               &
+                                  date_range_id_list=options%date_range_id_list,            &
+                                  start_date_list=options%start_date_list,                  &
+                                  end_date_list=options%end_date_list,                      &
+                                  zonal_stats_grid_file_list=options%zone_grid_file_list )
 
     elseif ( temp_string .containssimilar. "comparison_period_file" ) then
 
@@ -287,7 +312,7 @@ program swbstats2
       options%multiple_comparison_grids = TRUE
       options%compare_to_obs_values     = TRUE
       options%write_csv                 = TRUE
-      options%filename_modifier_string = "COMPARISON_PERIOD_STATS"//"_"
+      options%filename_modifier_string = "COMPARISON_PERIOD_STATS"
 
       options%comparison_period_filename = right(temp_string, substring="=")
       call read_comparison_period_file( csv_filename=options%comparison_period_filename,         &
@@ -302,7 +327,6 @@ program swbstats2
       start_date_string   = left(sub_string, substring=",")
       end_date_string     = right(sub_string, substring=",")
 
-      options%write_grids = TRUE
       options%slice_option = OPT_SINGLE_TIME_SLICE
 
       call options%slice_start_date%parseDate(start_date_string)
@@ -312,7 +336,7 @@ program swbstats2
       call options%slice_end_date%calcGregorianDate()
       options%filename_modifier_string = "SLICE_STATS--"                     &
         //options%slice_start_date%prettydate()//"_to_"                        &
-        //options%slice_end_date%prettydate()//"_"
+        //options%slice_end_date%prettydate()
 
     elseif ( temp_string .containssimilar. "zone_grid" ) then
 
@@ -325,6 +349,22 @@ program swbstats2
       options%comparison_grid_filename = right(temp_string, substring="=")
       options%compare_to_obs_values    = TRUE
       options%write_csv                = TRUE
+
+    elseif ( temp_string .containssimilar. "netcdf_output" ) then
+
+      output_files%write_netcdf             = TRUE
+
+    elseif ( temp_string .containssimilar. "no_netcdf_output" ) then
+
+      output_files%write_netcdf             = FALSE
+
+    elseif ( temp_string .containssimilar. "arcgrid_output" ) then
+
+      output_files%write_arcgrid            = TRUE
+
+    elseif ( temp_string .containssimilar. "no_arcgrid_output" ) then
+
+      output_files%write_arcgrid            = FALSE
 
     elseif ( temp_string .contains. "--" ) then
 
@@ -391,7 +431,8 @@ program swbstats2
             rY1=ncfile_in%rY(NC_TOP),                      &
             iDataType=GRID_DATATYPE_REAL )
 
-  pGrdSum => grid_Create ( iNX=ncfile_in%iNX,              &
+  output_files(STATS_SUM)%grid_ptr => grid_Create (        &
+            iNX=ncfile_in%iNX,                             &
             iNY=ncfile_in%iNY,                             &
             rX0=ncfile_in%rX(NC_LEFT),                     &
             rY0=ncfile_in%rY(NC_BOTTOM),                   &
@@ -399,7 +440,8 @@ program swbstats2
             rY1=ncfile_in%rY(NC_TOP),                      &
             iDataType=GRID_DATATYPE_REAL )
 
-  pGrdMean => grid_Create ( iNX=ncfile_in%iNX,             &
+  output_files(STATS_MEAN)%grid_ptr => grid_Create (       &
+            iNX=ncfile_in%iNX,                             &
             iNY=ncfile_in%iNY,                             &
             rX0=ncfile_in%rX(NC_LEFT),                     &
             rY0=ncfile_in%rY(NC_BOTTOM),                   &
@@ -407,7 +449,8 @@ program swbstats2
             rY1=ncfile_in%rY(NC_TOP),                      &
             iDataType=GRID_DATATYPE_REAL )
 
-  pGrdVar  => grid_Create ( iNX=ncfile_in%iNX,             &
+  output_files(STATS_VARIANCE)%grid_ptr => grid_Create (   &
+            iNX=ncfile_in%iNX,                             &
             iNY=ncfile_in%iNY,                             &
             rX0=ncfile_in%rX(NC_LEFT),                     &
             rY0=ncfile_in%rY(NC_BOTTOM),                   &
@@ -469,12 +512,14 @@ program swbstats2
       options%slice_end_date = options%data_end_date
 
     call SIM_DT%initialize( options%slice_start_date, options%slice_end_date )
+    call create_date_list_for_period_statistics(options)
 
   elseif (options%slice_option == OPT_NO_TIME_SLICE) then
     ! no slice dates were provided; default to a single slice with start/end date
     ! corresponding to the start/end date of the data bounds
     options%slice_option = OPT_SINGLE_TIME_SLICE
     call SIM_DT%initialize( options%data_start_date, options%data_end_date )
+    call create_date_list_for_period_statistics(options)
   else
     ! default time slice = all data in netcdf file
     call SIM_DT%initialize( options%data_start_date, options%data_end_date )
@@ -489,60 +534,60 @@ program swbstats2
     call open_output_csv_file(trim(temp_string))
   endif
 
-  if (options%write_grids)  call open_output_netcdf_files(options)
+  call open_output_netcdf_files(output_files, options)
 
   ! Done with preliminaries (opening files, setting options, etc.); begin calcs
+  !
+  ! if ( options%slice_option == OPT_SINGLE_TIME_SLICE ) then
+  !
+  !   call calculate_slice_statistics(grid_sum=pGrdSum, grid_mean=pGrdMean,           &
+  !                           grid_variance=pGrdVar, grid_delta=pGrdDelta,    &
+  !                           grid_delta2=pGrdDelta2,                         &
+  !                           start_date=options%slice_start_date,            &
+  !                           end_date=options%slice_end_date)
+  !
+  !   if (options%write_grids) then
+  !
+  !     call write_stats_to_netcdf(grid_sum=pGrdSum, grid_mean=pGrdMean,          &
+  !                               start_date=options%slice_start_date,           &
+  !                               end_date=options%slice_end_date)
+  !
+  !     call write_stats_to_arcgrid(grid_sum=pGrdSum, grid_mean=pGrdMean,        &
+  !                                 start_date=options%slice_start_date,         &
+  !                                 end_date=options%slice_end_date )
+  !
+  !   endif
+  !
+  !   if (options%calc_zonal_stats) then
+  !     if ( associated(pCOMPARISON_GRID) ) then
+  !
+  !       call output_zonal_stats(                                            &
+  !            start_date=options%slice_start_date,                           &
+  !            end_date=options%slice_end_date,                               &
+  !            values=pGrdMean%rData,                                         &
+  !            zone_ids=pZONE_GRID%pGrdBase%iData,                            &
+  !            unique_zone_list=options%unique_zone_list,                     &
+  !            comparison_values=pCOMPARISON_GRID%pGrdBase%rData,             &
+  !            funit=csv_output_files%unit() )
+  !
+  !     else
+  !
+  !       call output_zonal_stats(                                            &
+  !            start_date=options%slice_start_date,                           &
+  !            end_date=options%slice_end_date,                               &
+  !            values=pGrdMean%rData,                                         &
+  !            zone_ids=pZONE_GRID%pGrdBase%iData,                            &
+  !            unique_zone_list=options%unique_zone_list,                     &
+  !            funit=csv_output_files%unit() )
+  !
+  !     endif
+  !   endif
+  !
+  !   !call netcdf_close_file(NCFILE=ncfile_out)
+  !
+  ! elseif (options%slice_option == OPT_MULTIPLE_TIME_SLICES) then
 
-  if ( options%slice_option == OPT_SINGLE_TIME_SLICE ) then
-
-    call calculate_slice_statistics(grid_sum=pGrdSum, grid_mean=pGrdMean,           &
-                            grid_variance=pGrdVar, grid_delta=pGrdDelta,    &
-                            grid_delta2=pGrdDelta2,                         &
-                            start_date=options%slice_start_date,            &
-                            end_date=options%slice_end_date)
-
-    if (options%write_grids) then
-
-      call write_stats_to_netcdf(grid_sum=pGrdSum, grid_mean=pGrdMean,          &
-                                start_date=options%slice_start_date,           &
-                                end_date=options%slice_end_date)
-
-      call write_stats_to_arcgrid(grid_sum=pGrdSum, grid_mean=pGrdMean,        &
-                                  start_date=options%slice_start_date,         &
-                                  end_date=options%slice_end_date )
-
-    endif
-
-    if (options%calc_zonal_stats) then
-      if ( associated(pCOMPARISON_GRID) ) then
-
-        call output_zonal_stats(                                            &
-             start_date=options%slice_start_date,                           &
-             end_date=options%slice_end_date,                               &
-             values=pGrdMean%rData,                                         &
-             zone_ids=pZONE_GRID%pGrdBase%iData,                            &
-             unique_zone_list=options%unique_zone_list,                     &
-             comparison_values=pCOMPARISON_GRID%pGrdBase%rData,             &
-             funit=csv_output_file%unit() )
-
-      else
-
-        call output_zonal_stats(                                            &
-             start_date=options%slice_start_date,                           &
-             end_date=options%slice_end_date,                               &
-             values=pGrdMean%rData,                                         &
-             zone_ids=pZONE_GRID%pGrdBase%iData,                            &
-             unique_zone_list=options%unique_zone_list,                     &
-             funit=csv_output_file%unit() )
-
-      endif
-    endif
-
-    !call netcdf_close_file(NCFILE=ncfile_out)
-
-  elseif (options%slice_option == OPT_MULTIPLE_TIME_SLICES) then
-
-    call SIM_DT%initialize( options%data_start_date, options%data_end_date )
+!    call SIM_DT%initialize( options%data_start_date, options%data_end_date )
 
     do iIndex=1, options%date_range_id_list%count
 
@@ -566,8 +611,8 @@ program swbstats2
 
       ! grid_sum = simple addition over stack of grids;
       ! grid_mean is the grid_sum divided by number of days = daily mean
-      call calculate_slice_statistics(grid_sum=pGrdSum, grid_mean=pGrdMean,   &
-                              grid_variance=pGrdVar, grid_delta=pGrdDelta,    &
+      call calculate_slice_statistics(output_files=output_files,                &
+                              grid_delta=pGrdDelta,                           &
                               grid_delta2=pGrdDelta2,                         &
                               start_date=options%slice_start_date,            &
                               end_date=options%slice_end_date)
@@ -583,16 +628,15 @@ program swbstats2
         call get_unique_int(pZONE_GRID%pGrdBase%iData, options%unique_zone_list)
       endif
 
-      if (options%write_grids) then
-        call write_stats_to_netcdf(grid_sum=pGrdSum, grid_mean=pGrdMean,         &
+        call write_stats_to_netcdf(output_files=output_files,                     &
                                   start_date=options%slice_start_date,          &
                                   end_date=options%slice_end_date)
 
-        call write_stats_to_arcgrid(grid_sum=pGrdSum, grid_mean=pGrdMean,       &
+        call write_stats_to_arcgrid(output_files=output_files,                    &
                                     start_date=options%slice_start_date,        &
                                     end_date=options%slice_end_date,            &
                                     date_range_string=options%date_range_string)
-      endif
+
 
       if (options%calc_zonal_stats) then
         if ( associated(pCOMPARISON_GRID) ) then
@@ -600,20 +644,20 @@ program swbstats2
           call output_zonal_stats(                                            &
                start_date=options%slice_start_date,                           &
                end_date=options%slice_end_date,                               &
-               values=pGrdSum%rData,                                          &
+               values=output_files(STATS_SUM)%grid_ptr%rData,                 &
                zone_ids=pZONE_GRID%pGrdBase%iData,                            &
                unique_zone_list=options%unique_zone_list,                     &
                comparison_values=pCOMPARISON_GRID%pGrdBase%rData,             &
-               funit=csv_output_file%unit() )
+               funit=csv_output_files%unit() )
 
         else
           call output_zonal_stats(                                            &
                start_date=options%slice_start_date,                           &
                end_date=options%slice_end_date,                               &
-               values=pGrdSum%rData,                                          &
+               values=output_files(STATS_SUM)%grid_ptr%rData,                 &
                zone_ids=pZONE_GRID%pGrdBase%iData,                            &
                unique_zone_list=options%unique_zone_list,                     &
-               funit=csv_output_file%unit() )
+               funit=csv_output_files%unit() )
 
         endif
       endif
@@ -623,11 +667,12 @@ program swbstats2
 
     enddo
 
-    if (options%write_grids)  call netcdf_close_file(NCFILE=ncfile_out)
+    !call netcdf_close_file(NCFILE=ncfile_out)
+    call close_output_netcdf_files(output_files=output_files)
 
-    if (options%write_csv)  call csv_output_file%close()
+    if (options%write_csv)  call csv_output_files%close()
 
-  endif
+  ! endif
 
   if (options%dump_options_to_screen)  call print_all_options(options)
 
@@ -645,7 +690,15 @@ contains
 
     fmt_string = "(a,t30,': ',l)"
     write(*,fmt=fmt_string) "write_csv", options%write_csv
-    write(*,fmt=fmt_string) "write_grids", options%write_grids
+    write(*,fmt=fmt_string) "write_netcdf (SUM)", output_files(STATS_SUM)%write_netcdf
+    write(*,fmt=fmt_string) "write_netcdf (MEAN)", output_files(STATS_MEAN)%write_netcdf
+    write(*,fmt=fmt_string) "write_netcdf (VARIANCE)", output_files(STATS_VARIANCE)%write_netcdf
+    write(*,fmt=fmt_string) "write_arcgrid (SUM)", output_files(STATS_SUM)%write_arcgrid
+    write(*,fmt=fmt_string) "write_arcgrid (MEAN)", output_files(STATS_MEAN)%write_arcgrid
+    write(*,fmt=fmt_string) "write_arcgrid (VARIANCE)", output_files(STATS_VARIANCE)%write_arcgrid
+    write(*,fmt=fmt_string) "output_active (SUM)", output_files(STATS_SUM)%output_active
+    write(*,fmt=fmt_string) "output_active (MEAN)", output_files(STATS_MEAN)%output_active
+    write(*,fmt=fmt_string) "output_active (VARIANCE)", output_files(STATS_VARIANCE)%output_active
     write(*,fmt=fmt_string) "calc_annual_stats", options%calc_annual_stats
     write(*,fmt=fmt_string) "calc_zonal_stats", options%calc_zonal_stats
     write(*,fmt=fmt_string) "compare_to_obs_values", options%compare_to_obs_values
@@ -704,10 +757,9 @@ contains
 
   end subroutine print_all_options
 
-  subroutine write_stats_to_netcdf( grid_sum, grid_mean, start_date, end_date )
+  subroutine write_stats_to_netcdf( output_files, start_date, end_date )
 
-    type (GENERAL_GRID_T), pointer          :: grid_sum
-    type (GENERAL_GRID_T), pointer          :: grid_mean
+    type (FILE_COLLECTION_T), intent(inout) :: output_files(:)
     type (DATETIME_T), intent(inout)        :: start_date
     type (DATETIME_T), intent(inout)        :: end_date
 
@@ -715,6 +767,9 @@ contains
     real (kind=c_double) :: start_bnd
     real (kind=c_double) :: end_bnd
     integer (kind=c_size_t) :: nx, ny
+    type (T_NETCDF4_FILE), pointer    :: ncfile_out
+    type (GENERAL_GRID_T), pointer    :: grid_ptr
+    integer (kind=c_int)              :: stat_indx
 
     nx = BNDS%iNumCols
     ny = BNDS%iNumRows
@@ -722,67 +777,95 @@ contains
     start_bnd = SIM_DT%days_from_origin( start_date )
     end_bnd   = SIM_DT%days_from_origin( end_date )
 
-    call netcdf_put_variable_vector(NCFILE=ncfile_out,                        &
-       iVarID=ncfile_out%iVarID(NC_TIME),                                     &
-       iStart=[ RECNUM ],                                                     &
-       iCount=[1_c_size_t],                                                   &
-       iStride=[1_c_ptrdiff_t],                                               &
-       dpValues=[ ( start_bnd + end_bnd ) / 2.0_c_double ] )
-!       dpValues=[ real( SIM_DT%iNumDaysFromOrigin, kind=c_double) ] )
+    do stat_indx=STATS_SUM, STATS_VARIANCE
 
-    call netcdf_put_variable_vector(NCFILE=ncfile_out,                        &
-      iVarID=time_bnds_varid,                                                 &
-      iStart=[ RECNUM ,0_c_size_t],                                           &
-      iCount=[1_c_size_t,2_c_size_t],                                         &
-      iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t],                                 &
-      dpValues=[ start_bnd, end_bnd ] )
+      if ( .not. output_files(stat_indx)%output_active )  cycle
 
-    call netcdf_put_variable_array(NCFILE=ncfile_out,                         &
-       iVarID=ncfile_out%iVarID(NC_Z),                                        &
-       iStart=[ RECNUM , 0_c_size_t, 0_c_size_t],                             &
-       iCount=[ 1_c_size_t, ny, nx ],                                         &
-       iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                 &
-       rValues=grid_mean%rData )
+      if ( output_files(stat_indx)%write_netcdf ) then
+
+        ncfile_out => output_files(stat_indx)%nc_ptr
+        grid_ptr => output_files(stat_indx)%grid_ptr
+
+        call netcdf_put_variable_vector(NCFILE=ncfile_out,                        &
+           iVarID=ncfile_out%iVarID(NC_TIME),                                     &
+           iStart=[ RECNUM ],                                                     &
+           iCount=[1_c_size_t],                                                   &
+           iStride=[1_c_ptrdiff_t],                                               &
+           dpValues=[ ( start_bnd + end_bnd ) / 2.0_c_double ] )
+    !       dpValues=[ real( SIM_DT%iNumDaysFromOrigin, kind=c_double) ] )
+
+       ! call netcdf_put_variable_vector(NCFILE=ncfile_out,                        &
+       !    iVarID=TIME_BNDS_VARID,                                                 &
+       !    iStart=[ RECNUM ,0_c_size_t],                                           &
+       !    iCount=[1_c_size_t,2_c_size_t],                                         &
+       !    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t],                                 &
+       !    dpValues=[ start_bnd, end_bnd ] )
+
+        call netcdf_put_variable_array(NCFILE=ncfile_out,                         &
+           iVarID=ncfile_out%iVarID(NC_Z),                                        &
+           iStart=[ RECNUM , 0_c_size_t, 0_c_size_t],                             &
+           iCount=[ 1_c_size_t, ny, nx ],                                         &
+           iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                 &
+           rValues=grid_ptr%rData )
+
+      endif
+
+    enddo
 
   end subroutine write_stats_to_netcdf
 
+!------------------------------------------------------------------------------
 
-
-  subroutine write_stats_to_arcgrid( grid_sum, grid_mean, start_date,         &
+  subroutine write_stats_to_arcgrid( output_files, start_date,         &
                                      end_date, date_range_string )
 
-    type (GENERAL_GRID_T), pointer          :: grid_sum
-    type (GENERAL_GRID_T), pointer          :: grid_mean
+    type (FILE_COLLECTION_T), intent(inout) :: output_files(:)
     type (DATETIME_T), intent(inout)        :: start_date
     type (DATETIME_T), intent(inout)        :: end_date
     character (len=*), intent(in), optional :: date_range_string
 
     ! [ LOCALS ]
-    character (len=:), allocatable  :: filename
-    integer (kind=c_int)            :: nx, ny
+    character (len=:), allocatable    :: filename
+    integer (kind=c_int)              :: nx, ny
+    type (GENERAL_GRID_T), pointer    :: grid_ptr
+    integer (kind=c_int)              :: stat_indx
+    character (len=8)                 :: stats_description
 
     nx = BNDS%iNumCols
     ny = BNDS%iNumRows
 
-    if ( present(date_range_string) ) then
-      !@todo: change filename depending on the desired output statistic
-      filename = trim(options%netcdf_variable_name_string)                     &
-                 //"__"//trim(date_range_string)                               &
-                 //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)              &
-                 //"__MEAN_ANNUAL.asc"
-    else
-      filename = trim(options%netcdf_variable_name_string)                      &
-                 //"__"//start_date%prettydate()//"_to_"//end_date%prettydate() &
-                 //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)               &
-                 //"__MEAN_ANNUAL.asc"
-    endif
+    do stat_indx=STATS_SUM, STATS_VARIANCE
 
-    ! ugly hack to make the output match the default NODATA value
-    where ( pGrdNative%rData <= NC_FILL_FLOAT )
-      grid_mean%rData = -9999.
-    end where
+      if ( .not. output_files(stat_indx)%output_active )  cycle
 
-    call grid_WriteArcGrid( filename, grid_mean )
+      if ( output_files(stat_indx)%write_arcgrid ) then
+
+        grid_ptr => output_files(stat_indx)%grid_ptr
+        stats_description = output_files(stat_indx)%stats_description
+
+        if ( present(date_range_string) ) then
+          !@todo: change filename depending on the desired output statistic
+          filename = trim(options%netcdf_variable_name_string)                     &
+                     //"__"//trim(date_range_string)                               &
+                     //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)              &
+                     //"__"//trim(stats_description)//".asc"
+        else
+          filename = trim(options%netcdf_variable_name_string)                      &
+                     //"__"//start_date%prettydate()//"_to_"//end_date%prettydate() &
+                     //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)               &
+                     //"__"//trim(stats_description)//".asc"
+        endif
+
+        ! ugly hack to make the output match the default NODATA value
+        where ( pGrdNative%rData <= NC_FILL_FLOAT )
+          grid_ptr%rData = -9999.
+        end where
+
+        call grid_WriteArcGrid( filename, grid_ptr )
+
+      endif
+
+    enddo
 
   end subroutine write_stats_to_arcgrid
 
@@ -803,13 +886,11 @@ contains
   !
   ! end subroutine calculate_slice_statisticss
 
-  subroutine calculate_slice_statistics( grid_sum, grid_mean, grid_variance,    &
+  subroutine calculate_slice_statistics( output_files,                           &
                                  grid_delta, grid_delta2, start_date, end_date, &
                                  grid_mask )
 
-    type (GENERAL_GRID_T), pointer           :: grid_sum
-    type (GENERAL_GRID_T), pointer           :: grid_mean
-    type (GENERAL_GRID_T), pointer           :: grid_variance
+    type (FILE_COLLECTION_T)                 :: output_files(:)
     type (GENERAL_GRID_T), pointer           :: grid_delta
     type (GENERAL_GRID_T), pointer           :: grid_delta2
     type (DATETIME_T), intent(inout)         :: start_date
@@ -828,9 +909,12 @@ contains
 
 !    call SIM_DT%initialize( start_date, end_date )
 
-    associate( grd_sum => grid_sum%rData, grd_mean => grid_mean%rData,    &
-               grd_var => grid_variance%rData, delta => grid_delta%rData, &
-               delta2 => grid_delta2%rData, grd_new => pGrdNative%rData      )
+    associate( grd_sum => output_files(STATS_SUM)%grid_ptr%rData,                &
+               grd_mean => output_files(STATS_MEAN)%grid_ptr%rData,              &
+               grd_var => output_files(STATS_VARIANCE)%grid_ptr%rData,           &
+               delta =>  grid_delta%rData,                                      &
+               delta2 => grid_delta2%rData,                                     &
+               grd_new => pGrdNative%rData      )
 
       allocate(local_mask(ubound(grd_sum,1),ubound(grd_sum,2)))
 
@@ -860,22 +944,22 @@ contains
           endif
 
           grd_sum = 0.0_c_float
-          grd_mean = grd_new
+          grd_mean = 0.0_c_float
           grd_var = 0.0_c_float
 
         else
 
-          ! where ( local_mask )
-          !   delta = grd_new - grd_mean
-          !   grd_sum = grd_sum + grd_new
-          !   grd_mean = grd_mean + delta / real( counter, kind=c_float )
-          !   delta2 = grd_new - grd_mean
-          !   grd_var = grd_var + delta * delta2
-          ! end where
-
           where ( local_mask )
+            delta = grd_new - grd_mean
             grd_sum = grd_sum + grd_new
+            grd_mean = grd_mean + delta / real( day_count, kind=c_float )
+            delta2 = grd_new - grd_mean
+            grd_var = grd_var + delta * delta2
           end where
+
+          ! where ( local_mask )
+          !   grd_sum = grd_sum + grd_new
+          ! end where
 
         endif
 
@@ -897,14 +981,14 @@ contains
 
       if (options%annualize_stats) then
         where ( local_mask )
-          ! grd_mean = grd_mean * 365.25
-          ! grd_var = grd_var * 365.25
-          grd_mean = grd_sum / real( day_count, kind=c_float ) * 365.25
+          grd_mean = grd_mean * 365.25
+          grd_var = grd_var * 365.25
+          !grd_mean = grd_sum / real( day_count, kind=c_float ) * 365.25
         end where
-      else
-        where ( local_mask )
-          grd_mean = grd_sum / real( day_count, kind=c_float )
-        end where
+      ! else
+      !   where ( local_mask )
+      !     grd_mean = grd_sum / real( day_count, kind=c_float )
+      !   end where
       endif
 
     end associate
@@ -1084,13 +1168,13 @@ contains
     integer (kind=c_int)                 :: iIndex
     integer (kind=c_int)                 :: iStat
     character (len=:), allocatable       :: description_str
-    character (len=:), allocatable       :: output_filename_str
+    character (len=:), allocatable       :: output_filesname_str
 
     description_str = left( grid_filename, substring=".")
     if (description_str .contains. "/") description_str = right( description_str, substring="/")
     if (description_str .contains. "\") description_str = right( description_str, substring="\")
 
-    output_filename_str = "zone_grid__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
+    output_filesname_str = "zone_grid__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
 
     ! allocate memory for a generic data_catalog_entry
     if (associated(pZONE_GRID))  deallocate(pZONE_GRID)
@@ -1110,7 +1194,7 @@ contains
       pZONE_GRID%pGrdBase%iData = NC_FILL_INT
     end where
 
-    call grid_WriteArcGrid(output_filename_str, pZONE_GRID%pGrdBase )
+    call grid_WriteArcGrid(output_filesname_str, pZONE_GRID%pGrdBase )
 
   end subroutine initialize_zone_grid
 
@@ -1124,13 +1208,13 @@ contains
     integer (kind=c_int)                 :: iIndex
     integer (kind=c_int)                 :: iStat
     character (len=:), allocatable       :: description_str
-    character (len=:), allocatable       :: output_filename_str
+    character (len=:), allocatable       :: output_filesname_str
 
     description_str = left( grid_filename, substring=".")
     if (description_str .contains. "/") description_str = right( description_str, substring="/")
     if (description_str .contains. "\") description_str = right( description_str, substring="\")
 
-    output_filename_str = "Comparison_grid__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
+    output_filesname_str = "Comparison_grid__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
 
     ! allocate memory for a generic data_catalog_entry
     if (.not. associated(pCOMPARISON_GRID))  allocate(pCOMPARISON_GRID, stat=iStat)
@@ -1152,7 +1236,7 @@ contains
                                       * options%comparison_grid_conversion_factor
     end where
 
-    call grid_WriteArcGrid(output_filename_str, pCOMPARISON_GRID%pGrdBase )
+    call grid_WriteArcGrid(output_filesname_str, pCOMPARISON_GRID%pGrdBase )
 
   end subroutine initialize_comparison_grid
 
@@ -1306,33 +1390,78 @@ contains
 
   end subroutine get_unique_int
 
-  subroutine open_output_netcdf_files(options)
+!------------------------------------------------------------------------------
 
-    type (SWBSTATS_OPTIONS_T), intent(inout)     :: options
+  subroutine open_output_netcdf_files(output_files, options)
 
-    if (options%write_grids) then
+    type (FILE_COLLECTION_T), intent(inout)     :: output_files(:)
+    type (SWBSTATS_OPTIONS_T), intent(in)       :: options
 
-      call netcdf_open_and_prepare_as_output(                                     &
-            NCFILE=ncfile_out,                                                    &
-            sVariableName=trim(options%netcdf_variable_name_string),              &
-            sVariableUnits=trim(options%netcdf_variable_units_string),            &
-            iNX=ncfile_in%iNX,                                                    &
-            iNY=ncfile_in%iNY,                                                    &
-            fX=ncfile_in%rX_Coords,                                               &
-            fY=ncfile_in%rY_Coords,                                               &
-            PROJ4_string=trim(options%target_proj4_string),                       &
-            StartDate=SIM_DT%start,                                               &
-            EndDate=SIM_DT%end,                                                   &
-            write_time_bounds=TRUE,                                               &
-            filename_modifier=options%filename_modifier_string )
+    ! [ LOCALS ]
+    integer (kind=c_int)              :: stat_indx
+    integer (kind=c_int)              :: status
+    type (T_NETCDF4_FILE), pointer    :: ncfile_out
 
-      call netcdf_get_variable_id_for_variable( NCFILE=ncfile_out,                &
-                                                variable_name="time_bnds",        &
-                                                variable_id=time_bnds_varid      )
+    do stat_indx=STATS_MEAN, STATS_VARIANCE
 
-    endif
+      if ( .not. output_files(stat_indx)%output_active )  cycle
+
+      if (output_files(stat_indx)%write_netcdf) then
+
+        allocate( output_files(stat_indx)%nc_ptr, stat=status)
+        call assert( status==0, "Problem allocating netcdf file data structure.", &
+          __SRCNAME__, __LINE__)
+        ncfile_out => output_files(stat_indx)%nc_ptr
+
+        call netcdf_open_and_prepare_as_output(                                     &
+              NCFILE=ncfile_out,                                                    &
+              sVariableName=trim(options%netcdf_variable_name_string),              &
+              sVariableUnits=trim(options%netcdf_variable_units_string),            &
+              iNX=ncfile_in%iNX,                                                    &
+              iNY=ncfile_in%iNY,                                                    &
+              fX=ncfile_in%rX_Coords,                                               &
+              fY=ncfile_in%rY_Coords,                                               &
+              PROJ4_string=trim(options%target_proj4_string),                       &
+              StartDate=SIM_DT%start,                                               &
+              EndDate=SIM_DT%end,                                                   &
+!              write_time_bounds=TRUE,                                               &
+              executable_name="SWBSTATS2",                                          &
+              filename_modifier=options%filename_modifier_string                    &
+                                //"_"//output_files(stat_indx)%stats_description )
+
+      endif
+
+    enddo
 
   end subroutine open_output_netcdf_files
+
+!------------------------------------------------------------------------------
+
+  subroutine close_output_netcdf_files(output_files)
+
+    type (FILE_COLLECTION_T), intent(inout)     :: output_files(:)
+
+    ! [ LOCALS ]
+    integer (kind=c_int)              :: stat_indx
+    integer (kind=c_int)              :: status
+    type (T_NETCDF4_FILE), pointer    :: ncfile_out
+
+    do stat_indx=STATS_MEAN, STATS_VARIANCE
+
+      if ( .not. output_files(stat_indx)%output_active )  cycle
+
+      if (output_files(stat_indx)%write_netcdf) then
+
+        ncfile_out => output_files(stat_indx)%nc_ptr
+        call netcdf_close_file(NCFILE=ncfile_out)
+
+      endif
+
+    enddo
+
+  end subroutine close_output_netcdf_files
+
+!------------------------------------------------------------------------------
 
   subroutine open_output_csv_file(filename)
 
@@ -1341,7 +1470,7 @@ contains
     ! [ LOCALS ]
     character (len=256)    :: header_str
 
-    call csv_output_file%open(filename)
+    call csv_output_files%open(filename)
 
     if (options%multiple_comparison_grids .or. options%compare_to_obs_values) then
       header_str = "start_date,end_date,zone_id,minimum_swb,maximum_swb,"     &
@@ -1352,7 +1481,7 @@ contains
         //"mean_swb,sum_swb,count_swb"
     endif
 
-    call csv_output_file%writeLine(trim(header_str))
+    call csv_output_files%writeLine(trim(header_str))
 
   end subroutine open_output_csv_file
 
@@ -1386,6 +1515,8 @@ contains
 
   end subroutine create_date_list_for_annual_statistics
 
+!------------------------------------------------------------------------------
+
   subroutine create_date_list_for_monthly_statistics(options)
 
     type (SWBSTATS_OPTIONS_T), intent(inout)  :: options
@@ -1413,5 +1544,17 @@ contains
     enddo
 
   end subroutine create_date_list_for_monthly_statistics
+
+!------------------------------------------------------------------------------
+
+  subroutine create_date_list_for_period_statistics(options)
+
+    type (SWBSTATS_OPTIONS_T), intent(inout)  :: options
+
+    call options%start_date_list%append( options%data_start_date%prettydate() )
+    call options%date_range_id_list%append( "1" )
+    call options%end_date_list%append( options%data_end_date%prettydate() )
+
+  end subroutine create_date_list_for_period_statistics
 
 end program swbstats2

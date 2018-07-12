@@ -107,6 +107,11 @@ module netcdf4_support
   integer(kind=c_int),  parameter :: NC_UNLIMITED = 0
   integer(kind=c_int),  parameter :: NC_GLOBAL    = -1
 
+  !> @TODO: implement a more flexible way of tracking
+  !!        variable IDs; presently the code can break if
+  !!        lat and lon are omitted, but time_bnds is included;
+  !!        this is because if the lat and lon variables are
+  !!        not defined, NC_TIME_BNDS may be 4 or 5 or some other value.
   integer (c_int), public, parameter :: NC_TIME      = 0
   integer (c_int), public, parameter :: NC_Y         = 1
   integer (c_int), public, parameter :: NC_X         = 2
@@ -522,7 +527,6 @@ function nf_return_AttValue( NCFILE, iVarIndex, sAttName)   result(sAttValue)
     sAttValue = sAttValue//" "//trim(pNC_ATT(iIndex)%sAttValue(iIndex))
   enddo
 
-  sAttValue = adjustl(sAttValue)
 
 end function nf_return_AttValue
 
@@ -978,7 +982,7 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
    iNX, iNY, fX, fY, StartDate, EndDate, PROJ4_string, history_list, executable_name,   &
    dpLat, dpLon, fValidMin, fValidMax, write_time_bounds, filename_modifier)
 
-  type (T_NETCDF4_FILE ), pointer                     :: NCFILE
+  type (T_NETCDF4_FILE ), pointer, intent(inout)      :: NCFILE
   character (len=*), intent(in)                       :: sVariableName
   character (len=*), intent(in)                       :: sVariableUnits
   integer (kind=c_int), intent(in)                    :: iNX
@@ -1006,6 +1010,8 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   type (STRING_LIST_T), pointer                     :: history_list_l
   logical (kind=c_bool)                             :: write_time_bounds_l
   character (len=:), allocatable                    :: executable_name_l
+  real (kind=c_float)                               :: valid_minimum
+  real (kind=c_float)                               :: valid_maximum
   logical (kind=c_bool)                             :: include_latlon
   type (DATETIME_T)                                 :: DT
   character (len=:), allocatable                    :: date_time_text
@@ -1013,6 +1019,18 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   call DT%systime()
   date_time_text = DT%prettydatetime()
 
+
+  if (present( fValidMin ) ) then
+    valid_minimum = fValidMin
+  else
+    valid_minimum = 1.0E-10
+  endif
+
+  if (present( fValidMax ) ) then
+    valid_maximum = fValidMax
+  else
+    valid_maximum = 1.0E+10
+  endif
 
   if ( present( executable_name ) ) then
     executable_name_l = trim( executable_name )
@@ -1047,7 +1065,7 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
 
   sFilename = trim(OUTPUT_DIRECTORY_NAME)//trim(OUTPUT_PREFIX_NAME)           &
     //trim(sVariableName)//"_"//filename_modifier_l                            &
-    //StartDate%prettydate()//"_"//EndDate%prettydate()//"__"                 &
+    //StartDate%prettydate()//"_to_"//EndDate%prettydate()//"__"                 &
     //trim(asCharacter(iNY))//"_by_"//trim(asCharacter(iNX))//".nc"
 
   call LOGS%write("Attempting to open netCDF file for writing with filename "//dquote(sFilename))
@@ -1076,8 +1094,8 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   call nf_get_variable_id_and_type( NCFILE=NCFILE )
 
   call nf_set_standard_attributes(NCFILE=NCFILE, sOriginText=sOriginText,     &
-      PROJ4_string=PROJ4_string, lLatLon=include_latlon, fValidMin=fValidMin, &
-      fValidMax=fValidMax, write_time_bounds=write_time_bounds_l )
+      PROJ4_string=PROJ4_string, lLatLon=include_latlon, fValidMin=valid_minimum, &
+      fValidMax=valid_maximum, write_time_bounds=write_time_bounds_l )
 
   call nf_set_global_attributes(NCFILE=NCFILE, &
      sDataType=trim(NCFILE%sVarName(NC_Z)), history_list=history_list_l, &
