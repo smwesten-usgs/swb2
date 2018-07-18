@@ -59,7 +59,7 @@ contains
 
     else
 
-      ! should be negative to reflect drying of soil
+      ! could be positive or negative
       delta_soil_storage  = new_soil_storage - soil_storage
       soil_storage = new_soil_storage
       net_infiltration = 0.0_c_float
