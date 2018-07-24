@@ -78,5 +78,5 @@ endif()
 
 include( cmake/print_summary.cmake )
 
-enable_testing()
 add_subdirectory(src)
+add_subdirectory(test/unit_tests)

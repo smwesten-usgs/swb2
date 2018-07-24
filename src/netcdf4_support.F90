@@ -66,7 +66,7 @@ module netcdf4_support
   integer(kind=c_int), parameter :: NC_FILL_INT     = -2147483647
   integer(kind=c_int), parameter :: NC_NA_INT       = -9999
 
-  real(kind=c_float),  parameter :: NC_FILL_FLOAT   = -9.9e-20_c_float
+  real(kind=c_float),  parameter :: NC_FILL_FLOAT   = -9999.0_c_float
   real(kind=c_double), parameter :: NC_FILL_DOUBLE  = -9.9e-20_c_double
 !  real(kind=c_float),  parameter :: NC_FILL_FLOAT   = -( HUGE( 0_c_float ) - 1.0_c_float )
 !  real(kind=c_double), parameter :: NC_FILL_DOUBLE  = -( HUGE( 0_c_double ) - 1.0_c_double )

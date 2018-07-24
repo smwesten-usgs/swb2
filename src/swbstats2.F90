@@ -486,8 +486,6 @@ program swbstats2
   BNDS%fGridCellSize = pGrdNative%rGridCellSize
   BNDS%sPROJ4_string = options%target_proj4_string
 
-  if (options%dump_options_to_screen)  call print_all_options(options)
-
   if (options%calc_annual_stats) then
 
     call create_date_list_for_annual_statistics(options)
@@ -589,90 +587,92 @@ program swbstats2
 
 !    call SIM_DT%initialize( options%data_start_date, options%data_end_date )
 
-    do iIndex=1, options%date_range_id_list%count
 
-      call options%slice_start_date%setDateFormat("YYYY-MM-DD")
-      call options%slice_end_date%setDateFormat("YYYY-MM-DD")
+  if (options%dump_options_to_screen)  call print_all_options(options)
 
-      start_date_string = options%start_date_list%get( iIndex )
-      end_date_string = options%end_date_list%get( iIndex )
+  do iIndex=1, options%date_range_id_list%count
+
+    call options%slice_start_date%setDateFormat("YYYY-MM-DD")
+    call options%slice_end_date%setDateFormat("YYYY-MM-DD")
+
+    start_date_string = options%start_date_list%get( iIndex )
+    end_date_string = options%end_date_list%get( iIndex )
 !      options%date_range_string = options%date_range_id_list%get( iIndex )
 
-      call options%slice_start_date%parseDate( start_date_string )
-      call options%slice_end_date%parseDate( end_date_string )
+    call options%slice_start_date%parseDate( start_date_string )
+    call options%slice_end_date%parseDate( end_date_string )
 
-      options%date_range_string = options%slice_start_date%prettydate()    &
-         //"_to_"//options%slice_end_date%prettydate()
+    options%date_range_string = options%slice_start_date%prettydate()    &
+       //"_to_"//options%slice_end_date%prettydate()
 
-      write(*,fmt="(a)") ""
-      write(*,fmt="(a)") "Processing slice: ", options%slice_start_date%prettydate()    &
-         //" to "//options%slice_end_date%prettydate()
-      write(*,fmt="(a)") repeat("-", 70)
+    write(*,fmt="(a)") ""
+    write(*,fmt="(a)") "Processing slice: ", options%slice_start_date%prettydate()    &
+       //" to "//options%slice_end_date%prettydate()
+    write(*,fmt="(a)") repeat("-", 70)
 
-      ! grid_sum = simple addition over stack of grids;
-      ! grid_mean is the grid_sum divided by number of days = daily mean
-      call calculate_slice_statistics(output_files=output_files,                &
-                              grid_delta=pGrdDelta,                           &
-                              grid_delta2=pGrdDelta2,                         &
-                              start_date=options%slice_start_date,            &
-                              end_date=options%slice_end_date)
+    ! grid_sum = simple addition over stack of grids;
+    ! grid_mean is the grid_sum divided by number of days = daily mean
+    call calculate_slice_statistics( grid_delta=pGrdDelta,                           &
+                                     grid_delta2=pGrdDelta2,                         &
+                                     start_date=options%slice_start_date,            &
+                                     end_date=options%slice_end_date)
 
-      if (options%multiple_comparison_grids) then
-        options%comparison_grid_filename = options%comparison_grid_file_list%get( iIndex )
-        call initialize_comparison_grid(grid_filename=options%comparison_grid_filename)
+    if (options%multiple_comparison_grids) then
+      options%comparison_grid_filename = options%comparison_grid_file_list%get( iIndex )
+      call initialize_comparison_grid(grid_filename=options%comparison_grid_filename)
+    endif
+
+    if (options%multiple_zone_grids) then
+      options%zone_grid_filename = options%zone_grid_file_list%get( iIndex )
+      call initialize_zone_grid(grid_filename=options%zone_grid_filename)
+      call get_unique_int(pZONE_GRID%pGrdBase%iData, options%unique_zone_list)
+    endif
+
+      call write_stats_to_netcdf(output_files=output_files,                     &
+                                start_date=options%slice_start_date,          &
+                                end_date=options%slice_end_date)
+
+      call write_stats_to_arcgrid(output_files=output_files,                    &
+                                  start_date=options%slice_start_date,        &
+                                  end_date=options%slice_end_date,            &
+                                  date_range_string=options%date_range_string)
+
+
+    if (options%calc_zonal_stats) then
+      if ( associated(pCOMPARISON_GRID) ) then
+
+        call output_zonal_stats(                                            &
+             start_date=options%slice_start_date,                           &
+             end_date=options%slice_end_date,                               &
+             values=output_files(STATS_SUM)%grid_ptr%rData,                 &
+             zone_ids=pZONE_GRID%pGrdBase%iData,                            &
+             unique_zone_list=options%unique_zone_list,                     &
+             comparison_values=pCOMPARISON_GRID%pGrdBase%rData,             &
+             funit=csv_output_files%unit() )
+
+      else
+        call output_zonal_stats(                                            &
+             start_date=options%slice_start_date,                           &
+             end_date=options%slice_end_date,                               &
+             values=output_files(STATS_SUM)%grid_ptr%rData,                 &
+             zone_ids=pZONE_GRID%pGrdBase%iData,                            &
+             unique_zone_list=options%unique_zone_list,                     &
+             funit=csv_output_files%unit() )
+
       endif
+    endif
 
-      if (options%multiple_zone_grids) then
-        options%zone_grid_filename = options%zone_grid_file_list%get( iIndex )
-        call initialize_zone_grid(grid_filename=options%zone_grid_filename)
-        call get_unique_int(pZONE_GRID%pGrdBase%iData, options%unique_zone_list)
-      endif
+    ! icky hack; need to advance the record number for the multiple slice calc
+    RECNUM = RECNUM + 1
 
-        call write_stats_to_netcdf(output_files=output_files,                     &
-                                  start_date=options%slice_start_date,          &
-                                  end_date=options%slice_end_date)
+  enddo
 
-        call write_stats_to_arcgrid(output_files=output_files,                    &
-                                    start_date=options%slice_start_date,        &
-                                    end_date=options%slice_end_date,            &
-                                    date_range_string=options%date_range_string)
+  !call netcdf_close_file(NCFILE=ncfile_out)
+  call close_output_netcdf_files(output_files=output_files)
 
+  if (options%write_csv)  call csv_output_files%close()
 
-      if (options%calc_zonal_stats) then
-        if ( associated(pCOMPARISON_GRID) ) then
-
-          call output_zonal_stats(                                            &
-               start_date=options%slice_start_date,                           &
-               end_date=options%slice_end_date,                               &
-               values=output_files(STATS_SUM)%grid_ptr%rData,                 &
-               zone_ids=pZONE_GRID%pGrdBase%iData,                            &
-               unique_zone_list=options%unique_zone_list,                     &
-               comparison_values=pCOMPARISON_GRID%pGrdBase%rData,             &
-               funit=csv_output_files%unit() )
-
-        else
-          call output_zonal_stats(                                            &
-               start_date=options%slice_start_date,                           &
-               end_date=options%slice_end_date,                               &
-               values=output_files(STATS_SUM)%grid_ptr%rData,                 &
-               zone_ids=pZONE_GRID%pGrdBase%iData,                            &
-               unique_zone_list=options%unique_zone_list,                     &
-               funit=csv_output_files%unit() )
-
-        endif
-      endif
-
-      ! icky hack; need to advance the record number for the multiple slice calc
-      RECNUM = RECNUM + 1
-
-    enddo
-
-    !call netcdf_close_file(NCFILE=ncfile_out)
-    call close_output_netcdf_files(output_files=output_files)
-
-    if (options%write_csv)  call csv_output_files%close()
-
-  ! endif
+! endif
 
   if (options%dump_options_to_screen)  call print_all_options(options)
 
@@ -699,6 +699,13 @@ contains
     write(*,fmt=fmt_string) "output_active (SUM)", output_files(STATS_SUM)%output_active
     write(*,fmt=fmt_string) "output_active (MEAN)", output_files(STATS_MEAN)%output_active
     write(*,fmt=fmt_string) "output_active (VARIANCE)", output_files(STATS_VARIANCE)%output_active
+
+    fmt_string = "(a,t40,': ',l)"
+    write(*,fmt=fmt_string) "grid pointer allocated? (SUM)", associated( output_files(STATS_SUM)%grid_ptr)
+    write(*,fmt=fmt_string) "grid pointer allocated? (MEAN)", associated( output_files(STATS_MEAN)%grid_ptr)
+    write(*,fmt=fmt_string) "grid pointer allocated? (VARIANCE)", associated( output_files(STATS_VARIANCE)%grid_ptr)
+
+    fmt_string = "(a,t30,': ',l)"
     write(*,fmt=fmt_string) "calc_annual_stats", options%calc_annual_stats
     write(*,fmt=fmt_string) "calc_zonal_stats", options%calc_zonal_stats
     write(*,fmt=fmt_string) "compare_to_obs_values", options%compare_to_obs_values
@@ -886,11 +893,8 @@ contains
   !
   ! end subroutine calculate_slice_statisticss
 
-  subroutine calculate_slice_statistics( output_files,                           &
-                                 grid_delta, grid_delta2, start_date, end_date, &
-                                 grid_mask )
+  subroutine calculate_slice_statistics( grid_delta, grid_delta2, start_date, end_date, grid_mask )
 
-    type (FILE_COLLECTION_T)                 :: output_files(:)
     type (GENERAL_GRID_T), pointer           :: grid_delta
     type (GENERAL_GRID_T), pointer           :: grid_delta2
     type (DATETIME_T), intent(inout)         :: start_date
@@ -963,8 +967,14 @@ contains
 
         endif
 
-  !      write(*,fmt="(a)") "gridsum: ", minval(grid_sum%rData,  mask=pGrdNative%rData > NC_FILL_FLOAT), &
-  !          maxval(grid_sum%rData,  mask=pGrdNative%rData > NC_FILL_FLOAT)
+        ! write(*,fmt="(a,f14.3,f14.3)") "gridsum: ", minval(grd_sum,  mask=grd_new > NC_FILL_FLOAT), &
+        !     maxval(grd_sum,  mask=grd_new > NC_FILL_FLOAT)
+        !
+        ! write(*,fmt="(a,f14.3,f14.3)") "gridnew: ", minval(grd_new,  mask=grd_new > NC_FILL_FLOAT), &
+        !     maxval(grd_new,  mask=grd_new > NC_FILL_FLOAT)
+        !
+        ! write(*,fmt="(a,f14.3,f14.3)") "gridnew: ", minval(pGrdNative%rData,  mask=pGrdNative%rData > NC_FILL_FLOAT), &
+        !     maxval(pGrdNative%rData,  mask=pGrdNative%rData > NC_FILL_FLOAT)
 
         call SIM_DT%addDay
         if ( SIM_DT%curr > end_date )  exit

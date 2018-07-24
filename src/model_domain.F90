@@ -393,7 +393,7 @@ contains
                       rX0=dX_ll, rY0=dY_ll, rGridCellSize=dGridCellSize,  &
                       iDataType=GRID_DATATYPE_REAL )
 
-    this%nodata_fill_value = -999.0
+    this%nodata_fill_value = NC_FILL_FLOAT
 
   end subroutine initialize_grid_sub
 

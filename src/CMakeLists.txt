@@ -1,3 +1,21 @@
+file(GLOB fortran_files
+     RELATIVE ${CMAKE_CURRENT_SOURCE_DIR}
+     *.F90 )
+
+ # the following snippet assigns the local filename to __SRCNAME__
+ # for each of the files contained in the 'SRCS' list
+ #
+ # i.e. rather than using __FILE__, which might expand to
+ # d:/Some_dir/some_subdir/filename.F90, we can use
+ # __SRCNAME__, which expands to 'filename.F90'
+
+ foreach(f IN LISTS fortran_files)
+   get_filename_component(b ${f} NAME)
+   set_source_files_properties(${f} PROPERTIES
+     COMPILE_DEFINITIONS "__SRCNAME__=\"${b}\"")
+ endforeach()
+
+
 set(SRC_PROJ4
       proj4/aasincos.c
       proj4/adjlon.c
@@ -183,7 +201,6 @@ set(SRCS
       dictionary.F90
       direct_net_infiltration__gridded_data.F90
       direct_soil_moisture__gridded_data.F90
-      #et_FAO56_crop_coefficients.F90
       et__gridded_values.F90
       et__hargreaves_samani.F90
       et__jensen_haise.F90
@@ -191,7 +208,6 @@ set(SRCS
       exceptions.F90
       fog__monthly_grid.F90
       file_operations.F90
-      #get_libc_error_number.c
       grid.F90
       growing_degree_day.F90
       growing_degree_day_baskerville_emin.F90
@@ -199,11 +215,8 @@ set(SRCS
       interception__bucket.F90
       interception__gash.F90
       irrigation.F90
-      #libc_utilities.F90
       kiss_random_number_generator.F90
       logfiles.F90
-      #loop_iterate.F90
-      main.F90
       mass_balance__impervious_surface.F90
       mass_balance__interception.F90
       mass_balance__snow.F90
@@ -214,7 +227,6 @@ set(SRCS
       model_initialize.F90
       model_iterate.F90
       model_iterate_multiple_simulations.F90
-      #model.F90
       netcdf4_support.F90
       netcdf_c_api_interfaces.F90
       output.F90
@@ -232,71 +244,23 @@ set(SRCS
       strings.F90
       string_list.F90
       storm_drain_capture.F90
-      #summary_statistics.F90
 
       generated/version_control.F90
 
       )
 
-# the following snippet assigns the local filename to __SRCNAME__
-# for each of the files contained in the 'SRCS' list
-#
-# i.e. rather than using __FILE__, which might expand to
-# d:/Some_dir/some_subdir/filename.F90, we can use
-# __SRCNAME__, which expands to 'filename.F90'
 
-foreach(f IN LISTS SRCS)
-  get_filename_component(b ${f} NAME)
-  set_source_files_properties(${f} PROPERTIES
-    COMPILE_DEFINITIONS "__SRCNAME__=\"${b}\"")
-endforeach()
+add_library(swb_lib STATIC ${SRCS})
+set_target_properties(swb_lib
+      PROPERTIES COMPILE_DEFINITIONS "${PREPROCESSOR_DEFINES}")
+target_link_libraries( swb_lib proj4_lib )
 
-add_executable(swb2 ${SRCS} )
-
+add_executable(swb2 main.F90 )
 set_target_properties(swb2
       PROPERTIES COMPILE_DEFINITIONS "${PREPROCESSOR_DEFINES}")
+target_link_libraries( swb2 proj4_lib swb_lib )
 
-target_link_libraries( swb2 proj4_lib )
-#  target_link_libraries(swb2 ${EXTRA_LIBS})
-
-set(SRCS_SWBSTATS2
-      constants_and_conversions.F90
-      data_catalog.F90
-      data_catalog_entry.F90
-      datetime.F90
-      dictionary.F90
-      exceptions.F90
-      file_operations.F90
-      #get_libc_error_number.c
-      grid.F90
-      #libc_utilities.F90
-      logfiles.F90
-      netcdf4_support.F90
-      netcdf_c_api_interfaces.F90
-      proj4_support.F90
-      simulation_datetime.F90
-      strings.F90
-      string_list.F90
-      swbstats2.F90
-
-      generated/version_control.F90
-      )
-
-# the following snippet assigns the local filename to __SRCNAME__
-# for each of the files contained in the 'SRCS' list
-#
-# i.e. rather than using __FILE__, which might expand to
-# d:/Some_dir/some_subdir/filename.F90, we can use
-# __SRCNAME__, which expands to 'filename.F90'
-#
-foreach(f IN LISTS SRCS_SWBSTATS2)
-  get_filename_component(b ${f} NAME)
-  set_source_files_properties(${f} PROPERTIES
-    COMPILE_DEFINITIONS "__SRCNAME__=\"${b}\"")
-endforeach()
-
-add_executable(swbstats2 ${SRCS_SWBSTATS2} )
-target_link_libraries( swbstats2 proj4_lib )
-
+add_executable(swbstats2 swbstats2.F90 )
 set_target_properties(swbstats2
       PROPERTIES COMPILE_DEFINITIONS "${PREPROCESSOR_DEFINES}")
+target_link_libraries( swbstats2 proj4_lib swb_lib )
