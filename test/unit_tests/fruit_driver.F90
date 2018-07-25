@@ -21,6 +21,7 @@ program tests
   call run_test_case(test_datetime_addition,"datetime: add 5 to Julian day and return the correct Gregorian date")
 
   ! test_gash.F90:
+  call run_test_case(test_gash_psat_calculation,"gash: test calculation of Gash PSat")
   call run_test_case(test_gash_calculation,"gash: calculate Gash interception for published case")
 
   call fruit_summary
