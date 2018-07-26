@@ -480,7 +480,7 @@ end function update_crop_coefficient_date_as_threshold
   real (kind=c_float)                :: fKcb
 
   ! [ LOCALS ]
-  real (kind=c_float) :: fFrac
+  real (kind=c_double) :: fFrac
 
   ! define shorthand variable names for remainder of function
   associate ( GDD_ini_l => GROWTH_STAGE_GDD( GDD_INI, iLanduseIndex ),         &
