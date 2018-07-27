@@ -37,9 +37,9 @@ elemental subroutine update_rooting_depth( Zr_i, Zr_max, landuse_index, Kcb )
   real (kind=c_float), intent(in)     :: Kcb
 
   ! [ LOCALS ]
-  ! 0.3048 feet equals 0.1 meters, which is seems to be the standard
+  ! 0.328 feet equals 0.1 meters, which is seems to be the standard
   ! initial rooting depth in the FAO-56 methodology
-  real (kind=c_float), parameter :: Zr_min = 0.3048
+  real (kind=c_float), parameter :: Zr_min = 0.328
   real (kind=c_float)            :: MaxKCB
   real (kind=c_float)            :: MinKCB
 

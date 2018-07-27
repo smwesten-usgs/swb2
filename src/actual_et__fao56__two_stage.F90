@@ -162,68 +162,6 @@ end function calculate_fraction_exposed_and_wetted_soil_fc
 
 !------------------------------------------------------------------------------
 
-!> Calculate the effective root zone depth.
-!!
-!! Calculate the effective root zone depth given the current stage
-!! of plant growth, the soil type, and the crop type.
-!!
-!! @param[in] pIRRIGATION pointer to a specific line of the irrigation
-!!     lookup data structure.
-!! @param[in] rZr_max The maximum rooting depth for this crop; currently this
-!!     is supplied to this function as the rooting depth associated with the
-!!     landuse/soil type found in the landuse lookup table.
-!! @param[in] iThreshold Numeric value (either the GDD or the DOY) defining
-!!     the time that the crop is planted.
-!! @retval rZr_i current active rooting depth.
-!! @note Implemented as equation 8-1 (Annex 8), FAO-56, Allen and others.
-
-elemental subroutine update_rooting_depth( Zr_i, Zr_max, landuse_index, Kcb )
-
-  real (kind=c_float), intent(inout)  :: Zr_i
-  real (kind=c_float), intent(in)     :: Zr_max
-  integer (kind=c_int), intent(in)    :: landuse_index
-  real (kind=c_float), intent(in)     :: Kcb
-
-  ! [ LOCALS ]
-  ! 0.3280 feet equals 0.1 meters, which is seems to be the standard
-  ! initial rooting depth in the FAO-56 methodology
-  real (kind=c_float), parameter :: Zr_min = 0.3280
-  real (kind=c_float)            :: MaxKCB
-  real (kind=c_float)            :: MinKCB
-
-  if ( KCB_METHOD( landuse_index ) == KCB_METHOD_MONTHLY_VALUES ) then
-    MaxKCB = maxval( KCB_l( JAN:DEC, landuse_index ) )
-    MinKCB = minval( KCB_l( JAN:DEC, landuse_index ) )
-  else
-    MaxKCB = maxval( KCB_l( KCB_INI:KCB_MIN, landuse_index ) )
-    MinKCB = minval( KCB_l( KCB_INI:KCB_MIN, landuse_index ) )
-  endif
-
-  ! if there is not much difference between the MAX Kcb and MIN Kcb, assume that
-  ! we are dealing with an area such as a forest, where we assume that the rooting
-  ! depths are constant year-round
-   if ( ( MaxKCB - MinKCB ) < 0.1_c_float ) then
-
-     Zr_i = Zr_max
-
-   elseif ( MaxKCB > 0.0_C_float ) then
-
-     Zr_i = Zr_min + ( Kcb - MinKCB ) / ( MaxKCB - MinKCB ) * ( Zr_max - Zr_min )
-
-!     Zr_i = ( MinKCB + (Kcb - MinKCB) / (MaxKCB - MinKCB) ) * Zr_max
-
-   else
-
-     Zr_i = Zr_min
-
-   endif
-
-!  fZr_i = fZr_max
-
-end subroutine update_rooting_depth
-
-!------------------------------------------------------------------------------
-
 !> This function estimates Ke, the bare surface evaporation coefficient
 !> @note Implemented as equation 71, FAO-56, Allen and others
 elemental function calculate_surface_evap_coefficient_ke( landuse_index, Kcb, Kr )     result( Ke )
