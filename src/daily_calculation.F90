@@ -67,6 +67,7 @@ contains
     call calculate_snow_mass_balance( snow_storage=cells%snow_storage,                 &
                                       potential_snowmelt=cells%potential_snowmelt,     &
                                       snowmelt=cells%snowmelt,                         &
+                                      interception=cells%interception,                 &
                                       snowfall=cells%snowfall )
 
      cells%runon          = 0.0_c_float

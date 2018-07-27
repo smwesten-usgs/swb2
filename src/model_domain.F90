@@ -62,11 +62,11 @@ module model_domain
     real (kind=c_float), allocatable       :: curve_num_adj(:)
     real (kind=c_float), allocatable       :: gdd(:)
     real (kind=c_float), allocatable       :: crop_coefficient_kcb(:)
-    real (kind=c_float), allocatable       :: surf_evap_coef_ke(:)
-    real (kind=c_float), allocatable       :: plant_stress_coef_ks(:)
-    real (kind=c_float), allocatable       :: evap_reduction_coef_kr(:)
-    real (kind=c_float), allocatable       :: total_available_water_taw(:)
-    real (kind=c_float), allocatable       :: readily_available_water_raw(:)
+    real (kind=c_double), allocatable      :: surf_evap_coef_ke(:)
+    real (kind=c_double), allocatable      :: plant_stress_coef_ks(:)
+    real (kind=c_double), allocatable      :: evap_reduction_coef_kr(:)
+    real (kind=c_double), allocatable      :: total_available_water_taw(:)
+    real (kind=c_double), allocatable      :: readily_available_water_raw(:)
 
     real (kind=c_float), allocatable       :: continuous_frozen_ground_index(:)
 
@@ -104,6 +104,7 @@ module model_domain
     real (kind=c_float), allocatable       :: delta_soil_storage(:)
     real (kind=c_double), pointer          :: soil_storage(:)
     real (kind=c_float), allocatable       :: soil_storage_max(:)
+    real (kind=c_double), allocatable      :: soil_moisture_deficit(:)
     real (kind=c_float), pointer           :: net_infiltration(:)
     real (kind=c_float), allocatable       :: rejected_net_infiltration(:)
     real (kind=c_float), allocatable       :: direct_net_infiltration(:)
@@ -127,7 +128,7 @@ module model_domain
 
     integer (kind=c_int), allocatable      :: sort_order(:)
 
-    real (kind=c_float), allocatable       :: adjusted_depletion_fraction_p(:)
+    real (kind=c_double), allocatable      :: adjusted_depletion_fraction_p(:)
     real (kind=c_float), allocatable       :: fraction_exposed_and_wetted_soil(:)
 
     ! member variables that are only allocated if particular optional methods are invoked
@@ -407,7 +408,7 @@ contains
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
     integer (kind=c_int)  :: indx
-    integer (kind=c_int)  :: iStat(61)
+    integer (kind=c_int)  :: iStat(62)
 
     iCount = count( this%active )
     iStat = 0
@@ -471,7 +472,8 @@ contains
     allocate( this%readily_available_water_raw( iCount ), stat=iStat(58) )
     allocate( this%bare_soil_evap( iCount ), stat=iStat(59) )
     allocate( this%fraction_exposed_and_wetted_soil( iCount ), stat=iStat(60) )
-    allocate( this%delta_soil_storage( iCount ), stat=iStat(60) )
+    allocate( this%delta_soil_storage( iCount ), stat=iStat(61) )
+    allocate( this%soil_moisture_deficit( iCount ), stat=iStat(62) )
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR"                    &
@@ -507,6 +509,7 @@ contains
     this%soil_storage                        = 0.0_c_double
     this%soil_storage_max                    = 0.0_c_float
     this%delta_soil_storage                  = 0.0_c_float
+    this%soil_moisture_deficit               = 0.0_c_float
 
     this%net_infiltration                  = 0.0_c_float
     this%rejected_net_infiltration         = 0.0_c_float
@@ -1497,7 +1500,8 @@ contains
               //"actual_ET, curve_num_adj, inflow, runon, "                                                        &
               //"runoff, outflow, infiltration, snowfall, potential_snowmelt, snowmelt, interception, "            &
               //"rainfall, monthly_gross_precip, monthly_runoff, interception_storage, tmax, tmin, tmean, "        &
-              //"snow_storage, soil_storage, soil_storage_max, delta_soil_storage, surface_storage, "              &
+              //"snow_storage, soil_storage, soil_storage_max, delta_soil_storage, "                               &
+              //"soil_moisture_deficit, surface_storage, "                                                         &
               //"surface_storage_excess, surface_storage_max, net_infiltration, "                                  &
               //"rejected_net_infiltration, fog, irrigation, gdd, runoff_outside, "                                &
               //"pervious_fraction, storm_drain_capture, canopy_cover_fraction, crop_coefficient_kcb, "            &
@@ -2297,7 +2301,6 @@ contains
 
     ! [ LOCALS ]
     integer (kind=c_int)               :: index
-    real (kind=c_float), allocatable   :: deficit(:)
 
     ! if ( present(indx) ) then
 
@@ -2720,7 +2723,7 @@ contains
     if (allocated(this%monthly_runoff) )  monthly_runoff = this%monthly_runoff( cell_indx )
     if (allocated(this%monthly_gross_precip) )  monthly_gross_precip = this%monthly_gross_precip( cell_indx )
 
-      write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',8(i6,','),60(g16.9,','),g16.9)")                                      &
+      write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',8(i6,','),61(g16.9,','),g16.9)")                                      &
         SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                                            &
         this%landuse_code( cell_indx ), this%landuse_index( cell_indx ),                                                    &
         this%soil_group( cell_indx ), this%num_upslope_connections( cell_indx ), this%sum_upslope_cells( cell_indx ),       &
@@ -2733,7 +2736,7 @@ contains
         monthly_gross_precip, monthly_runoff,                                                                                   &
         this%interception_storage( cell_indx ), this%tmax( cell_indx ), this%tmin( cell_indx ), this%tmean( cell_indx ),    &
         this%snow_storage( cell_indx ), this%soil_storage( cell_indx ), this%soil_storage_max( cell_indx ),                 &
-        this%delta_soil_storage( cell_indx ),                                                                               &
+        this%delta_soil_storage( cell_indx ),this%soil_moisture_deficit( cell_indx ),                                       &
         this%surface_storage( cell_indx ), this%surface_storage_excess( cell_indx ),                                        &
         this%surface_storage_max( cell_indx ), this%net_infiltration( cell_indx ),                                          &
         this%rejected_net_infiltration( cell_indx ), this%fog( cell_indx ),                                                 &
@@ -2884,6 +2887,7 @@ contains
               Ke=this%surf_evap_coef_ke( indx ),                                                &
               Ks=this%plant_stress_coef_ks( indx ),                                             &
               adjusted_depletion_fraction_p=this%adjusted_depletion_fraction_p( indx ),         &
+              soil_moisture_deficit=this%soil_moisture_deficit( indx ),                         &
               Kcb=this%crop_coefficient_kcb( indx ),                                            &
               landuse_index=this%landuse_index( indx ),                                         &
               soil_group=this%soil_group( indx ),                                               &

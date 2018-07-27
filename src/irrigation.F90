@@ -431,7 +431,7 @@ contains
     integer (kind=c_int), intent(in)            :: landuse_index
     real (kind=c_double), intent(in)            :: soil_storage
     real (kind=c_float), intent(in)             :: soil_storage_max
-    real (kind=c_float), intent(in)             :: total_available_water
+    real (kind=c_double), intent(in)            :: total_available_water
     real (kind=c_float), intent(in)             :: rainfall
     real (kind=c_float), intent(in)             :: runoff
     real (kind=c_float), intent(in)             :: crop_etc
@@ -495,9 +495,6 @@ contains
       if ( soil_storage_max <= 0.0_c_float ) exit
       if ( IRRIGATION_MASK < 1.0e-6_c_float ) exit
       if ( num_days_since_planting > NUM_DAYS_OF_IRRIGATION( landuse_index ) ) exit
-      ! if ( total_available_water <= 0.0_c_float ) exit
-
-      !depletion_fraction = 1.0_c_float - soil_storage / soil_storage_max
 
       ! total_available_water is calculated only by the fao56_two_stage module, but
       ! not by any other modules; need to just calculate depletion fraction based on

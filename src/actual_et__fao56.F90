@@ -57,7 +57,7 @@ contains
 
 
     real (kind=c_double), intent(inout)            :: actual_et
-    real (kind=c_float), intent(inout)             :: adjusted_depletion_fraction_p
+    real (kind=c_double), intent(inout)            :: adjusted_depletion_fraction_p
     real (kind=c_float), intent(in)                :: depletion_fraction_p
     real (kind=c_double), intent(in)               :: soil_storage
     real (kind=c_float), intent(in)                :: soil_storage_max

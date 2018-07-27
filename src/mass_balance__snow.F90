@@ -4,29 +4,31 @@ module mass_balance__snow
   implicit none
 
 contains
- 
+
   elemental subroutine calculate_snow_mass_balance( snow_storage,         &
                                                     potential_snowmelt,   &
                                                     snowmelt,             &
+                                                    interception,         &
                                                     snowfall )
 
     real (kind=c_float), intent(inout)      :: snow_storage
     real (kind=c_float), intent(inout)      :: snowmelt
     real (kind=c_float), intent(in)         :: potential_snowmelt
-    real (kind=c_float), intent(in)         :: snowfall    
+    real (kind=c_float), intent(in)         :: interception
+    real (kind=c_float), intent(in)         :: snowfall
 
 
-    snow_storage = snow_storage + snowfall
+    snow_storage = max(0.0_c_float, snow_storage + snowfall - interception)
 
-     if( snow_storage > potential_snowmelt ) then
+    if( snow_storage > potential_snowmelt ) then
 
-        snowmelt = potential_snowmelt
+      snowmelt = potential_snowmelt
 
-      else   ! not enough snowcover to satisfy the amount that *could* melt
-        
-        snowmelt = snow_storage
-      
-      end if
+    else   ! not enough snowcover to satisfy the amount that *could* melt
+
+      snowmelt = snow_storage
+
+    end if
 
     snow_storage = max( snow_storage - snowmelt, 0.0_c_float )
 
