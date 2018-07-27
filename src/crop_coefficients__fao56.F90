@@ -305,13 +305,19 @@ contains
         GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) + L_late_l( iIndex )
         GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) + L_fallow_l( iIndex )
 
-        call LOGS%write( asCharacter( LANDUSE_CODE( iIndex ))//" | "                &
-           //trim( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate() )//" | " &
+        call LOGS%write( "| "//asCharacter( LANDUSE_CODE( iIndex ))//" | "                &
+           //trim( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate() )        &
+             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%getDayOfYear() )//") | " &
            //trim( GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )%prettydate() )//" | "   &
+             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )%getDayOfYear() )//") | " &
            //trim( GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )%prettydate() )//" | "   &
+             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )%getDayOfYear() )//") | " &
            //trim( GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )%prettydate() )//" | "   &
+             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )%getDayOfYear() )//") | " &
            //trim( GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate() )//" | "  &
-           //trim( GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex )%prettydate() ) )
+             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%getDayOfYear() )//") | " &
+           //trim( GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex )%prettydate() )       &
+             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex )%getDayOfYear() )//") | ")
       enddo
 
     endif
@@ -405,7 +411,7 @@ contains
   real (kind=c_float)                :: Kcb
 
   ! [ LOCALS ]
-  real (kind=c_float) :: fFrac
+  real (kind=c_double) :: fFrac
 
   if ( KCB_METHOD( iLanduseIndex ) == KCB_METHOD_MONTHLY_VALUES ) then
 
@@ -414,15 +420,15 @@ contains
   else
 
     ! define shorthand variable names for remainder of function
-    associate ( Date_ini => GROWTH_STAGE_DATE( ENDDATE_INI, iLanduseIndex ),         &
-                Date_dev => GROWTH_STAGE_DATE( ENDDATE_DEV, iLanduseIndex ),         &
-                Date_mid => GROWTH_STAGE_DATE( ENDDATE_MID, iLanduseIndex ),         &
-                Date_late => GROWTH_STAGE_DATE( ENDDATE_LATE, iLanduseIndex ),       &
-                Date_fallow => GROWTH_STAGE_DATE( ENDDATE_FALLOW, iLanduseIndex ),   &
+    associate ( Date_ini => GROWTH_STAGE_DATE( ENDDATE_INI, iLanduseIndex ),           &
+                Date_dev => GROWTH_STAGE_DATE( ENDDATE_DEV, iLanduseIndex ),           &
+                Date_mid => GROWTH_STAGE_DATE( ENDDATE_MID, iLanduseIndex ),           &
+                Date_late => GROWTH_STAGE_DATE( ENDDATE_LATE, iLanduseIndex ),         &
+                Date_fallow => GROWTH_STAGE_DATE( ENDDATE_FALLOW, iLanduseIndex ),     &
                 Kcb_ini => KCB_l(KCB_INI, iLanduseIndex),                              &
                 Kcb_mid => KCB_l(KCB_MID, iLanduseIndex),                              &
                 Kcb_min => KCB_l(KCB_MIN, iLanduseIndex),                              &
-                PlantingDate => GROWTH_STAGE_DATE( PLANTING_DATE, iLanduseIndex),    &
+                PlantingDate => GROWTH_STAGE_DATE( PLANTING_DATE, iLanduseIndex),      &
                 Kcb_end => KCB_l(KCB_END, iLanduseIndex),                              &
                 current_date => SIM_DT%curr )
 
@@ -436,7 +442,7 @@ contains
 
         fFrac = ( current_date - Date_mid ) / ( Date_late - Date_mid )
 
-        Kcb =  Kcb_mid * (1_c_float - fFrac) + Kcb_end * fFrac
+        Kcb =  Kcb_mid * (1.0_c_double - fFrac) + Kcb_end * fFrac
 
       elseif ( current_date > Date_dev ) then
 
@@ -446,7 +452,7 @@ contains
 
         fFrac = ( current_date - Date_ini ) / ( Date_dev - Date_ini )
 
-        Kcb = Kcb_ini * (1_c_float - fFrac) + Kcb_mid * fFrac
+        Kcb = Kcb_ini * (1.0_c_double - fFrac) + Kcb_mid * fFrac
 
       elseif ( current_date >= PlantingDate ) then
 
@@ -502,7 +508,7 @@ end function update_crop_coefficient_date_as_threshold
 
       fFrac = ( fGDD - GDD_mid_l ) / ( GDD_late_l - GDD_mid_l )
 
-      fKcb =  Kcb_mid * (1_c_float - fFrac) + Kcb_end * fFrac
+      fKcb =  Kcb_mid * (1.0_c_double - fFrac) + Kcb_end * fFrac
 
     elseif ( fGDD > GDD_dev_l ) then
 
@@ -512,7 +518,7 @@ end function update_crop_coefficient_date_as_threshold
 
       fFrac = ( fGDD - GDD_ini_l ) / ( GDD_dev_l - GDD_ini_l )
 
-      fKcb = Kcb_ini * (1_c_float - fFrac) + Kcb_mid * fFrac
+      fKcb = Kcb_ini * (1_c_double - fFrac) + Kcb_mid * fFrac
 
     elseif ( fGDD >= GDD_plant_l ) then
 

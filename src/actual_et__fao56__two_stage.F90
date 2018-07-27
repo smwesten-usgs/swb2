@@ -43,13 +43,13 @@ contains
 
     integer ( kind=c_int), intent(in)    :: landuse_index
     real (kind=c_float), intent(in)      :: reference_et0
-    real (kind=c_float)                  :: p
+    real (kind=c_double)                 :: p
 
-    p = DEPLETION_FRACTION( landuse_index )                                      &
-            + 0.04_c_float * ( 5.0_c_float - in_to_mm( reference_et0 ) )
+    p = real(DEPLETION_FRACTION( landuse_index ),kind=c_double) + 0.04_c_double         &
+        * ( 5.0_c_double - in_to_mm( real(reference_et0, kind=c_double ) ) )
 
-    p = min( p, 0.8_c_float )
-    p = max( p, 0.1_c_float )
+    p = min( p, 0.8_c_double )
+    p = max( p, 0.1_c_double )
 
   end function adjust_depletion_fraction_p
 
@@ -101,7 +101,7 @@ elemental function calculate_evaporation_reduction_coefficient_Kr( landuse_index
   real (kind=c_float), intent(in)   :: soil_storage_max
 
   ! [ RESULT ]
-  real (kind=c_float) :: Kr
+  real (kind=c_double) :: Kr
 
   ! [ LOCALS ]
   real (kind=c_double) :: deficit
@@ -112,7 +112,7 @@ elemental function calculate_evaporation_reduction_coefficient_Kr( landuse_index
     deficit = real( soil_storage_max, kind=c_double) - soil_storage
 
     if ( deficit < REW ) then
-      Kr = 1._c_float
+      Kr = 1._c_double
     elseif ( deficit < TEW ) then
       Kr = ( TEW - deficit ) / ( TEW - REW + 1.0E-8)
     else
