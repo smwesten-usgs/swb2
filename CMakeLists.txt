@@ -45,11 +45,11 @@ set(CMAKE_INCLUDE_CURRENT_DIR OFF)
 
 set(PACKAGE_BUGREPORT "smwesten@usgs.gov")
 set(PACKAGE_NAME "swb2")
-set(PACKAGE_STRING "swb2 2.0 ALPHA")
+set(PACKAGE_STRING "swb2 2.0")
 set(PACKAGE_TARNAME "swb2")
-set(PACKAGE_VERSION "2.0 ALPHA")
+set(PACKAGE_VERSION "2.0")
 
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.1)
 
 include( cmake/version_control.cmake )
 

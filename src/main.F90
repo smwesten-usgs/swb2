@@ -157,7 +157,7 @@ program main
       if ( .not. sDataDirectoryName(iLen:iLen) .eq. OS_NATIVE_PATH_DELIMITER )  &
         sDataDirectoryName = trim(sDataDirectoryName)//OS_NATIVE_PATH_DELIMITER
 
-    elseif ( sBuf(1:11) .eq. "--weather_data_dir=" ) then
+    elseif ( sBuf(1:19) .eq. "--weather_data_dir=" ) then
 
       sWeatherDataDirectoryName = sBuf(20:)
       iLen = len_trim( sWeatherDataDirectoryName )
@@ -178,13 +178,13 @@ program main
 
   ! open and initialize logfiles
   call LOGS%initialize( iLogLevel = LOG_DEBUG )
-  call LOGS%write( sMessage='Base data directory name set to: "'//trim( sDataDirectoryName )//'"', &
-                   lEcho=.TRUE._c_bool )
-  call LOGS%write( sMessage='Weather data directory name set to: "'//trim( sWeatherDataDirectoryName )//'"', &
-                   lEcho=.TRUE._c_bool )
+  call LOGS%write( sMessage='Base data directory name set to:',lEcho=.TRUE._c_bool )
+  call LOGS%write( sMessage='"'//trim( sDataDirectoryName )//'"', iTab=4,lEcho=.TRUE._c_bool )
+  call LOGS%write( sMessage='Weather data directory (precip, tmin, tmax grids) name set to: ',lEcho=.TRUE._c_bool )
+  call LOGS%write( '"'//trim( sWeatherDataDirectoryName )//'"',iTab=4,lEcho=.TRUE._c_bool )
 
-  call LOGS%write( sMessage='Output file prefix set to: "'//trim( sOutputPrefixName )//'"', &
-                   lEcho=.TRUE._c_bool )
+  call LOGS%write( sMessage='Output file prefix set to:',lEcho=.TRUE._c_bool )
+  call LOGS%write( sMessage='"'//trim( sOutputPrefixName )//'"', iTab=4, lEcho=.TRUE._c_bool )
 
   if (RANDOM_START >0)   &
     call LOGS%write(sMessage="Pseudo-random numbers will be pulled from index number "   &

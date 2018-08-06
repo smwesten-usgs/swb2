@@ -33,9 +33,10 @@ module model_initialize
   public :: check_for_fatal_warnings
 
   type GRIDDED_DATASETS_T
-    character (len=38)     :: sName
-    logical (kind=c_bool)  :: lOptional
-    integer (kind=c_int)   :: iDataType
+    character (len=38)             :: sName
+    character (len=256)            :: sPathname
+    logical (kind=c_bool)          :: lOptional
+    integer (kind=c_int)           :: iDataType
   end type GRIDDED_DATASETS_T
 
   type METHODS_LIST_T
@@ -46,51 +47,51 @@ module model_initialize
   integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 43
   integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 18
 
-  type (GRIDDED_DATASETS_T), parameter  :: KNOWN_GRIDS( NUMBER_OF_KNOWN_GRIDS ) =       &
+  type (GRIDDED_DATASETS_T)    :: KNOWN_GRIDS( NUMBER_OF_KNOWN_GRIDS ) =                             &
 
-    [ GRIDDED_DATASETS_T("PRECIPITATION                         ", lFALSE, DATATYPE_FLOAT ),     &
-      GRIDDED_DATASETS_T("TMIN                                  ", lFALSE, DATATYPE_FLOAT ),     &
-      GRIDDED_DATASETS_T("TMAX                                  ", lFALSE, DATATYPE_FLOAT ),     &
-      GRIDDED_DATASETS_T("AVAILABLE_WATER_CONTENT               ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("REFERENCE_ET0                         ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("POTENTIAL_ET                          ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("SOLAR_RADIATION                       ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("WIND_SPEED                            ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("RAINFALL_ZONE                         ", lTRUE, DATATYPE_INT ),        &
-      GRIDDED_DATASETS_T("REFERENCE_ET_ZONE                     ", lTRUE, DATATYPE_INT ),        &
-      GRIDDED_DATASETS_T("POTENTIAL_ET_ZONE                     ", lTRUE, DATATYPE_INT ),        &
-      GRIDDED_DATASETS_T("FLOW_DIRECTION                        ", lTRUE, DATATYPE_INT),         &
-      GRIDDED_DATASETS_T("FOG_RATIO                             ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("LAND_USE                              ", lFALSE, DATATYPE_INT ),       &
-      GRIDDED_DATASETS_T("SOILS_CODE                            ", lTRUE, DATATYPE_INT ),        &
-      GRIDDED_DATASETS_T("HYDROLOGIC_SOILS_GROUP                ", lFALSE, DATATYPE_INT ),       &
-      GRIDDED_DATASETS_T("INITIAL_PERCENT_SOIL_MOISTURE         ", lFALSE, DATATYPE_FLOAT),      &
-      GRIDDED_DATASETS_T("INITIAL_SNOW_COVER_STORAGE            ", lTRUE, DATATYPE_FLOAT),       &
-      GRIDDED_DATASETS_T("INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX", lTRUE, DATATYPE_FLOAT),       &
-      GRIDDED_DATASETS_T("PERCENT_CANOPY_COVER                  ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("PERCENT_PERVIOUS_COVER                ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("PERCENT_IMPERVIOUS_COVER              ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("FRACTION_CANOPY_COVER                 ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("FRACTION_PERVIOUS_COVER               ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("FRACTION_IMPERVIOUS_COVER             ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("STEMFLOW_FRACTION                     ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("EVAPORATION_TO_RAINFALL_RATIO         ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("RAINFALL_ADJUST_FACTOR                ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("CESSPOOL_LEAKAGE                      ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("STORM_DRAIN_CAPTURE_FRACTION          ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("WATER_BODY_LEAKAGE                    ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("WATER_MAIN_LEAKAGE                    ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("DISPOSAL_WELL_DISCHARGE               ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("ANNUAL_DIRECT_NET_INFILTRATION_RATE   ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("ANNUAL_SEPTIC_DISCHARGE               ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("SEPTIC_DISCHARGE                      ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("RUNOFF_ZONE                           ", lTRUE, DATATYPE_INT ),        &
-      GRIDDED_DATASETS_T("POLYGON_ID                            ", lTRUE, DATATYPE_INT ),        &
-      GRIDDED_DATASETS_T("SOIL_STORAGE_MAX                      ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("PLANT_AVAILABLE_WATER                 ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("MAXIMUM_NET_INFILTRATION              ", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("IRRIGATION_MASK                       ", lTRUE, DATATYPE_INT),         &
-      GRIDDED_DATASETS_T("RELATIVE_HUMIDITY                     ", lTRUE, DATATYPE_FLOAT )   ]
+    [ GRIDDED_DATASETS_T("PRECIPITATION                         ", "", lFALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("TMIN                                  ", "", lFALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("TMAX                                  ", "", lFALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("AVAILABLE_WATER_CONTENT               ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("REFERENCE_ET0                         ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("POTENTIAL_ET                          ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("SOLAR_RADIATION                       ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("WIND_SPEED                            ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("RAINFALL_ZONE                         ", "", lTRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("REFERENCE_ET_ZONE                     ", "", lTRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("POTENTIAL_ET_ZONE                     ", "", lTRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("FLOW_DIRECTION                        ", "", lTRUE, DATATYPE_INT),         &
+      GRIDDED_DATASETS_T("FOG_RATIO                             ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("LAND_USE                              ", "", lFALSE, DATATYPE_INT ),       &
+      GRIDDED_DATASETS_T("SOILS_CODE                            ", "", lTRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("HYDROLOGIC_SOILS_GROUP                ", "", lFALSE, DATATYPE_INT ),       &
+      GRIDDED_DATASETS_T("INITIAL_PERCENT_SOIL_MOISTURE         ", "", lFALSE, DATATYPE_FLOAT),      &
+      GRIDDED_DATASETS_T("INITIAL_SNOW_COVER_STORAGE            ", "", lTRUE, DATATYPE_FLOAT),       &
+      GRIDDED_DATASETS_T("INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX", "", lTRUE, DATATYPE_FLOAT),       &
+      GRIDDED_DATASETS_T("PERCENT_CANOPY_COVER                  ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("PERCENT_PERVIOUS_COVER                ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("PERCENT_IMPERVIOUS_COVER              ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("FRACTION_CANOPY_COVER                 ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("FRACTION_PERVIOUS_COVER               ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("FRACTION_IMPERVIOUS_COVER             ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("STEMFLOW_FRACTION                     ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("EVAPORATION_TO_RAINFALL_RATIO         ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("RAINFALL_ADJUST_FACTOR                ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("CESSPOOL_LEAKAGE                      ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("STORM_DRAIN_CAPTURE_FRACTION          ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("WATER_BODY_LEAKAGE                    ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("WATER_MAIN_LEAKAGE                    ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("DISPOSAL_WELL_DISCHARGE               ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("ANNUAL_DIRECT_NET_INFILTRATION_RATE   ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("ANNUAL_SEPTIC_DISCHARGE               ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("SEPTIC_DISCHARGE                      ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("RUNOFF_ZONE                           ", "", lTRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("POLYGON_ID                            ", "", lTRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("SOIL_STORAGE_MAX                      ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("PLANT_AVAILABLE_WATER                 ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("MAXIMUM_NET_INFILTRATION              ", "", lTRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("IRRIGATION_MASK                       ", "", lTRUE, DATATYPE_INT),         &
+      GRIDDED_DATASETS_T("RELATIVE_HUMIDITY                     ", "", lTRUE, DATATYPE_FLOAT )   ]
 
   type (METHODS_LIST_T), parameter  :: KNOWN_METHODS( NUMBER_OF_KNOWN_METHODS ) =   &
 
@@ -157,6 +158,7 @@ contains
     do iIndex = 1, ubound(KNOWN_GRIDS, 1)
 
       call initialize_generic_grid( sKey=KNOWN_GRIDS(iIndex)%sName,            &
+                                    sPathname=KNOWN_GRIDS(iIndex)%sPathname,   &
                                     lOptional=KNOWN_GRIDS(iIndex)%lOptional,   &
                                     iDataType=KNOWN_GRIDS(iIndex)%iDataType )
 
@@ -297,6 +299,22 @@ contains
 
     character(len=*), intent(in) :: data_dirname
 
+    integer (kind=c_int) :: indx
+
+    do indx=1,ubound(KNOWN_GRIDS,1)
+
+      select case (trim(KNOWN_GRIDS(indx)%sName))
+
+        case("PRECIPITATION","TMIN","TMAX")
+
+        case default
+
+          KNOWN_GRIDS(indx)%sPathname = trim( data_dirname )
+
+      end select
+
+    enddo
+
     ! setting the MODULE variable DATA_DIRECTORY_NAME, module = file_operations
     DATA_DIRECTORY_NAME = data_dirname
 
@@ -308,8 +326,21 @@ contains
 
     character(len=*), intent(in) :: weather_data_dirname
 
-    ! setting the MODULE variable WEATHER_DATA_DIRECTORY_NAME, module = XXXX
-    !WEATHER_DATA_DIRECTORY_NAME = data_dirname
+    integer (kind=c_int) :: indx
+
+    do indx=1,ubound(KNOWN_GRIDS,1)
+
+      select case (trim(KNOWN_GRIDS(indx)%sName))
+
+        case("PRECIPITATION","TMIN","TMAX")
+
+          KNOWN_GRIDS(indx)%sPathname = trim( weather_data_dirname )
+
+        case default
+
+      end select
+
+    enddo
 
   end subroutine set_weather_data_directory
 
@@ -905,9 +936,10 @@ contains
   !! to the list defined in the module variable @ref KNOWN_TYPES.
   !!
 
-  subroutine initialize_generic_grid(sKey, lOptional, iDataType )
+  subroutine initialize_generic_grid(sKey, sPathname, lOptional, iDataType )
 
     character (len=*), intent(in)      :: sKey
+    character (len=*), intent(in)      :: sPathname
     logical (kind=c_bool), intent(in)  :: lOptional
     integer (kind=c_int), intent(in)   :: iDataType
 
@@ -1012,18 +1044,18 @@ contains
               .or. (sArgText_1 .strapprox. "SURFER")                 &
               .or. (sArgText_1 .strapprox. "ARC_GRID") ) then
 
-            call pENTRY%initialize(                   &
-              sDescription=trim(sCmdText),            &
-              sFileType=trim(sArgText_1),             &
-              sFilename=fix_pathname(sArgText_2),     &
+            call pENTRY%initialize(                                    &
+              sDescription=trim(sCmdText),                             &
+              sFileType=trim(sArgText_1),                              &
+              sFilename=fix_pathname(trim(sPathname)//sArgText_2),     &
               iDataType=iDataType )
             lGridPresent = lTRUE
 
           elseif ( sArgText_1 .strapprox. "NETCDF" ) then
 
-            call pENTRY%initialize_netcdf(            &
-              sDescription=trim(sCmdText),            &
-              sFilename = fix_pathname(sArgText_2),   &
+            call pENTRY%initialize_netcdf(                             &
+              sDescription=trim(sCmdText),                             &
+              sFilename = fix_pathname(trim(sPathname)//sArgText_2),   &
               iDataType=iDataType )
             lGridPresent = lTRUE
 

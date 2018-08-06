@@ -409,18 +409,19 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  function fully_qualified_filename( filename )
+  function fully_qualified_filename( filename, pathname )
 
-    character(len=*), intent(in)    :: filename
-    character(len=:), allocatable   :: fully_qualified_filename
+    character(len=*), intent(in)            :: filename
+    character(len=*), intent(in), optional  :: pathname
+    character(len=:), allocatable           :: fully_qualified_filename
 
-    if (.not. allocated( DATA_DIRECTORY_NAME ) ) then
+    if (.not. present(pathname) ) then
 
       fully_qualified_filename = fix_pathname(filename)
 
     else
 
-      fully_qualified_filename = trim( DATA_DIRECTORY_NAME )//fix_pathname(filename)
+      fully_qualified_filename = trim( pathname )//fix_pathname(filename)
 
     endif
 
