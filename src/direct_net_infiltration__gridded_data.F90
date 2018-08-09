@@ -308,32 +308,19 @@ contains
     real (kind=c_float), intent(in)        :: nodata_fill_value(:,:)
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iJulianDay
-    integer (kind=c_int) :: iMonth
-    integer (kind=c_int) :: iDay
-    integer (kind=c_int) :: iYear
-    integer (kind=c_int) :: iDaysInMonth
-    integer (kind=c_int) :: iNumDaysFromOrigin
     real (kind=c_float)  :: fFactor
 
     if ( .not. DATE_OF_LAST_RETRIEVAL == SIM_DT%curr ) then
 
       associate ( dt => SIM_DT%curr )
 
-        iJulianDay = dt%getJulianDay()
-        iMonth = asInt( dt%iMonth )
-        iDay = asInt( dt%iDay )
-        iYear = dt%iYear
-        iDaysInMonth = SIM_DT%iDaysInMonth
-        iNumDaysFromOrigin = SIM_DT%iNumDaysFromOrigin
-
         if ( associated( pCESSPOOL ) ) then
-          call pCESSPOOL%getvalues( iMonth, iDay, iYear, iJulianDay )
+          call pCESSPOOL%getvalues( dt )
           if ( pCESSPOOL%lGridHasChanged ) fCESSPOOL = pack( pCESSPOOL%pGrdBase%rData, is_cell_active )
         endif
 
         if ( associated( pDISPOSAL_WELL ) ) then
-          call pDISPOSAL_WELL%getvalues( iMonth, iDay, iYear, iJulianDay )
+          call pDISPOSAL_WELL%getvalues( dt )
           if ( pDISPOSAL_WELL%lGridHasChanged ) fDISPOSAL_WELL =                                      &
                pack( pDISPOSAL_WELL%pGrdBase%rData, is_cell_active )
         endif
@@ -344,18 +331,18 @@ contains
         ! endif
 
         if ( associated( pWATER_BODY_RECHARGE ) ) then
-          call pWATER_BODY_RECHARGE%getvalues( iMonth, iDay, iYear, iJulianDay )
+          call pWATER_BODY_RECHARGE%getvalues( dt )
           if ( pWATER_BODY_RECHARGE%lGridHasChanged ) fWATER_BODY_RECHARGE =                          &
                pack( pWATER_BODY_RECHARGE%pGrdBase%rData, is_cell_active )
         endif
 
         if ( associated( pWATER_MAIN ) ) then
-          call pWATER_MAIN%getvalues( iMonth, iDay, iYear, iJulianDay )
+          call pWATER_MAIN%getvalues( dt )
           if ( pWATER_MAIN%lGridHasChanged ) fWATER_MAIN = pack( pWATER_MAIN%pGrdBase%rData, is_cell_active )
         endif
 
         if ( associated( pANNUAL_RECHARGE_RATE ) ) then
-          call pANNUAL_RECHARGE_RATE%getvalues( iMonth, iDay, iYear, iJulianDay )
+          call pANNUAL_RECHARGE_RATE%getvalues( dt )
           if ( pANNUAL_RECHARGE_RATE%lGridHasChanged ) fANNUAL_RECHARGE_RATE =                        &
                pack( pANNUAL_RECHARGE_RATE%pGrdBase%rData, is_cell_active )
         endif

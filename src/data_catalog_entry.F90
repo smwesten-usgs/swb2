@@ -494,24 +494,18 @@ end subroutine initialize_netcdf_data_object_sub
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine getvalues_sub( this, iMonth, iDay, iYear, iJulianDay )
+  subroutine getvalues_sub( this, dt )
 
     class (DATA_CATALOG_ENTRY_T) :: this
-    integer (kind=c_int), intent(in), optional :: iMonth, iDay, iYear, iJulianDay
-
-    ! [ LOCALS ]
-    integer (kind=c_int) :: iNumDaysToPad
-    integer (kind=c_int) :: iPadDays
-    integer (kind=c_int) :: iLocalJulianDay
+    type (DATETIME_T), optional  :: dt
 
     if(this%iSourceDataForm == DYNAMIC_GRID ) then
 
-      call getvalues_gridded_sub( this, iMonth, iDay, iYear)
+      call getvalues_gridded_sub( this, dt )
 
     elseif ( this%iSourceDataForm == DYNAMIC_NETCDF_GRID ) then
 
-      iLocalJulianDay = iJulianDay
-      call getvalues_dynamic_netcdf_sub( this, iMonth, iDay, iYear, iLocalJulianDay)
+      call getvalues_dynamic_netcdf_sub( this, dt )
 
     elseif ( this%iSourceDataForm == STATIC_NETCDF_GRID ) then
 
@@ -648,12 +642,10 @@ subroutine getvalues_constant_sub( this  )
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine getvalues_gridded_sub( this, iMonth, iDay, iYear)
+  subroutine getvalues_gridded_sub( this, dt )
 
-    class (DATA_CATALOG_ENTRY_T) :: this
-    integer (kind=c_int), optional :: iMonth
-    integer (kind=c_int), optional :: iDay
-    integer (kind=c_int), optional :: iYear
+    class (DATA_CATALOG_ENTRY_T)   :: this
+    type (DATETIME_T), optional    :: dt
     logical (kind=c_bool) :: lExist
     logical (kind=c_bool) :: lOpened
 
@@ -668,13 +660,13 @@ subroutine getvalues_constant_sub( this  )
 
       if(this%iSourceDataForm == DYNAMIC_GRID ) then
 
-        if(.not. (present(iMonth) .and. present(iDay) .and. present(iYear) ) ) &
-          call assert(lFALSE, "INTERNAL PROGRAMMING ERROR - month, day, and year" &
-            //" arguments must be supplied when calling this subroutine in a " &
+        if(.not. present(dt) ) &
+          call assert(lFALSE, "INTERNAL PROGRAMMING ERROR - datetime object"   &
+            //" must be supplied when calling this subroutine in a "           &
             //"dynamic mode.", __SRCNAME__, __LINE__)
 
 
-        call this%make_filename(iMonth, iDay, iYear)
+        call this%make_filename(dt)
 
       endif
 
@@ -877,19 +869,18 @@ end subroutine set_constant_value_real
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine make_filename_from_template( this, iMonth, iDay, iYear )
+  subroutine make_filename_from_template( this, dt )
 
-    class (DATA_CATALOG_ENTRY_T) :: this
-    integer (kind=c_int), optional :: iMonth
-    integer (kind=c_int), optional :: iDay
-    integer (kind=c_int), optional :: iYear
+    class (DATA_CATALOG_ENTRY_T)            :: this
+    type (DATETIME_T), intent(in), optional :: dt
 
     ! [ LOCALS ]
     character (len=256) :: sNewFilename
     character (len=256) :: sUppercaseFilename
     character (len=256) :: sCWD
     character (len=256) :: sBuf2
-    integer (kind=c_int) :: iPos_Y, iPos_D, iPos_M, iPos_0D, iPos_0M, iPos_B, iPos_BF, iPos, iPos2, iLen, iCount
+    integer (kind=c_int) :: iPos_Y, iPos_D, iPos_M, iPos_0D, iPos_0M, iPos_B,  &
+                            iPos_BF, iPos_j, iPos, iPos2, iLen, iCount
     integer (kind=c_int) :: iNumZeros, iNumZerosToPrint
     logical (kind=c_bool) :: lMatch
     logical (kind=c_bool) :: lExist
@@ -900,6 +891,7 @@ end subroutine set_constant_value_real
     logical (kind=c_bool) :: lAnnual
 
     iPos_Y = 0; iPos_M = 0; iPos_D = 0; iPos = 0; iPos_B = 0; iPos_BF = 0; sNumber = ""
+    iPos_j = 0
     lAnnual = lFALSE
 
     ! EXAMPLES of the kinds of templates that we need to be able to understand:
@@ -919,19 +911,15 @@ end subroutine set_constant_value_real
 
       lMatch = lFALSE
 
-      if (present(iYear) ) then
+      iPos_Y = max(index(sNewFilename, "%Y"), index(sNewFilename, "%y") )
 
-        iPos_Y = max(index(sNewFilename, "%Y"), index(sNewFilename, "%y") )
+      if (iPos_Y > 0) then
+        lMatch = lTRUE
+        iLen=len_trim(sNewFilename)
+        sNewFilename = sNewFilename(1:iPos_Y - 1)//trim(asCharacter(dt%iYear)) &
+                       //sNewFilename(iPos_Y + 2:iLen)
 
-        if (iPos_Y > 0) then
-          lMatch = lTRUE
-          iLen=len_trim(sNewFilename)
-          sNewFilename = sNewFilename(1:iPos_Y - 1)//trim(asCharacter(iYear)) &
-                         //sNewFilename(iPos_Y + 2:iLen)
-
-          lAnnual = lTRUE
-
-        endif
+        lAnnual = lTRUE
 
       endif
 
@@ -960,118 +948,124 @@ end subroutine set_constant_value_real
                        //sNewFilename(iPos+1:iLen)
       endif
 
-
       ! evaluate template string for "%m": month number
-      if (present(iMonth) ) then
 
-        iPos_M = index(sNewFilename, "%m")
-        iPos_0M = index(sNewFilename, "%0m")
-        iPos_B = index(sNewFilename, "%b")
-        iPos_BF = index(sNewFilename, "%B")
+      iPos_M = index(sNewFilename, "%m")
+      iPos_0M = index(sNewFilename, "%0m")
+      iPos_B = index(sNewFilename, "%b")
+      iPos_BF = index(sNewFilename, "%B")
 
-        if ( iPos_0M > 0 ) then
+      if ( iPos_0M > 0 ) then
 
-          lMatch = lTRUE
-          lAnnual = lFALSE
-          write (unit=sBuf, fmt="(i2.2)") iMonth
+        lMatch = lTRUE
+        lAnnual = lFALSE
+        write (unit=sBuf, fmt="(i2.2)") dt%iMonth
 
-          iLen=len_trim(sNewFilename)
-          sNewFilename = sNewFilename(1:iPos_0M - 1)//trim(sBuf) &
-                         //sNewFilename(iPos_0M + 3:iLen)
+        iLen=len_trim(sNewFilename)
+        sNewFilename = sNewFilename(1:iPos_0M - 1)//trim(sBuf) &
+                       //sNewFilename(iPos_0M + 3:iLen)
 
-        elseif ( iPos_M > 0 ) then
+      elseif ( iPos_M > 0 ) then
 
-          lMatch = lTRUE
-          lAnnual = lFALSE
-          sBuf = asCharacter( iMonth )
+        lMatch = lTRUE
+        lAnnual = lFALSE
+        sBuf = asCharacter( dt%iMonth )
 
-          iLen=len_trim(sNewFilename)
-          sNewFilename = sNewFilename(1:iPos_M - 1)//trim(sBuf) &
-                         //sNewFilename(iPos_M + 2:iLen)
+        iLen=len_trim(sNewFilename)
+        sNewFilename = sNewFilename(1:iPos_M - 1)//trim(sBuf) &
+                       //sNewFilename(iPos_M + 2:iLen)
 
-        elseif ( iPos_B > 0 ) then
+      elseif ( iPos_B > 0 ) then
 
-          lMatch = lTRUE
-          lAnnual = lFALSE
+        lMatch = lTRUE
+        lAnnual = lFALSE
 
-          select case ( this% iFilename_Monthname_Capitalization_Rule )
+        select case ( this% iFilename_Monthname_Capitalization_Rule )
 
-            case ( FILE_TEMPLATE_UPPERCASE_MONTHNAME )
+          case ( FILE_TEMPLATE_UPPERCASE_MONTHNAME )
 
-              sBuf = MONTHS( iMonth )%sName
-              call toUppercase( sBuf )
+            sBuf = MONTHS( dt%iMonth )%sName
+            call toUppercase( sBuf )
 
-            case ( FILE_TEMPLATE_LOWERCASE_MONTHNAME )
+          case ( FILE_TEMPLATE_LOWERCASE_MONTHNAME )
 
-              sBuf = MONTHS( iMonth )%sName
-              call toLowercase ( sBuf )
+            sBuf = MONTHS( dt%iMonth )%sName
+            call toLowercase ( sBuf )
 
-            case default
+          case default
 
-              sBuf = MONTHS( iMonth )%sName
+            sBuf = MONTHS( dt%iMonth )%sName
 
-          end select
+        end select
 
-          iLen=len_trim(sNewFilename)
-          sNewFilename = sNewFilename(1:iPos_B - 1)//trim(sBuf) &
-                         //sNewFilename(iPos_B + 2:iLen)
+        iLen=len_trim(sNewFilename)
+        sNewFilename = sNewFilename(1:iPos_B - 1)//trim(sBuf) &
+                       //sNewFilename(iPos_B + 2:iLen)
 
-        elseif ( iPos_BF > 0 ) then
+      elseif ( iPos_BF > 0 ) then
 
-          lMatch = lTRUE
-          lAnnual = lFALSE
+        lMatch = lTRUE
+        lAnnual = lFALSE
 
-          select case ( this% iFilename_Monthname_Capitalization_Rule )
+        select case ( this% iFilename_Monthname_Capitalization_Rule )
 
-            case ( FILE_TEMPLATE_UPPERCASE_MONTHNAME )
+          case ( FILE_TEMPLATE_UPPERCASE_MONTHNAME )
 
-              sBuf = MONTHS( iMonth )%sFullName
-              call toUppercase( sBuf )
+            sBuf = MONTHS( dt%iMonth )%sFullName
+            call toUppercase( sBuf )
 
-            case ( FILE_TEMPLATE_LOWERCASE_MONTHNAME )
+          case ( FILE_TEMPLATE_LOWERCASE_MONTHNAME )
 
-              sBuf = MONTHS( iMonth )%sFullName
-              call toLowercase( sBuf )
+            sBuf = MONTHS( dt%iMonth )%sFullName
+            call toLowercase( sBuf )
 
-            case default
+          case default
 
-              sBuf = MONTHS( iMonth )%sFullName
+            sBuf = MONTHS( dt%iMonth )%sFullName
 
-          end select
+        end select
 
-          iLen=len_trim(sNewFilename)
-          sNewFilename = sNewFilename(1:iPos_BF - 1)//trim(sBuf) &
-                         //sNewFilename( ( iPos_BF + len_trim(sBuf) - 1):iLen)
-
-        endif
+        iLen=len_trim(sNewFilename)
+        sNewFilename = sNewFilename(1:iPos_BF - 1)//trim(sBuf) &
+                       //sNewFilename( ( iPos_BF + len_trim(sBuf) - 1):iLen)
 
       endif
 
+      ! evaluate template string for DOY number (%j)
+      iPos_j = max(index(sNewFilename, "%J"),index(sNewFilename, "%j") )
+
+      if (iPos_j > 0) then
+        lMatch = lTRUE
+        lAnnual = lFALSE
+        write (unit=sBuf, fmt="(i3.3)") dt%getDayOfYear()
+        iLen=len_trim(sNewFilename)
+        sNewFilename = sNewFilename(1:iPos_j - 1)//trim(sBuf) &
+                       //sNewFilename(iPos_j + 3:iLen)
+
+       endif
+
       ! evaluate template string for "%d": day number
-      if (present(iDay) )  then
 
-        iPos_D = max(index(sNewFilename, "%D"),index(sNewFilename, "%d") )
-        iPos_0D = max(index(sNewFilename, "%0D"), index(sNewFilename, "%0d") )
+      iPos_D = max(index(sNewFilename, "%D"),index(sNewFilename, "%d") )
+      iPos_0D = max(index(sNewFilename, "%0D"), index(sNewFilename, "%0d") )
 
-        if (iPos_0D > 0) then
-          lMatch = lTRUE
-          lAnnual = lFALSE
-          write (unit=sBuf, fmt="(i2.2)") iDay
-          iLen=len_trim(sNewFilename)
-          sNewFilename = sNewFilename(1:iPos_0D - 1)//trim(sBuf) &
-                         //sNewFilename(iPos_0D + 3:iLen)
+      if (iPos_0D > 0) then
+        lMatch = lTRUE
+        lAnnual = lFALSE
+        write (unit=sBuf, fmt="(i2.2)") dt%iDay
+        iLen=len_trim(sNewFilename)
+        sNewFilename = sNewFilename(1:iPos_0D - 1)//trim(sBuf) &
+                       //sNewFilename(iPos_0D + 3:iLen)
 
-        elseif ( iPos_D > 0 ) then
+      elseif ( iPos_D > 0 ) then
 
-          lMatch = lTRUE
-          lAnnual = lFALSE
-          sBuf = asCharacter( iDay )
+        lMatch = lTRUE
+        lAnnual = lFALSE
+        sBuf = asCharacter( dt%iDay )
 
-          iLen=len_trim(sNewFilename)
-          sNewFilename = sNewFilename(1:iPos_D - 1)//trim(sBuf) &
-                         //sNewFilename(iPos_D + 2:iLen)
-
-        endif
+        iLen=len_trim(sNewFilename)
+        sNewFilename = sNewFilename(1:iPos_D - 1)//trim(sBuf) &
+                       //sNewFilename(iPos_D + 2:iLen)
 
       endif
 
@@ -1099,16 +1093,15 @@ end subroutine set_constant_value_real
 
 !--------------------------------------------------------------------------------------------------
 
-  function test_for_need_to_pad_values_fn(this, iMonth, iDay, iYear ) &
-                                               result(lNeedToPadData)
+  function test_for_need_to_pad_values_fn(this, dt )    result(lNeedToPadData)
 
-    class (DATA_CATALOG_ENTRY_T) :: this
-    integer (kind=c_int) :: iMonth, iDay, iYear
+    class (DATA_CATALOG_ENTRY_T)  :: this
+    type (DATETIME_T), intent(in) :: dt
 
     ! [ LOCALS ]
     logical (kind=c_bool) :: lExist
-    integer (kind=c_int) :: iDaysLeftInMonth
-    integer (kind=c_int) :: iPos
+    integer (kind=c_int)  :: iDaysLeftInMonth
+    integer (kind=c_int)  :: iPos
     logical (kind=c_bool) :: lNeedToPadData
 
     do
@@ -1135,11 +1128,11 @@ end subroutine set_constant_value_real
 
         ! if file doesn't exist, and we're close to the end of the year,
         ! assume that we should pad values at the end of the year
-        if (iMonth == 12 ) then
+        if (dt%iMonth == 12 ) then
 
-          iDaysLeftInMonth = 31 - iDay
+          iDaysLeftInMonth = 31 - dt%iDay
 
-          if (isLeap(iYear)) then
+          if ( dt%isLeapYear() ) then
 
             if ( iDaysLeftInMonth <= this%iDaysToPadIfLeapYear ) then
 
@@ -1178,10 +1171,10 @@ end subroutine set_constant_value_real
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine getvalues_dynamic_netcdf_sub( this, iMonth, iDay, iYear, iJulianDay)
+  subroutine getvalues_dynamic_netcdf_sub( this, dt )
 
-    class (DATA_CATALOG_ENTRY_T) :: this
-    integer (kind=c_int) :: iMonth, iDay, iYear, iJulianDay
+    class (DATA_CATALOG_ENTRY_T)   :: this
+    type (DATETIME_T), intent(in)  :: dt
 
     ! [ LOCALS ]
     integer (kind=c_int) :: iTimeIndex
@@ -1199,7 +1192,7 @@ end subroutine set_constant_value_real
     dScaleFactor = this%NCFILE%rScaleFactor(NC_Z)
 
     ! call once at start of run...
-    if ( this%iFileCountYear < 0 ) call this%set_filecount(-1, iYear)
+    if ( this%iFileCountYear < 0 ) call this%set_filecount(-1, dt%iYear)
 
     do
 
@@ -1208,7 +1201,8 @@ end subroutine set_constant_value_real
         ! check to see whether currently opened file is within date range
         ! if past date range, close file
 
-        if ( netcdf_date_within_range(NCFILE=this%NCFILE, iJulianDay=iJulianDay ) ) then
+        if ( netcdf_date_within_range(NCFILE=this%NCFILE,                      &
+           iJulianDay=int(dt%iJulianDay, kind=c_int) ) ) then
           exit
         else
           call netcdf_close_file( NCFILE=this%NCFILE )
@@ -1223,13 +1217,13 @@ end subroutine set_constant_value_real
         call this%increment_filecount()
 
         ! the numerical counter used in creating filenames is reset at the end of each year
-        call this%reset_at_yearend_filecount(iYear)
+        call this%reset_at_yearend_filecount(dt%iYear)
 
         ! based on the template information, create the filename that SWB
         ! is to look for
-        call this%make_filename( iMonth=iMonth, iYear=iYear, iDay=iDay)
+        call this%make_filename( dt )
 
-        this%lPadValues = this%test_for_need_to_pad_values(iMonth=iMonth, iYear=iYear, iDay=iDay)
+        this%lPadValues = this%test_for_need_to_pad_values(dt)
 
         ! call to test_for_need_to_pad_values return value of "TRUE" if
         ! if attempts to open a nonexistent file within the last few days of a year.
@@ -1346,7 +1340,8 @@ end subroutine set_constant_value_real
           endif
 
 
-          if ( netcdf_date_within_range(NCFILE=this%NCFILE, iJulianDay=iJulianDay) ) then
+          if ( netcdf_date_within_range(NCFILE=this%NCFILE,                    &
+               iJulianDay=int(dt%iJulianDay, kind=c_int) ) ) then
 
             exit
 
@@ -1356,7 +1351,7 @@ end subroutine set_constant_value_real
             this%iNC_FILE_STATUS = NETCDF_FILE_CLOSED
             call LOGS%write("Did not find the current date in the file "//dquote(this%sSourceFilename)//"~" &
               //"JD range: "//asCharacter(this%NCFILE%iFirstDayJD)//" to "//asCharacter(this%NCFILE%iLastDayJD) &
-              //"~current JD: "//asCharacter(iJulianDay)//"~ Will increment sequential file number and try again.", &
+              //"~current JD: "//asCharacter(dt%iJulianDay)//"~ Will increment sequential file number and try again.", &
               iLinesBefore=1, iLinesAfter=1 )
 
           else
@@ -1364,7 +1359,7 @@ end subroutine set_constant_value_real
             call LOGS%write("Valid date range (NetCDF): "//trim(asCharacter(this%NCFILE%iFirstDayJD)) &
               //" to "//trim(asCharacter(this%NCFILE%iLastDayJD)) )
 
-            call LOGS%write("Current Julian Day value: "//trim(asCharacter(iJulianDay)) )
+            call LOGS%write("Current Julian Day value: "//trim(asCharacter(dt%iJulianDay)) )
 
             call assert (lFALSE, "Date range for currently open NetCDF file" &
               //" does not include the present simulation date.", &
@@ -1384,7 +1379,7 @@ end subroutine set_constant_value_real
 
       do
         lDateTimeFound = netcdf_update_time_starting_index(NCFILE=this%NCFILE, &
-                                         iJulianDay=iJulianDay)
+                                  iJulianDay=int(dt%iJulianDay, kind=c_int) )
 
         if (.not. lDateTimeFound) then
           this%lPadValues = lTRUE
@@ -1426,7 +1421,8 @@ end subroutine set_constant_value_real
     endif
 
     if (this%lCreateLocalNetCDFArchive) &
-             call this%put_values_to_archive(iMonth, iDay, iYear)
+             call this%put_values_to_archive(int(dt%iMonth,c_int),             &
+                 int(dt%iDay,c_int), dt%iYear)
 
     call this%transform_native_to_base( )
 
@@ -1949,7 +1945,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
 #ifdef DEBUG_PRINT
    print *, " "
-   print *, trim(__FILE__), ": ", __LINE__ 
+   print *, trim(__FILE__), ": ", __LINE__
    print *, "--  BASE GRID BOUNDS projected to DATA NATIVE COORDS"
    print *, "FROM: ", dquote(pGrdBase%sPROJ4_string)
    print *, "TO:   ", dquote(this%sSourcePROJ4_string)

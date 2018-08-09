@@ -185,21 +185,14 @@ contains
 
       associate ( dt => SIM_DT%curr )
 
-        iJulianDay = dt%getJulianDay()
-        iMonth = asInt( dt%iMonth )
-        iDay = asInt( dt%iDay )
-        iYear = dt%iYear
-        iDaysInMonth = SIM_DT%iDaysInMonth
-        iNumDaysFromOrigin = SIM_DT%iNumDaysFromOrigin
-
         if ( associated( pSEPTIC_DISCHARGE ) ) then
-          call pSEPTIC_DISCHARGE%getvalues( iMonth, iDay, iYear, iJulianDay )
+          call pSEPTIC_DISCHARGE%getvalues( dt )
           if ( pSEPTIC_DISCHARGE%lGridHasChanged ) fSEPTIC_DISCHARGE =                   &
                pack( pSEPTIC_DISCHARGE%pGrdBase%rData, is_cell_active )
         endif
 
         if ( associated( pANNUAL_SEPTIC_DISCHARGE ) ) then
-          call pANNUAL_SEPTIC_DISCHARGE%getvalues( iMonth, iDay, iYear, iJulianDay )
+          call pANNUAL_SEPTIC_DISCHARGE%getvalues( dt )
           if ( pANNUAL_SEPTIC_DISCHARGE%lGridHasChanged ) fANNUAL_SEPTIC_DISCHARGE =     &
               pack( pANNUAL_SEPTIC_DISCHARGE%pGrdBase%rData, is_cell_active )
         endif

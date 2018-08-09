@@ -165,12 +165,6 @@ module et__zone_values
   subroutine et_zone_values_calculate( )
 
     ! [ LOCALS ]
-    integer (kind=c_int)  :: iJulianDay
-    integer (kind=c_int)  :: iMonth
-    integer (kind=c_int)  :: iDay
-    integer (kind=c_int)  :: iYear
-    integer (kind=c_int)  :: iDaysInMonth
-    integer (kind=c_int)  :: iNumDaysFromOrigin
     integer (kind=c_int)  :: iLineNum
     integer (kind=c_int)  :: iFieldNum
     integer (kind=c_int)  :: iET_zone_id
@@ -182,19 +176,14 @@ module et__zone_values
 
     associate ( dt => SIM_DT%curr )
 
-      iJulianDay = dt%getJulianDay()
-      iMonth = asInt( dt%iMonth )
-      iDay = asInt( dt%iDay )
-      iYear = dt%iYear
-
-      call pET_GRID%getvalues( iMonth, iDay, iYear, iJulianDay )
+      call pET_GRID%getvalues( dt )
 
       ! this assumes the input file is structured such that fields 2-13
       ! correspond to the ET ratios for months 1-12 (Jan-Dec)
-      iFieldNum = iMonth + 1
+      iFieldNum = dt%iMonth + 1
 
       ! if it is the first day of the month, update the ratio values
-      if ( iDay == 1 ) then
+      if ( dt%iDay == 1 ) then
 
         do iLineNum = lbound(ET_TABLE_VALUES, 1), ubound(ET_TABLE_VALUES, 1)
 

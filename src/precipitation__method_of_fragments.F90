@@ -830,19 +830,12 @@ contains
     integer (kind=c_int)              :: iStat
     logical (kind=c_bool), save       :: lFirstCall = lTRUE
 
-    integer (kind=c_int) :: iMonth
-    integer (kind=c_int) :: iDay
-    integer (kind=c_int) :: iYear
     type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ADJUST_FACTOR
 
 
-    iMonth = SIM_DT%curr%iMonth
-    iDay = SIM_DT%curr%iDay
-    iYear = SIM_DT%curr%iYear
-
     !! if it is the first day of the month, update the rainfall adjustment factor grid
     !! and update the fragments
-    if ( iDay == 1 .or. lFirstCall ) then
+    if ( SIM_DT%curr%iDay == 1 .or. lFirstCall ) then
 
       ! locate the data structure associated with the gridded rainfall adjustment factor
       pRAINFALL_ADJUST_FACTOR => DAT%find("RAINFALL_ADJUST_FACTOR")
@@ -851,7 +844,7 @@ contains
           call die("A RAINFALL_ADJUST_FACTOR grid must be supplied in order to make use"     &
                    //" of this option.", __SRCNAME__, __LINE__)
 
-      call pRAINFALL_ADJUST_FACTOR%getvalues(iMonth=iMonth, iDay=iDay, iYear=iYear  )
+      call pRAINFALL_ADJUST_FACTOR%getvalues( SIM_DT%curr )
 
       ! map the 2D array of RAINFALL_ADJUST_FACTOR values to the vector of active cells
       RAINFALL_ADJUST_FACTOR = pack( pRAINFALL_ADJUST_FACTOR%pGrdBase%rData, lActive )

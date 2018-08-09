@@ -103,23 +103,10 @@ contains
     real (kind=c_float), intent(in)        :: nodata_fill_value(:,:)
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iJulianDay
-    integer (kind=c_int) :: iMonth
-    integer (kind=c_int) :: iDay
-    integer (kind=c_int) :: iYear
-    integer (kind=c_int) :: iDaysInMonth
-    integer (kind=c_int) :: iNumDaysFromOrigin
     integer (kind=c_int) :: iIndex
     real (kind=c_float)  :: fFactor
 
     associate ( dt => SIM_DT%curr )
-
-      iJulianDay = dt%getJulianDay()
-      iMonth = asInt( dt%iMonth )
-      iDay = asInt( dt%iDay )
-      iYear = dt%iYear
-      iDaysInMonth = SIM_DT%iDaysInMonth
-      iNumDaysFromOrigin = SIM_DT%iNumDaysFromOrigin
 
       if ( .not. associated(pFOG_RATIO) ) &
         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
@@ -127,7 +114,7 @@ contains
       if ( .not. allocated(pFOG_RATIO%pGrdBase%rData) ) &
         call die("INTERNAL PROGRAMMING ERROR: attempted use of unallocated variable", __SRCNAME__, __LINE__)
 
-      call pFOG_RATIO%getvalues( iMonth, iDay, iYear, iJulianDay )
+      call pFOG_RATIO%getvalues( dt )
 
       fFog = fRainfall * pack( pFOG_RATIO%pGrdBase%rData, lActive )   &
                        * fFOG_CATCH_EFFICIENCY( iLanduse_Index )

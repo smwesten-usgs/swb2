@@ -125,28 +125,13 @@ contains
     integer (kind=c_int), intent(in)       :: indx
     logical (kind=c_bool), intent(in)      :: is_cell_active(:,:)
 
-    ! [ LOCALS ]
-    integer (kind=c_int) :: iJulianDay
-    integer (kind=c_int) :: iMonth
-    integer (kind=c_int) :: iDay
-    integer (kind=c_int) :: iYear
-    integer (kind=c_int) :: iDaysInMonth
-    integer (kind=c_int) :: iNumDaysFromOrigin
-
     ! attempt to update values from gridded source, if active
     if ( .not. DATE_OF_LAST_RETRIEVAL == SIM_DT%curr ) then
 
       associate ( dt => SIM_DT%curr )
 
-        iJulianDay = dt%getJulianDay()
-        iMonth = asInt( dt%iMonth )
-        iDay = asInt( dt%iDay )
-        iYear = dt%iYear
-        iDaysInMonth = SIM_DT%iDaysInMonth
-        iNumDaysFromOrigin = SIM_DT%iNumDaysFromOrigin
-
         if ( associated( pSTORM_DRAIN_CAPTURE_FRACTION ) ) then
-          call pSTORM_DRAIN_CAPTURE_FRACTION%getvalues( iMonth, iDay, iYear, iJulianDay )
+          call pSTORM_DRAIN_CAPTURE_FRACTION%getvalues( dt )
           if ( pSTORM_DRAIN_CAPTURE_FRACTION%lGridHasChanged ) then
             STORM_DRAIN_CAPTURE_FRACTION = pack( pSTORM_DRAIN_CAPTURE_FRACTION%pGrdBase%rData, is_cell_active )
             call grid_WriteArcGrid("Storm_drain_capture_fraction__as_read_into_SWB.asc", &

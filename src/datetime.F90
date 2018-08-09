@@ -38,6 +38,7 @@ module datetime
     integer (kind=c_short)  :: iSecond = 0
     integer (kind=c_int)    :: iWaterYearHigh = 0
     integer (kind=c_int)    :: iWaterYearLow = 0
+    integer (kind=c_long)   :: iJulianDay = 0
     real (kind=c_double)    :: dJulianDate = 0.0_c_double
 
   contains
@@ -262,8 +263,8 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
   integer (kind=c_int) :: iMonthOffset, iDayOffset
   character (len=256)  :: sStr
   character (len=256)  :: sMonth, sDay, sYear, sBuf
-  character (len=256)  :: sFilename_l 
-  integer (kind=c_int) :: iLinenumber_l 
+  character (len=256)  :: sFilename_l
+  integer (kind=c_int) :: iLinenumber_l
 
   if ( present( sFilename) ) then
     sFilename_l = sFilename
@@ -395,6 +396,8 @@ subroutine parse_text_to_time_sub(this, sString)
                                       + real( iMinute, kind=c_double) / 1440.0_c_double  &
                                       + real( iSecond, kind=c_double) / 86400.0_c_double
 
+  this%iJulianDay = int(this%dJulianDate, kind=c_long)
+
 end subroutine parse_text_to_time_sub
 
 !--------------------------------------------------------------------------
@@ -487,6 +490,8 @@ subroutine calc_julian_day_sub(this, iMonth, iDay, iYear, &
 
 !  this%rJulianDay = real(iJulianDay, kind=c_double) + rFractionOfDay ! - 2400000.5_c_double
 
+   this%iJulianDay = int(this%dJulianDate, kind=c_long)
+
 end subroutine calc_julian_day_sub
 
 !--------------------------------------------------------------------------
@@ -565,7 +570,7 @@ end subroutine calc_gregorian_date_sub
 !! GIVEN THE JULIAN DATE (JD).
 
   ! [ ARGUMENTS ]
-  integer (kind=c_int), value        :: iJD
+  integer (kind=c_int), value                :: iJD
   integer (kind=c_int), intent(inout)        :: iYear, iMonth, iDay
   integer (kind=c_int), intent(in), optional :: iOrigin
   ! [ LOCALS ]
@@ -785,6 +790,7 @@ subroutine assign_value_to_sub( date2, date1 )
   date2%iWaterYearHigh = date1%iWaterYearHigh
   date2%iWaterYearLow = date1%iWaterYearLow
   date2%dJulianDate = date1%dJulianDate
+  date2%iJulianDay = date1%iJulianDay
 
 end subroutine assign_value_to_sub
 
@@ -810,6 +816,7 @@ end function date_minus_date_fn
 
   allocate( newdate )
   newdate%dJulianDate = date1%dJulianDate + real( fValue, kind=c_double)
+  newdate%iJulianDay = int(newdate%dJulianDate, kind=c_long)
   call newdate%calcGregorianDate()
 
 end function date_plus_float_fn
@@ -824,6 +831,7 @@ end function date_plus_float_fn
 
   allocate( newdate )
   newdate%dJulianDate = date1%dJulianDate - real( fValue, kind=c_double)
+  newdate%iJulianDay = int(newdate%dJulianDate, kind=c_long)
   call newdate%calcGregorianDate()
 
 end function date_minus_float_fn
@@ -838,6 +846,7 @@ end function date_minus_float_fn
 
   allocate( newdate )
   newdate%dJulianDate = date1%dJulianDate - real( iValue, kind=c_double)
+  newdate%iJulianDay = int(newdate%dJulianDate, kind=c_long)
   call newdate%calcGregorianDate()
 
 end function date_minus_int_fn
@@ -1088,6 +1097,7 @@ end subroutine system_time_to_date_sub
   real (kind=c_double), intent(in)       :: dValue
 
   this%dJulianDate = dValue
+  this%iJulianDay = int(dValue, kind=c_long)
 
   call this%calcGregorianDate()
 
@@ -1215,6 +1225,7 @@ subroutine date_advance_to_last_day_of_month_sub(this)
 
   ! now step back a day to obtain the date for the last day of the month
   this%dJulianDate = this%dJulianDate - 1.0_c_double
+  this%iJulianDay = int(this%dJulianDate, kind=c_long)
   call this%calcGregorianDate()
 
 end subroutine date_advance_to_last_day_of_month_sub
@@ -1237,6 +1248,7 @@ subroutine date_plus_day_sub(this)
   class(DATETIME_T) :: this
 
   this%dJulianDate = this%dJulianDate + 1._c_double
+  this%iJulianDay = int(this%dJulianDate, kind=c_long)
   call this%calcGregorianDate()
 
 end subroutine date_plus_day_sub
@@ -1248,6 +1260,7 @@ subroutine date_minus_day_sub(this)
   class(DATETIME_T) :: this
 
   this%dJulianDate = this%dJulianDate - 1._c_double
+  this%iJulianDay = int(this%dJulianDate, kind=c_long)
   call this%calcGregorianDate()
 
 end subroutine date_minus_day_sub
@@ -1319,7 +1332,7 @@ function mmdd2doy(sMMDD, sInputItemName )  result(iDOY)
   integer (kind=c_int) :: iStat
   integer (kind=c_int) :: iJD
   integer (kind=c_int) :: iStartingJD
-  character (len=256)  :: sInputItemName_l 
+  character (len=256)  :: sInputItemName_l
 
   sItem = sMMDD
 

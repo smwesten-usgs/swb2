@@ -53,20 +53,9 @@ contains
 
   subroutine et_gridded_values_calculate()
 
-    ! [ LOCALS ]
-    integer (kind=c_int) :: iJulianDay
-    integer (kind=c_int) :: iMonth
-    integer (kind=c_int) :: iDay
-    integer (kind=c_int) :: iYear
-
     associate ( dt => SIM_DT%curr )
 
-      iJulianDay = dt%getJulianDay()
-      iMonth = asInt( dt%iMonth )
-      iDay = asInt( dt%iDay )
-      iYear = dt%iYear
-
-      call pET_GRID%getvalues( iMonth, iDay, iYear, iJulianDay )
+      call pET_GRID%getvalues( dt )
 
     end associate
 

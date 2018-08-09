@@ -768,9 +768,7 @@ contains
 
         MODEL%update_landuse_codes => model_update_landuse_codes_dynamic
 
-        call pLULC%getvalues(iMonth=int(SIM_DT%curr%iMonth, kind=c_int),      &
-                             iDay=int(SIM_DT%curr%iDay, kind=c_int),          &
-                             iYear=SIM_DT%curr%iYear )
+        call pLULC%getvalues( SIM_DT%curr )
 
         if ( pLULC%lGridHasChanged ) then
           date_str = SIM_DT%curr%prettydate()
@@ -3192,12 +3190,6 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    ! [ LOCALS ]
-    integer (kind=c_int) :: iJulianDay
-    integer (kind=c_int) ::iMonth
-    integer (kind=c_int) ::iDay
-    integer (kind=c_int) ::iYear
-
     type (DATA_CATALOG_ENTRY_T), pointer :: pTMAX
 
     pTMAX => DAT%find("TMAX")
@@ -3206,12 +3198,7 @@ contains
 
     associate ( dt => SIM_DT%curr )
 
-      iJulianDay = dt%getJulianDay()
-      iMonth = asInt( dt%iMonth )
-      iDay = asInt( dt%iDay )
-      iYear = dt%iYear
-
-      call pTMAX%getvalues( iMonth, iDay, iYear, iJulianDay )
+      call pTMAX%getvalues( dt )
 
     end associate
 
@@ -3228,12 +3215,6 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    ! [ LOCALS ]
-    integer (kind=c_int) :: iJulianDay
-    integer (kind=c_int) ::iMonth
-    integer (kind=c_int) ::iDay
-    integer (kind=c_int) ::iYear
-
     type (DATA_CATALOG_ENTRY_T), pointer :: pTMIN
 
     pTMIN => DAT%find("TMIN")
@@ -3242,12 +3223,7 @@ contains
 
     associate ( dt => SIM_DT%curr )
 
-      iJulianDay = dt%getJulianDay()
-      iMonth = asInt( dt%iMonth )
-      iDay = asInt( dt%iDay )
-      iYear = dt%iYear
-
-      call pTMIN%getvalues( iMonth, iDay, iYear, iJulianDay )
+      call pTMIN%getvalues( dt )
 
     end associate
 
@@ -3266,10 +3242,6 @@ contains
 
     ! [ LOCALS ]
     type (DATA_CATALOG_ENTRY_T), pointer :: pPRCP
-    integer (kind=c_int) :: iJulianDay
-    integer (kind=c_int) ::iMonth
-    integer (kind=c_int) ::iDay
-    integer (kind=c_int) ::iYear
 
     pPRCP => DAT%find("PRECIPITATION")
     if ( .not. associated(pPRCP) ) &
@@ -3277,13 +3249,7 @@ contains
 
     associate ( dt => SIM_DT%curr )
 
-      iJulianDay = dt%getJulianDay()
-      iMonth = asInt( dt%iMonth )
-      iDay = asInt( dt%iDay )
-      iYear = dt%iYear
-
-      ! next three statements retrieve the data from the raw or native form
-      call pPRCP%getvalues( iMonth, iDay, iYear, iJulianDay )
+      call pPRCP%getvalues( dt )
 
     end associate
 
@@ -3323,10 +3289,6 @@ contains
 
     ! [ LOCALS ]
     type (DATA_CATALOG_ENTRY_T), pointer :: pPRCP
-    integer (kind=c_int) :: iJulianDay
-    integer (kind=c_int) ::iMonth
-    integer (kind=c_int) ::iDay
-    integer (kind=c_int) ::iYear
     integer (kind=c_int) :: targetindex
     integer (kind=c_int) :: indexval
 
@@ -3338,14 +3300,9 @@ contains
 
     associate ( dt => SIM_DT%curr )
 
-      iJulianDay = dt%getJulianDay()
-      iMonth = asInt( dt%iMonth )
-      iDay = asInt( dt%iDay )
-      iYear = dt%iYear
-
       ! get current grid value for precip; in the design case, this is a grid of MONTHLY
       ! mean precipitation totals in inches
-      call pPRCP%getvalues( iMonth, iDay, iYear, iJulianDay )
+      call pPRCP%getvalues( dt )
 
     end associate
 
