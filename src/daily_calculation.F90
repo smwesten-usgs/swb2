@@ -111,7 +111,9 @@ contains
         infiltration                      => cells%infiltration( indx ),                            &
         fog                               => cells%fog( indx ),                                     &
         interception                      => cells%interception( indx ),                            &
-        reference_et0                     => cells%reference_et0( indx ) )
+        reference_et0                     => cells%reference_et0( indx ),                           &
+        actual_et_interception            => cells%actual_et_interception( indx ),                  &
+        canopy_cover_fraction             => cells%canopy_cover_fraction(indx) )
 
         ! inflow is calculated over the entire cell (pervious + impervious) area
         inflow = max( 0.0_c_float, runon + rainfall + fog + snowmelt - interception )
@@ -176,10 +178,10 @@ contains
         ! the following call updates bound variable actual_et_soil
         call cells%calc_actual_et( indx )
 
-        if ( runoff < 0.)                                                                               &
-          call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
-                           //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
-                           //", "//asCharacter( cells%row_num_1D( indx ) ) )
+        ! if ( runoff < 0.)                                                                               &
+        !   call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
+        !                    //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
+        !                    //", "//asCharacter( cells%row_num_1D( indx ) ) )
 
     !     ! actual et for the entire cell is the weighted average of the ET for pervious and impervious
     !     ! fractions of the cell
@@ -198,9 +200,9 @@ contains
 
         ! actual et for the entire cell is the weighted average of the ET for pervious and impervious
         ! fractions of the cell
-        actual_et = actual_et_soil * pervious_fraction                              &
-                   + actual_et_impervious * ( 1.0_c_float - pervious_fraction )
-    !                      + cells%actual_et_interception * cells%canopy_cover_fraction             &
+        actual_et = actual_et_soil * pervious_fraction                                   &
+                   + actual_et_impervious * ( 1.0_c_float - pervious_fraction )          &
+                          + actual_et_interception * canopy_cover_fraction
 
         if ( runoff < 0.)                                                                               &
           call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
@@ -217,10 +219,10 @@ contains
         net_infiltration = net_infiltration * pervious_fraction + direct_net_infiltration
 !        net_infiltration = net_infiltration + direct_net_infiltration
 
-        if ( runoff < 0.)                                                                               &
-          call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
-                           //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
-                           //", "//asCharacter( cells%row_num_1D( indx ) ) )
+        ! if ( runoff < 0.)                                                                               &
+        !   call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
+        !                    //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
+        !                    //", "//asCharacter( cells%row_num_1D( indx ) ) )
 
         irrigation = irrigation * pervious_fraction
 
@@ -232,10 +234,10 @@ contains
         ! rejected net_infiltration + runoff will be routed downslope if routing option is turned on
         call cells%calc_routing( index=indx )
 
-        if ( runoff < 0.)                                                                               &
-          call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
-                           //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
-                           //", "//asCharacter( cells%row_num_1D( indx ) ) )
+        ! if ( runoff < 0.)                                                                               &
+        !   call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
+        !                    //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
+        !                    //", "//asCharacter( cells%row_num_1D( indx ) ) )
 
       end associate
 
