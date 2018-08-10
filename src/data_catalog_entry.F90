@@ -1040,7 +1040,7 @@ end subroutine set_constant_value_real
         write (unit=sBuf, fmt="(i3.3)") dt%getDayOfYear()
         iLen=len_trim(sNewFilename)
         sNewFilename = sNewFilename(1:iPos_j - 1)//trim(sBuf) &
-                       //sNewFilename(iPos_j + 3:iLen)
+                       //sNewFilename(iPos_j + 2:iLen)
 
        endif
 

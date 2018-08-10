@@ -1417,6 +1417,14 @@ contains
         call LOGS%WRITE( "==> FAO-56 SOIL MOISTURE RETENTION submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = lFALSE )
 
+      elseif ( ( Method_Name .strapprox. "GRIDDED" ) ) then
+
+        this%init_actual_et => model_initialize_actual_et_gridded_values
+        this%calc_actual_et => model_calculate_actual_et_gridded_values
+
+        call LOGS%WRITE( "==> **GRIDDED** ACTUAL ET will determine SOIL MOISTURE RETENTION.", &
+            iLogLevel = LOG_ALL, lEcho = lFALSE )
+
       else
 
         call warn("Your control file specifies an unknown or unsupported SOIL_MOISTURE method.", &
@@ -2754,6 +2762,35 @@ contains
     enddo
 
   end subroutine model_dump_variables
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_actual_et_gridded_values(this)
+
+    use actual_et__gridded_values, only : actual_et_gridded_values_initialize
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call actual_et_gridded_values_initialize( this%active )
+
+  end subroutine model_initialize_actual_et_gridded_values
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_actual_et_gridded_values(this, indx)
+
+    use actual_et__gridded_values, only : actual_et_gridded_values_calculate,    &
+                                          ACTUAL_ET
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    integer (kind=c_int), intent(in)       :: indx
+
+    call actual_et_gridded_values_calculate( this%active )
+
+    this%actual_et(indx) = ACTUAL_ET(indx)
+    this%actual_et_soil(indx) = max(this%actual_et(indx) - this%actual_et_interception(indx), 0.0_c_float)
+
+  end subroutine model_calculate_actual_et_gridded_values
 
 !--------------------------------------------------------------------------------------------------
 
