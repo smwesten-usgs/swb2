@@ -2788,8 +2788,8 @@ contains
     call actual_et_gridded_values_calculate( this%active )
 
 !    this%actual_et(indx) = ACTUAL_ET(indx)
-    this%actual_et_soil(indx) = max(ACTUAL_ET(indx) - this%actual_et_interception(indx)             &
-                                                      * this%canopy_cover_fraction, 0.0_c_float)
+    this%actual_et_soil(indx) = max(ACTUAL_ET(indx) - this%actual_et_interception(indx)                &
+                                                      * this%canopy_cover_fraction(indx), 0.0_c_float)
 
   end subroutine model_calculate_actual_et_gridded_values
 
