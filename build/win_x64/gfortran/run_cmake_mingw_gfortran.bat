@@ -36,7 +36,7 @@ set LIB_Z=%LIB_Z:\=/%
 set LIB_DL=%LIB_DL:\=/%
 set LIB_SZ=%LIB_SZ:\=/%
 
-set SWB_EXTERNAL_LIBS="%LIB_HDF5_HL%;%LIB_HDF5%;%LIB_NETCDF%;%LIB_Z%;%LIB_DL%;%LIB_SZ%;%LIB_GCC%;%LIB_GFORTRAN%"
+set SWB_EXTERNAL_LIBS="%LIB_NETCDF%;%LIB_HDF5_HL%;%LIB_HDF5%;%LIB_Z%;%LIB_DL%;%LIB_SZ%;%LIB_GCC%;%LIB_GFORTRAN%"
 
 
 :: define where 'make copy' will place executables

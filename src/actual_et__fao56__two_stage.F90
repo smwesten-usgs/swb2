@@ -104,7 +104,7 @@ elemental function calculate_evaporation_reduction_coefficient_Kr( landuse_index
   associate( REW => REW_l( landuse_index, soil_group ),         &
              TEW => TEW_l( landuse_index, soil_group ) )
 
-    if ( soil_moisture_deficit < REW ) then
+    if ( soil_moisture_deficit <= REW ) then
       Kr = 1._c_double
     elseif ( soil_moisture_deficit < TEW ) then
       Kr = ( real(TEW, kind=c_double) - soil_moisture_deficit )                &
