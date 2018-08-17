@@ -11,23 +11,31 @@ module snowfall__original
 
 contains
 
-  elemental subroutine snowfall_original_calculate( fSnowfall, fRainfall, fTMin, fTMax, fPrecip)
+  elemental subroutine snowfall_original_calculate( snowfall, rainfall,        &
+                                                    net_rainfall, tmin, tmax,  &
+                                                    interception,              &
+                                                    gross_precipitation)
 
-    real (kind=c_float), intent(inout)  :: fSnowfall
-    real (kind=c_float), intent(inout)  :: fRainfall
-    real (kind=c_float), intent(in)     :: fTMin
-    real (kind=c_float), intent(in)     :: fTMax
-    real (kind=c_float), intent(in)     :: fPrecip
+    real (kind=c_float), intent(inout)  :: snowfall
+    real (kind=c_float), intent(inout)  :: rainfall
+    real (kind=c_float), intent(inout)  :: net_rainfall
+    real (kind=c_float), intent(in)     :: tmin
+    real (kind=c_float), intent(in)     :: tmax
+    real (kind=c_float), intent(in)     :: interception
+    real (kind=c_float), intent(in)     :: gross_precipitation
 
-    if ( ( (fTMin + fTMax) / 2.0_c_float - ( fTMax - fTMin ) / 3.0_c_float ) <= FREEZING ) then 
+    ! classify gross_precipitation as snowfall if condition is met
+    if ( ( (tmin + tmax) / 2.0_c_float - ( tmax - tmin ) / 3.0_c_float ) <= FREEZING ) then
 
-      fSnowfall = fPrecip
-      fRainfall = 0.0_c_float
+      snowfall = gross_precipitation
+      rainfall = 0.0_c_float
+      net_rainfall = 0.0_c_float
 
-    else
+    else  ! rainfall
 
-      fSnowfall = 0.0_c_float
-      fRainfall = fPrecip
+      snowfall = 0.0_c_float
+      rainfall = gross_precipitation
+      net_rainfall = gross_precipitation - interception
 
     endif
 

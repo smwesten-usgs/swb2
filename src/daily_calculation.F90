@@ -46,15 +46,18 @@ contains
     cells%crop_etc = cells%reference_et0 * cells%crop_coefficient_kcb
 
     call cells%calc_snowfall()
+
+    ! interception calculation *does* reflect the canopy fraction
+    call cells%calc_interception()
+
+    ! actually calculating *potential* snowmelt here; actual snowmelt determined
+    ! in 'calculate_snow_mass_balance'
     call cells%calc_snowmelt()
 
     call cells%calc_continuous_frozen_ground_index()
 
     ! fog calculation does not explicitly consider canopy fraction
     call cells%calc_fog()
-
-    ! interception calculation *does* reflect the canopy fraction
-    call cells%calc_interception()
 
     ! ! irrigation calculated as though entire cell is to be irrigated
     ! call cells%calc_irrigation()
@@ -102,6 +105,7 @@ contains
         storm_drain_capture               => cells%storm_drain_capture( indx ),                     &
         gross_precipitation               => cells%gross_precip( indx ),                            &
         rainfall                          => cells%rainfall( indx ),                                &
+        net_rainfall                      => cells%net_rainfall( indx ),                            &
         snowmelt                          => cells%snowmelt( indx ),                                &
         snowfall                          => cells%snowfall( indx ),                                &
         runon                             => cells%runon( indx ),                                   &
@@ -116,7 +120,7 @@ contains
         canopy_cover_fraction             => cells%canopy_cover_fraction(indx) )
 
         ! inflow is calculated over the entire cell (pervious + impervious) area
-        inflow = max( 0.0_c_float, runon + rainfall + fog + snowmelt - interception )
+        inflow = max( 0.0_c_float, runon + net_rainfall + fog + snowmelt )
 
         call cells%calc_runoff( indx )
 
@@ -144,12 +148,11 @@ contains
           surface_storage_max=surface_storage_max,                                              &
           storm_drain_capture=storm_drain_capture,                                              &
           storm_drain_capture_fraction=STORM_DRAIN_CAPTURE_FRACTION(indx),                      &
-          rainfall=rainfall,                                                                    &
+          net_rainfall=net_rainfall,                                                            &
           snowmelt=snowmelt,                                                                    &
           runon=runon,                                                                          &
           runoff=runoff,                                                                        &
           fog=fog,                                                                              &
-          interception=interception,                                                            &
           reference_et0=reference_et0,                                                          &
           pervious_fraction=pervious_fraction )
 
@@ -166,10 +169,9 @@ contains
         ! term is calculated with respect to the pervious fraction of the cell
         infiltration = max( 0.0_c_float,                                       &
                              ( ( runon                                         &
-                            + rainfall                                         &
+                            + net_rainfall                                     &
                             + fog                                              &
                             + snowmelt                                         &
-                            - interception                                     &
                             + irrigation                                       &
                             + direct_soil_moisture                             &
                             - runoff ) * pervious_fraction                     &

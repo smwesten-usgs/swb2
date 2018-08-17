@@ -23,15 +23,14 @@ contains
     if( snow_storage > potential_snowmelt ) then
 
       snowmelt = potential_snowmelt
+      snow_storage = snow_storage - snowmelt
 
     else   ! not enough snowcover to satisfy the amount that *could* melt
 
       snowmelt = snow_storage
+      snow_storage = 0.0_c_float
 
     end if
-
-    snow_storage = max( snow_storage - snowmelt, 0.0_c_float )
-
 
   end subroutine calculate_snow_mass_balance
 

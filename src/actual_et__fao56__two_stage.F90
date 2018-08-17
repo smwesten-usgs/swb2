@@ -278,8 +278,8 @@ elemental subroutine calculate_actual_et_fao56_two_stage(                       
 
   fraction_exposed_and_wetted_soil = calculate_fraction_exposed_and_wetted_soil_fc( landuse_index, Kcb )
 
-  Ke = min( calculate_surface_evap_coefficient_ke( landuse_index, Kcb, Kr ),       &
-            fraction_exposed_and_wetted_soil * KCB_l( KCB_MID, landuse_index ) )
+  Ke = min( calculate_surface_evap_coefficient_ke( landuse_index, Kcb, Kr ),                      &
+            fraction_exposed_and_wetted_soil * maxval(KCB_l( KCB_INI:KCB_MIN, landuse_index ) ) )
 
   Ks = calculate_water_stress_coefficient_ks(taw, raw, soil_moisture_deficit)
 

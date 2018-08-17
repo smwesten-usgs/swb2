@@ -19,12 +19,11 @@ contains
    	                                      surface_storage_max,          &
                                           storm_drain_capture,          &
                                           storm_drain_capture_fraction, &
-   	                                      rainfall,                     &
+   	                                      net_rainfall,                 &
    	                                      snowmelt,                     &
                                           runon,                        &
                                           runoff,                       &
                                           fog,                          &
-                                          interception,                 &
                                           reference_et0,                &
                                           pervious_fraction )
 
@@ -34,12 +33,11 @@ contains
     real (kind=c_float), intent(inout)      :: storm_drain_capture
     real (kind=c_float), intent(in)         :: storm_drain_capture_fraction
     real (kind=c_float), intent(in)         :: surface_storage_max
-    real (kind=c_float), intent(in)         :: rainfall
+    real (kind=c_float), intent(in)         :: net_rainfall
     real (kind=c_float), intent(in)         :: snowmelt
     real (kind=c_float), intent(in)         :: runon
     real (kind=c_float), intent(in)         :: runoff
     real (kind=c_float), intent(in)         :: fog
-    real (kind=c_float), intent(in)         :: interception
     real (kind=c_float), intent(in)         :: reference_et0
     real (kind=c_float), intent(in)         :: pervious_fraction
 
@@ -63,10 +61,9 @@ contains
     impervious_fraction = 1.0_c_float - pervious_fraction
 
     surface_storage = surface_storage                                        &
-                      + rainfall                                             &
+                      + net_rainfall                                         &
                       + fog                                                  &
                       + snowmelt                                             &
-                      - interception                                         &
                       - runoff
 
     ! **amount is reduced proportional to amount of impervious surface present**

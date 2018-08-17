@@ -117,6 +117,7 @@ module model_domain
     real (kind=c_float), allocatable       :: monthly_gross_precip(:)
     real (kind=c_float), pointer           :: fog(:)
     real (kind=c_float), allocatable       :: rainfall(:)
+    real (kind=c_float), allocatable       :: net_rainfall(:)
     real (kind=c_float), allocatable       :: snowfall(:)
     real (kind=c_float), allocatable       :: irrigation(:)
 
@@ -408,7 +409,7 @@ contains
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
     integer (kind=c_int)  :: indx
-    integer (kind=c_int)  :: iStat(62)
+    integer (kind=c_int)  :: iStat(63)
 
     iCount = count( this%active )
     iStat = 0
@@ -474,6 +475,7 @@ contains
     allocate( this%fraction_exposed_and_wetted_soil( iCount ), stat=iStat(60) )
     allocate( this%delta_soil_storage( iCount ), stat=iStat(61) )
     allocate( this%soil_moisture_deficit( iCount ), stat=iStat(62) )
+    allocate( this%net_rainfall( iCount ), stat=iStat(63) )
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR"                    &
@@ -504,6 +506,7 @@ contains
 
     this%interception                        = 0.0_c_float
     this%rainfall                            = 0.0_c_float
+    this%net_rainfall                        = 0.0_c_float
     this%interception_storage                = 0.0_c_float
     this%snow_storage                        = 0.0_c_float
     this%soil_storage                        = 0.0_c_double
@@ -511,8 +514,8 @@ contains
     this%delta_soil_storage                  = 0.0_c_float
     this%soil_moisture_deficit               = 0.0_c_float
 
-    this%net_infiltration                  = 0.0_c_float
-    this%rejected_net_infiltration         = 0.0_c_float
+    this%net_infiltration                    = 0.0_c_float
+    this%rejected_net_infiltration           = 0.0_c_float
     this%fog                                 = 0.0_c_float
     this%irrigation                          = 0.0_c_float
     this%curve_num_adj                       = 0.0_c_float
@@ -1505,8 +1508,8 @@ contains
               //"sum_upslope_cells, solution_order, cell_index, target_index, awc, latitude, reference_ET0, "      &
               //"actual_ET, curve_num_adj, inflow, runon, "                                                        &
               //"runoff, outflow, infiltration, snowfall, potential_snowmelt, snowmelt, interception, "            &
-              //"rainfall, monthly_gross_precip, monthly_runoff, interception_storage, tmax, tmin, tmean, "        &
-              //"snow_storage, soil_storage, soil_storage_max, delta_soil_storage, "                               &
+              //"rainfall, net_rainfall, monthly_gross_precip, monthly_runoff, interception_storage, tmax, tmin, " &
+              //" tmean, snow_storage, soil_storage, soil_storage_max, delta_soil_storage, "                       &
               //"soil_moisture_deficit, surface_storage, "                                                         &
               //"surface_storage_excess, surface_storage_max, net_infiltration, "                                  &
               //"rejected_net_infiltration, fog, irrigation, gdd, runoff_outside, "                                &
@@ -1745,7 +1748,9 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call snowfall_original_calculate( this%snowfall, this%rainfall, this%tmin, this%tmax, this%gross_precip )
+    call snowfall_original_calculate( this%snowfall, this%rainfall,            &
+                                      this%net_rainfall, this%tmin, this%tmax, &
+                                      this%interception, this%gross_precip )
 
   end subroutine model_calculate_snowfall_original
 
@@ -2729,7 +2734,7 @@ contains
     if (allocated(this%monthly_runoff) )  monthly_runoff = this%monthly_runoff( cell_indx )
     if (allocated(this%monthly_gross_precip) )  monthly_gross_precip = this%monthly_gross_precip( cell_indx )
 
-      write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',8(i6,','),61(g16.9,','),g16.9)")                                      &
+      write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',8(i6,','),62(g16.9,','),g16.9)")                                      &
         SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                                            &
         this%landuse_code( cell_indx ), this%landuse_index( cell_indx ),                                                    &
         this%soil_group( cell_indx ), this%num_upslope_connections( cell_indx ), this%sum_upslope_cells( cell_indx ),       &
@@ -2739,7 +2744,7 @@ contains
         this%outflow( cell_indx ),                                                                                          &
         this%infiltration( cell_indx ), this%snowfall( cell_indx ), this%potential_snowmelt( cell_indx ),                   &
         this%snowmelt( cell_indx ), this%interception( cell_indx ), this%rainfall( cell_indx ),                             &
-        monthly_gross_precip, monthly_runoff,                                                                                   &
+        this%net_rainfall( cell_indx ), monthly_gross_precip, monthly_runoff,                                               &
         this%interception_storage( cell_indx ), this%tmax( cell_indx ), this%tmin( cell_indx ), this%tmean( cell_indx ),    &
         this%snow_storage( cell_indx ), this%soil_storage( cell_indx ), this%soil_storage_max( cell_indx ),                 &
         this%delta_soil_storage( cell_indx ),this%soil_moisture_deficit( cell_indx ),                                       &
