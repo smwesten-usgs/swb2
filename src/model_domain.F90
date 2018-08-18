@@ -119,6 +119,7 @@ module model_domain
     real (kind=c_float), allocatable       :: rainfall(:)
     real (kind=c_float), allocatable       :: net_rainfall(:)
     real (kind=c_float), allocatable       :: snowfall(:)
+    real (kind=c_float), allocatable       :: net_snowfall(:)
     real (kind=c_float), allocatable       :: irrigation(:)
 
     real (kind=c_float), allocatable       :: tmin(:)
@@ -409,7 +410,7 @@ contains
     integer (kind=c_int)  :: iCount
     integer (kind=c_int)  :: iIndex
     integer (kind=c_int)  :: indx
-    integer (kind=c_int)  :: iStat(63)
+    integer (kind=c_int)  :: iStat(64)
 
     iCount = count( this%active )
     iStat = 0
@@ -476,6 +477,7 @@ contains
     allocate( this%delta_soil_storage( iCount ), stat=iStat(61) )
     allocate( this%soil_moisture_deficit( iCount ), stat=iStat(62) )
     allocate( this%net_rainfall( iCount ), stat=iStat(63) )
+    allocate( this%net_snowfall( iCount ), stat=iStat(64) )
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR"                    &
@@ -502,6 +504,7 @@ contains
     this%outflow                             = 0.0_c_float
     this%infiltration                        = 0.0_c_float
     this%snowfall                            = 0.0_c_float
+    this%net_snowfall                        = 0.0_c_float
     this%snowmelt                            = 0.0_c_float
 
     this%interception                        = 0.0_c_float
@@ -1748,8 +1751,9 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call snowfall_original_calculate( this%snowfall, this%rainfall,            &
-                                      this%net_rainfall, this%tmin, this%tmax, &
+    call snowfall_original_calculate( this%snowfall, this%net_snowfall,        &
+                                      this%rainfall, this%net_rainfall,        &
+                                      this%tmin, this%tmax,                    &
                                       this%interception, this%gross_precip )
 
   end subroutine model_calculate_snowfall_original

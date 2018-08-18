@@ -45,10 +45,10 @@ contains
     ! update crop evapotranspiration; crop_coefficient_kcb defaults to 1.0
     cells%crop_etc = cells%reference_et0 * cells%crop_coefficient_kcb
 
-    call cells%calc_snowfall()
-
     ! interception calculation *does* reflect the canopy fraction
     call cells%calc_interception()
+
+    call cells%calc_snowfall()
 
     ! actually calculating *potential* snowmelt here; actual snowmelt determined
     ! in 'calculate_snow_mass_balance'
@@ -70,8 +70,7 @@ contains
     call calculate_snow_mass_balance( snow_storage=cells%snow_storage,                 &
                                       potential_snowmelt=cells%potential_snowmelt,     &
                                       snowmelt=cells%snowmelt,                         &
-                                      interception=cells%interception,                 &
-                                      snowfall=cells%snowfall )
+                                      net_snowfall=cells%net_snowfall )
 
      cells%runon          = 0.0_c_float
      cells%runoff         = 0.0_c_float

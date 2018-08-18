@@ -11,12 +11,14 @@ module snowfall__original
 
 contains
 
-  elemental subroutine snowfall_original_calculate( snowfall, rainfall,        &
-                                                    net_rainfall, tmin, tmax,  &
+  elemental subroutine snowfall_original_calculate( snowfall, net_snowfall,    &
+                                                    rainfall, net_rainfall,    &
+                                                    tmin, tmax,                &
                                                     interception,              &
                                                     gross_precipitation)
 
     real (kind=c_float), intent(inout)  :: snowfall
+    real (kind=c_float), intent(inout)  :: net_snowfall
     real (kind=c_float), intent(inout)  :: rainfall
     real (kind=c_float), intent(inout)  :: net_rainfall
     real (kind=c_float), intent(in)     :: tmin
@@ -28,12 +30,14 @@ contains
     if ( ( (tmin + tmax) / 2.0_c_float - ( tmax - tmin ) / 3.0_c_float ) <= FREEZING ) then
 
       snowfall = gross_precipitation
+      net_snowfall = gross_precipitation - interception
       rainfall = 0.0_c_float
       net_rainfall = 0.0_c_float
 
     else  ! rainfall
 
       snowfall = 0.0_c_float
+      net_snowfall = 0.0_c_float
       rainfall = gross_precipitation
       net_rainfall = gross_precipitation - interception
 

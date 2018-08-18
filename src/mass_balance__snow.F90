@@ -8,17 +8,15 @@ contains
   elemental subroutine calculate_snow_mass_balance( snow_storage,         &
                                                     potential_snowmelt,   &
                                                     snowmelt,             &
-                                                    interception,         &
-                                                    snowfall )
+                                                    net_snowfall )
 
     real (kind=c_float), intent(inout)      :: snow_storage
     real (kind=c_float), intent(inout)      :: snowmelt
     real (kind=c_float), intent(in)         :: potential_snowmelt
-    real (kind=c_float), intent(in)         :: interception
-    real (kind=c_float), intent(in)         :: snowfall
+    real (kind=c_float), intent(in)         :: net_snowfall
 
 
-    snow_storage = max(0.0_c_float, snow_storage + snowfall - interception)
+    snow_storage = max(0.0_c_float, snow_storage + net_snowfall )
 
     if( snow_storage > potential_snowmelt ) then
 

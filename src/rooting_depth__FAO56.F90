@@ -58,7 +58,7 @@ elemental subroutine update_rooting_depth( Zr_i, Zr_max, landuse_index, Kcb )
 
      Zr_i = Zr_max
 
-   elseif ( MaxKCB > 0.0_C_float ) then
+   elseif ( Kcb > MinKcb ) then
 
      Zr_i = Zr_min + ( Kcb - MinKCB ) / ( MaxKCB - MinKCB ) * ( Zr_max - Zr_min )
 
