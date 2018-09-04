@@ -1023,7 +1023,7 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   if (present( fValidMin ) ) then
     valid_minimum = fValidMin
   else
-    valid_minimum = 1.0E-10
+    valid_minimum = 0.0
   endif
 
   if (present( fValidMax ) ) then

@@ -94,6 +94,9 @@ INITIAL_SNOW_COVER_STORAGE CONSTANT 2.0
 # POTATOES
 DUMP_VARIABLES COORDINATES 561167. 445224.
 
+# RYE
+DUMP_VARIABLES COORDINATES 546094., 438492.
+
 # EVERGREEN FOREST
 DUMP_VARIABLES COORDINATES 556791. 457569.
 
@@ -113,7 +116,7 @@ DUMP_VARIABLES COORDINATES 558663. 432949.
 DUMP_VARIABLES COORDINATES 570741. 445112.
 
 
-OUTPUT ENABLE bare_soil_evaporation crop_et
+OUTPUT ENABLE bare_soil_evaporation crop_et snowmelt soil_storage delta_soil_storage
 
 %% start and end date may be any valid dates in SWB version 2.0
 %% remember to allow for adequate model spin up; running the

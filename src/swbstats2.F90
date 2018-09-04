@@ -62,7 +62,8 @@ program swbstats2
   type (STRING_LIST_T)           :: name_list
   type (STRING_LIST_T)           :: value_list
 
-  type (ASCII_FILE_T)            :: csv_output_files
+  type (ASCII_FILE_T)            :: zonal_stats_output_file
+  type (ASCII_FILE_T)            :: whole_grid_stats_output_file
 
   type (T_NETCDF4_FILE), pointer          :: ncfile_in
 
@@ -273,14 +274,9 @@ program swbstats2
 
       options%dump_options_to_screen = TRUE
 
-    elseif ( temp_string .containssimilar. "annualize_means" ) then
+    elseif ( temp_string .containssimilar. "annualize_sums" ) then
 
-      sub_string = right(temp_string, substring="=")
-      if (sub_string .containssimilar. "TRUE") then
-
-        options%annualize_stats = TRUE
-
-      endif
+      options%annualize_stats = TRUE
 
     elseif ( temp_string .containssimilar. "stress_period_file" ) then
 
@@ -529,7 +525,7 @@ program swbstats2
       call get_unique_int(pZONE_GRID%pGrdBase%iData, options%unique_zone_list)
     endif
     temp_string = "zonal_stats_"//trim(options%netcdf_variable_name_string)//".csv"
-    call open_output_csv_file(trim(temp_string))
+    call open_zonal_stats_output_file(trim(temp_string))
   endif
 
   call open_output_netcdf_files(output_files, options)
@@ -566,7 +562,7 @@ program swbstats2
   !            zone_ids=pZONE_GRID%pGrdBase%iData,                            &
   !            unique_zone_list=options%unique_zone_list,                     &
   !            comparison_values=pCOMPARISON_GRID%pGrdBase%rData,             &
-  !            funit=csv_output_files%unit() )
+  !            funit=zonal_stats_output_file%unit() )
   !
   !     else
   !
@@ -576,7 +572,7 @@ program swbstats2
   !            values=pGrdMean%rData,                                         &
   !            zone_ids=pZONE_GRID%pGrdBase%iData,                            &
   !            unique_zone_list=options%unique_zone_list,                     &
-  !            funit=csv_output_files%unit() )
+  !            funit=zonal_stats_output_file%unit() )
   !
   !     endif
   !   endif
@@ -648,7 +644,7 @@ program swbstats2
              zone_ids=pZONE_GRID%pGrdBase%iData,                            &
              unique_zone_list=options%unique_zone_list,                     &
              comparison_values=pCOMPARISON_GRID%pGrdBase%rData,             &
-             funit=csv_output_files%unit() )
+             funit=zonal_stats_output_file%unit() )
 
       else
         call output_zonal_stats(                                            &
@@ -657,7 +653,7 @@ program swbstats2
              values=output_files(STATS_SUM)%grid_ptr%rData,                 &
              zone_ids=pZONE_GRID%pGrdBase%iData,                            &
              unique_zone_list=options%unique_zone_list,                     &
-             funit=csv_output_files%unit() )
+             funit=zonal_stats_output_file%unit() )
 
       endif
     endif
@@ -670,7 +666,7 @@ program swbstats2
   !call netcdf_close_file(NCFILE=ncfile_out)
   call close_output_netcdf_files(output_files=output_files)
 
-  if (options%write_csv)  call csv_output_files%close()
+  if (options%write_csv)  call zonal_stats_output_file%close()
 
 ! endif
 
@@ -837,15 +833,24 @@ contains
     type (GENERAL_GRID_T), pointer    :: grid_ptr
     integer (kind=c_int)              :: stat_indx
     character (len=8)                 :: stats_description
+    character (len=:), allocatable    :: units_string
 
     nx = BNDS%iNumCols
     ny = BNDS%iNumRows
 
-    do stat_indx=STATS_SUM, STATS_VARIANCE
+    do stat_indx=STATS_MEAN, STATS_VARIANCE
 
       if ( .not. output_files(stat_indx)%output_active )  cycle
 
-      if ( output_files(stat_indx)%write_arcgrid ) then
+      if ( output_files(stat_indx)%write_arcgrid) then
+
+        if ( options%annualize_stats .and. stat_indx == STATS_SUM ) then
+          units_string = asUppercase(trim(options%netcdf_variable_units_string)//"_per_year")
+        else
+          units_string = asUppercase(options%netcdf_variable_units_string)
+        endif
+
+        call replace(units_string, ' ', '_' )
 
         grid_ptr => output_files(stat_indx)%grid_ptr
         stats_description = output_files(stat_indx)%stats_description
@@ -855,12 +860,13 @@ contains
           filename = trim(options%netcdf_variable_name_string)                     &
                      //"__"//trim(date_range_string)                               &
                      //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)              &
-                     //"__"//trim(stats_description)//".asc"
+                     //"__"//trim(stats_description)                               &
+                     //"__"//trim(units_string)//".asc"
         else
           filename = trim(options%netcdf_variable_name_string)                      &
                      //"__"//start_date%prettydate()//"_to_"//end_date%prettydate() &
                      //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)               &
-                     //"__"//trim(stats_description)//".asc"
+                     //"__"//trim(units_string)//".asc"
         endif
 
         ! ugly hack to make the output match the default NODATA value
@@ -991,9 +997,9 @@ contains
 
       if (options%annualize_stats) then
         where ( local_mask )
-          grd_mean = grd_mean * 365.25
-          grd_var = grd_var * 365.25
-          !grd_mean = grd_sum / real( day_count, kind=c_float ) * 365.25
+!          grd_mean = grd_mean/ real( day_count, kind=c_float ) * 365.25
+!          grd_var = grd_var/ real( day_count, kind=c_float ) * 365.25
+          grd_sum = grd_sum / real( day_count, kind=c_float ) * 365.25
         end where
       ! else
       !   where ( local_mask )
@@ -1411,12 +1417,19 @@ contains
     integer (kind=c_int)              :: stat_indx
     integer (kind=c_int)              :: status
     type (T_NETCDF4_FILE), pointer    :: ncfile_out
+    character (len=:), allocatable    :: units_string
 
     do stat_indx=STATS_MEAN, STATS_VARIANCE
 
       if ( .not. output_files(stat_indx)%output_active )  cycle
 
       if (output_files(stat_indx)%write_netcdf) then
+
+        if ( options%annualize_stats .and. stat_indx == STATS_SUM) then
+          units_string = trim(options%netcdf_variable_units_string)//", per year"
+        else
+          units_string = trim(options%netcdf_variable_units_string)
+        endif
 
         allocate( output_files(stat_indx)%nc_ptr, stat=status)
         call assert( status==0, "Problem allocating netcdf file data structure.", &
@@ -1426,7 +1439,7 @@ contains
         call netcdf_open_and_prepare_as_output(                                     &
               NCFILE=ncfile_out,                                                    &
               sVariableName=trim(options%netcdf_variable_name_string),              &
-              sVariableUnits=trim(options%netcdf_variable_units_string),            &
+              sVariableUnits=units_string,                                          &
               iNX=ncfile_in%iNX,                                                    &
               iNY=ncfile_in%iNY,                                                    &
               fX=ncfile_in%rX_Coords,                                               &
@@ -1473,14 +1486,14 @@ contains
 
 !------------------------------------------------------------------------------
 
-  subroutine open_output_csv_file(filename)
+  subroutine open_zonal_stats_output_file(filename)
 
     character (len=*)   :: filename
 
     ! [ LOCALS ]
     character (len=256)    :: header_str
 
-    call csv_output_files%open(filename)
+    call zonal_stats_output_file%open(filename)
 
     if (options%multiple_comparison_grids .or. options%compare_to_obs_values) then
       header_str = "start_date,end_date,zone_id,minimum_swb,maximum_swb,"     &
@@ -1491,9 +1504,9 @@ contains
         //"mean_swb,sum_swb,count_swb"
     endif
 
-    call csv_output_files%writeLine(trim(header_str))
+    call zonal_stats_output_file%writeLine(trim(header_str))
 
-  end subroutine open_output_csv_file
+  end subroutine open_zonal_stats_output_file
 
 !------------------------------------------------------------------------------
 
