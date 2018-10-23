@@ -8,7 +8,7 @@ rmdir /S /Q tests
 del /S /Q *.txt
 
 :: set CMAKE-related and build-related variables
-set CMAKEROOT=C:\Program Files\CMake\
+set CMAKEROOT=C:\Program Files\CMake
 set COMPILER_DIR=C:\mingw64
 set Fortran_COMPILER_NAME=gfortran
 set CMAKE_C_COMPILER=gcc
@@ -56,12 +56,10 @@ set CMAKE_Fortran_FLAGS_PROFILE="-O2 -pg -g -cpp -fno-omit-frame-pointer -DNDEBU
 ::set CMAKE_Fortran_FLAGS_RELEASE="-O3 -mtune=native -fopenmp -flto -ffree-line-length-none -static-libgcc -static-libgfortran -DCURL_STATICLIB"
 
 :: recreate clean Windows environment
-set PATH=c:\windows;c:\windows\system32;c:\windows\system32\Wbem
-set PATH=%PATH%;C:\Program Files (x86)\7-Zip
-set PATH=%PATH%;C:\Program Files\Git\bin;c:\Program Files\CMake\bin
-set PATH=%PATH%;%CMAKEROOT%\bin;%CMAKEROOT%\share
-set PATH=%PATH%;c:\mingw64\bin
-set PATH=%PATH%;c:\mingw64\include;c:\mingw64\lib
+set PATH=C:\Program Files\Git\bin;c:\Program Files\CMake\bin;d:\dos;%PATH%
+set PATH=%CMAKEROOT%\bin;%CMAKEROOT%\share;%PATH%
+set PATH=c:\mingw64\bin;%PATH%
+set PATH=c:\mingw64\include;c:\mingw64\lib;%PATH%
 
 :: set a useful alias for make
 echo %COMPILER_DIR%\bin\%MAKE_EXECUTABLE_NAME% %%1 > make.bat
