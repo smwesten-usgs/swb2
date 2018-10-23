@@ -106,32 +106,22 @@ contains
     this%minutes = -9999
     this%seconds = -9999
 
-    print *, __LINE__, ': ', remainder
-
     if ( int(remainder) >= 86400 ) then
       this%days = int( remainder / 86400.0_c_double )
       remainder = modulo(remainder, 86400.0_c_double)
     endif
-
-    print *,  __LINE__, ': ',this%days, remainder
 
     if ( int(remainder) >= 3600) then
       this%hours = int( remainder / 3600.0_c_double )
       remainder = modulo(remainder, 3600.0_c_double)
     endif
 
-    print *, __LINE__, ': ', this%hours, remainder
-
     if ( int(remainder) >= 60) then
       this%minutes = int( remainder / 60.0_c_double )
       remainder = modulo(remainder, 60.0_c_double)
     endif
 
-    print *, __LINE__, ': ', this%minutes, remainder
-
     this%seconds = int( remainder )
-
-    print *, __LINE__, ': ', this%seconds, remainder
 
   end subroutine calc_time_values_sub
 

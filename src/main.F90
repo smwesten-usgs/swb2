@@ -23,6 +23,7 @@ program main
                                         GIT_BRANCH_STRING, COMPILE_DATE,        &
                                         COMPILE_TIME, SYSTEM_NAME
   use string_list, only               : STRING_LIST_T
+  use timer, only                     : TIMER_T
   use iso_fortran_env
 
   implicit none
@@ -46,11 +47,15 @@ program main
   integer (kind=c_int)           :: iLen
   integer (kind=c_int)           :: number_of_simulations
 
+  type (TIMER_T)                 :: runtimer
+
   sOutputPrefixName         = ""
   sOutputDirectoryName      = ""
   sDataDirectoryName        = ""
   sWeatherDataDirectoryName = ""
   number_of_simulations = 1
+
+  call runtimer%start()
 
   iNumArgs = COMMAND_ARGUMENT_COUNT()
 
@@ -210,6 +215,12 @@ program main
   call initialize_all( sOutputPrefixName, sOutputDirectoryName, sDataDirectoryName, &
                        sWeatherDataDirectoryName )
 
+  call runtimer%stop()
+  call runtimer%calc_elapsed()
+  print *, "Time spent initializing data: ", trim( runtimer%get_pretty())
+  call runtimer%reset()
+  call runtimer%start()
+
   if ( number_of_simulations > 1) then
 
     call iterate_over_multiple_simulation_days(MODEL, number_of_simulations)
@@ -219,6 +230,10 @@ program main
     call iterate_over_simulation_days( MODEL )
 
   endif
+
+  call runtimer%stop()
+
+  print *, "Time spent running simulation: ", trim( runtimer%get_pretty())
 
   call LOGS%close()
 
