@@ -146,6 +146,7 @@ module constants_and_conversions
     module procedure short2real
     module procedure int2real
     module procedure dbl2real
+    module procedure bool2real
   end interface asFloat
 
   public :: asDouble
@@ -154,6 +155,7 @@ module constants_and_conversions
     module procedure short2dbl
     module procedure int2dbl
     module procedure real2dbl
+    module procedure bool2dbl
   end interface asDouble
 
   public asInt
@@ -776,6 +778,21 @@ end function dbl2real
 
 !--------------------------------------------------------------------------------------------------
 
+!> Convert a boolean value into a real
+elemental pure function bool2real(lValue)   result(rValue)
+  logical (c_bool), intent(in) :: lValue
+  real (c_float)               :: rValue
+
+  if (lValue) then
+    rValue = 1.0_c_float
+  else
+    rValue = 0.0_c_float
+  end if
+
+end function bool2real
+
+!--------------------------------------------------------------------------------------------------
+
 !> Convert a character value into a double
 
 elemental function char2dbl(sValue)  result(dValue)
@@ -830,6 +847,21 @@ elemental function real2dbl(fValue)  result(dValue)
   dValue = real(fValue, kind=c_double)
 
 end function real2dbl
+
+!--------------------------------------------------------------------------------------------------
+
+!> Convert a boolean value into a double
+elemental pure function bool2dbl(lValue)   result(dValue)
+  logical (c_bool), intent(in) :: lValue
+  real (c_double)              :: dValue
+
+  if (lValue) then
+    dValue = 1.0_c_double
+  else
+    dValue = 0.0_c_double
+  end if
+
+end function bool2dbl
 
 !--------------------------------------------------------------------------------------------------
 

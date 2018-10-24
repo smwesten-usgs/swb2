@@ -212,13 +212,15 @@ program main
 
   call slControlFiles%clear()
 
-  call initialize_all( sOutputPrefixName, sOutputDirectoryName, sDataDirectoryName, &
-                       sWeatherDataDirectoryName )
+  call initialize_all( sOutputPrefixName, sOutputDirectoryName,                &
+                       sDataDirectoryName, sWeatherDataDirectoryName )
 
   call runtimer%stop()
-  call runtimer%calc_elapsed()
-  print *, "Time spent initializing data: ", trim( runtimer%get_pretty())
-  call runtimer%reset()
+  call runtimer%calc_time_values("split")
+  call LOGS%write(sMessage="Time spent initializing simulation: "              &
+     //trim( runtimer%get_pretty()), lEcho=.true._c_bool,                      &
+     iLinesBefore=1, iLinesAfter=1 )
+
   call runtimer%start()
 
   if ( number_of_simulations > 1) then
@@ -232,9 +234,14 @@ program main
   endif
 
   call runtimer%stop()
-
-  print *, "Time spent running simulation: ", trim( runtimer%get_pretty())
-
+  call runtimer%calc_time_values("split")
+  call LOGS%write(sMessage="Time spent running simulation: "                   &
+     //trim( runtimer%get_pretty()), lEcho=.true._c_bool,                      &
+     iLinesBefore=1)
+  call runtimer%calc_time_values("elapsed")
+  call LOGS%write(sMessage="Total runtime                : "                   &
+    //trim( runtimer%get_pretty()), lEcho=.true._c_bool,                       &
+    iLinesAfter=1 )
   call LOGS%close()
 
 end program main

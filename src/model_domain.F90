@@ -153,6 +153,7 @@ module model_domain
     procedure ( array_method ), pointer  :: init_direct_soil_moisture
     procedure ( array_method ), pointer  :: update_landuse_codes
     procedure ( array_method ), pointer  :: init_GDD
+    procedure ( array_method ), pointer  :: init_growing_season
     procedure ( array_method ), pointer  :: init_AWC
     procedure ( array_method ), pointer  :: init_crop_coefficient
     procedure ( array_method ), pointer  :: calc_interception
@@ -171,6 +172,7 @@ module model_domain
     procedure ( array_method ), pointer  :: calc_fog
     procedure ( index_method ), pointer  :: calc_irrigation
     procedure ( array_method ), pointer  :: calc_GDD
+    procedure ( array_method ), pointer  :: update_growing_season
     procedure ( index_method ), pointer  :: calc_direct_net_infiltration
     procedure ( index_method ), pointer  :: calc_direct_soil_moisture
     procedure (array_method), pointer    :: output_irrigation
@@ -221,9 +223,6 @@ module model_domain
 
     procedure :: model_initialize_growing_season
     generic   :: initialize_growing_season => model_initialize_growing_season
-
-    procedure :: model_update_growing_season
-    generic   :: update_growing_season => model_update_growing_season
 
   end type MODEL_DOMAIN_T
 
@@ -319,6 +318,7 @@ contains
      this%init_direct_soil_moisture    => model_initialize_direct_soil_moisture_none
      this%update_landuse_codes         => model_update_landuse_codes_static
      this%init_GDD                     => model_initialize_GDD
+     this%init_growing_season          => model_initialize_growing_season
      this%init_AWC                     => model_initialize_available_water_content_gridded
      this%init_crop_coefficient        => model_initialize_crop_coefficient_none
      this%calc_interception            => model_calculate_interception_bucket
@@ -343,6 +343,7 @@ contains
      this%calc_fog                => model_calculate_fog_none
      this%calc_irrigation         => model_calculate_irrigation_none
      this%calc_GDD                => model_calculate_GDD
+     this%update_growing_season   => model_update_growing_season
      this%calc_direct_net_infiltration => model_calculate_direct_net_infiltration_none
      this%calc_direct_soil_moisture    => model_calculate_direct_soil_moisture_none
 
@@ -1192,7 +1193,8 @@ contains
 
         this%init_crop_coefficient => model_initialize_crop_coefficient_FAO56
         this%update_crop_coefficient => model_update_crop_coefficient_FAO56
-
+        this%init_growing_season => model_initialize_growing_season_crop_coefficient_FAO56
+        this%update_growing_season => model_update_growing_season_crop_coefficient_FAO56
         call LOGS%WRITE( "==> FAO-56 crop coefficient calculation method selected.", iLogLevel = LOG_ALL, &
            lEcho = lFALSE )
 
@@ -2387,6 +2389,29 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  subroutine model_initialize_growing_season_crop_coefficient_FAO56( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_initialize_growing_season_crop_coefficient_FAO56
+
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine model_update_growing_season_crop_coefficient_FAO56( this )
+
+    use crop_coefficients__fao56
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call crop_coefficients_FAO56_update_growing_season(                           &
+                                 landuse_index=this%landuse_index,                &
+                                 Kcb=this%crop_coefficient_kcb,                   &
+                                 it_is_growing_season=this%it_is_growing_season )
+
+  end subroutine model_update_growing_season_crop_coefficient_FAO56
+
+!--------------------------------------------------------------------------------------------------
+
   subroutine model_initialize_growing_season( this )
 
     use growing_season
@@ -3130,11 +3155,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call crop_coefficients_FAO56_initialize( fSoilStorage=real(this%soil_storage, kind=c_float),  &
-                                             iLanduseIndex=this%landuse_index,                    &
-                                             iSoilGroup=this%soil_group,                          &
-                                             fAvailable_Water_Content=this%awc,                   &
-                                             lActive=this%active )
+    call crop_coefficients_FAO56_initialize()
 
   end subroutine model_initialize_crop_coefficient_FAO56
 

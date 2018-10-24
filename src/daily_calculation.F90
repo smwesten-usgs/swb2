@@ -37,8 +37,8 @@ contains
     call cells%calc_GDD()
 
     ! calls elemental
-    call cells%update_growing_season()
     call cells%update_crop_coefficient()
+    call cells%update_growing_season()
     call cells%update_rooting_depth()
     call cells%calc_reference_et()
 

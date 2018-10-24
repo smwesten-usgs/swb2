@@ -68,14 +68,6 @@ set( EXTERNAL_LIBS ${SWB_EXTERNAL_LIBS})
 link_libraries( ${EXTERNAL_LIBS} )
 include_directories( ${INCLUDE_DIRECTORIES} "${PROJECT_SOURCE_DIR}/src/proj4" )
 
-if ("${SYSTEM_TYPE}" STREQUAL "win_x64" OR "${SYSTEM_TYPE}" STREQUAL "win_x86")
-  add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2.exe ${CMAKE_INSTALL_PREFIX}/swb2.exe )
-  add_custom_target(copy_swbstats ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swbstats2.exe ${CMAKE_INSTALL_PREFIX}/swbstats2.exe )
-else()
-  add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2 ${CMAKE_INSTALL_PREFIX}/swb2 )
-  add_custom_target(copy_swbstats ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swbstats2 ${CMAKE_INSTALL_PREFIX}/swbstats2 )
-endif()
-
 include( cmake/print_summary.cmake )
 
 add_subdirectory(src)

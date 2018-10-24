@@ -25,7 +25,7 @@ module output
   type (NETCDF_FILE_COLLECTION_T), allocatable, public :: NC_MULTI_SIM_OUT(:,:)
 
 
-  integer (kind=c_int), parameter   :: NCDF_NUM_OUTPUTS = 28
+  integer (kind=c_int), parameter   :: NCDF_NUM_OUTPUTS = 29
 
   type OUTPUT_SPECS_T
     character (len=27)          :: variable_name
@@ -60,10 +60,11 @@ module output
     OUTPUT_SPECS_T( "runoff_outside             ", "inches               ", 0.0, 10000.0, TRUE, FALSE  ), &
     OUTPUT_SPECS_T( "crop_et                    ", "inches               ", 0.0, 10000.0, FALSE, FALSE ), &
     OUTPUT_SPECS_T( "bare_soil_evaporation      ", "inches               ", 0.0, 10000.0, FALSE, FALSE ), &
-    OUTPUT_SPECS_T( "gdd                        ", "degree_day_fahrenheit", 0.0, 10000.0, FALSE, FALSE ), &
+    OUTPUT_SPECS_T( "growing_degree_day         ", "degree_day_fahrenheit", 0.0, 10000.0, FALSE, FALSE ), &
     OUTPUT_SPECS_T( "direct_net_infiltation     ", "inches               ", 0.0, 100.0, FALSE, FALSE ),   &
     OUTPUT_SPECS_T( "direct_soil_moisture       ", "inches               ", 0.0, 100.0, FALSE, FALSE ),   &
     OUTPUT_SPECS_T( "storm_drain_capture        ", "inches               ", 0.0, 100.0, FALSE, FALSE ),   &
+    OUTPUT_SPECS_T( "growing_season             ", "0_no__1_yes          ", 0.0, 1.0, FALSE, FALSE ),     &
     OUTPUT_SPECS_T( "fog                        ", "inches               ", 0.0, 100.0, FALSE, FALSE)      ]
 
   enum, bind(c)
@@ -79,7 +80,7 @@ module output
                   NCDF_IRRIGATION, NCDF_RUNOFF_OUTSIDE,                       &
                   NCDF_CROP_ET, NCDF_BARE_SOIL_EVAP, NCDF_GDD,                &
                   NCDF_DIRECT_NET_INFILTRATION, NCDF_DIRECT_SOIL_MOISTURE,    &
-                  NCDF_STORM_DRAIN_CAPTURE, NCDF_FOG
+                  NCDF_STORM_DRAIN_CAPTURE, NCDF_GROWING_SEASON, NCDF_FOG
   end enum
 
   logical ( kind=c_bool ) :: OUTPUT_INCLUDES_LATLON = lTRUE
@@ -519,6 +520,12 @@ contains
 
         call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_STORM_DRAIN_CAPTURE )%ncfile,        &
                                     values=cells%storm_drain_capture,                            &
+                                    cells=cells )
+
+      if ( OUTSPECS( NCDF_GROWING_SEASON )%is_active ) &
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_GROWING_SEASON )%ncfile,        &
+                                    values=asFloat(cells%it_is_growing_season),             &
                                     cells=cells )
 
       if ( OUTSPECS( NCDF_FOG )%is_active ) &

@@ -117,6 +117,7 @@ DUMP_VARIABLES COORDINATES 570741. 445112.
 
 
 OUTPUT ENABLE bare_soil_evaporation crop_et snowmelt soil_storage delta_soil_storage
+OUTPUT ENABLE growing_season growing_degree_day
 
 %% start and end date may be any valid dates in SWB version 2.0
 %% remember to allow for adequate model spin up; running the

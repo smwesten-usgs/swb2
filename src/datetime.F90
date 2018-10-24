@@ -30,9 +30,9 @@ module datetime
 
   type, public :: DATETIME_T
 
-    integer (kind=c_short)  :: iMonth = 1
-    integer (kind=c_short)  :: iDay = 1
-    integer (kind=c_int)    :: iYear = 1
+    integer (kind=c_short)  :: iMonth = 0
+    integer (kind=c_short)  :: iDay = 0
+    integer (kind=c_int)    :: iYear = 0
     integer (kind=c_short)  :: iHour = 0
     integer (kind=c_short)  :: iMinute = 0
     integer (kind=c_short)  :: iSecond = 0

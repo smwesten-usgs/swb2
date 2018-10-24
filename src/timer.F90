@@ -9,6 +9,7 @@ module timer
     real(c_double)   :: starttime
     real(c_double)   :: stoptime
     real (c_double)  :: elapsedtime = 0.0_c_double
+    real (c_double)  :: splittime = 0.0_c_double
 
     integer (c_int)  :: seconds
     integer (c_int)  :: minutes
@@ -26,8 +27,14 @@ module timer
     generic       :: calc_elapsed => calc_elapsed_time_sub
     procedure     :: calc_elapsed_time_sub
 
-    generic       :: get_seconds => get_timer_seconds_fn
-    procedure     :: get_timer_seconds_fn
+    generic       :: calc_split => calc_split_time_sub
+    procedure     :: calc_split_time_sub
+
+    generic       :: get_elapsed => get_elapsed_seconds_fn
+    procedure     :: get_elapsed_seconds_fn
+
+    generic       :: get_split => get_split_seconds_fn
+    procedure     :: get_split_seconds_fn
 
     generic       :: calc_time_values => calc_time_values_sub
     procedure     :: calc_time_values_sub
@@ -55,20 +62,32 @@ contains
     class (TIMER_T) :: this
 
     call cpu_time(this%stoptime)
+    this%splittime = this%stoptime - this%starttime
     this%elapsedtime = this%elapsedtime + (this%stoptime - this%starttime)
 
   end subroutine stop_timer_sub
 
-  !------------------------------------------------------------------------------
+!------------------------------------------------------------------------------
 
   subroutine calc_elapsed_time_sub(this)
 
     class (TIMER_T) :: this
 
     this%elapsedtime = this%elapsedtime + (this%stoptime - this%starttime)
-    call this%calc_time_values()
+    call this%calc_time_values("elapsed")
 
   end subroutine calc_elapsed_time_sub
+
+!------------------------------------------------------------------------------
+
+  subroutine calc_split_time_sub(this)
+
+    class (TIMER_T) :: this
+
+    this%splittime = this%stoptime - this%starttime
+    call this%calc_time_values("split")
+
+end subroutine calc_split_time_sub
 
 !------------------------------------------------------------------------------
 
@@ -82,24 +101,44 @@ contains
 
 !------------------------------------------------------------------------------
 
-  function get_timer_seconds_fn(this)    result(elapsed_seconds)
+  function get_elapsed_seconds_fn(this)    result(elapsed_seconds)
 
     class (TIMER_T) :: this
     integer (c_int) :: elapsed_seconds
 
     elapsed_seconds = int(this%elapsedtime, kind=c_int)
 
-  end function get_timer_seconds_fn
+end function get_elapsed_seconds_fn
 
 !------------------------------------------------------------------------------
 
-  subroutine calc_time_values_sub(this)
+function get_split_seconds_fn(this)    result(split_seconds)
 
-    class (TIMER_T) :: this
+  class (TIMER_T) :: this
+  integer (c_int) :: split_seconds
 
+  split_seconds = int(this%splittime, kind=c_int)
+
+end function get_split_seconds_fn
+
+!------------------------------------------------------------------------------
+
+  subroutine calc_time_values_sub(this, timer_name)
+
+    class (TIMER_T)                :: this
+    character (len=*), intent(in)  :: timer_name
+
+    ! [ LOCALS ]
     real (c_double) :: remainder
 
-    remainder = this%elapsedtime
+    select case(timer_name)
+      case("split")
+        remainder = this%splittime
+      case("elapsed")
+        remainder = this%elapsedtime
+      case default
+        remainder = this%elapsedtime
+    end select
 
     this%days    = -9999
     this%hours   = -9999

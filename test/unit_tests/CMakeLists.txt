@@ -15,3 +15,9 @@ add_executable(swbtest
 
 target_link_libraries(swbtest swb_lib proj4_lib)
 target_include_directories(swbtest PUBLIC ${CMAKE_BINARY_DIR}/src)
+
+if ("${SYSTEM_TYPE}" STREQUAL "win_x64" OR "${SYSTEM_TYPE}" STREQUAL "win_x86")
+  install(TARGETS swbtest "${PROJECT_SOURCE_DIR}\test\unit_tests")
+else()
+  install(TARGETS swbtest DESTINATION "${PROJECT_SOURCE_DIR}/test/unit_tests")
+endif()

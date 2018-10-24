@@ -59,7 +59,7 @@ contains
 
     call PARAMS%get_parameters( slKeys=sl_temp_list,                                  &
                                 slValues=sl_growing_season_begin,                     &
-                                lFatal=.true._c_bool )
+                                lFatal=FALSE )
 
     !> process first day of growing season. retrieved as a list of strings;
     !! must convert the strings from mm/dd to DOY
@@ -93,7 +93,7 @@ contains
 
     call PARAMS%get_parameters( slKeys=sl_temp_list,                                  &
                                 slValues=sl_growing_season_end,                       &
-                                lFatal=.true._c_bool )
+                                lFatal=FALSE)
 
     !> process last day of growing season. retrieved as a list of strings;
     !! must convert the strings from mm/dd to DOY
@@ -178,6 +178,12 @@ contains
     count_killing_frost_end = count( KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON > 0 )
     count_grow_start = count( FIRST_DAY_OF_GROWING_SEASON > 0 )
     count_grow_end = count( LAST_DAY_OF_GROWING_SEASON > 0 )
+
+    if ( (count_gdd_start == 0) .and. (count_killing_frost_end == 0)            &
+      .and. (count_grow_start == 0) .and. (count_grow_end == 0) )               &
+      call warn( sMessage="A pair of values (GDD or DOY) must be given to "     &
+        //"define the start and end of the growing season for each landuse"     &
+        //" present in the lookup table.")
 
     if ( count_gdd_start /= count_killing_frost_end )                                     &
       call warn( sMessage="Unequal numbers of values given for defining the "             &

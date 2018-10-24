@@ -4,6 +4,7 @@
 rm -fr CMake*
 rm -rf Testing
 rm -rf src
+rm -rf test
 rm -rf tests
 rm -f CPack*
 rm -f *.txt
@@ -37,13 +38,11 @@ export SWB_EXTERNAL_LIBS="$LIB_HDF5_HL;$LIB_HDF5;$LIB_NETCDF;$LIB_SZ;$LIBZ;$LIBD
 
 export PATH=/usr/local:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:$PATH
 
-# define where 'make copy' will place executables
-export INSTALL_PREFIX=/usr/local/bin
-
 # define other variables for use in the CMakeList.txt file
 # options are "Release" or "Debug"
 export BUILD_TYPE="Release"
 export SYSTEM_TYPE="MacOS"
+export PYTHON_CMD="/usr/bin/python"
 
 # define platform and compiler specific compilation flags
 export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -gfull -ggdb -Wuninitialized -fbacktrace -fcheck=all -fexceptions -fsanitize=null -fsanitize=leak -fmax-errors=6 -fbackslash -ffree-line-length-none -Wno-maybe-uninitialized"
@@ -60,5 +59,6 @@ cmake "../../.." -G "Unix Makefiles"                         \
 -DCMAKE_BUILD_TYPE="$BUILD_TYPE "                            \
 -DSWB_EXTERNAL_LIBS="$SWB_EXTERNAL_LIBS "                    \
 -DCMAKE_INSTALL_PREFIX:PATH="$INSTALL_PREFIX "               \
+-DPYTHON_CMD="$PYTHON_CMD "                                  \
 -DCMAKE_Fortran_FLAGS_DEBUG="$CMAKE_Fortran_FLAGS_DEBUG "    \
 -DCMAKE_Fortran_FLAGS_RELEASE="$CMAKE_Fortran_FLAGS_RELEASE"

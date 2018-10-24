@@ -9,7 +9,8 @@ module crop_coefficients__FAO56
 
   use iso_c_binding, only             : c_bool, c_short, c_int, c_float, c_double
   use constants_and_conversions, only : M_PER_FOOT, lTRUE, lFALSE, fTINYVAL,       &
-                                        iTINYVAL, asInt, asFloat, fZERO, in_to_mm
+                                        iTINYVAL, asInt, asFloat, fZERO, in_to_mm, &
+                                        TRUE, FALSE
   use data_catalog, only              : DAT
   use data_catalog_entry, only        : DATA_CATALOG_ENTRY_T
   use datetime
@@ -25,8 +26,9 @@ module crop_coefficients__FAO56
 
   public :: crop_coefficients_FAO56_initialize, crop_coefficients_FAO56_calculate
   public :: crop_coefficients_FAO56_update_growth_stage_dates
+  public :: crop_coefficients_FAO56_update_growing_season
   public :: update_crop_coefficient_date_as_threshold, update_crop_coefficient_GDD_as_threshold
-  public :: GROWTH_STAGE_DATE, PLANTING_DATE
+  public :: GROWTH_STAGE_DATE, PLANTING_DATE, GROWTH_STAGE_DOY
   public :: KCB_MIN, KCB_INI, KCB_MID, KCB_END
   public :: KCB_l, JAN, DEC, KCB_METHOD, KCB_METHOD_GDD, KCB_METHOD_FAO56
   public :: KCB_METHOD_MONTHLY_VALUES
@@ -72,14 +74,7 @@ module crop_coefficients__FAO56
 
 contains
 
-  subroutine crop_coefficients_FAO56_initialize( fSoilStorage, iLanduseIndex, iSoilGroup, &
-                                                 fAvailable_Water_Content, lActive )
-
-    real (kind=c_float), intent(in)      :: fSoilStorage(:)
-    integer (kind=c_int), intent(in)     :: iLanduseIndex(:)
-    integer (kind=c_int), intent(in)     :: iSoilGroup(:)
-    real (kind=c_float), intent(in)      :: fAvailable_Water_Content(:)
-    logical (kind=c_bool), intent(in)    :: lActive(:,:)
+  subroutine crop_coefficients_FAO56_initialize()
 
     ! [ LOCALS ]
     ! type (STRING_LIST_T)              :: slREW, slTEW
@@ -161,25 +156,25 @@ contains
    !!       REW_1, REW_3, REW_5, only the values associated with "REW_1" would be retrieved.
    !!       Needless to say, this would be catastrophic.
 
-   call PARAMS%get_parameters( sKey="Planting_date", slValues=slPlantingDate, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="Planting_date", slValues=slPlantingDate )
 
-   call PARAMS%get_parameters( sKey="L_shift", fValues=L_shift_days_l, lFatal=lFALSE )
-   call PARAMS%get_parameters( sKey="L_ini", fValues=L_ini_l, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="L_dev", fValues=L_dev_l, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="L_mid", fValues=L_mid_l, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="L_late", fValues=L_late_l, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="L_fallow", fValues=L_fallow_l, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="L_shift", fValues=L_shift_days_l)
+   call PARAMS%get_parameters( sKey="L_ini", fValues=L_ini_l)
+   call PARAMS%get_parameters( sKey="L_dev", fValues=L_dev_l)
+   call PARAMS%get_parameters( sKey="L_mid", fValues=L_mid_l)
+   call PARAMS%get_parameters( sKey="L_late", fValues=L_late_l)
+   call PARAMS%get_parameters( sKey="L_fallow", fValues=L_fallow_l)
 
-   call PARAMS%get_parameters( sKey="GDD_plant", fValues=GDD_plant_l, lFatal=lFALSE )
-   call PARAMS%get_parameters( sKey="GDD_ini", fValues=GDD_ini_l, lFatal=lFALSE )
-   call PARAMS%get_parameters( sKey="GDD_dev", fValues=GDD_dev_l, lFatal=lFALSE )
-   call PARAMS%get_parameters( sKey="GDD_mid", fValues=GDD_mid_l, lFatal=lFALSE )
-   call PARAMS%get_parameters( sKey="GDD_late", fValues=GDD_late_l, lFatal=lFALSE )
+   call PARAMS%get_parameters( sKey="GDD_plant", fValues=GDD_plant_l)
+   call PARAMS%get_parameters( sKey="GDD_ini", fValues=GDD_ini_l)
+   call PARAMS%get_parameters( sKey="GDD_dev", fValues=GDD_dev_l)
+   call PARAMS%get_parameters( sKey="GDD_mid", fValues=GDD_mid_l)
+   call PARAMS%get_parameters( sKey="GDD_late", fValues=GDD_late_l)
 
-   call PARAMS%get_parameters( sKey="Kcb_ini", fValues=KCB_ini_l, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="Kcb_mid", fValues=KCB_mid_l, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="Kcb_end", fValues=KCB_end_l, lFatal=lTRUE )
-   call PARAMS%get_parameters( sKey="Kcb_min", fValues=KCB_min_l, lFatal=lTRUE )
+   call PARAMS%get_parameters( sKey="Kcb_ini", fValues=KCB_ini_l)
+   call PARAMS%get_parameters( sKey="Kcb_mid", fValues=KCB_mid_l)
+   call PARAMS%get_parameters( sKey="Kcb_end", fValues=KCB_end_l)
+   call PARAMS%get_parameters( sKey="Kcb_min", fValues=KCB_min_l)
 
    call PARAMS%get_parameters( sKey="Kcb_Jan", fValues=KCB_jan )
    call PARAMS%get_parameters( sKey="Kcb_Feb", fValues=KCB_feb )
@@ -225,48 +220,23 @@ contains
     GROWTH_STAGE_DOY = -9999.
     GROWTH_STAGE_SHIFT_DAYS = 0.0_c_float
 
-    if ( ubound(L_shift_days_l,1) == iNumberOfLanduses ) then
+    if ( ubound(L_shift_days_l,1) == iNumberOfLanduses )    &
       GROWTH_STAGE_SHIFT_DAYS = L_shift_days_l
-    else
-      call warn(sMessage="L_shift_days has "//asCharacter(ubound(L_shift_days_l,1))//" entries; there are "  &
-        //asCharacter(iNumberOfLanduses)//" landuse codes. Assuming value of zero." )
-    endif
 
-
-    if ( ubound(L_ini_l,1) == iNumberOfLanduses ) then
+    if ( ubound(L_ini_l,1) == iNumberOfLanduses )           &
       GROWTH_STAGE_DOY( L_DOY_INI,  : ) = L_ini_l
-    else
-      call warn(sMessage="L_ini has "//asCharacter(ubound(L_ini_l,1))//" entries; there are "  &
-        //asCharacter(iNumberOfLanduses)//" landuse codes.", lFatal=lTRUE)
-    endif
 
-    if ( ubound(L_dev_l,1) == iNumberOfLanduses ) then
+    if ( ubound(L_dev_l,1) == iNumberOfLanduses )           &
       GROWTH_STAGE_DOY( L_DOY_DEV,  : ) = L_dev_l
-    else
-      call warn(sMessage="L_dev has "//asCharacter(ubound(L_dev_l,1))//" entries; there are "  &
-        //asCharacter(iNumberOfLanduses)//" landuse codes.", lFatal=lTRUE)
-    endif
 
-    if ( ubound(L_mid_l,1) == iNumberOfLanduses ) then
+    if ( ubound(L_mid_l,1) == iNumberOfLanduses )           &
       GROWTH_STAGE_DOY( L_DOY_MID,  : ) = L_mid_l
-    else
-      call warn(sMessage="L_mid has "//asCharacter(ubound(L_mid_l,1))//" entries; there are "  &
-        //asCharacter(iNumberOfLanduses)//" landuse codes.", lFatal=lTRUE)
-    endif
 
-    if ( ubound(L_late_l,1) == iNumberOfLanduses ) then
+    if ( ubound(L_late_l,1) == iNumberOfLanduses )          &
       GROWTH_STAGE_DOY( L_DOY_LATE, : ) = L_late_l
-    else
-      call warn(sMessage="L_late has "//asCharacter(ubound(L_late_l,1))//" entries; there are "  &
-        //asCharacter(iNumberOfLanduses)//" landuse codes.", lFatal=lTRUE)
-    endif
 
-    if ( ubound(L_fallow_l,1) == iNumberOfLanduses ) then
+    if ( ubound(L_fallow_l,1) == iNumberOfLanduses )        &
       GROWTH_STAGE_DOY( L_DOY_FALLOW, : ) = L_fallow_l
-    else
-      call warn(sMessage="L_fallow has "//asCharacter(ubound(L_fallow_l,1))//" entries; there are "  &
-        //asCharacter(iNumberOfLanduses)//" landuse codes.", lFatal=lTRUE)
-    endif
 
     call LOGS%write(" ## Crop Kcb Curve Summary ##", iLinesAfter=1)
     call LOGS%write(" _only meaningful for landuses where the Kcb curve is defined " &
@@ -282,6 +252,10 @@ contains
 
         PlantingDate_str = slPlantingDate%get( iIndex )
 
+        ! if there is no planting date entry, assume user is specifying
+        ! a planting GDD for this landuse code
+        if ( len_trim(PlantingDate_str) == 0 ) cycle
+
         if ( PlantingDate_str .contains. "/" ) then
 
           ! append current year to the end of the user-entered planting date in mm/dd
@@ -292,7 +266,7 @@ contains
                                                       + GROWTH_STAGE_SHIFT_DAYS( iIndex )
 
         else
-
+          ! assume the value is a day-of-year value
           dtPlantingDate = SIM_DT%start + asFloat( PlantingDate_str) + GROWTH_STAGE_SHIFT_DAYS( iIndex )
           call dtPlantingDate%calcJulianDay()
           GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = dtPlantingDate
@@ -359,7 +333,7 @@ contains
          .and. all( KCB_l( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_GDD
 
-      elseif ( all( GROWTH_STAGE_DOY( :, iIndex ) >= 0.0_c_float )              &
+      elseif ( all( GROWTH_STAGE_DOY( PLANTING_DATE:, iIndex ) >= 0.0_c_float )              &
          .and. all( KCB_l( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_FAO56
       endif
@@ -373,9 +347,9 @@ contains
 
     enddo
 
-    do iIndex = lbound( fSoilStorage, 1 ), ubound( fSoilStorage,1 )
+!    do iIndex = lbound( fSoilStorage, 1 ), ubound( fSoilStorage,1 )
 
-      fKcb_initial = update_crop_coefficient_date_as_threshold( iLanduseIndex( iIndex ) )
+!      fKcb_initial = update_crop_coefficient_date_as_threshold( iLanduseIndex( iIndex ) )
 
       ! call calc_effective_root_depth( fRz_i=fRz_initial, iLanduseIndex=iLanduseIndex( iIndex ),    &
       !                                 fZr_max=fMax_Rooting_Depths( iLanduseIndex( iIndex ),        &
@@ -385,7 +359,7 @@ contains
       ! fSoilStorage( iIndex ) = INITIAL_PERCENT_SOIL_MOISTURE( iIndex ) / 100.0_c_float             &
       !                          * fRz_initial * fAvailable_Water_Content( iIndex )
 
-    enddo
+!    enddo
 
   !> @TODO Add more logic here to perform checks on the validity of this data.
 
@@ -489,15 +463,18 @@ end function update_crop_coefficient_date_as_threshold
   real (kind=c_double) :: fFrac
 
   ! define shorthand variable names for remainder of function
-  associate ( GDD_ini_l => GROWTH_STAGE_GDD( GDD_INI, iLanduseIndex ),         &
-              GDD_dev_l => GROWTH_STAGE_GDD( GDD_DEV, iLanduseIndex ),         &
-              GDD_mid_l => GROWTH_STAGE_GDD( GDD_MID, iLanduseIndex ),         &
-              GDD_late_l => GROWTH_STAGE_GDD( GDD_LATE, iLanduseIndex ),       &
+  associate ( GDD_ini_l => GROWTH_STAGE_GDD( GDD_INI, iLanduseIndex ),          &
+              GDD_dev_l => GROWTH_STAGE_GDD( GDD_DEV, iLanduseIndex ),          &
+              GDD_mid_l => GROWTH_STAGE_GDD( GDD_MID, iLanduseIndex ),          &
+              GDD_late_l => GROWTH_STAGE_GDD( GDD_LATE, iLanduseIndex ),        &
               Kcb_ini => KCB_l(KCB_INI, iLanduseIndex),                         &
               Kcb_mid => KCB_l(KCB_MID, iLanduseIndex),                         &
               Kcb_min => KCB_l(KCB_MIN, iLanduseIndex),                         &
-              GDD_plant_l => GROWTH_STAGE_GDD( GDD_PLANT, iLanduseIndex),      &
-              Kcb_end => KCB_l(KCB_END, iLanduseIndex) )
+              PlantingDOY => GROWTH_STAGE_DATE( PLANTING_DATE,                  &
+                                                iLanduseIndex)%getDayOfYear(),  &
+              GDD_plant_l => GROWTH_STAGE_GDD( GDD_PLANT, iLanduseIndex),       &
+              Kcb_end => KCB_l(KCB_END, iLanduseIndex),                         &
+              current_doy => SIM_DT%curr%getDayOfYear() )
 
     ! now calculate Kcb for the given landuse
     if( fGDD > GDD_late_l ) then
@@ -520,9 +497,14 @@ end function update_crop_coefficient_date_as_threshold
 
       fKcb = Kcb_ini * (1_c_double - fFrac) + Kcb_mid * fFrac
 
-    elseif ( fGDD >= GDD_plant_l ) then
+    elseif ( (PlantingDOY > 0) .and. (current_DOY >= PlantingDOY) ) then
 
+      ! if there is a valid value for the Planting Date, use it
       fKcb = Kcb_ini
+
+    elseif ( (GDD_plant_l >= 0.) .and. (fGDD >= GDD_plant_l) ) then
+
+        fKcb = Kcb_ini
 
     else
 
@@ -564,7 +546,7 @@ end function update_crop_coefficient_GDD_as_threshold
 !      print *, "b) ",SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate()
 
       ! however, if we're already past that point in the year, planting date must be
-      ! next celendar year
+      ! next calendar year
       if ( SIM_DT%iDOY > GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%getDayOfYear() )  &
         call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%addYear()
 
@@ -623,5 +605,24 @@ end function update_crop_coefficient_GDD_as_threshold
     endif
 
   end subroutine crop_coefficients_FAO56_calculate
+
+!--------------------------------------------------------------------------------------------------
+
+  impure elemental subroutine crop_coefficients_FAO56_update_growing_season(   &
+                                           landuse_index,                      &
+                                           Kcb,                                &
+                                           it_is_growing_season)
+
+    real (kind=c_float), intent(in)             :: Kcb
+    integer (kind=c_int), intent(in)            :: landuse_index
+    logical (c_bool), intent(out)               :: it_is_growing_season
+
+    if ( Kcb > KCB_l( KCB_MIN, landuse_index) ) then
+      it_is_growing_season = TRUE
+    else
+      it_is_growing_season = FALSE
+    endif
+
+  end subroutine crop_coefficients_FAO56_update_growing_season
 
 end module crop_coefficients__FAO56
