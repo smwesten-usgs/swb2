@@ -1,0 +1,8 @@
+language: c
+sudo: required
+before_install:
+  - sudo apt-get install gcc-gfortran cmake netcdf netcdf zlib hdf5 
+
+script:
+  - ./build/linux_x64_/gfortran/run_cmake_gfortran.sh
+  - make 
