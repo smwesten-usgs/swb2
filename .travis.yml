@@ -1,8 +1,9 @@
 language: c
 sudo: required
 before_install:
-  - sudo apt-get install gfortran-6 cmake libnetcdf zlib libhdf5 
-
+  - sudo apt-get install cmake
+  - sudo apt-get install gcc-6
+  - sudo apt-get install gfortran-6
 script:
   - ./build/linux_x64_/gfortran/run_cmake_gfortran.sh
   - make
