@@ -3,6 +3,11 @@ sudo: required
 git:
   depth: 6
 
+env:
+  global:
+    - CC=gcc-8
+    - FC=gfortran-8
+    
 before_install:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get -y update
