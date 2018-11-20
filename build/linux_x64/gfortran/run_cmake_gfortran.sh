@@ -19,18 +19,20 @@ export GFORTRAN=${GFORTRANARR[1]}
 export CMAKEROOT=/usr/bin/cmake
 export R_HOME=/usr/bin/R
 
-export LIB_HDF5_HL=$( locate hdf5_hl.a )
-export LIB_HDF5=$( locate hdf5.a )
-export LIB_NETCDF=$( locate netcdf.a )
-export LIB_Z=$( locate libz.a )
+#export LIB_HDF5_HL=$( locate hdf5_hl.a | grep usr | grep -v data)
+#export LIB_HDF5=$( locate hdf5.a | grep usr | grep -v data)
+export LIB_NETCDF=$( locate netcdf.so.11 | grep usr | grep -v data | grep -v netcdf.so.11.)
+#export LIB_Z=$( locate libz.a | grep usr | grep -v data)
 #export LIB_SZ=$( locate libsz.a | grep /usr/lib64 )
-export LIB_DL=$(locate libdl.so | grep -v 32 | grep -v libdl.so.)
+#export LIB_DL=$(locate libdl.so | grep -v 32 | grep -v libdl.so.)
+#export LIB_CURL=$(locate libcurl.so | grep usr | grep -v libcurl.so. )
 export LIB_GCC=$( locate libgcc.a | grep -v 32 | grep -v gnu/4.)
 export LIB_GFORTRAN=$( locate libgfortran.a | grep -v 32 | grep -v gnu/4. )
 
 export PATH=/usr/local:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:$PATH
 
-export SWB_EXTERNAL_LIBS="$LIB_NETCDF;$LIB_HDF5_HL;$LIB_HDF5;$LIB_Z;$LIB_DL;$LIB_GCC;$LIB_GFORTRAN"
+#export SWB_EXTERNAL_LIBS="$LIB_NETCDF;$LIB_HDF5_HL;$LIB_HDF5;$LIB_Z;$LIB_DL;$LIB_GCC;$LIB_GFORTRAN;$LIB_CURL"
+export SWB_EXTERNAL_LIBS="$LIB_NETCDF;$LIB_GCC;$LIB_GFORTRAN"
 
 # define where 'make copy' will place executables
 export INSTALL_PREFIX=/usr/local/bin
