@@ -16,7 +16,7 @@ before_install:
   - sudo apt-get -y install gfortran-8
   - sudo apt-get -y install libnetcdfc7 
   - sudo apt-get -y install libnetcdf-dev
-  - sudo apt-get -y install libhdf5* 
+  - sudo apt-get -y install libhdf5-dev 
   - sudo apt-get -y install findutils
   - sudo updatedb --add-prunepaths '/bin /opt'
   - ls -la
