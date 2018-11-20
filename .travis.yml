@@ -1,5 +1,4 @@
 language: c
-dist: precise
 sudo: required
 
 before_install:
