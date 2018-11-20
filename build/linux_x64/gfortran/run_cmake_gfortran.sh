@@ -30,7 +30,7 @@ export LIB_GFORTRAN=$( locate libgfortran.a | grep -v 32 | grep -v gnu/4. )
 
 export PATH=/usr/local:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:$PATH
 
-export SWB_EXTERNAL_LIBS="$LIB_HDF5_HL;$LIB_HDF5;$LIB_NETCDF;$LIB_Z;$LIB_DL;$LIB_GCC;$LIB_GFORTRAN"
+export SWB_EXTERNAL_LIBS="$LIB_NETCDF;$LIB_HDF5_HL;$LIB_HDF5;$LIB_Z;$LIB_DL;$LIB_GCC;$LIB_GFORTRAN"
 
 # define where 'make copy' will place executables
 export INSTALL_PREFIX=/usr/local/bin
