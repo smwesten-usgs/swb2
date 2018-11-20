@@ -1,5 +1,6 @@
 language: c
 sudo: required
+compiler: gcc-8
 git:
   depth: 6
 
