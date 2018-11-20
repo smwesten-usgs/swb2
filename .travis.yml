@@ -16,6 +16,6 @@ before_install:
   - ls -la
 
 script:
-  - cd swb2/build/linux_x64/gfortran
+  - cd $TRAVIS_BUILD_DIR/build/linux_x64/gfortran
   - ./run_cmake_gfortran.sh
   - make
