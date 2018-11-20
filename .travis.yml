@@ -8,6 +8,7 @@ before_install:
   - sudo apt-get -y install gcc-8
   - sudo apt-get -y install gfortran-8
   - sudo unlink /usr/bin/gcc && sudo ln -s /usr/bin/gcc-5 /usr/bin/gcc
+  - tree
 
 script:
   - cd build/linux_x64_/gfortran
