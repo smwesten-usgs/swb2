@@ -24,7 +24,7 @@ export LIB_HDF5=$( locate hdf5.a )
 export LIB_NETCDF=$( locate netcdf.a )
 export LIB_Z=$( locate libz.a )
 #export LIB_SZ=$( locate libsz.a | grep /usr/lib64 )
-export LIB_DL=/usr/lib64/libdl.so
+export LIB_DL=$(locate libdl.so | grep -v 32)
 export LIB_GCC=$( locate libgcc.a | grep -v 32 | grep -v gnu/4.)
 export LIB_GFORTRAN=$( locate libgfortran.a | grep -v 32 | grep -v gnu/4. )
 
