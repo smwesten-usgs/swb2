@@ -19,10 +19,10 @@ export GFORTRAN=${GFORTRANARR[1]}
 export CMAKEROOT=/usr/bin/cmake
 export R_HOME=/usr/bin/R
 
-export LIB_HDF5_HL=$( locate hdf5_hl.a | grep /usr/local/lib )
-export LIB_HDF5=$( locate hdf5.a | grep /usr/local/lib )
-export LIB_NETCDF=$( locate netcdf.a | grep /usr/local/lib )
-export LIB_Z=$( locate libz.a | grep /usr/lib64 )
+export LIB_HDF5_HL=$( locate hdf5_hl.a )
+export LIB_HDF5=$( locate hdf5.a )
+export LIB_NETCDF=$( locate netcdf.a )
+export LIB_Z=$( locate libz.a )
 #export LIB_SZ=$( locate libsz.a | grep /usr/lib64 )
 export LIB_DL=/usr/lib64/libdl.so
 export LIB_GCC=$( locate libgcc.a | grep -v 32 )
