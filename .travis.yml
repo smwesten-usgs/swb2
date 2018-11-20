@@ -9,7 +9,8 @@ before_install:
   - sudo apt-get -y install cmake
   - sudo unlink /usr/bin/gcc && sudo ln -s /usr/bin/gcc-5 /usr/bin/gcc  
   - sudo apt-get -y install gfortran-8
-  - sudo apt-get install libnetcdf libnetcdf-dev
+  - sudo apt-get -y install libnetcdfc7 
+  - sudo apt-get -y install libnetcdf-dev
   - sudo apt-get -y install findutils
   - sudo updatedb --localpaths='/usr'
   - ls -la
