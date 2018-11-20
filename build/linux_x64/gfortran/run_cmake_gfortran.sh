@@ -21,7 +21,12 @@ export R_HOME=/usr/bin/R
 
 #export LIB_HDF5_HL=$( locate hdf5_hl.a | grep usr | grep -v data)
 #export LIB_HDF5=$( locate hdf5.a | grep usr | grep -v data)
-export LIB_NETCDF=$( locate netcdf.so.11 | grep usr | grep -v data | grep -v netcdf.so.11.)
+#export LIB_NETCDF=$( locate netcdf.so.11 | grep usr | grep -v data | grep -v netcdf.so.11.)
+
+export NETCDF_LIST=$( locate netcdf.so | grep usr )
+export NETCDF_ARR=($NETCDF_LIST)
+export LIB_NETCDF=${NETCDF_ARR[1]}
+
 #export LIB_Z=$( locate libz.a | grep usr | grep -v data)
 #export LIB_SZ=$( locate libsz.a | grep /usr/lib64 )
 #export LIB_DL=$(locate libdl.so | grep -v 32 | grep -v libdl.so.)
