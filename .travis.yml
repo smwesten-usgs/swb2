@@ -1,9 +1,15 @@
 language: c
+dist: precise
 sudo: required
+
 before_install:
-  - sudo apt-get install cmake
-  - sudo apt-get install gcc-6
-  - sudo apt-get install gfortran-6
+  - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
+  - sudo apt-get -y install cmake
+  - sudo apt-get -y install gcc-7
+  - sudo apt-get -y install gfortran-7
+  - sudo unlink /usr/bin/gcc && sudo ln -s /usr/bin/gcc-5 /usr/bin/gcc
+
 script:
-  - ./build/linux_x64_/gfortran/run_cmake_gfortran.sh
+  - cd build/linux_x64_/gfortran
+  - ./run_cmake_gfortran.sh
   - make
