@@ -8,13 +8,11 @@ rm -rf tests
 rm -f CPack*
 rm -f *.txt
 
-export GCC_VERSION=6.4.1
-export GCC_TRIPLET=x86_64-redhat-linux
 # set CMAKE-related and build-related variables
-export GCCLIST=$( locate gcc-6 | grep bin | grep $GCC_VERSION )
+export GCCLIST=$( locate gcc-8 | grep bin )
 export GCCARR=($GCCLIST)
 export GCC=${GCCARR[1]}
-export GFORTRANLIST=$( locate gfortran-6 | grep bin | grep $GCC_VERSION )
+export GFORTRANLIST=$( locate gfortran-8 | grep bin )
 export GFORTRANARR=($GFORTRANLIST)
 export GFORTRAN=${GFORTRANARR[1]}
 
@@ -27,8 +25,8 @@ export LIB_NETCDF=$( locate netcdf.a | grep /usr/local/lib )
 export LIB_Z=$( locate libz.a | grep /usr/lib64 )
 #export LIB_SZ=$( locate libsz.a | grep /usr/lib64 )
 export LIB_DL=/usr/lib64/libdl.so
-export LIB_GCC=$( locate libgcc.a | grep $GCC_TRIPLET | grep -v 32 )
-export LIB_GFORTRAN=$( locate libgfortran.a | grep $GCC_TRIPLET | grep -v 32 )
+export LIB_GCC=$( locate libgcc.a | grep -v 32 )
+export LIB_GFORTRAN=$( locate libgfortran.a | grep -v 32 )
 
 export PATH=/usr/local:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:$PATH
 
@@ -49,7 +47,6 @@ export CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -ffree-line-length-512 -fb
 # set important environment variables
 export FC=$GFORTRAN
 export CC=$GCC
-export CXX=$GPP
 
 cmake "../../.." -G "Unix Makefiles"                         \
 -DSYSTEM_TYPE="$SYSTEM_TYPE "                                \
