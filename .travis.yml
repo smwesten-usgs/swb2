@@ -12,7 +12,7 @@ before_install:
   - sudo apt-get -y install libnetcdfc7 
   - sudo apt-get -y install libnetcdf-dev
   - sudo apt-get -y install findutils
-  - sudo updatedb --localpaths='/usr'
+  - sudo updatedb --add-prunepaths '/bin /opt'
   - ls -la
 
 script:
