@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/smwesten-usgs/swb2.svg?branch=master)](https://travis-ci.org/smwesten-usgs/swb2)
+
 SWB2 - A Modified Thornthwaite-Mather Soil-Water-Balance Code for Estimating Groundwater Recharge
 ------------------------------------------------------------------------------------------------
 
