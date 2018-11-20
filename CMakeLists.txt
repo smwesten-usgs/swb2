@@ -72,3 +72,13 @@ include( cmake/print_summary.cmake )
 
 add_subdirectory(src)
 add_subdirectory(test/unit_tests)
+
+if ("${SYSTEM_TYPE}" STREQUAL "win_x64" OR "${SYSTEM_TYPE}" STREQUAL "win_x86")
+  add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb.exe ${PROJECT_SOURCE_DIR}/bin/swb.exe
+                 COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swbstats.exe ${PROJECT_SOURCE_DIR}/bin/swbstats.exe
+  )
+else()
+  add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb ${PROJECT_SOURCE_DIR}/bin/swb
+                 COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swbstats ${PROJECT_SOURCE_DIR}/bin/swbstats
+  )
+endif()
