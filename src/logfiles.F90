@@ -460,5 +460,4 @@ contains
 
   end function make_timestamp
 
-
 end module logfiles

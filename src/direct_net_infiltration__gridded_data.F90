@@ -355,17 +355,22 @@ contains
 
     direct_net_infiltration = 0.0_c_float
 
-    if ( allocated( fCESSPOOL ) )  direct_net_infiltration = direct_net_infiltration + fCESSPOOL( indx )
+    if ( allocated( fCESSPOOL ) )                                              &
+      direct_net_infiltration = direct_net_infiltration + fCESSPOOL( indx )
 
-    if ( allocated( fDISPOSAL_WELL ) )  direct_net_infiltration = direct_net_infiltration + fDISPOSAL_WELL( indx )
+    if ( allocated( fDISPOSAL_WELL ) )                                         &
+      direct_net_infiltration = direct_net_infiltration + fDISPOSAL_WELL( indx )
 
-    if ( allocated( fWATER_MAIN ) )  direct_net_infiltration = direct_net_infiltration + fWATER_MAIN( indx )
+    if ( allocated( fWATER_MAIN ) )                                            &
+      direct_net_infiltration = direct_net_infiltration + fWATER_MAIN( indx )
 
-    if ( allocated( fWATER_BODY_RECHARGE ) )  direct_net_infiltration = direct_net_infiltration + fWATER_BODY_RECHARGE( indx )
+    if ( allocated( fWATER_BODY_RECHARGE ) )                                   &
+      direct_net_infiltration = direct_net_infiltration + fWATER_BODY_RECHARGE( indx )
 
 !    if ( allocated( fSTORM_DRAIN ) )  direct_net_infiltration = direct_net_infiltration + fSTORM_DRAIN( indx )
 
-    if ( allocated( fANNUAL_RECHARGE_RATE) )  direct_net_infiltration = direct_net_infiltration + fANNUAL_RECHARGE_RATE( indx ) / 365.25_c_float
+    if ( allocated( fANNUAL_RECHARGE_RATE) )                                   &
+      direct_net_infiltration = direct_net_infiltration + fANNUAL_RECHARGE_RATE( indx ) / 365.25_c_float
 
   end subroutine direct_net_infiltration_calculate
 

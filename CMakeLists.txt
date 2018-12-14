@@ -41,7 +41,7 @@ enable_language (Fortran C)
 SET(CPACK_GENERATOR "TGZ")
 include(CPack)
 
-set(CMAKE_INCLUDE_CURRENT_DIR OFF)
+set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 set(PACKAGE_BUGREPORT "smwesten@usgs.gov")
 set(PACKAGE_NAME "swb2")
@@ -66,7 +66,7 @@ set( EXTERNAL_LIBS ${SWB_EXTERNAL_LIBS})
 #libvcruntime.lib libucrt.lib libifport.lib
 
 link_libraries( ${EXTERNAL_LIBS} )
-include_directories( ${INCLUDE_DIRECTORIES} "${PROJECT_SOURCE_DIR}/src/proj4" )
+include_directories( ${INCLUDE_DIRECTORIES} ${CMAKE_BINARY_DIR}/src ${PROJECT_SOURCE_DIR}/src/proj4 )
 
 include( cmake/print_summary.cmake )
 

@@ -20,7 +20,6 @@ set NETCDF_VERSION='netCDF 4.6.1'
 set INTEL_LIBDIR="C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\compiler\lib\intel64_win"
 set INTEL_BINDIR="c:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\bin\intel64"
 set MAKE_EXECUTABLE_NAME=nmake
-set R_HOME=C:\Program Files\R\R-3.3.1\bin
 
 :: explicitly locate each key library
 for /f "delims=" %%x in ('where /R "c:\Program Files" libhdf5_hl.lib') do call set LIB_HDF5_HL=%%x
@@ -66,18 +65,16 @@ set CMAKE_C_FLAGS_RELEASE="/O2 /QxHost /MT"
 ::set CMAKE_EXE_LINKER_FLAGS='/NODEFAULTLIB:"LIBCMT"'
 ::set LINKER_FLAGS="/nodefaultlib:vcomp"
 
-set SWB_EXECUTABLE="c:/"
-
 ::set SWB_EXTERNAL_LIBS="%LIB_HDF5_HL%;%LIB_HDF5%;%LIB_NETCDF%;%LIB_Z%;%LIB_IFCONSOL%;%LIB_IFCORE%"
-set SWB_EXTERNAL_LIBS="%LIB_HDF5_HL%;%LIB_HDF5%;%LIB_NETCDF%;%LIB_Z%;%LIB_IFCORE%;%LIB_IRC%;%LIB_IFCONSOL%"
+::set SWB_EXTERNAL_LIBS="%LIB_HDF5_HL%;%LIB_HDF5%;%LIB_NETCDF%;%LIB_Z%;%LIB_IFCORE%;%LIB_IRC%;%LIB_IFCONSOL%"
+set SWB_EXTERNAL_LIBS="%LIB_HDF5_HL%;%LIB_HDF5%;%LIB_NETCDF%;%LIB_Z%"
+set CMAKE_OUTPUT="Visual Studio 15 2017"
 
 echo "Running CMake..."
 cmake ..\..\.. -G "NMake Makefiles" ^
 -DCMAKE_Fortran_COMPILER=%Fortran_COMPILER_NAME% ^
 -DCMAKE_C_COMPILER=%CMAKE_C_COMPILER%   ^
--DSWB_EXECUTABLE=%SWB_EXECUTABLE%       ^
 -DSWB_EXTERNAL_LIBS=%SWB_EXTERNAL_LIBS% ^
--DR_SCRIPT=%R_SCRIPT%                   ^
 -DSYSTEM_TYPE=%SYSTEM_TYPE%             ^
 -DCMAKE_BUILD_TYPE=%BUILD_TYPE%         ^
 -DCMAKE_INSTALL_PREFIX:PATH=%INSTALL_PREFIX%                ^

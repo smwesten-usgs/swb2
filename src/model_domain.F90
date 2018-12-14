@@ -664,6 +664,7 @@ contains
     type (DATA_CATALOG_ENTRY_T), pointer :: pAWC
     type (DATA_CATALOG_ENTRY_T), pointer :: pSoil_Storage_Max
     type (DATA_CATALOG_ENTRY_T), pointer :: pD8_FLOWDIR
+    type ( GENERAL_GRID_T ), pointer     :: pTempGrd
 
     pLULC             => DAT%find("LAND_USE")
     pHSG              => DAT%find("HYDROLOGIC_SOILS_GROUP")
@@ -756,6 +757,20 @@ contains
 
     call LOGS%write(asCharacter(count(this%active))//" cells are currently active out of a total of " &
       //asCharacter(size(this%active)), iLinesBefore=1, iLinesAfter=1, iLogLevel=LOG_ALL)
+
+    ! output a simple ASCII grid depicting final active/non-active cell status
+    pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
+        rX0=this%X_ll, rY0=this%Y_ll, &
+        rGridCellSize=this%gridcellsize, iDataType=GRID_DATATYPE_INT )
+
+    where ( this%active )
+      pTempGrd%iData = 1_c_int
+    elsewhere
+      pTempGrd%iData = 0_c_int
+    endwhere
+
+    call grid_WriteArcGrid( sFilename="Active_and_inactive_gridcells.asc", pGrd=pTempGrd )
+    call grid_Destroy( pTempGrd )
 
   end subroutine set_inactive_cells_sub
 

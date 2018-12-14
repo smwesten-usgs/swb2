@@ -242,7 +242,7 @@ contains
     call MODEL%read_AWC_data()
 
     ! determine which grid cells should be inactive on the basis of available water content,
-    ! hudrologic soils group, and/or soils group grids
+    ! hydrologic soils group, and/or soils group grids
     call MODEL%set_inactive_cells()
 
     ! allocate and zero out model arrays

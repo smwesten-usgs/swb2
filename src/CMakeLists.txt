@@ -202,6 +202,7 @@ set(SRCS
       dictionary.F90
       direct_net_infiltration__gridded_data.F90
       direct_soil_moisture__gridded_data.F90
+      disclaimers.F90
       et__gridded_values.F90
       et__hargreaves_samani.F90
       et__jensen_haise.F90
@@ -266,10 +267,3 @@ add_executable(swbstats2 swbstats2.F90 )
 set_target_properties(swbstats2
       PROPERTIES COMPILE_DEFINITIONS "${PREPROCESSOR_DEFINES}")
 target_link_libraries( swbstats2 proj4_lib swb_lib )
-
-if ("${SYSTEM_TYPE}" STREQUAL "win_x64" OR "${SYSTEM_TYPE}" STREQUAL "win_x86")
-  install(TARGETS swb2 swbstats2 "${PROJECT_SOURCE_DIR}\bin" )
-else()
-  install(TARGETS swb2 swbstats2 DESTINATION /usr/local/bin )
-  install(TARGETS swb2 swbstats2 DESTINATION "${PROJECT_SOURCE_DIR}/bin" )
-endif()

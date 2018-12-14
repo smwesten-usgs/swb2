@@ -332,19 +332,25 @@ contains
     ! [ LOCALS ]
     character (len=MAX_STR_LEN)           :: sString
     character (len=MAX_STR_LEN)           :: sSubString
-    character (len=:), allocatable        :: sSubStringClean
-
+    character (len=MAX_STR_LEN)           :: sSubStringClean
+    integer (kind=c_int)                  :: column_count
 
     this%sBuf = this%readline()
+    column_count = 0
+
+    call stList%clear()
 
     do while ( len_trim( this%sBuf ) > 0)
 
+      column_count = column_count + 1
       call chomp( this%sBuf, sSubString, this%sDelimiters )
 
       call replace(sSubString, " ", "_")
       call replace(sSubString, ".", "_")
       sSubStringClean = trim( clean( sSubString, DOUBLE_QUOTE ) )
+
       call stList%append( trim( adjustl( sSubStringClean ) ) )
+
     enddo
 
   end function read_header_fn

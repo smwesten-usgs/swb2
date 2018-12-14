@@ -11,7 +11,6 @@ rm -f *.txt
 
 export GCC_VERSION=8.1.0
 export GCC_MAJ_VERSION=8
-export NETCDF_VERSION=4.6.1_2
 export LIBSZ_VERSION=2.1.1_1
 # set CMAKE-related and build-related variables
 export GCCLIST=$( glocate gcc-$GCC_MAJ_VERSION | grep Cellar | grep bin | grep $GCC_VERSION )
@@ -26,7 +25,7 @@ export R_HOME=/usr/bin/R
 
 export LIB_HDF5_HL=$( glocate hdf5_hl.a | grep Cellar )
 export LIB_HDF5=$( glocate hdf5.a | grep Cellar )
-export LIB_NETCDF=$( glocate libnetcdf.dylib | grep Cellar | grep $NETCDF_VERSION )
+export LIB_NETCDF=$( glocate libnetcdf.dylib | grep Cellar )
 export LIB_Z=$( glocate libz.a | grep Cellar )
 #export LIB_SZ=$( glocate libsz.a | grep Cellar )
 export LIB_SZ=$(glocate libsz.a | grep Cellar | grep $LIBSZ_VERSION )

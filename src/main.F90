@@ -10,6 +10,7 @@ program main
 
   use iso_c_binding, only             : c_short, c_int, c_float, c_double, c_bool, c_long
   use constants_and_conversions, only : OS_NATIVE_PATH_DELIMITER, RANDOM_START, asInt
+  use disclaimers, only               : log_provisional_disclaimer
   use logfiles, only                  : LOGS, LOG_DEBUG
   use model_initialize, only          : initialize_all, read_control_file
   use model_domain, only              : MODEL
@@ -36,8 +37,9 @@ program main
   character (len=256)            :: sDataDirectoryName
   character (len=256)            :: sWeatherDataDirectoryName
   integer (kind=c_int)           :: iNumArgs
-  character (len=1024)           :: sCompilerFlags
+  character (len=1024)           :: sCompilerOptions
   character (len=256)            :: sCompilerVersion
+  character (len=256)            :: sCompilerName
   character (len=256)            :: sVersionString
   character (len=256)            :: sCompilationDateString
   character (len=256)            :: sCompilationSystemString
@@ -59,10 +61,11 @@ program main
 
   iNumArgs = COMMAND_ARGUMENT_COUNT()
 
-  sVersionString = "  Soil Water Balance Code version "//trim( SWB_VERSION )
-  sCompilationDateString   = "     compilation date           : "              &
-                               //trim(COMPILE_DATE)//" "//trim(COMPILE_TIME)
-  sCompilationSystemString = "     compiled on                : "//trim(SYSTEM_NAME)
+  sVersionString = trim( SWB_VERSION )
+  sCompilationDateString   = trim(COMPILE_DATE)//" "//trim(COMPILE_TIME)
+  sCompilationSystemString = trim(SYSTEM_NAME)
+  sCompilerOptions = COMPILER_OPTIONS()
+  sCompilerVersion = COMPILER_VERSION()
 
   if (     (SYSTEM_NAME .containssimilar. "Windows")                           &
       .or. (SYSTEM_NAME .containssimilar. "Mingw") ) then
@@ -71,54 +74,41 @@ program main
     OS_NATIVE_PATH_DELIMITER = "/"
   endif
 
-  sGitHashString = "     Git branch and commit hash : "                        &
-                         //trim( adjustl(GIT_BRANCH_STRING ) )                 &
-                         //", "//trim( GIT_COMMIT_HASH_STRING )
+  sGitHashString = trim( adjustl(GIT_BRANCH_STRING ) )//", "//trim( GIT_COMMIT_HASH_STRING )
 
-  iCount = max( max( len_trim( sVersionString ), len_trim( sGitHashString ) ), &
-                len_trim( sCompilationSystemString) )
+#ifdef __GFORTRAN__
+  sCompilerName = "gfortran"
+#endif
+
+#ifdef __INTEL_COMPILER
+  ! populate with empty string, since for Intel the COMPILER_VERSION string contains
+  ! the compiler name already
+  sCompilerName = ""
+!  write(UNIT=*,FMT="(a,/)") "compiler build date:"//TRIM(asCharacter(__INTEL_COMPILER_BUILD_DATE))
+#endif
+
+  iCount = max( len_trim( sVersionString ), len_trim( sGitHashString ) )
+  iCount = max( iCount, len_trim( sCompilationSystemString) )
+  iCount = max( iCount, len_trim( sCompilerName) + len_trim( sCompilerVersion ) )
+  iCount = iCount + 24
 
   write(unit=*, fmt="(/,a)") repeat("-",iCount + 4)
-  write(UNIT=*,FMT="(a,/)") trim( sVersionString )
-  write(UNIT=*,FMT="(a)") trim( sCompilationDateString )
-  write(UNIT=*,FMT="(a)") trim( sCompilationSystemString )
-  write(UNIT=*,FMT="(a)") trim( sGitHashString )
+  write(UNIT=*,FMT="(2x,a,/)") "USGS Soil-Water-Balance Code version "//trim( sVersionString )
+  write(UNIT=*,FMT="(a24,a)") "compiled on : ", trim( sCompilationDateString )
+  write(UNIT=*,FMT="(a24,a)") "compiled with : ", trim( sCompilerName )//", "//trim(sCompilerVersion)
+  write(UNIT=*,FMT="(a24,a)") "compiled for : ",trim( sCompilationSystemString )
+  write(UNIT=*,FMT="(a24,a)") "git hash and branch : ", trim( sGitHashString )
   write(unit=*, fmt="(a,/)") repeat("-",iCount + 4)
 
   if(iNumArgs == 0 ) then
 
-#ifdef __GFORTRAN__l
-    sCompilerFlags = COMPILER_OPTIONS()
-    sCompilerVersion = COMPILER_VERSION()
-    write(UNIT=*,FMT="(a,/)") "compiler name: gfortran, version ("//TRIM(sCompilerVersion)//")"
-    write(UNIT=*,FMT="(a)") "compiler flags:"
-    write(UNIT=*,FMT="(a)") "-------------------------------"
-    write(UNIT=*,FMT="(a,/)") TRIM(sCompilerFlags)
-#endif
-
-#ifdef __INTEL_COMPILER
-    sCompilerFlags = COMPILER_OPTIONS()
-    sCompilerVersion = COMPILER_VERSION()
-    write(UNIT=*,FMT="(a)") "compiler name: Intel Fortran, version " &
-      //TRIM(asCharacter(__INTEL_COMPILER))
-    write(UNIT=*,FMT="(a)") "compiler flags:"
-    write(UNIT=*,FMT="(a)") "-------------------------------"
-    write(UNIT=*,FMT="(a,/)") TRIM(sCompilerFlags)
-    write(UNIT=*,FMT="(a,/)") "compiler build date:"//TRIM(asCharacter(__INTEL_COMPILER_BUILD_DATE))
-#endif
-
-#ifdef __G95__l
-    write(UNIT=*,FMT="(a,/)") "compiler name: G95, minor version " &
-      //TRIM(asCharacter(__G95_MINOR__))
-#endif
-
-    write(UNIT=*,FMT="(/,a,/,/,7(a,/))")  "Usage: swb2 [ options ] control_file_name ",                    &
-             "[ --output_prefix= ]     :: text to use as a prefix for output filenames",                   &
-             "[ --output_dir= ]        :: directory to place output in (may be relative or absolute)",     &
-             "[ --data_dir= ]          :: directory to search for input grids or lookup tables",           &
-             "[ --weather_data_dir= ]  :: directory to search for weather data grids",                     &
-             "[ --random_start= ]      :: advance random number generator to this position in the series", &
-             "[ --number_of_sims= ]    :: number of simulations to run when 'method of fragments' is used"
+      write(UNIT=*,FMT="(//,a,/,/,5(a,/))")  "Usage: swb2 [ options ] control_file_name ",                   &
+               "[ --output_prefix= ]     :: text to use as a prefix for output filenames",                   &
+               "[ --output_dir= ]        :: directory to place output in (may be relative or absolute)",     &
+               "[ --data_dir= ]          :: directory to search for input grids or lookup tables",           &
+               "[ --weather_data_dir= ]  :: directory to search for weather data grids"
+!               "[ --random_start= ]      :: advance random number generator to this position in the series", &
+!               "[ --number_of_sims= ]    :: number of simulations to run when 'method of fragments' is used"
     stop
 
   end if
@@ -183,6 +173,9 @@ program main
 
   ! open and initialize logfiles
   call LOGS%initialize( iLogLevel = LOG_DEBUG )
+
+  call log_provisional_disclaimer()
+
   call LOGS%write( sMessage='Base data directory name set to:',lEcho=.TRUE._c_bool )
   call LOGS%write( sMessage='"'//trim( sDataDirectoryName )//'"', iTab=4,lEcho=.TRUE._c_bool )
   call LOGS%write( sMessage='Weather data directory (precip, tmin, tmax grids) name set to: ',lEcho=.TRUE._c_bool )

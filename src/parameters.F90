@@ -116,7 +116,7 @@ contains
     type (DICT_ENTRY_T), pointer :: pCurrentDict
     integer (kind=c_int)         :: iNumberOfHeaderLines
     character (len=:), allocatable :: sNumberOfHeaderLines
-    character (len=:), allocatable :: tempstr
+    character (len=256)          :: tempstr
     character (len=MAX_TABLE_RECORD_LEN) :: sRecord, sItem
 
     if ( this%count > 0 ) then
@@ -132,24 +132,31 @@ contains
         ! obtain the headers from the file
         DF%slColNames = DF%readHeader()
 
-        call LOGS%write( "Number of columns in file: "//asCharacter( DF%slColNames%count ), iTab=35 )
+        call LOGS%write( "Number of columns in file: "//asCharacter( DF%slColNames%count ), iTab=35)
+
+        !call DF%slColNames%print()
 
         ! loop over each column header
         do iColIndex = 1, DF%slColNames%count
 
           ! create and allocate memory for dictionary entry
+
           pDict => null()
+
           allocate( pDict, stat=iStat )
+
           call assert(iStat == 0, "Failed to allocate memory for dictionary object", &
               __SRCNAME__, __LINE__ )
 
+          ! this is first obvious failure point when compiling under Intel
           tempstr = DF%slColNames%get(iColIndex)
 
           if ( PARAMS_DICT%key_already_in_use( tempstr ) ) then
 
             ! add dictionary entry to dictionary, tack "DUP" on end of name
-            tempstr = tempstr//"_DUP"
+            tempstr = trim(adjustl(tempstr))//"_DUP"
             ! update the string list to reflect duplicate entry
+
             call DF%slColNames%replace( iColIndex, tempstr )
             call pDict%add_key( asUppercase( tempstr ) )
             call PARAMS_DICT%add_entry( pDict )

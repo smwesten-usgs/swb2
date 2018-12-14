@@ -146,6 +146,7 @@ contains
         __SRCNAME__, __LINE__)
 
     pNewElement%s    = trim( sText )
+
     pNewElement%next => null()
 
     if (associated( this%first ) ) then
@@ -236,7 +237,9 @@ contains
 
     if (associated(current) ) then
 
-      if ( allocated( current%s) )  sText = current%s
+      if ( allocated( current%s) )  then
+        sText = current%s
+      endif
 
     endif
 
