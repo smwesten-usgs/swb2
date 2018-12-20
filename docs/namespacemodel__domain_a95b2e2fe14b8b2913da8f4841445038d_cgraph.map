@@ -1,5 +1,0 @@
-<map id="model_domain::model_update_crop_coefficient_fao56" name="model_domain::model_update_crop_coefficient_fao56">
-<area shape="rect" id="node2" href="$namespacecrop__coefficients____fao56.html#ac360e63a2ef8c2821ccd7c65beb525ea" title="crop_coefficients_\l_fao56::crop_coefficients\l_fao56_calculate" alt="" coords="321,13,505,69"/>
-<area shape="rect" id="node4" href="$namespacecrop__coefficients____fao56.html#a7d38167cc2ba756a05ad21ec000e1ded" title="crop_coefficients_\l_fao56::crop_coefficients\l_fao56_update_growth_stage_dates" alt="" coords="283,93,543,149"/>
-<area shape="rect" id="node3" href="$namespacecrop__coefficients____fao56.html#a2e5eaecdad409378faa4c5f4fc5e6e54" title="Update the current basal crop coefficient (Kcb) for a SINGLE irrigation table entry. " alt="" coords="591,5,747,76"/>
-</map>

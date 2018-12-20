@@ -1,7 +1,0 @@
-<map id="file_operations::fully_qualified_filename" name="file_operations::fully_qualified_filename">
-<area shape="rect" id="node2" href="$namespacefile__operations.html#a15d1f86957ab49f6a337829ae4b893b2" title="file_operations::does\l_file_exist_fn" alt="" coords="212,5,368,47"/>
-<area shape="rect" id="node3" href="$namespacedata__catalog__entry.html#ac6473a54607828addaf00dc3bb506c80" title="data_catalog_entry\l::initialize_gridded\l_data_object_sub" alt="" coords="217,71,363,127"/>
-<area shape="rect" id="node4" href="$namespacedata__catalog__entry.html#afe5c4e07f7f952402b6fa93c3b7d475e" title="data_catalog_entry\l::initialize_netcdf\l_data_object_sub" alt="" coords="217,151,363,207"/>
-<area shape="rect" id="node5" href="$namespacefile__operations.html#aacd9e77c4953683ad68306612045de76" title="file_operations::open\l_file_read_access_sub" alt="" coords="204,232,376,273"/>
-<area shape="rect" id="node6" href="$namespacefile__operations.html#a388b20fef1ab65c64e7708c7f7e73b30" title="file_operations::write\l_line_of_data_sub" alt="" coords="212,297,368,339"/>
-</map>

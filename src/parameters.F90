@@ -151,7 +151,11 @@ contains
           ! this is first obvious failure point when compiling under Intel
           tempstr = DF%slColNames%get(iColIndex)
 
+          print *, "***   ", trim(tempstr)
+
           if ( PARAMS_DICT%key_already_in_use( tempstr ) ) then
+
+            print *, "| ",__LINE__
 
             ! add dictionary entry to dictionary, tack "DUP" on end of name
             tempstr = trim(adjustl(tempstr))//"_DUP"
@@ -162,14 +166,15 @@ contains
             call PARAMS_DICT%add_entry( pDict )
 
           else
-
+            print *, "+ ",__LINE__
             ! call warn( sMessage="Found a duplicate dictionary entry in file "        &
             !   //squote( this%filenames%get(iFileIndex) )//"; column name: "          &
             !   //squote( DF%slColNames%get(iColIndex) ),                              &
             !   sHints="Eliminate the duplicate column of information and try again.", &
             !   lFatal=TRUE )
 
-            ! add dictionary entry to dictionary
+            ! first add the key to the dictionary entry,
+            ! then add dictionary entry to dictionary
             call pDict%add_key( asUppercase( DF%slColNames%get(iColIndex) ) )
             call PARAMS_DICT%add_entry( pDict )
 

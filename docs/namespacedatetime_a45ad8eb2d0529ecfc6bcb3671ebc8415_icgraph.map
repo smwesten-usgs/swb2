@@ -1,7 +1,0 @@
-<map id="datetime::mmdd2doy" name="datetime::mmdd2doy">
-<area shape="rect" id="node2" href="$namespacegrowing__degree__day.html#a0e7f6a6149d6eb2f4aa96cadc1dc86de" title="growing_degree_day\l::growing_degree_day\l_initialize" alt="" coords="222,5,389,61"/>
-<area shape="rect" id="node5" href="$namespacegrowing__season.html#add2a4f3df5a65bcd0406e7a24f8493f7" title="growing_season::growing\l_season_initialize" alt="" coords="212,86,399,127"/>
-<area shape="rect" id="node3" href="$namespacemodel__domain.html#acda9accebb6158cde99b20eb39898053" title="model_domain::model\l_initialize_gdd" alt="" coords="447,13,613,54"/>
-<area shape="rect" id="node4" href="$namespacemodel__domain.html#aac78dbf26ba37cf86ebed4edd7acf89b" title="model_domain::set_method\l_pointers_sub" alt="" coords="661,13,863,54"/>
-<area shape="rect" id="node6" href="$namespacemodel__domain.html#ae57b872047925a2673ad1c369a759d42" title="model_domain::model\l_initialize_growing\l_season" alt="" coords="447,79,613,135"/>
-</map>

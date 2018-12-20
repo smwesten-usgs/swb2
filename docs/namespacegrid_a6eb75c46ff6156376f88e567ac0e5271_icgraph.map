@@ -1,7 +1,0 @@
-<map id="grid::grid_transform" name="grid::grid_transform">
-<area shape="rect" id="node2" href="$namespacemodel__initialize.html#a63c6e7946b13f1ffe90ca3e2d7df1387" title="model_initialize::initialize\l_latitude" alt="" coords="202,5,384,47"/>
-<area shape="rect" id="node6" href="$namespacedata__catalog__entry.html#aacf51804adb730b5710c4060576a7948" title="data_catalog_entry\l::transform_grid_to\l_grid_sub" alt="" coords="220,71,366,127"/>
-<area shape="rect" id="node3" href="$namespacemodel__initialize.html#a39e959b59f3ec67f64a1b37a5b30ebc2" title="model_initialize::initialize\l_ancillary_values" alt="" coords="432,5,614,47"/>
-<area shape="rect" id="node4" href="$namespacemodel__initialize.html#a46370bf2e9ea112d1f219277ba7fd3ce" title="model_initialize::initialize_all" alt="" coords="662,13,866,39"/>
-<area shape="rect" id="node5" href="$main_8F90.html#a8ec2266d83cd6c0b762cbcbc92c0af3d" title="Main program which references all other modules; execution begins here. " alt="" coords="914,13,968,39"/>
-</map>

@@ -1,5 +1,0 @@
-<map id="runoff__gridded_values::read_runoff_ratio_table" name="runoff__gridded_values::read_runoff_ratio_table">
-<area shape="rect" id="node2" href="$namespacerunoff____gridded__values.html#a3ac2987bbbdf8952bfb1457cad017b28" title="Initialize the infiltration grid. " alt="" coords="234,5,409,61"/>
-<area shape="rect" id="node3" href="$namespacemodel__domain.html#a88a992fcd1bcf220cdba23ee7f6db209" title="model_domain::model\l_initialize_runoff_gridded\l_values" alt="" coords="457,5,641,61"/>
-<area shape="rect" id="node4" href="$namespacemodel__domain.html#aac78dbf26ba37cf86ebed4edd7acf89b" title="model_domain::set_method\l_pointers_sub" alt="" coords="689,13,891,54"/>
-</map>

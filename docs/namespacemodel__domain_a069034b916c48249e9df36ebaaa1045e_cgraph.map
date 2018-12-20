@@ -1,4 +1,0 @@
-<map id="model_domain::model_initialize_direct_soil_moisture_gridded" name="model_domain::model_initialize_direct_soil_moisture_gridded">
-<area shape="rect" id="node2" href="$namespacedirect__soil__moisture____gridded__data.html#ac0f17d28e297cf4148454928320e5515" title="Initialize the routine to enable input/output of arbitrary sources/sink terms to be added directly to..." alt="" coords="219,5,395,61"/>
-<area shape="rect" id="node3" href="$namespaceexceptions.html#a84dd04476b06e0a398bfe6d106a82a4d" title="exceptions::warn" alt="" coords="443,20,575,47"/>
-</map>

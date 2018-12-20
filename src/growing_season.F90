@@ -90,6 +90,7 @@ contains
     call sl_temp_list%append("Last_day_of_growing_season")
     call sl_temp_list%append("Last_DOY_growing_season")
     call sl_temp_list%append("Growing_season_end")
+    call sl_temp_list%append("Growing_season_begin")
 
     call PARAMS%get_parameters( slKeys=sl_temp_list,                                  &
                                 slValues=sl_growing_season_end,                       &
@@ -122,6 +123,7 @@ contains
     call sl_temp_list%clear()
     call sl_temp_list%append("GDD_first_day_of_growing_season")
     call sl_temp_list%append("GDD_start_of_growing_season")
+    call sl_temp_list%append("GDD_growing_season_start")
 
     call PARAMS%get_parameters( slKeys=sl_temp_list,          &
                                 fValues=temp_values,          &
@@ -150,6 +152,7 @@ contains
     call sl_temp_list%clear()
     call sl_temp_list%append("Killing_frost_temperature")
     call sl_temp_list%append("Air_temperature_end_of_growing_season")
+    call sl_temp_list%append("Air_temperature_growing_season_end")
 
     call PARAMS%get_parameters( slKeys=sl_temp_list,          &
                                 fValues=temp_values,          &
@@ -174,16 +177,21 @@ contains
 
     endif
 
-    count_gdd_start = count( GDD_FIRST_DAY_OF_GROWING_SEASON > 0 )
-    count_killing_frost_end = count( KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON > 0 )
-    count_grow_start = count( FIRST_DAY_OF_GROWING_SEASON > 0 )
-    count_grow_end = count( LAST_DAY_OF_GROWING_SEASON > 0 )
+    count_gdd_start = count( GDD_FIRST_DAY_OF_GROWING_SEASON > NODATA_VALUE )
+    count_killing_frost_end = count( KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON > NODATA_VALUE )
+    count_grow_start = count( FIRST_DAY_OF_GROWING_SEASON > NODATA_VALUE )
+    count_grow_end = count( LAST_DAY_OF_GROWING_SEASON > NODATA_VALUE )
+
+    print *, "==="
+    print *, count_gdd_start, count_killing_frost_end,count_grow_start,count_grow_end
+    print *, "==="
+
 
     if ( (count_gdd_start == 0) .and. (count_killing_frost_end == 0)            &
       .and. (count_grow_start == 0) .and. (count_grow_end == 0) )               &
       call warn( sMessage="A pair of values (GDD or DOY) must be given to "     &
         //"define the start and end of the growing season for each landuse"     &
-        //" present in the lookup table.")
+        //" present in the lookup table.", lFatal=TRUE)
 
     if ( count_gdd_start /= count_killing_frost_end )                                     &
       call warn( sMessage="Unequal numbers of values given for defining the "             &
@@ -192,13 +200,24 @@ contains
 
     if ( count_grow_start /= count_grow_end )                                             &
       call warn( sMessage="Unequal numbers of values given for defining the "             &
-        //"start (Growing_season_start) and end (Growing season end) of the "             &
+        //"start (Growing_season_start) and end (Growing_season_end) of the "             &
         //"growing season.", sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
 
-    if ( count_gdd_start + count_grow_start /= ubound( iLanduseCodes, 1) )                &
-      call warn( sMessage="A pair of values must be given to define the "                 &
-        //"start and end of the growing season for each landuse present "                 &
-        //"in the lookup table.", sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
+    if ( ( (count_gdd_start + count_grow_start) /= ubound( iLanduseCodes, 1) )  &
+      .and. ( (count_gdd_start + count_grow_start) > 0 ) )                      &
+      call warn( sMessage="Two growing season start definitions "               &
+        //"(GDD_first_day_of_growing_season and Growing_season_start) are "     &
+        //"provided for one or more land uses. Only one of these values "       &
+        //"should be non-zero for each entry the lookup table.",                &
+        sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
+
+    if ( ( (count_killing_frost_end + count_grow_end) /= ubound( iLanduseCodes, 1) )  &
+         .and. ( (count_killing_frost_end + count_grow_end) > 0) )                    &
+      call warn( sMessage="Two growing season ending definitions "                    &
+        //"(Killing_frost_temperature and Growing_season_end) are "                   &
+        //"provided for one or more land uses. Only one of these values "             &
+        //"should be non-zero for each entry the lookup table.",                      &
+        sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
 
   end subroutine growing_season_initialize
 
@@ -223,13 +242,14 @@ contains
 
           if ( mean_air_temp <= KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON( landuse_index ) ) &
                  it_is_growing_season = FALSE
+
         elseif (    SIM_DT%iDOY > LAST_DAY_OF_GROWING_SEASON( landuse_index )  ) then
                  it_is_growing_season = FALSE
         endif
 
       else  ! not growing season; should it be?
 
-        if ( GDD_FIRST_DAY_OF_GROWING_SEASON( landuse_index ) > 0. ) then
+        if ( GDD_FIRST_DAY_OF_GROWING_SEASON( landuse_index ) > NODATA_VALUE ) then
 
           if ( GDD >= GDD_FIRST_DAY_OF_GROWING_SEASON( landuse_index ) ) &
                it_is_growing_season = TRUE
@@ -248,13 +268,14 @@ contains
 
           if ( mean_air_temp <= KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON( landuse_index ) ) &
                it_is_growing_season = FALSE
+
         elseif (    SIM_DT%iDOY > LAST_DAY_OF_GROWING_SEASON( landuse_index ) )  then
                it_is_growing_season = FALSE
         endif
 
       else  ! not growing season; should it be?
 
-        if ( GDD_FIRST_DAY_OF_GROWING_SEASON( landuse_index ) > 0. ) then
+        if ( GDD_FIRST_DAY_OF_GROWING_SEASON( landuse_index ) > NODATA_VALUE ) then
 
           if ( GDD >= GDD_FIRST_DAY_OF_GROWING_SEASON( landuse_index ) )              &
                it_is_growing_season = TRUE

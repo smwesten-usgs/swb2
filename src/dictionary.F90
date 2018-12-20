@@ -338,9 +338,11 @@ function key_name_already_in_use_fn(this, sKey)   result( in_use )
 
   do while ( associated(this%current ) )
 
-    iIndex = index(string=this%current%key, substring=asUppercase(sKey) )
+    !iIndex = index(string=this%current%key, substring=asUppercase(sKey) )
 
-    if ( iIndex > 0 ) iCount = iCount + 1
+    !if ( iIndex > 0 ) iCount = iCount + 1
+
+    if ( this%current%key .strapprox. sKey )  iCount = iCount + 1
 
     this%current => this%current%next
 
@@ -375,9 +377,11 @@ function find_dict_entry_fn(this, sSearchKey)   result( pDict )
 
   do while ( associated(this%current ) )
 
-    iIndex = index(string=this%current%key, substring=asUppercase(sSearchKey) )
+    !iIndex = index(string=this%current%key, substring=asUppercase(sSearchKey) )
 
-    if ( iIndex > 0 ) then
+    !if ( iIndex > 0 ) then
+
+    if (this%current%key .strapprox. sSearchKey ) then
 
       pDict => this%current
       exit
@@ -402,12 +406,14 @@ end function find_dict_entry_fn
 
     temp_dict_entry => null()
 
-    if ( associated(dict_entry) ) then   ! add list values to existing key
+    if ( associated(dict_entry) ) then
 
       temp_dict_entry => this%find_dict_entry( dict_entry%key )
 
+      ! the dictionary already contains a dictionary entry with this
+      ! key value; append the values to the existing entry
       if ( associated( temp_dict_entry ) ) then
-
+        print *, __FILE__, ": ", __LINE__, "  |  adding to existing key : ", trim(dict_entry%key)
         do iIndex=1, dict_entry%sl%count
 
           call temp_dict_entry%sl%append( dict_entry%sl%get( iIndex ) )
@@ -417,6 +423,8 @@ end function find_dict_entry_fn
         temp_dict_entry => null()
 
       else
+
+        print *, __FILE__, ": ", __LINE__, "  |  adding key: ", trim(dict_entry%key)
 
         this%count = this%count + 1
 

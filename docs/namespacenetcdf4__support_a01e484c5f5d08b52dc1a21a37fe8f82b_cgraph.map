@@ -1,7 +1,0 @@
-<map id="netcdf4_support::nf_get_variable_slice_short" name="netcdf4_support::nf_get_variable_slice_short">
-<area shape="rect" id="node2" href="$namespacenetcdf4__support.html#a39ec664145f0d0a54d69abafd51a4226" title="netcdf4_support::nf\l_get_variable_array\l_as_vector_short" alt="" coords="241,5,392,61"/>
-<area shape="rect" id="node5" href="$namespacenetcdf4__support.html#a26ac7fa9681548ec954f9cec8fbfa3b2" title="netcdf4_support::nf\l_return_varindex" alt="" coords="243,86,390,127"/>
-<area shape="rect" id="node6" href="$namespaceexceptions.html#a84dd04476b06e0a398bfe6d106a82a4d" title="exceptions::warn" alt="" coords="251,152,382,179"/>
-<area shape="rect" id="node3" href="$namespacenetcdf4__support.html#ac8c7276a5849ae6d17ffef1787e3f234" title="netcdf4_support::nf_trap" alt="" coords="440,20,620,47"/>
-<area shape="rect" id="node4" href="$namespaceconstants__and__conversions.html#ac13fba285229deab77131132e6f62caf" title="constants_and_conversions\l::char_ptr_to_fortran_string" alt="" coords="668,13,871,54"/>
-</map>

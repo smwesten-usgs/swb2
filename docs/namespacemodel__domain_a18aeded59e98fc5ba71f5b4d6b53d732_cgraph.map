@@ -1,9 +1,0 @@
-<map id="model_domain::model_initialize_routing_d8" name="model_domain::model_initialize_routing_d8">
-<area shape="rect" id="node2" href="$namespacerouting____d8.html#a0008fcb9bc5678e484885bc650fae726" title="routing__d8::routing\l_d8_initialize" alt="" coords="219,82,371,123"/>
-<area shape="rect" id="node3" href="$namespaceexceptions.html#a22a1bf2808fdc249e6b378ee3f221156" title="exceptions::die" alt="" coords="469,5,589,32"/>
-<area shape="rect" id="node4" href="$namespacegrid.html#a02803f7fe27d0354d3d16a15bd1338da" title="grid::grid_writearcgrid" alt="" coords="687,81,849,108"/>
-<area shape="rect" id="node5" href="$namespacerouting____d8.html#a4ffeb4be9d01e7cae56e0886d9161b18" title="routing__d8::routing\l_d8_assign_downstream\l_row_col" alt="" coords="437,107,621,163"/>
-<area shape="rect" id="node6" href="$namespacerouting____d8.html#ae2756c01d52d156a1b6c7ce48ca1e941" title="routing__d8::routing\l_d8_determine_solution_order" alt="" coords="419,187,639,229"/>
-<area shape="rect" id="node7" href="$namespacerouting____d8.html#a8ff5176982b0ac8b08696510dad5b894" title="routing__d8::routing\l_d8_get_index" alt="" coords="692,158,844,199"/>
-<area shape="rect" id="node8" href="$namespacegrid.html#adfcb9064d9b58a49eb61093cd4809a43" title="grid::grid_destroy" alt="" coords="701,224,836,251"/>
-</map>

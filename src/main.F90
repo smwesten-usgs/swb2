@@ -10,7 +10,8 @@ program main
 
   use iso_c_binding, only             : c_short, c_int, c_float, c_double, c_bool, c_long
   use constants_and_conversions, only : OS_NATIVE_PATH_DELIMITER, RANDOM_START, asInt
-  use disclaimers, only               : log_provisional_disclaimer
+  use disclaimers, only               : log_provisional_disclaimer,                          &
+                                        write_provisional_disclaimer
   use logfiles, only                  : LOGS, LOG_DEBUG
   use model_initialize, only          : initialize_all, read_control_file
   use model_domain, only              : MODEL
@@ -43,6 +44,7 @@ program main
   character (len=256)            :: sVersionString
   character (len=256)            :: sCompilationDateString
   character (len=256)            :: sCompilationSystemString
+  character (len=256)            :: sExecutableDescription
   character (len=256)            :: sGitHashString
   integer (kind=c_int)           :: iCount
   integer (kind=c_int)           :: iIndex
@@ -66,6 +68,7 @@ program main
   sCompilationSystemString = trim(SYSTEM_NAME)
   sCompilerOptions = COMPILER_OPTIONS()
   sCompilerVersion = COMPILER_VERSION()
+  sExecutableDescription = "USGS Soil-Water-Balance Code version "//trim( sVersionString )
 
   if (     (SYSTEM_NAME .containssimilar. "Windows")                           &
       .or. (SYSTEM_NAME .containssimilar. "Mingw") ) then
@@ -91,9 +94,10 @@ program main
   iCount = max( iCount, len_trim( sCompilationSystemString) )
   iCount = max( iCount, len_trim( sCompilerName) + len_trim( sCompilerVersion ) )
   iCount = iCount + 24
+  iCount = max( iCount, len_trim( sExecutableDescription ) )
 
   write(unit=*, fmt="(/,a)") repeat("-",iCount + 4)
-  write(UNIT=*,FMT="(2x,a,/)") "USGS Soil-Water-Balance Code version "//trim( sVersionString )
+  write(UNIT=*,FMT="(2x,a,/)") trim(sExecutableDescription)
   write(UNIT=*,FMT="(a24,a)") "compiled on : ", trim( sCompilationDateString )
   write(UNIT=*,FMT="(a24,a)") "compiled with : ", trim( sCompilerName )//", "//trim(sCompilerVersion)
   write(UNIT=*,FMT="(a24,a)") "compiled for : ",trim( sCompilationSystemString )
@@ -102,11 +106,13 @@ program main
 
   if(iNumArgs == 0 ) then
 
-      write(UNIT=*,FMT="(//,a,/,/,5(a,/))")  "Usage: swb2 [ options ] control_file_name ",                   &
-               "[ --output_prefix= ]     :: text to use as a prefix for output filenames",                   &
-               "[ --output_dir= ]        :: directory to place output in (may be relative or absolute)",     &
-               "[ --data_dir= ]          :: directory to search for input grids or lookup tables",           &
-               "[ --weather_data_dir= ]  :: directory to search for weather data grids"
+    call write_provisional_disclaimer()
+
+    write(UNIT=*,FMT="(//,a,/,/,5(a,/))")  "Usage: swb2 [ options ] control_file_name ",                   &
+             "[ --output_prefix= ]     :: text to use as a prefix for output filenames",                   &
+             "[ --output_dir= ]        :: directory to place output in (may be relative or absolute)",     &
+             "[ --data_dir= ]          :: directory to search for input grids or lookup tables",           &
+             "[ --weather_data_dir= ]  :: directory to search for weather data grids"
 !               "[ --random_start= ]      :: advance random number generator to this position in the series", &
 !               "[ --number_of_sims= ]    :: number of simulations to run when 'method of fragments' is used"
     stop

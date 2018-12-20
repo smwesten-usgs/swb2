@@ -44,7 +44,7 @@ set INSTALL_PREFIX=d:/DOS
 
 :: define other variables for use in the CMakeList.txt file
 :: options are "Release", "Profile" or "Debug"
-set BUILD_TYPE="Profile"
+set BUILD_TYPE="Release"
 
 :: options are "x86" (32-bit) or "x64" (64-bit)
 set SYSTEM_TYPE="win_x64"

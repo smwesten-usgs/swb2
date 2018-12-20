@@ -1,6 +1,0 @@
-<map id="model_initialize::initialize_percent_canopy_cover" name="model_initialize::initialize_percent_canopy_cover">
-<area shape="rect" id="node2" href="$namespaceexceptions.html#a22a1bf2808fdc249e6b378ee3f221156" title="exceptions::die" alt="" coords="257,5,376,32"/>
-<area shape="rect" id="node3" href="$namespacegrid.html#adfcb9064d9b58a49eb61093cd4809a43" title="grid::grid_destroy" alt="" coords="249,56,384,83"/>
-<area shape="rect" id="node4" href="$namespacegrid.html#a02803f7fe27d0354d3d16a15bd1338da" title="grid::grid_writearcgrid" alt="" coords="235,107,398,133"/>
-<area shape="rect" id="node5" href="$namespaceexceptions.html#a84dd04476b06e0a398bfe6d106a82a4d" title="exceptions::warn" alt="" coords="251,157,382,184"/>
-</map>

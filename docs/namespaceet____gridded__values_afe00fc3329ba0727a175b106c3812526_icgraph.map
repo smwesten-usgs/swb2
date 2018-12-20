@@ -1,5 +1,0 @@
-<map id="et__gridded_values::et_gridded_values_initialize" name="et__gridded_values::et_gridded_values_initialize">
-<area shape="rect" id="node2" href="$namespacemodel__domain.html#aab7726dd6c71dbddc877e4f4498e5f7e" title="model_domain::model\l_initialize_et_daily_grid" alt="" coords="213,5,386,47"/>
-<area shape="rect" id="node4" href="$namespacemodel__domain.html#ad81755f7a28f5df66a51b36386cf285a" title="model_domain::model\l_initialize_et_monthly_grid" alt="" coords="203,71,397,112"/>
-<area shape="rect" id="node3" href="$namespacemodel__domain.html#aac78dbf26ba37cf86ebed4edd7acf89b" title="model_domain::set_method\l_pointers_sub" alt="" coords="445,39,647,80"/>
-</map>

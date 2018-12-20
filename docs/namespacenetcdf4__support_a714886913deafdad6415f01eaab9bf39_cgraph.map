@@ -1,6 +1,0 @@
-<map id="netcdf4_support::nf_populate_variable_struct" name="netcdf4_support::nf_populate_variable_struct">
-<area shape="rect" id="node2" href="$namespaceconstants__and__conversions.html#adeac78899e44bc3d58e26397fa64e4a7" title="constants_and_conversions\l::c_to_fortran_string" alt="" coords="438,5,641,47"/>
-<area shape="rect" id="node3" href="$namespacenetcdf4__support.html#aa2d6e99c4cd59ef92c2878aa06c4a67e" title="netcdf4_support::nf\l_populate_attribute\l_struct" alt="" coords="243,29,390,85"/>
-<area shape="rect" id="node4" href="$namespacenetcdf4__support.html#ac8c7276a5849ae6d17ffef1787e3f234" title="netcdf4_support::nf_trap" alt="" coords="449,74,629,101"/>
-<area shape="rect" id="node5" href="$namespaceconstants__and__conversions.html#ac13fba285229deab77131132e6f62caf" title="constants_and_conversions\l::char_ptr_to_fortran_string" alt="" coords="689,67,892,108"/>
-</map>

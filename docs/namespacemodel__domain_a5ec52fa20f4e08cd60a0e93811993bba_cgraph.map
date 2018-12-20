@@ -1,5 +1,0 @@
-<map id="model_domain::model_calculate_actual_et_thornthwaite_mather_eqns" name="model_domain::model_calculate_actual_et_thornthwaite_mather_eqns">
-<area shape="rect" id="node2" href="$namespaceactual__et____thornthwaite__mather__eqns.html#a9f7f2f95c21676187762e5bed2884b39" title="actual_et__thornthwaite\l_mather_eqns::calculate\l_actual_et_thornthwaite\l_mather_eqns" alt="" coords="256,38,438,109"/>
-<area shape="rect" id="node3" href="$namespaceactual__et____thornthwaite__mather__eqns.html#a8b67a22e831afd6c828577642d2b8942" title="Return an updated APWL given the max soil&#45;water&#45;capacity and current soil storage. " alt="" coords="486,5,689,61"/>
-<area shape="rect" id="node4" href="$namespaceactual__et____thornthwaite__mather__eqns.html#aa6c9bb2bd8feb1650afb7bf778c8aafd" title="Return the current soil moisture given the max soil&#45;water&#45;capacity and current APWL. " alt="" coords="486,85,689,141"/>
-</map>

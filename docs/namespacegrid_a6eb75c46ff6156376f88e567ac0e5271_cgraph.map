@@ -1,6 +1,0 @@
-<map id="grid::grid_transform" name="grid::grid_transform">
-<area shape="rect" id="node2" href="$namespacegrid.html#a4e234a7e1a3a1ba76a7c92bab7114bf7" title="grid::grid_checkforproj4error" alt="" coords="202,5,407,32"/>
-<area shape="rect" id="node3" href="$namespacegrid.html#ace8ea960868faf40cf79d5303f881ed8" title="grid::grid_populatexy" alt="" coords="226,56,383,83"/>
-<area shape="rect" id="node4" href="$namespacegrid.html#ad3fbf6446fa8a58df8888c05b7165324" title="grid::grid_getgridx" alt="" coords="455,31,594,57"/>
-<area shape="rect" id="node5" href="$namespacegrid.html#a93d74de05bc5c8aee4cb556f461be266" title="grid::grid_getgridy" alt="" coords="455,81,594,108"/>
-</map>

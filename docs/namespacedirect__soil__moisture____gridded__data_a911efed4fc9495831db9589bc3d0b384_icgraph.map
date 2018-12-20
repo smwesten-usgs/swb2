@@ -1,4 +1,0 @@
-<map id="direct_soil_moisture__gridded_data::direct_soil_moisture_calculate" name="direct_soil_moisture__gridded_data::direct_soil_moisture_calculate">
-<area shape="rect" id="node2" href="$namespacemodel__domain.html#a8be6e8a3f6f80533812be9148a6af679" title="model_domain::model\l_calculate_direct_soil\l_moisture_gridded" alt="" coords="235,5,401,61"/>
-<area shape="rect" id="node3" href="$namespacemodel__domain.html#aac78dbf26ba37cf86ebed4edd7acf89b" title="model_domain::set_method\l_pointers_sub" alt="" coords="449,13,651,54"/>
-</map>

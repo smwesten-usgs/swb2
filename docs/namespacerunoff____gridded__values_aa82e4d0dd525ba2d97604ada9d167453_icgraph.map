@@ -1,5 +1,0 @@
-<map id="runoff__gridded_values::runoff_gridded_values_update_ratios" name="runoff__gridded_values::runoff_gridded_values_update_ratios">
-<area shape="rect" id="node2" href="$namespacemodel__domain.html#a64aba1b1bb30b69f9c00f7272b2d7b13" title="model_domain::model\l_calculate_runoff_gridded\l_values" alt="" coords="228,5,418,61"/>
-<area shape="rect" id="node4" href="$namespacemodel__domain.html#a88a992fcd1bcf220cdba23ee7f6db209" title="model_domain::model\l_initialize_runoff_gridded\l_values" alt="" coords="231,85,415,141"/>
-<area shape="rect" id="node3" href="$namespacemodel__domain.html#aac78dbf26ba37cf86ebed4edd7acf89b" title="model_domain::set_method\l_pointers_sub" alt="" coords="466,53,668,94"/>
-</map>

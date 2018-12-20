@@ -2445,6 +2445,8 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
+    print *, this%gdd(1), this%tmean(1), this%it_is_growing_season(1)
+
     call growing_season_update( landuse_index=this%landuse_index,                                &
                                               GDD=this%gdd,                                      &
                                               mean_air_temp=this%tmean,                          &

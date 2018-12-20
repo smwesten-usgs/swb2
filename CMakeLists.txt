@@ -20,6 +20,9 @@
 
 message("Processing top-level CMakelists.txt for project swb2")
 
+set(SWB_MAJOR_VERSION "2")
+set(SWB_MINOR_VERSION "0")
+
 include( CMakeForceCompiler )
 
 #------------------------------------------------------------------------------------#
@@ -42,12 +45,6 @@ SET(CPACK_GENERATOR "TGZ")
 include(CPack)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
-
-set(PACKAGE_BUGREPORT "smwesten@usgs.gov")
-set(PACKAGE_NAME "swb2")
-set(PACKAGE_STRING "swb2 2.0")
-set(PACKAGE_TARNAME "swb2")
-set(PACKAGE_VERSION "2.0")
 
 cmake_minimum_required(VERSION 3.1)
 
@@ -84,3 +81,5 @@ else()
 		 COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/test/unit_tests/swbtest ${PROJECT_SOURCE_DIR}/test/unit_tests/swbtest
   )
 endif()
+
+file(WRITE VERSION "${SWB_MAJOR_VERSION}.${SWB_MINOR_VERSION}, build ${GIT_COMMITS_ON_BRANCH}")

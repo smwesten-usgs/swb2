@@ -1,5 +1,0 @@
-<map id="growing_season::growing_season_initialize" name="growing_season::growing_season_initialize">
-<area shape="rect" id="node2" href="$namespacedatetime.html#a45ad8eb2d0529ecfc6bcb3671ebc8415" title="datetime::mmdd2doy" alt="" coords="241,5,399,32"/>
-<area shape="rect" id="node4" href="$namespaceexceptions.html#a84dd04476b06e0a398bfe6d106a82a4d" title="exceptions::warn" alt="" coords="254,56,386,83"/>
-<area shape="rect" id="node3" href="$namespacedatetime.html#a9ac1a0a808a83a072ebc08cf0b3b4d8a" title="datetime::julian_day" alt="" coords="447,5,599,32"/>
-</map>

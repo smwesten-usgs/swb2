@@ -1,6 +1,0 @@
-<map id="model_initialize::initialize_start_and_end_dates" name="model_initialize::initialize_start_and_end_dates">
-<area shape="rect" id="node2" href="$namespacedatetime.html#a9575f695885d806cc658b68cbdb75a70" title="datetime::day_of_year" alt="" coords="235,31,402,57"/>
-<area shape="rect" id="node5" href="$namespaceexceptions.html#a84dd04476b06e0a398bfe6d106a82a4d" title="exceptions::warn" alt="" coords="253,81,384,108"/>
-<area shape="rect" id="node3" href="$namespacedatetime.html#a9d8dbfe179e1cc628e1b7ccec684e13a" title="datetime::gregorian_date" alt="" coords="450,5,634,32"/>
-<area shape="rect" id="node4" href="$namespacedatetime.html#a9ac1a0a808a83a072ebc08cf0b3b4d8a" title="datetime::julian_day" alt="" coords="466,56,618,83"/>
-</map>

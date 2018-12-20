@@ -1,5 +1,0 @@
-<map id="model_initialize::read_landuse_codes" name="model_initialize::read_landuse_codes">
-<area shape="rect" id="node2" href="$namespacemodel__initialize.html#ad5de643aae8f976ef39b44ec8276c528" title="Initialize soils, landuse, and available water content values. " alt="" coords="212,5,466,47"/>
-<area shape="rect" id="node3" href="$namespacemodel__initialize.html#a46370bf2e9ea112d1f219277ba7fd3ce" title="model_initialize::initialize_all" alt="" coords="514,13,719,39"/>
-<area shape="rect" id="node4" href="$main_8F90.html#a8ec2266d83cd6c0b762cbcbc92c0af3d" title="Main program which references all other modules; execution begins here. " alt="" coords="767,13,820,39"/>
-</map>

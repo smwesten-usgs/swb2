@@ -1,9 +1,0 @@
-<map id="datetime::gregorian_date" name="datetime::gregorian_date">
-<area shape="rect" id="node2" href="$namespacedatetime.html#ae5d2fd012d07fb0dfc273d2b0ff2a4eb" title="datetime::calc_gregorian\l_date_sub" alt="" coords="238,12,420,53"/>
-<area shape="rect" id="node3" href="$namespacedatetime.html#a9575f695885d806cc658b68cbdb75a70" title="datetime::day_of_year" alt="" coords="245,78,412,105"/>
-<area shape="rect" id="node4" href="$namespacedatetime.html#a5e943042ca778d305fabbbe6f8d96aac" title="datetime::get_day_of\l_year_fn" alt="" coords="495,5,654,47"/>
-<area shape="rect" id="node5" href="$namespacemodel__initialize.html#aa901fa3beec7f5be635326923f7cd49b" title="model_initialize::initialize\l_start_and_end_dates" alt="" coords="484,71,666,112"/>
-<area shape="rect" id="node8" href="$namespacesimulation__datetime.html#a614317d68d6d6e98353e087670dc7a98" title="simulation_datetime\l::increment_by_one_day_sub" alt="" coords="468,136,681,177"/>
-<area shape="rect" id="node6" href="$namespacemodel__initialize.html#a46370bf2e9ea112d1f219277ba7fd3ce" title="model_initialize::initialize_all" alt="" coords="729,78,934,105"/>
-<area shape="rect" id="node7" href="$main_8F90.html#a8ec2266d83cd6c0b762cbcbc92c0af3d" title="Main program which references all other modules; execution begins here. " alt="" coords="982,78,1035,105"/>
-</map>

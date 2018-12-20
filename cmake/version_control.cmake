@@ -26,6 +26,9 @@ add_definitions("-DGIT_COMMIT_HASH=${GIT_COMMIT_HASH}")
 add_definitions("-DGIT_BRANCH=${GIT_BRANCH}")
 add_definitions("-DGIT_COMMITS_ON_BRANCH=${GIT_COMMITS_ON_BRANCH}")
 
+# Copy a file to another location and modify its contents.
+# information in the *.tpl file is populated with CMake
+# variable values, then copied to the 'generated' subdir
 configure_file(
   ${CMAKE_SOURCE_DIR}/src/version_control.tpl
   ${CMAKE_SOURCE_DIR}/src/generated/version_control.F90
