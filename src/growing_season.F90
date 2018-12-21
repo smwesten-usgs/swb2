@@ -56,6 +56,7 @@ contains
     call sl_temp_list%append("First_day_of_growing_season")
     call sl_temp_list%append("First_DOY_growing_season")
     call sl_temp_list%append("Growing_season_start")
+    call sl_temp_list%append("Growing_season_begin")
 
     call PARAMS%get_parameters( slKeys=sl_temp_list,                                  &
                                 slValues=sl_growing_season_begin,                     &
@@ -90,7 +91,7 @@ contains
     call sl_temp_list%append("Last_day_of_growing_season")
     call sl_temp_list%append("Last_DOY_growing_season")
     call sl_temp_list%append("Growing_season_end")
-    call sl_temp_list%append("Growing_season_begin")
+    call sl_temp_list%append("Growing_season_stop")
 
     call PARAMS%get_parameters( slKeys=sl_temp_list,                                  &
                                 slValues=sl_growing_season_end,                       &

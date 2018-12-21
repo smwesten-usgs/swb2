@@ -22,9 +22,6 @@ set NETCDF_VERSION='netCDF 4.6.1'
 
 set VERBOSE=1
 
-:: set path to Intel build tools
-set INTEL_LIBDIR="C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\compiler\lib\intel64_win"
-set INTEL_BINDIR="c:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\bin\intel64"
 set MAKE_EXECUTABLE_NAME=nmake
 
 :: explicitly locate each key library
@@ -32,26 +29,12 @@ for /f "delims=" %%x in ('where /R "c:\Program Files" libhdf5_hl.lib') do call s
 for /f "delims=" %%x in ('where /R "c:\Program Files" libhdf5.lib') do call set LIB_HDF5=%%x
 for /f "delims=" %%x in ('where /R "c:\Program Files" zlibstatic.lib') do call set LIB_Z=%%x
 for /f "delims=" %%x in ('where /R "c:\Program Files" netcdf.lib') do call set LIB_NETCDF=%%x
-for /f "delims=" %%x in ('where /R %INTEL_LIBDIR% libirc.lib') do call set LIB_IRC=%%x
-for /f "delims=" %%x in ('where /R %INTEL_LIBDIR% libifcore.lib') do call set LIB_IFCORE=%%x
-for /f "delims=" %%x in ('where /R %INTEL_LIBDIR% ifconsol.lib') do call set LIB_IFCONSOL=%%x
-::for /f "delims=" %%q in ('where /R %INTEL_BINDIR% ifort.exe') do call set IFORT_EXE=%%q
 
-::echo 1) %IFORT_EXE%
 :: substitute forward slash for backward slash
 set LIB_HDF5_HL=%LIB_HDF5_HL:\=/%
 set LIB_HDF5=%LIB_HDF5:\=/%
 set LIB_NETCDF=%LIB_NETCDF:\=/%
 set LIB_Z=%LIB_Z:\=/%
-set LIB_IRC=%LIB_IRC:\=/%
-set LIB_IFCORE=%LIB_IFCORE:\=/%
-set LIB_IFCONSOL=%LIB_IFCONSOL:\=/%
-::set IFORT_EXE=%IFORT_EXE:\=/%
-
-::set LIB_HDF5_HL=%LIB_HDF5_HL: =\ %
-::set LIB_HDF5=%LIB_HDF5: =\ %
-::set LIB_NETCDF=%LIB_NETCDF: =\ %
-::set LIB_Z=%LIB_Z: =\ %
 
 :: define where 'make copy' will place executables
 set INSTALL_PREFIX=d:\DOS
@@ -71,8 +54,6 @@ set CMAKE_C_FLAGS_RELEASE="/O2 /QxHost /MT"
 ::set CMAKE_EXE_LINKER_FLAGS='/NODEFAULTLIB:"LIBCMT"'
 ::set LINKER_FLAGS="/nodefaultlib:vcomp"
 
-::set SWB_EXTERNAL_LIBS="%LIB_HDF5_HL%;%LIB_HDF5%;%LIB_NETCDF%;%LIB_Z%;%LIB_IFCONSOL%;%LIB_IFCORE%"
-::set SWB_EXTERNAL_LIBS="%LIB_HDF5_HL%;%LIB_HDF5%;%LIB_NETCDF%;%LIB_Z%;%LIB_IFCORE%;%LIB_IRC%;%LIB_IFCONSOL%"
 set SWB_EXTERNAL_LIBS="%LIB_HDF5_HL%;%LIB_HDF5%;%LIB_NETCDF%;%LIB_Z%"
 set CMAKE_OUTPUT="NMake Makefiles"
 
