@@ -1247,10 +1247,14 @@ contains
              .or. ( Method_Name .strapprox. "BE" )              &
              .or. ( Method_Name .strapprox. "SINUSOIDAL" )  )        then
 
-        this%init_GDD => model_initialize_GDD_be
-        this%calc_GDD => model_calculate_GDD_be
-        call LOGS%WRITE( "==> Growing degree-day (GDD) will be calculated as described "  &
-          //"in Baskerville and Emin (1969)", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        ! this%init_GDD => model_initialize_GDD_be
+        ! this%calc_GDD => model_calculate_GDD_be
+        ! call LOGS%WRITE( "==> Growing degree-day (GDD) will be calculated as described "  &
+        !   //"in Baskerville and Emin (1969)", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        this%init_GDD => model_initialize_GDD
+        this%calc_GDD => model_calculate_GDD
+        call LOGS%WRITE( "==> THIS OPTION IS TEMPORARILY DISABLED! Growing degree-day (GDD) will be calculated using "  &
+          //"simple averaging of TMAX and TMIN.", iLogLevel = LOG_ALL, lEcho = lFALSE )
 
       else
 
@@ -2444,8 +2448,6 @@ contains
     use growing_season
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-    print *, this%gdd(1), this%tmean(1), this%it_is_growing_season(1)
 
     call growing_season_update( landuse_index=this%landuse_index,                                &
                                               GDD=this%gdd,                                      &

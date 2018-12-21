@@ -413,7 +413,7 @@ end function find_dict_entry_fn
       ! the dictionary already contains a dictionary entry with this
       ! key value; append the values to the existing entry
       if ( associated( temp_dict_entry ) ) then
-        print *, __FILE__, ": ", __LINE__, "  |  adding to existing key : ", trim(dict_entry%key)
+
         do iIndex=1, dict_entry%sl%count
 
           call temp_dict_entry%sl%append( dict_entry%sl%get( iIndex ) )
@@ -423,8 +423,6 @@ end function find_dict_entry_fn
         temp_dict_entry => null()
 
       else
-
-        print *, __FILE__, ": ", __LINE__, "  |  adding key: ", trim(dict_entry%key)
 
         this%count = this%count + 1
 

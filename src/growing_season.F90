@@ -182,11 +182,6 @@ contains
     count_grow_start = count( FIRST_DAY_OF_GROWING_SEASON > NODATA_VALUE )
     count_grow_end = count( LAST_DAY_OF_GROWING_SEASON > NODATA_VALUE )
 
-    print *, "==="
-    print *, count_gdd_start, count_killing_frost_end,count_grow_start,count_grow_end
-    print *, "==="
-
-
     if ( (count_gdd_start == 0) .and. (count_killing_frost_end == 0)            &
       .and. (count_grow_start == 0) .and. (count_grow_end == 0) )               &
       call warn( sMessage="A pair of values (GDD or DOY) must be given to "     &

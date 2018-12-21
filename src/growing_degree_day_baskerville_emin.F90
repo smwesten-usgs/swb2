@@ -160,7 +160,7 @@ contains
     real (kind=c_float)    :: A
 
     associate( doy_to_reset_gdd => GDD_RESET_DATE( order ),      &
-               gdd_max => GDD_MAX( order ),                     &
+               gdd_max => GDD_MAX( order ),                      &
                gdd_base => GDD_BASE( order ) )
 
       if ( SIM_DT%iDOY == doy_to_reset_gdd )  gdd = 0.0_c_float

@@ -3,8 +3,12 @@
 del /F /Q CMakeCache.*
 rmdir /S /Q CMakeFiles
 rmdir /S /Q src
+rmdir /S /Q Win32
+rmdir /S /Q Debug
 rmdir /S /Q Testing
+rmdir /S /Q Release
 rmdir /S /Q tests
+rmdir /S /Q .vs
 del /S /Q *.txt
 del /S /Q *.sln
 del /S /Q *.vcxproj*
@@ -15,6 +19,8 @@ set CMAKEROOT=C:\Program Files\CMake\
 set Fortran_COMPILER_NAME=ifort
 set CMAKE_C_COMPILER=icl
 set NETCDF_VERSION='netCDF 4.6.1'
+
+set VERBOSE=1
 
 :: set path to Intel build tools
 set INTEL_LIBDIR="C:\Program Files (x86)\IntelSWTools\compilers_and_libraries\windows\compiler\lib\intel64_win"
@@ -68,10 +74,12 @@ set CMAKE_C_FLAGS_RELEASE="/O2 /QxHost /MT"
 ::set SWB_EXTERNAL_LIBS="%LIB_HDF5_HL%;%LIB_HDF5%;%LIB_NETCDF%;%LIB_Z%;%LIB_IFCONSOL%;%LIB_IFCORE%"
 ::set SWB_EXTERNAL_LIBS="%LIB_HDF5_HL%;%LIB_HDF5%;%LIB_NETCDF%;%LIB_Z%;%LIB_IFCORE%;%LIB_IRC%;%LIB_IFCONSOL%"
 set SWB_EXTERNAL_LIBS="%LIB_HDF5_HL%;%LIB_HDF5%;%LIB_NETCDF%;%LIB_Z%"
-set CMAKE_OUTPUT="Visual Studio 15 2017"
+set CMAKE_OUTPUT="NMake Makefiles"
 
-echo "Running CMake..."
-cmake ..\..\.. -G "NMake Makefiles" ^
+for %%i in (%CMAKE_OUTPUT%) do (
+
+echo "Running CMake for target %%i"
+cmake ..\..\.. -G %%i ^
 -DCMAKE_Fortran_COMPILER=%Fortran_COMPILER_NAME% ^
 -DCMAKE_C_COMPILER=%CMAKE_C_COMPILER%   ^
 -DSWB_EXTERNAL_LIBS=%SWB_EXTERNAL_LIBS% ^
@@ -83,3 +91,5 @@ cmake ..\..\.. -G "NMake Makefiles" ^
 -DCMAKE_EXE_LINKER_FLAGS=%CMAKE_EXE_LINKER_FLAGS% ^
 -DCMAKE_C_FLAGS_DEBUG=%CMAKE_C_FLAGS_DEBUG%       ^
 -DCMAKE_C_FLAGS_RELEASE=%CMAKE_C_FLAGS_RELEASE%
+
+)

@@ -3,8 +3,7 @@
 del /F /Q CMakeCache.*
 rmdir /S /Q CMakeFiles
 rmdir /S /Q src
-rmdir /S /Q Testing
-rmdir /S /Q tests
+rmdir /S /Q test
 del /S /Q *.txt
 
 :: set CMAKE-related and build-related variables

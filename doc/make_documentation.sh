@@ -1,3 +1,3 @@
 #!/bin/bash
 
-ford FORD_project_file.md
+ford --debug FORD_project_file.md
