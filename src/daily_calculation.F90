@@ -130,7 +130,7 @@ contains
         ! being used to estimate the current month's irrigation demand
         call cells%calc_irrigation( indx )
 
-        ! this is a convoluted call: we're getting an individual capture fraction,
+        ! this is a convoluted call: we are getting an individual capture fraction,
         ! but supplying a pointer to the active cells so that the first time through,
         ! gridded data (if supplied) are updated
         call storm_drain_capture_calculate( storm_drain_capture, indx, cells%active )

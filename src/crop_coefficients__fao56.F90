@@ -545,7 +545,7 @@ end function update_crop_coefficient_GDD_as_threshold
 
 !      print *, "b) ",SIM_DT%curr%prettydate(), " | ", GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate()
 
-      ! however, if we're already past that point in the year, planting date must be
+      ! however, if we are already past that point in the year, planting date must be
       ! next calendar year
       if ( SIM_DT%iDOY > GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%getDayOfYear() )  &
         call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%addYear()

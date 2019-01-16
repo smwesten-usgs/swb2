@@ -17,8 +17,8 @@ contains
 !!
 !! @note Reference:
 !!    Allen, R.G., and others, 1998, FAO Irrigation and Drainage Paper No. 56,
-!!    "Crop Evapotranspiration (Guidelines for computing crop water
-!!    requirements)", Food and Agriculture Organization, Rome, Italy.
+!!    Crop Evapotranspiration (Guidelines for computing crop water
+!!    requirements), Food and Agriculture Organization, Rome, Italy.
 elemental function sat_vapor_pressure__e_0(rT) result (re_0)
 
   real (kind=c_float), intent(in)   :: rT
@@ -38,10 +38,10 @@ end function sat_vapor_pressure__e_0
 !! @param[in]  fTMin  Minimum daily air temperature, in &deg;C
 !! @retval   fe_a  Dewpoint vapor pressure at given air temperature, in kiloPascals
 !!
-!! @note 
+!! @note
 !!
 !! @note Reference:
-!!    
+!!
 elemental function dewpoint_vapor_pressure__e_a(fTMin) result (fe_a)
 
   ! [ ARGUMENTS ]

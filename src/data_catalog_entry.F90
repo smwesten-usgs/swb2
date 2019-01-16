@@ -526,7 +526,7 @@ end subroutine initialize_netcdf_data_object_sub
 
     endif
 
-    ! if grid data hasn't changed this timestep, we don't want to *reapply* the
+    ! if grid data hasn't changed this timestep, we do not want to *reapply* the
     ! scale and offset values
     if ( this%lGridHasChanged ) then
 
@@ -670,14 +670,14 @@ subroutine getvalues_constant_sub( this  )
 
       endif
 
-      ! if the source filename hasn't changed, we don't need to be here
+      ! if the source filename hasn't changed, we do not need to be here
       if ( this%sOldFilename .strequal. this%sSourceFilename ) exit
 
       this%sOldFilename = this%sSourceFilename
 
       inquire(file=this%sSourceFilename, exist=lExist, opened=lOpened)
 
-      ! if the file doesn't exist, EXIT
+      ! if the file does not exist, EXIT
       if (.not. lExist ) then
         if ( this%lAllowMissingFiles ) then
          exit
@@ -769,7 +769,7 @@ subroutine transform_grid_to_grid_sub(this)
     if ( this%lRequireCompleteSpatialCoverage )   &
       call assert( grid_CompletelyCover( this%pGrdBase, this%pGrdNative ), &
           "Transformed grid read from file "//dquote(this%sSourceFilename) &
-          //" doesn't completely cover your model domain.")
+          //" does not completely cover your model domain.")
 
   endif
 
@@ -1110,7 +1110,7 @@ end subroutine set_constant_value_real
 
       iPos = scan(string=trim(this%sSourceFilename), set="http://")
 
-      ! if this is a URL, we don't want to test for file existence using
+      ! if this is a URL, we do not want to test for file existence using
       ! the Fortran "inquire" function
       if (this%sSourceFilename(iPos:iPos+6) == "http://") then
 
@@ -1121,12 +1121,12 @@ end subroutine set_constant_value_real
         ! does this file actually exist?
         inquire( file=this%sSourceFilename, exist=lExist )
 
-        ! if the file exists, don't bother with padding any values, unless
-        ! we're dealing with a file that does exist but drops the last day
+        ! if the file exists, do not bother with padding any values, unless
+        ! we are dealing with a file that does exist but drops the last day
         ! or two of data (looking at you, DayMet)
         if ( lExist .and. ( .not. this%lIsAnnualGrid ) )   exit
 
-        ! if file doesn't exist, and we're close to the end of the year,
+        ! if file does not exist, and we are close to the end of the year,
         ! assume that we should pad values at the end of the year
         if (dt%iMonth == 12 ) then
 
@@ -1154,7 +1154,7 @@ end subroutine set_constant_value_real
 
         endif
 
-        ! if we've reached this point, we cannot locate the proper file and
+        ! if we have reached this point, we cannot locate the proper file and
         ! we are not within the proper range of dates to allow for padding.
         call assert(lExist, "The filename created from your template refers to " &
           //"a nonexistent file. ~ Attempted to open filename "&
@@ -1323,7 +1323,7 @@ end subroutine set_constant_value_real
 
             this%pGrdNative%sFilename = this%sSourceFilename
 
-            ! we don't need to perform all these steps for the next file; we are
+            ! we do not need to perform all these steps for the next file; we are
             ! assuming, of course, that all of the subsequent files cover the same
             ! extents and are in the same projection as this first file
             this%lPerformFullInitialization = lFALSE
@@ -1563,7 +1563,7 @@ end subroutine set_constant_value_real
 
           this%pGrdNative%sFilename = this%sSourceFilename
 
-          ! we don't need to perform all these steps for the next file; we are
+          ! we do not need to perform all these steps for the next file; we are
           ! assuming, of course, that all of the subsequent files cover the same
           ! extents and are in the same projection as this first file
           this%lPerformFullInitialization = lFALSE

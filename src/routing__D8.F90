@@ -51,7 +51,7 @@ module routing__D8
   ! the rest of the vectors are packed.
 
   ! the vector of row-column numbers may then be used to make the required D8 routing connections.
-  ! there shouldn't be anumber_of_rows difference between ROW_INDEX, COL_INDEX, and SORT_ORDER_l 
+  ! there should not be anumber_of_rows difference between ROW_INDEX, COL_INDEX, and SORT_ORDER_l 
 
 contains
 
@@ -478,7 +478,7 @@ main_loop: do
 
 	        if ( .not. lActive(column_num, row_num) ) cycle
 
-          ! we've already determined the identiy of the downslope cell; skip this one
+          ! we have already determined the identiy of the downslope cell; skip this one
 	        if ( IS_DOWNSLOPE_TARGET_MARKED(column_num, row_num) ) cycle
 
           iNumberOfChangedCells = iNumberOfChangedCells + 1

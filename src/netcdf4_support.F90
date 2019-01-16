@@ -1190,7 +1190,7 @@ subroutine nf_set_start_count_stride(NCFILE)
 
       case (NC_X)
 
-        !> need to subtract 1 from the start index: we're using the
+        !> need to subtract 1 from the start index: we are using the
         !> netCDF C API, in which index values are relative to zero
         NCFILE%iStart(iIndex) = minval(NCFILE%iColBounds) - 1
         NCFILE%iNX = maxval(NCFILE%iColBounds) - minval(NCFILE%iColBounds) + 1
@@ -2826,8 +2826,8 @@ subroutine nf_get_time_units(NCFILE)
 
   sDateTime = pNC_VAR%pNC_ATT(iIndex)%sAttValue(0)
 
-  call chomp(sDateTime, sItem)    !> should be "days"
-  call chomp(sDateTime, sItem)    !> should be "since"
+  call chomp(sDateTime, sItem)    ! should be "days"
+  call chomp(sDateTime, sItem)    ! should be "since"
 
   call chomp(sDateTime, sItem, "/-")
   read(sItem, *) NCFILE%iOriginYear

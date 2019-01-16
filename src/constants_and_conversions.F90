@@ -953,7 +953,7 @@ end function fortran_to_c_string
     integer (kind=c_int)           :: iIndex1, iIndex2
     character (len=:), allocatable :: sTargetCharacters_l
 
-    ! TargetCharacter omits the period ("."): don't want a real value returned
+    ! TargetCharacter omits the period ("."): do not want a real value returned
     ! as a funky integer (e.g. string "3.141" returned as integer 3141 )
     sTargetCharacters_l = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM" &
       //"!@#$%^&*()_+-={}[]|\:;'<,>?/~`'"//DOUBLE_QUOTE

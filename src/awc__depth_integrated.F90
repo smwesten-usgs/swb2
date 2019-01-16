@@ -184,7 +184,7 @@ contains
                   iDeepestSoilHorizon = max( iDeepestSoilHorizon, iSoils_Horizons( iIndex2 ) )
               enddo
 
-              ! if we're in the deepest horizon of the current soils code, calculate the composite averaged AWC
+              ! if we are in the deepest horizon of the current soils code, calculate the composite averaged AWC
               do iIndex2=iIndex, iNumberOfSoils
                 if ( ( pSOILS_CODE_GRID%pGrdBase%iData( iIndex_x, iIndex_y ) == iSoils_Table_Code( iIndex2 ) )  &
                   .and. ( iDeepestSoilHorizon == iSoils_Horizons( iIndex2) ) )   &
@@ -217,7 +217,7 @@ contains
 
         enddo  
 
-        ! if the soil data from the table doesn't extend to the rooting depth, extrapolate
+        ! if the soil data from the table does not extend to the rooting depth, extrapolate
         if (fRooting_Depth_inches > fDepthOfDeepestHorizon )  &
 
               fTemp_AWC = fTemp_AWC + fFinal_AWC * ( fRooting_Depth_inches - fDepthOfDeepestHorizon )

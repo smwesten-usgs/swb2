@@ -400,7 +400,7 @@ contains
 
       if ( iRainGageZone /= iPreviousRainGageZone ) then
         ! the previous record was the last one associated with the previous
-        ! rainfall gage zone; don't count the current record as part of the
+        ! rainfall gage zone; do not count the current record as part of the
         ! collection of records associated with previous zone
 
         FRAGMENTS_SETS( iPreviousRainGageZone )%iNumberOfFragments(iPreviousMonth) = iCount

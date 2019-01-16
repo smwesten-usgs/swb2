@@ -1238,28 +1238,28 @@ function grid_Conform ( pGrd1, pGrd2, rTolerance ) result ( lConform )
   endif
 
   if( abs ( pGrd1%rX0 - pGrd2%rX0 ) > rTol ) then
-     call LOGS%write("Lower left-hand side X coordinates don't match:", iLogLevel=LOG_ALL)
+     call LOGS%write("Lower left-hand side X coordinates do not match:", iLogLevel=LOG_ALL)
      call LOGS%write("Grid 1 value: "//asCharacter(pGrd1%rX0)  &
           //"; grid 2 value: "//asCharacter(pGrd2%rX0), iLogLevel=LOG_ALL)
     lConform = lFALSE
   endif
 
   if( abs ( pGrd1%rY0 - pGrd2%rY0 ) > rTol ) then
-    call LOGS%write("Lower left-hand side Y coordinates don't match:", iLogLevel=LOG_ALL)
+    call LOGS%write("Lower left-hand side Y coordinates do not match:", iLogLevel=LOG_ALL)
     call LOGS%write("Grid 1 value: "//asCharacter(pGrd1%rY0)  &
           //"; grid 2 value: "//asCharacter(pGrd2%rY0), iLogLevel=LOG_ALL)
     lConform = lFALSE
   endif
 
   if( abs ( pGrd1%rX1 - pGrd2%rX1 ) > rTol ) then
-     call LOGS%write("Upper right-hand side X coordinates don't match:", iLogLevel=LOG_ALL)
+     call LOGS%write("Upper right-hand side X coordinates do not match:", iLogLevel=LOG_ALL)
      call LOGS%write("Grid 1 value: "//asCharacter(pGrd1%rX1)  &
           //"; grid 2 value: "//asCharacter(pGrd2%rX1), iLogLevel=LOG_ALL)
     lConform = lFALSE
   endif
 
   if( abs ( pGrd1%rY1 - pGrd2%rY1 ) > rTol ) then
-    call LOGS%write("Upper right-hand side Y coordinates don't match:", iLogLevel=LOG_ALL)
+    call LOGS%write("Upper right-hand side Y coordinates do not match:", iLogLevel=LOG_ALL)
     call LOGS%write("Grid 1 value: "//asCharacter(pGrd1%rY1)  &
           //"; grid 2 value: "//asCharacter(pGrd2%rY1), iLogLevel=LOG_ALL)
     lConform = lFALSE
@@ -1843,7 +1843,7 @@ function grid_SearchColumn(pGrd,rXval,rZval,rNoData) result ( rValue )
           rValue = v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1
           exit
         else if ( rZval < rprev .and. rCol(iRow) > rprev ) then
-          ! Doesn't exist, choose the limit
+          ! does not exist, choose the limit
           v = real(iRow-2) / real(pGrd%iNY-1)
           rValue = v*pGrd%rY0 + ( 1.0_c_float -v)*pGrd%rY1
           exit

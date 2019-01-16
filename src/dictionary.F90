@@ -476,7 +476,7 @@ end function find_dict_entry_fn
       pTemp => pTarget%previous
 
       if (associated( pTemp) ) then
-        ! if pTemp is unassociated, it means we're at the head of the list
+        ! if pTemp is unassociated, it means we are at the head of the list
         pTemp%next => pTarget%next
         pTarget%next%previous => pTemp
 

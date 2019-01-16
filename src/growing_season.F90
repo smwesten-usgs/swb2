@@ -229,7 +229,7 @@ contains
     real (kind=c_float), intent(in)       :: mean_air_temp
     logical (kind=c_bool), intent(inout)  :: it_is_growing_season
 
-    ! first growing season day > last if we're growing a winter crop, winter wheat for example
+    ! first growing season day > last if we are growing a winter crop, winter wheat for example
     if ( FIRST_DAY_OF_GROWING_SEASON(landuse_index) > LAST_DAY_OF_GROWING_SEASON (landuse_index) ) then
 
       if ( it_is_growing_season ) then

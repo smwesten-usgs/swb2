@@ -242,7 +242,7 @@ contains
 
     if ( .not. associated( pCurrentDict )) then
 
-      ! if key doesn't currently exist, make a new entry with this key value
+      ! if key does not currently exist, make a new entry with this key value
       allocate( pCurrentDict, stat=iStat )
 
       call assert(iStat == 0, "Failed to allocate memory for dictionary object", &

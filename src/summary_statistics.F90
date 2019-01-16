@@ -193,12 +193,12 @@ contains
 
     do index1=1, ubound( int_vector, 1 )
 
-      ! skip over cells that don't belong to the current polygon
+      ! skip over cells that do not belong to the current polygon
       if ( .not. cell_selection( index1 ) )  cycle
 
       match = .false.
 
-      ! loop over the items we've already found; if we found another,
+      ! loop over the items we have already found; if we found another,
       ! add to the count of that item
       do index2=1, last
        if (value(index2) == int_vector( index1 ) ) then

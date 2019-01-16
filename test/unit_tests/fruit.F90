@@ -21,6 +21,7 @@
 !      failed_assert_count
 !
 module fruit
+  
   use fruit_util
   use iso_c_binding
   implicit none

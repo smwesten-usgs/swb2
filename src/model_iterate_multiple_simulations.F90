@@ -73,7 +73,7 @@ contains
     allocate( MONTHLY_RAINFALL_STATS(length, 12) )
     allocate( ANNUAL_RAINFALL_STATS(length) )
 
-    ! don't want or need this memory since we're going to swap out a
+    ! do not want or need this memory since we are going to swap out a
     ! different set of arrays for each simulation number
     if (associated(cells%snow_storage)) then
       do indx=1,number_of_simulations

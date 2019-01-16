@@ -1809,7 +1809,7 @@ contains
 !     MODEL%landuse_index = -9999
 !     iCount = 0
 !
-!     ! only run through matching process if we've found a LU_Code entry in the
+!     ! only run through matching process if we have found a LU_Code entry in the
 !     ! parameter dictionary
 !     if ( all( iLandUseCodes >= 0 ) ) then
 !
@@ -1833,8 +1833,8 @@ contains
 !             //" with a corresponding landuse code from lookup tables.",                                &
 !             sHints="Make sure your lookup table(s) have landuse codes corresponding to all values in " &
 !             //"the land-use grid.", lFatal=TRUE, iLogLevel=LOG_ALL, lEcho=TRUE)
-!           ! we're setting this value to a valid value. this shouldn't cause problems with any
-!           ! calculations because we've already thrown a fatal error
+!           ! we are setting this value to a valid value. this should not cause problems with any
+!           ! calculations because we have already thrown a fatal error
 !           MODEL%landuse_index(iIndex) = 1
 !         endif
 !       enddo

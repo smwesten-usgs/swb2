@@ -377,7 +377,7 @@ contains
 !   /*suprkiss64.c
 !   b=2^64; x[n]=(b-1)-[(2^41+2^39)*x[n-20632]+carry mod b]
 !   period 5*2^1320480>10^397505
-!   This version of SUPRKISS doesn't use t=a*x+c in 128 bits,
+!   This version of SUPRKISS does not use t=a*x+c in 128 bits,
 !   but uses only 64-bit stuff, takes 20 nanos versus 7.5 for
 !   the 32-bit unsigned long long t=a*x+c version.
 !   */

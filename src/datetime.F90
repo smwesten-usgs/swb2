@@ -1358,7 +1358,7 @@ function mmdd2doy(sMMDD, sInputItemName )  result(iDOY)
     sHints="The offending string was "//sQuote(sMMDD)//", which was encountered "   &
            //"while attempting to read in "//sQuote( sInputItemName_l ) )
 
-  ! we don't really care about the year value here; any year value could have been used
+  ! we do not really care about the year value here; any year value could have been used
   iStartingJD = julian_day ( 1999, 1, 1)
   iJD = julian_day ( 1999, iMonth, iDay)
 
