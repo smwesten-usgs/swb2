@@ -29,12 +29,12 @@ contains
 
   subroutine et_gridded_values_initialize( lActive )
 
-    logical (kind=c_bool), intent(in)     :: lActive(:,:)
+    logical (c_bool), intent(in)     :: lActive(:,:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)                 :: iStat
+    integer (c_int)                 :: iStat
     type (STRING_LIST_T)                 :: slString
-    integer (kind=c_int)                 :: iIndex
+    integer (c_int)                 :: iIndex
 
 
     ! locate the data structure associated with the gridded rainfall zone entries

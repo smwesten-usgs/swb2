@@ -18,20 +18,20 @@ contains
                                                      soil_storage_max,      &
                                                      infiltration )
 
-    real (kind=c_float), intent(inout)      :: net_infiltration
-    real (kind=c_double), intent(inout)     :: soil_storage
-    real (kind=c_double), intent(inout)     :: actual_et_soil
-    real (kind=c_float), intent(inout)      :: runoff
-    real (kind=c_float), intent(inout)      :: delta_soil_storage
-    real (kind=c_float), intent(in)         :: reference_et0
-    real (kind=c_float), intent(in)         :: soil_storage_max
-    real (kind=c_float), intent(in)         :: infiltration
+    real (c_float), intent(inout)      :: net_infiltration
+    real (c_double), intent(inout)     :: soil_storage
+    real (c_double), intent(inout)     :: actual_et_soil
+    real (c_float), intent(inout)      :: runoff
+    real (c_float), intent(inout)      :: delta_soil_storage
+    real (c_float), intent(in)         :: reference_et0
+    real (c_float), intent(in)         :: soil_storage_max
+    real (c_float), intent(in)         :: infiltration
 
-    real (kind=c_float), parameter          :: NEAR_ZERO = 1.0E-6_c_float
+    real (c_float), parameter          :: NEAR_ZERO = 1.0E-6_c_float
 
 
     ! [ LOCALS ]
-    real (kind=c_double) :: new_soil_storage
+    real (c_double) :: new_soil_storage
 
     ! all of these entities have been previously corrected for pervious fraction
     new_soil_storage = soil_storage + infiltration - actual_et_soil

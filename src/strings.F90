@@ -116,12 +116,12 @@ contains
   function return_left_part_of_string_fn( string, indx, substring )   result( left_part )
 
     character (len=*), intent(in)              :: string
-    integer (kind=c_int), intent(in), optional :: indx
+    integer (c_int), intent(in), optional :: indx
     character (len=*), intent(in), optional    :: substring
     character (len=:), allocatable             :: left_part
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: position
+    integer (c_int) :: position
 
     if ( present( indx ) ) then
 
@@ -163,12 +163,12 @@ contains
   function return_right_part_of_string_fn( string, indx, substring )   result( right_part )
 
     character (len=*), intent(in)              :: string
-    integer (kind=c_int), intent(in), optional :: indx
+    integer (c_int), intent(in), optional :: indx
     character (len=*), intent(in), optional    :: substring
     character (len=:), allocatable             :: right_part
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: position
+    integer (c_int) :: position
 
     if ( present( indx ) ) then
 
@@ -211,7 +211,7 @@ contains
 
     character (len=*), intent(in)      :: sText1
     character (len=*), intent(in)      :: sText2
-    logical (kind=c_bool)              :: lBool
+    logical (c_bool)              :: lBool
 
     ! [ LOCALS ]
     character (len=len_trim(sText1))  :: sTemp1
@@ -232,7 +232,7 @@ contains
 
     character (len=*), intent(in)      :: sText1
     character (len=*), intent(in)      :: sText2
-    logical (kind=c_bool)              :: lBool
+    logical (c_bool)              :: lBool
 
     ! [ LOCALS ]
     character (len=len_trim(sText1))  :: sTemp1
@@ -253,7 +253,7 @@ contains
 
     character (len=*), intent(in)      :: sText1
     character (len=*), intent(in)      :: sText2
-    logical (kind=c_bool)              :: lBool
+    logical (c_bool)              :: lBool
 
     ! [ LOCALS ]
     character (len=:), allocatable    :: sTemp1
@@ -274,7 +274,7 @@ contains
 
     character (len=*), intent(in)      :: sText1
     character (len=*), intent(in)      :: sText2
-    logical (kind=c_bool)              :: lBool
+    logical (c_bool)              :: lBool
 
     ! [ LOCALS ]
     character (len=:), allocatable    :: sTemp1
@@ -306,7 +306,7 @@ contains
   function concatenate_char_int_fn(sText1, iValue1)   result(sText)
 
     character (len=*), intent(in)        :: sText1
-    integer (kind=c_int), intent(in)     :: iValue1
+    integer (c_int), intent(in)     :: iValue1
     character (len=:), allocatable       :: sText
 
     sText = sText1 // asCharacter( iValue1 )
@@ -318,7 +318,7 @@ contains
   function concatenate_char_float_fn(sText1, fValue1)   result(sText)
 
     character (len=*), intent(in)        :: sText1
-    real (kind=c_float), intent(in)      :: fValue1
+    real (c_float), intent(in)      :: fValue1
     character (len=:), allocatable       :: sText
 
     sText = sText1 // asCharacter( fValue1 )
@@ -330,7 +330,7 @@ contains
   function concatenate_char_double_fn(sText1, dValue1)   result(sText)
 
     character (len=*), intent(in)        :: sText1
-    real (kind=c_double), intent(in)     :: dValue1
+    real (c_double), intent(in)     :: dValue1
     character (len=:), allocatable       :: sText
 
     sText = sText1 // asCharacter( dValue1 )
@@ -341,11 +341,11 @@ contains
 
   function short_to_char_fn(iValue)    result(sText)
 
-    integer (kind=c_short), intent(in)  :: iValue
+    integer (c_short), intent(in)  :: iValue
     character (len=:), allocatable    :: sText
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iStat
+    integer (c_int) :: iStat
     character (len=32)   :: sBuf
 
     write(sBuf, fmt=*, iostat=iStat)  iValue
@@ -362,11 +362,11 @@ contains
 
    function int_to_char_fn(iValue)    result(sText)
 
-    integer (kind=c_int), intent(in)  :: iValue
+    integer (c_int), intent(in)  :: iValue
     character (len=:), allocatable    :: sText
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iStat
+    integer (c_int) :: iStat
     character (len=32)   :: sBuf
 
     write(sBuf, fmt=*, iostat=iStat)  iValue
@@ -383,11 +383,11 @@ contains
 
    function long_long_to_char_fn(iValue)    result(sText)
 
-    integer (kind=c_long_long), intent(in)  :: iValue
+    integer (c_long_long), intent(in)  :: iValue
     character (len=:), allocatable          :: sText
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iStat
+    integer (c_int) :: iStat
     character (len=32)   :: sBuf
 
     write(sBuf, fmt=*, iostat=iStat)  iValue
@@ -404,13 +404,13 @@ contains
 
    function float_to_char_fn(fValue, iFieldWidth, iNumdigits)    result(sText)
 
-    real (kind=c_float), intent(in)             :: fValue
-    integer (kind=c_int), intent(in), optional  :: iFieldWidth
-    integer (kind=c_int), intent(in), optional  :: iNumdigits
+    real (c_float), intent(in)             :: fValue
+    integer (c_int), intent(in), optional  :: iFieldWidth
+    integer (c_int), intent(in), optional  :: iNumdigits
     character (len=:), allocatable              :: sText
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iStat
+    integer (c_int) :: iStat
     character (len=32)   :: sFmt
     character (len=32)   :: sBuf
 
@@ -438,12 +438,12 @@ contains
 
    function double_to_char_fn(dValue, iNumdigits)    result(sText)
 
-    real (kind=c_double), intent(in)             :: dValue
-    integer (kind=c_int), intent(in), optional  :: iNumdigits
+    real (c_double), intent(in)             :: dValue
+    integer (c_int), intent(in), optional  :: iNumdigits
     character (len=:), allocatable              :: sText
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iStat
+    integer (c_int) :: iStat
     character (len=:), allocatable :: sFmt
     character (len=32)   :: sBuf
 
@@ -467,7 +467,7 @@ contains
 
    function logical_to_char_fn(lValue)    result(sText)
 
-    logical (kind=c_bool), intent(in)    :: lValue
+    logical (c_bool), intent(in)    :: lValue
     character (len=:), allocatable       :: sText
 
     if (lValue) then
@@ -509,12 +509,12 @@ contains
     character(len=len(s))         :: sText
 
     ! LOCALS
-    integer (kind=c_int) :: i    ! do loop index
+    integer (c_int) :: i    ! do loop index
 
     ! CONSTANTS
-    integer (kind=c_int), parameter :: LOWER_TO_UPPER = -32
-    integer (kind=c_int), parameter :: ASCII_SMALL_A = ichar("a")
-    integer (kind=c_int), parameter :: ASCII_SMALL_Z = ichar("z")
+    integer (c_int), parameter :: LOWER_TO_UPPER = -32
+    integer (c_int), parameter :: ASCII_SMALL_A = ichar("a")
+    integer (c_int), parameter :: ASCII_SMALL_Z = ichar("z")
 
     sText = s
 
@@ -535,11 +535,11 @@ contains
     character(len=len(s)) :: sText
 
     ! LOCALS
-    integer (kind=c_int) :: i    ! do loop index
+    integer (c_int) :: i    ! do loop index
     ! CONSTANTS
-    integer (kind=c_int), parameter :: UPPER_TO_LOWER = 32
-    integer (kind=c_int), parameter :: ASCII_A = ichar("A")
-    integer (kind=c_int), parameter :: ASCII_Z = ichar("Z")
+    integer (c_int), parameter :: UPPER_TO_LOWER = 32
+    integer (c_int), parameter :: ASCII_A = ichar("A")
+    integer (c_int), parameter :: ASCII_Z = ichar("Z")
 
     sText = s
 
@@ -557,11 +557,11 @@ contains
     ! ARGUMENTS
     character (len=*), intent(inout) :: s
     ! LOCALS
-    integer (kind=c_int) :: i    ! do loop index
+    integer (c_int) :: i    ! do loop index
     ! CONSTANTS
-    integer (kind=c_int), parameter :: LOWER_TO_UPPER = -32
-    integer (kind=c_int), parameter :: ASCII_SMALL_A = ichar("a")
-    integer (kind=c_int), parameter :: ASCII_SMALL_Z = ichar("z")
+    integer (c_int), parameter :: LOWER_TO_UPPER = -32
+    integer (c_int), parameter :: ASCII_SMALL_A = ichar("a")
+    integer (c_int), parameter :: ASCII_SMALL_Z = ichar("z")
 
     do i=1,len_trim(s)
       if ( ichar(s(i:i) ) >= ASCII_SMALL_A .and. ichar(s(i:i)) <= ASCII_SMALL_Z ) then
@@ -577,11 +577,11 @@ contains
     ! ARGUMENTS
     character (len=*), intent(inout) :: s
     ! LOCALS
-    integer (kind=c_int) :: i    ! do loop index
+    integer (c_int) :: i    ! do loop index
     ! CONSTANTS
-    integer (kind=c_int), parameter :: UPPER_TO_LOWER = 32
-    integer (kind=c_int), parameter :: ASCII_A = ichar("A")
-    integer (kind=c_int), parameter :: ASCII_Z = ichar("Z")
+    integer (c_int), parameter :: UPPER_TO_LOWER = 32
+    integer (c_int), parameter :: ASCII_A = ichar("A")
+    integer (c_int), parameter :: ASCII_Z = ichar("Z")
 
     ! UPPER_TO_LOWER = ichar( "a" ) - ichar( "A" )
 
@@ -613,8 +613,8 @@ contains
 
     ! LOCALS
     character (len=512)            :: sBuf
-    integer (kind=c_int)           :: iR                 ! Index in sRecord
-    integer (kind=c_int)           :: iIndex1, iIndex2
+    integer (c_int)           :: iR                 ! Index in sRecord
+    integer (c_int)           :: iIndex1, iIndex2
     character (len=:), allocatable :: sTargetCharacters_l 
 
     ! eliminate any leading spaces
@@ -658,10 +658,10 @@ contains
 
     ! LOCALS
     character (len=256)            :: sBuf
-    integer (kind=c_int)           :: iR                 ! Index in sRecord
-    integer (kind=c_int)           :: iIndex1, iIndex2
+    integer (c_int)           :: iR                 ! Index in sRecord
+    integer (c_int)           :: iIndex1, iIndex2
     character (len=1)              :: sChar_l 
-    logical (kind=c_bool)          :: lPreviouslyFound
+    logical (c_bool)          :: lPreviouslyFound
 
     ! eliminate any leading spaces
     sText1 = adjustl(sText1)
@@ -711,7 +711,7 @@ contains
 
     character (len=*), intent(in)               :: sText
     character (len=*), intent(in), optional     :: sDelimiters
-    integer (kind=c_int)                        :: iCount
+    integer (c_int)                        :: iCount
 
     ! [ LOCALS ]
     character (len=len(sText))      :: sText1
@@ -749,7 +749,7 @@ contains
 
     ! [ LOCALS ]
     character (len=:), allocatable :: sDelimiters_l 
-    integer (kind=c_int) :: iIndex
+    integer (c_int) :: iIndex
 
     if ( present(sDelimiters) ) then
 
@@ -795,7 +795,7 @@ contains
     character (len=1), intent(in)       :: sReplace
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iIndex
+    integer (c_int) :: iIndex
 
     if ( len(sText1) > 0 ) then
 
@@ -820,8 +820,8 @@ contains
   !
   !   ! LOCALS
   !   character ( len=len_trim(sText) ) :: sTemp
-  !   integer (kind=c_int) :: iR                 ! Index in sRecord
-  !   integer (kind=c_int) :: i, j
+  !   integer (c_int) :: iR                 ! Index in sRecord
+  !   integer (c_int) :: i, j
   !
   !   ! eliminate any leading spaces
   !   sText = adjustl(sText)

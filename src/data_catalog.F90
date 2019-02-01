@@ -24,7 +24,7 @@ module data_catalog
     type (DATA_CATALOG_ENTRY_T), pointer            :: first    => null()
     type (DATA_CATALOG_ENTRY_T), pointer            :: last     => null()
     type (DATA_CATALOG_ENTRY_T), pointer            :: current  => null()
-    integer (kind=c_int)                            :: count    = 0
+    integer (c_int)                            :: count    = 0
   contains
 
     procedure :: catalog_add_entry_sub
@@ -62,7 +62,7 @@ contains
 
 
     class (DATA_CATALOG_T)              :: this
-    integer (kind=c_int), intent(in)    :: iStartYear
+    integer (c_int), intent(in)    :: iStartYear
 
     ! [ LOCALS ]
     type (DATA_CATALOG_ENTRY_T), pointer :: current
@@ -89,7 +89,7 @@ contains
 
 
     class (DATA_CATALOG_T)              :: this
-    integer (kind=c_int), intent(in)    :: iEndYear
+    integer (c_int), intent(in)    :: iEndYear
 
     ! [ LOCALS ]
     type (DATA_CATALOG_ENTRY_T), pointer :: current
@@ -213,11 +213,11 @@ contains
   function catalog_get_entry_at_index_fn(this, index)    result(data)
 
     class (DATA_CATALOG_T)                :: this
-    integer (kind=c_int), intent(in)      :: index
+    integer (c_int), intent(in)      :: index
     type (DATA_CATALOG_ENTRY_T), pointer  :: data
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iCount
+    integer (c_int) :: iCount
 
     data => null()
     iCount = 0

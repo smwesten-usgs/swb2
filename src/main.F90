@@ -37,7 +37,7 @@ program main
   character (len=256)            :: sOutputDirectoryName
   character (len=256)            :: sDataDirectoryName
   character (len=256)            :: sWeatherDataDirectoryName
-  integer (kind=c_int)           :: iNumArgs
+  integer (c_int)           :: iNumArgs
   character (len=1024)           :: sCompilerOptions
   character (len=256)            :: sCompilerVersion
   character (len=256)            :: sCompilerName
@@ -46,10 +46,10 @@ program main
   character (len=256)            :: sCompilationSystemString
   character (len=256)            :: sExecutableDescription
   character (len=256)            :: sGitHashString
-  integer (kind=c_int)           :: iCount
-  integer (kind=c_int)           :: iIndex
-  integer (kind=c_int)           :: iLen
-  integer (kind=c_int)           :: number_of_simulations
+  integer (c_int)           :: iCount
+  integer (c_int)           :: iIndex
+  integer (c_int)           :: iLen
+  integer (c_int)           :: number_of_simulations
 
   type (TIMER_T)                 :: runtimer
 
@@ -137,7 +137,7 @@ program main
 
     elseif( sBuf(1:15) .eq."--random_start=" ) then
 
-      RANDOM_START = int( asInt( sBuf(16:) ), kind=c_long )
+      RANDOM_START = int( asInt( sBuf(16:) ), c_long )
 
     elseif( sBuf(1:17) .eq."--number_of_sims=" ) then
 

@@ -17,10 +17,10 @@ module actual_et__fao56__two_stage
                                          KCB_METHOD
   implicit none
 
-  real (kind=c_float), allocatable   :: REW_l(:,:)
-  real (kind=c_float), allocatable   :: TEW_l(:,:)
-  real (kind=c_float), allocatable   :: DEPLETION_FRACTION(:)
-  real (kind=c_float), allocatable   :: MEAN_PLANT_HEIGHT(:)
+  real (c_float), allocatable   :: REW_l(:,:)
+  real (c_float), allocatable   :: TEW_l(:,:)
+  real (c_float), allocatable   :: DEPLETION_FRACTION(:)
+  real (c_float), allocatable   :: MEAN_PLANT_HEIGHT(:)
 
 contains
 
@@ -41,12 +41,12 @@ contains
 
   elemental function adjust_depletion_fraction_p( landuse_index, reference_et0 )   result( p )
 
-    integer ( kind=c_int), intent(in)    :: landuse_index
-    real (kind=c_float), intent(in)      :: reference_et0
-    real (kind=c_double)                 :: p
+    integer ( c_int), intent(in)    :: landuse_index
+    real (c_float), intent(in)      :: reference_et0
+    real (c_double)                 :: p
 
-    p = real(DEPLETION_FRACTION( landuse_index ),kind=c_double) + 0.04_c_double         &
-        * ( 5.0_c_double - in_to_mm( real(reference_et0, kind=c_double ) ) )
+    p = real(DEPLETION_FRACTION( landuse_index ),c_double) + 0.04_c_double         &
+        * ( 5.0_c_double - in_to_mm( real(reference_et0, c_double ) ) )
 
     p = min( p, 0.8_c_double )
     p = max( p, 0.1_c_double )
@@ -59,9 +59,9 @@ contains
 
     use parameters, only        : PARAMS, PARAMS_DICT
 
-    integer (kind=c_int)               :: number_of_landuses
+    integer (c_int)               :: number_of_landuses
     type(STRING_LIST_T)                :: slList
-    integer (kind=c_int), allocatable  ::  landuse_table_codes(:)
+    integer (c_int), allocatable  ::  landuse_table_codes(:)
 
     ! create list of possible table headings to look for...
     call slList%append( "LU_Code" )
@@ -94,12 +94,12 @@ elemental function calculate_evaporation_reduction_coefficient_Kr( landuse_index
                                                                    soil_moisture_deficit )   result( Kr )
 
   ! [ ARGUMENTS ]
-  integer (kind=c_int), intent(in)  :: landuse_index
-  integer (kind=c_int), intent(in)  :: soil_group
-  real (kind=c_double), intent(in)  :: soil_moisture_deficit
+  integer (c_int), intent(in)  :: landuse_index
+  integer (c_int), intent(in)  :: soil_group
+  real (c_double), intent(in)  :: soil_moisture_deficit
 
   ! [ RESULT ]
-  real (kind=c_double) :: Kr
+  real (c_double) :: Kr
 
   associate( REW => REW_l( landuse_index, soil_group ),         &
              TEW => TEW_l( landuse_index, soil_group ) )
@@ -107,8 +107,8 @@ elemental function calculate_evaporation_reduction_coefficient_Kr( landuse_index
     if ( soil_moisture_deficit <= REW ) then
       Kr = 1._c_double
     elseif ( soil_moisture_deficit < TEW ) then
-      Kr = ( real(TEW, kind=c_double) - soil_moisture_deficit )                &
-          / ( real(TEW, kind=c_double) - real(REW, kind=c_double) + 1.0E-8)
+      Kr = ( real(TEW, c_double) - soil_moisture_deficit )                &
+          / ( real(TEW, c_double) - real(REW, c_double) + 1.0E-8)
     else
       Kr = 0._c_double
     endif
@@ -125,17 +125,17 @@ end function calculate_evaporation_reduction_coefficient_Kr
 elemental function calculate_fraction_exposed_and_wetted_soil_fc( landuse_index, Kcb )   result ( few )
 
   ! [ ARGUMENTS ]
-  integer (kind=c_int), intent(in)    :: landuse_index
-  real (kind=c_float), intent(in)     :: Kcb
+  integer (c_int), intent(in)    :: landuse_index
+  real (c_float), intent(in)     :: Kcb
 
   ! [ RESULT ]
-  real (kind=c_float) :: few
+  real (c_float) :: few
 
   ! [ LOCALS ]
-  real (kind=c_float) :: r_fc
-  real (kind=c_double) :: numerator
-  real (kind=c_double) :: denominator
-  real (kind=c_double) :: exponent
+  real (c_float) :: r_fc
+  real (c_double) :: numerator
+  real (c_double) :: denominator
+  real (c_double) :: exponent
 
   numerator = Kcb - KCB_l( KCB_MIN, landuse_index)
   denominator =  KCB_l( KCB_MID, landuse_index)  -  KCB_l( KCB_MIN, landuse_index)
@@ -161,12 +161,12 @@ end function calculate_fraction_exposed_and_wetted_soil_fc
 elemental function calculate_surface_evap_coefficient_ke( landuse_index, Kcb, Kr )     result( Ke )
 
   ! [ ARGUMENTS ]
-  integer (kind=c_int), intent(in)   :: landuse_index
-  real (kind=c_float), intent(in)    :: Kcb
-  real (kind=c_double), intent(in)   :: Kr
-  real (kind=c_double)               :: Ke
+  integer (c_int), intent(in)   :: landuse_index
+  real (c_float), intent(in)    :: Kcb
+  real (c_double), intent(in)   :: Kr
+  real (c_double)               :: Ke
 
-  Ke = Kr * ( real(maxval(KCB_l( KCB_INI:KCB_MIN, landuse_index )), kind=c_double) - real(Kcb, kind=c_double) )
+  Ke = Kr * ( real(maxval(KCB_l( KCB_INI:KCB_MIN, landuse_index )), c_double) - real(Kcb, c_double) )
 
 end function calculate_surface_evap_coefficient_ke
 
@@ -179,13 +179,13 @@ elemental subroutine calculate_total_available_water( taw, raw,                 
                                                       current_rooting_depth,         &
                                                       awc )
 
-  real (kind=c_double), intent(inout)   :: raw
-  real (kind=c_double), intent(inout)   :: taw
-  real (kind=c_double), intent(in)      :: adjusted_depletion_fraction_p
-  real (kind=c_float), intent(in)       :: current_rooting_depth
-  real (kind=c_float), intent(in)       :: awc
+  real (c_double), intent(inout)   :: raw
+  real (c_double), intent(inout)   :: taw
+  real (c_double), intent(in)      :: adjusted_depletion_fraction_p
+  real (c_float), intent(in)       :: current_rooting_depth
+  real (c_float), intent(in)       :: awc
 
-  taw = real(current_rooting_depth, kind=c_double) * real(awc, kind=c_double)
+  taw = real(current_rooting_depth, c_double) * real(awc, c_double)
   raw = taw * adjusted_depletion_fraction_p
 
 end subroutine calculate_total_available_water
@@ -197,10 +197,10 @@ end subroutine calculate_total_available_water
 elemental function calculate_water_stress_coefficient_ks( taw, raw,                             &
                                                           soil_moisture_deficit) result( Ks )
 
-  real (kind=c_double), intent(in)      :: raw
-  real (kind=c_double), intent(in)      :: taw
-  real (kind=c_double), intent(in)      :: soil_moisture_deficit
-  real (kind=c_double)                  :: Ks
+  real (c_double), intent(in)      :: raw
+  real (c_double), intent(in)      :: taw
+  real (c_double), intent(in)      :: soil_moisture_deficit
+  real (c_double)                  :: Ks
 
   if ( soil_moisture_deficit < raw ) then
 
@@ -241,30 +241,30 @@ elemental subroutine calculate_actual_et_fao56_two_stage(                       
                                                   soil_storage_max,                  &
                                                   reference_et0 )
 
-  real (kind=c_double), intent(inout)            :: actual_et
-  real (kind=c_float), intent(inout)             :: crop_etc
-  real (kind=c_float), intent(inout)             :: bare_soil_evap
-  real (kind=c_double), intent(inout)            :: taw
-  real (kind=c_double), intent(inout)            :: raw
-  real (kind=c_float), intent(inout)             :: fraction_exposed_and_wetted_soil
-  real (kind=c_double), intent(inout)            :: Kr
-  real (kind=c_double), intent(inout)            :: Ke
-  real (kind=c_double), intent(inout)            :: Ks
-  real (kind=c_double), intent(inout)            :: adjusted_depletion_fraction_p
-  real (kind=c_double), intent(inout)            :: soil_moisture_deficit
-  real (kind=c_float), intent(in)                :: Kcb
-  integer (kind=c_int), intent(in)               :: landuse_index
-  integer (kind=c_int), intent(in)               :: soil_group
-  real (kind=c_float), intent(in)                :: awc
-  real (kind=c_float), intent(in)                :: current_rooting_depth
-  real (kind=c_double), intent(in)               :: soil_storage
-  real (kind=c_float), intent(in)                :: soil_storage_max
-  real (kind=c_float), intent(in)                :: reference_et0
+  real (c_double), intent(inout)            :: actual_et
+  real (c_float), intent(inout)             :: crop_etc
+  real (c_float), intent(inout)             :: bare_soil_evap
+  real (c_double), intent(inout)            :: taw
+  real (c_double), intent(inout)            :: raw
+  real (c_float), intent(inout)             :: fraction_exposed_and_wetted_soil
+  real (c_double), intent(inout)            :: Kr
+  real (c_double), intent(inout)            :: Ke
+  real (c_double), intent(inout)            :: Ks
+  real (c_double), intent(inout)            :: adjusted_depletion_fraction_p
+  real (c_double), intent(inout)            :: soil_moisture_deficit
+  real (c_float), intent(in)                :: Kcb
+  integer (c_int), intent(in)               :: landuse_index
+  integer (c_int), intent(in)               :: soil_group
+  real (c_float), intent(in)                :: awc
+  real (c_float), intent(in)                :: current_rooting_depth
+  real (c_double), intent(in)               :: soil_storage
+  real (c_float), intent(in)                :: soil_storage_max
+  real (c_float), intent(in)                :: reference_et0
 
 
   adjusted_depletion_fraction_p = adjust_depletion_fraction_p( landuse_index, reference_et0 )
 
-  soil_moisture_deficit = max( 0.0_c_double, real(soil_storage_max, kind=c_double) - soil_storage)
+  soil_moisture_deficit = max( 0.0_c_double, real(soil_storage_max, c_double) - soil_storage)
 
   call calculate_total_available_water( taw, raw,                      &
                                         adjusted_depletion_fraction_p, &

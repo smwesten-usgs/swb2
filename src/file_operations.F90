@@ -13,7 +13,7 @@ module file_operations
 
   public :: fully_qualified_filename
 
-  integer (kind=c_int), parameter         :: MAX_STR_LEN    = 65536
+  integer (c_int), parameter         :: MAX_STR_LEN    = 65536
 
   type, public :: ASCII_FILE_T
 
@@ -21,15 +21,15 @@ module file_operations
     character (len=:), allocatable  :: sDelimiters
     character (len=:), allocatable  :: sCommentChars
     type (STRING_LIST_T)            :: slColNames
-    integer (kind=c_int)            :: iCurrentLinenum = 0
-    integer (kind=c_int)            :: iNumberOfLines = 0
-    integer (kind=c_int)            :: iNumberOfRecords = 0
-    integer (kind=c_int)            :: iNumberOfHeaderLines = 1
-    logical (kind=c_bool)           :: lIsOpen = lFALSE
-    logical (kind=c_bool)           :: lReadOnly = lTRUE
-    logical (kind=c_bool)           :: lEOF = lFALSE
-    integer (kind=c_int)            :: iUnitNum
-    integer (kind=c_int)            :: iStat
+    integer (c_int)            :: iCurrentLinenum = 0
+    integer (c_int)            :: iNumberOfLines = 0
+    integer (c_int)            :: iNumberOfRecords = 0
+    integer (c_int)            :: iNumberOfHeaderLines = 1
+    logical (c_bool)           :: lIsOpen = lFALSE
+    logical (c_bool)           :: lReadOnly = lTRUE
+    logical (c_bool)           :: lEOF = lFALSE
+    integer (c_int)            :: iUnitNum
+    integer (c_int)            :: iStat
     character (len=MAX_STR_LEN)     :: sBuf
     character (len=:), allocatable  :: stMissingValue
 
@@ -86,7 +86,7 @@ contains
   function return_fortran_unit_number_fn(this)   result(iUnitNum)
 
     class (ASCII_FILE_T)   :: this
-    integer (kind=c_int)   :: iUnitNum
+    integer (c_int)   :: iUnitNum
 
     iUnitNum = this%iUnitNum
 
@@ -97,7 +97,7 @@ contains
   function return_num_lines_fn(this)    result(iNumLines)
 
     class (ASCII_FILE_T)   :: this
-    integer (kind=c_int) :: iNumLines
+    integer (c_int) :: iNumLines
 
     iNumLines = this%iNumberOfLines
 
@@ -108,7 +108,7 @@ contains
   function return_num_records_fn(this)                 result(iNumRecords)
 
     class (ASCII_FILE_T)   :: this
-    integer (kind=c_int) :: iNumRecords
+    integer (c_int) :: iNumRecords
 
     iNumRecords = this%iNumberOfRecords
 
@@ -119,7 +119,7 @@ contains
   function return_current_linenum_fn(this)          result(iCurrentLinenum)
 
     class (ASCII_FILE_T)   :: this
-    integer (kind=c_int) :: iCurrentLinenum
+    integer (c_int) :: iCurrentLinenum
 
     iCurrentLinenum = this%iCurrentLinenum
 
@@ -130,7 +130,7 @@ contains
   function have_we_reached_the_EOF_fn(this)           result(lIsEOF)
 
     class (ASCII_FILE_T)     :: this
-    logical (kind=c_bool)   :: lIsEOF
+    logical (c_bool)   :: lIsEOF
 
     lIsEOF = this%lEOF
 
@@ -141,11 +141,11 @@ contains
   function is_current_line_a_comment_fn(this)         result(lIsComment)
 
     class (ASCII_FILE_T)     :: this
-    logical (kind=c_bool)   :: lIsComment
+    logical (c_bool)   :: lIsComment
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iIndex
-    integer (kind=c_int) :: iLen
+    integer (c_int) :: iIndex
+    integer (c_int) :: iLen
     character (len=1)   :: sBufTemp
 
     iLen = len_trim( this%sBuf )
@@ -168,7 +168,7 @@ contains
     character (len=*), intent(in)               :: sFilename
     character (len=*), intent(in)               :: sCommentChars
     character (len=*), intent(in)               :: sDelimiters
-    logical (kind=c_bool), intent(in), optional :: lHasHeader
+    logical (c_bool), intent(in), optional :: lHasHeader
 
     ! [ LOCALS ]
     character (len=len(sFilename) ) :: sFilename_l
@@ -214,7 +214,7 @@ contains
 
     class (ASCII_FILE_T), intent(inout)           :: this
     character (len=*), intent(in)                 :: sFilename
-    logical (kind=c_bool), intent(in), optional   :: lQuiet
+    logical (c_bool), intent(in), optional   :: lQuiet
 
     ! [ LOCALS ]
     logical :: lQuiet_l
@@ -264,7 +264,7 @@ contains
 
     class (ASCII_FILE_T)              :: this
     character (len=*), intent(in)    :: sFilename
-    logical(kind=c_bool)             :: lExists
+    logical(c_bool)             :: lExists
 
     inquire(file=fully_qualified_filename( sFilename ), exist=lExists)
 
@@ -275,7 +275,7 @@ contains
   function is_file_open_fn(this) result(lIsOpen)
 
     class (ASCII_FILE_T) :: this
-    logical(kind=c_bool) :: lIsOpen
+    logical(c_bool) :: lIsOpen
 
     lIsOpen = this%lIsOpen
 
@@ -288,10 +288,10 @@ contains
     class (ASCII_FILE_T), intent(inout) :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iStat
-    integer (kind=c_int) :: iNumLines
-    integer (kind=c_int) :: iNumRecords
-    integer (kind=c_int) :: iIndex
+    integer (c_int) :: iStat
+    integer (c_int) :: iNumLines
+    integer (c_int) :: iNumRecords
+    integer (c_int) :: iIndex
 
     iNumLines = 0
     iNumRecords = 0
@@ -333,7 +333,7 @@ contains
     character (len=MAX_STR_LEN)           :: sString
     character (len=MAX_STR_LEN)           :: sSubString
     character (len=MAX_STR_LEN)           :: sSubStringClean
-    integer (kind=c_int)                  :: column_count
+    integer (c_int)                  :: column_count
 
     this%sBuf = this%readline()
     column_count = 0
@@ -363,7 +363,7 @@ contains
     character (len=*), intent(in)               :: sText
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iStat
+    integer (c_int) :: iStat
 
     call assert( .not. this%lReadOnly, "INTERNAL ERROR -- File "  &
       //dquote( fully_qualified_filename( this%sFilename ) )      &
@@ -385,8 +385,8 @@ contains
     character (len=:), allocatable     :: sText
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iStat
-    logical (kind=c_bool)                 :: lIsComment
+    integer (c_int) :: iStat
+    logical (c_bool)                 :: lIsComment
 
     lIsComment = lTRUE
 

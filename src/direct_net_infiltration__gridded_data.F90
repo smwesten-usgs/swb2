@@ -39,18 +39,18 @@ module direct_net_infiltration__gridded_data
   type (DATA_CATALOG_ENTRY_T), pointer :: pWATER_MAIN
   type (DATA_CATALOG_ENTRY_T), pointer :: pANNUAL_RECHARGE_RATE
 
-  real (kind=c_float), allocatable     :: fCESSPOOL(:)
-  real (kind=c_float), allocatable     :: fDISPOSAL_WELL(:)
-  real (kind=c_float), allocatable     :: fWATER_BODY_RECHARGE(:)
-  real (kind=c_float), allocatable     :: fWATER_MAIN(:)
-  real (kind=c_float), allocatable     :: fANNUAL_RECHARGE_RATE(:)
+  real (c_float), allocatable     :: fCESSPOOL(:)
+  real (c_float), allocatable     :: fDISPOSAL_WELL(:)
+  real (c_float), allocatable     :: fWATER_BODY_RECHARGE(:)
+  real (c_float), allocatable     :: fWATER_MAIN(:)
+  real (c_float), allocatable     :: fANNUAL_RECHARGE_RATE(:)
 
   ! ****_TABLE variables: will have same number of values as there are landuses
-  real (kind=c_float), allocatable     :: fCESSPOOL_TABLE(:)
-  real (kind=c_float), allocatable     :: fDISPOSAL_WELL_TABLE(:)
-  real (kind=c_float), allocatable     :: fWATER_BODY_RECHARGE_TABLE(:)
-  real (kind=c_float), allocatable     :: fWATER_MAIN_TABLE(:)
-  real (kind=c_float), allocatable     :: fANNUAL_RECHARGE_RATE_TABLE(:)
+  real (c_float), allocatable     :: fCESSPOOL_TABLE(:)
+  real (c_float), allocatable     :: fDISPOSAL_WELL_TABLE(:)
+  real (c_float), allocatable     :: fWATER_BODY_RECHARGE_TABLE(:)
+  real (c_float), allocatable     :: fWATER_MAIN_TABLE(:)
+  real (c_float), allocatable     :: fANNUAL_RECHARGE_RATE_TABLE(:)
 
   type (T_NETCDF4_FILE), pointer       :: pNCFILE
 
@@ -73,18 +73,18 @@ contains
 
   subroutine direct_net_infiltration_initialize( is_cell_active, landuse_index )
 
-    logical (kind=c_bool), intent(in)     :: is_cell_active(:,:)
-    integer (kind=c_int), intent(in)      :: landuse_index(:)
+    logical (c_bool), intent(in)     :: is_cell_active(:,:)
+    integer (c_int), intent(in)      :: landuse_index(:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)                 :: status
+    integer (c_int)                 :: status
     type (STRING_LIST_T)                 :: parameter_list
-    integer (kind=c_int)                 :: indx
-    integer (kind=c_int)                 :: iNX
-    integer (kind=c_int)                 :: iNY
-    integer (kind=c_int), allocatable    :: landuse_codes(:)
-    integer (kind=c_int)                 :: number_of_landuses
-    logical (kind=c_bool)                :: are_lengths_equal
+    integer (c_int)                 :: indx
+    integer (c_int)                 :: iNX
+    integer (c_int)                 :: iNY
+    integer (c_int), allocatable    :: landuse_codes(:)
+    integer (c_int)                 :: number_of_landuses
+    logical (c_bool)                :: are_lengths_equal
 
 
     !> Determine how many landuse codes are present
@@ -302,13 +302,13 @@ contains
 
   subroutine direct_net_infiltration_calculate( direct_net_infiltration, indx, is_cell_active, nodata_fill_value )
 
-    real (kind=c_float), intent(inout)     :: direct_net_infiltration
-    integer (kind=c_int), intent(in)       :: indx
-    logical (kind=c_bool), intent(in)      :: is_cell_active(:,:)
-    real (kind=c_float), intent(in)        :: nodata_fill_value(:,:)
+    real (c_float), intent(inout)     :: direct_net_infiltration
+    integer (c_int), intent(in)       :: indx
+    logical (c_bool), intent(in)      :: is_cell_active(:,:)
+    real (c_float), intent(in)        :: nodata_fill_value(:,:)
 
     ! [ LOCALS ]
-    real (kind=c_float)  :: fFactor
+    real (c_float)  :: fFactor
 
     if ( .not. DATE_OF_LAST_RETRIEVAL == SIM_DT%curr ) then
 

@@ -29,13 +29,13 @@ module interception__gash
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pEVAPORATION_TO_RAINFALL_RATIO
 
-  real (kind=c_float), allocatable   :: EVAPORATION_TO_RAINFALL_RATIO(:)
+  real (c_float), allocatable   :: EVAPORATION_TO_RAINFALL_RATIO(:)
 
-  real (kind=c_float), allocatable   :: CANOPY_STORAGE_CAPACITY_TABLE_VALUES(:)
-  real (kind=c_float), allocatable   :: TRUNK_STORAGE_CAPACITY_TABLE_VALUES(:)
-  real (kind=c_float), allocatable   :: STEMFLOW_FRACTION_TABLE_VALUES(:)
+  real (c_float), allocatable   :: CANOPY_STORAGE_CAPACITY_TABLE_VALUES(:)
+  real (c_float), allocatable   :: TRUNK_STORAGE_CAPACITY_TABLE_VALUES(:)
+  real (c_float), allocatable   :: STEMFLOW_FRACTION_TABLE_VALUES(:)
 
-  real (kind=c_float), allocatable   :: P_SAT(:)
+  real (c_float), allocatable   :: P_SAT(:)
 
   type (T_NETCDF4_FILE), pointer     :: pNCFILE           ! pointer to OUTPUT NetCDF file
 
@@ -47,19 +47,19 @@ contains
   !!
   subroutine interception_gash_initialize( lActive, fCanopy_Cover_Fraction, iLandUseIndex )
 
-    logical (kind=c_bool), intent(in)    :: lActive(:,:)
-    real (kind=c_float), intent(in)      :: fCanopy_Cover_Fraction(:)
-    integer (kind=c_int), intent(in)     :: iLanduseIndex(:)
+    logical (c_bool), intent(in)    :: lActive(:,:)
+    real (c_float), intent(in)      :: fCanopy_Cover_Fraction(:)
+    integer (c_int), intent(in)     :: iLanduseIndex(:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)                 :: iStat
+    integer (c_int)                 :: iStat
     type (STRING_LIST_T)                 :: slList
-    integer (kind=c_int)                 :: iIndex
-    integer (kind=c_int)                 :: iCount
-    integer (kind=c_int)                 :: iNumRecs
-    integer (kind=c_int), allocatable    :: iLanduseTableCodes(:)
-    integer (kind=c_int)                 :: iNumberOfLanduses
-    logical (kind=c_bool)                :: lAreLengthsEqual
+    integer (c_int)                 :: iIndex
+    integer (c_int)                 :: iCount
+    integer (c_int)                 :: iNumRecs
+    integer (c_int), allocatable    :: iLanduseTableCodes(:)
+    integer (c_int)                 :: iNumberOfLanduses
+    logical (c_bool)                :: lAreLengthsEqual
 
     iCount = count( lActive )
 
@@ -151,13 +151,13 @@ contains
   elemental function precipitation_at_saturation( E_div_P, canopy_storage_capacity, canopy_cover_fraction )  &
                                                                                result( Psat )
 
-    real (kind=c_float), intent(in)    :: E_div_P
-    real (kind=c_float), intent(in)    :: canopy_storage_capacity
-    real (kind=c_float), intent(in)    :: canopy_cover_fraction
-    real (kind=c_float)                :: Psat
+    real (c_float), intent(in)    :: E_div_P
+    real (c_float), intent(in)    :: canopy_storage_capacity
+    real (c_float), intent(in)    :: canopy_cover_fraction
+    real (c_float)                :: Psat
 
     ! [ LOCALS ]
-    real (kind=c_float)                :: P_div_E
+    real (c_float)                :: P_div_E
 
     if ( canopy_cover_fraction > 0.0_c_float .and. canopy_storage_capacity > 0.0_c_float ) then
 
@@ -183,17 +183,17 @@ contains
                                                     fEvaporation_to_Rainfall_Ratio,                &
                                                     fPrecipitation_at_Saturation, fInterception )
 
-    real (kind=c_float), intent(in)        :: fRainfall
-    real (kind=c_float), intent(in)        :: fFog
-    real (kind=c_float), intent(in)        :: fCanopy_Cover_Fraction
-    real (kind=c_float), intent(in)        :: fTrunk_Storage_Capacity
-    real (kind=c_float), intent(in)        :: fStemflow_Fraction
-    real (kind=c_float), intent(in)        :: fEvaporation_to_Rainfall_Ratio
-    real (kind=c_float), intent(in)        :: fPrecipitation_at_Saturation
-    real (kind=c_float), intent(inout)     :: fInterception
+    real (c_float), intent(in)        :: fRainfall
+    real (c_float), intent(in)        :: fFog
+    real (c_float), intent(in)        :: fCanopy_Cover_Fraction
+    real (c_float), intent(in)        :: fTrunk_Storage_Capacity
+    real (c_float), intent(in)        :: fStemflow_Fraction
+    real (c_float), intent(in)        :: fEvaporation_to_Rainfall_Ratio
+    real (c_float), intent(in)        :: fPrecipitation_at_Saturation
+    real (c_float), intent(inout)     :: fInterception
 
     ! [ LOCALS ]
-    real (kind=c_float)      :: fRainfall_plus_Fog
+    real (c_float)      :: fRainfall_plus_Fog
 
     fRainfall_plus_Fog = fRainfall + fFog
 

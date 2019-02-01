@@ -11,10 +11,10 @@ module summary_statistics
   type ( STRING_LIST_T ) :: POLY_ID
   type ( STRING_LIST_T ) :: LANDUSE_CODES
 
-  integer (kind=c_int)         :: LU
+  integer (c_int)         :: LU
   character (len=1), parameter :: TAB = achar(9)
 
-  logical (kind=c_bool)     :: anything_to_summarize = FALSE
+  logical (c_bool)     :: anything_to_summarize = FALSE
 
 contains
 
@@ -39,7 +39,7 @@ contains
   subroutine initialize_summary_statistics()
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: status
+    integer (c_int) :: status
     character (len=256)  :: fname
 
     if ( anything_to_summarize ) then
@@ -81,7 +81,7 @@ contains
   	type ( MODEL_DOMAIN_T ), intent(inout) :: cells
 
     ! [ LOCALS ]
-    integer (kind=c_int)  :: indx
+    integer (c_int)  :: indx
     logical               :: belongs_to_poly( ubound( cells%polygon_id, 1 ) )
 
     do indx=1, ubound( POLY_ID, 1 )
@@ -102,7 +102,7 @@ contains
 
     ! [ LOCALS ]
     logical               :: belongs_to_lu( ubound( cells%landuse_code, 1 ) )
-    integer (kind=c_int)  :: indx
+    integer (c_int)  :: indx
 
     do indx=1, ubound( landuse_code_list, 1 )
 
@@ -118,13 +118,13 @@ contains
 
   subroutine write_out_values( cell_selection, poly_id )
 
-    logical (kind=c_bool), intent(in)            :: cell_selection(:)
-    integer (kind=c_int), intent(in), optional   :: poly_id
+    logical (c_bool), intent(in)            :: cell_selection(:)
+    integer (c_int), intent(in), optional   :: poly_id
 
-    integer (kind=c_int) :: lc
-    integer (kind=c_int) :: poly_id_l
+    integer (c_int) :: lc
+    integer (c_int) :: poly_id_l
     character (len=10)   :: date
-    real (kind=c_float)  :: sms_max, rain, fog, irr, runoff, can_evap, ref_et0,       &
+    real (c_float)  :: sms_max, rain, fog, irr, runoff, can_evap, ref_et0,       &
                             crop_et0, actual_et, recharge, sms_end, snowmelt,         &
                             surface_storage_excess, impervious_frac, surface_storage, &
                             actual_et_soil
@@ -150,8 +150,8 @@ contains
     can_evap = mean( cells%interception, cell_selection )
     ref_et0 = mean( cells%reference_et0, cell_selection )
     crop_et0 = mean( cells%reference_et0 * cells%crop_coefficient_kcb, cell_selection )
-    actual_et_soil = mean( real( cells%actual_et_soil, kind=c_float), cell_selection )
-    actual_et = mean( real( cells%actual_et, kind=c_float), cell_selection )
+    actual_et_soil = mean( real( cells%actual_et_soil, c_float), cell_selection )
+    actual_et = mean( real( cells%actual_et, c_float), cell_selection )
     recharge = mean( cells%net_infiltration, cell_selection )
     sms_end = mean( cells%soil_storage, cell_selection )
     surface_storage_excess = mean( cells%surface_storage_excess, cell_selection )
@@ -176,16 +176,16 @@ contains
 
   function most_common_value( int_vector, cell_selection )  result( majority_value )
 
-    integer ( kind=c_int) :: int_vector(:)
+    integer ( c_int) :: int_vector(:)
     logical               :: cell_selection(:)
 
     ! [ LOCALS ]
-    integer (kind=c_int), dimension(625) :: value
-    integer (kind=c_int), dimension(625) :: item_count
+    integer (c_int), dimension(625) :: value
+    integer (c_int), dimension(625) :: item_count
     logical              :: match
-    integer (kind=c_int) :: index, index1, index2
-    integer (kind=c_int) :: last
-    integer (kind=c_int) :: majority_value
+    integer (c_int) :: index, index1, index2
+    integer (c_int) :: last
+    integer (c_int) :: majority_value
 
     value = 0
     item_count = 0
@@ -227,18 +227,18 @@ contains
 
   function mean( float_vector, cell_selection )  result( mean_value )
 
-    real (kind=c_float)   :: float_vector(:)
+    real (c_float)   :: float_vector(:)
     logical               :: cell_selection(:)
-    real (kind=c_float)   :: mean_value
+    real (c_float)   :: mean_value
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: item_count
+    integer (c_int) :: item_count
 
     item_count = count( cell_selection )
 
     if ( item_count > 0 ) then
 
-      mean_value = sum( float_vector, cell_selection ) / real(item_count, kind=c_float)
+      mean_value = sum( float_vector, cell_selection ) / real(item_count, c_float)
 
     else
 

@@ -37,18 +37,18 @@ module irrigation
        "Apply constant amount              ", &
        "Apply proportional to (PE + RO - R)"   ]
 
-  real (kind=c_float), allocatable     :: MAXIMUM_ALLOWABLE_DEPLETION_FRACTION(:)
-  real (kind=c_float), allocatable     :: IRRIGATION_FROM_GROUNDWATER(:)
-  real (kind=c_float), allocatable     :: IRRIGATION_FROM_SURFACE_WATER(:)
+  real (c_float), allocatable     :: MAXIMUM_ALLOWABLE_DEPLETION_FRACTION(:)
+  real (c_float), allocatable     :: IRRIGATION_FROM_GROUNDWATER(:)
+  real (c_float), allocatable     :: IRRIGATION_FROM_SURFACE_WATER(:)
 
-  real (kind=c_float), allocatable     :: FRACTION_OF_IRRIGATION_FROM_GW(:)
-  real (kind=c_float), allocatable     :: IRRIGATION_EFFICIENCY(:)
-  integer (kind=c_int), allocatable    :: NUM_DAYS_OF_IRRIGATION(:)
-  integer (kind=c_int), allocatable    :: FIRST_DAY_OF_IRRIGATION(:)
-  integer (kind=c_int), allocatable    :: LAST_DAY_OF_IRRIGATION(:)
-  integer (kind=c_int), allocatable    :: APPLICATION_METHOD_CODE(:)
-  integer (kind=c_short), allocatable  :: MONTHLY_IRRIGATION_SCHEDULE(:,:)
-  real (kind=c_float), allocatable     :: APPLICATION_AMOUNT(:)
+  real (c_float), allocatable     :: FRACTION_OF_IRRIGATION_FROM_GW(:)
+  real (c_float), allocatable     :: IRRIGATION_EFFICIENCY(:)
+  integer (c_int), allocatable    :: NUM_DAYS_OF_IRRIGATION(:)
+  integer (c_int), allocatable    :: FIRST_DAY_OF_IRRIGATION(:)
+  integer (c_int), allocatable    :: LAST_DAY_OF_IRRIGATION(:)
+  integer (c_int), allocatable    :: APPLICATION_METHOD_CODE(:)
+  integer (c_short), allocatable  :: MONTHLY_IRRIGATION_SCHEDULE(:,:)
+  real (c_float), allocatable     :: APPLICATION_AMOUNT(:)
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pIRRIGATION_MASK
 
@@ -66,18 +66,18 @@ contains
 
   subroutine irrigation__initialize( irrigation_mask, is_active)
 
-    real (kind=c_float), intent(inout)   :: irrigation_mask(:)
-    logical (kind=c_bool), intent(in)    :: is_active(:,:)
+    real (c_float), intent(inout)   :: irrigation_mask(:)
+    logical (c_bool), intent(in)    :: is_active(:,:)
 
     ! [ LOCALS ]
     type (STRING_LIST_T)              :: sl_temp_list
-    integer (kind=c_int)              :: number_of_landuse_codes
-    integer (kind=c_int), allocatable :: landuse_table_codes(:)
-    integer (kind=c_int)              :: num_records
-    logical (kind=c_bool)             :: are_lengths_unequal
-    integer (kind=c_int)              :: index
-    integer (kind=c_int)              :: i
-    integer (kind=c_int)              :: status
+    integer (c_int)              :: number_of_landuse_codes
+    integer (c_int), allocatable :: landuse_table_codes(:)
+    integer (c_int)              :: num_records
+    logical (c_bool)             :: are_lengths_unequal
+    integer (c_int)              :: index
+    integer (c_int)              :: i
+    integer (c_int)              :: status
     character (len=256)               :: str_buffer
     type (STRING_LIST_T)              :: sl_irrigation_days
     type (STRING_LIST_T)              :: sl_irrigation_begin
@@ -362,7 +362,7 @@ contains
 
     if ( associated(pIRRIGATION_MASK) ) then
 
-      irrigation_mask = pack( real(pIRRIGATION_MASK%pGrdBase%iData, kind=c_float), is_active )
+      irrigation_mask = pack( real(pIRRIGATION_MASK%pGrdBase%iData, c_float), is_active )
 
     else
 
@@ -404,8 +404,8 @@ contains
 
   function irrigation__output_schedule_values( landuse_index )  result( values )
 
-    integer (kind=c_int), intent(in)   :: landuse_index
-    integer (kind=c_int)               :: values(31)
+    integer (c_int), intent(in)   :: landuse_index
+    integer (c_int)               :: values(31)
 
     values = MONTHLY_IRRIGATION_SCHEDULE( landuse_index, : )
 
@@ -427,35 +427,35 @@ contains
                                               monthly_runoff                &
                                                 )
 
-    real (kind=c_float), intent(inout)          :: irrigation_amount
-    integer (kind=c_int), intent(in)            :: landuse_index
-    real (kind=c_double), intent(in)            :: soil_storage
-    real (kind=c_float), intent(in)             :: soil_storage_max
-    real (kind=c_double), intent(in)            :: total_available_water
-    real (kind=c_float), intent(in)             :: rainfall
-    real (kind=c_float), intent(in)             :: runoff
-    real (kind=c_float), intent(in)             :: crop_etc
-    real (kind=c_float), intent(in)             :: irrigation_mask
-    integer (kind=c_int), intent(in)            :: num_days_since_planting
-    real (kind=c_float), intent(in), optional   :: monthly_rainfall
-    real (kind=c_float), intent(in), optional   :: monthly_runoff
+    real (c_float), intent(inout)          :: irrigation_amount
+    integer (c_int), intent(in)            :: landuse_index
+    real (c_double), intent(in)            :: soil_storage
+    real (c_float), intent(in)             :: soil_storage_max
+    real (c_double), intent(in)            :: total_available_water
+    real (c_float), intent(in)             :: rainfall
+    real (c_float), intent(in)             :: runoff
+    real (c_float), intent(in)             :: crop_etc
+    real (c_float), intent(in)             :: irrigation_mask
+    integer (c_int), intent(in)            :: num_days_since_planting
+    real (c_float), intent(in), optional   :: monthly_rainfall
+    real (c_float), intent(in), optional   :: monthly_runoff
 
     ! [ LOCALS ]
-    real (kind=c_float)        :: depletion_fraction
+    real (c_float)        :: depletion_fraction
 
-    integer (kind=c_int)       :: month
-    integer (kind=c_int)       :: day
-    integer (kind=c_int)       :: year
-    integer (kind=c_int)       :: julian_day
-    integer (kind=c_int)       :: day_of_year
-    integer (kind=c_int)       :: days_in_month
-    integer (kind=c_int)       :: num_days_from_origin
-    integer (kind=c_int)       :: index
+    integer (c_int)       :: month
+    integer (c_int)       :: day
+    integer (c_int)       :: year
+    integer (c_int)       :: julian_day
+    integer (c_int)       :: day_of_year
+    integer (c_int)       :: days_in_month
+    integer (c_int)       :: num_days_from_origin
+    integer (c_int)       :: index
     character (len=31)         :: irrigation_day
-    integer (kind=c_int)       :: irrigation_days_per_month
-    real (kind=c_float)        :: efficiency
-    real (kind=c_float)        :: interim_irrigation_amount
-    integer (kind=c_int)       :: option
+    integer (c_int)       :: irrigation_days_per_month
+    real (c_float)        :: efficiency
+    real (c_float)        :: interim_irrigation_amount
+    integer (c_int)       :: option
 
     ! zero out Irrigation term
 !    IRRIGATION_FROM_GROUNDWATER = rZERO
@@ -539,8 +539,8 @@ contains
               interim_irrigation_amount = 0.0_c_float
             else
               interim_irrigation_amount = max( 0.0_c_float,    &
-              ( crop_etc * real( days_in_month, kind=c_float) + monthly_runoff - monthly_rainfall ) )  &
-                / real( irrigation_days_per_month, kind=c_float )
+              ( crop_etc * real( days_in_month, c_float) + monthly_runoff - monthly_rainfall ) )  &
+                / real( irrigation_days_per_month, c_float )
             endif
 
           else

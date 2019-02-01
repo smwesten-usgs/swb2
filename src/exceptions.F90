@@ -14,8 +14,8 @@ module exceptions
      module procedure :: assert_1bit
   end interface assert
 
-  integer (kind=c_int), public     :: NUMBER_OF_FATAL_WARNINGS = 0
-  integer (kind=c_int), parameter  :: MAX_FATAL_WARNINGS = 50
+  integer (c_int), public     :: NUMBER_OF_FATAL_WARNINGS = 0
+  integer (c_int), parameter  :: MAX_FATAL_WARNINGS = 50
   character (len=256)              :: WARNING_TEXT( MAX_FATAL_WARNINGS )
 
 contains
@@ -24,12 +24,12 @@ contains
 
     character (len=*), intent(in)               :: sMessage
     character (len=*), intent(in), optional     :: sModule
-    integer (kind=c_int), intent(in), optional  :: iLine
+    integer (c_int), intent(in), optional  :: iLine
     character (len=*), intent(in), optional     :: sHints
     character (len=*), intent(in), optional     :: sCalledBy
-    integer (kind=c_int), intent(in), optional  :: iCalledByLine
+    integer (c_int), intent(in), optional  :: iCalledByLine
 
-!    integer (kind=c_int), intent(in), optional  :: iLU
+!    integer (c_int), intent(in), optional  :: iLU
 
     ! [ LOCALS ]
     character (len=6) :: sLineNum
@@ -75,7 +75,7 @@ contains
     character (len=6)     :: sNumWarnings
     character (len=6)     :: sMaxWarnings
     character (len=6)     :: sIndex
-    integer (kind=c_int)  :: iIndex
+    integer (c_int)  :: iIndex
     character (len=10)    :: sBigS
     character (len=1)     :: sLittleS
 
@@ -125,12 +125,12 @@ contains
 
     character (len=*), intent(in)               :: sMessage
     character (len=*), intent(in), optional     :: sModule
-    integer (kind=c_int), intent(in), optional  :: iLine
+    integer (c_int), intent(in), optional  :: iLine
     character (len=*), intent(in), optional     :: sHints
-    logical (kind=c_bool), intent(in), optional :: lFatal
-    integer (kind=c_int), intent(in), optional  :: iLogLevel
-    logical (kind=c_bool), intent(in), optional :: lEcho
-!    integer (kind=c_int), intent(in), optional  :: iLU
+    logical (c_bool), intent(in), optional :: lFatal
+    integer (c_int), intent(in), optional  :: iLogLevel
+    logical (c_bool), intent(in), optional :: lEcho
+!    integer (c_int), intent(in), optional  :: iLU
 
     ! [ LOCALS ]
     character (len=32)   :: sBuf
@@ -173,13 +173,13 @@ contains
 
   subroutine assert_1bit(lCondition, sMessage, sModule, iLine, sCalledBy, iCalledByLine, sHints )
 
-    logical (kind=c_bool), intent(in)           :: lCondition
+    logical (c_bool), intent(in)           :: lCondition
     character (len=*), intent(in)               :: sMessage
     character (len=*), intent(in), optional     :: sHints
     character (len=*), intent(in), optional     :: sCalledBy
-    integer (kind=c_int), intent(in), optional  :: iCalledByLine
+    integer (c_int), intent(in), optional  :: iCalledByLine
     character (len=*), intent(in), optional     :: sModule
-    integer (kind=c_int), intent(in), optional  :: iLine
+    integer (c_int), intent(in), optional  :: iLine
 
     character (len=256) :: sHints_l 
 
@@ -211,13 +211,13 @@ contains
 
 subroutine assert_4bit(lCondition, sMessage, sModule, iLine, sCalledBy, iCalledByLine, sHints )
 
-  logical (kind=4), intent(in)                :: lCondition
+  logical (4), intent(in)                :: lCondition
   character (len=*), intent(in)               :: sMessage
   character (len=*), intent(in), optional     :: sHints
   character (len=*), intent(in), optional     :: sCalledBy
-  integer (kind=c_int), intent(in), optional  :: iCalledByLine
+  integer (c_int), intent(in), optional  :: iCalledByLine
   character (len=*), intent(in), optional     :: sModule
-  integer (kind=c_int), intent(in), optional  :: iLine
+  integer (c_int), intent(in), optional  :: iLine
 
   character (len=256) :: sHints_l 
 

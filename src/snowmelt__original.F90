@@ -7,20 +7,20 @@ module snowmelt__original
 
   public :: snowmelt_original_calculate
 
-  real (kind=c_double), parameter    :: FREEZING_F    = 32.0_c_double
-  real (kind=c_double), parameter    :: FREEZING_C    = 0.0_c_double
-  real (kind=c_double), parameter    :: MELT_INDEX    = 1.5_c_double
-  real (kind=c_double), parameter    :: DEGC_PER_DEGF = 0.55555555555555555555556_c_double
-  real (kind=c_double), parameter    :: MM_PER_INCH   = 25.4_c_double
+  real (c_double), parameter    :: FREEZING_F    = 32.0_c_double
+  real (c_double), parameter    :: FREEZING_C    = 0.0_c_double
+  real (c_double), parameter    :: MELT_INDEX    = 1.5_c_double
+  real (c_double), parameter    :: DEGC_PER_DEGF = 0.55555555555555555555556_c_double
+  real (c_double), parameter    :: MM_PER_INCH   = 25.4_c_double
 
 contains
 
   elemental subroutine snowmelt_original_calculate( potential_snowmelt, tmin, tmax, imperial_units )
 
-    real (kind=c_float), intent(inout)      :: potential_snowmelt 
-    real (kind=c_float), intent(in)         :: tmin
-    real (kind=c_float), intent(in)         :: tmax
-    logical ( kind=c_bool), intent(in)      :: imperial_units
+    real (c_float), intent(inout)      :: potential_snowmelt 
+    real (c_float), intent(in)         :: tmin
+    real (c_float), intent(in)         :: tmax
+    logical ( c_bool), intent(in)      :: imperial_units
 
     if ( imperial_units ) then
 

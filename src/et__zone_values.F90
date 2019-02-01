@@ -27,14 +27,14 @@ module et__zone_values
   public :: et_zone_values_initialize, et_zone_values_calculate
   public :: pET_GRID, ET_RATIOS
 
-  real (kind=c_float), allocatable           :: ET_TABLE_VALUES(:,:)
+  real (c_float), allocatable           :: ET_TABLE_VALUES(:,:)
 
   type (DATA_CATALOG_ENTRY_T), pointer       :: pET_ZONE
   type (DATA_CATALOG_ENTRY_T), pointer       :: pET_GRID
 
-  integer (kind=c_int), allocatable          :: ET_ZONE(:)
+  integer (c_int), allocatable          :: ET_ZONE(:)
 
-  real (kind=c_float), allocatable           :: ET_RATIOS(:)
+  real (c_float), allocatable           :: ET_RATIOS(:)
 
  contains
 
@@ -44,10 +44,10 @@ module et__zone_values
   !!
   subroutine et_zone_values_initialize( lActive )
 
-    logical (kind=c_bool), intent(in)   :: lActive(:,:)
+    logical (c_bool), intent(in)   :: lActive(:,:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)      :: iStat
+    integer (c_int)      :: iStat
     type (STRING_LIST_T)      :: slString
 
     ! locate the data structure associated with ANNUAL gridded ET
@@ -91,15 +91,15 @@ module et__zone_values
 
     ! [ LOCALS ]
     character (len=65536)   :: sRecord, sSubstring
-    integer (kind=c_int)    :: iStat
-    integer (kind=c_int)    :: iLineNum
-    integer (kind=c_int)    :: iFieldNum
-    integer (kind=c_int)    :: iIndex
-    integer (kind=c_int)    :: iNumLines
-    integer (kind=c_int)    :: iNumFields
+    integer (c_int)    :: iStat
+    integer (c_int)    :: iLineNum
+    integer (c_int)    :: iFieldNum
+    integer (c_int)    :: iIndex
+    integer (c_int)    :: iNumLines
+    integer (c_int)    :: iNumFields
     type (ASCII_FILE_T)     :: ET_RATIO_FILE
 
-    integer (kind=c_int), parameter :: ET_ZONE_FIELD = 1
+    integer (c_int), parameter :: ET_ZONE_FIELD = 1
 
     call ET_RATIO_FILE%open( sFilename = sFilename, &
                   sCommentChars = "#%!", &
@@ -165,11 +165,11 @@ module et__zone_values
   subroutine et_zone_values_calculate( )
 
     ! [ LOCALS ]
-    integer (kind=c_int)  :: iLineNum
-    integer (kind=c_int)  :: iFieldNum
-    integer (kind=c_int)  :: iET_zone_id
-    real (kind=c_float)   :: fFactor
-    integer (kind=c_int)  :: iCount
+    integer (c_int)  :: iLineNum
+    integer (c_int)  :: iFieldNum
+    integer (c_int)  :: iET_zone_id
+    real (c_float)   :: fFactor
+    integer (c_int)  :: iCount
 
     ET_RATIOS = 0.0_c_float
     iCount = 0.0_c_float

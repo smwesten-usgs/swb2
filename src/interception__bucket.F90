@@ -15,44 +15,44 @@ module interception__bucket
   public :: interception_bucket_initialize, interception_bucket_calculate
 !  public :: IS_GROWING_SEASON
 
-!  logical (kind=c_bool) :: GROWING_SEASON = .true._c_bool
+!  logical (c_bool) :: GROWING_SEASON = .true._c_bool
 
-  integer (kind=c_int), allocatable :: iLanduseCodes(:)
-  real (kind=c_float), allocatable  :: INTERCEPTION_A_VALUE_GROWING_SEASON(:)
-  real (kind=c_float), allocatable  :: INTERCEPTION_B_VALUE_GROWING_SEASON(:)
-  real (kind=c_float), allocatable  :: INTERCEPTION_N_VALUE_GROWING_SEASON(:)
-  real (kind=c_float), allocatable  :: INTERCEPTION_A_VALUE_NONGROWING_SEASON(:)
-  real (kind=c_float), allocatable  :: INTERCEPTION_B_VALUE_NONGROWING_SEASON(:)
-  real (kind=c_float), allocatable  :: INTERCEPTION_N_VALUE_NONGROWING_SEASON(:)
-  real (kind=c_float), allocatable  :: FIRST_DAY_OF_GROWING_SEASON(:)
-  real (kind=c_float), allocatable  :: LAST_DAY_OF_GROWING_SEASON(:)
-  real (kind=c_float), allocatable  :: GDD_FIRST_DAY_OF_GROWING_SEASON(:)
-  real (kind=c_float), allocatable  :: KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON(:)
+  integer (c_int), allocatable :: iLanduseCodes(:)
+  real (c_float), allocatable  :: INTERCEPTION_A_VALUE_GROWING_SEASON(:)
+  real (c_float), allocatable  :: INTERCEPTION_B_VALUE_GROWING_SEASON(:)
+  real (c_float), allocatable  :: INTERCEPTION_N_VALUE_GROWING_SEASON(:)
+  real (c_float), allocatable  :: INTERCEPTION_A_VALUE_NONGROWING_SEASON(:)
+  real (c_float), allocatable  :: INTERCEPTION_B_VALUE_NONGROWING_SEASON(:)
+  real (c_float), allocatable  :: INTERCEPTION_N_VALUE_NONGROWING_SEASON(:)
+  real (c_float), allocatable  :: FIRST_DAY_OF_GROWING_SEASON(:)
+  real (c_float), allocatable  :: LAST_DAY_OF_GROWING_SEASON(:)
+  real (c_float), allocatable  :: GDD_FIRST_DAY_OF_GROWING_SEASON(:)
+  real (c_float), allocatable  :: KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON(:)
 
   !> Form of the bucket interception: I = A + P*B^n
 
-!  logical (kind=c_bool), allocatable :: IS_GROWING_SEASON(:)
+!  logical (c_bool), allocatable :: IS_GROWING_SEASON(:)
 
   character( len=2 ), parameter     :: DATE_DELIMS = "/-"
-  real (kind=c_float), parameter    :: NODATA_VALUE = -9999._c_float
+  real (c_float), parameter    :: NODATA_VALUE = -9999._c_float
 
 contains
 
   subroutine interception_bucket_initialize( active_cells )
 
-    logical (kind=c_bool), intent(in)   :: active_cells(:,:)
+    logical (c_bool), intent(in)   :: active_cells(:,:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)              :: iNumberOfLanduses
-    logical (kind=c_bool)             :: lAreLengthsEqual
+    integer (c_int)              :: iNumberOfLanduses
+    logical (c_bool)             :: lAreLengthsEqual
     character (len=:), allocatable    :: sTemp
     type (STRING_LIST_T)              :: sl_temp_list
     type (STRING_LIST_T)              :: sl_growing_season_begin
     type (STRING_LIST_T)              :: sl_growing_season_end
     character (len=32)                :: str_buffer
-    real (kind=c_float), allocatable  :: temp_values(:)
-    integer (kind=c_int)              :: indx
-    integer (kind=c_int)              :: status
+    real (c_float), allocatable  :: temp_values(:)
+    integer (c_int)              :: indx
+    integer (c_int)              :: status
 
     !> Determine how many landuse codes are present
     sTemp = "LU_Code"
@@ -231,16 +231,16 @@ contains
                                                     fCanopy_Cover_Fraction,                            &
                                                     it_is_growing_season )     result( fInterception )
 
-    integer (kind=c_int), intent(in)   :: iLanduseIndex
-    real (kind=c_float), intent(in)    :: fPrecip
-    real (kind=c_float), intent(in)    :: fFog
-    real (kind=c_float), intent(in)    :: fCanopy_Cover_Fraction
-    logical (kind=c_bool), intent(in)  :: it_is_growing_season
-    real (kind=c_float)                :: fInterception
+    integer (c_int), intent(in)   :: iLanduseIndex
+    real (c_float), intent(in)    :: fPrecip
+    real (c_float), intent(in)    :: fFog
+    real (c_float), intent(in)    :: fCanopy_Cover_Fraction
+    logical (c_bool), intent(in)  :: it_is_growing_season
+    real (c_float)                :: fInterception
 
     ! [ LOCALS ]
-    real (kind=c_float) :: fPotentialInterception
-    real (kind=c_float) :: precip_plus_fog
+    real (c_float) :: fPotentialInterception
+    real (c_float) :: precip_plus_fog
 
     precip_plus_fog = fPrecip + fFog
 

@@ -27,25 +27,25 @@ module storm_drain_capture
 #endif
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pSTORM_DRAIN_CAPTURE_FRACTION
-  real (kind=c_float), allocatable     :: STORM_DRAIN_CAPTURE_FRACTION(:)
-  real (kind=c_float), allocatable     :: STORM_DRAIN_CAPTURE_FRACTION_TABLE(:)
+  real (c_float), allocatable     :: STORM_DRAIN_CAPTURE_FRACTION(:)
+  real (c_float), allocatable     :: STORM_DRAIN_CAPTURE_FRACTION_TABLE(:)
   type ( DATETIME_T )                  :: DATE_OF_LAST_RETRIEVAL
 
 contains
 
   subroutine storm_drain_capture_initialize( is_cell_active, landuse_index )
 
-    logical (kind=c_bool), intent(in)     :: is_cell_active(:,:)
-    integer (kind=c_int), intent(in)      :: landuse_index(:)
+    logical (c_bool), intent(in)     :: is_cell_active(:,:)
+    integer (c_int), intent(in)      :: landuse_index(:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)              :: number_of_landuse_codes
-    integer (kind=c_int), allocatable :: lu_codes(:)
-    integer (kind=c_int)              :: indx
-    integer (kind=c_int)              :: num_records
+    integer (c_int)              :: number_of_landuse_codes
+    integer (c_int), allocatable :: lu_codes(:)
+    integer (c_int)              :: indx
+    integer (c_int)              :: num_records
     logical                           :: are_lengths_unequal
     type (STRING_LIST_T)              :: string_list
-    integer (kind=c_int)              :: status
+    integer (c_int)              :: status
     character (len=256)               :: sBuf
 
     call string_list%append("LU_Code")
@@ -121,9 +121,9 @@ contains
 
   subroutine storm_drain_capture_calculate( capture_fraction, indx, is_cell_active )
 
-    real (kind=c_float), intent(inout)     :: capture_fraction
-    integer (kind=c_int), intent(in)       :: indx
-    logical (kind=c_bool), intent(in)      :: is_cell_active(:,:)
+    real (c_float), intent(inout)     :: capture_fraction
+    integer (c_int), intent(in)       :: indx
+    logical (c_bool), intent(in)      :: is_cell_active(:,:)
 
     ! attempt to update values from gridded source, if active
     if ( .not. DATE_OF_LAST_RETRIEVAL == SIM_DT%curr ) then

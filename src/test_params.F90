@@ -10,7 +10,7 @@ program test_params
   implicit none
 
   type (PARAMETERS_T)             :: PARAMS
-  real (kind=c_float), allocatable     :: fValues(:)
+  real (c_float), allocatable     :: fValues(:)
   type (STRING_LIST_T)                 :: slString
 
 

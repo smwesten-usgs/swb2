@@ -39,36 +39,36 @@ module precipitation__method_of_fragments
   public :: precipitation_method_of_fragments_calculate
 
   !> Module variable that holds the rainfall gage (zone) number
-  integer (kind=c_int), allocatable, public :: RAIN_GAGE_ID(:)
+  integer (c_int), allocatable, public :: RAIN_GAGE_ID(:)
 
   !> Module variable that holds the current day's rainfall fragment value
-  real (kind=c_float), allocatable, public  :: FRAGMENT_VALUE(:)
+  real (c_float), allocatable, public  :: FRAGMENT_VALUE(:)
 
   !> Module variable indicating which "simulation number" is active
   !! Only has meaning if the rainfall fragments are being applied via a predetermined
   !! sequence file
-  integer (kind=c_int), public :: SIMULATION_NUMBER = 1
+  integer (c_int), public :: SIMULATION_NUMBER = 1
 
   !> Module variable that holds the rainfall adjustment factor
-  real (kind=c_float), allocatable, public  :: RAINFALL_ADJUST_FACTOR(:)
+  real (c_float), allocatable, public  :: RAINFALL_ADJUST_FACTOR(:)
 
   !> Module variable that holds a sequence of random numbers associated with the selection
   !! of the fragment set to use
-  real (kind=c_double), allocatable :: RANDOM_VALUES(:,:)
+  real (c_double), allocatable :: RANDOM_VALUES(:,:)
 
   !> Module level variable used to create subsets of the FRAGMENT_SEQUENCES file
-  logical (kind=c_bool), allocatable :: SEQUENCE_SELECTION(:)
+  logical (c_bool), allocatable :: SEQUENCE_SELECTION(:)
 
   !> Module variable detemining whether fragment sequences are chosen at random or
   !! selected from an external file
-  logical (kind=c_bool) :: RANDOM_FRAGMENT_SEQUENCES = .true._c_bool
+  logical (c_bool) :: RANDOM_FRAGMENT_SEQUENCES = .true._c_bool
 
   !> Data structure that holds a single line of data from the input rainfall fragments file.
   type, public :: FRAGMENTS_T
-    integer (kind=c_int) :: iMonth
-    integer (kind=c_int) :: iRainGageZone
-    integer (kind=c_int) :: iFragmentSet
-    real (kind=c_float)  :: fFragmentValue(31)
+    integer (c_int) :: iMonth
+    integer (c_int) :: iRainGageZone
+    integer (c_int) :: iFragmentSet
+    real (c_float)  :: fFragmentValue(31)
   end type FRAGMENTS_T
 
   !> Pointer to a rainfall fragments data structure.
@@ -79,9 +79,9 @@ module precipitation__method_of_fragments
   !> Data structure to hold the current active rainfall fragments for
   !! a particular rain gage zone.
   type, public :: FRAGMENTS_SET_T
-    integer (kind=c_int) :: iRainGageZone
-    integer (kind=c_int) :: iNumberOfFragments(12)
-    integer (kind=c_int) :: iStartRecord(12)
+    integer (c_int) :: iRainGageZone
+    integer (c_int) :: iNumberOfFragments(12)
+    integer (c_int) :: iStartRecord(12)
   end type FRAGMENTS_SET_T
 
   !> Array of all fragments read in from the rainfall fragments file.
@@ -97,12 +97,12 @@ module precipitation__method_of_fragments
 
   !> Data structure to hold static (pre-calculated) fragment selection numbers
   type, public :: FRAGMENTS_SEQUENCE_T
-    integer (kind=c_int) :: sim_number
-    integer (kind=c_int) :: sim_month
-    integer (kind=c_int) :: sim_rainfall_zone
-    integer (kind=c_int) :: sim_year
-    real (kind=c_float)  :: sim_random_number
-    integer (kind=c_int) :: sim_selected_set
+    integer (c_int) :: sim_number
+    integer (c_int) :: sim_month
+    integer (c_int) :: sim_rainfall_zone
+    integer (c_int) :: sim_year
+    real (c_float)  :: sim_random_number
+    integer (c_int) :: sim_selected_set
   end type FRAGMENTS_SEQUENCE_T
 
   !> Pointer to all or some of the FRAGMENTS_SEQUENCE array
@@ -113,7 +113,7 @@ module precipitation__method_of_fragments
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ADJUST_FACTOR
 
-  integer (kind=c_int) :: LU_FRAGMENTS_ECHO
+  integer (c_int) :: LU_FRAGMENTS_ECHO
 
 contains
 
@@ -127,14 +127,14 @@ contains
 
   subroutine precipitation_method_of_fragments_initialize( lActive )
 
-    logical (kind=c_bool), intent(in)     :: lActive(:,:)
+    logical (c_bool), intent(in)     :: lActive(:,:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)                 :: iStat
+    integer (c_int)                 :: iStat
     type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ZONE
     type (STRING_LIST_T)                 :: slString
-    integer (kind=c_int)                 :: iMaxRainZones
-    integer (kind=c_int), allocatable    :: iSimulationNumbers(:)
+    integer (c_int)                 :: iMaxRainZones
+    integer (c_int), allocatable    :: iSimulationNumbers(:)
     character (len=256)                  :: error_str
 
     ! look up the simulation number associated with the desired fragment sequence set
@@ -220,14 +220,14 @@ contains
 
     ! [ LOCALS ]
     character (len=512)   :: sRecord, sSubstring
-    integer (kind=c_int)  :: iStat
-    integer (kind=c_int)  :: iCount
-    integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: last_zone
-    integer (kind=c_int)  :: last_fragment
-    integer (kind=c_int)  :: last_month
-    integer (kind=c_int)  :: iNumLines
-    real (kind=c_float)   :: fTempValue
+    integer (c_int)  :: iStat
+    integer (c_int)  :: iCount
+    integer (c_int)  :: iIndex
+    integer (c_int)  :: last_zone
+    integer (c_int)  :: last_fragment
+    integer (c_int)  :: last_month
+    integer (c_int)  :: iNumLines
+    real (c_float)   :: fTempValue
     type (ASCII_FILE_T)   :: FRAGMENTS_FILE
 
 
@@ -363,13 +363,13 @@ contains
   ! in month and rain gage numbers
   subroutine process_fragment_sets()
 
-    integer (kind=c_int)   :: iCount
-    integer (kind=c_int)   :: iIndex
-    integer (kind=c_int)   :: iRainGageZone
-    integer (kind=c_int)   :: iPreviousRainGageZone
-    integer (kind=c_int)   :: iFragmentChunk
-    integer (kind=c_int)   :: iMonth
-    integer (kind=c_int)   :: iPreviousMonth
+    integer (c_int)   :: iCount
+    integer (c_int)   :: iIndex
+    integer (c_int)   :: iRainGageZone
+    integer (c_int)   :: iPreviousRainGageZone
+    integer (c_int)   :: iFragmentChunk
+    integer (c_int)   :: iMonth
+    integer (c_int)   :: iPreviousMonth
     character (len=10)     :: sBuf0
     character (len=10)     :: sBuf1
     character (len=12)     :: sBuf2
@@ -447,10 +447,10 @@ contains
   !> eliminate rainfall on the 29th day of February; bump up all other values to ensure sum = 1
   subroutine normalize_february_fragment_sequence( iCount )
 
-    integer (kind=c_int), intent(in)   :: iCount
+    integer (c_int), intent(in)   :: iCount
 
     ! [ LOCALS ]
-    real (kind=c_float) :: sum_fragments
+    real (c_float) :: sum_fragments
 
     ! we only want to correct the fragment if it was actually generated during a
     ! leap year
@@ -477,10 +477,10 @@ contains
 
     ! [ LOCALS ]
     character (len=512)   :: sRecord, sSubstring
-    integer (kind=c_int)  :: iStat
-    integer (kind=c_int)  :: iCount
-    integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: iNumLines
+    integer (c_int)  :: iStat
+    integer (c_int)  :: iCount
+    integer (c_int)  :: iIndex
+    integer (c_int)  :: iNumLines
     type (ASCII_FILE_T)   :: SEQUENCE_FILE
     character (len=10)     :: sBuf0
     character (len=10)     :: sBuf1
@@ -490,8 +490,8 @@ contains
     character (len=256)    :: sBuf5
     character (len=256)    :: error_str
     type (STRING_LIST_T)   :: slHeader
-    integer (kind=c_int)   :: max_rain_gage_number
-    integer (kind=c_int)   :: max_simulation_number
+    integer (c_int)   :: max_rain_gage_number
+    integer (c_int)   :: max_simulation_number
 
 
     call SEQUENCE_FILE%open( sFilename = sFilename,         &
@@ -648,22 +648,22 @@ contains
 
   subroutine update_fragments( lShuffle )
 
-    logical (kind=c_bool), intent(in) :: lShuffle
+    logical (c_bool), intent(in) :: lShuffle
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: rain_zone
-    integer (kind=c_int) :: iMaxRainZones
-    integer (kind=c_int) :: iMonth
-    integer (kind=c_int) :: iDay
-    integer (kind=c_int) :: iYearOfSimulation
+    integer (c_int) :: rain_zone
+    integer (c_int) :: iMaxRainZones
+    integer (c_int) :: iMonth
+    integer (c_int) :: iDay
+    integer (c_int) :: iYearOfSimulation
 
-    integer (kind=c_int) :: iNumberOfFragments
-    integer (kind=c_int)  :: iStartRecord
-    integer (kind=c_int) :: iEndRecord
-    integer (kind=c_int) :: iTargetRecord
-    integer (kind=c_int) :: iStat
-    integer (kind=c_int) :: iUBOUND_FRAGMENTS
-    integer (kind=c_int) :: iUBOUND_CURRENT_FRAGMENTS
+    integer (c_int) :: iNumberOfFragments
+    integer (c_int)  :: iStartRecord
+    integer (c_int) :: iEndRecord
+    integer (c_int) :: iTargetRecord
+    integer (c_int) :: iStat
+    integer (c_int) :: iUBOUND_FRAGMENTS
+    integer (c_int) :: iUBOUND_CURRENT_FRAGMENTS
     character (len=512)  :: sBuf
 
 
@@ -765,8 +765,8 @@ contains
   subroutine update_random_values()
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iIndex, iIndex2
-    logical (kind=c_bool) :: lSequenceSelection
+    integer (c_int) :: iIndex, iIndex2
+    logical (c_bool) :: lSequenceSelection
 
     if ( RANDOM_FRAGMENT_SEQUENCES ) then
 
@@ -822,13 +822,13 @@ contains
 
   subroutine precipitation_method_of_fragments_calculate( lActive )
 
-    logical (kind=c_bool), intent(in)     :: lActive(:,:)
+    logical (c_bool), intent(in)     :: lActive(:,:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)              :: iIndex
-    integer (kind=c_int)              :: iMaxRainZones
-    integer (kind=c_int)              :: iStat
-    logical (kind=c_bool), save       :: lFirstCall = lTRUE
+    integer (c_int)              :: iIndex
+    integer (c_int)              :: iMaxRainZones
+    integer (c_int)              :: iStat
+    logical (c_bool), save       :: lFirstCall = lTRUE
 
     type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ADJUST_FACTOR
 

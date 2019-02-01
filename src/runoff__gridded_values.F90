@@ -26,13 +26,13 @@ module runoff__gridded_values
 
   public :: runoff_gridded_values_initialize, runoff_gridded_values_update_ratios
 
-  real (kind=c_float), allocatable           :: RUNOFF_TABLE_VALUES(:,:)
+  real (c_float), allocatable           :: RUNOFF_TABLE_VALUES(:,:)
   type ( DATETIME_T ), allocatable           :: RUNOFF_TABLE_DATES(:)
 
   type (DATA_CATALOG_ENTRY_T), pointer       :: pRUNOFF_ZONE
-  integer (kind=c_int), allocatable          :: RUNOFF_ZONE(:)
+  integer (c_int), allocatable          :: RUNOFF_ZONE(:)
 
-  real (kind=c_float), allocatable, public   :: RUNOFF_RATIOS(:)
+  real (c_float), allocatable, public   :: RUNOFF_RATIOS(:)
 
  contains
 
@@ -42,10 +42,10 @@ module runoff__gridded_values
   !!
   subroutine runoff_gridded_values_initialize( lActive )
 
-    logical (kind=c_bool), intent(in)   :: lActive(:,:)
+    logical (c_bool), intent(in)   :: lActive(:,:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)      :: iStat
+    integer (c_int)      :: iStat
     type (STRING_LIST_T)      :: slString
 
     ! locate the data structure associated with the gridded fog ratio entries
@@ -81,12 +81,12 @@ module runoff__gridded_values
 
     ! [ LOCALS ]
     character (len=65536)   :: sRecord, sSubstring
-    integer (kind=c_int)    :: iStat
-    integer (kind=c_int)    :: iLineNum
-    integer (kind=c_int)    :: iFieldNum
-    integer (kind=c_int)    :: iIndex
-    integer (kind=c_int)    :: iNumLines
-    integer (kind=c_int)    :: iNumFields
+    integer (c_int)    :: iStat
+    integer (c_int)    :: iLineNum
+    integer (c_int)    :: iFieldNum
+    integer (c_int)    :: iIndex
+    integer (c_int)    :: iNumLines
+    integer (c_int)    :: iNumFields
     type (ASCII_FILE_T)     :: RUNOFF_RATIO_FILE
 
     call RUNOFF_RATIO_FILE%open( sFilename = sFilename, &
@@ -159,17 +159,17 @@ module runoff__gridded_values
   subroutine runoff_gridded_values_update_ratios( )
 
     ! [ LOCALS ]
-    integer (kind=c_int)  :: iJulianDay
-    integer (kind=c_int)  :: iMonth
-    integer (kind=c_int)  :: iDay
-    integer (kind=c_int)  :: iYear
-    integer (kind=c_int)  :: iDaysInMonth
-    integer (kind=c_int)  :: iNumDaysFromOrigin
-    integer (kind=c_int)  :: iLineNum
-    integer (kind=c_int)  :: iFieldNum
-    real (kind=c_float)   :: fFactor
-    logical (kind=c_bool) :: lMatch
-    integer (kind=c_int)  :: iCount
+    integer (c_int)  :: iJulianDay
+    integer (c_int)  :: iMonth
+    integer (c_int)  :: iDay
+    integer (c_int)  :: iYear
+    integer (c_int)  :: iDaysInMonth
+    integer (c_int)  :: iNumDaysFromOrigin
+    integer (c_int)  :: iLineNum
+    integer (c_int)  :: iFieldNum
+    real (c_float)   :: fFactor
+    logical (c_bool) :: lMatch
+    integer (c_int)  :: iCount
 
     lMatch = lFALSE
     iCount = 0

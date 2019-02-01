@@ -31,111 +31,111 @@ module model_domain
 
     character (len=:), allocatable     :: output_directory_name
     character (len=:), allocatable     :: PROJ4_string
-    integer (kind=c_int)               :: number_of_columns
-    integer (kind=c_int)               :: number_of_rows
-    real (kind=c_double)               :: X_ll, Y_ll
-    real (kind=c_double)               :: X_ur, Y_ur
-    real (kind=c_double), allocatable  :: X(:), Y(:)
-    real (kind=c_double), allocatable  :: X_lon(:,:), Y_lat(:,:)
-    real (kind=c_double)               :: gridcellsize
+    integer (c_int)               :: number_of_columns
+    integer (c_int)               :: number_of_rows
+    real (c_double)               :: X_ll, Y_ll
+    real (c_double)               :: X_ur, Y_ur
+    real (c_double), allocatable  :: X(:), Y(:)
+    real (c_double), allocatable  :: X_lon(:,:), Y_lat(:,:)
+    real (c_double)               :: gridcellsize
 
-    logical (kind=c_bool), allocatable     :: active(:,:)
-    real (kind=c_float), allocatable       :: nodata_fill_value(:,:)
-    real (kind=c_float), allocatable       :: array_output(:,:)
+    logical (c_bool), allocatable     :: active(:,:)
+    real (c_float), allocatable       :: nodata_fill_value(:,:)
+    real (c_float), allocatable       :: array_output(:,:)
 
-    integer (kind=c_int), allocatable      :: landuse_code(:)
-    integer (kind=c_int), allocatable      :: landuse_index(:)
-    integer (kind=c_int), allocatable      :: soil_code(:)
-    integer (kind=c_int), allocatable      :: soil_group(:)
-    integer (kind=c_int), allocatable      :: num_upslope_connections(:)
-    integer (kind=c_int), allocatable      :: sum_upslope_cells(:)
+    integer (c_int), allocatable      :: landuse_code(:)
+    integer (c_int), allocatable      :: landuse_index(:)
+    integer (c_int), allocatable      :: soil_code(:)
+    integer (c_int), allocatable      :: soil_group(:)
+    integer (c_int), allocatable      :: num_upslope_connections(:)
+    integer (c_int), allocatable      :: sum_upslope_cells(:)
 
-    integer (kind=c_int), allocatable      :: col_num_2D(:,:)
-    integer (kind=c_int), allocatable      :: row_num_2D(:,:)
+    integer (c_int), allocatable      :: col_num_2D(:,:)
+    integer (c_int), allocatable      :: row_num_2D(:,:)
 
-    integer (kind=c_int), allocatable      :: col_num_1D(:)
-    integer (kind=c_int), allocatable      :: row_num_1D(:)
+    integer (c_int), allocatable      :: col_num_1D(:)
+    integer (c_int), allocatable      :: row_num_1D(:)
 
-    real (kind=c_float), allocatable       :: pervious_fraction(:)
-    real (kind=c_float), allocatable       :: canopy_cover_fraction(:)
-    real (kind=c_float), allocatable       :: awc(:)
-    real (kind=c_float), allocatable       :: curve_num_adj(:)
-    real (kind=c_float), allocatable       :: gdd(:)
-    real (kind=c_float), allocatable       :: crop_coefficient_kcb(:)
-    real (kind=c_double), allocatable      :: surf_evap_coef_ke(:)
-    real (kind=c_double), allocatable      :: plant_stress_coef_ks(:)
-    real (kind=c_double), allocatable      :: evap_reduction_coef_kr(:)
-    real (kind=c_double), allocatable      :: total_available_water_taw(:)
-    real (kind=c_double), allocatable      :: readily_available_water_raw(:)
+    real (c_float), allocatable       :: pervious_fraction(:)
+    real (c_float), allocatable       :: canopy_cover_fraction(:)
+    real (c_float), allocatable       :: awc(:)
+    real (c_float), allocatable       :: curve_num_adj(:)
+    real (c_float), allocatable       :: gdd(:)
+    real (c_float), allocatable       :: crop_coefficient_kcb(:)
+    real (c_double), allocatable      :: surf_evap_coef_ke(:)
+    real (c_double), allocatable      :: plant_stress_coef_ks(:)
+    real (c_double), allocatable      :: evap_reduction_coef_kr(:)
+    real (c_double), allocatable      :: total_available_water_taw(:)
+    real (c_double), allocatable      :: readily_available_water_raw(:)
 
-    real (kind=c_float), allocatable       :: continuous_frozen_ground_index(:)
+    real (c_float), allocatable       :: continuous_frozen_ground_index(:)
 
-    real (kind=c_float), allocatable       :: rooting_depth_max(:)
+    real (c_float), allocatable       :: rooting_depth_max(:)
 
-    integer (kind=c_int), allocatable      :: polygon_id(:)
-    real (kind=c_float), allocatable       :: latitude(:)
-    real (kind=c_float), allocatable       :: reference_et0(:)
-    real (kind=c_float), allocatable       :: crop_etc(:)
+    integer (c_int), allocatable      :: polygon_id(:)
+    real (c_float), allocatable       :: latitude(:)
+    real (c_float), allocatable       :: reference_et0(:)
+    real (c_float), allocatable       :: crop_etc(:)
 
-    real (kind=c_double), allocatable      :: actual_et_interception(:)
-    real (kind=c_double), allocatable      :: actual_et_impervious(:)
-    real (kind=c_double), allocatable      :: actual_et_soil(:)
-    real (kind=c_double), pointer          :: actual_et(:)
-    real (kind=c_float), allocatable       :: bare_soil_evap(:)
+    real (c_double), allocatable      :: actual_et_interception(:)
+    real (c_double), allocatable      :: actual_et_impervious(:)
+    real (c_double), allocatable      :: actual_et_soil(:)
+    real (c_double), pointer          :: actual_et(:)
+    real (c_float), allocatable       :: bare_soil_evap(:)
 
-    real (kind=c_float), allocatable       :: inflow(:)
-    real (kind=c_float), allocatable       :: runon(:)
-    real (kind=c_float), allocatable       :: runoff(:)
-    real (kind=c_float), allocatable       :: monthly_runoff(:)
-    real (kind=c_float), allocatable       :: runoff_outside(:)
-    real (kind=c_float), allocatable       :: outflow(:)
-    real (kind=c_float), allocatable       :: infiltration(:)
-    real (kind=c_float), allocatable       :: potential_snowmelt(:)
-    real (kind=c_float), allocatable       :: snowmelt(:)
+    real (c_float), allocatable       :: inflow(:)
+    real (c_float), allocatable       :: runon(:)
+    real (c_float), allocatable       :: runoff(:)
+    real (c_float), allocatable       :: monthly_runoff(:)
+    real (c_float), allocatable       :: runoff_outside(:)
+    real (c_float), allocatable       :: outflow(:)
+    real (c_float), allocatable       :: infiltration(:)
+    real (c_float), allocatable       :: potential_snowmelt(:)
+    real (c_float), allocatable       :: snowmelt(:)
     type (GENERAL_GRID_T), pointer         :: pGrdOut
-    real (kind=c_float), allocatable       :: interception(:)
-    real (kind=c_float), pointer           :: interception_storage(:)
+    real (c_float), allocatable       :: interception(:)
+    real (c_float), pointer           :: interception_storage(:)
 
-    real (kind=c_float), pointer           :: snow_storage(:)
-    real (kind=c_double), pointer          :: surface_storage(:)
-    real (kind=c_float), allocatable       :: surface_storage_max(:)
-    real (kind=c_float), allocatable       :: surface_storage_excess(:)
-    real (kind=c_float), allocatable       :: storm_drain_capture(:)
-    real (kind=c_float), allocatable       :: delta_soil_storage(:)
-    real (kind=c_double), pointer          :: soil_storage(:)
-    real (kind=c_float), allocatable       :: soil_storage_max(:)
-    real (kind=c_double), allocatable      :: soil_moisture_deficit(:)
-    real (kind=c_float), pointer           :: net_infiltration(:)
-    real (kind=c_float), allocatable       :: rejected_net_infiltration(:)
-    real (kind=c_float), allocatable       :: direct_net_infiltration(:)
-    real (kind=c_float), allocatable       :: direct_soil_moisture(:)
-    real (kind=c_float), allocatable       :: current_rooting_depth(:)
-    integer (kind=c_int), allocatable      :: number_of_days_since_planting(:)
-    logical (kind=c_bool), allocatable     :: it_is_growing_season(:)
+    real (c_float), pointer           :: snow_storage(:)
+    real (c_double), pointer          :: surface_storage(:)
+    real (c_float), allocatable       :: surface_storage_max(:)
+    real (c_float), allocatable       :: surface_storage_excess(:)
+    real (c_float), allocatable       :: storm_drain_capture(:)
+    real (c_float), allocatable       :: delta_soil_storage(:)
+    real (c_double), pointer          :: soil_storage(:)
+    real (c_float), allocatable       :: soil_storage_max(:)
+    real (c_double), allocatable      :: soil_moisture_deficit(:)
+    real (c_float), pointer           :: net_infiltration(:)
+    real (c_float), allocatable       :: rejected_net_infiltration(:)
+    real (c_float), allocatable       :: direct_net_infiltration(:)
+    real (c_float), allocatable       :: direct_soil_moisture(:)
+    real (c_float), allocatable       :: current_rooting_depth(:)
+    integer (c_int), allocatable      :: number_of_days_since_planting(:)
+    logical (c_bool), allocatable     :: it_is_growing_season(:)
 
-    real (kind=c_float), allocatable       :: gross_precip(:)
-    real (kind=c_float), allocatable       :: monthly_gross_precip(:)
-    real (kind=c_float), pointer           :: fog(:)
-    real (kind=c_float), allocatable       :: rainfall(:)
-    real (kind=c_float), allocatable       :: net_rainfall(:)
-    real (kind=c_float), allocatable       :: snowfall(:)
-    real (kind=c_float), allocatable       :: net_snowfall(:)
-    real (kind=c_float), allocatable       :: irrigation(:)
+    real (c_float), allocatable       :: gross_precip(:)
+    real (c_float), allocatable       :: monthly_gross_precip(:)
+    real (c_float), pointer           :: fog(:)
+    real (c_float), allocatable       :: rainfall(:)
+    real (c_float), allocatable       :: net_rainfall(:)
+    real (c_float), allocatable       :: snowfall(:)
+    real (c_float), allocatable       :: net_snowfall(:)
+    real (c_float), allocatable       :: irrigation(:)
 
-    real (kind=c_float), allocatable       :: tmin(:)
-    real (kind=c_float), allocatable       :: tmax(:)
-    real (kind=c_float), allocatable       :: tmean(:)
+    real (c_float), allocatable       :: tmin(:)
+    real (c_float), allocatable       :: tmax(:)
+    real (c_float), allocatable       :: tmean(:)
 
-    real (kind=c_float), allocatable       :: routing_fraction(:)
+    real (c_float), allocatable       :: routing_fraction(:)
 
-    integer (kind=c_int), allocatable      :: sort_order(:)
+    integer (c_int), allocatable      :: sort_order(:)
 
-    real (kind=c_double), allocatable      :: adjusted_depletion_fraction_p(:)
-    real (kind=c_float), allocatable       :: fraction_exposed_and_wetted_soil(:)
+    real (c_double), allocatable      :: adjusted_depletion_fraction_p(:)
+    real (c_float), allocatable       :: fraction_exposed_and_wetted_soil(:)
 
     ! member variables that are only allocated if particular optional methods are invoked
 
-    real (kind=c_float), allocatable       :: irrigation_mask(:)
+    real (c_float), allocatable       :: irrigation_mask(:)
 
     !> declare procedure pointers - these will have to be initialized elsewhere
     procedure ( array_method ), pointer  :: init_interception
@@ -242,7 +242,7 @@ module model_domain
     subroutine index_method( this, index )
       import :: MODEL_DOMAIN_T, c_int
       class ( MODEL_DOMAIN_T ), intent(inout)       :: this
-      integer (kind=c_int), intent(in)              :: index
+      integer (c_int), intent(in)              :: index
     end subroutine index_method
   end interface
 
@@ -252,13 +252,13 @@ module model_domain
   end interface minmaxmean
 
   type :: CELL_COL_ROW_T
-    integer (kind=c_int) :: unitnum
-    integer (kind=c_int) :: col
-    integer (kind=c_int) :: row
-    real (kind=c_float)  :: x_coord
-    real (kind=c_float)  :: y_coord
-    integer (kind=c_int) :: indx_start
-    integer (kind=c_int) :: indx_end
+    integer (c_int) :: unitnum
+    integer (c_int) :: col
+    integer (c_int) :: row
+    real (c_float)  :: x_coord
+    real (c_float)  :: y_coord
+    integer (c_int) :: indx_start
+    integer (c_int) :: indx_end
   end type CELL_COL_ROW_T
 
   type ( CELL_COL_ROW_T ) :: DUMP(20)
@@ -266,7 +266,7 @@ module model_domain
   ! creating several module-level globals
   type (MODEL_DOMAIN_T), public             :: MODEL
 
-  real (kind=c_float), allocatable, public  :: ROOTING_DEPTH_MAX(:,:)
+  real (c_float), allocatable, public  :: ROOTING_DEPTH_MAX(:,:)
 
   type (GENERAL_GRID_T), pointer            :: pROOTING_DEPTH
 
@@ -363,14 +363,14 @@ contains
   subroutine initialize_grid_sub(this, iNumCols, iNumRows, dX_ll, dY_ll, dGridCellSize )
 
     class (MODEL_DOMAIN_T), intent(inout)        :: this
-    integer (kind=c_int), intent(in)             :: iNumCols
-    integer (kind=c_int), intent(in)             :: iNumRows
-    real (kind=c_double), intent(in)             :: dX_ll
-    real (kind=c_double), intent(in)             :: dY_ll
-    real (kind=c_double), intent(in)             :: dGridcellSize
+    integer (c_int), intent(in)             :: iNumCols
+    integer (c_int), intent(in)             :: iNumRows
+    real (c_double), intent(in)             :: dX_ll
+    real (c_double), intent(in)             :: dY_ll
+    real (c_double), intent(in)             :: dGridcellSize
 
     ! [ LOCALS ]
-    integer (kind=c_int)  :: iStat
+    integer (c_int)  :: iStat
 
     this%number_of_columns = iNumCols
     this%number_of_rows = iNumRows
@@ -408,10 +408,10 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)        :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int)  :: iCount
-    integer (kind=c_int)  :: iIndex
-    integer (kind=c_int)  :: indx
-    integer (kind=c_int)  :: iStat(64)
+    integer (c_int)  :: iCount
+    integer (c_int)  :: iIndex
+    integer (c_int)  :: indx
+    integer (c_int)  :: iStat(64)
 
     iCount = count( this%active )
     iStat = 0
@@ -565,8 +565,8 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)   :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: row_num, col_num
-    integer (kind=c_int) :: status
+    integer (c_int) :: row_num, col_num
+    integer (c_int) :: status
 
     do row_num=lbound( this%row_num_2D, 2), ubound( this%row_num_2D, 2)
       this%row_num_2D( :, row_num ) = row_num
@@ -589,12 +589,12 @@ contains
   function row_column_to_index_fn( this, col_num, row_num )   result( indexval )
 
     class (MODEL_DOMAIN_T), intent(inout)   :: this
-    integer (kind=c_int), intent(in)        :: col_num
-    integer (kind=c_int), intent(in)        :: row_num
-    integer (kind=c_int)                    :: indexval
+    integer (c_int), intent(in)        :: col_num
+    integer (c_int), intent(in)        :: row_num
+    integer (c_int)                    :: indexval
 
     ! [ LOCALS ]
-    logical (kind=c_bool)   :: found_match
+    logical (c_bool)   :: found_match
 
     found_match = FALSE
 
@@ -825,13 +825,13 @@ contains
   subroutine initialize_landuse_codes()
 
     ! [ LOCALS ]
-    integer (kind=c_int)                 :: iIndex
-    integer (kind=c_int), allocatable    :: iLandUseCodes(:)
+    integer (c_int)                 :: iIndex
+    integer (c_int), allocatable    :: iLandUseCodes(:)
     type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
-    integer (kind=c_int)                 :: iIndex2
-    integer (kind=c_int)                 :: iCount
-    integer (kind=c_int)                 :: iStat
-    logical (kind=c_bool)                :: lMatch
+    integer (c_int)                 :: iIndex2
+    integer (c_int)                 :: iCount
+    integer (c_int)                 :: iStat
+    logical (c_bool)                :: lMatch
     type (STRING_LIST_T)                 :: slList
 
     call slList%append("LU_Code")
@@ -920,8 +920,8 @@ contains
 !     class (MODEL_DOMAIN_T), intent(inout)     :: this
 
 !     ! [ LOCALS ]
-!     integer (kind=c_int)                 :: iStat
-!     integer (kind=c_int)                 :: iIndex
+!     integer (c_int)                 :: iStat
+!     integer (c_int)                 :: iIndex
 !     type (DATA_CATALOG_ENTRY_T), pointer :: pAWC
 
 !     pAWC => DAT%find("AVAILABLE_WATER_CONTENT")
@@ -949,10 +949,10 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iJulianDay
-    integer (kind=c_int) ::iMonth
-    integer (kind=c_int) ::iDay
-    integer (kind=c_int) ::iYear
+    integer (c_int) :: iJulianDay
+    integer (c_int) ::iMonth
+    integer (c_int) ::iDay
+    integer (c_int) ::iYear
 
     associate ( dt => SIM_DT%curr )
 
@@ -1049,14 +1049,14 @@ contains
     type (STRING_LIST_T), intent(in)        :: argv_list
 
     ! [ LOCALS ]
-    integer (kind=c_int)              :: indx
-    integer (kind=c_int)              :: iostat
-    integer (kind=c_int)              :: unitnum
+    integer (c_int)              :: indx
+    integer (c_int)              :: iostat
+    integer (c_int)              :: unitnum
     character (len=256)               :: filename
     character (len=:), allocatable    :: Method_Name
-    integer (kind=c_int)              :: col, row
-    integer (kind=c_int)              :: indx_start, indx_end
-    real (kind=c_double)              :: xcoord, ycoord
+    integer (c_int)              :: col, row
+    integer (c_int)              :: indx_start, indx_end
+    real (c_double)              :: xcoord, ycoord
 
     Method_Name = argv_list%get(1)
 
@@ -1605,8 +1605,8 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)      :: this
 
     ! [ LOCALS ]
-    real (kind=c_float), allocatable :: fTrunk_Storage_Capacity(:)
-    real (kind=c_float), allocatable :: fStemflow_Fraction(:)
+    real (c_float), allocatable :: fTrunk_Storage_Capacity(:)
+    real (c_float), allocatable :: fStemflow_Fraction(:)
 
     fTrunk_Storage_Capacity = TRUNK_STORAGE_CAPACITY_TABLE_VALUES( this%landuse_index )
     fStemflow_Fraction = STEMFLOW_FRACTION_TABLE_VALUES( this%landuse_index )
@@ -1639,7 +1639,7 @@ contains
   subroutine model_calculate_routing_none(this, indx)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    integer (kind=c_int), intent(in)       :: indx
+    integer (c_int), intent(in)       :: indx
 
     this%runoff_outside( indx ) =                                        &
       this%runoff( indx )                                                &
@@ -1668,14 +1668,14 @@ contains
     use routing__D8, only   : get_target_index, get_cell_index
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    integer (kind=c_int), intent(in)       :: indx
+    integer (c_int), intent(in)       :: indx
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: target_index
-    integer (kind=c_int) :: cell_index
-    real (kind=c_float)  :: msb
+    integer (c_int) :: target_index
+    integer (c_int) :: cell_index
+    real (c_float)  :: msb
 
-    integer (kind=c_int) :: cell_row, cell_col, targ_row, targ_col
+    integer (c_int) :: cell_row, cell_col, targ_row, targ_col
 
     cell_index    = get_cell_index( indx )
     target_index  = get_target_index( indx )
@@ -1904,7 +1904,7 @@ contains
     call et_zone_values_calculate( )
 
     ! as with HWB, multiply ANNUAL ET grid by a monthly to annual RATIO, then divide by number of days
-    this%reference_ET0 = pack( pET_GRID%pGrdBase%rData, this%active ) * ET_RATIOS / real( SIM_DT%iDaysInMonth, kind=c_float)
+    this%reference_ET0 = pack( pET_GRID%pGrdBase%rData, this%active ) * ET_RATIOS / real( SIM_DT%iDaysInMonth, c_float)
 
   end subroutine model_calculate_et_monthly_zone_grid
 
@@ -1931,7 +1931,7 @@ contains
     call et_gridded_values_calculate( )
 
     this%reference_ET0 = pack( pET_GRID%pGrdBase%rData, this%active ) &
-                                      / real( SIM_DT%iDaysInMonth, kind=c_float)
+                                      / real( SIM_DT%iDaysInMonth, c_float)
 
   end subroutine model_calculate_et_monthly_grid
 
@@ -1979,9 +1979,9 @@ contains
                                       update_previous_5_day_rainfall
 
     class (MODEL_DOMAIN_T), intent(inout)          :: this
-    integer (kind=c_int), intent(in)               :: cell_index
+    integer (c_int), intent(in)               :: cell_index
 
-    integer (kind=c_int)  :: indx
+    integer (c_int)  :: indx
 
     !> @TODO: Should interception term be part of this? Initial abstraction should include
     !!        some of this interception...
@@ -2028,7 +2028,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: status
+    integer (c_int) :: status
 
     allocate( this%monthly_runoff( count( this%active ) ), stat=status)
     call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
@@ -2046,11 +2046,11 @@ contains
     use datetime, only           : DATETIME_T
 
     class (MODEL_DOMAIN_T), intent(inout)       :: this
-    integer (kind=c_int), intent(in)            :: indx
+    integer (c_int), intent(in)            :: indx
 
     ! [ LOCALS ]
     type (DATETIME_T), save     :: date_of_last_grid_update
-    real (kind=c_float)         :: interim_inflow
+    real (c_float)         :: interim_inflow
 
     if ( .not. ( date_of_last_grid_update == SIM_DT%curr ) ) then
       call runoff_gridded_values_update_ratios( )
@@ -2073,22 +2073,22 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)       :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int)              :: iNumActiveCells
-    integer (kind=c_int)              :: iStat
-    integer (kind=c_int)              :: iNumberOfLanduses
-    integer (kind=c_int)              :: iNumberOfSoilGroups
-    integer (kind=c_int)              :: iSoilsIndex
-    integer (kind=c_int)              :: iLUIndex
-    integer (kind=c_int), allocatable :: iLanduseCodes(:)
+    integer (c_int)              :: iNumActiveCells
+    integer (c_int)              :: iStat
+    integer (c_int)              :: iNumberOfLanduses
+    integer (c_int)              :: iNumberOfSoilGroups
+    integer (c_int)              :: iSoilsIndex
+    integer (c_int)              :: iLUIndex
+    integer (c_int), allocatable :: iLanduseCodes(:)
     type (STRING_LIST_T)              :: slList
     type (STRING_LIST_T)              :: slRZ
-    integer (kind=c_int), allocatable :: iRZ_SeqNums(:)
-    real (kind=c_float), allocatable  :: RZ(:)
+    integer (c_int), allocatable :: iRZ_SeqNums(:)
+    real (c_float), allocatable  :: RZ(:)
     character (len=:), allocatable    :: sText
-    real (kind=c_float), allocatable  :: water_capacity(:)
-    integer (kind=c_int)              :: iIndex
+    real (c_float), allocatable  :: water_capacity(:)
+    integer (c_int)              :: iIndex
     type (GENERAL_GRID_T), pointer    :: pRooting_Depth
-    real (kind=c_float), allocatable  :: fMax_Rooting_Depth(:,:)
+    real (c_float), allocatable  :: fMax_Rooting_Depth(:,:)
     character (len=10)                :: date_str
 
     type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
@@ -2229,7 +2229,7 @@ contains
 
     ! [ LOCALS ]
     type ( GENERAL_GRID_T ), pointer :: pTempGrd
-    integer (kind=c_int)             :: iStat
+    integer (c_int)             :: iStat
     type (DATA_CATALOG_ENTRY_T), pointer :: pSOIL_STORAGE_MAX_GRID
 
     pSOIL_STORAGE_MAX_GRID => null()
@@ -2293,7 +2293,7 @@ contains
   subroutine model_calculate_irrigation_none( this, indx )
 
     class (MODEL_DOMAIN_T), intent(inout)      :: this
-    integer (kind=c_int), intent(in)           :: indx
+    integer (c_int), intent(in)           :: indx
     !> Nothing here to see.
 
   end subroutine model_calculate_irrigation_none
@@ -2316,7 +2316,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: status
+    integer (c_int) :: status
 
     allocate( this%irrigation_mask( count( this%active ) ), stat=status )
     call assert( status==0, "Problem allocating memory.", &
@@ -2333,10 +2333,10 @@ contains
   use irrigation
 
     class (MODEL_DOMAIN_T), intent(inout)      :: this
-    integer (kind=c_int), intent(in)           :: indx
+    integer (c_int), intent(in)           :: indx
 
     ! [ LOCALS ]
-    integer (kind=c_int)               :: index
+    integer (c_int)               :: index
 
     ! if ( present(indx) ) then
 
@@ -2516,7 +2516,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int)            :: iStat
+    integer (c_int)            :: iStat
     type (GENERAL_GRID_T), pointer  :: pTempGrd
 
     pTempGrd => grid_Create( iNX=this%number_of_columns, iNY=this%number_of_rows, &
@@ -2601,7 +2601,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int)  :: status
+    integer (c_int)  :: status
 
     allocate( this%gdd( count( this%active ) ), stat=status )
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
@@ -2636,7 +2636,7 @@ contains
       class (MODEL_DOMAIN_T), intent(inout)  :: this
 
       ! [ LOCALS ]
-      integer (kind=c_int)  :: status
+      integer (c_int)  :: status
 
       allocate( this%gdd( count( this%active ) ), stat=status )
       call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
@@ -2682,7 +2682,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int)   :: jndx, indx_start, indx_end
+    integer (c_int)   :: jndx, indx_start, indx_end
 
     ! iterating over the list of cells or cell ranges to dump
     do jndx=lbound( DUMP, 1), ubound( DUMP, 1)
@@ -2725,7 +2725,7 @@ contains
 !     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
 !     ! [ LOCALS ]
-!     integer (kind=c_int)   :: indx, jndx
+!     integer (c_int)   :: indx, jndx
 
 !     do jndx=lbound( DUMP, 1), ubound( DUMP, 1)
 
@@ -2749,20 +2749,20 @@ contains
     use routing__D8, only            : get_cell_index, get_target_index
 
     class (MODEL_DOMAIN_T), intent(inout)       :: this
-    integer (kind=c_int), intent(in)            :: unitnum
-    integer (kind=c_int), intent(in)            :: indx_start
-    integer (kind=c_int), intent(in), optional  :: indx_end
+    integer (c_int), intent(in)            :: unitnum
+    integer (c_int), intent(in)            :: indx_start
+    integer (c_int), intent(in), optional  :: indx_end
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: kndx
-    integer (kind=c_int) :: target_indx
-    integer (kind=c_int) :: cell_indx
-    integer (kind=c_int) :: indx_end_l
-    integer (kind=c_int) :: indx
+    integer (c_int) :: kndx
+    integer (c_int) :: target_indx
+    integer (c_int) :: cell_indx
+    integer (c_int) :: indx_end_l
+    integer (c_int) :: indx
 
-    real (kind=c_float)  :: previous_5_day_rain(6)
-    real (kind=c_float)  :: monthly_runoff
-    real (kind=c_float)  :: monthly_gross_precip
+    real (c_float)  :: previous_5_day_rain(6)
+    real (c_float)  :: monthly_runoff
+    real (c_float)  :: monthly_gross_precip
 
     previous_5_day_rain     = -9999.0
     monthly_runoff          = -9999.0
@@ -2836,7 +2836,7 @@ contains
                                           ACTUAL_ET
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    integer (kind=c_int), intent(in)       :: indx
+    integer (c_int), intent(in)       :: indx
 
     call actual_et_gridded_values_calculate( this%active )
 
@@ -2866,7 +2866,7 @@ contains
     use actual_et__thornthwaite_mather_eqns, only : calculate_actual_et_thornthwaite_mather_eqns
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    integer (kind=c_int), intent(in)       :: indx
+    integer (c_int), intent(in)       :: indx
 
     call calculate_actual_et_thornthwaite_mather_eqns(                                                          &
                                                   actual_et=this%actual_et( indx ),                             &
@@ -2893,7 +2893,7 @@ contains
     use actual_et__thornthwaite_mather
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    integer (kind=c_int), intent(in)       :: indx
+    integer (c_int), intent(in)       :: indx
 
     call calculate_actual_et_thornthwaite_mather( actual_et=this%actual_et_soil( indx ),                        &
                                                   soil_storage=this%soil_storage( indx ),                       &
@@ -2922,10 +2922,10 @@ contains
     use actual_et__fao56
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    integer (kind=c_int), intent(in)       :: indx
+    integer (c_int), intent(in)       :: indx
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: landuse_index
+    integer (c_int) :: landuse_index
 
     landuse_index = this%landuse_index( indx )
 
@@ -2958,10 +2958,10 @@ contains
     use actual_et__fao56__two_stage
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    integer (kind=c_int), intent(in)       :: indx
+    integer (c_int), intent(in)       :: indx
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: landuse_index
+    integer (c_int) :: landuse_index
 
     landuse_index = this%landuse_index( indx )
 
@@ -3001,7 +3001,7 @@ contains
   subroutine model_calculate_direct_net_infiltration_none ( this, indx )
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    integer ( kind=c_int ), intent(in)     :: indx
+    integer ( c_int ), intent(in)     :: indx
 
   end subroutine model_calculate_direct_net_infiltration_none
 
@@ -3025,7 +3025,7 @@ contains
     use direct_net_infiltration__gridded_data
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    integer ( kind=c_int ), intent(in)     :: indx
+    integer ( c_int ), intent(in)     :: indx
 
     call direct_net_infiltration_calculate( direct_net_infiltration = this%direct_net_infiltration( indx ),      &
                                     indx=indx,                                           &
@@ -3047,7 +3047,7 @@ contains
   subroutine model_calculate_direct_soil_moisture_none ( this, indx )
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    integer ( kind=c_int ), intent(in)     :: indx
+    integer ( c_int ), intent(in)     :: indx
 
   end subroutine model_calculate_direct_soil_moisture_none
 
@@ -3071,7 +3071,7 @@ contains
     use direct_soil_moisture__gridded_data
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    integer ( kind=c_int ), intent(in)     :: indx
+    integer ( c_int ), intent(in)     :: indx
 
     call direct_soil_moisture_calculate( direct_soil_moisture = this%direct_soil_moisture( indx ),   &
                                          indx=indx,                                                  &
@@ -3092,7 +3092,7 @@ contains
   subroutine model_calculate_maximum_net_infiltration_none ( this, indx )
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    integer ( kind=c_int ), intent(in)     :: indx
+    integer ( c_int ), intent(in)     :: indx
 
   end subroutine model_calculate_maximum_net_infiltration_none
 
@@ -3116,7 +3116,7 @@ contains
     use maximum_net_infiltration__gridded_data
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    integer ( kind=c_int ), intent(in)     :: indx
+    integer ( c_int ), intent(in)     :: indx
 
     call maximum_net_infiltration_calculate( net_infiltration = this%net_infiltration( indx ),                      &
                                                rejected_net_infiltration = this%rejected_net_infiltration( indx ),  &
@@ -3189,7 +3189,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: indx
+    integer (c_int) :: indx
 
     call crop_coefficients_FAO56_update_growth_stage_dates( )
 
@@ -3356,7 +3356,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: status
+    integer (c_int) :: status
 
     allocate( this%monthly_gross_precip( count( this%active ) ), stat=status)
     call assert( status==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
@@ -3376,8 +3376,8 @@ contains
 
     ! [ LOCALS ]
     type (DATA_CATALOG_ENTRY_T), pointer :: pPRCP
-    integer (kind=c_int) :: targetindex
-    integer (kind=c_int) :: indexval
+    integer (c_int) :: targetindex
+    integer (c_int) :: indexval
 
     ! in this usage, it is assumed that the precipitation grids that are being read in represent
     ! MONTHLY sum of precipitation
@@ -3429,12 +3429,12 @@ contains
 
   subroutine minmaxmean_float( variable , varname, active_cells )
 
-    real (kind=c_float), dimension(:)  :: variable
+    real (c_float), dimension(:)  :: variable
     character (len=*), intent(in)      :: varname
     logical, dimension(:), optional    :: active_cells
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iCount
+    integer (c_int) :: iCount
     character (len=20)   :: sVarname
     character (len=14)   :: sMin
     character (len=14)   :: sMax
@@ -3482,12 +3482,12 @@ contains
 
   subroutine minmaxmean_int( variable , varname, active_cells )
 
-    integer (kind=c_int), dimension(:)  :: variable
+    integer (c_int), dimension(:)  :: variable
     character (len=*), intent(in)       :: varname
     logical, dimension(:), optional     :: active_cells
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iCount
+    integer (c_int) :: iCount
     character (len=20)   :: sVarname
     character (len=14)   :: sMin
     character (len=14)   :: sMax
@@ -3548,7 +3548,7 @@ contains
 
     call minmaxmean( this%latitude, "Lat")
     call minmaxmean( this%reference_ET0, "ET0")
-    call minmaxmean( real( this%actual_ET, kind=c_float), "actET")
+    call minmaxmean( real( this%actual_ET, c_float), "actET")
     call minmaxmean( this%inflow, "inflow")
     call minmaxmean( this%runon, "runon")
     call minmaxmean( this%runoff, "runoff")
@@ -3561,7 +3561,7 @@ contains
 
     call minmaxmean( this%interception_storage, "intcp_stor")
     call minmaxmean( this%snow_storage, "snow_stor")
-    call minmaxmean( real(this%soil_storage, kind=c_float), "soil_stor")
+    call minmaxmean( real(this%soil_storage, c_float), "soil_stor")
     call minmaxmean( this%soil_storage_max, "soil_stor_max")
     call minmaxmean( this%net_infiltration, "net_infiltration")
 

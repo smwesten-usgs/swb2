@@ -6,8 +6,8 @@ module solar_calculations
   use exceptions
   implicit none
 
-  real (kind=c_float) :: EARTH_SUN_DIST_Dr
-  real (kind=c_float) :: SOLAR_DECLINATION_Delta
+  real (c_float) :: EARTH_SUN_DIST_Dr
+  real (c_float) :: SOLAR_DECLINATION_Delta
 
 contains
 
@@ -23,8 +23,8 @@ contains
   !!       requirements)", Food and Agriculture Organization, Rome, Italy.
   function daylight_hours( dOmega_s )    result(dN)   bind(c)
 
-    real (kind=c_double), intent(in)   :: dOmega_s
-    real (kind=c_double)               :: dN
+    real (c_double), intent(in)   :: dOmega_s
+    real (c_double)               :: dN
 
     dN = 24_c_double / PI * dOmega_s
 
@@ -42,8 +42,8 @@ contains
 !
 !  subroutine daylight_hours_c(dOmega_s, dN)  bind(c, name="daylight_hours_c")
 !
-!    real (kind=c_double), intent(in), value        :: dOmega_s
-!    real (kind=c_double), intent(out)              :: dN
+!    real (c_double), intent(in), value        :: dOmega_s
+!    real (c_double), intent(out)              :: dN
 !
 !    dN = daylight_hours(dOmega_s)
 !
@@ -76,15 +76,15 @@ contains
   elemental function extraterrestrial_radiation__Ra(dLatitude, dDelta, dOmega_s, dDsubR)    result(dRa)
 
     ! [ ARGUMENTS ]
-    real (kind=c_double), intent(in) :: dLatitude
-    real (kind=c_double), intent(in) :: dDelta
-    real (kind=c_double), intent(in) :: dOmega_s
-    real (kind=c_double), intent(in) :: dDsubR
+    real (c_double), intent(in) :: dLatitude
+    real (c_double), intent(in) :: dDelta
+    real (c_double), intent(in) :: dOmega_s
+    real (c_double), intent(in) :: dDsubR
 
     ! [ LOCALS ]
-    real (kind=c_double) :: dRa
-    real (kind=c_double) :: dPartA, dPartB
-    real (kind=c_double), parameter :: dGsc = 0.0820_c_double  ! MJ / m**2 / min
+    real (c_double) :: dRa
+    real (c_double) :: dPartA, dPartB
+    real (c_double), parameter :: dGsc = 0.0820_c_double  ! MJ / m**2 / min
 
     dPartA = dOmega_s * sin( dLatitude ) * sin( dDelta )
     dPartB = cos( dLatitude ) * cos( dDelta ) * sin( dOmega_s )
@@ -111,11 +111,11 @@ contains
 
   function net_shortwave_radiation__Rns(dRs, dAlbedo)  result(dRns)
 
-    real(kind=c_double), intent(in) :: dRs
-    real(kind=c_double), intent(in) :: dAlbedo
+    real(c_double), intent(in) :: dRs
+    real(c_double), intent(in) :: dAlbedo
 
     ! [ LOCALS ]
-    real(kind=c_double) :: dRns
+    real(c_double) :: dRns
 
     dRns = (1_c_double - dAlbedo) * dRs
 
@@ -137,12 +137,12 @@ contains
 
   elemental function solar_declination_simple__delta(iDayOfYear, iNumDaysInYear) result(dDelta)
 
-    integer (kind=c_int), intent(in) :: iDayOfYear
-    integer (kind=c_int), intent(in) :: iNumDaysInYear
-    real (kind=c_double) :: dDelta
+    integer (c_int), intent(in) :: iDayOfYear
+    integer (c_int), intent(in) :: iNumDaysInYear
+    real (c_double) :: dDelta
 
     dDelta = 0.409_c_double &
-             * sin( (TWOPI * real(iDayOfYear, kind=c_double) / real(iNumDaysInYear, kind=c_double) ) &
+             * sin( (TWOPI * real(iDayOfYear, c_double) / real(iNumDaysInYear, c_double) ) &
   		          - 1.39_c_double)
 
   end function solar_declination_simple__delta
@@ -166,12 +166,12 @@ contains
 
   elemental function solar_declination__delta(iDayOfYear, iNumDaysInYear) result(dDelta)
 
-    integer (kind=c_int), intent(in) :: iDayOfYear
-    integer (kind=c_int), intent(in) :: iNumDaysInYear
-    real (kind=c_double) :: dDelta
+    integer (c_int), intent(in) :: iDayOfYear
+    integer (c_int), intent(in) :: iNumDaysInYear
+    real (c_double) :: dDelta
 
     ! [ LOCALS ]
-    real (kind=c_double) :: dGamma
+    real (c_double) :: dGamma
 
     dGamma = day_angle__gamma( iDayOfYear, iNumDaysInYear )
 
@@ -214,13 +214,13 @@ contains
   elemental function relative_earth_sun_distance__D_r( iDayOfYear, iNumDaysInYear )   result( dDsubR )
 
     ! [ ARGUMENTS ]
-    integer (kind=c_int), intent(in) :: iDayOfYear
-    integer (kind=c_int), intent(in) :: iNumDaysInYear
-    real (kind=c_double) :: dDsubR
+    integer (c_int), intent(in) :: iDayOfYear
+    integer (c_int), intent(in) :: iNumDaysInYear
+    real (c_double) :: dDsubR
 
     dDsubR = 1_c_double + 0.033_c_double &
-             * cos( TWOPI * real( iDayOfYear, kind=c_double )          &
-                                      / real( iNumDaysInYear, kind=c_double ) )
+             * cos( TWOPI * real( iDayOfYear, c_double )          &
+                                      / real( iNumDaysInYear, c_double ) )
 
   end function relative_earth_sun_distance__D_r
 
@@ -244,9 +244,9 @@ contains
 
    elemental function sunrise_sunset_angle__omega_s( dLatitude, dDelta ) result( dOmega_s )
 
-    real (kind=c_double), intent(in) :: dLatitude
-    real (kind=c_double), intent(in) :: dDelta
-    real (kind=c_double) :: dOmega_s
+    real (c_double), intent(in) :: dLatitude
+    real (c_double), intent(in) :: dDelta
+    real (c_double) :: dOmega_s
 
     dOmega_s = acos( - tan(dLatitude) * tan(dDelta) )
 
@@ -273,13 +273,13 @@ contains
 
   function solar_radiation_Hargreaves__Rs( dRa, fTMin, fTMax )   result( dRs )   bind(c)
 
-    real (kind=c_double), intent(in) :: dRa
-    real (kind=c_float), intent(in)  :: fTMin
-    real (kind=c_float), intent(in)  :: fTMax
-    real (kind=c_double)             :: dRs
+    real (c_double), intent(in) :: dRa
+    real (c_float), intent(in)  :: fTMin
+    real (c_float), intent(in)  :: fTMax
+    real (c_double)             :: dRs
 
     ! [ LOCALS ]
-    real (kind=c_double), parameter :: dKRs = 0.175
+    real (c_double), parameter :: dKRs = 0.175
 
     dRs = dKRs * sqrt( C_to_K(fTMax) - C_to_K(fTMin) ) * dRa
 
@@ -301,12 +301,12 @@ contains
 
   elemental function estimate_percent_of_possible_sunshine__psun(fTMax, fTMin)  result(fPsun)
 
-    real (kind=c_float), intent(in) :: fTMax   ! Kelvin degrees
-    real (kind=c_float), intent(in) :: fTMin   ! Kelvin degrees
-    real (kind=c_float) :: fPsun
+    real (c_float), intent(in) :: fTMax   ! Kelvin degrees
+    real (c_float), intent(in) :: fTMin   ! Kelvin degrees
+    real (c_float) :: fPsun
 
     ! [ LOCALS ]
-    real (kind=c_float), parameter :: fKRs = 0.175
+    real (c_float), parameter :: fKRs = 0.175
 
     fPsun = ( 2_c_float * fKRs * sqrt( fTMAX - fTMIN ) ) - 0.5_c_float
 
@@ -343,14 +343,14 @@ contains
 
   function clear_sky_solar_radiation__Rso( dRa, dAs, dBs )   result( dRso )   bind(c)
 
-    real (kind=c_double), intent(in)           :: dRa
-    real (kind=c_double), intent(in), optional :: dAs
-    real (kind=c_double), intent(in),optional  :: dBs
-    real (kind=c_double)                       :: dRso
+    real (c_double), intent(in)           :: dRa
+    real (c_double), intent(in), optional :: dAs
+    real (c_double), intent(in),optional  :: dBs
+    real (c_double)                       :: dRso
 
     ! [ LOCALS ]
-    real (kind=c_double) :: dAs_l
-    real (kind=c_double) :: dBs_l
+    real (c_double) :: dAs_l
+    real (c_double) :: dBs_l
 
     ! assign default value to As if none is provided
     if ( present( dAs ) ) then
@@ -391,9 +391,9 @@ contains
 
   function clear_sky_solar_radiation_noAB__Rso(dRa, fElevation) result(dRso)
 
-    real (kind=c_double), intent(in) :: dRa
-    real (kind=c_float), intent(in)  :: fElevation
-    real (kind=c_double)             :: dRso
+    real (c_double), intent(in) :: dRa
+    real (c_float), intent(in)  :: fElevation
+    real (c_double)             :: dRso
 
     dRso = ( 0.75_c_double + 1.0E-5_c_double * fElevation ) * dRa
 
@@ -422,11 +422,11 @@ contains
 
   elemental function solar_radiation__Rs(dRa, dAs, dBs, fPctSun) result(dRs)
 
-    real (kind=c_double), intent(in) :: dRa
-    real (kind=c_double), intent(in) :: dAs
-    real (kind=c_double), intent(in) :: dBs
-    real (kind=c_double), intent(in) :: fPctSun
-    real (kind=c_double)             :: dRs
+    real (c_double), intent(in) :: dRa
+    real (c_double), intent(in) :: dAs
+    real (c_double), intent(in) :: dBs
+    real (c_double), intent(in) :: fPctSun
+    real (c_double)             :: dRs
 
     dRs = ( dAs + (dBs * fPctSun / 100_c_float ) ) * dRa
 
@@ -453,18 +453,18 @@ contains
 
   elemental function net_longwave_radiation__Rnl(fTMin, fTMax, dRs, dRso)  result(dRnl)
 
-    real(kind=c_float), intent(in)  :: fTMin
-    real(kind=c_float), intent(in)  :: fTMax
-    real(kind=c_double), intent(in) :: dRs
-    real(kind=c_double), intent(in) :: dRso
-    real(kind=c_double)             :: dRnl
+    real(c_float), intent(in)  :: fTMin
+    real(c_float), intent(in)  :: fTMax
+    real(c_double), intent(in) :: dRs
+    real(c_double), intent(in) :: dRso
+    real(c_double)             :: dRnl
 
     ! [ LOCALS ]
-    real(kind=c_double)             :: dTAvg_K
-    real(kind=c_double)             :: dTAvg_4
-    real (kind=c_double)            :: d_ea
-    real (kind=c_double)            :: dCloudFrac
-    real (kind=c_double), parameter :: dSIGMA = 4.903E-9_c_double
+    real(c_double)             :: dTAvg_K
+    real(c_double)             :: dTAvg_4
+    real (c_double)            :: d_ea
+    real (c_double)            :: dCloudFrac
+    real (c_double), parameter :: dSIGMA = 4.903E-9_c_double
 
     dTAvg_K = C_to_K((fTMin + fTMax ) / 2.0_c_float )
 
@@ -497,9 +497,9 @@ contains
 
   elemental function day_angle__gamma(iDayOfYear, iNumDaysInYear)     result(dGamma)
 
-    integer (kind=c_int), intent(in)   :: iDayOfYear
-    integer (kind=c_int), intent(in)   :: iNumDaysInYear
-    real (kind=c_double)               :: dGamma
+    integer (c_int), intent(in)   :: iDayOfYear
+    integer (c_int), intent(in)   :: iNumDaysInYear
+    real (c_double)               :: dGamma
 
     dGamma = TWOPI * ( iDayOfYear - 1 ) / iNumDaysInYear
 
@@ -516,8 +516,8 @@ contains
 
   function solar_altitude__alpha( dTheta_z )    result( dAlpha )   bind(c)
 
-    real (kind=c_double), intent(in)   :: dTheta_z
-    real (kind=c_double)               :: dAlpha
+    real (c_double), intent(in)   :: dTheta_z
+    real (c_double)               :: dAlpha
 
     call assert( dTheta_z >= 0.0_c_double .and. dTheta_z <= HALFPI, &
       "Internal programming error: solar zenith angle must be in radians and in the range 0 to pi/2", &
@@ -551,13 +551,13 @@ contains
 
 	function zenith_angle__theta_z( dLatitude, dDelta, dOmega ) result( dTheta_z )     bind(c)
 
-	  real (kind=c_double), intent(in)            :: dLatitude
-	  real (kind=c_double), intent(in)            :: dDelta
-    real (kind=c_double), intent(in), optional  :: dOmega
+	  real (c_double), intent(in)            :: dLatitude
+	  real (c_double), intent(in)            :: dDelta
+    real (c_double), intent(in), optional  :: dOmega
 
 	  ! [ LOCALS ]
-	  real (kind=c_double) :: dTheta_z
-    real (kind=c_double) :: dOmega_l
+	  real (c_double) :: dTheta_z
+    real (c_double) :: dOmega_l
 
     if ( present( dOmega ) ) then
       dOmega_l = dOmega_l
@@ -591,13 +591,13 @@ contains
 
   function azimuth_angle__psi(rAlpha, rLatitude, rDelta)   result(rPsi)    bind(c)
 
-    real (kind=c_double), intent(in)      :: rAlpha
-    real (kind=c_double), intent(in)      :: rLatitude
-    real (kind=c_double), intent(in)      :: rDelta
-    real (kind=c_double)                  :: rPsi
+    real (c_double), intent(in)      :: rAlpha
+    real (c_double), intent(in)      :: rLatitude
+    real (c_double), intent(in)      :: rDelta
+    real (c_double)                  :: rPsi
 
     ! [ LOCALS ]
-    real (kind=c_double) :: rTempval
+    real (c_double) :: rTempval
 
     rTempval = ( sin( rAlpha ) * sin( rLatitude ) - sin( rDelta ) )          &
               /   ( cos( rAlpha ) * cos( rLatitude ) )

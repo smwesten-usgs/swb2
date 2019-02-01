@@ -43,7 +43,7 @@ module dictionary
     type (DICT_ENTRY_T), pointer   :: first   => null()
     type (DICT_ENTRY_T), pointer   :: last    => null()
     type (DICT_ENTRY_T), pointer   :: current => null()
-    integer (kind=c_int)           :: count   = 0
+    integer (c_int)           :: count   = 0
 
   contains
 
@@ -132,7 +132,7 @@ contains
   subroutine add_float_sub(this, fValue)
 
     class (DICT_ENTRY_T)             :: this
-    real (kind=c_float), intent(in)  :: fValue
+    real (c_float), intent(in)  :: fValue
 
     call this%sl%append( asCharacter( fValue ) )
 
@@ -143,7 +143,7 @@ contains
   subroutine add_integer_sub(this, iValue)
 
     class (DICT_ENTRY_T)               :: this
-    integer (kind=c_int), intent(in)   :: iValue
+    integer (c_int), intent(in)   :: iValue
 
     call this%sl%append( asCharacter( iValue ) )
 
@@ -154,7 +154,7 @@ contains
   subroutine add_double_sub(this, dValue)
 
     class (DICT_ENTRY_T)               :: this
-    real (kind=c_double), intent(in)   :: dValue
+    real (c_double), intent(in)   :: dValue
 
     call this%sl%append( asCharacter( dValue ) )
 
@@ -165,7 +165,7 @@ contains
   subroutine add_logical_sub(this, lValue)
 
     class (DICT_ENTRY_T)                :: this
-    logical (kind=c_bool), intent(in)   :: lValue
+    logical (c_bool), intent(in)   :: lValue
 
     call this%sl%append( asCharacter( lValue ) )
 
@@ -207,11 +207,11 @@ contains
   function get_entry_by_index_fn(this, iIndex)   result( pDict )
 
     class (DICT_T)                   :: this
-    integer (kind=c_int), intent(in) :: iIndex
+    integer (c_int), intent(in) :: iIndex
     type (DICT_ENTRY_T), pointer     :: pDict
 
     ! [ LOCALS ]
-    integer (kind=c_int)  :: iCurrentIndex
+    integer (c_int)  :: iCurrentIndex
 
     iCurrentIndex = 1
 
@@ -302,7 +302,7 @@ contains
     type (STRING_LIST_T)             :: slString
 
     ! [ LOCALS ]
-    integer (kind=c_int)             :: iIndex
+    integer (c_int)             :: iIndex
 
     this%current => this%first
 
@@ -327,11 +327,11 @@ function key_name_already_in_use_fn(this, sKey)   result( in_use )
 
   class (DICT_T)                   :: this
   character (len=*), intent(in)    :: sKey
-  logical (kind=c_bool)            :: in_use
+  logical (c_bool)            :: in_use
 
   ! [ LOCALS ]
-  integer (kind=c_int)             :: iIndex
-  integer (kind=c_int)             :: iCount
+  integer (c_int)             :: iIndex
+  integer (c_int)             :: iCount
 
   this%current => this%first
   iCount = 0
@@ -370,7 +370,7 @@ function find_dict_entry_fn(this, sSearchKey)   result( pDict )
   type (DICT_ENTRY_T), pointer  :: pDict
 
   ! [ LOCALS ]
-  integer (kind=c_int)             :: iIndex
+  integer (c_int)             :: iIndex
 
   pDict => null()
   this%current => this%first
@@ -402,7 +402,7 @@ end function find_dict_entry_fn
     type (DICT_ENTRY_T), pointer  :: dict_entry
 
     type (DICT_ENTRY_T), pointer  :: temp_dict_entry
-    integer (kind=c_int)          :: iIndex
+    integer (c_int)          :: iIndex
 
     temp_dict_entry => null()
 
@@ -502,14 +502,14 @@ end function find_dict_entry_fn
 
     class (DICT_T)                                  :: this
     character (len=*), intent(in)                   :: sKey
-    integer (kind=c_int), allocatable, intent(out)  :: iValues(:)
-    logical (kind=c_bool), optional                 :: is_fatal
+    integer (c_int), allocatable, intent(out)  :: iValues(:)
+    logical (c_bool), optional                 :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
-    integer (kind=c_int)           :: iStat
-    logical (kind=c_bool)          :: is_fatal_l
-    logical (kind=c_bool)          :: empty_entries
+    integer (c_int)           :: iStat
+    logical (c_bool)          :: is_fatal_l
+    logical (c_bool)          :: empty_entries
 
     if ( present( is_fatal ) ) then
       is_fatal_l = is_fatal
@@ -551,14 +551,14 @@ end function find_dict_entry_fn
 
     class (DICT_T)                                   :: this
     character (len=*), intent(in)                    :: sKey
-    logical (kind=c_bool), allocatable, intent(out)  :: lValues(:)
-    logical (kind=c_bool), optional                 :: is_fatal
+    logical (c_bool), allocatable, intent(out)  :: lValues(:)
+    logical (c_bool), optional                 :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
-    integer (kind=c_int)           :: iStat
-    logical (kind=c_bool)          :: is_fatal_l
-    logical (kind=c_bool)          :: empty_entries
+    integer (c_int)           :: iStat
+    logical (c_bool)          :: is_fatal_l
+    logical (c_bool)          :: empty_entries
 
     if ( present( is_fatal ) ) then
       is_fatal_l = is_fatal
@@ -609,16 +609,16 @@ end function find_dict_entry_fn
 
     class (DICT_T)                                     :: this
     type (STRING_LIST_T), intent(in)                   :: slKeys
-    logical (kind=c_bool), allocatable, intent(out)    :: lValues(:)
-    logical (kind=c_bool), optional                    :: is_fatal
+    logical (c_bool), allocatable, intent(out)    :: lValues(:)
+    logical (c_bool), optional                    :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
-    integer (kind=c_int)           :: iStat
-    integer (kind=c_int)           :: iCount
+    integer (c_int)           :: iStat
+    integer (c_int)           :: iCount
     character (len=:), allocatable :: sText
-    logical (kind=c_bool)          :: is_fatal_l
-    logical (kind=c_bool)          :: empty_entries
+    logical (c_bool)          :: is_fatal_l
+    logical (c_bool)          :: empty_entries
 
     if ( present( is_fatal ) ) then
       is_fatal_l = is_fatal
@@ -673,15 +673,15 @@ end function find_dict_entry_fn
     class (DICT_T)                                     :: this
     type (STRING_LIST_T), intent(in)                   :: slKeys
     type ( STRING_LIST_T ), intent(out)                :: slString
-    logical (kind=c_bool), optional                    :: is_fatal
+    logical (c_bool), optional                    :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
-    integer (kind=c_int)           :: iStat
-    integer (kind=c_int)           :: iCount
+    integer (c_int)           :: iStat
+    integer (c_int)           :: iCount
     character (len=:), allocatable :: sText
-    logical (kind=c_bool)          :: is_fatal_l
-    logical (kind=c_bool)          :: empty_entries
+    logical (c_bool)          :: is_fatal_l
+    logical (c_bool)          :: empty_entries
 
     if ( present( is_fatal ) ) then
       is_fatal_l = is_fatal
@@ -731,14 +731,14 @@ end function find_dict_entry_fn
     class (DICT_T)                                  :: this
     character(len=:), allocatable, intent(out)      :: sText
     character (len=*), intent(in), optional         :: sKey
-    integer (kind=c_int), intent(in), optional      :: iIndex
-    logical (kind=c_bool), optional                 :: is_fatal
+    integer (c_int), intent(in), optional      :: iIndex
+    logical (c_bool), optional                 :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
-    integer (kind=c_int)           :: iStat
-    logical (kind=c_bool)          :: is_fatal_l
-    logical (kind=c_bool)          :: empty_entries
+    integer (c_int)           :: iStat
+    logical (c_bool)          :: is_fatal_l
+    logical (c_bool)          :: empty_entries
 
     if ( present( is_fatal ) ) then
       is_fatal_l = is_fatal
@@ -769,13 +769,13 @@ end function find_dict_entry_fn
     class (DICT_T)                                  :: this
     character (len=*), intent(in)                   :: sKey
     type (STRING_LIST_T), intent(out)               :: slString
-    logical (kind=c_bool), optional                 :: is_fatal
+    logical (c_bool), optional                 :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
-    integer (kind=c_int)           :: iStat
-    logical (kind=c_bool)          :: is_fatal_l
-    logical (kind=c_bool)          :: empty_entries
+    integer (c_int)           :: iStat
+    logical (c_bool)          :: is_fatal_l
+    logical (c_bool)          :: empty_entries
 
     pTarget => this%get_entry(sKey)
 
@@ -822,16 +822,16 @@ end function find_dict_entry_fn
 
     class (DICT_T)                                     :: this
     type (STRING_LIST_T), intent(in)                   :: slKeys
-    integer (kind=c_int), allocatable, intent(out)     :: iValues(:)
-    logical (kind=c_bool), optional                    :: is_fatal
+    integer (c_int), allocatable, intent(out)     :: iValues(:)
+    logical (c_bool), optional                    :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
-    integer (kind=c_int)           :: iStat
-    integer (kind=c_int)           :: iCount
+    integer (c_int)           :: iStat
+    integer (c_int)           :: iCount
     character (len=256)            :: sText
-    logical (kind=c_bool)          :: is_fatal_l
-    logical (kind=c_bool)          :: empty_entries
+    logical (c_bool)          :: is_fatal_l
+    logical (c_bool)          :: empty_entries
 
     if ( present( is_fatal ) ) then
       is_fatal_l = is_fatal
@@ -896,16 +896,16 @@ end function find_dict_entry_fn
 
     class (DICT_T)                                    :: this
     type (STRING_LIST_T), intent(in)                  :: slKeys
-    real (kind=c_float), allocatable, intent(out)     :: fValues(:)
-    logical (kind=c_bool), optional                   :: is_fatal
+    real (c_float), allocatable, intent(out)     :: fValues(:)
+    logical (c_bool), optional                   :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
-    integer (kind=c_int)           :: iStat
-    integer (kind=c_int)           :: iCount
+    integer (c_int)           :: iStat
+    integer (c_int)           :: iCount
     character (len=:), allocatable :: sText
-    logical (kind=c_bool)          :: is_fatal_l
-    logical (kind=c_bool)          :: empty_entries
+    logical (c_bool)          :: is_fatal_l
+    logical (c_bool)          :: empty_entries
 
     if ( present( is_fatal ) ) then
       is_fatal_l = is_fatal
@@ -961,14 +961,14 @@ end function find_dict_entry_fn
 
     class (DICT_T)                                    :: this
     character (len=*), intent(in)                     :: sKey
-    real (kind=c_float), allocatable, intent(out)     :: fValues(:)
-    logical (kind=c_bool), optional                   :: is_fatal
+    real (c_float), allocatable, intent(out)     :: fValues(:)
+    logical (c_bool), optional                   :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
-    integer (kind=c_int)           :: iStat
-    logical (kind=c_bool)          :: is_fatal_l
-    logical (kind=c_bool)          :: empty_entries
+    integer (c_int)           :: iStat
+    logical (c_bool)          :: is_fatal_l
+    logical (c_bool)          :: empty_entries
 
     pTarget => this%get_entry(sKey)
 
@@ -1003,16 +1003,16 @@ end function find_dict_entry_fn
   subroutine print_all_dictionary_entries_sub(this, iLogLevel, lEcho )
 
     class (DICT_T)                               :: this
-    integer (kind=c_int), intent(in), optional   :: iLogLevel
-    logical (kind=c_bool), intent(in), optional  :: lEcho
+    integer (c_int), intent(in), optional   :: iLogLevel
+    logical (c_bool), intent(in), optional  :: lEcho
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: current
     character (len=512)            :: sTempBuf
-    integer (kind=c_int)           :: iCount
-    integer (kind=c_int)           :: iIndex
-    integer (kind=c_int)           :: iLogLevel_l
-    logical (kind=c_bool)          :: lEcho_l
+    integer (c_int)           :: iCount
+    integer (c_int)           :: iIndex
+    integer (c_int)           :: iLogLevel_l
+    logical (c_bool)          :: lEcho_l
 
     if ( present( iLogLevel ) ) then
       iLogLevel_l = iLogLevel

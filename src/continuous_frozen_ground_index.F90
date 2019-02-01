@@ -15,15 +15,15 @@ module continuous_frozen_ground_index
 
 
   !> @TODO: make these into user-accessible variables
-  real (kind=c_float)               :: CFGI_LL = 55.
-  real (kind=c_float)               :: CFGI_UL = 83.
+  real (c_float)               :: CFGI_LL = 55.
+  real (c_float)               :: CFGI_UL = 83.
 
 contains
 
   subroutine initialize_continuous_frozen_ground_index( cfgi, active_cells )
 
-    real (kind=c_float), intent(inout)  :: cfgi(:)
-    logical (kind=c_bool), intent(in)   :: active_cells(:,:)
+    real (c_float), intent(inout)  :: cfgi(:)
+    logical (c_bool), intent(in)   :: active_cells(:,:)
 
     ! [ LOCALS ]
     type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_CFGI
@@ -76,20 +76,20 @@ contains
   elemental subroutine update_continuous_frozen_ground_index( fCFGI, fTMax_F, fTMin_F, fSnowCover )
 
     ! [ ARGUMENTS ]
-    real (kind=c_float), intent(inout)       :: fCFGI
-    real (kind=c_float), intent(in)          :: fTMax_F
-    real (kind=c_float), intent(in)          :: fTMin_F
-    real (kind=c_float), intent(in)          :: fSnowCover
+    real (c_float), intent(inout)       :: fCFGI
+    real (c_float), intent(in)          :: fTMax_F
+    real (c_float), intent(in)          :: fTMin_F
+    real (c_float), intent(in)          :: fSnowCover
 
     ! [ LOCALS ]
-    real (kind=c_float), parameter    :: fDecay_Coefficient_A                      = 0.97_c_float
-    real (kind=c_float), parameter    :: fSnow_Reduction_Coefficient_Freezing      = 0.08_c_float
-    real (kind=c_float), parameter    :: fSnow_Reduction_Coefficient_Thawing       = 0.5_c_float
-    real (kind=c_float), parameter    :: fCM_PER_INCH                              = 2.54_c_float
-    real (kind=c_float), parameter    :: FREEZING_POINT_DEG_C                      = 0.0_c_float
+    real (c_float), parameter    :: fDecay_Coefficient_A                      = 0.97_c_float
+    real (c_float), parameter    :: fSnow_Reduction_Coefficient_Freezing      = 0.08_c_float
+    real (c_float), parameter    :: fSnow_Reduction_Coefficient_Thawing       = 0.5_c_float
+    real (c_float), parameter    :: fCM_PER_INCH                              = 2.54_c_float
+    real (c_float), parameter    :: FREEZING_POINT_DEG_C                      = 0.0_c_float
 
-    real (kind=c_float) :: fTAvg_C              ! temporary variable holding avg temp in C
-    real (kind=c_float) :: fSnowDepthCM         ! snow depth in centimeters
+    real (c_float) :: fTAvg_C              ! temporary variable holding avg temp in C
+    real (c_float) :: fSnowDepthCM         ! snow depth in centimeters
 
 
     fTAvg_C = F_to_C( (fTMax_F + fTMin_F) / 2.0_c_float )

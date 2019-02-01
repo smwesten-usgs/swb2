@@ -25,10 +25,10 @@ module logfiles
   type LOGFILE_T
     character (len=:), allocatable  :: sFilePrefix
     character (len=64)              :: sFilename(2)
-    logical (kind=c_bool)           :: lIsOpen(2)       = .false._c_bool
-    integer (kind=c_int)            :: iUnitNum(2)
-    integer (kind=c_int)            :: iStat(2)
-    integer (kind=c_int)            :: iLogLevel        = LOG_GENERAL
+    logical (c_bool)           :: lIsOpen(2)       = .false._c_bool
+    integer (c_int)            :: iUnitNum(2)
+    integer (c_int)            :: iStat(2)
+    integer (c_int)            :: iLogLevel        = LOG_GENERAL
 
   contains
 
@@ -60,10 +60,10 @@ module logfiles
 
   type (LOGFILE_T), public :: LOGS
 
-  integer (kind=c_int)               :: CURRENT_LOG_LEVEL     = LOG_GENERAL
-  logical (kind=c_bool)              :: CURRENT_LOG_ECHO      = .false._c_bool
+  integer (c_int)               :: CURRENT_LOG_LEVEL     = LOG_GENERAL
+  logical (c_bool)              :: CURRENT_LOG_ECHO      = .false._c_bool
   character (len=64)                 :: OUTPUT_DIRECTORY_NAME = ""
-  logical (kind=c_bool), parameter   :: TRUE = .true._c_bool
+  logical (c_bool), parameter   :: TRUE = .true._c_bool
 
 contains
 
@@ -81,7 +81,7 @@ contains
   subroutine set_log_level_sub( this, iLogLevel )
 
     class (LOGFILE_T)                           :: this
-    integer (kind=c_int), intent(in)            :: iLogLevel
+    integer (c_int), intent(in)            :: iLogLevel
 
     CURRENT_LOG_LEVEL = iLogLevel
 
@@ -92,7 +92,7 @@ contains
   subroutine set_screen_echo_sub( this, lEcho )
 
     class (LOGFILE_T)                           :: this
-    logical (kind=c_bool), intent(in)           :: lEcho
+    logical (c_bool), intent(in)           :: lEcho
 
     CURRENT_LOG_ECHO = lEcho
 
@@ -103,14 +103,14 @@ contains
   subroutine initialize_logfiles_sub(this, iLogLevel, sFilePrefix, lWrite_SWB_Info )
 
     class (LOGFILE_T)                            :: this
-    integer (kind=c_int), intent(in), optional   :: iLogLevel
+    integer (c_int), intent(in), optional   :: iLogLevel
     character (len=*), intent(in), optional      :: sFilePrefix
-    logical (kind=c_bool), intent(in), optional  :: lWrite_SWB_Info
+    logical (c_bool), intent(in), optional  :: lWrite_SWB_Info
 
 
     ! [ LOCALS ]
-    integer (kind=c_int)    :: iLogLevel_l
-    logical (kind=c_bool)   :: lWrite_SWB_Info_l
+    integer (c_int)    :: iLogLevel_l
+    logical (c_bool)   :: lWrite_SWB_Info_l
 
     if ( present( lWrite_SWB_Info) ) then
       lWrite_SWB_Info_l = lWrite_SWB_Info
@@ -140,14 +140,14 @@ contains
   subroutine open_files_write_access_sub(this, lWrite_SWB_Info )
 
     class (LOGFILE_T), intent(inout)             :: this
-    logical (kind=c_bool), intent(in), optional  :: lWrite_SWB_Info
+    logical (c_bool), intent(in), optional  :: lWrite_SWB_Info
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iIndex
+    integer (c_int) :: iIndex
     character (len=:), allocatable   :: sFilename
     character (len=:), allocatable   :: sDatetime
     character (len=12)               :: sDescriptor(2) = [ "         ", "_DEBUG   " ]
-    logical (kind=c_bool)            :: lWrite_SWB_Info_l
+    logical (c_bool)            :: lWrite_SWB_Info_l
 
     if ( present( lWrite_SWB_Info) ) then
       lWrite_SWB_Info_l = lWrite_SWB_Info
@@ -205,7 +205,7 @@ contains
     class (LOGFILE_T)    :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iIndex
+    integer (c_int) :: iIndex
 
     do iIndex = 1,2
 
@@ -227,7 +227,7 @@ contains
     class (LOGFILE_T)     :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iValues(8)
+    integer (c_int) :: iValues(8)
     character (len=2)    :: sHour
     character (len=2)    :: sMinutes
     character (len=2)    :: sSeconds
@@ -257,16 +257,16 @@ contains
 
     class (LOGFILE_T)                            :: this
     character (len=*), intent(in)                :: sMessage
-    integer (kind=c_int), intent(in), optional   :: iTab
-    integer (kind=c_int), intent(in), optional   :: iLinesBefore
-    integer (kind=c_int), intent(in), optional   :: iLinesAfter
-    integer (kind=c_int), intent(in), optional   :: iLogLevel
-    logical (kind=c_bool), intent(in), optional  :: lEcho
+    integer (c_int), intent(in), optional   :: iTab
+    integer (c_int), intent(in), optional   :: iLinesBefore
+    integer (c_int), intent(in), optional   :: iLinesAfter
+    integer (c_int), intent(in), optional   :: iLogLevel
+    logical (c_bool), intent(in), optional  :: lEcho
 
     ! [ LOCALS ]
-    integer (kind=c_int)  :: iTab_l
-    integer (kind=c_int)  :: iLinesBefore_l
-    integer (kind=c_int)  :: iLinesAfter_l
+    integer (c_int)  :: iTab_l
+    integer (c_int)  :: iLinesBefore_l
+    integer (c_int)  :: iLinesAfter_l
 
     if (present(iLogLevel) )   call this%set_loglevel( iLogLevel )
     if (present(lEcho) )       call this%set_echo( lEcho )
@@ -338,18 +338,18 @@ contains
 
     ! [ ARGUMENTS ]
     character (len=*), intent(in)     :: sMessageText
-    integer (kind=c_int), intent(in)  :: iLU
-    integer (kind=c_int), intent(in)  :: iTab
-    integer (kind=c_int), intent(in)  :: iLinesBefore
-    integer (kind=c_int), intent(in)  :: iLinesAfter
+    integer (c_int), intent(in)  :: iLU
+    integer (c_int), intent(in)  :: iTab
+    integer (c_int), intent(in)  :: iLinesBefore
+    integer (c_int), intent(in)  :: iLinesAfter
 
 
     ! [ LOCALS ]
     character (len=len(sMessageText) ) :: sRecord
     character (len=256) :: sItem
-    logical (kind=c_bool) :: lFileOpen
+    logical (c_bool) :: lFileOpen
     character (len=12) :: sFmt
-    integer (kind=c_int) :: iIndex
+    integer (c_int) :: iIndex
 
     inquire (unit=iLU, opened=lFileOpen)
 
@@ -393,7 +393,7 @@ contains
 
     ! [ LOCALS ]
     character (len=1)    :: sDelimiter
-    integer (kind=c_int) :: iIndex
+    integer (c_int) :: iIndex
 
     sDelimiter = "~"
 
@@ -431,7 +431,7 @@ contains
     character (len=:), allocatable   :: sDatetime
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iValues(8)
+    integer (c_int) :: iValues(8)
     character (len=2)    :: sHour
     character (len=2)    :: sMinutes
     character (len=2)    :: sSeconds

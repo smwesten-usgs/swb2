@@ -4,7 +4,7 @@ module actual_et__thornthwaite_mather
   use iso_c_binding, only : c_short, c_int, c_float, c_double
   implicit none
 
-  real (kind=c_float), parameter :: NEAR_ZERO = 1.0e-9_c_float
+  real (c_float), parameter :: NEAR_ZERO = 1.0e-9_c_float
 
 contains
 
@@ -15,15 +15,15 @@ contains
                                                   precipitation,                     &
                                                   crop_etc )
 
-    real (kind=c_double), intent(inout)            :: actual_et
-    real (kind=c_double), intent(in)               :: soil_storage
-    real (kind=c_float), intent(in)                :: soil_storage_max
-    real (kind=c_float), intent(in)                :: precipitation
-    real (kind=c_float), intent(in)                :: crop_etc
+    real (c_double), intent(inout)            :: actual_et
+    real (c_double), intent(in)               :: soil_storage
+    real (c_float), intent(in)                :: soil_storage_max
+    real (c_float), intent(in)                :: precipitation
+    real (c_float), intent(in)                :: crop_etc
 
     ! [ LOCALS ]
-    real (kind=c_float)  :: P_minus_PE
-    real (kind=c_double) :: soil_storage_temp
+    real (c_float)  :: P_minus_PE
+    real (c_double) :: soil_storage_temp
 
     P_minus_PE = precipitation - crop_etc
 

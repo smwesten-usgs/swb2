@@ -33,9 +33,9 @@ module string_list
 
     type (STRING_LIST_ELEMENT_T), pointer        :: first        => null()
     type (STRING_LIST_ELEMENT_T), pointer        :: last         => null()
-    logical (kind=c_bool)                        :: autocleanup  = TRUE
-    integer (kind=c_int)                         :: count        = 0
-    logical (kind=c_bool)                        :: is_populated = FALSE
+    logical (c_bool)                        :: autocleanup  = TRUE
+    integer (c_int)                         :: count        = 0
+    logical (c_bool)                        :: is_populated = FALSE
 
   contains
 
@@ -89,7 +89,7 @@ contains
   subroutine list_append_int_sub( this, iValue )
 
     class (STRING_LIST_T), intent(inout)   :: this
-    integer (kind=c_int), intent(in)       :: iValue
+    integer (c_int), intent(in)       :: iValue
 
     call this%list_append_string_sub( asCharacter(iValue) )
 
@@ -100,7 +100,7 @@ contains
   subroutine list_set_auto_cleanup_sub( this, autocleanup )
 
     class (STRING_LIST_T), intent(inout)    :: this
-    logical (kind=c_bool), intent(in)       :: autocleanup
+    logical (c_bool), intent(in)       :: autocleanup
 
     this%autocleanup = autocleanup
 
@@ -114,7 +114,7 @@ contains
     type (STRING_LIST_T), intent(in)    :: slList1
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iIndex
+    integer (c_int) :: iIndex
 
     if ( slList1%count > 0 ) then
 
@@ -137,7 +137,7 @@ contains
 
     ! [ LOCALS ]
     type (STRING_LIST_ELEMENT_T), pointer   :: pNewElement
-    integer (kind=c_int)                     :: iStat
+    integer (c_int)                     :: iStat
 
     pNewElement => null()
 
@@ -178,11 +178,11 @@ contains
   subroutine list_replace_value_at_index_sub(this, iIndex, sText)
 
     class (STRING_LIST_T), intent(in)        :: this
-    integer (kind=c_int), intent(in)         :: iIndex
+    integer (c_int), intent(in)         :: iIndex
     character (len=*), intent(in)            :: sText
 
     ! [ LOCALS ]
-    integer (kind=c_int)                      :: iCount
+    integer (c_int)                      :: iCount
     type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
 
     iCount = 0
@@ -215,11 +215,11 @@ contains
   function list_get_value_at_index_fn(this, iIndex)   result(sText)
 
     class (STRING_LIST_T), intent(in)        :: this
-    integer (kind=c_int), intent(in)         :: iIndex
+    integer (c_int), intent(in)         :: iIndex
     character (len=:), allocatable           :: sText
 
     ! [ LOCALS ]
-    integer (kind=c_int)                      :: iCount
+    integer (c_int)                      :: iCount
     type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
 
     iCount = 1
@@ -251,12 +251,12 @@ contains
   function list_get_values_in_range_fn(this, iStartIndex, iEndIndex)   result(sText)
 
     class (STRING_LIST_T), intent(in)        :: this
-    integer (kind=c_int), intent(in)         :: iStartIndex
-    integer (kind=c_int), intent(in)         :: iEndIndex
+    integer (c_int), intent(in)         :: iStartIndex
+    integer (c_int), intent(in)         :: iEndIndex
     character (len=:), allocatable           :: sText
 
     ! [ LOCALS ]
-    integer (kind=c_int)                      :: iCount
+    integer (c_int)                      :: iCount
     type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
 
     iCount = 0
@@ -295,12 +295,12 @@ contains
     use iso_fortran_env, only : OUTPUT_UNIT
 
     class (STRING_LIST_T), intent(in)     :: this
-    integer (kind=c_int), optional        :: iLU
+    integer (c_int), optional        :: iLU
 
     ! [ LOCALS ]
     type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
-    integer (kind=c_int)                      :: iLU_l
-    integer (kind=c_int)                      :: iCount
+    integer (c_int)                      :: iLU_l
+    integer (c_int)                      :: iCount
 
     if (present(iLU) ) then
       iLU_l = iLU
@@ -337,8 +337,8 @@ contains
 
     ! [ LOCALS ]
     type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
-    integer (kind=c_int)                      :: iLU_l
-    integer (kind=c_int)                      :: iCount
+    integer (c_int)                      :: iLU_l
+    integer (c_int)                      :: iCount
     character (len=2048)                      :: sBuf
 
     current => this%first
@@ -372,8 +372,8 @@ contains
 
     ! [ LOCALS ]
     type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
-    integer (kind=c_int)                      :: iLU_l
-    integer (kind=c_int)                      :: iCount
+    integer (c_int)                      :: iLU_l
+    integer (c_int)                      :: iCount
     character (len=2048)                      :: sBuf
 
     current => this%first
@@ -412,12 +412,12 @@ contains
   function list_return_all_as_float_fn(this)    result(rValues)
 
     class (STRING_LIST_T), intent(in)     :: this
-    real (kind=c_float), allocatable      :: rValues(:)
+    real (c_float), allocatable      :: rValues(:)
 
     ! [ LOCALS ]
     type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
-    integer (kind=c_int)                      :: iStat
-    integer (kind=c_int)                      :: iIndex
+    integer (c_int)                      :: iStat
+    integer (c_int)                      :: iIndex
 
     allocate( rValues( 1:this%count ), stat=iStat )
     if (iStat /= 0)  call die("Failed to allocate memory for list conversion", __SRCNAME__, __LINE__)
@@ -442,13 +442,13 @@ contains
 
     class (STRING_LIST_T), intent(in)     :: this
     character (len=64), allocatable       :: sValues(:)
-    logical (kind=c_bool), optional       :: null_terminated
+    logical (c_bool), optional       :: null_terminated
 
     ! [ LOCALS ]
     type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
-    integer (kind=c_int)                      :: iStat
-    integer (kind=c_int)                      :: iIndex
-    logical (kind=c_bool)                     :: null_terminated_l
+    integer (c_int)                      :: iStat
+    integer (c_int)                      :: iIndex
+    logical (c_bool)                     :: null_terminated_l
 
     if ( present( null_terminated) ) then
       null_terminated_l = null_terminated
@@ -483,12 +483,12 @@ contains
   function list_return_all_as_int_fn(this)    result(iValues)
 
     class (STRING_LIST_T), intent(in)     :: this
-    integer (kind=c_int), allocatable     :: iValues(:)
+    integer (c_int), allocatable     :: iValues(:)
 
     ! [ LOCALS ]
     type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
-    integer (kind=c_int)                      :: iStat
-    integer (kind=c_int)                      :: iIndex
+    integer (c_int)                      :: iStat
+    integer (c_int)                      :: iIndex
 
     allocate( iValues(this%count ), stat=iStat )
     if (iStat /= 0)  call die("Failed to allocate memory for list conversion", __SRCNAME__, __LINE__)
@@ -513,12 +513,12 @@ contains
   function list_return_all_as_logical_fn(this)    result(lValues)
 
     class (STRING_LIST_T), intent(in)     :: this
-    logical (kind=c_bool), allocatable     :: lValues(:)
+    logical (c_bool), allocatable     :: lValues(:)
 
     ! [ LOCALS ]
     type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
-    integer (kind=c_int)                      :: iStat
-    integer (kind=c_int)                      :: iIndex
+    integer (c_int)                      :: iStat
+    integer (c_int)                      :: iIndex
 
     allocate( lValues( this%count ), stat=iStat )
     if (iStat /= 0)  call die("Failed to allocate memory for list conversion", __SRCNAME__, __LINE__)
@@ -621,12 +621,12 @@ contains
   function list_are_there_empty_entries_fn( this )  result( lResult )
 
     class (STRING_LIST_T), intent(in)       :: this
-    logical (kind=c_bool)                   :: lResult
+    logical (c_bool)                   :: lResult
 
     ! [ LOCALS ]
-    integer (kind=c_int)                        :: iIndex
-    integer (kind=c_int)                        :: iStat
-    integer (kind=c_int)                        :: iCount
+    integer (c_int)                        :: iIndex
+    integer (c_int)                        :: iStat
+    integer (c_int)                        :: iCount
     type (STRING_LIST_ELEMENT_T), pointer       :: current
 
     iCount = 0
@@ -657,10 +657,10 @@ contains
 
     class (STRING_LIST_T), intent(in) :: this
     character (len=*), intent(in)     :: sChar
-    logical (kind=c_bool)             :: lResult
+    logical (c_bool)             :: lResult
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iCount
+    integer (c_int) :: iCount
 
     iCount = 0
 
@@ -680,13 +680,13 @@ contains
 
     class (STRING_LIST_T), intent(in) :: this
     character (len=*), intent(in) :: sChar
-    integer (kind=c_int) :: iCount
+    integer (c_int) :: iCount
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iIndex
-    integer (kind=c_int) :: iStat
-    integer (kind=c_int) :: iRetVal
-    integer (kind=c_int), dimension(this%count) :: iTempResult
+    integer (c_int) :: iIndex
+    integer (c_int) :: iStat
+    integer (c_int) :: iRetVal
+    integer (c_int), dimension(this%count) :: iTempResult
     type (STRING_LIST_ELEMENT_T), pointer :: current => null()
 
     iCount = 0
@@ -715,14 +715,14 @@ contains
 
     class (STRING_LIST_T), intent(in)                    :: this
     character (len=*), intent(in)                        :: sChar
-    integer (kind=c_int), dimension(:), allocatable      :: iResult
+    integer (c_int), dimension(:), allocatable      :: iResult
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iIndex
-    integer (kind=c_int) :: iCount
-    integer (kind=c_int) :: iStat
-    integer (kind=c_int) :: iRetVal
-    integer (kind=c_int), dimension(this%count) :: iTempResult
+    integer (c_int) :: iIndex
+    integer (c_int) :: iCount
+    integer (c_int) :: iStat
+    integer (c_int) :: iRetVal
+    integer (c_int), dimension(this%count) :: iTempResult
     type (STRING_LIST_ELEMENT_T), pointer   :: current => null()
 
     iIndex = 0
@@ -770,11 +770,11 @@ contains
     type (STRING_LIST_T)                                 :: newList
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iIndex
-    integer (kind=c_int) :: iStat
-    integer (kind=c_int) :: iRetVal
-    integer (kind=c_int) :: iCount
-    integer (kind=c_int), dimension(this%count) :: iTempResult
+    integer (c_int) :: iIndex
+    integer (c_int) :: iStat
+    integer (c_int) :: iRetVal
+    integer (c_int) :: iCount
+    integer (c_int), dimension(this%count) :: iTempResult
     type (STRING_LIST_ELEMENT_T), pointer   :: current => null()
 
     iCount = 0

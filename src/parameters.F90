@@ -26,7 +26,7 @@ module parameters
     type (STRING_LIST_T)               :: filenames
     type (STRING_LIST_T)               :: delimiters
     type (STRING_LIST_T)               :: comment_chars
-    integer (kind=c_int)               :: count           = 0
+    integer (c_int)               :: count           = 0
 
   contains
 
@@ -67,7 +67,7 @@ module parameters
   type (PARAMETERS_T), public :: PARAMS
   type (DICT_T), public       :: PARAMS_DICT
 
-  integer (kind=c_int), parameter :: MAX_TABLE_RECORD_LEN = 512
+  integer (c_int), parameter :: MAX_TABLE_RECORD_LEN = 512
 
 contains
 
@@ -109,12 +109,12 @@ contains
     class (PARAMETERS_T)    :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int)         :: iFileIndex, iColIndex
-    integer (kind=c_int)         :: iStat
+    integer (c_int)         :: iFileIndex, iColIndex
+    integer (c_int)         :: iStat
     type (ASCII_FILE_T)          :: DF
     type (DICT_ENTRY_T), pointer :: pDict
     type (DICT_ENTRY_T), pointer :: pCurrentDict
-    integer (kind=c_int)         :: iNumberOfHeaderLines
+    integer (c_int)         :: iNumberOfHeaderLines
     character (len=:), allocatable :: sNumberOfHeaderLines
     character (len=256)          :: tempstr
     character (len=MAX_TABLE_RECORD_LEN) :: sRecord, sItem
@@ -224,15 +224,15 @@ contains
     class (PARAMETERS_T)                         :: this
     character (len=*), intent(in)                :: sKey
     character (len=*), intent(in), optional      :: sValues(:)
-    integer (kind=c_int), intent(in), optional   :: iValues(:)
-    real (kind=c_float), intent(in), optional    :: fValues(:)
-    real (kind=c_double), intent(in), optional   :: dValues(:)
-    logical (kind=c_bool), intent(in), optional  :: lValues(:)
+    integer (c_int), intent(in), optional   :: iValues(:)
+    real (c_float), intent(in), optional    :: fValues(:)
+    real (c_double), intent(in), optional   :: dValues(:)
+    logical (c_bool), intent(in), optional  :: lValues(:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)         :: iStat
+    integer (c_int)         :: iStat
     type (DICT_ENTRY_T), pointer :: pDict
-    integer (kind=c_int)         :: iIndex
+    integer (c_int)         :: iIndex
     type (DICT_ENTRY_T), pointer :: pCurrentDict
     character (len=MAX_TABLE_RECORD_LEN) :: sRecord, sItem
 
@@ -304,11 +304,11 @@ contains
 
     class (PARAMETERS_T)                                       :: this
     character (len=*), intent(in)                              :: sKey
-    logical (kind=c_bool), intent(in), optional                :: lFatal
+    logical (c_bool), intent(in), optional                :: lFatal
     type ( STRING_LIST_T )                                     :: slList
 
     ! [ LOCALS ]
-    logical (kind=c_bool) :: lFatal_l
+    logical (c_bool) :: lFatal_l
 
     if ( present (lFatal) ) then
       lFatal_l = lFatal
@@ -333,13 +333,13 @@ contains
   subroutine get_parameter_values_logical( this, lValues, slKeys, sKey, lFatal )
 
     class (PARAMETERS_T)                                        :: this
-    logical (kind=c_bool), intent(in out), allocatable          :: lValues(:)
+    logical (c_bool), intent(in out), allocatable          :: lValues(:)
     type (STRING_LIST_T), intent(in out),              optional :: slKeys
     character (len=*),    intent(in ),                 optional :: sKey
-    logical (kind=c_bool), intent(in),                 optional :: lFatal
+    logical (c_bool), intent(in),                 optional :: lFatal
 
     ! [ LOCALS ]
-    logical (kind=c_bool) :: lFatal_l
+    logical (c_bool) :: lFatal_l
 
     if ( present (lFatal) ) then
       lFatal_l = lFatal
@@ -376,10 +376,10 @@ contains
     type (STRING_LIST_T), intent(out)                           :: slValues
     type (STRING_LIST_T), intent(in),                  optional :: slKeys
     character (len=*),    intent(in ),                 optional :: sKey
-    logical (kind=c_bool), intent(in),                 optional :: lFatal
+    logical (c_bool), intent(in),                 optional :: lFatal
 
     ! [ LOCALS ]
-    logical (kind=c_bool) :: lFatal_l
+    logical (c_bool) :: lFatal_l
 
     if ( present (lFatal) ) then
       lFatal_l = lFatal
@@ -417,13 +417,13 @@ contains
   subroutine get_parameter_values_int( this, iValues, slKeys, sKey, lFatal )
 
     class (PARAMETERS_T)                                       :: this
-    integer (kind=c_int), intent(out), allocatable             :: iValues(:)
+    integer (c_int), intent(out), allocatable             :: iValues(:)
     type (STRING_LIST_T), intent(in out),             optional :: slKeys
     character (len=*),    intent(in ),                optional :: sKey
-    logical (kind=c_bool), intent(in),                optional :: lFatal
+    logical (c_bool), intent(in),                optional :: lFatal
 
     ! [ LOCALS ]
-    logical (kind=c_bool) :: lFatal_l
+    logical (c_bool) :: lFatal_l
 
     if ( present (lFatal) ) then
       lFatal_l = lFatal
@@ -459,13 +459,13 @@ contains
   subroutine get_parameter_values_float( this, fValues, slKeys, sKey, lFatal )
 
     class (PARAMETERS_T)                                       :: this
-    real (kind=c_float),  intent(in out), allocatable          :: fValues(:)
+    real (c_float),  intent(in out), allocatable          :: fValues(:)
     type (STRING_LIST_T), intent(in out),             optional :: slKeys
     character (len=*),    intent(in ),                optional :: sKey
-    logical (kind=c_bool), intent(in),                optional :: lFatal
+    logical (c_bool), intent(in),                optional :: lFatal
 
     ! [ LOCALS ]
-    logical (kind=c_bool) :: lFatal_l
+    logical (c_bool) :: lFatal_l
 
     if ( present (lFatal) ) then
       lFatal_l = lFatal
@@ -501,19 +501,19 @@ contains
     use strings
 
     class (PARAMETERS_T)                                       :: this
-    real (kind=c_float),  intent(in out), allocatable          :: fValues(:,:)
+    real (c_float),  intent(in out), allocatable          :: fValues(:,:)
     character (len=*),    intent(in)                           :: sPrefix
-    integer (kind=c_int), intent(in)                           :: iNumRows
-    logical (kind=c_bool), intent(in),                optional :: lFatal
+    integer (c_int), intent(in)                           :: iNumRows
+    logical (c_bool), intent(in),                optional :: lFatal
 
     ! [ LOCALS ]
-    integer (kind=c_int)             :: iIndex
-    integer (kind=c_int)             :: iStat
+    integer (c_int)             :: iIndex
+    integer (c_int)             :: iStat
     character (len=256)              :: sText
-    integer (kind=c_int)             :: iNumCols
+    integer (c_int)             :: iNumCols
     type (STRING_LIST_T)             :: slList
-    real (kind=c_float), allocatable :: fTempVal(:)
-    logical (kind=c_bool) :: lFatal_l
+    real (c_float), allocatable :: fTempVal(:)
+    logical (c_bool) :: lFatal_l
 
     if ( present (lFatal) ) then
       lFatal_l = lFatal

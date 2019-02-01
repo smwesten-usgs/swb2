@@ -15,7 +15,7 @@ module output
   integer, parameter :: c_diff_t = 8
 #endif
 
-  real( kind=c_double ), allocatable      :: RECHARGE_ARRAY(:)
+  real( c_double ), allocatable      :: RECHARGE_ARRAY(:)
 
   type, public :: NETCDF_FILE_COLLECTION_T
     type (T_NETCDF4_FILE), pointer :: ncfile
@@ -25,15 +25,15 @@ module output
   type (NETCDF_FILE_COLLECTION_T), allocatable, public :: NC_MULTI_SIM_OUT(:,:)
 
 
-  integer (kind=c_int), parameter   :: NCDF_NUM_OUTPUTS = 29
+  integer (c_int), parameter   :: NCDF_NUM_OUTPUTS = 29
 
   type OUTPUT_SPECS_T
     character (len=27)          :: variable_name
     character (len=21)          :: variable_units
-    real (kind=c_float)         :: valid_minimum
-    real (kind=c_float)         :: valid_maximum
-    logical (kind=c_bool)       :: is_active
-    logical (kind=c_bool)       :: multisim_outputs
+    real (c_float)         :: valid_minimum
+    real (c_float)         :: valid_maximum
+    logical (c_bool)       :: is_active
+    logical (c_bool)       :: multisim_outputs
   end type OUTPUT_SPECS_T
 
   type (OUTPUT_SPECS_T)    :: OUTSPECS(NCDF_NUM_OUTPUTS) = [                                              &
@@ -83,13 +83,13 @@ module output
                   NCDF_STORM_DRAIN_CAPTURE, NCDF_GROWING_SEASON, NCDF_FOG
   end enum
 
-  logical ( kind=c_bool ) :: OUTPUT_INCLUDES_LATLON = lTRUE
+  logical ( c_bool ) :: OUTPUT_INCLUDES_LATLON = lTRUE
 
 contains
 
   subroutine set_output_latlon_option( output_includes_latlon_l )
 
-    logical (kind=c_bool) :: output_includes_latlon_l
+    logical (c_bool) :: output_includes_latlon_l
 
     OUTPUT_INCLUDES_LATLON = output_includes_latlon_l
 
@@ -122,8 +122,8 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)   :: cells
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iStat
-    integer (kind=c_int) :: iIndex
+    integer (c_int) :: iStat
+    integer (c_int) :: iIndex
 
     allocate ( NC_OUT( NCDF_NUM_OUTPUTS ), stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
@@ -205,11 +205,11 @@ contains
   subroutine initialize_multiple_sim_output(cells, number_of_simulations)
 
     class (MODEL_DOMAIN_T), intent(inout)   :: cells
-    integer (kind=c_int), intent(in)        :: number_of_simulations
+    integer (c_int), intent(in)        :: number_of_simulations
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iStat
-    integer (kind=c_int) :: noutput, nsim
+    integer (c_int) :: iStat
+    integer (c_int) :: noutput, nsim
 
     allocate ( NC_MULTI_SIM_OUT( NCDF_NUM_OUTPUTS, number_of_simulations ), stat=iStat )
     call assert( iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
@@ -296,22 +296,22 @@ contains
   subroutine output_2D_float_array( ncfile_ptr, values, cells )
 
     type (T_NETCDF4_FILE), pointer      :: ncfile_ptr
-    real (kind=c_float), intent(in)     :: values(:)
+    real (c_float), intent(in)     :: values(:)
     class (MODEL_DOMAIN_T), intent(in)  :: cells
 
     call netcdf_put_variable_vector(NCFILE=ncfile_ptr,                         &
        iVarID=ncfile_ptr%iVarID(NC_TIME),                                      &
-       iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t)],                 &
+       iStart=[int(SIM_DT%iNumDaysFromOrigin, c_size_t)],                 &
        iCount=[1_c_size_t],                                                    &
        iStride=[1_c_ptrdiff_t],                                                &
-       dpValues=[real(SIM_DT%iNumDaysFromOrigin, kind=c_double)])
+       dpValues=[real(SIM_DT%iNumDaysFromOrigin, c_double)])
 
   call netcdf_put_packed_variable_array(NCFILE=ncfile_ptr,                     &
         iVarID=ncfile_ptr%iVarID(NC_Z),                                        &
-        iStart=[ int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t),                &
+        iStart=[ int(SIM_DT%iNumDaysFromOrigin, c_size_t),                &
                 0_c_size_t, 0_c_size_t ],                                      &
-        iCount=[ 1_c_size_t, int(cells%number_of_rows, kind=c_size_t),         &
-                int(cells%number_of_columns, kind=c_size_t) ],                 &
+        iCount=[ 1_c_size_t, int(cells%number_of_rows, c_size_t),         &
+                int(cells%number_of_columns, c_size_t) ],                 &
         iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],               &
         lMask=cells%active,                                                    &
         rValues=values,                                                        &
@@ -326,7 +326,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: cells
 
     ! [ LOCALS ]
-    integer (kind=c_int)           :: iIndex
+    integer (c_int)           :: iIndex
     type (T_NETCDF4_FILE), pointer :: ncfile_ptr
 
     do
@@ -344,10 +344,10 @@ contains
 
           call netcdf_put_variable_vector(NCFILE=NC_OUT(iIndex)%ncfile, &
              iVarID=NC_OUT(iIndex)%ncfile%iVarID(NC_TIME), &
-             iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t)], &
+             iStart=[int(SIM_DT%iNumDaysFromOrigin, c_size_t)], &
              iCount=[1_c_size_t], &
              iStride=[1_c_ptrdiff_t], &
-             dpValues=[real(SIM_DT%iNumDaysFromOrigin, kind=c_double)])
+             dpValues=[real(SIM_DT%iNumDaysFromOrigin, c_double)])
 
         endif
 
@@ -426,14 +426,14 @@ contains
            .and. (.not. OUTSPECS( NCDF_SURFACE_STORAGE )%multisim_outputs) )     &
 
         call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_SURFACE_STORAGE )%ncfile,  &
-                                    values=real(cells%surface_storage, kind=c_float),  &
+                                    values=real(cells%surface_storage, c_float),  &
                                     cells=cells )
 
       if ( OUTSPECS( NCDF_SOIL_STORAGE )%is_active                             &
            .and. (.not. OUTSPECS( NCDF_SOIL_STORAGE )%multisim_outputs) )   &
 
         call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_SOIL_STORAGE )%ncfile,  &
-                                    values=real(cells%soil_storage, kind=c_float),  &
+                                    values=real(cells%soil_storage, c_float),  &
                                     cells=cells )
 
       if ( OUTSPECS( NCDF_DELTA_SOIL_STORAGE )%is_active ) &
@@ -459,7 +459,7 @@ contains
            .and. (.not. OUTSPECS( NCDF_ACTUAL_ET )%multisim_outputs) )          &
 
         call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_ACTUAL_ET )%ncfile,  &
-                                    values=real(cells%actual_et, kind=c_float),  &
+                                    values=real(cells%actual_et, c_float),  &
                                     cells=cells )
 
       if ( OUTSPECS( NCDF_TMIN )%is_active ) &
@@ -547,10 +547,10 @@ contains
   subroutine write_multi_sim_output(cells, simulation_number)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: cells
-    integer (kind=c_int), intent(in)       :: simulation_number
+    integer (c_int), intent(in)       :: simulation_number
 
     ! [ LOCALS ]
-    integer (kind=c_int)           :: iIndex
+    integer (c_int)           :: iIndex
     type (T_NETCDF4_FILE), pointer :: ncfile_ptr
 
 
@@ -567,10 +567,10 @@ contains
         call netcdf_put_variable_vector(NCFILE=                                        &
            NC_MULTI_SIM_OUT(iIndex,simulation_number)%ncfile,                          &
            iVarID=NC_MULTI_SIM_OUT(iIndex, simulation_number)%ncfile%iVarID(NC_TIME),  &
-           iStart=[int(SIM_DT%iNumDaysFromOrigin, kind=c_size_t)],                     &
+           iStart=[int(SIM_DT%iNumDaysFromOrigin, c_size_t)],                     &
            iCount=[1_c_size_t],                                                        &
            iStride=[1_c_ptrdiff_t],                                                    &
-           dpValues=[real(SIM_DT%iNumDaysFromOrigin, kind=c_double)])
+           dpValues=[real(SIM_DT%iNumDaysFromOrigin, c_double)])
 
       endif
 
@@ -589,7 +589,7 @@ contains
 
       call output_2D_float_array(                                                    &
         ncfile_ptr=NC_MULTI_SIM_OUT( NCDF_SOIL_STORAGE, simulation_number )%ncfile,  &
-        values=real(cells%soil_storage, kind=c_float),                               &
+        values=real(cells%soil_storage, c_float),                               &
         cells=cells )
 
     if ( OUTSPECS( NCDF_NET_INFILTRATION )%is_active                    &
@@ -605,7 +605,7 @@ contains
 
       call output_2D_float_array(                                                   &
         ncfile_ptr=NC_MULTI_SIM_OUT( NCDF_ACTUAL_ET, simulation_number )%ncfile,    &
-        values=real(cells%actual_et, kind=c_float),                                 &
+        values=real(cells%actual_et, c_float),                                 &
         cells=cells )
 
     if ( OUTSPECS( NCDF_INTERCEPTION_STORAGE )%is_active                    &
@@ -613,7 +613,7 @@ contains
 
       call output_2D_float_array(                                                            &
         ncfile_ptr=NC_MULTI_SIM_OUT( NCDF_INTERCEPTION_STORAGE, simulation_number )%ncfile,  &
-        values=real(cells%interception_storage, kind=c_float),                               &
+        values=real(cells%interception_storage, c_float),                               &
         cells=cells )
 
     if ( OUTSPECS( NCDF_SURFACE_STORAGE )%is_active                    &
@@ -621,7 +621,7 @@ contains
 
       call output_2D_float_array(                                                         &
         ncfile_ptr=NC_MULTI_SIM_OUT( NCDF_SURFACE_STORAGE, simulation_number )%ncfile,    &
-        values=real(cells%surface_storage, kind=c_float),                                 &
+        values=real(cells%surface_storage, c_float),                                 &
         cells=cells )
 
   end subroutine write_multi_sim_output

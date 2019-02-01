@@ -36,11 +36,11 @@ module direct_soil_moisture__gridded_data
   type (DATA_CATALOG_ENTRY_T), pointer :: pSEPTIC_DISCHARGE
   type (DATA_CATALOG_ENTRY_T), pointer :: pANNUAL_SEPTIC_DISCHARGE
 
-  real (kind=c_float), allocatable     :: fSEPTIC_DISCHARGE(:)
-  real (kind=c_float), allocatable     :: fANNUAL_SEPTIC_DISCHARGE(:)
+  real (c_float), allocatable     :: fSEPTIC_DISCHARGE(:)
+  real (c_float), allocatable     :: fANNUAL_SEPTIC_DISCHARGE(:)
 
-  real (kind=c_float), allocatable     :: fSEPTIC_DISCHARGE_TABLE(:)
-  real (kind=c_float), allocatable     :: fANNUAL_SEPTIC_DISCHARGE_TABLE(:)
+  real (c_float), allocatable     :: fSEPTIC_DISCHARGE_TABLE(:)
+  real (c_float), allocatable     :: fANNUAL_SEPTIC_DISCHARGE_TABLE(:)
 
   type (T_NETCDF4_FILE), pointer       :: pNCFILE
 
@@ -64,18 +64,18 @@ contains
 
   subroutine direct_soil_moisture_initialize( is_cell_active, landuse_index )
 
-    logical (kind=c_bool), intent(in)     :: is_cell_active(:,:)
-    integer (kind=c_int), intent(in)      :: landuse_index(:)
+    logical (c_bool), intent(in)     :: is_cell_active(:,:)
+    integer (c_int), intent(in)      :: landuse_index(:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)                 :: iStat
+    integer (c_int)                 :: iStat
     type (STRING_LIST_T)                 :: parameter_list
-    integer (kind=c_int)                 :: iIndex
-    integer (kind=c_int)                 :: iNX
-    integer (kind=c_int)                 :: iNY
-    integer (kind=c_int), allocatable    :: iLanduseCodes(:)
-    integer (kind=c_int)                 :: iNumberOfLanduses
-    logical (kind=c_bool)                :: lAreLengthsEqual
+    integer (c_int)                 :: iIndex
+    integer (c_int)                 :: iNX
+    integer (c_int)                 :: iNY
+    integer (c_int), allocatable    :: iLanduseCodes(:)
+    integer (c_int)                 :: iNumberOfLanduses
+    logical (c_bool)                :: lAreLengthsEqual
 
 
     !> Determine how many landuse codes are present
@@ -167,19 +167,19 @@ contains
 
   subroutine direct_soil_moisture_calculate( direct_soil_moisture, is_cell_active, indx )
 
-    real (kind=c_float), intent(inout)     :: direct_soil_moisture
-    logical (kind=c_bool), intent(in)      :: is_cell_active(:,:)
-    integer (kind=c_int), intent(in)       :: indx
+    real (c_float), intent(inout)     :: direct_soil_moisture
+    logical (c_bool), intent(in)      :: is_cell_active(:,:)
+    integer (c_int), intent(in)       :: indx
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iJulianDay
-    integer (kind=c_int) :: iMonth
-    integer (kind=c_int) :: iDay
-    integer (kind=c_int) :: iYear
-    integer (kind=c_int) :: iDaysInMonth
-    integer (kind=c_int) :: iNumDaysFromOrigin
-    integer (kind=c_int) :: iIndex
-    real (kind=c_float)  :: fFactor
+    integer (c_int) :: iJulianDay
+    integer (c_int) :: iMonth
+    integer (c_int) :: iDay
+    integer (c_int) :: iYear
+    integer (c_int) :: iDaysInMonth
+    integer (c_int) :: iNumDaysFromOrigin
+    integer (c_int) :: iIndex
+    real (c_float)  :: fFactor
 
     if ( .not. DATE_OF_LAST_RETRIEVAL == SIM_DT%curr ) then
 

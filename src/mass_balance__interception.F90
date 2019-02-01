@@ -14,10 +14,10 @@ contains
  	                                                          interception,             &
  	                                                          reference_et0 )
 
-    real (kind=c_float), intent(inout)      :: interception_storage
-    real (kind=c_double), intent(inout)     :: actual_et_interception
-    real (kind=c_float), intent(in)         :: interception
-    real (kind=c_float), intent(in)         :: reference_et0
+    real (c_float), intent(inout)      :: interception_storage
+    real (c_double), intent(inout)     :: actual_et_interception
+    real (c_float), intent(in)         :: interception
+    real (c_float), intent(in)         :: reference_et0
 
     interception_storage = interception_storage + interception
 

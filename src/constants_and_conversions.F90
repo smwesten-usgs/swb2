@@ -12,49 +12,49 @@ module constants_and_conversions
   implicit none
 
   !
-  integer (kind=c_int), parameter :: DATATYPE_INT     = 0
-  integer (kind=c_int), parameter :: DATATYPE_FLOAT   = 1
-  integer (kind=c_int), parameter :: DATATYPE_REAL    = 1
-  integer (kind=c_int), parameter :: DATATYPE_SHORT   = 2
-  integer (kind=c_int), parameter :: DATATYPE_DOUBLE  = 3
-  integer (kind=c_int), parameter :: DATATYPE_NA      = -9999
+  integer (c_int), parameter :: DATATYPE_INT     = 0
+  integer (c_int), parameter :: DATATYPE_FLOAT   = 1
+  integer (c_int), parameter :: DATATYPE_REAL    = 1
+  integer (c_int), parameter :: DATATYPE_SHORT   = 2
+  integer (c_int), parameter :: DATATYPE_DOUBLE  = 3
+  integer (c_int), parameter :: DATATYPE_NA      = -9999
 
   ! [ common mathematical constants ]
   public :: PI, TWOPI, HALFPI
-  real (kind=c_double), parameter    :: PI = 3.1415926535897932384626433_c_double
-  real (kind=c_double), parameter    :: TWOPI = 3.1415926535897932384626433_c_double * 2.0_c_double
-  real (kind=c_double), parameter    :: HALFPI = 3.1415926535897932384626433_c_double / 2.0_c_double
+  real (c_double), parameter    :: PI = 3.1415926535897932384626433_c_double
+  real (c_double), parameter    :: TWOPI = 3.1415926535897932384626433_c_double * 2.0_c_double
+  real (c_double), parameter    :: HALFPI = 3.1415926535897932384626433_c_double / 2.0_c_double
 
   ! [ trig conversion factors ]
   public :: DEGREES_TO_RADIANS, RADIANS_TO_DEGREES
-  real (kind=c_double), parameter    :: DEGREES_TO_RADIANS = TWOPI / 360.0_c_double
-  real (kind=c_double), parameter    :: RADIANS_TO_DEGREES = 360.0_c_double / TWOPI
+  real (c_double), parameter    :: DEGREES_TO_RADIANS = TWOPI / 360.0_c_double
+  real (c_double), parameter    :: RADIANS_TO_DEGREES = 360.0_c_double / TWOPI
 
   ! [ common 'magic' numbers and logicals ]
   public :: lTRUE, lFALSE
   public :: rBIGVAL, iBIGVAL, dBIGVAL, iTINYVAL, rTINYVAL, dTINYVAL
   public :: rFREEZING, dFREEZING
   public :: rZERO
-  logical (kind=c_bool), parameter   :: lTRUE = .true._c_bool
-  logical (kind=c_bool), parameter   :: lFALSE = .false._c_bool
+  logical (c_bool), parameter   :: lTRUE = .true._c_bool
+  logical (c_bool), parameter   :: lFALSE = .false._c_bool
 
-  logical (kind=c_bool), parameter   :: TRUE = .true._c_bool
-  logical (kind=c_bool), parameter   :: FALSE = .false._c_bool
+  logical (c_bool), parameter   :: TRUE = .true._c_bool
+  logical (c_bool), parameter   :: FALSE = .false._c_bool
 
-  real (kind=c_float), parameter     :: rBIGVAL = HUGE(0.0_c_float)
-  real (kind=c_double), parameter    :: dBIGVAL = HUGE(0.0_c_double)
-  integer(kind=c_int), parameter     :: iBIGVAL = HUGE(0_c_int)
-  real (kind=c_float), parameter     :: rTINYVAL = -(HUGE(0.0_c_float) - 1.0)
-  real (kind=c_double), parameter    :: dTINYVAL = -(HUGE(0.0_c_double) - 1.0)
-  real (kind=c_float), parameter     :: fTINYVAL = -(HUGE(0.0_c_float) - 1.0)
-  integer(kind=c_int), parameter     :: iTINYVAL = -(HUGE(0_c_int) - 1)
-  real (kind=c_float), parameter     :: rFREEZING = 32.0_c_float
-  real (kind=c_float), parameter     :: fFREEZING = 32.0_c_float
-  real (kind=c_double), parameter    :: dFREEZING = 32.0_c_double
-  integer (kind=c_int), parameter    :: iZERO = 0_c_int
-  real (kind=c_float), parameter     :: fZERO = 0.0_c_float
-  real (kind=c_float), parameter     :: rZERO = 0.0_c_float
-  real (kind=c_double), parameter    :: dZERO = 0.0_c_double
+  real (c_float), parameter     :: rBIGVAL = HUGE(0.0_c_float)
+  real (c_double), parameter    :: dBIGVAL = HUGE(0.0_c_double)
+  integer(c_int), parameter     :: iBIGVAL = HUGE(0_c_int)
+  real (c_float), parameter     :: rTINYVAL = -(HUGE(0.0_c_float) - 1.0)
+  real (c_double), parameter    :: dTINYVAL = -(HUGE(0.0_c_double) - 1.0)
+  real (c_float), parameter     :: fTINYVAL = -(HUGE(0.0_c_float) - 1.0)
+  integer(c_int), parameter     :: iTINYVAL = -(HUGE(0_c_int) - 1)
+  real (c_float), parameter     :: rFREEZING = 32.0_c_float
+  real (c_float), parameter     :: fFREEZING = 32.0_c_float
+  real (c_double), parameter    :: dFREEZING = 32.0_c_double
+  integer (c_int), parameter    :: iZERO = 0_c_int
+  real (c_float), parameter     :: fZERO = 0.0_c_float
+  real (c_float), parameter     :: rZERO = 0.0_c_float
+  real (c_double), parameter    :: dZERO = 0.0_c_double
 
 
   ! [ special ASCII characters ]
@@ -71,13 +71,13 @@ module constants_and_conversions
 
   ! [ evil global variables ]
   character (len=1)            :: OS_NATIVE_PATH_DELIMITER
-  integer (kind=c_long_long)   :: RANDOM_START = 0
+  integer (c_long_long)   :: RANDOM_START = 0
 
   ! [ select conversion factors ]
-  real (kind=c_double), parameter, public :: C_PER_F    = 5.0_c_double / 9.0_c_double
-  real (kind=c_double), parameter, public :: F_PER_C    = 9.0_c_double / 5.0_c_double
-  real (kind=c_double), parameter, public :: M_PER_FOOT = 0.3048_c_double
-  real (kind=c_double), parameter, public :: MM_PER_IN  = 25.4_c_double
+  real (c_double), parameter, public :: C_PER_F    = 5.0_c_double / 9.0_c_double
+  real (c_double), parameter, public :: F_PER_C    = 9.0_c_double / 5.0_c_double
+  real (c_double), parameter, public :: M_PER_FOOT = 0.3048_c_double
+  real (c_double), parameter, public :: MM_PER_IN  = 25.4_c_double
 
   character (len=:), allocatable    :: OUTPUT_DIRECTORY_NAME
   character (len=:), allocatable    :: OUTPUT_PREFIX_NAME
@@ -85,11 +85,11 @@ module constants_and_conversions
 
   type BOUNDS_T
     character (len=:), allocatable  :: sPROJ4_string
-    integer (kind=c_int)            :: iNumCols
-    integer (kind=c_int)            :: iNumRows
-    real (kind=c_double)            :: fX_ll, fY_ll
-    real (kind=c_double)            :: fX_ur, fY_ur
-    real (kind=c_double)            :: fGridcellSize
+    integer (c_int)            :: iNumCols
+    integer (c_int)            :: iNumRows
+    real (c_double)            :: fX_ll, fY_ll
+    real (c_double)            :: fX_ur, fY_ur
+    real (c_double)            :: fGridcellSize
   end type BOUNDS_T
 
   type (BOUNDS_T), public :: BNDS
@@ -192,8 +192,8 @@ module constants_and_conversions
   public :: fortran_to_c_string
   public :: is_numeric
 
-  real (kind=c_float), parameter  :: TOLERANCE_FLOAT = 1.0e-6_c_float
-  real (kind=c_double), parameter :: TOLERANCE_DOUBLE = 1.0e-9_c_double
+  real (c_float), parameter  :: TOLERANCE_FLOAT = 1.0e-6_c_float
+  real (c_double), parameter :: TOLERANCE_DOUBLE = 1.0e-9_c_double
 
 contains
 
@@ -203,7 +203,7 @@ contains
     character (len=len_trim(input_pathname)) :: output_pathname
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: indx, jndx
+    integer (c_int) :: indx, jndx
 
     do indx=1,len_trim(input_pathname)
 
@@ -228,9 +228,9 @@ contains
 
   elemental function approx_equal_float_float(fValue1, fValue2)  result(lBool)
 
-    real (kind=c_float), intent(in)    :: fValue1
-    real (kind=c_float), intent(in)    :: fValue2
-    logical (kind=c_bool)              :: lBool
+    real (c_float), intent(in)    :: fValue1
+    real (c_float), intent(in)    :: fValue2
+    logical (c_bool)              :: lBool
 
     if ( abs( fValue1 - fValue2 ) < TOLERANCE_FLOAT ) then
       lBool = lTRUE
@@ -245,11 +245,11 @@ contains
 
   elemental function approx_equal_float_double(fValue1, fValue2)  result(lBool)
 
-    real (kind=c_float), intent(in)    :: fValue1
-    real (kind=c_double), intent(in)    :: fValue2
-    logical (kind=c_bool)              :: lBool
+    real (c_float), intent(in)    :: fValue1
+    real (c_double), intent(in)    :: fValue2
+    logical (c_bool)              :: lBool
 
-    if ( abs( fValue1 - real(fValue2, kind=c_float) ) < TOLERANCE_FLOAT ) then
+    if ( abs( fValue1 - real(fValue2, c_float) ) < TOLERANCE_FLOAT ) then
       lBool = lTRUE
     else
       lBool = lFALSE
@@ -263,9 +263,9 @@ contains
 
   elemental function approx_equal_double_double(fValue1, fValue2)  result(lBool)
 
-    real (kind=c_double), intent(in)    :: fValue1
-    real (kind=c_double), intent(in)    :: fValue2
-    logical (kind=c_bool)               :: lBool
+    real (c_double), intent(in)    :: fValue1
+    real (c_double), intent(in)    :: fValue2
+    logical (c_bool)               :: lBool
 
     if ( abs( fValue1 - fValue2 ) < TOLERANCE_DOUBLE ) then
       lBool = lTRUE
@@ -284,7 +284,7 @@ contains
   impure elemental function is_numeric( value )
 
     character (len=*), intent(in)    :: value
-    logical (kind=c_bool)            :: is_numeric
+    logical (c_bool)            :: is_numeric
 
     ! [ LOCALS ]
     character (len=256) :: sbuf
@@ -307,8 +307,8 @@ contains
 
   elemental function deg_to_rad_sgl_fn( degrees )    result( radians )
 
-    real (kind=c_float), intent(in)    :: degrees
-    real (kind=c_float)                :: radians
+    real (c_float), intent(in)    :: degrees
+    real (c_float)                :: radians
 
     radians = degrees * DEGREES_TO_RADIANS
 
@@ -323,8 +323,8 @@ contains
 
   elemental function deg_to_rad_dbl_fn(degrees)    result(radians)
 
-    real (kind=c_double), intent(in)    :: degrees
-    real (kind=c_double)                :: radians
+    real (c_double), intent(in)    :: degrees
+    real (c_double)                :: radians
 
     radians = degrees * DEGREES_TO_RADIANS
 
@@ -339,8 +339,8 @@ contains
 
   elemental function rad_to_deg_sgl_fn(radians)    result(degrees)
 
-    real (kind=c_float), intent(in)    :: radians
-    real (kind=c_float)                :: degrees
+    real (c_float), intent(in)    :: radians
+    real (c_float)                :: degrees
 
     degrees = radians * RADIANS_TO_DEGREES
 
@@ -354,8 +354,8 @@ contains
 
   elemental function rad_to_deg_dbl_fn(radians)    result(degrees)
 
-    real (kind=c_double), intent(in)    :: radians
-    real (kind=c_double)                :: degrees
+    real (c_double), intent(in)    :: radians
+    real (c_double)                :: degrees
 
     degrees = radians * RADIANS_TO_DEGREES
 
@@ -370,8 +370,8 @@ contains
 
   elemental function FtoC_sgl_fn(degrees_F)   result(degrees_C)
 
-    real (kind=c_float),intent(in) :: degrees_F
-    real (kind=c_float) :: degrees_C
+    real (c_float),intent(in) :: degrees_F
+    real (c_float) :: degrees_C
 
     degrees_C = (degrees_F - rFREEZING) * C_PER_F
 
@@ -386,8 +386,8 @@ contains
 
   elemental function FtoC_dbl_fn( degrees_F )   result( degrees_C )
 
-    real (kind=c_double),intent(in) :: degrees_F
-    real (kind=c_double) :: degrees_C
+    real (c_double),intent(in) :: degrees_F
+    real (c_double) :: degrees_C
 
     degrees_C = ( degrees_F - dFREEZING ) * C_PER_F
 
@@ -402,8 +402,8 @@ contains
 
   elemental function CtoF_sgl_fn( degrees_C )   result( degrees_F )
 
-    real (kind=c_float),intent(in) :: degrees_C
-    real (kind=c_float) :: degrees_F
+    real (c_float),intent(in) :: degrees_C
+    real (c_float) :: degrees_F
 
     degrees_F = degrees_C * F_PER_C + dFREEZING
 
@@ -418,8 +418,8 @@ contains
 
   elemental function CtoF_dbl_fn( degrees_C )   result( degrees_F )
 
-    real (kind=c_double),intent(in) :: degrees_C
-    real (kind=c_double) :: degrees_F
+    real (c_double),intent(in) :: degrees_C
+    real (c_double) :: degrees_F
 
     degrees_F = degrees_C * F_PER_C + dFREEZING
 
@@ -434,8 +434,8 @@ contains
 
   elemental function FtoK_sgl_fn( degrees_F )    result( degrees_K )
 
-    real (kind=c_float),intent(in) :: degrees_F
-    real (kind=c_float) :: degrees_K
+    real (c_float),intent(in) :: degrees_F
+    real (c_float) :: degrees_K
 
     degrees_K = (degrees_F - dFREEZING) * C_PER_F + 273.15_c_double
 
@@ -450,8 +450,8 @@ contains
 
   elemental function FtoK_dbl_fn( degrees_F )    result( degrees_K )
 
-    real (kind=c_double),intent(in) :: degrees_F
-    real (kind=c_double) :: degrees_K
+    real (c_double),intent(in) :: degrees_F
+    real (c_double) :: degrees_K
 
     degrees_K = (degrees_F - dFREEZING) * C_PER_F + 273.15_c_double
 
@@ -466,8 +466,8 @@ contains
 
   elemental function CtoK_sgl_fn( degrees_C )    result( degrees_K )
 
-    real (kind=c_float), intent(in) :: degrees_C
-    real (kind=c_float) :: degrees_K
+    real (c_float), intent(in) :: degrees_C
+    real (c_float) :: degrees_K
 
     degrees_K = degrees_C + 273.15_c_double
 
@@ -482,8 +482,8 @@ contains
 
   elemental function CtoK_dbl_fn( degrees_C )    result( degrees_K )
 
-    real (kind=c_double), intent(in) :: degrees_C
-    real (kind=c_double) :: degrees_K
+    real (c_double), intent(in) :: degrees_C
+    real (c_double) :: degrees_K
 
     degrees_K = degrees_C + 273.15_c_double
 
@@ -497,8 +497,8 @@ contains
 
   elemental function inches_to_mm_sgl_fn( inches )   result( mm )
 
-    real (kind=c_float),intent(in) :: inches
-    real (kind=c_float)            :: mm
+    real (c_float),intent(in) :: inches
+    real (c_float)            :: mm
 
     mm = inches * 25.4_c_double
 
@@ -512,8 +512,8 @@ contains
 
   elemental function inches_to_mm_dbl_fn( inches )   result( mm )
 
-    real (kind=c_double),intent(in) :: inches
-    real (kind=c_double)            :: mm
+    real (c_double),intent(in) :: inches
+    real (c_double)            :: mm
 
     mm = inches * 25.4_c_double
 
@@ -527,8 +527,8 @@ contains
 
   elemental function mm_to_inches_sgl_fn(mm) result(inches)
 
-    real (kind=c_float),intent(in) :: mm
-    real (kind=c_float) :: inches
+    real (c_float),intent(in) :: mm
+    real (c_float) :: inches
 
     inches = mm / 25.4_c_double
 
@@ -542,8 +542,8 @@ contains
 
   elemental function mm_to_inches_dbl_fn( mm ) result( inches )
 
-    real (kind=c_double),intent(in) :: mm
-    real (kind=c_double) :: inches
+    real (c_double),intent(in) :: mm
+    real (c_double) :: inches
 
     inches = mm / 25.4_c_double
 
@@ -555,8 +555,8 @@ contains
 
   elemental function short2logical(iShortVal)    result(lValue)
 
-    integer (kind=c_short), intent(in)    :: iShortVal
-    logical (kind=c_bool)                 :: lValue
+    integer (c_short), intent(in)    :: iShortVal
+    logical (c_bool)                 :: lValue
 
     if ( iShortVal == 0 ) then
       lValue = lFALSE
@@ -572,8 +572,8 @@ contains
 
   elemental function int2logical(iValue)    result(lValue)
 
-    integer (kind=c_int), intent(in)      :: iValue
-    logical (kind=c_bool)                 :: lValue
+    integer (c_int), intent(in)      :: iValue
+    logical (c_bool)                 :: lValue
 
     if ( iValue == 0 ) then
       lValue = lFALSE
@@ -589,11 +589,11 @@ contains
 
   elemental function real2logical(rValue)    result(lValue)
 
-    real (kind=c_float), intent(in)      :: rValue
-    logical (kind=c_bool)                :: lValue
+    real (c_float), intent(in)      :: rValue
+    logical (c_bool)                :: lValue
 
     ! [ LOCALS ]
-    real (kind=c_float), parameter :: fMinResolution = 2.0 * spacing(1.0_c_float)
+    real (c_float), parameter :: fMinResolution = 2.0 * spacing(1.0_c_float)
 
     if ( rValue > -fMinResolution .and. rValue < fMinResolution ) then
       lValue = lFALSE
@@ -609,11 +609,11 @@ contains
 
   elemental function dbl2logical(rValue)    result(lValue)
 
-    real (kind=c_double), intent(in)      :: rValue
-    logical (kind=c_bool)                 :: lValue
+    real (c_double), intent(in)      :: rValue
+    logical (c_bool)                 :: lValue
 
     ! [ LOCALS ]
-    real (kind=c_double), parameter :: dMinResolution = 2.0 * spacing(1.0_c_float)
+    real (c_double), parameter :: dMinResolution = 2.0 * spacing(1.0_c_float)
 
     if ( rValue > -dMinResolution .and. rValue < dMinResolution ) then
       lValue = lFALSE
@@ -630,7 +630,7 @@ contains
   elemental function char2logical(sValue)    result(lValue)
 
     character (len=*), intent(in)      :: sValue
-    logical (kind=c_bool)              :: lValue
+    logical (c_bool)              :: lValue
 
     select case ( sValue )
 
@@ -652,10 +652,10 @@ contains
 
   elemental function short2int(iShortVal)    result(iValue)
 
-    integer (kind=c_short), intent(in)    :: iShortVal
-    integer (kind=c_int)                  :: iValue
+    integer (c_short), intent(in)    :: iShortVal
+    integer (c_int)                  :: iValue
 
-    iValue = int( iShortVal, kind=c_int )
+    iValue = int( iShortVal, c_int )
 
   end function short2int
 
@@ -666,12 +666,12 @@ contains
   impure elemental function char2int(sValue)  result(iValue)
 
     character (len=*), intent(in) :: sValue
-    integer (kind=c_int) :: iValue
+    integer (c_int) :: iValue
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iStat
+    integer (c_int) :: iStat
     character (len=:), allocatable :: sTempVal
-    real (kind=c_float)  :: rValue
+    real (c_float)  :: rValue
 
     sTempVal = keepnumeric(sValue)
 
@@ -681,7 +681,7 @@ contains
 
       read(unit=sTempVal, fmt=*, iostat=iStat) rValue
 
-      if (iStat == 0)  iValue = int(rValue, kind=c_int)
+      if (iStat == 0)  iValue = int(rValue, c_int)
 
     else
 
@@ -699,10 +699,10 @@ contains
 
 elemental function real2int(rValue)  result(iValue)
 
-  real (kind=c_float), intent(in) :: rValue
-  integer (kind=c_int) :: iValue
+  real (c_float), intent(in) :: rValue
+  integer (c_int) :: iValue
 
-  iValue = int(rValue, kind=c_int)
+  iValue = int(rValue, c_int)
 
 end function real2int
 
@@ -712,10 +712,10 @@ end function real2int
 
 elemental function dbl2int(rValue)  result(iValue)
 
-  real (kind=c_double), intent(in) :: rValue
-  integer (kind=c_int) :: iValue
+  real (c_double), intent(in) :: rValue
+  integer (c_int) :: iValue
 
-  iValue = int(rValue, kind=c_int)
+  iValue = int(rValue, c_int)
 
 end function dbl2int
 
@@ -726,10 +726,10 @@ end function dbl2int
 elemental function char2real(sValue)  result(rValue)
 
   character (len=*), intent(in) :: sValue
-  real (kind=c_float) :: rValue
+  real (c_float) :: rValue
 
   ! [ LOCALS ]
-  integer (kind=c_int) :: iStat
+  integer (c_int) :: iStat
 
   read(unit=sValue, fmt=*, iostat=iStat) rValue
 
@@ -743,10 +743,10 @@ end function char2real
 
 elemental function short2real(iValue)  result(rValue)
 
-  integer (kind=c_short), intent(in) :: iValue
-  real (kind=c_float)                :: rValue
+  integer (c_short), intent(in) :: iValue
+  real (c_float)                :: rValue
 
-  rValue = real(iValue, kind=c_float)
+  rValue = real(iValue, c_float)
 
 end function short2real
 
@@ -756,10 +756,10 @@ end function short2real
 
 elemental function int2real(iValue)  result(rValue)
 
-  integer (kind=c_int), intent(in) :: iValue
-  real (kind=c_float) :: rValue
+  integer (c_int), intent(in) :: iValue
+  real (c_float) :: rValue
 
-  rValue = real(iValue, kind=c_float)
+  rValue = real(iValue, c_float)
 
 end function int2real
 
@@ -769,10 +769,10 @@ end function int2real
 
 elemental function dbl2real(dpValue)  result(rValue)
 
-  real (kind=c_double), intent(in) :: dpValue
-  real (kind=c_float) :: rValue
+  real (c_double), intent(in) :: dpValue
+  real (c_float) :: rValue
 
-  rValue = real(dpValue, kind=c_float)
+  rValue = real(dpValue, c_float)
 
 end function dbl2real
 
@@ -798,10 +798,10 @@ end function bool2real
 elemental function char2dbl(sValue)  result(dValue)
 
   character (len=*), intent(in)    :: sValue
-  real (kind=c_double) :: dValue
+  real (c_double) :: dValue
 
   ! [ LOCALS ]
-  integer (kind=c_int) :: iStat
+  integer (c_int) :: iStat
 
   read(unit=sValue, fmt=*, iostat=iStat) dValue
 
@@ -815,10 +815,10 @@ end function char2dbl
 
 elemental function short2dbl(iValue)  result(dValue)
 
-  integer (kind=c_short), intent(in) :: iValue
-  real (kind=c_double)               :: dValue
+  integer (c_short), intent(in) :: iValue
+  real (c_double)               :: dValue
 
-  dValue = real(iValue, kind=c_double)
+  dValue = real(iValue, c_double)
 
 end function short2dbl
 
@@ -828,10 +828,10 @@ end function short2dbl
 
 elemental function int2dbl(iValue)  result(dValue)
 
-  integer (kind=c_int), intent(in) :: iValue
-  real (kind=c_double) :: dValue
+  integer (c_int), intent(in) :: iValue
+  real (c_double) :: dValue
 
-  dValue = real(iValue, kind=c_double)
+  dValue = real(iValue, c_double)
 
 end function int2dbl
 
@@ -841,10 +841,10 @@ end function int2dbl
 
 elemental function real2dbl(fValue)  result(dValue)
 
-  real (kind=c_float), intent(in) :: fValue
-  real (kind=c_double) :: dValue
+  real (c_float), intent(in) :: fValue
+  real (c_double) :: dValue
 
-  dValue = real(fValue, kind=c_double)
+  dValue = real(fValue, c_double)
 
 end function real2dbl
 
@@ -872,8 +872,8 @@ function char_ptr_to_fortran_string( cpCharacterPtr )  result(sText)
 
   type(c_ptr) :: cpCharacterPtr
   character(len=256) :: sText
-  character (kind=c_char), pointer, dimension(:) :: fptr
-  integer (kind=c_int) :: iCount
+  character (c_char), pointer, dimension(:) :: fptr
+  integer (c_int) :: iCount
 
     sText = repeat(" ", 256)
 
@@ -897,7 +897,7 @@ elemental function c_to_fortran_string( cCharacterString )  result(sText)
 
   character (len=*), intent(in) :: cCharacterString
   character(len=len(cCharacterString) - 1) :: sText
-  integer (kind=c_int) :: iIndex
+  integer (c_int) :: iIndex
 
   sText = ""
 
@@ -924,7 +924,7 @@ elemental function fortran_to_c_string( sText )  result(cCharacterString)
 
   character (len=*), intent(in) :: sText
   character(len=256) :: cCharacterString
-  integer (kind=c_int) :: iIndex
+  integer (c_int) :: iIndex
 
   iIndex = index(string=sText, substring=c_null_char)
 
@@ -949,8 +949,8 @@ end function fortran_to_c_string
     ! LOCALS
     character (len=512)            :: sTemp
     character (len=512)            :: sBuf
-    integer (kind=c_int)           :: iR                 ! Index in sRecord
-    integer (kind=c_int)           :: iIndex1, iIndex2
+    integer (c_int)           :: iR                 ! Index in sRecord
+    integer (c_int)           :: iIndex1, iIndex2
     character (len=:), allocatable :: sTargetCharacters_l
 
     ! TargetCharacter omits the period ("."): do not want a real value returned

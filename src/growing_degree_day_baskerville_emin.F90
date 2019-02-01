@@ -22,28 +22,28 @@ module growing_degree_day_baskerville_emin
   integer, parameter :: c_diff_t = 8
 #endif
 
-  real (kind=c_float), allocatable  :: GDD_BASE(:)
-  real (kind=c_float), allocatable  :: GDD_MAX(:)
-  integer (kind=c_int), allocatable :: GDD_RESET_DATE(:)
+  real (c_float), allocatable  :: GDD_BASE(:)
+  real (c_float), allocatable  :: GDD_MAX(:)
+  integer (c_int), allocatable :: GDD_RESET_DATE(:)
   type (T_NETCDF4_FILE), pointer    :: pNCFILE
 
 contains
 
   subroutine growing_degree_day_be_initialize( is_cell_active, landuse_index )
 
-    logical (kind=c_bool), intent(in)     :: is_cell_active(:,:)
-    integer (kind=c_int), intent(in)      :: landuse_index(:)
+    logical (c_bool), intent(in)     :: is_cell_active(:,:)
+    integer (c_int), intent(in)      :: landuse_index(:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)              :: status
-    integer (kind=c_int)              :: indx
+    integer (c_int)              :: status
+    integer (c_int)              :: indx
     type (STRING_LIST_T)              :: parameter_list
     type (STRING_LIST_T)              :: gdd_reset_val_list
     character (len=32)                :: sBuf
-    real (kind=c_float), allocatable  :: gdd_base_l(:)
-    real (kind=c_float), allocatable  :: gdd_max_l(:)
-    integer (kind=c_int)              :: number_of_landuse_codes
-    integer (kind=c_int), allocatable :: landuse_code(:)
+    real (c_float), allocatable  :: gdd_base_l(:)
+    real (c_float), allocatable  :: gdd_max_l(:)
+    integer (c_int)              :: number_of_landuse_codes
+    integer (c_int), allocatable :: landuse_code(:)
 
     allocate( GDD_BASE( count( is_cell_active ) ), stat=status )
     call assert( status == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
@@ -145,19 +145,19 @@ contains
   elemental subroutine growing_degree_day_be_calculate( gdd, tmean, tmin, tmax, order )
 
     ! [ ARGUMENTS ]
-    real (kind=c_float), intent(inout)       :: gdd
-    real (kind=c_float), intent(in)          :: tmean
-    real (kind=c_float), intent(in)          :: tmin
-    real (kind=c_float), intent(in)          :: tmax
-    integer (kind=c_int), intent(in)         :: order
+    real (c_float), intent(inout)       :: gdd
+    real (c_float), intent(in)          :: tmean
+    real (c_float), intent(in)          :: tmin
+    real (c_float), intent(in)          :: tmax
+    integer (c_int), intent(in)         :: order
 
     ! [ LOCALS ]
-    real (kind=c_float)    :: delta
-    real (kind=c_float)    :: tmax_l
-    real (kind=c_float)    :: dd
-    real (kind=c_float)    :: W
-    real (kind=c_float)    :: At
-    real (kind=c_float)    :: A
+    real (c_float)    :: delta
+    real (c_float)    :: tmax_l
+    real (c_float)    :: dd
+    real (c_float)    :: W
+    real (c_float)    :: At
+    real (c_float)    :: A
 
     associate( doy_to_reset_gdd => GDD_RESET_DATE( order ),      &
                gdd_max => GDD_MAX( order ),                      &
@@ -187,7 +187,7 @@ contains
         A = asin( At )
 
         dd = ( ( W * cos( A ) ) - ( ( gdd_base - tmean )                    &
-               * ( real( PI / 2._c_double, kind=c_float ) - A ) ) ) / PI
+               * ( real( PI / 2._c_double, c_float ) - A ) ) ) / PI
 
       endif
 

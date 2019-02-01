@@ -10,10 +10,10 @@ contains
                                                     snowmelt,             &
                                                     net_snowfall )
 
-    real (kind=c_float), intent(inout)      :: snow_storage
-    real (kind=c_float), intent(inout)      :: snowmelt
-    real (kind=c_float), intent(in)         :: potential_snowmelt
-    real (kind=c_float), intent(in)         :: net_snowfall
+    real (c_float), intent(inout)      :: snow_storage
+    real (c_float), intent(inout)      :: snowmelt
+    real (c_float), intent(in)         :: potential_snowmelt
+    real (c_float), intent(in)         :: net_snowfall
 
 
     snow_storage = max(0.0_c_float, snow_storage + net_snowfall )

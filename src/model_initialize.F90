@@ -35,17 +35,17 @@ module model_initialize
   type GRIDDED_DATASETS_T
     character (len=38)             :: sName
     character (len=256)            :: sPathname
-    logical (kind=c_bool)          :: lOptional
-    integer (kind=c_int)           :: iDataType
+    logical (c_bool)          :: lOptional
+    integer (c_int)           :: iDataType
   end type GRIDDED_DATASETS_T
 
   type METHODS_LIST_T
     character (len=23)     :: sName
-    logical (kind=c_bool)  :: lOptional
+    logical (c_bool)  :: lOptional
   end type METHODS_LIST_T
 
-  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 44
-  integer (kind=c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 18
+  integer (c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 44
+  integer (c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 18
 
   type (GRIDDED_DATASETS_T)    :: KNOWN_GRIDS( NUMBER_OF_KNOWN_GRIDS ) =                             &
 
@@ -129,7 +129,7 @@ contains
                                      weather_data_dirname
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iIndex
+    integer (c_int) :: iIndex
 
     call MODEL%set_default_method_pointers()
 
@@ -300,7 +300,7 @@ contains
 
     character(len=*), intent(in) :: data_dirname
 
-    integer (kind=c_int) :: indx
+    integer (c_int) :: indx
 
     do indx=1,ubound(KNOWN_GRIDS,1)
 
@@ -327,7 +327,7 @@ contains
 
     character(len=*), intent(in) :: weather_data_dirname
 
-    integer (kind=c_int) :: indx
+    integer (c_int) :: indx
 
     do indx=1,ubound(KNOWN_GRIDS,1)
 
@@ -352,8 +352,8 @@ contains
     type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_SNOW_COVER_STORAGE
 
     ! [ LOCALS ]
-    real (kind=c_float), allocatable  :: fInitial_Snow_Cover_Storage(:)
-    integer (kind=c_int)              :: iStat
+    real (c_float), allocatable  :: fInitial_Snow_Cover_Storage(:)
+    integer (c_int)              :: iStat
 
     allocate ( fInitial_Snow_Cover_Storage( count( MODEL%active ) ), stat=iStat )
 
@@ -397,8 +397,8 @@ contains
     type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_PERCENT_SOIL_MOISTURE
 
     ! [ LOCALS ]
-    real (kind=c_float), allocatable  :: fInitial_Percent_Soil_Moisture(:)
-    integer (kind=c_int)              :: iStat
+    real (c_float), allocatable  :: fInitial_Percent_Soil_Moisture(:)
+    integer (c_int)              :: iStat
 
     allocate ( fInitial_Percent_Soil_Moisture( count( MODEL%active ) ), stat=iStat )
 
@@ -436,8 +436,8 @@ contains
   subroutine initialize_percent_pervious()
 
     ! [ LOCALS ]
-    integer (kind=c_int)                 :: iStat
-    integer (kind=c_int)                 :: iIndex
+    integer (c_int)                 :: iStat
+    integer (c_int)                 :: iIndex
     type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_IMPERVIOUS
     type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_PERVIOUS
     type (DATA_CATALOG_ENTRY_T), pointer :: pFRACTION_IMPERVIOUS
@@ -523,8 +523,8 @@ contains
   subroutine initialize_percent_canopy_cover
 
     ! [ LOCALS ]
-    integer (kind=c_int)                 :: iStat
-    integer (kind=c_int)                 :: iIndex
+    integer (c_int)                 :: iStat
+    integer (c_int)                 :: iIndex
     type (DATA_CATALOG_ENTRY_T), pointer :: pPERCENT_CANOPY_COVER
     type (DATA_CATALOG_ENTRY_T), pointer :: pFRACTION_CANOPY_COVER
     type ( GENERAL_GRID_T ), pointer     :: pTempGrd
@@ -589,8 +589,8 @@ contains
   subroutine initialize_hydrologic_soil_groups
 
     ! [ LOCALS ]
-    integer (kind=c_int)                 :: iStat
-    integer (kind=c_int)                 :: iIndex
+    integer (c_int)                 :: iStat
+    integer (c_int)                 :: iIndex
     type (DATA_CATALOG_ENTRY_T), pointer :: pHSG
 
     pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
@@ -656,14 +656,14 @@ contains
 
     ! [ LOCALS ]
     type (DATA_CATALOG_ENTRY_T), pointer :: pPOLYGON_ID
-    logical (kind=c_bool)                :: any_problems
+    logical (c_bool)                :: any_problems
     type (STRING_LIST_T)                 :: slList
-    integer (kind=c_int), allocatable    :: polygon_id(:)
-    real (kind=c_float), allocatable     :: rooting_depth_inches(:)
-    real (kind=c_float), allocatable     :: soil_moisture_storage(:)
-    integer (kind=c_int)                 :: iNumberOfPolygonIDs
+    integer (c_int), allocatable    :: polygon_id(:)
+    real (c_float), allocatable     :: rooting_depth_inches(:)
+    real (c_float), allocatable     :: soil_moisture_storage(:)
+    integer (c_int)                 :: iNumberOfPolygonIDs
     type (GENERAL_GRID_T), pointer       :: pTempGrd
-    integer (kind=c_int)                 :: index
+    integer (c_int)                 :: index
 
 
 
@@ -799,9 +799,9 @@ contains
     ! [ LOCALS ]
     character (len=256)             :: sRecord, sSubstring
     character (len=:), allocatable  :: sText
-    integer (kind=c_int)            :: iStat
-    integer (kind=c_int)            :: iIndex
-    integer (kind=c_int)            :: iCount
+    integer (c_int)            :: iStat
+    integer (c_int)            :: iIndex
+    integer (c_int)            :: iCount
     type (ASCII_FILE_T)             :: CF
     type (DICT_ENTRY_T), pointer    :: pDict
 
@@ -854,9 +854,9 @@ contains
 
     ! [ LOCALS ]
     character (len=256)   :: sRecord, sSubstring
-    integer (kind=c_int)  :: iStat
+    integer (c_int)  :: iStat
     type (ASCII_FILE_T)   :: CF
-    integer (kind=c_int)  :: dumpfile_count
+    integer (c_int)  :: dumpfile_count
 
     dumpfile_count = 0
 
@@ -941,20 +941,20 @@ contains
 
     character (len=*), intent(in)      :: sKey
     character (len=*), intent(in)      :: sPathname
-    logical (kind=c_bool), intent(in)  :: lOptional
-    integer (kind=c_int), intent(in)   :: iDataType
+    logical (c_bool), intent(in)  :: lOptional
+    integer (c_int), intent(in)   :: iDataType
 
     ! [ LOCALS ]
     type (STRING_LIST_T)                 :: myDirectives
     type (STRING_LIST_T)                 :: myOptions
-    integer (kind=c_int)                 :: iIndex
+    integer (c_int)                 :: iIndex
     character (len=:), allocatable       :: sCmdText
     character (len=:), allocatable       :: sArgText
     character (len=:), allocatable       :: sArgText_1
     character (len=:), allocatable       :: sArgText_2
-    integer (kind=c_int)                 :: iStat
+    integer (c_int)                 :: iStat
     type (DATA_CATALOG_ENTRY_T), pointer :: pENTRY
-    logical (kind=c_bool)             :: lGridPresent
+    logical (c_bool)             :: lGridPresent
 
     pENTRY => null()
     lGridPresent = lFALSE
@@ -1232,12 +1232,12 @@ contains
 
     ! [ LOCALS ]
     type (STRING_LIST_T)             :: myOptions
-    integer (kind=c_int)             :: iIndex
+    integer (c_int)             :: iIndex
     character (len=:), allocatable   :: sArgText
-    integer (kind=c_int)             :: iStat
-    real (kind=c_double)             :: rX0, rX1, rY0, rY1, rGridCellSize
-    integer (kind=c_int)             :: iNX, iNY
-    real (kind=c_float)              :: fTempVal
+    integer (c_int)             :: iStat
+    real (c_double)             :: rX0, rX1, rY0, rY1, rGridCellSize
+    integer (c_int)             :: iNX, iNY
+    real (c_float)              :: fTempVal
 
 
     ! For MODEL directive, obtain the associated dictionary entries
@@ -1261,8 +1261,8 @@ contains
 
       call MODEL%initialize_grid(iNX, iNY, rX0, rY0, rGridCellSize)
 
-      rX1 = rX0 + rGridCellSize * real(iNX, kind=c_double)
-      rY1 = rY0 + rGridCellSize * real(iNY, kind=c_double)
+      rX1 = rX0 + rGridCellSize * real(iNX, c_double)
+      rY1 = rY0 + rGridCellSize * real(iNY, c_double)
 
     elseif ( myOptions%count == 7 ) then
 
@@ -1270,7 +1270,7 @@ contains
       rY1 = asDouble( myOptions%get(6) )
       rGridCellSize = asDouble( myOptions%get(7) )
 
-      fTempVal = ( rX1 - rX0 ) / real(iNX, kind=c_double)
+      fTempVal = ( rX1 - rX0 ) / real(iNX, c_double)
 
       call MODEL%initialize_grid(iNX, iNY, rX0, rY0, rGridCellSize)
 
@@ -1319,13 +1319,13 @@ contains
 
       ! [ LOCALS ]
       type (STRING_LIST_T)             :: myOptions
-      integer (kind=c_int)             :: iIndex
-      integer (kind=c_int)             :: jIndex
+      integer (c_int)             :: iIndex
+      integer (c_int)             :: jIndex
       character (len=:), allocatable   :: sArgText
       character (len=:), allocatable   :: sAction
       character (len=:), allocatable   :: sOutput
-      integer (kind=c_int)             :: iStat
-      logical (kind=c_bool)            :: enable_output
+      integer (c_int)             :: iStat
+      logical (c_bool)            :: enable_output
 
       enable_output = TRUE
 
@@ -1394,13 +1394,13 @@ contains
     ! [ LOCALS ]
     type (STRING_LIST_T)             :: myDirectives
     type (STRING_LIST_T)             :: myOptions
-    integer (kind=c_int)             :: iIndex
+    integer (c_int)             :: iIndex
     character (len=:), allocatable   :: sCmdText
     character (len=:), allocatable   :: sOptionText
     character (len=:), allocatable   :: sArgText
-    integer (kind=c_int)             :: iStat
-    logical (kind=c_bool)            :: lHaveStartDate
-    logical (kind=c_bool)            :: lHaveEndDate
+    integer (c_int)             :: iStat
+    logical (c_bool)            :: lHaveStartDate
+    logical (c_bool)            :: lHaveEndDate
 
     lHaveStartDate = lFALSE
     lHaveEndDate = lFALSE
@@ -1500,15 +1500,15 @@ contains
     type (STRING_LIST_T)             :: myDirectives
     type (STRING_LIST_T)             :: myOptions
     type (STRING_LIST_T)             :: slString
-    integer (kind=c_int)             :: iIndex
+    integer (c_int)             :: iIndex
     character (len=:), allocatable   :: sCmdText
     character (len=:), allocatable   :: sOptionText
     character (len=:), allocatable   :: sArgText
     character (len=:), allocatable   :: sText
     character (len=256)              :: sBuf
-    integer (kind=c_int)             :: iStat
+    integer (c_int)             :: iStat
     type (PARAMETERS_T)              :: PARAMS
-    integer (kind=c_int)             :: iCount
+    integer (c_int)             :: iCount
     type (DICT_ENTRY_T), pointer     :: pDict1
     type (DICT_ENTRY_T), pointer     :: pDict2
 
@@ -1575,21 +1575,21 @@ contains
   subroutine initialize_generic_method( sKey, lOptional)
 
     character (len=*), intent(in)     :: sKey
-    logical (kind=c_bool), intent(in) :: lOptional
+    logical (c_bool), intent(in) :: lOptional
 
     ! [ LOCALS ]
     type (STRING_LIST_T)             :: myDirectives
     type (STRING_LIST_T)             :: myOptions
-    integer (kind=c_int)             :: iIndex
-    integer (kind=c_int)             :: indx
+    integer (c_int)             :: iIndex
+    integer (c_int)             :: indx
     character (len=:), allocatable   :: sCmdText
 !    character (len=:), allocatable   :: sOptionText
     type (STRING_LIST_T)             :: argv_list
     character (len=:), allocatable   :: sArgText
-    integer (kind=c_int)             :: iStat
-    integer (kind=c_int)             :: status
-    logical (kind=c_bool)            :: lFatal
-    integer (kind=c_int)             :: num_elements
+    integer (c_int)             :: iStat
+    integer (c_int)             :: status
+    logical (c_bool)            :: lFatal
+    integer (c_int)             :: num_elements
 
     ! obtain a list of control file directives whose key values contain the string sKey
     myDirectives = CF_DICT%grep_keys( trim(sKey) )
@@ -1655,16 +1655,16 @@ contains
     ! [ LOCALS ]
     type (STRING_LIST_T)             :: myDirectives
     type (STRING_LIST_T)             :: myOptions
-    integer (kind=c_int)             :: iIndex
-    integer (kind=c_int)             :: indx
+    integer (c_int)             :: iIndex
+    integer (c_int)             :: indx
     character (len=:), allocatable   :: sCmdText
 !    character (len=:), allocatable   :: sOptionText
     type (STRING_LIST_T)             :: argv_list
     character (len=:), allocatable   :: sArgText
-    integer (kind=c_int)             :: iStat
-    integer (kind=c_int)             :: status
-    logical (kind=c_bool)            :: lFatal
-    integer (kind=c_int)             :: num_elements
+    integer (c_int)             :: iStat
+    integer (c_int)             :: status
+    logical (c_bool)            :: lFatal
+    integer (c_int)             :: num_elements
     character (len=:), allocatable   :: Option_Name
 
     ! obtain a list of control file directives whose key values contain the string sKey
@@ -1728,7 +1728,7 @@ contains
   subroutine initialize_latitude()
 
     ! [ LOCALS ]
-    integer (kind=c_int)  :: iIndex
+    integer (c_int)  :: iIndex
 
     pCOORD_GRD => grid_Create( iNX=MODEL%number_of_columns, iNY=MODEL%number_of_rows, &
         rX0=MODEL%X_ll, rY0=MODEL%Y_ll, &
@@ -1771,13 +1771,13 @@ contains
 !   subroutine initialize_landuse_codes()
 !
 !     ! [ LOCALS ]
-!     integer (kind=c_int)                 :: iIndex
-!     integer (kind=c_int), allocatable    :: iLandUseCodes(:)
+!     integer (c_int)                 :: iIndex
+!     integer (c_int), allocatable    :: iLandUseCodes(:)
 !     type (DATA_CATALOG_ENTRY_T), pointer :: pLULC
-!     integer (kind=c_int)                 :: iIndex2
-!     integer (kind=c_int)                 :: iCount
-!     integer (kind=c_int)                 :: iStat
-!     logical (kind=c_bool)                :: lMatch
+!     integer (c_int)                 :: iIndex2
+!     integer (c_int)                 :: iCount
+!     integer (c_int)                 :: iStat
+!     logical (c_bool)                :: lMatch
 !     type (STRING_LIST_T)                 :: slList
 !
 !     call slList%append("LU_Code")
@@ -1861,14 +1861,14 @@ contains
 
   subroutine initialize_surface_storage_max()
 
-    integer (kind=c_int)               :: iIndex
-    integer (kind=c_int)               :: iStat
+    integer (c_int)               :: iIndex
+    integer (c_int)               :: iStat
     character (len=256)                :: sBuf
     type (STRING_LIST_T)               :: slList
-    integer( kind=c_int), allocatable  :: iLanduseTableCodes(:)
-    integer (kind=c_int)               :: iNumberOfLanduses
-    real (kind=c_float), allocatable   :: SURFACE_STORAGE_MAXIMUM(:)
-    real (kind=c_float)                :: current_surface_storage_max
+    integer( c_int), allocatable  :: iLanduseTableCodes(:)
+    integer (c_int)               :: iNumberOfLanduses
+    real (c_float), allocatable   :: SURFACE_STORAGE_MAXIMUM(:)
+    real (c_float)                :: current_surface_storage_max
 
 
     ! create list of possible table headings to look for...

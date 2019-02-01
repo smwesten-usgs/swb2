@@ -21,7 +21,7 @@ contains
 
     ! [ LOCALS ]
     type (STRING_LIST_T)           :: proj4_list
-    integer (kind=c_int)           :: indx
+    integer (c_int)           :: indx
     character (len=256)            :: temp_string
     character (len=:), allocatable :: valuestring
     character (len=:), allocatable :: namestring

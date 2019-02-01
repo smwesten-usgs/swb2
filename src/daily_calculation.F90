@@ -30,8 +30,8 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: cells
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: indx, jndx
-    integer (kind=c_int) :: landuse_index
+    integer (c_int) :: indx, jndx
+    integer (c_int) :: landuse_index
 
     ! calls elemental
     call cells%calc_GDD()
@@ -250,12 +250,12 @@ contains
 
   subroutine minmaxmean( variable , varname, logical_vector )
 
-    real (kind=c_float), dimension(:)           :: variable
+    real (c_float), dimension(:)           :: variable
     character (len=*), intent(in)               :: varname
     logical, intent(in), optional               :: logical_vector(:)
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iCount
+    integer (c_int) :: iCount
     character (len=30)   :: sVarname
     character (len=14)   :: sMin
     character (len=14)   :: sMax

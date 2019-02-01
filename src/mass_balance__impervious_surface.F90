@@ -8,7 +8,7 @@ module mass_balance__impervious_surface
 
   public :: calculate_impervious_surface_mass_balance
 
-  real (kind=c_float), parameter   :: NEAR_ZERO = 1.0e-6_c_float
+  real (c_float), parameter   :: NEAR_ZERO = 1.0e-6_c_float
 
 contains
 
@@ -27,24 +27,24 @@ contains
                                           reference_et0,                &
                                           pervious_fraction )
 
-    real (kind=c_double), intent(inout)     :: surface_storage
-    real (kind=c_double), intent(inout)     :: actual_et_impervious
-    real (kind=c_float), intent(inout)      :: paved_to_unpaved           ! 'wadd' in HWB
-    real (kind=c_float), intent(inout)      :: storm_drain_capture
-    real (kind=c_float), intent(in)         :: storm_drain_capture_fraction
-    real (kind=c_float), intent(in)         :: surface_storage_max
-    real (kind=c_float), intent(in)         :: net_rainfall
-    real (kind=c_float), intent(in)         :: snowmelt
-    real (kind=c_float), intent(in)         :: runon
-    real (kind=c_float), intent(in)         :: runoff
-    real (kind=c_float), intent(in)         :: fog
-    real (kind=c_float), intent(in)         :: reference_et0
-    real (kind=c_float), intent(in)         :: pervious_fraction
+    real (c_double), intent(inout)     :: surface_storage
+    real (c_double), intent(inout)     :: actual_et_impervious
+    real (c_float), intent(inout)      :: paved_to_unpaved           ! 'wadd' in HWB
+    real (c_float), intent(inout)      :: storm_drain_capture
+    real (c_float), intent(in)         :: storm_drain_capture_fraction
+    real (c_float), intent(in)         :: surface_storage_max
+    real (c_float), intent(in)         :: net_rainfall
+    real (c_float), intent(in)         :: snowmelt
+    real (c_float), intent(in)         :: runon
+    real (c_float), intent(in)         :: runoff
+    real (c_float), intent(in)         :: fog
+    real (c_float), intent(in)         :: reference_et0
+    real (c_float), intent(in)         :: pervious_fraction
 
     ! [ LOCALS ]
-    real (kind=c_float) :: surface_storage_excess
-    real (kind=c_float) :: impervious_fraction
-    real (kind=c_float) :: surface_storage_l
+    real (c_float) :: surface_storage_excess
+    real (c_float) :: impervious_fraction
+    real (c_float) :: surface_storage_l
 
 !    if ( storm_drain_capture_fraction >= 0.0_c_float ) then
 

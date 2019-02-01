@@ -10,12 +10,12 @@ module simulation_datetime
     type (DATETIME_T)       :: start
     type (DATETIME_T)       :: end
     type (DATETIME_T)       :: curr
-    integer (kind=c_int)    :: iDOY
-    integer (kind=c_int)    :: iDaysInMonth
-    integer (kind=c_int)    :: iDaysInYear
-    integer (kind=c_int)    :: iYearOfSimulation = 1
-    logical (kind=c_bool)   :: lIsLeapYear
-    integer (kind=c_int)    :: iNumDaysFromOrigin = 0
+    integer (c_int)    :: iDOY
+    integer (c_int)    :: iDaysInMonth
+    integer (c_int)    :: iDaysInYear
+    integer (c_int)    :: iYearOfSimulation = 1
+    logical (c_bool)   :: lIsLeapYear
+    integer (c_int)    :: iNumDaysFromOrigin = 0
 
   contains
 
@@ -97,16 +97,16 @@ contains
 
     class (DATE_RANGE_T), intent(inout)   :: this
     type (DATETIME_T), intent(in)         :: datetime
-    real (kind=c_double)                  :: num_days_from_origin
+    real (c_double)                  :: num_days_from_origin
 
-    num_days_from_origin = real( datetime - this%start, kind=c_double)
+    num_days_from_origin = real( datetime - this%start, c_double)
 
   end function days_from_origin_fn
 
   function percent_complete_fn( this )   result( percent_complete )
 
     class (DATE_RANGE_T), intent(inout)   :: this
-    real (kind=c_float)                   :: percent_complete
+    real (c_float)                   :: percent_complete
 
     percent_complete = real(this%curr - this%start) / real( this%end - this%start ) * 100.
 

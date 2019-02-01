@@ -7,15 +7,15 @@ module kiss_random_number_generator
   integer,parameter :: R8=8
   integer,parameter :: R16=16
 
-  integer(kind=I8)  :: Q(20632)
-  integer(kind=I8)  :: carry=36243678541_I8
-  integer(kind=I8)  :: xcng=12367890123456_I8
-  integer(kind=I8)  :: xs=521288629546311_I8
-  integer(kind=I8)  :: indx=20633_I8
+  integer(I8)  :: Q(20632)
+  integer(I8)  :: carry=36243678541_I8
+  integer(I8)  :: xcng=12367890123456_I8
+  integer(I8)  :: xs=521288629546311_I8
+  integer(I8)  :: indx=20633_I8
 
-  integer(kind=I8)  :: I8_max = huge(xs)
-  integer(kind=I8)  :: I8_min = -(huge(xs))
-  real(kind=R16)    :: I16_range = 2.*huge(xs)+1.
+  integer(I8)  :: I8_max = huge(xs)
+  integer(I8)  :: I8_min = -(huge(xs))
+  real(R16)    :: I16_range = 2.*huge(xs)+1.
 
 contains
 
@@ -416,11 +416,11 @@ contains
 !   -----------------------------------------------------------
 !   module suprkiss64_M ! period 5*2^1320480*(2^64-1)
 !   integer,parameter :: I8=selected_int_kind(18)
-!   integer(kind=I8) :: Q(20632),carry=36243678541_I8, &
+!   integer(I8) :: Q(20632),carry=36243678541_I8, &
 !   xcng=12367890123456_I8,xs=521288629546311_I8,indx=20633_I8
 !   contains
 !   function KISS64() result(x)
-!   integer(kind=I8) :: x
+!   integer(I8) :: x
 !   if(indx <= 20632)then; x=Q(indx); indx=indx+1
 !   else; x=refill(); endif
 !   xcng=xcng*6906969069_I8+123
@@ -431,7 +431,7 @@ contains
 !   return; end function KISS64
 !
 !   function refill() result(s)
-!   integer(kind=I8) :: i,s,z,h
+!   integer(I8) :: i,s,z,h
 !   do i=1,20632
 !   h=iand(carry,1_I8)
 !   z = ishft(ishft(Q(i),41),-1)+ &
@@ -447,7 +447,7 @@ contains
 !
 !   program testKISS64
 !   use suprkiss64_M
-!   integer(kind=I8) :: i,x
+!   integer(I8) :: i,x
 !   do i=1,20632 !fill Q with Congruential+Xorshift
 !   xcng=xcng*6906969069_I8+123
 !   xs=ieor(xs,ishft(xs,13))
@@ -463,11 +463,11 @@ contains
 !
 !   module suprkiss32_M ! period 5*2^1320481*(2^32-1)
 !   integer,parameter :: I4=selected_int_kind(9)
-!   integer(kind=I4) :: Q(41265),carry=362_I4, &
+!   integer(I4) :: Q(41265),carry=362_I4, &
 !   xcng=1236789_I4,xs=521288629_I4,indx=41266_I4
 !   contains
 !   function KISS32() result(x)
-!   integer(kind=I4):: x
+!   integer(I4):: x
 !   if(indx <= 41265)then;x=Q(indx); indx=indx+1
 !   else; x=refill(); endif
 !   xcng=xcng*69069_I4+123
@@ -478,7 +478,7 @@ contains
 !   return; end function KISS32
 !
 !   function refill() result(s)
-!   integer(kind=I4) :: i,s,z,h
+!   integer(I4) :: i,s,z,h
 !   do i = 1,41265
 !   h = iand(carry,1_I4)
 !   z = ishft(ishft(Q(i),9),-1)+ &
@@ -494,7 +494,7 @@ contains
 !
 !   program testKISS32
 !   use suprkiss32_M
-!   integer(kind=I4) :: i,x
+!   integer(I4) :: i,x
 !   do i=1,41265 !fill Q with Congruential+Xorshift
 !   xcng=xcng*69069_I4+123
 !   xs=ieor(xs,ishft(xs,13))
@@ -517,13 +517,13 @@ contains
 
   function kiss64_uniform_rng()                     result(unif)
 
-    real (kind=R8)      :: unif
+    real (R8)      :: unif
 
     ! [ LOCALS ]
-    integer (kind=I8)   :: x
+    integer (I8)   :: x
 
     x = kiss64_rng()
-    unif = ( real(x, kind=R8) - real(I8_min, kind=R8) ) / I16_range
+    unif = ( real(x, R8) - real(I8_min, R8) ) / I16_range
 
   end function kiss64_uniform_rng
 
@@ -531,7 +531,7 @@ contains
 
   function kiss64_rng()                             result(x)
 
-    integer(kind=I8) :: x
+    integer(I8) :: x
     if(indx <= 20632) then
       x=Q(indx)
       indx=indx+1
@@ -550,8 +550,8 @@ contains
 
   subroutine initialize_kiss_rng(seed)
 
-    integer(kind=I8), optional    :: seed
-    integer(kind=I8)              :: i,x
+    integer(I8), optional    :: seed
+    integer(I8)              :: i,x
 
     do i=1,20632 !fill Q with Congruential+Xorshift
       xcng=xcng*6906969069_I8+123
@@ -577,7 +577,7 @@ contains
 !-------------------------------------------------------------------------------
 
   function refill()                                 result(s)
-    integer(kind=I8) :: i, s, z, h
+    integer(I8) :: i, s, z, h
     do i=1, 20632
       h=iand(carry,1_I8)
       z = ishft(ishft(Q(i),41),-1)                                             &

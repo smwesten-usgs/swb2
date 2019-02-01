@@ -28,7 +28,7 @@ module actual_et__gridded_values
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pAET_GRID
 
-  real ( kind=c_float), allocatable    :: ACTUAL_ET(:)
+  real ( c_float), allocatable    :: ACTUAL_ET(:)
 
   type ( DATETIME_T )                  :: DATE_OF_LAST_RETRIEVAL
 
@@ -36,12 +36,12 @@ contains
 
   subroutine actual_et_gridded_values_initialize( is_cell_active )
 
-    logical (kind=c_bool), intent(in)     :: is_cell_active(:,:)
+    logical (c_bool), intent(in)     :: is_cell_active(:,:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)                 :: iStat
+    integer (c_int)                 :: iStat
     type (STRING_LIST_T)                 :: slString
-    integer (kind=c_int)                 :: iIndex
+    integer (c_int)                 :: iIndex
 
     ! locate the data structure associated with the gridded actual_et entries
     pAET_GRID => DAT%find("ACTUAL_ET")
@@ -59,7 +59,7 @@ contains
 
   subroutine actual_et_gridded_values_calculate( is_cell_active )
 
-    logical (kind=c_bool), intent(in)     :: is_cell_active(:,:)
+    logical (c_bool), intent(in)     :: is_cell_active(:,:)
 
     if ( .not. DATE_OF_LAST_RETRIEVAL == SIM_DT%curr ) then
 

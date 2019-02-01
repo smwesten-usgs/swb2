@@ -34,7 +34,7 @@ module fog__monthly_grid
 #endif
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pFOG_RATIO
-  real (kind=c_float), allocatable     :: fFOG_CATCH_EFFICIENCY(:)
+  real (c_float), allocatable     :: fFOG_CATCH_EFFICIENCY(:)
 
 contains
 
@@ -51,15 +51,15 @@ contains
 
   subroutine fog_monthly_grid_initialize( lActive )
 
-    logical (kind=c_bool), intent(in)     :: lActive(:,:)
+    logical (c_bool), intent(in)     :: lActive(:,:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)                 :: iStat
+    integer (c_int)                 :: iStat
     type (STRING_LIST_T)                 :: slString
-    integer (kind=c_int)                 :: iIndex
-    integer (kind=c_int), allocatable    :: iLanduseCodes(:)
-    integer (kind=c_int)                 :: iNumberOfLanduses
-    logical (kind=c_bool)                :: lAreLengthsEqual
+    integer (c_int)                 :: iIndex
+    integer (c_int), allocatable    :: iLanduseCodes(:)
+    integer (c_int)                 :: iNumberOfLanduses
+    logical (c_bool)                :: lAreLengthsEqual
 
     ! locate the data structure associated with the gridded fog ratio entries
     pFOG_RATIO => DAT%find("FOG_RATIO")
@@ -96,15 +96,15 @@ contains
 
   subroutine fog_monthly_grid_calculate( fRainfall, fFog, iLanduse_Index, lActive, nodata_fill_value )
 
-    real (kind=c_float), intent(in)        :: fRainfall(:)
-    real (kind=c_float), intent(inout)     :: fFog(:)
-    integer (kind=c_int), intent(in)       :: iLanduse_Index(:)
-    logical (kind=c_bool), intent(in)      :: lActive(:,:)
-    real (kind=c_float), intent(in)        :: nodata_fill_value(:,:)
+    real (c_float), intent(in)        :: fRainfall(:)
+    real (c_float), intent(inout)     :: fFog(:)
+    integer (c_int), intent(in)       :: iLanduse_Index(:)
+    logical (c_bool), intent(in)      :: lActive(:,:)
+    real (c_float), intent(in)        :: nodata_fill_value(:,:)
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iIndex
-    real (kind=c_float)  :: fFactor
+    integer (c_int) :: iIndex
+    real (c_float)  :: fFactor
 
     associate ( dt => SIM_DT%curr )
 

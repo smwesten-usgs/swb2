@@ -25,21 +25,21 @@ module model_iterate_multiple_simulations
 
   public :: iterate_over_multiple_simulation_days
 
-  real (kind=c_float), allocatable   :: MONTHLY_NET_INFILTRATION_STATS(:,:)
-  real (kind=c_float), allocatable   :: ANNUAL_NET_INFILTRATION_STATS(:)
-  real (kind=c_float), allocatable   :: MONTHLY_ACTUAL_ET_STATS(:,:)
-  real (kind=c_float), allocatable   :: ANNUAL_ACTUAL_ET_STATS(:)
-  real (kind=c_float), allocatable   :: MONTHLY_RAINFALL_STATS(:,:)
-  real (kind=c_float), allocatable   :: ANNUAL_RAINFALL_STATS(:)
-  integer (kind=c_int)               :: DAY_COUNT_BY_MONTH(12)
+  real (c_float), allocatable   :: MONTHLY_NET_INFILTRATION_STATS(:,:)
+  real (c_float), allocatable   :: ANNUAL_NET_INFILTRATION_STATS(:)
+  real (c_float), allocatable   :: MONTHLY_ACTUAL_ET_STATS(:,:)
+  real (c_float), allocatable   :: ANNUAL_ACTUAL_ET_STATS(:)
+  real (c_float), allocatable   :: MONTHLY_RAINFALL_STATS(:,:)
+  real (c_float), allocatable   :: ANNUAL_RAINFALL_STATS(:)
+  integer (c_int)               :: DAY_COUNT_BY_MONTH(12)
 
-  real (kind=c_double), target, allocatable   :: SOIL_MOISTURE_STORAGE_PER_SIM(:,:)
-  real (kind=c_float), target, allocatable    :: SNOW_STORAGE_PER_SIM(:,:)
-  real (kind=c_double), target, allocatable   :: SURFACE_STORAGE_PER_SIM(:,:)
-  real (kind=c_float), target, allocatable    :: INTERCEPTION_STORAGE_PER_SIM(:,:)
-  real (kind=c_float), target, allocatable    :: NET_INFILTRATION_PER_SIM(:,:)
-  real (kind=c_double), target, allocatable   :: ACTUAL_ET_PER_SIM(:,:)
-  real (kind=c_float), target, allocatable    :: FOG_PER_SIM(:,:)
+  real (c_double), target, allocatable   :: SOIL_MOISTURE_STORAGE_PER_SIM(:,:)
+  real (c_float), target, allocatable    :: SNOW_STORAGE_PER_SIM(:,:)
+  real (c_double), target, allocatable   :: SURFACE_STORAGE_PER_SIM(:,:)
+  real (c_float), target, allocatable    :: INTERCEPTION_STORAGE_PER_SIM(:,:)
+  real (c_float), target, allocatable    :: NET_INFILTRATION_PER_SIM(:,:)
+  real (c_double), target, allocatable   :: ACTUAL_ET_PER_SIM(:,:)
+  real (c_float), target, allocatable    :: FOG_PER_SIM(:,:)
 
 ! Concept: remap pointers to key state variables for each of X simulations,
 !          run the daily simulation given current landuse, soil type, etc.
@@ -50,11 +50,11 @@ contains
   subroutine allocate_space_for_simulation_storage_state_variables(cells, number_of_simulations)
 
     class (MODEL_DOMAIN_T), intent(inout)     :: cells
-    integer (kind=c_int), intent(in)          :: number_of_simulations
+    integer (c_int), intent(in)          :: number_of_simulations
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: length
-    integer (kind=c_int) :: indx
+    integer (c_int) :: length
+    integer (c_int) :: indx
 
     length = size( cells%soil_storage, 1)
 
@@ -133,10 +133,10 @@ contains
     use precipitation__method_of_fragments, only  : SIMULATION_NUMBER
 
     class (MODEL_DOMAIN_T), intent(inout)     :: cells
-    integer (kind=c_int), intent(inout)       :: number_of_simulations
+    integer (c_int), intent(inout)       :: number_of_simulations
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: sim_number
+    integer (c_int) :: sim_number
 
     ! set flags in output mod to allow multiple simulation output to be generated
     OUTSPECS(NCDF_NET_INFILTRATION)%multisim_outputs = TRUE
@@ -224,10 +224,10 @@ contains
   subroutine update_accumulators( cells, simulation_number )
 
     class (MODEL_DOMAIN_T), intent(inout)     :: cells
-    integer (kind=c_int), intent(in)          :: simulation_number
+    integer (c_int), intent(in)          :: simulation_number
 
     ![ LOCALS ]
-    integer (kind=c_int)  :: month
+    integer (c_int)  :: month
 
     month = SIM_DT%curr%iMonth
 
@@ -257,15 +257,15 @@ contains
   subroutine finalize_accumulators(cells, number_of_simulations)
 
     class (MODEL_DOMAIN_T), intent(inout)     :: cells
-    integer (kind=c_int), intent(in)          :: number_of_simulations
+    integer (c_int), intent(in)          :: number_of_simulations
 
     ![ LOCALS ]
-    real (kind=c_float)   :: number_of_simulation_days
-    integer (kind=c_int)  :: month
-    integer (kind=c_int)  :: simulation_number
+    real (c_float)   :: number_of_simulation_days
+    integer (c_int)  :: month
+    integer (c_int)  :: simulation_number
     character (len=256)   :: filename, file_suffix
-    integer (kind=c_int)  :: start_year, end_year
-    integer (kind=c_int)  :: nx, ny
+    integer (c_int)  :: start_year, end_year
+    integer (c_int)  :: nx, ny
     character (len=3)     :: month_abbrev
 
     type (GENERAL_GRID_T), pointer  :: pTempGrid
@@ -285,7 +285,7 @@ contains
 
     call grid_set_nodata_value(pTempGrid, fValue=cells%nodata_fill_value(1,1))
 
-    number_of_simulation_days = real( SIM_DT%end - SIM_DT%start + 1.0, kind=c_float)
+    number_of_simulation_days = real( SIM_DT%end - SIM_DT%start + 1.0, c_float)
 
     do month=1,12
 
@@ -301,19 +301,19 @@ contains
                                   + MONTHLY_RAINFALL_STATS(:,month)
 
       MONTHLY_NET_INFILTRATION_STATS(:,month) = MONTHLY_NET_INFILTRATION_STATS(:,month)          &
-                                                / real(number_of_simulations, kind=c_float)      &
-                                                * real(MONTHS(month)%iNumDays, kind=c_float)     &
-                                                / real(DAY_COUNT_BY_MONTH(month), kind=c_float)
+                                                / real(number_of_simulations, c_float)      &
+                                                * real(MONTHS(month)%iNumDays, c_float)     &
+                                                / real(DAY_COUNT_BY_MONTH(month), c_float)
 
       MONTHLY_ACTUAL_ET_STATS(:,month) = MONTHLY_ACTUAL_ET_STATS(:,month)                  &
-                                          / real(number_of_simulations, kind=c_float)      &
-                                          * real(MONTHS(month)%iNumDays, kind=c_float)     &
-                                          / real(DAY_COUNT_BY_MONTH(month), kind=c_float)
+                                          / real(number_of_simulations, c_float)      &
+                                          * real(MONTHS(month)%iNumDays, c_float)     &
+                                          / real(DAY_COUNT_BY_MONTH(month), c_float)
 
       MONTHLY_RAINFALL_STATS(:,month) = MONTHLY_RAINFALL_STATS(:,month)                    &
-                                          / real(number_of_simulations, kind=c_float)      &
-                                          * real(MONTHS(month)%iNumDays, kind=c_float)     &
-                                          / real(DAY_COUNT_BY_MONTH(month), kind=c_float)
+                                          / real(number_of_simulations, c_float)      &
+                                          * real(MONTHS(month)%iNumDays, c_float)     &
+                                          / real(DAY_COUNT_BY_MONTH(month), c_float)
 
       pTempGrid%rData = unpack( MONTHLY_ACTUAL_ET_STATS(:,month), cells%active, cells%nodata_fill_value )
       filename = "MEAN_MONTHLY_SUM-"//trim(month_abbrev)//"__actual_evapotranspiration"//trim(file_suffix)
@@ -330,19 +330,19 @@ contains
      enddo
 
      ANNUAL_NET_INFILTRATION_STATS(:) = ANNUAL_NET_INFILTRATION_STATS(:)                   &
-                                         / real(number_of_simulations, kind=c_float)       &
+                                         / real(number_of_simulations, c_float)       &
                                          * 365.0_c_float                                   &
-                                         / real(number_of_simulation_days, kind=c_float)
+                                         / real(number_of_simulation_days, c_float)
 
      ANNUAL_ACTUAL_ET_STATS(:) = ANNUAL_ACTUAL_ET_STATS(:)                         &
-                                 / real(number_of_simulations, kind=c_float)       &
+                                 / real(number_of_simulations, c_float)       &
                                  * 365.0_c_float                                   &
-                                 / real(number_of_simulation_days, kind=c_float)
+                                 / real(number_of_simulation_days, c_float)
 
      ANNUAL_RAINFALL_STATS(:) = ANNUAL_RAINFALL_STATS(:)                           &
-                                 / real(number_of_simulations, kind=c_float)       &
+                                 / real(number_of_simulations, c_float)       &
                                  * 365.0_c_float                                   &
-                                 / real(number_of_simulation_days, kind=c_float)
+                                 / real(number_of_simulation_days, c_float)
 
      pTempGrid%rData = unpack( ANNUAL_ACTUAL_ET_STATS, cells%active, cells%nodata_fill_value )
      filename = "MEAN_ANNUAL_SUM__actual_evapotranspiration"//trim(file_suffix)

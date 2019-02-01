@@ -60,17 +60,17 @@ module crop_coefficients__FAO56
 
   ! Private, module level variables
   ! kept at a landuse code level (i.e. same value applies to all cells with same LU codes)
-  integer (kind=c_int), allocatable  :: LANDUSE_CODE(:)
-!  real (kind=c_float), allocatable   :: REW(:,:)
-!  real (kind=c_float), allocatable   :: TEW(:,:)
-  real (kind=c_float), allocatable   :: KCB_l(:,:)
-  integer (kind=c_int), allocatable  :: KCB_METHOD(:)
-  real (kind=c_float), allocatable   :: GROWTH_STAGE_SHIFT_DAYS(:)
-  real (kind=c_float), allocatable   :: GROWTH_STAGE_DOY(:,:)
-  real (kind=c_float), allocatable   :: GROWTH_STAGE_GDD(:,:)
+  integer (c_int), allocatable  :: LANDUSE_CODE(:)
+!  real (c_float), allocatable   :: REW(:,:)
+!  real (c_float), allocatable   :: TEW(:,:)
+  real (c_float), allocatable   :: KCB_l(:,:)
+  integer (c_int), allocatable  :: KCB_METHOD(:)
+  real (c_float), allocatable   :: GROWTH_STAGE_SHIFT_DAYS(:)
+  real (c_float), allocatable   :: GROWTH_STAGE_DOY(:,:)
+  real (c_float), allocatable   :: GROWTH_STAGE_GDD(:,:)
   type (DATETIME_T), allocatable     :: GROWTH_STAGE_DATE(:,:)
 
-  integer (kind=c_int)               :: LU_SOILS_CSV
+  integer (c_int)               :: LU_SOILS_CSV
 
 contains
 
@@ -81,13 +81,13 @@ contains
     type (STRING_LIST_T)              :: slList
     type (DATETIME_T)                 :: DT
     type (DATETIME_T)                 :: temp_date
-    ! integer (kind=c_int), allocatable :: iTEWSeqNums(:)
-    ! integer (kind=c_int), allocatable :: iREWSeqNums(:)
-    integer (kind=c_int)              :: iNumberOfTEW, iNumberOfREW
-    integer (kind=c_int)              :: iNumberOfLanduses
-    integer (kind=c_int)              :: iIndex, iIndex2
-    integer (kind=c_int)              :: iStat
-    real (kind=c_float)               :: growing_cycle_length
+    ! integer (c_int), allocatable :: iTEWSeqNums(:)
+    ! integer (c_int), allocatable :: iREWSeqNums(:)
+    integer (c_int)              :: iNumberOfTEW, iNumberOfREW
+    integer (c_int)              :: iNumberOfLanduses
+    integer (c_int)              :: iIndex, iIndex2
+    integer (c_int)              :: iStat
+    real (c_float)               :: growing_cycle_length
 
     character (len=10)               :: sMMDDYYYY
     character (len=:), allocatable   :: sText
@@ -96,42 +96,42 @@ contains
     type (DATETIME_T)                :: dtPlantingDate
     character (len=:), allocatable   :: PlantingDate_str
 
-    real (kind=c_float), allocatable :: L_shift_days_l(:)
+    real (c_float), allocatable :: L_shift_days_l(:)
 
-    real (kind=c_float), allocatable :: L_ini_l(:)
-    real (kind=c_float), allocatable :: L_dev_l(:)
-    real (kind=c_float), allocatable :: L_mid_l(:)
-    real (kind=c_float), allocatable :: L_late_l(:)
-    real (kind=c_float), allocatable :: L_fallow_l(:)
+    real (c_float), allocatable :: L_ini_l(:)
+    real (c_float), allocatable :: L_dev_l(:)
+    real (c_float), allocatable :: L_mid_l(:)
+    real (c_float), allocatable :: L_late_l(:)
+    real (c_float), allocatable :: L_fallow_l(:)
 
-    real (kind=c_float), allocatable :: GDD_plant_l(:)
-    real (kind=c_float), allocatable :: GDD_ini_l(:)
-    real (kind=c_float), allocatable :: GDD_dev_l(:)
-    real (kind=c_float), allocatable :: GDD_mid_l(:)
-    real (kind=c_float), allocatable :: GDD_late_l(:)
+    real (c_float), allocatable :: GDD_plant_l(:)
+    real (c_float), allocatable :: GDD_ini_l(:)
+    real (c_float), allocatable :: GDD_dev_l(:)
+    real (c_float), allocatable :: GDD_mid_l(:)
+    real (c_float), allocatable :: GDD_late_l(:)
 
-    real (kind=c_float), allocatable :: Kcb_ini_l(:)
-    real (kind=c_float), allocatable :: Kcb_mid_l(:)
-    real (kind=c_float), allocatable :: Kcb_end_l(:)
-    real (kind=c_float), allocatable :: Kcb_min_l(:)
+    real (c_float), allocatable :: Kcb_ini_l(:)
+    real (c_float), allocatable :: Kcb_mid_l(:)
+    real (c_float), allocatable :: Kcb_end_l(:)
+    real (c_float), allocatable :: Kcb_min_l(:)
 
-    real (kind=c_float), allocatable :: Kcb_jan(:)
-    real (kind=c_float), allocatable :: Kcb_feb(:)
-    real (kind=c_float), allocatable :: Kcb_mar(:)
-    real (kind=c_float), allocatable :: Kcb_apr(:)
-    real (kind=c_float), allocatable :: Kcb_may(:)
-    real (kind=c_float), allocatable :: Kcb_jun(:)
-    real (kind=c_float), allocatable :: Kcb_jul(:)
-    real (kind=c_float), allocatable :: Kcb_aug(:)
-    real (kind=c_float), allocatable :: Kcb_sep(:)
-    real (kind=c_float), allocatable :: Kcb_oct(:)
-    real (kind=c_float), allocatable :: Kcb_nov(:)
-    real (kind=c_float), allocatable :: Kcb_dec(:)
+    real (c_float), allocatable :: Kcb_jan(:)
+    real (c_float), allocatable :: Kcb_feb(:)
+    real (c_float), allocatable :: Kcb_mar(:)
+    real (c_float), allocatable :: Kcb_apr(:)
+    real (c_float), allocatable :: Kcb_may(:)
+    real (c_float), allocatable :: Kcb_jun(:)
+    real (c_float), allocatable :: Kcb_jul(:)
+    real (c_float), allocatable :: Kcb_aug(:)
+    real (c_float), allocatable :: Kcb_sep(:)
+    real (c_float), allocatable :: Kcb_oct(:)
+    real (c_float), allocatable :: Kcb_nov(:)
+    real (c_float), allocatable :: Kcb_dec(:)
 
-    real (kind=c_float)              :: fKcb_initial
-    real (kind=c_float)              :: fRz_initial
+    real (c_float)              :: fKcb_initial
+    real (c_float)              :: fRz_initial
 
-    real (kind=c_float), parameter   :: NEAR_ZERO = 1.0e-9_c_float
+    real (c_float), parameter   :: NEAR_ZERO = 1.0e-9_c_float
 
     type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_PERCENT_SOIL_MOISTURE
 
@@ -381,11 +381,11 @@ contains
  impure elemental function update_crop_coefficient_date_as_threshold( iLanduseIndex )           &
                                                                           result(Kcb)
 
-  integer (kind=c_int), intent(in)   :: iLanduseIndex
-  real (kind=c_float)                :: Kcb
+  integer (c_int), intent(in)   :: iLanduseIndex
+  real (c_float)                :: Kcb
 
   ! [ LOCALS ]
-  real (kind=c_double) :: fFrac
+  real (c_double) :: fFrac
 
   if ( KCB_METHOD( iLanduseIndex ) == KCB_METHOD_MONTHLY_VALUES ) then
 
@@ -455,12 +455,12 @@ end function update_crop_coefficient_date_as_threshold
  impure elemental function update_crop_coefficient_GDD_as_threshold( iLanduseIndex, fGDD )   &
                                                                          result(fKcb)
 
-  integer (kind=c_int), intent(in)   :: iLanduseIndex
-  real (kind=c_float), intent(in)    :: fGDD
-  real (kind=c_float)                :: fKcb
+  integer (c_int), intent(in)   :: iLanduseIndex
+  real (c_float), intent(in)    :: fGDD
+  real (c_float)                :: fKcb
 
   ! [ LOCALS ]
-  real (kind=c_double) :: fFrac
+  real (c_double) :: fFrac
 
   ! define shorthand variable names for remainder of function
   associate ( GDD_ini_l => GROWTH_STAGE_GDD( GDD_INI, iLanduseIndex ),          &
@@ -521,10 +521,10 @@ end function update_crop_coefficient_GDD_as_threshold
   subroutine crop_coefficients_FAO56_update_growth_stage_dates( )
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iIndex
-    real (kind=c_double) :: dTempDate
+    integer (c_int) :: iIndex
+    real (c_double) :: dTempDate
     type (DATETIME_T)    :: dtTempDate
-    real (kind=c_float)  :: growing_cycle_length
+    real (c_float)  :: growing_cycle_length
 
     do iIndex=lbound(GROWTH_STAGE_DATE,2), ubound(GROWTH_STAGE_DATE,2)
 
@@ -588,9 +588,9 @@ end function update_crop_coefficient_GDD_as_threshold
 
   impure elemental subroutine crop_coefficients_FAO56_calculate( Kcb, landuse_index, GDD )
 
-    real (kind=c_float), intent(inout)          :: Kcb
-    integer (kind=c_int), intent(in)            :: landuse_index
-    real (kind=c_float), intent(in), optional   :: GDD
+    real (c_float), intent(inout)          :: Kcb
+    integer (c_int), intent(in)            :: landuse_index
+    real (c_float), intent(in), optional   :: GDD
 
 
     if ( KCB_METHOD( landuse_index )  == KCB_METHOD_FAO56  &
@@ -613,8 +613,8 @@ end function update_crop_coefficient_GDD_as_threshold
                                            Kcb,                                &
                                            it_is_growing_season)
 
-    real (kind=c_float), intent(in)             :: Kcb
-    integer (kind=c_int), intent(in)            :: landuse_index
+    real (c_float), intent(in)             :: Kcb
+    integer (c_int), intent(in)            :: landuse_index
     logical (c_bool), intent(out)               :: it_is_growing_season
 
     if ( Kcb > KCB_l( KCB_MIN, landuse_index) ) then

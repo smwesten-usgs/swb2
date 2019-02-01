@@ -6,8 +6,8 @@ module actual_et__fao56
   use parameters, only                  : PARAMS
   implicit none
 
-  real (kind=c_float), allocatable   :: DEPLETION_FRACTION(:)
-  real (kind=c_float), parameter     :: NEAR_ZERO = 3.0_c_float * tiny( 0.0_c_float )
+  real (c_float), allocatable   :: DEPLETION_FRACTION(:)
+  real (c_float), parameter     :: NEAR_ZERO = 3.0_c_float * tiny( 0.0_c_float )
 
 contains
 
@@ -34,9 +34,9 @@ contains
 
   elemental function adjust_depletion_fraction_p( p_table_22, reference_et0 )   result( p )
 
-    real (kind=c_float), intent(in)      :: p_table_22
-    real (kind=c_float), intent(in)      :: reference_et0
-    real (kind=c_float)                  :: p
+    real (c_float), intent(in)      :: p_table_22
+    real (c_float), intent(in)      :: reference_et0
+    real (c_float)                  :: p
 
     p = p_table_22 + 0.04_c_float * ( 5.0_c_float - in_to_mm( reference_et0 ) )
 
@@ -56,21 +56,21 @@ contains
                                                   crop_etc )
 
 
-    real (kind=c_double), intent(inout)            :: actual_et
-    real (kind=c_double), intent(inout)            :: adjusted_depletion_fraction_p
-    real (kind=c_float), intent(in)                :: depletion_fraction_p
-    real (kind=c_double), intent(in)               :: soil_storage
-    real (kind=c_float), intent(in)                :: soil_storage_max
-    real (kind=c_float), intent(in)                :: infiltration
-    real (kind=c_float), intent(in)                :: crop_etc
+    real (c_double), intent(inout)            :: actual_et
+    real (c_double), intent(inout)            :: adjusted_depletion_fraction_p
+    real (c_float), intent(in)                :: depletion_fraction_p
+    real (c_double), intent(in)               :: soil_storage
+    real (c_float), intent(in)                :: soil_storage_max
+    real (c_float), intent(in)                :: infiltration
+    real (c_float), intent(in)                :: crop_etc
 
     ! [ LOCALS ]
-    real (kind=c_float)  :: Kcb
-    real (kind=c_float)  :: depletion_amount
-    real (kind=c_float)  :: p
-    real (kind=c_double) :: interim_soil_storage
-    real (kind=c_float)  :: fraction_full_PET
-    real (kind=c_float)  :: root_constant_ci
+    real (c_float)  :: Kcb
+    real (c_float)  :: depletion_amount
+    real (c_float)  :: p
+    real (c_double) :: interim_soil_storage
+    real (c_float)  :: fraction_full_PET
+    real (c_float)  :: root_constant_ci
 
     if ( soil_storage_max >= 0.0_c_float .and. soil_storage_max <= NEAR_ZERO ) then
 

@@ -26,34 +26,34 @@ module data_catalog_entry
   integer, parameter :: c_diff_t = 8
 #endif
 
-  integer (kind=c_int), public, parameter :: NETCDF_FILE_OPEN = 27
-  integer (kind=c_int), public, parameter :: NETCDF_FILE_CLOSED = 42
+  integer (c_int), public, parameter :: NETCDF_FILE_OPEN = 27
+  integer (c_int), public, parameter :: NETCDF_FILE_CLOSED = 42
 
-  integer (kind=c_int), parameter, public :: FILE_TEMPLATE_CAPITALIZED_MONTHNAME = 0
-  integer (kind=c_int), parameter, public :: FILE_TEMPLATE_LOWERCASE_MONTHNAME   = 1
-  integer (kind=c_int), parameter, public :: FILE_TEMPLATE_UPPERCASE_MONTHNAME   = 2
+  integer (c_int), parameter, public :: FILE_TEMPLATE_CAPITALIZED_MONTHNAME = 0
+  integer (c_int), parameter, public :: FILE_TEMPLATE_LOWERCASE_MONTHNAME   = 1
+  integer (c_int), parameter, public :: FILE_TEMPLATE_UPPERCASE_MONTHNAME   = 2
 
-  integer (kind=c_int), parameter         :: CONSTANT_GRID = 0
-  integer (kind=c_int), parameter         :: STATIC_GRID = 1
-  integer (kind=c_int), parameter         :: STATIC_NETCDF_GRID = 2
-  integer (kind=c_int), public, parameter :: DYNAMIC_GRID = 3
-  integer (kind=c_int), parameter         :: DYNAMIC_NETCDF_GRID = 4
-  integer (kind=c_int), parameter         :: NO_GRID = 5
+  integer (c_int), parameter         :: CONSTANT_GRID = 0
+  integer (c_int), parameter         :: STATIC_GRID = 1
+  integer (c_int), parameter         :: STATIC_NETCDF_GRID = 2
+  integer (c_int), public, parameter :: DYNAMIC_GRID = 3
+  integer (c_int), parameter         :: DYNAMIC_NETCDF_GRID = 4
+  integer (c_int), parameter         :: NO_GRID = 5
 
-  integer (kind=c_int), parameter :: FILETYPE_ARC_ASCII = 0
-  integer (kind=c_int), parameter :: FILETYPE_SURFER = 1
-  integer (kind=c_int), parameter :: FILETYPE_NETCDF = 2
-  integer (kind=c_int), parameter :: FILETYPE_NONE = 3
+  integer (c_int), parameter :: FILETYPE_ARC_ASCII = 0
+  integer (c_int), parameter :: FILETYPE_SURFER = 1
+  integer (c_int), parameter :: FILETYPE_NETCDF = 2
+  integer (c_int), parameter :: FILETYPE_NONE = 3
 
   type, public :: DATA_CATALOG_ENTRY_T
     character (len=:), allocatable :: sKeyword
     type (DATA_CATALOG_ENTRY_T), pointer :: previous => null()
     type (DATA_CATALOG_ENTRY_T), pointer :: next     => null()
 
-    integer (kind=c_int)               :: iSourceDataForm = NO_GRID   ! constant, static grid, dynamic grid
-    integer (kind=c_int)               :: iSourceDataType = DATATYPE_NA  ! real, short, integer, etc.
-    integer (kind=c_int)               :: iSourceFileType = FILETYPE_NONE  ! Arc ASCII, Surfer, NetCDF
-    integer (kind=c_int)               :: iTargetDataType = DATATYPE_NA  ! Fortran real, integer, etc.
+    integer (c_int)               :: iSourceDataForm = NO_GRID   ! constant, static grid, dynamic grid
+    integer (c_int)               :: iSourceDataType = DATATYPE_NA  ! real, short, integer, etc.
+    integer (c_int)               :: iSourceFileType = FILETYPE_NONE  ! Arc ASCII, Surfer, NetCDF
+    integer (c_int)               :: iTargetDataType = DATATYPE_NA  ! Fortran real, integer, etc.
 
     character (len=256)       :: sDescription           = ""
     character (len=256)       :: sSourcePROJ4_string    = ""
@@ -61,41 +61,41 @@ module data_catalog_entry
     character (len=256)       :: sSourceFileType        = ""
     character (len=512)       :: sSourceFilename        = ""
     character (len=512)       :: sFilenameTemplate      = ""
-    integer (kind=c_int)      :: iFilename_Monthname_Capitalization_Rule = FILE_TEMPLATE_CAPITALIZED_MONTHNAME
+    integer (c_int)      :: iFilename_Monthname_Capitalization_Rule = FILE_TEMPLATE_CAPITALIZED_MONTHNAME
     character (len=512)       :: sOldFilename           = ""
     character (len=256)       :: sDateColumnName        = ""
     character (len=256)       :: sValueColumnName       = ""
 
-    integer (kind=c_int)      :: iFileCount = -1
-    integer (kind=c_int)      :: iFileCountYear = -9999
-    real (kind=c_float)       :: rMinAllowedValue = -rBIGVAL     ! default condition is to impose
-    real (kind=c_float)       :: rMaxAllowedValue = rBIGVAL      ! no bounds on data
-    integer (kind=c_int)      :: iMinAllowedValue = -iBIGVAL     ! default condition is to impose
-    integer (kind=c_int)      :: iMaxAllowedValue = iBIGVAL      ! no bounds on data
-    real (kind=c_float)       :: rMissingValuesCode = -rBIGVAL
-    integer (kind=c_int)      :: iMissingValuesCode = -iBIGVAL
+    integer (c_int)      :: iFileCount = -1
+    integer (c_int)      :: iFileCountYear = -9999
+    real (c_float)       :: rMinAllowedValue = -rBIGVAL     ! default condition is to impose
+    real (c_float)       :: rMaxAllowedValue = rBIGVAL      ! no bounds on data
+    integer (c_int)      :: iMinAllowedValue = -iBIGVAL     ! default condition is to impose
+    integer (c_int)      :: iMaxAllowedValue = iBIGVAL      ! no bounds on data
+    real (c_float)       :: rMissingValuesCode = -rBIGVAL
+    integer (c_int)      :: iMissingValuesCode = -iBIGVAL
     character (len=2)         :: sMissingValuesOperator = "&&"
-    integer (kind=c_int)      :: iMissingValuesAction = 0
+    integer (c_int)      :: iMissingValuesAction = 0
 
-    real (kind=c_double)      :: rUserScaleFactor = 1_c_double
-    real (kind=c_double)      :: rUserAddOffset = 0_c_double
-    real (kind=c_double)      :: rX_Coord_AddOffset = 0.0_c_double
-    real (kind=c_double)      :: rY_Coord_AddOffset = 0.0_c_double
+    real (c_double)      :: rUserScaleFactor = 1_c_double
+    real (c_double)      :: rUserAddOffset = 0_c_double
+    real (c_double)      :: rX_Coord_AddOffset = 0.0_c_double
+    real (c_double)      :: rY_Coord_AddOffset = 0.0_c_double
 
-    logical (kind=c_bool)     :: lAllowMissingFiles = lFALSE
-    logical (kind=c_bool)     :: lAllowAutomaticDataFlipping = TRUE
-    logical (kind=c_bool)     :: lFlipHorizontal = lFALSE
-    logical (kind=c_bool)     :: lFlipVertical = lFALSE
-    logical (kind=c_bool)     :: lUseMajorityFilter = lFALSE
-    logical (kind=c_bool)     :: lRequireCompleteSpatialCoverage = lTRUE
+    logical (c_bool)     :: lAllowMissingFiles = lFALSE
+    logical (c_bool)     :: lAllowAutomaticDataFlipping = TRUE
+    logical (c_bool)     :: lFlipHorizontal = lFALSE
+    logical (c_bool)     :: lFlipVertical = lFALSE
+    logical (c_bool)     :: lUseMajorityFilter = lFALSE
+    logical (c_bool)     :: lRequireCompleteSpatialCoverage = lTRUE
 
-    integer (kind=c_int)  :: iDaysToPadAtYearsEnd = 0
-    integer (kind=c_int)  :: iDaysToPadIfLeapYear = 1
-    integer (kind=c_int)  :: iStartYear = -9999
-    integer (kind=c_int)  :: iEndYear = -9999
-    logical (kind=c_bool) :: lPadReplaceWithZero = lFALSE
-    logical (kind=c_bool) :: lPadValues = lFALSE
-    logical (kind=c_bool) :: lIsAnnualGrid = lFALSE
+    integer (c_int)  :: iDaysToPadAtYearsEnd = 0
+    integer (c_int)  :: iDaysToPadIfLeapYear = 1
+    integer (c_int)  :: iStartYear = -9999
+    integer (c_int)  :: iEndYear = -9999
+    logical (c_bool) :: lPadReplaceWithZero = lFALSE
+    logical (c_bool) :: lPadValues = lFALSE
+    logical (c_bool) :: lIsAnnualGrid = lFALSE
 
     ! the following are only used if data are being read from a NetCDF file
     character (len=32)       :: sVariableName_x = "x"
@@ -107,24 +107,24 @@ module data_catalog_entry
     type (GRID_BOUNDS_T)     :: GRID_BOUNDS_NATIVE
     type (GRID_BOUNDS_T)     :: GRID_BOUNDS_BASE
 
-    integer (kind=c_int)     :: iNC_FILE_STATUS = NETCDF_FILE_CLOSED
+    integer (c_int)     :: iNC_FILE_STATUS = NETCDF_FILE_CLOSED
     type (T_NETCDF4_FILE)    :: NCFILE
 
-    integer (kind=c_int)     :: iNC_ARCHIVE_STATUS = NETCDF_FILE_CLOSED
+    integer (c_int)     :: iNC_ARCHIVE_STATUS = NETCDF_FILE_CLOSED
     type (T_NETCDF4_FILE)    :: NCFILE_ARCHIVE
-    integer (kind=c_size_t)  :: iNCFILE_RECNUM = 0
+    integer (c_size_t)  :: iNCFILE_RECNUM = 0
 
-    integer (kind=c_int)     :: iConstantValue = 0
-    real (kind=c_float)      :: rConstantValue = 0.0
+    integer (c_int)     :: iConstantValue = 0
+    real (c_float)      :: rConstantValue = 0.0
 
     ! pGrdNative is a grid created to serve as an intermediary between
     ! the native coordinate of the data source file and the project coordinates
     ! in use by swb
     type (GENERAL_GRID_T), pointer :: pGrdNative                 => null()
-    logical (kind=c_bool)          :: lGridIsPersistent          = lFALSE
-    logical (kind=c_bool)          :: lGridHasChanged            = lFALSE
-    logical (kind=c_bool)          :: lPerformFullInitialization = lTRUE
-    logical (kind=c_bool)          :: lCreateLocalNetCDFArchive  = lFALSE
+    logical (c_bool)          :: lGridIsPersistent          = lFALSE
+    logical (c_bool)          :: lGridHasChanged            = lFALSE
+    logical (c_bool)          :: lPerformFullInitialization = lTRUE
+    logical (c_bool)          :: lCreateLocalNetCDFArchive  = lFALSE
 
     ! pGrdBase takes the coordinate system and dimensions as defined
     ! for the overall SWB project (i.e. BASE_PROJECTION_DEFINITION )
@@ -221,8 +221,8 @@ module data_catalog_entry
 
   end type DATA_CATALOG_ENTRY_T
 
-  integer (kind=c_int), parameter, public :: MISSING_VALUES_ZERO_OUT = 0
-  integer (kind=c_int), parameter, public :: MISSING_VALUES_REPLACE_WITH_MEAN = 1
+  integer (c_int), parameter, public :: MISSING_VALUES_ZERO_OUT = 0
+  integer (c_int), parameter, public :: MISSING_VALUES_REPLACE_WITH_MEAN = 1
 
   type (GENERAL_GRID_T), public, pointer :: pGrd => null()
 
@@ -266,9 +266,9 @@ contains
   subroutine get_value_int_sub(this, iCol, iRow, iValue)
 
     class (DATA_CATALOG_ENTRY_T), intent(in)  :: this
-    integer (kind=c_int), intent(in)          :: iCol
-    integer (kind=c_int), intent(in)          :: iRow
-    integer (kind=c_int), intent(out)         :: iValue
+    integer (c_int), intent(in)          :: iCol
+    integer (c_int), intent(in)          :: iRow
+    integer (c_int), intent(out)         :: iValue
 
     if ( .not. associated(this%pGrdBase) ) &
       call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
@@ -287,9 +287,9 @@ contains
   subroutine get_value_float_sub(this, iCol, iRow, fValue)
 
     class (DATA_CATALOG_ENTRY_T), intent(in)  :: this
-    integer (kind=c_int), intent(in)          :: iCol
-    integer (kind=c_int), intent(in)          :: iRow
-    real (kind=c_float), intent(out)          :: fValue
+    integer (c_int), intent(in)          :: iCol
+    integer (c_int), intent(in)          :: iRow
+    real (c_float), intent(out)          :: fValue
 
     if ( .not. associated(this%pGrdBase) ) &
       call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
@@ -311,7 +311,7 @@ contains
 
     class (DATA_CATALOG_ENTRY_T)    :: this
     character (len=*), intent(in)   :: sDescription
-    real (kind=c_float), intent(in) :: rConstant
+    real (c_float), intent(in) :: rConstant
 
     this%rConstantValue = rConstant
     this%sDescription = trim(sDescription)
@@ -338,7 +338,7 @@ contains
 
     class (DATA_CATALOG_ENTRY_T) :: this
     character (len=*) :: sDescription
-    integer (kind=c_int), intent(in) :: iConstant
+    integer (c_int), intent(in) :: iConstant
 
     this%iConstantValue = iConstant
     this%sDescription = trim(sDescription)
@@ -370,7 +370,7 @@ subroutine initialize_gridded_data_object_sub( this, &
   character (len=*), intent(in)            :: sDescription
   character (len=*), intent(in)            :: sFileType
   character (len=*), intent(in)            :: sFilename
-  integer (kind=c_int)                     :: iDataType
+  integer (c_int)                     :: iDataType
   character (len=*), intent(in), optional  :: sPROJ4_string
 
   if (present(sPROJ4_string) ) then
@@ -435,7 +435,7 @@ subroutine initialize_netcdf_data_object_sub( this, &
 
    class (DATA_CATALOG_ENTRY_T)               :: this
    character (len=*), intent(in)              :: sDescription
-   integer (kind=c_int), intent(in)           :: iDataType
+   integer (c_int), intent(in)           :: iDataType
    character (len=*), intent(in)              :: sFilename
    character (len=*), intent(in), optional    :: sPROJ4_string
 
@@ -556,10 +556,10 @@ end subroutine initialize_netcdf_data_object_sub
 
 elemental subroutine apply_scale_and_offset_float(fResult, fValue, dUserScaleFactor, dUserAddOffset )
 
-  real (kind=c_float), intent(out)  :: fResult
-  real (kind=c_float), intent(in)   :: fValue
-  real (kind=c_double), intent(in)   :: dUserScaleFactor
-  real (kind=c_double), intent(in)   :: dUserAddOffset
+  real (c_float), intent(out)  :: fResult
+  real (c_float), intent(in)   :: fValue
+  real (c_double), intent(in)   :: dUserScaleFactor
+  real (c_double), intent(in)   :: dUserAddOffset
 
   fResult = ( fValue * dUserScaleFactor ) + dUserAddOffset
 
@@ -569,12 +569,12 @@ end subroutine apply_scale_and_offset_float
 
 elemental subroutine apply_scale_and_offset_int(iResult, iValue, dUserScaleFactor, dUserAddOffset )
 
-  integer (kind=c_int), intent(out) :: iResult
-  integer (kind=c_int), intent(in)  :: iValue
-  real (kind=c_double), intent(in)   :: dUserScaleFactor
-  real (kind=c_double), intent(in)   :: dUserAddOffset
+  integer (c_int), intent(out) :: iResult
+  integer (c_int), intent(in)  :: iValue
+  real (c_double), intent(in)   :: dUserScaleFactor
+  real (c_double), intent(in)   :: dUserAddOffset
 
-  iResult = ( real( iValue, kind=c_float) * dUserScaleFactor ) + dUserAddOffset
+  iResult = ( real( iValue, c_float) * dUserScaleFactor ) + dUserAddOffset
 
 end subroutine apply_scale_and_offset_int
 
@@ -646,8 +646,8 @@ subroutine getvalues_constant_sub( this  )
 
     class (DATA_CATALOG_ENTRY_T)   :: this
     type (DATETIME_T), optional    :: dt
-    logical (kind=c_bool) :: lExist
-    logical (kind=c_bool) :: lOpened
+    logical (c_bool) :: lExist
+    logical (c_bool) :: lOpened
 
     this%lGridHasChanged = lFALSE
 
@@ -802,7 +802,7 @@ end subroutine transform_grid_to_grid_sub
 subroutine set_constant_value_int( this, iValue )
 
     class (DATA_CATALOG_ENTRY_T) :: this
-    integer (kind=c_int) :: iValue
+    integer (c_int) :: iValue
 
     this%iConstantValue = iValue
 
@@ -813,7 +813,7 @@ end subroutine set_constant_value_int
 subroutine set_constant_value_real( this, rValue )
 
     class (DATA_CATALOG_ENTRY_T) :: this
-    real (kind=c_float) :: rValue
+    real (c_float) :: rValue
 
     this%rConstantValue = rValue
 
@@ -824,8 +824,8 @@ end subroutine set_constant_value_real
   subroutine set_filecount( this, iValue, iYear)
 
     class (DATA_CATALOG_ENTRY_T) :: this
-    integer (kind=c_int) :: iValue
-    integer (kind=c_int), optional :: iYear
+    integer (c_int) :: iValue
+    integer (c_int), optional :: iYear
 
     this%iFileCount = iValue
 
@@ -858,7 +858,7 @@ end subroutine set_constant_value_real
   subroutine reset_at_yearend_filecount( this, iYear )
 
     class (DATA_CATALOG_ENTRY_T) :: this
-    integer (kind=c_int) :: iYear
+    integer (c_int) :: iYear
 
     if (iYear /= this%iFileCountYear )  then
       this%iFileCount = 0
@@ -879,16 +879,16 @@ end subroutine set_constant_value_real
     character (len=256) :: sUppercaseFilename
     character (len=256) :: sCWD
     character (len=256) :: sBuf2
-    integer (kind=c_int) :: iPos_Y, iPos_D, iPos_M, iPos_0D, iPos_0M, iPos_B,  &
+    integer (c_int) :: iPos_Y, iPos_D, iPos_M, iPos_0D, iPos_0M, iPos_B,  &
                             iPos_BF, iPos_j, iPos, iPos2, iLen, iCount
-    integer (kind=c_int) :: iNumZeros, iNumZerosToPrint
-    logical (kind=c_bool) :: lMatch
-    logical (kind=c_bool) :: lExist
+    integer (c_int) :: iNumZeros, iNumZerosToPrint
+    logical (c_bool) :: lMatch
+    logical (c_bool) :: lExist
     character (len=16) :: sBuf
     character (len=12) :: sNumber
     character (len=1) :: sDelimiter
-    integer (kind=c_int) :: iStatus
-    logical (kind=c_bool) :: lAnnual
+    integer (c_int) :: iStatus
+    logical (c_bool) :: lAnnual
 
     iPos_Y = 0; iPos_M = 0; iPos_D = 0; iPos = 0; iPos_B = 0; iPos_BF = 0; sNumber = ""
     iPos_j = 0
@@ -1099,10 +1099,10 @@ end subroutine set_constant_value_real
     type (DATETIME_T), intent(in) :: dt
 
     ! [ LOCALS ]
-    logical (kind=c_bool) :: lExist
-    integer (kind=c_int)  :: iDaysLeftInMonth
-    integer (kind=c_int)  :: iPos
-    logical (kind=c_bool) :: lNeedToPadData
+    logical (c_bool) :: lExist
+    integer (c_int)  :: iDaysLeftInMonth
+    integer (c_int)  :: iPos
+    logical (c_bool) :: lNeedToPadData
 
     do
 
@@ -1177,11 +1177,11 @@ end subroutine set_constant_value_real
     type (DATETIME_T), intent(in)  :: dt
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iTimeIndex
-    integer (kind=c_int) :: iStat
-    logical (kind=c_bool) :: lDateTimeFound
-    real (kind=c_double) :: dAddOffset
-    real (kind=c_double) :: dScaleFactor
+    integer (c_int) :: iTimeIndex
+    integer (c_int) :: iStat
+    logical (c_bool) :: lDateTimeFound
+    real (c_double) :: dAddOffset
+    real (c_double) :: dScaleFactor
 
     if ( .not. associated(this%pGrdBase) ) &
       call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
@@ -1202,7 +1202,7 @@ end subroutine set_constant_value_real
         ! if past date range, close file
 
         if ( netcdf_date_within_range(NCFILE=this%NCFILE,                      &
-           iJulianDay=int(dt%iJulianDay, kind=c_int) ) ) then
+           iJulianDay=int(dt%iJulianDay, c_int) ) ) then
           exit
         else
           call netcdf_close_file( NCFILE=this%NCFILE )
@@ -1341,7 +1341,7 @@ end subroutine set_constant_value_real
 
 
           if ( netcdf_date_within_range(NCFILE=this%NCFILE,                    &
-               iJulianDay=int(dt%iJulianDay, kind=c_int) ) ) then
+               iJulianDay=int(dt%iJulianDay, c_int) ) ) then
 
             exit
 
@@ -1379,7 +1379,7 @@ end subroutine set_constant_value_real
 
       do
         lDateTimeFound = netcdf_update_time_starting_index(NCFILE=this%NCFILE, &
-                                  iJulianDay=int(dt%iJulianDay, kind=c_int) )
+                                  iJulianDay=int(dt%iJulianDay, c_int) )
 
         if (.not. lDateTimeFound) then
           this%lPadValues = lTRUE
@@ -1431,12 +1431,12 @@ end subroutine set_constant_value_real
 
   subroutine minmaxmean_float( variable , varname, nodata_value )
 
-    real (kind=c_float), dimension(:,:)  :: variable
+    real (c_float), dimension(:,:)  :: variable
     character (len=*), intent(in)        :: varname
-    real (kind=c_float), intent(in)      :: nodata_value
+    real (c_float), intent(in)      :: nodata_value
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iCount
+    integer (c_int) :: iCount
     character (len=20)   :: sVarname
     character (len=14)   :: sMin
     character (len=14)   :: sMax
@@ -1471,9 +1471,9 @@ end subroutine set_constant_value_real
     class (DATA_CATALOG_ENTRY_T) :: this
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iStat
-    real (kind=c_double) :: dAddOffset
-    real (kind=c_double) :: dScaleFactor
+    integer (c_int) :: iStat
+    real (c_double) :: dAddOffset
+    real (c_double) :: dScaleFactor
 
     if ( .not. associated(this%pGrdBase) ) &
       call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
@@ -1599,12 +1599,12 @@ end subroutine set_constant_value_real
   subroutine put_values_to_local_NetCDF_sub(this, iMonth, iDay, iYear)
 
     class (DATA_CATALOG_ENTRY_T) :: this
-    integer (kind=c_int) :: iMonth
-    integer (kind=c_int) :: iDay
-    integer (kind=c_int) :: iYear
+    integer (c_int) :: iMonth
+    integer (c_int) :: iDay
+    integer (c_int) :: iYear
 
     ! [ LOCALS ]
-    integer (kind=c_size_t) :: iNumRows, iNumCols, iNumRecs
+    integer (c_size_t) :: iNumRows, iNumCols, iNumRecs
 
     if (this%iNC_ARCHIVE_STATUS == NETCDF_FILE_CLOSED) then
 
@@ -1617,8 +1617,8 @@ end subroutine set_constant_value_real
 
     endif
 
-    iNumRows = int(size(this%pGrdNative%rData, 2), kind=c_size_t)
-    iNumCols = int(size(this%pGrdNative%rData, 1), kind=c_size_t)
+    iNumRows = int(size(this%pGrdNative%rData, 2), c_size_t)
+    iNumCols = int(size(this%pGrdNative%rData, 1), c_size_t)
     iNumRecs = this%iNCFILE_RECNUM
 
     call netcdf_put_variable_array(NCFILE=this%NCFILE_ARCHIVE, &
@@ -1633,7 +1633,7 @@ end subroutine set_constant_value_real
        iStart=[this%iNCFILE_RECNUM], &
        iCount=[1_c_size_t], &
        iStride=[1_c_size_t], &
-       dpValues=[real(this%iNCFILE_RECNUM, kind=c_double)])
+       dpValues=[real(this%iNCFILE_RECNUM, c_double)])
 
     this%iNCFILE_RECNUM = this%iNCFILE_RECNUM + 1
 
@@ -1644,7 +1644,7 @@ end subroutine set_constant_value_real
   function get_source_filetype_fn(this)  result(iFileType)
 
      class (DATA_CATALOG_ENTRY_T) :: this
-     integer (kind=c_int) :: iFileType
+     integer (c_int) :: iFileType
 
      if ( (this%sSourceFileType .strequal. "ARC_GRID") &
          .or. (this%sSourceFileType .strequal. "ARC_ASCII") ) then
@@ -1748,7 +1748,7 @@ end subroutine set_constant_value_real
 subroutine set_scale_sub(this, rScaleFactor)
 
    class (DATA_CATALOG_ENTRY_T) :: this
-   real (kind=c_float) :: rScaleFactor
+   real (c_float) :: rScaleFactor
 
    this%rUserScaleFactor = rScaleFactor
 
@@ -1759,7 +1759,7 @@ end subroutine set_scale_sub
 subroutine set_archive_local_sub(this, lValue)
 
    class (DATA_CATALOG_ENTRY_T) :: this
-   logical (kind=c_bool)        :: lValue
+   logical (c_bool)        :: lValue
 
    this%lCreateLocalNetCDFArchive = lValue
 
@@ -1770,7 +1770,7 @@ end subroutine set_archive_local_sub
 subroutine set_X_coord_offset_sub(this, rXOffset)
 
    class (DATA_CATALOG_ENTRY_T) :: this
-   real (kind=c_double)         :: rXOffset
+   real (c_double)         :: rXOffset
 
    this%rX_Coord_AddOffset = rXOffset
 
@@ -1781,7 +1781,7 @@ end subroutine set_X_coord_offset_sub
 subroutine set_Y_coord_offset_sub(this, rYOffset)
 
    class (DATA_CATALOG_ENTRY_T) :: this
-   real (kind=c_double)         :: rYOffset
+   real (c_double)         :: rYOffset
 
    this%rY_Coord_AddOffset = rYOffset
 
@@ -1792,7 +1792,7 @@ end subroutine set_Y_coord_offset_sub
 subroutine set_offset_sub(this, rAddOffset)
 
    class (DATA_CATALOG_ENTRY_T) :: this
-   real (kind=c_float)          :: rAddOffset
+   real (c_float)          :: rAddOffset
 
    this%rUserAddOffset = rAddOffset
 
@@ -1803,7 +1803,7 @@ end subroutine set_offset_sub
 subroutine set_majority_filter_flag_sub(this, lUseMajorityFilter)
 
    class (DATA_CATALOG_ENTRY_T) :: this
-   logical (kind=c_bool)        :: lUseMajorityFilter
+   logical (c_bool)        :: lUseMajorityFilter
 
    this%lUseMajorityFilter = lUseMajorityFilter
 
@@ -1814,7 +1814,7 @@ end subroutine set_majority_filter_flag_sub
 subroutine set_missing_value_int_sub(this, iMissingVal)
 
   class (DATA_CATALOG_ENTRY_T) :: this
-  integer (kind=c_int)         :: iMissingVal
+  integer (c_int)         :: iMissingVal
 
   this%iMissingValuesCode = iMissingVal
 
@@ -1825,7 +1825,7 @@ end subroutine set_missing_value_int_sub
 subroutine set_missing_value_real_sub(this, rMissingVal)
 
   class (DATA_CATALOG_ENTRY_T) :: this
-  integer (kind=c_int)         :: rMissingVal
+  integer (c_int)         :: rMissingVal
 
   this%rMissingValuesCode = rMissingVal
 
@@ -1836,7 +1836,7 @@ end subroutine set_missing_value_real_sub
 subroutine set_complete_spatial_coverage_flag_sub(this, lRequireCompleteSpatialCoverage )
 
   class (DATA_CATALOG_ENTRY_T)       :: this
-  logical (kind=c_bool), intent(in)  :: lRequireCompleteSpatialCoverage
+  logical (c_bool), intent(in)  :: lRequireCompleteSpatialCoverage
 
   this%lRequireCompleteSpatialCoverage = lRequireCompleteSpatialCoverage
 
@@ -1847,7 +1847,7 @@ end subroutine set_complete_spatial_coverage_flag_sub
 subroutine set_minimum_allowable_value_int_sub(this, iMinVal)
 
   class (DATA_CATALOG_ENTRY_T) :: this
-  integer (kind=c_int) :: iMinVal
+  integer (c_int) :: iMinVal
 
   this%iMinAllowedValue = iMinVal
 
@@ -1858,7 +1858,7 @@ end subroutine set_minimum_allowable_value_int_sub
 subroutine set_maximum_allowable_value_int_sub(this, iMaxVal)
 
   class (DATA_CATALOG_ENTRY_T) :: this
-  integer (kind=c_int) :: iMaxVal
+  integer (c_int) :: iMaxVal
 
   this%iMaxAllowedValue = iMaxVal
 
@@ -1869,7 +1869,7 @@ end subroutine set_maximum_allowable_value_int_sub
 subroutine set_minimum_allowable_value_real_sub(this, rMinVal)
 
   class (DATA_CATALOG_ENTRY_T) :: this
-  real (kind=c_float) :: rMinVal
+  real (c_float) :: rMinVal
 
   this%rMinAllowedValue = rMinVal
 
@@ -1880,7 +1880,7 @@ end subroutine set_minimum_allowable_value_real_sub
 subroutine set_maximum_allowable_value_real_sub(this, rMaxVal)
 
   class (DATA_CATALOG_ENTRY_T) :: this
-  real (kind=c_float) :: rMaxVal
+  real (c_float) :: rMaxVal
 
   this%rMaxAllowedValue = rMaxVal
 
@@ -1894,9 +1894,9 @@ end subroutine set_maximum_allowable_value_real_sub
     type ( GENERAL_GRID_T ), pointer :: pGrdBase
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iRetVal
-    real (kind=c_float) :: rMultiplier = 1.
-    real (kind=c_double), dimension(4) :: rX, rY
+    integer (c_int) :: iRetVal
+    real (c_float) :: rMultiplier = 1.
+    real (c_double), dimension(4) :: rX, rY
 
     ! ensure that there is sufficient coverage on all sides of grid
     rX(1) = pGrdBase%rX0 - pGrdBase%rGridCellSize * rMultiplier ! Xll
@@ -1964,10 +1964,10 @@ end subroutine set_maximum_allowable_value_real_sub
   subroutine data_GridEnforceLimits_int(this, iValues)
 
     class (DATA_CATALOG_ENTRY_T) :: this
-    integer (kind=c_int), dimension(:,:) :: iValues
+    integer (c_int), dimension(:,:) :: iValues
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iMin, iMax
+    integer (c_int) :: iMin, iMax
 
     iMin = this%iMinAllowedValue
     iMax = this%iMaxAllowedValue
@@ -1982,13 +1982,13 @@ end subroutine set_maximum_allowable_value_real_sub
   subroutine data_GridEnforceLimits_real(this, rValues)
 
     class (DATA_CATALOG_ENTRY_T) :: this
-    real (kind=c_float), dimension(:,:) :: rValues
+    real (c_float), dimension(:,:) :: rValues
 
     ! [ LOCALS ]
-    real (kind=c_float) :: rMin, rMax
+    real (c_float) :: rMin, rMax
 
-    rMin = real(this%rMinAllowedValue, kind=c_float)
-    rMax = real(this%rMaxAllowedValue, kind=c_float)
+    rMin = real(this%rMinAllowedValue, c_float)
+    rMax = real(this%rMaxAllowedValue, c_float)
 
     where ( rValues < rMin )  rValues = rMin
     where ( rValues > rMax )  rValues = rMax
@@ -2000,12 +2000,12 @@ end subroutine set_maximum_allowable_value_real_sub
   subroutine data_GridHandleMissingData_real(this, rValues)
 
     class (DATA_CATALOG_ENTRY_T) :: this
-    real (kind=c_float), dimension(:,:), intent(inout) :: rValues
+    real (c_float), dimension(:,:), intent(inout) :: rValues
 
     ! [ LOCALS ]
-    real (kind=c_float) :: rMissing, rMean
+    real (c_float) :: rMissing, rMean
 
-    rMissing = real(this%rMissingValuesCode, kind=c_float)
+    rMissing = real(this%rMissingValuesCode, c_float)
 
     ! changing the default operation to "do nothing"
     ! user must actively choose what to do with missing values
@@ -2093,10 +2093,10 @@ end subroutine set_maximum_allowable_value_real_sub
   subroutine data_GridHandleMissingData_int(this, iValues)
 
     class (DATA_CATALOG_ENTRY_T) :: this
-    integer (kind=c_int), dimension(:,:), intent(inout) :: iValues
+    integer (c_int), dimension(:,:), intent(inout) :: iValues
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: iMissing, iMean
+    integer (c_int) :: iMissing, iMean
 
     iMissing = this%iMissingValuesCode
     if ( trim(this%sMissingValuesOperator) .ne. "&&" ) then

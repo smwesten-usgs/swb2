@@ -25,47 +25,47 @@ module awc__depth_integrated
   public :: awc_depth_integrated_read, awc_depth_integrated_initialize, AVAILABLE_WATER_CONTENT
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pSOILS_CODE_GRID
-  real (kind=c_float), allocatable     :: AVAILABLE_WATER_CONTENT(:,:)
+  real (c_float), allocatable     :: AVAILABLE_WATER_CONTENT(:,:)
 
 contains
 
   subroutine awc_depth_integrated_read( fRooting_Depth )
 
-    real (kind=c_float), intent(inout)       :: fRooting_Depth(:,:)
+    real (c_float), intent(inout)       :: fRooting_Depth(:,:)
 
     ! [ LOCALS ]
 
-    integer (kind=c_int), allocatable  :: iLanduse_Code(:)
-    integer (kind=c_int), allocatable  :: iSoils_Table_Code(:)
-    integer (kind=c_int), allocatable  :: iSoils_Components(:)
-    integer (kind=c_int), allocatable  :: iSoils_Horizons(:)    
-    real (kind=c_float), allocatable   :: fSoils_AWC(:) 
-    real (kind=c_float), allocatable   :: fSoils_Top_Depth(:)
-    real (kind=c_float), allocatable   :: fSoils_Bottom_Depth(:)
-    real (kind=c_float), allocatable   :: fSoils_Component_Fraction(:)
-    real (kind=c_float), allocatable   :: fSoils_Horizon_Thickness(:)
+    integer (c_int), allocatable  :: iLanduse_Code(:)
+    integer (c_int), allocatable  :: iSoils_Table_Code(:)
+    integer (c_int), allocatable  :: iSoils_Components(:)
+    integer (c_int), allocatable  :: iSoils_Horizons(:)    
+    real (c_float), allocatable   :: fSoils_AWC(:) 
+    real (c_float), allocatable   :: fSoils_Top_Depth(:)
+    real (c_float), allocatable   :: fSoils_Bottom_Depth(:)
+    real (c_float), allocatable   :: fSoils_Component_Fraction(:)
+    real (c_float), allocatable   :: fSoils_Horizon_Thickness(:)
                    
-    integer (kind=c_int)               :: iNumberOfLanduses
-    integer (kind=c_int)               :: iNumberOfSoils
-    integer (kind=c_int)               :: iNumberOfSoilsComponents
-    integer (kind=c_int)               :: iNumberOfSoilsHorizons
-    integer (kind=c_int)               :: iNumberOfSoilsAWC
-    integer (kind=c_int)               :: iNumberOfSoilsTopDepths
-    integer (kind=c_int)               :: iNumberOfSoilsBottomDepths
-    integer (kind=c_int)               :: iNumberOfSoilsComponentFractions     
+    integer (c_int)               :: iNumberOfLanduses
+    integer (c_int)               :: iNumberOfSoils
+    integer (c_int)               :: iNumberOfSoilsComponents
+    integer (c_int)               :: iNumberOfSoilsHorizons
+    integer (c_int)               :: iNumberOfSoilsAWC
+    integer (c_int)               :: iNumberOfSoilsTopDepths
+    integer (c_int)               :: iNumberOfSoilsBottomDepths
+    integer (c_int)               :: iNumberOfSoilsComponentFractions     
 
-    real (kind=c_float)                :: fTemp_AWC               
-    real (kind=c_float)                :: fDepthOfDeepestHorizon
-    real (kind=c_float)                :: fFinal_AWC
-    integer (kind=c_int)               :: iDeepestSoilHorizon
-    logical (kind=c_bool)              :: lFirst
+    real (c_float)                :: fTemp_AWC               
+    real (c_float)                :: fDepthOfDeepestHorizon
+    real (c_float)                :: fFinal_AWC
+    integer (c_int)               :: iDeepestSoilHorizon
+    logical (c_bool)              :: lFirst
 
     type (STRING_LIST_T)               :: slList
-    integer (kind=c_int)               :: iStat
-    integer (kind=c_int)               :: iIndex, iIndex2
-    integer (kind=c_int)               :: iIndex_x, iIndex_y
-    real (kind=c_float)                :: fRooting_Depth_inches
-    real (kind=c_float)                :: fSoil_Thickness_Total
+    integer (c_int)               :: iStat
+    integer (c_int)               :: iIndex, iIndex2
+    integer (c_int)               :: iIndex_x, iIndex_y
+    real (c_float)                :: fRooting_Depth_inches
+    real (c_float)                :: fSoil_Thickness_Total
 
    call slList%append("LU_Code")
    call slList%append("Landuse_Code")
@@ -273,9 +273,9 @@ contains
 
   subroutine awc_depth_integrated_initialize( lActive, fAWC, iSoils_Code )
 
-    logical (kind=c_bool), intent(in)     :: lActive(:,:)
-    real (kind=c_float), intent(inout)    :: fAWC(:)
-    integer (kind=c_int), intent(inout)   :: iSoils_Code(:)
+    logical (c_bool), intent(in)     :: lActive(:,:)
+    real (c_float), intent(inout)    :: fAWC(:)
+    integer (c_int), intent(inout)   :: iSoils_Code(:)
 
     iSoils_Code = pack( pSOILS_CODE_GRID%pGrdBase%iData, lActive )
 

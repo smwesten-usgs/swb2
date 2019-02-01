@@ -44,27 +44,27 @@ contains
 elemental function et_jh_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax,    &
                                     fAs, fBs, fSunPct )                      result(fReferenceET0)
 
-  integer (kind=c_int), intent(in)          :: iDayOfYear
-  integer (kind=c_int), intent(in)          :: iNumDaysInYear
-  real (kind=c_float), intent(in)           :: fLatitude
-  real (kind=c_float), intent(in)           :: fTMin
-  real (kind=c_float), intent(in)           :: fTMax
-  real (kind=c_float), intent(in), optional :: fAs
-  real (kind=c_float), intent(in), optional :: fBs
-  real (kind=c_float), intent(in), optional :: fSunPct
-  real (kind=c_float)                       :: fReferenceET0
+  integer (c_int), intent(in)          :: iDayOfYear
+  integer (c_int), intent(in)          :: iNumDaysInYear
+  real (c_float), intent(in)           :: fLatitude
+  real (c_float), intent(in)           :: fTMin
+  real (c_float), intent(in)           :: fTMax
+  real (c_float), intent(in), optional :: fAs
+  real (c_float), intent(in), optional :: fBs
+  real (c_float), intent(in), optional :: fSunPct
+  real (c_float)                       :: fReferenceET0
 
   ! [ LOCALS ]
-  real (kind=c_double) :: dRa
-  real (kind=c_double) :: dDelta
-  real (kind=c_double) :: dOmega_s
-  real (kind=c_double) :: dD_r
-  real (kind=c_double) :: dRs
-  real (kind=c_float)  :: fTAvg
+  real (c_double) :: dRa
+  real (c_double) :: dDelta
+  real (c_double) :: dOmega_s
+  real (c_double) :: dD_r
+  real (c_double) :: dRs
+  real (c_float)  :: fTAvg
 
-  real (kind=c_double) :: dAs_l
-  real (kind=c_double) :: dBs_l
-  real (kind=c_double) :: dSunPct_l
+  real (c_double) :: dAs_l
+  real (c_double) :: dBs_l
+  real (c_double) :: dSunPct_l
 
   if (present( fAs ) ) then
     dAs_l = fAs
@@ -97,12 +97,12 @@ elemental function et_jh_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin
 
 !  fOmega_s = acos( -tan(fLatitude) * tan(fDelta) )
 
-  dOmega_s = sunrise_sunset_angle__omega_s( real( fLatitude, kind=c_double), dDelta )
+  dOmega_s = sunrise_sunset_angle__omega_s( real( fLatitude, c_double), dDelta )
 
 !  dSo = 2.44722_c_float * 15.392_c_float * dD_r * (     dOmega_s  * sin(dLatitude) * sin(dDelta) + &
 !                                                  sin(dOmega_s) * cos(dLatitude) * cos(dDelta) )
 
-  dRa =  extraterrestrial_radiation__Ra(dLatitude=real( fLatitude, kind=c_double),    &
+  dRa =  extraterrestrial_radiation__Ra(dLatitude=real( fLatitude, c_double),    &
                                                         dDelta=dDelta,                &
                                                         dOmega_s=dOmega_s,            &
                                                         dDsubR=dD_r )

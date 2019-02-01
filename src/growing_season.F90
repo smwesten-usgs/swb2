@@ -15,34 +15,34 @@ module growing_season
   public :: growing_season_initialize
   public :: growing_season_update
 
-  integer (kind=c_int), allocatable :: iLanduseCodes(:)
-  real (kind=c_float), allocatable  :: FIRST_DAY_OF_GROWING_SEASON(:)
-  real (kind=c_float), allocatable  :: LAST_DAY_OF_GROWING_SEASON(:)
-  real (kind=c_float), allocatable  :: GDD_FIRST_DAY_OF_GROWING_SEASON(:)
-  real (kind=c_float), allocatable  :: KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON(:)
+  integer (c_int), allocatable :: iLanduseCodes(:)
+  real (c_float), allocatable  :: FIRST_DAY_OF_GROWING_SEASON(:)
+  real (c_float), allocatable  :: LAST_DAY_OF_GROWING_SEASON(:)
+  real (c_float), allocatable  :: GDD_FIRST_DAY_OF_GROWING_SEASON(:)
+  real (c_float), allocatable  :: KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON(:)
 
   character( len=2 ), parameter     :: DATE_DELIMS = "/-"
-  real (kind=c_float), parameter    :: NODATA_VALUE = -9999._c_float
+  real (c_float), parameter    :: NODATA_VALUE = -9999._c_float
 
 contains
 
   subroutine growing_season_initialize( )
 
     ! [ LOCALS ]
-    integer (kind=c_int)              :: iNumberOfLanduses
-    logical (kind=c_bool)             :: lAreLengthsEqual
+    integer (c_int)              :: iNumberOfLanduses
+    logical (c_bool)             :: lAreLengthsEqual
     character (len=:), allocatable    :: sTemp
     type (STRING_LIST_T)              :: sl_temp_list
     type (STRING_LIST_T)              :: sl_growing_season_begin
     type (STRING_LIST_T)              :: sl_growing_season_end
     character (len=32)                :: str_buffer
-    real (kind=c_float), allocatable  :: temp_values(:)
-    integer (kind=c_int)              :: indx
-    integer (kind=c_int)              :: status
-    integer (kind=c_int)              :: count_gdd_start
-    integer (kind=c_int)              :: count_killing_frost_end
-    integer (kind=c_int)              :: count_grow_start
-    integer (kind=c_int)              :: count_grow_end
+    real (c_float), allocatable  :: temp_values(:)
+    integer (c_int)              :: indx
+    integer (c_int)              :: status
+    integer (c_int)              :: count_gdd_start
+    integer (c_int)              :: count_killing_frost_end
+    integer (c_int)              :: count_grow_start
+    integer (c_int)              :: count_grow_end
 
     !> Determine how many landuse codes are present
     sTemp = "LU_Code"
@@ -224,10 +224,10 @@ contains
                                               mean_air_temp,                   &
                                               it_is_growing_season )
 
-    integer (kind=c_int), intent(in)      :: landuse_index
-    real (kind=c_float), intent(in)       :: GDD
-    real (kind=c_float), intent(in)       :: mean_air_temp
-    logical (kind=c_bool), intent(inout)  :: it_is_growing_season
+    integer (c_int), intent(in)      :: landuse_index
+    real (c_float), intent(in)       :: GDD
+    real (c_float), intent(in)       :: mean_air_temp
+    logical (c_bool), intent(inout)  :: it_is_growing_season
 
     ! first growing season day > last if we are growing a winter crop, winter wheat for example
     if ( FIRST_DAY_OF_GROWING_SEASON(landuse_index) > LAST_DAY_OF_GROWING_SEASON (landuse_index) ) then

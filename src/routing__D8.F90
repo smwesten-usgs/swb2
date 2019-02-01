@@ -17,34 +17,34 @@ module routing__D8
 
   type (DATA_CATALOG_ENTRY_T), pointer :: pD8_FLOWDIR    ! data catalog object => D8 flow direction grid
 
-  integer (kind=c_int), allocatable     :: TARGET_ROW(:,:)
-  integer (kind=c_int), allocatable     :: TARGET_COL(:,:)
-  logical (kind=c_bool), allocatable    :: IS_DOWNSLOPE_TARGET_MARKED(:,:)
-  integer (kind=c_int), allocatable     :: SUM_OF_UPSLOPE_CELLS(:,:)
-  integer (kind=c_int), allocatable     :: NUMBER_OF_UPSLOPE_CONNECTIONS(:,:)
+  integer (c_int), allocatable     :: TARGET_ROW(:,:)
+  integer (c_int), allocatable     :: TARGET_COL(:,:)
+  logical (c_bool), allocatable    :: IS_DOWNSLOPE_TARGET_MARKED(:,:)
+  integer (c_int), allocatable     :: SUM_OF_UPSLOPE_CELLS(:,:)
+  integer (c_int), allocatable     :: NUMBER_OF_UPSLOPE_CONNECTIONS(:,:)
 
   !> @TODO remove redundant data elements; row1d, col1d, etc. are now also stored in the model data structure.
 
-  integer (kind=c_int), allocatable     :: ROW2D(:,:)
-  integer (kind=c_int), allocatable     :: COL2D(:,:)
-  integer (kind=c_int), allocatable     :: ROW1D(:)
-  integer (kind=c_int), allocatable     :: COL1D(:)
+  integer (c_int), allocatable     :: ROW2D(:,:)
+  integer (c_int), allocatable     :: COL2D(:,:)
+  integer (c_int), allocatable     :: ROW1D(:)
+  integer (c_int), allocatable     :: COL1D(:)
 
-  integer (kind=c_int), allocatable     :: ROW_INDEX(:)
-  integer (kind=c_int), allocatable     :: COLUMN_INDEX(:)
-  integer (kind=c_int), allocatable     :: SORT_ORDER_l(:)
-  integer (kind=c_int), allocatable     :: TARGET_INDEX_l(:)
+  integer (c_int), allocatable     :: ROW_INDEX(:)
+  integer (c_int), allocatable     :: COLUMN_INDEX(:)
+  integer (c_int), allocatable     :: SORT_ORDER_l(:)
+  integer (c_int), allocatable     :: TARGET_INDEX_l(:)
 
-  integer (kind=c_int), parameter       :: D8_EAST         = 1
-  integer (kind=c_int), parameter       :: D8_SOUTHEAST    = 2
-  integer (kind=c_int), parameter       :: D8_SOUTH        = 4
-  integer (kind=c_int), parameter       :: D8_SOUTHWEST    = 8
-  integer (kind=c_int), parameter       :: D8_WEST         = 16
-  integer (kind=c_int), parameter       :: D8_NORTHWEST    = 32
-  integer (kind=c_int), parameter       :: D8_NORTH        = 64
-  integer (kind=c_int), parameter       :: D8_NORTHEAST    = 128
+  integer (c_int), parameter       :: D8_EAST         = 1
+  integer (c_int), parameter       :: D8_SOUTHEAST    = 2
+  integer (c_int), parameter       :: D8_SOUTH        = 4
+  integer (c_int), parameter       :: D8_SOUTHWEST    = 8
+  integer (c_int), parameter       :: D8_WEST         = 16
+  integer (c_int), parameter       :: D8_NORTHWEST    = 32
+  integer (c_int), parameter       :: D8_NORTH        = 64
+  integer (c_int), parameter       :: D8_NORTHEAST    = 128
 
-  integer (kind=c_int), parameter       :: D8_UNDETERMINED = -999
+  integer (c_int), parameter       :: D8_UNDETERMINED = -999
 
   ! idea here is to create an array of row and column numbers, then use the
   ! PACK statement to create a vector of row-column numbers in the same order that
@@ -78,8 +78,8 @@ contains
 !
   elemental function get_cell_index( iteration_index )  result( cell_index )
 
-    integer (kind=c_int), intent(in)    :: iteration_index
-    integer (kind=c_int)                :: cell_index
+    integer (c_int), intent(in)    :: iteration_index
+    integer (c_int)                :: cell_index
 
     ! if D8 flow routing has not been initialized, report back the iteration index
     cell_index = iteration_index
@@ -93,8 +93,8 @@ contains
 
 elemental function get_target_index( iteration_index )  result( target_index )
 
-  integer (kind=c_int), intent(in)    :: iteration_index
-  integer (kind=c_int)                :: target_index
+  integer (c_int), intent(in)    :: iteration_index
+  integer (c_int)                :: target_index
 
    if ( allocated( TARGET_INDEX_l ) ) then
 
@@ -112,12 +112,12 @@ end function get_target_index
 
   elemental function get_sort_order( cell_index )  result( iteration_index )
 
-    integer (kind=c_int), intent(in)    :: cell_index
-    integer (kind=c_int)                :: iteration_index
+    integer (c_int), intent(in)    :: cell_index
+    integer (c_int)                :: iteration_index
 
     ! [ LOCALS ]
-    integer (kind=c_int)  :: current_cell_index
-    logical (kind=c_bool) :: found_match
+    integer (c_int)  :: current_cell_index
+    logical (c_bool) :: found_match
 
     found_match = FALSE
 
@@ -145,24 +145,24 @@ end function get_target_index
 
   subroutine routing_D8_initialize( lActive, sort_order )
 
-    logical (kind=c_bool), intent(in)    :: lActive(:,:)
-    integer (kind=c_int), intent(inout)  :: sort_order(:)
+    logical (c_bool), intent(in)    :: lActive(:,:)
+    integer (c_int), intent(inout)  :: sort_order(:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)                 :: number_of_cols
-    integer (kind=c_int)                 :: number_of_rows
-    integer (kind=c_int)                 :: iStat
-    integer (kind=c_int)                 :: column_num
-    integer (kind=c_int)                 :: row_num
-    integer (kind=c_int)                 :: iteration_index
-    integer (kind=c_int)                 :: iCount
+    integer (c_int)                 :: number_of_cols
+    integer (c_int)                 :: number_of_rows
+    integer (c_int)                 :: iStat
+    integer (c_int)                 :: column_num
+    integer (c_int)                 :: row_num
+    integer (c_int)                 :: iteration_index
+    integer (c_int)                 :: iCount
     character (len=256)                  :: sBuf
 
-    integer (kind=c_int) :: col_lbound, col_ubound
-    integer (kind=c_int) :: row_lbound, row_ubound
-    integer (kind=c_int) :: cell_index, target_index
-    integer (kind=c_int) :: iUnitNum
-    integer (kind=c_int) :: Target_row_num, Target_col_num
+    integer (c_int) :: col_lbound, col_ubound
+    integer (c_int) :: row_lbound, row_ubound
+    integer (c_int) :: cell_index, target_index
+    integer (c_int) :: iUnitNum
+    integer (c_int) :: Target_row_num, Target_col_num
 
     type (GENERAL_GRID_T), pointer  :: pTempGrid
 
@@ -314,13 +314,13 @@ end function get_target_index
 
   function routing_D8_get_index( iCol, iRow )   result( cell_index )
 
-    integer (kind=c_int), intent(in)   :: iCol
-    integer (kind=c_int), intent(in)   :: iRow
-    integer (kind=c_int)               :: cell_index
+    integer (c_int), intent(in)   :: iCol
+    integer (c_int), intent(in)   :: iRow
+    integer (c_int)               :: cell_index
 
     ! [ LOCALS ]
-    integer (kind=c_int)   :: iIndex
-    logical (kind=c_bool)  :: lFound
+    integer (c_int)   :: iIndex
+    logical (c_bool)  :: lFound
 
     iIndex        = -9999
     cell_index    = -9999
@@ -346,13 +346,13 @@ end function get_target_index
 
   subroutine routing_D8_assign_downstream_row_col( lActive )
 
-    logical (kind=c_bool), intent(in)    :: lActive(:,:)
+    logical (c_bool), intent(in)    :: lActive(:,:)
 
     ! [ LOCALS ]
-    integer (kind=c_int) :: row_num
-    integer (kind=c_int) :: column_num
-    integer (kind=c_int) :: col_lbound, col_ubound
-    integer (kind=c_int) :: row_lbound, row_ubound
+    integer (c_int) :: row_num
+    integer (c_int) :: column_num
+    integer (c_int) :: col_lbound, col_ubound
+    integer (c_int) :: row_lbound, row_ubound
 
     col_lbound = lbound(lActive, 1)
     col_ubound = ubound(lActive, 1)
@@ -429,24 +429,24 @@ end function get_target_index
 
     use grid
 
-    logical (kind=c_bool), intent(in)    :: lActive(:,:)
+    logical (c_bool), intent(in)    :: lActive(:,:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)  :: row_num
-    integer (kind=c_int)  :: column_num
-    integer (kind=c_int)  :: iColsrch
-    integer (kind=c_int)  :: iRowsrch
-    integer (kind=c_int)  :: iNumberOfChangedCells
-    integer (kind=c_int)  :: col_lbound, col_ubound
-    integer (kind=c_int)  :: row_lbound, row_ubound
-    integer (kind=c_int)  :: iUpslopeSum, iUpslopeConnections
-    logical (kind=c_bool) :: are_there_unmarked_upslope_cells
-    logical (kind=c_bool) :: lCircular
-    integer (kind=c_int)  :: iNumberRemaining
-    integer (kind=c_int)  :: indx, k, iCount
-    integer (kind=c_int)  :: num_cells_marked_this_iteration
-    integer (kind=c_int)  :: iPasses
-    integer (kind=c_int)  :: iPassesWithoutChange
+    integer (c_int)  :: row_num
+    integer (c_int)  :: column_num
+    integer (c_int)  :: iColsrch
+    integer (c_int)  :: iRowsrch
+    integer (c_int)  :: iNumberOfChangedCells
+    integer (c_int)  :: col_lbound, col_ubound
+    integer (c_int)  :: row_lbound, row_ubound
+    integer (c_int)  :: iUpslopeSum, iUpslopeConnections
+    logical (c_bool) :: are_there_unmarked_upslope_cells
+    logical (c_bool) :: lCircular
+    integer (c_int)  :: iNumberRemaining
+    integer (c_int)  :: indx, k, iCount
+    integer (c_int)  :: num_cells_marked_this_iteration
+    integer (c_int)  :: iPasses
+    integer (c_int)  :: iPassesWithoutChange
     type (GENERAL_GRID_T), pointer  :: pTempGrid
 
     col_lbound = lbound(lActive, 1)

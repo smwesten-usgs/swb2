@@ -106,7 +106,7 @@ end subroutine calc_split_time_sub
     class (TIMER_T) :: this
     integer (c_int) :: elapsed_seconds
 
-    elapsed_seconds = int(this%elapsedtime, kind=c_int)
+    elapsed_seconds = int(this%elapsedtime, c_int)
 
 end function get_elapsed_seconds_fn
 
@@ -117,7 +117,7 @@ function get_split_seconds_fn(this)    result(split_seconds)
   class (TIMER_T) :: this
   integer (c_int) :: split_seconds
 
-  split_seconds = int(this%splittime, kind=c_int)
+  split_seconds = int(this%splittime, c_int)
 
 end function get_split_seconds_fn
 

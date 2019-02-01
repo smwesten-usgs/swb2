@@ -13,13 +13,13 @@ module runoff__curve_number
 
   private
 
-  real (kind=c_float), allocatable    :: CN_ARCIII(:,:)
-  real (kind=c_float), allocatable    :: CN_ARCII(:,:)
-  real (kind=c_float), allocatable    :: CN_ARCI(:,:)
-  real (kind=c_float), allocatable    :: PREV_5_DAYS_RAIN(:,:)
-  integer (kind=c_int), allocatable   :: iLanduseCodes(:)
-  integer (kind=c_int)                :: DAYCOUNT
-  integer (kind=c_int), parameter     :: FIVE_DAY_SUM = 6
+  real (c_float), allocatable    :: CN_ARCIII(:,:)
+  real (c_float), allocatable    :: CN_ARCII(:,:)
+  real (c_float), allocatable    :: CN_ARCI(:,:)
+  real (c_float), allocatable    :: PREV_5_DAYS_RAIN(:,:)
+  integer (c_int), allocatable   :: iLanduseCodes(:)
+  integer (c_int)                :: DAYCOUNT
+  integer (c_int), parameter     :: FIVE_DAY_SUM = 6
 
 
   public :: runoff_curve_number_initialize
@@ -29,10 +29,10 @@ module runoff__curve_number
   public :: CN_ARCI, CN_ARCII, CN_ARCIII
   public :: FIVE_DAY_SUM, PREV_5_DAYS_RAIN
 
-  real (kind=c_float), parameter :: AMC_DRY_GROWING = 1.40_c_float
-  real (kind=c_float), parameter :: AMC_DRY_DORMANT = 0.50_c_float
-  real (kind=c_float), parameter :: AMC_WET_GROWING = 2.10_c_float
-  real (kind=c_float), parameter :: AMC_WET_DORMANT = 1.10_c_float
+  real (c_float), parameter :: AMC_DRY_GROWING = 1.40_c_float
+  real (c_float), parameter :: AMC_DRY_DORMANT = 0.50_c_float
+  real (c_float), parameter :: AMC_WET_GROWING = 2.10_c_float
+  real (c_float), parameter :: AMC_WET_DORMANT = 1.10_c_float
 
   type (DATETIME_T) :: DATE_LAST_UPDATED
 
@@ -42,19 +42,19 @@ contains
 
    use ieee_arithmetic, only : ieee_is_nan, ieee_is_finite
 
-    logical (kind=c_bool), intent(in)   :: cell_is_active(:,:)
+    logical (c_bool), intent(in)   :: cell_is_active(:,:)
 
 
     ! [ LOCALS ]
-    integer (kind=c_int)              :: iNumberOfLanduses
-    integer (kind=c_int)              :: iNumberOfSoilGroups
-    integer (kind=c_int), allocatable :: iCurveNumberSeqNums(:)
+    integer (c_int)              :: iNumberOfLanduses
+    integer (c_int)              :: iNumberOfSoilGroups
+    integer (c_int), allocatable :: iCurveNumberSeqNums(:)
     type (STRING_LIST_T)              :: slList
     type (STRING_LIST_T)              :: slCurveNumber
-    integer (kind=c_int)              :: iStat
-    integer (kind=c_int)              :: iSoilsIndex
+    integer (c_int)              :: iStat
+    integer (c_int)              :: iSoilsIndex
     character (len=:), allocatable    :: sText
-    real (kind=c_float), allocatable  :: CN(:)
+    real (c_float), allocatable  :: CN(:)
 
     call slList%append("LU_Code")
     call slList%append("Landuse_Lookup_Code")
@@ -113,8 +113,8 @@ contains
 
   elemental function return_landuse_index_fn(iLanduseCode)      result(iLanduseIndex)
 
-    integer (kind=c_int), intent(in)         :: iLanduseCode
-    integer (kind=c_int)                     :: iLanduseIndex
+    integer (c_int), intent(in)         :: iLanduseCode
+    integer (c_int)                     :: iLanduseIndex
 
     iLanduseIndex = 0
 
@@ -132,8 +132,8 @@ contains
 
   elemental function prob_runoff_enhancement( fCFGI )    result(fPf)
 
-    real (kind=c_float), intent(in) :: fCFGI
-    real (kind=c_float)             :: fPf
+    real (c_float), intent(in) :: fCFGI
+    real (c_float)             :: fPf
 
     if(fCFGI <= CFGI_LL ) then
       fPf = 0_c_float
@@ -149,8 +149,8 @@ contains
 
   subroutine update_previous_5_day_rainfall( infil, indx )
 
-    real (kind=c_float), intent(in)            :: infil
-    integer (kind=c_int), intent(in)           :: indx
+    real (c_float), intent(in)            :: infil
+    integer (c_int), intent(in)           :: indx
 
     ! we only want to increment DAYCOUNT 1x per day!
     if ( .not. DATE_LAST_UPDATED == SIM_DT%curr ) then
@@ -174,18 +174,18 @@ contains
 !   elemental function update_curve_number_fn( iLanduseIndex, iSoilsIndex, fSoilStorage, &
 !                           fSoilStorage_Max, fCFGI )  result( CN_adj )
 
-!     integer (kind=c_int), intent(in)  :: iLanduseIndex
-!     integer (kind=c_int), intent(in)  :: iSoilsIndex
-!     real (kind=c_float), intent(in)   :: fSoilStorage
-!     real (kind=c_float), intent(in)   :: fSoilStorage_Max
-!     real (kind=c_float), intent(in)   :: fCFGI
-!     real (kind=c_float)               :: CN_adj
+!     integer (c_int), intent(in)  :: iLanduseIndex
+!     integer (c_int), intent(in)  :: iSoilsIndex
+!     real (c_float), intent(in)   :: fSoilStorage
+!     real (c_float), intent(in)   :: fSoilStorage_Max
+!     real (c_float), intent(in)   :: fCFGI
+!     real (c_float)               :: CN_adj
 
 !     ! [ LOCALS ]
-!     real (kind=c_float) :: Pf
-!     real (kind=c_float) :: CN_base
-!     real (kind=c_float) :: fFraction_FC   ! fraction of field capacity
-!     real (kind=c_float) :: frac
+!     real (c_float) :: Pf
+!     real (c_float) :: CN_base
+!     real (c_float) :: fFraction_FC   ! fraction of field capacity
+!     real (c_float) :: frac
 
 !     fFraction_FC = 0.0
 !     if (fSoilStorage_Max > 0.0) fFraction_FC = min( 1.0_c_float, fSoilStorage / fSoilStorage_Max )
@@ -248,18 +248,18 @@ contains
                                              it_is_growing_season, fSoilStorage_Max,   &
                                              fCFGI )                                      result( CN_adj )
 
-  integer (kind=c_int), intent(in)  :: iLanduseIndex
-  integer (kind=c_int), intent(in)  :: iSoilsIndex
-  integer (kind=c_int), intent(in)  :: cell_index
-  logical (kind=c_bool), intent(in) :: it_is_growing_season
-  real (kind=c_float), intent(in)   :: fSoilStorage_Max
-  real (kind=c_float), intent(in)   :: fCFGI
-  real (kind=c_float)               :: CN_adj
+  integer (c_int), intent(in)  :: iLanduseIndex
+  integer (c_int), intent(in)  :: iSoilsIndex
+  integer (c_int), intent(in)  :: cell_index
+  logical (c_bool), intent(in) :: it_is_growing_season
+  real (c_float), intent(in)   :: fSoilStorage_Max
+  real (c_float), intent(in)   :: fCFGI
+  real (c_float)               :: CN_adj
 
   ! [ LOCALS ]
-  real (kind=c_float) :: Pf
-  real (kind=c_float) :: frac
-  real (kind=c_float) :: fInflow
+  real (c_float) :: Pf
+  real (c_float) :: frac
+  real (c_float) :: fInflow
 
   fInflow = PREV_5_DAYS_RAIN( cell_index, FIVE_DAY_SUM )
 
@@ -328,8 +328,8 @@ contains
 
   elemental function CN_II_to_CN_III(CN_II)   result(CN_III)
 
-    real (kind=c_float), intent(in)  :: CN_II
-    real (kind=c_float)              :: CN_III
+    real (c_float), intent(in)  :: CN_II
+    real (c_float)              :: CN_III
 
     CN_III = CN_II / ( 0.427_c_float + 0.00573_c_float * CN_II )
 
@@ -342,8 +342,8 @@ contains
 
   elemental function CN_II_to_CN_I(CN_II)   result(CN_I)
 
-    real (kind=c_float), intent(in)  :: CN_II
-    real (kind=c_float)              :: CN_I
+    real (c_float), intent(in)  :: CN_II
+    real (c_float)              :: CN_I
 
     ! The following comes from page 192, eq. 3.145 of "SCS Curve Number Methodology"
     CN_I = CN_II / (2.281_c_float - 0.01281_c_float * CN_II )
@@ -383,20 +383,20 @@ contains
                                                      soil_storage_max,                    &
                                                      continuous_frozen_ground_index )
 
-    real (kind=c_float), intent(inout)  :: runoff
-    real (kind=c_float), intent(inout)  :: curve_num_adj
-    integer (kind=c_int), intent(in)    :: cell_index
-    integer (kind=c_int), intent(in)    :: landuse_index
-    integer (kind=c_int), intent(in)    :: soil_group
-    logical (kind=c_bool), intent(in)   :: it_is_growing_season
-    real (kind=c_float), intent(in)     :: inflow
-    real (kind=c_float), intent(in)     :: soil_storage_max
-    real (kind=c_float), intent(in)     :: continuous_frozen_ground_index
+    real (c_float), intent(inout)  :: runoff
+    real (c_float), intent(inout)  :: curve_num_adj
+    integer (c_int), intent(in)    :: cell_index
+    integer (c_int), intent(in)    :: landuse_index
+    integer (c_int), intent(in)    :: soil_group
+    logical (c_bool), intent(in)   :: it_is_growing_season
+    real (c_float), intent(in)     :: inflow
+    real (c_float), intent(in)     :: soil_storage_max
+    real (c_float), intent(in)     :: continuous_frozen_ground_index
 
     ! [ LOCALS ]
-!    real (kind=c_float) :: CN_05
-    real (kind=c_float) :: Smax
-    real (kind=c_float) :: CN_adj
+!    real (c_float) :: CN_05
+    real (c_float) :: Smax
+    real (c_float) :: CN_adj
 
     curve_num_adj = update_curve_number_fn( landuse_index, soil_group,                        &
                                             cell_index,                                       &

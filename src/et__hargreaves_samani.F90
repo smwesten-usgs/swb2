@@ -34,9 +34,9 @@ module et__hargreaves_samani
 
 
   ! ET parameters -- default values are from Hargreaves and Samani (1985)
-  real (kind=c_float) :: fET_Slope = 0.0023     
-  real (kind=c_float) :: fET_Exponent = 0.5
-  real (kind=c_float) :: fET_Constant = 17.8
+  real (c_float) :: fET_Slope = 0.0023     
+  real (c_float) :: fET_Exponent = 0.5
+  real (c_float) :: fET_Constant = 17.8
 
 contains
 
@@ -49,8 +49,8 @@ subroutine et_hargreaves_initialize( ) !pConfig, sRecord )
 
   ! [ LOCALS ]
   character (len=256) :: sOption
-  integer (kind=c_int) :: iStat
-  real (kind=c_float) :: rValue
+  integer (c_int) :: iStat
+  real (c_float) :: rValue
 
 !  write(UNIT=LU_LOG,FMT=*) "Configuring Hargreaves PET model"
 
@@ -83,16 +83,16 @@ elemental function et_hargreaves_calculate( iDayOfYear, iNumDaysInYear, fLatitud
   !! Computes the potential ET for each cell, based on TMIN and TMAX.
   !! Stores cell-by-cell PET values in the model grid.
 
-  integer (kind=c_int),intent(in) :: iDayOfYear
-  integer (kind=c_int),intent(in) :: iNumDaysInYear
-  real (kind=c_float), intent(in) :: fLatitude
-  real (kind=c_float), intent(in) :: fTMin
-  real (kind=c_float), intent(in) :: fTMax
-  real (kind=c_float)             :: fReferenceET0
+  integer (c_int),intent(in) :: iDayOfYear
+  integer (c_int),intent(in) :: iNumDaysInYear
+  real (c_float), intent(in) :: fLatitude
+  real (c_float), intent(in) :: fTMin
+  real (c_float), intent(in) :: fTMax
+  real (c_float)             :: fReferenceET0
 
   ! [ LOCALS ]
-  real (kind=c_double) :: fDelta, fOmega_s, fD_r, fRa
-  real (kind=c_double) :: dLatitude_radians
+  real (c_double) :: fDelta, fOmega_s, fD_r, fRa
+  real (c_double) :: dLatitude_radians
 
   dLatitude_radians = fLatitude * DEGREES_TO_RADIANS
 
@@ -114,16 +114,16 @@ end function et_hargreaves_calculate
 elemental function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)
 
   ! [ ARGUMENTS ]
-  real (kind=c_double),intent(in) :: rRa
-  real (kind=c_float),intent(in) :: rTMinF
-  real (kind=c_float),intent(in) :: rTMaxF
+  real (c_double),intent(in) :: rRa
+  real (c_float),intent(in) :: rTMinF
+  real (c_float),intent(in) :: rTMaxF
 
   ! [ RETURN VALUE ]
-  real (kind=c_float) :: rET_0
+  real (c_float) :: rET_0
 
   ! [ LOCALS ]
-  real (kind=c_double) :: rTDelta
-  real (kind=c_double) :: rTAvg
+  real (c_double) :: rTDelta
+  real (c_double) :: rTAvg
 
   rTAvg = (rTMinF + rTMaxF) / 2.0_c_double
 

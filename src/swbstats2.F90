@@ -30,7 +30,7 @@ program swbstats2
   integer, parameter :: c_diff_t = 8
 #endif
 
-  integer (kind=c_size_t)          :: RECNUM = 0
+  integer (c_size_t)          :: RECNUM = 0
 
   character (len=256)              :: temp_string, sub_string
 
@@ -39,7 +39,7 @@ program swbstats2
   type (DATA_CATALOG_ENTRY_T), pointer :: pZONE_GRID       => null()
   type (DATA_CATALOG_ENTRY_T), pointer :: pCOMPARISON_GRID => null()
 
-  integer (kind=c_int)           :: iNumArgs
+  integer (c_int)           :: iNumArgs
   character (len=1024)           :: sCompilerFlags
   character (len=256)            :: sCompilerVersion
   character (len=256)            :: sVersionString
@@ -49,15 +49,15 @@ program swbstats2
   character (len=256)            :: sCompilationSystemString
   character (len=:), allocatable :: start_date_string
   character (len=:), allocatable :: end_date_string
-  integer (kind=c_int)           :: iCount
-  integer (kind=c_int)           :: iIndex
-  integer (kind=c_int), allocatable           ::iIndex_array(:)
-  integer (kind=c_int)           :: iLen
-  real (kind=c_double)           :: start_date_dbl
-  real (kind=c_double)           :: end_date_dbl
-  integer (kind=c_int)           :: TIME_BNDS_VARID
+  integer (c_int)           :: iCount
+  integer (c_int)           :: iIndex
+  integer (c_int), allocatable           ::iIndex_array(:)
+  integer (c_int)           :: iLen
+  real (c_double)           :: start_date_dbl
+  real (c_double)           :: end_date_dbl
+  integer (c_int)           :: TIME_BNDS_VARID
 
-  logical (kind=c_bool)          :: netcdf_active = FALSE
+  logical (c_bool)          :: netcdf_active = FALSE
 
   type (STRING_LIST_T)           :: name_list
   type (STRING_LIST_T)           :: value_list
@@ -71,9 +71,9 @@ program swbstats2
     type (T_NETCDF4_FILE), pointer        :: nc_ptr => null()
     type (GENERAL_GRID_T), pointer        :: grid_ptr => null()
     character (len=8)                     :: stats_description
-    logical (kind=c_bool)                 :: write_netcdf     = TRUE
-    logical (kind=c_bool)                 :: write_arcgrid    = FALSE
-    logical (kind=c_bool)                 :: output_active    = FALSE
+    logical (c_bool)                 :: write_netcdf     = TRUE
+    logical (c_bool)                 :: write_arcgrid    = FALSE
+    logical (c_bool)                 :: output_active    = FALSE
   end type FILE_COLLECTION_T
 
   enum, bind(c)
@@ -87,25 +87,25 @@ program swbstats2
   type (GENERAL_GRID_T), pointer :: pGrdDelta
   type (GENERAL_GRID_T), pointer :: pGrdDelta2
 
-  integer (kind=c_int), parameter  :: OPT_NO_TIME_SLICE        = 1
-  integer (kind=c_int), parameter  :: OPT_SINGLE_TIME_SLICE    = 2
-  integer (kind=c_int), parameter  :: OPT_MULTIPLE_TIME_SLICES = 3
+  integer (c_int), parameter  :: OPT_NO_TIME_SLICE        = 1
+  integer (c_int), parameter  :: OPT_SINGLE_TIME_SLICE    = 2
+  integer (c_int), parameter  :: OPT_MULTIPLE_TIME_SLICES = 3
 
   type SWBSTATS_OPTIONS_T
-    logical (kind=c_bool)          :: dump_options_to_screen = FALSE
-    logical (kind=c_bool)          :: write_csv              = FALSE
-    logical (kind=c_bool)          :: calc_annual_stats      = FALSE
-    logical (kind=c_bool)          :: calc_monthly_stats     = FALSE
-    logical (kind=c_bool)          :: calc_zonal_stats       = FALSE
-    logical (kind=c_bool)          :: compare_to_obs_values  = FALSE
-    logical (kind=c_bool)          :: annualize_stats        = FALSE
+    logical (c_bool)          :: dump_options_to_screen = FALSE
+    logical (c_bool)          :: write_csv              = FALSE
+    logical (c_bool)          :: calc_annual_stats      = FALSE
+    logical (c_bool)          :: calc_monthly_stats     = FALSE
+    logical (c_bool)          :: calc_zonal_stats       = FALSE
+    logical (c_bool)          :: compare_to_obs_values  = FALSE
+    logical (c_bool)          :: annualize_stats        = FALSE
     character (len=:), allocatable :: target_proj4_string
     type (DATETIME_T)              :: data_start_date
     type (DATETIME_T)              :: data_end_date
     type (DATETIME_T)              :: slice_start_date
     type (DATETIME_T)              :: slice_end_date
     character (len=:), allocatable :: date_range_string
-    integer (kind=c_int)           :: slice_option      = OPT_NO_TIME_SLICE
+    integer (c_int)           :: slice_option      = OPT_NO_TIME_SLICE
     character (len=:), allocatable :: stress_period_filename
     character (len=:), allocatable :: comparison_period_filename
     character (len=:), allocatable :: zone_period_filename
@@ -115,10 +115,10 @@ program swbstats2
     character (len=:), allocatable :: netcdf_variable_units_string
     character (len=:), allocatable :: netcdf_variable_name_string
     character (len=:), allocatable :: filename_modifier_string
-    logical (kind=c_bool)          :: netcdf_input_file_is_open = FALSE
-    logical (kind=c_bool)          :: multiple_zone_grids       = FALSE
-    logical (kind=c_bool)          :: multiple_comparison_grids = FALSE
-    real (kind=c_double)           :: comparison_grid_conversion_factor = 1.0_c_double
+    logical (c_bool)          :: netcdf_input_file_is_open = FALSE
+    logical (c_bool)          :: multiple_zone_grids       = FALSE
+    logical (c_bool)          :: multiple_comparison_grids = FALSE
+    real (c_double)           :: comparison_grid_conversion_factor = 1.0_c_double
     type (STRING_LIST_T)           :: start_date_list
     type (STRING_LIST_T)           :: end_date_list
     type (STRING_LIST_T)           :: date_range_id_list
@@ -378,8 +378,8 @@ program swbstats2
                                                 guess_z_var_name=TRUE )
 
       ! extract integer start and end Julian dates from netCDF file
-      start_date_dbl = real( ncfile_in%iFirstDayJD, kind=c_double )
-      end_date_dbl = real( ncfile_in%iLastDayJD, kind=c_double )
+      start_date_dbl = real( ncfile_in%iFirstDayJD, c_double )
+      end_date_dbl = real( ncfile_in%iLastDayJD, c_double )
 
       ! populate datetime data structure
       call options%data_start_date%setJulianDate(start_date_dbl)
@@ -767,12 +767,12 @@ contains
     type (DATETIME_T), intent(inout)        :: end_date
 
     ! [ LOCALS ]
-    real (kind=c_double) :: start_bnd
-    real (kind=c_double) :: end_bnd
-    integer (kind=c_size_t) :: nx, ny
+    real (c_double) :: start_bnd
+    real (c_double) :: end_bnd
+    integer (c_size_t) :: nx, ny
     type (T_NETCDF4_FILE), pointer    :: ncfile_out
     type (GENERAL_GRID_T), pointer    :: grid_ptr
-    integer (kind=c_int)              :: stat_indx
+    integer (c_int)              :: stat_indx
 
     nx = BNDS%iNumCols
     ny = BNDS%iNumRows
@@ -795,7 +795,7 @@ contains
            iCount=[1_c_size_t],                                                   &
            iStride=[1_c_ptrdiff_t],                                               &
            dpValues=[ ( start_bnd + end_bnd ) / 2.0_c_double ] )
-    !       dpValues=[ real( SIM_DT%iNumDaysFromOrigin, kind=c_double) ] )
+    !       dpValues=[ real( SIM_DT%iNumDaysFromOrigin, c_double) ] )
 
        ! call netcdf_put_variable_vector(NCFILE=ncfile_out,                        &
        !    iVarID=TIME_BNDS_VARID,                                                 &
@@ -829,9 +829,9 @@ contains
 
     ! [ LOCALS ]
     character (len=:), allocatable    :: filename
-    integer (kind=c_int)              :: nx, ny
+    integer (c_int)              :: nx, ny
     type (GENERAL_GRID_T), pointer    :: grid_ptr
-    integer (kind=c_int)              :: stat_indx
+    integer (c_int)              :: stat_indx
     character (len=8)                 :: stats_description
     character (len=:), allocatable    :: units_string
 
@@ -908,10 +908,10 @@ contains
     logical, optional                        :: grid_mask(:,:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)               :: julian_day_number
-    real (kind=c_float), allocatable   :: tempvals(:)
-    integer (kind=c_int)               :: day_count
-    logical (kind=c_bool), allocatable :: local_mask(:,:)
+    integer (c_int)               :: julian_day_number
+    real (c_float), allocatable   :: tempvals(:)
+    integer (c_int)               :: day_count
+    logical (c_bool), allocatable :: local_mask(:,:)
 
     ! force slice dates to honor bounds of data dates
     if ( start_date < options%data_start_date )  start_date = options%data_start_date
@@ -937,7 +937,7 @@ contains
           cycle
         endif
 
-        julian_day_number = int( SIM_DT%curr%dJulianDate, kind=c_int)
+        julian_day_number = int( SIM_DT%curr%dJulianDate, c_int)
 
         day_count = day_count + 1
 
@@ -962,7 +962,7 @@ contains
           where ( local_mask )
             delta = grd_new - grd_mean
             grd_sum = grd_sum + grd_new
-            grd_mean = grd_mean + delta / real( day_count, kind=c_float )
+            grd_mean = grd_mean + delta / real( day_count, c_float )
             delta2 = grd_new - grd_mean
             grd_var = grd_var + delta * delta2
           end where
@@ -997,13 +997,13 @@ contains
 
       if (options%annualize_stats) then
         where ( local_mask )
-!          grd_mean = grd_mean/ real( day_count, kind=c_float ) * 365.25
-!          grd_var = grd_var/ real( day_count, kind=c_float ) * 365.25
-          grd_sum = grd_sum / real( day_count, kind=c_float ) * 365.25
+!          grd_mean = grd_mean/ real( day_count, c_float ) * 365.25
+!          grd_var = grd_var/ real( day_count, c_float ) * 365.25
+          grd_sum = grd_sum / real( day_count, c_float ) * 365.25
         end where
       ! else
       !   where ( local_mask )
-      !     grd_mean = grd_sum / real( day_count, kind=c_float )
+      !     grd_mean = grd_sum / real( day_count, c_float )
       !   end where
       endif
 
@@ -1027,8 +1027,8 @@ contains
     type (STRING_LIST_T), intent(out)  :: end_date_list
 
     ! [ LOCALS ]
-    integer (kind=c_int)           :: iFileIndex, iColIndex
-    integer (kind=c_int)           :: iStat
+    integer (c_int)           :: iFileIndex, iColIndex
+    integer (c_int)           :: iStat
     type (ASCII_FILE_T)            :: DF
     character (len=256)            :: sRecord, sItem
 
@@ -1079,8 +1079,8 @@ contains
     type (STRING_LIST_T), intent(out)  :: comparison_grid_file_list
 
     ! [ LOCALS ]
-    integer (kind=c_int)           :: iFileIndex, iColIndex
-    integer (kind=c_int)           :: iStat
+    integer (c_int)           :: iFileIndex, iColIndex
+    integer (c_int)           :: iStat
     type (ASCII_FILE_T)            :: DF
     character (len=256)            :: sRecord, sItem
 
@@ -1134,8 +1134,8 @@ contains
     type (STRING_LIST_T), intent(out)  :: zonal_stats_grid_file_list
 
     ! [ LOCALS ]
-    integer (kind=c_int)           :: iFileIndex, iColIndex
-    integer (kind=c_int)           :: iStat
+    integer (c_int)           :: iFileIndex, iColIndex
+    integer (c_int)           :: iStat
     type (ASCII_FILE_T)            :: DF
     character (len=256)            :: sRecord, sItem
 
@@ -1181,8 +1181,8 @@ contains
     character (len=*), intent(inout)   :: grid_filename
 
     ! [ LOCALS ]
-    integer (kind=c_int)                 :: iIndex
-    integer (kind=c_int)                 :: iStat
+    integer (c_int)                 :: iIndex
+    integer (c_int)                 :: iStat
     character (len=:), allocatable       :: description_str
     character (len=:), allocatable       :: output_filesname_str
 
@@ -1221,8 +1221,8 @@ contains
     character (len=*), intent(inout)   :: grid_filename
 
     ! [ LOCALS ]
-    integer (kind=c_int)                 :: iIndex
-    integer (kind=c_int)                 :: iStat
+    integer (c_int)                 :: iIndex
+    integer (c_int)                 :: iStat
     character (len=:), allocatable       :: description_str
     character (len=:), allocatable       :: output_filesname_str
 
@@ -1414,8 +1414,8 @@ contains
     type (SWBSTATS_OPTIONS_T), intent(in)       :: options
 
     ! [ LOCALS ]
-    integer (kind=c_int)              :: stat_indx
-    integer (kind=c_int)              :: status
+    integer (c_int)              :: stat_indx
+    integer (c_int)              :: status
     type (T_NETCDF4_FILE), pointer    :: ncfile_out
     character (len=:), allocatable    :: units_string
 
@@ -1465,8 +1465,8 @@ contains
     type (FILE_COLLECTION_T), intent(inout)     :: output_files(:)
 
     ! [ LOCALS ]
-    integer (kind=c_int)              :: stat_indx
-    integer (kind=c_int)              :: status
+    integer (c_int)              :: stat_indx
+    integer (c_int)              :: status
     type (T_NETCDF4_FILE), pointer    :: ncfile_out
 
     do stat_indx=STATS_MEAN, STATS_VARIANCE

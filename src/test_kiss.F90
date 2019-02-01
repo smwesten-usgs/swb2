@@ -6,12 +6,12 @@ program test_kiss
 
   integer,parameter :: I8=selected_int_kind(18)
   integer,parameter :: R8=selected_real_kind(18,18)
-  integer(kind=I8)  :: Q(20632)
-  integer(kind=I8)  :: I8_max = huge(Q(1))
-  integer(kind=I8)  :: I8_min = -(huge(Q(1)) + 1)
-  integer(kind=I8)  :: I8_range = 2*huge(Q(1)) + 1
-  integer(kind=I8)  :: x
-  integer(kind=I8)  :: i
+  integer(I8)  :: Q(20632)
+  integer(I8)  :: I8_max = huge(Q(1))
+  integer(I8)  :: I8_min = -(huge(Q(1)) + 1)
+  integer(I8)  :: I8_range = 2*huge(Q(1)) + 1
+  integer(I8)  :: x
+  integer(I8)  :: i
 
   call initialize_kiss_rng()
 
