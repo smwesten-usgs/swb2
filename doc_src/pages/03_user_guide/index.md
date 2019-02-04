@@ -33,11 +33,11 @@ existed during compilation.
 
 The procedure for running SWB is the same for an Apple Macintosh, Linux,
 or Windows-based computer. An example of SWB execution with no
-command-line arguments when run on a Macintosh is shown in figure 2–1.
+command-line arguments when run on a Macintosh is shown in figure 1.
 ![SWB startup message](|media|/swb_startup_message.png){: width="600"}
 {: style="text-align: center"}
 
-1.  Command-line response when Soil-Water-Balance (SWB) version 2.0 is
+Figure 1.  Command-line response when Soil-Water-Balance (SWB) version 2.0 is
     executed with no other arguments.
 
 ## System Requirements
@@ -127,247 +127,134 @@ in uppercase letters; Lookup\_table works as well as LOOKUP\_TABLE. Note
 that in SWB version 2.0, the cartographic projection of the SWB project
 grid is required to be supplied by means of the
 BASE\_PROJECTION\_DEFINITION directive in the form of a PROJ.4 string
-(fig. 2–2). Figures 2–2 through 2–4 together present an annotated SWB
-control
-    file.
-
-    ## SWB 2 will ignore lines that begin with one of the following:  #%!+=
-
-    ## also, SWB doesn’t care about blank lines
-
+(fig. 2).
 ```
-```
+## SWB 2 will ignore lines that begin with one of the following:  #%!+=
+## also, SWB doesn’t care about blank lines
+## the order of lines makes no difference to SWB; however, it is useful for
+## users to see the definition of the underlying grid up front
 
-    % the order of lines makes no difference to SWB; however, it is useful for
+! Define model domain extent, origin coordinates, and resolution
+!-----------------------------------------------------------------------------
+!       nx    ny          xll            yll      resolution
+!----------+-----+------------+--------------+---------------
+GRID   400   346       545300.       432200.             90.
 
-    % users to see the definition of the underlying grid up front:
+! where:      nx, ny          are the number of columns and number of rows
+!             xll, yll        are the coordinates for the lower left-hand corner of the *grid*
+!             res             is the grid cell resolution
 
-```
-```
+% SWB grid projection *must* be defined in SWB 2.0
+% projection in this example is Wisconsin Transverse Mercator(!)
+BASE_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m
 
-    !         nx    ny            xll               yll      resolution
+% Select which methods SWB should use
+%-----------------------------------------------------------------------------
+INTERCEPTION_METHOD             BUCKET
+EVAPOTRANSPIRATION_METHOD       HARGREAVES
+RUNOFF_METHOD                   CURVE_NUMBER
+SOIL_MOISTURE_METHOD            FAO-56_TWO_STAGE
+FOG_METHOD                      NONE
+FLOW_ROUTING_METHOD             NONE
+IRRIGATION_METHOD               FAO-56
+ROOTING_DEPTH_METHOD            DYNAMIC
+CROP_COEFFICIENT_METHOD         FAO-56
+DIRECT_RECHARGE_METHOD          NONE
+SOIL_STORAGE_MAX_METHOD         CALCULATED
+AVAILABLE_WATER_CONTENT_METHOD  GRIDDED
 
-    !----------+-----+------------+--------------+---------------
+% Define input weather data grids
+%-----------------------------------------------------------------------------
+! precipitation: converting mm to inches
+PRECIPITATION NETCDF ../Daymet_V3_2016/daymet_v3_prcp_%y_na.nc4
+PRECIPITATION_GRID_PROJECTION_DEFINITION +proj=lcc +lat_1=25.0 +lat_2=60.0 +lat_0=42.5 +lon_0=-100.0 +x_0=0.0 +y_0=0.0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs
+PRECIPITATION_NETCDF_Z_VAR   prcp
+PRECIPITATION_SCALE_FACTOR    0.03937008
 
-GRID 400 346 545300. 432200.
-    90.
+! maximum air temperature: converting degrees Celsius to degrees Fahrenheit
+TMAX NETCDF ../Daymet_V3_2016/daymet_v3_tmax_%y_na.nc4
+TMAX_GRID_PROJECTION_DEFINITION +proj=lcc +lat_1=25.0 +lat_2=60.0 +lat_0=42.5 +lon_0=-100.0 +x_0=0.0 +y_0=0.0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs
+TMAX_SCALE_FACTOR    1.8
+TMAX_ADD_OFFSET     32.0
 
-```
-```
+! minimum air temperature: converting degrees Celsius to degrees Fahrenheit
+TMIN NETCDF ../Daymet_V3_2016/daymet_v3_tmin_%y_na.nc4
+TMIN_GRID_PROJECTION_DEFINITION +proj=lcc +lat_1=25.0 +lat_2=60.0 +lat_0=42.5 +lon_0=-100.0 +x_0=0.0 +y_0=0.0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs
+TMIN_SCALE_FACTOR                 1.8
+TMIN_ADD_OFFSET                  32.0
+TMIN_MISSING_VALUES_CODE     -9999.0
+TMIN_MISSING_VALUES_OPERATOR   \<=
+TMIN_MISSING_VALUES_ACTION     mean
 
-    ! where:   	nx, ny 		are the number of columns and number of rows
+% Continuous Forzen Ground Index initial value and upper and lower limits
+%-----------------------------------------------------------------------------
+INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX CONSTANT 100.0
+UPPER_LIMIT_CFGI 83.
+LOWER_LIMIT_CFGI 55.
 
-    !		xll, yll 		are the coordinates for the lower left-hand corner of the *grid*
+% Define flow direction, hydrologic soils group, land-use, available
+% water-content grids
+%-----------------------------------------------------------------------------
+FLOW_DIRECTION ARC_GRID ../swb/input/d8_flow_direction.asc
+FLOW_DIRECTION_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m
 
-    !		res 		is the grid cell resolution
+HYDROLOGIC_SOILS_GROUP ARC_GRID ../swb/input/hydrologic_soils_group.asc
+HYDROLOGIC_SOILS_GROUP_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m
 
-```
-```
+LANDUSE ARC_GRID ../swb/input/landuse.asc
+LANDUSE_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m
 
-    % SWB grid projection *must* be defined in SWB 2.0
+AVAILABLE_WATER_CONTENT ARC_GRID ../swb/input/available_water_capacity.asc
+AVAILABLE_WATER_CONTENT_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m
 
-    % projection in this example is Wisconsin Transverse Mercator(!)
+% Specify lookup tables; this is where most model parameters are defined
+%-----------------------------------------------------------------------------
 
-BASE\_PROJECTION\_DEFINITION +proj=tmerc +lat\_0=0.0 +lon\_0=-90.0
-+k=0.9996 +x\_0=520000 +y\_0=-4480000 +datum=NAD83
-    +units=m
+% SWB 2.0 can accommodate multiple lookup tables; however, column names
+% may not be repeated from one table to another. Thus, if the land-use code column
+% heading in the land use lookup table has the name LU_CODE, the irrigation lookup
+% table heading could be called LU_CODE2
 
-```
-```
+LANDUSE_LOOKUP_TABLE std_input/landuse_table_SWB2.txt
+IRRIGATION_LOOKUP_TABLE std_input/irrigation_table_SWB2.txt
 
-    % Select which methods SWB should use
+% Irrigation mask file can be used to definitively activate or inactivate
+% simulation of irrigation inputs on a cell-by-cell basis
+%-----------------------------------------------------------------------------
+IRRIGATION_MASK ARC_GRID ../swb/input/irrigation_mask_from_cdl.asc
+IRRIGATION_MASK_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m
 
-    %-----------------------------------------------------------------------------
 
-INTERCEPTION\_METHOD BUCKET
+% Specify some initial conditions
+%-----------------------------------------------------------------------------
+INITIAL_PERCENT_SOIL_MOISTURE CONSTANT 100.0
+% initial snow storage as liquid water; at a rough 10:1 ratio of
+% snow to liquid water, 10 inches of snow would be roughly 1.0 inches of
+% liquid water
+INITIAL_SNOW_COVER_STORAGE CONSTANT      1.0
 
-EVAPOTRANSPIRATION\_METHOD HARGREAVES
+% this option is good for debugging, but might be useful when one wants a lot of
+% detail about what SWB is doing
 
-RUNOFF\_METHOD CURVE\_NUMBER
+DUMP_VARIABLES COORDINATES 563406. 454630.
+DUMP_VARIABLES COORDINATES 552982. 439512.
 
-SOIL\_MOISTURE\_METHOD FAO-56\_TWO\_STAGE
+% for SWB 2.0, the start and end dates need not follow calendar year bounds;
+% the run may start and end on any arbitrary day.
 
-FOG\_METHOD NONE
-
-FLOW\_ROUTING\_METHOD NONE
-
-IRRIGATION\_METHOD FAO-56
-
-ROOTING\_DEPTH\_METHOD DYNAMIC
-
-CROP\_COEFFICIENT\_METHOD FAO-56
-
-DIRECT\_RECHARGE\_METHOD NONE
-
-SOIL\_STORAGE\_MAX\_METHOD CALCULATED
-
-AVAILABLE\_WATER\_CONTENT\_METHOD GRIDDED
-
-2.  First segment of a Soil-Water-Balance (SWB) control file showing
-    base-grid definition and method-specification syntax.
-
-<!-- end list -->
-
-    % not much new here; SWB 1.0 supports all of the same syntax
-
-    ! precipitation: converting mm to inches
-
-PRECIPITATION NETCDF ../Daymet\_V3\_2016/daymet\_v3\_prcp\_%y\_na.nc4
-
-PRECIPITATION\_GRID\_PROJECTION\_DEFINITION +proj=lcc +lat\_1=25.0
-+lat\_2=60.0 +lat\_0=42.5 +lon\_0=-100.0 +x\_0=0.0 +y\_0=0.0
-+ellps=GRS80 +datum=NAD83 +units=m +no\_defs
-
-PRECIPITATION\_NETCDF\_Z\_VAR prcp
-
-PRECIPITATION\_SCALE\_FACTOR
-    0.03937008
-
-```
-```
-
-    ! maximum air temperature: converting degrees Celsius to degrees Fahrenheit
-
-TMAX NETCDF ../Daymet\_V3\_2016/daymet\_v3\_tmax\_%y\_na.nc4
-
-TMAX\_GRID\_PROJECTION\_DEFINITION +proj=lcc +lat\_1=25.0 +lat\_2=60.0
-+lat\_0=42.5 +lon\_0=-100.0 +x\_0=0.0 +y\_0=0.0 +ellps=GRS80
-+datum=NAD83 +units=m +no\_defs
-
-TMAX\_SCALE\_FACTOR 1.8
-
-TMAX\_ADD\_OFFSET
-    32.0
-
-    ! minimum air temperature: converting degrees Celsius to degrees Fahrenheit
-
-TMIN NETCDF ../Daymet\_V3\_2016/daymet\_v3\_tmin\_%y\_na.nc4
-
-TMIN\_GRID\_PROJECTION\_DEFINITION +proj=lcc +lat\_1=25.0 +lat\_2=60.0
-+lat\_0=42.5 +lon\_0=-100.0 +x\_0=0.0 +y\_0=0.0 +ellps=GRS80
-+datum=NAD83 +units=m +no\_defs
-
-TMIN\_SCALE\_FACTOR 1.8
-
-TMIN\_ADD\_OFFSET 32.0
-
-TMIN\_MISSING\_VALUES\_CODE -9999.0
-
-TMIN\_MISSING\_VALUES\_OPERATOR \<=
-
-TMIN\_MISSING\_VALUES\_ACTION mean
-
-INITIAL\_CONTINUOUS\_FROZEN\_GROUND\_INDEX CONSTANT 100.0
-
-UPPER\_LIMIT\_CFGI 83.
-
-LOWER\_LIMIT\_CFGI 55.
-
-3.  Second segment of a Soil-Water-Balance (SWB) control file
-    demonstrating syntax for defining weather data and growing season
-    specification.
-
-FLOW\_DIRECTION ARC\_GRID ../swb/input/d8\_flow\_direction.asc
-
-FLOW\_DIRECTION\_PROJECTION\_DEFINITION +proj=tmerc +lat\_0=0.0
-+lon\_0=-90.0 +k=0.9996 +x\_0=520000 +y\_0=-4480000 +datum=NAD83
-+units=m
-
-```
+START_DATE 01/01/2013
+END_DATE 12/31/2014
 ```
 
-HYDROLOGIC\_SOILS\_GROUP ARC\_GRID
-../swb/input/hydrologic\_soils\_group.asc
+Figure 2. Annotated SWB2 control file.
 
-HYDROLOGIC\_SOILS\_GROUP\_PROJECTION\_DEFINITION +proj=tmerc +lat\_0=0.0
-+lon\_0=-90.0 +k=0.9996 +x\_0=520000 +y\_0=-4480000 +datum=NAD83
-+units=m
-
-```
-```
-
-LANDUSE ARC\_GRID ../swb/input/landuse.asc
-
-LANDUSE\_PROJECTION\_DEFINITION +proj=tmerc +lat\_0=0.0 +lon\_0=-90.0
-+k=0.9996 +x\_0=520000 +y\_0=-4480000 +datum=NAD83
-    +units=m
-
-```
-```
-
-    % SWB 2.0 can accommodate multiple lookup tables; however, column names
-
-    % may not be repeated from one table to another. Thus, if the land-use code column
-
-    % heading in the land use lookup table has the name LU_CODE, the irrigation lookup
-
-    % table heading could be called LU_CODE2
-
-LANDUSE\_LOOKUP\_TABLE std\_input/landuse\_table\_SWB2.txt
-
-IRRIGATION\_LOOKUP\_TABLE std\_input/irrigation\_table\_SWB2.txt
-
-```
-```
-
-AVAILABLE\_WATER\_CONTENT ARC\_GRID
-../swb/input/available\_water\_capacity.asc
-
-AVAILABLE\_WATER\_CONTENT\_PROJECTION\_DEFINITION +proj=tmerc
-+lat\_0=0.0 +lon\_0=-90.0 +k=0.9996 +x\_0=520000 +y\_0=-4480000
-+datum=NAD83 +units=m
-
-```
-```
-
-IRRIGATION\_MASK ARC\_GRID ../swb/input/irrigation\_mask\_from\_cdl.asc
-
-IRRIGATION\_MASK\_PROJECTION\_DEFINITION +proj=tmerc +lat\_0=0.0
-+lon\_0=-90.0 +k=0.9996 +x\_0=520000 +y\_0=-4480000 +datum=NAD83
-+units=m
-
-```
-```
-
-INITIAL\_PERCENT\_SOIL\_MOISTURE CONSTANT 100.0
-
-INITIAL\_SNOW\_COVER\_STORAGE CONSTANT
-    2.0
-
-```
-```
-
-    % this option is good for debugging, but might be useful when one wants a lot of
-
-    % detail about what SWB is doing
-
-DUMP\_VARIABLES COORDINATES 563406. 454630.
-
-DUMP\_VARIABLES COORDINATES 552982.
-    439512.
-
-```
-```
-
-    % for SWB 2.0, the start and end dates need not follow calendar year bounds; the run may
-
-    % start and end on any arbitrary day.
-
-START\_DATE 01/01/2013
-
-END\_DATE 12/31/2014
-
-4.  Final segment of a Soil-Water-Balance (SWB) control file showing
-    syntax used to specify input grids, initial conditions, and starting
-    and ending dates.
-
-The section of the SWB control file in figure 2–3 shows how the
+The section of the SWB control file in figure 2 shows how the
 SCALE\_FACTOR and ADD\_OFFSET suffixes can be used to ensure that
 gridded data in the International System of Units (millimeter, degrees
 Celsius) are converted to U.S. customary units (inch, degrees
 Fahrenheit) as the grids are read in by SWB.
 
-Toward the end of the control file syntax shown in figure 2–4 are
+Toward the end of the control file syntax shown in figure 2 are
 several directives that need additional explanation. The
 INITIAL\_PERCENT\_SOIL\_MOISTURE directive allows the user to set the
 percent of soil saturation for each grid cell in the model. Likewise,
@@ -386,7 +273,7 @@ their initial condition values), then reasonable values suitable for
 average project area conditions may be specified as CONSTANT values. For
 a project in the northern Midwest of the United States, the
 INITIAL\_PERCENT\_SOIL\_MOISTURE might be set to 70 percent, and the
-INITIAL\_SNOW\_COVER\_STORAGE might be set to 2.0 inches. Alternatively,
+INITIAL\_SNOW\_COVER\_STORAGE might be set to 1.0 inches. Alternatively,
 SWB could be run for several years with the last day of the simulation
 ending just before the start date of the period of interest. The
 soil-moisture and snow-storage values on the last day of such a
@@ -648,15 +535,15 @@ table that has header and date formats the same as those shown in fig.
 %
 ```
 
-    Date		PRCP		TMIN		TMAX
+    Date        PRCP        TMIN        TMAX
 
-    01-01-2015	0.0		20.0		26.0
+    01-01-2015    0.0        20.0        26.0
 
-    01-02-2015 	1.1		25.0		30.0
+    01-02-2015     1.1        25.0        30.0
 
-    01-02-2015     0.3     		24.0		29.0
+    01-02-2015     0.3             24.0        29.0
 
-    01-04-2015 	0.0		23.0		28.5
+    01-04-2015     0.0        23.0        28.5
 
 6.  Sample climate data in tabular form.
 
@@ -731,198 +618,57 @@ addition, details about the version of the SWB code used to generate
 those values are recorded to assist in future data
 archiving.
 
-    netcdf snowmelt_2013_2014__346_by_400 {
+```
+netcdf snowfall {
+dimensions:
+    time = UNLIMITED ; // (731 currently)
+    y = 346 ;
+    x = 400 ;
+variables:
+    double time(time) ;
+        time:units = "days since 2012-01-01 00:00:00" ;
+        time:calendar = "standard" ;
+        time:long_name = "time" ;
+    double y(y) ;
+        y:units = "meter" ;
+        y:long_name = "y coordinate of projection" ;
+        y:standard_name = "projection_y_coordinate" ;
+    double x(x) ;
+        x:units = "meter" ;
+        x:long_name = "x coordinate of projection" ;
+        x:standard_name = "projection_x_coordinate" ;
+    float snowfall(time, y, x) ;
+        snowfall:units = "inches" ;
+        snowfall:valid_min = 0.f ;
+        snowfall:valid_max = 60.f ;
+        snowfall:valid_range = 0.f, 60.f ;
+        snowfall:_FillValue = -9999.f ;
+        snowfall:coordinates = "lat lon" ;
+        snowfall:grid_mapping = "crs" ;
+    int crs ;
+        crs:grid_mapping_name = "transverse_mercator" ;
+        crs:latitude_of_projection_origin = 0.f ;
+        crs:longitude_of_central_meridian = -90.f ;
+        crs:scale_factor_at_central_meridian = 0.9996f ;
+        crs:false_easting = 520000.f ;
+        crs:false_northing = -4480000.f ;
+        crs:datum = "NAD83" ;
+        crs:units = "meter" ;
+        crs:proj4_string = "+proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m" ;
+    double lat(y, x) ;
+        lat:units = "degrees_north" ;
+        lat:long_name = "latitude" ;
+        lat:standard_name = "latitude" ;
+    double lon(y, x) ;
+        lon:units = "degrees_east" ;
+        lon:long_name = "longitude" ;
+        lon:standard_name = "longitude" ;
 
-    dimensions:
-
-```
-	time = UNLIMITED ; // (730 currently)
-```
-
-```
-	y = 346 ;
-```
-
-```
-	x = 400 ;
-```
-
-    variables:
-
-```
-	double time(time) ;
-```
-
-```
-		time:units = "days since 2012-01-01 00:00:00" ;
-```
-
-```
-		time:calendar = "standard" ;
-```
-
-```
-		time:long_name = "time" ;
-```
-
-```
-	double y(y) ;
-```
-
-```
-		y:units = "meter" ;
-```
-
-```
-		y:long_name = "y coordinate of projection" ;
-```
-
-```
-		y:standard_name = "projection_y_coordinate" ;
-```
-
-```
-	double x(x) ;
-```
-
-```
-		x:units = "meter" ;
-```
-
-```
-		x:long_name = "x coordinate of projection" ;
-```
-
-```
-		x:standard_name = "projection_x_coordinate" ;
-```
-
-```
-	float snowmelt(time, y, x) ;
-```
-
-```
-		snowmelt:units = "inches_per_day" ;
-```
-
-```
-		snowmelt:valid_min = 0.f ;
-```
-
-```
-		snowmelt:valid_max = 2000.f ;
-```
-
-```
-		snowmelt:valid_range = 0.f, 2000.f ;
-```
-
-```
-		snowmelt:_FillValue = -9.9e-20f ;
-```
-
-```
-		snowmelt:coordinates = "lat lon" ;
-```
-
-```
-		snowmelt:grid_mapping = "crs" ;
-```
-
-```
-	int crs ;
-```
-
-```
-		crs:grid_mapping_name = "transverse_mercator" ;
-```
-
-```
-		crs:latitude_of_projection_origin = 0.f ;
-```
-
-```
-		crs:longitude_of_central_meridian = -90.f ;
-```
-
-```
-		crs:scale_factor_at_central_meridian = 0.9996f ;
-```
-
-```
-		crs:false_easting = 520000.f ;
-```
-
-```
-		crs:false_northing = -4480000.f ;
-```
-
-```
-		crs:datum = "NAD83" ;
-```
-
-```
-		crs:units = "meter" ;
-```
-
-```
-		crs:PROJ.4_string = "+proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m" ;
-```
-
-```
-	double lat(y, x) ;
-```
-
-```
-		lat:units = "degrees_north" ;
-```
-
-```
-		lat:long_name = "latitude" ;
-```
-
-```
-		lat:standard_name = "latitude" ;
-```
-
-```
-	double lon(y, x) ;
-```
-
-```
-		lon:units = "degrees_east" ;
-```
-
-```
-		lon:long_name = "longitude" ;
-```
-
-```
-		lon:standard_name = "longitude" ;
-```
-
-```
-```
-
-    // global attributes:
-
-```
-		:source = "snowmelt output from SWB run started on Mar 15 2017 16:51:01." ;
-```
-
-```
-		:executable_version = "version 2.0 ALPHA, Git branch:  master, Git commit hash string:  6aa729c, compiled on: Mar 15 2017 16:29:00." ;
-```
-
-```
-		:conventions = "CF-1.6" ;
-```
-
-```
-		:history = "Mar 15 2017 16:51:01: Soil-Water-Balance run started." ;
-```
-
-```
+// global attributes:
+        :source = "snowfall output from SWB run started on Oct 09 2018 13:39:36." ;
+        :executable_version = "version 2.0, build 887, Git branch:  master, Git commit hash string:  e882aa6e, compiled on: Sep 10 2018 14:05:27." ;
+        :conventions = "CF-1.6" ;
+        :history = "Oct 09 2018 13:39:36: Soil-Water-Balance run started." ;
 }
 ```
 
@@ -1324,185 +1070,185 @@ the file reveals a variety of useful information about the file contents
     dimensions:
 
 ```
-	x = 7814 ;
+    x = 7814 ;
 ```
 
 ```
-	y = 8075 ;
+    y = 8075 ;
 ```
 
 ```
-	time = UNLIMITED ; // (365 currently)
+    time = UNLIMITED ; // (365 currently)
 ```
 
 ```
-	nv = 2 ;
+    nv = 2 ;
 ```
 
     variables:
 
 ```
-	float x(x) ;
+    float x(x) ;
 ```
 
 ```
-		x:units = "m" ;
+        x:units = "m" ;
 ```
 
 ```
-		x:long_name = "x coordinate of projection" ;
+        x:long_name = "x coordinate of projection" ;
 ```
 
 ```
-		x:standard_name = "projection_x_coordinate" ;
+        x:standard_name = "projection_x_coordinate" ;
 ```
 
 ```
-	float y(y) ;
+    float y(y) ;
 ```
 
 ```
-		y:units = "m" ;
+        y:units = "m" ;
 ```
 
 ```
-		y:long_name = "y coordinate of projection" ;
+        y:long_name = "y coordinate of projection" ;
 ```
 
 ```
-		y:standard_name = "projection_y_coordinate" ;
+        y:standard_name = "projection_y_coordinate" ;
 ```
 
 ```
-	float lat(y, x) ;
+    float lat(y, x) ;
 ```
 
 ```
-		lat:units = "degrees_north" ;
+        lat:units = "degrees_north" ;
 ```
 
 ```
-		lat:long_name = "latitude coordinate" ;
+        lat:long_name = "latitude coordinate" ;
 ```
 
 ```
-		lat:standard_name = "latitude" ;
+        lat:standard_name = "latitude" ;
 ```
 
 ```
-	float lon(y, x) ;
+    float lon(y, x) ;
 ```
 
 ```
-		lon:units = "degrees_east" ;
+        lon:units = "degrees_east" ;
 ```
 
 ```
-		lon:long_name = "longitude coordinate" ;
+        lon:long_name = "longitude coordinate" ;
 ```
 
 ```
-		lon:standard_name = "longitude" ;
+        lon:standard_name = "longitude" ;
 ```
 
 ```
-	float time(time) ;
+    float time(time) ;
 ```
 
 ```
-		time:long_name = "time" ;
+        time:long_name = "time" ;
 ```
 
 ```
-		time:calendar = "standard" ;
+        time:calendar = "standard" ;
 ```
 
 ```
-		time:units = "days since 1980-01-01 00:00:00 UTC" ;
+        time:units = "days since 1980-01-01 00:00:00 UTC" ;
 ```
 
 ```
-		time:bounds = "time_bnds" ;
+        time:bounds = "time_bnds" ;
 ```
 
 ```
-	short yearday(time) ;
+    short yearday(time) ;
 ```
 
 ```
-		yearday:long_name = "yearday" ;
+        yearday:long_name = "yearday" ;
 ```
 
 ```
-	float time_bnds(time, nv) ;
+    float time_bnds(time, nv) ;
 ```
 
 ```
-	short lambert_conformal_conic ;
+    short lambert_conformal_conic ;
 ```
 
 ```
-		lambert_conformal_conic:grid_mapping_name = "lambert_conformal_conic" ;
+        lambert_conformal_conic:grid_mapping_name = "lambert_conformal_conic" ;
 ```
 
 ```
-		lambert_conformal_conic:longitude_of_central_meridian = -100. ;
+        lambert_conformal_conic:longitude_of_central_meridian = -100. ;
 ```
 
 ```
-		lambert_conformal_conic:latitude_of_projection_origin = 42.5 ;
+        lambert_conformal_conic:latitude_of_projection_origin = 42.5 ;
 ```
 
 ```
-		lambert_conformal_conic:false_easting = 0. ;
+        lambert_conformal_conic:false_easting = 0. ;
 ```
 
 ```
-		lambert_conformal_conic:false_northing = 0. ;
+        lambert_conformal_conic:false_northing = 0. ;
 ```
 
 ```
-		lambert_conformal_conic:standard_parallel = 25., 60. ;
+        lambert_conformal_conic:standard_parallel = 25., 60. ;
 ```
 
 ```
-		lambert_conformal_conic:semi_major_axis = 6378137. ;
+        lambert_conformal_conic:semi_major_axis = 6378137. ;
 ```
 
 ```
-		lambert_conformal_conic:inverse_flattening = 298.257223563 ;
+        lambert_conformal_conic:inverse_flattening = 298.257223563 ;
 ```
 
 ```
-	float prcp(time, y, x) ;
+    float prcp(time, y, x) ;
 ```
 
 ```
-		prcp:_FillValue = -9999.f ;
+        prcp:_FillValue = -9999.f ;
 ```
 
 ```
-		prcp:long_name = "daily total precipitation" ;
+        prcp:long_name = "daily total precipitation" ;
 ```
 
 ```
-		prcp:units = "mm/day" ;
+        prcp:units = "mm/day" ;
 ```
 
 ```
-		prcp:missing_value = -9999.f ;
+        prcp:missing_value = -9999.f ;
 ```
 
 ```
-		prcp:coordinates = "lat lon" ;
+        prcp:coordinates = "lat lon" ;
 ```
 
 ```
-		prcp:grid_mapping = "lambert_conformal_conic" ;
+        prcp:grid_mapping = "lambert_conformal_conic" ;
 ```
 
 ```
-		prcp:cell_methods = "area: mean time: sum" ;
+        prcp:cell_methods = "area: mean time: sum" ;
 ```
 
 ```
@@ -1511,31 +1257,31 @@ the file reveals a variety of useful information about the file contents
     // global attributes:
 
 ```
-		:start_year = 2014s ;
+        :start_year = 2014s ;
 ```
 
 ```
-		:source = "Daymet Software Version 3.0" ;
+        :source = "Daymet Software Version 3.0" ;
 ```
 
 ```
-		:Version_software = "Daymet Software Version 3.0" ;
+        :Version_software = "Daymet Software Version 3.0" ;
 ```
 
 ```
-		:Version_data = "Daymet Data Version 3.0" ;
+        :Version_data = "Daymet Data Version 3.0" ;
 ```
 
 ```
-		:Conventions = "CF-1.6" ;
+        :Conventions = "CF-1.6" ;
 ```
 
 ```
-		:citation = "Please see http://daymet.ornl.gov/ for current Daymet data citation information" ;
+        :citation = "Please see http://daymet.ornl.gov/ for current Daymet data citation information" ;
 ```
 
 ```
-		:references = "Please see http://daymet.ornl.gov/ for current information on Daymet references" ;
+        :references = "Please see http://daymet.ornl.gov/ for current information on Daymet references" ;
 ```
 
 ```
@@ -1697,11 +1443,11 @@ large waterbody, control file statements might be added to inform SWB
 that the mean value is to be used in place of missing data values (fig.
 2–15).
 
-    PRECIPITATION_MISSING_VALUES_CODE 		0.0
+    PRECIPITATION_MISSING_VALUES_CODE         0.0
 
-    PRECIPITATION_MISSING_VALUES_OPERATOR	<
+    PRECIPITATION_MISSING_VALUES_OPERATOR    <
 
-    PRECIPITATION_MISSING_VALUES_ACTION		MEAN
+    PRECIPITATION_MISSING_VALUES_ACTION        MEAN
 
 15. Control file statements used to request that Soil Water Balance
     (SWB) code substitute mean daily air temperatures in areas of
@@ -1739,9 +1485,9 @@ would be added to specify the scale factor and offset to apply to the
 data. The scale factor and offset values as applied to minimum
 air-temperature data (TMIN) are shown in figure 2–16.
 
-    TMIN_SCALE_FACTOR 		1.8
+    TMIN_SCALE_FACTOR         1.8
 
-    TMIN_ADD_OFFSET    		32.0
+    TMIN_ADD_OFFSET            32.0
 
 16. Control file syntax for conversion of temperature data from degrees
     Celsius to degrees Fahrenheit.
