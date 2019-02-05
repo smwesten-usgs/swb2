@@ -1,6 +1,6 @@
 ---
 project: SWB2
-version: {!../VERSION!}
+version: {!VERSION!}
 license: by
 project_github: https://github.com/smwesten-usgs/swb2
 project_download: https://github.com/smwesten-usgs/swb2
