@@ -1,6 +1,28 @@
 ---
 title: User Guide
 ---
+<style>
+pre {
+background-color: #C6C6CB;
+border: 1px solid #777;
+}
+table {
+width: 100%;
+}
+table,th,td {
+border: 1px solid black;
+border-collapse: collapse;
+}
+th, td {
+padding: 5px;
+}
+th {
+text-align: center;
+}
+tbody > tr:nth-child(odd) {
+  background-color: #f9f9f9;
+}
+</style>
 
 # Installing and Running Soil-Water-Balance Version 2.0
 
@@ -300,10 +322,9 @@ soil groups. Tables could be easily prepared using spreadsheet software
 such as Microsoft Excel; however, tables should be saved as a
 tab-delimited text file for use with SWB.
 
-1.  Extract from the Soil-Water-Balance (SWB) version 2.0 table format.
-
-\[CN, curve number; LU,
-landuse\]
+Table 1.  Extract from the Soil-Water-Balance (SWB) version 2.0 table format.
+[CN, curve number; LU,
+landuse]
 
 | LU\_code | Description                | Surface\_storage\_max | CN\_1 | CN\_2 | CN\_3 | CN\_4 |
 | -------- | -------------------------- | --------------------- | ----- | ----- | ----- | ----- |
