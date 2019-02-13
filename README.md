@@ -12,8 +12,7 @@ Recharge calculations are made on a rectangular grid of computational elements t
 easily imported into a regional groundwater-flow model. Recharge estimates calculated by
  the code may be output as daily, monthly, or annual values.
 
-The experimental version in this repository incorporates some of the latest Fortran 2003/2008 features. This
- version is an INCOMPLETE WORK IN PROGRESS.
+Official documentation for the code may be found here: https://pubs.er.usgs.gov/publication/tm6A59.
 
 
 Disclaimer
