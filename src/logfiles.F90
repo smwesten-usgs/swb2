@@ -26,7 +26,7 @@ module logfiles
     character (len=:), allocatable  :: sFilePrefix
     character (len=64)              :: sFilename(2)
     logical (c_bool)           :: lIsOpen(2)       = .false._c_bool
-    integer (c_int)            :: iUnitNum(2)
+    integer (c_int)            :: iUnitNum(2)      = -999
     integer (c_int)            :: iStat(2)
     integer (c_int)            :: iLogLevel        = LOG_GENERAL
 
@@ -147,7 +147,7 @@ contains
     character (len=:), allocatable   :: sFilename
     character (len=:), allocatable   :: sDatetime
     character (len=12)               :: sDescriptor(2) = [ "         ", "_DEBUG   " ]
-    logical (c_bool)            :: lWrite_SWB_Info_l
+    logical (c_bool)                 :: lWrite_SWB_Info_l
 
     if ( present( lWrite_SWB_Info) ) then
       lWrite_SWB_Info_l = lWrite_SWB_Info

@@ -5,7 +5,7 @@ program swbstats2
   use constants_and_conversions, only : TRUE, FALSE, DATATYPE_INT,             &
                                         DATATYPE_FLOAT, BNDS, asFloat,         &
                                         OS_NATIVE_PATH_DELIMITER
-  use exceptions, only                : assert
+  use exceptions, only                : assert, die
   use file_operations, only           : ASCII_FILE_T
   use data_catalog_entry, only        : DATA_CATALOG_ENTRY_T
   use datetime, only                  : DATETIME_T, assignment(=), operator(>)
@@ -39,7 +39,7 @@ program swbstats2
   type (DATA_CATALOG_ENTRY_T), pointer :: pZONE_GRID       => null()
   type (DATA_CATALOG_ENTRY_T), pointer :: pCOMPARISON_GRID => null()
 
-  integer (c_int)           :: iNumArgs
+  integer (c_int)                :: iNumArgs
   character (len=1024)           :: sCompilerFlags
   character (len=256)            :: sCompilerVersion
   character (len=256)            :: sVersionString
@@ -49,15 +49,15 @@ program swbstats2
   character (len=256)            :: sCompilationSystemString
   character (len=:), allocatable :: start_date_string
   character (len=:), allocatable :: end_date_string
-  integer (c_int)           :: iCount
-  integer (c_int)           :: iIndex
-  integer (c_int), allocatable           ::iIndex_array(:)
-  integer (c_int)           :: iLen
-  real (c_double)           :: start_date_dbl
-  real (c_double)           :: end_date_dbl
-  integer (c_int)           :: TIME_BNDS_VARID
+  integer (c_int)                :: iCount
+  integer (c_int)                :: iIndex
+  integer (c_int), allocatable   ::iIndex_array(:)
+  integer (c_int)                :: iLen
+  real (c_double)                :: start_date_dbl
+  real (c_double)                :: end_date_dbl
+  integer (c_int)                :: TIME_BNDS_VARID
 
-  logical (c_bool)          :: netcdf_active = FALSE
+  logical (c_bool)               :: netcdf_active = FALSE
 
   type (STRING_LIST_T)           :: name_list
   type (STRING_LIST_T)           :: value_list
@@ -71,9 +71,9 @@ program swbstats2
     type (T_NETCDF4_FILE), pointer        :: nc_ptr => null()
     type (GENERAL_GRID_T), pointer        :: grid_ptr => null()
     character (len=8)                     :: stats_description
-    logical (c_bool)                 :: write_netcdf     = TRUE
-    logical (c_bool)                 :: write_arcgrid    = FALSE
-    logical (c_bool)                 :: output_active    = FALSE
+    logical (c_bool)                      :: write_netcdf     = TRUE
+    logical (c_bool)                      :: write_arcgrid    = FALSE
+    logical (c_bool)                      :: output_active    = FALSE
   end type FILE_COLLECTION_T
 
   enum, bind(c)
@@ -92,20 +92,22 @@ program swbstats2
   integer (c_int), parameter  :: OPT_MULTIPLE_TIME_SLICES = 3
 
   type SWBSTATS_OPTIONS_T
-    logical (c_bool)          :: dump_options_to_screen = FALSE
-    logical (c_bool)          :: write_csv              = FALSE
-    logical (c_bool)          :: calc_annual_stats      = FALSE
-    logical (c_bool)          :: calc_monthly_stats     = FALSE
-    logical (c_bool)          :: calc_zonal_stats       = FALSE
-    logical (c_bool)          :: compare_to_obs_values  = FALSE
-    logical (c_bool)          :: annualize_stats        = FALSE
+    logical (c_bool)               :: dump_options_to_screen = FALSE
+    logical (c_bool)               :: write_csv              = FALSE
+    logical (c_bool)               :: calc_annual_stats      = FALSE
+    logical (c_bool)               :: calc_monthly_stats     = FALSE
+    logical (c_bool)               :: calc_zonal_stats       = FALSE
+    logical (c_bool)               :: compare_to_obs_values  = FALSE
+    logical (c_bool)               :: annualize_stats        = FALSE
+    logical (c_bool)               :: report_as_volume = FALSE
+    logical (c_bool)               :: report_in_meters       = FALSE
     character (len=:), allocatable :: target_proj4_string
     type (DATETIME_T)              :: data_start_date
     type (DATETIME_T)              :: data_end_date
     type (DATETIME_T)              :: slice_start_date
     type (DATETIME_T)              :: slice_end_date
     character (len=:), allocatable :: date_range_string
-    integer (c_int)           :: slice_option      = OPT_NO_TIME_SLICE
+    integer (c_int)                :: slice_option      = OPT_NO_TIME_SLICE
     character (len=:), allocatable :: stress_period_filename
     character (len=:), allocatable :: comparison_period_filename
     character (len=:), allocatable :: zone_period_filename
@@ -115,16 +117,20 @@ program swbstats2
     character (len=:), allocatable :: netcdf_variable_units_string
     character (len=:), allocatable :: netcdf_variable_name_string
     character (len=:), allocatable :: filename_modifier_string
-    logical (c_bool)          :: netcdf_input_file_is_open = FALSE
-    logical (c_bool)          :: multiple_zone_grids       = FALSE
-    logical (c_bool)          :: multiple_comparison_grids = FALSE
-    real (c_double)           :: comparison_grid_conversion_factor = 1.0_c_double
+    logical (c_bool)               :: netcdf_input_file_is_open = FALSE
+    logical (c_bool)               :: multiple_zone_grids       = FALSE
+    logical (c_bool)               :: multiple_comparison_grids = FALSE
+    real (c_double)                :: comparison_grid_conversion_factor = 1.0_c_double
     type (STRING_LIST_T)           :: start_date_list
     type (STRING_LIST_T)           :: end_date_list
     type (STRING_LIST_T)           :: date_range_id_list
     type (STRING_LIST_T)           :: unique_zone_list
     type (STRING_LIST_T)           :: comparison_grid_file_list
     type (STRING_LIST_T)           :: zone_grid_file_list
+    real (c_double)                :: output_conversion_factor = 1.0_c_double
+    real (c_double)                :: unit_conversion_factor = 1.0_c_double
+    real (c_double)                :: grid_cell_area_sq_meters = 1.0_c_double
+    real (c_double)                :: length_conversion_factor = 1.0_c_double
   end type SWBSTATS_OPTIONS_T
 
   type (SWBSTATS_OPTIONS_T)   :: options
@@ -136,7 +142,7 @@ program swbstats2
   output_files(STATS_VARIANCE)%stats_description = "VARIANCE"
 
   output_files(STATS_SUM)%output_active = TRUE
-  output_files(STATS_MEAN)%output_active = FALSE
+  output_files(STATS_MEAN)%output_active = TRUE
   output_files(STATS_VARIANCE)%output_active = FALSE
 
 
@@ -193,7 +199,7 @@ program swbstats2
       //TRIM(int2char(__G95_MINOR__))
 #endif
 
-    allocate(usage_string(36))
+    allocate(usage_string(40))
 
     usage_string = [                                                           &
      "usage: swbstats2 [options] netcdf_file_name                           ", &
@@ -204,6 +210,10 @@ program swbstats2
      "    calculate statistics for every calendar year between start and end", &
      "  [ --monthly_statistics ]                                            ", &
      "    calculate statistics for every month between start and end        ", &
+     "  [ --report_as_volume ]                                              ", &
+     "    express statistics as a volume                                    ", &
+     "  [ --report_in_meters ]                                              ", &
+     "    express output statistics in *meters*                             ", &
      "  [ --slice= ]                                                        ", &
      "    dates over which statistics should be calculated,                 ", &
      "    with start date and end date formatted as yyyy-mm-dd,yyyy-mm-dd   ", &
@@ -273,6 +283,14 @@ program swbstats2
     elseif ( temp_string .containssimilar. "dump_options" ) then
 
       options%dump_options_to_screen = TRUE
+
+    elseif ( temp_string .containssimilar. "report_as_volume" ) then
+
+      options%report_as_volume = TRUE
+
+    elseif ( temp_string .containssimilar. "report_in_meters" ) then
+
+      options%report_in_meters = TRUE
 
     elseif ( temp_string .containssimilar. "annualize_sums" ) then
 
@@ -491,6 +509,43 @@ program swbstats2
   if (options%calc_monthly_stats) then
 
     call create_date_list_for_monthly_statistics(options)
+
+  endif
+
+  if (options%report_as_volume .or. options%report_in_meters) then
+
+    ! set unit conversions needed to obtain output units of "meters"
+    if (options%netcdf_variable_units_string .containssimilar. "inch") then
+      options%unit_conversion_factor = 0.0254_c_double
+    elseif (options%netcdf_variable_units_string .containssimilar. "cm") then
+      options%unit_conversion_factor = 0.01_c_double
+    elseif (options%netcdf_variable_units_string .containssimilar. "mm") then
+      options%unit_conversion_factor = 0.001_c_double
+    else
+      call die("Was attempting to determine the output unit conversion factor," &
+      //" but the netCDF variable has units of "                                &
+      //sQuote(options%netcdf_variable_units_string)//", which cannot"          &
+      //" be converted to units of 'meters'.")
+    endif
+
+    if (options%report_as_volume) then
+      if (options%target_proj4_string .containssimilar. "units=m") then
+        options%length_conversion_factor = 1.0_c_double
+      elseif (options%target_proj4_string .containssimilar. "units=us-ft") then
+        options%length_conversion_factor = 0.3048006096012192_c_double
+      elseif (options%target_proj4_string .containssimilar. "units=ft") then
+        options%length_conversion_factor = 0.3048_c_double
+      else
+        call die("Was attempting to define length conversion factor, but no units " &
+          //"information found in input PROJ4 string.")
+      endif
+      options%grid_cell_area_sq_meters = (pGrdNative%rGridCellSize                  &
+                                           * options%length_conversion_factor)**2
+      options%output_conversion_factor = options%grid_cell_area_sq_meters           &
+                                           * options%unit_conversion_factor
+    else
+      options%output_conversion_factor = options%unit_conversion_factor
+    endif
 
   endif
 
@@ -772,7 +827,7 @@ contains
     integer (c_size_t) :: nx, ny
     type (T_NETCDF4_FILE), pointer    :: ncfile_out
     type (GENERAL_GRID_T), pointer    :: grid_ptr
-    integer (c_int)              :: stat_indx
+    integer (c_int)                   :: stat_indx
 
     nx = BNDS%iNumCols
     ny = BNDS%iNumRows
@@ -780,7 +835,7 @@ contains
     start_bnd = SIM_DT%days_from_origin( start_date )
     end_bnd   = SIM_DT%days_from_origin( end_date )
 
-    do stat_indx=STATS_SUM, STATS_VARIANCE
+    do stat_indx=STATS_MEAN, STATS_VARIANCE
 
       if ( .not. output_files(stat_indx)%output_active )  cycle
 
@@ -944,6 +999,13 @@ contains
         if ( netcdf_update_time_starting_index(ncfile_in, julian_day_number ) )   then
           call netcdf_get_variable_slice(NCFILE=ncfile_in, rValues=grd_new )
         endif
+
+        ! volumetric_conversion_factor is 1.0 *unless* user has specifically
+        ! asked for volumetric reporting or other unit conversions; in this case,
+        ! the output_conversion_factor amounts to the cell area times the
+        ! unit length, appropriately converted to cubic meters, or if output
+        ! is requested in meters, the conversion factor is just 0.
+        grd_new = grd_new * options%output_conversion_factor
 
         if (day_count == 1) then
 
@@ -1427,6 +1489,10 @@ contains
 
         if ( options%annualize_stats .and. stat_indx == STATS_SUM) then
           units_string = trim(options%netcdf_variable_units_string)//", per year"
+        elseif (options%report_as_volume) then
+          units_string = "cubic meters"
+        elseif (options%report_in_meters) then
+          units_string = "meters"
         else
           units_string = trim(options%netcdf_variable_units_string)
         endif
