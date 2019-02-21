@@ -1300,16 +1300,14 @@ function grid_CompletelyCover( pBaseGrd, pOtherGrd, rTolerance ) result ( lCompl
   else
       lCompletelyCover = lFALSE
 
-      call LOGS%write("Extents of the grid file "//dquote(pOtherGrd%sFilename) &
+      call LOGS%write("Extents of the data grid file "//dquote(pOtherGrd%sFilename) &
           //" do not cover the base grid extents.")
 
-      call LOGS%write( " " )
-      call LOGS%write("    BASE GRID EXTENTS   ANCILLARY GRID EXTENTS")
-      call LOGS%write("X0:  "//trim(asCharacter(pBaseGrd%rX0))//"    "//trim(asCharacter(pOtherGrd%rX0)) )
-      call LOGS%write("Y0:  "//trim(asCharacter(pBaseGrd%rY0))//"    "//trim(asCharacter(pOtherGrd%rY0)) )
-      call LOGS%write("X1:  "//trim(asCharacter(pBaseGrd%rX1))//"    "//trim(asCharacter(pOtherGrd%rX1)) )
-      call LOGS%write("Y1:  "//trim(asCharacter(pBaseGrd%rY1))//"    "//trim(asCharacter(pOtherGrd%rY1)) )
-      call LOGS%write(" ")
+      call LOGS%write("BASE GRID EXTENTS   DATA GRID EXTENTS", iTab=18, iLinesBefore=1)
+      call LOGS%write("X (lower-left):   "//trim(asCharacter(pBaseGrd%rX0))//"       "//trim(asCharacter(pOtherGrd%rX0)) )
+      call LOGS%write("Y (lower-left):   "//trim(asCharacter(pBaseGrd%rY0))//"       "//trim(asCharacter(pOtherGrd%rY0)) )
+      call LOGS%write("X (upper-right):  "//trim(asCharacter(pBaseGrd%rX1))//"       "//trim(asCharacter(pOtherGrd%rX1)) )
+      call LOGS%write("Y (upper-right):  "//trim(asCharacter(pBaseGrd%rY1))//"       "//trim(asCharacter(pOtherGrd%rY1)), iLinesAfter=1 )
 
   end if
 
@@ -1914,8 +1912,8 @@ function grid_GetGridColNum(pGrd,rX)  result(iColumnNumber)
   real (c_double) :: rX
   integer (c_int) :: iColumnNumber
 
-!  print *, "rX: ",rX
-!  print *, pGrd%rX0, pGrd%rX1, pGrd%iNX
+ ! print *, "rX: ",rX
+ ! print *, pGrd%rX0, pGrd%rX1, pGrd%iNX
 
   !! this only works if the data are in the originally supplied projection. If the coordinates have been
   !! transformed, there is no guarantee that the assumption used in this calculation will hold.
@@ -1924,14 +1922,14 @@ function grid_GetGridColNum(pGrd,rX)  result(iColumnNumber)
 
 !               * ( rX - pGrd%rX0 ) / (pGrd%rX1 - pGrd%rX0) + 0.5_c_double, c_int)
 
-!  print *, "iColumnNumber = ", iColumnNumber
-!  print *, "calc: ",  real(pGrd%iNX, c_double) &
-!               * ( rX - pGrd%rX0 ) / (pGrd%rX1 - pGrd%rX0) + 0.5_c_double
-!  print *, "numerator: ", real(pGrd%iNX, c_double) * ( rX - pGrd%rX0 )
-!  print *, "numerator (LHS): ", real(pGrd%iNX, c_double)
-!  print *, "numerator (RHS): ", rX, pGrd%rX0, ( rX - pGrd%rX0 )
-!  print *, "denominator: ", (pGrd%rX1 - pGrd%rX0)
-
+ ! print *, "iColumnNumber = ", iColumnNumber
+ ! print *, "calc: ",  real(pGrd%iNX, c_double) &
+ !              * ( rX - pGrd%rX0 ) / (pGrd%rX1 - pGrd%rX0) + 0.5_c_double
+ ! print *, "numerator: ", real(pGrd%iNX, c_double) * ( rX - pGrd%rX0 )
+ ! print *, "numerator (LHS): ", real(pGrd%iNX, c_double)
+ ! print *, "numerator (RHS): ", rX, pGrd%rX0, ( rX - pGrd%rX0 )
+ ! print *, "denominator: ", (pGrd%rX1 - pGrd%rX0)
+ !
 !   if ( iColumnNumber < 1 .or. iColumnNumber > pGrd%iNX ) then
 !     call grid_DumpGridExtent(pGrd)
 !     write(*, fmt="(a)") "was attempting to find column associated with X: "//trim(asCharacter(rX))
@@ -1993,80 +1991,75 @@ function grid_GetGridColRowNum(pGrd, rX, rY)    result(iColRow)
 
   if (iStartingColNum > 0 .and. iStartingColNum <= pGrd%iNX &
      .and. iStartingRowNum > 0 .and. iStartingRowNum <= pGrd%iNY) then
-  rDist = hypot(pGrd%rX(iStartingColNum,iStartingRowNum) - rX, &
-              pGrd%rY(iStartingColNum,iStartingRowNum) - rY)
+    rDist = hypot(pGrd%rX(iStartingColNum,iStartingRowNum) - rX, &
+                pGrd%rY(iStartingColNum,iStartingRowNum) - rY)
 
-  ! need to ensure that the leftover column and row numbers from
-  ! perhaps an entirely different grid are not used as indices
-  if (iLastColNum > 0 .and. iLastColNum <= pGrd%iNX &
-     .and. iLastRowNum > 0 .and. iLastRowNum <= pGrd%iNY) then
-    rDist2 = hypot(pGrd%rX(iLastColNum,iLastRowNum) - rX, &
-              pGrd%rY(iLastColNum,iLastRowNum) - rY)
-  else
-    rDist2 = rBIGVAL
-  endif
+    ! need to ensure that the leftover column and row numbers from
+    ! perhaps an entirely different grid are not used as indices
+    if (iLastColNum > 0 .and. iLastColNum <= pGrd%iNX &
+       .and. iLastRowNum > 0 .and. iLastRowNum <= pGrd%iNY) then
+      rDist2 = hypot(pGrd%rX(iLastColNum,iLastRowNum) - rX, &
+                pGrd%rY(iLastColNum,iLastRowNum) - rY)
+    else
+      rDist2 = rBIGVAL
+    endif
 
-  if (rDist > rDist2) then
-    iCandidateRow = iLastRowNum
-    iCandidateCol = iLastColNum
-  else
-    iCandidateRow = iStartingRowNum
-    iCandidateCol = iStartingColNum
-  endif
+    if (rDist > rDist2) then
+      iCandidateRow = iLastRowNum
+      iCandidateCol = iLastColNum
+    else
+      iCandidateRow = iStartingRowNum
+      iCandidateCol = iStartingColNum
+    endif
 
-  rMinDistance = rBIGVAL
+    rMinDistance = rBIGVAL
 
-  do
+    do
 
-    !> need to ensure that whatever bound is calculated
-    !> is within the declared array bounds or we get a segfault
-    iRowBoundLower = min(max( 1, iCandidateRow - 1), pGrd%iNY)
-    iRowBoundUpper = max(min( pGrd%iNY, iCandidateRow + 1), 1)
+      !> need to ensure that whatever bound is calculated
+      !> is within the declared array bounds or we get a segfault
+      iRowBoundLower = min(max( 1, iCandidateRow - 1), pGrd%iNY)
+      iRowBoundUpper = max(min( pGrd%iNY, iCandidateRow + 1), 1)
 
-    iColBoundLower = min(max( 1, iCandidateCol - 1), pGrd%iNX)
-    iColBoundUpper = max(min( pGrd%iNX, iCandidateCol + 1), 1)
+      iColBoundLower = min(max( 1, iCandidateCol - 1), pGrd%iNX)
+      iColBoundUpper = max(min( pGrd%iNX, iCandidateCol + 1), 1)
 
-    lChanged = lFALSE
+      lChanged = lFALSE
 
-    do iRow=iRowBoundLower,iRowBoundUpper
-      do iCol=iColBoundLower,iColBoundUpper
+      do iRow=iRowBoundLower,iRowBoundUpper
+        do iCol=iColBoundLower,iColBoundUpper
 
-        rDist = hypot(pGrd%rX(iCol,iRow) - rX, pGrd%rY(iCol,iRow) - rY)
+          rDist = hypot(pGrd%rX(iCol,iRow) - rX, pGrd%rY(iCol,iRow) - rY)
 
-        if (rDist < rMinDistance ) then
+          if (rDist < rMinDistance ) then
 
-          rMinDistance = rDist
-          iCandidateCol = iCol
-          iCandidateRow = iRow
-          lChanged = lTRUE
+            rMinDistance = rDist
+            iCandidateCol = iCol
+            iCandidateRow = iRow
+            lChanged = lTRUE
 
-        endif
+          endif
 
+        enddo
       enddo
+
+      if (.not. lChanged ) exit
+
     enddo
 
-    if (.not. lChanged ) exit
+    iLastColNum = iCandidateCol
+    iLastRowNum = iCandidateRow
 
-  enddo
-
-!  iLastColNum = iCol
-!  iLastRowNum = iRow
-
-  iLastColNum = iCandidateCol
-  iLastRowNum = iCandidateRow
-
-!  iColRow(COLUMN) = iCol
-!  iColRow(ROW) = iRow
-  iColRow(COLUMN) = iCandidateCol
-  iColRow(ROW) = iCandidateRow
+    iColRow(COLUMN) = iCandidateCol
+    iColRow(ROW) = iCandidateRow
 
   else
 
     iColRow(COLUMN) = iStartingColNum
     iColRow(ROW) = iStartingRowNum
   endif
-end function grid_GetGridColRowNum
 
+end function grid_GetGridColRowNum
 
 !----------------------------------------------------------------------
 subroutine grid_set_nodata_value( pGrd, iValue, fValue )
@@ -2249,22 +2242,22 @@ subroutine grid_GridToGrid_int( pGrdFrom, pGrdTo, lUseMajorityFilter )
     do iRow=1,pGrdTo%iNY
       do iCol=1,pGrdTo%iNX
 
-        iColRow = grid_GetGridColRowNum(pGrd=pGrdFrom,             &
-                   rX=real(pGrdTo%rX(iCol, iRow), c_double),  &
+        iColRow = grid_GetGridColRowNum(pGrd=pGrdFrom,                          &
+                   rX=real(pGrdTo%rX(iCol, iRow), c_double),                    &
                    rY=real(pGrdTo%rY(iCol, iRow), c_double) )
 
         call assert(iColRow(COLUMN) > 0 .and. iColRow(COLUMN) <= pGrdFrom%iNX,    &
           "Illegal column number supplied: "//trim(asCharacter(iColRow(COLUMN))), &
           __SRCNAME__, __LINE__)
 
-        call assert(iColRow(ROW) > 0 .and. iColRow(ROW) <= pGrdFrom%iNY,    &
-          "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))), &
+        call assert(iColRow(ROW) > 0 .and. iColRow(ROW) <= pGrdFrom%iNY,        &
+          "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))),     &
           __SRCNAME__, __LINE__)
 
-        pGrdTo%iData(iCol,iRow) = grid_majorityFilter_int( pGrdFrom=pGrdFrom,         &
-             iTargetCol=iColRow(COLUMN),                                              &
-             iTargetRow=iColRow(ROW),                                                 &
-             iNoDataValue=pGrdFrom%iNoDataValue,                                      &
+        pGrdTo%iData(iCol,iRow) = grid_majorityFilter_int( pGrdFrom=pGrdFrom,   &
+             iTargetCol=iColRow(COLUMN),                                        &
+             iTargetRow=iColRow(ROW),                                           &
+             iNoDataValue=pGrdFrom%iNoDataValue,                                &
              iSpread=iSpread)
 
       enddo
@@ -2275,16 +2268,16 @@ subroutine grid_GridToGrid_int( pGrdFrom, pGrdTo, lUseMajorityFilter )
     do iRow=1,pGrdTo%iNY
       do iCol=1,pGrdTo%iNX
 
-        iColRow = grid_GetGridColRowNum(pGrd=pGrdFrom,                        &
-                   rX=real(pGrdTo%rX(iCol, iRow), c_double),             &
+        iColRow = grid_GetGridColRowNum(pGrd=pGrdFrom,                          &
+                   rX=real(pGrdTo%rX(iCol, iRow), c_double),                    &
                    rY=real(pGrdTo%rY(iCol, iRow), c_double))
 
         call assert(iColRow(COLUMN) > 0 .and. iColRow(COLUMN) <= pGrdFrom%iNX,    &
           "Illegal column number supplied: "//trim(asCharacter(iColRow(COLUMN))), &
           __SRCNAME__, __LINE__)
 
-        call assert(iColRow(ROW) > 0 .and. iColRow(ROW) <= pGrdFrom%iNY,      &
-          "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))),   &
+        call assert(iColRow(ROW) > 0 .and. iColRow(ROW) <= pGrdFrom%iNY,        &
+          "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))),     &
           __SRCNAME__, __LINE__)
 
         pGrdTo%iData(iCol,iRow) = pGrdFrom%iData( iColRow(COLUMN), iColRow(ROW) )
@@ -2323,26 +2316,14 @@ subroutine grid_GridToGrid_sgl(pGrdFrom,  pGrdTo )
   do iRow=1,pGrdTo%iNY
     do iCol=1,pGrdTo%iNX
 
-      iColRow = grid_GetGridColRowNum(pGrd=pGrdFrom, &
-                 rX=real(pGrdTo%rX(iCol, iRow), c_double), &
+      iColRow = grid_GetGridColRowNum(pGrd=pGrdFrom,                            &
+                 rX=real(pGrdTo%rX(iCol, iRow), c_double),                      &
                  rY=real(pGrdTo%rY(iCol, iRow), c_double))
 
       if ( iColRow(COLUMN) < 1 .or. iColRow(COLUMN) > pGrdFrom%iNX) cycle
       if ( iColRow(ROW) < 1 .or. iColRow(ROW) > pGrdFrom%iNY) cycle
-!       call assert(iColRow(COLUMN) > 0 .and. iColRow(COLUMN) <= pGrdFrom%iNX, &
-!         "Illegal column number supplied: "//trim(asCharacter(iColRow(COLUMN))), &
-!         __SRCNAME__, __LINE__)
-
-!       call assert(iColRow(ROW) > 0 .and. iColRow(ROW) <= pGrdFrom%iNY, &
-!         "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))), &
-!         __SRCNAME__, __LINE__)
 
       pGrdTo%rData(iCol,iRow) = pGrdFrom%rData( iColRow(COLUMN), iColRow(ROW) )
-
-!         rArrayTo(iCol,iRow) = grid_Convolve_sgl(rValues=rArrayFrom, &
-!           iTargetCol=iColRow(COLUMN), &
-!           iTargetRow=iColRow(ROW), &
-!           rKernel=rKernel)
 
     enddo
   enddo

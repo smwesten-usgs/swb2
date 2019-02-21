@@ -766,12 +766,12 @@ subroutine transform_grid_to_grid_sub(this)
     !! following this call, the pGrdNative%rX and pGrdNative%rY values will be given in the
     !! base SWB project projection
 
-    if ( this%lRequireCompleteSpatialCoverage )   &
-      call assert( grid_CompletelyCover( this%pGrdBase, this%pGrdNative ), &
-          "Transformed grid read from file "//dquote(this%sSourceFilename) &
-          //" does not completely cover your model domain.")
-
   endif
+
+  if ( this%lRequireCompleteSpatialCoverage )   &
+    call assert( grid_CompletelyCover( this%pGrdBase, this%pGrdNative ), &
+        "Transformed grid read from file "//dquote(this%sSourceFilename) &
+        //" does not completely cover your model domain.")
 
   select case (this%iTargetDataType)
 
