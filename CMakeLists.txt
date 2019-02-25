@@ -77,8 +77,10 @@ if ("${SYSTEM_TYPE}" STREQUAL "win_x64" OR "${SYSTEM_TYPE}" STREQUAL "win_x86")
   )
 else()
   add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2 ${PROJECT_SOURCE_DIR}/bin/swb2
+                 COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2 /usr/local/bin/swb2
                  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swbstats2 ${PROJECT_SOURCE_DIR}/bin/swbstats2
-		 COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/test/unit_tests/swbtest ${PROJECT_SOURCE_DIR}/test/unit_tests/swbtest
+                 COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swbstats2 /usr/local/bin/swbstats2
+                 COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/test/unit_tests/swbtest ${PROJECT_SOURCE_DIR}/test/unit_tests/swbtest
   )
 endif()
 

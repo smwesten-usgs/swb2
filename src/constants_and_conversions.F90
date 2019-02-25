@@ -15,8 +15,8 @@ module constants_and_conversions
   integer (c_int), parameter :: DATATYPE_INT     = 0
   integer (c_int), parameter :: DATATYPE_FLOAT   = 1
   integer (c_int), parameter :: DATATYPE_REAL    = 1
-  integer (c_int), parameter :: DATATYPE_SHORT   = 2
-  integer (c_int), parameter :: DATATYPE_DOUBLE  = 3
+  integer (c_int), parameter :: DATATYPE_DOUBLE  = 2
+  integer (c_int), parameter :: DATATYPE_SHORT   = 3
   integer (c_int), parameter :: DATATYPE_NA      = -9999
 
   ! [ common mathematical constants ]

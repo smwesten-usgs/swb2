@@ -17,13 +17,14 @@ module grid
 
   private
 
-  integer (c_int), public, parameter :: GRID_NODATA_INT  = -9999
-  real (c_float), public, parameter  :: GRID_NODATA_REAL = -9999.
+  integer (c_int), public, parameter :: GRID_NODATA_INT  = -9999_c_int
+  real (c_float), public, parameter  :: GRID_NODATA_REAL = -9999._c_float
+  real (c_double), public, parameter  :: GRID_NODATA_DOUBLE = -9999._c_double
 
-  integer (c_int), public, parameter :: GRID_DATATYPE_INT = 0
-  integer (c_int), public, parameter :: GRID_DATATYPE_REAL = 1
-!   integer (c_int), public, parameter :: GRID_DATATYPE_CELL_GRID = 2
-!   integer (c_int), public, parameter :: GRID_DATATYPE_ALL = 3
+  ! @TODO: why redefine these when types have been defined in 'constants_and_conversions'?
+  integer (c_int), public, parameter :: GRID_DATATYPE_INT = DATATYPE_INT
+  integer (c_int), public, parameter :: GRID_DATATYPE_REAL = DATATYPE_REAL
+  integer (c_int), public, parameter :: GRID_DATATYPE_DOUBLE = DATATYPE_DOUBLE
 
   integer (c_int), public, parameter :: OUTPUT_SURFER = 0
   integer (c_int), public, parameter :: OUTPUT_ARC = 1
@@ -31,6 +32,7 @@ module grid
   integer (c_int), public, parameter :: GRID_ACTIVE_CELL = 1
   integer(c_int), parameter :: NC_FILL_INT     = GRID_NODATA_INT
   real(c_float),  parameter :: NC_FILL_FLOAT   = GRID_NODATA_REAL
+  real(c_double),  parameter :: NC_FILL_DOUBLE   = GRID_NODATA_DOUBLE
 
   !> interface to C code that provides a simplified entry point to PROJ4
   !> capabilities: it has been modified so that all C pointers are kept within the
@@ -64,15 +66,17 @@ module grid
     real (c_double)            :: rX0, rX1              ! World-coordinate range in X
     real (c_double)            :: rY0, rY1              ! World-coordinate range in Y
 
-    integer (c_int), dimension(:,:), allocatable   :: iData ! Integer data
-    real (c_float), dimension(:,:), allocatable    :: rData    ! Real data
-    real (c_float), dimension(:,:), allocatable    :: fData    ! Float data
+    integer (c_int), dimension(:,:), allocatable :: iData ! Integer data
+    real (c_float), dimension(:,:), allocatable  :: rData    ! Real data
+    real (c_float), dimension(:,:), allocatable  :: fData    ! Float data
+    real (c_double), dimension(:,:), allocatable :: dpData   ! Douple-precision data
     real (c_double), dimension(:,:), allocatable :: rX    ! x coordinate associated with data
     real (c_double), dimension(:,:), allocatable :: rY    ! y coordinate associated with data
     integer (c_int), dimension(:,:), allocatable :: iMask ! Mask for processing results
 
     integer (c_int)                    :: iNoDataValue = NC_FILL_INT
     real (c_float)                     :: rNoDataValue = NC_FILL_FLOAT
+    real (c_double)                    :: dpNoDataValue = NC_FILL_DOUBLE
 !      type (T_CELL), dimension(:,:), pointer :: Cells        ! T_CELL objects
   end type GENERAL_GRID_T
 
@@ -246,29 +250,12 @@ function grid_CreateComplete ( iNX, iNY, rX0, rY0, rX1, rY1, iDataType ) result 
               __SRCNAME__,__LINE__)
           pGrd%rData = rZERO
 
-!       case ( GRID_DATATYPE_CELL_GRID )
-!           allocate ( pGrd%Cells( iNX, iNY ), stat=iStat )
-!           call assert (iStat == 0, &
-!              "Could not allocate cell-by-cell data", &
-!              __SRCNAME__,__LINE__)
-
-!       case ( GRID_DATATYPE_ALL )
-!           allocate ( pGrd%iData( iNX, iNY ), stat=iStat )
-!           call assert (iStat == 0, &
-!              "Could not allocate integer data", &
-!               __SRCNAME__,__LINE__)
-!               pGrd%iData = 0
-
-!           allocate ( pGrd%rData( iNX, iNY ), stat=iStat )
-!           call assert (iStat == 0, &
-!              "Could not allocate real data", &
-!               __SRCNAME__,__LINE__)
-!               pGrd%rData = 0.0
-
-!           allocate ( pGrd%Cells( iNX, iNY ), stat=iStat )
-!           call assert (iStat == 0, &
-!              "Could not allocate cell-by-cell data", &
-!              __SRCNAME__,__LINE__)
+      case ( GRID_DATATYPE_DOUBLE )
+          allocate ( pGrd%dpData( iNX, iNY ), stat=iStat )
+          call assert (iStat == 0, &
+             "Could not allocate double-precision data", &
+              __SRCNAME__,__LINE__)
+          pGrd%dpData = 0.0_c_double
 
       case default
           call assert ( lFALSE, 'Internal error -- illegal grid data type' )
@@ -326,29 +313,12 @@ function grid_CreateSimple ( iNX, iNY, rX0, rY0, rGridCellSize, iDataType ) resu
               __SRCNAME__,__LINE__)
           pGrd%rData = pGrd%rNoDataValue
 
-!       case ( GRID_DATATYPE_CELL_GRID )
-!           allocate ( pGrd%Cells( iNX, iNY ), stat=iStat )
-!           call assert (iStat == 0, &
-!              "Could not allocate cell-by-cell data", &
-!              __SRCNAME__,__LINE__)
-
-!       case ( GRID_DATATYPE_ALL )
-!           allocate ( pGrd%iData( iNX, iNY ), stat=iStat )
-!           call assert (iStat == 0, &
-!              "Could not allocate integer data", &
-!               __SRCNAME__,__LINE__)
-!               pGrd%iData = 0
-
-!           allocate ( pGrd%rData( iNX, iNY ), stat=iStat )
-!           call assert (iStat == 0, &
-!              "Could not allocate real data", &
-!               __SRCNAME__,__LINE__)
-!               pGrd%rData = 0.0
-
-!           allocate ( pGrd%Cells( iNX, iNY ), stat=iStat )
-!           call assert (iStat == 0, &
-!              "Could not allocate cell-by-cell data", &
-!              __SRCNAME__,__LINE__)
+      case ( GRID_DATATYPE_DOUBLE )
+          allocate ( pGrd%dpData( iNX, iNY ), stat=iStat )
+          call assert (iStat == 0, &
+             "Could not allocate double-precision data", &
+              __SRCNAME__,__LINE__)
+          pGrd%dpData = pGrd%dpNoDataValue
 
       case default
           call assert ( lFALSE, 'Internal error -- illegal grid data type' )
@@ -406,6 +376,10 @@ subroutine grid_Destroy ( pGrd )
     else if ( pGrd%iDataType == GRID_DATATYPE_REAL ) then
       deallocate ( pGrd%rData, stat=iStat )
       call assert ( iStat == 0, "Failed to deallocate real grid" )
+    else if ( pGrd%iDataType == GRID_DATATYPE_DOUBLE ) then
+      deallocate ( pGrd%dpData, stat=iStat )
+      call assert ( iStat == 0, "Failed to deallocate double-precision grid" )
+
 !     else if ( pGrd%iDataType == GRID_DATATYPE_CELL_GRID ) then
 !       deallocate ( pGrd%Cells, stat=iStat )
 !       call assert ( iStat == 0, "Failed to deallocate cell grid" )
@@ -670,6 +644,22 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
                     //trim(sFileName), __SRCNAME__,__LINE__ )
                 endif
 
+              case ( DATATYPE_DOUBLE )
+
+                do iRow=1,pGrd%iNY
+                  read ( unit=LU_GRID, fmt=*, iostat=iStat ) pGrd%dpData(:,iRow)
+                  call assert ( iStat == 0, &
+                    "Failed to read double-precision grid data - file: "        &
+                    //trim(sFileName)//"  row num: "//TRIM( asCharacter(iRow)), &
+                   __SRCNAME__,__LINE__ )
+                end do
+                if(len_trim(sNoDataValue) > 0) then
+                  read(unit=sNoDataValue, fmt=*, iostat=iStat) pGrd%dpNoDataValue
+                  call assert ( iStat == 0, &
+                    "Failed to read NODATA value in grid data - file: " &
+                    //trim(sFileName), __SRCNAME__,__LINE__ )
+                endif
+
               case default
 
                   call assert ( lFALSE, &
@@ -785,6 +775,7 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
           end do
           ! ... and read the data.
           select case ( pGrd%iDataType )
+
               case ( DATATYPE_INT )
                 do iRow=1,pGrd%iNY
                   read ( unit=LU_GRID, fmt=*, iostat=iStat ) pGrd%iData(:,iRow)
@@ -799,6 +790,7 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
                     "Failed to read NODATA value in grid data - file: " &
                     //trim(sFileName), __SRCNAME__,__LINE__ )
                 endif
+
               case ( DATATYPE_REAL )
                 do iRow=1,pGrd%iNY
                   read ( unit=LU_GRID, fmt=*, iostat=iStat ) pGrd%rData(:,iRow)
@@ -813,6 +805,22 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
                     "Failed to read NODATA value in grid data - file: " &
                     //trim(sFileName), __SRCNAME__,__LINE__ )
                 endif
+
+              case ( DATATYPE_DOUBLE )
+                do iRow=1,pGrd%iNY
+                  read ( unit=LU_GRID, fmt=*, iostat=iStat ) pGrd%dpData(:,iRow)
+                  call assert ( iStat == 0, &
+                    "Failed to read double-precision grid data - file: "        &
+                    //trim(sFileName)//"  row num: "//TRIM( asCharacter(iRow)), &
+                   __SRCNAME__,__LINE__ )
+                end do
+                if(len_trim(sNoDataValue) > 0) then
+                  read(unit=sNoDataValue, fmt=*, iostat=iStat) pGrd%dpNoDataValue
+                  call assert ( iStat == 0, &
+                    "Failed to read NODATA value in grid data - file: " &
+                    //trim(sFileName), __SRCNAME__,__LINE__ )
+                endif
+
               case default
                   call assert ( lFALSE, &
                     "Internal error -- illegal ARC GRID data type", &
@@ -913,6 +921,11 @@ function grid_ReadSurferGrid_fn ( sFileName, iDataType ) result ( pGrd )
               read ( unit=LU_GRID, fmt=*, iostat=iStat ) pGrd%rData(:,iRow)
               call assert ( iStat == 0, "Failed to read real grid data" )
           end do
+      case ( DATATYPE_DOUBLE )
+          do iRow=1, iNY
+              read ( unit=LU_GRID, fmt=*, iostat=iStat ) pGrd%dpData(:,iRow)
+              call assert ( iStat == 0, "Failed to read double-precision grid data" )
+          end do
       case default
           call assert ( lFALSE, "Internal error -- illegal SURFER grid data type" )
   end select
@@ -988,6 +1001,11 @@ subroutine grid_ReadSurferGrid_sub ( sFileName, pGrd )
               read ( unit=LU_GRID, fmt=*, iostat=iStat ) pGrd%rData(:,iRow)
               call assert ( iStat == 0, "Failed to read real grid data" )
           end do
+      case ( DATATYPE_DOUBLE )
+          do iRow=1, iNY
+              read ( unit=LU_GRID, fmt=*, iostat=iStat ) pGrd%dpData(:,iRow)
+              call assert ( iStat == 0, "Failed to read double-precision grid data" )
+          end do
       case default
           call assert ( lFALSE, "Internal error -- illegal SURFER grid data type" )
   end select
@@ -1044,6 +1062,9 @@ subroutine grid_WriteArcGrid(sFilename, pGrd)
   elseif ( pGrd%iDataType == DATATYPE_REAL ) then
     iNumCols = size(pGrd%rData,1)
     iNumRows = size(pGrd%rData,2)
+  elseif ( pGrd%iDataType == DATATYPE_DOUBLE ) then
+    iNumCols = size(pGrd%dpData,1)
+    iNumRows = size(pGrd%dpData,2)
   else
     call assert(lFALSE, "Internal programming error - Unsupported grid type", &
       __SRCNAME__, __LINE__)
@@ -1093,6 +1114,17 @@ subroutine grid_WriteArcGrid(sFilename, pGrd)
         __SRCNAME__, __LINE__)
     end do
 
+  elseif ( pGrd%iDataType == DATATYPE_DOUBLE ) then
+
+    write ( unit=LU_TEMP, fmt="('NODATA_VALUE ',g14.4)", iostat=istat ) pGrd%dpNoDataValue
+    call assert( istat==0, "Error writing NODATA value", __SRCNAME__, __LINE__)
+    do iRow=1,iNumRows
+      write( unit=LU_TEMP, fmt=TRIM(sBuf), iostat=istat ) &
+        (TRIM(asCharacter( pGrd%dpData(iCol,iRow) )),iCol=1,iNumCols)
+      call assert( istat==0, "Error writing Arc ASCII REAL grid data", &
+        __SRCNAME__, __LINE__)
+    end do
+
   endif
 
   close (unit=LU_TEMP)
@@ -1120,6 +1152,9 @@ subroutine grid_WriteSurferGrid(sFilename, pGrd)
   elseif ( pGrd%iDataType == DATATYPE_REAL ) then
     iNumCols = size(pGrd%rData,1)
     iNumRows = size(pGrd%rData,2)
+  elseif ( pGrd%iDataType == DATATYPE_DOUBLE ) then
+    iNumCols = size(pGrd%dpData,1)
+    iNumRows = size(pGrd%dpData,2)
   else
     call assert(lFALSE, "Internal programming error - Unsupported grid type", &
       __SRCNAME__, __LINE__)
@@ -1175,6 +1210,19 @@ subroutine grid_WriteSurferGrid(sFilename, pGrd)
     do iRow=iNumRows,1,-1
       write( unit=LU_TEMP, fmt=TRIM(sBuf), iostat=istat ) &
         (TRIM( asCharacter(pGrd%rData(iCol,iRow) ) ),iCol=1,iNumCols)
+      call assert( istat==0, "Error writing SURFER grid data" , &
+        __SRCNAME__, __LINE__)
+    end do
+
+  elseif ( pGrd%iDataType == DATATYPE_DOUBLE ) then
+
+    write ( unit=LU_TEMP, fmt="(2f14.3)", iostat=istat ) minval(pGrd%dpData),maxval(pGrd%dpData)
+    call assert( istat==0, "Error writing SURFER Z limits", &
+      __SRCNAME__, __LINE__)
+
+    do iRow=iNumRows,1,-1
+      write( unit=LU_TEMP, fmt=TRIM(sBuf), iostat=istat ) &
+        (TRIM( asCharacter(pGrd%dpData(iCol,iRow) ) ),iCol=1,iNumCols)
       call assert( istat==0, "Error writing SURFER grid data" , &
         __SRCNAME__, __LINE__)
     end do
@@ -1593,10 +1641,7 @@ subroutine grid_checkIntegerGridValues(pGrd, sFilename)
 
 end subroutine grid_checkIntegerGridValues
 
-
 !--------------------------------------------------------------------------
-
-
 
 subroutine grid_CheckForPROJ4Error(iRetVal, sFromPROJ4, sToPROJ4)
 
@@ -1900,7 +1945,6 @@ function grid_LookupReal(pGrd,rXval,rYval) result(rValue)
   if ( iCol > pGrd%iNX ) iCol = pGrd%iNX
   rValue = pGrd%rData(iCol,iRow)
 
-  return
 end function grid_LookupReal
 !!***
 

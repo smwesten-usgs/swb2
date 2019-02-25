@@ -9,7 +9,7 @@ rm -rf tests
 rm -f CPack*
 rm -f *.txt
 
-export GCC_VERSION=8.1.0
+export GCC_VERSION=8.2.0
 export GCC_MAJ_VERSION=8
 export LIBSZ_VERSION=2.1.1_1
 # set CMAKE-related and build-related variables
@@ -31,7 +31,7 @@ export LIB_Z=$( glocate libz.a | grep Cellar )
 export LIB_SZ=$(glocate libsz.a | grep Cellar | grep $LIBSZ_VERSION )
 export LIB_GCC=$( glocate libgcc.a | grep Cellar | grep $GCC_VERSION | grep -v i386 )
 export LIB_GFORTRAN=$( glocate libgfortran.a | grep Cellar | grep $GCC_VERSION | grep -v i386 )
-export NC_CONFIG=$(glocate nc-config | grep Cellar | grep $NETCDF_VERSION )
+export NC_CONFIG=$(glocate nc-config | grep Cellar )
 
 export SWB_EXTERNAL_LIBS="$LIB_HDF5_HL;$LIB_HDF5;$LIB_NETCDF;$LIB_SZ;$LIBZ;$LIBDL;$LIB_GCC;$LIB_GFORTRAN"
 

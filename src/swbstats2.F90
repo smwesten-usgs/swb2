@@ -211,7 +211,7 @@ program swbstats2
      "  [ --monthly_statistics ]                                            ", &
      "    calculate statistics for every month between start and end        ", &
      "  [ --report_as_volume ]                                              ", &
-     "    express statistics as a volume                                    ", &
+     "    express statistics as a volume (cubic meters)                     ", &
      "  [ --report_in_meters ]                                              ", &
      "    express output statistics in *meters*                             ", &
      "  [ --slice= ]                                                        ", &
@@ -443,7 +443,7 @@ program swbstats2
             rY0=ncfile_in%rY(NC_BOTTOM),                   &
             rX1=ncfile_in%rX(NC_RIGHT),                    &
             rY1=ncfile_in%rY(NC_TOP),                      &
-            iDataType=GRID_DATATYPE_REAL )
+            iDataType=GRID_DATATYPE_DOUBLE )
 
   output_files(STATS_SUM)%grid_ptr => grid_Create (        &
             iNX=ncfile_in%iNX,                             &
@@ -452,7 +452,7 @@ program swbstats2
             rY0=ncfile_in%rY(NC_BOTTOM),                   &
             rX1=ncfile_in%rX(NC_RIGHT),                    &
             rY1=ncfile_in%rY(NC_TOP),                      &
-            iDataType=GRID_DATATYPE_REAL )
+            iDataType=GRID_DATATYPE_DOUBLE )
 
   output_files(STATS_MEAN)%grid_ptr => grid_Create (       &
             iNX=ncfile_in%iNX,                             &
@@ -461,7 +461,7 @@ program swbstats2
             rY0=ncfile_in%rY(NC_BOTTOM),                   &
             rX1=ncfile_in%rX(NC_RIGHT),                    &
             rY1=ncfile_in%rY(NC_TOP),                      &
-            iDataType=GRID_DATATYPE_REAL )
+            iDataType=GRID_DATATYPE_DOUBLE )
 
   output_files(STATS_VARIANCE)%grid_ptr => grid_Create (   &
             iNX=ncfile_in%iNX,                             &
@@ -470,7 +470,7 @@ program swbstats2
             rY0=ncfile_in%rY(NC_BOTTOM),                   &
             rX1=ncfile_in%rX(NC_RIGHT),                    &
             rY1=ncfile_in%rY(NC_TOP),                      &
-            iDataType=GRID_DATATYPE_REAL )
+            iDataType=GRID_DATATYPE_DOUBLE )
 
   ! delta, delta2 are temporary work grids used in calculating variance
   pGrdDelta   =>  grid_Create ( iNX=ncfile_in%iNX,               &
@@ -479,7 +479,7 @@ program swbstats2
                   rY0=ncfile_in%rY(NC_BOTTOM),                   &
                   rX1=ncfile_in%rX(NC_RIGHT),                    &
                   rY1=ncfile_in%rY(NC_TOP),                      &
-                  iDataType=GRID_DATATYPE_REAL )
+                  iDataType=GRID_DATATYPE_DOUBLE )
 
   pGrdDelta2  =>  grid_Create ( iNX=ncfile_in%iNX,               &
                   iNY=ncfile_in%iNY,                             &
@@ -487,7 +487,7 @@ program swbstats2
                   rY0=ncfile_in%rY(NC_BOTTOM),                   &
                   rX1=ncfile_in%rX(NC_RIGHT),                    &
                   rY1=ncfile_in%rY(NC_TOP),                      &
-                  iDataType=GRID_DATATYPE_REAL )
+                  iDataType=GRID_DATATYPE_DOUBLE )
 
   ! extract basic information about the SWB computational grid
   ! 'BNDS' is defined in module constants_and_conversions
@@ -679,11 +679,11 @@ program swbstats2
       call get_unique_int(pZONE_GRID%pGrdBase%iData, options%unique_zone_list)
     endif
 
-      call write_stats_to_netcdf(output_files=output_files,                     &
+      call write_stats_to_netcdf(output_files=output_files,                   &
                                 start_date=options%slice_start_date,          &
                                 end_date=options%slice_end_date)
 
-      call write_stats_to_arcgrid(output_files=output_files,                    &
+      call write_stats_to_arcgrid(output_files=output_files,                  &
                                   start_date=options%slice_start_date,        &
                                   end_date=options%slice_end_date,            &
                                   date_range_string=options%date_range_string)
@@ -692,22 +692,22 @@ program swbstats2
     if (options%calc_zonal_stats) then
       if ( associated(pCOMPARISON_GRID) ) then
 
-        call output_zonal_stats(                                            &
-             start_date=options%slice_start_date,                           &
-             end_date=options%slice_end_date,                               &
-             values=output_files(STATS_SUM)%grid_ptr%rData,                 &
-             zone_ids=pZONE_GRID%pGrdBase%iData,                            &
-             unique_zone_list=options%unique_zone_list,                     &
-             comparison_values=pCOMPARISON_GRID%pGrdBase%rData,             &
+        call output_zonal_stats(                                                  &
+             start_date=options%slice_start_date,                                 &
+             end_date=options%slice_end_date,                                     &
+             values=output_files(STATS_SUM)%grid_ptr%dpData,                      &
+             zone_ids=pZONE_GRID%pGrdBase%iData,                                  &
+             unique_zone_list=options%unique_zone_list,                           &
+             comparison_values=pCOMPARISON_GRID%pGrdBase%dpData,                  &
              funit=zonal_stats_output_file%unit() )
 
       else
-        call output_zonal_stats(                                            &
-             start_date=options%slice_start_date,                           &
-             end_date=options%slice_end_date,                               &
-             values=output_files(STATS_SUM)%grid_ptr%rData,                 &
-             zone_ids=pZONE_GRID%pGrdBase%iData,                            &
-             unique_zone_list=options%unique_zone_list,                     &
+        call output_zonal_stats(                                                  &
+             start_date=options%slice_start_date,                                 &
+             end_date=options%slice_end_date,                                     &
+             values=output_files(STATS_SUM)%grid_ptr%dpData,                      &
+             zone_ids=pZONE_GRID%pGrdBase%iData,                                  &
+             unique_zone_list=options%unique_zone_list,                           &
              funit=zonal_stats_output_file%unit() )
 
       endif
@@ -864,7 +864,7 @@ contains
            iStart=[ RECNUM , 0_c_size_t, 0_c_size_t],                             &
            iCount=[ 1_c_size_t, ny, nx ],                                         &
            iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                 &
-           rValues=grid_ptr%rData )
+           rValues=real(grid_ptr%dpData, kind=c_float) )
 
       endif
 
@@ -925,8 +925,8 @@ contains
         endif
 
         ! ugly hack to make the output match the default NODATA value
-        where ( pGrdNative%rData <= NC_FILL_FLOAT )
-          grid_ptr%rData = -9999.
+        where ( pGrdNative%dpData <= NC_FILL_FLOAT )
+          grid_ptr%dpData = -9999.
         end where
 
         call grid_WriteArcGrid( filename, grid_ptr )
@@ -967,6 +967,7 @@ contains
     real (c_float), allocatable   :: tempvals(:)
     integer (c_int)               :: day_count
     logical (c_bool), allocatable :: local_mask(:,:)
+    real (c_float), dimension(size(grid_delta%dpData,1), size(grid_delta%dpData,2)) :: rTemp
 
     ! force slice dates to honor bounds of data dates
     if ( start_date < options%data_start_date )  start_date = options%data_start_date
@@ -974,12 +975,12 @@ contains
 
 !    call SIM_DT%initialize( start_date, end_date )
 
-    associate( grd_sum => output_files(STATS_SUM)%grid_ptr%rData,                &
-               grd_mean => output_files(STATS_MEAN)%grid_ptr%rData,              &
-               grd_var => output_files(STATS_VARIANCE)%grid_ptr%rData,           &
-               delta =>  grid_delta%rData,                                      &
-               delta2 => grid_delta2%rData,                                     &
-               grd_new => pGrdNative%rData      )
+    associate( grd_sum => output_files(STATS_SUM)%grid_ptr%dpData,                &
+               grd_mean => output_files(STATS_MEAN)%grid_ptr%dpData,              &
+               grd_var => output_files(STATS_VARIANCE)%grid_ptr%dpData,           &
+               delta =>  grid_delta%dpData,                                      &
+               delta2 => grid_delta2%dpData,                                     &
+               grd_new => pGrdNative%dpData      )
 
       allocate(local_mask(ubound(grd_sum,1),ubound(grd_sum,2)))
 
@@ -997,7 +998,7 @@ contains
         day_count = day_count + 1
 
         if ( netcdf_update_time_starting_index(ncfile_in, julian_day_number ) )   then
-          call netcdf_get_variable_slice(NCFILE=ncfile_in, rValues=grd_new )
+          call netcdf_get_variable_slice(NCFILE=ncfile_in, rValues=rTemp )
         endif
 
         ! volumetric_conversion_factor is 1.0 *unless* user has specifically
@@ -1005,7 +1006,7 @@ contains
         ! the output_conversion_factor amounts to the cell area times the
         ! unit length, appropriately converted to cubic meters, or if output
         ! is requested in meters, the conversion factor is just 0.
-        grd_new = grd_new * options%output_conversion_factor
+        grd_new = real(rTemp, kind=c_double) * options%output_conversion_factor
 
         if (day_count == 1) then
 
@@ -1015,34 +1016,28 @@ contains
             local_mask = grd_new > NC_FILL_FLOAT
           endif
 
-          grd_sum = 0.0_c_float
-          grd_mean = 0.0_c_float
-          grd_var = 0.0_c_float
-
-        else
-
-          where ( local_mask )
-            delta = grd_new - grd_mean
-            grd_sum = grd_sum + grd_new
-            grd_mean = grd_mean + delta / real( day_count, c_float )
-            delta2 = grd_new - grd_mean
-            grd_var = grd_var + delta * delta2
-          end where
-
-          ! where ( local_mask )
-          !   grd_sum = grd_sum + grd_new
-          ! end where
+          grd_sum = 0.0_c_double
+          grd_mean = 0.0_c_double
+          grd_var = 0.0_c_double
 
         endif
 
-        ! write(*,fmt="(a,f14.3,f14.3)") "gridsum: ", minval(grd_sum,  mask=grd_new > NC_FILL_FLOAT), &
-        !     maxval(grd_sum,  mask=grd_new > NC_FILL_FLOAT)
-        !
-        ! write(*,fmt="(a,f14.3,f14.3)") "gridnew: ", minval(grd_new,  mask=grd_new > NC_FILL_FLOAT), &
-        !     maxval(grd_new,  mask=grd_new > NC_FILL_FLOAT)
-        !
-        ! write(*,fmt="(a,f14.3,f14.3)") "gridnew: ", minval(pGrdNative%rData,  mask=pGrdNative%rData > NC_FILL_FLOAT), &
-        !     maxval(pGrdNative%rData,  mask=pGrdNative%rData > NC_FILL_FLOAT)
+        where ( local_mask )
+          delta = grd_new - grd_mean
+          grd_sum = grd_sum + grd_new
+          grd_mean = grd_mean + delta / real( day_count, c_double )
+          delta2 = grd_new - grd_mean
+          grd_var = grd_var + delta * delta2
+        end where
+
+         ! write(*,fmt="(a,f14.3,f14.3)") "gridsum: ", minval(grd_sum,  mask=grd_new > NC_FILL_FLOAT), &
+         !     maxval(grd_sum,  mask=grd_new > NC_FILL_FLOAT)
+         !
+         ! write(*,fmt="(a,f14.3,f14.3)") "gridnew: ", minval(grd_new,  mask=grd_new > NC_FILL_FLOAT), &
+         !     maxval(grd_new,  mask=grd_new > NC_FILL_FLOAT)
+         !
+         ! write(*,fmt="(a,f14.3,f14.3)") "gridnew: ", minval(pGrdNative%dpData,  mask=pGrdNative%dpData > NC_FILL_FLOAT), &
+         !     maxval(pGrdNative%dpData,  mask=pGrdNative%dpData > NC_FILL_FLOAT)
 
         call SIM_DT%addDay
         if ( SIM_DT%curr > end_date )  exit
@@ -1061,7 +1056,7 @@ contains
         where ( local_mask )
 !          grd_mean = grd_mean/ real( day_count, c_float ) * 365.25
 !          grd_var = grd_var/ real( day_count, c_float ) * 365.25
-          grd_sum = grd_sum / real( day_count, c_float ) * 365.25
+          grd_sum = grd_sum / real( day_count, c_double ) * 365.25
         end where
       ! else
       !   where ( local_mask )
@@ -1268,7 +1263,7 @@ contains
 
     call pZONE_GRID%getvalues()
 
-    where ( pGrdNative%rData <= NC_FILL_FLOAT )
+    where ( pGrdNative%dpData <= NC_FILL_FLOAT )
       pZONE_GRID%pGrdBase%iData = NC_FILL_INT
     end where
 
@@ -1307,10 +1302,10 @@ contains
 
     call pCOMPARISON_GRID%getvalues()
 
-    where ( pGrdNative%rData <= NC_FILL_FLOAT )
-      pCOMPARISON_GRID%pGrdBase%rData = NC_FILL_FLOAT
+    where ( pGrdNative%dpData <= NC_FILL_FLOAT )
+      pCOMPARISON_GRID%pGrdBase%dpData = NC_FILL_FLOAT
     elsewhere
-      pCOMPARISON_GRID%pGrdBase%rData = pCOMPARISON_GRID%pGrdBase%rData           &
+      pCOMPARISON_GRID%pGrdBase%dpData = pCOMPARISON_GRID%pGrdBase%dpData           &
                                       * options%comparison_grid_conversion_factor
     end where
 
@@ -1325,18 +1320,18 @@ contains
 
     type (DATETIME_T), intent(in)            :: start_date
     type (DATETIME_T), intent(in)            :: end_date
-    real (c_float), intent(inout)            :: values(:,:)
+    real (c_double), intent(inout)           :: values(:,:)
     integer (c_int), intent(inout)           :: zone_ids(:,:)
     type (STRING_LIST_T), intent(in)         :: unique_zone_list
     integer (c_int), intent(in), optional    :: funit
-    real (c_float), intent(inout), optional  :: comparison_values(:,:)
+    real (c_double), intent(inout), optional :: comparison_values(:,:)
 
     ! [ LOCALS ]
     integer (c_int)                :: n
     integer (c_int)                :: indx
     integer (c_int), allocatable   :: tempvals(:)
     integer (c_int)                :: number_of_matches
-    real (c_float), allocatable    :: stats(:)
+    real (c_double), allocatable   :: stats(:)
     integer (c_int)                :: funit_l
 
     if (present(funit)) then
@@ -1370,11 +1365,11 @@ contains
 
   subroutine calc_zonal_stats(values, zone_ids, target_id, result_vector, comparison_values)
 
-    real (c_float), intent(inout)                 :: values(:,:)
-    integer (c_int), intent(inout)                :: zone_ids(:,:)
-    integer (c_int), intent(inout)                :: target_id
-    real (c_float), intent(inout), allocatable    :: result_vector(:)
-    real (c_float), intent(inout), optional       :: comparison_values(:,:)
+    real (c_double), intent(inout)                 :: values(:,:)
+    integer (c_int), intent(inout)                 :: zone_ids(:,:)
+    integer (c_int), intent(inout)                 :: target_id
+    real (c_double), intent(inout), allocatable    :: result_vector(:)
+    real (c_double), intent(inout), optional       :: comparison_values(:,:)
 
     ! [ LOCALS ]
     real (c_double)  :: min_val
