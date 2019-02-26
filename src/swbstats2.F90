@@ -199,7 +199,7 @@ program swbstats2
       //TRIM(int2char(__G95_MINOR__))
 #endif
 
-    allocate(usage_string(40))
+    allocate(usage_string(44))
 
     usage_string = [                                                           &
      "usage: swbstats2 [options] netcdf_file_name                           ", &
@@ -243,7 +243,11 @@ program swbstats2
      "      id,start_date,end_date,zone_grid_filename                       ", &
      "      #2,1870-01-01,1898-12-31,zone_grod_file_period_2.asc            ", &
      "      5,1920-01-01,1925-12-31,zone_grid_file_period_5.asc             ", &
-     "      6,1925-01-01,1930-12-31,zone_grid_file_period_6.asc             "  &
+     "      6,1925-01-01,1930-12-31,zone_grid_file_period_6.asc             ", &
+     "  [ --{no_}netcdf_output ]                                            ", &
+     "    toggle whether netCDF file is target for gridded output           ", &
+     "  [ --{no_}arcgrid_output ]                                           ", &
+     "    toggle whether an ASCII Arc Grid is target for gridded output     "  &
      ]
 
      do iIndex=1,ubound(usage_string,1)
@@ -512,7 +516,7 @@ program swbstats2
 
   endif
 
-  if (options%report_as_volume .or. options%report_in_meters) then
+  if (options%report_in_meters) then
 
     ! set unit conversions needed to obtain output units of "meters"
     if (options%netcdf_variable_units_string .containssimilar. "inch") then
@@ -527,6 +531,13 @@ program swbstats2
       //sQuote(options%netcdf_variable_units_string)//", which cannot"          &
       //" be converted to units of 'meters'.")
     endif
+
+    options%filename_modifier_string = trim(options%filename_modifier_string)   &
+                                       //"__meters"
+
+  endif
+
+  if (options%report_as_volume) then
 
     if (options%report_as_volume) then
       if (options%target_proj4_string .containssimilar. "units=m") then
@@ -547,7 +558,14 @@ program swbstats2
       options%output_conversion_factor = options%unit_conversion_factor
     endif
 
+    options%filename_modifier_string = trim(options%filename_modifier_string)   &
+                                       //"__cubic_meters"
+
   endif
+
+  call assert(.not. (options%report_as_volume .and. options%report_in_meters),  &
+       "Cannot use '--report_as_volume' and '--report_in_meters' in the same"   &
+       //" swbstats run")
 
   if (options%compare_to_obs_values) then
     call initialize_comparison_grid(grid_filename=options%comparison_grid_filename)
