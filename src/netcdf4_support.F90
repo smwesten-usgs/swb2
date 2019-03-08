@@ -38,7 +38,6 @@ module netcdf4_support
                                GIT_BRANCH_STRING, COMPILE_DATE, COMPILE_TIME, &
                                COMPILATION_TIMESTAMP
 
-
   use grid
 !  use typesizes
   use netcdf_c_api_interfaces
@@ -2348,7 +2347,7 @@ subroutine nf_get_variable_vector_short(NCFILE, iNC_VarID, iNC_Start, iNC_Count,
   integer (c_int) :: iNC_VarID
   integer (c_size_t) :: iNC_Start
   integer (c_size_t) :: iNC_Count
-  integer (c_ptrdiff_t) :: iNC_Stride
+  integer (c_size_t) :: iNC_Stride
   integer (c_short), dimension(:) :: iNC_Vars
 
   call nf_trap(nc_get_vars_short(ncid=NCFILE%iNCID, &
@@ -2390,7 +2389,7 @@ subroutine nf_get_variable_array_as_vector_short(NCFILE, iNC_VarID, iNC_Start, i
   integer (c_int) :: iNC_VarID
   integer (c_size_t), dimension(:) :: iNC_Start
   integer (c_size_t), dimension(:) :: iNC_Count
-  integer (c_ptrdiff_t), dimension(:) :: iNC_Stride
+  integer (c_size_t), dimension(:) :: iNC_Stride
   integer (c_short), dimension(:) :: iNC_Vars
 
   call nf_trap(nc_get_vars_short(ncid=NCFILE%iNCID, &
@@ -2411,7 +2410,7 @@ subroutine nf_get_variable_array_as_vector_int(NCFILE, iNC_VarID, iNC_Start, iNC
   integer (c_int)                     :: iNC_VarID
   integer (c_size_t), dimension(:)    :: iNC_Start
   integer (c_size_t), dimension(:)    :: iNC_Count
-  integer (c_ptrdiff_t), dimension(:) :: iNC_Stride
+  integer (c_size_t), dimension(:) :: iNC_Stride
   integer (c_int), dimension(:)       :: iNC_Vars
 
   call nf_trap(nc_get_vars_int(ncid=NCFILE%iNCID, &
@@ -2432,7 +2431,7 @@ subroutine nf_get_variable_vector_int(NCFILE, iNC_VarID, iNC_Start, iNC_Count, &
   integer (c_int) :: iNC_VarID
   integer (c_size_t) :: iNC_Start
   integer (c_size_t) :: iNC_Count
-  integer (c_ptrdiff_t) :: iNC_Stride
+  integer (c_size_t) :: iNC_Stride
   integer (c_int), dimension(:) :: iNC_Vars
 
   call nf_trap(nc_get_vars_int(ncid=NCFILE%iNCID, &
@@ -2495,7 +2494,7 @@ subroutine nf_get_variable_array_as_vector_double(NCFILE, iNC_VarID, iNC_Start, 
   integer (c_int) :: iNC_VarID
   integer (c_size_t), dimension(:) :: iNC_Start
   integer (c_size_t), dimension(:) :: iNC_Count
-  integer (c_ptrdiff_t), dimension(:) :: iNC_Stride
+  integer (c_size_t), dimension(:) :: iNC_Stride
   real (c_double), dimension(:) :: dpNC_Vars
 
   call nf_trap(nc_get_vars_double(ncid=NCFILE%iNCID, &
@@ -2516,7 +2515,7 @@ subroutine nf_get_variable_vector_float(NCFILE, iNC_VarID, iNC_Start, iNC_Count,
   integer (c_int) :: iNC_VarID
   integer (c_size_t) :: iNC_Start
   integer (c_size_t) :: iNC_Count
-  integer (c_ptrdiff_t) :: iNC_Stride
+  integer (c_size_t) :: iNC_Stride
   real (c_float), dimension(:) :: rNC_Vars
 
   call nf_trap(nc_get_vars_float(ncid=NCFILE%iNCID, &
@@ -2537,7 +2536,7 @@ subroutine nf_get_variable_array_float(NCFILE, iNC_VarID, iNC_Start, iNC_Count, 
   integer (c_int) :: iNC_VarID
   integer (c_size_t), dimension(:) :: iNC_Start
   integer (c_size_t), dimension(:) :: iNC_Count
-  integer (c_ptrdiff_t), dimension(:) :: iNC_Stride
+  integer (c_size_t), dimension(:) :: iNC_Stride
   real (c_float), dimension(:,:) :: rNC_Vars
 
   call nf_trap(nc_get_vars_float(ncid=NCFILE%iNCID, &
@@ -2558,7 +2557,7 @@ subroutine nf_get_variable_array_as_vector_float(NCFILE, iNC_VarID, iNC_Start, i
   integer (c_int) :: iNC_VarID
   integer (c_size_t), dimension(:) :: iNC_Start
   integer (c_size_t), dimension(:) :: iNC_Count
-  integer (c_ptrdiff_t), dimension(:) :: iNC_Stride
+  integer (c_size_t), dimension(:) :: iNC_Stride
   real (c_float), dimension(:) :: rNC_Vars
 
   call nf_trap(nc_get_vars_float(ncid=NCFILE%iNCID, &
@@ -3873,7 +3872,7 @@ subroutine nf_put_x_and_y(NCFILE, dpX, dpY)
                    iVarID=NCFILE%pNC_VAR(NC_X)%iNC_VarID, &
                    iStart=[0_c_size_t], &
                    iCount=[iLength], &
-                   iStride=[1_c_ptrdiff_t], &
+                   iStride=[1_c_size_t], &
                    dpValues=dpX)
 
   iLength = int(size(dpY, 1), c_size_t)
@@ -3882,7 +3881,7 @@ subroutine nf_put_x_and_y(NCFILE, dpX, dpY)
                    iVarID=NCFILE%pNC_VAR(NC_Y)%iNC_VarID, &
                    iStart=[0_c_size_t], &
                    iCount=[iLength], &
-                   iStride=[1_c_ptrdiff_t], &
+                   iStride=[1_c_size_t], &
                    dpValues=dpY)
 
 end subroutine nf_put_x_and_y
@@ -3905,7 +3904,7 @@ subroutine nf_put_lat_and_lon(NCFILE, dpLat, dpLon)
                    iVarID=NCFILE%pNC_VAR(NC_LAT)%iNC_VarID, &
                    iStart=[0_c_size_t, 0_c_size_t], &
                    iCount=[ iNY, iNX ], &
-                   iStride=[1_c_ptrdiff_t,1_c_ptrdiff_t], &
+                   iStride=[1_c_size_t,1_c_size_t], &
                    dpValues=dpLat)
 
 
@@ -3913,7 +3912,7 @@ subroutine nf_put_lat_and_lon(NCFILE, dpLat, dpLon)
                    iVarID=NCFILE%pNC_VAR(NC_LON)%iNC_VarID, &
                    iStart=[0_c_size_t, 0_c_size_t], &
                    iCount=[ iNY, iNX ],&
-                   iStride=[1_c_ptrdiff_t,1_c_ptrdiff_t], &
+                   iStride=[1_c_size_t,1_c_size_t], &
                    dpValues=dpLon)
 
 end subroutine nf_put_lat_and_lon
@@ -4201,7 +4200,7 @@ subroutine netcdf_put_variable_array(NCFILE, iVarID, iStart, iCount, iStride, &
   integer (c_int) :: iVarID
   integer (c_size_t), dimension(:) :: iStart
   integer (c_size_t), dimension(:) :: iCount
-  integer (c_ptrdiff_t), dimension(:) :: iStride
+  integer (c_size_t), dimension(:) :: iStride
   integer (c_int), dimension(:,:), optional :: iValues
   integer (c_short), dimension(:,:), optional :: i2Values
   real (c_float), dimension(:,:), optional :: rValues
@@ -4260,7 +4259,7 @@ subroutine netcdf_put_packed_variable_array(NCFILE, iVarID, iStart, iCount, iStr
   integer (c_int) :: iVarID
   integer (c_size_t), dimension(:)            :: iStart
   integer (c_size_t), dimension(:)            :: iCount
-  integer (c_ptrdiff_t), dimension(:)         :: iStride
+  integer (c_size_t), dimension(:)         :: iStride
   logical (c_bool), dimension(:,:)            :: lMask
   integer (c_int), dimension(:), optional     :: iValues
   integer (c_int), dimension(:,:), optional   :: iField
@@ -4323,7 +4322,7 @@ subroutine netcdf_put_variable_vector(NCFILE, iVarID, iStart, iCount, iStride, &
   integer (c_int) :: iVarID
   integer (c_size_t), dimension(:) :: iStart
   integer (c_size_t), dimension(:) :: iCount
-  integer (c_ptrdiff_t), dimension(:) :: iStride
+  integer (c_size_t), dimension(:) :: iStride
   integer (c_int), dimension(:), optional :: iValues
   integer (c_short), dimension(:), optional :: i2Values
   real (c_float), dimension(:), optional :: rValues

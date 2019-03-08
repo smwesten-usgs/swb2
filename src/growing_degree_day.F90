@@ -16,12 +16,6 @@ module growing_degree_day
   public :: GDD_BASE, GDD_MAX, GDD_RESET_DATE
   public :: growing_degree_day_calculate, growing_degree_day_initialize
 
-  ! supply apparently missing parameter values from Intel implementation of ISO_C_BINDING
-#ifdef __INTEL_COMPILER
-  integer, parameter :: c_ptrdiff_t = 8
-  integer, parameter :: c_diff_t = 8
-#endif
-
   real (c_float), allocatable  :: GDD_BASE(:)
   real (c_float), allocatable  :: GDD_MAX(:)
   integer (c_int), allocatable :: GDD_RESET_DATE(:)

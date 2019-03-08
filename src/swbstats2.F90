@@ -24,12 +24,6 @@ program swbstats2
 
   implicit none
 
-! supply apparently missing parameter values from Intel implementation of ISO_C_BINDING
-#ifdef __INTEL_COMPILER
-  integer, parameter :: c_ptrdiff_t = 8
-  integer, parameter :: c_diff_t = 8
-#endif
-
   integer (c_size_t)          :: RECNUM = 0
 
   character (len=256)              :: temp_string, sub_string
@@ -866,7 +860,7 @@ contains
            iVarID=ncfile_out%iVarID(NC_TIME),                                     &
            iStart=[ RECNUM ],                                                     &
            iCount=[1_c_size_t],                                                   &
-           iStride=[1_c_ptrdiff_t],                                               &
+           iStride=[1_c_size_t],                                               &
            dpValues=[ ( start_bnd + end_bnd ) / 2.0_c_double ] )
     !       dpValues=[ real( SIM_DT%iNumDaysFromOrigin, c_double) ] )
 
@@ -874,14 +868,14 @@ contains
        !    iVarID=TIME_BNDS_VARID,                                                 &
        !    iStart=[ RECNUM ,0_c_size_t],                                           &
        !    iCount=[1_c_size_t,2_c_size_t],                                         &
-       !    iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t],                                 &
+       !    iStride=[1_c_size_t, 1_c_size_t],                                 &
        !    dpValues=[ start_bnd, end_bnd ] )
 
         call netcdf_put_variable_array(NCFILE=ncfile_out,                         &
            iVarID=ncfile_out%iVarID(NC_Z),                                        &
            iStart=[ RECNUM , 0_c_size_t, 0_c_size_t],                             &
            iCount=[ 1_c_size_t, ny, nx ],                                         &
-           iStride=[1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t],                 &
+           iStride=[1_c_size_t, 1_c_size_t, 1_c_size_t],                 &
            rValues=real(grid_ptr%dpData, kind=c_float) )
 
       endif

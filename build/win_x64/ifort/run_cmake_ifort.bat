@@ -20,7 +20,7 @@ set Fortran_COMPILER_NAME=ifort
 set CMAKE_C_COMPILER=icl
 set NETCDF_VERSION='netCDF 4.6.1'
 
-set VERBOSE=1
+set VERBOSE=0
 
 set MAKE_EXECUTABLE_NAME=nmake
 

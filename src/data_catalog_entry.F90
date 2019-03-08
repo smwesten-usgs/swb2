@@ -20,12 +20,6 @@ module data_catalog_entry
 
   private
 
-  ! supply apparently missing parameter values from Intel implementation of ISO_C_BINDING
-#ifdef __INTEL_COMPILER
-  integer, parameter :: c_ptrdiff_t = 8
-  integer, parameter :: c_diff_t = 8
-#endif
-
   integer (c_int), public, parameter :: NETCDF_FILE_OPEN = 27
   integer (c_int), public, parameter :: NETCDF_FILE_CLOSED = 42
 
@@ -1625,7 +1619,7 @@ end subroutine set_constant_value_real
        iVarID=this%NCFILE_ARCHIVE%iVarID(NC_Z), &
        iStart=[iNumRecs, 0_c_size_t, 0_c_size_t], &
        iCount=[1_c_size_t, iNumRows, iNumCols], &
-       iStride=[1_c_ptrdiff_t,1_c_ptrdiff_t,1_c_ptrdiff_t], &
+       iStride=[1_c_size_t,1_c_size_t,1_c_size_t], &
        rValues=this%pGrdNative%rData)
 
     call netcdf_put_variable_vector(NCFILE=this%NCFILE_ARCHIVE, &

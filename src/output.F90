@@ -9,12 +9,6 @@ module output
   use strings, only               : asCharacter
   implicit none
 
-! supply apparently missing parameter values from Intel implementation of ISO_C_BINDING
-#ifdef __INTEL_COMPILER
-  integer, parameter :: c_ptrdiff_t = 8
-  integer, parameter :: c_diff_t = 8
-#endif
-
   real( c_double ), allocatable      :: RECHARGE_ARRAY(:)
 
   type, public :: NETCDF_FILE_COLLECTION_T
@@ -303,7 +297,7 @@ contains
        iVarID=ncfile_ptr%iVarID(NC_TIME),                                      &
        iStart=[int(SIM_DT%iNumDaysFromOrigin, c_size_t)],                 &
        iCount=[1_c_size_t],                                                    &
-       iStride=[1_c_ptrdiff_t],                                                &
+       iStride=[1_c_size_t],                                                &
        dpValues=[real(SIM_DT%iNumDaysFromOrigin, c_double)])
 
   call netcdf_put_packed_variable_array(NCFILE=ncfile_ptr,                     &
@@ -312,7 +306,7 @@ contains
                 0_c_size_t, 0_c_size_t ],                                      &
         iCount=[ 1_c_size_t, int(cells%number_of_rows, c_size_t),         &
                 int(cells%number_of_columns, c_size_t) ],                 &
-        iStride=[ 1_c_ptrdiff_t, 1_c_ptrdiff_t, 1_c_ptrdiff_t ],               &
+        iStride=[ 1_c_size_t, 1_c_size_t, 1_c_size_t ],               &
         lMask=cells%active,                                                    &
         rValues=values,                                                        &
         rField=cells%nodata_fill_value )
@@ -346,7 +340,7 @@ contains
              iVarID=NC_OUT(iIndex)%ncfile%iVarID(NC_TIME), &
              iStart=[int(SIM_DT%iNumDaysFromOrigin, c_size_t)], &
              iCount=[1_c_size_t], &
-             iStride=[1_c_ptrdiff_t], &
+             iStride=[1_c_size_t], &
              dpValues=[real(SIM_DT%iNumDaysFromOrigin, c_double)])
 
         endif
@@ -569,7 +563,7 @@ contains
            iVarID=NC_MULTI_SIM_OUT(iIndex, simulation_number)%ncfile%iVarID(NC_TIME),  &
            iStart=[int(SIM_DT%iNumDaysFromOrigin, c_size_t)],                     &
            iCount=[1_c_size_t],                                                        &
-           iStride=[1_c_ptrdiff_t],                                                    &
+           iStride=[1_c_size_t],                                                    &
            dpValues=[real(SIM_DT%iNumDaysFromOrigin, c_double)])
 
       endif

@@ -27,12 +27,6 @@ module direct_soil_moisture__gridded_data
 
   public :: direct_soil_moisture_initialize, direct_soil_moisture_calculate
 
-  ! supply apparently missing parameter values from Intel implementation of ISO_C_BINDING
-#ifdef __INTEL_COMPILER
-  integer, parameter :: c_ptrdiff_t = 8
-  integer, parameter :: c_diff_t = 8
-#endif
-
   type (DATA_CATALOG_ENTRY_T), pointer :: pSEPTIC_DISCHARGE
   type (DATA_CATALOG_ENTRY_T), pointer :: pANNUAL_SEPTIC_DISCHARGE
 

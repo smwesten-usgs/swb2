@@ -29,12 +29,6 @@ module maximum_net_infiltration__gridded_data
 
   public :: maximum_net_infiltration_initialize, maximum_net_infiltration_calculate
 
-  ! supply apparently missing parameter values from Intel implementation of ISO_C_BINDING
-#ifdef __INTEL_COMPILER
-  integer, parameter :: c_ptrdiff_t = 8
-  integer, parameter :: c_diff_t = 8
-#endif
-
   type (DATA_CATALOG_ENTRY_T), pointer :: pMAXIMUM_NET_INFILTRATION
   real (c_float), allocatable     :: fMAXIMUM_NET_INFILTRATION(:)
   real (c_float), allocatable     :: fMAXIMUM_NET_INFILTRATION_ARRAY(:,:)

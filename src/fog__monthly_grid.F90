@@ -27,12 +27,6 @@ module fog__monthly_grid
 
   public :: fog_monthly_grid_initialize, fog_monthly_grid_calculate, pFOG_RATIO
 
-  ! supply apparently missing parameter values from Intel implementation of ISO_C_BINDING
-#ifdef __INTEL_COMPILER
-  integer, parameter :: c_ptrdiff_t = 8
-  integer, parameter :: c_diff_t = 8
-#endif
-
   type (DATA_CATALOG_ENTRY_T), pointer :: pFOG_RATIO
   real (c_float), allocatable     :: fFOG_CATCH_EFFICIENCY(:)
 
