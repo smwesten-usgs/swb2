@@ -509,11 +509,11 @@ contains
     ! [ LOCALS ]
     integer (c_int)             :: iIndex
     integer (c_int)             :: iStat
-    character (len=256)              :: sText
+    character (len=256)         :: sText
     integer (c_int)             :: iNumCols
-    type (STRING_LIST_T)             :: slList
+    type (STRING_LIST_T)        :: slList
     real (c_float), allocatable :: fTempVal(:)
-    logical (c_bool) :: lFatal_l
+    logical (c_bool)            :: lFatal_l
 
     if ( present (lFatal) ) then
       lFatal_l = lFatal

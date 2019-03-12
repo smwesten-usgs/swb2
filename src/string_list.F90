@@ -32,10 +32,9 @@ module string_list
   type STRING_LIST_T
 
     type (STRING_LIST_ELEMENT_T), pointer        :: first        => null()
-    type (STRING_LIST_ELEMENT_T), pointer        :: last         => null()
-    logical (c_bool)                        :: autocleanup  = TRUE
-    integer (c_int)                         :: count        = 0
-    logical (c_bool)                        :: is_populated = FALSE
+    logical (c_bool)                             :: autocleanup  = TRUE
+    integer (c_int)                              :: count        = 0
+    logical (c_bool)                             :: is_populated = FALSE
 
   contains
 
@@ -89,7 +88,7 @@ contains
   subroutine list_append_int_sub( this, iValue )
 
     class (STRING_LIST_T), intent(inout)   :: this
-    integer (c_int), intent(in)       :: iValue
+    integer (c_int), intent(in)            :: iValue
 
     call this%list_append_string_sub( asCharacter(iValue) )
 
@@ -136,35 +135,48 @@ contains
     character (len=*), intent(in) :: sText
 
     ! [ LOCALS ]
-    type (STRING_LIST_ELEMENT_T), pointer   :: pNewElement
+    type (STRING_LIST_ELEMENT_T), pointer   :: new_element
+    type (STRING_LIST_ELEMENT_T), pointer   :: current
+    type (STRING_LIST_ELEMENT_T), pointer   :: previous
+
     integer (c_int)                     :: iStat
 
-    pNewElement => null()
+    new_element => null()
+    current => null()
+    previous => null()
 
-    allocate(pNewElement, stat=iStat)
+    ! create memory for new list element; assign text to list element
+    allocate(new_element, stat=iStat)
     call assert(iStat == 0, "There was a problem allocating memory for a new string list element", &
         __SRCNAME__, __LINE__)
 
-    pNewElement%s    = trim( sText )
+    new_element%s    = trim( sText )
+    new_element%next => null()
 
-    pNewElement%next => null()
+    ! start at beginning of linked list
+    current => this%first
 
-    if (associated( this%first ) ) then
+    if (associated( current ) ) then
 
       if (this%count == 0)  call die("Internal logic error: count should *not* be zero in this block", &
           __SRCNAME__, __LINE__)
 
-      !      pOldLastElement => this%last
-      !      pOldLastElement%next => pNewElement
+      do while (associated(current) )
 
-      this%last%next => pNewElement
-      this%last      => pNewElement
-      this%last%next => null()
+        previous => current
+        current => current%next
 
+      enddo
+
+      call assert(.not. associated(previous%next), "Target pointer in string"   &
+        //" list is already associated.", __SRCNAME__, __LINE__)
+      ! current element should be a null pointer
+      previous%next => new_element
+
+    ! no elements present in the list; begin with a single element
     else
 
-      this%first => pNewElement
-      this%last  => pNewElement
+      this%first     => new_element
 
     endif
 
@@ -841,8 +853,6 @@ contains
     this%count = 0
 
     this%first => null()
-
-    this%last => null()
 
   end subroutine list_items_deallocate_all_sub
 
