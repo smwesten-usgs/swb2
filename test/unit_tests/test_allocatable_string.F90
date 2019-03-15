@@ -32,8 +32,8 @@ contains
     integer (kind=c_int)                  :: column_count
     type (STRING_LIST_T)                  :: stList
 
-    sBuf = '“Begin at the beginning," the King said, very gravely, '           &
-      //'"and go on till you come to the end: then stop.”'
+    sBuf = '"Begin at the beginning," the King said, very gravely, '           &
+      //'"and go on till you come to the end: then stop."'
 
     column_count = 0
 

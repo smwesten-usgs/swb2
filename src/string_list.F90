@@ -131,7 +131,7 @@ contains
 
   subroutine list_append_string_sub( this, sText )
 
-    class (STRING_LIST_T), intent(inout)   :: this
+    class (STRING_LIST_T)         :: this
     character (len=*), intent(in) :: sText
 
     ! [ LOCALS ]
@@ -140,10 +140,13 @@ contains
     type (STRING_LIST_ELEMENT_T), pointer   :: previous
 
     integer (c_int)                     :: iStat
+    integer (c_int)                     :: iter_num
 
     new_element => null()
     current => null()
     previous => null()
+
+    iter_num = 0
 
     ! create memory for new list element; assign text to list element
     allocate(new_element, stat=iStat)
@@ -156,6 +159,13 @@ contains
     ! start at beginning of linked list
     current => this%first
 
+! print *, "line number ", __LINE__
+! print *, "-------"
+! print *, "sText: ", squote(sText)
+! print *, "associated(this%first)? ", associated(this%first)
+! if (associated(this%first) ) print *, "  associated(this%first%next)? ", associated(this%first%next)
+! print *, "associated(current)? ", associated(current)
+
     if (associated( current ) ) then
 
       if (this%count == 0)  call die("Internal logic error: count should *not* be zero in this block", &
@@ -163,9 +173,39 @@ contains
 
       do while (associated(current) )
 
+        iter_num = iter_num + 1
+
+        ! print *, "=> iter_num: ", iter_num
+        ! print *, "   before reassignment..."
+        ! print *, "     associated(current)? ", associated(current)
+        ! if (associated(current) ) then
+        !   print *, "     current%s      : ", squote(current%s)
+        ! else
+        !   print *, "     current%s      : ***"
+        ! endif
+        ! print *, "     associated(current%next)? ", associated(current%next)
+
         previous => current
         current => current%next
 
+        ! print *, "   after reassignment..."
+        ! print *, "     associated(current)? ", associated(current)
+        ! if (associated(current) ) then
+        !   print *, "     current%s: ", squote(current%s)
+        !   print *, "     associated(current%next)? ", associated(current%next)
+        ! else
+        !   print *, "     current%s      : ***"
+        !   print *, "     current%next   : <undef>"
+        ! endif
+        !
+        ! print *, "     associated(previous)? ", associated(previous)
+        ! if (associated(previous) ) then
+        !   print *, "     previous%s     : ", squote(previous%s)
+        ! else
+        !   print *, "     previous%s     : ***"
+        ! endif
+        ! print *, "     associated(previous%next)? ", associated(previous%next)
+        !
       enddo
 
       call assert(.not. associated(previous%next), "Target pointer in string"   &
@@ -182,6 +222,13 @@ contains
 
     this%count = this%count + 1
     this%is_populated = TRUE
+
+    ! print *, "line number ", __LINE__
+    ! print *, "-------"
+    ! print *, "associated(this%first)? ", associated(this%first)
+    ! if (associated(this%first) ) print *, "  associated(this%first%next)? ", associated(this%first%next)
+    ! if (associated(this%first) ) print *, "  this%first%s: ", squote(this%first%s)
+    ! print *, "associated(current)? ", associated(current)
 
   end subroutine list_append_string_sub
 
@@ -249,9 +296,9 @@ contains
 
     if (associated(current) ) then
 
-      if ( allocated( current%s) )  then
+!      if ( allocated( current%s) )  then
         sText = current%s
-      endif
+!      endif
 
     endif
 

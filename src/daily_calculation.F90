@@ -190,6 +190,10 @@ contains
     ! !                      + cells%actual_et_interception * cells%canopy_cover_fraction             &
     !                       + actual_et_impervious * ( 1.0_c_float - pervious_fraction )
 
+        ! we cannot allow more actual ET to occur in excess of reference ET
+        ! after accounting for evaporation of interception
+        actual_et_soil = max( min( actual_et_soil, reference_ET0 - actual_et_interception), 0.0_c_float )
+
         call calculate_soil_mass_balance( net_infiltration=net_infiltration,             &
                                           soil_storage=soil_storage,                     &
                                           soil_storage_max=soil_storage_max,             &

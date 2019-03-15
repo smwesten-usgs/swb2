@@ -51,7 +51,6 @@ set CMAKE_Fortran_FLAGS_DEBUG="/Od /fpp /MTd /debug:full /check:all /traceback"
 set CMAKE_Fortran_FLAGS_RELEASE="/O2 /QxHost /MT /fpp /traceback"
 set CMAKE_C_FLAGS_DEBUG="/Od /MTd /debug:full"
 set CMAKE_C_FLAGS_RELEASE="/O2 /QxHost /MT"
-set CMAKE_GENERATOR_PLATFORM="x64"
 ::set CMAKE_EXE_LINKER_FLAGS='/NODEFAULTLIB:"LIBCMT"'
 ::set LINKER_FLAGS="/nodefaultlib:vcomp"
 
@@ -71,7 +70,6 @@ cmake ..\..\.. -G %%i ^
 -DCMAKE_Fortran_FLAGS_DEBUG=%CMAKE_Fortran_FLAGS_DEBUG%       ^
 -DCMAKE_Fortran_FLAGS_RELEASE=%CMAKE_Fortran_FLAGS_RELEASE%   ^
 -DCMAKE_EXE_LINKER_FLAGS=%CMAKE_EXE_LINKER_FLAGS%             ^
--DCMAKE_GENERATOR_PLATFORM=%CMAKE_GENERATOR_PLATFORM%         ^
 -DCMAKE_C_FLAGS_DEBUG=%CMAKE_C_FLAGS_DEBUG%                   ^
 -DCMAKE_C_FLAGS_RELEASE=%CMAKE_C_FLAGS_RELEASE%
 
