@@ -911,10 +911,14 @@ contains
 
       if ( output_files(stat_indx)%write_arcgrid) then
 
-        if ( options%annualize_stats .and. stat_indx == STATS_SUM ) then
-          units_string = asUppercase(trim(options%netcdf_variable_units_string)//"_per_year")
+        if ( options%annualize_stats .and. stat_indx == STATS_SUM) then
+          units_string = trim(options%netcdf_variable_units_string)//", per year"
+        elseif (options%report_as_volume) then
+          units_string = "cubic meters"
+        elseif (options%report_in_meters) then
+          units_string = "meters"
         else
-          units_string = asUppercase(options%netcdf_variable_units_string)
+          units_string = trim(options%netcdf_variable_units_string)
         endif
 
         call replace(units_string, ' ', '_' )
