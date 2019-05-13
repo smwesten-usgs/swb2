@@ -81,8 +81,8 @@ IRRIGATION_MASK_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9
 %% specify location and names for all lookup tables
 ---------------------------------------------------
 
-LAND_USE_LOOKUP_TABLE std_input/Landuse_lookup_CDL.txt
-IRRIGATION_LOOKUP_TABLE std_input/Irrigation_lookup_CDL.txt
+LAND_USE_LOOKUP_TABLE ../../../test_data/tables/Landuse_lookup_CDL.txt
+IRRIGATION_LOOKUP_TABLE ../../../test_data/tables/Irrigation_lookup_CDL.txt
 
 %% initial conditions for soil moisture and snow storage amounts
 %% may be specified as grids, but using a constant amount and

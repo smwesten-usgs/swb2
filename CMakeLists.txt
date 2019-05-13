@@ -23,7 +23,7 @@ message("Processing top-level CMakelists.txt for project swb2")
 set(SWB_MAJOR_VERSION "2")
 set(SWB_MINOR_VERSION "0")
 
-include( CMakeForceCompiler )
+#include( CMakeForceCompiler )
 
 #------------------------------------------------------------------------------------#
 #                           Build directory check                                    #

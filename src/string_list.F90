@@ -285,7 +285,7 @@ contains
 
     current => this%first
 
-    do while ( associated( current ) .and. ( iCount <= this%count ) )
+    do while ( associated( current ) )
 
       if (iCount == iIndex)  exit
       current => current%next

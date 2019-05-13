@@ -37,7 +37,7 @@ program main
   character (len=256)            :: sOutputDirectoryName
   character (len=256)            :: sDataDirectoryName
   character (len=256)            :: sWeatherDataDirectoryName
-  integer (c_int)           :: iNumArgs
+  integer (c_int)                :: iNumArgs
   character (len=1024)           :: sCompilerOptions
   character (len=256)            :: sCompilerVersion
   character (len=256)            :: sCompilerName
@@ -46,10 +46,10 @@ program main
   character (len=256)            :: sCompilationSystemString
   character (len=256)            :: sExecutableDescription
   character (len=256)            :: sGitHashString
-  integer (c_int)           :: iCount
-  integer (c_int)           :: iIndex
-  integer (c_int)           :: iLen
-  integer (c_int)           :: number_of_simulations
+  integer (c_int)                :: iCount
+  integer (c_int)                :: iIndex
+  integer (c_int)                :: iLen
+  integer (c_int)                :: number_of_simulations
 
   type (TIMER_T)                 :: runtimer
 
@@ -71,7 +71,8 @@ program main
   sExecutableDescription = "USGS Soil-Water-Balance Code version "//trim( sVersionString )
 
   if (     (SYSTEM_NAME .containssimilar. "Windows")                           &
-      .or. (SYSTEM_NAME .containssimilar. "Mingw") ) then
+      .or. (SYSTEM_NAME .containssimilar. "Mingw")                             &
+      .or. (sCompilerVersion .containssimilar. "Windows")) then
     OS_NATIVE_PATH_DELIMITER = "\"
   else
     OS_NATIVE_PATH_DELIMITER = "/"
@@ -80,13 +81,13 @@ program main
   sGitHashString = trim( adjustl(GIT_BRANCH_STRING ) )//", "//trim( GIT_COMMIT_HASH_STRING )
 
 #ifdef __GFORTRAN__
-  sCompilerName = "gfortran"
+  sCompilerName = "gfortran" // trim(sCompilerVersion)
 #endif
 
 #ifdef __INTEL_COMPILER
   ! populate with empty string, since for Intel the COMPILER_VERSION string contains
   ! the compiler name already
-  sCompilerName = ""
+  sCompilerName = trim(sCompilerVersion)
 !  write(UNIT=*,FMT="(a,/)") "compiler build date:"//TRIM(asCharacter(__INTEL_COMPILER_BUILD_DATE))
 #endif
 
@@ -99,7 +100,7 @@ program main
   write(unit=*, fmt="(/,a)") repeat("-",iCount + 4)
   write(UNIT=*,FMT="(2x,a,/)") trim(sExecutableDescription)
   write(UNIT=*,FMT="(a24,a)") "compiled on : ", trim( sCompilationDateString )
-  write(UNIT=*,FMT="(a24,a)") "compiled with : ", trim( sCompilerName )//", "//trim(sCompilerVersion)
+  write(UNIT=*,FMT="(a24,a)") "compiled with : ", trim( sCompilerName )
   write(UNIT=*,FMT="(a24,a)") "compiled for : ",trim( sCompilationSystemString )
   write(UNIT=*,FMT="(a24,a)") "git hash and branch : ", trim( sGitHashString )
   write(unit=*, fmt="(a,/)") repeat("-",iCount + 4)
