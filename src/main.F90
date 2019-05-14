@@ -88,6 +88,7 @@ program main
   ! populate with empty string, since for Intel the COMPILER_VERSION string contains
   ! the compiler name already
   sCompilerName = trim(sCompilerVersion)
+  sCompilerVersion = ""
 !  write(UNIT=*,FMT="(a,/)") "compiler build date:"//TRIM(asCharacter(__INTEL_COMPILER_BUILD_DATE))
 #endif
 

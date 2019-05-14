@@ -794,7 +794,7 @@ contains
 
     character (len=*), intent(in)              :: sFilename
     character (len=*), intent(in), optional    :: sGridSpecification
-    type (STRING_LIST_T), intent(in), optional :: slExtraDirectives
+    type (STRING_LIST_T), optional             :: slExtraDirectives
 
     ! [ LOCALS ]
     character (len=256)             :: sRecord, sSubstring

@@ -1046,7 +1046,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)   :: this
     character (len=*), intent(in)           :: sCmdText
-    type (STRING_LIST_T), intent(in)        :: argv_list
+    type (STRING_LIST_T)                    :: argv_list
 
     ! [ LOCALS ]
     integer (c_int)              :: indx

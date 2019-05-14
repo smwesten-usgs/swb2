@@ -11,11 +11,10 @@ module string_list
   private
 
   public :: STRING_LIST_T, create_list
-
-  public :: assignment(=)
-  interface assignment(=)
-    module procedure :: assign_string_list_to_string_list_sub
-  end interface assignment(=)
+  ! public :: assignment(=)
+  ! interface assignment(=)
+  !   module procedure :: assign_string_list_to_string_list_sub
+  ! end interface assignment(=)
 
   interface create_list
     procedure :: list_from_delimited_string_fn
@@ -58,10 +57,12 @@ module string_list
     procedure :: list_return_all_as_character_fn
     procedure :: list_subset_partial_matches_fn
     procedure :: list_set_auto_cleanup_sub
+    procedure :: copy_string_list_to_string_list_fn
     final     :: list_finalize_sub
 
     generic :: append            => list_append_string_sub,                   &
                                     list_append_int_sub
+    generic :: copy_list         => copy_string_list_to_string_list_fn
     generic :: get               => list_get_value_at_index_fn,               &
                                     list_get_values_in_range_fn
     generic :: replace           => list_replace_value_at_index_sub
@@ -107,25 +108,29 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-  subroutine assign_string_list_to_string_list_sub(slList2, slList1)
+  function copy_string_list_to_string_list_fn(this)   result(slList2)
 
-    type (STRING_LIST_T), intent(out)   :: slList2
-    type (STRING_LIST_T), intent(in)    :: slList1
+    class (STRING_LIST_T)         :: this
+    type (STRING_LIST_T)          :: slList2
 
     ! [ LOCALS ]
     integer (c_int) :: iIndex
 
-    if ( slList1%count > 0 ) then
+    if ( this%count > 0 ) then
 
-      do iIndex=1, slList1%count
+      do iIndex=1, this%count
 
-        call slList2%append( slList1%get(iIndex) )
+        call slList2%append( this%get(iIndex) )
 
       enddo
 
-    endif
+     else
 
-  end subroutine assign_string_list_to_string_list_sub
+       call slList2%append("<NA>")
+
+     endif
+
+  end function copy_string_list_to_string_list_fn
 
   !------------------------------------------------------------------------------
 
@@ -236,9 +241,9 @@ contains
 
   subroutine list_replace_value_at_index_sub(this, iIndex, sText)
 
-    class (STRING_LIST_T), intent(in)        :: this
-    integer (c_int), intent(in)         :: iIndex
-    character (len=*), intent(in)            :: sText
+    class (STRING_LIST_T), intent(inout)        :: this
+    integer (c_int), intent(in)                 :: iIndex
+    character (len=*), intent(in)               :: sText
 
     ! [ LOCALS ]
     integer (c_int)                      :: iCount
@@ -273,12 +278,12 @@ contains
 
   function list_get_value_at_index_fn(this, iIndex)   result(sText)
 
-    class (STRING_LIST_T), intent(in)        :: this
-    integer (c_int), intent(in)         :: iIndex
-    character (len=:), allocatable           :: sText
+    class (STRING_LIST_T), intent(inout)        :: this
+    integer (c_int), intent(in)                 :: iIndex
+    character (len=:), allocatable              :: sText
 
     ! [ LOCALS ]
-    integer (c_int)                      :: iCount
+    integer (c_int)                          :: iCount
     type (STRING_LIST_ELEMENT_T), pointer    :: current => null()
 
     iCount = 1
@@ -309,10 +314,10 @@ contains
   !> Iterate over a range of indices; return a space-delimited string comprised of the values.
   function list_get_values_in_range_fn(this, iStartIndex, iEndIndex)   result(sText)
 
-    class (STRING_LIST_T), intent(in)        :: this
-    integer (c_int), intent(in)         :: iStartIndex
-    integer (c_int), intent(in)         :: iEndIndex
-    character (len=:), allocatable           :: sText
+    class (STRING_LIST_T), intent(inout)        :: this
+    integer (c_int), intent(in)                 :: iStartIndex
+    integer (c_int), intent(in)                 :: iEndIndex
+    character (len=:), allocatable              :: sText
 
     ! [ LOCALS ]
     integer (c_int)                      :: iCount
@@ -353,8 +358,8 @@ contains
 
     use iso_fortran_env, only : OUTPUT_UNIT
 
-    class (STRING_LIST_T), intent(in)     :: this
-    integer (c_int), optional        :: iLU
+    class (STRING_LIST_T), intent(inout)     :: this
+    integer (c_int), optional                :: iLU
 
     ! [ LOCALS ]
     type (STRING_LIST_ELEMENT_T), pointer    :: current => null()

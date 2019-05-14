@@ -501,9 +501,9 @@ end function find_dict_entry_fn
   subroutine get_values_as_int_sub(this, sKey, iValues, is_fatal )
 
     class (DICT_T)                                  :: this
-    character (len=*), intent(in)                   :: sKey
-    integer (c_int), allocatable, intent(out)  :: iValues(:)
-    logical (c_bool), optional                 :: is_fatal
+    character (len=*)                               :: sKey
+    integer (c_int), allocatable, intent(out)       :: iValues(:)
+    logical (c_bool), optional                      :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
@@ -550,7 +550,7 @@ end function find_dict_entry_fn
   subroutine get_values_as_logical_sub(this, sKey, lValues, is_fatal)
 
     class (DICT_T)                                   :: this
-    character (len=*), intent(in)                    :: sKey
+    character (len=*)                                :: sKey
     logical (c_bool), allocatable, intent(out)  :: lValues(:)
     logical (c_bool), optional                 :: is_fatal
 
@@ -608,9 +608,9 @@ end function find_dict_entry_fn
   subroutine get_values_as_logical_given_list_of_keys_sub(this, slKeys, lValues, is_fatal)
 
     class (DICT_T)                                     :: this
-    type (STRING_LIST_T), intent(in)                   :: slKeys
-    logical (c_bool), allocatable, intent(out)    :: lValues(:)
-    logical (c_bool), optional                    :: is_fatal
+    type (STRING_LIST_T)                               :: slKeys
+    logical (c_bool), allocatable, intent(out)         :: lValues(:)
+    logical (c_bool), optional                         :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
@@ -671,9 +671,9 @@ end function find_dict_entry_fn
   subroutine get_values_as_string_list_given_list_of_keys_sub(this, slKeys, slString, is_fatal )
 
     class (DICT_T)                                     :: this
-    type (STRING_LIST_T), intent(in)                   :: slKeys
+    type (STRING_LIST_T)                               :: slKeys
     type ( STRING_LIST_T ), intent(out)                :: slString
-    logical (c_bool), optional                    :: is_fatal
+    logical (c_bool), optional                         :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
@@ -821,9 +821,9 @@ end function find_dict_entry_fn
   subroutine get_values_as_int_given_list_of_keys_sub(this, slKeys, iValues, is_fatal)
 
     class (DICT_T)                                     :: this
-    type (STRING_LIST_T), intent(in)                   :: slKeys
-    integer (c_int), allocatable, intent(out)     :: iValues(:)
-    logical (c_bool), optional                    :: is_fatal
+    type (STRING_LIST_T)                               :: slKeys
+    integer (c_int), allocatable, intent(out)          :: iValues(:)
+    logical (c_bool), optional                         :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
@@ -895,9 +895,9 @@ end function find_dict_entry_fn
   subroutine get_values_as_float_given_list_of_keys_sub(this, slKeys, fValues, is_fatal)
 
     class (DICT_T)                                    :: this
-    type (STRING_LIST_T), intent(in)                  :: slKeys
-    real (c_float), allocatable, intent(out)     :: fValues(:)
-    logical (c_bool), optional                   :: is_fatal
+    type (STRING_LIST_T)                              :: slKeys
+    real (c_float), allocatable, intent(out)          :: fValues(:)
+    logical (c_bool), optional                        :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
