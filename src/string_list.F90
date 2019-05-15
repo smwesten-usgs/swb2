@@ -158,65 +158,24 @@ contains
     call assert(iStat == 0, "There was a problem allocating memory for a new string list element", &
         __SRCNAME__, __LINE__)
 
-    new_element%s    = trim( sText )
+    new_element%s    = trim( adjustl(sText ) )
     new_element%next => null()
 
     ! start at beginning of linked list
     current => this%first
-
-! print *, "line number ", __LINE__
-! print *, "-------"
-! print *, "sText: ", squote(sText)
-! print *, "associated(this%first)? ", associated(this%first)
-! if (associated(this%first) ) print *, "  associated(this%first%next)? ", associated(this%first%next)
-! print *, "associated(current)? ", associated(current)
 
     if (associated( current ) ) then
 
       if (this%count == 0)  call die("Internal logic error: count should *not* be zero in this block", &
           __SRCNAME__, __LINE__)
 
-      do while (associated(current) )
+      do while (associated(current%next) )
 
-        iter_num = iter_num + 1
-
-        ! print *, "=> iter_num: ", iter_num
-        ! print *, "   before reassignment..."
-        ! print *, "     associated(current)? ", associated(current)
-        ! if (associated(current) ) then
-        !   print *, "     current%s      : ", squote(current%s)
-        ! else
-        !   print *, "     current%s      : ***"
-        ! endif
-        ! print *, "     associated(current%next)? ", associated(current%next)
-
-        previous => current
         current => current%next
 
-        ! print *, "   after reassignment..."
-        ! print *, "     associated(current)? ", associated(current)
-        ! if (associated(current) ) then
-        !   print *, "     current%s: ", squote(current%s)
-        !   print *, "     associated(current%next)? ", associated(current%next)
-        ! else
-        !   print *, "     current%s      : ***"
-        !   print *, "     current%next   : <undef>"
-        ! endif
-        !
-        ! print *, "     associated(previous)? ", associated(previous)
-        ! if (associated(previous) ) then
-        !   print *, "     previous%s     : ", squote(previous%s)
-        ! else
-        !   print *, "     previous%s     : ***"
-        ! endif
-        ! print *, "     associated(previous%next)? ", associated(previous%next)
-        !
       enddo
 
-      call assert(.not. associated(previous%next), "Target pointer in string"   &
-        //" list is already associated.", __SRCNAME__, __LINE__)
-      ! current element should be a null pointer
-      previous%next => new_element
+        current%next => new_element
 
     ! no elements present in the list; begin with a single element
     else
@@ -227,13 +186,6 @@ contains
 
     this%count = this%count + 1
     this%is_populated = TRUE
-
-    ! print *, "line number ", __LINE__
-    ! print *, "-------"
-    ! print *, "associated(this%first)? ", associated(this%first)
-    ! if (associated(this%first) ) print *, "  associated(this%first%next)? ", associated(this%first%next)
-    ! if (associated(this%first) ) print *, "  this%first%s: ", squote(this%first%s)
-    ! print *, "associated(current)? ", associated(current)
 
   end subroutine list_append_string_sub
 
@@ -328,14 +280,18 @@ contains
 
     current => this%first
 
-    do while ( associated( current ) .and. iCount < this%count )
+    do while ( associated( current ) )
 
       iCount = iCount + 1
 
+      if ( iCount > this%count ) exit
+
+      print *, "cnt: ", iCount, " item: ", "'"//current%s//"'"
+
       if (iCount == iStartIndex ) then
-        sText = current%s
+        sText = trim(current%s)
       elseif (iCount > iStartIndex .and. iCount <= iEndIndex ) then
-        sText = sText//" "//current%s
+        sText = sText//" "//trim(current%s)
       endif
 
       current => current%next

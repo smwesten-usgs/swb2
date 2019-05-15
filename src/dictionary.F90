@@ -30,7 +30,7 @@ module dictionary
     procedure   :: add_float_sub
     procedure   :: add_double_sub
     procedure   :: add_logical_sub
-    generic     :: add_entry  => add_string_sub,   &
+    generic     :: add_value  => add_string_sub,   &
                                  add_integer_sub,  &
                                  add_float_sub,    &
                                  add_double_sub,   &
@@ -112,7 +112,7 @@ contains
     class (DICT_ENTRY_T)            :: this
     character (len=*), intent(in)   :: sKey
 
-     this%key = sKey
+     this%key = trim(sKey)
 
   end subroutine add_key_sub
 

@@ -847,16 +847,17 @@ contains
 
   end subroutine write_control_file
 
+!--------------------------------------------------------------------------------------------------
 
   subroutine read_control_file( sFilename )
 
     character (len=*), intent(in)    :: sFilename
 
     ! [ LOCALS ]
-    character (len=256)   :: sRecord, sSubstring
-    integer (c_int)  :: iStat
+    character (len=256)   :: sRecord, sKey, sValue
+    integer (c_int)       :: iStat
     type (ASCII_FILE_T)   :: CF
-    integer (c_int)  :: dumpfile_count
+    integer (c_int)       :: dumpfile_count
 
     dumpfile_count = 0
 
@@ -881,30 +882,30 @@ contains
             __SRCNAME__, __LINE__ )
 
       ! break off key value for the current record
-      call chomp(sRecord, sSubstring, CF%sDelimiters )
+      call chomp(sRecord, sKey, CF%sDelimiters )
 
-      if ( len_trim( sSubstring ) > 0 ) then
+      if ( len_trim( sKey ) > 0 ) then
 
         ! there can be more than one instance of 'DUMP_VARIABLES'
         ! need to make the key unique; tack on an instance number
-        if ( sSubstring .strequal. "DUMP_VARIABLES" ) then
+        if ( sKey .strequal. "DUMP_VARIABLES" ) then
           dumpfile_count = dumpfile_count + 1
-          sSubstring = trim(sSubstring)//"_"//asCharacter(dumpfile_count)
+          sKey = trim(sKey)//"_"//asCharacter(dumpfile_count)
         endif
 
         ! first add the key value to the directory entry data structure
-        call CF_ENTRY%add_key( sSubstring )
+        call CF_ENTRY%add_key( sKey )
 
         ! break off first directive for the current record
-        call chomp( sRecord, sSubstring, CF%sDelimiters )
+        call chomp( sRecord, sValue, CF%sDelimiters )
 
-        do while ( len_trim( sSubString ) > 0 )
+        do while ( len_trim( sValue ) > 0 )
 
           ! add the next directive snippet to dictionary entry data structure
-          call CF_ENTRY%add_entry( sSubstring )
+          call CF_ENTRY%add_value( sValue )
 
           ! break off next directive for the current record
-          call chomp( sRecord, sSubstring, CF%sDelimiters )
+          call chomp( sRecord, sValue, CF%sDelimiters )
 
         enddo
 
@@ -996,6 +997,8 @@ contains
 
         ! For MODEL directive, obtain the associated dictionary entries
         call CF_DICT%get_values(sCmdText, myOptions )
+
+        print *, "*cmd text: ", "'"//trim(sCmdText)//"'"
 
         ! dictionary entries are initially space-delimited; sArgText_1 contains
         ! all dictionary entries present, concatenated, with a space between entries

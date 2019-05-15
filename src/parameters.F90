@@ -109,14 +109,14 @@ contains
     class (PARAMETERS_T)    :: this
 
     ! [ LOCALS ]
-    integer (c_int)         :: iFileIndex, iColIndex
-    integer (c_int)         :: iStat
-    type (ASCII_FILE_T)          :: DF
-    type (DICT_ENTRY_T), pointer :: pDict
-    type (DICT_ENTRY_T), pointer :: pCurrentDict
-    integer (c_int)         :: iNumberOfHeaderLines
+    integer (c_int)                :: iFileIndex, iColIndex
+    integer (c_int)                :: iStat
+    type (ASCII_FILE_T)            :: DF
+    type (DICT_ENTRY_T), pointer   :: pDict
+    type (DICT_ENTRY_T), pointer   :: pCurrentDict
+    integer (c_int)                :: iNumberOfHeaderLines
     character (len=:), allocatable :: sNumberOfHeaderLines
-    character (len=256)          :: tempstr
+    character (len=256)            :: tempstr
     character (len=MAX_TABLE_RECORD_LEN) :: sRecord, sItem
 
     if ( this%count > 0 ) then
@@ -142,9 +142,7 @@ contains
           ! create and allocate memory for dictionary entry
 
           pDict => null()
-
           allocate( pDict, stat=iStat )
-
           call assert(iStat == 0, "Failed to allocate memory for dictionary object", &
               __SRCNAME__, __LINE__ )
 
@@ -191,12 +189,11 @@ contains
             ! break off next column of data for the current record
             call chomp(sRecord, sItem, this%delimiters%get(iFileIndex) )
 
-            ! must avoid manipulating null pointers at all costs
             if ( associated( pCurrentDict )) then
 
               ! if not null, it means that we were able to return a pointer
               ! associated with the current column heading
-              call pCurrentDict%add_entry( sItem )
+              call pCurrentDict%add_value( sItem )
 
             else
 
@@ -258,7 +255,7 @@ contains
 
       do iIndex = lbound(sValues,1), ubound(sValues,1)
 
-        call pCurrentDict%add_entry( sValues( iIndex ) )
+        call pCurrentDict%add_value( sValues( iIndex ) )
 
       enddo
 
@@ -266,7 +263,7 @@ contains
 
       do iIndex = lbound(iValues,1), ubound(iValues,1)
 
-        call pCurrentDict%add_entry( iValues( iIndex ) )
+        call pCurrentDict%add_value( iValues( iIndex ) )
 
       enddo
 
@@ -274,7 +271,7 @@ contains
 
       do iIndex = lbound(fValues,1), ubound(fValues,1)
 
-        call pCurrentDict%add_entry( fValues( iIndex ) )
+        call pCurrentDict%add_value( fValues( iIndex ) )
 
       enddo
 
@@ -282,7 +279,7 @@ contains
 
       do iIndex = lbound(dValues,1), ubound(dValues,1)
 
-        call pCurrentDict%add_entry( dValues( iIndex ) )
+        call pCurrentDict%add_value( dValues( iIndex ) )
 
       enddo
 
@@ -290,7 +287,7 @@ contains
 
       do iIndex = lbound(lValues,1), ubound(lValues,1)
 
-        call pCurrentDict%add_entry( lValues( iIndex ) )
+        call pCurrentDict%add_value( lValues( iIndex ) )
 
       enddo
 

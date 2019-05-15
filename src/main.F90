@@ -203,12 +203,11 @@ program main
          //"was selected as the precipitation method.",                                      &
          lEcho=.true._c_bool )
 
-
+  ! idea is that there may be multiple control files fed to SWB; all of the files
+  ! will be munged and the entries added to the CF_DICT dictionary
   do iIndex=1, slControlFiles%count
-
     ! read control file
     call read_control_file( slControlFiles%get( iIndex ) )
-
   enddo
 
   call slControlFiles%clear()
