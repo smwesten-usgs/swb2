@@ -16,8 +16,8 @@ module irrigation
   use logfiles, only               : LOGS, LOG_ALL
   use parameters, only             : PARAMS
   use simulation_datetime, only    : SIM_DT
-  use strings, only                : asCharacter, operator( .contains. )
-  use string_list, only            : STRING_LIST_T
+  use fstring, only                : asCharacter, operator( .contains. )
+  use fstring_list, only            : FSTRING_LIST_T
 
   implicit none
 
@@ -70,7 +70,7 @@ contains
     logical (c_bool), intent(in)    :: is_active(:,:)
 
     ! [ LOCALS ]
-    type (STRING_LIST_T)              :: sl_temp_list
+    type (FSTRING_LIST_T)              :: sl_temp_list
     integer (c_int)              :: number_of_landuse_codes
     integer (c_int), allocatable :: landuse_table_codes(:)
     integer (c_int)              :: num_records
@@ -79,11 +79,11 @@ contains
     integer (c_int)              :: i
     integer (c_int)              :: status
     character (len=256)               :: str_buffer
-    type (STRING_LIST_T)              :: sl_irrigation_days
-    type (STRING_LIST_T)              :: sl_irrigation_begin
-    type (STRING_LIST_T)              :: sl_irrigation_end
-    type (STRING_LIST_T)              :: sl_application_method
-    type (STRING_LIST_T)              :: sl_monthly_irrigation_schedule
+    type (FSTRING_LIST_T)              :: sl_irrigation_days
+    type (FSTRING_LIST_T)              :: sl_irrigation_begin
+    type (FSTRING_LIST_T)              :: sl_irrigation_end
+    type (FSTRING_LIST_T)              :: sl_application_method
+    type (FSTRING_LIST_T)              :: sl_monthly_irrigation_schedule
     character (len=31)                :: temp_str
 
     allocate( IRRIGATION_FROM_GROUNDWATER( count( is_active ) ), stat=status )

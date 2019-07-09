@@ -1,8 +1,8 @@
 module test_allocatable_string
 
   use fruit
-  use string_list
-  use strings, only        : chomp, replace, clean
+  use fstring_list
+  use fstring, only        : chomp, replace, clean
   use iso_c_binding, only  : c_int
   implicit none
 
@@ -30,7 +30,7 @@ contains
     character (len=MAX_STR_LEN)           :: sSubStringClean
     character (len=MAX_STR_LEN)           :: sBuf
     integer (kind=c_int)                  :: column_count
-    type (STRING_LIST_T)                  :: stList
+    type (FSTRING_LIST_T)                  :: stList
 
     sBuf = '"Begin at the beginning," the King said, very gravely, '           &
       //'"and go on till you come to the end: then stop."'

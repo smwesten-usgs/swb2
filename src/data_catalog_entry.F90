@@ -12,7 +12,7 @@ module data_catalog_entry
   use exceptions
   use file_operations, only      : fully_qualified_filename
   use logfiles
-  use strings
+  use fstring
   use grid
   use netcdf4_support
   use iso_c_binding

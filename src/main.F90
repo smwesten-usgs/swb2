@@ -19,18 +19,18 @@ program main
 
   use model_iterate_multiple_simulations, only  : iterate_over_multiple_simulation_days
 
-  use strings, only                   : operator(.containssimilar.),            &
+  use fstring, only                   : operator(.containssimilar.),            &
                                           asCharacter
   use version_control, only           : SWB_VERSION, GIT_COMMIT_HASH_STRING,    &
                                         GIT_BRANCH_STRING, COMPILE_DATE,        &
                                         COMPILE_TIME, SYSTEM_NAME
-  use string_list, only               : STRING_LIST_T
+  use fstring_list, only               : FSTRING_LIST_T
   use timer, only                     : TIMER_T
   use iso_fortran_env
 
   implicit none
 
-  type (STRING_LIST_T)           :: slControlFiles
+  type (FSTRING_LIST_T)           :: slControlFiles
 
   character (len=256)            :: sBuf
   character (len=256)            :: sOutputPrefixName

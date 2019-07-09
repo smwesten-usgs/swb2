@@ -210,6 +210,8 @@ set(SRCS
       exceptions.F90
       fog__monthly_grid.F90
       file_operations.F90
+      fstring.F90
+      fstring_list.F90
       grid.F90
       growing_degree_day.F90
       growing_degree_day_baskerville_emin.F90
@@ -243,8 +245,6 @@ set(SRCS
       snowfall__original.F90
       snowmelt__original.F90
       solar_calculations.F90
-      strings.F90
-      string_list.F90
       storm_drain_capture.F90
       timer.F90
 

@@ -9,7 +9,7 @@ module model_iterate_multiple_simulations
   use logfiles, only                  : LOGS, LOG_ALL
   use model_domain, only              : MODEL_DOMAIN_T
   use simulation_datetime, only       : SIM_DT
-  use strings, only                   : asCharacter
+  use fstring, only                   : asCharacter
   use output, only                    : write_output,                          &
                                         initialize_output,                     &
                                         initialize_multiple_sim_output,        &

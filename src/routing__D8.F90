@@ -6,7 +6,7 @@ module routing__D8
   use data_catalog_entry
   use exceptions
   use grid
-  use strings
+  use fstring
   implicit none
 
   private

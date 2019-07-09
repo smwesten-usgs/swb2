@@ -6,8 +6,8 @@ module runoff__curve_number
   use datetime
   use exceptions
   use simulation_datetime
-  use strings
-  use string_list
+  use fstring
+  use fstring_list
   use parameters, only                    : PARAMS, PARAMS_DICT
   implicit none
 
@@ -49,8 +49,8 @@ contains
     integer (c_int)              :: iNumberOfLanduses
     integer (c_int)              :: iNumberOfSoilGroups
     integer (c_int), allocatable :: iCurveNumberSeqNums(:)
-    type (STRING_LIST_T)              :: slList
-    type (STRING_LIST_T)              :: slCurveNumber
+    type (FSTRING_LIST_T)              :: slList
+    type (FSTRING_LIST_T)              :: slCurveNumber
     integer (c_int)              :: iStat
     integer (c_int)              :: iSoilsIndex
     character (len=:), allocatable    :: sText

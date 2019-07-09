@@ -15,8 +15,8 @@ module awc__depth_integrated
   use data_catalog_entry
   use exceptions
   use parameters
-  use strings
-  use string_list
+  use fstring
+  use fstring_list
 
   implicit none
 
@@ -60,7 +60,7 @@ contains
     integer (c_int)               :: iDeepestSoilHorizon
     logical (c_bool)              :: lFirst
 
-    type (STRING_LIST_T)               :: slList
+    type (FSTRING_LIST_T)               :: slList
     integer (c_int)               :: iStat
     integer (c_int)               :: iIndex, iIndex2
     integer (c_int)               :: iIndex_x, iIndex_y

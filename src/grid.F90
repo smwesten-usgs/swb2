@@ -10,7 +10,7 @@ module grid
   use iso_c_binding
   use constants_and_conversions
   use exceptions
-  use strings
+  use fstring
   use logfiles
 
   implicit none
@@ -1724,7 +1724,7 @@ function grid_Interpolate(pGrd,rXval,rYval) result ( rValue )
   call assert (ib>0 .and. ia>0 .and. ib <= ubound(pGrd%rData,1) &
      .and. ia <= ubound(pGrd%rData,1), &
     "Internal programming error: illegal bounds caught~requested column value " &
-    //trim( asCharacter(fValue=rXval, iNumDigits=3)) &
+    //trim( asCharacter(rXval, fmt_string="F0.3")) &
     //" out of range", __SRCNAME__, __LINE__)
 
   ! In some cases, when things really dry out, the y value
@@ -1746,7 +1746,7 @@ function grid_Interpolate(pGrd,rXval,rYval) result ( rValue )
   call assert (jb>0 .and. ja>0 .and. jb <= ubound(pGrd%rData,2) &
      .and. ja <= ubound(pGrd%rData,2), &
     "Internal programming error: illegal bounds caught~requested row value " &
-    //trim( asCharacter(fValue=rXval, iNumDigits=3)) &
+    //trim( asCharacter(rXval, fmt_string="F0.3")) &
     //" out of range", __SRCNAME__, __LINE__)
 
   rValue = ( 1.0_c_float -u) * ( 1.0_c_float -v) * pGrd%rData(ib,jb)   + &
@@ -1831,7 +1831,7 @@ function grid_SearchColumn(pGrd,rXval,rZval,rNoData) result ( rValue )
   call assert (ib>0 .and. ia>0 .and. ib <= ubound(pGrd%rData,1) &
      .and. ia <= ubound(pGrd%rData,1), &
     "Internal programming error: requested X value " &
-    //trim( asCharacter(fValue=rXval, iNumDigits=3)) &
+    //trim( asCharacter(rXval, fmt_string="F0.3")) &
     //" out of range", __SRCNAME__, __LINE__)
 
   call assert(ubound(rCol,1) == ubound(pGrd%rData,2), &

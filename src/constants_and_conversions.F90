@@ -56,20 +56,7 @@ module constants_and_conversions
   real (c_float), parameter     :: rZERO = 0.0_c_float
   real (c_double), parameter    :: dZERO = 0.0_c_double
 
-
-  ! [ special ASCII characters ]
-  public :: TAB, WHITESPACE, BACKSLASH, FORWARDSLASH, CARRIAGE_RETURN, COMMENT_CHARS, &
-            PUNCTUATION
-  character (len=1), parameter :: TAB = achar(9)
-  character (len=2), parameter :: WHITESPACE = achar(9)//" "
-  character (len=1), parameter :: BACKSLASH = achar(92)
-  character (len=1), parameter :: FORWARDSLASH = achar(47)
-  character (len=1), parameter :: CARRIAGE_RETURN = achar(13)
-  character (len=3), parameter :: COMMENT_CHARS = "#!%"
-  character (len=1), parameter :: DOUBLE_QUOTE = achar(34)
-  character (len=3), parameter :: PUNCTUATION = ",;:"
-
-  ! [ evil global variables ]
+    ! [ evil global variables ]
   character (len=1)            :: OS_NATIVE_PATH_DELIMITER
   integer (c_long_long)   :: RANDOM_START = 0
 
@@ -956,7 +943,7 @@ end function fortran_to_c_string
     ! TargetCharacter omits the period ("."): do not want a real value returned
     ! as a funky integer (e.g. string "3.141" returned as integer 3141 )
     sTargetCharacters_l = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM" &
-      //"!@#$%^&*()_+-={}[]|\:;'<,>?/~`'"//DOUBLE_QUOTE
+      //"!@#$%^&*()_+-={}[]|\:;'<,>?/~`'"//'"'
 
     ! eliminate any leading spaces
     sTemp = adjustl(sText1)

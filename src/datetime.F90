@@ -9,7 +9,7 @@
 module datetime
 
   use iso_c_binding, only : c_short, c_int, c_long, c_float, c_double, c_bool
-  use strings
+  use fstring
   use exceptions
   use constants_and_conversions
 

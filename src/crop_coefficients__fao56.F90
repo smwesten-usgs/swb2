@@ -18,8 +18,8 @@ module crop_coefficients__FAO56
   use exceptions, only                : assert, warn, die
   use parameters, only                : PARAMS
   use simulation_datetime, only       : SIM_DT
-  use strings, only                   : asCharacter, sQuote, operator(.contains.)
-  use string_list
+  use fstring, only                   : asCharacter, sQuote, operator(.contains.)
+  use fstring_list
   implicit none
 
   private
@@ -77,8 +77,8 @@ contains
   subroutine crop_coefficients_FAO56_initialize()
 
     ! [ LOCALS ]
-    ! type (STRING_LIST_T)              :: slREW, slTEW
-    type (STRING_LIST_T)              :: slList
+    ! type (FSTRING_LIST_T)              :: slREW, slTEW
+    type (FSTRING_LIST_T)              :: slList
     type (DATETIME_T)                 :: DT
     type (DATETIME_T)                 :: temp_date
     ! integer (c_int), allocatable :: iTEWSeqNums(:)
@@ -92,7 +92,7 @@ contains
     character (len=10)               :: sMMDDYYYY
     character (len=:), allocatable   :: sText
 
-    type (STRING_LIST_T)             :: slPlantingDate
+    type (FSTRING_LIST_T)             :: slPlantingDate
     type (DATETIME_T)                :: dtPlantingDate
     character (len=:), allocatable   :: PlantingDate_str
 

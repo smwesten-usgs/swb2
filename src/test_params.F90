@@ -3,15 +3,15 @@ program test_params
   use iso_c_binding, only : c_int, c_float, c_double, c_bool
 !  use constants_and_conversions, only :WHITESPACE
   use exceptions
-!  use strings
-  use string_list
+!  use fstring
+  use fstring_list
 !  use dictionary
   use parameters
   implicit none
 
   type (PARAMETERS_T)             :: PARAMS
   real (c_float), allocatable     :: fValues(:)
-  type (STRING_LIST_T)                 :: slString
+  type (FSTRING_LIST_T)                 :: slString
 
 
   call PARAMS%add_file("LU_lookup_NLCD.txt")

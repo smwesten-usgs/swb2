@@ -17,8 +17,8 @@ module runoff__gridded_values
   use exceptions
   use file_operations
   use simulation_datetime
-  use strings
-  use string_list
+  use fstring
+  use fstring_list
 
   implicit none
 
@@ -46,7 +46,7 @@ module runoff__gridded_values
 
     ! [ LOCALS ]
     integer (c_int)      :: iStat
-    type (STRING_LIST_T)      :: slString
+    type (FSTRING_LIST_T)      :: slString
 
     ! locate the data structure associated with the gridded fog ratio entries
     pRUNOFF_ZONE => DAT%find("RUNOFF_ZONE")

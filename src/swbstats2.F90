@@ -12,9 +12,9 @@ program swbstats2
   use grid
   use netcdf4_support
   use simulation_datetime, only       : SIM_DT, DATE_RANGE_T
-  use string_list, only               : STRING_LIST_T,                         &
+  use fstring_list, only               : FSTRING_LIST_T,                         &
                                         create_list
-  use strings
+  use fstring
   use version_control, only           : SWB_VERSION, GIT_COMMIT_HASH_STRING,   &
                                         GIT_BRANCH_STRING, COMPILE_DATE,       &
                                         COMPILE_TIME, SYSTEM_NAME
@@ -53,8 +53,8 @@ program swbstats2
 
   logical (c_bool)               :: netcdf_active = FALSE
 
-  type (STRING_LIST_T)           :: name_list
-  type (STRING_LIST_T)           :: value_list
+  type (FSTRING_LIST_T)           :: name_list
+  type (FSTRING_LIST_T)           :: value_list
 
   type (ASCII_FILE_T)            :: zonal_stats_output_file
   type (ASCII_FILE_T)            :: whole_grid_stats_output_file
@@ -115,12 +115,12 @@ program swbstats2
     logical (c_bool)               :: multiple_zone_grids       = FALSE
     logical (c_bool)               :: multiple_comparison_grids = FALSE
     real (c_double)                :: comparison_grid_conversion_factor = 1.0_c_double
-    type (STRING_LIST_T)           :: start_date_list
-    type (STRING_LIST_T)           :: end_date_list
-    type (STRING_LIST_T)           :: date_range_id_list
-    type (STRING_LIST_T)           :: unique_zone_list
-    type (STRING_LIST_T)           :: comparison_grid_file_list
-    type (STRING_LIST_T)           :: zone_grid_file_list
+    type (FSTRING_LIST_T)           :: start_date_list
+    type (FSTRING_LIST_T)           :: end_date_list
+    type (FSTRING_LIST_T)           :: date_range_id_list
+    type (FSTRING_LIST_T)           :: unique_zone_list
+    type (FSTRING_LIST_T)           :: comparison_grid_file_list
+    type (FSTRING_LIST_T)           :: zone_grid_file_list
     real (c_double)                :: output_conversion_factor = 1.0_c_double
     real (c_double)                :: unit_conversion_factor = 1.0_c_double
     real (c_double)                :: grid_cell_area_sq_meters = 1.0_c_double
@@ -960,9 +960,9 @@ contains
   !
   !   type (GENERAL_GRID_T), pointer          :: grid_sum
   !   type (GENERAL_GRID_T), pointer          :: grid_mean
-  !   type (STRING_LIST_T), intent(in)        :: date_range_id_list
-  !   type (STRING_LIST_T), intent(in)        :: start_date_list
-  !   type (STRING_LIST_T), intent(in)        :: end_date_list
+  !   type (FSTRING_LIST_T), intent(in)        :: date_range_id_list
+  !   type (FSTRING_LIST_T), intent(in)        :: start_date_list
+  !   type (FSTRING_LIST_T), intent(in)        :: end_date_list
   !
   !
   !
@@ -1095,9 +1095,9 @@ contains
                                       end_date_list )
 
     character (len=*), intent(inout)   :: csv_filename
-    type (STRING_LIST_T), intent(out)  :: date_range_id_list
-    type (STRING_LIST_T), intent(out)  :: start_date_list
-    type (STRING_LIST_T), intent(out)  :: end_date_list
+    type (FSTRING_LIST_T), intent(out)  :: date_range_id_list
+    type (FSTRING_LIST_T), intent(out)  :: start_date_list
+    type (FSTRING_LIST_T), intent(out)  :: end_date_list
 
     ! [ LOCALS ]
     integer (c_int)           :: iFileIndex, iColIndex
@@ -1146,10 +1146,10 @@ contains
                                           comparison_grid_file_list)
 
     character (len=*), intent(inout)   :: csv_filename
-    type (STRING_LIST_T), intent(out)  :: date_range_id_list
-    type (STRING_LIST_T), intent(out)  :: start_date_list
-    type (STRING_LIST_T), intent(out)  :: end_date_list
-    type (STRING_LIST_T), intent(out)  :: comparison_grid_file_list
+    type (FSTRING_LIST_T), intent(out)  :: date_range_id_list
+    type (FSTRING_LIST_T), intent(out)  :: start_date_list
+    type (FSTRING_LIST_T), intent(out)  :: end_date_list
+    type (FSTRING_LIST_T), intent(out)  :: comparison_grid_file_list
 
     ! [ LOCALS ]
     integer (c_int)           :: iFileIndex, iColIndex
@@ -1201,10 +1201,10 @@ contains
                                           zonal_stats_grid_file_list)
 
     character (len=*), intent(inout)   :: csv_filename
-    type (STRING_LIST_T), intent(out)  :: date_range_id_list
-    type (STRING_LIST_T), intent(out)  :: start_date_list
-    type (STRING_LIST_T), intent(out)  :: end_date_list
-    type (STRING_LIST_T), intent(out)  :: zonal_stats_grid_file_list
+    type (FSTRING_LIST_T), intent(out)  :: date_range_id_list
+    type (FSTRING_LIST_T), intent(out)  :: start_date_list
+    type (FSTRING_LIST_T), intent(out)  :: end_date_list
+    type (FSTRING_LIST_T), intent(out)  :: zonal_stats_grid_file_list
 
     ! [ LOCALS ]
     integer (c_int)           :: iFileIndex, iColIndex
@@ -1338,7 +1338,7 @@ contains
     type (DATETIME_T), intent(in)            :: end_date
     real (c_double), intent(inout)           :: values(:,:)
     integer (c_int), intent(inout)           :: zone_ids(:,:)
-    type (STRING_LIST_T), intent(in)         :: unique_zone_list
+    type (FSTRING_LIST_T), intent(in)         :: unique_zone_list
     integer (c_int), intent(in), optional    :: funit
     real (c_double), intent(inout), optional :: comparison_values(:,:)
 
@@ -1452,7 +1452,7 @@ contains
   subroutine get_unique_int(grid_values, unique_val_list)
 
     integer (c_int), intent(in)           :: grid_values(:,:)
-    type (STRING_LIST_T), intent(inout)   :: unique_val_list
+    type (FSTRING_LIST_T), intent(inout)   :: unique_val_list
 
     ! [ LOCALS ]
     integer (c_int)       :: ix, iy

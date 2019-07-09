@@ -22,8 +22,8 @@ module model_initialize
   use parameters
   use precipitation__method_of_fragments
   use simulation_datetime, only          : SIM_DT
-  use strings
-  use string_list
+  use fstring
+  use fstring_list
   use storm_drain_capture, only          : storm_drain_capture_initialize
   implicit none
 
@@ -657,7 +657,7 @@ contains
     ! [ LOCALS ]
     type (DATA_CATALOG_ENTRY_T), pointer :: pPOLYGON_ID
     logical (c_bool)                :: any_problems
-    type (STRING_LIST_T)                 :: slList
+    type (FSTRING_LIST_T)                 :: slList
     integer (c_int), allocatable    :: polygon_id(:)
     real (c_float), allocatable     :: rooting_depth_inches(:)
     real (c_float), allocatable     :: soil_moisture_storage(:)
@@ -794,7 +794,7 @@ contains
 
     character (len=*), intent(in)              :: sFilename
     character (len=*), intent(in), optional    :: sGridSpecification
-    type (STRING_LIST_T), optional             :: slExtraDirectives
+    type (FSTRING_LIST_T), optional             :: slExtraDirectives
 
     ! [ LOCALS ]
     character (len=256)             :: sRecord, sSubstring
@@ -867,7 +867,6 @@ contains
                   sCommentChars = "#%!+=|[{(-*$",   &
                   sDelimiters = "WHITESPACE",       &
                   lHasHeader = .false._c_bool )
-
     do
 
       ! read in next line of the control file
@@ -896,6 +895,8 @@ contains
         ! first add the key value to the directory entry data structure
         call CF_ENTRY%add_key( sKey )
 
+        print *, "@ key: ", "'"//trim(sKey)//"'"
+
         ! break off first directive for the current record
         call chomp( sRecord, sValue, CF%sDelimiters )
 
@@ -903,13 +904,13 @@ contains
 
           ! add the next directive snippet to dictionary entry data structure
           call CF_ENTRY%add_value( sValue )
-
+          print *, "@   value: ", "'"//trim(sValue)//"'"
           ! break off next directive for the current record
           call chomp( sRecord, sValue, CF%sDelimiters )
 
         enddo
 
-        ! add the final entry to the dictionary data structure
+        ! add the dictionary entry to the dictionary data structure
         call CF_DICT%add_entry( CF_ENTRY )
 
       endif
@@ -942,20 +943,20 @@ contains
 
     character (len=*), intent(in)      :: sKey
     character (len=*), intent(in)      :: sPathname
-    logical (c_bool), intent(in)  :: lOptional
-    integer (c_int), intent(in)   :: iDataType
+    logical (c_bool), intent(in)       :: lOptional
+    integer (c_int), intent(in)        :: iDataType
 
     ! [ LOCALS ]
-    type (STRING_LIST_T)                 :: myDirectives
-    type (STRING_LIST_T)                 :: myOptions
-    integer (c_int)                 :: iIndex
-    character (len=:), allocatable       :: sCmdText
-    character (len=:), allocatable       :: sArgText
-    character (len=:), allocatable       :: sArgText_1
-    character (len=:), allocatable       :: sArgText_2
-    integer (c_int)                 :: iStat
+    type (FSTRING_LIST_T)                 :: myDirectives
+    type (FSTRING_LIST_T)                 :: myOptions
+    integer (c_int)                      :: iIndex
+    character (len=512)       :: sCmdText
+    character (len=512)       :: sArgText
+    character (len=512)       :: sArgText_1
+    character (len=512)       :: sArgText_2
+    integer (c_int)                      :: iStat
     type (DATA_CATALOG_ENTRY_T), pointer :: pENTRY
-    logical (c_bool)             :: lGridPresent
+    logical (c_bool)                     :: lGridPresent
 
     pENTRY => null()
     lGridPresent = lFALSE
@@ -988,8 +989,16 @@ contains
       call assert( iStat == 0, "Failed to allocate memory for the "//dquote(sKey)//" data structure", &
         __SRCNAME__, __LINE__ )
 
+      sCmdText = ""
+      sArgText = ""
+      sArgText_1 = ""
+      sArgText_2 = ""
+      call myOptions%clear()
+
       ! process all known directives associated with key word
       do iIndex = 1, myDirectives%count
+
+        print *, "*iIndex: ", iIndex, "*Number of directives: ", myDirectives%count
 
         ! myDirectives is a string list of all SWB directives that contain sKey
         ! sCmdText contains an individual directive
@@ -999,17 +1008,22 @@ contains
         call CF_DICT%get_values(sCmdText, myOptions )
 
         print *, "*cmd text: ", "'"//trim(sCmdText)//"'"
+        print *, "  * count= ", myOptions%count
+
+        ! most of the time, we only care about the first dictionary entry, obtained below
+        sArgText_1 = myOptions%get(1)
+        print *, "  * arg text1: ", "'"//trim(sArgText_1)//"'"
+        sArgText_2 = myOptions%get(2)
+        print *, "  * arg text2: ", "'"//trim(sArgText_2)//"'"
 
         ! dictionary entries are initially space-delimited; sArgText_1 contains
         ! all dictionary entries present, concatenated, with a space between entries
         sArgText = myOptions%get(1, myOptions%count )
 
+        print *, "  * arg text: ", "'"//trim(sArgText)//"'"
+
         ! echo the original directive and dictionary entries to the logfile
         call LOGS%write("> "//sCmdText//" "//sArgText, iLinesBefore=1 )
-
-        ! most of the time, we only care about the first dictionary entry, obtained below
-        sArgText_1 = myOptions%get(1)
-        sArgText_2 = myOptions%get(2)
 
         ! first option is that the key value and directive are the same
         ! (.e.g. "PRECIPITATION"; no trailing underscores or modifiers )
@@ -1234,14 +1248,13 @@ contains
   subroutine initialize_grid_options()
 
     ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myOptions
-    integer (c_int)             :: iIndex
+    type (FSTRING_LIST_T)             :: myOptions
+    integer (c_int)                  :: iIndex
     character (len=:), allocatable   :: sArgText
-    integer (c_int)             :: iStat
-    real (c_double)             :: rX0, rX1, rY0, rY1, rGridCellSize
-    integer (c_int)             :: iNX, iNY
-    real (c_float)              :: fTempVal
-
+    integer (c_int)                  :: iStat
+    real (c_double)                  :: rX0, rX1, rY0, rY1, rGridCellSize
+    integer (c_int)                  :: iNX, iNY
+    real (c_float)                   :: fTempVal
 
     ! For MODEL directive, obtain the associated dictionary entries
     call CF_DICT%get_values( "GRID", myOptions )
@@ -1321,7 +1334,7 @@ contains
     subroutine initialize_output_options()
 
       ! [ LOCALS ]
-      type (STRING_LIST_T)             :: myOptions
+      type (FSTRING_LIST_T)             :: myOptions
       integer (c_int)             :: iIndex
       integer (c_int)             :: jIndex
       character (len=:), allocatable   :: sArgText
@@ -1395,15 +1408,15 @@ contains
   subroutine initialize_start_and_end_dates()
 
     ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions
-    integer (c_int)             :: iIndex
+    type (FSTRING_LIST_T)             :: myDirectives
+    type (FSTRING_LIST_T)             :: myOptions
+    integer (c_int)                  :: iIndex
     character (len=:), allocatable   :: sCmdText
     character (len=:), allocatable   :: sOptionText
     character (len=:), allocatable   :: sArgText
-    integer (c_int)             :: iStat
-    logical (c_bool)            :: lHaveStartDate
-    logical (c_bool)            :: lHaveEndDate
+    integer (c_int)                  :: iStat
+    logical (c_bool)                 :: lHaveStartDate
+    logical (c_bool)                 :: lHaveEndDate
 
     lHaveStartDate = lFALSE
     lHaveEndDate = lFALSE
@@ -1500,9 +1513,9 @@ contains
   subroutine initialize_lookup_tables()
 
     ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions
-    type (STRING_LIST_T)             :: slString
+    type (FSTRING_LIST_T)             :: myDirectives
+    type (FSTRING_LIST_T)             :: myOptions
+    type (FSTRING_LIST_T)             :: slString
     integer (c_int)             :: iIndex
     character (len=:), allocatable   :: sCmdText
     character (len=:), allocatable   :: sOptionText
@@ -1542,6 +1555,9 @@ contains
         ! all dictionary entries present, concatenated, with a space between entries
         sArgText = myOptions%get(1, myOptions%count )
 
+        print *, "$$ cmd: ","'"//trim(sCmdText)//"'"
+        print *, "$$   args: ","'"//trim(sArgText)//"'"
+
         ! echo the original directive and dictionary entries to the logfile
         call LOGS%write("> "//sCmdText//" "//sArgText, iLinesBefore=1 )
 
@@ -1565,7 +1581,8 @@ contains
       if ( iCount > 0 ) then
 
         call PARAMS%munge_file()
-        call PARAMS_DICT%print_all(iLogLevel=LOG_DEBUG, lEcho=lFALSE)
+        call PARAMS_DICT%print_all(sDescription="LOOKUP TABLE dictionary",      &
+                                   iLogLevel=LOG_DEBUG, lEcho=lFALSE)
 
       endif
 
@@ -1581,13 +1598,13 @@ contains
     logical (c_bool), intent(in) :: lOptional
 
     ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions
+    type (FSTRING_LIST_T)             :: myDirectives
+    type (FSTRING_LIST_T)             :: myOptions
     integer (c_int)             :: iIndex
     integer (c_int)             :: indx
     character (len=:), allocatable   :: sCmdText
 !    character (len=:), allocatable   :: sOptionText
-    type (STRING_LIST_T)             :: argv_list
+    type (FSTRING_LIST_T)             :: argv_list
     character (len=:), allocatable   :: sArgText
     integer (c_int)             :: iStat
     integer (c_int)             :: status
@@ -1656,13 +1673,13 @@ contains
   subroutine initialize_program_options( )
 
     ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions
+    type (FSTRING_LIST_T)             :: myDirectives
+    type (FSTRING_LIST_T)             :: myOptions
     integer (c_int)             :: iIndex
     integer (c_int)             :: indx
     character (len=:), allocatable   :: sCmdText
 !    character (len=:), allocatable   :: sOptionText
-    type (STRING_LIST_T)             :: argv_list
+    type (FSTRING_LIST_T)             :: argv_list
     character (len=:), allocatable   :: sArgText
     integer (c_int)             :: iStat
     integer (c_int)             :: status
@@ -1781,7 +1798,7 @@ contains
 !     integer (c_int)                 :: iCount
 !     integer (c_int)                 :: iStat
 !     logical (c_bool)                :: lMatch
-!     type (STRING_LIST_T)                 :: slList
+!     type (FSTRING_LIST_T)                 :: slList
 !
 !     call slList%append("LU_Code")
 !     call slList%append("LU_code")
@@ -1867,7 +1884,7 @@ contains
     integer (c_int)               :: iIndex
     integer (c_int)               :: iStat
     character (len=256)                :: sBuf
-    type (STRING_LIST_T)               :: slList
+    type (FSTRING_LIST_T)               :: slList
     integer( c_int), allocatable  :: iLanduseTableCodes(:)
     integer (c_int)               :: iNumberOfLanduses
     real (c_float), allocatable   :: SURFACE_STORAGE_MAXIMUM(:)

@@ -18,8 +18,8 @@ module fog__monthly_grid
   use logfiles, only            : LOGS, LOG_ALL
   use parameters, only          : PARAMS
   use simulation_datetime
-  use strings
-  use string_list
+  use fstring
+  use fstring_list
 
   implicit none
 
@@ -49,7 +49,7 @@ contains
 
     ! [ LOCALS ]
     integer (c_int)                 :: iStat
-    type (STRING_LIST_T)                 :: slString
+    type (FSTRING_LIST_T)                 :: slString
     integer (c_int)                 :: iIndex
     integer (c_int), allocatable    :: iLanduseCodes(:)
     integer (c_int)                 :: iNumberOfLanduses

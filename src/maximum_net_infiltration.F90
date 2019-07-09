@@ -20,8 +20,8 @@ module maximum_net_infiltration__gridded_data
   use netcdf4_support
   use parameters, only          : PARAMS
   use simulation_datetime
-  use strings
-  use string_list
+  use fstring
+  use fstring_list
 
   implicit none
 
@@ -53,8 +53,8 @@ contains
 
     ! [ LOCALS ]
     integer (c_int)                 :: iStat
-    type (STRING_LIST_T)                 :: parameter_list
-    type (STRING_LIST_T)                 :: max_net_infiltration_list
+    type (FSTRING_LIST_T)                 :: parameter_list
+    type (FSTRING_LIST_T)                 :: max_net_infiltration_list
     real (c_float), allocatable     :: max_net_infiltration_vector(:)
     integer (c_int), allocatable    :: sequence_nums(:)
     integer (c_int), allocatable    :: landuse_codes(:)

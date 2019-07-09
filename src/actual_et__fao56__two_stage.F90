@@ -10,7 +10,7 @@ module actual_et__fao56__two_stage
 
   use iso_c_binding, only              : c_short, c_int, c_float, c_double
   use constants_and_conversions, only  : TRUE, M_PER_FOOT, in_to_mm
-  use string_list, only                : STRING_LIST_T, create_list
+  use fstring_list, only                : FSTRING_LIST_T, create_list
   use parameters, only                 : PARAMS
   use crop_coefficients__FAO56, only   : KCB_l, KCB_MIN, KCB_INI, KCB_MID, KCB_END,    &
                                          JAN, DEC, KCB_METHOD_MONTHLY_VALUES,         &
@@ -60,7 +60,7 @@ contains
     use parameters, only        : PARAMS, PARAMS_DICT
 
     integer (c_int)               :: number_of_landuses
-    type(STRING_LIST_T)                :: slList
+    type(FSTRING_LIST_T)                :: slList
     integer (c_int), allocatable  ::  landuse_table_codes(:)
 
     ! create list of possible table headings to look for...

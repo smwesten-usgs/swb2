@@ -8,7 +8,7 @@ module growing_degree_day_baskerville_emin
   use netcdf4_support
   use parameters
   use simulation_datetime
-  use string_list
+  use fstring_list
   implicit none
 
   private
@@ -31,8 +31,8 @@ contains
     ! [ LOCALS ]
     integer (c_int)              :: status
     integer (c_int)              :: indx
-    type (STRING_LIST_T)              :: parameter_list
-    type (STRING_LIST_T)              :: gdd_reset_val_list
+    type (FSTRING_LIST_T)              :: parameter_list
+    type (FSTRING_LIST_T)              :: gdd_reset_val_list
     character (len=32)                :: sBuf
     real (c_float), allocatable  :: gdd_base_l(:)
     real (c_float), allocatable  :: gdd_max_l(:)

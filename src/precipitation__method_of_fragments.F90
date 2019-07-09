@@ -26,8 +26,8 @@ module precipitation__method_of_fragments
   use kiss_random_number_generator
   use logfiles, only            : LOGS, LOG_ALL, LOG_DEBUG
   use parameters
-  use strings
-  use string_list
+  use fstring
+  use fstring_list
   use simulation_datetime
   use grid
   implicit none
@@ -132,7 +132,7 @@ contains
     ! [ LOCALS ]
     integer (c_int)                 :: iStat
     type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ZONE
-    type (STRING_LIST_T)                 :: slString
+    type (FSTRING_LIST_T)                 :: slString
     integer (c_int)                 :: iMaxRainZones
     integer (c_int), allocatable    :: iSimulationNumbers(:)
     character (len=256)                  :: error_str
@@ -489,7 +489,7 @@ contains
     character (len=10)     :: sBuf4
     character (len=256)    :: sBuf5
     character (len=256)    :: error_str
-    type (STRING_LIST_T)   :: slHeader
+    type (FSTRING_LIST_T)   :: slHeader
     integer (c_int)   :: max_rain_gage_number
     integer (c_int)   :: max_simulation_number
 

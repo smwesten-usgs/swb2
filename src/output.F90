@@ -6,7 +6,7 @@ module output
   use iso_c_binding
   use netcdf4_support
   use simulation_datetime, only   : SIM_DT
-  use strings, only               : asCharacter
+  use fstring, only               : asCharacter
   implicit none
 
   real( c_double ), allocatable      :: RECHARGE_ARRAY(:)

@@ -18,8 +18,8 @@ module direct_net_infiltration__gridded_data
   use netcdf4_support
   use parameters, only          : PARAMS
   use simulation_datetime
-  use strings
-  use string_list
+  use fstring
+  use fstring_list
 
   implicit none
 
@@ -72,7 +72,7 @@ contains
 
     ! [ LOCALS ]
     integer (c_int)                 :: status
-    type (STRING_LIST_T)                 :: parameter_list
+    type (FSTRING_LIST_T)                 :: parameter_list
     integer (c_int)                 :: indx
     integer (c_int)                 :: iNX
     integer (c_int)                 :: iNY

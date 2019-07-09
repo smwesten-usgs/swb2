@@ -10,11 +10,11 @@ module model_domain
   use logfiles
   use simulation_datetime
   use snowfall__original
-  use string_list, only      : STRING_LIST_T
+  use fstring_list, only      : FSTRING_LIST_T
   use grid
   use parameters, only       : PARAMS, PARAMS_DICT
   use netcdf4_support, only  : NC_FILL_FLOAT
-  use strings
+  use fstring
   implicit none
 
   public
@@ -832,7 +832,7 @@ contains
     integer (c_int)                 :: iCount
     integer (c_int)                 :: iStat
     logical (c_bool)                :: lMatch
-    type (STRING_LIST_T)                 :: slList
+    type (FSTRING_LIST_T)                 :: slList
 
     call slList%append("LU_Code")
     call slList%append("LU_code")
@@ -1046,7 +1046,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)   :: this
     character (len=*), intent(in)           :: sCmdText
-    type (STRING_LIST_T)                    :: argv_list
+    type (FSTRING_LIST_T)                    :: argv_list
 
     ! [ LOCALS ]
     integer (c_int)              :: indx
@@ -2080,8 +2080,8 @@ contains
     integer (c_int)              :: iSoilsIndex
     integer (c_int)              :: iLUIndex
     integer (c_int), allocatable :: iLanduseCodes(:)
-    type (STRING_LIST_T)              :: slList
-    type (STRING_LIST_T)              :: slRZ
+    type (FSTRING_LIST_T)              :: slList
+    type (FSTRING_LIST_T)              :: slRZ
     integer (c_int), allocatable :: iRZ_SeqNums(:)
     real (c_float), allocatable  :: RZ(:)
     character (len=:), allocatable    :: sText

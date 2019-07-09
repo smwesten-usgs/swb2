@@ -29,8 +29,8 @@ module netcdf4_support
   use exceptions
   use logfiles
   use netcdf_c_api_interfaces
-  use strings
-  use string_list, only           : STRING_LIST_T
+  use fstring
+  use fstring_list, only           : FSTRING_LIST_T
   use PROJ4_support, only         : create_attributes_from_proj4_string
   use datetime
 
@@ -991,7 +991,7 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   type (DATETIME_T), intent(in)                       :: StartDate
   type (DATETIME_T), intent(in)                       :: EndDate
   character (len=*), intent(in)                       :: PROJ4_string
-  type (STRING_LIST_T), intent(in), pointer, optional :: history_list
+  type (FSTRING_LIST_T), intent(in), pointer, optional :: history_list
   character (len=*), intent(in), optional             :: executable_name
   real (c_double), intent(in), optional          :: dpLat(:,:)
   real (c_double), intent(in), optional          :: dpLon(:,:)
@@ -1006,7 +1006,7 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   integer (c_int) :: iIndex
   character (len=10)                                :: sOriginText
   character (len=:), allocatable                    :: sFilename
-  type (STRING_LIST_T), pointer                     :: history_list_l
+  type (FSTRING_LIST_T), pointer                     :: history_list_l
   logical (c_bool)                             :: write_time_bounds_l
   character (len=:), allocatable                    :: executable_name_l
   real (c_float)                               :: valid_minimum
@@ -1057,8 +1057,6 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   endif
 
   include_latlon = logical( present( dpLat ) .and. present( dpLon ), c_bool )
-
-  call history_list_l%set_autocleanup( FALSE )
 
   write(sOriginText, fmt="(i4.4,'-',i2.2,'-',i2.2)") StartDate%iYear, StartDate%iMonth, StartDate%iDay
 
@@ -1900,8 +1898,8 @@ subroutine netcdf_get_attribute_list_for_variable( NCFILE, variable_name, &
 
   type (T_NETCDF4_FILE), intent(inout) :: NCFILE
   character (len=*), intent(in)        :: variable_name
-  type (STRING_LIST_T), intent(out)    :: attribute_name_list
-  type (STRING_LIST_T), intent(out)    :: attribute_value_list
+  type (FSTRING_LIST_T), intent(out)    :: attribute_name_list
+  type (FSTRING_LIST_T), intent(out)    :: attribute_value_list
 
   ! [ LOCALS ]
   integer (c_int) :: indx
@@ -1979,7 +1977,7 @@ end subroutine netcdf_get_attribute_list_for_variable
 subroutine netcdf_get_variable_list( NCFILE, variable_list )
 
   type (T_NETCDF4_FILE) :: NCFILE
-  type (STRING_LIST_T)  :: variable_list
+  type (FSTRING_LIST_T)  :: variable_list
 
   ! [ LOCALS ]
   integer (c_int) :: indx
@@ -3406,7 +3404,7 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, executable_name, &
   type (T_NETCDF4_FILE ) :: NCFILE
   character (len=*), intent(in) :: sDataType
   character (len=*), intent(in), optional    :: executable_name
-  type (STRING_LIST_T), intent(in), pointer, optional :: history_list
+  type (FSTRING_LIST_T), intent(in), pointer, optional :: history_list
   character (len=*), intent(in), optional    :: sSourceFile
 
   ! [ LOCALS ]
@@ -3414,7 +3412,7 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, executable_name, &
   type (DATETIME_T)              :: DT
   character (len=20)             :: sDateTime
   character (len=:), allocatable :: executable_name_l
-  type (STRING_LIST_T), pointer           :: history_list_l
+  type (FSTRING_LIST_T), pointer           :: history_list_l
   integer (c_int)           :: indx, jndx
   integer (c_int)  :: records
 
@@ -3515,8 +3513,8 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
   type (T_NETCDF_ATTRIBUTE), dimension(:), pointer :: pNC_ATT
   logical (c_bool)                            :: lLatLon_l
   logical (c_bool)                            :: write_time_bounds_l
-  type (STRING_LIST_T)                             :: attribute_name_list
-  type (STRING_LIST_T)                             :: attribute_value_list
+  type (FSTRING_LIST_T)                             :: attribute_name_list
+  type (FSTRING_LIST_T)                             :: attribute_value_list
   character (len=:), allocatable                   :: tempstring
   character (len=:), allocatable                   :: value_string
   integer (c_int)                             :: indx

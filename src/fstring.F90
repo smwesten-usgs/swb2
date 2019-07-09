@@ -1,8 +1,7 @@
-module strings
+module fstring
 
-  use iso_c_binding, only : c_int, c_long_long, c_float, c_double, c_bool, c_short
-  use constants_and_conversions
-  use exceptions
+  use iso_c_binding, only : c_int, c_long_long, c_float, c_double, c_bool,     &
+                            c_short, c_null_char
   implicit none
 
   private
@@ -48,8 +47,18 @@ module strings
     procedure :: long_long_to_char_fn
     procedure :: float_to_char_fn
     procedure :: double_to_char_fn
-    procedure :: logical_to_char_fn
+    procedure :: bool_to_char_fn
   end interface asCharacter
+
+  public :: as_character
+  interface as_character
+    procedure :: short_to_char_fn
+    procedure :: int_to_char_fn
+    procedure :: long_long_to_char_fn
+    procedure :: float_to_char_fn
+    procedure :: double_to_char_fn
+    procedure :: bool_to_char_fn
+  end interface as_character
 
   public :: chomp
   interface chomp
@@ -101,6 +110,26 @@ module strings
     procedure :: char_to_lowercase_sub
   end interface toLowercase
 
+  public :: as_uppercase
+  interface as_uppercase
+    procedure :: char_to_uppercase_fn
+  end interface as_uppercase
+
+  public :: as_lowercase
+  interface as_lowercase
+    procedure :: char_to_lowercase_fn
+  end interface as_lowercase
+
+  public :: to_uppercase
+  interface to_uppercase
+    procedure :: char_to_uppercase_sub
+  end interface to_uppercase
+
+  public :: to_lowercase
+  interface to_lowercase
+    procedure :: char_to_lowercase_sub
+  end interface to_lowercase
+
   public :: right
   interface right
     procedure :: return_right_part_of_string_fn
@@ -111,12 +140,34 @@ module strings
     procedure :: return_left_part_of_string_fn
   end interface left
 
+  public :: f_to_c_str
+  interface f_to_c_str
+    procedure :: f_to_c_string_fn
+  end interface f_to_c_str
+
+  public :: c_to_f_str
+  interface c_to_f_str
+    procedure :: c_to_f_string_fn
+  end interface c_to_f_str
+
+  ! [ special ASCII characters ]
+  public :: TAB, WHITESPACE, BACKSLASH, FORWARDSLASH, CARRIAGE_RETURN, COMMENT_CHARS, &
+            PUNCTUATION, DOUBLE_QUOTE
+  character (len=1), parameter :: TAB = achar(9)
+  character (len=2), parameter :: WHITESPACE = achar(9)//" "
+  character (len=1), parameter :: BACKSLASH = achar(92)
+  character (len=1), parameter :: FORWARDSLASH = achar(47)
+  character (len=1), parameter :: CARRIAGE_RETURN = achar(13)
+  character (len=3), parameter :: COMMENT_CHARS = "#!%"
+  character (len=1), parameter :: DOUBLE_QUOTE = achar(34)
+  character (len=3), parameter :: PUNCTUATION = ",;:"
+
 contains
 
   function return_left_part_of_string_fn( string, indx, substring )   result( left_part )
 
     character (len=*), intent(in)              :: string
-    integer (c_int), intent(in), optional :: indx
+    integer (c_int), intent(in), optional      :: indx
     character (len=*), intent(in), optional    :: substring
     character (len=:), allocatable             :: left_part
 
@@ -163,7 +214,7 @@ contains
   function return_right_part_of_string_fn( string, indx, substring )   result( right_part )
 
     character (len=*), intent(in)              :: string
-    integer (c_int), intent(in), optional :: indx
+    integer (c_int), intent(in), optional      :: indx
     character (len=*), intent(in), optional    :: substring
     character (len=:), allocatable             :: right_part
 
@@ -184,7 +235,7 @@ contains
 
     elseif ( present( substring ) ) then
 
-      position = index( string, substring, back=TRUE )
+      position = index( string, substring, back=.TRUE._c_bool )
 
       if ( position > 0 ) then
 
@@ -217,12 +268,12 @@ contains
     character (len=len_trim(sText1))  :: sTemp1
     character (len=len_trim(sText2))  :: sTemp2
 
-    lBool = lFALSE
+    lBool = .FALSE._c_bool
 
     sTemp1 = asUppercase(sText1)
     sTemp2 = asUppercase(sText2)
 
-    if ( index(sTemp1, sTemp2) /= 0 ) lBool = lTRUE
+    if ( index(sTemp1, sTemp2) /= 0 ) lBool = .TRUE._c_bool
 
   end function is_string2_present_in_string1_case_insensitive_fn
 
@@ -238,12 +289,12 @@ contains
     character (len=len_trim(sText1))  :: sTemp1
     character (len=len_trim(sText2))  :: sTemp2
 
-    lBool = lFALSE
+    lBool = .FALSE._c_bool
 
     sTemp1 = trim( sText1 )
     sTemp2 = trim( sText2 )
 
-    if ( index(sTemp1, sTemp2) /= 0 ) lBool = lTRUE
+    if ( index(sTemp1, sTemp2) /= 0 ) lBool = .TRUE._c_bool
 
   end function is_string2_present_in_string1_case_sensitive_fn
 
@@ -259,12 +310,12 @@ contains
     character (len=:), allocatable    :: sTemp1
     character (len=:), allocatable    :: sTemp2
 
-    lBool = lFALSE
+    lBool = .FALSE._c_bool
 
     sTemp1 = trim( sText1 )
     sTemp2 = trim( sText2 )
 
-    if (trim(adjustl( sTemp1 ) )  .eq. trim(adjustl( sTemp2) ) ) lBool = lTRUE
+    if (trim(adjustl( sTemp1 ) )  .eq. trim(adjustl( sTemp2) ) ) lBool = .TRUE._c_bool
 
   end function is_char_equal_to_char_case_sensitive_fn
 
@@ -280,12 +331,12 @@ contains
     character (len=:), allocatable    :: sTemp1
     character (len=:), allocatable    :: sTemp2
 
-    lBool = lFALSE
+    lBool = .FALSE._c_bool
 
     sTemp1 = asUppercase( sText1 )
     sTemp2 = asUppercase( sText2 )
 
-    if (trim(adjustl( sTemp1 ) )  .eq. trim(adjustl( sTemp2) ) ) lBool = lTRUE
+    if (trim(adjustl( sTemp1 ) )  .eq. trim(adjustl( sTemp2) ) ) lBool = .TRUE._c_bool
 
   end function is_char_equal_to_char_case_insensitive_fn
 
@@ -338,147 +389,142 @@ contains
   end function concatenate_char_double_fn
 
   !--------------------------------------------------------------------------------------------------
+  function short_to_char_fn(value, fmt_string)    result(text)
+    integer (c_short), intent(in)            :: value
+    character (len=*), intent(in), optional  :: fmt_string
+    character (len=:), allocatable           :: text
 
-  function short_to_char_fn(iValue)    result(sText)
+    integer (c_int)      :: status
+    character (len=32)   :: sbuf
 
-    integer (c_short), intent(in)  :: iValue
-    character (len=:), allocatable    :: sText
-
-    ! [ LOCALS ]
-    integer (c_int) :: iStat
-    character (len=32)   :: sBuf
-
-    write(sBuf, fmt=*, iostat=iStat)  iValue
-
-    if (iStat==0) then
-      sText = trim( adjustl(sBuf) )
+    if ( present(fmt_string) ) then
+      write(sbuf, fmt="("//trim(fmt_string)//")", iostat=status)  value
     else
-      sText = "NA"
+      write(sbuf, fmt=*, iostat=status)  value
+    endif
+
+    if (status==0) then
+      text = trim( adjustl(sbuf) )
+    else
+      text = "<NA>"
     endif
 
   end function short_to_char_fn
 
-  !--------------------------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
-   function int_to_char_fn(iValue)    result(sText)
+  function int_to_char_fn(value, fmt_string)    result(text)
+    integer (c_int), intent(in)              :: value
+    character (len=*), intent(in), optional  :: fmt_string
+    character (len=:), allocatable           :: text
 
-    integer (c_int), intent(in)  :: iValue
-    character (len=:), allocatable    :: sText
+    integer (c_int)      :: status
+    character (len=32)   :: sbuf
 
-    ! [ LOCALS ]
-    integer (c_int) :: iStat
-    character (len=32)   :: sBuf
-
-    write(sBuf, fmt=*, iostat=iStat)  iValue
-
-    if (iStat==0) then
-      sText = trim( adjustl(sBuf) )
+    if ( present(fmt_string) ) then
+      write(sbuf, fmt="("//trim(fmt_string)//")", iostat=status)  value
     else
-      sText = "NA"
+      write(sbuf, fmt=*, iostat=status)  value
+    endif
+
+    if (status==0) then
+      text = trim( adjustl(sbuf) )
+    else
+      text = "<NA>"
     endif
 
   end function int_to_char_fn
 
-  !--------------------------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
-   function long_long_to_char_fn(iValue)    result(sText)
+  function long_long_to_char_fn(value, fmt_string)    result(text)
+    integer (c_long_long), intent(in)           :: value
+    character (len=*), intent(in), optional  :: fmt_string
+    character (len=:), allocatable           :: text
 
-    integer (c_long_long), intent(in)  :: iValue
-    character (len=:), allocatable          :: sText
+    integer (c_int)      :: status
+    character (len=32)   :: sbuf
 
-    ! [ LOCALS ]
-    integer (c_int) :: iStat
-    character (len=32)   :: sBuf
-
-    write(sBuf, fmt=*, iostat=iStat)  iValue
-
-    if (iStat==0) then
-      sText = trim( adjustl(sBuf) )
+    if ( present(fmt_string) ) then
+      write(sbuf, fmt="("//trim(fmt_string)//")", iostat=status)  value
     else
-      sText = "NA"
+      write(sbuf, fmt=*, iostat=status)  value
+    endif
+
+    if (status==0) then
+      text = trim( adjustl(sbuf) )
+    else
+      text = "<NA>"
     endif
 
   end function long_long_to_char_fn
 
-  !--------------------------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
-   function float_to_char_fn(fValue, iFieldWidth, iNumdigits)    result(sText)
+  function float_to_char_fn(value, fmt_string)    result(text)
+    real (c_float), intent(in)               :: value
+    character (len=*), intent(in), optional  :: fmt_string
+    character (len=:), allocatable           :: text
 
-    real (c_float), intent(in)             :: fValue
-    integer (c_int), intent(in), optional  :: iFieldWidth
-    integer (c_int), intent(in), optional  :: iNumdigits
-    character (len=:), allocatable              :: sText
+    integer (c_int)      :: status
+    character (len=32)   :: sbuf
 
-    ! [ LOCALS ]
-    integer (c_int) :: iStat
-    character (len=32)   :: sFmt
-    character (len=32)   :: sBuf
-
-    if ( present( iNumDigits) .and. present( iFieldWidth ) ) then
-      write(sFmt, fmt="('(G',i0,'.',i0,')')") iFieldWidth, iNumdigits
-    elseif (present(iNumDigits) ) then
-      write(sFmt, fmt="('(G0.',i0,')')") iNumdigits
-    elseif (present(iFieldWidth) ) then
-      write(sFmt, fmt="('(G',i0,'.4)')") iNumdigits
+    if ( present(fmt_string) ) then
+      write(sbuf, fmt="("//trim(fmt_string)//")", iostat=status)  value
     else
-      sFmt = "(G0.4)"
+      write(sbuf, fmt=*, iostat=status)  value
     endif
 
-    write(sBuf, fmt=trim(sFmt), iostat=iStat)  fValue
-
-    if (iStat==0) then
-      sText = trim( adjustl(sBuf) )
+    if (status==0) then
+      text = trim( adjustl(sbuf) )
     else
-      sText = "NA"
+      text = "<NA>"
     endif
 
   end function float_to_char_fn
 
-  !--------------------------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
-   function double_to_char_fn(dValue, iNumdigits)    result(sText)
+  function double_to_char_fn(value, fmt_string)    result(text)
+    real (c_double), intent(in)              :: value
+    character (len=*), intent(in), optional  :: fmt_string
+    character (len=:), allocatable           :: text
 
-    real (c_double), intent(in)             :: dValue
-    integer (c_int), intent(in), optional  :: iNumdigits
-    character (len=:), allocatable              :: sText
+    integer (c_int)      :: status
+    character (len=32)   :: sbuf
 
-    ! [ LOCALS ]
-    integer (c_int) :: iStat
-    character (len=:), allocatable :: sFmt
-    character (len=32)   :: sBuf
-
-    if (present(iNumDigits) ) then
-      write(sFmt, fmt="('(G0.',i0,')')") iNumdigits
+    if ( present(fmt_string) ) then
+      write(sbuf, fmt="("//trim(fmt_string)//")", iostat=status)  value
     else
-      sFmt = "(G0.12)"
+      write(sbuf, fmt=*, iostat=status)  value
     endif
 
-    write(sBuf, fmt=sFmt, iostat=iStat)  dValue
-
-    if (iStat==0) then
-      sText = trim( adjustl(sBuf) )
+    if (status==0) then
+      text = trim( adjustl(sbuf) )
     else
-      sText = "NA"
+      text = "<NA>"
     endif
 
   end function double_to_char_fn
 
-  !--------------------------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
-   function logical_to_char_fn(lValue)    result(sText)
+  function bool_to_char_fn(value)    result(text)
+    logical (c_bool), intent(in)    :: value
+    character (len=:), allocatable  :: text
 
-    logical (c_bool), intent(in)    :: lValue
-    character (len=:), allocatable       :: sText
+    integer (c_int)      :: status
+    character (len=32)   :: sbuf
 
-    if (lValue) then
-      sText = "TRUE"
+    if ( value ) then
+      text = ".TRUE._c_bool"
     else
-      sText = "FALSE"
+      text = "False"
     endif
 
-  end function logical_to_char_fn
+  end function bool_to_char_fn
 
-  !--------------------------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
    function squote_char_fn(sText1)    result(sText)
 
@@ -489,7 +535,7 @@ contains
 
   end function squote_char_fn
 
-  !--------------------------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
    function dquote_char_fn(sText1)    result(sText)
 
@@ -615,7 +661,7 @@ contains
     character (len=512)            :: sBuf
     integer (c_int)           :: iR                 ! Index in sRecord
     integer (c_int)           :: iIndex1, iIndex2
-    character (len=:), allocatable :: sTargetCharacters_l 
+    character (len=:), allocatable :: sTargetCharacters_l
 
     ! eliminate any leading spaces
     sText1 = adjustl(sText1)
@@ -660,14 +706,14 @@ contains
     character (len=256)            :: sBuf
     integer (c_int)           :: iR                 ! Index in sRecord
     integer (c_int)           :: iIndex1, iIndex2
-    character (len=1)              :: sChar_l 
+    character (len=1)              :: sChar_l
     logical (c_bool)          :: lPreviouslyFound
 
     ! eliminate any leading spaces
     sText1 = adjustl(sText1)
     sBuf = ""
     iIndex2 = 0
-    lPreviouslyFound = lFALSE
+    lPreviouslyFound = .FALSE._c_bool
 
     if (present(sChar) ) then
       sChar_l = sChar
@@ -683,7 +729,7 @@ contains
         ! sChar_l was not found
         iIndex2 = iIndex2 + 1
         sBuf(iIndex2:iIndex2) = sText1(iIndex1:iIndex1)
-        lPreviouslyFound = lFALSE
+        lPreviouslyFound = .FALSE._c_bool
 
       elseif( lPreviouslyFound ) then
         ! sChar_l was found, and was also found in the position preceding this one
@@ -695,7 +741,7 @@ contains
 
         iIndex2 = iIndex2 + 1
         sBuf(iIndex2:iIndex2) = sText1(iIndex1:iIndex1)
-        lPreviouslyFound = lTRUE
+        lPreviouslyFound = .TRUE._c_bool
 
       end if
 
@@ -714,24 +760,24 @@ contains
     integer (c_int)                        :: iCount
 
     ! [ LOCALS ]
-    character (len=len(sText))      :: sText1
-    character (len=len(sText))      :: sText2
-    character (len=:), allocatable  :: sDelimiters_l 
+    character (len=len(sText))      :: str
+    character (len=len(sText))      :: substr
+    character (len=:), allocatable  :: delimiter_chr_
 
     if ( present(sDelimiters) ) then
-      sDelimiters_l = sDelimiters_l 
+      delimiter_chr_=sDelimiters
     else
-      sDelimiters_l = WHITESPACE
+      delimiter_chr_ = WHITESPACE
     endif
 
     iCount = 0
 
-    sText1 = sText
+    str = sText
 
     do
-      call chomp(sText1=sText1, sText2=sText2, sDelimiters=sDelimiters_l )
+      call chomp(str=str, substr=substr, delimiter_chr=delimiter_chr_ )
 
-      if ( len_trim( sText2 ) == 0 )  exit
+      if ( len_trim( substr ) == 0 )  exit
 
       iCount = iCount + 1
 
@@ -741,47 +787,34 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-  subroutine split_and_return_text_sub(sText1, sText2, sDelimiters)
+  subroutine split_and_return_text_sub(str, substr, delimiter_chr)
 
-    character (len=*), intent(inout)                     :: sText1
-    character (len=*), intent(out)                       :: sText2
-    character (len=*), intent(in), optional              :: sDelimiters
+    character (len=*), intent(inout)                     :: str
+    character (len=*), intent(out)                       :: substr
+    character (len=*), intent(in), optional              :: delimiter_chr
 
     ! [ LOCALS ]
-    character (len=:), allocatable :: sDelimiters_l 
-    integer (c_int) :: iIndex
+    character (len=:), allocatable :: delimiter_chr_
+    integer (kind=c_int) :: iIndex
 
-    if ( present(sDelimiters) ) then
-
-      select case (sDelimiters)
-      case ("WHITESPACE")
-        sDelimiters_l = WHITESPACE
-      case ("TAB", "TABS")
-        sDelimiters_l = TAB
-      case ("COMMA", "CSV")
-        sDelimiters_l = ","
-      case default
-        sDelimiters_l = sDelimiters
-      end select
-
+    if ( present(delimiter_chr) ) then
+      delimiter_chr_ = delimiter_chr
     else
-
-      sDelimiters_l = WHITESPACE
-
+      delimiter_chr_ = ","
     endif
 
-    sText1 = adjustl(sText1)
+    str = adjustl(str)
 
-    iIndex = scan( string = sText1, set = sDelimiters_l )
+    iIndex = scan( string = str, set = delimiter_chr_ )
 
     if (iIndex == 0) then
       ! no delimiters found; return string as was supplied originally
-      sText2 = sText1
-      sText1 = ""
+      substr = str
+      str = ""
     else
       ! delimiters were found; split and return the chunks of text
-      sText2 = trim( sText1(1:iIndex-1) )
-      sText1 = trim( adjustl( sText1(iIndex + 1:) ) )
+      substr = trim( str(1:iIndex-1) )
+      str = trim( adjustl( str(iIndex + 1:) ) )
     endif
 
   end subroutine split_and_return_text_sub
@@ -790,62 +823,80 @@ contains
 
   subroutine replace_character_sub(sText1, sFind, sReplace)
 
-    character (len=*), intent(inout)    :: sText1
-    character (len=1), intent(in)       :: sFind
-    character (len=1), intent(in)       :: sReplace
+    character (len=*), intent(inout)         :: sText1
+    character (len=1), intent(in)            :: sFind
+    character (len=1), intent(in), optional  :: sReplace
 
     ! [ LOCALS ]
-    integer (c_int) :: iIndex
+    integer (c_int)                  :: iIndex
+    integer (c_int)                  :: iCount
+    character (len=len_trim(sText1)) :: sText
+
+    sText = ""
 
     if ( len(sText1) > 0 ) then
 
+      iCount = 0
       do iIndex = 1, len_trim(sText1)
-
-        if ( sText1(iIndex:iIndex) .eq. sFind)    sText1(iIndex:iIndex) = sReplace
-
+        if ( sText1(iIndex:iIndex) .ne. sFind) then
+          iCount = iCount + 1
+          sText(iCount:iCount) = sText1(iIndex:iIndex)
+        else
+          if (present(sReplace)) then
+            iCount = iCount + 1
+            sText(iCount:iCount) = sReplace
+          endif
+        endif
       enddo
 
     endif
 
+    sText1 = trim(sText)
+
   end subroutine replace_character_sub
 
   !--------------------------------------------------------------------------------------------------
-  !
-  ! function remove_multiple_characters_fn(sText, sDelimiters)                result(sText1)
-  !
-  !   ! ARGUMENTS
-  !   character (len=*), intent(inout)           :: sText
-  !   character (len=*), intent(in), optional    :: sDelimiters
-  !   character (len=:), allocatable             :: sText1
-  !
-  !   ! LOCALS
-  !   character ( len=len_trim(sText) ) :: sTemp
-  !   integer (c_int) :: iR                 ! Index in sRecord
-  !   integer (c_int) :: i, j
-  !
-  !   ! eliminate any leading spaces
-  !   sText = adjustl(sText)
-  !   sTemp = ""
-  !   j = 0
-  !
-  !   do i = 1,len_trim(sText)
-  !
-  !     if(present(sDelimiters)) then
-  !       iR = scan(sText(i:i), sDelimiters)
-  !     else
-  !       iR = scan(sText(i:i),":/;,")
-  !     endif
-  !
-  !     if(iR==0) then
-  !       j = j + 1
-  !       sTemp(j:j) = sText(i:i)
-  !     end if
-  !
-  !   enddo
-  !
-  !   sText1 = trim(sTemp)
-  !
-  ! end function remove_multiple_characters_fn
+
+  function c_to_f_string_fn(c_character_str)   result(f_character_str)
+
+    character (len=*), intent(in)                    :: c_character_str
+    character (len=:), allocatable                   :: f_character_str
+
+    integer (c_int)   :: indx
+
+    f_character_str = c_character_str
+
+    do indx=1,len(c_character_str)
+      if (c_character_str(indx:indx) == c_null_char) then
+        f_character_str = c_character_str(1:indx-1)
+        exit
+      endif
+    enddo
+
+  end function c_to_f_string_fn
+
+!--------------------------------------------------------------------------------------------------
+
+  function f_to_c_string_fn(f_character_str)   result(c_character_str)
+
+    character (len=*), intent(in)                    :: f_character_str
+    character (len=:), allocatable                   :: c_character_str
+
+    integer (c_int) :: str_len
+
+    str_len = len_trim(f_character_str)
+
+    if ( str_len == 0 ) then
+      c_character_str = c_null_char
+    elseif ( f_character_str(str_len:str_len) == c_null_char ) then
+      ! already has a null character at end; do not append another
+      c_character_str = trim(f_character_str)
+    else
+      ! last char is not null character; append c_null_char
+      c_character_str = trim(f_character_str)//c_null_char
+    endif
+
+  end function f_to_c_string_fn
 
 
-end module strings
+end module fstring

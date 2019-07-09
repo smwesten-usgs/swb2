@@ -1,6 +1,6 @@
 module timer
 
-  use strings, only   : asCharacter
+  use fstring, only   : asCharacter
   use iso_c_binding
   implicit none
 

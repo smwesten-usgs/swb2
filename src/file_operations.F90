@@ -5,8 +5,8 @@ module file_operations
   use logfiles
   use exceptions
   use constants_and_conversions
-  use strings
-  use string_list
+  use fstring
+  use fstring_list
   implicit none
 
   private
@@ -20,7 +20,7 @@ module file_operations
     character (len=:), allocatable  :: sFilename
     character (len=:), allocatable  :: sDelimiters
     character (len=:), allocatable  :: sCommentChars
-    type (STRING_LIST_T)            :: slColNames
+    type (FSTRING_LIST_T)            :: slColNames
     integer (c_int)            :: iCurrentLinenum = 0
     integer (c_int)            :: iNumberOfLines = 0
     integer (c_int)            :: iNumberOfRecords = 0
@@ -327,7 +327,7 @@ contains
   function read_header_fn(this) result (stList)
 
     class (ASCII_FILE_T), intent(inout) :: this
-    type (STRING_LIST_T) :: stList
+    type (FSTRING_LIST_T) :: stList
 
     ! [ LOCALS ]
     character (len=MAX_STR_LEN)           :: sString

@@ -25,10 +25,10 @@ module logfiles
   type LOGFILE_T
     character (len=:), allocatable  :: sFilePrefix
     character (len=64)              :: sFilename(2)
-    logical (c_bool)           :: lIsOpen(2)       = .false._c_bool
-    integer (c_int)            :: iUnitNum(2)      = -999
-    integer (c_int)            :: iStat(2)
-    integer (c_int)            :: iLogLevel        = LOG_GENERAL
+    logical (c_bool)                :: lIsOpen(2)       = .false._c_bool
+    integer (c_int)                 :: iUnitNum(2)      = -999
+    integer (c_int)                 :: iStat(2)
+    integer (c_int)                 :: iLogLevel        = LOG_GENERAL
 
   contains
 
@@ -62,7 +62,7 @@ module logfiles
 
   integer (c_int)               :: CURRENT_LOG_LEVEL     = LOG_GENERAL
   logical (c_bool)              :: CURRENT_LOG_ECHO      = .false._c_bool
-  character (len=64)                 :: OUTPUT_DIRECTORY_NAME = ""
+  character (len=64)            :: OUTPUT_DIRECTORY_NAME = ""
   logical (c_bool), parameter   :: TRUE = .true._c_bool
 
 contains
@@ -103,10 +103,9 @@ contains
   subroutine initialize_logfiles_sub(this, iLogLevel, sFilePrefix, lWrite_SWB_Info )
 
     class (LOGFILE_T)                            :: this
-    integer (c_int), intent(in), optional   :: iLogLevel
+    integer (c_int), intent(in), optional        :: iLogLevel
     character (len=*), intent(in), optional      :: sFilePrefix
-    logical (c_bool), intent(in), optional  :: lWrite_SWB_Info
-
+    logical (c_bool), intent(in), optional       :: lWrite_SWB_Info
 
     ! [ LOCALS ]
     integer (c_int)    :: iLogLevel_l
@@ -248,20 +247,20 @@ contains
     this%sFilePrefix = "SWB_LOGFILE__"//sYear//sMonth//sDay//"_"  &
                                                    //sHour//sMinutes//sSeconds
 
-
   end subroutine make_prefix_sub
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine write_to_logfiles_sub(this, sMessage, iTab, iLinesBefore, iLinesAfter, iLogLevel, lEcho )
+  subroutine write_to_logfiles_sub(this, sMessage, iTab, iLinesBefore,         &
+                                   iLinesAfter, iLogLevel, lEcho )
 
     class (LOGFILE_T)                            :: this
     character (len=*), intent(in)                :: sMessage
-    integer (c_int), intent(in), optional   :: iTab
-    integer (c_int), intent(in), optional   :: iLinesBefore
-    integer (c_int), intent(in), optional   :: iLinesAfter
-    integer (c_int), intent(in), optional   :: iLogLevel
-    logical (c_bool), intent(in), optional  :: lEcho
+    integer (c_int), intent(in), optional        :: iTab
+    integer (c_int), intent(in), optional        :: iLinesBefore
+    integer (c_int), intent(in), optional        :: iLinesAfter
+    integer (c_int), intent(in), optional        :: iLogLevel
+    logical (c_bool), intent(in), optional       :: lEcho
 
     ! [ LOCALS ]
     integer (c_int)  :: iTab_l
