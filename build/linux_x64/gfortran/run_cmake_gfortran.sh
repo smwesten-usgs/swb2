@@ -31,8 +31,8 @@ export LIB_NETCDF=${NETCDF_ARR[1]}
 #export LIB_SZ=$( locate libsz.a | grep /usr/lib64 )
 #export LIB_DL=$(locate libdl.so | grep -v 32 | grep -v libdl.so.)
 #export LIB_CURL=$(locate libcurl.so | grep usr | grep -v libcurl.so. )
-export LIB_GCC=$( locate libgcc.a | grep -v 32 | grep -v gnu/4.)
-export LIB_GFORTRAN=$( locate libgfortran.a | grep -v 32 | grep -v gnu/4. )
+export LIB_GCC=$( locate libgcc.a | grep -v 32 | grep -v gnu/4/ | grep -v gnu/5/ | grep -v gnu/6/)
+export LIB_GFORTRAN=$( locate libgfortran.a | grep -v 32 | grep -v gnu/4/ | grep -v gnu/5/ | grep -v gnu/6/)
 
 export PATH=/usr/local:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:$PATH
 
