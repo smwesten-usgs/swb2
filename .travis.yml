@@ -1,4 +1,5 @@
 language: c
+dist: xenial
 sudo: required
 compiler: gcc-8
 git:
@@ -13,10 +14,8 @@ before_install:
   - sudo add-apt-repository -y ppa:ubuntu-toolchain-r/test
   - sudo apt-get -y update
   - sudo apt-get -y install cmake
-  - sudo unlink /usr/bin/gcc && sudo ln -s /usr/bin/gcc-5 /usr/bin/gcc  
   - sudo apt-get -y install gfortran-8
-  - sudo apt-get -y install libnetcdfc
-  - sudo apt-get -y install libnetcdf-dev
+  - sudo apt-get -y install libnetcdf11
   - sudo apt-get -y install libhdf5-dev 
   - sudo apt-get -y install findutils
   - sudo updatedb --add-prunepaths '/bin /opt'
