@@ -5,7 +5,7 @@ module parameters
   use file_operations, only  : ASCII_FILE_T
   use logfiles
   use fstring
-  use fstring_list, only      : FSTRING_LIST_T
+  use fstring_list, only     : FSTRING_LIST_T
   use dictionary
   use constants_and_conversions
   implicit none
@@ -26,7 +26,7 @@ module parameters
     type (FSTRING_LIST_T)               :: filenames
     type (FSTRING_LIST_T)               :: delimiters
     type (FSTRING_LIST_T)               :: comment_chars
-    integer (c_int)                    :: count           = 0
+    integer (c_int)                     :: count           = 0
 
   contains
 
@@ -67,7 +67,7 @@ module parameters
   type (PARAMETERS_T), public :: PARAMS
   type (DICT_T), public       :: PARAMS_DICT
 
-  integer (c_int), parameter :: MAX_TABLE_RECORD_LEN = 512
+  integer (c_int), parameter  :: MAX_TABLE_RECORD_LEN = 512
 
 contains
 
@@ -351,7 +351,7 @@ contains
 
 !       if ( any( iValues <= iTINYVAL ) ) &
 !         call warn( "Failed to find a lookup table column named " &
-!           //dQuote( slKeys%listall() )//".", lFatal = lFatal_l )
+!           //dQuote( slKeys%list_all() )//".", lFatal = lFatal_l )
 
     else if ( present( sKey) ) then
 
@@ -369,11 +369,11 @@ contains
 
   subroutine get_parameter_values_string_list( this, slValues, slKeys, sKey, lFatal )
 
-    class (PARAMETERS_T)                                        :: this
-    type (FSTRING_LIST_T), intent(out)                           :: slValues
-    type (FSTRING_LIST_T), intent(in),                  optional :: slKeys
-    character (len=*),    intent(in ),                 optional :: sKey
-    logical (c_bool), intent(in),                 optional :: lFatal
+    class (PARAMETERS_T)                               :: this
+    type (FSTRING_LIST_T), intent(out)                 :: slValues
+    type (FSTRING_LIST_T), intent(inout), optional     :: slKeys
+    character (len=*), intent(in ), optional           :: sKey
+    logical (c_bool), intent(in), optional             :: lFatal
 
     ! [ LOCALS ]
     logical (c_bool) :: lFatal_l
@@ -391,8 +391,7 @@ contains
 
        if ( slValues%get(1) .strequal. "<NA>" ) then
          call warn( "Failed to find a lookup table column named "        &
-           //dQuote( slKeys%listall() )//".", lFatal = lFatal_l )
-         slValues%is_populated = FALSE
+           //dQuote( slKeys%list_all() )//".", lFatal = lFatal_l )
        end if
 
     else if ( present( sKey) ) then
@@ -402,7 +401,6 @@ contains
       if ( slValues%get(1) .strequal. "<NA>" ) then
         call warn( "Failed to find a lookup table column named "        &
           //dQuote( sKey )//".", lFatal = lFatal_l )
-        slValues%is_populated = FALSE
       end if
 
     endif
@@ -436,7 +434,7 @@ contains
 
       if ( any( iValues <= iTINYVAL ) ) &
         call warn( "Failed to find a lookup table column named " &
-          //dQuote( slKeys%listall() )//".", lFatal = lFatal_l )
+          //dQuote( slKeys%list_all() )//".", lFatal = lFatal_l )
 
     else if ( present( sKey) ) then
 
@@ -476,7 +474,7 @@ contains
 
       if ( any( fValues <= fTINYVAL ) ) &
         call warn( "Failed to find a lookup table column named " &
-          //dQuote( slKeys%listall() )//".", lFatal = lFatal_l )
+          //dQuote( slKeys%list_all() )//".", lFatal = lFatal_l )
 
     else if ( present( sKey) ) then
 

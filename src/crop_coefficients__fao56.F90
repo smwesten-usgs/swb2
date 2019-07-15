@@ -246,7 +246,7 @@ contains
     call Logs%write("-------------|---------------|--------------|--------------" &
       //"|--------------|---------------|-----------------")
 
-    if ( slPlantingDate%count == iNumberOfLanduses .and. slPlantingDate%is_populated ) then
+    if ( slPlantingDate%count == iNumberOfLanduses .and. slPlantingDate%count > 0 ) then
 
       do iIndex=1, slPlantingDate%count
 

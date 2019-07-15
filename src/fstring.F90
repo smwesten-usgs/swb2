@@ -798,9 +798,18 @@ contains
     integer (kind=c_int) :: iIndex
 
     if ( present(delimiter_chr) ) then
-      delimiter_chr_ = delimiter_chr
+      select case (delimiter_chr)
+      case ("WHITESPACE")
+        delimiter_chr_ = WHITESPACE
+      case ("TAB", "TABS")
+        delimiter_chr_ = TAB
+      case ("COMMA", "CSV")
+        delimiter_chr_ = ","
+      case default
+        delimiter_chr_ = delimiter_chr
+      end select
     else
-      delimiter_chr_ = ","
+      delimiter_chr_ = WHITESPACE
     endif
 
     str = adjustl(str)

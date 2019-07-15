@@ -80,7 +80,7 @@ contains
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
     if ( gdd_reset_val_list%count == number_of_landuse_codes      &
-         .and. gdd_reset_val_list%countmatching("<NA>") == 0 ) then
+         .and. gdd_reset_val_list%count_matching("<NA>") == 0 ) then
 
       ! retrieve gdd reset values; convert mm/dd to DOY
       do indx=1, gdd_reset_val_list%count

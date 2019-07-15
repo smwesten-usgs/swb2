@@ -20,16 +20,16 @@ module file_operations
     character (len=:), allocatable  :: sFilename
     character (len=:), allocatable  :: sDelimiters
     character (len=:), allocatable  :: sCommentChars
-    type (FSTRING_LIST_T)            :: slColNames
-    integer (c_int)            :: iCurrentLinenum = 0
-    integer (c_int)            :: iNumberOfLines = 0
-    integer (c_int)            :: iNumberOfRecords = 0
-    integer (c_int)            :: iNumberOfHeaderLines = 1
-    logical (c_bool)           :: lIsOpen = lFALSE
-    logical (c_bool)           :: lReadOnly = lTRUE
-    logical (c_bool)           :: lEOF = lFALSE
-    integer (c_int)            :: iUnitNum
-    integer (c_int)            :: iStat
+    type (FSTRING_LIST_T)           :: slColNames
+    integer (c_int)                 :: iCurrentLinenum = 0
+    integer (c_int)                 :: iNumberOfLines = 0
+    integer (c_int)                 :: iNumberOfRecords = 0
+    integer (c_int)                 :: iNumberOfHeaderLines = 1
+    logical (c_bool)                :: lIsOpen = lFALSE
+    logical (c_bool)                :: lReadOnly = lTRUE
+    logical (c_bool)                :: lEOF = lFALSE
+    integer (c_int)                 :: iUnitNum
+    integer (c_int)                 :: iStat
     character (len=MAX_STR_LEN)     :: sBuf
     character (len=:), allocatable  :: stMissingValue
 

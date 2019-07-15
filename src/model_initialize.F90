@@ -872,6 +872,8 @@ contains
       ! read in next line of the control file
       sRecord = CF%readLine()
 
+      print *, "@ line: "//dquote(sRecord)
+
       if ( CF%isEOF() )  exit
 
       ! create and allocate memory for a single dictionary entry
@@ -895,8 +897,6 @@ contains
         ! first add the key value to the directory entry data structure
         call CF_ENTRY%add_key( sKey )
 
-        print *, "@ key: ", "'"//trim(sKey)//"'"
-
         ! break off first directive for the current record
         call chomp( sRecord, sValue, CF%sDelimiters )
 
@@ -904,7 +904,6 @@ contains
 
           ! add the next directive snippet to dictionary entry data structure
           call CF_ENTRY%add_value( sValue )
-          print *, "@   value: ", "'"//trim(sValue)//"'"
           ! break off next directive for the current record
           call chomp( sRecord, sValue, CF%sDelimiters )
 
@@ -998,8 +997,6 @@ contains
       ! process all known directives associated with key word
       do iIndex = 1, myDirectives%count
 
-        print *, "*iIndex: ", iIndex, "*Number of directives: ", myDirectives%count
-
         ! myDirectives is a string list of all SWB directives that contain sKey
         ! sCmdText contains an individual directive
         sCmdText = myDirectives%get(iIndex)
@@ -1007,20 +1004,13 @@ contains
         ! For MODEL directive, obtain the associated dictionary entries
         call CF_DICT%get_values(sCmdText, myOptions )
 
-        print *, "*cmd text: ", "'"//trim(sCmdText)//"'"
-        print *, "  * count= ", myOptions%count
-
         ! most of the time, we only care about the first dictionary entry, obtained below
         sArgText_1 = myOptions%get(1)
-        print *, "  * arg text1: ", "'"//trim(sArgText_1)//"'"
         sArgText_2 = myOptions%get(2)
-        print *, "  * arg text2: ", "'"//trim(sArgText_2)//"'"
 
         ! dictionary entries are initially space-delimited; sArgText_1 contains
         ! all dictionary entries present, concatenated, with a space between entries
         sArgText = myOptions%get(1, myOptions%count )
-
-        print *, "  * arg text: ", "'"//trim(sArgText)//"'"
 
         ! echo the original directive and dictionary entries to the logfile
         call LOGS%write("> "//sCmdText//" "//sArgText, iLinesBefore=1 )
@@ -1554,9 +1544,6 @@ contains
         ! dictionary entries are initially space-delimited; sArgText contains
         ! all dictionary entries present, concatenated, with a space between entries
         sArgText = myOptions%get(1, myOptions%count )
-
-        print *, "$$ cmd: ","'"//trim(sCmdText)//"'"
-        print *, "$$   args: ","'"//trim(sArgText)//"'"
 
         ! echo the original directive and dictionary entries to the logfile
         call LOGS%write("> "//sCmdText//" "//sArgText, iLinesBefore=1 )

@@ -2133,7 +2133,7 @@ contains
     ! retrieve a string list of all keys associated with root zone depth (i.e. RZ_1, RZ_2, RZ_3, etc.)
     slRZ = PARAMS%grep_name("RZ", lFatal=TRUE )
     ! Convert the string list to an vector of integers; MODEL call strips off the "RZ_" part of label
-    iRZ_SeqNums = slRZ%asInt()
+    iRZ_SeqNums = slRZ%get_integer()
     ! count how many items are present in the vector; MODEL should equal the number of soils groups
     iNumberOfSoilGroups = count( iRZ_SeqNums > 0 )
 

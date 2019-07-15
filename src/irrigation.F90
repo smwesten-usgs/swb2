@@ -188,7 +188,7 @@ contains
     allocate( FIRST_DAY_OF_IRRIGATION( sl_irrigation_begin%count ), stat=status )
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
-    if ( sl_irrigation_begin%countmatching("<NA>") == 0 ) then
+    if ( sl_irrigation_begin%count_matching("<NA>") == 0 ) then
 
       do index = 1, sl_irrigation_begin%count
         str_buffer = sl_irrigation_begin%get( index )
@@ -208,7 +208,7 @@ contains
     allocate( LAST_DAY_OF_IRRIGATION( sl_irrigation_end%count ), stat=status )
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
-    if ( sl_irrigation_end%countmatching("<NA>") == 0 ) then
+    if ( sl_irrigation_end%count_matching("<NA>") == 0 ) then
 
       do index = 1, sl_irrigation_end%count
         str_buffer = sl_irrigation_end%get( index )
@@ -227,9 +227,9 @@ contains
     allocate( NUM_DAYS_OF_IRRIGATION( sl_irrigation_days%count ), stat=status )
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
-    NUM_DAYS_OF_IRRIGATION = sl_irrigation_days%asInt()
+    NUM_DAYS_OF_IRRIGATION = sl_irrigation_days%get_integer()
 
-    if ( sl_irrigation_days%countmatching("<NA>") == 0 ) then
+    if ( sl_irrigation_days%count_matching("<NA>") == 0 ) then
 
       where ( NUM_DAYS_OF_IRRIGATION == 0 )
         NUM_DAYS_OF_IRRIGATION = 999999

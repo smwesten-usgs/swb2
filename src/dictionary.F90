@@ -526,7 +526,7 @@ end function find_dict_entry_fn
           iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
       endif
 
-      iValues = pTarget%sl%asInt()
+      iValues = pTarget%sl%get_integer()
 
     else
 
@@ -575,7 +575,7 @@ end function find_dict_entry_fn
           iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
       endif
 
-      lValues = pTarget%sl%asLogical()
+      lValues = pTarget%sl%get_logical()
 
     else
 
@@ -643,11 +643,11 @@ end function find_dict_entry_fn
       if ( is_fatal_l ) then
         empty_entries = pTarget%sl%empty_entries_present()
         if( empty_entries )  call warn(sMessage="There are missing values associated" &
-          //" with the key values of "//slKeys%listall(),                             &
+          //" with the key values of "//slKeys%list_all(),                             &
           iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
       endif
 
-      lValues = pTarget%sl%asLogical()
+      lValues = pTarget%sl%get_logical()
 
     else
 
@@ -655,7 +655,7 @@ end function find_dict_entry_fn
       call assert(iStat == 0, "Failed to allocate memory to lValues array", &
         __SRCNAME__, __LINE__)
 
-      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
+      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%list_all()), &
         sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
       lValues = FALSE
@@ -706,7 +706,7 @@ end function find_dict_entry_fn
       if ( is_fatal_l ) then
         empty_entries = pTarget%sl%empty_entries_present()
         if( empty_entries )  call warn(sMessage="There are missing values associated" &
-          //" with the key values of "//slKeys%listall(),                             &
+          //" with the key values of "//slKeys%list_all(),                             &
           iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
       endif
 
@@ -715,7 +715,7 @@ end function find_dict_entry_fn
     else
 
       call slString%append("<NA>")
-      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
+      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%list_all()), &
         sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
     endif
@@ -858,11 +858,11 @@ end function find_dict_entry_fn
       if ( is_fatal_l ) then
         empty_entries = pTarget%sl%empty_entries_present()
         if( empty_entries )  call warn(sMessage="There are missing values associated" &
-          //" with the key values of "//slKeys%listall(),                             &
+          //" with the key values of "//slKeys%list_all(),                             &
           iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
       endif
 
-      iValues = pTarget%sl%asInt()
+      iValues = pTarget%sl%get_integer()
 
     else
 
@@ -870,7 +870,7 @@ end function find_dict_entry_fn
       call assert(iStat == 0, "Failed to allocate memory to iValues array", &
         __SRCNAME__, __LINE__)
 
-      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
+      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%list_all()), &
         sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
       iValues = iTINYVAL
@@ -912,6 +912,7 @@ end function find_dict_entry_fn
     endif
 
     iCount = 0
+    pTarget => null()
 
     do while ( iCount < slKeys%count )
 
@@ -930,11 +931,11 @@ end function find_dict_entry_fn
       if ( is_fatal_l ) then
         empty_entries = pTarget%sl%empty_entries_present()
         if( empty_entries )  call warn(sMessage="There are missing values associated" &
-          //" with the key values of "//slKeys%listall(),                             &
+          //" with the key values of "//slKeys%list_all(),                             &
           iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
       endif
 
-      fValues = pTarget%sl%asFloat()
+      fValues = pTarget%sl%get_float()
 
     else
 
@@ -942,7 +943,7 @@ end function find_dict_entry_fn
       call assert(iStat == 0, "Failed to allocate memory to fValues array", &
         __SRCNAME__, __LINE__)
 
-      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
+      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%list_all()), &
         sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
 
@@ -979,7 +980,7 @@ end function find_dict_entry_fn
           iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
       endif
 
-      fValues = pTarget%sl%asFloat()
+      fValues = pTarget%sl%get_float()
 
     else
 
@@ -1050,16 +1051,16 @@ end function find_dict_entry_fn
 
         case ( LOG_GENERAL )
 
-          call current%sl%print( iLU=LOGS%iUnitNum( LOG_GENERAL ) )
+          call current%sl%print( lu=LOGS%iUnitNum( LOG_GENERAL ) )
 
         case ( LOG_DEBUG )
 
-          call current%sl%print( iLU=LOGS%iUnitNum( LOG_DEBUG ) )
+          call current%sl%print( lu=LOGS%iUnitNum( LOG_DEBUG ) )
 
         case ( LOG_ALL )
 
-          call current%sl%print( iLU=LOGS%iUnitNum( LOG_GENERAL ) )
-          call current%sl%print( iLU=LOGS%iUnitNum( LOG_DEBUG ) )
+          call current%sl%print( lu=LOGS%iUnitNum( LOG_GENERAL ) )
+          call current%sl%print( lu=LOGS%iUnitNum( LOG_DEBUG ) )
 
         case default
 

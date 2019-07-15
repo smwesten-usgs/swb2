@@ -12,7 +12,7 @@ program swbstats2
   use grid
   use netcdf4_support
   use simulation_datetime, only       : SIM_DT, DATE_RANGE_T
-  use fstring_list, only               : FSTRING_LIST_T,                         &
+  use fstring_list, only              : FSTRING_LIST_T,                         &
                                         create_list
   use fstring
   use version_control, only           : SWB_VERSION, GIT_COMMIT_HASH_STRING,   &
@@ -1123,10 +1123,10 @@ contains
       ! skip blank lines
       if ( len_trim(sRecord) == 0 ) cycle
 
-      call chomp( sRecord, sItem, sDelimiters="," )
+      call chomp( sRecord, sItem, delimiter_chr="," )
       call options%date_range_id_list%append( sItem )
 
-      call chomp( sRecord, sItem, sDelimiters="," )
+      call chomp( sRecord, sItem, delimiter_chr="," )
       call options%start_date_list%append( sItem )
       call options%end_date_list%append( sRecord )
 
@@ -1175,13 +1175,13 @@ contains
       ! skip blank lines
       if ( len_trim(sRecord) == 0 ) cycle
 
-      call chomp( sRecord, sItem, sDelimiters="," )
+      call chomp( sRecord, sItem, delimiter_chr="," )
       call options%date_range_id_list%append( sItem )
 
-      call chomp( sRecord, sItem, sDelimiters="," )
+      call chomp( sRecord, sItem, delimiter_chr="," )
       call options%start_date_list%append( sItem )
 
-      call chomp( sRecord, sItem, sDelimiters="," )
+      call chomp( sRecord, sItem, delimiter_chr="," )
       call options%end_date_list%append( sItem )
 
       call options%comparison_grid_file_list%append( sRecord )
@@ -1230,13 +1230,13 @@ contains
       ! skip blank lines
       if ( len_trim(sRecord) == 0 ) cycle
 
-      call chomp( sRecord, sItem, sDelimiters="," )
+      call chomp( sRecord, sItem, delimiter_chr="," )
       call options%date_range_id_list%append( sItem )
 
-      call chomp( sRecord, sItem, sDelimiters="," )
+      call chomp( sRecord, sItem, delimiter_chr="," )
       call options%start_date_list%append( sItem )
 
-      call chomp( sRecord, sItem, sDelimiters="," )
+      call chomp( sRecord, sItem, delimiter_chr="," )
       call options%end_date_list%append( sItem )
 
       call options%zone_grid_file_list%append( sRecord )
@@ -1338,7 +1338,7 @@ contains
     type (DATETIME_T), intent(in)            :: end_date
     real (c_double), intent(inout)           :: values(:,:)
     integer (c_int), intent(inout)           :: zone_ids(:,:)
-    type (FSTRING_LIST_T), intent(in)         :: unique_zone_list
+    type (FSTRING_LIST_T), intent(inout)     :: unique_zone_list
     integer (c_int), intent(in), optional    :: funit
     real (c_double), intent(inout), optional :: comparison_values(:,:)
 
@@ -1357,7 +1357,7 @@ contains
     endif
 
     ! obtain list of unique integers present in the zone grid
-    tempvals = unique_zone_list%asInt()
+    tempvals = unique_zone_list%get_integer()
 
     do indx=1,ubound(tempvals,1)
       n = tempvals(indx)
@@ -1469,7 +1469,7 @@ contains
           call unique_val_list%append(sval)
 
         else
-          if ( unique_val_list%countmatching( sval ) > 0 )  cycle
+          if ( unique_val_list%count_matching( sval ) > 0 )  cycle
           call unique_val_list%append(sval)
 
         endif

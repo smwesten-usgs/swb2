@@ -68,7 +68,7 @@ contains
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
     if ( sl_growing_season_begin%count == iNumberOfLanduses                &
-         .and. sl_growing_season_begin%countmatching("<NA>") == 0 ) then
+         .and. sl_growing_season_begin%count_matching("<NA>") == 0 ) then
 
       do indx = 1, sl_growing_season_begin%count
         str_buffer = sl_growing_season_begin%get( indx )
@@ -103,7 +103,7 @@ contains
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
     if ( sl_growing_season_end%count == iNumberOfLanduses                  &
-         .and. sl_growing_season_end%countmatching("<NA>") == 0 ) then
+         .and. sl_growing_season_end%count_matching("<NA>") == 0 ) then
 
       do indx = 1, sl_growing_season_end%count
         str_buffer = sl_growing_season_end%get( indx )
