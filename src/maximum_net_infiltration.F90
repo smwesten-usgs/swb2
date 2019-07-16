@@ -138,9 +138,9 @@ contains
       number_of_soils = ubound( fMAXIMUM_NET_INFILTRATION_TABLE, 2 )
 
       call LOGS%WRITE( "| Landuse Code |  Soils Code  | Number of Matches | Maximum net infiltration (in) |",   &
-        iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        iLogLevel = LOG_DEBUG, lEcho = FALSE )
       call LOGS%WRITE( "|-------------|--------------|-------------------|--------------------------------| ",  &
-        iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        iLogLevel = LOG_DEBUG, lEcho = FALSE )
 
       allocate( fMAXIMUM_NET_INFILTRATION_ARRAY( ubound(is_cell_active,1),ubound(is_cell_active,2) ), stat=iStat )
       call assert( iStat == 0, "Failed to allocate memory for maximum potential recharge table", &
@@ -153,7 +153,7 @@ contains
               asCharacter(count( pLULC%pGrdBase%iData == landuse_codes( landuse_indx)               &
                                    .and. pHSG%pGrdBase%iData == soils_indx ) )//" | "          &
                                    //asCharacter( fMAXIMUM_NET_INFILTRATION_TABLE( landuse_indx, soils_indx))//" |", &
-                                   iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+                                   iLogLevel = LOG_DEBUG, lEcho = FALSE )
 
            value = fMAXIMUM_NET_INFILTRATION_TABLE( landuse_indx, soils_indx )
 
@@ -183,7 +183,7 @@ contains
       fMAXIMUM_NET_INFILTRATION = 9999.0
 
       call warn( "Did not find any valid maximum net infiltration rate parameters.",    &
-        lFatal = lTRUE )
+        lFatal = TRUE )
 
     endif
 

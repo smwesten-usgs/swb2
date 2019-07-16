@@ -171,7 +171,7 @@ module runoff__gridded_values
     logical (c_bool) :: lMatch
     integer (c_int)  :: iCount
 
-    lMatch = lFALSE
+    lMatch = FALSE
     iCount = 0
 
     do iLineNum = lbound( RUNOFF_TABLE_DATES, 1), ubound( RUNOFF_TABLE_DATES, 1) - 1
@@ -180,7 +180,7 @@ module runoff__gridded_values
       if (     ( RUNOFF_TABLE_DATES( iLineNum ) <= SIM_DT%curr )   &
         .and.  ( RUNOFF_TABLE_DATES( iLineNum + 1 ) > SIM_DT%curr ) )  then
 
-          lMatch = lTRUE
+          lMatch = TRUE
           exit
       endif
 

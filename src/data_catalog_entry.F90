@@ -76,20 +76,20 @@ module data_catalog_entry
     real (c_double)      :: rX_Coord_AddOffset = 0.0_c_double
     real (c_double)      :: rY_Coord_AddOffset = 0.0_c_double
 
-    logical (c_bool)     :: lAllowMissingFiles = lFALSE
+    logical (c_bool)     :: lAllowMissingFiles = FALSE
     logical (c_bool)     :: lAllowAutomaticDataFlipping = TRUE
-    logical (c_bool)     :: lFlipHorizontal = lFALSE
-    logical (c_bool)     :: lFlipVertical = lFALSE
-    logical (c_bool)     :: lUseMajorityFilter = lFALSE
-    logical (c_bool)     :: lRequireCompleteSpatialCoverage = lTRUE
+    logical (c_bool)     :: lFlipHorizontal = FALSE
+    logical (c_bool)     :: lFlipVertical = FALSE
+    logical (c_bool)     :: lUseMajorityFilter = FALSE
+    logical (c_bool)     :: lRequireCompleteSpatialCoverage = TRUE
 
     integer (c_int)  :: iDaysToPadAtYearsEnd = 0
     integer (c_int)  :: iDaysToPadIfLeapYear = 1
     integer (c_int)  :: iStartYear = -9999
     integer (c_int)  :: iEndYear = -9999
-    logical (c_bool) :: lPadReplaceWithZero = lFALSE
-    logical (c_bool) :: lPadValues = lFALSE
-    logical (c_bool) :: lIsAnnualGrid = lFALSE
+    logical (c_bool) :: lPadReplaceWithZero = FALSE
+    logical (c_bool) :: lPadValues = FALSE
+    logical (c_bool) :: lIsAnnualGrid = FALSE
 
     ! the following are only used if data are being read from a NetCDF file
     character (len=32)       :: sVariableName_x = "x"
@@ -115,10 +115,10 @@ module data_catalog_entry
     ! the native coordinate of the data source file and the project coordinates
     ! in use by swb
     type (GENERAL_GRID_T), pointer :: pGrdNative                 => null()
-    logical (c_bool)          :: lGridIsPersistent          = lFALSE
-    logical (c_bool)          :: lGridHasChanged            = lFALSE
-    logical (c_bool)          :: lPerformFullInitialization = lTRUE
-    logical (c_bool)          :: lCreateLocalNetCDFArchive  = lFALSE
+    logical (c_bool)          :: lGridIsPersistent          = FALSE
+    logical (c_bool)          :: lGridHasChanged            = FALSE
+    logical (c_bool)          :: lPerformFullInitialization = TRUE
+    logical (c_bool)          :: lCreateLocalNetCDFArchive  = FALSE
 
     ! pGrdBase takes the coordinate system and dimensions as defined
     ! for the overall SWB project (i.e. BASE_PROJECTION_DEFINITION )
@@ -380,13 +380,13 @@ subroutine initialize_gridded_data_object_sub( this, &
   if ( scan(string=sFilename, set="%#") > 0 ) then
 
     this%iSourceDataForm = DYNAMIC_GRID
-    this%lGridIsPersistent = lTRUE
+    this%lGridIsPersistent = TRUE
     this%sFilenameTemplate = trim( this%sSourceFilename )
 
   else
 
     this%iSourceDataForm = STATIC_GRID
-    this%lGridIsPersistent = lFALSE
+    this%lGridIsPersistent = FALSE
     this%sFilenameTemplate = ""
 
   endif
@@ -457,7 +457,7 @@ subroutine initialize_netcdf_data_object_sub( this, &
 
 
     this%iSourceDataForm   = DYNAMIC_NETCDF_GRID
-    this%lGridIsPersistent = lTRUE
+    this%lGridIsPersistent = TRUE
     this%sFilenameTemplate = trim(sFilename)
 
 !   else
@@ -465,7 +465,7 @@ subroutine initialize_netcdf_data_object_sub( this, &
 !     !> intent of "static" NetCDF file is to house large non-changing
 !     !! input grids (i.e. landuse, soils )
 !     this%iSourceDataForm   = STATIC_NETCDF_GRID
-!     this%lGridIsPersistent = lFALSE
+!     this%lGridIsPersistent = FALSE
 !     this%sFilenameTemplate = ""
 
 !   endif
@@ -515,7 +515,7 @@ end subroutine initialize_netcdf_data_object_sub
 
     else
 
-      call assert(lFALSE, "Unsupported data source specified", &
+      call assert(FALSE, "Unsupported data source specified", &
         __SRCNAME__, __LINE__)
 
     endif
@@ -585,13 +585,13 @@ subroutine getvalues_constant_sub( this  )
 
     case ( DATATYPE_REAL )
 
-      this%lGridHasChanged = lTRUE
+      this%lGridHasChanged = TRUE
 
       this%pGrdBase%rData = this%rConstantValue
 
     case ( DATATYPE_INT)
 
-      this%lGridHasChanged = lTRUE
+      this%lGridHasChanged = TRUE
 
       this%pGrdBase%iData = this%iConstantValue
 
@@ -599,7 +599,7 @@ subroutine getvalues_constant_sub( this  )
 
       call dump_data_structure_sub(this)
 
-      call assert(lFALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: " &
+      call assert(FALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: " &
         //"name="//dquote(this%sDescription) &
         //"; value="//trim(asCharacter(this%iSourceDataType)), &
         __SRCNAME__, __LINE__)
@@ -643,7 +643,7 @@ subroutine getvalues_constant_sub( this  )
     logical (c_bool) :: lExist
     logical (c_bool) :: lOpened
 
-    this%lGridHasChanged = lFALSE
+    this%lGridHasChanged = FALSE
 
     do
 
@@ -655,7 +655,7 @@ subroutine getvalues_constant_sub( this  )
       if(this%iSourceDataForm == DYNAMIC_GRID ) then
 
         if(.not. present(dt) ) &
-          call assert(lFALSE, "INTERNAL PROGRAMMING ERROR - datetime object"   &
+          call assert(FALSE, "INTERNAL PROGRAMMING ERROR - datetime object"   &
             //" must be supplied when calling this subroutine in a "           &
             //"dynamic mode.", __SRCNAME__, __LINE__)
 
@@ -676,14 +676,14 @@ subroutine getvalues_constant_sub( this  )
         if ( this%lAllowMissingFiles ) then
          exit
         else
-          call assert( lFALSE, &
+          call assert( FALSE, &
             "Could not find input data file~filename:"//dquote(this%sSourceFilename) &
             //"~data description: "//trim(this%sDescription))
         endif
       endif
 
       call LOGS%write("Opening file "//dQuote(this%sSourceFilename) &
-        //" for "//trim(this%sDescription)//" data.", iLogLevel=LOG_ALL, lEcho=lTRUE )
+        //" for "//trim(this%sDescription)//" data.", iLogLevel=LOG_ALL, lEcho=TRUE )
 
       if ( this%lGridIsPersistent .and. associated(this%pGrdNative) ) then
 
@@ -701,7 +701,7 @@ subroutine getvalues_constant_sub( this  )
         this%pGrdNative%sPROJ4_string = this%sSourcePROJ4_string
       endif
 
-      this%lGridHasChanged = lTRUE
+      this%lGridHasChanged = TRUE
 
       select case (this%iTargetDataType)
 
@@ -717,7 +717,7 @@ subroutine getvalues_constant_sub( this  )
 
         case default
 
-          call assert(lFALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: value=" &
+          call assert(FALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: value=" &
             //trim(asCharacter(this%iSourceDataType)), &
             __SRCNAME__, __LINE__)
 
@@ -782,7 +782,7 @@ subroutine transform_grid_to_grid_sub(this)
 
     case default
 
-      call assert(lFALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: value=" &
+      call assert(FALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: value=" &
         //trim(asCharacter(this%iSourceDataType)), &
         __SRCNAME__, __LINE__)
 
@@ -886,7 +886,7 @@ end subroutine set_constant_value_real
 
     iPos_Y = 0; iPos_M = 0; iPos_D = 0; iPos = 0; iPos_B = 0; iPos_BF = 0; sNumber = ""
     iPos_j = 0
-    lAnnual = lFALSE
+    lAnnual = FALSE
 
     ! EXAMPLES of the kinds of templates that we need to be able to understand:
     ! tars1980\prcp.nc   template => "tars%Y\prcp.nc"
@@ -903,17 +903,17 @@ end subroutine set_constant_value_real
 
     do
 
-      lMatch = lFALSE
+      lMatch = FALSE
 
       iPos_Y = max(index(sNewFilename, "%Y"), index(sNewFilename, "%y") )
 
       if (iPos_Y > 0) then
-        lMatch = lTRUE
+        lMatch = TRUE
         iLen=len_trim(sNewFilename)
         sNewFilename = sNewFilename(1:iPos_Y - 1)//trim(asCharacter(dt%iYear)) &
                        //sNewFilename(iPos_Y + 2:iLen)
 
-        lAnnual = lTRUE
+        lAnnual = TRUE
 
       endif
 
@@ -924,7 +924,7 @@ end subroutine set_constant_value_real
 
         ! example:  %000#
         ! trying to determine how many zero values have been inserted between % and # characters
-        iPos2 = index(sNewFilename(1:iPos),"%", BACK=lTRUE)
+        iPos2 = index(sNewFilename(1:iPos),"%", BACK=TRUE)
         sBuf2 = trim(asCharacter(this%iFileCount))
         iNumZeros = max(0, iPos - iPos2 - 1)
 
@@ -935,8 +935,8 @@ end subroutine set_constant_value_real
           sNumber = trim(sBuf2)
         endif
 
-        lMatch = lTRUE
-        lAnnual = lFALSE
+        lMatch = TRUE
+        lAnnual = FALSE
         iLen=len_trim(sNewFilename)
         sNewFilename = sNewFilename(1:iPos-2-iNumZeros)//trim(sNumber) &
                        //sNewFilename(iPos+1:iLen)
@@ -951,8 +951,8 @@ end subroutine set_constant_value_real
 
       if ( iPos_0M > 0 ) then
 
-        lMatch = lTRUE
-        lAnnual = lFALSE
+        lMatch = TRUE
+        lAnnual = FALSE
         write (unit=sBuf, fmt="(i2.2)") dt%iMonth
 
         iLen=len_trim(sNewFilename)
@@ -961,8 +961,8 @@ end subroutine set_constant_value_real
 
       elseif ( iPos_M > 0 ) then
 
-        lMatch = lTRUE
-        lAnnual = lFALSE
+        lMatch = TRUE
+        lAnnual = FALSE
         sBuf = asCharacter( dt%iMonth )
 
         iLen=len_trim(sNewFilename)
@@ -971,8 +971,8 @@ end subroutine set_constant_value_real
 
       elseif ( iPos_B > 0 ) then
 
-        lMatch = lTRUE
-        lAnnual = lFALSE
+        lMatch = TRUE
+        lAnnual = FALSE
 
         select case ( this% iFilename_Monthname_Capitalization_Rule )
 
@@ -998,8 +998,8 @@ end subroutine set_constant_value_real
 
       elseif ( iPos_BF > 0 ) then
 
-        lMatch = lTRUE
-        lAnnual = lFALSE
+        lMatch = TRUE
+        lAnnual = FALSE
 
         select case ( this% iFilename_Monthname_Capitalization_Rule )
 
@@ -1029,8 +1029,8 @@ end subroutine set_constant_value_real
       iPos_j = max(index(sNewFilename, "%J"),index(sNewFilename, "%j") )
 
       if (iPos_j > 0) then
-        lMatch = lTRUE
-        lAnnual = lFALSE
+        lMatch = TRUE
+        lAnnual = FALSE
         write (unit=sBuf, fmt="(i3.3)") dt%getDayOfYear()
         iLen=len_trim(sNewFilename)
         sNewFilename = sNewFilename(1:iPos_j - 1)//trim(sBuf) &
@@ -1044,8 +1044,8 @@ end subroutine set_constant_value_real
       iPos_0D = max(index(sNewFilename, "%0D"), index(sNewFilename, "%0d") )
 
       if (iPos_0D > 0) then
-        lMatch = lTRUE
-        lAnnual = lFALSE
+        lMatch = TRUE
+        lAnnual = FALSE
         write (unit=sBuf, fmt="(i2.2)") dt%iDay
         iLen=len_trim(sNewFilename)
         sNewFilename = sNewFilename(1:iPos_0D - 1)//trim(sBuf) &
@@ -1053,8 +1053,8 @@ end subroutine set_constant_value_real
 
       elseif ( iPos_D > 0 ) then
 
-        lMatch = lTRUE
-        lAnnual = lFALSE
+        lMatch = TRUE
+        lAnnual = FALSE
         sBuf = asCharacter( dt%iDay )
 
         iLen=len_trim(sNewFilename)
@@ -1100,7 +1100,7 @@ end subroutine set_constant_value_real
 
     do
 
-      lNeedToPadData = lFALSE
+      lNeedToPadData = FALSE
 
       iPos = scan(string=trim(this%sSourceFilename), set="http://")
 
@@ -1130,7 +1130,7 @@ end subroutine set_constant_value_real
 
             if ( iDaysLeftInMonth <= this%iDaysToPadIfLeapYear ) then
 
-              lNeedToPadData = lTRUE
+              lNeedToPadData = TRUE
               exit
 
             endif
@@ -1139,7 +1139,7 @@ end subroutine set_constant_value_real
 
             if ( iDaysLeftInMonth <= this%iDaysToPadAtYearsEnd ) then
 
-              lNeedToPadData = lTRUE
+              lNeedToPadData = TRUE
               exit
 
             endif
@@ -1180,7 +1180,7 @@ end subroutine set_constant_value_real
     if ( .not. associated(this%pGrdBase) ) &
       call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
 
-    this%lPadValues = lFALSE
+    this%lPadValues = FALSE
 
     dAddOffset = this%NCFILE%rAddOffset(NC_Z)
     dScaleFactor = this%NCFILE%rScaleFactor(NC_Z)
@@ -1320,7 +1320,7 @@ end subroutine set_constant_value_real
             ! we do not need to perform all these steps for the next file; we are
             ! assuming, of course, that all of the subsequent files cover the same
             ! extents and are in the same projection as this first file
-            this%lPerformFullInitialization = lFALSE
+            this%lPerformFullInitialization = FALSE
 
           else
             ! Projection settings can be left alone; read values from new
@@ -1355,7 +1355,7 @@ end subroutine set_constant_value_real
 
             call LOGS%write("Current Julian Day value: "//trim(asCharacter(dt%iJulianDay)) )
 
-            call assert (lFALSE, "Date range for currently open NetCDF file" &
+            call assert (FALSE, "Date range for currently open NetCDF file" &
               //" does not include the present simulation date.", &
               __SRCNAME__, __LINE__)
 
@@ -1376,12 +1376,12 @@ end subroutine set_constant_value_real
                                   iJulianDay=int(dt%iJulianDay, c_int) )
 
         if (.not. lDateTimeFound) then
-          this%lPadValues = lTRUE
+          this%lPadValues = TRUE
           exit
         endif
 
         call netcdf_get_variable_slice(NCFILE=this%NCFILE, rValues=this%pGrdNative%rData)
-        this%lGridHasChanged = lTRUE
+        this%lGridHasChanged = TRUE
 
         this%pGrdNative%rData = this%pGrdNative%rData * dScaleFactor + dAddOffset
 
@@ -1560,7 +1560,7 @@ end subroutine set_constant_value_real
           ! we do not need to perform all these steps for the next file; we are
           ! assuming, of course, that all of the subsequent files cover the same
           ! extents and are in the same projection as this first file
-          this%lPerformFullInitialization = lFALSE
+          this%lPerformFullInitialization = FALSE
 
         else
           ! Projection settings can be left alone; read values from new
@@ -1655,7 +1655,7 @@ end subroutine set_constant_value_real
 
      else
 
-       call assert(lFALSE, "Unknown input file type specified. ~"&
+       call assert(FALSE, "Unknown input file type specified. ~"&
          //"  filename: "//dquote(this%sSourceFilename) &
          //"~  file type specified as: "//dquote(this%sSourceFileType), &
          __SRCNAME__, __LINE__)
@@ -1702,7 +1702,7 @@ end subroutine set_constant_value_real
 
     class (DATA_CATALOG_ENTRY_T) :: this
 
-    this%lFlipHorizontal = lTRUE
+    this%lFlipHorizontal = TRUE
 
   end subroutine set_grid_flip_horizontal_sub
 
@@ -1712,7 +1712,7 @@ end subroutine set_constant_value_real
 
     class (DATA_CATALOG_ENTRY_T) :: this
 
-    this%lFlipVertical = lTRUE
+    this%lFlipVertical = TRUE
 
   end subroutine set_grid_flip_vertical_sub
 
@@ -2030,7 +2030,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
           case default
 
-            call assert(lFALSE, "Unknown missing values code was supplied " &
+            call assert(FALSE, "Unknown missing values code was supplied " &
               //"for processing data "//squote(this%sDescription)//": " &
               //dquote(this%sMissingValuesOperator) )
 
@@ -2066,7 +2066,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
           case default
 
-            call assert(lFALSE, "Unknown missing values code was supplied " &
+            call assert(FALSE, "Unknown missing values code was supplied " &
               //"for processing data "//squote(this%sDescription)//": " &
               //dquote(this%sMissingValuesOperator) )
 
@@ -2074,7 +2074,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
       case default
 
-        call assert(lFALSE, "INTERNAL PROGRAMMING ERROR - unhandled iMissingValuesAction", &
+        call assert(FALSE, "INTERNAL PROGRAMMING ERROR - unhandled iMissingValuesAction", &
         __SRCNAME__, __LINE__)
 
     end select
@@ -2119,7 +2119,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
           case default
 
-            call assert(lFALSE, "Unknown missing values code was supplied " &
+            call assert(FALSE, "Unknown missing values code was supplied " &
               //"for processing data "//squote(this%sDescription)//": " &
               //dquote(this%sMissingValuesOperator) )
 
@@ -2159,7 +2159,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
           case default
 
-            call assert(lFALSE, "Unknown missing values code was supplied " &
+            call assert(FALSE, "Unknown missing values code was supplied " &
               //"for processing data "//squote(this%sDescription)//": " &
               //dquote(this%sMissingValuesOperator) )
 
@@ -2167,7 +2167,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
       case default
 
-        call assert(lFALSE, "INTERNAL PROGRAMMING ERROR - unhandled iMissingValuesAction", &
+        call assert(FALSE, "INTERNAL PROGRAMMING ERROR - unhandled iMissingValuesAction", &
         __SRCNAME__, __LINE__)
 
     end select

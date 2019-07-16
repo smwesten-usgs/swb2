@@ -31,13 +31,10 @@ module constants_and_conversions
   real (c_double), parameter    :: RADIANS_TO_DEGREES = 360.0_c_double / TWOPI
 
   ! [ common 'magic' numbers and logicals ]
-  public :: lTRUE, lFALSE
+  public :: TRUE, FALSE
   public :: rBIGVAL, iBIGVAL, dBIGVAL, iTINYVAL, rTINYVAL, dTINYVAL
   public :: rFREEZING, dFREEZING
   public :: rZERO
-  logical (c_bool), parameter   :: lTRUE = .true._c_bool
-  logical (c_bool), parameter   :: lFALSE = .false._c_bool
-
   logical (c_bool), parameter   :: TRUE = .true._c_bool
   logical (c_bool), parameter   :: FALSE = .false._c_bool
 
@@ -220,9 +217,9 @@ contains
     logical (c_bool)              :: lBool
 
     if ( abs( fValue1 - fValue2 ) < TOLERANCE_FLOAT ) then
-      lBool = lTRUE
+      lBool = TRUE
     else
-      lBool = lFALSE
+      lBool = FALSE
     endif
 
   end function approx_equal_float_float
@@ -237,9 +234,9 @@ contains
     logical (c_bool)              :: lBool
 
     if ( abs( fValue1 - real(fValue2, c_float) ) < TOLERANCE_FLOAT ) then
-      lBool = lTRUE
+      lBool = TRUE
     else
-      lBool = lFALSE
+      lBool = FALSE
     endif
 
   end function approx_equal_float_double
@@ -255,9 +252,9 @@ contains
     logical (c_bool)               :: lBool
 
     if ( abs( fValue1 - fValue2 ) < TOLERANCE_DOUBLE ) then
-      lBool = lTRUE
+      lBool = TRUE
     else
-      lBool = lFALSE
+      lBool = FALSE
     endif
 
   end function approx_equal_double_double
@@ -279,9 +276,9 @@ contains
     sbuf = keepnumeric( value )
 
     if ( len_trim( sbuf ) == 0 ) then
-      is_numeric = lFALSE
+      is_numeric = FALSE
     else
-      is_numeric = lTRUE
+      is_numeric = TRUE
     endif
 
   end function is_numeric
@@ -546,9 +543,9 @@ contains
     logical (c_bool)                 :: lValue
 
     if ( iShortVal == 0 ) then
-      lValue = lFALSE
+      lValue = FALSE
     else
-      lValue = lTRUE
+      lValue = TRUE
     endif
 
   end function short2logical
@@ -563,9 +560,9 @@ contains
     logical (c_bool)                 :: lValue
 
     if ( iValue == 0 ) then
-      lValue = lFALSE
+      lValue = FALSE
     else
-      lValue = lTRUE
+      lValue = TRUE
     endif
 
   end function int2logical
@@ -583,9 +580,9 @@ contains
     real (c_float), parameter :: fMinResolution = 2.0 * spacing(1.0_c_float)
 
     if ( rValue > -fMinResolution .and. rValue < fMinResolution ) then
-      lValue = lFALSE
+      lValue = FALSE
     else
-      lValue = lTRUE
+      lValue = TRUE
     endif
 
   end function real2logical
@@ -603,9 +600,9 @@ contains
     real (c_double), parameter :: dMinResolution = 2.0 * spacing(1.0_c_float)
 
     if ( rValue > -dMinResolution .and. rValue < dMinResolution ) then
-      lValue = lFALSE
+      lValue = FALSE
     else
-      lValue = lTRUE
+      lValue = TRUE
     endif
 
   end function dbl2logical
@@ -623,11 +620,11 @@ contains
 
       case ( "TRUE", "True", "true", "T", "YES", "Yes", "yes", "1" )
 
-        lValue = lTRUE
+        lValue = TRUE
 
       case default
 
-        lValue = lFALSE
+        lValue = FALSE
 
     end select
 

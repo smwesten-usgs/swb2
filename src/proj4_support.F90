@@ -1,7 +1,7 @@
 module proj4_support
 
   use iso_c_binding
-  use fstring, only      : right, left, squote
+  use fstring, only      : right, left, squote, WHITESPACE
   use fstring_list, only  : FSTRING_LIST_T, create_list
   implicit none
 
@@ -29,7 +29,7 @@ contains
 
     proj4_string_local = proj4_string
 
-    proj4_list = create_list( proj4_string_local )
+    proj4_list = create_list( proj4_string_local, delimiter_chr=WHITESPACE )
 
     do indx=1, proj4_list%count
 

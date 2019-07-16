@@ -75,7 +75,7 @@ contains
     call PARAMS%get_parameters( slKeys=slString , fValues=fFOG_CATCH_EFFICIENCY )
 
     if ( fFOG_CATCH_EFFICIENCY(1) <= fTINYVAL )  &
-      call warn( "Failed to find a data column containing fog catch efficiency values.", lFATAL=lTRUE, &
+      call warn( "Failed to find a data column containing fog catch efficiency values.", lFATAL=TRUE, &
         iLogLevel=LOG_ALL )
 
     lAreLengthsEqual = ( ( ubound(fFOG_CATCH_EFFICIENCY,1) == ubound(iLanduseCodes,1) )  )

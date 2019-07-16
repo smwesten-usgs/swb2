@@ -50,6 +50,7 @@ module fstring
     procedure :: bool_to_char_fn
   end interface asCharacter
 
+
   public :: as_character
   interface as_character
     procedure :: short_to_char_fn
@@ -59,6 +60,16 @@ module fstring
     procedure :: double_to_char_fn
     procedure :: bool_to_char_fn
   end interface as_character
+
+  public :: as_integer
+  interface as_integer
+    procedure :: string_to_integer_fn
+  end interface as_integer
+
+  public :: as_float
+  interface as_float
+    procedure :: string_to_float_fn
+  end interface as_float
 
   public :: chomp
   interface chomp
@@ -162,7 +173,61 @@ module fstring
   character (len=1), parameter :: DOUBLE_QUOTE = achar(34)
   character (len=3), parameter :: PUNCTUATION = ",;:"
 
+  private :: NA_INT, NA_FLOAT, NA_DOUBLE
+  integer (c_int), parameter  :: NA_INT    = - (huge(1_c_int)-1_c_int)
+  real (c_float), parameter   :: NA_FLOAT  = - (huge(1._c_float)-1._c_float)
+  real (c_double), parameter  :: NA_DOUBLE = - (huge(1._c_double)-1._c_double)
+
 contains
+
+  impure elemental function string_to_integer_fn(text)  result(value)
+
+    character (len=*), intent(in) :: text
+    integer (c_int) :: value
+
+    ! [ LOCALS ]
+    integer (c_int)                :: op_status
+    character (len=:), allocatable :: temp_str
+    real (c_float)                 :: float_value
+
+    temp_str = keepnumeric(text)
+
+    ! if the cleaned up string appears to be a real value,
+    ! attempt to read as real and convert to int
+    if ( scan(temp_str, ".") /= 0 ) then
+
+      read(unit=temp_str, fmt=*, iostat=op_status) float_value
+      if (op_status == 0)  value = int(float_value, c_int)
+
+    else
+
+      read(unit=temp_str, fmt=*, iostat=op_status) value
+
+    endif
+
+    if (op_status /= 0)  value = NA_INT
+
+  end function string_to_integer_fn
+
+!--------------------------------------------------------------------------------------------------
+
+  impure elemental function string_to_float_fn(text)  result(value)
+
+    character (len=*), intent(in) :: text
+    real (c_float)                :: value
+
+    ! [ LOCALS ]
+    integer (c_int)                :: op_status
+    character (len=:), allocatable :: temp_str
+
+    temp_str = keepnumeric(text)
+
+    read(unit=temp_str, fmt=*, iostat=op_status) value
+    if (op_status /= 0)  value = NA_FLOAT
+
+  end function string_to_float_fn
+
+!--------------------------------------------------------------------------------------------------
 
   function return_left_part_of_string_fn( string, indx, substring )   result( left_part )
 
@@ -209,7 +274,7 @@ contains
 
   end function return_left_part_of_string_fn
 
-  !--------------------------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
 
   function return_right_part_of_string_fn( string, indx, substring )   result( right_part )
 
@@ -864,7 +929,43 @@ contains
 
   end subroutine replace_character_sub
 
-  !--------------------------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
+
+  impure elemental function keepnumeric(text)            result(result_text)
+
+    ! ARGUMENTS
+    character (len=*), intent(in)           :: text
+    character (len=:), allocatable          :: result_text
+
+    character (len=:), allocatable     :: temp_str
+    character (len=512)                :: temp_result
+
+    integer (c_int)                :: n
+    integer (c_int)                :: index1, index2
+    character (len=:), allocatable :: target_characters
+
+    ! target_character omits the period ("."): do not want a real value returned
+    ! as a funky integer (e.g. string "3.141" returned as integer 3141 )
+    target_characters = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM" &
+      //"!@#$%^&*()_+-={}[]|\:;'<,>?/~`'"//DOUBLE_QUOTE
+
+    temp_str = adjustl(text)
+    temp_result = ""
+    index2 = 0
+
+    do index1 = 1,len_trim(text)
+      n = scan(text(index1:index1), target_characters)
+      if(n==0) then
+        index2 = index2 + 1
+        temp_result(index2:index2) = text(index1:index1)
+      endif
+    enddo
+
+    result_text = trim(temp_result)
+
+   end function keepnumeric
+
+!--------------------------------------------------------------------------------------------------
 
   function c_to_f_string_fn(c_character_str)   result(f_character_str)
 

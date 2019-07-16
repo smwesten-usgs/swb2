@@ -77,7 +77,7 @@ module output
                   NCDF_STORM_DRAIN_CAPTURE, NCDF_GROWING_SEASON, NCDF_FOG
   end enum
 
-  logical ( c_bool ) :: OUTPUT_INCLUDES_LATLON = lTRUE
+  logical ( c_bool ) :: OUTPUT_INCLUDES_LATLON = TRUE
 
 contains
 

@@ -80,7 +80,7 @@ contains
 
    call PARAMS%get_parameters( sKey="Mean_Plant_Height", fValues=MEAN_PLANT_HEIGHT, lFatal=TRUE )
 
-   slList = create_list("Depletion_fraction; Plant_stress_depletion_fraction")
+   slList = create_list("Depletion_fraction, Plant_stress_depletion_fraction")
 
    call PARAMS%get_parameters( slKeys=slList, fValues=DEPLETION_FRACTION, lFatal=TRUE )
    call slList%clear()

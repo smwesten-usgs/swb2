@@ -25,9 +25,9 @@ module file_operations
     integer (c_int)                 :: iNumberOfLines = 0
     integer (c_int)                 :: iNumberOfRecords = 0
     integer (c_int)                 :: iNumberOfHeaderLines = 1
-    logical (c_bool)                :: lIsOpen = lFALSE
-    logical (c_bool)                :: lReadOnly = lTRUE
-    logical (c_bool)                :: lEOF = lFALSE
+    logical (c_bool)                :: lIsOpen = FALSE
+    logical (c_bool)                :: lReadOnly = TRUE
+    logical (c_bool)                :: lEOF = FALSE
     integer (c_int)                 :: iUnitNum
     integer (c_int)                 :: iStat
     character (len=MAX_STR_LEN)     :: sBuf
@@ -154,9 +154,9 @@ contains
 
     iIndex = verify( sBufTemp , this%sCommentChars )
 
-    lIsComment = lFALSE
+    lIsComment = FALSE
 
-    if ( iIndex == 0 .or. len_trim(this%sBuf) == 0 ) lIsComment = lTRUE
+    if ( iIndex == 0 .or. len_trim(this%sBuf) == 0 ) lIsComment = TRUE
 
   end function is_current_line_a_comment_fn
 
@@ -188,8 +188,8 @@ contains
       call assert(this%iStat == 0, "Failed to open file "//dquote( fully_qualified_filename( sFilename_l ) )//"."  &
         //" Exit code: "//asCharacter( this%iStat )//".", __SRCNAME__, __LINE__)
 
-      if (this%iStat == 0) this%lIsOpen = lTRUE
-      this%lEOF = lFALSE
+      if (this%iStat == 0) this%lIsOpen = TRUE
+      this%lEOF = FALSE
 
       call this%countLines()
 
@@ -225,7 +225,7 @@ contains
     if ( present( lQuiet ) ) then
       lQuiet_l = lQuiet
     else
-      lQuiet_l = lFALSE
+      lQuiet_l = FALSE
     endif
 
     if (.not. this%isOpen() ) then
@@ -233,9 +233,9 @@ contains
       open(newunit=this%iUnitNum, file=sFilename_l, iostat=this%iStat, action='WRITE')
       call assert(this%iStat == 0, "Failed to open file "//dquote(sFilename_l)//".", __SRCNAME__, __LINE__)
 
-      this%lIsOpen = lTRUE
-      this%lEOF = lFALSE
-      this%lReadOnly = lFALSE
+      this%lIsOpen = TRUE
+      this%lEOF = FALSE
+      this%lReadOnly = FALSE
       this%sFilename = trim(sFilename_l)
 
       if ( .not. lQuiet_l ) &
@@ -254,7 +254,7 @@ contains
     class (ASCII_FILE_T) :: this
 
     close(unit=this%iUnitNum, iostat=this%iStat)
-    this%lIsOpen = lFALSE
+    this%lIsOpen = FALSE
 
   end subroutine close_file_sub
 
@@ -388,7 +388,7 @@ contains
     integer (c_int) :: iStat
     logical (c_bool)                 :: lIsComment
 
-    lIsComment = lTRUE
+    lIsComment = TRUE
 
     do while ( lIsComment .and. this%isOpen() )
 
@@ -397,7 +397,7 @@ contains
         read (unit = this%iUnitNum, fmt = "(a)", iostat = iStat) this%sBuf
 
         if (iStat == IOSTAT_END) then
-          this%lEOF = lTRUE
+          this%lEOF = TRUE
           sText = ""
           call this%close()
         else

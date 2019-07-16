@@ -185,7 +185,7 @@ contains
 
     call LOGS%write("ASCII grids will be written to subdirectory "             &
       //dquote( OUTPUT_GRID_DIRECTORY_NAME ), iLogLevel=LOG_ALL,                    &
-      iLinesBefore=1, lEcho=lTRUE )
+      iLinesBefore=1, lEcho=TRUE )
 
   end subroutine grid_set_output_directory_name
 
@@ -230,7 +230,7 @@ function grid_CreateComplete ( iNX, iNY, rX0, rY0, rX1, rY1, iDataType ) result 
     call LOGS%write("rY0: "//asCharacter(rY0) )
     call LOGS%write("rX1: "//asCharacter(rX1) )
     call LOGS%write("rY1: "//asCharacter(rY1) )
-    call assert ( lFALSE, &
+    call assert ( FALSE, &
        "INTERNAL PROGRAMMING ERROR? - Illegal grid dimensions specified", __SRCNAME__,__LINE__)
   endif
 
@@ -258,7 +258,7 @@ function grid_CreateComplete ( iNX, iNY, rX0, rY0, rX1, rY1, iDataType ) result 
           pGrd%dpData = 0.0_c_double
 
       case default
-          call assert ( lFALSE, 'Internal error -- illegal grid data type' )
+          call assert ( FALSE, 'Internal error -- illegal grid data type' )
   end select
 
   pGrd%iDataType = iDataType
@@ -321,7 +321,7 @@ function grid_CreateSimple ( iNX, iNY, rX0, rY0, rGridCellSize, iDataType ) resu
           pGrd%dpData = pGrd%dpNoDataValue
 
       case default
-          call assert ( lFALSE, 'Internal error -- illegal grid data type' )
+          call assert ( FALSE, 'Internal error -- illegal grid data type' )
   end select
 
   pGrd%iDataType = iDataType
@@ -391,7 +391,7 @@ subroutine grid_Destroy ( pGrd )
 !       deallocate ( pGrd%Cells, stat=iStat )
 !       call assert ( iStat == 0, "Failed to deallocate cell grid" )
     else
-      call assert ( lFALSE, "Internal error -- unknown grid type", &
+      call assert ( FALSE, "Internal error -- unknown grid type", &
         __SRCNAME__, __LINE__)
     end if
 
@@ -456,7 +456,7 @@ function grid_Read ( sFilename, sFileType, iDataType ) result ( pGrd )
   else if ( trim(sFileType) == "SURFER" ) then
       pGrd => grid_ReadSurferGrid_fn( sFileName, iDataType )
   else
-      call assert( lFALSE, "Illegal grid file type requested" )
+      call assert( FALSE, "Illegal grid file type requested" )
   end if
 
   pGrd%sFilename = trim(sFilename)
@@ -477,7 +477,7 @@ subroutine grid_ReadExisting ( sFileName, sFileType, pGrd )
   else if ( trim(sFileType) == "SURFER" ) then
       call grid_ReadSurferGrid_sub( sFilename, pGrd )
   else
-      call assert( lFALSE, "Illegal grid file type requested" )
+      call assert( FALSE, "Illegal grid file type requested" )
   end if
 
   pGrd%sFilename = trim(sFilename)
@@ -547,8 +547,8 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
     "Could not open input file " // trim(sFileName) )
 
   iHdrRecs = 0
-  lXLLCenter = lFALSE
-  lYLLCenter = lFALSE
+  lXLLCenter = FALSE
+  lYLLCenter = FALSE
   sNoDataValue = ""
 
   do
@@ -569,12 +569,12 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
       else if ( sDirective == "XLLCENTER" ) then
           read ( unit=sArgument, fmt=*, iostat=iStat ) rX0
           call assert ( iStat == 0, "Could not read XLLCENTER" )
-          lXLLCenter = lTRUE
+          lXLLCenter = TRUE
           iHdrRecs = iHdrRecs + 1
       else if ( sDirective == "YLLCENTER" ) then
           read ( unit=sArgument, fmt=*, iostat=iStat ) rY0
           call assert ( iStat == 0, "Could not read YLLCENTER" )
-          lXLLCenter = lTRUE
+          lXLLCenter = TRUE
           iHdrRecs = iHdrRecs + 1
       else if ( sDirective == "XLLCORNER" ) then
           read ( unit=sArgument, fmt=*, iostat=iStat ) rX0
@@ -662,7 +662,7 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
 
               case default
 
-                  call assert ( lFALSE, &
+                  call assert ( FALSE, &
                     "Internal error -- illegal ARC GRID data type", &
                     __SRCNAME__,__LINE__)
 
@@ -718,8 +718,8 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
     "Could not open input file " // trim(sFileName) )
 
   iHdrRecs = 0
-  lXLLCenter = lFALSE
-  lYLLCenter = lFALSE
+  lXLLCenter = FALSE
+  lYLLCenter = FALSE
   sNoDataValue = ""
 
   do
@@ -740,12 +740,12 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
       else if ( sDirective == "XLLCENTER" ) then
           read ( unit=sArgument, fmt=*, iostat=iStat ) rX0
           call assert ( iStat == 0, "Could not read XLLCENTER" )
-          lXLLCenter = lTRUE
+          lXLLCenter = TRUE
           iHdrRecs = iHdrRecs + 1
       else if ( sDirective == "YLLCENTER" ) then
           read ( unit=sArgument, fmt=*, iostat=iStat ) rY0
           call assert ( iStat == 0, "Could not read YLLCENTER" )
-          lXLLCenter = lTRUE
+          lXLLCenter = TRUE
           iHdrRecs = iHdrRecs + 1
       else if ( sDirective == "XLLCORNER" ) then
           read ( unit=sArgument, fmt=*, iostat=iStat ) rX0
@@ -822,7 +822,7 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
                 endif
 
               case default
-                  call assert ( lFALSE, &
+                  call assert ( FALSE, &
                     "Internal error -- illegal ARC GRID data type", &
                     __SRCNAME__,__LINE__)
           end select
@@ -927,7 +927,7 @@ function grid_ReadSurferGrid_fn ( sFileName, iDataType ) result ( pGrd )
               call assert ( iStat == 0, "Failed to read double-precision grid data" )
           end do
       case default
-          call assert ( lFALSE, "Internal error -- illegal SURFER grid data type" )
+          call assert ( FALSE, "Internal error -- illegal SURFER grid data type" )
   end select
 
   call assert(iNX>0, "Must have a non-zero number of columns surfer grid file...")
@@ -1007,7 +1007,7 @@ subroutine grid_ReadSurferGrid_sub ( sFileName, pGrd )
               call assert ( iStat == 0, "Failed to read double-precision grid data" )
           end do
       case default
-          call assert ( lFALSE, "Internal error -- illegal SURFER grid data type" )
+          call assert ( FALSE, "Internal error -- illegal SURFER grid data type" )
   end select
 
   call assert(iNX > 0,"Must have a non-zero number of grid cells in a surfer grid file...")
@@ -1066,7 +1066,7 @@ subroutine grid_WriteArcGrid(sFilename, pGrd)
     iNumCols = size(pGrd%dpData,1)
     iNumRows = size(pGrd%dpData,2)
   else
-    call assert(lFALSE, "Internal programming error - Unsupported grid type", &
+    call assert(FALSE, "Internal programming error - Unsupported grid type", &
       __SRCNAME__, __LINE__)
   endif
 
@@ -1156,7 +1156,7 @@ subroutine grid_WriteSurferGrid(sFilename, pGrd)
     iNumCols = size(pGrd%dpData,1)
     iNumRows = size(pGrd%dpData,2)
   else
-    call assert(lFALSE, "Internal programming error - Unsupported grid type", &
+    call assert(FALSE, "Internal programming error - Unsupported grid type", &
       __SRCNAME__, __LINE__)
   endif
 
@@ -1273,15 +1273,15 @@ function grid_Conform ( pGrd1, pGrd2, rTolerance ) result ( lConform )
       rTol = rDEFAULT_TOLERANCE * ( pGrd1%rX1 - pGrd1%rX0 )
   end if
 
-  lConform = lTRUE
+  lConform = TRUE
 
   if ( pGrd1%iNX /= pGrd2%iNX ) then
-    lConform = lFALSE
+    lConform = FALSE
     call LOGS%write("Unequal number of columns between grids", iLogLevel=LOG_ALL)
   endif
 
   if ( pGrd1%iNY /= pGrd2%iNY ) then
-    lConform = lFALSE
+    lConform = FALSE
     call LOGS%write("Unequal number of rows between grids", iLogLevel=LOG_ALL)
   endif
 
@@ -1289,28 +1289,28 @@ function grid_Conform ( pGrd1, pGrd2, rTolerance ) result ( lConform )
      call LOGS%write("Lower left-hand side X coordinates do not match:", iLogLevel=LOG_ALL)
      call LOGS%write("Grid 1 value: "//asCharacter(pGrd1%rX0)  &
           //"; grid 2 value: "//asCharacter(pGrd2%rX0), iLogLevel=LOG_ALL)
-    lConform = lFALSE
+    lConform = FALSE
   endif
 
   if( abs ( pGrd1%rY0 - pGrd2%rY0 ) > rTol ) then
     call LOGS%write("Lower left-hand side Y coordinates do not match:", iLogLevel=LOG_ALL)
     call LOGS%write("Grid 1 value: "//asCharacter(pGrd1%rY0)  &
           //"; grid 2 value: "//asCharacter(pGrd2%rY0), iLogLevel=LOG_ALL)
-    lConform = lFALSE
+    lConform = FALSE
   endif
 
   if( abs ( pGrd1%rX1 - pGrd2%rX1 ) > rTol ) then
      call LOGS%write("Upper right-hand side X coordinates do not match:", iLogLevel=LOG_ALL)
      call LOGS%write("Grid 1 value: "//asCharacter(pGrd1%rX1)  &
           //"; grid 2 value: "//asCharacter(pGrd2%rX1), iLogLevel=LOG_ALL)
-    lConform = lFALSE
+    lConform = FALSE
   endif
 
   if( abs ( pGrd1%rY1 - pGrd2%rY1 ) > rTol ) then
     call LOGS%write("Upper right-hand side Y coordinates do not match:", iLogLevel=LOG_ALL)
     call LOGS%write("Grid 1 value: "//asCharacter(pGrd1%rY1)  &
           //"; grid 2 value: "//asCharacter(pGrd2%rY1), iLogLevel=LOG_ALL)
-    lConform = lFALSE
+    lConform = FALSE
   endif
 
 end function grid_Conform
@@ -1344,9 +1344,9 @@ function grid_CompletelyCover( pBaseGrd, pOtherGrd, rTolerance ) result ( lCompl
        (pBaseGrd%rY0 - pOtherGrd%rY0 >= rTol) .and. &
        (pOtherGrd%rX1 - pBaseGrd%rX1 >= rTol) .and. &
        (pOtherGrd%rY1 - pBaseGrd%rY1 >= rTol) ) then
-      lCompletelyCover = lTRUE
+      lCompletelyCover = TRUE
   else
-      lCompletelyCover = lFALSE
+      lCompletelyCover = FALSE
 
       call LOGS%write("Extents of the data grid file "//dquote(pOtherGrd%sFilename) &
           //" do not cover the base grid extents.")
@@ -1606,7 +1606,7 @@ subroutine grid_checkIntegerGridValues(pGrd, sFilename)
   iRunningSum = 0
   iRecord = 0
 
-!  call LOGS%set_echo(lFALSE)
+!  call LOGS%set_echo(FALSE)
 !  call LOGS%write("### Summary of integer grid data values for file "//dquote(sFilename)//" ###", &
 !     iLogLevel=LOG_DEBUG, iLinesBefore=1, iLinesAfter=1 )
 
@@ -1669,12 +1669,12 @@ subroutine grid_CheckForPROJ4Error(iRetVal, sFromPROJ4, sToPROJ4)
           sErrorMessage = sErrorMessage &
           //"~ PROJ4 Error number "// asCharacter(iRetVal)//" reported.~" &
           //"   ==> error description: "//trim(tErrorMessage(i)%cErrorMessageText)
-          lFound = lTRUE
+          lFound = TRUE
         exit
       endif
     enddo
 
-    call assert(lFALSE, trim(sErrorMessage), __SRCNAME__, __LINE__)
+    call assert(FALSE, trim(sErrorMessage), __SRCNAME__, __LINE__)
 
   endif
 
@@ -1977,7 +1977,7 @@ function grid_GetGridColNum(pGrd,rX)  result(iColumnNumber)
 !   if ( iColumnNumber < 1 .or. iColumnNumber > pGrd%iNX ) then
 !     call grid_DumpGridExtent(pGrd)
 !     write(*, fmt="(a)") "was attempting to find column associated with X: "//trim(asCharacter(rX))
-!     call assert(lFALSE,  "INTERNAL PROGRAMMING ERROR: Column number out of bounds (value: " &
+!     call assert(FALSE,  "INTERNAL PROGRAMMING ERROR: Column number out of bounds (value: " &
 !      //trim( asCharacter(iColumnNumber))//")", &
 !      __SRCNAME__, __LINE__)
 !   endif
@@ -1998,7 +1998,7 @@ function grid_GetGridRowNum(pGrd,rY)  result(iRowNumber)
 !   if ( iRowNumber < 1 .or. iRowNumber > pGrd%iNY ) then
 !     call grid_DumpGridExtent(pGrd)
 !     write(*, fmt="(a)") "was attempting to find row associated with Y: "//trim(asCharacter(rY))
-!     call assert(lFALSE,  "INTERNAL PROGRAMMING ERROR: Row number out of bounds (value: " &
+!     call assert(FALSE,  "INTERNAL PROGRAMMING ERROR: Row number out of bounds (value: " &
 !      //trim( asCharacter(iRowNumber))//")", &
 !      __SRCNAME__, __LINE__)
 !   endif
@@ -2068,7 +2068,7 @@ function grid_GetGridColRowNum(pGrd, rX, rY)    result(iColRow)
       iColBoundLower = min(max( 1, iCandidateCol - 1), pGrd%iNX)
       iColBoundUpper = max(min( pGrd%iNX, iCandidateCol + 1), 1)
 
-      lChanged = lFALSE
+      lChanged = FALSE
 
       do iRow=iRowBoundLower,iRowBoundUpper
         do iCol=iColBoundLower,iColBoundUpper
@@ -2080,7 +2080,7 @@ function grid_GetGridColRowNum(pGrd, rX, rY)    result(iColRow)
             rMinDistance = rDist
             iCandidateCol = iCol
             iCandidateRow = iRow
-            lChanged = lTRUE
+            lChanged = TRUE
 
           endif
 
@@ -2279,7 +2279,7 @@ subroutine grid_GridToGrid_int( pGrdFrom, pGrdTo, lUseMajorityFilter )
   ! Allow USER to trigger whether the majority filter is employed or not
   if ( lUseMajorityFilter ) then
 
-    call LOGS%write( "** Majority filter in use for data from grid file "//dquote(pGrdFrom%sFilename), lEcho=lTRUE )
+    call LOGS%write( "** Majority filter in use for data from grid file "//dquote(pGrdFrom%sFilename), lEcho=TRUE )
 
     iSpread = max( 1, nint( fGridcellRatio / 2.0_c_float ) )
 
@@ -2410,12 +2410,12 @@ function grid_MajorityFilter_int(pGrdFrom, iTargetCol, &
 !
        iCellNum = iCellNum + 1
 !
-       lMatch = lFALSE
+       lMatch = FALSE
 !
        do i=1, iLast
          if (iValue(i) == pGrdFrom%iData(iCol, iRow) ) then
            iCount(i) = iCount(i) + 1
-           lMatch = lTRUE
+           lMatch = TRUE
            exit
          endif
        enddo
@@ -2426,7 +2426,7 @@ function grid_MajorityFilter_int(pGrdFrom, iTargetCol, &
          iLast = iLast + 1
          iValue(iLast) = pGrdFrom%iData(iCol, iRow)
          iCount(iLast) = iCount(iLast) + 1
-         lMatch = lTRUE
+         lMatch = TRUE
        endif
 
      enddo

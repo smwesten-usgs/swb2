@@ -550,7 +550,7 @@ contains
     this%total_available_water_taw           = 0.0_c_float
     this%readily_available_water_raw         = 0.0_c_float
     this%fraction_exposed_and_wetted_soil    = 0.0_c_float
-    this%it_is_growing_season                = lFALSE
+    this%it_is_growing_season                = FALSE
 
     do iIndex=1, iCount
       this%sort_order( iIndex ) = iIndex
@@ -807,10 +807,10 @@ contains
 
     else
 
-      call warn(sMessage="LAND_USE dataset is flawed or missing.", lFatal=lTRUE,         &
+      call warn(sMessage="LAND_USE dataset is flawed or missing.", lFatal=TRUE,         &
         iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"   &
         //" been ~included in the control file for the LAND_USE dataset.",               &
-        lEcho = lTRUE )
+        lEcho = TRUE )
 
     endif
 
@@ -871,14 +871,14 @@ contains
 
       do iIndex = 1, ubound(MODEL%landuse_code,1)
 
-        lMatch = lFALSE
+        lMatch = FALSE
 
         do iIndex2=1, ubound(iLandUseCodes, 1)
 
           if (MODEL%landuse_code(iIndex) == iLandUseCodes(iIndex2) ) then
             MODEL%landuse_index(iIndex) = iIndex2
             iCount = iCount + 1
-            lMatch = lTRUE
+            lMatch = TRUE
             exit
           endif
 
@@ -906,7 +906,7 @@ contains
     ! if we have more than one cell for which an index value could not be assigned, trigger fatal error
     if ( count(MODEL%landuse_index < 0) > 0 ) then
       call warn(asCharacter(count(MODEL%landuse_index < 0))//" landuse codes could not be "        &
-      //" assigned a landuse index value.", lFatal=lTRUE, sHints="Make sure that you have an "        &
+      //" assigned a landuse index value.", lFatal=TRUE, sHints="Make sure that you have an "        &
       //"entry in the landuse lookup table for each unique code contained in your landuse grid." )
     endif
 
@@ -933,10 +933,10 @@ contains
 
 !     else
 
-!       call warn(sMessage="AVAILABLE_WATER_CONTENT dataset is flawed or missing.", lFatal=lFALSE,    &
+!       call warn(sMessage="AVAILABLE_WATER_CONTENT dataset is flawed or missing.", lFatal=FALSE,    &
 !         iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"              &
 !         //" been ~included in the control file for the AVAILABLE_WATER_CONTENT dataset.",           &
-!         lEcho = lTRUE )
+!         lEcho = TRUE )
 
 !     endif
 
@@ -1067,19 +1067,19 @@ contains
         this%init_interception => model_initialize_interception_bucket
         this%calc_interception => model_calculate_interception_bucket
 
-        call LOGS%WRITE( "==> BUCKET/HORTON INTERCEPTION submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        call LOGS%WRITE( "==> BUCKET/HORTON INTERCEPTION submodel selected.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
       elseif ( Method_Name .strapprox. "GASH" ) then
 
         this%init_interception => model_initialize_interception_gash
         this%calc_interception => model_calculate_interception_gash
 
-        call LOGS%WRITE( "==> GASH INTERCEPTION submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        call LOGS%WRITE( "==> GASH INTERCEPTION submodel selected.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
       else
 
         call warn("Your control file specifies an unknown or unsupported INTERCEPTION method.", &
-            lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+            lFatal = TRUE, iLogLevel = LOG_ALL, lEcho = TRUE )
 
       endif
 
@@ -1090,19 +1090,19 @@ contains
         this%init_runoff => model_initialize_runoff_curve_number
         this%calc_runoff => model_calculate_runoff_curve_number
 
-        call LOGS%WRITE( "==> CURVE NUMBER RUNOFF submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        call LOGS%WRITE( "==> CURVE NUMBER RUNOFF submodel selected.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
       elseif ( ( Method_Name .strapprox. "RUNOFF_RATIO" ) .or. ( Method_Name .strapprox. "MONTHLY_GRID" ) ) then
 
         this%init_runoff => model_initialize_runoff_gridded_values
         this%calc_runoff => model_calculate_runoff_gridded_values
 
-        call LOGS%WRITE( "==> RUNOFF RATIO submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        call LOGS%WRITE( "==> RUNOFF RATIO submodel selected.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
       else
 
         call warn("Your control file specifies an unknown or unsupported RUNOFF method.", &
-            lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+            lFatal = TRUE, iLogLevel = LOG_ALL, lEcho = TRUE )
 
       endif
 
@@ -1112,12 +1112,12 @@ contains
           .or. ( Method_Name .strapprox. "FAO-56" ) )                                          then
 
         this%update_rooting_depth => model_update_rooting_depth_FAO56
-        call LOGS%WRITE( "==> DYNAMIC rooting depth submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        call LOGS%WRITE( "==> DYNAMIC rooting depth submodel selected.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
       else
 
         this%update_rooting_depth => model_update_rooting_depth_none
-        call LOGS%WRITE( "==> STATIC rooting depth submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        call LOGS%WRITE( "==> STATIC rooting depth submodel selected.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
       endif
 
@@ -1136,19 +1136,19 @@ contains
         this%init_snowfall => model_initialize_snowfall_original
         this%calc_snowfall => model_calculate_snowfall_original
 
-        call LOGS%WRITE( "==> ORIGINAL SNOWFALL submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        call LOGS%WRITE( "==> ORIGINAL SNOWFALL submodel selected.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
       elseif ( Method_Name .strapprox. "PRMS" ) then
 
         this%init_snowfall => model_initialize_snowfall_prms
         this%calc_snowfall => model_calculate_snowfall_prms
 
-        call LOGS%WRITE( "==> PRMS SNOWFALL submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        call LOGS%WRITE( "==> PRMS SNOWFALL submodel selected.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
       else
 
         call warn("Your control file specifies an unknown or unsupported SNOWFALL method.", &
-            lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+            lFatal = TRUE, iLogLevel = LOG_ALL, lEcho = TRUE )
 
       endif
 
@@ -1161,7 +1161,7 @@ contains
         this%read_awc_data => model_read_available_water_content_depth_integrated
 
         call LOGS%WRITE( "==> TABLE method for populating AVAILABLE_WATER_CONTENT/AVAILABLE_WATER_CAPACITY selected.",     &
-                         iLogLevel = LOG_ALL, lEcho = lFALSE )
+                         iLogLevel = LOG_ALL, lEcho = FALSE )
 
       elseif ( ( Method_Name .strapprox. "GRID" ) .or. ( Method_Name .strapprox. "GRIDDED" ) ) then
 
@@ -1169,13 +1169,13 @@ contains
         this%read_awc_data => model_read_available_water_content_gridded
 
         call LOGS%WRITE( "==> GRIDDED VALUES method for populating AVAILABLE_WATER_CONTENT/AVAILABLE_WATER_CAPACITY selected.",   &
-                         iLogLevel = LOG_ALL, lEcho = lFALSE )
+                         iLogLevel = LOG_ALL, lEcho = FALSE )
 
       else
 
         call warn("Your control file specifies an unknown or unsupported AVAILABLE_WATER_CONTENT/"    &
                   //"AVAILABLE_WATER_CAPACITY method.",                                               &
-                  lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+                  lFatal = TRUE, iLogLevel = LOG_ALL, lEcho = TRUE )
 
       endif
 
@@ -1187,7 +1187,7 @@ contains
         this%init_routing => model_initialize_routing_D8
         this%calc_routing => model_calculate_routing_D8
 
-        call LOGS%WRITE( "==> D8 FLOW ROUTING submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        call LOGS%WRITE( "==> D8 FLOW ROUTING submodel selected.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
       else
 
@@ -1195,7 +1195,7 @@ contains
         this%calc_routing => model_calculate_routing_none
 
         call LOGS%WRITE( "==> NULL FLOW ROUTING submodel selected -- NO routing will be performed.", &
-            iLogLevel = LOG_ALL, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = FALSE )
 
       endif
 
@@ -1211,7 +1211,7 @@ contains
         this%init_growing_season => model_initialize_growing_season_crop_coefficient_FAO56
         this%update_growing_season => model_update_growing_season_crop_coefficient_FAO56
         call LOGS%WRITE( "==> FAO-56 crop coefficient calculation method selected.", iLogLevel = LOG_ALL, &
-           lEcho = lFALSE )
+           lEcho = FALSE )
 
       else
 
@@ -1219,7 +1219,7 @@ contains
         this%update_crop_coefficient => model_update_crop_coefficient_none
 
         call LOGS%WRITE( "==> NO crop coefficient calculation method selected. Kcb defaults to 1.0.",     &
-          iLogLevel = LOG_ALL, lEcho = lFALSE )
+          iLogLevel = LOG_ALL, lEcho = FALSE )
 
       endif
 
@@ -1230,14 +1230,14 @@ contains
         this%init_fog => model_initialize_fog_monthly_grid
         this%calc_fog => model_calculate_fog_monthly_grid
 
-        call LOGS%WRITE( "==> MONTHLY_GRID FOG submodel selected.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        call LOGS%WRITE( "==> MONTHLY_GRID FOG submodel selected.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
       else
 
         this%init_fog => model_initialize_fog_none
         this%calc_fog => model_calculate_fog_none
 
-        call LOGS%WRITE( "==> NULL FOG submodel selected (i.e. no fog term).", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        call LOGS%WRITE( "==> NULL FOG submodel selected (i.e. no fog term).", iLogLevel = LOG_ALL, lEcho = FALSE )
 
       endif
 
@@ -1250,18 +1250,18 @@ contains
         ! this%init_GDD => model_initialize_GDD_be
         ! this%calc_GDD => model_calculate_GDD_be
         ! call LOGS%WRITE( "==> Growing degree-day (GDD) will be calculated as described "  &
-        !   //"in Baskerville and Emin (1969)", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        !   //"in Baskerville and Emin (1969)", iLogLevel = LOG_ALL, lEcho = FALSE )
         this%init_GDD => model_initialize_GDD
         this%calc_GDD => model_calculate_GDD
         call LOGS%WRITE( "==> THIS OPTION IS TEMPORARILY DISABLED! Growing degree-day (GDD) will be calculated using "  &
-          //"simple averaging of TMAX and TMIN.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+          //"simple averaging of TMAX and TMIN.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
       else
 
         this%init_GDD => model_initialize_GDD
         this%calc_GDD => model_calculate_GDD
         call LOGS%WRITE( "==> Growing degree-day (GDD) will be calculated using "  &
-          //"simple averaging of TMAX and TMIN.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+          //"simple averaging of TMAX and TMIN.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
       endif
 
@@ -1274,14 +1274,14 @@ contains
         this%init_irrigation => model_initialize_irrigation
         this%calc_irrigation => model_calculate_irrigation
 
-        call LOGS%WRITE( "==> IRRIGATION will be calculated and applied as needed.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        call LOGS%WRITE( "==> IRRIGATION will be calculated and applied as needed.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
       else
 
         this%init_irrigation => model_initialize_irrigation_none
         this%calc_irrigation => model_calculate_irrigation_none
 
-        call LOGS%WRITE( "==> IRRIGATION will *NOT* be active.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        call LOGS%WRITE( "==> IRRIGATION will *NOT* be active.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
       endif
 
@@ -1294,14 +1294,14 @@ contains
         this%init_soil_storage_max => model_initialize_soil_storage_max_gridded
 
         call LOGS%WRITE( "==> SOIL_STORAGE_MAX will be read from a grid. Rooting depths will be recalculated" &
-          //" as ~SOIL_STORAGE_MAX / AWC.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+          //" as ~SOIL_STORAGE_MAX / AWC.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
       else
 
         this%init_soil_storage_max => model_initialize_soil_storage_max_internally_calculated
 
         call LOGS%WRITE( "==> SOIL_STORAGE_MAX will be internally calculated from the given AWC and rooting depth values.",   &
-          iLogLevel = LOG_ALL, lEcho = lFALSE )
+          iLogLevel = LOG_ALL, lEcho = FALSE )
 
       endif
 
@@ -1316,7 +1316,7 @@ contains
         this%calc_reference_et => model_calculate_et_hargreaves
 
         call LOGS%WRITE( "==> HARGREAVES-SAMANI EVAPOTRANSPIRATION submodel selected.", &
-            iLogLevel = LOG_ALL, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = FALSE )
 
       elseif ( ( Method_Name .strapprox. "JENSEN-HAISE" )             &
            .or. ( Method_Name .strapprox. "JENSEN_HAISE" )            &
@@ -1326,7 +1326,7 @@ contains
         this%calc_reference_et => model_calculate_et_jensen_haise
 
         call LOGS%WRITE( "==> JENSEN_HAISE EVAPOTRANSPIRATION submodel selected.", &
-            iLogLevel = LOG_ALL, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = FALSE )
 
       elseif ( ( Method_Name .strapprox. "MONTHLY_GRID" ) &
            .or. ( Method_Name .strapprox. "MONTHLY_GRID" ) ) then
@@ -1335,7 +1335,7 @@ contains
         this%calc_reference_et => model_calculate_et_monthly_grid
 
         call LOGS%WRITE( "==> MONTHLY_GRID EVAPOTRANSPIRATION submodel selected.", &
-            iLogLevel = LOG_ALL, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = FALSE )
 
       elseif ( ( Method_Name .strapprox. "MONTHLY_ZONE" ) &
            .or. ( Method_Name .strapprox. "MONTHLY_ZONE_GRID" ) ) then
@@ -1344,7 +1344,7 @@ contains
         this%calc_reference_et => model_calculate_et_monthly_zone_grid
 
         call LOGS%WRITE( "==> MONTHLY_GRID EVAPOTRANSPIRATION submodel selected.", &
-            iLogLevel = LOG_ALL, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = FALSE )
 
       elseif ( ( Method_Name .strapprox. "DAILY_GRID" ) &
            .or. ( Method_Name .strapprox. "DAILY_GRID" ) ) then
@@ -1353,12 +1353,12 @@ contains
         this%calc_reference_et => model_calculate_et_daily_grid
 
         call LOGS%WRITE( "==> DAILY_GRID EVAPOTRANSPIRATION submodel selected.", &
-            iLogLevel = LOG_ALL, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = FALSE )
 
       else
 
         call warn("Your control file specifies an unknown or unsupported EVAPOTRANSPIRATION method.", &
-            lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+            lFatal = TRUE, iLogLevel = LOG_ALL, lEcho = TRUE )
 
       endif
 
@@ -1372,7 +1372,7 @@ contains
         this%get_precipitation_data => model_get_precip_normal
 
         call LOGS%WRITE( "==> STANDARD PRECIPITATION submodel selected.", &
-            iLogLevel = LOG_ALL, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = FALSE )
 
       elseif ( ( Method_Name .strapprox. "METHOD_OF_FRAGMENTS" ) &
            .or. ( Method_Name .strapprox. "FRAGMENTS" ) ) then
@@ -1381,12 +1381,12 @@ contains
         this%get_precipitation_data => model_get_precip_method_of_fragments
 
         call LOGS%WRITE( "==> METHOD OF FRAGMENTS PRECIPITATION submodel selected.", &
-            iLogLevel = LOG_ALL, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = FALSE )
 
       else
 
         call warn("Your control file specifies an unknown or unsupported PRECIPITATION method.", &
-            lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+            lFatal = TRUE, iLogLevel = LOG_ALL, lEcho = TRUE )
 
       endif
 
@@ -1397,7 +1397,7 @@ contains
       this%calc_direct_net_infiltration => model_calculate_direct_net_infiltration_gridded
 
       call LOGS%WRITE( "==> GRIDDED or TABULAR values for water main leakage and other direct " &
-        //"net infiltration will be used.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        //"net infiltration will be used.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
     elseif ( sCmdText .containssimilar. "DIRECT_SOIL_MOISTURE" ) then
 
@@ -1405,7 +1405,7 @@ contains
       this%calc_direct_soil_moisture => model_calculate_direct_soil_moisture_gridded
 
       call LOGS%WRITE( "==> GRIDDED or TABULAR values for septic drainage and other direct " &
-        //"inputs to the root zone will be used.", iLogLevel = LOG_ALL, lEcho = lFALSE )
+        //"inputs to the root zone will be used.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
     elseif ( sCmdText .containssimilar. "SOIL_MOISTURE" ) then
 
@@ -1416,7 +1416,7 @@ contains
         this%calc_actual_et => model_calculate_actual_et_thornthwaite_mather
 
         call LOGS%WRITE( "==> THORNTHWAITE-MATHER SOIL MOISTURE RETENTION submodel selected.", &
-            iLogLevel = LOG_ALL, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = FALSE )
 
       elseif ( ( Method_Name .strapprox. "T-M_EQUATIONS" )                           &
              .or. ( Method_Name .strapprox. "THORNTHWAITE-MATHER_EQUATIONS" )        &
@@ -1426,7 +1426,7 @@ contains
         this%calc_actual_et => model_calculate_actual_et_thornthwaite_mather_eqns
 
         call LOGS%WRITE( "==> THORNTHWAITE-MATHER SOIL MOISTURE RETENTION (SWB 1.0 equations) submodel selected.", &
-            iLogLevel = LOG_ALL, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = FALSE )
 
       elseif ( ( Method_Name .strapprox. "FAO56_TWO_STAGE" ) .or. ( Method_Name .strapprox. "FAO-56_TWO_STAGE" ) ) then
 
@@ -1434,7 +1434,7 @@ contains
         this%calc_actual_et => model_calculate_actual_et_fao56__two_stage
 
         call LOGS%WRITE( "==> **TWO-STAGE** FAO-56 SOIL MOISTURE RETENTION submodel selected.", &
-            iLogLevel = LOG_ALL, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = FALSE )
 
       elseif ( ( Method_Name .strapprox. "FAO56" ) .or. ( Method_Name .strapprox. "FAO-56" ) ) then
 
@@ -1442,7 +1442,7 @@ contains
         this%calc_actual_et => model_calculate_actual_et_fao56
 
         call LOGS%WRITE( "==> FAO-56 SOIL MOISTURE RETENTION submodel selected.", &
-            iLogLevel = LOG_ALL, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = FALSE )
 
       elseif ( ( Method_Name .strapprox. "GRIDDED" ) ) then
 
@@ -1450,12 +1450,12 @@ contains
         this%calc_actual_et => model_calculate_actual_et_gridded_values
 
         call LOGS%WRITE( "==> **GRIDDED** ACTUAL ET will determine SOIL MOISTURE RETENTION.", &
-            iLogLevel = LOG_ALL, lEcho = lFALSE )
+            iLogLevel = LOG_ALL, lEcho = FALSE )
 
       else
 
         call warn("Your control file specifies an unknown or unsupported SOIL_MOISTURE method.", &
-          lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+          lFatal = TRUE, iLogLevel = LOG_ALL, lEcho = TRUE )
 
       endif
 
@@ -1489,7 +1489,7 @@ contains
 
           call warn("Unknown option and/or arguments supplied to DUMP_VARIABLES method.",          &
             sHints="The only known option keywords are 'COORD' and 'INDEX_RANGE'.",                &
-            lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+            lFatal = TRUE, iLogLevel = LOG_ALL, lEcho = TRUE )
 
         endif
 
@@ -1508,7 +1508,7 @@ contains
 
             if ( ( col > 0 ) .and. ( row > 0 ) ) then
               call LOGS%WRITE( "==> SWB will dump variables for cell ("//asCharacter(col)//","     &
-                //asCharacter(row)//").", iLogLevel = LOG_ALL, lEcho = lFALSE )
+                //asCharacter(row)//").", iLogLevel = LOG_ALL, lEcho = FALSE )
                 filename = "SWB2_variable_values__col_"//asCharacter( col )//"__row_"              &
                            //asCharacter( row )//"__x_"//asCharacter(asInt(xcoord))                &
                            //"__y_"//asCharacter(asInt(ycoord))//".csv"
@@ -1516,7 +1516,7 @@ contains
             else
               call LOGS%WRITE( "==> SWB will dump variables for cell indices ranging from "        &
                 //asCharacter(indx_start)//" to "//asCharacter(indx_end)//").",                    &
-                iLogLevel = LOG_ALL, lEcho = lFALSE )
+                iLogLevel = LOG_ALL, lEcho = FALSE )
                 filename = "SWB2_variable_values__start_index_"//asCharacter( indx_start )         &
                            //"__end_index_"//asCharacter( indx_end )//".csv"
             endif
@@ -1553,7 +1553,7 @@ contains
     else
 
       call warn("Your control file references an unknown or unsupported method: "//dquote(sCmdText), &
-          lFatal = lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+          lFatal = TRUE, iLogLevel = LOG_ALL, lEcho = TRUE )
 
     endif
 
@@ -1812,7 +1812,7 @@ contains
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
     call snowmelt_original_calculate( potential_snowmelt=this%potential_snowmelt, tmin=this%tmin,   &
-                                      tmax=this%tmax, imperial_units=lTRUE )
+                                      tmax=this%tmax, imperial_units=TRUE )
 
   end subroutine model_calculate_snowmelt_original
 
@@ -2153,9 +2153,9 @@ contains
     enddo
 
     call LOGS%WRITE( "Landuse Code |  Soils Code  | Number of Matches | Rooting Depth (ft)",   &
-      iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+      iLogLevel = LOG_DEBUG, lEcho = FALSE )
     call LOGS%WRITE( "-------------|--------------|-------------------|------------------ ",   &
-      iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+      iLogLevel = LOG_DEBUG, lEcho = FALSE )
 
     do iSoilsIndex = 1, iNumberOfSoilGroups
       do iLUIndex = 1, iNumberOfLanduses
@@ -2164,7 +2164,7 @@ contains
             asCharacter(count( pLULC%pGrdBase%iData == iLanduseCodes( iLUIndex)               &
                                  .and. pHSG%pGrdBase%iData == iSoilsIndex ) )//" | "          &
                                  //asCharacter( fMax_Rooting_Depth( iLUIndex, iSoilsIndex) ), &
-                                 iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+                                 iLogLevel = LOG_DEBUG, lEcho = FALSE )
 
 
          where ( pLULC%pGrdBase%iData == iLanduseCodes( iLUIndex) .and. pHSG%pGrdBase%iData == iSoilsIndex )
@@ -3474,7 +3474,7 @@ contains
     endif
 
     call LOGS%write( adjustl(sVarname)//" | "//adjustl(sMin)//" | "//adjustl(sMax) &
-       //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_ALL, lEcho=lTRUE )
+       //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_ALL, lEcho=TRUE )
 
 
   end subroutine minmaxmean_float
@@ -3527,7 +3527,7 @@ contains
     endif
 
     call LOGS%write( adjustl(sVarname)//" | "//adjustl(sMin)//" | "//adjustl(sMax) &
-       //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_ALL, lEcho=lTRUE )
+       //" | "//adjustl(sMean)//" | "//adjustl(sCount), iLogLevel=LOG_ALL, lEcho=TRUE )
 
   end subroutine minmaxmean_int
 

@@ -324,14 +324,14 @@ end function get_target_index
 
     iIndex        = -9999
     cell_index    = -9999
-    lFound        = lFALSE
+    lFound        = FALSE
 
     ! iterate over 1D vector of column numbers
     do iIndex = lbound(COL1D,1), ubound(COL1D,1)
 
       if( COL1D( iIndex ) == iCol  .and.  ROW1D( iIndex ) == iRow ) then
       	cell_index = iIndex
-        lFound = lTRUE
+        lFound = TRUE
       	exit
       endif
 
@@ -455,7 +455,7 @@ end function get_target_index
     row_lbound = lbound(lActive, 2)
     row_ubound = ubound(lActive, 2)
 
-    IS_DOWNSLOPE_TARGET_MARKED = lFALSE
+    IS_DOWNSLOPE_TARGET_MARKED = FALSE
     SUM_OF_UPSLOPE_CELLS = 0_c_int
 
     indx = 0
@@ -484,8 +484,8 @@ main_loop: do
           iNumberOfChangedCells = iNumberOfChangedCells + 1
 	        iUpslopeSum = 0_c_int
 	        iUpslopeConnections = 0_c_int
-	        are_there_unmarked_upslope_cells = lFALSE
-          lCircular = lFALSE
+	        are_there_unmarked_upslope_cells = FALSE
+          lCircular = FALSE
 
           ! search the 8 cells immediately adjacent to the current cell
 	local_search: do iRowsrch=max( row_num-1, row_lbound),min( row_num+1, row_ubound)
@@ -502,7 +502,7 @@ main_loop: do
                       ! if the target of the current cell points back at the adjacent
                       ! cell, mark current cell as having a "circular" connection
                       if ( ( TARGET_COL( column_num, row_num ) == iColsrch )                &
-                        .and. ( TARGET_ROW( column_num, row_num ) == iRowsrch ) )  lCircular = lTRUE
+                        .and. ( TARGET_ROW( column_num, row_num ) == iRowsrch ) )  lCircular = TRUE
 
                       ! if the adjacent cell is marked (that is, has no unresolved
                       ! upslope contributions), add the 1 to the number of connections
@@ -519,7 +519,7 @@ main_loop: do
                       ! be able to mark the current cell
 	 			           	  else
 
-                        are_there_unmarked_upslope_cells = lTRUE
+                        are_there_unmarked_upslope_cells = TRUE
 
 	 			           	  endif
 
@@ -542,7 +542,7 @@ main_loop: do
                   ! current cell as well
 	                SUM_OF_UPSLOPE_CELLS( column_num, row_num ) = iUpslopeSum + 1
 	                NUMBER_OF_UPSLOPE_CONNECTIONS( column_num, row_num ) = iUpslopeConnections
-	                IS_DOWNSLOPE_TARGET_MARKED( column_num, row_num ) = lTRUE
+	                IS_DOWNSLOPE_TARGET_MARKED( column_num, row_num ) = TRUE
                   COLUMN_INDEX( indx )  = column_num
                   ROW_INDEX( indx )     = row_num
                   SORT_ORDER_l( indx )    = routing_D8_get_index( column_num, row_num )
@@ -566,7 +566,7 @@ main_loop: do
 
                   SUM_OF_UPSLOPE_CELLS( column_num, row_num ) = iUpslopeSum
                   NUMBER_OF_UPSLOPE_CONNECTIONS( column_num, row_num ) = iUpslopeConnections
-                  IS_DOWNSLOPE_TARGET_MARKED( column_num, row_num ) = lTRUE
+                  IS_DOWNSLOPE_TARGET_MARKED( column_num, row_num ) = TRUE
                   COLUMN_INDEX( indx ) = column_num
                   ROW_INDEX( indx ) = row_num
                   SORT_ORDER_l( indx ) = routing_D8_get_index( column_num, row_num )

@@ -8,7 +8,7 @@
 module crop_coefficients__FAO56
 
   use iso_c_binding, only             : c_bool, c_short, c_int, c_float, c_double
-  use constants_and_conversions, only : M_PER_FOOT, lTRUE, lFALSE, fTINYVAL,       &
+  use constants_and_conversions, only : M_PER_FOOT, TRUE, FALSE, fTINYVAL,       &
                                         iTINYVAL, asInt, asFloat, fZERO, in_to_mm, &
                                         TRUE, FALSE
   use data_catalog, only              : DAT
@@ -136,7 +136,7 @@ contains
     type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_PERCENT_SOIL_MOISTURE
 
    !> create string list that allows for alternate heading identifiers for the landuse code
-   slList = create_list("LU_Code; Landuse_Code; Landuse_Lookup_Code")
+   slList = create_list("LU_Code, Landuse_Code, Landuse_Lookup_Code")
 
    !> Determine how many landuse codes are present
    call PARAMS%get_parameters( slKeys=slList, iValues=LANDUSE_CODE )
@@ -342,7 +342,7 @@ contains
         call warn("There are missing day-of-year (L_ini, L_dev, L_mid, L_late, L_fallow), " &
           //"growing degree-day ~(GDD_plant, GDD_ini, GDD_dev, GDD_mid, GDD_late)," &
           //" or monthly crop ~coefficients (Kcb_jan...Kcb_dec) for" &
-          //" landuse "//asCharacter( LANDUSE_CODE( iIndex ) ), lFatal=lTRUE )
+          //" landuse "//asCharacter( LANDUSE_CODE( iIndex ) ), lFatal=TRUE )
       endif
 
     enddo
@@ -564,11 +564,11 @@ end function update_crop_coefficient_GDD_as_threshold
       GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )&
                                                 + GROWTH_STAGE_DOY( L_DOY_FALLOW, iIndex )
 
-      call LOGS%write("## Updating Kcb Date Values ##", iLinesAfter=1, lEcho=lFALSE )
+      call LOGS%write("## Updating Kcb Date Values ##", iLinesAfter=1, lEcho=FALSE )
       call LOGS%write("Landuse Code | Planting Date | End of 'ini' | End of 'dev' " &
-        //"| End of 'mid' | End of 'late' | End of 'fallow' ", lEcho=lFALSE )
+        //"| End of 'mid' | End of 'late' | End of 'fallow' ", lEcho=FALSE )
       call Logs%write("-------------|---------------|--------------|--------------" &
-        //"|--------------|---------------|-----------------", lEcho=lFALSE )
+        //"|--------------|---------------|-----------------", lEcho=FALSE )
 
       call LOGS%write( asCharacter( LANDUSE_CODE( iIndex ))//" | "                &
          //trim( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate() )//" | " &
@@ -577,7 +577,7 @@ end function update_crop_coefficient_GDD_as_threshold
          //trim( GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )%prettydate() )//" | "   &
          //trim( GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate() )//" | "  &
          //trim( GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex )%prettydate() ),      &
-         lEcho=lFALSE, iLogLevel=LOG_ALL )
+         lEcho=FALSE, iLogLevel=LOG_ALL )
 
     enddo
 

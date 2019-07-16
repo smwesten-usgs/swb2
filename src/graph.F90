@@ -88,7 +88,7 @@ module graph
 
       case(DATATYPE_CELL_GRID)
 
-        call Assert(lFALSE,"Unsupported grid type (T_GRID_CELL) was used in call", &
+        call Assert(FALSE,"Unsupported grid type (T_GRID_CELL) was used in call", &
           __SRCNAME__, __LINE__)
 
     end select
@@ -208,7 +208,7 @@ module graph
 
       case default
 
-        call assert(lFALSE, "Unknown device specified for output plots." &
+        call assert(FALSE, "Unknown device specified for output plots." &
           //" Device: "//trim(pGraph(iVarNum)%cCDEV))
 
     end select
@@ -513,7 +513,7 @@ module graph
 
       case(DATATYPE_CELL_GRID)
 
-        call Assert(lFALSE,"Unsupported grid type (T_GRID_CELL) was used in call", &
+        call Assert(FALSE,"Unsupported grid type (T_GRID_CELL) was used in call", &
           __SRCNAME__, __LINE__)
 
       end select

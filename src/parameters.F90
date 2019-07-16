@@ -310,7 +310,7 @@ contains
     if ( present (lFatal) ) then
       lFatal_l = lFatal
     else
-      lFatal_l = lFALSE
+      lFatal_l = FALSE
     endif
 
     slList = PARAMS_DICT%grep_keys( asUppercase( sKey ) )
@@ -341,7 +341,7 @@ contains
     if ( present (lFatal) ) then
       lFatal_l = lFatal
     else
-      lFatal_l = lFALSE
+      lFatal_l = FALSE
     endif
 
     if ( present( slKeys) ) then
@@ -381,7 +381,7 @@ contains
     if ( present (lFatal) ) then
       lFatal_l = lFatal
     else
-      lFatal_l = lFALSE
+      lFatal_l = FALSE
     endif
 
     if ( present( slKeys) ) then
@@ -423,7 +423,7 @@ contains
     if ( present (lFatal) ) then
       lFatal_l = lFatal
     else
-      lFatal_l = lFALSE
+      lFatal_l = FALSE
     endif
 
 
@@ -465,7 +465,7 @@ contains
     if ( present (lFatal) ) then
       lFatal_l = lFatal
     else
-      lFatal_l = lFALSE
+      lFatal_l = FALSE
     endif
 
     if ( present( slKeys) ) then
@@ -513,7 +513,7 @@ contains
     if ( present (lFatal) ) then
       lFatal_l = lFatal
     else
-      lFatal_l = lFALSE
+      lFatal_l = FALSE
     endif
 
     slList = PARAMS%grep_name( sPrefix )
