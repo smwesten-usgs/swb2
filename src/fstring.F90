@@ -934,8 +934,8 @@ contains
   impure elemental function keepnumeric(text)            result(result_text)
 
     ! ARGUMENTS
-    character (len=*), intent(in)           :: text
-    character (len=:), allocatable          :: result_text
+    character (len=*), intent(in)         :: text
+    character (len=len(text))             :: result_text
 
     character (len=:), allocatable     :: temp_str
     character (len=512)                :: temp_result
