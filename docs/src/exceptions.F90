@@ -7,132 +7,18 @@ module exceptions
 
   private
 
-  public :: assert, die, warn, check_for_fatal_warnings, index_values_valid
-
-  logical (c_bool), parameter :: TRUE = .true._c_bool
-  logical (c_bool), parameter :: FALSE = .false._c_bool
+  public :: assert, die, warn, check_for_fatal_warnings
 
   interface  assert
      module procedure :: assert_4bit
      module procedure :: assert_1bit
   end interface assert
 
-  interface index_values_valid
-    module procedure :: bounds_check_integer_1d
-    module procedure :: bounds_check_float_1d
-    module procedure :: bounds_check_double_1d
-    module procedure :: bounds_check_integer_2d
-    module procedure :: bounds_check_float_2d
-    module procedure :: bounds_check_double_2d
-  end interface index_values_valid
-
   integer (c_int), public     :: NUMBER_OF_FATAL_WARNINGS = 0
   integer (c_int), parameter  :: MAX_FATAL_WARNINGS = 50
-  character (len=256)         :: WARNING_TEXT( MAX_FATAL_WARNINGS )
+  character (len=256)              :: WARNING_TEXT( MAX_FATAL_WARNINGS )
 
 contains
-
-   function bounds_check_integer_1d( array_vals, array_index )   result(bounds_ok)
-
-     integer (c_int), intent(in)  :: array_vals(:)
-     integer (c_int), intent(in)  :: array_index
-     logical (c_bool)             :: bounds_ok
-
-     bounds_ok = FALSE
-
-     if (      lbound(array_vals,1) <= array_index                             &
-         .and. ubound(array_vals,1) >= array_index ) bounds_ok = TRUE
-
-   end function bounds_check_integer_1d
-
-!------------------------------------------------------------------------------------------------
-
-   function bounds_check_float_1d( array_vals, array_index )   result(bounds_ok)
-
-     real (c_float), intent(in)   :: array_vals(:)
-     integer (c_int), intent(in)  :: array_index
-     logical (c_bool)             :: bounds_ok
-
-     bounds_ok = FALSE
-
-     if (      lbound(array_vals,1) <= array_index                             &
-         .and. ubound(array_vals,1) >= array_index ) bounds_ok = TRUE
-
-   end function bounds_check_float_1d
-
-!------------------------------------------------------------------------------------------------
-
-   function bounds_check_double_1d( array_vals, array_index )   result(bounds_ok)
-
-     real (c_double), intent(in)  :: array_vals(:)
-     integer (c_int), intent(in)  :: array_index
-     logical (c_bool)             :: bounds_ok
-
-     bounds_ok = FALSE
-
-     if (      lbound(array_vals,1) <= array_index                             &
-         .and. ubound(array_vals,1) >= array_index ) bounds_ok = TRUE
-
-   end function bounds_check_double_1d
-
-!------------------------------------------------------------------------------------------------
-
-   function bounds_check_integer_2d( array_vals, array_index1,                 &
-                                                 array_index2 )  result(bounds_ok)
-
-     integer (c_int), intent(in)  :: array_vals(:,:)
-     integer (c_int), intent(in)  :: array_index1
-     integer (c_int), intent(in)  :: array_index2
-     logical (c_bool)             :: bounds_ok
-
-     bounds_ok = FALSE
-
-     if (      lbound(array_vals,1) <= array_index1                            &
-         .and. ubound(array_vals,1) >= array_index1                            &
-         .and. lbound(array_vals,2) <= array_index2                            &
-         .and. ubound(array_vals,2) >= array_index2 )  bounds_ok = TRUE
-
-   end function bounds_check_integer_2d
-
-!------------------------------------------------------------------------------------------------
-
-   function bounds_check_float_2d( array_vals, array_index1,                 &
-                                               array_index2 )  result(bounds_ok)
-
-     real (c_float), intent(in)   :: array_vals(:,:)
-     integer (c_int), intent(in)  :: array_index1
-     integer (c_int), intent(in)  :: array_index2
-     logical (c_bool)             :: bounds_ok
-
-     bounds_ok = FALSE
-
-     if (      lbound(array_vals,1) <= array_index1                            &
-         .and. ubound(array_vals,1) >= array_index1                            &
-         .and. lbound(array_vals,2) <= array_index2                            &
-         .and. ubound(array_vals,2) >= array_index2 )  bounds_ok = TRUE
-
-   end function bounds_check_float_2d
-
-!------------------------------------------------------------------------------------------------
-
-   function bounds_check_double_2d( array_vals, array_index1,                 &
-                                                array_index2 )  result(bounds_ok)
-
-     real (c_double), intent(in)  :: array_vals(:,:)
-     integer (c_int), intent(in)  :: array_index1
-     integer (c_int), intent(in)  :: array_index2
-     logical (c_bool)             :: bounds_ok
-
-     bounds_ok = FALSE
-
-     if (      lbound(array_vals,1) <= array_index1                            &
-         .and. ubound(array_vals,1) >= array_index1                            &
-         .and. lbound(array_vals,2) <= array_index2                            &
-         .and. ubound(array_vals,2) >= array_index2 )  bounds_ok = TRUE
-
-   end function bounds_check_double_2d
-
-!------------------------------------------------------------------------------------------------
 
    subroutine die(sMessage, sModule, iLine, sHints, sCalledBy, iCalledByLine )
 
@@ -181,7 +67,7 @@ contains
 
   end subroutine die
 
-!------------------------------------------------------------------------------------------------
+  !------------------------------------------------------------------------------------------------
 
   subroutine check_for_fatal_warnings()
 
@@ -295,7 +181,7 @@ contains
     character (len=*), intent(in), optional     :: sModule
     integer (c_int), intent(in), optional  :: iLine
 
-    character (len=256) :: sHints_l
+    character (len=256) :: sHints_l 
 
     if (.not. lCondition) then
 
@@ -333,7 +219,7 @@ subroutine assert_4bit(lCondition, sMessage, sModule, iLine, sCalledBy, iCalledB
   character (len=*), intent(in), optional     :: sModule
   integer (c_int), intent(in), optional  :: iLine
 
-  character (len=256) :: sHints_l
+  character (len=256) :: sHints_l 
 
   if (.not. lCondition) then
 

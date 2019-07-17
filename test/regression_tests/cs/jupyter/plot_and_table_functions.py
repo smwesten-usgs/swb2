@@ -1,13 +1,3 @@
-
-# coding: utf-8
-
-# In[1]:
-
-### Define basic plot types ###
-
-
-# In[2]:
-
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 import matplotlib.colors as colors

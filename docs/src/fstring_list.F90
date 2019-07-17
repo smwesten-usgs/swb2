@@ -360,7 +360,7 @@ end subroutine append_fstring_to_fstring_sub
 
       do i=1,this%count
         sbuf = this%get(i)
-        value = as_integer(sbuf)
+        read(unit=sbuf, fmt=*, iostat=op_status) value
         if ( op_status==0 ) then
           values(i) = value
         else
