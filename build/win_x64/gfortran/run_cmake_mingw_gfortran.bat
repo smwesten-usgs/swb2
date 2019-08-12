@@ -18,8 +18,8 @@ set R_HOME=C:\Program Files\R\R-3.3.1\bin
 :: explicitly locate each key library
 for /f %%x in ('dir /b /s c:\mingw64\*libhdf5_hl.a') do call set LIB_HDF5_HL=%%x
 for /f %%x in ('dir /b /s c:\mingw64\*libhdf5.a') do call set LIB_HDF5=%%x
-for /f %%x in ('dir /b /s c:\mingw64\*libsz.a') do call set LIB_SZ=%%x
-for /f %%x in ('dir /b /s c:\mingw64\*libdl.a') do call set LIB_DL=%%x
+::for /f %%x in ('dir /b /s c:\mingw64\*libsz.a') do call set LIB_SZ=%%x
+::for /f %%x in ('dir /b /s c:\mingw64\*libdl.a') do call set LIB_DL=%%x
 for /f %%x in ('dir /b /s c:\mingw64\*libz.a') do call set LIB_Z=%%x
 for /f %%x in ('dir /b /s c:\mingw64\*libnetcdf.a') do call set LIB_NETCDF=%%x
 for /f %%x in ('dir /b /s c:\mingw64\*libgcc.a') do call set LIB_GCC=%%x
@@ -32,11 +32,11 @@ set LIB_NETCDF=%LIB_NETCDF:\=/%
 set LIB_GCC=%LIB_GCC:\=/%
 set LIB_GFORTRAN=%LIB_GFORTRAN:\=/%
 set LIB_Z=%LIB_Z:\=/%
-set LIB_DL=%LIB_DL:\=/%
-set LIB_SZ=%LIB_SZ:\=/%
+::set LIB_DL=%LIB_DL:\=/%
+::set LIB_SZ=%LIB_SZ:\=/%
 
-set SWB_EXTERNAL_LIBS="%LIB_NETCDF%;%LIB_HDF5_HL%;%LIB_HDF5%;%LIB_Z%;%LIB_DL%;%LIB_SZ%;%LIB_GCC%;%LIB_GFORTRAN%"
-
+::set SWB_EXTERNAL_LIBS="%LIB_NETCDF%;%LIB_HDF5_HL%;%LIB_HDF5%;%LIB_Z%;%LIB_DL%;%LIB_SZ%;%LIB_GCC%;%LIB_GFORTRAN%"
+set SWB_EXTERNAL_LIBS="%LIB_NETCDF%;%LIB_HDF5_HL%;%LIB_HDF5%;%LIB_Z%;%LIB_GCC%;%LIB_GFORTRAN%"
 
 :: define where 'make copy' will place executables
 set INSTALL_PREFIX=d:/DOS

@@ -165,7 +165,7 @@ module fstring
   public :: TAB, WHITESPACE, BACKSLASH, FORWARDSLASH, CARRIAGE_RETURN, COMMENT_CHARS, &
             PUNCTUATION, DOUBLE_QUOTE
   character (len=1), parameter :: TAB = achar(9)
-  character (len=2), parameter :: WHITESPACE = achar(9)//" "
+  character (len=2), parameter :: WHITESPACE = " "//achar(9)
   character (len=1), parameter :: BACKSLASH = achar(92)
   character (len=1), parameter :: FORWARDSLASH = achar(47)
   character (len=1), parameter :: CARRIAGE_RETURN = achar(13)

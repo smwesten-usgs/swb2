@@ -1331,8 +1331,8 @@ function grid_CompletelyCover( pBaseGrd, pOtherGrd, rTolerance ) result ( lCompl
   real (c_float) :: rTol
   real (c_float) :: rDEFAULT_TOLERANCE
 
-!  rDEFAULT_TOLERANCE = pBaseGrd%rGridCellSize / 2.
-  rDEFAULT_TOLERANCE = rZERO
+  rDEFAULT_TOLERANCE = -pBaseGrd%rGridCellSize / 100.
+  !rDEFAULT_TOLERANCE = rZERO
 
   if ( present ( rTolerance ) ) then
       rTol = rTolerance
@@ -1351,11 +1351,20 @@ function grid_CompletelyCover( pBaseGrd, pOtherGrd, rTolerance ) result ( lCompl
       call LOGS%write("Extents of the data grid file "//dquote(pOtherGrd%sFilename) &
           //" do not cover the base grid extents.")
 
-      call LOGS%write("BASE GRID EXTENTS   DATA GRID EXTENTS", iTab=18, iLinesBefore=1)
-      call LOGS%write("X (lower-left):   "//trim(asCharacter(pBaseGrd%rX0))//"       "//trim(asCharacter(pOtherGrd%rX0)) )
-      call LOGS%write("Y (lower-left):   "//trim(asCharacter(pBaseGrd%rY0))//"       "//trim(asCharacter(pOtherGrd%rY0)) )
-      call LOGS%write("X (upper-right):  "//trim(asCharacter(pBaseGrd%rX1))//"       "//trim(asCharacter(pOtherGrd%rX1)) )
-      call LOGS%write("Y (upper-right):  "//trim(asCharacter(pBaseGrd%rY1))//"       "//trim(asCharacter(pOtherGrd%rY1)), iLinesAfter=1 )
+      call LOGS%write("BASE GRID EXTENTS        DATA GRID EXTENTS        DIFFERENCE", &
+        iTab=18, iLinesBefore=1)
+      call LOGS%write("X (lower-left):   "//trim(asCharacter(pBaseGrd%rX0))    &
+        //"       "//trim(asCharacter(pOtherGrd%rX0))                          &
+        //"       "//trim(asCharacter(pBaseGrd%rX0 - pOtherGrd%rX0)) )
+      call LOGS%write("Y (lower-left):   "//trim(asCharacter(pBaseGrd%rY0))    &
+        //"       "//trim(asCharacter(pOtherGrd%rY0))                          &
+        //"       "//trim(asCharacter(pBaseGrd%rY0 - pOtherGrd%rY0)) )
+      call LOGS%write("X (upper-right):  "//trim(asCharacter(pBaseGrd%rX1))    &
+        //"       "//trim(asCharacter(pOtherGrd%rX1))                          &
+        //"       "//trim(asCharacter(pOtherGrd%rX1 - pBaseGrd%rX1)) )
+      call LOGS%write("Y (upper-right):  "//trim(asCharacter(pBaseGrd%rY1))    &
+        //"       "//trim(asCharacter(pOtherGrd%rY1))                          &
+        //"       "//trim(asCharacter(pOtherGrd%rY1 - pBaseGrd%rY1)), iLinesAfter=1 )
 
   end if
 

@@ -148,12 +148,15 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine assign_fstring_to_character_sub(character_str, this)
+  subroutine assign_fstring_to_character_sub(this, character_str)
 
-    character (len=:), allocatable, intent(out)      :: character_str
-    type (FSTRING_LIST_T), intent(inout)                 :: this
+    type (FSTRING_LIST_T), intent(inout)            :: this
+    character (len=:), allocatable                  :: character_str
 
-    character_str = this%get(1)
+    character (len=:), allocatable :: temp_str
+
+    temp_str = this%get(1)
+    character_str = trim(temp_str)
 
   end subroutine assign_fstring_to_character_sub
 
@@ -483,24 +486,28 @@ end function retrieve_values_as_logical_fn
     integer (c_int)                :: i
 
     start_pos = 1
-    end_pos = index( this%s, c_null_char ) - 1
-    str_len = len_trim( this%s )
-
     text = "<NA>"
 
-    do i=1, this%count
+    if ( allocated(this%s) ) then
 
-      if ( index_val == i ) then
-        text = this%s(start_pos:end_pos)
-        exit
-      endif
+      end_pos = index( this%s, c_null_char ) - 1
+      str_len = len_trim( this%s )
 
-      ! skip over the 'c_null_char' to position of beginning of
-      ! next substring
-      start_pos = end_pos + 2
-      end_pos = index( this%s(start_pos:str_len), c_null_char ) + start_pos - 2
+      do i=1, this%count
 
-    end do
+        if ( index_val == i ) then
+          text = this%s(start_pos:end_pos)
+          exit
+        endif
+
+        ! skip over the 'c_null_char' to position of beginning of
+        ! next substring
+        start_pos = end_pos + 2
+        end_pos = index( this%s(start_pos:str_len), c_null_char ) + start_pos - 2
+
+      end do
+
+    endif  
 
   end function retrieve_value_from_list_at_index_fn
 
@@ -927,7 +934,7 @@ end function retrieve_values_as_logical_fn
 
       do i=1, this%count
 
-        if ( this%get(i) .contains. substr )  count = count + 1
+        if ( this%get(i) .strequal. substr )  count = count + 1
 
       enddo
 
@@ -935,7 +942,7 @@ end function retrieve_values_as_logical_fn
 
       do i=1, this%count
 
-        if ( this%get(i) .containssimilar. substr )  count = count + 1
+        if ( this%get(i) .strapprox. substr )  count = count + 1
 
       enddo
 

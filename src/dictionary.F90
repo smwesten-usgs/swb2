@@ -969,6 +969,12 @@ end function find_dict_entry_fn
     logical (c_bool)          :: is_fatal_l
     logical (c_bool)          :: empty_entries
 
+    if ( present( is_fatal ) ) then
+      is_fatal_l = is_fatal
+    else
+      is_fatal_l = FALSE
+    endif
+    
     pTarget => this%get_entry(sKey)
 
     if ( associated( pTarget ) ) then

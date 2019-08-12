@@ -45,10 +45,10 @@ module parameters
     procedure            :: get_parameter_table_float
     procedure            :: get_parameter_values_string_list
 
-    generic              :: get_parameters => get_parameter_values_int,     &
-                                              get_parameter_values_float,   &
-                                              get_parameter_table_float,    &
-                                              get_parameter_values_logical, &
+    generic              :: get_parameters => get_parameter_values_int,         &
+                                              get_parameter_values_float,       &
+                                              get_parameter_table_float,        &
+                                              get_parameter_values_logical,     &
                                               get_parameter_values_string_list
 
     procedure            :: grep_name => grep_parameter_name
@@ -67,7 +67,7 @@ module parameters
   type (PARAMETERS_T), public :: PARAMS
   type (DICT_T), public       :: PARAMS_DICT
 
-  integer (c_int), parameter  :: MAX_TABLE_RECORD_LEN = 512
+  integer (c_int), parameter  :: MAX_TABLE_RECORD_LEN = 2048
 
 contains
 
@@ -85,7 +85,7 @@ contains
     if (present(sDelimiters) ) then
       sDelimiters_l = sDelimiters
     else
-      sDelimiters_l = TAB
+      sDelimiters_l = WHITESPACE
     endif
 
     if ( present(sCommentChars) ) then

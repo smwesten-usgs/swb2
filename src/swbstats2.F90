@@ -457,6 +457,12 @@ program swbstats2
     if (.not. swbstats%multiple_zone_grids) then
       call swbstats%initialize_zone_grid(grid_filename=swbstats%zone_grid_filename)
       call swbstats%get_unique_int(swbstats%grd_zone%pGrdBase%iData, swbstats%unique_zone_list)
+
+      if (len_trim(swbstats%zone_grid2_filename) > 0) then
+        call swbstats%initialize_secondary_zone_grid(grid_filename=swbstats%zone_grid2_filename)
+        call swbstats%get_unique_int(swbstats%grd_zone2%pGrdBase%iData, swbstats%unique_zone2_list)
+      endif
+
     endif
     temp_string = "zonal_stats_"//trim(swbstats%netcdf_variable_name_string)//".csv"
     call swbstats%open_zonal_stats_output_file(trim(temp_string))
@@ -524,26 +530,55 @@ program swbstats2
 
 
     if (swbstats%calc_zonal_stats) then
-      if ( associated(swbstats%grd_comparison) ) then
+      if ( len_trim(swbstats%zone_grid2_filename) > 0) then
 
-        call swbstats%output_zonal_stats(                                      &
-             start_date=swbstats%slice_start_date,                             &
-             end_date=swbstats%slice_end_date,                                 &
-             values=output_files(STATS_SUM)%grid_ptr%dpData,                   &
-             zone_ids=swbstats%grd_zone%pGrdBase%iData,                               &
-             unique_zone_list=swbstats%unique_zone_list,                       &
-             comparison_values=swbstats%grd_comparison%pGrdBase%dpData,               &
-             funit=swbstats%zonal_stats_output_file%unit() )
+        if ( associated(swbstats%grd_comparison) ) then
+
+          call swbstats%output_zonal_stats(                                      &
+               start_date=swbstats%slice_start_date,                             &
+               end_date=swbstats%slice_end_date,                                 &
+               values=output_files(STATS_SUM)%grid_ptr%dpData,                   &
+               zone_ids=swbstats%grd_zone%pGrdBase%iData,                        &
+               unique_zone_list=swbstats%unique_zone_list,                       &
+               zone2_ids=swbstats%grd_zone2%pGrdBase%iData,                      &
+               unique_zone2_list=swbstats%unique_zone2_list,                     &
+               comparison_values=swbstats%grd_comparison%pGrdBase%dpData,        &
+               funit=swbstats%zonal_stats_output_file%unit() )
+
+        else
+          call swbstats%output_zonal_stats(                                      &
+               start_date=swbstats%slice_start_date,                             &
+               end_date=swbstats%slice_end_date,                                 &
+               values=output_files(STATS_SUM)%grid_ptr%dpData,                   &
+               zone_ids=swbstats%grd_zone%pGrdBase%iData,                        &
+               unique_zone_list=swbstats%unique_zone_list,                       &
+               zone2_ids=swbstats%grd_zone2%pGrdBase%iData,                      &
+               unique_zone2_list=swbstats%unique_zone2_list,                     &
+               funit=swbstats%zonal_stats_output_file%unit() )
+
+        endif
 
       else
-        call swbstats%output_zonal_stats(                                      &
-             start_date=swbstats%slice_start_date,                             &
-             end_date=swbstats%slice_end_date,                                 &
-             values=output_files(STATS_SUM)%grid_ptr%dpData,                   &
-             zone_ids=swbstats%grd_zone%pGrdBase%iData,                               &
-             unique_zone_list=swbstats%unique_zone_list,                       &
-             funit=swbstats%zonal_stats_output_file%unit() )
+        if ( associated(swbstats%grd_comparison) ) then
+          call swbstats%output_zonal_stats(                                      &
+               start_date=swbstats%slice_start_date,                             &
+               end_date=swbstats%slice_end_date,                                 &
+               values=output_files(STATS_SUM)%grid_ptr%dpData,                   &
+               zone_ids=swbstats%grd_zone%pGrdBase%iData,                               &
+               unique_zone_list=swbstats%unique_zone_list,                       &
+               comparison_values=swbstats%grd_comparison%pGrdBase%dpData,               &
+               funit=swbstats%zonal_stats_output_file%unit() )
 
+        else
+          call swbstats%output_zonal_stats(                                      &
+               start_date=swbstats%slice_start_date,                             &
+               end_date=swbstats%slice_end_date,                                 &
+               values=output_files(STATS_SUM)%grid_ptr%dpData,                   &
+               zone_ids=swbstats%grd_zone%pGrdBase%iData,                               &
+               unique_zone_list=swbstats%unique_zone_list,                       &
+               funit=swbstats%zonal_stats_output_file%unit() )
+
+        endif
       endif
     endif
 

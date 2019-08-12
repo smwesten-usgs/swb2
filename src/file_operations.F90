@@ -182,13 +182,17 @@ contains
       if (.not. lHasHeader ) this%iNumberOfHeaderLines = 0
     endif
 
-    if (.not. this%isOpen() ) then
+    if ( this%isOpen() ) then
+
+      call die( "PROGRAMMING ERROR--file already open: "//dquote( fully_qualified_filename( sFilename_l ) )//"." )
+
+    else
 
       open(newunit=this%iUnitNum, file=fully_qualified_filename( sFilename_l ), iostat=this%iStat, action='READ')
       call assert(this%iStat == 0, "Failed to open file "//dquote( fully_qualified_filename( sFilename_l ) )//"."  &
         //" Exit code: "//asCharacter( this%iStat )//".", __SRCNAME__, __LINE__)
 
-      if (this%iStat == 0) this%lIsOpen = TRUE
+      this%lIsOpen = TRUE
       this%lEOF = FALSE
 
       call this%countLines()
@@ -199,10 +203,6 @@ contains
       call LOGS%write( "Number of lines in file: "//asCharacter( this%numLines() ), iTab=37 )
       call LOGS%write( "Number of lines excluding blanks, headers and comments: " &
            //asCharacter( this%numRecords() ), iTab=6 )
-
-    else
-
-      call die( "Failed to open file "//dquote( fully_qualified_filename( sFilename_l ) )//" with read access." )
 
     endif
 

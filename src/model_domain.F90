@@ -2134,11 +2134,12 @@ contains
     slRZ = PARAMS%grep_name("RZ", lFatal=TRUE )
     ! Convert the string list to an vector of integers; MODEL call strips off the "RZ_" part of label
     iRZ_SeqNums = slRZ%get_integer()
+
     ! count how many items are present in the vector; MODEL should equal the number of soils groups
     iNumberOfSoilGroups = count( iRZ_SeqNums > 0 )
 
-    !> Determine how many landuse codes are present
-    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCodes )
+    !> Determine how many landuse codes are present; FATAL error if no landuse codes found
+    call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCodes, lFatal=TRUE )
     iNumberOfLanduses = count( iLanduseCodes >= 0 )
 
     allocate( fMax_Rooting_Depth(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )

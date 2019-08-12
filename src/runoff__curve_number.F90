@@ -62,7 +62,7 @@ contains
 
     ! retrieve a string list of all keys associated with curve number (i.e. "CN_1", "CN_2", "CN_3", etc)
     slCurveNumber = PARAMS%grep_name( "CN", lFatal=TRUE )
-    call slCurveNumber%print_all()
+
     ! Convert the string list to an vector of integers; this call strips off the "CN_" part of label
     iCurveNumberSeqNums = slCurveNumber%get_integer()
 

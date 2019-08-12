@@ -84,6 +84,7 @@ module swbstats2_support
     type (FSTRING_LIST_T)           :: end_date_list
     type (FSTRING_LIST_T)           :: date_range_id_list
     type (FSTRING_LIST_T)           :: unique_zone_list
+    type (FSTRING_LIST_T)           :: unique_zone2_list
     type (FSTRING_LIST_T)           :: comparison_grid_file_list
     type (FSTRING_LIST_T)           :: zone_grid_file_list
     real (c_double)                 :: output_conversion_factor = 1.0_c_double
@@ -1110,6 +1111,10 @@ contains
 
     if (present(zone2_ids) .and. present(unique_zone2_list)) then
 
+      ! sort the values before use
+      call unique_zone_list%sort_integer()
+      call unique_zone2_list%sort_integer()
+
       ! obtain list of unique integers present in the zone grid
       zone_values = unique_zone_list%get_integer()
       zone2_values = unique_zone2_list%get_integer()
@@ -1129,9 +1134,11 @@ contains
               start_date%prettydate(),end_date%prettydate(), n, m, stats(1:4),        &
               int(stats(5)), stats(6:9),int(stats(10))
           else
-            call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats)
-            write(unit=funit_l, fmt="(2(a,', '),i0,', ',4(f14.5,', '),i0)")           &
-              start_date%prettydate(),end_date%prettydate(), n, stats(1:4),int(stats(5))
+            call calc_multizonal_stats(values, zone_ids, target_id=n, target2_id=m,   &
+                                  result_vector=stats,                                &
+                                  zone2_ids=zone2_ids)
+            write(unit=funit_l, fmt="(2(a,', '),2(i0,', '),4(f14.5,', '),i0)")           &
+              start_date%prettydate(),end_date%prettydate(), n, m, stats(1:4),int(stats(5))
           endif
         enddo
       enddo
@@ -1256,13 +1263,28 @@ contains
 
     call this%zonal_stats_output_file%open(filename)
 
-    if (this%multiple_comparison_grids .or. this%compare_to_obs_values) then
-      header_str = "start_date,end_date,zone_id,minimum_swb,maximum_swb,"     &
-        //"mean_swb,sum_swb,count_swb,minimum_obs,maximum_obs,"               &
-        //"mean_obs,sum_obs,count_obs"
+    if (len_trim(this%zone_grid2_filename) > 0) then
+
+      if (this%multiple_comparison_grids .or. this%compare_to_obs_values) then
+        header_str = "start_date,end_date,zone_id,zone2_id,minimum_swb,"        &
+          //"maximum_swb,mean_swb,sum_swb,count_swb,minimum_obs,maximum_obs,"   &
+          //"mean_obs,sum_obs,count_obs"
+      else
+        header_str = "start_date,end_date,zone_id,zone2_id,minimum_swb,"        &
+          //"maximum_swb,mean_swb,sum_swb,count_swb"
+      endif
+
     else
-      header_str = "start_date,end_date,zone_id,minimum_swb,maximum_swb,"     &
-        //"mean_swb,sum_swb,count_swb"
+
+      if (this%multiple_comparison_grids .or. this%compare_to_obs_values) then
+        header_str = "start_date,end_date,zone_id,minimum_swb,maximum_swb,"     &
+          //"mean_swb,sum_swb,count_swb,minimum_obs,maximum_obs,"               &
+          //"mean_obs,sum_obs,count_obs"
+      else
+        header_str = "start_date,end_date,zone_id,minimum_swb,maximum_swb,"     &
+          //"mean_swb,sum_swb,count_swb"
+      endif
+
     endif
 
     call this%zonal_stats_output_file%writeLine(trim(header_str))

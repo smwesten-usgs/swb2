@@ -47,7 +47,7 @@ set BUILD_TYPE="Debug"
 set SYSTEM_TYPE="win_x64"
 
 :: define platform and compiler specific compilation flags
-set CMAKE_Fortran_FLAGS_DEBUG="/Od /fpp /MTd /debug:full /check:all /traceback"
+set CMAKE_Fortran_FLAGS_DEBUG="/Od /fpp /MTd /debug:full /Z7 /check:bounds,pointers,stack /traceback /free /Qzero /heap-arrays:128"
 set CMAKE_Fortran_FLAGS_RELEASE="/O2 /QxHost /MT /fpp /traceback"
 set CMAKE_C_FLAGS_DEBUG="/Od /MTd /debug:full"
 set CMAKE_C_FLAGS_RELEASE="/O2 /QxHost /MT"
