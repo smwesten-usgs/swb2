@@ -148,14 +148,14 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine assign_fstring_to_character_sub(this, character_str)
+  subroutine assign_fstring_to_character_sub( character_str, string_list )
 
-    type (FSTRING_LIST_T), intent(inout)            :: this
-    character (len=:), allocatable                  :: character_str
+    character (len=:), allocatable, intent(out)     :: character_str
+    type (FSTRING_LIST_T), intent(in)               :: string_list
 
     character (len=:), allocatable :: temp_str
 
-    temp_str = this%get(1)
+    temp_str = string_list%get(1)
     character_str = trim(temp_str)
 
   end subroutine assign_fstring_to_character_sub
@@ -476,7 +476,7 @@ end function retrieve_values_as_logical_fn
 
   function retrieve_value_from_list_at_index_fn(this, index_val)   result(text)
 
-    class (FSTRING_LIST_T), intent(inout)     :: this
+    class (FSTRING_LIST_T), intent(in)        :: this
     integer (c_int), intent(in)               :: index_val
     character(len=:), allocatable             :: text
 
@@ -507,7 +507,7 @@ end function retrieve_values_as_logical_fn
 
       end do
 
-    endif  
+    endif
 
   end function retrieve_value_from_list_at_index_fn
 
