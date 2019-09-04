@@ -1,23 +1,5 @@
 # CMake project for swb2
 
-# This script expects that the following configuration variables are
-# set and passed during CMake invocation:
-
-# CMAKE_BINARY_DIR
-# DESIRED_BUILD_TYPE     | possible values: "debug", "release", "profile"
-# CMAKE_INSTALL_PREFIX   | ex: "D:/DOS"
-# Fortran_FLAGS_DEBUG
-# Fortran_FLAGS_RELEASE
-# Fortran_FLAGS_PROFILE
-# PATH_TO_R
-# OS                     | possible values: "win_x86", "win_x64", "max_osx", "linux_x64"
-# Fortran_COMPILER_NAME  | ex: "gfortran", "ifort"
-# COMPILER_VERSION       | ex: "4.8.2"
-# LIB_PATH1
-# LIB_PATH2
-# LIB_PATH3
-# LIB_PATH4
-
 message("Processing top-level CMakelists.txt for project swb2")
 
 set(SWB_MAJOR_VERSION "2")
@@ -49,8 +31,9 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 cmake_minimum_required(VERSION 3.1)
 
 include( cmake/version_control.cmake )
-
-set( EXTERNAL_LIBS ${SWB_EXTERNAL_LIBS})
+include( cmake/FindNetCDF.cmake )
+include( cmake/FindHDF5.cmake )
+include( cmake/FindHDF5_HL.cmake )
 
 #if(MSVC)
   # Automatically adds compiler definitions to all subdirectories too.
@@ -59,8 +42,6 @@ set( EXTERNAL_LIBS ${SWB_EXTERNAL_LIBS})
   # string (REPLACE "/W3" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
   # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /w")
 #endif(MSVC)
-
-#libvcruntime.lib libucrt.lib libifport.lib
 
 link_libraries( ${EXTERNAL_LIBS} )
 include_directories( ${INCLUDE_DIRECTORIES} ${CMAKE_BINARY_DIR}/src ${PROJECT_SOURCE_DIR}/src/proj4 )

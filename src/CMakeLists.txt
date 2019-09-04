@@ -254,16 +254,10 @@ set(SRCS
 
 
 add_library(swb_lib STATIC ${SRCS})
-set_target_properties(swb_lib
-      PROPERTIES COMPILE_DEFINITIONS "${PREPROCESSOR_DEFINES}")
 target_link_libraries( swb_lib proj4_lib )
 
 add_executable(swb2 main.F90 )
-set_target_properties(swb2
-      PROPERTIES COMPILE_DEFINITIONS "${PREPROCESSOR_DEFINES}")
-target_link_libraries( swb2 proj4_lib swb_lib )
+target_link_libraries( swb2 proj4_lib swb_lib ${HDF5_HL_LIBRARY} ${HDF5_LIBRARY} ${NetCDF_LIBRARY})
 
 add_executable(swbstats2 swbstats2.F90 swbstats2_support.F90)
-set_target_properties(swbstats2
-      PROPERTIES COMPILE_DEFINITIONS "${PREPROCESSOR_DEFINES}")
-target_link_libraries( swbstats2 proj4_lib swb_lib )
+target_link_libraries( swbstats2 proj4_lib swb_lib ${HDF5_HL_LIBRARY} ${HDF5_LIBRARY} ${NetCDF_LIBRARY})
