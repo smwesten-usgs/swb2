@@ -6,8 +6,8 @@ module test_crop_coefficients__FAO56
   use logfiles, only               : LOGS, LOG_DEBUG
   use parameters, only             : PARAMETERS_T
   use simulation_datetime, only    : SIM_DT
-  use strings
-  use string_list, only            : STRING_LIST_T
+  use fstring
+  use fstring_list, only           : FSTRING_LIST_T
   use version_control
   use iso_c_binding
   implicit none
@@ -16,9 +16,9 @@ contains
 
   subroutine setup_crop_coefficients__FAO56
 
-    type (PARAMETERS_T)             :: PARAMS
-    real (kind=c_float), allocatable     :: fValues(:)
-    type (STRING_LIST_T)                 :: slString
+    type (PARAMETERS_T)                   :: PARAMS
+    real (kind=c_float), allocatable      :: fValues(:)
+    type (FSTRING_LIST_T)                 :: slString
 
     if (     (SYSTEM_NAME .containssimilar. "Windows")                           &
         .or. (SYSTEM_NAME .containssimilar. "Mingw") ) then

@@ -28,7 +28,7 @@ module crop_coefficients__FAO56
   public :: crop_coefficients_FAO56_update_growth_stage_dates
   public :: crop_coefficients_FAO56_update_growing_season
   public :: update_crop_coefficient_date_as_threshold, update_crop_coefficient_GDD_as_threshold
-  public :: GROWTH_STAGE_DATE, PLANTING_DATE, GROWTH_STAGE_DOY
+  public :: GROWTH_STAGE_DATE, PLANTING_DATE, GROWTH_STAGE_LENGTH_IN_DAYS
   public :: KCB_MIN, KCB_INI, KCB_MID, KCB_END
   public :: KCB_l, JAN, DEC, KCB_METHOD, KCB_METHOD_GDD, KCB_METHOD_FAO56
   public :: KCB_METHOD_MONTHLY_VALUES
@@ -66,7 +66,7 @@ module crop_coefficients__FAO56
   real (c_float), allocatable   :: KCB_l(:,:)
   integer (c_int), allocatable  :: KCB_METHOD(:)
   real (c_float), allocatable   :: GROWTH_STAGE_SHIFT_DAYS(:)
-  real (c_float), allocatable   :: GROWTH_STAGE_DOY(:,:)
+  real (c_float), allocatable   :: GROWTH_STAGE_LENGTH_IN_DAYS(:,:)
   real (c_float), allocatable   :: GROWTH_STAGE_GDD(:,:)
   type (DATETIME_T), allocatable     :: GROWTH_STAGE_DATE(:,:)
 
@@ -190,8 +190,8 @@ contains
    call PARAMS%get_parameters( sKey="Kcb_Dec", fValues=KCB_dec )
 
 
-    allocate( GROWTH_STAGE_DOY( 5, iNumberOfLanduses ), stat=iStat )
-    call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_DOY array", &
+    allocate( GROWTH_STAGE_LENGTH_IN_DAYS( 5, iNumberOfLanduses ), stat=iStat )
+    call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_LENGTH_IN_DAYS array", &
       __SRCNAME__, __LINE__ )
 
     allocate( GROWTH_STAGE_GDD( 5, iNumberOfLanduses ), stat=iStat )
@@ -217,26 +217,26 @@ contains
     KCB_METHOD = -9999
     KCB_l = -9999.
     GROWTH_STAGE_GDD = -9999.
-    GROWTH_STAGE_DOY = -9999.
+    GROWTH_STAGE_LENGTH_IN_DAYS = 0.
     GROWTH_STAGE_SHIFT_DAYS = 0.0_c_float
 
     if ( ubound(L_shift_days_l,1) == iNumberOfLanduses )    &
       GROWTH_STAGE_SHIFT_DAYS = L_shift_days_l
 
     if ( ubound(L_ini_l,1) == iNumberOfLanduses )           &
-      GROWTH_STAGE_DOY( L_DOY_INI,  : ) = L_ini_l
+      GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_INI,  : ) = L_ini_l
 
     if ( ubound(L_dev_l,1) == iNumberOfLanduses )           &
-      GROWTH_STAGE_DOY( L_DOY_DEV,  : ) = L_dev_l
+      GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_DEV,  : ) = L_dev_l
 
     if ( ubound(L_mid_l,1) == iNumberOfLanduses )           &
-      GROWTH_STAGE_DOY( L_DOY_MID,  : ) = L_mid_l
+      GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_MID,  : ) = L_mid_l
 
     if ( ubound(L_late_l,1) == iNumberOfLanduses )          &
-      GROWTH_STAGE_DOY( L_DOY_LATE, : ) = L_late_l
+      GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_LATE, : ) = L_late_l
 
     if ( ubound(L_fallow_l,1) == iNumberOfLanduses )        &
-      GROWTH_STAGE_DOY( L_DOY_FALLOW, : ) = L_fallow_l
+      GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_FALLOW, : ) = L_fallow_l
 
     call LOGS%write(" ## Crop Kcb Curve Summary ##", iLinesAfter=1)
     call LOGS%write(" _only meaningful for landuses where the Kcb curve is defined " &
@@ -273,11 +273,18 @@ contains
         endif
 
         ! march forward through time calculating the various dates on the Kcb curve
-        GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) + L_ini_l( iIndex )
-        GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) + L_dev_l( iIndex )
-        GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) + L_mid_l( iIndex )
-        GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) + L_late_l( iIndex )
-        GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) + L_fallow_l( iIndex )
+        ! GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) + L_ini_l( iIndex )
+        ! GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) + L_dev_l( iIndex )
+        ! GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) + L_mid_l( iIndex )
+        ! GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) + L_late_l( iIndex )
+        ! GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) + L_fallow_l( iIndex )
+
+        ! if any of the L_* length values is missing, a value of zero will be used, resulting in a wierd looking Kcb curve
+        GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_INI, iIndex )
+        GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_DEV, iIndex )
+        GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_MID, iIndex )
+        GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_LATE, iIndex )
+        GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_FALLOW, iIndex )
 
         call LOGS%write( "| "//asCharacter( LANDUSE_CODE( iIndex ))//" | "                &
            //trim( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate() )        &
@@ -333,7 +340,7 @@ contains
          .and. all( KCB_l( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_GDD
 
-      elseif ( all( GROWTH_STAGE_DOY( PLANTING_DATE:, iIndex ) >= 0.0_c_float )              &
+      elseif ( all( GROWTH_STAGE_LENGTH_IN_DAYS( PLANTING_DATE:, iIndex ) >= 0.0_c_float )              &
          .and. all( KCB_l( KCB_INI:KCB_MIN, iIndex ) > 0.0_c_float ) ) then
         KCB_METHOD( iIndex ) = KCB_METHOD_FAO56
       endif
@@ -554,15 +561,15 @@ end function update_crop_coefficient_GDD_as_threshold
 
       ! now calculate dates associated with the rest of the Kcb curve
       GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) &
-                                                + GROWTH_STAGE_DOY( L_DOY_INI, iIndex )
+                                                + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_INI, iIndex )
       GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )&
-                                                + GROWTH_STAGE_DOY( L_DOY_DEV, iIndex )
+                                                + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_DEV, iIndex )
       GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )&
-                                                + GROWTH_STAGE_DOY( L_DOY_MID, iIndex )
+                                                + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_MID, iIndex )
       GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )&
-                                                + GROWTH_STAGE_DOY( L_DOY_LATE, iIndex )
+                                                + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_LATE, iIndex )
       GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )&
-                                                + GROWTH_STAGE_DOY( L_DOY_FALLOW, iIndex )
+                                                + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_FALLOW, iIndex )
 
       call LOGS%write("## Updating Kcb Date Values ##", iLinesAfter=1, lEcho=FALSE )
       call LOGS%write("Landuse Code | Planting Date | End of 'ini' | End of 'dev' " &
