@@ -6,8 +6,8 @@ module growing_season
   use exceptions
   use parameters, only                : PARAMS
   use simulation_datetime, only       : SIM_DT
-  use strings
-  use string_list, only               : STRING_LIST_T
+  use fstring
+  use fstring_list, only               : FSTRING_LIST_T
   implicit none
 
   private
@@ -32,9 +32,9 @@ contains
     integer (c_int)              :: iNumberOfLanduses
     logical (c_bool)             :: lAreLengthsEqual
     character (len=:), allocatable    :: sTemp
-    type (STRING_LIST_T)              :: sl_temp_list
-    type (STRING_LIST_T)              :: sl_growing_season_begin
-    type (STRING_LIST_T)              :: sl_growing_season_end
+    type (FSTRING_LIST_T)              :: sl_temp_list
+    type (FSTRING_LIST_T)              :: sl_growing_season_begin
+    type (FSTRING_LIST_T)              :: sl_growing_season_end
     character (len=32)                :: str_buffer
     real (c_float), allocatable  :: temp_values(:)
     integer (c_int)              :: indx
@@ -68,7 +68,7 @@ contains
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
     if ( sl_growing_season_begin%count == iNumberOfLanduses                &
-         .and. sl_growing_season_begin%countmatching("<NA>") == 0 ) then
+         .and. sl_growing_season_begin%count_matching("<NA>") == 0 ) then
 
       do indx = 1, sl_growing_season_begin%count
         str_buffer = sl_growing_season_begin%get( indx )
@@ -103,7 +103,7 @@ contains
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
     if ( sl_growing_season_end%count == iNumberOfLanduses                  &
-         .and. sl_growing_season_end%countmatching("<NA>") == 0 ) then
+         .and. sl_growing_season_end%count_matching("<NA>") == 0 ) then
 
       do indx = 1, sl_growing_season_end%count
         str_buffer = sl_growing_season_end%get( indx )

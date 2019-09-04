@@ -1,8 +1,8 @@
 module proj4_support
 
   use iso_c_binding
-  use strings, only      : right, left, squote
-  use string_list, only  : STRING_LIST_T, create_list
+  use fstring, only      : right, left, squote, WHITESPACE
+  use fstring_list, only  : FSTRING_LIST_T, create_list
   implicit none
 
   private
@@ -15,12 +15,12 @@ contains
                                                   attribute_value_list )
 
     character (len=*), intent(in)         :: proj4_string
-    type ( STRING_LIST_T), intent(out)    :: attribute_name_list
-    type (STRING_LIST_T), intent(out)     :: attribute_value_list
+    type ( FSTRING_LIST_T), intent(out)    :: attribute_name_list
+    type (FSTRING_LIST_T), intent(out)     :: attribute_value_list
 
 
     ! [ LOCALS ]
-    type (STRING_LIST_T)           :: proj4_list
+    type (FSTRING_LIST_T)           :: proj4_list
     integer (c_int)           :: indx
     character (len=256)            :: temp_string
     character (len=:), allocatable :: valuestring
@@ -29,10 +29,10 @@ contains
 
     proj4_string_local = proj4_string
 
-    proj4_list = create_list( proj4_string_local )
+    proj4_list = create_list( proj4_string_local, delimiter_chr=WHITESPACE )
 
     do indx=1, proj4_list%count
- 
+
       temp_string = proj4_list%get( indx )
       namestring = left( string=temp_string, substring="=" )
       valuestring = right( string=temp_string, substring="=" )
@@ -48,7 +48,7 @@ contains
               call attribute_value_list%append("decimal_degrees")
             case ( "aea" )
               call attribute_value_list%append("albers_conical_equal_area")
-            case ( "aeqd" ) 
+            case ( "aeqd" )
               call attribute_value_list%append("azimuthal_equidistant")
             case ( "tmerc" )
               call attribute_value_list%append("transverse_mercator")
@@ -57,9 +57,9 @@ contains
             case ( "cea" )
               call attribute_value_list%append("lambert_cylindrical_equal_area")
             case ( "lcc" )
-              call attribute_value_list%append("lambert_conformal_conic")  
+              call attribute_value_list%append("lambert_conformal_conic")
             case ( "utm" )
-              call attribute_value_list%append("universal_transverse_mercator")  
+              call attribute_value_list%append("universal_transverse_mercator")
             case default
               call attribute_value_list%append("unknown")
           end select
@@ -133,22 +133,22 @@ contains
           call attribute_value_list%append( valuestring )
 
         case ( "+a" )
-          
+
           call attribute_name_list%append("semi_major_axis")
           call attribute_value_list%append( valuestring )
 
-        case ( "+b" ) 
-        
+        case ( "+b" )
+
           call attribute_name_list%append("semi_minor_axis")
           call attribute_value_list%append( valuestring )
 
-        case ( "+R" ) 
-        
+        case ( "+R" )
+
           call attribute_name_list%append("earth_radius")
           call attribute_value_list%append( valuestring )
 
-        case ( "+rf" ) 
-        
+        case ( "+rf" )
+
           call attribute_name_list%append("inverse_flattening")
           call attribute_value_list%append( valuestring )
 
@@ -157,7 +157,7 @@ contains
           call attribute_name_list%append("scale_factor_at_central_meridian")
           call attribute_value_list%append( valuestring )
 
-        case ( "+units" )   
+        case ( "+units" )
 
           call attribute_name_list%append("units")
 
@@ -175,7 +175,7 @@ contains
               case default
                 call attribute_value_list%append( valuestring )
 
-            end select      
+            end select
 
         case ( "+zone" )
 
@@ -184,7 +184,7 @@ contains
 
         case default
 
-      end select  
+      end select
 
     enddo
 

@@ -29,8 +29,8 @@ module netcdf4_support
   use exceptions
   use logfiles
   use netcdf_c_api_interfaces
-  use strings
-  use string_list, only           : STRING_LIST_T
+  use fstring
+  use fstring_list, only           : FSTRING_LIST_T
   use PROJ4_support, only         : create_attributes_from_proj4_string
   use datetime
 
@@ -152,7 +152,7 @@ module netcdf4_support
     character (len=64)      :: sDimensionName
     integer (c_int)    :: iNC_DimID = NC_NA_INT
     integer (c_size_t) :: iNC_DimSize
-    logical (c_bool)   :: lUnlimited = lFALSE
+    logical (c_bool)   :: lUnlimited = FALSE
   end type T_NETCDF_DIMENSION
 
   type T_NETCDF_ATTRIBUTE
@@ -204,8 +204,8 @@ module netcdf4_support
     character (len=3) :: sVariableOrder = "tyx"
     real (c_double), dimension(0:1) :: rX
     real (c_double), dimension(0:1) :: rY
-    logical (c_bool)  :: lX_IncreasesWithIndex = lTRUE
-    logical (c_bool)  :: lY_IncreasesWithIndex = lFALSE
+    logical (c_bool)  :: lX_IncreasesWithIndex = TRUE
+    logical (c_bool)  :: lY_IncreasesWithIndex = FALSE
     logical (c_bool)  :: lAllowAutomaticDataFlipping = TRUE
 
     real (c_double), dimension(0:1) :: dpFirstAndLastTimeValues
@@ -219,8 +219,8 @@ module netcdf4_support
     real (c_double), dimension(0:3) :: rAddOffset = 0.0_c_double
     integer (c_int), dimension(0:2) :: iRowIter
     integer (c_int), dimension(0:2) :: iColIter
-    logical (c_bool) :: lFlipHorizontal = lFALSE
-    logical (c_bool) :: lFlipVertical = lFALSE
+    logical (c_bool) :: lFlipHorizontal = FALSE
+    logical (c_bool) :: lFlipVertical = FALSE
 
     real (c_double), allocatable, dimension(:) :: rX_Coords
     real (c_double), allocatable, dimension(:) :: rY_Coords
@@ -292,11 +292,11 @@ function netcdf_date_within_range( NCFILE, iJulianDay)  result( lWithinRange )
   if ( iJulianDay >= NCFILE%iFirstDayJD &
       .and. iJulianDay <= NCFILE%iLastDayJD ) then
 
-    lWithinRange = lTRUE
+    lWithinRange = TRUE
 
   else
 
-    lWithinRange = lFALSE
+    lWithinRange = FALSE
 
   endif
 
@@ -384,7 +384,7 @@ function nf_julian_day_to_index_adj( NCFILE, rJulianDay )  result(iStart)
     iIndexLower = max( lbound(NCFILE%rDateTimeValues, 1), iCandidateIndex - 1)
     iIndexUpper = min( ubound(NCFILE%rDateTimeValues, 1), iCandidateIndex + 1)
 
-    lChanged = lFALSE
+    lChanged = FALSE
 
     do iIndex=iIndexLower,iIndexUpper
 
@@ -398,7 +398,7 @@ function nf_julian_day_to_index_adj( NCFILE, rJulianDay )  result(iStart)
 
         iMinDiff = iDiff
         iCandidateIndex = iIndex
-        lChanged = lTRUE
+        lChanged = TRUE
 
       endif
 
@@ -456,14 +456,14 @@ function nf_return_VarIndex( NCFILE, iVarID)   result(iVarIndex)
    integer (c_int) :: iIndex
    logical (c_bool) :: lFound
 
-  lFound = lFALSE
+  lFound = FALSE
 
   do iIndex=0, NCFILE%iNumberOfVariables - 1
 
     pNC_VAR => NCFILE%pNC_VAR(iIndex)
 
     if (pNC_VAR%iNC_VarID == iVarID) then
-      lFound = lTRUE
+      lFound = TRUE
       exit
     endif
 
@@ -506,12 +506,12 @@ function nf_return_AttValue( NCFILE, iVarIndex, sAttName)   result(sAttValue)
 
   endif
 
-  lFound = lFALSE
+  lFound = FALSE
 
   do iIndex=lbound(pNC_ATT,1), ubound(pNC_ATT,1)
 
     if ( sAttName .strequal. pNC_ATT(iIndex)%sAttributeName ) then
-      lFound = lTRUE
+      lFound = TRUE
       exit
     endif
 
@@ -541,14 +541,14 @@ function nf_return_DimIndex( NCFILE, iDimID)   result(iDimIndex)
    integer (c_int) :: iIndex
    logical (c_bool) :: lFound
 
-  lFound = lFALSE
+  lFound = FALSE
 
   do iIndex=0, NCFILE%iNumberOfDimensions - 1
 
     pNC_DIM => NCFILE%pNC_DIM(iIndex)
 
     if (pNC_DIM%iNC_DimID == iDimID) then
-      lFound = lTRUE
+      lFound = TRUE
       exit
     endif
 
@@ -574,14 +574,14 @@ function nf_return_DimSize( NCFILE, iDimID)   result(iDimSize)
    integer (c_int) :: iIndex
    logical (c_bool) :: lFound
 
-  lFound = lFALSE
+  lFound = FALSE
 
   do iIndex=0, NCFILE%iNumberOfDimensions - 1
 
     pNC_DIM => NCFILE%pNC_DIM(iIndex)
 
     if (pNC_DIM%iNC_DimID == iDimID) then
-      lFound = lTRUE
+      lFound = TRUE
       exit
     endif
 
@@ -991,7 +991,7 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   type (DATETIME_T), intent(in)                       :: StartDate
   type (DATETIME_T), intent(in)                       :: EndDate
   character (len=*), intent(in)                       :: PROJ4_string
-  type (STRING_LIST_T), intent(in), pointer, optional :: history_list
+  type (FSTRING_LIST_T), intent(in), pointer, optional :: history_list
   character (len=*), intent(in), optional             :: executable_name
   real (c_double), intent(in), optional          :: dpLat(:,:)
   real (c_double), intent(in), optional          :: dpLon(:,:)
@@ -1006,7 +1006,7 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   integer (c_int) :: iIndex
   character (len=10)                                :: sOriginText
   character (len=:), allocatable                    :: sFilename
-  type (STRING_LIST_T), pointer                     :: history_list_l
+  type (FSTRING_LIST_T), pointer                     :: history_list_l
   logical (c_bool)                             :: write_time_bounds_l
   character (len=:), allocatable                    :: executable_name_l
   real (c_float)                               :: valid_minimum
@@ -1057,8 +1057,6 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   endif
 
   include_latlon = logical( present( dpLat ) .and. present( dpLon ), c_bool )
-
-  call history_list_l%set_autocleanup( FALSE )
 
   write(sOriginText, fmt="(i4.4,'-',i2.2,'-',i2.2)") StartDate%iYear, StartDate%iMonth, StartDate%iDay
 
@@ -1372,10 +1370,10 @@ subroutine nf_get_x_and_y(NCFILE)
   iUpperBound = ubound(NCFILE%rX_Coords, 1)
 
   if (NCFILE%rX_Coords(iUpperBound) > NCFILE%rX_Coords(iLowerBound) ) then
-    NCFILE%lX_IncreasesWithIndex = lTRUE
+    NCFILE%lX_IncreasesWithIndex = TRUE
     if ( NCFILE%lAllowAutomaticDataFlipping ) NCFILE%lFlipHorizontal = FALSE
   else
-    NCFILE%lX_IncreasesWithIndex = lFALSE
+    NCFILE%lX_IncreasesWithIndex = FALSE
     if ( NCFILE%lAllowAutomaticDataFlipping ) then
       NCFILE%lFlipHorizontal       = TRUE
       call LOGS%write( "** Horizontal coordinates decrease with index values **", &
@@ -1402,7 +1400,7 @@ subroutine nf_get_x_and_y(NCFILE)
                        iLogLevel=LOG_ALL )
     endif
   else
-    NCFILE%lY_IncreasesWithIndex = lFALSE
+    NCFILE%lY_IncreasesWithIndex = FALSE
     if ( NCFILE%lAllowAutomaticDataFlipping ) NCFILE%lFlipVertical = FALSE
   endif
 
@@ -1544,7 +1542,7 @@ subroutine nf_trap( iResultCode, sFilename, iLineNumber, netcdf_filename )
     call LOGS%write("netCDF ERROR: "//dquote( sTextString  )//" | error code was: " &
       //trim(asCharacter(iResultCode)) )
 
-    call assert(lFALSE, "SWB is stopping due to a problem reading or writing" &
+    call assert(FALSE, "SWB is stopping due to a problem reading or writing" &
       //" a netCDF file", trim(sFile), iLine)
 
   endif
@@ -1900,8 +1898,8 @@ subroutine netcdf_get_attribute_list_for_variable( NCFILE, variable_name, &
 
   type (T_NETCDF4_FILE), intent(inout) :: NCFILE
   character (len=*), intent(in)        :: variable_name
-  type (STRING_LIST_T), intent(out)    :: attribute_name_list
-  type (STRING_LIST_T), intent(out)    :: attribute_value_list
+  type (FSTRING_LIST_T), intent(out)    :: attribute_name_list
+  type (FSTRING_LIST_T), intent(out)    :: attribute_value_list
 
   ! [ LOCALS ]
   integer (c_int) :: indx
@@ -1979,7 +1977,7 @@ end subroutine netcdf_get_attribute_list_for_variable
 subroutine netcdf_get_variable_list( NCFILE, variable_list )
 
   type (T_NETCDF4_FILE) :: NCFILE
-  type (STRING_LIST_T)  :: variable_list
+  type (FSTRING_LIST_T)  :: variable_list
 
   ! [ LOCALS ]
   integer (c_int) :: indx
@@ -2011,9 +2009,9 @@ function netcdf_update_time_starting_index(NCFILE, iJulianDay)  result(lDateTime
 
   if (NCFILE%iStart(NC_TIME) < 0) then
     NCFILE%iStart(NC_TIME) = 0
-    lDateTimeFound = lFALSE
+    lDateTimeFound = FALSE
   else
-    lDateTimeFound = lTRUE
+    lDateTimeFound = TRUE
   endif
 
 end function netcdf_update_time_starting_index
@@ -2808,12 +2806,12 @@ subroutine nf_get_time_units(NCFILE)
 
   pNC_VAR => NCFILE%pNC_VAR(NCFILE%iVarID(NC_TIME) )
 
-  lFound = lFALSE
+  lFound = FALSE
 
   do iIndex=0, pNC_VAR%iNumberOfAttributes - 1
 
     if ( pNC_VAR%pNC_ATT(iIndex)%sAttributeName .strequal. "units"   ) then
-      lFound = lTRUE
+      lFound = TRUE
       exit
     endif
 
@@ -2872,12 +2870,12 @@ subroutine nf_get_xyz_units(NCFILE)
 
     pNC_VAR => NCFILE%pNC_VAR(NCFILE%iVarID(iIndex) )
 
-    lFound = lFALSE
+    lFound = FALSE
 
     do iIndex2=0, pNC_VAR%iNumberOfAttributes - 1
 
       if ( pNC_VAR%pNC_ATT(iIndex2)%sAttributeName .strequal. "units" ) then
-        lFound = lTRUE
+        lFound = TRUE
         exit
       endif
 
@@ -2906,12 +2904,12 @@ subroutine nf_get_scale_and_offset(NCFILE)
 
   pNC_VAR => NCFILE%pNC_VAR(NCFILE%iVarID(NC_Z) )
 
-  lFound = lFALSE
+  lFound = FALSE
 
   do iIndex=0, pNC_VAR%iNumberOfAttributes - 1
 
     if ( pNC_VAR%pNC_ATT(iIndex)%sAttributeName .strequal. "scale_factor" ) then
-      lFound = lTRUE
+      lFound = TRUE
       exit
     endif
 
@@ -2923,12 +2921,12 @@ subroutine nf_get_scale_and_offset(NCFILE)
   endif
 
   !> Now repeat the process for "add_offset" attribute
-  lFound = lFALSE
+  lFound = FALSE
 
   do iIndex=0, pNC_VAR%iNumberOfAttributes - 1
 
     if ( pNC_VAR%pNC_ATT(iIndex)%sAttributeName .strequal. "add_offset" ) then
-      lFound = lTRUE
+      lFound = TRUE
       exit
     endif
 
@@ -3028,9 +3026,9 @@ function nf_return_index_double(rValues, rTargetValue)  result(iIndex)
   if ( .not. (rTargetValue >= minval(rValues) .and. rTargetValue <= maxval(rValues)) ) then
     call LOGS%write("rTargetValue (" &
     //trim(asCharacter(rTargetValue))//") is not within the range " &
-    //trim(asCharacter(minval(rValues)))//" to "//trim(asCharacter(maxval(rValues))), lEcho=lTRUE )
+    //trim(asCharacter(minval(rValues)))//" to "//trim(asCharacter(maxval(rValues))), lEcho=TRUE )
 
-    call assert(lFALSE, "INTERNAL PROGRAMMING ERROR", __SRCNAME__, __LINE__)
+    call assert(FALSE, "INTERNAL PROGRAMMING ERROR", __SRCNAME__, __LINE__)
   endif
 
   rDiffMin = 1.e+20
@@ -3315,7 +3313,7 @@ subroutine nf_set_standard_variables(NCFILE, sVarName_z, lLatLon, write_time_bou
   if (present( lLatLon) ) then
     lLatLon_l = lLatLon
   else
-    lLatLon_l = lFALSE
+    lLatLon_l = FALSE
   endif
 
   if (present(write_time_bounds) ) then
@@ -3406,7 +3404,7 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, executable_name, &
   type (T_NETCDF4_FILE ) :: NCFILE
   character (len=*), intent(in) :: sDataType
   character (len=*), intent(in), optional    :: executable_name
-  type (STRING_LIST_T), intent(in), pointer, optional :: history_list
+  type (FSTRING_LIST_T), intent(in), pointer, optional :: history_list
   character (len=*), intent(in), optional    :: sSourceFile
 
   ! [ LOCALS ]
@@ -3414,7 +3412,7 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, executable_name, &
   type (DATETIME_T)              :: DT
   character (len=20)             :: sDateTime
   character (len=:), allocatable :: executable_name_l
-  type (STRING_LIST_T), pointer           :: history_list_l
+  type (FSTRING_LIST_T), pointer           :: history_list_l
   integer (c_int)           :: indx, jndx
   integer (c_int)  :: records
 
@@ -3515,8 +3513,8 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
   type (T_NETCDF_ATTRIBUTE), dimension(:), pointer :: pNC_ATT
   logical (c_bool)                            :: lLatLon_l
   logical (c_bool)                            :: write_time_bounds_l
-  type (STRING_LIST_T)                             :: attribute_name_list
-  type (STRING_LIST_T)                             :: attribute_value_list
+  type (FSTRING_LIST_T)                             :: attribute_name_list
+  type (FSTRING_LIST_T)                             :: attribute_value_list
   character (len=:), allocatable                   :: tempstring
   character (len=:), allocatable                   :: value_string
   integer (c_int)                             :: indx
@@ -3524,7 +3522,7 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
   if (present( lLatLon ) ) then
     lLatLon_l = lLatLon
   else
-    lLatLon_l = lFALSE
+    lLatLon_l = FALSE
   endif
 
   if ( present( write_time_bounds ) ) then

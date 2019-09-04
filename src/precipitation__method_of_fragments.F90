@@ -17,7 +17,7 @@
 module precipitation__method_of_fragments
 
   use iso_c_binding
-  use constants_and_conversions, only  : asInt, asFloat, lTRUE, lFALSE, RANDOM_START
+  use constants_and_conversions, only  : asInt, asFloat, TRUE, FALSE, RANDOM_START
   use data_catalog
   use data_catalog_entry
   use dictionary
@@ -26,8 +26,8 @@ module precipitation__method_of_fragments
   use kiss_random_number_generator
   use logfiles, only            : LOGS, LOG_ALL, LOG_DEBUG
   use parameters
-  use strings
-  use string_list
+  use fstring
+  use fstring_list
   use simulation_datetime
   use grid
   implicit none
@@ -132,7 +132,7 @@ contains
     ! [ LOCALS ]
     integer (c_int)                 :: iStat
     type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ZONE
-    type (STRING_LIST_T)                 :: slString
+    type (FSTRING_LIST_T)                 :: slString
     integer (c_int)                 :: iMaxRainZones
     integer (c_int), allocatable    :: iSimulationNumbers(:)
     character (len=256)                  :: error_str
@@ -425,7 +425,7 @@ contains
     FRAGMENTS_SETS( iRainGageZone )%iNumberOfFragments(iMonth) = iCount
 
     call LOGS%write("### Summary of fragment sets in memory ###", &
-       iLogLevel=LOG_ALL, iLinesBefore=1, iLinesAfter=1, lEcho=lFALSE )
+       iLogLevel=LOG_ALL, iLinesBefore=1, iLinesAfter=1, lEcho=FALSE )
     call LOGS%write("gage number | month      | start index  | num records ")
     call LOGS%write("----------- | ---------- | ------------ | ------------")
     do iIndex=1, ubound( FRAGMENTS_SETS, 1)
@@ -489,7 +489,7 @@ contains
     character (len=10)     :: sBuf4
     character (len=256)    :: sBuf5
     character (len=256)    :: error_str
-    type (STRING_LIST_T)   :: slHeader
+    type (FSTRING_LIST_T)   :: slHeader
     integer (c_int)   :: max_rain_gage_number
     integer (c_int)   :: max_simulation_number
 
@@ -616,7 +616,7 @@ contains
       //"; msg: "//trim(error_str), __SRCNAME__, __LINE__ )
 
     call LOGS%write("### Summary of fragment sequence sets in memory ###", &
-       iLogLevel=LOG_DEBUG, iLinesBefore=1, iLinesAfter=1, lEcho=lFALSE )
+       iLogLevel=LOG_DEBUG, iLinesBefore=1, iLinesAfter=1, lEcho=FALSE )
     call LOGS%write("sim number | rainfall zone   | month  | year   | selected set ")
     call LOGS%write("----------- | ---------- | ------------ | ------------|------------")
     do iIndex=1, ubound( FRAGMENTS_SEQUENCE, 1)
@@ -728,7 +728,7 @@ contains
                      FRAGMENTS( iTargetRecord)%iFragmentSet,                             &
                      FRAGMENTS( iTargetRecord)%fFragmentValue
 
-        ! call LOGS%write( trim(sBuf), iLogLevel=LOG_DEBUG, lEcho=lFALSE )
+        ! call LOGS%write( trim(sBuf), iLogLevel=LOG_DEBUG, lEcho=FALSE )
 
       endif
 
@@ -747,7 +747,7 @@ contains
 
       ! call LOGS%write("frag: "//asCharacter(rain_zone)//"  day: "//asCharacter(iDay) &
       !    //"  value: "//asCharacter( CURRENT_FRAGMENTS( rain_zone )%pFragment%fFragmentValue( iDay ) ), &
-      !    lEcho=lFALSE )
+      !    lEcho=FALSE )
 
       ! now place current days' fragment value into the matching cells
       where ( RAIN_GAGE_ID == rain_zone )
@@ -828,7 +828,7 @@ contains
     integer (c_int)              :: iIndex
     integer (c_int)              :: iMaxRainZones
     integer (c_int)              :: iStat
-    logical (c_bool), save       :: lFirstCall = lTRUE
+    logical (c_bool), save       :: lFirstCall = TRUE
 
     type (DATA_CATALOG_ENTRY_T), pointer :: pRAINFALL_ADJUST_FACTOR
 
@@ -849,12 +849,12 @@ contains
       ! map the 2D array of RAINFALL_ADJUST_FACTOR values to the vector of active cells
       RAINFALL_ADJUST_FACTOR = pack( pRAINFALL_ADJUST_FACTOR%pGrdBase%rData, lActive )
 
-      call update_fragments( lShuffle = lTRUE)
-      lFirstCall = lFALSE
+      call update_fragments( lShuffle = TRUE)
+      lFirstCall = FALSE
 
     else
 
-      call update_fragments( lShuffle = lFALSE )
+      call update_fragments( lShuffle = FALSE )
 
     endif
 

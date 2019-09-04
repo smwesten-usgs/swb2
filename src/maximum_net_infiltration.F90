@@ -20,8 +20,8 @@ module maximum_net_infiltration__gridded_data
   use netcdf4_support
   use parameters, only          : PARAMS
   use simulation_datetime
-  use strings
-  use string_list
+  use fstring
+  use fstring_list
 
   implicit none
 
@@ -53,8 +53,8 @@ contains
 
     ! [ LOCALS ]
     integer (c_int)                 :: iStat
-    type (STRING_LIST_T)                 :: parameter_list
-    type (STRING_LIST_T)                 :: max_net_infiltration_list
+    type (FSTRING_LIST_T)                 :: parameter_list
+    type (FSTRING_LIST_T)                 :: max_net_infiltration_list
     real (c_float), allocatable     :: max_net_infiltration_vector(:)
     integer (c_int), allocatable    :: sequence_nums(:)
     integer (c_int), allocatable    :: landuse_codes(:)
@@ -138,9 +138,9 @@ contains
       number_of_soils = ubound( fMAXIMUM_NET_INFILTRATION_TABLE, 2 )
 
       call LOGS%WRITE( "| Landuse Code |  Soils Code  | Number of Matches | Maximum net infiltration (in) |",   &
-        iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        iLogLevel = LOG_DEBUG, lEcho = FALSE )
       call LOGS%WRITE( "|-------------|--------------|-------------------|--------------------------------| ",  &
-        iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+        iLogLevel = LOG_DEBUG, lEcho = FALSE )
 
       allocate( fMAXIMUM_NET_INFILTRATION_ARRAY( ubound(is_cell_active,1),ubound(is_cell_active,2) ), stat=iStat )
       call assert( iStat == 0, "Failed to allocate memory for maximum potential recharge table", &
@@ -153,7 +153,7 @@ contains
               asCharacter(count( pLULC%pGrdBase%iData == landuse_codes( landuse_indx)               &
                                    .and. pHSG%pGrdBase%iData == soils_indx ) )//" | "          &
                                    //asCharacter( fMAXIMUM_NET_INFILTRATION_TABLE( landuse_indx, soils_indx))//" |", &
-                                   iLogLevel = LOG_DEBUG, lEcho = lFALSE )
+                                   iLogLevel = LOG_DEBUG, lEcho = FALSE )
 
            value = fMAXIMUM_NET_INFILTRATION_TABLE( landuse_indx, soils_indx )
 
@@ -183,7 +183,7 @@ contains
       fMAXIMUM_NET_INFILTRATION = 9999.0
 
       call warn( "Did not find any valid maximum net infiltration rate parameters.",    &
-        lFatal = lTRUE )
+        lFatal = TRUE )
 
     endif
 

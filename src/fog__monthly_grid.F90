@@ -18,8 +18,8 @@ module fog__monthly_grid
   use logfiles, only            : LOGS, LOG_ALL
   use parameters, only          : PARAMS
   use simulation_datetime
-  use strings
-  use string_list
+  use fstring
+  use fstring_list
 
   implicit none
 
@@ -49,7 +49,7 @@ contains
 
     ! [ LOCALS ]
     integer (c_int)                 :: iStat
-    type (STRING_LIST_T)                 :: slString
+    type (FSTRING_LIST_T)                 :: slString
     integer (c_int)                 :: iIndex
     integer (c_int), allocatable    :: iLanduseCodes(:)
     integer (c_int)                 :: iNumberOfLanduses
@@ -75,7 +75,7 @@ contains
     call PARAMS%get_parameters( slKeys=slString , fValues=fFOG_CATCH_EFFICIENCY )
 
     if ( fFOG_CATCH_EFFICIENCY(1) <= fTINYVAL )  &
-      call warn( "Failed to find a data column containing fog catch efficiency values.", lFATAL=lTRUE, &
+      call warn( "Failed to find a data column containing fog catch efficiency values.", lFATAL=TRUE, &
         iLogLevel=LOG_ALL )
 
     lAreLengthsEqual = ( ( ubound(fFOG_CATCH_EFFICIENCY,1) == ubound(iLanduseCodes,1) )  )

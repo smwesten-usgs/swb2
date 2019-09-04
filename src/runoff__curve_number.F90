@@ -6,8 +6,8 @@ module runoff__curve_number
   use datetime
   use exceptions
   use simulation_datetime
-  use strings
-  use string_list
+  use fstring
+  use fstring_list
   use parameters, only                    : PARAMS, PARAMS_DICT
   implicit none
 
@@ -44,13 +44,12 @@ contains
 
     logical (c_bool), intent(in)   :: cell_is_active(:,:)
 
-
     ! [ LOCALS ]
     integer (c_int)              :: iNumberOfLanduses
     integer (c_int)              :: iNumberOfSoilGroups
     integer (c_int), allocatable :: iCurveNumberSeqNums(:)
-    type (STRING_LIST_T)              :: slList
-    type (STRING_LIST_T)              :: slCurveNumber
+    type (FSTRING_LIST_T)              :: slList
+    type (FSTRING_LIST_T)              :: slCurveNumber
     integer (c_int)              :: iStat
     integer (c_int)              :: iSoilsIndex
     character (len=:), allocatable    :: sText
@@ -63,8 +62,10 @@ contains
 
     ! retrieve a string list of all keys associated with curve number (i.e. "CN_1", "CN_2", "CN_3", etc)
     slCurveNumber = PARAMS%grep_name( "CN", lFatal=TRUE )
+
     ! Convert the string list to an vector of integers; this call strips off the "CN_" part of label
-    iCurveNumberSeqNums = slCurveNumber%asInt()
+    iCurveNumberSeqNums = slCurveNumber%get_integer()
+
     ! count how many items are present in the vector; this should equal the number of soils groups
     iNumberOfSoilGroups = count( iCurveNumberSeqNums > 0 )
 

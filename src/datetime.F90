@@ -9,7 +9,7 @@
 module datetime
 
   use iso_c_binding, only : c_short, c_int, c_long, c_float, c_double, c_bool
-  use strings
+  use fstring
   use exceptions
   use constants_and_conversions
 
@@ -194,13 +194,13 @@ subroutine set_date_format_indices(this, sDateFormat)
   endif
 
   iScanMM1 = scan(string=sDateFmt,set="M")
-  iScanMM2 = scan(string=sDateFmt,set="M", back=lTRUE )
+  iScanMM2 = scan(string=sDateFmt,set="M", back=TRUE )
   iScanDD1 = scan(string=sDateFmt,set="D")
-  iScanDD2 = scan(string=sDateFmt,set="D", back=lTRUE )
+  iScanDD2 = scan(string=sDateFmt,set="D", back=TRUE )
   iScanYYYY1 = scan(string=sDateFmt,set="Y")
-  iScanYYYY2 = scan(string=sDateFmt,set="Y", back=lTRUE )
+  iScanYYYY2 = scan(string=sDateFmt,set="Y", back=TRUE )
   iScanDelim1 = scan(string=trim(sDateFmt), set=DELIMITERS)
-  iScanDelim2 = scan(string=trim(sDateFmt), set=DELIMITERS, back=lTRUE)
+  iScanDelim2 = scan(string=trim(sDateFmt), set=DELIMITERS, back=TRUE)
 
   call Assert(iScanMM1 > 0 .and. iScanMM2 > 0 &
     .and. iScanDD1 > 0 .and. iScanDD2 > 0 &
@@ -232,11 +232,11 @@ subroutine set_time_format_indices(this, sTimeFormat)
   endif
 
   iScanHour1 = scan(string=sTimeFmt,set="H")
-  iScanHour2 = scan(string=sTimeFmt,set="H", back=lTRUE )
+  iScanHour2 = scan(string=sTimeFmt,set="H", back=TRUE )
   iScanMin1 = scan(string=sTimeFmt,set="M")
-  iScanMin2 = scan(string=sTimeFmt,set="M", back=lTRUE )
+  iScanMin2 = scan(string=sTimeFmt,set="M", back=TRUE )
   iScanSec1 = scan(string=sTimeFmt,set="S")
-  iScanSec2 = scan(string=sTimeFmt,set="S", back=lTRUE )
+  iScanSec2 = scan(string=sTimeFmt,set="S", back=TRUE )
 
   call Assert(iScanHour1 > 0 .and. iScanHour2 > 0 &
         .and. iScanMin1 > 0 .and. iScanMin2 > 0 &
@@ -293,7 +293,7 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
 
   if ( .not. (iStat==0 .and. (iMonth > 0 .and. iMonth <= 12) ) ) then
 
-    call Assert(lFALSE, &
+    call Assert(FALSE, &
       "Error parsing month value - got "//trim(sMonth)//";"// &
       " date text: "//trim(sStr), __SRCNAME__, __LINE__, sFilename_l, iLinenumber_l )
 
@@ -309,7 +309,7 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
 
   if ( .not. (iStat==0 .and. (iDay > 0 .and. iDay <= 31) ) ) then
 
-    call Assert(lFALSE, &
+    call Assert(FALSE, &
       "Error parsing day value - got "//trim(sDay)//";"// &
       " date text: "//trim(sStr),sFilename_l, iLinenumber_l, __SRCNAME__, __LINE__ )
 
@@ -320,7 +320,7 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
 
   if ( iStat/=0 ) then
 
-    call Assert(lFALSE, &
+    call Assert(FALSE, &
       "Error parsing year value - got "//trim(sYear)//";"// &
       " date text: "//trim(sStr),sFilename_l, iLinenumber_l, __SRCNAME__, __LINE__ )
 
@@ -654,10 +654,10 @@ function julian_day ( iYear, iMonth, iDay, iOrigin ) result(iJD)
 
   if(.not. (iMonth >= 1 .and. iMonth <= 12)) then
     write(sBuf,fmt="('Illegal month value given: ',i4)") iMonth
-    call Assert( lFALSE, trim(sBuf), __SRCNAME__, __LINE__)
+    call Assert( FALSE, trim(sBuf), __SRCNAME__, __LINE__)
   elseif(.not. (iDay >= 1 .and. iDay <= 31)) then
     write(sBuf,fmt="('Illegal day value given: ',i4)") iDay
-    call Assert( lFALSE, trim(sBuf), __SRCNAME__, __LINE__)
+    call Assert( FALSE, trim(sBuf), __SRCNAME__, __LINE__)
   endif
 
   if(present(iOrigin)) then
@@ -683,16 +683,16 @@ end function julian_day
   ! [ LOCALS ]
   logical(c_bool ) :: lResult
 
-  lResult = lFALSE
+  lResult = FALSE
 
 !  if(date2%iJulianDay == date1%iJulianDay &
 !     .and. date1%rFractionOfDay > date2%rFractionOfDay) then
-!     lResult = lTRUE
+!     lResult = TRUE
 !  elseif(date1%iJulianDay > date2%iJulianDay) then
-!    lResult = lTRUE
+!    lResult = TRUE
 !  endif
 
-  if( date1%dJulianDate > date2%dJulianDate )  lResult = lTRUE
+  if( date1%dJulianDate > date2%dJulianDate )  lResult = TRUE
 
 end function is_date_greater_than
 
@@ -706,16 +706,16 @@ end function is_date_greater_than
   ! [ LOCALS ]
   logical(c_bool ) :: lResult
 
-  lResult = lFALSE
+  lResult = FALSE
 
 !  if(date1%iJulianDay == date2%iJulianDay &
 !     .and. date1%rFractionOfDay < date2%rFractionOfDay) then
-!     lResult = lTRUE
+!     lResult = TRUE
 !  elseif(date1%iJulianDay < date2%iJulianDay) then
-!    lResult = lTRUE
+!    lResult = TRUE
 !  endif
 
-  if( date1%dJulianDate < date2%dJulianDate )  lResult = lTRUE
+  if( date1%dJulianDate < date2%dJulianDate )  lResult = TRUE
 
 end function is_date_less_than
 
@@ -729,9 +729,9 @@ end function is_date_less_than
   ! [ LOCALS ]
   logical(c_bool ) :: lResult
 
-  lResult = lFALSE
+  lResult = FALSE
 
-  if( date1%dJulianDate <= date2%dJulianDate )  lResult = lTRUE
+  if( date1%dJulianDate <= date2%dJulianDate )  lResult = TRUE
 
 end function is_date_LT_or_equal_to
 
@@ -745,9 +745,9 @@ end function is_date_LT_or_equal_to
   ! [ LOCALS ]
   logical(c_bool ) :: lResult
 
-  lResult = lFALSE
+  lResult = FALSE
 
-  if( date1%dJulianDate >= date2%dJulianDate )  lResult = lTRUE
+  if( date1%dJulianDate >= date2%dJulianDate )  lResult = TRUE
 
 end function is_date_GT_or_equal_to
 
@@ -761,14 +761,14 @@ end function is_date_GT_or_equal_to
   ! [ LOCALS ]
   logical(c_bool ) :: lResult
 
-  lResult = lFALSE
+  lResult = FALSE
 
   if( date1%getJulianDay() == date2%getJulianDay() .and. &
              date1%iHour == date2%iHour .and. &
              date1%iMinute == date2%iMinute .and. &
              date1%iSecond == date2%iSecond) then
 
-     lResult = lTRUE
+     lResult = TRUE
 
   endif
 
@@ -944,20 +944,20 @@ function write_list_datetime_fn(this)    result(sDatetimeText)
 !  if(present(lDateOnly)) then
 !    lListTime = .not. lDateOnly
 !  else
-!    lListTime = lTRUE
+!    lListTime = TRUE
 !  endif
 
 !  iScanMM1 = scan(string=sDateFmt,set="M")
-!  iScanMM2 = scan(string=sDateFmt,set="M", back=lTRUE )
+!  iScanMM2 = scan(string=sDateFmt,set="M", back=TRUE )
 
 !  iScanDD1 = scan(string=sDateFmt,set="D")
-!  iScanDD2 = scan(string=sDateFmt,set="D", back=lTRUE )
+!  iScanDD2 = scan(string=sDateFmt,set="D", back=TRUE )
 
 !  iScanYYYY1 = scan(string=sDateFmt,set="Y")
-!  iScanYYYY2 = scan(string=sDateFmt,set="Y", back=lTRUE )
+!  iScanYYYY2 = scan(string=sDateFmt,set="Y", back=TRUE )
 
 !  iScanDelim1 = scan(string=trim(sDateFmt), set=DELIMITERS)
-!  iScanDelim2 = scan(string=trim(sDateFmt), set=DELIMITERS, back=lTRUE)
+!  iScanDelim2 = scan(string=trim(sDateFmt), set=DELIMITERS, back=TRUE)
 
   write(sDateTimeText(iScanMM1:iScanMM2),fmt="(i2.2)", iostat=iStat(1)) this%iMonth
   write(sDateTimeText(iScanDD1:iScanDD2),fmt="(i2.2)", iostat=iStat(2)) this%iDay

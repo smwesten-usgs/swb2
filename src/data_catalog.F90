@@ -12,7 +12,7 @@ module data_catalog
 
   use iso_c_binding, only  : c_int, c_float, c_bool, c_double
   use logfiles, only       : LOGS, LOG_ALL, LOG_DEBUG
-  use strings
+  use fstring
   use data_catalog_entry
   implicit none
 

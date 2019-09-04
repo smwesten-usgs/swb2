@@ -15,8 +15,8 @@ module actual_et__gridded_values
   use datetime, only                  : DATETIME_T
   use exceptions
   use simulation_datetime, only       : SIM_DT
-  use strings
-  use string_list
+  use fstring
+  use fstring_list
 
   implicit none
 
@@ -40,7 +40,7 @@ contains
 
     ! [ LOCALS ]
     integer (c_int)                 :: iStat
-    type (STRING_LIST_T)                 :: slString
+    type (FSTRING_LIST_T)                 :: slString
     integer (c_int)                 :: iIndex
 
     ! locate the data structure associated with the gridded actual_et entries

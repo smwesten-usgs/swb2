@@ -1,7 +1,7 @@
 module model_iterate_multiple_simulations
 
   use iso_c_binding, only             : c_bool, c_float, c_int, c_double
-  use constants_and_conversions, only : lTRUE, BNDS, TRUE
+  use constants_and_conversions, only : TRUE, BNDS, TRUE
   use datetime, only                  : MONTHS
   use daily_calculation, only         : perform_daily_calculation
   use file_operations, only           : ASCII_FILE_T
@@ -9,7 +9,7 @@ module model_iterate_multiple_simulations
   use logfiles, only                  : LOGS, LOG_ALL
   use model_domain, only              : MODEL_DOMAIN_T
   use simulation_datetime, only       : SIM_DT
-  use strings, only                   : asCharacter
+  use fstring, only                   : asCharacter
   use output, only                    : write_output,                          &
                                         initialize_output,                     &
                                         initialize_multiple_sim_output,        &

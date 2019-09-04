@@ -11,8 +11,8 @@ module storm_drain_capture
   use exceptions, only               : warn, assert
   use parameters, only               : PARAMS
   use simulation_datetime, only      : SIM_DT
-  use string_list, only              : STRING_LIST_T
-  use strings, only                  : asCharacter
+  use fstring_list, only              : FSTRING_LIST_T
+  use fstring, only                  : asCharacter
   implicit none
 
   private
@@ -38,7 +38,7 @@ contains
     integer (c_int)              :: indx
     integer (c_int)              :: num_records
     logical                           :: are_lengths_unequal
-    type (STRING_LIST_T)              :: string_list
+    type (FSTRING_LIST_T)              :: string_list
     integer (c_int)              :: status
     character (len=256)               :: sBuf
 

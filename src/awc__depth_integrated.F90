@@ -15,8 +15,8 @@ module awc__depth_integrated
   use data_catalog_entry
   use exceptions
   use parameters
-  use strings
-  use string_list
+  use fstring
+  use fstring_list
 
   implicit none
 
@@ -60,7 +60,7 @@ contains
     integer (c_int)               :: iDeepestSoilHorizon
     logical (c_bool)              :: lFirst
 
-    type (STRING_LIST_T)               :: slList
+    type (FSTRING_LIST_T)               :: slList
     integer (c_int)               :: iStat
     integer (c_int)               :: iIndex, iIndex2
     integer (c_int)               :: iIndex_x, iIndex_y
@@ -165,7 +165,7 @@ contains
         fRooting_Depth_inches = fRooting_Depth( iIndex_x, iIndex_y ) * 12.0_c_float
 
         fTemp_AWC = 0.0_c_float
-        lFirst = lTRUE
+        lFirst = TRUE
         iDeepestSoilHorizon = 0_c_int
         fDepthOfDeepestHorizon = 0.0_c_float
         fFinal_AWC = 0.0_c_float
@@ -176,7 +176,7 @@ contains
             ! look for current soil code; calculate the component-weighted mean AWC for the deepest horizon
             if ( lFirst ) then
 
-              lFirst = lFALSE
+              lFirst = FALSE
 
               ! find deepest soil horizon for the current soils code
               do iIndex2=iIndex, iNumberOfSoils

@@ -22,8 +22,8 @@ module model_initialize
   use parameters
   use precipitation__method_of_fragments
   use simulation_datetime, only          : SIM_DT
-  use strings
-  use string_list
+  use fstring
+  use fstring_list
   use storm_drain_capture, only          : storm_drain_capture_initialize
   implicit none
 
@@ -49,71 +49,71 @@ module model_initialize
 
   type (GRIDDED_DATASETS_T)    :: KNOWN_GRIDS( NUMBER_OF_KNOWN_GRIDS ) =                             &
 
-    [ GRIDDED_DATASETS_T("PRECIPITATION                         ", "", lFALSE, DATATYPE_FLOAT ),     &
-      GRIDDED_DATASETS_T("TMIN                                  ", "", lFALSE, DATATYPE_FLOAT ),     &
-      GRIDDED_DATASETS_T("TMAX                                  ", "", lFALSE, DATATYPE_FLOAT ),     &
-      GRIDDED_DATASETS_T("AVAILABLE_WATER_CONTENT               ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("REFERENCE_ET0                         ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("POTENTIAL_ET                          ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("ACTUAL_ET                             ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("SOLAR_RADIATION                       ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("WIND_SPEED                            ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("RAINFALL_ZONE                         ", "", lTRUE, DATATYPE_INT ),        &
-      GRIDDED_DATASETS_T("REFERENCE_ET_ZONE                     ", "", lTRUE, DATATYPE_INT ),        &
-      GRIDDED_DATASETS_T("POTENTIAL_ET_ZONE                     ", "", lTRUE, DATATYPE_INT ),        &
-      GRIDDED_DATASETS_T("FLOW_DIRECTION                        ", "", lTRUE, DATATYPE_INT),         &
-      GRIDDED_DATASETS_T("FOG_RATIO                             ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("LAND_USE                              ", "", lFALSE, DATATYPE_INT ),       &
-      GRIDDED_DATASETS_T("SOILS_CODE                            ", "", lTRUE, DATATYPE_INT ),        &
-      GRIDDED_DATASETS_T("HYDROLOGIC_SOILS_GROUP                ", "", lFALSE, DATATYPE_INT ),       &
-      GRIDDED_DATASETS_T("INITIAL_PERCENT_SOIL_MOISTURE         ", "", lFALSE, DATATYPE_FLOAT),      &
-      GRIDDED_DATASETS_T("INITIAL_SNOW_COVER_STORAGE            ", "", lTRUE, DATATYPE_FLOAT),       &
-      GRIDDED_DATASETS_T("INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX", "", lTRUE, DATATYPE_FLOAT),       &
-      GRIDDED_DATASETS_T("PERCENT_CANOPY_COVER                  ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("PERCENT_PERVIOUS_COVER                ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("PERCENT_IMPERVIOUS_COVER              ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("FRACTION_CANOPY_COVER                 ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("FRACTION_PERVIOUS_COVER               ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("FRACTION_IMPERVIOUS_COVER             ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("STEMFLOW_FRACTION                     ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("EVAPORATION_TO_RAINFALL_RATIO         ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("RAINFALL_ADJUST_FACTOR                ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("CESSPOOL_LEAKAGE                      ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("STORM_DRAIN_CAPTURE_FRACTION          ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("WATER_BODY_LEAKAGE                    ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("WATER_MAIN_LEAKAGE                    ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("DISPOSAL_WELL_DISCHARGE               ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("ANNUAL_DIRECT_NET_INFILTRATION_RATE   ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("ANNUAL_SEPTIC_DISCHARGE               ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("SEPTIC_DISCHARGE                      ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("RUNOFF_ZONE                           ", "", lTRUE, DATATYPE_INT ),        &
-      GRIDDED_DATASETS_T("POLYGON_ID                            ", "", lTRUE, DATATYPE_INT ),        &
-      GRIDDED_DATASETS_T("SOIL_STORAGE_MAX                      ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("PLANT_AVAILABLE_WATER                 ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("MAXIMUM_NET_INFILTRATION              ", "", lTRUE, DATATYPE_FLOAT ),      &
-      GRIDDED_DATASETS_T("IRRIGATION_MASK                       ", "", lTRUE, DATATYPE_INT),         &
-      GRIDDED_DATASETS_T("RELATIVE_HUMIDITY                     ", "", lTRUE, DATATYPE_FLOAT )   ]
+    [ GRIDDED_DATASETS_T("PRECIPITATION                         ", "", FALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("TMIN                                  ", "", FALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("TMAX                                  ", "", FALSE, DATATYPE_FLOAT ),     &
+      GRIDDED_DATASETS_T("AVAILABLE_WATER_CONTENT               ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("REFERENCE_ET0                         ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("POTENTIAL_ET                          ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("ACTUAL_ET                             ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("SOLAR_RADIATION                       ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("WIND_SPEED                            ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("RAINFALL_ZONE                         ", "", TRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("REFERENCE_ET_ZONE                     ", "", TRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("POTENTIAL_ET_ZONE                     ", "", TRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("FLOW_DIRECTION                        ", "", TRUE, DATATYPE_INT),         &
+      GRIDDED_DATASETS_T("FOG_RATIO                             ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("LAND_USE                              ", "", FALSE, DATATYPE_INT ),       &
+      GRIDDED_DATASETS_T("SOILS_CODE                            ", "", TRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("HYDROLOGIC_SOILS_GROUP                ", "", FALSE, DATATYPE_INT ),       &
+      GRIDDED_DATASETS_T("INITIAL_PERCENT_SOIL_MOISTURE         ", "", FALSE, DATATYPE_FLOAT),      &
+      GRIDDED_DATASETS_T("INITIAL_SNOW_COVER_STORAGE            ", "", TRUE, DATATYPE_FLOAT),       &
+      GRIDDED_DATASETS_T("INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX", "", TRUE, DATATYPE_FLOAT),       &
+      GRIDDED_DATASETS_T("PERCENT_CANOPY_COVER                  ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("PERCENT_PERVIOUS_COVER                ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("PERCENT_IMPERVIOUS_COVER              ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("FRACTION_CANOPY_COVER                 ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("FRACTION_PERVIOUS_COVER               ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("FRACTION_IMPERVIOUS_COVER             ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("STEMFLOW_FRACTION                     ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("EVAPORATION_TO_RAINFALL_RATIO         ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("RAINFALL_ADJUST_FACTOR                ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("CESSPOOL_LEAKAGE                      ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("STORM_DRAIN_CAPTURE_FRACTION          ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("WATER_BODY_LEAKAGE                    ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("WATER_MAIN_LEAKAGE                    ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("DISPOSAL_WELL_DISCHARGE               ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("ANNUAL_DIRECT_NET_INFILTRATION_RATE   ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("ANNUAL_SEPTIC_DISCHARGE               ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("SEPTIC_DISCHARGE                      ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("RUNOFF_ZONE                           ", "", TRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("POLYGON_ID                            ", "", TRUE, DATATYPE_INT ),        &
+      GRIDDED_DATASETS_T("SOIL_STORAGE_MAX                      ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("PLANT_AVAILABLE_WATER                 ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("MAXIMUM_NET_INFILTRATION              ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("IRRIGATION_MASK                       ", "", TRUE, DATATYPE_INT),         &
+      GRIDDED_DATASETS_T("RELATIVE_HUMIDITY                     ", "", TRUE, DATATYPE_FLOAT )   ]
 
   type (METHODS_LIST_T), parameter  :: KNOWN_METHODS( NUMBER_OF_KNOWN_METHODS ) =   &
 
-    [ METHODS_LIST_T("INTERCEPTION           ", lFALSE),                            &
-      METHODS_LIST_T("EVAPOTRANSPIRATION     ", lFALSE),                            &
-      METHODS_LIST_T("RUNOFF                 ", lFALSE),                            &
-      METHODS_LIST_T("PRECIPITATION          ", lFALSE),                            &
-      METHODS_LIST_T("FOG                    ", lTRUE),                             &
-      METHODS_LIST_T("AVAILABLE_WATER_CONTENT", lTRUE),                             &
-      METHODS_LIST_T("SOIL_STORAGE_MAX       ", lTRUE),                             &
-      METHODS_LIST_T("SOIL_MOISTURE          ", lFALSE),                            &
-      METHODS_LIST_T("IRRIGATION             ", lTRUE),                             &
-      METHODS_LIST_T("CROP_COEFFICIENT       ", lTRUE),                             &
-      METHODS_LIST_T("GROWING_DEGREE_DAY     ", lTRUE),                             &
-      METHODS_LIST_T("DYNAMIC_LANDUSE        ", lTRUE),                             &
-      METHODS_LIST_T("DIRECT_RECHARGE        ", lTRUE),                             &
-      METHODS_LIST_T("DIRECT_NET_INFILTRATION", lTRUE),                             &
-      METHODS_LIST_T("DIRECT_SOIL_MOISTURE   ", lTRUE),                             &
-      METHODS_LIST_T("FLOW_ROUTING           ", lTRUE),                             &
-      METHODS_LIST_T("ROOTING_DEPTH          ", lTRUE),                             &
-      METHODS_LIST_T("DUMP_VARIABLES         ", lTRUE)   ]
+    [ METHODS_LIST_T("INTERCEPTION           ", FALSE),                            &
+      METHODS_LIST_T("EVAPOTRANSPIRATION     ", FALSE),                            &
+      METHODS_LIST_T("RUNOFF                 ", FALSE),                            &
+      METHODS_LIST_T("PRECIPITATION          ", FALSE),                            &
+      METHODS_LIST_T("FOG                    ", TRUE),                             &
+      METHODS_LIST_T("AVAILABLE_WATER_CONTENT", TRUE),                             &
+      METHODS_LIST_T("SOIL_STORAGE_MAX       ", TRUE),                             &
+      METHODS_LIST_T("SOIL_MOISTURE          ", FALSE),                            &
+      METHODS_LIST_T("IRRIGATION             ", TRUE),                             &
+      METHODS_LIST_T("CROP_COEFFICIENT       ", TRUE),                             &
+      METHODS_LIST_T("GROWING_DEGREE_DAY     ", TRUE),                             &
+      METHODS_LIST_T("DYNAMIC_LANDUSE        ", TRUE),                             &
+      METHODS_LIST_T("DIRECT_RECHARGE        ", TRUE),                             &
+      METHODS_LIST_T("DIRECT_NET_INFILTRATION", TRUE),                             &
+      METHODS_LIST_T("DIRECT_SOIL_MOISTURE   ", TRUE),                             &
+      METHODS_LIST_T("FLOW_ROUTING           ", TRUE),                             &
+      METHODS_LIST_T("ROOTING_DEPTH          ", TRUE),                             &
+      METHODS_LIST_T("DUMP_VARIABLES         ", TRUE)   ]
 
   ! grid that will be used in the calculation of cell latitudes
   type (GENERAL_GRID_T), pointer    :: pCOORD_GRD
@@ -368,7 +368,7 @@ contains
     if ( .not. associated( pINITIAL_SNOW_COVER_STORAGE ) ) then
         call warn(sMessage="An INITIAL_SNOW_COVER_STORAGE grid (or constant) was not found.",    &
         sHints="Check your control file to see that a valid INITIAL_SNOW_COVER_STORAGE grid or"  &
-          //" constant is specified.", lFatal=lFALSE )
+          //" constant is specified.", lFatal=FALSE )
 
       MODEL%snow_storage = 0.0_c_float
 
@@ -382,7 +382,7 @@ contains
      if ( minval( fInitial_Snow_Cover_Storage ) < fZERO &
         .or. maxval( fInitial_Snow_Cover_Storage ) > 300.0_c_float )  &
        call warn(sMessage="One or more initial snow cover storage values outside of " &
-         //"valid range (0 to 300)", lFatal=lTRUE )
+         //"valid range (0 to 300)", lFatal=TRUE )
 
      MODEL%snow_storage = fInitial_Snow_Cover_Storage
 
@@ -412,7 +412,7 @@ contains
     if ( .not. associated( pINITIAL_PERCENT_SOIL_MOISTURE ) ) then
         call warn(sMessage="An INITIAL_PERCENT_SOIL_MOISTURE grid (or constant) was not found.",    &
         sHints="Check your control file to see that a valid INITIAL_PERCENT_SOIL_MOISTURE grid or"  &
-          //" constant is specified.", lFatal=lTRUE )
+          //" constant is specified.", lFatal=TRUE )
     else
 
       call pINITIAL_PERCENT_SOIL_MOISTURE%getvalues()
@@ -423,7 +423,7 @@ contains
      if ( minval( fInitial_Percent_Soil_Moisture ) < fZERO &
         .or. maxval( fInitial_Percent_Soil_Moisture ) > 100.0_c_float )  &
        call warn(sMessage="One or more initial percent soils moisture values outside of " &
-         //"valid range (0% to 100%)", lFatal=lTRUE )
+         //"valid range (0% to 100%)", lFatal=TRUE )
 
      MODEL%soil_storage = fInitial_Percent_Soil_Moisture / 100.0_c_float * MODEL%soil_storage_max
 
@@ -498,11 +498,11 @@ contains
      if ( minval( MODEL%pervious_fraction ) < fZERO &
         .or. maxval( MODEL%pervious_fraction ) > 1.0_c_float )  &
        call warn(sMessage="One or more percent (im)pervious cover percent/fraction values are outside of " &
-         //"valid range (0% to 100% or 0.0 to 1.0)", lFatal=lTRUE )
+         //"valid range (0% to 100% or 0.0 to 1.0)", lFatal=TRUE )
 
      if ( all( MODEL%pervious_fraction < 0.01_c_float ) ) &
        call warn(sMessage="All (im)pervious cover percent/fraction values are suspiciously low " &
-         //"(less than 1% or less than 0.01)", lFatal=lTRUE,                                      &
+         //"(less than 1% or less than 0.01)", lFatal=TRUE,                                      &
          sHints="Check to see whether (im)pervious cover is expressed as a fraction (0.0-1.0)"   &
               //" or a percentage (0-100%)." )
 
@@ -564,11 +564,11 @@ contains
     if ( minval( MODEL%canopy_cover_fraction ) < fZERO &
        .or. maxval( MODEL%canopy_cover_fraction ) > 1.0_c_float )  &
       call warn(sMessage="One or more percent canopy cover percent/fraction values values are outside of " &
-        //"valid range (0% to 100% or 0.0 to 1.0)", lFatal=lTRUE )
+        //"valid range (0% to 100% or 0.0 to 1.0)", lFatal=TRUE )
 
      if ( all( MODEL%canopy_cover_fraction < 0.01_c_float ) )                               &
        call warn(sMessage="All canopy cover percent/fraction values are suspiciously low " &
-         //"(less than 1% or less than 0.01)", lFatal=lTRUE,                                &
+         //"(less than 1% or less than 0.01)", lFatal=TRUE,                                &
          sHints="Check to see whether canopy cover is expressed as a fraction (0.0-1.0)"   &
               //" or a percentage (0-100%)." )
 
@@ -639,10 +639,10 @@ contains
 
     else
 
-      call warn(sMessage="HYDROLOGIC_SOILS_GROUP dataset is flawed or missing.", lFatal=lTRUE,     &
+      call warn(sMessage="HYDROLOGIC_SOILS_GROUP dataset is flawed or missing.", lFatal=TRUE,     &
         iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"  &
         //" been ~included in the control file for the HYDROLOGIC_SOILS_GROUP dataset.",           &
-        lEcho = lTRUE )
+        lEcho = TRUE )
 
     endif
 
@@ -657,7 +657,7 @@ contains
     ! [ LOCALS ]
     type (DATA_CATALOG_ENTRY_T), pointer :: pPOLYGON_ID
     logical (c_bool)                :: any_problems
-    type (STRING_LIST_T)                 :: slList
+    type (FSTRING_LIST_T)                 :: slList
     integer (c_int), allocatable    :: polygon_id(:)
     real (c_float), allocatable     :: rooting_depth_inches(:)
     real (c_float), allocatable     :: soil_moisture_storage(:)
@@ -671,7 +671,7 @@ contains
         rX0=MODEL%X_ll, rY0=MODEL%Y_ll, &
         rGridCellSize=MODEL%gridcellsize, iDataType=GRID_DATATYPE_REAL )
 
-    any_problems = lTRUE
+    any_problems = TRUE
 
     do
 
@@ -707,7 +707,7 @@ contains
 !       call PARAMS%get_parameters( slKeys=slList, fValues=soil_moisture_storage )
 !       call slList%clear()
 
-!       if ( ubound( soil_moisture_storage, 1) == ubound( polygon_id, 1 ) )  any_problems = lFALSE
+!       if ( ubound( soil_moisture_storage, 1) == ubound( polygon_id, 1 ) )  any_problems = FALSE
 
 !       exit
 
@@ -779,10 +779,10 @@ contains
 !
 !     else
 !
-!       call warn(sMessage="LAND_USE dataset is flawed or missing.", lFatal=lTRUE,         &
+!       call warn(sMessage="LAND_USE dataset is flawed or missing.", lFatal=TRUE,         &
 !         iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"   &
 !         //" been ~included in the control file for the LAND_USE dataset.",               &
-!         lEcho = lTRUE )
+!         lEcho = TRUE )
 !
 !     endif
 !
@@ -794,7 +794,7 @@ contains
 
     character (len=*), intent(in)              :: sFilename
     character (len=*), intent(in), optional    :: sGridSpecification
-    type (STRING_LIST_T), optional             :: slExtraDirectives
+    type (FSTRING_LIST_T), optional             :: slExtraDirectives
 
     ! [ LOCALS ]
     character (len=256)             :: sRecord, sSubstring
@@ -867,7 +867,6 @@ contains
                   sCommentChars = "#%!+=|[{(-*$",   &
                   sDelimiters = "WHITESPACE",       &
                   lHasHeader = .false._c_bool )
-
     do
 
       ! read in next line of the control file
@@ -903,13 +902,12 @@ contains
 
           ! add the next directive snippet to dictionary entry data structure
           call CF_ENTRY%add_value( sValue )
-
           ! break off next directive for the current record
           call chomp( sRecord, sValue, CF%sDelimiters )
 
         enddo
 
-        ! add the final entry to the dictionary data structure
+        ! add the dictionary entry to the dictionary data structure
         call CF_DICT%add_entry( CF_ENTRY )
 
       endif
@@ -942,23 +940,23 @@ contains
 
     character (len=*), intent(in)      :: sKey
     character (len=*), intent(in)      :: sPathname
-    logical (c_bool), intent(in)  :: lOptional
-    integer (c_int), intent(in)   :: iDataType
+    logical (c_bool), intent(in)       :: lOptional
+    integer (c_int), intent(in)        :: iDataType
 
     ! [ LOCALS ]
-    type (STRING_LIST_T)                 :: myDirectives
-    type (STRING_LIST_T)                 :: myOptions
-    integer (c_int)                 :: iIndex
-    character (len=:), allocatable       :: sCmdText
-    character (len=:), allocatable       :: sArgText
-    character (len=:), allocatable       :: sArgText_1
-    character (len=:), allocatable       :: sArgText_2
-    integer (c_int)                 :: iStat
+    type (FSTRING_LIST_T)                 :: myDirectives
+    type (FSTRING_LIST_T)                 :: myOptions
+    integer (c_int)                      :: iIndex
+    character (len=512)       :: sCmdText
+    character (len=512)       :: sArgText
+    character (len=512)       :: sArgText_1
+    character (len=512)       :: sArgText_2
+    integer (c_int)                      :: iStat
     type (DATA_CATALOG_ENTRY_T), pointer :: pENTRY
-    logical (c_bool)             :: lGridPresent
+    logical (c_bool)                     :: lGridPresent
 
     pENTRY => null()
-    lGridPresent = lFALSE
+    lGridPresent = FALSE
 
     ! obtain a string list of directives that contain the keyword
     ! (e.g. if the key is "TMIN", MODEL might return:
@@ -973,11 +971,11 @@ contains
     if ( myDirectives%count == 0 ) then
 
       call LOGS%write("Your control file is missing gridded data relating to "//dquote(sKey)//".", &
-        iLogLevel=LOG_ALL, lEcho=lFALSE )
+        iLogLevel=LOG_ALL, lEcho=FALSE )
 
       if (.not. lOptional) then
         call warn("Your control file is missing gridded data relating to "//dquote(sKey)//".", &
-          lFatal = lTRUE )
+          lFatal = TRUE )
 
       endif
 
@@ -987,6 +985,12 @@ contains
       allocate(pENTRY, stat=iStat)
       call assert( iStat == 0, "Failed to allocate memory for the "//dquote(sKey)//" data structure", &
         __SRCNAME__, __LINE__ )
+
+      sCmdText = ""
+      sArgText = ""
+      sArgText_1 = ""
+      sArgText_2 = ""
+      call myOptions%clear()
 
       ! process all known directives associated with key word
       do iIndex = 1, myDirectives%count
@@ -998,7 +1002,9 @@ contains
         ! For MODEL directive, obtain the associated dictionary entries
         call CF_DICT%get_values(sCmdText, myOptions )
 
-        print *, "*cmd text: ", "'"//trim(sCmdText)//"'"
+        ! most of the time, we only care about the first dictionary entry, obtained below
+        sArgText_1 = myOptions%get(1)
+        sArgText_2 = myOptions%get(2)
 
         ! dictionary entries are initially space-delimited; sArgText_1 contains
         ! all dictionary entries present, concatenated, with a space between entries
@@ -1006,10 +1012,6 @@ contains
 
         ! echo the original directive and dictionary entries to the logfile
         call LOGS%write("> "//sCmdText//" "//sArgText, iLinesBefore=1 )
-
-        ! most of the time, we only care about the first dictionary entry, obtained below
-        sArgText_1 = myOptions%get(1)
-        sArgText_2 = myOptions%get(2)
 
         ! first option is that the key value and directive are the same
         ! (.e.g. "PRECIPITATION"; no trailing underscores or modifiers )
@@ -1028,14 +1030,14 @@ contains
               call pENTRY%initialize(            &
                 sDescription=trim(sCmdText),     &
                 rConstant=asFloat(sArgText_2)  )
-              lGridPresent = lTRUE
+              lGridPresent = TRUE
 
             case ( DATATYPE_INT )
 
               call pENTRY%initialize(            &
                 sDescription=trim(sCmdText),     &
                 iConstant=asInt(sArgText_2)  )
-              lGridPresent = lTRUE
+              lGridPresent = TRUE
 
             case default
 
@@ -1053,7 +1055,7 @@ contains
               sFileType=trim(sArgText_1),                              &
               sFilename=fix_pathname(trim(sPathname)//sArgText_2),     &
               iDataType=iDataType )
-            lGridPresent = lTRUE
+            lGridPresent = TRUE
 
           elseif ( sArgText_1 .strapprox. "NETCDF" ) then
 
@@ -1061,7 +1063,7 @@ contains
               sDescription=trim(sCmdText),                             &
               sFilename = fix_pathname(trim(sPathname)//sArgText_2),   &
               iDataType=iDataType )
-            lGridPresent = lTRUE
+            lGridPresent = TRUE
 
           elseif ( sArgText_1 .strapprox. "TABLE" ) then
 
@@ -1070,7 +1072,7 @@ contains
           else
 
             call warn( "Did not find a valid "//dquote(sKey)//" option. Value supplied was: "//dquote(sArgText_1), &
-              lFatal = lTRUE, sHints="Valid options include "//dquote("ARC_ASCII")//", "//dquote("ARC_GRID") &
+              lFatal = TRUE, sHints="Valid options include "//dquote("ARC_ASCII")//", "//dquote("ARC_GRID") &
               //", "//dquote("SURFER")//", or "//dquote("NETCDF") )
 
           endif
@@ -1078,7 +1080,7 @@ contains
 
         elseif ( sCmdText .containssimilar. "_USE_MAJORITY_FILTER" ) then
 
-          call pENTRY%set_majority_filter_flag( lTRUE )
+          call pENTRY%set_majority_filter_flag( TRUE )
 
         elseif ( sCmdText .containssimilar. "_MONTHNAMES_CAPITALIZED" ) then
 
@@ -1150,7 +1152,7 @@ contains
 
         elseif ( sCmdText .containssimilar. "NETCDF_MAKE_LOCAL_ARCHIVE" ) then
 
-          call pENTRY%set_make_local_archive(lTRUE)
+          call pENTRY%set_make_local_archive(TRUE)
 
         elseif ( sCmdText .containssimilar. "_PROJECTION_DEFINITION" ) then
 
@@ -1234,14 +1236,13 @@ contains
   subroutine initialize_grid_options()
 
     ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myOptions
-    integer (c_int)             :: iIndex
+    type (FSTRING_LIST_T)             :: myOptions
+    integer (c_int)                  :: iIndex
     character (len=:), allocatable   :: sArgText
-    integer (c_int)             :: iStat
-    real (c_double)             :: rX0, rX1, rY0, rY1, rGridCellSize
-    integer (c_int)             :: iNX, iNY
-    real (c_float)              :: fTempVal
-
+    integer (c_int)                  :: iStat
+    real (c_double)                  :: rX0, rX1, rY0, rY1, rGridCellSize
+    integer (c_int)                  :: iNX, iNY
+    real (c_float)                   :: fTempVal
 
     ! For MODEL directive, obtain the associated dictionary entries
     call CF_DICT%get_values( "GRID", myOptions )
@@ -1279,7 +1280,7 @@ contains
 
     else
 
-      call warn("Grid specification is flawed or missing.", lFatal=lTRUE, iLogLevel = LOG_ALL, lEcho = lTRUE )
+      call warn("Grid specification is flawed or missing.", lFatal=TRUE, iLogLevel = LOG_ALL, lEcho = TRUE )
 
     endif
 
@@ -1321,7 +1322,7 @@ contains
     subroutine initialize_output_options()
 
       ! [ LOCALS ]
-      type (STRING_LIST_T)             :: myOptions
+      type (FSTRING_LIST_T)             :: myOptions
       integer (c_int)             :: iIndex
       integer (c_int)             :: jIndex
       character (len=:), allocatable   :: sArgText
@@ -1395,18 +1396,18 @@ contains
   subroutine initialize_start_and_end_dates()
 
     ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions
-    integer (c_int)             :: iIndex
+    type (FSTRING_LIST_T)             :: myDirectives
+    type (FSTRING_LIST_T)             :: myOptions
+    integer (c_int)                  :: iIndex
     character (len=:), allocatable   :: sCmdText
     character (len=:), allocatable   :: sOptionText
     character (len=:), allocatable   :: sArgText
-    integer (c_int)             :: iStat
-    logical (c_bool)            :: lHaveStartDate
-    logical (c_bool)            :: lHaveEndDate
+    integer (c_int)                  :: iStat
+    logical (c_bool)                 :: lHaveStartDate
+    logical (c_bool)                 :: lHaveEndDate
 
-    lHaveStartDate = lFALSE
-    lHaveEndDate = lFALSE
+    lHaveStartDate = FALSE
+    lHaveEndDate = FALSE
 
     myDirectives = CF_DICT%grep_keys("DATE")
 
@@ -1414,12 +1415,12 @@ contains
 
 !       call warn(sMessage="Your control file seems to be missing START_DATE and/or END_DATE", &
 !         sHints="Add a START_DATE and/or END_DATE directive to your control file. Date "      &
-!         //"~should be specified as mm/dd/yyyy.", lFatal = lTRUE, iLogLevel = LOG_ALL,        &
-!         lEcho = lTRUE )
+!         //"~should be specified as mm/dd/yyyy.", lFatal = TRUE, iLogLevel = LOG_ALL,        &
+!         lEcho = TRUE )
 
 
     call LOGS%set_loglevel( LOG_ALL )
-    call LOGS%set_echo( lFALSE )
+    call LOGS%set_echo( FALSE )
 
     do iIndex = 1, myDirectives%count
 
@@ -1444,13 +1445,13 @@ contains
 
         case ( "START_DATE", "STARTDATE", "BEGIN_DATE" )
 
-          lHaveStartDate = lTRUE
+          lHaveStartDate = TRUE
           call SIM_DT%start%parseDate( sOptionText )
           call SIM_DT%start%calcJulianDay()
 
         case ( "END_DATE", "ENDDATE", "STOP_DATE" )
 
-          lHaveEndDate = lTRUE
+          lHaveEndDate = TRUE
           call SIM_DT%end%parseDate( sOptionText )
           call SIM_DT%end%calcJulianDay()
 
@@ -1472,15 +1473,15 @@ contains
       SIM_DT%iDaysInYear = SIM_DT%curr%daysperyear()
       SIM_DT%lIsLeapYear = SIM_DT%curr%isLeapYear()
 
-      call LOGS%write("Model run start date set to: "//SIM_DT%start%prettydate(), iTab=4, lEcho=lTRUE)
-      call LOGS%write("Model run end date set to:   "//SIM_DT%end%prettydate(), iTab=4, lEcho=lTRUE)
+      call LOGS%write("Model run start date set to: "//SIM_DT%start%prettydate(), iTab=4, lEcho=TRUE)
+      call LOGS%write("Model run end date set to:   "//SIM_DT%end%prettydate(), iTab=4, lEcho=TRUE)
 
     else
 
       call warn(sMessage="Your control file seems to be missing START_DATE and/or END_DATE", &
         sHints="Add a START_DATE and/or END_DATE directive to your control file. Date "      &
-        //"~should be specified as mm/dd/yyyy.", lFatal = lTRUE, iLogLevel = LOG_ALL,        &
-        lEcho = lTRUE )
+        //"~should be specified as mm/dd/yyyy.", lFatal = TRUE, iLogLevel = LOG_ALL,        &
+        lEcho = TRUE )
 
     endif
 
@@ -1500,9 +1501,9 @@ contains
   subroutine initialize_lookup_tables()
 
     ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions
-    type (STRING_LIST_T)             :: slString
+    type (FSTRING_LIST_T)             :: myDirectives
+    type (FSTRING_LIST_T)             :: myOptions
+    type (FSTRING_LIST_T)             :: slString
     integer (c_int)             :: iIndex
     character (len=:), allocatable   :: sCmdText
     character (len=:), allocatable   :: sOptionText
@@ -1522,12 +1523,12 @@ contains
     if ( myDirectives%count == 0 ) then
 
       call warn("Your control file seems to be missing the required lookup table(s).", &
-        lFatal = lTRUE )
+        lFatal = TRUE )
 
     else
 
       call LOGS%set_loglevel( LOG_ALL )
-      call LOGS%set_echo( lFALSE )
+      call LOGS%set_echo( FALSE )
 
       ! iterate over list of all control file statements that contain the phrase "LOOKUP_TABLE"
       do iIndex = 1, myDirectives%count
@@ -1565,7 +1566,8 @@ contains
       if ( iCount > 0 ) then
 
         call PARAMS%munge_file()
-        call PARAMS_DICT%print_all(iLogLevel=LOG_DEBUG, lEcho=lFALSE)
+        call PARAMS_DICT%print_all(sDescription="LOOKUP TABLE dictionary",      &
+                                   iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
       endif
 
@@ -1581,13 +1583,13 @@ contains
     logical (c_bool), intent(in) :: lOptional
 
     ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions
+    type (FSTRING_LIST_T)             :: myDirectives
+    type (FSTRING_LIST_T)             :: myOptions
     integer (c_int)             :: iIndex
     integer (c_int)             :: indx
     character (len=:), allocatable   :: sCmdText
 !    character (len=:), allocatable   :: sOptionText
-    type (STRING_LIST_T)             :: argv_list
+    type (FSTRING_LIST_T)             :: argv_list
     character (len=:), allocatable   :: sArgText
     integer (c_int)             :: iStat
     integer (c_int)             :: status
@@ -1602,12 +1604,12 @@ contains
     if ( myDirectives%count == 0 ) then
 
       call warn("Your control file is missing any of the required directives relating to "//dquote(sKey)//" method.", &
-        lFatal = lFatal, iLogLevel = LOG_ALL, lEcho = lTRUE )
+        lFatal = lFatal, iLogLevel = LOG_ALL, lEcho = TRUE )
 
     else
 
       call LOGS%set_loglevel( LOG_ALL )
-      call LOGS%set_echo( lFALSE )
+      call LOGS%set_echo( FALSE )
 
       ! repeat MODEL process for each control file directive in list
       do iIndex = 1, myDirectives%count
@@ -1656,13 +1658,13 @@ contains
   subroutine initialize_program_options( )
 
     ! [ LOCALS ]
-    type (STRING_LIST_T)             :: myDirectives
-    type (STRING_LIST_T)             :: myOptions
+    type (FSTRING_LIST_T)             :: myDirectives
+    type (FSTRING_LIST_T)             :: myOptions
     integer (c_int)             :: iIndex
     integer (c_int)             :: indx
     character (len=:), allocatable   :: sCmdText
 !    character (len=:), allocatable   :: sOptionText
-    type (STRING_LIST_T)             :: argv_list
+    type (FSTRING_LIST_T)             :: argv_list
     character (len=:), allocatable   :: sArgText
     integer (c_int)             :: iStat
     integer (c_int)             :: status
@@ -1674,7 +1676,7 @@ contains
     myDirectives = CF_DICT%grep_keys( "OPTION" )
 
     call LOGS%set_loglevel( LOG_ALL )
-    call LOGS%set_echo( lFALSE )
+    call LOGS%set_echo( FALSE )
 
     ! repeat MODEL process for each control file directive in list
     do iIndex = 1, myDirectives%count
@@ -1713,7 +1715,7 @@ contains
 
           case ( "NO_LATLON_IN_OUTPUT" )
 
-            call set_output_latlon_option( lFALSE )
+            call set_output_latlon_option( FALSE )
             call LOGS%write("==> LATITUDE and LONGITUDE will *not* be included in output NetCDF files.", iLinesBefore=1 )
 
         end select
@@ -1781,7 +1783,7 @@ contains
 !     integer (c_int)                 :: iCount
 !     integer (c_int)                 :: iStat
 !     logical (c_bool)                :: lMatch
-!     type (STRING_LIST_T)                 :: slList
+!     type (FSTRING_LIST_T)                 :: slList
 !
 !     call slList%append("LU_Code")
 !     call slList%append("LU_code")
@@ -1818,14 +1820,14 @@ contains
 !
 !       do iIndex = 1, ubound(MODEL%landuse_code,1)
 !
-!         lMatch = lFALSE
+!         lMatch = FALSE
 !
 !         do iIndex2=1, ubound(iLandUseCodes, 1)
 !
 !           if (MODEL%landuse_code(iIndex) == iLandUseCodes(iIndex2) ) then
 !             MODEL%landuse_index(iIndex) = iIndex2
 !             iCount = iCount + 1
-!             lMatch = lTRUE
+!             lMatch = TRUE
 !             exit
 !           endif
 !
@@ -1853,7 +1855,7 @@ contains
 !     ! if we have more than one cell for which an index value could not be assigned, trigger fatal error
 !     if ( count(MODEL%landuse_index < 0) > 0 ) then
 !       call warn(asCharacter(count(MODEL%landuse_index < 0))//" landuse codes could not be "        &
-!       //" assigned a landuse index value.", lFatal=lTRUE, sHints="Make sure that you have an "        &
+!       //" assigned a landuse index value.", lFatal=TRUE, sHints="Make sure that you have an "        &
 !       //"entry in the landuse lookup table for each unique code contained in your landuse grid." )
 !     endif
 !
@@ -1867,7 +1869,7 @@ contains
     integer (c_int)               :: iIndex
     integer (c_int)               :: iStat
     character (len=256)                :: sBuf
-    type (STRING_LIST_T)               :: slList
+    type (FSTRING_LIST_T)               :: slList
     integer( c_int), allocatable  :: iLanduseTableCodes(:)
     integer (c_int)               :: iNumberOfLanduses
     real (c_float), allocatable   :: SURFACE_STORAGE_MAXIMUM(:)

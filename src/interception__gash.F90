@@ -11,8 +11,8 @@ module interception__gash
   use grid
   use netcdf4_support, only      : T_NETCDF4_FILE
   use simulation_datetime
-  use strings
-  use string_list
+  use fstring
+  use fstring_list
   implicit none
 
   private
@@ -53,7 +53,7 @@ contains
 
     ! [ LOCALS ]
     integer (c_int)                 :: iStat
-    type (STRING_LIST_T)                 :: slList
+    type (FSTRING_LIST_T)                 :: slList
     integer (c_int)                 :: iIndex
     integer (c_int)                 :: iCount
     integer (c_int)                 :: iNumRecs

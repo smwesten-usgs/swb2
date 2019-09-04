@@ -38,7 +38,7 @@ contains
 
         call warn(sMessage="An INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX grid (or constant) was not found.",    &
         sHints="Check your control file to see that a valid INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX grid or"  &
-          //" constant is specified.", lFatal=lFALSE )
+          //" constant is specified.", lFatal=FALSE )
 
         cfgi = 0.0_c_float
 
@@ -54,7 +54,7 @@ contains
      if ( minval( cfgi ) < fZERO &
         .or. maxval( cfgi ) > 300.0_c_float )  &
        call warn(sMessage="One or more initial continuous frozen ground values outside of " &
-         //"valid range (0 to 300)", lFatal=lTRUE )
+         //"valid range (0 to 300)", lFatal=TRUE )
 
     endif
 

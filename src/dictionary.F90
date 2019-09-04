@@ -4,8 +4,8 @@ module dictionary
   use constants_and_conversions, only : iTINYVAL, fTINYVAL, TRUE, FALSE
   use exceptions
   use logfiles
-  use strings
-  use string_list
+  use fstring
+  use fstring_list
   use exceptions
   implicit none
 
@@ -16,7 +16,7 @@ module dictionary
     character (len=:), allocatable            :: key
     character (len=:), allocatable            :: secondary_key
 
-    type (STRING_LIST_T)                      :: sl
+    type (FSTRING_LIST_T)                      :: sl
     type (DICT_ENTRY_T), pointer              :: previous   => null()
     type (DICT_ENTRY_T), pointer              :: next       => null()
 
@@ -43,7 +43,7 @@ module dictionary
     type (DICT_ENTRY_T), pointer   :: first   => null()
     type (DICT_ENTRY_T), pointer   :: last    => null()
     type (DICT_ENTRY_T), pointer   :: current => null()
-    integer (c_int)           :: count   = 0
+    integer (c_int)                :: count   = 0
 
   contains
 
@@ -85,7 +85,7 @@ module dictionary
     procedure, private   :: get_values_as_float_given_list_of_keys_sub
     procedure, private   :: get_values_as_logical_given_list_of_keys_sub
     procedure, private   :: get_values_as_string_list_given_list_of_keys_sub
-    generic              :: get_values => get_values_as_int_sub,                       &
+    generic              :: get_values => get_values_as_int_sub,                          &
                                           get_values_as_float_sub,                        &
                                           get_values_as_logical_sub,                      &
                                           get_values_as_string_list_sub,                  &
@@ -132,7 +132,7 @@ contains
   subroutine add_float_sub(this, fValue)
 
     class (DICT_ENTRY_T)             :: this
-    real (c_float), intent(in)  :: fValue
+    real (c_float), intent(in)       :: fValue
 
     call this%sl%append( asCharacter( fValue ) )
 
@@ -143,7 +143,7 @@ contains
   subroutine add_integer_sub(this, iValue)
 
     class (DICT_ENTRY_T)               :: this
-    integer (c_int), intent(in)   :: iValue
+    integer (c_int), intent(in)        :: iValue
 
     call this%sl%append( asCharacter( iValue ) )
 
@@ -154,7 +154,7 @@ contains
   subroutine add_double_sub(this, dValue)
 
     class (DICT_ENTRY_T)               :: this
-    real (c_double), intent(in)   :: dValue
+    real (c_double), intent(in)        :: dValue
 
     call this%sl%append( asCharacter( dValue ) )
 
@@ -184,30 +184,31 @@ contains
     character (len=*), intent(in) :: sKey
     type (DICT_ENTRY_T), pointer  :: pDict
 
-    pDict => this%first
     this%current => this%first
 
-    do while ( associated( pDict ) )
+    do while ( associated( this%current ) )
 
-      if ( pDict%key .strapprox. sKey )  exit
+      if ( this%current%key .strapprox. sKey )  exit
 
-      pDict => pDict%next
-      this%current => pDict
+      this%current => this%current%next
 
     enddo
 
-    if (.not. associated( pDict ) )  &
+    if (.not. associated( this%current ) )  &
       call warn( sMessage="Failed to find a dictionary entry with a key value of "//dquote(sKey),   &
                  iLogLevel=LOG_DEBUG,                                                               &
                  lEcho=FALSE )
 
+    pDict => this%current
+
   end function get_entry_by_key_fn
 
+!--------------------------------------------------------------------------------------------------
 
   function get_entry_by_index_fn(this, iIndex)   result( pDict )
 
     class (DICT_T)                   :: this
-    integer (c_int), intent(in) :: iIndex
+    integer (c_int), intent(in)      :: iIndex
     type (DICT_ENTRY_T), pointer     :: pDict
 
     ! [ LOCALS ]
@@ -215,30 +216,27 @@ contains
 
     iCurrentIndex = 1
 
-    pDict => this%first
-
     this%current => this%first
 
     do
 
-      if ( .not. associated( pDict ) ) exit
+      if ( .not. associated( this%current ) ) exit
 
       if ( iCurrentIndex == iIndex )  exit
 
-      pDict => pDict%next
-
-      this%current => pDict
+      this%current => this%current%next
 
       iCurrentIndex = iCurrentIndex + 1
 
-
     enddo
 
-    if (.not. associated( pDict ) )  &
+    if (.not. associated( this%current ) )  &
       call warn( sMessage="Failed to find a dictionary entry with a index value of "   &
         //asCharacter(iIndex),                                                         &
                  iLogLevel=LOG_DEBUG,                                                  &
                  lEcho=FALSE )
+
+    pDict => this%current
 
   end function get_entry_by_index_fn
 
@@ -299,7 +297,7 @@ contains
 
     class (DICT_T)                   :: this
     character (len=*), intent(in)    :: sKey
-    type (STRING_LIST_T)             :: slString
+    type (FSTRING_LIST_T)             :: slString
 
     ! [ LOCALS ]
     integer (c_int)             :: iIndex
@@ -327,7 +325,7 @@ function key_name_already_in_use_fn(this, sKey)   result( in_use )
 
   class (DICT_T)                   :: this
   character (len=*), intent(in)    :: sKey
-  logical (c_bool)            :: in_use
+  logical (c_bool)                 :: in_use
 
   ! [ LOCALS ]
   integer (c_int)             :: iIndex
@@ -367,7 +365,7 @@ function find_dict_entry_fn(this, sSearchKey)   result( pDict )
 
   class (DICT_T)                   :: this
   character (len=*), intent(in)    :: sSearchKey
-  type (DICT_ENTRY_T), pointer  :: pDict
+  type (DICT_ENTRY_T), pointer     :: pDict
 
   ! [ LOCALS ]
   integer (c_int)             :: iIndex
@@ -528,7 +526,7 @@ end function find_dict_entry_fn
           iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
       endif
 
-      iValues = pTarget%sl%asInt()
+      iValues = pTarget%sl%get_integer()
 
     else
 
@@ -551,8 +549,8 @@ end function find_dict_entry_fn
 
     class (DICT_T)                                   :: this
     character (len=*)                                :: sKey
-    logical (c_bool), allocatable, intent(out)  :: lValues(:)
-    logical (c_bool), optional                 :: is_fatal
+    logical (c_bool), allocatable, intent(out)       :: lValues(:)
+    logical (c_bool), optional                       :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
@@ -577,7 +575,7 @@ end function find_dict_entry_fn
           iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
       endif
 
-      lValues = pTarget%sl%asLogical()
+      lValues = pTarget%sl%get_logical()
 
     else
 
@@ -608,7 +606,7 @@ end function find_dict_entry_fn
   subroutine get_values_as_logical_given_list_of_keys_sub(this, slKeys, lValues, is_fatal)
 
     class (DICT_T)                                     :: this
-    type (STRING_LIST_T)                               :: slKeys
+    type (FSTRING_LIST_T)                               :: slKeys
     logical (c_bool), allocatable, intent(out)         :: lValues(:)
     logical (c_bool), optional                         :: is_fatal
 
@@ -645,11 +643,11 @@ end function find_dict_entry_fn
       if ( is_fatal_l ) then
         empty_entries = pTarget%sl%empty_entries_present()
         if( empty_entries )  call warn(sMessage="There are missing values associated" &
-          //" with the key values of "//slKeys%listall(),                             &
+          //" with the key values of "//slKeys%list_all(),                             &
           iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
       endif
 
-      lValues = pTarget%sl%asLogical()
+      lValues = pTarget%sl%get_logical()
 
     else
 
@@ -657,7 +655,7 @@ end function find_dict_entry_fn
       call assert(iStat == 0, "Failed to allocate memory to lValues array", &
         __SRCNAME__, __LINE__)
 
-      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
+      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%list_all()), &
         sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
       lValues = FALSE
@@ -671,8 +669,8 @@ end function find_dict_entry_fn
   subroutine get_values_as_string_list_given_list_of_keys_sub(this, slKeys, slString, is_fatal )
 
     class (DICT_T)                                     :: this
-    type (STRING_LIST_T)                               :: slKeys
-    type ( STRING_LIST_T ), intent(out)                :: slString
+    type (FSTRING_LIST_T)                               :: slKeys
+    type ( FSTRING_LIST_T ), intent(out)                :: slString
     logical (c_bool), optional                         :: is_fatal
 
     ! [ LOCALS ]
@@ -708,7 +706,7 @@ end function find_dict_entry_fn
       if ( is_fatal_l ) then
         empty_entries = pTarget%sl%empty_entries_present()
         if( empty_entries )  call warn(sMessage="There are missing values associated" &
-          //" with the key values of "//slKeys%listall(),                             &
+          //" with the key values of "//slKeys%list_all(),                             &
           iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
       endif
 
@@ -717,7 +715,7 @@ end function find_dict_entry_fn
     else
 
       call slString%append("<NA>")
-      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
+      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%list_all()), &
         sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
     endif
@@ -731,8 +729,8 @@ end function find_dict_entry_fn
     class (DICT_T)                                  :: this
     character(len=:), allocatable, intent(out)      :: sText
     character (len=*), intent(in), optional         :: sKey
-    integer (c_int), intent(in), optional      :: iIndex
-    logical (c_bool), optional                 :: is_fatal
+    integer (c_int), intent(in), optional           :: iIndex
+    logical (c_bool), optional                      :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
@@ -768,8 +766,8 @@ end function find_dict_entry_fn
 
     class (DICT_T)                                  :: this
     character (len=*), intent(in)                   :: sKey
-    type (STRING_LIST_T), intent(out)               :: slString
-    logical (c_bool), optional                 :: is_fatal
+    type (FSTRING_LIST_T), intent(out)               :: slString
+    logical (c_bool), optional                      :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
@@ -821,7 +819,7 @@ end function find_dict_entry_fn
   subroutine get_values_as_int_given_list_of_keys_sub(this, slKeys, iValues, is_fatal)
 
     class (DICT_T)                                     :: this
-    type (STRING_LIST_T)                               :: slKeys
+    type (FSTRING_LIST_T)                               :: slKeys
     integer (c_int), allocatable, intent(out)          :: iValues(:)
     logical (c_bool), optional                         :: is_fatal
 
@@ -860,11 +858,11 @@ end function find_dict_entry_fn
       if ( is_fatal_l ) then
         empty_entries = pTarget%sl%empty_entries_present()
         if( empty_entries )  call warn(sMessage="There are missing values associated" &
-          //" with the key values of "//slKeys%listall(),                             &
+          //" with the key values of "//slKeys%list_all(),                             &
           iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
       endif
 
-      iValues = pTarget%sl%asInt()
+      iValues = pTarget%sl%get_integer()
 
     else
 
@@ -872,7 +870,7 @@ end function find_dict_entry_fn
       call assert(iStat == 0, "Failed to allocate memory to iValues array", &
         __SRCNAME__, __LINE__)
 
-      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
+      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%list_all()), &
         sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
       iValues = iTINYVAL
@@ -895,7 +893,7 @@ end function find_dict_entry_fn
   subroutine get_values_as_float_given_list_of_keys_sub(this, slKeys, fValues, is_fatal)
 
     class (DICT_T)                                    :: this
-    type (STRING_LIST_T)                              :: slKeys
+    type (FSTRING_LIST_T)                              :: slKeys
     real (c_float), allocatable, intent(out)          :: fValues(:)
     logical (c_bool), optional                        :: is_fatal
 
@@ -914,6 +912,7 @@ end function find_dict_entry_fn
     endif
 
     iCount = 0
+    pTarget => null()
 
     do while ( iCount < slKeys%count )
 
@@ -932,11 +931,11 @@ end function find_dict_entry_fn
       if ( is_fatal_l ) then
         empty_entries = pTarget%sl%empty_entries_present()
         if( empty_entries )  call warn(sMessage="There are missing values associated" &
-          //" with the key values of "//slKeys%listall(),                             &
+          //" with the key values of "//slKeys%list_all(),                             &
           iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
       endif
 
-      fValues = pTarget%sl%asFloat()
+      fValues = pTarget%sl%get_float()
 
     else
 
@@ -944,7 +943,7 @@ end function find_dict_entry_fn
       call assert(iStat == 0, "Failed to allocate memory to fValues array", &
         __SRCNAME__, __LINE__)
 
-      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%listall()), &
+      call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%list_all()), &
         sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
 
@@ -961,8 +960,8 @@ end function find_dict_entry_fn
 
     class (DICT_T)                                    :: this
     character (len=*), intent(in)                     :: sKey
-    real (c_float), allocatable, intent(out)     :: fValues(:)
-    logical (c_bool), optional                   :: is_fatal
+    real (c_float), allocatable, intent(out)          :: fValues(:)
+    logical (c_bool), optional                        :: is_fatal
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: pTarget
@@ -970,6 +969,12 @@ end function find_dict_entry_fn
     logical (c_bool)          :: is_fatal_l
     logical (c_bool)          :: empty_entries
 
+    if ( present( is_fatal ) ) then
+      is_fatal_l = is_fatal
+    else
+      is_fatal_l = FALSE
+    endif
+    
     pTarget => this%get_entry(sKey)
 
     if ( associated( pTarget ) ) then
@@ -981,7 +986,7 @@ end function find_dict_entry_fn
           iLogLevel=LOG_ALL, lEcho=TRUE, lFatal=TRUE )
       endif
 
-      fValues = pTarget%sl%asFloat()
+      fValues = pTarget%sl%get_float()
 
     else
 
@@ -1000,15 +1005,17 @@ end function find_dict_entry_fn
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine print_all_dictionary_entries_sub(this, iLogLevel, lEcho )
+  subroutine print_all_dictionary_entries_sub(this, iLogLevel, sDescription, lEcho )
 
     class (DICT_T)                               :: this
-    integer (c_int), intent(in), optional   :: iLogLevel
-    logical (c_bool), intent(in), optional  :: lEcho
+    integer (c_int), intent(in), optional        :: iLogLevel
+    character (len=*), intent(in), optional      :: sDescription
+    logical (c_bool), intent(in), optional       :: lEcho
 
     ! [ LOCALS ]
     type (DICT_ENTRY_T), pointer   :: current
     character (len=512)            :: sTempBuf
+    character (len=:), allocatable :: sDescription_
     integer (c_int)           :: iCount
     integer (c_int)           :: iIndex
     integer (c_int)           :: iLogLevel_l
@@ -1026,10 +1033,16 @@ end function find_dict_entry_fn
       lEcho_l = FALSE
     end if
 
+    if ( present( sDescription ) ) then
+      sDescription_ = trim(sDescription)
+    else
+      sDescription_ = "dictionary data structure"
+    endif
+
     current => this%first
     iCount = 0
 
-    call LOGS%write( "### Summary of all items stored in SWB parameter dictionary",                &
+    call LOGS%write( "### Summary of all items stored in "//trim(sDescription_), &
       iLogLevel=iLogLevel_l, lEcho=lEcho_l )
 
     do while ( associated( current ) )
@@ -1044,16 +1057,16 @@ end function find_dict_entry_fn
 
         case ( LOG_GENERAL )
 
-          call current%sl%print( iLU=LOGS%iUnitNum( LOG_GENERAL ) )
+          call current%sl%print( lu=LOGS%iUnitNum( LOG_GENERAL ) )
 
         case ( LOG_DEBUG )
 
-          call current%sl%print( iLU=LOGS%iUnitNum( LOG_DEBUG ) )
+          call current%sl%print( lu=LOGS%iUnitNum( LOG_DEBUG ) )
 
         case ( LOG_ALL )
 
-          call current%sl%print( iLU=LOGS%iUnitNum( LOG_GENERAL ) )
-          call current%sl%print( iLU=LOGS%iUnitNum( LOG_DEBUG ) )
+          call current%sl%print( lu=LOGS%iUnitNum( LOG_GENERAL ) )
+          call current%sl%print( lu=LOGS%iUnitNum( LOG_DEBUG ) )
 
         case default
 

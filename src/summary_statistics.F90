@@ -4,12 +4,12 @@ module summary_statistics
   use exceptions
   use model_domain, only         : MODEL_DOMAIN_T
   use simulation_datetime, only  : SIM_DT
-  use strings
-  use string_list, only          : STRING_LIST_T
+  use fstring
+  use fstring_list, only          : FSTRING_LIST_T
   implicit none
 
-  type ( STRING_LIST_T ) :: POLY_ID
-  type ( STRING_LIST_T ) :: LANDUSE_CODES
+  type ( FSTRING_LIST_T ) :: POLY_ID
+  type ( FSTRING_LIST_T ) :: LANDUSE_CODES
 
   integer (c_int)         :: LU
   character (len=1), parameter :: TAB = achar(9)

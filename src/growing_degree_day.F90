@@ -8,7 +8,7 @@ module growing_degree_day
   use netcdf4_support
   use parameters
   use simulation_datetime
-  use string_list
+  use fstring_list
   implicit none
 
   private
@@ -31,8 +31,8 @@ contains
     ! [ LOCALS ]
     integer (c_int)              :: status
     integer (c_int)              :: indx
-    type (STRING_LIST_T)              :: parameter_list
-    type (STRING_LIST_T)              :: gdd_reset_val_list
+    type (FSTRING_LIST_T)              :: parameter_list
+    type (FSTRING_LIST_T)              :: gdd_reset_val_list
     character (len=32)                :: sBuf
     real (c_float), allocatable  :: gdd_base_l(:)
     real (c_float), allocatable  :: gdd_max_l(:)
@@ -80,7 +80,7 @@ contains
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
     if ( gdd_reset_val_list%count == number_of_landuse_codes      &
-         .and. gdd_reset_val_list%countmatching("<NA>") == 0 ) then
+         .and. gdd_reset_val_list%count_matching("<NA>") == 0 ) then
 
       ! retrieve gdd reset values; convert mm/dd to DOY
       do indx=1, gdd_reset_val_list%count

@@ -14,7 +14,7 @@ module daily_calculation
 
   use simulation_datetime, only       : SIM_DT
 
-  use strings
+  use fstring
   use logfiles
 
   implicit none

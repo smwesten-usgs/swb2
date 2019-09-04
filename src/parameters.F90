@@ -4,8 +4,8 @@ module parameters
   use exceptions
   use file_operations, only  : ASCII_FILE_T
   use logfiles
-  use strings
-  use string_list, only      : STRING_LIST_T
+  use fstring
+  use fstring_list, only     : FSTRING_LIST_T
   use dictionary
   use constants_and_conversions
   implicit none
@@ -23,10 +23,10 @@ module parameters
 
   type, public :: PARAMETERS_T
 
-    type (STRING_LIST_T)               :: filenames
-    type (STRING_LIST_T)               :: delimiters
-    type (STRING_LIST_T)               :: comment_chars
-    integer (c_int)               :: count           = 0
+    type (FSTRING_LIST_T)               :: filenames
+    type (FSTRING_LIST_T)               :: delimiters
+    type (FSTRING_LIST_T)               :: comment_chars
+    integer (c_int)                     :: count           = 0
 
   contains
 
@@ -45,10 +45,10 @@ module parameters
     procedure            :: get_parameter_table_float
     procedure            :: get_parameter_values_string_list
 
-    generic              :: get_parameters => get_parameter_values_int,     &
-                                              get_parameter_values_float,   &
-                                              get_parameter_table_float,    &
-                                              get_parameter_values_logical, &
+    generic              :: get_parameters => get_parameter_values_int,         &
+                                              get_parameter_values_float,       &
+                                              get_parameter_table_float,        &
+                                              get_parameter_values_logical,     &
                                               get_parameter_values_string_list
 
     procedure            :: grep_name => grep_parameter_name
@@ -67,7 +67,7 @@ module parameters
   type (PARAMETERS_T), public :: PARAMS
   type (DICT_T), public       :: PARAMS_DICT
 
-  integer (c_int), parameter :: MAX_TABLE_RECORD_LEN = 512
+  integer (c_int), parameter  :: MAX_TABLE_RECORD_LEN = 2048
 
 contains
 
@@ -85,7 +85,7 @@ contains
     if (present(sDelimiters) ) then
       sDelimiters_l = sDelimiters
     else
-      sDelimiters_l = TAB
+      sDelimiters_l = WHITESPACE
     endif
 
     if ( present(sCommentChars) ) then
@@ -302,7 +302,7 @@ contains
     class (PARAMETERS_T)                                       :: this
     character (len=*), intent(in)                              :: sKey
     logical (c_bool), intent(in), optional                :: lFatal
-    type ( STRING_LIST_T )                                     :: slList
+    type ( FSTRING_LIST_T )                                     :: slList
 
     ! [ LOCALS ]
     logical (c_bool) :: lFatal_l
@@ -310,7 +310,7 @@ contains
     if ( present (lFatal) ) then
       lFatal_l = lFatal
     else
-      lFatal_l = lFALSE
+      lFatal_l = FALSE
     endif
 
     slList = PARAMS_DICT%grep_keys( asUppercase( sKey ) )
@@ -331,7 +331,7 @@ contains
 
     class (PARAMETERS_T)                                        :: this
     logical (c_bool), intent(in out), allocatable          :: lValues(:)
-    type (STRING_LIST_T), intent(in out),              optional :: slKeys
+    type (FSTRING_LIST_T), intent(in out),              optional :: slKeys
     character (len=*),    intent(in ),                 optional :: sKey
     logical (c_bool), intent(in),                 optional :: lFatal
 
@@ -341,7 +341,7 @@ contains
     if ( present (lFatal) ) then
       lFatal_l = lFatal
     else
-      lFatal_l = lFALSE
+      lFatal_l = FALSE
     endif
 
     if ( present( slKeys) ) then
@@ -351,7 +351,7 @@ contains
 
 !       if ( any( iValues <= iTINYVAL ) ) &
 !         call warn( "Failed to find a lookup table column named " &
-!           //dQuote( slKeys%listall() )//".", lFatal = lFatal_l )
+!           //dQuote( slKeys%list_all() )//".", lFatal = lFatal_l )
 
     else if ( present( sKey) ) then
 
@@ -369,11 +369,11 @@ contains
 
   subroutine get_parameter_values_string_list( this, slValues, slKeys, sKey, lFatal )
 
-    class (PARAMETERS_T)                                        :: this
-    type (STRING_LIST_T), intent(out)                           :: slValues
-    type (STRING_LIST_T), intent(in),                  optional :: slKeys
-    character (len=*),    intent(in ),                 optional :: sKey
-    logical (c_bool), intent(in),                 optional :: lFatal
+    class (PARAMETERS_T)                               :: this
+    type (FSTRING_LIST_T), intent(out)                 :: slValues
+    type (FSTRING_LIST_T), intent(inout), optional     :: slKeys
+    character (len=*), intent(in ), optional           :: sKey
+    logical (c_bool), intent(in), optional             :: lFatal
 
     ! [ LOCALS ]
     logical (c_bool) :: lFatal_l
@@ -381,7 +381,7 @@ contains
     if ( present (lFatal) ) then
       lFatal_l = lFatal
     else
-      lFatal_l = lFALSE
+      lFatal_l = FALSE
     endif
 
     if ( present( slKeys) ) then
@@ -391,8 +391,7 @@ contains
 
        if ( slValues%get(1) .strequal. "<NA>" ) then
          call warn( "Failed to find a lookup table column named "        &
-           //dQuote( slKeys%listall() )//".", lFatal = lFatal_l )
-         slValues%is_populated = FALSE
+           //dQuote( slKeys%list_all() )//".", lFatal = lFatal_l )
        end if
 
     else if ( present( sKey) ) then
@@ -402,7 +401,6 @@ contains
       if ( slValues%get(1) .strequal. "<NA>" ) then
         call warn( "Failed to find a lookup table column named "        &
           //dQuote( sKey )//".", lFatal = lFatal_l )
-        slValues%is_populated = FALSE
       end if
 
     endif
@@ -415,7 +413,7 @@ contains
 
     class (PARAMETERS_T)                                       :: this
     integer (c_int), intent(out), allocatable             :: iValues(:)
-    type (STRING_LIST_T), intent(in out),             optional :: slKeys
+    type (FSTRING_LIST_T), intent(in out),             optional :: slKeys
     character (len=*),    intent(in ),                optional :: sKey
     logical (c_bool), intent(in),                optional :: lFatal
 
@@ -425,7 +423,7 @@ contains
     if ( present (lFatal) ) then
       lFatal_l = lFatal
     else
-      lFatal_l = lFALSE
+      lFatal_l = FALSE
     endif
 
 
@@ -436,7 +434,7 @@ contains
 
       if ( any( iValues <= iTINYVAL ) ) &
         call warn( "Failed to find a lookup table column named " &
-          //dQuote( slKeys%listall() )//".", lFatal = lFatal_l )
+          //dQuote( slKeys%list_all() )//".", lFatal = lFatal_l )
 
     else if ( present( sKey) ) then
 
@@ -457,7 +455,7 @@ contains
 
     class (PARAMETERS_T)                                       :: this
     real (c_float),  intent(in out), allocatable          :: fValues(:)
-    type (STRING_LIST_T), intent(in out),             optional :: slKeys
+    type (FSTRING_LIST_T), intent(in out),             optional :: slKeys
     character (len=*),    intent(in ),                optional :: sKey
     logical (c_bool), intent(in),                optional :: lFatal
 
@@ -467,7 +465,7 @@ contains
     if ( present (lFatal) ) then
       lFatal_l = lFatal
     else
-      lFatal_l = lFALSE
+      lFatal_l = FALSE
     endif
 
     if ( present( slKeys) ) then
@@ -476,7 +474,7 @@ contains
 
       if ( any( fValues <= fTINYVAL ) ) &
         call warn( "Failed to find a lookup table column named " &
-          //dQuote( slKeys%listall() )//".", lFatal = lFatal_l )
+          //dQuote( slKeys%list_all() )//".", lFatal = lFatal_l )
 
     else if ( present( sKey) ) then
 
@@ -495,7 +493,7 @@ contains
 
   subroutine get_parameter_table_float( this, fValues, sPrefix, iNumRows, lFatal )
 
-    use strings
+    use fstring
 
     class (PARAMETERS_T)                                       :: this
     real (c_float),  intent(in out), allocatable          :: fValues(:,:)
@@ -508,14 +506,14 @@ contains
     integer (c_int)             :: iStat
     character (len=256)         :: sText
     integer (c_int)             :: iNumCols
-    type (STRING_LIST_T)        :: slList
+    type (FSTRING_LIST_T)        :: slList
     real (c_float), allocatable :: fTempVal(:)
     logical (c_bool)            :: lFatal_l
 
     if ( present (lFatal) ) then
       lFatal_l = lFatal
     else
-      lFatal_l = lFALSE
+      lFatal_l = FALSE
     endif
 
     slList = PARAMS%grep_name( sPrefix )

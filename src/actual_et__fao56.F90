@@ -2,7 +2,7 @@ module actual_et__fao56
 
 
   use iso_c_binding, only               : c_short, c_int, c_float, c_double
-  use constants_and_conversions, only   : in_to_mm, lTRUE, lFALSE
+  use constants_and_conversions, only   : in_to_mm, TRUE, FALSE
   use parameters, only                  : PARAMS
   implicit none
 
@@ -13,7 +13,7 @@ contains
 
   subroutine initialize_actual_et_FAO56( )
 
-    call PARAMS%get_parameters( sKey="Depletion_Fraction", fValues=DEPLETION_FRACTION, lFatal=lTRUE )
+    call PARAMS%get_parameters( sKey="Depletion_Fraction", fValues=DEPLETION_FRACTION, lFatal=TRUE )
 
   end subroutine initialize_actual_et_FAO56
 

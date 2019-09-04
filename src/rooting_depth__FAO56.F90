@@ -7,7 +7,7 @@
 module rooting_depth__FAO56
 
   use iso_c_binding, only              : c_short, c_int, c_float, c_double
-  use string_list, only                : STRING_LIST_T
+  use fstring_list, only                : FSTRING_LIST_T
   use parameters, only                 : PARAMS
   use crop_coefficients__FAO56, only   : KCB_l, KCB_MIN, KCB_INI, KCB_MID, KCB_END,               &
                                          KCB_METHOD, KCB_METHOD_GDD, KCB_METHOD_MONTHLY_VALUES,  &

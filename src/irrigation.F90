@@ -16,8 +16,8 @@ module irrigation
   use logfiles, only               : LOGS, LOG_ALL
   use parameters, only             : PARAMS
   use simulation_datetime, only    : SIM_DT
-  use strings, only                : asCharacter, operator( .contains. )
-  use string_list, only            : STRING_LIST_T
+  use fstring, only                : asCharacter, operator( .contains. )
+  use fstring_list, only            : FSTRING_LIST_T
 
   implicit none
 
@@ -70,7 +70,7 @@ contains
     logical (c_bool), intent(in)    :: is_active(:,:)
 
     ! [ LOCALS ]
-    type (STRING_LIST_T)              :: sl_temp_list
+    type (FSTRING_LIST_T)              :: sl_temp_list
     integer (c_int)              :: number_of_landuse_codes
     integer (c_int), allocatable :: landuse_table_codes(:)
     integer (c_int)              :: num_records
@@ -79,11 +79,11 @@ contains
     integer (c_int)              :: i
     integer (c_int)              :: status
     character (len=256)               :: str_buffer
-    type (STRING_LIST_T)              :: sl_irrigation_days
-    type (STRING_LIST_T)              :: sl_irrigation_begin
-    type (STRING_LIST_T)              :: sl_irrigation_end
-    type (STRING_LIST_T)              :: sl_application_method
-    type (STRING_LIST_T)              :: sl_monthly_irrigation_schedule
+    type (FSTRING_LIST_T)              :: sl_irrigation_days
+    type (FSTRING_LIST_T)              :: sl_irrigation_begin
+    type (FSTRING_LIST_T)              :: sl_irrigation_end
+    type (FSTRING_LIST_T)              :: sl_application_method
+    type (FSTRING_LIST_T)              :: sl_monthly_irrigation_schedule
     character (len=31)                :: temp_str
 
     allocate( IRRIGATION_FROM_GROUNDWATER( count( is_active ) ), stat=status )
@@ -119,7 +119,7 @@ contains
     call sl_temp_list%append("Fraction_of_irrigation_from_GW")
     call sl_temp_list%append("Fraction_of_irrigation_from_groundwater")
 
-    call PARAMS%get_parameters( slKeys=sl_temp_list, fValues=FRACTION_OF_IRRIGATION_FROM_GW, lFatal=lTRUE )
+    call PARAMS%get_parameters( slKeys=sl_temp_list, fValues=FRACTION_OF_IRRIGATION_FROM_GW, lFatal=TRUE )
 
     !> retrieve maximum allowable depletion
     call sl_temp_list%clear()
@@ -129,7 +129,7 @@ contains
 
     call PARAMS%get_parameters( slKeys=sl_temp_list,                            &
                                 fValues=MAXIMUM_ALLOWABLE_DEPLETION_FRACTION,   &
-                                lFatal=lTRUE )
+                                lFatal=TRUE )
 
 
     !> retrieve length (in days since planting) of irrigation
@@ -138,7 +138,7 @@ contains
     call sl_temp_list%append("Irrigation_days")
     call sl_temp_list%append("Irrigation_days_since_planting")
 
-    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_irrigation_days, lFatal=lFALSE )
+    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_irrigation_days, lFatal=FALSE )
 
 
     !> retrieve first day of irrigation
@@ -148,7 +148,7 @@ contains
     call sl_temp_list%append("Irrigation_start")
     call sl_temp_list%append("Irrigation_start_date")
 
-    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_irrigation_begin, lFatal=lTRUE )
+    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_irrigation_begin, lFatal=TRUE )
 
 
     !> retrieve last day of irrigation
@@ -158,7 +158,7 @@ contains
     call sl_temp_list%append("Irrigation_end")
     call sl_temp_list%append("Irrigation_end_date")
 
-    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_irrigation_end, lFatal=lTRUE )
+    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_irrigation_end, lFatal=TRUE )
     call sl_temp_list%clear()
 
 
@@ -169,7 +169,7 @@ contains
 
     call PARAMS%get_parameters( slKeys=sl_temp_list,                     &
                                 fValues=IRRIGATION_EFFICIENCY,           &
-                                lFatal=lTRUE )
+                                lFatal=TRUE )
 
     !> check: number of irrigation efficiency values == number of landuse codes?
     num_records = ubound(IRRIGATION_EFFICIENCY,1)
@@ -188,7 +188,7 @@ contains
     allocate( FIRST_DAY_OF_IRRIGATION( sl_irrigation_begin%count ), stat=status )
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
-    if ( sl_irrigation_begin%countmatching("<NA>") == 0 ) then
+    if ( sl_irrigation_begin%count_matching("<NA>") == 0 ) then
 
       do index = 1, sl_irrigation_begin%count
         str_buffer = sl_irrigation_begin%get( index )
@@ -208,7 +208,7 @@ contains
     allocate( LAST_DAY_OF_IRRIGATION( sl_irrigation_end%count ), stat=status )
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
-    if ( sl_irrigation_end%countmatching("<NA>") == 0 ) then
+    if ( sl_irrigation_end%count_matching("<NA>") == 0 ) then
 
       do index = 1, sl_irrigation_end%count
         str_buffer = sl_irrigation_end%get( index )
@@ -227,9 +227,9 @@ contains
     allocate( NUM_DAYS_OF_IRRIGATION( sl_irrigation_days%count ), stat=status )
     call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
 
-    NUM_DAYS_OF_IRRIGATION = sl_irrigation_days%asInt()
+    NUM_DAYS_OF_IRRIGATION = sl_irrigation_days%get_integer()
 
-    if ( sl_irrigation_days%countmatching("<NA>") == 0 ) then
+    if ( sl_irrigation_days%count_matching("<NA>") == 0 ) then
 
       where ( NUM_DAYS_OF_IRRIGATION == 0 )
         NUM_DAYS_OF_IRRIGATION = 999999
@@ -250,7 +250,7 @@ contains
     call sl_temp_list%append("Application_scheme")
     call sl_temp_list%append("Application_option")
 
-    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_application_method, lFatal=lTRUE )
+    call PARAMS%get_parameters( slKeys=sl_temp_list, slValues=sl_application_method, lFatal=TRUE )
     call sl_temp_list%clear()
 
     allocate( APPLICATION_METHOD_CODE( sl_application_method%count ), stat=status )
@@ -262,7 +262,7 @@ contains
     call sl_temp_list%append("Application_amount")
     call sl_temp_list%append("Irrigation_amount")
 
-    call PARAMS%get_parameters( slKeys=sl_temp_list, fValues=APPLICATION_AMOUNT, lFatal=lTRUE )
+    call PARAMS%get_parameters( slKeys=sl_temp_list, fValues=APPLICATION_AMOUNT, lFatal=TRUE )
     call sl_temp_list%clear()
 
     !> basic checks to see whether the number of parameters equals the number of lu codes
