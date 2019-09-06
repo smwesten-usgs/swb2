@@ -8,8 +8,8 @@ contains
 
   subroutine write_provisional_disclaimer()
 
-    write(*,"(/,a)") 'Disclaimer'
-    write(*,"(a,/)") '=========='
+    write(*,"(/,a)") ' Disclaimer'
+    write(*,"(a,/)") '============'
     write(*,"(a)") 'This software is preliminary or provisional and is subject to revision. It is'
     write(*,"(a)") 'being provided to meet the need for timely best science. The software has not'
     write(*,"(a)") 'received final approval by the U.S. Geological Survey (USGS). No warranty,'
@@ -25,8 +25,8 @@ contains
 
   subroutine log_provisional_disclaimer()
 
-    call LOGS%write( sMessage='Disclaimer', lEcho=TRUE)
-    call LOGS%write( sMessage='==========', lEcho=TRUE,iLinesAfter=1)
+    call LOGS%write( sMessage=' Disclaimer', lEcho=TRUE)
+    call LOGS%write( sMessage='============', lEcho=TRUE,iLinesAfter=1)
 
     call LOGS%write( sMessage='This software is preliminary or provisional and is subject to revision. It is', lEcho=TRUE)
     call LOGS%write( sMessage='being provided to meet the need for timely best science. The software has not', lEcho=TRUE)

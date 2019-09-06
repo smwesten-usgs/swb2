@@ -19,6 +19,7 @@ message(" ==> ${INCLUDE_DIRECTORIES}")
 message("NetCDF_LIBRARY  : ${NetCDF_LIBRARY}")
 message("HDF5_LIBRARY    : ${HDF5_LIBRARY}")
 message("HDF5_HL_LIBRARY : ${HDF5_HL_LIBRARY}")
+message("ZLIB_LIBRARY    : ${ZLIB_LIBRARY}")
 
 message(" ")
 message("CMAKE_BINARY_DIR: " ${CMAKE_BINARY_DIR})
