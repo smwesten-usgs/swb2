@@ -17,9 +17,7 @@ before_install:
   - sudo apt-get -y install gfortran-6
   - sudo apt-get -y install libnetcdf11
   - sudo apt-get -y install libhdf5-dev
-  - sudo apt-get -y install findutils
-  - sudo updatedb --add-prunepaths '/bin /opt'
-  - locate netcdf
+  - sudo ln -s /usr/lib/x86_64-linux-gnu/libnetcdf.so.11 /usr/lib/x86_64-linux-gnu/libnetcdf.so
   - ls -la
 
 script:
