@@ -280,24 +280,29 @@ contains
         ! GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) + L_fallow_l( iIndex )
 
         ! if any of the L_* length values is missing, a value of zero will be used, resulting in a wierd looking Kcb curve
-        GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex ) + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_INI, iIndex )
-        GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_DEV, iIndex )
-        GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_MID, iIndex )
-        GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_LATE, iIndex )
-        GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_FALLOW, iIndex )
+        GROWTH_STAGE_DATE( ENDDATE_INI, iIndex ) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )                        &
+                                                   + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_INI, iIndex )
+        GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )                          &
+                                                   + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_DEV, iIndex )
+        GROWTH_STAGE_DATE( ENDDATE_MID, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )                          &
+                                                   + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_MID, iIndex )
+        GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )                         &
+                                                   + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_LATE, iIndex )
+        GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex ) = GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )                      &
+                                                     + GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_FALLOW, iIndex )
 
-        call LOGS%write( "| "//asCharacter( LANDUSE_CODE( iIndex ))//" | "                &
-           //trim( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate() )        &
-             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%getDayOfYear() )//") | " &
-           //trim( GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )%prettydate() )//" | "   &
-             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )%getDayOfYear() )//") | " &
-           //trim( GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )%prettydate() )//" | "   &
-             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )%getDayOfYear() )//") | " &
-           //trim( GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )%prettydate() )//" | "   &
-             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )%getDayOfYear() )//") | " &
-           //trim( GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate() )//" | "  &
-             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%getDayOfYear() )//") | " &
-           //trim( GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex )%prettydate() )       &
+        call LOGS%write( "| "//asCharacter( LANDUSE_CODE( iIndex ))//" | "                                    &
+           //trim( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%prettydate() )                                  &
+             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( PLANTING_DATE, iIndex )%getDayOfYear() )//") | "     &
+           //trim( GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )%prettydate() )//" | "                             &
+             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_INI, iIndex )%getDayOfYear() )//") | "       &
+           //trim( GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )%prettydate() )//" | "                             &
+             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_DEV, iIndex )%getDayOfYear() )//") | "       &
+           //trim( GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )%prettydate() )//" | "                             &
+             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_MID, iIndex )%getDayOfYear() )//") | "       &
+           //trim( GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%prettydate() )//" | "                            &
+             //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_LATE, iIndex )%getDayOfYear() )//") | "      &
+           //trim( GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex )%prettydate() )                                 &
              //" (doy:"//asCharacter( GROWTH_STAGE_DATE( ENDDATE_FALLOW, iIndex )%getDayOfYear() )//") | ")
       enddo
 

@@ -1,1 +1,1 @@
-C:\mingw64\bin\mingw32-make.exe %1 
+c:\Mingw64\bin\mingw32-make.exe %1 

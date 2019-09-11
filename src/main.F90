@@ -20,7 +20,7 @@ program main
   use model_iterate_multiple_simulations, only  : iterate_over_multiple_simulation_days
 
   use fstring, only                   : operator(.containssimilar.),            &
-                                          asCharacter
+                                          asCharacter, right
   use version_control, only           : SWB_VERSION, GIT_COMMIT_HASH_STRING,    &
                                         GIT_BRANCH_STRING, COMPILE_DATE,        &
                                         COMPILE_TIME, SYSTEM_NAME
@@ -40,7 +40,7 @@ program main
   integer (c_int)                :: iNumArgs
   character (len=1024)           :: sCompilerOptions
   character (len=256)            :: sCompilerVersion
-  character (len=256)            :: sCompilerName
+  character (len=:), allocatable :: sCompilerName
   character (len=256)            :: sVersionString
   character (len=256)            :: sCompilationDateString
   character (len=256)            :: sCompilationSystemString
@@ -87,7 +87,7 @@ program main
 #ifdef __INTEL_COMPILER
   ! populate with empty string, since for Intel the COMPILER_VERSION string contains
   ! the compiler name already
-  sCompilerName = trim(sCompilerVersion)
+  sCompilerName = "Intel Fortran,"//right(string=sCompilerVersion, substring=",")
   sCompilerVersion = ""
 !  write(UNIT=*,FMT="(a,/)") "compiler build date:"//TRIM(asCharacter(__INTEL_COMPILER_BUILD_DATE))
 #endif
@@ -107,6 +107,9 @@ program main
   write(unit=*, fmt="(a,/)") repeat("-",iCount + 4)
 
   if(iNumArgs == 0 ) then
+
+  write(UNIT=*,FMT="(a)")       " Compiler options :  "
+  write(UNIT=*,FMT="(a,/,a,/)") "==================== ", trim( sCompilerOptions )
 
     call write_provisional_disclaimer()
 

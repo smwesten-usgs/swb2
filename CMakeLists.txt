@@ -1,29 +1,9 @@
 # CMake project for swb2
 
-# This script expects that the following configuration variables are
-# set and passed during CMake invocation:
-
-# CMAKE_BINARY_DIR
-# DESIRED_BUILD_TYPE     | possible values: "debug", "release", "profile"
-# CMAKE_INSTALL_PREFIX   | ex: "D:/DOS"
-# Fortran_FLAGS_DEBUG
-# Fortran_FLAGS_RELEASE
-# Fortran_FLAGS_PROFILE
-# PATH_TO_R
-# OS                     | possible values: "win_x86", "win_x64", "max_osx", "linux_x64"
-# Fortran_COMPILER_NAME  | ex: "gfortran", "ifort"
-# COMPILER_VERSION       | ex: "4.8.2"
-# LIB_PATH1
-# LIB_PATH2
-# LIB_PATH3
-# LIB_PATH4
-
 message("Processing top-level CMakelists.txt for project swb2")
 
 set(SWB_MAJOR_VERSION "2")
 set(SWB_MINOR_VERSION "0")
-
-#include( CMakeForceCompiler )
 
 #------------------------------------------------------------------------------------#
 #                           Build directory check                                    #
@@ -49,8 +29,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 cmake_minimum_required(VERSION 3.1)
 
 include( cmake/version_control.cmake )
-
-set( EXTERNAL_LIBS ${SWB_EXTERNAL_LIBS})
+include( cmake/FindNetCDF.cmake )
+include( cmake/FindHDF5.cmake )
+include( cmake/FindHDF5_HL.cmake )
+include( cmake/FindZlib.cmake )
 
 #if(MSVC)
   # Automatically adds compiler definitions to all subdirectories too.
@@ -60,9 +42,7 @@ set( EXTERNAL_LIBS ${SWB_EXTERNAL_LIBS})
   # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /w")
 #endif(MSVC)
 
-#libvcruntime.lib libucrt.lib libifport.lib
-
-link_libraries( ${EXTERNAL_LIBS} )
+link_libraries( ${EXTERNAL_LIBRARIES} )
 include_directories( ${INCLUDE_DIRECTORIES} ${CMAKE_BINARY_DIR}/src ${PROJECT_SOURCE_DIR}/src/proj4 )
 
 include( cmake/print_summary.cmake )
@@ -70,15 +50,34 @@ include( cmake/print_summary.cmake )
 add_subdirectory(src)
 add_subdirectory(test/unit_tests)
 
-if ("${SYSTEM_TYPE}" STREQUAL "win_x64" OR "${SYSTEM_TYPE}" STREQUAL "win_x86")
-  add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2.exe ${PROJECT_SOURCE_DIR}/bin/swb2.exe
-                 COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swbstats2.exe ${PROJECT_SOURCE_DIR}/bin/swbstats2.exe
-		 COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/test/unit_tests/swbtest.exe ${PROJECT_SOURCE_DIR}/test/unit_tests/swbtest.exe
+if ( CMAKE_HOST_WIN32 )
+  set( OUTPUT_BIN_TARGET_DIR win_x86 )
+elseif( CMAKE_HOST_APPLE )
+  set( OUTPUT_BIN_TARGET_DIR macOS )
+elseif( CMAKE_HOST_UNIX AND (NOT CMAKE_HOST_APPLE) )
+  set( OUTPUT_BIN_TARGET_DIR linux_x64 )
+endif()
+
+if(CMAKE_Fortran_COMPILER_ID=="GNU")
+  set( OUTPUT_BIN_TARGET_DIR ${OUTPUT_BIN_TARGET_DIR}/gfortran)
+elseif( CMAKE_Fortran_COMPILER_ID=="PGI")
+
+elseif(CMAKE_Fortran_COMPILER_ID=="GNU")
+
+endif()
+
+# prepend location of project 'bin' directory
+set( OUTPUT_BIN_TARGET_DIR ${PROJECT_SOURCE_DIR}/bin/${OUTPUT_BIN_TARGET_DIR} )
+
+if ( WIN32 )
+  add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2.exe ${OUTPUT_BIN_TARGET_DIR}/swb2.exe
+                 COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swbstats2.exe ${OUTPUT_BIN_TARGET_DIR}/swbstats2.exe
+		             COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/test/unit_tests/swbtest.exe ${PROJECT_SOURCE_DIR}/test/unit_tests/swbtest.exe
   )
 else()
-  add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2 ${PROJECT_SOURCE_DIR}/bin/swb2
+  add_custom_target(copy ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2 ${OUTPUT_BIN_TARGET_DIR}/swb2
                  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swb2 /usr/local/bin/swb2
-                 COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swbstats2 ${PROJECT_SOURCE_DIR}/bin/swbstats2
+                 COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swbstats2 ${OUTPUT_BIN_TARGET_DIR}/swbstats2
                  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/src/swbstats2 /usr/local/bin/swbstats2
                  COMMAND ${CMAKE_COMMAND} -E copy ${CMAKE_BINARY_DIR}/test/unit_tests/swbtest ${PROJECT_SOURCE_DIR}/test/unit_tests/swbtest
   )

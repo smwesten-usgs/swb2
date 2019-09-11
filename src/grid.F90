@@ -692,6 +692,7 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
   character (len=256) :: sArgument                    ! Argument for keyword directives
   character (len=256) :: sNoDataValue                 ! String to hold nodata value
   character (len=8192) :: sBuf
+  character (len=256) :: sTemp
   integer (c_int) :: iStat                       ! For "iostat="
   integer (c_int) :: iNX,iNY                     ! Grid dimensions
   integer (c_int) :: iHdrRecs                    ! Number of records in header
@@ -792,13 +793,25 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
                 endif
 
               case ( DATATYPE_REAL )
+
+                pGrd%rData = 3.141592654
+
                 do iRow=1,pGrd%iNY
+
                   read ( unit=LU_GRID, fmt=*, iostat=iStat ) pGrd%rData(:,iRow)
+
+                  if(iStat /= 0) then
+                    do iCol=1,pGrd%iNX
+                      print *, iCol, ": ",pGrd%rData(iCol,iRow)
+                    enddo
+                  endif
+
                   call assert ( iStat == 0, &
                     "Failed to read real grid data - file: " &
                     //trim(sFileName)//"  row num: "//TRIM( asCharacter(iRow)), &
                    __SRCNAME__,__LINE__ )
-                end do
+
+                enddo
                 if(len_trim(sNoDataValue) > 0) then
                   read(unit=sNoDataValue, fmt=*, iostat=iStat) pGrd%rNoDataValue
                   call assert ( iStat == 0, &
