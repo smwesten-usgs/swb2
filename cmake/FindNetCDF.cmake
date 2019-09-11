@@ -5,9 +5,9 @@ find_library(NetCDF_LIBRARY
   DOC "netcdf library")
 
 find_path(NetCDF_INCLUDE_DIR
-  NAMES netcdf.h
-  HINTS /usr "c:/Program Files"
-  PATH_SUFFIXES lib/x86_64-linux-gnu/ local/lib/ local/lib64 "NetCDF" include/
+  NAMES netcdf.h netcdf
+  HINTS /usr "c:/Program Files" /usr/include
+  PATH_SUFFIXES lib/x86_64-linux-gnu/ local/lib/ local/lib64 "NetCDF"
   DOC "netcdf include dir")
 
 add_library(NetCDF_LIBRARY UNKNOWN IMPORTED)
