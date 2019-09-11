@@ -1,5 +1,5 @@
 find_library(NetCDF_LIBRARY
-  NAMES netcdf.a netcdf netcdf.so
+  NAMES netcdf.a netcdf netcdf.so libnetcdf11 libnetcdf11.so
   HINTS /usr "c:/MinGW64" "c:/Program Files"
   PATH_SUFFIXES lib/x86_64-linux-gnu/ local/lib/ local/lib64 x86_64-w64-mingw32/lib "NetCDF"
   DOC "netcdf library")
@@ -7,7 +7,7 @@ find_library(NetCDF_LIBRARY
 find_path(NetCDF_INCLUDE_DIR
   NAMES netcdf.h
   HINTS /usr "c:/Program Files"
-  PATH_SUFFIXES lib/x86_64-linux-gnu/ local/lib/ local/lib64 "NetCDF"
+  PATH_SUFFIXES lib/x86_64-linux-gnu/ local/lib/ local/lib64 "NetCDF" include/
   DOC "netcdf include dir")
 
 add_library(NetCDF_LIBRARY UNKNOWN IMPORTED)
