@@ -21,9 +21,8 @@ export SYSTEM_TYPE="Linux"
 export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -Wuninitialized -fbacktrace -fcheck=all -fexceptions -fmax-errors=6 -fbackslash -ffree-line-length-none -Wno-maybe-uninitialized"
 export CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -ffree-line-length-512 -fbackslash -ffpe-summary='none' -Wno-maybe-uninitialized"
 
-# set important environment variables
-export FC=gfortran
-export CC=gcc
+export FC=gfortran-6
+export CC=gcc-6
 
 cmake "../../.." -G "Unix Makefiles"                         \
 -DSYSTEM_TYPE="$SYSTEM_TYPE "                                \
