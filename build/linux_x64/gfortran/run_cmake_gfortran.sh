@@ -15,7 +15,6 @@ export INSTALL_PREFIX=/usr/local/bin
 # define other variables for use in the CMakeList.txt file
 # options are "Release" or "Debug"
 export BUILD_TYPE="Debug"
-export SYSTEM_TYPE="Linux"
 
 # define platform and compiler specific compilation flags
 export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -Wuninitialized -fbacktrace -fcheck=all -fexceptions -fmax-errors=6 -fbackslash -ffree-line-length-none -Wno-maybe-uninitialized"
@@ -25,7 +24,6 @@ export FC=gfortran-6
 export CC=gcc-6
 
 cmake "../../.." -G "Unix Makefiles"                         \
--DSYSTEM_TYPE="$SYSTEM_TYPE "                                \
 -DCMAKE_BUILD_TYPE="$BUILD_TYPE "                            \
 -DCMAKE_INSTALL_PREFIX:PATH="$INSTALL_PREFIX "               \
 -DCMAKE_Fortran_FLAGS_DEBUG="$CMAKE_Fortran_FLAGS_DEBUG "    \
