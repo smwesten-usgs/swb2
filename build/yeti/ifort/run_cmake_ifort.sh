@@ -9,25 +9,25 @@ rm -f CPack*
 rm -f *.txt
 
 module purge
-module load gcc/6.1
-module load tools/netcdf-c-4.6.2-gnu
-module load tools/hdf5-1.8.13-gnu
+module load intel/psxe-2018u3 
+module load tools/netcdf-c-4.6.2-intel
+module load tools/hdf5-1.8.15-intel
 module load cmake/3.14.2
 module load zlib/1.2.11-gcc
 
-export GFORTRAN=gfortran
-export GCC=gcc
+export GFORTRAN=ifort
+export GCC=icc
 
 # define where 'make copy' will place executables
 export INSTALL_PREFIX=/usr/local/bin
 
 # define other variables for use in the CMakeList.txt file
 # options are "Release" or "Debug"
-export BUILD_TYPE="Debug"
+export BUILD_TYPE="Release"
 
 # define platform and compiler specific compilation flags
-export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -Wuninitialized -fbacktrace -fcheck=all -fexceptions -fmax-errors=6 -fbackslash -ffree-line-length-none -Wno-maybe-uninitialized"
-export CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -ffree-line-length-512 -fbackslash -ffpe-summary='none' -Wno-maybe-uninitialized"
+export CMAKE_Fortran_FLAGS_DEBUG="-O0 -cpp -g -ggdb -traceback -check bounds -extend_source"
+export CMAKE_Fortran_FLAGS_RELEASE="-O2 -cpp -traceback -extend_source"
 
 # set important environment variables
 export FC=$GFORTRAN
