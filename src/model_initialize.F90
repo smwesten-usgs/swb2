@@ -1098,11 +1098,19 @@ contains
 
           call pENTRY%set_scale(asFloat(sArgText_1))
 
-        elseif ( sCmdText .containssimilar. "_SCALE" ) then
+        elseif ( sCmdText .containssimilar. "NETCDF_X_VAR_ADD_OFFSET" ) then
+
+          call pENTRY%set_X_offset( asDouble( sArgText_1 ) )
+
+        elseif ( sCmdText .containssimilar. "NETCDF_Y_VAR_ADD_OFFSET" ) then
+
+          call pENTRY%set_Y_offset( asDouble( sArgText_1 ) )
+
+        elseif ( sCmdText .containssimilar. "_SCALE_FACTOR" ) then
 
           call pENTRY%set_scale(asFloat(sArgText_1))
 
-        elseif ( sCmdText .containssimilar. "_OFFSET" ) then
+        elseif ( sCmdText .containssimilar. "_ADD_OFFSET" ) then
 
           call pENTRY%set_offset(asFloat(sArgText_1))
 
@@ -1117,14 +1125,6 @@ contains
         elseif ( sCmdText .containssimilar. "NETCDF_Z_VAR" ) then
 
           pENTRY%sVariableName_z = trim(sArgText_1)
-
-        elseif ( sCmdText .containssimilar. "NETCDF_X_VAR_ADD_OFFSET" ) then
-
-          call pENTRY%set_X_offset( asDouble( sArgText_1 ) )
-
-        elseif ( sCmdText .containssimilar. "NETCDF_Y_VAR_ADD_OFFSET" ) then
-
-          call pENTRY%set_Y_offset( asDouble( sArgText_1 ) )
 
         elseif ( sCmdText .containssimilar. "NETCDF_TIME_VAR" ) then
 
