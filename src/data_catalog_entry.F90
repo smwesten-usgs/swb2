@@ -530,7 +530,6 @@ end subroutine initialize_netcdf_data_object_sub
         call apply_scale_and_offset(fResult=this%pGrdBase%rData, fValue=this%pGrdBase%rData,          &
               dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
 
-
       elseif ( this%iTargetDataType == DATATYPE_INT ) then
 
          call apply_scale_and_offset(iResult=this%pGrdBase%iData, iValue=this%pGrdBase%iData,          &
@@ -1182,9 +1181,6 @@ end subroutine set_constant_value_real
 
     this%lPadValues = FALSE
 
-    dAddOffset = this%NCFILE%rAddOffset(NC_Z)
-    dScaleFactor = this%NCFILE%rScaleFactor(NC_Z)
-
     ! call once at start of run...
     if ( this%iFileCountYear < 0 ) call this%set_filecount(-1, dt%iYear)
 
@@ -1383,8 +1379,14 @@ end subroutine set_constant_value_real
         call netcdf_get_variable_slice(NCFILE=this%NCFILE, rValues=this%pGrdNative%rData)
         this%lGridHasChanged = TRUE
 
-        this%pGrdNative%rData = this%pGrdNative%rData * dScaleFactor + dAddOffset
+       ! this initialization must take place here so that initialization may
+       ! occur *after* the netCDF file has been opened. previously initialization
+       ! took place tens of lines above, which resulted in an 'add_offset' of 0.0
+       ! and a 'scale_factor' of 1.0 being applied for the first time step.
+        dAddOffset = this%NCFILE%rAddOffset(NC_Z)
+        dScaleFactor = this%NCFILE%rScaleFactor(NC_Z)
 
+        this%pGrdNative%rData = this%pGrdNative%rData * dScaleFactor + dAddOffset
 
         call this%handle_missing_values(this%pGrdNative%rData)
         call this%enforce_limits(this%pGrdNative%rData)
@@ -1471,9 +1473,6 @@ end subroutine set_constant_value_real
 
     if ( .not. associated(this%pGrdBase) ) &
       call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
-
-    dAddOffset = this%NCFILE%rAddOffset(NC_Z)
-    dScaleFactor = this%NCFILE%rScaleFactor(NC_Z)
 
     if ( this%iNC_FILE_STATUS == NETCDF_FILE_CLOSED ) then
 
@@ -1578,6 +1577,8 @@ end subroutine set_constant_value_real
 
     call netcdf_get_variable_slice(NCFILE=this%NCFILE, rValues=this%pGrdNative%rData)
 
+    dAddOffset = this%NCFILE%rAddOffset(NC_Z)
+    dScaleFactor = this%NCFILE%rScaleFactor(NC_Z)
     this%pGrdNative%rData = this%pGrdNative%rData * dScaleFactor + dAddOffset
 
     call this%handle_missing_values(this%pGrdNative%rData)

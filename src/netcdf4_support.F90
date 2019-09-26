@@ -2903,15 +2903,21 @@ subroutine nf_get_time_units(NCFILE)
   read(sDateTime, *) NCFILE%iOriginDay
 
   call chomp(sDateTime, sItem, ":")
-  read(sItem, *) NCFILE%iOriginHH
+  read(sItem, *, iostat=iStat) NCFILE%iOriginHH
+  if (iStat /=0) NCFILE%iOriginHH = 0
 
   call chomp(sDateTime, sItem, ":")
-  read(sItem, *) NCFILE%iOriginMM
+  read(sItem, *, iostat=iStat) NCFILE%iOriginMM
+  if (iStat /=0) NCFILE%iOriginMM = 0
 
   ! changed this to a real value, since some data providers encode the date and
   ! time as YYYY-MM-DD HH-MM-SS.S
-  read(sDateTime, *) fTempVal
-  NCFILE%iOriginSS = int(fTempVal, c_int)
+  read(sDateTime, *, iostat=iStat) fTempVal
+  if (iStat ==0) then
+    NCFILE%iOriginSS = int(fTempVal, c_int)
+  else
+    NCFILE%iOriginSS = 0
+  endif
 
 end subroutine nf_get_time_units
 
