@@ -28,11 +28,11 @@ module fruit
   private
 
   integer, parameter :: STDOUT_DEFAULT = 6
-  integer (kind=c_int) :: stdout   = STDOUT_DEFAULT
+  integer (c_int) :: stdout   = STDOUT_DEFAULT
 
   integer, parameter :: XML_OPEN = 20
   integer, parameter :: XML_WORK_DEFAULT = 21
-  integer (kind=c_int) :: xml_work = XML_WORK_DEFAULT
+  integer (c_int) :: xml_work = XML_WORK_DEFAULT
   character (len = *), parameter :: xml_filename     = "result.xml"
   character (len = *), parameter :: XML_FN_WORK_DEF = "result_tmp.xml"
   character (len = 50) :: xml_filename_work = XML_FN_WORK_DEF
@@ -79,23 +79,23 @@ module fruit
   !---------- save ----------
 
   type ty_stack
-    integer (kind=c_int) :: successful_assert_count
-    integer (kind=c_int) :: failed_assert_count
+    integer (c_int) :: successful_assert_count
+    integer (c_int) :: failed_assert_count
 
-    integer (kind=c_int) :: message_index
-    integer (kind=c_int) :: message_index_from
-    integer (kind=c_int) :: current_max
+    integer (c_int) :: message_index
+    integer (c_int) :: message_index_from
+    integer (c_int) :: current_max
 
     character (len = MSG_LENGTH), pointer :: message_array(:)
     character (len = MSG_LENGTH) :: case_name !  = DEFAULT_CASE_NAME
 
-    integer (kind=c_int) :: successful_case_count
-    integer (kind=c_int) :: failed_case_count
-    integer (kind=c_int) :: testCaseIndex
+    integer (c_int) :: successful_case_count
+    integer (c_int) :: failed_case_count
+    integer (c_int) :: testCaseIndex
     logical :: last_passed
     logical :: case_passed = DEFAULT_CASE_PASSED
-    integer (kind=c_int) :: case_time_from
-    integer (kind=c_int) :: linechar_count
+    integer (c_int) :: case_time_from
+    integer (c_int) :: linechar_count
     logical :: if_show_dots
   end type ty_stack
 
@@ -430,7 +430,7 @@ module fruit
   end interface
 contains
   subroutine init_fruit(rank)
-    integer (kind=c_int), intent(in), optional :: rank
+    integer (c_int), intent(in), optional :: rank
     logical :: if_write
 
     successful_assert_count = 0
@@ -508,8 +508,8 @@ contains
 
   function  case_delta_t()
     character(len = STRLEN_T) :: case_delta_t
-    real (kind=c_float) :: delta_t
-    integer (kind=c_int) :: case_time_to, time_rate, time_max
+    real (c_float) :: delta_t
+    integer (c_int) :: case_time_to, time_rate, time_max
 
     call system_clock(case_time_to, time_rate, time_max)
     if (time_rate > 0) then
@@ -543,7 +543,7 @@ contains
   subroutine case_failed_xml_(tc_name, classname)
     character(*), intent(in) :: tc_name
     character(*), intent(in) :: classname
-    integer (kind=c_int) :: i, j
+    integer (c_int) :: i, j
     character(len = STRLEN_T) :: case_time
 
     case_time = case_delta_t()
@@ -611,7 +611,7 @@ contains
   end subroutine fruit_summary_xml_
 
   function int_to_str(i)
-    integer (kind=c_int), intent(in) :: i
+    integer (c_int), intent(in) :: i
     character(LEN = NUMBER_LENGTH) :: int_to_str
 
     write(int_to_str, '(i10)') i
@@ -661,7 +661,7 @@ contains
     end interface
     character(*), intent(in) :: tc_name
 
-    integer (kind=c_int) :: initial_failed_assert_count
+    integer (c_int) :: initial_failed_assert_count
 
     initial_failed_assert_count = failed_assert_count
 
@@ -710,7 +710,7 @@ contains
 
 
   subroutine fruit_summary_
-    integer (kind=c_int) :: i
+    integer (c_int) :: i
 
 
     write (stdout,*)
@@ -751,8 +751,8 @@ contains
   & succ_assert, fail_assert, &
   & succ_case  , fail_case    &
   &)
-    integer (kind=c_int), intent(in) :: succ_assert, fail_assert
-    integer (kind=c_int), intent(in) :: succ_case  , fail_case
+    integer (c_int), intent(in) :: succ_assert, fail_assert
+    integer (c_int), intent(in) :: succ_case  , fail_case
 
     write (stdout,*) 'Total asserts :   ', succ_assert + fail_assert
     write (stdout,*) 'Successful    :   ', succ_assert
@@ -871,7 +871,7 @@ contains
   end function get_last_message
 
   subroutine get_message_index_(index)
-    integer (kind=c_int), intent(out) :: index
+    integer (c_int), intent(out) :: index
 
     index = message_index
   end subroutine get_message_index_
@@ -879,7 +879,7 @@ contains
 
   subroutine get_message_array_(msgs)
     character(len = *), intent(out) :: msgs(:)
-    integer (kind=c_int) :: i
+    integer (c_int) :: i
     msgs(:) = ""
 
     do i = 1, message_index - 1
@@ -890,7 +890,7 @@ contains
 
   subroutine get_messages_(msgs)
     character(len = *), intent(out) :: msgs(:)
-    integer (kind=c_int) :: i, j
+    integer (c_int) :: i, j
 
     msgs(:) = ""
     do i = message_index_from, message_index - 1
@@ -907,7 +907,7 @@ contains
   end subroutine obsolete_getTotalCount_
 
   subroutine get_total_count(count)
-    integer (kind=c_int), intent(out) :: count
+    integer (c_int), intent(out) :: count
 
     count = successful_assert_count + failed_assert_count
   end subroutine get_total_count
@@ -921,7 +921,7 @@ contains
   end subroutine obsolete_getFailedCount_
 
   subroutine get_failed_count (count)
-    integer (kind=c_int), intent(out) :: count
+    integer (c_int), intent(out) :: count
     count = failed_assert_count
   end subroutine get_failed_count
 
@@ -1010,7 +1010,7 @@ contains
   end function is_case_passed
 
   subroutine override_stdout_(write_unit, filename)
-    integer (kind=c_int), intent(in) ::    write_unit
+    integer (c_int), intent(in) ::    write_unit
     character(len = *), intent(in) :: filename
 
     stdout = write_unit
@@ -1018,7 +1018,7 @@ contains
   end subroutine override_stdout_
 
   subroutine override_xml_work_(new_unit, filename)
-    integer (kind=c_int), intent(in) ::    new_unit
+    integer (c_int), intent(in) ::    new_unit
     character(len = *), intent(in) :: filename
 
     xml_work = new_unit
@@ -1127,7 +1127,7 @@ contains
   end subroutine get_prefix_
 
   subroutine get_assert_and_case_count_(fail_assert, suc_assert, fail_case, suc_case)
-    integer (kind=c_int), intent(out) :: fail_assert, suc_assert, fail_case, suc_case
+    integer (c_int), intent(out) :: fail_assert, suc_assert, fail_case, suc_case
 
     fail_assert =     failed_assert_count
      suc_assert = successful_assert_count
@@ -1190,8 +1190,8 @@ contains
 
   !------ 1d_logical ------
   subroutine assert_eq_1d_logical_(var1, var2, n, message)
-    integer (kind=c_int), intent (in) :: n
-    integer (kind=c_int)              :: i
+    integer (c_int), intent (in) :: n
+    integer (c_int)              :: i
     logical, intent (in) :: var1(n), var2(n)
 
     character(len = *), intent (in), optional :: message
@@ -1208,8 +1208,8 @@ contains
 
   !------ 2d_logical ------
   subroutine assert_eq_2d_logical_(var1, var2, n, m, message)
-    integer (kind=c_int), intent (in) :: n, m
-    integer (kind=c_int)              :: i, j
+    integer (c_int), intent (in) :: n, m
+    integer (c_int)              :: i, j
     logical, intent (in) :: var1(n, m), var2(n, m)
 
     character(len = *), intent (in), optional :: message
@@ -1245,8 +1245,8 @@ contains
 
   !------ 1d_string ------
   subroutine assert_eq_1d_string_(var1, var2, n, message)
-    integer (kind=c_int), intent (in) :: n
-    integer (kind=c_int)              :: i
+    integer (c_int), intent (in) :: n
+    integer (c_int)              :: i
     character (len = *), intent (in) :: var1(n), var2(n)
 
     character(len = *), intent (in), optional :: message
@@ -1263,8 +1263,8 @@ contains
 
   !------ 2d_string ------
   subroutine assert_eq_2d_string_(var1, var2, n, m, message)
-    integer (kind=c_int), intent (in) :: n, m
-    integer (kind=c_int)              :: i, j
+    integer (c_int), intent (in) :: n, m
+    integer (c_int)              :: i, j
     character (len = *), intent (in) :: var1(n, m), var2(n, m)
 
     character(len = *), intent (in), optional :: message
@@ -1284,7 +1284,7 @@ contains
   !------ 0d_int ------
   subroutine assert_eq_int_(var1, var2, message)
 
-    integer (kind=c_int), intent (in) :: var1, var2
+    integer (c_int), intent (in) :: var1, var2
 
     character(len = *), intent (in), optional :: message
 
@@ -1300,9 +1300,9 @@ contains
 
   !------ 1d_int ------
   subroutine assert_eq_1d_int_(var1, var2, n, message)
-    integer (kind=c_int), intent (in) :: n
-    integer (kind=c_int)              :: i
-    integer (kind=c_int), intent (in) :: var1(n), var2(n)
+    integer (c_int), intent (in) :: n
+    integer (c_int)              :: i
+    integer (c_int), intent (in) :: var1(n), var2(n)
 
     character(len = *), intent (in), optional :: message
     do i = 1, n
@@ -1318,9 +1318,9 @@ contains
 
   !------ 2d_int ------
   subroutine assert_eq_2d_int_(var1, var2, n, m, message)
-    integer (kind=c_int), intent (in) :: n, m
-    integer (kind=c_int)              :: i, j
-    integer (kind=c_int), intent (in) :: var1(n, m), var2(n, m)
+    integer (c_int), intent (in) :: n, m
+    integer (c_int)              :: i, j
+    integer (c_int), intent (in) :: var1(n, m), var2(n, m)
 
     character(len = *), intent (in), optional :: message
     do j = 1, m
@@ -1339,7 +1339,7 @@ contains
   !------ 0d_real ------
   subroutine assert_eq_real_(var1, var2, message)
 
-    real (kind=c_float), intent (in) :: var1, var2
+    real (c_float), intent (in) :: var1, var2
 
     character(len = *), intent (in), optional :: message
 
@@ -1356,8 +1356,8 @@ contains
   !------ 0d_real ------
   subroutine assert_eq_real_in_range_(var1, var2, delta, message)
 
-    real (kind=c_float), intent (in) :: var1, var2
-    real (kind=c_float), intent (in) :: delta
+    real (c_float), intent (in) :: var1, var2
+    real (c_float), intent (in) :: delta
     character(len = *), intent (in), optional :: message
 
         if (abs(var1 - var2) > delta) then
@@ -1372,9 +1372,9 @@ contains
 
   !------ 1d_real ------
   subroutine assert_eq_1d_real_(var1, var2, n, message)
-    integer (kind=c_int), intent (in) :: n
-    integer (kind=c_int)              :: i
-    real (kind=c_float), intent (in) :: var1(n), var2(n)
+    integer (c_int), intent (in) :: n
+    integer (c_int)              :: i
+    real (c_float), intent (in) :: var1(n), var2(n)
 
     character(len = *), intent (in), optional :: message
     do i = 1, n
@@ -1390,10 +1390,10 @@ contains
 
   !------ 1d_real ------
   subroutine assert_eq_1d_real_in_range_(var1, var2, n, delta, message)
-    integer (kind=c_int), intent (in) :: n
-    integer (kind=c_int)              :: i
-    real (kind=c_float), intent (in) :: var1(n), var2(n)
-    real (kind=c_float), intent (in) :: delta
+    integer (c_int), intent (in) :: n
+    integer (c_int)              :: i
+    real (c_float), intent (in) :: var1(n), var2(n)
+    real (c_float), intent (in) :: delta
     character(len = *), intent (in), optional :: message
     do i = 1, n
         if (abs(var1(i) - var2(i)) > delta) then
@@ -1408,9 +1408,9 @@ contains
 
   !------ 2d_real ------
   subroutine assert_eq_2d_real_(var1, var2, n, m, message)
-    integer (kind=c_int), intent (in) :: n, m
-    integer (kind=c_int)              :: i, j
-    real (kind=c_float), intent (in) :: var1(n, m), var2(n, m)
+    integer (c_int), intent (in) :: n, m
+    integer (c_int)              :: i, j
+    real (c_float), intent (in) :: var1(n, m), var2(n, m)
 
     character(len = *), intent (in), optional :: message
     do j = 1, m
@@ -1428,10 +1428,10 @@ contains
 
   !------ 2d_real ------
   subroutine assert_eq_2d_real_in_range_(var1, var2, n, m, delta, message)
-    integer (kind=c_int), intent (in) :: n, m
-    integer (kind=c_int)              :: i, j
-    real (kind=c_float), intent (in) :: var1(n, m), var2(n, m)
-    real (kind=c_float), intent (in) :: delta
+    integer (c_int), intent (in) :: n, m
+    integer (c_int)              :: i, j
+    real (c_float), intent (in) :: var1(n, m), var2(n, m)
+    real (c_float), intent (in) :: delta
     character(len = *), intent (in), optional :: message
     do j = 1, m
       do i = 1, n
@@ -1449,7 +1449,7 @@ contains
   !------ 0d_double ------
   subroutine assert_eq_double_(var1, var2, message)
 
-    real (kind=c_double), intent (in) :: var1, var2
+    real (c_double), intent (in) :: var1, var2
 
     character(len = *), intent (in), optional :: message
 
@@ -1466,8 +1466,8 @@ contains
   !------ 0d_double ------
   subroutine assert_eq_double_in_range_(var1, var2, delta, message)
 
-    real (kind=c_double), intent (in) :: var1, var2
-    real (kind=c_double), intent (in) :: delta
+    real (c_double), intent (in) :: var1, var2
+    real (c_double), intent (in) :: delta
     character(len = *), intent (in), optional :: message
 
         if (abs(var1 - var2) > delta) then
@@ -1482,9 +1482,9 @@ contains
 
   !------ 1d_double ------
   subroutine assert_eq_1d_double_(var1, var2, n, message)
-    integer (kind=c_int), intent (in) :: n
-    integer (kind=c_int)              :: i
-    real (kind=c_double), intent (in) :: var1(n), var2(n)
+    integer (c_int), intent (in) :: n
+    integer (c_int)              :: i
+    real (c_double), intent (in) :: var1(n), var2(n)
 
     character(len = *), intent (in), optional :: message
     do i = 1, n
@@ -1500,10 +1500,10 @@ contains
 
   !------ 1d_double ------
   subroutine assert_eq_1d_double_in_range_(var1, var2, n, delta, message)
-    integer (kind=c_int), intent (in) :: n
-    integer (kind=c_int)              :: i
-    real (kind=c_double), intent (in) :: var1(n), var2(n)
-    real (kind=c_double), intent (in) :: delta
+    integer (c_int), intent (in) :: n
+    integer (c_int)              :: i
+    real (c_double), intent (in) :: var1(n), var2(n)
+    real (c_double), intent (in) :: delta
     character(len = *), intent (in), optional :: message
     do i = 1, n
         if (abs(var1(i) - var2(i)) > delta) then
@@ -1518,9 +1518,9 @@ contains
 
   !------ 2d_double ------
   subroutine assert_eq_2d_double_(var1, var2, n, m, message)
-    integer (kind=c_int), intent (in) :: n, m
-    integer (kind=c_int)              :: i, j
-    real (kind=c_double), intent (in) :: var1(n, m), var2(n, m)
+    integer (c_int), intent (in) :: n, m
+    integer (c_int)              :: i, j
+    real (c_double), intent (in) :: var1(n, m), var2(n, m)
 
     character(len = *), intent (in), optional :: message
     do j = 1, m
@@ -1538,10 +1538,10 @@ contains
 
   !------ 2d_double ------
   subroutine assert_eq_2d_double_in_range_(var1, var2, n, m, delta, message)
-    integer (kind=c_int), intent (in) :: n, m
-    integer (kind=c_int)              :: i, j
-    real (kind=c_double), intent (in) :: var1(n, m), var2(n, m)
-    real (kind=c_double), intent (in) :: delta
+    integer (c_int), intent (in) :: n, m
+    integer (c_int)              :: i, j
+    real (c_double), intent (in) :: var1(n, m), var2(n, m)
+    real (c_double), intent (in) :: delta
     character(len = *), intent (in), optional :: message
     do j = 1, m
       do i = 1, n
@@ -1559,7 +1559,7 @@ contains
   !------ 0d_complex ------
   subroutine assert_eq_complex_(var1, var2, message)
 
-    complex(kind=kind(1.0D0)), intent (in) :: var1, var2
+    complex(kind(1.0D0)), intent (in) :: var1, var2
 
     character(len = *), intent (in), optional :: message
 
@@ -1579,8 +1579,8 @@ contains
   !------ 0d_complex ------
   subroutine assert_eq_complex_in_range_(var1, var2, delta, message)
 
-    complex(kind=kind(1.0D0)), intent (in) :: var1, var2
-    real (kind=c_double), intent (in) :: delta
+    complex(kind(1.0D0)), intent (in) :: var1, var2
+    real (c_double), intent (in) :: delta
     character(len = *), intent (in), optional :: message
 
         if (abs(var1 - var2) > delta) then
@@ -1595,9 +1595,9 @@ contains
 
   !------ 1d_complex ------
   subroutine assert_eq_1d_complex_(var1, var2, n, message)
-    integer (kind=c_int), intent (in) :: n
-    integer (kind=c_int)              :: i
-    complex(kind=kind(1.0D0)), intent (in) :: var1(n), var2(n)
+    integer (c_int), intent (in) :: n
+    integer (c_int)              :: i
+    complex(kind(1.0D0)), intent (in) :: var1(n), var2(n)
 
     character(len = *), intent (in), optional :: message
     do i = 1, n
@@ -1616,10 +1616,10 @@ contains
 
   !------ 1d_complex ------
   subroutine assert_eq_1d_complex_in_range_(var1, var2, n, delta, message)
-    integer (kind=c_int), intent (in) :: n
-    integer (kind=c_int)              :: i
-    complex(kind=kind(1.0D0)), intent (in) :: var1(n), var2(n)
-    real (kind=c_double), intent (in) :: delta
+    integer (c_int), intent (in) :: n
+    integer (c_int)              :: i
+    complex(kind(1.0D0)), intent (in) :: var1(n), var2(n)
+    real (c_double), intent (in) :: delta
     character(len = *), intent (in), optional :: message
     do i = 1, n
         if (abs(var1(i) - var2(i)) > delta) then
@@ -1634,9 +1634,9 @@ contains
 
   !------ 2d_complex ------
   subroutine assert_eq_2d_complex_(var1, var2, n, m, message)
-    integer (kind=c_int), intent (in) :: n, m
-    integer (kind=c_int)              :: i, j
-    complex(kind=kind(1.0D0)), intent (in) :: var1(n, m), var2(n, m)
+    integer (c_int), intent (in) :: n, m
+    integer (c_int)              :: i, j
+    complex(kind(1.0D0)), intent (in) :: var1(n, m), var2(n, m)
 
     character(len = *), intent (in), optional :: message
     do j = 1, m
@@ -1657,10 +1657,10 @@ contains
 
   !------ 2d_complex ------
   subroutine assert_eq_2d_complex_in_range_(var1, var2, n, m, delta, message)
-    integer (kind=c_int), intent (in) :: n, m
-    integer (kind=c_int)              :: i, j
-    complex(kind=kind(1.0D0)), intent (in) :: var1(n, m), var2(n, m)
-    real (kind=c_double), intent (in) :: delta
+    integer (c_int), intent (in) :: n, m
+    integer (c_int)              :: i, j
+    complex(kind(1.0D0)), intent (in) :: var1(n, m), var2(n, m)
+    real (c_double), intent (in) :: delta
     character(len = *), intent (in), optional :: message
     do j = 1, m
       do i = 1, n
@@ -1700,8 +1700,8 @@ contains
 
   !------ 1d_logical ------
   subroutine assert_not_equals_1d_logical_(var1, var2, n, message)
-    integer (kind=c_int), intent (in) :: n
-    integer (kind=c_int)              :: i
+    integer (c_int), intent (in) :: n
+    integer (c_int)              :: i
     logical, intent (in) :: var1(n), var2(n)
 
     character(len = *), intent (in), optional :: message
@@ -1724,8 +1724,8 @@ contains
 
   !------ 2d_logical ------
   subroutine assert_not_equals_2d_logical_(var1, var2, n, m, message)
-    integer (kind=c_int), intent (in) :: n, m
-    integer (kind=c_int)              :: i, j
+    integer (c_int), intent (in) :: n, m
+    integer (c_int)              :: i, j
     logical, intent (in) :: var1(n, m), var2(n, m)
 
     character(len = *), intent (in), optional :: message
@@ -1773,8 +1773,8 @@ contains
 
   !------ 1d_string ------
   subroutine assert_not_equals_1d_string_(var1, var2, n, message)
-    integer (kind=c_int), intent (in) :: n
-    integer (kind=c_int)              :: i
+    integer (c_int), intent (in) :: n
+    integer (c_int)              :: i
     character (len = *), intent (in) :: var1(n), var2(n)
 
     character(len = *), intent (in), optional :: message
@@ -1797,8 +1797,8 @@ contains
 
   !------ 2d_string ------
   subroutine assert_not_equals_2d_string_(var1, var2, n, m, message)
-    integer (kind=c_int), intent (in) :: n, m
-    integer (kind=c_int)              :: i, j
+    integer (c_int), intent (in) :: n, m
+    integer (c_int)              :: i, j
     character (len = *), intent (in) :: var1(n, m), var2(n, m)
 
     character(len = *), intent (in), optional :: message
@@ -1824,7 +1824,7 @@ contains
   !------ 0d_int ------
   subroutine assert_not_equals_int_(var1, var2, message)
 
-    integer (kind=c_int), intent (in) :: var1, var2
+    integer (c_int), intent (in) :: var1, var2
 
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
@@ -1846,9 +1846,9 @@ contains
 
   !------ 1d_int ------
   subroutine assert_not_equals_1d_int_(var1, var2, n, message)
-    integer (kind=c_int), intent (in) :: n
-    integer (kind=c_int)              :: i
-    integer (kind=c_int), intent (in) :: var1(n), var2(n)
+    integer (c_int), intent (in) :: n
+    integer (c_int)              :: i
+    integer (c_int), intent (in) :: var1(n), var2(n)
 
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
@@ -1870,9 +1870,9 @@ contains
 
   !------ 2d_int ------
   subroutine assert_not_equals_2d_int_(var1, var2, n, m, message)
-    integer (kind=c_int), intent (in) :: n, m
-    integer (kind=c_int)              :: i, j
-    integer (kind=c_int), intent (in) :: var1(n, m), var2(n, m)
+    integer (c_int), intent (in) :: n, m
+    integer (c_int)              :: i, j
+    integer (c_int), intent (in) :: var1(n, m), var2(n, m)
 
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
@@ -1897,7 +1897,7 @@ contains
   !------ 0d_real ------
   subroutine assert_not_equals_real_(var1, var2, message)
 
-    real (kind=c_float), intent (in) :: var1, var2
+    real (c_float), intent (in) :: var1, var2
 
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
@@ -1920,8 +1920,8 @@ contains
   !------ 0d_real ------
   subroutine assert_not_equals_real_in_range_(var1, var2, delta, message)
 
-    real (kind=c_float), intent (in) :: var1, var2
-    real (kind=c_float), intent (in) :: delta
+    real (c_float), intent (in) :: var1, var2
+    real (c_float), intent (in) :: delta
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
 
@@ -1942,9 +1942,9 @@ contains
 
   !------ 1d_real ------
   subroutine assert_not_equals_1d_real_(var1, var2, n, message)
-    integer (kind=c_int), intent (in) :: n
-    integer (kind=c_int)              :: i
-    real (kind=c_float), intent (in) :: var1(n), var2(n)
+    integer (c_int), intent (in) :: n
+    integer (c_int)              :: i
+    real (c_float), intent (in) :: var1(n), var2(n)
 
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
@@ -1966,10 +1966,10 @@ contains
 
   !------ 1d_real ------
   subroutine assert_not_equals_1d_real_in_range_(var1, var2, n, delta, message)
-    integer (kind=c_int), intent (in) :: n
-    integer (kind=c_int)              :: i
-    real (kind=c_float), intent (in) :: var1(n), var2(n)
-    real (kind=c_float), intent (in) :: delta
+    integer (c_int), intent (in) :: n
+    integer (c_int)              :: i
+    real (c_float), intent (in) :: var1(n), var2(n)
+    real (c_float), intent (in) :: delta
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
 
@@ -1990,9 +1990,9 @@ contains
 
   !------ 2d_real ------
   subroutine assert_not_equals_2d_real_(var1, var2, n, m, message)
-    integer (kind=c_int), intent (in) :: n, m
-    integer (kind=c_int)              :: i, j
-    real (kind=c_float), intent (in) :: var1(n, m), var2(n, m)
+    integer (c_int), intent (in) :: n, m
+    integer (c_int)              :: i, j
+    real (c_float), intent (in) :: var1(n, m), var2(n, m)
 
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
@@ -2016,10 +2016,10 @@ contains
 
   !------ 2d_real ------
   subroutine assert_not_equals_2d_real_in_range_(var1, var2, n, m, delta, message)
-    integer (kind=c_int), intent (in) :: n, m
-    integer (kind=c_int)              :: i, j
-    real (kind=c_float), intent (in) :: var1(n, m), var2(n, m)
-    real (kind=c_float), intent (in) :: delta
+    integer (c_int), intent (in) :: n, m
+    integer (c_int)              :: i, j
+    real (c_float), intent (in) :: var1(n, m), var2(n, m)
+    real (c_float), intent (in) :: delta
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
 
@@ -2043,7 +2043,7 @@ contains
   !------ 0d_double ------
   subroutine assert_not_equals_double_(var1, var2, message)
 
-    real (kind=c_double), intent (in) :: var1, var2
+    real (c_double), intent (in) :: var1, var2
 
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
@@ -2066,8 +2066,8 @@ contains
   !------ 0d_double ------
   subroutine assert_not_equals_double_in_range_(var1, var2, delta, message)
 
-    real (kind=c_double), intent (in) :: var1, var2
-    real (kind=c_double), intent (in) :: delta
+    real (c_double), intent (in) :: var1, var2
+    real (c_double), intent (in) :: delta
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
 
@@ -2088,9 +2088,9 @@ contains
 
   !------ 1d_double ------
   subroutine assert_not_equals_1d_double_(var1, var2, n, message)
-    integer (kind=c_int), intent (in) :: n
-    integer (kind=c_int)              :: i
-    real (kind=c_double), intent (in) :: var1(n), var2(n)
+    integer (c_int), intent (in) :: n
+    integer (c_int)              :: i
+    real (c_double), intent (in) :: var1(n), var2(n)
 
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
@@ -2112,10 +2112,10 @@ contains
 
   !------ 1d_double ------
   subroutine assert_not_equals_1d_double_in_range_(var1, var2, n, delta, message)
-    integer (kind=c_int), intent (in) :: n
-    integer (kind=c_int)              :: i
-    real (kind=c_double), intent (in) :: var1(n), var2(n)
-    real (kind=c_double), intent (in) :: delta
+    integer (c_int), intent (in) :: n
+    integer (c_int)              :: i
+    real (c_double), intent (in) :: var1(n), var2(n)
+    real (c_double), intent (in) :: delta
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
 
@@ -2136,9 +2136,9 @@ contains
 
   !------ 2d_double ------
   subroutine assert_not_equals_2d_double_(var1, var2, n, m, message)
-    integer (kind=c_int), intent (in) :: n, m
-    integer (kind=c_int)              :: i, j
-    real (kind=c_double), intent (in) :: var1(n, m), var2(n, m)
+    integer (c_int), intent (in) :: n, m
+    integer (c_int)              :: i, j
+    real (c_double), intent (in) :: var1(n, m), var2(n, m)
 
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
@@ -2162,10 +2162,10 @@ contains
 
   !------ 2d_double ------
   subroutine assert_not_equals_2d_double_in_range_(var1, var2, n, m, delta, message)
-    integer (kind=c_int), intent (in) :: n, m
-    integer (kind=c_int)              :: i, j
-    real (kind=c_double), intent (in) :: var1(n, m), var2(n, m)
-    real (kind=c_double), intent (in) :: delta
+    integer (c_int), intent (in) :: n, m
+    integer (c_int)              :: i, j
+    real (c_double), intent (in) :: var1(n, m), var2(n, m)
+    real (c_double), intent (in) :: delta
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
 
@@ -2189,7 +2189,7 @@ contains
   !------ 0d_complex ------
   subroutine assert_not_equals_complex_(var1, var2, message)
 
-    complex(kind=kind(1.0D0)), intent (in) :: var1, var2
+    complex(kind(1.0D0)), intent (in) :: var1, var2
 
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
@@ -2215,8 +2215,8 @@ contains
   !------ 0d_complex ------
   subroutine assert_not_equals_complex_in_range_(var1, var2, delta, message)
 
-    complex(kind=kind(1.0D0)), intent (in) :: var1, var2
-    real (kind=c_double), intent (in) :: delta
+    complex(kind(1.0D0)), intent (in) :: var1, var2
+    real (c_double), intent (in) :: delta
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
 
@@ -2237,9 +2237,9 @@ contains
 
   !------ 1d_complex ------
   subroutine assert_not_equals_1d_complex_(var1, var2, n, message)
-    integer (kind=c_int), intent (in) :: n
-    integer (kind=c_int)              :: i
-    complex(kind=kind(1.0D0)), intent (in) :: var1(n), var2(n)
+    integer (c_int), intent (in) :: n
+    integer (c_int)              :: i
+    complex(kind(1.0D0)), intent (in) :: var1(n), var2(n)
 
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
@@ -2264,10 +2264,10 @@ contains
 
   !------ 1d_complex ------
   subroutine assert_not_equals_1d_complex_in_range_(var1, var2, n, delta, message)
-    integer (kind=c_int), intent (in) :: n
-    integer (kind=c_int)              :: i
-    complex(kind=kind(1.0D0)), intent (in) :: var1(n), var2(n)
-    real (kind=c_double), intent (in) :: delta
+    integer (c_int), intent (in) :: n
+    integer (c_int)              :: i
+    complex(kind(1.0D0)), intent (in) :: var1(n), var2(n)
+    real (c_double), intent (in) :: delta
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
 
@@ -2288,9 +2288,9 @@ contains
 
   !------ 2d_complex ------
   subroutine assert_not_equals_2d_complex_(var1, var2, n, m, message)
-    integer (kind=c_int), intent (in) :: n, m
-    integer (kind=c_int)              :: i, j
-    complex(kind=kind(1.0D0)), intent (in) :: var1(n, m), var2(n, m)
+    integer (c_int), intent (in) :: n, m
+    integer (c_int)              :: i, j
+    complex(kind(1.0D0)), intent (in) :: var1(n, m), var2(n, m)
 
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
@@ -2317,10 +2317,10 @@ contains
 
   !------ 2d_complex ------
   subroutine assert_not_equals_2d_complex_in_range_(var1, var2, n, m, delta, message)
-    integer (kind=c_int), intent (in) :: n, m
-    integer (kind=c_int)              :: i, j
-    complex(kind=kind(1.0D0)), intent (in) :: var1(n, m), var2(n, m)
-    real (kind=c_double), intent (in) :: delta
+    integer (c_int), intent (in) :: n, m
+    integer (c_int)              :: i, j
+    complex(kind(1.0D0)), intent (in) :: var1(n, m), var2(n, m)
+    real (c_double), intent (in) :: delta
     character(len = *), intent (in), optional :: message
     logical :: same_so_far
 

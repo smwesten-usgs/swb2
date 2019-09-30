@@ -6,23 +6,23 @@ module test__gash
   use interception__gash
   implicit none
 
-  integer (kind=c_int)  :: indx
-  real (kind=c_float)   :: PSat
-  real (kind=c_float)   :: rainfall(20) = [ 0., 0.0057, 0., 0., 0., 0., 0., 0.0189, 0.0057 ,0.0214,          &
+  integer (c_int)  :: indx
+  real (c_float)   :: PSat
+  real (c_float)   :: rainfall(20) = [ 0., 0.0057, 0., 0., 0., 0., 0., 0.0189, 0.0057 ,0.0214,          &
                                              0.1121, 0.2172, 0.0082, 0., 0.0007, 0., 0.0007, 0., 0., 0. ]
 
-  real (kind=c_float)   :: expected_interception(20) = [ 0.0, 0.003306, 0.0, 0.0, 0.0, 0.0, 0.0, 0.010962,   &
+  real (c_float)   :: expected_interception(20) = [ 0.0, 0.003306, 0.0, 0.0, 0.0, 0.0, 0.0, 0.010962,   &
                                                          0.003306, 0.01241, 0.0650, 0.1063, 0.004756, 0.0,   &
                                                          0.000406, 0.0, 0.000406, 0.0, 0.0, 0.0]
 
-  real (kind=c_float)   :: fog(20) = 0.0
-  real (kind=c_float), parameter   :: fE_div_P           = 0.5
-  real (kind=c_float), parameter   :: fCanopy_Fraction   = 0.58
-  real (kind=c_float), parameter   :: fCanopy_Storage    = 0.05
-  real (kind=c_float), parameter   :: fTrunk_Storage     = 0.01
-  real (kind=c_float), parameter   :: fStemflow_Fraction = 0.04
+  real (c_float)   :: fog(20) = 0.0
+  real (c_float), parameter   :: fE_div_P           = 0.5
+  real (c_float), parameter   :: fCanopy_Fraction   = 0.58
+  real (c_float), parameter   :: fCanopy_Storage    = 0.05
+  real (c_float), parameter   :: fTrunk_Storage     = 0.01
+  real (c_float), parameter   :: fStemflow_Fraction = 0.04
 
-  real (kind=c_float), parameter   :: maximum_difference = 1.0e-4
+  real (c_float), parameter   :: maximum_difference = 1.0e-4
 
 contains
 
@@ -42,7 +42,7 @@ contains
   subroutine test_gash_calculation
   ! gash: calculate Gash interception for published case
 
-    real (kind=c_float)  :: fInterception_Value
+    real (c_float)  :: fInterception_Value
 
     PSat = precipitation_at_saturation(                                        &
            E_div_P=fE_div_P,                                                   &

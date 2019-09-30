@@ -3,13 +3,13 @@ program test_hwb_rng
   use iso_c_binding
   implicit none
 
-  integer (kind=c_int), parameter :: initial_seed = 1
+  integer (c_int), parameter :: initial_seed = 1
 
-  integer (kind=c_int)  :: num_zones
-  integer (kind=c_int)  :: num_months
-  integer (kind=c_int)  :: num_years
-  integer (kind=c_int)  :: current_seed_value
-  real (kind=c_float)   :: rand_num
+  integer (c_int)  :: num_zones
+  integer (c_int)  :: num_months
+  integer (c_int)  :: num_years
+  integer (c_int)  :: current_seed_value
+  real (c_float)   :: rand_num
 
   current_seed_value = initial_seed - 1
 

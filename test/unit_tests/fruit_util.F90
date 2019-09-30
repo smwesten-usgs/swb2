@@ -56,7 +56,7 @@ contains
   function to_s_int_ (value)
     implicit none
     character(len=500):: to_s_int_
-    integer (kind=c_int), intent(in) :: value
+    integer (c_int), intent(in) :: value
     character(len=500) :: result
     write (result, *) value
     to_s_int_ = adjustl(trim(result))
@@ -92,7 +92,7 @@ contains
   function to_s_double_complex_ (value)
     implicit none
     character(len=500):: to_s_double_complex_
-    complex(kind=kind(1.0D0)), intent(in) :: value
+    complex(kind(1.0D0)), intent(in) :: value
     character(len=500) :: result
     write (result, *) value
     to_s_double_complex_ = adjustl(trim(result))
@@ -124,7 +124,7 @@ contains
   function strip_length_(value, length)
     implicit none
     character(len=*), intent(in) :: value
-    integer (kind=c_int), intent(in) :: length
+    integer (c_int), intent(in) :: length
     character(len= length):: strip_length_
     strip_length_ = trim(adjustl(value))
   end function strip_length_
@@ -141,7 +141,7 @@ contains
 
 
   function equalEpsilon (number1, number2, epsilon ) result (resultValue)
-    real (kind=c_float), intent(in) :: number1, number2, epsilon
+    real (c_float), intent(in) :: number1, number2, epsilon
     logical :: resultValue
 
     resultValue = .false.
@@ -160,8 +160,8 @@ contains
   end function equalEpsilon
 
   function floatEqual (number1, number2 ) result (resultValue)
-    real (kind=c_float), intent(in) :: number1, number2
-    real (kind=c_float) :: epsilon
+    real (c_float), intent(in) :: number1, number2
+    real (c_float) :: epsilon
     logical :: resultValue
 
     resultValue = .false.
@@ -181,7 +181,7 @@ contains
 
   function doublePrecisionEqual (number1, number2 ) result (resultValue)
     double precision , intent (in) :: number1, number2
-    real (kind=c_float) :: epsilon
+    real (c_float) :: epsilon
     logical :: resultValue
 
     resultValue = .false.

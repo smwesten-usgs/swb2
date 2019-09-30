@@ -17,7 +17,7 @@ contains
   subroutine setup_crop_coefficients__FAO56
 
     type (PARAMETERS_T)                   :: PARAMS
-    real (kind=c_float), allocatable      :: fValues(:)
+    real (c_float), allocatable      :: fValues(:)
     type (FSTRING_LIST_T)                 :: slString
 
     if (     (SYSTEM_NAME .containssimilar. "Windows")                           &

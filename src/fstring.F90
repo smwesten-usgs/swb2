@@ -860,7 +860,7 @@ contains
 
     ! [ LOCALS ]
     character (len=:), allocatable :: delimiter_chr_
-    integer (kind=c_int) :: iIndex
+    integer (c_int) :: iIndex
 
     if ( present(delimiter_chr) ) then
       select case (delimiter_chr)

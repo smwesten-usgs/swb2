@@ -691,7 +691,7 @@ contains
            iStart=[ RECNUM , 0_c_size_t, 0_c_size_t],                             &
            iCount=[ 1_c_size_t, ny, nx ],                                         &
            iStride=[1_c_size_t, 1_c_size_t, 1_c_size_t],                 &
-           rValues=real(grid_ptr%dpData, kind=c_float) )
+           rValues=real(grid_ptr%dpData, c_float) )
 
       endif
 
@@ -839,7 +839,7 @@ contains
         ! the output_conversion_factor amounts to the cell area times the
         ! unit length, appropriately converted to cubic meters, or if output
         ! is requested in meters, the conversion factor is just 0.
-        grd_new = real(rTemp, kind=c_double) * this%output_conversion_factor
+        grd_new = real(rTemp, c_double) * this%output_conversion_factor
 
         if (day_count == 1) then
 

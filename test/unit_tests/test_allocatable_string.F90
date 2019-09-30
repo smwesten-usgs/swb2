@@ -24,12 +24,12 @@ contains
   subroutine test_string_list_with_character
 
     ! [ LOCALS ]
-    integer (kind=c_int), parameter       :: MAX_STR_LEN = 8096
+    integer (c_int), parameter       :: MAX_STR_LEN = 8096
     character (len=MAX_STR_LEN)           :: sString
     character (len=MAX_STR_LEN)           :: sSubString
     character (len=MAX_STR_LEN)           :: sSubStringClean
     character (len=MAX_STR_LEN)           :: sBuf
-    integer (kind=c_int)                  :: column_count
+    integer (c_int)                  :: column_count
     type (FSTRING_LIST_T)                  :: stList
 
     sBuf = '"Begin at the beginning," the King said, very gravely, '           &

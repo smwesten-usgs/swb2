@@ -1544,8 +1544,8 @@ subroutine grid_Transform(pGrd, sFromPROJ4, sToPROJ4 )
 
   type ( GENERAL_GRID_T ),pointer :: pGrd
   character (len=*) :: sFromPROJ4, sToPROJ4
-  character (kind=C_CHAR, len=len_trim(sFromPROJ4)) :: csFromPROJ4
-  character (kind=C_CHAR, len=len_trim(sToPROJ4)) :: csToPROJ4
+  character (kind=c_char, len=len_trim(sFromPROJ4)) :: csFromPROJ4
+  character (kind=c_char, len=len_trim(sToPROJ4)) :: csToPROJ4
 
   ! [ LOCALS ]
   integer (c_int) :: iRetVal
