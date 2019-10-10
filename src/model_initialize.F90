@@ -1548,10 +1548,13 @@ contains
 
         ! most of the time, we only care about the first dictionary entry, obtained below
         sOptionText = fix_pathname( myOptions%get(1) )
+        if (allocated(DATA_DIRECTORY_NAME)) then
+          if (len_trim(DATA_DIRECTORY_NAME) > 0)  sOptionText = trim(DATA_DIRECTORY_NAME)//"/"//trim(sOptionText)
+        endif
 
         if ( index(string=sCmdText, substring="LOOKUP_TABLE" ) > 0 ) then
 
-            call PARAMS%add_file( sOptionText )
+            call PARAMS%add_file( fix_pathname( sOptionText ))
             iCount = iCount + 1
 
         else

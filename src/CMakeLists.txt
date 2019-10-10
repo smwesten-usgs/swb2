@@ -182,7 +182,7 @@ set(SRC_PROJ4
 
       )
 
-add_library( proj4_lib STATIC ${SRC_PROJ4} )
+add_library( proj4_lib ${SRC_PROJ4} )
 
 set(SRCS
       actual_et__gridded_values.F90
@@ -257,8 +257,8 @@ set(SRCS
 add_library(combinedLib INTERFACE)
 target_link_libraries(combinedLib INTERFACE ${ZLIB_LIBRARY} ${HDF5_LIBRARY} ${HDF5_HL_LIBRARY} ${NETCDF_LIBRARY})
 
-add_library(swb_lib STATIC ${SRCS})
-target_link_libraries( swb_lib proj4_lib combinedLib )
+add_library(swb_lib ${SRCS})
+target_link_libraries( swb_lib proj4_lib ${EXTERNAL_LIBRARIES})
 
 add_executable(swb2 main.F90 )
 target_link_libraries( swb2 proj4_lib combinedLib swb_lib)

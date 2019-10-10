@@ -27,7 +27,7 @@ export BUILD_TYPE="Release"
 
 # define platform and compiler specific compilation flags
 export CMAKE_Fortran_FLAGS_DEBUG="-O0 -cpp -g -ggdb -traceback -check bounds -extend_source"
-export CMAKE_Fortran_FLAGS_RELEASE="-O2 -cpp -traceback -extend_source"
+export CMAKE_Fortran_FLAGS_RELEASE="-O2 -cpp -traceback -extend_source -xHost -no-cxxlib"
 
 # set important environment variables
 export FC=$GFORTRAN
@@ -37,4 +37,7 @@ cmake "../../.." -G "Unix Makefiles"                         \
 -DCMAKE_BUILD_TYPE="$BUILD_TYPE "                            \
 -DCMAKE_INSTALL_PREFIX:PATH="$INSTALL_PREFIX "               \
 -DCMAKE_Fortran_FLAGS_DEBUG="$CMAKE_Fortran_FLAGS_DEBUG "    \
+-DHDF5_LIB_DIR="$HDF5_LIB_DIR"                               \
+-DNETCDF_C_LIB="$NETCDF_C_LIB"                               \
+-DLIBRARY_PATH="$LIBRARY_PATH"                               \
 -DCMAKE_Fortran_FLAGS_RELEASE="$CMAKE_Fortran_FLAGS_RELEASE"
