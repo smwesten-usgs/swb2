@@ -27,6 +27,7 @@ include(CPack)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 cmake_minimum_required(VERSION 3.1)
+#set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" ".so" ${CMAKE_FIND_LIBRARY_SUFFIXES})
 
 include( cmake/version_control.cmake )
 include( cmake/FindNetCDF.cmake )
@@ -42,7 +43,7 @@ include( cmake/FindZlib.cmake )
   # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /w")
 #endif(MSVC)
 
-link_libraries( ${EXTERNAL_LIBRARIES} )
+#link_libraries( "-static" )
 include_directories( ${INCLUDE_DIRECTORIES} ${CMAKE_BINARY_DIR}/src ${PROJECT_SOURCE_DIR}/src/proj4 )
 
 include( cmake/print_summary.cmake )

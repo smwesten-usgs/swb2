@@ -182,7 +182,7 @@ set(SRC_PROJ4
 
       )
 
-add_library( proj4_lib STATIC ${SRC_PROJ4} )
+add_library( proj4_lib ${SRC_PROJ4} )
 
 set(SRCS
       actual_et__gridded_values.F90
@@ -253,7 +253,7 @@ set(SRCS
       )
 
 
-add_library(swb_lib STATIC ${SRCS})
+add_library(swb_lib ${SRCS})
 target_link_libraries( swb_lib proj4_lib ${EXTERNAL_LIBRARIES})
 
 add_executable(swb2 main.F90 )
