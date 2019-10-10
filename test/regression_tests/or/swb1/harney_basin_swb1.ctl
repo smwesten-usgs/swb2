@@ -45,7 +45,7 @@ LOWER_LIMIT_CFGI 55.
 # CLIMATE DATA
 #########################################################
 
-PRECIPITATION NETCDF ../../../test_data/or/pr_%y.nc
+PRECIPITATION NETCDF ..\..\..\test_data\or\pr_%y.nc
 PRECIPITATION_GRID_PROJECTION_DEFINITION +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
 NETCDF_PRECIP_Z_VAR          precipitation_amount
 NETCDF_PRECIP_X_VAR                           lon
@@ -56,7 +56,7 @@ PRECIPITATION_MISSING_VALUES_CODE                 1000.0
 PRECIPITATION_MISSING_VALUES_OPERATOR                 >=
 PRECIPITATION_MISSING_VALUES_ACTION                 ZERO
 
-TMAX NETCDF ../../../test_data/or/tmmx_%y__subset.nc
+TMAX NETCDF ..\..\..\test_data\or\tmmx_%y__subset.nc
 TMAX_GRID_PROJECTION_DEFINITION +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
 TMAX_NETCDF_Z_VAR               air_temperature
 TMAX_NETCDF_X_VAR                           lon
@@ -68,7 +68,7 @@ TMAX_MISSING_VALUES_CODE      -9999.0
 TMAX_MISSING_VALUES_OPERATOR      <=
 TMAX_MISSING_VALUES_ACTION       mean
 
-TMIN NETCDF ../../../test_data/or/tmmn_%y__subset.nc
+TMIN NETCDF ..\..\..\test_data\or\tmmn_%y__subset.nc
 TMIN_GRID_PROJECTION_DEFINITION +proj=longlat +ellps=WGS84 +datum=WGS84 +no_defs
 TMIN_NETCDF_Z_VAR               air_temperature
 TMIN_NETCDF_X_VAR                           lon
@@ -83,16 +83,16 @@ TMIN_MISSING_VALUES_ACTION       mean
 ###################################################
 # WATER CONTENT, HYDROLOGIC SOIL GROUP, and LANDUSE GRIDS
 ###################################################
-HYDROLOGIC_SOILS_GROUP ARC_GRID ../../../test_data/or/hydrologic_soils_group.asc
+HYDROLOGIC_SOILS_GROUP ARC_GRID ..\..\..\test_data\or\hydrologic_soils_group.asc
 
-LAND_USE ARC_GRID ../../../test_data/or/landuse.asc
+LAND_USE ARC_GRID ..\..\..\test_data\or\landuse.asc
 
-AVAILABLE_WATER_CONTENT ARC_GRID ../../../test_data/or/available_water_capacity.asc
+AVAILABLE_WATER_CONTENT ARC_GRID ..\..\..\test_data\or\available_water_capacity.asc
 
 ###################################################
 # LANDUSE SETTINGS
 ###################################################
-LAND_USE_LOOKUP_TABLE ../../../test_data/tables/Landuse_lookup__Oregon_veg__bucket_interception__SWB1.txt
+LAND_USE_LOOKUP_TABLE ..\..\..\test_data\tables\Landuse_lookup__Oregon_veg__bucket_interception__SWB1.txt
 
 OPEN_WATER_LAND_USE 111
 
@@ -115,6 +115,8 @@ INITIAL_ABSTRACTION_METHOD HAWKINS
 # EVAPOTRANSPIRATION SETTINGS
 ###################################################
 ET HARGREAVES 42.1 44.5
+
+SNOWMELT_CONSTANT 0.4
 
 ###################################################
 # PLOTTING CUSTOMIZATION
@@ -211,6 +213,9 @@ OUTPUT_OPTIONS NET_INFIL     			  NONE     NONE      NONE
 OUTPUT_OPTIONS ROOTING_DEPTH	      NONE     NONE      NONE
 OUTPUT_OPTIONS GDD						      NONE     NONE      NONE
 OUTPUT_OPTIONS BARE_SOIL_EVAP		    NONE     NONE      NONE
+
+
+DUMP_VARIABLES COORDINATES -1814392 2425869
 
 OUTPUT_GRID_SUFFIX asc
 

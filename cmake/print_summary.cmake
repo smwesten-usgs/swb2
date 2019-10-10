@@ -16,7 +16,7 @@ message(" ")
 message("Include directory: ")
 message(" ==> ${INCLUDE_DIRECTORIES}")
 
-message("NetCDF_LIBRARY  : ${NetCDF_LIBRARY}")
+message("NETCDF_LIBRARY  : ${NETCDF_LIBRARY}")
 message("HDF5_LIBRARY    : ${HDF5_LIBRARY}")
 message("HDF5_HL_LIBRARY : ${HDF5_HL_LIBRARY}")
 message("ZLIB_LIBRARY    : ${ZLIB_LIBRARY}")

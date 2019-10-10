@@ -29,10 +29,10 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 cmake_minimum_required(VERSION 3.1)
 
 include( cmake/version_control.cmake )
-include( cmake/FindNetCDF.cmake )
+include( cmake/FindZlib.cmake )
 include( cmake/FindHDF5.cmake )
 include( cmake/FindHDF5_HL.cmake )
-include( cmake/FindZlib.cmake )
+include( cmake/FindNetCDF.cmake )
 
 #if(MSVC)
   # Automatically adds compiler definitions to all subdirectories too.

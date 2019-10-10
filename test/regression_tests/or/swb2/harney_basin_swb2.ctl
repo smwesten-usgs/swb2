@@ -96,10 +96,9 @@ LAND_USE_LOOKUP_TABLE ../../../test_data/tables/Landuse_lookup__Oregon_veg__buck
 %% allowing the model to "spin up" for a year is also acceptable.
 
 INITIAL_PERCENT_SOIL_MOISTURE CONSTANT 100.0
-INITIAL_SNOW_COVER_STORAGE CONSTANT 2.0
+INITIAL_SNOW_COVER_STORAGE CONSTANT .0
 
-# POTATOES
-#DUMP_VARIABLES COORDINATES 561167. 445224.
+DUMP_VARIABLES COORDINATES -1814392 2425869
 
 %% start and end date may be any valid dates in SWB version 2.0
 %% remember to allow for adequate model spin up; running the
