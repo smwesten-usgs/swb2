@@ -44,7 +44,7 @@ include( cmake/FindNetCDF.cmake )
 #endif(MSVC)
 
 #link_libraries( "-static" )
-include_directories( ${INCLUDE_DIRECTORIES} ${CMAKE_BINARY_DIR}/src ${PROJECT_SOURCE_DIR}/src/proj4 )
+include_directories( ${CMAKE_BINARY_DIR}/src ${PROJECT_SOURCE_DIR}/src/proj4 )
 
 include( cmake/print_summary.cmake )
 
