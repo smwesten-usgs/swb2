@@ -10,16 +10,17 @@ rm -f *.txt
 
 module purge
 module load intel/psxe-2018u3 
-module load tools/netcdf-c-4.6.2-intel
-module load tools/hdf5-1.8.15-intel
 module load cmake/3.14.2
-module load zlib/1.2.11-gcc
 
 export GFORTRAN=ifort
 export GCC=icc
 
 # define where 'make copy' will place executables
 export INSTALL_PREFIX=/usr/local/bin
+
+export HDF5_LIB_DIR=build/yeti/ifort/static_libs
+export NETCDF_LIB_DIR=$HDF5_LIB_DIR
+export ZLIB_LIB_DIR=$HDF5_LIB_DIR
 
 # define other variables for use in the CMakeList.txt file
 # options are "Release" or "Debug"
@@ -38,6 +39,6 @@ cmake "../../.." -G "Unix Makefiles"                         \
 -DCMAKE_INSTALL_PREFIX:PATH="$INSTALL_PREFIX "               \
 -DCMAKE_Fortran_FLAGS_DEBUG="$CMAKE_Fortran_FLAGS_DEBUG "    \
 -DHDF5_LIB_DIR="$HDF5_LIB_DIR"                               \
--DNETCDF_C_LIB="$NETCDF_C_LIB"                               \
--DLIBRARY_PATH="$LIBRARY_PATH"                               \
+-DNETCDF_LIB_DIR="$NETCDF_LIB_DIR"                           \
+-DZLIB_LIB_DIR="$ZLIB_LIB_DIR"                               \
 -DCMAKE_Fortran_FLAGS_RELEASE="$CMAKE_Fortran_FLAGS_RELEASE"
