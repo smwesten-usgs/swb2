@@ -252,12 +252,16 @@ set(SRCS
 
       )
 
+#https://stackoverflow.com/questions/14199708/cmake-include-library-dependencies-in-a-static-library
+
+add_library(combinedLib INTERFACE)
+target_link_libraries(combinedLib INTERFACE ${ZLIB_LIBRARY} ${HDF5_LIBRARY} ${HDF5_HL_LIBRARY} ${NETCDF_LIBRARY})
 
 add_library(swb_lib ${SRCS})
-target_link_libraries( swb_lib proj4_lib ${EXTERNAL_LIBRARIES})
+target_link_libraries( swb_lib proj4_lib combinedLib)
 
 add_executable(swb2 main.F90 )
-target_link_libraries( swb2 proj4_lib swb_lib ${EXTERNAL_LIBRARIES} )
+target_link_libraries( swb2 proj4_lib swb_lib)
 
 add_executable(swbstats2 swbstats2.F90 swbstats2_support.F90)
-target_link_libraries( swbstats2 proj4_lib swb_lib ${EXTERNAL_LIBRARIES})
+target_link_libraries( swbstats2 proj4_lib swb_lib )

@@ -30,10 +30,10 @@ cmake_minimum_required(VERSION 3.1)
 #set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" ".so" ${CMAKE_FIND_LIBRARY_SUFFIXES})
 
 include( cmake/version_control.cmake )
-include( cmake/FindNetCDF.cmake )
+include( cmake/FindZlib.cmake )
 include( cmake/FindHDF5.cmake )
 include( cmake/FindHDF5_HL.cmake )
-include( cmake/FindZlib.cmake )
+include( cmake/FindNetCDF.cmake )
 
 #if(MSVC)
   # Automatically adds compiler definitions to all subdirectories too.
@@ -44,7 +44,7 @@ include( cmake/FindZlib.cmake )
 #endif(MSVC)
 
 #link_libraries( "-static" )
-include_directories( ${INCLUDE_DIRECTORIES} ${CMAKE_BINARY_DIR}/src ${PROJECT_SOURCE_DIR}/src/proj4 )
+include_directories( ${CMAKE_BINARY_DIR}/src ${PROJECT_SOURCE_DIR}/src/proj4 )
 
 include( cmake/print_summary.cmake )
 

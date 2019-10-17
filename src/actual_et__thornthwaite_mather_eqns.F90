@@ -51,9 +51,16 @@ elemental subroutine thornthwaite_mather_soil_moisture(soil_moisture, max_soil_m
 
   if( max_soil_moisture > 0.0_c_float ) then
 
-    soil_moisture = 10_c_double**( log10( max_soil_moisture )        &
-                      - ( abs( APWL ) * TM_SLOPE_TERM              &
-                      * max_soil_moisture**TM_EXPONENT_TERM ) )
+    soil_moisture = 10_c_double**( log10( max_soil_moisture )                                        &
+                      - ( abs( APWL ) * TM_SLOPE_TERM * max_soil_moisture**TM_EXPONENT_TERM ) )
+
+
+  ! from SWB 1.0:
+  !   dpValue = 10_c_double**( log10(REAL(rSWC,c_double)) - &
+  !            ( ABS(REAL(rAPWL,c_double)) * rTM_slope_term &
+  !            * real(rSWC, c_double)**rTM_exp_term ) )
+
+
 
   else
 
@@ -82,6 +89,13 @@ end subroutine thornthwaite_mather_soil_moisture
 
       APWL = -( log10( max_soil_moisture ) - log10( soil_moisture ) )            &
                   / ( TM_SLOPE_TERM * max_soil_moisture**TM_EXPONENT_TERM )
+
+
+
+      ! From SWB 1.0 code:
+      !
+      ! dpValue = -( log10(REAL(rSWC,c_double)) - log10(dpSoilStorage)) / &
+      !           ( rTM_slope_term * REAL(rSWC,c_double)**rTM_exp_term )
 
     else
 
