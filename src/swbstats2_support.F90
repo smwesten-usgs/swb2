@@ -59,6 +59,7 @@ module swbstats2_support
     logical (c_bool)                :: annualize_stats        = FALSE
     logical (c_bool)                :: report_as_volume       = FALSE
     logical (c_bool)                :: report_in_meters       = FALSE
+    character (len=:), allocatable  :: output_file_prefix 
     character (len=:), allocatable  :: target_proj4_string
     type (DATETIME_T)               :: data_start_date
     type (DATETIME_T)               :: data_end_date
@@ -1176,10 +1177,17 @@ contains
     type (FILE_COLLECTION_T), intent(inout)     :: output_files(:)
 
     ! [ LOCALS ]
-    integer (c_int)              :: stat_indx
-    integer (c_int)              :: status
+    integer (c_int)                   :: stat_indx
+    integer (c_int)                   :: status
     type (T_NETCDF4_FILE), pointer    :: ncfile_out
     character (len=:), allocatable    :: units_string
+    character (len=:), allocatable    :: filename_prefix
+
+    if (allocated( this%output_file_prefix) ) then
+      filename_prefix = this%output_file_prefix
+    else
+      filename_prefix = ""
+    endif
 
     do stat_indx=STATS_MEAN, STATS_VARIANCE
 
@@ -1204,18 +1212,18 @@ contains
 
         call netcdf_open_and_prepare_as_output(                                     &
               NCFILE=ncfile_out,                                                    &
-              sVariableName=trim(this%netcdf_variable_name_string),              &
+              sVariableName=trim(this%netcdf_variable_name_string),                 &
               sVariableUnits=units_string,                                          &
-              iNX=this%ncfile_in%iNX,                                                    &
-              iNY=this%ncfile_in%iNY,                                                    &
-              fX=this%ncfile_in%rX_Coords,                                               &
-              fY=this%ncfile_in%rY_Coords,                                               &
-              PROJ4_string=trim(this%target_proj4_string),                       &
+              iNX=this%ncfile_in%iNX,                                               &
+              iNY=this%ncfile_in%iNY,                                               &
+              fX=this%ncfile_in%rX_Coords,                                          &
+              fY=this%ncfile_in%rY_Coords,                                          &
+              PROJ4_string=trim(this%target_proj4_string),                          &
               StartDate=SIM_DT%start,                                               &
               EndDate=SIM_DT%end,                                                   &
-!              write_time_bounds=TRUE,                                               &
               executable_name="SWBSTATS2",                                          &
-              filename_modifier=this%filename_modifier_string                    &
+              filename_prefix=filename_prefix,                                      &
+              filename_modifier=this%filename_modifier_string                       &
                                 //"_"//output_files(stat_indx)%stats_description )
 
       endif

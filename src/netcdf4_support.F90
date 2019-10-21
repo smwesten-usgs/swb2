@@ -1003,26 +1003,28 @@ end subroutine netcdf_open_and_prepare_as_output_archive
 
 subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUnits,    &
    iNX, iNY, fX, fY, StartDate, EndDate, PROJ4_string, history_list, executable_name,   &
-   dpLat, dpLon, fValidMin, fValidMax, write_time_bounds, filename_modifier)
+   dpLat, dpLon, fValidMin, fValidMax, write_time_bounds, filename_prefix,              &
+   filename_modifier)
 
-  type (T_NETCDF4_FILE ), pointer, intent(inout)      :: NCFILE
-  character (len=*), intent(in)                       :: sVariableName
-  character (len=*), intent(in)                       :: sVariableUnits
-  integer (c_int), intent(in)                    :: iNX
-  integer (c_int), intent(in)                    :: iNY
-  real (c_double), intent(in)                    :: fX(:)
-  real (c_double), intent(in)                    :: fY(:)
-  type (DATETIME_T), intent(in)                       :: StartDate
-  type (DATETIME_T), intent(in)                       :: EndDate
-  character (len=*), intent(in)                       :: PROJ4_string
+  type (T_NETCDF4_FILE ), pointer, intent(inout)       :: NCFILE
+  character (len=*), intent(in)                        :: sVariableName
+  character (len=*), intent(in)                        :: sVariableUnits
+  integer (c_int), intent(in)                          :: iNY
+  real (c_double), intent(in)                          :: fX(:)
+  integer (c_int), intent(in)                          :: iNX
+  real (c_double), intent(in)                          :: fY(:)
+  type (DATETIME_T), intent(in)                        :: StartDate
+  type (DATETIME_T), intent(in)                        :: EndDate
+  character (len=*), intent(in)                        :: PROJ4_string
   type (FSTRING_LIST_T), intent(in), pointer, optional :: history_list
-  character (len=*), intent(in), optional             :: executable_name
-  real (c_double), intent(in), optional          :: dpLat(:,:)
-  real (c_double), intent(in), optional          :: dpLon(:,:)
-  real (c_float), intent(in), optional           :: fValidMin
-  real (c_float), intent(in), optional           :: fValidMax
-  logical (c_bool), intent(in), optional         :: write_time_bounds
-  character (len=*), intent(in), optional             :: filename_modifier
+  character (len=*), intent(in), optional              :: executable_name
+  real (c_double), intent(in), optional                :: dpLat(:,:)
+  real (c_double), intent(in), optional                :: dpLon(:,:)
+  real (c_float), intent(in), optional                 :: fValidMin
+  real (c_float), intent(in), optional                 :: fValidMax
+  logical (c_bool), intent(in), optional               :: write_time_bounds
+  character (len=*), intent(in), optional              :: filename_prefix
+  character (len=*), intent(in), optional              :: filename_modifier
 
 !   ! [ LOCALS ]
   type (T_NETCDF_VARIABLE), pointer :: pNC_VAR
@@ -1030,14 +1032,15 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   integer (c_int) :: iIndex
   character (len=10)                                :: sOriginText
   character (len=:), allocatable                    :: sFilename
-  type (FSTRING_LIST_T), pointer                     :: history_list_l
-  logical (c_bool)                             :: write_time_bounds_l
+  type (FSTRING_LIST_T), pointer                    :: history_list_l
+  logical (c_bool)                                  :: write_time_bounds_l
   character (len=:), allocatable                    :: executable_name_l
-  real (c_float)                               :: valid_minimum
-  real (c_float)                               :: valid_maximum
-  logical (c_bool)                             :: include_latlon
+  real (c_float)                                    :: valid_minimum
+  real (c_float)                                    :: valid_maximum
+  logical (c_bool)                                  :: include_latlon
   type (DATETIME_T)                                 :: DT
   character (len=:), allocatable                    :: date_time_text
+  character (len=:), allocatable                    :: filename_prefix_l
   character (len=:), allocatable                    :: filename_modifier_l
   call DT%systime()
   date_time_text = DT%prettydatetime()
@@ -1067,6 +1070,12 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
     filename_modifier_l = "_"
   endif
 
+  if ( present( filename_prefix ) ) then
+    filename_prefix_l = trim( filename_prefix )//"_"
+  else
+    filename_prefix_l = ""
+  endif
+
   if ( present( history_list) ) then
     history_list_l => history_list
   else
@@ -1084,10 +1093,23 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
 
   write(sOriginText, fmt="(i4.4,'-',i2.2,'-',i2.2)") StartDate%iYear, StartDate%iMonth, StartDate%iDay
 
-  sFilename = trim(OUTPUT_DIRECTORY_NAME)//trim(OUTPUT_PREFIX_NAME)           &
-    //trim(sVariableName)//"_"//filename_modifier_l                            &
-    //StartDate%prettydate()//"_to_"//EndDate%prettydate()//"__"                 &
+  ! if a filename_prefix argument has been supplied, override the variable specified in
+  ! the 'output' module
+  if (len_trim(filename_prefix_l) > 0 ) then
+
+  sFilename = trim(OUTPUT_DIRECTORY_NAME)//trim(filename_prefix_l)              &
+    //trim(sVariableName)//"_"//filename_modifier_l                             &
+    //StartDate%prettydate()//"_to_"//EndDate%prettydate()//"__"                &
     //trim(asCharacter(iNY))//"_by_"//trim(asCharacter(iNX))//".nc"
+
+  else
+
+    sFilename = trim(OUTPUT_DIRECTORY_NAME)//trim(OUTPUT_PREFIX_NAME)           &
+    //trim(sVariableName)//"_"//filename_modifier_l                             &
+    //StartDate%prettydate()//"_to_"//EndDate%prettydate()//"__"                &
+    //trim(asCharacter(iNY))//"_by_"//trim(asCharacter(iNX))//".nc"
+
+  endif
 
   call LOGS%write("Attempting to open netCDF file for writing with filename "//dquote(sFilename))
 

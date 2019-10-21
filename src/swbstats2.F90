@@ -106,13 +106,15 @@ program swbstats2
       //TRIM(int2char(__G95_MINOR__))
 #endif
 
-    allocate(usage_string(44))
+    allocate(usage_string(46))
 
     usage_string = [                                                           &
      "usage: swbstats2 [options] netcdf_file_name                           ", &
      "                                                                      ", &
      "  options:                                                            ", &
      "                                                                      ", &
+     "  [ --output_prefix= ]                                                ", &
+     "    text to place in front of the default output filename(s)          ", &
      "  [ --annual_statistics ]                                             ", &
      "    calculate statistics for every calendar year between start and end", &
      "  [ --monthly_statistics ]                                            ", &
@@ -131,7 +133,7 @@ program swbstats2
      "      #2,1870-01-01,1898-12-31                                        ", &
      "      5,1920-01-01,1925-12-31                                         ", &
      "      6,1925-01-01,1930-12-31                                         ", &
-     "  [ --comparison_scale_factor=]                                       ", &
+     "  [ --comparison_scale_factor= ]                                      ", &
      "    value to multiply comparison grid by before calculating statistics", &
      "  [ --comparison_grid= ]                                              ", &
      "    name of real-valued grid to compare SWB output against            ", &
@@ -182,6 +184,12 @@ program swbstats2
 
       swbstats%comparison_grid_conversion_factor = asFloat(sub_string)
 
+    elseif ( command_arg_str .containssimilar. "output_prefix" ) then
+
+        sub_string = right(command_arg_str, substring="=")
+  
+        swbstats%output_file_prefix = trim(sub_string)
+  
     elseif ( command_arg_str .containssimilar. "annual_statistics" ) then
 
       swbstats%calculation_time_period = CALC_PERIOD_ANNUAL
@@ -464,7 +472,13 @@ program swbstats2
       endif
 
     endif
-    temp_string = "zonal_stats_"//trim(swbstats%netcdf_variable_name_string)//".csv"
+
+    if ( allocated( swbstats%output_file_prefix) ) then
+      temp_string = trim(swbstats%output_file_prefix)//"__zonal_stats__"//trim(swbstats%netcdf_variable_name_string)//".csv"
+    else
+      temp_string = "zonal_stats__"//trim(swbstats%netcdf_variable_name_string)//".csv"
+    endif
+
     call swbstats%open_zonal_stats_output_file(trim(temp_string))
   endif
 
