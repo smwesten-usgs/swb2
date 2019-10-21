@@ -10,8 +10,8 @@ rm -f *.txt
 
 module purge
 module load gcc/6.1
-module load tools/netcdf-c-4.6.2-gnu
-module load tools/hdf5-1.8.13-gnu
+module load hdf5-serial/1.10.1-gcc6.1.0
+module load netcdf-serial/4.4.1.1-hdf51.10.1-gcc6.1.0
 module load cmake/3.14.2
 module load zlib/1.2.11-gcc
 

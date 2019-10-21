@@ -10,17 +10,18 @@ rm -f *.txt
 
 module purge
 module load intel/psxe-2018u3 
+#module load gcc/6.1
+#module load hdf5-serial/1.10.1-gcc6.1.0
+#module load netcdf-serial/4.4.1.1-hdf51.10.1-gcc6.1.0
+#module load zlib/1.2.11-gcc
 module load cmake/3.14.2
 
 export GFORTRAN=ifort
 export GCC=icc
+export LD_LIBRARY_PATH=/home/smwesten/Source_Code/swb2/build/yeti/ifort/static_libs
 
 # define where 'make copy' will place executables
 export INSTALL_PREFIX=/usr/local/bin
-
-export HDF5_LIB_DIR=build/yeti/ifort/static_libs
-export NETCDF_LIB_DIR=$HDF5_LIB_DIR
-export ZLIB_LIB_DIR=$HDF5_LIB_DIR
 
 # define other variables for use in the CMakeList.txt file
 # options are "Release" or "Debug"
@@ -38,7 +39,5 @@ cmake "../../.." -G "Unix Makefiles"                         \
 -DCMAKE_BUILD_TYPE="$BUILD_TYPE "                            \
 -DCMAKE_INSTALL_PREFIX:PATH="$INSTALL_PREFIX "               \
 -DCMAKE_Fortran_FLAGS_DEBUG="$CMAKE_Fortran_FLAGS_DEBUG "    \
--DHDF5_LIB_DIR="$HDF5_LIB_DIR"                               \
--DNETCDF_LIB_DIR="$NETCDF_LIB_DIR"                           \
--DZLIB_LIB_DIR="$ZLIB_LIB_DIR"                               \
+-DLD_LIBRARY_PATH="$LD_LIBRARY_PATH"                         \
 -DCMAKE_Fortran_FLAGS_RELEASE="$CMAKE_Fortran_FLAGS_RELEASE"
