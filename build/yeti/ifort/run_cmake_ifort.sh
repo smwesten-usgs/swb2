@@ -29,7 +29,7 @@ export BUILD_TYPE="Release"
 
 # define platform and compiler specific compilation flags
 export CMAKE_Fortran_FLAGS_DEBUG="-O0 -cpp -g -ggdb -traceback -check bounds -extend_source"
-export CMAKE_Fortran_FLAGS_RELEASE="-O2 -cpp -traceback -extend_source -xHost -no-cxxlib"
+export CMAKE_Fortran_FLAGS_RELEASE="-O2 -cpp -traceback -extend_source -xHost -no-cxxlib -heap-arrays 128"
 
 # set important environment variables
 export FC=$GFORTRAN
