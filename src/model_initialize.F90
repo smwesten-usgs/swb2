@@ -120,13 +120,13 @@ module model_initialize
 
 contains
 
-  subroutine initialize_all( output_prefix, output_dirname, data_dirname,         &
-                             weather_data_dirname )
+  subroutine initialize_all( output_prefix, output_dirname, data_dirname,          &
+                             lookup_table_dirname, weather_data_dirname )
 
 !    use polygon_summarize, only : initialize_polygon_summarize
 
-    character (len=*), intent(in) :: output_prefix, output_dirname, data_dirname, &
-                                     weather_data_dirname
+    character (len=*), intent(in) :: output_prefix, output_dirname, data_dirname,  &
+                                     lookup_table_dirname, weather_data_dirname
 
     ! [ LOCALS ]
     integer (c_int) :: iIndex
@@ -136,6 +136,7 @@ contains
     ! set output directory names for NetCDF and Surfer/Arc ASCII grid output
     call grid_set_output_directory_name( output_dirname )
     call set_data_directory( data_dirname )
+    call set_lookup_table_directory( lookup_table_dirname )
     call set_weather_data_directory( weather_data_dirname )
     call set_output_directory( output_dirname )
     call MODEL%set_output_directory( output_dirname )
@@ -294,6 +295,17 @@ contains
 
   end subroutine initialize_ancillary_values
 
+ !--------------------------------------------------------------------------------------------------
+
+  subroutine set_lookup_table_directory( lookup_table_dirname )
+
+    character(len=*), intent(in) :: lookup_table_dirname
+
+    ! setting the MODULE variable LOOKUP_TABLE_DIRECTORY_NAME, module = constants_and_conversions
+    if( len_trim(lookup_table_dirname) > 0 )  LOOKUP_TABLE_DIRECTORY_NAME = lookup_table_dirname
+
+  end subroutine set_lookup_table_directory
+
 !--------------------------------------------------------------------------------------------------
 
   subroutine set_data_directory( data_dirname )
@@ -302,22 +314,26 @@ contains
 
     integer (c_int) :: indx
 
-    do indx=1,ubound(KNOWN_GRIDS,1)
+    if ( len_trim(data_dirname) > 0 ) then
 
-      select case (trim(KNOWN_GRIDS(indx)%sName))
+      do indx=1,ubound(KNOWN_GRIDS,1)
 
-        case("PRECIPITATION","TMIN","TMAX")
+        select case (trim(KNOWN_GRIDS(indx)%sName))
 
-        case default
+          case("PRECIPITATION","TMIN","TMAX")
 
-          KNOWN_GRIDS(indx)%sPathname = trim( data_dirname )
+          case default
 
-      end select
+            KNOWN_GRIDS(indx)%sPathname = trim( data_dirname )
 
-    enddo
+        end select
 
-    ! setting the MODULE variable DATA_DIRECTORY_NAME, module = file_operations
-    DATA_DIRECTORY_NAME = data_dirname
+      enddo
+
+      ! setting the MODULE variable DATA_DIRECTORY_NAME, module = file_operations
+      DATA_DIRECTORY_NAME = data_dirname
+
+    endif
 
   end subroutine set_data_directory
 
@@ -1504,17 +1520,17 @@ contains
     type (FSTRING_LIST_T)             :: myDirectives
     type (FSTRING_LIST_T)             :: myOptions
     type (FSTRING_LIST_T)             :: slString
-    integer (c_int)             :: iIndex
-    character (len=:), allocatable   :: sCmdText
-    character (len=:), allocatable   :: sOptionText
-    character (len=:), allocatable   :: sArgText
-    character (len=:), allocatable   :: sText
-    character (len=256)              :: sBuf
-    integer (c_int)             :: iStat
-    type (PARAMETERS_T)              :: PARAMS
-    integer (c_int)             :: iCount
-    type (DICT_ENTRY_T), pointer     :: pDict1
-    type (DICT_ENTRY_T), pointer     :: pDict2
+    integer (c_int)                   :: iIndex
+    character (len=:), allocatable    :: sCmdText
+    character (len=:), allocatable    :: sOptionText
+    character (len=:), allocatable    :: sArgText
+    character (len=:), allocatable    :: sText
+    character (len=256)               :: sBuf
+    integer (c_int)                   :: iStat
+    type (PARAMETERS_T)               :: PARAMS
+    integer (c_int)                   :: iCount
+    type (DICT_ENTRY_T), pointer      :: pDict1
+    type (DICT_ENTRY_T), pointer      :: pDict2
 
     iCount = 0
 
@@ -1548,8 +1564,9 @@ contains
 
         ! most of the time, we only care about the first dictionary entry, obtained below
         sOptionText = fix_pathname( myOptions%get(1) )
-        if (allocated(DATA_DIRECTORY_NAME)) then
-          if (len_trim(DATA_DIRECTORY_NAME) > 0)  sOptionText = trim(DATA_DIRECTORY_NAME)//"/"//trim(sOptionText)
+        if (allocated(LOOKUP_TABLE_DIRECTORY_NAME)) then
+          if (len_trim(LOOKUP_TABLE_DIRECTORY_NAME) > 0)                                 &
+            sOptionText = trim(LOOKUP_TABLE_DIRECTORY_NAME)//"/"//trim(sOptionText)
         endif
 
         if ( index(string=sCmdText, substring="LOOKUP_TABLE" ) > 0 ) then

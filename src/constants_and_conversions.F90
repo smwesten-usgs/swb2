@@ -55,7 +55,7 @@ module constants_and_conversions
 
     ! [ evil global variables ]
   character (len=1)            :: OS_NATIVE_PATH_DELIMITER
-  integer (c_long_long)   :: RANDOM_START = 0
+  integer (c_long_long)        :: RANDOM_START = 0
 
   ! [ select conversion factors ]
   real (c_double), parameter, public :: C_PER_F    = 5.0_c_double / 9.0_c_double
@@ -63,9 +63,12 @@ module constants_and_conversions
   real (c_double), parameter, public :: M_PER_FOOT = 0.3048_c_double
   real (c_double), parameter, public :: MM_PER_IN  = 25.4_c_double
 
+  public :: OUTPUT_PREFIX_NAME, OUTPUT_DIRECTORY_NAME, DATA_DIRECTORY_NAME,     &
+            LOOKUP_TABLE_DIRECTORY_NAME
   character (len=:), allocatable    :: OUTPUT_DIRECTORY_NAME
   character (len=:), allocatable    :: OUTPUT_PREFIX_NAME
   character (len=:), allocatable    :: DATA_DIRECTORY_NAME
+  character (len=:), allocatable    :: LOOKUP_TABLE_DIRECTORY_NAME
 
   type BOUNDS_T
     character (len=:), allocatable  :: sPROJ4_string

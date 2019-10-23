@@ -36,6 +36,7 @@ program main
   character (len=256)            :: sOutputPrefixName
   character (len=256)            :: sOutputDirectoryName
   character (len=256)            :: sDataDirectoryName
+  character (len=256)            :: sLookupTableDirectoryName
   character (len=256)            :: sWeatherDataDirectoryName
   integer (c_int)                :: iNumArgs
   character (len=1024)           :: sCompilerOptions
@@ -56,6 +57,7 @@ program main
   sOutputPrefixName         = ""
   sOutputDirectoryName      = ""
   sDataDirectoryName        = ""
+  sLookupTableDirectoryName = ""
   sWeatherDataDirectoryName = ""
   number_of_simulations = 1
 
@@ -116,7 +118,8 @@ program main
     write(UNIT=*,FMT="(//,a,/,/,5(a,/))")  "Usage: swb2 [ options ] control_file_name ",                   &
              "[ --output_prefix= ]     :: text to use as a prefix for output filenames",                   &
              "[ --output_dir= ]        :: directory to place output in (may be relative or absolute)",     &
-             "[ --data_dir= ]          :: directory to search for input grids or lookup tables",           &
+             "[ --lookup_dir= ]        :: directory to search for lookup tables",                          &
+             "[ --data_dir= ]          :: directory to search for input data grids",                       &
              "[ --weather_data_dir= ]  :: directory to search for weather data grids"
 !               "[ --random_start= ]      :: advance random number generator to this position in the series", &
 !               "[ --number_of_sims= ]    :: number of simulations to run when 'method of fragments' is used"
@@ -162,6 +165,26 @@ program main
       ! qualified filenames later
       if ( .not. sDataDirectoryName(iLen:iLen) .eq. OS_NATIVE_PATH_DELIMITER )  &
         sDataDirectoryName = trim(sDataDirectoryName)//OS_NATIVE_PATH_DELIMITER
+
+    elseif ( sBuf(1:13) .eq. "--lookup_dir=" ) then
+
+      sLookupTableDirectoryName = sBuf(14:)
+      iLen = len_trim( sLookupTableDirectoryName )
+    
+      ! if there is no trailing "/", append one so we can form (more) fully
+      ! qualified filenames later
+      if ( .not. sLookupTableDirectoryName(iLen:iLen) .eq. OS_NATIVE_PATH_DELIMITER )  &
+      sLookupTableDirectoryName = trim(sLookupTableDirectoryName)//OS_NATIVE_PATH_DELIMITER
+
+    elseif ( sBuf(1:19) .eq. "--lookup_table_dir=" ) then
+
+      sLookupTableDirectoryName = sBuf(20:)
+      iLen = len_trim( sLookupTableDirectoryName )
+      
+      ! if there is no trailing "/", append one so we can form (more) fully
+      ! qualified filenames later
+      if ( .not. sLookupTableDirectoryName(iLen:iLen) .eq. OS_NATIVE_PATH_DELIMITER )  &
+      sLookupTableDirectoryName = trim(sLookupTableDirectoryName)//OS_NATIVE_PATH_DELIMITER
 
     elseif ( sBuf(1:19) .eq. "--weather_data_dir=" ) then
 
@@ -216,7 +239,8 @@ program main
   call slControlFiles%clear()
 
   call initialize_all( sOutputPrefixName, sOutputDirectoryName,                &
-                       sDataDirectoryName, sWeatherDataDirectoryName )
+                       sDataDirectoryName, sLookupTableDirectoryName,          &
+                       sWeatherDataDirectoryName )
 
   call runtimer%stop()
   call runtimer%calc_time_values("split")
