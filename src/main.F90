@@ -210,8 +210,10 @@ program main
 
   call log_provisional_disclaimer()
 
-  call LOGS%write( sMessage='Base data directory name set to:',lEcho=.TRUE._c_bool )
+  call LOGS%write( sMessage='Grid data directory name set to:',lEcho=.TRUE._c_bool )
   call LOGS%write( sMessage='"'//trim( sDataDirectoryName )//'"', iTab=4,lEcho=.TRUE._c_bool )
+  call LOGS%write( sMessage='Lookup table directory name set to:',lEcho=.TRUE._c_bool )
+  call LOGS%write( sMessage='"'//trim( sLookupTableDirectoryName )//'"', iTab=4,lEcho=.TRUE._c_bool )
   call LOGS%write( sMessage='Weather data directory (precip, tmin, tmax grids) name set to: ',lEcho=.TRUE._c_bool )
   call LOGS%write( '"'//trim( sWeatherDataDirectoryName )//'"',iTab=4,lEcho=.TRUE._c_bool )
 
