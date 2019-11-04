@@ -148,7 +148,7 @@ contains
     ! define the start and end date for the simulation
     call initialize_start_and_end_dates()
 
-    ! read in and munge all tables that have been defined in the control file as ***_LOOKUP_TABLE
+    ! specify all tables that have been defined in the control file as ***_LOOKUP_TABLE
     call initialize_lookup_tables()
 
     ! scan input file entries for keywords associated with known gridded datasets
@@ -165,6 +165,11 @@ contains
                                     iDataType=KNOWN_GRIDS(iIndex)%iDataType )
 
     enddo
+
+    ! at this point the list of files that need to be incorporated into the parameter
+    ! database shoule be complete; munge each file in turn and add the parameter values to
+    ! the parameter dictionary
+    call PARAMS%munge_file()
 
     ! scan the control file input for method specifications
     ! (e.g. EVAPOTRANSPIRATION_METHOD HARGREAVES-SAMANI )
@@ -1084,6 +1089,7 @@ contains
           elseif ( sArgText_1 .strapprox. "TABLE" ) then
 
             ! add code to get the table header name and table values
+            call PARAMS%add_file( fix_pathname(trim(sPathname)//sArgText_2))
 
           else
 
@@ -1583,13 +1589,13 @@ contains
 
       enddo
 
-      if ( iCount > 0 ) then
+      ! if ( iCount > 0 ) then
 
-        call PARAMS%munge_file()
-        call PARAMS_DICT%print_all(sDescription="LOOKUP TABLE dictionary",      &
-                                   iLogLevel=LOG_DEBUG, lEcho=FALSE)
+      !   call PARAMS%munge_file()
+      !   call PARAMS_DICT%print_all(sDescription="LOOKUP TABLE dictionary",      &
+      !                              iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
-      endif
+      ! endif
 
     endif
 

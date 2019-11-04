@@ -109,7 +109,7 @@ contains
     class (PARAMETERS_T)    :: this
 
     ! [ LOCALS ]
-    integer (c_int)                :: iFileIndex, iColIndex
+    integer (c_int)                :: iFileIndex, iColIndex, iTempIndex
     integer (c_int)                :: iStat
     type (ASCII_FILE_T)            :: DF
     type (DICT_ENTRY_T), pointer   :: pDict
@@ -117,15 +117,22 @@ contains
     integer (c_int)                :: iNumberOfHeaderLines
     character (len=:), allocatable :: sNumberOfHeaderLines
     character (len=256)            :: tempstr
+    character (len=256)            :: filename1, filename2
     character (len=MAX_TABLE_RECORD_LEN) :: sRecord, sItem
 
     if ( this%count > 0 ) then
 
-      ! iterate over the list of files
-      do iFileIndex = 1, this%filenames%count
+      ! iterate over the *unique*list of files
+      LOOP_OVER_FILES: do iFileIndex = 1, this%filenames%count
+
+        filename1 = this%filenames%get(iFileIndex)
+        do iTempIndex = 1, iFileIndex
+          filename2 = this%filenames%get(iTempIndex)
+          if ( filename1 .eq. filename2 )  cycle LOOP_OVER_FILES
+        enddo
 
        ! open the file associated with current file index value
-        call DF%open(sFilename = this%filenames%get(iFileIndex),             &
+        call DF%open(sFilename = filename1,                                  &
                      sCommentChars = this%comment_chars%get(iFileIndex),     &
                      sDelimiters = this%delimiters%get(iFileIndex) )
 
@@ -209,7 +216,7 @@ contains
 
         call DF%close()
 
-      enddo
+        enddo LOOP_OVER_FILES
     endif
 
   end subroutine munge_files_and_add_to_param_list_sub

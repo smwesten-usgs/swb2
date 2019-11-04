@@ -132,8 +132,8 @@ module data_catalog_entry
     procedure  :: initialize_constant_real_data_object_sub
     procedure  :: initialize_gridded_data_object_sub
     generic    :: initialize => initialize_constant_int_data_object_sub,    &
-                                        initialize_constant_real_data_object_sub,   &
-                                        initialize_gridded_data_object_sub
+                                initialize_constant_real_data_object_sub,   &
+                                initialize_gridded_data_object_sub
 
     procedure  :: initialize_netcdf => initialize_netcdf_data_object_sub
 
@@ -147,7 +147,7 @@ module data_catalog_entry
     procedure  :: set_minimum_allowable_value_int_sub
     procedure  :: set_minimum_allowable_value_real_sub
     generic    :: set_valid_minimum => set_minimum_allowable_value_int_sub,    &
-                                               set_minimum_allowable_value_real_sub
+                                       set_minimum_allowable_value_real_sub
 
     procedure  :: set_maximum_allowable_value_int_sub
     procedure  :: set_maximum_allowable_value_real_sub
@@ -350,6 +350,29 @@ contains
     this%pGrdBase%sFilename = "None: constant value entered from control file."
 
   end subroutine initialize_constant_int_data_object_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine initialize_table_real_data_object_sub( this, sDescription)
+
+    class (DATA_CATALOG_ENTRY_T) :: this
+    character (len=*) :: sDescription
+
+    this%sDescription = trim(sDescription)
+    this%iSourceDataForm = CONSTANT_GRID
+    this%iSourceDataType = DATATYPE_REAL
+    this%iTargetDataType = DATATYPE_REAL
+    this%iSourceFileType = FILETYPE_NONE
+
+    call this%nullify_pointers()
+
+    this%pGrdBase => grid_Create(iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, &
+      rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, rGridCellSize=BNDS%fGridCellSize, iDataType=DATATYPE_REAL)
+
+    this%pGrdBase%sPROJ4_string = BNDS%sPROJ4_string
+    this%pGrdBase%sFilename = "None: daily value found in table of values."
+
+  end subroutine initialize_table_real_data_object_sub
 
 !--------------------------------------------------------------------------------------------------
 
