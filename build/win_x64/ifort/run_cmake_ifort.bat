@@ -26,9 +26,9 @@ set MAKE_EXECUTABLE_NAME=nmake
 set BUILD_TYPE="Release"
 
 :: define platform and compiler specific compilation flags
-set CMAKE_Fortran_FLAGS_DEBUG="/Od /fpp /MTd /debug:full /Z7 /check:bounds,pointers,stack /traceback /free /Qzero /heap-arrays:128"
-set CMAKE_Fortran_FLAGS_PROFILE="/Od /fpp /MTd /debug:full /Z7 /check:bounds,pointers,stack /traceback /free /Qzero /heap-arrays:128"
-set CMAKE_Fortran_FLAGS_RELEASE="/O2 /QxHost /MT /fpp /traceback /heap-arrays:128"
+set CMAKE_Fortran_FLAGS_DEBUG="/Od /fpp /MTd /debug:full /Z7 /check:bounds,pointers,stack /traceback /free /Qzero /heap-arrays:64"
+set CMAKE_Fortran_FLAGS_PROFILE="/Od /fpp /MTd /debug:full /Z7 /check:bounds,pointers,stack /traceback /free /Qzero /heap-arrays:64"
+set CMAKE_Fortran_FLAGS_RELEASE="/O2 /QxHost /MT /fpp /traceback /heap-arrays:64"
 set CMAKE_C_FLAGS_DEBUG="/Od /MTd /debug:full"
 set CMAKE_C_FLAGS_PROFILE="/Od /MTd /debug:full"
 set CMAKE_C_FLAGS_RELEASE="/O2 /QxHost /MT"
