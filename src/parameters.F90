@@ -1,6 +1,7 @@
 module parameters
 
   use iso_c_binding, only    : c_int, c_float, c_double, c_bool
+  use datetime, only         : DATETIME_T
   use exceptions
   use file_operations, only  : ASCII_FILE_T
   use logfiles
@@ -79,34 +80,36 @@ contains
     character (len=*), intent(in), optional       :: sCommentChars
 
     ! [ LOCALS ]
-    character (len=:), allocatable  :: sDelimiters_l
-    character (len=:), allocatable  :: sCommentChars_l
-
-    if (present(sDelimiters) ) then
-      sDelimiters_l = sDelimiters
-    else
-      sDelimiters_l = WHITESPACE
-    endif
+    character (len=:), allocatable  :: sDelimiters_
+    character (len=:), allocatable  :: sCommentChars_
 
     if ( present(sCommentChars) ) then
-      sCommentChars_l = sCommentChars
+      sCommentChars_ = sCommentChars
     else
-      sCommentChars_l = "#!"
+      sCommentChars_ = COMMENT_CHARACTERS
+    endif
+
+    if (present(sDelimiters) ) then
+      sDelimiters_ = sDelimiters
+    else
+      sDelimiters_ = TAB
     endif
 
     this%count = this%count + 1
 
     call this%filenames%append( sFilename )
-    call this%delimiters%append( sDelimiters_l )
-    call this%comment_chars%append( sCommentChars_l )
+    call this%delimiters%append( sDelimiters_ )
+    call this%comment_chars%append( sCommentChars_ )
 
   end subroutine add_filename_to_list_sub
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine munge_files_and_add_to_param_list_sub(this)
+  subroutine munge_files_and_add_to_param_list_sub(this, comment_chars, delimiters)
 
     class (PARAMETERS_T)    :: this
+    character (len=*), intent(in), optional  :: comment_chars
+    character (len=*), intent(in), optional  :: delimiters
 
     ! [ LOCALS ]
     integer (c_int)                :: iFileIndex, iColIndex, iTempIndex
@@ -117,24 +120,41 @@ contains
     integer (c_int)                :: iNumberOfHeaderLines
     character (len=:), allocatable :: sNumberOfHeaderLines
     character (len=256)            :: tempstr
-    character (len=256)            :: filename1, filename2
+    character (len=256)            :: filename1
+    character (len=:), allocatable :: comment_chars_
+    character (len=:), allocatable :: delimiters_
+    type (FSTRING_LIST_T)          :: unique_file_list
     character (len=MAX_TABLE_RECORD_LEN) :: sRecord, sItem
 
-    if ( this%count > 0 ) then
+    if ( present(comment_chars) ) then
+      comment_chars_ = trim(comment_chars)
+    else
+      comment_chars_ = COMMENT_CHARACTERS
+    endif
+
+    if ( present(delimiters) ) then
+      delimiters_ = trim(delimiters)
+    else
+      delimiters_ = TAB
+    endif
+
+    call this%filenames%print()
+
+    unique_file_list = this%filenames%unique()
+
+    call unique_file_list%print()
+
+    if ( unique_file_list%get(1) .ne. '<NA>' ) then
 
       ! iterate over the *unique*list of files
-      LOOP_OVER_FILES: do iFileIndex = 1, this%filenames%count
+      do iFileIndex = 1, unique_file_list%count
 
-        filename1 = this%filenames%get(iFileIndex)
-        do iTempIndex = 1, iFileIndex
-          filename2 = this%filenames%get(iTempIndex)
-          if ( filename1 .eq. filename2 )  cycle LOOP_OVER_FILES
-        enddo
+        filename1 = unique_file_list%get(iFileIndex)
 
-       ! open the file associated with current file index value
+        ! open the file associated with current file index value
         call DF%open(sFilename = filename1,                                  &
-                     sCommentChars = this%comment_chars%get(iFileIndex),     &
-                     sDelimiters = this%delimiters%get(iFileIndex) )
+                     sCommentChars = comment_chars_,                         &
+                     sDelimiters = delimiters_ )
 
         ! obtain the headers from the file
         DF%slColNames = DF%readHeader()
@@ -216,7 +236,7 @@ contains
 
         call DF%close()
 
-        enddo LOOP_OVER_FILES
+        enddo
     endif
 
   end subroutine munge_files_and_add_to_param_list_sub
@@ -374,6 +394,46 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  subroutine get_parameter_values_datetime( this, dtValues, slKeys, sKey, lFatal )
+
+    class (PARAMETERS_T)                                        :: this
+    type (DATETIME_T), intent(in out), allocatable              :: dtValues(:)
+    type (FSTRING_LIST_T), intent(in out),             optional :: slKeys
+    character (len=*),    intent(in ),                 optional :: sKey
+    logical (c_bool), intent(in),                      optional :: lFatal
+
+    ! [ LOCALS ]
+    logical (c_bool)                        :: lFatal_l
+    type (FSTRING_LIST_T)                   :: slValues
+    integer (c_int)                         :: n
+    integer (c_int)                         :: istat
+
+    if ( present (lFatal) ) then
+      lFatal_l = lFatal
+    else
+      lFatal_l = FALSE
+    endif
+
+    if ( present( slKeys) ) then
+
+      call PARAMS_DICT%get_values( slKeys=slKeys, slString=slValues, is_fatal=lFatal_l )
+
+    else if ( present( sKey) ) then
+
+      call PARAMS_DICT%get_values( sKey=sKey, slString=slValues )
+
+    endif
+
+    allocate(dtValues(slValues%count), stat=istat)
+
+    do n=1, slValues%count
+      call dtValues(n)%parseDate(slValues%get(n))
+    enddo  
+
+  end subroutine get_parameter_values_datetime
+
+  !--------------------------------------------------------------------------------------------------
+
   subroutine get_parameter_values_string_list( this, slValues, slKeys, sKey, lFatal )
 
     class (PARAMETERS_T)                               :: this
@@ -397,7 +457,7 @@ contains
         is_fatal=lFatal_l )
 
        if ( slValues%get(1) .strequal. "<NA>" ) then
-         call warn( "Failed to find a lookup table column named "        &
+         call warn( "Failed to find a lookup table column named "             &
            //dQuote( slKeys%list_all() )//".", lFatal = lFatal_l )
        end if
 
@@ -406,7 +466,7 @@ contains
       call PARAMS_DICT%get_values( sKey=sKey, slString=slValues )
 
       if ( slValues%get(1) .strequal. "<NA>" ) then
-        call warn( "Failed to find a lookup table column named "        &
+        call warn( "Failed to find a lookup table column named "              &
           //dQuote( sKey )//".", lFatal = lFatal_l )
       end if
 
@@ -432,7 +492,6 @@ contains
     else
       lFatal_l = FALSE
     endif
-
 
     if ( present( slKeys) ) then
 
@@ -461,10 +520,10 @@ contains
   subroutine get_parameter_values_float( this, fValues, slKeys, sKey, lFatal )
 
     class (PARAMETERS_T)                                       :: this
-    real (c_float),  intent(in out), allocatable          :: fValues(:)
-    type (FSTRING_LIST_T), intent(in out),             optional :: slKeys
+    real (c_float),  intent(in out), allocatable               :: fValues(:)
+    type (FSTRING_LIST_T), intent(in out),            optional :: slKeys
     character (len=*),    intent(in ),                optional :: sKey
-    logical (c_bool), intent(in),                optional :: lFatal
+    logical (c_bool), intent(in),                     optional :: lFatal
 
     ! [ LOCALS ]
     logical (c_bool) :: lFatal_l
@@ -503,10 +562,10 @@ contains
     use fstring
 
     class (PARAMETERS_T)                                       :: this
-    real (c_float),  intent(in out), allocatable          :: fValues(:,:)
+    real (c_float),  intent(in out), allocatable               :: fValues(:,:)
     character (len=*),    intent(in)                           :: sPrefix
-    integer (c_int), intent(in)                           :: iNumRows
-    logical (c_bool), intent(in),                optional :: lFatal
+    integer (c_int), intent(in)                                :: iNumRows
+    logical (c_bool), intent(in),                     optional :: lFatal
 
     ! [ LOCALS ]
     integer (c_int)             :: iIndex

@@ -15,6 +15,7 @@ module data_catalog_entry
   use fstring
   use grid
   use netcdf4_support
+  use parameters
   use iso_c_binding
   implicit none
 

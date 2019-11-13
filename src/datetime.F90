@@ -193,12 +193,12 @@ subroutine set_date_format_indices(this, sDateFormat)
     sDATE_FORMAT = sDEFAULT_DATE_FORMAT
   endif
 
-  iScanMM1 = scan(string=sDateFmt,set="M")
-  iScanMM2 = scan(string=sDateFmt,set="M", back=TRUE )
-  iScanDD1 = scan(string=sDateFmt,set="D")
-  iScanDD2 = scan(string=sDateFmt,set="D", back=TRUE )
-  iScanYYYY1 = scan(string=sDateFmt,set="Y")
-  iScanYYYY2 = scan(string=sDateFmt,set="Y", back=TRUE )
+  iScanMM1 = scan(string=sDateFmt,set="Mm")
+  iScanMM2 = scan(string=sDateFmt,set="Mm", back=TRUE )
+  iScanDD1 = scan(string=sDateFmt,set="Dd")
+  iScanDD2 = scan(string=sDateFmt,set="Dd", back=TRUE )
+  iScanYYYY1 = scan(string=sDateFmt,set="Yy")
+  iScanYYYY2 = scan(string=sDateFmt,set="Yy", back=TRUE )
   iScanDelim1 = scan(string=trim(sDateFmt), set=DELIMITERS)
   iScanDelim2 = scan(string=trim(sDateFmt), set=DELIMITERS, back=TRUE)
 

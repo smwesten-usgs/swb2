@@ -162,14 +162,14 @@ module fstring
   end interface c_to_f_str
 
   ! [ special ASCII characters ]
-  public :: TAB, WHITESPACE, BACKSLASH, FORWARDSLASH, CARRIAGE_RETURN, COMMENT_CHARS, &
+  public :: TAB, WHITESPACE, BACKSLASH, FORWARDSLASH, CARRIAGE_RETURN, COMMENT_CHARACTERS, &
             PUNCTUATION, DOUBLE_QUOTE
   character (len=1), parameter :: TAB = achar(9)
   character (len=2), parameter :: WHITESPACE = " "//achar(9)
   character (len=1), parameter :: BACKSLASH = achar(92)
   character (len=1), parameter :: FORWARDSLASH = achar(47)
   character (len=1), parameter :: CARRIAGE_RETURN = achar(13)
-  character (len=3), parameter :: COMMENT_CHARS = "#!%"
+  character (len=3), parameter :: COMMENT_CHARACTERS = "#!%"
   character (len=1), parameter :: DOUBLE_QUOTE = achar(34)
   character (len=3), parameter :: PUNCTUATION = ",;:"
 

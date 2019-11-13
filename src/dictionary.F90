@@ -16,7 +16,7 @@ module dictionary
     character (len=:), allocatable            :: key
     character (len=:), allocatable            :: secondary_key
 
-    type (FSTRING_LIST_T)                      :: sl
+    type (FSTRING_LIST_T)                     :: sl
     type (DICT_ENTRY_T), pointer              :: previous   => null()
     type (DICT_ENTRY_T), pointer              :: next       => null()
 

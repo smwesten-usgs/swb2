@@ -167,9 +167,9 @@ contains
     enddo
 
     ! at this point the list of files that need to be incorporated into the parameter
-    ! database shoule be complete; munge each file in turn and add the parameter values to
+    ! database should be complete; munge each file in turn and add the parameter values to
     ! the parameter dictionary
-    call PARAMS%munge_file()
+    !call PARAMS%munge_file()
 
     ! scan the control file input for method specifications
     ! (e.g. EVAPOTRANSPIRATION_METHOD HARGREAVES-SAMANI )
@@ -967,14 +967,14 @@ contains
     ! [ LOCALS ]
     type (FSTRING_LIST_T)                 :: myDirectives
     type (FSTRING_LIST_T)                 :: myOptions
-    integer (c_int)                      :: iIndex
-    character (len=512)       :: sCmdText
-    character (len=512)       :: sArgText
-    character (len=512)       :: sArgText_1
-    character (len=512)       :: sArgText_2
-    integer (c_int)                      :: iStat
-    type (DATA_CATALOG_ENTRY_T), pointer :: pENTRY
-    logical (c_bool)                     :: lGridPresent
+    integer (c_int)                       :: iIndex
+    character (len=512)                   :: sCmdText
+    character (len=512)                   :: sArgText
+    character (len=512)                   :: sArgText_1
+    character (len=512)                   :: sArgText_2
+    integer (c_int)                       :: iStat
+    type (DATA_CATALOG_ENTRY_T), pointer  :: pENTRY
+    logical (c_bool)                      :: lGridPresent
 
     pENTRY => null()
     lGridPresent = FALSE
@@ -1533,7 +1533,7 @@ contains
     character (len=:), allocatable    :: sText
     character (len=256)               :: sBuf
     integer (c_int)                   :: iStat
-    type (PARAMETERS_T)               :: PARAMS
+    type (PARAMETERS_T)               :: PARAMS_LU_TABLE
     integer (c_int)                   :: iCount
     type (DICT_ENTRY_T), pointer      :: pDict1
     type (DICT_ENTRY_T), pointer      :: pDict2
@@ -1577,7 +1577,7 @@ contains
 
         if ( index(string=sCmdText, substring="LOOKUP_TABLE" ) > 0 ) then
 
-            call PARAMS%add_file( fix_pathname( sOptionText ))
+            call PARAMS_LU_TABLE%add_file( fix_pathname( sOptionText ))
             iCount = iCount + 1
 
         else
@@ -1589,13 +1589,13 @@ contains
 
       enddo
 
-      ! if ( iCount > 0 ) then
+      if ( iCount > 0 ) then
 
-      !   call PARAMS%munge_file()
-      !   call PARAMS_DICT%print_all(sDescription="LOOKUP TABLE dictionary",      &
-      !                              iLogLevel=LOG_DEBUG, lEcho=FALSE)
+        call PARAMS_LU_TABLE%munge_file(delimiters=TAB)
+        call PARAMS_DICT%print_all(sDescription="LOOKUP TABLE dictionary",      &
+                                   iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
-      ! endif
+      endif
 
     endif
 
