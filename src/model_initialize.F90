@@ -1651,7 +1651,7 @@ contains
         sArgText = myOptions%get(1, myOptions%count )
 
         ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write("> "//sCmdText//" "//sArgText, iLinesBefore=1 )
+        call LOGS%write("> "//sCmdText//" "//sArgText, iLinesBefore=1, iLogLevel=LOG_ALL, lEcho=FALSE )
 
         ! most of the time, we only care about the first dictionary entry, obtained below
 !        sOptionText = myOptions%get(1)

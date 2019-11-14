@@ -252,16 +252,17 @@ module model_domain
   end interface minmaxmean
 
   type :: CELL_COL_ROW_T
-    integer (c_int) :: unitnum
-    integer (c_int) :: col
-    integer (c_int) :: row
-    real (c_float)  :: x_coord
-    real (c_float)  :: y_coord
-    integer (c_int) :: indx_start
-    integer (c_int) :: indx_end
+    integer (c_int) :: unitnum     = 0
+    integer (c_int) :: col         = 0
+    integer (c_int) :: row         = 0
+    real (c_float)  :: x_coord     = 0
+    real (c_float)  :: y_coord     = 0
+    integer (c_int) :: indx_start  = 0
+    integer (c_int) :: indx_end    = 0
   end type CELL_COL_ROW_T
 
-  type ( CELL_COL_ROW_T ) :: DUMP(20)
+  type ( CELL_COL_ROW_T ), allocatable :: DUMP(:)
+  type ( CELL_COL_ROW_T ), allocatable :: TEMP_DUMP(:)
 
   ! creating several module-level globals
   type (MODEL_DOMAIN_T), public             :: MODEL
@@ -1049,14 +1050,16 @@ contains
     type (FSTRING_LIST_T)                    :: argv_list
 
     ! [ LOCALS ]
-    integer (c_int)              :: indx
-    integer (c_int)              :: iostat
-    integer (c_int)              :: unitnum
+    integer (c_int)                   :: indx
+    integer (c_int)                   :: iostat
+    integer (c_int)                   :: unitnum
     character (len=256)               :: filename
     character (len=:), allocatable    :: Method_Name
-    integer (c_int)              :: col, row
-    integer (c_int)              :: indx_start, indx_end
-    real (c_double)              :: xcoord, ycoord
+    integer (c_int)                   :: col, row
+    integer (c_int)                   :: indx_start, indx_end
+    real (c_double)                   :: xcoord, ycoord
+    logical (c_bool)                  :: positive_row_col
+    logical (c_bool)                  :: positive_indices
 
     Method_Name = argv_list%get(1)
 
@@ -1466,7 +1469,14 @@ contains
         row = 0; col = 0; indx_start = 0; indx_end = 0
         xcoord=99999.; ycoord=99999.
 
-        this%dump_variables => model_dump_variables_by_cell
+        if ( allocated(DUMP) ) then
+          allocate(TEMP_DUMP(size(DUMP,1)+1) )
+          TEMP_DUMP(:size(DUMP,1)) = DUMP
+          call move_alloc(TEMP_DUMP,DUMP)
+        else
+          allocate(DUMP(1))
+          this%dump_variables => model_dump_variables_by_cell
+        endif
 
         if ( ( Method_Name .containssimilar. "INDEX_RANGE") .and. ( argv_list%count == 3 ) ) then
 
@@ -1480,7 +1490,7 @@ contains
           row = grid_GetGridRowNum( this%pGrdOut, ycoord )
           col = grid_GetGridColNum( this%pGrdOut, xcoord )
 
-        elseif ( argv_list%count == 2 ) then
+        elseif ( argv_list%count == 2 ) then        ! raw grid cell input
 
           col = asInt( argv_list%get(1) )
           row = asInt( argv_list%get(2) )
@@ -1495,11 +1505,18 @@ contains
 
         endif
 
-        if ( ( ( col > 0 ) .and. ( row > 0 ) )                                                  &
-            .or. ( ( indx_start > 0 ) .and. ( indx_end > 0 ) ) ) then
+        positive_row_col = ( col > 0 ) .and. ( row > 0 )
+        positive_indices = ( indx_start > 0 ) .and. ( indx_end > 0 )
+
+        ! print *, "########   col=",col,"   row=",row, "   size(DUMP)=", size(DUMP,1),              &
+        !   "    positive_row_col=",positive_row_col, "    positive_indices=",positive_indices
+
+        if ( positive_row_col .or. positive_indices ) then
 
           do indx=1, ubound( DUMP, 1)
-            if (DUMP( indx )%col /= 0 .or. DUMP( indx )%indx_start /= 0 )  cycle
+            if (DUMP( indx )%col > 0 .or. DUMP( indx )%indx_start > 0 )  cycle
+
+            ! print *, "@@@@@@@@@@ indx=",indx,"   col=",col,"   row=",row
 
             DUMP( indx )%col = col
             DUMP( indx )%row = row
@@ -1508,14 +1525,14 @@ contains
             DUMP( indx )%x_coord = xcoord
             DUMP( indx )%y_coord = ycoord
 
-            if ( ( col > 0 ) .and. ( row > 0 ) ) then
+            if ( positive_row_col ) then
               call LOGS%WRITE( "==> SWB will dump variables for cell ("//asCharacter(col)//","     &
                 //asCharacter(row)//").", iLogLevel = LOG_ALL, lEcho = FALSE )
                 filename = "SWB2_variable_values__col_"//asCharacter( col )//"__row_"              &
                            //asCharacter( row )//"__x_"//asCharacter(asInt(xcoord))                &
                            //"__y_"//asCharacter(asInt(ycoord))//".csv"
 
-            else
+            elseif( positive_indices ) then
               call LOGS%WRITE( "==> SWB will dump variables for cell indices ranging from "        &
                 //asCharacter(indx_start)//" to "//asCharacter(indx_end)//").",                    &
                 iLogLevel = LOG_ALL, lEcho = FALSE )
@@ -1549,6 +1566,11 @@ contains
             exit
 
           enddo
+
+        else
+
+          call warn("You are attempting to dump variables using invalid coordinates or index values.", &
+          lFatal = FALSE, iLogLevel = LOG_ALL, lEcho = TRUE )
 
         endif
 

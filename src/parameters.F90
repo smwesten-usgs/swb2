@@ -138,11 +138,7 @@ contains
       delimiters_ = TAB
     endif
 
-    call this%filenames%print()
-
     unique_file_list = this%filenames%unique()
-
-    call unique_file_list%print()
 
     if ( unique_file_list%get(1) .ne. '<NA>' ) then
 
