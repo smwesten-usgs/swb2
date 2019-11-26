@@ -21,6 +21,12 @@ set CMAKE_C_COMPILER=icl
 set VERBOSE=0
 set MAKE_EXECUTABLE_NAME=nmake
 
+:: clunky, clunky, clunky: last-ditch effort to get CMake to find the netCDF libraries
+set LIBRARY_PATH="C:\Program Files\netCDF 4.6.3\lib"
+
+echo "LIBRARY_PATH:"
+echo %LIBRARY_PATH%
+
 :: define other variables for use in the CMakeList.txt file
 :: options are "Release", "Profile" or "Debug"
 set BUILD_TYPE="Release"
@@ -40,6 +46,7 @@ for %%i in (%CMAKE_OUTPUT%) do (
 
 echo "Running CMake for target %%i"
 cmake ..\..\.. -G %%i ^
+-DLD_LIBRARY_PATH=%LIBRARY_PATH%                              ^
 -DCMAKE_Fortran_COMPILER=%Fortran_COMPILER_NAME%              ^
 -DCMAKE_C_COMPILER=%CMAKE_C_COMPILER%                         ^
 -DCMAKE_BUILD_TYPE=%BUILD_TYPE%                               ^

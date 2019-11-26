@@ -1050,16 +1050,17 @@ contains
     type (FSTRING_LIST_T)                    :: argv_list
 
     ! [ LOCALS ]
-    integer (c_int)                   :: indx
-    integer (c_int)                   :: iostat
-    integer (c_int)                   :: unitnum
+    integer (c_int)              :: indx
+    integer (c_int)              :: iostat
+    integer (c_int)              :: unitnum
     character (len=256)               :: filename
     character (len=:), allocatable    :: Method_Name
-    integer (c_int)                   :: col, row
-    integer (c_int)                   :: indx_start, indx_end
-    real (c_double)                   :: xcoord, ycoord
-    logical (c_bool)                  :: positive_row_col
-    logical (c_bool)                  :: positive_indices
+    integer (c_int)              :: col, row
+    integer (c_int)              :: indx_start, indx_end
+    real (c_double)              :: xcoord, ycoord
+    logical (c_bool)             :: row_col_num_are_valid
+    logical (c_bool)             :: coordinates_are_valid
+    logical (c_bool)             :: indices_are_valid
 
     Method_Name = argv_list%get(1)
 
@@ -1469,15 +1470,6 @@ contains
         row = 0; col = 0; indx_start = 0; indx_end = 0
         xcoord=99999.; ycoord=99999.
 
-        if ( allocated(DUMP) ) then
-          allocate(TEMP_DUMP(size(DUMP,1)+1) )
-          TEMP_DUMP(:size(DUMP,1)) = DUMP
-          call move_alloc(TEMP_DUMP,DUMP)
-        else
-          allocate(DUMP(1))
-          this%dump_variables => model_dump_variables_by_cell
-        endif
-
         if ( ( Method_Name .containssimilar. "INDEX_RANGE") .and. ( argv_list%count == 3 ) ) then
 
           indx_start = asInt( argv_list%get(2) )
@@ -1490,7 +1482,7 @@ contains
           row = grid_GetGridRowNum( this%pGrdOut, ycoord )
           col = grid_GetGridColNum( this%pGrdOut, xcoord )
 
-        elseif ( argv_list%count == 2 ) then        ! raw grid cell input
+        elseif ( argv_list%count == 2 ) then
 
           col = asInt( argv_list%get(1) )
           row = asInt( argv_list%get(2) )
@@ -1505,18 +1497,26 @@ contains
 
         endif
 
-        positive_row_col = ( col > 0 ) .and. ( row > 0 )
-        positive_indices = ( indx_start > 0 ) .and. ( indx_end > 0 )
+        row_col_num_are_valid = grid_RowColFallsInsideGrid( this%pGrdOut, row, col )
+        coordinates_are_valid = grid_CoordinatesFallInsideGrid( this%pGrdOut, xcoord, ycoord )
+        indices_are_valid = (      (indx_start >= lbound(this%col_num_1D, 1) )               &
+                             .and. (indx_start <= ubound(this%col_num_1D, 1) )               &
+                             .and. (indx_end >= lbound(this%col_num_1D, 1) )                 &
+                             .and. (indx_end <= ubound(this%col_num_1D, 1) ) )
 
-        ! print *, "########   col=",col,"   row=",row, "   size(DUMP)=", size(DUMP,1),              &
-        !   "    positive_row_col=",positive_row_col, "    positive_indices=",positive_indices
+        if ( row_col_num_are_valid .or. indices_are_valid ) then
 
-        if ( positive_row_col .or. positive_indices ) then
+          if ( allocated(DUMP) ) then
+            allocate(TEMP_DUMP(size(DUMP,1)+1) )
+            TEMP_DUMP(:size(DUMP,1)) = DUMP
+            call move_alloc(TEMP_DUMP,DUMP)
+          else
+            allocate(DUMP(1))
+            this%dump_variables => model_dump_variables_by_cell
+          endif
 
           do indx=1, ubound( DUMP, 1)
-            if (DUMP( indx )%col > 0 .or. DUMP( indx )%indx_start > 0 )  cycle
-
-            ! print *, "@@@@@@@@@@ indx=",indx,"   col=",col,"   row=",row
+            if (DUMP( indx )%col /= 0 .or. DUMP( indx )%indx_start /= 0 )  cycle
 
             DUMP( indx )%col = col
             DUMP( indx )%row = row
@@ -1525,14 +1525,14 @@ contains
             DUMP( indx )%x_coord = xcoord
             DUMP( indx )%y_coord = ycoord
 
-            if ( positive_row_col ) then
+            if ( row_col_num_are_valid ) then
               call LOGS%WRITE( "==> SWB will dump variables for cell ("//asCharacter(col)//","     &
                 //asCharacter(row)//").", iLogLevel = LOG_ALL, lEcho = FALSE )
                 filename = "SWB2_variable_values__col_"//asCharacter( col )//"__row_"              &
                            //asCharacter( row )//"__x_"//asCharacter(asInt(xcoord))                &
                            //"__y_"//asCharacter(asInt(ycoord))//".csv"
 
-            elseif( positive_indices ) then
+            elseif ( indices_are_valid ) then
               call LOGS%WRITE( "==> SWB will dump variables for cell indices ranging from "        &
                 //asCharacter(indx_start)//" to "//asCharacter(indx_end)//").",                    &
                 iLogLevel = LOG_ALL, lEcho = FALSE )
@@ -1566,7 +1566,7 @@ contains
             exit
 
           enddo
-
+        
         else
 
           call warn("You are attempting to dump variables using invalid coordinates or index values.", &
@@ -2807,7 +2807,7 @@ contains
     if (allocated(this%monthly_runoff) )  monthly_runoff = this%monthly_runoff( cell_indx )
     if (allocated(this%monthly_gross_precip) )  monthly_gross_precip = this%monthly_gross_precip( cell_indx )
 
-      write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',8(i6,','),62(g17.9e3,','),g17.9e3)")                                      &
+      write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',8(i6,','),62(g16.9,','),g16.9)")                                      &
         SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                                            &
         this%landuse_code( cell_indx ), this%landuse_index( cell_indx ),                                                    &
         this%soil_group( cell_indx ), this%num_upslope_connections( cell_indx ), this%sum_upslope_cells( cell_indx ),       &

@@ -155,7 +155,8 @@ module grid
      grid_set_nodata_value,                                                                 &
      grid_CreateComplete, grid_CreateSimple, grid_WriteGrid,                                &
      grid_WriteArcGrid, grid_WriteSurferGrid, grid_set_output_directory_name,               &
-     grid_GetGridRowNum, grid_GetGridColNum
+     grid_GetGridRowNum, grid_GetGridColNum,                                                &
+     grid_RowColFallsInsideGrid, grid_CoordinatesFallInsideGrid
 
   interface grid_Create
     module procedure grid_CreateSimple
@@ -692,7 +693,6 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
   character (len=256) :: sArgument                    ! Argument for keyword directives
   character (len=256) :: sNoDataValue                 ! String to hold nodata value
   character (len=8192) :: sBuf
-  character (len=256) :: sTemp
   integer (c_int) :: iStat                       ! For "iostat="
   integer (c_int) :: iNX,iNY                     ! Grid dimensions
   integer (c_int) :: iHdrRecs                    ! Number of records in header
@@ -793,25 +793,13 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
                 endif
 
               case ( DATATYPE_REAL )
-
-                pGrd%rData = 3.141592654
-
                 do iRow=1,pGrd%iNY
-
                   read ( unit=LU_GRID, fmt=*, iostat=iStat ) pGrd%rData(:,iRow)
-
-                  if(iStat /= 0) then
-                    do iCol=1,pGrd%iNX
-                      print *, iCol, ": ",pGrd%rData(iCol,iRow)
-                    enddo
-                  endif
-
                   call assert ( iStat == 0, &
                     "Failed to read real grid data - file: " &
                     //trim(sFileName)//"  row num: "//TRIM( asCharacter(iRow)), &
                    __SRCNAME__,__LINE__ )
-
-                enddo
+                end do
                 if(len_trim(sNoDataValue) > 0) then
                   read(unit=sNoDataValue, fmt=*, iostat=iStat) pGrd%rNoDataValue
                   call assert ( iStat == 0, &
@@ -1969,6 +1957,34 @@ function grid_LookupReal(pGrd,rXval,rYval) result(rValue)
 
 end function grid_LookupReal
 !!***
+
+!----------------------------------------------------------------------
+
+function grid_CoordinatesFallInsideGrid(pGrd, rX, rY)  result(coordinates_fall_inside_grid)
+
+  type ( GENERAL_GRID_T ),pointer :: pGrd
+  real (c_double)                 :: rX
+  real (c_double)                 :: rY
+  logical (c_bool)                :: coordinates_fall_inside_grid
+
+  coordinates_fall_inside_grid = (       ( rX >= pGrd%rX0 ) .and. ( rX <= pGrd%rX1 )  &
+                                   .and. ( rY >= pGrd%rY0 ) .and. ( rY <= pGrd%rY1 ) )
+
+end function grid_CoordinatesFallInsideGrid
+
+!----------------------------------------------------------------------
+
+function grid_RowColFallsInsideGrid(pGrd, iRow, iCol)  result(row_col_falls_inside_grid)
+
+  type ( GENERAL_GRID_T ),pointer :: pGrd
+  integer (c_int)                 :: iRow
+  integer (c_int)                 :: iCol
+  logical (c_bool)                :: row_col_falls_inside_grid
+
+  row_col_falls_inside_grid = (       ( iRow >= 1 ) .and. ( iRow <= pGrd%iNY )  &
+                                .and. ( iCol >= 1 ) .and. ( iCol <= pGrd%iNX ) )
+
+end function grid_RowColFallsInsideGrid
 
 !----------------------------------------------------------------------
 
