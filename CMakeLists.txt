@@ -27,13 +27,20 @@ include(CPack)
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 cmake_minimum_required(VERSION 3.1)
-#set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" ".so" ${CMAKE_FIND_LIBRARY_SUFFIXES})
+
+if(CMAKE_HOST_APPLE)
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" ${CMAKE_FIND_LIBRARY_SUFFIXES})
+else(CMAKE_HOST_APPLE)
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" ".so" ${CMAKE_FIND_LIBRARY_SUFFIXES})
+endif(CMAKE_HOST_APPLE)
 
 include( cmake/version_control.cmake )
-include( cmake/FindZlib.cmake )
 include( cmake/FindHDF5.cmake )
 include( cmake/FindHDF5_HL.cmake )
 include( cmake/FindNetCDF.cmake )
+include( cmake/FindZlib.cmake )
+include( cmake/FindCurl.cmake )
+include( cmake/FindSzip.cmake )
 
 #if(MSVC)
   # Automatically adds compiler definitions to all subdirectories too.
