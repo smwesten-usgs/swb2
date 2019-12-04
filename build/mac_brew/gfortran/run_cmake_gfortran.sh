@@ -9,7 +9,7 @@ rm -rf tests
 rm -f CPack*
 rm -f *.txt
 
-export PATH=/usr:/usr/local:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:/usr/bin:/bin:/usr/sbin:/sbin
+export PATH=/usr:/usr/local:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/CMake.app/Contents/bin
 
 # define other variables for use in the CMakeList.txt file
 # options are "Release" or "Debug"
