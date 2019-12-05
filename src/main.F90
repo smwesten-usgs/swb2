@@ -24,7 +24,7 @@ program main
   use version_control, only           : SWB_VERSION, GIT_COMMIT_HASH_STRING,    &
                                         GIT_BRANCH_STRING, COMPILE_DATE,        &
                                         COMPILE_TIME, SYSTEM_NAME
-  use fstring_list, only               : FSTRING_LIST_T
+  use fstring_list, only              : FSTRING_LIST_T
   use timer, only                     : TIMER_T
   use iso_fortran_env
 
@@ -35,6 +35,7 @@ program main
   character (len=256)            :: sBuf
   character (len=256)            :: sOutputPrefixName
   character (len=256)            :: sOutputDirectoryName
+  character (len=256)            :: sLogfileDirectoryName
   character (len=256)            :: sDataDirectoryName
   character (len=256)            :: sLookupTableDirectoryName
   character (len=256)            :: sWeatherDataDirectoryName
@@ -57,6 +58,7 @@ program main
   sOutputPrefixName         = ""
   sOutputDirectoryName      = ""
   sDataDirectoryName        = ""
+  sLogfileDirectoryName     = ""
   sLookupTableDirectoryName = ""
   sWeatherDataDirectoryName = ""
   number_of_simulations = 1
@@ -115,10 +117,11 @@ program main
 
     call write_provisional_disclaimer()
 
-    write(UNIT=*,FMT="(//,a,/,/,5(a,/))")  "Usage: swb2 [ options ] control_file_name ",                   &
+    write(UNIT=*,FMT="(//,a,/,/,6(a,/))")  "Usage: swb2 [ options ] control_file_name ",                   &
              "[ --output_prefix= ]     :: text to use as a prefix for output filenames",                   &
              "[ --output_dir= ]        :: directory to place output in (may be relative or absolute)",     &
              "[ --lookup_dir= ]        :: directory to search for lookup tables",                          &
+             "[ --logfile_dir= ]       :: directory to write logfiles to",                                 &
              "[ --data_dir= ]          :: directory to search for input data grids",                       &
              "[ --weather_data_dir= ]  :: directory to search for weather data grids"
 !               "[ --random_start= ]      :: advance random number generator to this position in the series", &
@@ -140,8 +143,6 @@ program main
       ! qualified filenames later
       if ( .not. sOutputDirectoryName(iLen:iLen) .eq. OS_NATIVE_PATH_DELIMITER )  &
         sOutputDirectoryName = trim(sOutputDirectoryName)//OS_NATIVE_PATH_DELIMITER
-
-      call LOGS%set_output_directory( sOutputDirectoryName )
 
     elseif( sBuf(1:15) .eq."--random_start=" ) then
 
@@ -166,6 +167,15 @@ program main
       if ( .not. sDataDirectoryName(iLen:iLen) .eq. OS_NATIVE_PATH_DELIMITER )  &
         sDataDirectoryName = trim(sDataDirectoryName)//OS_NATIVE_PATH_DELIMITER
 
+    elseif ( sBuf(1:14) .eq. "--logfile_dir=" ) then
+      sLogfileDirectoryName = sBuf(15:)
+      iLen = len_trim( sLogfileDirectoryName )
+    
+      ! if there is no trailing "/", append one so we can form (more) fully
+      ! qualified filenames later
+      if ( .not. sLogfileDirectoryName(iLen:iLen) .eq. OS_NATIVE_PATH_DELIMITER )  &
+      sLogfileDirectoryName = trim(sLogfileDirectoryName)//OS_NATIVE_PATH_DELIMITER
+    
     elseif ( sBuf(1:13) .eq. "--lookup_dir=" ) then
 
       sLookupTableDirectoryName = sBuf(14:)
@@ -206,6 +216,14 @@ program main
   enddo
 
   ! open and initialize logfiles
+
+  ! allow for modification of the location in which logfiles will be written
+  if ( len_trim( sLogfileDirectoryName ) /= 0 ) then
+    call LOGS%set_output_directory( trim( sLogfileDirectoryName ) )
+  elseif ( len_trim( sOutputDirectoryName ) /= 0 ) then
+    call LOGS%set_output_directory( trim( sOutputDirectoryName ) )
+  endif  
+
   call LOGS%initialize( iLogLevel = LOG_DEBUG )
 
   call log_provisional_disclaimer()
@@ -217,6 +235,8 @@ program main
   call LOGS%write( sMessage='Weather data directory (precip, tmin, tmax grids) name set to: ',lEcho=.TRUE._c_bool )
   call LOGS%write( '"'//trim( sWeatherDataDirectoryName )//'"',iTab=4,lEcho=.TRUE._c_bool )
 
+  call LOGS%write( sMessage='Output will be written to: ',lEcho=.TRUE._c_bool )
+  call LOGS%write( '"'//trim( sOutputDirectoryName )//'"',iTab=4,lEcho=.TRUE._c_bool )
   call LOGS%write( sMessage='Output file prefix set to:',lEcho=.TRUE._c_bool )
   call LOGS%write( sMessage='"'//trim( sOutputPrefixName )//'"', iTab=4, lEcho=.TRUE._c_bool )
 

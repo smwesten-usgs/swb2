@@ -173,7 +173,7 @@ module grid
   !> @todo change these global (module) variables to local variables
   integer (c_int) :: LU_TEMP, LU_GRID
 
-  character (len=64) :: OUTPUT_GRID_DIRECTORY_NAME = ""
+  character (len=256) :: OUTPUT_GRID_DIRECTORY_NAME = ""
 
 contains
 
