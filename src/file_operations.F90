@@ -21,6 +21,7 @@ module file_operations
     character (len=:), allocatable  :: sDelimiters
     character (len=:), allocatable  :: sCommentChars
     type (FSTRING_LIST_T)           :: slColNames
+    logical (c_bool), allocatable   :: lSkipThisColumn(:)
     integer (c_int)                 :: iCurrentLinenum = 0
     integer (c_int)                 :: iNumberOfLines = 0
     integer (c_int)                 :: iNumberOfRecords = 0
@@ -333,16 +334,13 @@ contains
     character (len=MAX_STR_LEN)           :: sString
     character (len=MAX_STR_LEN)           :: sSubString
     character (len=MAX_STR_LEN)           :: sSubStringClean
-    integer (c_int)                  :: column_count
+    integer (c_int)                       :: iStat
 
     this%sBuf = this%readline()
-    column_count = 0
-
     call stList%clear()
 
     do while ( len_trim( this%sBuf ) > 0)
 
-      column_count = column_count + 1
       call chomp( this%sBuf, sSubString, this%sDelimiters )
 
       call replace(sSubString, " ", "_")
@@ -352,6 +350,10 @@ contains
       call stList%append( trim( adjustl( sSubStringClean ) ) )
 
     enddo
+
+    allocate( this%lSkipThisColumn( stList%count ), stat=iStat )
+    call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__)
+    this%lSkipThisColumn = FALSE
 
   end function read_header_fn
 

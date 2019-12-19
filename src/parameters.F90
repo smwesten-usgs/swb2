@@ -120,10 +120,12 @@ contains
     integer (c_int)                :: iNumberOfHeaderLines
     character (len=:), allocatable :: sNumberOfHeaderLines
     character (len=256)            :: tempstr
+    character (len=256)            :: tempstr2
     character (len=256)            :: filename1
     character (len=:), allocatable :: comment_chars_
     character (len=:), allocatable :: delimiters_
     type (FSTRING_LIST_T)          :: unique_file_list
+    integer (kind=c_int)           :: row_indx
     character (len=MAX_TABLE_RECORD_LEN) :: sRecord, sItem
 
     if ( present(comment_chars) ) then
@@ -162,27 +164,29 @@ contains
         ! loop over each column header
         do iColIndex = 1, DF%slColNames%count
 
-          ! create and allocate memory for dictionary entry
-
-          pDict => null()
-          allocate( pDict, stat=iStat )
-          call assert(iStat == 0, "Failed to allocate memory for dictionary object", &
-              __SRCNAME__, __LINE__ )
-
-          ! this is first obvious failure point when compiling under Intel
           tempstr = DF%slColNames%get(iColIndex)
 
           if ( PARAMS_DICT%key_already_in_use( tempstr ) ) then
 
-            ! add dictionary entry to dictionary, tack "DUP" on end of name
-            tempstr = trim(adjustl(tempstr))//"_DUP"
-            ! update the string list to reflect duplicate entry
+            DF%lSkipThisColumn( iColIndex ) = TRUE
 
-            call DF%slColNames%replace( iColIndex, tempstr )
-            call pDict%add_key( asUppercase( tempstr ) )
-            call PARAMS_DICT%add_entry( pDict )
+            ! Dec 2019: let try eliminating duplicates from the dictionary altogether
+
+            ! ! add dictionary entry to dictionary, tack "DUP" on end of name
+            ! tempstr = trim(adjustl(tempstr))//"_DUP"
+            ! ! update the string list to reflect duplicate entry
+
+            ! call DF%slColNames%replace( iColIndex, tempstr )
+            ! call pDict%add_key( asUppercase( tempstr ) )
+            ! call PARAMS_DICT%add_entry( pDict )
 
           else
+
+            ! create and allocate memory for dictionary entry
+            pDict => null()
+            allocate( pDict, stat=iStat )
+            call assert(iStat == 0, "Failed to allocate memory for dictionary object", &
+              __SRCNAME__, __LINE__ )
 
             ! first add the key to the dictionary entry,
             ! then add dictionary entry to dictionary
@@ -193,6 +197,8 @@ contains
 
         enddo
 
+        row_indx = 0
+
         ! now read in the remainder of the file
         do while ( .not. DF%isEOF() )
 
@@ -202,15 +208,19 @@ contains
           ! skip blank lines
           if ( len_trim(sRecord) == 0 ) cycle
 
+          row_indx = row_indx + 1
+
           ! loop over each column header
           do iColIndex = 1, DF%slColNames%count
+
+            ! break off next column of data for the current record
+            call chomp(sRecord, sItem, this%delimiters%get(iFileIndex) )
+
+            if ( DF%lSkipThisColumn(iColIndex) )  cycle
 
             ! find pointer associated with header name
             ! (inefficient, but should be OK for small # of columns)
             pCurrentDict => PARAMS_DICT%get_entry( DF%slColNames%get(iColIndex) )
-
-            ! break off next column of data for the current record
-            call chomp(sRecord, sItem, this%delimiters%get(iFileIndex) )
 
             if ( associated( pCurrentDict )) then
 

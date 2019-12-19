@@ -294,8 +294,8 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
   if ( .not. (iStat==0 .and. (iMonth > 0 .and. iMonth <= 12) ) ) then
 
     call Assert(FALSE, &
-      "Error parsing month value - got "//trim(sMonth)//";"// &
-      " date text: "//trim(sStr), __SRCNAME__, __LINE__, sFilename_l, iLinenumber_l )
+      "Error parsing month value. Input: "//squote(sMonth)//";"// &
+      " parsed date text: "//trim(sStr), __SRCNAME__, __LINE__, sFilename_l, iLinenumber_l )
 
   endif
 

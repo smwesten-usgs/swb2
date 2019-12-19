@@ -780,9 +780,11 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
               case ( DATATYPE_INT )
                 do iRow=1,pGrd%iNY
                   read ( unit=LU_GRID, fmt=*, iostat=iStat ) pGrd%iData(:,iRow)
-                  call assert ( iStat == 0, &
-                    "Failed to read integer grid data - file: " &
-                    //trim(sFileName)//"  row num: "//TRIM( asCharacter(iRow)), &
+                  call assert ( iStat == 0,                                       &
+                    "Failed to read integer grid data - file: "                   &
+                    //trim(sFileName)//";  row num: "//TRIM( asCharacter(iRow))   &
+                    //";  line num: "//TRIM( asCharacter(iRow + iHdrRecs))        &
+                    //';  error code: '//as_character(iStat),                     &
                    __SRCNAME__,__LINE__ )
                 end do
                 if(len_trim(sNoDataValue) > 0) then
@@ -793,11 +795,15 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
                 endif
 
               case ( DATATYPE_REAL )
+
                 do iRow=1,pGrd%iNY
                   read ( unit=LU_GRID, fmt=*, iostat=iStat ) pGrd%rData(:,iRow)
-                  call assert ( iStat == 0, &
-                    "Failed to read real grid data - file: " &
-                    //trim(sFileName)//"  row num: "//TRIM( asCharacter(iRow)), &
+                  
+                  call assert ( iStat == 0,                                       &
+                    "Failed to read real grid data - file: "                      &
+                    //trim(sFileName)//";  row num: "//TRIM( asCharacter(iRow))   &
+                    //";  line num: "//TRIM( asCharacter(iRow + iHdrRecs))        &
+                    //';  error code: '//as_character(iStat),                     &
                    __SRCNAME__,__LINE__ )
                 end do
                 if(len_trim(sNoDataValue) > 0) then
@@ -810,9 +816,11 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
               case ( DATATYPE_DOUBLE )
                 do iRow=1,pGrd%iNY
                   read ( unit=LU_GRID, fmt=*, iostat=iStat ) pGrd%dpData(:,iRow)
-                  call assert ( iStat == 0, &
-                    "Failed to read double-precision grid data - file: "        &
-                    //trim(sFileName)//"  row num: "//TRIM( asCharacter(iRow)), &
+                  call assert ( iStat == 0,                                       &
+                    "Failed to read double-precision grid data - file: "          &
+                    //trim(sFileName)//";  row num: "//TRIM( asCharacter(iRow))   &
+                    //";  line num: "//TRIM( asCharacter(iRow + iHdrRecs))        &
+                    //';  error code: '//as_character(iStat),                     &
                    __SRCNAME__,__LINE__ )
                 end do
                 if(len_trim(sNoDataValue) > 0) then

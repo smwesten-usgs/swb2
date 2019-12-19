@@ -13,6 +13,7 @@ module data_catalog_entry
   use file_operations, only      : fully_qualified_filename
   use logfiles
   use fstring
+  use fstring_list
   use grid
   use netcdf4_support
   use parameters
@@ -34,6 +35,7 @@ module data_catalog_entry
   integer (c_int), public, parameter :: DYNAMIC_GRID = 3
   integer (c_int), parameter         :: DYNAMIC_NETCDF_GRID = 4
   integer (c_int), parameter         :: NO_GRID = 5
+  integer (c_int), parameter         :: TABLE_LOOKUP_GRID = 6
 
   integer (c_int), parameter :: FILETYPE_ARC_ASCII = 0
   integer (c_int), parameter :: FILETYPE_SURFER = 1
@@ -45,10 +47,10 @@ module data_catalog_entry
     type (DATA_CATALOG_ENTRY_T), pointer :: previous => null()
     type (DATA_CATALOG_ENTRY_T), pointer :: next     => null()
 
-    integer (c_int)               :: iSourceDataForm = NO_GRID   ! constant, static grid, dynamic grid
-    integer (c_int)               :: iSourceDataType = DATATYPE_NA  ! real, short, integer, etc.
+    integer (c_int)               :: iSourceDataForm = NO_GRID        ! constant, static grid, dynamic grid
+    integer (c_int)               :: iSourceDataType = DATATYPE_NA    ! real, short, integer, etc.
     integer (c_int)               :: iSourceFileType = FILETYPE_NONE  ! Arc ASCII, Surfer, NetCDF
-    integer (c_int)               :: iTargetDataType = DATATYPE_NA  ! Fortran real, integer, etc.
+    integer (c_int)               :: iTargetDataType = DATATYPE_NA    ! Fortran real, integer, etc.
 
     character (len=256)       :: sDescription           = ""
     character (len=256)       :: sSourcePROJ4_string    = ""
@@ -56,10 +58,16 @@ module data_catalog_entry
     character (len=256)       :: sSourceFileType        = ""
     character (len=512)       :: sSourceFilename        = ""
     character (len=512)       :: sFilenameTemplate      = ""
-    integer (c_int)      :: iFilename_Monthname_Capitalization_Rule = FILE_TEMPLATE_CAPITALIZED_MONTHNAME
+    integer (c_int)           :: iFilename_Monthname_Capitalization_Rule = FILE_TEMPLATE_CAPITALIZED_MONTHNAME
     character (len=512)       :: sOldFilename           = ""
     character (len=256)       :: sDateColumnName        = ""
     character (len=256)       :: sValueColumnName       = ""
+
+    real (c_float), allocatable    :: table_values_real(:)
+    type (DATETIME_T), allocatable :: table_dates(:)
+    integer (c_int)                :: table_indx 
+
+    logical (c_bool)          :: lTableValuesHaveBeenRetrieved = FALSE
 
     integer (c_int)      :: iFileCount = -1
     integer (c_int)      :: iFileCountYear = -9999
@@ -69,7 +77,7 @@ module data_catalog_entry
     integer (c_int)      :: iMaxAllowedValue = iBIGVAL      ! no bounds on data
     real (c_float)       :: rMissingValuesCode = -rBIGVAL
     integer (c_int)      :: iMissingValuesCode = -iBIGVAL
-    character (len=2)         :: sMissingValuesOperator = "&&"
+    character (len=2)    :: sMissingValuesOperator = "&&"
     integer (c_int)      :: iMissingValuesAction = 0
 
     real (c_double)      :: rUserScaleFactor = 1_c_double
@@ -127,7 +135,7 @@ module data_catalog_entry
 
   contains
 
-    procedure         :: setkey => set_keyword_sub
+    procedure  :: setkey => set_keyword_sub
 
     procedure  :: initialize_constant_int_data_object_sub
     procedure  :: initialize_constant_real_data_object_sub
@@ -135,6 +143,12 @@ module data_catalog_entry
     generic    :: initialize => initialize_constant_int_data_object_sub,    &
                                 initialize_constant_real_data_object_sub,   &
                                 initialize_gridded_data_object_sub
+
+    procedure  :: initialize_table_real_data_object_sub
+    generic    :: initialize_real_table => initialize_table_real_data_object_sub
+
+    procedure  :: initialize_table_integer_data_object_sub
+    generic    :: initialize_integer_table => initialize_table_integer_data_object_sub
 
     procedure  :: initialize_netcdf => initialize_netcdf_data_object_sub
 
@@ -354,16 +368,20 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine initialize_table_real_data_object_sub( this, sDescription)
+  subroutine initialize_table_real_data_object_sub( this, sDescription, sDateColumnName, sValueColumnName)
 
-    class (DATA_CATALOG_ENTRY_T) :: this
-    character (len=*) :: sDescription
+    class (DATA_CATALOG_ENTRY_T)  :: this
+    character (len=*), intent(in) :: sDescription
+    character (len=*), intent(in) :: sDateColumnName
+    character (len=*), intent(in) :: sValueColumnName
 
-    this%sDescription = trim(sDescription)
-    this%iSourceDataForm = CONSTANT_GRID
-    this%iSourceDataType = DATATYPE_REAL
-    this%iTargetDataType = DATATYPE_REAL
-    this%iSourceFileType = FILETYPE_NONE
+    this%sDescription     = trim(sDescription)
+    this%iSourceDataForm  = TABLE_LOOKUP_GRID
+    this%iSourceDataType  = DATATYPE_REAL
+    this%iTargetDataType  = DATATYPE_REAL
+    this%iSourceFileType  = FILETYPE_NONE
+    this%sDateColumnName  = sDateColumnName
+    this%sValueColumnName = sValueColumnName
 
     call this%nullify_pointers()
 
@@ -376,6 +394,33 @@ contains
   end subroutine initialize_table_real_data_object_sub
 
 !--------------------------------------------------------------------------------------------------
+
+  subroutine initialize_table_integer_data_object_sub( this, sDescription, sDateColumnName, sValueColumnName)
+
+    class (DATA_CATALOG_ENTRY_T)  :: this
+    character (len=*), intent(in) :: sDescription
+    character (len=*), intent(in) :: sDateColumnName
+    character (len=*), intent(in) :: sValueColumnName
+
+    this%sDescription      = trim(sDescription)
+    this%iSourceDataForm   = TABLE_LOOKUP_GRID
+    this%iSourceDataType   = DATATYPE_INT
+    this%iTargetDataType   = DATATYPE_INT
+    this%iSourceFileType   = FILETYPE_NONE
+    this%sDateColumnName   = sDateColumnName
+    this%sValueColumnName  = sValueColumnName
+
+    call this%nullify_pointers()
+
+    this%pGrdBase => grid_Create(iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, &
+      rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, rGridCellSize=BNDS%fGridCellSize, iDataType=DATATYPE_REAL)
+
+    this%pGrdBase%sPROJ4_string = BNDS%sPROJ4_string
+    this%pGrdBase%sFilename = "None: daily value found in table of values."
+
+  end subroutine initialize_table_integer_data_object_sub
+
+ !--------------------------------------------------------------------------------------------------
 
 subroutine initialize_gridded_data_object_sub( this, &
   sDescription, &
@@ -529,6 +574,10 @@ end subroutine initialize_netcdf_data_object_sub
 
       call getvalues_static_netcdf_sub( this )
 
+    elseif( this%iSourceDataForm == TABLE_LOOKUP_GRID ) then
+
+      call getvalues_from_lookup_table( this, dt )
+
     elseif(this%iSourceDataForm == STATIC_GRID ) then
 
       call getvalues_gridded_sub( this )
@@ -630,6 +679,104 @@ subroutine getvalues_constant_sub( this  )
     end select
 
   end subroutine getvalues_constant_sub
+
+
+
+
+
+
+  subroutine getvalues_from_lookup_table( this, dt )
+
+    class (DATA_CATALOG_ENTRY_T)   :: this
+    type (DATETIME_T), intent(in)  :: dt
+
+    integer (c_int) :: indx
+    integer (c_int) :: n
+    integer (c_int) :: status_code
+  
+    ! [ LOCALS ]
+    type (FSTRING_LIST_T) :: slDateValues
+
+    if ( .not. associated(this%pGrdBase) ) &
+      call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
+
+    if ( .not. this%lTableValuesHaveBeenRetrieved ) then
+
+      this%lTableValuesHaveBeenRetrieved = TRUE
+      this%table_indx = 0
+
+      select case (this%iSourceDataType)
+
+      case ( DATATYPE_REAL )
+
+        call PARAMS%get_parameters(sKey="date", slValues=slDateValues)
+
+        n = slDateValues%count
+
+        !@TODO: more tests needed to ensure user can't feed in more than one column with same name, 
+        !!      dates out of order, dates missing, mismatched numbers of dates versus values, etc.
+        allocate(this%table_dates(n), stat=status_code)
+        allocate(this%table_values_real(n), stat=status_code)
+        call PARAMS%get_parameters(sKey=this%sValueColumnName, fValues=this%table_values_real)
+
+        if (     ( size( this%table_values_real,1) /= n)      &
+            .or. ( size( this%table_values_real,1) == 1 ) )   &
+            call die("Did not find values associated with a required table entry ("//squote(this%sValueColumnName)//"). ",   &
+            __SRCNAME__, __LINE__)
+
+        do indx=1, n
+          call this%table_dates(indx)%parseDate(slDateValues%get(indx),__SRCNAME__, __LINE__)
+        enddo 
+
+      case ( DATATYPE_INT)
+
+
+      case default
+
+        call dump_data_structure_sub(this)
+
+        call assert(FALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: " &
+          //"name="//dquote(this%sDescription) &
+          //"; value="//trim(asCharacter(this%iSourceDataType)), &
+          __SRCNAME__, __LINE__)
+
+      end select
+
+    endif
+
+    this%table_indx = this%table_indx + 1
+
+    if ( this%table_dates(this%table_indx) == dt ) then
+
+      select case (this%iSourceDataType)
+    
+        case ( DATATYPE_REAL )
+    
+          this%lGridHasChanged = TRUE
+    
+          this%pGrdBase%rData = this%table_values_real(this%table_indx)
+    
+        case ( DATATYPE_INT)
+    
+        case default
+    
+          call dump_data_structure_sub(this)
+    
+          call assert(FALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: " &
+            //"name="//dquote(this%sDescription) &
+            //"; value="//trim(asCharacter(this%iSourceDataType)), &
+            __SRCNAME__, __LINE__)
+    
+        end select
+
+      else 
+
+        call die("Missing or out-of-order value supplied for "//squote(this%sValueColumnName),   &
+          __SRCNAME__, __LINE__)
+        
+      endif
+
+    end subroutine getvalues_from_lookup_table
 
 !--------------------------------------------------------------------------------------------------
 

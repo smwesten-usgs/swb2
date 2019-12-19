@@ -169,7 +169,9 @@ contains
     ! at this point the list of files that need to be incorporated into the parameter
     ! database should be complete; munge each file in turn and add the parameter values to
     ! the parameter dictionary
-    !call PARAMS%munge_file()
+    
+    ! this should be OK to run again; duplicate entries should now be ignored
+    call PARAMS%munge_file()
 
     ! scan the control file input for method specifications
     ! (e.g. EVAPOTRANSPIRATION_METHOD HARGREAVES-SAMANI )
@@ -1067,6 +1069,36 @@ contains
 
             end select
 
+          elseif (    (sArgText_1 .strapprox. "TABLE")                  &
+                 .or. (sArgText_1 .strapprox. "TABLE_LOOKUP") ) then
+           
+            if (len_trim(sArgText_2) > 0)   &
+            call PARAMS%add_file( fix_pathname(trim(sPathname)//sArgText_2))
+
+            select case ( iDataType )
+
+              case ( DATATYPE_FLOAT )
+
+              call pENTRY%initialize_real_table(            &
+                sDescription=trim(sCmdText),                &
+                sDateColumnName = "date",                   &
+                sValueColumnName = pENTRY%sVariableName_z )
+              lGridPresent = TRUE
+
+            case ( DATATYPE_INT )
+
+              call pENTRY%initialize_integer_table(         &
+                sDescription=trim(sCmdText),                &
+                sDateColumnName = "date",                   &
+                sValueColumnName = pENTRY%sVariableName_z )
+              lGridPresent = TRUE
+
+            case default
+
+              call die( "INTERNAL PROGRAMMING ERROR: Unhandled data type selected.", &
+                __SRCNAME__, __LINE__ )
+              end select
+  
           elseif ( (sArgText_1 .strapprox. "ARC_ASCII")              &
               .or. (sArgText_1 .strapprox. "SURFER")                 &
               .or. (sArgText_1 .strapprox. "ARC_GRID") ) then
@@ -1086,10 +1118,11 @@ contains
               iDataType=iDataType )
             lGridPresent = TRUE
 
-          elseif ( sArgText_1 .strapprox. "TABLE" ) then
+          ! elseif ( sArgText_1 .strapprox. "TABLE" ) then
 
-            ! add code to get the table header name and table values
-            call PARAMS%add_file( fix_pathname(trim(sPathname)//sArgText_2))
+          !   ! add code to get the table header name and table values
+          !   if (len_trim(sArgText_2) > 0)   &
+          !     call PARAMS%add_file( fix_pathname(trim(sPathname)//sArgText_2))
 
           else
 
