@@ -31,7 +31,7 @@ GROWING_SEASON 133 268 TRUE
 %% define location, projection, and conversions for weather data
 ----------------------------------------------------------------
 
-PRECIPITATION NETCDF ../../../test_data/cs/prcp_Daymet_v3_%y.nc
+PRECIPITATION NETCDF prcp_Daymet_v3_%y.nc
 PRECIPITATION_GRID_PROJECTION_DEFINITION +proj=lcc +lat_1=25.0 +lat_2=60.0 +lat_0=42.5 +lon_0=-100.0 +x_0=0.0 +y_0=0.0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs
 PRECIPITATION_NETCDF_Z_VAR                prcp
 PRECIPITATION_SCALE_FACTOR          0.03937008
@@ -39,7 +39,7 @@ PRECIPITATION_MISSING_VALUES_CODE      -9999.0
 PRECIPITATION_MISSING_VALUES_OPERATOR      <=
 PRECIPITATION_MISSING_VALUES_ACTION       zero
 
-TMAX NETCDF ../../../test_data/cs/tmax_Daymet_v3_%y.nc
+TMAX NETCDF tmax_Daymet_v3_%y.nc
 TMAX_GRID_PROJECTION_DEFINITION +proj=lcc +lat_1=25.0 +lat_2=60.0 +lat_0=42.5 +lon_0=-100.0 +x_0=0.0 +y_0=0.0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs
 TMAX_SCALE_FACTOR                 1.8
 TMAX_ADD_OFFSET                  32.0
@@ -47,7 +47,7 @@ TMAX_MISSING_VALUES_CODE      -9999.0
 TMAX_MISSING_VALUES_OPERATOR      <=
 TMAX_MISSING_VALUES_ACTION       mean
 
-TMIN NETCDF ../../../test_data/cs/tmin_Daymet_v3_%y.nc
+TMIN NETCDF tmin_Daymet_v3_%y.nc
 TMIN_GRID_PROJECTION_DEFINITION +proj=lcc +lat_1=25.0 +lat_2=60.0 +lat_0=42.5 +lon_0=-100.0 +x_0=0.0 +y_0=0.0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs
 TMIN_SCALE_FACTOR                 1.8
 TMIN_ADD_OFFSET                  32.0
@@ -62,27 +62,27 @@ LOWER_LIMIT_CFGI 55.
 %% specify location and projection for input GIS grids
 ------------------------------------------------------
 
-FLOW_DIRECTION ARC_GRID ../../../test_data/cs/d8_flow_direction.asc
+FLOW_DIRECTION ARC_GRID d8_flow_direction.asc
 FLOW_DIRECTION_PROJECTION_DEFINITION  +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m
 
-HYDROLOGIC_SOILS_GROUP ARC_GRID ../../../test_data/cs/hydrologic_soils_group.asc
+HYDROLOGIC_SOILS_GROUP ARC_GRID hydrologic_soils_group.asc
 HYDROLOGIC_SOILS_GROUP_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m
 
-LAND_USE ARC_GRID ../../../test_data/cs/landuse.asc
+LAND_USE ARC_GRID landuse.asc
 LANDUSE_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m
 
-AVAILABLE_WATER_CONTENT ARC_GRID ../../../test_data/cs/available_water_capacity.asc
+AVAILABLE_WATER_CONTENT ARC_GRID available_water_capacity.asc
 AVAILABLE_WATER_CONTENT_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m
 
-IRRIGATION_MASK ARC_GRID ../../../test_data/cs/irrigation_mask_from_cdl.asc
+IRRIGATION_MASK ARC_GRID irrigation_mask_from_cdl.asc
 IRRIGATION_MASK_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m
 
 
 %% specify location and names for all lookup tables
 ---------------------------------------------------
 
-LAND_USE_LOOKUP_TABLE ../../../test_data/tables/Landuse_lookup_CDL.txt
-IRRIGATION_LOOKUP_TABLE ../../../test_data/tables/Irrigation_lookup_CDL.txt
+LAND_USE_LOOKUP_TABLE Landuse_lookup_CDL.txt
+IRRIGATION_LOOKUP_TABLE Irrigation_lookup_CDL.txt
 
 %% initial conditions for soil moisture and snow storage amounts
 %% may be specified as grids, but using a constant amount and

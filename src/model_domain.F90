@@ -1528,16 +1528,17 @@ contains
             if ( row_col_num_are_valid ) then
               call LOGS%WRITE( "==> SWB will dump variables for cell ("//asCharacter(col)//","     &
                 //asCharacter(row)//").", iLogLevel = LOG_ALL, lEcho = FALSE )
-                filename = "SWB2_variable_values__col_"//asCharacter( col )//"__row_"              &
+                filename = trim(OUTPUT_DIRECTORY_NAME)//"SWB2_variable_values__col_"               &
+                           //asCharacter( col )//"__row_"                                          &
                            //asCharacter( row )//"__x_"//asCharacter(asInt(xcoord))                &
                            //"__y_"//asCharacter(asInt(ycoord))//".csv"
 
             elseif ( indices_are_valid ) then
-              call LOGS%WRITE( "==> SWB will dump variables for cell indices ranging from "        &
-                //asCharacter(indx_start)//" to "//asCharacter(indx_end)//").",                    &
+              call LOGS%WRITE( "==> SWB will dump variables for cell indices ranging from "              &
+                //asCharacter(indx_start)//" to "//asCharacter(indx_end)//").",                          &
                 iLogLevel = LOG_ALL, lEcho = FALSE )
-                filename = "SWB2_variable_values__start_index_"//asCharacter( indx_start )         &
-                           //"__end_index_"//asCharacter( indx_end )//".csv"
+                filename = trim(OUTPUT_DIRECTORY_NAME)//"SWB2_variable_values__start_index_"             &
+                           //asCharacter( indx_start )//"__end_index_"//asCharacter( indx_end )//".csv"
             endif
 
             open( newunit=unitnum, file=trim(filename), iostat=iostat, action="write", status="replace" )

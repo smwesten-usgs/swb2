@@ -1,0 +1,10 @@
+FROM fedora_build_env 
+RUN  git clone --depth 1 https://github.com/smwesten-usgs/swb2.git && \
+     cd swb2/build/docker/fedora/gfortran                          && \
+     ./run_cmake_gfortran.sh                                       && \
+     make                                                          && \
+     make copy                                                     && \
+     cp ../../../../bin/linux_x64/* /usr/local/bin
+WORKDIR /work_dir
+ENTRYPOINT ["swb2"]
+CMD [""]

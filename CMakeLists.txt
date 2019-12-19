@@ -1,4 +1,7 @@
-# CMake project for swb2
+cmake_minimum_required(VERSION 3.1)
+project( swb2 VERSION 2.0
+              DESCRIPTION "Soil-Water-Balance Code"
+              LANGUAGES C Fortran )
 
 message("Processing top-level CMakelists.txt for project swb2")
 
@@ -6,7 +9,7 @@ set(SWB_MAJOR_VERSION "2")
 set(SWB_MINOR_VERSION "0")
 
 #------------------------------------------------------------------------------------#
-#                           Build directory check                                    #
+#                           Force out-of-source build
 #------------------------------------------------------------------------------------#
 if(${CMAKE_SOURCE_DIR}/src STREQUAL ${CMAKE_BINARY_DIR})
   message(FATAL_ERROR "Cannot be built in the source directory. Use out-of-source build instead.")
@@ -14,26 +17,25 @@ if(${CMAKE_SOURCE_DIR}/src STREQUAL ${CMAKE_BINARY_DIR})
   message(FATAL_ERROR "  cmake -i /path/to/source")
 endif()
 
-#------------------------------------------------------------------------
-# Set basic project settings
-#------------------------------------------------------------------------
-#
-project (swb2 Fortran C)
-enable_language (Fortran C)
 
 SET(CPACK_GENERATOR "TGZ")
 include(CPack)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-cmake_minimum_required(VERSION 3.1)
-#set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" ".so" ${CMAKE_FIND_LIBRARY_SUFFIXES})
+if(CMAKE_HOST_APPLE)
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" ${CMAKE_FIND_LIBRARY_SUFFIXES})
+else(CMAKE_HOST_APPLE)
+  set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" ".so" ${CMAKE_FIND_LIBRARY_SUFFIXES})
+endif(CMAKE_HOST_APPLE)
 
 include( cmake/version_control.cmake )
-include( cmake/FindZlib.cmake )
 include( cmake/FindHDF5.cmake )
 include( cmake/FindHDF5_HL.cmake )
 include( cmake/FindNetCDF.cmake )
+include( cmake/FindZlib.cmake )
+include( cmake/FindCurl.cmake )
+include( cmake/FindSzip.cmake )
 
 #if(MSVC)
   # Automatically adds compiler definitions to all subdirectories too.

@@ -9,7 +9,7 @@ rm -rf tests
 rm -f CPack*
 rm -f *.txt
 
-export PATH=/usr/local:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:$PATH
+export PATH=/usr:/usr/local:/usr/local/bin:/usr/local/lib:/usr/bin/cmake:/usr/bin:/bin:/usr/sbin:/sbin:/Applications/CMake.app/Contents/bin
 
 # define other variables for use in the CMakeList.txt file
 # options are "Release" or "Debug"
@@ -21,9 +21,9 @@ export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -gfull -ggdb -Wuninitialized -fbacktrac
 export CMAKE_Fortran_FLAGS_RELEASE="-O2 -g -march=native -ffree-line-length-512 -fbackslash -ffpe-summary='none' -Wno-maybe-uninitialized"
 
 # set important environment variables
-export FC=gfortran-8
-export CC=gcc-8
-export CXX=g++-8
+export FC=gfortran-9
+export CC=gcc-9
+export CXX=g++-9
 
 cmake "../../.." -G "Unix Makefiles"                         \
 -DCMAKE_BUILD_TYPE="$BUILD_TYPE "                            \

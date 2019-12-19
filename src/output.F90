@@ -24,10 +24,10 @@ module output
   type OUTPUT_SPECS_T
     character (len=27)          :: variable_name
     character (len=21)          :: variable_units
-    real (c_float)         :: valid_minimum
-    real (c_float)         :: valid_maximum
-    logical (c_bool)       :: is_active
-    logical (c_bool)       :: multisim_outputs
+    real (c_float)              :: valid_minimum
+    real (c_float)              :: valid_maximum
+    logical (c_bool)            :: is_active
+    logical (c_bool)            :: multisim_outputs
   end type OUTPUT_SPECS_T
 
   type (OUTPUT_SPECS_T)    :: OUTSPECS(NCDF_NUM_OUTPUTS) = [                                              &
