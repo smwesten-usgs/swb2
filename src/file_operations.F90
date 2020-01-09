@@ -21,7 +21,6 @@ module file_operations
     character (len=:), allocatable  :: sDelimiters
     character (len=:), allocatable  :: sCommentChars
     type (FSTRING_LIST_T)           :: slColNames
-    logical (c_bool), allocatable   :: lSkipThisColumn(:)
     integer (c_int)                 :: iCurrentLinenum = 0
     integer (c_int)                 :: iNumberOfLines = 0
     integer (c_int)                 :: iNumberOfRecords = 0
@@ -254,7 +253,10 @@ contains
 
     class (ASCII_FILE_T) :: this
 
+    integer (c_int)      :: iStat
+
     close(unit=this%iUnitNum, iostat=this%iStat)
+    
     this%lIsOpen = FALSE
 
   end subroutine close_file_sub
@@ -346,14 +348,9 @@ contains
       call replace(sSubString, " ", "_")
       call replace(sSubString, ".", "_")
       sSubStringClean = trim( clean( sSubString, DOUBLE_QUOTE ) )
-
       call stList%append( trim( adjustl( sSubStringClean ) ) )
 
     enddo
-
-    allocate( this%lSkipThisColumn( stList%count ), stat=iStat )
-    call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__)
-    this%lSkipThisColumn = FALSE
 
   end function read_header_fn
 

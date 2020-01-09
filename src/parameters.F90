@@ -124,8 +124,10 @@ contains
     character (len=256)            :: filename1
     character (len=:), allocatable :: comment_chars_
     character (len=:), allocatable :: delimiters_
+    logical (c_bool), allocatable  :: skip_this_column(:)
     type (FSTRING_LIST_T)          :: unique_file_list
     integer (kind=c_int)           :: row_indx
+    integer (c_int)                :: number_of_columns
     character (len=MAX_TABLE_RECORD_LEN) :: sRecord, sItem
 
     if ( present(comment_chars) ) then
@@ -157,9 +159,15 @@ contains
         ! obtain the headers from the file
         DF%slColNames = DF%readHeader()
 
-        call LOGS%write( "Number of columns in file: "//asCharacter( DF%slColNames%count ), iTab=35)
+        number_of_columns = DF%slColNames%count
+
+        call LOGS%write( "Number of columns in file: "//asCharacter( number_of_columns ), iTab=35)
 
         !call DF%slColNames%print()
+
+        if (allocated(skip_this_column))  deallocate(skip_this_column)
+        allocate(skip_this_column(number_of_columns))
+        skip_this_column = FALSE
 
         ! loop over each column header
         do iColIndex = 1, DF%slColNames%count
@@ -168,7 +176,7 @@ contains
 
           if ( PARAMS_DICT%key_already_in_use( tempstr ) ) then
 
-            DF%lSkipThisColumn( iColIndex ) = TRUE
+            skip_this_column( iColIndex ) = TRUE
 
             ! Dec 2019: let try eliminating duplicates from the dictionary altogether
 
@@ -216,7 +224,7 @@ contains
             ! break off next column of data for the current record
             call chomp(sRecord, sItem, this%delimiters%get(iFileIndex) )
 
-            if ( DF%lSkipThisColumn(iColIndex) )  cycle
+            if ( skip_this_column(iColIndex) )  cycle
 
             ! find pointer associated with header name
             ! (inefficient, but should be OK for small # of columns)
@@ -240,9 +248,12 @@ contains
 
         enddo
 
+        deallocate(skip_this_column)
+
         call DF%close()
 
-        enddo
+      enddo
+      
     endif
 
   end subroutine munge_files_and_add_to_param_list_sub

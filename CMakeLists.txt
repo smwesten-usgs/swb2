@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
-project( swb2 VERSION 2.0
-              DESCRIPTION "Soil-Water-Balance Code"
-              LANGUAGES C Fortran )
+project( swb2 
+	 VERSION 2.0
+         LANGUAGES C Fortran )
 
 message("Processing top-level CMakelists.txt for project swb2")
 
