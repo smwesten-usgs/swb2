@@ -1079,6 +1079,7 @@ contains
                                 values,                                        &
                                 zone_ids,                                      &
                                 unique_zone_list,                              &
+                                delimiter,                                     &
                                 funit,                                         &
                                 zone2_ids,                                     &
                                 unique_zone2_list,                             &
@@ -1090,6 +1091,7 @@ contains
     real (c_double), intent(inout)                  :: values(:,:)
     integer (c_int), intent(inout)                  :: zone_ids(:,:)
     type (FSTRING_LIST_T), intent(inout)            :: unique_zone_list
+    character (len=*), intent(in), optional         :: delimiter
     integer (c_int), intent(in), optional           :: funit
     integer (c_int), intent(inout), optional        :: zone2_ids(:,:)
     type (FSTRING_LIST_T), intent(inout), optional  :: unique_zone2_list
@@ -1103,11 +1105,18 @@ contains
     integer (c_int)                :: number_of_matches
     real (c_double), allocatable   :: stats(:)
     integer (c_int)                :: funit_l
+    character (len=:), allocatable :: delimiter_
 
     if (present(funit)) then
       funit_l = funit
     else
       funit_l = OUTPUT_UNIT
+    endif
+
+    if (present(delimiter) ) then
+      delimiter_ = trim(delimiter)
+    else
+      delimiter_ = ","
     endif
 
     if (present(zone2_ids) .and. present(unique_zone2_list)) then
@@ -1120,49 +1129,87 @@ contains
       zone_values = unique_zone_list%get_integer()
       zone2_values = unique_zone2_list%get_integer()
 
-      do i=1,ubound(zone_values,1)
-        do j=1,ubound(zone2_values,1)
-          n = zone_values(i)
-          m = zone2_values(j)
-          if (present(comparison_values)) then
-            call calc_multizonal_stats(values, zone_ids, target_id=n, target2_id=m,   &
-                                  result_vector=stats,                                &
-                                  zone2_ids=zone2_ids,                                &
-                                  comparison_values=comparison_values)
+      if (present(comparison_values)) then
 
-            write(unit=funit_l, fmt="(2(a,', '),2(i0,', '),4(f14.5,', '),i0,', ',"    &
-              //"4(f14.5,', '),i0)")                                                  &
-              start_date%prettydate(),end_date%prettydate(), n, m, stats(1:4),        &
-              int(stats(5)), stats(6:9),int(stats(10))
-          else
-            call calc_multizonal_stats(values, zone_ids, target_id=n, target2_id=m,   &
-                                  result_vector=stats,                                &
-                                  zone2_ids=zone2_ids)
-            write(unit=funit_l, fmt="(2(a,', '),2(i0,', '),4(f14.5,', '),i0)")           &
-              start_date%prettydate(),end_date%prettydate(), n, m, stats(1:4),int(stats(5))
-          endif
+        do i=1,ubound(zone_values,1)
+          do j=1,ubound(zone2_values,1)
+            n = zone_values(i)
+            m = zone2_values(j)
+            call calc_multizonal_stats(values, zone_ids, target_id=n, target2_id=m,    &
+                                  result_vector=stats,                                 &
+                                  zone2_ids=zone2_ids,                                 &
+                                  comparison_values=comparison_values)
+  
+            write(unit=funit_l, fmt="(2(a,a),2(i0,a),4(g16.10,a),i0,a,4(g16.10,a),i0)")   &
+              start_date%prettydate(),delimiter_,                                       &
+              end_date%prettydate(), delimiter_,                                        &
+              n, delimiter_, m, delimiter_,                                             &
+              stats(1), delimiter_, stats(2), delimiter_, stats(3), delimiter_,         &
+              stats(4), delimiter_, int(stats(5)), delimiter_,                          &
+              stats(6), delimiter_, stats(7), delimiter_, stats(8), delimiter_,         &
+              stats(9), delimiter_, int(stats(10))
+
+          enddo
         enddo
-      enddo
+
+      else 
+
+        do i=1,ubound(zone_values,1)
+          do j=1,ubound(zone2_values,1)
+            n = zone_values(i)
+            m = zone2_values(j)
+
+            call calc_multizonal_stats(values, zone_ids, target_id=n, target2_id=m,    &
+              result_vector=stats, zone2_ids=zone2_ids)
+
+            write(unit=funit_l, fmt="(2(a,a),2(i0,a),4(g16.10,a),i0)")                 &
+              start_date%prettydate(), delimiter_,                                    &
+              end_date%prettydate(), delimiter_,                                      &
+              n, delimiter_, m, delimiter_,                                           &
+              stats(1), delimiter_, stats(2), delimiter_, stats(3), delimiter_,       &
+              stats(4), delimiter_, int(stats(5))
+          enddo
+        enddo
+
+      endif  
 
     else
       ! obtain list of unique integers present in the zone grid
       zone_values = unique_zone_list%get_integer()
 
-      do i=1,ubound(zone_values,1)
-        n = zone_values(i)
-        if (present(comparison_values)) then
-          call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats, &
-                comparison_values=comparison_values)
-          write(unit=funit_l, fmt="(2(a,', '),i0,', ',4(f14.5,', '),i0,', ',"  &
-            //"4(f14.5,', '),i0)")                                            &
-            start_date%prettydate(),end_date%prettydate(), n, stats(1:4),     &
-            int(stats(5)), stats(6:9),int(stats(10))
-        else
+      if (present(comparison_values)) then
+
+        do i=1,ubound(zone_values,1)
+          n = zone_values(i)
+   
+          call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats,   &
+            comparison_values=comparison_values)
+          write(unit=funit_l, fmt="(2(a,a),i0,a,4(g16.10,a),i0,a,4(g16.10,a),i0)")      &
+            start_date%prettydate(), delimiter_,                                      &
+            end_date%prettydate(), delimiter_,                                        &
+            n, delimiter_,                                                            &
+            stats(1), delimiter_, stats(2), delimiter_, stats(3), delimiter_,         &
+            stats(4), delimiter_, int(stats(5)), delimiter_,                          &
+            stats(6), delimiter_, stats(7), delimiter_, stats(8), delimiter_,         &
+            stats(9), delimiter_, int(stats(10))
+
+        enddo
+      
+      else
+
+        do i=1,ubound(zone_values,1)
+          n = zone_values(i)
+
           call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats)
-          write(unit=funit_l, fmt="(2(a,', '),i0,', ',4(f14.5,', '),i0)")         &
-            start_date%prettydate(),end_date%prettydate(), n, stats(1:4),int(stats(5))
-        endif
-      enddo
+          write(unit=funit_l, fmt="(2(a,a),i0,a,4(f14.5,a),i0)")                        &
+            start_date%prettydate(), delimiter_,                                        &
+            end_date%prettydate(), delimiter_,                                          &
+            n, delimiter_,                                                              &
+            stats(1), delimiter_, stats(2), delimiter_, stats(3), delimiter_,           &
+            stats(4), delimiter_, int(stats(5))
+        enddo
+
+      endif
 
     endif
 
@@ -1261,36 +1308,58 @@ contains
 
 !------------------------------------------------------------------------------
 
-  subroutine open_zonal_stats_output_file(this, filename)
+  subroutine open_zonal_stats_output_file(this, filename, delimiter)
 
-    class (SWBSTATS_T), intent(inout)   :: this
-    character (len=*)                   :: filename
+    class (SWBSTATS_T), intent(inout)       :: this
+    character (len=*)                       :: filename
+    character (len=*), intent(in), optional :: delimiter 
 
     ! [ LOCALS ]
-    character (len=256)    :: header_str
+    character (len=256)            :: header_str
+    character (len=:), allocatable :: delimiter_
+
+    if (present(delimiter)) then
+      delimiter_ = delimiter
+    else
+      delimiter_ = ","
+    endif  
 
     call this%zonal_stats_output_file%open(filename)
 
     if (len_trim(this%zone_grid2_filename) > 0) then
 
       if (this%multiple_comparison_grids .or. this%compare_to_obs_values) then
-        header_str = "start_date,end_date,zone_id,zone2_id,minimum_swb,"        &
-          //"maximum_swb,mean_swb,sum_swb,count_swb,minimum_obs,maximum_obs,"   &
-          //"mean_obs,sum_obs,count_obs"
+        header_str = "start_date"//delimiter_//"end_date"//delimiter_//"zone_id"   &
+          //delimiter_//"zone2_id"//delimiter_//"minimum_swb"//delimiter_           &
+          //"maximum_swb"//delimiter_//"mean_swb"//delimiter_//"sum_swb"           &
+          //delimiter_//"count_swb"//delimiter_//"minimum_obs"//delimiter_          &
+          //"maximum_obs"//delimiter_//"mean_obs"//delimiter_//"sum_obs"           &
+          //delimiter_//"count_obs"
       else
-        header_str = "start_date,end_date,zone_id,zone2_id,minimum_swb,"        &
-          //"maximum_swb,mean_swb,sum_swb,count_swb"
+        header_str = "start_date"//delimiter_//"end_date"//delimiter_//"zone_id"   &
+        //delimiter_//"zone2_id"//delimiter_//"minimum_swb"//delimiter_             &
+          //"maximum_swb"//delimiter_//"mean_swb"//delimiter_//"sum_swb"           &
+          //delimiter_//"count_swb"
       endif
 
     else
 
       if (this%multiple_comparison_grids .or. this%compare_to_obs_values) then
-        header_str = "start_date,end_date,zone_id,minimum_swb,maximum_swb,"     &
-          //"mean_swb,sum_swb,count_swb,minimum_obs,maximum_obs,"               &
-          //"mean_obs,sum_obs,count_obs"
+
+        header_str = "start_date"//delimiter_//"end_date"//delimiter_//"zone_id"   &
+          //delimiter_//"minimum_swb"//delimiter_                                  &
+          //"maximum_swb"//delimiter_//"mean_swb"//delimiter_//"sum_swb"           &
+          //delimiter_//"count_swb"//delimiter_//"minimum_obs"//delimiter_          &
+          //"maximum_obs"//delimiter_//"mean_obs"//delimiter_//"sum_obs"           &
+          //delimiter_//"count_obs"
+
       else
-        header_str = "start_date,end_date,zone_id,minimum_swb,maximum_swb,"     &
-          //"mean_swb,sum_swb,count_swb"
+
+        header_str = "start_date"//delimiter_//"end_date"//delimiter_//"zone_id"   &
+          //delimiter_//"minimum_swb"//delimiter_                                  &
+          //"maximum_swb"//delimiter_//"mean_swb"//delimiter_//"sum_swb"           &
+          //delimiter_//"count_swb"
+
       endif
 
     endif
