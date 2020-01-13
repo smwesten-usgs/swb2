@@ -34,6 +34,9 @@ module simulation_datetime
     procedure :: advance_curr_to_last_day_of_month_sub
     generic   :: advance_to_last_day_of_month => advance_curr_to_last_day_of_month_sub
 
+    procedure :: set_curr_to_arbitrary_date_sub
+    generic   :: set_current_date => set_curr_to_arbitrary_date_sub
+
     procedure :: percent_complete => percent_complete_fn
 
   end type DATE_RANGE_T
@@ -53,6 +56,25 @@ contains
     this%curr = start_date
 
   end subroutine initialize_datetimes_sub
+
+!------------------------------------------------------------------------------
+
+  subroutine set_curr_to_arbitrary_date_sub(this, new_current_date)
+
+    class (DATE_RANGE_T), intent(inout)   :: this
+    type (DATETIME_T), intent(in)         :: new_current_date
+
+    if (( new_current_date > this%end ) .or. ( new_current_date < this%start ))      &
+      stop ( "Attempted to set current date to one outside of start and end date." )
+
+    this%curr = new_current_date  
+    this%iNumDaysFromOrigin = this%days_from_origin( new_current_date )
+    this%iDaysInMonth = this%curr%dayspermonth()
+    this%iDaysInYear = this%curr%daysperyear()
+    this%lIsLeapYear = this%curr%isLeapYear()
+    this%iDOY = day_of_year( this%curr%getJulianDay() )
+
+  end subroutine set_curr_to_arbitrary_date_sub
 
 !------------------------------------------------------------------------------
 

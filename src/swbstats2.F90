@@ -311,10 +311,8 @@ program swbstats2
 
     elseif ( command_arg_str .contains. "--" ) then
 
-       ! ??? gfortran 5.4 does not support variables within the stop statement???
-       print *, "Unknown swbstats2 option: "//sQuote(command_arg_str)//"."
-      stop
-
+       stop ("Unknown swbstats2 option: "//sQuote(command_arg_str)//".")
+      
     else
 
       ! no match on the command-line argument flags; must be the netCDF file
@@ -347,6 +345,7 @@ program swbstats2
 ! end of argument processing; now take action based on the options selected
 !----------------------------------------------------------------------------
 
+  ! get the attributes associated with the coordinate reference system (CRS) variable  
   call netcdf_get_attribute_list_for_variable( NCFILE=swbstats%ncfile_in,              &
                                                variable_name="crs",  &
                                                attribute_name_list=name_list, &
@@ -359,6 +358,7 @@ program swbstats2
 
   swbstats%netcdf_variable_name_string = trim(swbstats%ncfile_in%pNC_VAR(NC_Z)%sVariableName)
 
+  ! get the attributes associated with the SWB2 output variable
   call netcdf_get_attribute_list_for_variable(                                 &
                    NCFILE=swbstats%ncfile_in,                                  &
                    variable_name=swbstats%netcdf_variable_name_string,         &
@@ -372,13 +372,13 @@ program swbstats2
   ! create working grids with dimensions extracted from netCDF file being munged
   call swbstats%create_working_grids()
 
+  ! if user wants annual or monthly statistics, calculate a list of annual or
+  ! monthly starting and ending dates for each time slice
   if (swbstats%calculation_time_period == CALC_PERIOD_ANNUAL) then
 
     call swbstats%create_date_list_for_annual_statistics()
 
-  endif
-
-  if (swbstats%calculation_time_period == CALC_PERIOD_MONTHLY) then
+  elseif (swbstats%calculation_time_period == CALC_PERIOD_MONTHLY) then
 
     call swbstats%create_date_list_for_monthly_statistics()
 
@@ -402,9 +402,10 @@ program swbstats2
 
     swbstats%filename_modifier_string = trim(swbstats%filename_modifier_string) &
                                        //"__meters"
-
   endif
 
+  ! for use with MODFLOW, the output needs to be expressed as a volume; set the
+  ! conversion factors based on the information contained in the netCDF proj4 string
   if (swbstats%report_as_volume) then
 
     if (swbstats%report_as_volume) then
@@ -448,19 +449,20 @@ program swbstats2
       swbstats%slice_end_date = swbstats%data_end_date
 
     call SIM_DT%initialize( swbstats%slice_start_date, swbstats%slice_end_date )
-    call swbstats%create_date_list_for_period_statistics()
+    call swbstats%create_date_list_for_period_statistics( swbstats%slice_start_date, swbstats%slice_end_date )
 
   elseif (swbstats%calculation_time_period == CALC_PERIOD_ALL) then
     ! no slice dates were provided; default to a single slice with start/end date
     ! corresponding to the start/end date of the data bounds
     swbstats%calculation_time_period = CALC_PERIOD_SLICE_SINGLE
     call SIM_DT%initialize( swbstats%data_start_date, swbstats%data_end_date )
-    call swbstats%create_date_list_for_period_statistics()
+    call swbstats%create_date_list_for_period_statistics( swbstats%data_start_date, swbstats%data_end_date )
   else
     ! default time slice = all data in netcdf file
     call SIM_DT%initialize( swbstats%data_start_date, swbstats%data_end_date )
   endif
 
+  ! calculate zonal statistics for a *SINGLE* zone grid
   if (swbstats%calc_zonal_stats) then
     if (.not. swbstats%multiple_zone_grids) then
       call swbstats%initialize_zone_grid(grid_filename=swbstats%zone_grid_filename)
@@ -494,9 +496,9 @@ program swbstats2
   !     netCDF start and end period; or
   !  c) time periods bracketing complete calendar years within the start and
   !     end dates contained within the netCDF file to be munged.
-
   do iIndex=1, swbstats%date_range_id_list%count
 
+    ! set the date format that is expected in subsequent calls to parseDate
     call swbstats%slice_start_date%setDateFormat("YYYY-MM-DD")
     call swbstats%slice_end_date%setDateFormat("YYYY-MM-DD")
 
@@ -530,6 +532,7 @@ program swbstats2
     if (swbstats%multiple_zone_grids) then
       swbstats%zone_grid_filename = swbstats%zone_grid_file_list%get( iIndex )
       call swbstats%initialize_zone_grid(grid_filename=swbstats%zone_grid_filename)
+      call swbstats%unique_zone_list%clear()
       call swbstats%get_unique_int(swbstats%grd_zone%pGrdBase%iData, swbstats%unique_zone_list)
     endif
 
@@ -572,15 +575,15 @@ program swbstats2
 
         endif
 
-      else
+      else  ! perform calculation for a single zone grid
         if ( associated(swbstats%grd_comparison) ) then
           call swbstats%output_zonal_stats(                                      &
                start_date=swbstats%slice_start_date,                             &
                end_date=swbstats%slice_end_date,                                 &
                values=output_files(STATS_SUM)%grid_ptr%dpData,                   &
-               zone_ids=swbstats%grd_zone%pGrdBase%iData,                               &
+               zone_ids=swbstats%grd_zone%pGrdBase%iData,                        &
                unique_zone_list=swbstats%unique_zone_list,                       &
-               comparison_values=swbstats%grd_comparison%pGrdBase%dpData,               &
+               comparison_values=swbstats%grd_comparison%pGrdBase%dpData,        &
                funit=swbstats%zonal_stats_output_file%unit() )
 
         else
@@ -588,7 +591,7 @@ program swbstats2
                start_date=swbstats%slice_start_date,                             &
                end_date=swbstats%slice_end_date,                                 &
                values=output_files(STATS_SUM)%grid_ptr%dpData,                   &
-               zone_ids=swbstats%grd_zone%pGrdBase%iData,                               &
+               zone_ids=swbstats%grd_zone%pGrdBase%iData,                        &
                unique_zone_list=swbstats%unique_zone_list,                       &
                funit=swbstats%zonal_stats_output_file%unit() )
 

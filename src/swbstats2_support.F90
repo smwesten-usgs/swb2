@@ -475,13 +475,15 @@ contains
 
 !------------------------------------------------------------------------------
 
-  subroutine create_date_list_for_period_statistics(this)
+  subroutine create_date_list_for_period_statistics(this, start_date, end_date)
 
     class (SWBSTATS_T), intent(inout)  :: this
+    type (DATETIME_T), intent(in)      :: start_date
+    type (DATETIME_T), intent(in)      :: end_date
 
-    call this%start_date_list%append( this%data_start_date%prettydate() )
+    call this%start_date_list%append( start_date%prettydate() )
     call this%date_range_id_list%append( "1" )
-    call this%end_date_list%append( this%data_end_date%prettydate() )
+    call this%end_date_list%append( end_date%prettydate() )
 
   end subroutine create_date_list_for_period_statistics
 
@@ -498,6 +500,7 @@ contains
     character (len=:), allocatable       :: description_str
     character (len=:), allocatable       :: output_filesname_str
 
+    ! remove file extension and path from zone filename
     description_str = left( grid_filename, substring=".")
     if (description_str .contains. "/") description_str = right( description_str, substring="/")
     if (description_str .contains. "\") description_str = right( description_str, substring="\")
@@ -518,9 +521,9 @@ contains
 
     call this%grd_zone%getvalues()
 
-    where ( this%grd_native%dpData <= NC_FILL_FLOAT )
-      this%grd_zone%pGrdBase%iData = NC_FILL_INT
-    end where
+!    where ( this%grd_native%dpData <= NC_FILL_FLOAT )
+!      this%grd_zone%pGrdBase%iData = NC_FILL_INT
+!    end where
 
     call grid_WriteArcGrid(output_filesname_str, this%grd_zone%pGrdBase )
 
@@ -559,9 +562,9 @@ contains
 
     call this%grd_zone2%getvalues()
 
-    where ( this%grd_native%dpData <= NC_FILL_FLOAT )
-      this%grd_zone2%pGrdBase%iData = NC_FILL_INT
-    end where
+!    where ( this%grd_native%dpData <= NC_FILL_FLOAT )
+!      this%grd_zone2%pGrdBase%iData = NC_FILL_INT
+!    end where
 
     call grid_WriteArcGrid(output_filesname_str, this%grd_zone2%pGrdBase )
 
@@ -599,12 +602,12 @@ contains
 
     call this%grd_comparison%getvalues()
 
-    where ( this%grd_native%dpData <= NC_FILL_FLOAT )
-      this%grd_comparison%pGrdBase%dpData = NC_FILL_FLOAT
-    elsewhere
+!   where ( this%grd_native%dpData <= NC_FILL_FLOAT )
+!     this%grd_comparison%pGrdBase%dpData = NC_FILL_FLOAT
+!   elsewhere
       this%grd_comparison%pGrdBase%dpData = this%grd_comparison%pGrdBase%dpData           &
                                       * this%comparison_grid_conversion_factor
-    end where
+!    end where
 
     call grid_WriteArcGrid(output_filesname_str, this%grd_comparison%pGrdBase )
 
@@ -820,6 +823,13 @@ contains
 
       day_count = 0
 
+      ! SIM_DT is being used here simply because it provides a simple way to march through
+      ! time on a day-by-day basis; need to ensure that the "current" day aligns with the 
+      ! desired start and end dates of the slice. 
+      if ( SIM_DT%curr > start_date ) then
+        call SIM_DT%set_current_date(start_date)
+      endif
+
       do
 
         if ( SIM_DT%curr < start_date ) then
@@ -829,6 +839,7 @@ contains
 
         julian_day_number = int( SIM_DT%curr%dJulianDate, c_int)
 
+        ! keep track of number of days that are summed together so we can calculated a mean grid value later
         day_count = day_count + 1
 
         if ( netcdf_update_time_starting_index(this%ncfile_in, julian_day_number ) )   then
