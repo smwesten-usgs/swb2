@@ -311,9 +311,10 @@ program swbstats2
 
     elseif ( command_arg_str .contains. "--" ) then
 
+       ! ifort barfs if 'sQuote' embedded in stop statement. revert to print *
        print *, "Unknown swbstats2 option: "//sQuote(command_arg_str)//"."
-       stop
-      
+       stop    
+    
     else
 
       ! no match on the command-line argument flags; must be the netCDF file
