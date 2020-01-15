@@ -1605,7 +1605,7 @@ contains
         sOptionText = fix_pathname( myOptions%get(1) )
         if (allocated(LOOKUP_TABLE_DIRECTORY_NAME)) then
           if (len_trim(LOOKUP_TABLE_DIRECTORY_NAME) > 0)                                 &
-            sOptionText = trim(LOOKUP_TABLE_DIRECTORY_NAME)//"/"//trim(sOptionText)
+            sOptionText = trim(LOOKUP_TABLE_DIRECTORY_NAME)//trim(sOptionText)
         endif
 
         if ( index(string=sCmdText, substring="LOOKUP_TABLE" ) > 0 ) then

@@ -35,8 +35,8 @@ set CMAKE_Fortran_FLAGS_PROFILE="-O2 -pg -cpp -ffree-line-length-none -fno-omit-
 echo %COMPILER_DIR%\bin\%MAKE_EXECUTABLE_NAME% %%1 > make.bat
 
 :: invoke CMake; add --trace to see copious details re: CMAKE
-for %%f in ( "CodeBlocks - MinGW Makefiles" "MinGW Makefiles" ) do ^
-cmake ..\..\.. -G %%f ^
+
+cmake ..\..\.. -G "MinGW Makefiles" ^
 -DCMAKE_C_COMPILER=%CMAKE_C_COMPILER%   ^
 -DSYSTEM_TYPE=%SYSTEM_TYPE%  ^
 -DCMAKE_BUILD_TYPE=%BUILD_TYPE%  ^

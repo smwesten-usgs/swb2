@@ -170,17 +170,17 @@ program main
     elseif ( sBuf(1:14) .eq. "--logfile_dir=" ) then
       sLogfileDirectoryName = sBuf(15:)
       iLen = len_trim( sLogfileDirectoryName )
-    
+
       ! if there is no trailing "/", append one so we can form (more) fully
       ! qualified filenames later
       if ( .not. sLogfileDirectoryName(iLen:iLen) .eq. OS_NATIVE_PATH_DELIMITER )  &
       sLogfileDirectoryName = trim(sLogfileDirectoryName)//OS_NATIVE_PATH_DELIMITER
-    
+
     elseif ( sBuf(1:13) .eq. "--lookup_dir=" ) then
 
       sLookupTableDirectoryName = sBuf(14:)
       iLen = len_trim( sLookupTableDirectoryName )
-    
+
       ! if there is no trailing "/", append one so we can form (more) fully
       ! qualified filenames later
       if ( .not. sLookupTableDirectoryName(iLen:iLen) .eq. OS_NATIVE_PATH_DELIMITER )  &
@@ -190,7 +190,7 @@ program main
 
       sLookupTableDirectoryName = sBuf(20:)
       iLen = len_trim( sLookupTableDirectoryName )
-      
+
       ! if there is no trailing "/", append one so we can form (more) fully
       ! qualified filenames later
       if ( .not. sLookupTableDirectoryName(iLen:iLen) .eq. OS_NATIVE_PATH_DELIMITER )  &

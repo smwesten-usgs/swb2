@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.5)
 project( swb2 
 	 VERSION 2.0
          LANGUAGES C Fortran )
@@ -23,11 +23,21 @@ include(CPack)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-if(CMAKE_HOST_APPLE)
+# try to have CMake find static libraries if possible
+set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" ${CMAKE_FIND_LIBRARY_SUFFIXES})
+
+if ( CMAKE_HOST_WIN32 )
+  set( OUTPUT_BIN_TARGET_DIR win_x64 )
+  if ( CMAKE_Fortran_COMPILER_ID STREQUAL "Intel" )
+    set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib" )
+    add_definitions(/D_CRT_SECURE_NO_DEPRECATE /DWIN32_LEAN_AND_MEAN)
+  endif()
+elseif( CMAKE_HOST_APPLE )
+  set( OUTPUT_BIN_TARGET_DIR macOS )
   set(CMAKE_FIND_LIBRARY_SUFFIXES ".dylib" ${CMAKE_FIND_LIBRARY_SUFFIXES})
-else(CMAKE_HOST_APPLE)
-  set(CMAKE_FIND_LIBRARY_SUFFIXES ".a" ".so" ${CMAKE_FIND_LIBRARY_SUFFIXES})
-endif(CMAKE_HOST_APPLE)
+elseif( CMAKE_HOST_UNIX AND (NOT CMAKE_HOST_APPLE) )
+  set( OUTPUT_BIN_TARGET_DIR linux_x64 )
+endif()
 
 include( cmake/version_control.cmake )
 include( cmake/FindHDF5.cmake )
@@ -36,38 +46,16 @@ include( cmake/FindNetCDF.cmake )
 include( cmake/FindZlib.cmake )
 include( cmake/FindCurl.cmake )
 include( cmake/FindSzip.cmake )
+#include( cmake/FindWinPthread.cmake )
+#include( cmake/FindQuadMath.cmake )
+#include( cmake/FindGfortran.cmake )
 
-#if(MSVC)
-  # Automatically adds compiler definitions to all subdirectories too.
-  add_definitions(/D_CRT_SECURE_NO_DEPRECATE /DWIN32_LEAN_AND_MEAN)
-  # # Disable all warnings
-  # string (REPLACE "/W3" "" CMAKE_C_FLAGS "${CMAKE_C_FLAGS}")
-  # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /w")
-#endif(MSVC)
-
-#link_libraries( "-static" )
 include_directories( ${CMAKE_BINARY_DIR}/src ${PROJECT_SOURCE_DIR}/src/proj4 )
 
 include( cmake/print_summary.cmake )
 
 add_subdirectory(src)
 add_subdirectory(test/unit_tests)
-
-if ( CMAKE_HOST_WIN32 )
-  set( OUTPUT_BIN_TARGET_DIR win_x86 )
-elseif( CMAKE_HOST_APPLE )
-  set( OUTPUT_BIN_TARGET_DIR macOS )
-elseif( CMAKE_HOST_UNIX AND (NOT CMAKE_HOST_APPLE) )
-  set( OUTPUT_BIN_TARGET_DIR linux_x64 )
-endif()
-
-if(CMAKE_Fortran_COMPILER_ID=="GNU")
-  set( OUTPUT_BIN_TARGET_DIR ${OUTPUT_BIN_TARGET_DIR}/gfortran)
-elseif( CMAKE_Fortran_COMPILER_ID=="PGI")
-
-elseif(CMAKE_Fortran_COMPILER_ID=="GNU")
-
-endif()
 
 # prepend location of project 'bin' directory
 set( OUTPUT_BIN_TARGET_DIR ${PROJECT_SOURCE_DIR}/bin/${OUTPUT_BIN_TARGET_DIR} )

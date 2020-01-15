@@ -311,7 +311,8 @@ program swbstats2
 
     elseif ( command_arg_str .contains. "--" ) then
 
-       stop ("Unknown swbstats2 option: "//sQuote(command_arg_str)//".")
+       print *, "Unknown swbstats2 option: "//sQuote(command_arg_str)//"."
+       stop
       
     else
 

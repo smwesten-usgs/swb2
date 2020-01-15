@@ -173,8 +173,10 @@ contains
     ! [ LOCALS ]
     character (len=len(sFilename) ) :: sFilename_l
 
+    ! 'fix_pathname' simply replaces forward slashes and backslashes with whatever the native OS
+    ! path delimiter character should be
     sFilename_l = fix_pathname( sFilename )
-
+    
     this%sCommentChars = sCommentChars
     this%sDelimiters = sDelimiters
 
