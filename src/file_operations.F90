@@ -21,6 +21,7 @@ module file_operations
     character (len=:), allocatable  :: sDelimiters
     character (len=:), allocatable  :: sCommentChars
     type (FSTRING_LIST_T)           :: slColNames
+    logical (c_bool)                :: remove_extra_delimiters = FALSE
     integer (c_int)                 :: iCurrentLinenum = 0
     integer (c_int)                 :: iNumberOfLines = 0
     integer (c_int)                 :: iNumberOfRecords = 0
@@ -345,7 +346,8 @@ contains
 
     do while ( len_trim( this%sBuf ) > 0)
 
-      call chomp( this%sBuf, sSubString, this%sDelimiters )
+      call chomp( str=this%sBuf, substr=sSubString, delimiter_chr=this%sDelimiters,   &
+                  remove_extra_delimiters=this%remove_extra_delimiters )
 
       call replace(sSubString, " ", "_")
       call replace(sSubString, ".", "_")

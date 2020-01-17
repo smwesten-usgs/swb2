@@ -852,15 +852,24 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-  subroutine split_and_return_text_sub(str, substr, delimiter_chr)
+  subroutine split_and_return_text_sub(str, substr, delimiter_chr, remove_extra_delimiters)
 
     character (len=*), intent(inout)                     :: str
     character (len=*), intent(out)                       :: substr
     character (len=*), intent(in), optional              :: delimiter_chr
+    logical (c_bool), intent(in), optional               :: remove_extra_delimiters
 
     ! [ LOCALS ]
     character (len=:), allocatable :: delimiter_chr_
-    integer (c_int) :: iIndex
+    logical (c_bool)     :: remove_extra_delimiters_
+    integer (kind=c_int) :: iIndex
+    integer (c_int)      :: n
+
+    if ( present(remove_extra_delimiters)) then
+      remove_extra_delimiters_ = remove_extra_delimiters
+    else
+      remove_extra_delimiters_ = .false._c_bool
+    endif
 
     if ( present(delimiter_chr) ) then
       select case (delimiter_chr)
@@ -888,7 +897,18 @@ contains
     else
       ! delimiters were found; split and return the chunks of text
       substr = trim( str(1:iIndex-1) )
-      str = trim( adjustl( str(iIndex + 1:) ) )
+      str = trim( str(iIndex + 1: ) )
+      ! inelegant, but something like this is needed to detect the presence of duplicate delimiters in cases where
+      ! more than one delimiter in a row should just be ignored
+      if (remove_extra_delimiters_) then
+        do
+          n = len_trim(str)
+          if (n == 0 ) exit
+          ! if we still have delimiters (whitespace, for example) in the first position, lop it off and try again
+          if ( scan( string=str(1:1), set=delimiter_chr_) == 0) exit
+          str = trim(str(2:n))
+        enddo
+      endif  
     endif
 
   end subroutine split_and_return_text_sub

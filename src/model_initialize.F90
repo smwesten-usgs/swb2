@@ -890,6 +890,10 @@ contains
                   sCommentChars = "#%!+=|[{(-*$",   &
                   sDelimiters = "WHITESPACE",       &
                   lHasHeader = .false._c_bool )
+
+    ! set flag to have 'chomp' remove extra whitespace characters if found between items of interest 
+    CF%remove_extra_delimiters = TRUE
+
     do
 
       ! read in next line of the control file
@@ -904,7 +908,7 @@ contains
             __SRCNAME__, __LINE__ )
 
       ! break off key value for the current record
-      call chomp(sRecord, sKey, CF%sDelimiters )
+      call chomp(sRecord, sKey, CF%sDelimiters, CF%remove_extra_delimiters )
 
       if ( len_trim( sKey ) > 0 ) then
 
@@ -919,14 +923,14 @@ contains
         call CF_ENTRY%add_key( sKey )
 
         ! break off first directive for the current record
-        call chomp( sRecord, sValue, CF%sDelimiters )
+        call chomp( sRecord, sValue, CF%sDelimiters, CF%remove_extra_delimiters )
 
         do while ( len_trim( sValue ) > 0 )
 
           ! add the next directive snippet to dictionary entry data structure
           call CF_ENTRY%add_value( sValue )
           ! break off next directive for the current record
-          call chomp( sRecord, sValue, CF%sDelimiters )
+          call chomp( sRecord, sValue, CF%sDelimiters, CF%remove_extra_delimiters )
 
         enddo
 
