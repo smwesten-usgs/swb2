@@ -192,7 +192,7 @@ contains
 
       do index = 1, sl_irrigation_begin%count
         str_buffer = sl_irrigation_begin%get( index )
-        if ( scan(str_buffer, "/-") == 0 ) then
+        if ( scan(str_buffer, "/-") /= 0 ) then
           FIRST_DAY_OF_IRRIGATION( index ) = mmdd2doy( str_buffer, "FIRST_DAY_OF_IRRIGATION" )
         else
           FIRST_DAY_OF_IRRIGATION( index ) = asInt( str_buffer )
@@ -216,7 +216,7 @@ contains
 
       do index = 1, sl_irrigation_end%count
         str_buffer = sl_irrigation_end%get( index )
-        if ( scan(str_buffer, "/-") == 0 ) then
+        if ( scan(str_buffer, "/-") /= 0 ) then
           LAST_DAY_OF_IRRIGATION( index ) = mmdd2doy( str_buffer, "LAST_DAY_OF_IRRIGATION" )
         else
           LAST_DAY_OF_IRRIGATION( index ) = asInt( str_buffer )
