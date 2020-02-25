@@ -464,7 +464,7 @@ program swbstats2
     call SIM_DT%initialize( swbstats%data_start_date, swbstats%data_end_date )
   endif
 
-  ! calculate zonal statistics for a *SINGLE* zone grid
+  ! initialize data needed to calculate zonal statistics for a *SINGLE* zone grid
   if (swbstats%calc_zonal_stats) then
     if (.not. swbstats%multiple_zone_grids) then
       call swbstats%initialize_zone_grid(grid_filename=swbstats%zone_grid_filename)
@@ -484,7 +484,9 @@ program swbstats2
     endif
 
     call swbstats%open_zonal_stats_output_file(trim(temp_string))
-  endif
+
+  endif  ! initialize data structures needed to calculate zonal statistics for a *SINGLE* zone grid 
+
 
   call swbstats%open_output_netcdf_files(output_files)
 
@@ -498,19 +500,49 @@ program swbstats2
   !     netCDF start and end period; or
   !  c) time periods bracketing complete calendar years within the start and
   !     end dates contained within the netCDF file to be munged.
+
+
+! .o8                             o8o                                                o8o                   oooo                                 
+!"888                             `"'                                                `"'                   `888                                 
+! 888oooo.   .ooooo.   .oooooooo oooo  ooo. .oo.        ooo. .oo.  .oo.    .oooo.   oooo  ooo. .oo.         888   .ooooo.   .ooooo.  oo.ooooo.  
+! d88' `88b d88' `88b 888' `88b  `888  `888P"Y88b       `888P"Y88bP"Y88b  `P  )88b  `888  `888P"Y88b        888  d88' `88b d88' `88b  888' `88b 
+! 888   888 888ooo888 888   888   888   888   888        888   888   888   .oP"888   888   888   888        888  888   888 888   888  888   888 
+! 888   888 888    .o `88bod8P'   888   888   888        888   888   888  d8(  888   888   888   888        888  888   888 888   888  888   888 
+! `Y8bod8P' `Y8bod8P' `8oooooo.  o888o o888o o888o      o888o o888o o888o `Y888""8o o888o o888o o888o      o888o `Y8bod8P' `Y8bod8P'  888bod8P' 
+!                     d"     YD                                                                                                       888       
+!                     "Y88888P'                                                                                                      o888o      
+
+
+! One potential use case: several hundred lines that look like the entry below.
+! Need to ensure that all resources are deallocated promptly to avoid memory leak
+
+!  *** snippet of a 'zone_period_file' ***
+!-------------------------------------------------
+!  id,start_date,end_date,zone_grid_filename
+!  1,2013-05-01,2013-05-31,corn2013_zone_1000m.asc
+!  2,2013-06-01,2013-06-30,corn2013_zone_1000m.asc
+!  3,2013-07-01,2013-07-31,corn2013_zone_1000m.asc
+!  4,2013-08-01,2013-08-31,corn2013_zone_1000m.asc
+!  5,2013-09-01,2013-09-30,corn2013_zone_1000m.asc
+
+! for the use case given above, date_range_id_list%count should equal the number of rows in the zone period file
+
   do iIndex=1, swbstats%date_range_id_list%count
 
     ! set the date format that is expected in subsequent calls to parseDate
     call swbstats%slice_start_date%setDateFormat("YYYY-MM-DD")
     call swbstats%slice_end_date%setDateFormat("YYYY-MM-DD")
 
+    ! set start and end date for slice calculation to the value corresponding to its position
+    ! in the input zone or observation file list.
     start_date_string = swbstats%start_date_list%get( iIndex )
     end_date_string = swbstats%end_date_list%get( iIndex )
-!      swbstats%date_range_string = swbstats%date_range_id_list%get( iIndex )
 
+    ! parse start and end dates for slice into date objects
     call swbstats%slice_start_date%parseDate( start_date_string )
     call swbstats%slice_end_date%parseDate( end_date_string )
 
+    ! create date range string for use in output filenames
     swbstats%date_range_string = swbstats%slice_start_date%prettydate()    &
        //"_to_"//swbstats%slice_end_date%prettydate()
 
@@ -521,6 +553,8 @@ program swbstats2
 
     ! grid_sum = simple addition over stack of grids;
     ! grid_mean is the grid_sum divided by number of days = daily mean
+    !
+    ! first step is to calculate the statistics over the entire grid
     call swbstats%calculate_slice_statistics( grid_delta=swbstats%grd_delta,            &
                                      grid_delta2=swbstats%grd_delta2,                   &
                                      start_date=swbstats%slice_start_date,     &
@@ -534,8 +568,7 @@ program swbstats2
     if (swbstats%multiple_zone_grids) then
       swbstats%zone_grid_filename = swbstats%zone_grid_file_list%get( iIndex )
       call swbstats%initialize_zone_grid(grid_filename=swbstats%zone_grid_filename)
-      call swbstats%unique_zone_list%clear()
-      call swbstats%get_unique_int(swbstats%grd_zone%pGrdBase%iData, swbstats%unique_zone_list)
+
     endif
 
       call swbstats%write_stats_to_netcdf(output_files=output_files,           &

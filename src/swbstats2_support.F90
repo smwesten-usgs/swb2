@@ -499,33 +499,46 @@ contains
     integer (c_int)                 :: iStat
     character (len=:), allocatable       :: description_str
     character (len=:), allocatable       :: output_filesname_str
+    character (len=256), save            :: previous_zone_filename
 
-    ! remove file extension and path from zone filename
-    description_str = left( grid_filename, substring=".")
-    if (description_str .contains. "/") description_str = right( description_str, substring="/")
-    if (description_str .contains. "\") description_str = right( description_str, substring="\")
+    ! OK, if this is the same ARC ASCII grid file processed in a previous iteration,
+    ! we leave the values as they are and skip reading in the grid again
+    if ( .not. trim(previous_zone_filename)==trim(grid_filename) ) then
 
-    output_filesname_str = "zone_grid__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
+      ! remove file extension and path from zone filename
+      description_str = left( grid_filename, substring=".")
+      if (description_str .contains. "/") description_str = right( description_str, substring="/")
+      if (description_str .contains. "\") description_str = right( description_str, substring="\")
 
-    ! allocate memory for a generic data_catalog_entry
-    if (associated(this%grd_zone))  deallocate(this%grd_zone)
-    nullify(this%grd_zone)
-    allocate(this%grd_zone)
+      output_filesname_str = "zone_grid__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
 
-    call this%grd_zone%set_target_PROJ4(this%target_proj4_string)
-    call this%grd_zone%initialize(          &
-      sDescription="Zone Grid",             &
-      sFileType="ARC_GRID",                 &
-      sFilename=trim(grid_filename),        &
-      iDataType=DATATYPE_INT )
+      ! allocate memory for a generic data_catalog_entry
+      if (associated(this%grd_zone))  deallocate(this%grd_zone)
+      nullify(this%grd_zone)
+      allocate(this%grd_zone)
 
-    call this%grd_zone%getvalues()
+      call this%grd_zone%set_target_PROJ4(this%target_proj4_string)
+      call this%grd_zone%initialize(          &
+        sDescription="Zone Grid",             &
+        sFileType="ARC_GRID",                 &
+        sFilename=trim(grid_filename),        &
+        iDataType=DATATYPE_INT )
+
+      call this%grd_zone%getvalues()
 
 !    where ( this%grd_native%dpData <= NC_FILL_FLOAT )
 !      this%grd_zone%pGrdBase%iData = NC_FILL_INT
 !    end where
 
-    call grid_WriteArcGrid(output_filesname_str, this%grd_zone%pGrdBase )
+      call grid_WriteArcGrid(output_filesname_str, this%grd_zone%pGrdBase )
+
+      ! set value of previous filename to the name of the grid we just processed.
+      previous_zone_filename = trim(grid_filename)
+
+      call this%unique_zone_list%clear()
+      call this%get_unique_int(this%grd_zone%pGrdBase%iData, this%unique_zone_list)
+
+    endif  
 
   end subroutine initialize_zone_grid
 
@@ -541,32 +554,41 @@ contains
     integer (c_int)                 :: iStat
     character (len=:), allocatable       :: description_str
     character (len=:), allocatable       :: output_filesname_str
+    character (len=256), save            :: previous_zone_filename
 
-    description_str = left( grid_filename, substring=".")
-    if (description_str .contains. "/") description_str = right( description_str, substring="/")
-    if (description_str .contains. "\") description_str = right( description_str, substring="\")
+    ! OK, if this is the same ARC ASCII grid file processed in a previous iteration,
+    ! we leave the values as they are and skip reading in the grid again
+    if ( .not. trim(previous_zone_filename)==trim(grid_filename) ) then
 
-    output_filesname_str = "zone_grid2__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
+      description_str = left( grid_filename, substring=".")
+      if (description_str .contains. "/") description_str = right( description_str, substring="/")
+      if (description_str .contains. "\") description_str = right( description_str, substring="\")
 
-    ! allocate memory for a generic data_catalog_entry
-    if (associated(this%grd_zone2))  deallocate(this%grd_zone2)
-    nullify(this%grd_zone2)
-    allocate(this%grd_zone2)
+      output_filesname_str = "zone_grid2__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
 
-    call this%grd_zone2%set_target_PROJ4(this%target_proj4_string)
-    call this%grd_zone2%initialize(          &
-      sDescription="Zone Grid",             &
-      sFileType="ARC_GRID",                 &
-      sFilename=trim(grid_filename),        &
-      iDataType=DATATYPE_INT )
+      ! allocate memory for a generic data_catalog_entry
+      if (associated(this%grd_zone2))  deallocate(this%grd_zone2)
+      nullify(this%grd_zone2)
+      allocate(this%grd_zone2)
 
-    call this%grd_zone2%getvalues()
+      call this%grd_zone2%set_target_PROJ4(this%target_proj4_string)
+      call this%grd_zone2%initialize(          &
+        sDescription="Zone Grid",             &
+        sFileType="ARC_GRID",                 &
+        sFilename=trim(grid_filename),        &
+        iDataType=DATATYPE_INT )
+
+      call this%grd_zone2%getvalues()
 
 !    where ( this%grd_native%dpData <= NC_FILL_FLOAT )
 !      this%grd_zone2%pGrdBase%iData = NC_FILL_INT
 !    end where
 
-    call grid_WriteArcGrid(output_filesname_str, this%grd_zone2%pGrdBase )
+      call grid_WriteArcGrid(output_filesname_str, this%grd_zone2%pGrdBase )
+
+      previous_zone_filename = trim(grid_filename)
+
+    endif
 
   end subroutine initialize_secondary_zone_grid
 
@@ -582,34 +604,43 @@ contains
     integer (c_int)                 :: iStat
     character (len=:), allocatable       :: description_str
     character (len=:), allocatable       :: output_filesname_str
+    character (len=256), save            :: previous_comparison_filename
 
-    description_str = left( grid_filename, substring=".")
-    if (description_str .contains. "/") description_str = right( description_str, substring="/")
-    if (description_str .contains. "\") description_str = right( description_str, substring="\")
+    ! OK, if this is the same ARC ASCII grid file processed in a previous iteration,
+    ! we leave the values as they are and skip reading in the grid again
+    if ( .not. trim(previous_comparison_filename)==trim(grid_filename) ) then
 
-    output_filesname_str = "Comparison_grid__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
+      description_str = left( grid_filename, substring=".")
+      if (description_str .contains. "/") description_str = right( description_str, substring="/")
+      if (description_str .contains. "\") description_str = right( description_str, substring="\")
 
-    ! allocate memory for a generic data_catalog_entry
-    if (.not. associated(this%grd_comparison))  allocate(this%grd_comparison, stat=iStat)
+      output_filesname_str = "Comparison_grid__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
 
-    call this%grd_comparison%set_target_PROJ4(this%target_proj4_string)
+      ! allocate memory for a generic data_catalog_entry
+      if (.not. associated(this%grd_comparison))  allocate(this%grd_comparison, stat=iStat)
 
-    call this%grd_comparison%initialize(          &
-      sDescription="Comparison Grid",          &
-      sFileType="ARC_GRID",                    &
-      sFilename=trim(grid_filename),           &
-      iDataType=DATATYPE_FLOAT )
+      call this%grd_comparison%set_target_PROJ4(this%target_proj4_string)
 
-    call this%grd_comparison%getvalues()
+      call this%grd_comparison%initialize(          &
+        sDescription="Comparison Grid",          &
+        sFileType="ARC_GRID",                    &
+        sFilename=trim(grid_filename),           &
+        iDataType=DATATYPE_FLOAT )
+
+      call this%grd_comparison%getvalues()
 
 !   where ( this%grd_native%dpData <= NC_FILL_FLOAT )
 !     this%grd_comparison%pGrdBase%dpData = NC_FILL_FLOAT
 !   elsewhere
-      this%grd_comparison%pGrdBase%dpData = this%grd_comparison%pGrdBase%dpData           &
-                                      * this%comparison_grid_conversion_factor
+        this%grd_comparison%pGrdBase%dpData = this%grd_comparison%pGrdBase%dpData           &
+                                        * this%comparison_grid_conversion_factor
 !    end where
 
-    call grid_WriteArcGrid(output_filesname_str, this%grd_comparison%pGrdBase )
+      call grid_WriteArcGrid(output_filesname_str, this%grd_comparison%pGrdBase )
+
+      previous_comparison_filename = trim(grid_filename)
+
+    endif
 
   end subroutine initialize_comparison_grid
 
@@ -908,6 +939,8 @@ contains
       !     grd_mean = grd_sum / real( day_count, c_float )
       !   end where
       endif
+
+      deallocate(local_mask)
 
     end associate
 
