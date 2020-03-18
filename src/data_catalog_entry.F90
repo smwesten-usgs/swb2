@@ -2061,55 +2061,60 @@ end subroutine set_maximum_allowable_value_real_sub
 
     ! [ LOCALS ]
     integer (c_int) :: iRetVal
-    real (c_float) :: rMultiplier = 1.
+    real (c_float) :: rMultiplier = 0.
     real (c_double), dimension(4) :: rX, rY
 
     ! ensure that there is sufficient coverage on all sides of grid
-    rX(1) = pGrdBase%rX0 - pGrdBase%rGridCellSize * rMultiplier ! Xll
-    rY(1) = pGrdBase%rY0 - pGrdBase%rGridCellSize * rMultiplier ! Yll
-    rX(2) = pGrdBase%rX1 + pGrdBase%rGridCellSize * rMultiplier ! Xlr
-    rY(2) = pGrdBase%rY0 - pGrdBase%rGridCellSize * rMultiplier ! Ylr
-    rX(3) = pGrdBase%rX0 - pGrdBase%rGridCellSize * rMultiplier ! Xul
-    rY(3) = pGrdBase%rY1 + pGrdBase%rGridCellSize * rMultiplier ! Yul
-    rX(4) = pGrdBase%rX1 + pGrdBase%rGridCellSize * rMultiplier ! Xur
-    rY(4) = pGrdBase%rY1 + pGrdBase%rGridCellSize * rMultiplier ! Yur
+    rX(1) = pGrdBase%rX0 ! - pGrdBase%rGridCellSize * rMultiplier ! Xll
+    rY(1) = pGrdBase%rY0 ! - pGrdBase%rGridCellSize * rMultiplier ! Yll
+    rX(2) = pGrdBase%rX1 ! + pGrdBase%rGridCellSize * rMultiplier ! Xlr
+    rY(2) = pGrdBase%rY0 ! - pGrdBase%rGridCellSize * rMultiplier ! Ylr
+    rX(3) = pGrdBase%rX0 ! - pGrdBase%rGridCellSize * rMultiplier ! Xul
+    rY(3) = pGrdBase%rY1 ! + pGrdBase%rGridCellSize * rMultiplier ! Yul
+    rX(4) = pGrdBase%rX1 ! + pGrdBase%rGridCellSize * rMultiplier ! Xur
+    rY(4) = pGrdBase%rY1 ! + pGrdBase%rGridCellSize * rMultiplier ! Yur
 
-    ! now transform the project coordinates to native coordinates so we can
-    ! use the native coordinate boundaries to "cookie-cut" only the data
-    ! pertinent to our project area.
-    iRetVal = pj_init_and_transform(trim(pGrdBase%sPROJ4_string)//C_NULL_CHAR, &
-                trim(this%sSourcePROJ4_string)//C_NULL_CHAR,                   &
-                __SRCNAME__//C_NULL_CHAR,                                   &
-                __LINE__,                                                      &
-                4_c_long,                                                      &
-                rX, rY )
+    ! don't invoke PROJ4 unless projections are at least superficially different
+    if ( .not. trim( pGrdBase%sPROJ4_string) == trim(this%sSourcePROJ4_string)) then
 
-  call grid_CheckForPROJ4Error(iRetVal=iRetVal, &
-     sFromPROJ4=trim(pGrdBase%sPROJ4_string), &
-     sToPROJ4=trim(this%sSourcePROJ4_string))
+      ! now transform the project coordinates to native coordinates so we can
+      ! use the native coordinate boundaries to "cookie-cut" only the data
+      ! pertinent to our project area.
+      iRetVal = pj_init_and_transform(trim(pGrdBase%sPROJ4_string)//C_NULL_CHAR, &
+                  trim(this%sSourcePROJ4_string)//C_NULL_CHAR,                   &
+                  __SRCNAME__//C_NULL_CHAR,                                   &
+                  __LINE__,                                                      &
+                  4_c_long,                                                      &
+                  rX, rY )
+
+      call grid_CheckForPROJ4Error(iRetVal=iRetVal, &
+        sFromPROJ4=trim(pGrdBase%sPROJ4_string), &
+        sToPROJ4=trim(this%sSourcePROJ4_string))
+
+    endif
 
   ! because PROJ4 works in RADIANS if data are unprojected (i.e. GEOGRAPHIC),
   ! we need to convert back to degrees on the assumption that the coordinates
   ! referenced in the file will also be i degrees
-!  if( index(string=trim(this%sSourcePROJ4_string), substring="latlon") > 0 &
-!      .or. index(string=trim(this%sSourcePROJ4_string), substring="lonlat") > 0 ) then
+  !  if( index(string=trim(this%sSourcePROJ4_string), substring="latlon") > 0 &
+  !      .or. index(string=trim(this%sSourcePROJ4_string), substring="lonlat") > 0 ) then
 
-  if (      ( this%sSourcePROJ4_string .containssimilar. "latlon" )            &
-       .or. ( this%sSourcePROJ4_string .containssimilar. "latlong" )           &
-       .or. ( this%sSourcePROJ4_string .containssimilar. "lonlat" )            &
-       .or. ( this%sSourcePROJ4_string .containssimilar. "longlat" ) ) then
+    if (      ( this%sSourcePROJ4_string .containssimilar. "latlon" )            &
+         .or. ( this%sSourcePROJ4_string .containssimilar. "latlong" )           &
+         .or. ( this%sSourcePROJ4_string .containssimilar. "lonlat" )            &
+         .or. ( this%sSourcePROJ4_string .containssimilar. "longlat" ) ) then
 
-    rX = rad_to_deg(rX)
-    rY = rad_to_deg(rY)
+      rX = rad_to_deg(rX)
+      rY = rad_to_deg(rY)
 
-  endif
+    endif
 
-   this%GRID_BOUNDS_NATIVE%rXll = rX(1); this%GRID_BOUNDS_NATIVE%rXlr = rX(2)
-   this%GRID_BOUNDS_NATIVE%rYll = rY(1); this%GRID_BOUNDS_NATIVE%rYlr = rY(2)
-   this%GRID_BOUNDS_NATIVE%rXul = rX(3); this%GRID_BOUNDS_NATIVE%rXur = rX(4)
-   this%GRID_BOUNDS_NATIVE%rYul = rY(3); this%GRID_BOUNDS_NATIVE%rYur = rY(4)
+    this%GRID_BOUNDS_NATIVE%rXll = rX(1); this%GRID_BOUNDS_NATIVE%rXlr = rX(2)
+    this%GRID_BOUNDS_NATIVE%rYll = rY(1); this%GRID_BOUNDS_NATIVE%rYlr = rY(2)
+    this%GRID_BOUNDS_NATIVE%rXul = rX(3); this%GRID_BOUNDS_NATIVE%rXur = rX(4)
+    this%GRID_BOUNDS_NATIVE%rYul = rY(3); this%GRID_BOUNDS_NATIVE%rYur = rY(4)
 
-#ifdef DEBUG_PRINT
+!#ifdef DEBUG_PRINT
    print *, " "
    print *, trim(__FILE__), ": ", __LINE__
    print *, "--  BASE GRID BOUNDS projected to DATA NATIVE COORDS"
@@ -2121,7 +2126,7 @@ end subroutine set_maximum_allowable_value_real_sub
    print *, "LR: ", this%GRID_BOUNDS_NATIVE%rXlr, this%GRID_BOUNDS_NATIVE%rYlr
    print *, "UL: ", this%GRID_BOUNDS_NATIVE%rXul, this%GRID_BOUNDS_NATIVE%rYul
    print *, "UR: ", this%GRID_BOUNDS_NATIVE%rXur, this%GRID_BOUNDS_NATIVE%rYur
-#endif
+!#endif
 
   end subroutine calc_project_boundaries_sub
 
