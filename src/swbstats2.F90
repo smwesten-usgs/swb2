@@ -106,7 +106,7 @@ program swbstats2
       //TRIM(int2char(__G95_MINOR__))
 #endif
 
-    allocate(usage_string(46))
+    allocate(usage_string(48))
 
     usage_string = [                                                           &
      "usage: swbstats2 [options] netcdf_file_name                           ", &
@@ -119,6 +119,8 @@ program swbstats2
      "    calculate statistics for every calendar year between start and end", &
      "  [ --monthly_statistics ]                                            ", &
      "    calculate statistics for every month between start and end        ", &
+     "  [ --annualize_sums ]                                                ", &
+     "    express sums on an annual basis (e.g. inches per year)            ", &
      "  [ --report_as_volume ]                                              ", &
      "    express statistics as a volume (cubic meters)                     ", &
      "  [ --report_in_meters ]                                              ", &
@@ -150,7 +152,7 @@ program swbstats2
      "    comma-delimited file containing calculation period start and      ", &
      "    end date, with header labels and comments starting with'#':       ", &
      "      id,start_date,end_date,zone_grid_filename                       ", &
-     "      #2,1870-01-01,1898-12-31,zone_grod_file_period_2.asc            ", &
+     "      #2,1870-01-01,1898-12-31,zone_grid_file_period_2.asc            ", &
      "      5,1920-01-01,1925-12-31,zone_grid_file_period_5.asc             ", &
      "      6,1925-01-01,1930-12-31,zone_grid_file_period_6.asc             ", &
      "  [ --{no_}netcdf_output ]                                            ", &

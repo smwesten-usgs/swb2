@@ -3132,17 +3132,22 @@ end subroutine nf_get_variable_id_and_type
 
 !----------------------------------------------------------------------
 
-function nf_return_index_double(rValues, rTargetValue)  result(iIndex)
+function nf_return_index_double(rValues, rTargetValue, rOffsetValue)  result(iIndex)
 
   real (c_double), dimension(:) :: rValues
   real (c_double) :: rTargetValue
+  real (c_double) :: rOffsetValue
   integer (c_int) :: iIndex
 
   ! [ LOCALS ]
   integer (c_int) :: iCount
   real (c_double) :: rDiff, rDiffMin
 
-  if ( .not. (rTargetValue >= minval(rValues) .and. rTargetValue <= maxval(rValues)) ) then
+  ! attempting to account for the fact that coordinates are specified
+  ! initially relative toi cell edges, but are stored internally within netCDF
+  ! relative to cell centers
+  if ( .not. (rTargetValue >= (minval(rValues) - rOffsetValue) )             &
+         .and. (rTargetValue <= (maxval(rValues) + rOffsetValue) ) ) then
     call LOGS%write("rTargetValue (" &
     //trim(asCharacter(rTargetValue))//") is not within the range " &
     //trim(asCharacter(minval(rValues)))//" to "//trim(asCharacter(maxval(rValues))), lEcho=TRUE )
@@ -3180,32 +3185,37 @@ function netcdf_coord_to_col_row(NCFILE, rX, rY)  result(iColRow)
 
   ! [ LOCALS ]
   integer (c_int) :: iColNum, iRowNum
+  real (c_double) :: x_offset
+  real (c_double) :: y_offset
+
+  x_offset = NCFILE%rGridCellSizeX / 2.0_c_double
+  y_offset = NCFILE%rGridCellSizeY / 2.0_c_double
 
   call assert( allocated( NCFILE%rX_Coords ), "Internal programming error -- attempt " &
   //"to access unallocated array rX_Coords.", __SRCNAME__, __LINE__ )
 
-  if (rX < minval(NCFILE%rX_Coords) ) &
+  if (rX < (minval(NCFILE%rX_Coords) - x_offset) ) &
     call die( "X coordinate value "//asCharacter(rX)//" is less than the minimum X coordinate " &
-      //"value ("//asCharacter(minval(NCFILE%rX_Coords))//") contained in the netCDF file " &
+      //"value ("//asCharacter(minval(NCFILE%rX_Coords)-x_offset)//") contained in the netCDF file " &
       //dquote(NCFILE%sFilename) )
 
-  if (rX > maxval(NCFILE%rX_Coords) ) &
+  if (rX > (maxval(NCFILE%rX_Coords) + x_offset) ) &
     call die( "X coordinate value "//asCharacter(rX)//" is greater than the maximum X coordinate " &
-      //"value ("//asCharacter(maxval(NCFILE%rX_Coords))//") contained in the netCDF file " &
+      //"value ("//asCharacter(maxval(NCFILE%rX_Coords)+x_offset)//") contained in the netCDF file " &
       //dquote(NCFILE%sFilename) )
 
-  if (rY < minval(NCFILE%rY_Coords) ) &
+  if (rY < (minval(NCFILE%rY_Coords) - y_offset) ) &
     call die( "Y coordinate value "//asCharacter(rY)//" is less than the minimum Y coordinate " &
-      //"value ("//asCharacter(minval(NCFILE%rY_Coords))//") contained in the netCDF file " &
+      //"value ("//asCharacter(minval(NCFILE%rY_Coords)-y_offset)//") contained in the netCDF file " &
       //dquote(NCFILE%sFilename) )
 
-  if (rY > maxval(NCFILE%rY_Coords) ) &
+  if (rY > (maxval(NCFILE%rY_Coords) + y_offset) ) &
     call die( "Y coordinate value "//asCharacter(rY)//" is greater than the maximum Y coordinate " &
-      //"value ("//asCharacter(maxval(NCFILE%rY_Coords))//") contained in the netCDF file " &
+      //"value ("//asCharacter(maxval(NCFILE%rY_Coords)+y_offset)//") contained in the netCDF file " &
       //dquote(NCFILE%sFilename) )
 
-  iColNum = nf_return_index_double(NCFILE%rX_Coords, rX)
-  iRowNum = nf_return_index_double(NCFILE%rY_Coords, rY)
+  iColNum = nf_return_index_double(NCFILE%rX_Coords, rX, x_offset)
+  iRowNum = nf_return_index_double(NCFILE%rY_Coords, rY, y_offset)
 
   iColRow(COLUMN) = iColNum
   iColRow(ROW) = iRowNum

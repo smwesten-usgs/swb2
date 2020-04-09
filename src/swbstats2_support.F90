@@ -752,6 +752,7 @@ contains
     integer (c_int)              :: stat_indx
     character (len=8)                 :: stats_description
     character (len=:), allocatable    :: units_string
+    character (len=:), allocatable    :: filename_modifier
 
     nx = BNDS%iNumCols
     ny = BNDS%iNumRows
@@ -774,6 +775,9 @@ contains
 
         call replace(units_string, ' ', '_' )
 
+        ! remove commas from filename modifier
+        filename_modifier = clean(units_string, ",")
+
         grid_ptr => output_files(stat_indx)%grid_ptr
         stats_description = output_files(stat_indx)%stats_description
 
@@ -783,12 +787,12 @@ contains
                      //"__"//trim(date_range_string)                               &
                      //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)              &
                      //"__"//trim(stats_description)                               &
-                     //"__"//trim(units_string)//".asc"
+                     //"__"//trim(filename_modifier)//".asc"
         else
           filename = trim(this%netcdf_variable_name_string)                      &
                      //"__"//start_date%prettydate()//"_to_"//end_date%prettydate() &
                      //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)               &
-                     //"__"//trim(units_string)//".asc"
+                     //"__"//trim(filename_modifier)//".asc"
         endif
 
         ! ugly hack to make the output match the default NODATA value
