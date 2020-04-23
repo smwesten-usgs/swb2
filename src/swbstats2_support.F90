@@ -8,7 +8,10 @@ module swbstats2_support
   use datetime, only                  : DATETIME_T, assignment(=), operator(>)
   use exceptions, only                : assert, die
   use file_operations, only           : ASCII_FILE_T
-  use grid
+  use grid, only                      : GENERAL_GRID_T,                         &
+                                        GRID_DATATYPE_DOUBLE,                   &
+                                        grid_Create,                            &
+                                        grid_WriteArcGrid
   use netcdf4_support
   use simulation_datetime, only       : SIM_DT, DATE_RANGE_T
   use fstring
@@ -24,7 +27,7 @@ module swbstats2_support
   enum, bind(c)
     enumerator :: CALC_PERIOD_ALL=1, CALC_PERIOD_ANNUAL, CALC_PERIOD_MONTHLY,  &
                   CALC_PERIOD_SLICE_SINGLE, CALC_PERIOD_SLICE_MULTIPLE,        &
-                  CALC_PERIOD_WATER_YEAR
+                  CALC_PERIOD_WATER_YEAR, CALC_PERIOD_DAILY
   end enum
 
   integer (c_size_t)               :: RECNUM = 0
@@ -115,6 +118,7 @@ module swbstats2_support
     procedure :: create_date_list_for_annual_statistics
     procedure :: create_date_list_for_period_statistics
     procedure :: create_date_list_for_monthly_statistics
+    procedure :: create_date_list_for_daily_statistics
 
     procedure :: read_date_range_file
     procedure :: read_zone_period_file
@@ -472,6 +476,35 @@ contains
     enddo
 
   end subroutine create_date_list_for_monthly_statistics
+
+!------------------------------------------------------------------------------
+
+  subroutine create_date_list_for_daily_statistics(this)
+
+    class (SWBSTATS_T), intent(inout)  :: this
+
+    ! [ LOCALS ]
+    integer (c_int)      :: indx
+    type (DATE_RANGE_T)  :: DAILY_DT
+
+    indx = 0
+
+    call DAILY_DT%initialize( this%data_start_date, this%data_end_date )
+
+    do
+      indx = indx + 1
+      call this%start_date_list%append( DAILY_DT%curr%prettydate() )
+      call this%end_date_list%append( DAILY_DT%curr%prettydate() )
+      call this%date_range_id_list%append( asCharacter(indx) )
+
+      if ( DAILY_DT%curr < DAILY_DT%end ) then
+        call DAILY_DT%addDay()
+      else
+        exit
+      endif
+    enddo
+
+  end subroutine create_date_list_for_daily_statistics
 
 !------------------------------------------------------------------------------
 

@@ -372,7 +372,7 @@ contains
   !! @retval   fRunoff  Daily runoff calculated by means of the SCS Curve Number method.
   !!
   !! @note Reference: Woodward, D. E., R. H. Hawkins, R. Jiang, A. Hjelmfeldt Jr, J. Van Mullem,
-  !!       and Q. D. Quan. “Runoff Curve Number Method: Examination of the Initial Abstraction Ratio.”
+  !!       and Q. D. Quan. "Runoff Curve Number Method: Examination of the Initial Abstraction Ratio."
   !!       In Conference Proceeding Paper, World Water and Environmental Resources Congress, 2003.
   elemental subroutine runoff_curve_number_calculate(runoff,                              &
                                                      curve_num_adj,                       &

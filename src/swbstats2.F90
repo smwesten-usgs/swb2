@@ -106,7 +106,7 @@ program swbstats2
       //TRIM(int2char(__G95_MINOR__))
 #endif
 
-    allocate(usage_string(48))
+    allocate(usage_string(50))
 
     usage_string = [                                                           &
      "usage: swbstats2 [options] netcdf_file_name                           ", &
@@ -119,6 +119,8 @@ program swbstats2
      "    calculate statistics for every calendar year between start and end", &
      "  [ --monthly_statistics ]                                            ", &
      "    calculate statistics for every month between start and end        ", &
+     "  [ --daily_statistics ]                                              ", &
+     "    calculate statistics for every day between start and end          ", &     
      "  [ --annualize_sums ]                                                ", &
      "    express sums on an annual basis (e.g. inches per year)            ", &
      "  [ --report_as_volume ]                                              ", &
@@ -196,6 +198,11 @@ program swbstats2
 
       swbstats%calculation_time_period = CALC_PERIOD_ANNUAL
       swbstats%filename_modifier_string = "YEARLY"
+
+    elseif ( command_arg_str .containssimilar. "daily_statistics" ) then
+
+      swbstats%calculation_time_period = CALC_PERIOD_DAILY
+      swbstats%filename_modifier_string = "DAILY"
 
     elseif ( command_arg_str .containssimilar. "monthly_statistics" ) then
 
@@ -385,6 +392,10 @@ program swbstats2
   elseif (swbstats%calculation_time_period == CALC_PERIOD_MONTHLY) then
 
     call swbstats%create_date_list_for_monthly_statistics()
+
+  elseif (swbstats%calculation_time_period == CALC_PERIOD_DAILY) then
+
+    call swbstats%create_date_list_for_daily_statistics()
 
   endif
 

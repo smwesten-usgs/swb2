@@ -206,7 +206,7 @@ contains
   !!    "Crop Evapotranspiration (Guidelines for computing crop water
   !!    requirements)", Food and Agriculture Organization, Rome, Italy.
   !!
-  !! @note Duffie, J.A., Beckman, W.A. Solar Engineering of Thermal Processes.”. New York: Wiley, 1980.
+  !! @note Duffie, J.A., Beckman, W.A. Solar Engineering of Thermal Processes. New York: Wiley, 1980.
   !!
   !! @note Equation 1.2.3 in Iqbal, Muhammad (1983-09-28). An Introduction To Solar Radiation (p. 28).
   !!       Elsevier Science. Kindle Edition.

@@ -118,8 +118,8 @@ To calculate canopy interception, the first step is to determine the
 minimum depth of precipitation necessary to saturate the forest canopy,
 *P<sub>sat</sub>*. Forest canopy is calculated as
 
-${P\_{sat}} = - {S \over {c \cdot V}}\\ln \left( {1 - V}
-\right)$
+@f${P_{sat}} = - {S \over {c \cdot V}}\\ln \left( {1 - V}
+\right)@f$
 
 where
 
