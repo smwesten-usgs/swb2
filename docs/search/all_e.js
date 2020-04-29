@@ -1,6 +1,6 @@
 var searchData=
 [
-  ['online_20documentation_20_28_3cstrong_3edraft_21_21_20work_20in_20progress_3c_2fstrong_3e_29_981',['Online Documentation (&lt;strong&gt;DRAFT!! WORK IN PROGRESS&lt;/strong&gt;)',['../md__d_1__s_m_w_data_git_repos_swb2_doc_src_index.html',1,'']]],
+  ['online_20documentation_981',['Online Documentation',['../md__d_1__s_m_w_data_git_repos_swb2_doc_src_index.html',1,'']]],
   ['open_982',['open',['../structfile__operations_1_1ascii__file__t.html#a36be8f8c91a5af7770e795f7f1564ab3',1,'file_operations::ascii_file_t']]],
   ['open_5foutput_5fnetcdf_5ffiles_983',['open_output_netcdf_files',['../structswbstats2__support_1_1swbstats__t.html#a13c8ce1d9c7ba22b600e1a8223f35b9b',1,'swbstats2_support::swbstats_t::open_output_netcdf_files()'],['../namespaceswbstats2__support.html#a9ba75035f1e3b7f50078802433f4650b',1,'swbstats2_support::open_output_netcdf_files()']]],
   ['open_5fzonal_5fstats_5foutput_5ffile_984',['open_zonal_stats_output_file',['../structswbstats2__support_1_1swbstats__t.html#a00729de7065c87e44564ee8ebc9c32b5',1,'swbstats2_support::swbstats_t::open_zonal_stats_output_file()'],['../namespaceswbstats2__support.html#ae2b1490d0a2dfd1b05b6d9eb1cb5c1f8',1,'swbstats2_support::open_zonal_stats_output_file()']]],

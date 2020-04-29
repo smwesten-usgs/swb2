@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.18"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Soil Water Balance (SWB2): Online Documentation (&lt;strong&gt;DRAFT!! WORK IN PROGRESS&lt;/strong&gt;)</title>
+<title>Soil Water Balance (SWB2): Online Documentation</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -89,23 +89,24 @@ $(document).ready(function(){initNavTree('md__d_1__s_m_w_data_git_repos_swb2_doc
 
 <div class="PageDoc"><div class="header">
   <div class="headertitle">
-<div class="title">Online Documentation (<b>DRAFT!! WORK IN PROGRESS</b>) </div>  </div>
+<div class="title">Online Documentation </div>  </div>
 </div><!--header-->
 <div class="contents">
-<div class="textblock"><p>The official documentation for this code is contained in <a href="https://pubs.er.usgs.gov/publication/tm6A59">USGS Techniques and Methods Report 6-A59</a>. This online documentation is a work-in-progress. While we will try to keep this as up-to-date as possible, you may find occasionally find instances where the actual behavior of the code differs from the official documentation or from this online documentation. Please consider submitting an issue on the <a href="https://github.com/smwesten-usgs/swb2/issues">GitHub repository</a> if you find such differences between code and documentation.</p>
+<div class="textblock"><p><b>DRAFT!! WORK IN PROGRESS</b></p>
+<p>The official documentation for this code is contained in <a href="https://pubs.er.usgs.gov/publication/tm6A59">USGS Techniques and Methods Report 6-A59</a>. This online documentation is a work-in-progress. While we will try to keep this as up-to-date as possible, you may find occasionally find instances where the actual behavior of the code differs from the official documentation or from this online documentation. Please consider submitting an issue on the <a href="https://github.com/smwesten-usgs/swb2/issues">GitHub repository</a> if you find such differences between code and documentation.</p>
 <h1><a class="anchor" id="autotoc_md1"></a>
 Installing and Running Soil-Water-Balance Version 2.0</h1>
-<p>SWB is compiled Fortran 2008 code; no installation is needed other than copying the executable program to the desired location on the system hard drive. When the name of the executable is typed at a terminal command prompt, SWB will start up, list the compilation date, list the Git commit hash and branch, and finally, list any options that may be invoked. Git is a software tool designed to keep track of changes made to a source code such as SWB (Torvalds and Hamano, 2010). A Git commit hash is a symbol that uniquely identifies the state of the code modules used to compile the version of SWB the user is running. If a SWB run has issues, the Git commit hash is crucial for recreating the code as it existed during compilation.</p>
-<p>The procedure for running SWB is the same for an Apple Macintosh, Linux, or Windows-based computer. An example of SWB execution with no command-line arguments when run on a Macintosh is shown in figure 1. <img src="swb_startup_message.png" alt="" class="inline" title="SWB startup message"/>   </p>
-<p>Figure 1. Command-line response when Soil-Water-Balance (SWB) version 2.0 is executed with no other arguments.</p>
-<h1><a class="anchor" id="autotoc_md2"></a>
-System Requirements</h1>
-<p>SWB can be compiled and run on any modern hardware including Apple Macintosh, Linux, or Windows-based systems. Performance will improve if SWB is run on a system with greater processing speed and more random access memory (RAM). A small problem, consisting of a model domain of about 100 cells by 100 cells, will run on a small single-board computer such as a Raspberry Pi, albeit slowly.</p>
-<p>An important point about system requirements is that the code is capable of accessing large gridded climate datasets and will run efficiently by pulling out only the data needed for the simulation. This point can be viewed as a positive and a negative attribute about SWB. From an ease of use standpoint, a user can save a lot of work by downloading a gridded dataset, such as Daymet (Thornton and others, 2016), for the conterminous United States. SWB will run efficiently while accessing national gridded datasets, pulling the local values as needed. However, a year of Daymet data takes up almost 3 gigabytes (GB) of disk space; a simulation spanning from 1980 to 2016 would require more than 100 GB of disk storage for just the daily weather dataset. Although a considerable amount of space may be saved by creating a subset of the gridded data, the task would require a considerable amount of time and effort. The purchase of a larger hard drive, therefore, would be more efficient.</p>
-<p>Output from SWB is now in the form of a compressed Network Common Data Form (netCDF) file (Unidata, 2014). A 346 by 400-cell example problem run with SWB for a 2-year period generated about 900 megabytes (MB) of file output. For a typical SWB simulation, a hard drive with empty space ranging from 100 GB or greater is recommended to accommodate the output files generated by SWB.</p>
-<h1><a class="anchor" id="autotoc_md3"></a>
-Running SWB</h1>
-<p>SWB must be run from an operating system command line, with a control filename specified. If the command 'swb2' is entered at the command prompt without providing a control filename, SWB will print out some diagnostic information. The information includes the date of compilation and a Git hash that uniquely identifies the source code used in the compilation SWB also prints out a message that mentions three command-line options: &ndash;output_prefix, &ndash;output_dir, and &ndash;data_dir.</p>
+<p>SWB is compiled Fortran 2008 code; no installation is needed other than copying the executable program to the desired location on the system hard drive. When the name of the executable is typed at a terminal command prompt, SWB will start up, list the compilation date, list the Git commit hash and branch, and finally, list any options that may be invoked (fig 1). Git is a software tool designed to keep track of changes made to a source code such as SWB (Torvalds and Hamano, 2010). A Git commit hash is a symbol that uniquely identifies the state of the code modules used to compile the version of SWB the user is running. If a SWB run has issues, the Git commit hash is crucial for recreating the code as it existed during compilation.</p>
+<p><img src="swb_startup_message.png" alt="" class="inline" title="SWB startup message"/>   </p>
+<p><b>Figure 1.</b> Command-line response when Soil-Water-Balance (SWB) version 2.0 is executed with no other arguments.</p>
+<h2><a class="anchor" id="autotoc_md2"></a>
+System Requirements</h2>
+<p>SWB compiles and runs on any modern hardware including Apple Macintosh, Linux, or Windows-based systems. Performance will generally be better on a system with greater processing speed and more random access memory (RAM). A small problem, consisting of a model domain of about 100 cells by 100 cells, will run on a small single-board computer such as a Raspberry Pi, albeit slowly.</p>
+<p>SWB is able to access large gridded daily weather datasets by use of the netCDF library and will run efficiently by pulling out only the data needed for the simulation. It is possible to supply SWB with gridded weather data such as Daymet (Thornton and others, 2016) for the conterminous United States even if the model application area is only a few square kilometers; SWB will pull the local values as needed. However, a year of Daymet data covering the continental United States takes up almost 3 gigabytes (GB) of disk space; a simulation spanning from 1980 to 2018 would require more than 100 GB of disk storage for just the daily weather dataset. The authors have had success using Python packages such as xarray to effciently pare down continental-scale daily weather input netCDF files to a size covering local or regional SWB application areas.</p>
+<p>Output from SWB is in the form of a compressed Network Common Data Form (netCDF) file (Unidata, 2014). A 346 by 400-cell example problem run with SWB for a 2-year period generates about 900 megabytes (MB) of file output. For a typical SWB simulation, a hard drive with empty space ranging from 100 GB or greater is recommended to accommodate the output files generated by SWB.</p>
+<h2><a class="anchor" id="autotoc_md3"></a>
+Running SWB</h2>
+<p>SWB must be run from an operating system command line, with a control filename specified. If the command 'swb2' is entered at the command prompt without providing a control filename, SWB will print out some diagnostic information (fig 1.). The information includes the date of compilation and a Git hash that uniquely identifies the source code used in the compilation SWB also prints out a message that mentions three command-line options: &ndash;output_prefix, &ndash;output_dir, and &ndash;data_dir.</p>
 <p>Within the control file, paths may be specified so that the input datasets may stay in their own dedicated space on the hard drive. SWB will use relative or absolute paths to files. The &ndash;output_prefix option allows the user to specify a text string that will be affixed to the front of each output file name. The &ndash;output_dir option allows the user to specify the location in which program output should be stored. The &ndash;data_dir option may be used to specify the location on the disk that SWB will search for input data.</p>
 <p>If swb2 my_control_file.ctl &ndash;output_prefix=WI_ &ndash;output_dir=output &ndash;data_dir=input is entered at the command line, an SWB run will begin with whatever options are contained within the control file. Output files will be prefixed with the characters WI_ and saved in the output subdirectory, and the required data will be accessed in the input subdirectory.</p>
 <h1><a class="anchor" id="autotoc_md4"></a>
@@ -114,8 +115,8 @@ Overview of Input and Output Files</h1>
 <h2><a class="anchor" id="autotoc_md5"></a>
 Input Files</h2>
 <p>Several different input files must be in place for an SWB simulation to work. The most important of these files is the SWB control file. The control file specifies the location of input data grids and climate datasets and is the place where the user may select specific program options. A lookup table, or possibly several lookup tables, are required to relate SWB model parameters to the land use or hydrologic soil group, or both. Input-data grids are used to provide SWB with a map of land-use and soil-related information. Finally, daily weather data must be provided in either tabular or gridded form. These input files are discussed in greater detail in the following sections.</p>
-<h3><a class="anchor" id="autotoc_md6"></a>
-Control File</h3>
+<h2><a class="anchor" id="autotoc_md6"></a>
+Control File</h2>
 <p>The SWB control file contains all details about the grid specifications, gridded and tabular datasets to be used, and the location and name of lookup tables. SWB does not require the control file entries to be made in any particular order. The control file statements do not need to be in uppercase letters; Lookup_table works as well as LOOKUP_TABLE. Note that in SWB version 2.0, the cartographic projection of the SWB project grid is required to be supplied by means of the BASE_PROJECTION_DEFINITION directive in the form of a PROJ.4 string (fig. 2). </p><div class="fragment"><div class="line">## SWB 2 will ignore lines that begin with one of the following:  #%!+=</div>
 <div class="line">## also, SWB doesn&#39;t care about blank lines</div>
 <div class="line">## the order of lines makes no difference to SWB; however, it is useful for</div>
@@ -235,8 +236,8 @@ Control File</h3>
 <p>The section of the SWB control file in figure 2 shows how the SCALE_FACTOR and ADD_OFFSET suffixes can be used to ensure that gridded data in the International System of Units (millimeter, degrees Celsius) are converted to U.S. customary units (inch, degrees Fahrenheit) as the grids are read in by SWB.</p>
 <p>Toward the end of the control file syntax shown in figure 2 are several directives that need additional explanation. The INITIAL_PERCENT_SOIL_MOISTURE directive allows the user to set the percent of soil saturation for each grid cell in the model. Likewise, the INITIAL_SNOW_COVER_STORAGE directive allows the user to set the amount of snow as water equivalent for each grid cell in the model. Both of these directives may be specified as CONSTANT values or may be specified using Arc ASCII or Surfer grids. If gridded values are supplied, the grids must be in the same cartographic projection and of the same dimensions as the SWB project grid.</p>
 <p>The choice regarding the use of a constant value instead of a gridded set of initial conditions for these values is project-specific. If the first year of a simulation is to be discarded as a spool-up period (a period in which soil-moisture and snow-depth values lose the memory of their initial condition values), then reasonable values suitable for average project area conditions may be specified as CONSTANT values. For a project in the northern Midwest of the United States, the INITIAL_PERCENT_SOIL_MOISTURE might be set to 70 percent, and the INITIAL_SNOW_COVER_STORAGE might be set to 1.0 inches. Alternatively, SWB could be run for several years with the last day of the simulation ending just before the start date of the period of interest. The soil-moisture and snow-storage values on the last day of such a simulation could be extracted and supplied as initial conditions to SWB for the run covering the time period of interest.</p>
-<h3><a class="anchor" id="autotoc_md7"></a>
-Lookup Tables</h3>
+<h2><a class="anchor" id="autotoc_md7"></a>
+Lookup Tables</h2>
 <p>In addition to the gridded data, one or more lookup tables must be provided to supply parameter values to the SWB methods. Many parameters are specified for specific combinations of land-use categories and hydrologic soil groups. The required parameters for each SWB method are listed in appendix 3. At a minimum, a SWB application requires the user to supply parameter values for the Soil Conservation Service curve number, the maximum recharge rate, the growing and nongrowing season interception values, and the rooting depths; except for the interception values, these parameters are specified for each combination of land use category and hydrologic soil group.</p>
 <p>In the original version of the SWB model (version 1.0), the location of the parameters was hardwired; in other words, SWB version 1.0 required the lookup table to be structured such that the parameters were supplied in a nonflexible column order. Parameter values for curve numbers were supplied in the first columns, followed by the maximum recharge rates, interception values, and rooting depths. In addition, SWB version 1.0 required that the number of soil types and land uses be specified and did not allow nor require a table header.</p>
 <p>SWB version 2.0 uses keywords to identify parameter values within the table; the new lookup tables allow parameters to be supplied in any arbitrary column order. A separate column of parameter values must be supplied for each soil type. A snippet of the new table format is listed in table 2-1). Of the field values listed, the land-use code (LU_Code) is the key that relates the table values back to the land-use grid. The "Description" field is ignored by SWB, and the remaining fields specify the maximum surface storage for a given land use and the range of curve numbers for combinations of land-use categories and hydrologic soil groups. Tables could be easily prepared using spreadsheet software such as Microsoft Excel; however, tables should be saved as a tab-delimited text file for use with SWB.</p>
@@ -267,11 +268,11 @@ Lookup Tables</h3>
 </table>
 <p>In SWB 2.0, each column should be clearly identified so that the proper parameters may be linked to their respective process methods. Parameters that are tied to land use and to soil type are identified in the header in the form parameter_name_#, where # is the index value of the hydrologic soil group and must correspond to the values given in that grid. There must be a column for each index value found in the grid file. Soil types (hydrologic soil groups) are assumed to be numbered from 1 to <em>n</em>, where <em>n</em> is the number of different soil groupings. If a soil with five distinct hydrologic soil groups is supplied, the lookup table would need curve numbers for each land use and soil type combination; the column names for these curve numbers would be CN_1, CN_2, CN_3, CN_4, and CN_5. The required column names for each method are listed in appendix 3.</p>
 <p>If multiple lookup tables are used, the row ordering must be consistent from one table to the next***;*** SWB will perform some basic sanity checks on the table values, but will assume that values from all tables are defined relative to the order of land*-*use codes read from the first table that the SWB checks.</p>
-<h3><a class="anchor" id="autotoc_md8"></a>
-Input Data Grids</h3>
+<h2><a class="anchor" id="autotoc_md8"></a>
+Input Data Grids</h2>
 <p>Several input data grids are required to perform a basic SWB run. As a SWB model, basic information about the soils is required. The typically required data grids are discussed in the following sections. Choosing other optional process methods may negate the need for the grids discussed in this section; however, additional gridded data types may be required.</p>
-<h4><a class="anchor" id="autotoc_md9"></a>
-Hydrologic Soil Group</h4>
+<h3><a class="anchor" id="autotoc_md9"></a>
+Hydrologic Soil Group</h3>
 <p>The hydrologic soil group grid is an integer-valued grid that contains the soil group for each cell in the model. Any number of soils may be used in this grid, but frequently SWB models use the integers 1, 2, 3, and 4 to represent the 4 standard hydrologic soil groups defined as part of the curve number literature. The U.S. Department of Agriculture, Natural Resources Conservation Service, formerly the Soil Conservation Service, has categorized more than 14,000 soil series within the United States into 1 of 4 hydrologic soil groups (A-D) on the basis of infiltration capacity. Hydrologic soil group information may be input to the model as an Arc ASCII or Surfer integer grid with values ranging from 1 (soil group A) to 4 (soil group D). Soils in hydrologic soil group A have a high infiltration capacity and, consequently, a low overland flow potential. In contrast, soils in hydrologic soil group D, have a low infiltration capacity and, consequently, a high overland flow potential (table 2-2).</p>
 <ol type="1">
 <li>Infiltration rates for hydrologic soil groups and associated Soil-Water-Balance (SWB) grid values.</li>
@@ -288,8 +289,8 @@ Hydrologic Soil Group</h4>
 <tr class="markdownTableRowEven">
 <td class="markdownTableBodyNone">D </td><td class="markdownTableBodyNone">Less than 0.05 inch per hour </td><td class="markdownTableBodyNone">4  </td></tr>
 </table>
-<h4><a class="anchor" id="autotoc_md10"></a>
-Available Water Capacity</h4>
+<h3><a class="anchor" id="autotoc_md10"></a>
+Available Water Capacity</h3>
 <p>SWB needs one or more datasets for use in assigning the size of the soil-storage reservoirs. The user can specify gridded datasets of either (1) maximum soil-water capacity in inches, or (2) available-water-capacity in inches per foot, along with tabular values of the rooting depth in feet. Traditionally SWB uses the gridded available water capacity and tabular rooting depth to calculate a maximum soil water-holding capacity for each grid cell. The maximum soil-water capacity is calculated as in equation 2-1.</p>
 <p>(2-1)</p>
 <p>If the maximum soil-water capacity is not specified directly, each grid cell within the model area must be assigned an available water capacity and each combination of land use and soil type assigned a rooting depth in the lookup table. Soil classifications, which include an estimate of the available water capacity or textural information, are typically available through the state offices of the Natural Resources Conservation Service or on the website at https:\\soils.usda.gov. If data for available water capacity are not available, the user can use soil texture to assign a value, listed in table 2-3 (original source table 10, Thornthwaite and Mather, 1957).</p>
@@ -330,11 +331,11 @@ Available Water Capacity</h4>
 </table>
 <p>The available water capacity of a soil is typically given as inches of water-holding capacity per foot of soil thickness. For example, if a soil type has an available water capacity of 2 inches per foot and the root-zone depth of the cell under consideration is 2.5 feet, the maximum water capacity of that grid cell would be 5.0 inches. The 5.0 inches is the maximum amount of soil-water storage that can take place in the grid cell. Water added to the soil column in excess of this value will become recharge.</p>
 <p>A grid containing the maximum soil-water capacity may be input directly into the SWB code, bypassing the internal calculation of the maximum soil-water capacity.</p>
-<h4><a class="anchor" id="autotoc_md11"></a>
-Land-Use Code</h4>
+<h3><a class="anchor" id="autotoc_md11"></a>
+Land-Use Code</h3>
 <p>The model uses land-use information, together with the soil-available, water-capacity information, to calculate surface runoff and assign a maximum soil-moisture holding capacity for each grid cell. The original model required that land-use classifications follow a modified Anderson Level II Land Cover Classification (Anderson and others, 1976). SWB can handle any arbitrary land-use classification method as long as the accompanying land-use lookup table contains curve-number, interception, maximum-recharge, and rooting-depth data for each land-use type contained in the grid. Data from the Multi-Resolution Land Characteristics Consortium (<a href="https://www.mrlc.gov/">https://www.mrlc.gov/</a>) are a common source for land-use data, but any suitable gridded dataset may be used.</p>
-<h4><a class="anchor" id="autotoc_md12"></a>
-D8 Surface-Water-Flow Direction</h4>
+<h3><a class="anchor" id="autotoc_md12"></a>
+D8 Surface-Water-Flow Direction</h3>
 <p>The SWB code requires an integer flow-direction grid for the entire model domain when the flow-routing method is enabled. SWB uses the flow-direction grid to determine how to route overland flow between cells. The user must create the flow-direction grid consistent with the D8 flow-routing algorithm (O'Callaghan and Mark, 1984), with flow directions defined as shown in figure 2-5*B*. The original algorithm assigns a unique flow direction to each grid cell by determining the steepest slope between the central cell and its eight neighboring cells. For the cells shown in figure 2-5*A*, the steepest descent algorithm results in flow from the central cell to the southwest; the corresponding cell figure 2-5*B*, located to the southwest of the central cell, contains the number 8. By convention, therefore, the D8 flow direction for the cell shown in figure 2-5*A* is 8.</p>
 <ol type="1">
 <li>Example (a) elevation grid values, in meters, and (b) resulting D8 flow-direction encoding.</li>
@@ -342,8 +343,8 @@ D8 Surface-Water-Flow Direction</h4>
 <p>Many GIS software implementations of the D8 algorithm generate intermediate grids whereby neighboring cells are assigned a combination of flow-direction encodings. A cell for which all neighboring cells are of equal or greater elevation is a cell that Jenson and Domingue (1988) called a condition 4 cell. For example, if the cells to the east, southeast, south, and southwest of the central cell in figure 2-5*A* all share the same elevation as the central cell (109), water might be expected to flow to any one of the neighboring cells. The flow direction for such a cell might be encoded as; a flow direction that is not a power of 2 is most likely to be generated from an unfilled digital elevation model. SWB is not equipped to handle these values.</p>
 <p>In the SWB code, a cell for which the flow-direction value is not a power of 2 (as shown in fig. 2-5*B*) is considered to indicate a closed depression. The SWB code does not attempt to split flows between two or more cells; if a cell has more than one possible flow direction, the cell is identified as a closed depression. The SWB code allows no further surface runoff to be generated or ponding to occur. The SWB code, instead, requires water in excess of the soil-moisture capacity to contribute to net infiltration, with net infiltration in excess of any maximum net-infiltration rate extracted from the model domain and tracked as runoff_outside.</p>
 <p>For best results, the user must carefully consider whether the D8 flow-direction grid should be generated from an unfilled or a filled digital elevation model and if SWB's treatment of flow-direction grid values that are not a power of 2 (as a depression) is acceptable. In addition, some researchers suggest that the traditional filling procedure used to prepare grids for use in determining D8 flow direction may be inappropriate for glaciated areas of the country where large areas of internal drainage reduce the size of the contributing area to streams. The presence of large areas of internal drainage may result in overestimation of surface-water runoff (Macholl and others, 2011; Richards and Brenner, 2004).</p>
-<h3><a class="anchor" id="autotoc_md13"></a>
-Climate Data Tables or Grids</h3>
+<h2><a class="anchor" id="autotoc_md13"></a>
+Climate Data Tables or Grids</h2>
 <p>The most important component of the water budget when estimating net infiltration is precipitation. The next most important component is generally evaporation, which can be estimated from air temperature data. SWB accepts precipitation, and minimum and maximum air temperature data in the form of tabular or gridded files.</p>
 <p>For a project that covers an area small enough to be described by a single climate station, these data may be entered directly by use of a table that has header and date formats the same as those shown in fig. 2-6.</p>
 <div class="fragment"><div class="line">% Data obtained from ***** station in Roswell, NM</div>
@@ -357,11 +358,11 @@ Climate Data Tables or Grids</h3>
 <li>Sample climate data in tabular form.</li>
 </ol>
 <p>For many projects, the use of some type of gridded data may be desirable. The source of the gridded data might be a project-specific custom interpolation routine. Alternatively, a gridded data product such as Daymet (Thornton and others, 2016) can be used. Daymet uses consistent methodology to generate a continuous gridded dataset for the contiguous United States, The dataset contains precipitation, air temperature, and several other estimated data series (relative humidity, snow-water equivalent). The precomputed gridded datasets are generally much easier to use and save significant amounts of time relative to computing project-specific interpolated fields for precipitation and air temperature. Use of gridded datasets with SWB is discussed further in the "Gridded Datasets" section of this appendix.</p>
-<h2><a class="anchor" id="autotoc_md14"></a>
-Output Files</h2>
+<h1><a class="anchor" id="autotoc_md14"></a>
+Output Files</h1>
 <p>This section describes the gridded netCDF files and ASCII log files generated by SWB during a simulation run.</p>
-<h3><a class="anchor" id="autotoc_md15"></a>
-netCDF Files</h3>
+<h2><a class="anchor" id="autotoc_md15"></a>
+netCDF Files</h2>
 <p>Primary water-budget variables and other important variables are written to individual netCDF files. These variables are listed in table 2-4. The filenames include the variable name, the time range in years, and the dimensions of the grid. For example, the output filename for the rainfall variable for a model run that spans from 2013 to 2014 and covers a model domain of 346 rows by 400 columns would be named "rainfall\_2013\_2014\_\_346\_by\_400.nc." Because of the efficiency of the underlying netCDF library, writing out netCDF files with SWB is still several times faster than writing to the custom binary files of SWB version 1.0.</p>
 <ol type="1">
 <li>List of variables written to separate netCDF files.</li>
@@ -473,8 +474,8 @@ netCDF Files</h3>
 </ol>
 <p>More details about making use of netCDF files are given in the "Gridded
 Datasets" section of this appendix.</p>
-<h3><a class="anchor" id="autotoc_md16"></a>
-Log Files</h3>
+<h2><a class="anchor" id="autotoc_md16"></a>
+Log Files</h2>
 <p>In addition to the gridded netCDF output files, SWB writes ASCII log files each time the code is run. If the user experiences an issue while running the code, the first response should be to examine the end of the log file. Often an important error or warning message will be printed to the log file just before the SWB run fails. A small subset of a SWB run log is shown in figure 2-8.</p>
 <table class="markdownTable">
 <tr class="markdownTableHead">
