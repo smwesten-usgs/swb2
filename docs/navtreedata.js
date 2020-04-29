@@ -25,7 +25,7 @@
 var NAVTREE =
 [
   [ "Soil Water Balance (SWB2)", "index.html", [
-    [ "Online Documentation", "md__d_1__s_m_w_data_git_repos_swb2_doc_src_index.html", [
+    [ "Online Documentation (<strong>DRAFT!! WORK IN PROGRESS</strong>)", "md__d_1__s_m_w_data_git_repos_swb2_doc_src_index.html", [
       [ "Installing and Running Soil-Water-Balance Version 2.0", "md__d_1__s_m_w_data_git_repos_swb2_doc_src_index.html#autotoc_md1", null ],
       [ "System Requirements", "md__d_1__s_m_w_data_git_repos_swb2_doc_src_index.html#autotoc_md2", null ],
       [ "Running SWB", "md__d_1__s_m_w_data_git_repos_swb2_doc_src_index.html#autotoc_md3", null ],
