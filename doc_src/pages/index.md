@@ -1,108 +1,30 @@
----
-title: User Guide
----
-<style>
-pre {
-background-color: #C6C6CB;
-border: 1px solid #777;
-}
-table {
-width: 100%;
-}
-table,th,td {
-border: 1px solid black;
-border-collapse: collapse;
-}
-th, td {
-padding: 5px;
-}
-th {
-text-align: center;
-}
-tbody > tr:nth-child(odd) {
-  background-color: #f9f9f9;
-}
-</style>
+# Online Documentation
 
-# Installing and Running Soil-Water-Balance Version 2.0
+The official documentation for this code is contained in [USGS Techniques and Methods Report 6-A59](https://pubs.er.usgs.gov/publication/tm6A59). This online documentation is a work-in-progress. While we will try to keep this as up-to-date as possible, you may find occasionally find instances where the actual behavior of the code differs from the official documentation or from this online documentation. Please consider submitting an issue on the [GitHub repository](https://github.com/smwesten-usgs/swb2/issues) if you find such differences between code and documentation.
 
-SWB is compiled Fortran 2008 code; no installation is needed other than
-copying the executable program to the desired location on the system
-hard drive. When the name of the executable is typed at a terminal
-command prompt, SWB will start up, list the compilation date, list the
-Git commit hash and branch, and finally, list any options that may be
-invoked. Git is a software tool designed to keep track of changes made
-to a source code such as SWB (Torvalds and Hamano, 2010). A Git commit
-hash is a symbol that uniquely identifies the state of the code modules
-used to compile the version of SWB the user is running. If a SWB run has
-issues, the Git commit hash is crucial for recreating the code as it
-existed during compilation.
+## Installing and Running Soil-Water-Balance Version 2.0
 
-The procedure for running SWB is the same for an Apple Macintosh, Linux,
-or Windows-based computer. An example of SWB execution with no
-command-line arguments when run on a Macintosh is shown in figure 1.
-![SWB startup message](|media|/swb_startup_message.png){: width="600"}
-{: style="text-align: center"}
+SWB is compiled Fortran 2008 code; no installation is needed other than copying the executable program to the desired location on the system hard drive. When the name of the executable is typed at a terminal command prompt, SWB will start up, list the compilation date, list the Git commit hash and branch, and finally, list any options that may be invoked. Git is a software tool designed to keep track of changes made to a source code such as SWB (Torvalds and Hamano, 2010). A Git commit hash is a symbol that uniquely identifies the state of the code modules used to compile the version of SWB the user is running. If a SWB run has issues, the Git commit hash is crucial for recreating the code as it existed during compilation.
+
+The procedure for running SWB is the same for an Apple Macintosh, Linux, or Windows-based computer. An example of SWB execution with no command-line arguments when run on a Macintosh is shown in figure 1. ![SWB startup message](swb_startup_message.png)
 
 Figure 1.  Command-line response when Soil-Water-Balance (SWB) version 2.0 is
     executed with no other arguments.
 
 ## System Requirements
 
-SWB can be compiled and run on any modern hardware including Apple
-Macintosh, Linux, or Windows-based systems. Performance will improve if
-SWB is run on a system with greater processing speed and more random
-access memory (RAM). A small problem, consisting of a model domain of
-about 100 cells by 100 cells, will run on a small single-board computer
-such as a Raspberry Pi, albeit slowly.
+SWB can be compiled and run on any modern hardware including Apple Macintosh, Linux, or Windows-based systems. Performance will improve if SWB is run on a system with greater processing speed and more random access memory (RAM). A small problem, consisting of a model domain of about 100 cells by 100 cells, will run on a small single-board computer such as a Raspberry Pi, albeit slowly.
 
-An important point about system requirements is that the code is capable
-of accessing large gridded climate datasets and will run efficiently by
-pulling out only the data needed for the simulation. This point can be
-viewed as a positive and a negative attribute about SWB. From an ease of
-use standpoint, a user can save a lot of work by downloading a gridded
-dataset, such as Daymet (Thornton and others, 2016), for the
-conterminous United States. SWB will run efficiently while accessing
-national gridded datasets, pulling the local values as needed. However,
-a year of Daymet data takes up almost 3 gigabytes (GB) of disk space; a
-simulation spanning from 1980 to 2016 would require more than 100 GB of
-disk storage for just the daily weather dataset. Although a considerable
-amount of space may be saved by creating a subset of the gridded data,
-the task would require a considerable amount of time and effort. The
-purchase of a larger hard drive, therefore, would be more efficient.
+An important point about system requirements is that the code is capable of accessing large gridded climate datasets and will run efficiently by pulling out only the data needed for the simulation. This point can be viewed as a positive and a negative attribute about SWB. From an ease of use standpoint, a user can save a lot of work by downloading a gridded dataset, such as Daymet (Thornton and others, 2016), for the conterminous United States. SWB will run efficiently while accessing national gridded datasets, pulling the local values as needed. However, a year of Daymet data takes up almost 3 gigabytes (GB) of disk space; a simulation spanning from 1980 to 2016 would require more than 100 GB of disk storage for just the daily weather dataset. Although a considerable amount of space may be saved by creating a subset of the gridded data, the task would require a considerable amount of time and effort. The purchase of a larger hard drive, therefore, would be more efficient.
 
-Output from SWB is now in the form of a compressed Network Common Data
-Form (netCDF) file (Unidata, 2014). A 346 by 400-cell example problem
-run with SWB for a 2-year period generated about 900 megabytes (MB) of
-file output. For a typical SWB simulation, a hard drive with empty space
-ranging from 100 GB or greater is recommended to accommodate the output
-files generated by SWB.
+Output from SWB is now in the form of a compressed Network Common Data Form (netCDF) file (Unidata, 2014). A 346 by 400-cell example problem run with SWB for a 2-year period generated about 900 megabytes (MB) of file output. For a typical SWB simulation, a hard drive with empty space ranging from 100 GB or greater is recommended to accommodate the output files generated by SWB.
 
 ## Running SWB
+SWB must be run from an operating system command line, with a control filename specified. If the command 'swb2' is entered at the command prompt without providing a control filename, SWB will print out some diagnostic information. The information includes the date of compilation and a Git hash that uniquely identifies the source code used in the compilation SWB also prints out a message that mentions three command-line options: --output\_prefix, --output\_dir, and --data\_dir.
 
-SWB must be run from an operating system command line, with a control
-filename specified. If the command ‘swb2’ is entered at the command
-prompt without providing a control filename, SWB will print out some
-diagnostic information. The information includes the date of compilation
-and a Git hash that uniquely identifies the source code used in the
-compilation SWB also prints out a message that mentions three
-command-line options: --output\_prefix, --output\_dir, and --data\_dir.
+Within the control file, paths may be specified so that the input datasets may stay in their own dedicated space on the hard drive. SWB will use relative or absolute paths to files. The --output\_prefix option allows the user to specify a text string that will be affixed to the front of each output file name. The --output\_dir option allows the user to specify the location in which program output should be stored. The --data\_dir option may be used to specify the location on the disk that SWB will search for input data.
 
-Within the control file, paths may be specified so that the input
-datasets may stay in their own dedicated space on the hard drive. SWB
-will use relative or absolute paths to files. The --output\_prefix
-option allows the user to specify a text string that will be affixed to
-the front of each output file name. The --output\_dir option allows the
-user to specify the location in which program output should be stored.
-The --data\_dir option may be used to specify the location on the disk
-that SWB will search for input data.
-
-If swb2 my\_control\_file.ctl --output\_prefix=WI\_ --output\_dir=output
---data\_dir=input is entered at the command line, an SWB run will begin
-with whatever options are contained within the control file. Output
-files will be prefixed with the characters WI\_ and saved in the output
-subdirectory, and the required data will be accessed in the input
-subdirectory.
+If swb2 my\_control\_file.ctl --output\_prefix=WI\_ --output\_dir=output --data\_dir=input is entered at the command line, an SWB run will begin with whatever options are contained within the control file. Output files will be prefixed with the characters WI\_ and saved in the output subdirectory, and the required data will be accessed in the input subdirectory.
 
 # Overview of Input and Output Files
 
@@ -137,7 +59,7 @@ BASE\_PROJECTION\_DEFINITION directive in the form of a PROJ.4 string
 (fig. 2).
 ```
 ## SWB 2 will ignore lines that begin with one of the following:  #%!+=
-## also, SWB doesn’t care about blank lines
+## also, SWB doesn't care about blank lines
 ## the order of lines makes no difference to SWB; however, it is useful for
 ## users to see the definition of the underlying grid up front
 
@@ -313,9 +235,9 @@ SWB version 2.0 uses keywords to identify parameter values within the
 table; the new lookup tables allow parameters to be supplied in any
 arbitrary column order. A separate column of parameter values must be
 supplied for each soil type. A snippet of the new table format is listed
-in table 2–1). Of the field values listed, the land-use code (LU\_Code)
+in table 2-1). Of the field values listed, the land-use code (LU\_Code)
 is the key that relates the table values back to the land-use grid. The
-“Description” field is ignored by SWB, and the remaining fields
+"Description" field is ignored by SWB, and the remaining fields
 specify the maximum surface storage for a given land use and the range
 of curve numbers for combinations of land-use categories and hydrologic
 soil groups. Tables could be easily prepared using spreadsheet software
@@ -377,14 +299,14 @@ and 4 to represent the 4 standard hydrologic soil groups defined as part
 of the curve number literature. The U.S. Department of Agriculture,
 Natural Resources Conservation Service, formerly the Soil Conservation
 Service, has categorized more than 14,000 soil series within the United
-States into 1 of 4 hydrologic soil groups (A–D) on the basis of
+States into 1 of 4 hydrologic soil groups (A-D) on the basis of
 infiltration capacity. Hydrologic soil group information may be input to
 the model as an Arc ASCII or Surfer integer grid with values ranging
 from 1 (soil group A) to 4 (soil group D). Soils in hydrologic soil
 group A have a high infiltration capacity and, consequently, a low
 overland flow potential. In contrast, soils in hydrologic soil group D,
 have a low infiltration capacity and, consequently, a high overland flow
-potential (table 2–2).
+potential (table 2-2).
 
 2.  Infiltration rates for hydrologic soil groups and associated
     Soil-Water-Balance (SWB) grid
@@ -393,8 +315,8 @@ values.
 | Hydrologic soil group | Infiltration rate              | Integer grid value |
 | --------------------- | ------------------------------ | ------------------ |
 | A                     | Greater than 0.3 inch per hour | 1                  |
-| B                     | 0.15–0.3 inch per hour         | 2                  |
-| C                     | 0.05–0.15 inch per hour        | 3                  |
+| B                     | 0.15-0.3 inch per hour         | 2                  |
+| C                     | 0.05-0.15 inch per hour        | 3                  |
 | D                     | Less than 0.05 inch per hour   | 4                  |
 
 #### Available Water Capacity
@@ -406,9 +328,9 @@ available-water-capacity in inches per foot, along with tabular values
 of the rooting depth in feet. Traditionally SWB uses the gridded
 available water capacity and tabular rooting depth to calculate a
 maximum soil water-holding capacity for each grid cell. The maximum
-soil-water capacity is calculated as in equation 2–1.
+soil-water capacity is calculated as in equation 2-1.
 
-(2–1)
+(2-1)
 
 If the maximum soil-water capacity is not specified directly, each grid
 cell within the model area must be assigned an available water capacity
@@ -418,7 +340,7 @@ the available water capacity or textural information, are typically
 available through the state offices of the Natural Resources
 Conservation Service or on the website at https:\\\\soils.usda.gov. If
 data for available water capacity are not available, the user can use
-soil texture to assign a value, listed in table 2–3 (original source
+soil texture to assign a value, listed in table 2-3 (original source
 table 10, Thornthwaite and Mather, 1957).
 
 3.  Estimated available water capacities for various soil-texture
@@ -474,15 +396,15 @@ The SWB code requires an integer flow-direction grid for the entire
 model domain when the flow-routing method is enabled. SWB uses the
 flow-direction grid to determine how to route overland flow between
 cells. The user must create the flow-direction grid consistent with the
-D8 flow-routing algorithm (O’Callaghan and Mark, 1984), with flow
-directions defined as shown in figure 2–5*B*. The original algorithm
+D8 flow-routing algorithm (O'Callaghan and Mark, 1984), with flow
+directions defined as shown in figure 2-5*B*. The original algorithm
 assigns a unique flow direction to each grid cell by determining the
 steepest slope between the central cell and its eight neighboring cells.
-For the cells shown in figure 2–5*A*, the steepest descent algorithm
+For the cells shown in figure 2-5*A*, the steepest descent algorithm
 results in flow from the central cell to the southwest; the
-corresponding cell figure 2–5*B*, located to the southwest of the
+corresponding cell figure 2-5*B*, located to the southwest of the
 central cell, contains the number 8. By convention, therefore, the D8
-flow direction for the cell shown in figure 2–5*A* is 8.
+flow direction for the cell shown in figure 2-5*A* is 8.
 
 5.  Example (a) elevation grid values, in meters, and (b) resulting D8
     flow-direction encoding.
@@ -492,7 +414,7 @@ intermediate grids whereby neighboring cells are assigned a combination
 of flow-direction encodings. A cell for which all neighboring cells are
 of equal or greater elevation is a cell that Jenson and Domingue (1988)
 called a condition 4 cell. For example, if the cells to the east,
-southeast, south, and southwest of the central cell in figure 2–5*A* all
+southeast, south, and southwest of the central cell in figure 2-5*A* all
 share the same elevation as the central cell (109), water might be
 expected to flow to any one of the neighboring cells. The flow direction
 for such a cell might be encoded as; a flow direction that is not a
@@ -500,7 +422,7 @@ power of 2 is most likely to be generated from an unfilled digital
 elevation model. SWB is not equipped to handle these values.
 
 In the SWB code, a cell for which the flow-direction value is not a
-power of 2 (as shown in fig. 2–5*B*) is considered to indicate a closed
+power of 2 (as shown in fig. 2-5*B*) is considered to indicate a closed
 depression. The SWB code does not attempt to split flows between two or
 more cells; if a cell has more than one possible flow direction, the
 cell is identified as a closed depression. The SWB code allows no
@@ -512,7 +434,7 @@ tracked as runoff\_outside.
 
 For best results, the user must carefully consider whether the D8
 flow-direction grid should be generated from an unfilled or a filled
-digital elevation model and if SWB’s treatment of flow-direction grid
+digital elevation model and if SWB's treatment of flow-direction grid
 values that are not a power of 2 (as a depression) is acceptable. In
 addition, some researchers suggest that the traditional filling
 procedure used to prepare grids for use in determining D8 flow direction
@@ -533,23 +455,18 @@ in the form of tabular or gridded files.
 For a project that covers an area small enough to be described by a
 single climate station, these data may be entered directly by use of a
 table that has header and date formats the same as those shown in fig.
-2–6.
+2-6.
 
+```
     % Data obtained from ***** station in Roswell, NM
-
-```
-%
-```
-
     Date        PRCP        TMIN        TMAX
-
     01-01-2015    0.0        20.0        26.0
+    01-02-2015    1.1        25.0        30.0
+    01-02-2015    0.3        24.0        29.0
+    01-04-2015    0.0        23.0        28.5
+```
 
-    01-02-2015     1.1        25.0        30.0
-
-    01-02-2015     0.3             24.0        29.0
-
-    01-04-2015     0.0        23.0        28.5
+Fig
 
 6.  Sample climate data in tabular form.
 
@@ -564,7 +481,7 @@ snow-water equivalent). The precomputed gridded datasets are generally
 much easier to use and save significant amounts of time relative to
 computing project-specific interpolated fields for precipitation and air
 temperature. Use of gridded datasets with SWB is discussed further in
-the “Gridded Datasets” section of this appendix.
+the "Gridded Datasets" section of this appendix.
 
 ## Output Files
 
@@ -574,12 +491,12 @@ generated by SWB during a simulation run.
 ### netCDF Files
 
 Primary water-budget variables and other important variables are written
-to individual netCDF files. These variables are listed in table 2–4. The
+to individual netCDF files. These variables are listed in table 2-4. The
 filenames include the variable name, the time range in years, and the
 dimensions of the grid. For example, the output filename for the
 rainfall variable for a model run that spans from 2013 to 2014 and
 covers a model domain of 346 rows by 400 columns would be named
-“rainfall\_2013\_2014\_\_346\_by\_400.nc.” Because of the efficiency
+"rainfall\_2013\_2014\_\_346\_by\_400.nc." Because of the efficiency
 of the underlying netCDF library, writing out netCDF files with SWB is
 still several times faster than writing to the custom binary files of
 SWB version 1.0.
@@ -590,8 +507,8 @@ files.
 | Variable name                | Units                  |                                                                                                                                                                                                                                                                           |
 | ---------------------------- | ---------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | gross\_precipitation         | Inches                 | Precipitation amount as read into SWB before any further processing; this is a useful output to examine to ensure that any conversion factors have been specified and interpreted correctly.                                                                              |
-| rainfall                     | Inches                 | Precipitation amount that is considered to have fallen as rainfall; this amount is the gross rainfall—the amount of rainfall before any canopy or vegetation interception is calculated. Net rainfall must be calculated by subtracting interception from rainfall.       |
-| snowfall                     | Inches                 | Precipitation amount that is considered to fall as snow; this amount is the gross snowfall—the amount of precipitation that falls as snow before any canopy or vegetative interception is calculated.                                                                     |
+| rainfall                     | Inches                 | Precipitation amount that is considered to have fallen as rainfall; this amount is the gross rainfall-the amount of rainfall before any canopy or vegetation interception is calculated. Net rainfall must be calculated by subtracting interception from rainfall.       |
+| snowfall                     | Inches                 | Precipitation amount that is considered to fall as snow; this amount is the gross snowfall-the amount of precipitation that falls as snow before any canopy or vegetative interception is calculated.                                                                     |
 | snowmelt                     | Inches                 | Water released to runoff and infiltration as snow melts.                                                                                                                                                                                                                  |
 | interception                 | Inches                 | Canopy or vegetation interception amount.                                                                                                                                                                                                                                 |
 | run-on                       | Inches                 | Water input to a cell derived from runoff from upslope cells.                                                                                                                                                                                                             |
@@ -603,10 +520,10 @@ files.
 | net\_infiltration            | Inches                 | Water that escapes the evapotranspiration demands of the root zone and enters the top of the unsaturated zone.                                                                                                                                                            |
 | rejected\_net\_infiltration  | Inches                 | Net infiltration in excess of a user-specified maximum net-infiltration amount. With routing active, this is added to the run-on for the cell immediately downslope of the current cell.                                                                                  |
 | crop\_et                     | Inches                 | Amount of water extracted from the root zone by plant transpiration; this is only a valid output if crop coefficients are being applied in the simulation.                                                                                                                |
-| soil\_evaporation            | Inches                 | Amount of water extracted from the root zone by evaporation from exposed and wetted soil surfaces; this is only a valid output if crop coefficients are being applied in the simulation and if the dual-stage FAO–56 method is specified as the SOIL\_MOISTURE\_METHOD*.* |
+| soil\_evaporation            | Inches                 | Amount of water extracted from the root zone by evaporation from exposed and wetted soil surfaces; this is only a valid output if crop coefficients are being applied in the simulation and if the dual-stage FAO-56 method is specified as the SOIL\_MOISTURE\_METHOD*.* |
 | gdd                          | Degree-days Fahrenheit | Accumulated growing degree-day value for each cell.                                                                                                                                                                                                                       |
 | runoff\_outside              | Inches                 | Water that can be routed no further downslope because it enters a waterbody or a closed depression or is routed to an inactive model cell and is tracked as runoff outside.                                                                                               |
-| irrigation                   | Inches                 | Total amount of water required to sustain crop growth based on the many user-defined FAO–56 irrigation parameters (maximum allowable depletion, irrigation method).                                                                                                       |
+| irrigation                   | Inches                 | Total amount of water required to sustain crop growth based on the many user-defined FAO-56 irrigation parameters (maximum allowable depletion, irrigation method).                                                                                                       |
 | snow\_storage                | Inches                 | Water stored in the snow reservoir.                                                                                                                                                                                                                                       |
 | soil\_storage                | Inches                 | Water stored in the soil reservoir.                                                                                                                                                                                                                                       |
 | delta soil storage           | Inches                 | Change in amount of water stored in soil-storage reservoir relative to the previous day.                                                                                                                                                                                  |
@@ -617,7 +534,7 @@ A useful feature of netCDF files is that the files are able to hold
 information about multiple variables as well as metadata about the
 conditions under which these variable values were generated. The
 metadata for the snowmelt variable generated by SWB are shown in figure
-2–7. The file holds daily SWB output for snowmelt, along with projected
+2-7. The file holds daily SWB output for snowmelt, along with projected
 and geographic spatial coordinates and detailed information about the
 cartographic projection associated with the projected coordinates. In
 addition, details about the version of the SWB code used to generate
@@ -681,8 +598,8 @@ variables:
 7.  Example header data from a Soil-Water-Balance (SWB) version 2.0
     output netCDF file.
 
-More details about making use of netCDF files are given in the “Gridded
-Datasets” section of this appendix.
+More details about making use of netCDF files are given in the "Gridded
+Datasets" section of this appendix.
 
 ### Log Files
 
@@ -691,7 +608,7 @@ files each time the code is run. If the user experiences an issue while
 running the code, the first response should be to examine the end of the
 log file. Often an important error or warning message will be printed to
 the log file just before the SWB run fails. A small subset of a SWB run
-log is shown in figure 2–8.
+log is shown in figure 2-8.
 
 |                         |
 | ----------------------- |
@@ -710,7 +627,7 @@ selected so that error messages are more easily recognized within the
 voluminous text of the logfile output.
 
 A warning message regarding missing solar-radiation data is shown in
-figure 2–8. SWB will print several similar warnings for each data type
+figure 2-8. SWB will print several similar warnings for each data type
 that does not have an existing file. These warnings are safely ignored,
 but might be useful if SWB reports missing datasets when the user
 believes the datesets have been properly specified.
@@ -726,7 +643,7 @@ written by Gerald Evenden of the U.S. Geological Survey (Evenden, 1990).
 
 The specific attributes of a projection are defined by supplying SWB
 with a PROJ.4 string. A PROJ.4 string may be assembled by specifying a
-combination of the appropriate PROJ.4 parameters (table 2–5) to describe
+combination of the appropriate PROJ.4 parameters (table 2-5) to describe
 the cartographic projection.
 
 5.  List of commonly used PROJ.4 parameter
@@ -767,7 +684,7 @@ names.
 Assembling a string from several PROJ.4 parameters results in a
 definition of a cartographic projection. This string is used by SWB and
 PROJ.4 to transform coordinates to the base project coordinate system.
-Some common cartographic projections are listed in table 2–6. Note that
+Some common cartographic projections are listed in table 2-6. Note that
 the Michigan Oblique Mercator projection offers an example of a
 PROJ.4-supported projection that allows for grid rotation by means of
 the alpha parameter. Groundwater models are often rotated to align with
@@ -816,7 +733,7 @@ If, for example, the data grid contains precipitation data at a
 4-kilometer grid resolution and the underlying SWB base resolution is
 200 meters, the execution time will not be slower by applying a
 nearest-neighbor approach. Interpolating this type of data could be
-done, but would provide only the illusion of greater accuracy—a smoother
+done, but would provide only the illusion of greater accuracy-a smoother
 precipitation surface.
 
 However, if the SWB base grid is 1 kilometer and the underlying data
@@ -869,7 +786,7 @@ In the filename template, the meanings for the characters that
 immediately follow the percent symbol (%) are as follows: %0m, the month
 number (1-12), padded by a leading zero; %0d, the day of the month,
 padded by a leading zero; and %Y, the four-digit year value. More of
-these filename template values are listed in table 2–7.
+these filename template values are listed in table 2-7.
 
 7.  Soil-Water-Balance (SWB) control file template values for specifying
     a series of
@@ -890,7 +807,7 @@ filenames.
 In addition, three modifiers may be specified in the control file if SWB
 is being run on a computing platform where capitalization is
 significant, as is the case for the Linux or MacOS operating systems
-(fig. 2–9).
+(fig. 2-9).
 
     _MONTHNAMES_CAPITALIZED
 
@@ -908,7 +825,7 @@ PRECIPITATION\_MONTHNAMES\_UPPERCASE can be added to the control file.
 When the various control- file modifiers are used together, SWB can
 locate and use a variety of files without requiring that the files be
 renamed. Some common file naming patterns and corresponding SWB template
-statements are listed in table 2–8.
+statements are listed in table 2-8.
 
 8.  Examples showing the use of filename
 templates.
@@ -927,7 +844,7 @@ any input gridded dataset. For each of the applicable gridded datasets,
 a standard set of suffixes may be added to the dataset name to control
 how SWB treats the dataset. The dataset prefixes understood by SWB 2.0
 are given in the previous section. The suffixes understood by SWB are
-listed in table 2–9.
+listed in table 2-9.
 
 9.  Control file suffixes for modifying gridded data input to
     Soil-Water-Balance (SWB) code.
@@ -952,11 +869,11 @@ to\]
 | \_MAXIMUM\_ALLOWED\_VALUE   | real value            | Floor to be applied to the data; data beneath this value will be reset to this amount.                                                                                                         |
 | \_MISSING\_VALUES\_CODE     | real or integer value | Value.                                                                                                                                                                                         |
 | \_MISSING\_VALUES\_OPERATOR | \<, \<=, \>, \>=      | Operator to use for comparison to the \_MISSING\_VALUES\_CODE.                                                                                                                                 |
-| \_MISSING\_VALUES\_ACTION   | mean or zero          | Supplying the keyword “mean” will substitute the mean value calculated over the remaining valid cells; supplying the keyword “zero” will substitute a value of 0.0 in place of missing values. |
+| \_MISSING\_VALUES\_ACTION   | mean or zero          | Supplying the keyword "mean" will substitute the mean value calculated over the remaining valid cells; supplying the keyword "zero" will substitute a value of 0.0 in place of missing values. |
 
 More information regarding the use of some of the control file suffixes
-to handle missing data is in the “Treatment of Missing Values” and
-“Conversion Factors” sections.
+to handle missing data is in the "Treatment of Missing Values" and
+"Conversion Factors" sections.
 
 ## Supported File Types
 
@@ -969,9 +886,9 @@ format is discussed further in the following sections.
 
 ### Surfer ASCII Grid
 
-Golden Software’s ASCII grid format consists of a five-line header
+Golden Software's ASCII grid format consists of a five-line header
 followed by the data values arranged in a matrix. An example Surfer
-ASCII grid file is shown in figure 2–10.
+ASCII grid file is shown in figure 2-10.
 
     DSAA
     14    5
@@ -1000,7 +917,7 @@ The header values contain the following information.
 
 5.  Minimum Z value, maximum Z value.
 
-For the file shown in figure 2–10, the coordinate system has its origin
+For the file shown in figure 2-10, the coordinate system has its origin
 in the lower left-hand corner, with x and y coordinates increasing
 toward the upper right-hand corner. Surfer files are not explicitly
 georeferenced to real-world coordinate systems.
@@ -1008,14 +925,14 @@ georeferenced to real-world coordinate systems.
 ### Arc ASCII Grid
 
 The publishers of ArcMap and ArcView software, Esri, developed one of
-the most commonly used raster-data formats in use. Esri’s Arc ASCII grid
+the most commonly used raster-data formats in use. Esri's Arc ASCII grid
 format is a matrix representation of the gridded dataset with a short
 header tacked to the top of the file (U.S. Library of Congress, 2015).
 In an Arc ASCII grid, the data are arranged as though a user is viewing
 the data from above. The coordinates for the lower left-hand corner of
 the lower left-hand grid cell are specified as xllcorner and yllcorner
-in figure 2–11. The value stored in the lower left-hand grid cell is a
-7, which is shown in the bottom row and left-most column of figure 2–11.
+in figure 2-11. The value stored in the lower left-hand grid cell is a
+7, which is shown in the bottom row and left-most column of figure 2-11.
 
     ncols        34
     nrows        4
@@ -1058,18 +975,18 @@ that will work with SWB output.
 In addition to these benefits of netCDF file use, the fact that dozens
 of open-source tools are available to read, write, and visualize netCDF
 files makes them a good format for use with SWB. A basic tool called
-ncdump—a program to dump the contents of a netCDF file—is distributed by
+ncdump-a program to dump the contents of a netCDF file-is distributed by
 Unidata, the maintainer of netCDF file format. Issuing the command
-ncdump –h along with the filename will cause the header information and
+ncdump -h along with the filename will cause the header information and
 other various metadata to be printed to the screen.
 
 As an example, one useful source for gridded daily weather data is the
 Daymet product containing gridded daily precipitation and air
-temperature for the conterminous United States on a 1 kilometer
+temperature for the conterminous United States on a 1 kilometer
 grid-cell spacing (Thornton and others, 2016). The metadata stored in
 the file reveals a variety of useful information about the file contents
 (fig.
-2–12).
+2-12).
 
     netCDF daymet_v3_prcp_2014_na {
 
@@ -1299,21 +1216,21 @@ the file reveals a variety of useful information about the file contents
 
 This particular file contains three classes of metadata pertaining to
 dimensions, variables, and global attributes. The file contains data
-pertaining to four dimensions—x, y, time, and nv. For this file, the x
-and y dimensions may be thought of in terms of Cartesian coordinates—x
+pertaining to four dimensions-x, y, time, and nv. For this file, the x
+and y dimensions may be thought of in terms of Cartesian coordinates-x
 refers to the number of cells in the east-west orientation, whereas y
 refers to the number of cells in the north-south orientation. The
 dimension time is declared unlimited; this file could contain many days
 of daily weather data. In this case, the time dimension is of size 365,
-which means the file contains 1 year of data. Dimension nv is of size 2
+which means the file contains 1 year of data. Dimension nv is of size 2
 and exists so that the variable time\_bnds can contain a starting and
 ending date and a time stamp.
 
 Each of the nine variables defined is referenced in terms of the
-dimensions. The key variable in the file is named “prcp”—the daily
+dimensions. The key variable in the file is named "prcp"-the daily
 precipitation value. The daily precipitation value is defined at each
 time (day) in the file for all values of x and y. Note the way that
-dates and times are specified in the netCDF file—as a real-valued number
+dates and times are specified in the netCDF file-as a real-valued number
 of days since 1980-01-01 00:00:00 UTC.
 
 The grid-cell location is specified in the following two ways: in terms
@@ -1350,13 +1267,13 @@ SWB project bounds exactly, a PROJ.4 string must be provided to enable
 SWB to translate between project coordinates and the netCDF file
 coordinates.
 
-As an example, look again at the metadata included in figure 2–12. The
+As an example, look again at the metadata included in figure 2-12. The
 creators of this dataset have provided a variable
 (lambert\_conformal\_conic) and have attached several attributes to the
 variable to help ensure correct georeferencing of the coordinate values.
 The PROJ.4 string can be constructed from the metadata attached to the
 lambert\_conformal\_conic variable (fig.
-    2–13).
+    2-13).
 
     +proj=lcc +lat_1=25.0 +lat_2=60.0 +lat_0=42.5 +lon_0=-100.0 +x_0=0.0 +y_0=0.0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs
 
@@ -1365,10 +1282,10 @@ lambert\_conformal\_conic variable (fig.
 
 The netCDF file metadata does not include any details about the ellipse
 (PROJ.4 keyword ellps) or datum associated with this projection.
-However, the semi\_major\_axis and inverse\_flattening” attribute values
+However, the semi\_major\_axis and inverse\_flattening" attribute values
 are consistent with the GRS80 definition (Moritz, 2000). In this
 example, the standard parallels as defined by lat\_1 and lat\_2 in
-figure 2–13 differ from the standard parallels of 33 degrees and 45
+figure 2-13 differ from the standard parallels of 33 degrees and 45
 degrees as described in Snyder (1987). Supplying the standard values in
 the SWB control file, at best, would cause SWB to issue a warning about
 a mismatch between the data coverage and the model domain and, at worst,
@@ -1381,11 +1298,11 @@ air temperature and precipitation data to verify that daily weather data
 are being correctly interpreted by SWB.
 
 An explicit definition of the grid spacing is not included as an
-attribute in the header of the netCDF file (fig. 2–12). However, grid
+attribute in the header of the netCDF file (fig. 2-12). However, grid
 spacing can be gleaned from the coordinate variable values themselves.
 Running the command-line utility ncdump with the option -v x (ncdump -v
 x daymet\_v3\_prcp\_2014\_na.nc4) produces the output shown in figure
-2–14.
+2-14.
 
 ```
     3232750, 3233750, 3234750, 3235750, 3236750, 3237750, 3238750, 3239750,
@@ -1405,7 +1322,7 @@ x daymet\_v3\_prcp\_2014\_na.nc4) produces the output shown in figure
 By subtracting two adjacent x coordinate values, the grid spacing in the
 x direction is 1,000 meters. Subtracting two adjacent y coordinate
 values (not shown) also produces 1,000 meters; therefore, the grid cells
-are square and measure 1 kilometer on a side.
+are square and measure 1 kilometer on a side.
 
 ## Treatment of Missing Values
 
@@ -1420,7 +1337,7 @@ would result in a cell being simulated with permanent winter conditions.
 SWB has a few actions that may be taken to deal with the issue of
 missing values. These actions are triggered through a set of control
 file directives that are supplied as suffixes to the dataset they
-pertain to (table 2–10).
+pertain to (table 2-10).
 
 10. Control file suffixes for treatment of missing data.
 
@@ -1434,7 +1351,7 @@ to\]
 | \_MAXIMUM\_ALLOWED\_VALUE   | Real value            | Floor to be applied to the data; data beneath this value will be reset to this amount.                                                                                                         | \_MAXIMUM\_ALLOWED\_VALUE   |
 | \_MISSING\_VALUES\_CODE     | Real or integer value | Value.                                                                                                                                                                                         | \_MISSING\_VALUES\_CODE     |
 | \_MISSING\_VALUES\_OPERATOR | \<, \<=, \>, \>=      | Operator to use for comparison to the \_MISSING\_VALUES\_CODE.                                                                                                                                 | \_MISSING\_VALUES\_OPERATOR |
-| \_MISSING\_VALUES\_ACTION   | mean or zero          | Supplying the keyword “mean” will substitute the mean value calculated over the remaining valid cells; supplying the keyword “zero” will substitute a value of 0.0 in place of missing values. | \_MISSING\_VALUES\_ACTION   |
+| \_MISSING\_VALUES\_ACTION   | mean or zero          | Supplying the keyword "mean" will substitute the mean value calculated over the remaining valid cells; supplying the keyword "zero" will substitute a value of 0.0 in place of missing values. | \_MISSING\_VALUES\_ACTION   |
 
 For example, gridded weather datasets typically end abruptly at the edge
 of a large waterbody, which from the perspective of interpolations is
@@ -1447,7 +1364,7 @@ dataset is to enforce some type of value substitution for the affected
 cells. For example, to eliminate zones of zero precipitation around a
 large waterbody, control file statements might be added to inform SWB
 that the mean value is to be used in place of missing data values (fig.
-2–15).
+2-15).
 
     PRECIPITATION_MISSING_VALUES_CODE         0.0
 
@@ -1474,7 +1391,7 @@ climate forecast elements from the metadata of a netCDF file should be
 possible; however, in practice, too many gridded datasets are still in
 existence that do not adhere to the standards. For now (2017), the user
 must handle unit conversion explicitly in the control file. The
-control-file syntax is listed in table 2–11.
+control-file syntax is listed in table 2-11.
 
 11. Control file suffixes for use in performing unit conversions of
     values read from
@@ -1489,7 +1406,7 @@ For example, most air-temperature data are stored with units of degrees
 Celsius. To make use of this data grid with SWB, control-file syntax
 would be added to specify the scale factor and offset to apply to the
 data. The scale factor and offset values as applied to minimum
-air-temperature data (TMIN) are shown in figure 2–16.
+air-temperature data (TMIN) are shown in figure 2-16.
 
     TMIN_SCALE_FACTOR         1.8
 
@@ -1521,7 +1438,7 @@ If the user does not wish to have cells with missing values inactivated,
 some GIS preprocessing will be needed to ensure that SWB can separate
 inactive cells from those with missing values. A strategy might be to
 convert active-cell missing values to an extremely large positive
-number, then use SWB’s control file directives to find these values and
+number, then use SWB's control file directives to find these values and
 convert them to appropriate values.
 
 # References Cited
@@ -1537,50 +1454,50 @@ M., 2011, netCDF climate and forecast (CF) metadata conventions (version
 <http://cfconventions.org/cf-conventions/v1.6.0/cf-conventions.html>.
 
 Evenden, G.I., 1990, Cartographic projection procedures for the UNIX
-environment—A user’s manual: U.S. Geological Survey Open-File Report
-90–284, 63 p., accessed August 29, 2017, at
+environment-A user's manual: U.S. Geological Survey Open-File Report
+90-284, 63 p., accessed August 29, 2017, at
 <http://pubs.er.usgs.gov/publication/ofr90284>.
 
-Gruber, J., 2012, Markdown—Syntax, accessed September 28, 2017, at
+Gruber, J., 2012, Markdown-Syntax, accessed September 28, 2017, at
 https://daringfireball. net/projects/markdown/syntax.
 
 Jenson, S.K., and Domingue, J.O., 1988, Extracting topographic structure
 from digital elevation data for geographic information system analysis:
 Photogrammetric engineering and remote sensing, v. 54, no. 11, p.
-1593–1600.
+1593-1600.
 
 Macholl, J.A., Clancy, K.A., and McGinley, P.M., 2011, Using a GIS model
 to identify internally drained areas and runoff contribution in a
 glaciated watershed: Journal of the American Water Resources Association
-(JAWRA), v. 47, no. 1, p. 114–125.
+(JAWRA), v. 47, no. 1, p. 114-125.
 
 Moritz, H., 2000, Geodetic reference system 1980: Journal of Geodesy, v.
-74, no. 1, p. 128–133.
+74, no. 1, p. 128-133.
 
-O’Callaghan, J.F., and Mark, D.M., 1984, The extraction of drainage
+O'Callaghan, J.F., and Mark, D.M., 1984, The extraction of drainage
 networks from digital elevation data: Computer vision, graphics, and
-image processing, v. 28, no. 3, p. 323–344.
+image processing, v. 28, no. 3, p. 323-344.
 
 Richards, P.L., and Brenner, A.J., 2004, Delineating source areas for
-runoff in depressional landscapes—Implications for hydrologic modeling:
-Journal of Great Lakes Research, v. 30, no. 1, p. 9–21.
+runoff in depressional landscapes-Implications for hydrologic modeling:
+Journal of Great Lakes Research, v. 30, no. 1, p. 9-21.
 
-Snyder, J.P., 1987, Map projections–A working manual: U.S. Geological
+Snyder, J.P., 1987, Map projections-A working manual: U.S. Geological
 Survey Professional Paper 1395, 383 p.
 
 Thornthwaite, C.W., and Mather, J.R., 1957, Instructions and tables for
 computing potential evapotranspiration and the water balance:
-Publications in Climatology, v. 10, no. 3, p. 1–104.
+Publications in Climatology, v. 10, no. 3, p. 1-104.
 
 Thornton, P.E., Thornton, M.M., Mayer, B.W., Wei, Y., Devarakonda, R.,
-Vose, R.S., and Cook, R.B., 2016, Daymet—Daily surface weather data on a
+Vose, R.S., and Cook, R.B., 2016, Daymet-Daily surface weather data on a
 1-km grid for North America (version 3): accessed August 16, 2016, at
 <http://dx.doi.org/10.3334/ORNLDAAC/1328>.
 
 Torvalds, L., and Hamano, J., 2010, Git web page: accessed August 29,
 2017, at <http://git-scm.com/>.
 
-Unidata, 2014, netCDF—Network common data format: Boulder, Colo.,
+Unidata, 2014, netCDF-Network common data format: Boulder, Colo.,
 UCAR/Unidata Program Center.
 
 U.S. Library of Congress, 2015, ESRI ArcInfo ASCII grid: Sustainability
