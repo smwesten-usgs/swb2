@@ -1,0 +1,25 @@
+var structgrid_1_1general__grid__t =
+[
+    [ "dpdata", "structgrid_1_1general__grid__t.html#a88876eded2acd88899c2f232b6832792", null ],
+    [ "dpnodatavalue", "structgrid_1_1general__grid__t.html#a2cdd81d0769d683d4e6eb4ad5c50aba3", null ],
+    [ "fdata", "structgrid_1_1general__grid__t.html#a93f9fb8a90998b8718b8dab21107f877", null ],
+    [ "idata", "structgrid_1_1general__grid__t.html#afa56a37a70cd4a7292b05bbac2415d8f", null ],
+    [ "idatatype", "structgrid_1_1general__grid__t.html#a19b51fbbc3a25e317b0dc750708e532a", null ],
+    [ "ilengthunits", "structgrid_1_1general__grid__t.html#afba623dfd1c81dc8ec3abb48bfbfafbf", null ],
+    [ "imask", "structgrid_1_1general__grid__t.html#a1ad53d20f76a127f4391c763e246b42c", null ],
+    [ "inodatavalue", "structgrid_1_1general__grid__t.html#a5326be503d6307bb1be6aae0da417336", null ],
+    [ "inumgridcells", "structgrid_1_1general__grid__t.html#a8a70022ef7f34dbe55194aa249f91890", null ],
+    [ "inx", "structgrid_1_1general__grid__t.html#abfaebe90c253757b63333d96140f806a", null ],
+    [ "iny", "structgrid_1_1general__grid__t.html#a55b58b19d1b9414519b3f43644a7273f", null ],
+    [ "rdata", "structgrid_1_1general__grid__t.html#a137d9aa5aaaccfbd4ae9276b55dd1a2f", null ],
+    [ "rgridcellsize", "structgrid_1_1general__grid__t.html#a331cb55be8e9615194c55363c554ab35", null ],
+    [ "rnodatavalue", "structgrid_1_1general__grid__t.html#ae39d486d01c5bc6818fd53431ebdf80b", null ],
+    [ "rx", "structgrid_1_1general__grid__t.html#a7f715d3e1d0486b3fda48098c0709d9d", null ],
+    [ "rx0", "structgrid_1_1general__grid__t.html#a52fc6c068ca775cfc5436a78663f6a8a", null ],
+    [ "rx1", "structgrid_1_1general__grid__t.html#a64d941c7385859414c7be6d34c13d1a1", null ],
+    [ "ry", "structgrid_1_1general__grid__t.html#a2c1218d21456b3aa91fc7b8f57f569f5", null ],
+    [ "ry0", "structgrid_1_1general__grid__t.html#a54493cca81fc1a03d6a2b27d907b0f74", null ],
+    [ "ry1", "structgrid_1_1general__grid__t.html#a10c667452f7f483448232df4af669bc8", null ],
+    [ "sfilename", "structgrid_1_1general__grid__t.html#ada166db2f6cef551c47df379fa55cddf", null ],
+    [ "sproj4_string", "structgrid_1_1general__grid__t.html#a24c7a1d66f0b2fd51123cce07c430557", null ]
+];
