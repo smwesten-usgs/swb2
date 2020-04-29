@@ -459,7 +459,7 @@ variables:
 
 In addition to the gridded netCDF output files, SWB writes ASCII log files each time the code is run. If the user experiences an issue while running the code, the first response should be to examine the end of the log file. Often an important error or warning message will be printed to the log file just before the SWB run fails. A small subset of a SWB run log is shown in figure 8.
 
-![SWB logfile snippet](swb_logfile_snippet.png)
+![SWB logfile snippet](swb_logfile_snippet2.png)
 
 **Figure 8.**  Subset of a Soil-Water-Balance (SWB) log file as displayed in a
     Markdown editor.

@@ -466,7 +466,7 @@ netCDF Files</h2>
 <h2><a class="anchor" id="autotoc_md16"></a>
 Log Files</h2>
 <p>In addition to the gridded netCDF output files, SWB writes ASCII log files each time the code is run. If the user experiences an issue while running the code, the first response should be to examine the end of the log file. Often an important error or warning message will be printed to the log file just before the SWB run fails. A small subset of a SWB run log is shown in figure 8.</p>
-<p><img src="swb_logfile_snippet.png" alt="SWB logfile snippet" class="inline"/></p>
+<p><img src="swb_logfile_snippet2.png" alt="" class="inline" title="SWB logfile snippet"/>   </p>
 <p><b>Figure 8.</b> Subset of a Soil-Water-Balance (SWB) log file as displayed in a Markdown editor.</p>
 <p>The log files are formatted as Markdown text files; Markdown is a set of text file conventions that can be used to produce HyperText Markup Language (HTML), Portable Document Format (PDF), or other formatted output (Gruber, 2012). The log files are not required to be viewed in a Markdown editor; the files are accessible as plain text and may be viewed in any standard text editor. However, Markdown tags have been selected so that error messages are more easily recognized within the voluminous text of the logfile output.</p>
 <p>Many warning messages about missing data will be found in a typical logfile. SWB will print warnings for each data type that does not have an existing file, even if the file is not needed given the simulation options the user has selected. These warnings are safely ignored, but might be useful if SWB reports missing datasets when the user believes the datesets have been properly specified.</p>
