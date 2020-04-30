@@ -321,7 +321,7 @@ in the form of tabular or gridded files.
 For a project that covers an area small enough to be described by a
 single climate station, these data may be entered directly by use of a
 table that has header and date formats the same as those shown in fig.
-2-6.
+6.
 
 ```
     % Data obtained from ***** station in Roswell, NM
@@ -332,22 +332,9 @@ table that has header and date formats the same as those shown in fig.
     01-04-2015    0.0        23.0        28.5
 ```
 
-Fig
+**Figure 6.** Example of daily weather data in supplied to SWB in tabular form.
 
-6.  Sample climate data in tabular form.
-
-For many projects, the use of some type of gridded data may be
-desirable. The source of the gridded data might be a project-specific
-custom interpolation routine. Alternatively, a gridded data product such
-as Daymet (Thornton and others, 2016) can be used. Daymet uses
-consistent methodology to generate a continuous gridded dataset for the
-contiguous United States, The dataset contains precipitation, air
-temperature, and several other estimated data series (relative humidity,
-snow-water equivalent). The precomputed gridded datasets are generally
-much easier to use and save significant amounts of time relative to
-computing project-specific interpolated fields for precipitation and air
-temperature. Use of gridded datasets with SWB is discussed further in
-the "Gridded Datasets" section of this appendix.
+For many projects, the use of some type of gridded data may be desirable. The source of the gridded data might be a project-specific custom interpolation routine. Alternatively, a gridded data product such as Daymet (Thornton and others, 2016) can be used. Daymet uses consistent methodology to generate a continuous gridded dataset for the contiguous United States, The dataset contains precipitation, air temperature, and several other estimated data series (relative humidity, snow-water equivalent). The precomputed gridded datasets are generally much easier to use and save significant amounts of time relative to computing project-specific interpolated fields for precipitation and air temperature. Use of gridded datasets with SWB is discussed further in the "Gridded Datasets" section of this appendix.
 
 ## Output Files
 
@@ -367,7 +354,7 @@ of the underlying netCDF library, writing out netCDF files with SWB is
 still several times faster than writing to the custom binary files of
 SWB version 1.0.
 
-4.  List of variables written to separate netCDF
+**Table 4.** List of variables written to separate netCDF
 files.
 
 | Variable name                | Units                  |                                                                                                                                                                                                                                                                           |
@@ -474,7 +461,7 @@ A significant feature added to SWB since the initial release is the ability to u
 
 The specific attributes of a projection are defined by supplying SWB with a PROJ string. A PROJ string may be assembled by specifying a combination of the appropriate PROJ parameters (table 5) to describe the cartographic projection.
 
-5.  List of commonly used PROJ parameter names.
+**Table 5.**  List of commonly used PROJ parameter names.
 
 | Parameter    | Definition                                                           |
 | ------------ | -------------------------------------------------------------------- |
@@ -546,39 +533,17 @@ BASE_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=52
 
 # Gridded Datasets
 
-SWB currently can make use of gridded data in the following three
-formats: Surfer, Esri Arc ASCII, or netCDF. Of these formats, only
-Surfer and Arc ASCII grids may be used as a source for the input data
-grids discussed in the previous section. All three file formats may be
-used to supply daily weather data to SWB. Often, one or more files
-constituting a time series of gridded data are required to perform a
-simulation. In addition, missing values are often a feature of these
-gridded datasets, which can cause numerical errors in the simulation
-results. These topics are discussed further in the following sections.
-The functionality and control file syntax discussed in this section
-applies regardless of what type of grid file is being used.
+SWB currently can make use of gridded data in the following three formats: Surfer, Esri Arc ASCII, or netCDF. Of these formats, only Surfer and Arc ASCII grids may be used as a source for the input data grids discussed in the previous section. All three file formats may be used to supply daily weather data to SWB. Often, one or more files constituting a time series of gridded data are required to perform a simulation. In addition, missing values are often a feature of these gridded datasets, which can cause numerical errors in the simulation results. These topics are discussed further in the following sections. The functionality and control file syntax discussed in this section applies regardless of what type of grid file is being used.
 
 ## Specifying Grid Filenames
 
-To specify a series of grid files for use with SWB, a filename template
-can be used in place of a normal filename. For example, more than 43,000
-individual Arc ASCII grids were supplied to make a 100-year model run
-for the Lake Michigan Pilot Water Availability Study. The files were
-given names with the pattern precip-month-day-year.asc; for example,
-precip-02-12-1967.asc. The control file syntax required to specify this
-file naming convention was as follows:
+To specify a series of grid files for use with SWB, a filename template can be used in place of a normal filename. For example, more than 43,000 individual Arc ASCII grids were supplied to make a 100-year model run for the Lake Michigan Pilot Water Availability Study. The files were given names with the pattern precip-*month*-*day*-*year*.asc; for example, precip-02-12-1967.asc. The control file syntax required to specify this file naming convention was as follows:
 
-PRECIPITATION ARC_GRID precip-%0m-%0d-%Y.asc.
+`PRECIPITATION ARC_GRID precip-%0m-%0d-%Y.asc.`
 
-In the filename template, the meanings for the characters that
-immediately follow the percent symbol (%) are as follows: %0m, the month
-number (1-12), padded by a leading zero; %0d, the day of the month,
-padded by a leading zero; and %Y, the four-digit year value. More of
-these filename template values are listed in table 2-7.
+In the filename template, the meanings for the characters that immediately follow the percent symbol (%) are as follows: %0m, the month number (1-12), padded by a leading zero; %0d, the day of the month, padded by a leading zero; and %Y, the four-digit year value. More of these filename template values are listed in table 7.
 
-7.  Soil-Water-Balance (SWB) control file template values for specifying
-    a series of
-filenames.
+**Table 7.**  Soil-Water-Balance (SWB) control file template values for specifying a series of filenames.
 
 | Template value | Meaning                                                                   |
 | -------------- | ------------------------------------------------------------------------- |
@@ -592,31 +557,17 @@ filenames.
 | \#             | File counter, reset each year beginning with 1.                           |
 | \#000          | File counter with three positions of zero padding, reset each year (1-n). |
 
-In addition, three modifiers may be specified in the control file if SWB
-is being run on a computing platform where capitalization is
-significant, as is the case for the Linux or MacOS operating systems
-(fig. 2-9).
+In addition, three modifiers may be specified in the control file if SWB is being run on a computing platform where capitalization is significant, as is the case for the Linux or MacOS operating systems (fig. 9).
 
-    _MONTHNAMES_CAPITALIZED
+`_MONTHNAMES_CAPITALIZED`
+`_MONTHNAMES_UPPERCASE`
+`_MONTHNAMES_LOWERCASE`
 
-    _MONTHNAMES_UPPERCASE
+**Figure 9.**  Control file modifiers for use in specifying month name capitalization.
 
-    _MONTHNAMES_LOWERCASE
+The modifiers are to be used in the control file prefixed by the data name. For example, to ensure uppercase month names are used in conjunction with precipitation data files, `PRECIPITATION_MONTHNAMES_UPPERCASE` can be added to the control file. When the various control- file modifiers are used together, SWB can locate and use a variety of files without requiring that the files be renamed. Some common file naming patterns and corresponding SWB template statements are listed in table 8.
 
-9.  Control file modifiers for use in specifying month name
-    capitalization.
-
-The modifiers are to be used in the control file prefixed by the data
-name. For example, to ensure uppercase month names are used in
-conjunction with precipitation data files,
-PRECIPITATION_MONTHNAMES_UPPERCASE can be added to the control file.
-When the various control- file modifiers are used together, SWB can
-locate and use a variety of files without requiring that the files be
-renamed. Some common file naming patterns and corresponding SWB template
-statements are listed in table 2-8.
-
-8.  Examples showing the use of filename
-templates.
+**Table 8.**  Examples showing the use of filename templates.
 
 | Example filename         | Template              | Control file modifier entry             |
 | ------------------------ | --------------------- | --------------------------------------- |
@@ -636,10 +587,7 @@ listed in table 2-9.
 
 9.  Control file suffixes for modifying gridded data input to
     Soil-Water-Balance (SWB) code.
-
-\[\<, less than; \<=, less than or equal to; \>, greater than; \>=
-greater than or equal
-to\]
+[<, less than; <=, less than or equal to; >, greater than; >= greater than or equal to\]
 
 | Suffix                      | Argument              | Description                                                                                                                                                                                    |
 | --------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -659,98 +607,63 @@ to\]
 | _MISSING_VALUES_OPERATOR | \<, \<=, \>, \>=      | Operator to use for comparison to the _MISSING_VALUES_CODE.                                                                                                                                 |
 | _MISSING_VALUES_ACTION   | mean or zero          | Supplying the keyword "mean" will substitute the mean value calculated over the remaining valid cells; supplying the keyword "zero" will substitute a value of 0.0 in place of missing values. |
 
-More information regarding the use of some of the control file suffixes
-to handle missing data is in the "Treatment of Missing Values" and
-"Conversion Factors" sections.
+More information regarding the use of some of the control file suffixes to handle missing data is in the "Treatment of Missing Values" and "Conversion Factors" sections.
 
 ## Supported File Types
 
-The following three file formats are supported as input to SWB: Surfer
-ASCII grids, Arc ASCII grids, and netCDF files. Both the Surfer and Arc
-ASCII grids amount to a rectangular matrix of data with several lines of
-header information prepended; any software could be used to create the
-data matrices as long as the header information can be provided. Each
-format is discussed further in the following sections.
+The following three file formats are supported as input to SWB: Surfer ASCII grids, Arc ASCII grids, and netCDF files. Both the Surfer and Arc ASCII grids amount to a rectangular matrix of data with several lines of header information prepended; any software could be used to create the data matrices as long as the header information can be provided. Each format is discussed further in the following sections.
 
 ### Surfer ASCII Grid
 
-Golden Software's ASCII grid format consists of a five-line header
-followed by the data values arranged in a matrix. An example Surfer
-ASCII grid file is shown in figure 2-10.
+Golden Software's ASCII grid format consists of a five-line header followed by the data values arranged in a matrix. An example Surfer ASCII grid file is shown in figure 10.
 
-    DSAA
-    14    5
-    0.5   7.0
-    -0.4  0.0
-    0.0   7.0
-    0.50  1.0  1.5  2.0  2.5  3.0  3.5  4.0  4.5  5.0  5.5  6.0  6.5  7.0
-    0.45  0.9  1.4  1.9  2.4  2.9  3.4  3.9  4.4  4.9  5.4  5.9  6.4  6.9
-    0.40  0.8  1.3  1.8  2.3  2.8  3.3  3.8  4.3  4.8  5.3  5.8  6.3  6.8
-    0.36  0.7  1.2  1.7  2.2  2.7  3.2  3.7  4.2  4.7  5.2  5.7  6.2  6.7
-    0.32  0.6  1.1  1.6  2.1  2.6  3.1  3.6  4.1  4.6  5.1  5.6  6.1  6.6
+```
+DSAA
+14    5
+0.5   7.0
+-0.4  0.0
+0.0   7.0
+0.50  1.0  1.5  2.0  2.5  3.0  3.5  4.0  4.5  5.0  5.5  6.0  6.5  7.0
+0.45  0.9  1.4  1.9  2.4  2.9  3.4  3.9  4.4  4.9  5.4  5.9  6.4  6.9
+0.40  0.8  1.3  1.8  2.3  2.8  3.3  3.8  4.3  4.8  5.3  5.8  6.3  6.8
+0.36  0.7  1.2  1.7  2.2  2.7  3.2  3.7  4.2  4.7  5.2  5.7  6.2  6.7
+0.32  0.6  1.1  1.6  2.1  2.6  3.1  3.6  4.1  4.6  5.1  5.6  6.1  6.6
+```
 
-10. Example showing a Golden Software Surfer ASCII grid file.
+**Figure 10.** Example showing a Golden Software Surfer ASCII grid file.
 
 The header values contain the following information.
 
-1.  DSAA, a label identifying the file format as a Golden Software ASCII
-    grid,
-
-2.  Number of columns (number of X values), number of rows (number of Y
-    values),
-
+1.  "DSAA", a label identifying the file format as a Golden Software ASCII grid,
+2.  Number of columns (number of X values), number of rows (number of Y values),
 3.  Minimum X value, maximum X value,
-
 4.  Minimum Y value, maximum Y value,
-
 5.  Minimum Z value, maximum Z value.
 
-For the file shown in figure 2-10, the coordinate system has its origin
-in the lower left-hand corner, with x and y coordinates increasing
-toward the upper right-hand corner. Surfer files are not explicitly
-georeferenced to real-world coordinate systems.
+For the file shown in figure 10, the coordinate system has its origin in the lower left-hand corner, with x and y coordinates increasing toward the upper right-hand corner. Surfer files are not explicitly georeferenced to real-world coordinate systems.
 
 ### Arc ASCII Grid
 
-The publishers of ArcMap and ArcView software, Esri, developed one of
-the most commonly used raster-data formats in use. Esri's Arc ASCII grid
-format is a matrix representation of the gridded dataset with a short
-header tacked to the top of the file (U.S. Library of Congress, 2015).
-In an Arc ASCII grid, the data are arranged as though a user is viewing
-the data from above. The coordinates for the lower left-hand corner of
-the lower left-hand grid cell are specified as xllcorner and yllcorner
-in figure 2-11. The value stored in the lower left-hand grid cell is a
-7, which is shown in the bottom row and left-most column of figure 2-11.
+The publishers of ArcMap and ArcView software, Esri, developed one of the most commonly used raster-data formats in use. Esri's Arc ASCII grid format is a matrix representation of the gridded dataset with a short header tacked to the top of the file (U.S. Library of Congress, 2015). In an Arc ASCII grid, the data are arranged as though a user is viewing the data from above. The coordinates for the lower left-hand corner of the lower left-hand grid cell are specified as xllcorner and yllcorner in figure 2-11. The value stored in the lower left-hand grid cell is a 7, which is shown in the bottom row and left-most column of figure 11.
 
     ncols        34
     nrows        4
-    xllcorner    739475.000000000000
-    yllcorner    2314000.000000000000
-    cellsize     10.000000000000
+    xllcorner    739475.0
+    yllcorner    2314000.0
+    cellsize     10.0
     NODATA_value -9999
     9 9 9 9 9 9 9 9 9 9 9 8 8 8 8 8 8 8 9 9 9 9 9 9 8 8 8 8 8 8 8 8 9 9
     7 7 7 7 7 7 7 7 7 7 7 7 7 7 7 6 6 6 7 7 7 6 6 6 6 6 6 6 6 6 6 6 6 6
     7 7 7 7 6 6 6 7 7 7 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6
     7 7 7 7 7 7 7 7 7 7 6 6 6 7 7 7 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6 6
 
-11. Example showing an Arc ASCII grid file.
+**Figure 11.** Example showing an Arc ASCII grid file.
 
-Note that SWB does not process the NODATA_ value codes as given in the
-Arc ASCII grid files; missing values should be handled through the use
-of user-supplied, control-file directives, discussed later in this
-section.
+Note that SWB does not process the NODATA_ value codes as given in the Arc ASCII grid files; missing values should be handled through the use of user-supplied, control-file directives, discussed later in this section.
 
 ### netCDF
 
-NetCDF is a file format commonly used by researchers in atmospheric and
-oceanic sciences. A key benefit of netCDF files is that they are
-designed to be platform independent; in other words, a netCDF file
-generated on a Macintosh computer by an application compiled with the
-GNU compiler collection gfortran compiler should be able to be read by
-an application that is compiled with the Intel compiler and running on
-Windows. In addition, netCDF files are able to store arbitrary
-combinations of data. This ability allows for substantial metadata to be
-stored in the netCDF file along with the variable of interest.
+NetCDF is a file format commonly used by researchers in atmospheric and oceanic sciences. A key benefit of netCDF files is that they are designed to be platform independent; in other words, a netCDF file generated on a Macintosh computer by an application compiled with the GNU compiler collection gfortran compiler should be able to be read by an application that is compiled with the Intel compiler and running on Windows. In addition, netCDF files are able to store arbitrary combinations of data. This ability allows for substantial metadata to be stored in the netCDF file along with the variable of interest.
 
 A set of conventions, known as the Climate and Forecast Metadata
 Conventions, gives recommendations regarding the type and nature of
