@@ -14,6 +14,8 @@ easily imported into a regional groundwater-flow model. Recharge estimates calcu
 
 Official documentation for the code may be found here: https://pubs.er.usgs.gov/publication/tm6A59.
 
+Unofficial online supplemental documentation of the code may be found [here](http://smwesten-usgs.github.io/swb2/).
+
 
 Disclaimer
 ----------
