@@ -16,6 +16,9 @@
 #GRID 1210  1048  545225.71773482       432152.74546081     30.0
 GRID 400  346  545300         432200      90.0
 
+#################################
+INTERCEPTION_IS_PART_OF_ACTUAL_ET
+
 BASE_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m
 
 GRID_LENGTH_UNITS METERS
@@ -54,6 +57,19 @@ TMIN_MISSING_VALUES_ACTION       MEAN
 
 OUTPUT_GRID_SUFFIX asc
 
+# set output paths to current directory
+OUTPUT_PATH
+OUTPUT_ANNUAL_PATH
+OUTPUT_MONTHLY_PATH
+OUTPUT_DAILY_PATH
+OUTPUT_FUTURE_PATH
+
+#set image output paths to current directory
+IMAGE_PATH
+IMAGE_ANNUAL_PATH
+IMAGE_MONTHLY_PATH
+IMAGE_DAILY_PATH
+
 INITIAL_ABSTRACTION_METHOD HAWKINS
 
 INITIAL_FROZEN_GROUND_INDEX CONSTANT 100.0
@@ -71,8 +87,8 @@ LANDUSE_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0
 
 OPEN_WATER_LAND_USE 111
 
-LAND_USE_LOOKUP_TABLE std_input/Landuse_table.txt
-IRRIGATION_LOOKUP_TABLE std_input/Irrigation_table.txt
+LAND_USE_LOOKUP_TABLE ../../../test_data/tables/Landuse_lookup_SWB1.txt
+IRRIGATION_LOOKUP_TABLE ../../../test_data/tables/Irrigation_lookup_SWB1.txt
 
 WATER_CAPACITY ARC_GRID ../../../test_data/cs/available_water_capacity.asc
 WATER_CAPACITY_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m

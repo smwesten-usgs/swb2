@@ -1,0 +1,62 @@
+NUM_LANDUSE_TYPES	59																																		
+NUM_SOIL_TYPES	7		NRCS base curve numbers							Maximum infiltration rates							Interception storage values			Depth of root zone															
+# LU Code	Description	Assumed impervious area	A	B	C	D	A/D	B/D	Null	Soil A	Soil B	Soil C	Soil D	A/D	B/D	C/D	Growing Season	Not growing season	Max Intcp Storage	Soil A	Soil B	Soil C	Soil D	A/D	B/D	C/D	Reference (CN)	Reference (Root depth)	Acres	% landcover					
+1	 Corn	**	65	75	82	86	65	86	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2	2	2	2	2	2	2	Bussan presentation	"Table 10, TM 1957; moderately deep-rooted crops"	25278.5	16%					
+4	 Sorghum	**	30	58	71	78	30	78	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	2.1.9   Forage Crops  (assume meadow type)	40.9	0%					
+5	 Soybeans	**	67	78	85	89	67	89	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	1.875	1.875	1.875	1.875	1.875	1.875	1.875	Bussan presentation	"Table 10, TM 1957; shallow-rooted crops"	2505.7	2%					
+6	 Sunflowers	**	61	73	81	84	61	84	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	"2.1.8   Other Row Crops (sm grain, contoured, good condition)"	1.6	0%					
+12	 Sweet Corn	**	65	75	82	86	65	86	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	1.875	1.875	1.875	1.875	1.875	1.875	1.875	Bussan presentation	"Table 10, TM 1957; moderately deep-rooted crops"	8682.3	5%					
+21	 Barley	**	30	58	71	78	30	78	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	2.1.9   Forage Crops  (assume meadow type)	35.8	0%					
+23	 Spring Wheat	**	30	58	71	78	30	78	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	2.1.9   Forage Crops  (assume meadow type)	3.8	0%					
+24	 Winter Wheat	**	30	58	71	78	30	78	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	2.1.9   Forage Crops  (assume meadow type)	236.9	0%					
+26	 Dbl Crop WinWht/Soybeans	**	67	78	85	89	67	89	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	1.875	1.875	1.875	1.875	1.875	1.875	1.875	210-VI-TR-55 Second Ed. June 1986	"2.1.2   Row Crops (straight row, good condition)"	6	0%					
+27	 Rye	**	30	58	71	78	30	78	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	2.1.9   Forage Crops  (assume meadow type)	328.3	0%					
+28	 Oats	**	30	58	71	78	30	78	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	2.1.9   Forage Crops  (assume meadow type)	243.3	0%					
+29	 Millet	**	30	58	71	78	30	78	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	2.1.9   Forage Crops  (assume meadow type)	1.6	0%					
+30	Speltz	**	30	58	71	78	30	78	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825									
+32	 Flaxseed	**	30	58	71	78	30	78	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	2.1.9   Forage Crops  (assume meadow type)	0.2	0%					
+36	 Alfalfa	**	30	58	71	78	30	78	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.25	2.25	2.25	2.25	2.25	2.25	2.25	Bussan presentation	"Table 10, TM 1957; deep-rooted crops"	11794.3	7%					
+37	 Other Hay/Non Alfalfa	**	30	58	71	78	30	78	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.4975	3.1275	2.4975	2.4975	2.4975	2.4975	"SCS Nat Eng Handbook Section 9, Table 9-1, 2004,  continuous grass, good"	"Table 10, TM 1957; deep-rooted crops"	1535.4	1%					
+38	 Camelina	**	55	69	78	83	55	83	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	"2.1.1   Herbaceous/Field Crops (close-seeded, contoured, good condition)"	3.8	0%					
+41	 Sugarbeets	**	67	78	85	89	67	89	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	"2.1.2   Row Crops (straight row, good condition)"	15.1	0%					
+42	 Dry Beans	**	67	78	85	89	67	89	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	1.5	1.5	1.5	1.5	1.5	1.5	1.5	Bussan presentation	"Table 10, TM 1957; shallow-rooted crops"	5269	3%					
+43	 Potatoes	**	67	78	85	89	67	89	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	1	1	1	1	1	1	1	Bussan presentation	"Table 10, TM 1957; shallow-rooted crops"	8140.8	5%					
+47	Misc Vegs and Fruits	**	67	78	85	89	67	89	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825									
+49	 Onions	**	67	78	85	89	67	89	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	"2.1.2   Row Crops (straight row, good condition)"	0.4	0%					
+50	 Cucumbers	**	67	78	85	89	67	89	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	"2.1.2   Row Crops (straight row, good condition)"	0.9	0%					
+53	 Peas	**	67	78	85	89	67	89	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	1.5	1.5	1.5	1.5	1.5	1.5	1.5	Bussan presentation	"Table 10, TM 1957; shallow-rooted crops"	1042.6	1%					
+57	 Herbs	**	67	78	85	89	67	89	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	"2.1.2   Row Crops (straight row, good condition)"	8.9	0%					
+58	 Clover/Wildflowers	**	30	58	71	78	30	78	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	"210-VI-NEH, July 2004"	2.1.9   Forage Crops  (assume meadow type)	30.5	0%					
+59	Sod/Grass Seed	**	30	58	71	78	30	78	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825									
+61	 Fallow/Idle Cropland	**	77	86	91	93	77	93	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	1.5	1.5	1.5	1.5	1.5	1.5	1.5	210-VI-TR-55 Second Ed. June 1986	"2/3 of Table 10, TM 1957"	14.5	0%					
+70	 Christmas Trees	**	43	65	76	82	43	82	100	4	0.6	0.24	0.12	4	0.12	0.12	0.05	0	0.05	1.125	1.125	1.125	1.125	1.125	1.125	1.125	"Like ""Forest"""		36	0%					23.62204724
+92	 Aquaculture	**	92	92	94	95	92	95	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.4975	2.4975	1.665	2.4975	1.665	1.665	"Like ""Developed"""		0.2	0%					1.968503937
+111	 Open Water	**	100	100	100	100	100	100	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	0	0	0	0	0	0	0	Dripps		1435.3	1%					
+121	 Developed/Open Space	**	49	69	79	84	49	84	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.4975	2.4975	2.4975	2.4975	2.4975	2.4975	"SCS Nat Eng Handbook Section 9, Table 9-5, 2004, open space, fair condition"	"SWB_doc, table 9, loamy till"	10026.9	6%					
+122	 Developed/Low Intensity	0.65	67	78	85	89	67	89	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	1.5	1.5	1.5	1.5	1.5	1.5	1.5	Bussan presentation	SWB_doc	7167.8	4%					
+123	 Developed/Medium Intensity	0.75	77	85	90	92	77	92	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	1.5	1.5	1.5	1.5	1.5	1.5	1.5	Bussan presentation	"Like USGS ""High Intensity"" or ""Low Intensity"""	1862.6	1%					
+124	 Developed/High Intensity	0.85	89	92	94	95	89	95	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	1.5	1.5	1.5	1.5	1.5	1.5	1.5	Bussan presentation	"2/3 of Table 10, TM 1957"	889.4	1%					
+131	 Barren	**	74	83	88	90	74	90	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	1.5	1.5	1.5	1.5	1.5	1.5	1.5	"210-VI-TR-55 Second Ed. June 1986; 210-VI-NEH, July 2004"	"2/3 of Table 10, TM 1957"	167.7	0%					
+141	 Deciduous Forest	**	30	55	70	77	30	77	100	4	0.6	0.24	0.12	4	0.12	0.12	0.05	0	0.05	3.12375	2.4975	2.4975	1.99875	3.12375	1.99875	1.99875	"SCS Nat Eng Handbook Section 9, Table 9-1, 2004, woods, good"	"Table 10, TM 1957; closed-mature forests"	38279	24%					
+142	 Evergreen Forest	**	30	55	70	77	30	77	100	4	0.6	0.24	0.12	4	0.12	0.12	0.1	0.1	0.1	1.561875	1.24875	1.24875	0.999375	1.561875	0.999375	0.999375	De Byle 1957	"Table 10, TM 1957; closed-mature forests"	4591.1	3%					
+143	 Mixed Forest	**	30	55	70	77	30	77	100	4	0.6	0.24	0.12	4	0.12	0.12	0.06	0.03	0.06	3.12375	2.4975	2.4975	1.99875	3.12375	1.99875	1.99875	"SCS Nat Eng Handbook Section 9, Table 9-1, 2004, woods, good"	"Table 10, TM 1957; orchard"	828.6	1%					
+151	Dwarf Scrub	**	35	56	70	77	35	77	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.4975	2.4975	1.665	2.4975	1.665	1.665									
+152	 Shrubland	**	35	56	70	77	35	77	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.4975	2.4975	1.665	2.4975	1.665	1.665	"SCS Nat Eng Handbook Section 4, 1964"	"Table 10, TM 1957; Deep-rooted crops"	240.6	0%					
+171	Grassland/Herbaceous (arid)	**	39	61	74	80	39	80	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825									
+176	 Grass/Pasture	**	39	61	74	80	39	80	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.4975	3.1275	2.4975	2.4975	2.4975	2.4975	"SCS Nat Eng Handbook Section 9, Table 9-1, 2004, pasture, grassland, good"	"Table 10, TM 1957; deep-rooted crops"	10752.3	7%					
+181	Pasture/Hay (fair)	**	39	61	74	80	39	80	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825									
+182	Cultivated Crops (SR+CR poor)	**	39	61	74	80	39	80	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825									
+190	 Woody Wetlands	**	30	48	65	73	30	73	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	3.375	3.375	3.375	3.375	3.375	3.375	3.375	"SCS Nat Eng Handbook Section 9, Table 9-1, 2004, brush-forbs-grass, good"	"6.1.1   Floating Aquatic Herbaceous Vegetation, SWB_doc"	5516.7	3%					
+195	 Herbaceous Wetlands	**	30	58	71	78	30	78	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	3.375	3.375	3.375	3.375	3.375	3.375	3.375	"SCS Nat Eng Handbook Section 9, Table 9-1, 2004,  continuous grass, good"	"6.1.1   Floating Aquatic Herbaceous Vegetation, SWB_doc"	1779.6	1%					
+205	 Triticale	**	30	58	71	78	30	78	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.4975	3.1275	2.4975	2.4975	2.4975	2.4975	"SCS Nat Eng Handbook Section 9, Table 9-1, 2004,  continuous grass, good"	"Table 10, TM 1957; deep-rooted crops"	11794.3	7%					
+206	 Carrots	**	67	78	85	89	67	89	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	"2.1.2   Row Crops (straight row, good condition)"	88.5	0%					
+207	Asparagus	**	67	78	85	89	67	89	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825									
+221	 Strawberries	**	67	78	85	89	67	89	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	"2.1.2   Row Crops (straight row, good condition)"	0.4	0%					
+225	 Dbl Crop WinWht/Corn	**	65	75	82	86	65	86	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	"2.1.3   Corn (contoured, good condition)"	13.6	0%					
+226	 Dbl Crop Oats/Corn	**	65	75	82	86	65	86	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	"2.1.3   Corn (contoured, good condition)"	0.2	0%					
+241	 Dbl Crop Corn/Soybeans	**	65	75	82	86	65	86	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2	2	2	2	2	2	2	210-VI-TR-55 Second Ed. June 1986	"2.1.2   Row Crops (straight row, good condition)"	0.2	0%					
+242	 Blueberries	**	67	78	85	89	67	89	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	"2.1.2   Row Crops (straight row, good condition)"	0.2	0%					
+243	 Cabbage	**	67	78	85	89	67	89	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986	"2.1.2   Row Crops (straight row, good condition)"	0.2	0%					
+250	 Cranberries	**	51	67	76	80	51	80	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825	210-VI-TR-55 Second Ed. June 1986		4.4	0%					
+251	Del_monte_fallow	**	77	86	91	93	77	93	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	1.5	1.5	1.5	1.5	1.5	1.5	1.5	210-VI-TR-55 Second Ed. June 1986	"2/3 of Table 10, TM 1957"	14.5	0					
+252	Del_monte_grass	**	30	58	71	78	30	78	100	4	0.6	0.24	0.12	4	0.12	0.12	0	0	0	2.4975	2.7075	2.55	1.5825	2.4975	1.5825	1.5825									

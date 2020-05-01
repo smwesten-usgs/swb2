@@ -665,338 +665,91 @@ Note that SWB does not process the NODATA_ value codes as given in the Arc ASCII
 
 NetCDF is a file format commonly used by researchers in atmospheric and oceanic sciences. A key benefit of netCDF files is that they are designed to be platform independent; in other words, a netCDF file generated on a Macintosh computer by an application compiled with the GNU compiler collection gfortran compiler should be able to be read by an application that is compiled with the Intel compiler and running on Windows. In addition, netCDF files are able to store arbitrary combinations of data. This ability allows for substantial metadata to be stored in the netCDF file along with the variable of interest.
 
-A set of conventions, known as the Climate and Forecast Metadata
-Conventions, gives recommendations regarding the type and nature of
-metadata to be included along with the primary variable within a netCDF
-file (Eaton and others, 2011). SWB outputs written to netCDF files
-attempt to adhere to the Climate and Forecast Metadata Conventions
-version 1.6 (CF 1.6) to maximize the number of third-party netCDF tools
-that will work with SWB output.
+A set of conventions, known as the Climate and Forecast Metadata Conventions, gives recommendations regarding the type and nature of metadata to be included along with the primary variable within a netCDF file (Eaton and others, 2011). SWB outputs written to netCDF files attempt to adhere to the Climate and Forecast Metadata Conventions version 1.6 (CF 1.6) to maximize the number of third-party netCDF tools that will work with SWB output.
 
-In addition to these benefits of netCDF file use, the fact that dozens
-of open-source tools are available to read, write, and visualize netCDF
-files makes them a good format for use with SWB. A basic tool called
-ncdump-a program to dump the contents of a netCDF file-is distributed by
-Unidata, the maintainer of netCDF file format. Issuing the command
-ncdump -h along with the filename will cause the header information and
-other various metadata to be printed to the screen.
+In addition to these benefits of netCDF file use, the fact that dozens of open-source tools are available to read, write, and visualize netCDF files makes them a good format for use with SWB. A basic tool called ncdump--a program to dump the contents of a netCDF file--is distributed by Unidata, the maintainer of netCDF file format. Issuing the command `ncdump -h` along with the filename will cause the header information and other various metadata to be printed to the screen.
 
-As an example, one useful source for gridded daily weather data is the
-Daymet product containing gridded daily precipitation and air
-temperature for the conterminous United States on a 1 kilometer
-grid-cell spacing (Thornton and others, 2016). The metadata stored in
-the file reveals a variety of useful information about the file contents
-(fig.
-2-12).
-
-    netCDF daymet_v3_prcp_2014_na {
-
-    dimensions:
+As an example, one useful source for gridded daily weather data is the Daymet product containing gridded daily precipitation and air temperature for the conterminous United States on a 1 kilometer grid-cell spacing (Thornton and others, 2016). The metadata stored in the file reveals a variety of useful information about the file contents (fig. 12).
 
 ```
-    x = 7814 ;
-```
+netcdf daymet_v3_prcp_2010_na {
+dimensions:
+        x = 7814 ;
+        y = 8075 ;
+        time = UNLIMITED ; // (365 currently)
+        nv = 2 ;
+variables:
+        float x(x) ;
+                x:units = "m" ;
+                x:long_name = "x coordinate of projection" ;
+                x:standard_name = "projection_x_coordinate" ;
+        float y(y) ;
+                y:units = "m" ;
+                y:long_name = "y coordinate of projection" ;
+                y:standard_name = "projection_y_coordinate" ;
+        float lat(y, x) ;
+                lat:units = "degrees_north" ;
+                lat:long_name = "latitude coordinate" ;
+                lat:standard_name = "latitude" ;
+        float lon(y, x) ;
+                lon:units = "degrees_east" ;
+                lon:long_name = "longitude coordinate" ;
+                lon:standard_name = "longitude" ;
+        float time(time) ;
+                time:long_name = "time" ;
+                time:calendar = "standard" ;
+                time:units = "days since 1980-01-01 00:00:00 UTC" ;
+                time:bounds = "time_bnds" ;
+        short yearday(time) ;
+                yearday:long_name = "yearday" ;
+        float time_bnds(time, nv) ;
+        short lambert_conformal_conic ;
+                lambert_conformal_conic:grid_mapping_name = "lambert_conformal_conic" ;
+                lambert_conformal_conic:longitude_of_central_meridian = -100. ;
+                lambert_conformal_conic:latitude_of_projection_origin = 42.5 ;
+                lambert_conformal_conic:false_easting = 0. ;
+                lambert_conformal_conic:false_northing = 0. ;
+                lambert_conformal_conic:standard_parallel = 25., 60. ;
+                lambert_conformal_conic:semi_major_axis = 6378137. ;
+                lambert_conformal_conic:inverse_flattening = 298.257223563 ;
+        float prcp(time, y, x) ;
+                prcp:_FillValue = -9999.f ;
+                prcp:long_name = "daily total precipitation" ;
+                prcp:units = "mm/day" ;
+                prcp:missing_value = -9999.f ;
+                prcp:coordinates = "lat lon" ;
+                prcp:grid_mapping = "lambert_conformal_conic" ;
+                prcp:cell_methods = "area: mean time: sum" ;
 
-```
-    y = 8075 ;
-```
-
-```
-    time = UNLIMITED ; // (365 currently)
-```
-
-```
-    nv = 2 ;
-```
-
-    variables:
-
-```
-    float x(x) ;
-```
-
-```
-        x:units = "m" ;
-```
-
-```
-        x:long_name = "x coordinate of projection" ;
-```
-
-```
-        x:standard_name = "projection_x_coordinate" ;
-```
-
-```
-    float y(y) ;
-```
-
-```
-        y:units = "m" ;
-```
-
-```
-        y:long_name = "y coordinate of projection" ;
-```
-
-```
-        y:standard_name = "projection_y_coordinate" ;
-```
-
-```
-    float lat(y, x) ;
-```
-
-```
-        lat:units = "degrees_north" ;
-```
-
-```
-        lat:long_name = "latitude coordinate" ;
-```
-
-```
-        lat:standard_name = "latitude" ;
-```
-
-```
-    float lon(y, x) ;
-```
-
-```
-        lon:units = "degrees_east" ;
-```
-
-```
-        lon:long_name = "longitude coordinate" ;
-```
-
-```
-        lon:standard_name = "longitude" ;
-```
-
-```
-    float time(time) ;
-```
-
-```
-        time:long_name = "time" ;
-```
-
-```
-        time:calendar = "standard" ;
-```
-
-```
-        time:units = "days since 1980-01-01 00:00:00 UTC" ;
-```
-
-```
-        time:bounds = "time_bnds" ;
-```
-
-```
-    short yearday(time) ;
-```
-
-```
-        yearday:long_name = "yearday" ;
-```
-
-```
-    float time_bnds(time, nv) ;
-```
-
-```
-    short lambert_conformal_conic ;
-```
-
-```
-        lambert_conformal_conic:grid_mapping_name = "lambert_conformal_conic" ;
-```
-
-```
-        lambert_conformal_conic:longitude_of_central_meridian = -100. ;
-```
-
-```
-        lambert_conformal_conic:latitude_of_projection_origin = 42.5 ;
-```
-
-```
-        lambert_conformal_conic:false_easting = 0. ;
-```
-
-```
-        lambert_conformal_conic:false_northing = 0. ;
-```
-
-```
-        lambert_conformal_conic:standard_parallel = 25., 60. ;
-```
-
-```
-        lambert_conformal_conic:semi_major_axis = 6378137. ;
-```
-
-```
-        lambert_conformal_conic:inverse_flattening = 298.257223563 ;
-```
-
-```
-    float prcp(time, y, x) ;
-```
-
-```
-        prcp:_FillValue = -9999.f ;
-```
-
-```
-        prcp:long_name = "daily total precipitation" ;
-```
-
-```
-        prcp:units = "mm/day" ;
-```
-
-```
-        prcp:missing_value = -9999.f ;
-```
-
-```
-        prcp:coordinates = "lat lon" ;
-```
-
-```
-        prcp:grid_mapping = "lambert_conformal_conic" ;
-```
-
-```
-        prcp:cell_methods = "area: mean time: sum" ;
-```
-
-```
-```
-
-    // global attributes:
-
-```
-        :start_year = 2014s ;
-```
-
-```
-        :source = "Daymet Software Version 3.0" ;
-```
-
-```
-        :Version_software = "Daymet Software Version 3.0" ;
-```
-
-```
-        :Version_data = "Daymet Data Version 3.0" ;
-```
-
-```
-        :Conventions = "CF-1.6" ;
-```
-
-```
-        :citation = "Please see http://daymet.ornl.gov/ for current Daymet data citation information" ;
-```
-
-```
-        :references = "Please see http://daymet.ornl.gov/ for current information on Daymet references" ;
-```
-
-```
+// global attributes:
+                :start_year = 2010s ;
+                :source = "Daymet Software Version 3.0" ;
+                :Version_software = "Daymet Software Version 3.0" ;
+                :Version_data = "Daymet Data Version 3.0" ;
+                :Conventions = "CF-1.6" ;
+                :citation = "Please see http://daymet.ornl.gov/ for current Daymet data citation information" ;
+                :references = "Please see http://daymet.ornl.gov/ for current information on Daymet references" ;
 }
 ```
+**Figure 12.** Metadata embedded in a Daymet, version 3 precipitation netCDF file (Thornton and others, 2016).
 
-12. Metadata embedded in a Daymet, version 3 precipitation netCDF file
-    (Thornton and others, 2016).
+The file whose metadata are shown in figure 12 contains three classes of metadata pertaining to dimensions, variables, and global attributes. Four dimensions are defined: `x`, `y`, `time`, and `nv`. For this file, the `x` and `y` dimensions may be thought of in terms of Cartesian coordinates; `x` refers to the number of cells along a east-west axis, and `y` refers to the number of cells along a north-south axis. The dimension `time` is declared unlimited; this file could contain many days of daily weather data. In this case, the time dimension is of size 365, which means the file contains one year of data. Dimension `nv` is of size two and exists so that the variable time_bnds can contain a starting and ending date and a time stamp.
 
-This particular file contains three classes of metadata pertaining to
-dimensions, variables, and global attributes. The file contains data
-pertaining to four dimensions-x, y, time, and nv. For this file, the x
-and y dimensions may be thought of in terms of Cartesian coordinates-x
-refers to the number of cells in the east-west orientation, whereas y
-refers to the number of cells in the north-south orientation. The
-dimension time is declared unlimited; this file could contain many days
-of daily weather data. In this case, the time dimension is of size 365,
-which means the file contains 1 year of data. Dimension nv is of size 2
-and exists so that the variable time_bnds can contain a starting and
-ending date and a time stamp.
+Each of the nine variables defined is referenced in terms of the dimensions. The main variable of interest in the file is named `prcp`, the daily precipitation value. The daily precipitation value is defined at each time (day) in the file for all values of `x` and `y`. Note the way that dates and times are specified in the netCDF file-as a real-valued number of days since 1980-01-01 00:00:00 UTC.
 
-Each of the nine variables defined is referenced in terms of the
-dimensions. The key variable in the file is named "prcp"-the daily
-precipitation value. The daily precipitation value is defined at each
-time (day) in the file for all values of x and y. Note the way that
-dates and times are specified in the netCDF file-as a real-valued number
-of days since 1980-01-01 00:00:00 UTC.
+The grid-cell location is specified in the following two ways: in terms of projected (x, y) coordinates, as well as in geographic (longitude, latitude) coordinates. Often netCDF files will be written so that both projected and geographic coordinates are provided, ensuring that third-party software applications will be able to correctly interpret the location of each data value.
 
-The grid-cell location is specified in the following two ways: in terms
-of projected (x, y) coordinates, as well as in geographic (longitude,
-latitude) coordinates. Often netCDF files will be written so that both
-projected and geographic coordinates are provided, ensuring that
-third-party software applications will be able to correctly interpret
-the location of each data value.
+SWB does not make use of much of the metadata included in the netCDF file header. *The user is responsible for being aware of the physical units that each of the datasets is stored in, and must supply control file directive to SWB to ensure that the data are used correctly.* In order to make SWB correctly interpret the values for the file shown in figure 12, for example, control file directives  must be inserted into the SWB control file to cause it to convert precipitation in metric units (millimeters per day) to inches per day. The authors recommend examining the SWB output values of air temperature and precipitation to verify that any such unit conversions have been done correctly. Some of the temperature conversion suffixes are particularly easy to forget, which leads to disastrous SWB results. SWB will still run with the incorrect daily weather values. For example, if air temperatures are given in degrees Celsius but no offset or scale factor values are provided, the air temperatures processed by SWB will never exceed a numerical value of 30 or 40 degrees Celsius; SWB will process these values as though the values are given in degrees Fahrenheit, which results in considerable snowfall and snowmelt and unrealistically elevated net infiltration values.
 
-SWB does not have the ability to process and make use of much of the
-metadata included in the netCDF file header. The user is responsible for
-being aware of the physical units that each of the datasets is stored
-in, and must supply control file directive to SWB to ensure that the
-data are used correctly. For example, control file directives must often
-be included in the SWB control file to cause SWB to convert
-precipitation in metric units (millimeters per day) to inches per day.
-The authors recommend examining the SWB output values of air temperature
-and precipitation to verify that any such unit conversions have been
-done correctly. Some of the temperature conversion suffixes are
-particularly easy to forget, which leads to disastrous SWB results. SWB
-will still run with the incorrect daily weather values. For example, if
-air temperatures are given in degrees Celsius but no offset or scale
-factor values are provided, the air temperatures processed by SWB will
-never exceed a numerical value of 30 or 40 degrees Celsius; SWB will
-process these values as though the values are given in degrees
-Fahrenheit, which results in considerable snowfall and snowmelt and
-unrealistically elevated net infiltration values.
+In addition, SWB cannot parse the netCDF variables and attributes associated with any map projection that may have been used when the netCDF file was created. The user needs to be aware of the geographic projection (if any) that was used. If the gridded data do not match the SWB project bounds exactly, a PROJ string must be provided to enable SWB to translate between project coordinates and the netCDF file coordinates.
 
-In addition, SWB cannot parse the netCDF variables and attributes
-associated with any map projection that may have been used when the
-netCDF file was created. The user needs to be aware of the geographic
-projection (if any) that was used. If the gridded data do not match the
-SWB project bounds exactly, a PROJ string must be provided to enable
-SWB to translate between project coordinates and the netCDF file
-coordinates.
-
-As an example, look again at the metadata included in figure 2-12. The
-creators of this dataset have provided a variable
-(lambert_conformal_conic) and have attached several attributes to the
-variable to help ensure correct georeferencing of the coordinate values.
-The PROJ string can be constructed from the metadata attached to the
-lambert_conformal_conic variable (fig.
-    2-13).
+As an example, look again at the metadata included in figure 12. The creators of this dataset have provided a variable (lambert_conformal_conic) and have attached several attributes to the variable to help ensure correct georeferencing of the coordinate values. The PROJ string can be constructed from the metadata attached to the lambert_conformal_conic variable (fig. 13).
 
     +proj=lcc +lat_1=25.0 +lat_2=60.0 +lat_0=42.5 +lon_0=-100.0 +x_0=0.0 +y_0=0.0 +ellps=GRS80 +datum=NAD83 +units=m +no_defs
 
-13. PROJ string for a Daymet, version3 netCDF file (Thornton and
-    others, 2016).
+**Figure 13.** PROJ string for a Daymet, version3 netCDF file (Thornton and others, 2016).
 
-The netCDF file metadata does not include any details about the ellipse
-(PROJ keyword ellps) or datum associated with this projection.
-However, the semi_major_axis and inverse_flattening" attribute values
-are consistent with the GRS80 definition (Moritz, 2000). In this
-example, the standard parallels as defined by lat_1 and lat_2 in
-figure 2-13 differ from the standard parallels of 33 degrees and 45
-degrees as described in Snyder (1987). Supplying the standard values in
-the SWB control file, at best, would cause SWB to issue a warning about
-a mismatch between the data coverage and the model domain and, at worst,
-would run anyway, supplying incorrect daily weather data to the model.
-In other words, SWB checks to see that numerically valid coordinates are
-present and that the weather data cover the region defined by the base
-grid. However, SWB cannot detect an incorrect user-supplied PROJ
-string. Users are encouraged to examine the SWB output files containing
-air temperature and precipitation data to verify that daily weather data
-are being correctly interpreted by SWB.
+The netCDF file metadata does not include any details about the ellipse (PROJ keyword ellps) or datum associated with this projection. However, the semi_major_axis and inverse_flattening" attribute values are consistent with the GRS80 definition (Moritz, 2000). In this example, the standard parallels as defined by `lat_1` and `lat_2` in figure 13 differ from the standard parallels of 33 degrees and 45 degrees as described in Snyder (1987). Supplying the standard values in the SWB control file, at best, would cause SWB to issue a warning about a mismatch between the data coverage and the model domain and, at worst, would run anyway, supplying incorrect daily weather data to the model. In other words, SWB checks to see that numerically valid coordinates are present and that the weather data cover the region defined by the base grid. However, SWB cannot detect an incorrect user-supplied PROJ string. Users are encouraged to examine the SWB output files containing air temperature and precipitation data to verify that daily weather data are being correctly interpreted by SWB.
 
 An explicit definition of the grid spacing is not included as an
 attribute in the header of the netCDF file (fig. 2-12). However, grid
