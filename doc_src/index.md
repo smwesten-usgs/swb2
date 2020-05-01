@@ -455,7 +455,7 @@ The log files are formatted as Markdown text files; Markdown is a set of text fi
 
 Many warning messages about missing data will be found in a typical logfile. SWB will print warnings for each data type that does not have an existing file, even if the file is not needed given the simulation options the user has selected. These warnings are safely ignored, but might be useful if SWB reports missing datasets when the user believes the datesets have been properly specified.
 
-# Cartographic Projections and Resampling
+### Cartographic Projections and Resampling
 
 A significant feature added to SWB since the initial release is the ability to use datasets that differ from the base grid in grid cell size, cartographic projection, and geographic extent. To do this SWB incorporates a software library called PROJ to perform transformations among various map projections. PROJ was originally written by Gerald Evenden of the U.S. Geological Survey (Evenden, 1990).
 
@@ -531,11 +531,11 @@ Specification of a cartographic projection for an SWB model is accomplished with
 BASE_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9996 +x_0=520000 +y_0=-4480000 +datum=NAD83 +units=m.
 ```
 
-# Gridded Datasets
+## Gridded Datasets
 
 SWB currently can make use of gridded data in the following three formats: Surfer, Esri Arc ASCII, or netCDF. Of these formats, only Surfer and Arc ASCII grids may be used as a source for the input data grids discussed in the previous section. All three file formats may be used to supply daily weather data to SWB. Often, one or more files constituting a time series of gridded data are required to perform a simulation. In addition, missing values are often a feature of these gridded datasets, which can cause numerical errors in the simulation results. These topics are discussed further in the following sections. The functionality and control file syntax discussed in this section applies regardless of what type of grid file is being used.
 
-## Specifying Grid Filenames
+### Specifying Grid Filenames
 
 To specify a series of grid files for use with SWB, a filename template can be used in place of a normal filename. For example, more than 43,000 individual Arc ASCII grids were supplied to make a 100-year model run for the Lake Michigan Pilot Water Availability Study. The files were given names with the pattern precip-*month*-*day*-*year*.asc; for example, precip-02-12-1967.asc. The control file syntax required to specify this file naming convention was as follows:
 
@@ -609,11 +609,11 @@ listed in table 2-9.
 
 More information regarding the use of some of the control file suffixes to handle missing data is in the "Treatment of Missing Values" and "Conversion Factors" sections.
 
-## Supported File Types
+### Supported File Types
 
 The following three file formats are supported as input to SWB: Surfer ASCII grids, Arc ASCII grids, and netCDF files. Both the Surfer and Arc ASCII grids amount to a rectangular matrix of data with several lines of header information prepended; any software could be used to create the data matrices as long as the header information can be provided. Each format is discussed further in the following sections.
 
-### Surfer ASCII Grid
+#### Surfer ASCII Grid
 
 Golden Software's ASCII grid format consists of a five-line header followed by the data values arranged in a matrix. An example Surfer ASCII grid file is shown in figure 10.
 
@@ -642,7 +642,7 @@ The header values contain the following information.
 
 For the file shown in figure 10, the coordinate system has its origin in the lower left-hand corner, with x and y coordinates increasing toward the upper right-hand corner. Surfer files are not explicitly georeferenced to real-world coordinate systems.
 
-### Arc ASCII Grid
+#### Arc ASCII Grid
 
 The publishers of ArcMap and ArcView software, Esri, developed one of the most commonly used raster-data formats in use. Esri's Arc ASCII grid format is a matrix representation of the gridded dataset with a short header tacked to the top of the file (U.S. Library of Congress, 2015). In an Arc ASCII grid, the data are arranged as though a user is viewing the data from above. The coordinates for the lower left-hand corner of the lower left-hand grid cell are specified as xllcorner and yllcorner in figure 2-11. The value stored in the lower left-hand grid cell is a 7, which is shown in the bottom row and left-most column of figure 11.
 
@@ -661,7 +661,7 @@ The publishers of ArcMap and ArcView software, Esri, developed one of the most c
 
 Note that SWB does not process the NODATA_ value codes as given in the Arc ASCII grid files; missing values should be handled through the use of user-supplied, control-file directives, discussed later in this section.
 
-### netCDF
+#### netCDF
 
 NetCDF is a file format commonly used by researchers in atmospheric and oceanic sciences. A key benefit of netCDF files is that they are designed to be platform independent; in other words, a netCDF file generated on a Macintosh computer by an application compiled with the GNU compiler collection gfortran compiler should be able to be read by an application that is compiled with the Intel compiler and running on Windows. In addition, netCDF files are able to store arbitrary combinations of data. This ability allows for substantial metadata to be stored in the netCDF file along with the variable of interest.
 
@@ -751,53 +751,27 @@ As an example, look again at the metadata included in figure 12. The creators of
 
 The netCDF file metadata does not include any details about the ellipse (PROJ keyword ellps) or datum associated with this projection. However, the semi_major_axis and inverse_flattening" attribute values are consistent with the GRS80 definition (Moritz, 2000). In this example, the standard parallels as defined by `lat_1` and `lat_2` in figure 13 differ from the standard parallels of 33 degrees and 45 degrees as described in Snyder (1987). Supplying the standard values in the SWB control file, at best, would cause SWB to issue a warning about a mismatch between the data coverage and the model domain and, at worst, would run anyway, supplying incorrect daily weather data to the model. In other words, SWB checks to see that numerically valid coordinates are present and that the weather data cover the region defined by the base grid. However, SWB cannot detect an incorrect user-supplied PROJ string. Users are encouraged to examine the SWB output files containing air temperature and precipitation data to verify that daily weather data are being correctly interpreted by SWB.
 
-An explicit definition of the grid spacing is not included as an
-attribute in the header of the netCDF file (fig. 2-12). However, grid
-spacing can be gleaned from the coordinate variable values themselves.
-Running the command-line utility ncdump with the option -v x (ncdump -v
-x daymet_v3_prcp_2014_na.nc4) produces the output shown in figure
-2-14.
+An explicit definition of the grid spacing is not included as an attribute in the header of the netCDF file (fig. 12). However, grid spacing can be gleaned from the coordinate variable values themselves. Running the command-line utility ncdump with the option -v x (ncdump -v x daymet_v3_prcp_2014_na.nc4) produces the output shown in figure 14.
 
 ```
     3232750, 3233750, 3234750, 3235750, 3236750, 3237750, 3238750, 3239750,
-```
-
-```
     3240750, 3241750, 3242750, 3243750, 3244750, 3245750, 3246750, 3247750,
-```
-
-```
     3248750, 3249750, 3250750, 3251750, 3252750 ;
 ```
 
-14. Partial listing of the x variables embedded in a Daymet, version 3
+**Figure 14.** Partial listing of the x variables embedded in a Daymet, version 3
     netCDF file (Thornton and others, 2016).
 
-By subtracting two adjacent x coordinate values, the grid spacing in the
-x direction is 1,000 meters. Subtracting two adjacent y coordinate
-values (not shown) also produces 1,000 meters; therefore, the grid cells
-are square and measure 1 kilometer on a side.
+By subtracting two adjacent x coordinate values, the grid spacing in the x direction is 1,000 meters. Subtracting two adjacent y coordinate values (not shown) also produces 1,000 meters; therefore, the grid cells are square and measure 1 kilometer on a side.
 
-## Treatment of Missing Values
+### Treatment of Missing Values
 
-Missing values in datasets can be an issue during a SWB simulation.
-Generally, SWB will detect most obvious issues, such as numerical values
-outside of a reasonable range of values. However, missing values that
-are within the expected normal range of values for the dataset could
-lead to unexpected results. For example, an air temperature value that
-is interpreted as zero rather than being treated as a missing value
-would result in a cell being simulated with permanent winter conditions.
+Missing values in datasets can be an issue during a SWB simulation. Generally, SWB will detect most obvious issues, such as numerical values outside of a reasonable range of values. However, missing values that are within the expected normal range of values for the dataset could lead to unexpected results. For example, an air temperature value that is interpreted as zero rather than being treated as a missing value would result in a cell being simulated with permanent winter conditions.
 
-SWB has a few actions that may be taken to deal with the issue of
-missing values. These actions are triggered through a set of control
-file directives that are supplied as suffixes to the dataset they
-pertain to (table 2-10).
+SWB has a few actions that may be taken to deal with the issue of missing values. These actions are triggered through a set of control file directives that are supplied as suffixes to the dataset they pertain to (table 10).
 
-10. Control file suffixes for treatment of missing data.
-
-\[\<, less than; \<=, less than or equal to; \>, greater than; \>=
-greater than or equal
-to\]
+**Table 10.** Control file suffixes for treatment of missing data.
+[<, less than; <=, less than or equal to; >, greater than; >=, greater than or equal to]
 
 | Suffix                      | Argument              | Description                                                                                                                                                                                    | Default value               |
 | --------------------------- | --------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | --------------------------- |
@@ -807,154 +781,75 @@ to\]
 | _MISSING_VALUES_OPERATOR | \<, \<=, \>, \>=      | Operator to use for comparison to the _MISSING_VALUES_CODE.                                                                                                                                 | _MISSING_VALUES_OPERATOR |
 | _MISSING_VALUES_ACTION   | mean or zero          | Supplying the keyword "mean" will substitute the mean value calculated over the remaining valid cells; supplying the keyword "zero" will substitute a value of 0.0 in place of missing values. | _MISSING_VALUES_ACTION   |
 
-For example, gridded weather datasets typically end abruptly at the edge
-of a large waterbody, which from the perspective of interpolations is
-done for valid reasons. However, a dataset that ends abruptly at the
-edge of a large water body often leads to extreme edge effects on the
-SWB results.
+For example, gridded weather datasets typically end abruptly at the edge of a large waterbody, which from the perspective of interpolations is done for valid reasons. However, a dataset that ends abruptly at the edge of a large water body often leads to extreme edge effects on the SWB results.
 
-A crude but effective way to overcome this limitation in the climate
-dataset is to enforce some type of value substitution for the affected
-cells. For example, to eliminate zones of zero precipitation around a
-large waterbody, control file statements might be added to inform SWB
-that the mean value is to be used in place of missing data values (fig.
-2-15).
+A crude but effective way to overcome this limitation in the climate dataset is to enforce some type of value substitution for the affected cells. For example, to eliminate zones of zero precipitation around a large waterbody, control file statements might be added to inform SWB that the mean value is to be used in place of missing data values (fig. 15).
 
-    PRECIPITATION_MISSING_VALUES_CODE         0.0
+```
+PRECIPITATION_MISSING_VALUES_CODE           0.0
+PRECIPITATION_MISSING_VALUES_OPERATOR         <
+PRECIPITATION_MISSING_VALUES_ACTION        MEAN
+```
 
-    PRECIPITATION_MISSING_VALUES_OPERATOR    <
+**Figure 15.** Control file statements used to request that Soil Water Balance (SWB) code substitute mean daily air temperatures in areas of missing data.
 
-    PRECIPITATION_MISSING_VALUES_ACTION        MEAN
-
-15. Control file statements used to request that Soil Water Balance
-    (SWB) code substitute mean daily air temperatures in areas of
-    missing data.
-
-Including this syntax in the control file would result in the mean value
-of the valid cells being substituted for the missing values across the
-model grid for a day.
+Including this syntax in the control file would result in the mean value of the valid cells being substituted for the missing values across the model grid for a day.
 
 ## Conversion Factors
 
-SWB still uses U.S. customary units for many dimensions (inches, degrees
-Fahrenheit), primarily for historical reasons. Most available gridded
-climate data are encoded in metric units. In order for SWB to make use
-of these data sources, conversion factors or offsets, or both must be
-provided. In theory, to craft a code that would read the standard
-climate forecast elements from the metadata of a netCDF file should be
-possible; however, in practice, too many gridded datasets are still in
-existence that do not adhere to the standards. For now (2017), the user
-must handle unit conversion explicitly in the control file. The
-control-file syntax is listed in table 2-11.
+SWB still uses U.S. customary units for many dimensions (inches, degrees Fahrenheit), primarily for historical reasons. Most available gridded climate data are encoded in metric units. In order for SWB to make use of these data sources, conversion factors or offsets, or both must be provided. In theory, to craft a code that would read the standard climate forecast elements from the metadata of a netCDF file should be possible; however, in practice, too many gridded datasets are still in existence that do not adhere to the standards. For now (2017), the user must handle unit conversion explicitly in the control file. The control-file syntax is listed in table 11.
 
-11. Control file suffixes for use in performing unit conversions of
-    values read from
-grids.
+**Table 11.** Control file suffixes for use in performing unit conversions of values read from grids.
 
 | Suffix          | Argument   | Description                                                                    |
 | --------------- | ---------- | ------------------------------------------------------------------------------ |
 | _SCALE_FACTOR | Real value | Amount to multiply raw grid value by prior to use.                             |
 | _ADD_OFFSET   | Real value | Amount to add to the raw grid value following application of the scale factor. |
 
-For example, most air-temperature data are stored with units of degrees
-Celsius. To make use of this data grid with SWB, control-file syntax
-would be added to specify the scale factor and offset to apply to the
-data. The scale factor and offset values as applied to minimum
-air-temperature data (TMIN) are shown in figure 2-16.
+For example, most air-temperature data are stored with units of degrees Celsius. To make use of this data grid with SWB, control-file syntax would be added to specify the scale factor and offset to apply to the data. The scale factor and offset values as applied to minimum air-temperature data (TMIN) are shown in figure 16.
 
-    TMIN_SCALE_FACTOR         1.8
+```
+TMIN_SCALE_FACTOR         1.8
+TMIN_ADD_OFFSET          32.0
+```
 
-    TMIN_ADD_OFFSET            32.0
+**Figure 16.** Control file syntax for conversion of temperature data from degrees Celsius to degrees Fahrenheit.
 
-16. Control file syntax for conversion of temperature data from degrees
-    Celsius to degrees Fahrenheit.
-
-This syntax will cause SWB to convert all values in the minimum air
-temperature grid from Celsius to Fahrenheit before performing any water
-balance calculations.
+This syntax will cause SWB to convert all values in the minimum air temperature grid from Celsius to Fahrenheit before performing any water balance calculations.
 
 ## Inactive Grid Cells
 
-Grid cells outside the area of interest to the user may be inactivated.
-SWB will use information from certain standard grids to determine which
-grid cells should remain active during the course of a simulation;
-namely, the land-use, soil-type, and available water-capacity grids. *A
-negative value in the land-use, soil-type, or available water-capacity
-grids causes SWB to mark the cell as inactive; the cell will be removed
-from further calculations.* The missing value treatments discussed in
-the previous section could interfere with this interpretation; the user
-is discouraged from using the missing value treatments to these grids.
-Because integer grids with missing values are often encoded with -9999,
-these negative values were used to help define active and inactive grid
-cells.
+Grid cells outside the area of interest to the user may be inactivated. SWB will use information from certain standard grids to determine which grid cells should remain active during the course of a simulation; namely, the land-use, soil-type, and available water-capacity grids. **A negative value in the land-use, soil-type, or available water-capacity grids causes SWB to mark the cell as inactive; the cell will be removed from further calculations.** The missing value treatments discussed in the previous section could interfere with this interpretation; the user is discouraged from using the missing value treatments to these grids. Because integer grids with missing values are often encoded with -9999, these negative values were used to help define active and inactive grid cells.
+If the user does not wish to have cells with missing values inactivated, some GIS preprocessing will be needed to ensure that SWB can separate inactive cells from those with missing values. A strategy might be to convert active-cell missing values to an extremely large positive number, then use SWB's control file directives to find these values and convert them to appropriate values.
 
-If the user does not wish to have cells with missing values inactivated,
-some GIS preprocessing will be needed to ensure that SWB can separate
-inactive cells from those with missing values. A strategy might be to
-convert active-cell missing values to an extremely large positive
-number, then use SWB's control file directives to find these values and
-convert them to appropriate values.
+## References Cited
 
-# References Cited
+Anderson, J.R., Hardy, E.E., Roach, J.T., Witmer, R.E., 1976, A land use and land cover classification system for use with remote sensor data, U.S. Geological Survey Professional Paper 964, Reston, Virginia, 28 p.
 
-Anderson, J.R., Hardy, E.E., Roach, J.T., Witmer, R.E., 1976, A land use
-and land cover classification system for use with remote sensor data,
-U.S. Geological Survey Professional Paper 964, Reston, Virginia, 28 p.
+Eaton, B., Gregory, J., Drach, B., Taylor, K., Hankin, S., Caron, J., Signell, R., Bently, P., Rappa, G., Heinke, H., Pamment, A., and Juckes, M., 2011, netCDF climate and forecast (CF) metadata conventions (version 1.6), accessed February 8, 2016, at <http://cfconventions.org/cf-conventions/v1.6.0/cf-conventions.html>.
 
-Eaton, B., Gregory, J., Drach, B., Taylor, K., Hankin, S., Caron, J.,
-Signell, R., Bently, P., Rappa, G., Heinke, H., Pamment, A., and Juckes,
-M., 2011, netCDF climate and forecast (CF) metadata conventions (version
-1.6), accessed February 8, 2016, at
-<http://cfconventions.org/cf-conventions/v1.6.0/cf-conventions.html>.
+Evenden, G.I., 1990, Cartographic projection procedures for the UNIX environment-A user's manual: U.S. Geological Survey Open-File Report 90-284, 63 p., accessed August 29, 2017, at <http://pubs.er.usgs.gov/publication/ofr90284>.
 
-Evenden, G.I., 1990, Cartographic projection procedures for the UNIX
-environment-A user's manual: U.S. Geological Survey Open-File Report
-90-284, 63 p., accessed August 29, 2017, at
-<http://pubs.er.usgs.gov/publication/ofr90284>.
+Gruber, J., 2012, Markdown-Syntax, accessed September 28, 2017, at https://daringfireball. net/projects/markdown/syntax.
 
-Gruber, J., 2012, Markdown-Syntax, accessed September 28, 2017, at
-https://daringfireball. net/projects/markdown/syntax.
+Jenson, S.K., and Domingue, J.O., 1988, Extracting topographic structure from digital elevation data for geographic information system analysis: Photogrammetric engineering and remote sensing, v. 54, no. 11, p. 1593-1600.
 
-Jenson, S.K., and Domingue, J.O., 1988, Extracting topographic structure
-from digital elevation data for geographic information system analysis:
-Photogrammetric engineering and remote sensing, v. 54, no. 11, p.
-1593-1600.
+Macholl, J.A., Clancy, K.A., and McGinley, P.M., 2011, Using a GIS model to identify internally drained areas and runoff contribution in a glaciated watershed: Journal of the American Water Resources Association (JAWRA), v. 47, no. 1, p. 114-125.
 
-Macholl, J.A., Clancy, K.A., and McGinley, P.M., 2011, Using a GIS model
-to identify internally drained areas and runoff contribution in a
-glaciated watershed: Journal of the American Water Resources Association
-(JAWRA), v. 47, no. 1, p. 114-125.
+Moritz, H., 2000, Geodetic reference system 1980: Journal of Geodesy, v. 74, no. 1, p. 128-133.
 
-Moritz, H., 2000, Geodetic reference system 1980: Journal of Geodesy, v.
-74, no. 1, p. 128-133.
+O'Callaghan, J.F., and Mark, D.M., 1984, The extraction of drainage networks from digital elevation data: Computer vision, graphics, and image processing, v. 28, no. 3, p. 323-344.
 
-O'Callaghan, J.F., and Mark, D.M., 1984, The extraction of drainage
-networks from digital elevation data: Computer vision, graphics, and
-image processing, v. 28, no. 3, p. 323-344.
+Richards, P.L., and Brenner, A.J., 2004, Delineating source areas for runoff in depressional landscapes-Implications for hydrologic modeling: Journal of Great Lakes Research, v. 30, no. 1, p. 9-21.
 
-Richards, P.L., and Brenner, A.J., 2004, Delineating source areas for
-runoff in depressional landscapes-Implications for hydrologic modeling:
-Journal of Great Lakes Research, v. 30, no. 1, p. 9-21.
+Snyder, J.P., 1987, Map projections-A working manual: U.S. Geological Survey Professional Paper 1395, 383 p.
 
-Snyder, J.P., 1987, Map projections-A working manual: U.S. Geological
-Survey Professional Paper 1395, 383 p.
+Thornthwaite, C.W., and Mather, J.R., 1957, Instructions and tables for computing potential evapotranspiration and the water balance: Publications in Climatology, v. 10, no. 3, p. 1-104.
 
-Thornthwaite, C.W., and Mather, J.R., 1957, Instructions and tables for
-computing potential evapotranspiration and the water balance:
-Publications in Climatology, v. 10, no. 3, p. 1-104.
+Thornton, P.E., Thornton, M.M., Mayer, B.W., Wei, Y., Devarakonda, R., Vose, R.S., and Cook, R.B., 2016, Daymet-Daily surface weather data on a 1-km grid for North America (version 3): accessed August 16, 2016, at <http://dx.doi.org/10.3334/ORNLDAAC/1328>.
 
-Thornton, P.E., Thornton, M.M., Mayer, B.W., Wei, Y., Devarakonda, R.,
-Vose, R.S., and Cook, R.B., 2016, Daymet-Daily surface weather data on a
-1-km grid for North America (version 3): accessed August 16, 2016, at
-<http://dx.doi.org/10.3334/ORNLDAAC/1328>.
+Torvalds, L., and Hamano, J., 2010, Git web page: accessed August 29, 2017, at <http://git-scm.com/>.
 
-Torvalds, L., and Hamano, J., 2010, Git web page: accessed August 29,
-2017, at <http://git-scm.com/>.
+Unidata, 2014, netCDF-Network common data format: Boulder, Colo., UCAR/Unidata Program Center.
 
-Unidata, 2014, netCDF-Network common data format: Boulder, Colo.,
-UCAR/Unidata Program Center.
-
-U.S. Library of Congress, 2015, ESRI ArcInfo ASCII grid: Sustainability
-of Digital Formats, Planning for Library of Congress Collections,
-accessed June 5, 2017, at
-<https://www.loc.gov/preservation/digital/formats/fdd/fdd000421.shtml>.
+U.S. Library of Congress, 2015, ESRI ArcInfo ASCII grid: Sustainability of Digital Formats, Planning for Library of Congress Collections, accessed June 5, 2017, at <https://www.loc.gov/preservation/digital/formats/fdd/fdd000421.shtml>.
