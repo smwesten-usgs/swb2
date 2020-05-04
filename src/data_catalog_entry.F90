@@ -2114,7 +2114,7 @@ end subroutine set_maximum_allowable_value_real_sub
     this%GRID_BOUNDS_NATIVE%rXul = rX(3); this%GRID_BOUNDS_NATIVE%rXur = rX(4)
     this%GRID_BOUNDS_NATIVE%rYul = rY(3); this%GRID_BOUNDS_NATIVE%rYur = rY(4)
 
-!#ifdef DEBUG_PRINT
+#ifdef DEBUG_PRINT
    print *, " "
    print *, trim(__FILE__), ": ", __LINE__
    print *, "--  BASE GRID BOUNDS projected to DATA NATIVE COORDS"
@@ -2126,7 +2126,7 @@ end subroutine set_maximum_allowable_value_real_sub
    print *, "LR: ", this%GRID_BOUNDS_NATIVE%rXlr, this%GRID_BOUNDS_NATIVE%rYlr
    print *, "UL: ", this%GRID_BOUNDS_NATIVE%rXul, this%GRID_BOUNDS_NATIVE%rYul
    print *, "UR: ", this%GRID_BOUNDS_NATIVE%rXur, this%GRID_BOUNDS_NATIVE%rYur
-!#endif
+#endif
 
   end subroutine calc_project_boundaries_sub
 

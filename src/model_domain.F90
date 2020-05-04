@@ -1434,7 +1434,8 @@ contains
         call LOGS%WRITE( "==> THORNTHWAITE-MATHER SOIL MOISTURE RETENTION (SWB 1.0 equations) submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = FALSE )
 
-      elseif ( ( Method_Name .strapprox. "FAO56_TWO_STAGE" ) .or. ( Method_Name .strapprox. "FAO-56_TWO_STAGE" ) ) then
+      elseif ( ( Method_Name .strapprox. "FAO56_TWO_STAGE" ) .or. ( Method_Name .strapprox. "FAO-56_TWO_STAGE" )   &
+              .or. ( Method_Name .strapprox. "FAO-56_TWO-STAGE" )) then
 
         this%init_actual_et => model_initialize_actual_et_fao56__two_stage
         this%calc_actual_et => model_calculate_actual_et_fao56__two_stage
@@ -1548,7 +1549,7 @@ contains
             DUMP( indx )%unitnum = unitnum
 
             write( unit=DUMP( indx )%unitnum, fmt="(a)")                                                           &
-              "month, day, year,landuse_code, landuse_index, soil_group, num_upslope_connections, "                &
+              "date, month, day, year,landuse_code, landuse_index, soil_group, num_upslope_connections, "          &
               //"sum_upslope_cells, solution_order, cell_index, target_index, awc, latitude, reference_ET0, "      &
               //"actual_ET, curve_num_adj, inflow, runon, "                                                        &
               //"runoff, outflow, infiltration, snowfall, potential_snowmelt, snowmelt, interception, "            &
@@ -2808,7 +2809,8 @@ contains
     if (allocated(this%monthly_runoff) )  monthly_runoff = this%monthly_runoff( cell_indx )
     if (allocated(this%monthly_gross_precip) )  monthly_gross_precip = this%monthly_gross_precip( cell_indx )
 
-      write( unit=unitnum, fmt="(i2,',',i2,',',i4,',',8(i6,','),62(g16.9,','),g16.9)")                                      &
+      write( unit=unitnum, fmt="(i4,'-',i2.2,'-'i2.2,',',i2,',',i2,',',i4,',',8(i6,','),62(g16.9,','),g16.9)")                &
+        SIM_DT%curr%iYear, SIM_DT%curr%iMonth, SIM_DT%curr%iDay,                                                            &
         SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                                            &
         this%landuse_code( cell_indx ), this%landuse_index( cell_indx ),                                                    &
         this%soil_group( cell_indx ), this%num_upslope_connections( cell_indx ), this%sum_upslope_cells( cell_indx ),       &
