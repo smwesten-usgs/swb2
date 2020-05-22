@@ -77,61 +77,61 @@ contains
   subroutine crop_coefficients_FAO56_initialize()
 
     ! [ LOCALS ]
-    ! type (FSTRING_LIST_T)              :: slREW, slTEW
-    type (FSTRING_LIST_T)              :: slList
+    ! type (FSTRING_LIST_T)            :: slREW, slTEW
+    type (FSTRING_LIST_T)             :: slList
     type (DATETIME_T)                 :: DT
     type (DATETIME_T)                 :: temp_date
     ! integer (c_int), allocatable :: iTEWSeqNums(:)
     ! integer (c_int), allocatable :: iREWSeqNums(:)
-    integer (c_int)              :: iNumberOfTEW, iNumberOfREW
-    integer (c_int)              :: iNumberOfLanduses
-    integer (c_int)              :: iIndex, iIndex2
-    integer (c_int)              :: iStat
-    real (c_float)               :: growing_cycle_length
+    integer (c_int)                   :: iNumberOfTEW, iNumberOfREW
+    integer (c_int)                   :: iNumberOfLanduses
+    integer (c_int)                   :: iIndex, iIndex2
+    integer (c_int)                   :: iStat
+    real (c_float)                    :: growing_cycle_length
 
-    character (len=10)               :: sMMDDYYYY
-    character (len=:), allocatable   :: sText
+    character (len=10)                :: sMMDDYYYY
+    character (len=:), allocatable    :: sText
 
     type (FSTRING_LIST_T)             :: slPlantingDate
-    type (DATETIME_T)                :: dtPlantingDate
-    character (len=:), allocatable   :: PlantingDate_str
+    type (DATETIME_T)                 :: dtPlantingDate
+    character (len=:), allocatable    :: PlantingDate_str
 
-    real (c_float), allocatable :: L_shift_days_l(:)
+    real (c_float), allocatable       :: L_shift_days_l(:)
 
-    real (c_float), allocatable :: L_ini_l(:)
-    real (c_float), allocatable :: L_dev_l(:)
-    real (c_float), allocatable :: L_mid_l(:)
-    real (c_float), allocatable :: L_late_l(:)
-    real (c_float), allocatable :: L_fallow_l(:)
+    real (c_float), allocatable       :: L_ini_l(:)
+    real (c_float), allocatable       :: L_dev_l(:)
+    real (c_float), allocatable       :: L_mid_l(:)
+    real (c_float), allocatable       :: L_late_l(:)
+    real (c_float), allocatable       :: L_fallow_l(:)
 
-    real (c_float), allocatable :: GDD_plant_l(:)
-    real (c_float), allocatable :: GDD_ini_l(:)
-    real (c_float), allocatable :: GDD_dev_l(:)
-    real (c_float), allocatable :: GDD_mid_l(:)
-    real (c_float), allocatable :: GDD_late_l(:)
+    real (c_float), allocatable       :: GDD_plant_l(:)
+    real (c_float), allocatable       :: GDD_ini_l(:)
+    real (c_float), allocatable       :: GDD_dev_l(:)
+    real (c_float), allocatable       :: GDD_mid_l(:)
+    real (c_float), allocatable       :: GDD_late_l(:)
 
-    real (c_float), allocatable :: Kcb_ini_l(:)
-    real (c_float), allocatable :: Kcb_mid_l(:)
-    real (c_float), allocatable :: Kcb_end_l(:)
-    real (c_float), allocatable :: Kcb_min_l(:)
+    real (c_float), allocatable       :: Kcb_ini_l(:)
+    real (c_float), allocatable       :: Kcb_mid_l(:)
+    real (c_float), allocatable       :: Kcb_end_l(:)
+    real (c_float), allocatable       :: Kcb_min_l(:)
 
-    real (c_float), allocatable :: Kcb_jan(:)
-    real (c_float), allocatable :: Kcb_feb(:)
-    real (c_float), allocatable :: Kcb_mar(:)
-    real (c_float), allocatable :: Kcb_apr(:)
-    real (c_float), allocatable :: Kcb_may(:)
-    real (c_float), allocatable :: Kcb_jun(:)
-    real (c_float), allocatable :: Kcb_jul(:)
-    real (c_float), allocatable :: Kcb_aug(:)
-    real (c_float), allocatable :: Kcb_sep(:)
-    real (c_float), allocatable :: Kcb_oct(:)
-    real (c_float), allocatable :: Kcb_nov(:)
-    real (c_float), allocatable :: Kcb_dec(:)
+    real (c_float), allocatable       :: Kcb_jan(:)
+    real (c_float), allocatable       :: Kcb_feb(:)
+    real (c_float), allocatable       :: Kcb_mar(:)
+    real (c_float), allocatable       :: Kcb_apr(:)
+    real (c_float), allocatable       :: Kcb_may(:)
+    real (c_float), allocatable       :: Kcb_jun(:)
+    real (c_float), allocatable       :: Kcb_jul(:)
+    real (c_float), allocatable       :: Kcb_aug(:)
+    real (c_float), allocatable       :: Kcb_sep(:)
+    real (c_float), allocatable       :: Kcb_oct(:)
+    real (c_float), allocatable       :: Kcb_nov(:)
+    real (c_float), allocatable       :: Kcb_dec(:)
 
-    real (c_float)              :: fKcb_initial
-    real (c_float)              :: fRz_initial
+    real (c_float)                    :: fKcb_initial
+    real (c_float)                    :: fRz_initial
 
-    real (c_float), parameter   :: NEAR_ZERO = 1.0e-9_c_float
+    real (c_float), parameter         :: NEAR_ZERO = 1.0e-9_c_float
 
     type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_PERCENT_SOIL_MOISTURE
 

@@ -29,11 +29,11 @@ program tests
   call setup_crop_coefficients__FAO56
   call run_test_case(test_crop_coefficients_parsing,"test_crop_coefficients_parsing")
   call run_test_case(test_crop_coefficients_basic,"test_crop_coefficients_basic")
+  call run_test_case(test_gdd_max_plus_min_simple,"test_gdd_max_plus_min_simple")
 
   ! test_datetime.F90:
   call run_test_case(test_datetime_basic_dateparse,"datetime: parse with default mm/dd/yyyy date format")
-  call run_test_case(test_datetime_basic_mangled_dateparse,"datetime: parse with default mm/dd/yyyy date format, " &
-    //" missing '0' values in month and day")
+  call run_test_case(test_datetime_basic_mangled_dateparse,"datetime: parse with default mm/dd/yyyy date format, missing '0' values in month and day")
   call run_test_case(test_datetime_custom_dateparse,"datetime: parse with custom yyyy-mm-dd date format")
   call run_test_case(test_datetime_addition,"datetime: add 5 to Julian day and return the correct Gregorian date")
 

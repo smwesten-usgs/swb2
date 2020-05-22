@@ -174,6 +174,13 @@ module constants_and_conversions
     module procedure inches_to_mm_dbl_fn
   end interface in_to_mm
 
+  public :: enforce_bounds
+  interface enforce_bounds
+    module procedure enforce_bounds_int_fn
+    module procedure enforce_bounds_sgl_fn
+    module procedure enforce_bounds_dbl_fn
+  end interface enforce_bounds
+
   public :: char_ptr_to_fortran_string
   public :: c_to_fortran_string
   public :: fortran_to_c_string
@@ -965,5 +972,37 @@ end function fortran_to_c_string
 
   end function keepnumeric
 
+  elemental function enforce_bounds_int_fn(value, minval, maxval)  result(retval)
+
+    integer (c_int), intent(in)   :: value
+    integer (c_int), intent(in)   :: minval
+    integer (c_int), intent(in)   :: maxval
+    integer (c_int)               :: retval
+
+    retval = min( max( value, minval ), maxval)
+
+  end function enforce_bounds_int_fn 
+
+  elemental function enforce_bounds_sgl_fn(value, minval, maxval)  result(retval)
+
+    real (c_float), intent(in)   :: value
+    real (c_float), intent(in)   :: minval
+    real (c_float), intent(in)   :: maxval
+    real (c_float)               :: retval
+
+    retval = min( max( value, minval ), maxval)
+
+  end function enforce_bounds_sgl_fn 
+
+  elemental function enforce_bounds_dbl_fn(value, minval, maxval)  result(retval)
+  
+    real (c_double), intent(in)   :: value
+    real (c_double), intent(in)   :: minval
+    real (c_double), intent(in)   :: maxval
+    real (c_double)               :: retval
+  
+    retval = min( max( value, minval ), maxval)
+  
+  end function enforce_bounds_dbl_fn 
 
 end module constants_and_conversions

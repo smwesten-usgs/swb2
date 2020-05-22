@@ -133,7 +133,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  elemental subroutine growing_degree_day_calculate( gdd, tmean, order )
+  impure elemental subroutine growing_degree_day_calculate( gdd, tmean, order )
 
     ! [ ARGUMENTS ]
     real (c_float), intent(inout)       :: gdd
@@ -142,6 +142,7 @@ contains
 
     ! [ LOCALS ]
     real (c_float)    :: delta
+    real (c_float)    :: bounded_mean_air_temp
 
     associate( doy_to_reset_gdd => GDD_RESET_DATE( order ),         &
                gdd_max => GDD_MAX( order ),                         &
@@ -149,9 +150,10 @@ contains
 
       if ( SIM_DT%iDOY == doy_to_reset_gdd )  gdd = 0.0_c_float
 
-      delta = min(tmean, gdd_max - gdd_base)
-
-      if ( delta > 0.0_c_float ) gdd = gdd + delta
+      bounded_mean_air_temp = enforce_bounds(value=tmean, minval=gdd_base, maxval=gdd_max)
+      
+      delta = bounded_mean_air_temp - gdd_base
+      gdd = gdd + delta
 
     end associate
 
