@@ -1,19 +1,12 @@
 #!/bin/bash
 #remove existing Cmake cache and directories
 # remove existing Cmake cache and directories
-rm -fr CMake*
+rm -rf CMake*
 rm -rf Testing
 rm -rf src
 rm -rf tests
 rm -f CPack*
 rm -f *.txt
-
-module purge
-module load gcc/6.1
-module load hdf5-serial/1.10.1-gcc6.1.0
-module load netcdf-serial/4.4.1.1-hdf51.10.1-gcc6.1.0
-module load cmake/3.14.2
-module load zlib/1.2.11-gcc
 
 export GFORTRAN=gfortran
 export GCC=gcc
@@ -33,6 +26,11 @@ export CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -ffree-line-length-512 -fb
 export FC=$GFORTRAN
 export CC=$GCC
 
+module purge && module load legacy && module load gcc/6.1 && \
+  module load hdf5-serial/1.10.1-gcc6.1.0 && \
+  module load netcdf-serial/4.4.1.1-hdf51.10.1-gcc6.1.0 && \
+  module load cmake/3.15.4 && \
+  module load zlib/1.2.11-gcc && \
 cmake "../../.." -G "Unix Makefiles"                         \
 -DCMAKE_BUILD_TYPE="$BUILD_TYPE "                            \
 -DCMAKE_INSTALL_PREFIX:PATH="$INSTALL_PREFIX "               \
