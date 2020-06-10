@@ -1251,22 +1251,38 @@ contains
              .or. ( Method_Name .strapprox. "BE" )              &
              .or. ( Method_Name .strapprox. "SINUSOIDAL" )  )        then
 
-        ! this%init_GDD => model_initialize_GDD_be
-        ! this%calc_GDD => model_calculate_GDD_be
-        ! call LOGS%WRITE( "==> Growing degree-day (GDD) will be calculated as described "  &
-        !   //"in Baskerville and Emin (1969)", iLogLevel = LOG_ALL, lEcho = FALSE )
-        this%init_GDD => model_initialize_GDD
-        this%calc_GDD => model_calculate_GDD
-        call LOGS%WRITE( "==> THIS OPTION IS TEMPORARILY DISABLED! Growing degree-day (GDD) will be calculated using "  &
-          //"simple averaging of TMAX and TMIN.", iLogLevel = LOG_ALL, lEcho = FALSE )
+         this%init_GDD => model_initialize_GDD_be
+         this%calc_GDD => model_calculate_GDD_be
+         call LOGS%WRITE( "==> Growing degree-day (GDD) will be calculated as described "  &
+           //"in Baskerville and Emin (1969)", iLogLevel = LOG_ALL, lEcho = FALSE )
+!        this%init_GDD => model_initialize_GDD
+!        this%calc_GDD => model_calculate_GDD
+!        call LOGS%WRITE( "==> THIS OPTION IS TEMPORARILY DISABLED! Growing degree-day (GDD) will be calculated using "  &
+!          //"simple averaging of TMAX and TMIN.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
-      else
+      elseif( ( Method_Name .strapprox. "SIMPLE" )                       &
+        .or. ( Method_Name .strapprox. "SIMPLE_GROWING_DEGREE_DAY" )     &
+        .or. ( Method_Name .strapprox. "SIMPLE_GROWING_DEGREE-DAY") )          then
 
         this%init_GDD => model_initialize_GDD
         this%calc_GDD => model_calculate_GDD
         call LOGS%WRITE( "==> Growing degree-day (GDD) will be calculated using "  &
           //"simple averaging of TMAX and TMIN.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
+      elseif( ( Method_Name .strapprox. "MODIFIED" )                      &
+        .or. ( Method_Name .strapprox. "MODIFIED_GROWING_DEGREE-DAY" )    &
+        .or. ( Method_Name .strapprox. "MODIFIED_GROWING_DEGREE_DAY" )  )        then
+
+        this%init_GDD => model_initialize_GDD
+        this%calc_GDD => model_calculate_modified_GDD
+        call LOGS%WRITE( "==> Modified growing degree-day (GDD) will be calculated using "  &
+          //"a simple averaging of TMAX and TMIN.", iLogLevel = LOG_ALL, lEcho = FALSE )
+
+      else
+
+        call warn("Your control file specifies an unknown or unsupported GROWING DEGREE-DAY method.", &
+                   lFatal = TRUE, iLogLevel = LOG_ALL, lEcho = TRUE )
+  
       endif
 
     elseif ( sCmdText .containssimilar. "IRRIGATION" ) then
@@ -2654,7 +2670,22 @@ contains
 
   end subroutine model_calculate_GDD
 
-  !--------------------------------------------------------------------------------------------------
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_modified_GDD( this )
+
+    use growing_degree_day, only           : modified_growing_degree_day_calculate
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call modified_growing_degree_day_calculate( gdd=this%gdd,                                 &
+                                                tmin=this%tmin,                               &
+                                                tmax=this%tmax,                               &
+                                                order=this%sort_order )
+
+  end subroutine model_calculate_modified_GDD
+
+!--------------------------------------------------------------------------------------------------
 
     subroutine model_initialize_GDD_be( this )
 
@@ -2684,10 +2715,10 @@ contains
       class (MODEL_DOMAIN_T), intent(inout)  :: this
 
       call growing_degree_day_be_calculate( gdd=this%gdd,                                          &
-                                                 tmean=this%tmean,                                      &
-                                                 tmin=this%tmin,                                        &
-                                                 tmax=this%tmax,                                        &
-                                                 order=this%sort_order )
+                                            tmean=this%tmean,                                      &
+                                            tmin=this%tmin,                                        &
+                                            tmax=this%tmax,                                        &
+                                            order=this%sort_order )
 
     end subroutine model_calculate_GDD_be
 

@@ -136,14 +136,14 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  elemental subroutine growing_degree_day_be_calculate( gdd, tmean, tmin, tmax, order )
+  subroutine growing_degree_day_be_calculate( gdd, tmean, tmin, tmax, order )
 
     ! [ ARGUMENTS ]
-    real (c_float), intent(inout)       :: gdd
-    real (c_float), intent(in)          :: tmean
-    real (c_float), intent(in)          :: tmin
-    real (c_float), intent(in)          :: tmax
-    integer (c_int), intent(in)         :: order
+    real (c_float), intent(inout)       :: gdd(:)
+    real (c_float), intent(in)          :: tmean(:)
+    real (c_float), intent(in)          :: tmin(:)
+    real (c_float), intent(in)          :: tmax(:)
+    integer (c_int), intent(in)         :: order(:)
 
     ! [ LOCALS ]
     real (c_float)    :: delta
@@ -152,42 +152,41 @@ contains
     real (c_float)    :: W
     real (c_float)    :: At
     real (c_float)    :: A
+    integer (c_int)   :: indx
 
-    associate( doy_to_reset_gdd => GDD_RESET_DATE( order ),      &
-               gdd_max => GDD_MAX( order ),                      &
-               gdd_base => GDD_BASE( order ) )
+    do indx=lbound(order,1),ubound(order,1)
 
-      if ( SIM_DT%iDOY == doy_to_reset_gdd )  gdd = 0.0_c_float
+      if ( SIM_DT%iDOY == GDD_RESET_DATE( order(indx) ) )  gdd(indx) = 0.0_c_float
 
-      tmax_l = min( tmax, gdd_max )
+      tmax_l = min( tmax(indx), GDD_MAX( order(indx) ) )
 
-      if ( tmax_l <= gdd_base ) then
+      if ( tmax_l <= GDD_BASE( order(indx) ) ) then
 
         dd = 0.0_c_float
 
-      elseif ( tmin >= gdd_base ) then
+      elseif ( tmin(indx) >= GDD_BASE( order(indx) ) ) then
 
-        dd = min(tmean, gdd_max - gdd_base )
+        dd = min(( tmean(indx) - GDD_BASE( order(indx) )), (GDD_MAX( order(indx) ) - GDD_BASE( order(indx) ) ) )
 
       else
 
-        W = ( tmax_l -  tmin) / 2.0_c_float
+        W = ( tmax_l -  tmin(indx)) / 2.0_c_float
 
-        At = ( gdd_base - tmean ) / W
+        At = ( GDD_BASE( order(indx) ) - tmean(indx) ) / W
 
         if ( At > 1 ) At = 1.0_c_float
         if ( At < -1 ) At = -1._c_float
 
         A = asin( At )
 
-        dd = ( ( W * cos( A ) ) - ( ( gdd_base - tmean )                    &
+        dd = ( ( W * cos( A ) ) - ( ( GDD_BASE( order(indx) ) - tmean(indx) )                    &
                * ( real( PI / 2._c_double, c_float ) - A ) ) ) / PI
 
       endif
 
-      gdd = gdd + dd
+      gdd(indx) = gdd(indx) + dd
 
-    end associate
+    enddo  
 
   end subroutine growing_degree_day_be_calculate
 
