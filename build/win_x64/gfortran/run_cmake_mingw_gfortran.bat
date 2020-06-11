@@ -8,7 +8,7 @@ del /S /Q *.txt
 
 :: set CMAKE-related and build-related variables
 set CMAKEROOT=C:\Program Files\CMake
-set COMPILER_DIR=c:\Mingw64
+set COMPILER_DIR=d:\Mingw64
 set FC=gfortran
 set CC=gcc
 
@@ -16,7 +16,7 @@ set MAKE_EXECUTABLE_NAME=mingw32-make.exe
 
 
 :: define where 'make copy' will place executables
-set INSTALL_PREFIX=d:/DOS
+set INSTALL_PREFIX=d:/bin
 
 :: define other variables for use in the CMakeList.txt file
 :: options are "Release", "Profile" or "Debug"

@@ -29,3 +29,18 @@ This software is provided "AS IS."
  [
     ![CC0](http://i.creativecommons.org/p/zero/1.0/88x31.png)
   ](http://creativecommons.org/publicdomain/zero/1.0/)
+
+
+Open Source
+-----------
+This software makes use of several open source projects in order to improve functionality for users. These projects include:
+
+1) PROJ      - https://proj.org/
+2) netCDF    - https://www.unidata.ucar.edu/software/netcdf/
+3) HDF5      - https://www.hdfgroup.org/solutions/hdf5
+4) zlib      - http://zlib.net/
+
+`PROJ` is included in SWB2 as a static snapshot of the code as it existed from when the project was known as `PROJ4`. SWB2 has not been updated to make use of later versions of `PROJ` in order to keep the SWB2 build somewhat simpler; more recent versions of `PROJ` have `sqlite3` as a dependency.
+
+`netCDF`, `HDF5`, and `zlib` are either linked statically or dynamically depending on the platform. Generally static linking is possible using `gfortran` on Windows platforms. Dynamic linking of these libraries is often easier on Macintosh and Linux platforms.
+
