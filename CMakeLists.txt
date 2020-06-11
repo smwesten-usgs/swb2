@@ -1,12 +1,12 @@
 cmake_minimum_required(VERSION 3.5)
 project( swb2 
-	 VERSION 2.0
          LANGUAGES C Fortran )
 
 message("Processing top-level CMakelists.txt for project swb2")
 
 set(SWB_MAJOR_VERSION "2")
 set(SWB_MINOR_VERSION "0")
+set(SWB_PATCH_VERSION "1")
 
 #------------------------------------------------------------------------------------#
 #                           Force out-of-source build
