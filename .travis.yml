@@ -24,3 +24,6 @@ script:
   - cd $TRAVIS_BUILD_DIR/build/linux_x64/gfortran
   - ./run_cmake_gfortran.sh
   - make
+  - make copy
+  - cd $TRAVIS_BUILD_DIR/test/unit_tests
+  - ./swbtest
