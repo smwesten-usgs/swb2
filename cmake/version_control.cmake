@@ -16,7 +16,7 @@ execute_process(
 
 # Get the total number of commits on this branch
 execute_process(
-  COMMAND git rev-list --count HEAD
+	COMMAND git rev-list ${SWB_LATEST_VERSION_TAG}.. --count 
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   OUTPUT_VARIABLE GIT_COMMITS_ON_BRANCH
   OUTPUT_STRIP_TRAILING_WHITESPACE
