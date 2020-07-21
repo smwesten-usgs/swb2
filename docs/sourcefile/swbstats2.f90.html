@@ -1,0 +1,931 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="">
+  
+  <meta name="author" content="Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt">
+  <link rel="icon" href="../favicon.png">
+
+  <title>swbstats2.F90 &ndash; SWB2</title>
+
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/pygments.css" rel="stylesheet">
+  <link href="../css/font-awesome.min.css" rel="stylesheet">
+  <link href="../css/bootstrap-toc.css" rel="stylesheet">
+    <!-- <link href="../css/local.css" rel="stylesheet"> -->
+  
+  
+
+  <script src="../js/jquery-2.1.3.min.js"></script>
+  <script src="../js/svg-pan-zoom.min.js"></script>
+  <script src="../js/bootstrap-toc.js"></script>
+
+</head>
+
+<body data-spy="scroll" data-target="#toc">
+
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+
+    <a class="navbar-brand" href="../index.html">SWB2</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" navbar-light bg-light id="navbarText">
+      <ul class="navbar-nav mr-auto">
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../page/index.html">User Guide</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/modules.html">Modules</a>
+          </li>
+        
+
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+          </li>
+        
+
+
+      </ul>
+    </div>
+
+    <form class="form-inline">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+        <!-- <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contents <span class="caret"></span></a>
+            <ul class="dropdown-menu"> -->
+          <!-- 
+            
+              <li><a href="../lists/files.html">Source Files</a></li>
+            
+          
+          
+            <li><a href="../lists/modules.html">Modules</a></li>
+          
+          
+          
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+          
+          
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+           
+            <li><a href="../lists/types.html">Derived Types</a></li>
+          
+          
+            <li><a href="../lists/programs.html">Programs</a></li>
+          
+        </ul> -->
+
+      <!-- </div> -->
+      <!--/.nav-collapse -->
+
+  </nav>
+
+  <div class="container">
+    
+  
+  <div class="row">
+    <h1>swbstats2.F90
+    <small>Source File</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="card">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 1.5% of total for source files.">277 statements</a>
+     </li>
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/swbstats2.F90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+  
+     <li class="active">swbstats2.F90</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#progs-0">Programs</a></h3></div>
+  <div id="progs-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../program/swbstats2.html">swbstats2</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/swbstats2.f90.html#src">swbstats2.F90</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+    <div class="col-md-9" id='text'>
+      
+      <br>
+    
+      
+      
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#progs-1">Programs</a></h3></div>
+  <div id="progs-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../program/swbstats2.html">swbstats2</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/swbstats2.f90.html#src">swbstats2.F90</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    <section>
+      <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">program </span><span class="n">swbstats2</span>
+<a name="ln-2"></a>
+<a name="ln-3"></a>  <span class="k">use </span><span class="nb">iso_c_binding</span>
+<a name="ln-4"></a><span class="nb">  </span><span class="k">use </span><span class="n">constants_and_conversions</span><span class="p">,</span> <span class="n">only</span> <span class="p">:</span> <span class="n">TRUE</span><span class="p">,</span> <span class="n">FALSE</span><span class="p">,</span> <span class="n">DATATYPE_INT</span><span class="p">,</span>             <span class="p">&amp;</span>
+<a name="ln-5"></a>                                        <span class="n">DATATYPE_FLOAT</span><span class="p">,</span> <span class="n">BNDS</span><span class="p">,</span> <span class="n">asFloat</span><span class="p">,</span>         <span class="p">&amp;</span>
+<a name="ln-6"></a>                                        <span class="n">OS_NATIVE_PATH_DELIMITER</span>
+<a name="ln-7"></a>  <span class="k">use </span><span class="n">exceptions</span><span class="p">,</span> <span class="n">only</span>                <span class="p">:</span> <span class="n">assert</span><span class="p">,</span> <span class="n">die</span>
+<a name="ln-8"></a>  <span class="k">use </span><span class="n">datetime</span><span class="p">,</span> <span class="n">only</span>                  <span class="p">:</span> <span class="n">DATETIME_T</span><span class="p">,</span> <span class="n">assignment</span><span class="p">(</span><span class="o">=</span><span class="p">),</span> <span class="n">operator</span><span class="p">(</span><span class="o">&gt;</span><span class="p">)</span>
+<a name="ln-9"></a>  <span class="k">use </span><span class="n">grid</span>
+<a name="ln-10"></a>  <span class="k">use </span><span class="n">netcdf4_support</span>
+<a name="ln-11"></a>  <span class="k">use </span><span class="n">simulation_datetime</span><span class="p">,</span> <span class="n">only</span>       <span class="p">:</span> <span class="n">SIM_DT</span><span class="p">,</span> <span class="n">DATE_RANGE_T</span>
+<a name="ln-12"></a>  <span class="k">use </span><span class="n">fstring_list</span><span class="p">,</span> <span class="n">only</span>              <span class="p">:</span> <span class="n">FSTRING_LIST_T</span><span class="p">,</span>                         <span class="p">&amp;</span>
+<a name="ln-13"></a>                                        <span class="n">create_list</span>
+<a name="ln-14"></a>  <span class="k">use </span><span class="n">fstring</span>
+<a name="ln-15"></a>  <span class="k">use </span><span class="n">version_control</span><span class="p">,</span> <span class="n">only</span>           <span class="p">:</span> <span class="n">SWB_VERSION</span><span class="p">,</span> <span class="n">GIT_COMMIT_HASH_STRING</span><span class="p">,</span>   <span class="p">&amp;</span>
+<a name="ln-16"></a>                                        <span class="n">GIT_BRANCH_STRING</span><span class="p">,</span> <span class="n">COMPILE_DATE</span><span class="p">,</span>       <span class="p">&amp;</span>
+<a name="ln-17"></a>                                        <span class="n">COMPILE_TIME</span><span class="p">,</span> <span class="n">SYSTEM_NAME</span>
+<a name="ln-18"></a>
+<a name="ln-19"></a>  <span class="k">use </span><span class="n">iso_fortran_env</span><span class="p">,</span> <span class="n">only</span>           <span class="p">:</span> <span class="n">OUTPUT_UNIT</span><span class="p">,</span> <span class="n">COMPILER_OPTIONS</span><span class="p">,</span>         <span class="p">&amp;</span>
+<a name="ln-20"></a>                                        <span class="n">COMPILER_VERSION</span>
+<a name="ln-21"></a>
+<a name="ln-22"></a>  <span class="k">use </span><span class="n">swbstats2_support</span>
+<a name="ln-23"></a>  <span class="k">implicit none</span>
+<a name="ln-24"></a>
+<a name="ln-25"></a><span class="k">  </span><span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">command_arg_str</span>
+<a name="ln-26"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">temp_string</span><span class="p">,</span> <span class="n">sub_string</span>
+<a name="ln-27"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">70</span><span class="p">),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">usage_string</span><span class="p">(:)</span>
+<a name="ln-28"></a>
+<a name="ln-29"></a>  <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">iNumArgs</span>
+<a name="ln-30"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">sCompilerFlags</span>
+<a name="ln-31"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">sCompilerVersion</span>
+<a name="ln-32"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">sVersionString</span>
+<a name="ln-33"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">sGitHashString</span>
+<a name="ln-34"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">sProgramName</span>
+<a name="ln-35"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">sCompilationDateString</span>
+<a name="ln-36"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">sCompilationSystemString</span>
+<a name="ln-37"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">start_date_string</span>
+<a name="ln-38"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">end_date_string</span>
+<a name="ln-39"></a>  <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">iCount</span>
+<a name="ln-40"></a>  <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">iIndex</span>
+<a name="ln-41"></a>  <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">allocatable</span>   <span class="kd">::</span><span class="n">iIndex_array</span><span class="p">(:)</span>
+<a name="ln-42"></a>  <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">iLen</span>
+<a name="ln-43"></a>  <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">start_date_dbl</span>
+<a name="ln-44"></a>  <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">end_date_dbl</span>
+<a name="ln-45"></a>  <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">TIME_BNDS_VARID</span>
+<a name="ln-46"></a>
+<a name="ln-47"></a>  <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">netcdf_active</span> <span class="o">=</span> <span class="n">FALSE</span>
+<a name="ln-48"></a>
+<a name="ln-49"></a>  <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">name_list</span>
+<a name="ln-50"></a>  <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">value_list</span>
+<a name="ln-51"></a>
+<a name="ln-52"></a>  <span class="k">type</span> <span class="p">(</span><span class="n">SWBSTATS_T</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">swbstats</span>
+<a name="ln-53"></a>
+<a name="ln-54"></a>  <span class="k">allocate</span><span class="p">(</span> <span class="n">swbstats</span><span class="p">%</span><span class="n">ncfile_in</span> <span class="p">)</span>
+<a name="ln-55"></a>
+<a name="ln-56"></a>  <span class="n">iNumArgs</span> <span class="o">=</span> <span class="nb">COMMAND_ARGUMENT_COUNT</span><span class="p">()</span>
+<a name="ln-57"></a>
+<a name="ln-58"></a>  <span class="n">sProgramName</span> <span class="o">=</span> <span class="s2">&quot;  SWB Statistics Calculator (SWBSTATS2), a companion to&quot;</span>
+<a name="ln-59"></a>  <span class="n">sVersionString</span> <span class="o">=</span> <span class="s2">&quot;  Soil Water Balance Code version &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span> <span class="n">SWB_VERSION</span> <span class="p">)</span>
+<a name="ln-60"></a>  <span class="n">sCompilationDateString</span>   <span class="o">=</span> <span class="s2">&quot;     compilation date           : &quot;</span>              <span class="p">&amp;</span>
+<a name="ln-61"></a>                               <span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">COMPILE_DATE</span><span class="p">)</span><span class="o">//</span><span class="s2">&quot; &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">COMPILE_TIME</span><span class="p">)</span>
+<a name="ln-62"></a>  <span class="n">sCompilationSystemString</span> <span class="o">=</span> <span class="s2">&quot;     compiled on                : &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">SYSTEM_NAME</span><span class="p">)</span>
+<a name="ln-63"></a>
+<a name="ln-64"></a>  <span class="k">if</span> <span class="p">(</span>     <span class="p">(</span><span class="n">SYSTEM_NAME</span> <span class="p">.</span><span class="n">containssimilar</span><span class="p">.</span> <span class="s2">&quot;Windows&quot;</span><span class="p">)</span>                           <span class="p">&amp;</span>
+<a name="ln-65"></a>      <span class="p">.</span><span class="nb">or</span><span class="p">.</span> <span class="p">(</span><span class="n">SYSTEM_NAME</span> <span class="p">.</span><span class="n">containssimilar</span><span class="p">.</span> <span class="s2">&quot;Mingw&quot;</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-66"></a><span class="k">    </span><span class="n">OS_NATIVE_PATH_DELIMITER</span> <span class="o">=</span> <span class="s2">&quot;\&quot;</span>
+<a name="ln-67"></a><span class="s2">  else</span>
+<a name="ln-68"></a><span class="s2">    OS_NATIVE_PATH_DELIMITER = &quot;</span><span class="o">/</span><span class="s2">&quot;</span>
+<a name="ln-69"></a><span class="s2">  endif</span>
+<a name="ln-70"></a>
+<a name="ln-71"></a><span class="s2">  sGitHashString = &quot;</span>     <span class="n">Git</span> <span class="n">branch</span> <span class="nb">and </span><span class="n">commit</span> <span class="n">hash</span> <span class="p">:</span> <span class="s2">&quot;                        &amp;</span>
+<a name="ln-72"></a><span class="s2">                         //trim( adjustl(GIT_BRANCH_STRING ) )                 &amp;</span>
+<a name="ln-73"></a><span class="s2">                         //&quot;</span><span class="p">,</span> <span class="s2">&quot;//trim( GIT_COMMIT_HASH_STRING )</span>
+<a name="ln-74"></a>
+<a name="ln-75"></a><span class="s2">  iCount = max( len_trim( sVersionString ), len_trim( sGitHashString ) )</span>
+<a name="ln-76"></a><span class="s2">  iCount = max( iCount, len_trim( sCompilationSystemString ) )</span>
+<a name="ln-77"></a><span class="s2">  iCount = max( iCount, len_trim( sProgramName) )</span>
+<a name="ln-78"></a>
+<a name="ln-79"></a><span class="s2">  write(unit=*, fmt=&quot;</span><span class="p">(</span><span class="o">/</span><span class="p">,</span><span class="n">a</span><span class="p">)</span><span class="s2">&quot;) repeat(&quot;</span><span class="o">-</span><span class="s2">&quot;,iCount + 4)</span>
+<a name="ln-80"></a><span class="s2">  write(unit=*, fmt=&quot;</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="o">/</span><span class="p">)</span><span class="s2">&quot;) trim( sProgramName )</span>
+<a name="ln-81"></a><span class="s2">  write(UNIT=*,FMT=&quot;</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="o">/</span><span class="p">)</span><span class="s2">&quot;) trim( sVersionString )</span>
+<a name="ln-82"></a><span class="s2">  write(UNIT=*,FMT=&quot;</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="s2">&quot;) trim( sCompilationDateString )</span>
+<a name="ln-83"></a><span class="s2">  write(UNIT=*,FMT=&quot;</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="s2">&quot;) trim( sCompilationSystemString )</span>
+<a name="ln-84"></a><span class="s2">  write(UNIT=*,FMT=&quot;</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="s2">&quot;) trim( sGitHashString )</span>
+<a name="ln-85"></a><span class="s2">  write(unit=*, fmt=&quot;</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="o">/</span><span class="p">)</span><span class="s2">&quot;) repeat(&quot;</span><span class="o">-</span><span class="s2">&quot;,iCount + 4)</span>
+<a name="ln-86"></a>
+<a name="ln-87"></a><span class="s2">  if(iNumArgs == 0 ) then</span>
+<a name="ln-88"></a>
+<a name="ln-89"></a><span class="s2">#ifdef __GFORTRAN__l</span>
+<a name="ln-90"></a><span class="s2">    sCompilerFlags = COMPILER_OPTIONS()</span>
+<a name="ln-91"></a><span class="s2">    sCompilerVersion = COMPILER_VERSION()</span>
+<a name="ln-92"></a><span class="s2">    write(UNIT=*,FMT=&quot;</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="o">/</span><span class="p">)</span><span class="s2">&quot;) &quot;</span><span class="n">Compiled</span> <span class="n">with</span><span class="p">:</span> <span class="n">gfortran</span> <span class="p">(</span><span class="s2">&quot;//TRIM(sCompilerVersion)//&quot;</span><span class="p">)</span><span class="s2">&quot;</span>
+<a name="ln-93"></a><span class="s2">    write(UNIT=*,FMT=&quot;</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="s2">&quot;) &quot;</span><span class="n">Compiler</span> <span class="n">flags</span><span class="p">:</span><span class="s2">&quot;</span>
+<a name="ln-94"></a><span class="s2">    write(UNIT=*,FMT=&quot;</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="s2">&quot;) &quot;</span><span class="o">-------------------------------</span><span class="s2">&quot;</span>
+<a name="ln-95"></a><span class="s2">    write(UNIT=*,FMT=&quot;</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="o">/</span><span class="p">)</span><span class="s2">&quot;) TRIM(sCompilerFlags)</span>
+<a name="ln-96"></a><span class="s2">#endif</span>
+<a name="ln-97"></a>
+<a name="ln-98"></a><span class="s2">#ifdef __INTEL_COMPILER</span>
+<a name="ln-99"></a><span class="s2">    write(UNIT=*,FMT=&quot;</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="s2">&quot;) &quot;</span><span class="n">Compiled</span> <span class="n">with</span><span class="p">:</span> <span class="n">Intel</span> <span class="n">Fortran</span> <span class="n">version</span> <span class="s2">&quot; &amp;</span>
+<a name="ln-100"></a><span class="s2">      //TRIM(asCharacter(__INTEL_COMPILER))</span>
+<a name="ln-101"></a><span class="s2">      write(UNIT=*,FMT=&quot;</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="o">/</span><span class="p">)</span><span class="s2">&quot;) &quot;</span><span class="n">Compiler</span> <span class="n">build</span> <span class="n">date</span><span class="p">:</span><span class="s2">&quot;//TRIM(asCharacter(__INTEL_COMPILER_BUILD_DATE))</span>
+<a name="ln-102"></a><span class="s2">#endif</span>
+<a name="ln-103"></a>
+<a name="ln-104"></a><span class="s2">#ifdef __G95__l</span>
+<a name="ln-105"></a><span class="s2">    write(UNIT=*,FMT=&quot;</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="o">/</span><span class="p">)</span><span class="s2">&quot;) &quot;</span><span class="n">Compiled</span> <span class="n">with</span><span class="p">:</span> <span class="n">G95</span> <span class="n">minor</span> <span class="n">version</span> <span class="s2">&quot; &amp;</span>
+<a name="ln-106"></a><span class="s2">      //TRIM(int2char(__G95_MINOR__))</span>
+<a name="ln-107"></a><span class="s2">#endif</span>
+<a name="ln-108"></a>
+<a name="ln-109"></a><span class="s2">    allocate(usage_string(44))</span>
+<a name="ln-110"></a>
+<a name="ln-111"></a><span class="s2">    usage_string = [                                                           &amp;</span>
+<a name="ln-112"></a><span class="s2">     &quot;</span><span class="n">usage</span><span class="p">:</span> <span class="n">swbstats2</span> <span class="p">[</span><span class="k">options</span><span class="p">]</span> <span class="n">netcdf_file_name</span>                           <span class="s2">&quot;, &amp;</span>
+<a name="ln-113"></a><span class="s2">     &quot;</span>                                                                      <span class="s2">&quot;, &amp;</span>
+<a name="ln-114"></a><span class="s2">     &quot;</span>  <span class="k">options</span><span class="p">:</span>                                                            <span class="s2">&quot;, &amp;</span>
+<a name="ln-115"></a><span class="s2">     &quot;</span>                                                                      <span class="s2">&quot;, &amp;</span>
+<a name="ln-116"></a><span class="s2">     &quot;</span>  <span class="p">[</span> <span class="o">--</span><span class="n">annual_statistics</span> <span class="p">]</span>                                             <span class="s2">&quot;, &amp;</span>
+<a name="ln-117"></a><span class="s2">     &quot;</span>    <span class="n">calculate</span> <span class="n">statistics</span> <span class="n">for</span> <span class="n">every</span> <span class="n">calendar</span> <span class="n">year</span> <span class="n">between</span> <span class="n">start</span> <span class="nb">and </span><span class="k">end</span><span class="s2">&quot;, &amp;</span>
+<a name="ln-118"></a><span class="s2">     &quot;</span>  <span class="p">[</span> <span class="o">--</span><span class="n">monthly_statistics</span> <span class="p">]</span>                                            <span class="s2">&quot;, &amp;</span>
+<a name="ln-119"></a><span class="s2">     &quot;</span>    <span class="n">calculate</span> <span class="n">statistics</span> <span class="n">for</span> <span class="n">every</span> <span class="n">month</span> <span class="n">between</span> <span class="n">start</span> <span class="nb">and </span><span class="k">end</span>        <span class="s2">&quot;, &amp;</span>
+<a name="ln-120"></a><span class="s2">     &quot;</span>  <span class="p">[</span> <span class="o">--</span><span class="n">report_as_volume</span> <span class="p">]</span>                                              <span class="s2">&quot;, &amp;</span>
+<a name="ln-121"></a><span class="s2">     &quot;</span>    <span class="n">express</span> <span class="n">statistics</span> <span class="n">as</span> <span class="n">a</span> <span class="n">volume</span> <span class="p">(</span><span class="n">cubic</span> <span class="n">meters</span><span class="p">)</span>                     <span class="s2">&quot;, &amp;</span>
+<a name="ln-122"></a><span class="s2">     &quot;</span>  <span class="p">[</span> <span class="o">--</span><span class="n">report_in_meters</span> <span class="p">]</span>                                              <span class="s2">&quot;, &amp;</span>
+<a name="ln-123"></a><span class="s2">     &quot;</span>    <span class="n">express</span> <span class="n">output</span> <span class="n">statistics</span> <span class="n">in</span> <span class="o">*</span><span class="n">meters</span><span class="o">*</span>                             <span class="s2">&quot;, &amp;</span>
+<a name="ln-124"></a><span class="s2">     &quot;</span>  <span class="p">[</span> <span class="o">--</span><span class="n">slice</span><span class="o">=</span> <span class="p">]</span>                                                        <span class="s2">&quot;, &amp;</span>
+<a name="ln-125"></a><span class="s2">     &quot;</span>    <span class="n">dates</span> <span class="n">over</span> <span class="n">which</span> <span class="n">statistics</span> <span class="n">should</span> <span class="n">be</span> <span class="n">calculated</span><span class="p">,</span>                 <span class="s2">&quot;, &amp;</span>
+<a name="ln-126"></a><span class="s2">     &quot;</span>    <span class="n">with</span> <span class="n">start</span> <span class="n">date</span> <span class="nb">and </span><span class="k">end </span><span class="n">date</span> <span class="n">formatted</span> <span class="n">as</span> <span class="n">yyyy</span><span class="o">-</span><span class="n">mm</span><span class="o">-</span><span class="n">dd</span><span class="p">,</span><span class="n">yyyy</span><span class="o">-</span><span class="n">mm</span><span class="o">-</span><span class="n">dd</span>   <span class="s2">&quot;, &amp;</span>
+<a name="ln-127"></a><span class="s2">     &quot;</span>  <span class="p">[</span> <span class="o">--</span><span class="n">stress_period_file</span><span class="o">=</span> <span class="p">]</span>                                           <span class="s2">&quot;, &amp;</span>
+<a name="ln-128"></a><span class="s2">     &quot;</span>    <span class="n">comma</span><span class="o">-</span><span class="n">delimited</span> <span class="k">file </span><span class="n">containing</span> <span class="n">stress</span> <span class="n">period</span> <span class="n">start</span> <span class="nb">and</span>           <span class="s2">&quot;, &amp;</span>
+<a name="ln-129"></a><span class="s2">     &quot;</span>    <span class="k">end </span><span class="n">date</span><span class="p">,</span> <span class="n">with</span> <span class="n">header</span> <span class="n">labels</span> <span class="nb">and </span><span class="n">comments</span> <span class="n">starting</span> <span class="n">with</span><span class="s1">&#39;#&#39;</span><span class="p">:</span>       <span class="s2">&quot;, &amp;</span>
+<a name="ln-130"></a><span class="s2">     &quot;</span>      <span class="n">id</span><span class="p">,</span><span class="n">start_date</span><span class="p">,</span><span class="n">end_date</span>                                          <span class="s2">&quot;, &amp;</span>
+<a name="ln-131"></a><span class="s2">     &quot;</span>      <span class="err">#</span><span class="mi">2</span><span class="p">,</span><span class="mi">1870</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="p">,</span><span class="mi">1898</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span>                                        <span class="s2">&quot;, &amp;</span>
+<a name="ln-132"></a><span class="s2">     &quot;</span>      <span class="mi">5</span><span class="p">,</span><span class="mi">1920</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="p">,</span><span class="mi">1925</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span>                                         <span class="s2">&quot;, &amp;</span>
+<a name="ln-133"></a><span class="s2">     &quot;</span>      <span class="mi">6</span><span class="p">,</span><span class="mi">1925</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="p">,</span><span class="mi">1930</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span>                                         <span class="s2">&quot;, &amp;</span>
+<a name="ln-134"></a><span class="s2">     &quot;</span>  <span class="p">[</span> <span class="o">--</span><span class="n">comparison_scale_factor</span><span class="o">=</span><span class="p">]</span>                                       <span class="s2">&quot;, &amp;</span>
+<a name="ln-135"></a><span class="s2">     &quot;</span>    <span class="k">value </span><span class="n">to</span> <span class="n">multiply</span> <span class="n">comparison</span> <span class="n">grid</span> <span class="n">by</span> <span class="n">before</span> <span class="n">calculating</span> <span class="n">statistics</span><span class="s2">&quot;, &amp;</span>
+<a name="ln-136"></a><span class="s2">     &quot;</span>  <span class="p">[</span> <span class="o">--</span><span class="n">comparison_grid</span><span class="o">=</span> <span class="p">]</span>                                              <span class="s2">&quot;, &amp;</span>
+<a name="ln-137"></a><span class="s2">     &quot;</span>    <span class="n">name</span> <span class="n">of</span> <span class="kt">real</span><span class="o">-</span><span class="n">valued</span> <span class="n">grid</span> <span class="n">to</span> <span class="n">compare</span> <span class="n">SWB</span> <span class="n">output</span> <span class="n">against</span>            <span class="s2">&quot;, &amp;</span>
+<a name="ln-138"></a><span class="s2">     &quot;</span>  <span class="p">[</span> <span class="o">--</span><span class="n">comparison_period_file</span><span class="o">=</span> <span class="p">]</span>                                       <span class="s2">&quot;, &amp;</span>
+<a name="ln-139"></a><span class="s2">     &quot;</span>    <span class="n">comma</span><span class="o">-</span><span class="n">delimited</span> <span class="k">file </span><span class="n">containing</span> <span class="n">comparison</span> <span class="n">period</span> <span class="n">start</span> <span class="nb">and</span>       <span class="s2">&quot;, &amp;</span>
+<a name="ln-140"></a><span class="s2">     &quot;</span>    <span class="k">end </span><span class="n">date</span><span class="p">,</span> <span class="n">with</span> <span class="n">header</span> <span class="n">labels</span> <span class="nb">and </span><span class="n">comments</span> <span class="n">starting</span> <span class="n">with</span><span class="s1">&#39;#&#39;</span><span class="p">:</span>       <span class="s2">&quot;, &amp;</span>
+<a name="ln-141"></a><span class="s2">     &quot;</span>      <span class="n">id</span><span class="p">,</span><span class="n">start_date</span><span class="p">,</span><span class="n">end_date</span><span class="p">,</span><span class="n">comparison_grid_filename</span>                 <span class="s2">&quot;, &amp;</span>
+<a name="ln-142"></a><span class="s2">     &quot;</span>      <span class="err">#</span><span class="mi">2</span><span class="p">,</span><span class="mi">1870</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="p">,</span><span class="mi">1898</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="p">,</span><span class="n">comparison_file_period_2</span><span class="p">.</span><span class="n">asc</span>           <span class="s2">&quot;, &amp;</span>
+<a name="ln-143"></a><span class="s2">     &quot;</span>      <span class="mi">5</span><span class="p">,</span><span class="mi">1920</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="p">,</span><span class="mi">1925</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="p">,</span><span class="n">comparison_file_period_5</span><span class="p">.</span><span class="n">asc</span>            <span class="s2">&quot;, &amp;</span>
+<a name="ln-144"></a><span class="s2">     &quot;</span>      <span class="mi">6</span><span class="p">,</span><span class="mi">1925</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="p">,</span><span class="mi">1930</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="p">,</span><span class="n">comparison_file_period_6</span><span class="p">.</span><span class="n">asc</span>            <span class="s2">&quot;, &amp;</span>
+<a name="ln-145"></a><span class="s2">     &quot;</span>  <span class="p">[</span> <span class="o">--</span><span class="n">zone_grid</span><span class="o">=</span> <span class="p">]</span>                                                    <span class="s2">&quot;, &amp;</span>
+<a name="ln-146"></a><span class="s2">     &quot;</span>    <span class="n">name</span> <span class="n">of</span> <span class="kt">integer</span><span class="o">-</span><span class="n">valued</span> <span class="n">grid</span> <span class="n">for</span> <span class="n">which</span> <span class="n">zonal</span> <span class="n">statistics</span> <span class="n">are</span> <span class="n">desired</span><span class="s2">&quot;, &amp;</span>
+<a name="ln-147"></a><span class="s2">     &quot;</span>  <span class="p">[</span> <span class="o">--</span><span class="n">zone_period_file</span><span class="o">=</span> <span class="p">]</span>                                             <span class="s2">&quot;, &amp;</span>
+<a name="ln-148"></a><span class="s2">     &quot;</span>    <span class="n">comma</span><span class="o">-</span><span class="n">delimited</span> <span class="k">file </span><span class="n">containing</span> <span class="n">calculation</span> <span class="n">period</span> <span class="n">start</span> <span class="nb">and</span>      <span class="s2">&quot;, &amp;</span>
+<a name="ln-149"></a><span class="s2">     &quot;</span>    <span class="k">end </span><span class="n">date</span><span class="p">,</span> <span class="n">with</span> <span class="n">header</span> <span class="n">labels</span> <span class="nb">and </span><span class="n">comments</span> <span class="n">starting</span> <span class="n">with</span><span class="s1">&#39;#&#39;</span><span class="p">:</span>       <span class="s2">&quot;, &amp;</span>
+<a name="ln-150"></a><span class="s2">     &quot;</span>      <span class="n">id</span><span class="p">,</span><span class="n">start_date</span><span class="p">,</span><span class="n">end_date</span><span class="p">,</span><span class="n">zone_grid_filename</span>                       <span class="s2">&quot;, &amp;</span>
+<a name="ln-151"></a><span class="s2">     &quot;</span>      <span class="err">#</span><span class="mi">2</span><span class="p">,</span><span class="mi">1870</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="p">,</span><span class="mi">1898</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="p">,</span><span class="n">zone_grod_file_period_2</span><span class="p">.</span><span class="n">asc</span>            <span class="s2">&quot;, &amp;</span>
+<a name="ln-152"></a><span class="s2">     &quot;</span>      <span class="mi">5</span><span class="p">,</span><span class="mi">1920</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="p">,</span><span class="mi">1925</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="p">,</span><span class="n">zone_grid_file_period_5</span><span class="p">.</span><span class="n">asc</span>             <span class="s2">&quot;, &amp;</span>
+<a name="ln-153"></a><span class="s2">     &quot;</span>      <span class="mi">6</span><span class="p">,</span><span class="mi">1925</span><span class="o">-</span><span class="mi">01</span><span class="o">-</span><span class="mi">01</span><span class="p">,</span><span class="mi">1930</span><span class="o">-</span><span class="mi">12</span><span class="o">-</span><span class="mi">31</span><span class="p">,</span><span class="n">zone_grid_file_period_6</span><span class="p">.</span><span class="n">asc</span>             <span class="s2">&quot;, &amp;</span>
+<a name="ln-154"></a><span class="s2">     &quot;</span>  <span class="p">[</span> <span class="o">--</span><span class="err">{</span><span class="n">no_</span><span class="err">}</span><span class="n">netcdf_output</span> <span class="p">]</span>                                            <span class="s2">&quot;, &amp;</span>
+<a name="ln-155"></a><span class="s2">     &quot;</span>    <span class="n">toggle</span> <span class="n">whether</span> <span class="n">netCDF</span> <span class="k">file is target </span><span class="n">for</span> <span class="n">gridded</span> <span class="n">output</span>           <span class="s2">&quot;, &amp;</span>
+<a name="ln-156"></a><span class="s2">     &quot;</span>  <span class="p">[</span> <span class="o">--</span><span class="err">{</span><span class="n">no_</span><span class="err">}</span><span class="n">arcgrid_output</span> <span class="p">]</span>                                           <span class="s2">&quot;, &amp;</span>
+<a name="ln-157"></a><span class="s2">     &quot;</span>    <span class="n">toggle</span> <span class="n">whether</span> <span class="n">an</span> <span class="n">ASCII</span> <span class="n">Arc</span> <span class="n">Grid</span> <span class="k">is target </span><span class="n">for</span> <span class="n">gridded</span> <span class="n">output</span>     <span class="s2">&quot;  &amp;</span>
+<a name="ln-158"></a><span class="s2">     ]</span>
+<a name="ln-159"></a>
+<a name="ln-160"></a><span class="s2">     do iIndex=1,ubound(usage_string,1)</span>
+<a name="ln-161"></a><span class="s2">       write(unit=*, fmt=&quot;</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="s2">&quot;) trim(usage_string(iIndex))</span>
+<a name="ln-162"></a><span class="s2">     enddo</span>
+<a name="ln-163"></a>
+<a name="ln-164"></a><span class="s2">    stop</span>
+<a name="ln-165"></a>
+<a name="ln-166"></a><span class="s2">  end if</span>
+<a name="ln-167"></a>
+<a name="ln-168"></a><span class="s2">  output_files(STATS_SUM)%output_active = TRUE</span>
+<a name="ln-169"></a><span class="s2">  output_files(STATS_MEAN)%output_active = TRUE</span>
+<a name="ln-170"></a>
+<a name="ln-171"></a><span class="s2">  call swbstats%slice_start_date%setDateFormat(&quot;</span><span class="n">YYYY</span><span class="o">-</span><span class="n">MM</span><span class="o">-</span><span class="n">DD</span><span class="s2">&quot;)</span>
+<a name="ln-172"></a><span class="s2">  call swbstats%slice_end_date%setDateFormat(&quot;</span><span class="n">YYYY</span><span class="o">-</span><span class="n">MM</span><span class="o">-</span><span class="n">DD</span><span class="s2">&quot;)</span>
+<a name="ln-173"></a><span class="s2">  swbstats%filename_modifier_string = &quot;&quot;</span>
+<a name="ln-174"></a>
+<a name="ln-175"></a><span class="s2">  do iIndex=1, iNumArgs</span>
+<a name="ln-176"></a>
+<a name="ln-177"></a><span class="s2">    call GET_COMMAND_ARGUMENT( iIndex, command_arg_str )</span>
+<a name="ln-178"></a>
+<a name="ln-179"></a><span class="s2">    if ( command_arg_str .containssimilar. &quot;</span><span class="n">comparison_scale_factor</span><span class="s2">&quot; ) then</span>
+<a name="ln-180"></a>
+<a name="ln-181"></a><span class="s2">      sub_string = right(command_arg_str, substring=&quot;</span><span class="o">=</span><span class="s2">&quot;)</span>
+<a name="ln-182"></a>
+<a name="ln-183"></a><span class="s2">      swbstats%comparison_grid_conversion_factor = asFloat(sub_string)</span>
+<a name="ln-184"></a>
+<a name="ln-185"></a><span class="s2">    elseif ( command_arg_str .containssimilar. &quot;</span><span class="n">annual_statistics</span><span class="s2">&quot; ) then</span>
+<a name="ln-186"></a>
+<a name="ln-187"></a><span class="s2">      swbstats%calculation_time_period = CALC_PERIOD_ANNUAL</span>
+<a name="ln-188"></a><span class="s2">      swbstats%filename_modifier_string = &quot;</span><span class="n">YEARLY</span><span class="s2">&quot;</span>
+<a name="ln-189"></a>
+<a name="ln-190"></a><span class="s2">    elseif ( command_arg_str .containssimilar. &quot;</span><span class="n">monthly_statistics</span><span class="s2">&quot; ) then</span>
+<a name="ln-191"></a>
+<a name="ln-192"></a><span class="s2">      swbstats%calculation_time_period = CALC_PERIOD_MONTHLY</span>
+<a name="ln-193"></a><span class="s2">      swbstats%filename_modifier_string = &quot;</span><span class="n">MONTHLY</span><span class="s2">&quot;</span>
+<a name="ln-194"></a>
+<a name="ln-195"></a><span class="s2">    elseif ( command_arg_str .containssimilar. &quot;</span><span class="n">dump_options</span><span class="s2">&quot; ) then</span>
+<a name="ln-196"></a>
+<a name="ln-197"></a><span class="s2">      swbstats%dump_options_to_screen = TRUE</span>
+<a name="ln-198"></a>
+<a name="ln-199"></a><span class="s2">    elseif ( command_arg_str .containssimilar. &quot;</span><span class="n">report_as_volume</span><span class="s2">&quot; ) then</span>
+<a name="ln-200"></a>
+<a name="ln-201"></a><span class="s2">      swbstats%report_as_volume = TRUE</span>
+<a name="ln-202"></a>
+<a name="ln-203"></a><span class="s2">    elseif ( command_arg_str .containssimilar. &quot;</span><span class="n">report_in_meters</span><span class="s2">&quot; ) then</span>
+<a name="ln-204"></a>
+<a name="ln-205"></a><span class="s2">      swbstats%report_in_meters = TRUE</span>
+<a name="ln-206"></a>
+<a name="ln-207"></a><span class="s2">    elseif ( command_arg_str .containssimilar. &quot;</span><span class="n">annualize_sums</span><span class="s2">&quot; ) then</span>
+<a name="ln-208"></a>
+<a name="ln-209"></a><span class="s2">      swbstats%annualize_stats = TRUE</span>
+<a name="ln-210"></a>
+<a name="ln-211"></a><span class="s2">    elseif ( command_arg_str .containssimilar. &quot;</span><span class="n">stress_period_file</span><span class="s2">&quot; ) then</span>
+<a name="ln-212"></a>
+<a name="ln-213"></a><span class="s2">      swbstats%calculation_time_period = CALC_PERIOD_SLICE_MULTIPLE</span>
+<a name="ln-214"></a><span class="s2">      swbstats%stress_period_filename = right(command_arg_str, substring=&quot;</span><span class="o">=</span><span class="s2">&quot;)</span>
+<a name="ln-215"></a><span class="s2">      call swbstats%read_date_range_file(                                            &amp;</span>
+<a name="ln-216"></a><span class="s2">                                    csv_filename=swbstats%stress_period_filename,    &amp;</span>
+<a name="ln-217"></a><span class="s2">                                    date_range_id_list=swbstats%date_range_id_list,  &amp;</span>
+<a name="ln-218"></a><span class="s2">                                    start_date_list=swbstats%start_date_list,        &amp;</span>
+<a name="ln-219"></a><span class="s2">                                    end_date_list=swbstats%end_date_list )</span>
+<a name="ln-220"></a><span class="s2">      swbstats%filename_modifier_string = &quot;</span><span class="n">STRESS_PERIOD_STATS</span><span class="s2">&quot;</span>
+<a name="ln-221"></a>
+<a name="ln-222"></a><span class="s2">    elseif ( command_arg_str .containssimilar. &quot;</span><span class="n">zone_period_file</span><span class="s2">&quot; ) then</span>
+<a name="ln-223"></a>
+<a name="ln-224"></a><span class="s2">      swbstats%calculation_time_period = CALC_PERIOD_SLICE_MULTIPLE</span>
+<a name="ln-225"></a><span class="s2">      swbstats%multiple_zone_grids = TRUE</span>
+<a name="ln-226"></a><span class="s2">      swbstats%calc_zonal_stats    = TRUE</span>
+<a name="ln-227"></a><span class="s2">      swbstats%write_csv           = TRUE</span>
+<a name="ln-228"></a>
+<a name="ln-229"></a><span class="s2">      swbstats%zone_period_filename = right(command_arg_str, substring=&quot;</span><span class="o">=</span><span class="s2">&quot;)</span>
+<a name="ln-230"></a><span class="s2">      call swbstats%read_zone_period_file(                                                   &amp;</span>
+<a name="ln-231"></a><span class="s2">                                  csv_filename=swbstats%zone_period_filename ,               &amp;</span>
+<a name="ln-232"></a><span class="s2">                                  date_range_id_list=swbstats%date_range_id_list,            &amp;</span>
+<a name="ln-233"></a><span class="s2">                                  start_date_list=swbstats%start_date_list,                  &amp;</span>
+<a name="ln-234"></a><span class="s2">                                  end_date_list=swbstats%end_date_list,                      &amp;</span>
+<a name="ln-235"></a><span class="s2">                                  zonal_stats_grid_file_list=swbstats%zone_grid_file_list )</span>
+<a name="ln-236"></a>
+<a name="ln-237"></a><span class="s2">    elseif ( command_arg_str .containssimilar. &quot;</span><span class="n">comparison_period_file</span><span class="s2">&quot; ) then</span>
+<a name="ln-238"></a>
+<a name="ln-239"></a><span class="s2">      swbstats%calculation_time_period = CALC_PERIOD_SLICE_MULTIPLE</span>
+<a name="ln-240"></a><span class="s2">      swbstats%multiple_comparison_grids = TRUE</span>
+<a name="ln-241"></a><span class="s2">      swbstats%compare_to_obs_values     = TRUE</span>
+<a name="ln-242"></a><span class="s2">      swbstats%write_csv                 = TRUE</span>
+<a name="ln-243"></a><span class="s2">      swbstats%filename_modifier_string = &quot;</span><span class="n">COMPARISON_PERIOD_STATS</span><span class="s2">&quot;</span>
+<a name="ln-244"></a>
+<a name="ln-245"></a><span class="s2">      swbstats%comparison_period_filename = right(command_arg_str, substring=&quot;</span><span class="o">=</span><span class="s2">&quot;)</span>
+<a name="ln-246"></a><span class="s2">      call swbstats%read_comparison_period_file(                                                  &amp;</span>
+<a name="ln-247"></a><span class="s2">                                    csv_filename=swbstats%comparison_period_filename,             &amp;</span>
+<a name="ln-248"></a><span class="s2">                                    date_range_id_list=swbstats%date_range_id_list,               &amp;</span>
+<a name="ln-249"></a><span class="s2">                                    start_date_list=swbstats%start_date_list,                     &amp;</span>
+<a name="ln-250"></a><span class="s2">                                    end_date_list=swbstats%end_date_list,                         &amp;</span>
+<a name="ln-251"></a><span class="s2">                                    comparison_grid_file_list=swbstats%comparison_grid_file_list )</span>
+<a name="ln-252"></a>
+<a name="ln-253"></a><span class="s2">    elseif ( command_arg_str .containssimilar. &quot;</span><span class="n">slice</span><span class="s2">&quot; ) then</span>
+<a name="ln-254"></a>
+<a name="ln-255"></a><span class="s2">      sub_string          = right(command_arg_str, substring=&quot;</span><span class="o">=</span><span class="s2">&quot;)</span>
+<a name="ln-256"></a><span class="s2">      start_date_string   = left(sub_string, substring=&quot;</span><span class="p">,</span><span class="s2">&quot;)</span>
+<a name="ln-257"></a><span class="s2">      end_date_string     = right(sub_string, substring=&quot;</span><span class="p">,</span><span class="s2">&quot;)</span>
+<a name="ln-258"></a>
+<a name="ln-259"></a><span class="s2">      swbstats%calculation_time_period = CALC_PERIOD_SLICE_SINGLE</span>
+<a name="ln-260"></a>
+<a name="ln-261"></a><span class="s2">      call swbstats%slice_start_date%parseDate(start_date_string)</span>
+<a name="ln-262"></a><span class="s2">      call swbstats%slice_start_date%calcGregorianDate()</span>
+<a name="ln-263"></a>
+<a name="ln-264"></a><span class="s2">      call swbstats%slice_end_date%parseDate(end_date_string)</span>
+<a name="ln-265"></a><span class="s2">      call swbstats%slice_end_date%calcGregorianDate()</span>
+<a name="ln-266"></a><span class="s2">      swbstats%filename_modifier_string = &quot;</span><span class="n">SLICE_STATS</span><span class="o">--</span><span class="s2">&quot;                      &amp;</span>
+<a name="ln-267"></a><span class="s2">        //swbstats%slice_start_date%prettydate()//&quot;</span><span class="err">_</span><span class="n">to_</span><span class="s2">&quot;                       &amp;</span>
+<a name="ln-268"></a><span class="s2">        //swbstats%slice_end_date%prettydate()</span>
+<a name="ln-269"></a>
+<a name="ln-270"></a><span class="s2">    elseif ( command_arg_str .containssimilar. &quot;</span><span class="n">zone_grid</span><span class="o">=</span><span class="s2">&quot; ) then</span>
+<a name="ln-271"></a>
+<a name="ln-272"></a><span class="s2">      swbstats%zone_grid_filename = right(command_arg_str, substring=&quot;</span><span class="o">=</span><span class="s2">&quot;)</span>
+<a name="ln-273"></a><span class="s2">      swbstats%calc_zonal_stats   = TRUE</span>
+<a name="ln-274"></a><span class="s2">      swbstats%write_csv          = TRUE</span>
+<a name="ln-275"></a>
+<a name="ln-276"></a><span class="s2">    elseif ( command_arg_str .containssimilar. &quot;</span><span class="n">zone_grid2</span><span class="o">=</span><span class="s2">&quot; ) then</span>
+<a name="ln-277"></a>
+<a name="ln-278"></a><span class="s2">      swbstats%zone_grid2_filename = right(command_arg_str, substring=&quot;</span><span class="o">=</span><span class="s2">&quot;)</span>
+<a name="ln-279"></a><span class="s2">      swbstats%calc_zonal_stats   = TRUE</span>
+<a name="ln-280"></a><span class="s2">      swbstats%write_csv          = TRUE</span>
+<a name="ln-281"></a>
+<a name="ln-282"></a><span class="s2">    elseif ( command_arg_str .containssimilar. &quot;</span><span class="n">comparison_grid</span><span class="s2">&quot; ) then</span>
+<a name="ln-283"></a>
+<a name="ln-284"></a><span class="s2">      swbstats%comparison_grid_filename = right(command_arg_str, substring=&quot;</span><span class="o">=</span><span class="s2">&quot;)</span>
+<a name="ln-285"></a><span class="s2">      swbstats%compare_to_obs_values    = TRUE</span>
+<a name="ln-286"></a><span class="s2">      swbstats%write_csv                = TRUE</span>
+<a name="ln-287"></a>
+<a name="ln-288"></a><span class="s2">    elseif ( command_arg_str .strapprox. &quot;</span><span class="o">--</span><span class="n">netcdf_output</span><span class="s2">&quot;) then</span>
+<a name="ln-289"></a>
+<a name="ln-290"></a><span class="s2">      output_files%write_netcdf             = TRUE</span>
+<a name="ln-291"></a>
+<a name="ln-292"></a><span class="s2">    elseif ( command_arg_str .strapprox. &quot;</span><span class="o">--</span><span class="n">no_netcdf_output</span><span class="s2">&quot; ) then</span>
+<a name="ln-293"></a>
+<a name="ln-294"></a><span class="s2">      output_files%write_netcdf             = FALSE</span>
+<a name="ln-295"></a>
+<a name="ln-296"></a><span class="s2">    elseif ( command_arg_str .strapprox. &quot;</span><span class="o">--</span><span class="n">arcgrid_output</span><span class="s2">&quot; ) then</span>
+<a name="ln-297"></a>
+<a name="ln-298"></a><span class="s2">      output_files%write_arcgrid            = TRUE</span>
+<a name="ln-299"></a>
+<a name="ln-300"></a><span class="s2">    elseif ( command_arg_str .strapprox. &quot;</span><span class="o">--</span><span class="n">no_arcgrid_output</span><span class="s2">&quot; ) then</span>
+<a name="ln-301"></a>
+<a name="ln-302"></a><span class="s2">      output_files%write_arcgrid            = FALSE</span>
+<a name="ln-303"></a>
+<a name="ln-304"></a><span class="s2">    elseif ( command_arg_str .contains. &quot;</span><span class="o">--</span><span class="s2">&quot; ) then</span>
+<a name="ln-305"></a>
+<a name="ln-306"></a><span class="s2">       ! ??? gfortran 5.4 does not support variables within the stop statement???</span>
+<a name="ln-307"></a><span class="s2">       print *, &quot;</span><span class="n">Unknown</span> <span class="n">swbstats2</span> <span class="n">option</span><span class="p">:</span> <span class="s2">&quot;//sQuote(command_arg_str)//&quot;</span><span class="p">.</span><span class="s2">&quot;</span>
+<a name="ln-308"></a><span class="s2">      stop</span>
+<a name="ln-309"></a>
+<a name="ln-310"></a><span class="s2">    else</span>
+<a name="ln-311"></a>
+<a name="ln-312"></a><span class="s2">      ! no match on the command-line argument flags; must be the netCDF file</span>
+<a name="ln-313"></a><span class="s2">      swbstats%netcdf_input_filename = trim(command_arg_str)</span>
+<a name="ln-314"></a>
+<a name="ln-315"></a><span class="s2">      call netcdf_open_and_prepare_for_merging( swbstats%ncfile_in,             &amp;</span>
+<a name="ln-316"></a><span class="s2">                                                swbstats%netcdf_input_filename, &amp;</span>
+<a name="ln-317"></a><span class="s2">                                                guess_z_var_name=TRUE )</span>
+<a name="ln-318"></a>
+<a name="ln-319"></a><span class="s2">      ! extract integer start and end Julian dates from netCDF file</span>
+<a name="ln-320"></a><span class="s2">      start_date_dbl = real( swbstats%ncfile_in%iFirstDayJD, c_double )</span>
+<a name="ln-321"></a><span class="s2">      end_date_dbl = real( swbstats%ncfile_in%iLastDayJD, c_double )</span>
+<a name="ln-322"></a>
+<a name="ln-323"></a><span class="s2">      ! populate datetime data structure</span>
+<a name="ln-324"></a><span class="s2">      call swbstats%data_start_date%setJulianDate(start_date_dbl)</span>
+<a name="ln-325"></a><span class="s2">      call swbstats%data_start_date%calcGregorianDate()</span>
+<a name="ln-326"></a><span class="s2">      call swbstats%data_end_date%setJulianDate(end_date_dbl)</span>
+<a name="ln-327"></a><span class="s2">      call swbstats%data_end_date%calcGregorianDate()</span>
+<a name="ln-328"></a>
+<a name="ln-329"></a><span class="s2">      swbstats%netcdf_input_file_is_open = TRUE</span>
+<a name="ln-330"></a>
+<a name="ln-331"></a><span class="s2">    endif</span>
+<a name="ln-332"></a>
+<a name="ln-333"></a><span class="s2">  enddo</span>
+<a name="ln-334"></a>
+<a name="ln-335"></a><span class="s2">  if (.not. swbstats%netcdf_input_file_is_open)                                   &amp;</span>
+<a name="ln-336"></a><span class="s2">    stop (&quot;</span><span class="n">No</span> <span class="n">netCDF</span> <span class="k">file </span><span class="n">was</span> <span class="n">specified</span> <span class="nb">or </span><span class="n">there</span> <span class="n">was</span> <span class="n">an</span> <span class="n">error</span> <span class="n">opening</span> <span class="n">the</span> <span class="k">file</span><span class="p">.</span><span class="s2">&quot;)</span>
+<a name="ln-337"></a>
+<a name="ln-338"></a><span class="s2">!----------------------------------------------------------------------------</span>
+<a name="ln-339"></a><span class="s2">! end of argument processing; now take action based on the options selected</span>
+<a name="ln-340"></a><span class="s2">!----------------------------------------------------------------------------</span>
+<a name="ln-341"></a>
+<a name="ln-342"></a><span class="s2">  call netcdf_get_attribute_list_for_variable( NCFILE=swbstats%ncfile_in,              &amp;</span>
+<a name="ln-343"></a><span class="s2">                                               variable_name=&quot;</span><span class="n">crs</span><span class="s2">&quot;,  &amp;</span>
+<a name="ln-344"></a><span class="s2">                                               attribute_name_list=name_list, &amp;</span>
+<a name="ln-345"></a><span class="s2">                                               attribute_value_list=value_list )</span>
+<a name="ln-346"></a>
+<a name="ln-347"></a><span class="s2">  ! extract PROJ4 string from netCDF file</span>
+<a name="ln-348"></a><span class="s2">  iIndex_array = name_list%which(&quot;</span><span class="n">proj4_string</span><span class="s2">&quot;)</span>
+<a name="ln-349"></a><span class="s2">  temp_string = value_list%get( iIndex_array(1) )</span>
+<a name="ln-350"></a><span class="s2">  swbstats%target_proj4_string = trim(temp_string)</span>
+<a name="ln-351"></a>
+<a name="ln-352"></a><span class="s2">  swbstats%netcdf_variable_name_string = trim(swbstats%ncfile_in%pNC_VAR(NC_Z)%sVariableName)</span>
+<a name="ln-353"></a>
+<a name="ln-354"></a><span class="s2">  call netcdf_get_attribute_list_for_variable(                                 &amp;</span>
+<a name="ln-355"></a><span class="s2">                   NCFILE=swbstats%ncfile_in,                                  &amp;</span>
+<a name="ln-356"></a><span class="s2">                   variable_name=swbstats%netcdf_variable_name_string,         &amp;</span>
+<a name="ln-357"></a><span class="s2">                   attribute_name_list=name_list,                              &amp;</span>
+<a name="ln-358"></a><span class="s2">                   attribute_value_list=value_list )</span>
+<a name="ln-359"></a>
+<a name="ln-360"></a><span class="s2">  ! extract units description string from netCDF file</span>
+<a name="ln-361"></a><span class="s2">  iIndex_array = name_list%which(&quot;</span><span class="n">units</span><span class="s2">&quot;)</span>
+<a name="ln-362"></a><span class="s2">  swbstats%netcdf_variable_units_string = value_list%get( iIndex_array(1) )</span>
+<a name="ln-363"></a>
+<a name="ln-364"></a><span class="s2">  ! create working grids with dimensions extracted from netCDF file being munged</span>
+<a name="ln-365"></a><span class="s2">  call swbstats%create_working_grids()</span>
+<a name="ln-366"></a>
+<a name="ln-367"></a><span class="s2">  if (swbstats%calculation_time_period == CALC_PERIOD_ANNUAL) then</span>
+<a name="ln-368"></a>
+<a name="ln-369"></a><span class="s2">    call swbstats%create_date_list_for_annual_statistics()</span>
+<a name="ln-370"></a>
+<a name="ln-371"></a><span class="s2">  endif</span>
+<a name="ln-372"></a>
+<a name="ln-373"></a><span class="s2">  if (swbstats%calculation_time_period == CALC_PERIOD_MONTHLY) then</span>
+<a name="ln-374"></a>
+<a name="ln-375"></a><span class="s2">    call swbstats%create_date_list_for_monthly_statistics()</span>
+<a name="ln-376"></a>
+<a name="ln-377"></a><span class="s2">  endif</span>
+<a name="ln-378"></a>
+<a name="ln-379"></a><span class="s2">  if (swbstats%report_in_meters) then</span>
+<a name="ln-380"></a>
+<a name="ln-381"></a><span class="s2">    ! set unit conversions needed to obtain output units of &quot;</span><span class="n">meters</span><span class="s2">&quot;</span>
+<a name="ln-382"></a><span class="s2">    if (swbstats%netcdf_variable_units_string .containssimilar. &quot;</span><span class="n">inch</span><span class="s2">&quot;) then</span>
+<a name="ln-383"></a><span class="s2">      swbstats%unit_conversion_factor = 0.0254_c_double</span>
+<a name="ln-384"></a><span class="s2">    elseif (swbstats%netcdf_variable_units_string .containssimilar. &quot;</span><span class="n">cm</span><span class="s2">&quot;) then</span>
+<a name="ln-385"></a><span class="s2">      swbstats%unit_conversion_factor = 0.01_c_double</span>
+<a name="ln-386"></a><span class="s2">    elseif (swbstats%netcdf_variable_units_string .containssimilar. &quot;</span><span class="n">mm</span><span class="s2">&quot;) then</span>
+<a name="ln-387"></a><span class="s2">      swbstats%unit_conversion_factor = 0.001_c_double</span>
+<a name="ln-388"></a><span class="s2">    else</span>
+<a name="ln-389"></a><span class="s2">      call die(&quot;</span><span class="n">Was</span> <span class="n">attempting</span> <span class="n">to</span> <span class="n">determine</span> <span class="n">the</span> <span class="n">output</span> <span class="n">unit</span> <span class="n">conversion</span> <span class="n">factor</span><span class="p">,</span><span class="s2">&quot; &amp;</span>
+<a name="ln-390"></a><span class="s2">      //&quot;</span> <span class="n">but</span> <span class="n">the</span> <span class="n">netCDF</span> <span class="n">variable</span> <span class="n">has</span> <span class="n">units</span> <span class="n">of</span> <span class="s2">&quot;                                &amp;</span>
+<a name="ln-391"></a><span class="s2">      //sQuote(swbstats%netcdf_variable_units_string)//&quot;</span><span class="p">,</span> <span class="n">which</span> <span class="n">cannot</span><span class="s2">&quot;         &amp;</span>
+<a name="ln-392"></a><span class="s2">      //&quot;</span> <span class="n">be</span> <span class="n">converted</span> <span class="n">to</span> <span class="n">units</span> <span class="n">of</span> <span class="s1">&#39;meters&#39;</span><span class="p">.</span><span class="s2">&quot;)</span>
+<a name="ln-393"></a><span class="s2">    endif</span>
+<a name="ln-394"></a>
+<a name="ln-395"></a><span class="s2">    swbstats%filename_modifier_string = trim(swbstats%filename_modifier_string) &amp;</span>
+<a name="ln-396"></a><span class="s2">                                       //&quot;</span><span class="err">__</span><span class="n">meters</span><span class="s2">&quot;</span>
+<a name="ln-397"></a>
+<a name="ln-398"></a><span class="s2">  endif</span>
+<a name="ln-399"></a>
+<a name="ln-400"></a><span class="s2">  if (swbstats%report_as_volume) then</span>
+<a name="ln-401"></a>
+<a name="ln-402"></a><span class="s2">    if (swbstats%report_as_volume) then</span>
+<a name="ln-403"></a><span class="s2">      if (swbstats%target_proj4_string .containssimilar. &quot;</span><span class="n">units</span><span class="o">=</span><span class="n">m</span><span class="s2">&quot;) then</span>
+<a name="ln-404"></a><span class="s2">        swbstats%length_conversion_factor = 1.0_c_double</span>
+<a name="ln-405"></a><span class="s2">      elseif (swbstats%target_proj4_string .containssimilar. &quot;</span><span class="n">units</span><span class="o">=</span><span class="n">us</span><span class="o">-</span><span class="n">ft</span><span class="s2">&quot;) then</span>
+<a name="ln-406"></a><span class="s2">        swbstats%length_conversion_factor = 0.3048006096012192_c_double</span>
+<a name="ln-407"></a><span class="s2">      elseif (swbstats%target_proj4_string .containssimilar. &quot;</span><span class="n">units</span><span class="o">=</span><span class="n">ft</span><span class="s2">&quot;) then</span>
+<a name="ln-408"></a><span class="s2">        swbstats%length_conversion_factor = 0.3048_c_double</span>
+<a name="ln-409"></a><span class="s2">      else</span>
+<a name="ln-410"></a><span class="s2">        call die(&quot;</span><span class="n">Was</span> <span class="n">attempting</span> <span class="n">to</span> <span class="n">define</span> <span class="n">length</span> <span class="n">conversion</span> <span class="n">factor</span><span class="p">,</span> <span class="n">but</span> <span class="n">no</span> <span class="n">units</span> <span class="s2">&quot; &amp;</span>
+<a name="ln-411"></a><span class="s2">          //&quot;</span><span class="n">information</span> <span class="n">found</span> <span class="n">in</span> <span class="n">input</span> <span class="n">PROJ4</span> <span class="n">string</span><span class="p">.</span><span class="s2">&quot;)</span>
+<a name="ln-412"></a><span class="s2">      endif</span>
+<a name="ln-413"></a><span class="s2">      swbstats%grid_cell_area_sq_meters = (swbstats%grd_native%rGridCellSize                  &amp;</span>
+<a name="ln-414"></a><span class="s2">                                           * swbstats%length_conversion_factor)**2</span>
+<a name="ln-415"></a><span class="s2">      swbstats%output_conversion_factor = swbstats%grid_cell_area_sq_meters          &amp;</span>
+<a name="ln-416"></a><span class="s2">                                           * swbstats%unit_conversion_factor</span>
+<a name="ln-417"></a><span class="s2">    else</span>
+<a name="ln-418"></a><span class="s2">      swbstats%output_conversion_factor = swbstats%unit_conversion_factor</span>
+<a name="ln-419"></a><span class="s2">    endif</span>
+<a name="ln-420"></a>
+<a name="ln-421"></a><span class="s2">    swbstats%filename_modifier_string = trim(swbstats%filename_modifier_string)   &amp;</span>
+<a name="ln-422"></a><span class="s2">                                       //&quot;</span><span class="err">__</span><span class="n">cubic_meters</span><span class="s2">&quot;</span>
+<a name="ln-423"></a>
+<a name="ln-424"></a><span class="s2">  endif</span>
+<a name="ln-425"></a>
+<a name="ln-426"></a><span class="s2">  call assert(.not. (swbstats%report_as_volume .and. swbstats%report_in_meters),  &amp;</span>
+<a name="ln-427"></a><span class="s2">       &quot;</span><span class="n">Cannot</span> <span class="k">use</span> <span class="s1">&#39;--report_as_volume&#39;</span> <span class="nb">and</span> <span class="s1">&#39;--report_in_meters&#39;</span> <span class="n">in</span> <span class="n">the</span> <span class="n">same</span><span class="s2">&quot;   &amp;</span>
+<a name="ln-428"></a><span class="s2">       //&quot;</span> <span class="n">swbstats</span> <span class="n">run</span><span class="s2">&quot;)</span>
+<a name="ln-429"></a>
+<a name="ln-430"></a><span class="s2">  if (swbstats%compare_to_obs_values) then</span>
+<a name="ln-431"></a><span class="s2">    call swbstats%initialize_comparison_grid(grid_filename=swbstats%comparison_grid_filename)</span>
+<a name="ln-432"></a><span class="s2">  endif</span>
+<a name="ln-433"></a>
+<a name="ln-434"></a><span class="s2">  if ( swbstats%calculation_time_period == CALC_PERIOD_SLICE_SINGLE) then</span>
+<a name="ln-435"></a>
+<a name="ln-436"></a><span class="s2">    ! force slice dates to honor bounds of data dates</span>
+<a name="ln-437"></a><span class="s2">    if ( swbstats%slice_start_date &lt; swbstats%data_start_date )                  &amp;</span>
+<a name="ln-438"></a><span class="s2">      swbstats%slice_start_date = swbstats%data_start_date</span>
+<a name="ln-439"></a><span class="s2">    if ( swbstats%slice_end_date &gt; swbstats%data_end_date )                      &amp;</span>
+<a name="ln-440"></a><span class="s2">      swbstats%slice_end_date = swbstats%data_end_date</span>
+<a name="ln-441"></a>
+<a name="ln-442"></a><span class="s2">    call SIM_DT%initialize( swbstats%slice_start_date, swbstats%slice_end_date )</span>
+<a name="ln-443"></a><span class="s2">    call swbstats%create_date_list_for_period_statistics()</span>
+<a name="ln-444"></a>
+<a name="ln-445"></a><span class="s2">  elseif (swbstats%calculation_time_period == CALC_PERIOD_ALL) then</span>
+<a name="ln-446"></a><span class="s2">    ! no slice dates were provided; default to a single slice with start/end date</span>
+<a name="ln-447"></a><span class="s2">    ! corresponding to the start/end date of the data bounds</span>
+<a name="ln-448"></a><span class="s2">    swbstats%calculation_time_period = CALC_PERIOD_SLICE_SINGLE</span>
+<a name="ln-449"></a><span class="s2">    call SIM_DT%initialize( swbstats%data_start_date, swbstats%data_end_date )</span>
+<a name="ln-450"></a><span class="s2">    call swbstats%create_date_list_for_period_statistics()</span>
+<a name="ln-451"></a><span class="s2">  else</span>
+<a name="ln-452"></a><span class="s2">    ! default time slice = all data in netcdf file</span>
+<a name="ln-453"></a><span class="s2">    call SIM_DT%initialize( swbstats%data_start_date, swbstats%data_end_date )</span>
+<a name="ln-454"></a><span class="s2">  endif</span>
+<a name="ln-455"></a>
+<a name="ln-456"></a><span class="s2">  if (swbstats%calc_zonal_stats) then</span>
+<a name="ln-457"></a><span class="s2">    if (.not. swbstats%multiple_zone_grids) then</span>
+<a name="ln-458"></a><span class="s2">      call swbstats%initialize_zone_grid(grid_filename=swbstats%zone_grid_filename)</span>
+<a name="ln-459"></a><span class="s2">      call swbstats%get_unique_int(swbstats%grd_zone%pGrdBase%iData, swbstats%unique_zone_list)</span>
+<a name="ln-460"></a>
+<a name="ln-461"></a><span class="s2">      if (len_trim(swbstats%zone_grid2_filename) &gt; 0) then</span>
+<a name="ln-462"></a><span class="s2">        call swbstats%initialize_secondary_zone_grid(grid_filename=swbstats%zone_grid2_filename)</span>
+<a name="ln-463"></a><span class="s2">        call swbstats%get_unique_int(swbstats%grd_zone2%pGrdBase%iData, swbstats%unique_zone2_list)</span>
+<a name="ln-464"></a><span class="s2">      endif</span>
+<a name="ln-465"></a>
+<a name="ln-466"></a><span class="s2">    endif</span>
+<a name="ln-467"></a><span class="s2">    temp_string = &quot;</span><span class="n">zonal_stats_</span><span class="s2">&quot;//trim(swbstats%netcdf_variable_name_string)//&quot;</span><span class="p">.</span><span class="n">csv</span><span class="s2">&quot;</span>
+<a name="ln-468"></a><span class="s2">    call swbstats%open_zonal_stats_output_file(trim(temp_string))</span>
+<a name="ln-469"></a><span class="s2">  endif</span>
+<a name="ln-470"></a>
+<a name="ln-471"></a><span class="s2">  call swbstats%open_output_netcdf_files(output_files)</span>
+<a name="ln-472"></a>
+<a name="ln-473"></a><span class="s2">  ! Done with preliminaries (opening files, setting options, etc.); begin calcs</span>
+<a name="ln-474"></a>
+<a name="ln-475"></a><span class="s2">  if (swbstats%dump_options_to_screen)  call swbstats%print_all_options()</span>
+<a name="ln-476"></a>
+<a name="ln-477"></a><span class="s2">  ! depending on options selected, we will have a list of:</span>
+<a name="ln-478"></a><span class="s2">  !  a) arbitrary time periods based on user-supplied date ranges;</span>
+<a name="ln-479"></a><span class="s2">  !  b) time periods bracketing the start and end of all months within the</span>
+<a name="ln-480"></a><span class="s2">  !     netCDF start and end period; or</span>
+<a name="ln-481"></a><span class="s2">  !  c) time periods bracketing complete calendar years within the start and</span>
+<a name="ln-482"></a><span class="s2">  !     end dates contained within the netCDF file to be munged.</span>
+<a name="ln-483"></a>
+<a name="ln-484"></a><span class="s2">  do iIndex=1, swbstats%date_range_id_list%count</span>
+<a name="ln-485"></a>
+<a name="ln-486"></a><span class="s2">    call swbstats%slice_start_date%setDateFormat(&quot;</span><span class="n">YYYY</span><span class="o">-</span><span class="n">MM</span><span class="o">-</span><span class="n">DD</span><span class="s2">&quot;)</span>
+<a name="ln-487"></a><span class="s2">    call swbstats%slice_end_date%setDateFormat(&quot;</span><span class="n">YYYY</span><span class="o">-</span><span class="n">MM</span><span class="o">-</span><span class="n">DD</span><span class="s2">&quot;)</span>
+<a name="ln-488"></a>
+<a name="ln-489"></a><span class="s2">    start_date_string = swbstats%start_date_list%get( iIndex )</span>
+<a name="ln-490"></a><span class="s2">    end_date_string = swbstats%end_date_list%get( iIndex )</span>
+<a name="ln-491"></a><span class="s2">!      swbstats%date_range_string = swbstats%date_range_id_list%get( iIndex )</span>
+<a name="ln-492"></a>
+<a name="ln-493"></a><span class="s2">    call swbstats%slice_start_date%parseDate( start_date_string )</span>
+<a name="ln-494"></a><span class="s2">    call swbstats%slice_end_date%parseDate( end_date_string )</span>
+<a name="ln-495"></a>
+<a name="ln-496"></a><span class="s2">    swbstats%date_range_string = swbstats%slice_start_date%prettydate()    &amp;</span>
+<a name="ln-497"></a><span class="s2">       //&quot;</span><span class="err">_</span><span class="n">to_</span><span class="s2">&quot;//swbstats%slice_end_date%prettydate()</span>
+<a name="ln-498"></a>
+<a name="ln-499"></a><span class="s2">    write(*,fmt=&quot;</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="s2">&quot;) &quot;&quot;</span>
+<a name="ln-500"></a><span class="s2">    write(*,fmt=&quot;</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="s2">&quot;) &quot;</span><span class="n">Processing</span> <span class="n">slice</span><span class="p">:</span> <span class="s2">&quot;, swbstats%slice_start_date%prettydate()    &amp;</span>
+<a name="ln-501"></a><span class="s2">       //&quot;</span> <span class="n">to</span> <span class="s2">&quot;//swbstats%slice_end_date%prettydate()</span>
+<a name="ln-502"></a><span class="s2">    write(*,fmt=&quot;</span><span class="p">(</span><span class="n">a</span><span class="p">)</span><span class="s2">&quot;) repeat(&quot;</span><span class="o">-</span><span class="err">&quot;</span><span class="p">,</span> <span class="mi">70</span><span class="p">)</span>
+<a name="ln-503"></a>
+<a name="ln-504"></a>    <span class="c">! grid_sum = simple addition over stack of grids;</span>
+<a name="ln-505"></a>    <span class="c">! grid_mean is the grid_sum divided by number of days = daily mean</span>
+<a name="ln-506"></a>    <span class="k">call </span><span class="n">swbstats</span><span class="p">%</span><span class="n">calculate_slice_statistics</span><span class="p">(</span> <span class="n">grid_delta</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">grd_delta</span><span class="p">,</span>            <span class="p">&amp;</span>
+<a name="ln-507"></a>                                     <span class="n">grid_delta2</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">grd_delta2</span><span class="p">,</span>                   <span class="p">&amp;</span>
+<a name="ln-508"></a>                                     <span class="n">start_date</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">slice_start_date</span><span class="p">,</span>     <span class="p">&amp;</span>
+<a name="ln-509"></a>                                     <span class="n">end_date</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">slice_end_date</span><span class="p">)</span>
+<a name="ln-510"></a>
+<a name="ln-511"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">swbstats</span><span class="p">%</span><span class="n">multiple_comparison_grids</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-512"></a><span class="k">      </span><span class="n">swbstats</span><span class="p">%</span><span class="n">comparison_grid_filename</span> <span class="o">=</span> <span class="n">swbstats</span><span class="p">%</span><span class="n">comparison_grid_file_list</span><span class="p">%</span><span class="n">get</span><span class="p">(</span> <span class="n">iIndex</span> <span class="p">)</span>
+<a name="ln-513"></a>      <span class="k">call </span><span class="n">swbstats</span><span class="p">%</span><span class="n">initialize_comparison_grid</span><span class="p">(</span><span class="n">grid_filename</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">comparison_grid_filename</span><span class="p">)</span>
+<a name="ln-514"></a>    <span class="n">endif</span>
+<a name="ln-515"></a>
+<a name="ln-516"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">swbstats</span><span class="p">%</span><span class="n">multiple_zone_grids</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-517"></a><span class="k">      </span><span class="n">swbstats</span><span class="p">%</span><span class="n">zone_grid_filename</span> <span class="o">=</span> <span class="n">swbstats</span><span class="p">%</span><span class="n">zone_grid_file_list</span><span class="p">%</span><span class="n">get</span><span class="p">(</span> <span class="n">iIndex</span> <span class="p">)</span>
+<a name="ln-518"></a>      <span class="k">call </span><span class="n">swbstats</span><span class="p">%</span><span class="n">initialize_zone_grid</span><span class="p">(</span><span class="n">grid_filename</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">zone_grid_filename</span><span class="p">)</span>
+<a name="ln-519"></a>      <span class="k">call </span><span class="n">swbstats</span><span class="p">%</span><span class="n">get_unique_int</span><span class="p">(</span><span class="n">swbstats</span><span class="p">%</span><span class="n">grd_zone</span><span class="p">%</span><span class="n">pGrdBase</span><span class="p">%</span><span class="n">iData</span><span class="p">,</span> <span class="n">swbstats</span><span class="p">%</span><span class="n">unique_zone_list</span><span class="p">)</span>
+<a name="ln-520"></a>    <span class="n">endif</span>
+<a name="ln-521"></a>
+<a name="ln-522"></a>      <span class="k">call </span><span class="n">swbstats</span><span class="p">%</span><span class="n">write_stats_to_netcdf</span><span class="p">(</span><span class="n">output_files</span><span class="o">=</span><span class="n">output_files</span><span class="p">,</span>           <span class="p">&amp;</span>
+<a name="ln-523"></a>                                <span class="n">start_date</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">slice_start_date</span><span class="p">,</span>          <span class="p">&amp;</span>
+<a name="ln-524"></a>                                <span class="n">end_date</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">slice_end_date</span><span class="p">)</span>
+<a name="ln-525"></a>
+<a name="ln-526"></a>      <span class="k">call </span><span class="n">swbstats</span><span class="p">%</span><span class="n">write_stats_to_arcgrid</span><span class="p">(</span><span class="n">output_files</span><span class="o">=</span><span class="n">output_files</span><span class="p">,</span>          <span class="p">&amp;</span>
+<a name="ln-527"></a>                                  <span class="n">start_date</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">slice_start_date</span><span class="p">,</span>        <span class="p">&amp;</span>
+<a name="ln-528"></a>                                  <span class="n">end_date</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">slice_end_date</span><span class="p">,</span>            <span class="p">&amp;</span>
+<a name="ln-529"></a>                                  <span class="n">date_range_string</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">date_range_string</span><span class="p">)</span>
+<a name="ln-530"></a>
+<a name="ln-531"></a>
+<a name="ln-532"></a>    <span class="k">if</span> <span class="p">(</span><span class="n">swbstats</span><span class="p">%</span><span class="n">calc_zonal_stats</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-533"></a><span class="k">      if</span> <span class="p">(</span> <span class="nb">len_trim</span><span class="p">(</span><span class="n">swbstats</span><span class="p">%</span><span class="n">zone_grid2_filename</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<a name="ln-534"></a>
+<a name="ln-535"></a><span class="k">        if</span> <span class="p">(</span> <span class="nb">associated</span><span class="p">(</span><span class="n">swbstats</span><span class="p">%</span><span class="n">grd_comparison</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-536"></a>
+<a name="ln-537"></a><span class="k">          call </span><span class="n">swbstats</span><span class="p">%</span><span class="n">output_zonal_stats</span><span class="p">(</span>                                      <span class="p">&amp;</span>
+<a name="ln-538"></a>               <span class="n">start_date</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">slice_start_date</span><span class="p">,</span>                             <span class="p">&amp;</span>
+<a name="ln-539"></a>               <span class="n">end_date</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">slice_end_date</span><span class="p">,</span>                                 <span class="p">&amp;</span>
+<a name="ln-540"></a>               <span class="n">values</span><span class="o">=</span><span class="n">output_files</span><span class="p">(</span><span class="n">STATS_SUM</span><span class="p">)%</span><span class="n">grid_ptr</span><span class="p">%</span><span class="n">dpData</span><span class="p">,</span>                   <span class="p">&amp;</span>
+<a name="ln-541"></a>               <span class="n">zone_ids</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">grd_zone</span><span class="p">%</span><span class="n">pGrdBase</span><span class="p">%</span><span class="n">iData</span><span class="p">,</span>                        <span class="p">&amp;</span>
+<a name="ln-542"></a>               <span class="n">unique_zone_list</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">unique_zone_list</span><span class="p">,</span>                       <span class="p">&amp;</span>
+<a name="ln-543"></a>               <span class="n">zone2_ids</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">grd_zone2</span><span class="p">%</span><span class="n">pGrdBase</span><span class="p">%</span><span class="n">iData</span><span class="p">,</span>                      <span class="p">&amp;</span>
+<a name="ln-544"></a>               <span class="n">unique_zone2_list</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">unique_zone2_list</span><span class="p">,</span>                     <span class="p">&amp;</span>
+<a name="ln-545"></a>               <span class="n">comparison_values</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">grd_comparison</span><span class="p">%</span><span class="n">pGrdBase</span><span class="p">%</span><span class="n">dpData</span><span class="p">,</span>        <span class="p">&amp;</span>
+<a name="ln-546"></a>               <span class="n">funit</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">zonal_stats_output_file</span><span class="p">%</span><span class="n">unit</span><span class="p">()</span> <span class="p">)</span>
+<a name="ln-547"></a>
+<a name="ln-548"></a>        <span class="k">else</span>
+<a name="ln-549"></a><span class="k">          call </span><span class="n">swbstats</span><span class="p">%</span><span class="n">output_zonal_stats</span><span class="p">(</span>                                      <span class="p">&amp;</span>
+<a name="ln-550"></a>               <span class="n">start_date</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">slice_start_date</span><span class="p">,</span>                             <span class="p">&amp;</span>
+<a name="ln-551"></a>               <span class="n">end_date</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">slice_end_date</span><span class="p">,</span>                                 <span class="p">&amp;</span>
+<a name="ln-552"></a>               <span class="n">values</span><span class="o">=</span><span class="n">output_files</span><span class="p">(</span><span class="n">STATS_SUM</span><span class="p">)%</span><span class="n">grid_ptr</span><span class="p">%</span><span class="n">dpData</span><span class="p">,</span>                   <span class="p">&amp;</span>
+<a name="ln-553"></a>               <span class="n">zone_ids</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">grd_zone</span><span class="p">%</span><span class="n">pGrdBase</span><span class="p">%</span><span class="n">iData</span><span class="p">,</span>                        <span class="p">&amp;</span>
+<a name="ln-554"></a>               <span class="n">unique_zone_list</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">unique_zone_list</span><span class="p">,</span>                       <span class="p">&amp;</span>
+<a name="ln-555"></a>               <span class="n">zone2_ids</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">grd_zone2</span><span class="p">%</span><span class="n">pGrdBase</span><span class="p">%</span><span class="n">iData</span><span class="p">,</span>                      <span class="p">&amp;</span>
+<a name="ln-556"></a>               <span class="n">unique_zone2_list</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">unique_zone2_list</span><span class="p">,</span>                     <span class="p">&amp;</span>
+<a name="ln-557"></a>               <span class="n">funit</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">zonal_stats_output_file</span><span class="p">%</span><span class="n">unit</span><span class="p">()</span> <span class="p">)</span>
+<a name="ln-558"></a>
+<a name="ln-559"></a>        <span class="n">endif</span>
+<a name="ln-560"></a>
+<a name="ln-561"></a>      <span class="k">else</span>
+<a name="ln-562"></a><span class="k">        if</span> <span class="p">(</span> <span class="nb">associated</span><span class="p">(</span><span class="n">swbstats</span><span class="p">%</span><span class="n">grd_comparison</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-563"></a><span class="k">          call </span><span class="n">swbstats</span><span class="p">%</span><span class="n">output_zonal_stats</span><span class="p">(</span>                                      <span class="p">&amp;</span>
+<a name="ln-564"></a>               <span class="n">start_date</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">slice_start_date</span><span class="p">,</span>                             <span class="p">&amp;</span>
+<a name="ln-565"></a>               <span class="n">end_date</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">slice_end_date</span><span class="p">,</span>                                 <span class="p">&amp;</span>
+<a name="ln-566"></a>               <span class="n">values</span><span class="o">=</span><span class="n">output_files</span><span class="p">(</span><span class="n">STATS_SUM</span><span class="p">)%</span><span class="n">grid_ptr</span><span class="p">%</span><span class="n">dpData</span><span class="p">,</span>                   <span class="p">&amp;</span>
+<a name="ln-567"></a>               <span class="n">zone_ids</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">grd_zone</span><span class="p">%</span><span class="n">pGrdBase</span><span class="p">%</span><span class="n">iData</span><span class="p">,</span>                               <span class="p">&amp;</span>
+<a name="ln-568"></a>               <span class="n">unique_zone_list</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">unique_zone_list</span><span class="p">,</span>                       <span class="p">&amp;</span>
+<a name="ln-569"></a>               <span class="n">comparison_values</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">grd_comparison</span><span class="p">%</span><span class="n">pGrdBase</span><span class="p">%</span><span class="n">dpData</span><span class="p">,</span>               <span class="p">&amp;</span>
+<a name="ln-570"></a>               <span class="n">funit</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">zonal_stats_output_file</span><span class="p">%</span><span class="n">unit</span><span class="p">()</span> <span class="p">)</span>
+<a name="ln-571"></a>
+<a name="ln-572"></a>        <span class="k">else</span>
+<a name="ln-573"></a><span class="k">          call </span><span class="n">swbstats</span><span class="p">%</span><span class="n">output_zonal_stats</span><span class="p">(</span>                                      <span class="p">&amp;</span>
+<a name="ln-574"></a>               <span class="n">start_date</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">slice_start_date</span><span class="p">,</span>                             <span class="p">&amp;</span>
+<a name="ln-575"></a>               <span class="n">end_date</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">slice_end_date</span><span class="p">,</span>                                 <span class="p">&amp;</span>
+<a name="ln-576"></a>               <span class="n">values</span><span class="o">=</span><span class="n">output_files</span><span class="p">(</span><span class="n">STATS_SUM</span><span class="p">)%</span><span class="n">grid_ptr</span><span class="p">%</span><span class="n">dpData</span><span class="p">,</span>                   <span class="p">&amp;</span>
+<a name="ln-577"></a>               <span class="n">zone_ids</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">grd_zone</span><span class="p">%</span><span class="n">pGrdBase</span><span class="p">%</span><span class="n">iData</span><span class="p">,</span>                               <span class="p">&amp;</span>
+<a name="ln-578"></a>               <span class="n">unique_zone_list</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">unique_zone_list</span><span class="p">,</span>                       <span class="p">&amp;</span>
+<a name="ln-579"></a>               <span class="n">funit</span><span class="o">=</span><span class="n">swbstats</span><span class="p">%</span><span class="n">zonal_stats_output_file</span><span class="p">%</span><span class="n">unit</span><span class="p">()</span> <span class="p">)</span>
+<a name="ln-580"></a>
+<a name="ln-581"></a>        <span class="n">endif</span>
+<a name="ln-582"></a>      <span class="n">endif</span>
+<a name="ln-583"></a>    <span class="n">endif</span>
+<a name="ln-584"></a>
+<a name="ln-585"></a>    <span class="c">! icky hack; need to advance the record number for the multiple slice calc</span>
+<a name="ln-586"></a>    <span class="n">RECNUM</span> <span class="o">=</span> <span class="n">RECNUM</span> <span class="o">+</span> <span class="mi">1</span>
+<a name="ln-587"></a>
+<a name="ln-588"></a>  <span class="n">enddo</span>
+<a name="ln-589"></a>
+<a name="ln-590"></a>  <span class="c">!call netcdf_close_file(NCFILE=ncfile_out)</span>
+<a name="ln-591"></a>  <span class="k">call </span><span class="n">swbstats</span><span class="p">%</span><span class="n">close_output_netcdf_files</span><span class="p">(</span><span class="n">output_files</span><span class="o">=</span><span class="n">output_files</span><span class="p">)</span>
+<a name="ln-592"></a>
+<a name="ln-593"></a>  <span class="k">if</span> <span class="p">(</span><span class="n">swbstats</span><span class="p">%</span><span class="n">write_csv</span><span class="p">)</span>  <span class="k">call </span><span class="n">swbstats</span><span class="p">%</span><span class="n">zonal_stats_output_file</span><span class="p">%</span><span class="k">close</span><span class="p">()</span>
+<a name="ln-594"></a>
+<a name="ln-595"></a><span class="c">! endif</span>
+<a name="ln-596"></a>
+<a name="ln-597"></a>  <span class="k">if</span> <span class="p">(</span><span class="n">swbstats</span><span class="p">%</span><span class="n">dump_options_to_screen</span><span class="p">)</span>  <span class="k">call </span><span class="n">swbstats</span><span class="p">%</span><span class="n">print_all_options</span><span class="p">()</span>
+<a name="ln-598"></a>
+<a name="ln-599"></a><span class="k">end program </span><span class="n">swbstats2</span>
+</pre></div>
+
+    </section>
+    </div>
+  </div>
+
+  
+    <hr>
+  </div> <!-- /container -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <p>&copy; 2019 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
+            </p>
+        </div>
+        <div class="col-4">
+          <p class="text-right"><small>
+            Documentation for SWB2
+               (version 2.0, build 96) generated by
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on Tue Sep  3 16:54:50 2019 </small>
+          </p>
+        </div>
+        <div class="col">
+          <p class="text-center"> SWB2 was developed by Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt</p>
+        </div>
+      </div>
+      <br>
+    </div> <!-- /container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+  <script src="../js/bootstrap.min.js"></script>
+
+  <!-- MathJax JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+  
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+
+</body>
+
+</html>

@@ -1,0 +1,631 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="">
+  
+  <meta name="author" content="Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt">
+  <link rel="icon" href="../favicon.png">
+
+  <title>direct_net_infiltration_initialize &ndash; SWB2</title>
+
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/pygments.css" rel="stylesheet">
+  <link href="../css/font-awesome.min.css" rel="stylesheet">
+  <link href="../css/bootstrap-toc.css" rel="stylesheet">
+    <!-- <link href="../css/local.css" rel="stylesheet"> -->
+  
+  
+
+  <script src="../js/jquery-2.1.3.min.js"></script>
+  <script src="../js/svg-pan-zoom.min.js"></script>
+  <script src="../js/bootstrap-toc.js"></script>
+
+</head>
+
+<body data-spy="scroll" data-target="#toc">
+
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+
+    <a class="navbar-brand" href="../index.html">SWB2</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" navbar-light bg-light id="navbarText">
+      <ul class="navbar-nav mr-auto">
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../page/index.html">User Guide</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/modules.html">Modules</a>
+          </li>
+        
+
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+          </li>
+        
+
+
+      </ul>
+    </div>
+
+    <form class="form-inline">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+        <!-- <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contents <span class="caret"></span></a>
+            <ul class="dropdown-menu"> -->
+          <!-- 
+            
+              <li><a href="../lists/files.html">Source Files</a></li>
+            
+          
+          
+            <li><a href="../lists/modules.html">Modules</a></li>
+          
+          
+          
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+          
+          
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+           
+            <li><a href="../lists/types.html">Derived Types</a></li>
+          
+          
+            <li><a href="../lists/programs.html">Programs</a></li>
+          
+        </ul> -->
+
+      <!-- </div> -->
+      <!--/.nav-collapse -->
+
+  </nav>
+
+  <div class="container">
+    
+  
+  <div class="row">
+    <h1>direct_net_infiltration_initialize
+      <small>Subroutine</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="card">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 1.3% of total for procedures.">109 statements</a>
+     </li>
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/direct_net_infiltration__gridded_data.F90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+     <li><a href='../sourcefile/direct_net_infiltration__gridded_data.f90.html'>direct_net_infiltration__gridded_data.F90</a></li>
+    
+     <li><a href='../module/direct_net_infiltration__gridded_data.html'>direct_net_infiltration__gridded_data</a></li>
+    
+  
+     <li class="active">direct_net_infiltration_initialize</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/direct_net_infiltration_initialize.html#src">direct_net_infiltration_initialize</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+    <h2>
+public subroutine direct_net_infiltration_initialize(is_cell_active, landuse_index)
+    
+    
+   
+</h2>
+    
+  
+
+
+    
+    <p>Initialize the routine to enable input/output of arbitrary sources/sink terms.</p>
+<p>Open gridded data file.
+ Open a NetCDF output file to hold variable output.</p>
+<p>@param[in] is_cell_active 2D array of active cells within the model domain.
+ @param[in] iLanduseIndex 1D vector of indices corresponding to rows of the
+            landuse lookup table(s).
+ @param[in] dX 1D vector of X coordinates associated with the model domain.
+ @param[in] dY 1D vector of Y coordinates.
+ @param[in] dX_lon 2D array of longitude values.
+ @param[in] dY_lat 2D array of latitude values.</p>
+<p>Determine how many landuse codes are present</p>
+    
+
+    <h3>Arguments</h3>
+    
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-is_cell_active~3"></span>logical(kind=c_bool),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>is_cell_active</strong>(:,:)</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-landuse_index~9"></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>landuse_index</strong>(:)</td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    
+    
+    
+    
+     
+    <br>
+
+    <!-- <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/direct_net_infiltration_initialize.html#src">direct_net_infiltration_initialize</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md"> -->
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+    
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span>  <span class="k">subroutine </span><span class="n">direct_net_infiltration_initialize</span><span class="p">(</span> <span class="n">is_cell_active</span><span class="p">,</span> <span class="n">landuse_index</span> <span class="p">)</span>
+
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>     <span class="kd">::</span> <span class="n">is_cell_active</span><span class="p">(:,:)</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>      <span class="kd">::</span> <span class="n">landuse_index</span><span class="p">(:)</span>
+
+    <span class="c">! [ LOCALS ]</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">status</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">parameter_list</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">indx</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">iNX</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">iNY</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">allocatable</span>    <span class="kd">::</span> <span class="n">landuse_codes</span><span class="p">(:)</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">number_of_landuses</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">are_lengths_equal</span>
+
+
+    <span class="c">!&gt; Determine how many landuse codes are present</span>
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;LU_Code&quot;</span> <span class="p">)</span>
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;Landuse_Code&quot;</span> <span class="p">)</span>
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;Landuse_Lookup_Code&quot;</span> <span class="p">)</span>
+
+    <span class="k">call </span><span class="n">PARAMS</span><span class="p">%</span><span class="n">get_parameters</span><span class="p">(</span> <span class="n">slKeys</span><span class="o">=</span><span class="n">parameter_list</span><span class="p">,</span> <span class="n">iValues</span><span class="o">=</span><span class="n">landuse_codes</span> <span class="p">)</span>
+    <span class="n">number_of_landuses</span> <span class="o">=</span> <span class="nb">count</span><span class="p">(</span> <span class="n">landuse_codes</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span>
+
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">clear</span><span class="p">()</span>
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;Annual_direct_net_infiltration_rate&quot;</span> <span class="p">)</span>
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;Annual_direct_recharge_rate&quot;</span> <span class="p">)</span>
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;Annual_direct_recharge&quot;</span> <span class="p">)</span>
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;Annual_direct_net_infiltration&quot;</span> <span class="p">)</span>
+
+    <span class="k">call </span><span class="n">PARAMS</span><span class="p">%</span><span class="n">get_parameters</span><span class="p">(</span> <span class="n">slKeys</span><span class="o">=</span><span class="n">parameter_list</span> <span class="p">,</span> <span class="n">fValues</span><span class="o">=</span><span class="n">fANNUAL_RECHARGE_RATE_TABLE</span> <span class="p">)</span>
+
+    <span class="c">! attempt to find a source of GRIDDED ANNUAL DIRECT RECHARGE data</span>
+    <span class="n">pANNUAL_RECHARGE_RATE</span> <span class="o">=&gt;</span> <span class="n">DAT</span><span class="p">%</span><span class="n">find</span><span class="p">(</span> <span class="s2">&quot;ANNUAL_DIRECT_NET_INFILTRATION_RATE&quot;</span> <span class="p">)</span>
+
+
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">clear</span><span class="p">()</span>
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;Cesspool_direct_net_infiltration&quot;</span> <span class="p">)</span>
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;Cesspool_recharge&quot;</span> <span class="p">)</span>
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;Cesspool_discharge&quot;</span> <span class="p">)</span>
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;Cesspool_leakage&quot;</span> <span class="p">)</span>
+
+    <span class="k">call </span><span class="n">PARAMS</span><span class="p">%</span><span class="n">get_parameters</span><span class="p">(</span> <span class="n">slKeys</span><span class="o">=</span><span class="n">parameter_list</span> <span class="p">,</span> <span class="n">fValues</span><span class="o">=</span><span class="n">fCESSPOOL_TABLE</span> <span class="p">)</span>
+
+    <span class="c">! attempt to find a source of GRIDDED CESSPOOL data</span>
+    <span class="n">pCESSPOOL</span> <span class="o">=&gt;</span> <span class="n">DAT</span><span class="p">%</span><span class="n">find</span><span class="p">(</span> <span class="s2">&quot;CESSPOOL_LEAKAGE&quot;</span> <span class="p">)</span>
+
+
+    <span class="c">! call parameter_list%clear()</span>
+    <span class="c">! call parameter_list%append( &quot;Storm_drain_discharge&quot; )</span>
+    <span class="c">! call parameter_list%append( &quot;Storm_drain_recharge&quot; )</span>
+    <span class="c">! call parameter_list%append( &quot;Storm_drain_leakage&quot; )</span>
+    <span class="c">!</span>
+    <span class="c">! call PARAMS%get_parameters( slKeys=parameter_list , fValues=fSTORM_DRAIN_TABLE )</span>
+    <span class="c">!</span>
+    <span class="c">! pSTORM_DRAIN =&gt; DAT%find( &quot;STORM_DRAIN&quot; )</span>
+    <span class="c">!</span>
+
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">clear</span><span class="p">()</span>
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;Water_body_recharge&quot;</span> <span class="p">)</span>
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;Water_body_discharge&quot;</span> <span class="p">)</span>
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;Water_body_leakage&quot;</span> <span class="p">)</span>
+
+    <span class="k">call </span><span class="n">PARAMS</span><span class="p">%</span><span class="n">get_parameters</span><span class="p">(</span> <span class="n">slKeys</span><span class="o">=</span><span class="n">parameter_list</span> <span class="p">,</span> <span class="n">fValues</span><span class="o">=</span><span class="n">fWATER_BODY_RECHARGE_TABLE</span> <span class="p">)</span>
+
+    <span class="n">pWATER_BODY_RECHARGE</span> <span class="o">=&gt;</span> <span class="n">DAT</span><span class="p">%</span><span class="n">find</span><span class="p">(</span> <span class="s2">&quot;WATER_BODY_RECHARGE&quot;</span> <span class="p">)</span>
+
+
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">clear</span><span class="p">()</span>
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;Water_main_recharge&quot;</span> <span class="p">)</span>
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;Water_main_discharge&quot;</span> <span class="p">)</span>
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;Water_main_leakage&quot;</span> <span class="p">)</span>
+
+    <span class="k">call </span><span class="n">PARAMS</span><span class="p">%</span><span class="n">get_parameters</span><span class="p">(</span> <span class="n">slKeys</span><span class="o">=</span><span class="n">parameter_list</span> <span class="p">,</span> <span class="n">fValues</span><span class="o">=</span><span class="n">fWATER_MAIN_TABLE</span> <span class="p">)</span>
+
+    <span class="n">pWATER_MAIN</span> <span class="o">=&gt;</span> <span class="n">DAT</span><span class="p">%</span><span class="n">find</span><span class="p">(</span> <span class="s2">&quot;WATER_MAIN_LEAKAGE&quot;</span> <span class="p">)</span>
+
+
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">clear</span><span class="p">()</span>
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;Disposal_well_recharge&quot;</span> <span class="p">)</span>
+    <span class="k">call </span><span class="n">parameter_list</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="s2">&quot;Disposal_well_discharge&quot;</span> <span class="p">)</span>
+
+    <span class="k">call </span><span class="n">PARAMS</span><span class="p">%</span><span class="n">get_parameters</span><span class="p">(</span> <span class="n">slKeys</span><span class="o">=</span><span class="n">parameter_list</span> <span class="p">,</span> <span class="n">fValues</span><span class="o">=</span><span class="n">fDISPOSAL_WELL_TABLE</span> <span class="p">)</span>
+
+    <span class="n">pDISPOSAL_WELL</span> <span class="o">=&gt;</span> <span class="n">DAT</span><span class="p">%</span><span class="n">find</span><span class="p">(</span> <span class="s2">&quot;DISPOSAL_WELL_DISCHARGE&quot;</span> <span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span> <span class="nb">associated</span><span class="p">(</span> <span class="n">pANNUAL_RECHARGE_RATE</span> <span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+
+<span class="k">      allocate</span><span class="p">(</span> <span class="n">fANNUAL_RECHARGE_RATE</span><span class="p">(</span> <span class="nb">count</span><span class="p">(</span> <span class="n">is_cell_active</span> <span class="p">)</span> <span class="p">),</span> <span class="nb">stat</span><span class="o">=</span><span class="n">status</span> <span class="p">)</span>
+      <span class="k">call </span><span class="n">assert</span><span class="p">(</span> <span class="n">status</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Problem allocating memory&quot;</span><span class="p">,</span> <span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="err">__</span><span class="n">LINE__</span> <span class="p">)</span>
+
+    <span class="n">elseif</span> <span class="p">(</span> <span class="n">fANNUAL_RECHARGE_RATE_TABLE</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">fTINYVAL</span> <span class="p">)</span> <span class="k">then</span>
+
+<span class="k">      </span><span class="n">are_lengths_equal</span> <span class="o">=</span> <span class="p">(</span> <span class="p">(</span> <span class="nb">ubound</span><span class="p">(</span><span class="n">fANNUAL_RECHARGE_RATE_TABLE</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">ubound</span><span class="p">(</span><span class="n">landuse_codes</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span>  <span class="p">)</span>
+
+      <span class="k">if</span> <span class="p">(</span> <span class="p">.</span><span class="nb">not</span><span class="p">.</span> <span class="n">are_lengths_equal</span> <span class="p">)</span>     <span class="p">&amp;</span>
+        <span class="k">call </span><span class="n">warn</span><span class="p">(</span> <span class="n">sMessage</span><span class="o">=</span><span class="s2">&quot;The number of landuses does not match the number of annual direct&quot;</span>   <span class="p">&amp;</span>
+          <span class="o">//</span><span class="s2">&quot; recharge rate values.&quot;</span><span class="p">,</span> <span class="n">sModule</span><span class="o">=</span><span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="n">iLine</span><span class="o">=</span><span class="err">__</span><span class="n">LINE__</span><span class="p">,</span> <span class="n">lFatal</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.</span><span class="err">_</span><span class="n">c_bool</span> <span class="p">)</span>
+
+      <span class="k">allocate</span><span class="p">(</span> <span class="n">fANNUAL_RECHARGE_RATE</span><span class="p">(</span> <span class="nb">count</span><span class="p">(</span> <span class="n">is_cell_active</span> <span class="p">)</span> <span class="p">),</span> <span class="nb">stat</span><span class="o">=</span><span class="n">status</span> <span class="p">)</span>
+      <span class="k">call </span><span class="n">assert</span><span class="p">(</span> <span class="n">status</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Problem allocating memory&quot;</span><span class="p">,</span> <span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="err">__</span><span class="n">LINE__</span> <span class="p">)</span>
+
+      <span class="k">do </span><span class="n">indx</span><span class="o">=</span><span class="nb">lbound</span><span class="p">(</span> <span class="n">landuse_index</span><span class="p">,</span> <span class="mi">1</span> <span class="p">),</span> <span class="nb">ubound</span><span class="p">(</span> <span class="n">landuse_index</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span>
+        <span class="n">fANNUAL_RECHARGE_RATE</span><span class="p">(</span> <span class="n">indx</span> <span class="p">)</span> <span class="o">=</span> <span class="n">fANNUAL_RECHARGE_RATE_TABLE</span><span class="p">(</span> <span class="n">landuse_index</span><span class="p">(</span> <span class="n">indx</span> <span class="p">)</span> <span class="p">)</span>
+      <span class="n">enddo</span>
+
+     <span class="n">endif</span>
+
+
+    <span class="k">if</span> <span class="p">(</span> <span class="nb">associated</span><span class="p">(</span> <span class="n">pCESSPOOL</span> <span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+
+<span class="k">      allocate</span><span class="p">(</span> <span class="n">fCESSPOOL</span><span class="p">(</span> <span class="nb">count</span><span class="p">(</span> <span class="n">is_cell_active</span> <span class="p">)</span> <span class="p">),</span> <span class="nb">stat</span><span class="o">=</span><span class="n">status</span> <span class="p">)</span>
+      <span class="k">call </span><span class="n">assert</span><span class="p">(</span> <span class="n">status</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Problem allocating memory&quot;</span><span class="p">,</span> <span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="err">__</span><span class="n">LINE__</span> <span class="p">)</span>
+
+    <span class="n">elseif</span> <span class="p">(</span> <span class="n">fCESSPOOL_TABLE</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">fTINYVAL</span> <span class="p">)</span> <span class="k">then</span>
+
+<span class="k">      </span><span class="n">are_lengths_equal</span> <span class="o">=</span> <span class="p">(</span> <span class="p">(</span> <span class="nb">ubound</span><span class="p">(</span><span class="n">fCESSPOOL_TABLE</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">ubound</span><span class="p">(</span><span class="n">landuse_codes</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span>  <span class="p">)</span>
+
+      <span class="k">if</span> <span class="p">(</span> <span class="p">.</span><span class="nb">not</span><span class="p">.</span> <span class="n">are_lengths_equal</span> <span class="p">)</span>     <span class="p">&amp;</span>
+        <span class="k">call </span><span class="n">warn</span><span class="p">(</span> <span class="n">sMessage</span><span class="o">=</span><span class="s2">&quot;The number of landuses does not match the number of cesspool discharge/leakage values.&quot;</span><span class="p">,</span>   <span class="p">&amp;</span>
+          <span class="n">sModule</span><span class="o">=</span><span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="n">iLine</span><span class="o">=</span><span class="err">__</span><span class="n">LINE__</span><span class="p">,</span> <span class="n">lFatal</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.</span><span class="err">_</span><span class="n">c_bool</span> <span class="p">)</span>
+
+      <span class="k">allocate</span><span class="p">(</span> <span class="n">fCESSPOOL</span><span class="p">(</span> <span class="nb">count</span><span class="p">(</span> <span class="n">is_cell_active</span> <span class="p">)</span> <span class="p">),</span> <span class="nb">stat</span><span class="o">=</span><span class="n">status</span> <span class="p">)</span>
+      <span class="k">call </span><span class="n">assert</span><span class="p">(</span> <span class="n">status</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Problem allocating memory&quot;</span><span class="p">,</span> <span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="err">__</span><span class="n">LINE__</span> <span class="p">)</span>
+
+      <span class="k">do </span><span class="n">indx</span><span class="o">=</span><span class="nb">lbound</span><span class="p">(</span> <span class="n">landuse_index</span><span class="p">,</span> <span class="mi">1</span> <span class="p">),</span> <span class="nb">ubound</span><span class="p">(</span> <span class="n">landuse_index</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span>
+        <span class="n">fCESSPOOL</span><span class="p">(</span> <span class="n">indx</span> <span class="p">)</span> <span class="o">=</span> <span class="n">fCESSPOOL_TABLE</span><span class="p">(</span> <span class="n">landuse_index</span><span class="p">(</span> <span class="n">indx</span> <span class="p">)</span> <span class="p">)</span>
+      <span class="n">enddo</span>
+
+     <span class="n">endif</span>
+
+    <span class="c">! if ( associated( pSTORM_DRAIN ) ) then</span>
+    <span class="c">!</span>
+    <span class="c">!   allocate( fSTORM_DRAIN( count( is_cell_active ) ), stat=status )</span>
+    <span class="c">!   call assert( status==0, &quot;Problem allocating memory&quot;, __SRCNAME__, __LINE__ )</span>
+    <span class="c">!</span>
+    <span class="c">! elseif ( fSTORM_DRAIN_TABLE(1) &gt; fTINYVAL ) then</span>
+    <span class="c">!</span>
+    <span class="c">!   are_lengths_equal = ( ( ubound(fSTORM_DRAIN_TABLE,1) == ubound(landuse_codes,1) )  )</span>
+    <span class="c">!</span>
+    <span class="c">!   if ( .not. are_lengths_equal )     &amp;</span>
+    <span class="c">!     call warn( sMessage=&quot;The number of landuses does not match the number of storm drain discharge/leakage values.&quot;,   &amp;</span>
+    <span class="c">!       sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )</span>
+    <span class="c">!</span>
+    <span class="c">!   allocate( fSTORM_DRAIN( count( is_cell_active ) ), stat=status )</span>
+    <span class="c">!   call assert( status==0, &quot;Problem allocating memory&quot;, __SRCNAME__, __LINE__ )</span>
+    <span class="c">!</span>
+    <span class="c">!   do indx=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )</span>
+    <span class="c">!     fSTORM_DRAIN( indx ) = fSTORM_DRAIN_TABLE( landuse_index( indx ) )</span>
+    <span class="c">!   enddo</span>
+    <span class="c">!</span>
+    <span class="c">!  endif</span>
+
+    <span class="k">if</span> <span class="p">(</span> <span class="nb">associated</span><span class="p">(</span> <span class="n">pWATER_BODY_RECHARGE</span> <span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+
+<span class="k">      allocate</span><span class="p">(</span> <span class="n">fWATER_BODY_RECHARGE</span><span class="p">(</span> <span class="nb">count</span><span class="p">(</span> <span class="n">is_cell_active</span> <span class="p">)</span> <span class="p">),</span> <span class="nb">stat</span><span class="o">=</span><span class="n">status</span> <span class="p">)</span>
+      <span class="k">call </span><span class="n">assert</span><span class="p">(</span> <span class="n">status</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Problem allocating memory&quot;</span><span class="p">,</span> <span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="err">__</span><span class="n">LINE__</span> <span class="p">)</span>
+
+    <span class="n">elseif</span> <span class="p">(</span> <span class="n">fWATER_BODY_RECHARGE_TABLE</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">fTINYVAL</span> <span class="p">)</span> <span class="k">then</span>
+
+<span class="k">      </span><span class="n">are_lengths_equal</span> <span class="o">=</span> <span class="p">(</span> <span class="p">(</span> <span class="nb">ubound</span><span class="p">(</span><span class="n">fWATER_BODY_RECHARGE_TABLE</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">ubound</span><span class="p">(</span><span class="n">landuse_codes</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span>  <span class="p">)</span>
+
+      <span class="k">if</span> <span class="p">(</span> <span class="p">.</span><span class="nb">not</span><span class="p">.</span> <span class="n">are_lengths_equal</span> <span class="p">)</span>     <span class="p">&amp;</span>
+        <span class="k">call </span><span class="n">warn</span><span class="p">(</span> <span class="n">sMessage</span><span class="o">=</span><span class="s2">&quot;The number of landuses does not match the number of water body recharge/leakage values.&quot;</span><span class="p">,</span>   <span class="p">&amp;</span>
+          <span class="n">sModule</span><span class="o">=</span><span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="n">iLine</span><span class="o">=</span><span class="err">__</span><span class="n">LINE__</span><span class="p">,</span> <span class="n">lFatal</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.</span><span class="err">_</span><span class="n">c_bool</span> <span class="p">)</span>
+
+      <span class="k">allocate</span><span class="p">(</span> <span class="n">fWATER_BODY_RECHARGE</span><span class="p">(</span> <span class="nb">count</span><span class="p">(</span> <span class="n">is_cell_active</span> <span class="p">)</span> <span class="p">),</span> <span class="nb">stat</span><span class="o">=</span><span class="n">status</span> <span class="p">)</span>
+      <span class="k">call </span><span class="n">assert</span><span class="p">(</span> <span class="n">status</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Problem allocating memory&quot;</span><span class="p">,</span> <span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="err">__</span><span class="n">LINE__</span> <span class="p">)</span>
+
+      <span class="k">do </span><span class="n">indx</span><span class="o">=</span><span class="nb">lbound</span><span class="p">(</span> <span class="n">landuse_index</span><span class="p">,</span> <span class="mi">1</span> <span class="p">),</span> <span class="nb">ubound</span><span class="p">(</span> <span class="n">landuse_index</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span>
+        <span class="n">fWATER_BODY_RECHARGE</span><span class="p">(</span> <span class="n">indx</span> <span class="p">)</span> <span class="o">=</span> <span class="n">fWATER_BODY_RECHARGE_TABLE</span><span class="p">(</span> <span class="n">landuse_index</span><span class="p">(</span> <span class="n">indx</span> <span class="p">)</span> <span class="p">)</span>
+      <span class="n">enddo</span>
+
+     <span class="n">endif</span>
+
+
+    <span class="k">if</span> <span class="p">(</span> <span class="nb">associated</span><span class="p">(</span> <span class="n">pWATER_MAIN</span> <span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+
+<span class="k">      allocate</span><span class="p">(</span> <span class="n">fWATER_MAIN</span><span class="p">(</span> <span class="nb">count</span><span class="p">(</span> <span class="n">is_cell_active</span> <span class="p">)</span> <span class="p">),</span> <span class="nb">stat</span><span class="o">=</span><span class="n">status</span> <span class="p">)</span>
+      <span class="k">call </span><span class="n">assert</span><span class="p">(</span> <span class="n">status</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Problem allocating memory&quot;</span><span class="p">,</span> <span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="err">__</span><span class="n">LINE__</span> <span class="p">)</span>
+
+    <span class="n">elseif</span> <span class="p">(</span> <span class="n">fWATER_MAIN_TABLE</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">fTINYVAL</span> <span class="p">)</span> <span class="k">then</span>
+
+<span class="k">      </span><span class="n">are_lengths_equal</span> <span class="o">=</span> <span class="p">(</span> <span class="p">(</span> <span class="nb">ubound</span><span class="p">(</span><span class="n">fWATER_MAIN_TABLE</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">ubound</span><span class="p">(</span><span class="n">landuse_codes</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span>  <span class="p">)</span>
+
+      <span class="k">if</span> <span class="p">(</span> <span class="p">.</span><span class="nb">not</span><span class="p">.</span> <span class="n">are_lengths_equal</span> <span class="p">)</span>     <span class="p">&amp;</span>
+        <span class="k">call </span><span class="n">warn</span><span class="p">(</span> <span class="n">sMessage</span><span class="o">=</span><span class="s2">&quot;The number of landuses does not match the number of water main leakage values.&quot;</span><span class="p">,</span>   <span class="p">&amp;</span>
+          <span class="n">sModule</span><span class="o">=</span><span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="n">iLine</span><span class="o">=</span><span class="err">__</span><span class="n">LINE__</span><span class="p">,</span> <span class="n">lFatal</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.</span><span class="err">_</span><span class="n">c_bool</span> <span class="p">)</span>
+
+      <span class="k">allocate</span><span class="p">(</span> <span class="n">fWATER_MAIN</span><span class="p">(</span> <span class="nb">count</span><span class="p">(</span> <span class="n">is_cell_active</span> <span class="p">)</span> <span class="p">),</span> <span class="nb">stat</span><span class="o">=</span><span class="n">status</span> <span class="p">)</span>
+      <span class="k">call </span><span class="n">assert</span><span class="p">(</span> <span class="n">status</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Problem allocating memory&quot;</span><span class="p">,</span> <span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="err">__</span><span class="n">LINE__</span> <span class="p">)</span>
+
+      <span class="k">do </span><span class="n">indx</span><span class="o">=</span><span class="nb">lbound</span><span class="p">(</span> <span class="n">landuse_index</span><span class="p">,</span> <span class="mi">1</span> <span class="p">),</span> <span class="nb">ubound</span><span class="p">(</span> <span class="n">landuse_index</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span>
+        <span class="n">fWATER_MAIN</span><span class="p">(</span> <span class="n">indx</span> <span class="p">)</span> <span class="o">=</span> <span class="n">fWATER_MAIN_TABLE</span><span class="p">(</span> <span class="n">landuse_index</span><span class="p">(</span> <span class="n">indx</span> <span class="p">)</span> <span class="p">)</span>
+      <span class="n">enddo</span>
+
+     <span class="n">endif</span>
+
+
+    <span class="k">if</span> <span class="p">(</span> <span class="nb">associated</span><span class="p">(</span> <span class="n">pDISPOSAL_WELL</span> <span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+
+<span class="k">      allocate</span><span class="p">(</span> <span class="n">fDISPOSAL_WELL</span><span class="p">(</span> <span class="nb">count</span><span class="p">(</span> <span class="n">is_cell_active</span> <span class="p">)</span> <span class="p">),</span> <span class="nb">stat</span><span class="o">=</span><span class="n">status</span> <span class="p">)</span>
+      <span class="k">call </span><span class="n">assert</span><span class="p">(</span> <span class="n">status</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Problem allocating memory&quot;</span><span class="p">,</span> <span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="err">__</span><span class="n">LINE__</span> <span class="p">)</span>
+
+    <span class="n">elseif</span> <span class="p">(</span> <span class="n">fDISPOSAL_WELL_TABLE</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">&gt;</span> <span class="n">fTINYVAL</span> <span class="p">)</span> <span class="k">then</span>
+
+<span class="k">      </span><span class="n">are_lengths_equal</span> <span class="o">=</span> <span class="p">(</span> <span class="p">(</span> <span class="nb">ubound</span><span class="p">(</span><span class="n">fDISPOSAL_WELL_TABLE</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="nb">ubound</span><span class="p">(</span><span class="n">landuse_codes</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span> <span class="p">)</span>  <span class="p">)</span>
+
+      <span class="k">if</span> <span class="p">(</span> <span class="p">.</span><span class="nb">not</span><span class="p">.</span> <span class="n">are_lengths_equal</span> <span class="p">)</span>     <span class="p">&amp;</span>
+        <span class="k">call </span><span class="n">warn</span><span class="p">(</span> <span class="n">sMessage</span><span class="o">=</span><span class="s2">&quot;The number of landuses does not match the number of discharge well values.&quot;</span><span class="p">,</span>   <span class="p">&amp;</span>
+          <span class="n">sModule</span><span class="o">=</span><span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="n">iLine</span><span class="o">=</span><span class="err">__</span><span class="n">LINE__</span><span class="p">,</span> <span class="n">lFatal</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.</span><span class="err">_</span><span class="n">c_bool</span> <span class="p">)</span>
+
+      <span class="k">allocate</span><span class="p">(</span> <span class="n">fDISPOSAL_WELL</span><span class="p">(</span> <span class="nb">count</span><span class="p">(</span> <span class="n">is_cell_active</span> <span class="p">)</span> <span class="p">),</span> <span class="nb">stat</span><span class="o">=</span><span class="n">status</span> <span class="p">)</span>
+      <span class="k">call </span><span class="n">assert</span><span class="p">(</span> <span class="n">status</span><span class="o">==</span><span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Problem allocating memory&quot;</span><span class="p">,</span> <span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="err">__</span><span class="n">LINE__</span> <span class="p">)</span>
+
+      <span class="k">do </span><span class="n">indx</span><span class="o">=</span><span class="nb">lbound</span><span class="p">(</span> <span class="n">landuse_index</span><span class="p">,</span> <span class="mi">1</span> <span class="p">),</span> <span class="nb">ubound</span><span class="p">(</span> <span class="n">landuse_index</span><span class="p">,</span> <span class="mi">1</span> <span class="p">)</span>
+        <span class="n">fDISPOSAL_WELL</span><span class="p">(</span> <span class="n">indx</span> <span class="p">)</span> <span class="o">=</span> <span class="n">fDISPOSAL_WELL_TABLE</span><span class="p">(</span> <span class="n">landuse_index</span><span class="p">(</span> <span class="n">indx</span> <span class="p">)</span> <span class="p">)</span>
+      <span class="n">enddo</span>
+
+     <span class="n">endif</span>
+
+    <span class="c">! initialize last retrieval date to something implausibly low to trigger initial read</span>
+    <span class="c">! in the calculate procedure</span>
+    <span class="k">call </span><span class="n">DATE_OF_LAST_RETRIEVAL</span><span class="p">%</span><span class="n">parseDate</span><span class="p">(</span><span class="s2">&quot;01/01/1000&quot;</span><span class="p">,</span> <span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="err">__</span><span class="n">LINE__</span><span class="p">)</span>
+
+  <span class="k">end subroutine </span><span class="n">direct_net_infiltration_initialize</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+
+    </div>
+  </div>
+
+
+    <hr>
+  </div> <!-- /container -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <p>&copy; 2019 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
+            </p>
+        </div>
+        <div class="col-4">
+          <p class="text-right"><small>
+            Documentation for SWB2
+               (version 2.0, build 96) generated by
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on Tue Sep  3 16:54:50 2019 </small>
+          </p>
+        </div>
+        <div class="col">
+          <p class="text-center"> SWB2 was developed by Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt</p>
+        </div>
+      </div>
+      <br>
+    </div> <!-- /container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+  <script src="../js/bootstrap.min.js"></script>
+
+  <!-- MathJax JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+  
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+
+</body>
+
+</html>

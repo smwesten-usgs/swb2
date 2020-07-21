@@ -1,0 +1,516 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="">
+  
+  <meta name="author" content="Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt">
+  <link rel="icon" href="../favicon.png">
+
+  <title>model_dump_variables &ndash; SWB2</title>
+
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/pygments.css" rel="stylesheet">
+  <link href="../css/font-awesome.min.css" rel="stylesheet">
+  <link href="../css/bootstrap-toc.css" rel="stylesheet">
+    <!-- <link href="../css/local.css" rel="stylesheet"> -->
+  
+  
+
+  <script src="../js/jquery-2.1.3.min.js"></script>
+  <script src="../js/svg-pan-zoom.min.js"></script>
+  <script src="../js/bootstrap-toc.js"></script>
+
+</head>
+
+<body data-spy="scroll" data-target="#toc">
+
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+
+    <a class="navbar-brand" href="../index.html">SWB2</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" navbar-light bg-light id="navbarText">
+      <ul class="navbar-nav mr-auto">
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../page/index.html">User Guide</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/modules.html">Modules</a>
+          </li>
+        
+
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+          </li>
+        
+
+
+      </ul>
+    </div>
+
+    <form class="form-inline">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+        <!-- <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contents <span class="caret"></span></a>
+            <ul class="dropdown-menu"> -->
+          <!-- 
+            
+              <li><a href="../lists/files.html">Source Files</a></li>
+            
+          
+          
+            <li><a href="../lists/modules.html">Modules</a></li>
+          
+          
+          
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+          
+          
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+           
+            <li><a href="../lists/types.html">Derived Types</a></li>
+          
+          
+            <li><a href="../lists/programs.html">Programs</a></li>
+          
+        </ul> -->
+
+      <!-- </div> -->
+      <!--/.nav-collapse -->
+
+  </nav>
+
+  <div class="container">
+    
+  
+  <div class="row">
+    <h1>model_dump_variables
+      <small>Subroutine</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="card">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 0.4% of total for procedures.">32 statements</a>
+     </li>
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/model_domain.F90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+     <li><a href='../sourcefile/model_domain.f90.html'>model_domain.F90</a></li>
+    
+     <li><a href='../module/model_domain.html'>model_domain</a></li>
+    
+  
+     <li class="active">model_dump_variables</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/model_dump_variables.html#src">model_dump_variables</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+    <h2>
+public subroutine model_dump_variables(this, unitnum, indx_start, indx_end)
+    
+    
+   
+</h2>
+    
+  
+    <div class="card card-default">
+      <div class="card-heading">
+  <h3 class="card-title">Uses</h3>
+      </div>
+      <ul class="list-group">
+      
+      <li class="list-group-item">
+  <ul class="list-inline">
+    
+    <li><a href='../module/runoff__curve_number.html'>runoff__curve_number</a></li>
+    
+    <li><a href='../module/routing__d8.html'>routing__D8</a></li>
+    
+  </ul>
+      </li>
+      
+      
+      
+      </ul>
+    </div>
+    
+
+
+    
+
+    <h3>Arguments</h3>
+    
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-this~72"></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-unitnum~2"></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>unitnum</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-indx_start~2"></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>indx_start</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-indx_end~2"></span>integer(kind=c_int),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>indx_end</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    
+    
+    
+    
+     
+    <br>
+
+    <!-- <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/model_dump_variables.html#src">model_dump_variables</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md"> -->
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+    
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span>  <span class="k">subroutine </span><span class="n">model_dump_variables</span><span class="p">(</span> <span class="n">this</span><span class="p">,</span> <span class="n">unitnum</span><span class="p">,</span> <span class="n">indx_start</span><span class="p">,</span> <span class="n">indx_end</span> <span class="p">)</span>
+
+    <span class="k">use </span><span class="n">runoff__curve_number</span><span class="p">,</span> <span class="n">only</span>   <span class="p">:</span> <span class="n">PREV_5_DAYS_RAIN</span>
+    <span class="k">use </span><span class="n">routing__D8</span><span class="p">,</span> <span class="n">only</span>            <span class="p">:</span> <span class="n">get_cell_index</span><span class="p">,</span> <span class="n">get_target_index</span>
+
+    <span class="k">class</span> <span class="p">(</span><span class="n">MODEL_DOMAIN_T</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">)</span>       <span class="kd">::</span> <span class="n">this</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">unitnum</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">indx_start</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span>  <span class="kd">::</span> <span class="n">indx_end</span>
+
+    <span class="c">! [ LOCALS ]</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">kndx</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">target_indx</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">cell_indx</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">indx_end_l</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">indx</span>
+
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">previous_5_day_rain</span><span class="p">(</span><span class="mi">6</span><span class="p">)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">monthly_runoff</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">monthly_gross_precip</span>
+
+    <span class="n">previous_5_day_rain</span>     <span class="o">=</span> <span class="o">-</span><span class="mi">999</span><span class="mf">9.0</span>
+    <span class="n">monthly_runoff</span>          <span class="o">=</span> <span class="o">-</span><span class="mi">999</span><span class="mf">9.0</span>
+    <span class="n">monthly_gross_precip</span>    <span class="o">=</span> <span class="o">-</span><span class="mi">999</span><span class="mf">9.0</span>
+
+    <span class="k">if</span> <span class="p">(</span> <span class="nb">present</span><span class="p">(</span> <span class="n">indx_end</span> <span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<span class="k">      </span><span class="n">indx_end_l</span> <span class="o">=</span> <span class="n">indx_end</span>
+    <span class="k">else</span>
+<span class="k">      </span><span class="n">indx_end_l</span> <span class="o">=</span> <span class="n">indx_start</span>
+    <span class="n">endif</span>
+
+    <span class="k">do </span><span class="n">indx</span><span class="o">=</span><span class="n">indx_start</span><span class="p">,</span> <span class="n">indx_end_l</span>
+      <span class="n">target_indx</span> <span class="o">=</span> <span class="n">get_target_index</span><span class="p">(</span> <span class="n">indx</span> <span class="p">)</span>
+      <span class="n">cell_indx</span>   <span class="o">=</span> <span class="n">get_cell_index</span><span class="p">(</span> <span class="n">indx</span> <span class="p">)</span>
+
+    <span class="k">if</span> <span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">PREV_5_DAYS_RAIN</span><span class="p">)</span> <span class="p">)</span>  <span class="n">previous_5_day_rain</span> <span class="o">=</span> <span class="n">PREV_5_DAYS_RAIN</span><span class="p">(</span><span class="n">cell_indx</span><span class="p">,:)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">this</span><span class="p">%</span><span class="n">monthly_runoff</span><span class="p">)</span> <span class="p">)</span>  <span class="n">monthly_runoff</span> <span class="o">=</span> <span class="n">this</span><span class="p">%</span><span class="n">monthly_runoff</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">)</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">allocated</span><span class="p">(</span><span class="n">this</span><span class="p">%</span><span class="n">monthly_gross_precip</span><span class="p">)</span> <span class="p">)</span>  <span class="n">monthly_gross_precip</span> <span class="o">=</span> <span class="n">this</span><span class="p">%</span><span class="n">monthly_gross_precip</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">)</span>
+
+      <span class="k">write</span><span class="p">(</span> <span class="n">unit</span><span class="o">=</span><span class="n">unitnum</span><span class="p">,</span> <span class="n">fmt</span><span class="o">=</span><span class="s2">&quot;(i2,&#39;,&#39;,i2,&#39;,&#39;,i4,&#39;,&#39;,8(i6,&#39;,&#39;),62(g16.9,&#39;,&#39;),g16.9)&quot;</span><span class="p">)</span>                                      <span class="p">&amp;</span>
+        <span class="n">SIM_DT</span><span class="p">%</span><span class="n">curr</span><span class="p">%</span><span class="n">iMonth</span><span class="p">,</span> <span class="n">SIM_DT</span><span class="p">%</span><span class="n">curr</span><span class="p">%</span><span class="n">iDay</span><span class="p">,</span> <span class="n">SIM_DT</span><span class="p">%</span><span class="n">curr</span><span class="p">%</span><span class="n">iYear</span><span class="p">,</span>                                                            <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">landuse_code</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">landuse_index</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>                                                    <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">soil_group</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">num_upslope_connections</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">sum_upslope_cells</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>       <span class="p">&amp;</span>
+        <span class="n">indx</span><span class="p">,</span> <span class="n">cell_indx</span><span class="p">,</span> <span class="n">target_indx</span><span class="p">,</span>                                                                                       <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">awc</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">latitude</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">reference_ET0</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">actual_ET</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>    <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">curve_num_adj</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">inflow</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">runon</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">runoff</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>       <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">outflow</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>                                                                                          <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">infiltration</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">snowfall</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">potential_snowmelt</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>                   <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">snowmelt</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">interception</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">rainfall</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>                             <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">net_rainfall</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">monthly_gross_precip</span><span class="p">,</span> <span class="n">monthly_runoff</span><span class="p">,</span>                                               <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">interception_storage</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">tmax</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">tmin</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">tmean</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>    <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">snow_storage</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">soil_storage</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">soil_storage_max</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>                 <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">delta_soil_storage</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span><span class="n">this</span><span class="p">%</span><span class="n">soil_moisture_deficit</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>                                       <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">surface_storage</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">surface_storage_excess</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>                                        <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">surface_storage_max</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">net_infiltration</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>                                          <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">rejected_net_infiltration</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">fog</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>                                                 <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">irrigation</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">gdd</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">runoff_outside</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>                              <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">pervious_fraction</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">storm_drain_capture</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>                                         <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">canopy_cover_fraction</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">crop_coefficient_kcb</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>                                    <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">continuous_frozen_ground_index</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">rooting_depth_max</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>                              <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">current_rooting_depth</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">actual_et_soil</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>                                          <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">readily_available_water_raw</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">total_available_water_taw</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>                         <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">plant_stress_coef_ks</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">evap_reduction_coef_kr</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>                                   <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">surf_evap_coef_ke</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">fraction_exposed_and_wetted_soil</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>                            <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">actual_et_impervious</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">actual_et_interception</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>                                   <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">adjusted_depletion_fraction_p</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">crop_etc</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="n">this</span><span class="p">%</span><span class="n">bare_soil_evap</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>      <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">direct_net_infiltration</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span>                                                                          <span class="p">&amp;</span>
+        <span class="n">this</span><span class="p">%</span><span class="n">direct_soil_moisture</span><span class="p">(</span> <span class="n">cell_indx</span> <span class="p">),</span> <span class="p">(</span><span class="n">previous_5_day_rain</span><span class="p">(</span><span class="n">kndx</span><span class="p">),</span> <span class="n">kndx</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="mi">6</span><span class="p">)</span>
+
+    <span class="n">enddo</span>
+
+  <span class="k">end subroutine </span><span class="n">model_dump_variables</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+
+    </div>
+  </div>
+
+
+    <hr>
+  </div> <!-- /container -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <p>&copy; 2019 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
+            </p>
+        </div>
+        <div class="col-4">
+          <p class="text-right"><small>
+            Documentation for SWB2
+               (version 2.0, build 96) generated by
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on Tue Sep  3 16:54:50 2019 </small>
+          </p>
+        </div>
+        <div class="col">
+          <p class="text-center"> SWB2 was developed by Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt</p>
+        </div>
+      </div>
+      <br>
+    </div> <!-- /container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+  <script src="../js/bootstrap.min.js"></script>
+
+  <!-- MathJax JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+  
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+
+</body>
+
+</html>

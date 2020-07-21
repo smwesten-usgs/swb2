@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="">
+  
+  <meta name="author" content="Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt">
+  <link rel="icon" href="../favicon.png">
+
+  <title>makegraph &ndash; SWB2</title>
+
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/pygments.css" rel="stylesheet">
+  <link href="../css/font-awesome.min.css" rel="stylesheet">
+  <link href="../css/bootstrap-toc.css" rel="stylesheet">
+    <!-- <link href="../css/local.css" rel="stylesheet"> -->
+  
+  
+
+  <script src="../js/jquery-2.1.3.min.js"></script>
+  <script src="../js/svg-pan-zoom.min.js"></script>
+  <script src="../js/bootstrap-toc.js"></script>
+
+</head>
+
+<body data-spy="scroll" data-target="#toc">
+
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+
+    <a class="navbar-brand" href="../index.html">SWB2</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" navbar-light bg-light id="navbarText">
+      <ul class="navbar-nav mr-auto">
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../page/index.html">User Guide</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/modules.html">Modules</a>
+          </li>
+        
+
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+          </li>
+        
+
+
+      </ul>
+    </div>
+
+    <form class="form-inline">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+        <!-- <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contents <span class="caret"></span></a>
+            <ul class="dropdown-menu"> -->
+          <!-- 
+            
+              <li><a href="../lists/files.html">Source Files</a></li>
+            
+          
+          
+            <li><a href="../lists/modules.html">Modules</a></li>
+          
+          
+          
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+          
+          
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+           
+            <li><a href="../lists/types.html">Derived Types</a></li>
+          
+          
+            <li><a href="../lists/programs.html">Programs</a></li>
+          
+        </ul> -->
+
+      <!-- </div> -->
+      <!--/.nav-collapse -->
+
+  </nav>
+
+  <div class="container">
+    
+  
+  <div class="row">
+    <h1>makegraph
+      <small>Subroutine</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="card">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 2.0% of total for procedures.">163 statements</a>
+     </li>
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/graph.F90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+     <li><a href='../sourcefile/graph.f90.html'>graph.F90</a></li>
+    
+     <li><a href='../module/graph.html'>graph</a></li>
+    
+  
+     <li class="active">makegraph</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/makegraph.html#src">makegraph</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+    <h2>
+public subroutine makegraph(pGraph, pGrd, iVarNum)
+    
+    
+   
+</h2>
+    
+  
+
+
+    
+
+    <h3>Arguments</h3>
+    
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pgraph"></span>type(T_GRAPH_CONFIGURATION),</td>
+  <td></td>
+  <td></td>
+  
+  <td>dimension(:), pointer</td><td>::</td>
+  <td><strong>pGraph</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pgrd"></span>type(T_GENERAL_GRID),</td>
+  <td></td>
+  <td></td>
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>pGrd</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ivarnum"></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iVarNum</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    
+    
+    
+    
+     
+    <br>
+
+    <!-- <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/makegraph.html#src">makegraph</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md"> -->
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+    
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span>  <span class="k">subroutine </span><span class="n">makegraph</span><span class="p">(</span><span class="n">pGraph</span><span class="p">,</span> <span class="n">pGrd</span><span class="p">,</span> <span class="n">iVarNum</span><span class="p">)</span>
+
+    <span class="k">type</span> <span class="p">(</span><span class="n">T_GENERAL_GRID</span><span class="p">),</span><span class="k">pointer</span> <span class="kd">::</span> <span class="n">pGrd</span>      <span class="c">! Grid of model cells</span>
+    <span class="k">type</span><span class="p">(</span><span class="n">T_GRAPH_CONFIGURATION</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">pointer</span> <span class="kd">::</span> <span class="n">pGraph</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iVarNum</span>
+    <span class="kt">real</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(</span><span class="n">pGrd</span><span class="p">%</span><span class="n">iNX</span><span class="p">,</span><span class="n">pGrd</span><span class="p">%</span><span class="n">iNY</span><span class="p">)</span> <span class="kd">::</span> <span class="n">ZMAT</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iCol</span><span class="p">,</span><span class="n">iRow</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span> <span class="kd">::</span> <span class="n">sBuf</span>
+
+    <span class="c">! [ LOCALS ]</span>
+
+    <span class="kt">real</span> <span class="kd">::</span> <span class="n">XA</span><span class="p">,</span><span class="n">XE</span><span class="p">,</span><span class="nb">XOR</span><span class="p">,</span><span class="n">XSTEP</span>
+    <span class="kt">real</span> <span class="kd">::</span> <span class="n">YA</span><span class="p">,</span><span class="n">YE</span><span class="p">,</span><span class="n">YOR</span><span class="p">,</span><span class="n">YSTEP</span>
+    <span class="kt">real</span> <span class="kd">::</span> <span class="n">ZA</span><span class="p">,</span><span class="n">ZE</span><span class="p">,</span><span class="n">ZOR</span><span class="p">,</span><span class="n">ZSTEP</span>
+    <span class="kt">real</span> <span class="kd">::</span> <span class="n">rAspectRatio</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">iX</span><span class="p">,</span> <span class="n">iY</span><span class="p">,</span> <span class="n">iNXW</span><span class="p">,</span> <span class="n">iNYW</span><span class="p">,</span> <span class="n">iNXP</span><span class="p">,</span> <span class="n">iNYP</span>
+    <span class="kt">integer</span> <span class="p">,</span> <span class="k">parameter</span> <span class="kd">::</span> <span class="n">iSZ</span> <span class="o">=</span> <span class="mi">1024</span>    <span class="c">! base graph size</span>
+
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rMin</span><span class="p">,</span> <span class="n">rMean</span><span class="p">,</span> <span class="n">rMax</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">iNumGridCells</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span> <span class="kd">::</span> <span class="n">sPaperSize</span>
+    <span class="kt">real</span> <span class="kd">::</span> <span class="n">rFG_Color</span>
+    <span class="kt">integer</span> <span class="kd">::</span> <span class="n">iBG_Color</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="n">pGrd</span><span class="p">%</span><span class="n">iNX</span><span class="p">,</span><span class="n">pGrd</span><span class="p">%</span><span class="n">iNY</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iMask</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span> <span class="kd">::</span> <span class="n">sDislin</span>
+
+    <span class="c">! is the DISLIN environment variable defined? if so, it is OK</span>
+    <span class="c">! to make a call to BMPFNT</span>
+    <span class="k">call </span><span class="nb">get_environment_variable</span><span class="p">(</span><span class="s2">&quot;DISLIN&quot;</span><span class="p">,</span> <span class="n">sDislin</span><span class="p">)</span>
+
+    <span class="c">! establish number of cells in model grid</span>
+<span class="c">!    iNumGridCells = pGrd%iNY * pGrd%iNX</span>
+    <span class="n">iNumGridCells</span> <span class="o">=</span> <span class="nb">count</span><span class="p">(</span><span class="n">pGrd</span><span class="p">%</span><span class="n">iMask</span> <span class="o">==</span> <span class="n">iACTIVE_CELL</span><span class="p">)</span>
+
+    <span class="n">XA</span> <span class="o">=</span> <span class="kt">REAL</span><span class="p">(</span><span class="n">pGrd</span><span class="p">%</span><span class="n">rX0</span><span class="p">)</span>
+    <span class="n">XE</span> <span class="o">=</span> <span class="kt">REAL</span><span class="p">(</span><span class="n">pGrd</span><span class="p">%</span><span class="n">rX1</span><span class="p">)</span>
+    <span class="nb">XOR</span> <span class="o">=</span> <span class="n">XA</span>
+    <span class="n">XSTEP</span> <span class="o">=</span> <span class="p">(</span><span class="n">XE</span> <span class="o">-</span> <span class="n">XA</span><span class="p">)</span> <span class="o">/</span> <span class="mf">5.</span>
+
+    <span class="n">YA</span> <span class="o">=</span> <span class="kt">REAL</span><span class="p">(</span><span class="n">pGrd</span><span class="p">%</span><span class="n">rY0</span><span class="p">)</span>
+    <span class="n">YE</span> <span class="o">=</span> <span class="kt">REAL</span><span class="p">(</span><span class="n">pGrd</span><span class="p">%</span><span class="n">rY1</span><span class="p">)</span>
+    <span class="n">YOR</span> <span class="o">=</span> <span class="n">YA</span>
+    <span class="n">YSTEP</span> <span class="o">=</span> <span class="p">(</span><span class="n">YE</span> <span class="o">-</span> <span class="n">YA</span><span class="p">)</span> <span class="o">/</span> <span class="mf">5.</span>
+
+    <span class="n">ZA</span> <span class="o">=</span> <span class="kt">REAL</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">rZA</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">iTimeFrame</span><span class="p">))</span>
+    <span class="n">ZE</span> <span class="o">=</span> <span class="kt">REAL</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">rZE</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">iTimeFrame</span><span class="p">))</span>
+    <span class="n">ZOR</span> <span class="o">=</span> <span class="kt">REAL</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">rZOR</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">iTimeFrame</span><span class="p">))</span>
+    <span class="n">ZSTEP</span> <span class="o">=</span> <span class="kt">REAL</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">rZSTEP</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">iTimeFrame</span><span class="p">))</span>
+
+    <span class="n">iX</span> <span class="o">=</span> <span class="nb">INT</span><span class="p">(</span><span class="n">pGrd</span><span class="p">%</span><span class="n">iNX</span><span class="p">)</span>
+    <span class="n">iY</span> <span class="o">=</span> <span class="nb">INT</span><span class="p">(</span><span class="n">pGrd</span><span class="p">%</span><span class="n">iNY</span><span class="p">)</span>
+
+    <span class="k">select case</span><span class="p">(</span><span class="n">pGrd</span><span class="p">%</span><span class="n">iDataType</span><span class="p">)</span>
+
+      <span class="k">case</span><span class="p">(</span><span class="n">DATATYPE_INT</span><span class="p">)</span>
+        <span class="k">do </span><span class="n">iCol</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">iX</span>
+          <span class="k">do </span><span class="n">iRow</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">iY</span>
+            <span class="n">ZMAT</span><span class="p">(</span><span class="n">iCol</span><span class="p">,</span><span class="n">iRow</span><span class="p">)</span> <span class="o">=</span> <span class="kt">REAL</span><span class="p">(</span><span class="n">pGrd</span><span class="p">%</span><span class="n">iData</span><span class="p">(</span><span class="n">iCol</span><span class="p">,(</span><span class="n">iY</span><span class="o">-</span><span class="n">iRow</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+            <span class="n">iMask</span><span class="p">(</span><span class="n">iCol</span><span class="p">,</span> <span class="n">iRow</span><span class="p">)</span> <span class="o">=</span> <span class="n">pGrd</span><span class="p">%</span><span class="n">iMask</span><span class="p">(</span><span class="n">iCol</span><span class="p">,(</span><span class="n">iY</span><span class="o">-</span><span class="n">iRow</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+          <span class="k">end do</span>
+<span class="k">        end do</span>
+
+<span class="k">      case</span><span class="p">(</span><span class="n">DATATYPE_REAL</span><span class="p">)</span>
+        <span class="k">do </span><span class="n">iCol</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">iX</span>
+          <span class="k">do </span><span class="n">iRow</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span><span class="n">iY</span>
+            <span class="n">ZMAT</span><span class="p">(</span><span class="n">iCol</span><span class="p">,</span><span class="n">iRow</span><span class="p">)</span> <span class="o">=</span> <span class="kt">REAL</span><span class="p">(</span><span class="n">pGrd</span><span class="p">%</span><span class="n">rData</span><span class="p">(</span><span class="n">iCol</span><span class="p">,(</span><span class="n">iY</span><span class="o">-</span><span class="n">iRow</span><span class="o">+</span><span class="mi">1</span><span class="p">)))</span>
+            <span class="n">iMask</span><span class="p">(</span><span class="n">iCol</span><span class="p">,</span> <span class="n">iRow</span><span class="p">)</span> <span class="o">=</span> <span class="n">pGrd</span><span class="p">%</span><span class="n">iMask</span><span class="p">(</span><span class="n">iCol</span><span class="p">,(</span><span class="n">iY</span><span class="o">-</span><span class="n">iRow</span><span class="o">+</span><span class="mi">1</span><span class="p">))</span>
+          <span class="k">end do</span>
+<span class="k">        end do</span>
+
+<span class="k">      case</span><span class="p">(</span><span class="n">DATATYPE_CELL_GRID</span><span class="p">)</span>
+
+        <span class="k">call </span><span class="n">Assert</span><span class="p">(</span><span class="n">FALSE</span><span class="p">,</span><span class="s2">&quot;Unsupported grid type (T_GRID_CELL) was used in call&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+          <span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="err">__</span><span class="n">LINE__</span><span class="p">)</span>
+
+    <span class="k">end select</span>
+
+    <span class="c">! if no data and ZA == ZE, make up a maximum and calc ZSTEP</span>
+    <span class="c">! accordingly</span>
+<span class="c">!    if(approx_equal(real(ZA,c_float), real(ZE,c_float) ) ) then</span>
+     <span class="k">if</span><span class="p">(</span> <span class="nb">int</span><span class="p">(</span><span class="n">ZA</span><span class="p">)</span> <span class="o">==</span> <span class="nb">int</span><span class="p">(</span><span class="n">ZE</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<span class="k">      </span><span class="n">ZE</span> <span class="o">=</span> <span class="n">ZA</span> <span class="o">*</span> <span class="mf">1.1</span> <span class="o">+</span> <span class="p">.</span><span class="mi">1</span>
+      <span class="n">ZSTEP</span> <span class="o">=</span> <span class="p">(</span><span class="n">ZE</span> <span class="o">-</span> <span class="n">ZA</span><span class="p">)</span> <span class="o">/</span> <span class="mi">1</span><span class="mf">0.</span>
+    <span class="n">endif</span>
+
+    <span class="n">rMin</span> <span class="o">=</span> <span class="nb">minval</span><span class="p">(</span><span class="n">ZMAT</span><span class="p">,</span> <span class="n">iMask</span> <span class="o">==</span> <span class="n">iACTIVE_CELL</span><span class="p">)</span>
+    <span class="n">rMax</span> <span class="o">=</span> <span class="nb">maxval</span><span class="p">(</span><span class="n">ZMAT</span><span class="p">,</span> <span class="n">iMask</span> <span class="o">==</span> <span class="n">iACTIVE_CELL</span><span class="p">)</span>
+    <span class="n">rMean</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">(</span><span class="n">ZMAT</span><span class="p">,</span> <span class="n">iMask</span> <span class="o">==</span> <span class="n">iACTIVE_CELL</span><span class="p">)</span> <span class="o">/</span> <span class="nb">count</span><span class="p">(</span><span class="n">iMask</span> <span class="o">==</span> <span class="n">iACTIVE_CELL</span><span class="p">)</span>
+
+    <span class="k">write</span><span class="p">(</span><span class="n">sBuf</span><span class="p">,</span><span class="s2">&quot;(a)&quot;</span><span class="p">)</span> <span class="p">&amp;</span>
+       <span class="s2">&quot;min: &quot;</span><span class="o">//</span><span class="nb">adjustl</span><span class="p">(</span><span class="nb">trim</span><span class="p">(</span><span class="n">asCharacter</span><span class="p">(</span><span class="n">rMin</span><span class="p">,</span><span class="n">sFmt</span><span class="o">=</span><span class="s2">&quot;F9.2&quot;</span><span class="p">)))</span> <span class="p">&amp;</span>
+       <span class="o">//</span><span class="s2">&quot;  mean: &quot;</span><span class="o">//</span><span class="nb">adjustl</span><span class="p">(</span><span class="nb">trim</span><span class="p">(</span><span class="n">asCharacter</span><span class="p">(</span><span class="n">rMean</span><span class="p">,</span><span class="n">sFmt</span><span class="o">=</span><span class="s2">&quot;F9.2&quot;</span><span class="p">)))</span> <span class="p">&amp;</span>
+       <span class="o">//</span><span class="s2">&quot;  max: &quot;</span><span class="o">//</span><span class="nb">adjustl</span><span class="p">(</span><span class="nb">trim</span><span class="p">(</span><span class="n">asCharacter</span><span class="p">(</span><span class="n">rMax</span><span class="p">,</span><span class="n">sFmt</span><span class="o">=</span><span class="s2">&quot;F9.2&quot;</span><span class="p">)))</span>
+
+    <span class="c">! METAFL defines the metafile format.</span>
+    <span class="c">! &#39;PS&#39;     defines a coloured PostScript file.</span>
+    <span class="c">! &#39;EPS&#39;     defines an Encapsulated PostScript file. The format is nearly the same as for &#39;PS&#39;.</span>
+    <span class="c">! &#39;PDF&#39;     defines a PDF file.</span>
+    <span class="c">! &#39;WMF&#39;     defines a Windows metafile.</span>
+    <span class="c">! &#39;PNG&#39;     defines a PNG file.</span>
+    <span class="c">! &#39;BMP&#39;     defines a Windows Bitmap format.</span>
+
+      <span class="k">CALL </span><span class="n">METAFL</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cCDEV</span><span class="p">))</span>
+
+    <span class="c">!&#39;USAL&#39;     US paper size A, landscape,  2790 *  2160 points.</span>
+    <span class="c">!&#39;USAP&#39; US paper size A, portrait, 2160 *  2790 points</span>
+<span class="c">!      call SETPAG(TRIM(pGraph(iVarNum)%cPAPER_SIZE))</span>
+
+    <span class="n">rAspectRatio</span> <span class="o">=</span> <span class="kt">REAL</span><span class="p">(</span><span class="n">iX</span><span class="p">)</span> <span class="o">/</span> <span class="kt">REAL</span><span class="p">(</span><span class="n">iY</span><span class="p">)</span>
+
+    <span class="c">! set paper size for Postscript-based output options</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">rAspectRatio</span><span class="o">&gt;</span><span class="mf">1.</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">      </span><span class="n">sPaperSize</span> <span class="o">=</span> <span class="s2">&quot;USAL&quot;</span>
+      <span class="n">iNXP</span> <span class="o">=</span> <span class="mi">2790</span>
+      <span class="n">iNYP</span> <span class="o">=</span> <span class="mi">2160</span>
+    <span class="k">else</span>
+<span class="k">      </span><span class="n">sPaperSize</span> <span class="o">=</span> <span class="s2">&quot;USAP&quot;</span>
+      <span class="n">iNXP</span> <span class="o">=</span> <span class="mi">2160</span>
+      <span class="n">iNYP</span> <span class="o">=</span> <span class="mi">2790</span>
+    <span class="n">endif</span>
+
+<span class="c">!      iNXP = INT(rAspectRatio * REAL(iSZ,c_float))</span>
+    <span class="n">iNXW</span> <span class="o">=</span> <span class="n">iNXP</span>
+
+<span class="c">!      iNYP = INT((1./rAspectRatio) * REAL(iSZ,c_float) * 1.15)</span>
+      <span class="n">iNYW</span> <span class="o">=</span> <span class="n">iNYP</span>
+
+
+<span class="c">!      write(UNIT=LU_LOG,FMT=*) &quot;iX: &quot;,iX,&quot;    iY: &quot;,iY</span>
+<span class="c">!      write(UNIT=LU_LOG,FMT=*) &quot;iNXP: &quot;,iNXP, &quot;   iNYP: &quot;, iNYP</span>
+<span class="c">!      write(UNIT=LU_LOG,FMT=*) &quot; &quot;</span>
+
+<span class="c">!      call PAGE(iNXP,iNYP)</span>
+
+     <span class="c">! WINSIZ: This routine defines the size of windows and the</span>
+     <span class="c">! resolution of DISLIN image formats such as TIFF, PNG, BMP,</span>
+     <span class="c">! PPM and IMAGE. By default, the window size is</span>
+     <span class="c">! set to 2/3 of the screen size, and the resolution of</span>
+     <span class="c">! image formats is 853 x 603 pixels.</span>
+
+    <span class="c">! Allow scaling up to full page size</span>
+    <span class="k">CALL </span><span class="n">SCLMOD</span><span class="p">(</span><span class="s1">&#39;FULL&#39;</span><span class="p">)</span>
+
+    <span class="c">! A output image filename can be set with SETFIL</span>
+    <span class="k">call </span><span class="n">SETFIL</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cSETFIL</span><span class="p">))</span>
+
+    <span class="c">! Set options specific to the desired output type</span>
+    <span class="c">! ==&gt; LEVEL 0 &lt;==</span>
+
+    <span class="k">select case</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cCDEV</span><span class="p">))</span>
+
+      <span class="k">case</span><span class="p">(</span><span class="s2">&quot;PNG&quot;</span><span class="p">)</span>
+
+        <span class="c">! The routine PNGMOD enables transparency for PNG files.</span>
+<span class="c">!        call PNGMOD(&#39;ON&#39;,&#39;TRANSPARENCY&#39;)</span>
+        <span class="k">call </span><span class="n">PAGE</span><span class="p">(</span><span class="n">iNXP</span><span class="p">,</span><span class="n">iNYP</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">WINSIZ</span><span class="p">(</span><span class="n">iNXW</span><span class="o">/</span><span class="mi">2</span><span class="p">,</span><span class="n">iNYW</span><span class="o">/</span><span class="mi">2</span><span class="p">)</span>
+
+      <span class="k">case</span><span class="p">(</span><span class="s2">&quot;PDF&quot;</span><span class="p">)</span>
+
+        <span class="k">call </span><span class="n">SETPAG</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">sPaperSize</span><span class="p">))</span>
+
+      <span class="k">case</span><span class="p">(</span><span class="s2">&quot;GIF&quot;</span><span class="p">)</span>
+
+        <span class="c">! The routine GIFMOD enables transparency for GIF files.</span>
+        <span class="k">call </span><span class="n">GIFMOD</span><span class="p">(</span><span class="s1">&#39;ON&#39;</span><span class="p">,</span><span class="s1">&#39;TRANSPARENCY&#39;</span><span class="p">)</span>
+        <span class="k">call </span><span class="n">WINSIZ</span><span class="p">(</span><span class="n">iNXW</span><span class="p">,</span><span class="n">iNYW</span><span class="p">)</span>
+
+      <span class="k">case</span><span class="p">(</span><span class="s2">&quot;WMF&quot;</span><span class="p">)</span>
+
+      <span class="k">case</span><span class="p">(</span><span class="s2">&quot;TIFF&quot;</span><span class="p">)</span>
+
+        <span class="k">call </span><span class="n">WINSIZ</span><span class="p">(</span><span class="n">iNXW</span><span class="p">,</span><span class="n">iNYW</span><span class="p">)</span>
+
+      <span class="k">case</span><span class="p">(</span><span class="s2">&quot;BMP&quot;</span><span class="p">)</span>
+
+        <span class="k">call </span><span class="n">WINSIZ</span><span class="p">(</span><span class="n">iNXW</span><span class="p">,</span><span class="n">iNYW</span><span class="p">)</span>
+
+      <span class="k">case</span><span class="p">(</span><span class="s2">&quot;PS&quot;</span><span class="p">)</span>
+
+        <span class="k">call </span><span class="n">SETPAG</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">sPaperSize</span><span class="p">))</span>
+
+      <span class="k">case</span><span class="p">(</span><span class="s2">&quot;EPS&quot;</span><span class="p">)</span>
+
+        <span class="k">call </span><span class="n">SETPAG</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">sPaperSize</span><span class="p">))</span>
+
+      <span class="k">case</span><span class="p">(</span><span class="s2">&quot;SVG&quot;</span><span class="p">)</span>
+
+        <span class="k">call </span><span class="n">SETPAG</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">sPaperSize</span><span class="p">))</span>
+
+      <span class="k">case </span><span class="n">default</span>
+
+        <span class="k">call </span><span class="n">assert</span><span class="p">(</span><span class="n">FALSE</span><span class="p">,</span> <span class="s2">&quot;Unknown device specified for output plots.&quot;</span> <span class="p">&amp;</span>
+          <span class="o">//</span><span class="s2">&quot; Device: &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cCDEV</span><span class="p">))</span>
+
+    <span class="k">end select</span>
+
+
+    <span class="c">! WINSIZ: This routine defines the size of windows and the</span>
+    <span class="c">! resolution of DISLIN image formats such as TIFF, PNG, BMP,</span>
+    <span class="c">! PPM and IMAGE. By default, the window size is</span>
+    <span class="c">! set to 2/3 of the screen size, and the resolution of</span>
+    <span class="c">! image formats is 853 x 603 pixels.</span>
+
+    <span class="c">!------------------------------------------------------------</span>
+    <span class="c">! ** INITIALIZE PLOT - MOVE TO LEVEL 1</span>
+    <span class="c">!------------------------------------------------------------</span>
+
+    <span class="c">! DISINI: initializes DISLIN by setting default parameters</span>
+    <span class="c">! and creating a plotfile.</span>
+    <span class="k">CALL </span><span class="n">DISINI</span><span class="p">()</span>
+
+    <span class="c">! ERRMOD: The printing of warnings and the output of the</span>
+    <span class="c">! protocol in DISFIN can be disabled with the routine ERRMOD.</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">lEnableDislinMessages</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">      call </span><span class="n">ERRMOD</span><span class="p">(</span><span class="s1">&#39;ALL&#39;</span><span class="p">,</span><span class="s1">&#39;ON&#39;</span><span class="p">)</span>
+    <span class="k">else</span>
+<span class="k">      call </span><span class="n">ERRMOD</span><span class="p">(</span><span class="s1">&#39;ALL&#39;</span><span class="p">,</span><span class="s1">&#39;OFF&#39;</span><span class="p">)</span>
+    <span class="n">endif</span>
+
+    <span class="c">! SETVLT: selects a colour table.</span>
+    <span class="c">! &#39;SPEC&#39;     defines 256 colours arranged in a rainbow where 0 means</span>
+    <span class="c">! black and 255 means white. This colour table uses more</span>
+    <span class="c">! violet colours than &#39;RAIN&#39;.</span>
+    <span class="k">if</span> <span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cCOLOR_TABLE</span><span class="p">)</span> <span class="o">/=</span> <span class="s2">&quot;CUSTOM&quot;</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">      CALL </span><span class="n">SETVLT</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cCOLOR_TABLE</span><span class="p">))</span>
+    <span class="k">else</span>
+<span class="k">      call </span><span class="n">makeColorTable</span><span class="p">()</span>
+    <span class="n">endif</span>
+
+    <span class="n">rFG_Color</span> <span class="o">=</span> <span class="mf">1.</span>
+    <span class="n">iBG_Color</span> <span class="o">=</span> <span class="mi">0</span>
+
+    <span class="c">! LABELS: The routine LABELS defines contour labels.</span>
+    <span class="k">CALL </span><span class="n">LABELS</span><span class="p">(</span><span class="s1">&#39;FLOAT&#39;</span><span class="p">,</span><span class="s1">&#39;Z&#39;</span><span class="p">)</span>
+
+    <span class="c">! LABDIG: Set the number of digits following the decimal place.</span>
+    <span class="c">! select an appropriate number of digits</span>
+    <span class="k">if</span><span class="p">(</span><span class="n">ZE</span> <span class="o">&gt;=</span> <span class="mi">10</span><span class="mf">0.</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">      CALL </span><span class="n">LABDIG</span> <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="s1">&#39;Z&#39;</span><span class="p">)</span>
+    <span class="n">elseif</span><span class="p">(</span><span class="n">ZE</span> <span class="o">&lt;</span> <span class="mf">1.</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">      CALL </span><span class="n">LABDIG</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="s1">&#39;Z&#39;</span><span class="p">)</span>
+    <span class="k">else</span>
+<span class="k">      CALL </span><span class="n">LABDIG</span> <span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="s1">&#39;Z&#39;</span><span class="p">)</span>
+    <span class="n">endif</span>
+
+    <span class="c">! SETGRF removes a part of an axis or a complete axis from an axis system.</span>
+    <span class="c">! The call is:     CALL SETGRF (C1, C2, C3, C4)     level 1, 2, 3</span>
+    <span class="c">! or:    void setgrf (char *c1, char *c2, char *c3, char *c4);</span>
+    <span class="c">! The parameters can have the values</span>
+    <span class="c">! &#39;NONE&#39;, &#39;LINE&#39;, &#39;TICKS&#39;, &#39;LABELS&#39; and &#39;NAME&#39;.</span>
+    <span class="k">call </span><span class="n">SETGRF</span><span class="p">(</span><span class="s1">&#39;LINES&#39;</span><span class="p">,</span><span class="s1">&#39;LINES&#39;</span><span class="p">,</span><span class="s1">&#39;LINES&#39;</span><span class="p">,</span><span class="s1">&#39;LINES&#39;</span><span class="p">)</span>
+
+    <span class="c">! Set options specific to the desired output type</span>
+    <span class="c">! ==&gt; LEVEL 1 &lt;==</span>
+    <span class="k">if</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cCDEV</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;PNG&quot;</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">      if</span><span class="p">(</span><span class="nb">len_trim</span><span class="p">(</span><span class="n">sDislin</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        CALL </span><span class="n">BMPFNT</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cFONT_NAME</span><span class="p">))</span>
+      <span class="k">else</span>
+<span class="k">        CALL </span><span class="n">DUPLX</span><span class="p">()</span>
+      <span class="n">endif</span>
+      <span class="c">! set the foreground color; SETRGB(1., 1., 1.) should set</span>
+      <span class="c">! background color to &quot;WHITE&quot;</span>
+      <span class="k">call </span><span class="n">SETRGB</span><span class="p">(</span><span class="n">rFG_Color</span><span class="p">,</span> <span class="n">rFG_Color</span><span class="p">,</span> <span class="n">rFG_Color</span><span class="p">)</span>
+      <span class="c">! set the background color</span>
+      <span class="k">CALL </span><span class="n">PAGFLL</span><span class="p">(</span><span class="n">iBG_Color</span><span class="p">)</span>
+
+    <span class="n">elseif</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cCDEV</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;PDF&quot;</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">      CALL </span><span class="n">PSFONT</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cFONT_NAME</span><span class="p">))</span>
+
+    <span class="n">elseif</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cCDEV</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;GIF&quot;</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">      CALL </span><span class="n">HWFONT</span><span class="p">()</span>
+<span class="c">!           call COLOR(&#39;YELLOW&#39;)</span>
+
+    <span class="n">elseif</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cCDEV</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;WMF&quot;</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">      CALL </span><span class="n">WINFNT</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cFONT_NAME</span><span class="p">))</span>
+<span class="c">!           call COLOR(&#39;YELLOW&#39;)</span>
+
+    <span class="n">elseif</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cCDEV</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;TIFF&quot;</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">      CALL </span><span class="n">BMPFNT</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cFONT_NAME</span><span class="p">))</span>
+<span class="c">!           call COLOR(&#39;YELLOW&#39;)</span>
+
+    <span class="n">elseif</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cCDEV</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;BMP&quot;</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">        if</span><span class="p">(</span><span class="nb">len_trim</span><span class="p">(</span><span class="n">sDislin</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">          CALL </span><span class="n">BMPFNT</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cFONT_NAME</span><span class="p">))</span>
+        <span class="k">else</span>
+<span class="k">          CALL </span><span class="n">DUPLX</span><span class="p">()</span>
+        <span class="n">endif</span>
+<span class="c">!           call COLOR(&#39;YELLOW&#39;)</span>
+
+    <span class="n">elseif</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cCDEV</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;PS&quot;</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">      CALL </span><span class="n">PSFONT</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cFONT_NAME</span><span class="p">))</span>
+
+    <span class="n">elseif</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cCDEV</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;EPS&quot;</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">      CALL </span><span class="n">PSFONT</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cFONT_NAME</span><span class="p">))</span>
+
+    <span class="n">elseif</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cCDEV</span><span class="p">)</span><span class="o">==</span><span class="s2">&quot;SVG&quot;</span><span class="p">)</span> <span class="k">then</span>
+<span class="k">      CALL </span><span class="n">PSFONT</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cFONT_NAME</span><span class="p">))</span>
+
+    <span class="n">endif</span>
+
+    <span class="c">! COLOR defines the colours used for plotting text and lines.</span>
+
+
+    <span class="c">! PAGERA: plots a border around the page.</span>
+<span class="c">!      CALL PAGERA()</span>
+
+    <span class="c">! TITLIN: This subroutine defines up to four lines of</span>
+    <span class="c">! text used for axis system titles. The text can be</span>
+    <span class="c">! plotted with TITLE after a call to GRAF.</span>
+
+    <span class="c">! populate second line of title</span>
+    <span class="k">CALL </span><span class="n">TITLIN</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cTITLE</span><span class="p">),</span><span class="mi">2</span><span class="p">)</span>
+    <span class="c">! populate fourth line of title</span>
+    <span class="k">CALL </span><span class="n">TITLIN</span><span class="p">(</span><span class="n">sBuf</span><span class="p">,</span><span class="mi">4</span><span class="p">)</span>
+
+    <span class="k">CALL </span><span class="n">NAME</span><span class="p">(</span><span class="nb">TRIM</span><span class="p">(</span><span class="n">pGraph</span><span class="p">(</span><span class="n">iVarNum</span><span class="p">)%</span><span class="n">cZ_AXIS_TITLE</span><span class="p">),</span><span class="s1">&#39;Z&#39;</span><span class="p">)</span>
+
+    <span class="c">! AUTRES: With a call to AUTRES, the size of coloured rectangles</span>
+    <span class="c">! will be automatically calculated by GRAF3 or CRVMAT.</span>
+    <span class="k">CALL </span><span class="n">AUTRES</span><span class="p">(</span><span class="n">iX</span><span class="p">,</span><span class="n">iY</span><span class="p">)</span>
+
+    <span class="c">! CENTER:  center the axis system on the page</span>
+    <span class="k">call </span><span class="n">CENTER</span><span class="p">()</span>
+
+    <span class="c">! The routine GRAF3 plots a 3-D axis system where the</span>
+    <span class="c">! Z-axis is plotted as a colour bar.</span>
+    <span class="k">CALL </span><span class="n">GRAF3</span><span class="p">(</span><span class="n">XA</span><span class="p">,</span> <span class="p">&amp;</span>
+               <span class="n">XE</span><span class="p">,</span> <span class="p">&amp;</span>
+               <span class="nb">XOR</span><span class="p">,</span> <span class="p">&amp;</span>
+               <span class="n">XSTEP</span><span class="p">,</span> <span class="p">&amp;</span>
+               <span class="n">YA</span><span class="p">,</span> <span class="p">&amp;</span>
+               <span class="n">YE</span><span class="p">,</span> <span class="p">&amp;</span>
+               <span class="n">YOR</span><span class="p">,</span> <span class="p">&amp;</span>
+               <span class="n">YSTEP</span><span class="p">,</span> <span class="p">&amp;</span>
+               <span class="n">ZA</span><span class="p">,</span> <span class="p">&amp;</span>
+               <span class="n">ZE</span><span class="p">,</span> <span class="p">&amp;</span>
+               <span class="n">ZOR</span><span class="p">,</span> <span class="p">&amp;</span>
+               <span class="n">ZSTEP</span><span class="p">)</span>
+
+    <span class="c">! CRVMAT: plots a coloured surface according to a matrix</span>
+    <span class="k">CALL </span><span class="n">CRVMAT</span><span class="p">(</span><span class="n">ZMAT</span><span class="p">,</span><span class="n">iX</span><span class="p">,</span><span class="n">iY</span><span class="p">,</span><span class="mi">1</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+
+    <span class="c">! HEIGHT: defines the character height.</span>
+    <span class="k">CALL </span><span class="n">HEIGHT</span><span class="p">(</span><span class="mi">50</span><span class="p">)</span>
+
+    <span class="c">! TITLE: places the title text onto the page</span>
+    <span class="k">CALL </span><span class="n">TITLE</span><span class="p">()</span>
+
+    <span class="k">CALL </span><span class="n">DISFIN</span><span class="p">()</span>
+    <span class="k">return</span>
+
+<span class="k">  end subroutine </span><span class="n">makegraph</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+
+    </div>
+  </div>
+
+
+    <hr>
+  </div> <!-- /container -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <p>&copy; 2019 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
+            </p>
+        </div>
+        <div class="col-4">
+          <p class="text-right"><small>
+            Documentation for SWB2
+               (version 2.0, build 96) generated by
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on Tue Sep  3 16:54:50 2019 </small>
+          </p>
+        </div>
+        <div class="col">
+          <p class="text-center"> SWB2 was developed by Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt</p>
+        </div>
+      </div>
+      <br>
+    </div> <!-- /container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+  <script src="../js/bootstrap.min.js"></script>
+
+  <!-- MathJax JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+  
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+
+</body>
+
+</html>

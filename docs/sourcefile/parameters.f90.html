@@ -1,0 +1,897 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="">
+  
+  <meta name="author" content="Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt">
+  <link rel="icon" href="../favicon.png">
+
+  <title>parameters.F90 &ndash; SWB2</title>
+
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/pygments.css" rel="stylesheet">
+  <link href="../css/font-awesome.min.css" rel="stylesheet">
+  <link href="../css/bootstrap-toc.css" rel="stylesheet">
+    <!-- <link href="../css/local.css" rel="stylesheet"> -->
+  
+  
+
+  <script src="../js/jquery-2.1.3.min.js"></script>
+  <script src="../js/svg-pan-zoom.min.js"></script>
+  <script src="../js/bootstrap-toc.js"></script>
+
+</head>
+
+<body data-spy="scroll" data-target="#toc">
+
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+
+    <a class="navbar-brand" href="../index.html">SWB2</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" navbar-light bg-light id="navbarText">
+      <ul class="navbar-nav mr-auto">
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../page/index.html">User Guide</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/modules.html">Modules</a>
+          </li>
+        
+
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+          </li>
+        
+
+
+      </ul>
+    </div>
+
+    <form class="form-inline">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+        <!-- <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contents <span class="caret"></span></a>
+            <ul class="dropdown-menu"> -->
+          <!-- 
+            
+              <li><a href="../lists/files.html">Source Files</a></li>
+            
+          
+          
+            <li><a href="../lists/modules.html">Modules</a></li>
+          
+          
+          
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+          
+          
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+           
+            <li><a href="../lists/types.html">Derived Types</a></li>
+          
+          
+            <li><a href="../lists/programs.html">Programs</a></li>
+          
+        </ul> -->
+
+      <!-- </div> -->
+      <!--/.nav-collapse -->
+
+  </nav>
+
+  <div class="container">
+    
+  
+  <div class="row">
+    <h1>parameters.F90
+    <small>Source File</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="card">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 1.6% of total for source files.">283 statements</a>
+     </li>
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/parameters.F90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+  
+     <li class="active">parameters.F90</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-0">Modules</a></h3></div> -->
+  <div class="card-header"><a data-toggle="collapse" href="#mods-0" aria-expanded="true" aria-controls="collapse-example" id="heading-example" class="d-block">
+            <i class="fa fa-chevron-down pull-right"></i>Modules</a>
+  </div>
+
+  <div id="mods-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/parameters.html">parameters</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/parameters.f90.html#src">parameters.F90</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+    <div class="col-md-9" id='text'>
+      
+      <br>
+    
+      
+      
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-1">Modules</a></h3></div> -->
+  <div class="card-header"><a data-toggle="collapse" href="#mods-1" aria-expanded="true" aria-controls="collapse-example" id="heading-example" class="d-block">
+            <i class="fa fa-chevron-down pull-right"></i>Modules</a>
+  </div>
+
+  <div id="mods-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/parameters.html">parameters</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/parameters.f90.html#src">parameters.F90</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    <section>
+      <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="k">module </span><span class="n">parameters</span>
+<a name="ln-2"></a>
+<a name="ln-3"></a>  <span class="k">use </span><span class="nb">iso_c_binding</span><span class="p">,</span> <span class="n">only</span>    <span class="p">:</span> <span class="kt">c_int</span><span class="p">,</span> <span class="kt">c_float</span><span class="p">,</span> <span class="kt">c_double</span><span class="p">,</span> <span class="kt">c_bool</span>
+<a name="ln-4"></a><span class="kt">  </span><span class="k">use </span><span class="n">exceptions</span>
+<a name="ln-5"></a>  <span class="k">use </span><span class="n">file_operations</span><span class="p">,</span> <span class="n">only</span>  <span class="p">:</span> <span class="n">ASCII_FILE_T</span>
+<a name="ln-6"></a>  <span class="k">use </span><span class="n">logfiles</span>
+<a name="ln-7"></a>  <span class="k">use </span><span class="n">fstring</span>
+<a name="ln-8"></a>  <span class="k">use </span><span class="n">fstring_list</span><span class="p">,</span> <span class="n">only</span>     <span class="p">:</span> <span class="n">FSTRING_LIST_T</span>
+<a name="ln-9"></a>  <span class="k">use </span><span class="n">dictionary</span>
+<a name="ln-10"></a>  <span class="k">use </span><span class="n">constants_and_conversions</span>
+<a name="ln-11"></a>  <span class="k">implicit none</span>
+<a name="ln-12"></a>
+<a name="ln-13"></a><span class="k">  private</span>
+<a name="ln-14"></a>
+<a name="ln-15"></a>  <span class="c">!! module to provide a single POC for storage and retrieval of parameter scalars and vectors</span>
+<a name="ln-16"></a>  <span class="c">!! need to provide a method for storing, finding, and retrieving parameters.</span>
+<a name="ln-17"></a>  <span class="c">!! dictionary: keyword, string_list</span>
+<a name="ln-18"></a>
+<a name="ln-19"></a>  <span class="c">!! first create list of files. parse through each file, adding to the param dictionary.</span>
+<a name="ln-20"></a>  <span class="c">!! once complete, allow other modules to interrogate the dictionary. return matches in the</span>
+<a name="ln-21"></a>  <span class="c">!! data type required for the parameter. once all params are in place, the data structures can be</span>
+<a name="ln-22"></a>  <span class="c">!! deallocated.</span>
+<a name="ln-23"></a>
+<a name="ln-24"></a>  <span class="k">type</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">PARAMETERS_T</span>
+<a name="ln-25"></a>
+<a name="ln-26"></a>    <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">filenames</span>
+<a name="ln-27"></a>    <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">delimiters</span>
+<a name="ln-28"></a>    <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">comment_chars</span>
+<a name="ln-29"></a>    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                     <span class="kd">::</span> <span class="nb">count</span>           <span class="o">=</span> <span class="mi">0</span>
+<a name="ln-30"></a>
+<a name="ln-31"></a>  <span class="k">contains</span>
+<a name="ln-32"></a>
+<a name="ln-33"></a><span class="k">    procedure</span>            <span class="kd">::</span> <span class="n">add_filename_to_list_sub</span>
+<a name="ln-34"></a>    <span class="k">generic</span>              <span class="kd">::</span> <span class="n">add_file</span> <span class="o">=&gt;</span> <span class="n">add_filename_to_list_sub</span>
+<a name="ln-35"></a>
+<a name="ln-36"></a>    <span class="k">procedure</span>            <span class="kd">::</span> <span class="n">add_to_param_list_sub</span>
+<a name="ln-37"></a>    <span class="k">generic</span>              <span class="kd">::</span> <span class="n">add_parameters</span> <span class="o">=&gt;</span> <span class="n">add_to_param_list_sub</span>
+<a name="ln-38"></a>
+<a name="ln-39"></a>    <span class="k">procedure</span>            <span class="kd">::</span> <span class="n">munge_files_and_add_to_param_list_sub</span>
+<a name="ln-40"></a>    <span class="k">generic</span>              <span class="kd">::</span> <span class="n">munge_file</span> <span class="o">=&gt;</span> <span class="n">munge_files_and_add_to_param_list_sub</span>
+<a name="ln-41"></a>
+<a name="ln-42"></a>    <span class="k">procedure</span>            <span class="kd">::</span> <span class="n">get_parameter_values_int</span>
+<a name="ln-43"></a>    <span class="k">procedure</span>            <span class="kd">::</span> <span class="n">get_parameter_values_float</span>
+<a name="ln-44"></a>    <span class="k">procedure</span>            <span class="kd">::</span> <span class="n">get_parameter_values_logical</span>
+<a name="ln-45"></a>    <span class="k">procedure</span>            <span class="kd">::</span> <span class="n">get_parameter_table_float</span>
+<a name="ln-46"></a>    <span class="k">procedure</span>            <span class="kd">::</span> <span class="n">get_parameter_values_string_list</span>
+<a name="ln-47"></a>
+<a name="ln-48"></a>    <span class="k">generic</span>              <span class="kd">::</span> <span class="n">get_parameters</span> <span class="o">=&gt;</span> <span class="n">get_parameter_values_int</span><span class="p">,</span>         <span class="p">&amp;</span>
+<a name="ln-49"></a>                                              <span class="n">get_parameter_values_float</span><span class="p">,</span>       <span class="p">&amp;</span>
+<a name="ln-50"></a>                                              <span class="n">get_parameter_table_float</span><span class="p">,</span>        <span class="p">&amp;</span>
+<a name="ln-51"></a>                                              <span class="n">get_parameter_values_logical</span><span class="p">,</span>     <span class="p">&amp;</span>
+<a name="ln-52"></a>                                              <span class="n">get_parameter_values_string_list</span>
+<a name="ln-53"></a>
+<a name="ln-54"></a>    <span class="k">procedure</span>            <span class="kd">::</span> <span class="n">grep_name</span> <span class="o">=&gt;</span> <span class="n">grep_parameter_name</span>
+<a name="ln-55"></a>
+<a name="ln-56"></a>
+<a name="ln-57"></a>    <span class="c">! other functionality:</span>
+<a name="ln-58"></a>    <span class="c">!  * retrieve parameter list:</span>
+<a name="ln-59"></a>    <span class="c">!      1) input = single string</span>
+<a name="ln-60"></a>    <span class="c">!      2) input = string list</span>
+<a name="ln-61"></a>    <span class="c">!  * basic error checking re: number of params in list</span>
+<a name="ln-62"></a>
+<a name="ln-63"></a>
+<a name="ln-64"></a>
+<a name="ln-65"></a>  <span class="k">end type </span><span class="n">PARAMETERS_T</span>
+<a name="ln-66"></a>
+<a name="ln-67"></a>  <span class="k">type</span> <span class="p">(</span><span class="n">PARAMETERS_T</span><span class="p">),</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">PARAMS</span>
+<a name="ln-68"></a>  <span class="k">type</span> <span class="p">(</span><span class="n">DICT_T</span><span class="p">),</span> <span class="k">public</span>       <span class="kd">::</span> <span class="n">PARAMS_DICT</span>
+<a name="ln-69"></a>
+<a name="ln-70"></a>  <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">parameter</span>  <span class="kd">::</span> <span class="n">MAX_TABLE_RECORD_LEN</span> <span class="o">=</span> <span class="mi">2048</span>
+<a name="ln-71"></a>
+<a name="ln-72"></a><span class="k">contains</span>
+<a name="ln-73"></a>
+<a name="ln-74"></a><span class="k">  subroutine </span><span class="n">add_filename_to_list_sub</span><span class="p">(</span> <span class="n">this</span><span class="p">,</span> <span class="n">sFilename</span><span class="p">,</span> <span class="n">sDelimiters</span><span class="p">,</span> <span class="n">sCommentChars</span> <span class="p">)</span>
+<a name="ln-75"></a>
+<a name="ln-76"></a>    <span class="k">class</span> <span class="p">(</span><span class="n">PARAMETERS_T</span><span class="p">)</span>                          <span class="kd">::</span> <span class="n">this</span>
+<a name="ln-77"></a>    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">sFilename</span>
+<a name="ln-78"></a>    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span>       <span class="kd">::</span> <span class="n">sDelimiters</span>
+<a name="ln-79"></a>    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span>       <span class="kd">::</span> <span class="n">sCommentChars</span>
+<a name="ln-80"></a>
+<a name="ln-81"></a>    <span class="c">! [ LOCALS ]</span>
+<a name="ln-82"></a>    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">sDelimiters_l</span>
+<a name="ln-83"></a>    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">sCommentChars_l</span>
+<a name="ln-84"></a>
+<a name="ln-85"></a>    <span class="k">if</span> <span class="p">(</span><span class="nb">present</span><span class="p">(</span><span class="n">sDelimiters</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-86"></a><span class="k">      </span><span class="n">sDelimiters_l</span> <span class="o">=</span> <span class="n">sDelimiters</span>
+<a name="ln-87"></a>    <span class="k">else</span>
+<a name="ln-88"></a><span class="k">      </span><span class="n">sDelimiters_l</span> <span class="o">=</span> <span class="n">WHITESPACE</span>
+<a name="ln-89"></a>    <span class="n">endif</span>
+<a name="ln-90"></a>
+<a name="ln-91"></a>    <span class="k">if</span> <span class="p">(</span> <span class="nb">present</span><span class="p">(</span><span class="n">sCommentChars</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-92"></a><span class="k">      </span><span class="n">sCommentChars_l</span> <span class="o">=</span> <span class="n">sCommentChars</span>
+<a name="ln-93"></a>    <span class="k">else</span>
+<a name="ln-94"></a><span class="k">      </span><span class="n">sCommentChars_l</span> <span class="o">=</span> <span class="s2">&quot;#!&quot;</span>
+<a name="ln-95"></a>    <span class="n">endif</span>
+<a name="ln-96"></a>
+<a name="ln-97"></a>    <span class="n">this</span><span class="p">%</span><span class="nb">count</span> <span class="o">=</span> <span class="n">this</span><span class="p">%</span><span class="nb">count</span> <span class="o">+</span> <span class="mi">1</span>
+<a name="ln-98"></a>
+<a name="ln-99"></a>    <span class="k">call </span><span class="n">this</span><span class="p">%</span><span class="n">filenames</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="n">sFilename</span> <span class="p">)</span>
+<a name="ln-100"></a>    <span class="k">call </span><span class="n">this</span><span class="p">%</span><span class="n">delimiters</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="n">sDelimiters_l</span> <span class="p">)</span>
+<a name="ln-101"></a>    <span class="k">call </span><span class="n">this</span><span class="p">%</span><span class="n">comment_chars</span><span class="p">%</span><span class="n">append</span><span class="p">(</span> <span class="n">sCommentChars_l</span> <span class="p">)</span>
+<a name="ln-102"></a>
+<a name="ln-103"></a>  <span class="k">end subroutine </span><span class="n">add_filename_to_list_sub</span>
+<a name="ln-104"></a>
+<a name="ln-105"></a><span class="c">!--------------------------------------------------------------------------------------------------</span>
+<a name="ln-106"></a>
+<a name="ln-107"></a>  <span class="k">subroutine </span><span class="n">munge_files_and_add_to_param_list_sub</span><span class="p">(</span><span class="n">this</span><span class="p">)</span>
+<a name="ln-108"></a>
+<a name="ln-109"></a>    <span class="k">class</span> <span class="p">(</span><span class="n">PARAMETERS_T</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">this</span>
+<a name="ln-110"></a>
+<a name="ln-111"></a>    <span class="c">! [ LOCALS ]</span>
+<a name="ln-112"></a>    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">iFileIndex</span><span class="p">,</span> <span class="n">iColIndex</span>
+<a name="ln-113"></a>    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">iStat</span>
+<a name="ln-114"></a>    <span class="k">type</span> <span class="p">(</span><span class="n">ASCII_FILE_T</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">DF</span>
+<a name="ln-115"></a>    <span class="k">type</span> <span class="p">(</span><span class="n">DICT_ENTRY_T</span><span class="p">),</span> <span class="k">pointer</span>   <span class="kd">::</span> <span class="n">pDict</span>
+<a name="ln-116"></a>    <span class="k">type</span> <span class="p">(</span><span class="n">DICT_ENTRY_T</span><span class="p">),</span> <span class="k">pointer</span>   <span class="kd">::</span> <span class="n">pCurrentDict</span>
+<a name="ln-117"></a>    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">iNumberOfHeaderLines</span>
+<a name="ln-118"></a>    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">sNumberOfHeaderLines</span>
+<a name="ln-119"></a>    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">tempstr</span>
+<a name="ln-120"></a>    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="n">MAX_TABLE_RECORD_LEN</span><span class="p">)</span> <span class="kd">::</span> <span class="n">sRecord</span><span class="p">,</span> <span class="n">sItem</span>
+<a name="ln-121"></a>
+<a name="ln-122"></a>    <span class="k">if</span> <span class="p">(</span> <span class="n">this</span><span class="p">%</span><span class="nb">count</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-123"></a>
+<a name="ln-124"></a>      <span class="c">! iterate over the list of files</span>
+<a name="ln-125"></a>      <span class="k">do </span><span class="n">iFileIndex</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">this</span><span class="p">%</span><span class="n">filenames</span><span class="p">%</span><span class="nb">count</span>
+<a name="ln-126"></a>
+<a name="ln-127"></a>       <span class="c">! open the file associated with current file index value</span>
+<a name="ln-128"></a>        <span class="k">call </span><span class="n">DF</span><span class="p">%</span><span class="k">open</span><span class="p">(</span><span class="n">sFilename</span> <span class="o">=</span> <span class="n">this</span><span class="p">%</span><span class="n">filenames</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">iFileIndex</span><span class="p">),</span>             <span class="p">&amp;</span>
+<a name="ln-129"></a>                     <span class="n">sCommentChars</span> <span class="o">=</span> <span class="n">this</span><span class="p">%</span><span class="n">comment_chars</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">iFileIndex</span><span class="p">),</span>     <span class="p">&amp;</span>
+<a name="ln-130"></a>                     <span class="n">sDelimiters</span> <span class="o">=</span> <span class="n">this</span><span class="p">%</span><span class="n">delimiters</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">iFileIndex</span><span class="p">)</span> <span class="p">)</span>
+<a name="ln-131"></a>
+<a name="ln-132"></a>        <span class="c">! obtain the headers from the file</span>
+<a name="ln-133"></a>        <span class="n">DF</span><span class="p">%</span><span class="n">slColNames</span> <span class="o">=</span> <span class="n">DF</span><span class="p">%</span><span class="n">readHeader</span><span class="p">()</span>
+<a name="ln-134"></a>
+<a name="ln-135"></a>        <span class="k">call </span><span class="n">LOGS</span><span class="p">%</span><span class="k">write</span><span class="p">(</span> <span class="s2">&quot;Number of columns in file: &quot;</span><span class="o">//</span><span class="n">asCharacter</span><span class="p">(</span> <span class="n">DF</span><span class="p">%</span><span class="n">slColNames</span><span class="p">%</span><span class="nb">count</span> <span class="p">),</span> <span class="n">iTab</span><span class="o">=</span><span class="mi">35</span><span class="p">)</span>
+<a name="ln-136"></a>
+<a name="ln-137"></a>        <span class="c">!call DF%slColNames%print()</span>
+<a name="ln-138"></a>
+<a name="ln-139"></a>        <span class="c">! loop over each column header</span>
+<a name="ln-140"></a>        <span class="k">do </span><span class="n">iColIndex</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">DF</span><span class="p">%</span><span class="n">slColNames</span><span class="p">%</span><span class="nb">count</span>
+<a name="ln-141"></a>
+<a name="ln-142"></a>          <span class="c">! create and allocate memory for dictionary entry</span>
+<a name="ln-143"></a>
+<a name="ln-144"></a>          <span class="n">pDict</span> <span class="o">=&gt;</span> <span class="nb">null</span><span class="p">()</span>
+<a name="ln-145"></a>          <span class="k">allocate</span><span class="p">(</span> <span class="n">pDict</span><span class="p">,</span> <span class="nb">stat</span><span class="o">=</span><span class="n">iStat</span> <span class="p">)</span>
+<a name="ln-146"></a>          <span class="k">call </span><span class="n">assert</span><span class="p">(</span><span class="n">iStat</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Failed to allocate memory for dictionary object&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+<a name="ln-147"></a>              <span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="err">__</span><span class="n">LINE__</span> <span class="p">)</span>
+<a name="ln-148"></a>
+<a name="ln-149"></a>          <span class="c">! this is first obvious failure point when compiling under Intel</span>
+<a name="ln-150"></a>          <span class="n">tempstr</span> <span class="o">=</span> <span class="n">DF</span><span class="p">%</span><span class="n">slColNames</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">iColIndex</span><span class="p">)</span>
+<a name="ln-151"></a>
+<a name="ln-152"></a>          <span class="k">if</span> <span class="p">(</span> <span class="n">PARAMS_DICT</span><span class="p">%</span><span class="n">key_already_in_use</span><span class="p">(</span> <span class="n">tempstr</span> <span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-153"></a>
+<a name="ln-154"></a>            <span class="c">! add dictionary entry to dictionary, tack &quot;DUP&quot; on end of name</span>
+<a name="ln-155"></a>            <span class="n">tempstr</span> <span class="o">=</span> <span class="nb">trim</span><span class="p">(</span><span class="nb">adjustl</span><span class="p">(</span><span class="n">tempstr</span><span class="p">))</span><span class="o">//</span><span class="s2">&quot;_DUP&quot;</span>
+<a name="ln-156"></a>            <span class="c">! update the string list to reflect duplicate entry</span>
+<a name="ln-157"></a>
+<a name="ln-158"></a>            <span class="k">call </span><span class="n">DF</span><span class="p">%</span><span class="n">slColNames</span><span class="p">%</span><span class="n">replace</span><span class="p">(</span> <span class="n">iColIndex</span><span class="p">,</span> <span class="n">tempstr</span> <span class="p">)</span>
+<a name="ln-159"></a>            <span class="k">call </span><span class="n">pDict</span><span class="p">%</span><span class="n">add_key</span><span class="p">(</span> <span class="n">asUppercase</span><span class="p">(</span> <span class="n">tempstr</span> <span class="p">)</span> <span class="p">)</span>
+<a name="ln-160"></a>            <span class="k">call </span><span class="n">PARAMS_DICT</span><span class="p">%</span><span class="n">add_entry</span><span class="p">(</span> <span class="n">pDict</span> <span class="p">)</span>
+<a name="ln-161"></a>
+<a name="ln-162"></a>          <span class="k">else</span>
+<a name="ln-163"></a>
+<a name="ln-164"></a>            <span class="c">! first add the key to the dictionary entry,</span>
+<a name="ln-165"></a>            <span class="c">! then add dictionary entry to dictionary</span>
+<a name="ln-166"></a>            <span class="k">call </span><span class="n">pDict</span><span class="p">%</span><span class="n">add_key</span><span class="p">(</span> <span class="n">asUppercase</span><span class="p">(</span> <span class="n">DF</span><span class="p">%</span><span class="n">slColNames</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">iColIndex</span><span class="p">)</span> <span class="p">)</span> <span class="p">)</span>
+<a name="ln-167"></a>            <span class="k">call </span><span class="n">PARAMS_DICT</span><span class="p">%</span><span class="n">add_entry</span><span class="p">(</span> <span class="n">pDict</span> <span class="p">)</span>
+<a name="ln-168"></a>
+<a name="ln-169"></a>          <span class="n">endif</span>
+<a name="ln-170"></a>
+<a name="ln-171"></a>        <span class="n">enddo</span>
+<a name="ln-172"></a>
+<a name="ln-173"></a>        <span class="c">! now read in the remainder of the file</span>
+<a name="ln-174"></a>        <span class="k">do while</span> <span class="p">(</span> <span class="p">.</span><span class="nb">not</span><span class="p">.</span> <span class="n">DF</span><span class="p">%</span><span class="n">isEOF</span><span class="p">()</span> <span class="p">)</span>
+<a name="ln-175"></a>
+<a name="ln-176"></a>          <span class="c">! read in next line of file</span>
+<a name="ln-177"></a>          <span class="n">sRecord</span> <span class="o">=</span> <span class="n">DF</span><span class="p">%</span><span class="n">readLine</span><span class="p">()</span>
+<a name="ln-178"></a>
+<a name="ln-179"></a>          <span class="c">! skip blank lines</span>
+<a name="ln-180"></a>          <span class="k">if</span> <span class="p">(</span> <span class="nb">len_trim</span><span class="p">(</span><span class="n">sRecord</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="k">cycle</span>
+<a name="ln-181"></a>
+<a name="ln-182"></a>          <span class="c">! loop over each column header</span>
+<a name="ln-183"></a>          <span class="k">do </span><span class="n">iColIndex</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">DF</span><span class="p">%</span><span class="n">slColNames</span><span class="p">%</span><span class="nb">count</span>
+<a name="ln-184"></a>
+<a name="ln-185"></a>            <span class="c">! find pointer associated with header name</span>
+<a name="ln-186"></a>            <span class="c">! (inefficient, but should be OK for small # of columns)</span>
+<a name="ln-187"></a>            <span class="n">pCurrentDict</span> <span class="o">=&gt;</span> <span class="n">PARAMS_DICT</span><span class="p">%</span><span class="n">get_entry</span><span class="p">(</span> <span class="n">DF</span><span class="p">%</span><span class="n">slColNames</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">iColIndex</span><span class="p">)</span> <span class="p">)</span>
+<a name="ln-188"></a>
+<a name="ln-189"></a>            <span class="c">! break off next column of data for the current record</span>
+<a name="ln-190"></a>            <span class="k">call </span><span class="n">chomp</span><span class="p">(</span><span class="n">sRecord</span><span class="p">,</span> <span class="n">sItem</span><span class="p">,</span> <span class="n">this</span><span class="p">%</span><span class="n">delimiters</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">iFileIndex</span><span class="p">)</span> <span class="p">)</span>
+<a name="ln-191"></a>
+<a name="ln-192"></a>            <span class="k">if</span> <span class="p">(</span> <span class="nb">associated</span><span class="p">(</span> <span class="n">pCurrentDict</span> <span class="p">))</span> <span class="k">then</span>
+<a name="ln-193"></a>
+<a name="ln-194"></a>              <span class="c">! if not null, it means that we were able to return a pointer</span>
+<a name="ln-195"></a>              <span class="c">! associated with the current column heading</span>
+<a name="ln-196"></a>              <span class="k">call </span><span class="n">pCurrentDict</span><span class="p">%</span><span class="n">add_value</span><span class="p">(</span> <span class="n">sItem</span> <span class="p">)</span>
+<a name="ln-197"></a>
+<a name="ln-198"></a>            <span class="k">else</span>
+<a name="ln-199"></a>
+<a name="ln-200"></a><span class="k">              call </span><span class="n">warn</span><span class="p">(</span><span class="s2">&quot;Internal programming error: null pointer detected&quot;</span> <span class="p">&amp;</span>
+<a name="ln-201"></a>                <span class="o">//</span><span class="s2">&quot; -- was trying to find pointer associated with column &quot;</span><span class="o">//</span><span class="n">dquote</span><span class="p">(</span><span class="n">DF</span><span class="p">%</span><span class="n">slColNames</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="n">iColIndex</span><span class="p">)),</span> <span class="p">&amp;</span>
+<a name="ln-202"></a>                <span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="err">__</span><span class="n">LINE__</span><span class="p">)</span>
+<a name="ln-203"></a>
+<a name="ln-204"></a>            <span class="n">endif</span>
+<a name="ln-205"></a>
+<a name="ln-206"></a>          <span class="n">enddo</span>
+<a name="ln-207"></a>
+<a name="ln-208"></a>        <span class="n">enddo</span>
+<a name="ln-209"></a>
+<a name="ln-210"></a>        <span class="k">call </span><span class="n">DF</span><span class="p">%</span><span class="k">close</span><span class="p">()</span>
+<a name="ln-211"></a>
+<a name="ln-212"></a>      <span class="n">enddo</span>
+<a name="ln-213"></a>    <span class="n">endif</span>
+<a name="ln-214"></a>
+<a name="ln-215"></a>  <span class="k">end subroutine </span><span class="n">munge_files_and_add_to_param_list_sub</span>
+<a name="ln-216"></a>
+<a name="ln-217"></a><span class="c">!--------------------------------------------------------------------------------------------------</span>
+<a name="ln-218"></a>
+<a name="ln-219"></a>  <span class="k">subroutine </span><span class="n">add_to_param_list_sub</span><span class="p">(</span><span class="n">this</span><span class="p">,</span> <span class="n">sKey</span><span class="p">,</span> <span class="n">sValues</span><span class="p">,</span> <span class="n">iValues</span><span class="p">,</span> <span class="n">fValues</span><span class="p">,</span> <span class="n">dValues</span><span class="p">,</span> <span class="n">lValues</span><span class="p">)</span>
+<a name="ln-220"></a>
+<a name="ln-221"></a>    <span class="k">class</span> <span class="p">(</span><span class="n">PARAMETERS_T</span><span class="p">)</span>                         <span class="kd">::</span> <span class="n">this</span>
+<a name="ln-222"></a>    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">sKey</span>
+<a name="ln-223"></a>    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span>      <span class="kd">::</span> <span class="n">sValues</span><span class="p">(:)</span>
+<a name="ln-224"></a>    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span>   <span class="kd">::</span> <span class="n">iValues</span><span class="p">(:)</span>
+<a name="ln-225"></a>    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span>    <span class="kd">::</span> <span class="n">fValues</span><span class="p">(:)</span>
+<a name="ln-226"></a>    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span>   <span class="kd">::</span> <span class="n">dValues</span><span class="p">(:)</span>
+<a name="ln-227"></a>    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span>  <span class="kd">::</span> <span class="n">lValues</span><span class="p">(:)</span>
+<a name="ln-228"></a>
+<a name="ln-229"></a>    <span class="c">! [ LOCALS ]</span>
+<a name="ln-230"></a>    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>         <span class="kd">::</span> <span class="n">iStat</span>
+<a name="ln-231"></a>    <span class="k">type</span> <span class="p">(</span><span class="n">DICT_ENTRY_T</span><span class="p">),</span> <span class="k">pointer</span> <span class="kd">::</span> <span class="n">pDict</span>
+<a name="ln-232"></a>    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>         <span class="kd">::</span> <span class="n">iIndex</span>
+<a name="ln-233"></a>    <span class="k">type</span> <span class="p">(</span><span class="n">DICT_ENTRY_T</span><span class="p">),</span> <span class="k">pointer</span> <span class="kd">::</span> <span class="n">pCurrentDict</span>
+<a name="ln-234"></a>    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="n">MAX_TABLE_RECORD_LEN</span><span class="p">)</span> <span class="kd">::</span> <span class="n">sRecord</span><span class="p">,</span> <span class="n">sItem</span>
+<a name="ln-235"></a>
+<a name="ln-236"></a>
+<a name="ln-237"></a>    <span class="n">pCurrentDict</span> <span class="o">=&gt;</span> <span class="nb">null</span><span class="p">()</span>
+<a name="ln-238"></a>    <span class="n">pCurrentDict</span> <span class="o">=&gt;</span> <span class="n">PARAMS_DICT</span><span class="p">%</span><span class="n">get_entry</span><span class="p">(</span> <span class="n">sKey</span> <span class="p">)</span>
+<a name="ln-239"></a>
+<a name="ln-240"></a>    <span class="k">if</span> <span class="p">(</span> <span class="p">.</span><span class="nb">not</span><span class="p">.</span> <span class="nb">associated</span><span class="p">(</span> <span class="n">pCurrentDict</span> <span class="p">))</span> <span class="k">then</span>
+<a name="ln-241"></a>
+<a name="ln-242"></a>      <span class="c">! if key does not currently exist, make a new entry with this key value</span>
+<a name="ln-243"></a>      <span class="k">allocate</span><span class="p">(</span> <span class="n">pCurrentDict</span><span class="p">,</span> <span class="nb">stat</span><span class="o">=</span><span class="n">iStat</span> <span class="p">)</span>
+<a name="ln-244"></a>
+<a name="ln-245"></a>      <span class="k">call </span><span class="n">assert</span><span class="p">(</span><span class="n">iStat</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Failed to allocate memory for dictionary object&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+<a name="ln-246"></a>          <span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="err">__</span><span class="n">LINE__</span> <span class="p">)</span>
+<a name="ln-247"></a>
+<a name="ln-248"></a>      <span class="c">! add dictionary entry to dictionary</span>
+<a name="ln-249"></a>      <span class="k">call </span><span class="n">pCurrentDict</span><span class="p">%</span><span class="n">add_key</span><span class="p">(</span> <span class="n">sKey</span> <span class="p">)</span>
+<a name="ln-250"></a>      <span class="k">call </span><span class="n">PARAMS_DICT</span><span class="p">%</span><span class="n">add_entry</span><span class="p">(</span> <span class="n">pCurrentDict</span> <span class="p">)</span>
+<a name="ln-251"></a>
+<a name="ln-252"></a>    <span class="n">endif</span>
+<a name="ln-253"></a>
+<a name="ln-254"></a>    <span class="k">if</span> <span class="p">(</span> <span class="nb">present</span><span class="p">(</span> <span class="n">sValues</span> <span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-255"></a>
+<a name="ln-256"></a><span class="k">      do </span><span class="n">iIndex</span> <span class="o">=</span> <span class="nb">lbound</span><span class="p">(</span><span class="n">sValues</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="nb">ubound</span><span class="p">(</span><span class="n">sValues</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-257"></a>
+<a name="ln-258"></a>        <span class="k">call </span><span class="n">pCurrentDict</span><span class="p">%</span><span class="n">add_value</span><span class="p">(</span> <span class="n">sValues</span><span class="p">(</span> <span class="n">iIndex</span> <span class="p">)</span> <span class="p">)</span>
+<a name="ln-259"></a>
+<a name="ln-260"></a>      <span class="n">enddo</span>
+<a name="ln-261"></a>
+<a name="ln-262"></a>    <span class="k">else if</span> <span class="p">(</span> <span class="nb">present</span> <span class="p">(</span> <span class="n">iValues</span> <span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-263"></a>
+<a name="ln-264"></a><span class="k">      do </span><span class="n">iIndex</span> <span class="o">=</span> <span class="nb">lbound</span><span class="p">(</span><span class="n">iValues</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="nb">ubound</span><span class="p">(</span><span class="n">iValues</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-265"></a>
+<a name="ln-266"></a>        <span class="k">call </span><span class="n">pCurrentDict</span><span class="p">%</span><span class="n">add_value</span><span class="p">(</span> <span class="n">iValues</span><span class="p">(</span> <span class="n">iIndex</span> <span class="p">)</span> <span class="p">)</span>
+<a name="ln-267"></a>
+<a name="ln-268"></a>      <span class="n">enddo</span>
+<a name="ln-269"></a>
+<a name="ln-270"></a>    <span class="k">else if</span> <span class="p">(</span> <span class="nb">present</span> <span class="p">(</span> <span class="n">fValues</span> <span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-271"></a>
+<a name="ln-272"></a><span class="k">      do </span><span class="n">iIndex</span> <span class="o">=</span> <span class="nb">lbound</span><span class="p">(</span><span class="n">fValues</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="nb">ubound</span><span class="p">(</span><span class="n">fValues</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-273"></a>
+<a name="ln-274"></a>        <span class="k">call </span><span class="n">pCurrentDict</span><span class="p">%</span><span class="n">add_value</span><span class="p">(</span> <span class="n">fValues</span><span class="p">(</span> <span class="n">iIndex</span> <span class="p">)</span> <span class="p">)</span>
+<a name="ln-275"></a>
+<a name="ln-276"></a>      <span class="n">enddo</span>
+<a name="ln-277"></a>
+<a name="ln-278"></a>    <span class="k">else if</span> <span class="p">(</span> <span class="nb">present</span> <span class="p">(</span> <span class="n">dValues</span> <span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-279"></a>
+<a name="ln-280"></a><span class="k">      do </span><span class="n">iIndex</span> <span class="o">=</span> <span class="nb">lbound</span><span class="p">(</span><span class="n">dValues</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="nb">ubound</span><span class="p">(</span><span class="n">dValues</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-281"></a>
+<a name="ln-282"></a>        <span class="k">call </span><span class="n">pCurrentDict</span><span class="p">%</span><span class="n">add_value</span><span class="p">(</span> <span class="n">dValues</span><span class="p">(</span> <span class="n">iIndex</span> <span class="p">)</span> <span class="p">)</span>
+<a name="ln-283"></a>
+<a name="ln-284"></a>      <span class="n">enddo</span>
+<a name="ln-285"></a>
+<a name="ln-286"></a>    <span class="k">else if</span> <span class="p">(</span> <span class="nb">present</span> <span class="p">(</span> <span class="n">lValues</span> <span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-287"></a>
+<a name="ln-288"></a><span class="k">      do </span><span class="n">iIndex</span> <span class="o">=</span> <span class="nb">lbound</span><span class="p">(</span><span class="n">lValues</span><span class="p">,</span><span class="mi">1</span><span class="p">),</span> <span class="nb">ubound</span><span class="p">(</span><span class="n">lValues</span><span class="p">,</span><span class="mi">1</span><span class="p">)</span>
+<a name="ln-289"></a>
+<a name="ln-290"></a>        <span class="k">call </span><span class="n">pCurrentDict</span><span class="p">%</span><span class="n">add_value</span><span class="p">(</span> <span class="n">lValues</span><span class="p">(</span> <span class="n">iIndex</span> <span class="p">)</span> <span class="p">)</span>
+<a name="ln-291"></a>
+<a name="ln-292"></a>      <span class="n">enddo</span>
+<a name="ln-293"></a>
+<a name="ln-294"></a>    <span class="n">endif</span>
+<a name="ln-295"></a>
+<a name="ln-296"></a>  <span class="k">end subroutine </span><span class="n">add_to_param_list_sub</span>
+<a name="ln-297"></a>
+<a name="ln-298"></a><span class="c">!--------------------------------------------------------------------------------------------------</span>
+<a name="ln-299"></a>
+<a name="ln-300"></a>  <span class="k">function </span><span class="n">grep_parameter_name</span><span class="p">(</span> <span class="n">this</span><span class="p">,</span> <span class="n">sKey</span><span class="p">,</span> <span class="n">lFatal</span> <span class="p">)</span>      <span class="k">result</span><span class="p">(</span> <span class="n">slList</span> <span class="p">)</span>
+<a name="ln-301"></a>
+<a name="ln-302"></a>    <span class="k">class</span> <span class="p">(</span><span class="n">PARAMETERS_T</span><span class="p">)</span>                                       <span class="kd">::</span> <span class="n">this</span>
+<a name="ln-303"></a>    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                              <span class="kd">::</span> <span class="n">sKey</span>
+<a name="ln-304"></a>    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span>                <span class="kd">::</span> <span class="n">lFatal</span>
+<a name="ln-305"></a>    <span class="k">type</span> <span class="p">(</span> <span class="n">FSTRING_LIST_T</span> <span class="p">)</span>                                     <span class="kd">::</span> <span class="n">slList</span>
+<a name="ln-306"></a>
+<a name="ln-307"></a>    <span class="c">! [ LOCALS ]</span>
+<a name="ln-308"></a>    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span> <span class="kd">::</span> <span class="n">lFatal_l</span>
+<a name="ln-309"></a>
+<a name="ln-310"></a>    <span class="k">if</span> <span class="p">(</span> <span class="nb">present</span> <span class="p">(</span><span class="n">lFatal</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-311"></a><span class="k">      </span><span class="n">lFatal_l</span> <span class="o">=</span> <span class="n">lFatal</span>
+<a name="ln-312"></a>    <span class="k">else</span>
+<a name="ln-313"></a><span class="k">      </span><span class="n">lFatal_l</span> <span class="o">=</span> <span class="n">FALSE</span>
+<a name="ln-314"></a>    <span class="n">endif</span>
+<a name="ln-315"></a>
+<a name="ln-316"></a>    <span class="n">slList</span> <span class="o">=</span> <span class="n">PARAMS_DICT</span><span class="p">%</span><span class="n">grep_keys</span><span class="p">(</span> <span class="n">asUppercase</span><span class="p">(</span> <span class="n">sKey</span> <span class="p">)</span> <span class="p">)</span>
+<a name="ln-317"></a>
+<a name="ln-318"></a>    <span class="k">if</span> <span class="p">(</span> <span class="n">lFatal_l</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-319"></a>
+<a name="ln-320"></a><span class="k">       if</span> <span class="p">(</span> <span class="n">slList</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">.</span><span class="n">strequal</span><span class="p">.</span> <span class="s2">&quot;&lt;NA&gt;&quot;</span> <span class="p">)</span>                              <span class="p">&amp;</span>
+<a name="ln-321"></a>         <span class="k">call </span><span class="n">warn</span><span class="p">(</span> <span class="s2">&quot;Failed to find a lookup table column whose name contains &quot;</span>        <span class="p">&amp;</span>
+<a name="ln-322"></a>           <span class="o">//</span><span class="n">dQuote</span><span class="p">(</span> <span class="n">sKey</span> <span class="p">)</span><span class="o">//</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">lFatal</span> <span class="o">=</span> <span class="n">lFatal_l</span> <span class="p">)</span>
+<a name="ln-323"></a>
+<a name="ln-324"></a>    <span class="n">endif</span>
+<a name="ln-325"></a>
+<a name="ln-326"></a>  <span class="k">end function </span><span class="n">grep_parameter_name</span>
+<a name="ln-327"></a>
+<a name="ln-328"></a><span class="c">!--------------------------------------------------------------------------------------------------</span>
+<a name="ln-329"></a>
+<a name="ln-330"></a>  <span class="k">subroutine </span><span class="n">get_parameter_values_logical</span><span class="p">(</span> <span class="n">this</span><span class="p">,</span> <span class="n">lValues</span><span class="p">,</span> <span class="n">slKeys</span><span class="p">,</span> <span class="n">sKey</span><span class="p">,</span> <span class="n">lFatal</span> <span class="p">)</span>
+<a name="ln-331"></a>
+<a name="ln-332"></a>    <span class="k">class</span> <span class="p">(</span><span class="n">PARAMETERS_T</span><span class="p">)</span>                                        <span class="kd">::</span> <span class="n">this</span>
+<a name="ln-333"></a>    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span> <span class="n">out</span><span class="p">),</span> <span class="k">allocatable</span>          <span class="kd">::</span> <span class="n">lValues</span><span class="p">(:)</span>
+<a name="ln-334"></a>    <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span> <span class="n">out</span><span class="p">),</span>              <span class="k">optional</span> <span class="kd">::</span> <span class="n">slKeys</span>
+<a name="ln-335"></a>    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span>    <span class="k">intent</span><span class="p">(</span><span class="n">in</span> <span class="p">),</span>                 <span class="k">optional</span> <span class="kd">::</span> <span class="n">sKey</span>
+<a name="ln-336"></a>    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span>                 <span class="k">optional</span> <span class="kd">::</span> <span class="n">lFatal</span>
+<a name="ln-337"></a>
+<a name="ln-338"></a>    <span class="c">! [ LOCALS ]</span>
+<a name="ln-339"></a>    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span> <span class="kd">::</span> <span class="n">lFatal_l</span>
+<a name="ln-340"></a>
+<a name="ln-341"></a>    <span class="k">if</span> <span class="p">(</span> <span class="nb">present</span> <span class="p">(</span><span class="n">lFatal</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-342"></a><span class="k">      </span><span class="n">lFatal_l</span> <span class="o">=</span> <span class="n">lFatal</span>
+<a name="ln-343"></a>    <span class="k">else</span>
+<a name="ln-344"></a><span class="k">      </span><span class="n">lFatal_l</span> <span class="o">=</span> <span class="n">FALSE</span>
+<a name="ln-345"></a>    <span class="n">endif</span>
+<a name="ln-346"></a>
+<a name="ln-347"></a>    <span class="k">if</span> <span class="p">(</span> <span class="nb">present</span><span class="p">(</span> <span class="n">slKeys</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-348"></a>
+<a name="ln-349"></a><span class="k">      call </span><span class="n">PARAMS_DICT</span><span class="p">%</span><span class="n">get_values</span><span class="p">(</span> <span class="n">slKeys</span><span class="o">=</span><span class="n">slKeys</span><span class="p">,</span> <span class="n">lValues</span><span class="o">=</span><span class="n">lValues</span><span class="p">,</span>            <span class="p">&amp;</span>
+<a name="ln-350"></a>        <span class="n">is_fatal</span><span class="o">=</span><span class="n">lFatal_l</span> <span class="p">)</span>
+<a name="ln-351"></a>
+<a name="ln-352"></a><span class="c">!       if ( any( iValues &lt;= iTINYVAL ) ) &amp;</span>
+<a name="ln-353"></a><span class="c">!         call warn( &quot;Failed to find a lookup table column named &quot; &amp;</span>
+<a name="ln-354"></a><span class="c">!           //dQuote( slKeys%list_all() )//&quot;.&quot;, lFatal = lFatal_l )</span>
+<a name="ln-355"></a>
+<a name="ln-356"></a>    <span class="k">else if</span> <span class="p">(</span> <span class="nb">present</span><span class="p">(</span> <span class="n">sKey</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-357"></a>
+<a name="ln-358"></a><span class="k">      call </span><span class="n">PARAMS_DICT</span><span class="p">%</span><span class="n">get_values</span><span class="p">(</span> <span class="n">sKey</span><span class="o">=</span><span class="n">sKey</span><span class="p">,</span> <span class="n">lValues</span><span class="o">=</span><span class="n">lValues</span> <span class="p">)</span>
+<a name="ln-359"></a>
+<a name="ln-360"></a><span class="c">!       if ( any( iValues &lt;= iTINYVAL ) ) &amp;</span>
+<a name="ln-361"></a><span class="c">!         call warn( &quot;Failed to find a lookup table column named &quot; &amp;</span>
+<a name="ln-362"></a><span class="c">!           //dQuote( sKey )//&quot;.&quot;, lFatal = lFatal_l )</span>
+<a name="ln-363"></a>
+<a name="ln-364"></a>    <span class="n">endif</span>
+<a name="ln-365"></a>
+<a name="ln-366"></a>  <span class="k">end subroutine </span><span class="n">get_parameter_values_logical</span>
+<a name="ln-367"></a>
+<a name="ln-368"></a><span class="c">!--------------------------------------------------------------------------------------------------</span>
+<a name="ln-369"></a>
+<a name="ln-370"></a>  <span class="k">subroutine </span><span class="n">get_parameter_values_string_list</span><span class="p">(</span> <span class="n">this</span><span class="p">,</span> <span class="n">slValues</span><span class="p">,</span> <span class="n">slKeys</span><span class="p">,</span> <span class="n">sKey</span><span class="p">,</span> <span class="n">lFatal</span> <span class="p">)</span>
+<a name="ln-371"></a>
+<a name="ln-372"></a>    <span class="k">class</span> <span class="p">(</span><span class="n">PARAMETERS_T</span><span class="p">)</span>                               <span class="kd">::</span> <span class="n">this</span>
+<a name="ln-373"></a>    <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">slValues</span>
+<a name="ln-374"></a>    <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">inout</span><span class="p">),</span> <span class="k">optional</span>     <span class="kd">::</span> <span class="n">slKeys</span>
+<a name="ln-375"></a>    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span> <span class="p">),</span> <span class="k">optional</span>           <span class="kd">::</span> <span class="n">sKey</span>
+<a name="ln-376"></a>    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span>             <span class="kd">::</span> <span class="n">lFatal</span>
+<a name="ln-377"></a>
+<a name="ln-378"></a>    <span class="c">! [ LOCALS ]</span>
+<a name="ln-379"></a>    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span> <span class="kd">::</span> <span class="n">lFatal_l</span>
+<a name="ln-380"></a>
+<a name="ln-381"></a>    <span class="k">if</span> <span class="p">(</span> <span class="nb">present</span> <span class="p">(</span><span class="n">lFatal</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-382"></a><span class="k">      </span><span class="n">lFatal_l</span> <span class="o">=</span> <span class="n">lFatal</span>
+<a name="ln-383"></a>    <span class="k">else</span>
+<a name="ln-384"></a><span class="k">      </span><span class="n">lFatal_l</span> <span class="o">=</span> <span class="n">FALSE</span>
+<a name="ln-385"></a>    <span class="n">endif</span>
+<a name="ln-386"></a>
+<a name="ln-387"></a>    <span class="k">if</span> <span class="p">(</span> <span class="nb">present</span><span class="p">(</span> <span class="n">slKeys</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-388"></a>
+<a name="ln-389"></a><span class="k">      call </span><span class="n">PARAMS_DICT</span><span class="p">%</span><span class="n">get_values</span><span class="p">(</span> <span class="n">slKeys</span><span class="o">=</span><span class="n">slKeys</span><span class="p">,</span> <span class="n">slString</span><span class="o">=</span><span class="n">slValues</span><span class="p">,</span>          <span class="p">&amp;</span>
+<a name="ln-390"></a>        <span class="n">is_fatal</span><span class="o">=</span><span class="n">lFatal_l</span> <span class="p">)</span>
+<a name="ln-391"></a>
+<a name="ln-392"></a>       <span class="k">if</span> <span class="p">(</span> <span class="n">slValues</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">.</span><span class="n">strequal</span><span class="p">.</span> <span class="s2">&quot;&lt;NA&gt;&quot;</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-393"></a><span class="k">         call </span><span class="n">warn</span><span class="p">(</span> <span class="s2">&quot;Failed to find a lookup table column named &quot;</span>        <span class="p">&amp;</span>
+<a name="ln-394"></a>           <span class="o">//</span><span class="n">dQuote</span><span class="p">(</span> <span class="n">slKeys</span><span class="p">%</span><span class="n">list_all</span><span class="p">()</span> <span class="p">)</span><span class="o">//</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">lFatal</span> <span class="o">=</span> <span class="n">lFatal_l</span> <span class="p">)</span>
+<a name="ln-395"></a>       <span class="k">end if</span>
+<a name="ln-396"></a>
+<a name="ln-397"></a><span class="k">    else if</span> <span class="p">(</span> <span class="nb">present</span><span class="p">(</span> <span class="n">sKey</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-398"></a>
+<a name="ln-399"></a><span class="k">      call </span><span class="n">PARAMS_DICT</span><span class="p">%</span><span class="n">get_values</span><span class="p">(</span> <span class="n">sKey</span><span class="o">=</span><span class="n">sKey</span><span class="p">,</span> <span class="n">slString</span><span class="o">=</span><span class="n">slValues</span> <span class="p">)</span>
+<a name="ln-400"></a>
+<a name="ln-401"></a>      <span class="k">if</span> <span class="p">(</span> <span class="n">slValues</span><span class="p">%</span><span class="n">get</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="p">.</span><span class="n">strequal</span><span class="p">.</span> <span class="s2">&quot;&lt;NA&gt;&quot;</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-402"></a><span class="k">        call </span><span class="n">warn</span><span class="p">(</span> <span class="s2">&quot;Failed to find a lookup table column named &quot;</span>        <span class="p">&amp;</span>
+<a name="ln-403"></a>          <span class="o">//</span><span class="n">dQuote</span><span class="p">(</span> <span class="n">sKey</span> <span class="p">)</span><span class="o">//</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">lFatal</span> <span class="o">=</span> <span class="n">lFatal_l</span> <span class="p">)</span>
+<a name="ln-404"></a>      <span class="k">end if</span>
+<a name="ln-405"></a>
+<a name="ln-406"></a><span class="k">    </span><span class="n">endif</span>
+<a name="ln-407"></a>
+<a name="ln-408"></a>  <span class="k">end subroutine </span><span class="n">get_parameter_values_string_list</span>
+<a name="ln-409"></a>
+<a name="ln-410"></a><span class="c">!--------------------------------------------------------------------------------------------------</span>
+<a name="ln-411"></a>
+<a name="ln-412"></a>  <span class="k">subroutine </span><span class="n">get_parameter_values_int</span><span class="p">(</span> <span class="n">this</span><span class="p">,</span> <span class="n">iValues</span><span class="p">,</span> <span class="n">slKeys</span><span class="p">,</span> <span class="n">sKey</span><span class="p">,</span> <span class="n">lFatal</span> <span class="p">)</span>
+<a name="ln-413"></a>
+<a name="ln-414"></a>    <span class="k">class</span> <span class="p">(</span><span class="n">PARAMETERS_T</span><span class="p">)</span>                                       <span class="kd">::</span> <span class="n">this</span>
+<a name="ln-415"></a>    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">out</span><span class="p">),</span> <span class="k">allocatable</span>             <span class="kd">::</span> <span class="n">iValues</span><span class="p">(:)</span>
+<a name="ln-416"></a>    <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span> <span class="n">out</span><span class="p">),</span>             <span class="k">optional</span> <span class="kd">::</span> <span class="n">slKeys</span>
+<a name="ln-417"></a>    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span>    <span class="k">intent</span><span class="p">(</span><span class="n">in</span> <span class="p">),</span>                <span class="k">optional</span> <span class="kd">::</span> <span class="n">sKey</span>
+<a name="ln-418"></a>    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span>                <span class="k">optional</span> <span class="kd">::</span> <span class="n">lFatal</span>
+<a name="ln-419"></a>
+<a name="ln-420"></a>    <span class="c">! [ LOCALS ]</span>
+<a name="ln-421"></a>    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span> <span class="kd">::</span> <span class="n">lFatal_l</span>
+<a name="ln-422"></a>
+<a name="ln-423"></a>    <span class="k">if</span> <span class="p">(</span> <span class="nb">present</span> <span class="p">(</span><span class="n">lFatal</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-424"></a><span class="k">      </span><span class="n">lFatal_l</span> <span class="o">=</span> <span class="n">lFatal</span>
+<a name="ln-425"></a>    <span class="k">else</span>
+<a name="ln-426"></a><span class="k">      </span><span class="n">lFatal_l</span> <span class="o">=</span> <span class="n">FALSE</span>
+<a name="ln-427"></a>    <span class="n">endif</span>
+<a name="ln-428"></a>
+<a name="ln-429"></a>
+<a name="ln-430"></a>    <span class="k">if</span> <span class="p">(</span> <span class="nb">present</span><span class="p">(</span> <span class="n">slKeys</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-431"></a>
+<a name="ln-432"></a><span class="k">      call </span><span class="n">PARAMS_DICT</span><span class="p">%</span><span class="n">get_values</span><span class="p">(</span> <span class="n">slKeys</span><span class="o">=</span><span class="n">slKeys</span><span class="p">,</span> <span class="n">iValues</span><span class="o">=</span><span class="n">iValues</span><span class="p">,</span>            <span class="p">&amp;</span>
+<a name="ln-433"></a>        <span class="n">is_fatal</span><span class="o">=</span><span class="n">lFatal_l</span> <span class="p">)</span>
+<a name="ln-434"></a>
+<a name="ln-435"></a>      <span class="k">if</span> <span class="p">(</span> <span class="nb">any</span><span class="p">(</span> <span class="n">iValues</span> <span class="o">&lt;=</span> <span class="n">iTINYVAL</span> <span class="p">)</span> <span class="p">)</span> <span class="p">&amp;</span>
+<a name="ln-436"></a>        <span class="k">call </span><span class="n">warn</span><span class="p">(</span> <span class="s2">&quot;Failed to find a lookup table column named &quot;</span> <span class="p">&amp;</span>
+<a name="ln-437"></a>          <span class="o">//</span><span class="n">dQuote</span><span class="p">(</span> <span class="n">slKeys</span><span class="p">%</span><span class="n">list_all</span><span class="p">()</span> <span class="p">)</span><span class="o">//</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">lFatal</span> <span class="o">=</span> <span class="n">lFatal_l</span> <span class="p">)</span>
+<a name="ln-438"></a>
+<a name="ln-439"></a>    <span class="k">else if</span> <span class="p">(</span> <span class="nb">present</span><span class="p">(</span> <span class="n">sKey</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-440"></a>
+<a name="ln-441"></a><span class="k">      call </span><span class="n">PARAMS_DICT</span><span class="p">%</span><span class="n">get_values</span><span class="p">(</span> <span class="n">sKey</span><span class="o">=</span><span class="n">sKey</span><span class="p">,</span> <span class="n">iValues</span><span class="o">=</span><span class="n">iValues</span><span class="p">,</span>                <span class="p">&amp;</span>
+<a name="ln-442"></a>        <span class="n">is_fatal</span><span class="o">=</span><span class="n">lFatal_l</span> <span class="p">)</span>
+<a name="ln-443"></a>
+<a name="ln-444"></a>      <span class="k">if</span> <span class="p">(</span> <span class="nb">any</span><span class="p">(</span> <span class="n">iValues</span> <span class="o">&lt;=</span> <span class="n">iTINYVAL</span> <span class="p">)</span> <span class="p">)</span> <span class="p">&amp;</span>
+<a name="ln-445"></a>        <span class="k">call </span><span class="n">warn</span><span class="p">(</span> <span class="s2">&quot;Failed to find a lookup table column named &quot;</span> <span class="p">&amp;</span>
+<a name="ln-446"></a>          <span class="o">//</span><span class="n">dQuote</span><span class="p">(</span> <span class="n">sKey</span> <span class="p">)</span><span class="o">//</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">lFatal</span> <span class="o">=</span> <span class="n">lFatal_l</span> <span class="p">)</span>
+<a name="ln-447"></a>
+<a name="ln-448"></a>    <span class="n">endif</span>
+<a name="ln-449"></a>
+<a name="ln-450"></a>  <span class="k">end subroutine </span><span class="n">get_parameter_values_int</span>
+<a name="ln-451"></a>
+<a name="ln-452"></a><span class="c">!--------------------------------------------------------------------------------------------------</span>
+<a name="ln-453"></a>
+<a name="ln-454"></a>  <span class="k">subroutine </span><span class="n">get_parameter_values_float</span><span class="p">(</span> <span class="n">this</span><span class="p">,</span> <span class="n">fValues</span><span class="p">,</span> <span class="n">slKeys</span><span class="p">,</span> <span class="n">sKey</span><span class="p">,</span> <span class="n">lFatal</span> <span class="p">)</span>
+<a name="ln-455"></a>
+<a name="ln-456"></a>    <span class="k">class</span> <span class="p">(</span><span class="n">PARAMETERS_T</span><span class="p">)</span>                                       <span class="kd">::</span> <span class="n">this</span>
+<a name="ln-457"></a>    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span>  <span class="k">intent</span><span class="p">(</span><span class="n">in</span> <span class="n">out</span><span class="p">),</span> <span class="k">allocatable</span>          <span class="kd">::</span> <span class="n">fValues</span><span class="p">(:)</span>
+<a name="ln-458"></a>    <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span> <span class="n">out</span><span class="p">),</span>             <span class="k">optional</span> <span class="kd">::</span> <span class="n">slKeys</span>
+<a name="ln-459"></a>    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span>    <span class="k">intent</span><span class="p">(</span><span class="n">in</span> <span class="p">),</span>                <span class="k">optional</span> <span class="kd">::</span> <span class="n">sKey</span>
+<a name="ln-460"></a>    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span>                <span class="k">optional</span> <span class="kd">::</span> <span class="n">lFatal</span>
+<a name="ln-461"></a>
+<a name="ln-462"></a>    <span class="c">! [ LOCALS ]</span>
+<a name="ln-463"></a>    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span> <span class="kd">::</span> <span class="n">lFatal_l</span>
+<a name="ln-464"></a>
+<a name="ln-465"></a>    <span class="k">if</span> <span class="p">(</span> <span class="nb">present</span> <span class="p">(</span><span class="n">lFatal</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-466"></a><span class="k">      </span><span class="n">lFatal_l</span> <span class="o">=</span> <span class="n">lFatal</span>
+<a name="ln-467"></a>    <span class="k">else</span>
+<a name="ln-468"></a><span class="k">      </span><span class="n">lFatal_l</span> <span class="o">=</span> <span class="n">FALSE</span>
+<a name="ln-469"></a>    <span class="n">endif</span>
+<a name="ln-470"></a>
+<a name="ln-471"></a>    <span class="k">if</span> <span class="p">(</span> <span class="nb">present</span><span class="p">(</span> <span class="n">slKeys</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-472"></a>
+<a name="ln-473"></a><span class="k">      call </span><span class="n">PARAMS_DICT</span><span class="p">%</span><span class="n">get_values</span><span class="p">(</span> <span class="n">slKeys</span><span class="o">=</span><span class="n">slKeys</span><span class="p">,</span> <span class="n">fValues</span><span class="o">=</span><span class="n">fValues</span> <span class="p">)</span>
+<a name="ln-474"></a>
+<a name="ln-475"></a>      <span class="k">if</span> <span class="p">(</span> <span class="nb">any</span><span class="p">(</span> <span class="n">fValues</span> <span class="o">&lt;=</span> <span class="n">fTINYVAL</span> <span class="p">)</span> <span class="p">)</span> <span class="p">&amp;</span>
+<a name="ln-476"></a>        <span class="k">call </span><span class="n">warn</span><span class="p">(</span> <span class="s2">&quot;Failed to find a lookup table column named &quot;</span> <span class="p">&amp;</span>
+<a name="ln-477"></a>          <span class="o">//</span><span class="n">dQuote</span><span class="p">(</span> <span class="n">slKeys</span><span class="p">%</span><span class="n">list_all</span><span class="p">()</span> <span class="p">)</span><span class="o">//</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">lFatal</span> <span class="o">=</span> <span class="n">lFatal_l</span> <span class="p">)</span>
+<a name="ln-478"></a>
+<a name="ln-479"></a>    <span class="k">else if</span> <span class="p">(</span> <span class="nb">present</span><span class="p">(</span> <span class="n">sKey</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-480"></a>
+<a name="ln-481"></a><span class="k">      call </span><span class="n">PARAMS_DICT</span><span class="p">%</span><span class="n">get_values</span><span class="p">(</span> <span class="n">sKey</span><span class="o">=</span><span class="n">sKey</span><span class="p">,</span> <span class="n">fValues</span><span class="o">=</span><span class="n">fValues</span><span class="p">,</span>                <span class="p">&amp;</span>
+<a name="ln-482"></a>        <span class="n">is_fatal</span><span class="o">=</span><span class="n">lFatal_l</span> <span class="p">)</span>
+<a name="ln-483"></a>
+<a name="ln-484"></a>      <span class="k">if</span> <span class="p">(</span> <span class="nb">any</span><span class="p">(</span> <span class="n">fValues</span> <span class="o">&lt;=</span> <span class="n">fTINYVAL</span> <span class="p">)</span> <span class="p">)</span> <span class="p">&amp;</span>
+<a name="ln-485"></a>        <span class="k">call </span><span class="n">warn</span><span class="p">(</span> <span class="s2">&quot;Failed to find a lookup table column named &quot;</span> <span class="p">&amp;</span>
+<a name="ln-486"></a>          <span class="o">//</span><span class="n">dQuote</span><span class="p">(</span> <span class="n">sKey</span> <span class="p">)</span><span class="o">//</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">lFatal</span> <span class="o">=</span> <span class="n">lFatal_l</span> <span class="p">)</span>
+<a name="ln-487"></a>
+<a name="ln-488"></a>    <span class="n">endif</span>
+<a name="ln-489"></a>
+<a name="ln-490"></a>  <span class="k">end subroutine </span><span class="n">get_parameter_values_float</span>
+<a name="ln-491"></a>
+<a name="ln-492"></a><span class="c">!--------------------------------------------------------------------------------------------------</span>
+<a name="ln-493"></a>
+<a name="ln-494"></a>  <span class="k">subroutine </span><span class="n">get_parameter_table_float</span><span class="p">(</span> <span class="n">this</span><span class="p">,</span> <span class="n">fValues</span><span class="p">,</span> <span class="n">sPrefix</span><span class="p">,</span> <span class="n">iNumRows</span><span class="p">,</span> <span class="n">lFatal</span> <span class="p">)</span>
+<a name="ln-495"></a>
+<a name="ln-496"></a>    <span class="k">use </span><span class="n">fstring</span>
+<a name="ln-497"></a>
+<a name="ln-498"></a>    <span class="k">class</span> <span class="p">(</span><span class="n">PARAMETERS_T</span><span class="p">)</span>                                       <span class="kd">::</span> <span class="n">this</span>
+<a name="ln-499"></a>    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span>  <span class="k">intent</span><span class="p">(</span><span class="n">in</span> <span class="n">out</span><span class="p">),</span> <span class="k">allocatable</span>          <span class="kd">::</span> <span class="n">fValues</span><span class="p">(:,:)</span>
+<a name="ln-500"></a>    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=*</span><span class="p">),</span>    <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                           <span class="kd">::</span> <span class="n">sPrefix</span>
+<a name="ln-501"></a>    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">)</span>                           <span class="kd">::</span> <span class="n">iNumRows</span>
+<a name="ln-502"></a>    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span>                <span class="k">optional</span> <span class="kd">::</span> <span class="n">lFatal</span>
+<a name="ln-503"></a>
+<a name="ln-504"></a>    <span class="c">! [ LOCALS ]</span>
+<a name="ln-505"></a>    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">iIndex</span>
+<a name="ln-506"></a>    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">iStat</span>
+<a name="ln-507"></a>    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>         <span class="kd">::</span> <span class="n">sText</span>
+<a name="ln-508"></a>    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">iNumCols</span>
+<a name="ln-509"></a>    <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">)</span>        <span class="kd">::</span> <span class="n">slList</span>
+<a name="ln-510"></a>    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span> <span class="kd">::</span> <span class="n">fTempVal</span><span class="p">(:)</span>
+<a name="ln-511"></a>    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">lFatal_l</span>
+<a name="ln-512"></a>
+<a name="ln-513"></a>    <span class="k">if</span> <span class="p">(</span> <span class="nb">present</span> <span class="p">(</span><span class="n">lFatal</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-514"></a><span class="k">      </span><span class="n">lFatal_l</span> <span class="o">=</span> <span class="n">lFatal</span>
+<a name="ln-515"></a>    <span class="k">else</span>
+<a name="ln-516"></a><span class="k">      </span><span class="n">lFatal_l</span> <span class="o">=</span> <span class="n">FALSE</span>
+<a name="ln-517"></a>    <span class="n">endif</span>
+<a name="ln-518"></a>
+<a name="ln-519"></a>    <span class="n">slList</span> <span class="o">=</span> <span class="n">PARAMS</span><span class="p">%</span><span class="n">grep_name</span><span class="p">(</span> <span class="n">sPrefix</span> <span class="p">)</span>
+<a name="ln-520"></a>
+<a name="ln-521"></a>    <span class="n">iNumCols</span> <span class="o">=</span> <span class="n">slList</span><span class="p">%</span><span class="nb">count</span>
+<a name="ln-522"></a>
+<a name="ln-523"></a><span class="nb">    </span><span class="k">if</span> <span class="p">(</span> <span class="n">iNumCols</span> <span class="o">==</span> <span class="mi">0</span> <span class="p">)</span> <span class="k">then</span>
+<a name="ln-524"></a>
+<a name="ln-525"></a><span class="k">      call </span><span class="n">warn</span><span class="p">(</span> <span class="s2">&quot;Failed to find a lookup table column named &quot;</span> <span class="p">&amp;</span>
+<a name="ln-526"></a>        <span class="o">//</span><span class="n">dQuote</span><span class="p">(</span> <span class="n">sPrefix</span> <span class="p">)</span><span class="o">//</span><span class="s2">&quot;.&quot;</span><span class="p">,</span> <span class="n">lFatal</span> <span class="o">=</span> <span class="n">lFatal_l</span> <span class="p">)</span>
+<a name="ln-527"></a>
+<a name="ln-528"></a>    <span class="k">else</span>
+<a name="ln-529"></a>
+<a name="ln-530"></a><span class="k">      allocate</span><span class="p">(</span> <span class="n">fTempVal</span><span class="p">(</span> <span class="n">iNumRows</span> <span class="p">),</span> <span class="nb">stat</span><span class="o">=</span><span class="n">iStat</span> <span class="p">)</span>
+<a name="ln-531"></a>      <span class="k">call </span><span class="n">assert</span><span class="p">(</span> <span class="n">iStat</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Problem allocating memory.&quot;</span><span class="p">,</span> <span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="err">__</span><span class="n">LINE__</span> <span class="p">)</span>
+<a name="ln-532"></a>
+<a name="ln-533"></a>      <span class="k">allocate</span><span class="p">(</span> <span class="n">fValues</span><span class="p">(</span> <span class="n">iNumRows</span><span class="p">,</span> <span class="n">iNumCols</span> <span class="p">),</span> <span class="nb">stat</span><span class="o">=</span><span class="n">iStat</span> <span class="p">)</span>
+<a name="ln-534"></a>      <span class="k">call </span><span class="n">assert</span><span class="p">(</span> <span class="n">iStat</span> <span class="o">==</span> <span class="mi">0</span><span class="p">,</span> <span class="s2">&quot;Problem allocating memory.&quot;</span>                            <span class="p">&amp;</span>
+<a name="ln-535"></a>        <span class="o">//</span><span class="s2">&quot;~iNumCols: &quot;</span><span class="o">//</span><span class="n">asCharacter</span><span class="p">(</span><span class="n">iNumCols</span><span class="p">)</span><span class="o">//</span><span class="s2">&quot;; iNumRows: &quot;</span><span class="o">//</span><span class="n">asCharacter</span><span class="p">(</span><span class="n">iNumRows</span><span class="p">)</span>  <span class="p">&amp;</span>
+<a name="ln-536"></a>        <span class="o">//</span><span class="s2">&quot; sPrefix: &quot;</span><span class="o">//</span><span class="n">dQuote</span><span class="p">(</span><span class="n">sPrefix</span><span class="p">),</span> <span class="err">__</span><span class="n">SRCNAME__</span><span class="p">,</span> <span class="err">__</span><span class="n">LINE__</span> <span class="p">)</span>
+<a name="ln-537"></a>
+<a name="ln-538"></a>      <span class="k">do </span><span class="n">iIndex</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span> <span class="n">iNumCols</span>
+<a name="ln-539"></a>
+<a name="ln-540"></a>        <span class="n">sText</span> <span class="o">=</span> <span class="nb">trim</span><span class="p">(</span> <span class="n">slList</span><span class="p">%</span><span class="n">get</span><span class="p">(</span> <span class="n">iIndex</span> <span class="p">)</span> <span class="p">)</span>
+<a name="ln-541"></a>        <span class="k">call </span><span class="n">PARAMS_DICT</span><span class="p">%</span><span class="n">get_values</span><span class="p">(</span> <span class="n">sKey</span><span class="o">=</span><span class="n">sText</span><span class="p">,</span> <span class="n">fValues</span><span class="o">=</span><span class="n">fTempVal</span><span class="p">,</span>            <span class="p">&amp;</span>
+<a name="ln-542"></a>          <span class="n">is_fatal</span><span class="o">=</span><span class="n">lFatal_l</span> <span class="p">)</span>
+<a name="ln-543"></a>
+<a name="ln-544"></a>        <span class="k">call </span><span class="n">assert</span><span class="p">(</span> <span class="n">size</span><span class="p">(</span> <span class="n">fTempVal</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="o">==</span> <span class="n">size</span><span class="p">(</span> <span class="n">fValues</span><span class="p">,</span> <span class="mi">1</span><span class="p">),</span>                 <span class="p">&amp;</span>
+<a name="ln-545"></a>          <span class="s2">&quot;Mismatch in array size. Dictionary key: &quot;</span><span class="o">//</span><span class="n">squote</span><span class="p">(</span> <span class="n">sText</span> <span class="p">)</span>         <span class="p">&amp;</span>
+<a name="ln-546"></a>          <span class="o">//</span><span class="s2">&quot;  expected size: &quot;</span><span class="o">//</span><span class="n">asCharacter</span><span class="p">(</span> <span class="n">size</span><span class="p">(</span> <span class="n">fValues</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">)</span>             <span class="p">&amp;</span>
+<a name="ln-547"></a>          <span class="o">//</span><span class="s2">&quot;  size of items in dictionary: &quot;</span>                                 <span class="p">&amp;</span>
+<a name="ln-548"></a>          <span class="o">//</span><span class="n">asCharacter</span><span class="p">(</span> <span class="n">size</span><span class="p">(</span> <span class="n">fTempVal</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span> <span class="p">)</span>   <span class="p">)</span>
+<a name="ln-549"></a>
+<a name="ln-550"></a>        <span class="n">fValues</span><span class="p">(:,</span><span class="n">iIndex</span><span class="p">)</span> <span class="o">=</span> <span class="n">fTempVal</span>
+<a name="ln-551"></a>      <span class="n">enddo</span>
+<a name="ln-552"></a>
+<a name="ln-553"></a>    <span class="n">endif</span>
+<a name="ln-554"></a>
+<a name="ln-555"></a>  <span class="k">end subroutine </span><span class="n">get_parameter_table_float</span>
+<a name="ln-556"></a>
+<a name="ln-557"></a><span class="k">end module </span><span class="n">parameters</span>
+</pre></div>
+
+    </section>
+    </div>
+  </div>
+
+  
+    <hr>
+  </div> <!-- /container -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <p>&copy; 2019 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
+            </p>
+        </div>
+        <div class="col-4">
+          <p class="text-right"><small>
+            Documentation for SWB2
+               (version 2.0, build 96) generated by
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on Tue Sep  3 16:54:50 2019 </small>
+          </p>
+        </div>
+        <div class="col">
+          <p class="text-center"> SWB2 was developed by Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt</p>
+        </div>
+      </div>
+      <br>
+    </div> <!-- /container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+  <script src="../js/bootstrap.min.js"></script>
+
+  <!-- MathJax JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+  
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+
+</body>
+
+</html>

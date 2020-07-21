@@ -1,0 +1,2045 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="">
+  
+  <meta name="author" content="Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt">
+  <link rel="icon" href="../favicon.png">
+
+  <title>DATA_CATALOG_T &ndash; SWB2 </title>
+
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/pygments.css" rel="stylesheet">
+  <link href="../css/font-awesome.min.css" rel="stylesheet">
+  <link href="../css/bootstrap-toc.css" rel="stylesheet">
+    <!-- <link href="../css/local.css" rel="stylesheet"> -->
+  
+  
+
+  <script src="../js/jquery-2.1.3.min.js"></script>
+  <script src="../js/svg-pan-zoom.min.js"></script>
+  <script src="../js/bootstrap-toc.js"></script>
+
+</head>
+
+<body data-spy="scroll" data-target="#toc">
+
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+
+    <a class="navbar-brand" href="../index.html">SWB2</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" navbar-light bg-light id="navbarText">
+      <ul class="navbar-nav mr-auto">
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../page/index.html">User Guide</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/modules.html">Modules</a>
+          </li>
+        
+
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+          </li>
+        
+
+
+      </ul>
+    </div>
+
+    <form class="form-inline">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+        <!-- <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contents <span class="caret"></span></a>
+            <ul class="dropdown-menu"> -->
+          <!-- 
+            
+              <li><a href="../lists/files.html">Source Files</a></li>
+            
+          
+          
+            <li><a href="../lists/modules.html">Modules</a></li>
+          
+          
+          
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+          
+          
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+           
+            <li><a href="../lists/types.html">Derived Types</a></li>
+          
+          
+            <li><a href="../lists/programs.html">Programs</a></li>
+          
+        </ul> -->
+
+      <!-- </div> -->
+      <!--/.nav-collapse -->
+
+  </nav>
+
+  <div class="container">
+    
+  
+  <div class="row">
+    <h1>DATA_CATALOG_T
+    <small>Derived Type</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="card">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title="<p> 2.9% of total for derived types.</p>Including implementation: 293 statements,  3.7% of total for derived types.">25 statements</a>
+     </li>
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/data_catalog.F90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+     <li><a href='../sourcefile/data_catalog.f90.html'>data_catalog.F90</a></li>
+    
+     <li><a href='../module/data_catalog.html'>data_catalog</a></li>
+    
+  
+     <li class="active">DATA_CATALOG_T</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+
+
+
+
+
+<div class="card bg-primary">
+    <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-0">Modules</a></h3></div> -->
+    <div class="card-header"><a data-toggle="collapse" href="#var-0" aria-expanded="true" aria-controls="collapse-example" id="variables-header" class="d-block">
+              <i class="fa fa-chevron-down pull-right"></i>Variables</a>
+    </div>
+
+  <div id="var-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#variable-first">first</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#variable-last">last</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#variable-current">current</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#variable-count">count</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#boundprocs-0">Type-Bound Procedures</a></h3></div>
+  <div id="boundprocs-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-catalog_add_entry_sub">catalog_add_entry_sub</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-catalog_delete_entry_sub">catalog_delete_entry_sub</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-catalog_find_key_fn">catalog_find_key_fn</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-catalog_find_next_key_fn">catalog_find_next_key_fn</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-catalog_get_entry_at_index_fn">catalog_get_entry_at_index_fn</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-catalog_print_sub">catalog_print_sub</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-catalog_set_all_proj4_string_sub">catalog_set_all_PROJ4_string_sub</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-catalog_set_all_start_year_sub">catalog_set_all_start_year_sub</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-catalog_set_all_end_year_sub">catalog_set_all_end_year_sub</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-add">add</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-delete">delete</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-find">find</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-next">next</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-get">get</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-print">print</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-set_proj4">set_PROJ4</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-set_endyear">set_EndYear</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-set_startyear">set_StartYear</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/data_catalog_t.html#src">DATA_CATALOG_T</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      <h2>type, public :: DATA_CATALOG_T</h2>
+    
+    
+    
+    
+    <br>
+
+    <!-- <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+
+
+
+
+
+<div class="card bg-primary">
+    <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-1">Modules</a></h3></div> -->
+    <div class="card-header"><a data-toggle="collapse" href="#var-1" aria-expanded="true" aria-controls="collapse-example" id="variables-header" class="d-block">
+              <i class="fa fa-chevron-down pull-right"></i>Variables</a>
+    </div>
+
+  <div id="var-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#variable-first">first</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#variable-last">last</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#variable-current">current</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#variable-count">count</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#boundprocs-1">Type-Bound Procedures</a></h3></div>
+  <div id="boundprocs-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-catalog_add_entry_sub">catalog_add_entry_sub</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-catalog_delete_entry_sub">catalog_delete_entry_sub</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-catalog_find_key_fn">catalog_find_key_fn</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-catalog_find_next_key_fn">catalog_find_next_key_fn</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-catalog_get_entry_at_index_fn">catalog_get_entry_at_index_fn</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-catalog_print_sub">catalog_print_sub</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-catalog_set_all_proj4_string_sub">catalog_set_all_PROJ4_string_sub</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-catalog_set_all_start_year_sub">catalog_set_all_start_year_sub</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-catalog_set_all_end_year_sub">catalog_set_all_end_year_sub</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-add">add</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-delete">delete</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-find">find</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-next">next</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-get">get</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-print">print</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-set_proj4">set_PROJ4</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-set_endyear">set_EndYear</a>
+      
+      <a class="list-group-item" href="../type/data_catalog_t.html#boundprocedure-set_startyear">set_StartYear</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/data_catalog_t.html#src">DATA_CATALOG_T</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md"> -->
+
+    
+    <section>
+    <h2>Components</h2>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-first"></span>type(DATA_CATALOG_ENTRY_T),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>first</strong></td><td>=> </td><td>null()</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-last"></span>type(DATA_CATALOG_ENTRY_T),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>last</strong></td><td>=> </td><td>null()</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-current"></span>type(DATA_CATALOG_ENTRY_T),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>current</strong></td><td>=> </td><td>null()</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-count"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>count</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    </section>
+    <br>
+    
+
+    
+
+    
+
+    
+    <section>
+    <h2>Type-Bound Procedures</h2>
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-catalog_add_entry_sub"></span><h3>procedure, public :: <strong>catalog_add_entry_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine catalog_add_entry_sub(this, key, data)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/data_catalog_t.html'>DATA_CATALOG_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>key</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(DATA_CATALOG_ENTRY_T),</td>
+  <td></td>
+  <td></td>
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>data</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-catalog_delete_entry_sub"></span><h3>procedure, public :: <strong>catalog_delete_entry_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine catalog_delete_entry_sub(this, key)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/data_catalog_t.html'>DATA_CATALOG_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>key</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-catalog_find_key_fn"></span><h3>procedure, public :: <strong>catalog_find_key_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function catalog_find_key_fn(this, key) result(data)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/data_catalog_t.html'>DATA_CATALOG_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>key</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>type(DATA_CATALOG_ENTRY_T),
+  pointer</small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-catalog_find_next_key_fn"></span><h3>procedure, public :: <strong>catalog_find_next_key_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function catalog_find_next_key_fn(this, key) result(data)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/data_catalog_t.html'>DATA_CATALOG_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>key</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>type(DATA_CATALOG_ENTRY_T),
+  pointer</small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-catalog_get_entry_at_index_fn"></span><h3>procedure, public :: <strong>catalog_get_entry_at_index_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function catalog_get_entry_at_index_fn(this, index) result(data)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/data_catalog_t.html'>DATA_CATALOG_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>index</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>type(DATA_CATALOG_ENTRY_T),
+  pointer</small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-catalog_print_sub"></span><h3>procedure, public :: <strong>catalog_print_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine catalog_print_sub(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/data_catalog_t.html'>DATA_CATALOG_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-catalog_set_all_proj4_string_sub"></span><h3>procedure, public :: <strong>catalog_set_all_PROJ4_string_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine catalog_set_all_PROJ4_string_sub(this, PROJ4_string)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/data_catalog_t.html'>DATA_CATALOG_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>PROJ4_string</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-catalog_set_all_start_year_sub"></span><h3>procedure, public :: <strong>catalog_set_all_start_year_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine catalog_set_all_start_year_sub(this, iStartYear)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/data_catalog_t.html'>DATA_CATALOG_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iStartYear</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-catalog_set_all_end_year_sub"></span><h3>procedure, public :: <strong>catalog_set_all_end_year_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine catalog_set_all_end_year_sub(this, iEndYear)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/data_catalog_t.html'>DATA_CATALOG_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iEndYear</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-add"></span><h3>generic, public :: <strong>add</strong>  => <a href='../type/data_catalog_t.html#boundprocedure-catalog_add_entry_sub'>catalog_add_entry_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine catalog_add_entry_sub(this, key, data)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/data_catalog_t.html'>DATA_CATALOG_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>key</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(DATA_CATALOG_ENTRY_T),</td>
+  <td></td>
+  <td></td>
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>data</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-delete"></span><h3>generic, public :: <strong>delete</strong>  => <a href='../type/data_catalog_t.html#boundprocedure-catalog_delete_entry_sub'>catalog_delete_entry_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine catalog_delete_entry_sub(this, key)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/data_catalog_t.html'>DATA_CATALOG_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>key</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-find"></span><h3>generic, public :: <strong>find</strong>  => <a href='../type/data_catalog_t.html#boundprocedure-catalog_find_key_fn'>catalog_find_key_fn</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function catalog_find_key_fn(this, key) result(data)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/data_catalog_t.html'>DATA_CATALOG_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>key</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>type(DATA_CATALOG_ENTRY_T),
+  pointer</small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-next"></span><h3>generic, public :: <strong>next</strong>  => <a href='../type/data_catalog_t.html#boundprocedure-catalog_find_next_key_fn'>catalog_find_next_key_fn</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function catalog_find_next_key_fn(this, key) result(data)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/data_catalog_t.html'>DATA_CATALOG_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>key</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>type(DATA_CATALOG_ENTRY_T),
+  pointer</small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-get"></span><h3>generic, public :: <strong>get</strong>  => <a href='../type/data_catalog_t.html#boundprocedure-catalog_get_entry_at_index_fn'>catalog_get_entry_at_index_fn</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function catalog_get_entry_at_index_fn(this, index) result(data)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/data_catalog_t.html'>DATA_CATALOG_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>index</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>type(DATA_CATALOG_ENTRY_T),
+  pointer</small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-print"></span><h3>generic, public :: <strong>print</strong>  => <a href='../type/data_catalog_t.html#boundprocedure-catalog_print_sub'>catalog_print_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine catalog_print_sub(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/data_catalog_t.html'>DATA_CATALOG_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-set_proj4"></span><h3>generic, public :: <strong>set_PROJ4</strong>  => <a href='../type/data_catalog_t.html#boundprocedure-catalog_set_all_proj4_string_sub'>catalog_set_all_PROJ4_string_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine catalog_set_all_PROJ4_string_sub(this, PROJ4_string)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/data_catalog_t.html'>DATA_CATALOG_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>PROJ4_string</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-set_endyear"></span><h3>generic, public :: <strong>set_EndYear</strong>  => <a href='../type/data_catalog_t.html#boundprocedure-catalog_set_all_end_year_sub'>catalog_set_all_end_year_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine catalog_set_all_end_year_sub(this, iEndYear)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/data_catalog_t.html'>DATA_CATALOG_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iEndYear</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-set_startyear"></span><h3>generic, public :: <strong>set_StartYear</strong>  => <a href='../type/data_catalog_t.html#boundprocedure-catalog_set_all_start_year_sub'>catalog_set_all_start_year_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine catalog_set_all_start_year_sub(this, iStartYear)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/data_catalog_t.html'>DATA_CATALOG_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iStartYear</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+    </section>
+    
+
+    
+    <section>
+    <h3><span class="anchor" id="src"></span>Source Code</h3>
+    <div class="highlight"><pre><span></span>  <span class="k">type </span><span class="n">DATA_CATALOG_T</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">DATA_CATALOG_ENTRY_T</span><span class="p">),</span> <span class="k">pointer</span>            <span class="kd">::</span> <span class="n">first</span>    <span class="o">=&gt;</span> <span class="nb">null</span><span class="p">()</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">DATA_CATALOG_ENTRY_T</span><span class="p">),</span> <span class="k">pointer</span>            <span class="kd">::</span> <span class="n">last</span>     <span class="o">=&gt;</span> <span class="nb">null</span><span class="p">()</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">DATA_CATALOG_ENTRY_T</span><span class="p">),</span> <span class="k">pointer</span>            <span class="kd">::</span> <span class="n">current</span>  <span class="o">=&gt;</span> <span class="nb">null</span><span class="p">()</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                            <span class="kd">::</span> <span class="nb">count</span>    <span class="o">=</span> <span class="mi">0</span>
+  <span class="k">contains</span>
+
+<span class="k">    procedure</span> <span class="kd">::</span> <span class="n">catalog_add_entry_sub</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">catalog_delete_entry_sub</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">catalog_find_key_fn</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">catalog_find_next_key_fn</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">catalog_get_entry_at_index_fn</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">catalog_print_sub</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">catalog_set_all_PROJ4_string_sub</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">catalog_set_all_start_year_sub</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">catalog_set_all_end_year_sub</span>
+
+    <span class="k">generic</span> <span class="kd">::</span> <span class="n">add</span> <span class="o">=&gt;</span> <span class="n">catalog_add_entry_sub</span>
+    <span class="k">generic</span> <span class="kd">::</span> <span class="n">delete</span> <span class="o">=&gt;</span> <span class="n">catalog_delete_entry_sub</span>
+    <span class="k">generic</span> <span class="kd">::</span> <span class="n">find</span> <span class="o">=&gt;</span> <span class="n">catalog_find_key_fn</span>
+    <span class="k">generic</span> <span class="kd">::</span> <span class="n">next</span> <span class="o">=&gt;</span> <span class="n">catalog_find_next_key_fn</span>
+    <span class="k">generic</span> <span class="kd">::</span> <span class="n">get</span> <span class="o">=&gt;</span> <span class="n">catalog_get_entry_at_index_fn</span>
+    <span class="k">generic</span> <span class="kd">::</span> <span class="k">print</span> <span class="o">=&gt;</span> <span class="n">catalog_print_sub</span>
+    <span class="k">generic</span> <span class="kd">::</span> <span class="n">set_PROJ4</span> <span class="o">=&gt;</span> <span class="n">catalog_set_all_PROJ4_string_sub</span>
+    <span class="k">generic</span> <span class="kd">::</span> <span class="n">set_EndYear</span> <span class="o">=&gt;</span> <span class="n">catalog_set_all_end_year_sub</span>
+    <span class="k">generic</span> <span class="kd">::</span> <span class="n">set_StartYear</span> <span class="o">=&gt;</span> <span class="n">catalog_set_all_start_year_sub</span>
+
+  <span class="k">end type </span><span class="n">DATA_CATALOG_T</span>
+</pre></div>
+
+    </section>
+    
+
+    </div>
+  </div>
+
+
+    <hr>
+  </div> <!-- /container -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <p>&copy; 2019 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
+            </p>
+        </div>
+        <div class="col-4">
+          <p class="text-right"><small>
+            Documentation for SWB2
+               (version 2.0, build 96) generated by
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on Tue Sep  3 16:54:50 2019 </small>
+          </p>
+        </div>
+        <div class="col">
+          <p class="text-center"> SWB2 was developed by Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt</p>
+        </div>
+      </div>
+      <br>
+    </div> <!-- /container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+  <script src="../js/bootstrap.min.js"></script>
+
+  <!-- MathJax JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+  
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+
+</body>
+
+</html>

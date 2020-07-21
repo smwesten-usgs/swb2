@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="">
+  
+  <meta name="author" content="Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt">
+  <link rel="icon" href="../favicon.png">
+
+  <title>main.F90 &ndash; SWB2</title>
+
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/pygments.css" rel="stylesheet">
+  <link href="../css/font-awesome.min.css" rel="stylesheet">
+  <link href="../css/bootstrap-toc.css" rel="stylesheet">
+    <!-- <link href="../css/local.css" rel="stylesheet"> -->
+  
+  
+
+  <script src="../js/jquery-2.1.3.min.js"></script>
+  <script src="../js/svg-pan-zoom.min.js"></script>
+  <script src="../js/bootstrap-toc.js"></script>
+
+</head>
+
+<body data-spy="scroll" data-target="#toc">
+
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+
+    <a class="navbar-brand" href="../index.html">SWB2</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" navbar-light bg-light id="navbarText">
+      <ul class="navbar-nav mr-auto">
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../page/index.html">User Guide</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/modules.html">Modules</a>
+          </li>
+        
+
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+          </li>
+        
+
+
+      </ul>
+    </div>
+
+    <form class="form-inline">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+        <!-- <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contents <span class="caret"></span></a>
+            <ul class="dropdown-menu"> -->
+          <!-- 
+            
+              <li><a href="../lists/files.html">Source Files</a></li>
+            
+          
+          
+            <li><a href="../lists/modules.html">Modules</a></li>
+          
+          
+          
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+          
+          
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+           
+            <li><a href="../lists/types.html">Derived Types</a></li>
+          
+          
+            <li><a href="../lists/programs.html">Programs</a></li>
+          
+        </ul> -->
+
+      <!-- </div> -->
+      <!--/.nav-collapse -->
+
+  </nav>
+
+  <div class="container">
+    
+  
+  <div class="row">
+    <h1>main.F90
+    <small>Source File</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="card">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 0.7% of total for source files.">129 statements</a>
+     </li>
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/main.F90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+  
+     <li class="active">main.F90</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#progs-0">Programs</a></h3></div>
+  <div id="progs-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../program/main.html">main</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/main.f90.html#src">main.F90</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+    <div class="col-md-9" id='text'>
+      
+      <br>
+    
+      
+      
+
+    <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#progs-1">Programs</a></h3></div>
+  <div id="progs-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../program/main.html">main</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../sourcefile/main.f90.html#src">main.F90</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md">
+
+    <section>
+      <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="hl"><pre><span></span><a name="ln-1"></a><span class="c">!&gt; @file</span>
+<a name="ln-2"></a><span class="c">!&gt;  Main program which references all other modules; execution begins here.</span>
+<a name="ln-3"></a>
+<a name="ln-4"></a>
+<a name="ln-5"></a><span class="c">!&gt;  Main program which references all other modules; execution begins here.</span>
+<a name="ln-6"></a><span class="c">!&gt;</span>
+<a name="ln-7"></a><span class="c">!&gt; Accepts command-line arguments and makes a single call</span>
+<a name="ln-8"></a><span class="c">!&gt; to the control_setModelOptions routine in module \ref control.</span>
+<a name="ln-9"></a><span class="k">program </span><span class="n">main</span>
+<a name="ln-10"></a>
+<a name="ln-11"></a>  <span class="k">use </span><span class="nb">iso_c_binding</span><span class="p">,</span> <span class="n">only</span>             <span class="p">:</span> <span class="kt">c_short</span><span class="p">,</span> <span class="kt">c_int</span><span class="p">,</span> <span class="kt">c_float</span><span class="p">,</span> <span class="kt">c_double</span><span class="p">,</span> <span class="kt">c_bool</span><span class="p">,</span> <span class="kt">c_long</span>
+<a name="ln-12"></a><span class="kt">  </span><span class="k">use </span><span class="n">constants_and_conversions</span><span class="p">,</span> <span class="n">only</span> <span class="p">:</span> <span class="n">OS_NATIVE_PATH_DELIMITER</span><span class="p">,</span> <span class="n">RANDOM_START</span><span class="p">,</span> <span class="n">asInt</span>
+<a name="ln-13"></a>  <span class="k">use </span><span class="n">disclaimers</span><span class="p">,</span> <span class="n">only</span>               <span class="p">:</span> <span class="n">log_provisional_disclaimer</span><span class="p">,</span>                          <span class="p">&amp;</span>
+<a name="ln-14"></a>                                        <span class="n">write_provisional_disclaimer</span>
+<a name="ln-15"></a>  <span class="k">use </span><span class="n">logfiles</span><span class="p">,</span> <span class="n">only</span>                  <span class="p">:</span> <span class="n">LOGS</span><span class="p">,</span> <span class="n">LOG_DEBUG</span>
+<a name="ln-16"></a>  <span class="k">use </span><span class="n">model_initialize</span><span class="p">,</span> <span class="n">only</span>          <span class="p">:</span> <span class="n">initialize_all</span><span class="p">,</span> <span class="n">read_control_file</span>
+<a name="ln-17"></a>  <span class="k">use </span><span class="n">model_domain</span><span class="p">,</span> <span class="n">only</span>              <span class="p">:</span> <span class="n">MODEL</span>
+<a name="ln-18"></a>  <span class="k">use </span><span class="n">model_iterate</span><span class="p">,</span> <span class="n">only</span>             <span class="p">:</span> <span class="n">iterate_over_simulation_days</span>
+<a name="ln-19"></a>
+<a name="ln-20"></a>  <span class="k">use </span><span class="n">model_iterate_multiple_simulations</span><span class="p">,</span> <span class="n">only</span>  <span class="p">:</span> <span class="n">iterate_over_multiple_simulation_days</span>
+<a name="ln-21"></a>
+<a name="ln-22"></a>  <span class="k">use </span><span class="n">fstring</span><span class="p">,</span> <span class="n">only</span>                   <span class="p">:</span> <span class="n">operator</span><span class="p">(.</span><span class="n">containssimilar</span><span class="p">.),</span>            <span class="p">&amp;</span>
+<a name="ln-23"></a>                                          <span class="n">asCharacter</span>
+<a name="ln-24"></a>  <span class="k">use </span><span class="n">version_control</span><span class="p">,</span> <span class="n">only</span>           <span class="p">:</span> <span class="n">SWB_VERSION</span><span class="p">,</span> <span class="n">GIT_COMMIT_HASH_STRING</span><span class="p">,</span>    <span class="p">&amp;</span>
+<a name="ln-25"></a>                                        <span class="n">GIT_BRANCH_STRING</span><span class="p">,</span> <span class="n">COMPILE_DATE</span><span class="p">,</span>        <span class="p">&amp;</span>
+<a name="ln-26"></a>                                        <span class="n">COMPILE_TIME</span><span class="p">,</span> <span class="n">SYSTEM_NAME</span>
+<a name="ln-27"></a>  <span class="k">use </span><span class="n">fstring_list</span><span class="p">,</span> <span class="n">only</span>               <span class="p">:</span> <span class="n">FSTRING_LIST_T</span>
+<a name="ln-28"></a>  <span class="k">use </span><span class="n">timer</span><span class="p">,</span> <span class="n">only</span>                     <span class="p">:</span> <span class="n">TIMER_T</span>
+<a name="ln-29"></a>  <span class="k">use </span><span class="n">iso_fortran_env</span>
+<a name="ln-30"></a>
+<a name="ln-31"></a>  <span class="k">implicit none</span>
+<a name="ln-32"></a>
+<a name="ln-33"></a><span class="k">  type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">slControlFiles</span>
+<a name="ln-34"></a>
+<a name="ln-35"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">sBuf</span>
+<a name="ln-36"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">sOutputPrefixName</span>
+<a name="ln-37"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">sOutputDirectoryName</span>
+<a name="ln-38"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">sDataDirectoryName</span>
+<a name="ln-39"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">sWeatherDataDirectoryName</span>
+<a name="ln-40"></a>  <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">iNumArgs</span>
+<a name="ln-41"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">1024</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">sCompilerOptions</span>
+<a name="ln-42"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">sCompilerVersion</span>
+<a name="ln-43"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">sCompilerName</span>
+<a name="ln-44"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">sVersionString</span>
+<a name="ln-45"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">sCompilationDateString</span>
+<a name="ln-46"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">sCompilationSystemString</span>
+<a name="ln-47"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">sExecutableDescription</span>
+<a name="ln-48"></a>  <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>            <span class="kd">::</span> <span class="n">sGitHashString</span>
+<a name="ln-49"></a>  <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">iCount</span>
+<a name="ln-50"></a>  <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">iIndex</span>
+<a name="ln-51"></a>  <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">iLen</span>
+<a name="ln-52"></a>  <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">number_of_simulations</span>
+<a name="ln-53"></a>
+<a name="ln-54"></a>  <span class="k">type</span> <span class="p">(</span><span class="n">TIMER_T</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">runtimer</span>
+<a name="ln-55"></a>
+<a name="ln-56"></a>  <span class="n">sOutputPrefixName</span>         <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a name="ln-57"></a>  <span class="n">sOutputDirectoryName</span>      <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a name="ln-58"></a>  <span class="n">sDataDirectoryName</span>        <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a name="ln-59"></a>  <span class="n">sWeatherDataDirectoryName</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+<a name="ln-60"></a>  <span class="n">number_of_simulations</span> <span class="o">=</span> <span class="mi">1</span>
+<a name="ln-61"></a>
+<a name="ln-62"></a>  <span class="k">call </span><span class="n">runtimer</span><span class="p">%</span><span class="n">start</span><span class="p">()</span>
+<a name="ln-63"></a>
+<a name="ln-64"></a>  <span class="n">iNumArgs</span> <span class="o">=</span> <span class="nb">COMMAND_ARGUMENT_COUNT</span><span class="p">()</span>
+<a name="ln-65"></a>
+<a name="ln-66"></a>  <span class="n">sVersionString</span> <span class="o">=</span> <span class="nb">trim</span><span class="p">(</span> <span class="n">SWB_VERSION</span> <span class="p">)</span>
+<a name="ln-67"></a>  <span class="n">sCompilationDateString</span>   <span class="o">=</span> <span class="nb">trim</span><span class="p">(</span><span class="n">COMPILE_DATE</span><span class="p">)</span><span class="o">//</span><span class="s2">&quot; &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">COMPILE_TIME</span><span class="p">)</span>
+<a name="ln-68"></a>  <span class="n">sCompilationSystemString</span> <span class="o">=</span> <span class="nb">trim</span><span class="p">(</span><span class="n">SYSTEM_NAME</span><span class="p">)</span>
+<a name="ln-69"></a>  <span class="n">sCompilerOptions</span> <span class="o">=</span> <span class="n">COMPILER_OPTIONS</span><span class="p">()</span>
+<a name="ln-70"></a>  <span class="n">sCompilerVersion</span> <span class="o">=</span> <span class="n">COMPILER_VERSION</span><span class="p">()</span>
+<a name="ln-71"></a>  <span class="n">sExecutableDescription</span> <span class="o">=</span> <span class="s2">&quot;USGS Soil-Water-Balance Code version &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span> <span class="n">sVersionString</span> <span class="p">)</span>
+<a name="ln-72"></a>
+<a name="ln-73"></a>  <span class="k">if</span> <span class="p">(</span>     <span class="p">(</span><span class="n">SYSTEM_NAME</span> <span class="p">.</span><span class="n">containssimilar</span><span class="p">.</span> <span class="s2">&quot;Windows&quot;</span><span class="p">)</span>                           <span class="p">&amp;</span>
+<a name="ln-74"></a>      <span class="p">.</span><span class="nb">or</span><span class="p">.</span> <span class="p">(</span><span class="n">SYSTEM_NAME</span> <span class="p">.</span><span class="n">containssimilar</span><span class="p">.</span> <span class="s2">&quot;Mingw&quot;</span><span class="p">)</span>                             <span class="p">&amp;</span>
+<a name="ln-75"></a>      <span class="p">.</span><span class="nb">or</span><span class="p">.</span> <span class="p">(</span><span class="n">sCompilerVersion</span> <span class="p">.</span><span class="n">containssimilar</span><span class="p">.</span> <span class="s2">&quot;Windows&quot;</span><span class="p">))</span> <span class="k">then</span>
+<a name="ln-76"></a><span class="k">    </span><span class="n">OS_NATIVE_PATH_DELIMITER</span> <span class="o">=</span> <span class="s2">&quot;\&quot;</span>
+<a name="ln-77"></a><span class="s2">  else</span>
+<a name="ln-78"></a><span class="s2">    OS_NATIVE_PATH_DELIMITER = &quot;</span><span class="o">/</span><span class="s2">&quot;</span>
+<a name="ln-79"></a><span class="s2">  endif</span>
+<a name="ln-80"></a>
+<a name="ln-81"></a><span class="s2">  sGitHashString = trim( adjustl(GIT_BRANCH_STRING ) )//&quot;</span><span class="p">,</span> <span class="s2">&quot;//trim( GIT_COMMIT_HASH_STRING )</span>
+<a name="ln-82"></a>
+<a name="ln-83"></a><span class="s2">#ifdef __GFORTRAN__</span>
+<a name="ln-84"></a><span class="s2">  sCompilerName = &quot;</span><span class="n">gfortran</span><span class="s2">&quot; // trim(sCompilerVersion)</span>
+<a name="ln-85"></a><span class="s2">#endif</span>
+<a name="ln-86"></a>
+<a name="ln-87"></a><span class="s2">#ifdef __INTEL_COMPILER</span>
+<a name="ln-88"></a><span class="s2">  ! populate with empty string, since for Intel the COMPILER_VERSION string contains</span>
+<a name="ln-89"></a><span class="s2">  ! the compiler name already</span>
+<a name="ln-90"></a><span class="s2">  sCompilerName = trim(sCompilerVersion)</span>
+<a name="ln-91"></a><span class="s2">  sCompilerVersion = &quot;&quot;</span>
+<a name="ln-92"></a><span class="s2">!  write(UNIT=*,FMT=&quot;</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="o">/</span><span class="p">)</span><span class="s2">&quot;) &quot;</span><span class="n">compiler</span> <span class="n">build</span> <span class="n">date</span><span class="p">:</span><span class="s2">&quot;//TRIM(asCharacter(__INTEL_COMPILER_BUILD_DATE))</span>
+<a name="ln-93"></a><span class="s2">#endif</span>
+<a name="ln-94"></a>
+<a name="ln-95"></a><span class="s2">  iCount = max( len_trim( sVersionString ), len_trim( sGitHashString ) )</span>
+<a name="ln-96"></a><span class="s2">  iCount = max( iCount, len_trim( sCompilationSystemString) )</span>
+<a name="ln-97"></a><span class="s2">  iCount = max( iCount, len_trim( sCompilerName) + len_trim( sCompilerVersion ) )</span>
+<a name="ln-98"></a><span class="s2">  iCount = iCount + 24</span>
+<a name="ln-99"></a><span class="s2">  iCount = max( iCount, len_trim( sExecutableDescription ) )</span>
+<a name="ln-100"></a>
+<a name="ln-101"></a><span class="s2">  write(unit=*, fmt=&quot;</span><span class="p">(</span><span class="o">/</span><span class="p">,</span><span class="n">a</span><span class="p">)</span><span class="s2">&quot;) repeat(&quot;</span><span class="o">-</span><span class="s2">&quot;,iCount + 4)</span>
+<a name="ln-102"></a><span class="s2">  write(UNIT=*,FMT=&quot;</span><span class="p">(</span><span class="mi">2</span><span class="n">x</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="o">/</span><span class="p">)</span><span class="s2">&quot;) trim(sExecutableDescription)</span>
+<a name="ln-103"></a><span class="s2">  write(UNIT=*,FMT=&quot;</span><span class="p">(</span><span class="n">a24</span><span class="p">,</span><span class="n">a</span><span class="p">)</span><span class="s2">&quot;) &quot;</span><span class="n">compiled</span> <span class="n">on</span> <span class="p">:</span> <span class="s2">&quot;, trim( sCompilationDateString )</span>
+<a name="ln-104"></a><span class="s2">  write(UNIT=*,FMT=&quot;</span><span class="p">(</span><span class="n">a24</span><span class="p">,</span><span class="n">a</span><span class="p">)</span><span class="s2">&quot;) &quot;</span><span class="n">compiled</span> <span class="n">with</span> <span class="p">:</span> <span class="s2">&quot;, trim( sCompilerName )</span>
+<a name="ln-105"></a><span class="s2">  write(UNIT=*,FMT=&quot;</span><span class="p">(</span><span class="n">a24</span><span class="p">,</span><span class="n">a</span><span class="p">)</span><span class="s2">&quot;) &quot;</span><span class="n">compiled</span> <span class="n">for</span> <span class="p">:</span> <span class="s2">&quot;,trim( sCompilationSystemString )</span>
+<a name="ln-106"></a><span class="s2">  write(UNIT=*,FMT=&quot;</span><span class="p">(</span><span class="n">a24</span><span class="p">,</span><span class="n">a</span><span class="p">)</span><span class="s2">&quot;) &quot;</span><span class="n">git</span> <span class="n">hash</span> <span class="nb">and </span><span class="n">branch</span> <span class="p">:</span> <span class="s2">&quot;, trim( sGitHashString )</span>
+<a name="ln-107"></a><span class="s2">  write(unit=*, fmt=&quot;</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="o">/</span><span class="p">)</span><span class="s2">&quot;) repeat(&quot;</span><span class="o">-</span><span class="s2">&quot;,iCount + 4)</span>
+<a name="ln-108"></a>
+<a name="ln-109"></a><span class="s2">  if(iNumArgs == 0 ) then</span>
+<a name="ln-110"></a>
+<a name="ln-111"></a><span class="s2">    call write_provisional_disclaimer()</span>
+<a name="ln-112"></a>
+<a name="ln-113"></a><span class="s2">    write(UNIT=*,FMT=&quot;</span><span class="p">(</span><span class="o">//</span><span class="p">,</span><span class="n">a</span><span class="p">,</span><span class="o">/</span><span class="p">,</span><span class="o">/</span><span class="p">,</span><span class="mi">5</span><span class="p">(</span><span class="n">a</span><span class="p">,</span><span class="o">/</span><span class="p">))</span><span class="s2">&quot;)  &quot;</span><span class="n">Usage</span><span class="p">:</span> <span class="n">swb2</span> <span class="p">[</span> <span class="k">options</span> <span class="p">]</span> <span class="n">control_file_name</span> <span class="s2">&quot;,                   &amp;</span>
+<a name="ln-114"></a><span class="s2">             &quot;</span><span class="p">[</span> <span class="o">--</span><span class="n">output_prefix</span><span class="o">=</span> <span class="p">]</span>     <span class="kd">::</span> <span class="n">text</span> <span class="n">to</span> <span class="k">use </span><span class="n">as</span> <span class="n">a</span> <span class="n">prefix</span> <span class="n">for</span> <span class="n">output</span> <span class="n">filenames</span><span class="s2">&quot;,                   &amp;</span>
+<a name="ln-115"></a><span class="s2">             &quot;</span><span class="p">[</span> <span class="o">--</span><span class="n">output_dir</span><span class="o">=</span> <span class="p">]</span>        <span class="kd">::</span> <span class="n">directory</span> <span class="n">to</span> <span class="n">place</span> <span class="n">output</span> <span class="n">in</span> <span class="p">(</span><span class="n">may</span> <span class="n">be</span> <span class="n">relative</span> <span class="nb">or </span><span class="n">absolute</span><span class="p">)</span><span class="s2">&quot;,     &amp;</span>
+<a name="ln-116"></a><span class="s2">             &quot;</span><span class="p">[</span> <span class="o">--</span><span class="n">data_dir</span><span class="o">=</span> <span class="p">]</span>          <span class="kd">::</span> <span class="n">directory</span> <span class="n">to</span> <span class="n">search</span> <span class="n">for</span> <span class="n">input</span> <span class="n">grids</span> <span class="nb">or </span><span class="n">lookup</span> <span class="n">tables</span><span class="s2">&quot;,           &amp;</span>
+<a name="ln-117"></a><span class="s2">             &quot;</span><span class="p">[</span> <span class="o">--</span><span class="n">weather_data_dir</span><span class="o">=</span> <span class="p">]</span>  <span class="kd">::</span> <span class="n">directory</span> <span class="n">to</span> <span class="n">search</span> <span class="n">for</span> <span class="n">weather</span> <span class="k">data </span><span class="n">grids</span><span class="s2">&quot;</span>
+<a name="ln-118"></a><span class="s2">!               &quot;</span><span class="p">[</span> <span class="o">--</span><span class="n">random_start</span><span class="o">=</span> <span class="p">]</span>      <span class="kd">::</span> <span class="n">advance</span> <span class="n">random</span> <span class="n">number</span> <span class="n">generator</span> <span class="n">to</span> <span class="n">this</span> <span class="n">position</span> <span class="n">in</span> <span class="n">the</span> <span class="n">series</span><span class="s2">&quot;, &amp;</span>
+<a name="ln-119"></a><span class="s2">!               &quot;</span><span class="p">[</span> <span class="o">--</span><span class="n">number_of_sims</span><span class="o">=</span> <span class="p">]</span>    <span class="kd">::</span> <span class="n">number</span> <span class="n">of</span> <span class="n">simulations</span> <span class="n">to</span> <span class="n">run</span> <span class="n">when</span> <span class="s1">&#39;method of fragments&#39;</span> <span class="k">is </span><span class="n">used</span><span class="s2">&quot;</span>
+<a name="ln-120"></a><span class="s2">    stop</span>
+<a name="ln-121"></a>
+<a name="ln-122"></a><span class="s2">  end if</span>
+<a name="ln-123"></a>
+<a name="ln-124"></a><span class="s2">  do iIndex=1, iNumArgs</span>
+<a name="ln-125"></a>
+<a name="ln-126"></a><span class="s2">    call GET_COMMAND_ARGUMENT( iIndex, sBuf )</span>
+<a name="ln-127"></a>
+<a name="ln-128"></a><span class="s2">    if ( sBuf(1:13) .eq. &quot;</span><span class="o">--</span><span class="n">output_dir</span><span class="o">=</span><span class="s2">&quot; ) then</span>
+<a name="ln-129"></a>
+<a name="ln-130"></a><span class="s2">      sOutputDirectoryName = trim( sBuf(14:) )</span>
+<a name="ln-131"></a><span class="s2">      iLen = len_trim( sOutputDirectoryName )</span>
+<a name="ln-132"></a>
+<a name="ln-133"></a><span class="s2">      ! if there is no trailing &quot;</span><span class="o">/</span><span class="s2">&quot;, append one so we can form (more) fully</span>
+<a name="ln-134"></a><span class="s2">      ! qualified filenames later</span>
+<a name="ln-135"></a><span class="s2">      if ( .not. sOutputDirectoryName(iLen:iLen) .eq. OS_NATIVE_PATH_DELIMITER )  &amp;</span>
+<a name="ln-136"></a><span class="s2">        sOutputDirectoryName = trim(sOutputDirectoryName)//OS_NATIVE_PATH_DELIMITER</span>
+<a name="ln-137"></a>
+<a name="ln-138"></a><span class="s2">      call LOGS%set_output_directory( sOutputDirectoryName )</span>
+<a name="ln-139"></a>
+<a name="ln-140"></a><span class="s2">    elseif( sBuf(1:15) .eq.&quot;</span><span class="o">--</span><span class="n">random_start</span><span class="o">=</span><span class="s2">&quot; ) then</span>
+<a name="ln-141"></a>
+<a name="ln-142"></a><span class="s2">      RANDOM_START = int( asInt( sBuf(16:) ), c_long )</span>
+<a name="ln-143"></a>
+<a name="ln-144"></a><span class="s2">    elseif( sBuf(1:17) .eq.&quot;</span><span class="o">--</span><span class="n">number_of_sims</span><span class="o">=</span><span class="s2">&quot; ) then</span>
+<a name="ln-145"></a>
+<a name="ln-146"></a><span class="s2">      number_of_simulations = asInt( sBuf(18:) )</span>
+<a name="ln-147"></a>
+<a name="ln-148"></a><span class="s2">    elseif ( sBuf(1:16) .eq. &quot;</span><span class="o">--</span><span class="n">output_prefix</span><span class="o">=</span><span class="s2">&quot; ) then</span>
+<a name="ln-149"></a>
+<a name="ln-150"></a><span class="s2">      sOutputPrefixName = trim( sBuf(17:) )</span>
+<a name="ln-151"></a><span class="s2">      iLen = len_trim( sOutputPrefixName )</span>
+<a name="ln-152"></a>
+<a name="ln-153"></a><span class="s2">    elseif ( sBuf(1:11) .eq. &quot;</span><span class="o">--</span><span class="n">data_dir</span><span class="o">=</span><span class="s2">&quot; ) then</span>
+<a name="ln-154"></a>
+<a name="ln-155"></a><span class="s2">      sDataDirectoryName = sBuf(12:)</span>
+<a name="ln-156"></a><span class="s2">      iLen = len_trim( sDataDirectoryName )</span>
+<a name="ln-157"></a>
+<a name="ln-158"></a><span class="s2">      ! if there is no trailing &quot;</span><span class="o">/</span><span class="s2">&quot;, append one so we can form (more) fully</span>
+<a name="ln-159"></a><span class="s2">      ! qualified filenames later</span>
+<a name="ln-160"></a><span class="s2">      if ( .not. sDataDirectoryName(iLen:iLen) .eq. OS_NATIVE_PATH_DELIMITER )  &amp;</span>
+<a name="ln-161"></a><span class="s2">        sDataDirectoryName = trim(sDataDirectoryName)//OS_NATIVE_PATH_DELIMITER</span>
+<a name="ln-162"></a>
+<a name="ln-163"></a><span class="s2">    elseif ( sBuf(1:19) .eq. &quot;</span><span class="o">--</span><span class="n">weather_data_dir</span><span class="o">=</span><span class="s2">&quot; ) then</span>
+<a name="ln-164"></a>
+<a name="ln-165"></a><span class="s2">      sWeatherDataDirectoryName = sBuf(20:)</span>
+<a name="ln-166"></a><span class="s2">      iLen = len_trim( sWeatherDataDirectoryName )</span>
+<a name="ln-167"></a>
+<a name="ln-168"></a><span class="s2">      ! if there is no trailing &quot;</span><span class="o">/</span><span class="s2">&quot;, append one so we can form (more) fully</span>
+<a name="ln-169"></a><span class="s2">      ! qualified filenames later</span>
+<a name="ln-170"></a><span class="s2">      if ( .not. sWeatherDataDirectoryName(iLen:iLen) .eq. OS_NATIVE_PATH_DELIMITER )  &amp;</span>
+<a name="ln-171"></a><span class="s2">        sWeatherDataDirectoryName = trim(sWeatherDataDirectoryName)//OS_NATIVE_PATH_DELIMITER</span>
+<a name="ln-172"></a>
+<a name="ln-173"></a><span class="s2">    else</span>
+<a name="ln-174"></a>
+<a name="ln-175"></a><span class="s2">      ! no match on the command-line argument flags; this must be a control file</span>
+<a name="ln-176"></a><span class="s2">      call slControlFiles%append( trim( sBuf ) )</span>
+<a name="ln-177"></a>
+<a name="ln-178"></a><span class="s2">    endif</span>
+<a name="ln-179"></a>
+<a name="ln-180"></a><span class="s2">  enddo</span>
+<a name="ln-181"></a>
+<a name="ln-182"></a><span class="s2">  ! open and initialize logfiles</span>
+<a name="ln-183"></a><span class="s2">  call LOGS%initialize( iLogLevel = LOG_DEBUG )</span>
+<a name="ln-184"></a>
+<a name="ln-185"></a><span class="s2">  call log_provisional_disclaimer()</span>
+<a name="ln-186"></a>
+<a name="ln-187"></a><span class="s2">  call LOGS%write( sMessage=&#39;Base data directory name set to:&#39;,lEcho=.TRUE._c_bool )</span>
+<a name="ln-188"></a><span class="s2">  call LOGS%write( sMessage=&#39;&quot;</span><span class="s1">&#39;//trim( sDataDirectoryName )//&#39;</span><span class="s2">&quot;&#39;, iTab=4,lEcho=.TRUE._c_bool )</span>
+<a name="ln-189"></a><span class="s2">  call LOGS%write( sMessage=&#39;Weather data directory (precip, tmin, tmax grids) name set to: &#39;,lEcho=.TRUE._c_bool )</span>
+<a name="ln-190"></a><span class="s2">  call LOGS%write( &#39;&quot;</span><span class="s1">&#39;//trim( sWeatherDataDirectoryName )//&#39;</span><span class="s2">&quot;&#39;,iTab=4,lEcho=.TRUE._c_bool )</span>
+<a name="ln-191"></a>
+<a name="ln-192"></a><span class="s2">  call LOGS%write( sMessage=&#39;Output file prefix set to:&#39;,lEcho=.TRUE._c_bool )</span>
+<a name="ln-193"></a><span class="s2">  call LOGS%write( sMessage=&#39;&quot;</span><span class="s1">&#39;//trim( sOutputPrefixName )//&#39;</span><span class="s2">&quot;&#39;, iTab=4, lEcho=.TRUE._c_bool )</span>
+<a name="ln-194"></a>
+<a name="ln-195"></a><span class="s2">  if (RANDOM_START &gt;0)   &amp;</span>
+<a name="ln-196"></a><span class="s2">    call LOGS%write(sMessage=&quot;</span><span class="n">Pseudo</span><span class="o">-</span><span class="n">random</span> <span class="n">numbers</span> <span class="n">will</span> <span class="n">be</span> <span class="n">pulled</span> <span class="n">from</span> <span class="nb">index </span><span class="n">number</span> <span class="s2">&quot;   &amp;</span>
+<a name="ln-197"></a><span class="s2">           //trim(asCharacter(RANDOM_START))//&quot;</span> <span class="n">in</span> <span class="n">the</span> <span class="n">generated</span> <span class="n">series</span><span class="p">.</span><span class="s2">&quot;,               &amp;</span>
+<a name="ln-198"></a><span class="s2">           lEcho=.true._c_bool )</span>
+<a name="ln-199"></a>
+<a name="ln-200"></a><span class="s2">  if ( number_of_simulations &gt; 1)  &amp;</span>
+<a name="ln-201"></a>
+<a name="ln-202"></a><span class="s2">    call LOGS%write(sMessage=&quot;</span><span class="n">Running</span> <span class="n">multiple</span> <span class="n">simulations</span><span class="p">;</span> <span class="n">assuming</span> <span class="n">method</span> <span class="n">of</span> <span class="n">fragments</span> <span class="s2">&quot;   &amp;</span>
+<a name="ln-203"></a><span class="s2">         //&quot;</span><span class="n">was</span> <span class="n">selected</span> <span class="n">as</span> <span class="n">the</span> <span class="n">precipitation</span> <span class="n">method</span><span class="p">.</span><span class="s2">&quot;,                                      &amp;</span>
+<a name="ln-204"></a><span class="s2">         lEcho=.true._c_bool )</span>
+<a name="ln-205"></a>
+<a name="ln-206"></a><span class="s2">  ! idea is that there may be multiple control files fed to SWB; all of the files</span>
+<a name="ln-207"></a><span class="s2">  ! will be munged and the entries added to the CF_DICT dictionary</span>
+<a name="ln-208"></a><span class="s2">  do iIndex=1, slControlFiles%count</span>
+<a name="ln-209"></a><span class="s2">    ! read control file</span>
+<a name="ln-210"></a><span class="s2">    call read_control_file( slControlFiles%get( iIndex ) )</span>
+<a name="ln-211"></a><span class="s2">  enddo</span>
+<a name="ln-212"></a>
+<a name="ln-213"></a><span class="s2">  call slControlFiles%clear()</span>
+<a name="ln-214"></a>
+<a name="ln-215"></a><span class="s2">  call initialize_all( sOutputPrefixName, sOutputDirectoryName,                &amp;</span>
+<a name="ln-216"></a><span class="s2">                       sDataDirectoryName, sWeatherDataDirectoryName )</span>
+<a name="ln-217"></a>
+<a name="ln-218"></a><span class="s2">  call runtimer%stop()</span>
+<a name="ln-219"></a><span class="s2">  call runtimer%calc_time_values(&quot;</span><span class="n">split</span><span class="s2">&quot;)</span>
+<a name="ln-220"></a><span class="s2">  call LOGS%write(sMessage=&quot;</span><span class="nb">Time </span><span class="n">spent</span> <span class="n">initializing</span> <span class="n">simulation</span><span class="p">:</span> <span class="s2">&quot;              &amp;</span>
+<a name="ln-221"></a><span class="s2">     //trim( runtimer%get_pretty()), lEcho=.true._c_bool,                      &amp;</span>
+<a name="ln-222"></a><span class="s2">     iLinesBefore=1, iLinesAfter=1 )</span>
+<a name="ln-223"></a>
+<a name="ln-224"></a><span class="s2">  call runtimer%start()</span>
+<a name="ln-225"></a>
+<a name="ln-226"></a><span class="s2">  if ( number_of_simulations &gt; 1) then</span>
+<a name="ln-227"></a>
+<a name="ln-228"></a><span class="s2">    call iterate_over_multiple_simulation_days(MODEL, number_of_simulations)</span>
+<a name="ln-229"></a>
+<a name="ln-230"></a><span class="s2">  else</span>
+<a name="ln-231"></a>
+<a name="ln-232"></a><span class="s2">    call iterate_over_simulation_days( MODEL )</span>
+<a name="ln-233"></a>
+<a name="ln-234"></a><span class="s2">  endif</span>
+<a name="ln-235"></a>
+<a name="ln-236"></a><span class="s2">  call runtimer%stop()</span>
+<a name="ln-237"></a><span class="s2">  call runtimer%calc_time_values(&quot;</span><span class="n">split</span><span class="s2">&quot;)</span>
+<a name="ln-238"></a><span class="s2">  call LOGS%write(sMessage=&quot;</span><span class="nb">Time </span><span class="n">spent</span> <span class="n">running</span> <span class="n">simulation</span><span class="p">:</span> <span class="s2">&quot;                   &amp;</span>
+<a name="ln-239"></a><span class="s2">     //trim( runtimer%get_pretty()), lEcho=.true._c_bool,                      &amp;</span>
+<a name="ln-240"></a><span class="s2">     iLinesBefore=1)</span>
+<a name="ln-241"></a><span class="s2">  call runtimer%calc_time_values(&quot;</span><span class="n">elapsed</span><span class="s2">&quot;)</span>
+<a name="ln-242"></a><span class="s2">  call LOGS%write(sMessage=&quot;</span><span class="n">Total</span> <span class="n">runtime</span>                <span class="p">:</span> <span class="err">&quot;</span>                   <span class="p">&amp;</span>
+<a name="ln-243"></a>    <span class="o">//</span><span class="nb">trim</span><span class="p">(</span> <span class="n">runtimer</span><span class="p">%</span><span class="n">get_pretty</span><span class="p">()),</span> <span class="n">lEcho</span><span class="o">=</span><span class="p">.</span><span class="n">true</span><span class="p">.</span><span class="err">_</span><span class="n">c_bool</span><span class="p">,</span>                       <span class="p">&amp;</span>
+<a name="ln-244"></a>    <span class="n">iLinesAfter</span><span class="o">=</span><span class="mi">1</span> <span class="p">)</span>
+<a name="ln-245"></a>  <span class="k">call </span><span class="n">LOGS</span><span class="p">%</span><span class="k">close</span><span class="p">()</span>
+<a name="ln-246"></a>
+<a name="ln-247"></a><span class="k">end program </span><span class="n">main</span>
+</pre></div>
+
+    </section>
+    </div>
+  </div>
+
+  
+    <hr>
+  </div> <!-- /container -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <p>&copy; 2019 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
+            </p>
+        </div>
+        <div class="col-4">
+          <p class="text-right"><small>
+            Documentation for SWB2
+               (version 2.0, build 96) generated by
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on Tue Sep  3 16:54:50 2019 </small>
+          </p>
+        </div>
+        <div class="col">
+          <p class="text-center"> SWB2 was developed by Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt</p>
+        </div>
+      </div>
+      <br>
+    </div> <!-- /container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+  <script src="../js/bootstrap.min.js"></script>
+
+  <!-- MathJax JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+  
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+
+</body>
+
+</html>

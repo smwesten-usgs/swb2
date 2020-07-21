@@ -1,0 +1,4522 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="">
+  
+  <meta name="author" content="Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt">
+  <link rel="icon" href="../favicon.png">
+
+  <title>FSTRING_LIST_T &ndash; SWB2 </title>
+
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/pygments.css" rel="stylesheet">
+  <link href="../css/font-awesome.min.css" rel="stylesheet">
+  <link href="../css/bootstrap-toc.css" rel="stylesheet">
+    <!-- <link href="../css/local.css" rel="stylesheet"> -->
+  
+  
+
+  <script src="../js/jquery-2.1.3.min.js"></script>
+  <script src="../js/svg-pan-zoom.min.js"></script>
+  <script src="../js/bootstrap-toc.js"></script>
+
+</head>
+
+<body data-spy="scroll" data-target="#toc">
+
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+
+    <a class="navbar-brand" href="../index.html">SWB2</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" navbar-light bg-light id="navbarText">
+      <ul class="navbar-nav mr-auto">
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../page/index.html">User Guide</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/modules.html">Modules</a>
+          </li>
+        
+
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+          </li>
+        
+
+
+      </ul>
+    </div>
+
+    <form class="form-inline">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+        <!-- <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contents <span class="caret"></span></a>
+            <ul class="dropdown-menu"> -->
+          <!-- 
+            
+              <li><a href="../lists/files.html">Source Files</a></li>
+            
+          
+          
+            <li><a href="../lists/modules.html">Modules</a></li>
+          
+          
+          
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+          
+          
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+           
+            <li><a href="../lists/types.html">Derived Types</a></li>
+          
+          
+            <li><a href="../lists/programs.html">Programs</a></li>
+          
+        </ul> -->
+
+      <!-- </div> -->
+      <!--/.nav-collapse -->
+
+  </nav>
+
+  <div class="container">
+    
+  
+  <div class="row">
+    <h1>FSTRING_LIST_T
+    <small>Derived Type</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="card">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title="<p> 5.9% of total for derived types.</p>Including implementation: 913 statements, 11.5% of total for derived types.">51 statements</a>
+     </li>
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/fstring_list.F90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+     <li><a href='../sourcefile/fstring_list.f90.html'>fstring_list.F90</a></li>
+    
+     <li><a href='../module/fstring_list.html'>fstring_list</a></li>
+    
+  
+     <li class="active">FSTRING_LIST_T</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+
+
+
+
+
+<div class="card bg-primary">
+    <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-0">Modules</a></h3></div> -->
+    <div class="card-header"><a data-toggle="collapse" href="#var-0" aria-expanded="true" aria-controls="collapse-example" id="variables-header" class="d-block">
+              <i class="fa fa-chevron-down pull-right"></i>Variables</a>
+    </div>
+
+  <div id="var-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#variable-s">s</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#variable-count~3">count</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#variable-missing_value_count">missing_value_count</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#boundprocs-0">Type-Bound Procedures</a></h3></div>
+  <div id="boundprocs-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-assign_character_to_fstring_sub">assign_character_to_fstring_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-assignment%28%3D%29">assignment(=)</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-print_all_entries_sub">print_all_entries_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-print_all~2">print_all</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-print_as_markdown_sub">print_as_markdown_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-print~2">print</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-append_character_to_fstring_sub">append_character_to_fstring_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-append_character_array_to_fstring_sub">append_character_array_to_fstring_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-append_fstring_to_fstring_sub">append_fstring_to_fstring_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-append">append</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-count_strings_in_list_fn">count_strings_in_list_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-count_entries">count_entries</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-retrieve_value_from_list_at_index_fn">retrieve_value_from_list_at_index_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-retrieve_values_for_range_of_indices_fn">retrieve_values_for_range_of_indices_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-get~2">get</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-retrieve_values_as_integer_fn">retrieve_values_as_integer_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-get_integer">get_integer</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-retrieve_values_as_float_fn">retrieve_values_as_float_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-get_float">get_float</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-retrieve_values_as_double_fn">retrieve_values_as_double_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-get_double">get_double</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-retrieve_values_as_logical_fn">retrieve_values_as_logical_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-get_logical">get_logical</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-replace_value_at_index_sub">replace_value_at_index_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-replace">replace</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-list_all_fn">list_all_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-list_all">list_all</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-are_there_missing_list_values_fn">are_there_missing_list_values_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-empty_entries_present">empty_entries_present</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-quicksort_alpha_sub">quicksort_alpha_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-sort">sort</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-quicksort_int_sub">quicksort_int_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-sort_integer">sort_integer</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-quicksort_float_sub">quicksort_float_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-sort_float">sort_float</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-clear_list_sub">clear_list_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-clear">clear</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-return_count_of_matching_strings_fn">return_count_of_matching_strings_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-count_matching">count_matching</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-return_indices_of_matching_list_entries_fn">return_indices_of_matching_list_entries_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-which">which</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-return_subset_of_partial_matches_fn">return_subset_of_partial_matches_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-grep">grep</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-return_list_of_unique_values_fn">return_list_of_unique_values_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-unique">unique</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/fstring_list_t.html#src">FSTRING_LIST_T</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      <h2>type, public :: FSTRING_LIST_T</h2>
+    
+    
+    
+    
+    <br>
+
+    <!-- <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+
+
+
+
+
+<div class="card bg-primary">
+    <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-1">Modules</a></h3></div> -->
+    <div class="card-header"><a data-toggle="collapse" href="#var-1" aria-expanded="true" aria-controls="collapse-example" id="variables-header" class="d-block">
+              <i class="fa fa-chevron-down pull-right"></i>Variables</a>
+    </div>
+
+  <div id="var-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#variable-s">s</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#variable-count~3">count</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#variable-missing_value_count">missing_value_count</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#boundprocs-1">Type-Bound Procedures</a></h3></div>
+  <div id="boundprocs-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-assign_character_to_fstring_sub">assign_character_to_fstring_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-assignment%28%3D%29">assignment(=)</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-print_all_entries_sub">print_all_entries_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-print_all~2">print_all</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-print_as_markdown_sub">print_as_markdown_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-print~2">print</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-append_character_to_fstring_sub">append_character_to_fstring_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-append_character_array_to_fstring_sub">append_character_array_to_fstring_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-append_fstring_to_fstring_sub">append_fstring_to_fstring_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-append">append</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-count_strings_in_list_fn">count_strings_in_list_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-count_entries">count_entries</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-retrieve_value_from_list_at_index_fn">retrieve_value_from_list_at_index_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-retrieve_values_for_range_of_indices_fn">retrieve_values_for_range_of_indices_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-get~2">get</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-retrieve_values_as_integer_fn">retrieve_values_as_integer_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-get_integer">get_integer</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-retrieve_values_as_float_fn">retrieve_values_as_float_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-get_float">get_float</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-retrieve_values_as_double_fn">retrieve_values_as_double_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-get_double">get_double</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-retrieve_values_as_logical_fn">retrieve_values_as_logical_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-get_logical">get_logical</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-replace_value_at_index_sub">replace_value_at_index_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-replace">replace</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-list_all_fn">list_all_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-list_all">list_all</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-are_there_missing_list_values_fn">are_there_missing_list_values_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-empty_entries_present">empty_entries_present</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-quicksort_alpha_sub">quicksort_alpha_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-sort">sort</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-quicksort_int_sub">quicksort_int_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-sort_integer">sort_integer</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-quicksort_float_sub">quicksort_float_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-sort_float">sort_float</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-clear_list_sub">clear_list_sub</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-clear">clear</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-return_count_of_matching_strings_fn">return_count_of_matching_strings_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-count_matching">count_matching</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-return_indices_of_matching_list_entries_fn">return_indices_of_matching_list_entries_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-which">which</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-return_subset_of_partial_matches_fn">return_subset_of_partial_matches_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-grep">grep</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-return_list_of_unique_values_fn">return_list_of_unique_values_fn</a>
+      
+      <a class="list-group-item" href="../type/fstring_list_t.html#boundprocedure-unique">unique</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/fstring_list_t.html#src">FSTRING_LIST_T</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md"> -->
+
+    
+    <section>
+    <h2>Components</h2>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-s"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>s</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-count~3"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>count</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-missing_value_count"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>missing_value_count</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    </section>
+    <br>
+    
+
+    
+
+    
+
+    
+    <section>
+    <h2>Type-Bound Procedures</h2>
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-assign_character_to_fstring_sub"></span><h3>procedure, public :: <strong>assign_character_to_fstring_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine assign_character_to_fstring_sub(this, character_str)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>character_str</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-assignment%28%3D%29"></span><h3>generic, public :: <strong>assignment(=)</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-assign_character_to_fstring_sub'>assign_character_to_fstring_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine assign_character_to_fstring_sub(this, character_str)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>character_str</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-print_all_entries_sub"></span><h3>procedure, public :: <strong>print_all_entries_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine print_all_entries_sub(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-print_all~2"></span><h3>generic, public :: <strong>print_all</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-print_all_entries_sub'>print_all_entries_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine print_all_entries_sub(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-print_as_markdown_sub"></span><h3>procedure, public :: <strong>print_as_markdown_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine print_as_markdown_sub(this, lu)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>lu</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-print~2"></span><h3>generic, public :: <strong>print</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-print_as_markdown_sub'>print_as_markdown_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine print_as_markdown_sub(this, lu)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>lu</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-append_character_to_fstring_sub"></span><h3>procedure, public :: <strong>append_character_to_fstring_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine append_character_to_fstring_sub(this, character_str)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>character_str</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-append_character_array_to_fstring_sub"></span><h3>procedure, public :: <strong>append_character_array_to_fstring_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine append_character_array_to_fstring_sub(this, character_str)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>character_str</strong>(:)</td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-append_fstring_to_fstring_sub"></span><h3>procedure, public :: <strong>append_fstring_to_fstring_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine append_fstring_to_fstring_sub(this, other_fstring)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>other_fstring</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-append"></span><h3>generic, public :: <strong>append</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-append_character_to_fstring_sub'>append_character_to_fstring_sub</a>, <a href='../type/fstring_list_t.html#boundprocedure-append_character_array_to_fstring_sub'>append_character_array_to_fstring_sub</a>, <a href='../type/fstring_list_t.html#boundprocedure-append_fstring_to_fstring_sub'>append_fstring_to_fstring_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine append_character_to_fstring_sub(this, character_str)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>character_str</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine append_character_array_to_fstring_sub(this, character_str)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>character_str</strong>(:)</td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine append_fstring_to_fstring_sub(this, other_fstring)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>other_fstring</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-count_strings_in_list_fn"></span><h3>procedure, public :: <strong>count_strings_in_list_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function count_strings_in_list_fn(this) result(count)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-count_entries"></span><h3>generic, public :: <strong>count_entries</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-count_strings_in_list_fn'>count_strings_in_list_fn</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function count_strings_in_list_fn(this) result(count)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-retrieve_value_from_list_at_index_fn"></span><h3>procedure, public :: <strong>retrieve_value_from_list_at_index_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function retrieve_value_from_list_at_index_fn(this, index_val) result(text)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>index_val</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=:),
+  allocatable</small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-retrieve_values_for_range_of_indices_fn"></span><h3>procedure, public :: <strong>retrieve_values_for_range_of_indices_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function retrieve_values_for_range_of_indices_fn(this, start_indx, end_indx) result(text)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>start_indx</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>end_indx</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=:),
+  allocatable</small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-get~2"></span><h3>generic, public :: <strong>get</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-retrieve_value_from_list_at_index_fn'>retrieve_value_from_list_at_index_fn</a>, <a href='../type/fstring_list_t.html#boundprocedure-retrieve_values_for_range_of_indices_fn'>retrieve_values_for_range_of_indices_fn</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function retrieve_value_from_list_at_index_fn(this, index_val) result(text)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>index_val</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=:),
+  allocatable</small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function retrieve_values_for_range_of_indices_fn(this, start_indx, end_indx) result(text)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>start_indx</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>end_indx</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=:),
+  allocatable</small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-retrieve_values_as_integer_fn"></span><h3>procedure, public :: <strong>retrieve_values_as_integer_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function retrieve_values_as_integer_fn(this) result(values)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int),
+  allocatable, (:)</small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-get_integer"></span><h3>generic, public :: <strong>get_integer</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-retrieve_values_as_integer_fn'>retrieve_values_as_integer_fn</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function retrieve_values_as_integer_fn(this) result(values)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int),
+  allocatable, (:)</small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-retrieve_values_as_float_fn"></span><h3>procedure, public :: <strong>retrieve_values_as_float_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function retrieve_values_as_float_fn(this) result(values)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float),
+  allocatable, (:)</small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-get_float"></span><h3>generic, public :: <strong>get_float</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-retrieve_values_as_float_fn'>retrieve_values_as_float_fn</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function retrieve_values_as_float_fn(this) result(values)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float),
+  allocatable, (:)</small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-retrieve_values_as_double_fn"></span><h3>procedure, public :: <strong>retrieve_values_as_double_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function retrieve_values_as_double_fn(this) result(values)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double),
+  allocatable, (:)</small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-get_double"></span><h3>generic, public :: <strong>get_double</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-retrieve_values_as_double_fn'>retrieve_values_as_double_fn</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function retrieve_values_as_double_fn(this) result(values)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double),
+  allocatable, (:)</small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-retrieve_values_as_logical_fn"></span><h3>procedure, public :: <strong>retrieve_values_as_logical_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function retrieve_values_as_logical_fn(this) result(values)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool),
+  allocatable, (:)</small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-get_logical"></span><h3>generic, public :: <strong>get_logical</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-retrieve_values_as_logical_fn'>retrieve_values_as_logical_fn</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function retrieve_values_as_logical_fn(this) result(values)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool),
+  allocatable, (:)</small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-replace_value_at_index_sub"></span><h3>procedure, public :: <strong>replace_value_at_index_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine replace_value_at_index_sub(this, index_val, character_str)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>index_val</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>character_str</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-replace"></span><h3>generic, public :: <strong>replace</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-replace_value_at_index_sub'>replace_value_at_index_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine replace_value_at_index_sub(this, index_val, character_str)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>index_val</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>character_str</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-list_all_fn"></span><h3>procedure, public :: <strong>list_all_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function list_all_fn(this, delimiter_chr) result(text)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=1),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>delimiter_chr</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=:),
+  allocatable</small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-list_all"></span><h3>generic, public :: <strong>list_all</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-list_all_fn'>list_all_fn</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function list_all_fn(this, delimiter_chr) result(text)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=1),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>delimiter_chr</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=:),
+  allocatable</small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-are_there_missing_list_values_fn"></span><h3>procedure, public :: <strong>are_there_missing_list_values_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function are_there_missing_list_values_fn(this) result(value)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-empty_entries_present"></span><h3>generic, public :: <strong>empty_entries_present</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-are_there_missing_list_values_fn'>are_there_missing_list_values_fn</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function are_there_missing_list_values_fn(this) result(value)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>target</td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-quicksort_alpha_sub"></span><h3>procedure, public :: <strong>quicksort_alpha_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine quicksort_alpha_sub(this, sort_order)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>sort_order</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-sort"></span><h3>generic, public :: <strong>sort</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-quicksort_alpha_sub'>quicksort_alpha_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine quicksort_alpha_sub(this, sort_order)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>sort_order</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-quicksort_int_sub"></span><h3>procedure, public :: <strong>quicksort_int_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine quicksort_int_sub(this, sort_order)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>sort_order</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-sort_integer"></span><h3>generic, public :: <strong>sort_integer</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-quicksort_int_sub'>quicksort_int_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine quicksort_int_sub(this, sort_order)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>sort_order</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-quicksort_float_sub"></span><h3>procedure, public :: <strong>quicksort_float_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine quicksort_float_sub(this, sort_order)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>sort_order</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-sort_float"></span><h3>generic, public :: <strong>sort_float</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-quicksort_float_sub'>quicksort_float_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine quicksort_float_sub(this, sort_order)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>sort_order</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-clear_list_sub"></span><h3>procedure, public :: <strong>clear_list_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine clear_list_sub(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-clear"></span><h3>generic, public :: <strong>clear</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-clear_list_sub'>clear_list_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine clear_list_sub(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-return_count_of_matching_strings_fn"></span><h3>procedure, public :: <strong>return_count_of_matching_strings_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function return_count_of_matching_strings_fn(this, substr, match_case) result(count)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>substr</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical(kind=c_bool),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>match_case</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-count_matching"></span><h3>generic, public :: <strong>count_matching</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-return_count_of_matching_strings_fn'>return_count_of_matching_strings_fn</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function return_count_of_matching_strings_fn(this, substr, match_case) result(count)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>substr</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical(kind=c_bool),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>match_case</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-return_indices_of_matching_list_entries_fn"></span><h3>procedure, public :: <strong>return_indices_of_matching_list_entries_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function return_indices_of_matching_list_entries_fn(this, character_str) result(index_values)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>character_str</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int),
+  allocatable, (:)</small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-which"></span><h3>generic, public :: <strong>which</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-return_indices_of_matching_list_entries_fn'>return_indices_of_matching_list_entries_fn</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function return_indices_of_matching_list_entries_fn(this, character_str) result(index_values)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>character_str</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int),
+  allocatable, (:)</small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-return_subset_of_partial_matches_fn"></span><h3>procedure, public :: <strong>return_subset_of_partial_matches_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function return_subset_of_partial_matches_fn(this, substr) result(new_fstring)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>substr</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-grep"></span><h3>generic, public :: <strong>grep</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-return_subset_of_partial_matches_fn'>return_subset_of_partial_matches_fn</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function return_subset_of_partial_matches_fn(this, substr) result(new_fstring)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>substr</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-return_list_of_unique_values_fn"></span><h3>procedure, public :: <strong>return_list_of_unique_values_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function return_list_of_unique_values_fn(this) result(new_fstring)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-unique"></span><h3>generic, public :: <strong>unique</strong>  => <a href='../type/fstring_list_t.html#boundprocedure-return_list_of_unique_values_fn'>return_list_of_unique_values_fn</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function return_list_of_unique_values_fn(this) result(new_fstring)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+    </section>
+    
+
+    
+    <section>
+    <h3><span class="anchor" id="src"></span>Source Code</h3>
+    <div class="highlight"><pre><span></span>  <span class="k">type </span><span class="n">FSTRING_LIST_T</span>
+
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>    <span class="kd">::</span> <span class="n">s</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                   <span class="kd">::</span> <span class="nb">count</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                   <span class="kd">::</span> <span class="n">missing_value_count</span> <span class="o">=</span> <span class="mi">0</span>
+
+  <span class="k">contains</span>
+
+<span class="k">    procedure</span>   <span class="kd">::</span> <span class="n">assign_character_to_fstring_sub</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">assignment</span><span class="p">(</span><span class="o">=</span><span class="p">)</span> <span class="o">=&gt;</span> <span class="n">assign_character_to_fstring_sub</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">print_all_entries_sub</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">print_all</span> <span class="o">=&gt;</span> <span class="n">print_all_entries_sub</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">print_as_markdown_sub</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="k">print</span> <span class="o">=&gt;</span> <span class="n">print_as_markdown_sub</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">append_character_to_fstring_sub</span>
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">append_character_array_to_fstring_sub</span>
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">append_fstring_to_fstring_sub</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">append</span> <span class="o">=&gt;</span> <span class="n">append_character_to_fstring_sub</span><span class="p">,</span>                  <span class="p">&amp;</span>
+                             <span class="n">append_character_array_to_fstring_sub</span><span class="p">,</span>            <span class="p">&amp;</span>
+                             <span class="n">append_fstring_to_fstring_sub</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">count_strings_in_list_fn</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">count_entries</span> <span class="o">=&gt;</span> <span class="n">count_strings_in_list_fn</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">retrieve_value_from_list_at_index_fn</span>
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">retrieve_values_for_range_of_indices_fn</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">get</span> <span class="o">=&gt;</span> <span class="n">retrieve_value_from_list_at_index_fn</span><span class="p">,</span>                <span class="p">&amp;</span>
+                          <span class="n">retrieve_values_for_range_of_indices_fn</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">retrieve_values_as_integer_fn</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">get_integer</span> <span class="o">=&gt;</span> <span class="n">retrieve_values_as_integer_fn</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">retrieve_values_as_float_fn</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">get_float</span> <span class="o">=&gt;</span> <span class="n">retrieve_values_as_float_fn</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">retrieve_values_as_double_fn</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">get_double</span> <span class="o">=&gt;</span> <span class="n">retrieve_values_as_double_fn</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">retrieve_values_as_logical_fn</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">get_logical</span> <span class="o">=&gt;</span> <span class="n">retrieve_values_as_logical_fn</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">replace_value_at_index_sub</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">replace</span> <span class="o">=&gt;</span> <span class="n">replace_value_at_index_sub</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">list_all_fn</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">list_all</span> <span class="o">=&gt;</span> <span class="n">list_all_fn</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">are_there_missing_list_values_fn</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">empty_entries_present</span> <span class="o">=&gt;</span> <span class="n">are_there_missing_list_values_fn</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">quicksort_alpha_sub</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">sort</span> <span class="o">=&gt;</span> <span class="n">quicksort_alpha_sub</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">quicksort_int_sub</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">sort_integer</span> <span class="o">=&gt;</span> <span class="n">quicksort_int_sub</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">quicksort_float_sub</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">sort_float</span> <span class="o">=&gt;</span> <span class="n">quicksort_float_sub</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">clear_list_sub</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">clear</span> <span class="o">=&gt;</span> <span class="n">clear_list_sub</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">return_count_of_matching_strings_fn</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">count_matching</span> <span class="o">=&gt;</span> <span class="n">return_count_of_matching_strings_fn</span>
+
+<span class="c">!    procedure   :: is_substring_present_in_string_case_sensitive_fn</span>
+<span class="c">!    procedure   :: is_substring_present_in_string_case_insensitive_fn</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">return_indices_of_matching_list_entries_fn</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">which</span> <span class="o">=&gt;</span> <span class="n">return_indices_of_matching_list_entries_fn</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">return_subset_of_partial_matches_fn</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">grep</span> <span class="o">=&gt;</span> <span class="n">return_subset_of_partial_matches_fn</span>
+
+    <span class="k">procedure</span>   <span class="kd">::</span> <span class="n">return_list_of_unique_values_fn</span>
+    <span class="k">generic</span>     <span class="kd">::</span> <span class="n">unique</span> <span class="o">=&gt;</span> <span class="n">return_list_of_unique_values_fn</span>
+
+  <span class="k">end type </span><span class="n">FSTRING_LIST_T</span>
+</pre></div>
+
+    </section>
+    
+
+    </div>
+  </div>
+
+
+    <hr>
+  </div> <!-- /container -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <p>&copy; 2019 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
+            </p>
+        </div>
+        <div class="col-4">
+          <p class="text-right"><small>
+            Documentation for SWB2
+               (version 2.0, build 96) generated by
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on Tue Sep  3 16:54:50 2019 </small>
+          </p>
+        </div>
+        <div class="col">
+          <p class="text-center"> SWB2 was developed by Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt</p>
+        </div>
+      </div>
+      <br>
+    </div> <!-- /container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+  <script src="../js/bootstrap.min.js"></script>
+
+  <!-- MathJax JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+  
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+
+</body>
+
+</html>

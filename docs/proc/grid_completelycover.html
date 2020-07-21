@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="">
+  
+  <meta name="author" content="Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt">
+  <link rel="icon" href="../favicon.png">
+
+  <title>grid_CompletelyCover &ndash; SWB2</title>
+
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/pygments.css" rel="stylesheet">
+  <link href="../css/font-awesome.min.css" rel="stylesheet">
+  <link href="../css/bootstrap-toc.css" rel="stylesheet">
+    <!-- <link href="../css/local.css" rel="stylesheet"> -->
+  
+  
+
+  <script src="../js/jquery-2.1.3.min.js"></script>
+  <script src="../js/svg-pan-zoom.min.js"></script>
+  <script src="../js/bootstrap-toc.js"></script>
+
+</head>
+
+<body data-spy="scroll" data-target="#toc">
+
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+
+    <a class="navbar-brand" href="../index.html">SWB2</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" navbar-light bg-light id="navbarText">
+      <ul class="navbar-nav mr-auto">
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../page/index.html">User Guide</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/modules.html">Modules</a>
+          </li>
+        
+
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+          </li>
+        
+
+
+      </ul>
+    </div>
+
+    <form class="form-inline">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+        <!-- <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contents <span class="caret"></span></a>
+            <ul class="dropdown-menu"> -->
+          <!-- 
+            
+              <li><a href="../lists/files.html">Source Files</a></li>
+            
+          
+          
+            <li><a href="../lists/modules.html">Modules</a></li>
+          
+          
+          
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+          
+          
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+           
+            <li><a href="../lists/types.html">Derived Types</a></li>
+          
+          
+            <li><a href="../lists/programs.html">Programs</a></li>
+          
+        </ul> -->
+
+      <!-- </div> -->
+      <!--/.nav-collapse -->
+
+  </nav>
+
+  <div class="container">
+    
+  
+  <div class="row">
+    <h1>grid_CompletelyCover
+      <small>Function</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="card">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 0.3% of total for procedures.">24 statements</a>
+     </li>
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/grid.F90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+     <li><a href='../sourcefile/grid.f90.html'>grid.F90</a></li>
+    
+     <li><a href='../module/grid.html'>grid</a></li>
+    
+  
+     <li class="active">grid_CompletelyCover</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/grid_completelycover.html#src">grid_CompletelyCover</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+    <h2>
+public function grid_CompletelyCover(pBaseGrd, pOtherGrd, rTolerance) result(lCompletelyCover)
+    
+    
+   
+</h2>
+    
+  
+
+
+    
+    <p>Returns .true. if the T_GRID objects conform (in terms of cell sizes and extents)
+ The optional argument rTolerance is the precision for checking the (floating-point)
+ extent coordinates (this defaults to rDEFAULT_TOLERANCE, below). The tolerance
+ is set to abs(rTolerance * ( rX1-rX1 ) )</p>
+    
+
+    <h3>Arguments</h3>
+    
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pbasegrd"></span>type(<a href='../type/general_grid_t.html'>GENERAL_GRID_T</a>),</td>
+  <td></td>
+  <td></td>
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>pBaseGrd</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pothergrd"></span>type(<a href='../type/general_grid_t.html'>GENERAL_GRID_T</a>),</td>
+  <td></td>
+  <td></td>
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>pOtherGrd</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rtolerance~2"></span>real(kind=c_float),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>rTolerance</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    
+    
+    
+    
+    
+    
+    
+   <h3>Return Value <small><span class="anchor" id="variable-lcompletelycover"></span>logical(kind=c_bool)
+  </small></h3>
+    
+    
+    
+    
+     
+    <br>
+
+    <!-- <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../proc/grid_completelycover.html#src">grid_CompletelyCover</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md"> -->
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+
+    
+
+    
+    <section>
+    <h2><span class="anchor" id="src"></span>Source Code</h2>
+    <div class="highlight"><pre><span></span><span class="k">function </span><span class="n">grid_CompletelyCover</span><span class="p">(</span> <span class="n">pBaseGrd</span><span class="p">,</span> <span class="n">pOtherGrd</span><span class="p">,</span> <span class="n">rTolerance</span> <span class="p">)</span> <span class="k">result</span> <span class="p">(</span> <span class="n">lCompletelyCover</span> <span class="p">)</span>
+  <span class="c">!! Returns .true. if the T_GRID objects conform (in terms of cell sizes and extents)</span>
+  <span class="c">!! The optional argument rTolerance is the precision for checking the (floating-point)</span>
+  <span class="c">!! extent coordinates (this defaults to rDEFAULT_TOLERANCE, below). The tolerance</span>
+  <span class="c">!! is set to abs(rTolerance * ( rX1-rX1 ) )</span>
+  <span class="c">! ARGUMENTS</span>
+  <span class="k">type</span> <span class="p">(</span><span class="n">GENERAL_GRID_T</span><span class="p">),</span> <span class="k">pointer</span> <span class="kd">::</span> <span class="n">pBaseGrd</span><span class="p">,</span><span class="n">pOtherGrd</span>
+  <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">intent</span><span class="p">(</span><span class="n">in</span><span class="p">),</span> <span class="k">optional</span> <span class="kd">::</span> <span class="n">rTolerance</span>
+  <span class="c">! RETURN VALUE</span>
+  <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span> <span class="kd">::</span> <span class="n">lCompletelyCover</span>
+  <span class="c">! LOCALS</span>
+  <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rTol</span>
+  <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rDEFAULT_TOLERANCE</span>
+
+  <span class="n">rDEFAULT_TOLERANCE</span> <span class="o">=</span> <span class="o">-</span><span class="n">pBaseGrd</span><span class="p">%</span><span class="n">rGridCellSize</span> <span class="o">/</span> <span class="mi">10</span><span class="mf">0.</span>
+  <span class="c">!rDEFAULT_TOLERANCE = rZERO</span>
+
+  <span class="k">if</span> <span class="p">(</span> <span class="nb">present</span> <span class="p">(</span> <span class="n">rTolerance</span> <span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<span class="k">      </span><span class="n">rTol</span> <span class="o">=</span> <span class="n">rTolerance</span>
+  <span class="k">else</span>
+<span class="k">      </span><span class="n">rTol</span> <span class="o">=</span> <span class="n">rDEFAULT_TOLERANCE</span>
+  <span class="k">end if</span>
+
+<span class="k">  if</span> <span class="p">(</span> <span class="p">(</span><span class="n">pBaseGrd</span><span class="p">%</span><span class="n">rX0</span> <span class="o">-</span> <span class="n">pOtherGrd</span><span class="p">%</span><span class="n">rX0</span> <span class="o">&gt;=</span> <span class="n">rTol</span><span class="p">)</span> <span class="p">.</span><span class="nb">and</span><span class="p">.</span> <span class="p">&amp;</span>
+       <span class="p">(</span><span class="n">pBaseGrd</span><span class="p">%</span><span class="n">rY0</span> <span class="o">-</span> <span class="n">pOtherGrd</span><span class="p">%</span><span class="n">rY0</span> <span class="o">&gt;=</span> <span class="n">rTol</span><span class="p">)</span> <span class="p">.</span><span class="nb">and</span><span class="p">.</span> <span class="p">&amp;</span>
+       <span class="p">(</span><span class="n">pOtherGrd</span><span class="p">%</span><span class="n">rX1</span> <span class="o">-</span> <span class="n">pBaseGrd</span><span class="p">%</span><span class="n">rX1</span> <span class="o">&gt;=</span> <span class="n">rTol</span><span class="p">)</span> <span class="p">.</span><span class="nb">and</span><span class="p">.</span> <span class="p">&amp;</span>
+       <span class="p">(</span><span class="n">pOtherGrd</span><span class="p">%</span><span class="n">rY1</span> <span class="o">-</span> <span class="n">pBaseGrd</span><span class="p">%</span><span class="n">rY1</span> <span class="o">&gt;=</span> <span class="n">rTol</span><span class="p">)</span> <span class="p">)</span> <span class="k">then</span>
+<span class="k">      </span><span class="n">lCompletelyCover</span> <span class="o">=</span> <span class="n">TRUE</span>
+  <span class="k">else</span>
+<span class="k">      </span><span class="n">lCompletelyCover</span> <span class="o">=</span> <span class="n">FALSE</span>
+
+      <span class="k">call </span><span class="n">LOGS</span><span class="p">%</span><span class="k">write</span><span class="p">(</span><span class="s2">&quot;Extents of the data grid file &quot;</span><span class="o">//</span><span class="n">dquote</span><span class="p">(</span><span class="n">pOtherGrd</span><span class="p">%</span><span class="n">sFilename</span><span class="p">)</span> <span class="p">&amp;</span>
+          <span class="o">//</span><span class="s2">&quot; do not cover the base grid extents.&quot;</span><span class="p">)</span>
+
+      <span class="k">call </span><span class="n">LOGS</span><span class="p">%</span><span class="k">write</span><span class="p">(</span><span class="s2">&quot;BASE GRID EXTENTS        DATA GRID EXTENTS        DIFFERENCE&quot;</span><span class="p">,</span> <span class="p">&amp;</span>
+        <span class="n">iTab</span><span class="o">=</span><span class="mi">18</span><span class="p">,</span> <span class="n">iLinesBefore</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+      <span class="k">call </span><span class="n">LOGS</span><span class="p">%</span><span class="k">write</span><span class="p">(</span><span class="s2">&quot;X (lower-left):   &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">asCharacter</span><span class="p">(</span><span class="n">pBaseGrd</span><span class="p">%</span><span class="n">rX0</span><span class="p">))</span>    <span class="p">&amp;</span>
+        <span class="o">//</span><span class="s2">&quot;       &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">asCharacter</span><span class="p">(</span><span class="n">pOtherGrd</span><span class="p">%</span><span class="n">rX0</span><span class="p">))</span>                          <span class="p">&amp;</span>
+        <span class="o">//</span><span class="s2">&quot;       &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">asCharacter</span><span class="p">(</span><span class="n">pBaseGrd</span><span class="p">%</span><span class="n">rX0</span> <span class="o">-</span> <span class="n">pOtherGrd</span><span class="p">%</span><span class="n">rX0</span><span class="p">))</span> <span class="p">)</span>
+      <span class="k">call </span><span class="n">LOGS</span><span class="p">%</span><span class="k">write</span><span class="p">(</span><span class="s2">&quot;Y (lower-left):   &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">asCharacter</span><span class="p">(</span><span class="n">pBaseGrd</span><span class="p">%</span><span class="n">rY0</span><span class="p">))</span>    <span class="p">&amp;</span>
+        <span class="o">//</span><span class="s2">&quot;       &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">asCharacter</span><span class="p">(</span><span class="n">pOtherGrd</span><span class="p">%</span><span class="n">rY0</span><span class="p">))</span>                          <span class="p">&amp;</span>
+        <span class="o">//</span><span class="s2">&quot;       &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">asCharacter</span><span class="p">(</span><span class="n">pBaseGrd</span><span class="p">%</span><span class="n">rY0</span> <span class="o">-</span> <span class="n">pOtherGrd</span><span class="p">%</span><span class="n">rY0</span><span class="p">))</span> <span class="p">)</span>
+      <span class="k">call </span><span class="n">LOGS</span><span class="p">%</span><span class="k">write</span><span class="p">(</span><span class="s2">&quot;X (upper-right):  &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">asCharacter</span><span class="p">(</span><span class="n">pBaseGrd</span><span class="p">%</span><span class="n">rX1</span><span class="p">))</span>    <span class="p">&amp;</span>
+        <span class="o">//</span><span class="s2">&quot;       &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">asCharacter</span><span class="p">(</span><span class="n">pOtherGrd</span><span class="p">%</span><span class="n">rX1</span><span class="p">))</span>                          <span class="p">&amp;</span>
+        <span class="o">//</span><span class="s2">&quot;       &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">asCharacter</span><span class="p">(</span><span class="n">pOtherGrd</span><span class="p">%</span><span class="n">rX1</span> <span class="o">-</span> <span class="n">pBaseGrd</span><span class="p">%</span><span class="n">rX1</span><span class="p">))</span> <span class="p">)</span>
+      <span class="k">call </span><span class="n">LOGS</span><span class="p">%</span><span class="k">write</span><span class="p">(</span><span class="s2">&quot;Y (upper-right):  &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">asCharacter</span><span class="p">(</span><span class="n">pBaseGrd</span><span class="p">%</span><span class="n">rY1</span><span class="p">))</span>    <span class="p">&amp;</span>
+        <span class="o">//</span><span class="s2">&quot;       &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">asCharacter</span><span class="p">(</span><span class="n">pOtherGrd</span><span class="p">%</span><span class="n">rY1</span><span class="p">))</span>                          <span class="p">&amp;</span>
+        <span class="o">//</span><span class="s2">&quot;       &quot;</span><span class="o">//</span><span class="nb">trim</span><span class="p">(</span><span class="n">asCharacter</span><span class="p">(</span><span class="n">pOtherGrd</span><span class="p">%</span><span class="n">rY1</span> <span class="o">-</span> <span class="n">pBaseGrd</span><span class="p">%</span><span class="n">rY1</span><span class="p">)),</span> <span class="n">iLinesAfter</span><span class="o">=</span><span class="mi">1</span> <span class="p">)</span>
+
+  <span class="k">end if</span>
+
+<span class="k">end function </span><span class="n">grid_CompletelyCover</span>
+</pre></div>
+
+    </section>
+    <br>
+    
+
+    </div>
+  </div>
+
+
+    <hr>
+  </div> <!-- /container -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <p>&copy; 2019 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
+            </p>
+        </div>
+        <div class="col-4">
+          <p class="text-right"><small>
+            Documentation for SWB2
+               (version 2.0, build 96) generated by
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on Tue Sep  3 16:54:50 2019 </small>
+          </p>
+        </div>
+        <div class="col">
+          <p class="text-center"> SWB2 was developed by Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt</p>
+        </div>
+      </div>
+      <br>
+    </div> <!-- /container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+  <script src="../js/bootstrap.min.js"></script>
+
+  <!-- MathJax JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+  
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+
+</body>
+
+</html>

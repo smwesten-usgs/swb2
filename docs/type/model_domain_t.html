@@ -1,0 +1,5082 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="">
+  
+  <meta name="author" content="Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt">
+  <link rel="icon" href="../favicon.png">
+
+  <title>MODEL_DOMAIN_T &ndash; SWB2 </title>
+
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/pygments.css" rel="stylesheet">
+  <link href="../css/font-awesome.min.css" rel="stylesheet">
+  <link href="../css/bootstrap-toc.css" rel="stylesheet">
+    <!-- <link href="../css/local.css" rel="stylesheet"> -->
+  
+  
+
+  <script src="../js/jquery-2.1.3.min.js"></script>
+  <script src="../js/svg-pan-zoom.min.js"></script>
+  <script src="../js/bootstrap-toc.js"></script>
+
+</head>
+
+<body data-spy="scroll" data-target="#toc">
+
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+
+    <a class="navbar-brand" href="../index.html">SWB2</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" navbar-light bg-light id="navbarText">
+      <ul class="navbar-nav mr-auto">
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../page/index.html">User Guide</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/modules.html">Modules</a>
+          </li>
+        
+
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+          </li>
+        
+
+
+      </ul>
+    </div>
+
+    <form class="form-inline">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+        <!-- <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contents <span class="caret"></span></a>
+            <ul class="dropdown-menu"> -->
+          <!-- 
+            
+              <li><a href="../lists/files.html">Source Files</a></li>
+            
+          
+          
+            <li><a href="../lists/modules.html">Modules</a></li>
+          
+          
+          
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+          
+          
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+           
+            <li><a href="../lists/types.html">Derived Types</a></li>
+          
+          
+            <li><a href="../lists/programs.html">Programs</a></li>
+          
+        </ul> -->
+
+      <!-- </div> -->
+      <!--/.nav-collapse -->
+
+  </nav>
+
+  <div class="container">
+    
+  
+  <div class="row">
+    <h1>MODEL_DOMAIN_T
+    <small>Derived Type</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="card">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title="<p>18.6% of total for derived types.</p>Including implementation: 1529 statements, 19.2% of total for derived types.">160 statements</a>
+     </li>
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/model_domain.F90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+     <li><a href='../sourcefile/model_domain.f90.html'>model_domain.F90</a></li>
+    
+     <li><a href='../module/model_domain.html'>model_domain</a></li>
+    
+  
+     <li class="active">MODEL_DOMAIN_T</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+
+
+
+
+
+<div class="card bg-primary">
+    <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-0">Modules</a></h3></div> -->
+    <div class="card-header"><a data-toggle="collapse" href="#var-0" aria-expanded="true" aria-controls="collapse-example" id="variables-header" class="d-block">
+              <i class="fa fa-chevron-down pull-right"></i>Variables</a>
+    </div>
+
+  <div id="var-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-output_directory_name">output_directory_name</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-proj4_string">PROJ4_string</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-number_of_columns">number_of_columns</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-number_of_rows">number_of_rows</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-x_ll">X_ll</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-y_ll">Y_ll</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-x_ur">X_ur</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-y_ur">Y_ur</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-x">X</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-y">Y</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-x_lon">X_lon</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-y_lat">Y_lat</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-gridcellsize">gridcellsize</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-active">active</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-nodata_fill_value">nodata_fill_value</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-array_output">array_output</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-landuse_code">landuse_code</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-landuse_index">landuse_index</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-soil_code">soil_code</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-soil_group">soil_group</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-num_upslope_connections">num_upslope_connections</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-sum_upslope_cells">sum_upslope_cells</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-col_num_2d">col_num_2D</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-row_num_2d">row_num_2D</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-col_num_1d">col_num_1D</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-row_num_1d">row_num_1D</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-pervious_fraction">pervious_fraction</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-canopy_cover_fraction">canopy_cover_fraction</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-awc">awc</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-curve_num_adj">curve_num_adj</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-gdd">gdd</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-crop_coefficient_kcb">crop_coefficient_kcb</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-surf_evap_coef_ke">surf_evap_coef_ke</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-plant_stress_coef_ks">plant_stress_coef_ks</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-evap_reduction_coef_kr">evap_reduction_coef_kr</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-total_available_water_taw">total_available_water_taw</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-readily_available_water_raw">readily_available_water_raw</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-continuous_frozen_ground_index">continuous_frozen_ground_index</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-rooting_depth_max">rooting_depth_max</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-polygon_id">polygon_id</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-latitude">latitude</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-reference_et0">reference_et0</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-crop_etc">crop_etc</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-actual_et_interception">actual_et_interception</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-actual_et_impervious">actual_et_impervious</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-actual_et_soil">actual_et_soil</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-actual_et">actual_et</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-bare_soil_evap">bare_soil_evap</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-inflow">inflow</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-runon">runon</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-runoff">runoff</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-monthly_runoff">monthly_runoff</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-runoff_outside">runoff_outside</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-outflow">outflow</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-infiltration">infiltration</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-potential_snowmelt">potential_snowmelt</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-snowmelt">snowmelt</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-pgrdout">pGrdOut</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-interception">interception</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-interception_storage">interception_storage</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-snow_storage">snow_storage</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-surface_storage">surface_storage</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-surface_storage_max">surface_storage_max</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-surface_storage_excess">surface_storage_excess</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-storm_drain_capture">storm_drain_capture</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-delta_soil_storage">delta_soil_storage</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-soil_storage">soil_storage</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-soil_storage_max">soil_storage_max</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-soil_moisture_deficit">soil_moisture_deficit</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-net_infiltration">net_infiltration</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-rejected_net_infiltration">rejected_net_infiltration</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-direct_net_infiltration">direct_net_infiltration</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-direct_soil_moisture">direct_soil_moisture</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-current_rooting_depth">current_rooting_depth</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-number_of_days_since_planting">number_of_days_since_planting</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-it_is_growing_season">it_is_growing_season</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-gross_precip">gross_precip</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-monthly_gross_precip">monthly_gross_precip</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-fog">fog</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-rainfall">rainfall</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-net_rainfall">net_rainfall</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-snowfall">snowfall</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-net_snowfall">net_snowfall</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-irrigation">irrigation</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-tmin">tmin</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-tmax">tmax</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-tmean">tmean</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-routing_fraction">routing_fraction</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-sort_order">sort_order</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-adjusted_depletion_fraction_p">adjusted_depletion_fraction_p</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-fraction_exposed_and_wetted_soil">fraction_exposed_and_wetted_soil</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-irrigation_mask">irrigation_mask</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_interception">init_interception</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_runoff">init_runoff</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_reference_et">init_reference_et</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_actual_et">init_actual_et</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_routing">init_routing</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_soil_storage_max">init_soil_storage_max</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_snowfall">init_snowfall</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_snowmelt">init_snowmelt</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_precipitation_data">init_precipitation_data</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_fog">init_fog</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_irrigation">init_irrigation</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_direct_net_infiltration">init_direct_net_infiltration</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_direct_soil_moisture">init_direct_soil_moisture</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-update_landuse_codes">update_landuse_codes</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_gdd">init_GDD</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_growing_season">init_growing_season</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_awc">init_AWC</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_crop_coefficient">init_crop_coefficient</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_interception">calc_interception</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-update_crop_coefficient">update_crop_coefficient</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-update_rooting_depth">update_rooting_depth</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_continuous_frozen_ground_index">init_continuous_frozen_ground_index</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_continuous_frozen_ground_index">calc_continuous_frozen_ground_index</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_maximum_net_infiltration">init_maximum_net_infiltration</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_maximum_net_infiltration">calc_maximum_net_infiltration</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_runoff">calc_runoff</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_reference_et">calc_reference_et</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_routing">calc_routing</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_actual_et">calc_actual_et</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_snowfall">calc_snowfall</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_snowmelt">calc_snowmelt</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_fog">calc_fog</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_irrigation">calc_irrigation</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_gdd">calc_GDD</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-update_growing_season">update_growing_season</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_direct_net_infiltration">calc_direct_net_infiltration</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_direct_soil_moisture">calc_direct_soil_moisture</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-output_irrigation">output_irrigation</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-dump_variables">dump_variables</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-read_awc_data">read_awc_data</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-get_precipitation_data">get_precipitation_data</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-get_minimum_air_temperature_data">get_minimum_air_temperature_data</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-get_maximum_air_temperature_data">get_maximum_air_temperature_data</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calculate_mean_air_temperature">calculate_mean_air_temperature</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#boundprocs-0">Type-Bound Procedures</a></h3></div>
+  <div id="boundprocs-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-model_update_rooting_depth_table_sub">model_update_rooting_depth_table_sub</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-update_rooting_depth_table">update_rooting_depth_table</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-initialize_arrays_sub">initialize_arrays_sub</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-initialize_arrays">initialize_arrays</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-initialize_grid_sub">initialize_grid_sub</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-initialize_grid">initialize_grid</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-set_default_procedure_pointers_sub">set_default_procedure_pointers_sub</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-set_default_method_pointers">set_default_method_pointers</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-set_method_pointers_sub">set_method_pointers_sub</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-set_method_pointers">set_method_pointers</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-set_inactive_cells_sub">set_inactive_cells_sub</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-set_inactive_cells">set_inactive_cells</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-preflight_check_method_pointers">preflight_check_method_pointers</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-get_climate_data">get_climate_data</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-set_output_directory~2">set_output_directory</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-initialize_methods_sub">initialize_methods_sub</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-initialize_methods">initialize_methods</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-summarize_state_variables_sub">summarize_state_variables_sub</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-summarize">summarize</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-initialize_row_column_indices_sub">initialize_row_column_indices_sub</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-initialize_row_column_indices">initialize_row_column_indices</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-row_column_to_index_fn">row_column_to_index_fn</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-row_column_to_index">row_column_to_index</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-model_initialize_growing_season">model_initialize_growing_season</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-initialize_growing_season">initialize_growing_season</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/model_domain_t.html#src">MODEL_DOMAIN_T</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      <h2>type, public :: MODEL_DOMAIN_T</h2>
+    
+    
+    
+    
+    <br>
+
+    <!-- <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+
+
+
+
+
+<div class="card bg-primary">
+    <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-1">Modules</a></h3></div> -->
+    <div class="card-header"><a data-toggle="collapse" href="#var-1" aria-expanded="true" aria-controls="collapse-example" id="variables-header" class="d-block">
+              <i class="fa fa-chevron-down pull-right"></i>Variables</a>
+    </div>
+
+  <div id="var-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-output_directory_name">output_directory_name</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-proj4_string">PROJ4_string</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-number_of_columns">number_of_columns</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-number_of_rows">number_of_rows</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-x_ll">X_ll</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-y_ll">Y_ll</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-x_ur">X_ur</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-y_ur">Y_ur</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-x">X</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-y">Y</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-x_lon">X_lon</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-y_lat">Y_lat</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-gridcellsize">gridcellsize</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-active">active</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-nodata_fill_value">nodata_fill_value</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-array_output">array_output</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-landuse_code">landuse_code</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-landuse_index">landuse_index</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-soil_code">soil_code</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-soil_group">soil_group</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-num_upslope_connections">num_upslope_connections</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-sum_upslope_cells">sum_upslope_cells</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-col_num_2d">col_num_2D</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-row_num_2d">row_num_2D</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-col_num_1d">col_num_1D</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-row_num_1d">row_num_1D</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-pervious_fraction">pervious_fraction</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-canopy_cover_fraction">canopy_cover_fraction</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-awc">awc</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-curve_num_adj">curve_num_adj</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-gdd">gdd</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-crop_coefficient_kcb">crop_coefficient_kcb</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-surf_evap_coef_ke">surf_evap_coef_ke</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-plant_stress_coef_ks">plant_stress_coef_ks</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-evap_reduction_coef_kr">evap_reduction_coef_kr</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-total_available_water_taw">total_available_water_taw</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-readily_available_water_raw">readily_available_water_raw</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-continuous_frozen_ground_index">continuous_frozen_ground_index</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-rooting_depth_max">rooting_depth_max</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-polygon_id">polygon_id</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-latitude">latitude</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-reference_et0">reference_et0</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-crop_etc">crop_etc</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-actual_et_interception">actual_et_interception</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-actual_et_impervious">actual_et_impervious</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-actual_et_soil">actual_et_soil</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-actual_et">actual_et</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-bare_soil_evap">bare_soil_evap</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-inflow">inflow</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-runon">runon</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-runoff">runoff</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-monthly_runoff">monthly_runoff</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-runoff_outside">runoff_outside</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-outflow">outflow</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-infiltration">infiltration</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-potential_snowmelt">potential_snowmelt</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-snowmelt">snowmelt</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-pgrdout">pGrdOut</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-interception">interception</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-interception_storage">interception_storage</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-snow_storage">snow_storage</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-surface_storage">surface_storage</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-surface_storage_max">surface_storage_max</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-surface_storage_excess">surface_storage_excess</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-storm_drain_capture">storm_drain_capture</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-delta_soil_storage">delta_soil_storage</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-soil_storage">soil_storage</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-soil_storage_max">soil_storage_max</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-soil_moisture_deficit">soil_moisture_deficit</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-net_infiltration">net_infiltration</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-rejected_net_infiltration">rejected_net_infiltration</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-direct_net_infiltration">direct_net_infiltration</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-direct_soil_moisture">direct_soil_moisture</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-current_rooting_depth">current_rooting_depth</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-number_of_days_since_planting">number_of_days_since_planting</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-it_is_growing_season">it_is_growing_season</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-gross_precip">gross_precip</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-monthly_gross_precip">monthly_gross_precip</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-fog">fog</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-rainfall">rainfall</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-net_rainfall">net_rainfall</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-snowfall">snowfall</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-net_snowfall">net_snowfall</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-irrigation">irrigation</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-tmin">tmin</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-tmax">tmax</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-tmean">tmean</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-routing_fraction">routing_fraction</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-sort_order">sort_order</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-adjusted_depletion_fraction_p">adjusted_depletion_fraction_p</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-fraction_exposed_and_wetted_soil">fraction_exposed_and_wetted_soil</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-irrigation_mask">irrigation_mask</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_interception">init_interception</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_runoff">init_runoff</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_reference_et">init_reference_et</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_actual_et">init_actual_et</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_routing">init_routing</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_soil_storage_max">init_soil_storage_max</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_snowfall">init_snowfall</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_snowmelt">init_snowmelt</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_precipitation_data">init_precipitation_data</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_fog">init_fog</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_irrigation">init_irrigation</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_direct_net_infiltration">init_direct_net_infiltration</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_direct_soil_moisture">init_direct_soil_moisture</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-update_landuse_codes">update_landuse_codes</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_gdd">init_GDD</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_growing_season">init_growing_season</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_awc">init_AWC</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_crop_coefficient">init_crop_coefficient</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_interception">calc_interception</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-update_crop_coefficient">update_crop_coefficient</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-update_rooting_depth">update_rooting_depth</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_continuous_frozen_ground_index">init_continuous_frozen_ground_index</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_continuous_frozen_ground_index">calc_continuous_frozen_ground_index</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-init_maximum_net_infiltration">init_maximum_net_infiltration</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_maximum_net_infiltration">calc_maximum_net_infiltration</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_runoff">calc_runoff</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_reference_et">calc_reference_et</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_routing">calc_routing</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_actual_et">calc_actual_et</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_snowfall">calc_snowfall</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_snowmelt">calc_snowmelt</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_fog">calc_fog</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_irrigation">calc_irrigation</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_gdd">calc_GDD</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-update_growing_season">update_growing_season</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_direct_net_infiltration">calc_direct_net_infiltration</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calc_direct_soil_moisture">calc_direct_soil_moisture</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-output_irrigation">output_irrigation</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-dump_variables">dump_variables</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-read_awc_data">read_awc_data</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-get_precipitation_data">get_precipitation_data</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-get_minimum_air_temperature_data">get_minimum_air_temperature_data</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-get_maximum_air_temperature_data">get_maximum_air_temperature_data</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#variable-calculate_mean_air_temperature">calculate_mean_air_temperature</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#boundprocs-1">Type-Bound Procedures</a></h3></div>
+  <div id="boundprocs-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-model_update_rooting_depth_table_sub">model_update_rooting_depth_table_sub</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-update_rooting_depth_table">update_rooting_depth_table</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-initialize_arrays_sub">initialize_arrays_sub</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-initialize_arrays">initialize_arrays</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-initialize_grid_sub">initialize_grid_sub</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-initialize_grid">initialize_grid</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-set_default_procedure_pointers_sub">set_default_procedure_pointers_sub</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-set_default_method_pointers">set_default_method_pointers</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-set_method_pointers_sub">set_method_pointers_sub</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-set_method_pointers">set_method_pointers</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-set_inactive_cells_sub">set_inactive_cells_sub</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-set_inactive_cells">set_inactive_cells</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-preflight_check_method_pointers">preflight_check_method_pointers</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-get_climate_data">get_climate_data</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-set_output_directory~2">set_output_directory</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-initialize_methods_sub">initialize_methods_sub</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-initialize_methods">initialize_methods</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-summarize_state_variables_sub">summarize_state_variables_sub</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-summarize">summarize</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-initialize_row_column_indices_sub">initialize_row_column_indices_sub</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-initialize_row_column_indices">initialize_row_column_indices</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-row_column_to_index_fn">row_column_to_index_fn</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-row_column_to_index">row_column_to_index</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-model_initialize_growing_season">model_initialize_growing_season</a>
+      
+      <a class="list-group-item" href="../type/model_domain_t.html#boundprocedure-initialize_growing_season">initialize_growing_season</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/model_domain_t.html#src">MODEL_DOMAIN_T</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md"> -->
+
+    
+    <section>
+    <h2>Components</h2>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-output_directory_name"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>output_directory_name</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-proj4_string"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>PROJ4_string</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-number_of_columns"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>number_of_columns</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-number_of_rows"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>number_of_rows</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-x_ll"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>X_ll</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-y_ll"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>Y_ll</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-x_ur"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>X_ur</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-y_ur"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>Y_ur</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-x"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>X</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-y"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>Y</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-x_lon"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>X_lon</strong>(:,:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-y_lat"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>Y_lat</strong>(:,:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-gridcellsize"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>gridcellsize</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-active"></span>logical(kind=c_bool),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>active</strong>(:,:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nodata_fill_value"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>nodata_fill_value</strong>(:,:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-array_output"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>array_output</strong>(:,:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-landuse_code"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>landuse_code</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-landuse_index"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>landuse_index</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-soil_code"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>soil_code</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-soil_group"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>soil_group</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-num_upslope_connections"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>num_upslope_connections</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-sum_upslope_cells"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>sum_upslope_cells</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-col_num_2d"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>col_num_2D</strong>(:,:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-row_num_2d"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>row_num_2D</strong>(:,:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-col_num_1d"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>col_num_1D</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-row_num_1d"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>row_num_1D</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pervious_fraction"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>pervious_fraction</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-canopy_cover_fraction"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>canopy_cover_fraction</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-awc"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>awc</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-curve_num_adj"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>curve_num_adj</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-gdd"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>gdd</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-crop_coefficient_kcb"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>crop_coefficient_kcb</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-surf_evap_coef_ke"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>surf_evap_coef_ke</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-plant_stress_coef_ks"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>plant_stress_coef_ks</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-evap_reduction_coef_kr"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>evap_reduction_coef_kr</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-total_available_water_taw"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>total_available_water_taw</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-readily_available_water_raw"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>readily_available_water_raw</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-continuous_frozen_ground_index"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>continuous_frozen_ground_index</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rooting_depth_max"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>rooting_depth_max</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-polygon_id"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>polygon_id</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-latitude"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>latitude</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-reference_et0"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>reference_et0</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-crop_etc"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>crop_etc</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-actual_et_interception"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>actual_et_interception</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-actual_et_impervious"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>actual_et_impervious</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-actual_et_soil"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>actual_et_soil</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-actual_et"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>actual_et</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-bare_soil_evap"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>bare_soil_evap</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inflow"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>inflow</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-runon"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>runon</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-runoff"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>runoff</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-monthly_runoff"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>monthly_runoff</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-runoff_outside"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>runoff_outside</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-outflow"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>outflow</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-infiltration"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>infiltration</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-potential_snowmelt"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>potential_snowmelt</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-snowmelt"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>snowmelt</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pgrdout"></span>type(GENERAL_GRID_T),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>pGrdOut</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-interception"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>interception</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-interception_storage"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>interception_storage</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-snow_storage"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>snow_storage</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-surface_storage"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>surface_storage</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-surface_storage_max"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>surface_storage_max</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-surface_storage_excess"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>surface_storage_excess</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-storm_drain_capture"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>storm_drain_capture</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-delta_soil_storage"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>delta_soil_storage</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-soil_storage"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>soil_storage</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-soil_storage_max"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>soil_storage_max</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-soil_moisture_deficit"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>soil_moisture_deficit</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-net_infiltration"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>net_infiltration</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rejected_net_infiltration"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>rejected_net_infiltration</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-direct_net_infiltration"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>direct_net_infiltration</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-direct_soil_moisture"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>direct_soil_moisture</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-current_rooting_depth"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>current_rooting_depth</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-number_of_days_since_planting"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>number_of_days_since_planting</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-it_is_growing_season"></span>logical(kind=c_bool),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>it_is_growing_season</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-gross_precip"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>gross_precip</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-monthly_gross_precip"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>monthly_gross_precip</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-fog"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>fog</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rainfall"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>rainfall</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-net_rainfall"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>net_rainfall</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-snowfall"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>snowfall</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-net_snowfall"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>net_snowfall</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-irrigation"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>irrigation</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-tmin"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>tmin</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-tmax"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>tmax</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-tmean"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>tmean</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-routing_fraction"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>routing_fraction</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-sort_order"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>sort_order</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-adjusted_depletion_fraction_p"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>adjusted_depletion_fraction_p</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-fraction_exposed_and_wetted_soil"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>fraction_exposed_and_wetted_soil</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-irrigation_mask"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>irrigation_mask</strong>(:)</td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-init_interception"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>init_interception</strong></td><td></td><td></td><td><p>declare procedure pointers - these will have to be initialized elsewhere</p></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-init_runoff"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>init_runoff</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-init_reference_et"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>init_reference_et</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-init_actual_et"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>init_actual_et</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-init_routing"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>init_routing</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-init_soil_storage_max"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>init_soil_storage_max</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-init_snowfall"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>init_snowfall</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-init_snowmelt"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>init_snowmelt</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-init_precipitation_data"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>init_precipitation_data</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-init_fog"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>init_fog</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-init_irrigation"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>init_irrigation</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-init_direct_net_infiltration"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>init_direct_net_infiltration</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-init_direct_soil_moisture"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>init_direct_soil_moisture</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-update_landuse_codes"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>update_landuse_codes</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-init_gdd"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>init_GDD</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-init_growing_season"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>init_growing_season</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-init_awc"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>init_AWC</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-init_crop_coefficient"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>init_crop_coefficient</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calc_interception"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>calc_interception</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-update_crop_coefficient"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>update_crop_coefficient</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-update_rooting_depth"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>update_rooting_depth</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-init_continuous_frozen_ground_index"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>init_continuous_frozen_ground_index</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calc_continuous_frozen_ground_index"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>calc_continuous_frozen_ground_index</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-init_maximum_net_infiltration"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>init_maximum_net_infiltration</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calc_maximum_net_infiltration"></span>procedure(<a href='../interface/index_method.html'>index_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>calc_maximum_net_infiltration</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calc_runoff"></span>procedure(<a href='../interface/index_method.html'>index_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>calc_runoff</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calc_reference_et"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>calc_reference_et</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calc_routing"></span>procedure(<a href='../interface/index_method.html'>index_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>calc_routing</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calc_actual_et"></span>procedure(<a href='../interface/index_method.html'>index_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>calc_actual_et</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calc_snowfall"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>calc_snowfall</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calc_snowmelt"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>calc_snowmelt</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calc_fog"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>calc_fog</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calc_irrigation"></span>procedure(<a href='../interface/index_method.html'>index_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>calc_irrigation</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calc_gdd"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>calc_GDD</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-update_growing_season"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>update_growing_season</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calc_direct_net_infiltration"></span>procedure(<a href='../interface/index_method.html'>index_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>calc_direct_net_infiltration</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calc_direct_soil_moisture"></span>procedure(<a href='../interface/index_method.html'>index_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>calc_direct_soil_moisture</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-output_irrigation"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>output_irrigation</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dump_variables"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>dump_variables</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-read_awc_data"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>read_awc_data</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-get_precipitation_data"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>get_precipitation_data</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-get_minimum_air_temperature_data"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>get_minimum_air_temperature_data</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-get_maximum_air_temperature_data"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>get_maximum_air_temperature_data</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calculate_mean_air_temperature"></span>procedure(<a href='../interface/array_method.html'>array_method</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>calculate_mean_air_temperature</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    </section>
+    <br>
+    
+
+    
+
+    
+
+    
+    <section>
+    <h2>Type-Bound Procedures</h2>
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-model_update_rooting_depth_table_sub"></span><h3>procedure, public :: <strong>model_update_rooting_depth_table_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/model_update_rooting_depth_table_sub.html'>model_update_rooting_depth_table_sub</a>(this)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Determine how many soil groups are present</p><a href="../proc/model_update_rooting_depth_table_sub.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-update_rooting_depth_table"></span><h3>procedure, public :: <strong>update_rooting_depth_table</strong>  => <a href='../proc/model_update_rooting_depth_table_sub.html'>model_update_rooting_depth_table_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/model_update_rooting_depth_table_sub.html'>model_update_rooting_depth_table_sub</a>(this)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Determine how many soil groups are present</p><a href="../proc/model_update_rooting_depth_table_sub.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-initialize_arrays_sub"></span><h3>procedure, public :: <strong>initialize_arrays_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/initialize_arrays_sub.html'>initialize_arrays_sub</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-initialize_arrays"></span><h3>generic, public :: <strong>initialize_arrays</strong>  => <a href='../type/model_domain_t.html#boundprocedure-initialize_arrays_sub'>initialize_arrays_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+public subroutine <a href='../proc/initialize_arrays_sub.html'>initialize_arrays_sub</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-initialize_grid_sub"></span><h3>procedure, public :: <strong>initialize_grid_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/initialize_grid_sub.html'>initialize_grid_sub</a>(this, iNumCols, iNumRows, dX_ll, dY_ll, dGridcellSize)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iNumCols</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iNumRows</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>dX_ll</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>dY_ll</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>dGridcellSize</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-initialize_grid"></span><h3>generic, public :: <strong>initialize_grid</strong>  => <a href='../type/model_domain_t.html#boundprocedure-initialize_grid_sub'>initialize_grid_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+public subroutine <a href='../proc/initialize_grid_sub.html'>initialize_grid_sub</a>(this, iNumCols, iNumRows, dX_ll, dY_ll, dGridcellSize)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iNumCols</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iNumRows</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>dX_ll</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>dY_ll</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>dGridcellSize</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-set_default_procedure_pointers_sub"></span><h3>procedure, public :: <strong>set_default_procedure_pointers_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/set_default_procedure_pointers_sub.html'>set_default_procedure_pointers_sub</a>(this)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>initialize procedure pointers such that the default methods are in place
+ this routine necessary because Intel compiler does not support initialization
+ of defined type procedure pointers within the defined type definition</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-set_default_method_pointers"></span><h3>generic, public :: <strong>set_default_method_pointers</strong>  => <a href='../type/model_domain_t.html#boundprocedure-set_default_procedure_pointers_sub'>set_default_procedure_pointers_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+public subroutine <a href='../proc/set_default_procedure_pointers_sub.html'>set_default_procedure_pointers_sub</a>(this)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>initialize procedure pointers such that the default methods are in place
+ this routine necessary because Intel compiler does not support initialization
+ of defined type procedure pointers within the defined type definition</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-set_method_pointers_sub"></span><h3>procedure, public :: <strong>set_method_pointers_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/set_method_pointers_sub.html'>set_method_pointers_sub</a>(this, sCmdText, argv_list)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sCmdText</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>argv_list</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-set_method_pointers"></span><h3>generic, public :: <strong>set_method_pointers</strong>  => <a href='../type/model_domain_t.html#boundprocedure-set_method_pointers_sub'>set_method_pointers_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+public subroutine <a href='../proc/set_method_pointers_sub.html'>set_method_pointers_sub</a>(this, sCmdText, argv_list)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sCmdText</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>argv_list</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-set_inactive_cells_sub"></span><h3>procedure, public :: <strong>set_inactive_cells_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/set_inactive_cells_sub.html'>set_inactive_cells_sub</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-set_inactive_cells"></span><h3>generic, public :: <strong>set_inactive_cells</strong>  => <a href='../type/model_domain_t.html#boundprocedure-set_inactive_cells_sub'>set_inactive_cells_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+public subroutine <a href='../proc/set_inactive_cells_sub.html'>set_inactive_cells_sub</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-preflight_check_method_pointers"></span><h3>procedure, public :: <strong>preflight_check_method_pointers</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/preflight_check_method_pointers.html'>preflight_check_method_pointers</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-get_climate_data"></span><h3>procedure, public :: <strong>get_climate_data</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/get_climate_data.html'>get_climate_data</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-set_output_directory~2"></span><h3>procedure, public :: <strong>set_output_directory</strong>  => <a href='../proc/set_output_directory_sub.html'>set_output_directory_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/set_output_directory_sub.html'>set_output_directory_sub</a>(this, output_dir_name)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>output_dir_name</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-initialize_methods_sub"></span><h3>procedure, public :: <strong>initialize_methods_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/initialize_methods_sub.html'>initialize_methods_sub</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-initialize_methods"></span><h3>generic, public :: <strong>initialize_methods</strong>  => <a href='../type/model_domain_t.html#boundprocedure-initialize_methods_sub'>initialize_methods_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+public subroutine <a href='../proc/initialize_methods_sub.html'>initialize_methods_sub</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-summarize_state_variables_sub"></span><h3>procedure, public :: <strong>summarize_state_variables_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/summarize_state_variables_sub.html'>summarize_state_variables_sub</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-summarize"></span><h3>generic, public :: <strong>summarize</strong>  => <a href='../type/model_domain_t.html#boundprocedure-summarize_state_variables_sub'>summarize_state_variables_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+public subroutine <a href='../proc/summarize_state_variables_sub.html'>summarize_state_variables_sub</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-initialize_row_column_indices_sub"></span><h3>procedure, public :: <strong>initialize_row_column_indices_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/initialize_row_column_indices_sub.html'>initialize_row_column_indices_sub</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-initialize_row_column_indices"></span><h3>generic, public :: <strong>initialize_row_column_indices</strong>  => <a href='../type/model_domain_t.html#boundprocedure-initialize_row_column_indices_sub'>initialize_row_column_indices_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+public subroutine <a href='../proc/initialize_row_column_indices_sub.html'>initialize_row_column_indices_sub</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-row_column_to_index_fn"></span><h3>procedure, public :: <strong>row_column_to_index_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public function <a href='../proc/row_column_to_index_fn.html'>row_column_to_index_fn</a>(this, col_num, row_num) result(indexval)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>col_num</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>row_num</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-row_column_to_index"></span><h3>generic, public :: <strong>row_column_to_index</strong>  => <a href='../type/model_domain_t.html#boundprocedure-row_column_to_index_fn'>row_column_to_index_fn</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+public function <a href='../proc/row_column_to_index_fn.html'>row_column_to_index_fn</a>(this, col_num, row_num) result(indexval)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>col_num</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>row_num</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-model_initialize_growing_season"></span><h3>procedure, public :: <strong>model_initialize_growing_season</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/model_initialize_growing_season.html'>model_initialize_growing_season</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-initialize_growing_season"></span><h3>generic, public :: <strong>initialize_growing_season</strong>  => <a href='../type/model_domain_t.html#boundprocedure-model_initialize_growing_season'>model_initialize_growing_season</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+public subroutine <a href='../proc/model_initialize_growing_season.html'>model_initialize_growing_season</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/model_domain_t.html'>MODEL_DOMAIN_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+    </section>
+    
+
+    
+    <section>
+    <h3><span class="anchor" id="src"></span>Source Code</h3>
+    <div class="highlight"><pre><span></span>  <span class="k">type</span> <span class="kd">::</span> <span class="n">MODEL_DOMAIN_T</span>
+
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>     <span class="kd">::</span> <span class="n">output_directory_name</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>     <span class="kd">::</span> <span class="n">PROJ4_string</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">number_of_columns</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">number_of_rows</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">X_ll</span><span class="p">,</span> <span class="n">Y_ll</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">X_ur</span><span class="p">,</span> <span class="n">Y_ur</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">X</span><span class="p">(:),</span> <span class="n">Y</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">X_lon</span><span class="p">(:,:),</span> <span class="n">Y_lat</span><span class="p">(:,:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">gridcellsize</span>
+
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">),</span> <span class="k">allocatable</span>     <span class="kd">::</span> <span class="n">active</span><span class="p">(:,:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">nodata_fill_value</span><span class="p">(:,:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">array_output</span><span class="p">(:,:)</span>
+
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">landuse_code</span><span class="p">(:)</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">landuse_index</span><span class="p">(:)</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">soil_code</span><span class="p">(:)</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">soil_group</span><span class="p">(:)</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">num_upslope_connections</span><span class="p">(:)</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">sum_upslope_cells</span><span class="p">(:)</span>
+
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">col_num_2D</span><span class="p">(:,:)</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">row_num_2D</span><span class="p">(:,:)</span>
+
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">col_num_1D</span><span class="p">(:)</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">row_num_1D</span><span class="p">(:)</span>
+
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">pervious_fraction</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">canopy_cover_fraction</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">awc</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">curve_num_adj</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">gdd</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">crop_coefficient_kcb</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">surf_evap_coef_ke</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">plant_stress_coef_ks</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">evap_reduction_coef_kr</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">total_available_water_taw</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">readily_available_water_raw</span><span class="p">(:)</span>
+
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">continuous_frozen_ground_index</span><span class="p">(:)</span>
+
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">rooting_depth_max</span><span class="p">(:)</span>
+
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">polygon_id</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">latitude</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">reference_et0</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">crop_etc</span><span class="p">(:)</span>
+
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">actual_et_interception</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">actual_et_impervious</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">actual_et_soil</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">pointer</span>          <span class="kd">::</span> <span class="n">actual_et</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">bare_soil_evap</span><span class="p">(:)</span>
+
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">inflow</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">runon</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">runoff</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">monthly_runoff</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">runoff_outside</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">outflow</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">infiltration</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">potential_snowmelt</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">snowmelt</span><span class="p">(:)</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">GENERAL_GRID_T</span><span class="p">),</span> <span class="k">pointer</span>         <span class="kd">::</span> <span class="n">pGrdOut</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">interception</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">pointer</span>           <span class="kd">::</span> <span class="n">interception_storage</span><span class="p">(:)</span>
+
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">pointer</span>           <span class="kd">::</span> <span class="n">snow_storage</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">pointer</span>          <span class="kd">::</span> <span class="n">surface_storage</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">surface_storage_max</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">surface_storage_excess</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">storm_drain_capture</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">delta_soil_storage</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">pointer</span>          <span class="kd">::</span> <span class="n">soil_storage</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">soil_storage_max</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">soil_moisture_deficit</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">pointer</span>           <span class="kd">::</span> <span class="n">net_infiltration</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">rejected_net_infiltration</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">direct_net_infiltration</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">direct_soil_moisture</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">current_rooting_depth</span><span class="p">(:)</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">number_of_days_since_planting</span><span class="p">(:)</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">),</span> <span class="k">allocatable</span>     <span class="kd">::</span> <span class="n">it_is_growing_season</span><span class="p">(:)</span>
+
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">gross_precip</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">monthly_gross_precip</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">pointer</span>           <span class="kd">::</span> <span class="n">fog</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">rainfall</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">net_rainfall</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">snowfall</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">net_snowfall</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">irrigation</span><span class="p">(:)</span>
+
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">tmin</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">tmax</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">tmean</span><span class="p">(:)</span>
+
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">routing_fraction</span><span class="p">(:)</span>
+
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">sort_order</span><span class="p">(:)</span>
+
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">allocatable</span>      <span class="kd">::</span> <span class="n">adjusted_depletion_fraction_p</span><span class="p">(:)</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">fraction_exposed_and_wetted_soil</span><span class="p">(:)</span>
+
+    <span class="c">! member variables that are only allocated if particular optional methods are invoked</span>
+
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_float</span><span class="p">),</span> <span class="k">allocatable</span>       <span class="kd">::</span> <span class="n">irrigation_mask</span><span class="p">(:)</span>
+
+    <span class="c">!&gt; declare procedure pointers - these will have to be initialized elsewhere</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">init_interception</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">init_runoff</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">init_reference_et</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">init_actual_et</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">init_routing</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">init_soil_storage_max</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">init_snowfall</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">init_snowmelt</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">init_precipitation_data</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">init_fog</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">init_irrigation</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">init_direct_net_infiltration</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">init_direct_soil_moisture</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">update_landuse_codes</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">init_GDD</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">init_growing_season</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">init_AWC</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">init_crop_coefficient</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">calc_interception</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">update_crop_coefficient</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">update_rooting_depth</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">init_continuous_frozen_ground_index</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">calc_continuous_frozen_ground_index</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">init_maximum_net_infiltration</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">index_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">calc_maximum_net_infiltration</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">index_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">calc_runoff</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">calc_reference_et</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">index_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">calc_routing</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">index_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">calc_actual_et</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">calc_snowfall</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">calc_snowmelt</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">calc_fog</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">index_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">calc_irrigation</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">calc_GDD</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">update_growing_season</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">index_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">calc_direct_net_infiltration</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">index_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">calc_direct_soil_moisture</span>
+    <span class="k">procedure</span> <span class="p">(</span><span class="n">array_method</span><span class="p">),</span> <span class="k">pointer</span>    <span class="kd">::</span> <span class="n">output_irrigation</span>
+    <span class="k">procedure</span> <span class="p">(</span><span class="n">array_method</span><span class="p">),</span> <span class="k">pointer</span>    <span class="kd">::</span> <span class="n">dump_variables</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">read_awc_data</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">get_precipitation_data</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">get_minimum_air_temperature_data</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">get_maximum_air_temperature_data</span>
+    <span class="k">procedure</span> <span class="p">(</span> <span class="n">array_method</span> <span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">calculate_mean_air_temperature</span>
+
+  <span class="k">contains</span>
+
+<span class="k">    procedure</span> <span class="kd">::</span> <span class="n">model_update_rooting_depth_table_sub</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">update_rooting_depth_table</span> <span class="o">=&gt;</span> <span class="n">model_update_rooting_depth_table_sub</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">initialize_arrays_sub</span>
+    <span class="k">generic</span>   <span class="kd">::</span> <span class="n">initialize_arrays</span> <span class="o">=&gt;</span> <span class="n">initialize_arrays_sub</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">initialize_grid_sub</span>
+    <span class="k">generic</span>   <span class="kd">::</span> <span class="n">initialize_grid</span> <span class="o">=&gt;</span> <span class="n">initialize_grid_sub</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">set_default_procedure_pointers_sub</span>
+    <span class="k">generic</span>   <span class="kd">::</span> <span class="n">set_default_method_pointers</span> <span class="o">=&gt;</span> <span class="n">set_default_procedure_pointers_sub</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">set_method_pointers_sub</span>
+    <span class="k">generic</span>   <span class="kd">::</span> <span class="n">set_method_pointers</span> <span class="o">=&gt;</span> <span class="n">set_method_pointers_sub</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">set_inactive_cells_sub</span>
+    <span class="k">generic</span>   <span class="kd">::</span> <span class="n">set_inactive_cells</span> <span class="o">=&gt;</span> <span class="n">set_inactive_cells_sub</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">preflight_check_method_pointers</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">get_climate_data</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">set_output_directory</span> <span class="o">=&gt;</span> <span class="n">set_output_directory_sub</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">initialize_methods_sub</span>
+    <span class="k">generic</span>   <span class="kd">::</span> <span class="n">initialize_methods</span> <span class="o">=&gt;</span> <span class="n">initialize_methods_sub</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">summarize_state_variables_sub</span>
+    <span class="k">generic</span>   <span class="kd">::</span> <span class="n">summarize</span> <span class="o">=&gt;</span> <span class="n">summarize_state_variables_sub</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">initialize_row_column_indices_sub</span>
+    <span class="k">generic</span>   <span class="kd">::</span> <span class="n">initialize_row_column_indices</span> <span class="o">=&gt;</span> <span class="n">initialize_row_column_indices_sub</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">row_column_to_index_fn</span>
+    <span class="k">generic</span>   <span class="kd">::</span> <span class="n">row_column_to_index</span> <span class="o">=&gt;</span> <span class="n">row_column_to_index_fn</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">model_initialize_growing_season</span>
+    <span class="k">generic</span>   <span class="kd">::</span> <span class="n">initialize_growing_season</span> <span class="o">=&gt;</span> <span class="n">model_initialize_growing_season</span>
+
+  <span class="k">end type </span><span class="n">MODEL_DOMAIN_T</span>
+</pre></div>
+
+    </section>
+    
+
+    </div>
+  </div>
+
+
+    <hr>
+  </div> <!-- /container -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <p>&copy; 2019 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
+            </p>
+        </div>
+        <div class="col-4">
+          <p class="text-right"><small>
+            Documentation for SWB2
+               (version 2.0, build 96) generated by
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on Tue Sep  3 16:54:50 2019 </small>
+          </p>
+        </div>
+        <div class="col">
+          <p class="text-center"> SWB2 was developed by Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt</p>
+        </div>
+      </div>
+      <br>
+    </div> <!-- /container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+  <script src="../js/bootstrap.min.js"></script>
+
+  <!-- MathJax JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+  
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+
+</body>
+
+</html>

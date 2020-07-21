@@ -1,0 +1,4373 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="">
+  
+  <meta name="author" content="Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt">
+  <link rel="icon" href="../favicon.png">
+
+  <title>DATETIME_T &ndash; SWB2 </title>
+
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/pygments.css" rel="stylesheet">
+  <link href="../css/font-awesome.min.css" rel="stylesheet">
+  <link href="../css/bootstrap-toc.css" rel="stylesheet">
+    <!-- <link href="../css/local.css" rel="stylesheet"> -->
+  
+  
+
+  <script src="../js/jquery-2.1.3.min.js"></script>
+  <script src="../js/svg-pan-zoom.min.js"></script>
+  <script src="../js/bootstrap-toc.js"></script>
+
+</head>
+
+<body data-spy="scroll" data-target="#toc">
+
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+
+    <a class="navbar-brand" href="../index.html">SWB2</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" navbar-light bg-light id="navbarText">
+      <ul class="navbar-nav mr-auto">
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../page/index.html">User Guide</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/modules.html">Modules</a>
+          </li>
+        
+
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+          </li>
+        
+
+
+      </ul>
+    </div>
+
+    <form class="form-inline">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+        <!-- <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contents <span class="caret"></span></a>
+            <ul class="dropdown-menu"> -->
+          <!-- 
+            
+              <li><a href="../lists/files.html">Source Files</a></li>
+            
+          
+          
+            <li><a href="../lists/modules.html">Modules</a></li>
+          
+          
+          
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+          
+          
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+           
+            <li><a href="../lists/types.html">Derived Types</a></li>
+          
+          
+            <li><a href="../lists/programs.html">Programs</a></li>
+          
+        </ul> -->
+
+      <!-- </div> -->
+      <!--/.nav-collapse -->
+
+  </nav>
+
+  <div class="container">
+    
+  
+  <div class="row">
+    <h1>DATETIME_T
+    <small>Derived Type</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="card">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title="<p> 6.4% of total for derived types.</p>Including implementation: 527 statements,  6.6% of total for derived types.">55 statements</a>
+     </li>
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/datetime.F90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+     <li><a href='../sourcefile/datetime.f90.html'>datetime.F90</a></li>
+    
+     <li><a href='../module/datetime.html'>datetime</a></li>
+    
+  
+     <li class="active">DATETIME_T</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+
+
+
+
+
+<div class="card bg-primary">
+    <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-0">Modules</a></h3></div> -->
+    <div class="card-header"><a data-toggle="collapse" href="#var-0" aria-expanded="true" aria-controls="collapse-example" id="variables-header" class="d-block">
+              <i class="fa fa-chevron-down pull-right"></i>Variables</a>
+    </div>
+
+  <div id="var-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-imonth">iMonth</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-iday">iDay</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-iyear">iYear</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-ihour">iHour</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-iminute">iMinute</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-isecond">iSecond</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-iwateryearhigh">iWaterYearHigh</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-iwateryearlow">iWaterYearLow</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-ijulianday">iJulianDay</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-djuliandate">dJulianDate</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#boundprocs-0">Type-Bound Procedures</a></h3></div>
+  <div id="boundprocs-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-calcjulianday">calcJulianDay</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-dayspermonth">dayspermonth</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-daysperyear">daysperyear</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-calcgregoriandate">calcGregorianDate</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-calcwateryear">calcWaterYear</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-parsedate">parseDate</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-parsetime">parseTime</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-isleapyear">isLeapYear</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-settimeformat">setTimeFormat</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-setdateformat">setDateFormat</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-is_date_less_than">is_date_less_than</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-operator%28%20lt%20%29">operator( < )</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-is_date_gt_or_equal_to">is_date_GT_or_equal_to</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-operator%28%20gt%3D%20%29">operator( >= )</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-is_date_lt_or_equal_to">is_date_LT_or_equal_to</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-operator%28%20lt%3D%20%29">operator( <= )</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-is_date_equal_to">is_date_equal_to</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-operator%28%20%3D%3D%20%29">operator( == )</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-date_minus_date_fn">date_minus_date_fn</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-date_minus_float_fn">date_minus_float_fn</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-date_minus_int_fn">date_minus_int_fn</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-operator%28%20-%20%29">operator( - )</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-date_plus_float_fn">date_plus_float_fn</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-operator%28%20%2B%20%29">operator( + )</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-setday">setDay</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-setmonth">setMonth</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-setyear">setYear</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-addday">addDay</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-advancelastdayofmonth">advanceLastDayOfMonth</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-subtractday">subtractDay</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-addyear">addYear</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-subtractyear">subtractYear</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-prettydate">prettydate</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-prettydatetime">prettydatetime</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-listdatetime">listdatetime</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-listdate">listdate</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-listtime">listtime</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-systime">systime</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-getdayofyear">getDayOfYear</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-getjulianday">getJulianDay</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-setjuliandate">setJulianDate</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-getfractionofday">getFractionOfDay</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/datetime_t.html#src">DATETIME_T</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      <h2>type, public :: DATETIME_T</h2>
+    
+    
+    
+    
+    <br>
+
+    <!-- <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+
+
+
+
+
+<div class="card bg-primary">
+    <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-1">Modules</a></h3></div> -->
+    <div class="card-header"><a data-toggle="collapse" href="#var-1" aria-expanded="true" aria-controls="collapse-example" id="variables-header" class="d-block">
+              <i class="fa fa-chevron-down pull-right"></i>Variables</a>
+    </div>
+
+  <div id="var-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-imonth">iMonth</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-iday">iDay</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-iyear">iYear</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-ihour">iHour</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-iminute">iMinute</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-isecond">iSecond</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-iwateryearhigh">iWaterYearHigh</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-iwateryearlow">iWaterYearLow</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-ijulianday">iJulianDay</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#variable-djuliandate">dJulianDate</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#boundprocs-1">Type-Bound Procedures</a></h3></div>
+  <div id="boundprocs-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-calcjulianday">calcJulianDay</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-dayspermonth">dayspermonth</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-daysperyear">daysperyear</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-calcgregoriandate">calcGregorianDate</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-calcwateryear">calcWaterYear</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-parsedate">parseDate</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-parsetime">parseTime</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-isleapyear">isLeapYear</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-settimeformat">setTimeFormat</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-setdateformat">setDateFormat</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-is_date_less_than">is_date_less_than</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-operator%28%20lt%20%29">operator( < )</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-is_date_gt_or_equal_to">is_date_GT_or_equal_to</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-operator%28%20gt%3D%20%29">operator( >= )</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-is_date_lt_or_equal_to">is_date_LT_or_equal_to</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-operator%28%20lt%3D%20%29">operator( <= )</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-is_date_equal_to">is_date_equal_to</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-operator%28%20%3D%3D%20%29">operator( == )</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-date_minus_date_fn">date_minus_date_fn</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-date_minus_float_fn">date_minus_float_fn</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-date_minus_int_fn">date_minus_int_fn</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-operator%28%20-%20%29">operator( - )</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-date_plus_float_fn">date_plus_float_fn</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-operator%28%20%2B%20%29">operator( + )</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-setday">setDay</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-setmonth">setMonth</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-setyear">setYear</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-addday">addDay</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-advancelastdayofmonth">advanceLastDayOfMonth</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-subtractday">subtractDay</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-addyear">addYear</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-subtractyear">subtractYear</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-prettydate">prettydate</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-prettydatetime">prettydatetime</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-listdatetime">listdatetime</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-listdate">listdate</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-listtime">listtime</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-systime">systime</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-getdayofyear">getDayOfYear</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-getjulianday">getJulianDay</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-setjuliandate">setJulianDate</a>
+      
+      <a class="list-group-item" href="../type/datetime_t.html#boundprocedure-getfractionofday">getFractionOfDay</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/datetime_t.html#src">DATETIME_T</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md"> -->
+
+    
+    <section>
+    <h2>Components</h2>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-imonth"></span>integer(kind=c_short),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iMonth</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-iday"></span>integer(kind=c_short),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iDay</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-iyear"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iYear</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ihour"></span>integer(kind=c_short),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iHour</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-iminute"></span>integer(kind=c_short),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iMinute</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-isecond"></span>integer(kind=c_short),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iSecond</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-iwateryearhigh"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iWaterYearHigh</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-iwateryearlow"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iWaterYearLow</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ijulianday"></span>integer(kind=c_long),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iJulianDay</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-djuliandate"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dJulianDate</strong></td><td> =</td><td>0.0_c_double</td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    </section>
+    <br>
+    
+
+    
+
+    
+
+    
+    <section>
+    <h2>Type-Bound Procedures</h2>
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-calcjulianday"></span><h3>procedure, public :: <strong>calcJulianDay</strong>  => calc_julian_day_sub 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine calc_julian_day_sub(this, iMonth, iDay, iYear, iHour, iMinute, iSecond)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>iMonth</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>iDay</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>iYear</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>iHour</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>iMinute</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>iSecond</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-dayspermonth"></span><h3>procedure, public :: <strong>dayspermonth</strong>  => get_days_in_month_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function get_days_in_month_fn(this) result(iDaysInMonth)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-daysperyear"></span><h3>procedure, public :: <strong>daysperyear</strong>  => get_days_in_year_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function get_days_in_year_fn(this) result(iDaysInYear)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-calcgregoriandate"></span><h3>procedure, public :: <strong>calcGregorianDate</strong>  => calc_gregorian_date_sub 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine calc_gregorian_date_sub(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-calcwateryear"></span><h3>procedure, public :: <strong>calcWaterYear</strong>  => calc_water_year_sub 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine calc_water_year_sub(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-parsedate"></span><h3>procedure, public :: <strong>parseDate</strong>  => parse_text_to_date_sub 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sString</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>sFilename</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>iLinenumber</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-parsetime"></span><h3>procedure, public :: <strong>parseTime</strong>  => parse_text_to_time_sub 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine parse_text_to_time_sub(this, sString)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sString</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-isleapyear"></span><h3>procedure, public :: <strong>isLeapYear</strong>  => is_leap_year_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function is_leap_year_fn(this) result(lIsLeapYear)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-settimeformat"></span><h3>procedure, public :: <strong>setTimeFormat</strong>  => set_time_format_indices 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine set_time_format_indices(this, sTimeFormat)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>sTimeFormat</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-setdateformat"></span><h3>procedure, public :: <strong>setDateFormat</strong>  => set_date_format_indices 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine set_date_format_indices(this, sDateFormat)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>sDateFormat</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-is_date_less_than"></span><h3>procedure, public :: <strong>is_date_less_than</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function is_date_less_than(date1, date2) result(lResult)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-operator%28%20lt%20%29"></span><h3>generic, public :: <strong>operator( < )</strong>  => <a href='../type/datetime_t.html#boundprocedure-is_date_less_than'>is_date_less_than</a> 
+    
+  </h3></div>
+  
+  <div class="card-body">
+    
+
+
+    <p>"&lt;" operator for comparing two date objects</p>
+  </div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function is_date_less_than(date1, date2) result(lResult)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-is_date_gt_or_equal_to"></span><h3>procedure, public :: <strong>is_date_GT_or_equal_to</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function is_date_GT_or_equal_to(date1, date2) result(lResult)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-operator%28%20gt%3D%20%29"></span><h3>generic, public :: <strong>operator( >= )</strong>  => <a href='../type/datetime_t.html#boundprocedure-is_date_gt_or_equal_to'>is_date_GT_or_equal_to</a> 
+    
+  </h3></div>
+  
+  <div class="card-body">
+    
+
+
+    <p>"&gt;=" operator for comparing two date objects</p>
+  </div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function is_date_GT_or_equal_to(date1, date2) result(lResult)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-is_date_lt_or_equal_to"></span><h3>procedure, public :: <strong>is_date_LT_or_equal_to</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function is_date_LT_or_equal_to(date1, date2) result(lResult)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-operator%28%20lt%3D%20%29"></span><h3>generic, public :: <strong>operator( <= )</strong>  => <a href='../type/datetime_t.html#boundprocedure-is_date_lt_or_equal_to'>is_date_LT_or_equal_to</a> 
+    
+  </h3></div>
+  
+  <div class="card-body">
+    
+
+
+    <p>"&lt;=" operator for comparing two date objects</p>
+  </div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function is_date_LT_or_equal_to(date1, date2) result(lResult)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-is_date_equal_to"></span><h3>procedure, public :: <strong>is_date_equal_to</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function is_date_equal_to(date1, date2) result(lResult)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-operator%28%20%3D%3D%20%29"></span><h3>generic, public :: <strong>operator( == )</strong>  => <a href='../type/datetime_t.html#boundprocedure-is_date_equal_to'>is_date_equal_to</a> 
+    
+  </h3></div>
+  
+  <div class="card-body">
+    
+
+
+    <p>"==" operator for comparing two date objects</p>
+  </div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function is_date_equal_to(date1, date2) result(lResult)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-date_minus_date_fn"></span><h3>procedure, public :: <strong>date_minus_date_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function date_minus_date_fn(date1, date2) result(rDelta)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-date_minus_float_fn"></span><h3>procedure, public :: <strong>date_minus_float_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function date_minus_float_fn(date1, fValue) result(newdate)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),
+  allocatable</small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-date_minus_int_fn"></span><h3>procedure, public :: <strong>date_minus_int_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function date_minus_int_fn(date1, iValue) result(newdate)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),
+  allocatable</small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-operator%28%20-%20%29"></span><h3>generic, public :: <strong>operator( - )</strong>  => <a href='../type/datetime_t.html#boundprocedure-date_minus_date_fn'>date_minus_date_fn</a>, <a href='../type/datetime_t.html#boundprocedure-date_minus_float_fn'>date_minus_float_fn</a>, <a href='../type/datetime_t.html#boundprocedure-date_minus_int_fn'>date_minus_int_fn</a> 
+    
+  </h3></div>
+  
+  <div class="card-body">
+    
+
+
+    <p>"-" operator for subtracting two date objects</p>
+  </div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function date_minus_date_fn(date1, date2) result(rDelta)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function date_minus_float_fn(date1, fValue) result(newdate)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),
+  allocatable</small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function date_minus_int_fn(date1, iValue) result(newdate)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),
+  allocatable</small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-date_plus_float_fn"></span><h3>procedure, public :: <strong>date_plus_float_fn</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function date_plus_float_fn(date1, fValue) result(newdate)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),
+  allocatable</small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-operator%28%20%2B%20%29"></span><h3>generic, public :: <strong>operator( + )</strong>  => <a href='../type/datetime_t.html#boundprocedure-date_plus_float_fn'>date_plus_float_fn</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function date_plus_float_fn(date1, fValue) result(newdate)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),
+  allocatable</small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-setday"></span><h3>procedure, public :: <strong>setDay</strong>  => date_set_day_sub 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine date_set_day_sub(this, newday)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>newday</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-setmonth"></span><h3>procedure, public :: <strong>setMonth</strong>  => date_set_month_sub 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine date_set_month_sub(this, newmonth)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>newmonth</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-setyear"></span><h3>procedure, public :: <strong>setYear</strong>  => date_set_year_sub 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine date_set_year_sub(this, newyear)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>newyear</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-addday"></span><h3>procedure, public :: <strong>addDay</strong>  => date_plus_day_sub 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine date_plus_day_sub(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-advancelastdayofmonth"></span><h3>procedure, public :: <strong>advanceLastDayOfMonth</strong>  => date_advance_to_last_day_of_month_sub 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine date_advance_to_last_day_of_month_sub(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-subtractday"></span><h3>procedure, public :: <strong>subtractDay</strong>  => date_minus_day_sub 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine date_minus_day_sub(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-addyear"></span><h3>procedure, public :: <strong>addYear</strong>  => date_plus_year_sub 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine date_plus_year_sub(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-subtractyear"></span><h3>procedure, public :: <strong>subtractYear</strong>  => date_minus_year_sub 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine date_minus_year_sub(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-prettydate"></span><h3>procedure, public :: <strong>prettydate</strong>  => write_pretty_date_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function write_pretty_date_fn(this) result(sDateText)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=10)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-prettydatetime"></span><h3>procedure, public :: <strong>prettydatetime</strong>  => write_pretty_datetime_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function write_pretty_datetime_fn(this) result(sDateTimeText)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=20)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-listdatetime"></span><h3>procedure, public :: <strong>listdatetime</strong>  => write_list_datetime_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function write_list_datetime_fn(this) result(sDatetimeText)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=19)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-listdate"></span><h3>procedure, public :: <strong>listdate</strong>  => write_list_date_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function write_list_date_fn(this) result(sDateText)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=10)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-listtime"></span><h3>procedure, public :: <strong>listtime</strong>  => write_list_time_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function write_list_time_fn(this) result(sTimeText)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=8)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-systime"></span><h3>procedure, public :: <strong>systime</strong>  => system_time_to_date_sub 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine system_time_to_date_sub(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-getdayofyear"></span><h3>procedure, public :: <strong>getDayOfYear</strong>  => get_day_of_year_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function get_day_of_year_fn(this) result(iDOY)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-getjulianday"></span><h3>procedure, public :: <strong>getJulianDay</strong>  => get_julian_day_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function get_julian_day_fn(this) result(iJulianDay)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-setjuliandate"></span><h3>procedure, public :: <strong>setJulianDate</strong>  => set_julian_date_sub 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private subroutine set_julian_date_sub(this, dValue)
+    
+    
+   
+</h3>
+    
+
+
+
+<p>\brief Return the number of days in the given year.</p><a href="../proc/set_julian_date_sub.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>dValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-getfractionofday"></span><h3>procedure, public :: <strong>getFractionOfDay</strong>  => get_fraction_of_day_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+private function get_fraction_of_day_fn(this) result(dFractionOfDay)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+    </section>
+    
+
+    
+    <section>
+    <h3><span class="anchor" id="src"></span>Source Code</h3>
+    <div class="highlight"><pre><span></span>  <span class="k">type</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">DATETIME_T</span>
+
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_short</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">iMonth</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_short</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">iDay</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">iYear</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_short</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">iHour</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_short</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">iMinute</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_short</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">iSecond</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">iWaterYearHigh</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">iWaterYearLow</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_long</span><span class="p">)</span>   <span class="kd">::</span> <span class="n">iJulianDay</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">)</span>    <span class="kd">::</span> <span class="n">dJulianDate</span> <span class="o">=</span> <span class="mf">0.0_c_double</span>
+
+  <span class="k">contains</span>
+
+<span class="k">    procedure</span>  <span class="kd">::</span> <span class="n">calcJulianDay</span> <span class="o">=&gt;</span> <span class="n">calc_julian_day_sub</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">dayspermonth</span> <span class="o">=&gt;</span> <span class="n">get_days_in_month_fn</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">daysperyear</span> <span class="o">=&gt;</span> <span class="n">get_days_in_year_fn</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">calcGregorianDate</span> <span class="o">=&gt;</span> <span class="n">calc_gregorian_date_sub</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">calcWaterYear</span> <span class="o">=&gt;</span> <span class="n">calc_water_year_sub</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">parseDate</span> <span class="o">=&gt;</span> <span class="n">parse_text_to_date_sub</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">parseTime</span> <span class="o">=&gt;</span> <span class="n">parse_text_to_time_sub</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">isLeapYear</span> <span class="o">=&gt;</span> <span class="n">is_leap_year_fn</span>
+
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">setTimeFormat</span> <span class="o">=&gt;</span> <span class="n">set_time_format_indices</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">setDateFormat</span> <span class="o">=&gt;</span> <span class="n">set_date_format_indices</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">is_date_less_than</span>
+    <span class="c">!&gt; &quot;&lt;&quot; operator for comparing two date objects</span>
+    <span class="k">generic</span>   <span class="kd">::</span> <span class="n">operator</span><span class="p">(</span> <span class="o">&lt;</span> <span class="p">)</span> <span class="o">=&gt;</span> <span class="n">is_date_less_than</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">is_date_GT_or_equal_to</span>
+    <span class="c">!&gt; &quot;&gt;=&quot; operator for comparing two date objects</span>
+    <span class="k">generic</span>   <span class="kd">::</span> <span class="n">operator</span><span class="p">(</span> <span class="o">&gt;=</span> <span class="p">)</span> <span class="o">=&gt;</span> <span class="n">is_date_GT_or_equal_to</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">is_date_LT_or_equal_to</span>
+    <span class="c">!&gt; &quot;&lt;=&quot; operator for comparing two date objects</span>
+    <span class="k">generic</span>   <span class="kd">::</span> <span class="n">operator</span><span class="p">(</span> <span class="o">&lt;=</span> <span class="p">)</span> <span class="o">=&gt;</span> <span class="n">is_date_LT_or_equal_to</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">is_date_equal_to</span>
+    <span class="c">!&gt; &quot;==&quot; operator for comparing two date objects</span>
+    <span class="k">generic</span>   <span class="kd">::</span> <span class="n">operator</span><span class="p">(</span> <span class="o">==</span> <span class="p">)</span> <span class="o">=&gt;</span> <span class="n">is_date_equal_to</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">date_minus_date_fn</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">date_minus_float_fn</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">date_minus_int_fn</span>
+    <span class="c">!&gt; &quot;-&quot; operator for subtracting two date objects</span>
+    <span class="k">generic</span>   <span class="kd">::</span> <span class="n">operator</span><span class="p">(</span> <span class="o">-</span> <span class="p">)</span> <span class="o">=&gt;</span> <span class="n">date_minus_date_fn</span><span class="p">,</span>   <span class="p">&amp;</span>
+                                  <span class="n">date_minus_float_fn</span><span class="p">,</span>  <span class="p">&amp;</span>
+                                  <span class="n">date_minus_int_fn</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">date_plus_float_fn</span>
+    <span class="k">generic</span>   <span class="kd">::</span> <span class="n">operator</span><span class="p">(</span> <span class="o">+</span> <span class="p">)</span> <span class="o">=&gt;</span> <span class="n">date_plus_float_fn</span>
+
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">setDay</span> <span class="o">=&gt;</span> <span class="n">date_set_day_sub</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">setMonth</span> <span class="o">=&gt;</span> <span class="n">date_set_month_sub</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">setYear</span> <span class="o">=&gt;</span> <span class="n">date_set_year_sub</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">addDay</span> <span class="o">=&gt;</span> <span class="n">date_plus_day_sub</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">advanceLastDayOfMonth</span> <span class="o">=&gt;</span> <span class="n">date_advance_to_last_day_of_month_sub</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">subtractDay</span> <span class="o">=&gt;</span> <span class="n">date_minus_day_sub</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">addYear</span> <span class="o">=&gt;</span> <span class="n">date_plus_year_sub</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">subtractYear</span> <span class="o">=&gt;</span> <span class="n">date_minus_year_sub</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">prettydate</span> <span class="o">=&gt;</span> <span class="n">write_pretty_date_fn</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">prettydatetime</span> <span class="o">=&gt;</span> <span class="n">write_pretty_datetime_fn</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">listdatetime</span> <span class="o">=&gt;</span> <span class="n">write_list_datetime_fn</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">listdate</span> <span class="o">=&gt;</span> <span class="n">write_list_date_fn</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">listtime</span> <span class="o">=&gt;</span> <span class="n">write_list_time_fn</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">systime</span> <span class="o">=&gt;</span> <span class="n">system_time_to_date_sub</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">getDayOfYear</span> <span class="o">=&gt;</span> <span class="n">get_day_of_year_fn</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">getJulianDay</span> <span class="o">=&gt;</span> <span class="n">get_julian_day_fn</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">setJulianDate</span> <span class="o">=&gt;</span> <span class="n">set_julian_date_sub</span>
+    <span class="k">procedure</span>  <span class="kd">::</span> <span class="n">getFractionOfDay</span> <span class="o">=&gt;</span> <span class="n">get_fraction_of_day_fn</span>
+
+  <span class="k">end type </span><span class="n">DATETIME_T</span>
+</pre></div>
+
+    </section>
+    
+
+    </div>
+  </div>
+
+
+    <hr>
+  </div> <!-- /container -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <p>&copy; 2019 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
+            </p>
+        </div>
+        <div class="col-4">
+          <p class="text-right"><small>
+            Documentation for SWB2
+               (version 2.0, build 96) generated by
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on Tue Sep  3 16:54:50 2019 </small>
+          </p>
+        </div>
+        <div class="col">
+          <p class="text-center"> SWB2 was developed by Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt</p>
+        </div>
+      </div>
+      <br>
+    </div> <!-- /container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+  <script src="../js/bootstrap.min.js"></script>
+
+  <!-- MathJax JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+  
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+
+</body>
+
+</html>

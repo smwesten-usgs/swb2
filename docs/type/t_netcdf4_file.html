@@ -1,0 +1,1384 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="">
+  
+  <meta name="author" content="Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt">
+  <link rel="icon" href="../favicon.png">
+
+  <title>T_NETCDF4_FILE &ndash; SWB2 </title>
+
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/pygments.css" rel="stylesheet">
+  <link href="../css/font-awesome.min.css" rel="stylesheet">
+  <link href="../css/bootstrap-toc.css" rel="stylesheet">
+    <!-- <link href="../css/local.css" rel="stylesheet"> -->
+  
+  
+
+  <script src="../js/jquery-2.1.3.min.js"></script>
+  <script src="../js/svg-pan-zoom.min.js"></script>
+  <script src="../js/bootstrap-toc.js"></script>
+
+</head>
+
+<body data-spy="scroll" data-target="#toc">
+
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+
+    <a class="navbar-brand" href="../index.html">SWB2</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" navbar-light bg-light id="navbarText">
+      <ul class="navbar-nav mr-auto">
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../page/index.html">User Guide</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/modules.html">Modules</a>
+          </li>
+        
+
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+          </li>
+        
+
+
+      </ul>
+    </div>
+
+    <form class="form-inline">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+        <!-- <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contents <span class="caret"></span></a>
+            <ul class="dropdown-menu"> -->
+          <!-- 
+            
+              <li><a href="../lists/files.html">Source Files</a></li>
+            
+          
+          
+            <li><a href="../lists/modules.html">Modules</a></li>
+          
+          
+          
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+          
+          
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+           
+            <li><a href="../lists/types.html">Derived Types</a></li>
+          
+          
+            <li><a href="../lists/programs.html">Programs</a></li>
+          
+        </ul> -->
+
+      <!-- </div> -->
+      <!--/.nav-collapse -->
+
+  </nav>
+
+  <div class="container">
+    
+  
+  <div class="row">
+    <h1>T_NETCDF4_FILE
+    <small>Derived Type</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="card">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title="<p> 6.4% of total for derived types.</p>Including implementation: 55 statements,  0.7% of total for derived types.">55 statements</a>
+     </li>
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/netcdf4_support.F90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+     <li><a href='../sourcefile/netcdf4_support.f90.html'>netcdf4_support.F90</a></li>
+    
+     <li><a href='../module/netcdf4_support.html'>netcdf4_support</a></li>
+    
+  
+     <li class="active">T_NETCDF4_FILE</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+
+
+
+
+
+<div class="card bg-primary">
+    <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-0">Modules</a></h3></div> -->
+    <div class="card-header"><a data-toggle="collapse" href="#var-0" aria-expanded="true" aria-controls="collapse-example" id="variables-header" class="d-block">
+              <i class="fa fa-chevron-down pull-right"></i>Variables</a>
+    </div>
+
+  <div id="var-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-incid">iNCID</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-sfilename~4">sFilename</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ifileformat">iFileFormat</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-inumberofdimensions~2">iNumberOfDimensions</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-inumberofvariables">iNumberOfVariables</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-inumberofattributes~2">iNumberOfAttributes</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-inc3_unlimiteddimensionnumber">iNC3_UnlimitedDimensionNumber</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ioriginjd">iOriginJD</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ifirstdayjd">iFirstDayJD</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ilastdayjd">iLastDayJD</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ioriginmonth">iOriginMonth</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ioriginday">iOriginDay</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ioriginyear">iOriginYear</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ioriginhh">iOriginHH</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ioriginmm">iOriginMM</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ioriginss">iOriginSS</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-lleapyeartreatment">lLeapYearTreatment</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-istart">iStart</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-icount">iCount</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-istride">iStride</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-icolbounds">iColBounds</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-irowbounds">iRowBounds</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-inx~2">iNX</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-iny~2">iNY</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-svariableorder~2">sVariableOrder</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-rx~2">rX</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ry~2">rY</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-lx_increaseswithindex">lX_IncreasesWithIndex</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ly_increaseswithindex">lY_IncreasesWithIndex</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-lallowautomaticdataflipping~2">lAllowAutomaticDataFlipping</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-dpfirstandlasttimevalues">dpFirstAndLastTimeValues</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-svarname">sVarName</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ivarid">iVarID</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ivarindex">iVarIndex</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ivartype">iVarType</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-svarunits">sVarUnits</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ivar_dimid">iVar_DimID</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-rscalefactor">rScaleFactor</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-raddoffset">rAddOffset</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-irowiter">iRowIter</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-icoliter">iColIter</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-lfliphorizontal~2">lFlipHorizontal</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-lflipvertical~2">lFlipVertical</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-rx_coords">rX_Coords</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ry_coords">rY_Coords</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-rx_coord_addoffset~2">rX_Coord_AddOffset</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ry_coord_addoffset~2">rY_Coord_AddOffset</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-rdatetimevalues">rDateTimeValues</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-rgridcellsizex">rGridCellSizeX</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-rgridcellsizey">rGridCellSizeY</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-pnc_dim">pNC_DIM</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-pnc_var">pNC_VAR</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-pnc_att~2">pNC_ATT</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/t_netcdf4_file.html#src">T_NETCDF4_FILE</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      <h2>type, public :: T_NETCDF4_FILE</h2>
+    
+    
+    
+    
+    <br>
+
+    <!-- <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+
+
+
+
+
+<div class="card bg-primary">
+    <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-1">Modules</a></h3></div> -->
+    <div class="card-header"><a data-toggle="collapse" href="#var-1" aria-expanded="true" aria-controls="collapse-example" id="variables-header" class="d-block">
+              <i class="fa fa-chevron-down pull-right"></i>Variables</a>
+    </div>
+
+  <div id="var-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-incid">iNCID</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-sfilename~4">sFilename</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ifileformat">iFileFormat</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-inumberofdimensions~2">iNumberOfDimensions</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-inumberofvariables">iNumberOfVariables</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-inumberofattributes~2">iNumberOfAttributes</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-inc3_unlimiteddimensionnumber">iNC3_UnlimitedDimensionNumber</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ioriginjd">iOriginJD</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ifirstdayjd">iFirstDayJD</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ilastdayjd">iLastDayJD</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ioriginmonth">iOriginMonth</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ioriginday">iOriginDay</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ioriginyear">iOriginYear</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ioriginhh">iOriginHH</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ioriginmm">iOriginMM</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ioriginss">iOriginSS</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-lleapyeartreatment">lLeapYearTreatment</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-istart">iStart</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-icount">iCount</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-istride">iStride</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-icolbounds">iColBounds</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-irowbounds">iRowBounds</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-inx~2">iNX</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-iny~2">iNY</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-svariableorder~2">sVariableOrder</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-rx~2">rX</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ry~2">rY</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-lx_increaseswithindex">lX_IncreasesWithIndex</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ly_increaseswithindex">lY_IncreasesWithIndex</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-lallowautomaticdataflipping~2">lAllowAutomaticDataFlipping</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-dpfirstandlasttimevalues">dpFirstAndLastTimeValues</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-svarname">sVarName</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ivarid">iVarID</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ivarindex">iVarIndex</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ivartype">iVarType</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-svarunits">sVarUnits</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ivar_dimid">iVar_DimID</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-rscalefactor">rScaleFactor</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-raddoffset">rAddOffset</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-irowiter">iRowIter</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-icoliter">iColIter</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-lfliphorizontal~2">lFlipHorizontal</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-lflipvertical~2">lFlipVertical</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-rx_coords">rX_Coords</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ry_coords">rY_Coords</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-rx_coord_addoffset~2">rX_Coord_AddOffset</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-ry_coord_addoffset~2">rY_Coord_AddOffset</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-rdatetimevalues">rDateTimeValues</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-rgridcellsizex">rGridCellSizeX</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-rgridcellsizey">rGridCellSizeY</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-pnc_dim">pNC_DIM</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-pnc_var">pNC_VAR</a>
+      
+      <a class="list-group-item" href="../type/t_netcdf4_file.html#variable-pnc_att~2">pNC_ATT</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/t_netcdf4_file.html#src">T_NETCDF4_FILE</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md"> -->
+
+    
+    <section>
+    <h2>Components</h2>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-incid"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNCID</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-sfilename~4"></span>character(len=256),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>sFilename</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ifileformat"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iFileFormat</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inumberofdimensions~2"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNumberOfDimensions</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inumberofvariables"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNumberOfVariables</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inumberofattributes~2"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNumberOfAttributes</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inc3_unlimiteddimensionnumber"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNC3_UnlimitedDimensionNumber</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ioriginjd"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iOriginJD</strong></td><td> =</td><td>NC_NA_INT</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ifirstdayjd"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iFirstDayJD</strong></td><td> =</td><td>NC_NA_INT</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ilastdayjd"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iLastDayJD</strong></td><td> =</td><td>NC_NA_INT</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ioriginmonth"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iOriginMonth</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ioriginday"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iOriginDay</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ioriginyear"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iOriginYear</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ioriginhh"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iOriginHH</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ioriginmm"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iOriginMM</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ioriginss"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iOriginSS</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lleapyeartreatment"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>lLeapYearTreatment</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-istart"></span>integer(kind=c_size_t),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>iStart</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-icount"></span>integer(kind=c_size_t),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>iCount</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-istride"></span>integer(kind=c_size_t),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>iStride</strong></td><td> =</td><td>1</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-icolbounds"></span>integer(kind=c_size_t),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:1)</td><td>::</td>
+  <td><strong>iColBounds</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-irowbounds"></span>integer(kind=c_size_t),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:1)</td><td>::</td>
+  <td><strong>iRowBounds</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inx~2"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNX</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-iny~2"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNY</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-svariableorder~2"></span>character(len=3),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>sVariableOrder</strong></td><td> =</td><td>"tyx"</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rx~2"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:1)</td><td>::</td>
+  <td><strong>rX</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ry~2"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:1)</td><td>::</td>
+  <td><strong>rY</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lx_increaseswithindex"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>lX_IncreasesWithIndex</strong></td><td> =</td><td>TRUE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ly_increaseswithindex"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>lY_IncreasesWithIndex</strong></td><td> =</td><td>FALSE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lallowautomaticdataflipping~2"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>lAllowAutomaticDataFlipping</strong></td><td> =</td><td>TRUE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dpfirstandlasttimevalues"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:1)</td><td>::</td>
+  <td><strong>dpFirstAndLastTimeValues</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-svarname"></span>character(len=64),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>sVarName</strong></td><td> =</td><td>["time", "y&nbsp;&nbsp;&nbsp;", "x&nbsp;&nbsp;&nbsp;", "z&nbsp;&nbsp;&nbsp;"]</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ivarid"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>iVarID</strong></td><td> =</td><td>NC_NA_INT</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ivarindex"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>iVarIndex</strong></td><td> =</td><td>NC_NA_INT</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ivartype"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>iVarType</strong></td><td> =</td><td>NC_NA_INT</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-svarunits"></span>character(len=64),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>sVarUnits</strong></td><td> =</td><td>"NA"</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ivar_dimid"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3, 0:3)</td><td>::</td>
+  <td><strong>iVar_DimID</strong></td><td> =</td><td>NC_NA_INT</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rscalefactor"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>rScaleFactor</strong></td><td> =</td><td>1.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-raddoffset"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>rAddOffset</strong></td><td> =</td><td>0.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-irowiter"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:2)</td><td>::</td>
+  <td><strong>iRowIter</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-icoliter"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:2)</td><td>::</td>
+  <td><strong>iColIter</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lfliphorizontal~2"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>lFlipHorizontal</strong></td><td> =</td><td>FALSE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lflipvertical~2"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>lFlipVertical</strong></td><td> =</td><td>FALSE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rx_coords"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable, dimension(:)</td><td>::</td>
+  <td><strong>rX_Coords</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ry_coords"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable, dimension(:)</td><td>::</td>
+  <td><strong>rY_Coords</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rx_coord_addoffset~2"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>rX_Coord_AddOffset</strong></td><td> =</td><td>0.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ry_coord_addoffset~2"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>rY_Coord_AddOffset</strong></td><td> =</td><td>0.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rdatetimevalues"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable, dimension(:)</td><td>::</td>
+  <td><strong>rDateTimeValues</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rgridcellsizex"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>rGridCellSizeX</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rgridcellsizey"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>rGridCellSizeY</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pnc_dim"></span>type(<a href='../type/t_netcdf_dimension.html'>T_NETCDF_DIMENSION</a>),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), pointer</td><td>::</td>
+  <td><strong>pNC_DIM</strong></td><td>=> </td><td>null()</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pnc_var"></span>type(<a href='../type/t_netcdf_variable.html'>T_NETCDF_VARIABLE</a>),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), pointer</td><td>::</td>
+  <td><strong>pNC_VAR</strong></td><td>=> </td><td>null()</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pnc_att~2"></span>type(<a href='../type/t_netcdf_attribute.html'>T_NETCDF_ATTRIBUTE</a>),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), pointer</td><td>::</td>
+  <td><strong>pNC_ATT</strong></td><td>=> </td><td>null()</td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    </section>
+    <br>
+    
+
+    
+
+    
+
+    
+
+    
+    <section>
+    <h3><span class="anchor" id="src"></span>Source Code</h3>
+    <div class="highlight"><pre><span></span>  <span class="k">type </span><span class="n">T_NETCDF4_FILE</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iNCID</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">256</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">sFilename</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iFileFormat</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iNumberOfDimensions</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iNumberOfVariables</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iNumberOfAttributes</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iNC3_UnlimitedDimensionNumber</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iOriginJD</span>   <span class="o">=</span> <span class="n">NC_NA_INT</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iFirstDayJD</span> <span class="o">=</span> <span class="n">NC_NA_INT</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iLastDayJD</span>  <span class="o">=</span> <span class="n">NC_NA_INT</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iOriginMonth</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iOriginDay</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iOriginYear</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iOriginHH</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iOriginMM</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iOriginSS</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">lLeapYearTreatment</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_size_t</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iStart</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_size_t</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iCount</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_size_t</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iStride</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_size_t</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iColBounds</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_size_t</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iRowBounds</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iNX</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iNY</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">sVariableOrder</span> <span class="o">=</span> <span class="s2">&quot;tyx&quot;</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rX</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rY</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">lX_IncreasesWithIndex</span> <span class="o">=</span> <span class="n">TRUE</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">lY_IncreasesWithIndex</span> <span class="o">=</span> <span class="n">FALSE</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span>  <span class="kd">::</span> <span class="n">lAllowAutomaticDataFlipping</span> <span class="o">=</span> <span class="n">TRUE</span>
+
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">1</span><span class="p">)</span> <span class="kd">::</span> <span class="n">dpFirstAndLastTimeValues</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">sVarName</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;time&quot;</span><span class="p">,</span><span class="s2">&quot;y   &quot;</span><span class="p">,</span><span class="s2">&quot;x   &quot;</span><span class="p">,</span><span class="s2">&quot;z   &quot;</span><span class="p">]</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iVarID</span> <span class="o">=</span> <span class="n">NC_NA_INT</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iVarIndex</span> <span class="o">=</span> <span class="n">NC_NA_INT</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iVarType</span> <span class="o">=</span> <span class="n">NC_NA_INT</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="mi">64</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">sVarUnits</span> <span class="o">=</span> <span class="s2">&quot;NA&quot;</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">,</span> <span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iVar_DimID</span> <span class="o">=</span> <span class="n">NC_NA_INT</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rScaleFactor</span> <span class="o">=</span> <span class="mf">1.0_c_double</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">3</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rAddOffset</span> <span class="o">=</span> <span class="mf">0.0_c_double</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iRowIter</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(</span><span class="mi">0</span><span class="p">:</span><span class="mi">2</span><span class="p">)</span> <span class="kd">::</span> <span class="n">iColIter</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span> <span class="kd">::</span> <span class="n">lFlipHorizontal</span> <span class="o">=</span> <span class="n">FALSE</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span> <span class="kd">::</span> <span class="n">lFlipVertical</span> <span class="o">=</span> <span class="n">FALSE</span>
+
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">allocatable</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:)</span> <span class="kd">::</span> <span class="n">rX_Coords</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">allocatable</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:)</span> <span class="kd">::</span> <span class="n">rY_Coords</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">)</span>                            <span class="kd">::</span> <span class="n">rX_Coord_AddOffset</span> <span class="o">=</span> <span class="mf">0.0_c_double</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">)</span>                            <span class="kd">::</span> <span class="n">rY_Coord_AddOffset</span> <span class="o">=</span> <span class="mf">0.0_c_double</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">),</span> <span class="k">allocatable</span><span class="p">,</span> <span class="k">dimension</span><span class="p">(:)</span> <span class="kd">::</span> <span class="n">rDateTimeValues</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rGridCellSizeX</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">)</span> <span class="kd">::</span> <span class="n">rGridCellSizeY</span>
+
+    <span class="k">type</span> <span class="p">(</span><span class="n">T_NETCDF_DIMENSION</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">pointer</span> <span class="kd">::</span> <span class="n">pNC_DIM</span> <span class="o">=&gt;</span> <span class="nb">null</span><span class="p">()</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">T_NETCDF_VARIABLE</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">pNC_VAR</span> <span class="o">=&gt;</span> <span class="nb">null</span><span class="p">()</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">T_NETCDF_ATTRIBUTE</span><span class="p">),</span> <span class="k">dimension</span><span class="p">(:),</span> <span class="k">pointer</span> <span class="kd">::</span> <span class="n">pNC_ATT</span> <span class="o">=&gt;</span> <span class="nb">null</span><span class="p">()</span>
+  <span class="k">end type </span><span class="n">T_NETCDF4_FILE</span>
+</pre></div>
+
+    </section>
+    
+
+    </div>
+  </div>
+
+
+    <hr>
+  </div> <!-- /container -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <p>&copy; 2019 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
+            </p>
+        </div>
+        <div class="col-4">
+          <p class="text-right"><small>
+            Documentation for SWB2
+               (version 2.0, build 96) generated by
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on Tue Sep  3 16:54:50 2019 </small>
+          </p>
+        </div>
+        <div class="col">
+          <p class="text-center"> SWB2 was developed by Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt</p>
+        </div>
+      </div>
+      <br>
+    </div> <!-- /container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+  <script src="../js/bootstrap.min.js"></script>
+
+  <!-- MathJax JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+  
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+
+</body>
+
+</html>

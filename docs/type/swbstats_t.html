@@ -1,0 +1,3420 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="">
+  
+  <meta name="author" content="Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt">
+  <link rel="icon" href="../favicon.png">
+
+  <title>SWBSTATS_T &ndash; SWB2 </title>
+
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/pygments.css" rel="stylesheet">
+  <link href="../css/font-awesome.min.css" rel="stylesheet">
+  <link href="../css/bootstrap-toc.css" rel="stylesheet">
+    <!-- <link href="../css/local.css" rel="stylesheet"> -->
+  
+  
+
+  <script src="../js/jquery-2.1.3.min.js"></script>
+  <script src="../js/svg-pan-zoom.min.js"></script>
+  <script src="../js/bootstrap-toc.js"></script>
+
+</head>
+
+<body data-spy="scroll" data-target="#toc">
+
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+
+    <a class="navbar-brand" href="../index.html">SWB2</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" navbar-light bg-light id="navbarText">
+      <ul class="navbar-nav mr-auto">
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../page/index.html">User Guide</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/modules.html">Modules</a>
+          </li>
+        
+
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+          </li>
+        
+
+
+      </ul>
+    </div>
+
+    <form class="form-inline">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+        <!-- <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contents <span class="caret"></span></a>
+            <ul class="dropdown-menu"> -->
+          <!-- 
+            
+              <li><a href="../lists/files.html">Source Files</a></li>
+            
+          
+          
+            <li><a href="../lists/modules.html">Modules</a></li>
+          
+          
+          
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+          
+          
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+           
+            <li><a href="../lists/types.html">Derived Types</a></li>
+          
+          
+            <li><a href="../lists/programs.html">Programs</a></li>
+          
+        </ul> -->
+
+      <!-- </div> -->
+      <!--/.nav-collapse -->
+
+  </nav>
+
+  <div class="container">
+    
+  
+  <div class="row">
+    <h1>SWBSTATS_T
+    <small>Derived Type</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="card">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title="<p> 8.4% of total for derived types.</p>Including implementation: 645 statements,  8.1% of total for derived types.">72 statements</a>
+     </li>
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/swbstats2_support.F90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+     <li><a href='../sourcefile/swbstats2_support.f90.html'>swbstats2_support.F90</a></li>
+    
+     <li><a href='../module/swbstats2_support.html'>swbstats2_support</a></li>
+    
+  
+     <li class="active">SWBSTATS_T</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+
+
+
+
+
+<div class="card bg-primary">
+    <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-0">Modules</a></h3></div> -->
+    <div class="card-header"><a data-toggle="collapse" href="#var-0" aria-expanded="true" aria-controls="collapse-example" id="variables-header" class="d-block">
+              <i class="fa fa-chevron-down pull-right"></i>Variables</a>
+    </div>
+
+  <div id="var-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-dump_options_to_screen">dump_options_to_screen</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-write_csv">write_csv</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-calc_zonal_stats">calc_zonal_stats</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-compare_to_obs_values">compare_to_obs_values</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-annualize_stats">annualize_stats</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-report_as_volume">report_as_volume</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-report_in_meters">report_in_meters</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-target_proj4_string">target_proj4_string</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-data_start_date">data_start_date</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-data_end_date">data_end_date</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-slice_start_date">slice_start_date</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-slice_end_date">slice_end_date</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-date_range_string">date_range_string</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-calculation_time_period">calculation_time_period</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-stress_period_filename">stress_period_filename</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-comparison_period_filename">comparison_period_filename</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-zone_period_filename">zone_period_filename</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-comparison_grid_filename">comparison_grid_filename</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-zone_grid_filename">zone_grid_filename</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-zone_grid2_filename">zone_grid2_filename</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-netcdf_input_filename">netcdf_input_filename</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-netcdf_variable_units_string">netcdf_variable_units_string</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-netcdf_variable_name_string">netcdf_variable_name_string</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-filename_modifier_string">filename_modifier_string</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-netcdf_input_file_is_open">netcdf_input_file_is_open</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-multiple_zone_grids">multiple_zone_grids</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-multiple_comparison_grids">multiple_comparison_grids</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-comparison_grid_conversion_factor">comparison_grid_conversion_factor</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-start_date_list">start_date_list</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-end_date_list">end_date_list</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-date_range_id_list">date_range_id_list</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-unique_zone_list">unique_zone_list</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-unique_zone2_list">unique_zone2_list</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-comparison_grid_file_list">comparison_grid_file_list</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-zone_grid_file_list">zone_grid_file_list</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-output_conversion_factor">output_conversion_factor</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-unit_conversion_factor">unit_conversion_factor</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-grid_cell_area_sq_meters">grid_cell_area_sq_meters</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-length_conversion_factor">length_conversion_factor</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-ncfile_in">ncfile_in</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-zonal_stats_output_file">zonal_stats_output_file</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-whole_grid_stats_output_file">whole_grid_stats_output_file</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-grd_native">grd_native</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-grd_delta">grd_delta</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-grd_delta2">grd_delta2</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-grd_zone">grd_zone</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-grd_zone2">grd_zone2</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-grd_comparison">grd_comparison</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#boundprocs-0">Type-Bound Procedures</a></h3></div>
+  <div id="boundprocs-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-set_conversion_factors_sub">set_conversion_factors_sub</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-set_conversion_factors">set_conversion_factors</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-create_working_grids">create_working_grids</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-open_zonal_stats_output_file">open_zonal_stats_output_file</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-create_date_list_for_annual_statistics">create_date_list_for_annual_statistics</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-create_date_list_for_period_statistics">create_date_list_for_period_statistics</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-create_date_list_for_monthly_statistics">create_date_list_for_monthly_statistics</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-read_date_range_file">read_date_range_file</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-read_zone_period_file">read_zone_period_file</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-read_comparison_period_file">read_comparison_period_file</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-get_unique_int">get_unique_int</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-initialize_zone_grid">initialize_zone_grid</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-initialize_secondary_zone_grid">initialize_secondary_zone_grid</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-initialize_comparison_grid">initialize_comparison_grid</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-calculate_slice_statistics">calculate_slice_statistics</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-open_output_netcdf_files">open_output_netcdf_files</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-close_output_netcdf_files">close_output_netcdf_files</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-write_stats_to_netcdf">write_stats_to_netcdf</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-write_stats_to_arcgrid">write_stats_to_arcgrid</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-output_zonal_stats">output_zonal_stats</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-print_all_options">print_all_options</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/swbstats_t.html#src">SWBSTATS_T</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      <h2>type, public :: SWBSTATS_T</h2>
+    
+    
+    
+    
+    <br>
+
+    <!-- <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+
+
+
+
+
+<div class="card bg-primary">
+    <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-1">Modules</a></h3></div> -->
+    <div class="card-header"><a data-toggle="collapse" href="#var-1" aria-expanded="true" aria-controls="collapse-example" id="variables-header" class="d-block">
+              <i class="fa fa-chevron-down pull-right"></i>Variables</a>
+    </div>
+
+  <div id="var-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-dump_options_to_screen">dump_options_to_screen</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-write_csv">write_csv</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-calc_zonal_stats">calc_zonal_stats</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-compare_to_obs_values">compare_to_obs_values</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-annualize_stats">annualize_stats</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-report_as_volume">report_as_volume</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-report_in_meters">report_in_meters</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-target_proj4_string">target_proj4_string</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-data_start_date">data_start_date</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-data_end_date">data_end_date</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-slice_start_date">slice_start_date</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-slice_end_date">slice_end_date</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-date_range_string">date_range_string</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-calculation_time_period">calculation_time_period</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-stress_period_filename">stress_period_filename</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-comparison_period_filename">comparison_period_filename</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-zone_period_filename">zone_period_filename</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-comparison_grid_filename">comparison_grid_filename</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-zone_grid_filename">zone_grid_filename</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-zone_grid2_filename">zone_grid2_filename</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-netcdf_input_filename">netcdf_input_filename</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-netcdf_variable_units_string">netcdf_variable_units_string</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-netcdf_variable_name_string">netcdf_variable_name_string</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-filename_modifier_string">filename_modifier_string</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-netcdf_input_file_is_open">netcdf_input_file_is_open</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-multiple_zone_grids">multiple_zone_grids</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-multiple_comparison_grids">multiple_comparison_grids</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-comparison_grid_conversion_factor">comparison_grid_conversion_factor</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-start_date_list">start_date_list</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-end_date_list">end_date_list</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-date_range_id_list">date_range_id_list</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-unique_zone_list">unique_zone_list</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-unique_zone2_list">unique_zone2_list</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-comparison_grid_file_list">comparison_grid_file_list</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-zone_grid_file_list">zone_grid_file_list</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-output_conversion_factor">output_conversion_factor</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-unit_conversion_factor">unit_conversion_factor</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-grid_cell_area_sq_meters">grid_cell_area_sq_meters</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-length_conversion_factor">length_conversion_factor</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-ncfile_in">ncfile_in</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-zonal_stats_output_file">zonal_stats_output_file</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-whole_grid_stats_output_file">whole_grid_stats_output_file</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-grd_native">grd_native</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-grd_delta">grd_delta</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-grd_delta2">grd_delta2</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-grd_zone">grd_zone</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-grd_zone2">grd_zone2</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#variable-grd_comparison">grd_comparison</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#boundprocs-1">Type-Bound Procedures</a></h3></div>
+  <div id="boundprocs-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-set_conversion_factors_sub">set_conversion_factors_sub</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-set_conversion_factors">set_conversion_factors</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-create_working_grids">create_working_grids</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-open_zonal_stats_output_file">open_zonal_stats_output_file</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-create_date_list_for_annual_statistics">create_date_list_for_annual_statistics</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-create_date_list_for_period_statistics">create_date_list_for_period_statistics</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-create_date_list_for_monthly_statistics">create_date_list_for_monthly_statistics</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-read_date_range_file">read_date_range_file</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-read_zone_period_file">read_zone_period_file</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-read_comparison_period_file">read_comparison_period_file</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-get_unique_int">get_unique_int</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-initialize_zone_grid">initialize_zone_grid</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-initialize_secondary_zone_grid">initialize_secondary_zone_grid</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-initialize_comparison_grid">initialize_comparison_grid</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-calculate_slice_statistics">calculate_slice_statistics</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-open_output_netcdf_files">open_output_netcdf_files</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-close_output_netcdf_files">close_output_netcdf_files</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-write_stats_to_netcdf">write_stats_to_netcdf</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-write_stats_to_arcgrid">write_stats_to_arcgrid</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-output_zonal_stats">output_zonal_stats</a>
+      
+      <a class="list-group-item" href="../type/swbstats_t.html#boundprocedure-print_all_options">print_all_options</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/swbstats_t.html#src">SWBSTATS_T</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md"> -->
+
+    
+    <section>
+    <h2>Components</h2>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dump_options_to_screen"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>dump_options_to_screen</strong></td><td> =</td><td>FALSE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-write_csv"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>write_csv</strong></td><td> =</td><td>FALSE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calc_zonal_stats"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>calc_zonal_stats</strong></td><td> =</td><td>FALSE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-compare_to_obs_values"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>compare_to_obs_values</strong></td><td> =</td><td>FALSE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-annualize_stats"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>annualize_stats</strong></td><td> =</td><td>FALSE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-report_as_volume"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>report_as_volume</strong></td><td> =</td><td>FALSE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-report_in_meters"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>report_in_meters</strong></td><td> =</td><td>FALSE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-target_proj4_string"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>target_proj4_string</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-data_start_date"></span>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>data_start_date</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-data_end_date"></span>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>data_end_date</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-slice_start_date"></span>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>slice_start_date</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-slice_end_date"></span>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>slice_end_date</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-date_range_string"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>date_range_string</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-calculation_time_period"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>calculation_time_period</strong></td><td> =</td><td>CALC_PERIOD_ALL</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-stress_period_filename"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>stress_period_filename</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-comparison_period_filename"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>comparison_period_filename</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-zone_period_filename"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>zone_period_filename</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-comparison_grid_filename"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>comparison_grid_filename</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-zone_grid_filename"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>zone_grid_filename</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-zone_grid2_filename"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>zone_grid2_filename</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-netcdf_input_filename"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>netcdf_input_filename</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-netcdf_variable_units_string"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>netcdf_variable_units_string</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-netcdf_variable_name_string"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>netcdf_variable_name_string</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-filename_modifier_string"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>filename_modifier_string</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-netcdf_input_file_is_open"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>netcdf_input_file_is_open</strong></td><td> =</td><td>FALSE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-multiple_zone_grids"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>multiple_zone_grids</strong></td><td> =</td><td>FALSE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-multiple_comparison_grids"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>multiple_comparison_grids</strong></td><td> =</td><td>FALSE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-comparison_grid_conversion_factor"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>comparison_grid_conversion_factor</strong></td><td> =</td><td>1.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-start_date_list"></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>start_date_list</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-end_date_list"></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>end_date_list</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-date_range_id_list"></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>date_range_id_list</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-unique_zone_list"></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>unique_zone_list</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-unique_zone2_list"></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>unique_zone2_list</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-comparison_grid_file_list"></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>comparison_grid_file_list</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-zone_grid_file_list"></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>zone_grid_file_list</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-output_conversion_factor"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>output_conversion_factor</strong></td><td> =</td><td>1.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-unit_conversion_factor"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>unit_conversion_factor</strong></td><td> =</td><td>1.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-grid_cell_area_sq_meters"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>grid_cell_area_sq_meters</strong></td><td> =</td><td>1.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-length_conversion_factor"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>length_conversion_factor</strong></td><td> =</td><td>1.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ncfile_in"></span>type(T_NETCDF4_FILE),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>ncfile_in</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-zonal_stats_output_file"></span>type(<a href='../type/ascii_file_t.html'>ASCII_FILE_T</a>),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>zonal_stats_output_file</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-whole_grid_stats_output_file"></span>type(<a href='../type/ascii_file_t.html'>ASCII_FILE_T</a>),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>whole_grid_stats_output_file</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-grd_native"></span>type(GENERAL_GRID_T),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>grd_native</strong></td><td>=> </td><td>null()</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-grd_delta"></span>type(GENERAL_GRID_T),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>grd_delta</strong></td><td>=> </td><td>null()</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-grd_delta2"></span>type(GENERAL_GRID_T),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>grd_delta2</strong></td><td>=> </td><td>null()</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-grd_zone"></span>type(<a href='../type/data_catalog_entry_t.html'>DATA_CATALOG_ENTRY_T</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>grd_zone</strong></td><td>=> </td><td>null()</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-grd_zone2"></span>type(<a href='../type/data_catalog_entry_t.html'>DATA_CATALOG_ENTRY_T</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>grd_zone2</strong></td><td>=> </td><td>null()</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-grd_comparison"></span>type(<a href='../type/data_catalog_entry_t.html'>DATA_CATALOG_ENTRY_T</a>),</td>
+  
+  <td>public,</td>
+  <td>pointer</td><td>::</td>
+  <td><strong>grd_comparison</strong></td><td>=> </td><td>null()</td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    </section>
+    <br>
+    
+
+    
+
+    
+
+    
+    <section>
+    <h2>Type-Bound Procedures</h2>
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-set_conversion_factors_sub"></span><h3>procedure, public :: <strong>set_conversion_factors_sub</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/set_conversion_factors_sub.html'>set_conversion_factors_sub</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-set_conversion_factors"></span><h3>generic, public :: <strong>set_conversion_factors</strong>  => <a href='../type/swbstats_t.html#boundprocedure-set_conversion_factors_sub'>set_conversion_factors_sub</a> 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+public subroutine <a href='../proc/set_conversion_factors_sub.html'>set_conversion_factors_sub</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-create_working_grids"></span><h3>procedure, public :: <strong>create_working_grids</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/create_working_grids.html'>create_working_grids</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-open_zonal_stats_output_file"></span><h3>procedure, public :: <strong>open_zonal_stats_output_file</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/open_zonal_stats_output_file.html'>open_zonal_stats_output_file</a>(this, filename)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>filename</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-create_date_list_for_annual_statistics"></span><h3>procedure, public :: <strong>create_date_list_for_annual_statistics</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/create_date_list_for_annual_statistics.html'>create_date_list_for_annual_statistics</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-create_date_list_for_period_statistics"></span><h3>procedure, public :: <strong>create_date_list_for_period_statistics</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/create_date_list_for_period_statistics.html'>create_date_list_for_period_statistics</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-create_date_list_for_monthly_statistics"></span><h3>procedure, public :: <strong>create_date_list_for_monthly_statistics</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/create_date_list_for_monthly_statistics.html'>create_date_list_for_monthly_statistics</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-read_date_range_file"></span><h3>procedure, public :: <strong>read_date_range_file</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/read_date_range_file.html'>read_date_range_file</a>(this, csv_filename, date_range_id_list, start_date_list, end_date_list)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>csv_filename</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date_range_id_list</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>start_date_list</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>end_date_list</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-read_zone_period_file"></span><h3>procedure, public :: <strong>read_zone_period_file</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/read_zone_period_file.html'>read_zone_period_file</a>(this, csv_filename, date_range_id_list, start_date_list, end_date_list, zonal_stats_grid_file_list)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>csv_filename</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date_range_id_list</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>start_date_list</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>end_date_list</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>zonal_stats_grid_file_list</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-read_comparison_period_file"></span><h3>procedure, public :: <strong>read_comparison_period_file</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/read_comparison_period_file.html'>read_comparison_period_file</a>(this, csv_filename, date_range_id_list, start_date_list, end_date_list, comparison_grid_file_list)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>csv_filename</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>date_range_id_list</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>start_date_list</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>end_date_list</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>comparison_grid_file_list</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-get_unique_int"></span><h3>procedure, public :: <strong>get_unique_int</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/get_unique_int.html'>get_unique_int</a>(this, grid_values, unique_val_list)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>grid_values</strong>(:,:)</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>unique_val_list</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-initialize_zone_grid"></span><h3>procedure, public :: <strong>initialize_zone_grid</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/initialize_zone_grid.html'>initialize_zone_grid</a>(this, grid_filename)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>grid_filename</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-initialize_secondary_zone_grid"></span><h3>procedure, public :: <strong>initialize_secondary_zone_grid</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/initialize_secondary_zone_grid.html'>initialize_secondary_zone_grid</a>(this, grid_filename)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>grid_filename</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-initialize_comparison_grid"></span><h3>procedure, public :: <strong>initialize_comparison_grid</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/initialize_comparison_grid.html'>initialize_comparison_grid</a>(this, grid_filename)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>grid_filename</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-calculate_slice_statistics"></span><h3>procedure, public :: <strong>calculate_slice_statistics</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/calculate_slice_statistics.html'>calculate_slice_statistics</a>(this, grid_delta, grid_delta2, start_date, end_date, grid_mask)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(GENERAL_GRID_T),</td>
+  <td></td>
+  <td></td>
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>grid_delta</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(GENERAL_GRID_T),</td>
+  <td></td>
+  <td></td>
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>grid_delta2</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>start_date</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>end_date</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical,</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>grid_mask</strong>(:,:)</td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-open_output_netcdf_files"></span><h3>procedure, public :: <strong>open_output_netcdf_files</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/open_output_netcdf_files.html'>open_output_netcdf_files</a>(this, output_files)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/file_collection_t.html'>FILE_COLLECTION_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>output_files</strong>(:)</td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-close_output_netcdf_files"></span><h3>procedure, public :: <strong>close_output_netcdf_files</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/close_output_netcdf_files.html'>close_output_netcdf_files</a>(this, output_files)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/file_collection_t.html'>FILE_COLLECTION_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>output_files</strong>(:)</td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-write_stats_to_netcdf"></span><h3>procedure, public :: <strong>write_stats_to_netcdf</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/write_stats_to_netcdf.html'>write_stats_to_netcdf</a>(this, output_files, start_date, end_date)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/file_collection_t.html'>FILE_COLLECTION_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>output_files</strong>(:)</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>start_date</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>end_date</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-write_stats_to_arcgrid"></span><h3>procedure, public :: <strong>write_stats_to_arcgrid</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/write_stats_to_arcgrid.html'>write_stats_to_arcgrid</a>(this, output_files, start_date, end_date, date_range_string)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/file_collection_t.html'>FILE_COLLECTION_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>output_files</strong>(:)</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>start_date</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>end_date</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>date_range_string</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-output_zonal_stats"></span><h3>procedure, public :: <strong>output_zonal_stats</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/output_zonal_stats.html'>output_zonal_stats</a>(this, start_date, end_date, values, zone_ids, unique_zone_list, funit, zone2_ids, unique_zone2_list, comparison_values)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>start_date</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/datetime_t.html'>DATETIME_T</a>),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>end_date</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>values</strong>(:,:)</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>zone_ids</strong>(:,:)</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>unique_zone_list</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>funit</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(inout),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>zone2_ids</strong>(:,:)</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(inout),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>unique_zone2_list</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(inout),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>comparison_values</strong>(:,:)</td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-print_all_options"></span><h3>procedure, public :: <strong>print_all_options</strong>  
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+        
+          
+    
+    <h3>
+public subroutine <a href='../proc/print_all_options.html'>print_all_options</a>(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/swbstats_t.html'>SWBSTATS_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+        
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+    </section>
+    
+
+    
+    <section>
+    <h3><span class="anchor" id="src"></span>Source Code</h3>
+    <div class="highlight"><pre><span></span>  <span class="k">type </span><span class="n">SWBSTATS_T</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">dump_options_to_screen</span> <span class="o">=</span> <span class="n">FALSE</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">write_csv</span>              <span class="o">=</span> <span class="n">FALSE</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">calc_zonal_stats</span>       <span class="o">=</span> <span class="n">FALSE</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">compare_to_obs_values</span>  <span class="o">=</span> <span class="n">FALSE</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">annualize_stats</span>        <span class="o">=</span> <span class="n">FALSE</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">report_as_volume</span>       <span class="o">=</span> <span class="n">FALSE</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">report_in_meters</span>       <span class="o">=</span> <span class="n">FALSE</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">target_proj4_string</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">DATETIME_T</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">data_start_date</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">DATETIME_T</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">data_end_date</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">DATETIME_T</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">slice_start_date</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">DATETIME_T</span><span class="p">)</span>               <span class="kd">::</span> <span class="n">slice_end_date</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">date_range_string</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">calculation_time_period</span> <span class="o">=</span> <span class="n">CALC_PERIOD_ALL</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">stress_period_filename</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">comparison_period_filename</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">zone_period_filename</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">comparison_grid_filename</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">zone_grid_filename</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">zone_grid2_filename</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">netcdf_input_filename</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">netcdf_variable_units_string</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">netcdf_variable_name_string</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">filename_modifier_string</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">netcdf_input_file_is_open</span> <span class="o">=</span> <span class="n">FALSE</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">multiple_zone_grids</span>       <span class="o">=</span> <span class="n">FALSE</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">multiple_comparison_grids</span> <span class="o">=</span> <span class="n">FALSE</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">comparison_grid_conversion_factor</span> <span class="o">=</span> <span class="mf">1.0_c_double</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">start_date_list</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">end_date_list</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">date_range_id_list</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">unique_zone_list</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">unique_zone2_list</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">comparison_grid_file_list</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">zone_grid_file_list</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">output_conversion_factor</span> <span class="o">=</span> <span class="mf">1.0_c_double</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">unit_conversion_factor</span> <span class="o">=</span> <span class="mf">1.0_c_double</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">grid_cell_area_sq_meters</span> <span class="o">=</span> <span class="mf">1.0_c_double</span>
+    <span class="kt">real</span> <span class="p">(</span><span class="kt">c_double</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">length_conversion_factor</span> <span class="o">=</span> <span class="mf">1.0_c_double</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">T_NETCDF4_FILE</span><span class="p">),</span> <span class="k">pointer</span>  <span class="kd">::</span> <span class="n">ncfile_in</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">ASCII_FILE_T</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">zonal_stats_output_file</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">ASCII_FILE_T</span><span class="p">)</span>             <span class="kd">::</span> <span class="n">whole_grid_stats_output_file</span>
+
+    <span class="k">type</span> <span class="p">(</span><span class="n">GENERAL_GRID_T</span><span class="p">),</span> <span class="k">pointer</span>       <span class="kd">::</span> <span class="n">grd_native</span> <span class="o">=&gt;</span> <span class="nb">null</span><span class="p">()</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">GENERAL_GRID_T</span><span class="p">),</span> <span class="k">pointer</span>       <span class="kd">::</span> <span class="n">grd_delta</span> <span class="o">=&gt;</span> <span class="nb">null</span><span class="p">()</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">GENERAL_GRID_T</span><span class="p">),</span> <span class="k">pointer</span>       <span class="kd">::</span> <span class="n">grd_delta2</span> <span class="o">=&gt;</span> <span class="nb">null</span><span class="p">()</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">DATA_CATALOG_ENTRY_T</span><span class="p">),</span> <span class="k">pointer</span> <span class="kd">::</span> <span class="n">grd_zone</span> <span class="o">=&gt;</span> <span class="nb">null</span><span class="p">()</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">DATA_CATALOG_ENTRY_T</span><span class="p">),</span> <span class="k">pointer</span> <span class="kd">::</span> <span class="n">grd_zone2</span> <span class="o">=&gt;</span> <span class="nb">null</span><span class="p">()</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">DATA_CATALOG_ENTRY_T</span><span class="p">),</span> <span class="k">pointer</span> <span class="kd">::</span> <span class="n">grd_comparison</span> <span class="o">=&gt;</span> <span class="nb">null</span><span class="p">()</span>
+
+  <span class="k">contains</span>
+
+<span class="k">    procedure</span> <span class="kd">::</span> <span class="n">set_conversion_factors_sub</span>
+    <span class="k">generic</span>   <span class="kd">::</span> <span class="n">set_conversion_factors</span> <span class="o">=&gt;</span> <span class="n">set_conversion_factors_sub</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">create_working_grids</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">open_zonal_stats_output_file</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">create_date_list_for_annual_statistics</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">create_date_list_for_period_statistics</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">create_date_list_for_monthly_statistics</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">read_date_range_file</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">read_zone_period_file</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">read_comparison_period_file</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">get_unique_int</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">initialize_zone_grid</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">initialize_secondary_zone_grid</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">initialize_comparison_grid</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">calculate_slice_statistics</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">open_output_netcdf_files</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">close_output_netcdf_files</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">write_stats_to_netcdf</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">write_stats_to_arcgrid</span>
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">output_zonal_stats</span>
+
+    <span class="k">procedure</span> <span class="kd">::</span> <span class="n">print_all_options</span>
+
+  <span class="k">end type </span><span class="n">SWBSTATS_T</span>
+</pre></div>
+
+    </section>
+    
+
+    </div>
+  </div>
+
+
+    <hr>
+  </div> <!-- /container -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <p>&copy; 2019 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
+            </p>
+        </div>
+        <div class="col-4">
+          <p class="text-right"><small>
+            Documentation for SWB2
+               (version 2.0, build 96) generated by
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on Tue Sep  3 16:54:50 2019 </small>
+          </p>
+        </div>
+        <div class="col">
+          <p class="text-center"> SWB2 was developed by Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt</p>
+        </div>
+      </div>
+      <br>
+    </div> <!-- /container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+  <script src="../js/bootstrap.min.js"></script>
+
+  <!-- MathJax JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+  
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+
+</body>
+
+</html>

@@ -1,0 +1,1946 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="">
+  
+  <meta name="author" content="Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt">
+  <link rel="icon" href="../favicon.png">
+
+  <title>ASCII_FILE_T &ndash; SWB2 </title>
+
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/pygments.css" rel="stylesheet">
+  <link href="../css/font-awesome.min.css" rel="stylesheet">
+  <link href="../css/bootstrap-toc.css" rel="stylesheet">
+    <!-- <link href="../css/local.css" rel="stylesheet"> -->
+  
+  
+
+  <script src="../js/jquery-2.1.3.min.js"></script>
+  <script src="../js/svg-pan-zoom.min.js"></script>
+  <script src="../js/bootstrap-toc.js"></script>
+
+</head>
+
+<body data-spy="scroll" data-target="#toc">
+
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+
+    <a class="navbar-brand" href="../index.html">SWB2</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" navbar-light bg-light id="navbarText">
+      <ul class="navbar-nav mr-auto">
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../page/index.html">User Guide</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/modules.html">Modules</a>
+          </li>
+        
+
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+          </li>
+        
+
+
+      </ul>
+    </div>
+
+    <form class="form-inline">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+        <!-- <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contents <span class="caret"></span></a>
+            <ul class="dropdown-menu"> -->
+          <!-- 
+            
+              <li><a href="../lists/files.html">Source Files</a></li>
+            
+          
+          
+            <li><a href="../lists/modules.html">Modules</a></li>
+          
+          
+          
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+          
+          
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+           
+            <li><a href="../lists/types.html">Derived Types</a></li>
+          
+          
+            <li><a href="../lists/programs.html">Programs</a></li>
+          
+        </ul> -->
+
+      <!-- </div> -->
+      <!--/.nav-collapse -->
+
+  </nav>
+
+  <div class="container">
+    
+  
+  <div class="row">
+    <h1>ASCII_FILE_T
+    <small>Derived Type</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="card">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title="<p> 5.5% of total for derived types.</p>Including implementation: 397 statements,  5.0% of total for derived types.">47 statements</a>
+     </li>
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/file_operations.F90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+     <li><a href='../sourcefile/file_operations.f90.html'>file_operations.F90</a></li>
+    
+     <li><a href='../module/file_operations.html'>file_operations</a></li>
+    
+  
+     <li class="active">ASCII_FILE_T</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+
+
+
+
+
+<div class="card bg-primary">
+    <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-0">Modules</a></h3></div> -->
+    <div class="card-header"><a data-toggle="collapse" href="#var-0" aria-expanded="true" aria-controls="collapse-example" id="variables-header" class="d-block">
+              <i class="fa fa-chevron-down pull-right"></i>Variables</a>
+    </div>
+
+  <div id="var-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-sfilename">sFilename</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-sdelimiters">sDelimiters</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-scommentchars">sCommentChars</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-slcolnames">slColNames</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-icurrentlinenum">iCurrentLinenum</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-inumberoflines">iNumberOfLines</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-inumberofrecords">iNumberOfRecords</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-inumberofheaderlines">iNumberOfHeaderLines</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-lisopen">lIsOpen</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-lreadonly">lReadOnly</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-leof">lEOF</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-iunitnum">iUnitNum</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-istat">iStat</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-sbuf">sBuf</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-stmissingvalue">stMissingValue</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#boundprocs-0">Type-Bound Procedures</a></h3></div>
+  <div id="boundprocs-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-open">open</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-close">close</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-isopen">isOpen</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-iseof">isEOF</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-exists">exists</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-iscomment">isComment</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-countlines">countLines</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-numlines">numLines</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-numrecords">numRecords</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-currentlinenum">currentLineNum</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-unit">unit</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-readheader">readHeader</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-readline">readLine</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-writeline">writeLine</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/ascii_file_t.html#src">ASCII_FILE_T</a>
+  </div>
+</div>
+
+
+
+</div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+      <h2>type, public :: ASCII_FILE_T</h2>
+    
+    
+    
+    
+    <br>
+
+    <!-- <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+
+
+
+
+
+<div class="card bg-primary">
+    <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-1">Modules</a></h3></div> -->
+    <div class="card-header"><a data-toggle="collapse" href="#var-1" aria-expanded="true" aria-controls="collapse-example" id="variables-header" class="d-block">
+              <i class="fa fa-chevron-down pull-right"></i>Variables</a>
+    </div>
+
+  <div id="var-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-sfilename">sFilename</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-sdelimiters">sDelimiters</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-scommentchars">sCommentChars</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-slcolnames">slColNames</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-icurrentlinenum">iCurrentLinenum</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-inumberoflines">iNumberOfLines</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-inumberofrecords">iNumberOfRecords</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-inumberofheaderlines">iNumberOfHeaderLines</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-lisopen">lIsOpen</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-lreadonly">lReadOnly</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-leof">lEOF</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-iunitnum">iUnitNum</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-istat">iStat</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-sbuf">sBuf</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#variable-stmissingvalue">stMissingValue</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#boundprocs-1">Type-Bound Procedures</a></h3></div>
+  <div id="boundprocs-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-open">open</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-close">close</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-isopen">isOpen</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-iseof">isEOF</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-exists">exists</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-iscomment">isComment</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-countlines">countLines</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-numlines">numLines</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-numrecords">numRecords</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-currentlinenum">currentLineNum</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-unit">unit</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-readheader">readHeader</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-readline">readLine</a>
+      
+      <a class="list-group-item" href="../type/ascii_file_t.html#boundprocedure-writeline">writeLine</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title">Source Code</h3></div>
+  <div class="list-group">
+    <a class="list-group-item" href="../type/ascii_file_t.html#src">ASCII_FILE_T</a>
+  </div>
+</div>
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md"> -->
+
+    
+    <section>
+    <h2>Components</h2>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-sfilename"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>sFilename</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-sdelimiters"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>sDelimiters</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-scommentchars"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>sCommentChars</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-slcolnames"></span>type(FSTRING_LIST_T),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>slColNames</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-icurrentlinenum"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iCurrentLinenum</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inumberoflines"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNumberOfLines</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inumberofrecords"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNumberOfRecords</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inumberofheaderlines"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNumberOfHeaderLines</strong></td><td> =</td><td>1</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lisopen"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>lIsOpen</strong></td><td> =</td><td>FALSE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lreadonly"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>lReadOnly</strong></td><td> =</td><td>TRUE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-leof"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>lEOF</strong></td><td> =</td><td>FALSE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-iunitnum"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iUnitNum</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-istat"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iStat</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-sbuf"></span>character(len=MAX_STR_LEN),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>sBuf</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-stmissingvalue"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>stMissingValue</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    </section>
+    <br>
+    
+
+    
+
+    
+
+    
+    <section>
+    <h2>Type-Bound Procedures</h2>
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-open"></span><h3>generic, public :: <strong>open</strong>  => open_file_read_access_sub, open_file_write_access_sub 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine open_file_read_access_sub(this, sFilename, sCommentChars, sDelimiters, lHasHeader)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/ascii_file_t.html'>ASCII_FILE_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sFilename</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sCommentChars</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sDelimiters</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical(kind=c_bool),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>lHasHeader</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine open_file_write_access_sub(this, sFilename, lQuiet)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/ascii_file_t.html'>ASCII_FILE_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sFilename</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical(kind=c_bool),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>lQuiet</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-close"></span><h3>generic, public :: <strong>close</strong>  => close_file_sub 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine close_file_sub(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/ascii_file_t.html'>ASCII_FILE_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-isopen"></span><h3>generic, public :: <strong>isOpen</strong>  => is_file_open_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function is_file_open_fn(this) result(lIsOpen)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/ascii_file_t.html'>ASCII_FILE_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-iseof"></span><h3>generic, public :: <strong>isEOF</strong>  => have_we_reached_the_EOF_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function have_we_reached_the_EOF_fn(this) result(lIsEOF)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/ascii_file_t.html'>ASCII_FILE_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-exists"></span><h3>generic, public :: <strong>exists</strong>  => does_file_exist_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function does_file_exist_fn(this, sFilename) result(lExists)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/ascii_file_t.html'>ASCII_FILE_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sFilename</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-iscomment"></span><h3>generic, public :: <strong>isComment</strong>  => is_current_line_a_comment_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function is_current_line_a_comment_fn(this) result(lIsComment)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/ascii_file_t.html'>ASCII_FILE_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-countlines"></span><h3>generic, public :: <strong>countLines</strong>  => count_number_of_lines_sub 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine count_number_of_lines_sub(this)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/ascii_file_t.html'>ASCII_FILE_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-numlines"></span><h3>generic, public :: <strong>numLines</strong>  => return_num_lines_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function return_num_lines_fn(this) result(iNumLines)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/ascii_file_t.html'>ASCII_FILE_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-numrecords"></span><h3>generic, public :: <strong>numRecords</strong>  => return_num_records_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function return_num_records_fn(this) result(iNumRecords)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/ascii_file_t.html'>ASCII_FILE_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-currentlinenum"></span><h3>generic, public :: <strong>currentLineNum</strong>  => return_current_linenum_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function return_current_linenum_fn(this) result(iCurrentLinenum)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/ascii_file_t.html'>ASCII_FILE_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-unit"></span><h3>generic, public :: <strong>unit</strong>  => return_fortran_unit_number_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function return_fortran_unit_number_fn(this) result(iUnitNum)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/ascii_file_t.html'>ASCII_FILE_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-readheader"></span><h3>generic, public :: <strong>readHeader</strong>  => read_header_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function read_header_fn(this) result(stList)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/ascii_file_t.html'>ASCII_FILE_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>type(FSTRING_LIST_T)
+  </small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-readline"></span><h3>generic, public :: <strong>readLine</strong>  => read_line_of_data_fn 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private function read_line_of_data_fn(this) result(sText)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/ascii_file_t.html'>ASCII_FILE_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=:),
+  allocatable</small></h4>
+  
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="boundprocedure-writeline"></span><h3>generic, public :: <strong>writeLine</strong>  => write_line_of_data_sub 
+    
+  </h3></div>
+  
+  <ul class="list-group">
+    
+      <li class="list-group-item">
+      
+         
+            
+    
+    <h3>
+private subroutine write_line_of_data_sub(this, sText)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>class(<a href='../type/ascii_file_t.html'>ASCII_FILE_T</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>this</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sText</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+         
+      
+      </li>
+    
+  </ul>
+</div>
+
+    
+    </section>
+    
+
+    
+    <section>
+    <h3><span class="anchor" id="src"></span>Source Code</h3>
+    <div class="highlight"><pre><span></span>  <span class="k">type</span><span class="p">,</span> <span class="k">public</span> <span class="kd">::</span> <span class="n">ASCII_FILE_T</span>
+
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">sFilename</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">sDelimiters</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">sCommentChars</span>
+    <span class="k">type</span> <span class="p">(</span><span class="n">FSTRING_LIST_T</span><span class="p">)</span>           <span class="kd">::</span> <span class="n">slColNames</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">iCurrentLinenum</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">iNumberOfLines</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">iNumberOfRecords</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">iNumberOfHeaderLines</span> <span class="o">=</span> <span class="mi">1</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">lIsOpen</span> <span class="o">=</span> <span class="n">FALSE</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">lReadOnly</span> <span class="o">=</span> <span class="n">TRUE</span>
+    <span class="kt">logical</span> <span class="p">(</span><span class="kt">c_bool</span><span class="p">)</span>                <span class="kd">::</span> <span class="n">lEOF</span> <span class="o">=</span> <span class="n">FALSE</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">iUnitNum</span>
+    <span class="kt">integer</span> <span class="p">(</span><span class="kt">c_int</span><span class="p">)</span>                 <span class="kd">::</span> <span class="n">iStat</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="n">MAX_STR_LEN</span><span class="p">)</span>     <span class="kd">::</span> <span class="n">sBuf</span>
+    <span class="kt">character</span> <span class="p">(</span><span class="nb">len</span><span class="o">=</span><span class="p">:),</span> <span class="k">allocatable</span>  <span class="kd">::</span> <span class="n">stMissingValue</span>
+
+  <span class="k">contains</span>
+
+<span class="k">    procedure</span><span class="p">,</span> <span class="k">private</span> <span class="kd">::</span> <span class="n">open_file_read_access_sub</span>
+    <span class="k">procedure</span><span class="p">,</span> <span class="k">private</span> <span class="kd">::</span> <span class="n">open_file_write_access_sub</span>
+    <span class="k">generic</span> <span class="kd">::</span> <span class="k">open</span> <span class="o">=&gt;</span> <span class="n">open_file_read_access_sub</span><span class="p">,</span> <span class="p">&amp;</span>
+                       <span class="n">open_file_write_access_sub</span>
+
+    <span class="k">procedure</span><span class="p">,</span> <span class="k">private</span> <span class="kd">::</span> <span class="n">close_file_sub</span>
+    <span class="k">generic</span> <span class="kd">::</span> <span class="k">close</span> <span class="o">=&gt;</span> <span class="n">close_file_sub</span>
+
+    <span class="k">procedure</span><span class="p">,</span> <span class="k">private</span> <span class="kd">::</span> <span class="n">is_file_open_fn</span>
+    <span class="k">generic</span> <span class="kd">::</span> <span class="n">isOpen</span> <span class="o">=&gt;</span> <span class="n">is_file_open_fn</span>
+
+    <span class="k">procedure</span><span class="p">,</span> <span class="k">private</span> <span class="kd">::</span> <span class="n">have_we_reached_the_EOF_fn</span>
+    <span class="k">generic</span> <span class="kd">::</span> <span class="n">isEOF</span> <span class="o">=&gt;</span> <span class="n">have_we_reached_the_EOF_fn</span>
+
+    <span class="k">procedure</span><span class="p">,</span> <span class="k">private</span> <span class="kd">::</span> <span class="n">does_file_exist_fn</span>
+    <span class="k">generic</span> <span class="kd">::</span> <span class="n">exists</span> <span class="o">=&gt;</span> <span class="n">does_file_exist_fn</span>
+
+    <span class="k">procedure</span><span class="p">,</span> <span class="k">private</span> <span class="kd">::</span> <span class="n">is_current_line_a_comment_fn</span>
+    <span class="k">generic</span> <span class="kd">::</span> <span class="n">isComment</span> <span class="o">=&gt;</span> <span class="n">is_current_line_a_comment_fn</span>
+
+    <span class="k">procedure</span><span class="p">,</span> <span class="k">private</span> <span class="kd">::</span> <span class="n">count_number_of_lines_sub</span>
+    <span class="k">generic</span> <span class="kd">::</span> <span class="n">countLines</span> <span class="o">=&gt;</span> <span class="n">count_number_of_lines_sub</span>
+
+    <span class="k">procedure</span><span class="p">,</span> <span class="k">private</span> <span class="kd">::</span> <span class="n">return_num_lines_fn</span>
+    <span class="k">generic</span> <span class="kd">::</span> <span class="n">numLines</span> <span class="o">=&gt;</span> <span class="n">return_num_lines_fn</span>
+
+    <span class="k">procedure</span><span class="p">,</span> <span class="k">private</span> <span class="kd">::</span> <span class="n">return_num_records_fn</span>
+    <span class="k">generic</span> <span class="kd">::</span> <span class="n">numRecords</span> <span class="o">=&gt;</span> <span class="n">return_num_records_fn</span>
+
+    <span class="k">procedure</span><span class="p">,</span> <span class="k">private</span> <span class="kd">::</span> <span class="n">return_current_linenum_fn</span>
+    <span class="k">generic</span> <span class="kd">::</span> <span class="n">currentLineNum</span> <span class="o">=&gt;</span> <span class="n">return_current_linenum_fn</span>
+
+    <span class="k">procedure</span><span class="p">,</span> <span class="k">private</span> <span class="kd">::</span> <span class="n">return_fortran_unit_number_fn</span>
+    <span class="k">generic</span> <span class="kd">::</span> <span class="n">unit</span> <span class="o">=&gt;</span> <span class="n">return_fortran_unit_number_fn</span>
+
+    <span class="k">procedure</span><span class="p">,</span> <span class="k">private</span> <span class="kd">::</span> <span class="n">read_header_fn</span>
+    <span class="k">generic</span><span class="p">,</span> <span class="k">public</span>    <span class="kd">::</span> <span class="n">readHeader</span> <span class="o">=&gt;</span> <span class="n">read_header_fn</span>
+
+    <span class="k">procedure</span><span class="p">,</span> <span class="k">private</span> <span class="kd">::</span> <span class="n">read_line_of_data_fn</span>
+    <span class="k">generic</span><span class="p">,</span> <span class="k">public</span>    <span class="kd">::</span> <span class="n">readLine</span> <span class="o">=&gt;</span> <span class="n">read_line_of_data_fn</span>
+
+    <span class="k">procedure</span><span class="p">,</span> <span class="k">private</span> <span class="kd">::</span> <span class="n">write_line_of_data_sub</span>
+    <span class="k">generic</span><span class="p">,</span> <span class="k">public</span>    <span class="kd">::</span> <span class="n">writeLine</span> <span class="o">=&gt;</span> <span class="n">write_line_of_data_sub</span>
+
+  <span class="k">end type </span><span class="n">ASCII_FILE_T</span>
+</pre></div>
+
+    </section>
+    
+
+    </div>
+  </div>
+
+
+    <hr>
+  </div> <!-- /container -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <p>&copy; 2019 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
+            </p>
+        </div>
+        <div class="col-4">
+          <p class="text-right"><small>
+            Documentation for SWB2
+               (version 2.0, build 96) generated by
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on Tue Sep  3 16:54:50 2019 </small>
+          </p>
+        </div>
+        <div class="col">
+          <p class="text-center"> SWB2 was developed by Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt</p>
+        </div>
+      </div>
+      <br>
+    </div> <!-- /container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+  <script src="../js/bootstrap.min.js"></script>
+
+  <!-- MathJax JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+  
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+
+</body>
+
+</html>

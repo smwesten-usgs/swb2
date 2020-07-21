@@ -1,0 +1,7270 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="">
+  
+  <meta name="author" content="Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt">
+  <link rel="icon" href="../favicon.png">
+
+  <title>constants_and_conversions &ndash; SWB2</title>
+
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/pygments.css" rel="stylesheet">
+  <link href="../css/font-awesome.min.css" rel="stylesheet">
+  <link href="../css/bootstrap-toc.css" rel="stylesheet">
+    <!-- <link href="../css/local.css" rel="stylesheet"> -->
+  
+  
+
+  <script src="../js/jquery-2.1.3.min.js"></script>
+  <script src="../js/svg-pan-zoom.min.js"></script>
+  <script src="../js/bootstrap-toc.js"></script>
+
+</head>
+
+<body data-spy="scroll" data-target="#toc">
+
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+
+    <a class="navbar-brand" href="../index.html">SWB2</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" navbar-light bg-light id="navbarText">
+      <ul class="navbar-nav mr-auto">
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../page/index.html">User Guide</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/modules.html">Modules</a>
+          </li>
+        
+
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+          </li>
+        
+
+
+      </ul>
+    </div>
+
+    <form class="form-inline">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+        <!-- <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contents <span class="caret"></span></a>
+            <ul class="dropdown-menu"> -->
+          <!-- 
+            
+              <li><a href="../lists/files.html">Source Files</a></li>
+            
+          
+          
+            <li><a href="../lists/modules.html">Modules</a></li>
+          
+          
+          
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+          
+          
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+           
+            <li><a href="../lists/types.html">Derived Types</a></li>
+          
+          
+            <li><a href="../lists/programs.html">Programs</a></li>
+          
+        </ul> -->
+
+      <!-- </div> -->
+      <!--/.nav-collapse -->
+
+  </nav>
+
+  <div class="container">
+    
+  
+  <div class="row">
+    <h1>constants_and_conversions
+    <small>Module</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="card">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title=" 2.7% of total for modules and submodules.">477 statements</a>
+     </li>
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/constants_and_conversions.F90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+     <li><a href='../sourcefile/constants_and_conversions.f90.html'>constants_and_conversions.F90</a></li>
+    
+  
+     <li class="active">constants_and_conversions</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+
+
+
+
+
+<div class="card bg-primary">
+    <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-0">Modules</a></h3></div> -->
+    <div class="card-header"><a data-toggle="collapse" href="#var-0" aria-expanded="true" aria-controls="collapse-example" id="variables-header" class="d-block">
+              <i class="fa fa-chevron-down pull-right"></i>Variables</a>
+    </div>
+
+  <div id="var-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-datatype_int">DATATYPE_INT</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-datatype_float">DATATYPE_FLOAT</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-datatype_real">DATATYPE_REAL</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-datatype_double">DATATYPE_DOUBLE</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-datatype_short">DATATYPE_SHORT</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-datatype_na">DATATYPE_NA</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-pi">PI</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-twopi">TWOPI</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-halfpi">HALFPI</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-degrees_to_radians">DEGREES_TO_RADIANS</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-radians_to_degrees">RADIANS_TO_DEGREES</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-true">TRUE</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-false">FALSE</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-rbigval">rBIGVAL</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-dbigval">dBIGVAL</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-ibigval">iBIGVAL</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-rtinyval">rTINYVAL</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-dtinyval">dTINYVAL</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-ftinyval">fTINYVAL</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-itinyval">iTINYVAL</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-rfreezing">rFREEZING</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-ffreezing">fFREEZING</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-dfreezing">dFREEZING</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-izero">iZERO</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-fzero">fZERO</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-rzero">rZERO</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-dzero">dZERO</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-os_native_path_delimiter">OS_NATIVE_PATH_DELIMITER</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-random_start">RANDOM_START</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-c_per_f">C_PER_F</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-f_per_c">F_PER_C</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-m_per_foot">M_PER_FOOT</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-mm_per_in">MM_PER_IN</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-output_directory_name">OUTPUT_DIRECTORY_NAME</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-output_prefix_name">OUTPUT_PREFIX_NAME</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-data_directory_name">DATA_DIRECTORY_NAME</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-bnds">BNDS</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-tolerance_float">TOLERANCE_FLOAT</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-tolerance_double">TOLERANCE_DOUBLE</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#inters-0">Interfaces</a></h3></div>
+  <div id="inters-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-operator%28.approxequal.%29">operator(.approxequal.)</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-c_to_f">C_to_F</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-f_to_c">F_to_C</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-f_to_k">F_to_K</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-c_to_k">C_to_K</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-deg_to_rad">deg_to_rad</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-rad_to_deg">rad_to_deg</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-asfloat">asFloat</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-asdouble">asDouble</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-asint">asInt</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-aslogical">asLogical</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-mm_to_in">mm_to_in</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-in_to_mm">in_to_mm</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#types-0">Derived Types</a></h3></div>
+  <div id="types-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#type-bounds_t">BOUNDS_T</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#funcs-0">Functions</a></h3></div>
+  <div id="funcs-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-fix_pathname">fix_pathname</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-approx_equal_float_float">approx_equal_float_float</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-approx_equal_float_double">approx_equal_float_double</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-approx_equal_double_double">approx_equal_double_double</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-is_numeric">is_numeric</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-deg_to_rad_sgl_fn">deg_to_rad_sgl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-deg_to_rad_dbl_fn">deg_to_rad_dbl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-rad_to_deg_sgl_fn">rad_to_deg_sgl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-rad_to_deg_dbl_fn">rad_to_deg_dbl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-ftoc_sgl_fn">FtoC_sgl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-ftoc_dbl_fn">FtoC_dbl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-ctof_sgl_fn">CtoF_sgl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-ctof_dbl_fn">CtoF_dbl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-ftok_sgl_fn">FtoK_sgl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-ftok_dbl_fn">FtoK_dbl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-ctok_sgl_fn">CtoK_sgl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-ctok_dbl_fn">CtoK_dbl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-inches_to_mm_sgl_fn">inches_to_mm_sgl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-inches_to_mm_dbl_fn">inches_to_mm_dbl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-mm_to_inches_sgl_fn">mm_to_inches_sgl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-mm_to_inches_dbl_fn">mm_to_inches_dbl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-short2logical">short2logical</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-int2logical">int2logical</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-real2logical">real2logical</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-dbl2logical">dbl2logical</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-char2logical">char2logical</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-short2int">short2int</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-char2int">char2int</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-real2int">real2int</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-dbl2int">dbl2int</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-char2real">char2real</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-short2real">short2real</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-int2real">int2real</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-dbl2real">dbl2real</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-bool2real">bool2real</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-char2dbl">char2dbl</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-short2dbl">short2dbl</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-int2dbl">int2dbl</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-real2dbl">real2dbl</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-bool2dbl">bool2dbl</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-char_ptr_to_fortran_string">char_ptr_to_fortran_string</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-c_to_fortran_string">c_to_fortran_string</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-fortran_to_c_string">fortran_to_c_string</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-keepnumeric">keepnumeric</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+</div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+    <p>@file
+ Contains a single module, @ref constants_and_conversions, which contains useful
+ physical constants and basic conversion utilities
+ This module contains physical constants and convenience functions aimed at
+ performing unit conversions. The functions included in this module perform
+ conversions between various temperature and distance units.</p>
+<p>establish generic interfaces to single and double precision functions</p>
+      <br>
+    
+  
+    <div class="card card-default">
+      <div class="card-heading">
+  <h3 class="card-title">Uses</h3>
+      </div>
+      <ul class="list-group">
+      
+      <li class="list-group-item">
+  <ul class="list-inline">
+    
+    <li><a href="http://fortranwiki.org/fortran/show/ISO_C_BINDING">iso_c_binding</a></li>
+    
+  </ul>
+      </li>
+      
+      
+      
+      </ul>
+    </div>
+    
+
+    
+    
+
+    <br>
+
+    <!-- <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+
+
+
+
+
+<div class="card bg-primary">
+    <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-1">Modules</a></h3></div> -->
+    <div class="card-header"><a data-toggle="collapse" href="#var-1" aria-expanded="true" aria-controls="collapse-example" id="variables-header" class="d-block">
+              <i class="fa fa-chevron-down pull-right"></i>Variables</a>
+    </div>
+
+  <div id="var-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-datatype_int">DATATYPE_INT</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-datatype_float">DATATYPE_FLOAT</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-datatype_real">DATATYPE_REAL</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-datatype_double">DATATYPE_DOUBLE</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-datatype_short">DATATYPE_SHORT</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-datatype_na">DATATYPE_NA</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-pi">PI</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-twopi">TWOPI</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-halfpi">HALFPI</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-degrees_to_radians">DEGREES_TO_RADIANS</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-radians_to_degrees">RADIANS_TO_DEGREES</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-true">TRUE</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-false">FALSE</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-rbigval">rBIGVAL</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-dbigval">dBIGVAL</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-ibigval">iBIGVAL</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-rtinyval">rTINYVAL</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-dtinyval">dTINYVAL</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-ftinyval">fTINYVAL</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-itinyval">iTINYVAL</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-rfreezing">rFREEZING</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-ffreezing">fFREEZING</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-dfreezing">dFREEZING</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-izero">iZERO</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-fzero">fZERO</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-rzero">rZERO</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-dzero">dZERO</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-os_native_path_delimiter">OS_NATIVE_PATH_DELIMITER</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-random_start">RANDOM_START</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-c_per_f">C_PER_F</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-f_per_c">F_PER_C</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-m_per_foot">M_PER_FOOT</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-mm_per_in">MM_PER_IN</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-output_directory_name">OUTPUT_DIRECTORY_NAME</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-output_prefix_name">OUTPUT_PREFIX_NAME</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-data_directory_name">DATA_DIRECTORY_NAME</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-bnds">BNDS</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-tolerance_float">TOLERANCE_FLOAT</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#variable-tolerance_double">TOLERANCE_DOUBLE</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#inters-1">Interfaces</a></h3></div>
+  <div id="inters-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-operator%28.approxequal.%29">operator(.approxequal.)</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-c_to_f">C_to_F</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-f_to_c">F_to_C</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-f_to_k">F_to_K</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-c_to_k">C_to_K</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-deg_to_rad">deg_to_rad</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-rad_to_deg">rad_to_deg</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-asfloat">asFloat</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-asdouble">asDouble</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-asint">asInt</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-aslogical">asLogical</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-mm_to_in">mm_to_in</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#interface-in_to_mm">in_to_mm</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#types-1">Derived Types</a></h3></div>
+  <div id="types-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#type-bounds_t">BOUNDS_T</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#funcs-1">Functions</a></h3></div>
+  <div id="funcs-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-fix_pathname">fix_pathname</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-approx_equal_float_float">approx_equal_float_float</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-approx_equal_float_double">approx_equal_float_double</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-approx_equal_double_double">approx_equal_double_double</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-is_numeric">is_numeric</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-deg_to_rad_sgl_fn">deg_to_rad_sgl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-deg_to_rad_dbl_fn">deg_to_rad_dbl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-rad_to_deg_sgl_fn">rad_to_deg_sgl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-rad_to_deg_dbl_fn">rad_to_deg_dbl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-ftoc_sgl_fn">FtoC_sgl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-ftoc_dbl_fn">FtoC_dbl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-ctof_sgl_fn">CtoF_sgl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-ctof_dbl_fn">CtoF_dbl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-ftok_sgl_fn">FtoK_sgl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-ftok_dbl_fn">FtoK_dbl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-ctok_sgl_fn">CtoK_sgl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-ctok_dbl_fn">CtoK_dbl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-inches_to_mm_sgl_fn">inches_to_mm_sgl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-inches_to_mm_dbl_fn">inches_to_mm_dbl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-mm_to_inches_sgl_fn">mm_to_inches_sgl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-mm_to_inches_dbl_fn">mm_to_inches_dbl_fn</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-short2logical">short2logical</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-int2logical">int2logical</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-real2logical">real2logical</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-dbl2logical">dbl2logical</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-char2logical">char2logical</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-short2int">short2int</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-char2int">char2int</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-real2int">real2int</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-dbl2int">dbl2int</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-char2real">char2real</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-short2real">short2real</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-int2real">int2real</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-dbl2real">dbl2real</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-bool2real">bool2real</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-char2dbl">char2dbl</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-short2dbl">short2dbl</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-int2dbl">int2dbl</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-real2dbl">real2dbl</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-bool2dbl">bool2dbl</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-char_ptr_to_fortran_string">char_ptr_to_fortran_string</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-c_to_fortran_string">c_to_fortran_string</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-fortran_to_c_string">fortran_to_c_string</a>
+      
+      <a class="list-group-item" href="../module/constants_and_conversions.html#proc-keepnumeric">keepnumeric</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md"> -->
+
+    
+
+    
+    <section>
+    <h2>Variables</h2>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-datatype_int"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>DATATYPE_INT</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-datatype_float"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>DATATYPE_FLOAT</strong></td><td> =</td><td>1</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-datatype_real"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>DATATYPE_REAL</strong></td><td> =</td><td>1</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-datatype_double"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>DATATYPE_DOUBLE</strong></td><td> =</td><td>2</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-datatype_short"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>DATATYPE_SHORT</strong></td><td> =</td><td>3</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-datatype_na"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>DATATYPE_NA</strong></td><td> =</td><td>-9999</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pi"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>PI</strong></td><td> =</td><td>3.1415926535897932384626433_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-twopi"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>TWOPI</strong></td><td> =</td><td>3.1415926535897932384626433_c_double*2.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-halfpi"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>HALFPI</strong></td><td> =</td><td>3.1415926535897932384626433_c_double/2.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-degrees_to_radians"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>DEGREES_TO_RADIANS</strong></td><td> =</td><td>TWOPI/360.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-radians_to_degrees"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>RADIANS_TO_DEGREES</strong></td><td> =</td><td>360.0_c_double/TWOPI</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-true"></span>logical(kind=c_bool),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>TRUE</strong></td><td> =</td><td>.true._c_bool</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-false"></span>logical(kind=c_bool),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>FALSE</strong></td><td> =</td><td>.false._c_bool</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rbigval"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>rBIGVAL</strong></td><td> =</td><td>HUGE(0.0_c_float)</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dbigval"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>dBIGVAL</strong></td><td> =</td><td>HUGE(0.0_c_double)</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ibigval"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>iBIGVAL</strong></td><td> =</td><td>HUGE(0_c_int)</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rtinyval"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>rTINYVAL</strong></td><td> =</td><td>-(HUGE(0.0_c_float)-1.0)</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dtinyval"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>dTINYVAL</strong></td><td> =</td><td>-(HUGE(0.0_c_double)-1.0)</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ftinyval"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>fTINYVAL</strong></td><td> =</td><td>-(HUGE(0.0_c_float)-1.0)</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-itinyval"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>iTINYVAL</strong></td><td> =</td><td>-(HUGE(0_c_int)-1)</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rfreezing"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>rFREEZING</strong></td><td> =</td><td>32.0_c_float</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ffreezing"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>fFREEZING</strong></td><td> =</td><td>32.0_c_float</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dfreezing"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>dFREEZING</strong></td><td> =</td><td>32.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-izero"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>iZERO</strong></td><td> =</td><td>0_c_int</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-fzero"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>fZERO</strong></td><td> =</td><td>0.0_c_float</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rzero"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>rZERO</strong></td><td> =</td><td>0.0_c_float</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dzero"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>dZERO</strong></td><td> =</td><td>0.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-os_native_path_delimiter"></span>character(len=1),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>OS_NATIVE_PATH_DELIMITER</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-random_start"></span>integer(kind=c_long_long),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>RANDOM_START</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-c_per_f"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>C_PER_F</strong></td><td> =</td><td>5.0_c_double/9.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-f_per_c"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>F_PER_C</strong></td><td> =</td><td>9.0_c_double/5.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-m_per_foot"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>M_PER_FOOT</strong></td><td> =</td><td>0.3048_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-mm_per_in"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>MM_PER_IN</strong></td><td> =</td><td>25.4_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-output_directory_name"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>OUTPUT_DIRECTORY_NAME</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-output_prefix_name"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>OUTPUT_PREFIX_NAME</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-data_directory_name"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>DATA_DIRECTORY_NAME</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-bnds"></span>type(<a href='../type/bounds_t.html'>BOUNDS_T</a>),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>BNDS</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-tolerance_float"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>TOLERANCE_FLOAT</strong></td><td> =</td><td>1.0e-6_c_float</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-tolerance_double"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>TOLERANCE_DOUBLE</strong></td><td> =</td><td>1.0e-9_c_double</td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    </section>
+    <br>
+    
+
+    
+
+    
+    <section>
+   <h2>Interfaces</h2>
+   
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="interface-operator%28.approxequal.%29"></span><h3>public interface <a href='../interface/operator%28.approxequal.%29.html'>operator(.approxequal.)</a>
+    
+  </h3></div>
+  
+  <ul class="list-group">
+  
+  
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/approx_equal_float_float.html'>approx_equal_float_float</a>(fValue1, fValue2) result(lBool)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValue1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValue2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/approx_equal_double_double.html'>approx_equal_double_double</a>(fValue1, fValue2) result(lBool)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValue1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValue2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/approx_equal_float_double.html'>approx_equal_float_double</a>(fValue1, fValue2) result(lBool)
+    
+    
+   
+</h3>
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValue1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValue2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+    </li>
+  
+  
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="interface-c_to_f"></span><h3>public interface <a href='../interface/c_to_f.html'>C_to_F</a>
+    
+  </h3></div>
+  
+  <ul class="list-group">
+  
+  
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/ctof_sgl_fn.html'>CtoF_sgl_fn</a>(degrees_C) result(degrees_F)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert degrees Celsius to degrees Fahrenheit.
+ @param[in] degrees_C Temperature in degrees Celsius.
+ @retval degrees_F Temperature in degrees Fahrenheit.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees_C</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/ctof_dbl_fn.html'>CtoF_dbl_fn</a>(degrees_C) result(degrees_F)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert degrees Celsius to degrees Fahrenheit.
+ @param[in] degrees_C Temperature in degrees Celsius.
+ @retval degrees_F Temperature in degree</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees_C</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+    </li>
+  
+  
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="interface-f_to_c"></span><h3>public interface <a href='../interface/f_to_c.html'>F_to_C</a>
+    
+  </h3></div>
+  
+  <ul class="list-group">
+  
+  
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/ftoc_sgl_fn.html'>FtoC_sgl_fn</a>(degrees_F) result(degrees_C)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert degrees Fahrenheit to degrees Celsius.
+ @param[in]  degrees_F   Temperature in degrees Fahrenheit.
+ @retval     degrees_C   Temperature in degrees Celcius.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees_F</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/ftoc_dbl_fn.html'>FtoC_dbl_fn</a>(degrees_F) result(degrees_C)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert degrees Fahrenheit to degrees Celsius.
+ @param[in] degrees_F Temperature in degrees Fahrenheit.
+ @retval degrees_C Temperature in degrees Celcius.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees_F</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+    </li>
+  
+  
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="interface-f_to_k"></span><h3>public interface <a href='../interface/f_to_k.html'>F_to_K</a>
+    
+  </h3></div>
+  
+  <ul class="list-group">
+  
+  
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/ftok_sgl_fn.html'>FtoK_sgl_fn</a>(degrees_F) result(degrees_K)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert degrees Fahrenheit to Kelvins.
+ @param[in] degrees_F Temperature in degrees Fahrenheit.
+ @retval degrees_K Temperature in Kelvins.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees_F</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/ftok_dbl_fn.html'>FtoK_dbl_fn</a>(degrees_F) result(degrees_K)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert degrees Fahrenheit to Kelvins.
+ @param[in] degrees_F Temperature in degrees Fahrenheit.
+ @retval degrees_K Temperature in Kelvins.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees_F</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+    </li>
+  
+  
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="interface-c_to_k"></span><h3>public interface <a href='../interface/c_to_k.html'>C_to_K</a>
+    
+  </h3></div>
+  
+  <ul class="list-group">
+  
+  
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/ctok_sgl_fn.html'>CtoK_sgl_fn</a>(degrees_C) result(degrees_K)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert degrees Celsius to Kelvins.
+ @param[in] degrees_C Temperature in degrees Celcius.
+ @retval degrees_K Temperature in Kelvins.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees_C</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/ctok_dbl_fn.html'>CtoK_dbl_fn</a>(degrees_C) result(degrees_K)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert degrees Fahrenheit to Kelvins.
+ @param[in] degrees_C Temperature in degrees Celsius.
+ @retval degrees_K Temperature in Kelvins.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees_C</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+    </li>
+  
+  
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="interface-deg_to_rad"></span><h3>public interface <a href='../interface/deg_to_rad.html'>deg_to_rad</a>
+    
+  </h3></div>
+  
+  <ul class="list-group">
+  
+  
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/deg_to_rad_sgl_fn.html'>deg_to_rad_sgl_fn</a>(degrees) result(radians)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert degrees to radians.
+ @param[in]  degrees   Angle in degrees.
+ @retval     radians  Angle in radians.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/deg_to_rad_dbl_fn.html'>deg_to_rad_dbl_fn</a>(degrees) result(radians)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert degrees to radians.
+ @param[in]  degrees   Angle in degrees.
+ @retval     radians   Angle in radians.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+    </li>
+  
+  
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="interface-rad_to_deg"></span><h3>public interface <a href='../interface/rad_to_deg.html'>rad_to_deg</a>
+    
+  </h3></div>
+  
+  <ul class="list-group">
+  
+  
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/rad_to_deg_sgl_fn.html'>rad_to_deg_sgl_fn</a>(radians) result(degrees)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert radians to degrees.
+ @param[in]  radians   Angle in radians.
+ @retval     degrees   Angle in degrees.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>radians</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/rad_to_deg_dbl_fn.html'>rad_to_deg_dbl_fn</a>(radians) result(degrees)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert radians to degrees.
+ @param[in]  radians   Angle in radians.
+ @retval     degrees   Angle in degrees.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>radians</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+    </li>
+  
+  
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="interface-asfloat"></span><h3>public interface <a href='../interface/asfloat.html'>asFloat</a>
+    
+  </h3></div>
+  
+  <ul class="list-group">
+  
+  
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/char2real.html'>char2real</a>(sValue) result(rValue)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert a character value into a real</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/short2real.html'>short2real</a>(iValue) result(rValue)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert a short int value into a real</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_short),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/int2real.html'>int2real</a>(iValue) result(rValue)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert an int value into a real</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/dbl2real.html'>dbl2real</a>(dpValue) result(rValue)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert a dbl value into a real</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>dpValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public pure elemental function <a href='../proc/bool2real.html'>bool2real</a>(lValue) result(rValue)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert a boolean value into a real</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical(kind=c_bool),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>lValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+    </li>
+  
+  
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="interface-asdouble"></span><h3>public interface <a href='../interface/asdouble.html'>asDouble</a>
+    
+  </h3></div>
+  
+  <ul class="list-group">
+  
+  
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/char2dbl.html'>char2dbl</a>(sValue) result(dValue)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert a character value into a double</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/short2dbl.html'>short2dbl</a>(iValue) result(dValue)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert a short int value into a double</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_short),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/int2dbl.html'>int2dbl</a>(iValue) result(dValue)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert an int value into a double</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/real2dbl.html'>real2dbl</a>(fValue) result(dValue)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert a real value into a double</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public pure elemental function <a href='../proc/bool2dbl.html'>bool2dbl</a>(lValue) result(dValue)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert a boolean value into a double</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical(kind=c_bool),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>lValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+    </li>
+  
+  
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="interface-asint"></span><h3>public interface <a href='../interface/asint.html'>asInt</a>
+    
+  </h3></div>
+  
+  <ul class="list-group">
+  
+  
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/short2int.html'>short2int</a>(iShortVal) result(iValue)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert a short integer to an integer</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_short),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iShortVal</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public impure elemental function <a href='../proc/char2int.html'>char2int</a>(sValue) result(iValue)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert a character value into a integer</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/real2int.html'>real2int</a>(rValue) result(iValue)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert a real value into a integer</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/dbl2int.html'>dbl2int</a>(rValue) result(iValue)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert a double-precision value to an integer</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+    </li>
+  
+  
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="interface-aslogical"></span><h3>public interface <a href='../interface/aslogical.html'>asLogical</a>
+    
+  </h3></div>
+  
+  <ul class="list-group">
+  
+  
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/short2logical.html'>short2logical</a>(iShortVal) result(lValue)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert a short integer to a logical value</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_short),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iShortVal</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/int2logical.html'>int2logical</a>(iValue) result(lValue)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert an integer to a logical value</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/real2logical.html'>real2logical</a>(rValue) result(lValue)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert a real to a logical value</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/dbl2logical.html'>dbl2logical</a>(rValue) result(lValue)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert a double to a logical value</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/char2logical.html'>char2logical</a>(sValue) result(lValue)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert a character string to a logical value</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+    </li>
+  
+  
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="interface-mm_to_in"></span><h3>public interface <a href='../interface/mm_to_in.html'>mm_to_in</a>
+    
+  </h3></div>
+  
+  <ul class="list-group">
+  
+  
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/mm_to_inches_sgl_fn.html'>mm_to_inches_sgl_fn</a>(mm) result(inches)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert millimeters to inches.
+ @param[in] mm Value in millimeters.
+ @retval inches Value in inches.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>mm</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/mm_to_inches_dbl_fn.html'>mm_to_inches_dbl_fn</a>(mm) result(inches)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert millimeters to inches.
+ @param[in] mm Value in millimeters.
+ @retval inches Value in inches.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>mm</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+    </li>
+  
+  
+  </ul>
+</div>
+
+    
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="interface-in_to_mm"></span><h3>public interface <a href='../interface/in_to_mm.html'>in_to_mm</a>
+    
+  </h3></div>
+  
+  <ul class="list-group">
+  
+  
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/inches_to_mm_sgl_fn.html'>inches_to_mm_sgl_fn</a>(inches) result(mm)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert inches to mm.
+ @param[in] inches Value in inches.
+ @retval mm Value in millimeters.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>inches</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+    </li>
+  
+    <li class="list-group-item">
+    
+    
+    <h3>
+public elemental function <a href='../proc/inches_to_mm_dbl_fn.html'>inches_to_mm_dbl_fn</a>(inches) result(mm)
+    
+    
+   
+</h3>
+    
+
+
+
+
+
+
+
+<p>Convert inches to mm.
+ @param[in] inches Value in inches.
+ @retval mm Value in millimeters.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>inches</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+    </li>
+  
+  
+  </ul>
+</div>
+
+    
+    </section>
+  <br>
+    
+
+    
+
+    
+    <section>
+     <h2>Derived Types</h2>
+   
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="type-bounds_t"></span><h3>type, public :: <a href='../type/bounds_t.html'>BOUNDS_T</a>
+    
+  </h3></div>
+  <div class="card-body">
+    
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-sproj4_string"></span>character(len=:),</td>
+  
+  <td>public,</td>
+  <td>allocatable</td><td>::</td>
+  <td><strong>sPROJ4_string</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inumcols"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNumCols</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inumrows"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNumRows</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-fx_ll"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>fX_ll</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-fy_ll"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>fY_ll</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-fx_ur"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>fX_ur</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-fy_ur"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>fY_ur</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-fgridcellsize"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>fGridcellSize</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+     
+     
+  </div>
+</div>
+
+     
+    </section>
+  <br>
+    
+
+    
+    <section>
+    <h2>Functions</h2>
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-fix_pathname"></span><h3>
+public function <a href='../proc/fix_pathname.html'>fix_pathname</a>(input_pathname) result(output_pathname)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>input_pathname</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=len_trim(input_pathname))
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-approx_equal_float_float"></span><h3>
+public elemental function <a href='../proc/approx_equal_float_float.html'>approx_equal_float_float</a>(fValue1, fValue2) result(lBool)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValue1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValue2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-approx_equal_float_double"></span><h3>
+public elemental function <a href='../proc/approx_equal_float_double.html'>approx_equal_float_double</a>(fValue1, fValue2) result(lBool)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValue1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValue2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-approx_equal_double_double"></span><h3>
+public elemental function <a href='../proc/approx_equal_double_double.html'>approx_equal_double_double</a>(fValue1, fValue2) result(lBool)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValue1</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValue2</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-is_numeric"></span><h3>
+public impure elemental function <a href='../proc/is_numeric.html'>is_numeric</a>(value)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Determine if string contains numeric values.
+ @param[in]  degrees     String value.
+ @retval     is_numeric  True if any numeric values are present in the string.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>value</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-deg_to_rad_sgl_fn"></span><h3>
+public elemental function <a href='../proc/deg_to_rad_sgl_fn.html'>deg_to_rad_sgl_fn</a>(degrees) result(radians)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert degrees to radians.
+ @param[in]  degrees   Angle in degrees.
+ @retval     radians  Angle in radians.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-deg_to_rad_dbl_fn"></span><h3>
+public elemental function <a href='../proc/deg_to_rad_dbl_fn.html'>deg_to_rad_dbl_fn</a>(degrees) result(radians)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert degrees to radians.
+ @param[in]  degrees   Angle in degrees.
+ @retval     radians   Angle in radians.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-rad_to_deg_sgl_fn"></span><h3>
+public elemental function <a href='../proc/rad_to_deg_sgl_fn.html'>rad_to_deg_sgl_fn</a>(radians) result(degrees)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert radians to degrees.
+ @param[in]  radians   Angle in radians.
+ @retval     degrees   Angle in degrees.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>radians</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-rad_to_deg_dbl_fn"></span><h3>
+public elemental function <a href='../proc/rad_to_deg_dbl_fn.html'>rad_to_deg_dbl_fn</a>(radians) result(degrees)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert radians to degrees.
+ @param[in]  radians   Angle in radians.
+ @retval     degrees   Angle in degrees.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>radians</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-ftoc_sgl_fn"></span><h3>
+public elemental function <a href='../proc/ftoc_sgl_fn.html'>FtoC_sgl_fn</a>(degrees_F) result(degrees_C)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert degrees Fahrenheit to degrees Celsius.
+ @param[in]  degrees_F   Temperature in degrees Fahrenheit.
+ @retval     degrees_C   Temperature in degrees Celcius.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees_F</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-ftoc_dbl_fn"></span><h3>
+public elemental function <a href='../proc/ftoc_dbl_fn.html'>FtoC_dbl_fn</a>(degrees_F) result(degrees_C)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert degrees Fahrenheit to degrees Celsius.
+ @param[in] degrees_F Temperature in degrees Fahrenheit.
+ @retval degrees_C Temperature in degrees Celcius.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees_F</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-ctof_sgl_fn"></span><h3>
+public elemental function <a href='../proc/ctof_sgl_fn.html'>CtoF_sgl_fn</a>(degrees_C) result(degrees_F)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert degrees Celsius to degrees Fahrenheit.
+ @param[in] degrees_C Temperature in degrees Celsius.
+ @retval degrees_F Temperature in degrees Fahrenheit.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees_C</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-ctof_dbl_fn"></span><h3>
+public elemental function <a href='../proc/ctof_dbl_fn.html'>CtoF_dbl_fn</a>(degrees_C) result(degrees_F)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert degrees Celsius to degrees Fahrenheit.
+ @param[in] degrees_C Temperature in degrees Celsius.
+ @retval degrees_F Temperature in degree</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees_C</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-ftok_sgl_fn"></span><h3>
+public elemental function <a href='../proc/ftok_sgl_fn.html'>FtoK_sgl_fn</a>(degrees_F) result(degrees_K)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert degrees Fahrenheit to Kelvins.
+ @param[in] degrees_F Temperature in degrees Fahrenheit.
+ @retval degrees_K Temperature in Kelvins.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees_F</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-ftok_dbl_fn"></span><h3>
+public elemental function <a href='../proc/ftok_dbl_fn.html'>FtoK_dbl_fn</a>(degrees_F) result(degrees_K)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert degrees Fahrenheit to Kelvins.
+ @param[in] degrees_F Temperature in degrees Fahrenheit.
+ @retval degrees_K Temperature in Kelvins.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees_F</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-ctok_sgl_fn"></span><h3>
+public elemental function <a href='../proc/ctok_sgl_fn.html'>CtoK_sgl_fn</a>(degrees_C) result(degrees_K)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert degrees Celsius to Kelvins.
+ @param[in] degrees_C Temperature in degrees Celcius.
+ @retval degrees_K Temperature in Kelvins.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees_C</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-ctok_dbl_fn"></span><h3>
+public elemental function <a href='../proc/ctok_dbl_fn.html'>CtoK_dbl_fn</a>(degrees_C) result(degrees_K)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert degrees Fahrenheit to Kelvins.
+ @param[in] degrees_C Temperature in degrees Celsius.
+ @retval degrees_K Temperature in Kelvins.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>degrees_C</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-inches_to_mm_sgl_fn"></span><h3>
+public elemental function <a href='../proc/inches_to_mm_sgl_fn.html'>inches_to_mm_sgl_fn</a>(inches) result(mm)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert inches to mm.
+ @param[in] inches Value in inches.
+ @retval mm Value in millimeters.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>inches</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-inches_to_mm_dbl_fn"></span><h3>
+public elemental function <a href='../proc/inches_to_mm_dbl_fn.html'>inches_to_mm_dbl_fn</a>(inches) result(mm)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert inches to mm.
+ @param[in] inches Value in inches.
+ @retval mm Value in millimeters.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>inches</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-mm_to_inches_sgl_fn"></span><h3>
+public elemental function <a href='../proc/mm_to_inches_sgl_fn.html'>mm_to_inches_sgl_fn</a>(mm) result(inches)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert millimeters to inches.
+ @param[in] mm Value in millimeters.
+ @retval inches Value in inches.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>mm</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-mm_to_inches_dbl_fn"></span><h3>
+public elemental function <a href='../proc/mm_to_inches_dbl_fn.html'>mm_to_inches_dbl_fn</a>(mm) result(inches)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert millimeters to inches.
+ @param[in] mm Value in millimeters.
+ @retval inches Value in inches.</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>mm</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-short2logical"></span><h3>
+public elemental function <a href='../proc/short2logical.html'>short2logical</a>(iShortVal) result(lValue)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert a short integer to a logical value</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_short),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iShortVal</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-int2logical"></span><h3>
+public elemental function <a href='../proc/int2logical.html'>int2logical</a>(iValue) result(lValue)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert an integer to a logical value</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-real2logical"></span><h3>
+public elemental function <a href='../proc/real2logical.html'>real2logical</a>(rValue) result(lValue)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert a real to a logical value</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-dbl2logical"></span><h3>
+public elemental function <a href='../proc/dbl2logical.html'>dbl2logical</a>(rValue) result(lValue)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert a double to a logical value</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-char2logical"></span><h3>
+public elemental function <a href='../proc/char2logical.html'>char2logical</a>(sValue) result(lValue)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert a character string to a logical value</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-short2int"></span><h3>
+public elemental function <a href='../proc/short2int.html'>short2int</a>(iShortVal) result(iValue)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert a short integer to an integer</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_short),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iShortVal</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-char2int"></span><h3>
+public impure elemental function <a href='../proc/char2int.html'>char2int</a>(sValue) result(iValue)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert a character value into a integer</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-real2int"></span><h3>
+public elemental function <a href='../proc/real2int.html'>real2int</a>(rValue) result(iValue)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert a real value into a integer</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-dbl2int"></span><h3>
+public elemental function <a href='../proc/dbl2int.html'>dbl2int</a>(rValue) result(iValue)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert a double-precision value to an integer</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_int)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-char2real"></span><h3>
+public elemental function <a href='../proc/char2real.html'>char2real</a>(sValue) result(rValue)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert a character value into a real</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-short2real"></span><h3>
+public elemental function <a href='../proc/short2real.html'>short2real</a>(iValue) result(rValue)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert a short int value into a real</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_short),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-int2real"></span><h3>
+public elemental function <a href='../proc/int2real.html'>int2real</a>(iValue) result(rValue)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert an int value into a real</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-dbl2real"></span><h3>
+public elemental function <a href='../proc/dbl2real.html'>dbl2real</a>(dpValue) result(rValue)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert a dbl value into a real</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>dpValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-bool2real"></span><h3>
+public pure elemental function <a href='../proc/bool2real.html'>bool2real</a>(lValue) result(rValue)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert a boolean value into a real</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical(kind=c_bool),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>lValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_float)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-char2dbl"></span><h3>
+public elemental function <a href='../proc/char2dbl.html'>char2dbl</a>(sValue) result(dValue)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert a character value into a double</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-short2dbl"></span><h3>
+public elemental function <a href='../proc/short2dbl.html'>short2dbl</a>(iValue) result(dValue)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert a short int value into a double</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_short),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-int2dbl"></span><h3>
+public elemental function <a href='../proc/int2dbl.html'>int2dbl</a>(iValue) result(dValue)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert an int value into a double</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-real2dbl"></span><h3>
+public elemental function <a href='../proc/real2dbl.html'>real2dbl</a>(fValue) result(dValue)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert a real value into a double</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-bool2dbl"></span><h3>
+public pure elemental function <a href='../proc/bool2dbl.html'>bool2dbl</a>(lValue) result(dValue)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Convert a boolean value into a double</p>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical(kind=c_bool),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>lValue</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>real(kind=c_double)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-char_ptr_to_fortran_string"></span><h3>
+public function <a href='../proc/char_ptr_to_fortran_string.html'>char_ptr_to_fortran_string</a>(cpCharacterPtr) result(sText)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(c_ptr)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>cpCharacterPtr</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=256)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-c_to_fortran_string"></span><h3>
+public elemental function <a href='../proc/c_to_fortran_string.html'>c_to_fortran_string</a>(cCharacterString) result(sText)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>cCharacterString</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=len(cCharacterString)-1)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-fortran_to_c_string"></span><h3>
+public elemental function <a href='../proc/fortran_to_c_string.html'>fortran_to_c_string</a>(sText) result(cCharacterString)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sText</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=256)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-keepnumeric"></span><h3>
+public impure elemental function <a href='../proc/keepnumeric.html'>keepnumeric</a>(sText1) result(sText)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Strip everything except numeric characters from a text string.</p><a href="../proc/keepnumeric.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sText1</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>character(len=len(sText1))
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    </section>
+    <br>
+    
+
+    
+
+    
+    </div>
+  </div>
+
+  
+    <hr>
+  </div> <!-- /container -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <p>&copy; 2019 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
+            </p>
+        </div>
+        <div class="col-4">
+          <p class="text-right"><small>
+            Documentation for SWB2
+               (version 2.0, build 96) generated by
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on Tue Sep  3 16:54:50 2019 </small>
+          </p>
+        </div>
+        <div class="col">
+          <p class="text-center"> SWB2 was developed by Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt</p>
+        </div>
+      </div>
+      <br>
+    </div> <!-- /container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+  <script src="../js/bootstrap.min.js"></script>
+
+  <!-- MathJax JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+  
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+
+</body>
+
+</html>

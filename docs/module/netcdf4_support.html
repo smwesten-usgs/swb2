@@ -1,0 +1,4335 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  
+  <meta name="description" content="">
+  
+  <meta name="author" content="Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt">
+  <link rel="icon" href="../favicon.png">
+
+  <title>netcdf4_support &ndash; SWB2</title>
+
+  <link href="../css/bootstrap.min.css" rel="stylesheet">
+  <link href="../css/pygments.css" rel="stylesheet">
+  <link href="../css/font-awesome.min.css" rel="stylesheet">
+  <link href="../css/bootstrap-toc.css" rel="stylesheet">
+    <!-- <link href="../css/local.css" rel="stylesheet"> -->
+  
+  
+
+  <script src="../js/jquery-2.1.3.min.js"></script>
+  <script src="../js/svg-pan-zoom.min.js"></script>
+  <script src="../js/bootstrap-toc.js"></script>
+
+</head>
+
+<body data-spy="scroll" data-target="#toc">
+
+  <!-- Fixed navbar -->
+  <nav class="navbar navbar-expand-lg fixed-top navbar-light bg-light">
+
+    <a class="navbar-brand" href="../index.html">SWB2</a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarText" aria-controls="navbarText" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" navbar-light bg-light id="navbarText">
+      <ul class="navbar-nav mr-auto">
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../page/index.html">User Guide</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/modules.html">Modules</a>
+          </li>
+        
+
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/procedures.html">Procedures</a>
+          </li>
+        
+
+        
+          <li class="nav-item">
+            <a class="nav-link" href="../lists/absint.html">Abstract Interfaces</a>
+          </li>
+        
+
+
+      </ul>
+    </div>
+
+    <form class="form-inline">
+      <input class="form-control mr-sm-2" type="text" placeholder="Search">
+      <button class="btn btn-outline-success my-2 my-sm-0" type="submit">Search</button>
+    </form>
+        <!-- <li class="dropdown">
+            <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false">Contents <span class="caret"></span></a>
+            <ul class="dropdown-menu"> -->
+          <!-- 
+            
+              <li><a href="../lists/files.html">Source Files</a></li>
+            
+          
+          
+            <li><a href="../lists/modules.html">Modules</a></li>
+          
+          
+          
+            <li><a href="../lists/procedures.html">Procedures</a></li>
+          
+          
+            <li><a href="../lists/absint.html">Abstract Interfaces</a></li>
+           
+            <li><a href="../lists/types.html">Derived Types</a></li>
+          
+          
+            <li><a href="../lists/programs.html">Programs</a></li>
+          
+        </ul> -->
+
+      <!-- </div> -->
+      <!--/.nav-collapse -->
+
+  </nav>
+
+  <div class="container">
+    
+  
+  <div class="row">
+    <h1>netcdf4_support
+    <small>Module</small>
+    
+    </h1>
+    
+<div class="row">
+  <div class="col-lg-12">
+<div class="card">
+  <ul class="list-inline" style="margin-bottom:0px;display:inline">
+     
+     
+     
+     
+    
+    
+     <li><i class="fa fa-list-ol"></i>
+       <a data-toggle="tooltip"
+    data-placement="bottom" data-html="true"
+    title="12.7% of total for modules and submodules.">2249 statements</a>
+     </li>
+     
+     
+     
+    <li><i class="fa fa-code"></i><a href="../src/netcdf4_support.F90"> Source File</a></li>
+     
+     
+  </ul>
+  <ol class="breadcrumb in-well text-right">
+  
+    
+     <li><a href='../sourcefile/netcdf4_support.f90.html'>netcdf4_support.F90</a></li>
+    
+  
+     <li class="active">netcdf4_support</li>
+  </ol>
+</div>
+</div>
+</div>
+<script>
+  $(function () {
+  $('[data-toggle="tooltip"]').tooltip()
+  })
+</script>
+
+  </div>
+
+  <div class="row">
+    <div class="col-md-3 hidden-xs hidden-sm visible-md visible-lg">
+    
+<div id="sidebar">
+  
+<h3>Contents</h3>
+
+
+
+
+
+<div class="card bg-primary">
+    <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-0">Modules</a></h3></div> -->
+    <div class="card-header"><a data-toggle="collapse" href="#var-0" aria-expanded="true" aria-controls="collapse-example" id="variables-header" class="d-block">
+              <i class="fa fa-chevron-down pull-right"></i>Variables</a>
+    </div>
+
+  <div id="var-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_readonly">NC_READONLY</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_readwrite">NC_READWRITE</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_float">NC_FLOAT</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_fill_int">NC_FILL_INT</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_fill_float">NC_FILL_FLOAT</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_time">NC_TIME</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_y">NC_Y</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_x">NC_X</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_z">NC_Z</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_aux">NC_AUX</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_crs">NC_CRS</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_lat">NC_LAT</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_lon">NC_LON</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_time_bnds">NC_TIME_BNDS</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_left">NC_LEFT</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_right">NC_RIGHT</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_top">NC_TOP</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_bottom">NC_BOTTOM</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#types-0">Derived Types</a></h3></div>
+  <div id="types-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#type-t_netcdf_dimension">T_NETCDF_DIMENSION</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#type-t_netcdf_attribute">T_NETCDF_ATTRIBUTE</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#type-t_netcdf_variable">T_NETCDF_VARIABLE</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#type-t_netcdf4_file">T_NETCDF4_FILE</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#funcs-0">Functions</a></h3></div>
+  <div id="funcs-0" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_date_within_range">netcdf_date_within_range</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_update_time_starting_index">netcdf_update_time_starting_index</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_coord_to_col_row">netcdf_coord_to_col_row</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#subs-0">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-0" class="card-collapse collapse">
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_open_and_prepare_for_merging">netcdf_open_and_prepare_for_merging</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_open_and_prepare_as_input">netcdf_open_and_prepare_as_input</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_open_and_prepare_as_output_archive">netcdf_open_and_prepare_as_output_archive</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_open_and_prepare_as_output">netcdf_open_and_prepare_as_output</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_open_file">netcdf_open_file</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_close_file">netcdf_close_file</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_deallocate_data_struct">netcdf_deallocate_data_struct</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_nullify_data_struct">netcdf_nullify_data_struct</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_get_variable_id_for_variable">netcdf_get_variable_id_for_variable</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_get_attribute_list_for_variable">netcdf_get_attribute_list_for_variable</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_get_variable_list">netcdf_get_variable_list</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_get_variable_slice">netcdf_get_variable_slice</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_dump_cdl">netcdf_dump_cdl</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_put_variable_array">netcdf_put_variable_array</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_put_packed_variable_array">netcdf_put_packed_variable_array</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_put_variable_vector">netcdf_put_variable_vector</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+</div>
+
+    </div>
+
+    <div class="col-md-9" id='text'>
+    <p>@file
+  Contain a single module, @ref netcdf4_support, which
+  provides support for use of netCDF files as input or output.</p>
+<p>Supports use of netCDF files as input for time-varying,
+ gridded meteorlogic data, or output for any SWB-generated variable.</p>
+<p>from the C API:
+ The @c nc_get_vars_l type family of functions read a subsampled (strided)
+ array section of values from a netCDF variable of an open netCDF dataset.
+ The subsampled array section is specified by giving a corner,
+ a vector of edge lengths, and a stride vector. The values are read
+ with the last dimension of the netCDF variable varying fastest.
+          ^^^^                                  ^^^^^^^ ^^^^^^^</p>
+<p>from the Fortran 90 API:
+ The values to be read are associated with the netCDF variable by
+ assuming that the first dimension of the netCDF variable
+                   ^^^^^
+ varies fastest in the Fortran 90 interface.
+ ^^^^^^ ^^^^^^^
+ Provide support for use of netCDF files as input for time-varying,
+ gridded meteorlogic data, or output for any SWB-generated variable.</p>
+<p>before this function is called, the values associated with NCFILE must be defined.</p>
+      <br>
+    
+  
+    <div class="card card-default">
+      <div class="card-heading">
+  <h3 class="card-title">Uses</h3>
+      </div>
+      <ul class="list-group">
+      
+      <li class="list-group-item">
+  <ul class="list-inline">
+    
+    <li><a href="http://fortranwiki.org/fortran/show/ISO_C_BINDING">iso_c_binding</a></li>
+    
+    <li><a href='../module/netcdf_c_api_interfaces.html'>netcdf_c_api_interfaces</a></li>
+    
+    <li><a href='../module/logfiles.html'>logfiles</a></li>
+    
+    <li><a href='../module/constants_and_conversions.html'>constants_and_conversions</a></li>
+    
+    <li><a href='../module/fstring.html'>fstring</a></li>
+    
+    <li><a href='../module/grid.html'>grid</a></li>
+    
+    <li><a href='../module/version_control.html'>version_control</a></li>
+    
+    <li><a href='../module/exceptions.html'>exceptions</a></li>
+    
+    <li><a href='../module/datetime.html'>datetime</a></li>
+    
+    <li><a href='../module/fstring_list.html'>fstring_list</a></li>
+    
+    <li><a href='../module/proj4_support.html'>proj4_support</a></li>
+    
+  </ul>
+      </li>
+      
+      
+      
+      </ul>
+    </div>
+    
+
+    
+    
+
+    <br>
+
+    <!-- <section class="visible-xs visible-sm hidden-md">
+      
+<h3>Contents</h3>
+
+
+
+
+
+<div class="card bg-primary">
+    <!-- <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#mods-1">Modules</a></h3></div> -->
+    <div class="card-header"><a data-toggle="collapse" href="#var-1" aria-expanded="true" aria-controls="collapse-example" id="variables-header" class="d-block">
+              <i class="fa fa-chevron-down pull-right"></i>Variables</a>
+    </div>
+
+  <div id="var-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_readonly">NC_READONLY</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_readwrite">NC_READWRITE</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_float">NC_FLOAT</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_fill_int">NC_FILL_INT</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_fill_float">NC_FILL_FLOAT</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_time">NC_TIME</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_y">NC_Y</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_x">NC_X</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_z">NC_Z</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_aux">NC_AUX</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_crs">NC_CRS</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_lat">NC_LAT</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_lon">NC_LON</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_time_bnds">NC_TIME_BNDS</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_left">NC_LEFT</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_right">NC_RIGHT</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_top">NC_TOP</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#variable-nc_bottom">NC_BOTTOM</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#types-1">Derived Types</a></h3></div>
+  <div id="types-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#type-t_netcdf_dimension">T_NETCDF_DIMENSION</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#type-t_netcdf_attribute">T_NETCDF_ATTRIBUTE</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#type-t_netcdf_variable">T_NETCDF_VARIABLE</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#type-t_netcdf4_file">T_NETCDF4_FILE</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#funcs-1">Functions</a></h3></div>
+  <div id="funcs-1" class="card-collapse collapse">
+    <div class="list-group">
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_date_within_range">netcdf_date_within_range</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_update_time_starting_index">netcdf_update_time_starting_index</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_coord_to_col_row">netcdf_coord_to_col_row</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+<div class="card bg-primary">
+  <div class="card-heading text-left"><h3 class="card-title"><a data-toggle="collapse" href="#subs-1">Subroutines</a></h3></div>
+  <div class="list-group">
+    <div id="subs-1" class="card-collapse collapse">
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_open_and_prepare_for_merging">netcdf_open_and_prepare_for_merging</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_open_and_prepare_as_input">netcdf_open_and_prepare_as_input</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_open_and_prepare_as_output_archive">netcdf_open_and_prepare_as_output_archive</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_open_and_prepare_as_output">netcdf_open_and_prepare_as_output</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_open_file">netcdf_open_file</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_close_file">netcdf_close_file</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_deallocate_data_struct">netcdf_deallocate_data_struct</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_nullify_data_struct">netcdf_nullify_data_struct</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_get_variable_id_for_variable">netcdf_get_variable_id_for_variable</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_get_attribute_list_for_variable">netcdf_get_attribute_list_for_variable</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_get_variable_list">netcdf_get_variable_list</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_get_variable_slice">netcdf_get_variable_slice</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_dump_cdl">netcdf_dump_cdl</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_put_variable_array">netcdf_put_variable_array</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_put_packed_variable_array">netcdf_put_packed_variable_array</a>
+      
+      <a class="list-group-item" href="../module/netcdf4_support.html#proc-netcdf_put_variable_vector">netcdf_put_variable_vector</a>
+      
+    </div>
+  </div>
+</div>
+
+
+
+
+
+
+
+
+
+
+    </section>
+    <br class="visible-xs visible-sm hidden-md"> -->
+
+    
+
+    
+    <section>
+    <h2>Variables</h2>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nc_readonly"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>NC_READONLY</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nc_readwrite"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>NC_READWRITE</strong></td><td> =</td><td>1</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nc_float"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>NC_FLOAT</strong></td><td> =</td><td>5</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nc_fill_int"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>NC_FILL_INT</strong></td><td> =</td><td>-2147483647</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nc_fill_float"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>NC_FILL_FLOAT</strong></td><td> =</td><td>-9999.0_c_float</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nc_time"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>NC_TIME</strong></td><td> =</td><td>0</td><td><p></p><div class="alert alert-success" role="alert"><h4>Todo</h4><p>: implement a more flexible way of tracking
+        variable IDs; presently the code can break if
+        lat and lon are omitted, but time_bnds is included;
+        this is because if the lat and lon variables are
+        not defined, NC_TIME_BNDS may be 4 or 5 or some other value.</p></div></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nc_y"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>NC_Y</strong></td><td> =</td><td>1</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nc_x"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>NC_X</strong></td><td> =</td><td>2</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nc_z"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>NC_Z</strong></td><td> =</td><td>3</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nc_aux"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>NC_AUX</strong></td><td> =</td><td>3</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nc_crs"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>NC_CRS</strong></td><td> =</td><td>4</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nc_lat"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>NC_LAT</strong></td><td> =</td><td>5</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nc_lon"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>NC_LON</strong></td><td> =</td><td>6</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nc_time_bnds"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>NC_TIME_BNDS</strong></td><td> =</td><td>7</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nc_left"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>NC_LEFT</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nc_right"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>NC_RIGHT</strong></td><td> =</td><td>1</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nc_top"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>NC_TOP</strong></td><td> =</td><td>0</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-nc_bottom"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>parameter</td><td>::</td>
+  <td><strong>NC_BOTTOM</strong></td><td> =</td><td>1</td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+    </section>
+    <br>
+    
+
+    
+
+    
+
+    
+
+    
+    <section>
+     <h2>Derived Types</h2>
+   
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="type-t_netcdf_dimension"></span><h3>type, public :: <a href='../type/t_netcdf_dimension.html'>T_NETCDF_DIMENSION</a>
+    
+  </h3></div>
+  <div class="card-body">
+    
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-sdimensionname"></span>character(len=64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>sDimensionName</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inc_dimid"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNC_DimID</strong></td><td> =</td><td>NC_NA_INT</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inc_dimsize"></span>integer(kind=c_size_t),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNC_DimSize</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lunlimited"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>lUnlimited</strong></td><td> =</td><td>FALSE</td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+     
+     
+  </div>
+</div>
+
+     
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="type-t_netcdf_attribute"></span><h3>type, public :: <a href='../type/t_netcdf_attribute.html'>T_NETCDF_ATTRIBUTE</a>
+    
+  </h3></div>
+  <div class="card-body">
+    
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-sattributename"></span>character(len=64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>sAttributeName</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-sattvalue"></span>character(len=256),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>sAttValue</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-i2attvalue"></span>integer(kind=c_short),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>i2AttValue</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-iattvalue"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>iAttValue</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rattvalue"></span>real(kind=c_float),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>rAttValue</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dpattvalue"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), allocatable</td><td>::</td>
+  <td><strong>dpAttValue</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inc_atttype"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNC_AttType</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inc_attsize"></span>integer(kind=c_size_t),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNC_AttSize</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+     
+     
+  </div>
+</div>
+
+     
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="type-t_netcdf_variable"></span><h3>type, public :: <a href='../type/t_netcdf_variable.html'>T_NETCDF_VARIABLE</a>
+    
+  </h3></div>
+  <div class="card-body">
+    
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-svariablename"></span>character(len=64),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>sVariableName</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inc_varid"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNC_VarID</strong></td><td> =</td><td>NC_NA_INT</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inc_vartype"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNC_VarType</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inumberofdimensions"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNumberOfDimensions</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inc_dimid~2"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>iNC_DimID</strong></td><td> =</td><td>NC_NA_INT</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inumberofattributes"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNumberOfAttributes</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pnc_att"></span>type(<a href='../type/t_netcdf_attribute.html'>T_NETCDF_ATTRIBUTE</a>),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), pointer</td><td>::</td>
+  <td><strong>pNC_ATT</strong></td><td>=> </td><td>null()</td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+     
+     
+  </div>
+</div>
+
+     
+     
+<div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="type-t_netcdf4_file"></span><h3>type, public :: <a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>
+    
+  </h3></div>
+  <div class="card-body">
+    
+     
+     <h4>Components</h4>
+    
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th><th>Visibility</th>
+
+<th>Attributes</th><th></th><th>Name</th><th></th><th>Initial</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-incid"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNCID</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-sfilename~4"></span>character(len=256),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>sFilename</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ifileformat"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iFileFormat</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inumberofdimensions~2"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNumberOfDimensions</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inumberofvariables"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNumberOfVariables</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inumberofattributes~2"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNumberOfAttributes</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inc3_unlimiteddimensionnumber"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNC3_UnlimitedDimensionNumber</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ioriginjd"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iOriginJD</strong></td><td> =</td><td>NC_NA_INT</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ifirstdayjd"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iFirstDayJD</strong></td><td> =</td><td>NC_NA_INT</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ilastdayjd"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iLastDayJD</strong></td><td> =</td><td>NC_NA_INT</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ioriginmonth"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iOriginMonth</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ioriginday"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iOriginDay</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ioriginyear"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iOriginYear</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ioriginhh"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iOriginHH</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ioriginmm"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iOriginMM</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ioriginss"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iOriginSS</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lleapyeartreatment"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>lLeapYearTreatment</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-istart"></span>integer(kind=c_size_t),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>iStart</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-icount"></span>integer(kind=c_size_t),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>iCount</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-istride"></span>integer(kind=c_size_t),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>iStride</strong></td><td> =</td><td>1</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-icolbounds"></span>integer(kind=c_size_t),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:1)</td><td>::</td>
+  <td><strong>iColBounds</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-irowbounds"></span>integer(kind=c_size_t),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:1)</td><td>::</td>
+  <td><strong>iRowBounds</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-inx~2"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNX</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-iny~2"></span>integer(kind=c_int),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>iNY</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-svariableorder~2"></span>character(len=3),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>sVariableOrder</strong></td><td> =</td><td>"tyx"</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rx~2"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:1)</td><td>::</td>
+  <td><strong>rX</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ry~2"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:1)</td><td>::</td>
+  <td><strong>rY</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lx_increaseswithindex"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>lX_IncreasesWithIndex</strong></td><td> =</td><td>TRUE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ly_increaseswithindex"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>lY_IncreasesWithIndex</strong></td><td> =</td><td>FALSE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lallowautomaticdataflipping~2"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>lAllowAutomaticDataFlipping</strong></td><td> =</td><td>TRUE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-dpfirstandlasttimevalues"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:1)</td><td>::</td>
+  <td><strong>dpFirstAndLastTimeValues</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-svarname"></span>character(len=64),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>sVarName</strong></td><td> =</td><td>["time", "y&nbsp;&nbsp;&nbsp;", "x&nbsp;&nbsp;&nbsp;", "z&nbsp;&nbsp;&nbsp;"]</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ivarid"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>iVarID</strong></td><td> =</td><td>NC_NA_INT</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ivarindex"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>iVarIndex</strong></td><td> =</td><td>NC_NA_INT</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ivartype"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>iVarType</strong></td><td> =</td><td>NC_NA_INT</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-svarunits"></span>character(len=64),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>sVarUnits</strong></td><td> =</td><td>"NA"</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ivar_dimid"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3, 0:3)</td><td>::</td>
+  <td><strong>iVar_DimID</strong></td><td> =</td><td>NC_NA_INT</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rscalefactor"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>rScaleFactor</strong></td><td> =</td><td>1.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-raddoffset"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:3)</td><td>::</td>
+  <td><strong>rAddOffset</strong></td><td> =</td><td>0.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-irowiter"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:2)</td><td>::</td>
+  <td><strong>iRowIter</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-icoliter"></span>integer(kind=c_int),</td>
+  
+  <td>public,</td>
+  <td>dimension(0:2)</td><td>::</td>
+  <td><strong>iColIter</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lfliphorizontal~2"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>lFlipHorizontal</strong></td><td> =</td><td>FALSE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-lflipvertical~2"></span>logical(kind=c_bool),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>lFlipVertical</strong></td><td> =</td><td>FALSE</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rx_coords"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable, dimension(:)</td><td>::</td>
+  <td><strong>rX_Coords</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ry_coords"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable, dimension(:)</td><td>::</td>
+  <td><strong>rY_Coords</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rx_coord_addoffset~2"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>rX_Coord_AddOffset</strong></td><td> =</td><td>0.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-ry_coord_addoffset~2"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>rY_Coord_AddOffset</strong></td><td> =</td><td>0.0_c_double</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rdatetimevalues"></span>real(kind=c_double),</td>
+  
+  <td>public,</td>
+  <td>allocatable, dimension(:)</td><td>::</td>
+  <td><strong>rDateTimeValues</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rgridcellsizex"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>rGridCellSizeX</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-rgridcellsizey"></span>real(kind=c_double),</td>
+  
+  <td>public</td>
+  <td></td><td>::</td>
+  <td><strong>rGridCellSizeY</strong></td><td></td><td></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pnc_dim"></span>type(<a href='../type/t_netcdf_dimension.html'>T_NETCDF_DIMENSION</a>),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), pointer</td><td>::</td>
+  <td><strong>pNC_DIM</strong></td><td>=> </td><td>null()</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pnc_var"></span>type(<a href='../type/t_netcdf_variable.html'>T_NETCDF_VARIABLE</a>),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), pointer</td><td>::</td>
+  <td><strong>pNC_VAR</strong></td><td>=> </td><td>null()</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" id="variable-pnc_att~2"></span>type(<a href='../type/t_netcdf_attribute.html'>T_NETCDF_ATTRIBUTE</a>),</td>
+  
+  <td>public,</td>
+  <td>dimension(:), pointer</td><td>::</td>
+  <td><strong>pNC_ATT</strong></td><td>=> </td><td>null()</td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+     
+     
+     
+     
+  </div>
+</div>
+
+     
+    </section>
+  <br>
+    
+
+    
+    <section>
+    <h2>Functions</h2>
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-netcdf_date_within_range"></span><h3>
+public function <a href='../proc/netcdf_date_within_range.html'>netcdf_date_within_range</a>(NCFILE, iJulianDay) result(lWithinRange)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>NCFILE</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iJulianDay</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-netcdf_update_time_starting_index"></span><h3>
+public function <a href='../proc/netcdf_update_time_starting_index.html'>netcdf_update_time_starting_index</a>(NCFILE, iJulianDay) result(lDateTimeFound)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>NCFILE</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iJulianDay</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>logical(kind=c_bool)
+  </small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-netcdf_coord_to_col_row"></span><h3>
+public function <a href='../proc/netcdf_coord_to_col_row.html'>netcdf_coord_to_col_row</a>(NCFILE, rX, rY) result(iColRow)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>NCFILE</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rX</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>rY</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  
+  
+  
+  
+     <h4>Return Value <small>integer(kind=c_size_t),
+  dimension(2)</small></h4>
+  
+    
+
+  </div>
+  </div>
+
+    
+    </section>
+    <br>
+    
+
+    
+    <section>
+    <h2>Subroutines</h2>
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-netcdf_open_and_prepare_for_merging"></span><h3>
+public subroutine <a href='../proc/netcdf_open_and_prepare_for_merging.html'>netcdf_open_and_prepare_for_merging</a>(NCFILE, sFilename, guess_z_var_name)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>look for and process the "days since MM-DD-YYYY" attribute</p><a href="../proc/netcdf_open_and_prepare_for_merging.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>NCFILE</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sFilename</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical(kind=c_bool),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>guess_z_var_name</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-netcdf_open_and_prepare_as_input"></span><h3>
+public subroutine <a href='../proc/netcdf_open_and_prepare_as_input.html'>netcdf_open_and_prepare_as_input</a>(NCFILE, sFilename, lFlipHorizontal, lFlipVertical, lAllowAutomaticDataFlipping, rX_Coord_AddOffset, rY_Coord_AddOffset, sVariableOrder, sVarName_x, sVarName_y, sVarName_z, sVarName_time, tGridBounds, iLU)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>look for and process the "days since MM-D-YYYY" attribute</p><a href="../proc/netcdf_open_and_prepare_as_input.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>NCFILE</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sFilename</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical(kind=c_bool),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>lFlipHorizontal</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical(kind=c_bool),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>lFlipVertical</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical(kind=c_bool),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>lAllowAutomaticDataFlipping</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>rX_Coord_AddOffset</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>rY_Coord_AddOffset</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>sVariableOrder</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>sVarName_x</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>sVarName_y</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>sVarName_z</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>sVarName_time</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(GRID_BOUNDS_T),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>tGridBounds</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>iLU</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-netcdf_open_and_prepare_as_output_archive"></span><h3>
+public subroutine <a href='../proc/netcdf_open_and_prepare_as_output_archive.html'>netcdf_open_and_prepare_as_output_archive</a>(NCFILE, NCFILE_ARCHIVE, iOriginMonth, iOriginDay, iOriginYear, iStartYear, iEndYear)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>set dimension values in the NCFILE struct</p><a href="../proc/netcdf_open_and_prepare_as_output_archive.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>NCFILE</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>NCFILE_ARCHIVE</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iOriginMonth</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iOriginDay</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iOriginYear</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iStartYear</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iEndYear</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-netcdf_open_and_prepare_as_output"></span><h3>
+public subroutine <a href='../proc/netcdf_open_and_prepare_as_output.html'>netcdf_open_and_prepare_as_output</a>(NCFILE, sVariableName, sVariableUnits, iNX, iNY, fX, fY, StartDate, EndDate, PROJ4_string, history_list, executable_name, dpLat, dpLon, fValidMin, fValidMax, write_time_bounds, filename_modifier)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>set dimension values in the NCFILE struct</p><a href="../proc/netcdf_open_and_prepare_as_output.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>),</td>
+  <td>intent(inout),</td>
+  <td></td>
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>NCFILE</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sVariableName</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sVariableUnits</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iNX</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iNY</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fX</strong>(:)</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>fY</strong>(:)</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(DATETIME_T),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>StartDate</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(DATETIME_T),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>EndDate</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>PROJ4_string</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td>pointer</td><td>::</td>
+  <td><strong>history_list</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>executable_name</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>dpLat</strong>(:,:)</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>dpLon</strong>(:,:)</td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValidMin</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>fValidMax</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical(kind=c_bool),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>write_time_bounds</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in),</td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>filename_modifier</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-netcdf_open_file"></span><h3>
+public subroutine <a href='../proc/netcdf_open_file.html'>netcdf_open_file</a>(NCFILE, sFilename, iLU)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p>Similarly, the structure of the file may be slightly different from the
+ previous file
+ CANNOT ASSUME THAT THIS WILL REMAIN CONSTANT ACROSS FILES FROM THE
+ SAME PROVIDER!! MUST UPDATE TO ENSURE THAT THE INDICES ARE STILL RELEVANT</p><a href="../proc/netcdf_open_file.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>NCFILE</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>sFilename</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td></td><td>::</td>
+  <td><strong>iLU</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-netcdf_close_file"></span><h3>
+public subroutine <a href='../proc/netcdf_close_file.html'>netcdf_close_file</a>(NCFILE)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>NCFILE</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-netcdf_deallocate_data_struct"></span><h3>
+public subroutine <a href='../proc/netcdf_deallocate_data_struct.html'>netcdf_deallocate_data_struct</a>(NCFILE)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>NCFILE</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-netcdf_nullify_data_struct"></span><h3>
+public subroutine <a href='../proc/netcdf_nullify_data_struct.html'>netcdf_nullify_data_struct</a>(NCFILE)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>NCFILE</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-netcdf_get_variable_id_for_variable"></span><h3>
+public subroutine <a href='../proc/netcdf_get_variable_id_for_variable.html'>netcdf_get_variable_id_for_variable</a>(NCFILE, variable_name, variable_id)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>NCFILE</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>variable_name</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>variable_id</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-netcdf_get_attribute_list_for_variable"></span><h3>
+public subroutine <a href='../proc/netcdf_get_attribute_list_for_variable.html'>netcdf_get_attribute_list_for_variable</a>(NCFILE, variable_name, attribute_name_list, attribute_value_list)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>NCFILE</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>character(len=*),</td>
+  <td>intent(in)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>variable_name</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>attribute_name_list</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>),</td>
+  <td>intent(out)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>attribute_value_list</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-netcdf_get_variable_list"></span><h3>
+public subroutine <a href='../proc/netcdf_get_variable_list.html'>netcdf_get_variable_list</a>(NCFILE, variable_list)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>NCFILE</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/fstring_list_t.html'>FSTRING_LIST_T</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>variable_list</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-netcdf_get_variable_slice"></span><h3>
+public subroutine <a href='../proc/netcdf_get_variable_slice.html'>netcdf_get_variable_slice</a>(NCFILE, rValues, dpValues, iValues)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+
+
+
+
+
+
+<p></p><a href="../proc/netcdf_get_variable_slice.html" class="pull-right"><emph>Read more&hellip;</emph></a>
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>),</td>
+  <td>intent(inout)</td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>NCFILE</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>rValues</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>dpValues</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>iValues</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-netcdf_dump_cdl"></span><h3>
+public subroutine <a href='../proc/netcdf_dump_cdl.html'>netcdf_dump_cdl</a>(NCFILE, iLU)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>NCFILE</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iLU</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-netcdf_put_variable_array"></span><h3>
+public subroutine <a href='../proc/netcdf_put_variable_array.html'>netcdf_put_variable_array</a>(NCFILE, iVarID, iStart, iCount, iStride, iValues, i2Values, rValues, dpValues)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>NCFILE</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iVarID</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_size_t),</td>
+  <td></td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>iStart</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_size_t),</td>
+  <td></td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>iCount</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_size_t),</td>
+  <td></td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>iStride</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>iValues</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_short),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>i2Values</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>rValues</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>dpValues</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-netcdf_put_packed_variable_array"></span><h3>
+public subroutine <a href='../proc/netcdf_put_packed_variable_array.html'>netcdf_put_packed_variable_array</a>(NCFILE, iVarID, iStart, iCount, iStride, lMask, iValues, iField, i2Values, i2Field, rValues, rField, dpValues, dpField)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>NCFILE</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iVarID</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_size_t),</td>
+  <td></td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>iStart</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_size_t),</td>
+  <td></td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>iCount</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_size_t),</td>
+  <td></td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>iStride</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>logical(kind=c_bool),</td>
+  <td></td>
+  <td></td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>lMask</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>iValues</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>iField</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_short),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>i2Values</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_short),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>i2Field</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>rValues</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>rField</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>dpValues</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td>dimension(:,:)</td><td>::</td>
+  <td><strong>dpField</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    
+  <div class="card card-default">
+  <div class="card-heading"><span class="anchor" id="proc-netcdf_put_variable_vector"></span><h3>
+public subroutine <a href='../proc/netcdf_put_variable_vector.html'>netcdf_put_variable_vector</a>(NCFILE, iVarID, iStart, iCount, iStride, iValues, i2Values, rValues, dpValues)
+    
+    
+   
+</h3></div>
+  <div class="card-body">
+       
+    
+
+    <h4>Arguments</h4>
+    
+      
+      
+<table class="table table-striped varlist">
+<thead><tr><th>Type</th>
+<th>Intent</th><th>Optional</th>
+<th>Attributes</th><th></th><th>Name</th><th></th></thead>
+
+
+
+<tbody>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>type(<a href='../type/t_netcdf4_file.html'>T_NETCDF4_FILE</a>)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>NCFILE</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int)</td>
+  <td></td>
+  <td></td>
+  
+  <td></td><td>::</td>
+  <td><strong>iVarID</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_size_t),</td>
+  <td></td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>iStart</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_size_t),</td>
+  <td></td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>iCount</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_size_t),</td>
+  <td></td>
+  <td></td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>iStride</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_int),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>iValues</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>integer(kind=c_short),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>i2Values</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_float),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>rValues</strong></td><td></td>
+  
+</tr>
+
+  
+  
+  
+  
+<tr>
+  
+  <td><span class="anchor" ></span>real(kind=c_double),</td>
+  <td></td>
+  <td>optional</td>
+  
+  <td>dimension(:)</td><td>::</td>
+  <td><strong>dpValues</strong></td><td></td>
+  
+</tr>
+
+</tbody>
+</table>
+
+      
+    
+    
+
+  </div>
+  </div>
+
+    
+    </section>
+    <br>
+    
+
+    
+    </div>
+  </div>
+
+  
+    <hr>
+  </div> <!-- /container -->
+  <footer>
+    <div class="container">
+      <div class="row">
+        <div class="col-2">
+          <p>&copy; 2019 <a rel="license" href="http://creativecommons.org/licenses/by/4.0/"><img alt="Creative Commons License" style="border-width:0" src="https://i.creativecommons.org/l/by/4.0/80x15.png" /></a>
+            </p>
+        </div>
+        <div class="col-4">
+          <p class="text-right"><small>
+            Documentation for SWB2
+               (version 2.0, build 96) generated by
+            <a href="https://github.com/cmacmackin/ford">FORD</a>
+             on Tue Sep  3 16:54:50 2019 </small>
+          </p>
+        </div>
+        <div class="col">
+          <p class="text-center"> SWB2 was developed by Steve Westenbroek, John Engott, Vic Kelson, Randall Hunt</p>
+        </div>
+      </div>
+      <br>
+    </div> <!-- /container -->
+  </footer>
+
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <!--
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+-->
+  <script src="../js/bootstrap.min.js"></script>
+
+  <!-- MathJax JavaScript
+    ================================================== -->
+  <!-- Placed at the end of the document so the pages load faster -->
+  <script type="text/x-mathjax-config">
+    MathJax.Hub.Config({
+        TeX: { extensions: ['AMSmath.js','AMSsymbols.js','noErrors.js','noUndefined.js'], equationNumbers: { autoNumber: 'AMS' } },
+        jax: ['input/TeX','input/MathML','output/HTML-CSS'],
+        extensions: ['tex2jax.js','mml2jax.js','MathMenu.js','MathZoom.js']
+      });
+    </script>
+  
+
+  <!-- <script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.1/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script> -->
+
+  <script type="text/javascript" async
+    src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+  </script>
+
+  
+
+</body>
+
+</html>
