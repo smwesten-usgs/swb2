@@ -37,6 +37,7 @@ var namespaces_dup =
     [ "irrigation", "namespaceirrigation.html", null ],
     [ "kiss_random_number_generator", "namespacekiss__random__number__generator.html", null ],
     [ "logfiles", "namespacelogfiles.html", null ],
+    [ "luxury", "namespaceluxury.html", null ],
     [ "mass_balance__impervious_surface", "namespacemass__balance____impervious__surface.html", null ],
     [ "mass_balance__interception", "namespacemass__balance____interception.html", null ],
     [ "mass_balance__snow", "namespacemass__balance____snow.html", null ],

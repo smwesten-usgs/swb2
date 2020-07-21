@@ -8,6 +8,7 @@ var namespaceconstants__and__conversions =
     [ "c_to_f", "interfaceconstants__and__conversions_1_1c__to__f.html", "interfaceconstants__and__conversions_1_1c__to__f" ],
     [ "c_to_k", "interfaceconstants__and__conversions_1_1c__to__k.html", "interfaceconstants__and__conversions_1_1c__to__k" ],
     [ "deg_to_rad", "interfaceconstants__and__conversions_1_1deg__to__rad.html", "interfaceconstants__and__conversions_1_1deg__to__rad" ],
+    [ "enforce_bounds", "interfaceconstants__and__conversions_1_1enforce__bounds.html", "interfaceconstants__and__conversions_1_1enforce__bounds" ],
     [ "f_to_c", "interfaceconstants__and__conversions_1_1f__to__c.html", "interfaceconstants__and__conversions_1_1f__to__c" ],
     [ "f_to_k", "interfaceconstants__and__conversions_1_1f__to__k.html", "interfaceconstants__and__conversions_1_1f__to__k" ],
     [ "in_to_mm", "interfaceconstants__and__conversions_1_1in__to__mm.html", "interfaceconstants__and__conversions_1_1in__to__mm" ],

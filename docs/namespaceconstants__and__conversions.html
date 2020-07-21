@@ -119,6 +119,8 @@ Data Types</h2></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceconstants__and__conversions_1_1deg__to__rad.html">deg_to_rad</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceconstants__and__conversions_1_1enforce__bounds.html">enforce_bounds</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceconstants__and__conversions_1_1f__to__c.html">f_to_c</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceconstants__and__conversions_1_1f__to__k.html">f_to_k</a></td></tr>
@@ -259,6 +261,12 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memitem:a10f8b9aa84e4a19fcac56765c9cf9a25"><td class="memItemLeft" align="right" valign="top">impure elemental character(len=len(stext1)) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceconstants__and__conversions.html#a10f8b9aa84e4a19fcac56765c9cf9a25">keepnumeric</a> (sText1)</td></tr>
 <tr class="memdesc:a10f8b9aa84e4a19fcac56765c9cf9a25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Strip everything except numeric characters from a text string.  <a href="namespaceconstants__and__conversions.html#a10f8b9aa84e4a19fcac56765c9cf9a25">More...</a><br /></td></tr>
 <tr class="separator:a10f8b9aa84e4a19fcac56765c9cf9a25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3fd09151348d9c69e8564a474f32aa3"><td class="memItemLeft" align="right" valign="top">elemental integer(c_int) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceconstants__and__conversions.html#ad3fd09151348d9c69e8564a474f32aa3">enforce_bounds_int_fn</a> (value, minval, maxval)</td></tr>
+<tr class="separator:ad3fd09151348d9c69e8564a474f32aa3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa34b83131ce2c515efab4759a9a803ac"><td class="memItemLeft" align="right" valign="top">elemental real(c_float) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceconstants__and__conversions.html#aa34b83131ce2c515efab4759a9a803ac">enforce_bounds_sgl_fn</a> (value, minval, maxval)</td></tr>
+<tr class="separator:aa34b83131ce2c515efab4759a9a803ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29e0db48a0031ed9a3f8c025bf7d2d12"><td class="memItemLeft" align="right" valign="top">elemental real(c_double) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceconstants__and__conversions.html#a29e0db48a0031ed9a3f8c025bf7d2d12">enforce_bounds_dbl_fn</a> (value, minval, maxval)</td></tr>
+<tr class="separator:a29e0db48a0031ed9a3f8c025bf7d2d12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -372,7 +380,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00251">251</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00258">258</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -402,7 +410,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00233">233</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00240">240</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -432,7 +440,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00216">216</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00223">223</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -454,7 +462,7 @@ Variables</h2></td></tr>
 
 <p>Convert a boolean value into a double. </p>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00841">841</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00848">848</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -476,7 +484,7 @@ Variables</h2></td></tr>
 
 <p>Convert a boolean value into a real. </p>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00769">769</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00776">776</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -496,7 +504,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00880">880</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00887">887</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -518,7 +526,7 @@ Variables</h2></td></tr>
 
 <p>Convert a character value into a double. </p>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00785">785</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00792">792</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -540,7 +548,7 @@ Variables</h2></td></tr>
 
 <p>Convert a character value into a integer. </p>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00653">653</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00660">660</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -562,7 +570,7 @@ Variables</h2></td></tr>
 
 <p>Convert a character string to a logical value. </p>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00617">617</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00624">624</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -584,7 +592,7 @@ Variables</h2></td></tr>
 
 <p>Convert a character value into a real. </p>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00713">713</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00720">720</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -604,7 +612,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00855">855</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00862">862</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -638,7 +646,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00406">406</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00413">413</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -672,7 +680,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00390">390</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00397">397</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -706,7 +714,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00470">470</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00477">477</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -740,7 +748,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00454">454</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00461">461</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -762,7 +770,7 @@ Variables</h2></td></tr>
 
 <p>Convert a double-precision value to an integer. </p>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00700">700</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00707">707</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -784,7 +792,7 @@ Variables</h2></td></tr>
 
 <p>Convert a double to a logical value. </p>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00597">597</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00604">604</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -806,7 +814,7 @@ Variables</h2></td></tr>
 
 <p>Convert a dbl value into a real. </p>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00757">757</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00764">764</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -840,7 +848,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00311">311</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00318">318</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -874,7 +882,115 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00295">295</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00302">302</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+
+</div>
+</div>
+<a id="a29e0db48a0031ed9a3f8c025bf7d2d12"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a29e0db48a0031ed9a3f8c025bf7d2d12">&#9670;&nbsp;</a></span>enforce_bounds_dbl_fn()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">elemental real (c_double) function constants_and_conversions::enforce_bounds_dbl_fn </td>
+          <td>(</td>
+          <td class="paramtype">real (c_double), intent(in)&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real (c_double), intent(in)&#160;</td>
+          <td class="paramname"><em>minval</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real (c_double), intent(in)&#160;</td>
+          <td class="paramname"><em>maxval</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00997">997</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+
+</div>
+</div>
+<a id="ad3fd09151348d9c69e8564a474f32aa3"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ad3fd09151348d9c69e8564a474f32aa3">&#9670;&nbsp;</a></span>enforce_bounds_int_fn()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">elemental integer (c_int) function constants_and_conversions::enforce_bounds_int_fn </td>
+          <td>(</td>
+          <td class="paramtype">integer (c_int), intent(in)&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer (c_int), intent(in)&#160;</td>
+          <td class="paramname"><em>minval</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer (c_int), intent(in)&#160;</td>
+          <td class="paramname"><em>maxval</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00975">975</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+
+</div>
+</div>
+<a id="aa34b83131ce2c515efab4759a9a803ac"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa34b83131ce2c515efab4759a9a803ac">&#9670;&nbsp;</a></span>enforce_bounds_sgl_fn()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">elemental real (c_float) function constants_and_conversions::enforce_bounds_sgl_fn </td>
+          <td>(</td>
+          <td class="paramtype">real (c_float), intent(in)&#160;</td>
+          <td class="paramname"><em>value</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real (c_float), intent(in)&#160;</td>
+          <td class="paramname"><em>minval</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real (c_float), intent(in)&#160;</td>
+          <td class="paramname"><em>maxval</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00986">986</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -894,7 +1010,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00187">187</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00194">194</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -914,7 +1030,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00907">907</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00914">914</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -948,7 +1064,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00374">374</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00381">381</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -982,7 +1098,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00358">358</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00365">365</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1016,7 +1132,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00438">438</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00445">445</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1050,7 +1166,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00422">422</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00429">429</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1084,7 +1200,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00500">500</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00507">507</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1118,7 +1234,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00485">485</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00492">492</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1140,7 +1256,7 @@ Variables</h2></td></tr>
 
 <p>Convert an int value into a double. </p>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00816">816</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00823">823</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1162,7 +1278,7 @@ Variables</h2></td></tr>
 
 <p>Convert an integer to a logical value. </p>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00560">560</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00567">567</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1184,7 +1300,7 @@ Variables</h2></td></tr>
 
 <p>Convert an int value into a real. </p>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00744">744</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00751">751</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1218,7 +1334,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00271">271</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00278">278</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1246,7 +1362,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00930">930</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00937">937</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1280,7 +1396,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00530">530</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00537">537</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1314,7 +1430,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00515">515</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00522">522</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1348,7 +1464,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00342">342</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00349">349</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1382,7 +1498,7 @@ Variables</h2></td></tr>
   </dd>
 </dl>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00327">327</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00334">334</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1404,7 +1520,7 @@ Variables</h2></td></tr>
 
 <p>Convert a real value into a double. </p>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00829">829</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00836">836</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1426,7 +1542,7 @@ Variables</h2></td></tr>
 
 <p>Convert a real value into a integer. </p>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00687">687</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00694">694</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1448,7 +1564,7 @@ Variables</h2></td></tr>
 
 <p>Convert a real to a logical value. </p>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00577">577</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00584">584</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1470,7 +1586,7 @@ Variables</h2></td></tr>
 
 <p>Convert a short int value into a double. </p>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00803">803</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00810">810</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1492,7 +1608,7 @@ Variables</h2></td></tr>
 
 <p>Convert a short integer to an integer. </p>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00640">640</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00647">647</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1514,7 +1630,7 @@ Variables</h2></td></tr>
 
 <p>Convert a short integer to a logical value. </p>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00543">543</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00550">550</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -1536,7 +1652,7 @@ Variables</h2></td></tr>
 
 <p>Convert a short int value into a real. </p>
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00731">731</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00738">738</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -2129,7 +2245,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00183">183</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00190">190</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>
@@ -2145,7 +2261,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00182">182</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="constants__and__conversions_8_f90_source.html#l00189">189</a> of file <a class="el" href="constants__and__conversions_8_f90_source.html">constants_and_conversions.F90</a>.</p>
 
 </div>
 </div>

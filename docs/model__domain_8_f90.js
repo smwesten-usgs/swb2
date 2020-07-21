@@ -40,6 +40,7 @@ var model__domain_8_f90 =
     [ "model_calculate_maximum_net_infiltration_gridded", "model__domain_8_f90.html#a45bd142dea5e00ee5a1e1e1a8b4b9713", null ],
     [ "model_calculate_maximum_net_infiltration_none", "model__domain_8_f90.html#a1de28abf05c72b60d773c6f6702f11d2", null ],
     [ "model_calculate_mean_air_temperature", "model__domain_8_f90.html#aee169074aec39d30061cb66f484605d5", null ],
+    [ "model_calculate_modified_gdd", "model__domain_8_f90.html#a3dd020e64af542e1962a4fcde4468368", null ],
     [ "model_calculate_routing_d8", "model__domain_8_f90.html#a5209bb5a97395d78c7c21943a1063a69", null ],
     [ "model_calculate_routing_none", "model__domain_8_f90.html#afb529e08675ab87c439662845b836243", null ],
     [ "model_calculate_runoff_curve_number", "model__domain_8_f90.html#ab35d378db8d7e12a05773ded859cbad5", null ],

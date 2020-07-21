@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.18"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Soil Water Balance (SWB2): D:/SMWData/git_repos/swb2/src/constants_and_conversions.F90 File Reference</title>
+<title>Soil Water Balance (SWB2): F:/projects/swb_development/git/swb2/src/constants_and_conversions.F90 File Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -130,6 +130,8 @@ Data Types</h2></td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceconstants__and__conversions_1_1mm__to__in.html">constants_and_conversions::mm_to_in</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceconstants__and__conversions_1_1in__to__mm.html">constants_and_conversions::in_to_mm</a></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">interface &#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="interfaceconstants__and__conversions_1_1enforce__bounds.html">constants_and_conversions::enforce_bounds</a></td></tr>
 <tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="namespaces"></a>
@@ -265,6 +267,12 @@ Functions/Subroutines</h2></td></tr>
 <tr class="memitem:a10f8b9aa84e4a19fcac56765c9cf9a25"><td class="memItemLeft" align="right" valign="top">impure elemental character(len=len(stext1)) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceconstants__and__conversions.html#a10f8b9aa84e4a19fcac56765c9cf9a25">constants_and_conversions::keepnumeric</a> (sText1)</td></tr>
 <tr class="memdesc:a10f8b9aa84e4a19fcac56765c9cf9a25"><td class="mdescLeft">&#160;</td><td class="mdescRight">Strip everything except numeric characters from a text string.  <a href="namespaceconstants__and__conversions.html#a10f8b9aa84e4a19fcac56765c9cf9a25">More...</a><br /></td></tr>
 <tr class="separator:a10f8b9aa84e4a19fcac56765c9cf9a25"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ad3fd09151348d9c69e8564a474f32aa3"><td class="memItemLeft" align="right" valign="top">elemental integer(c_int) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceconstants__and__conversions.html#ad3fd09151348d9c69e8564a474f32aa3">constants_and_conversions::enforce_bounds_int_fn</a> (value, minval, maxval)</td></tr>
+<tr class="separator:ad3fd09151348d9c69e8564a474f32aa3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa34b83131ce2c515efab4759a9a803ac"><td class="memItemLeft" align="right" valign="top">elemental real(c_float) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceconstants__and__conversions.html#aa34b83131ce2c515efab4759a9a803ac">constants_and_conversions::enforce_bounds_sgl_fn</a> (value, minval, maxval)</td></tr>
+<tr class="separator:aa34b83131ce2c515efab4759a9a803ac"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a29e0db48a0031ed9a3f8c025bf7d2d12"><td class="memItemLeft" align="right" valign="top">elemental real(c_double) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceconstants__and__conversions.html#a29e0db48a0031ed9a3f8c025bf7d2d12">constants_and_conversions::enforce_bounds_dbl_fn</a> (value, minval, maxval)</td></tr>
+<tr class="separator:a29e0db48a0031ed9a3f8c025bf7d2d12"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>

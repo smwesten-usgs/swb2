@@ -5,7 +5,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.18"/>
 <meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>Soil Water Balance (SWB2): D:/SMWData/git_repos/swb2/src/crop_coefficients__fao56.F90 Source File</title>
+<title>Soil Water Balance (SWB2): F:/projects/swb_development/git/swb2/src/crop_coefficients__fao56.F90 Source File</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -167,61 +167,61 @@ $(document).ready(function(){initNavTree('crop__coefficients____fao56_8_f90_sour
 <div class="line"><a name="l00077"></a><span class="lineno"><a class="line" href="namespacecrop__coefficients____fao56.html#a12966098ef34ed15c09876a3add78312">   77</a></span>&#160;  <span class="keyword">subroutine </span><a class="code" href="namespacecrop__coefficients____fao56.html#a12966098ef34ed15c09876a3add78312">crop_coefficients_fao56_initialize</a>()</div>
 <div class="line"><a name="l00078"></a><span class="lineno">   78</span>&#160; </div>
 <div class="line"><a name="l00079"></a><span class="lineno">   79</span>&#160;    <span class="comment">! [ LOCALS ]</span></div>
-<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="comment">! type (FSTRING_LIST_T)              :: slREW, slTEW</span></div>
-<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordtype">type</span> (fstring_list_t)              :: sllist</div>
+<div class="line"><a name="l00080"></a><span class="lineno">   80</span>&#160;    <span class="comment">! type (FSTRING_LIST_T)            :: slREW, slTEW</span></div>
+<div class="line"><a name="l00081"></a><span class="lineno">   81</span>&#160;    <span class="keywordtype">type</span> (fstring_list_t)             :: sllist</div>
 <div class="line"><a name="l00082"></a><span class="lineno">   82</span>&#160;    <span class="keywordtype">type</span> (<a class="code" href="structdatetime_1_1datetime__t.html">datetime_t</a>)                 :: dt</div>
 <div class="line"><a name="l00083"></a><span class="lineno">   83</span>&#160;    <span class="keywordtype">type</span> (<a class="code" href="structdatetime_1_1datetime__t.html">datetime_t</a>)                 :: temp_date</div>
 <div class="line"><a name="l00084"></a><span class="lineno">   84</span>&#160;    <span class="comment">! integer (c_int), allocatable :: iTEWSeqNums(:)</span></div>
 <div class="line"><a name="l00085"></a><span class="lineno">   85</span>&#160;    <span class="comment">! integer (c_int), allocatable :: iREWSeqNums(:)</span></div>
-<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordtype">integer (c_int)</span>              :: inumberoftew, inumberofrew</div>
-<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keywordtype">integer (c_int)</span>              :: inumberoflanduses</div>
-<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keywordtype">integer (c_int)</span>              :: iindex, iindex2</div>
-<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keywordtype">integer (c_int)</span>              :: istat</div>
-<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="keywordtype">    real</span> (c_float)               :: growing_cycle_length</div>
+<div class="line"><a name="l00086"></a><span class="lineno">   86</span>&#160;    <span class="keywordtype">integer (c_int)</span>                   :: inumberoftew, inumberofrew</div>
+<div class="line"><a name="l00087"></a><span class="lineno">   87</span>&#160;    <span class="keywordtype">integer (c_int)</span>                   :: inumberoflanduses</div>
+<div class="line"><a name="l00088"></a><span class="lineno">   88</span>&#160;    <span class="keywordtype">integer (c_int)</span>                   :: iindex, iindex2</div>
+<div class="line"><a name="l00089"></a><span class="lineno">   89</span>&#160;    <span class="keywordtype">integer (c_int)</span>                   :: istat</div>
+<div class="line"><a name="l00090"></a><span class="lineno">   90</span>&#160;<span class="keywordtype">    real</span> (c_float)                    :: growing_cycle_length</div>
 <div class="line"><a name="l00091"></a><span class="lineno">   91</span>&#160; </div>
-<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keywordtype">character (len=10)</span>               :: smmddyyyy</div>
-<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keywordtype">character (len=:)</span>, <span class="keywordtype">allocatable</span>   :: stext</div>
+<div class="line"><a name="l00092"></a><span class="lineno">   92</span>&#160;    <span class="keywordtype">character (len=10)</span>                :: smmddyyyy</div>
+<div class="line"><a name="l00093"></a><span class="lineno">   93</span>&#160;    <span class="keywordtype">character (len=:)</span>, <span class="keywordtype">allocatable</span>    :: stext</div>
 <div class="line"><a name="l00094"></a><span class="lineno">   94</span>&#160; </div>
 <div class="line"><a name="l00095"></a><span class="lineno">   95</span>&#160;    <span class="keywordtype">type</span> (fstring_list_t)             :: slplantingdate</div>
-<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keywordtype">type</span> (<a class="code" href="structdatetime_1_1datetime__t.html">datetime_t</a>)                :: dtplantingdate</div>
-<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordtype">character (len=:)</span>, <span class="keywordtype">allocatable</span>   :: plantingdate_str</div>
+<div class="line"><a name="l00096"></a><span class="lineno">   96</span>&#160;    <span class="keywordtype">type</span> (<a class="code" href="structdatetime_1_1datetime__t.html">datetime_t</a>)                 :: dtplantingdate</div>
+<div class="line"><a name="l00097"></a><span class="lineno">   97</span>&#160;    <span class="keywordtype">character (len=:)</span>, <span class="keywordtype">allocatable</span>    :: plantingdate_str</div>
 <div class="line"><a name="l00098"></a><span class="lineno">   98</span>&#160; </div>
-<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: l_shift_days_l(:)</div>
+<div class="line"><a name="l00099"></a><span class="lineno">   99</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: l_shift_days_l(:)</div>
 <div class="line"><a name="l00100"></a><span class="lineno">  100</span>&#160; </div>
-<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: l_ini_l(:)</div>
-<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: l_dev_l(:)</div>
-<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: l_mid_l(:)</div>
-<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: l_late_l(:)</div>
-<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: l_fallow_l(:)</div>
+<div class="line"><a name="l00101"></a><span class="lineno">  101</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: l_ini_l(:)</div>
+<div class="line"><a name="l00102"></a><span class="lineno">  102</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: l_dev_l(:)</div>
+<div class="line"><a name="l00103"></a><span class="lineno">  103</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: l_mid_l(:)</div>
+<div class="line"><a name="l00104"></a><span class="lineno">  104</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: l_late_l(:)</div>
+<div class="line"><a name="l00105"></a><span class="lineno">  105</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: l_fallow_l(:)</div>
 <div class="line"><a name="l00106"></a><span class="lineno">  106</span>&#160; </div>
-<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: gdd_plant_l(:)</div>
-<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: gdd_ini_l(:)</div>
-<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: gdd_dev_l(:)</div>
-<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: gdd_mid_l(:)</div>
-<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: gdd_late_l(:)</div>
+<div class="line"><a name="l00107"></a><span class="lineno">  107</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: gdd_plant_l(:)</div>
+<div class="line"><a name="l00108"></a><span class="lineno">  108</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: gdd_ini_l(:)</div>
+<div class="line"><a name="l00109"></a><span class="lineno">  109</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: gdd_dev_l(:)</div>
+<div class="line"><a name="l00110"></a><span class="lineno">  110</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: gdd_mid_l(:)</div>
+<div class="line"><a name="l00111"></a><span class="lineno">  111</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: gdd_late_l(:)</div>
 <div class="line"><a name="l00112"></a><span class="lineno">  112</span>&#160; </div>
-<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: kcb_ini_l(:)</div>
-<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: kcb_mid_l(:)</div>
-<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: kcb_end_l(:)</div>
-<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: kcb_min_l(:)</div>
+<div class="line"><a name="l00113"></a><span class="lineno">  113</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: kcb_ini_l(:)</div>
+<div class="line"><a name="l00114"></a><span class="lineno">  114</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: kcb_mid_l(:)</div>
+<div class="line"><a name="l00115"></a><span class="lineno">  115</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: kcb_end_l(:)</div>
+<div class="line"><a name="l00116"></a><span class="lineno">  116</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: kcb_min_l(:)</div>
 <div class="line"><a name="l00117"></a><span class="lineno">  117</span>&#160; </div>
-<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: kcb_jan(:)</div>
-<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: kcb_feb(:)</div>
-<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: kcb_mar(:)</div>
-<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: kcb_apr(:)</div>
-<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: kcb_may(:)</div>
-<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: kcb_jun(:)</div>
-<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: kcb_jul(:)</div>
-<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: kcb_aug(:)</div>
-<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: kcb_sep(:)</div>
-<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: kcb_oct(:)</div>
-<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: kcb_nov(:)</div>
-<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span> :: kcb_dec(:)</div>
+<div class="line"><a name="l00118"></a><span class="lineno">  118</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: kcb_jan(:)</div>
+<div class="line"><a name="l00119"></a><span class="lineno">  119</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: kcb_feb(:)</div>
+<div class="line"><a name="l00120"></a><span class="lineno">  120</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: kcb_mar(:)</div>
+<div class="line"><a name="l00121"></a><span class="lineno">  121</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: kcb_apr(:)</div>
+<div class="line"><a name="l00122"></a><span class="lineno">  122</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: kcb_may(:)</div>
+<div class="line"><a name="l00123"></a><span class="lineno">  123</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: kcb_jun(:)</div>
+<div class="line"><a name="l00124"></a><span class="lineno">  124</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: kcb_jul(:)</div>
+<div class="line"><a name="l00125"></a><span class="lineno">  125</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: kcb_aug(:)</div>
+<div class="line"><a name="l00126"></a><span class="lineno">  126</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: kcb_sep(:)</div>
+<div class="line"><a name="l00127"></a><span class="lineno">  127</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: kcb_oct(:)</div>
+<div class="line"><a name="l00128"></a><span class="lineno">  128</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: kcb_nov(:)</div>
+<div class="line"><a name="l00129"></a><span class="lineno">  129</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">allocatable</span>       :: kcb_dec(:)</div>
 <div class="line"><a name="l00130"></a><span class="lineno">  130</span>&#160; </div>
-<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="keywordtype">    real</span> (c_float)              :: fkcb_initial</div>
-<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="keywordtype">    real</span> (c_float)              :: frz_initial</div>
+<div class="line"><a name="l00131"></a><span class="lineno">  131</span>&#160;<span class="keywordtype">    real</span> (c_float)                    :: fkcb_initial</div>
+<div class="line"><a name="l00132"></a><span class="lineno">  132</span>&#160;<span class="keywordtype">    real</span> (c_float)                    :: frz_initial</div>
 <div class="line"><a name="l00133"></a><span class="lineno">  133</span>&#160; </div>
-<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">parameter</span>   :: near_zero = 1.0e-9_c_float</div>
+<div class="line"><a name="l00134"></a><span class="lineno">  134</span>&#160;<span class="keywordtype">    real</span> (c_float), <span class="keywordtype">parameter</span>         :: near_zero = 1.0e-9_c_float</div>
 <div class="line"><a name="l00135"></a><span class="lineno">  135</span>&#160; </div>
 <div class="line"><a name="l00136"></a><span class="lineno">  136</span>&#160;    <span class="keywordtype">type</span> (<a class="code" href="structdata__catalog__entry_1_1data__catalog__entry__t.html">data_catalog_entry_t</a>), <span class="keywordtype">pointer</span> :: pinitial_percent_soil_moisture</div>
 <div class="line"><a name="l00137"></a><span class="lineno">  137</span>&#160; </div>

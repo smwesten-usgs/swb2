@@ -1,16 +1,19 @@
 var searchData=
 [
-  ['enforce_5flimits_1716',['enforce_limits',['../structdata__catalog__entry_1_1data__catalog__entry__t.html#ad20d098abdfd1a203c21f29b529c7307',1,'data_catalog_entry::data_catalog_entry_t']]],
-  ['equivalent_5fevaporation_1717',['equivalent_evaporation',['../namespacemeteorological__calculations.html#aa2c69dfea48e36ed94909b4b1dc30206',1,'meteorological_calculations']]],
-  ['estimate_5fpercent_5fof_5fpossible_5fsunshine_5f_5fpsun_1718',['estimate_percent_of_possible_sunshine__psun',['../namespacesolar__calculations.html#a6ffcf51b1a0bd61f1821b64e797e96e9',1,'solar_calculations']]],
-  ['et0_5fhargreaves_1719',['et0_hargreaves',['../namespaceet____hargreaves__samani.html#ab4bad3b35345bacf0be978adf7889eca',1,'et__hargreaves_samani']]],
-  ['et_5fgridded_5fvalues_5fcalculate_1720',['et_gridded_values_calculate',['../namespaceet____gridded__values.html#a47620ef47e89b4af2dadbae1b0b7b70b',1,'et__gridded_values']]],
-  ['et_5fgridded_5fvalues_5finitialize_1721',['et_gridded_values_initialize',['../namespaceet____gridded__values.html#afe00fc3329ba0727a175b106c3812526',1,'et__gridded_values']]],
-  ['et_5fhargreaves_5fcalculate_1722',['et_hargreaves_calculate',['../namespaceet____hargreaves__samani.html#aa1188dde0964edd68b7e45aed501312d',1,'et__hargreaves_samani']]],
-  ['et_5fhargreaves_5finitialize_1723',['et_hargreaves_initialize',['../namespaceet____hargreaves__samani.html#a8512a837baefd57047e55c7a53b03cf3',1,'et__hargreaves_samani']]],
-  ['et_5fjh_5fcalculate_1724',['et_jh_calculate',['../namespaceet____jensen__haise.html#a8647cf6b332a35bd7f2162d1a7df6381',1,'et__jensen_haise']]],
-  ['et_5fzone_5fvalues_5fcalculate_1725',['et_zone_values_calculate',['../namespaceet____zone__values.html#afc61abb429d560fccdf982d2dfb0f226',1,'et__zone_values']]],
-  ['et_5fzone_5fvalues_5finitialize_1726',['et_zone_values_initialize',['../namespaceet____zone__values.html#a006192d99f088ef95d7761123f8958c9',1,'et__zone_values']]],
-  ['exists_1727',['exists',['../structfile__operations_1_1ascii__file__t.html#aa81ab8253135d910cb12301762356ee5',1,'file_operations::ascii_file_t']]],
-  ['extraterrestrial_5fradiation_5f_5fra_1728',['extraterrestrial_radiation__ra',['../namespacesolar__calculations.html#a47f8d30770abf4348ac52a17c9d1b33a',1,'solar_calculations']]]
+  ['enforce_5fbounds_5fdbl_5ffn_1756',['enforce_bounds_dbl_fn',['../interfaceconstants__and__conversions_1_1enforce__bounds.html#a05d89c70ea7e96cdd73b9d26f82a46cf',1,'constants_and_conversions::enforce_bounds::enforce_bounds_dbl_fn()'],['../namespaceconstants__and__conversions.html#a29e0db48a0031ed9a3f8c025bf7d2d12',1,'constants_and_conversions::enforce_bounds_dbl_fn()']]],
+  ['enforce_5fbounds_5fint_5ffn_1757',['enforce_bounds_int_fn',['../interfaceconstants__and__conversions_1_1enforce__bounds.html#a7bd8bb8ecd6b45e912c5f84285b63868',1,'constants_and_conversions::enforce_bounds::enforce_bounds_int_fn()'],['../namespaceconstants__and__conversions.html#ad3fd09151348d9c69e8564a474f32aa3',1,'constants_and_conversions::enforce_bounds_int_fn()']]],
+  ['enforce_5fbounds_5fsgl_5ffn_1758',['enforce_bounds_sgl_fn',['../interfaceconstants__and__conversions_1_1enforce__bounds.html#a9d96e26d554e8fb2e18a9f9716c41e08',1,'constants_and_conversions::enforce_bounds::enforce_bounds_sgl_fn()'],['../namespaceconstants__and__conversions.html#aa34b83131ce2c515efab4759a9a803ac',1,'constants_and_conversions::enforce_bounds_sgl_fn()']]],
+  ['enforce_5flimits_1759',['enforce_limits',['../structdata__catalog__entry_1_1data__catalog__entry__t.html#ad20d098abdfd1a203c21f29b529c7307',1,'data_catalog_entry::data_catalog_entry_t']]],
+  ['equivalent_5fevaporation_1760',['equivalent_evaporation',['../namespacemeteorological__calculations.html#aa2c69dfea48e36ed94909b4b1dc30206',1,'meteorological_calculations']]],
+  ['estimate_5fpercent_5fof_5fpossible_5fsunshine_5f_5fpsun_1761',['estimate_percent_of_possible_sunshine__psun',['../namespacesolar__calculations.html#a6ffcf51b1a0bd61f1821b64e797e96e9',1,'solar_calculations']]],
+  ['et0_5fhargreaves_1762',['et0_hargreaves',['../namespaceet____hargreaves__samani.html#ab4bad3b35345bacf0be978adf7889eca',1,'et__hargreaves_samani']]],
+  ['et_5fgridded_5fvalues_5fcalculate_1763',['et_gridded_values_calculate',['../namespaceet____gridded__values.html#a47620ef47e89b4af2dadbae1b0b7b70b',1,'et__gridded_values']]],
+  ['et_5fgridded_5fvalues_5finitialize_1764',['et_gridded_values_initialize',['../namespaceet____gridded__values.html#afe00fc3329ba0727a175b106c3812526',1,'et__gridded_values']]],
+  ['et_5fhargreaves_5fcalculate_1765',['et_hargreaves_calculate',['../namespaceet____hargreaves__samani.html#aa1188dde0964edd68b7e45aed501312d',1,'et__hargreaves_samani']]],
+  ['et_5fhargreaves_5finitialize_1766',['et_hargreaves_initialize',['../namespaceet____hargreaves__samani.html#a8512a837baefd57047e55c7a53b03cf3',1,'et__hargreaves_samani']]],
+  ['et_5fjh_5fcalculate_1767',['et_jh_calculate',['../namespaceet____jensen__haise.html#a8647cf6b332a35bd7f2162d1a7df6381',1,'et__jensen_haise']]],
+  ['et_5fzone_5fvalues_5fcalculate_1768',['et_zone_values_calculate',['../namespaceet____zone__values.html#afc61abb429d560fccdf982d2dfb0f226',1,'et__zone_values']]],
+  ['et_5fzone_5fvalues_5finitialize_1769',['et_zone_values_initialize',['../namespaceet____zone__values.html#a006192d99f088ef95d7761123f8958c9',1,'et__zone_values']]],
+  ['exists_1770',['exists',['../structfile__operations_1_1ascii__file__t.html#aa81ab8253135d910cb12301762356ee5',1,'file_operations::ascii_file_t']]],
+  ['extraterrestrial_5fradiation_5f_5fra_1771',['extraterrestrial_radiation__ra',['../namespacesolar__calculations.html#a47f8d30770abf4348ac52a17c9d1b33a',1,'solar_calculations']]]
 ];
