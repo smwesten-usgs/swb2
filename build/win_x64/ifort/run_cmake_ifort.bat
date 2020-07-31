@@ -1,4 +1,3 @@
-@echo off
 :: remove existing Cmake cache and directories
 del /F /Q CMakeCache.*
 rmdir /S /Q CMakeFiles
@@ -15,17 +14,14 @@ del /S /Q *.vcxproj*
 del /S /Q *.cmake
 
 :: set CMAKE-related and build-related variables
-set CMAKEROOT=C:\Program Files\CMake\
-set Fortran_COMPILER_NAME=ifort
-set CMAKE_C_COMPILER=icl
+set CMAKEROOT="C:\Program Files\CMake\"
+set Fortran_COMPILER_NAME="ifort"
+set CMAKE_C_COMPILER="icl"
 set VERBOSE=0
 set MAKE_EXECUTABLE_NAME=nmake
 
 :: clunky, clunky, clunky: last-ditch effort to get CMake to find the netCDF libraries
-set LIBRARY_PATH="C:\Program Files\netCDF 4.6.3\lib"
-
-echo "LIBRARY_PATH:"
-echo %LIBRARY_PATH%
+set LIBRARY_PATH="C:\Program Files\netCDF 4.7.4\lib"
 
 :: define other variables for use in the CMakeList.txt file
 :: options are "Release", "Profile" or "Debug"
@@ -42,13 +38,13 @@ set CMAKE_C_FLAGS_RELEASE="/O2 /QxHost /MT"
 :: set the type of CMAKE OUTPUT to generate
 set CMAKE_OUTPUT="NMake Makefiles"
 
-for %%i in (%CMAKE_OUTPUT%) do (
+::for %%i in (%CMAKE_OUTPUT%) do (
 
 echo "Running CMake for target %%i"
-cmake ..\..\.. -G %%i ^
--DLD_LIBRARY_PATH=%LIBRARY_PATH%                              ^
+cmake ..\..\.. -G "NMake Makefiles" ^
 -DCMAKE_Fortran_COMPILER=%Fortran_COMPILER_NAME%              ^
 -DCMAKE_C_COMPILER=%CMAKE_C_COMPILER%                         ^
+-DLIBRARY_PATH=%LIBRARY_PATH%                                 ^
 -DCMAKE_BUILD_TYPE=%BUILD_TYPE%                               ^
 -DCMAKE_INSTALL_PREFIX:PATH=%INSTALL_PREFIX%                  ^
 -DCMAKE_Fortran_FLAGS_DEBUG=%CMAKE_Fortran_FLAGS_DEBUG%       ^
@@ -59,4 +55,4 @@ cmake ..\..\.. -G %%i ^
 -DCMAKE_C_FLAGS_PROFILE=%CMAKE_C_FLAGS_PROFILE%               ^
 -DCMAKE_C_FLAGS_RELEASE=%CMAKE_C_FLAGS_RELEASE%
 
-)
+::)

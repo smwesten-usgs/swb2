@@ -6,8 +6,8 @@ message("Processing top-level CMakelists.txt for project swb2")
 
 set(SWB_MAJOR_VERSION "2")
 set(SWB_MINOR_VERSION "0")
-set(SWB_PATCH_VERSION "1")
-set(SWB_LATEST_VERSION_TAG "v2.0.1")
+set(SWB_PATCH_VERSION "2")
+set(SWB_LATEST_VERSION_TAG "v2.0.2")
 
 #------------------------------------------------------------------------------------#
 #                           Force out-of-source build
@@ -26,13 +26,13 @@ set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
 # try to have CMake find static libraries if possible
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ${CMAKE_FIND_LIBRARY_SUFFIXES})
-set(CMAKE_FIND_LIBRARY_PREFIXES "lib" ${CMAKE_FIND_LIBRARY_PREFIXES})
 
 if ( CMAKE_HOST_WIN32 )
   set( OUTPUT_BIN_TARGET_DIR win_x64 )
   if ( CMAKE_Fortran_COMPILER_ID STREQUAL "Intel" )
     set(CMAKE_FIND_LIBRARY_SUFFIXES ".lib" )
     add_definitions(/D_CRT_SECURE_NO_DEPRECATE /DWIN32_LEAN_AND_MEAN)
+    message("==> Set library suffixes to .lib")
   endif()
 elseif( CMAKE_HOST_APPLE )
   set( OUTPUT_BIN_TARGET_DIR macOS )

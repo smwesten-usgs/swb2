@@ -1,4 +1,3 @@
-@echo off
 :: remove existing Cmake cache and directories
 del /F /Q CMakeCache.*
 rmdir /S /Q CMakeFiles
