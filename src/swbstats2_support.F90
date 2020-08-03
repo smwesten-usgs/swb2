@@ -1187,6 +1187,7 @@ contains
     real (c_double), allocatable   :: stats(:)
     integer (c_int)                :: funit_l
     character (len=:), allocatable :: delimiter_
+    character (len=6), parameter   :: NUM_FMT = "g25.16"
 
     if (present(funit)) then
       funit_l = funit
@@ -1221,13 +1222,13 @@ contains
                                   zone2_ids=zone2_ids,                                 &
                                   comparison_values=comparison_values)
   
-            write(unit=funit_l, fmt="(2(a,a),2(i0,a),4(g16.10,a),i0,a,4(g16.10,a),i0)") &
-              start_date%prettydate(),delimiter_,                                       &
-              end_date%prettydate(), delimiter_,                                        &
-              n, delimiter_, m, delimiter_,                                             &
-              stats(1), delimiter_, stats(2), delimiter_, stats(3), delimiter_,         &
-              stats(4), delimiter_, int(stats(5)), delimiter_,                          &
-              stats(6), delimiter_, stats(7), delimiter_, stats(8), delimiter_,         &
+            write(unit=funit_l, fmt="(2(a,a),2(i0,a),4("//NUM_FMT//",a),i0,a,4("//NUM_FMT//",a),i0)") &
+              start_date%prettydate(),delimiter_,                                                     &
+              end_date%prettydate(), delimiter_,                                                      &
+              n, delimiter_, m, delimiter_,                                                           &
+              stats(1), delimiter_, stats(2), delimiter_, stats(3), delimiter_,                       &
+              stats(4), delimiter_, int(stats(5)), delimiter_,                                        &
+              stats(6), delimiter_, stats(7), delimiter_, stats(8), delimiter_,                       &
               stats(9), delimiter_, int(stats(10))
 
           enddo
@@ -1243,7 +1244,7 @@ contains
             call calc_multizonal_stats(values, zone_ids, target_id=n, target2_id=m,    &
               result_vector=stats, zone2_ids=zone2_ids)
 
-            write(unit=funit_l, fmt="(2(a,a),2(i0,a),4(g16.10,a),i0)")                 &
+            write(unit=funit_l, fmt="(2(a,a),2(i0,a),4("//NUM_FMT//",a),i0)")          &
               start_date%prettydate(), delimiter_,                                     &
               end_date%prettydate(), delimiter_,                                       &
               n, delimiter_, m, delimiter_,                                            &
@@ -1265,13 +1266,13 @@ contains
    
           call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats,   &
             comparison_values=comparison_values)
-          write(unit=funit_l, fmt="(2(a,a),i0,a,4(g16.10,a),i0,a,4(g16.10,a),i0)")    &
-            start_date%prettydate(), delimiter_,                                      &
-            end_date%prettydate(), delimiter_,                                        &
-            n, delimiter_,                                                            &
-            stats(1), delimiter_, stats(2), delimiter_, stats(3), delimiter_,         &
-            stats(4), delimiter_, int(stats(5)), delimiter_,                          &
-            stats(6), delimiter_, stats(7), delimiter_, stats(8), delimiter_,         &
+          write(unit=funit_l, fmt="(2(a,a),i0,a,4("//NUM_FMT//",a),i0,a,4("//NUM_FMT//",a),i0)")    &
+            start_date%prettydate(), delimiter_,                                                    &
+            end_date%prettydate(), delimiter_,                                                      &
+            n, delimiter_,                                                                          &
+            stats(1), delimiter_, stats(2), delimiter_, stats(3), delimiter_,                       &
+            stats(4), delimiter_, int(stats(5)), delimiter_,                                        &
+            stats(6), delimiter_, stats(7), delimiter_, stats(8), delimiter_,                       &
             stats(9), delimiter_, int(stats(10))
 
         enddo
@@ -1282,7 +1283,7 @@ contains
           n = zone_values(i)
 
           call calc_zonal_stats(values, zone_ids, target_id=n, result_vector=stats)
-          write(unit=funit_l, fmt="(2(a,a),i0,a,4(f16.10,a),i0)")                       &
+          write(unit=funit_l, fmt="(2(a,a),i0,a,4("//NUM_FMT//",a),i0)")                &
             start_date%prettydate(), delimiter_,                                        &
             end_date%prettydate(), delimiter_,                                          &
             n, delimiter_,                                                              &

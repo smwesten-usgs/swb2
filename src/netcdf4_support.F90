@@ -1071,7 +1071,11 @@ subroutine netcdf_open_and_prepare_as_output( NCFILE, sVariableName, sVariableUn
   endif
 
   if ( present( filename_prefix ) ) then
-    filename_prefix_l = trim( filename_prefix )//"_"
+    if (len_trim(filename_prefix) > 0) then
+      filename_prefix_l = trim( filename_prefix )//"_"
+    else 
+      filename_prefix_l = ""
+    endif
   else
     filename_prefix_l = ""
   endif
