@@ -399,7 +399,7 @@ contains
     do ix=1,ubound(grid_values,1)
       do iy=1,ubound(grid_values,2)
 
-        if (grid_values(ix, iy) <= 0 )  cycle
+        if (grid_values(ix, iy) < 0 )  cycle
 
         sval = asCharacter( grid_values(ix,iy) )
 

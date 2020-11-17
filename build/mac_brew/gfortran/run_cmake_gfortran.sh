@@ -21,9 +21,9 @@ export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -gfull -ggdb -Wuninitialized -fbacktrac
 export CMAKE_Fortran_FLAGS_RELEASE="-O2 -g -march=native -ffree-line-length-512 -fbackslash -ffpe-summary='none' -Wno-maybe-uninitialized"
 
 # set important environment variables
-export FC=gfortran-9
-export CC=gcc-9
-export CXX=g++-9
+export FC=gfortran-10
+export CC=gcc-10
+export CXX=g++-10
 
 cmake "../../.." -G "Unix Makefiles"                         \
 -DCMAKE_BUILD_TYPE="$BUILD_TYPE "                            \
