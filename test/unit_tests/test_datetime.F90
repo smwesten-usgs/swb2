@@ -2,6 +2,8 @@ module test_datetime
 
   use fruit
   use datetime
+  use exceptions
+  use constants_and_conversions, only   : FALSE, iTINYVAL
   implicit none
 
 contains
@@ -64,4 +66,58 @@ contains
 
    end subroutine test_datetime_addition
 
-end module test_datetime
+ !-------------------------------------------------------------------------------
+
+   subroutine test_datetime_julian_date_illegal_month
+    ! datetime: supply illegal month value to Julian Date routine
+      type (DATETIME_T)    :: dt
+      integer              :: indx
+
+      ! override exceptions module default behavior, which is to stop program execution entirely
+      HALT_UPON_FATAL_ERROR = FALSE
+
+      call dt%calcJulianDay(iMonth=0, iDay=28, iYear=2000)
+ 
+      call assert_equals(iTINYVAL, int(dt%iJulianDay))
+!      call assert_equals (5, int(dt%iDay))
+!      call assert_equals (2000, int(dt%iYear))
+ 
+    end subroutine test_datetime_julian_date_illegal_month
+ 
+ !-------------------------------------------------------------------------------
+
+    subroutine test_datetime_julian_date_illegal_day
+      ! datetime: supply illegal day value to Julian Date routine
+        type (DATETIME_T)    :: dt
+        integer              :: indx
+  
+        ! override exceptions module default behavior, which is to stop program execution entirely
+        HALT_UPON_FATAL_ERROR = FALSE
+  
+        call dt%calcJulianDay(iMonth=2, iDay=0, iYear=2000)
+   
+        call assert_equals(iTINYVAL, int(dt%iJulianDay))
+  !      call assert_equals (5, int(dt%iDay))
+  !      call assert_equals (2000, int(dt%iYear))
+   
+      end subroutine test_datetime_julian_date_illegal_day
+  
+ !-------------------------------------------------------------------------------
+
+      subroutine test_datetime_julian_date_illegal_month_day
+        ! datetime: supply illegal month and day value to Julian Date routine
+          type (DATETIME_T)    :: dt
+          integer              :: indx
+    
+          ! override exceptions module default behavior, which is to stop program execution entirely
+          HALT_UPON_FATAL_ERROR = FALSE
+    
+          call dt%calcJulianDay(iMonth=13, iDay=0, iYear=2000)
+     
+          call assert_equals(iTINYVAL, int(dt%iJulianDay))
+    !      call assert_equals (5, int(dt%iDay))
+    !      call assert_equals (2000, int(dt%iYear))
+     
+        end subroutine test_datetime_julian_date_illegal_month_day
+  
+  end module test_datetime

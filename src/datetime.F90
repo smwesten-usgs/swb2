@@ -670,20 +670,6 @@ function julian_day ( iYear, iMonth, iDay, iOrigin, sInputItemName ) result(iJD)
   if (.not. (iMonth >= 1 .and. iMonth <= 12))   illegal_month = TRUE
   if (.not. (iDay >= 1 .and. iDay <= 31))       illegal_day = TRUE
 
-  if ( illegal_month .or. illegal_day ) then
-    call LOGS%write(" ** there was a problem converting month, day, year values to a Julian date **", iLinesBefore=2)
-    call LOGS%write("    month value: " + as_character(iMonth))
-    call LOGS%write("    day value:   " + as_character(iDay))
-    call LOGS%write("    year value:  " + as_character(iYear))
-    call LOGS%write("    input type:  " + sInputItemName_, iLinesAfter=2)
-
-    if ( illegal_month)     sBuf = "month value is illegal. "
-    if ( illegal_day)       sBuf = sBuf + "day value is illegal."
-
-    call Assert( FALSE, trim(sBuf), __SRCNAME__, __LINE__)
-
-  endif
-
   if(present(iOrigin)) then
     iOffset = iOrigin
   else
@@ -695,6 +681,24 @@ function julian_day ( iYear, iMonth, iDay, iOrigin, sInputItemName ) result(iJD)
         /12_c_int - 3_c_int *((i + 4900_c_int + (j - 14_c_int) &
         /12_c_int)/100_c_int)/4_c_int ) - iOffset
 
+  if ( illegal_month .or. illegal_day ) then
+    call LOGS%write(" ** there was a problem converting month, day, year values to a Julian date **",    &
+      iLinesBefore=2, iLogLevel=LOG_ALL, lEcho=TRUE)
+    call LOGS%write("    month value: " + as_character(iMonth))
+    call LOGS%write("    day value:   " + as_character(iDay))
+    call LOGS%write("    year value:  " + as_character(iYear))
+    call LOGS%write("    input type:  " + sInputItemName_, iLinesAfter=2)
+
+    if ( illegal_month)     sBuf = "month value is illegal. "
+    if ( illegal_day)       sBuf = trim(trim(sBuf) + " day value is illegal.")
+
+    call Assert( FALSE, trim(sBuf), __SRCNAME__, __LINE__)
+
+    ! will never get here normally, but for unit testing purposes, return some nonsensical value
+    iJD = iTINYVAL
+
+  endif
+      
 end function julian_day
 
 !------------------------------------------------------------------------------

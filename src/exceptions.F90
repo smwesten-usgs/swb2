@@ -29,6 +29,7 @@ module exceptions
   integer (c_int), public     :: NUMBER_OF_FATAL_WARNINGS = 0
   integer (c_int), parameter  :: MAX_FATAL_WARNINGS = 50
   character (len=256)         :: WARNING_TEXT( MAX_FATAL_WARNINGS )
+  logical (c_bool), public    :: HALT_UPON_FATAL_ERROR = TRUE
 
 contains
 
@@ -177,7 +178,7 @@ contains
 
     call LOGS%write("", iLinesAfter=1)
 
-    stop
+    if (HALT_UPON_FATAL_ERROR) stop
 
   end subroutine die
 
