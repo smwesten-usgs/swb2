@@ -8,8 +8,9 @@
 
 module datetime
 
-  use iso_c_binding, only : c_short, c_int, c_long, c_float, c_double, c_bool
+  use iso_c_binding, only          : c_short, c_int, c_long, c_float, c_double, c_bool
   use fstring
+  use logfiles, only               : LOGS, LOG_ALL
   use exceptions
   use constants_and_conversions
 
@@ -634,30 +635,53 @@ end subroutine gregorian_date
 !
 ! SOURCE
 
-function julian_day ( iYear, iMonth, iDay, iOrigin ) result(iJD)
+function julian_day ( iYear, iMonth, iDay, iOrigin, sInputItemName ) result(iJD)
 
   ! [ ARGUMENTS ]
-  integer (c_int), intent(in) :: iYear, iMonth, iDay
-  integer (c_int), optional :: iOrigin
+  integer (c_int), intent(in)     :: iYear, iMonth, iDay
+  integer (c_int), optional       :: iOrigin
+  character (len=*), optional     :: sInputItemName
+
 
   ! [ LOCALS ]
   integer (c_int) i,j,k
   integer (c_int) :: iOffset
   character (len=256) :: sBuf
+  character (len=:), allocatable :: sInputItemName_
+  logical (c_bool) :: illegal_month, illegal_day
 
   ! [ RETURN VALUE ]
   integer (c_int) :: iJD
+  sBuf = ""
+
+   illegal_month = FALSE
+   illegal_day   = FALSE
+
+  if (present(sInputItemName)) then
+    sInputItemName_ = trim(sInputItemName)
+  else
+    sInputItemName_ = "unspecified"
+  endif
 
   i= iYear
   j= iMonth
   k= iDay
 
-  if(.not. (iMonth >= 1 .and. iMonth <= 12)) then
-    write(sBuf,fmt="('Illegal month value given: ',i4)") iMonth
+  if (.not. (iMonth >= 1 .and. iMonth <= 12))   illegal_month = TRUE
+  if (.not. (iDay >= 1 .and. iDay <= 31))       illegal_day = TRUE
+
+  if ( illegal_month .or. illegal_day ) then
+    call LOGS%write(" ** there was a problem converting month, day, year values to a Julian date **", iLinesBefore=2)
+    call LOGS%write("    month value: " + as_character(iMonth))
+    call LOGS%write("    day value:   " + as_character(iDay))
+    call LOGS%write("    year value:  " + as_character(iYear))
+    call LOGS%write("    input type:  " + sInputItemName_, iLinesAfter=2)
+
+    if ( illegal_month)     sBuf = "month value is illegal. "
+    if ( illegal_day)       sBuf = sBuf + "day value is illegal."
+
     call Assert( FALSE, trim(sBuf), __SRCNAME__, __LINE__)
-  elseif(.not. (iDay >= 1 .and. iDay <= 31)) then
-    write(sBuf,fmt="('Illegal day value given: ',i4)") iDay
-    call Assert( FALSE, trim(sBuf), __SRCNAME__, __LINE__)
+
   endif
 
   if(present(iOrigin)) then

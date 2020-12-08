@@ -2840,7 +2840,7 @@ contains
     if (allocated(this%monthly_runoff) )  monthly_runoff = this%monthly_runoff( cell_indx )
     if (allocated(this%monthly_gross_precip) )  monthly_gross_precip = this%monthly_gross_precip( cell_indx )
 
-      write( unit=unitnum, fmt="(i4,'-',i2.2,'-'i2.2,',',i2,',',i2,',',i4,',',8(i6,','),62(g16.9,','),g16.9)")                &
+      write( unit=unitnum, fmt="(i4,'-',i2.2,'-'i2.2,',',i2,',',i2,',',i4,',',8(i6,','),62(g20.12,','),g20.12)")                &
         SIM_DT%curr%iYear, SIM_DT%curr%iMonth, SIM_DT%curr%iDay,                                                            &
         SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                                            &
         this%landuse_code( cell_indx ), this%landuse_index( cell_indx ),                                                    &
