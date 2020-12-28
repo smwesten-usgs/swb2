@@ -174,12 +174,12 @@ module constants_and_conversions
     module procedure inches_to_mm_dbl_fn
   end interface in_to_mm
 
-  public :: enforce_bounds
-  interface enforce_bounds
+  public :: clip
+  interface clip
     module procedure enforce_bounds_int_fn
     module procedure enforce_bounds_sgl_fn
     module procedure enforce_bounds_dbl_fn
-  end interface enforce_bounds
+  end interface clip
 
   public :: char_ptr_to_fortran_string
   public :: c_to_fortran_string

@@ -102,7 +102,7 @@ end subroutine test_crop_coefficients_parsing
     integer (c_int) :: i
     real (c_float)  :: tmean(6)
 
-    tmean = enforce_bounds(value=((TMIN + TMAX) / 2.), minval=50., maxval=85.) 
+    tmean = clip(value=((TMIN + TMAX) / 2.), minval=50., maxval=85.) 
   
     do i=1, ubound(TMIN,1)
       GDD = 0.0
