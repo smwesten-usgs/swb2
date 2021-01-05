@@ -627,7 +627,7 @@ end function update_crop_coefficient_GDD_as_threshold
 
     real (c_float), intent(in)             :: Kcb
     integer (c_int), intent(in)            :: landuse_index
-    logical (c_bool), intent(out)               :: it_is_growing_season
+    logical (c_bool), intent(out)          :: it_is_growing_season
 
     if ( Kcb > KCB_l( KCB_MIN, landuse_index) ) then
       it_is_growing_season = TRUE

@@ -166,6 +166,8 @@ elemental function calculate_surface_evap_coefficient_ke( landuse_index, Kcb, Kr
   real (c_double), intent(in)   :: Kr
   real (c_double)               :: Ke
 
+
+  !    Kr *            ( Kcb_mid - Kcb )
   Ke = Kr * ( real(maxval(KCB_l( KCB_INI:KCB_MIN, landuse_index )), c_double) - real(Kcb, c_double) )
 
 end function calculate_surface_evap_coefficient_ke

@@ -47,7 +47,7 @@ contains
 
   subroutine initialize_datetimes_sub( this, start_date, end_date )
 
-    class (DATE_RANGE_T), intent(inout)   :: this
+    class (DATE_RANGE_T), intent(inout)      :: this
     type (DATETIME_T), intent(inout)         :: start_date
     type (DATETIME_T), intent(inout)         :: end_date
 

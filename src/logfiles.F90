@@ -82,7 +82,7 @@ contains
   subroutine set_log_level_sub( this, iLogLevel )
 
     class (LOGFILE_T)                           :: this
-    integer (c_int), intent(in)            :: iLogLevel
+    integer (c_int), intent(in)                 :: iLogLevel
 
     CURRENT_LOG_LEVEL = iLogLevel
 
@@ -93,7 +93,7 @@ contains
   subroutine set_screen_echo_sub( this, lEcho )
 
     class (LOGFILE_T)                           :: this
-    logical (c_bool), intent(in)           :: lEcho
+    logical (c_bool), intent(in)                :: lEcho
 
     CURRENT_LOG_ECHO = lEcho
 
@@ -140,7 +140,7 @@ contains
   subroutine open_files_write_access_sub(this, lWrite_SWB_Info )
 
     class (LOGFILE_T), intent(inout)             :: this
-    logical (c_bool), intent(in), optional  :: lWrite_SWB_Info
+    logical (c_bool), intent(in), optional       :: lWrite_SWB_Info
 
     ! [ LOCALS ]
     integer (c_int) :: iIndex

@@ -3,29 +3,38 @@ module test_datetime
   use fruit
   use datetime
   use exceptions
+  use logfiles, only               : LOGS
   use constants_and_conversions, only   : FALSE, iTINYVAL
   implicit none
 
 contains
 
+  subroutine setup_datetime_tests
+
+    HALT_UPON_FATAL_ERROR = FALSE
+
+  end subroutine setup_datetime_tests
+
+!-------------------------------------------------------------------------------
+
   subroutine test_datetime_basic_dateparse
    ! datetime: parse with default mm/dd/yyyy date format
      type (DATETIME_T) :: dt
 
-     call dt%parseDate("03/15/2011")
+     call dt%parseDate("03/15/2011", sFilename=trim(__SRCNAME__), iLineNumber=__LINE__)
      call assert_equals (3, int(dt%iMonth))
      call assert_equals (15, int(dt%iDay))
      call assert_equals (2011, int(dt%iYear))
 
    end subroutine test_datetime_basic_dateparse
 
- !-------------------------------------------------------------------------------
+!-------------------------------------------------------------------------------
 
    subroutine test_datetime_basic_mangled_dateparse
    ! datetime: parse with default mm/dd/yyyy date format, missing '0' values in month and day
      type (DATETIME_T) :: dt
 
-     call dt%parseDate("3/2/2011")
+     call dt%parseDate("3/2/2011", sFilename=trim(__SRCNAME__), iLineNumber=__LINE__)
      call assert_equals (3, int(dt%iMonth))
      call assert_equals (2, int(dt%iDay))
      call assert_equals (2011, int(dt%iYear))
@@ -40,7 +49,7 @@ contains
      type (DATETIME_T) :: dt
 
      call dt%setDateFormat("YYYY-MM-DD")
-     call dt%parseDate("1776-07-4")
+     call dt%parseDate("1776-07-4", sFilename=trim(__SRCNAME__), iLineNumber=__LINE__)
      call assert_equals (7, int(dt%iMonth))
      call assert_equals (4, int(dt%iDay))
      call assert_equals (1776, int(dt%iYear))

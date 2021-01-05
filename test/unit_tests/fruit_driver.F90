@@ -2,9 +2,9 @@ program tests
 
   ! Driver program for FRUIT unit tests in:
   ! test_allocatable_string.F90
-  ! test_crop_coefficients__FAO56.F90
   ! test_datetime.F90
   ! test_exceptions__index_values_valid.F90
+  ! test_FAO56_functions.F90
   ! test_gash.F90
   ! test_timer.F90
 
@@ -12,12 +12,11 @@ program tests
 
   use fruit
   use test_allocatable_string
-  use test_crop_coefficients__FAO56
   use test_datetime
   use test_exceptions
+  use test_FAO56_functions
   use test__gash
   use test_timer
-  use test_two_stage_evapotranspiration__FAO56
 
   implicit none
 
@@ -26,13 +25,8 @@ program tests
   ! test_allocatable_string.F90:
   call run_test_case(test_string_list_with_character,"[ LOCALS ]")
 
-  ! test_crop_coefficients__FAO56.F90:
-  call setup_crop_coefficients__FAO56
-  call run_test_case(test_crop_coefficients_parsing,"test_crop_coefficients_parsing")
-  call run_test_case(test_crop_coefficients_basic,"test_crop_coefficients_basic")
-  call run_test_case(test_gdd_max_plus_min_simple,"Values taken from:")
-
   ! test_datetime.F90:
+  call setup_datetime_tests
   call run_test_case(test_datetime_basic_dateparse,"datetime: parse with default mm/dd/yyyy date format")
   call run_test_case(test_datetime_basic_mangled_dateparse,"datetime: parse with default mm/dd/yyyy date format, missing '0' values in month and day")
   call run_test_case(test_datetime_custom_dateparse,"datetime: parse with custom yyyy-mm-dd date format")
@@ -43,6 +37,12 @@ program tests
 
   ! test_exceptions__index_values_valid.F90:
   call run_test_case(test_check_array_bounds_1d,"test_check_array_bounds_1d")
+
+  ! test_FAO56_functions.F90:
+  call setup_crop_coefficients__FAO56
+  call run_test_case(test_crop_coefficients_parsing,"test_crop_coefficients_parsing")
+  call run_test_case(test_crop_coefficients_basic,"test_crop_coefficients_basic")
+  call run_test_case(test_gdd_max_plus_min_simple,"Values taken from:")
 
   ! test_gash.F90:
   call run_test_case(test_gash_psat_calculation,"gash: test calculation of Gash PSat")

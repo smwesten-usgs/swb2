@@ -1533,6 +1533,9 @@ contains
           endif
 
           do indx=1, ubound( DUMP, 1)
+
+            ! scan through list; if 'col' or 'indx_start' already have values, skip to the next,
+            ! looking for an empty slot in which to store the dump variable coordinates and indices
             if (DUMP( indx )%col /= 0 .or. DUMP( indx )%indx_start /= 0 )  cycle
 
             DUMP( indx )%col = col
@@ -2748,12 +2751,12 @@ contains
       indx_start = DUMP( jndx )%indx_start
       indx_end   = DUMP( jndx )%indx_end
 
-      if ( (indx_start >= lbound( this%landuse_code, 1) )                                        &
-         .and. ( indx_start <= ubound( this%landuse_code, 1) )                                   &
+      if ( (indx_start >= lbound( this%landuse_code, 1) )                                      &
+         .and. ( indx_start <= ubound( this%landuse_code, 1) )                                 &
          .and. (indx_end >= lbound( this%landuse_code, 1) )                                    &
          .and. (indx_end <= ubound( this%landuse_code, 1) ) ) then
 
-         call model_dump_variables( this=this, unitnum=DUMP( jndx )%unitnum,                     &
+         call model_dump_variables( this=this, unitnum=DUMP( jndx )%unitnum,                   &
                                     indx_start=indx_start, indx_end=indx_end )
 
       else
