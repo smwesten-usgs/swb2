@@ -8,7 +8,7 @@
 !> for specific crop types.
 module actual_et__fao56__two_stage
 
-  use iso_c_binding, only              : c_short, c_int, c_float, c_double
+  use iso_c_binding, only              : c_short, c_int, c_float, c_double, c_bool
   use constants_and_conversions, only  : TRUE, M_PER_FOOT, in_to_mm
   use fstring_list, only                : FSTRING_LIST_T, create_list
   use parameters, only                 : PARAMS
@@ -21,6 +21,9 @@ module actual_et__fao56__two_stage
   real (c_float), allocatable   :: TEW_l(:,:)
   real (c_float), allocatable   :: DEPLETION_FRACTION(:)
   real (c_float), allocatable   :: MEAN_PLANT_HEIGHT(:)
+
+  real (c_float), allocatable   :: EVAPORABLE_WATER_STORAGE(:)
+  real (c_float), allocatable   :: EVAPORABLE_WATER_LAYER_DEFICIT(:)
 
 contains
 
@@ -55,13 +58,15 @@ contains
 
 !------------------------------------------------------------------------------
 
-  subroutine actual_et_FAO56_two_stage_initialize( )
+  subroutine actual_et_FAO56_two_stage_initialize( active_cells )
 
     use parameters, only        : PARAMS, PARAMS_DICT
 
+    logical (c_bool), intent(in)   :: active_cells(:,:)
+
     integer (c_int)               :: number_of_landuses
-    type(FSTRING_LIST_T)                :: slList
-    integer (c_int), allocatable  ::  landuse_table_codes(:)
+    type(FSTRING_LIST_T)          :: slList
+    integer (c_int), allocatable  :: landuse_table_codes(:)
 
     ! create list of possible table headings to look for...
     call slList%append( "LU_Code" )
@@ -85,7 +90,32 @@ contains
    call PARAMS%get_parameters( slKeys=slList, fValues=DEPLETION_FRACTION, lFatal=TRUE )
    call slList%clear()
 
+   allocate( EVAPORABLE_WATER_STORAGE(count(active_cells)))
+   EVAPORABLE_WATER_STORAGE = 0.0
+
+   allocate( EVAPORABLE_WATER_LAYER_DEFICIT(count(active_cells)))
+   EVAPORABLE_WATER_LAYER_DEFICIT = 0.0
+
+
  end subroutine actual_et_FAO56_two_stage_initialize
+
+!------------------------------------------------------------------------------
+
+impure elemental subroutine update_evaporable_water_storage( infiltration, landuse_index, soil_group)
+
+  real (c_float), intent(in)   :: infiltration
+  integer (c_int), intent(in)  :: landuse_index
+  integer (c_int), intent(in)  :: soil_group
+
+  associate( REW => REW_l( landuse_index, soil_group ),         &
+             TEW => TEW_l( landuse_index, soil_group ) )
+
+  EVAPORABLE_WATER_STORAGE = min( EVAPORABLE_WATER_STORAGE + infiltration, TEW)
+  EVAPORABLE_WATER_LAYER_DEFICIT = max( 0.0, TEW - EVAPORABLE_WATER_STORAGE)
+
+  end associate
+
+end subroutine update_evaporable_water_storage  
 
 !------------------------------------------------------------------------------
 
@@ -222,7 +252,7 @@ end function calculate_water_stress_coefficient_ks
 
 !------------------------------------------------------------------------------
 
-elemental subroutine calculate_actual_et_fao56_two_stage(                            &
+impure elemental subroutine calculate_actual_et_fao56_two_stage(                            &
                                                   actual_et,                         &
                                                   crop_etc,                          &
                                                   bare_soil_evap,                    &
@@ -241,7 +271,8 @@ elemental subroutine calculate_actual_et_fao56_two_stage(                       
                                                   current_rooting_depth,             &
                                                   soil_storage,                      &
                                                   soil_storage_max,                  &
-                                                  reference_et0 )
+                                                  reference_et0,                     &
+                                                  infiltration )
 
   real (c_double), intent(inout)            :: actual_et
   real (c_float), intent(inout)             :: crop_etc
@@ -262,12 +293,19 @@ elemental subroutine calculate_actual_et_fao56_two_stage(                       
   real (c_double), intent(in)               :: soil_storage
   real (c_float), intent(in)                :: soil_storage_max
   real (c_float), intent(in)                :: reference_et0
+  real (c_float), intent(in)                :: infiltration
 
+  real (c_double)            :: interim_soil_storage
+  real (c_double)            :: evaporable_water_layer_deficit
 
   adjusted_depletion_fraction_p = adjust_depletion_fraction_p( landuse_index, reference_et0 )
 
-  soil_moisture_deficit = max( 0.0_c_double, real(soil_storage_max, c_double) - soil_storage)
+  interim_soil_storage = min(soil_storage + infiltration, soil_storage_max)
 
+  call  update_evaporable_water_storage( infiltration, landuse_index, soil_group)
+
+  soil_moisture_deficit = max( 0.0_c_double, real(soil_storage_max, c_double) - interim_soil_storage)
+ 
   call calculate_total_available_water( taw, raw,                      &
                                         adjusted_depletion_fraction_p, &
                                         current_rooting_depth,         &
@@ -276,7 +314,7 @@ elemental subroutine calculate_actual_et_fao56_two_stage(                       
 
   Kr = calculate_evaporation_reduction_coefficient_Kr( landuse_index,                    &
                                                        soil_group,                       &
-                                                       soil_moisture_deficit )
+                                                       EVAPORABLE_WATER_LAYER_DEFICIT )
 
   fraction_exposed_and_wetted_soil = calculate_fraction_exposed_and_wetted_soil_fc( landuse_index, Kcb )
 
@@ -286,6 +324,9 @@ elemental subroutine calculate_actual_et_fao56_two_stage(                       
   Ks = calculate_water_stress_coefficient_ks(taw, raw, soil_moisture_deficit)
 
   bare_soil_evap = reference_et0 * Ke
+
+  EVAPORABLE_WATER_STORAGE = max(0.0, EVAPORABLE_WATER_STORAGE - bare_soil_evap)
+
   crop_etc       = reference_et0 * Kcb * Ks
 
   actual_et = crop_etc + bare_soil_evap

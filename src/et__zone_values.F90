@@ -3,9 +3,8 @@
 
 !>
 !!  Module \ref et__zone_values
-!!  provides support for estimating fog drip given a zone map
-!!  of ET_ZONE, and a table containing monthly
-!!  fog factors.
+!!  provides support for estimating reference ET given a zone map
+!!  of ET_ZONE.
 module et__zone_values
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double, c_bool

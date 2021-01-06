@@ -3009,7 +3009,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call actual_et_FAO56_two_stage_initialize( )
+    call actual_et_FAO56_two_stage_initialize( active_cells=this%active )
 
   end subroutine model_initialize_actual_et_fao56__two_stage
 
@@ -3020,7 +3020,7 @@ contains
     use actual_et__fao56__two_stage
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-    integer (c_int), intent(in)       :: indx
+    integer (c_int), intent(in)            :: indx
 
     ! [ LOCALS ]
     integer (c_int) :: landuse_index
@@ -3046,7 +3046,8 @@ contains
               current_rooting_depth=this%current_rooting_depth( indx ),                         &
               soil_storage=this%soil_storage( indx ),                                           &
               soil_storage_max=this%soil_storage_max( indx ),                                   &
-              reference_et0=this%reference_et0( indx ) )
+              reference_et0=this%reference_et0( indx ),                                         &
+              infiltration=this%infiltration( indx ) )
 
   end subroutine model_calculate_actual_et_fao56__two_stage
 
