@@ -40,6 +40,7 @@ contains
 
     call TEST_PARAMS%add_file("../test_data/tables/Lookup__crop_coefficient_test.txt")
     call TEST_PARAMS%add_file("../test_data/tables/FAO56_Example_35.txt")
+    call TEST_PARAMS%add_file("../test_data/tables/FAO56_equation_72_calcs.txt")
     call TEST_PARAMS%munge_file()
     call SIM_DT%start%setDateFormat("MM/DD/YYYY")
     call SIM_DT%start%parseDate("01/01/2002", sFilename=trim(__SRCNAME__), iLineNumber=__LINE__)
@@ -124,6 +125,7 @@ end subroutine test_crop_coefficients_parsing
 !-------------------------------------------------------------------------------
 
 subroutine test_fao56_equation_72
+! fao-56: test functioning of equation 72 implementation
 
   real (c_float) :: wind_spd = 1.6
   real (c_float) :: RHmin = 35.
@@ -138,10 +140,46 @@ subroutine test_fao56_equation_72
                                                       plant_height_m)
 
   ! compare SWB code calculated value to example 35 calculation in FAO-56
-  call assert_equals(kcb_max, 1.200024)                                                    
-
+  ! value in publication appears to have round-off error; this value comes from 
+  ! an R implementation of equation 72
+  call assert_equals(1.212028, kcb_max, delta=0.0001, message="example 35 values used")                 
+  
 end subroutine test_fao56_equation_72
 
+!-------------------------------------------------------------------------------
+
+subroutine test_fao56_equation_72_v2
+  ! fao-56: test functioning of equation 72 implementation against R implementation
+  
+    real (c_float), allocatable :: wind_spd(:)
+    real (c_float), allocatable :: RHmin(:)
+    real (c_float), allocatable :: plant_height_m(:)
+    real (c_float), allocatable :: kcb_max(:)
+
+    character (len=:), allocatable :: str
+    real (c_float)  :: test_val
+    integer (c_int) :: n
+
+    call TEST_PARAMS%get_parameters(wind_spd, sKey="eq72_u2")
+    call TEST_PARAMS%get_parameters(RHmin, sKey="eq72_rhmin")
+    call TEST_PARAMS%get_parameters(plant_height_m, sKey="eq72_plant_height")    
+    call TEST_PARAMS%get_parameters(kcb_max, sKey="eq72_kc_max")
+
+    do n=1, ubound(RHmin,1)
+
+      test_val = crop_coefficients_FAO56_calculate_Kcb_Max(wind_spd(n),         &
+                                                           RHmin(n),            &
+                                                           0.5,                 & 
+                                                           plant_height_m(n))
+
+      str = "wind spd: "//as_character(wind_spd(n))//" RHmin: "//as_character(RHmin(n))      &
+            //" plnt ht: "//as_character(plant_height_m(n))
+
+      call assert_equals(test_val, kcb_max(n), delta=0.0001, message=str)
+      
+    enddo
+  
+  end subroutine test_fao56_equation_72_v2
 !-------------------------------------------------------------------------------
 
 subroutine test_fao56_example_35

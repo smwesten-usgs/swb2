@@ -43,7 +43,8 @@ program tests
   call run_test_case(test_crop_coefficients_parsing,"test_crop_coefficients_parsing")
   call run_test_case(test_crop_coefficients_basic,"test_crop_coefficients_basic")
   call run_test_case(test_gdd_max_plus_min_simple,"Values taken from:")
-  call run_test_case(test_fao56_equation_72,"test_fao56_equation_72")
+  call run_test_case(test_fao56_equation_72,"fao-56: test functioning of equation 72 implementation")
+  call run_test_case(test_fao56_equation_72_v2,"fao-56: test functioning of equation 72 implementation")
   call run_test_case(test_fao56_example_35,"test_fao56_example_35")
 
   ! test_gash.F90:

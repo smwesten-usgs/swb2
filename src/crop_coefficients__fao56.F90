@@ -482,7 +482,7 @@ pure elemental function crop_coefficients_FAO56_calculate_Kcb_Max(wind_speed_met
   ! equation 72, FAO-56, p 199
   kcb_max = max(  1.2_c_double + ( (0.04_c_double * (U2 - 2._c_double)               &
                                   - 0.004_c_double * (RHmin - 45._c_double) ) )      &
-                                  * (plant_height_meters/3._c_double)**3.,           &
+                                  * (plant_height_meters/3._c_double)**0.3_c_double, &
                   Kcb + 0.05_c_double )
 
 end function crop_coefficients_FAO56_calculate_Kcb_Max

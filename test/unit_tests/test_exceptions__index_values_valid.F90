@@ -18,7 +18,9 @@ contains
     logical, parameter :: TRUE =.true.
     logical, parameter :: FALSE =.false.
 
+    ! supply a legal index value; function should return 'TRUE'
     call assert_equals( TRUE, logical(index_values_valid(integer_values, 25)) )
+    call assert_equals( FALSE, logical(index_values_valid(integer_values, 616)) )
 
   end subroutine test_check_array_bounds_1d
 
