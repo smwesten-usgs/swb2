@@ -3,6 +3,7 @@ module test_FAO56_functions
   use fruit
   use constants_and_conversions
   use crop_coefficients__FAO56
+  use actual_et__fao56__two_stage
   use growing_degree_day
   use logfiles, only               : LOGS, LOG_DEBUG
   use parameters, only             : PARAMETERS_T
@@ -13,44 +14,18 @@ module test_FAO56_functions
   use iso_c_binding
   implicit none
 
-  logical (c_bool)   :: IS_CELL_ACTIVE(3,3) = .true.
-  integer (c_int)    :: LANDUSE_INDEX(9)    = [1,2,3,4,5,6,7,8,9]
+  type (PARAMETERS_T)      :: TEST_PARAMS
 
- ! ET0 in inches from Example 35, FAO56 publication, as present in Errata
-  real (c_double)    :: ET0(10)= [0.177165354,     &
-                                  0.196850394,     &
-                                  0.153543307,     &
-                                  0.165354331,     &
-                                  0.188976378,     &
-                                  0.106299213,     &
-                                  0.228346457,     &
-                                  0.200787402,     &
-                                  0.18503937,      &
-                                  0.204724409]
-  
-  ! rooting depth in meters taken from example 38, FAO56
-  ! convert to feet
-  real (c_double)    :: Zr(12) =  [0.3000000,              &
-                                   0.3054545,              &
-                                   0.3109091,              &
-                                   0.3163636,              &
-                                   0.3218182,              &
-                                   0.3272727,              &
-                                   0.3327273,              &
-                                   0.3381818,              &
-                                   0.3436364,              &
-                                   0.3490909,              &
-                                   0.3545455,              &
-                                   0.3600000] / 0.3048
+  logical (c_bool)         :: IS_CELL_ACTIVE(3,3) = .true.
+  integer (c_int)          :: LANDUSE_INDEX(9)    = [1,2,3,4,5,6,7,8,9]
 
-  real (c_double) :: SOIL_STORAGE_MAX(12)
+  real (c_double)          :: SOIL_STORAGE_MAX(12)
 
 
 contains
 
   subroutine setup_crop_coefficients__FAO56
 
-    type (PARAMETERS_T)                   :: PARAMS
     real (c_float), allocatable           :: fValues(:)
     type (FSTRING_LIST_T)                 :: slString
 
@@ -63,17 +38,14 @@ contains
 
     call LOGS%initialize( iLogLevel = LOG_DEBUG )
 
-    call PARAMS%add_file("../test_data/tables/Lookup__crop_coefficient_test.txt")
-    call PARAMS%munge_file()
+    call TEST_PARAMS%add_file("../test_data/tables/Lookup__crop_coefficient_test.txt")
+    call TEST_PARAMS%add_file("../test_data/tables/FAO56_Example_35.txt")
+    call TEST_PARAMS%munge_file()
     call SIM_DT%start%setDateFormat("MM/DD/YYYY")
     call SIM_DT%start%parseDate("01/01/2002", sFilename=trim(__SRCNAME__), iLineNumber=__LINE__)
     call crop_coefficients_FAO56_initialize( )
 
     call growing_degree_day_initialize( IS_CELL_ACTIVE, LANDUSE_INDEX )
-
-     ! Example 35 gives theta FC as 0.23 m^3/m^3, and theta WP as 0.1 m^3/m^3
-    ! we need these values in inches per foot
-    SOIL_STORAGE_MAX = (0.23 - 0.1) * 12. * Zr
 
   end subroutine setup_crop_coefficients__FAO56
 
@@ -124,6 +96,8 @@ end subroutine test_crop_coefficients_parsing
 
   end subroutine test_crop_coefficients_basic
 
+!-------------------------------------------------------------------------------
+
   subroutine test_gdd_max_plus_min_simple
 
     ! Values taken from:
@@ -146,5 +120,39 @@ end subroutine test_crop_coefficients_parsing
     enddo  
 
   end subroutine test_gdd_max_plus_min_simple
+
+!-------------------------------------------------------------------------------
+
+subroutine test_fao56_equation_72
+
+  real (c_float) :: wind_spd = 1.6
+  real (c_float) :: RHmin = 35.
+  real (c_float) :: Kcb = 0.35
+  real (c_float) :: plant_height_m = 0.3
+
+  real (c_float) :: kcb_max
+  
+  kcb_max = crop_coefficients_FAO56_calculate_Kcb_Max(wind_spd,         &
+                                                      RHMin,            &
+                                                      Kcb,              & 
+                                                      plant_height_m)
+
+  ! compare SWB code calculated value to example 35 calculation in FAO-56
+  call assert_equals(kcb_max, 1.200024)                                                    
+
+end subroutine test_fao56_equation_72
+
+!-------------------------------------------------------------------------------
+
+subroutine test_fao56_example_35
+
+    real (c_float), allocatable :: ex35_kr(:) 
+    real (c_float), allocatable :: ex35_ET0(:)
+
+    call TEST_PARAMS%get_parameters(ex35_kr, sKey="ex35_kr")
+    call TEST_PARAMS%get_parameters(ex35_ET0, sKey="ex35_ET0")
+
+
+end subroutine test_fao56_example_35
 
 end module test_FAO56_functions

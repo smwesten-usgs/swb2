@@ -10,7 +10,7 @@ module crop_coefficients__FAO56
   use iso_c_binding, only             : c_bool, c_short, c_int, c_float, c_double
   use constants_and_conversions, only : M_PER_FOOT, TRUE, FALSE, fTINYVAL,       &
                                         iTINYVAL, asInt, asFloat, fZERO, in_to_mm, &
-                                        TRUE, FALSE
+                                        TRUE, FALSE, clip
   use data_catalog, only              : DAT
   use data_catalog_entry, only        : DATA_CATALOG_ENTRY_T
   use datetime
@@ -27,6 +27,7 @@ module crop_coefficients__FAO56
   public :: crop_coefficients_FAO56_initialize, crop_coefficients_FAO56_calculate
   public :: crop_coefficients_FAO56_update_growth_stage_dates
   public :: crop_coefficients_FAO56_update_growing_season
+  public :: crop_coefficients_FAO56_calculate_Kcb_Max
   public :: update_crop_coefficient_date_as_threshold, update_crop_coefficient_GDD_as_threshold
   public :: GROWTH_STAGE_DATE, PLANTING_DATE, GROWTH_STAGE_LENGTH_IN_DAYS
   public :: KCB_MIN, KCB_INI, KCB_MID, KCB_END
@@ -109,6 +110,8 @@ contains
     real (c_float), allocatable       :: GDD_dev_l(:)
     real (c_float), allocatable       :: GDD_mid_l(:)
     real (c_float), allocatable       :: GDD_late_l(:)
+
+    real (c_float), allocatable       :: Kcb_MAX(:)
 
     real (c_float), allocatable       :: Kcb_ini_l(:)
     real (c_float), allocatable       :: Kcb_mid_l(:)
@@ -455,6 +458,34 @@ contains
   end if
 
 end function update_crop_coefficient_date_as_threshold
+
+!------------------------------------------------------------------------------
+
+pure elemental function crop_coefficients_FAO56_calculate_Kcb_Max(wind_speed_meters_per_sec,   &
+                                          relative_humidity_min_pct,   &
+                                          Kcb,                         & 
+                                          plant_height_meters)                       result(kcb_max)
+
+  real (c_float), intent(in) :: wind_speed_meters_per_sec
+  real (c_float), intent(in) :: relative_humidity_min_pct
+  real (c_float), intent(in) :: Kcb
+  real (c_float), intent(in) :: plant_height_meters
+
+  real (c_float)  :: kcb_max
+  real (c_double) :: U2
+  real (c_double) :: RHmin
+
+  ! not sure what a reasonable cap on the 2-meter wind velocity is. 
+  RHmin = clip( relative_humidity_min_pct, minval=0., maxval=100. )
+  U2 = clip(wind_speed_meters_per_sec, minval=0., maxval=50.)
+
+  ! equation 72, FAO-56, p 199
+  kcb_max = max(  1.2_c_double + ( (0.04_c_double * (U2 - 2._c_double)               &
+                                  - 0.004_c_double * (RHmin - 45._c_double) ) )      &
+                                  * (plant_height_meters/3._c_double)**3.,           &
+                  Kcb + 0.05_c_double )
+
+end function crop_coefficients_FAO56_calculate_Kcb_Max
 
 !------------------------------------------------------------------------------
 
