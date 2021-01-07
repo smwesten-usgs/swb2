@@ -474,10 +474,13 @@ pure elemental function crop_coefficients_FAO56_calculate_Kcb_Max(wind_speed_met
   real (c_float)  :: kcb_max
   real (c_double) :: U2
   real (c_double) :: RHmin
+  real (c_double) :: plant_height
 
-  ! not sure what a reasonable cap on the 2-meter wind velocity is. 
-  RHmin = clip( relative_humidity_min_pct, minval=0., maxval=100. )
-  U2 = clip(wind_speed_meters_per_sec, minval=0., maxval=50.)
+  ! Limits are as suggested on page 123 of FAO-56 with respect to
+  ! modifying mid-season KCB_mid values 
+  RHmin = clip( relative_humidity_min_pct, minval=20., maxval=80. )
+  U2 = clip(wind_speed_meters_per_sec, minval=1., maxval=6.)
+  plant_height = clip(plant_height_meters, minval=1., maxval=10.)
 
   ! equation 72, FAO-56, p 199
   kcb_max = max(  1.2_c_double + ( (0.04_c_double * (U2 - 2._c_double)               &

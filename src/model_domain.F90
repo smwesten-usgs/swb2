@@ -110,6 +110,7 @@ module model_domain
     real (c_float), allocatable       :: direct_net_infiltration(:)
     real (c_float), allocatable       :: direct_soil_moisture(:)
     real (c_float), allocatable       :: current_rooting_depth(:)
+    real (c_float), allocatable       :: current_plant_height(:)
     integer (c_int), allocatable      :: number_of_days_since_planting(:)
     logical (c_bool), allocatable     :: it_is_growing_season(:)
 
@@ -132,6 +133,9 @@ module model_domain
 
     real (c_double), allocatable      :: adjusted_depletion_fraction_p(:)
     real (c_float), allocatable       :: fraction_exposed_and_wetted_soil(:)
+
+    real (c_float), allocatable       :: evaporable_water_storage(:)
+    real (c_float), allocatable       :: evaporable_water_deficit(:)
 
     ! member variables that are only allocated if particular optional methods are invoked
 
@@ -412,7 +416,7 @@ contains
     integer (c_int)  :: iCount
     integer (c_int)  :: iIndex
     integer (c_int)  :: indx
-    integer (c_int)  :: iStat(64)
+    integer (c_int)  :: iStat(67)
 
     iCount = count( this%active )
     iStat = 0
@@ -455,31 +459,34 @@ contains
     allocate( this%continuous_frozen_ground_index( iCount ), stat=iStat(37) )
     allocate( this%rooting_depth_max( iCount ), stat=iStat(38) )
     allocate( this%current_rooting_depth( iCount ), stat=iStat(39) )
-    allocate( this%polygon_id( iCount ), stat=iStat(40) )
-    allocate( this%actual_et_soil( iCount ), stat=iStat(41) )
-    allocate( this%actual_et_impervious( iCount ), stat=iStat(42) )
-    allocate( this%actual_et_interception( iCount ), stat=iStat(43) )
-    allocate( this%adjusted_depletion_fraction_p( iCount ), stat=iStat(44) )
-    allocate( this%crop_etc( iCount ), stat=iStat(45) )
-    allocate( this%direct_net_infiltration( iCount ), stat=iStat(46) )
-    allocate( this%direct_soil_moisture( iCount ), stat=iStat(47) )
-    allocate( this%number_of_days_since_planting( iCount ), stat=iStat(48) )
-    allocate( this%col_num_1D( iCount ), stat=iStat(49) )
-    allocate( this%row_num_1D( iCount ), stat=iStat(50) )
-    allocate( this%it_is_growing_season( iCount ), stat=iStat(51) )
-    allocate( this%curve_num_adj( iCount ), stat=iStat(52) )
-    allocate( this%rejected_net_infiltration( iCount ), stat=iStat(53) )
-    allocate( this%evap_reduction_coef_kr( iCount ), stat=iStat(54) )
-    allocate( this%surf_evap_coef_ke( iCount ), stat=iStat(55) )
-    allocate( this%plant_stress_coef_ks( iCount ), stat=iStat(56) )
-    allocate( this%total_available_water_taw( iCount ), stat=iStat(57) )
-    allocate( this%readily_available_water_raw( iCount ), stat=iStat(58) )
-    allocate( this%bare_soil_evap( iCount ), stat=iStat(59) )
-    allocate( this%fraction_exposed_and_wetted_soil( iCount ), stat=iStat(60) )
-    allocate( this%delta_soil_storage( iCount ), stat=iStat(61) )
-    allocate( this%soil_moisture_deficit( iCount ), stat=iStat(62) )
-    allocate( this%net_rainfall( iCount ), stat=iStat(63) )
-    allocate( this%net_snowfall( iCount ), stat=iStat(64) )
+    allocate( this%current_plant_height( iCount ), stat=iStat(40) )
+    allocate( this%polygon_id( iCount ), stat=iStat(41) )
+    allocate( this%actual_et_soil( iCount ), stat=iStat(42) )
+    allocate( this%actual_et_impervious( iCount ), stat=iStat(43) )
+    allocate( this%actual_et_interception( iCount ), stat=iStat(44) )
+    allocate( this%adjusted_depletion_fraction_p( iCount ), stat=iStat(45) )
+    allocate( this%crop_etc( iCount ), stat=iStat(46) )
+    allocate( this%direct_net_infiltration( iCount ), stat=iStat(47) )
+    allocate( this%direct_soil_moisture( iCount ), stat=iStat(48) )
+    allocate( this%number_of_days_since_planting( iCount ), stat=iStat(49) )
+    allocate( this%col_num_1D( iCount ), stat=iStat(50) )
+    allocate( this%row_num_1D( iCount ), stat=iStat(51) )
+    allocate( this%it_is_growing_season( iCount ), stat=iStat(52) )
+    allocate( this%curve_num_adj( iCount ), stat=iStat(53) )
+    allocate( this%rejected_net_infiltration( iCount ), stat=iStat(54) )
+    allocate( this%evap_reduction_coef_kr( iCount ), stat=iStat(55) )
+    allocate( this%surf_evap_coef_ke( iCount ), stat=iStat(56) )
+    allocate( this%plant_stress_coef_ks( iCount ), stat=iStat(57) )
+    allocate( this%total_available_water_taw( iCount ), stat=iStat(58) )
+    allocate( this%readily_available_water_raw( iCount ), stat=iStat(59) )
+    allocate( this%bare_soil_evap( iCount ), stat=iStat(60) )
+    allocate( this%fraction_exposed_and_wetted_soil( iCount ), stat=iStat(61) )
+    allocate( this%delta_soil_storage( iCount ), stat=iStat(62) )
+    allocate( this%soil_moisture_deficit( iCount ), stat=iStat(63) )
+    allocate( this%net_rainfall( iCount ), stat=iStat(64) )
+    allocate( this%net_snowfall( iCount ), stat=iStat(65) )
+    allocate( this%evaporable_water_storage( iCount ), stat=iStat(66))
+    allocate( this%evaporable_water_deficit( iCount ), stat=iStat(67))
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR"                    &
@@ -536,6 +543,7 @@ contains
     this%continuous_frozen_ground_index      = 0.0_c_float
     this%rooting_depth_max                   = 0.0_c_float
     this%current_rooting_depth               = 0.0_c_float
+    this%current_plant_height                = 0.0_c_float
     this%polygon_id                          = 0_c_int
     this%actual_et_soil                      = 0.0_c_double
     this%actual_et_impervious                = 0.0_c_double
@@ -551,6 +559,8 @@ contains
     this%total_available_water_taw           = 0.0_c_float
     this%readily_available_water_raw         = 0.0_c_float
     this%fraction_exposed_and_wetted_soil    = 0.0_c_float
+    this%evaporable_water_storage            = 0.0_c_float
+    this%evaporable_water_deficit            = 0.0_c_float
     this%it_is_growing_season                = FALSE
 
     do iIndex=1, iCount
@@ -1578,7 +1588,7 @@ contains
               //"surface_storage_excess, surface_storage_max, net_infiltration, "                                  &
               //"rejected_net_infiltration, fog, irrigation, gdd, runoff_outside, "                                &
               //"pervious_fraction, storm_drain_capture, canopy_cover_fraction, crop_coefficient_kcb, "            &
-              //"cfgi, rooting_depth_max, current_rooting_depth, actual_et_soil, "                                 &
+              //"cfgi, rooting_depth_max, current_rooting_depth, current_plant_height, actual_et_soil, "           &
               //"readily_available_water, total_available_water, plant_stress_coef_ks, "                           &
               //"evap_reduction_coef_kr, surf_evap_coef_ke, fraction_exposed_and_wetted_soil, "                    &
               //"actual_et_impervious, actual_et_interception, adjusted_depletion_fraction_p, crop_etc, "          &
@@ -2843,7 +2853,7 @@ contains
     if (allocated(this%monthly_runoff) )  monthly_runoff = this%monthly_runoff( cell_indx )
     if (allocated(this%monthly_gross_precip) )  monthly_gross_precip = this%monthly_gross_precip( cell_indx )
 
-      write( unit=unitnum, fmt="(i4,'-',i2.2,'-'i2.2,',',i2,',',i2,',',i4,',',8(i6,','),62(g20.12,','),g20.12)")                &
+      write( unit=unitnum, fmt="(i4,'-',i2.2,'-'i2.2,',',i2,',',i2,',',i4,',',8(i6,','),63(g20.12,','),g20.12)")                &
         SIM_DT%curr%iYear, SIM_DT%curr%iMonth, SIM_DT%curr%iDay,                                                            &
         SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                                            &
         this%landuse_code( cell_indx ), this%landuse_index( cell_indx ),                                                    &
@@ -2865,7 +2875,7 @@ contains
         this%pervious_fraction( cell_indx ), this%storm_drain_capture( cell_indx ),                                         &
         this%canopy_cover_fraction( cell_indx ), this%crop_coefficient_kcb( cell_indx ),                                    &
         this%continuous_frozen_ground_index( cell_indx ), this%rooting_depth_max( cell_indx ),                              &
-        this%current_rooting_depth( cell_indx ), this%actual_et_soil( cell_indx ),                                          &
+        this%current_rooting_depth( cell_indx ), this%current_plant_height( cell_indx), this%actual_et_soil( cell_indx ),   &
         this%readily_available_water_raw( cell_indx ), this%total_available_water_taw( cell_indx ),                         &
         this%plant_stress_coef_ks( cell_indx ), this%evap_reduction_coef_kr( cell_indx ),                                   &
         this%surf_evap_coef_ke( cell_indx ), this%fraction_exposed_and_wetted_soil( cell_indx ),                            &
@@ -3009,7 +3019,7 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call actual_et_FAO56_two_stage_initialize( active_cells=this%active )
+    call actual_et_FAO56_two_stage_initialize( )
 
   end subroutine model_initialize_actual_et_fao56__two_stage
 
@@ -3039,6 +3049,10 @@ contains
               Ks=this%plant_stress_coef_ks( indx ),                                             &
               adjusted_depletion_fraction_p=this%adjusted_depletion_fraction_p( indx ),         &
               soil_moisture_deficit=this%soil_moisture_deficit( indx ),                         &
+              current_plant_height=this%current_plant_height( indx ),                           &
+              evaporable_water_storage=this%evaporable_water_storage( indx ),                   &
+              evaporable_water_deficit=this%evaporable_water_deficit( indx ),                   &
+              it_is_growing_season=this%it_is_growing_season( indx ),                           &
               Kcb=this%crop_coefficient_kcb( indx ),                                            &
               landuse_index=this%landuse_index( indx ),                                         &
               soil_group=this%soil_group( indx ),                                               &
