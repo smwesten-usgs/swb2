@@ -1583,7 +1583,8 @@ contains
               //"actual_ET, curve_num_adj, inflow, runon, "                                                        &
               //"runoff, outflow, infiltration, snowfall, potential_snowmelt, snowmelt, interception, "            &
               //"rainfall, net_rainfall, monthly_gross_precip, monthly_runoff, interception_storage, tmax, tmin, " &
-              //" tmean, snow_storage, soil_storage, soil_storage_max, delta_soil_storage, "                       &
+              //" tmean, snow_storage, soil_storage, soil_storage_max, "                                           &
+              //"evaporable_water_storage, evaporable_water_deficit, delta_soil_storage, "                         &
               //"soil_moisture_deficit, surface_storage, "                                                         &
               //"surface_storage_excess, surface_storage_max, net_infiltration, "                                  &
               //"rejected_net_infiltration, fog, irrigation, gdd, runoff_outside, "                                &
@@ -2853,7 +2854,7 @@ contains
     if (allocated(this%monthly_runoff) )  monthly_runoff = this%monthly_runoff( cell_indx )
     if (allocated(this%monthly_gross_precip) )  monthly_gross_precip = this%monthly_gross_precip( cell_indx )
 
-      write( unit=unitnum, fmt="(i4,'-',i2.2,'-'i2.2,',',i2,',',i2,',',i4,',',8(i6,','),63(g20.12,','),g20.12)")                &
+      write( unit=unitnum, fmt="(i4,'-',i2.2,'-'i2.2,',',i2,',',i2,',',i4,',',8(i6,','),65(g20.12,','),g20.12)")                &
         SIM_DT%curr%iYear, SIM_DT%curr%iMonth, SIM_DT%curr%iDay,                                                            &
         SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                                            &
         this%landuse_code( cell_indx ), this%landuse_index( cell_indx ),                                                    &
@@ -2867,6 +2868,7 @@ contains
         this%net_rainfall( cell_indx ), monthly_gross_precip, monthly_runoff,                                               &
         this%interception_storage( cell_indx ), this%tmax( cell_indx ), this%tmin( cell_indx ), this%tmean( cell_indx ),    &
         this%snow_storage( cell_indx ), this%soil_storage( cell_indx ), this%soil_storage_max( cell_indx ),                 &
+        this%evaporable_water_storage( cell_indx ), this%evaporable_water_deficit( cell_indx ),                             &
         this%delta_soil_storage( cell_indx ),this%soil_moisture_deficit( cell_indx ),                                       &
         this%surface_storage( cell_indx ), this%surface_storage_excess( cell_indx ),                                        &
         this%surface_storage_max( cell_indx ), this%net_infiltration( cell_indx ),                                          &

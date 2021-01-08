@@ -185,11 +185,91 @@ subroutine test_fao56_equation_72_v2
 subroutine test_fao56_example_35
 
     real (c_float), allocatable :: ex35_kr(:) 
+    real (c_float), allocatable :: ex35_ke(:) 
     real (c_float), allocatable :: ex35_ET0(:)
+    real (c_float), allocatable :: ex35_Kcb(:)
+    real (c_float), allocatable :: ex35_p_minus_ro(:)
+    real (c_float), allocatable :: ex35_irrigation(:)
+    real (c_float), allocatable :: ex35_1_minus_fc(:)
+    real (c_float), allocatable :: ex35_few(:)
+    real (c_float), allocatable :: ex35_fw(:)
+
+    real (c_float)              :: Kcb_max
+    real (c_float)              :: evaporable_water_storage
+    real (c_float)              :: evaporable_water_deficit
+    real (c_float)              :: TEW_ = 18
+    real (c_float)              :: REW_ = 8
+    integer (c_int)             :: day
+    real (c_float)              :: infiltration
+    real (c_float)              :: Kr
+    real (c_float)              :: Ke
+    real (c_float)              :: Ks
+    real (c_float)              :: Kcb
+    real (c_float)              :: fw
+    real (c_float)              :: few
+    real (c_float)              :: bare_soil_evap
+    real (c_float)              :: reference_et0
+    real (c_float)              :: actual_et
+    real (c_float)              :: crop_etc
+
+
+    evaporable_water_storage = 0.0
+    evaporable_water_deficit = TEW_
 
     call TEST_PARAMS%get_parameters(ex35_kr, sKey="ex35_kr")
+    call TEST_PARAMS%get_parameters(ex35_ke, sKey="ex35_ke")
     call TEST_PARAMS%get_parameters(ex35_ET0, sKey="ex35_ET0")
+    call TEST_PARAMS%get_parameters(ex35_Kcb, sKey="ex35_Kcb")
+    call TEST_PARAMS%get_parameters(ex35_p_minus_ro, sKey="ex35_p_minus_ro")
+    call TEST_PARAMS%get_parameters(ex35_irrigation, sKey="ex35_irrigation")
+    call TEST_PARAMS%get_parameters(ex35_1_minus_fc, sKey="ex35_1_minus_fc")
+    call TEST_PARAMS%get_parameters(ex35_few, sKey="ex35_few")
+    call TEST_PARAMS%get_parameters(ex35_fw, sKey="ex35_fw")
 
+    Kcb_max =  crop_coefficients_FAO56_calculate_Kcb_Max(wind_speed_meters_per_sec=1.5,                  &
+                                                         relative_humidity_min_pct=35.,                  &
+                                                         Kcb=0.35,                                       & 
+                                                         plant_height_meters=0.30) 
+
+    call assert_equals(Kcb_max, 1.21, delta=0.001)
+
+    do day=1,10
+
+      ! givens in example 35
+      fw = ex35_fw(day)
+      few = ex35_few(day)
+      infiltration = ex35_p_minus_ro(day) + ex35_irrigation(day)
+      Kcb = ex35_Kcb(day)
+      reference_et0 = ex35_ET0(day)
+
+      evaporable_water_storage = clip( evaporable_water_storage + infiltration, minval=0., maxval=TEW_)
+      evaporable_water_deficit = clip( TEW_ - evaporable_water_storage, minval=0., maxval=TEW_)
+
+      if ( evaporable_water_deficit <= REW_ ) then
+        Kr = 1._c_double
+      elseif ( evaporable_water_deficit < TEW_ ) then
+        Kr = ( real(TEW_, c_double) - evaporable_water_deficit )         &
+            / ( real(TEW_, c_double) - real(REW_, c_double) + 1.0E-8)
+      else
+        Kr = 0._c_double
+      endif
+
+      ! because the evaporable soil layer is the control volume under consideration, the value
+      ! of Ks should be the same as the value for Kr
+      Ks = Kr
+
+      Ke = Kr * ( real(Kcb_max, c_double) - real(Kcb, c_double) )
+
+      call assert_equals(Kr, ex35_kr(day),"Kr, day "//as_character(day))
+      call assert_equals(Ke, ex35_ke(day),"Ke, day "//as_character(day))
+
+      bare_soil_evap           = reference_et0 * Ke !/ few
+      crop_etc                 = reference_et0 * Kcb * Ks !* (1 - few)
+      actual_et                = crop_etc + bare_soil_evap
+
+      evaporable_water_storage = clip(evaporable_water_storage - actual_et, minval=0.0, maxval=TEW_)
+
+    enddo  
 
 end subroutine test_fao56_example_35
 
