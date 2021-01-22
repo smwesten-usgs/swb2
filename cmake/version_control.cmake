@@ -14,9 +14,9 @@ execute_process(
   OUTPUT_STRIP_TRAILING_WHITESPACE
 )
 
-# Get the total number of commits on this branch (since last release number bump)
+# Get the total number of commits on this branch
 execute_process(
-  COMMAND git rev-list --count ${SWB_LATEST_RELEASE_HASH}..HEAD
+	COMMAND git rev-list ${SWB_LATEST_VERSION_TAG}.. --count 
   WORKING_DIRECTORY ${CMAKE_SOURCE_DIR}
   OUTPUT_VARIABLE GIT_COMMITS_ON_BRANCH
   OUTPUT_STRIP_TRAILING_WHITESPACE
