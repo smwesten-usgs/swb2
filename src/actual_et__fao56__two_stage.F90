@@ -101,7 +101,7 @@ elemental subroutine update_evaporable_water_storage( evaporable_water_storage, 
   associate( REW => REW_l( landuse_index, soil_group ),         &
              TEW => TEW_l( landuse_index, soil_group ) )
 
-  evaporable_water_storage = min( evaporable_water_storage + infiltration, TEW)
+  evaporable_water_storage = clip( evaporable_water_storage + infiltration, minval=0.0, maxval=TEW)
   evaporable_water_deficit = max( 0.0, TEW - evaporable_water_storage)
 
   end associate
@@ -169,10 +169,7 @@ elemental function calculate_fraction_exposed_and_wetted_soil_fc( landuse_index,
     r_fc = 1.0_c_float
   endif
 
-  few = 1.0_c_float - r_fc
-
-  if ( few < 0._c_float ) few = 0.0_c_float
-  if ( few > 1._c_float ) few = 1.0_c_float
+  few = clip(1.0_c_float - r_fc, minval=0.05, maxval=1.0)
 
 end function calculate_fraction_exposed_and_wetted_soil_fc
 
@@ -180,16 +177,24 @@ end function calculate_fraction_exposed_and_wetted_soil_fc
 
 !> This function estimates Ke, the bare surface evaporation coefficient
 !> @note Implemented as equation 71, FAO-56, Allen and others
-elemental function calculate_surface_evap_coefficient_ke( landuse_index, Kcb, Kcb_max, Kr )     result( Ke )
+elemental function calculate_surface_evap_coefficient_ke( landuse_index, Kcb, Kcb_max, Kr,  &
+                                                          fraction_exposed_and_wetted_soil)     result( Ke )
 
   ! [ ARGUMENTS ]
   integer (c_int), intent(in)   :: landuse_index
   real (c_float), intent(in)    :: Kcb
   real (c_float), intent(in)    :: Kcb_max
   real (c_double), intent(in)   :: Kr
+  real (c_float), intent(in)    :: fraction_exposed_and_wetted_soil
   real (c_double)               :: Ke
+  
+  real (c_double) :: maximum_value
 
-  Ke = Kr * ( real(Kcb_max, c_double) - real(Kcb, c_double) )
+  ! OK, not quite spelled out in FAO-56, but I don't want to see evaporation coefficients
+  ! greater than one returned from this function
+  maximum_value = min( 1.0_c_double, fraction_exposed_and_wetted_soil * Kcb_max )
+
+  Ke = min( Kr * ( real(Kcb_max, c_double) - real(Kcb, c_double)), maximum_value )
 
 end function calculate_surface_evap_coefficient_ke
 
@@ -326,7 +331,8 @@ impure elemental subroutine calculate_actual_et_fao56_two_stage(                
   real (c_float), intent(in)                :: reference_et0
   real (c_float), intent(in)                :: infiltration
 
-  real (c_double)            :: interim_soil_storage
+  real (c_float)            :: interim_soil_storage
+  real (c_float)            :: interim_soil_storage2
   real (c_double)            :: evaporable_water_layer_deficit
   real (c_float)             :: Kcb_max
 
@@ -341,18 +347,14 @@ impure elemental subroutine calculate_actual_et_fao56_two_stage(                
 
   adjusted_depletion_fraction_p = adjust_depletion_fraction_p( landuse_index, reference_et0 )
 
-  interim_soil_storage = min(soil_storage + infiltration, soil_storage_max)
-
+  
   call update_evaporable_water_storage( evaporable_water_storage, evaporable_water_deficit, infiltration,    &
                                         landuse_index, soil_group )
 
-  soil_moisture_deficit = max( 0.0_c_double, real(soil_storage_max, c_double) - interim_soil_storage)
- 
   call calculate_total_available_water( taw, raw,                      &
                                         adjusted_depletion_fraction_p, &
                                         current_rooting_depth,         &
                                         awc )
-
 
   Kr = calculate_evaporation_reduction_coefficient_Kr( landuse_index,                    &
                                                        soil_group,                       &
@@ -360,16 +362,21 @@ impure elemental subroutine calculate_actual_et_fao56_two_stage(                
 
   fraction_exposed_and_wetted_soil = calculate_fraction_exposed_and_wetted_soil_fc( landuse_index, Kcb, current_plant_height )
 
-  Ke = min( calculate_surface_evap_coefficient_ke( landuse_index, Kcb, Kcb_max, Kr ),             &
-            fraction_exposed_and_wetted_soil * Kcb_max )
+  Ke = calculate_surface_evap_coefficient_ke( landuse_index, Kcb, Kcb_max, Kr, fraction_exposed_and_wetted_soil )
+  
+  bare_soil_evap = reference_et0 * Ke
+  evaporable_water_storage = max(0.0, evaporable_water_storage - bare_soil_evap / fraction_exposed_and_wetted_soil)
 
+  ! need to remove bare soil evap from interim soil to yield lower Ks values
+  interim_soil_storage = clip(real(soil_storage + infiltration, kind=c_float), minval=0.0, maxval=soil_storage_max)
+  interim_soil_storage2 = clip(real(soil_storage + infiltration - bare_soil_evap, kind=c_float), minval=0.0, maxval=soil_storage_max)
+  ! need to update bare soil evap term to reduce it in the event that more evap is calculated than water available
+  bare_soil_evap = clip(interim_soil_storage - interim_soil_storage2, minval=0.0, maxval=soil_storage_max)
+
+  soil_moisture_deficit = max( 0.0_c_double, real(soil_storage_max, c_double) - interim_soil_storage2)
   Ks = calculate_water_stress_coefficient_ks(taw, raw, soil_moisture_deficit)
 
-  bare_soil_evap = reference_et0 * Ke
-
-  evaporable_water_storage = max(0.0, evaporable_water_storage - bare_soil_evap)
-
-  crop_etc       = reference_et0 * Kcb * Ks
+  crop_etc = reference_et0 * Kcb * Ks
 
   actual_et = crop_etc + bare_soil_evap
 

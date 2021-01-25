@@ -680,10 +680,7 @@ subroutine getvalues_constant_sub( this  )
 
   end subroutine getvalues_constant_sub
 
-
-
-
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine getvalues_from_lookup_table( this, dt )
 

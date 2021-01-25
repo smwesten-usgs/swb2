@@ -142,14 +142,22 @@ contains
       delimiters_ = TAB
     endif
 
-    unique_file_list = this%filenames%unique()
+    !
+    ! proper way to screen for duplicate filenames is further down in loop
+    !
+    !unique_file_list = this%filenames%unique()
+    !if ( unique_file_list%get(1) .ne. '<NA>' ) then
 
-    if ( unique_file_list%get(1) .ne. '<NA>' ) then
+    if ( this%filenames%get(1) .ne. '<NA>' ) then
 
-      ! iterate over the *unique*list of files
-      do iFileIndex = 1, unique_file_list%count
+      do iFileIndex = 1, this%filenames%count
 
-        filename1 = unique_file_list%get(iFileIndex)
+        filename1 = this%filenames%get(iFileIndex)
+
+        ! if this filename has already been seen and processed, ignore and move on to next filename
+        if ( unique_file_list%count_matching(filename1) > 0 ) cycle
+
+        call unique_file_list%append(filename1)
 
         ! open the file associated with current file index value
         call DF%open(sFilename = filename1,                                  &

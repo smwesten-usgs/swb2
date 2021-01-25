@@ -180,7 +180,9 @@ contains
         call cells%calc_actual_et( indx )
 
         ! reduce soil actual et by the amount of interception et, if any
-        actual_et_soil = max( actual_et_soil - actual_et_interception, 0.0_c_float )
+        !actual_et_soil = max( actual_et_soil - actual_et_interception, 0.0_c_float )
+
+        ! OK, supplying a reduced value of reference ET0 to FAO56_two_stage calc
 
         !actual_et_soil = max( min( actual_et_soil, reference_ET0 - actual_et_interception), 0.0_c_float )
 

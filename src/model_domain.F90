@@ -3062,7 +3062,8 @@ contains
               current_rooting_depth=this%current_rooting_depth( indx ),                         &
               soil_storage=this%soil_storage( indx ),                                           &
               soil_storage_max=this%soil_storage_max( indx ),                                   &
-              reference_et0=this%reference_et0( indx ),                                         &
+              reference_et0=max(real(this%reference_et0( indx )                                 &
+                                - this%actual_et_interception( indx ), kind=c_float), 0.0),     &
               infiltration=this%infiltration( indx ) )
 
   end subroutine model_calculate_actual_et_fao56__two_stage

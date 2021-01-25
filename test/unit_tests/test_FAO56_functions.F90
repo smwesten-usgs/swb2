@@ -260,11 +260,11 @@ subroutine test_fao56_example_35
 
       Ke = Kr * ( real(Kcb_max, c_double) - real(Kcb, c_double) )
 
-      call assert_equals(Kr, ex35_kr(day),"Kr, day "//as_character(day))
-      call assert_equals(Ke, ex35_ke(day),"Ke, day "//as_character(day))
+      call assert_equals(Kr, ex35_kr(day),"Kr, day "//as_character(day)//": SWB calculated "//as_character(Kr))
+      call assert_equals(Ke, ex35_ke(day),"Ke, day "//as_character(day)//": SWB calculated "//as_character(Ke))
 
-      bare_soil_evap           = reference_et0 * Ke !/ few
-      crop_etc                 = reference_et0 * Kcb * Ks !* (1 - few)
+      bare_soil_evap           = reference_et0 * Ke / few
+      crop_etc                 = reference_et0 * Kcb * Ks * 0.0 !* (1 - few)
       actual_et                = crop_etc + bare_soil_evap
 
       evaporable_water_storage = clip(evaporable_water_storage - actual_et, minval=0.0, maxval=TEW_)
