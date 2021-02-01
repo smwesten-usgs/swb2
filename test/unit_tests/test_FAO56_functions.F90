@@ -216,10 +216,10 @@ subroutine test_fao56_example_35
     evaporable_water_storage = 0.0
     evaporable_water_deficit = TEW_
 
-    call TEST_PARAMS%get_parameters(ex35_kr, sKey="ex35_kr")
-    call TEST_PARAMS%get_parameters(ex35_ke, sKey="ex35_ke")
-    call TEST_PARAMS%get_parameters(ex35_ET0, sKey="ex35_ET0")
-    call TEST_PARAMS%get_parameters(ex35_Kcb, sKey="ex35_Kcb")
+    call TEST_PARAMS%get_parameters(ex35_kr, sKey="EX35_KR")
+    call TEST_PARAMS%get_parameters(ex35_ke, sKey="EX35_ke")
+    call TEST_PARAMS%get_parameters(ex35_ET0, sKey="EX35_ET0")
+    call TEST_PARAMS%get_parameters(ex35_Kcb, sKey="EX35_Kcb")
     call TEST_PARAMS%get_parameters(ex35_p_minus_ro, sKey="ex35_p_minus_ro")
     call TEST_PARAMS%get_parameters(ex35_irrigation, sKey="ex35_irrigation")
     call TEST_PARAMS%get_parameters(ex35_1_minus_fc, sKey="ex35_1_minus_fc")
@@ -260,8 +260,8 @@ subroutine test_fao56_example_35
 
       Ke = Kr * ( real(Kcb_max, c_double) - real(Kcb, c_double) )
 
-      call assert_equals(Kr, ex35_kr(day),"Kr, day "//as_character(day)//": SWB calculated "//as_character(Kr))
-      call assert_equals(Ke, ex35_ke(day),"Ke, day "//as_character(day)//": SWB calculated "//as_character(Ke))
+      call assert_equals(Kr, ex35_kr(day),message="Kr, day "//as_character(day)//": SWB calculated "//as_character(Kr), delta=1.0e-2)
+      call assert_equals(Ke, ex35_ke(day),message="Ke, day "//as_character(day)//": SWB calculated "//as_character(Ke), delta=1.0e-2)
 
       bare_soil_evap           = reference_et0 * Ke / few
       crop_etc                 = reference_et0 * Kcb * Ks * 0.0 !* (1 - few)

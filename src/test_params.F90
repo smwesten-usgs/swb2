@@ -19,7 +19,6 @@ program test_params
   call PARAMS%add_file("IRRIGATION_lookup_TWO_FACTOR.txt")
   call PARAMS%munge_file()
 
-
   !call PARAM_DICT%get_values(sKey="raincoef_3", fValues=fValues)
 
   !print *, "count: ", ubound(fValues, 1)

@@ -664,8 +664,28 @@ function julian_day ( iYear, iMonth, iDay, iOrigin, sInputItemName ) result(iJD)
   j= iMonth
   k= iDay
 
-  if (.not. (iMonth >= 1 .and. iMonth <= 12))   illegal_month = TRUE
-  if (.not. (iDay >= 1 .and. iDay <= 31))       illegal_day = TRUE
+  select case ( iMonth )
+
+    case (1, 3, 5, 7, 8, 10, 12)
+
+      if ( iDay  < 1 .or. iDay > 31 )   illegal_day = TRUE
+
+    case (2)
+
+      if ( isLeap( iYear) ) then
+        if ( iDay  < 1 .or. iDay > 29 )   illegal_day = TRUE
+      else
+        if ( iDay  < 1 .or. iDay > 28 )   illegal_day = TRUE
+      endif
+    case (4, 6, 9, 11)
+
+      if ( iDay  < 1 .or. iDay > 31 )   illegal_day = TRUE
+
+    case default
+
+      illegal_month = TRUE
+
+  end select
 
   if(present(iOrigin)) then
     iOffset = iOrigin

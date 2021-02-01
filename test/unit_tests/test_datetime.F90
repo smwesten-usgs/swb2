@@ -30,19 +30,30 @@ contains
 
 !-------------------------------------------------------------------------------
 
-   subroutine test_datetime_basic_mangled_dateparse
-   ! datetime: parse with default mm/dd/yyyy date format, missing '0' values in month and day
+   subroutine test_datetime_illegal_values
+   ! datetime: parse with non-existant day value
      type (DATETIME_T) :: dt
 
-     call dt%parseDate("3/2/2011", sFilename=trim(__SRCNAME__), iLineNumber=__LINE__)
-     call assert_equals (3, int(dt%iMonth))
-     call assert_equals (2, int(dt%iDay))
-     call assert_equals (2011, int(dt%iYear))
+     call dt%parseDate("2/29/2001", sFilename=trim(__SRCNAME__), iLineNumber=__LINE__)
+     call assert_true( dt%dJulianDate < 0.)
 
-   end subroutine test_datetime_basic_mangled_dateparse
+   end subroutine test_datetime_illegal_values
 
  !-------------------------------------------------------------------------------
 
+   subroutine test_datetime_basic_mangled_dateparse
+    ! datetime: parse with default mm/dd/yyyy date format, missing '0' values in month and day
+      type (DATETIME_T) :: dt
+ 
+      call dt%parseDate("3/2/2011", sFilename=trim(__SRCNAME__), iLineNumber=__LINE__)
+      call assert_equals (3, int(dt%iMonth))
+      call assert_equals (2, int(dt%iDay))
+      call assert_equals (2011, int(dt%iYear))
+ 
+    end subroutine test_datetime_basic_mangled_dateparse
+ 
+  !-------------------------------------------------------------------------------
+ 
    subroutine test_datetime_custom_dateparse
    ! datetime: parse with custom yyyy-mm-dd date format
 
