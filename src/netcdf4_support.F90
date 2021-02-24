@@ -807,7 +807,7 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
 
     NCFILE%dpFirstAndLastTimeValues = nf_get_first_and_last(NCFILE=NCFILE, &
         iVarIndex=NCFILE%iVarIndex(NC_TIME) )
-
+   
     !> look for and process the "days since MM-D-YYYY" attribute
     call nf_get_time_units(NCFILE=NCFILE)
 
@@ -836,7 +836,7 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
     iColRow_ll = netcdf_coord_to_col_row(NCFILE=NCFILE, &
                                      rX=tGridBounds%rXll, &
                                      rY=tGridBounds%rYll)
-
+  
     iColRow_lr = netcdf_coord_to_col_row(NCFILE=NCFILE, &
                                      rX=tGridBounds%rXlr, &
                                      rY=tGridBounds%rYlr)
@@ -3201,22 +3201,22 @@ function netcdf_coord_to_col_row(NCFILE, rX, rY)  result(iColRow)
   if (rX < (minval(NCFILE%rX_Coords) - x_offset) ) &
     call die( "X coordinate value "//asCharacter(rX)//" is less than the minimum X coordinate " &
       //"value ("//asCharacter(minval(NCFILE%rX_Coords)-x_offset)//") contained in the netCDF file " &
-      //dquote(NCFILE%sFilename) )
+      //dquote(NCFILE%sFilename), trim(__SRCNAME__), __LINE__ )
 
   if (rX > (maxval(NCFILE%rX_Coords) + x_offset) ) &
     call die( "X coordinate value "//asCharacter(rX)//" is greater than the maximum X coordinate " &
       //"value ("//asCharacter(maxval(NCFILE%rX_Coords)+x_offset)//") contained in the netCDF file " &
-      //dquote(NCFILE%sFilename) )
+      //dquote(NCFILE%sFilename), trim(__SRCNAME__), __LINE__  )
 
   if (rY < (minval(NCFILE%rY_Coords) - y_offset) ) &
     call die( "Y coordinate value "//asCharacter(rY)//" is less than the minimum Y coordinate " &
       //"value ("//asCharacter(minval(NCFILE%rY_Coords)-y_offset)//") contained in the netCDF file " &
-      //dquote(NCFILE%sFilename) )
+      //dquote(NCFILE%sFilename), trim(__SRCNAME__), __LINE__  )
 
   if (rY > (maxval(NCFILE%rY_Coords) + y_offset) ) &
     call die( "Y coordinate value "//asCharacter(rY)//" is greater than the maximum Y coordinate " &
       //"value ("//asCharacter(maxval(NCFILE%rY_Coords)+y_offset)//") contained in the netCDF file " &
-      //dquote(NCFILE%sFilename) )
+      //dquote(NCFILE%sFilename), trim(__SRCNAME__), __LINE__  )
 
   iColNum = nf_return_index_double(NCFILE%rX_Coords, rX, x_offset)
   iRowNum = nf_return_index_double(NCFILE%rY_Coords, rY, y_offset)

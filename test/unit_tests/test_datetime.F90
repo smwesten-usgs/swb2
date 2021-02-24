@@ -3,7 +3,7 @@ module test_datetime
   use fruit
   use datetime
   use exceptions
-  use constants_and_conversions, only   : FALSE, iTINYVAL
+  use constants_and_conversions, only   : FALSE, TRUE, iTINYVAL
   implicit none
 
 contains
@@ -81,7 +81,10 @@ contains
       call assert_equals(iTINYVAL, int(dt%iJulianDay))
 !      call assert_equals (5, int(dt%iDay))
 !      call assert_equals (2000, int(dt%iYear))
- 
+
+      ! nasty global variable; must reset to avoid unwanted side effects
+      HALT_UPON_FATAL_ERROR = TRUE
+
     end subroutine test_datetime_julian_date_illegal_month
  
  !-------------------------------------------------------------------------------
@@ -99,7 +102,10 @@ contains
         call assert_equals(iTINYVAL, int(dt%iJulianDay))
   !      call assert_equals (5, int(dt%iDay))
   !      call assert_equals (2000, int(dt%iYear))
-   
+
+        ! nasty global variable; must reset to avoid unwanted side effects
+        HALT_UPON_FATAL_ERROR = TRUE
+
       end subroutine test_datetime_julian_date_illegal_day
   
  !-------------------------------------------------------------------------------
@@ -117,7 +123,9 @@ contains
           call assert_equals(iTINYVAL, int(dt%iJulianDay))
     !      call assert_equals (5, int(dt%iDay))
     !      call assert_equals (2000, int(dt%iYear))
-     
+          ! nasty global variable; must reset to avoid unwanted side effects
+          HALT_UPON_FATAL_ERROR = TRUE
+
         end subroutine test_datetime_julian_date_illegal_month_day
   
   end module test_datetime

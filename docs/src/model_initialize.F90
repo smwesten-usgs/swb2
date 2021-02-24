@@ -141,8 +141,11 @@ contains
     call MODEL%set_output_directory( output_dirname )
     call set_output_prefix( output_prefix )
 
+    print *, trim(__FILE__), ": ", __LINE__
     ! define SWB project boundary and geographic projection
     call initialize_grid_options()
+
+    print *, trim(__FILE__), ": ", __LINE__
 
     ! define the start and end date for the simulation
     call initialize_start_and_end_dates()
@@ -1312,6 +1315,11 @@ contains
     BNDS%fX_ur = rX1
     BNDS%fGridCellSize = rGridCellSize
     BNDS%sPROJ4_string = trim(sArgText)
+
+    print *, trim(__FILE__), ': ', __LINE__
+
+    print *, 'BNDS: '
+    print *, BNDS
 
     MODEL%PROJ4_string = trim(sArgText)
 

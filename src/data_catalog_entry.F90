@@ -110,12 +110,12 @@ module data_catalog_entry
     type (GRID_BOUNDS_T)     :: GRID_BOUNDS_NATIVE
     type (GRID_BOUNDS_T)     :: GRID_BOUNDS_BASE
 
-    integer (c_int)     :: iNC_FILE_STATUS = NETCDF_FILE_CLOSED
+    integer (c_int)          :: iNC_FILE_STATUS = NETCDF_FILE_CLOSED
     type (T_NETCDF4_FILE)    :: NCFILE
 
-    integer (c_int)     :: iNC_ARCHIVE_STATUS = NETCDF_FILE_CLOSED
+    integer (c_int)          :: iNC_ARCHIVE_STATUS = NETCDF_FILE_CLOSED
     type (T_NETCDF4_FILE)    :: NCFILE_ARCHIVE
-    integer (c_size_t)  :: iNCFILE_RECNUM = 0
+    integer (c_size_t)       :: iNCFILE_RECNUM = 0
 
     integer (c_int)     :: iConstantValue = 0
     real (c_float)      :: rConstantValue = 0.0
@@ -1370,7 +1370,7 @@ end subroutine set_constant_value_real
           this%iNC_FILE_STATUS = NETCDF_FILE_CLOSED
         endif
 
-      endif
+      endif  ! end of block to process if NETCDF_FILE_OPEN
 
       if ( this%iNC_FILE_STATUS == NETCDF_FILE_CLOSED ) then
 
@@ -1577,12 +1577,6 @@ end subroutine set_constant_value_real
 
       call LOGS%write( repeat("=", 60) )
       call LOGS%write( "Missing day found in NetCDF file - padding values" )
-!      call stats_WriteMinMeanMax( iLU=6, &
-!        sText=trim(this%NCFILE%sFilename), &
-!        rData=this%pGrdNative%rData)
-!      call stats_WriteMinMeanMax( iLU=6, &
-!        sText=trim(this%NCFILE%sFilename), &
-!        rData=this%pGrdNative%rData)
       call LOGS%write( repeat("=", 60) )
 
     endif
@@ -2109,6 +2103,8 @@ end subroutine set_maximum_allowable_value_real_sub
 
     endif
 
+    ! GRID_BOUNDS_NATIVE will contain the SWB model bounds as defined in the
+    ! projection of the particular dataset
     this%GRID_BOUNDS_NATIVE%rXll = rX(1); this%GRID_BOUNDS_NATIVE%rXlr = rX(2)
     this%GRID_BOUNDS_NATIVE%rYll = rY(1); this%GRID_BOUNDS_NATIVE%rYlr = rY(2)
     this%GRID_BOUNDS_NATIVE%rXul = rX(3); this%GRID_BOUNDS_NATIVE%rXur = rX(4)
