@@ -38,18 +38,13 @@ contains
   !! Open a NetCDF output file to hold fog variable output.
   !!
   !! @param[in] lActive 2-D array of active cells within the model domain.
-  !! @param[in] dX 1D vector of X coordinates associated with the model domain.
-  !! @param[in] dY 1D vector of Y coordinates.
-  !! @param[in] dX_lon 2D array of longitude values.
-  !! @param[in] dY_lat 2D array of latitude values.
-
   subroutine fog_monthly_grid_initialize( lActive )
 
     logical (c_bool), intent(in)     :: lActive(:,:)
 
     ! [ LOCALS ]
     integer (c_int)                 :: iStat
-    type (FSTRING_LIST_T)                 :: slString
+    type (FSTRING_LIST_T)           :: slString
     integer (c_int)                 :: iIndex
     integer (c_int), allocatable    :: iLanduseCodes(:)
     integer (c_int)                 :: iNumberOfLanduses

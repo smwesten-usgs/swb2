@@ -8,13 +8,13 @@
 !> for specific crop types.
 module actual_et__fao56__two_stage
 
-  use iso_c_binding, only              : c_short, c_int, c_float, c_double
-  use constants_and_conversions, only  : TRUE, M_PER_FOOT, in_to_mm
+  use iso_c_binding, only              : c_short, c_int, c_float, c_double, c_bool
+  use constants_and_conversions, only  : TRUE, M_PER_FOOT, in_to_mm, clip
   use fstring_list, only                : FSTRING_LIST_T, create_list
   use parameters, only                 : PARAMS
-  use crop_coefficients__FAO56, only   : KCB_l, KCB_MIN, KCB_INI, KCB_MID, KCB_END,    &
-                                         JAN, DEC, KCB_METHOD_MONTHLY_VALUES,         &
-                                         KCB_METHOD
+  use crop_coefficients__FAO56, only   : KCB_l, KCB_MIN, KCB_INI, KCB_MID, KCB_END,               &
+                                         JAN, DEC, KCB_METHOD_MONTHLY_VALUES,                     &
+                                         KCB_METHOD, crop_coefficients_FAO56_calculate_Kcb_Max
   implicit none
 
   real (c_float), allocatable   :: REW_l(:,:)
@@ -60,8 +60,8 @@ contains
     use parameters, only        : PARAMS, PARAMS_DICT
 
     integer (c_int)               :: number_of_landuses
-    type(FSTRING_LIST_T)                :: slList
-    integer (c_int), allocatable  ::  landuse_table_codes(:)
+    type(FSTRING_LIST_T)          :: slList
+    integer (c_int), allocatable  :: landuse_table_codes(:)
 
     ! create list of possible table headings to look for...
     call slList%append( "LU_Code" )
@@ -89,14 +89,35 @@ contains
 
 !------------------------------------------------------------------------------
 
+elemental subroutine update_evaporable_water_storage( evaporable_water_storage, evaporable_water_deficit,     &
+                                                      infiltration, landuse_index, soil_group)
+
+  real (c_float), intent(inout) :: evaporable_water_storage
+  real (c_float), intent(inout) :: evaporable_water_deficit
+  real (c_float), intent(in)    :: infiltration
+  integer (c_int), intent(in)   :: landuse_index
+  integer (c_int), intent(in)   :: soil_group
+
+  associate( REW => REW_l( landuse_index, soil_group ),         &
+             TEW => TEW_l( landuse_index, soil_group ) )
+
+  evaporable_water_storage = clip( evaporable_water_storage + infiltration, minval=0.0, maxval=TEW)
+  evaporable_water_deficit = max( 0.0, TEW - evaporable_water_storage)
+
+  end associate
+
+end subroutine update_evaporable_water_storage  
+
+!------------------------------------------------------------------------------
+
 elemental function calculate_evaporation_reduction_coefficient_Kr( landuse_index,                          &
                                                                    soil_group,                             &
-                                                                   soil_moisture_deficit )   result( Kr )
+                                                                   evaporable_water_deficit )   result( Kr )
 
   ! [ ARGUMENTS ]
   integer (c_int), intent(in)  :: landuse_index
   integer (c_int), intent(in)  :: soil_group
-  real (c_double), intent(in)  :: soil_moisture_deficit
+  real (c_float), intent(in)   :: evaporable_water_deficit
 
   ! [ RESULT ]
   real (c_double) :: Kr
@@ -104,10 +125,10 @@ elemental function calculate_evaporation_reduction_coefficient_Kr( landuse_index
   associate( REW => REW_l( landuse_index, soil_group ),         &
              TEW => TEW_l( landuse_index, soil_group ) )
 
-    if ( soil_moisture_deficit <= REW ) then
+    if ( evaporable_water_deficit <= REW ) then
       Kr = 1._c_double
-    elseif ( soil_moisture_deficit < TEW ) then
-      Kr = ( real(TEW, c_double) - soil_moisture_deficit )                &
+    elseif ( evaporable_water_deficit < TEW ) then
+      Kr = ( real(TEW, c_double) - evaporable_water_deficit )         &
           / ( real(TEW, c_double) - real(REW, c_double) + 1.0E-8)
     else
       Kr = 0._c_double
@@ -122,11 +143,12 @@ end function calculate_evaporation_reduction_coefficient_Kr
 !> This function estimates the fraction of the ground covered by
 !> vegetation during the growing season
 !> @note Implemented as equation 76, FAO-56, Allen and others
-elemental function calculate_fraction_exposed_and_wetted_soil_fc( landuse_index, Kcb )   result ( few )
+elemental function calculate_fraction_exposed_and_wetted_soil_fc( landuse_index, Kcb, current_plant_height)   result ( few )
 
   ! [ ARGUMENTS ]
   integer (c_int), intent(in)    :: landuse_index
   real (c_float), intent(in)     :: Kcb
+  real (c_float), intent(in)     :: current_plant_height
 
   ! [ RESULT ]
   real (c_float) :: few
@@ -139,7 +161,7 @@ elemental function calculate_fraction_exposed_and_wetted_soil_fc( landuse_index,
 
   numerator = Kcb - KCB_l( KCB_MIN, landuse_index)
   denominator =  KCB_l( KCB_MID, landuse_index)  -  KCB_l( KCB_MIN, landuse_index)
-  exponent = 1.0 + 0.5 * MEAN_PLANT_HEIGHT( landuse_index ) * M_PER_FOOT
+  exponent = 1.0 + 0.5 * current_plant_height * M_PER_FOOT
 
   if( denominator > 0.0_c_double ) then
     r_fc = ( numerator / denominator ) ** exponent
@@ -147,10 +169,7 @@ elemental function calculate_fraction_exposed_and_wetted_soil_fc( landuse_index,
     r_fc = 1.0_c_float
   endif
 
-  few = 1.0_c_float - r_fc
-
-  if ( few < 0._c_float ) few = 0.0_c_float
-  if ( few > 1._c_float ) few = 1.0_c_float
+  few = clip(1.0_c_float - r_fc, minval=0.05, maxval=1.0)
 
 end function calculate_fraction_exposed_and_wetted_soil_fc
 
@@ -158,15 +177,24 @@ end function calculate_fraction_exposed_and_wetted_soil_fc
 
 !> This function estimates Ke, the bare surface evaporation coefficient
 !> @note Implemented as equation 71, FAO-56, Allen and others
-elemental function calculate_surface_evap_coefficient_ke( landuse_index, Kcb, Kr )     result( Ke )
+elemental function calculate_surface_evap_coefficient_ke( landuse_index, Kcb, Kcb_max, Kr,  &
+                                                          fraction_exposed_and_wetted_soil)     result( Ke )
 
   ! [ ARGUMENTS ]
   integer (c_int), intent(in)   :: landuse_index
   real (c_float), intent(in)    :: Kcb
+  real (c_float), intent(in)    :: Kcb_max
   real (c_double), intent(in)   :: Kr
+  real (c_float), intent(in)    :: fraction_exposed_and_wetted_soil
   real (c_double)               :: Ke
+  
+  real (c_double) :: maximum_value
 
-  Ke = Kr * ( real(maxval(KCB_l( KCB_INI:KCB_MIN, landuse_index )), c_double) - real(Kcb, c_double) )
+  ! OK, not quite spelled out in FAO-56, but I don't want to see evaporation coefficients
+  ! greater than one returned from this function
+  maximum_value = min( 1.0_c_double, fraction_exposed_and_wetted_soil * Kcb_max )
+
+  Ke = min( Kr * ( real(Kcb_max, c_double) - real(Kcb, c_double)), maximum_value )
 
 end function calculate_surface_evap_coefficient_ke
 
@@ -189,6 +217,38 @@ elemental subroutine calculate_total_available_water( taw, raw,                 
   raw = taw * adjusted_depletion_fraction_p
 
 end subroutine calculate_total_available_water
+
+!------------------------------------------------------------------------------
+
+!> This function updates the plant height by scaling values relative to the 
+!> position of the current Kcb value on the Kcb curve
+elemental function update_plant_height( landuse_index, it_is_growing_season, Kcb)  result(plant_height)
+
+  integer (c_int), intent(in)  :: landuse_index
+  logical (c_bool), intent(in) :: it_is_growing_season
+  real (c_float), intent(in)   :: Kcb
+  real (c_float)               :: plant_height
+
+  ! [ LOCALS ]
+  real (c_float) :: plant_height_minimum_m
+  real (c_double) :: numerator
+  real (c_double) :: denominator
+  real (c_double) :: exponent
+
+  plant_height_minimum_m = 0.1
+
+  numerator = Kcb - KCB_l( KCB_MIN, landuse_index)
+  denominator =  KCB_l( KCB_MID, landuse_index)  -  KCB_l( KCB_MIN, landuse_index)
+
+  if ( it_is_growing_season ) then
+    ! FAO documentation suggests limiting the plant height range to a value between 1 and 10 meters
+    plant_height = clip(real( numerator/denominator *  MEAN_PLANT_HEIGHT( landuse_index ) * M_PER_FOOT, kind=c_float),  &
+                        minval=plant_height_minimum_m, maxval=10.)
+  else
+    plant_height = plant_height_minimum_m
+  endif
+
+end function update_plant_height
 
 !------------------------------------------------------------------------------
 
@@ -220,7 +280,7 @@ end function calculate_water_stress_coefficient_ks
 
 !------------------------------------------------------------------------------
 
-elemental subroutine calculate_actual_et_fao56_two_stage(                            &
+impure elemental subroutine calculate_actual_et_fao56_two_stage(                            &
                                                   actual_et,                         &
                                                   crop_etc,                          &
                                                   bare_soil_evap,                    &
@@ -232,14 +292,19 @@ elemental subroutine calculate_actual_et_fao56_two_stage(                       
                                                   Ks,                                &
                                                   adjusted_depletion_fraction_p,     &
                                                   soil_moisture_deficit,             &
+                                                  evaporable_water_storage,          &
+                                                  evaporable_water_deficit,          &
+                                                  it_is_growing_season,              &
                                                   Kcb,                               &
                                                   landuse_index,                     &
                                                   soil_group,                        &
                                                   awc,                               &
                                                   current_rooting_depth,             &
+                                                  current_plant_height,              &
                                                   soil_storage,                      &
                                                   soil_storage_max,                  &
-                                                  reference_et0 )
+                                                  reference_et0,                     &
+                                                  infiltration )
 
   real (c_double), intent(inout)            :: actual_et
   real (c_float), intent(inout)             :: crop_etc
@@ -252,6 +317,10 @@ elemental subroutine calculate_actual_et_fao56_two_stage(                       
   real (c_double), intent(inout)            :: Ks
   real (c_double), intent(inout)            :: adjusted_depletion_fraction_p
   real (c_double), intent(inout)            :: soil_moisture_deficit
+  real (c_float), intent(inout)             :: current_plant_height
+  real (c_float), intent(inout)             :: evaporable_water_storage
+  real (c_float), intent(inout)             :: evaporable_water_deficit
+  logical (c_bool), intent(in)              :: it_is_growing_season
   real (c_float), intent(in)                :: Kcb
   integer (c_int), intent(in)               :: landuse_index
   integer (c_int), intent(in)               :: soil_group
@@ -260,31 +329,54 @@ elemental subroutine calculate_actual_et_fao56_two_stage(                       
   real (c_double), intent(in)               :: soil_storage
   real (c_float), intent(in)                :: soil_storage_max
   real (c_float), intent(in)                :: reference_et0
+  real (c_float), intent(in)                :: infiltration
 
+  real (c_float)            :: interim_soil_storage
+  real (c_float)            :: interim_soil_storage2
+  real (c_double)            :: evaporable_water_layer_deficit
+  real (c_float)             :: Kcb_max
+
+  current_plant_height = update_plant_height( landuse_index, it_is_growing_season, Kcb )
+
+  ! ! !
+  ! for now, hard-wiring reasonable values for SE U.S.
+  Kcb_max =  crop_coefficients_FAO56_calculate_Kcb_Max(wind_speed_meters_per_sec=2.,                   &
+                                                       relative_humidity_min_pct=55.,                  &
+                                                       Kcb=Kcb,                                        & 
+                                                       plant_height_meters=current_plant_height) 
 
   adjusted_depletion_fraction_p = adjust_depletion_fraction_p( landuse_index, reference_et0 )
 
-  soil_moisture_deficit = max( 0.0_c_double, real(soil_storage_max, c_double) - soil_storage)
+  
+  call update_evaporable_water_storage( evaporable_water_storage, evaporable_water_deficit, infiltration,    &
+                                        landuse_index, soil_group )
 
   call calculate_total_available_water( taw, raw,                      &
                                         adjusted_depletion_fraction_p, &
                                         current_rooting_depth,         &
                                         awc )
 
-
   Kr = calculate_evaporation_reduction_coefficient_Kr( landuse_index,                    &
                                                        soil_group,                       &
-                                                       soil_moisture_deficit )
+                                                       evaporable_water_deficit )
 
-  fraction_exposed_and_wetted_soil = calculate_fraction_exposed_and_wetted_soil_fc( landuse_index, Kcb )
+  fraction_exposed_and_wetted_soil = calculate_fraction_exposed_and_wetted_soil_fc( landuse_index, Kcb, current_plant_height )
 
-  Ke = min( calculate_surface_evap_coefficient_ke( landuse_index, Kcb, Kr ),                      &
-            fraction_exposed_and_wetted_soil * maxval(KCB_l( KCB_INI:KCB_MIN, landuse_index ) ) )
+  Ke = calculate_surface_evap_coefficient_ke( landuse_index, Kcb, Kcb_max, Kr, fraction_exposed_and_wetted_soil )
+  
+  bare_soil_evap = reference_et0 * Ke
+  evaporable_water_storage = max(0.0, evaporable_water_storage - bare_soil_evap / fraction_exposed_and_wetted_soil)
 
+  ! need to remove bare soil evap from interim soil to yield lower Ks values
+  interim_soil_storage = clip(real(soil_storage + infiltration, kind=c_float), minval=0.0, maxval=soil_storage_max)
+  interim_soil_storage2 = clip(real(soil_storage + infiltration - bare_soil_evap, kind=c_float), minval=0.0, maxval=soil_storage_max)
+  ! need to update bare soil evap term to reduce it in the event that more evap is calculated than water available
+  bare_soil_evap = clip(interim_soil_storage - interim_soil_storage2, minval=0.0, maxval=soil_storage_max)
+
+  soil_moisture_deficit = max( 0.0_c_double, real(soil_storage_max, c_double) - interim_soil_storage2)
   Ks = calculate_water_stress_coefficient_ks(taw, raw, soil_moisture_deficit)
 
-  bare_soil_evap = reference_et0 * Ke
-  crop_etc       = reference_et0 * Kcb * Ks
+  crop_etc = reference_et0 * Kcb * Ks
 
   actual_et = crop_etc + bare_soil_evap
 

@@ -35,8 +35,8 @@ module model_initialize
   type GRIDDED_DATASETS_T
     character (len=38)             :: sName
     character (len=256)            :: sPathname
-    logical (c_bool)          :: lOptional
-    integer (c_int)           :: iDataType
+    logical (c_bool)               :: lOptional
+    integer (c_int)                :: iDataType
   end type GRIDDED_DATASETS_T
 
   type METHODS_LIST_T
@@ -978,6 +978,8 @@ contains
     character (len=512)                   :: sArgText
     character (len=512)                   :: sArgText_1
     character (len=512)                   :: sArgText_2
+    character (len=512)                   :: sArgText_3
+    character (len=512)                   :: sArgText_4
     integer (c_int)                       :: iStat
     type (DATA_CATALOG_ENTRY_T), pointer  :: pENTRY
     logical (c_bool)                      :: lGridPresent
@@ -1017,6 +1019,8 @@ contains
       sArgText = ""
       sArgText_1 = ""
       sArgText_2 = ""
+      sArgText_3 = ""
+      sArgText_4= ""
       call myOptions%clear()
 
       ! process all known directives associated with key word
@@ -1032,8 +1036,10 @@ contains
         ! most of the time, we only care about the first dictionary entry, obtained below
         sArgText_1 = myOptions%get(1)
         sArgText_2 = myOptions%get(2)
+        sArgText_3 = myOptions%get(3)
+        sArgText_4 = myOptions%get(4)
 
-        ! dictionary entries are initially space-delimited; sArgText_1 contains
+        ! dictionary entries are initially space-delimited; sArgText contains
         ! all dictionary entries present, concatenated, with a space between entries
         sArgText = myOptions%get(1, myOptions%count )
 
@@ -1083,18 +1089,20 @@ contains
 
               case ( DATATYPE_FLOAT )
 
-              call pENTRY%initialize_real_table(            &
-                sDescription=trim(sCmdText),                &
-                sDateColumnName = "date",                   &
-                sValueColumnName = pENTRY%sVariableName_z )
+              call pENTRY%initialize(                        &
+                sDescription=trim(sCmdText),                 &
+                sDateColumnName = "date",                    &
+                sValueColumnName = pENTRY%sVariableName_z,   &
+                sType = "float")
               lGridPresent = TRUE
 
             case ( DATATYPE_INT )
 
-              call pENTRY%initialize_integer_table(         &
-                sDescription=trim(sCmdText),                &
-                sDateColumnName = "date",                   &
-                sValueColumnName = pENTRY%sVariableName_z )
+              call pENTRY%initialize(                        &
+                sDescription=trim(sCmdText),                 &
+                sDateColumnName = "date",                    &
+                sValueColumnName = pENTRY%sVariableName_z,   &
+                sType = "integer")
               lGridPresent = TRUE
 
             case default
@@ -1181,11 +1189,13 @@ contains
 
           pENTRY%sVariableName_y = trim(sArgText_1)
 
-        elseif ( sCmdText .containssimilar. "NETCDF_Z_VAR" ) then
+        elseif (      (sCmdText .containssimilar. "NETCDF_Z_VAR")                &
+                 .or. (sCmdText .containssimilar. "COLUMN_NAME") )  then
 
           pENTRY%sVariableName_z = trim(sArgText_1)
 
-        elseif ( sCmdText .containssimilar. "NETCDF_TIME_VAR" ) then
+        elseif (      (sCmdText .containssimilar. "NETCDF_TIME_VAR")             &
+                 .or. (sCmdText .containssimilar. "DATE_COLUMN_NAME") ) then
 
           pENTRY%sVariableName_time = trim(sArgText_1)
 

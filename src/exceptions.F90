@@ -139,10 +139,10 @@ contains
 
     character (len=*), intent(in)               :: sMessage
     character (len=*), intent(in), optional     :: sModule
-    integer (c_int), intent(in), optional  :: iLine
+    integer (c_int), intent(in), optional       :: iLine
     character (len=*), intent(in), optional     :: sHints
     character (len=*), intent(in), optional     :: sCalledBy
-    integer (c_int), intent(in), optional  :: iCalledByLine
+    integer (c_int), intent(in), optional       :: iCalledByLine
 
 !    integer (c_int), intent(in), optional  :: iLU
 
@@ -150,10 +150,16 @@ contains
     character (len=6) :: sLineNum
 
     call LOGS%set_loglevel( LOG_ALL )
-    call LOGS%set_echo( .true._c_bool )
 
-    call LOGS%write( "** ERROR -- PROGRAM EXECUTION HALTED **", iLinesBefore=1, iLinesAfter=1 )
-    call LOGS%write( "error condition:  "//trim(sMessage), iTab=12 )
+    ! if we are suppressing the halting of the overall program, we must be doing unit testing. if
+    ! we're in the middle of unit testing, suppress the normal echoing of error messages to the screen.
+    if (HALT_UPON_FATAL_ERROR) then
+      call LOGS%set_echo( .true._c_bool )
+    else
+      call LOGS%set_echo( .false._c_bool )
+    endif
+
+    call LOGS%write( "error condition:  "//trim(sMessage), iTab=12, iLinesBefore=1 )
 
     if ( present( sCalledBy ) )  &
       call LOGS%write( "called by:  "//trim(sCalledBy), iTab=18 )
@@ -178,7 +184,12 @@ contains
 
     call LOGS%write("", iLinesAfter=1)
 
-    if (HALT_UPON_FATAL_ERROR) stop
+    if (HALT_UPON_FATAL_ERROR) then
+      call LOGS%write( "** ERROR -- PROGRAM EXECUTION HALTED **", iLinesBefore=1, iLinesAfter=1 )
+    else
+      call LOGS%write( "** UNIT TESTING IN PROGRESS - CODE WOULD NORMALLY HALT HERE **", iLinesBefore=1, iLinesAfter=1 )
+    endif
+
 
   end subroutine die
 
@@ -288,13 +299,13 @@ contains
 
   subroutine assert_1bit(lCondition, sMessage, sModule, iLine, sCalledBy, iCalledByLine, sHints )
 
-    logical (c_bool), intent(in)           :: lCondition
+    logical (c_bool), intent(in)                :: lCondition
     character (len=*), intent(in)               :: sMessage
     character (len=*), intent(in), optional     :: sHints
     character (len=*), intent(in), optional     :: sCalledBy
-    integer (c_int), intent(in), optional  :: iCalledByLine
+    integer (c_int), intent(in), optional       :: iCalledByLine
     character (len=*), intent(in), optional     :: sModule
-    integer (c_int), intent(in), optional  :: iLine
+    integer (c_int), intent(in), optional       :: iLine
 
     character (len=256) :: sHints_l
 
@@ -326,13 +337,13 @@ contains
 
 subroutine assert_4bit(lCondition, sMessage, sModule, iLine, sCalledBy, iCalledByLine, sHints )
 
-  logical (4), intent(in)                :: lCondition
+  logical (4), intent(in)                     :: lCondition
   character (len=*), intent(in)               :: sMessage
   character (len=*), intent(in), optional     :: sHints
   character (len=*), intent(in), optional     :: sCalledBy
-  integer (c_int), intent(in), optional  :: iCalledByLine
+  integer (c_int), intent(in), optional       :: iCalledByLine
   character (len=*), intent(in), optional     :: sModule
-  integer (c_int), intent(in), optional  :: iLine
+  integer (c_int), intent(in), optional       :: iLine
 
   character (len=256) :: sHints_l
 

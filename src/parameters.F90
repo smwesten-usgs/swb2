@@ -119,8 +119,9 @@ contains
     type (DICT_ENTRY_T), pointer   :: pCurrentDict
     integer (c_int)                :: iNumberOfHeaderLines
     character (len=:), allocatable :: sNumberOfHeaderLines
-    character (len=256)            :: tempstr
+    character (len=256)            :: column_name
     character (len=256)            :: tempstr2
+    character (len=256)            :: qualified_column_name
     character (len=256)            :: filename1
     character (len=:), allocatable :: comment_chars_
     character (len=:), allocatable :: delimiters_
@@ -142,14 +143,22 @@ contains
       delimiters_ = TAB
     endif
 
-    unique_file_list = this%filenames%unique()
+    !
+    ! proper way to screen for duplicate filenames is further down in loop
+    !
+    !unique_file_list = this%filenames%unique()
+    !if ( unique_file_list%get(1) .ne. '<NA>' ) then
 
-    if ( unique_file_list%get(1) .ne. '<NA>' ) then
+    if ( this%filenames%get(1) .ne. '<NA>' ) then
 
-      ! iterate over the *unique*list of files
-      do iFileIndex = 1, unique_file_list%count
+      do iFileIndex = 1, this%filenames%count
 
-        filename1 = unique_file_list%get(iFileIndex)
+        filename1 = this%filenames%get(iFileIndex)
+
+        ! if this filename has already been seen and processed, ignore and move on to next filename
+        if ( unique_file_list%count_matching(filename1) > 0 ) cycle
+
+        call unique_file_list%append(filename1)
 
         ! open the file associated with current file index value
         call DF%open(sFilename = filename1,                                  &
@@ -172,11 +181,14 @@ contains
         ! loop over each column header
         do iColIndex = 1, DF%slColNames%count
 
-          tempstr = DF%slColNames%get(iColIndex)
+          column_name = DF%slColNames%get(iColIndex)
 
-          if ( PARAMS_DICT%key_already_in_use( tempstr ) ) then
+          if ( PARAMS_DICT%key_already_in_use( column_name ) ) then
 
             skip_this_column( iColIndex ) = TRUE
+
+            call warn("Column name "//sQuote(column_name)//" already in use. Data in this column will be ignored." &
+              //" [filename = "//sQuote(filename1)//"]")
 
             ! Dec 2019: let try eliminating duplicates from the dictionary altogether
 
@@ -198,7 +210,7 @@ contains
 
             ! first add the key to the dictionary entry,
             ! then add dictionary entry to dictionary
-            call pDict%add_key( asUppercase( DF%slColNames%get(iColIndex) ) )
+            call pDict%add_key( column_name )
             call PARAMS_DICT%add_entry( pDict )
 
           endif
@@ -226,9 +238,11 @@ contains
 
             if ( skip_this_column(iColIndex) )  cycle
 
+            column_name = DF%slColNames%get(iColIndex)
+          
             ! find pointer associated with header name
             ! (inefficient, but should be OK for small # of columns)
-            pCurrentDict => PARAMS_DICT%get_entry( DF%slColNames%get(iColIndex) )
+            pCurrentDict => PARAMS_DICT%get_entry( column_name )
 
             if ( associated( pCurrentDict )) then
 

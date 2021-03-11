@@ -295,8 +295,8 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
   if ( .not. (iStat==0 .and. (iMonth > 0 .and. iMonth <= 12) ) ) then
 
     call Assert(FALSE, &
-      "Error parsing month value. Input: "//squote(sMonth)//";"// &
-      " parsed date text: "//trim(sStr), __SRCNAME__, __LINE__, sFilename_l, iLinenumber_l )
+      "Error parsing month value. Parsed value: "//squote(sMonth)//";"// &
+      " input date text: "//trim(sStr), __SRCNAME__, __LINE__, sFilename_l, iLinenumber_l )
 
   endif
 
@@ -311,8 +311,8 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
   if ( .not. (iStat==0 .and. (iDay > 0 .and. iDay <= 31) ) ) then
 
     call Assert(FALSE, &
-      "Error parsing day value - got "//trim(sDay)//";"// &
-      " date text: "//trim(sStr),sFilename_l, iLinenumber_l, __SRCNAME__, __LINE__ )
+      "Error parsing day value. Parsed value: "//trim(sDay)//";"// &
+      " input date text: "//trim(sStr),sFilename_l, iLinenumber_l, __SRCNAME__, __LINE__ )
 
   endif
 
@@ -322,18 +322,15 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
   if ( iStat/=0 ) then
 
     call Assert(FALSE, &
-      "Error parsing year value - got "//trim(sYear)//";"// &
-      " date text: "//trim(sStr),sFilename_l, iLinenumber_l, __SRCNAME__, __LINE__ )
+      "Error parsing year value. Parsed value: "//trim(sYear)//";"// &
+      " input date text: "//trim(sStr),sFilename_l, iLinenumber_l, __SRCNAME__, __LINE__ )
 
   endif
-
-!  if(iYear <= 99 ) iYear = iYear + 1900    ! this might be a lethal assumption
 
   this%iMonth = iMonth
   this%iYear = iYear
   this%iDay = iDay
 
-!  this%dJulianDate = this%dJulianDate + julian_day( iMonth=iMonth, iDay=iDay, iYear=iYear )
   this%dJulianDate = julian_day( iMonth=iMonth, iDay=iDay, iYear=iYear )
 
 end subroutine parse_text_to_date_sub
@@ -667,8 +664,28 @@ function julian_day ( iYear, iMonth, iDay, iOrigin, sInputItemName ) result(iJD)
   j= iMonth
   k= iDay
 
-  if (.not. (iMonth >= 1 .and. iMonth <= 12))   illegal_month = TRUE
-  if (.not. (iDay >= 1 .and. iDay <= 31))       illegal_day = TRUE
+  select case ( iMonth )
+
+    case (1, 3, 5, 7, 8, 10, 12)
+
+      if ( iDay  < 1 .or. iDay > 31 )   illegal_day = TRUE
+
+    case (2)
+
+      if ( isLeap( iYear) ) then
+        if ( iDay  < 1 .or. iDay > 29 )   illegal_day = TRUE
+      else
+        if ( iDay  < 1 .or. iDay > 28 )   illegal_day = TRUE
+      endif
+    case (4, 6, 9, 11)
+
+      if ( iDay  < 1 .or. iDay > 31 )   illegal_day = TRUE
+
+    case default
+
+      illegal_month = TRUE
+
+  end select
 
   if(present(iOrigin)) then
     iOffset = iOrigin
@@ -682,15 +699,17 @@ function julian_day ( iYear, iMonth, iDay, iOrigin, sInputItemName ) result(iJD)
         /12_c_int)/100_c_int)/4_c_int ) - iOffset
 
   if ( illegal_month .or. illegal_day ) then
-    call LOGS%write(" ** there was a problem converting month, day, year values to a Julian date **",    &
-      iLinesBefore=2, iLogLevel=LOG_ALL, lEcho=TRUE)
-    call LOGS%write("    month value: " + as_character(iMonth))
-    call LOGS%write("    day value:   " + as_character(iDay))
-    call LOGS%write("    year value:  " + as_character(iYear))
-    call LOGS%write("    input type:  " + sInputItemName_, iLinesAfter=2)
+!    call LOGS%write(" ** there was a problem converting month, day, year values to a Julian date **",    &
+!      iLinesBefore=2, iLogLevel=LOG_ALL, lEcho=TRUE, iTab=5)
+    call LOGS%write("month value: " + as_character(iMonth), iTab=15)
+    call LOGS%write("day value: " + as_character(iDay), iTab=18)
+    call LOGS%write("year value: " + as_character(iYear), iTab=17)
+    call LOGS%write("input type: " + sInputItemName_, iLinesAfter=1, iTab=17)
 
-    if ( illegal_month)     sBuf = "month value is illegal. "
-    if ( illegal_day)       sBuf = trim(trim(sBuf) + " day value is illegal.")
+    sBuf = "there was a problem converting month, day, year values to a Julian date: "
+
+    if ( illegal_month)     sBuf = adjustl(trim(sBuf) + " month value is illegal. ")
+    if ( illegal_day)       sBuf = adjustl(trim(sBuf) + " day value is illegal.")
 
     call Assert( FALSE, trim(sBuf), __SRCNAME__, __LINE__)
 
