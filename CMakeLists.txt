@@ -5,9 +5,9 @@ project( swb2
 message("Processing top-level CMakelists.txt for project swb2")
 
 set(SWB_MAJOR_VERSION "2")
-set(SWB_MINOR_VERSION "0")
-set(SWB_PATCH_VERSION "3")
-set(SWB_LATEST_VERSION_TAG "v2.0.3")
+set(SWB_MINOR_VERSION "1")
+set(SWB_PATCH_VERSION "0")
+set(SWB_LATEST_VERSION_TAG "v2.1.0")
 
 #------------------------------------------------------------------------------------#
 #                           Force out-of-source build
