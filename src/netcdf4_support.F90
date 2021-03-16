@@ -1534,7 +1534,12 @@ subroutine netcdf_open_file(NCFILE, sFilename, iLU)
 
   ! OK. We only want to attempt to call functions that
   ! process the time variable if a time variable actually exists!!
-  if ( NCFILE%iVarID(NC_TIME) > 0 ) then
+  !
+  ! NOTE: this was previously coded as 'if ( NCFILE%iVarID(NC_TIME) > 0 ) then', which meant that the code
+  !       failed to properly initialize the time units in the event that the TIME variable happened to be
+  !       variable number 0
+  !
+  if ( NCFILE%iVarID(NC_TIME) >= 0 ) then
 
     NCFILE%dpFirstAndLastTimeValues = nf_get_first_and_last(NCFILE=NCFILE, &
         iVarIndex=NCFILE%iVarIndex(NC_TIME) )
