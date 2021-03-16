@@ -186,6 +186,7 @@ contains
 
     if (HALT_UPON_FATAL_ERROR) then
       call LOGS%write( "** ERROR -- PROGRAM EXECUTION HALTED **", iLinesBefore=1, iLinesAfter=1 )
+      stop
     else
       call LOGS%write( "** UNIT TESTING IN PROGRESS - CODE WOULD NORMALLY HALT HERE **", iLinesBefore=1, iLinesAfter=1 )
     endif

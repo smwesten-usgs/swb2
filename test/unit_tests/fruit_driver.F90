@@ -26,7 +26,6 @@ program tests
   call run_test_case(test_string_list_with_character,"[ LOCALS ]")
 
   ! test_datetime.F90:
-  call setup_datetime_tests
   call run_test_case(test_datetime_basic_dateparse,"datetime: parse with default mm/dd/yyyy date format")
   call run_test_case(test_datetime_illegal_values,"datetime: parse with non-existant day value")
   call run_test_case(test_datetime_basic_mangled_dateparse,"datetime: parse with default mm/dd/yyyy date format, missing '0' values in month and day")

@@ -3,17 +3,11 @@ module test_datetime
   use fruit
   use datetime
   use exceptions
-  use logfiles, only               : LOGS
-  use constants_and_conversions, only   : FALSE, iTINYVAL
+  use logfiles, only                    : LOGS
+  use constants_and_conversions, only   : FALSE, TRUE, iTINYVAL
   implicit none
 
 contains
-
-  subroutine setup_datetime_tests
-
-    HALT_UPON_FATAL_ERROR = FALSE
-
-  end subroutine setup_datetime_tests
 
 !-------------------------------------------------------------------------------
 
@@ -99,8 +93,9 @@ contains
       call dt%calcJulianDay(iMonth=0, iDay=28, iYear=2000)
  
       call assert_equals(iTINYVAL, int(dt%iJulianDay))
-!      call assert_equals (5, int(dt%iDay))
-!      call assert_equals (2000, int(dt%iYear))
+
+      ! reset global variable to normal mode of operation (normal == CRASH, HARD, when error is detected)
+      HALT_UPON_FATAL_ERROR = TRUE
  
     end subroutine test_datetime_julian_date_illegal_month
  
@@ -117,9 +112,10 @@ contains
         call dt%calcJulianDay(iMonth=2, iDay=0, iYear=2000)
    
         call assert_equals(iTINYVAL, int(dt%iJulianDay))
-  !      call assert_equals (5, int(dt%iDay))
-  !      call assert_equals (2000, int(dt%iYear))
-   
+
+        ! reset global variable to normal mode of operation (normal == CRASH, HARD, when error is detected)
+        HALT_UPON_FATAL_ERROR = TRUE
+
       end subroutine test_datetime_julian_date_illegal_day
   
  !-------------------------------------------------------------------------------
@@ -135,8 +131,9 @@ contains
           call dt%calcJulianDay(iMonth=13, iDay=0, iYear=2000)
      
           call assert_equals(iTINYVAL, int(dt%iJulianDay))
-    !      call assert_equals (5, int(dt%iDay))
-    !      call assert_equals (2000, int(dt%iYear))
+
+          ! reset global variable to normal mode of operation (normal == CRASH, HARD, when error is detected)
+          HALT_UPON_FATAL_ERROR = TRUE
      
         end subroutine test_datetime_julian_date_illegal_month_day
   
