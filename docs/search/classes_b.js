@@ -1,5 +1,5 @@
 var searchData=
 [
-  ['operator_28_2eapproxequal_2e_29_1490',['operator(.approxequal.)',['../interfaceconstants__and__conversions_1_1operator_07_8approxequal_8_08.html',1,'constants_and_conversions']]],
-  ['output_5fspecs_5ft_1491',['output_specs_t',['../structoutput_1_1output__specs__t.html',1,'output']]]
+  ['parameters_5ft_1467',['parameters_t',['../structparameters_1_1parameters__t.html',1,'parameters']]],
+  ['ptr_5ffragments_5ft_1468',['ptr_fragments_t',['../structprecipitation____method__of__fragments_1_1ptr__fragments__t.html',1,'precipitation__method_of_fragments']]]
 ];

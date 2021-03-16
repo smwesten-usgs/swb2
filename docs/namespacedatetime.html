@@ -109,8 +109,8 @@ Data Types</h2></td></tr>
 Functions/Subroutines</h2></td></tr>
 <tr class="memitem:aff55d6a290d6b501799acd4b32aff1dc"><td class="memItemLeft" align="right" valign="top">subroutine, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacedatetime.html#aff55d6a290d6b501799acd4b32aff1dc">gregorian_date</a> (iJD, iYear, iMonth, iDay, iOrigin)</td></tr>
 <tr class="separator:aff55d6a290d6b501799acd4b32aff1dc"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a00d59f377b22a5de9e18d6ce97dc89f6"><td class="memItemLeft" align="right" valign="top">integer(c_int) function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacedatetime.html#a00d59f377b22a5de9e18d6ce97dc89f6">julian_day</a> (iYear, iMonth, iDay, iOrigin)</td></tr>
-<tr class="separator:a00d59f377b22a5de9e18d6ce97dc89f6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:afa5e67dc36f6d1b413d21032db16c4df"><td class="memItemLeft" align="right" valign="top">integer(c_int) function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacedatetime.html#afa5e67dc36f6d1b413d21032db16c4df">julian_day</a> (iYear, iMonth, iDay, iOrigin, sInputItemName)</td></tr>
+<tr class="separator:afa5e67dc36f6d1b413d21032db16c4df"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a83510e697056c126c8751ad9f455c428"><td class="memItemLeft" align="right" valign="top">integer(c_int) function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacedatetime.html#a83510e697056c126c8751ad9f455c428">mmdd2doy</a> (sMMDD, sInputItemName)</td></tr>
 <tr class="separator:a83510e697056c126c8751ad9f455c428"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5170e448f8881c0329dfd66c757aca85"><td class="memItemLeft" align="right" valign="top">integer(c_int) function, public&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespacedatetime.html#a5170e448f8881c0329dfd66c757aca85">day_of_year</a> (iJD)</td></tr>
@@ -147,7 +147,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="datetime_8_f90_source.html#l01425">1425</a> of file <a class="el" href="datetime_8_f90_source.html">datetime.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="datetime_8_f90_source.html#l01472">1472</a> of file <a class="el" href="datetime_8_f90_source.html">datetime.F90</a>.</p>
 
 </div>
 </div>
@@ -195,7 +195,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="datetime_8_f90_source.html#l00567">567</a> of file <a class="el" href="datetime_8_f90_source.html">datetime.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="datetime_8_f90_source.html#l00565">565</a> of file <a class="el" href="datetime_8_f90_source.html">datetime.F90</a>.</p>
 
 </div>
 </div>
@@ -215,12 +215,12 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="datetime_8_f90_source.html#l01443">1443</a> of file <a class="el" href="datetime_8_f90_source.html">datetime.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="datetime_8_f90_source.html#l01490">1490</a> of file <a class="el" href="datetime_8_f90_source.html">datetime.F90</a>.</p>
 
 </div>
 </div>
-<a id="a00d59f377b22a5de9e18d6ce97dc89f6"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a00d59f377b22a5de9e18d6ce97dc89f6">&#9670;&nbsp;</a></span>julian_day()</h2>
+<a id="afa5e67dc36f6d1b413d21032db16c4df"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#afa5e67dc36f6d1b413d21032db16c4df">&#9670;&nbsp;</a></span>julian_day()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -247,7 +247,13 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">integer (c_int), optional&#160;</td>
-          <td class="paramname"><em>iOrigin</em>&#160;</td>
+          <td class="paramname"><em>iOrigin</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">character (len=*), optional&#160;</td>
+          <td class="paramname"><em>sInputItemName</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -257,7 +263,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="datetime_8_f90_source.html#l00637">637</a> of file <a class="el" href="datetime_8_f90_source.html">datetime.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="datetime_8_f90_source.html#l00635">635</a> of file <a class="el" href="datetime_8_f90_source.html">datetime.F90</a>.</p>
 
 </div>
 </div>
@@ -287,7 +293,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="datetime_8_f90_source.html#l01320">1320</a> of file <a class="el" href="datetime_8_f90_source.html">datetime.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="datetime_8_f90_source.html#l01367">1367</a> of file <a class="el" href="datetime_8_f90_source.html">datetime.F90</a>.</p>
 
 </div>
 </div>
@@ -306,7 +312,7 @@ Variables</h2></td></tr>
 
 <p>Month information. </p>
 
-<p class="definition">Definition at line <a class="el" href="datetime_8_f90_source.html#l00141">141</a> of file <a class="el" href="datetime_8_f90_source.html">datetime.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="datetime_8_f90_source.html#l00142">142</a> of file <a class="el" href="datetime_8_f90_source.html">datetime.F90</a>.</p>
 
 </div>
 </div>
@@ -322,7 +328,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="datetime_8_f90_source.html#l00109">109</a> of file <a class="el" href="datetime_8_f90_source.html">datetime.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="datetime_8_f90_source.html#l00110">110</a> of file <a class="el" href="datetime_8_f90_source.html">datetime.F90</a>.</p>
 
 </div>
 </div>
@@ -338,7 +344,7 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="datetime_8_f90_source.html#l00120">120</a> of file <a class="el" href="datetime_8_f90_source.html">datetime.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="datetime_8_f90_source.html#l00121">121</a> of file <a class="el" href="datetime_8_f90_source.html">datetime.F90</a>.</p>
 
 </div>
 </div>

@@ -493,7 +493,7 @@ $(document).ready(function(){initNavTree('swbstats2__support_8_f90_source.html',
 <div class="line"><a name="l00399"></a><span class="lineno">  399</span>&#160;    <span class="keywordflow">do</span> ix=1,ubound(grid_values,1)</div>
 <div class="line"><a name="l00400"></a><span class="lineno">  400</span>&#160;      <span class="keywordflow">do</span> iy=1,ubound(grid_values,2)</div>
 <div class="line"><a name="l00401"></a><span class="lineno">  401</span>&#160; </div>
-<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;        <span class="keywordflow">if</span> (grid_values(ix, iy) &lt;= 0 )  cycle</div>
+<div class="line"><a name="l00402"></a><span class="lineno">  402</span>&#160;        <span class="keywordflow">if</span> (grid_values(ix, iy) &lt; 0 )  cycle</div>
 <div class="line"><a name="l00403"></a><span class="lineno">  403</span>&#160; </div>
 <div class="line"><a name="l00404"></a><span class="lineno">  404</span>&#160;        sval = ascharacter( grid_values(ix,iy) )</div>
 <div class="line"><a name="l00405"></a><span class="lineno">  405</span>&#160; </div>
@@ -1281,367 +1281,368 @@ $(document).ready(function(){initNavTree('swbstats2__support_8_f90_source.html',
 <div class="line"><a name="l01187"></a><span class="lineno"> 1187</span>&#160;<span class="keywordtype">    real</span> (c_double), <span class="keywordtype">allocatable</span>   :: stats(:)</div>
 <div class="line"><a name="l01188"></a><span class="lineno"> 1188</span>&#160;    <span class="keywordtype">integer (c_int)</span>                :: funit_l</div>
 <div class="line"><a name="l01189"></a><span class="lineno"> 1189</span>&#160;    <span class="keywordtype">character (len=:)</span>, <span class="keywordtype">allocatable</span> :: delimiter_</div>
-<div class="line"><a name="l01190"></a><span class="lineno"> 1190</span>&#160; </div>
-<div class="line"><a name="l01191"></a><span class="lineno"> 1191</span>&#160;    <span class="keywordflow">if</span> (<span class="keyword">present</span>(funit)) <span class="keywordflow">then</span></div>
-<div class="line"><a name="l01192"></a><span class="lineno"> 1192</span>&#160;      funit_l = funit</div>
-<div class="line"><a name="l01193"></a><span class="lineno"> 1193</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01194"></a><span class="lineno"> 1194</span>&#160;      funit_l = output_unit</div>
-<div class="line"><a name="l01195"></a><span class="lineno"> 1195</span>&#160;<span class="keywordflow">    endif</span></div>
-<div class="line"><a name="l01196"></a><span class="lineno"> 1196</span>&#160; </div>
-<div class="line"><a name="l01197"></a><span class="lineno"> 1197</span>&#160;    <span class="keywordflow">if</span> (<span class="keyword">present</span>(delimiter) ) <span class="keywordflow">then</span></div>
-<div class="line"><a name="l01198"></a><span class="lineno"> 1198</span>&#160;      delimiter_ = trim(delimiter)</div>
-<div class="line"><a name="l01199"></a><span class="lineno"> 1199</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01200"></a><span class="lineno"> 1200</span>&#160;      delimiter_ = <span class="stringliteral">&quot;,&quot;</span></div>
-<div class="line"><a name="l01201"></a><span class="lineno"> 1201</span>&#160;<span class="keywordflow">    endif</span></div>
-<div class="line"><a name="l01202"></a><span class="lineno"> 1202</span>&#160; </div>
-<div class="line"><a name="l01203"></a><span class="lineno"> 1203</span>&#160;    <span class="keywordflow">if</span> (<span class="keyword">present</span>(zone2_ids) .and. <span class="keyword">present</span>(unique_zone2_list)) <span class="keywordflow">then</span></div>
-<div class="line"><a name="l01204"></a><span class="lineno"> 1204</span>&#160; </div>
-<div class="line"><a name="l01205"></a><span class="lineno"> 1205</span>&#160;      <span class="comment">! sort the values before use</span></div>
-<div class="line"><a name="l01206"></a><span class="lineno"> 1206</span>&#160;      <span class="keyword">call </span>unique_zone_list%sort_integer()</div>
-<div class="line"><a name="l01207"></a><span class="lineno"> 1207</span>&#160;      <span class="keyword">call </span>unique_zone2_list%sort_integer()</div>
-<div class="line"><a name="l01208"></a><span class="lineno"> 1208</span>&#160; </div>
-<div class="line"><a name="l01209"></a><span class="lineno"> 1209</span>&#160;      <span class="comment">! obtain list of unique integers present in the zone grid</span></div>
-<div class="line"><a name="l01210"></a><span class="lineno"> 1210</span>&#160;      zone_values = unique_zone_list%get_integer()</div>
-<div class="line"><a name="l01211"></a><span class="lineno"> 1211</span>&#160;      zone2_values = unique_zone2_list%get_integer()</div>
-<div class="line"><a name="l01212"></a><span class="lineno"> 1212</span>&#160; </div>
-<div class="line"><a name="l01213"></a><span class="lineno"> 1213</span>&#160;      <span class="keywordflow">if</span> (<span class="keyword">present</span>(comparison_values)) <span class="keywordflow">then</span></div>
-<div class="line"><a name="l01214"></a><span class="lineno"> 1214</span>&#160; </div>
-<div class="line"><a name="l01215"></a><span class="lineno"> 1215</span>&#160;        <span class="keywordflow">do</span> i=1,ubound(zone_values,1)</div>
-<div class="line"><a name="l01216"></a><span class="lineno"> 1216</span>&#160;          <span class="keywordflow">do</span> j=1,ubound(zone2_values,1)</div>
-<div class="line"><a name="l01217"></a><span class="lineno"> 1217</span>&#160;            n = zone_values(i)</div>
-<div class="line"><a name="l01218"></a><span class="lineno"> 1218</span>&#160;            m = zone2_values(j)</div>
-<div class="line"><a name="l01219"></a><span class="lineno"> 1219</span>&#160;            <span class="keyword">call </span><a class="code" href="namespaceswbstats2__support.html#abf0b85035d6592bc9576183c2378eb0b">calc_multizonal_stats</a>(values, zone_ids, target_id=n, target2_id=m,    &amp;</div>
-<div class="line"><a name="l01220"></a><span class="lineno"> 1220</span>&#160;                                  result_vector=stats,                                 &amp;</div>
-<div class="line"><a name="l01221"></a><span class="lineno"> 1221</span>&#160;                                  zone2_ids=zone2_ids,                                 &amp;</div>
-<div class="line"><a name="l01222"></a><span class="lineno"> 1222</span>&#160;                                  comparison_values=comparison_values)</div>
-<div class="line"><a name="l01223"></a><span class="lineno"> 1223</span>&#160;  </div>
-<div class="line"><a name="l01224"></a><span class="lineno"> 1224</span>&#160;            <span class="keyword">write</span>(unit=funit_l, fmt=<span class="stringliteral">&quot;(2(a,a),2(i0,a),4(g16.10,a),i0,a,4(g16.10,a),i0)&quot;</span>) &amp;</div>
-<div class="line"><a name="l01225"></a><span class="lineno"> 1225</span>&#160;              start_date%prettydate(),delimiter_,                                       &amp;</div>
-<div class="line"><a name="l01226"></a><span class="lineno"> 1226</span>&#160;              end_date%prettydate(), delimiter_,                                        &amp;</div>
-<div class="line"><a name="l01227"></a><span class="lineno"> 1227</span>&#160;              n, delimiter_, m, delimiter_,                                             &amp;</div>
-<div class="line"><a name="l01228"></a><span class="lineno"> 1228</span>&#160;              stats(1), delimiter_, stats(2), delimiter_, stats(3), delimiter_,         &amp;</div>
-<div class="line"><a name="l01229"></a><span class="lineno"> 1229</span>&#160;              stats(4), delimiter_, int(stats(5)), delimiter_,                          &amp;</div>
-<div class="line"><a name="l01230"></a><span class="lineno"> 1230</span>&#160;              stats(6), delimiter_, stats(7), delimiter_, stats(8), delimiter_,         &amp;</div>
-<div class="line"><a name="l01231"></a><span class="lineno"> 1231</span>&#160;              stats(9), delimiter_, int(stats(10))</div>
-<div class="line"><a name="l01232"></a><span class="lineno"> 1232</span>&#160; </div>
-<div class="line"><a name="l01233"></a><span class="lineno"> 1233</span>&#160;<span class="keywordflow">          enddo</span></div>
-<div class="line"><a name="l01234"></a><span class="lineno"> 1234</span>&#160;<span class="keywordflow">        enddo</span></div>
-<div class="line"><a name="l01235"></a><span class="lineno"> 1235</span>&#160; </div>
-<div class="line"><a name="l01236"></a><span class="lineno"> 1236</span>&#160;      <span class="keywordflow">else</span> </div>
-<div class="line"><a name="l01237"></a><span class="lineno"> 1237</span>&#160; </div>
-<div class="line"><a name="l01238"></a><span class="lineno"> 1238</span>&#160;        <span class="keywordflow">do</span> i=1,ubound(zone_values,1)</div>
-<div class="line"><a name="l01239"></a><span class="lineno"> 1239</span>&#160;          <span class="keywordflow">do</span> j=1,ubound(zone2_values,1)</div>
-<div class="line"><a name="l01240"></a><span class="lineno"> 1240</span>&#160;            n = zone_values(i)</div>
-<div class="line"><a name="l01241"></a><span class="lineno"> 1241</span>&#160;            m = zone2_values(j)</div>
-<div class="line"><a name="l01242"></a><span class="lineno"> 1242</span>&#160; </div>
-<div class="line"><a name="l01243"></a><span class="lineno"> 1243</span>&#160;            <span class="keyword">call </span><a class="code" href="namespaceswbstats2__support.html#abf0b85035d6592bc9576183c2378eb0b">calc_multizonal_stats</a>(values, zone_ids, target_id=n, target2_id=m,    &amp;</div>
-<div class="line"><a name="l01244"></a><span class="lineno"> 1244</span>&#160;              result_vector=stats, zone2_ids=zone2_ids)</div>
-<div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160; </div>
-<div class="line"><a name="l01246"></a><span class="lineno"> 1246</span>&#160;            <span class="keyword">write</span>(unit=funit_l, fmt=<span class="stringliteral">&quot;(2(a,a),2(i0,a),4(g16.10,a),i0)&quot;</span>)                 &amp;</div>
-<div class="line"><a name="l01247"></a><span class="lineno"> 1247</span>&#160;              start_date%prettydate(), delimiter_,                                     &amp;</div>
-<div class="line"><a name="l01248"></a><span class="lineno"> 1248</span>&#160;              end_date%prettydate(), delimiter_,                                       &amp;</div>
-<div class="line"><a name="l01249"></a><span class="lineno"> 1249</span>&#160;              n, delimiter_, m, delimiter_,                                            &amp;</div>
-<div class="line"><a name="l01250"></a><span class="lineno"> 1250</span>&#160;              stats(1), delimiter_, stats(2), delimiter_, stats(3), delimiter_,        &amp;</div>
-<div class="line"><a name="l01251"></a><span class="lineno"> 1251</span>&#160;              stats(4), delimiter_, int(stats(5))</div>
-<div class="line"><a name="l01252"></a><span class="lineno"> 1252</span>&#160;<span class="keywordflow">          enddo</span></div>
-<div class="line"><a name="l01253"></a><span class="lineno"> 1253</span>&#160;<span class="keywordflow">        enddo</span></div>
-<div class="line"><a name="l01254"></a><span class="lineno"> 1254</span>&#160; </div>
-<div class="line"><a name="l01255"></a><span class="lineno"> 1255</span>&#160;<span class="keywordflow">      endif</span>  </div>
-<div class="line"><a name="l01256"></a><span class="lineno"> 1256</span>&#160; </div>
-<div class="line"><a name="l01257"></a><span class="lineno"> 1257</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01258"></a><span class="lineno"> 1258</span>&#160;      <span class="comment">! obtain list of unique integers present in the zone grid</span></div>
-<div class="line"><a name="l01259"></a><span class="lineno"> 1259</span>&#160;      zone_values = unique_zone_list%get_integer()</div>
-<div class="line"><a name="l01260"></a><span class="lineno"> 1260</span>&#160; </div>
-<div class="line"><a name="l01261"></a><span class="lineno"> 1261</span>&#160;      <span class="keywordflow">if</span> (<span class="keyword">present</span>(comparison_values)) <span class="keywordflow">then</span></div>
-<div class="line"><a name="l01262"></a><span class="lineno"> 1262</span>&#160; </div>
-<div class="line"><a name="l01263"></a><span class="lineno"> 1263</span>&#160;        <span class="keywordflow">do</span> i=1,ubound(zone_values,1)</div>
-<div class="line"><a name="l01264"></a><span class="lineno"> 1264</span>&#160;          n = zone_values(i)</div>
-<div class="line"><a name="l01265"></a><span class="lineno"> 1265</span>&#160;   </div>
-<div class="line"><a name="l01266"></a><span class="lineno"> 1266</span>&#160;          <span class="keyword">call </span><a class="code" href="namespaceswbstats2__support.html#aef52306ec66db3359788597634d9e4b6">calc_zonal_stats</a>(values, zone_ids, target_id=n, result_vector=stats,   &amp;</div>
-<div class="line"><a name="l01267"></a><span class="lineno"> 1267</span>&#160;            comparison_values=comparison_values)</div>
-<div class="line"><a name="l01268"></a><span class="lineno"> 1268</span>&#160;          <span class="keyword">write</span>(unit=funit_l, fmt=<span class="stringliteral">&quot;(2(a,a),i0,a,4(g16.10,a),i0,a,4(g16.10,a),i0)&quot;</span>)    &amp;</div>
-<div class="line"><a name="l01269"></a><span class="lineno"> 1269</span>&#160;            start_date%prettydate(), delimiter_,                                      &amp;</div>
-<div class="line"><a name="l01270"></a><span class="lineno"> 1270</span>&#160;            end_date%prettydate(), delimiter_,                                        &amp;</div>
-<div class="line"><a name="l01271"></a><span class="lineno"> 1271</span>&#160;            n, delimiter_,                                                            &amp;</div>
-<div class="line"><a name="l01272"></a><span class="lineno"> 1272</span>&#160;            stats(1), delimiter_, stats(2), delimiter_, stats(3), delimiter_,         &amp;</div>
-<div class="line"><a name="l01273"></a><span class="lineno"> 1273</span>&#160;            stats(4), delimiter_, int(stats(5)), delimiter_,                          &amp;</div>
-<div class="line"><a name="l01274"></a><span class="lineno"> 1274</span>&#160;            stats(6), delimiter_, stats(7), delimiter_, stats(8), delimiter_,         &amp;</div>
-<div class="line"><a name="l01275"></a><span class="lineno"> 1275</span>&#160;            stats(9), delimiter_, int(stats(10))</div>
-<div class="line"><a name="l01276"></a><span class="lineno"> 1276</span>&#160; </div>
-<div class="line"><a name="l01277"></a><span class="lineno"> 1277</span>&#160;<span class="keywordflow">        enddo</span></div>
-<div class="line"><a name="l01278"></a><span class="lineno"> 1278</span>&#160;      </div>
-<div class="line"><a name="l01279"></a><span class="lineno"> 1279</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01280"></a><span class="lineno"> 1280</span>&#160; </div>
-<div class="line"><a name="l01281"></a><span class="lineno"> 1281</span>&#160;        <span class="keywordflow">do</span> i=1,ubound(zone_values,1)</div>
-<div class="line"><a name="l01282"></a><span class="lineno"> 1282</span>&#160;          n = zone_values(i)</div>
-<div class="line"><a name="l01283"></a><span class="lineno"> 1283</span>&#160; </div>
-<div class="line"><a name="l01284"></a><span class="lineno"> 1284</span>&#160;          <span class="keyword">call </span><a class="code" href="namespaceswbstats2__support.html#aef52306ec66db3359788597634d9e4b6">calc_zonal_stats</a>(values, zone_ids, target_id=n, result_vector=stats)</div>
-<div class="line"><a name="l01285"></a><span class="lineno"> 1285</span>&#160;          <span class="keyword">write</span>(unit=funit_l, fmt=<span class="stringliteral">&quot;(2(a,a),i0,a,4(f16.10,a),i0)&quot;</span>)                       &amp;</div>
-<div class="line"><a name="l01286"></a><span class="lineno"> 1286</span>&#160;            start_date%prettydate(), delimiter_,                                        &amp;</div>
-<div class="line"><a name="l01287"></a><span class="lineno"> 1287</span>&#160;            end_date%prettydate(), delimiter_,                                          &amp;</div>
-<div class="line"><a name="l01288"></a><span class="lineno"> 1288</span>&#160;            n, delimiter_,                                                              &amp;</div>
-<div class="line"><a name="l01289"></a><span class="lineno"> 1289</span>&#160;            stats(1), delimiter_, stats(2), delimiter_, stats(3), delimiter_,           &amp;</div>
-<div class="line"><a name="l01290"></a><span class="lineno"> 1290</span>&#160;            stats(4), delimiter_, int(stats(5))</div>
-<div class="line"><a name="l01291"></a><span class="lineno"> 1291</span>&#160;<span class="keywordflow">        enddo</span></div>
-<div class="line"><a name="l01292"></a><span class="lineno"> 1292</span>&#160; </div>
-<div class="line"><a name="l01293"></a><span class="lineno"> 1293</span>&#160;<span class="keywordflow">      endif</span></div>
-<div class="line"><a name="l01294"></a><span class="lineno"> 1294</span>&#160; </div>
-<div class="line"><a name="l01295"></a><span class="lineno"> 1295</span>&#160;<span class="keywordflow">    endif</span></div>
-<div class="line"><a name="l01296"></a><span class="lineno"> 1296</span>&#160; </div>
-<div class="line"><a name="l01297"></a><span class="lineno"> 1297</span>&#160;  <span class="keyword">end subroutine </span><a class="code" href="namespaceswbstats2__support.html#ab09ac12045e8977989270347e0d29b0e">output_zonal_stats</a></div>
-<div class="line"><a name="l01298"></a><span class="lineno"> 1298</span>&#160; </div>
-<div class="line"><a name="l01299"></a><span class="lineno"> 1299</span>&#160;<span class="comment">!------------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l01300"></a><span class="lineno"> 1300</span>&#160; </div>
-<div class="line"><a name="l01301"></a><span class="lineno"><a class="line" href="namespaceswbstats2__support.html#a9ba75035f1e3b7f50078802433f4650b"> 1301</a></span>&#160;  <span class="keyword">subroutine </span><a class="code" href="namespaceswbstats2__support.html#a9ba75035f1e3b7f50078802433f4650b">open_output_netcdf_files</a>(this,                                    &amp;</div>
-<div class="line"><a name="l01302"></a><span class="lineno"> 1302</span>&#160;                                      output_files)</div>
-<div class="line"><a name="l01303"></a><span class="lineno"> 1303</span>&#160; </div>
-<div class="line"><a name="l01304"></a><span class="lineno"> 1304</span>&#160;    class(<a class="code" href="structswbstats2__support_1_1swbstats__t.html">swbstats_t</a>), <span class="keywordtype">intent(inout)</span>           :: this</div>
-<div class="line"><a name="l01305"></a><span class="lineno"> 1305</span>&#160;    <span class="keywordtype">type</span> (FILE_COLLECTION_T), <span class="keywordtype">intent(inout)</span>     :: output_files(:)</div>
-<div class="line"><a name="l01306"></a><span class="lineno"> 1306</span>&#160; </div>
-<div class="line"><a name="l01307"></a><span class="lineno"> 1307</span>&#160;    <span class="comment">! [ LOCALS ]</span></div>
-<div class="line"><a name="l01308"></a><span class="lineno"> 1308</span>&#160;    <span class="keywordtype">integer (c_int)</span>                   :: stat_indx</div>
-<div class="line"><a name="l01309"></a><span class="lineno"> 1309</span>&#160;    <span class="keywordtype">integer (c_int)</span>                   :: status</div>
-<div class="line"><a name="l01310"></a><span class="lineno"> 1310</span>&#160;    <span class="keywordtype">type</span> (T_NETCDF4_FILE), <span class="keywordtype">pointer</span>    :: ncfile_out</div>
-<div class="line"><a name="l01311"></a><span class="lineno"> 1311</span>&#160;    <span class="keywordtype">character (len=:)</span>, <span class="keywordtype">allocatable</span>    :: units_string</div>
-<div class="line"><a name="l01312"></a><span class="lineno"> 1312</span>&#160;    <span class="keywordtype">character (len=:)</span>, <span class="keywordtype">allocatable</span>    :: filename_prefix</div>
-<div class="line"><a name="l01313"></a><span class="lineno"> 1313</span>&#160; </div>
-<div class="line"><a name="l01314"></a><span class="lineno"> 1314</span>&#160;    <span class="keywordflow">if</span> (<span class="keyword">allocated</span>( this%output_file_prefix) ) <span class="keywordflow">then</span></div>
-<div class="line"><a name="l01315"></a><span class="lineno"> 1315</span>&#160;      filename_prefix = this%output_file_prefix</div>
-<div class="line"><a name="l01316"></a><span class="lineno"> 1316</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01317"></a><span class="lineno"> 1317</span>&#160;      filename_prefix = <span class="stringliteral">&quot;&quot;</span></div>
-<div class="line"><a name="l01318"></a><span class="lineno"> 1318</span>&#160;<span class="keywordflow">    endif</span></div>
-<div class="line"><a name="l01319"></a><span class="lineno"> 1319</span>&#160; </div>
-<div class="line"><a name="l01320"></a><span class="lineno"> 1320</span>&#160;    <span class="keywordflow">do</span> stat_indx=<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2acd1bee0e435ef218139734cad44ea66a">stats_mean</a>, <a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a76eab4ab58362fc886c5755747ad88d4">stats_variance</a></div>
-<div class="line"><a name="l01321"></a><span class="lineno"> 1321</span>&#160; </div>
-<div class="line"><a name="l01322"></a><span class="lineno"> 1322</span>&#160;      <span class="keywordflow">if</span> ( .not. output_files(stat_indx)%output_active )  cycle</div>
-<div class="line"><a name="l01323"></a><span class="lineno"> 1323</span>&#160; </div>
-<div class="line"><a name="l01324"></a><span class="lineno"> 1324</span>&#160;      <span class="keywordflow">if</span> (output_files(stat_indx)%write_netcdf) <span class="keywordflow">then</span></div>
-<div class="line"><a name="l01325"></a><span class="lineno"> 1325</span>&#160; </div>
-<div class="line"><a name="l01326"></a><span class="lineno"> 1326</span>&#160;        <span class="keywordflow">if</span> ( this%annualize_stats .and. stat_indx == <a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a19e69c7853d2849e66d506046d0425ec">stats_sum</a>) <span class="keywordflow">then</span></div>
-<div class="line"><a name="l01327"></a><span class="lineno"> 1327</span>&#160;          units_string = trim(this%netcdf_variable_units_string)//<span class="stringliteral">&quot;, per year&quot;</span></div>
-<div class="line"><a name="l01328"></a><span class="lineno"> 1328</span>&#160;        <span class="keywordflow">elseif</span> (this%report_as_volume) <span class="keywordflow">then</span></div>
-<div class="line"><a name="l01329"></a><span class="lineno"> 1329</span>&#160;          units_string = <span class="stringliteral">&quot;cubic meters&quot;</span></div>
-<div class="line"><a name="l01330"></a><span class="lineno"> 1330</span>&#160;        <span class="keywordflow">elseif</span> (this%report_in_meters) <span class="keywordflow">then</span></div>
-<div class="line"><a name="l01331"></a><span class="lineno"> 1331</span>&#160;          units_string = <span class="stringliteral">&quot;meters&quot;</span></div>
-<div class="line"><a name="l01332"></a><span class="lineno"> 1332</span>&#160;        <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01333"></a><span class="lineno"> 1333</span>&#160;          units_string = trim(this%netcdf_variable_units_string)</div>
-<div class="line"><a name="l01334"></a><span class="lineno"> 1334</span>&#160;<span class="keywordflow">        endif</span></div>
-<div class="line"><a name="l01335"></a><span class="lineno"> 1335</span>&#160; </div>
-<div class="line"><a name="l01336"></a><span class="lineno"> 1336</span>&#160;        <span class="keyword">allocate</span>( output_files(stat_indx)%nc_ptr, stat=status)</div>
-<div class="line"><a name="l01337"></a><span class="lineno"> 1337</span>&#160;        <span class="keyword">call </span>assert( status==0, <span class="stringliteral">&quot;Problem allocating netcdf file data structure.&quot;</span>, &amp;</div>
-<div class="line"><a name="l01338"></a><span class="lineno"> 1338</span>&#160;          __srcname__, __line__)</div>
-<div class="line"><a name="l01339"></a><span class="lineno"> 1339</span>&#160;        ncfile_out =&gt; output_files(stat_indx)%nc_ptr</div>
-<div class="line"><a name="l01340"></a><span class="lineno"> 1340</span>&#160; </div>
-<div class="line"><a name="l01341"></a><span class="lineno"> 1341</span>&#160;        <span class="keyword">call </span>netcdf_open_and_prepare_as_output(                                     &amp;</div>
-<div class="line"><a name="l01342"></a><span class="lineno"> 1342</span>&#160;              ncfile=ncfile_out,                                                    &amp;</div>
-<div class="line"><a name="l01343"></a><span class="lineno"> 1343</span>&#160;              svariablename=trim(this%netcdf_variable_name_string),                 &amp;</div>
-<div class="line"><a name="l01344"></a><span class="lineno"> 1344</span>&#160;              svariableunits=units_string,                                          &amp;</div>
-<div class="line"><a name="l01345"></a><span class="lineno"> 1345</span>&#160;              inx=this%ncfile_in%iNX,                                               &amp;</div>
-<div class="line"><a name="l01346"></a><span class="lineno"> 1346</span>&#160;              iny=this%ncfile_in%iNY,                                               &amp;</div>
-<div class="line"><a name="l01347"></a><span class="lineno"> 1347</span>&#160;              fx=this%ncfile_in%rX_Coords,                                          &amp;</div>
-<div class="line"><a name="l01348"></a><span class="lineno"> 1348</span>&#160;              fy=this%ncfile_in%rY_Coords,                                          &amp;</div>
-<div class="line"><a name="l01349"></a><span class="lineno"> 1349</span>&#160;              proj4_string=trim(this%target_proj4_string),                          &amp;</div>
-<div class="line"><a name="l01350"></a><span class="lineno"> 1350</span>&#160;              startdate=sim_dt%start,                                               &amp;</div>
-<div class="line"><a name="l01351"></a><span class="lineno"> 1351</span>&#160;              enddate=sim_dt%end,                                                   &amp;</div>
-<div class="line"><a name="l01352"></a><span class="lineno"> 1352</span>&#160;              executable_name=<span class="stringliteral">&quot;SWBSTATS2&quot;</span>,                                          &amp;</div>
-<div class="line"><a name="l01353"></a><span class="lineno"> 1353</span>&#160;              filename_prefix=filename_prefix,                                      &amp;</div>
-<div class="line"><a name="l01354"></a><span class="lineno"> 1354</span>&#160;              filename_modifier=this%filename_modifier_string                       &amp;</div>
-<div class="line"><a name="l01355"></a><span class="lineno"> 1355</span>&#160;                                //<span class="stringliteral">&quot;_&quot;</span>//output_files(stat_indx)%stats_description )</div>
-<div class="line"><a name="l01356"></a><span class="lineno"> 1356</span>&#160; </div>
-<div class="line"><a name="l01357"></a><span class="lineno"> 1357</span>&#160;<span class="keywordflow">      endif</span></div>
-<div class="line"><a name="l01358"></a><span class="lineno"> 1358</span>&#160; </div>
-<div class="line"><a name="l01359"></a><span class="lineno"> 1359</span>&#160;<span class="keywordflow">    enddo</span></div>
-<div class="line"><a name="l01360"></a><span class="lineno"> 1360</span>&#160; </div>
-<div class="line"><a name="l01361"></a><span class="lineno"> 1361</span>&#160;  <span class="keyword">end subroutine </span><a class="code" href="namespaceswbstats2__support.html#a9ba75035f1e3b7f50078802433f4650b">open_output_netcdf_files</a></div>
-<div class="line"><a name="l01362"></a><span class="lineno"> 1362</span>&#160; </div>
-<div class="line"><a name="l01363"></a><span class="lineno"> 1363</span>&#160;<span class="comment">!------------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l01364"></a><span class="lineno"> 1364</span>&#160; </div>
-<div class="line"><a name="l01365"></a><span class="lineno"><a class="line" href="namespaceswbstats2__support.html#a1bcdfd547562a74474b2f1eb75ece1c0"> 1365</a></span>&#160;  <span class="keyword">subroutine </span><a class="code" href="namespaceswbstats2__support.html#a1bcdfd547562a74474b2f1eb75ece1c0">close_output_netcdf_files</a>(this, output_files)</div>
-<div class="line"><a name="l01366"></a><span class="lineno"> 1366</span>&#160; </div>
-<div class="line"><a name="l01367"></a><span class="lineno"> 1367</span>&#160;    class(<a class="code" href="structswbstats2__support_1_1swbstats__t.html">swbstats_t</a>), <span class="keywordtype">intent(inout)</span>         :: this</div>
-<div class="line"><a name="l01368"></a><span class="lineno"> 1368</span>&#160;    <span class="keywordtype">type</span> (FILE_COLLECTION_T), <span class="keywordtype">intent(inout)</span>   :: output_files(:)</div>
-<div class="line"><a name="l01369"></a><span class="lineno"> 1369</span>&#160; </div>
-<div class="line"><a name="l01370"></a><span class="lineno"> 1370</span>&#160;    <span class="comment">! [ LOCALS ]</span></div>
-<div class="line"><a name="l01371"></a><span class="lineno"> 1371</span>&#160;    <span class="keywordtype">integer (c_int)</span>              :: stat_indx</div>
-<div class="line"><a name="l01372"></a><span class="lineno"> 1372</span>&#160;    <span class="keywordtype">integer (c_int)</span>              :: status</div>
-<div class="line"><a name="l01373"></a><span class="lineno"> 1373</span>&#160;    <span class="keywordtype">type</span> (T_NETCDF4_FILE), <span class="keywordtype">pointer</span>    :: ncfile_out</div>
-<div class="line"><a name="l01374"></a><span class="lineno"> 1374</span>&#160; </div>
-<div class="line"><a name="l01375"></a><span class="lineno"> 1375</span>&#160;    <span class="keywordflow">do</span> stat_indx=<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2acd1bee0e435ef218139734cad44ea66a">stats_mean</a>, <a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a76eab4ab58362fc886c5755747ad88d4">stats_variance</a></div>
-<div class="line"><a name="l01376"></a><span class="lineno"> 1376</span>&#160; </div>
-<div class="line"><a name="l01377"></a><span class="lineno"> 1377</span>&#160;      <span class="keywordflow">if</span> ( .not. output_files(stat_indx)%output_active )  cycle</div>
-<div class="line"><a name="l01378"></a><span class="lineno"> 1378</span>&#160; </div>
-<div class="line"><a name="l01379"></a><span class="lineno"> 1379</span>&#160;      <span class="keywordflow">if</span> (output_files(stat_indx)%write_netcdf) <span class="keywordflow">then</span></div>
-<div class="line"><a name="l01380"></a><span class="lineno"> 1380</span>&#160; </div>
-<div class="line"><a name="l01381"></a><span class="lineno"> 1381</span>&#160;        ncfile_out =&gt; output_files(stat_indx)%nc_ptr</div>
-<div class="line"><a name="l01382"></a><span class="lineno"> 1382</span>&#160;        <span class="keyword">call </span>netcdf_close_file(ncfile=ncfile_out)</div>
-<div class="line"><a name="l01383"></a><span class="lineno"> 1383</span>&#160; </div>
-<div class="line"><a name="l01384"></a><span class="lineno"> 1384</span>&#160;<span class="keywordflow">      endif</span></div>
-<div class="line"><a name="l01385"></a><span class="lineno"> 1385</span>&#160; </div>
-<div class="line"><a name="l01386"></a><span class="lineno"> 1386</span>&#160;<span class="keywordflow">    enddo</span></div>
-<div class="line"><a name="l01387"></a><span class="lineno"> 1387</span>&#160; </div>
-<div class="line"><a name="l01388"></a><span class="lineno"> 1388</span>&#160;  <span class="keyword">end subroutine </span><a class="code" href="namespaceswbstats2__support.html#a1bcdfd547562a74474b2f1eb75ece1c0">close_output_netcdf_files</a></div>
-<div class="line"><a name="l01389"></a><span class="lineno"> 1389</span>&#160; </div>
-<div class="line"><a name="l01390"></a><span class="lineno"> 1390</span>&#160;<span class="comment">!------------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l01391"></a><span class="lineno"> 1391</span>&#160; </div>
-<div class="line"><a name="l01392"></a><span class="lineno"><a class="line" href="namespaceswbstats2__support.html#ae2b1490d0a2dfd1b05b6d9eb1cb5c1f8"> 1392</a></span>&#160;  <span class="keyword">subroutine </span><a class="code" href="namespaceswbstats2__support.html#ae2b1490d0a2dfd1b05b6d9eb1cb5c1f8">open_zonal_stats_output_file</a>(this, filename, delimiter)</div>
-<div class="line"><a name="l01393"></a><span class="lineno"> 1393</span>&#160; </div>
-<div class="line"><a name="l01394"></a><span class="lineno"> 1394</span>&#160;    class(<a class="code" href="structswbstats2__support_1_1swbstats__t.html">swbstats_t</a>), <span class="keywordtype">intent(inout)</span>       :: this</div>
-<div class="line"><a name="l01395"></a><span class="lineno"> 1395</span>&#160;    <span class="keywordtype">character (len=*)</span>                       :: filename</div>
-<div class="line"><a name="l01396"></a><span class="lineno"> 1396</span>&#160;    <span class="keywordtype">character (len=*)</span>, <span class="keywordtype">intent(in)</span>, <span class="keywordtype">optional</span> :: delimiter </div>
-<div class="line"><a name="l01397"></a><span class="lineno"> 1397</span>&#160; </div>
-<div class="line"><a name="l01398"></a><span class="lineno"> 1398</span>&#160;    <span class="comment">! [ LOCALS ]</span></div>
-<div class="line"><a name="l01399"></a><span class="lineno"> 1399</span>&#160;    <span class="keywordtype">character (len=256)</span>            :: header_str</div>
-<div class="line"><a name="l01400"></a><span class="lineno"> 1400</span>&#160;    <span class="keywordtype">character (len=:)</span>, <span class="keywordtype">allocatable</span> :: delimiter_</div>
-<div class="line"><a name="l01401"></a><span class="lineno"> 1401</span>&#160; </div>
-<div class="line"><a name="l01402"></a><span class="lineno"> 1402</span>&#160;    <span class="keywordflow">if</span> (<span class="keyword">present</span>(delimiter)) <span class="keywordflow">then</span></div>
-<div class="line"><a name="l01403"></a><span class="lineno"> 1403</span>&#160;      delimiter_ = delimiter</div>
-<div class="line"><a name="l01404"></a><span class="lineno"> 1404</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01405"></a><span class="lineno"> 1405</span>&#160;      delimiter_ = <span class="stringliteral">&quot;,&quot;</span></div>
-<div class="line"><a name="l01406"></a><span class="lineno"> 1406</span>&#160;<span class="keywordflow">    endif</span>  </div>
-<div class="line"><a name="l01407"></a><span class="lineno"> 1407</span>&#160; </div>
-<div class="line"><a name="l01408"></a><span class="lineno"> 1408</span>&#160;    <span class="keyword">call </span>this%zonal_stats_output_file%open(filename)</div>
-<div class="line"><a name="l01409"></a><span class="lineno"> 1409</span>&#160; </div>
-<div class="line"><a name="l01410"></a><span class="lineno"> 1410</span>&#160;    <span class="keywordflow">if</span> (len_trim(this%zone_grid2_filename) &gt; 0) <span class="keywordflow">then</span></div>
-<div class="line"><a name="l01411"></a><span class="lineno"> 1411</span>&#160; </div>
-<div class="line"><a name="l01412"></a><span class="lineno"> 1412</span>&#160;      <span class="keywordflow">if</span> (this%multiple_comparison_grids .or. this%compare_to_obs_values) <span class="keywordflow">then</span></div>
-<div class="line"><a name="l01413"></a><span class="lineno"> 1413</span>&#160;        header_str = <span class="stringliteral">&quot;start_date&quot;</span>//delimiter_//<span class="stringliteral">&quot;end_date&quot;</span>//delimiter_//<span class="stringliteral">&quot;zone_id&quot;</span>   &amp;</div>
-<div class="line"><a name="l01414"></a><span class="lineno"> 1414</span>&#160;          //delimiter_//<span class="stringliteral">&quot;zone2_id&quot;</span>//delimiter_//<span class="stringliteral">&quot;minimum_swb&quot;</span>//delimiter_           &amp;</div>
-<div class="line"><a name="l01415"></a><span class="lineno"> 1415</span>&#160;          //<span class="stringliteral">&quot;maximum_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;mean_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;sum_swb&quot;</span>           &amp;</div>
-<div class="line"><a name="l01416"></a><span class="lineno"> 1416</span>&#160;          //delimiter_//<span class="stringliteral">&quot;count_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;minimum_obs&quot;</span>//delimiter_          &amp;</div>
-<div class="line"><a name="l01417"></a><span class="lineno"> 1417</span>&#160;          //<span class="stringliteral">&quot;maximum_obs&quot;</span>//delimiter_//<span class="stringliteral">&quot;mean_obs&quot;</span>//delimiter_//<span class="stringliteral">&quot;sum_obs&quot;</span>           &amp;</div>
-<div class="line"><a name="l01418"></a><span class="lineno"> 1418</span>&#160;          //delimiter_//<span class="stringliteral">&quot;count_obs&quot;</span></div>
-<div class="line"><a name="l01419"></a><span class="lineno"> 1419</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01420"></a><span class="lineno"> 1420</span>&#160;        header_str = <span class="stringliteral">&quot;start_date&quot;</span>//delimiter_//<span class="stringliteral">&quot;end_date&quot;</span>//delimiter_//<span class="stringliteral">&quot;zone_id&quot;</span>   &amp;</div>
-<div class="line"><a name="l01421"></a><span class="lineno"> 1421</span>&#160;        //delimiter_//<span class="stringliteral">&quot;zone2_id&quot;</span>//delimiter_//<span class="stringliteral">&quot;minimum_swb&quot;</span>//delimiter_             &amp;</div>
-<div class="line"><a name="l01422"></a><span class="lineno"> 1422</span>&#160;          //<span class="stringliteral">&quot;maximum_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;mean_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;sum_swb&quot;</span>           &amp;</div>
-<div class="line"><a name="l01423"></a><span class="lineno"> 1423</span>&#160;          //delimiter_//<span class="stringliteral">&quot;count_swb&quot;</span></div>
-<div class="line"><a name="l01424"></a><span class="lineno"> 1424</span>&#160;<span class="keywordflow">      endif</span></div>
-<div class="line"><a name="l01425"></a><span class="lineno"> 1425</span>&#160; </div>
-<div class="line"><a name="l01426"></a><span class="lineno"> 1426</span>&#160;    <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01427"></a><span class="lineno"> 1427</span>&#160; </div>
-<div class="line"><a name="l01428"></a><span class="lineno"> 1428</span>&#160;      <span class="keywordflow">if</span> (this%multiple_comparison_grids .or. this%compare_to_obs_values) <span class="keywordflow">then</span></div>
-<div class="line"><a name="l01429"></a><span class="lineno"> 1429</span>&#160; </div>
-<div class="line"><a name="l01430"></a><span class="lineno"> 1430</span>&#160;        header_str = <span class="stringliteral">&quot;start_date&quot;</span>//delimiter_//<span class="stringliteral">&quot;end_date&quot;</span>//delimiter_//<span class="stringliteral">&quot;zone_id&quot;</span>   &amp;</div>
-<div class="line"><a name="l01431"></a><span class="lineno"> 1431</span>&#160;          //delimiter_//<span class="stringliteral">&quot;minimum_swb&quot;</span>//delimiter_                                  &amp;</div>
-<div class="line"><a name="l01432"></a><span class="lineno"> 1432</span>&#160;          //<span class="stringliteral">&quot;maximum_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;mean_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;sum_swb&quot;</span>           &amp;</div>
-<div class="line"><a name="l01433"></a><span class="lineno"> 1433</span>&#160;          //delimiter_//<span class="stringliteral">&quot;count_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;minimum_obs&quot;</span>//delimiter_          &amp;</div>
-<div class="line"><a name="l01434"></a><span class="lineno"> 1434</span>&#160;          //<span class="stringliteral">&quot;maximum_obs&quot;</span>//delimiter_//<span class="stringliteral">&quot;mean_obs&quot;</span>//delimiter_//<span class="stringliteral">&quot;sum_obs&quot;</span>           &amp;</div>
-<div class="line"><a name="l01435"></a><span class="lineno"> 1435</span>&#160;          //delimiter_//<span class="stringliteral">&quot;count_obs&quot;</span></div>
-<div class="line"><a name="l01436"></a><span class="lineno"> 1436</span>&#160; </div>
-<div class="line"><a name="l01437"></a><span class="lineno"> 1437</span>&#160;      <span class="keywordflow">else</span></div>
-<div class="line"><a name="l01438"></a><span class="lineno"> 1438</span>&#160; </div>
-<div class="line"><a name="l01439"></a><span class="lineno"> 1439</span>&#160;        header_str = <span class="stringliteral">&quot;start_date&quot;</span>//delimiter_//<span class="stringliteral">&quot;end_date&quot;</span>//delimiter_//<span class="stringliteral">&quot;zone_id&quot;</span>   &amp;</div>
-<div class="line"><a name="l01440"></a><span class="lineno"> 1440</span>&#160;          //delimiter_//<span class="stringliteral">&quot;minimum_swb&quot;</span>//delimiter_                                  &amp;</div>
-<div class="line"><a name="l01441"></a><span class="lineno"> 1441</span>&#160;          //<span class="stringliteral">&quot;maximum_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;mean_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;sum_swb&quot;</span>           &amp;</div>
-<div class="line"><a name="l01442"></a><span class="lineno"> 1442</span>&#160;          //delimiter_//<span class="stringliteral">&quot;count_swb&quot;</span></div>
-<div class="line"><a name="l01443"></a><span class="lineno"> 1443</span>&#160; </div>
-<div class="line"><a name="l01444"></a><span class="lineno"> 1444</span>&#160;<span class="keywordflow">      endif</span></div>
-<div class="line"><a name="l01445"></a><span class="lineno"> 1445</span>&#160; </div>
-<div class="line"><a name="l01446"></a><span class="lineno"> 1446</span>&#160;<span class="keywordflow">    endif</span></div>
-<div class="line"><a name="l01447"></a><span class="lineno"> 1447</span>&#160; </div>
-<div class="line"><a name="l01448"></a><span class="lineno"> 1448</span>&#160;    <span class="keyword">call </span>this%zonal_stats_output_file%writeLine(trim(header_str))</div>
-<div class="line"><a name="l01449"></a><span class="lineno"> 1449</span>&#160; </div>
-<div class="line"><a name="l01450"></a><span class="lineno"> 1450</span>&#160;  <span class="keyword">end subroutine </span><a class="code" href="namespaceswbstats2__support.html#ae2b1490d0a2dfd1b05b6d9eb1cb5c1f8">open_zonal_stats_output_file</a></div>
-<div class="line"><a name="l01451"></a><span class="lineno"> 1451</span>&#160; </div>
-<div class="line"><a name="l01452"></a><span class="lineno"> 1452</span>&#160;<span class="comment">!------------------------------------------------------------------------------</span></div>
-<div class="line"><a name="l01453"></a><span class="lineno"> 1453</span>&#160; </div>
-<div class="line"><a name="l01454"></a><span class="lineno"><a class="line" href="namespaceswbstats2__support.html#a4348e3834883ca9d18c24e3b7ba3607a"> 1454</a></span>&#160;  <span class="keyword">subroutine </span><a class="code" href="namespaceswbstats2__support.html#a4348e3834883ca9d18c24e3b7ba3607a">print_all_options</a>(this)</div>
-<div class="line"><a name="l01455"></a><span class="lineno"> 1455</span>&#160; </div>
-<div class="line"><a name="l01456"></a><span class="lineno"> 1456</span>&#160;    class(<a class="code" href="structswbstats2__support_1_1swbstats__t.html">swbstats_t</a>) :: this</div>
-<div class="line"><a name="l01457"></a><span class="lineno"> 1457</span>&#160; </div>
-<div class="line"><a name="l01458"></a><span class="lineno"> 1458</span>&#160;    <span class="comment">! [ LOCALS ]</span></div>
-<div class="line"><a name="l01459"></a><span class="lineno"> 1459</span>&#160;    <span class="keywordtype">character (len=:)</span>, <span class="keywordtype">allocatable</span>  :: fmt_string</div>
-<div class="line"><a name="l01460"></a><span class="lineno"> 1460</span>&#160; </div>
-<div class="line"><a name="l01461"></a><span class="lineno"> 1461</span>&#160;    <span class="keyword">write</span>(*,fmt=<span class="stringliteral">&quot;(/,/,a)&quot;</span>) <span class="stringliteral">&quot;  :: Dump of swbstats2 program this ::&quot;</span></div>
-<div class="line"><a name="l01462"></a><span class="lineno"> 1462</span>&#160;    <span class="keyword">write</span>(*,fmt=<span class="stringliteral">&quot;(a,/)&quot;</span>) repeat(<span class="stringliteral">&quot;-&quot;</span>, 43)</div>
-<div class="line"><a name="l01463"></a><span class="lineno"> 1463</span>&#160; </div>
-<div class="line"><a name="l01464"></a><span class="lineno"> 1464</span>&#160;    fmt_string = <span class="stringliteral">&quot;(a,t30,&#39;: &#39;,l)&quot;</span></div>
-<div class="line"><a name="l01465"></a><span class="lineno"> 1465</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;write_csv&quot;</span>, this%write_csv</div>
-<div class="line"><a name="l01466"></a><span class="lineno"> 1466</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;write_netcdf (SUM)&quot;</span>, <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a19e69c7853d2849e66d506046d0425ec">stats_sum</a>)%write_netcdf</div>
-<div class="line"><a name="l01467"></a><span class="lineno"> 1467</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;write_netcdf (MEAN)&quot;</span>, <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2acd1bee0e435ef218139734cad44ea66a">stats_mean</a>)%write_netcdf</div>
-<div class="line"><a name="l01468"></a><span class="lineno"> 1468</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;write_netcdf (VARIANCE)&quot;</span>, <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a76eab4ab58362fc886c5755747ad88d4">stats_variance</a>)%write_netcdf</div>
-<div class="line"><a name="l01469"></a><span class="lineno"> 1469</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;write_arcgrid (SUM)&quot;</span>, <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a19e69c7853d2849e66d506046d0425ec">stats_sum</a>)%write_arcgrid</div>
-<div class="line"><a name="l01470"></a><span class="lineno"> 1470</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;write_arcgrid (MEAN)&quot;</span>, <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2acd1bee0e435ef218139734cad44ea66a">stats_mean</a>)%write_arcgrid</div>
-<div class="line"><a name="l01471"></a><span class="lineno"> 1471</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;write_arcgrid (VARIANCE)&quot;</span>, <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a76eab4ab58362fc886c5755747ad88d4">stats_variance</a>)%write_arcgrid</div>
-<div class="line"><a name="l01472"></a><span class="lineno"> 1472</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;output_active (SUM)&quot;</span>, <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a19e69c7853d2849e66d506046d0425ec">stats_sum</a>)%output_active</div>
-<div class="line"><a name="l01473"></a><span class="lineno"> 1473</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;output_active (MEAN)&quot;</span>, <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2acd1bee0e435ef218139734cad44ea66a">stats_mean</a>)%output_active</div>
-<div class="line"><a name="l01474"></a><span class="lineno"> 1474</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;output_active (VARIANCE)&quot;</span>, <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a76eab4ab58362fc886c5755747ad88d4">stats_variance</a>)%output_active</div>
-<div class="line"><a name="l01475"></a><span class="lineno"> 1475</span>&#160; </div>
-<div class="line"><a name="l01476"></a><span class="lineno"> 1476</span>&#160;    fmt_string = <span class="stringliteral">&quot;(a,t40,&#39;: &#39;,l)&quot;</span></div>
-<div class="line"><a name="l01477"></a><span class="lineno"> 1477</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;grid pointer allocated? (SUM)&quot;</span>, <span class="keyword">associated</span>( <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a19e69c7853d2849e66d506046d0425ec">stats_sum</a>)%grid_ptr)</div>
-<div class="line"><a name="l01478"></a><span class="lineno"> 1478</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;grid pointer allocated? (MEAN)&quot;</span>, <span class="keyword">associated</span>( <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2acd1bee0e435ef218139734cad44ea66a">stats_mean</a>)%grid_ptr)</div>
-<div class="line"><a name="l01479"></a><span class="lineno"> 1479</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;grid pointer allocated? (VARIANCE)&quot;</span>, <span class="keyword">associated</span>( <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a76eab4ab58362fc886c5755747ad88d4">stats_variance</a>)%grid_ptr)</div>
-<div class="line"><a name="l01480"></a><span class="lineno"> 1480</span>&#160; </div>
-<div class="line"><a name="l01481"></a><span class="lineno"> 1481</span>&#160;    fmt_string = <span class="stringliteral">&quot;(a,t30,&#39;: &#39;,l)&quot;</span></div>
-<div class="line"><a name="l01482"></a><span class="lineno"> 1482</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;calc_zonal_stats&quot;</span>, this%calc_zonal_stats</div>
-<div class="line"><a name="l01483"></a><span class="lineno"> 1483</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;compare_to_obs_values&quot;</span>, this%compare_to_obs_values</div>
-<div class="line"><a name="l01484"></a><span class="lineno"> 1484</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;annualize_stats&quot;</span>, this%annualize_stats</div>
-<div class="line"><a name="l01485"></a><span class="lineno"> 1485</span>&#160; </div>
-<div class="line"><a name="l01486"></a><span class="lineno"> 1486</span>&#160;    fmt_string = <span class="stringliteral">&quot;(a,t30,&#39;: &#39;,a)&quot;</span></div>
-<div class="line"><a name="l01487"></a><span class="lineno"> 1487</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;target_proj4_string&quot;</span>, this%target_proj4_string</div>
-<div class="line"><a name="l01488"></a><span class="lineno"> 1488</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;data_start_date&quot;</span>, this%data_start_date%prettydate()</div>
-<div class="line"><a name="l01489"></a><span class="lineno"> 1489</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;data_end_date&quot;</span>, this%data_end_date%prettydate()</div>
-<div class="line"><a name="l01490"></a><span class="lineno"> 1490</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;slice_start_date&quot;</span>, this%slice_start_date%prettydate()</div>
-<div class="line"><a name="l01491"></a><span class="lineno"> 1491</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;slice_end_date&quot;</span>, this%slice_end_date%prettydate()</div>
-<div class="line"><a name="l01492"></a><span class="lineno"> 1492</span>&#160;    <span class="comment">!date_range_string</span></div>
-<div class="line"><a name="l01493"></a><span class="lineno"> 1493</span>&#160; </div>
-<div class="line"><a name="l01494"></a><span class="lineno"> 1494</span>&#160;    fmt_string = <span class="stringliteral">&quot;(a,t30,&#39;: &#39;,i0)&quot;</span></div>
-<div class="line"><a name="l01495"></a><span class="lineno"> 1495</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;input grid bounds, nx&quot;</span>, bnds%iNumCols</div>
-<div class="line"><a name="l01496"></a><span class="lineno"> 1496</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;input grid bounds, ny&quot;</span>, bnds%iNumRows</div>
-<div class="line"><a name="l01497"></a><span class="lineno"> 1497</span>&#160; </div>
-<div class="line"><a name="l01498"></a><span class="lineno"> 1498</span>&#160;    fmt_string = <span class="stringliteral">&quot;(a,t35,&#39;: &#39;,f16.5)&quot;</span></div>
-<div class="line"><a name="l01499"></a><span class="lineno"> 1499</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;input grid bounds, X_ll&quot;</span>, bnds%fX_ll</div>
-<div class="line"><a name="l01500"></a><span class="lineno"> 1500</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;input grid bounds, Y_ll&quot;</span>, bnds%fY_ll</div>
-<div class="line"><a name="l01501"></a><span class="lineno"> 1501</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;input grid bounds, X_ur&quot;</span>, bnds%fX_ur</div>
-<div class="line"><a name="l01502"></a><span class="lineno"> 1502</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;input grid bounds, Y_ur&quot;</span>, bnds%fY_ur</div>
-<div class="line"><a name="l01503"></a><span class="lineno"> 1503</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;input grid bounds, grid-cell size&quot;</span>, bnds%fGridCellSize</div>
-<div class="line"><a name="l01504"></a><span class="lineno"> 1504</span>&#160; </div>
-<div class="line"><a name="l01505"></a><span class="lineno"> 1505</span>&#160;    fmt_string = <span class="stringliteral">&quot;(a,t30,&#39;: &#39;,i0)&quot;</span></div>
-<div class="line"><a name="l01506"></a><span class="lineno"> 1506</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;calculation_time_period&quot;</span>, this%calculation_time_period</div>
-<div class="line"><a name="l01507"></a><span class="lineno"> 1507</span>&#160; </div>
-<div class="line"><a name="l01508"></a><span class="lineno"> 1508</span>&#160;    fmt_string = <span class="stringliteral">&quot;(a,t30,&#39;: &#39;,a)&quot;</span></div>
-<div class="line"><a name="l01509"></a><span class="lineno"> 1509</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;stress_period_filename&quot;</span>, this%stress_period_filename</div>
-<div class="line"><a name="l01510"></a><span class="lineno"> 1510</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;comparison_period_filename&quot;</span>, this%comparison_period_filename</div>
-<div class="line"><a name="l01511"></a><span class="lineno"> 1511</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;zone_period_filename&quot;</span>, this%zone_period_filename</div>
-<div class="line"><a name="l01512"></a><span class="lineno"> 1512</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;comparison_grid_filename&quot;</span>, this%comparison_grid_filename</div>
-<div class="line"><a name="l01513"></a><span class="lineno"> 1513</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;zone_grid_filename&quot;</span>, this%zone_grid_filename</div>
-<div class="line"><a name="l01514"></a><span class="lineno"> 1514</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;netcdf_input_filename&quot;</span>, this%netcdf_input_filename</div>
-<div class="line"><a name="l01515"></a><span class="lineno"> 1515</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;netcdf_variable_name_string&quot;</span>, this%netcdf_variable_name_string</div>
-<div class="line"><a name="l01516"></a><span class="lineno"> 1516</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;netcdf_variable_units_string&quot;</span>, this%netcdf_variable_units_string</div>
-<div class="line"><a name="l01517"></a><span class="lineno"> 1517</span>&#160; </div>
-<div class="line"><a name="l01518"></a><span class="lineno"> 1518</span>&#160;    fmt_string = <span class="stringliteral">&quot;(a,t30,&#39;: &#39;,l)&quot;</span></div>
-<div class="line"><a name="l01519"></a><span class="lineno"> 1519</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;netcdf_input_file_is_open    : &quot;</span>, this%netcdf_input_file_is_open</div>
-<div class="line"><a name="l01520"></a><span class="lineno"> 1520</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;multiple_zone_grids          : &quot;</span>, this%multiple_zone_grids</div>
-<div class="line"><a name="l01521"></a><span class="lineno"> 1521</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;multiple_comparison_grids    : &quot;</span>, this%multiple_comparison_grids</div>
-<div class="line"><a name="l01522"></a><span class="lineno"> 1522</span>&#160;    <span class="comment">!comparison_grid_conversion_factor = 1.0_c_double</span></div>
-<div class="line"><a name="l01523"></a><span class="lineno"> 1523</span>&#160;    fmt_string = <span class="stringliteral">&quot;(/,a,/,&#39;&quot;</span>//repeat(<span class="stringliteral">&quot;-&quot;</span>,62)//<span class="stringliteral">&quot;&#39;)&quot;</span></div>
-<div class="line"><a name="l01524"></a><span class="lineno"> 1524</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;Start date list&quot;</span></div>
-<div class="line"><a name="l01525"></a><span class="lineno"> 1525</span>&#160;    <span class="keyword">call </span>this%start_date_list%print()</div>
-<div class="line"><a name="l01526"></a><span class="lineno"> 1526</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;End date list&quot;</span></div>
-<div class="line"><a name="l01527"></a><span class="lineno"> 1527</span>&#160;    <span class="keyword">call </span>this%end_date_list%print()</div>
-<div class="line"><a name="l01528"></a><span class="lineno"> 1528</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;Date index list&quot;</span></div>
-<div class="line"><a name="l01529"></a><span class="lineno"> 1529</span>&#160;    <span class="keyword">call </span>this%date_range_id_list%print()</div>
-<div class="line"><a name="l01530"></a><span class="lineno"> 1530</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;Unique zone id list&quot;</span></div>
-<div class="line"><a name="l01531"></a><span class="lineno"> 1531</span>&#160;    <span class="keyword">call </span>this%unique_zone_list%print()</div>
-<div class="line"><a name="l01532"></a><span class="lineno"> 1532</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;Comparison grid file list&quot;</span></div>
-<div class="line"><a name="l01533"></a><span class="lineno"> 1533</span>&#160;    <span class="keyword">call </span>this%comparison_grid_file_list%print()</div>
-<div class="line"><a name="l01534"></a><span class="lineno"> 1534</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;Zone grid file list&quot;</span></div>
-<div class="line"><a name="l01535"></a><span class="lineno"> 1535</span>&#160;    <span class="keyword">call </span>this%zone_grid_file_list%print()</div>
-<div class="line"><a name="l01536"></a><span class="lineno"> 1536</span>&#160; </div>
-<div class="line"><a name="l01537"></a><span class="lineno"> 1537</span>&#160;  <span class="keyword">end subroutine </span><a class="code" href="namespaceswbstats2__support.html#a4348e3834883ca9d18c24e3b7ba3607a">print_all_options</a></div>
-<div class="line"><a name="l01538"></a><span class="lineno"> 1538</span>&#160; </div>
-<div class="line"><a name="l01539"></a><span class="lineno"> 1539</span>&#160;<span class="keyword">end module </span><a class="code" href="namespaceswbstats2__support.html">swbstats2_support</a></div>
+<div class="line"><a name="l01190"></a><span class="lineno"> 1190</span>&#160;    <span class="keywordtype">character (len=6)</span>, <span class="keywordtype">parameter</span>   :: NUM_FMT = <span class="stringliteral">&quot;g25.16&quot;</span></div>
+<div class="line"><a name="l01191"></a><span class="lineno"> 1191</span>&#160; </div>
+<div class="line"><a name="l01192"></a><span class="lineno"> 1192</span>&#160;    <span class="keywordflow">if</span> (<span class="keyword">present</span>(funit)) <span class="keywordflow">then</span></div>
+<div class="line"><a name="l01193"></a><span class="lineno"> 1193</span>&#160;      funit_l = funit</div>
+<div class="line"><a name="l01194"></a><span class="lineno"> 1194</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01195"></a><span class="lineno"> 1195</span>&#160;      funit_l = output_unit</div>
+<div class="line"><a name="l01196"></a><span class="lineno"> 1196</span>&#160;<span class="keywordflow">    endif</span></div>
+<div class="line"><a name="l01197"></a><span class="lineno"> 1197</span>&#160; </div>
+<div class="line"><a name="l01198"></a><span class="lineno"> 1198</span>&#160;    <span class="keywordflow">if</span> (<span class="keyword">present</span>(delimiter) ) <span class="keywordflow">then</span></div>
+<div class="line"><a name="l01199"></a><span class="lineno"> 1199</span>&#160;      delimiter_ = trim(delimiter)</div>
+<div class="line"><a name="l01200"></a><span class="lineno"> 1200</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01201"></a><span class="lineno"> 1201</span>&#160;      delimiter_ = <span class="stringliteral">&quot;,&quot;</span></div>
+<div class="line"><a name="l01202"></a><span class="lineno"> 1202</span>&#160;<span class="keywordflow">    endif</span></div>
+<div class="line"><a name="l01203"></a><span class="lineno"> 1203</span>&#160; </div>
+<div class="line"><a name="l01204"></a><span class="lineno"> 1204</span>&#160;    <span class="keywordflow">if</span> (<span class="keyword">present</span>(zone2_ids) .and. <span class="keyword">present</span>(unique_zone2_list)) <span class="keywordflow">then</span></div>
+<div class="line"><a name="l01205"></a><span class="lineno"> 1205</span>&#160; </div>
+<div class="line"><a name="l01206"></a><span class="lineno"> 1206</span>&#160;      <span class="comment">! sort the values before use</span></div>
+<div class="line"><a name="l01207"></a><span class="lineno"> 1207</span>&#160;      <span class="keyword">call </span>unique_zone_list%sort_integer()</div>
+<div class="line"><a name="l01208"></a><span class="lineno"> 1208</span>&#160;      <span class="keyword">call </span>unique_zone2_list%sort_integer()</div>
+<div class="line"><a name="l01209"></a><span class="lineno"> 1209</span>&#160; </div>
+<div class="line"><a name="l01210"></a><span class="lineno"> 1210</span>&#160;      <span class="comment">! obtain list of unique integers present in the zone grid</span></div>
+<div class="line"><a name="l01211"></a><span class="lineno"> 1211</span>&#160;      zone_values = unique_zone_list%get_integer()</div>
+<div class="line"><a name="l01212"></a><span class="lineno"> 1212</span>&#160;      zone2_values = unique_zone2_list%get_integer()</div>
+<div class="line"><a name="l01213"></a><span class="lineno"> 1213</span>&#160; </div>
+<div class="line"><a name="l01214"></a><span class="lineno"> 1214</span>&#160;      <span class="keywordflow">if</span> (<span class="keyword">present</span>(comparison_values)) <span class="keywordflow">then</span></div>
+<div class="line"><a name="l01215"></a><span class="lineno"> 1215</span>&#160; </div>
+<div class="line"><a name="l01216"></a><span class="lineno"> 1216</span>&#160;        <span class="keywordflow">do</span> i=1,ubound(zone_values,1)</div>
+<div class="line"><a name="l01217"></a><span class="lineno"> 1217</span>&#160;          <span class="keywordflow">do</span> j=1,ubound(zone2_values,1)</div>
+<div class="line"><a name="l01218"></a><span class="lineno"> 1218</span>&#160;            n = zone_values(i)</div>
+<div class="line"><a name="l01219"></a><span class="lineno"> 1219</span>&#160;            m = zone2_values(j)</div>
+<div class="line"><a name="l01220"></a><span class="lineno"> 1220</span>&#160;            <span class="keyword">call </span><a class="code" href="namespaceswbstats2__support.html#abf0b85035d6592bc9576183c2378eb0b">calc_multizonal_stats</a>(values, zone_ids, target_id=n, target2_id=m,    &amp;</div>
+<div class="line"><a name="l01221"></a><span class="lineno"> 1221</span>&#160;                                  result_vector=stats,                                 &amp;</div>
+<div class="line"><a name="l01222"></a><span class="lineno"> 1222</span>&#160;                                  zone2_ids=zone2_ids,                                 &amp;</div>
+<div class="line"><a name="l01223"></a><span class="lineno"> 1223</span>&#160;                                  comparison_values=comparison_values)</div>
+<div class="line"><a name="l01224"></a><span class="lineno"> 1224</span>&#160;  </div>
+<div class="line"><a name="l01225"></a><span class="lineno"> 1225</span>&#160;            <span class="keyword">write</span>(unit=funit_l, fmt=<span class="stringliteral">&quot;(2(a,a),2(i0,a),4(&quot;</span>//num_fmt//<span class="stringliteral">&quot;,a),i0,a,4(&quot;</span>//num_fmt//<span class="stringliteral">&quot;,a),i0)&quot;</span>) &amp;</div>
+<div class="line"><a name="l01226"></a><span class="lineno"> 1226</span>&#160;              start_date%prettydate(),delimiter_,                                                     &amp;</div>
+<div class="line"><a name="l01227"></a><span class="lineno"> 1227</span>&#160;              end_date%prettydate(), delimiter_,                                                      &amp;</div>
+<div class="line"><a name="l01228"></a><span class="lineno"> 1228</span>&#160;              n, delimiter_, m, delimiter_,                                                           &amp;</div>
+<div class="line"><a name="l01229"></a><span class="lineno"> 1229</span>&#160;              stats(1), delimiter_, stats(2), delimiter_, stats(3), delimiter_,                       &amp;</div>
+<div class="line"><a name="l01230"></a><span class="lineno"> 1230</span>&#160;              stats(4), delimiter_, int(stats(5)), delimiter_,                                        &amp;</div>
+<div class="line"><a name="l01231"></a><span class="lineno"> 1231</span>&#160;              stats(6), delimiter_, stats(7), delimiter_, stats(8), delimiter_,                       &amp;</div>
+<div class="line"><a name="l01232"></a><span class="lineno"> 1232</span>&#160;              stats(9), delimiter_, int(stats(10))</div>
+<div class="line"><a name="l01233"></a><span class="lineno"> 1233</span>&#160; </div>
+<div class="line"><a name="l01234"></a><span class="lineno"> 1234</span>&#160;<span class="keywordflow">          enddo</span></div>
+<div class="line"><a name="l01235"></a><span class="lineno"> 1235</span>&#160;<span class="keywordflow">        enddo</span></div>
+<div class="line"><a name="l01236"></a><span class="lineno"> 1236</span>&#160; </div>
+<div class="line"><a name="l01237"></a><span class="lineno"> 1237</span>&#160;      <span class="keywordflow">else</span> </div>
+<div class="line"><a name="l01238"></a><span class="lineno"> 1238</span>&#160; </div>
+<div class="line"><a name="l01239"></a><span class="lineno"> 1239</span>&#160;        <span class="keywordflow">do</span> i=1,ubound(zone_values,1)</div>
+<div class="line"><a name="l01240"></a><span class="lineno"> 1240</span>&#160;          <span class="keywordflow">do</span> j=1,ubound(zone2_values,1)</div>
+<div class="line"><a name="l01241"></a><span class="lineno"> 1241</span>&#160;            n = zone_values(i)</div>
+<div class="line"><a name="l01242"></a><span class="lineno"> 1242</span>&#160;            m = zone2_values(j)</div>
+<div class="line"><a name="l01243"></a><span class="lineno"> 1243</span>&#160; </div>
+<div class="line"><a name="l01244"></a><span class="lineno"> 1244</span>&#160;            <span class="keyword">call </span><a class="code" href="namespaceswbstats2__support.html#abf0b85035d6592bc9576183c2378eb0b">calc_multizonal_stats</a>(values, zone_ids, target_id=n, target2_id=m,    &amp;</div>
+<div class="line"><a name="l01245"></a><span class="lineno"> 1245</span>&#160;              result_vector=stats, zone2_ids=zone2_ids)</div>
+<div class="line"><a name="l01246"></a><span class="lineno"> 1246</span>&#160; </div>
+<div class="line"><a name="l01247"></a><span class="lineno"> 1247</span>&#160;            <span class="keyword">write</span>(unit=funit_l, fmt=<span class="stringliteral">&quot;(2(a,a),2(i0,a),4(&quot;</span>//num_fmt//<span class="stringliteral">&quot;,a),i0)&quot;</span>)          &amp;</div>
+<div class="line"><a name="l01248"></a><span class="lineno"> 1248</span>&#160;              start_date%prettydate(), delimiter_,                                     &amp;</div>
+<div class="line"><a name="l01249"></a><span class="lineno"> 1249</span>&#160;              end_date%prettydate(), delimiter_,                                       &amp;</div>
+<div class="line"><a name="l01250"></a><span class="lineno"> 1250</span>&#160;              n, delimiter_, m, delimiter_,                                            &amp;</div>
+<div class="line"><a name="l01251"></a><span class="lineno"> 1251</span>&#160;              stats(1), delimiter_, stats(2), delimiter_, stats(3), delimiter_,        &amp;</div>
+<div class="line"><a name="l01252"></a><span class="lineno"> 1252</span>&#160;              stats(4), delimiter_, int(stats(5))</div>
+<div class="line"><a name="l01253"></a><span class="lineno"> 1253</span>&#160;<span class="keywordflow">          enddo</span></div>
+<div class="line"><a name="l01254"></a><span class="lineno"> 1254</span>&#160;<span class="keywordflow">        enddo</span></div>
+<div class="line"><a name="l01255"></a><span class="lineno"> 1255</span>&#160; </div>
+<div class="line"><a name="l01256"></a><span class="lineno"> 1256</span>&#160;<span class="keywordflow">      endif</span>  </div>
+<div class="line"><a name="l01257"></a><span class="lineno"> 1257</span>&#160; </div>
+<div class="line"><a name="l01258"></a><span class="lineno"> 1258</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01259"></a><span class="lineno"> 1259</span>&#160;      <span class="comment">! obtain list of unique integers present in the zone grid</span></div>
+<div class="line"><a name="l01260"></a><span class="lineno"> 1260</span>&#160;      zone_values = unique_zone_list%get_integer()</div>
+<div class="line"><a name="l01261"></a><span class="lineno"> 1261</span>&#160; </div>
+<div class="line"><a name="l01262"></a><span class="lineno"> 1262</span>&#160;      <span class="keywordflow">if</span> (<span class="keyword">present</span>(comparison_values)) <span class="keywordflow">then</span></div>
+<div class="line"><a name="l01263"></a><span class="lineno"> 1263</span>&#160; </div>
+<div class="line"><a name="l01264"></a><span class="lineno"> 1264</span>&#160;        <span class="keywordflow">do</span> i=1,ubound(zone_values,1)</div>
+<div class="line"><a name="l01265"></a><span class="lineno"> 1265</span>&#160;          n = zone_values(i)</div>
+<div class="line"><a name="l01266"></a><span class="lineno"> 1266</span>&#160;   </div>
+<div class="line"><a name="l01267"></a><span class="lineno"> 1267</span>&#160;          <span class="keyword">call </span><a class="code" href="namespaceswbstats2__support.html#aef52306ec66db3359788597634d9e4b6">calc_zonal_stats</a>(values, zone_ids, target_id=n, result_vector=stats,   &amp;</div>
+<div class="line"><a name="l01268"></a><span class="lineno"> 1268</span>&#160;            comparison_values=comparison_values)</div>
+<div class="line"><a name="l01269"></a><span class="lineno"> 1269</span>&#160;          <span class="keyword">write</span>(unit=funit_l, fmt=<span class="stringliteral">&quot;(2(a,a),i0,a,4(&quot;</span>//num_fmt//<span class="stringliteral">&quot;,a),i0,a,4(&quot;</span>//num_fmt//<span class="stringliteral">&quot;,a),i0)&quot;</span>)    &amp;</div>
+<div class="line"><a name="l01270"></a><span class="lineno"> 1270</span>&#160;            start_date%prettydate(), delimiter_,                                                    &amp;</div>
+<div class="line"><a name="l01271"></a><span class="lineno"> 1271</span>&#160;            end_date%prettydate(), delimiter_,                                                      &amp;</div>
+<div class="line"><a name="l01272"></a><span class="lineno"> 1272</span>&#160;            n, delimiter_,                                                                          &amp;</div>
+<div class="line"><a name="l01273"></a><span class="lineno"> 1273</span>&#160;            stats(1), delimiter_, stats(2), delimiter_, stats(3), delimiter_,                       &amp;</div>
+<div class="line"><a name="l01274"></a><span class="lineno"> 1274</span>&#160;            stats(4), delimiter_, int(stats(5)), delimiter_,                                        &amp;</div>
+<div class="line"><a name="l01275"></a><span class="lineno"> 1275</span>&#160;            stats(6), delimiter_, stats(7), delimiter_, stats(8), delimiter_,                       &amp;</div>
+<div class="line"><a name="l01276"></a><span class="lineno"> 1276</span>&#160;            stats(9), delimiter_, int(stats(10))</div>
+<div class="line"><a name="l01277"></a><span class="lineno"> 1277</span>&#160; </div>
+<div class="line"><a name="l01278"></a><span class="lineno"> 1278</span>&#160;<span class="keywordflow">        enddo</span></div>
+<div class="line"><a name="l01279"></a><span class="lineno"> 1279</span>&#160;      </div>
+<div class="line"><a name="l01280"></a><span class="lineno"> 1280</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01281"></a><span class="lineno"> 1281</span>&#160; </div>
+<div class="line"><a name="l01282"></a><span class="lineno"> 1282</span>&#160;        <span class="keywordflow">do</span> i=1,ubound(zone_values,1)</div>
+<div class="line"><a name="l01283"></a><span class="lineno"> 1283</span>&#160;          n = zone_values(i)</div>
+<div class="line"><a name="l01284"></a><span class="lineno"> 1284</span>&#160; </div>
+<div class="line"><a name="l01285"></a><span class="lineno"> 1285</span>&#160;          <span class="keyword">call </span><a class="code" href="namespaceswbstats2__support.html#aef52306ec66db3359788597634d9e4b6">calc_zonal_stats</a>(values, zone_ids, target_id=n, result_vector=stats)</div>
+<div class="line"><a name="l01286"></a><span class="lineno"> 1286</span>&#160;          <span class="keyword">write</span>(unit=funit_l, fmt=<span class="stringliteral">&quot;(2(a,a),i0,a,4(&quot;</span>//num_fmt//<span class="stringliteral">&quot;,a),i0)&quot;</span>)                &amp;</div>
+<div class="line"><a name="l01287"></a><span class="lineno"> 1287</span>&#160;            start_date%prettydate(), delimiter_,                                        &amp;</div>
+<div class="line"><a name="l01288"></a><span class="lineno"> 1288</span>&#160;            end_date%prettydate(), delimiter_,                                          &amp;</div>
+<div class="line"><a name="l01289"></a><span class="lineno"> 1289</span>&#160;            n, delimiter_,                                                              &amp;</div>
+<div class="line"><a name="l01290"></a><span class="lineno"> 1290</span>&#160;            stats(1), delimiter_, stats(2), delimiter_, stats(3), delimiter_,           &amp;</div>
+<div class="line"><a name="l01291"></a><span class="lineno"> 1291</span>&#160;            stats(4), delimiter_, int(stats(5))</div>
+<div class="line"><a name="l01292"></a><span class="lineno"> 1292</span>&#160;<span class="keywordflow">        enddo</span></div>
+<div class="line"><a name="l01293"></a><span class="lineno"> 1293</span>&#160; </div>
+<div class="line"><a name="l01294"></a><span class="lineno"> 1294</span>&#160;<span class="keywordflow">      endif</span></div>
+<div class="line"><a name="l01295"></a><span class="lineno"> 1295</span>&#160; </div>
+<div class="line"><a name="l01296"></a><span class="lineno"> 1296</span>&#160;<span class="keywordflow">    endif</span></div>
+<div class="line"><a name="l01297"></a><span class="lineno"> 1297</span>&#160; </div>
+<div class="line"><a name="l01298"></a><span class="lineno"> 1298</span>&#160;  <span class="keyword">end subroutine </span><a class="code" href="namespaceswbstats2__support.html#ab09ac12045e8977989270347e0d29b0e">output_zonal_stats</a></div>
+<div class="line"><a name="l01299"></a><span class="lineno"> 1299</span>&#160; </div>
+<div class="line"><a name="l01300"></a><span class="lineno"> 1300</span>&#160;<span class="comment">!------------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l01301"></a><span class="lineno"> 1301</span>&#160; </div>
+<div class="line"><a name="l01302"></a><span class="lineno"><a class="line" href="namespaceswbstats2__support.html#a9ba75035f1e3b7f50078802433f4650b"> 1302</a></span>&#160;  <span class="keyword">subroutine </span><a class="code" href="namespaceswbstats2__support.html#a9ba75035f1e3b7f50078802433f4650b">open_output_netcdf_files</a>(this,                                    &amp;</div>
+<div class="line"><a name="l01303"></a><span class="lineno"> 1303</span>&#160;                                      output_files)</div>
+<div class="line"><a name="l01304"></a><span class="lineno"> 1304</span>&#160; </div>
+<div class="line"><a name="l01305"></a><span class="lineno"> 1305</span>&#160;    class(<a class="code" href="structswbstats2__support_1_1swbstats__t.html">swbstats_t</a>), <span class="keywordtype">intent(inout)</span>           :: this</div>
+<div class="line"><a name="l01306"></a><span class="lineno"> 1306</span>&#160;    <span class="keywordtype">type</span> (FILE_COLLECTION_T), <span class="keywordtype">intent(inout)</span>     :: output_files(:)</div>
+<div class="line"><a name="l01307"></a><span class="lineno"> 1307</span>&#160; </div>
+<div class="line"><a name="l01308"></a><span class="lineno"> 1308</span>&#160;    <span class="comment">! [ LOCALS ]</span></div>
+<div class="line"><a name="l01309"></a><span class="lineno"> 1309</span>&#160;    <span class="keywordtype">integer (c_int)</span>                   :: stat_indx</div>
+<div class="line"><a name="l01310"></a><span class="lineno"> 1310</span>&#160;    <span class="keywordtype">integer (c_int)</span>                   :: status</div>
+<div class="line"><a name="l01311"></a><span class="lineno"> 1311</span>&#160;    <span class="keywordtype">type</span> (T_NETCDF4_FILE), <span class="keywordtype">pointer</span>    :: ncfile_out</div>
+<div class="line"><a name="l01312"></a><span class="lineno"> 1312</span>&#160;    <span class="keywordtype">character (len=:)</span>, <span class="keywordtype">allocatable</span>    :: units_string</div>
+<div class="line"><a name="l01313"></a><span class="lineno"> 1313</span>&#160;    <span class="keywordtype">character (len=:)</span>, <span class="keywordtype">allocatable</span>    :: filename_prefix</div>
+<div class="line"><a name="l01314"></a><span class="lineno"> 1314</span>&#160; </div>
+<div class="line"><a name="l01315"></a><span class="lineno"> 1315</span>&#160;    <span class="keywordflow">if</span> (<span class="keyword">allocated</span>( this%output_file_prefix) ) <span class="keywordflow">then</span></div>
+<div class="line"><a name="l01316"></a><span class="lineno"> 1316</span>&#160;      filename_prefix = this%output_file_prefix</div>
+<div class="line"><a name="l01317"></a><span class="lineno"> 1317</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01318"></a><span class="lineno"> 1318</span>&#160;      filename_prefix = <span class="stringliteral">&quot;&quot;</span></div>
+<div class="line"><a name="l01319"></a><span class="lineno"> 1319</span>&#160;<span class="keywordflow">    endif</span></div>
+<div class="line"><a name="l01320"></a><span class="lineno"> 1320</span>&#160; </div>
+<div class="line"><a name="l01321"></a><span class="lineno"> 1321</span>&#160;    <span class="keywordflow">do</span> stat_indx=<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2acd1bee0e435ef218139734cad44ea66a">stats_mean</a>, <a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a76eab4ab58362fc886c5755747ad88d4">stats_variance</a></div>
+<div class="line"><a name="l01322"></a><span class="lineno"> 1322</span>&#160; </div>
+<div class="line"><a name="l01323"></a><span class="lineno"> 1323</span>&#160;      <span class="keywordflow">if</span> ( .not. output_files(stat_indx)%output_active )  cycle</div>
+<div class="line"><a name="l01324"></a><span class="lineno"> 1324</span>&#160; </div>
+<div class="line"><a name="l01325"></a><span class="lineno"> 1325</span>&#160;      <span class="keywordflow">if</span> (output_files(stat_indx)%write_netcdf) <span class="keywordflow">then</span></div>
+<div class="line"><a name="l01326"></a><span class="lineno"> 1326</span>&#160; </div>
+<div class="line"><a name="l01327"></a><span class="lineno"> 1327</span>&#160;        <span class="keywordflow">if</span> ( this%annualize_stats .and. stat_indx == <a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a19e69c7853d2849e66d506046d0425ec">stats_sum</a>) <span class="keywordflow">then</span></div>
+<div class="line"><a name="l01328"></a><span class="lineno"> 1328</span>&#160;          units_string = trim(this%netcdf_variable_units_string)//<span class="stringliteral">&quot;, per year&quot;</span></div>
+<div class="line"><a name="l01329"></a><span class="lineno"> 1329</span>&#160;        <span class="keywordflow">elseif</span> (this%report_as_volume) <span class="keywordflow">then</span></div>
+<div class="line"><a name="l01330"></a><span class="lineno"> 1330</span>&#160;          units_string = <span class="stringliteral">&quot;cubic meters&quot;</span></div>
+<div class="line"><a name="l01331"></a><span class="lineno"> 1331</span>&#160;        <span class="keywordflow">elseif</span> (this%report_in_meters) <span class="keywordflow">then</span></div>
+<div class="line"><a name="l01332"></a><span class="lineno"> 1332</span>&#160;          units_string = <span class="stringliteral">&quot;meters&quot;</span></div>
+<div class="line"><a name="l01333"></a><span class="lineno"> 1333</span>&#160;        <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01334"></a><span class="lineno"> 1334</span>&#160;          units_string = trim(this%netcdf_variable_units_string)</div>
+<div class="line"><a name="l01335"></a><span class="lineno"> 1335</span>&#160;<span class="keywordflow">        endif</span></div>
+<div class="line"><a name="l01336"></a><span class="lineno"> 1336</span>&#160; </div>
+<div class="line"><a name="l01337"></a><span class="lineno"> 1337</span>&#160;        <span class="keyword">allocate</span>( output_files(stat_indx)%nc_ptr, stat=status)</div>
+<div class="line"><a name="l01338"></a><span class="lineno"> 1338</span>&#160;        <span class="keyword">call </span>assert( status==0, <span class="stringliteral">&quot;Problem allocating netcdf file data structure.&quot;</span>, &amp;</div>
+<div class="line"><a name="l01339"></a><span class="lineno"> 1339</span>&#160;          __srcname__, __line__)</div>
+<div class="line"><a name="l01340"></a><span class="lineno"> 1340</span>&#160;        ncfile_out =&gt; output_files(stat_indx)%nc_ptr</div>
+<div class="line"><a name="l01341"></a><span class="lineno"> 1341</span>&#160; </div>
+<div class="line"><a name="l01342"></a><span class="lineno"> 1342</span>&#160;        <span class="keyword">call </span>netcdf_open_and_prepare_as_output(                                     &amp;</div>
+<div class="line"><a name="l01343"></a><span class="lineno"> 1343</span>&#160;              ncfile=ncfile_out,                                                    &amp;</div>
+<div class="line"><a name="l01344"></a><span class="lineno"> 1344</span>&#160;              svariablename=trim(this%netcdf_variable_name_string),                 &amp;</div>
+<div class="line"><a name="l01345"></a><span class="lineno"> 1345</span>&#160;              svariableunits=units_string,                                          &amp;</div>
+<div class="line"><a name="l01346"></a><span class="lineno"> 1346</span>&#160;              inx=this%ncfile_in%iNX,                                               &amp;</div>
+<div class="line"><a name="l01347"></a><span class="lineno"> 1347</span>&#160;              iny=this%ncfile_in%iNY,                                               &amp;</div>
+<div class="line"><a name="l01348"></a><span class="lineno"> 1348</span>&#160;              fx=this%ncfile_in%rX_Coords,                                          &amp;</div>
+<div class="line"><a name="l01349"></a><span class="lineno"> 1349</span>&#160;              fy=this%ncfile_in%rY_Coords,                                          &amp;</div>
+<div class="line"><a name="l01350"></a><span class="lineno"> 1350</span>&#160;              proj4_string=trim(this%target_proj4_string),                          &amp;</div>
+<div class="line"><a name="l01351"></a><span class="lineno"> 1351</span>&#160;              startdate=sim_dt%start,                                               &amp;</div>
+<div class="line"><a name="l01352"></a><span class="lineno"> 1352</span>&#160;              enddate=sim_dt%end,                                                   &amp;</div>
+<div class="line"><a name="l01353"></a><span class="lineno"> 1353</span>&#160;              executable_name=<span class="stringliteral">&quot;SWBSTATS2&quot;</span>,                                          &amp;</div>
+<div class="line"><a name="l01354"></a><span class="lineno"> 1354</span>&#160;              filename_prefix=filename_prefix,                                      &amp;</div>
+<div class="line"><a name="l01355"></a><span class="lineno"> 1355</span>&#160;              filename_modifier=this%filename_modifier_string                       &amp;</div>
+<div class="line"><a name="l01356"></a><span class="lineno"> 1356</span>&#160;                                //<span class="stringliteral">&quot;_&quot;</span>//output_files(stat_indx)%stats_description )</div>
+<div class="line"><a name="l01357"></a><span class="lineno"> 1357</span>&#160; </div>
+<div class="line"><a name="l01358"></a><span class="lineno"> 1358</span>&#160;<span class="keywordflow">      endif</span></div>
+<div class="line"><a name="l01359"></a><span class="lineno"> 1359</span>&#160; </div>
+<div class="line"><a name="l01360"></a><span class="lineno"> 1360</span>&#160;<span class="keywordflow">    enddo</span></div>
+<div class="line"><a name="l01361"></a><span class="lineno"> 1361</span>&#160; </div>
+<div class="line"><a name="l01362"></a><span class="lineno"> 1362</span>&#160;  <span class="keyword">end subroutine </span><a class="code" href="namespaceswbstats2__support.html#a9ba75035f1e3b7f50078802433f4650b">open_output_netcdf_files</a></div>
+<div class="line"><a name="l01363"></a><span class="lineno"> 1363</span>&#160; </div>
+<div class="line"><a name="l01364"></a><span class="lineno"> 1364</span>&#160;<span class="comment">!------------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l01365"></a><span class="lineno"> 1365</span>&#160; </div>
+<div class="line"><a name="l01366"></a><span class="lineno"><a class="line" href="namespaceswbstats2__support.html#a1bcdfd547562a74474b2f1eb75ece1c0"> 1366</a></span>&#160;  <span class="keyword">subroutine </span><a class="code" href="namespaceswbstats2__support.html#a1bcdfd547562a74474b2f1eb75ece1c0">close_output_netcdf_files</a>(this, output_files)</div>
+<div class="line"><a name="l01367"></a><span class="lineno"> 1367</span>&#160; </div>
+<div class="line"><a name="l01368"></a><span class="lineno"> 1368</span>&#160;    class(<a class="code" href="structswbstats2__support_1_1swbstats__t.html">swbstats_t</a>), <span class="keywordtype">intent(inout)</span>         :: this</div>
+<div class="line"><a name="l01369"></a><span class="lineno"> 1369</span>&#160;    <span class="keywordtype">type</span> (FILE_COLLECTION_T), <span class="keywordtype">intent(inout)</span>   :: output_files(:)</div>
+<div class="line"><a name="l01370"></a><span class="lineno"> 1370</span>&#160; </div>
+<div class="line"><a name="l01371"></a><span class="lineno"> 1371</span>&#160;    <span class="comment">! [ LOCALS ]</span></div>
+<div class="line"><a name="l01372"></a><span class="lineno"> 1372</span>&#160;    <span class="keywordtype">integer (c_int)</span>              :: stat_indx</div>
+<div class="line"><a name="l01373"></a><span class="lineno"> 1373</span>&#160;    <span class="keywordtype">integer (c_int)</span>              :: status</div>
+<div class="line"><a name="l01374"></a><span class="lineno"> 1374</span>&#160;    <span class="keywordtype">type</span> (T_NETCDF4_FILE), <span class="keywordtype">pointer</span>    :: ncfile_out</div>
+<div class="line"><a name="l01375"></a><span class="lineno"> 1375</span>&#160; </div>
+<div class="line"><a name="l01376"></a><span class="lineno"> 1376</span>&#160;    <span class="keywordflow">do</span> stat_indx=<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2acd1bee0e435ef218139734cad44ea66a">stats_mean</a>, <a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a76eab4ab58362fc886c5755747ad88d4">stats_variance</a></div>
+<div class="line"><a name="l01377"></a><span class="lineno"> 1377</span>&#160; </div>
+<div class="line"><a name="l01378"></a><span class="lineno"> 1378</span>&#160;      <span class="keywordflow">if</span> ( .not. output_files(stat_indx)%output_active )  cycle</div>
+<div class="line"><a name="l01379"></a><span class="lineno"> 1379</span>&#160; </div>
+<div class="line"><a name="l01380"></a><span class="lineno"> 1380</span>&#160;      <span class="keywordflow">if</span> (output_files(stat_indx)%write_netcdf) <span class="keywordflow">then</span></div>
+<div class="line"><a name="l01381"></a><span class="lineno"> 1381</span>&#160; </div>
+<div class="line"><a name="l01382"></a><span class="lineno"> 1382</span>&#160;        ncfile_out =&gt; output_files(stat_indx)%nc_ptr</div>
+<div class="line"><a name="l01383"></a><span class="lineno"> 1383</span>&#160;        <span class="keyword">call </span>netcdf_close_file(ncfile=ncfile_out)</div>
+<div class="line"><a name="l01384"></a><span class="lineno"> 1384</span>&#160; </div>
+<div class="line"><a name="l01385"></a><span class="lineno"> 1385</span>&#160;<span class="keywordflow">      endif</span></div>
+<div class="line"><a name="l01386"></a><span class="lineno"> 1386</span>&#160; </div>
+<div class="line"><a name="l01387"></a><span class="lineno"> 1387</span>&#160;<span class="keywordflow">    enddo</span></div>
+<div class="line"><a name="l01388"></a><span class="lineno"> 1388</span>&#160; </div>
+<div class="line"><a name="l01389"></a><span class="lineno"> 1389</span>&#160;  <span class="keyword">end subroutine </span><a class="code" href="namespaceswbstats2__support.html#a1bcdfd547562a74474b2f1eb75ece1c0">close_output_netcdf_files</a></div>
+<div class="line"><a name="l01390"></a><span class="lineno"> 1390</span>&#160; </div>
+<div class="line"><a name="l01391"></a><span class="lineno"> 1391</span>&#160;<span class="comment">!------------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l01392"></a><span class="lineno"> 1392</span>&#160; </div>
+<div class="line"><a name="l01393"></a><span class="lineno"><a class="line" href="namespaceswbstats2__support.html#ae2b1490d0a2dfd1b05b6d9eb1cb5c1f8"> 1393</a></span>&#160;  <span class="keyword">subroutine </span><a class="code" href="namespaceswbstats2__support.html#ae2b1490d0a2dfd1b05b6d9eb1cb5c1f8">open_zonal_stats_output_file</a>(this, filename, delimiter)</div>
+<div class="line"><a name="l01394"></a><span class="lineno"> 1394</span>&#160; </div>
+<div class="line"><a name="l01395"></a><span class="lineno"> 1395</span>&#160;    class(<a class="code" href="structswbstats2__support_1_1swbstats__t.html">swbstats_t</a>), <span class="keywordtype">intent(inout)</span>       :: this</div>
+<div class="line"><a name="l01396"></a><span class="lineno"> 1396</span>&#160;    <span class="keywordtype">character (len=*)</span>                       :: filename</div>
+<div class="line"><a name="l01397"></a><span class="lineno"> 1397</span>&#160;    <span class="keywordtype">character (len=*)</span>, <span class="keywordtype">intent(in)</span>, <span class="keywordtype">optional</span> :: delimiter </div>
+<div class="line"><a name="l01398"></a><span class="lineno"> 1398</span>&#160; </div>
+<div class="line"><a name="l01399"></a><span class="lineno"> 1399</span>&#160;    <span class="comment">! [ LOCALS ]</span></div>
+<div class="line"><a name="l01400"></a><span class="lineno"> 1400</span>&#160;    <span class="keywordtype">character (len=256)</span>            :: header_str</div>
+<div class="line"><a name="l01401"></a><span class="lineno"> 1401</span>&#160;    <span class="keywordtype">character (len=:)</span>, <span class="keywordtype">allocatable</span> :: delimiter_</div>
+<div class="line"><a name="l01402"></a><span class="lineno"> 1402</span>&#160; </div>
+<div class="line"><a name="l01403"></a><span class="lineno"> 1403</span>&#160;    <span class="keywordflow">if</span> (<span class="keyword">present</span>(delimiter)) <span class="keywordflow">then</span></div>
+<div class="line"><a name="l01404"></a><span class="lineno"> 1404</span>&#160;      delimiter_ = delimiter</div>
+<div class="line"><a name="l01405"></a><span class="lineno"> 1405</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01406"></a><span class="lineno"> 1406</span>&#160;      delimiter_ = <span class="stringliteral">&quot;,&quot;</span></div>
+<div class="line"><a name="l01407"></a><span class="lineno"> 1407</span>&#160;<span class="keywordflow">    endif</span>  </div>
+<div class="line"><a name="l01408"></a><span class="lineno"> 1408</span>&#160; </div>
+<div class="line"><a name="l01409"></a><span class="lineno"> 1409</span>&#160;    <span class="keyword">call </span>this%zonal_stats_output_file%open(filename)</div>
+<div class="line"><a name="l01410"></a><span class="lineno"> 1410</span>&#160; </div>
+<div class="line"><a name="l01411"></a><span class="lineno"> 1411</span>&#160;    <span class="keywordflow">if</span> (len_trim(this%zone_grid2_filename) &gt; 0) <span class="keywordflow">then</span></div>
+<div class="line"><a name="l01412"></a><span class="lineno"> 1412</span>&#160; </div>
+<div class="line"><a name="l01413"></a><span class="lineno"> 1413</span>&#160;      <span class="keywordflow">if</span> (this%multiple_comparison_grids .or. this%compare_to_obs_values) <span class="keywordflow">then</span></div>
+<div class="line"><a name="l01414"></a><span class="lineno"> 1414</span>&#160;        header_str = <span class="stringliteral">&quot;start_date&quot;</span>//delimiter_//<span class="stringliteral">&quot;end_date&quot;</span>//delimiter_//<span class="stringliteral">&quot;zone_id&quot;</span>   &amp;</div>
+<div class="line"><a name="l01415"></a><span class="lineno"> 1415</span>&#160;          //delimiter_//<span class="stringliteral">&quot;zone2_id&quot;</span>//delimiter_//<span class="stringliteral">&quot;minimum_swb&quot;</span>//delimiter_           &amp;</div>
+<div class="line"><a name="l01416"></a><span class="lineno"> 1416</span>&#160;          //<span class="stringliteral">&quot;maximum_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;mean_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;sum_swb&quot;</span>           &amp;</div>
+<div class="line"><a name="l01417"></a><span class="lineno"> 1417</span>&#160;          //delimiter_//<span class="stringliteral">&quot;count_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;minimum_obs&quot;</span>//delimiter_          &amp;</div>
+<div class="line"><a name="l01418"></a><span class="lineno"> 1418</span>&#160;          //<span class="stringliteral">&quot;maximum_obs&quot;</span>//delimiter_//<span class="stringliteral">&quot;mean_obs&quot;</span>//delimiter_//<span class="stringliteral">&quot;sum_obs&quot;</span>           &amp;</div>
+<div class="line"><a name="l01419"></a><span class="lineno"> 1419</span>&#160;          //delimiter_//<span class="stringliteral">&quot;count_obs&quot;</span></div>
+<div class="line"><a name="l01420"></a><span class="lineno"> 1420</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01421"></a><span class="lineno"> 1421</span>&#160;        header_str = <span class="stringliteral">&quot;start_date&quot;</span>//delimiter_//<span class="stringliteral">&quot;end_date&quot;</span>//delimiter_//<span class="stringliteral">&quot;zone_id&quot;</span>   &amp;</div>
+<div class="line"><a name="l01422"></a><span class="lineno"> 1422</span>&#160;        //delimiter_//<span class="stringliteral">&quot;zone2_id&quot;</span>//delimiter_//<span class="stringliteral">&quot;minimum_swb&quot;</span>//delimiter_             &amp;</div>
+<div class="line"><a name="l01423"></a><span class="lineno"> 1423</span>&#160;          //<span class="stringliteral">&quot;maximum_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;mean_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;sum_swb&quot;</span>           &amp;</div>
+<div class="line"><a name="l01424"></a><span class="lineno"> 1424</span>&#160;          //delimiter_//<span class="stringliteral">&quot;count_swb&quot;</span></div>
+<div class="line"><a name="l01425"></a><span class="lineno"> 1425</span>&#160;<span class="keywordflow">      endif</span></div>
+<div class="line"><a name="l01426"></a><span class="lineno"> 1426</span>&#160; </div>
+<div class="line"><a name="l01427"></a><span class="lineno"> 1427</span>&#160;    <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01428"></a><span class="lineno"> 1428</span>&#160; </div>
+<div class="line"><a name="l01429"></a><span class="lineno"> 1429</span>&#160;      <span class="keywordflow">if</span> (this%multiple_comparison_grids .or. this%compare_to_obs_values) <span class="keywordflow">then</span></div>
+<div class="line"><a name="l01430"></a><span class="lineno"> 1430</span>&#160; </div>
+<div class="line"><a name="l01431"></a><span class="lineno"> 1431</span>&#160;        header_str = <span class="stringliteral">&quot;start_date&quot;</span>//delimiter_//<span class="stringliteral">&quot;end_date&quot;</span>//delimiter_//<span class="stringliteral">&quot;zone_id&quot;</span>   &amp;</div>
+<div class="line"><a name="l01432"></a><span class="lineno"> 1432</span>&#160;          //delimiter_//<span class="stringliteral">&quot;minimum_swb&quot;</span>//delimiter_                                  &amp;</div>
+<div class="line"><a name="l01433"></a><span class="lineno"> 1433</span>&#160;          //<span class="stringliteral">&quot;maximum_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;mean_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;sum_swb&quot;</span>           &amp;</div>
+<div class="line"><a name="l01434"></a><span class="lineno"> 1434</span>&#160;          //delimiter_//<span class="stringliteral">&quot;count_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;minimum_obs&quot;</span>//delimiter_          &amp;</div>
+<div class="line"><a name="l01435"></a><span class="lineno"> 1435</span>&#160;          //<span class="stringliteral">&quot;maximum_obs&quot;</span>//delimiter_//<span class="stringliteral">&quot;mean_obs&quot;</span>//delimiter_//<span class="stringliteral">&quot;sum_obs&quot;</span>           &amp;</div>
+<div class="line"><a name="l01436"></a><span class="lineno"> 1436</span>&#160;          //delimiter_//<span class="stringliteral">&quot;count_obs&quot;</span></div>
+<div class="line"><a name="l01437"></a><span class="lineno"> 1437</span>&#160; </div>
+<div class="line"><a name="l01438"></a><span class="lineno"> 1438</span>&#160;      <span class="keywordflow">else</span></div>
+<div class="line"><a name="l01439"></a><span class="lineno"> 1439</span>&#160; </div>
+<div class="line"><a name="l01440"></a><span class="lineno"> 1440</span>&#160;        header_str = <span class="stringliteral">&quot;start_date&quot;</span>//delimiter_//<span class="stringliteral">&quot;end_date&quot;</span>//delimiter_//<span class="stringliteral">&quot;zone_id&quot;</span>   &amp;</div>
+<div class="line"><a name="l01441"></a><span class="lineno"> 1441</span>&#160;          //delimiter_//<span class="stringliteral">&quot;minimum_swb&quot;</span>//delimiter_                                  &amp;</div>
+<div class="line"><a name="l01442"></a><span class="lineno"> 1442</span>&#160;          //<span class="stringliteral">&quot;maximum_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;mean_swb&quot;</span>//delimiter_//<span class="stringliteral">&quot;sum_swb&quot;</span>           &amp;</div>
+<div class="line"><a name="l01443"></a><span class="lineno"> 1443</span>&#160;          //delimiter_//<span class="stringliteral">&quot;count_swb&quot;</span></div>
+<div class="line"><a name="l01444"></a><span class="lineno"> 1444</span>&#160; </div>
+<div class="line"><a name="l01445"></a><span class="lineno"> 1445</span>&#160;<span class="keywordflow">      endif</span></div>
+<div class="line"><a name="l01446"></a><span class="lineno"> 1446</span>&#160; </div>
+<div class="line"><a name="l01447"></a><span class="lineno"> 1447</span>&#160;<span class="keywordflow">    endif</span></div>
+<div class="line"><a name="l01448"></a><span class="lineno"> 1448</span>&#160; </div>
+<div class="line"><a name="l01449"></a><span class="lineno"> 1449</span>&#160;    <span class="keyword">call </span>this%zonal_stats_output_file%writeLine(trim(header_str))</div>
+<div class="line"><a name="l01450"></a><span class="lineno"> 1450</span>&#160; </div>
+<div class="line"><a name="l01451"></a><span class="lineno"> 1451</span>&#160;  <span class="keyword">end subroutine </span><a class="code" href="namespaceswbstats2__support.html#ae2b1490d0a2dfd1b05b6d9eb1cb5c1f8">open_zonal_stats_output_file</a></div>
+<div class="line"><a name="l01452"></a><span class="lineno"> 1452</span>&#160; </div>
+<div class="line"><a name="l01453"></a><span class="lineno"> 1453</span>&#160;<span class="comment">!------------------------------------------------------------------------------</span></div>
+<div class="line"><a name="l01454"></a><span class="lineno"> 1454</span>&#160; </div>
+<div class="line"><a name="l01455"></a><span class="lineno"><a class="line" href="namespaceswbstats2__support.html#a4348e3834883ca9d18c24e3b7ba3607a"> 1455</a></span>&#160;  <span class="keyword">subroutine </span><a class="code" href="namespaceswbstats2__support.html#a4348e3834883ca9d18c24e3b7ba3607a">print_all_options</a>(this)</div>
+<div class="line"><a name="l01456"></a><span class="lineno"> 1456</span>&#160; </div>
+<div class="line"><a name="l01457"></a><span class="lineno"> 1457</span>&#160;    class(<a class="code" href="structswbstats2__support_1_1swbstats__t.html">swbstats_t</a>) :: this</div>
+<div class="line"><a name="l01458"></a><span class="lineno"> 1458</span>&#160; </div>
+<div class="line"><a name="l01459"></a><span class="lineno"> 1459</span>&#160;    <span class="comment">! [ LOCALS ]</span></div>
+<div class="line"><a name="l01460"></a><span class="lineno"> 1460</span>&#160;    <span class="keywordtype">character (len=:)</span>, <span class="keywordtype">allocatable</span>  :: fmt_string</div>
+<div class="line"><a name="l01461"></a><span class="lineno"> 1461</span>&#160; </div>
+<div class="line"><a name="l01462"></a><span class="lineno"> 1462</span>&#160;    <span class="keyword">write</span>(*,fmt=<span class="stringliteral">&quot;(/,/,a)&quot;</span>) <span class="stringliteral">&quot;  :: Dump of swbstats2 program this ::&quot;</span></div>
+<div class="line"><a name="l01463"></a><span class="lineno"> 1463</span>&#160;    <span class="keyword">write</span>(*,fmt=<span class="stringliteral">&quot;(a,/)&quot;</span>) repeat(<span class="stringliteral">&quot;-&quot;</span>, 43)</div>
+<div class="line"><a name="l01464"></a><span class="lineno"> 1464</span>&#160; </div>
+<div class="line"><a name="l01465"></a><span class="lineno"> 1465</span>&#160;    fmt_string = <span class="stringliteral">&quot;(a,t30,&#39;: &#39;,l)&quot;</span></div>
+<div class="line"><a name="l01466"></a><span class="lineno"> 1466</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;write_csv&quot;</span>, this%write_csv</div>
+<div class="line"><a name="l01467"></a><span class="lineno"> 1467</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;write_netcdf (SUM)&quot;</span>, <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a19e69c7853d2849e66d506046d0425ec">stats_sum</a>)%write_netcdf</div>
+<div class="line"><a name="l01468"></a><span class="lineno"> 1468</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;write_netcdf (MEAN)&quot;</span>, <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2acd1bee0e435ef218139734cad44ea66a">stats_mean</a>)%write_netcdf</div>
+<div class="line"><a name="l01469"></a><span class="lineno"> 1469</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;write_netcdf (VARIANCE)&quot;</span>, <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a76eab4ab58362fc886c5755747ad88d4">stats_variance</a>)%write_netcdf</div>
+<div class="line"><a name="l01470"></a><span class="lineno"> 1470</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;write_arcgrid (SUM)&quot;</span>, <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a19e69c7853d2849e66d506046d0425ec">stats_sum</a>)%write_arcgrid</div>
+<div class="line"><a name="l01471"></a><span class="lineno"> 1471</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;write_arcgrid (MEAN)&quot;</span>, <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2acd1bee0e435ef218139734cad44ea66a">stats_mean</a>)%write_arcgrid</div>
+<div class="line"><a name="l01472"></a><span class="lineno"> 1472</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;write_arcgrid (VARIANCE)&quot;</span>, <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a76eab4ab58362fc886c5755747ad88d4">stats_variance</a>)%write_arcgrid</div>
+<div class="line"><a name="l01473"></a><span class="lineno"> 1473</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;output_active (SUM)&quot;</span>, <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a19e69c7853d2849e66d506046d0425ec">stats_sum</a>)%output_active</div>
+<div class="line"><a name="l01474"></a><span class="lineno"> 1474</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;output_active (MEAN)&quot;</span>, <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2acd1bee0e435ef218139734cad44ea66a">stats_mean</a>)%output_active</div>
+<div class="line"><a name="l01475"></a><span class="lineno"> 1475</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;output_active (VARIANCE)&quot;</span>, <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a76eab4ab58362fc886c5755747ad88d4">stats_variance</a>)%output_active</div>
+<div class="line"><a name="l01476"></a><span class="lineno"> 1476</span>&#160; </div>
+<div class="line"><a name="l01477"></a><span class="lineno"> 1477</span>&#160;    fmt_string = <span class="stringliteral">&quot;(a,t40,&#39;: &#39;,l)&quot;</span></div>
+<div class="line"><a name="l01478"></a><span class="lineno"> 1478</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;grid pointer allocated? (SUM)&quot;</span>, <span class="keyword">associated</span>( <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a19e69c7853d2849e66d506046d0425ec">stats_sum</a>)%grid_ptr)</div>
+<div class="line"><a name="l01479"></a><span class="lineno"> 1479</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;grid pointer allocated? (MEAN)&quot;</span>, <span class="keyword">associated</span>( <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2acd1bee0e435ef218139734cad44ea66a">stats_mean</a>)%grid_ptr)</div>
+<div class="line"><a name="l01480"></a><span class="lineno"> 1480</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;grid pointer allocated? (VARIANCE)&quot;</span>, <span class="keyword">associated</span>( <a class="code" href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">output_files</a>(<a class="code" href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a76eab4ab58362fc886c5755747ad88d4">stats_variance</a>)%grid_ptr)</div>
+<div class="line"><a name="l01481"></a><span class="lineno"> 1481</span>&#160; </div>
+<div class="line"><a name="l01482"></a><span class="lineno"> 1482</span>&#160;    fmt_string = <span class="stringliteral">&quot;(a,t30,&#39;: &#39;,l)&quot;</span></div>
+<div class="line"><a name="l01483"></a><span class="lineno"> 1483</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;calc_zonal_stats&quot;</span>, this%calc_zonal_stats</div>
+<div class="line"><a name="l01484"></a><span class="lineno"> 1484</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;compare_to_obs_values&quot;</span>, this%compare_to_obs_values</div>
+<div class="line"><a name="l01485"></a><span class="lineno"> 1485</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;annualize_stats&quot;</span>, this%annualize_stats</div>
+<div class="line"><a name="l01486"></a><span class="lineno"> 1486</span>&#160; </div>
+<div class="line"><a name="l01487"></a><span class="lineno"> 1487</span>&#160;    fmt_string = <span class="stringliteral">&quot;(a,t30,&#39;: &#39;,a)&quot;</span></div>
+<div class="line"><a name="l01488"></a><span class="lineno"> 1488</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;target_proj4_string&quot;</span>, this%target_proj4_string</div>
+<div class="line"><a name="l01489"></a><span class="lineno"> 1489</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;data_start_date&quot;</span>, this%data_start_date%prettydate()</div>
+<div class="line"><a name="l01490"></a><span class="lineno"> 1490</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;data_end_date&quot;</span>, this%data_end_date%prettydate()</div>
+<div class="line"><a name="l01491"></a><span class="lineno"> 1491</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;slice_start_date&quot;</span>, this%slice_start_date%prettydate()</div>
+<div class="line"><a name="l01492"></a><span class="lineno"> 1492</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;slice_end_date&quot;</span>, this%slice_end_date%prettydate()</div>
+<div class="line"><a name="l01493"></a><span class="lineno"> 1493</span>&#160;    <span class="comment">!date_range_string</span></div>
+<div class="line"><a name="l01494"></a><span class="lineno"> 1494</span>&#160; </div>
+<div class="line"><a name="l01495"></a><span class="lineno"> 1495</span>&#160;    fmt_string = <span class="stringliteral">&quot;(a,t30,&#39;: &#39;,i0)&quot;</span></div>
+<div class="line"><a name="l01496"></a><span class="lineno"> 1496</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;input grid bounds, nx&quot;</span>, bnds%iNumCols</div>
+<div class="line"><a name="l01497"></a><span class="lineno"> 1497</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;input grid bounds, ny&quot;</span>, bnds%iNumRows</div>
+<div class="line"><a name="l01498"></a><span class="lineno"> 1498</span>&#160; </div>
+<div class="line"><a name="l01499"></a><span class="lineno"> 1499</span>&#160;    fmt_string = <span class="stringliteral">&quot;(a,t35,&#39;: &#39;,f16.5)&quot;</span></div>
+<div class="line"><a name="l01500"></a><span class="lineno"> 1500</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;input grid bounds, X_ll&quot;</span>, bnds%fX_ll</div>
+<div class="line"><a name="l01501"></a><span class="lineno"> 1501</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;input grid bounds, Y_ll&quot;</span>, bnds%fY_ll</div>
+<div class="line"><a name="l01502"></a><span class="lineno"> 1502</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;input grid bounds, X_ur&quot;</span>, bnds%fX_ur</div>
+<div class="line"><a name="l01503"></a><span class="lineno"> 1503</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;input grid bounds, Y_ur&quot;</span>, bnds%fY_ur</div>
+<div class="line"><a name="l01504"></a><span class="lineno"> 1504</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;input grid bounds, grid-cell size&quot;</span>, bnds%fGridCellSize</div>
+<div class="line"><a name="l01505"></a><span class="lineno"> 1505</span>&#160; </div>
+<div class="line"><a name="l01506"></a><span class="lineno"> 1506</span>&#160;    fmt_string = <span class="stringliteral">&quot;(a,t30,&#39;: &#39;,i0)&quot;</span></div>
+<div class="line"><a name="l01507"></a><span class="lineno"> 1507</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;calculation_time_period&quot;</span>, this%calculation_time_period</div>
+<div class="line"><a name="l01508"></a><span class="lineno"> 1508</span>&#160; </div>
+<div class="line"><a name="l01509"></a><span class="lineno"> 1509</span>&#160;    fmt_string = <span class="stringliteral">&quot;(a,t30,&#39;: &#39;,a)&quot;</span></div>
+<div class="line"><a name="l01510"></a><span class="lineno"> 1510</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;stress_period_filename&quot;</span>, this%stress_period_filename</div>
+<div class="line"><a name="l01511"></a><span class="lineno"> 1511</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;comparison_period_filename&quot;</span>, this%comparison_period_filename</div>
+<div class="line"><a name="l01512"></a><span class="lineno"> 1512</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;zone_period_filename&quot;</span>, this%zone_period_filename</div>
+<div class="line"><a name="l01513"></a><span class="lineno"> 1513</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;comparison_grid_filename&quot;</span>, this%comparison_grid_filename</div>
+<div class="line"><a name="l01514"></a><span class="lineno"> 1514</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;zone_grid_filename&quot;</span>, this%zone_grid_filename</div>
+<div class="line"><a name="l01515"></a><span class="lineno"> 1515</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;netcdf_input_filename&quot;</span>, this%netcdf_input_filename</div>
+<div class="line"><a name="l01516"></a><span class="lineno"> 1516</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;netcdf_variable_name_string&quot;</span>, this%netcdf_variable_name_string</div>
+<div class="line"><a name="l01517"></a><span class="lineno"> 1517</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;netcdf_variable_units_string&quot;</span>, this%netcdf_variable_units_string</div>
+<div class="line"><a name="l01518"></a><span class="lineno"> 1518</span>&#160; </div>
+<div class="line"><a name="l01519"></a><span class="lineno"> 1519</span>&#160;    fmt_string = <span class="stringliteral">&quot;(a,t30,&#39;: &#39;,l)&quot;</span></div>
+<div class="line"><a name="l01520"></a><span class="lineno"> 1520</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;netcdf_input_file_is_open    : &quot;</span>, this%netcdf_input_file_is_open</div>
+<div class="line"><a name="l01521"></a><span class="lineno"> 1521</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;multiple_zone_grids          : &quot;</span>, this%multiple_zone_grids</div>
+<div class="line"><a name="l01522"></a><span class="lineno"> 1522</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;multiple_comparison_grids    : &quot;</span>, this%multiple_comparison_grids</div>
+<div class="line"><a name="l01523"></a><span class="lineno"> 1523</span>&#160;    <span class="comment">!comparison_grid_conversion_factor = 1.0_c_double</span></div>
+<div class="line"><a name="l01524"></a><span class="lineno"> 1524</span>&#160;    fmt_string = <span class="stringliteral">&quot;(/,a,/,&#39;&quot;</span>//repeat(<span class="stringliteral">&quot;-&quot;</span>,62)//<span class="stringliteral">&quot;&#39;)&quot;</span></div>
+<div class="line"><a name="l01525"></a><span class="lineno"> 1525</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;Start date list&quot;</span></div>
+<div class="line"><a name="l01526"></a><span class="lineno"> 1526</span>&#160;    <span class="keyword">call </span>this%start_date_list%print()</div>
+<div class="line"><a name="l01527"></a><span class="lineno"> 1527</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;End date list&quot;</span></div>
+<div class="line"><a name="l01528"></a><span class="lineno"> 1528</span>&#160;    <span class="keyword">call </span>this%end_date_list%print()</div>
+<div class="line"><a name="l01529"></a><span class="lineno"> 1529</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;Date index list&quot;</span></div>
+<div class="line"><a name="l01530"></a><span class="lineno"> 1530</span>&#160;    <span class="keyword">call </span>this%date_range_id_list%print()</div>
+<div class="line"><a name="l01531"></a><span class="lineno"> 1531</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;Unique zone id list&quot;</span></div>
+<div class="line"><a name="l01532"></a><span class="lineno"> 1532</span>&#160;    <span class="keyword">call </span>this%unique_zone_list%print()</div>
+<div class="line"><a name="l01533"></a><span class="lineno"> 1533</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;Comparison grid file list&quot;</span></div>
+<div class="line"><a name="l01534"></a><span class="lineno"> 1534</span>&#160;    <span class="keyword">call </span>this%comparison_grid_file_list%print()</div>
+<div class="line"><a name="l01535"></a><span class="lineno"> 1535</span>&#160;    <span class="keyword">write</span>(*,fmt=fmt_string) <span class="stringliteral">&quot;Zone grid file list&quot;</span></div>
+<div class="line"><a name="l01536"></a><span class="lineno"> 1536</span>&#160;    <span class="keyword">call </span>this%zone_grid_file_list%print()</div>
+<div class="line"><a name="l01537"></a><span class="lineno"> 1537</span>&#160; </div>
+<div class="line"><a name="l01538"></a><span class="lineno"> 1538</span>&#160;  <span class="keyword">end subroutine </span><a class="code" href="namespaceswbstats2__support.html#a4348e3834883ca9d18c24e3b7ba3607a">print_all_options</a></div>
+<div class="line"><a name="l01539"></a><span class="lineno"> 1539</span>&#160; </div>
+<div class="line"><a name="l01540"></a><span class="lineno"> 1540</span>&#160;<span class="keyword">end module </span><a class="code" href="namespaceswbstats2__support.html">swbstats2_support</a></div>
 </div><!-- fragment --></div><!-- contents -->
 </div><!-- doc-content -->
 <div class="ttc" id="anamespaceswbstats2__support_html_a93676f9e03da9d3a3ffc9b3b5dd5c10e"><div class="ttname"><a href="namespaceswbstats2__support.html#a93676f9e03da9d3a3ffc9b3b5dd5c10e">swbstats2_support::get_unique_int</a></div><div class="ttdeci">subroutine get_unique_int(this, grid_values, unique_val_list)</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l00389">swbstats2_support.F90:390</a></div></div>
 <div class="ttc" id="astructswbstats2__support_1_1length__unit__t_html"><div class="ttname"><a href="structswbstats2__support_1_1length__unit__t.html">swbstats2_support::length_unit_t</a></div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l00036">swbstats2_support.F90:36</a></div></div>
-<div class="ttc" id="astructdata__catalog__entry_1_1data__catalog__entry__t_html"><div class="ttname"><a href="structdata__catalog__entry_1_1data__catalog__entry__t.html">data_catalog_entry::data_catalog_entry_t</a></div><div class="ttdef"><b>Definition:</b> <a href="data__catalog__entry_8_f90_source.html#l00045">data_catalog_entry.F90:45</a></div></div>
-<div class="ttc" id="anamespacenetcdf4__support_html_a333198b161c1377afd5dcf5fd4e66713"><div class="ttname"><a href="namespacenetcdf4__support.html#a333198b161c1377afd5dcf5fd4e66713">netcdf4_support::netcdf_put_variable_array</a></div><div class="ttdeci">subroutine, public netcdf_put_variable_array(NCFILE, iVarID, iStart, iCount, iStride, iValues, i2Values, rValues, dpValues)</div><div class="ttdef"><b>Definition:</b> <a href="netcdf4__support_8_f90_source.html#l04323">netcdf4_support.F90:4325</a></div></div>
+<div class="ttc" id="astructdata__catalog__entry_1_1data__catalog__entry__t_html"><div class="ttname"><a href="structdata__catalog__entry_1_1data__catalog__entry__t.html">data_catalog_entry::data_catalog_entry_t</a></div><div class="ttdef"><b>Definition:</b> <a href="data__catalog__entry_8_f90_source.html#l00046">data_catalog_entry.F90:46</a></div></div>
+<div class="ttc" id="anamespacenetcdf4__support_html_a333198b161c1377afd5dcf5fd4e66713"><div class="ttname"><a href="namespacenetcdf4__support.html#a333198b161c1377afd5dcf5fd4e66713">netcdf4_support::netcdf_put_variable_array</a></div><div class="ttdeci">subroutine, public netcdf_put_variable_array(NCFILE, iVarID, iStart, iCount, iStride, iValues, i2Values, rValues, dpValues)</div><div class="ttdef"><b>Definition:</b> <a href="netcdf4__support_8_f90_source.html#l04327">netcdf4_support.F90:4329</a></div></div>
 <div class="ttc" id="anamespaceconstants__and__conversions_html_ae5ba058e1c8d7de03b63f5b6f6cce1fe"><div class="ttname"><a href="namespaceconstants__and__conversions.html#ae5ba058e1c8d7de03b63f5b6f6cce1fe">constants_and_conversions::datatype_int</a></div><div class="ttdeci">integer(c_int), parameter datatype_int</div><div class="ttdef"><b>Definition:</b> <a href="constants__and__conversions_8_f90_source.html#l00015">constants_and_conversions.F90:15</a></div></div>
 <div class="ttc" id="anamespaceswbstats2__support_html_a5622cad1727a102d2a84460d970c70b0a97e30c639f390549a293f69f390939be"><div class="ttname"><a href="namespaceswbstats2__support.html#a5622cad1727a102d2a84460d970c70b0a97e30c639f390549a293f69f390939be">swbstats2_support::calc_period_monthly</a></div><div class="ttdeci">@ calc_period_monthly</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l00028">swbstats2_support.F90:28</a></div></div>
 <div class="ttc" id="anamespaceswbstats2__support_html_a05d3fbb7e3222a820b5ef0368e7cfca7"><div class="ttname"><a href="namespaceswbstats2__support.html#a05d3fbb7e3222a820b5ef0368e7cfca7">swbstats2_support::initialize_zone_grid</a></div><div class="ttdeci">subroutine initialize_zone_grid(this, grid_filename)</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l00525">swbstats2_support.F90:526</a></div></div>
 <div class="ttc" id="anamespaceswbstats2__support_html_a5a7b0582b1c2d35dd0ef93a6e3785ed2a19e69c7853d2849e66d506046d0425ec"><div class="ttname"><a href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a19e69c7853d2849e66d506046d0425ec">swbstats2_support::stats_sum</a></div><div class="ttdeci">@ stats_sum</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l00024">swbstats2_support.F90:24</a></div></div>
-<div class="ttc" id="anamespaceswbstats2__support_html_ae2b1490d0a2dfd1b05b6d9eb1cb5c1f8"><div class="ttname"><a href="namespaceswbstats2__support.html#ae2b1490d0a2dfd1b05b6d9eb1cb5c1f8">swbstats2_support::open_zonal_stats_output_file</a></div><div class="ttdeci">subroutine open_zonal_stats_output_file(this, filename, delimiter)</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l01392">swbstats2_support.F90:1393</a></div></div>
+<div class="ttc" id="anamespaceswbstats2__support_html_ae2b1490d0a2dfd1b05b6d9eb1cb5c1f8"><div class="ttname"><a href="namespaceswbstats2__support.html#ae2b1490d0a2dfd1b05b6d9eb1cb5c1f8">swbstats2_support::open_zonal_stats_output_file</a></div><div class="ttdeci">subroutine open_zonal_stats_output_file(this, filename, delimiter)</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l01393">swbstats2_support.F90:1394</a></div></div>
 <div class="ttc" id="anamespaceswbstats2__support_html_ab6bbf0d202d888faa6d6a1dcbb984a61"><div class="ttname"><a href="namespaceswbstats2__support.html#ab6bbf0d202d888faa6d6a1dcbb984a61">swbstats2_support::output_files</a></div><div class="ttdeci">type(file_collection_t), dimension(3) output_files</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l00158">swbstats2_support.F90:158</a></div></div>
 <div class="ttc" id="anamespacegrid_html_aedc9fb9576632b6bf549f326f2fc96e3"><div class="ttname"><a href="namespacegrid.html#aedc9fb9576632b6bf549f326f2fc96e3">grid::grid_datatype_double</a></div><div class="ttdeci">integer(c_int), parameter, public grid_datatype_double</div><div class="ttdef"><b>Definition:</b> <a href="grid_8_f90_source.html#l00027">grid.F90:27</a></div></div>
 <div class="ttc" id="anamespacedatetime_html"><div class="ttname"><a href="namespacedatetime.html">datetime</a></div><div class="ttdoc">This module contains the DATETIME_T class and associated time and date-related routines,...</div><div class="ttdef"><b>Definition:</b> <a href="datetime_8_f90_source.html#l00009">datetime.F90:9</a></div></div>
@@ -1649,12 +1650,12 @@ $(document).ready(function(){initNavTree('swbstats2__support_8_f90_source.html',
 <div class="ttc" id="anamespaceswbstats2__support_html_a242a9ec9aabb4a1241502c3491343fb7"><div class="ttname"><a href="namespaceswbstats2__support.html#a242a9ec9aabb4a1241502c3491343fb7">swbstats2_support::recnum</a></div><div class="ttdeci">integer(c_size_t) recnum</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l00033">swbstats2_support.F90:33</a></div></div>
 <div class="ttc" id="anamespaceswbstats2__support_html_aef52306ec66db3359788597634d9e4b6"><div class="ttname"><a href="namespaceswbstats2__support.html#aef52306ec66db3359788597634d9e4b6">swbstats2_support::calc_zonal_stats</a></div><div class="ttdeci">subroutine calc_zonal_stats(values, zone_ids, target_id, result_vector, comparison_values)</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l00237">swbstats2_support.F90:238</a></div></div>
 <div class="ttc" id="anamespaceconstants__and__conversions_html_a3a5636ea1d3912ac8bde9c6138d47517"><div class="ttname"><a href="namespaceconstants__and__conversions.html#a3a5636ea1d3912ac8bde9c6138d47517">constants_and_conversions::bnds</a></div><div class="ttdeci">type(bounds_t), public bnds</div><div class="ttdef"><b>Definition:</b> <a href="constants__and__conversions_8_f90_source.html#l00082">constants_and_conversions.F90:82</a></div></div>
-<div class="ttc" id="anamespaceswbstats2__support_html_a9ba75035f1e3b7f50078802433f4650b"><div class="ttname"><a href="namespaceswbstats2__support.html#a9ba75035f1e3b7f50078802433f4650b">swbstats2_support::open_output_netcdf_files</a></div><div class="ttdeci">subroutine open_output_netcdf_files(this, output_files)</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l01301">swbstats2_support.F90:1303</a></div></div>
+<div class="ttc" id="anamespaceswbstats2__support_html_a9ba75035f1e3b7f50078802433f4650b"><div class="ttname"><a href="namespaceswbstats2__support.html#a9ba75035f1e3b7f50078802433f4650b">swbstats2_support::open_output_netcdf_files</a></div><div class="ttdeci">subroutine open_output_netcdf_files(this, output_files)</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l01302">swbstats2_support.F90:1304</a></div></div>
 <div class="ttc" id="anamespaceexceptions_html"><div class="ttname"><a href="namespaceexceptions.html">exceptions</a></div><div class="ttdef"><b>Definition:</b> <a href="exceptions_8_f90_source.html#l00001">exceptions.F90:1</a></div></div>
-<div class="ttc" id="anamespaceswbstats2__support_html_a4348e3834883ca9d18c24e3b7ba3607a"><div class="ttname"><a href="namespaceswbstats2__support.html#a4348e3834883ca9d18c24e3b7ba3607a">swbstats2_support::print_all_options</a></div><div class="ttdeci">subroutine print_all_options(this)</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l01454">swbstats2_support.F90:1455</a></div></div>
+<div class="ttc" id="anamespaceswbstats2__support_html_a4348e3834883ca9d18c24e3b7ba3607a"><div class="ttname"><a href="namespaceswbstats2__support.html#a4348e3834883ca9d18c24e3b7ba3607a">swbstats2_support::print_all_options</a></div><div class="ttdeci">subroutine print_all_options(this)</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l01455">swbstats2_support.F90:1456</a></div></div>
 <div class="ttc" id="anamespaceswbstats2__support_html_ac4150e064852f4b3b2c158543c567b60"><div class="ttname"><a href="namespaceswbstats2__support.html#ac4150e064852f4b3b2c158543c567b60">swbstats2_support::set_conversion_factors_sub</a></div><div class="ttdeci">subroutine set_conversion_factors_sub(this)</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l00680">swbstats2_support.F90:681</a></div></div>
 <div class="ttc" id="anamespaceswbstats2__support_html_abbcc811ad338c54f68f4e1992a626b63"><div class="ttname"><a href="namespaceswbstats2__support.html#abbcc811ad338c54f68f4e1992a626b63">swbstats2_support::volume_units</a></div><div class="ttdeci">type(volume_unit_t), dimension(3), parameter volume_units</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l00151">swbstats2_support.F90:151</a></div></div>
-<div class="ttc" id="anamespaceexceptions_html_a22a1bf2808fdc249e6b378ee3f221156"><div class="ttname"><a href="namespaceexceptions.html#a22a1bf2808fdc249e6b378ee3f221156">exceptions::die</a></div><div class="ttdeci">subroutine, public die(sMessage, sModule, iLine, sHints, sCalledBy, iCalledByLine)</div><div class="ttdef"><b>Definition:</b> <a href="exceptions_8_f90_source.html#l00137">exceptions.F90:138</a></div></div>
+<div class="ttc" id="anamespaceexceptions_html_a22a1bf2808fdc249e6b378ee3f221156"><div class="ttname"><a href="namespaceexceptions.html#a22a1bf2808fdc249e6b378ee3f221156">exceptions::die</a></div><div class="ttdeci">subroutine, public die(sMessage, sModule, iLine, sHints, sCalledBy, iCalledByLine)</div><div class="ttdef"><b>Definition:</b> <a href="exceptions_8_f90_source.html#l00138">exceptions.F90:139</a></div></div>
 <div class="ttc" id="astructgrid_1_1general__grid__t_html"><div class="ttname"><a href="structgrid_1_1general__grid__t.html">grid::general_grid_t</a></div><div class="ttdef"><b>Definition:</b> <a href="grid_8_f90_source.html#l00057">grid.F90:57</a></div></div>
 <div class="ttc" id="anamespaceswbstats2__support_html_a5622cad1727a102d2a84460d970c70b0ac8749d56b66a2720df163cdb67cd981b"><div class="ttname"><a href="namespaceswbstats2__support.html#a5622cad1727a102d2a84460d970c70b0ac8749d56b66a2720df163cdb67cd981b">swbstats2_support::calc_period_annual</a></div><div class="ttdeci">@ calc_period_annual</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l00028">swbstats2_support.F90:28</a></div></div>
 <div class="ttc" id="astructswbstats2__support_1_1swbstats__t_html"><div class="ttname"><a href="structswbstats2__support_1_1swbstats__t.html">swbstats2_support::swbstats_t</a></div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l00057">swbstats2_support.F90:57</a></div></div>
@@ -1681,9 +1682,9 @@ $(document).ready(function(){initNavTree('swbstats2__support_8_f90_source.html',
 <div class="ttc" id="anamespaceswbstats2__support_html_a5a7b0582b1c2d35dd0ef93a6e3785ed2a76eab4ab58362fc886c5755747ad88d4"><div class="ttname"><a href="namespaceswbstats2__support.html#a5a7b0582b1c2d35dd0ef93a6e3785ed2a76eab4ab58362fc886c5755747ad88d4">swbstats2_support::stats_variance</a></div><div class="ttdeci">@ stats_variance</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l00024">swbstats2_support.F90:24</a></div></div>
 <div class="ttc" id="anamespaceswbstats2__support_html_a077319e29ec10a0a01aefd6472887c12"><div class="ttname"><a href="namespaceswbstats2__support.html#a077319e29ec10a0a01aefd6472887c12">swbstats2_support::length_units</a></div><div class="ttdeci">type(length_unit_t), dimension(3), parameter length_units</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l00146">swbstats2_support.F90:146</a></div></div>
 <div class="ttc" id="anamespaceconstants__and__conversions_html_a0da51ba14ab21f1e8d6f364ee4513928"><div class="ttname"><a href="namespaceconstants__and__conversions.html#a0da51ba14ab21f1e8d6f364ee4513928">constants_and_conversions::true</a></div><div class="ttdeci">logical(c_bool), parameter, public true</div><div class="ttdef"><b>Definition:</b> <a href="constants__and__conversions_8_f90_source.html#l00038">constants_and_conversions.F90:38</a></div></div>
-<div class="ttc" id="anamespacenetcdf4__support_html_a131b8842810e13c604c60f5dc6ed90b9"><div class="ttname"><a href="namespacenetcdf4__support.html#a131b8842810e13c604c60f5dc6ed90b9">netcdf4_support::netcdf_get_variable_slice</a></div><div class="ttdeci">subroutine, public netcdf_get_variable_slice(NCFILE, rValues, dpValues, iValues)</div><div class="ttdef"><b>Definition:</b> <a href="netcdf4__support_8_f90_source.html#l02067">netcdf4_support.F90:2068</a></div></div>
+<div class="ttc" id="anamespacenetcdf4__support_html_a131b8842810e13c604c60f5dc6ed90b9"><div class="ttname"><a href="namespacenetcdf4__support.html#a131b8842810e13c604c60f5dc6ed90b9">netcdf4_support::netcdf_get_variable_slice</a></div><div class="ttdeci">subroutine, public netcdf_get_variable_slice(NCFILE, rValues, dpValues, iValues)</div><div class="ttdef"><b>Definition:</b> <a href="netcdf4__support_8_f90_source.html#l02071">netcdf4_support.F90:2072</a></div></div>
 <div class="ttc" id="anamespaceswbstats2__support_html_a5622cad1727a102d2a84460d970c70b0a7f769e9e3b5b19174a36a50b2903cfff"><div class="ttname"><a href="namespaceswbstats2__support.html#a5622cad1727a102d2a84460d970c70b0a7f769e9e3b5b19174a36a50b2903cfff">swbstats2_support::calc_period_slice_single</a></div><div class="ttdeci">@ calc_period_slice_single</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l00028">swbstats2_support.F90:28</a></div></div>
-<div class="ttc" id="anamespacenetcdf4__support_html_a0c16d0db4e8e316fe30746454db8d269"><div class="ttname"><a href="namespacenetcdf4__support.html#a0c16d0db4e8e316fe30746454db8d269">netcdf4_support::netcdf_put_variable_vector</a></div><div class="ttdeci">subroutine, public netcdf_put_variable_vector(NCFILE, iVarID, iStart, iCount, iStride, iValues, i2Values, rValues, dpValues)</div><div class="ttdef"><b>Definition:</b> <a href="netcdf4__support_8_f90_source.html#l04445">netcdf4_support.F90:4447</a></div></div>
+<div class="ttc" id="anamespacenetcdf4__support_html_a0c16d0db4e8e316fe30746454db8d269"><div class="ttname"><a href="namespacenetcdf4__support.html#a0c16d0db4e8e316fe30746454db8d269">netcdf4_support::netcdf_put_variable_vector</a></div><div class="ttdeci">subroutine, public netcdf_put_variable_vector(NCFILE, iVarID, iStart, iCount, iStride, iValues, i2Values, rValues, dpValues)</div><div class="ttdef"><b>Definition:</b> <a href="netcdf4__support_8_f90_source.html#l04449">netcdf4_support.F90:4451</a></div></div>
 <div class="ttc" id="anamespacefstring__list_html"><div class="ttname"><a href="namespacefstring__list.html">fstring_list</a></div><div class="ttdef"><b>Definition:</b> <a href="fstring__list_8_f90_source.html#l00001">fstring_list.F90:1</a></div></div>
 <div class="ttc" id="anamespacenetcdf4__support_html_a746c76fd2b72f5ecb7a2901833cc42a1"><div class="ttname"><a href="namespacenetcdf4__support.html#a746c76fd2b72f5ecb7a2901833cc42a1">netcdf4_support::nc_time</a></div><div class="ttdeci">integer(c_int), parameter, public nc_time</div><div class="ttdoc">@TODO: implement a more flexible way of tracking variable IDs; presently the code can break if lat an...</div><div class="ttdef"><b>Definition:</b> <a href="netcdf4__support_8_f90_source.html#l00138">netcdf4_support.F90:138</a></div></div>
 <div class="ttc" id="anamespacenetcdf4__support_html"><div class="ttname"><a href="namespacenetcdf4__support.html">netcdf4_support</a></div><div class="ttdoc">Provide support for use of netCDF files as input for time-varying, gridded meteorlogic data,...</div><div class="ttdef"><b>Definition:</b> <a href="netcdf4__support_8_f90_source.html#l00025">netcdf4_support.F90:25</a></div></div>
@@ -1691,14 +1692,14 @@ $(document).ready(function(){initNavTree('swbstats2__support_8_f90_source.html',
 <div class="ttc" id="anamespaceswbstats2__support_html_a5622cad1727a102d2a84460d970c70b0aef29636ff954cd8a6dee6b9d57c5408e"><div class="ttname"><a href="namespaceswbstats2__support.html#a5622cad1727a102d2a84460d970c70b0aef29636ff954cd8a6dee6b9d57c5408e">swbstats2_support::calc_period_all</a></div><div class="ttdeci">@ calc_period_all</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l00028">swbstats2_support.F90:28</a></div></div>
 <div class="ttc" id="ainterfaceconstants__and__conversions_1_1asfloat_html"><div class="ttname"><a href="interfaceconstants__and__conversions_1_1asfloat.html">constants_and_conversions::asfloat</a></div><div class="ttdef"><b>Definition:</b> <a href="constants__and__conversions_8_f90_source.html#l00131">constants_and_conversions.F90:131</a></div></div>
 <div class="ttc" id="anamespaceswbstats2__support_html_a527e7f90e4a887e4c41e7a95c84cb3d3"><div class="ttname"><a href="namespaceswbstats2__support.html#a527e7f90e4a887e4c41e7a95c84cb3d3">swbstats2_support::write_stats_to_arcgrid</a></div><div class="ttdeci">subroutine write_stats_to_arcgrid(this, output_files, start_date, end_date, date_range_string)</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l00772">swbstats2_support.F90:774</a></div></div>
-<div class="ttc" id="anamespacenetcdf4__support_html_aa63a93673a416472c0d7ee716c178e37"><div class="ttname"><a href="namespacenetcdf4__support.html#aa63a93673a416472c0d7ee716c178e37">netcdf4_support::netcdf_update_time_starting_index</a></div><div class="ttdeci">logical(c_bool) function, public netcdf_update_time_starting_index(NCFILE, iJulianDay)</div><div class="ttdef"><b>Definition:</b> <a href="netcdf4__support_8_f90_source.html#l02044">netcdf4_support.F90:2045</a></div></div>
+<div class="ttc" id="anamespacenetcdf4__support_html_aa63a93673a416472c0d7ee716c178e37"><div class="ttname"><a href="namespacenetcdf4__support.html#aa63a93673a416472c0d7ee716c178e37">netcdf4_support::netcdf_update_time_starting_index</a></div><div class="ttdeci">logical(c_bool) function, public netcdf_update_time_starting_index(NCFILE, iJulianDay)</div><div class="ttdef"><b>Definition:</b> <a href="netcdf4__support_8_f90_source.html#l02048">netcdf4_support.F90:2049</a></div></div>
 <div class="ttc" id="astructsimulation__datetime_1_1date__range__t_html"><div class="ttname"><a href="structsimulation__datetime_1_1date__range__t.html">simulation_datetime::date_range_t</a></div><div class="ttdef"><b>Definition:</b> <a href="simulation__datetime_8_f90_source.html#l00009">simulation_datetime.F90:9</a></div></div>
 <div class="ttc" id="anamespaceswbstats2__support_html_a5622cad1727a102d2a84460d970c70b0ae4568e51d5e0e94d12c1c4551c9755a5"><div class="ttname"><a href="namespaceswbstats2__support.html#a5622cad1727a102d2a84460d970c70b0ae4568e51d5e0e94d12c1c4551c9755a5">swbstats2_support::calc_period_daily</a></div><div class="ttdeci">@ calc_period_daily</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l00028">swbstats2_support.F90:28</a></div></div>
 <div class="ttc" id="anamespacenetcdf4__support_html_a827d4a46f5116fca25c60d2c88bf7cb8"><div class="ttname"><a href="namespacenetcdf4__support.html#a827d4a46f5116fca25c60d2c88bf7cb8">netcdf4_support::nc_fill_float</a></div><div class="ttdeci">real(c_float), parameter, public nc_fill_float</div><div class="ttdef"><b>Definition:</b> <a href="netcdf4__support_8_f90_source.html#l00092">netcdf4_support.F90:92</a></div></div>
 <div class="ttc" id="anamespacegrid_html_a02803f7fe27d0354d3d16a15bd1338da"><div class="ttname"><a href="namespacegrid.html#a02803f7fe27d0354d3d16a15bd1338da">grid::grid_writearcgrid</a></div><div class="ttdeci">subroutine, public grid_writearcgrid(sFilename, pGrd)</div><div class="ttdef"><b>Definition:</b> <a href="grid_8_f90_source.html#l01055">grid.F90:1056</a></div></div>
 <div class="ttc" id="anamespaceswbstats2__support_html_a2e7c48b2bf6d754c5730b128e725d10c"><div class="ttname"><a href="namespaceswbstats2__support.html#a2e7c48b2bf6d754c5730b128e725d10c">swbstats2_support::input_data_obj</a></div><div class="ttdeci">type(data_catalog_entry_t) input_data_obj</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l00156">swbstats2_support.F90:156</a></div></div>
-<div class="ttc" id="anamespaceswbstats2__support_html_a1bcdfd547562a74474b2f1eb75ece1c0"><div class="ttname"><a href="namespaceswbstats2__support.html#a1bcdfd547562a74474b2f1eb75ece1c0">swbstats2_support::close_output_netcdf_files</a></div><div class="ttdeci">subroutine close_output_netcdf_files(this, output_files)</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l01365">swbstats2_support.F90:1366</a></div></div>
-<div class="ttc" id="astructdatetime_1_1datetime__t_html"><div class="ttname"><a href="structdatetime_1_1datetime__t.html">datetime::datetime_t</a></div><div class="ttdef"><b>Definition:</b> <a href="datetime_8_f90_source.html#l00031">datetime.F90:31</a></div></div>
+<div class="ttc" id="anamespaceswbstats2__support_html_a1bcdfd547562a74474b2f1eb75ece1c0"><div class="ttname"><a href="namespaceswbstats2__support.html#a1bcdfd547562a74474b2f1eb75ece1c0">swbstats2_support::close_output_netcdf_files</a></div><div class="ttdeci">subroutine close_output_netcdf_files(this, output_files)</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l01366">swbstats2_support.F90:1367</a></div></div>
+<div class="ttc" id="astructdatetime_1_1datetime__t_html"><div class="ttname"><a href="structdatetime_1_1datetime__t.html">datetime::datetime_t</a></div><div class="ttdef"><b>Definition:</b> <a href="datetime_8_f90_source.html#l00032">datetime.F90:32</a></div></div>
 <div class="ttc" id="astructfile__operations_1_1ascii__file__t_html"><div class="ttname"><a href="structfile__operations_1_1ascii__file__t.html">file_operations::ascii_file_t</a></div><div class="ttdef"><b>Definition:</b> <a href="file__operations_8_f90_source.html#l00018">file_operations.F90:18</a></div></div>
 <div class="ttc" id="anamespaceswbstats2__support_html_acd76c774240993aee1383e4cc219d4bb"><div class="ttname"><a href="namespaceswbstats2__support.html#acd76c774240993aee1383e4cc219d4bb">swbstats2_support::read_comparison_period_file</a></div><div class="ttdeci">subroutine read_comparison_period_file(this, csv_filename, date_range_id_list, start_date_list, end_date_list, comparison_grid_file_list)</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l01043">swbstats2_support.F90:1049</a></div></div>
 <div class="ttc" id="anamespaceswbstats2__support_html_ab09ac12045e8977989270347e0d29b0e"><div class="ttname"><a href="namespaceswbstats2__support.html#ab09ac12045e8977989270347e0d29b0e">swbstats2_support::output_zonal_stats</a></div><div class="ttdeci">subroutine output_zonal_stats(this, start_date, end_date, values, zone_ids, unique_zone_list, delimiter, funit, zone2_ids, unique_zone2_list, comparison_values)</div><div class="ttdef"><b>Definition:</b> <a href="swbstats2__support_8_f90_source.html#l01157">swbstats2_support.F90:1168</a></div></div>

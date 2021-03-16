@@ -309,6 +309,8 @@ Public Attributes</h2></td></tr>
 <tr class="separator:a923b78584e31156ea170c26ea325d615"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac6d31732746d108f05b7b99f821bc6fa"><td class="memItemLeft" align="right" valign="top">real(c_float), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmodel__domain_1_1model__domain__t.html#ac6d31732746d108f05b7b99f821bc6fa">current_rooting_depth</a></td></tr>
 <tr class="separator:ac6d31732746d108f05b7b99f821bc6fa"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac9a2e1e6e22f1f3e82aa8f07cecb6218"><td class="memItemLeft" align="right" valign="top">real(c_float), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmodel__domain_1_1model__domain__t.html#ac9a2e1e6e22f1f3e82aa8f07cecb6218">current_plant_height</a></td></tr>
+<tr class="separator:ac9a2e1e6e22f1f3e82aa8f07cecb6218"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa584eb2a28d6132c6ac31257305a6237"><td class="memItemLeft" align="right" valign="top">integer(c_int), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmodel__domain_1_1model__domain__t.html#aa584eb2a28d6132c6ac31257305a6237">number_of_days_since_planting</a></td></tr>
 <tr class="separator:aa584eb2a28d6132c6ac31257305a6237"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a1e2e84a801bb7739d0ae48c401345283"><td class="memItemLeft" align="right" valign="top">logical(c_bool), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmodel__domain_1_1model__domain__t.html#a1e2e84a801bb7739d0ae48c401345283">it_is_growing_season</a></td></tr>
@@ -343,6 +345,10 @@ Public Attributes</h2></td></tr>
 <tr class="separator:ad82dd07463fc78e428fb424ba77a6ed9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aaf4310a7086d076b8823656b9cf29002"><td class="memItemLeft" align="right" valign="top">real(c_float), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmodel__domain_1_1model__domain__t.html#aaf4310a7086d076b8823656b9cf29002">fraction_exposed_and_wetted_soil</a></td></tr>
 <tr class="separator:aaf4310a7086d076b8823656b9cf29002"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a25ee9b685521ce80d0a76438cbd62fd6"><td class="memItemLeft" align="right" valign="top">real(c_float), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmodel__domain_1_1model__domain__t.html#a25ee9b685521ce80d0a76438cbd62fd6">evaporable_water_storage</a></td></tr>
+<tr class="separator:a25ee9b685521ce80d0a76438cbd62fd6"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac14050dbce579e5b9723416095362da9"><td class="memItemLeft" align="right" valign="top">real(c_float), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmodel__domain_1_1model__domain__t.html#ac14050dbce579e5b9723416095362da9">evaporable_water_deficit</a></td></tr>
+<tr class="separator:ac14050dbce579e5b9723416095362da9"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ac2ba50c73dc2dd5f8879a333fb7dc0b3"><td class="memItemLeft" align="right" valign="top">real(c_float), dimension(:), allocatable&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmodel__domain_1_1model__domain__t.html#ac2ba50c73dc2dd5f8879a333fb7dc0b3">irrigation_mask</a></td></tr>
 <tr class="separator:ac2ba50c73dc2dd5f8879a333fb7dc0b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ae581a4cb9c0fb615f59754e6102b7fc9"><td class="memItemLeft" align="right" valign="top">procedure(<a class="el" href="interfacemodel__domain_1_1array__method.html">array_method</a>), pointer&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="structmodel__domain_1_1model__domain__t.html#ae581a4cb9c0fb615f59754e6102b7fc9">init_interception</a></td></tr>
@@ -451,7 +457,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00208">208</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00212">212</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -467,7 +473,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00192">192</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00196">196</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -483,7 +489,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00191">191</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00195">195</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -499,7 +505,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00195">195</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00199">199</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -515,7 +521,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00194">194</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00198">198</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -531,7 +537,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00225">225</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00229">229</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -547,7 +553,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00213">213</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00217">217</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -563,7 +569,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00212">212</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00216">216</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -579,7 +585,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00219">219</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00223">223</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -595,7 +601,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00218">218</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00222">222</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -611,7 +617,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00224">224</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00228">228</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -627,7 +633,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00188">188</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00192">192</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -643,7 +649,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00206">206</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00210">210</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -659,7 +665,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00222">222</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00226">226</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -675,7 +681,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00221">221</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00225">225</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -691,7 +697,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00198">198</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00202">202</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -707,7 +713,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00197">197</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00201">201</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -723,7 +729,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00204">204</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00208">208</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -739,7 +745,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00203">203</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00207">207</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -755,7 +761,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00201">201</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00205">205</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -771,7 +777,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00200">200</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00204">204</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -787,7 +793,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00210">210</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00214">214</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -803,7 +809,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00216">216</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00220">220</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -819,7 +825,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00215">215</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00219">219</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -835,7 +841,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00189">189</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00193">193</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -932,7 +938,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00133">133</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00134">134</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -996,7 +1002,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00169">169</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00173">173</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1012,7 +1018,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00163">163</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00167">167</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1028,7 +1034,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00176">176</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00180">180</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1044,7 +1050,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00177">177</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00181">181</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1060,7 +1066,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00172">172</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00176">176</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1076,7 +1082,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00174">174</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00178">178</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1092,7 +1098,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00159">159</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00163">163</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1108,7 +1114,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00173">173</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00177">177</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1124,7 +1130,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00165">165</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00169">169</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1140,7 +1146,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00167">167</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00171">171</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1156,7 +1162,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00168">168</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00172">172</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1172,7 +1178,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00166">166</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00170">170</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1188,7 +1194,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00170">170</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00174">174</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1204,7 +1210,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00171">171</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00175">175</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1220,7 +1226,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00184">184</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00188">188</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1320,6 +1326,22 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="ac9a2e1e6e22f1f3e82aa8f07cecb6218"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac9a2e1e6e22f1f3e82aa8f07cecb6218">&#9670;&nbsp;</a></span>current_plant_height</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real (c_float), dimension(:), allocatable model_domain::model_domain_t::current_plant_height</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00113">113</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+
+</div>
+</div>
 <a id="ac6d31732746d108f05b7b99f821bc6fa"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#ac6d31732746d108f05b7b99f821bc6fa">&#9670;&nbsp;</a></span>current_rooting_depth</h2>
 
@@ -1412,7 +1434,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00179">179</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00183">183</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1432,6 +1454,38 @@ Public Attributes</h2></td></tr>
 
 </div>
 </div>
+<a id="ac14050dbce579e5b9723416095362da9"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ac14050dbce579e5b9723416095362da9">&#9670;&nbsp;</a></span>evaporable_water_deficit</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real (c_float), dimension(:), allocatable model_domain::model_domain_t::evaporable_water_deficit</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00138">138</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+
+</div>
+</div>
+<a id="a25ee9b685521ce80d0a76438cbd62fd6"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a25ee9b685521ce80d0a76438cbd62fd6">&#9670;&nbsp;</a></span>evaporable_water_storage</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">real (c_float), dimension(:), allocatable model_domain::model_domain_t::evaporable_water_storage</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00137">137</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+
+</div>
+</div>
 <a id="a84dd818aad070c48f013d7b3d9736c0a"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a84dd818aad070c48f013d7b3d9736c0a">&#9670;&nbsp;</a></span>fog</h2>
 
@@ -1444,7 +1498,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00118">118</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00119">119</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1460,7 +1514,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00134">134</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00135">135</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1492,7 +1546,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00183">183</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00187">187</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1508,7 +1562,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00182">182</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00186">186</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1524,7 +1578,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00181">181</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00185">185</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1556,7 +1610,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00116">116</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00117">117</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1604,7 +1658,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00144">144</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00148">148</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1620,7 +1674,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00157">157</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00161">161</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1636,7 +1690,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00162">162</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00166">166</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1652,7 +1706,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00158">158</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00162">162</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1668,7 +1722,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00152">152</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00156">156</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1684,7 +1738,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00153">153</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00157">157</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1700,7 +1754,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00150">150</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00154">154</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1716,7 +1770,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00155">155</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00159">159</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1732,7 +1786,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00156">156</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00160">160</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1750,7 +1804,7 @@ Public Attributes</h2></td></tr>
 
 <p>declare procedure pointers - these will have to be initialized elsewhere </p>
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00141">141</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00145">145</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1766,7 +1820,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00151">151</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00155">155</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1782,7 +1836,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00164">164</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00168">168</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1798,7 +1852,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00149">149</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00153">153</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1814,7 +1868,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00143">143</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00147">147</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1830,7 +1884,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00145">145</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00149">149</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1846,7 +1900,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00142">142</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00146">146</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1862,7 +1916,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00147">147</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00151">151</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1878,7 +1932,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00148">148</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00152">152</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1894,7 +1948,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00146">146</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00150">150</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1942,7 +1996,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00123">123</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00124">124</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1958,7 +2012,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00138">138</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00142">142</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -1974,7 +2028,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00114">114</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00115">115</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -2038,7 +2092,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00117">117</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00118">118</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -2086,7 +2140,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00120">120</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00121">121</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -2102,7 +2156,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00122">122</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00123">123</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -2166,7 +2220,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00113">113</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00114">114</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -2230,7 +2284,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00178">178</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00182">182</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -2342,7 +2396,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00119">119</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00120">120</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -2358,7 +2412,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00180">180</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00184">184</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -2438,7 +2492,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00129">129</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00130">130</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -2550,7 +2604,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00121">121</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00122">122</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -2662,7 +2716,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00131">131</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00132">132</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -2774,7 +2828,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00126">126</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00127">127</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -2790,7 +2844,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00127">127</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00128">128</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -2806,7 +2860,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00125">125</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00126">126</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -2838,7 +2892,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00160">160</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00164">164</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -2854,7 +2908,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00175">175</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00179">179</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -2870,7 +2924,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00154">154</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00158">158</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>
@@ -2886,7 +2940,7 @@ Public Attributes</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00161">161</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="model__domain_8_f90_source.html#l00165">165</a> of file <a class="el" href="model__domain_8_f90_source.html">model_domain.F90</a>.</p>
 
 </div>
 </div>

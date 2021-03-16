@@ -106,22 +106,27 @@ Functions/Subroutines</h2></td></tr>
 <tr class="separator:a76e6ada7405afce49a4a59f0b4ff2e1b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab523715d0103f450c51ba2933d79e622"><td class="memItemLeft" align="right" valign="top">subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceactual__et____fao56____two__stage.html#ab523715d0103f450c51ba2933d79e622">actual_et_fao56_two_stage_initialize</a> ()</td></tr>
 <tr class="separator:ab523715d0103f450c51ba2933d79e622"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a15a8e54af32b151c46eaccec15793c20"><td class="memItemLeft" align="right" valign="top">elemental real(c_double) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceactual__et____fao56____two__stage.html#a15a8e54af32b151c46eaccec15793c20">calculate_evaporation_reduction_coefficient_kr</a> (landuse_index, soil_group, soil_moisture_deficit)</td></tr>
-<tr class="separator:a15a8e54af32b151c46eaccec15793c20"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:acf15122135ad2f6d83e1fe02444d1987"><td class="memItemLeft" align="right" valign="top">elemental real(c_float) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceactual__et____fao56____two__stage.html#acf15122135ad2f6d83e1fe02444d1987">calculate_fraction_exposed_and_wetted_soil_fc</a> (landuse_index, Kcb)</td></tr>
-<tr class="memdesc:acf15122135ad2f6d83e1fe02444d1987"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function estimates the fraction of the ground covered by vegetation during the growing season.  <a href="namespaceactual__et____fao56____two__stage.html#acf15122135ad2f6d83e1fe02444d1987">More...</a><br /></td></tr>
-<tr class="separator:acf15122135ad2f6d83e1fe02444d1987"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a06637db61cf36bec2d93ed1151bffd76"><td class="memItemLeft" align="right" valign="top">elemental real(c_double) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceactual__et____fao56____two__stage.html#a06637db61cf36bec2d93ed1151bffd76">calculate_surface_evap_coefficient_ke</a> (landuse_index, Kcb, Kr)</td></tr>
-<tr class="memdesc:a06637db61cf36bec2d93ed1151bffd76"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function estimates Ke, the bare surface evaporation coefficient.  <a href="namespaceactual__et____fao56____two__stage.html#a06637db61cf36bec2d93ed1151bffd76">More...</a><br /></td></tr>
-<tr class="separator:a06637db61cf36bec2d93ed1151bffd76"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8be8682bb1cc3e01a5f9da40836cf06b"><td class="memItemLeft" align="right" valign="top">elemental subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceactual__et____fao56____two__stage.html#a8be8682bb1cc3e01a5f9da40836cf06b">update_evaporable_water_storage</a> (evaporable_water_storage, evaporable_water_deficit, infiltration, landuse_index, soil_group)</td></tr>
+<tr class="separator:a8be8682bb1cc3e01a5f9da40836cf06b"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ab91f127ee51113f148398b40359bcf96"><td class="memItemLeft" align="right" valign="top">elemental real(c_double) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceactual__et____fao56____two__stage.html#ab91f127ee51113f148398b40359bcf96">calculate_evaporation_reduction_coefficient_kr</a> (landuse_index, soil_group, evaporable_water_deficit)</td></tr>
+<tr class="separator:ab91f127ee51113f148398b40359bcf96"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa396cbc166b62274fea7a7f93040fe56"><td class="memItemLeft" align="right" valign="top">elemental real(c_float) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceactual__et____fao56____two__stage.html#aa396cbc166b62274fea7a7f93040fe56">calculate_fraction_exposed_and_wetted_soil_fc</a> (landuse_index, Kcb, current_plant_height)</td></tr>
+<tr class="memdesc:aa396cbc166b62274fea7a7f93040fe56"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function estimates the fraction of the ground covered by vegetation during the growing season.  <a href="namespaceactual__et____fao56____two__stage.html#aa396cbc166b62274fea7a7f93040fe56">More...</a><br /></td></tr>
+<tr class="separator:aa396cbc166b62274fea7a7f93040fe56"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8d27805b5513f4ce41d6e5cde79668ea"><td class="memItemLeft" align="right" valign="top">elemental real(c_double) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceactual__et____fao56____two__stage.html#a8d27805b5513f4ce41d6e5cde79668ea">calculate_surface_evap_coefficient_ke</a> (landuse_index, Kcb, Kcb_max, Kr, fraction_exposed_and_wetted_soil)</td></tr>
+<tr class="memdesc:a8d27805b5513f4ce41d6e5cde79668ea"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function estimates Ke, the bare surface evaporation coefficient.  <a href="namespaceactual__et____fao56____two__stage.html#a8d27805b5513f4ce41d6e5cde79668ea">More...</a><br /></td></tr>
+<tr class="separator:a8d27805b5513f4ce41d6e5cde79668ea"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a5ca6e96aa217849c3e545542fbff4468"><td class="memItemLeft" align="right" valign="top">elemental subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceactual__et____fao56____two__stage.html#a5ca6e96aa217849c3e545542fbff4468">calculate_total_available_water</a> (taw, raw, adjusted_depletion_fraction_p, current_rooting_depth, awc)</td></tr>
 <tr class="memdesc:a5ca6e96aa217849c3e545542fbff4468"><td class="mdescLeft">&#160;</td><td class="mdescRight">This subroutine updates the total available water (TAW) (water within the rootzone) for a gridcell.  <a href="namespaceactual__et____fao56____two__stage.html#a5ca6e96aa217849c3e545542fbff4468">More...</a><br /></td></tr>
 <tr class="separator:a5ca6e96aa217849c3e545542fbff4468"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a3687a07864b0d6858be4bad3f06ff076"><td class="memItemLeft" align="right" valign="top">elemental real(c_float) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceactual__et____fao56____two__stage.html#a3687a07864b0d6858be4bad3f06ff076">update_plant_height</a> (landuse_index, it_is_growing_season, Kcb)</td></tr>
+<tr class="memdesc:a3687a07864b0d6858be4bad3f06ff076"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function updates the plant height by scaling values relative to the position of the current Kcb value on the Kcb curve.  <a href="namespaceactual__et____fao56____two__stage.html#a3687a07864b0d6858be4bad3f06ff076">More...</a><br /></td></tr>
+<tr class="separator:a3687a07864b0d6858be4bad3f06ff076"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a813969f340b581bf800357bea36617d0"><td class="memItemLeft" align="right" valign="top">elemental real(c_double) function&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceactual__et____fao56____two__stage.html#a813969f340b581bf800357bea36617d0">calculate_water_stress_coefficient_ks</a> (taw, raw, soil_moisture_deficit)</td></tr>
 <tr class="memdesc:a813969f340b581bf800357bea36617d0"><td class="mdescLeft">&#160;</td><td class="mdescRight">This function estimates Ks, water stress coefficient.  <a href="namespaceactual__et____fao56____two__stage.html#a813969f340b581bf800357bea36617d0">More...</a><br /></td></tr>
 <tr class="separator:a813969f340b581bf800357bea36617d0"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a251318097b34816fff1b4f2e11224764"><td class="memItemLeft" align="right" valign="top">elemental subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceactual__et____fao56____two__stage.html#a251318097b34816fff1b4f2e11224764">calculate_actual_et_fao56_two_stage</a> (actual_et, crop_etc, bare_soil_evap, taw, raw, fraction_exposed_and_wetted_soil, Kr, Ke, Ks, adjusted_depletion_fraction_p, soil_moisture_deficit, Kcb, landuse_index, soil_group, awc, current_rooting_depth, soil_storage, soil_storage_max, reference_et0)</td></tr>
-<tr class="separator:a251318097b34816fff1b4f2e11224764"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aa957a27764c3adb7143ee5da9e7c4cb7"><td class="memItemLeft" align="right" valign="top">impure elemental subroutine&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="namespaceactual__et____fao56____two__stage.html#aa957a27764c3adb7143ee5da9e7c4cb7">calculate_actual_et_fao56_two_stage</a> (actual_et, crop_etc, bare_soil_evap, taw, raw, fraction_exposed_and_wetted_soil, Kr, Ke, Ks, adjusted_depletion_fraction_p, soil_moisture_deficit, evaporable_water_storage, evaporable_water_deficit, it_is_growing_season, Kcb, landuse_index, soil_group, awc, current_rooting_depth, current_plant_height, soil_storage, soil_storage_max, reference_et0, infiltration)</td></tr>
+<tr class="separator:aa957a27764c3adb7143ee5da9e7c4cb7"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="var-members"></a>
 Variables</h2></td></tr>
@@ -195,14 +200,14 @@ Variables</h2></td></tr>
 
 </div>
 </div>
-<a id="a251318097b34816fff1b4f2e11224764"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a251318097b34816fff1b4f2e11224764">&#9670;&nbsp;</a></span>calculate_actual_et_fao56_two_stage()</h2>
+<a id="aa957a27764c3adb7143ee5da9e7c4cb7"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa957a27764c3adb7143ee5da9e7c4cb7">&#9670;&nbsp;</a></span>calculate_actual_et_fao56_two_stage()</h2>
 
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
         <tr>
-          <td class="memname">elemental subroutine actual_et__fao56__two_stage::calculate_actual_et_fao56_two_stage </td>
+          <td class="memname">impure elemental subroutine actual_et__fao56__two_stage::calculate_actual_et_fao56_two_stage </td>
           <td>(</td>
           <td class="paramtype">real (c_double), intent(inout)&#160;</td>
           <td class="paramname"><em>actual_et</em>, </td>
@@ -270,6 +275,24 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">real (c_float), intent(inout)&#160;</td>
+          <td class="paramname"><em>evaporable_water_storage</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real (c_float), intent(inout)&#160;</td>
+          <td class="paramname"><em>evaporable_water_deficit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">logical (c_bool), intent(in)&#160;</td>
+          <td class="paramname"><em>it_is_growing_season</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">real (c_float), intent(in)&#160;</td>
           <td class="paramname"><em>Kcb</em>, </td>
         </tr>
@@ -300,6 +323,12 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">real (c_float), intent(inout)&#160;</td>
+          <td class="paramname"><em>current_plant_height</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">real (c_double), intent(in)&#160;</td>
           <td class="paramname"><em>soil_storage</em>, </td>
         </tr>
@@ -313,7 +342,13 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">real (c_float), intent(in)&#160;</td>
-          <td class="paramname"><em>reference_et0</em>&#160;</td>
+          <td class="paramname"><em>reference_et0</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real (c_float), intent(in)&#160;</td>
+          <td class="paramname"><em>infiltration</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -323,12 +358,12 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html#l00223">223</a> of file <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html">actual_et__fao56__two_stage.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html#l00283">283</a> of file <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html">actual_et__fao56__two_stage.F90</a>.</p>
 
 </div>
 </div>
-<a id="a15a8e54af32b151c46eaccec15793c20"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a15a8e54af32b151c46eaccec15793c20">&#9670;&nbsp;</a></span>calculate_evaporation_reduction_coefficient_kr()</h2>
+<a id="ab91f127ee51113f148398b40359bcf96"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#ab91f127ee51113f148398b40359bcf96">&#9670;&nbsp;</a></span>calculate_evaporation_reduction_coefficient_kr()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -348,8 +383,8 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
-          <td class="paramtype">real (c_double), intent(in)&#160;</td>
-          <td class="paramname"><em>soil_moisture_deficit</em>&#160;</td>
+          <td class="paramtype">real (c_float), intent(in)&#160;</td>
+          <td class="paramname"><em>evaporable_water_deficit</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -359,12 +394,12 @@ Variables</h2></td></tr>
       </table>
 </div><div class="memdoc">
 
-<p class="definition">Definition at line <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html#l00092">92</a> of file <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html">actual_et__fao56__two_stage.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html#l00113">113</a> of file <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html">actual_et__fao56__two_stage.F90</a>.</p>
 
 </div>
 </div>
-<a id="acf15122135ad2f6d83e1fe02444d1987"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#acf15122135ad2f6d83e1fe02444d1987">&#9670;&nbsp;</a></span>calculate_fraction_exposed_and_wetted_soil_fc()</h2>
+<a id="aa396cbc166b62274fea7a7f93040fe56"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#aa396cbc166b62274fea7a7f93040fe56">&#9670;&nbsp;</a></span>calculate_fraction_exposed_and_wetted_soil_fc()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -379,7 +414,13 @@ Variables</h2></td></tr>
           <td class="paramkey"></td>
           <td></td>
           <td class="paramtype">real (c_float), intent(in)&#160;</td>
-          <td class="paramname"><em>Kcb</em>&#160;</td>
+          <td class="paramname"><em>Kcb</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real (c_float), intent(in)&#160;</td>
+          <td class="paramname"><em>current_plant_height</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -392,12 +433,12 @@ Variables</h2></td></tr>
 <p>This function estimates the fraction of the ground covered by vegetation during the growing season. </p>
 <dl class="section note"><dt>Note</dt><dd>Implemented as equation 76, FAO-56, Allen and others </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html#l00125">125</a> of file <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html">actual_et__fao56__two_stage.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html#l00146">146</a> of file <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html">actual_et__fao56__two_stage.F90</a>.</p>
 
 </div>
 </div>
-<a id="a06637db61cf36bec2d93ed1151bffd76"></a>
-<h2 class="memtitle"><span class="permalink"><a href="#a06637db61cf36bec2d93ed1151bffd76">&#9670;&nbsp;</a></span>calculate_surface_evap_coefficient_ke()</h2>
+<a id="a8d27805b5513f4ce41d6e5cde79668ea"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8d27805b5513f4ce41d6e5cde79668ea">&#9670;&nbsp;</a></span>calculate_surface_evap_coefficient_ke()</h2>
 
 <div class="memitem">
 <div class="memproto">
@@ -417,8 +458,20 @@ Variables</h2></td></tr>
         <tr>
           <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">real (c_float), intent(in)&#160;</td>
+          <td class="paramname"><em>Kcb_max</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
           <td class="paramtype">real (c_double), intent(in)&#160;</td>
-          <td class="paramname"><em>Kr</em>&#160;</td>
+          <td class="paramname"><em>Kr</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real (c_float), intent(in)&#160;</td>
+          <td class="paramname"><em>fraction_exposed_and_wetted_soil</em>&#160;</td>
         </tr>
         <tr>
           <td></td>
@@ -431,7 +484,7 @@ Variables</h2></td></tr>
 <p>This function estimates Ke, the bare surface evaporation coefficient. </p>
 <dl class="section note"><dt>Note</dt><dd>Implemented as equation 71, FAO-56, Allen and others </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html#l00161">161</a> of file <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html">actual_et__fao56__two_stage.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html#l00180">180</a> of file <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html">actual_et__fao56__two_stage.F90</a>.</p>
 
 </div>
 </div>
@@ -481,7 +534,7 @@ Variables</h2></td></tr>
 
 <p>This subroutine updates the total available water (TAW) (water within the rootzone) for a gridcell. </p>
 
-<p class="definition">Definition at line <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html#l00177">177</a> of file <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html">actual_et__fao56__two_stage.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html#l00205">205</a> of file <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html">actual_et__fao56__two_stage.F90</a>.</p>
 
 </div>
 </div>
@@ -520,7 +573,93 @@ Variables</h2></td></tr>
 <p>This function estimates Ks, water stress coefficient. </p>
 <dl class="section note"><dt>Note</dt><dd>Implemented as equation 84, FAO-56, Allen and others </dd></dl>
 
-<p class="definition">Definition at line <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html#l00197">197</a> of file <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html">actual_et__fao56__two_stage.F90</a>.</p>
+<p class="definition">Definition at line <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html#l00257">257</a> of file <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html">actual_et__fao56__two_stage.F90</a>.</p>
+
+</div>
+</div>
+<a id="a8be8682bb1cc3e01a5f9da40836cf06b"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a8be8682bb1cc3e01a5f9da40836cf06b">&#9670;&nbsp;</a></span>update_evaporable_water_storage()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">elemental subroutine actual_et__fao56__two_stage::update_evaporable_water_storage </td>
+          <td>(</td>
+          <td class="paramtype">real (c_float), intent(inout)&#160;</td>
+          <td class="paramname"><em>evaporable_water_storage</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real (c_float), intent(inout)&#160;</td>
+          <td class="paramname"><em>evaporable_water_deficit</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real (c_float), intent(in)&#160;</td>
+          <td class="paramname"><em>infiltration</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer (c_int), intent(in)&#160;</td>
+          <td class="paramname"><em>landuse_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">integer (c_int), intent(in)&#160;</td>
+          <td class="paramname"><em>soil_group</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p class="definition">Definition at line <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html#l00092">92</a> of file <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html">actual_et__fao56__two_stage.F90</a>.</p>
+
+</div>
+</div>
+<a id="a3687a07864b0d6858be4bad3f06ff076"></a>
+<h2 class="memtitle"><span class="permalink"><a href="#a3687a07864b0d6858be4bad3f06ff076">&#9670;&nbsp;</a></span>update_plant_height()</h2>
+
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">elemental real (c_float) function actual_et__fao56__two_stage::update_plant_height </td>
+          <td>(</td>
+          <td class="paramtype">integer (c_int), intent(in)&#160;</td>
+          <td class="paramname"><em>landuse_index</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">logical (c_bool), intent(in)&#160;</td>
+          <td class="paramname"><em>it_is_growing_season</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
+          <td></td>
+          <td class="paramtype">real (c_float), intent(in)&#160;</td>
+          <td class="paramname"><em>Kcb</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>This function updates the plant height by scaling values relative to the position of the current Kcb value on the Kcb curve. </p>
+
+<p class="definition">Definition at line <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html#l00225">225</a> of file <a class="el" href="actual__et____fao56____two__stage_8_f90_source.html">actual_et__fao56__two_stage.F90</a>.</p>
 
 </div>
 </div>

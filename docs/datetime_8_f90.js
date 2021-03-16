@@ -31,7 +31,7 @@ var datetime_8_f90 =
     [ "is_date_lt_or_equal_to", "datetime_8_f90.html#a09219f11214902cf509b74e35299d561", null ],
     [ "is_leap_year_fn", "datetime_8_f90.html#a3e71b1d6cd77eeed651d0120197601b7", null ],
     [ "isleap", "datetime_8_f90.html#abc0341bac8bd7c719e594cb81d74eff5", null ],
-    [ "julian_day", "datetime_8_f90.html#a00d59f377b22a5de9e18d6ce97dc89f6", null ],
+    [ "julian_day", "datetime_8_f90.html#afa5e67dc36f6d1b413d21032db16c4df", null ],
     [ "mmdd2doy", "datetime_8_f90.html#a83510e697056c126c8751ad9f455c428", null ],
     [ "mmddyyyy2doy", "datetime_8_f90.html#a45e83f3ca37dc7e31d24bba9bd6f9312", null ],
     [ "mmddyyyy2julian", "datetime_8_f90.html#a1c2ddc38bf9befe4497df5fbf79386e3", null ],

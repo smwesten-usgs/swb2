@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['rad_5fto_5fdeg_1494',['rad_to_deg',['../interfaceconstants__and__conversions_1_1rad__to__deg.html',1,'constants_and_conversions']]]
+  ['swbstats_5ft_1470',['swbstats_t',['../structswbstats2__support_1_1swbstats__t.html',1,'swbstats2_support']]]
 ];

@@ -23,8 +23,7 @@ var data__catalog__entry_8_f90 =
     [ "initialize_constant_real_data_object_sub", "data__catalog__entry_8_f90.html#abc2b7462a51211d80adab8af732d9a5a", null ],
     [ "initialize_gridded_data_object_sub", "data__catalog__entry_8_f90.html#afa55f20583261f5e940eafeecbb4b27a", null ],
     [ "initialize_netcdf_data_object_sub", "data__catalog__entry_8_f90.html#a31b67392fa06e1353337a50f04c3f7c1", null ],
-    [ "initialize_table_integer_data_object_sub", "data__catalog__entry_8_f90.html#a9844423fe800b433bf84d690be6644c0", null ],
-    [ "initialize_table_real_data_object_sub", "data__catalog__entry_8_f90.html#ade3c4eac717d92002630eda7f85dda9d", null ],
+    [ "initialize_table_sub", "data__catalog__entry_8_f90.html#a6bfff54cb2c52a4a6c9f4959d2332068", null ],
     [ "make_filename_from_template", "data__catalog__entry_8_f90.html#a15366d09524e1277e352b07f61ac5ac4", null ],
     [ "minmaxmean_float", "data__catalog__entry_8_f90.html#a8cc630521e6a0d96c71351aa528c930a", null ],
     [ "nullify_pointers_sub", "data__catalog__entry_8_f90.html#a237d2408d68b3264a7cdf13a0a25de68", null ],
@@ -64,6 +63,7 @@ var data__catalog__entry_8_f90 =
     [ "file_template_lowercase_monthname", "data__catalog__entry_8_f90.html#ae4f78fe73695cd8e513d6e23e7a78eff", null ],
     [ "file_template_uppercase_monthname", "data__catalog__entry_8_f90.html#a64f6df4a36404956832ab8d48669e83b", null ],
     [ "filetype_arc_ascii", "data__catalog__entry_8_f90.html#a7b1a32713f78adfddef085e917f5dde0", null ],
+    [ "filetype_ascii_table", "data__catalog__entry_8_f90.html#a10376f71114efe421cd69b77e5bd3bbf", null ],
     [ "filetype_netcdf", "data__catalog__entry_8_f90.html#aac00fbe88fdd2a2059ef2d8f7c36b4d3", null ],
     [ "filetype_none", "data__catalog__entry_8_f90.html#aaa5c45b6697ebdd6aabeac52e1bf3c3d", null ],
     [ "filetype_surfer", "data__catalog__entry_8_f90.html#a9a02251427b2f97a0c11c585fe96b68b", null ],
@@ -75,5 +75,5 @@ var data__catalog__entry_8_f90 =
     [ "pgrd", "data__catalog__entry_8_f90.html#a19b10fb5aad8dd57270ffcf3e90ba98d", null ],
     [ "static_grid", "data__catalog__entry_8_f90.html#a131e045d77624cb169ac02a27cc89185", null ],
     [ "static_netcdf_grid", "data__catalog__entry_8_f90.html#a8ea347314ae639b96407b5a394aa2c91", null ],
-    [ "table_lookup_grid", "data__catalog__entry_8_f90.html#a8ee3985a7dda37b2185ca3d227e0031a", null ]
+    [ "table_lookup", "data__catalog__entry_8_f90.html#a198c1ad41e96d4b1a6702340d573dd9a", null ]
 ];
