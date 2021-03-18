@@ -701,7 +701,7 @@ function julian_day ( iYear, iMonth, iDay, iOrigin, sInputItemName ) result(iJD)
   if ( illegal_month .or. illegal_day ) then
 !    call LOGS%write(" ** there was a problem converting month, day, year values to a Julian date **",    &
 !      iLinesBefore=2, iLogLevel=LOG_ALL, lEcho=TRUE, iTab=5)
-    call LOGS%write("month value: " + as_character(iMonth), iTab=15)
+    call LOGS%write("month value: " + as_character(iMonth), iTab=16)
     call LOGS%write("day value: " + as_character(iDay), iTab=18)
     call LOGS%write("year value: " + as_character(iYear), iTab=17)
     call LOGS%write("input type: " + sInputItemName_, iLinesAfter=1, iTab=17)

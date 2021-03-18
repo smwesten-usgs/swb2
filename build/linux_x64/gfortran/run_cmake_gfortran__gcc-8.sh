@@ -20,8 +20,8 @@ export BUILD_TYPE="Debug"
 export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -Wuninitialized -fbacktrace -fcheck=all -fexceptions -fmax-errors=6 -fbackslash -ffree-line-length-none -Wno-maybe-uninitialized"
 export CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -ffree-line-length-512 -fbackslash -ffpe-summary='none' -Wno-maybe-uninitialized"
 
-export FC="gfortran"
-export CC="gcc"
+export FC="gfortran-8"
+export CC="gcc-8"
 
 cmake "../../.." -G "Unix Makefiles"                         \
 -DCMAKE_BUILD_TYPE="$BUILD_TYPE "                            \

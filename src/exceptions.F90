@@ -151,13 +151,7 @@ contains
 
     call LOGS%set_loglevel( LOG_ALL )
 
-    ! if we are suppressing the halting of the overall program, we must be doing unit testing. if
-    ! we're in the middle of unit testing, suppress the normal echoing of error messages to the screen.
-    if (HALT_UPON_FATAL_ERROR) then
-      call LOGS%set_echo( .true._c_bool )
-    else
-      call LOGS%set_echo( .false._c_bool )
-    endif
+    if (HALT_UPON_FATAL_ERROR)   call LOGS%set_echo( .true._c_bool )
 
     call LOGS%write( "error condition:  "//trim(sMessage), iTab=12, iLinesBefore=1 )
 
@@ -187,10 +181,7 @@ contains
     if (HALT_UPON_FATAL_ERROR) then
       call LOGS%write( "** ERROR -- PROGRAM EXECUTION HALTED **", iLinesBefore=1, iLinesAfter=1 )
       stop
-    else
-      call LOGS%write( "** UNIT TESTING IN PROGRESS - CODE WOULD NORMALLY HALT HERE **", iLinesBefore=1, iLinesAfter=1 )
     endif
-
 
   end subroutine die
 

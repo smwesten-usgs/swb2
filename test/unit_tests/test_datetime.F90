@@ -9,6 +9,30 @@ module test_datetime
 
 contains
 
+subroutine start_supressing_fatal_errors()
+
+  ! override exceptions module default behavior, which is to stop program execution entirely
+  HALT_UPON_FATAL_ERROR = FALSE
+
+  call LOGS%set_echo( TRUE )
+  call LOGS%write(repeat("-",80), iLinesBefore=2)
+  call LOGS%write(">>>>> FATAL ERROR WAS SUPPRESSED FOR UNIT TESTING. ERROR MESSAGE: >>>>>", iLinesAfter=2)
+
+end subroutine start_supressing_fatal_errors
+
+!-------------------------------------------------------------------------------
+
+subroutine stop_supressing_fatal_errors()
+
+  ! reset global variable to normal mode of operation (normal == CRASH, HARD, when error is detected)
+  HALT_UPON_FATAL_ERROR = TRUE
+
+  call LOGS%write("<<<<< END OF FATAL ERROR SUPPRESSED FOR UNIT TESTING <<<<<", iLinesBefore=2)
+  call LOGS%write(repeat("-",80), iLinesAfter=2)
+  call LOGS%set_echo( FALSE )
+
+end subroutine stop_supressing_fatal_errors
+
 !-------------------------------------------------------------------------------
 
   subroutine test_datetime_basic_dateparse
@@ -28,8 +52,12 @@ contains
    ! datetime: parse with non-existant day value
      type (DATETIME_T) :: dt
 
+     call start_supressing_fatal_errors()
+
      call dt%parseDate("2/29/2001", sFilename=trim(__SRCNAME__), iLineNumber=__LINE__)
      call assert_true( dt%dJulianDate < 0.)
+
+     call stop_supressing_fatal_errors()
 
    end subroutine test_datetime_illegal_values
 
@@ -38,7 +66,7 @@ contains
    subroutine test_datetime_basic_mangled_dateparse
     ! datetime: parse with default mm/dd/yyyy date format, missing '0' values in month and day
       type (DATETIME_T) :: dt
- 
+
       call dt%parseDate("3/2/2011", sFilename=trim(__SRCNAME__), iLineNumber=__LINE__)
       call assert_equals (3, int(dt%iMonth))
       call assert_equals (2, int(dt%iDay))
@@ -87,16 +115,13 @@ contains
       type (DATETIME_T)    :: dt
       integer              :: indx
 
-      ! override exceptions module default behavior, which is to stop program execution entirely
-      HALT_UPON_FATAL_ERROR = FALSE
+      call start_supressing_fatal_errors()
 
-      call dt%calcJulianDay(iMonth=0, iDay=28, iYear=2000)
- 
+      call dt%calcJulianDay(iMonth=0, iDay=28, iYear=2000) 
       call assert_equals(iTINYVAL, int(dt%iJulianDay))
 
-      ! reset global variable to normal mode of operation (normal == CRASH, HARD, when error is detected)
-      HALT_UPON_FATAL_ERROR = TRUE
- 
+      call stop_supressing_fatal_errors()
+      
     end subroutine test_datetime_julian_date_illegal_month
  
  !-------------------------------------------------------------------------------
@@ -106,15 +131,12 @@ contains
         type (DATETIME_T)    :: dt
         integer              :: indx
   
-        ! override exceptions module default behavior, which is to stop program execution entirely
-        HALT_UPON_FATAL_ERROR = FALSE
-  
+        call start_supressing_fatal_errors()
+
         call dt%calcJulianDay(iMonth=2, iDay=0, iYear=2000)
-   
         call assert_equals(iTINYVAL, int(dt%iJulianDay))
 
-        ! reset global variable to normal mode of operation (normal == CRASH, HARD, when error is detected)
-        HALT_UPON_FATAL_ERROR = TRUE
+        call stop_supressing_fatal_errors()
 
       end subroutine test_datetime_julian_date_illegal_day
   
@@ -125,16 +147,13 @@ contains
           type (DATETIME_T)    :: dt
           integer              :: indx
     
-          ! override exceptions module default behavior, which is to stop program execution entirely
-          HALT_UPON_FATAL_ERROR = FALSE
-    
-          call dt%calcJulianDay(iMonth=13, iDay=0, iYear=2000)
-     
+          call start_supressing_fatal_errors()
+
+          call dt%calcJulianDay(iMonth=13, iDay=0, iYear=2000)     
           call assert_equals(iTINYVAL, int(dt%iJulianDay))
 
-          ! reset global variable to normal mode of operation (normal == CRASH, HARD, when error is detected)
-          HALT_UPON_FATAL_ERROR = TRUE
-     
+          call stop_supressing_fatal_errors()
+          
         end subroutine test_datetime_julian_date_illegal_month_day
   
   end module test_datetime

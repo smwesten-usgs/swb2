@@ -1,6 +1,6 @@
-cmake_minimum_required(VERSION 3.5)
-project( swb2 
-         LANGUAGES C Fortran )
+cmake_minimum_required(VERSION 3.7)
+
+project( swb2 LANGUAGES C Fortran )
 
 message("Processing top-level CMakelists.txt for project swb2")
 
