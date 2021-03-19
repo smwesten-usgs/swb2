@@ -1181,6 +1181,10 @@ contains
 
           call pENTRY%set_offset(asFloat(sArgText_1))
 
+        elseif ( sCmdText .containssimilar. "_COORDINATE_TOLERANCE" ) then
+
+          call pENTRY%set_coordinate_tolerance( asDouble(sArgText_1))
+
         elseif ( sCmdText .containssimilar. "NETCDF_X_VAR" ) then
 
           pENTRY%sVariableName_x = trim(sArgText_1)
@@ -1289,7 +1293,7 @@ contains
 
       ! if an unadorned grid specification directive was processed, then we can add the key and
       ! the data_catalog_entry to the data_catalog
-      if ( lGridPresent )call DAT%add( key=sKey, data=pENTRY )
+      if ( lGridPresent )  call DAT%add( key=sKey, data=pENTRY )
 
       pENTRY => null()
 

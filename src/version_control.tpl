@@ -1,5 +1,6 @@
 module version_control
 
+  use iso_c_binding, only             : c_bool
   implicit none
 
 #ifndef VERSION_H
@@ -9,6 +10,7 @@ module version_control
 #define EXPAND_AND_QUOTE(str) QUOTE(str)
 
 #define PLATFORM_NAME "@CMAKE_SYSTEM@"
+#define WINDOWS_SYSTEM_BOOL "@WIN32"
 #define GIT_BRANCH_VALUE "@GIT_BRANCH@"
 #define GIT_COMMIT_HASH_VALUE "@GIT_COMMIT_HASH@"
 #define GIT_COMMITS_ON_BRANCH_VALUE "@GIT_COMMITS_ON_BRANCH@"
@@ -35,6 +37,7 @@ module version_control
   character (len=*), parameter :: COMPILE_DATE = trim(__DATE__)
   character (len=*), parameter :: COMPILE_TIME = trim(__TIME__)
   character (len=*), parameter :: COMPILATION_TIMESTAMP = trim(COMPILE_DATE)//"  "//trim(COMPILE_TIME)
+  logical (c_bool), parameter  :: WINDOWS_SYSTEM = (trim(WINDOWS_SYSTEM_BOOL) == "True")
 
 #endif
 

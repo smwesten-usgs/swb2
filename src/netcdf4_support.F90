@@ -228,6 +228,7 @@ module netcdf4_support
     character (len=3) :: sVariableOrder = "tyx"
     real (c_double), dimension(0:1) :: rX
     real (c_double), dimension(0:1) :: rY
+    real (c_double)   :: rCoordinateTolerance = 0.0_c_double  ! set this to be > 0.0 to allow some 'slop' when comparing coordinates
     logical (c_bool)  :: lX_IncreasesWithIndex = TRUE
     logical (c_bool)  :: lY_IncreasesWithIndex = FALSE
     logical (c_bool)  :: lAllowAutomaticDataFlipping = TRUE
@@ -301,6 +302,7 @@ module netcdf4_support
   public :: netcdf_put_packed_variable_array
   public :: netcdf_put_variable_vector
   public :: netcdf_coord_to_col_row
+  public :: netcdf_set_coordinate_tolerance
   public :: netcdf_get_variable_id_for_variable
 
 contains
@@ -731,6 +733,7 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
     rX_Coord_AddOffset, rY_Coord_AddOffset,                    &
     sVariableOrder, sVarName_x,                                &
     sVarName_y, sVarName_z, sVarName_time,                     &
+    rCoordinateTolerance,                                      &
     tGridBounds, iLU)
 
   type (T_NETCDF4_FILE ) :: NCFILE
@@ -745,6 +748,7 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
   character (len=*), optional :: sVarName_y
   character (len=*), optional :: sVarName_z
   character (len=*), optional :: sVarName_time
+  real (c_double), optional   :: rCoordinateTolerance
   type (GRID_BOUNDS_T), optional :: tGridBounds
   integer (c_int), optional :: iLU
 
@@ -767,6 +771,8 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
       NCFILE%lAllowAutomaticDataFlipping = lAllowAutomaticDataFlipping
   if (present(rX_Coord_AddOffset))  NCFILE%rX_Coord_AddOffset = rX_Coord_AddOffset
   if (present(rY_Coord_AddOffset))  NCFILE%rY_Coord_AddOffset = rY_Coord_AddOffset
+
+  if (present(rCoordinateTolerance))  NCFILE%rCoordinateTolerance = rCoordinateTolerance
 
   if (present(sVariableOrder) )  NCFILE%sVariableOrder = sVariableOrder
 
@@ -2029,6 +2035,19 @@ subroutine netcdf_get_attribute_list_for_variable( NCFILE, variable_name, &
 
 end subroutine netcdf_get_attribute_list_for_variable
 
+!----------------------------------------------------------------------
+
+subroutine netcdf_set_coordinate_tolerance(NCFILE, tolerance)
+
+  type (T_NETCDF4_FILE)        :: NCFILE
+  real (c_double), intent(in)  :: tolerance
+
+  NCFILE%rCoordinateTolerance = tolerance
+
+end subroutine netcdf_set_coordinate_tolerance
+
+!----------------------------------------------------------------------
+
 subroutine netcdf_get_variable_list( NCFILE, variable_list )
 
   type (T_NETCDF4_FILE) :: NCFILE
@@ -3197,8 +3216,8 @@ function netcdf_coord_to_col_row(NCFILE, rX, rY)  result(iColRow)
   real (c_double) :: x_offset
   real (c_double) :: y_offset
 
-  x_offset = NCFILE%rGridCellSizeX / 2.0_c_double
-  y_offset = NCFILE%rGridCellSizeY / 2.0_c_double
+  x_offset = NCFILE%rGridCellSizeX / 2.0_c_double + NCFILE%rCoordinateTolerance
+  y_offset = NCFILE%rGridCellSizeY / 2.0_c_double + NCFILE%rCoordinateTolerance
 
   call assert( allocated( NCFILE%rX_Coords ), "Internal programming error -- attempt " &
   //"to access unallocated array rX_Coords.", __SRCNAME__, __LINE__ )

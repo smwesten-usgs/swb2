@@ -86,6 +86,7 @@ module data_catalog_entry
     real (c_double)      :: rUserAddOffset = 0_c_double
     real (c_double)      :: rX_Coord_AddOffset = 0.0_c_double
     real (c_double)      :: rY_Coord_AddOffset = 0.0_c_double
+    real (c_double)      :: rCoordinateTolerance = 0.0_c_double
 
     logical (c_bool)     :: lAllowMissingFiles = FALSE
     logical (c_bool)     :: lAllowAutomaticDataFlipping = TRUE
@@ -150,10 +151,11 @@ module data_catalog_entry
 
     procedure  :: initialize_netcdf => initialize_netcdf_data_object_sub
 
-    procedure  :: set_scale    => set_scale_sub
-    procedure  :: set_offset   => set_offset_sub
-    procedure  :: set_X_offset => set_X_coord_offset_sub
-    procedure  :: set_Y_offset => set_Y_coord_offset_sub
+    procedure  :: set_scale                => set_scale_sub
+    procedure  :: set_offset               => set_offset_sub
+    procedure  :: set_X_offset             => set_X_coord_offset_sub
+    procedure  :: set_Y_offset             => set_Y_coord_offset_sub
+    procedure  :: set_coordinate_tolerance => set_coordinate_tolerance_sub
 
     procedure  :: set_majority_filter_flag => set_majority_filter_flag_sub
 
@@ -1330,7 +1332,6 @@ end subroutine set_constant_value_real
 
     enddo
 
-
   end function test_for_need_to_pad_values_fn
 
 !--------------------------------------------------------------------------------------------------
@@ -1346,6 +1347,9 @@ end subroutine set_constant_value_real
     logical (c_bool) :: lDateTimeFound
     real (c_double) :: dAddOffset
     real (c_double) :: dScaleFactor
+    integer (c_int) :: iMonth
+    integer (c_int) :: iDay
+    integer (c_int) :: iYear
 
     if ( .not. associated(this%pGrdBase) ) &
       call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
@@ -1398,40 +1402,42 @@ end subroutine set_constant_value_real
             if( ( len_trim( this%sSourcePROJ4_string ) > 0 )                    &
               .and. ( .not. ( this%sSourcePROJ4_string .strequal. "<NA>") ) ) then
 
-              ! calculate the project boundaries in the coordinate system of
+                ! calculate the project boundaries in the coordinate system of
               ! the native data file
               call this%calc_project_boundaries(pGrdBase=this%pGrdBase)
 
               if ( this%lRequireCompleteSpatialCoverage ) then
 
-                call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE, &
-                  sFilename=this%sSourceFilename, &
-                  lFlipHorizontal=this%lFlipHorizontal, &
-                  lFlipVertical=this%lFlipVertical, &
-                  lAllowAutomaticDataFlipping=this%lAllowAutomaticDataFlipping, &
-                  rX_Coord_AddOffset = this%rX_Coord_AddOffset, &
-                  rY_Coord_AddOffset = this%rY_Coord_AddOffset, &
-                  sVariableOrder=this%sVariableOrder, &
-                  sVarName_x=this%sVariableName_x, &
-                  sVarName_y=this%sVariableName_y, &
-                  sVarName_z=this%sVariableName_z, &
-                  sVarName_time=this%sVariableName_time, &
+                call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE,          &
+                  sFilename=this%sSourceFilename,                                  &
+                  lFlipHorizontal=this%lFlipHorizontal,                            &
+                  lFlipVertical=this%lFlipVertical,                                &
+                  lAllowAutomaticDataFlipping=this%lAllowAutomaticDataFlipping,    &
+                  rX_Coord_AddOffset = this%rX_Coord_AddOffset,                    &
+                  rY_Coord_AddOffset = this%rY_Coord_AddOffset,                    &
+                  sVariableOrder=this%sVariableOrder,                              &
+                  sVarName_x=this%sVariableName_x,                                 &
+                  sVarName_y=this%sVariableName_y,                                 &
+                  sVarName_z=this%sVariableName_z,                                 &
+                  sVarName_time=this%sVariableName_time,                           &
+                  rCoordinateTolerance=this%rCoordinateTolerance,                  &
                   tGridBounds=this%GRID_BOUNDS_NATIVE )
 
               else
 
-                call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE, &
-                  sFilename=this%sSourceFilename, &
-                  lFlipHorizontal=this%lFlipHorizontal, &
-                  lFlipVertical=this%lFlipVertical, &
-                  lAllowAutomaticDataFlipping=this%lAllowAutomaticDataFlipping, &
-                  rX_Coord_AddOffset = this%rX_Coord_AddOffset, &
-                  rY_Coord_AddOffset = this%rY_Coord_AddOffset, &
-                  sVariableOrder=this%sVariableOrder, &
-                  sVarName_x=this%sVariableName_x, &
-                  sVarName_y=this%sVariableName_y, &
-                  sVarName_z=this%sVariableName_z, &
-                  sVarName_time=this%sVariableName_time )
+                call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE,          &
+                  sFilename=this%sSourceFilename,                                  &
+                  lFlipHorizontal=this%lFlipHorizontal,                            &
+                  lFlipVertical=this%lFlipVertical,                                &
+                  lAllowAutomaticDataFlipping=this%lAllowAutomaticDataFlipping,    &
+                  rX_Coord_AddOffset = this%rX_Coord_AddOffset,                    &
+                  rY_Coord_AddOffset = this%rY_Coord_AddOffset,                    &
+                  sVariableOrder=this%sVariableOrder,                              &
+                  sVarName_x=this%sVariableName_x,                                 &
+                  sVarName_y=this%sVariableName_y,                                 &
+                  sVarName_z=this%sVariableName_z,                                 &
+                  sVarName_time=this%sVariableName_time,                           &
+                  rCoordinateTolerance=this%rCoordinateTolerance )
 
               endif
 
@@ -1439,15 +1445,16 @@ end subroutine set_constant_value_real
 
               ! assume source NetCDF file is in same projection and
               ! of same dimensions as base grid
-              call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE, &
-                sFilename=this%sSourceFilename, &
-                lFlipHorizontal=this%lFlipHorizontal, &
-                lFlipVertical=this%lFlipVertical, &
-                lAllowAutomaticDataFlipping=this%lAllowAutomaticDataFlipping, &
-                sVariableOrder=this%sVariableOrder, &
-                sVarName_x=this%sVariableName_x, &
-                sVarName_y=this%sVariableName_y, &
-                sVarName_z=this%sVariableName_z, &
+              call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE,              &
+                sFilename=this%sSourceFilename,                                      &
+                lFlipHorizontal=this%lFlipHorizontal,                                &
+                lFlipVertical=this%lFlipVertical,                                    &
+                lAllowAutomaticDataFlipping=this%lAllowAutomaticDataFlipping,        &
+                sVariableOrder=this%sVariableOrder,                                  &
+                sVarName_x=this%sVariableName_x,                                     &
+                sVarName_y=this%sVariableName_y,                                     &
+                sVarName_z=this%sVariableName_z,                                     &
+                rCoordinateTolerance=this%rCoordinateTolerance,                       &
                 sVarName_time=this%sVariableName_time )
 
               this%NCFILE%iNX = this%pGrdBase%iNX
@@ -1492,14 +1499,11 @@ end subroutine set_constant_value_real
           else
             ! Projection settings can be left alone; read values from new
             ! NetCDF file with same grid boundaries, projection, etc.
-
-  !          call netcdf_open_file(NCFILE=this%NCFILE, sFilename=this%sSourceFilename, iLU=LU_LOG)
             call netcdf_open_file(NCFILE=this%NCFILE, sFilename=this%sSourceFilename)
 
             this%iNC_FILE_STATUS = NETCDF_FILE_OPEN
 
           endif
-
 
           if ( netcdf_date_within_range(NCFILE=this%NCFILE,                    &
                iJulianDay=int(dt%iJulianDay, c_int) ) ) then
@@ -1517,13 +1521,21 @@ end subroutine set_constant_value_real
 
           else
 
-            call LOGS%write("Valid date range (NetCDF): "//trim(asCharacter(this%NCFILE%iFirstDayJD)) &
-              //" to "//trim(asCharacter(this%NCFILE%iLastDayJD)) )
-
-            call LOGS%write("Current Julian Day value: "//trim(asCharacter(dt%iJulianDay)) )
+            call gregorian_date(this%NCFILE%iFirstDayJD,iYear, iMonth, iDay )
+            call LOGS%write("NetCDF start date:            "//trim(asCharacter(iMonth, "i2.2"))  &
+              //"/"//trim(asCharacter(iDay, "i2.2"))//"/"//trim(asCharacter(iYear, "i4.4")))
+              !//" to "//trim(asCharacter(this%NCFILE%iLastDayJD)) )
+            
+            call gregorian_date(this%NCFILE%iLastDayJD,iYear, iMonth, iDay )
+            call LOGS%write("NetCDF end date:              "//trim(asCharacter(iMonth, "i2.2"))  &
+              //"/"//trim(asCharacter(iDay, "i2.2"))//"/"//trim(asCharacter(iYear, "i4.4")))
+  
+            call gregorian_date(int(dt%iJulianDay, c_int),iYear, iMonth, iDay )
+            call LOGS%write("Current SWB simulation date:  "//trim(asCharacter(iMonth, "i2.2"))  &
+              //"/"//trim(asCharacter(iDay, "i2.2"))//"/"//trim(asCharacter(iYear, "i4.4")))
 
             call assert (FALSE, "Date range for currently open NetCDF file" &
-              //" does not include the present simulation date.", &
+              //" does not include the current simulation date.", &
               __SRCNAME__, __LINE__)
 
           endif
@@ -1941,11 +1953,22 @@ end subroutine set_X_coord_offset_sub
 subroutine set_Y_coord_offset_sub(this, rYOffset)
 
    class (DATA_CATALOG_ENTRY_T) :: this
-   real (c_double)         :: rYOffset
+   real (c_double)              :: rYOffset
 
    this%rY_Coord_AddOffset = rYOffset
 
 end subroutine set_Y_coord_offset_sub
+
+!----------------------------------------------------------------------
+
+subroutine set_coordinate_tolerance_sub(this, rCoordinateTolerance)
+
+  class (DATA_CATALOG_ENTRY_T) :: this
+  real (c_double)              :: rCoordinateTolerance
+
+  this%rCoordinateTolerance = rCoordinateTolerance
+
+end subroutine set_coordinate_tolerance_sub  
 
 !----------------------------------------------------------------------
 
