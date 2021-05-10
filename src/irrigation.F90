@@ -64,9 +64,8 @@ contains
 !! @param[in] pConfig Pointer to the configuration data structure (type T_CONFIG).
 !!
 
-  subroutine irrigation__initialize( irrigation_mask, is_active)
+  subroutine irrigation__initialize( is_active)
 
-    real (c_float), intent(inout)   :: irrigation_mask(:)
     logical (c_bool), intent(in)    :: is_active(:,:)
 
     ! [ LOCALS ]
@@ -363,20 +362,19 @@ contains
         //asCharacter( number_of_landuse_codes )//").",                                   &
         sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
 
+   ! locate the data structure associated with the gridded irrigation mask entries
+    ! pIRRIGATION_MASK => DAT%find("IRRIGATION_MASK")
+    ! if ( associated(pIRRIGATION_MASK) ) call pIRRIGATION_MASK%getvalues( )
 
-    ! locate the data structure associated with the gridded irrigation mask entries
-    pIRRIGATION_MASK => DAT%find("IRRIGATION_MASK")
-    if ( associated(pIRRIGATION_MASK) ) call pIRRIGATION_MASK%getvalues( )
+    ! if ( associated(pIRRIGATION_MASK) ) then
 
-    if ( associated(pIRRIGATION_MASK) ) then
+    !   irrigation_mask = pack( real(pIRRIGATION_MASK%pGrdBase%iData, c_float), is_active )
 
-      irrigation_mask = pack( real(pIRRIGATION_MASK%pGrdBase%iData, c_float), is_active )
+    ! else
 
-    else
+    !   irrigation_mask = 1.0_c_float
 
-      irrigation_mask = 1.0_c_float
-
-    endif
+    ! endif
 
     call LOGS%write(" ## Initializing irrigation application rules and application schedules ##", iLinesBefore=1, &
       iLinesAfter=1, iLogLevel=LOG_ALL )

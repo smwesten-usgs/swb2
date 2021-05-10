@@ -152,6 +152,7 @@ contains
     do while ( SIM_DT%curr <= SIM_DT%end )
 
       call cells%update_landuse_codes()
+      call cells%update_irrigation_mask()
 
       do sim_number=1,number_of_simulations
 

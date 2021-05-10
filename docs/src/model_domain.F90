@@ -152,6 +152,7 @@ module model_domain
     procedure ( array_method ), pointer  :: init_direct_net_infiltration
     procedure ( array_method ), pointer  :: init_direct_soil_moisture
     procedure ( array_method ), pointer  :: update_landuse_codes
+    procedure ( array_method ), pointer  :: update_irrigation_mask
     procedure ( array_method ), pointer  :: init_GDD
     procedure ( array_method ), pointer  :: init_growing_season
     procedure ( array_method ), pointer  :: init_AWC
@@ -317,6 +318,7 @@ contains
      this%init_direct_net_infiltration => model_initialize_direct_net_infiltration_gridded
      this%init_direct_soil_moisture    => model_initialize_direct_soil_moisture_none
      this%update_landuse_codes         => model_update_landuse_codes_static
+     this%update_irrigation_mask       => model_update_irrigation_mask_static
      this%init_GDD                     => model_initialize_GDD
      this%init_growing_season          => model_initialize_growing_season
      this%init_AWC                     => model_initialize_available_water_content_gridded
@@ -817,6 +819,48 @@ contains
   end subroutine read_landuse_codes
 
 !--------------------------------------------------------------------------------------------------
+
+  subroutine read_irrigation_mask
+
+    ! [ LOCALS ]
+    type (DATA_CATALOG_ENTRY_T), pointer :: pIRR_MASK
+    character (len=10)                   :: date_str
+
+    pIRR_MASK => DAT%find("IRRIGATION_MASK")
+
+    if ( associated(pIRR_MASK) ) then
+
+      if (pIRR_MASK%iSourceDataForm == DYNAMIC_GRID) then
+
+        MODEL%update_irrigation_mask => model_update_irrigation_mask_dynamic
+
+        call pIRR_MASK%getvalues( SIM_DT%curr )
+
+        if ( pIRR_MASK%lGridHasChanged ) then
+          date_str = SIM_DT%curr%prettydate()
+          call grid_WriteArcGrid("Irrigation_mask__as_read_into_SWB__"     &
+                                //trim(date_str)//".asc", pIRR_MASK%pGrdBase )
+        endif
+
+      else
+
+        call pIRR_MASK%getvalues()
+        call grid_WriteArcGrid("Irrigation_mask__as_read_into_SWB.asc", pIRR_MASK%pGrdBase )
+
+      endif
+
+    else
+
+      call warn(sMessage="IRRIGATION_MASK dataset is flawed or missing.", lFatal=TRUE,   &
+        iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"   &
+        //" been ~included in the control file for the IRRIGATION_MASK dataset.",        &
+        lEcho = TRUE )
+
+    endif
+
+  end subroutine read_irrigation_mask
+
+  !--------------------------------------------------------------------------------------------------
 
   !> Match landuse codes from table with those contained in the gridded landuse.
   !!

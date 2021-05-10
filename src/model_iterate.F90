@@ -36,6 +36,7 @@ contains
       call LOGS%write("Calculating: "//SIM_DT%curr%prettydate(), iLogLevel=LOG_ALL, lEcho=.true._c_bool )
 
       call cells%update_landuse_codes()
+      call cells%update_irrigation_mask()
 
       call cells%get_climate_data( )
       call perform_daily_calculation( cells )

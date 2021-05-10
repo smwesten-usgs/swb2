@@ -156,6 +156,7 @@ module model_domain
     procedure ( array_method ), pointer  :: init_direct_net_infiltration
     procedure ( array_method ), pointer  :: init_direct_soil_moisture
     procedure ( array_method ), pointer  :: update_landuse_codes
+    procedure ( array_method ), pointer  :: update_irrigation_mask
     procedure ( array_method ), pointer  :: init_GDD
     procedure ( array_method ), pointer  :: init_growing_season
     procedure ( array_method ), pointer  :: init_AWC
@@ -416,7 +417,7 @@ contains
     integer (c_int)  :: iCount
     integer (c_int)  :: iIndex
     integer (c_int)  :: indx
-    integer (c_int)  :: iStat(67)
+    integer (c_int)  :: iStat(68)
 
     iCount = count( this%active )
     iStat = 0
@@ -487,6 +488,7 @@ contains
     allocate( this%net_snowfall( iCount ), stat=iStat(65) )
     allocate( this%evaporable_water_storage( iCount ), stat=iStat(66))
     allocate( this%evaporable_water_deficit( iCount ), stat=iStat(67))
+    allocate( this%irrigation_mask( iCount), stat=iStat(68))
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR"                    &
@@ -562,6 +564,7 @@ contains
     this%evaporable_water_storage            = 0.0_c_float
     this%evaporable_water_deficit            = 0.0_c_float
     this%it_is_growing_season                = FALSE
+    this%irrigation_mask                     = 1.0_c_float
 
     do iIndex=1, iCount
       this%sort_order( iIndex ) = iIndex
@@ -784,6 +787,48 @@ contains
     call grid_Destroy( pTempGrd )
 
   end subroutine set_inactive_cells_sub
+
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine read_irrigation_mask
+
+    ! [ LOCALS ]
+    type (DATA_CATALOG_ENTRY_T), pointer :: pIRR_MASK
+    character (len=10)                   :: date_str
+
+    pIRR_MASK => DAT%find("IRRIGATION_MASK")
+
+    if ( associated(pIRR_MASK) ) then
+
+      if (pIRR_MASK%iSourceDataForm == DYNAMIC_GRID) then
+
+        MODEL%update_irrigation_mask => model_update_irrigation_mask_dynamic
+
+        call pIRR_MASK%getvalues( SIM_DT%curr )
+
+        if ( pIRR_MASK%lGridHasChanged ) then
+          date_str = SIM_DT%curr%prettydate()
+          call grid_WriteArcGrid("Irrigation_mask__as_read_into_SWB__"     &
+                                //trim(date_str)//".asc", pIRR_MASK%pGrdBase )
+        endif
+
+      else
+
+        call pIRR_MASK%getvalues()
+        call grid_WriteArcGrid("Irrigation_mask__as_read_into_SWB.asc", pIRR_MASK%pGrdBase )
+
+      endif
+
+    else
+
+      call warn(sMessage="IRRIGATION_MASK dataset is flawed or missing.", lFatal=FALSE,         &
+        iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"   &
+        //" been ~included in the control file for the LAND_USE dataset.",               &
+        lEcho = TRUE )
+
+    endif
+
+  end subroutine read_irrigation_mask
 
 !--------------------------------------------------------------------------------------------------
 
@@ -2368,18 +2413,7 @@ contains
 
   subroutine model_initialize_irrigation( this )
 
-    use irrigation
-
     class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-    ! [ LOCALS ]
-    integer (c_int) :: status
-
-    allocate( this%irrigation_mask( count( this%active ) ), stat=status )
-    call assert( status==0, "Problem allocating memory.", &
-      __SRCNAME__, __LINE__ )
-
-    call irrigation__initialize( this%irrigation_mask, this%active )
 
   end subroutine model_initialize_irrigation
 
@@ -2597,12 +2631,80 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
-    subroutine model_update_landuse_codes_static ( this )
+  subroutine model_update_irrigation_mask_static ( this )
 
-      class (MODEL_DOMAIN_T), intent(inout)  :: this
-      !> Nothing here to see.
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    ! [ LOCALS ]
+    type (DATA_CATALOG_ENTRY_T), pointer :: pIRR_MASK
 
-    end subroutine model_update_landuse_codes_static
+    if (SIM_DT%iDayOfSimulation == 0) then
+
+      pIRR_MASK => DAT%find("IRRIGATION_MASK")
+
+      if ( associated(pIRR_MASK) ) then
+  
+        call read_irrigation_mask()
+  
+        if ( pIRR_MASK%lGridHasChanged ) then
+  
+          call pIRR_MASK%getvalues( )
+          this%irrigation_mask = pack( real(pIRR_MASK%pGrdBase%iData, c_float), this%active )
+  
+        endif
+  
+      else
+
+        this%irrigation_mask = 1.0_c_float
+      
+      endif
+
+    endif  
+  
+  end subroutine model_update_irrigation_mask_static
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_update_irrigation_mask_dynamic ( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    ! [ LOCALS ]
+    type (DATA_CATALOG_ENTRY_T), pointer :: pIRR_MASK
+
+print *, __FILE__, ": ", __LINE__
+
+    pIRR_MASK => DAT%find("IRRIGATION_MASK")
+
+    if ( associated(pIRR_MASK) ) then
+
+      print *, __FILE__, ": ", __LINE__
+
+      call read_irrigation_mask()
+
+      print *, __FILE__, ": ", __LINE__
+
+      if ( pIRR_MASK%lGridHasChanged ) then
+
+        print *, __FILE__, ": ", __LINE__
+
+        call pIRR_MASK%getvalues( )
+        print *, __FILE__, ": ", __LINE__
+
+        this%irrigation_mask = pack( real(pIRR_MASK%pGrdBase%iData, c_float), this%active )
+
+      endif
+
+    endif
+
+  end subroutine model_update_irrigation_mask_dynamic
+
+  !--------------------------------------------------------------------------------------------------
+
+  subroutine model_update_landuse_codes_static ( this )
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    !> Nothing here to see.
+
+  end subroutine model_update_landuse_codes_static
 
 !--------------------------------------------------------------------------------------------------
 
