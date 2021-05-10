@@ -329,6 +329,7 @@ contains
      this%init_crop_coefficient        => model_initialize_crop_coefficient_none
      this%calc_interception            => model_calculate_interception_bucket
      this%update_crop_coefficient      => model_update_crop_coefficient_none
+     this%update_irrigation_mask       => model_update_irrigation_mask
 
      this%update_rooting_depth         => model_update_rooting_depth_none
 
@@ -787,48 +788,6 @@ contains
     call grid_Destroy( pTempGrd )
 
   end subroutine set_inactive_cells_sub
-
-  !--------------------------------------------------------------------------------------------------
-
-  subroutine read_irrigation_mask
-
-    ! [ LOCALS ]
-    type (DATA_CATALOG_ENTRY_T), pointer :: pIRR_MASK
-    character (len=10)                   :: date_str
-
-    pIRR_MASK => DAT%find("IRRIGATION_MASK")
-
-    if ( associated(pIRR_MASK) ) then
-
-      if (pIRR_MASK%iSourceDataForm == DYNAMIC_GRID) then
-
-        MODEL%update_irrigation_mask => model_update_irrigation_mask_dynamic
-
-        call pIRR_MASK%getvalues( SIM_DT%curr )
-
-        if ( pIRR_MASK%lGridHasChanged ) then
-          date_str = SIM_DT%curr%prettydate()
-          call grid_WriteArcGrid("Irrigation_mask__as_read_into_SWB__"     &
-                                //trim(date_str)//".asc", pIRR_MASK%pGrdBase )
-        endif
-
-      else
-
-        call pIRR_MASK%getvalues()
-        call grid_WriteArcGrid("Irrigation_mask__as_read_into_SWB.asc", pIRR_MASK%pGrdBase )
-
-      endif
-
-    else
-
-      call warn(sMessage="IRRIGATION_MASK dataset is flawed or missing.", lFatal=FALSE,         &
-        iLogLevel = LOG_ALL, sHints="Check to see that a valid path and filename have"   &
-        //" been ~included in the control file for the LAND_USE dataset.",               &
-        lEcho = TRUE )
-
-    endif
-
-  end subroutine read_irrigation_mask
 
 !--------------------------------------------------------------------------------------------------
 
@@ -2413,7 +2372,11 @@ contains
 
   subroutine model_initialize_irrigation( this )
 
+    use irrigation
+
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call irrigation__initialize( this%active )
 
   end subroutine model_initialize_irrigation
 
@@ -2421,7 +2384,7 @@ contains
 
   subroutine model_calculate_irrigation( this, indx )
 
-  use irrigation
+    use irrigation
 
     class (MODEL_DOMAIN_T), intent(inout)      :: this
     integer (c_int), intent(in)           :: indx
@@ -2629,73 +2592,49 @@ contains
 
   end subroutine model_initialize_available_water_content_depth_integrated
 
-  !--------------------------------------------------------------------------------------------------
-
-  subroutine model_update_irrigation_mask_static ( this )
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-    ! [ LOCALS ]
-    type (DATA_CATALOG_ENTRY_T), pointer :: pIRR_MASK
-
-    if (SIM_DT%iDayOfSimulation == 0) then
-
-      pIRR_MASK => DAT%find("IRRIGATION_MASK")
-
-      if ( associated(pIRR_MASK) ) then
-  
-        call read_irrigation_mask()
-  
-        if ( pIRR_MASK%lGridHasChanged ) then
-  
-          call pIRR_MASK%getvalues( )
-          this%irrigation_mask = pack( real(pIRR_MASK%pGrdBase%iData, c_float), this%active )
-  
-        endif
-  
-      else
-
-        this%irrigation_mask = 1.0_c_float
-      
-      endif
-
-    endif  
-  
-  end subroutine model_update_irrigation_mask_static
-
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_update_irrigation_mask_dynamic ( this )
+  subroutine model_update_irrigation_mask ( this )
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+
     ! [ LOCALS ]
     type (DATA_CATALOG_ENTRY_T), pointer :: pIRR_MASK
-
-print *, __FILE__, ": ", __LINE__
+    character (len=10)                   :: date_str
 
     pIRR_MASK => DAT%find("IRRIGATION_MASK")
 
     if ( associated(pIRR_MASK) ) then
 
-      print *, __FILE__, ": ", __LINE__
+      if (pIRR_MASK%iSourceDataForm == DYNAMIC_GRID) then
 
-      call read_irrigation_mask()
+        call pIRR_MASK%getvalues( SIM_DT%curr )
 
-      print *, __FILE__, ": ", __LINE__
+        if ( pIRR_MASK%lGridHasChanged ) then
+          date_str = SIM_DT%curr%prettydate()
+          call grid_WriteArcGrid("Irrigation_mask__as_read_into_SWB__"     &
+                                //trim(date_str)//".asc", pIRR_MASK%pGrdBase )
+          this%irrigation_mask = pack( real(pIRR_MASK%pGrdBase%iData, c_float), this%active )
 
-      if ( pIRR_MASK%lGridHasChanged ) then
+        endif
 
-        print *, __FILE__, ": ", __LINE__
+      else  ! static grid; read in once at beginning of simulation
 
-        call pIRR_MASK%getvalues( )
-        print *, __FILE__, ": ", __LINE__
-
-        this%irrigation_mask = pack( real(pIRR_MASK%pGrdBase%iData, c_float), this%active )
+        if (SIM_DT%iDayOfSimulation < 1) then
+          call pIRR_MASK%getvalues()
+          this%irrigation_mask = pack( real(pIRR_MASK%pGrdBase%iData, c_float), this%active )
+          call grid_WriteArcGrid("Irrigation_mask__as_read_into_SWB.asc", pIRR_MASK%pGrdBase )
+        endif
 
       endif
 
+    else ! no irrigation mask specified; default to irrigating every cell
+
+      this%irrigation_mask = 1.0_c_float
+
     endif
 
-  end subroutine model_update_irrigation_mask_dynamic
+  end subroutine model_update_irrigation_mask
 
   !--------------------------------------------------------------------------------------------------
 
