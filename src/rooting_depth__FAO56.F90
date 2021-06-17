@@ -57,7 +57,7 @@ elemental subroutine update_rooting_depth( Zr_i, Zr_max, landuse_index, Kcb )
  
   ! if ( ( MaxKCB - MinKCB ) < 0.1_c_float ) then
 
-  if ( MinKCB > 0.19_c_float ) then
+  if ( MinKCB > 0.49_c_float ) then
 
      Zr_i = Zr_max
 
