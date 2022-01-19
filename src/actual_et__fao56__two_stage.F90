@@ -1,9 +1,8 @@
 !> @file
-!>  Contains a single module, \ref et_crop_coefficients, which
-!>  provides support for modifying reference ET through the use of
-!> crop coefficients
+!>  Contains a single module, \ref actual_et__fao56__two_stage, which
+!>  provides support for calculating actual evapotranspiration by means of the 
 
-!>  Provide support for assessing the effect of irrigation on recharge
+!> Provide support for assessing the effect of irrigation on recharge
 !> values by estimating the irrigation required to maintain soil moisture levels
 !> for specific crop types.
 module actual_et__fao56__two_stage

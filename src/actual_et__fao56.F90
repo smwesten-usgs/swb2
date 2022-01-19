@@ -1,5 +1,12 @@
-module actual_et__fao56
+!> @file
+!!  Contains module @ref actual_et__fao56. The module calculates actual evapotranspiration
+!!  by means of the SINGLE CROP COEFFICIENT procedure outlined in the FAO56 publication.
+!!  See @ref https://www.fao.org/3/x0490e/x0490e0b.htm for details.
 
+!>  Calculates actual evapotranspiration
+!!  by means of the SINGLE CROP COEFFICIENT procedure outlined in the FAO56 publication.
+!!  See @ref https://www.fao.org/3/x0490e/x0490e0b.htm for details.
+module actual_et__fao56
 
   use iso_c_binding, only               : c_short, c_int, c_float, c_double
   use constants_and_conversions, only   : in_to_mm, TRUE, FALSE

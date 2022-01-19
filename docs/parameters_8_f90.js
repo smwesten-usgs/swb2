@@ -1,6 +1,6 @@
 var parameters_8_f90 =
 [
-    [ "parameters_t", "structparameters_1_1parameters__t.html", "structparameters_1_1parameters__t" ],
+    [ "parameters::parameters_t", "structparameters_1_1parameters__t.html", "structparameters_1_1parameters__t" ],
     [ "add_filename_to_list_sub", "parameters_8_f90.html#a16b2630f8cf313386c4c5547231ec2c6", null ],
     [ "add_to_param_list_sub", "parameters_8_f90.html#a0a3994cb0242bad7ab569c060012b48c", null ],
     [ "get_parameter_table_float", "parameters_8_f90.html#ada308a5e81c5d1efed9769589429df00", null ],

@@ -48,6 +48,31 @@ include( cmake/FindNetCDF.cmake )
 include( cmake/FindZlib.cmake )
 include( cmake/FindCurl.cmake )
 include( cmake/FindSzip.cmake )
+
+if ( HDF5_HL_LIBRARY )
+  set( EXTERNAL_LIBRARIES ${EXTERNAL_LIBRARIES} ${HDF5_HL_LIBRARY} )
+endif()  
+
+if ( HDF5_LIBRARY )
+  set( EXTERNAL_LIBRARIES ${EXTERNAL_LIBRARIES} ${HDF5_LIBRARY} )
+endif()  
+
+if ( NETCDF_LIBRARY )
+  set( EXTERNAL_LIBRARIES ${EXTERNAL_LIBRARIES} ${NETCDF_LIBRARY} )
+endif()  
+
+if ( ZLIB_LIBRARY )
+  set( EXTERNAL_LIBRARIES ${EXTERNAL_LIBRARIES} ${ZLIB_LIBRARY} )
+endif()  
+
+if ( SZIP_LIBRARY )
+  set( EXTERNAL_LIBRARIES ${EXTERNAL_LIBRARIES} ${SZIP_LIBRARY} )
+endif()  
+
+if ( CURL_LIBRARY )
+  set( EXTERNAL_LIBRARIES ${EXTERNAL_LIBRARIES} ${CURL_LIBRARY} )
+endif()
+
 #include( cmake/FindWinPthread.cmake )
 #include( cmake/FindQuadMath.cmake )
 #include( cmake/FindGfortran.cmake )

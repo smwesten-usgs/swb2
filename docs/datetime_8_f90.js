@@ -1,6 +1,9 @@
 var datetime_8_f90 =
 [
-    [ "datetime_t", "structdatetime_1_1datetime__t.html", "structdatetime_1_1datetime__t" ],
+    [ "datetime::assignment(=)", "interfacedatetime_1_1assignment_07_0a_08.html", "interfacedatetime_1_1assignment_07_0a_08" ],
+    [ "datetime::operator(>)", "interfacedatetime_1_1operator_07_4_08.html", "interfacedatetime_1_1operator_07_4_08" ],
+    [ "datetime::datetime_t", "structdatetime_1_1datetime__t.html", "structdatetime_1_1datetime__t" ],
+    [ "datetime::month_t", "structdatetime_1_1month__t.html", "structdatetime_1_1month__t" ],
     [ "assign_value_to_sub", "datetime_8_f90.html#a3f282550de71aeee64c25d9d4f46a7ba", null ],
     [ "calc_gregorian_date_sub", "datetime_8_f90.html#a3a639394dd0bcddc18790cc8ebc33fa7", null ],
     [ "calc_julian_day_sub", "datetime_8_f90.html#a69d09bad23803d1c3b41eac94de7417c", null ],

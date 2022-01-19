@@ -1,11 +1,11 @@
 !> @file
-!>  Contains a single module, \ref crop_coefficients__FAO56, which
+!>  Contains a single module, \ref crop_coefficients__fao56, which
 !>  provides support for modifying reference ET through the use of
 !>  crop coefficients
 
 !> Update crop coefficients for crop types in simulation.
 
-module crop_coefficients__FAO56
+module crop_coefficients__fao56
 
   use iso_c_binding, only             : c_bool, c_short, c_int, c_float, c_double
   use constants_and_conversions, only : M_PER_FOOT, TRUE, FALSE, fTINYVAL,       &
@@ -671,4 +671,4 @@ end function update_crop_coefficient_GDD_as_threshold
 
   end subroutine crop_coefficients_FAO56_update_growing_season
 
-end module crop_coefficients__FAO56
+end module crop_coefficients__fao56

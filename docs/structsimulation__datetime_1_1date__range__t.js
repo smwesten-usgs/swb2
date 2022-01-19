@@ -15,6 +15,7 @@ var structsimulation__datetime_1_1date__range__t =
     [ "set_current_date", "structsimulation__datetime_1_1date__range__t.html#ae86045ffc1489d6d7ece78d539183657", null ],
     [ "curr", "structsimulation__datetime_1_1date__range__t.html#ab4785f215c17311865d88289424daf4e", null ],
     [ "end", "structsimulation__datetime_1_1date__range__t.html#a59a0631e93df580df3f6f99fe3e1ed95", null ],
+    [ "idayofsimulation", "structsimulation__datetime_1_1date__range__t.html#a46053ac1178c7ede3a3973f50764a44c", null ],
     [ "idaysinmonth", "structsimulation__datetime_1_1date__range__t.html#a07482fb739791556879069efcaf430cb", null ],
     [ "idaysinyear", "structsimulation__datetime_1_1date__range__t.html#a72677b2b97a0593f94c8189e711cd851", null ],
     [ "idoy", "structsimulation__datetime_1_1date__range__t.html#ad655b1c9098e2536b68d32d632233a50", null ],

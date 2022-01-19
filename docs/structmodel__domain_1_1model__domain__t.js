@@ -154,6 +154,7 @@ var structmodel__domain_1_1model__domain__t =
     [ "total_available_water_taw", "structmodel__domain_1_1model__domain__t.html#aa40c0bfdd80fa682d9afcf191fb642be", null ],
     [ "update_crop_coefficient", "structmodel__domain_1_1model__domain__t.html#ab31e05ad7ccc8bf1345fb7b6821d343f", null ],
     [ "update_growing_season", "structmodel__domain_1_1model__domain__t.html#a2dbc894b5ea18d09e906276fe683177a", null ],
+    [ "update_irrigation_mask", "structmodel__domain_1_1model__domain__t.html#ad40fdfc6e37dbbd841daab2282eb2fe3", null ],
     [ "update_landuse_codes", "structmodel__domain_1_1model__domain__t.html#a334680fe03c11e4af36b21dc149efa48", null ],
     [ "update_rooting_depth", "structmodel__domain_1_1model__domain__t.html#a607b09d194e40f4642967910109476a0", null ],
     [ "x", "structmodel__domain_1_1model__domain__t.html#abcc6e2e1023e16a027ec1cc1014b6968", null ],

@@ -1,10 +1,10 @@
 var model__domain_8_f90 =
 [
-    [ "model_domain_t", "structmodel__domain_1_1model__domain__t.html", "structmodel__domain_1_1model__domain__t" ],
-    [ "array_method", "interfacemodel__domain_1_1array__method.html", "interfacemodel__domain_1_1array__method" ],
-    [ "index_method", "interfacemodel__domain_1_1index__method.html", "interfacemodel__domain_1_1index__method" ],
-    [ "minmaxmean", "interfacemodel__domain_1_1minmaxmean.html", null ],
-    [ "cell_col_row_t", "structmodel__domain_1_1cell__col__row__t.html", "structmodel__domain_1_1cell__col__row__t" ],
+    [ "model_domain::model_domain_t", "structmodel__domain_1_1model__domain__t.html", "structmodel__domain_1_1model__domain__t" ],
+    [ "model_domain::array_method", "interfacemodel__domain_1_1array__method.html", "interfacemodel__domain_1_1array__method" ],
+    [ "model_domain::index_method", "interfacemodel__domain_1_1index__method.html", "interfacemodel__domain_1_1index__method" ],
+    [ "model_domain::minmaxmean", "interfacemodel__domain_1_1minmaxmean.html", null ],
+    [ "model_domain::cell_col_row_t", "structmodel__domain_1_1cell__col__row__t.html", "structmodel__domain_1_1cell__col__row__t" ],
     [ "get_climate_data", "model__domain_8_f90.html#ae63c4494244fd9d3d491ef2540510d0a", null ],
     [ "initialize_arrays_sub", "model__domain_8_f90.html#a360a1203c12aa6bddb9616ca02d28183", null ],
     [ "initialize_grid_sub", "model__domain_8_f90.html#a0cd541c782be4b557acbbde9ed3f5991", null ],
@@ -107,6 +107,7 @@ var model__domain_8_f90 =
     [ "model_update_crop_coefficient_none", "model__domain_8_f90.html#ae711f2ca00a29c8a569a0b2891ac371b", null ],
     [ "model_update_growing_season", "model__domain_8_f90.html#ae39eafd2f7a12e47b1b63ad22f03fcc8", null ],
     [ "model_update_growing_season_crop_coefficient_fao56", "model__domain_8_f90.html#a299258e3cf794d67fdebbc868e11615f", null ],
+    [ "model_update_irrigation_mask", "model__domain_8_f90.html#a46b3a6794e87e4823bc0105d21c60ea7", null ],
     [ "model_update_landuse_codes_dynamic", "model__domain_8_f90.html#a4b87d8967f873092dd943bca407d7075", null ],
     [ "model_update_landuse_codes_static", "model__domain_8_f90.html#aa68372aab8783f7426db31f10b1da4af", null ],
     [ "model_update_rooting_depth_fao56", "model__domain_8_f90.html#a3e6e4999dd9160d4edac323347187a29", null ],

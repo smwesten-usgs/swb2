@@ -1,13 +1,12 @@
 !> @file
-!!  Contains module @ref data_catalog, which
-!!  keeps track of all @ref DATA_CATALOG_T entries
+!!  Contains module @ref data_catalog, defining the @DATA_CATALOG_T data type, which contains type-bound
+!!  procedures to add, delete, and find @ref DATA_CATALOG_ENTRY_T values
 !!  created during the course of a SWB run.
 
 
-!>  Manage, find, and retrieve data for
-!!  all @ref DATA_CATALOG_T entries
+!>  Defines the @ref DATA_CATALOG_T data type, which contains type-bound
+!!  procedures to add, delete, and find @ref DATA_CATALOG_ENTRY_T values
 !!  created during the course of a SWB run.
-
 module data_catalog
 
   use iso_c_binding, only  : c_int, c_float, c_bool, c_double
@@ -20,12 +19,17 @@ module data_catalog
 
   public :: DATA_CATALOG_T
 
+  !>  @typedef DATA_CATALOG_T data type contains type-bound
+  !!  procedures to add, delete, and find @ref DATA_CATALOG_ENTRY_T values
+  !!  created during the course of a SWB run.
   type DATA_CATALOG_T
     type (DATA_CATALOG_ENTRY_T), pointer            :: first    => null()
     type (DATA_CATALOG_ENTRY_T), pointer            :: last     => null()
     type (DATA_CATALOG_ENTRY_T), pointer            :: current  => null()
     integer (c_int)                            :: count    = 0
   contains
+
+    private
 
     procedure :: catalog_add_entry_sub
     procedure :: catalog_delete_entry_sub
@@ -37,27 +41,34 @@ module data_catalog
     procedure :: catalog_set_all_start_year_sub
     procedure :: catalog_set_all_end_year_sub
 
-    generic :: add => catalog_add_entry_sub
-    generic :: delete => catalog_delete_entry_sub
-    generic :: find => catalog_find_key_fn
-    generic :: next => catalog_find_next_key_fn
-    generic :: get => catalog_get_entry_at_index_fn
-    generic :: print => catalog_print_sub
-    generic :: set_PROJ4 => catalog_set_all_PROJ4_string_sub
-    generic :: set_EndYear => catalog_set_all_end_year_sub
-    generic :: set_StartYear => catalog_set_all_start_year_sub
+    !> Add a data_catalog_entry object to the data_catalog.
+    generic, public :: add => catalog_add_entry_sub
+    !> Remove a data_catalog_entry object from the data_catalog.
+    generic, public :: delete => catalog_delete_entry_sub
+    !> Find a data_catalog_entry object by searching for its key value.
+    generic, public :: find => catalog_find_key_fn
+    !> Return next data_catalog_entry object in list.
+    generic, public :: next => catalog_find_next_key_fn
+    !> Return data_catalog_entry found at a specific index value within the list.
+    generic, public :: get => catalog_get_entry_at_index_fn
+    !> Print out a detailed summary of data_catalog_entry objects currently stored in data_catalog.
+    generic, public :: print => catalog_print_sub
+    generic, public :: set_PROJ4 => catalog_set_all_PROJ4_string_sub
+    generic, public :: set_EndYear => catalog_set_all_end_year_sub
+    generic, public :: set_StartYear => catalog_set_all_start_year_sub
 
   end type DATA_CATALOG_T
 
   public :: DAT
 
-  ! DAT is a global to hold data catalog entries
+  !> DAT is a global to hold data catalog entries
   type (DATA_CATALOG_T) :: DAT
 
 contains
 
 !--------------------------------------------------------------------------------------------------
 
+  !> @memberof DATA_CATALOG_T
   subroutine catalog_set_all_start_year_sub( this, iStartYear )
 
 
@@ -84,7 +95,8 @@ contains
   end subroutine catalog_set_all_start_year_sub
 
 !--------------------------------------------------------------------------------------------------
-
+  
+  !> @memberof DATA_CATALOG_T
   subroutine catalog_set_all_end_year_sub( this, iEndYear )
 
 
@@ -111,7 +123,8 @@ contains
   end subroutine catalog_set_all_end_year_sub
 
 !--------------------------------------------------------------------------------------------------
-
+  
+  !> @memberof DATA_CATALOG_T
   subroutine catalog_set_all_PROJ4_string_sub( this, PROJ4_string )
 
 
@@ -141,6 +154,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  !> @memberof DATA_CATALOG_T
   subroutine catalog_add_entry_sub( this, key, data )
 
     class (DATA_CATALOG_T)                :: this
@@ -178,6 +192,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+   !> @memberof DATA_CATALOG_T 
   subroutine catalog_delete_entry_sub( this, key )
 
     class (DATA_CATALOG_T)           :: this
@@ -210,6 +225,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  !> @memberof DATA_CATALOG_T
   function catalog_get_entry_at_index_fn(this, index)    result(data)
 
     class (DATA_CATALOG_T)                :: this
@@ -243,6 +259,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  !> @memberof DATA_CATALOG_T
   function catalog_find_key_fn( this, key)   result( data )
 
     class (DATA_CATALOG_T)                :: this
@@ -270,7 +287,7 @@ contains
   end function catalog_find_key_fn
 
 !--------------------------------------------------------------------------------------------------
-
+  !> @memberof DATA_CATALOG_T
   function catalog_find_next_key_fn( this, key)   result( data )
 
     class (DATA_CATALOG_T)                :: this
@@ -299,10 +316,11 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  !> @memberof DATA_CATALOG_T
+  !! @private
   subroutine catalog_print_sub(this)
 
     class (DATA_CATALOG_T)           :: this
-
 
     type (DATA_CATALOG_ENTRY_T), pointer :: current
 
@@ -326,7 +344,5 @@ contains
   end subroutine catalog_print_sub
 
 !--------------------------------------------------------------------------------------------------
-
-
 
 end module data_catalog

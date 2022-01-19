@@ -1,5 +1,7 @@
 var searchData=
 [
-  ['in_5fto_5fmm_1413',['in_to_mm',['../interfaceconstants__and__conversions_1_1in__to__mm.html',1,'constants_and_conversions']]],
-  ['index_5fmethod_1414',['index_method',['../interfacemodel__domain_1_1index__method.html',1,'model_domain']]]
+  ['general_5fgrid_5ft_0',['general_grid_t',['../structgrid_1_1general__grid__t.html',1,'grid']]],
+  ['grid_5fbounds_5ft_1',['grid_bounds_t',['../structgrid_1_1grid__bounds__t.html',1,'grid']]],
+  ['grid_5fcreate_2',['grid_create',['../interfacegrid_1_1grid__create.html',1,'grid']]],
+  ['gridded_5fdatasets_5ft_3',['gridded_datasets_t',['../structmodel__initialize_1_1gridded__datasets__t.html',1,'model_initialize']]]
 ];

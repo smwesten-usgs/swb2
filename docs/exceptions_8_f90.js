@@ -1,5 +1,7 @@
 var exceptions_8_f90 =
 [
+    [ "exceptions::assert", "interfaceexceptions_1_1assert.html", "interfaceexceptions_1_1assert" ],
+    [ "exceptions::index_values_valid", "interfaceexceptions_1_1index__values__valid.html", "interfaceexceptions_1_1index__values__valid" ],
     [ "assert_1bit", "exceptions_8_f90.html#a32b05abb4e186da8c7cbd54e6b594812", null ],
     [ "assert_4bit", "exceptions_8_f90.html#a0c885b30713a3f5b6a34c43b1065f074", null ],
     [ "bounds_check_double_1d", "exceptions_8_f90.html#ab89365a68173b495be649e02fba4d819", null ],

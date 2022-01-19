@@ -1,12 +1,7 @@
 var irrigation_8_f90 =
 [
-    [ "app_none", "irrigation_8_f90.html#a6423b54026dc21a0a953eff75b891b87a667de214c2cf64f9c9a35469c92f2d5e", null ],
-    [ "app_field_capacity", "irrigation_8_f90.html#a6423b54026dc21a0a953eff75b891b87a19c43b43f9436e222e6a14d2392f3b4d", null ],
-    [ "app_defined_deficit", "irrigation_8_f90.html#a6423b54026dc21a0a953eff75b891b87a6f404994cf1b44a22a94984f76b8a47f", null ],
-    [ "app_constant_amount", "irrigation_8_f90.html#a6423b54026dc21a0a953eff75b891b87ae0b25e54351132b086ebcb3e0e6a0ddd", null ],
-    [ "app_hwb_demand_based", "irrigation_8_f90.html#a6423b54026dc21a0a953eff75b891b87a3fe1759dee5ce0fd23a6b11152123009", null ],
     [ "irrigation__calculate", "irrigation_8_f90.html#a256e8c7f529f1ab21c5d2f54b09b5fb3", null ],
-    [ "irrigation__initialize", "irrigation_8_f90.html#a4967e74e2a8b2077014603a91e590ff3", null ],
+    [ "irrigation__initialize", "irrigation_8_f90.html#afc850d26eac671b7575124ee74a1ddb4", null ],
     [ "irrigation__output_schedule_values", "irrigation_8_f90.html#a9347af6817c97e0040b532513f10d5f6", null ],
     [ "app_option_name", "irrigation_8_f90.html#a11247bb40e255eefd332278d8deea03b", null ],
     [ "application_amount", "irrigation_8_f90.html#ae44bc07ec03bccab8fd3636b04bf7138", null ],

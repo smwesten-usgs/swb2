@@ -1,7 +1,7 @@
 var dictionary_8_f90 =
 [
-    [ "dict_entry_t", "structdictionary_1_1dict__entry__t.html", "structdictionary_1_1dict__entry__t" ],
-    [ "dict_t", "structdictionary_1_1dict__t.html", "structdictionary_1_1dict__t" ],
+    [ "dictionary::dict_entry_t", "structdictionary_1_1dict__entry__t.html", "structdictionary_1_1dict__entry__t" ],
+    [ "dictionary::dict_t", "structdictionary_1_1dict__t.html", "structdictionary_1_1dict__t" ],
     [ "add_double_sub", "dictionary_8_f90.html#a0974f1a4ad8051b76fcee45077849af3", null ],
     [ "add_entry_to_dict_sub", "dictionary_8_f90.html#ad068f5e6a29d4d8cd65d06e4a7de241d", null ],
     [ "add_float_sub", "dictionary_8_f90.html#ab5f45a149e8c659ed290b09949ab72ca", null ],

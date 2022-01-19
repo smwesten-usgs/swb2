@@ -1,13 +1,6 @@
 var logfiles_8_f90 =
 [
-    [ "dt_year", "logfiles_8_f90.html#a90abba705dbec85c16ab437e45b515c8abef29ab56e503fe785cb8b1abc90ce9c", null ],
-    [ "dt_month", "logfiles_8_f90.html#a90abba705dbec85c16ab437e45b515c8a135577cf3ef13f68cae6fb18e184e46a", null ],
-    [ "dt_day", "logfiles_8_f90.html#a90abba705dbec85c16ab437e45b515c8aad24ed296d46b8e0fd14a26951a1ea29", null ],
-    [ "dt_diff_fm_utc", "logfiles_8_f90.html#a90abba705dbec85c16ab437e45b515c8a173008016aeaedca55262c590f0a49d5", null ],
-    [ "dt_hour", "logfiles_8_f90.html#a90abba705dbec85c16ab437e45b515c8a1c82d0917fda976b8302cd4969b69075", null ],
-    [ "dt_minutes", "logfiles_8_f90.html#a90abba705dbec85c16ab437e45b515c8a14ee0179b849e844b7929914e1091d0a", null ],
-    [ "dt_seconds", "logfiles_8_f90.html#a90abba705dbec85c16ab437e45b515c8a592bb09e31d36863a5a0896d1a084b25", null ],
-    [ "dt_milliseconds", "logfiles_8_f90.html#a90abba705dbec85c16ab437e45b515c8abfb4bd6134f4f40e3192904ef12f72ef", null ],
+    [ "logfiles::logfile_t", "structlogfiles_1_1logfile__t.html", "structlogfiles_1_1logfile__t" ],
     [ "close_files_sub", "logfiles_8_f90.html#abe6605d6ea72c0bfb7a6d711de3e64f3", null ],
     [ "dquote", "logfiles_8_f90.html#a59aca224ba0dcd08c90029d4f0900143", null ],
     [ "initialize_logfiles_sub", "logfiles_8_f90.html#a0f09e1a9806e7bd9e1415d430229e0d9", null ],

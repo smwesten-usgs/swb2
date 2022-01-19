@@ -1,6 +1,7 @@
 var data__catalog__entry_8_f90 =
 [
-    [ "data_catalog_entry_t", "structdata__catalog__entry_1_1data__catalog__entry__t.html", "structdata__catalog__entry_1_1data__catalog__entry__t" ],
+    [ "data_catalog_entry::data_catalog_entry_t", "structdata__catalog__entry_1_1data__catalog__entry__t.html", "structdata__catalog__entry_1_1data__catalog__entry__t" ],
+    [ "data_catalog_entry::apply_scale_and_offset", "interfacedata__catalog__entry_1_1apply__scale__and__offset.html", "interfacedata__catalog__entry_1_1apply__scale__and__offset" ],
     [ "apply_scale_and_offset_float", "data__catalog__entry_8_f90.html#a436b6214aae4413689ee1ecd8a1fda4a", null ],
     [ "apply_scale_and_offset_int", "data__catalog__entry_8_f90.html#a7544f8aca96adf9a25c28997cc7128bf", null ],
     [ "calc_project_boundaries_sub", "data__catalog__entry_8_f90.html#a0617e9df002a70a08e53dbb0a92edc53", null ],
@@ -35,6 +36,7 @@ var data__catalog__entry_8_f90 =
     [ "set_complete_spatial_coverage_flag_sub", "data__catalog__entry_8_f90.html#a8c01c75945e92fac4bc241539a3fd802", null ],
     [ "set_constant_value_int", "data__catalog__entry_8_f90.html#a2bcff357a8523d090667cbe24c2767ad", null ],
     [ "set_constant_value_real", "data__catalog__entry_8_f90.html#a84a816431d219a2c504810db01202885", null ],
+    [ "set_coordinate_tolerance_sub", "data__catalog__entry_8_f90.html#ac0bfa61fd9fc4d0dc9f8a4481df8b314", null ],
     [ "set_do_not_allow_netcdf_grid_data_flipping_sub", "data__catalog__entry_8_f90.html#a3b49bae96be88157dbc3120259759272", null ],
     [ "set_filecount", "data__catalog__entry_8_f90.html#addc07c29f0ff79d0c57ee67501ae81cc", null ],
     [ "set_grid_flip_horizontal_sub", "data__catalog__entry_8_f90.html#ad1f9d877a0be84f131298d1cb29a6973", null ],

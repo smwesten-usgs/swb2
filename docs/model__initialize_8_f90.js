@@ -1,5 +1,7 @@
 var model__initialize_8_f90 =
 [
+    [ "model_initialize::gridded_datasets_t", "structmodel__initialize_1_1gridded__datasets__t.html", "structmodel__initialize_1_1gridded__datasets__t" ],
+    [ "model_initialize::methods_list_t", "structmodel__initialize_1_1methods__list__t.html", "structmodel__initialize_1_1methods__list__t" ],
     [ "initialize_all", "model__initialize_8_f90.html#a6c96f3ee83b68164e47424a1a412ba84", null ],
     [ "initialize_ancillary_values", "model__initialize_8_f90.html#a39e959b59f3ec67f64a1b37a5b30ebc2", null ],
     [ "initialize_generic_grid", "model__initialize_8_f90.html#ad13483b4c855d6fbfa3665d7d4037aa3", null ],

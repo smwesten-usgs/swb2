@@ -1,6 +1,6 @@
 var timer_8_f90 =
 [
-    [ "timer_t", "structtimer_1_1timer__t.html", "structtimer_1_1timer__t" ],
+    [ "timer::timer_t", "structtimer_1_1timer__t.html", "structtimer_1_1timer__t" ],
     [ "calc_elapsed_time_sub", "timer_8_f90.html#a0b53e4fb8b03fbcc5d43a3189925f989", null ],
     [ "calc_split_time_sub", "timer_8_f90.html#a7fb6c577fcb8c6177f3204e205cf15a0", null ],
     [ "calc_time_values_sub", "timer_8_f90.html#a3a9956cca1428bf433ecb0cc526959fb", null ],
