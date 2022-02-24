@@ -24,7 +24,7 @@ include(CPack)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-# try to have CMake find static libraries if possible
+# try to have CMake find shared libraries if possible
 set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ${CMAKE_FIND_LIBRARY_SUFFIXES})
 
 if ( CMAKE_HOST_WIN32 )

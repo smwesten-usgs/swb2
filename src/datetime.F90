@@ -1212,8 +1212,12 @@ subroutine date_plus_year_sub(this)
 
   class(DATETIME_T) :: this
 
-  this%iYear = this%iYear + 1_c_int
-  call this%calcJulianDay()
+!  this%iYear = this%iYear + 1_c_int
+!  call this%calcJulianDay()
+
+  this%dJulianDate = this%dJulianDate + 365.25_c_double
+  this%iJulianDay = int(this%dJulianDate, c_long)
+  call this%calcGregorianDate()
 
 end subroutine date_plus_year_sub
 
@@ -1283,8 +1287,12 @@ subroutine date_minus_year_sub(this)
 
   class(DATETIME_T) :: this
 
-  this%iYear = this%iYear - 1_c_int
-  call this%calcJulianDay()
+!  this%iYear = this%iYear - 1_c_int
+!  call this%calcJulianDay()
+
+  this%dJulianDate = this%dJulianDate - 365.25_c_double
+  this%iJulianDay = int(this%dJulianDate, c_long)
+  call this%calcGregorianDate()
 
 end subroutine date_minus_year_sub
 
