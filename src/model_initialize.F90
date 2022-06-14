@@ -44,7 +44,7 @@ module model_initialize
     logical (c_bool)  :: lOptional
   end type METHODS_LIST_T
 
-  integer (c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 44
+  integer (c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 46
   integer (c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 18
 
   type (GRIDDED_DATASETS_T)    :: KNOWN_GRIDS( NUMBER_OF_KNOWN_GRIDS ) =                             &
@@ -69,6 +69,8 @@ module model_initialize
       GRIDDED_DATASETS_T("INITIAL_PERCENT_SOIL_MOISTURE         ", "", FALSE, DATATYPE_FLOAT),      &
       GRIDDED_DATASETS_T("INITIAL_SNOW_COVER_STORAGE            ", "", TRUE, DATATYPE_FLOAT),       &
       GRIDDED_DATASETS_T("INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX", "", TRUE, DATATYPE_FLOAT),       &
+      GRIDDED_DATASETS_T("CFGI_LOWER_LIMIT                      ", "" ,TRUE, DATATYPE_FLOAT),       &
+      GRIDDED_DATASETS_T("CFGI_UPPER_LIMIT                      ", "" ,TRUE, DATATYPE_FLOAT),       &
       GRIDDED_DATASETS_T("PERCENT_CANOPY_COVER                  ", "", TRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("PERCENT_PERVIOUS_COVER                ", "", TRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("PERCENT_IMPERVIOUS_COVER              ", "", TRUE, DATATYPE_FLOAT ),      &

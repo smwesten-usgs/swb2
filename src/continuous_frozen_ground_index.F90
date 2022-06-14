@@ -10,23 +10,23 @@ module continuous_frozen_ground_index
 
   private
 
-  public :: CFGI_LL, CFGI_UL
   public update_continuous_frozen_ground_index, initialize_continuous_frozen_ground_index
-
-
-  !> @TODO: make these into user-accessible variables
-  real (c_float)               :: CFGI_LL = 55.
-  real (c_float)               :: CFGI_UL = 83.
 
 contains
 
-  subroutine initialize_continuous_frozen_ground_index( cfgi, active_cells )
+  subroutine initialize_continuous_frozen_ground_index( cfgi, cfgi_ll, cfgi_ul, active_cells )
 
     real (c_float), intent(inout)  :: cfgi(:)
+    real (c_float), intent(inout)  :: cfgi_ll(:)
+    real (c_float), intent(inout)  :: cfgi_ul(:)
+
     logical (c_bool), intent(in)   :: active_cells(:,:)
 
     ! [ LOCALS ]
     type (DATA_CATALOG_ENTRY_T), pointer :: pINITIAL_CFGI
+    type (DATA_CATALOG_ENTRY_T), pointer :: pCFGI_LOWER_LIMIT
+    type (DATA_CATALOG_ENTRY_T), pointer :: pCFGI_UPPER_LIMIT
+    integer (c_int) :: i
 
     ! locate the data structure associated with the gridded initial_cfgi
     pINITIAL_CFGI => DAT%find("INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX")
@@ -58,6 +58,65 @@ contains
 
     endif
 
+
+
+    ! locate the data structure associated with the gridded CFGI_LOWER_LIMIT
+    pCFGI_LOWER_LIMIT => DAT%find("CFGI_LOWER_LIMIT")
+
+    if ( .not. associated( pCFGI_LOWER_LIMIT ) ) then
+
+      call warn(sMessage="No value supplied for CONTINUOUS_FROZEN_GROUND_INDEX_LOWER_LIMIT.",             &
+      sHints="Value set to the default of 56, which was appropriate for the Pacific Northwestern U.S., "  &
+      //" but may be inappropriate elsewhere.", lFatal=FALSE )
+
+      cfgi_ll = 56.   ! units are degrees C-days
+
+    else
+
+      call pCFGI_LOWER_LIMIT%getvalues()
+
+      ! map the 2D array of INITIAL_CFGI values to the vector of active cells
+      cfgi_ll = pack( pCFGI_LOWER_LIMIT%pGrdBase%rData, active_cells )
+
+     if ( minval( cfgi_ll ) < fZERO                                             &
+        .or. maxval( cfgi_ll ) > 300.0_c_float )                                &
+       call warn(sMessage="One or more CFGI lower limit values outside of "     &
+         //"valid range (0 to 300)", lFatal=TRUE )
+
+    endif
+
+
+    ! locate the data structure associated with the gridded CFGI_UPPER_LIMIT
+    pCFGI_UPPER_LIMIT => DAT%find("CFGI_UPPER_LIMIT")
+
+    if ( .not. associated( pCFGI_UPPER_LIMIT ) ) then
+
+      call warn(sMessage="No value supplied for CONTINUOUS_FROZEN_GROUND_INDEX_UPPER_LIMIT.",             &
+      sHints="Value set to the default of 83, which was appropriate for the Pacific Northwestern U.S., "  &
+      //" but may be inappropriate elsewhere.", lFatal=FALSE )
+
+        cfgi_ul = 83. ! units are degree C-days
+
+    else
+
+      call pCFGI_UPPER_LIMIT%getvalues()
+
+      ! map the 2D array of INITIAL_CFGI values to the vector of active cells
+      cfgi_ul = pack( pCFGI_UPPER_LIMIT%pGrdBase%rData, active_cells )
+
+     if ( minval( cfgi_ul ) < fZERO                                            &
+        .or. maxval( cfgi_ul ) > 300.0_c_float )                               &
+       call warn(sMessage="One or more CFGI upper limit values outside of "    &
+         //"valid range (0 to 300)", lFatal=TRUE )
+
+    endif
+
+    if (any(cfgi_ul - cfgi_ll <= 0.0_c_float)) then
+      call warn(sMessage="One or more CFGI upper limit values is less that its"     &
+        //" corresponding CFGI lower limit values", lFatal=TRUE)
+    endif
+
+
   end subroutine initialize_continuous_frozen_ground_index
 
 !--------------------------------------------------------------------------------------------------
@@ -72,7 +131,7 @@ contains
   !!
   !! @note Molnau, M. and Bissell, V.C., 1983, A continuous frozen ground index for
   !! flood forecasting: In Proceedings 51st Annual Meeting Western Snow Conference,
-  !! 109–119, Canadian Water Resources Assoc. Cambridge, Ont.
+  !! 109-119, Canadian Water Resources Assoc. Cambridge, Ont.
   elemental subroutine update_continuous_frozen_ground_index( fCFGI, fTMax_F, fTMin_F, fSnowCover )
 
     ! [ ARGUMENTS ]

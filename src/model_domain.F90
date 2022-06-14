@@ -69,6 +69,12 @@ module model_domain
     real (c_double), allocatable      :: readily_available_water_raw(:)
 
     real (c_float), allocatable       :: continuous_frozen_ground_index(:)
+    real (c_float), allocatable       :: cfgi_lower_limit(:)
+    real (c_float), allocatable       :: cfgi_upper_limit(:)
+
+    real (c_float), allocatable       :: hargreaves_ET0_slope(:)
+    real (c_float), allocatable       :: hargreaves_ET0_exponent(:)
+    real (c_float), allocatable       :: hargreaves_ET0_constant(:)
 
     real (c_float), allocatable       :: rooting_depth_max(:)
 
@@ -418,7 +424,7 @@ contains
     integer (c_int)  :: iCount
     integer (c_int)  :: iIndex
     integer (c_int)  :: indx
-    integer (c_int)  :: iStat(68)
+    integer (c_int)  :: iStat(70)
 
     iCount = count( this%active )
     iStat = 0
@@ -459,37 +465,39 @@ contains
     allocate( this%crop_coefficient_kcb( iCount ), stat=iStat(35) )
     allocate( this%potential_snowmelt( iCount ), stat=iStat(36) )
     allocate( this%continuous_frozen_ground_index( iCount ), stat=iStat(37) )
-    allocate( this%rooting_depth_max( iCount ), stat=iStat(38) )
-    allocate( this%current_rooting_depth( iCount ), stat=iStat(39) )
-    allocate( this%current_plant_height( iCount ), stat=iStat(40) )
-    allocate( this%polygon_id( iCount ), stat=iStat(41) )
-    allocate( this%actual_et_soil( iCount ), stat=iStat(42) )
-    allocate( this%actual_et_impervious( iCount ), stat=iStat(43) )
-    allocate( this%actual_et_interception( iCount ), stat=iStat(44) )
-    allocate( this%adjusted_depletion_fraction_p( iCount ), stat=iStat(45) )
-    allocate( this%crop_etc( iCount ), stat=iStat(46) )
-    allocate( this%direct_net_infiltration( iCount ), stat=iStat(47) )
-    allocate( this%direct_soil_moisture( iCount ), stat=iStat(48) )
-    allocate( this%number_of_days_since_planting( iCount ), stat=iStat(49) )
-    allocate( this%col_num_1D( iCount ), stat=iStat(50) )
-    allocate( this%row_num_1D( iCount ), stat=iStat(51) )
-    allocate( this%it_is_growing_season( iCount ), stat=iStat(52) )
-    allocate( this%curve_num_adj( iCount ), stat=iStat(53) )
-    allocate( this%rejected_net_infiltration( iCount ), stat=iStat(54) )
-    allocate( this%evap_reduction_coef_kr( iCount ), stat=iStat(55) )
-    allocate( this%surf_evap_coef_ke( iCount ), stat=iStat(56) )
-    allocate( this%plant_stress_coef_ks( iCount ), stat=iStat(57) )
-    allocate( this%total_available_water_taw( iCount ), stat=iStat(58) )
-    allocate( this%readily_available_water_raw( iCount ), stat=iStat(59) )
-    allocate( this%bare_soil_evap( iCount ), stat=iStat(60) )
-    allocate( this%fraction_exposed_and_wetted_soil( iCount ), stat=iStat(61) )
-    allocate( this%delta_soil_storage( iCount ), stat=iStat(62) )
-    allocate( this%soil_moisture_deficit( iCount ), stat=iStat(63) )
-    allocate( this%net_rainfall( iCount ), stat=iStat(64) )
-    allocate( this%net_snowfall( iCount ), stat=iStat(65) )
-    allocate( this%evaporable_water_storage( iCount ), stat=iStat(66))
-    allocate( this%evaporable_water_deficit( iCount ), stat=iStat(67))
-    allocate( this%irrigation_mask( iCount), stat=iStat(68))
+    allocate( this%cfgi_lower_limit( iCount), stat=iStat(38) )
+    allocate( this%cfgi_upper_limit( iCount), stat=iStat(39) )    
+    allocate( this%rooting_depth_max( iCount ), stat=iStat(40) )
+    allocate( this%current_rooting_depth( iCount ), stat=iStat(41) )
+    allocate( this%current_plant_height( iCount ), stat=iStat(42) )
+    allocate( this%polygon_id( iCount ), stat=iStat(43) )
+    allocate( this%actual_et_soil( iCount ), stat=iStat(44) )
+    allocate( this%actual_et_impervious( iCount ), stat=iStat(45) )
+    allocate( this%actual_et_interception( iCount ), stat=iStat(46) )
+    allocate( this%adjusted_depletion_fraction_p( iCount ), stat=iStat(47) )
+    allocate( this%crop_etc( iCount ), stat=iStat(48) )
+    allocate( this%direct_net_infiltration( iCount ), stat=iStat(49) )
+    allocate( this%direct_soil_moisture( iCount ), stat=iStat(50) )
+    allocate( this%number_of_days_since_planting( iCount ), stat=iStat(51) )
+    allocate( this%col_num_1D( iCount ), stat=iStat(52) )
+    allocate( this%row_num_1D( iCount ), stat=iStat(53) )
+    allocate( this%it_is_growing_season( iCount ), stat=iStat(54) )
+    allocate( this%curve_num_adj( iCount ), stat=iStat(55) )
+    allocate( this%rejected_net_infiltration( iCount ), stat=iStat(56) )
+    allocate( this%evap_reduction_coef_kr( iCount ), stat=iStat(57) )
+    allocate( this%surf_evap_coef_ke( iCount ), stat=iStat(58) )
+    allocate( this%plant_stress_coef_ks( iCount ), stat=iStat(59) )
+    allocate( this%total_available_water_taw( iCount ), stat=iStat(60) )
+    allocate( this%readily_available_water_raw( iCount ), stat=iStat(61) )
+    allocate( this%bare_soil_evap( iCount ), stat=iStat(62) )
+    allocate( this%fraction_exposed_and_wetted_soil( iCount ), stat=iStat(63) )
+    allocate( this%delta_soil_storage( iCount ), stat=iStat(64) )
+    allocate( this%soil_moisture_deficit( iCount ), stat=iStat(65) )
+    allocate( this%net_rainfall( iCount ), stat=iStat(66) )
+    allocate( this%net_snowfall( iCount ), stat=iStat(67) )
+    allocate( this%evaporable_water_storage( iCount ), stat=iStat(68) )
+    allocate( this%evaporable_water_deficit( iCount ), stat=iStat(69) )
+    allocate( this%irrigation_mask( iCount), stat=iStat(70) )
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR"                    &
@@ -544,6 +552,8 @@ contains
     this%crop_coefficient_kcb                = 0.0_c_float
     this%potential_snowmelt                  = 0.0_c_float
     this%continuous_frozen_ground_index      = 0.0_c_float
+    this%cfgi_lower_limit                    = 0.0_c_float
+    this%cfgi_upper_limit                    = 0.0_c_float
     this%rooting_depth_max                   = 0.0_c_float
     this%current_rooting_depth               = 0.0_c_float
     this%current_plant_height                = 0.0_c_float
@@ -553,7 +563,7 @@ contains
     this%actual_et_interception              = 0.0_c_double
     this%adjusted_depletion_fraction_p       = 0.0_c_float
     this%crop_etc                            = 0.0_c_float
-    this%direct_net_infiltration                     = 0.0_c_float
+    this%direct_net_infiltration             = 0.0_c_float
     this%direct_soil_moisture                = 0.0_c_float
     this%number_of_days_since_planting       = 0_c_int
     this%evap_reduction_coef_kr              = 0.0_c_float
@@ -1801,7 +1811,10 @@ contains
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    call initialize_continuous_frozen_ground_index( this%continuous_frozen_ground_index, this%active )
+    call initialize_continuous_frozen_ground_index( this%continuous_frozen_ground_index,   &
+                                                    this%cfgi_lower_limit,                 &
+                                                    this%cfgi_upper_limit,                 &
+                                                    this%active )
 
   end subroutine model_initialize_continuous_frozen_ground_index
 
@@ -1899,6 +1912,8 @@ contains
     use et__hargreaves_samani
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call et_hargreaves_initialize()
 
   end subroutine model_initialize_et_hargreaves
 
@@ -2056,8 +2071,10 @@ contains
                                        soil_storage_max=this%soil_storage_max( cell_index ),           &
                                        it_is_growing_season=this%it_is_growing_season( cell_index ),   &
                                        inflow=this%inflow( cell_index ),                               &
-                                       continuous_frozen_ground_index=                           &
-                                           this%continuous_frozen_ground_index( cell_index ) )
+                                       continuous_frozen_ground_index=                                 &
+                                           this%continuous_frozen_ground_index( cell_index ),          &
+                                       cfgi_lower_limit=this%cfgi_lower_limit(cell_index),             &
+                                       cfgi_upper_limit=this%cfgi_upper_limit( cell_index) )
 
     call update_previous_5_day_rainfall( this%inflow( cell_index ), cell_index )
 

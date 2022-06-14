@@ -14,7 +14,7 @@ export INSTALL_PREFIX=/usr/local/bin
 
 # define other variables for use in the CMakeList.txt file
 # options are "Release" or "Debug"
-export BUILD_TYPE="Release"
+export BUILD_TYPE="Debug"
 
 # define platform and compiler specific compilation flags
 export CMAKE_Fortran_FLAGS_DEBUG="-O0 -g -ggdb -Wuninitialized -fbacktrace -fcheck=all -fexceptions -fmax-errors=6 -fbackslash -ffree-line-length-none -Wno-maybe-uninitialized"
@@ -23,9 +23,10 @@ export CMAKE_Fortran_FLAGS_RELEASE="-O2 -mtune=native -ffree-line-length-512 -fb
 export FC=gfortran
 export CC=gcc
 
-export PATH=/mingw64/lib:${PATH}
+export NETCDF_DIR=/d/msys2/mingw64/lib:${PATH}
 
 cmake "../../.." -G "Unix Makefiles"                         \
+-DLIBRARY_PATH="/d/msys2/mingw64/lib"                        \
 -DCMAKE_BUILD_TYPE="$BUILD_TYPE "                            \
 -DCMAKE_INSTALL_PREFIX:PATH="$INSTALL_PREFIX "               \
 -DCMAKE_Fortran_FLAGS_DEBUG="$CMAKE_Fortran_FLAGS_DEBUG "    \
