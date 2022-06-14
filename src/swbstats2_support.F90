@@ -18,6 +18,8 @@ module swbstats2_support
   use fstring
   use fstring_list, only              : FSTRING_LIST_T,                         &
                                         create_list
+
+  use running_grid_stats, only        : RUNNING_STATS_T
   use iso_c_binding
   implicit none
 
@@ -115,7 +117,7 @@ module swbstats2_support
 
     type (GENERAL_GRID_T), pointer       :: grd_native => null()
     type (GENERAL_GRID_T), pointer       :: grd_delta => null()
-    type (GENERAL_GRID_T), pointer       :: grd_delta2 => null()
+    type (GENERAL_GRID_T), pointer       :: grd_delta2 => null()    
     type (DATA_CATALOG_ENTRY_T), pointer :: grd_zone => null()
     type (DATA_CATALOG_ENTRY_T), pointer :: grd_zone2 => null()
     type (DATA_CATALOG_ENTRY_T), pointer :: grd_comparison => null()
@@ -1010,38 +1012,164 @@ contains
 
 !------------------------------------------------------------------------------
 
-  subroutine calculate_slice_statistics( this, grid_delta, grid_delta2, start_date, end_date, grid_mask )
+!   subroutine calculate_slice_statistics( this, grid_delta, grid_delta2, start_date, end_date, grid_mask )
+
+!     class (SWBSTATS_T), intent(inout)        :: this
+!     type (GENERAL_GRID_T), pointer           :: grid_delta
+!     type (GENERAL_GRID_T), pointer           :: grid_delta2
+!     type (DATETIME_T), intent(inout)         :: start_date
+!     type (DATETIME_T), intent(inout)         :: end_date
+!     logical, optional                        :: grid_mask(:,:)
+
+!     ! [ LOCALS ]
+!     integer (c_int)               :: julian_day_number
+!     real (c_float), allocatable   :: tempvals(:)
+!     integer (c_int)               :: day_count
+!     logical (c_bool), allocatable :: local_mask(:,:)
+!     real (c_float), dimension(size(grid_delta%dpData,1), size(grid_delta%dpData,2)) :: rTemp
+
+!     ! force slice dates to honor bounds of data dates
+!     if ( start_date < this%data_start_date )  start_date = this%data_start_date
+!     if ( end_date > this%data_end_date )      end_date = this%data_end_date
+
+! !    call SIM_DT%initialize( start_date, end_date )
+
+!     associate( grd_sum => output_files(STATS_SUM)%grid_ptr%dpData,                &
+!                grd_mean => output_files(STATS_MEAN)%grid_ptr%dpData,              &
+!                grd_var => output_files(STATS_VARIANCE)%grid_ptr%dpData,           &
+!                delta =>  grid_delta%dpData,                                      &
+!                delta2 => grid_delta2%dpData,                                     &
+!                grd_new => this%grd_native%dpData      )
+
+!       allocate(local_mask(ubound(grd_sum,1),ubound(grd_sum,2)))
+
+!       day_count = 0
+
+!       ! SIM_DT is being used here simply because it provides a simple way to march through
+!       ! time on a day-by-day basis; need to ensure that the "current" day aligns with the 
+!       ! desired start and end dates of the slice. 
+!       if ( SIM_DT%curr > start_date ) then
+!         call SIM_DT%set_current_date(start_date)
+!       endif
+
+!       do
+
+!         if ( SIM_DT%curr < start_date ) then
+!           call SIM_DT%addDay()
+!           cycle
+!         endif
+
+!         julian_day_number = int( SIM_DT%curr%dJulianDate, c_int)
+
+!         ! keep track of number of days that are summed together so we can calculated a mean grid value later
+!         day_count = day_count + 1
+
+!         if ( netcdf_update_time_starting_index(this%ncfile_in, julian_day_number ) )   then
+!           call netcdf_get_variable_slice(NCFILE=this%ncfile_in, rValues=rTemp )
+!         endif
+
+!         ! volumetric_conversion_factor is 1.0 *unless* user has specifically
+!         ! asked for volumetric reporting or other unit conversions; in this case,
+!         ! the output_conversion_factor amounts to the cell area times the
+!         ! unit length, appropriately converted to cubic meters, or if output
+!         ! is requested in meters, the conversion factor is just 0.
+!         grd_new = real(rTemp, c_double) * this%output_conversion_factor
+
+!         if (day_count == 1) then
+
+!           if (present(grid_mask)) then
+!             local_mask = (grd_new > NC_FILL_FLOAT) .and. grid_mask
+!           else
+!             local_mask = grd_new > NC_FILL_FLOAT
+!           endif
+
+!           grd_sum = 0.0_c_double
+!           grd_mean = 0.0_c_double
+!           grd_var = 0.0_c_double
+
+!         endif
+
+!         where ( local_mask )
+!           delta = grd_new - grd_mean
+!           grd_sum = grd_sum + grd_new
+!           grd_mean = grd_mean + delta / real( day_count, c_double )
+!           delta2 = grd_new - grd_mean
+!           grd_var = grd_var + delta * delta2
+!         end where
+
+!          ! write(*,fmt="(a,f14.3,f14.3)") "gridsum: ", minval(grd_sum,  mask=grd_new > NC_FILL_FLOAT), &
+!          !     maxval(grd_sum,  mask=grd_new > NC_FILL_FLOAT)
+!          !
+!          ! write(*,fmt="(a,f14.3,f14.3)") "gridnew: ", minval(grd_new,  mask=grd_new > NC_FILL_FLOAT), &
+!          !     maxval(grd_new,  mask=grd_new > NC_FILL_FLOAT)
+!          !
+!          ! write(*,fmt="(a,f14.3,f14.3)") "gridnew: ", minval(this%grd_native%dpData,  mask=this%grd_native%dpData > NC_FILL_FLOAT), &
+!          !     maxval(this%grd_native%dpData,  mask=this%grd_native%dpData > NC_FILL_FLOAT)
+
+!         call SIM_DT%addDay
+!         if ( SIM_DT%curr > end_date )  exit
+
+!       end do
+
+!       where ( .not. local_mask )
+!         grd_mean = NC_FILL_FLOAT
+!         grd_sum = NC_FILL_FLOAT
+!         grd_var = NC_FILL_FLOAT
+!       ! elsewhere
+!       !   grd_var = grd_var / (counter - 1)
+!       endwhere
+
+!       if (this%annualize_stats) then
+!         where ( local_mask )
+! !          grd_mean = grd_mean/ real( day_count, c_float ) * 365.25
+! !          grd_var = grd_var/ real( day_count, c_float ) * 365.25
+!           grd_sum = grd_sum / real( day_count, c_double ) * 365.25
+!         end where
+!       ! else
+!       !   where ( local_mask )
+!       !     grd_mean = grd_sum / real( day_count, c_float )
+!       !   end where
+!       endif
+
+!       deallocate(local_mask)
+
+!     end associate
+
+! !    write(*,fmt="(a)") "gridsum: ", minval(grid_sum%rData,  mask=this%grd_native%rData > NC_FILL_FLOAT), &
+! !        maxval(grid_sum%rData,  mask=this%grd_native%rData > NC_FILL_FLOAT)
+
+!   end subroutine calculate_slice_statistics
+
+  subroutine calculate_slice_statistics( this, start_date, end_date, grid_mask )
 
     class (SWBSTATS_T), intent(inout)        :: this
-    type (GENERAL_GRID_T), pointer           :: grid_delta
-    type (GENERAL_GRID_T), pointer           :: grid_delta2
     type (DATETIME_T), intent(inout)         :: start_date
     type (DATETIME_T), intent(inout)         :: end_date
     logical, optional                        :: grid_mask(:,:)
 
     ! [ LOCALS ]
     integer (c_int)               :: julian_day_number
-    real (c_float), allocatable   :: tempvals(:)
     integer (c_int)               :: day_count
     logical (c_bool), allocatable :: local_mask(:,:)
-    real (c_float), dimension(size(grid_delta%dpData,1), size(grid_delta%dpData,2)) :: rTemp
+    type ( RUNNING_STATS_T)       :: rstat
 
     ! force slice dates to honor bounds of data dates
     if ( start_date < this%data_start_date )  start_date = this%data_start_date
     if ( end_date > this%data_end_date )      end_date = this%data_end_date
 
-!    call SIM_DT%initialize( start_date, end_date )
+    allocate(local_mask(ubound(grd_sum,1),ubound(grd_sum,2)))
 
-    associate( grd_sum => output_files(STATS_SUM)%grid_ptr%dpData,                &
-               grd_mean => output_files(STATS_MEAN)%grid_ptr%dpData,              &
-               grd_var => output_files(STATS_VARIANCE)%grid_ptr%dpData,           &
-               delta =>  grid_delta%dpData,                                      &
-               delta2 => grid_delta2%dpData,                                     &
-               grd_new => this%grd_native%dpData      )
+    day_count = 0
 
-      allocate(local_mask(ubound(grd_sum,1),ubound(grd_sum,2)))
+    call rstat%initialize(NX=this%ncfile_in%iNX,                  &
+                          NY=this%ncfile_in%iNY,                  &
+                          X0=this%ncfile_in%rX(NC_LEFT),          &
+                          Y0=this%ncfile_in%rY(NC_BOTTOM),        &
+                          X1=this%ncfile_in%rX(NC_RIGHT),         &
+                          Y1=this%ncfile_in%rY(NC_TOP),           &
+                          nodata_value=-9999.)
 
-      day_count = 0
+     call rstat%clear()                          
 
       ! SIM_DT is being used here simply because it provides a simple way to march through
       ! time on a day-by-day basis; need to ensure that the "current" day aligns with the 
@@ -1160,29 +1288,54 @@ contains
       sum_index_num = ( month_num - 1 ) * 3 + 1
       mean_index_num = ( month_num - 1 ) * 3 + 2
 
-      output_files(sum_index_num)%grid_ptr%dpData = output_files(sum_index_num)%grid_ptr%dpData    &
+      where ( output_files(STATS_SUM)%grid_ptr%dpData > -9999. )
+
+        output_files(sum_index_num)%grid_ptr%dpData = output_files(sum_index_num)%grid_ptr%dpData    &
                                                     + output_files(STATS_SUM)%grid_ptr%dpData
+
+      else where
+      
+        output_files(sum_index_num)%grid_ptr%dpData = -9999.
+
+      end where  
 
       output_files(sum_index_num)%n_count = output_files(sum_index_num)%n_count + 1
 
-      print *, month_num, minval(output_files(sum_index_num)%grid_ptr%dpData), maxval(output_files(sum_index_num)%grid_ptr%dpData)
+      print *, month_num, output_files(sum_index_num)%n_count,           &
+               minval(output_files(sum_index_num)%grid_ptr%dpData),      &
+               maxval(output_files(sum_index_num)%grid_ptr%dpData)
 
     else  !finalize monthly outputs
 
       do month_index=1,12
 
-        month_name = MONTHS(month_num)%sName
-        sum_index_num = ( month_num - 1 ) * 3 + 1
-        mean_index_num = ( month_num - 1 ) * 3 + 2
+        month_name = MONTHS(month_index)%sName
+        sum_index_num = ( month_index - 1 ) * 3 + 1
+        mean_index_num = ( month_index- 1 ) * 3 + 2
     
-        if ( output_files(sum_index_num)%n_count > 0) then
-          output_files(mean_index_num)%grid_ptr%dpData = output_files(sum_index_num)%grid_ptr%dpData   &
-                                                       / output_files(sum_index_num)%n_count
+        if ( output_files(sum_index_num)%n_count > 0 ) then
+
+          where ( output_files(sum_index_num)%grid_ptr%dpData > -9999. )
+            output_files(mean_index_num)%grid_ptr%dpData = output_files(sum_index_num)%grid_ptr%dpData   &
+                                                       / real(output_files(sum_index_num)%n_count, kind=c_double)
+          else where
+          
+            output_files(mean_index_num)%grid_ptr%dpData = -9999.
+          
+          end where
+
         else
 
           output_files(mean_index_num)%grid_ptr%dpData = -9999.
 
         endif  
+
+        write(*,fmt='(a,i0,1x,4(f0.4, 2x))') 'FINALIZING: ', month_index,                    &
+        minval(output_files(sum_index_num)%grid_ptr%dpData),     &
+        maxval(output_files(sum_index_num)%grid_ptr%dpData),     &
+        minval(output_files(mean_index_num)%grid_ptr%dpData),    &
+        maxval(output_files(mean_index_num)%grid_ptr%dpData)
+
 
       enddo  
 

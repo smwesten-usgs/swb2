@@ -1114,22 +1114,22 @@ subroutine grid_WriteArcGrid(sFilename, pGrd)
 
   elseif ( pGrd%iDataType == DATATYPE_REAL ) then
 
-    write ( unit=LU_TEMP, fmt="('NODATA_VALUE ',g14.4)", iostat=istat ) pGrd%rNoDataValue
+    write ( unit=LU_TEMP, fmt="('NODATA_VALUE ',g0.4)", iostat=istat ) pGrd%rNoDataValue
     call assert( istat==0, "Error writing NODATA value", __SRCNAME__, __LINE__)
     do iRow=1,iNumRows
       write( unit=LU_TEMP, fmt=TRIM(sBuf), iostat=istat ) &
-        (TRIM(asCharacter( pGrd%rData(iCol,iRow) )),iCol=1,iNumCols)
+        (TRIM(asCharacter( pGrd%rData(iCol,iRow), fmt_string="g0.5" )),iCol=1,iNumCols)
       call assert( istat==0, "Error writing Arc ASCII REAL grid data", &
         __SRCNAME__, __LINE__)
     end do
 
   elseif ( pGrd%iDataType == DATATYPE_DOUBLE ) then
 
-    write ( unit=LU_TEMP, fmt="('NODATA_VALUE ',g14.4)", iostat=istat ) pGrd%dpNoDataValue
+    write ( unit=LU_TEMP, fmt="('NODATA_VALUE ',g0.4)", iostat=istat ) pGrd%dpNoDataValue
     call assert( istat==0, "Error writing NODATA value", __SRCNAME__, __LINE__)
     do iRow=1,iNumRows
       write( unit=LU_TEMP, fmt=TRIM(sBuf), iostat=istat ) &
-        (TRIM(asCharacter( pGrd%dpData(iCol,iRow) )),iCol=1,iNumCols)
+        (TRIM(asCharacter( pGrd%dpData(iCol,iRow), fmt_string="g0.5" )),iCol=1,iNumCols)
       call assert( istat==0, "Error writing Arc ASCII REAL grid data", &
         __SRCNAME__, __LINE__)
     end do

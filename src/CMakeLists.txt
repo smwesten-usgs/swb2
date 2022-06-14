@@ -239,6 +239,7 @@ set(SRCS
       proj4_support.F90
       rooting_depth__FAO56.F90
       routing__D8.F90
+      running_grid_stats.F90
       runoff__curve_number.F90
       runoff__gridded_values.F90
       simulation_datetime.F90

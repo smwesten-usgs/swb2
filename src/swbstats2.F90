@@ -574,6 +574,9 @@ program swbstats2
                                      start_date=swbstats%slice_start_date,          &
                                      end_date=swbstats%slice_end_date)
 
+    ! idea here is to tack on a set of accumulator grids that can be used to sum up 
+    ! results from all grid vals for every January within the simulation timeframe, 
+    ! all grid vals for every February within simulation timeframe, etc.
     if (swbstats%calculation_time_period == CALC_PERIOD_MONTHLY) then
       call swbstats%calculate_monthly_statistics(month_num=swbstats%slice_start_date%iMonth, finalize=FALSE)
     endif  
