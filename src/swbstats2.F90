@@ -502,6 +502,10 @@ program swbstats2
   endif  ! initialize data structures needed to calculate zonal statistics for a *SINGLE* zone grid 
 
 
+  ! establish data range string for use in output file naming
+  swbstats%date_range_string = swbstats%data_start_date%prettydate()                 &
+                                   //"_to_"//swbstats%data_end_date%prettydate()
+
   call swbstats%open_output_netcdf_files(output_files)
 
   ! Done with preliminaries (opening files, setting options, etc.); begin calcs
@@ -557,7 +561,7 @@ program swbstats2
     call swbstats%slice_end_date%parseDate( end_date_string )
 
     ! create date range string for use in output filenames
-    swbstats%date_range_string = swbstats%slice_start_date%prettydate()    &
+    swbstats%slice_range_string = swbstats%slice_start_date%prettydate()    &
        //"_to_"//swbstats%slice_end_date%prettydate()
 
     write(*,fmt="(a)") ""
@@ -569,10 +573,11 @@ program swbstats2
     ! grid_mean is the grid_sum divided by number of days = daily mean
     !
     ! first step is to calculate the statistics over the entire grid
-    call swbstats%calculate_slice_statistics( grid_delta=swbstats%grd_delta,        &
-                                     grid_delta2=swbstats%grd_delta2,               &
-                                     start_date=swbstats%slice_start_date,          &
-                                     end_date=swbstats%slice_end_date)
+    call swbstats%calculate_slice_statistics( start_date=swbstats%slice_start_date,                     &
+                                              end_date=swbstats%slice_end_date,                         &
+                                              grd_sum=output_files(STATS_SUM)%grid_ptr%dpData,          &
+                                              grd_mean=output_files(STATS_MEAN)%grid_ptr%dpData,        &
+                                              grd_var=output_files(STATS_VARIANCE)%grid_ptr%dpData)
 
     ! idea here is to tack on a set of accumulator grids that can be used to sum up 
     ! results from all grid vals for every January within the simulation timeframe, 
@@ -598,7 +603,7 @@ program swbstats2
     call swbstats%write_stats_to_arcgrid(output_files=output_files,            &
                                 start_date=swbstats%slice_start_date,          &
                                 end_date=swbstats%slice_end_date,              &
-                                date_range_string=swbstats%date_range_string,  &
+                                date_range_string=swbstats%slice_range_string,  &
                                 output_file_prefix=swbstats%output_file_prefix)
 
     if (swbstats%calc_zonal_stats) then

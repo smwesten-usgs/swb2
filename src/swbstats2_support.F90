@@ -84,6 +84,7 @@ module swbstats2_support
     type (DATETIME_T)               :: data_end_date
     type (DATETIME_T)               :: slice_start_date
     type (DATETIME_T)               :: slice_end_date
+    character (len=:), allocatable  :: slice_range_string
     character (len=:), allocatable  :: date_range_string
     integer (c_int)                 :: calculation_time_period = CALC_PERIOD_ALL
     character (len=:), allocatable  :: stress_period_filename
@@ -851,7 +852,7 @@ contains
     class (SWBSTATS_T), intent(inout)                    :: this
     type (FILE_COLLECTION_T), intent(inout)              :: output_files(:)
     character (len=*), intent(in), optional              :: date_range_string
-    character (len=:), allocatable, intent(in), optional :: output_file_prefix
+    character (len=*), intent(in), optional              :: output_file_prefix
 
     ! [ LOCALS ]
     character (len=:), allocatable    :: filename
@@ -864,14 +865,9 @@ contains
     
     integer (c_int)   :: sum_index_num
     integer (c_int)   :: mean_index_num
+    integer (c_int)   :: variance_index_num
     character (len=3) :: month_name
     integer (c_int)   :: month_num
-
-    if ( present(output_file_prefix) ) then
-      if (allocated(output_file_prefix))  file_prefix = output_file_prefix // "__"
-    else
-      file_prefix = ""
-    endif  
 
     nx = BNDS%iNumCols
     ny = BNDS%iNumRows
@@ -882,6 +878,7 @@ contains
       month_name = MONTHS(month_num)%sName
       sum_index_num = ( month_num - 1 ) * 3 + 1
       mean_index_num = ( month_num - 1 ) * 3 + 2
+      variance_index_num = ( month_num - 1 ) * 3 + 3
 
       if ( output_files(mean_index_num)%write_arcgrid) then
 
@@ -898,25 +895,49 @@ contains
         ! remove commas from filename modifier
         filename_modifier = clean(units_string, ",")
 
+        ! ** preliminaries done; now begin to write out to Arc Grid files
+
+
+        ! write out MEAN values grid
         grid_ptr => output_files(mean_index_num)%grid_ptr
-
         call assert(associated(grid_ptr), "Unallocated array", __FILE__, __LINE__)
-
         stats_description = output_files(mean_index_num)%stats_description
 
-        filename = output_file_prefix                                            &
-                     //trim(this%netcdf_variable_name_string)                    &
+        if ( present(output_file_prefix) ) then
+          file_prefix = output_file_prefix // "__" // "monthly_mean_over_all"
+        else
+          file_prefix = "monthly_mean_over_all"
+        endif  
+    
+        filename = trim(file_prefix)                                             &
                      //"_"//trim(month_name)                                     &
+                     //"__"//trim(this%netcdf_variable_name_string)              &
                      //"__"//trim(this%date_range_string)                        &
                      //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)            &
                      //"__"//trim(filename_modifier)//".asc"
 
-        ! ugly hack to make the output match the default NODATA value
-        where ( this%grd_native%dpData <= NC_FILL_FLOAT )
-          grid_ptr%dpData = -9999.
-        end where
-
         call grid_WriteArcGrid( filename, grid_ptr )
+
+        !!! Now output the VARIANCE grid 
+        grid_ptr => output_files(variance_index_num)%grid_ptr
+        call assert(associated(grid_ptr), "Unallocated array", __FILE__, __LINE__)
+        stats_description = output_files(variance_index_num)%stats_description
+
+        if ( present(output_file_prefix) ) then
+          file_prefix = output_file_prefix // "__" // "monthly_variance_over_all"
+        else
+          file_prefix = "monthly_variance_over_all"
+        endif  
+    
+        filename = trim(file_prefix)                                             &
+                     //"_"//trim(month_name)                                     &
+                     //"__"//trim(this%netcdf_variable_name_string)              &
+                     //"__"//trim(this%date_range_string)                        &
+                     //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)            &
+                     //"__"//trim(filename_modifier)//".asc"
+           
+        call grid_WriteArcGrid( filename, grid_ptr )
+
 
       endif
 
@@ -1140,24 +1161,31 @@ contains
 
 !   end subroutine calculate_slice_statistics
 
-  subroutine calculate_slice_statistics( this, start_date, end_date, grid_mask )
+  subroutine calculate_slice_statistics( this, start_date, end_date, grd_sum, grd_mean, grd_var )
 
     class (SWBSTATS_T), intent(inout)        :: this
     type (DATETIME_T), intent(inout)         :: start_date
     type (DATETIME_T), intent(inout)         :: end_date
-    logical, optional                        :: grid_mask(:,:)
+    real (c_double), intent(inout)           :: grd_sum(:,:)
+    real (c_double), intent(inout)           :: grd_mean(:,:)
+    real (c_double), intent(inout)           :: grd_var(:,:)
 
     ! [ LOCALS ]
     integer (c_int)               :: julian_day_number
     integer (c_int)               :: day_count
     logical (c_bool), allocatable :: local_mask(:,:)
+    real (c_float), allocatable   :: rTemp(:,:)
+    real (c_double), allocatable  :: grd_new(:,:)
+
     type ( RUNNING_STATS_T)       :: rstat
 
     ! force slice dates to honor bounds of data dates
     if ( start_date < this%data_start_date )  start_date = this%data_start_date
     if ( end_date > this%data_end_date )      end_date = this%data_end_date
 
-    allocate(local_mask(ubound(grd_sum,1),ubound(grd_sum,2)))
+    allocate(local_mask(this%ncfile_in%iNX,this%ncfile_in%iNY))
+    allocate(rTemp(this%ncfile_in%iNX,this%ncfile_in%iNY))
+    allocate(grd_new(this%ncfile_in%iNX,this%ncfile_in%iNY))
 
     day_count = 0
 
@@ -1167,61 +1195,46 @@ contains
                           Y0=this%ncfile_in%rY(NC_BOTTOM),        &
                           X1=this%ncfile_in%rX(NC_RIGHT),         &
                           Y1=this%ncfile_in%rY(NC_TOP),           &
-                          nodata_value=-9999.)
+                          nodata_value=-9999._c_double)
 
-     call rstat%clear()                          
+    call rstat%clear()                          
 
-      ! SIM_DT is being used here simply because it provides a simple way to march through
-      ! time on a day-by-day basis; need to ensure that the "current" day aligns with the 
-      ! desired start and end dates of the slice. 
-      if ( SIM_DT%curr > start_date ) then
-        call SIM_DT%set_current_date(start_date)
+    ! SIM_DT is being used here simply because it provides a simple way to march through
+    ! time on a day-by-day basis; need to ensure that the "current" day aligns with the 
+    ! desired start and end dates of the slice. 
+    if ( SIM_DT%curr > start_date ) then
+      call SIM_DT%set_current_date(start_date)
+    endif
+
+    do
+
+      if ( SIM_DT%curr < start_date ) then
+        call SIM_DT%addDay()
+        cycle
       endif
 
-      do
+      julian_day_number = int( SIM_DT%curr%dJulianDate, c_int)
 
-        if ( SIM_DT%curr < start_date ) then
-          call SIM_DT%addDay()
-          cycle
-        endif
+      ! keep track of number of days that are summed together so we can calculated a mean grid value later
+      day_count = day_count + 1
 
-        julian_day_number = int( SIM_DT%curr%dJulianDate, c_int)
+      if ( netcdf_update_time_starting_index(this%ncfile_in, julian_day_number ) )   then
+        call netcdf_get_variable_slice(NCFILE=this%ncfile_in, rValues=rTemp )
+      endif
 
-        ! keep track of number of days that are summed together so we can calculated a mean grid value later
-        day_count = day_count + 1
+      ! volumetric_conversion_factor is 1.0 *unless* user has specifically
+      ! asked for volumetric reporting or other unit conversions; in this case,
+      ! the output_conversion_factor amounts to the cell area times the
+      ! unit length, appropriately converted to cubic meters, or if output
+      ! is requested in meters, the conversion factor is just 0.
+      grd_new = real(rTemp, c_double) * this%output_conversion_factor
 
-        if ( netcdf_update_time_starting_index(this%ncfile_in, julian_day_number ) )   then
-          call netcdf_get_variable_slice(NCFILE=this%ncfile_in, rValues=rTemp )
-        endif
+      if (day_count == 1) then
+        local_mask = grd_new > NC_FILL_FLOAT
+      endif
 
-        ! volumetric_conversion_factor is 1.0 *unless* user has specifically
-        ! asked for volumetric reporting or other unit conversions; in this case,
-        ! the output_conversion_factor amounts to the cell area times the
-        ! unit length, appropriately converted to cubic meters, or if output
-        ! is requested in meters, the conversion factor is just 0.
-        grd_new = real(rTemp, c_double) * this%output_conversion_factor
+      call rstat%push(grd_data=grd_new, mask=local_mask)
 
-        if (day_count == 1) then
-
-          if (present(grid_mask)) then
-            local_mask = (grd_new > NC_FILL_FLOAT) .and. grid_mask
-          else
-            local_mask = grd_new > NC_FILL_FLOAT
-          endif
-
-          grd_sum = 0.0_c_double
-          grd_mean = 0.0_c_double
-          grd_var = 0.0_c_double
-
-        endif
-
-        where ( local_mask )
-          delta = grd_new - grd_mean
-          grd_sum = grd_sum + grd_new
-          grd_mean = grd_mean + delta / real( day_count, c_double )
-          delta2 = grd_new - grd_mean
-          grd_var = grd_var + delta * delta2
-        end where
 
          ! write(*,fmt="(a,f14.3,f14.3)") "gridsum: ", minval(grd_sum,  mask=grd_new > NC_FILL_FLOAT), &
          !     maxval(grd_sum,  mask=grd_new > NC_FILL_FLOAT)
@@ -1232,37 +1245,37 @@ contains
          ! write(*,fmt="(a,f14.3,f14.3)") "gridnew: ", minval(this%grd_native%dpData,  mask=this%grd_native%dpData > NC_FILL_FLOAT), &
          !     maxval(this%grd_native%dpData,  mask=this%grd_native%dpData > NC_FILL_FLOAT)
 
-        call SIM_DT%addDay
-        if ( SIM_DT%curr > end_date )  exit
+      call SIM_DT%addDay
+      if ( SIM_DT%curr > end_date )  exit
 
-      end do
+    end do
 
-      where ( .not. local_mask )
-        grd_mean = NC_FILL_FLOAT
-        grd_sum = NC_FILL_FLOAT
-        grd_var = NC_FILL_FLOAT
+    call rstat%mean(grd_mean)
+    call rstat%sum(grd_sum)
+    call rstat%variance(grd_var)
+
+    where ( .not. local_mask )
+      grd_mean = NC_FILL_FLOAT
+      grd_sum = NC_FILL_FLOAT
+      grd_var = NC_FILL_FLOAT
       ! elsewhere
       !   grd_var = grd_var / (counter - 1)
-      endwhere
+    end where
 
-      if (this%annualize_stats) then
-        where ( local_mask )
-!          grd_mean = grd_mean/ real( day_count, c_float ) * 365.25
-!          grd_var = grd_var/ real( day_count, c_float ) * 365.25
-          grd_sum = grd_sum / real( day_count, c_double ) * 365.25
-        end where
+    if (this%annualize_stats) then
+      where ( local_mask )
+!        grd_mean = grd_mean/ real( day_count, c_float ) * 365.25
+!        grd_var = grd_var/ real( day_count, c_float ) * 365.25
+        grd_sum = grd_sum / real( day_count, c_double ) * 365.25
+      end where
       ! else
       !   where ( local_mask )
       !     grd_mean = grd_sum / real( day_count, c_float )
       !   end where
-      endif
+    endif
 
-      deallocate(local_mask)
-
-    end associate
-
-!    write(*,fmt="(a)") "gridsum: ", minval(grid_sum%rData,  mask=this%grd_native%rData > NC_FILL_FLOAT), &
-!        maxval(grid_sum%rData,  mask=this%grd_native%rData > NC_FILL_FLOAT)
+    deallocate(local_mask)
+    deallocate(rTemp)
 
   end subroutine calculate_slice_statistics
 
@@ -1278,33 +1291,39 @@ contains
 
     integer (c_int)   :: sum_index_num
     integer (c_int)   :: mean_index_num
+    integer (c_int)   :: variance_index_num
     character (len=3) :: month_name
     integer (c_int)   :: month_index
 
+    type (RUNNING_STATS_T), save :: mon_stats(12)
+    logical (c_bool), save       :: uninitialized = TRUE
+
+    if (uninitialized) then
+
+      do month_index=1,12
+
+        call mon_stats(month_index)%initialize(NX=this%ncfile_in%iNX,                &
+                                             NY=this%ncfile_in%iNY,                  &
+                                             X0=this%ncfile_in%rX(NC_LEFT),          &
+                                             Y0=this%ncfile_in%rY(NC_BOTTOM),        &
+                                             X1=this%ncfile_in%rX(NC_RIGHT),         &
+                                             Y1=this%ncfile_in%rY(NC_TOP),           &
+                                             nodata_value=-9999._c_double)
+
+        call mon_stats(month_index)%clear()
+        
+      enddo
+
+      uninitialized = FALSE
+      
+    endif  
+
     if (.not. finalize) then
 
-      ! extract month name from the datetime module MONTHS data structure
-      month_name = MONTHS(month_num)%sName
-      sum_index_num = ( month_num - 1 ) * 3 + 1
-      mean_index_num = ( month_num - 1 ) * 3 + 2
+      call mon_stats(month_num)%push(grd_data=output_files(STATS_SUM)%grid_ptr%dpData,                &
+                                     mask=logical(output_files(STATS_SUM)%grid_ptr%dpData > -9999._c_double, c_bool))
 
-      where ( output_files(STATS_SUM)%grid_ptr%dpData > -9999. )
-
-        output_files(sum_index_num)%grid_ptr%dpData = output_files(sum_index_num)%grid_ptr%dpData    &
-                                                    + output_files(STATS_SUM)%grid_ptr%dpData
-
-      else where
       
-        output_files(sum_index_num)%grid_ptr%dpData = -9999.
-
-      end where  
-
-      output_files(sum_index_num)%n_count = output_files(sum_index_num)%n_count + 1
-
-      print *, month_num, output_files(sum_index_num)%n_count,           &
-               minval(output_files(sum_index_num)%grid_ptr%dpData),      &
-               maxval(output_files(sum_index_num)%grid_ptr%dpData)
-
     else  !finalize monthly outputs
 
       do month_index=1,12
@@ -1312,30 +1331,39 @@ contains
         month_name = MONTHS(month_index)%sName
         sum_index_num = ( month_index - 1 ) * 3 + 1
         mean_index_num = ( month_index- 1 ) * 3 + 2
+        variance_index_num = ( month_index- 1 ) * 3 + 3
     
-        if ( output_files(sum_index_num)%n_count > 0 ) then
+        call mon_stats(month_index)%mean(output_files(mean_index_num)%grid_ptr%dpData)
+        call mon_stats(month_index)%sum(output_files(sum_index_num)%grid_ptr%dpData)
+        call mon_stats(month_index)%variance(output_files(variance_index_num)%grid_ptr%dpData)
 
-          where ( output_files(sum_index_num)%grid_ptr%dpData > -9999. )
-            output_files(mean_index_num)%grid_ptr%dpData = output_files(sum_index_num)%grid_ptr%dpData   &
-                                                       / real(output_files(sum_index_num)%n_count, kind=c_double)
-          else where
+        ! if ( output_files(sum_index_num)%n_count > 0 ) then
+
+        !   where ( output_files(sum_index_num)%grid_ptr%dpData > -9999. )
+        !     output_files(mean_index_num)%grid_ptr%dpData = output_files(sum_index_num)%grid_ptr%dpData   &
+        !                                                / real(output_files(sum_index_num)%n_count, kind=c_double)
+        !   else where
           
-            output_files(mean_index_num)%grid_ptr%dpData = -9999.
+        !     output_files(mean_index_num)%grid_ptr%dpData = -9999.
           
-          end where
+        !   end where
 
-        else
+        ! else
 
-          output_files(mean_index_num)%grid_ptr%dpData = -9999.
+        !   output_files(mean_index_num)%grid_ptr%dpData = -9999.
 
-        endif  
+        ! endif  
 
-        write(*,fmt='(a,i0,1x,4(f0.4, 2x))') 'FINALIZING: ', month_index,                    &
-        minval(output_files(sum_index_num)%grid_ptr%dpData),     &
-        maxval(output_files(sum_index_num)%grid_ptr%dpData),     &
-        minval(output_files(mean_index_num)%grid_ptr%dpData),    &
-        maxval(output_files(mean_index_num)%grid_ptr%dpData)
+        
 
+
+        write(*,fmt='(a,i0,1x,6(f0.4, 2x))') 'FINALIZING: ', month_index,    &
+        minval(output_files(sum_index_num)%grid_ptr%dpData),                 &
+        maxval(output_files(sum_index_num)%grid_ptr%dpData),                 &
+        minval(output_files(mean_index_num)%grid_ptr%dpData),                &
+        maxval(output_files(mean_index_num)%grid_ptr%dpData),                &
+        minval(output_files(variance_index_num)%grid_ptr%dpData),            &
+        maxval(output_files(variance_index_num)%grid_ptr%dpData)
 
       enddo  
 
