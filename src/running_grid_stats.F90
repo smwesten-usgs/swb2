@@ -20,7 +20,6 @@ module running_grid_stats
     type (GENERAL_GRID_T), pointer        :: grd_sum => null()
     integer (c_long_long)                 :: n = 0
     real (c_double)                       :: nodata_value = -9999.
-    logical (c_bool)                      :: already_initialized = FALSE
     !    type (GENERAL_GRID_T), pointer        :: grd_M3 => null()
     !    type (GENERAL_GRID_T), pointer        :: grd_M4 => null()
 
@@ -49,72 +48,62 @@ module running_grid_stats
       real (c_double), intent(in)             :: Y1
       real (c_double), intent(in)             :: nodata_value
 
-      if ( this%already_initialized ) then
+      this%nodata_value = nodata_value
 
-        ! pass
+      this%grd_delta    => grid_Create ( iNX=NX,                          &
+                                         iNY=NY,                          &
+                                         rX0=X0,                          &
+                                         rY0=Y0,                          &
+                                         rX1=X1,                          &
+                                         rY1=Y1,                          &
+                                         iDataType=GRID_DATATYPE_DOUBLE )
+       this%grd_delta_n  => grid_Create ( iNX=NX,                          &
+                                         iNY=NY,                          &
+                                         rX0=X0,                          &
+                                         rY0=Y0,                          &
+                                         rX1=X1,                          &
+                                         rY1=Y1,                          &
+                                         iDataType=GRID_DATATYPE_DOUBLE )
 
-      else
+      this%grd_delta_n2 => grid_Create ( iNX=NX,                          &
+                                         iNY=NY,                          &
+                                         rX0=X0,                          &
+                                         rY0=Y0,                          &
+                                         rX1=X1,                          &
+                                         rY1=Y1,                          &
+                                         iDataType=GRID_DATATYPE_DOUBLE )
 
-        this%already_initialized = TRUE
-        this%nodata_value = nodata_value
+      this%grd_term1   => grid_Create ( iNX=NX,                          &
+                                        iNY=NY,                          &
+                                        rX0=X0,                          &
+                                        rY0=Y0,                          &
+                                        rX1=X1,                          &
+                                        rY1=Y1,                          &
+                                        iDataType=GRID_DATATYPE_DOUBLE )
 
-        this%grd_delta    => grid_Create ( iNX=NX,                          &
-                                           iNY=NY,                          &
-                                           rX0=X0,                          &
-                                           rY0=Y0,                          &
-                                           rX1=X1,                          &
-                                           rY1=Y1,                          &
-                                           iDataType=GRID_DATATYPE_DOUBLE )
+      this%grd_M1      => grid_Create ( iNX=NX,                          &
+                                        iNY=NY,                          &
+                                        rX0=X0,                          &
+                                        rY0=Y0,                          &
+                                        rX1=X1,                          &
+                                        rY1=Y1,                          &
+                                        iDataType=GRID_DATATYPE_DOUBLE )
 
-        this%grd_delta_n  => grid_Create ( iNX=NX,                          &
-                                           iNY=NY,                          &
-                                           rX0=X0,                          &
-                                           rY0=Y0,                          &
-                                           rX1=X1,                          &
-                                           rY1=Y1,                          &
-                                           iDataType=GRID_DATATYPE_DOUBLE )
+      this%grd_M2      => grid_Create ( iNX=NX,                          &
+                                        iNY=NY,                          &
+                                        rX0=X0,                          &
+                                        rY0=Y0,                          &
+                                        rX1=X1,                          &
+                                        rY1=Y1,                          &
+                                        iDataType=GRID_DATATYPE_DOUBLE )
 
-        this%grd_delta_n2 => grid_Create ( iNX=NX,                          &
-                                           iNY=NY,                          &
-                                           rX0=X0,                          &
-                                           rY0=Y0,                          &
-                                           rX1=X1,                          &
-                                           rY1=Y1,                          &
-                                           iDataType=GRID_DATATYPE_DOUBLE )
-
-        this%grd_term1   => grid_Create ( iNX=NX,                          &
-                                          iNY=NY,                          &
-                                          rX0=X0,                          &
-                                          rY0=Y0,                          &
-                                          rX1=X1,                          &
-                                          rY1=Y1,                          &
-                                          iDataType=GRID_DATATYPE_DOUBLE )
-
-        this%grd_M1      => grid_Create ( iNX=NX,                          &
-                                          iNY=NY,                          &
-                                          rX0=X0,                          &
-                                          rY0=Y0,                          &
-                                          rX1=X1,                          &
-                                          rY1=Y1,                          &
-                                          iDataType=GRID_DATATYPE_DOUBLE )
-
-        this%grd_M2      => grid_Create ( iNX=NX,                          &
-                                          iNY=NY,                          &
-                                          rX0=X0,                          &
-                                          rY0=Y0,                          &
-                                          rX1=X1,                          &
-                                          rY1=Y1,                          &
-                                          iDataType=GRID_DATATYPE_DOUBLE )
-
-        this%grd_sum     => grid_Create ( iNX=NX,                          &
-                                          iNY=NY,                          &
-                                          rX0=X0,                          &
-                                          rY0=Y0,                          &
-                                          rX1=X1,                          &
-                                          rY1=Y1,                          &
-                                          iDataType=GRID_DATATYPE_DOUBLE )
-
-       end if                                   
+      this%grd_sum     => grid_Create ( iNX=NX,                          &
+                                        iNY=NY,                          &
+                                        rX0=X0,                          &
+                                        rY0=Y0,                          &
+                                        rX1=X1,                          &
+                                        rY1=Y1,                          &
+                                        iDataType=GRID_DATATYPE_DOUBLE )
 
   end subroutine initialize_sub
 

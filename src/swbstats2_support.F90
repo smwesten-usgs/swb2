@@ -173,9 +173,13 @@ module swbstats2_support
     VOLUME_UNIT_T("millions of gallons", "MG   ", 7.4805194805E-6_c_double),   &
     VOLUME_UNIT_T("acre-feet          ", "ac-ft", 0.000022956840808_c_double) ]
 
-  type (DATA_CATALOG_ENTRY_T)    :: input_data_obj
+  type (DATA_CATALOG_ENTRY_T) :: input_data_obj
 
-  type (FILE_COLLECTION_T)       :: output_files(39)
+  type (FILE_COLLECTION_T)    :: OUTPUT_FILES(39)
+
+  type ( RUNNING_STATS_T)     :: RSTAT
+
+  type (RUNNING_STATS_T)      :: MON_STAT(12)
 
 contains
 
@@ -192,7 +196,7 @@ contains
               rY1=this%ncfile_in%rY(NC_TOP),                                 &
               iDataType=GRID_DATATYPE_DOUBLE )
 
-    output_files(STATS_SUM)%grid_ptr => grid_Create (                        &
+    OUTPUT_FILES(STATS_SUM)%grid_ptr => grid_Create (                        &
               iNX=this%ncfile_in%iNX,                                        &
               iNY=this%ncfile_in%iNY,                                        &
               rX0=this%ncfile_in%rX(NC_LEFT),                                &
@@ -200,9 +204,9 @@ contains
               rX1=this%ncfile_in%rX(NC_RIGHT),                               &
               rY1=this%ncfile_in%rY(NC_TOP),                                 &
               iDataType=GRID_DATATYPE_DOUBLE )
-    output_files(STATS_SUM)%stats_description = "SUM"
+    OUTPUT_FILES(STATS_SUM)%stats_description = "SUM"
 
-    output_files(STATS_MEAN)%grid_ptr => grid_Create (                       &
+    OUTPUT_FILES(STATS_MEAN)%grid_ptr => grid_Create (                       &
               iNX=this%ncfile_in%iNX,                                        &
               iNY=this%ncfile_in%iNY,                                        &
               rX0=this%ncfile_in%rX(NC_LEFT),                                &
@@ -210,9 +214,9 @@ contains
               rX1=this%ncfile_in%rX(NC_RIGHT),                               &
               rY1=this%ncfile_in%rY(NC_TOP),                                 &
               iDataType=GRID_DATATYPE_DOUBLE )
-    output_files(STATS_MEAN)%stats_description = "MEAN"
+    OUTPUT_FILES(STATS_MEAN)%stats_description = "MEAN"
 
-    output_files(STATS_VARIANCE)%grid_ptr => grid_Create (                   &
+    OUTPUT_FILES(STATS_VARIANCE)%grid_ptr => grid_Create (                   &
               iNX=this%ncfile_in%iNX,                                        &
               iNY=this%ncfile_in%iNY,                                        &
               rX0=this%ncfile_in%rX(NC_LEFT),                                &
@@ -220,7 +224,7 @@ contains
               rX1=this%ncfile_in%rX(NC_RIGHT),                               &
               rY1=this%ncfile_in%rY(NC_TOP),                                 &
               iDataType=GRID_DATATYPE_DOUBLE )
-      output_files(STATS_VARIANCE)%stats_description = "VARIANCE"
+      OUTPUT_FILES(STATS_VARIANCE)%stats_description = "VARIANCE"
 
     ! delta, delta2 are temporary work grids used in calculating variance
     this%grd_delta   =>  grid_Create ( iNX=this%ncfile_in%iNX,               &
@@ -272,7 +276,7 @@ contains
       mean_index_num = ( month_num - 1 ) * 3 + 2
       variance_index_num = ( month_num - 1 ) * 3 + 3
 
-      output_files(sum_index_num)%grid_ptr => grid_Create (          &
+      OUTPUT_FILES(sum_index_num)%grid_ptr => grid_Create (          &
       iNX=this%ncfile_in%iNX,                                        &
       iNY=this%ncfile_in%iNY,                                        &
       rX0=this%ncfile_in%rX(NC_LEFT),                                &
@@ -280,10 +284,10 @@ contains
       rX1=this%ncfile_in%rX(NC_RIGHT),                               &
       rY1=this%ncfile_in%rY(NC_TOP),                                 &
       iDataType=GRID_DATATYPE_DOUBLE )
-      output_files(sum_index_num)%stats_description = "SUM"
-      output_files(sum_index_num)%write_arcgrid = TRUE
+      OUTPUT_FILES(sum_index_num)%stats_description = "SUM"
+      OUTPUT_FILES(sum_index_num)%write_arcgrid = TRUE
 
-      output_files(mean_index_num)%grid_ptr => grid_Create (         &
+      OUTPUT_FILES(mean_index_num)%grid_ptr => grid_Create (         &
       iNX=this%ncfile_in%iNX,                                        &
       iNY=this%ncfile_in%iNY,                                        &
       rX0=this%ncfile_in%rX(NC_LEFT),                                &
@@ -291,10 +295,10 @@ contains
       rX1=this%ncfile_in%rX(NC_RIGHT),                               &
       rY1=this%ncfile_in%rY(NC_TOP),                                 &
       iDataType=GRID_DATATYPE_DOUBLE )
-      output_files(mean_index_num)%stats_description = "MEAN"
-      output_files(mean_index_num)%write_arcgrid = TRUE
+      OUTPUT_FILES(mean_index_num)%stats_description = "MEAN"
+      OUTPUT_FILES(mean_index_num)%write_arcgrid = TRUE
 
-      output_files(variance_index_num)%grid_ptr => grid_Create (     &
+      OUTPUT_FILES(variance_index_num)%grid_ptr => grid_Create (     &
       iNX=this%ncfile_in%iNX,                                        &
       iNY=this%ncfile_in%iNY,                                        &
       rX0=this%ncfile_in%rX(NC_LEFT),                                &
@@ -302,7 +306,7 @@ contains
       rX1=this%ncfile_in%rX(NC_RIGHT),                               &
       rY1=this%ncfile_in%rY(NC_TOP),                                 &
       iDataType=GRID_DATATYPE_DOUBLE )
-      output_files(variance_index_num)%stats_description = "VARIANCE"
+      OUTPUT_FILES(variance_index_num)%stats_description = "VARIANCE"
 
     enddo
         
@@ -607,7 +611,7 @@ contains
     integer (c_int)                 :: iIndex
     integer (c_int)                 :: iStat
     character (len=:), allocatable       :: description_str
-    character (len=:), allocatable       :: output_filesname_str
+    character (len=:), allocatable       :: OUTPUT_FILESname_str
     character (len=256), save            :: previous_zone_filename
 
     ! OK, if this is the same ARC ASCII grid file processed in a previous iteration,
@@ -619,7 +623,7 @@ contains
       if (description_str .contains. "/") description_str = right( description_str, substring="/")
       if (description_str .contains. "\") description_str = right( description_str, substring="\")
 
-      output_filesname_str = "zone_grid__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
+      OUTPUT_FILESname_str = "zone_grid__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
 
       ! allocate memory for a generic data_catalog_entry
       if (associated(this%grd_zone))  deallocate(this%grd_zone)
@@ -639,7 +643,7 @@ contains
 !      this%grd_zone%pGrdBase%iData = NC_FILL_INT
 !    end where
 
-      call grid_WriteArcGrid(output_filesname_str, this%grd_zone%pGrdBase )
+      call grid_WriteArcGrid(OUTPUT_FILESname_str, this%grd_zone%pGrdBase )
 
       ! set value of previous filename to the name of the grid we just processed.
       previous_zone_filename = trim(grid_filename)
@@ -662,7 +666,7 @@ contains
     integer (c_int)                 :: iIndex
     integer (c_int)                 :: iStat
     character (len=:), allocatable       :: description_str
-    character (len=:), allocatable       :: output_filesname_str
+    character (len=:), allocatable       :: OUTPUT_FILESname_str
     character (len=256), save            :: previous_zone_filename
 
     ! OK, if this is the same ARC ASCII grid file processed in a previous iteration,
@@ -673,7 +677,7 @@ contains
       if (description_str .contains. "/") description_str = right( description_str, substring="/")
       if (description_str .contains. "\") description_str = right( description_str, substring="\")
 
-      output_filesname_str = "zone_grid2__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
+      OUTPUT_FILESname_str = "zone_grid2__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
 
       ! allocate memory for a generic data_catalog_entry
       if (associated(this%grd_zone2))  deallocate(this%grd_zone2)
@@ -693,7 +697,7 @@ contains
 !      this%grd_zone2%pGrdBase%iData = NC_FILL_INT
 !    end where
 
-      call grid_WriteArcGrid(output_filesname_str, this%grd_zone2%pGrdBase )
+      call grid_WriteArcGrid(OUTPUT_FILESname_str, this%grd_zone2%pGrdBase )
 
       previous_zone_filename = trim(grid_filename)
 
@@ -712,7 +716,7 @@ contains
     integer (c_int)                 :: iIndex
     integer (c_int)                 :: iStat
     character (len=:), allocatable       :: description_str
-    character (len=:), allocatable       :: output_filesname_str
+    character (len=:), allocatable       :: OUTPUT_FILESname_str
     character (len=256), save            :: previous_comparison_filename
 
     ! OK, if this is the same ARC ASCII grid file processed in a previous iteration,
@@ -723,7 +727,7 @@ contains
       if (description_str .contains. "/") description_str = right( description_str, substring="/")
       if (description_str .contains. "\") description_str = right( description_str, substring="\")
 
-      output_filesname_str = "Comparison_grid__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
+      OUTPUT_FILESname_str = "Comparison_grid__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
 
       ! allocate memory for a generic data_catalog_entry
       if (.not. associated(this%grd_comparison))  allocate(this%grd_comparison, stat=iStat)
@@ -745,7 +749,7 @@ contains
                                         * this%comparison_grid_conversion_factor
 !    end where
 
-      call grid_WriteArcGrid(output_filesname_str, this%grd_comparison%pGrdBase )
+      call grid_WriteArcGrid(OUTPUT_FILESname_str, this%grd_comparison%pGrdBase )
 
       previous_comparison_filename = trim(grid_filename)
 
@@ -783,12 +787,12 @@ contains
 
 
   subroutine write_stats_to_netcdf( this,                                      &
-                                    output_files,                              &
+                                    OUTPUT_FILES,                              &
                                     start_date,                                &
                                     end_date )
 
     class (SWBSTATS_T), intent(inout)       :: this
-    type (FILE_COLLECTION_T), intent(inout) :: output_files(:)
+    type (FILE_COLLECTION_T), intent(inout) :: OUTPUT_FILES(:)
     type (DATETIME_T), intent(inout)        :: start_date
     type (DATETIME_T), intent(inout)        :: end_date
 
@@ -808,12 +812,12 @@ contains
 
     do stat_indx=STATS_MEAN, STATS_VARIANCE
 
-      if ( .not. output_files(stat_indx)%output_active )  cycle
+      if ( .not. OUTPUT_FILES(stat_indx)%output_active )  cycle
 
-      if ( output_files(stat_indx)%write_netcdf ) then
+      if ( OUTPUT_FILES(stat_indx)%write_netcdf ) then
 
-        ncfile_out => output_files(stat_indx)%nc_ptr
-        grid_ptr => output_files(stat_indx)%grid_ptr
+        ncfile_out => OUTPUT_FILES(stat_indx)%nc_ptr
+        grid_ptr => OUTPUT_FILES(stat_indx)%grid_ptr
 
         call netcdf_put_variable_vector(NCFILE=ncfile_out,                        &
            iVarID=ncfile_out%iVarID(NC_TIME),                                     &
@@ -845,12 +849,12 @@ contains
 
 !------------------------------------------------------------------------------
 
-  subroutine write_monthly_stats_to_arcgrid( this, output_files,    &
+  subroutine write_monthly_stats_to_arcgrid( this, OUTPUT_FILES,    &
                                              date_range_string,     &
                                              output_file_prefix )
 
     class (SWBSTATS_T), intent(inout)                    :: this
-    type (FILE_COLLECTION_T), intent(inout)              :: output_files(:)
+    type (FILE_COLLECTION_T), intent(inout)              :: OUTPUT_FILES(:)
     character (len=*), intent(in), optional              :: date_range_string
     character (len=*), intent(in), optional              :: output_file_prefix
 
@@ -880,7 +884,7 @@ contains
       mean_index_num = ( month_num - 1 ) * 3 + 2
       variance_index_num = ( month_num - 1 ) * 3 + 3
 
-      if ( output_files(mean_index_num)%write_arcgrid) then
+      if ( OUTPUT_FILES(mean_index_num)%write_arcgrid) then
 
         if (this%report_as_volume) then
           units_string = "cubic meters"
@@ -899,9 +903,9 @@ contains
 
 
         ! write out MEAN values grid
-        grid_ptr => output_files(mean_index_num)%grid_ptr
+        grid_ptr => OUTPUT_FILES(mean_index_num)%grid_ptr
         call assert(associated(grid_ptr), "Unallocated array", __FILE__, __LINE__)
-        stats_description = output_files(mean_index_num)%stats_description
+        stats_description = OUTPUT_FILES(mean_index_num)%stats_description
 
         if ( present(output_file_prefix) ) then
           file_prefix = output_file_prefix // "__" // "monthly_mean_over_all"
@@ -919,9 +923,9 @@ contains
         call grid_WriteArcGrid( filename, grid_ptr )
 
         !!! Now output the VARIANCE grid 
-        grid_ptr => output_files(variance_index_num)%grid_ptr
+        grid_ptr => OUTPUT_FILES(variance_index_num)%grid_ptr
         call assert(associated(grid_ptr), "Unallocated array", __FILE__, __LINE__)
-        stats_description = output_files(variance_index_num)%stats_description
+        stats_description = OUTPUT_FILES(variance_index_num)%stats_description
 
         if ( present(output_file_prefix) ) then
           file_prefix = output_file_prefix // "__" // "monthly_variance_over_all"
@@ -948,12 +952,12 @@ contains
 
 !------------------------------------------------------------------------------
 
-  subroutine write_stats_to_arcgrid( this, output_files, start_date,         &
+  subroutine write_stats_to_arcgrid( this, OUTPUT_FILES, start_date,         &
                                      end_date, date_range_string,            &
                                      output_file_prefix )
 
     class (SWBSTATS_T), intent(inout)                    :: this
-    type (FILE_COLLECTION_T), intent(inout)              :: output_files(:)
+    type (FILE_COLLECTION_T), intent(inout)              :: OUTPUT_FILES(:)
     type (DATETIME_T), intent(inout)                     :: start_date
     type (DATETIME_T), intent(inout)                     :: end_date
     character (len=*), intent(in), optional              :: date_range_string
@@ -980,9 +984,9 @@ contains
 
     do stat_indx=STATS_MEAN, STATS_VARIANCE
 
-      if ( .not. output_files(stat_indx)%output_active )  cycle
+      if ( .not. OUTPUT_FILES(stat_indx)%output_active )  cycle
 
-      if ( output_files(stat_indx)%write_arcgrid) then
+      if ( OUTPUT_FILES(stat_indx)%write_arcgrid) then
 
         if ( this%annualize_stats .and. stat_indx == STATS_SUM) then
           units_string = trim(this%netcdf_variable_units_string)//", per year"
@@ -999,8 +1003,8 @@ contains
         ! remove commas from filename modifier
         filename_modifier = clean(units_string, ",")
 
-        grid_ptr => output_files(stat_indx)%grid_ptr
-        stats_description = output_files(stat_indx)%stats_description
+        grid_ptr => OUTPUT_FILES(stat_indx)%grid_ptr
+        stats_description = OUTPUT_FILES(stat_indx)%stats_description
 
         if ( present(date_range_string) ) then
           !@todo: change filename depending on the desired output statistic
@@ -1055,9 +1059,9 @@ contains
 
 ! !    call SIM_DT%initialize( start_date, end_date )
 
-!     associate( grd_sum => output_files(STATS_SUM)%grid_ptr%dpData,                &
-!                grd_mean => output_files(STATS_MEAN)%grid_ptr%dpData,              &
-!                grd_var => output_files(STATS_VARIANCE)%grid_ptr%dpData,           &
+!     associate( grd_sum => OUTPUT_FILES(STATS_SUM)%grid_ptr%dpData,                &
+!                grd_mean => OUTPUT_FILES(STATS_MEAN)%grid_ptr%dpData,              &
+!                grd_var => OUTPUT_FILES(STATS_VARIANCE)%grid_ptr%dpData,           &
 !                delta =>  grid_delta%dpData,                                      &
 !                delta2 => grid_delta2%dpData,                                     &
 !                grd_new => this%grd_native%dpData      )
@@ -1177,8 +1181,6 @@ contains
     real (c_float), allocatable   :: rTemp(:,:)
     real (c_double), allocatable  :: grd_new(:,:)
 
-    type ( RUNNING_STATS_T)       :: rstat
-
     ! force slice dates to honor bounds of data dates
     if ( start_date < this%data_start_date )  start_date = this%data_start_date
     if ( end_date > this%data_end_date )      end_date = this%data_end_date
@@ -1189,15 +1191,15 @@ contains
 
     day_count = 0
 
-    call rstat%initialize(NX=this%ncfile_in%iNX,                  &
-                          NY=this%ncfile_in%iNY,                  &
-                          X0=this%ncfile_in%rX(NC_LEFT),          &
-                          Y0=this%ncfile_in%rY(NC_BOTTOM),        &
-                          X1=this%ncfile_in%rX(NC_RIGHT),         &
-                          Y1=this%ncfile_in%rY(NC_TOP),           &
-                          nodata_value=-9999._c_double)
+    ! call RSTAT%initialize(NX=this%ncfile_in%iNX,                  &
+    !                       NY=this%ncfile_in%iNY,                  &
+    !                       X0=this%ncfile_in%rX(NC_LEFT),          &
+    !                       Y0=this%ncfile_in%rY(NC_BOTTOM),        &
+    !                       X1=this%ncfile_in%rX(NC_RIGHT),         &
+    !                       Y1=this%ncfile_in%rY(NC_TOP),           &
+    !                       nodata_value=-9999._c_double)
 
-    call rstat%clear()                          
+    call RSTAT%clear()                          
 
     ! SIM_DT is being used here simply because it provides a simple way to march through
     ! time on a day-by-day basis; need to ensure that the "current" day aligns with the 
@@ -1233,7 +1235,7 @@ contains
         local_mask = grd_new > NC_FILL_FLOAT
       endif
 
-      call rstat%push(grd_data=grd_new, mask=local_mask)
+      call RSTAT%push(grd_data=grd_new, mask=local_mask)
 
 
          ! write(*,fmt="(a,f14.3,f14.3)") "gridsum: ", minval(grd_sum,  mask=grd_new > NC_FILL_FLOAT), &
@@ -1250,9 +1252,9 @@ contains
 
     end do
 
-    call rstat%mean(grd_mean)
-    call rstat%sum(grd_sum)
-    call rstat%variance(grd_var)
+    call RSTAT%mean(grd_mean)
+    call RSTAT%sum(grd_sum)
+    call RSTAT%variance(grd_var)
 
     where ( .not. local_mask )
       grd_mean = NC_FILL_FLOAT
@@ -1275,6 +1277,7 @@ contains
     endif
 
     deallocate(local_mask)
+    deallocate(grd_new)
     deallocate(rTemp)
 
   end subroutine calculate_slice_statistics
@@ -1295,34 +1298,10 @@ contains
     character (len=3) :: month_name
     integer (c_int)   :: month_index
 
-    type (RUNNING_STATS_T), save :: mon_stats(12)
-    logical (c_bool), save       :: uninitialized = TRUE
-
-    if (uninitialized) then
-
-      do month_index=1,12
-
-        call mon_stats(month_index)%initialize(NX=this%ncfile_in%iNX,                &
-                                             NY=this%ncfile_in%iNY,                  &
-                                             X0=this%ncfile_in%rX(NC_LEFT),          &
-                                             Y0=this%ncfile_in%rY(NC_BOTTOM),        &
-                                             X1=this%ncfile_in%rX(NC_RIGHT),         &
-                                             Y1=this%ncfile_in%rY(NC_TOP),           &
-                                             nodata_value=-9999._c_double)
-
-        call mon_stats(month_index)%clear()
-        
-      enddo
-
-      uninitialized = FALSE
-      
-    endif  
-
     if (.not. finalize) then
 
-      call mon_stats(month_num)%push(grd_data=output_files(STATS_SUM)%grid_ptr%dpData,                &
-                                     mask=logical(output_files(STATS_SUM)%grid_ptr%dpData > -9999._c_double, c_bool))
-
+      call MON_STAT(month_num)%push(grd_data=OUTPUT_FILES(STATS_SUM)%grid_ptr%dpData,                &
+                                     mask=logical(OUTPUT_FILES(STATS_SUM)%grid_ptr%dpData > -9999._c_double, c_bool))
       
     else  !finalize monthly outputs
 
@@ -1333,24 +1312,24 @@ contains
         mean_index_num = ( month_index- 1 ) * 3 + 2
         variance_index_num = ( month_index- 1 ) * 3 + 3
     
-        call mon_stats(month_index)%mean(output_files(mean_index_num)%grid_ptr%dpData)
-        call mon_stats(month_index)%sum(output_files(sum_index_num)%grid_ptr%dpData)
-        call mon_stats(month_index)%variance(output_files(variance_index_num)%grid_ptr%dpData)
+        call MON_STAT(month_index)%mean(OUTPUT_FILES(mean_index_num)%grid_ptr%dpData)
+        call MON_STAT(month_index)%sum(OUTPUT_FILES(sum_index_num)%grid_ptr%dpData)
+        call MON_STAT(month_index)%variance(OUTPUT_FILES(variance_index_num)%grid_ptr%dpData)
 
-        ! if ( output_files(sum_index_num)%n_count > 0 ) then
+        ! if ( OUTPUT_FILES(sum_index_num)%n_count > 0 ) then
 
-        !   where ( output_files(sum_index_num)%grid_ptr%dpData > -9999. )
-        !     output_files(mean_index_num)%grid_ptr%dpData = output_files(sum_index_num)%grid_ptr%dpData   &
-        !                                                / real(output_files(sum_index_num)%n_count, kind=c_double)
+        !   where ( OUTPUT_FILES(sum_index_num)%grid_ptr%dpData > -9999. )
+        !     OUTPUT_FILES(mean_index_num)%grid_ptr%dpData = OUTPUT_FILES(sum_index_num)%grid_ptr%dpData   &
+        !                                                / real(OUTPUT_FILES(sum_index_num)%n_count, kind=c_double)
         !   else where
           
-        !     output_files(mean_index_num)%grid_ptr%dpData = -9999.
+        !     OUTPUT_FILES(mean_index_num)%grid_ptr%dpData = -9999.
           
         !   end where
 
         ! else
 
-        !   output_files(mean_index_num)%grid_ptr%dpData = -9999.
+        !   OUTPUT_FILES(mean_index_num)%grid_ptr%dpData = -9999.
 
         ! endif  
 
@@ -1358,12 +1337,12 @@ contains
 
 
         write(*,fmt='(a,i0,1x,6(f0.4, 2x))') 'FINALIZING: ', month_index,    &
-        minval(output_files(sum_index_num)%grid_ptr%dpData),                 &
-        maxval(output_files(sum_index_num)%grid_ptr%dpData),                 &
-        minval(output_files(mean_index_num)%grid_ptr%dpData),                &
-        maxval(output_files(mean_index_num)%grid_ptr%dpData),                &
-        minval(output_files(variance_index_num)%grid_ptr%dpData),            &
-        maxval(output_files(variance_index_num)%grid_ptr%dpData)
+        minval(OUTPUT_FILES(sum_index_num)%grid_ptr%dpData),                 &
+        maxval(OUTPUT_FILES(sum_index_num)%grid_ptr%dpData),                 &
+        minval(OUTPUT_FILES(mean_index_num)%grid_ptr%dpData),                &
+        maxval(OUTPUT_FILES(mean_index_num)%grid_ptr%dpData),                &
+        minval(OUTPUT_FILES(variance_index_num)%grid_ptr%dpData),            &
+        maxval(OUTPUT_FILES(variance_index_num)%grid_ptr%dpData)
 
       enddo  
 
@@ -1684,10 +1663,10 @@ contains
 !------------------------------------------------------------------------------
 
   subroutine open_output_netcdf_files(this,                                    &
-                                      output_files)
+                                      OUTPUT_FILES)
 
     class (SWBSTATS_T), intent(inout)           :: this
-    type (FILE_COLLECTION_T), intent(inout)     :: output_files(:)
+    type (FILE_COLLECTION_T), intent(inout)     :: OUTPUT_FILES(:)
 
     ! [ LOCALS ]
     integer (c_int)                   :: stat_indx
@@ -1704,9 +1683,9 @@ contains
 
     do stat_indx=STATS_MEAN, STATS_VARIANCE
 
-      if ( .not. output_files(stat_indx)%output_active )  cycle
+      if ( .not. OUTPUT_FILES(stat_indx)%output_active )  cycle
 
-      if (output_files(stat_indx)%write_netcdf) then
+      if (OUTPUT_FILES(stat_indx)%write_netcdf) then
 
         if ( this%annualize_stats .and. stat_indx == STATS_SUM) then
           units_string = trim(this%netcdf_variable_units_string)//", per year"
@@ -1718,10 +1697,10 @@ contains
           units_string = trim(this%netcdf_variable_units_string)
         endif
 
-        allocate( output_files(stat_indx)%nc_ptr, stat=status)
+        allocate( OUTPUT_FILES(stat_indx)%nc_ptr, stat=status)
         call assert( status==0, "Problem allocating netcdf file data structure.", &
           __SRCNAME__, __LINE__)
-        ncfile_out => output_files(stat_indx)%nc_ptr
+        ncfile_out => OUTPUT_FILES(stat_indx)%nc_ptr
 
         call netcdf_open_and_prepare_as_output(                                     &
               NCFILE=ncfile_out,                                                    &
@@ -1737,7 +1716,7 @@ contains
               executable_name="SWBSTATS2",                                          &
               filename_prefix=filename_prefix,                                      &
               filename_modifier=this%filename_modifier_string                       &
-                                //"_"//output_files(stat_indx)%stats_description )
+                                //"_"//OUTPUT_FILES(stat_indx)%stats_description )
 
       endif
 
@@ -1747,10 +1726,10 @@ contains
 
 !------------------------------------------------------------------------------
 
-  subroutine close_output_netcdf_files(this, output_files)
+  subroutine close_output_netcdf_files(this, OUTPUT_FILES)
 
     class (SWBSTATS_T), intent(inout)         :: this
-    type (FILE_COLLECTION_T), intent(inout)   :: output_files(:)
+    type (FILE_COLLECTION_T), intent(inout)   :: OUTPUT_FILES(:)
 
     ! [ LOCALS ]
     integer (c_int)              :: stat_indx
@@ -1759,11 +1738,11 @@ contains
 
     do stat_indx=STATS_MEAN, STATS_VARIANCE
 
-      if ( .not. output_files(stat_indx)%output_active )  cycle
+      if ( .not. OUTPUT_FILES(stat_indx)%output_active )  cycle
 
-      if (output_files(stat_indx)%write_netcdf) then
+      if (OUTPUT_FILES(stat_indx)%write_netcdf) then
 
-        ncfile_out => output_files(stat_indx)%nc_ptr
+        ncfile_out => OUTPUT_FILES(stat_indx)%nc_ptr
         call netcdf_close_file(NCFILE=ncfile_out)
 
       endif
@@ -1848,20 +1827,20 @@ contains
 
     fmt_string = "(a,t30,': ',l)"
     write(*,fmt=fmt_string) "write_csv", this%write_csv
-    write(*,fmt=fmt_string) "write_netcdf (SUM)", output_files(STATS_SUM)%write_netcdf
-    write(*,fmt=fmt_string) "write_netcdf (MEAN)", output_files(STATS_MEAN)%write_netcdf
-    write(*,fmt=fmt_string) "write_netcdf (VARIANCE)", output_files(STATS_VARIANCE)%write_netcdf
-    write(*,fmt=fmt_string) "write_arcgrid (SUM)", output_files(STATS_SUM)%write_arcgrid
-    write(*,fmt=fmt_string) "write_arcgrid (MEAN)", output_files(STATS_MEAN)%write_arcgrid
-    write(*,fmt=fmt_string) "write_arcgrid (VARIANCE)", output_files(STATS_VARIANCE)%write_arcgrid
-    write(*,fmt=fmt_string) "output_active (SUM)", output_files(STATS_SUM)%output_active
-    write(*,fmt=fmt_string) "output_active (MEAN)", output_files(STATS_MEAN)%output_active
-    write(*,fmt=fmt_string) "output_active (VARIANCE)", output_files(STATS_VARIANCE)%output_active
+    write(*,fmt=fmt_string) "write_netcdf (SUM)", OUTPUT_FILES(STATS_SUM)%write_netcdf
+    write(*,fmt=fmt_string) "write_netcdf (MEAN)", OUTPUT_FILES(STATS_MEAN)%write_netcdf
+    write(*,fmt=fmt_string) "write_netcdf (VARIANCE)", OUTPUT_FILES(STATS_VARIANCE)%write_netcdf
+    write(*,fmt=fmt_string) "write_arcgrid (SUM)", OUTPUT_FILES(STATS_SUM)%write_arcgrid
+    write(*,fmt=fmt_string) "write_arcgrid (MEAN)", OUTPUT_FILES(STATS_MEAN)%write_arcgrid
+    write(*,fmt=fmt_string) "write_arcgrid (VARIANCE)", OUTPUT_FILES(STATS_VARIANCE)%write_arcgrid
+    write(*,fmt=fmt_string) "output_active (SUM)", OUTPUT_FILES(STATS_SUM)%output_active
+    write(*,fmt=fmt_string) "output_active (MEAN)", OUTPUT_FILES(STATS_MEAN)%output_active
+    write(*,fmt=fmt_string) "output_active (VARIANCE)", OUTPUT_FILES(STATS_VARIANCE)%output_active
 
     fmt_string = "(a,t40,': ',l)"
-    write(*,fmt=fmt_string) "grid pointer allocated? (SUM)", associated( output_files(STATS_SUM)%grid_ptr)
-    write(*,fmt=fmt_string) "grid pointer allocated? (MEAN)", associated( output_files(STATS_MEAN)%grid_ptr)
-    write(*,fmt=fmt_string) "grid pointer allocated? (VARIANCE)", associated( output_files(STATS_VARIANCE)%grid_ptr)
+    write(*,fmt=fmt_string) "grid pointer allocated? (SUM)", associated( OUTPUT_FILES(STATS_SUM)%grid_ptr)
+    write(*,fmt=fmt_string) "grid pointer allocated? (MEAN)", associated( OUTPUT_FILES(STATS_MEAN)%grid_ptr)
+    write(*,fmt=fmt_string) "grid pointer allocated? (VARIANCE)", associated( OUTPUT_FILES(STATS_VARIANCE)%grid_ptr)
 
     fmt_string = "(a,t30,': ',l)"
     write(*,fmt=fmt_string) "calc_zonal_stats", this%calc_zonal_stats

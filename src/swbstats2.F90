@@ -43,6 +43,7 @@ program swbstats2
   real (c_double)                :: start_date_dbl
   real (c_double)                :: end_date_dbl
   integer (c_int)                :: TIME_BNDS_VARID
+  integer (c_int)                :: month_index
 
   logical (c_bool)               :: netcdf_active = FALSE
 
@@ -383,6 +384,14 @@ program swbstats2
   ! create working grids with dimensions extracted from netCDF file being munged
   call swbstats%create_working_grids()
 
+  call RSTAT%initialize(NX=swbstats%ncfile_in%iNX,           &
+                        NY=swbstats%ncfile_in%iNY,           &
+                        X0=swbstats%ncfile_in%rX(0),         &
+                        Y0=swbstats%ncfile_in%rY(0),         &
+                        X1=swbstats%ncfile_in%rX(1),         &
+                        Y1=swbstats%ncfile_in%rY(1),         &
+                        nodata_value=-9999._c_double)
+
   ! if user wants annual or monthly statistics, calculate a list of annual or
   ! monthly starting and ending dates for each time slice
   if (swbstats%calculation_time_period == CALC_PERIOD_ANNUAL) then
@@ -393,6 +402,18 @@ program swbstats2
 
     call swbstats%create_date_list_for_monthly_statistics()
     call swbstats%create_monthly_working_grids()
+
+    do month_index=1,12
+
+      call MON_STAT(month_index)%initialize(NX=swbstats%ncfile_in%iNX,           &
+                                            NY=swbstats%ncfile_in%iNY,           &
+                                            X0=swbstats%ncfile_in%rX(0),         &
+                                            Y0=swbstats%ncfile_in%rY(0),         &
+                                            X1=swbstats%ncfile_in%rX(1),         &
+                                            Y1=swbstats%ncfile_in%rY(1),         &
+                                            nodata_value=-9999._c_double)
+
+    enddo  
 
   elseif (swbstats%calculation_time_period == CALC_PERIOD_DAILY) then
 
