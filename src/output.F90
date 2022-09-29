@@ -120,7 +120,7 @@ contains
     integer (c_int) :: iIndex
 
     allocate ( NC_OUT( NCDF_NUM_OUTPUTS ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
+    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
 
     if ( .not. allocated( OUTPUT_DIRECTORY_NAME ) ) OUTPUT_DIRECTORY_NAME = ""
     if ( .not. allocated( OUTPUT_PREFIX_NAME ) ) OUTPUT_PREFIX_NAME       = ""
@@ -206,7 +206,7 @@ contains
     integer (c_int) :: noutput, nsim
 
     allocate ( NC_MULTI_SIM_OUT( NCDF_NUM_OUTPUTS, number_of_simulations ), stat=iStat )
-    call assert( iStat == 0, "Problem allocating memory", __SRCNAME__, __LINE__ )
+    call assert( iStat == 0, "Problem allocating memory", __FILE__, __LINE__ )
 
     if ( .not. allocated( OUTPUT_DIRECTORY_NAME ) ) OUTPUT_DIRECTORY_NAME = ""
     if ( .not. allocated( OUTPUT_PREFIX_NAME ) ) OUTPUT_PREFIX_NAME       = ""

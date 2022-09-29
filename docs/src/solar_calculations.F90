@@ -521,7 +521,7 @@ contains
 
     call assert( dTheta_z >= 0.0_c_double .and. dTheta_z <= HALFPI, &
       "Internal programming error: solar zenith angle must be in radians and in the range 0 to pi/2", &
-      __SRCNAME__, __LINE__)
+      __FILE__, __LINE__)
 
     dAlpha = HALFPI - dAlpha
 
@@ -567,7 +567,7 @@ contains
 
 	  call assert( dLatitude <= HALFPI .and. dLatitude >= -HALFPI , &
 	    "Internal programming error: Latitude must be expressed in RADIANS and range from -pi/2 to pi/2", &
-	    __SRCNAME__, __LINE__ )
+	    __FILE__, __LINE__ )
 
 
 	  dTheta_z = acos( sin(dLatitude) * sin(dDelta) + cos(dLatitude) * cos(dDelta) * cos(dOmega_l ) )

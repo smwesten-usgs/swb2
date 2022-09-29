@@ -56,7 +56,7 @@ contains
 
     allocate( STORM_DRAIN_CAPTURE_FRACTION( count( is_cell_active ) ), stat=status )
     call assert( status==0, "Problem allocating STORM_DRAIN_CAPTURE_FRACTION", &
-      __SRCNAME__, __LINE__ )
+      __FILE__, __LINE__ )
 
     ! set default value for STORM_DRAIN_CAPTURE_FRACTION
     STORM_DRAIN_CAPTURE_FRACTION = 0.0_c_float
@@ -88,7 +88,7 @@ contains
          //" capture to 0.0 (ZERO)."
 
        call warn( sMessage=trim(sBuf),                                                      &
-                 sModule=__SRCNAME__,                                                      &
+                 sModule=__FILE__,                                                      &
                  iLine=__LINE__,                                                           &
                  lFatal=.false._c_bool,                                                    &
                  iLogLevel=LOG_ALL )
@@ -105,7 +105,7 @@ contains
 
       deallocate( STORM_DRAIN_CAPTURE_FRACTION_TABLE, stat=status )
       call assert( status==0, "Problem allocating STORM_DRAIN_CAPTURE_FRACTION_TABLE", &
-        __SRCNAME__, __LINE__ )
+        __FILE__, __LINE__ )
 
     endif
 

@@ -1,12 +1,11 @@
 project(
   'swb2',
-  'fortran','c',
+  'fortran','c','cpp',
   version: '2.3.1-rc',
   meson_version: '>= 0.59.0',
   default_options : [
-    'b_vscrt=static_from_buildtype', # Link runtime libraries statically on Windows
     'optimization=2',
-    'fortran_std=f2008',
+    'fortran_std=f2008'
 ])
 
 if get_option('optimization') == '3'
@@ -80,6 +79,7 @@ if fc_id == 'intel-cl'
 elif fc_id == 'intel'
   # linux and macOS
   compile_args += ['-fpe0',              # Activate all floating point exceptions
+                   '-fpp',
                    '-no-heap-arrays',
                    '-traceback',
                    '-diag-disable:7416',  # f2008 warning
@@ -92,7 +92,10 @@ endif
 add_project_arguments(fc.get_supported_arguments(compile_args), language: 'fortran')
 add_project_link_arguments(fc.get_supported_arguments(link_args), language: 'fortran')
 
+include_directories('C:/Program Files/netCDF 4.7.4/include')
+
 subdir('src')
+subdir('test/unit_tests')
 # subdir('srcbmi')
 # subdir('utils')
 

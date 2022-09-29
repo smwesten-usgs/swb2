@@ -75,26 +75,26 @@ contains
     pHSG => DAT%find("HYDROLOGIC_SOILS_GROUP")
 
     call assert( associated( pLULC), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer"          &
-      //" detected for pLULC", __SRCNAME__, __LINE__ )
+      //" detected for pLULC", __FILE__, __LINE__ )
 
     call assert( associated( pLULC%pGrdBase ),   &
       "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pLULC%pGrdBase",            &
-       __SRCNAME__, __LINE__ )
+       __FILE__, __LINE__ )
 
     call assert( allocated( pLULC%pGrdBase%iData ),   &
       "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pLULC%pGrdBase%iData", &
-      __SRCNAME__, __LINE__ )
+      __FILE__, __LINE__ )
 
     call assert( associated( pHSG), "Possible INTERNAL PROGRAMMING ERROR -- Null pointer"           &
-      //" detected for pHSG", __SRCNAME__, __LINE__ )
+      //" detected for pHSG", __FILE__, __LINE__ )
 
     call assert( associated( pHSG%pGrdBase ),      &
       "Possible INTERNAL PROGRAMMING ERROR -- Null pointer detected for pHSG%pGrdBase",             &
-       __SRCNAME__, __LINE__ )
+       __FILE__, __LINE__ )
 
     call assert( allocated( pHSG%pGrdBase%iData ),      &
       "Possible INTERNAL PROGRAMMING ERROR -- Unallocated array detected for pHSG%pGrdBase%iData",  &
-       __SRCNAME__, __LINE__ )
+       __FILE__, __LINE__ )
 
 
     ! attempt to find a source of GRIDDED MAXIMUM_NET_INFILTRATION data
@@ -107,7 +107,7 @@ contains
     if ( associated( pMAXIMUM_NET_INFILTRATION ) ) then
 
       allocate( fMAXIMUM_NET_INFILTRATION( count( is_cell_active ) ), stat=iStat )
-      call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
 
       associate ( dt => SIM_DT%curr )
 
@@ -144,7 +144,7 @@ contains
 
       allocate( fMAXIMUM_NET_INFILTRATION_ARRAY( ubound(is_cell_active,1),ubound(is_cell_active,2) ), stat=iStat )
       call assert( iStat == 0, "Failed to allocate memory for maximum potential recharge table", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
       do soils_indx = 1, number_of_soils
         do landuse_indx = 1, number_of_landuses
@@ -178,7 +178,7 @@ contains
           ! default to ridiculously high maximum potential recharge
 
       allocate( fMAXIMUM_NET_INFILTRATION( count( is_cell_active ) ), stat=iStat )
-      call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
 
       fMAXIMUM_NET_INFILTRATION = 9999.0
 

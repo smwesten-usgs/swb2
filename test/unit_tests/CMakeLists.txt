@@ -25,4 +25,5 @@ add_executable(swbtest
 target_link_libraries(swbtest swb_lib proj4_lib)
 
 # see https://stackoverflow.com/questions/43917443/fortran-module-files-not-found-by-cmake
-target_include_directories(swbtest PUBLIC $<TARGET_PROPERTY:swb_lib,Fortran_MODULE_DIRECTORY>)
+# target_include_directories(swbtest PUBLIC $<TARGET_PROPERTY:swb_lib,Fortran_MODULE_DIRECTORY>)
+include_directories(${CMAKE_CURRENT_BINARY_DIR}/src/generated)

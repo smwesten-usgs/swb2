@@ -280,13 +280,13 @@ contains
     integer (c_int), intent(out)         :: iValue
 
     if ( .not. associated(this%pGrdBase) ) &
-      call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
+      call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
 
     if (iCol <= ubound(this%pGrdBase%iData,1) .and. iRow <= ubound(this%pGrdBase%iData,2) ) then
       iValue = this%pGrdBase%iData(iCol, iRow)
     else
       call die ("Row/column indices out of bounds: ~row: "//asCharacter(iRow)//"~ col:"//asCharacter(iCol), &
-        __SRCNAME__, __LINE__ )
+        __FILE__, __LINE__ )
     endif
 
   end subroutine get_value_int_sub
@@ -301,13 +301,13 @@ contains
     real (c_float), intent(out)          :: fValue
 
     if ( .not. associated(this%pGrdBase) ) &
-      call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
+      call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
 
     if (iCol <= ubound(this%pGrdBase%iData,1) .and. iRow <= ubound(this%pGrdBase%iData,2) ) then
       fValue = this%pGrdBase%rData(iCol, iRow)
     else
       call die ("Row/column indices out of bounds: ~row: "//asCharacter(iRow)//"~ col:"//asCharacter(iCol), &
-        __SRCNAME__, __LINE__ )
+        __FILE__, __LINE__ )
     endif
 
   end subroutine get_value_float_sub
@@ -460,12 +460,12 @@ subroutine initialize_gridded_data_object_sub( this, &
   call assert(this%iSourceFileType == FILETYPE_ARC_ASCII .or. &
     this%iSourceFileType == FILETYPE_SURFER, "Only Arc ASCII or " &
     //"Surfer grids are supported as static grid inputs (for now).", &
-    __SRCNAME__, __LINE__)
+    __FILE__, __LINE__)
 
   call assert(this%iSourceDataType == DATATYPE_INT .or. &
     this%iSourceDataType == DATATYPE_REAL, "Only integer or " &
     //"real data types are supported as static grid inputs.", &
-    __SRCNAME__, __LINE__)
+    __FILE__, __LINE__)
 
   call this%nullify_pointers()
 
@@ -578,7 +578,7 @@ end subroutine initialize_netcdf_data_object_sub
     else
 
       call assert(FALSE, "Unsupported data source specified", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
     endif
 
@@ -599,7 +599,7 @@ end subroutine initialize_netcdf_data_object_sub
 
       else
 
-        call die("Unsupported data type specified", __SRCNAME__, __LINE__)
+        call die("Unsupported data type specified", __FILE__, __LINE__)
 
       endif
 
@@ -640,7 +640,7 @@ subroutine getvalues_constant_sub( this  )
   class (DATA_CATALOG_ENTRY_T) :: this
 
   if ( .not. associated(this%pGrdBase) ) &
-    call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
+    call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
 
   select case (this%iSourceDataType)
 
@@ -663,7 +663,7 @@ subroutine getvalues_constant_sub( this  )
       call assert(FALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: " &
         //"name="//dquote(this%sDescription) &
         //"; value="//trim(asCharacter(this%iSourceDataType)), &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
     end select
 
@@ -684,7 +684,7 @@ subroutine getvalues_constant_sub( this  )
     type (FSTRING_LIST_T) :: slDateValues
 
     if ( .not. associated(this%pGrdBase) ) &
-      call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
+      call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
 
     if ( .not. this%lTableValuesHaveBeenRetrieved ) then
 
@@ -711,10 +711,10 @@ subroutine getvalues_constant_sub( this  )
         if (     ( size( this%table_values_real,1) /= n)      &
             .or. ( size( this%table_values_real,1) == 1 ) )   &
             call die("Did not find values associated with a required table entry ("//squote(this%sValueColumnName)//"). ",   &
-            __SRCNAME__, __LINE__)
+            __FILE__, __LINE__)
 
         do indx=1, n
-          call this%table_dates(indx)%parseDate(slDateValues%get(indx),__SRCNAME__, __LINE__)
+          call this%table_dates(indx)%parseDate(slDateValues%get(indx),__FILE__, __LINE__)
         enddo 
 
       case ( DATATYPE_INT)
@@ -727,7 +727,7 @@ subroutine getvalues_constant_sub( this  )
         call assert(FALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: " &
           //"name="//dquote(this%sDescription) &
           //"; value="//trim(asCharacter(this%iSourceDataType)), &
-          __SRCNAME__, __LINE__)
+          __FILE__, __LINE__)
 
       end select
 
@@ -767,14 +767,14 @@ subroutine getvalues_constant_sub( this  )
           call assert(FALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: " &
             //"name="//dquote(this%sDescription) &
             //"; value="//trim(asCharacter(this%iSourceDataType)), &
-            __SRCNAME__, __LINE__)
+            __FILE__, __LINE__)
     
       end select
 
     else 
 
       call die("Missing or out-of-order value supplied for "//squote(this%sValueColumnName),   &
-          __SRCNAME__, __LINE__)
+          __FILE__, __LINE__)
         
     endif
 
@@ -822,14 +822,14 @@ subroutine getvalues_constant_sub( this  )
       call assert(this%iSourceFileType == FILETYPE_ARC_ASCII .or. &
         this%iSourceFileType == FILETYPE_SURFER, "INTERNAL PROGRAMMING ERROR -" &
         //" improper file type in use for a call to this subroutine", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
       if(this%iSourceDataForm == DYNAMIC_GRID ) then
 
         if(.not. present(dt) ) &
           call assert(FALSE, "INTERNAL PROGRAMMING ERROR - datetime object"   &
             //" must be supplied when calling this subroutine in a "           &
-            //"dynamic mode.", __SRCNAME__, __LINE__)
+            //"dynamic mode.", __FILE__, __LINE__)
 
 
         call this%make_filename(dt)
@@ -891,7 +891,7 @@ subroutine getvalues_constant_sub( this  )
 
           call assert(FALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: value=" &
             //trim(asCharacter(this%iSourceDataType)), &
-            __SRCNAME__, __LINE__)
+            __FILE__, __LINE__)
 
       end select
 
@@ -912,7 +912,7 @@ subroutine transform_grid_to_grid_sub(this)
   class (DATA_CATALOG_ENTRY_T) :: this
 
   if (.not. associated(this%pGrdNative) )  &
-    call die("INTERNAL PROGRAMMING ERROR--Null pointer detected.", __SRCNAME__, __LINE__)
+    call die("INTERNAL PROGRAMMING ERROR--Null pointer detected.", __FILE__, __LINE__)
 
   if ( .not. associated(this%pGrdBase) ) &
     this%pGrdBase => grid_Create( iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, &
@@ -956,7 +956,7 @@ subroutine transform_grid_to_grid_sub(this)
 
       call assert(FALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: value=" &
         //trim(asCharacter(this%iSourceDataType)), &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
   end select
 
@@ -1067,7 +1067,7 @@ end subroutine set_constant_value_real
 !    iStatus = getcwd(sCWD )
 
 !    call assert(iStatus==0, "Problem detemining what the current working" &
-!      //" directory is", __SRCNAME__, __LINE__)
+!      //" directory is", __FILE__, __LINE__)
 
     sNewFilename = this%sFilenameTemplate
 
@@ -1324,7 +1324,7 @@ end subroutine set_constant_value_real
         ! we are not within the proper range of dates to allow for padding.
         call assert(lExist, "The filename created from your template refers to " &
           //"a nonexistent file. ~ Attempted to open filename "&
-          //dquote(this%sSourceFilename), __SRCNAME__, __LINE__)
+          //dquote(this%sSourceFilename), __FILE__, __LINE__)
 
         exit
 
@@ -1352,7 +1352,7 @@ end subroutine set_constant_value_real
     integer (c_int) :: iYear
 
     if ( .not. associated(this%pGrdBase) ) &
-      call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
+      call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
 
     this%lPadValues = FALSE
 
@@ -1536,7 +1536,7 @@ end subroutine set_constant_value_real
 
             call assert (FALSE, "Date range for currently open NetCDF file" &
               //" does not include the current simulation date.", &
-              __SRCNAME__, __LINE__)
+              __FILE__, __LINE__)
 
           endif
 
@@ -1649,7 +1649,7 @@ end subroutine set_constant_value_real
     real (c_double) :: dScaleFactor
 
     if ( .not. associated(this%pGrdBase) ) &
-      call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
+      call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
 
     if ( this%iNC_FILE_STATUS == NETCDF_FILE_CLOSED ) then
 
@@ -1836,7 +1836,7 @@ end subroutine set_constant_value_real
        call assert(FALSE, "Unknown input file type specified. ~"&
          //"  filename: "//dquote(this%sSourceFilename) &
          //"~  file type specified as: "//dquote(this%sSourceFileType), &
-         __SRCNAME__, __LINE__)
+         __FILE__, __LINE__)
 
      endif
 
@@ -2099,7 +2099,7 @@ end subroutine set_maximum_allowable_value_real_sub
       ! pertinent to our project area.
       iRetVal = pj_init_and_transform(trim(pGrdBase%sPROJ4_string)//C_NULL_CHAR, &
                   trim(this%sSourcePROJ4_string)//C_NULL_CHAR,                   &
-                  __SRCNAME__//C_NULL_CHAR,                                   &
+                  __FILE__//C_NULL_CHAR,                                   &
                   __LINE__,                                                      &
                   4_c_long,                                                      &
                   rX, rY )
@@ -2271,7 +2271,7 @@ end subroutine set_maximum_allowable_value_real_sub
       case default
 
         call assert(FALSE, "INTERNAL PROGRAMMING ERROR - unhandled iMissingValuesAction", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
     end select
 
@@ -2364,7 +2364,7 @@ end subroutine set_maximum_allowable_value_real_sub
       case default
 
         call assert(FALSE, "INTERNAL PROGRAMMING ERROR - unhandled iMissingValuesAction", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
     end select
 

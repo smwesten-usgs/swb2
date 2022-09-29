@@ -206,11 +206,11 @@ subroutine set_date_format_indices(this, sDateFormat)
     .and. iScanDD1 > 0 .and. iScanDD2 > 0 &
     .and. iScanYYYY1 > 0 .and. iScanYYYY2 > 0, &
     "Failed to properly parse the date format string "//dquote(sDateFormat), &
-    __SRCNAME__, __LINE__)
+    __FILE__, __LINE__)
     ! perhaps there are no delimiters? if not, these values CAN be zero
 !  call assert(iScanDelim1 > 0 .and. iScanDelim2 > 0, &
 !    "Failed to properly parse the delimiters in the date format string "//dquote(sDateFormat), &
-!    __SRCNAME__, __LINE__)
+!    __FILE__, __LINE__)
 
 end subroutine set_date_format_indices
 
@@ -242,7 +242,7 @@ subroutine set_time_format_indices(this, sTimeFormat)
         .and. iScanMin1 > 0 .and. iScanMin2 > 0 &
         .and. iScanSec1 > 0 .and. iScanSec2 > 0, &
         "Failed to properly parse the time format string "//dquote(sTimeFormat), &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
 end subroutine set_time_format_indices
 
@@ -295,7 +295,7 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
 
     call Assert(FALSE, &
       "Error parsing month value - got "//trim(sMonth)//";"// &
-      " date text: "//trim(sStr), __SRCNAME__, __LINE__, sFilename_l, iLinenumber_l )
+      " date text: "//trim(sStr), __FILE__, __LINE__, sFilename_l, iLinenumber_l )
 
   endif
 
@@ -311,7 +311,7 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
 
     call Assert(FALSE, &
       "Error parsing day value - got "//trim(sDay)//";"// &
-      " date text: "//trim(sStr),sFilename_l, iLinenumber_l, __SRCNAME__, __LINE__ )
+      " date text: "//trim(sStr),sFilename_l, iLinenumber_l, __FILE__, __LINE__ )
 
   endif
 
@@ -322,7 +322,7 @@ subroutine parse_text_to_date_sub(this, sString, sFilename, iLinenumber )
 
     call Assert(FALSE, &
       "Error parsing year value - got "//trim(sYear)//";"// &
-      " date text: "//trim(sStr),sFilename_l, iLinenumber_l, __SRCNAME__, __LINE__ )
+      " date text: "//trim(sStr),sFilename_l, iLinenumber_l, __FILE__, __LINE__ )
 
   endif
 
@@ -372,18 +372,18 @@ subroutine parse_text_to_time_sub(this, sString)
   endif
   read(sHour,fmt=*, iostat = iStat) iHour
   call Assert(iStat==0, "Error parsing hour value - got "//trim(sHour)//";"// &
-    " time text: "//trim(sStr), __SRCNAME__,__LINE__)
+    " time text: "//trim(sStr), __FILE__,__LINE__)
 
   sMinute = sStr(iScanMin1 - iOffset : iScanMin2 - iOffset )
   read(sMinute,fmt=*, iostat = iStat) iMinute
   call Assert(iStat==0, "Error parsing minutes value - got "//trim(sMinute)//";"// &
-    " time text: "//trim(sStr), __SRCNAME__,__LINE__)
+    " time text: "//trim(sStr), __FILE__,__LINE__)
 
   if(iScanSec1 /= 0) then
     sSecond = sStr(iScanSec1 - iOffset : iScanSec2 - iOffset )
     read(sSecond,fmt=*, iostat = iStat) iSecond
     call Assert(iStat==0, "Error parsing hour value - got "//trim(sSecond)//";"// &
-      " time text: "//trim(sStr), __SRCNAME__,__LINE__)
+      " time text: "//trim(sStr), __FILE__,__LINE__)
   else
     iSecond = 0
   endif
@@ -654,10 +654,10 @@ function julian_day ( iYear, iMonth, iDay, iOrigin ) result(iJD)
 
   if(.not. (iMonth >= 1 .and. iMonth <= 12)) then
     write(sBuf,fmt="('Illegal month value given: ',i4)") iMonth
-    call Assert( FALSE, trim(sBuf), __SRCNAME__, __LINE__)
+    call Assert( FALSE, trim(sBuf), __FILE__, __LINE__)
   elseif(.not. (iDay >= 1 .and. iDay <= 31)) then
     write(sBuf,fmt="('Illegal day value given: ',i4)") iDay
-    call Assert( FALSE, trim(sBuf), __SRCNAME__, __LINE__)
+    call Assert( FALSE, trim(sBuf), __FILE__, __LINE__)
   endif
 
   if(present(iOrigin)) then
@@ -898,7 +898,7 @@ function write_list_date_fn(this)                     result(sDateText)
 
   call Assert(all(iStat==0),"Problem parsing the date format '"// &
      trim(sDATE_FORMAT)//"' for output", &
-    __SRCNAME__, __LINE__)
+    __FILE__, __LINE__)
 
 end function write_list_date_fn
 
@@ -971,7 +971,7 @@ function write_list_datetime_fn(this)    result(sDatetimeText)
 
   call Assert(all(iStat==0),"Problem parsing the date format '"// &
      trim(sDATE_FORMAT)//"' for output", &
-    __SRCNAME__, __LINE__)
+    __FILE__, __LINE__)
 
   write(sBuf,fmt="(1x,i2.2,':',i2.2':',i2.2)") this%iHour, this%iMinute, this%iSecond
 
@@ -1297,19 +1297,19 @@ function mmddyyyy2julian(sMMDDYYYY)  result(iJD)
   call chomp(sItem, sBuf, "/-")
   read(sBuf,*,iostat = iStat) iMonth
   call Assert(iStat==0, "Problem reading month value from string "//TRIM(sMMDDYYYY), &
-    __SRCNAME__,__LINE__)
+    __FILE__,__LINE__)
 
   ! parse day value
   call chomp(sItem, sBuf, "/-")
   read(sBuf,*,iostat=iStat) iDay
   call Assert(iStat==0, "Problem reading day value from string "//TRIM(sMMDDYYYY), &
-    __SRCNAME__,__LINE__)
+    __FILE__,__LINE__)
 
   ! parse year value
   call chomp(sItem, sBuf, "/-")
   read(sBuf,*,iostat=iStat) iYear
   call Assert(iStat==0, "Problem reading year value from string "//TRIM(sMMDDYYYY), &
-    __SRCNAME__,__LINE__)
+    __FILE__,__LINE__)
 
   iJD = julian_day ( iYear, iMonth, iDay)
 
@@ -1346,7 +1346,7 @@ function mmdd2doy(sMMDD, sInputItemName )  result(iDOY)
   call chomp(sItem, sBuf, "/-")
   read(sBuf,*,iostat = iStat) iMonth
   call Assert(iStat==0, "Problem reading month value from string "//TRIM(sMMDD),   &
-    __SRCNAME__,__LINE__,                                                          &
+    __FILE__,__LINE__,                                                          &
     sHints="The offending string was "//sQuote(sMMDD)//", which was encountered "   &
            //"while attempting to read in "//sQuote( sInputItemName_l ) )
 
@@ -1354,7 +1354,7 @@ function mmdd2doy(sMMDD, sInputItemName )  result(iDOY)
   call chomp(sItem, sBuf, "/-")
   read(sBuf,*,iostat=iStat) iDay
   call Assert(iStat==0, "Problem reading day value from string "//TRIM(sMMDD),   &
-    __SRCNAME__,__LINE__,                                                          &
+    __FILE__,__LINE__,                                                          &
     sHints="The offending string was "//sQuote(sMMDD)//", which was encountered "   &
            //"while attempting to read in "//sQuote( sInputItemName_l ) )
 
@@ -1388,19 +1388,19 @@ function mmddyyyy2doy(sMMDDYYYY)  result(iDOY)
   call chomp(sItem, sBuf, "/-")
   read(sBuf,*,iostat = iStat) iMonth
   call assert(iStat==0, "Problem reading month value from string "//TRIM(sMMDDYYYY), &
-    __SRCNAME__,__LINE__)
+    __FILE__,__LINE__)
 
   ! parse day value
   call chomp(sItem, sBuf, "/-")
   read(sBuf,*,iostat=iStat) iDay
   call assert(iStat==0, "Problem reading day value from string "//TRIM(sMMDDYYYY), &
-    __SRCNAME__,__LINE__)
+    __FILE__,__LINE__)
 
   ! parse year value
   call chomp(sItem, sBuf, "/-")
   read(sBuf,*,iostat=iStat) iYear
   call assert(iStat==0, "Problem reading year value from string "//TRIM(sMMDDYYYY), &
-    __SRCNAME__,__LINE__)
+    __FILE__,__LINE__)
 
   iStartingJD = julian_day ( iYear, 1, 1)
   iJD = julian_day ( iYear, iMonth, iDay)
