@@ -43,7 +43,7 @@ contains
     call TEST_PARAMS%add_file("../test_data/tables/FAO56_equation_72_calcs.txt")
     call TEST_PARAMS%munge_file()
     call SIM_DT%start%setDateFormat("MM/DD/YYYY")
-    call SIM_DT%start%parseDate("01/01/2002", sFilename=trim(__SRCNAME__), iLineNumber=__LINE__)
+    call SIM_DT%start%parseDate("01/01/2002", sFilename=trim(__FILE__), iLineNumber=__LINE__)
     call crop_coefficients_FAO56_initialize( )
 
     call growing_degree_day_initialize( IS_CELL_ACTIVE, LANDUSE_INDEX )

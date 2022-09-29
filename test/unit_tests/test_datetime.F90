@@ -39,7 +39,7 @@ end subroutine stop_supressing_fatal_errors
    ! datetime: parse with default mm/dd/yyyy date format
      type (DATETIME_T) :: dt
 
-     call dt%parseDate("03/15/2011", sFilename=trim(__SRCNAME__), iLineNumber=__LINE__)
+     call dt%parseDate("03/15/2011", sFilename=trim(__FILE__), iLineNumber=__LINE__)
      call assert_equals (3, int(dt%iMonth))
      call assert_equals (15, int(dt%iDay))
      call assert_equals (2011, int(dt%iYear))
@@ -54,7 +54,7 @@ end subroutine stop_supressing_fatal_errors
 
      call start_supressing_fatal_errors()
 
-     call dt%parseDate("2/29/2001", sFilename=trim(__SRCNAME__), iLineNumber=__LINE__)
+     call dt%parseDate("2/29/2001", sFilename=trim(__FILE__), iLineNumber=__LINE__)
      call assert_true( dt%dJulianDate < 0.)
 
      call stop_supressing_fatal_errors()
@@ -67,7 +67,7 @@ end subroutine stop_supressing_fatal_errors
     ! datetime: parse with default mm/dd/yyyy date format, missing '0' values in month and day
       type (DATETIME_T) :: dt
 
-      call dt%parseDate("3/2/2011", sFilename=trim(__SRCNAME__), iLineNumber=__LINE__)
+      call dt%parseDate("3/2/2011", sFilename=trim(__FILE__), iLineNumber=__LINE__)
       call assert_equals (3, int(dt%iMonth))
       call assert_equals (2, int(dt%iDay))
       call assert_equals (2011, int(dt%iYear))
@@ -82,7 +82,7 @@ end subroutine stop_supressing_fatal_errors
      type (DATETIME_T) :: dt
 
      call dt%setDateFormat("YYYY-MM-DD")
-     call dt%parseDate("1776-07-4", sFilename=trim(__SRCNAME__), iLineNumber=__LINE__)
+     call dt%parseDate("1776-07-4", sFilename=trim(__FILE__), iLineNumber=__LINE__)
      call assert_equals (7, int(dt%iMonth))
      call assert_equals (4, int(dt%iDay))
      call assert_equals (1776, int(dt%iYear))

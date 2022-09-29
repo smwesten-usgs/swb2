@@ -1699,7 +1699,7 @@ contains
 
         allocate( OUTPUT_FILES(stat_indx)%nc_ptr, stat=status)
         call assert( status==0, "Problem allocating netcdf file data structure.", &
-          __SRCNAME__, __LINE__)
+          __FILE__, __LINE__)
         ncfile_out => OUTPUT_FILES(stat_indx)%nc_ptr
 
         call netcdf_open_and_prepare_as_output(                                     &

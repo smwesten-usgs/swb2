@@ -47,11 +47,11 @@ contains
     pAET_GRID => DAT%find("ACTUAL_ET")
     if (.not. associated(pAET_GRID) ) &
       call die("A set of ACTUAL_ET grids must be supplied in order to make"   &
-               //" use of this option.", __SRCNAME__, __LINE__)
+               //" use of this option.", __FILE__, __LINE__)
 
     allocate( ACTUAL_ET( count( is_cell_active ) ), stat=iStat )
     call assert( iStat==0, "Problem allocating memory for ACTUAL_ET vector.",  &
-      __SRCNAME__, __LINE__)
+      __FILE__, __LINE__)
 
   end subroutine actual_et_gridded_values_initialize
 

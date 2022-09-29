@@ -79,7 +79,7 @@ contains
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of interception values "  &
                           //"specified for the 'a' term for use during the growing season.",              &
-                   sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
+                   sModule=__FILE__, iLine=__LINE__, lFatal=TRUE )
 
       call move_alloc( temp_values, INTERCEPTION_A_VALUE_GROWING_SEASON )
 
@@ -107,7 +107,7 @@ contains
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of interception values "  &
                           //"specified for the 'b' term for use during the growing season.",              &
-                   sModule=__SRCNAME__, iLine=__LINE__, lFatal=FALSE )
+                   sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
 
       call move_alloc( temp_values, INTERCEPTION_B_VALUE_GROWING_SEASON )
 
@@ -135,7 +135,7 @@ contains
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of interception values "  &
                           //"specified for the 'n' term for use during the growing season.",              &
-                   sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
+                   sModule=__FILE__, iLine=__LINE__, lFatal=TRUE )
 
       call move_alloc( temp_values, INTERCEPTION_N_VALUE_GROWING_SEASON )
 
@@ -159,7 +159,7 @@ contains
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of interception values "  &
                           //"specified for the 'a' term for use during the nongrowing season.",              &
-                   sModule=__SRCNAME__, iLine=__LINE__, lFatal=FALSE )
+                   sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
 
       call move_alloc( temp_values, INTERCEPTION_A_VALUE_NONGROWING_SEASON )
 
@@ -187,7 +187,7 @@ contains
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of interception values "  &
                           //"specified for the 'b' term for use during the nongrowing season.",              &
-                   sModule=__SRCNAME__, iLine=__LINE__, lFatal=FALSE )
+                   sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
 
       call move_alloc( temp_values, INTERCEPTION_B_VALUE_NONGROWING_SEASON )
 
@@ -215,7 +215,7 @@ contains
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of interception values "  &
                           //"specified for the 'n' term for use during the nongrowing season.",              &
-                   sModule=__SRCNAME__, iLine=__LINE__, lFatal=FALSE )
+                   sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
 
       call move_alloc( temp_values, INTERCEPTION_N_VALUE_NONGROWING_SEASON )
 

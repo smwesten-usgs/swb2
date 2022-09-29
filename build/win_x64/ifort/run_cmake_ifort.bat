@@ -21,20 +21,20 @@ set VERBOSE=0
 set MAKE_EXECUTABLE_NAME=nmake
 
 :: clunky, clunky, clunky: last-ditch effort to get CMake to find the netCDF libraries
-set LIBRARY_PATH="D:\git_repos\netcdf-4.7.4\install\lib"
+set LIBRARY_PATH="C:\Program Files\netCDF 4.7.4\lib"
 
 :: define other variables for use in the CMakeList.txt file
 :: options are "Release", "Profile" or "Debug"
-set BUILD_TYPE="Release"
+set BUILD_TYPE="Debug"
 
 :: define platform and compiler specific compilation flags
-set CMAKE_Fortran_FLAGS_DEBUG="/Od /fpp /MTd /debug:full /Z7 /check:bounds,pointers,stack /traceback /free /Qzero /heap-arrays:64"
+set CMAKE_Fortran_FLAGS_DEBUG="/Od /fpe:0 /fpp /MTd /debug:full /Z7 /check:bounds,pointers,stack /traceback /free /Qzero /heap-arrays:64"
 set CMAKE_Fortran_FLAGS_PROFILE="/Od /fpp /MTd /debug:full /Z7 /check:bounds,pointers,stack /traceback /free /Qzero /heap-arrays:64"
-set CMAKE_Fortran_FLAGS_RELEASE="/O2 /QxHost /fpp /traceback /heap-arrays:64 /VERBOSE /MT"
+set CMAKE_Fortran_FLAGS_RELEASE="/O2 /QxHost /fpp /traceback /heap-arrays:64 /MD"
 set CMAKE_C_FLAGS_DEBUG="/Od /MTd /debug:full"
 set CMAKE_C_FLAGS_PROFILE="/Od /MTd /debug:full"
 set CMAKE_C_FLAGS_RELEASE="/O2 /QxHost /MD"
-set CMAKE_EXE_LINKER_FLAGS="/VERBOSE:LIB"
+::set CMAKE_EXE_LINKER_FLAGS=""
 
 :: set the type of CMAKE OUTPUT to generate
 set CMAKE_OUTPUT="NMake Makefiles"

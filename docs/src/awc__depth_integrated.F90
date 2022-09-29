@@ -146,7 +146,7 @@ contains
     ! locate the data structure associated with the gridded rainfall zone entries
     pSOILS_CODE_GRID => DAT%find("SOILS_CODE")
     call assert( associated(pSOILS_CODE_GRID), &
-      "A SOILS_CODE grid must be supplied in order to make use of this option.", __SRCNAME__, __LINE__)
+      "A SOILS_CODE grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
 
     call pSOILS_CODE_GRID%getvalues( )
 

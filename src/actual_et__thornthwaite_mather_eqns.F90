@@ -26,7 +26,7 @@ subroutine initialize_actual_et_thornthwaite_mather_eqns ( soil_moisture, max_so
   integer (c_int) :: status
 
   allocate( ACCUMULATED_POTENTIAL_WATER_LOSS( size( soil_moisture) ), stat=status )
-  call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
+  call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
 
  ! calculate APWL from equation
  call thornthwaite_mather_APWL(ACCUMULATED_POTENTIAL_WATER_LOSS, max_soil_moisture, soil_moisture)

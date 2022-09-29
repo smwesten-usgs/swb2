@@ -93,7 +93,7 @@ contains
     if ( associated( pSEPTIC_DISCHARGE ) ) then
 
       allocate( fSEPTIC_DISCHARGE( count( is_cell_active ) ), stat=iStat )
-      call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
 
     ! no grid? then look for a table version; values > TINYVAL indicate that
     ! something is present
@@ -103,10 +103,10 @@ contains
 
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of annual direct"   &
-          //" recharge rate values.", sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
+          //" recharge rate values.", sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
 
       allocate( fSEPTIC_DISCHARGE( count( is_cell_active ) ), stat=iStat )
-      call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
 
       ! now populate the vector of cell values
       do iIndex=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )
@@ -129,7 +129,7 @@ contains
     if ( associated( pANNUAL_SEPTIC_DISCHARGE ) ) then
 
       allocate( fANNUAL_SEPTIC_DISCHARGE( count( is_cell_active ) ), stat=iStat )
-      call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
 
     ! no grid? then look for a table version; values > TINYVAL indicate that
     ! something is present
@@ -139,10 +139,10 @@ contains
 
       if ( .not. lAreLengthsEqual )     &
         call warn( sMessage="The number of landuses does not match the number of annual direct"   &
-          //" recharge rate values.", sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
+          //" recharge rate values.", sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
 
       allocate( fANNUAL_SEPTIC_DISCHARGE( count( is_cell_active ) ), stat=iStat )
-      call assert( iStat==0, "Problem allocating memory", __SRCNAME__, __LINE__ )
+      call assert( iStat==0, "Problem allocating memory", __FILE__, __LINE__ )
 
       ! now populate the vector of cell values
       do iIndex=lbound( landuse_index, 1 ), ubound( landuse_index, 1 )

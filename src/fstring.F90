@@ -151,6 +151,10 @@ module fstring
     procedure :: return_left_part_of_string_fn
   end interface left
 
+  interface strip_full_pathname
+    procedure :: strip_full_pathname_fn
+  end interface strip_full_pathname
+
   public :: f_to_c_str
   interface f_to_c_str
     procedure :: f_to_c_string_fn
@@ -179,6 +183,18 @@ module fstring
   real (c_double), parameter  :: NA_DOUBLE = - (huge(1._c_double)-1._c_double)
 
 contains
+
+  ! remove file path from a filename
+  function strip_full_pathname_fn( filename )   result(value)
+
+    character (len=*), intent(in)   :: filename
+    character (len=:), allocatable  :: value
+
+    if (filename  .contains. "/") value = right( value, substring="/")
+    if (filename  .contains. "\") value = right( value, substring="\")
+
+  end function strip_full_pathname_fn  
+
 
   impure elemental function string_to_integer_fn(text)  result(value)
 

@@ -193,7 +193,7 @@ contains
 
       open(newunit=this%iUnitNum, file=fully_qualified_filename( sFilename_l ), iostat=this%iStat, action='READ')
       call assert(this%iStat == 0, "Failed to open file "//dquote( fully_qualified_filename( sFilename_l ) )//"."  &
-        //" Exit code: "//asCharacter( this%iStat )//".", __SRCNAME__, __LINE__)
+        //" Exit code: "//asCharacter( this%iStat )//".", __FILE__, __LINE__)
 
       this%lIsOpen = TRUE
       this%lEOF = FALSE
@@ -234,7 +234,7 @@ contains
     if (.not. this%isOpen() ) then
 
       open(newunit=this%iUnitNum, file=sFilename_l, iostat=this%iStat, action='WRITE')
-      call assert(this%iStat == 0, "Failed to open file "//dquote(sFilename_l)//".", __SRCNAME__, __LINE__)
+      call assert(this%iStat == 0, "Failed to open file "//dquote(sFilename_l)//".", __FILE__, __LINE__)
 
       this%lIsOpen = TRUE
       this%lEOF = FALSE
@@ -370,7 +370,7 @@ contains
 
     call assert( .not. this%lReadOnly, "INTERNAL ERROR -- File "  &
       //dquote( fully_qualified_filename( this%sFilename ) )      &
-      //" was opened as READONLY.", __SRCNAME__, __LINE__ )
+      //" was opened as READONLY.", __FILE__, __LINE__ )
 
     if (this%isOpen() ) then
 
