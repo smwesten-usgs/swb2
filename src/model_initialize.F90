@@ -49,9 +49,9 @@ module model_initialize
 
   type (GRIDDED_DATASETS_T)    :: KNOWN_GRIDS( NUMBER_OF_KNOWN_GRIDS ) =                             &
 
-    [ GRIDDED_DATASETS_T("PRECIPITATION                         ", "", FALSE, DATATYPE_FLOAT ),     &
-      GRIDDED_DATASETS_T("TMIN                                  ", "", FALSE, DATATYPE_FLOAT ),     &
-      GRIDDED_DATASETS_T("TMAX                                  ", "", FALSE, DATATYPE_FLOAT ),     &
+    [ GRIDDED_DATASETS_T("PRECIPITATION                         ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("TMIN                                  ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("TMAX                                  ", "", TRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("AVAILABLE_WATER_CONTENT               ", "", TRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("REFERENCE_ET0                         ", "", TRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("POTENTIAL_ET                          ", "", TRUE, DATATYPE_FLOAT ),      &
@@ -131,7 +131,8 @@ contains
                                      lookup_table_dirname, weather_data_dirname
 
     ! [ LOCALS ]
-    integer (c_int) :: iIndex
+    integer (c_int)  :: iIndex
+    logical (c_bool) :: using_tabular_precip_and_temperature
 
     call MODEL%set_default_method_pointers()
 
@@ -1659,21 +1660,21 @@ contains
   subroutine initialize_generic_method( sKey, lOptional)
 
     character (len=*), intent(in)     :: sKey
-    logical (c_bool), intent(in) :: lOptional
+    logical (c_bool), intent(in)      :: lOptional
 
     ! [ LOCALS ]
     type (FSTRING_LIST_T)             :: myDirectives
     type (FSTRING_LIST_T)             :: myOptions
-    integer (c_int)             :: iIndex
-    integer (c_int)             :: indx
-    character (len=:), allocatable   :: sCmdText
+    integer (c_int)                   :: iIndex
+    integer (c_int)                   :: indx
+    character (len=:), allocatable    :: sCmdText
 !    character (len=:), allocatable   :: sOptionText
     type (FSTRING_LIST_T)             :: argv_list
-    character (len=:), allocatable   :: sArgText
-    integer (c_int)             :: iStat
-    integer (c_int)             :: status
-    logical (c_bool)            :: lFatal
-    integer (c_int)             :: num_elements
+    character (len=:), allocatable    :: sArgText
+    integer (c_int)                   :: iStat
+    integer (c_int)                   :: status
+    logical (c_bool)                  :: lFatal
+    integer (c_int)                   :: num_elements
 
     ! obtain a list of control file directives whose key values contain the string sKey
     myDirectives = CF_DICT%grep_keys( trim(sKey) )
@@ -1739,17 +1740,17 @@ contains
     ! [ LOCALS ]
     type (FSTRING_LIST_T)             :: myDirectives
     type (FSTRING_LIST_T)             :: myOptions
-    integer (c_int)             :: iIndex
-    integer (c_int)             :: indx
-    character (len=:), allocatable   :: sCmdText
+    integer (c_int)                   :: iIndex
+    integer (c_int)                   :: indx
+    character (len=:), allocatable    :: sCmdText
 !    character (len=:), allocatable   :: sOptionText
     type (FSTRING_LIST_T)             :: argv_list
-    character (len=:), allocatable   :: sArgText
-    integer (c_int)             :: iStat
-    integer (c_int)             :: status
-    logical (c_bool)            :: lFatal
-    integer (c_int)             :: num_elements
-    character (len=:), allocatable   :: Option_Name
+    character (len=:), allocatable    :: sArgText
+    integer (c_int)                   :: iStat
+    integer (c_int)                   :: status
+    logical (c_bool)                  :: lFatal
+    integer (c_int)                   :: num_elements
+    character (len=:), allocatable    :: Option_Name
 
     ! obtain a list of control file directives whose key values contain the string sKey
     myDirectives = CF_DICT%grep_keys( "OPTION" )

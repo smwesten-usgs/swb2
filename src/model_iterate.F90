@@ -37,7 +37,7 @@ contains
       call cells%update_landuse_codes()
       call cells%update_irrigation_mask()
 
-      call cells%get_climate_data( )
+      call cells%get_weather_data( )
       call perform_daily_calculation( cells )
       call write_output( cells )
 !      call perform_polygon_summarize( cells )

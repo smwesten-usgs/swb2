@@ -216,7 +216,7 @@ module model_domain
 
     procedure :: preflight_check_method_pointers
 
-    procedure :: get_climate_data
+    procedure :: get_weather_data
 
     procedure :: set_output_directory => set_output_directory_sub
 
@@ -969,7 +969,7 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine get_climate_data(this)
+  subroutine get_weather_data(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
@@ -998,7 +998,7 @@ contains
 
     end associate
 
-  end subroutine get_climate_data
+  end subroutine get_weather_data
 
 !--------------------------------------------------------------------------------------------------
 
@@ -1418,6 +1418,19 @@ contains
         call LOGS%WRITE( "==> STANDARD PRECIPITATION submodel selected.", &
             iLogLevel = LOG_ALL, lEcho = FALSE )
 
+      elseif ( ( Method_Name .strapprox. "TABLE")              &
+          .or. (Method_Name .strapprox. "TABULAR") ) then
+
+             this%init_precipitation_data => model_initialize_precip_tabular
+             this%get_precipitation_data => model_get_precip_tabular
+             this%get_maximum_air_temperature_data => model_get_maximum_air_temperature_tabular
+             this%get_minimum_air_temperature_data => model_get_minimum_air_temperature_tabular
+
+             call LOGS%WRITE( "==> TABULAR PRECIPITATION submodel selected.", &
+               iLogLevel = LOG_ALL, lEcho = FALSE )
+             call LOGS%WRITE( "    PRECIPITATION, TMIN, and TMAX will be supplied as TABLE values.", &
+               iLogLevel = LOG_ALL, lEcho = FALSE )
+ 
       elseif ( ( Method_Name .strapprox. "METHOD_OF_FRAGMENTS" ) &
            .or. ( Method_Name .strapprox. "FRAGMENTS" ) ) then
 
@@ -1594,7 +1607,7 @@ contains
             write( unit=DUMP( indx )%unitnum, fmt="(a)")                                                           &
               "date, month, day, year,landuse_code, landuse_index, soil_group, num_upslope_connections, "          &
               //"sum_upslope_cells, solution_order, cell_index, target_index, awc, latitude, reference_ET0, "      &
-              //"actual_ET, curve_num_adj, inflow, runon, "                                                        &
+              //"actual_ET, curve_num_adj, gross_precip, inflow, runon, "                                          &
               //"runoff, outflow, infiltration, snowfall, potential_snowmelt, snowmelt, interception, "            &
               //"rainfall, net_rainfall, monthly_gross_precip, monthly_runoff, interception_storage, tmax, tmin, " &
               //" tmean, snow_storage, soil_storage, soil_storage_max, "                                           &
@@ -2912,14 +2925,15 @@ contains
     if (allocated(this%monthly_runoff) )  monthly_runoff = this%monthly_runoff( cell_indx )
     if (allocated(this%monthly_gross_precip) )  monthly_gross_precip = this%monthly_gross_precip( cell_indx )
 
-      write( unit=unitnum, fmt="(i4,'-',i2.2,'-'i2.2,',',i2,',',i2,',',i4,',',8(i6,','),65(g20.12,','),g20.12)")                &
+      write( unit=unitnum, fmt="(i4,'-',i2.2,'-'i2.2,',',i2,',',i2,',',i4,',',8(i6,','),66(g20.12,','),g20.12)")            &
         SIM_DT%curr%iYear, SIM_DT%curr%iMonth, SIM_DT%curr%iDay,                                                            &
         SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                                            &
         this%landuse_code( cell_indx ), this%landuse_index( cell_indx ),                                                    &
         this%soil_group( cell_indx ), this%num_upslope_connections( cell_indx ), this%sum_upslope_cells( cell_indx ),       &
         indx, cell_indx, target_indx,                                                                                       &
         this%awc( cell_indx ), this%latitude( cell_indx ), this%reference_ET0( cell_indx ), this%actual_ET( cell_indx ),    &
-        this%curve_num_adj( cell_indx ), this%inflow( cell_indx ), this%runon( cell_indx ), this%runoff( cell_indx ),       &
+        this%curve_num_adj( cell_indx ),                                                                                    &
+        this%gross_precip( cell_indx ), this%inflow( cell_indx ), this%runon( cell_indx ), this%runoff( cell_indx ),        &
         this%outflow( cell_indx ),                                                                                          &
         this%infiltration( cell_indx ), this%snowfall( cell_indx ), this%potential_snowmelt( cell_indx ),                   &
         this%snowmelt( cell_indx ), this%interception( cell_indx ), this%rainfall( cell_indx ),                             &
@@ -3379,6 +3393,18 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  subroutine model_initialize_precip_tabular(this)
+
+    use weather_data_tabular, only    : weather_data_tabular_initialize
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call weather_data_tabular_initialize()
+
+  end subroutine model_initialize_precip_tabular
+
+!--------------------------------------------------------------------------------------------------
+
   subroutine model_calculate_fog_none(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
@@ -3436,6 +3462,27 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
+  subroutine model_get_maximum_air_temperature_tabular(this)
+
+    use weather_data_tabular, only    : weather_data_tabular_get_tmax
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    real (kind=c_float)                    :: tmax_value
+
+    associate ( dt => SIM_DT%curr )
+
+      call weather_data_tabular_get_tmax( dt, tmax_value )
+
+    end associate
+
+    if (.not. allocated(this%tmax))  allocate(this%tmax(count(this%active)))
+
+    this%tmax = tmax_value
+
+  end subroutine model_get_maximum_air_temperature_tabular
+
+!--------------------------------------------------------------------------------------------------
+
   subroutine model_get_minimum_air_temperature_normal(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
@@ -3458,6 +3505,28 @@ contains
     this%tmin = pack( pTMIN%pGrdBase%rData, this%active )
 
   end subroutine model_get_minimum_air_temperature_normal
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_get_minimum_air_temperature_tabular(this)
+
+    use weather_data_tabular, only    : weather_data_tabular_get_tmin
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    real (kind=c_float)                    :: tmin_value
+
+    associate ( dt => SIM_DT%curr )
+
+      call weather_data_tabular_get_tmin( dt, tmin_value )
+
+    end associate
+
+    if (.not. allocated(this%tmin))  allocate(this%tmin(count(this%active)))
+
+    this%tmin = tmin_value
+    
+
+  end subroutine model_get_minimum_air_temperature_tabular
 
 !--------------------------------------------------------------------------------------------------
 
@@ -3484,6 +3553,26 @@ contains
     this%gross_precip = pack( pPRCP%pGrdBase%rData, this%active )
 
   end subroutine model_get_precip_normal
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_get_precip_tabular(this)
+
+    use weather_data_tabular, only    : weather_data_tabular_get_precip
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+    real (kind=c_float)                    :: precip_value
+
+    associate ( dt => SIM_DT%curr )
+
+      call weather_data_tabular_get_precip( dt, precip_value )
+
+    end associate
+
+    if (.not. allocated(this%gross_precip))  allocate(this%gross_precip(count(this%active)))
+    this%gross_precip = precip_value
+
+  end subroutine model_get_precip_tabular
 
 !--------------------------------------------------------------------------------------------------
 
