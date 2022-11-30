@@ -1,34 +1,73 @@
 project(
   'swb2',
   'fortran','c','cpp',
-  version: '2.3.1-rc',
   meson_version: '>= 0.59.0',
   default_options : [
     'optimization=2',
     'fortran_std=f2008'
 ])
 
-if get_option('optimization') == '3'
+version = get_option('swb_version')
+
+git_branch = run_command(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], capture : true, check : true)
+git_branch_str = '"' + git_branch.stdout().strip() + '"'
+
+git_hash = run_command(['git', 'log', '-1', '--format=%h'], capture : true, check : true)
+git_hash_str = '"' + git_hash.stdout().strip() + '"'
+
+build_number = run_command(['git', 'rev-list', version + '..', '--count'], capture : true, check : true)
+build_number_str = '"' + build_number.stdout().strip() + '"'
+
+message('GIT BRANCH IS: ' + git_branch_str)
+message('GIT HASH IS: ' + git_hash_str)
+message('VERSION IS: ' + version)
+
+conf_data = configuration_data()
+conf_data.set('version', version)
+conf_data.set('GIT_BRANCH_STRING', git_branch_str)
+conf_data.set('GIT_HASH_STRING', git_hash_str)
+conf_data.set('BUILD_NUMBER_STRING', build_number_str)
+
+swb_major_version = get_option('swb_major_version')
+swb_minor_version = get_option('swb_minor_version')
+swb_patch_version = get_option('swb_patch_version')
+
+conf_data.set('SWB_MAJOR_VERSION_STRING', swb_major_version)
+conf_data.set('SWB_MINOR_VERSION_STRING', swb_minor_version)
+conf_data.set('SWB_PATCH_VERSION_STRING', swb_patch_version)
+
+system = build_machine.system()
+if system == 'linux'
+  conf_data.set('PLATFORM_NAME','"Linux"')
+  conf_data.set('WINDOWS_SYSTEM', 'False')
+elif system == 'darwin'
+  conf_data.set('PLATFORM_NAME','"MacOS"')
+  conf_data.set('WINDOWS_SYSTEM', 'False')
+elif system == 'windows'
+  conf_data.set('PLATFORM_NAME','"Windows"')
+  conf_data.set('WINDOWS_SYSTEM', 'True')
+endif
+
+if get_option('optimization_level') == 3
   error('Only optimization levels <= 2 are supported')
 endif
 
-if get_option('optimization') == '2'
+if get_option('optimization_level') == 2
   profile = 'release'
 else
   profile = 'develop'
 endif
 
-message('The used profile is:', profile)
-
+message('The compilation profile is:', profile)
 
 fc = meson.get_compiler('fortran')
 fc_id = fc.get_id()
 compile_args = []
+c_compile_args = []
 link_args = []
 
 cc = meson.get_compiler('c')
 cc_id = cc.get_id()
-
 
 # Command line options for gfortran
 if fc_id == 'gcc'
@@ -65,16 +104,24 @@ endif
 # Command line options for ifort
 if fc_id == 'intel-cl'
   # windows
-  compile_args += ['/fpe:0',              # Activate all floating point exceptions
+  c_compile_args +=['/Qdiag-disable:10441' # Disable warning about 'icl' being deprecated
+                   ]
+				   
+  compile_args += [#'/fpe:0',              # Activate all floating point exceptions
                    '/heap-arrays:0',
                    '/traceback',
                    '/fpp',                # Activate preprocessing
                    '/Qdiag-disable:7416', # f2008 warning
                    '/Qdiag-disable:7025', # f2008 warning
+                   '/Qdiag-disable:6048', # f2008: default-logical-variable must be of type default logical
                    '/Qdiag-disable:5268', # Line too long
+				   '/Qdiag-disable:10441',# Disable warning about 'icl' being deprecated
+                   '/warn:none',
+                   '/Qdiag-error-limit:1',
                   ]
-  link_args += ['/ignore:4217', # access through ddlimport might be inefficient
-                '/ignore:4286'  # same as 4217, but more general
+  link_args += ['/ignore:4217',  # access through ddlimport might be inefficient
+                '/ignore:4286',  # same as 4217, but more general
+				'/Qdiag-disable:10441'
                ]
 elif fc_id == 'intel'
   # linux and macOS
@@ -90,9 +137,10 @@ elif fc_id == 'intel'
 endif
 
 add_project_arguments(fc.get_supported_arguments(compile_args), language: 'fortran')
+add_project_arguments(cc.get_supported_arguments(c_compile_args), language: 'c')
 add_project_link_arguments(fc.get_supported_arguments(link_args), language: 'fortran')
 
-include_directories('C:/Program Files/netCDF 4.7.4/include')
+include_directories('C:/Program Files/netCDF 4.9.0/include')
 
 subdir('src')
 subdir('test/unit_tests')

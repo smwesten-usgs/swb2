@@ -1,3 +1,11 @@
+configure_file(
+  input : 'version_control.tpl',
+  output : 'version_control.F90',
+  configuration : conf_data,
+  install : true,
+  install_dir : 'src/generated'
+)
+
 swb_src = files(
     'actual_et__gridded_values.F90',
     'actual_et__fao56__two_stage.F90',
@@ -62,7 +70,8 @@ swb_src = files(
     'solar_calculations.F90',
     'storm_drain_capture.F90',
     'timer.F90',
-    'generated' / 'version_control.F90',
+    'weather_data_tabular.F90',
+     meson.current_build_dir()+'/version_control.F90',
     'main.F90'
 )
 
@@ -130,7 +139,8 @@ swbstats2_src = files(
     'solar_calculations.F90',
     'storm_drain_capture.F90',
     'timer.F90',
-    'generated' / 'version_control.F90',
+    'weather_data_tabular.F90',
+     meson.current_build_dir()+'/version_control.F90',
     'swbstats2_support.F90',
     'swbstats2.F90'
 )
@@ -138,7 +148,7 @@ swbstats2_src = files(
 subdir('proj4')
 
 dependencies = [
-  meson.get_compiler('cpp').find_library('netcdf',  dirs : ['C:/Program Files/netCDF 4.7.4/lib/'])
+  meson.get_compiler('cpp').find_library('netcdf',  dirs : ['C:/Program Files/netCDF 4.9.0/lib/'])
 #  meson.get_compiler('cpp').find_library('netcdf')
 ]
 swb_library = static_library('swb_library', swb_src, link_with: [swb_external])
