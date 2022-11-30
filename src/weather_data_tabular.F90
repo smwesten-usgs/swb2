@@ -6,7 +6,7 @@ module weather_data_tabular
   use fstring, only                    : asCharacter, sQuote, operator(.contains.)
   use parameters, only                 : PARAMS
   use simulation_datetime, only        : SIM_DT
-  use datetime, only                   : DATETIME_T
+  use datetime, only                   : DATETIME_T, operator(<), operator(>)
   use logfiles, only                   : LOGS, LOG_ALL
   use exceptions, only                 : assert, warn, die
 
@@ -65,7 +65,7 @@ contains
       if (indx == 1)  tempdate = WEATHER_DATE(1)
 
       do
-        if ( ( tempdate < SIM_DT%start ) .or. ( tempdate > SIM_DT%end )) then
+        if ( ( tempdate < SIM_DT%start ) .or. ( tempdate > SIM_DT%end ) ) then
 
           error_count = 0
           ! NOP

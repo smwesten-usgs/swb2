@@ -23,8 +23,7 @@ program main
                                           asCharacter, right
   use version_control, only           : SWB_VERSION, GIT_COMMIT_HASH_STRING,    &
                                         GIT_BRANCH_STRING, COMPILE_DATE,        &
-                                        COMPILE_TIME, SYSTEM_NAME,              &
-                                        WINDOWS_SYSTEM
+                                        COMPILE_TIME, SYSTEM_NAME
   use fstring_list, only              : FSTRING_LIST_T
   use timer, only                     : TIMER_T
   use iso_fortran_env
@@ -75,7 +74,7 @@ program main
   sCompilerVersion = COMPILER_VERSION()
   sExecutableDescription = "USGS Soil-Water-Balance Code version "//trim( sVersionString )
 
-  if ( WINDOWS_SYSTEM ) then
+  if ( SYSTEM_NAME == "Windows" ) then
     OS_NATIVE_PATH_DELIMITER = "\"
   else
     OS_NATIVE_PATH_DELIMITER = "/"
