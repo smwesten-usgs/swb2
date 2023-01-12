@@ -4,6 +4,7 @@ project(
   meson_version: '>= 0.59.0',
   default_options : [
     'optimization=2',
+    'warning_level=1',
     'fortran_std=f2008'
 ])
 
@@ -102,11 +103,12 @@ if fc_id == 'gcc'
 endif
 
 # Command line options for ifort
-if fc_id == 'intel-cl'
+if fc_id == 'intel-llvm-cl'
   # windows
-  c_compile_args +=['/Qdiag-disable:10441' # Disable warning about 'icl' being deprecated
-                   ]
-				   
+
+  c_compile_args += ['/Qdiag-disable:10430',  # shut up about unsupported compiler args
+                     ]
+
   compile_args += [#'/fpe:0',              # Activate all floating point exceptions
                    '/heap-arrays:0',
                    '/traceback',
@@ -115,14 +117,10 @@ if fc_id == 'intel-cl'
                    '/Qdiag-disable:7025', # f2008 warning
                    '/Qdiag-disable:6048', # f2008: default-logical-variable must be of type default logical
                    '/Qdiag-disable:5268', # Line too long
-				   '/Qdiag-disable:10441',# Disable warning about 'icl' being deprecated
-                   '/warn:none',
                    '/Qdiag-error-limit:1',
                   ]
-  link_args += ['/ignore:4217',  # access through ddlimport might be inefficient
-                '/ignore:4286',  # same as 4217, but more general
-				'/Qdiag-disable:10441'
-               ]
+  link_args += '/Qdiag-disable:10441'
+
 elif fc_id == 'intel'
   # linux and macOS
   compile_args += ['-fpe0',              # Activate all floating point exceptions
@@ -144,8 +142,3 @@ include_directories('C:/Program Files/netCDF 4.9.0/include')
 
 subdir('src')
 subdir('test/unit_tests')
-# subdir('srcbmi')
-# subdir('utils')
-
-# add unit test directory
-# subdir('unittests')
