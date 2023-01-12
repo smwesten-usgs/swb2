@@ -4,7 +4,7 @@ project(
   meson_version: '>= 0.59.0',
   default_options : [
     'optimization=2',
-    'warning_level=1',
+    'warning_level=0',    # nice in theory, but Meson doesn't appear to control warning levels on Windows with LLVM-Intel compiler?
     'fortran_std=f2008'
 ])
 
@@ -106,12 +106,18 @@ endif
 if fc_id == 'intel-llvm-cl'
   # windows
 
-  c_compile_args += ['/Qdiag-disable:10430',  # shut up about unsupported compiler args
-                     ]
+### Meson apparently throws in a /utf-8 compiler argument, which clang complains about. The kludge below is an attempt
+### to silence this
+  c_compile_args += ['/Qdiag-disable:10430',
+                     '/Wno-unused-command-line-argument',
+                     '/Wno-unknown-argument',
+                     '/Wmost',
+                    ]
 
   compile_args += [#'/fpe:0',              # Activate all floating point exceptions
                    '/heap-arrays:0',
                    '/traceback',
+                   '/W0',
                    '/fpp',                # Activate preprocessing
                    '/Qdiag-disable:7416', # f2008 warning
                    '/Qdiag-disable:7025', # f2008 warning
