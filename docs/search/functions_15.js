@@ -1,22 +1,4 @@
 var searchData=
 [
-  ['warn_0',['warn',['../namespaceexceptions.html#a84dd04476b06e0a398bfe6d106a82a4d',1,'exceptions']]],
-  ['which_1',['which',['../structfstring__list_1_1fstring__list__t.html#a495f20282ab0735fb1909defa44bfd40',1,'fstring_list::fstring_list_t']]],
-  ['write_2',['write',['../structlogfiles_1_1logfile__t.html#a98e54220a8e9777e9d451a7995f2a02e',1,'logfiles::logfile_t']]],
-  ['write_5fcontrol_5ffile_3',['write_control_file',['../namespacemodel__initialize.html#a70b835849fb55dea3f561b225f6fe9cf',1,'model_initialize']]],
-  ['write_5fline_5fof_5fdata_5fsub_4',['write_line_of_data_sub',['../structfile__operations_1_1ascii__file__t.html#a3027ec704ef0567afa37b905aeb479b2',1,'file_operations::ascii_file_t::write_line_of_data_sub()'],['../namespacefile__operations.html#a388b20fef1ab65c64e7708c7f7e73b30',1,'file_operations::write_line_of_data_sub()']]],
-  ['write_5flist_5fdate_5ffn_5',['write_list_date_fn',['../namespacedatetime.html#a037a24fd353175f3583616ce369205be',1,'datetime']]],
-  ['write_5flist_5fdatetime_5ffn_6',['write_list_datetime_fn',['../namespacedatetime.html#a4bd633b531720d324af7bdf35a375bf2',1,'datetime']]],
-  ['write_5flist_5ftime_5ffn_7',['write_list_time_fn',['../namespacedatetime.html#a0fe124d7c9d8cd2329107a6c34b317e7',1,'datetime']]],
-  ['write_5fmulti_5fsim_5foutput_8',['write_multi_sim_output',['../namespaceoutput.html#a5b9e391625a7e2aba8052baeae621f1b',1,'output']]],
-  ['write_5fout_5fvalues_9',['write_out_values',['../namespacesummary__statistics.html#a565bda85375c00671bdeb8d70f70cc14',1,'summary_statistics']]],
-  ['write_5foutput_10',['write_output',['../namespaceoutput.html#a2b28557ba9479d844061b46ded2533bb',1,'output']]],
-  ['write_5fpretty_5fdate_5ffn_11',['write_pretty_date_fn',['../namespacedatetime.html#a6b3b02a654cb4f7f6e8628141de12500',1,'datetime']]],
-  ['write_5fpretty_5fdatetime_5ffn_12',['write_pretty_datetime_fn',['../namespacedatetime.html#ab34ee153bcaa5355b9feed302baf44b2',1,'datetime']]],
-  ['write_5fprovisional_5fdisclaimer_13',['write_provisional_disclaimer',['../namespacedisclaimers.html#a9749194bc0f33fc80fa9cac4e279ee14',1,'disclaimers']]],
-  ['write_5fstats_5fto_5farcgrid_14',['write_stats_to_arcgrid',['../structswbstats2__support_1_1swbstats__t.html#a52e344d6aa96425bae178b699d1953e7',1,'swbstats2_support::swbstats_t::write_stats_to_arcgrid()'],['../namespaceswbstats2__support.html#a527e7f90e4a887e4c41e7a95c84cb3d3',1,'swbstats2_support::write_stats_to_arcgrid()']]],
-  ['write_5fstats_5fto_5fnetcdf_15',['write_stats_to_netcdf',['../structswbstats2__support_1_1swbstats__t.html#a7a3eea626a44ac351011f5b4e6e030f9',1,'swbstats2_support::swbstats_t::write_stats_to_netcdf()'],['../namespaceswbstats2__support.html#a0931f122b03930d51a26262935033c60',1,'swbstats2_support::write_stats_to_netcdf()']]],
-  ['write_5fto_5flogfiles_5fsub_16',['write_to_logfiles_sub',['../structlogfiles_1_1logfile__t.html#a53a12c1efd9a4a9031f133fa64a369aa',1,'logfiles::logfile_t::write_to_logfiles_sub()'],['../namespacelogfiles.html#a024cd0c9a38412fe0d2c7d83b5e7f908',1,'logfiles::write_to_logfiles_sub()']]],
-  ['writeline_17',['writeline',['../structfile__operations_1_1ascii__file__t.html#a4953829340598d9528100fac0f66618b',1,'file_operations::ascii_file_t']]],
-  ['writemultiline_18',['writemultiline',['../namespacelogfiles.html#ae807d3b84516a40194bbe44ae47ef553',1,'logfiles']]]
+  ['variance_0',['variance',['../structrunning__grid__stats_1_1running__stats__t.html#a25d28f6b4b859662fa0ef0956fad64a4',1,'running_grid_stats::running_stats_t']]]
 ];

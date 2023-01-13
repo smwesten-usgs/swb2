@@ -7,22 +7,12 @@ var crop__coefficients____fao56_8_f90 =
     [ "crop_coefficients_fao56_update_growth_stage_dates", "crop__coefficients____fao56_8_f90.html#a7d38167cc2ba756a05ad21ec000e1ded", null ],
     [ "update_crop_coefficient_date_as_threshold", "crop__coefficients____fao56_8_f90.html#a53486dd9e19017a8a6384fcc8b1d7f3a", null ],
     [ "update_crop_coefficient_gdd_as_threshold", "crop__coefficients____fao56_8_f90.html#aa28ee98711a6f0dceec4885fdb66971a", null ],
-    [ "dec", "crop__coefficients____fao56_8_f90.html#afe4575b8a9cb29f2d99256c376499ddd", null ],
     [ "growth_stage_date", "crop__coefficients____fao56_8_f90.html#ac65046b44c2a3ce959c663cfcecc9bf3", null ],
     [ "growth_stage_gdd", "crop__coefficients____fao56_8_f90.html#aa1e1f5f3c27dcb08bf4216edddefda5b", null ],
     [ "growth_stage_length_in_days", "crop__coefficients____fao56_8_f90.html#a531c0e3a3889cc1bc0ff7ce91e304131", null ],
     [ "growth_stage_shift_days", "crop__coefficients____fao56_8_f90.html#a777917a9f02e144df2e0367a41d947c7", null ],
-    [ "jan", "crop__coefficients____fao56_8_f90.html#ac1b64486c41865d9a40873fe5c05d7bf", null ],
-    [ "kcb_end", "crop__coefficients____fao56_8_f90.html#adf5a8f6f893e09769edd511db8dbda99", null ],
-    [ "kcb_ini", "crop__coefficients____fao56_8_f90.html#a21002d75a16ffe99817b6fa06b0f6195", null ],
     [ "kcb_l", "crop__coefficients____fao56_8_f90.html#a7c8aa2befa43a6540f130a4b91117624", null ],
     [ "kcb_method", "crop__coefficients____fao56_8_f90.html#aa758211e9cc708a80b7a8c3b0b0ad235", null ],
-    [ "kcb_method_fao56", "crop__coefficients____fao56_8_f90.html#a148a34d49ac64617d60122d1221d9fb2", null ],
-    [ "kcb_method_gdd", "crop__coefficients____fao56_8_f90.html#abc67b085dd6c55c427e6bde3ea18ca12", null ],
-    [ "kcb_method_monthly_values", "crop__coefficients____fao56_8_f90.html#aa217a988a30560dc6d204616346785a1", null ],
-    [ "kcb_mid", "crop__coefficients____fao56_8_f90.html#a0bc5943978651e6e4c7fabc24c57b836", null ],
-    [ "kcb_min", "crop__coefficients____fao56_8_f90.html#af10089c67057c404dfaf8fb0d066226a", null ],
     [ "landuse_code", "crop__coefficients____fao56_8_f90.html#ac5ebd4b42fd62a1daff2ae2c8b5e0184", null ],
-    [ "lu_soils_csv", "crop__coefficients____fao56_8_f90.html#a09a8e4b11a6c2f7576ddc5629067fd8b", null ],
-    [ "planting_date", "crop__coefficients____fao56_8_f90.html#a526ca7fb37abbd3263c6fddd700c5c88", null ]
+    [ "lu_soils_csv", "crop__coefficients____fao56_8_f90.html#a09a8e4b11a6c2f7576ddc5629067fd8b", null ]
 ];

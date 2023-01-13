@@ -6,6 +6,7 @@ var searchData=
   ['operator_28_2econtainssimilar_2e_29_3',['operator(.containssimilar.)',['../interfacefstring_1_1operator_07_8containssimilar_8_08.html',1,'fstring']]],
   ['operator_28_2estrapprox_2e_29_4',['operator(.strapprox.)',['../interfacefstring_1_1operator_07_8strapprox_8_08.html',1,'fstring']]],
   ['operator_28_2estrequal_2e_29_5',['operator(.strequal.)',['../interfacefstring_1_1operator_07_8strequal_8_08.html',1,'fstring']]],
-  ['operator_28_3e_29_6',['operator(&gt;)',['../interfacedatetime_1_1operator_07_4_08.html',1,'datetime']]],
-  ['output_5fspecs_5ft_7',['output_specs_t',['../structoutput_1_1output__specs__t.html',1,'output']]]
+  ['operator_28_3c_29_6',['operator(&lt;)',['../interfacedatetime_1_1operator_07_3_08.html',1,'datetime']]],
+  ['operator_28_3e_29_7',['operator(&gt;)',['../interfacedatetime_1_1operator_07_4_08.html',1,'datetime']]],
+  ['output_5fspecs_5ft_8',['output_specs_t',['../structoutput_1_1output__specs__t.html',1,'output']]]
 ];

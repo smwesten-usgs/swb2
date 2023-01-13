@@ -1,6 +1,6 @@
 var structmodel__domain_1_1model__domain__t =
 [
-    [ "get_climate_data", "structmodel__domain_1_1model__domain__t.html#a881485bacecfcc56588aa02526e037da", null ],
+    [ "get_weather_data", "structmodel__domain_1_1model__domain__t.html#abb20933ec6e4dc28a3522d99f9934c44", null ],
     [ "initialize_arrays", "structmodel__domain_1_1model__domain__t.html#ac19837500c4d663f03aa39627003886e", null ],
     [ "initialize_arrays_sub", "structmodel__domain_1_1model__domain__t.html#af8226e49b83d5edabf880a2fdabddd3a", null ],
     [ "initialize_grid", "structmodel__domain_1_1model__domain__t.html#a3ced9f7b1b88d7544449fa71aef784c2", null ],
@@ -50,6 +50,8 @@ var structmodel__domain_1_1model__domain__t =
     [ "calc_snowmelt", "structmodel__domain_1_1model__domain__t.html#ab28da086b68ffdbd9b60c007bf5765f4", null ],
     [ "calculate_mean_air_temperature", "structmodel__domain_1_1model__domain__t.html#ab4782816cda5d080568fc5234eca0a42", null ],
     [ "canopy_cover_fraction", "structmodel__domain_1_1model__domain__t.html#ac37314fbda804b4f66c2448190e16ada", null ],
+    [ "cfgi_lower_limit", "structmodel__domain_1_1model__domain__t.html#a1ce4bdffaeafe27ae269a303683a2457", null ],
+    [ "cfgi_upper_limit", "structmodel__domain_1_1model__domain__t.html#a69b028f432bbc5f81bf1a35d952a8648", null ],
     [ "col_num_1d", "structmodel__domain_1_1model__domain__t.html#a82f4cd07366034e6218032f2dac83c16", null ],
     [ "col_num_2d", "structmodel__domain_1_1model__domain__t.html#aeb16cd5dd9c9114dc0dc93775b476607", null ],
     [ "continuous_frozen_ground_index", "structmodel__domain_1_1model__domain__t.html#ae2bc48b820c862c97f67aec9b01a743e", null ],
@@ -73,6 +75,9 @@ var structmodel__domain_1_1model__domain__t =
     [ "get_precipitation_data", "structmodel__domain_1_1model__domain__t.html#a77240340ccbd20208ffb88253e258074", null ],
     [ "gridcellsize", "structmodel__domain_1_1model__domain__t.html#a8f1f898b6fb1a36aa327f08c81e676e8", null ],
     [ "gross_precip", "structmodel__domain_1_1model__domain__t.html#a5c0176b8db2436055b17007fff5863ab", null ],
+    [ "hargreaves_et0_constant", "structmodel__domain_1_1model__domain__t.html#a90a414e04d694e3d00f3692d9e3a1198", null ],
+    [ "hargreaves_et0_exponent", "structmodel__domain_1_1model__domain__t.html#aca07c2bf023fce23eae64ecdb2a24a3d", null ],
+    [ "hargreaves_et0_slope", "structmodel__domain_1_1model__domain__t.html#afc3f0243a7e5b7a19ebaf3716e2ee0de", null ],
     [ "infiltration", "structmodel__domain_1_1model__domain__t.html#ac91939d377491f85146a2877887df56b", null ],
     [ "inflow", "structmodel__domain_1_1model__domain__t.html#a97064d55ca7bda90d8adad1cc76ecc5f", null ],
     [ "init_actual_et", "structmodel__domain_1_1model__domain__t.html#a8a75dd5417ef3591d1a0dfd3076782a3", null ],

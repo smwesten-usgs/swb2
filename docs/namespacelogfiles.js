@@ -15,10 +15,6 @@ var namespacelogfiles =
     [ "writemultiline", "namespacelogfiles.html#ae807d3b84516a40194bbe44ae47ef553", null ],
     [ "current_log_echo", "namespacelogfiles.html#ac138ec3f356b54c8c1a8a3ab08884d9a", null ],
     [ "current_log_level", "namespacelogfiles.html#adbb7ca21f1b186e2a46acd8379161175", null ],
-    [ "log_all", "namespacelogfiles.html#ac010b02c31c14253e9477a3e70b8c238", null ],
-    [ "log_debug", "namespacelogfiles.html#a063359d042882225dd0ad5cbd83ff5ef", null ],
-    [ "log_general", "namespacelogfiles.html#a67db9445ec88420af7c60e961f4c5328", null ],
-    [ "log_none", "namespacelogfiles.html#a090b15344fadad0e637fcd219949182f", null ],
     [ "logfile_directory_name", "namespacelogfiles.html#ae5ffdfae6a5751eb665663e9c2b3a068", null ],
     [ "logs", "namespacelogfiles.html#a46c55f3ef7fe12c70f244e95b1a4dbae", null ],
     [ "true", "namespacelogfiles.html#aeefcdcefc31552ef9edc2661e09e4312", null ]

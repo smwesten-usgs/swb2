@@ -28,6 +28,7 @@ var annotated_dup =
       [ "assignment(=)", "interfacedatetime_1_1assignment_07_0a_08.html", "interfacedatetime_1_1assignment_07_0a_08" ],
       [ "datetime_t", "structdatetime_1_1datetime__t.html", "structdatetime_1_1datetime__t" ],
       [ "month_t", "structdatetime_1_1month__t.html", "structdatetime_1_1month__t" ],
+      [ "operator(<)", "interfacedatetime_1_1operator_07_3_08.html", "interfacedatetime_1_1operator_07_3_08" ],
       [ "operator(>)", "interfacedatetime_1_1operator_07_4_08.html", "interfacedatetime_1_1operator_07_4_08" ]
     ] ],
     [ "dictionary", "namespacedictionary.html", [
@@ -65,6 +66,7 @@ var annotated_dup =
       [ "replace", "interfacefstring_1_1replace.html", null ],
       [ "right", "interfacefstring_1_1right.html", null ],
       [ "squote", "interfacefstring_1_1squote.html", null ],
+      [ "strip_full_pathname", "interfacefstring_1_1strip__full__pathname.html", null ],
       [ "to_lowercase", "interfacefstring_1_1to__lowercase.html", null ],
       [ "to_uppercase", "interfacefstring_1_1to__uppercase.html", null ],
       [ "tolowercase", "interfacefstring_1_1tolowercase.html", null ],
@@ -165,6 +167,9 @@ var annotated_dup =
       [ "fragments_set_t", "structprecipitation____method__of__fragments_1_1fragments__set__t.html", "structprecipitation____method__of__fragments_1_1fragments__set__t" ],
       [ "fragments_t", "structprecipitation____method__of__fragments_1_1fragments__t.html", "structprecipitation____method__of__fragments_1_1fragments__t" ],
       [ "ptr_fragments_t", "structprecipitation____method__of__fragments_1_1ptr__fragments__t.html", "structprecipitation____method__of__fragments_1_1ptr__fragments__t" ]
+    ] ],
+    [ "running_grid_stats", "namespacerunning__grid__stats.html", [
+      [ "running_stats_t", "structrunning__grid__stats_1_1running__stats__t.html", "structrunning__grid__stats_1_1running__stats__t" ]
     ] ],
     [ "simulation_datetime", "namespacesimulation__datetime.html", [
       [ "date_range_t", "structsimulation__datetime_1_1date__range__t.html", "structsimulation__datetime_1_1date__range__t" ]

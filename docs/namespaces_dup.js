@@ -57,10 +57,8 @@ var namespaces_dup =
     ] ],
     [ "constants_and_conversions", "namespaceconstants__and__conversions.html", "namespaceconstants__and__conversions" ],
     [ "continuous_frozen_ground_index", "namespacecontinuous__frozen__ground__index.html", [
-      [ "initialize_continuous_frozen_ground_index", "namespacecontinuous__frozen__ground__index.html#a7a0dc849b9878606cea12861912a09df", null ],
-      [ "update_continuous_frozen_ground_index", "namespacecontinuous__frozen__ground__index.html#abcebec8cde74a0b86953ea3b5e118755", null ],
-      [ "cfgi_ll", "namespacecontinuous__frozen__ground__index.html#a0738fd14b2cd1cd00ae42718298cb4d2", null ],
-      [ "cfgi_ul", "namespacecontinuous__frozen__ground__index.html#ae201797b7dc6297563b9d82ad2052708", null ]
+      [ "initialize_continuous_frozen_ground_index", "namespacecontinuous__frozen__ground__index.html#a5477d02f7996b4d043779a7488a77fcf", null ],
+      [ "update_continuous_frozen_ground_index", "namespacecontinuous__frozen__ground__index.html#abcebec8cde74a0b86953ea3b5e118755", null ]
     ] ],
     [ "crop_coefficients__fao56", "namespacecrop__coefficients____fao56.html", [
       [ "crop_coefficients_fao56_calculate", "namespacecrop__coefficients____fao56.html#a8ef6ed91f4c976fb5e6026d2810c0e0f", null ],
@@ -70,24 +68,14 @@ var namespaces_dup =
       [ "crop_coefficients_fao56_update_growth_stage_dates", "namespacecrop__coefficients____fao56.html#a7d38167cc2ba756a05ad21ec000e1ded", null ],
       [ "update_crop_coefficient_date_as_threshold", "namespacecrop__coefficients____fao56.html#a53486dd9e19017a8a6384fcc8b1d7f3a", null ],
       [ "update_crop_coefficient_gdd_as_threshold", "namespacecrop__coefficients____fao56.html#aa28ee98711a6f0dceec4885fdb66971a", null ],
-      [ "dec", "namespacecrop__coefficients____fao56.html#afe4575b8a9cb29f2d99256c376499ddd", null ],
       [ "growth_stage_date", "namespacecrop__coefficients____fao56.html#ac65046b44c2a3ce959c663cfcecc9bf3", null ],
       [ "growth_stage_gdd", "namespacecrop__coefficients____fao56.html#aa1e1f5f3c27dcb08bf4216edddefda5b", null ],
       [ "growth_stage_length_in_days", "namespacecrop__coefficients____fao56.html#a531c0e3a3889cc1bc0ff7ce91e304131", null ],
       [ "growth_stage_shift_days", "namespacecrop__coefficients____fao56.html#a777917a9f02e144df2e0367a41d947c7", null ],
-      [ "jan", "namespacecrop__coefficients____fao56.html#ac1b64486c41865d9a40873fe5c05d7bf", null ],
-      [ "kcb_end", "namespacecrop__coefficients____fao56.html#adf5a8f6f893e09769edd511db8dbda99", null ],
-      [ "kcb_ini", "namespacecrop__coefficients____fao56.html#a21002d75a16ffe99817b6fa06b0f6195", null ],
       [ "kcb_l", "namespacecrop__coefficients____fao56.html#a7c8aa2befa43a6540f130a4b91117624", null ],
       [ "kcb_method", "namespacecrop__coefficients____fao56.html#aa758211e9cc708a80b7a8c3b0b0ad235", null ],
-      [ "kcb_method_fao56", "namespacecrop__coefficients____fao56.html#a148a34d49ac64617d60122d1221d9fb2", null ],
-      [ "kcb_method_gdd", "namespacecrop__coefficients____fao56.html#abc67b085dd6c55c427e6bde3ea18ca12", null ],
-      [ "kcb_method_monthly_values", "namespacecrop__coefficients____fao56.html#aa217a988a30560dc6d204616346785a1", null ],
-      [ "kcb_mid", "namespacecrop__coefficients____fao56.html#a0bc5943978651e6e4c7fabc24c57b836", null ],
-      [ "kcb_min", "namespacecrop__coefficients____fao56.html#af10089c67057c404dfaf8fb0d066226a", null ],
       [ "landuse_code", "namespacecrop__coefficients____fao56.html#ac5ebd4b42fd62a1daff2ae2c8b5e0184", null ],
-      [ "lu_soils_csv", "namespacecrop__coefficients____fao56.html#a09a8e4b11a6c2f7576ddc5629067fd8b", null ],
-      [ "planting_date", "namespacecrop__coefficients____fao56.html#a526ca7fb37abbd3263c6fddd700c5c88", null ]
+      [ "lu_soils_csv", "namespacecrop__coefficients____fao56.html#a09a8e4b11a6c2f7576ddc5629067fd8b", null ]
     ] ],
     [ "daily_calculation", "namespacedaily__calculation.html", [
       [ "minmaxmean", "namespacedaily__calculation.html#a7c80d999b76432ecbfab19f5d6ef0829", null ],
@@ -143,9 +131,9 @@ var namespaces_dup =
       [ "et0_hargreaves", "namespaceet____hargreaves__samani.html#ab4bad3b35345bacf0be978adf7889eca", null ],
       [ "et_hargreaves_calculate", "namespaceet____hargreaves__samani.html#aa1188dde0964edd68b7e45aed501312d", null ],
       [ "et_hargreaves_initialize", "namespaceet____hargreaves__samani.html#a8512a837baefd57047e55c7a53b03cf3", null ],
-      [ "fet_constant", "namespaceet____hargreaves__samani.html#a442e46ed60294b5c120889c5322fe633", null ],
-      [ "fet_exponent", "namespaceet____hargreaves__samani.html#a9d2534d17ad1857d24f739aa18952892", null ],
-      [ "fet_slope", "namespaceet____hargreaves__samani.html#ad905245fa467f188f949919a146d0e87", null ]
+      [ "et_constant", "namespaceet____hargreaves__samani.html#a013bc8a182138fdb16498c467b3ad37b", null ],
+      [ "et_exponent", "namespaceet____hargreaves__samani.html#a3c622ff5e2fc7f8b8e287b5ce02ec794", null ],
+      [ "et_slope", "namespaceet____hargreaves__samani.html#abb0f40dd993480d1ba6aa2e1556b1e93", null ]
     ] ],
     [ "et__jensen_haise", "namespaceet____jensen__haise.html", [
       [ "et_jh_calculate", "namespaceet____jensen__haise.html#a8647cf6b332a35bd7f2162d1a7df6381", null ]
@@ -366,14 +354,15 @@ var namespaces_dup =
       [ "target_index_l", "namespacerouting____d8.html#a6a0c97f57329616cb0bf0f11ddfdda3b", null ],
       [ "target_row", "namespacerouting____d8.html#afa0ae2e74393a5ed2cc2a60c786e7907", null ]
     ] ],
+    [ "running_grid_stats", "namespacerunning__grid__stats.html", "namespacerunning__grid__stats" ],
     [ "runoff__curve_number", "namespacerunoff____curve__number.html", [
       [ "cn_ii_to_cn_i", "namespacerunoff____curve__number.html#a14867fb1ed86e182fce49ffee63213b6", null ],
       [ "cn_ii_to_cn_iii", "namespacerunoff____curve__number.html#a59b6be4ec7293e2603fbdd0f7fc286cd", null ],
-      [ "prob_runoff_enhancement", "namespacerunoff____curve__number.html#ae1c7ba4b615c77b904445a1fc16a43bc", null ],
+      [ "prob_runoff_enhancement", "namespacerunoff____curve__number.html#afe1e6b566da02b4384668363122f95bb", null ],
       [ "return_landuse_index_fn", "namespacerunoff____curve__number.html#a8d909322aa57bdda4fe9570cfe54b85a", null ],
-      [ "runoff_curve_number_calculate", "namespacerunoff____curve__number.html#a6843730e6cbf629bbad64a5cdf930edf", null ],
+      [ "runoff_curve_number_calculate", "namespacerunoff____curve__number.html#a77710f6021d5bbdcb3ed86ca3ea638a5", null ],
       [ "runoff_curve_number_initialize", "namespacerunoff____curve__number.html#abe564eabd0170192d8569d8b59b52b4b", null ],
-      [ "update_curve_number_fn", "namespacerunoff____curve__number.html#ac4d97c7df5574f25c546256059ba5381", null ],
+      [ "update_curve_number_fn", "namespacerunoff____curve__number.html#a0529434634ff76958fed52a593f1ed02", null ],
       [ "update_previous_5_day_rainfall", "namespacerunoff____curve__number.html#a8ea014bd82d53fdd339b4bc30739c9b4", null ],
       [ "amc_dry_dormant", "namespacerunoff____curve__number.html#ab408634d8cab273b74b2bd02b9c979bd", null ],
       [ "amc_dry_growing", "namespacerunoff____curve__number.html#a5cbe1da72b3eef09c25c54d965def16c", null ],
@@ -457,5 +446,17 @@ var namespaces_dup =
       [ "tab", "namespacesummary__statistics.html#afc4e54fb36c47ee4fdf9fb91899f9e88", null ]
     ] ],
     [ "swbstats2_support", "namespaceswbstats2__support.html", "namespaceswbstats2__support" ],
-    [ "timer", "namespacetimer.html", "namespacetimer" ]
+    [ "timer", "namespacetimer.html", "namespacetimer" ],
+    [ "weather_data_tabular", "namespaceweather__data__tabular.html", [
+      [ "weather_data_find_date_indx", "namespaceweather__data__tabular.html#a39c4845d056720514a18c48b67bd0e7a", null ],
+      [ "weather_data_tabular_get_precip", "namespaceweather__data__tabular.html#a69e41790e9511a524fe9097e68f3b32e", null ],
+      [ "weather_data_tabular_get_tmax", "namespaceweather__data__tabular.html#a8cf0c98d9c214148633a6b9248151e79", null ],
+      [ "weather_data_tabular_get_tmin", "namespaceweather__data__tabular.html#a1ef2fe76062fa053ae7c0d73aaad0cea", null ],
+      [ "weather_data_tabular_initialize", "namespaceweather__data__tabular.html#a16ce9295323e3192c7398d7b465c1556", null ],
+      [ "date_indx", "namespaceweather__data__tabular.html#a84156d6caa8d9f1fb4de3a10a3581df6", null ],
+      [ "precip", "namespaceweather__data__tabular.html#a4fad1fb9522254499a724aef709ba1bc", null ],
+      [ "tmax", "namespaceweather__data__tabular.html#a4ece5c90ac31e008ab3378370ee7f379", null ],
+      [ "tmin", "namespaceweather__data__tabular.html#a5200e8dac9846dfe348768cc179a412b", null ],
+      [ "weather_date", "namespaceweather__data__tabular.html#aa633c8a01ef28be0ac23bb639e27e50e", null ]
+    ] ]
 ];

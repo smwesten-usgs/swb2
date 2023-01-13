@@ -88,7 +88,6 @@ var menudata={children:[
 {text:"g",url:"namespacemembers_vars_g.html#index_g"},
 {text:"h",url:"namespacemembers_vars_h.html#index_h"},
 {text:"i",url:"namespacemembers_vars_i.html#index_i"},
-{text:"j",url:"namespacemembers_vars_j.html#index_j"},
 {text:"k",url:"namespacemembers_vars_k.html#index_k"},
 {text:"l",url:"namespacemembers_vars_l.html#index_l"},
 {text:"m",url:"namespacemembers_vars_m.html#index_m"},
@@ -110,10 +109,12 @@ var menudata={children:[
 {text:"f",url:"namespacemembers_eval.html#index_f"},
 {text:"g",url:"namespacemembers_eval.html#index_g"},
 {text:"j",url:"namespacemembers_eval.html#index_j"},
+{text:"k",url:"namespacemembers_eval.html#index_k"},
 {text:"l",url:"namespacemembers_eval.html#index_l"},
 {text:"m",url:"namespacemembers_eval.html#index_m"},
 {text:"n",url:"namespacemembers_eval.html#index_n"},
 {text:"o",url:"namespacemembers_eval.html#index_o"},
+{text:"p",url:"namespacemembers_eval.html#index_p"},
 {text:"s",url:"namespacemembers_eval.html#index_s"}]}]}]},
 {text:"Data Types List",url:"annotated.html",children:[
 {text:"Data Types List",url:"annotated.html"},
@@ -166,6 +167,7 @@ var menudata={children:[
 {text:"s",url:"functions_func_s.html#index_s"},
 {text:"t",url:"functions_func_t.html#index_t"},
 {text:"u",url:"functions_func_u.html#index_u"},
+{text:"v",url:"functions_func_v.html#index_v"},
 {text:"w",url:"functions_func_w.html#index_w"}]},
 {text:"Variables",url:"functions_vars.html",children:[
 {text:"a",url:"functions_vars.html#index_a"},

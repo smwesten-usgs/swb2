@@ -25,42 +25,42 @@
 var NAVTREE =
 [
   [ "Soil Water Balance (SWB2)", "index.html", [
-    [ "Online Documentation", "md__f__projects_swb_development_git_swb2_doc_src_index.html", [
-      [ "Installing and Running Soil-Water-Balance Version 2.0", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md1", [
-        [ "System Requirements", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md2", null ],
-        [ "Running SWB", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md3", null ]
+    [ "Online Documentation", "md__e__projects_swb_development_git_swb2_doc_src_index.html", [
+      [ "Installing and Running Soil-Water-Balance Version 2.0", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md1", [
+        [ "System Requirements", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md2", null ],
+        [ "Running SWB", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md3", null ]
       ] ],
-      [ "Overview of Input and Output Files", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md4", [
-        [ "Input Files", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md5", null ],
-        [ "Control File", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md6", null ],
-        [ "Lookup Tables", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md7", null ],
-        [ "Input Data Grids", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md8", [
-          [ "Hydrologic Soil Group", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md9", null ],
-          [ "Available Water Capacity", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md10", null ],
-          [ "Land-Use Code", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md11", null ],
-          [ "D8 Surface-Water-Flow Direction", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md12", null ]
+      [ "Overview of Input and Output Files", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md4", [
+        [ "Input Files", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md5", null ],
+        [ "Control File", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md6", null ],
+        [ "Lookup Tables", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md7", null ],
+        [ "Input Data Grids", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md8", [
+          [ "Hydrologic Soil Group", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md9", null ],
+          [ "Available Water Capacity", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md10", null ],
+          [ "Land-Use Code", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md11", null ],
+          [ "D8 Surface-Water-Flow Direction", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md12", null ]
         ] ],
-        [ "Climate Data Tables or Grids", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md13", null ]
+        [ "Climate Data Tables or Grids", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md13", null ]
       ] ],
-      [ "Output Files", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md14", [
-        [ "netCDF Files", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md15", null ],
-        [ "Log Files", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md16", null ],
-        [ "Cartographic Projections and Resampling", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md17", null ]
+      [ "Output Files", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md14", [
+        [ "netCDF Files", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md15", null ],
+        [ "Log Files", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md16", null ],
+        [ "Cartographic Projections and Resampling", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md17", null ]
       ] ],
-      [ "Gridded Datasets", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md18", [
-        [ "Specifying Grid Filenames", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md19", null ]
+      [ "Gridded Datasets", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md18", [
+        [ "Specifying Grid Filenames", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md19", null ]
       ] ],
-      [ "Options for Gridded Datasets", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md20", [
-        [ "Supported File Types", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md21", [
-          [ "Surfer ASCII Grid", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md22", null ],
-          [ "Arc ASCII Grid", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md23", null ],
-          [ "netCDF", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md24", null ]
+      [ "Options for Gridded Datasets", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md20", [
+        [ "Supported File Types", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md21", [
+          [ "Surfer ASCII Grid", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md22", null ],
+          [ "Arc ASCII Grid", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md23", null ],
+          [ "netCDF", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md24", null ]
         ] ],
-        [ "Treatment of Missing Values", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md25", null ]
+        [ "Treatment of Missing Values", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md25", null ]
       ] ],
-      [ "Conversion Factors", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md26", null ],
-      [ "Inactive Grid Cells", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md27", null ],
-      [ "References Cited", "md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md28", null ]
+      [ "Conversion Factors", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md26", null ],
+      [ "Inactive Grid Cells", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md27", null ],
+      [ "References Cited", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md28", null ]
     ] ],
     [ "Todo List", "todo.html", null ],
     [ "Modules", "namespaces.html", [
@@ -94,25 +94,26 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "actual__et____fao56_8_f90.html",
-"data__catalog__entry_8_f90.html#addc07c29f0ff79d0c57ee67501ae81cc",
-"fstring_8_f90.html#aa2c95f2ca1cf1a74f1935ca2e830b3c5",
-"interfaceconstants__and__conversions_1_1asdouble.html",
-"interfacenetcdf__c__api__interfaces_1_1nc__def__var.html",
-"md__f__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md16",
-"namespaceawc____gridded__values.html#a18ab5c6ee2b27657585dea47561116b2",
-"namespacedatetime.html#a98fc965fb915b3b78cdbf826496d82d1",
-"namespacegrid.html#a628b32fed5d480b7752a8f3d627bd708",
-"namespacemodel__domain.html#a18aeded59e98fc5ba71f5b4d6b53d732",
-"namespacenetcdf4__support.html#a97a9fd4645e71ebf8aebea18356c8c40",
-"namespaceswbstats2__support.html#a0931f122b03930d51a26262935033c60",
-"rooting__depth_____f_a_o56_8_f90.html",
-"structdata__catalog__entry_1_1data__catalog__entry__t.html#a408e0b4372ed166946d32d257259cfe5",
-"structdatetime_1_1datetime__t.html#a93e41fdd5eb579538a2acd9427ff58d0",
-"structfstring__list_1_1alpha__sort__group__t.html#acb00448b55d7fdf3cf6296c87a993373",
-"structmodel__domain_1_1model__domain__t.html#a016c0b2cbc30a1967a879b24c0192aa3",
-"structmodel__domain_1_1model__domain__t.html#ac6a058818cea7cae089ea88a46fbd458",
-"structoutput_1_1netcdf__file__collection__t.html",
-"structswbstats2__support_1_1swbstats__t.html#a8a4009ce6662249dabde9966dd6eb485"
+"data__catalog__entry_8_f90.html#afcfb8f71f2377c7d1f6ef4136c72d129",
+"fstring_8_f90.html#ae91b7cc9159af8dafa75a9d8e72687e0",
+"interfaceconstants__and__conversions_1_1asdouble.html#afdbe45eba691cd670d6cac05565770e1",
+"interfacenetcdf__c__api__interfaces_1_1nc__def__var__deflate.html",
+"md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md23",
+"namespaceconstants__and__conversions.html#a033541136836ab3a090e3e1c31d7df33",
+"namespacedatetime.html#aed7d06fe19ba576ba8aedc6f71417a68",
+"namespacegrid.html#a95e2f2513fb7f2d11d0130f643931676",
+"namespacemodel__domain.html#a4ae2faaf00a3e1ae5bc39cf5b189008b",
+"namespacenetcdf4__support.html#ab00712076b8643e929f614ab96ddf5dd",
+"namespaceswbstats2__support.html#a411231f0f19c23c55f1317b01bf4ab46",
+"precipitation____method__of__fragments_8_f90.html#add6f11f5c1b29a329b4f49759f6c7635",
+"structdata__catalog__entry_1_1data__catalog__entry__t.html#a28498eca44c65bae89487ba38732047d",
+"structdatetime_1_1datetime__t.html#a47d1e4ddee4abc27674586a59b126ea2",
+"structfile__operations_1_1ascii__file__t.html#ad19c62536815c486639e7f33b887b988",
+"structmodel__domain_1_1cell__col__row__t.html",
+"structmodel__domain_1_1model__domain__t.html#ab31e05ad7ccc8bf1345fb7b6821d343f",
+"structnetcdf4__support_1_1t__netcdf__attribute.html#acd077b392b9d8654e6371f3ef3ba4ff6",
+"structswbstats2__support_1_1swbstats__t.html#a21367ae3de78f5573f0225cfa8bf9fd8",
+"timer_8_f90.html#a1e09bc3d9a563017a982f964e6c28c19"
 ];
 
 var SYNCONMSG = 'click to disable panel synchronisation';

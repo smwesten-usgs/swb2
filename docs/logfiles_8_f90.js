@@ -15,10 +15,6 @@ var logfiles_8_f90 =
     [ "writemultiline", "logfiles_8_f90.html#ae807d3b84516a40194bbe44ae47ef553", null ],
     [ "current_log_echo", "logfiles_8_f90.html#ac138ec3f356b54c8c1a8a3ab08884d9a", null ],
     [ "current_log_level", "logfiles_8_f90.html#adbb7ca21f1b186e2a46acd8379161175", null ],
-    [ "log_all", "logfiles_8_f90.html#ac010b02c31c14253e9477a3e70b8c238", null ],
-    [ "log_debug", "logfiles_8_f90.html#a063359d042882225dd0ad5cbd83ff5ef", null ],
-    [ "log_general", "logfiles_8_f90.html#a67db9445ec88420af7c60e961f4c5328", null ],
-    [ "log_none", "logfiles_8_f90.html#a090b15344fadad0e637fcd219949182f", null ],
     [ "logfile_directory_name", "logfiles_8_f90.html#ae5ffdfae6a5751eb665663e9c2b3a068", null ],
     [ "logs", "logfiles_8_f90.html#a46c55f3ef7fe12c70f244e95b1a4dbae", null ],
     [ "true", "logfiles_8_f90.html#aeefcdcefc31552ef9edc2661e09e4312", null ]
