@@ -112,6 +112,12 @@ if fc_id == 'intel-llvm-cl'
                      '/Wno-unused-command-line-argument',
                      '/Wno-unknown-argument',
                      '/Wmost',
+                     '/Wno-tautological-compare',
+                     '/Wno-missing-braces',
+                     '/Wno-infinite-recursion',
+                     '/fp-speculation=safe',
+                     '/fp-model=precise',
+                     '/no-fma',
                     ]
 
   compile_args += [#'/fpe:0',              # Activate all floating point exceptions
@@ -125,7 +131,8 @@ if fc_id == 'intel-llvm-cl'
                    '/Qdiag-disable:5268', # Line too long
                    '/Qdiag-error-limit:1',
                   ]
-  link_args += '/Qdiag-disable:10441'
+  link_args += ['/Qdiag-disable:10441',
+               ]
 
 elif fc_id == 'intel'
   # linux and macOS
