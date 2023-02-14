@@ -58,7 +58,7 @@ AVAILABLE_WATER_CONTENT_PROJECTION_DEFINITION +proj=aea +lat_0=50 +lon_0=-154 +l
 
 LAND_USE_LOOKUP_TABLE LU_Lookup_AK.txt
 IRRIGATION_LOOKUP_TABLE IRR_Lookup_AK.txt
-WEATHER_DATA_LOOKUP_TABLE 1959-2022_3037835_kenai_airport.txt
+WEATHER_DATA_LOOKUP_TABLE 1944-2022_3037835_kenai_airport.txt
 
 %% initial conditions for soil moisture and snow storage amounts
 %% may be specified as grids, but using a constant amount and
@@ -84,5 +84,5 @@ DUMP_VARIABLES COORDINATES 150393 1179331
 %% remember to allow for adequate model spin up; running the
 %% model for just a month or two will give questionable results
 
-START_DATE 01/01/1980
-END_DATE 12/31/2020
+START_DATE 01/01/1967
+END_DATE 07/22/2022
