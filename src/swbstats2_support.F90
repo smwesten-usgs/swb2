@@ -1333,16 +1333,13 @@ contains
 
         ! endif  
 
-        
-
-
-        write(*,fmt='(a,i0,1x,6(f0.4, 2x))') 'FINALIZING: ', month_index,    &
-        minval(OUTPUT_FILES(sum_index_num)%grid_ptr%dpData),                 &
-        maxval(OUTPUT_FILES(sum_index_num)%grid_ptr%dpData),                 &
-        minval(OUTPUT_FILES(mean_index_num)%grid_ptr%dpData),                &
-        maxval(OUTPUT_FILES(mean_index_num)%grid_ptr%dpData),                &
-        minval(OUTPUT_FILES(variance_index_num)%grid_ptr%dpData),            &
-        maxval(OUTPUT_FILES(variance_index_num)%grid_ptr%dpData)
+        ! write(*,fmt='(a,i0,1x,6(f0.4, 2x))') 'FINALIZING: ', month_index,    &
+        ! minval(OUTPUT_FILES(sum_index_num)%grid_ptr%dpData),                 &
+        ! maxval(OUTPUT_FILES(sum_index_num)%grid_ptr%dpData),                 &
+        ! minval(OUTPUT_FILES(mean_index_num)%grid_ptr%dpData),                &
+        ! maxval(OUTPUT_FILES(mean_index_num)%grid_ptr%dpData),                &
+        ! minval(OUTPUT_FILES(variance_index_num)%grid_ptr%dpData),            &
+        ! maxval(OUTPUT_FILES(variance_index_num)%grid_ptr%dpData)
 
       enddo  
 

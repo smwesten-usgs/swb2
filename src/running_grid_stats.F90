@@ -187,9 +187,9 @@ module running_grid_stats
     class(RUNNING_STATS_T), intent(inout)          :: this
     real (c_double), dimension(:,:), intent(out)   :: dpData
 
-    call assert(this%n > 1, "Not enough data points processed to calculate variance")
+!    call assert(this%n > 1, "Not enough data points processed to calculate variance")
 
-    where (this%grd_M1%dpData > -9999._c_double)
+    where ((this%grd_M1%dpData > -9999._c_double) .and. this%n > 1)
       dpData = this%grd_M1%dpData / (real(this%n, c_double) - 1.0_c_double)
     else where
       dpData = -9999._c_double
@@ -204,9 +204,13 @@ module running_grid_stats
     class(RUNNING_STATS_T), intent(inout)                       :: this
     real (c_double), dimension(:,:), allocatable, intent(out)   :: dpData
 
-    call assert(this%n > 1, "Not enough data points processed to calculate variance")
+!    call assert(this%n > 1, "Not enough data points processed to calculate variance")
 
-    dpData = sqrt(this%grd_M1%dpData / (real(this%n, c_double) - 1.0_c_double))
+    if(this%n > 1) then
+      dpData = sqrt(this%grd_M1%dpData / (real(this%n, c_double) - 1.0_c_double))
+    else
+      dpData = 0.0_c_double
+    endif
 
   end subroutine calc_std_deviation_sub
 
