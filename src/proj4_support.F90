@@ -124,12 +124,14 @@ contains
 
         case ( "+lat_1" )
 
-          call attribute_name_list%append("latitude_of_first_standard_parallel")
+          !call attribute_name_list%append("latitude_of_first_standard_parallel")
+          call attribute_name_list%append("standard_parallel_1")
           call attribute_value_list%append( valuestring )
 
         case ( "+lat_2" )
 
-          call attribute_name_list%append("latitude_of_second_standard_parallel")
+          !call attribute_name_list%append("latitude_of_second_standard_parallel")
+          call attribute_name_list%append("standard_parallel_2")
           call attribute_value_list%append( valuestring )
 
         case ( "+a" )
