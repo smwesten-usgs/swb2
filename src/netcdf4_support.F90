@@ -3626,7 +3626,7 @@ subroutine nf_set_global_attributes(NCFILE, sDataType, executable_name, &
     NCFILE%pNC_ATT(1)%iNC_AttType = NC_CHAR
     NCFILE%pNC_ATT(1)%iNC_AttSize = 1_c_size_t
 
-    NCFILE%pNC_ATT(2)%sAttributeName = "conventions"
+    NCFILE%pNC_ATT(2)%sAttributeName = "Conventions"
     allocate(NCFILE%pNC_ATT(2)%sAttValue(0:0))
     NCFILE%pNC_ATT(2)%sAttValue(0) = "CF-1.6"
     NCFILE%pNC_ATT(2)%iNC_AttType = NC_CHAR
