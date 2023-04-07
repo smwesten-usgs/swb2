@@ -2,7 +2,7 @@
 
 ## Commit messages
 
-From release version 2.0.1, we will adopt commit messages based on the "Conventional Commits" specification (https://www.conventionalcommits.org/en/v1.0.0-beta.2/#specification). Commit messages will be prefixed with one of the following:
+From release version 2.0.1, we will adopt commit messages based on the "Conventional Commits" specification (https://www.conventionalcommits.org/en/v1.0.0/). Commit messages will be prefixed with one of the following:
 
 | prefix  | example of change associated with commit                                          | 
 |---------|-----------------------------------------------------------------------------------|
