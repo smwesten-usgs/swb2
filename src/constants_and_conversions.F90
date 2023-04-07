@@ -62,6 +62,8 @@ module constants_and_conversions
   real (c_double), parameter, public :: F_PER_C    = 9.0_c_double / 5.0_c_double
   real (c_double), parameter, public :: M_PER_FOOT = 0.3048_c_double
   real (c_double), parameter, public :: MM_PER_IN  = 25.4_c_double
+  real (c_double), parameter, public :: FREEZING_POINT_OF_WATER_KELVIN = 273.15_c_double
+  real (c_double), parameter, public :: FREEZING_POINT_OF_WATER_FAHRENHEIT = 32.0_c_double
 
   public :: OUTPUT_PREFIX_NAME, OUTPUT_DIRECTORY_NAME, DATA_DIRECTORY_NAME,     &
             LOOKUP_TABLE_DIRECTORY_NAME

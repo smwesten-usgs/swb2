@@ -82,8 +82,9 @@ module data_catalog_entry
     character (len=2)    :: sMissingValuesOperator = "&&"
     integer (c_int)      :: iMissingValuesAction = 0
 
-    real (c_double)      :: rUserScaleFactor = 1_c_double
-    real (c_double)      :: rUserAddOffset = 0_c_double
+    real (c_double)      :: dUserScaleFactor = 1_c_double
+    real (c_double)      :: dUserAddOffset = 0_c_double
+    real (c_double)      :: dUserSubOffset = 0_c_double
     real (c_double)      :: rX_Coord_AddOffset = 0.0_c_double
     real (c_double)      :: rY_Coord_AddOffset = 0.0_c_double
     real (c_double)      :: rCoordinateTolerance = 0.0_c_double
@@ -152,7 +153,9 @@ module data_catalog_entry
     procedure  :: initialize_netcdf => initialize_netcdf_data_object_sub
 
     procedure  :: set_scale                => set_scale_sub
-    procedure  :: set_offset               => set_offset_sub
+    procedure  :: set_sub_offset           => set_sub_offset_sub
+    procedure  :: set_add_offset           => set_add_offset_sub
+    
     procedure  :: set_X_offset             => set_X_coord_offset_sub
     procedure  :: set_Y_offset             => set_Y_coord_offset_sub
     procedure  :: set_coordinate_tolerance => set_coordinate_tolerance_sub
@@ -590,12 +593,16 @@ end subroutine initialize_netcdf_data_object_sub
       if (this%iTargetDataType == DATATYPE_REAL) then
 
         call apply_scale_and_offset(fResult=this%pGrdBase%rData, fValue=this%pGrdBase%rData,          &
-              dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
+              dUserSubOffset=this%dUserSubOffset,                                                     &
+              dUserScaleFactor=this%dUserScaleFactor,                                                 &
+              dUserAddOffset=this%dUserAddOffset )
 
       elseif ( this%iTargetDataType == DATATYPE_INT ) then
 
-         call apply_scale_and_offset(iResult=this%pGrdBase%iData, iValue=this%pGrdBase%iData,          &
-              dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
+         call apply_scale_and_offset(iResult=this%pGrdBase%iData, iValue=this%pGrdBase%iData,         &
+              dUserSubOffset=this%dUserSubOffset,                                                     &
+              dUserScaleFactor=this%dUserScaleFactor,                                                 &
+              dUserAddOffset=this%dUserAddOffset )
 
       else
 
@@ -609,27 +616,29 @@ end subroutine initialize_netcdf_data_object_sub
 
 !--------------------------------------------------------------------------------------------------
 
-elemental subroutine apply_scale_and_offset_float(fResult, fValue, dUserScaleFactor, dUserAddOffset )
+elemental subroutine apply_scale_and_offset_float(fResult, fValue, dUserScaleFactor, dUserSubOffset, dUserAddOffset )
 
   real (c_float), intent(out)  :: fResult
   real (c_float), intent(in)   :: fValue
   real (c_double), intent(in)   :: dUserScaleFactor
+  real (c_double), intent(in)   :: dUserSubOffset
   real (c_double), intent(in)   :: dUserAddOffset
 
-  fResult = ( fValue * dUserScaleFactor ) + dUserAddOffset
+  fResult = ( (fValue - dUserSubOffset) * dUserScaleFactor ) + dUserAddOffset
 
 end subroutine apply_scale_and_offset_float
 
 !--------------------------------------------------------------------------------------------------
 
-elemental subroutine apply_scale_and_offset_int(iResult, iValue, dUserScaleFactor, dUserAddOffset )
+elemental subroutine apply_scale_and_offset_int(iResult, iValue, dUserScaleFactor, dUserSubOffset, dUserAddOffset )
 
   integer (c_int), intent(out) :: iResult
   integer (c_int), intent(in)  :: iValue
   real (c_double), intent(in)   :: dUserScaleFactor
+  real (c_double), intent(in)   :: dUserSubOffset
   real (c_double), intent(in)   :: dUserAddOffset
 
-  iResult = ( real( iValue, c_float) * dUserScaleFactor ) + dUserAddOffset
+  iResult = ( ( real( iValue, c_float) - dUserSubOffset ) * dUserScaleFactor ) + dUserAddOffset
 
 end subroutine apply_scale_and_offset_int
 
@@ -1917,12 +1926,12 @@ end subroutine set_constant_value_real
 
 !--------------------------------------------------------------------------------------------------
 
-subroutine set_scale_sub(this, rScaleFactor)
+subroutine set_scale_sub(this, dScaleFactor)
 
    class (DATA_CATALOG_ENTRY_T) :: this
-   real (c_float) :: rScaleFactor
+   real (c_double) :: dScaleFactor
 
-   this%rUserScaleFactor = rScaleFactor
+   this%dUserScaleFactor = dScaleFactor
 
 end subroutine set_scale_sub
 
@@ -1972,14 +1981,25 @@ end subroutine set_coordinate_tolerance_sub
 
 !----------------------------------------------------------------------
 
-subroutine set_offset_sub(this, rAddOffset)
+subroutine set_add_offset_sub(this, dAddOffset)
 
    class (DATA_CATALOG_ENTRY_T) :: this
-   real (c_float)          :: rAddOffset
+   real (c_double)              :: dAddOffset
 
-   this%rUserAddOffset = rAddOffset
+   this%dUserAddOffset = dAddOffset
 
-end subroutine set_offset_sub
+end subroutine set_add_offset_sub
+
+!----------------------------------------------------------------------
+
+subroutine set_sub_offset_sub(this, dSubOffset)
+
+  class (DATA_CATALOG_ENTRY_T) :: this
+  real (c_double)              :: dSubOffset
+
+  this%dUserSubOffset = dSubOffset
+
+end subroutine set_sub_offset_sub
 
 !--------------------------------------------------------------------------------------------------
 

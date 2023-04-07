@@ -1166,7 +1166,7 @@ contains
 
         elseif ( sCmdText .containssimilar. "_CONVERSION_FACTOR" ) then
 
-          call pENTRY%set_scale(asFloat(sArgText_1))
+          call pENTRY%set_scale(asDouble(sArgText_1))
 
         elseif ( sCmdText .containssimilar. "NETCDF_X_VAR_ADD_OFFSET" ) then
 
@@ -1178,12 +1178,31 @@ contains
 
         elseif ( sCmdText .containssimilar. "_SCALE_FACTOR" ) then
 
-          call pENTRY%set_scale(asFloat(sArgText_1))
+          call pENTRY%set_scale(asDouble(sArgText_1))
 
         elseif ( sCmdText .containssimilar. "_ADD_OFFSET" ) then
 
-          call pENTRY%set_offset(asFloat(sArgText_1))
+          call pENTRY%set_add_offset(asDouble(sArgText_1))
 
+        elseif ( sCmdText .containssimilar. "_SUBTRACT_OFFSET" ) then
+
+          call pENTRY%set_sub_offset(asDouble(sArgText_1))
+
+        elseif ( sCmdText .containssimilar. "_UNITS_KELVIN" ) then
+
+          call pENTRY%set_sub_offset(FREEZING_POINT_OF_WATER_KELVIN)
+          call pENTRY%set_add_offset(FREEZING_POINT_OF_WATER_FAHRENHEIT)
+          call pENTRY%set_scale(F_PER_C)
+
+        elseif ( sCmdText .containssimilar. "_UNITS_CELSIUS" ) then
+
+          call pENTRY%set_add_offset(FREEZING_POINT_OF_WATER_FAHRENHEIT)
+          call pENTRY%set_scale(F_PER_C)
+          
+        elseif ( sCmdText .containssimilar. "_UNITS_MILLIMETERS" ) then
+
+          call pENTRY%set_scale(MM_PER_IN)
+  
         elseif ( sCmdText .containssimilar. "_COORDINATE_TOLERANCE" ) then
 
           call pENTRY%set_coordinate_tolerance( asDouble(sArgText_1))
