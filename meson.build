@@ -118,12 +118,14 @@ if fc_id == 'intel-llvm-cl'
                      '/fp-speculation=safe',
                      '/fp-model=precise',
                      '/no-fma',
+                     '/MT'
                     ]
 
   compile_args += [#'/fpe:0',              # Activate all floating point exceptions
                    '/heap-arrays:0',
                    '/traceback',
                    '/W0',
+                   '/MT',
                    '/fpp',                # Activate preprocessing
                    '/Qdiag-disable:7416', # f2008 warning
                    '/Qdiag-disable:7025', # f2008 warning
