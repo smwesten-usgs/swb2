@@ -1201,7 +1201,7 @@ contains
           
         elseif ( sCmdText .containssimilar. "_UNITS_MILLIMETERS" ) then
 
-          call pENTRY%set_scale(MM_PER_IN)
+          call pENTRY%set_scale(1.0_c_double / MM_PER_IN)
   
         elseif ( sCmdText .containssimilar. "_COORDINATE_TOLERANCE" ) then
 
