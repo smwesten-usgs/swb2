@@ -3738,9 +3738,9 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
 
         case default
 
-          allocate(pNC_ATT(indx)%rAttValue(0:0))
-          pNC_ATT(indx)%rAttValue(0) = asFloat( attribute_value_list%get( indx + 1 ) )
-          pNC_ATT(indx)%iNC_AttType = NC_FLOAT
+          allocate(pNC_ATT(indx)%dpAttValue(0:0))
+          pNC_ATT(indx)%dpAttValue(0) = asDouble( attribute_value_list%get( indx + 1 ) )
+          pNC_ATT(indx)%iNC_AttType = NC_DOUBLE
           pNC_ATT(indx)%iNC_AttSize = 1_c_size_t
 
       end select
@@ -3838,7 +3838,8 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
 
     pNC_ATT(5)%sAttributeName = "coordinates"
     allocate(pNC_ATT(5)%sAttValue(0:0))
-    pNC_ATT(5)%sAttValue(0) = "lat lon"
+!    pNC_ATT(5)%sAttValue(0) = "lat lon"
+    pNC_ATT(5)%sAttValue(0) = "crs"
     pNC_ATT(5)%iNC_AttType = NC_CHAR
     pNC_ATT(5)%iNC_AttSize = 1_c_size_t
 
