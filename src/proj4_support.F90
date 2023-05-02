@@ -76,13 +76,21 @@ contains
 
           select case ( valuestring )
 
-            case ( "GRS80", "WGS84", "grs80", "wgs80" )
+            case ( "GRS80", "grs80" )
 
               call attribute_name_list%append("semi_major_axis")
               call attribute_value_list%append( "6378137.0" )
 
               call attribute_name_list%append("inverse_flattening")
               call attribute_value_list%append( "298.257222101" )
+
+            case ( "WGS84", "wgs84" )  
+
+              call attribute_name_list%append("semi_major_axis")
+              call attribute_value_list%append( "6378137.0" )
+
+              call attribute_name_list%append("inverse_flattening")
+              call attribute_value_list%append( "298.257223563" )
 
             case ( "clrk66", "CLRK66" )
 
