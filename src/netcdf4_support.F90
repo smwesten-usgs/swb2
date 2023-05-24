@@ -3741,13 +3741,11 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
           
           call assert(len_trim(value_string1) > 0, "standard_parallel requires valid values for '+lat_1' and '+lat_2'.", &
             sHints="Are '+lat_1' or '+lat_2' missing or out of order in the control file PROJ string?")
-          call assert(len_trim(value_string2) > 0, "Doh!")
 
           pNC_ATT(indx)%dpAttValue(0) = asDouble( value_string1 )
           pNC_ATT(indx)%dpAttValue(1) = asDouble( value_string2 )
           pNC_ATT(indx)%iNC_AttType = NC_DOUBLE
           pNC_ATT(indx)%iNC_AttSize = 2_c_size_t
-
 
         case ( "UTM_zone" )
 
