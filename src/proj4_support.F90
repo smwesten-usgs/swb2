@@ -1,6 +1,7 @@
 module proj4_support
 
   use iso_c_binding
+  use exceptions
   use fstring, only      : right, left, squote, WHITESPACE
   use fstring_list, only  : FSTRING_LIST_T, create_list
   implicit none
@@ -25,6 +26,7 @@ contains
     character (len=256)            :: temp_string
     character (len=:), allocatable :: valuestring
     character (len=:), allocatable :: namestring
+    character (len=:), allocatable :: standard_parallels
     character (len=:), allocatable :: proj4_string_local
 
     proj4_string_local = proj4_string
@@ -133,14 +135,17 @@ contains
         case ( "+lat_1" )
 
           !call attribute_name_list%append("latitude_of_first_standard_parallel")
-          call attribute_name_list%append("standard_parallel_1")
-          call attribute_value_list%append( valuestring )
+          !call attribute_name_list%append("standard_parallel_1")
+          !call attribute_value_list%append( valuestring )
+          standard_parallels = valuestring 
 
         case ( "+lat_2" )
 
           !call attribute_name_list%append("latitude_of_second_standard_parallel")
-          call attribute_name_list%append("standard_parallel_2")
-          call attribute_value_list%append( valuestring )
+          standard_parallels = standard_parallels//' , '//trim(valuestring)
+
+          call attribute_name_list%append("standard_parallel")
+          call attribute_value_list%append( standard_parallels )
 
         case ( "+a" )
 

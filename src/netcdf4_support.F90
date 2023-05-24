@@ -3670,10 +3670,12 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
   type (T_NETCDF_ATTRIBUTE), dimension(:), pointer :: pNC_ATT
   logical (c_bool)                            :: lLatLon_l
   logical (c_bool)                            :: write_time_bounds_l
-  type (FSTRING_LIST_T)                             :: attribute_name_list
-  type (FSTRING_LIST_T)                             :: attribute_value_list
-  character (len=:), allocatable                   :: tempstring
-  character (len=:), allocatable                   :: value_string
+  type (FSTRING_LIST_T)                       :: attribute_name_list
+  type (FSTRING_LIST_T)                       :: attribute_value_list
+  character (len=:), allocatable              :: tempstring
+  character (len=:), allocatable              :: value_string
+  character (len=:), allocatable              :: value_string1
+  character (len=:), allocatable              :: value_string2
   integer (c_int)                             :: indx
 
   if (present( lLatLon ) ) then
@@ -3728,6 +3730,24 @@ subroutine nf_set_standard_attributes(NCFILE, sOriginText, PROJ4_string,    &
           pNC_ATT(indx)%sAttValue(0) = attribute_value_list%get( indx + 1 )
           pNC_ATT(indx)%iNC_AttType = NC_CHAR
           pNC_ATT(indx)%iNC_AttSize = 1_c_size_t
+
+        case ( "standard_parallel" )
+
+          allocate(pNC_ATT(indx)%dpAttValue(0:1))
+
+          value_string = attribute_value_list%get( indx + 1 )
+          value_string1 = left(value_string, substring=",")
+          value_string2 = right(value_string, substring=",")
+          
+          call assert(len_trim(value_string1) > 0, "standard_parallel requires valid values for '+lat_1' and '+lat_2'.", &
+            sHints="Are '+lat_1' or '+lat_2' missing or out of order in the control file PROJ string?")
+          call assert(len_trim(value_string2) > 0, "Doh!")
+
+          pNC_ATT(indx)%dpAttValue(0) = asDouble( value_string1 )
+          pNC_ATT(indx)%dpAttValue(1) = asDouble( value_string2 )
+          pNC_ATT(indx)%iNC_AttType = NC_DOUBLE
+          pNC_ATT(indx)%iNC_AttSize = 2_c_size_t
+
 
         case ( "UTM_zone" )
 
