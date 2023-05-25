@@ -823,8 +823,8 @@ contains
            iVarID=ncfile_out%iVarID(NC_TIME),                                     &
            iStart=[ RECNUM ],                                                     &
            iCount=[1_c_size_t],                                                   &
-           iStride=[1_c_size_t],                                               &
-           dpValues=[ ( start_bnd + end_bnd ) / 2.0_c_double ] )
+           iStride=[1_c_size_t],                                                  &
+           rValues=[ real(( start_bnd + end_bnd ) / 2.0_c_float, c_float) ] )
     !       dpValues=[ real( SIM_DT%iNumDaysFromOrigin, c_double) ] )
 
        ! call netcdf_put_variable_vector(NCFILE=ncfile_out,                        &
@@ -838,7 +838,7 @@ contains
            iVarID=ncfile_out%iVarID(NC_Z),                                        &
            iStart=[ RECNUM , 0_c_size_t, 0_c_size_t],                             &
            iCount=[ 1_c_size_t, ny, nx ],                                         &
-           iStride=[1_c_size_t, 1_c_size_t, 1_c_size_t],                 &
+           iStride=[1_c_size_t, 1_c_size_t, 1_c_size_t],                          &
            rValues=real(grid_ptr%dpData, c_float) )
 
       endif

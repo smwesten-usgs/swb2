@@ -1814,7 +1814,7 @@ end subroutine set_constant_value_real
        iStart=[this%iNCFILE_RECNUM], &
        iCount=[1_c_size_t], &
        iStride=[1_c_size_t], &
-       dpValues=[real(this%iNCFILE_RECNUM, c_double)])
+       rValues=[real(this%iNCFILE_RECNUM, c_float)])
 
     this%iNCFILE_RECNUM = this%iNCFILE_RECNUM + 1
 

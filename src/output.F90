@@ -298,7 +298,7 @@ contains
        iStart=[int(SIM_DT%iNumDaysFromOrigin, c_size_t)],                 &
        iCount=[1_c_size_t],                                                    &
        iStride=[1_c_size_t],                                                &
-       dpValues=[real(SIM_DT%iNumDaysFromOrigin, c_double)])
+       rValues=[real(SIM_DT%iNumDaysFromOrigin, c_float)])
 
   call netcdf_put_packed_variable_array(NCFILE=ncfile_ptr,                     &
         iVarID=ncfile_ptr%iVarID(NC_Z),                                        &
@@ -341,7 +341,7 @@ contains
              iStart=[int(SIM_DT%iNumDaysFromOrigin, c_size_t)], &
              iCount=[1_c_size_t], &
              iStride=[1_c_size_t], &
-             dpValues=[real(SIM_DT%iNumDaysFromOrigin, c_double)])
+             rValues=[real(SIM_DT%iNumDaysFromOrigin, c_float)])
 
         endif
 
@@ -564,7 +564,7 @@ contains
            iStart=[int(SIM_DT%iNumDaysFromOrigin, c_size_t)],                     &
            iCount=[1_c_size_t],                                                        &
            iStride=[1_c_size_t],                                                    &
-           dpValues=[real(SIM_DT%iNumDaysFromOrigin, c_double)])
+           rValues=[real(SIM_DT%iNumDaysFromOrigin, c_float)])
 
       endif
 

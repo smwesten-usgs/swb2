@@ -3499,7 +3499,7 @@ subroutine nf_set_standard_variables(NCFILE, sVarName_z, lLatLon, write_time_bou
     __FILE__, __LINE__)
 
   NCFILE%pNC_VAR(NC_TIME)%sVariableName = "time"
-  NCFILE%pNC_VAR(NC_TIME)%iNC_VarType = NC_DOUBLE
+  NCFILE%pNC_VAR(NC_TIME)%iNC_VarType = NC_FLOAT
   NCFILE%pNC_VAR(NC_TIME)%iNumberOfDimensions = 1
   NCFILE%pNC_VAR(NC_TIME)%iNC_DimID(0) = NCFILE%pNC_DIM(NC_TIME)%iNC_DimID
 
