@@ -102,11 +102,6 @@ program swbstats2
       write(UNIT=*,FMT="(a,/)") "Compiler build date:"//TRIM(asCharacter(__INTEL_COMPILER_BUILD_DATE))
 #endif
 
-#ifdef __G95__l
-    write(UNIT=*,FMT="(a,/)") "Compiled with: G95 minor version " &
-      //TRIM(int2char(__G95_MINOR__))
-#endif
-
     allocate(usage_string(50))
 
     usage_string = [                                                           &
