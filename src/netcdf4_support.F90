@@ -304,6 +304,7 @@ module netcdf4_support
   public :: netcdf_coord_to_col_row
   public :: netcdf_set_coordinate_tolerance
   public :: netcdf_get_variable_id_for_variable
+  public :: netcdf_rewrite_attribute
 
 contains
 
@@ -3350,6 +3351,17 @@ end subroutine nf_enddef
 
 !----------------------------------------------------------------------
 
+subroutine nf_redef(NCFILE)
+
+  type (T_NETCDF4_FILE ) :: NCFILE
+
+  call nf_trap(nc_redef(ncid=NCFILE%iNCID), &
+       __FILE__, __LINE__)
+
+end subroutine nf_redef
+
+!----------------------------------------------------------------------
+
 subroutine nf_define_dimension(NCFILE, sDimensionName, iDimensionSize)
 
   type (T_NETCDF4_FILE ) :: NCFILE
@@ -3369,6 +3381,25 @@ subroutine nf_define_dimension(NCFILE, sDimensionName, iDimensionSize)
                           __FILE__, __LINE__)
 
 end subroutine nf_define_dimension
+
+!----------------------------------------------------------------------
+
+subroutine nf_delete_attribute(NCFILE, sVariableName, sAttributeName)
+
+  type (T_NETCDF4_FILE ) :: NCFILE
+  character (len=*)      :: sVariableName
+  character (len=*)      :: sAttributeName
+
+  integer (c_int) :: iVarID
+
+  iVarID = nf_get_varid(NCFILE, sVariableName//c_null_char)
+
+  call nf_trap(nc_del_att(ncid=NCFILE%iNCID,                       &
+                          varid=iVarID,                            &
+                          name=trim(sAttributeName)//c_null_char), &
+                          __FILE__, __LINE__)
+
+end subroutine nf_delete_attribute
 
 !----------------------------------------------------------------------
 
@@ -4145,6 +4176,40 @@ subroutine nf_define_variables( NCFILE )
   enddo
 
 end subroutine nf_define_variables
+
+!----------------------------------------------------------------------
+
+subroutine netcdf_rewrite_attribute(NCFILE, sVariableName, sAttributeName,       &
+  sAttributeValue, iAttributeValue, rAttributeValue, dpAttributeValue)
+
+  type (T_NETCDF4_FILE ) :: NCFILE
+  character (len=*) :: sVariableName
+  character (len=*) :: sAttributeName
+  character (len=*), dimension(:), optional :: sAttributeValue
+  integer (c_int), dimension(:), optional :: iAttributeValue
+  real (c_float), dimension(:), optional :: rAttributeValue
+  real (c_double), dimension(:), optional :: dpAttributeValue
+
+  integer (c_int) :: iVarID
+
+  ! put netCDF file into define mode again before attempting to redefine the attribute
+  call nf_redef(NCFILE)
+
+  iVarID = nf_get_varid(NCFILE, trim(sVariableName))
+  
+  if (present(sAttributeValue))     &
+    call nf_put_attribute( NCFILE, iVarID, trim(sAttributeName)//c_null_char, sAttributeValue )
+  
+  if (present(iAttributeValue))     &
+    call nf_put_attribute( NCFILE, iVarID, trim(sAttributeName)//c_null_char, iAttributeValue=iAttributeValue )
+  
+  if (present(rAttributeValue))     &
+    call nf_put_attribute( NCFILE, iVarID, trim(sAttributeName)//c_null_char, rAttributeValue=rAttributeValue )
+  
+  if (present(dpAttributeValue))    &
+    call nf_put_attribute( NCFILE, iVarID, trim(sAttributeName)//c_null_char, dpAttributeValue=dpAttributeValue )
+
+end subroutine netcdf_rewrite_attribute
 
 !----------------------------------------------------------------------
 
