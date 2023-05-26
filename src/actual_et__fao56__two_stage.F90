@@ -375,8 +375,9 @@ impure elemental subroutine calculate_actual_et_fao56_two_stage(                
   soil_moisture_deficit = max( 0.0_c_double, real(soil_storage_max, c_double) - interim_soil_storage2)
   Ks = calculate_water_stress_coefficient_ks(taw, raw, soil_moisture_deficit)
 
-  crop_etc = reference_et0 * Kcb * Ks
+  crop_etc = min(reference_et0 * Kcb * Ks, interim_soil_storage2)
 
+  ! actual_et needs to respect limitations on the amount of remaining soil moisture present
   actual_et = crop_etc + bare_soil_evap
 
 end subroutine calculate_actual_et_fao56_two_stage
