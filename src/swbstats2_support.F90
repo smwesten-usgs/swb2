@@ -68,6 +68,8 @@ module swbstats2_support
     logical (c_bool)                      :: write_netcdf     = FALSE
     logical (c_bool)                      :: write_arcgrid    = FALSE
     logical (c_bool)                      :: output_active    = FALSE
+    real (c_float)                        :: valid_min        = 10000.   ! only used for netCDF output
+    real (c_float)                        :: valid_max        = -10000.
   end type FILE_COLLECTION_T
 
   type SWBSTATS_T
@@ -271,10 +273,10 @@ contains
     do month_num = 1,12
 
       ! extract month name from the datetime module MONTHS data structure
-      month_name = MONTHS(month_num)%sName
-      sum_index_num = ( month_num - 1 ) * 3 + 1
-      mean_index_num = ( month_num - 1 ) * 3 + 2
-      variance_index_num = ( month_num - 1 ) * 3 + 3
+      month_name = MONTHS(month_num)%sName             ! yields the following index numbers...
+      sum_index_num = ( month_num - 1 ) * 3 + 1        ! 1 4 7 10 13 16 19 22 25 28 31 34
+      mean_index_num = ( month_num - 1 ) * 3 + 2       ! 2 5 8 11 14 17 20 23 26 29 32 35
+      variance_index_num = ( month_num - 1 ) * 3 + 3   ! 3 6 9 12 15 18 21 24 27 30 33 36
 
       OUTPUT_FILES(sum_index_num)%grid_ptr => grid_Create (          &
       iNX=this%ncfile_in%iNX,                                        &
@@ -685,7 +687,7 @@ contains
       allocate(this%grd_zone2)
 
       call this%grd_zone2%set_target_PROJ4(this%target_proj4_string)
-      call this%grd_zone2%initialize(          &
+      call this%grd_zone2%initialize(         &
         sDescription="Zone Grid",             &
         sFileType="ARC_GRID",                 &
         sFilename=trim(grid_filename),        &
@@ -824,8 +826,10 @@ contains
            iStart=[ RECNUM ],                                                     &
            iCount=[1_c_size_t],                                                   &
            iStride=[1_c_size_t],                                                  &
-           rValues=[ real(( start_bnd + end_bnd ) / 2.0_c_float, c_float) ] )
-    !       dpValues=[ real( SIM_DT%iNumDaysFromOrigin, c_double) ] )
+!           rValues=[ real(( start_bnd + end_bnd ) / 2.0_c_float, c_float) ] )
+           rValues=[ real(start_bnd, c_float) ] )
+  
+           !       dpValues=[ real( SIM_DT%iNumDaysFromOrigin, c_double) ] )
 
        ! call netcdf_put_variable_vector(NCFILE=ncfile_out,                        &
        !    iVarID=TIME_BNDS_VARID,                                                 &
@@ -840,6 +844,12 @@ contains
            iCount=[ 1_c_size_t, ny, nx ],                                         &
            iStride=[1_c_size_t, 1_c_size_t, 1_c_size_t],                          &
            rValues=real(grid_ptr%dpData, c_float) )
+
+        OUTPUT_FILES(stat_indx)%valid_min =    &
+          update_minimum_value(OUTPUT_FILES(stat_indx)%valid_min, real(grid_ptr%dpData, c_float))
+
+        OUTPUT_FILES(stat_indx)%valid_max =    &
+          update_maximum_value(OUTPUT_FILES(stat_indx)%valid_max, real(grid_ptr%dpData, c_float))
 
       endif
 
@@ -1738,6 +1748,22 @@ contains
       if ( .not. OUTPUT_FILES(stat_indx)%output_active )  cycle
 
       if (OUTPUT_FILES(stat_indx)%write_netcdf) then
+        
+        call netcdf_rewrite_attribute( NCFILE=OUTPUT_FILES(stat_indx)%nc_ptr,                    &
+                                       sVariableName=trim(this%netcdf_variable_name_string),     &
+                                       sAttributeName='valid_min',                               &
+                                       rAttributeValue=[OUTPUT_FILES(stat_indx)%valid_min])
+
+        call netcdf_rewrite_attribute( NCFILE=OUTPUT_FILES(stat_indx)%nc_ptr,                    &
+                                       sVariableName=trim(this%netcdf_variable_name_string),     &
+                                       sAttributeName='valid_max',                               &
+                                       rAttributeValue=[OUTPUT_FILES(stat_indx)%valid_max])
+
+        call netcdf_rewrite_attribute( NCFILE=OUTPUT_FILES(stat_indx)%nc_ptr,                    &
+                                       sVariableName=trim(this%netcdf_variable_name_string),     &
+                                       sAttributeName='valid_range',                             &
+                                       rAttributeValue=[OUTPUT_FILES(stat_indx)%valid_min,       &
+                                                          OUTPUT_FILES(stat_indx)%valid_max])
 
         ncfile_out => OUTPUT_FILES(stat_indx)%nc_ptr
         call netcdf_close_file(NCFILE=ncfile_out)
@@ -1896,6 +1922,32 @@ contains
     call this%zone_grid_file_list%print()
 
   end subroutine print_all_options
+
+!------------------------------------------------------------------------------
+
+  pure function update_minimum_value(current_minimum, values)    result(new_minimum)
+
+    real (c_float), intent(in)             :: current_minimum
+    real (c_float), intent(in)             :: values(:,:)
+
+    real (c_float)                         :: new_minimum
+
+    new_minimum = min(current_minimum, minval(values))
+
+  end function update_minimum_value
+
+!------------------------------------------------------------------------------
+
+  pure function update_maximum_value(current_maximum, values)    result(new_maximum)
+
+    real (c_float), intent(in)             :: current_maximum
+    real (c_float), intent(in)             :: values(:,:)
+
+    real (c_float)                         :: new_maximum
+
+    new_maximum = max(current_maximum, maxval(values))
+
+  end function update_maximum_value
 
 end module swbstats2_support
 
