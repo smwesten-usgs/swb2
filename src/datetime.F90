@@ -17,7 +17,8 @@ module datetime
   implicit none
   private
 
-  public :: gregorian_date, julian_day, isLeap, day_of_year, mmdd2doy
+  public :: gregorian_date, julian_day, isLeap, day_of_year, mmdd2doy, &
+            count_leap_days_between_dates
 
   public :: assignment(=)
   interface assignment(=)
@@ -825,6 +826,47 @@ end function is_date_GT_or_equal_to
   endif
 
 end function is_date_equal_to
+
+!------------------------------------------------------------------------------
+
+function count_leap_days_between_dates(date_min, date_max)   result(iCount)
+
+  class(DATETIME_T), intent(in) :: date_min
+  class(DATETIME_T), intent(in) :: date_max
+
+  integer (c_int) :: iNumYears
+  integer (c_int) :: iCount
+
+  ! [ LOCALS ]
+  integer (c_int) :: year_value
+
+  iCount = 0
+
+  iNumYears = date_max%iYear - date_min%iYear
+
+  if (iNumYears > 0) then 
+
+    if ( date_min%isLeapYear() .and.                                                     &
+       (date_min%iMonth == 1 .or. ( date_min%iMonth == 2 .and. date_min%iDay <= 28)))    &
+         iCount = 1
+
+    if ( date_max%isLeapYear() .and.                                                     &
+       (date_min%iMonth > 2 .or. ( date_min%iMonth == 2 .and. date_min%iDay > 28)))      &
+         iCount = iCount + 1
+
+  endif
+
+  if (iNumYears >=3) then
+
+    do year_value=date_min%iYear+1, date_max%iYear-1
+
+      if (isLeap(year_value)) iCount = iCount + 1
+
+    enddo
+
+  endif
+
+end function count_leap_days_between_dates
 
 !------------------------------------------------------------------------------
 

@@ -157,6 +157,10 @@ module netcdf4_support
   integer (c_int), parameter :: COLUMN = 1
   integer (c_int), parameter :: ROW = 2
 
+  integer (c_int), parameter :: LEAP_YEAR = 0
+  integer (c_int), parameter :: NOLEAP_YEAR = 1
+  integer (c_int), parameter :: YEAR_IS_360_DAYS = 2 
+
   character (len=25), dimension(4), parameter :: NETCDF_FORMAT_STRING = &
     ["NC_FORMAT_CLASSIC        ", &
      "NC_FORMAT_64BIT          ", &
@@ -217,7 +221,7 @@ module netcdf4_support
     integer (c_int) :: iOriginHH
     integer (c_int) :: iOriginMM
     integer (c_int) :: iOriginSS
-    integer (c_int) :: lLeapYearTreatment
+    integer (c_int) :: lLeapYearTreatment = LEAP_YEAR
     integer (c_size_t), dimension(0:3) :: iStart
     integer (c_size_t), dimension(0:3) :: iCount
     integer (c_size_t), dimension(0:3) :: iStride = 1
