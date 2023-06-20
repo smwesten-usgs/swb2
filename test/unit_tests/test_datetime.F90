@@ -9,29 +9,29 @@ module test_datetime
 
 contains
 
-subroutine start_supressing_fatal_errors()
+  subroutine start_supressing_fatal_errors()
 
-  ! override exceptions module default behavior, which is to stop program execution entirely
-  HALT_UPON_FATAL_ERROR = FALSE
+    ! override exceptions module default behavior, which is to stop program execution entirely
+    HALT_UPON_FATAL_ERROR = FALSE
 
-  call LOGS%set_echo( TRUE )
-  call LOGS%write(repeat("-",80), iLinesBefore=2)
-  call LOGS%write(">>>>> FATAL ERROR WAS SUPPRESSED FOR UNIT TESTING. ERROR MESSAGE: >>>>>", iLinesAfter=2)
+    call LOGS%set_echo( TRUE )
+    call LOGS%write(repeat("-",80), iLinesBefore=2)
+    call LOGS%write(">>>>> FATAL ERROR WAS SUPPRESSED FOR UNIT TESTING. ERROR MESSAGE: >>>>>", iLinesAfter=2)
 
-end subroutine start_supressing_fatal_errors
+  end subroutine start_supressing_fatal_errors
 
 !-------------------------------------------------------------------------------
 
-subroutine stop_supressing_fatal_errors()
+  subroutine stop_supressing_fatal_errors()
 
-  ! reset global variable to normal mode of operation (normal == CRASH, HARD, when error is detected)
-  HALT_UPON_FATAL_ERROR = TRUE
+    ! reset global variable to normal mode of operation (normal == CRASH, HARD, when error is detected)
+    HALT_UPON_FATAL_ERROR = TRUE
 
-  call LOGS%write("<<<<< END OF FATAL ERROR SUPPRESSED FOR UNIT TESTING <<<<<", iLinesBefore=2)
-  call LOGS%write(repeat("-",80), iLinesAfter=2)
-  call LOGS%set_echo( FALSE )
+    call LOGS%write("<<<<< END OF FATAL ERROR SUPPRESSED FOR UNIT TESTING <<<<<", iLinesBefore=2)
+    call LOGS%write(repeat("-",80), iLinesAfter=2)
+    call LOGS%set_echo( FALSE )
 
-end subroutine stop_supressing_fatal_errors
+  end subroutine stop_supressing_fatal_errors
 
 !-------------------------------------------------------------------------------
 
@@ -155,5 +155,67 @@ end subroutine stop_supressing_fatal_errors
           call stop_supressing_fatal_errors()
           
         end subroutine test_datetime_julian_date_illegal_month_day
+
+ !-------------------------------------------------------------------------------
+
+      subroutine test_count_leap_days_between_dates
+
+        type (DATETIME_T) :: dt_min, dt_max
+        integer           :: num_leap_days
+
+        call dt_min%setDateFormat("YYYY-MM-DD")
+        call dt_min%parseDate("2000-01-01", sFilename=trim(__FILE__), iLineNumber=__LINE__)
+        call dt_max%setDateFormat("YYYY-MM-DD")
+        call dt_max%parseDate("2000-03-01", sFilename=trim(__FILE__), iLineNumber=__LINE__)
+
+        ! set dt_max to 2000-03-01; should be 1 leap day
+        num_leap_days = count_leap_days_between_dates(date_min=dt_min, date_max=dt_max) 
+        call assert_equals (1, num_leap_days)
+
+        call dt_max%setMonth(2)
+        call dt_max%setDay(28)
+
+        ! dt_min = 2000-01-01, dt_max = 2000-02-28; should be 0 leap days
+        num_leap_days = count_leap_days_between_dates(date_min=dt_min, date_max=dt_max) 
+        call assert_equals (0, num_leap_days)
+
+        call dt_max%setMonth(2)
+        call dt_max%setDay(28)
+        call dt_max%setYear(2004)
+
+        ! dt_min = 2000-01-01, dt_max = 2004-02-28; should be 1 leap days
+        num_leap_days = count_leap_days_between_dates(date_min=dt_min, date_max=dt_max) 
+        call assert_equals (1, num_leap_days)
+
+        call dt_max%setMonth(2)
+        call dt_max%setDay(29)
+        call dt_max%setYear(2004)
+
+        ! dt_min = 2000-01-01, dt_max = 2004-02-29; should be '2' leap days
+        num_leap_days = count_leap_days_between_dates(date_min=dt_min, date_max=dt_max) 
+        call assert_equals (2, num_leap_days)
+
+        ! set dt_min to 1950-01-01
+        call dt_min%setMonth(1)
+        call dt_min%setDay(1)
+        call dt_min%setYear(1950)
+
+        ! set dt_max to 2020-12-31; there should be 18 leap days identified between 1950 and 2020, inclusive
+        call dt_max%setMonth(12)
+        call dt_max%setDay(31)
+        call dt_max%setYear(2020)
+
+        num_leap_days = count_leap_days_between_dates(date_min=dt_min, date_max=dt_max) 
+        call assert_equals (18, num_leap_days)
+
+        ! set dt_min to 1900-01-01; should be 30 leap days identified between 1900 and 2020, inclusive
+        call dt_min%setMonth(1)
+        call dt_min%setDay(1)
+        call dt_min%setYear(1900)
+
+        num_leap_days = count_leap_days_between_dates(date_min=dt_min, date_max=dt_max) 
+        call assert_equals (30, num_leap_days)
+
+      end subroutine test_count_leap_days_between_dates
   
   end module test_datetime

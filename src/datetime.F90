@@ -858,7 +858,7 @@ function count_leap_days_between_dates(date_min, date_max)   result(iCount)
          iCount = 1
 
     if ( date_max%isLeapYear() .and.                                                     &
-       (date_min%iMonth > 2 .or. ( date_min%iMonth == 2 .and. date_min%iDay > 28)))      &
+       (date_max%iMonth > 2 .or. ( date_max%iMonth == 2 .and. date_max%iDay > 28)))      &
          iCount = iCount + 1
 
   endif

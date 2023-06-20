@@ -34,6 +34,7 @@ program tests
   call run_test_case(test_datetime_julian_date_illegal_month,"datetime: supply illegal month value to Julian Date routine")
   call run_test_case(test_datetime_julian_date_illegal_day,"datetime: supply illegal day value to Julian Date routine")
   call run_test_case(test_datetime_julian_date_illegal_month_day,"datetime: supply illegal month and day value to Julian Date routine")
+  call run_test_case(test_count_leap_days_between_dates,"test_count_leap_days_between_dates")
 
   ! test_exceptions__index_values_valid.F90:
   call run_test_case(test_check_array_bounds_1d,"test_check_array_bounds_1d")
