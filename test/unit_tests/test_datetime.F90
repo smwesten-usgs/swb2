@@ -91,7 +91,7 @@ contains
 
  !-------------------------------------------------------------------------------
 
-   subroutine test_datetime_addition
+   subroutine test_datetime_addition_day
    ! datetime: add 5 to Julian day and return the correct Gregorian date
      type (DATETIME_T)    :: dt
      integer              :: indx
@@ -106,7 +106,7 @@ contains
      call assert_equals (5, int(dt%iDay))
      call assert_equals (2000, int(dt%iYear))
 
-   end subroutine test_datetime_addition
+   end subroutine test_datetime_addition_day
 
  !-------------------------------------------------------------------------------
 
@@ -160,7 +160,7 @@ contains
 
       subroutine test_count_leap_days_between_dates
 
-        type (DATETIME_T) :: dt_min, dt_max
+        type (DATETIME_T) :: dt_min, dt_max, dt_new
         integer           :: num_leap_days
 
         call dt_min%setDateFormat("YYYY-MM-DD")
@@ -217,5 +217,24 @@ contains
         call assert_equals (30, num_leap_days)
 
       end subroutine test_count_leap_days_between_dates
+
+ !-------------------------------------------------------------------------------
+
+      subroutine test_datetime_basic_addition
+        ! datetime: add known quantity to datetime object
+        type (DATETIME_T) :: dt_min, dt_new
+
+        ! set dt_min to 1950-01-01
+        call dt_min%parseDate("1950-01-01", sFilename=trim(__FILE__), iLineNumber=__LINE__)
   
+        dt_new = dt_min + 11323.5
+        call dt_new%calcGregorianDate()
+
+        ! new date value should be 1981-01-01
+        call assert_equals(1, int(dt_new%iMonth))
+        call assert_equals(1, int(dt_new%iDay))
+        call assert_equals(1981, int(dt_new%iYear))
+    
+      end subroutine test_datetime_basic_addition
+
   end module test_datetime

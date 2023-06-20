@@ -22,6 +22,12 @@ contains
     call assert_equals( TRUE, logical(index_values_valid(integer_values, 25)) )
     call assert_equals( FALSE, logical(index_values_valid(integer_values, 616)) )
 
+    call assert_equals( TRUE, logical(index_values_valid(float_values, 23)) )
+    call assert_equals( FALSE, logical(index_values_valid(float_values, 24)) )
+
+    call assert_equals( TRUE, logical(index_values_valid(double_values, 42)) )
+    call assert_equals( FALSE, logical(index_values_valid(double_values, 43)) )
+
   end subroutine test_check_array_bounds_1d
 
 end module test_exceptions
