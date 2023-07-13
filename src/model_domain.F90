@@ -1079,6 +1079,9 @@ contains
     integer (c_int)              :: unitnum
     character (len=256)               :: filename
     character (len=:), allocatable    :: Method_Name
+    character (len=:), allocatable    :: modifier_text
+    character (len=:), allocatable    :: dump_file_prefix
+    character (len=:), allocatable    :: temp_str
     integer (c_int)              :: col, row
     integer (c_int)              :: indx_start, indx_end
     real (c_double)              :: xcoord, ycoord
@@ -1523,20 +1526,23 @@ contains
 
         row = 0; col = 0; indx_start = 0; indx_end = 0
         xcoord=99999.; ycoord=99999.
+        dump_file_prefix = ""
+        modifier_text = ""
+        temp_str = "__"
 
-        if ( ( Method_Name .containssimilar. "INDEX_RANGE") .and. ( argv_list%count == 3 ) ) then
+        if ( ( Method_Name .containssimilar. "INDEX_RANGE") .and. ( argv_list%count >= 3 ) ) then
 
           indx_start = asInt( argv_list%get(2) )
           indx_end   = asInt( argv_list%get(3) )
 
-        elseif ( ( Method_Name .containssimilar. "COORD") .and. ( argv_list%count == 3 ) ) then
+        elseif ( ( Method_Name .containssimilar. "COORD") .and. ( argv_list%count >= 3 ) ) then
 
           xcoord = asFloat( argv_list%get(2) )
           ycoord = asFloat( argv_list%get(3) )
           row = grid_GetGridRowNum( this%pGrdOut, ycoord )
           col = grid_GetGridColNum( this%pGrdOut, xcoord )
 
-        elseif ( argv_list%count == 2 ) then
+        elseif ( ( Method_Name .containssimilar. "ROW_COL") .and. ( argv_list%count >= 3 ) ) then
 
           col = asInt( argv_list%get(1) )
           row = asInt( argv_list%get(2) )
@@ -1546,9 +1552,21 @@ contains
         else
 
           call warn("Unknown option and/or arguments supplied to DUMP_VARIABLES method.",          &
-            sHints="The only known option keywords are 'COORD' and 'INDEX_RANGE'.",                &
+            sHints="The known option keywords are 'ROW_COL', 'COORD' and 'INDEX_RANGE'.",          &
             lFatal = TRUE, iLogLevel = LOG_ALL, lEcho = TRUE )
 
+        endif
+
+        if ( argv_list%count == 5) then
+          modifier_text = argv_list%get(4)
+          if (modifier_text .containssimilar. "ID") then
+            dump_file_prefix = argv_list%get(5)
+            temp_str = "__"//trim(dump_file_prefix)//"__"
+          else
+            call warn("Unknown option modifier supplied to DUMP_VARIABLES method.",                 &
+            sHints="The known option modifier is 'ID. You supplied "//trim(modifier_text),          &
+            lFatal = TRUE, iLogLevel = LOG_ALL, lEcho = TRUE )
+          endif
         endif
 
         row_col_num_are_valid = grid_RowColFallsInsideGrid( this%pGrdOut, row, col )
@@ -1585,7 +1603,8 @@ contains
             if ( row_col_num_are_valid ) then
               call LOGS%WRITE( "==> SWB will dump variables for cell ("//asCharacter(col)//","     &
                 //asCharacter(row)//").", iLogLevel = LOG_ALL, lEcho = FALSE )
-                filename = trim(OUTPUT_DIRECTORY_NAME)//"SWB2_variable_values__col_"               &
+                filename = trim(OUTPUT_DIRECTORY_NAME)//"SWB2_variable_values"                     &
+                           //trim(temp_str)//"col_"                                                &
                            //asCharacter( col )//"__row_"                                          &
                            //asCharacter( row )//"__x_"//asCharacter(asInt(xcoord))                &
                            //"__y_"//asCharacter(asInt(ycoord))//".csv"
@@ -1594,7 +1613,8 @@ contains
               call LOGS%WRITE( "==> SWB will dump variables for cell indices ranging from "              &
                 //asCharacter(indx_start)//" to "//asCharacter(indx_end)//").",                          &
                 iLogLevel = LOG_ALL, lEcho = FALSE )
-                filename = trim(OUTPUT_DIRECTORY_NAME)//"SWB2_variable_values__start_index_"             &
+                filename = trim(OUTPUT_DIRECTORY_NAME)//"SWB2_variable_values"                           &
+                           //trim(temp_str)//"start_index_"                                              &
                            //asCharacter( indx_start )//"__end_index_"//asCharacter( indx_end )//".csv"
             endif
 
