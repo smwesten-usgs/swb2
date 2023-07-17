@@ -1140,7 +1140,7 @@ contains
     elseif ( sCmdText .containssimilar. "ROOTING" ) then
 
       if ( ( Method_Name .strapprox. "DYNAMIC" ) .or. ( Method_Name .strapprox. "FAO_56" )   &
-          .or. ( Method_Name .strapprox. "FAO-56" ) )                                          then
+          .or. ( Method_Name .strapprox. "FAO-56" ) .or. ( Method_Name .strapprox. "FAO56" ) )   then
 
         this%update_rooting_depth => model_update_rooting_depth_FAO56
         call LOGS%WRITE( "==> DYNAMIC rooting depth submodel selected.", iLogLevel = LOG_ALL, lEcho = FALSE )
