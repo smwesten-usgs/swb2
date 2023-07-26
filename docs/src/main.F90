@@ -212,8 +212,12 @@ program main
 
   call slControlFiles%clear()
 
+  print *, trim(__FILE__), ': ', __LINE__
+
   call initialize_all( sOutputPrefixName, sOutputDirectoryName,                &
                        sDataDirectoryName, sWeatherDataDirectoryName )
+
+  print *, trim(__FILE__), ': ', __LINE__
 
   call runtimer%stop()
   call runtimer%calc_time_values("split")

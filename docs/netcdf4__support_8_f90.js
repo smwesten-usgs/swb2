@@ -1,5 +1,9 @@
 var netcdf4__support_8_f90 =
 [
+    [ "netcdf4_support::t_netcdf_dimension", "structnetcdf4__support_1_1t__netcdf__dimension.html", "structnetcdf4__support_1_1t__netcdf__dimension" ],
+    [ "netcdf4_support::t_netcdf_attribute", "structnetcdf4__support_1_1t__netcdf__attribute.html", "structnetcdf4__support_1_1t__netcdf__attribute" ],
+    [ "netcdf4_support::t_netcdf_variable", "structnetcdf4__support_1_1t__netcdf__variable.html", "structnetcdf4__support_1_1t__netcdf__variable" ],
+    [ "netcdf4_support::t_netcdf4_file", "structnetcdf4__support_1_1t__netcdf4__file.html", "structnetcdf4__support_1_1t__netcdf4__file" ],
     [ "netcdf_close_file", "netcdf4__support_8_f90.html#aa3df85f14e6fa58f3366e4985b2c1022", null ],
     [ "netcdf_coord_to_col_row", "netcdf4__support_8_f90.html#ac331d6bbaeb68da9d6aa7ecc59fa82fa", null ],
     [ "netcdf_date_within_range", "netcdf4__support_8_f90.html#a37b27e4271eedd222b4257ef826ab12e", null ],
@@ -10,7 +14,7 @@ var netcdf4__support_8_f90 =
     [ "netcdf_get_variable_list", "netcdf4__support_8_f90.html#ada0374dd577f6fef7d31b5875c5d0453", null ],
     [ "netcdf_get_variable_slice", "netcdf4__support_8_f90.html#a131b8842810e13c604c60f5dc6ed90b9", null ],
     [ "netcdf_nullify_data_struct", "netcdf4__support_8_f90.html#ac3c077adb4c2e0578d53be7d42489828", null ],
-    [ "netcdf_open_and_prepare_as_input", "netcdf4__support_8_f90.html#abca475da46ccdc6a713b0cf8a992a904", null ],
+    [ "netcdf_open_and_prepare_as_input", "netcdf4__support_8_f90.html#a20b4a6996b770b75bc314b4186b553df", null ],
     [ "netcdf_open_and_prepare_as_output", "netcdf4__support_8_f90.html#a28919bec43fd22f803cdc4d8a82dccc8", null ],
     [ "netcdf_open_and_prepare_as_output_archive", "netcdf4__support_8_f90.html#a6c0e12debd35545980fa63ade1094e93", null ],
     [ "netcdf_open_and_prepare_for_merging", "netcdf4__support_8_f90.html#a21e0c4ad57e47f5c5a91ace65b8092c9", null ],
@@ -18,6 +22,7 @@ var netcdf4__support_8_f90 =
     [ "netcdf_put_packed_variable_array", "netcdf4__support_8_f90.html#aefc710195262d3f517b4224bb99b6728", null ],
     [ "netcdf_put_variable_array", "netcdf4__support_8_f90.html#a333198b161c1377afd5dcf5fd4e66713", null ],
     [ "netcdf_put_variable_vector", "netcdf4__support_8_f90.html#a0c16d0db4e8e316fe30746454db8d269", null ],
+    [ "netcdf_set_coordinate_tolerance", "netcdf4__support_8_f90.html#ad2be37f6fe806fd3226556f551912033", null ],
     [ "netcdf_update_time_starting_index", "netcdf4__support_8_f90.html#aa63a93673a416472c0d7ee716c178e37", null ],
     [ "nf_calculate_time_range", "netcdf4__support_8_f90.html#ad118f90a290289cde5043fc1ec23bca1", null ],
     [ "nf_create", "netcdf4__support_8_f90.html#ad6629f4108c3dcd35a20b03a0ef68ba5", null ],

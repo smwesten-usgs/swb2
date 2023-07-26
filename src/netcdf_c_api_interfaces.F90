@@ -125,6 +125,19 @@ module netcdf_c_api_interfaces
 
 
   interface
+    function nc_redef(ncid) bind(c)
+
+      import :: c_int
+
+      integer (c_int), value :: ncid
+
+      integer (c_int)        :: nc_redef
+
+    end function nc_redef
+  end interface
+
+
+  interface
     function nc_get_var_short(ncid, varid, sp) bind(c)
 
       import :: c_int, c_short
@@ -632,6 +645,21 @@ module netcdf_c_api_interfaces
       integer (c_int)                :: nc_put_att_text
 
     end function nc_put_att_text
+  end interface
+
+  !----------------------------------------------------------------------
+
+  interface
+    function nc_del_att(ncid, varid, name) bind(c)
+
+      import :: c_int, c_char
+
+      integer (c_int),    value      :: ncid, varid
+      character (c_char), intent(in) :: name(*)
+
+      integer (c_int)                :: nc_del_att
+
+    end function nc_del_att
   end interface
 
 !----------------------------------------------------------------------

@@ -1,0 +1,16 @@
+	lu_code	description	lu_group	note	cn_1	cn_2	cn_3	cn_4	cn_5	cn_6	cn_7	cn_8	cn_9	max_net_infil_1	max_net_infil_2	max_net_infil_3	max_net_infil_4	max_net_infil_5	max_net_infil_6	max_net_infil_7	max_net_infil_8	max_net_infil_9	growing_season_interception_a	growing_season_interception_b	growing_season_interception_n	nongrowing_season_interception_a	nongrowing_season_interception_b	nongrowing_season_interception_n	rz_1	rz_2	rz_3	rz_4	rz_5	rz_6	rz_7	rz_8	rz_9
+64	11	Open Water	openwat	0	99	99	99	99	99	99	99	99	99	0	0	0	0	0	0	0	0	0	0	0	1	0	0	1	0	0	0	0	0	0	0	0	0
+65	21	"Developed, Open Space"	devopen	"open space, fair"	58	73.9	82.7	86.2	58	73.9	82.7	81.75	73.9	4	2	0.24	0.12	4	1	0.12	0.25	3	0.015	0.08	1	0.0001	0.027	1	2.50	2.50	2.50	2.50	2.50	2.50	2.50	1.11	2.50
+66	22	"Developed, Low Intensity"	devlow	"developed, residential, 1/8 acre or less"	67	79.5	86.4	89.2	67	79.5	86.4	93.11	79.5	4	2	0.24	0.12	4	1	0.12	0.35	1	0.01	0.1	1	0.0001	0.033	1	1.50	1.50	1.50	1.50	1.50	1.50	1.50	1.11	2.50
+67	23	"Developed, Medium Intensity"	devmed	"developed, industrial"	89	93.2	95.5	96.4	89	93.2	95.5	93.86	93.86	4	2	0.24	0.12	4	1	0.12	0.45	1	0.01	0.08	1	0.0001	0.027	1	1.50	1.50	1.50	1.50	1.50	1.50	1.50	1.11	2.50
+68	24	"Developed, High Intensity"	devhi	"developed, commercial"	89	93.2	95.5	96.4	89	93.2	95.5	93.86	93.86	4	2	0.24	0.12	4	1	0.12	0.48	1	0.01	0.08	1	0.0001	0.027	1	1.50	1.50	1.50	1.50	1.50	1.50	1.50	1.11	2.50
+69	31	Barren Land	barren	0	77	85.7	90.5	92.5	77	85.7	90.5	93.9	85.7	4	2	0.24	0.12	4	1	0.12	0.25	3	0	0	1	0	0	1	1.50	1.50	1.50	1.50	1.50	1.50	1.50	0.75	2.50
+70	41	Deciduous Forest	decfrst	"woods, poor; CNs for forested LU tend to be too low"	45	65.8	77.4	82	45	65.8	77.4	77.4	65.8	4	2	0.24	0.12	4	1	0.12	1.2	3	0.02	0.18	0.5	0.0001	0.06	0.5	4.10	3.71	3.25	3.02	4.10	3.71	3.25	4.25	3.25
+71	42	Evergreen Forest	evfrst	"woods, poor; CNs for forested LU tend to be too low"	36	60.2	73.7	79	36	60.2	73.7	73.7	60.2	4	2	0.24	0.12	4	1	0.12	1.2	3	0.025	0.2	0.5	0.0065	0.2	0.5	2.14	1.63	1.10	0.83	2.14	1.63	1.10	4.25	1.10
+72	43	Mixed Forest	mixfrst	"woods, poor; CNs for forested LU tend to be too low"	40	62.7	75.3	80.3	40	62.7	75.3	75.3	62.7	4	2	0.24	0.12	4	1	0.12	1.2	3	0.0225	0.19	0.5	0.0001	0.095	0.5	2.43	1.98	1.49	1.24	2.43	1.98	1.49	4.25	1.49
+74	52	Shrub/Scrub	shrub	"brush, poor"	48	67.7	78.6	82.9	48	67.7	78.6	78.6	67.7	4	2	0.24	0.12	4	1	0.12	1.2	3	0.005	0.16	1	0.0001	0.0265	1	2.50	2.50	2.50	1.67	2.50	2.50	2.50	2.50	2.50
+75	71	Herbaceuous	grsherb	"grassland, poor"	49	68.3	79	83.3	49	68.3	79	79	68.3	4	2	0.24	0.12	4	1	0.12	1.2	3	0.015	0.15	1	0.0001	0.05	1	2.50	2.50	3.13	2.50	2.50	2.50	3.13	2.50	3.13
+77	81	Hay/Pasture	hay	0	30	56.5	71.2	77	30	56.5	71.2	86.22	56.5	4	2	0.24	0.12	4	1	0.12	1.2	3	0.015	0.15	1	0.0001	0.05	1	2.50	2.50	3.13	2.50	2.50	2.50	3.13	2.50	3.13
+78	82	Cultivated Crops	gencrop	0	48	67.7	78.6	82.9	48	67.7	78.6	78.6	67.7	4	2	0.24	0.12	4	1	0.12	0.49	3	0.03	0.1	1	0.0001	0.033	1	2.00	2.00	2.00	3.00	2.00	2.00	2.00	2.00	2.00
+79	90	Woody Wetlands	wdwetl	0	30	56.5	71.2	77	30	56.5	71.2	82.9	56.5	4	2	0.24	0.12	4	1	0.12	0.5	1	0.02	0.18	1	0.0001	0.06	1	3.38	3.38	3.38	3.38	3.38	3.38	3.38	3.38	3.38
+80	95	Emergent Herbaceuous Wetlands	hbwetl	0	30	56.5	71.2	77	30	56.5	71.2	84.84	56.5	4	2	0.24	0.12	4	1	0.12	0.96	1	0.0075	0.15	1	0.0001	0.05	1	3.38	3.38	3.38	3.38	3.38	3.38	3.38	3.38	3.38

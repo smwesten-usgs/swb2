@@ -65,7 +65,7 @@ contains
     !> process first day of growing season. retrieved as a list of strings;
     !! must convert the strings from mm/dd to DOY
     allocate( FIRST_DAY_OF_GROWING_SEASON( iNumberOfLanduses ), stat=status )
-    call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
+    call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
 
     if ( sl_growing_season_begin%count == iNumberOfLanduses                &
          .and. sl_growing_season_begin%count_matching("<NA>") == 0 ) then
@@ -100,7 +100,7 @@ contains
     !> process last day of growing season. retrieved as a list of strings;
     !! must convert the strings from mm/dd to DOY
     allocate( LAST_DAY_OF_GROWING_SEASON( iNumberOfLanduses ), stat=status )
-    call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__ )
+    call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
 
     if ( sl_growing_season_end%count == iNumberOfLanduses                  &
          .and. sl_growing_season_end%count_matching("<NA>") == 0 ) then
@@ -140,10 +140,10 @@ contains
 
       call warn( sMessage="The number of landuses does not match the number of GDD values "  &
                         //"specified for defining the beginning of the growing season.",     &
-                 sModule=__SRCNAME__, iLine=__LINE__, lFatal=FALSE )
+                 sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
 
       allocate( GDD_FIRST_DAY_OF_GROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
-      call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__)
+      call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__)
 
       GDD_FIRST_DAY_OF_GROWING_SEASON = NODATA_VALUE
 
@@ -169,10 +169,10 @@ contains
 
       call warn( sMessage="The number of landuses does not match the number of killing frost values "  &
                         //"specified to define the end of the growing season.",                        &
-                 sModule=__SRCNAME__, iLine=__LINE__, lFatal=FALSE )
+                 sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
 
       allocate( KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON( ubound( iLanduseCodes, 1) ), stat=status )
-      call assert( status==0, "Problem allocating memory.", __SRCNAME__, __LINE__)
+      call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__)
 
       KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON = NODATA_VALUE
 
@@ -192,12 +192,12 @@ contains
     if ( count_gdd_start /= count_killing_frost_end )                                     &
       call warn( sMessage="Unequal numbers of values given for defining the "             &
         //"start (GDD_first_day_of_growing_season) and end (Killing_frost_temperature) "  &
-        //"of the growing season.", sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
+        //"of the growing season.", sModule=__FILE__, iLine=__LINE__, lFatal=TRUE )
 
     if ( count_grow_start /= count_grow_end )                                             &
       call warn( sMessage="Unequal numbers of values given for defining the "             &
         //"start (Growing_season_start) and end (Growing_season_end) of the "             &
-        //"growing season.", sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
+        //"growing season.", sModule=__FILE__, iLine=__LINE__, lFatal=TRUE )
 
     if ( ( (count_gdd_start + count_grow_start) /= ubound( iLanduseCodes, 1) )  &
       .and. ( (count_gdd_start + count_grow_start) > 0 ) )                      &
@@ -205,7 +205,7 @@ contains
         //"(GDD_first_day_of_growing_season and Growing_season_start) are "     &
         //"provided for one or more land uses. Only one of these values "       &
         //"should be non-zero for each entry the lookup table.",                &
-        sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
+        sModule=__FILE__, iLine=__LINE__, lFatal=TRUE )
 
     if ( ( (count_killing_frost_end + count_grow_end) /= ubound( iLanduseCodes, 1) )  &
          .and. ( (count_killing_frost_end + count_grow_end) > 0) )                    &
@@ -213,7 +213,7 @@ contains
         //"(Killing_frost_temperature and Growing_season_end) are "                   &
         //"provided for one or more land uses. Only one of these values "             &
         //"should be non-zero for each entry the lookup table.",                      &
-        sModule=__SRCNAME__, iLine=__LINE__, lFatal=TRUE )
+        sModule=__FILE__, iLine=__LINE__, lFatal=TRUE )
 
   end subroutine growing_season_initialize
 

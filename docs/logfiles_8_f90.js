@@ -1,13 +1,6 @@
 var logfiles_8_f90 =
 [
-    [ "dt_year", "logfiles_8_f90.html#a90abba705dbec85c16ab437e45b515c8abef29ab56e503fe785cb8b1abc90ce9c", null ],
-    [ "dt_month", "logfiles_8_f90.html#a90abba705dbec85c16ab437e45b515c8a135577cf3ef13f68cae6fb18e184e46a", null ],
-    [ "dt_day", "logfiles_8_f90.html#a90abba705dbec85c16ab437e45b515c8aad24ed296d46b8e0fd14a26951a1ea29", null ],
-    [ "dt_diff_fm_utc", "logfiles_8_f90.html#a90abba705dbec85c16ab437e45b515c8a173008016aeaedca55262c590f0a49d5", null ],
-    [ "dt_hour", "logfiles_8_f90.html#a90abba705dbec85c16ab437e45b515c8a1c82d0917fda976b8302cd4969b69075", null ],
-    [ "dt_minutes", "logfiles_8_f90.html#a90abba705dbec85c16ab437e45b515c8a14ee0179b849e844b7929914e1091d0a", null ],
-    [ "dt_seconds", "logfiles_8_f90.html#a90abba705dbec85c16ab437e45b515c8a592bb09e31d36863a5a0896d1a084b25", null ],
-    [ "dt_milliseconds", "logfiles_8_f90.html#a90abba705dbec85c16ab437e45b515c8abfb4bd6134f4f40e3192904ef12f72ef", null ],
+    [ "logfiles::logfile_t", "structlogfiles_1_1logfile__t.html", "structlogfiles_1_1logfile__t" ],
     [ "close_files_sub", "logfiles_8_f90.html#abe6605d6ea72c0bfb7a6d711de3e64f3", null ],
     [ "dquote", "logfiles_8_f90.html#a59aca224ba0dcd08c90029d4f0900143", null ],
     [ "initialize_logfiles_sub", "logfiles_8_f90.html#a0f09e1a9806e7bd9e1415d430229e0d9", null ],
@@ -22,10 +15,6 @@ var logfiles_8_f90 =
     [ "writemultiline", "logfiles_8_f90.html#ae807d3b84516a40194bbe44ae47ef553", null ],
     [ "current_log_echo", "logfiles_8_f90.html#ac138ec3f356b54c8c1a8a3ab08884d9a", null ],
     [ "current_log_level", "logfiles_8_f90.html#adbb7ca21f1b186e2a46acd8379161175", null ],
-    [ "log_all", "logfiles_8_f90.html#ac010b02c31c14253e9477a3e70b8c238", null ],
-    [ "log_debug", "logfiles_8_f90.html#a063359d042882225dd0ad5cbd83ff5ef", null ],
-    [ "log_general", "logfiles_8_f90.html#a67db9445ec88420af7c60e961f4c5328", null ],
-    [ "log_none", "logfiles_8_f90.html#a090b15344fadad0e637fcd219949182f", null ],
     [ "logfile_directory_name", "logfiles_8_f90.html#ae5ffdfae6a5751eb665663e9c2b3a068", null ],
     [ "logs", "logfiles_8_f90.html#a46c55f3ef7fe12c70f244e95b1a4dbae", null ],
     [ "true", "logfiles_8_f90.html#aeefcdcefc31552ef9edc2661e09e4312", null ]

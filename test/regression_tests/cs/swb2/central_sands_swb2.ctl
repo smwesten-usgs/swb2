@@ -56,8 +56,8 @@ TMIN_MISSING_VALUES_OPERATOR      <=
 TMIN_MISSING_VALUES_ACTION       mean
 
 INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX CONSTANT 100.0
-UPPER_LIMIT_CFGI 83.
-LOWER_LIMIT_CFGI 55.
+CFGI_UPPER_LIMIT CONSTANT 100.
+CFGI_LOWER_LIMIT CONSTANT 40.
 
 %% specify location and projection for input GIS grids
 ------------------------------------------------------
@@ -83,6 +83,7 @@ IRRIGATION_MASK_PROJECTION_DEFINITION +proj=tmerc +lat_0=0.0 +lon_0=-90.0 +k=0.9
 
 LAND_USE_LOOKUP_TABLE Landuse_lookup_CDL.txt
 IRRIGATION_LOOKUP_TABLE Irrigation_lookup_CDL.txt
+HARGREAVES_ET_LOOKUP_TABLE Hargreaves_ET_parameters.txt
 
 %% initial conditions for soil moisture and snow storage amounts
 %% may be specified as grids, but using a constant amount and

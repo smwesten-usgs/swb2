@@ -1,0 +1,7 @@
+# optimization_level 1: DEBUG; optimization_level 2: RELEASE
+option('optimization_level', type : 'integer', min : 1, max : 2, value : 1)
+
+option('swb_major_version', type : 'string', value : '"2"', description : 'project major version number')
+option('swb_minor_version', type : 'string', value : '"3"', description : 'project minor version number')
+option('swb_patch_version', type : 'string', value : '"2"', description : 'project patch version number')
+option('swb_version', type : 'string', value : 'v2.3.2-rc0', description : 'project version')

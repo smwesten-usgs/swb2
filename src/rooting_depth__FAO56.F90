@@ -7,7 +7,7 @@
 module rooting_depth__FAO56
 
   use iso_c_binding, only              : c_short, c_int, c_float, c_double
-  use fstring_list, only                : FSTRING_LIST_T
+  use fstring_list, only               : FSTRING_LIST_T
   use parameters, only                 : PARAMS
   use crop_coefficients__FAO56, only   : KCB_l, KCB_MIN, KCB_INI, KCB_MID, KCB_END,               &
                                          KCB_METHOD, KCB_METHOD_GDD, KCB_METHOD_MONTHLY_VALUES,  &
@@ -54,7 +54,10 @@ elemental subroutine update_rooting_depth( Zr_i, Zr_max, landuse_index, Kcb )
   ! if there is not much difference between the MAX Kcb and MIN Kcb, assume that
   ! we are dealing with an area such as a forest, where we assume that the rooting
   ! depths are constant year-round
-   if ( ( MaxKCB - MinKCB ) < 0.1_c_float ) then
+ 
+  ! if ( ( MaxKCB - MinKCB ) < 0.1_c_float ) then
+
+  if ( MinKCB > 0.49_c_float ) then
 
      Zr_i = Zr_max
 

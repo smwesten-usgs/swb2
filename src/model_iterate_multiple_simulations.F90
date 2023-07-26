@@ -158,7 +158,7 @@ contains
         ! modifying module variable from precipitation__method_of_fragments
         SIMULATION_NUMBER = sim_number
 
-        call cells%get_climate_data( )
+        call cells%get_weather_data( )
 
         if (sim_number==1) then
           call LOGS%write("Calculating: "//SIM_DT%curr%prettydate(),  &

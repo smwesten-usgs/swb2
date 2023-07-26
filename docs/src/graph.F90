@@ -89,7 +89,7 @@ module graph
       case(DATATYPE_CELL_GRID)
 
         call Assert(FALSE,"Unsupported grid type (T_GRID_CELL) was used in call", &
-          __SRCNAME__, __LINE__)
+          __FILE__, __LINE__)
 
     end select
 
@@ -514,7 +514,7 @@ module graph
       case(DATATYPE_CELL_GRID)
 
         call Assert(FALSE,"Unsupported grid type (T_GRID_CELL) was used in call", &
-          __SRCNAME__, __LINE__)
+          __FILE__, __LINE__)
 
       end select
 

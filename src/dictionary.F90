@@ -315,7 +315,7 @@ contains
 
     if ( slString%get(1) == '<NA>' )            &
       call warn(sMessage="Failed to find a dictionary entry associated with a key value of " &
-        //dquote(sKey)//".", sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE )
+        //dquote(sKey)//".", sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE )
 
   end function grep_dictionary_key_names_fn
 
@@ -449,7 +449,7 @@ end function find_dict_entry_fn
     else
 
       call warn( sMessage="Internal programming error: dictionary entry is null",   &
-          sModule=__SRCNAME__, iLine=__LINE__ )
+          sModule=__FILE__, iLine=__LINE__ )
 
     endif
 
@@ -532,10 +532,10 @@ end function find_dict_entry_fn
 
       allocate(iValues(1), stat=iStat)
       call assert(iStat == 0, "Failed to allocate memory to iValues array", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
       iValues = iTINYVAL
 
@@ -581,10 +581,10 @@ end function find_dict_entry_fn
 
       allocate(lValues(1), stat=iStat)
       call assert(iStat == 0, "Failed to allocate memory to lValues array", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
       lValues = FALSE
 
@@ -653,10 +653,10 @@ end function find_dict_entry_fn
 
       allocate(lValues(1), stat=iStat)
       call assert(iStat == 0, "Failed to allocate memory to lValues array", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%list_all()), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
       lValues = FALSE
 
@@ -716,7 +716,7 @@ end function find_dict_entry_fn
 
       call slString%append("<NA>")
       call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%list_all()), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
     endif
 
@@ -798,7 +798,7 @@ end function find_dict_entry_fn
 
       call slString%append("<NA>")
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
     endif
 
@@ -868,10 +868,10 @@ end function find_dict_entry_fn
 
       allocate(iValues(1), stat=iStat)
       call assert(iStat == 0, "Failed to allocate memory to iValues array", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%list_all()), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
       iValues = iTINYVAL
 
@@ -941,10 +941,10 @@ end function find_dict_entry_fn
 
       allocate(fValues(1), stat=iStat)
       call assert(iStat == 0, "Failed to allocate memory to fValues array", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value(s) of: "//dquote(slKeys%list_all()), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG, lEcho=FALSE)
 
 
       fValues = fTINYVAL
@@ -992,10 +992,10 @@ end function find_dict_entry_fn
 
       allocate(fValues(1), stat=iStat)
       call assert(iStat == 0, "Failed to allocate memory to iValues array", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
       call warn(sMessage="Failed to find a dictionary entry associated with key value of "//dquote(sKey), &
-        sModule=__SRCNAME__, iLine=__LINE__, iLogLevel=LOG_DEBUG , lEcho=FALSE)
+        sModule=__FILE__, iLine=__LINE__, iLogLevel=LOG_DEBUG , lEcho=FALSE)
 
       fValues = fTINYVAL
 

@@ -179,20 +179,12 @@ contains
         ! the following call updates bound variable actual_et_soil
         call cells%calc_actual_et( indx )
 
-        ! if ( runoff < 0.)                                                                               &
-        !   call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
-        !                    //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
-        !                    //", "//asCharacter( cells%row_num_1D( indx ) ) )
+        ! reduce soil actual et by the amount of interception et, if any
+        !actual_et_soil = max( actual_et_soil - actual_et_interception, 0.0_c_float )
 
-    !     ! actual et for the entire cell is the weighted average of the ET for pervious and impervious
-    !     ! fractions of the cell
-    !     actual_et = actual_et_soil * pervious_fraction                            &
-    ! !                      + cells%actual_et_interception * cells%canopy_cover_fraction             &
-    !                       + actual_et_impervious * ( 1.0_c_float - pervious_fraction )
+        ! OK, supplying a reduced value of reference ET0 to FAO56_two_stage calc
 
-        ! we cannot allow more actual ET to occur in excess of reference ET
-        ! after accounting for evaporation of interception
-        actual_et_soil = max( min( actual_et_soil, reference_ET0 - actual_et_interception), 0.0_c_float )
+        !actual_et_soil = max( min( actual_et_soil, reference_ET0 - actual_et_interception), 0.0_c_float )
 
         call calculate_soil_mass_balance( net_infiltration=net_infiltration,             &
                                           soil_storage=soil_storage,                     &
@@ -219,16 +211,7 @@ contains
         ! reporting of net_infiltration and irrigation must be adjusted to account for zero
         ! irrigation and net_infiltration associated with the impervious areas
 
-        ! modify net_infiltration and irrigation terms
-
         net_infiltration = net_infiltration * pervious_fraction + direct_net_infiltration
-!        net_infiltration = net_infiltration + direct_net_infiltration
-
-        ! if ( runoff < 0.)                                                                               &
-        !   call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
-        !                    //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
-        !                    //", "//asCharacter( cells%row_num_1D( indx ) ) )
-
         irrigation = irrigation * pervious_fraction
 
         call cells%calc_maximum_net_infiltration( indx )
@@ -238,11 +221,6 @@ contains
 
         ! rejected net_infiltration + runoff will be routed downslope if routing option is turned on
         call cells%calc_routing( index=indx )
-
-        ! if ( runoff < 0.)                                                                               &
-        !   call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
-        !                    //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
-        !                    //", "//asCharacter( cells%row_num_1D( indx ) ) )
 
       end associate
 

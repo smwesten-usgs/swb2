@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['zenith_5fangle_5f_5ftheta_5fz_2250',['zenith_angle__theta_z',['../namespacesolar__calculations.html#a7a9f079e302f238b2ce0df4dad85a6ef',1,'solar_calculations']]]
+  ['variance_0',['variance',['../structrunning__grid__stats_1_1running__stats__t.html#a25d28f6b4b859662fa0ef0956fad64a4',1,'running_grid_stats::running_stats_t']]]
 ];

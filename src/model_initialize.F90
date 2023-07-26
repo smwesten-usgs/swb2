@@ -35,8 +35,8 @@ module model_initialize
   type GRIDDED_DATASETS_T
     character (len=38)             :: sName
     character (len=256)            :: sPathname
-    logical (c_bool)          :: lOptional
-    integer (c_int)           :: iDataType
+    logical (c_bool)               :: lOptional
+    integer (c_int)                :: iDataType
   end type GRIDDED_DATASETS_T
 
   type METHODS_LIST_T
@@ -44,14 +44,14 @@ module model_initialize
     logical (c_bool)  :: lOptional
   end type METHODS_LIST_T
 
-  integer (c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 44
+  integer (c_int), parameter :: NUMBER_OF_KNOWN_GRIDS   = 46
   integer (c_int), parameter :: NUMBER_OF_KNOWN_METHODS = 18
 
   type (GRIDDED_DATASETS_T)    :: KNOWN_GRIDS( NUMBER_OF_KNOWN_GRIDS ) =                             &
 
-    [ GRIDDED_DATASETS_T("PRECIPITATION                         ", "", FALSE, DATATYPE_FLOAT ),     &
-      GRIDDED_DATASETS_T("TMIN                                  ", "", FALSE, DATATYPE_FLOAT ),     &
-      GRIDDED_DATASETS_T("TMAX                                  ", "", FALSE, DATATYPE_FLOAT ),     &
+    [ GRIDDED_DATASETS_T("PRECIPITATION                         ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("TMIN                                  ", "", TRUE, DATATYPE_FLOAT ),      &
+      GRIDDED_DATASETS_T("TMAX                                  ", "", TRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("AVAILABLE_WATER_CONTENT               ", "", TRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("REFERENCE_ET0                         ", "", TRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("POTENTIAL_ET                          ", "", TRUE, DATATYPE_FLOAT ),      &
@@ -69,6 +69,8 @@ module model_initialize
       GRIDDED_DATASETS_T("INITIAL_PERCENT_SOIL_MOISTURE         ", "", FALSE, DATATYPE_FLOAT),      &
       GRIDDED_DATASETS_T("INITIAL_SNOW_COVER_STORAGE            ", "", TRUE, DATATYPE_FLOAT),       &
       GRIDDED_DATASETS_T("INITIAL_CONTINUOUS_FROZEN_GROUND_INDEX", "", TRUE, DATATYPE_FLOAT),       &
+      GRIDDED_DATASETS_T("CFGI_LOWER_LIMIT                      ", "" ,TRUE, DATATYPE_FLOAT),       &
+      GRIDDED_DATASETS_T("CFGI_UPPER_LIMIT                      ", "" ,TRUE, DATATYPE_FLOAT),       &
       GRIDDED_DATASETS_T("PERCENT_CANOPY_COVER                  ", "", TRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("PERCENT_PERVIOUS_COVER                ", "", TRUE, DATATYPE_FLOAT ),      &
       GRIDDED_DATASETS_T("PERCENT_IMPERVIOUS_COVER              ", "", TRUE, DATATYPE_FLOAT ),      &
@@ -129,7 +131,8 @@ contains
                                      lookup_table_dirname, weather_data_dirname
 
     ! [ LOCALS ]
-    integer (c_int) :: iIndex
+    integer (c_int)  :: iIndex
+    logical (c_bool) :: using_tabular_precip_and_temperature
 
     call MODEL%set_default_method_pointers()
 
@@ -479,7 +482,7 @@ contains
       if (associated( pPERCENT_IMPERVIOUS%pGrdBase) ) then
         MODEL%pervious_fraction = pack( 1.0_c_float - pPERCENT_IMPERVIOUS%pGrdBase%rData/100.0_c_float, MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif
 
     elseif ( associated( pPERCENT_PERVIOUS ) ) then
@@ -489,7 +492,7 @@ contains
       if (associated( pPERCENT_PERVIOUS%pGrdBase) ) then
         MODEL%pervious_fraction = pack( (pPERCENT_PERVIOUS%pGrdBase%rData/100.0_c_float), MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif
 
     elseif ( associated(pFRACTION_IMPERVIOUS) ) then
@@ -499,7 +502,7 @@ contains
       if (associated( pFRACTION_IMPERVIOUS%pGrdBase) ) then
         MODEL%pervious_fraction = pack( 1.0_c_float - pFRACTION_IMPERVIOUS%pGrdBase%rData, MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif
 
     elseif ( associated( pFRACTION_PERVIOUS ) ) then
@@ -509,7 +512,7 @@ contains
       if (associated( pFRACTION_PERVIOUS%pGrdBase) ) then
         MODEL%pervious_fraction = pack( pFRACTION_PERVIOUS%pGrdBase%rData, MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif
 
     else
@@ -562,7 +565,7 @@ contains
       if (associated( pPERCENT_CANOPY_COVER%pGrdBase) ) then
         MODEL%canopy_cover_fraction = pack( pPERCENT_CANOPY_COVER%pGrdBase%rData/100.0_c_float, MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif
 
     elseif ( associated(pFRACTION_CANOPY_COVER) ) then
@@ -572,7 +575,7 @@ contains
       if (associated( pFRACTION_CANOPY_COVER%pGrdBase) ) then
         MODEL%canopy_cover_fraction = pack( pFRACTION_CANOPY_COVER%pGrdBase%rData, MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif
 
     else
@@ -623,13 +626,13 @@ contains
       if (associated( pHSG%pGrdBase) ) then
         MODEL%soil_group = pack( pHSG%pGrdBase%iData, MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif
 
     else
 
       call die("Attempted use of NULL pointer. Failed to find HYDROLOGIC_SOILS_GROUP data element.", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
     endif
 
@@ -741,7 +744,7 @@ contains
 !     call minmaxmean( rooting_depth_inches, "Rooting_depth_inches")
 
 !     call assert( .not. any_problems, "One or more steps failed while processing POLYGON_ID.", &
-!       __SRCNAME__, __LINE__ )
+!       __FILE__, __LINE__ )
 
 ! !$OMP PARALLEL DO
 
@@ -837,7 +840,7 @@ contains
       call CF_DICT%get_value(sText, "GRID")
       pDict => CF_DICT%get_next_entry()
       call assert( associated( pDict ), "INTERNAL PROGRAMMING ERROR -- Attempted use of null poitner", &
-        __SRCNAME__, __LINE__ )
+        __FILE__, __LINE__ )
       call CF%writeLine( trim( sGridSpecification ) )
 
     else
@@ -905,7 +908,7 @@ contains
       CF_ENTRY => null()
       allocate( CF_ENTRY, stat=iStat )
       call assert(iStat == 0, "Failed to allocate memory for dictionary object", &
-            __SRCNAME__, __LINE__ )
+            __FILE__, __LINE__ )
 
       ! break off key value for the current record
       call chomp(sRecord, sKey, CF%sDelimiters, CF%remove_extra_delimiters )
@@ -978,6 +981,8 @@ contains
     character (len=512)                   :: sArgText
     character (len=512)                   :: sArgText_1
     character (len=512)                   :: sArgText_2
+    character (len=512)                   :: sArgText_3
+    character (len=512)                   :: sArgText_4
     integer (c_int)                       :: iStat
     type (DATA_CATALOG_ENTRY_T), pointer  :: pENTRY
     logical (c_bool)                      :: lGridPresent
@@ -1011,12 +1016,14 @@ contains
       ! allocate memory for a generic data_catalog_entry
       allocate(pENTRY, stat=iStat)
       call assert( iStat == 0, "Failed to allocate memory for the "//dquote(sKey)//" data structure", &
-        __SRCNAME__, __LINE__ )
+        __FILE__, __LINE__ )
 
       sCmdText = ""
       sArgText = ""
       sArgText_1 = ""
       sArgText_2 = ""
+      sArgText_3 = ""
+      sArgText_4= ""
       call myOptions%clear()
 
       ! process all known directives associated with key word
@@ -1032,8 +1039,10 @@ contains
         ! most of the time, we only care about the first dictionary entry, obtained below
         sArgText_1 = myOptions%get(1)
         sArgText_2 = myOptions%get(2)
+        sArgText_3 = myOptions%get(3)
+        sArgText_4 = myOptions%get(4)
 
-        ! dictionary entries are initially space-delimited; sArgText_1 contains
+        ! dictionary entries are initially space-delimited; sArgText contains
         ! all dictionary entries present, concatenated, with a space between entries
         sArgText = myOptions%get(1, myOptions%count )
 
@@ -1069,7 +1078,7 @@ contains
             case default
 
               call die( "INTERNAL PROGRAMMING ERROR: Unhandled data type selected.", &
-                __SRCNAME__, __LINE__ )
+                __FILE__, __LINE__ )
 
             end select
 
@@ -1083,24 +1092,26 @@ contains
 
               case ( DATATYPE_FLOAT )
 
-              call pENTRY%initialize_real_table(            &
-                sDescription=trim(sCmdText),                &
-                sDateColumnName = "date",                   &
-                sValueColumnName = pENTRY%sVariableName_z )
+              call pENTRY%initialize(                        &
+                sDescription=trim(sCmdText),                 &
+                sDateColumnName = "date",                    &
+                sValueColumnName = pENTRY%sVariableName_z,   &
+                sType = "float")
               lGridPresent = TRUE
 
             case ( DATATYPE_INT )
 
-              call pENTRY%initialize_integer_table(         &
-                sDescription=trim(sCmdText),                &
-                sDateColumnName = "date",                   &
-                sValueColumnName = pENTRY%sVariableName_z )
+              call pENTRY%initialize(                        &
+                sDescription=trim(sCmdText),                 &
+                sDateColumnName = "date",                    &
+                sValueColumnName = pENTRY%sVariableName_z,   &
+                sType = "integer")
               lGridPresent = TRUE
 
             case default
 
               call die( "INTERNAL PROGRAMMING ERROR: Unhandled data type selected.", &
-                __SRCNAME__, __LINE__ )
+                __FILE__, __LINE__ )
               end select
   
           elseif ( (sArgText_1 .strapprox. "ARC_ASCII")              &
@@ -1155,7 +1166,7 @@ contains
 
         elseif ( sCmdText .containssimilar. "_CONVERSION_FACTOR" ) then
 
-          call pENTRY%set_scale(asFloat(sArgText_1))
+          call pENTRY%set_scale(asDouble(sArgText_1))
 
         elseif ( sCmdText .containssimilar. "NETCDF_X_VAR_ADD_OFFSET" ) then
 
@@ -1167,11 +1178,34 @@ contains
 
         elseif ( sCmdText .containssimilar. "_SCALE_FACTOR" ) then
 
-          call pENTRY%set_scale(asFloat(sArgText_1))
+          call pENTRY%set_scale(asDouble(sArgText_1))
 
         elseif ( sCmdText .containssimilar. "_ADD_OFFSET" ) then
 
-          call pENTRY%set_offset(asFloat(sArgText_1))
+          call pENTRY%set_add_offset(asDouble(sArgText_1))
+
+        elseif ( sCmdText .containssimilar. "_SUBTRACT_OFFSET" ) then
+
+          call pENTRY%set_sub_offset(asDouble(sArgText_1))
+
+        elseif ( sCmdText .containssimilar. "_UNITS_KELVIN" ) then
+
+          call pENTRY%set_sub_offset(FREEZING_POINT_OF_WATER_KELVIN)
+          call pENTRY%set_add_offset(FREEZING_POINT_OF_WATER_FAHRENHEIT)
+          call pENTRY%set_scale(F_PER_C)
+
+        elseif ( sCmdText .containssimilar. "_UNITS_CELSIUS" ) then
+
+          call pENTRY%set_add_offset(FREEZING_POINT_OF_WATER_FAHRENHEIT)
+          call pENTRY%set_scale(F_PER_C)
+          
+        elseif ( sCmdText .containssimilar. "_UNITS_MILLIMETERS" ) then
+
+          call pENTRY%set_scale(1.0_c_double / MM_PER_IN)
+  
+        elseif ( sCmdText .containssimilar. "_COORDINATE_TOLERANCE" ) then
+
+          call pENTRY%set_coordinate_tolerance( asDouble(sArgText_1))
 
         elseif ( sCmdText .containssimilar. "NETCDF_X_VAR" ) then
 
@@ -1181,11 +1215,13 @@ contains
 
           pENTRY%sVariableName_y = trim(sArgText_1)
 
-        elseif ( sCmdText .containssimilar. "NETCDF_Z_VAR" ) then
+        elseif (      (sCmdText .containssimilar. "NETCDF_Z_VAR")                &
+                 .or. (sCmdText .containssimilar. "COLUMN_NAME") )  then
 
           pENTRY%sVariableName_z = trim(sArgText_1)
 
-        elseif ( sCmdText .containssimilar. "NETCDF_TIME_VAR" ) then
+        elseif (      (sCmdText .containssimilar. "NETCDF_TIME_VAR")             &
+                 .or. (sCmdText .containssimilar. "DATE_COLUMN_NAME") ) then
 
           pENTRY%sVariableName_time = trim(sArgText_1)
 
@@ -1270,7 +1306,7 @@ contains
 
         else
 
-          call warn("Unknown directive detected in code at line "//asCharacter(__LINE__)//", file "//__SRCNAME__ &
+          call warn("Unknown directive detected in code at line "//asCharacter(__LINE__)//", file "//__FILE__ &
             //". ~Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
 
         endif
@@ -1279,7 +1315,7 @@ contains
 
       ! if an unadorned grid specification directive was processed, then we can add the key and
       ! the data_catalog_entry to the data_catalog
-      if ( lGridPresent )call DAT%add( key=sKey, data=pENTRY )
+      if ( lGridPresent )  call DAT%add( key=sKey, data=pENTRY )
 
       pENTRY => null()
 
@@ -1516,7 +1552,7 @@ contains
 
         case default
 
-          call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__SRCNAME__ &
+          call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
             //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
 
       end select
@@ -1619,7 +1655,7 @@ contains
 
         else
 
-            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__SRCNAME__ &
+            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
               //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
 
         endif
@@ -1643,21 +1679,21 @@ contains
   subroutine initialize_generic_method( sKey, lOptional)
 
     character (len=*), intent(in)     :: sKey
-    logical (c_bool), intent(in) :: lOptional
+    logical (c_bool), intent(in)      :: lOptional
 
     ! [ LOCALS ]
     type (FSTRING_LIST_T)             :: myDirectives
     type (FSTRING_LIST_T)             :: myOptions
-    integer (c_int)             :: iIndex
-    integer (c_int)             :: indx
-    character (len=:), allocatable   :: sCmdText
+    integer (c_int)                   :: iIndex
+    integer (c_int)                   :: indx
+    character (len=:), allocatable    :: sCmdText
 !    character (len=:), allocatable   :: sOptionText
     type (FSTRING_LIST_T)             :: argv_list
-    character (len=:), allocatable   :: sArgText
-    integer (c_int)             :: iStat
-    integer (c_int)             :: status
-    logical (c_bool)            :: lFatal
-    integer (c_int)             :: num_elements
+    character (len=:), allocatable    :: sArgText
+    integer (c_int)                   :: iStat
+    integer (c_int)                   :: status
+    logical (c_bool)                  :: lFatal
+    integer (c_int)                   :: num_elements
 
     ! obtain a list of control file directives whose key values contain the string sKey
     myDirectives = CF_DICT%grep_keys( trim(sKey) )
@@ -1723,17 +1759,17 @@ contains
     ! [ LOCALS ]
     type (FSTRING_LIST_T)             :: myDirectives
     type (FSTRING_LIST_T)             :: myOptions
-    integer (c_int)             :: iIndex
-    integer (c_int)             :: indx
-    character (len=:), allocatable   :: sCmdText
+    integer (c_int)                   :: iIndex
+    integer (c_int)                   :: indx
+    character (len=:), allocatable    :: sCmdText
 !    character (len=:), allocatable   :: sOptionText
     type (FSTRING_LIST_T)             :: argv_list
-    character (len=:), allocatable   :: sArgText
-    integer (c_int)             :: iStat
-    integer (c_int)             :: status
-    logical (c_bool)            :: lFatal
-    integer (c_int)             :: num_elements
-    character (len=:), allocatable   :: Option_Name
+    character (len=:), allocatable    :: sArgText
+    integer (c_int)                   :: iStat
+    integer (c_int)                   :: status
+    logical (c_bool)                  :: lFatal
+    integer (c_int)                   :: num_elements
+    character (len=:), allocatable    :: Option_Name
 
     ! obtain a list of control file directives whose key values contain the string sKey
     myDirectives = CF_DICT%grep_keys( "OPTION" )
@@ -1864,11 +1900,11 @@ contains
 !       if (associated( pLULC%pGrdBase) ) then
 !         MODEL%landuse_code = pack( pLULC%pGrdBase%iData, MODEL%active )
 !       else
-!         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
+!         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
 !       endif
 !     else
 !       call die("Attempted use of NULL pointer. Failed to find LAND_USE data element.", &
-!         __SRCNAME__, __LINE__)
+!         __FILE__, __LINE__)
 !     endif
 !
 !     ! setting this to a value that is likely valid; if this is set to a negative value, a landuse

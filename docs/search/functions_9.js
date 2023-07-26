@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['julian_5fday_1911',['julian_day',['../namespacedatetime.html#a00d59f377b22a5de9e18d6ce97dc89f6',1,'datetime']]]
+  ['julian_5fday_0',['julian_day',['../namespacedatetime.html#afa5e67dc36f6d1b413d21032db16c4df',1,'datetime']]]
 ];

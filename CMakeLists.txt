@@ -1,13 +1,13 @@
-cmake_minimum_required(VERSION 3.5)
-project( swb2 
-         LANGUAGES C Fortran )
+cmake_minimum_required(VERSION 3.7)
+
+project( swb2 LANGUAGES C Fortran )
 
 message("Processing top-level CMakelists.txt for project swb2")
 
 set(SWB_MAJOR_VERSION "2")
-set(SWB_MINOR_VERSION "0")
-set(SWB_PATCH_VERSION "2")
-set(SWB_LATEST_VERSION_TAG "v2.0.2")
+set(SWB_MINOR_VERSION "3")
+set(SWB_PATCH_VERSION "1")
+set(SWB_LATEST_VERSION_TAG "v2.3.1")
 
 #------------------------------------------------------------------------------------#
 #                           Force out-of-source build
@@ -24,8 +24,10 @@ include(CPack)
 
 set(CMAKE_INCLUDE_CURRENT_DIR ON)
 
-# try to have CMake find static libraries if possible
-set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ${CMAKE_FIND_LIBRARY_SUFFIXES})
+# try to have CMake find shared libraries if possible
+#set(CMAKE_FIND_LIBRARY_SUFFIXES ".so" ${CMAKE_FIND_LIBRARY_SUFFIXES})
+
+set(CMAKE_FIND_LIBRARY_SUFFIXES ".dll" ${CMAKE_FIND_LIBRARY_SUFFIXES})
 
 if ( CMAKE_HOST_WIN32 )
   set( OUTPUT_BIN_TARGET_DIR win_x64 )
@@ -48,6 +50,31 @@ include( cmake/FindNetCDF.cmake )
 include( cmake/FindZlib.cmake )
 include( cmake/FindCurl.cmake )
 include( cmake/FindSzip.cmake )
+
+if ( HDF5_HL_LIBRARY )
+  set( EXTERNAL_LIBRARIES ${EXTERNAL_LIBRARIES} ${HDF5_HL_LIBRARY} )
+endif()  
+
+if ( HDF5_LIBRARY )
+  set( EXTERNAL_LIBRARIES ${EXTERNAL_LIBRARIES} ${HDF5_LIBRARY} )
+endif()  
+
+if ( NETCDF_LIBRARY )
+  set( EXTERNAL_LIBRARIES ${EXTERNAL_LIBRARIES} ${NETCDF_LIBRARY} )
+endif()  
+
+if ( ZLIB_LIBRARY )
+  set( EXTERNAL_LIBRARIES ${EXTERNAL_LIBRARIES} ${ZLIB_LIBRARY} )
+endif()  
+
+if ( SZIP_LIBRARY )
+  set( EXTERNAL_LIBRARIES ${EXTERNAL_LIBRARIES} ${SZIP_LIBRARY} )
+endif()  
+
+if ( CURL_LIBRARY )
+  set( EXTERNAL_LIBRARIES ${EXTERNAL_LIBRARIES} ${CURL_LIBRARY} )
+endif()
+
 #include( cmake/FindWinPthread.cmake )
 #include( cmake/FindQuadMath.cmake )
 #include( cmake/FindGfortran.cmake )

@@ -28,15 +28,16 @@ module et__hargreaves_samani
   use iso_c_binding, only : c_short, c_int, c_float, c_double
   use constants_and_conversions
   use meteorological_calculations
+  use parameters, only                : PARAMS
   use solar_calculations
 
   implicit none
 
 
   ! ET parameters -- default values are from Hargreaves and Samani (1985)
-  real (c_float) :: fET_Slope = 0.0023     
-  real (c_float) :: fET_Exponent = 0.5
-  real (c_float) :: fET_Constant = 17.8
+  real (c_float) :: ET_SLOPE         ! = 0.0023     
+  real (c_float) :: ET_EXPONENT      ! = 0.5
+  real (c_float) :: ET_CONSTANT      ! = 17.8
 
 contains
 
@@ -52,7 +53,40 @@ subroutine et_hargreaves_initialize( ) !pConfig, sRecord )
   integer (c_int) :: iStat
   real (c_float) :: rValue
 
-!  write(UNIT=LU_LOG,FMT=*) "Configuring Hargreaves PET model"
+  real (kind=c_float), allocatable :: fET_slope(:)
+  real (kind=c_float), allocatable :: fET_exponent(:)
+  real (kind=c_float), allocatable :: fET_constant(:)
+
+  call PARAMS%get_parameters( sKey="Hargreaves_ET_slope", fValues=fET_slope)
+  call PARAMS%get_parameters( sKey="Hargreaves_ET_exponent", fValues=fET_exponent)
+  call PARAMS%get_parameters( sKey="Hargreaves_ET_constant", fValues=fET_constant)
+
+  if ( fET_slope(1) > fTINYVAL) then
+    ET_SLOPE = fET_slope(1)
+  else
+    ET_SLOPE = 0.0023_c_float
+  endif
+
+  if ( fET_exponent(1) > fTINYVAL) then
+    ET_EXPONENT = fET_exponent(1)
+  else
+    ET_EXPONENT = 0.5_c_float
+  endif
+
+  if ( fET_constant(1) > fTINYVAL) then
+    ET_CONSTANT = fET_constant(1)
+  else
+    ET_CONSTANT = 17.8_c_float
+  endif
+
+  print *, "****************************************************************************"
+  print *, "initializing Hargreaves ET parameters"
+  print *, "****************************************************************************"
+  print *, "  ET_SLOPE     = ", ET_SLOPE
+  print *, "  ET_EXPONENT  = ", ET_EXPONENT
+  print *, "  ET_CONSTANT  = ", ET_CONSTANT
+
+  !  write(UNIT=LU_LOG,FMT=*) "Configuring Hargreaves PET model"
 
 !   if (pConfig%rSouthernLatitude <= rNO_DATA_NCDC &
 !     .or. pConfig%rNorthernLatitude <= rNO_DATA_NCDC) then
@@ -130,7 +164,9 @@ elemental function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)
   rTDelta = F_to_K(rTMaxF) - F_to_K(rTMinF)
 
   rET_0 = MAX(rZERO, &
-                mm_to_in( 0.0023_c_float * rRa * (F_to_C(rTavg) + 17.8_c_float) * sqrt(rTDelta)) )
+                mm_to_in( ET_SLOPE * rRa * (F_to_C(rTavg) + ET_CONSTANT) * (rTDelta**ET_EXPONENT) ) )
+!                mm_to_in( 0.0023_c_float * rRa * (F_to_C(rTavg) + 17.8_c_float) * sqrt(rTDelta)) )
+
 
 !  rET_0 = MAX(rZERO, &
 !           ( fET_Slope &

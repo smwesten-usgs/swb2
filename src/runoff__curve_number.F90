@@ -2,7 +2,6 @@ module runoff__curve_number
 
   use iso_c_binding, only                    : c_int, c_float, c_double, c_bool
   use constants_and_conversions, only        : FALSE, TRUE
-  use continuous_frozen_ground_index, only   : CFGI_LL, CFGI_UL
   use datetime
   use exceptions
   use simulation_datetime
@@ -75,15 +74,15 @@ contains
 
     allocate( CN_ARCIII(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
     call assert( iStat == 0, "Failed to allocate memory for curve number table - AMC III", &
-      __SRCNAME__, __LINE__)
+      __FILE__, __LINE__)
 
     allocate( CN_ARCII(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
     call assert( iStat == 0, "Failed to allocate memory for curve number table - AMC II", &
-      __SRCNAME__, __LINE__)
+      __FILE__, __LINE__)
 
     allocate( CN_ARCI(iNumberOfLanduses, iNumberOfSoilGroups), stat=iStat )
     call assert( iStat == 0, "Failed to allocate memory for curve number table - AMC I", &
-      __SRCNAME__, __LINE__)
+      __FILE__, __LINE__)
 
     ! we should have the curve number table fully filled out following this block
     do iSoilsIndex = 1, iNumberOfSoilGroups
@@ -94,7 +93,7 @@ contains
 
     allocate( PREV_5_DAYS_RAIN( count(cell_is_active), 6 ), stat=iStat )
     call assert( iStat == 0, "Failed to allocate memory for curve number PREV_5_DAYS_RAIN table", &
-      __SRCNAME__, __LINE__)
+      __FILE__, __LINE__)
 
     PREV_5_DAYS_RAIN = 0.0_c_float
 
@@ -131,17 +130,20 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  elemental function prob_runoff_enhancement( fCFGI )    result(fPf)
+  elemental function prob_runoff_enhancement( fCFGI, fCFGI_UL, fCFGI_LL )    result(fPf)
 
     real (c_float), intent(in) :: fCFGI
+    real (c_float), intent(in) :: fCFGI_UL
+    real (c_float), intent(in) :: fCFGI_LL
+
     real (c_float)             :: fPf
 
-    if(fCFGI <= CFGI_LL ) then
+    if(fCFGI <= fCFGI_LL ) then
       fPf = 0_c_float
-    elseif(fCFGI >= CFGI_UL) then
+    elseif(fCFGI >= fCFGI_UL) then
       fPf = 1.0_c_float
     else
-      fPf = ( fCFGI - CFGI_LL ) / ( CFGI_UL - CFGI_LL )
+      fPf = ( fCFGI - fCFGI_LL ) / ( fCFGI_UL - fCFGI_LL )
     end if
 
   end function prob_runoff_enhancement
@@ -247,7 +249,7 @@ contains
 
   elemental function update_curve_number_fn( iLanduseIndex, iSoilsIndex, cell_index,   &
                                              it_is_growing_season, fSoilStorage_Max,   &
-                                             fCFGI )                                      result( CN_adj )
+                                             fCFGI, fCFGI_LL, fCFGI_UL )                 result( CN_adj )
 
   integer (c_int), intent(in)  :: iLanduseIndex
   integer (c_int), intent(in)  :: iSoilsIndex
@@ -255,6 +257,8 @@ contains
   logical (c_bool), intent(in) :: it_is_growing_season
   real (c_float), intent(in)   :: fSoilStorage_Max
   real (c_float), intent(in)   :: fCFGI
+  real (c_float), intent(in)   :: fCFGI_LL
+  real (c_float), intent(in)   :: fCFGI_UL
   real (c_float)               :: CN_adj
 
   ! [ LOCALS ]
@@ -270,9 +274,9 @@ contains
 
     ! Correct the curve number...
 
-    if( ( fCFGI > CFGI_LL ) .and. ( fSoilStorage_Max > 0.0_c_float ) ) then
+    if( ( fCFGI > fCFGI_LL ) .and. ( fSoilStorage_Max > 0.0_c_float ) ) then
 
-       Pf = prob_runoff_enhancement( fCFGI )
+       Pf = prob_runoff_enhancement( fCFGI, fCFGI_LL, fCFGI_UL )
 
        ! use probability of runoff enhancement to calculate a weighted
        ! average of curve number under Type II vs Type III antecedent
@@ -382,7 +386,9 @@ contains
                                                      it_is_growing_season,                &
                                                      inflow,                              &
                                                      soil_storage_max,                    &
-                                                     continuous_frozen_ground_index )
+                                                     continuous_frozen_ground_index,      &
+                                                     cfgi_lower_limit,                    &
+                                                     cfgi_upper_limit )
 
     real (c_float), intent(inout)  :: runoff
     real (c_float), intent(inout)  :: curve_num_adj
@@ -393,6 +399,8 @@ contains
     real (c_float), intent(in)     :: inflow
     real (c_float), intent(in)     :: soil_storage_max
     real (c_float), intent(in)     :: continuous_frozen_ground_index
+    real (c_float), intent(in)     :: cfgi_lower_limit
+    real (c_float), intent(in)     :: cfgi_upper_limit
 
     ! [ LOCALS ]
 !    real (c_float) :: CN_05
@@ -403,7 +411,9 @@ contains
                                             cell_index,                                       &
                                             it_is_growing_season,                             &
                                             soil_storage_max,                                 &
-                                            continuous_frozen_ground_index )
+                                            continuous_frozen_ground_index,                   &
+                                            cfgi_lower_limit,                                 &
+                                            cfgi_upper_limit )
 
     Smax = ( 1000.0_c_float / curve_num_adj ) - 10.0_c_float
 

@@ -74,9 +74,7 @@ program main
   sCompilerVersion = COMPILER_VERSION()
   sExecutableDescription = "USGS Soil-Water-Balance Code version "//trim( sVersionString )
 
-  if (     (SYSTEM_NAME .containssimilar. "Windows")                           &
-      .or. (SYSTEM_NAME .containssimilar. "Mingw")                             &
-      .or. (sCompilerVersion .containssimilar. "Windows")) then
+  if ( SYSTEM_NAME == "Windows" ) then
     OS_NATIVE_PATH_DELIMITER = "\"
   else
     OS_NATIVE_PATH_DELIMITER = "/"

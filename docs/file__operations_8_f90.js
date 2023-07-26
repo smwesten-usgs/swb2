@@ -1,6 +1,6 @@
 var file__operations_8_f90 =
 [
-    [ "ascii_file_t", "structfile__operations_1_1ascii__file__t.html", "structfile__operations_1_1ascii__file__t" ],
+    [ "file_operations::ascii_file_t", "structfile__operations_1_1ascii__file__t.html", "structfile__operations_1_1ascii__file__t" ],
     [ "close_file_sub", "file__operations_8_f90.html#a54c867094cdf0330ea6cc80a15b3b60f", null ],
     [ "count_number_of_lines_sub", "file__operations_8_f90.html#a03aeca42b1828e7c9f3518895cd5c99a", null ],
     [ "does_file_exist_fn", "file__operations_8_f90.html#a8387b7f432e7bc2cf89f3a307d122c3a", null ],

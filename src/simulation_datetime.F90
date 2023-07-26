@@ -16,6 +16,7 @@ module simulation_datetime
     integer (c_int)    :: iYearOfSimulation = 1
     logical (c_bool)   :: lIsLeapYear
     integer (c_int)    :: iNumDaysFromOrigin = 0
+    integer (c_int)    :: iDayOfSimulation = 0
 
   contains
 
@@ -47,7 +48,7 @@ contains
 
   subroutine initialize_datetimes_sub( this, start_date, end_date )
 
-    class (DATE_RANGE_T), intent(inout)   :: this
+    class (DATE_RANGE_T), intent(inout)      :: this
     type (DATETIME_T), intent(inout)         :: start_date
     type (DATETIME_T), intent(inout)         :: end_date
 
@@ -73,6 +74,7 @@ contains
     this%iDaysInYear = this%curr%daysperyear()
     this%lIsLeapYear = this%curr%isLeapYear()
     this%iDOY = day_of_year( this%curr%getJulianDay() )
+    this%iDayOfSimulation = this%curr - this%start + 1
 
   end subroutine set_curr_to_arbitrary_date_sub
 
@@ -93,6 +95,7 @@ contains
     this%iDOY = day_of_year( this%curr%getJulianDay() )
     this%iYearOfSimulation = this%curr%iYear - this%start%iYear + 1
     this%iNumDaysFromOrigin = this%iNumDaysFromOrigin + 1
+    this%iDayOfSimulation = this%curr - this%start + 1
 
   end subroutine advance_curr_to_last_day_of_year_sub
 
@@ -110,6 +113,7 @@ contains
     this%iDOY = day_of_year( this%curr%getJulianDay() )
     this%iYearOfSimulation = this%curr%iYear - this%start%iYear + 1
     this%iNumDaysFromOrigin = this%iNumDaysFromOrigin + 1
+    this%iDayOfSimulation = this%curr - this%start + 1
 
   end subroutine advance_curr_to_last_day_of_month_sub
 
@@ -148,6 +152,7 @@ contains
     this%iDOY = day_of_year( this%curr%getJulianDay() )
     this%iYearOfSimulation = this%curr%iYear - this%start%iYear + 1
     this%iNumDaysFromOrigin = this%iNumDaysFromOrigin + 1
+    this%iDayOfSimulation = this%curr - this%start + 1
 
   end subroutine increment_by_one_day_sub
 

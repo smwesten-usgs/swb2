@@ -43,6 +43,7 @@ program swbstats2
   real (c_double)                :: start_date_dbl
   real (c_double)                :: end_date_dbl
   integer (c_int)                :: TIME_BNDS_VARID
+  integer (c_int)                :: month_index
 
   logical (c_bool)               :: netcdf_active = FALSE
 
@@ -99,11 +100,6 @@ program swbstats2
     write(UNIT=*,FMT="(a)") "Compiled with: Intel Fortran version " &
       //TRIM(asCharacter(__INTEL_COMPILER))
       write(UNIT=*,FMT="(a,/)") "Compiler build date:"//TRIM(asCharacter(__INTEL_COMPILER_BUILD_DATE))
-#endif
-
-#ifdef __G95__l
-    write(UNIT=*,FMT="(a,/)") "Compiled with: G95 minor version " &
-      //TRIM(int2char(__G95_MINOR__))
 #endif
 
     allocate(usage_string(50))
@@ -383,6 +379,14 @@ program swbstats2
   ! create working grids with dimensions extracted from netCDF file being munged
   call swbstats%create_working_grids()
 
+  call RSTAT%initialize(NX=swbstats%ncfile_in%iNX,           &
+                        NY=swbstats%ncfile_in%iNY,           &
+                        X0=swbstats%ncfile_in%rX(0),         &
+                        Y0=swbstats%ncfile_in%rY(0),         &
+                        X1=swbstats%ncfile_in%rX(1),         &
+                        Y1=swbstats%ncfile_in%rY(1),         &
+                        nodata_value=-9999._c_double)
+
   ! if user wants annual or monthly statistics, calculate a list of annual or
   ! monthly starting and ending dates for each time slice
   if (swbstats%calculation_time_period == CALC_PERIOD_ANNUAL) then
@@ -392,6 +396,19 @@ program swbstats2
   elseif (swbstats%calculation_time_period == CALC_PERIOD_MONTHLY) then
 
     call swbstats%create_date_list_for_monthly_statistics()
+    call swbstats%create_monthly_working_grids()
+
+    do month_index=1,12
+
+      call MON_STAT(month_index)%initialize(NX=swbstats%ncfile_in%iNX,           &
+                                            NY=swbstats%ncfile_in%iNY,           &
+                                            X0=swbstats%ncfile_in%rX(0),         &
+                                            Y0=swbstats%ncfile_in%rY(0),         &
+                                            X1=swbstats%ncfile_in%rX(1),         &
+                                            Y1=swbstats%ncfile_in%rY(1),         &
+                                            nodata_value=-9999._c_double)
+
+    enddo  
 
   elseif (swbstats%calculation_time_period == CALC_PERIOD_DAILY) then
 
@@ -501,6 +518,10 @@ program swbstats2
   endif  ! initialize data structures needed to calculate zonal statistics for a *SINGLE* zone grid 
 
 
+  ! establish data range string for use in output file naming
+  swbstats%date_range_string = swbstats%data_start_date%prettydate()                 &
+                                   //"_to_"//swbstats%data_end_date%prettydate()
+
   call swbstats%open_output_netcdf_files(output_files)
 
   ! Done with preliminaries (opening files, setting options, etc.); begin calcs
@@ -556,7 +577,7 @@ program swbstats2
     call swbstats%slice_end_date%parseDate( end_date_string )
 
     ! create date range string for use in output filenames
-    swbstats%date_range_string = swbstats%slice_start_date%prettydate()    &
+    swbstats%slice_range_string = swbstats%slice_start_date%prettydate()    &
        //"_to_"//swbstats%slice_end_date%prettydate()
 
     write(*,fmt="(a)") ""
@@ -568,10 +589,18 @@ program swbstats2
     ! grid_mean is the grid_sum divided by number of days = daily mean
     !
     ! first step is to calculate the statistics over the entire grid
-    call swbstats%calculate_slice_statistics( grid_delta=swbstats%grd_delta,            &
-                                     grid_delta2=swbstats%grd_delta2,                   &
-                                     start_date=swbstats%slice_start_date,     &
-                                     end_date=swbstats%slice_end_date)
+    call swbstats%calculate_slice_statistics( start_date=swbstats%slice_start_date,                     &
+                                              end_date=swbstats%slice_end_date,                         &
+                                              grd_sum=output_files(STATS_SUM)%grid_ptr%dpData,          &
+                                              grd_mean=output_files(STATS_MEAN)%grid_ptr%dpData,        &
+                                              grd_var=output_files(STATS_VARIANCE)%grid_ptr%dpData)
+
+    ! idea here is to tack on a set of accumulator grids that can be used to sum up 
+    ! results from all grid vals for every January within the simulation timeframe, 
+    ! all grid vals for every February within simulation timeframe, etc.
+    if (swbstats%calculation_time_period == CALC_PERIOD_MONTHLY) then
+      call swbstats%calculate_monthly_statistics(month_num=swbstats%slice_start_date%iMonth, finalize=FALSE)
+    endif  
 
     if (swbstats%multiple_comparison_grids) then
       swbstats%comparison_grid_filename = swbstats%comparison_grid_file_list%get( iIndex )
@@ -581,18 +610,17 @@ program swbstats2
     if (swbstats%multiple_zone_grids) then
       swbstats%zone_grid_filename = swbstats%zone_grid_file_list%get( iIndex )
       call swbstats%initialize_zone_grid(grid_filename=swbstats%zone_grid_filename)
-
     endif
 
-      call swbstats%write_stats_to_netcdf(output_files=output_files,           &
+    call swbstats%write_stats_to_netcdf(output_files=output_files,           &
+                              start_date=swbstats%slice_start_date,          &
+                              end_date=swbstats%slice_end_date)
+
+    call swbstats%write_stats_to_arcgrid(output_files=output_files,            &
                                 start_date=swbstats%slice_start_date,          &
-                                end_date=swbstats%slice_end_date)
-
-      call swbstats%write_stats_to_arcgrid(output_files=output_files,          &
-                                  start_date=swbstats%slice_start_date,        &
-                                  end_date=swbstats%slice_end_date,            &
-                                  date_range_string=swbstats%date_range_string)
-
+                                end_date=swbstats%slice_end_date,              &
+                                date_range_string=swbstats%slice_range_string,  &
+                                output_file_prefix=swbstats%output_file_prefix)
 
     if (swbstats%calc_zonal_stats) then
       if ( len_trim(swbstats%zone_grid2_filename) > 0) then
@@ -654,6 +682,13 @@ program swbstats2
 
   !call netcdf_close_file(NCFILE=ncfile_out)
   call swbstats%close_output_netcdf_files(output_files=output_files)
+
+  if (swbstats%calculation_time_period == CALC_PERIOD_MONTHLY) then
+    call swbstats%calculate_monthly_statistics(month_num=swbstats%slice_start_date%iMonth, finalize=TRUE)
+    call swbstats%write_monthly_stats_to_arcgrid(output_files=output_files,            &
+                                date_range_string=swbstats%date_range_string,          &
+                                output_file_prefix=swbstats%output_file_prefix)
+  endif  
 
   if (swbstats%write_csv)  call swbstats%zonal_stats_output_file%close()
 

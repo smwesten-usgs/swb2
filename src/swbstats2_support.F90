@@ -5,7 +5,8 @@ module swbstats2_support
                                         OS_NATIVE_PATH_DELIMITER
   use iso_fortran_env, only           : OUTPUT_UNIT
   use data_catalog_entry, only        : DATA_CATALOG_ENTRY_T
-  use datetime, only                  : DATETIME_T, assignment(=), operator(>)
+  use datetime, only                  : DATETIME_T, assignment(=), operator(>), &
+                                          MONTHS
   use exceptions, only                : assert, die
   use file_operations, only           : ASCII_FILE_T
   use grid, only                      : GENERAL_GRID_T,                         &
@@ -17,11 +18,25 @@ module swbstats2_support
   use fstring
   use fstring_list, only              : FSTRING_LIST_T,                         &
                                         create_list
+
+  use running_grid_stats, only        : RUNNING_STATS_T
   use iso_c_binding
   implicit none
 
   enum, bind(c)
-    enumerator :: STATS_MEAN=1, STATS_SUM, STATS_VARIANCE
+    enumerator :: STATS_JAN_SUM=1, STATS_JAN_MEAN, STATS_JAN_VARIANCE, &
+                  STATS_FEB_SUM, STATS_FEB_MEAN, STATS_FEB_VARIANCE,   &
+                  STATS_MAR_SUM, STATS_MAR_MEAN, STATS_MAR_VARIANCE,   &
+                  STATS_APR_SUM, STATS_APR_MEAN, STATS_APR_VARIANCE,   &
+                  STATS_MAY_SUM, STATS_MAY_MEAN, STATS_MAY_VARIANCE,   &
+                  STATS_JUN_SUM, STATS_JUN_MEAN, STATS_JUN_VARIANCE,   &
+                  STATS_JUL_SUM, STATS_JUL_MEAN, STATS_JUL_VARIANCE,   &
+                  STATS_AUG_SUM, STATS_AUG_MEAN, STATS_AUG_VARIANCE,   &
+                  STATS_SEP_SUM, STATS_SEP_MEAN, STATS_SEP_VARIANCE,   &
+                  STATS_OCT_SUM, STATS_OCT_MEAN, STATS_OCT_VARIANCE,   &
+                  STATS_NOV_SUM, STATS_NOV_MEAN, STATS_NOV_VARIANCE,   &
+                  STATS_DEC_SUM, STATS_DEC_MEAN, STATS_DEC_VARIANCE,   &
+                  STATS_MEAN, STATS_SUM, STATS_VARIANCE
   end enum
 
   enum, bind(c)
@@ -49,9 +64,12 @@ module swbstats2_support
     type (T_NETCDF4_FILE), pointer        :: nc_ptr => null()
     type (GENERAL_GRID_T), pointer        :: grid_ptr => null()
     character (len=8)                     :: stats_description
-    logical (c_bool)                      :: write_netcdf     = TRUE
+    integer (c_int)                       :: n_count = 0
+    logical (c_bool)                      :: write_netcdf     = FALSE
     logical (c_bool)                      :: write_arcgrid    = FALSE
     logical (c_bool)                      :: output_active    = FALSE
+    real (c_float)                        :: valid_min        = 10000.   ! only used for netCDF output
+    real (c_float)                        :: valid_max        = -10000.
   end type FILE_COLLECTION_T
 
   type SWBSTATS_T
@@ -68,6 +86,7 @@ module swbstats2_support
     type (DATETIME_T)               :: data_end_date
     type (DATETIME_T)               :: slice_start_date
     type (DATETIME_T)               :: slice_end_date
+    character (len=:), allocatable  :: slice_range_string
     character (len=:), allocatable  :: date_range_string
     integer (c_int)                 :: calculation_time_period = CALC_PERIOD_ALL
     character (len=:), allocatable  :: stress_period_filename
@@ -101,7 +120,7 @@ module swbstats2_support
 
     type (GENERAL_GRID_T), pointer       :: grd_native => null()
     type (GENERAL_GRID_T), pointer       :: grd_delta => null()
-    type (GENERAL_GRID_T), pointer       :: grd_delta2 => null()
+    type (GENERAL_GRID_T), pointer       :: grd_delta2 => null()    
     type (DATA_CATALOG_ENTRY_T), pointer :: grd_zone => null()
     type (DATA_CATALOG_ENTRY_T), pointer :: grd_zone2 => null()
     type (DATA_CATALOG_ENTRY_T), pointer :: grd_comparison => null()
@@ -112,6 +131,7 @@ module swbstats2_support
     generic   :: set_conversion_factors => set_conversion_factors_sub
 
     procedure :: create_working_grids
+    procedure :: create_monthly_working_grids
 
     procedure :: open_zonal_stats_output_file
 
@@ -131,12 +151,14 @@ module swbstats2_support
     procedure :: initialize_comparison_grid
 
     procedure :: calculate_slice_statistics
+    procedure :: calculate_monthly_statistics
 
     procedure :: open_output_netcdf_files
     procedure :: close_output_netcdf_files
 
     procedure :: write_stats_to_netcdf
     procedure :: write_stats_to_arcgrid
+    procedure :: write_monthly_stats_to_arcgrid
     procedure :: output_zonal_stats
 
     procedure :: print_all_options
@@ -153,9 +175,13 @@ module swbstats2_support
     VOLUME_UNIT_T("millions of gallons", "MG   ", 7.4805194805E-6_c_double),   &
     VOLUME_UNIT_T("acre-feet          ", "ac-ft", 0.000022956840808_c_double) ]
 
-  type (DATA_CATALOG_ENTRY_T)    :: input_data_obj
+  type (DATA_CATALOG_ENTRY_T) :: input_data_obj
 
-  type (FILE_COLLECTION_T)       :: output_files(3)
+  type (FILE_COLLECTION_T)    :: OUTPUT_FILES(39)
+
+  type ( RUNNING_STATS_T)     :: RSTAT
+
+  type (RUNNING_STATS_T)      :: MON_STAT(12)
 
 contains
 
@@ -172,7 +198,7 @@ contains
               rY1=this%ncfile_in%rY(NC_TOP),                                 &
               iDataType=GRID_DATATYPE_DOUBLE )
 
-    output_files(STATS_SUM)%grid_ptr => grid_Create (                        &
+    OUTPUT_FILES(STATS_SUM)%grid_ptr => grid_Create (                        &
               iNX=this%ncfile_in%iNX,                                        &
               iNY=this%ncfile_in%iNY,                                        &
               rX0=this%ncfile_in%rX(NC_LEFT),                                &
@@ -180,9 +206,9 @@ contains
               rX1=this%ncfile_in%rX(NC_RIGHT),                               &
               rY1=this%ncfile_in%rY(NC_TOP),                                 &
               iDataType=GRID_DATATYPE_DOUBLE )
-    output_files(STATS_SUM)%stats_description = "SUM"
+    OUTPUT_FILES(STATS_SUM)%stats_description = "SUM"
 
-    output_files(STATS_MEAN)%grid_ptr => grid_Create (                       &
+    OUTPUT_FILES(STATS_MEAN)%grid_ptr => grid_Create (                       &
               iNX=this%ncfile_in%iNX,                                        &
               iNY=this%ncfile_in%iNY,                                        &
               rX0=this%ncfile_in%rX(NC_LEFT),                                &
@@ -190,9 +216,9 @@ contains
               rX1=this%ncfile_in%rX(NC_RIGHT),                               &
               rY1=this%ncfile_in%rY(NC_TOP),                                 &
               iDataType=GRID_DATATYPE_DOUBLE )
-    output_files(STATS_MEAN)%stats_description = "MEAN"
+    OUTPUT_FILES(STATS_MEAN)%stats_description = "MEAN"
 
-    output_files(STATS_VARIANCE)%grid_ptr => grid_Create (                   &
+    OUTPUT_FILES(STATS_VARIANCE)%grid_ptr => grid_Create (                   &
               iNX=this%ncfile_in%iNX,                                        &
               iNY=this%ncfile_in%iNY,                                        &
               rX0=this%ncfile_in%rX(NC_LEFT),                                &
@@ -200,7 +226,7 @@ contains
               rX1=this%ncfile_in%rX(NC_RIGHT),                               &
               rY1=this%ncfile_in%rY(NC_TOP),                                 &
               iDataType=GRID_DATATYPE_DOUBLE )
-      output_files(STATS_VARIANCE)%stats_description = "VARIANCE"
+      OUTPUT_FILES(STATS_VARIANCE)%stats_description = "VARIANCE"
 
     ! delta, delta2 are temporary work grids used in calculating variance
     this%grd_delta   =>  grid_Create ( iNX=this%ncfile_in%iNX,               &
@@ -231,6 +257,62 @@ contains
     BNDS%sPROJ4_string = this%target_proj4_string
 
   end subroutine create_working_grids
+
+!------------------------------------------------------------------------------
+
+  subroutine create_monthly_working_grids(this)
+
+    class (SWBSTATS_T), intent(inout)  :: this
+
+    integer (c_int)   :: month_num
+    integer (c_int)   :: sum_index_num
+    integer (c_int)   :: mean_index_num
+    integer (c_int)   :: variance_index_num
+    character (len=3) :: month_name
+
+    do month_num = 1,12
+
+      ! extract month name from the datetime module MONTHS data structure
+      month_name = MONTHS(month_num)%sName             ! yields the following index numbers...
+      sum_index_num = ( month_num - 1 ) * 3 + 1        ! 1 4 7 10 13 16 19 22 25 28 31 34
+      mean_index_num = ( month_num - 1 ) * 3 + 2       ! 2 5 8 11 14 17 20 23 26 29 32 35
+      variance_index_num = ( month_num - 1 ) * 3 + 3   ! 3 6 9 12 15 18 21 24 27 30 33 36
+
+      OUTPUT_FILES(sum_index_num)%grid_ptr => grid_Create (          &
+      iNX=this%ncfile_in%iNX,                                        &
+      iNY=this%ncfile_in%iNY,                                        &
+      rX0=this%ncfile_in%rX(NC_LEFT),                                &
+      rY0=this%ncfile_in%rY(NC_BOTTOM),                              &
+      rX1=this%ncfile_in%rX(NC_RIGHT),                               &
+      rY1=this%ncfile_in%rY(NC_TOP),                                 &
+      iDataType=GRID_DATATYPE_DOUBLE )
+      OUTPUT_FILES(sum_index_num)%stats_description = "SUM"
+      OUTPUT_FILES(sum_index_num)%write_arcgrid = TRUE
+
+      OUTPUT_FILES(mean_index_num)%grid_ptr => grid_Create (         &
+      iNX=this%ncfile_in%iNX,                                        &
+      iNY=this%ncfile_in%iNY,                                        &
+      rX0=this%ncfile_in%rX(NC_LEFT),                                &
+      rY0=this%ncfile_in%rY(NC_BOTTOM),                              &
+      rX1=this%ncfile_in%rX(NC_RIGHT),                               &
+      rY1=this%ncfile_in%rY(NC_TOP),                                 &
+      iDataType=GRID_DATATYPE_DOUBLE )
+      OUTPUT_FILES(mean_index_num)%stats_description = "MEAN"
+      OUTPUT_FILES(mean_index_num)%write_arcgrid = TRUE
+
+      OUTPUT_FILES(variance_index_num)%grid_ptr => grid_Create (     &
+      iNX=this%ncfile_in%iNX,                                        &
+      iNY=this%ncfile_in%iNY,                                        &
+      rX0=this%ncfile_in%rX(NC_LEFT),                                &
+      rY0=this%ncfile_in%rY(NC_BOTTOM),                              &
+      rX1=this%ncfile_in%rX(NC_RIGHT),                               &
+      rY1=this%ncfile_in%rY(NC_TOP),                                 &
+      iDataType=GRID_DATATYPE_DOUBLE )
+      OUTPUT_FILES(variance_index_num)%stats_description = "VARIANCE"
+
+    enddo
+        
+  end subroutine create_monthly_working_grids    
 
 !------------------------------------------------------------------------------
 
@@ -399,7 +481,7 @@ contains
     do ix=1,ubound(grid_values,1)
       do iy=1,ubound(grid_values,2)
 
-        if (grid_values(ix, iy) <= 0 )  cycle
+        if (grid_values(ix, iy) < 0 )  cycle
 
         sval = asCharacter( grid_values(ix,iy) )
 
@@ -531,7 +613,7 @@ contains
     integer (c_int)                 :: iIndex
     integer (c_int)                 :: iStat
     character (len=:), allocatable       :: description_str
-    character (len=:), allocatable       :: output_filesname_str
+    character (len=:), allocatable       :: OUTPUT_FILESname_str
     character (len=256), save            :: previous_zone_filename
 
     ! OK, if this is the same ARC ASCII grid file processed in a previous iteration,
@@ -543,7 +625,7 @@ contains
       if (description_str .contains. "/") description_str = right( description_str, substring="/")
       if (description_str .contains. "\") description_str = right( description_str, substring="\")
 
-      output_filesname_str = "zone_grid__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
+      OUTPUT_FILESname_str = "zone_grid__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
 
       ! allocate memory for a generic data_catalog_entry
       if (associated(this%grd_zone))  deallocate(this%grd_zone)
@@ -563,7 +645,7 @@ contains
 !      this%grd_zone%pGrdBase%iData = NC_FILL_INT
 !    end where
 
-      call grid_WriteArcGrid(output_filesname_str, this%grd_zone%pGrdBase )
+      call grid_WriteArcGrid(OUTPUT_FILESname_str, this%grd_zone%pGrdBase )
 
       ! set value of previous filename to the name of the grid we just processed.
       previous_zone_filename = trim(grid_filename)
@@ -586,7 +668,7 @@ contains
     integer (c_int)                 :: iIndex
     integer (c_int)                 :: iStat
     character (len=:), allocatable       :: description_str
-    character (len=:), allocatable       :: output_filesname_str
+    character (len=:), allocatable       :: OUTPUT_FILESname_str
     character (len=256), save            :: previous_zone_filename
 
     ! OK, if this is the same ARC ASCII grid file processed in a previous iteration,
@@ -597,7 +679,7 @@ contains
       if (description_str .contains. "/") description_str = right( description_str, substring="/")
       if (description_str .contains. "\") description_str = right( description_str, substring="\")
 
-      output_filesname_str = "zone_grid2__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
+      OUTPUT_FILESname_str = "zone_grid2__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
 
       ! allocate memory for a generic data_catalog_entry
       if (associated(this%grd_zone2))  deallocate(this%grd_zone2)
@@ -605,7 +687,7 @@ contains
       allocate(this%grd_zone2)
 
       call this%grd_zone2%set_target_PROJ4(this%target_proj4_string)
-      call this%grd_zone2%initialize(          &
+      call this%grd_zone2%initialize(         &
         sDescription="Zone Grid",             &
         sFileType="ARC_GRID",                 &
         sFilename=trim(grid_filename),        &
@@ -617,7 +699,7 @@ contains
 !      this%grd_zone2%pGrdBase%iData = NC_FILL_INT
 !    end where
 
-      call grid_WriteArcGrid(output_filesname_str, this%grd_zone2%pGrdBase )
+      call grid_WriteArcGrid(OUTPUT_FILESname_str, this%grd_zone2%pGrdBase )
 
       previous_zone_filename = trim(grid_filename)
 
@@ -636,7 +718,7 @@ contains
     integer (c_int)                 :: iIndex
     integer (c_int)                 :: iStat
     character (len=:), allocatable       :: description_str
-    character (len=:), allocatable       :: output_filesname_str
+    character (len=:), allocatable       :: OUTPUT_FILESname_str
     character (len=256), save            :: previous_comparison_filename
 
     ! OK, if this is the same ARC ASCII grid file processed in a previous iteration,
@@ -647,7 +729,7 @@ contains
       if (description_str .contains. "/") description_str = right( description_str, substring="/")
       if (description_str .contains. "\") description_str = right( description_str, substring="\")
 
-      output_filesname_str = "Comparison_grid__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
+      OUTPUT_FILESname_str = "Comparison_grid__"//trim(description_str)//"__as_read_into_SWBSTATS2.asc"
 
       ! allocate memory for a generic data_catalog_entry
       if (.not. associated(this%grd_comparison))  allocate(this%grd_comparison, stat=iStat)
@@ -669,7 +751,7 @@ contains
                                         * this%comparison_grid_conversion_factor
 !    end where
 
-      call grid_WriteArcGrid(output_filesname_str, this%grd_comparison%pGrdBase )
+      call grid_WriteArcGrid(OUTPUT_FILESname_str, this%grd_comparison%pGrdBase )
 
       previous_comparison_filename = trim(grid_filename)
 
@@ -707,12 +789,12 @@ contains
 
 
   subroutine write_stats_to_netcdf( this,                                      &
-                                    output_files,                              &
+                                    OUTPUT_FILES,                              &
                                     start_date,                                &
                                     end_date )
 
     class (SWBSTATS_T), intent(inout)       :: this
-    type (FILE_COLLECTION_T), intent(inout) :: output_files(:)
+    type (FILE_COLLECTION_T), intent(inout) :: OUTPUT_FILES(:)
     type (DATETIME_T), intent(inout)        :: start_date
     type (DATETIME_T), intent(inout)        :: end_date
 
@@ -732,20 +814,22 @@ contains
 
     do stat_indx=STATS_MEAN, STATS_VARIANCE
 
-      if ( .not. output_files(stat_indx)%output_active )  cycle
+      if ( .not. OUTPUT_FILES(stat_indx)%output_active )  cycle
 
-      if ( output_files(stat_indx)%write_netcdf ) then
+      if ( OUTPUT_FILES(stat_indx)%write_netcdf ) then
 
-        ncfile_out => output_files(stat_indx)%nc_ptr
-        grid_ptr => output_files(stat_indx)%grid_ptr
+        ncfile_out => OUTPUT_FILES(stat_indx)%nc_ptr
+        grid_ptr => OUTPUT_FILES(stat_indx)%grid_ptr
 
         call netcdf_put_variable_vector(NCFILE=ncfile_out,                        &
            iVarID=ncfile_out%iVarID(NC_TIME),                                     &
            iStart=[ RECNUM ],                                                     &
            iCount=[1_c_size_t],                                                   &
-           iStride=[1_c_size_t],                                               &
-           dpValues=[ ( start_bnd + end_bnd ) / 2.0_c_double ] )
-    !       dpValues=[ real( SIM_DT%iNumDaysFromOrigin, c_double) ] )
+           iStride=[1_c_size_t],                                                  &
+!           rValues=[ real(( start_bnd + end_bnd ) / 2.0_c_float, c_float) ] )
+           rValues=[ real(start_bnd, c_float) ] )
+  
+           !       dpValues=[ real( SIM_DT%iNumDaysFromOrigin, c_double) ] )
 
        ! call netcdf_put_variable_vector(NCFILE=ncfile_out,                        &
        !    iVarID=TIME_BNDS_VARID,                                                 &
@@ -758,8 +842,14 @@ contains
            iVarID=ncfile_out%iVarID(NC_Z),                                        &
            iStart=[ RECNUM , 0_c_size_t, 0_c_size_t],                             &
            iCount=[ 1_c_size_t, ny, nx ],                                         &
-           iStride=[1_c_size_t, 1_c_size_t, 1_c_size_t],                 &
+           iStride=[1_c_size_t, 1_c_size_t, 1_c_size_t],                          &
            rValues=real(grid_ptr%dpData, c_float) )
+
+        OUTPUT_FILES(stat_indx)%valid_min =    &
+          update_minimum_value(OUTPUT_FILES(stat_indx)%valid_min, real(grid_ptr%dpData, c_float))
+
+        OUTPUT_FILES(stat_indx)%valid_max =    &
+          update_maximum_value(OUTPUT_FILES(stat_indx)%valid_max, real(grid_ptr%dpData, c_float))
 
       endif
 
@@ -769,14 +859,119 @@ contains
 
 !------------------------------------------------------------------------------
 
-  subroutine write_stats_to_arcgrid( this, output_files, start_date,         &
-                                     end_date, date_range_string )
+  subroutine write_monthly_stats_to_arcgrid( this, OUTPUT_FILES,    &
+                                             date_range_string,     &
+                                             output_file_prefix )
 
-    class (SWBSTATS_T), intent(inout)       :: this
-    type (FILE_COLLECTION_T), intent(inout) :: output_files(:)
-    type (DATETIME_T), intent(inout)        :: start_date
-    type (DATETIME_T), intent(inout)        :: end_date
-    character (len=*), intent(in), optional :: date_range_string
+    class (SWBSTATS_T), intent(inout)                    :: this
+    type (FILE_COLLECTION_T), intent(inout)              :: OUTPUT_FILES(:)
+    character (len=*), intent(in), optional              :: date_range_string
+    character (len=*), intent(in), optional              :: output_file_prefix
+
+    ! [ LOCALS ]
+    character (len=:), allocatable    :: filename
+    integer (c_int)                   :: nx, ny
+    type (GENERAL_GRID_T), pointer    :: grid_ptr
+    character (len=8)                 :: stats_description
+    character (len=:), allocatable    :: units_string
+    character (len=:), allocatable    :: filename_modifier
+    character (len=:), allocatable    :: file_prefix
+    
+    integer (c_int)   :: sum_index_num
+    integer (c_int)   :: mean_index_num
+    integer (c_int)   :: variance_index_num
+    character (len=3) :: month_name
+    integer (c_int)   :: month_num
+
+    nx = BNDS%iNumCols
+    ny = BNDS%iNumRows
+
+    do month_num=1,12
+
+      ! extract month name from the datetime module MONTHS data structure
+      month_name = MONTHS(month_num)%sName
+      sum_index_num = ( month_num - 1 ) * 3 + 1
+      mean_index_num = ( month_num - 1 ) * 3 + 2
+      variance_index_num = ( month_num - 1 ) * 3 + 3
+
+      if ( OUTPUT_FILES(mean_index_num)%write_arcgrid) then
+
+        if (this%report_as_volume) then
+          units_string = "cubic meters"
+        elseif (this%report_in_meters) then
+          units_string = "meters"
+        else
+          units_string = trim(this%netcdf_variable_units_string)
+        endif
+
+        call replace(units_string, ' ', '_' )
+
+        ! remove commas from filename modifier
+        filename_modifier = clean(units_string, ",")
+
+        ! ** preliminaries done; now begin to write out to Arc Grid files
+
+
+        ! write out MEAN values grid
+        grid_ptr => OUTPUT_FILES(mean_index_num)%grid_ptr
+        call assert(associated(grid_ptr), "Unallocated array", __FILE__, __LINE__)
+        stats_description = OUTPUT_FILES(mean_index_num)%stats_description
+
+        if ( present(output_file_prefix) ) then
+          file_prefix = output_file_prefix // "__" // "monthly_mean_over_all"
+        else
+          file_prefix = "monthly_mean_over_all"
+        endif  
+    
+        filename = trim(file_prefix)                                             &
+                     //"_"//trim(month_name)                                     &
+                     //"__"//trim(this%netcdf_variable_name_string)              &
+                     //"__"//trim(this%date_range_string)                        &
+                     //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)            &
+                     //"__"//trim(filename_modifier)//".asc"
+
+        call grid_WriteArcGrid( filename, grid_ptr )
+
+        !!! Now output the VARIANCE grid 
+        grid_ptr => OUTPUT_FILES(variance_index_num)%grid_ptr
+        call assert(associated(grid_ptr), "Unallocated array", __FILE__, __LINE__)
+        stats_description = OUTPUT_FILES(variance_index_num)%stats_description
+
+        if ( present(output_file_prefix) ) then
+          file_prefix = output_file_prefix // "__" // "monthly_variance_over_all"
+        else
+          file_prefix = "monthly_variance_over_all"
+        endif  
+    
+        filename = trim(file_prefix)                                             &
+                     //"_"//trim(month_name)                                     &
+                     //"__"//trim(this%netcdf_variable_name_string)              &
+                     //"__"//trim(this%date_range_string)                        &
+                     //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)            &
+                     //"__"//trim(filename_modifier)//".asc"
+           
+        call grid_WriteArcGrid( filename, grid_ptr )
+
+
+      endif
+
+    enddo
+
+  end subroutine write_monthly_stats_to_arcgrid
+
+
+!------------------------------------------------------------------------------
+
+  subroutine write_stats_to_arcgrid( this, OUTPUT_FILES, start_date,         &
+                                     end_date, date_range_string,            &
+                                     output_file_prefix )
+
+    class (SWBSTATS_T), intent(inout)                    :: this
+    type (FILE_COLLECTION_T), intent(inout)              :: OUTPUT_FILES(:)
+    type (DATETIME_T), intent(inout)                     :: start_date
+    type (DATETIME_T), intent(inout)                     :: end_date
+    character (len=*), intent(in), optional              :: date_range_string
+    character (len=:), allocatable, intent(in), optional :: output_file_prefix
 
     ! [ LOCALS ]
     character (len=:), allocatable    :: filename
@@ -786,15 +981,22 @@ contains
     character (len=8)                 :: stats_description
     character (len=:), allocatable    :: units_string
     character (len=:), allocatable    :: filename_modifier
+    character (len=:), allocatable    :: file_prefix
+
+    if ( present(output_file_prefix) ) then
+      if (allocated(output_file_prefix))  file_prefix = output_file_prefix // "__"
+    else
+      file_prefix = ""
+    endif  
 
     nx = BNDS%iNumCols
     ny = BNDS%iNumRows
 
     do stat_indx=STATS_MEAN, STATS_VARIANCE
 
-      if ( .not. output_files(stat_indx)%output_active )  cycle
+      if ( .not. OUTPUT_FILES(stat_indx)%output_active )  cycle
 
-      if ( output_files(stat_indx)%write_arcgrid) then
+      if ( OUTPUT_FILES(stat_indx)%write_arcgrid) then
 
         if ( this%annualize_stats .and. stat_indx == STATS_SUM) then
           units_string = trim(this%netcdf_variable_units_string)//", per year"
@@ -811,18 +1013,20 @@ contains
         ! remove commas from filename modifier
         filename_modifier = clean(units_string, ",")
 
-        grid_ptr => output_files(stat_indx)%grid_ptr
-        stats_description = output_files(stat_indx)%stats_description
+        grid_ptr => OUTPUT_FILES(stat_indx)%grid_ptr
+        stats_description = OUTPUT_FILES(stat_indx)%stats_description
 
         if ( present(date_range_string) ) then
           !@todo: change filename depending on the desired output statistic
-          filename = trim(this%netcdf_variable_name_string)                     &
+          filename = output_file_prefix                                            &
+                     //trim(this%netcdf_variable_name_string)                      &
                      //"__"//trim(date_range_string)                               &
                      //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)              &
                      //"__"//trim(stats_description)                               &
                      //"__"//trim(filename_modifier)//".asc"
         else
-          filename = trim(this%netcdf_variable_name_string)                      &
+          filename = output_file_prefix                                             &
+                     //trim(this%netcdf_variable_name_string)                       &
                      //"__"//start_date%prettydate()//"_to_"//end_date%prettydate() &
                      //"__"//asCharacter(nx)//"_by_"//asCharacter(ny)               &
                      //"__"//trim(filename_modifier)//".asc"
@@ -842,106 +1046,207 @@ contains
   end subroutine write_stats_to_arcgrid
 
 !------------------------------------------------------------------------------
-  !
-  ! subroutine calculate_slice_statisticss( grid_sum, grid_mean, date_range_id_list, &
-  !                                 start_date_list, end_date_list )
-  !
-  !   type (GENERAL_GRID_T), pointer          :: grid_sum
-  !   type (GENERAL_GRID_T), pointer          :: grid_mean
-  !   type (FSTRING_LIST_T), intent(in)        :: date_range_id_list
-  !   type (FSTRING_LIST_T), intent(in)        :: start_date_list
-  !   type (FSTRING_LIST_T), intent(in)        :: end_date_list
-  !
-  !
-  !
-  !
-  !
-  ! end subroutine calculate_slice_statisticss
 
-  subroutine calculate_slice_statistics( this, grid_delta, grid_delta2, start_date, end_date, grid_mask )
+!   subroutine calculate_slice_statistics( this, grid_delta, grid_delta2, start_date, end_date, grid_mask )
+
+!     class (SWBSTATS_T), intent(inout)        :: this
+!     type (GENERAL_GRID_T), pointer           :: grid_delta
+!     type (GENERAL_GRID_T), pointer           :: grid_delta2
+!     type (DATETIME_T), intent(inout)         :: start_date
+!     type (DATETIME_T), intent(inout)         :: end_date
+!     logical, optional                        :: grid_mask(:,:)
+
+!     ! [ LOCALS ]
+!     integer (c_int)               :: julian_day_number
+!     real (c_float), allocatable   :: tempvals(:)
+!     integer (c_int)               :: day_count
+!     logical (c_bool), allocatable :: local_mask(:,:)
+!     real (c_float), dimension(size(grid_delta%dpData,1), size(grid_delta%dpData,2)) :: rTemp
+
+!     ! force slice dates to honor bounds of data dates
+!     if ( start_date < this%data_start_date )  start_date = this%data_start_date
+!     if ( end_date > this%data_end_date )      end_date = this%data_end_date
+
+! !    call SIM_DT%initialize( start_date, end_date )
+
+!     associate( grd_sum => OUTPUT_FILES(STATS_SUM)%grid_ptr%dpData,                &
+!                grd_mean => OUTPUT_FILES(STATS_MEAN)%grid_ptr%dpData,              &
+!                grd_var => OUTPUT_FILES(STATS_VARIANCE)%grid_ptr%dpData,           &
+!                delta =>  grid_delta%dpData,                                      &
+!                delta2 => grid_delta2%dpData,                                     &
+!                grd_new => this%grd_native%dpData      )
+
+!       allocate(local_mask(ubound(grd_sum,1),ubound(grd_sum,2)))
+
+!       day_count = 0
+
+!       ! SIM_DT is being used here simply because it provides a simple way to march through
+!       ! time on a day-by-day basis; need to ensure that the "current" day aligns with the 
+!       ! desired start and end dates of the slice. 
+!       if ( SIM_DT%curr > start_date ) then
+!         call SIM_DT%set_current_date(start_date)
+!       endif
+
+!       do
+
+!         if ( SIM_DT%curr < start_date ) then
+!           call SIM_DT%addDay()
+!           cycle
+!         endif
+
+!         julian_day_number = int( SIM_DT%curr%dJulianDate, c_int)
+
+!         ! keep track of number of days that are summed together so we can calculated a mean grid value later
+!         day_count = day_count + 1
+
+!         if ( netcdf_update_time_starting_index(this%ncfile_in, julian_day_number ) )   then
+!           call netcdf_get_variable_slice(NCFILE=this%ncfile_in, rValues=rTemp )
+!         endif
+
+!         ! volumetric_conversion_factor is 1.0 *unless* user has specifically
+!         ! asked for volumetric reporting or other unit conversions; in this case,
+!         ! the output_conversion_factor amounts to the cell area times the
+!         ! unit length, appropriately converted to cubic meters, or if output
+!         ! is requested in meters, the conversion factor is just 0.
+!         grd_new = real(rTemp, c_double) * this%output_conversion_factor
+
+!         if (day_count == 1) then
+
+!           if (present(grid_mask)) then
+!             local_mask = (grd_new > NC_FILL_FLOAT) .and. grid_mask
+!           else
+!             local_mask = grd_new > NC_FILL_FLOAT
+!           endif
+
+!           grd_sum = 0.0_c_double
+!           grd_mean = 0.0_c_double
+!           grd_var = 0.0_c_double
+
+!         endif
+
+!         where ( local_mask )
+!           delta = grd_new - grd_mean
+!           grd_sum = grd_sum + grd_new
+!           grd_mean = grd_mean + delta / real( day_count, c_double )
+!           delta2 = grd_new - grd_mean
+!           grd_var = grd_var + delta * delta2
+!         end where
+
+!          ! write(*,fmt="(a,f14.3,f14.3)") "gridsum: ", minval(grd_sum,  mask=grd_new > NC_FILL_FLOAT), &
+!          !     maxval(grd_sum,  mask=grd_new > NC_FILL_FLOAT)
+!          !
+!          ! write(*,fmt="(a,f14.3,f14.3)") "gridnew: ", minval(grd_new,  mask=grd_new > NC_FILL_FLOAT), &
+!          !     maxval(grd_new,  mask=grd_new > NC_FILL_FLOAT)
+!          !
+!          ! write(*,fmt="(a,f14.3,f14.3)") "gridnew: ", minval(this%grd_native%dpData,  mask=this%grd_native%dpData > NC_FILL_FLOAT), &
+!          !     maxval(this%grd_native%dpData,  mask=this%grd_native%dpData > NC_FILL_FLOAT)
+
+!         call SIM_DT%addDay
+!         if ( SIM_DT%curr > end_date )  exit
+
+!       end do
+
+!       where ( .not. local_mask )
+!         grd_mean = NC_FILL_FLOAT
+!         grd_sum = NC_FILL_FLOAT
+!         grd_var = NC_FILL_FLOAT
+!       ! elsewhere
+!       !   grd_var = grd_var / (counter - 1)
+!       endwhere
+
+!       if (this%annualize_stats) then
+!         where ( local_mask )
+! !          grd_mean = grd_mean/ real( day_count, c_float ) * 365.25
+! !          grd_var = grd_var/ real( day_count, c_float ) * 365.25
+!           grd_sum = grd_sum / real( day_count, c_double ) * 365.25
+!         end where
+!       ! else
+!       !   where ( local_mask )
+!       !     grd_mean = grd_sum / real( day_count, c_float )
+!       !   end where
+!       endif
+
+!       deallocate(local_mask)
+
+!     end associate
+
+! !    write(*,fmt="(a)") "gridsum: ", minval(grid_sum%rData,  mask=this%grd_native%rData > NC_FILL_FLOAT), &
+! !        maxval(grid_sum%rData,  mask=this%grd_native%rData > NC_FILL_FLOAT)
+
+!   end subroutine calculate_slice_statistics
+
+  subroutine calculate_slice_statistics( this, start_date, end_date, grd_sum, grd_mean, grd_var )
 
     class (SWBSTATS_T), intent(inout)        :: this
-    type (GENERAL_GRID_T), pointer           :: grid_delta
-    type (GENERAL_GRID_T), pointer           :: grid_delta2
     type (DATETIME_T), intent(inout)         :: start_date
     type (DATETIME_T), intent(inout)         :: end_date
-    logical, optional                        :: grid_mask(:,:)
+    real (c_double), intent(inout)           :: grd_sum(:,:)
+    real (c_double), intent(inout)           :: grd_mean(:,:)
+    real (c_double), intent(inout)           :: grd_var(:,:)
 
     ! [ LOCALS ]
     integer (c_int)               :: julian_day_number
-    real (c_float), allocatable   :: tempvals(:)
     integer (c_int)               :: day_count
     logical (c_bool), allocatable :: local_mask(:,:)
-    real (c_float), dimension(size(grid_delta%dpData,1), size(grid_delta%dpData,2)) :: rTemp
+    real (c_float), allocatable   :: rTemp(:,:)
+    real (c_double), allocatable  :: grd_new(:,:)
 
     ! force slice dates to honor bounds of data dates
     if ( start_date < this%data_start_date )  start_date = this%data_start_date
     if ( end_date > this%data_end_date )      end_date = this%data_end_date
 
-!    call SIM_DT%initialize( start_date, end_date )
+    allocate(local_mask(this%ncfile_in%iNX,this%ncfile_in%iNY))
+    allocate(rTemp(this%ncfile_in%iNX,this%ncfile_in%iNY))
+    allocate(grd_new(this%ncfile_in%iNX,this%ncfile_in%iNY))
 
-    associate( grd_sum => output_files(STATS_SUM)%grid_ptr%dpData,                &
-               grd_mean => output_files(STATS_MEAN)%grid_ptr%dpData,              &
-               grd_var => output_files(STATS_VARIANCE)%grid_ptr%dpData,           &
-               delta =>  grid_delta%dpData,                                      &
-               delta2 => grid_delta2%dpData,                                     &
-               grd_new => this%grd_native%dpData      )
+    day_count = 0
 
-      allocate(local_mask(ubound(grd_sum,1),ubound(grd_sum,2)))
+    ! call RSTAT%initialize(NX=this%ncfile_in%iNX,                  &
+    !                       NY=this%ncfile_in%iNY,                  &
+    !                       X0=this%ncfile_in%rX(NC_LEFT),          &
+    !                       Y0=this%ncfile_in%rY(NC_BOTTOM),        &
+    !                       X1=this%ncfile_in%rX(NC_RIGHT),         &
+    !                       Y1=this%ncfile_in%rY(NC_TOP),           &
+    !                       nodata_value=-9999._c_double)
 
-      day_count = 0
+    call RSTAT%clear()                          
 
-      ! SIM_DT is being used here simply because it provides a simple way to march through
-      ! time on a day-by-day basis; need to ensure that the "current" day aligns with the 
-      ! desired start and end dates of the slice. 
-      if ( SIM_DT%curr > start_date ) then
-        call SIM_DT%set_current_date(start_date)
+    ! SIM_DT is being used here simply because it provides a simple way to march through
+    ! time on a day-by-day basis; need to ensure that the "current" day aligns with the 
+    ! desired start and end dates of the slice. 
+    if ( SIM_DT%curr > start_date ) then
+      call SIM_DT%set_current_date(start_date)
+    endif
+
+    do
+
+      if ( SIM_DT%curr < start_date ) then
+        call SIM_DT%addDay()
+        cycle
       endif
 
-      do
+      julian_day_number = int( SIM_DT%curr%dJulianDate, c_int)
 
-        if ( SIM_DT%curr < start_date ) then
-          call SIM_DT%addDay()
-          cycle
-        endif
+      ! keep track of number of days that are summed together so we can calculated a mean grid value later
+      day_count = day_count + 1
 
-        julian_day_number = int( SIM_DT%curr%dJulianDate, c_int)
+      if ( netcdf_update_time_starting_index(this%ncfile_in, julian_day_number ) )   then
+        call netcdf_get_variable_slice(NCFILE=this%ncfile_in, rValues=rTemp )
+      endif
 
-        ! keep track of number of days that are summed together so we can calculated a mean grid value later
-        day_count = day_count + 1
+      ! volumetric_conversion_factor is 1.0 *unless* user has specifically
+      ! asked for volumetric reporting or other unit conversions; in this case,
+      ! the output_conversion_factor amounts to the cell area times the
+      ! unit length, appropriately converted to cubic meters, or if output
+      ! is requested in meters, the conversion factor is just 0.
+      grd_new = real(rTemp, c_double) * this%output_conversion_factor
 
-        if ( netcdf_update_time_starting_index(this%ncfile_in, julian_day_number ) )   then
-          call netcdf_get_variable_slice(NCFILE=this%ncfile_in, rValues=rTemp )
-        endif
+      if (day_count == 1) then
+        local_mask = grd_new > NC_FILL_FLOAT
+      endif
 
-        ! volumetric_conversion_factor is 1.0 *unless* user has specifically
-        ! asked for volumetric reporting or other unit conversions; in this case,
-        ! the output_conversion_factor amounts to the cell area times the
-        ! unit length, appropriately converted to cubic meters, or if output
-        ! is requested in meters, the conversion factor is just 0.
-        grd_new = real(rTemp, c_double) * this%output_conversion_factor
+      call RSTAT%push(grd_data=grd_new, mask=local_mask)
 
-        if (day_count == 1) then
-
-          if (present(grid_mask)) then
-            local_mask = (grd_new > NC_FILL_FLOAT) .and. grid_mask
-          else
-            local_mask = grd_new > NC_FILL_FLOAT
-          endif
-
-          grd_sum = 0.0_c_double
-          grd_mean = 0.0_c_double
-          grd_var = 0.0_c_double
-
-        endif
-
-        where ( local_mask )
-          delta = grd_new - grd_mean
-          grd_sum = grd_sum + grd_new
-          grd_mean = grd_mean + delta / real( day_count, c_double )
-          delta2 = grd_new - grd_mean
-          grd_var = grd_var + delta * delta2
-        end where
 
          ! write(*,fmt="(a,f14.3,f14.3)") "gridsum: ", minval(grd_sum,  mask=grd_new > NC_FILL_FLOAT), &
          !     maxval(grd_sum,  mask=grd_new > NC_FILL_FLOAT)
@@ -952,40 +1257,105 @@ contains
          ! write(*,fmt="(a,f14.3,f14.3)") "gridnew: ", minval(this%grd_native%dpData,  mask=this%grd_native%dpData > NC_FILL_FLOAT), &
          !     maxval(this%grd_native%dpData,  mask=this%grd_native%dpData > NC_FILL_FLOAT)
 
-        call SIM_DT%addDay
-        if ( SIM_DT%curr > end_date )  exit
+      call SIM_DT%addDay
+      if ( SIM_DT%curr > end_date )  exit
 
-      end do
+    end do
 
-      where ( .not. local_mask )
-        grd_mean = NC_FILL_FLOAT
-        grd_sum = NC_FILL_FLOAT
-        grd_var = NC_FILL_FLOAT
+    call RSTAT%mean(grd_mean)
+    call RSTAT%sum(grd_sum)
+    call RSTAT%variance(grd_var)
+
+    where ( .not. local_mask )
+      grd_mean = NC_FILL_FLOAT
+      grd_sum = NC_FILL_FLOAT
+      grd_var = NC_FILL_FLOAT
       ! elsewhere
       !   grd_var = grd_var / (counter - 1)
-      endwhere
+    end where
 
-      if (this%annualize_stats) then
-        where ( local_mask )
-!          grd_mean = grd_mean/ real( day_count, c_float ) * 365.25
-!          grd_var = grd_var/ real( day_count, c_float ) * 365.25
-          grd_sum = grd_sum / real( day_count, c_double ) * 365.25
-        end where
+    if (this%annualize_stats) then
+      where ( local_mask )
+!        grd_mean = grd_mean/ real( day_count, c_float ) * 365.25
+!        grd_var = grd_var/ real( day_count, c_float ) * 365.25
+        grd_sum = grd_sum / real( day_count, c_double ) * 365.25
+      end where
       ! else
       !   where ( local_mask )
       !     grd_mean = grd_sum / real( day_count, c_float )
       !   end where
-      endif
+    endif
 
-      deallocate(local_mask)
-
-    end associate
-
-!    write(*,fmt="(a)") "gridsum: ", minval(grid_sum%rData,  mask=this%grd_native%rData > NC_FILL_FLOAT), &
-!        maxval(grid_sum%rData,  mask=this%grd_native%rData > NC_FILL_FLOAT)
+    deallocate(local_mask)
+    deallocate(grd_new)
+    deallocate(rTemp)
 
   end subroutine calculate_slice_statistics
 
+!------------------------------------------------------------------------------
+ 
+  ! ASSUMPTION: this routine will be called *AFTER* the slice statistics are calculated and
+  !             ONLY when the monthly statistics flag has been set from command line
+  subroutine calculate_monthly_statistics(this, month_num, finalize)
+
+    class (SWBSTATS_T), intent(inout)        :: this
+    integer (c_short), intent(in)            :: month_num
+    logical (c_bool), intent(in)             :: finalize 
+
+    integer (c_int)   :: sum_index_num
+    integer (c_int)   :: mean_index_num
+    integer (c_int)   :: variance_index_num
+    character (len=3) :: month_name
+    integer (c_int)   :: month_index
+
+    if (.not. finalize) then
+
+      call MON_STAT(month_num)%push(grd_data=OUTPUT_FILES(STATS_SUM)%grid_ptr%dpData,                &
+                                     mask=logical(OUTPUT_FILES(STATS_SUM)%grid_ptr%dpData > -9999._c_double, c_bool))
+      
+    else  !finalize monthly outputs
+
+      do month_index=1,12
+
+        month_name = MONTHS(month_index)%sName
+        sum_index_num = ( month_index - 1 ) * 3 + 1
+        mean_index_num = ( month_index- 1 ) * 3 + 2
+        variance_index_num = ( month_index- 1 ) * 3 + 3
+    
+        call MON_STAT(month_index)%mean(OUTPUT_FILES(mean_index_num)%grid_ptr%dpData)
+        call MON_STAT(month_index)%sum(OUTPUT_FILES(sum_index_num)%grid_ptr%dpData)
+        call MON_STAT(month_index)%variance(OUTPUT_FILES(variance_index_num)%grid_ptr%dpData)
+
+        ! if ( OUTPUT_FILES(sum_index_num)%n_count > 0 ) then
+
+        !   where ( OUTPUT_FILES(sum_index_num)%grid_ptr%dpData > -9999. )
+        !     OUTPUT_FILES(mean_index_num)%grid_ptr%dpData = OUTPUT_FILES(sum_index_num)%grid_ptr%dpData   &
+        !                                                / real(OUTPUT_FILES(sum_index_num)%n_count, kind=c_double)
+        !   else where
+          
+        !     OUTPUT_FILES(mean_index_num)%grid_ptr%dpData = -9999.
+          
+        !   end where
+
+        ! else
+
+        !   OUTPUT_FILES(mean_index_num)%grid_ptr%dpData = -9999.
+
+        ! endif  
+
+        ! write(*,fmt='(a,i0,1x,6(f0.4, 2x))') 'FINALIZING: ', month_index,    &
+        ! minval(OUTPUT_FILES(sum_index_num)%grid_ptr%dpData),                 &
+        ! maxval(OUTPUT_FILES(sum_index_num)%grid_ptr%dpData),                 &
+        ! minval(OUTPUT_FILES(mean_index_num)%grid_ptr%dpData),                &
+        ! maxval(OUTPUT_FILES(mean_index_num)%grid_ptr%dpData),                &
+        ! minval(OUTPUT_FILES(variance_index_num)%grid_ptr%dpData),            &
+        ! maxval(OUTPUT_FILES(variance_index_num)%grid_ptr%dpData)
+
+      enddo  
+
+    endif
+    
+  end subroutine calculate_monthly_statistics
 !------------------------------------------------------------------------------
 
   subroutine read_date_range_file( this,                                       &
@@ -1300,10 +1670,10 @@ contains
 !------------------------------------------------------------------------------
 
   subroutine open_output_netcdf_files(this,                                    &
-                                      output_files)
+                                      OUTPUT_FILES)
 
     class (SWBSTATS_T), intent(inout)           :: this
-    type (FILE_COLLECTION_T), intent(inout)     :: output_files(:)
+    type (FILE_COLLECTION_T), intent(inout)     :: OUTPUT_FILES(:)
 
     ! [ LOCALS ]
     integer (c_int)                   :: stat_indx
@@ -1320,9 +1690,9 @@ contains
 
     do stat_indx=STATS_MEAN, STATS_VARIANCE
 
-      if ( .not. output_files(stat_indx)%output_active )  cycle
+      if ( .not. OUTPUT_FILES(stat_indx)%output_active )  cycle
 
-      if (output_files(stat_indx)%write_netcdf) then
+      if (OUTPUT_FILES(stat_indx)%write_netcdf) then
 
         if ( this%annualize_stats .and. stat_indx == STATS_SUM) then
           units_string = trim(this%netcdf_variable_units_string)//", per year"
@@ -1334,10 +1704,10 @@ contains
           units_string = trim(this%netcdf_variable_units_string)
         endif
 
-        allocate( output_files(stat_indx)%nc_ptr, stat=status)
+        allocate( OUTPUT_FILES(stat_indx)%nc_ptr, stat=status)
         call assert( status==0, "Problem allocating netcdf file data structure.", &
-          __SRCNAME__, __LINE__)
-        ncfile_out => output_files(stat_indx)%nc_ptr
+          __FILE__, __LINE__)
+        ncfile_out => OUTPUT_FILES(stat_indx)%nc_ptr
 
         call netcdf_open_and_prepare_as_output(                                     &
               NCFILE=ncfile_out,                                                    &
@@ -1353,7 +1723,7 @@ contains
               executable_name="SWBSTATS2",                                          &
               filename_prefix=filename_prefix,                                      &
               filename_modifier=this%filename_modifier_string                       &
-                                //"_"//output_files(stat_indx)%stats_description )
+                                //"_"//OUTPUT_FILES(stat_indx)%stats_description )
 
       endif
 
@@ -1363,10 +1733,10 @@ contains
 
 !------------------------------------------------------------------------------
 
-  subroutine close_output_netcdf_files(this, output_files)
+  subroutine close_output_netcdf_files(this, OUTPUT_FILES)
 
     class (SWBSTATS_T), intent(inout)         :: this
-    type (FILE_COLLECTION_T), intent(inout)   :: output_files(:)
+    type (FILE_COLLECTION_T), intent(inout)   :: OUTPUT_FILES(:)
 
     ! [ LOCALS ]
     integer (c_int)              :: stat_indx
@@ -1375,11 +1745,27 @@ contains
 
     do stat_indx=STATS_MEAN, STATS_VARIANCE
 
-      if ( .not. output_files(stat_indx)%output_active )  cycle
+      if ( .not. OUTPUT_FILES(stat_indx)%output_active )  cycle
 
-      if (output_files(stat_indx)%write_netcdf) then
+      if (OUTPUT_FILES(stat_indx)%write_netcdf) then
+        
+        call netcdf_rewrite_attribute( NCFILE=OUTPUT_FILES(stat_indx)%nc_ptr,                    &
+                                       sVariableName=trim(this%netcdf_variable_name_string),     &
+                                       sAttributeName='valid_min',                               &
+                                       rAttributeValue=[OUTPUT_FILES(stat_indx)%valid_min])
 
-        ncfile_out => output_files(stat_indx)%nc_ptr
+        call netcdf_rewrite_attribute( NCFILE=OUTPUT_FILES(stat_indx)%nc_ptr,                    &
+                                       sVariableName=trim(this%netcdf_variable_name_string),     &
+                                       sAttributeName='valid_max',                               &
+                                       rAttributeValue=[OUTPUT_FILES(stat_indx)%valid_max])
+
+        call netcdf_rewrite_attribute( NCFILE=OUTPUT_FILES(stat_indx)%nc_ptr,                    &
+                                       sVariableName=trim(this%netcdf_variable_name_string),     &
+                                       sAttributeName='valid_range',                             &
+                                       rAttributeValue=[OUTPUT_FILES(stat_indx)%valid_min,       &
+                                                          OUTPUT_FILES(stat_indx)%valid_max])
+
+        ncfile_out => OUTPUT_FILES(stat_indx)%nc_ptr
         call netcdf_close_file(NCFILE=ncfile_out)
 
       endif
@@ -1464,20 +1850,20 @@ contains
 
     fmt_string = "(a,t30,': ',l)"
     write(*,fmt=fmt_string) "write_csv", this%write_csv
-    write(*,fmt=fmt_string) "write_netcdf (SUM)", output_files(STATS_SUM)%write_netcdf
-    write(*,fmt=fmt_string) "write_netcdf (MEAN)", output_files(STATS_MEAN)%write_netcdf
-    write(*,fmt=fmt_string) "write_netcdf (VARIANCE)", output_files(STATS_VARIANCE)%write_netcdf
-    write(*,fmt=fmt_string) "write_arcgrid (SUM)", output_files(STATS_SUM)%write_arcgrid
-    write(*,fmt=fmt_string) "write_arcgrid (MEAN)", output_files(STATS_MEAN)%write_arcgrid
-    write(*,fmt=fmt_string) "write_arcgrid (VARIANCE)", output_files(STATS_VARIANCE)%write_arcgrid
-    write(*,fmt=fmt_string) "output_active (SUM)", output_files(STATS_SUM)%output_active
-    write(*,fmt=fmt_string) "output_active (MEAN)", output_files(STATS_MEAN)%output_active
-    write(*,fmt=fmt_string) "output_active (VARIANCE)", output_files(STATS_VARIANCE)%output_active
+    write(*,fmt=fmt_string) "write_netcdf (SUM)", OUTPUT_FILES(STATS_SUM)%write_netcdf
+    write(*,fmt=fmt_string) "write_netcdf (MEAN)", OUTPUT_FILES(STATS_MEAN)%write_netcdf
+    write(*,fmt=fmt_string) "write_netcdf (VARIANCE)", OUTPUT_FILES(STATS_VARIANCE)%write_netcdf
+    write(*,fmt=fmt_string) "write_arcgrid (SUM)", OUTPUT_FILES(STATS_SUM)%write_arcgrid
+    write(*,fmt=fmt_string) "write_arcgrid (MEAN)", OUTPUT_FILES(STATS_MEAN)%write_arcgrid
+    write(*,fmt=fmt_string) "write_arcgrid (VARIANCE)", OUTPUT_FILES(STATS_VARIANCE)%write_arcgrid
+    write(*,fmt=fmt_string) "output_active (SUM)", OUTPUT_FILES(STATS_SUM)%output_active
+    write(*,fmt=fmt_string) "output_active (MEAN)", OUTPUT_FILES(STATS_MEAN)%output_active
+    write(*,fmt=fmt_string) "output_active (VARIANCE)", OUTPUT_FILES(STATS_VARIANCE)%output_active
 
     fmt_string = "(a,t40,': ',l)"
-    write(*,fmt=fmt_string) "grid pointer allocated? (SUM)", associated( output_files(STATS_SUM)%grid_ptr)
-    write(*,fmt=fmt_string) "grid pointer allocated? (MEAN)", associated( output_files(STATS_MEAN)%grid_ptr)
-    write(*,fmt=fmt_string) "grid pointer allocated? (VARIANCE)", associated( output_files(STATS_VARIANCE)%grid_ptr)
+    write(*,fmt=fmt_string) "grid pointer allocated? (SUM)", associated( OUTPUT_FILES(STATS_SUM)%grid_ptr)
+    write(*,fmt=fmt_string) "grid pointer allocated? (MEAN)", associated( OUTPUT_FILES(STATS_MEAN)%grid_ptr)
+    write(*,fmt=fmt_string) "grid pointer allocated? (VARIANCE)", associated( OUTPUT_FILES(STATS_VARIANCE)%grid_ptr)
 
     fmt_string = "(a,t30,': ',l)"
     write(*,fmt=fmt_string) "calc_zonal_stats", this%calc_zonal_stats
@@ -1537,4 +1923,2879 @@ contains
 
   end subroutine print_all_options
 
+!------------------------------------------------------------------------------
+
+  pure function update_minimum_value(current_minimum, values)    result(new_minimum)
+
+    real (c_float), intent(in)             :: current_minimum
+    real (c_float), intent(in)             :: values(:,:)
+
+    real (c_float)                         :: new_minimum
+
+    new_minimum = min(current_minimum, minval(values))
+
+  end function update_minimum_value
+
+!------------------------------------------------------------------------------
+
+  pure function update_maximum_value(current_maximum, values)    result(new_maximum)
+
+    real (c_float), intent(in)             :: current_maximum
+    real (c_float), intent(in)             :: values(:,:)
+
+    real (c_float)                         :: new_maximum
+
+    new_maximum = max(current_maximum, maxval(values))
+
+  end function update_maximum_value
+
 end module swbstats2_support
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

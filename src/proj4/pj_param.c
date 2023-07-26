@@ -1,6 +1,7 @@
 /* put parameters in linked list and retrieve */
 #include <projects.h>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 	paralist * /* create parameter list entry */
 pj_mkparam(char *str) {

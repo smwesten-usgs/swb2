@@ -1,0 +1,3 @@
+Hargreaves_ET_slope      0.0023
+Hargreaves_ET_exponent   0.5
+Hargreaves_ET_constant   17.8

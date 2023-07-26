@@ -220,7 +220,7 @@ function grid_CreateComplete ( iNX, iNY, rX0, rY0, rX1, rY1, iDataType ) result 
 
   allocate ( pGrd, stat=iStat )
   call assert ( iStat == 0, &
-     "Could not allocate pointer to T_GRID object", __SRCNAME__,__LINE__ )
+     "Could not allocate pointer to T_GRID object", __FILE__,__LINE__ )
 
   if (iNX <= 0 .or. iNY <= 0) then
     call LOGS%write("Illegal grid dimensions: ")
@@ -231,7 +231,7 @@ function grid_CreateComplete ( iNX, iNY, rX0, rY0, rX1, rY1, iDataType ) result 
     call LOGS%write("rX1: "//asCharacter(rX1) )
     call LOGS%write("rY1: "//asCharacter(rY1) )
     call assert ( FALSE, &
-       "INTERNAL PROGRAMMING ERROR? - Illegal grid dimensions specified", __SRCNAME__,__LINE__)
+       "INTERNAL PROGRAMMING ERROR? - Illegal grid dimensions specified", __FILE__,__LINE__)
   endif
 
   select case (iDataType)
@@ -240,21 +240,21 @@ function grid_CreateComplete ( iNX, iNY, rX0, rY0, rX1, rY1, iDataType ) result 
           allocate ( pGrd%iData( iNX, iNY ), stat=iStat )
           call assert (iStat == 0, &
              "Could not allocate integer data", &
-              __SRCNAME__,__LINE__)
+              __FILE__,__LINE__)
           pGrd%iData = 0
 
       case ( GRID_DATATYPE_REAL )
           allocate ( pGrd%rData( iNX, iNY ), stat=iStat )
           call assert (iStat == 0, &
              "Could not allocate real data", &
-              __SRCNAME__,__LINE__)
+              __FILE__,__LINE__)
           pGrd%rData = rZERO
 
       case ( GRID_DATATYPE_DOUBLE )
           allocate ( pGrd%dpData( iNX, iNY ), stat=iStat )
           call assert (iStat == 0, &
              "Could not allocate double-precision data", &
-              __SRCNAME__,__LINE__)
+              __FILE__,__LINE__)
           pGrd%dpData = 0.0_c_double
 
       case default
@@ -292,10 +292,10 @@ function grid_CreateSimple ( iNX, iNY, rX0, rY0, rGridCellSize, iDataType ) resu
 
   allocate ( pGrd, stat=iStat )
   call assert ( iStat == 0, &
-     "Could not allocate pointer to T_GRID object", __SRCNAME__,__LINE__ )
+     "Could not allocate pointer to T_GRID object", __FILE__,__LINE__ )
   call assert ( iNX > 0 .and. iNY > 0, &
      "Illegal grid dimensions specified: NX="//asCharacter(iNX)      &
-     //"  NY="//asCharacter(iNY), __SRCNAME__,__LINE__)
+     //"  NY="//asCharacter(iNY), __FILE__,__LINE__)
 
   select case (iDataType)
       case ( GRID_DATATYPE_INT )
@@ -303,21 +303,21 @@ function grid_CreateSimple ( iNX, iNY, rX0, rY0, rGridCellSize, iDataType ) resu
           allocate ( pGrd%iData( iNX, iNY ), stat=iStat )
           call assert (iStat == 0, &
              "Could not allocate integer data", &
-              __SRCNAME__,__LINE__)
+              __FILE__,__LINE__)
           pGrd%iData = pGrd%iNoDataValue
 
       case ( GRID_DATATYPE_REAL )
           allocate ( pGrd%rData( iNX, iNY ), stat=iStat )
           call assert (iStat == 0, &
              "Could not allocate real data", &
-              __SRCNAME__,__LINE__)
+              __FILE__,__LINE__)
           pGrd%rData = pGrd%rNoDataValue
 
       case ( GRID_DATATYPE_DOUBLE )
           allocate ( pGrd%dpData( iNX, iNY ), stat=iStat )
           call assert (iStat == 0, &
              "Could not allocate double-precision data", &
-              __SRCNAME__,__LINE__)
+              __FILE__,__LINE__)
           pGrd%dpData = pGrd%dpNoDataValue
 
       case default
@@ -392,19 +392,19 @@ subroutine grid_Destroy ( pGrd )
 !       call assert ( iStat == 0, "Failed to deallocate cell grid" )
     else
       call assert ( FALSE, "Internal error -- unknown grid type", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
     end if
 
     if( allocated(pGrd%rX) ) then
       deallocate( pGrd%rX, stat=iStat)
       call assert ( iStat == 0, "Failed to deallocate X-coordinate data structure associated with grid", &
-        __SRCNAME__, __LINE__ )
+        __FILE__, __LINE__ )
     endif
 
     if( allocated(pGrd%rY) ) then
       deallocate( pGrd%rY, stat=iStat)
       call assert ( iStat == 0, "Failed to deallocate Y-coordinate data structure associated with grid", &
-        __SRCNAME__, __LINE__ )
+        __FILE__, __LINE__ )
     endif
 
   endif
@@ -537,7 +537,7 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
   ! Pre-scan for the number of header records and read the header
   inquire(file=trim(sFileName), EXIST=lFileExists)
   call assert( lFileExists, "The Arc ASCII grid file "//dquote(sFilename)// &
-    " could not be found.",__SRCNAME__,__LINE__)
+    " could not be found.",__FILE__,__LINE__)
 
   inquire(unit=LU_GRID, OPENED=lIsOpen )
   if (lIsOpen )  close( unit=LU_GRID )
@@ -619,13 +619,13 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
                   call assert ( iStat == 0, &
                     "Failed to read integer grid data - file: " &
                     //trim(sFileName)//"  row num: "//TRIM( asCharacter(iRow)), &
-                   __SRCNAME__,__LINE__ )
+                   __FILE__,__LINE__ )
                 end do
                 if(len_trim(sNoDataValue) > 0) then
                   read(unit=sNoDataValue, fmt=*, iostat=iStat) pGrd%iNoDataValue
                   call assert ( iStat == 0, &
                     "Failed to read NODATA value in grid data - file: " &
-                    //dquote(sFileName), __SRCNAME__,__LINE__ )
+                    //dquote(sFileName), __FILE__,__LINE__ )
                 endif
 
               case ( DATATYPE_REAL )
@@ -635,13 +635,13 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
                   call assert ( iStat == 0, &
                     "Failed to read real grid data - file: " &
                     //trim(sFileName)//"  row num: "//TRIM( asCharacter(iRow)), &
-                   __SRCNAME__,__LINE__ )
+                   __FILE__,__LINE__ )
                 end do
                 if(len_trim(sNoDataValue) > 0) then
                   read(unit=sNoDataValue, fmt=*, iostat=iStat) pGrd%rNoDataValue
                   call assert ( iStat == 0, &
                     "Failed to read NODATA value in grid data - file: " &
-                    //trim(sFileName), __SRCNAME__,__LINE__ )
+                    //trim(sFileName), __FILE__,__LINE__ )
                 endif
 
               case ( DATATYPE_DOUBLE )
@@ -651,20 +651,20 @@ function grid_ReadArcGrid_fn ( sFileName, iDataType ) result ( pGrd )
                   call assert ( iStat == 0, &
                     "Failed to read double-precision grid data - file: "        &
                     //trim(sFileName)//"  row num: "//TRIM( asCharacter(iRow)), &
-                   __SRCNAME__,__LINE__ )
+                   __FILE__,__LINE__ )
                 end do
                 if(len_trim(sNoDataValue) > 0) then
                   read(unit=sNoDataValue, fmt=*, iostat=iStat) pGrd%dpNoDataValue
                   call assert ( iStat == 0, &
                     "Failed to read NODATA value in grid data - file: " &
-                    //trim(sFileName), __SRCNAME__,__LINE__ )
+                    //trim(sFileName), __FILE__,__LINE__ )
                 endif
 
               case default
 
                   call assert ( FALSE, &
                     "Internal error -- illegal ARC GRID data type", &
-                    __SRCNAME__,__LINE__)
+                    __FILE__,__LINE__)
 
           end select
           exit
@@ -708,7 +708,7 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
 
   inquire(file=trim(sFileName), EXIST=lFileExists, OPENED=lIsOpen )
   call assert( lFileExists, "The Arc ASCII grid file "//dquote(sFilename)// &
-    " could not be found.",__SRCNAME__,__LINE__)
+    " could not be found.",__FILE__,__LINE__)
 
   inquire(unit=LU_GRID, OPENED=lIsOpen )
   if (lIsOpen )  close( unit=LU_GRID )
@@ -782,13 +782,13 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
                   call assert ( iStat == 0, &
                     "Failed to read integer grid data - file: " &
                     //trim(sFileName)//"  row num: "//TRIM( asCharacter(iRow)), &
-                   __SRCNAME__,__LINE__ )
+                   __FILE__,__LINE__ )
                 end do
                 if(len_trim(sNoDataValue) > 0) then
                   read(unit=sNoDataValue, fmt=*, iostat=iStat) pGrd%iNoDataValue
                   call assert ( iStat == 0, &
                     "Failed to read NODATA value in grid data - file: " &
-                    //trim(sFileName), __SRCNAME__,__LINE__ )
+                    //trim(sFileName), __FILE__,__LINE__ )
                 endif
 
               case ( DATATYPE_REAL )
@@ -797,13 +797,13 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
                   call assert ( iStat == 0, &
                     "Failed to read real grid data - file: " &
                     //trim(sFileName)//"  row num: "//TRIM( asCharacter(iRow)), &
-                   __SRCNAME__,__LINE__ )
+                   __FILE__,__LINE__ )
                 end do
                 if(len_trim(sNoDataValue) > 0) then
                   read(unit=sNoDataValue, fmt=*, iostat=iStat) pGrd%rNoDataValue
                   call assert ( iStat == 0, &
                     "Failed to read NODATA value in grid data - file: " &
-                    //trim(sFileName), __SRCNAME__,__LINE__ )
+                    //trim(sFileName), __FILE__,__LINE__ )
                 endif
 
               case ( DATATYPE_DOUBLE )
@@ -812,19 +812,19 @@ subroutine grid_ReadArcGrid_sub ( sFileName, pGrd )
                   call assert ( iStat == 0, &
                     "Failed to read double-precision grid data - file: "        &
                     //trim(sFileName)//"  row num: "//TRIM( asCharacter(iRow)), &
-                   __SRCNAME__,__LINE__ )
+                   __FILE__,__LINE__ )
                 end do
                 if(len_trim(sNoDataValue) > 0) then
                   read(unit=sNoDataValue, fmt=*, iostat=iStat) pGrd%dpNoDataValue
                   call assert ( iStat == 0, &
                     "Failed to read NODATA value in grid data - file: " &
-                    //trim(sFileName), __SRCNAME__,__LINE__ )
+                    //trim(sFileName), __FILE__,__LINE__ )
                 endif
 
               case default
                   call assert ( FALSE, &
                     "Internal error -- illegal ARC GRID data type", &
-                    __SRCNAME__,__LINE__)
+                    __FILE__,__LINE__)
           end select
           exit
       end if
@@ -882,7 +882,7 @@ function grid_ReadSurferGrid_fn ( sFileName, iDataType ) result ( pGrd )
 
   inquire(file=trim(sFileName), EXIST=lFileExists)
   call assert( lFileExists, "The Surfer ASCII grid file "//dquote(sFilename)// &
-    " could not be found.",__SRCNAME__,__LINE__)
+    " could not be found.",__FILE__,__LINE__)
 
   inquire(unit=LU_GRID, OPENED=lIsOpen )
   if (lIsOpen )  close( unit=LU_GRID )
@@ -963,7 +963,7 @@ subroutine grid_ReadSurferGrid_sub ( sFileName, pGrd )
 
   inquire(file=trim(sFileName), EXIST=lFileExists)
   call assert( lFileExists, "The Surfer ASCII grid file "//dquote(sFilename)// &
-    " could not be found.",__SRCNAME__,__LINE__)
+    " could not be found.",__FILE__,__LINE__)
 
   inquire(unit=LU_GRID, OPENED=lIsOpen )
   if (lIsOpen )  close( unit=LU_GRID )
@@ -1067,7 +1067,7 @@ subroutine grid_WriteArcGrid(sFilename, pGrd)
     iNumRows = size(pGrd%dpData,2)
   else
     call assert(FALSE, "Internal programming error - Unsupported grid type", &
-      __SRCNAME__, __LINE__)
+      __FILE__, __LINE__)
   endif
 
   ! dynamically create the Fortran output format
@@ -1075,54 +1075,54 @@ subroutine grid_WriteArcGrid(sFilename, pGrd)
 
   open ( LU_TEMP, file=trim(OUTPUT_GRID_DIRECTORY_NAME)//sFilename, iostat=istat, status="REPLACE" )
   call assert( istat==0, "Could not open output file "//dQuote(sFilename), &
-      __SRCNAME__,__LINE__)
+      __FILE__,__LINE__)
 
   write ( unit=LU_TEMP, fmt="('NCOLS ',i10)", iostat=istat ) iNumCols
-  call assert( istat==0, "Error writing grid file header", __SRCNAME__, __LINE__)
+  call assert( istat==0, "Error writing grid file header", __FILE__, __LINE__)
 
   write ( unit=LU_TEMP, fmt="('NROWS ',i10)", iostat=istat ) iNumRows
-  call assert( istat==0, "Error writing grid file header", __SRCNAME__, __LINE__)
+  call assert( istat==0, "Error writing grid file header", __FILE__, __LINE__)
 
   write ( unit=LU_TEMP, fmt="('XLLCORNER ',f14.3)", iostat=istat ) pGrd%rX0
-  call assert( istat==0, "Error writing X limits", __SRCNAME__, __LINE__)
+  call assert( istat==0, "Error writing X limits", __FILE__, __LINE__)
 
   write ( unit=LU_TEMP, fmt="('YLLCORNER ',f14.3)", iostat=istat ) pGrd%rY0
-  call assert( istat==0, "Error writing Y limits", __SRCNAME__, __LINE__)
+  call assert( istat==0, "Error writing Y limits", __FILE__, __LINE__)
 
   write ( unit=LU_TEMP, fmt="('CELLSIZE ',f14.3)", iostat=istat ) pGrd%rGridCellSize
-  call assert( istat==0, "Error writing cell size", __SRCNAME__, __LINE__)
+  call assert( istat==0, "Error writing cell size", __FILE__, __LINE__)
 
   if ( pGrd%iDataType == DATATYPE_INT ) then
 
     write ( unit=LU_TEMP, fmt="('NODATA_VALUE ',i14)", iostat=istat ) pGrd%iNoDataValue
-    call assert( istat==0, "Error writing NODATA value", __SRCNAME__, __LINE__)
+    call assert( istat==0, "Error writing NODATA value", __FILE__, __LINE__)
     do iRow=1,iNumRows
       write( unit=LU_TEMP, fmt=TRIM(sBuf), iostat=istat ) &
         (TRIM( asCharacter(pGrd%iData(iCol,iRow) ) ),iCol=1,iNumCols)
       call assert( istat==0, "Error writing Arc ASCII INTEGER grid data", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
     end do
 
   elseif ( pGrd%iDataType == DATATYPE_REAL ) then
 
     write ( unit=LU_TEMP, fmt="('NODATA_VALUE ',g14.4)", iostat=istat ) pGrd%rNoDataValue
-    call assert( istat==0, "Error writing NODATA value", __SRCNAME__, __LINE__)
+    call assert( istat==0, "Error writing NODATA value", __FILE__, __LINE__)
     do iRow=1,iNumRows
       write( unit=LU_TEMP, fmt=TRIM(sBuf), iostat=istat ) &
         (TRIM(asCharacter( pGrd%rData(iCol,iRow) )),iCol=1,iNumCols)
       call assert( istat==0, "Error writing Arc ASCII REAL grid data", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
     end do
 
   elseif ( pGrd%iDataType == DATATYPE_DOUBLE ) then
 
     write ( unit=LU_TEMP, fmt="('NODATA_VALUE ',g14.4)", iostat=istat ) pGrd%dpNoDataValue
-    call assert( istat==0, "Error writing NODATA value", __SRCNAME__, __LINE__)
+    call assert( istat==0, "Error writing NODATA value", __FILE__, __LINE__)
     do iRow=1,iNumRows
       write( unit=LU_TEMP, fmt=TRIM(sBuf), iostat=istat ) &
         (TRIM(asCharacter( pGrd%dpData(iCol,iRow) )),iCol=1,iNumCols)
       call assert( istat==0, "Error writing Arc ASCII REAL grid data", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
     end do
 
   endif
@@ -1157,7 +1157,7 @@ subroutine grid_WriteSurferGrid(sFilename, pGrd)
     iNumRows = size(pGrd%dpData,2)
   else
     call assert(FALSE, "Internal programming error - Unsupported grid type", &
-      __SRCNAME__, __LINE__)
+      __FILE__, __LINE__)
   endif
 
   fHalfCell = pGrd%rGridCellSize * 0.5_c_float
@@ -1167,64 +1167,64 @@ subroutine grid_WriteSurferGrid(sFilename, pGrd)
 
   open ( LU_TEMP, file=trim(OUTPUT_GRID_DIRECTORY_NAME)//sFilename, iostat=istat, status="REPLACE" )
   call assert( istat==0, "Could not open output file "//dQuote(sFilename), &
-      __SRCNAME__,__LINE__)
+      __FILE__,__LINE__)
 
   write ( unit=LU_TEMP, fmt="('DSAA')", iostat=istat )
   call assert( istat==0, "Error writing SURFER header", &
-    __SRCNAME__, __LINE__)
+    __FILE__, __LINE__)
 
   write ( unit=LU_TEMP, fmt="(2i8)", iostat=istat ) iNumCols, iNumRows
   call assert( istat==0, "Error writing SURFER dimensions", &
-    __SRCNAME__, __LINE__)
+    __FILE__, __LINE__)
 
   write ( unit=LU_TEMP, fmt="(2f14.3)", iostat=istat ) &
            pGrd%rX0 + fHalfCell , pGrd%rX1 - fHalfCell
   call assert( istat==0, "Error writing SURFER X limits", &
-    __SRCNAME__, __LINE__)
+    __FILE__, __LINE__)
 
   write ( unit=LU_TEMP, fmt="(2f14.3)", iostat=istat ) &
            pGrd%rY0 + fHalfCell, pGrd%rY1 - fHalfCell
   call assert( istat==0, "Error writing SURFER Y limits", &
-    __SRCNAME__, __LINE__)
+    __FILE__, __LINE__)
 
   if ( pGrd%iDataType == DATATYPE_INT ) then
 
     write ( unit=LU_TEMP, fmt="(2i14)", iostat=istat ) minval(pGrd%iData),maxval(pGrd%iData)
     call assert( istat==0, "Error writing SURFER Z limits", &
-      __SRCNAME__, __LINE__)
+      __FILE__, __LINE__)
 
 
     do iRow=iNumRows,1,-1
       write( unit=LU_TEMP, fmt=TRIM(sBuf), iostat=istat ) &
         (TRIM(asCharacter(pGrd%iData(iCol,iRow) ) ),iCol=1,iNumCols)
       call assert( istat==0, "Error writing SURFER grid data" , &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
     end do
 
   elseif ( pGrd%iDataType == DATATYPE_REAL ) then
 
     write ( unit=LU_TEMP, fmt="(2f14.3)", iostat=istat ) minval(pGrd%rData),maxval(pGrd%rData)
     call assert( istat==0, "Error writing SURFER Z limits", &
-      __SRCNAME__, __LINE__)
+      __FILE__, __LINE__)
 
     do iRow=iNumRows,1,-1
       write( unit=LU_TEMP, fmt=TRIM(sBuf), iostat=istat ) &
         (TRIM( asCharacter(pGrd%rData(iCol,iRow) ) ),iCol=1,iNumCols)
       call assert( istat==0, "Error writing SURFER grid data" , &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
     end do
 
   elseif ( pGrd%iDataType == DATATYPE_DOUBLE ) then
 
     write ( unit=LU_TEMP, fmt="(2f14.3)", iostat=istat ) minval(pGrd%dpData),maxval(pGrd%dpData)
     call assert( istat==0, "Error writing SURFER Z limits", &
-      __SRCNAME__, __LINE__)
+      __FILE__, __LINE__)
 
     do iRow=iNumRows,1,-1
       write( unit=LU_TEMP, fmt=TRIM(sBuf), iostat=istat ) &
         (TRIM( asCharacter(pGrd%dpData(iCol,iRow) ) ),iCol=1,iNumCols)
       call assert( istat==0, "Error writing SURFER grid data" , &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
     end do
 
   endif
@@ -1560,7 +1560,7 @@ subroutine grid_Transform(pGrd, sFromPROJ4, sToPROJ4 )
 
   iRetVal = pj_init_and_transform(csFromPROJ4//C_NULL_CHAR, &
                                   csToPROJ4//C_NULL_CHAR,   &
-                                  __SRCNAME__//C_NULL_CHAR,    &
+                                  __FILE__//C_NULL_CHAR,    &
                                   __LINE__,                 &
                                   int(pGrd%iNumGridCells, c_long), pGrd%rX, pGrd%rY)
 
@@ -1683,7 +1683,7 @@ subroutine grid_CheckForPROJ4Error(iRetVal, sFromPROJ4, sToPROJ4)
       endif
     enddo
 
-    call assert(FALSE, trim(sErrorMessage), __SRCNAME__, __LINE__)
+    call assert(FALSE, trim(sErrorMessage), __FILE__, __LINE__)
 
   endif
 
@@ -1734,7 +1734,7 @@ function grid_Interpolate(pGrd,rXval,rYval) result ( rValue )
      .and. ia <= ubound(pGrd%rData,1), &
     "Internal programming error: illegal bounds caught~requested column value " &
     //trim( asCharacter(rXval, fmt_string="F0.3")) &
-    //" out of range", __SRCNAME__, __LINE__)
+    //" out of range", __FILE__, __LINE__)
 
   ! In some cases, when things really dry out, the y value
   ! goes out of range - enforce bounds.
@@ -1756,7 +1756,7 @@ function grid_Interpolate(pGrd,rXval,rYval) result ( rValue )
      .and. ja <= ubound(pGrd%rData,2), &
     "Internal programming error: illegal bounds caught~requested row value " &
     //trim( asCharacter(rXval, fmt_string="F0.3")) &
-    //" out of range", __SRCNAME__, __LINE__)
+    //" out of range", __FILE__, __LINE__)
 
   rValue = ( 1.0_c_float -u) * ( 1.0_c_float -v) * pGrd%rData(ib,jb)   + &
               u  * ( 1.0_c_float -v) * pGrd%rData(ib,ja)   + &
@@ -1841,14 +1841,14 @@ function grid_SearchColumn(pGrd,rXval,rZval,rNoData) result ( rValue )
      .and. ia <= ubound(pGrd%rData,1), &
     "Internal programming error: requested X value " &
     //trim( asCharacter(rXval, fmt_string="F0.3")) &
-    //" out of range", __SRCNAME__, __LINE__)
+    //" out of range", __FILE__, __LINE__)
 
   call assert(ubound(rCol,1) == ubound(pGrd%rData,2), &
     "Internal programming error: upper bound of rCol /= upper " &
     //"bound of first array element of pGrd%rData~" &
     //"ubound(rCol)="//trim( asCharacter(ubound(rCol,1))) &
     //"~ubound(pGrd%rData)="//trim( asCharacter(ubound(pGrd%rData,1))), &
-    __SRCNAME__, __LINE__)
+    __FILE__, __LINE__)
 
   ! interpolate the column of values based on the columns of values
   ! that bracket the real value rXval
@@ -2016,7 +2016,7 @@ function grid_GetGridColNum(pGrd,rX)  result(iColumnNumber)
 !     write(*, fmt="(a)") "was attempting to find column associated with X: "//trim(asCharacter(rX))
 !     call assert(FALSE,  "INTERNAL PROGRAMMING ERROR: Column number out of bounds (value: " &
 !      //trim( asCharacter(iColumnNumber))//")", &
-!      __SRCNAME__, __LINE__)
+!      __FILE__, __LINE__)
 !   endif
 
 end function grid_GetGridColNum
@@ -2037,7 +2037,7 @@ function grid_GetGridRowNum(pGrd,rY)  result(iRowNumber)
 !     write(*, fmt="(a)") "was attempting to find row associated with Y: "//trim(asCharacter(rY))
 !     call assert(FALSE,  "INTERNAL PROGRAMMING ERROR: Row number out of bounds (value: " &
 !      //trim( asCharacter(iRowNumber))//")", &
-!      __SRCNAME__, __LINE__)
+!      __FILE__, __LINE__)
 !   endif
 
 end function grid_GetGridRowNum
@@ -2193,14 +2193,14 @@ subroutine grid_PopulateXY(pGrd)
     ALLOCATE (pGrd%rX(pGrd%iNX, pGrd%iNY), STAT=iStat)
     call assert( iStat == 0, &
        "Could not allocate memory for x-coordinates within grid data structure", &
-       __SRCNAME__, __LINE__)
+       __FILE__, __LINE__)
   endif
 
   if ( .not. allocated(pGrd%rY) ) then
     ALLOCATE (pGrd%rY(pGrd%iNX, pGrd%iNY), STAT=iStat)
     call assert( iStat == 0, &
        "Could not allocate memory for y-coordinates within grid data structure", &
-       __SRCNAME__, __LINE__)
+       __FILE__, __LINE__)
   endif
 
   do iRow=1,pGrd%iNY
@@ -2271,11 +2271,11 @@ function grid_GridToPoint_int(pGrdFrom, pGrdTo, iCol, iRow)  result(iValue)
 
   if ( iColRow(COLUMN) < 1 .or. iColRow(COLUMN) > pGrdFrom%iNX )                       &
     call die( "Illegal column number supplied: "//trim(asCharacter(iColRow(COLUMN))),  &
-      __SRCNAME__, __LINE__)
+      __FILE__, __LINE__)
 
   if ( iColRow(ROW) < 1 .or. iColRow(ROW) > pGrdFrom%iNY )                             &
     call die( "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))),        &
-      __SRCNAME__, __LINE__)
+      __FILE__, __LINE__)
 
   !> @todo check the logic here...intent is to ensure that the majority filter is
   !!       searching an area that adequately covers corresponding gridcell areas
@@ -2329,11 +2329,11 @@ subroutine grid_GridToGrid_int( pGrdFrom, pGrdTo, lUseMajorityFilter )
 
         call assert(iColRow(COLUMN) > 0 .and. iColRow(COLUMN) <= pGrdFrom%iNX,    &
           "Illegal column number supplied: "//trim(asCharacter(iColRow(COLUMN))), &
-          __SRCNAME__, __LINE__)
+          __FILE__, __LINE__)
 
         call assert(iColRow(ROW) > 0 .and. iColRow(ROW) <= pGrdFrom%iNY,        &
           "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))),     &
-          __SRCNAME__, __LINE__)
+          __FILE__, __LINE__)
 
         pGrdTo%iData(iCol,iRow) = grid_majorityFilter_int( pGrdFrom=pGrdFrom,   &
              iTargetCol=iColRow(COLUMN),                                        &
@@ -2355,11 +2355,11 @@ subroutine grid_GridToGrid_int( pGrdFrom, pGrdTo, lUseMajorityFilter )
 
         call assert(iColRow(COLUMN) > 0 .and. iColRow(COLUMN) <= pGrdFrom%iNX,    &
           "Illegal column number supplied: "//trim(asCharacter(iColRow(COLUMN))), &
-          __SRCNAME__, __LINE__)
+          __FILE__, __LINE__)
 
         call assert(iColRow(ROW) > 0 .and. iColRow(ROW) <= pGrdFrom%iNY,        &
           "Illegal row number supplied: "//trim(asCharacter(iColRow(ROW))),     &
-          __SRCNAME__, __LINE__)
+          __FILE__, __LINE__)
 
         pGrdTo%iData(iCol,iRow) = pGrdFrom%iData( iColRow(COLUMN), iColRow(ROW) )
 

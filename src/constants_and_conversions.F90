@@ -62,6 +62,8 @@ module constants_and_conversions
   real (c_double), parameter, public :: F_PER_C    = 9.0_c_double / 5.0_c_double
   real (c_double), parameter, public :: M_PER_FOOT = 0.3048_c_double
   real (c_double), parameter, public :: MM_PER_IN  = 25.4_c_double
+  real (c_double), parameter, public :: FREEZING_POINT_OF_WATER_KELVIN = 273.15_c_double
+  real (c_double), parameter, public :: FREEZING_POINT_OF_WATER_FAHRENHEIT = 32.0_c_double
 
   public :: OUTPUT_PREFIX_NAME, OUTPUT_DIRECTORY_NAME, DATA_DIRECTORY_NAME,     &
             LOOKUP_TABLE_DIRECTORY_NAME
@@ -174,12 +176,12 @@ module constants_and_conversions
     module procedure inches_to_mm_dbl_fn
   end interface in_to_mm
 
-  public :: enforce_bounds
-  interface enforce_bounds
+  public :: clip
+  interface clip
     module procedure enforce_bounds_int_fn
     module procedure enforce_bounds_sgl_fn
     module procedure enforce_bounds_dbl_fn
-  end interface enforce_bounds
+  end interface clip
 
   public :: char_ptr_to_fortran_string
   public :: c_to_fortran_string

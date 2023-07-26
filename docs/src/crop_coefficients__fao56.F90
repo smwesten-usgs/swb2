@@ -5,7 +5,7 @@
 
 !> Update crop coefficients for crop types in simulation.
 
-module crop_coefficients__FAO56
+module crop_coefficients__fao56
 
   use iso_c_binding, only             : c_bool, c_short, c_int, c_float, c_double
   use constants_and_conversions, only : M_PER_FOOT, TRUE, FALSE, fTINYVAL,       &
@@ -192,27 +192,27 @@ contains
 
     allocate( GROWTH_STAGE_DOY( 5, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_DOY array", &
-      __SRCNAME__, __LINE__ )
+      __FILE__, __LINE__ )
 
     allocate( GROWTH_STAGE_GDD( 5, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_GDD array", &
-      __SRCNAME__, __LINE__ )
+      __FILE__, __LINE__ )
 
     allocate( GROWTH_STAGE_DATE( 6, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_DATE array", &
-      __SRCNAME__, __LINE__ )
+      __FILE__, __LINE__ )
 
     allocate( GROWTH_STAGE_SHIFT_DAYS( iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_SHIFT_DAYS array", &
-      __SRCNAME__, __LINE__ )
+      __FILE__, __LINE__ )
 
     allocate( KCB_l( 16, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for KCB_l array", &
-      __SRCNAME__, __LINE__ )
+      __FILE__, __LINE__ )
 
     allocate( KCB_METHOD( iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for KCB_METHOD vector", &
-      __SRCNAME__, __LINE__ )
+      __FILE__, __LINE__ )
 
     KCB_METHOD = -9999
     KCB_l = -9999.
@@ -260,7 +260,7 @@ contains
 
           ! append current year to the end of the user-entered planting date in mm/dd
           sMMDDYYYY = trim(PlantingDate_str)//"/"//asCharacter( SIM_DT%start%iYear )
-          call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)%parsedate( sMMDDYYYY, __SRCNAME__, __LINE__ )
+          call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)%parsedate( sMMDDYYYY, __FILE__, __LINE__ )
 
           GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) &
                                                       + GROWTH_STAGE_SHIFT_DAYS( iIndex )
@@ -625,4 +625,4 @@ end function update_crop_coefficient_GDD_as_threshold
 
   end subroutine crop_coefficients_FAO56_update_growing_season
 
-end module crop_coefficients__FAO56
+end module crop_coefficients__fao56

@@ -35,12 +35,13 @@ module data_catalog_entry
   integer (c_int), public, parameter :: DYNAMIC_GRID = 3
   integer (c_int), parameter         :: DYNAMIC_NETCDF_GRID = 4
   integer (c_int), parameter         :: NO_GRID = 5
-  integer (c_int), parameter         :: TABLE_LOOKUP_GRID = 6
+  integer (c_int), parameter         :: TABLE_LOOKUP = 6
 
   integer (c_int), parameter :: FILETYPE_ARC_ASCII = 0
   integer (c_int), parameter :: FILETYPE_SURFER = 1
   integer (c_int), parameter :: FILETYPE_NETCDF = 2
-  integer (c_int), parameter :: FILETYPE_NONE = 3
+  integer (c_int), parameter :: FILETYPE_ASCII_TABLE = 3
+  integer (c_int), parameter :: FILETYPE_NONE = 4
 
   type, public :: DATA_CATALOG_ENTRY_T
     character (len=:), allocatable :: sKeyword
@@ -61,6 +62,7 @@ module data_catalog_entry
     integer (c_int)           :: iFilename_Monthname_Capitalization_Rule = FILE_TEMPLATE_CAPITALIZED_MONTHNAME
     character (len=512)       :: sOldFilename           = ""
     character (len=256)       :: sDateColumnName        = ""
+    character (len=10)        :: sDefaultDateFormat     = "YYYY-MM-DD"
     character (len=256)       :: sValueColumnName       = ""
 
     real (c_float), allocatable    :: table_values_real(:)
@@ -80,10 +82,12 @@ module data_catalog_entry
     character (len=2)    :: sMissingValuesOperator = "&&"
     integer (c_int)      :: iMissingValuesAction = 0
 
-    real (c_double)      :: rUserScaleFactor = 1_c_double
-    real (c_double)      :: rUserAddOffset = 0_c_double
+    real (c_double)      :: dUserScaleFactor = 1_c_double
+    real (c_double)      :: dUserAddOffset = 0_c_double
+    real (c_double)      :: dUserSubOffset = 0_c_double
     real (c_double)      :: rX_Coord_AddOffset = 0.0_c_double
     real (c_double)      :: rY_Coord_AddOffset = 0.0_c_double
+    real (c_double)      :: rCoordinateTolerance = 0.0_c_double
 
     logical (c_bool)     :: lAllowMissingFiles = FALSE
     logical (c_bool)     :: lAllowAutomaticDataFlipping = TRUE
@@ -110,12 +114,12 @@ module data_catalog_entry
     type (GRID_BOUNDS_T)     :: GRID_BOUNDS_NATIVE
     type (GRID_BOUNDS_T)     :: GRID_BOUNDS_BASE
 
-    integer (c_int)     :: iNC_FILE_STATUS = NETCDF_FILE_CLOSED
+    integer (c_int)          :: iNC_FILE_STATUS = NETCDF_FILE_CLOSED
     type (T_NETCDF4_FILE)    :: NCFILE
 
-    integer (c_int)     :: iNC_ARCHIVE_STATUS = NETCDF_FILE_CLOSED
+    integer (c_int)          :: iNC_ARCHIVE_STATUS = NETCDF_FILE_CLOSED
     type (T_NETCDF4_FILE)    :: NCFILE_ARCHIVE
-    integer (c_size_t)  :: iNCFILE_RECNUM = 0
+    integer (c_size_t)       :: iNCFILE_RECNUM = 0
 
     integer (c_int)     :: iConstantValue = 0
     real (c_float)      :: rConstantValue = 0.0
@@ -140,22 +144,21 @@ module data_catalog_entry
     procedure  :: initialize_constant_int_data_object_sub
     procedure  :: initialize_constant_real_data_object_sub
     procedure  :: initialize_gridded_data_object_sub
+    procedure  :: initialize_table_sub
     generic    :: initialize => initialize_constant_int_data_object_sub,    &
                                 initialize_constant_real_data_object_sub,   &
-                                initialize_gridded_data_object_sub
-
-    procedure  :: initialize_table_real_data_object_sub
-    generic    :: initialize_real_table => initialize_table_real_data_object_sub
-
-    procedure  :: initialize_table_integer_data_object_sub
-    generic    :: initialize_integer_table => initialize_table_integer_data_object_sub
+                                initialize_gridded_data_object_sub,         &
+                                initialize_table_sub
 
     procedure  :: initialize_netcdf => initialize_netcdf_data_object_sub
 
-    procedure  :: set_scale    => set_scale_sub
-    procedure  :: set_offset   => set_offset_sub
-    procedure  :: set_X_offset => set_X_coord_offset_sub
-    procedure  :: set_Y_offset => set_Y_coord_offset_sub
+    procedure  :: set_scale                => set_scale_sub
+    procedure  :: set_sub_offset           => set_sub_offset_sub
+    procedure  :: set_add_offset           => set_add_offset_sub
+    
+    procedure  :: set_X_offset             => set_X_coord_offset_sub
+    procedure  :: set_Y_offset             => set_Y_coord_offset_sub
+    procedure  :: set_coordinate_tolerance => set_coordinate_tolerance_sub
 
     procedure  :: set_majority_filter_flag => set_majority_filter_flag_sub
 
@@ -280,13 +283,13 @@ contains
     integer (c_int), intent(out)         :: iValue
 
     if ( .not. associated(this%pGrdBase) ) &
-      call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
+      call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
 
     if (iCol <= ubound(this%pGrdBase%iData,1) .and. iRow <= ubound(this%pGrdBase%iData,2) ) then
       iValue = this%pGrdBase%iData(iCol, iRow)
     else
       call die ("Row/column indices out of bounds: ~row: "//asCharacter(iRow)//"~ col:"//asCharacter(iCol), &
-        __SRCNAME__, __LINE__ )
+        __FILE__, __LINE__ )
     endif
 
   end subroutine get_value_int_sub
@@ -301,16 +304,43 @@ contains
     real (c_float), intent(out)          :: fValue
 
     if ( .not. associated(this%pGrdBase) ) &
-      call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
+      call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
 
     if (iCol <= ubound(this%pGrdBase%iData,1) .and. iRow <= ubound(this%pGrdBase%iData,2) ) then
       fValue = this%pGrdBase%rData(iCol, iRow)
     else
       call die ("Row/column indices out of bounds: ~row: "//asCharacter(iRow)//"~ col:"//asCharacter(iCol), &
-        __SRCNAME__, __LINE__ )
+        __FILE__, __LINE__ )
     endif
 
   end subroutine get_value_float_sub
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine initialize_constant_int_data_object_sub( this, &
+    sDescription, &
+    iConstant )
+
+    class (DATA_CATALOG_ENTRY_T)    :: this
+    character (len=*), intent(in)   :: sDescription
+    integer (c_int), intent(in)     :: iConstant
+
+    this%iConstantValue = iConstant
+    this%sDescription = trim(sDescription)
+    this%iSourceDataForm = CONSTANT_GRID
+    this%iSourceDataType = DATATYPE_INT
+    this%iTargetDataType = DATATYPE_INT
+    this%iSourceFileType = FILETYPE_NONE
+
+    call this%nullify_pointers()
+
+    this%pGrdBase => grid_Create(iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, &
+      rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, rGridCellSize=BNDS%fGridCellSize, iDataType=DATATYPE_INT)
+
+    this%pGrdBase%sPROJ4_string = trim( BNDS%sPROJ4_string )
+    this%pGrdBase%sFilename = "None: constant value entered from control file."
+
+  end subroutine initialize_constant_int_data_object_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -341,86 +371,48 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine initialize_constant_int_data_object_sub( this, &
-    sDescription, &
-    iConstant )
-
-    class (DATA_CATALOG_ENTRY_T) :: this
-    character (len=*) :: sDescription
-    integer (c_int), intent(in) :: iConstant
-
-    this%iConstantValue = iConstant
-    this%sDescription = trim(sDescription)
-    this%iSourceDataForm = CONSTANT_GRID
-    this%iSourceDataType = DATATYPE_INT
-    this%iTargetDataType = DATATYPE_INT
-    this%iSourceFileType = FILETYPE_NONE
-
-    call this%nullify_pointers()
-
-    this%pGrdBase => grid_Create(iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, &
-      rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, rGridCellSize=BNDS%fGridCellSize, iDataType=DATATYPE_INT)
-
-    this%pGrdBase%sPROJ4_string = BNDS%sPROJ4_string
-    this%pGrdBase%sFilename = "None: constant value entered from control file."
-
-  end subroutine initialize_constant_int_data_object_sub
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine initialize_table_real_data_object_sub( this, sDescription, sDateColumnName, sValueColumnName)
+  subroutine initialize_table_sub( this, sDescription, sDateColumnName, sValueColumnName, sType)
 
     class (DATA_CATALOG_ENTRY_T)  :: this
     character (len=*), intent(in) :: sDescription
     character (len=*), intent(in) :: sDateColumnName
     character (len=*), intent(in) :: sValueColumnName
+    character (len=*), intent(in) :: sType
 
     this%sDescription     = trim(sDescription)
-    this%iSourceDataForm  = TABLE_LOOKUP_GRID
+    this%iSourceDataForm  = TABLE_LOOKUP
     this%iSourceDataType  = DATATYPE_REAL
     this%iTargetDataType  = DATATYPE_REAL
-    this%iSourceFileType  = FILETYPE_NONE
+    this%iSourceFileType  = FILETYPE_ASCII_TABLE
     this%sDateColumnName  = sDateColumnName
     this%sValueColumnName = sValueColumnName
 
     call this%nullify_pointers()
 
-    this%pGrdBase => grid_Create(iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, &
-      rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, rGridCellSize=BNDS%fGridCellSize, iDataType=DATATYPE_REAL)
+    select case (asLowercase(sType))
+
+      case ("float", "real" )
+
+        this%iSourceDataType  = DATATYPE_REAL
+        this%iTargetDataType  = DATATYPE_REAL
+        this%pGrdBase => grid_Create(iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, &
+        rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, rGridCellSize=BNDS%fGridCellSize, iDataType=DATATYPE_REAL)
+      
+      case ("int", "integer")
+
+        this%iSourceDataType  = DATATYPE_INT
+        this%iTargetDataType  = DATATYPE_INT
+        this%pGrdBase => grid_Create(iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, &
+        rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, rGridCellSize=BNDS%fGridCellSize, iDataType=DATATYPE_INT)
+      
+    end select  
 
     this%pGrdBase%sPROJ4_string = BNDS%sPROJ4_string
     this%pGrdBase%sFilename = "None: daily value found in table of values."
 
-  end subroutine initialize_table_real_data_object_sub
+  end subroutine initialize_table_sub
 
 !--------------------------------------------------------------------------------------------------
-
-  subroutine initialize_table_integer_data_object_sub( this, sDescription, sDateColumnName, sValueColumnName)
-
-    class (DATA_CATALOG_ENTRY_T)  :: this
-    character (len=*), intent(in) :: sDescription
-    character (len=*), intent(in) :: sDateColumnName
-    character (len=*), intent(in) :: sValueColumnName
-
-    this%sDescription      = trim(sDescription)
-    this%iSourceDataForm   = TABLE_LOOKUP_GRID
-    this%iSourceDataType   = DATATYPE_INT
-    this%iTargetDataType   = DATATYPE_INT
-    this%iSourceFileType   = FILETYPE_NONE
-    this%sDateColumnName   = sDateColumnName
-    this%sValueColumnName  = sValueColumnName
-
-    call this%nullify_pointers()
-
-    this%pGrdBase => grid_Create(iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, &
-      rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, rGridCellSize=BNDS%fGridCellSize, iDataType=DATATYPE_REAL)
-
-    this%pGrdBase%sPROJ4_string = BNDS%sPROJ4_string
-    this%pGrdBase%sFilename = "None: daily value found in table of values."
-
-  end subroutine initialize_table_integer_data_object_sub
-
- !--------------------------------------------------------------------------------------------------
 
 subroutine initialize_gridded_data_object_sub( this, &
   sDescription, &
@@ -471,12 +463,12 @@ subroutine initialize_gridded_data_object_sub( this, &
   call assert(this%iSourceFileType == FILETYPE_ARC_ASCII .or. &
     this%iSourceFileType == FILETYPE_SURFER, "Only Arc ASCII or " &
     //"Surfer grids are supported as static grid inputs (for now).", &
-    __SRCNAME__, __LINE__)
+    __FILE__, __LINE__)
 
   call assert(this%iSourceDataType == DATATYPE_INT .or. &
     this%iSourceDataType == DATATYPE_REAL, "Only integer or " &
     //"real data types are supported as static grid inputs.", &
-    __SRCNAME__, __LINE__)
+    __FILE__, __LINE__)
 
   call this%nullify_pointers()
 
@@ -574,7 +566,7 @@ end subroutine initialize_netcdf_data_object_sub
 
       call getvalues_static_netcdf_sub( this )
 
-    elseif( this%iSourceDataForm == TABLE_LOOKUP_GRID ) then
+    elseif( this%iSourceDataForm == TABLE_LOOKUP ) then
 
       call getvalues_from_lookup_table( this, dt )
 
@@ -589,7 +581,7 @@ end subroutine initialize_netcdf_data_object_sub
     else
 
       call assert(FALSE, "Unsupported data source specified", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
     endif
 
@@ -601,16 +593,20 @@ end subroutine initialize_netcdf_data_object_sub
       if (this%iTargetDataType == DATATYPE_REAL) then
 
         call apply_scale_and_offset(fResult=this%pGrdBase%rData, fValue=this%pGrdBase%rData,          &
-              dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
+              dUserSubOffset=this%dUserSubOffset,                                                     &
+              dUserScaleFactor=this%dUserScaleFactor,                                                 &
+              dUserAddOffset=this%dUserAddOffset )
 
       elseif ( this%iTargetDataType == DATATYPE_INT ) then
 
-         call apply_scale_and_offset(iResult=this%pGrdBase%iData, iValue=this%pGrdBase%iData,          &
-              dUserScaleFactor=this%rUserScaleFactor, dUserAddOffset=this%rUserAddOffset )
+         call apply_scale_and_offset(iResult=this%pGrdBase%iData, iValue=this%pGrdBase%iData,         &
+              dUserSubOffset=this%dUserSubOffset,                                                     &
+              dUserScaleFactor=this%dUserScaleFactor,                                                 &
+              dUserAddOffset=this%dUserAddOffset )
 
       else
 
-        call die("Unsupported data type specified", __SRCNAME__, __LINE__)
+        call die("Unsupported data type specified", __FILE__, __LINE__)
 
       endif
 
@@ -620,27 +616,29 @@ end subroutine initialize_netcdf_data_object_sub
 
 !--------------------------------------------------------------------------------------------------
 
-elemental subroutine apply_scale_and_offset_float(fResult, fValue, dUserScaleFactor, dUserAddOffset )
+elemental subroutine apply_scale_and_offset_float(fResult, fValue, dUserScaleFactor, dUserSubOffset, dUserAddOffset )
 
   real (c_float), intent(out)  :: fResult
   real (c_float), intent(in)   :: fValue
   real (c_double), intent(in)   :: dUserScaleFactor
+  real (c_double), intent(in)   :: dUserSubOffset
   real (c_double), intent(in)   :: dUserAddOffset
 
-  fResult = ( fValue * dUserScaleFactor ) + dUserAddOffset
+  fResult = ( (fValue - dUserSubOffset) * dUserScaleFactor ) + dUserAddOffset
 
 end subroutine apply_scale_and_offset_float
 
 !--------------------------------------------------------------------------------------------------
 
-elemental subroutine apply_scale_and_offset_int(iResult, iValue, dUserScaleFactor, dUserAddOffset )
+elemental subroutine apply_scale_and_offset_int(iResult, iValue, dUserScaleFactor, dUserSubOffset, dUserAddOffset )
 
   integer (c_int), intent(out) :: iResult
   integer (c_int), intent(in)  :: iValue
   real (c_double), intent(in)   :: dUserScaleFactor
+  real (c_double), intent(in)   :: dUserSubOffset
   real (c_double), intent(in)   :: dUserAddOffset
 
-  iResult = ( real( iValue, c_float) * dUserScaleFactor ) + dUserAddOffset
+  iResult = ( ( real( iValue, c_float) - dUserSubOffset ) * dUserScaleFactor ) + dUserAddOffset
 
 end subroutine apply_scale_and_offset_int
 
@@ -651,7 +649,7 @@ subroutine getvalues_constant_sub( this  )
   class (DATA_CATALOG_ENTRY_T) :: this
 
   if ( .not. associated(this%pGrdBase) ) &
-    call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
+    call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
 
   select case (this%iSourceDataType)
 
@@ -674,16 +672,13 @@ subroutine getvalues_constant_sub( this  )
       call assert(FALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: " &
         //"name="//dquote(this%sDescription) &
         //"; value="//trim(asCharacter(this%iSourceDataType)), &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
     end select
 
   end subroutine getvalues_constant_sub
 
-
-
-
-
+!--------------------------------------------------------------------------------------------------
 
   subroutine getvalues_from_lookup_table( this, dt )
 
@@ -698,12 +693,12 @@ subroutine getvalues_constant_sub( this  )
     type (FSTRING_LIST_T) :: slDateValues
 
     if ( .not. associated(this%pGrdBase) ) &
-      call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
+      call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
 
     if ( .not. this%lTableValuesHaveBeenRetrieved ) then
 
       this%lTableValuesHaveBeenRetrieved = TRUE
-      this%table_indx = 0
+      this%table_indx = 1
 
       select case (this%iSourceDataType)
 
@@ -717,15 +712,18 @@ subroutine getvalues_constant_sub( this  )
         !!      dates out of order, dates missing, mismatched numbers of dates versus values, etc.
         allocate(this%table_dates(n), stat=status_code)
         allocate(this%table_values_real(n), stat=status_code)
+
+        call this%table_dates(1)%setDateFormat(this%sDefaultDateFormat)
+        
         call PARAMS%get_parameters(sKey=this%sValueColumnName, fValues=this%table_values_real)
 
         if (     ( size( this%table_values_real,1) /= n)      &
             .or. ( size( this%table_values_real,1) == 1 ) )   &
             call die("Did not find values associated with a required table entry ("//squote(this%sValueColumnName)//"). ",   &
-            __SRCNAME__, __LINE__)
+            __FILE__, __LINE__)
 
         do indx=1, n
-          call this%table_dates(indx)%parseDate(slDateValues%get(indx),__SRCNAME__, __LINE__)
+          call this%table_dates(indx)%parseDate(slDateValues%get(indx),__FILE__, __LINE__)
         enddo 
 
       case ( DATATYPE_INT)
@@ -738,13 +736,26 @@ subroutine getvalues_constant_sub( this  )
         call assert(FALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: " &
           //"name="//dquote(this%sDescription) &
           //"; value="//trim(asCharacter(this%iSourceDataType)), &
-          __SRCNAME__, __LINE__)
+          __FILE__, __LINE__)
 
       end select
 
     endif
 
-    this%table_indx = this%table_indx + 1
+    do
+
+      if ( this%table_indx < lbound(this%table_dates,1))  exit
+      if ( this%table_indx > ubound(this%table_dates,1))  exit
+
+      if (this%table_dates(this%table_indx) < dt) then
+        this%table_indx = this%table_indx + 1
+      elseif (this%table_dates(this%table_indx) > dt) then
+        this%table_indx = this%table_indx - 1
+      else 
+        exit 
+      endif
+
+    enddo
 
     if ( this%table_dates(this%table_indx) == dt ) then
 
@@ -765,16 +776,16 @@ subroutine getvalues_constant_sub( this  )
           call assert(FALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: " &
             //"name="//dquote(this%sDescription) &
             //"; value="//trim(asCharacter(this%iSourceDataType)), &
-            __SRCNAME__, __LINE__)
+            __FILE__, __LINE__)
     
-        end select
+      end select
 
-      else 
+    else 
 
-        call die("Missing or out-of-order value supplied for "//squote(this%sValueColumnName),   &
-          __SRCNAME__, __LINE__)
+      call die("Missing or out-of-order value supplied for "//squote(this%sValueColumnName),   &
+          __FILE__, __LINE__)
         
-      endif
+    endif
 
     end subroutine getvalues_from_lookup_table
 
@@ -820,14 +831,14 @@ subroutine getvalues_constant_sub( this  )
       call assert(this%iSourceFileType == FILETYPE_ARC_ASCII .or. &
         this%iSourceFileType == FILETYPE_SURFER, "INTERNAL PROGRAMMING ERROR -" &
         //" improper file type in use for a call to this subroutine", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
       if(this%iSourceDataForm == DYNAMIC_GRID ) then
 
         if(.not. present(dt) ) &
           call assert(FALSE, "INTERNAL PROGRAMMING ERROR - datetime object"   &
             //" must be supplied when calling this subroutine in a "           &
-            //"dynamic mode.", __SRCNAME__, __LINE__)
+            //"dynamic mode.", __FILE__, __LINE__)
 
 
         call this%make_filename(dt)
@@ -889,7 +900,7 @@ subroutine getvalues_constant_sub( this  )
 
           call assert(FALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: value=" &
             //trim(asCharacter(this%iSourceDataType)), &
-            __SRCNAME__, __LINE__)
+            __FILE__, __LINE__)
 
       end select
 
@@ -910,7 +921,7 @@ subroutine transform_grid_to_grid_sub(this)
   class (DATA_CATALOG_ENTRY_T) :: this
 
   if (.not. associated(this%pGrdNative) )  &
-    call die("INTERNAL PROGRAMMING ERROR--Null pointer detected.", __SRCNAME__, __LINE__)
+    call die("INTERNAL PROGRAMMING ERROR--Null pointer detected.", __FILE__, __LINE__)
 
   if ( .not. associated(this%pGrdBase) ) &
     this%pGrdBase => grid_Create( iNX=BNDS%iNumCols, iNY=BNDS%iNumRows, rX0=BNDS%fX_ll, rY0=BNDS%fY_ll, &
@@ -954,7 +965,7 @@ subroutine transform_grid_to_grid_sub(this)
 
       call assert(FALSE, "INTERNAL PROGRAMMING ERROR - Unhandled data type: value=" &
         //trim(asCharacter(this%iSourceDataType)), &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
   end select
 
@@ -1065,7 +1076,7 @@ end subroutine set_constant_value_real
 !    iStatus = getcwd(sCWD )
 
 !    call assert(iStatus==0, "Problem detemining what the current working" &
-!      //" directory is", __SRCNAME__, __LINE__)
+!      //" directory is", __FILE__, __LINE__)
 
     sNewFilename = this%sFilenameTemplate
 
@@ -1322,14 +1333,13 @@ end subroutine set_constant_value_real
         ! we are not within the proper range of dates to allow for padding.
         call assert(lExist, "The filename created from your template refers to " &
           //"a nonexistent file. ~ Attempted to open filename "&
-          //dquote(this%sSourceFilename), __SRCNAME__, __LINE__)
+          //dquote(this%sSourceFilename), __FILE__, __LINE__)
 
         exit
 
       endif
 
     enddo
-
 
   end function test_for_need_to_pad_values_fn
 
@@ -1346,9 +1356,12 @@ end subroutine set_constant_value_real
     logical (c_bool) :: lDateTimeFound
     real (c_double) :: dAddOffset
     real (c_double) :: dScaleFactor
+    integer (c_int) :: iMonth
+    integer (c_int) :: iDay
+    integer (c_int) :: iYear
 
     if ( .not. associated(this%pGrdBase) ) &
-      call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
+      call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
 
     this%lPadValues = FALSE
 
@@ -1370,7 +1383,7 @@ end subroutine set_constant_value_real
           this%iNC_FILE_STATUS = NETCDF_FILE_CLOSED
         endif
 
-      endif
+      endif  ! end of block to process if NETCDF_FILE_OPEN
 
       if ( this%iNC_FILE_STATUS == NETCDF_FILE_CLOSED ) then
 
@@ -1398,40 +1411,42 @@ end subroutine set_constant_value_real
             if( ( len_trim( this%sSourcePROJ4_string ) > 0 )                    &
               .and. ( .not. ( this%sSourcePROJ4_string .strequal. "<NA>") ) ) then
 
-              ! calculate the project boundaries in the coordinate system of
+                ! calculate the project boundaries in the coordinate system of
               ! the native data file
               call this%calc_project_boundaries(pGrdBase=this%pGrdBase)
 
               if ( this%lRequireCompleteSpatialCoverage ) then
 
-                call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE, &
-                  sFilename=this%sSourceFilename, &
-                  lFlipHorizontal=this%lFlipHorizontal, &
-                  lFlipVertical=this%lFlipVertical, &
-                  lAllowAutomaticDataFlipping=this%lAllowAutomaticDataFlipping, &
-                  rX_Coord_AddOffset = this%rX_Coord_AddOffset, &
-                  rY_Coord_AddOffset = this%rY_Coord_AddOffset, &
-                  sVariableOrder=this%sVariableOrder, &
-                  sVarName_x=this%sVariableName_x, &
-                  sVarName_y=this%sVariableName_y, &
-                  sVarName_z=this%sVariableName_z, &
-                  sVarName_time=this%sVariableName_time, &
+                call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE,          &
+                  sFilename=this%sSourceFilename,                                  &
+                  lFlipHorizontal=this%lFlipHorizontal,                            &
+                  lFlipVertical=this%lFlipVertical,                                &
+                  lAllowAutomaticDataFlipping=this%lAllowAutomaticDataFlipping,    &
+                  rX_Coord_AddOffset = this%rX_Coord_AddOffset,                    &
+                  rY_Coord_AddOffset = this%rY_Coord_AddOffset,                    &
+                  sVariableOrder=this%sVariableOrder,                              &
+                  sVarName_x=this%sVariableName_x,                                 &
+                  sVarName_y=this%sVariableName_y,                                 &
+                  sVarName_z=this%sVariableName_z,                                 &
+                  sVarName_time=this%sVariableName_time,                           &
+                  rCoordinateTolerance=this%rCoordinateTolerance,                  &
                   tGridBounds=this%GRID_BOUNDS_NATIVE )
 
               else
 
-                call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE, &
-                  sFilename=this%sSourceFilename, &
-                  lFlipHorizontal=this%lFlipHorizontal, &
-                  lFlipVertical=this%lFlipVertical, &
-                  lAllowAutomaticDataFlipping=this%lAllowAutomaticDataFlipping, &
-                  rX_Coord_AddOffset = this%rX_Coord_AddOffset, &
-                  rY_Coord_AddOffset = this%rY_Coord_AddOffset, &
-                  sVariableOrder=this%sVariableOrder, &
-                  sVarName_x=this%sVariableName_x, &
-                  sVarName_y=this%sVariableName_y, &
-                  sVarName_z=this%sVariableName_z, &
-                  sVarName_time=this%sVariableName_time )
+                call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE,          &
+                  sFilename=this%sSourceFilename,                                  &
+                  lFlipHorizontal=this%lFlipHorizontal,                            &
+                  lFlipVertical=this%lFlipVertical,                                &
+                  lAllowAutomaticDataFlipping=this%lAllowAutomaticDataFlipping,    &
+                  rX_Coord_AddOffset = this%rX_Coord_AddOffset,                    &
+                  rY_Coord_AddOffset = this%rY_Coord_AddOffset,                    &
+                  sVariableOrder=this%sVariableOrder,                              &
+                  sVarName_x=this%sVariableName_x,                                 &
+                  sVarName_y=this%sVariableName_y,                                 &
+                  sVarName_z=this%sVariableName_z,                                 &
+                  sVarName_time=this%sVariableName_time,                           &
+                  rCoordinateTolerance=this%rCoordinateTolerance )
 
               endif
 
@@ -1439,15 +1454,16 @@ end subroutine set_constant_value_real
 
               ! assume source NetCDF file is in same projection and
               ! of same dimensions as base grid
-              call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE, &
-                sFilename=this%sSourceFilename, &
-                lFlipHorizontal=this%lFlipHorizontal, &
-                lFlipVertical=this%lFlipVertical, &
-                lAllowAutomaticDataFlipping=this%lAllowAutomaticDataFlipping, &
-                sVariableOrder=this%sVariableOrder, &
-                sVarName_x=this%sVariableName_x, &
-                sVarName_y=this%sVariableName_y, &
-                sVarName_z=this%sVariableName_z, &
+              call netcdf_open_and_prepare_as_input(NCFILE=this%NCFILE,              &
+                sFilename=this%sSourceFilename,                                      &
+                lFlipHorizontal=this%lFlipHorizontal,                                &
+                lFlipVertical=this%lFlipVertical,                                    &
+                lAllowAutomaticDataFlipping=this%lAllowAutomaticDataFlipping,        &
+                sVariableOrder=this%sVariableOrder,                                  &
+                sVarName_x=this%sVariableName_x,                                     &
+                sVarName_y=this%sVariableName_y,                                     &
+                sVarName_z=this%sVariableName_z,                                     &
+                rCoordinateTolerance=this%rCoordinateTolerance,                       &
                 sVarName_time=this%sVariableName_time )
 
               this%NCFILE%iNX = this%pGrdBase%iNX
@@ -1492,14 +1508,11 @@ end subroutine set_constant_value_real
           else
             ! Projection settings can be left alone; read values from new
             ! NetCDF file with same grid boundaries, projection, etc.
-
-  !          call netcdf_open_file(NCFILE=this%NCFILE, sFilename=this%sSourceFilename, iLU=LU_LOG)
             call netcdf_open_file(NCFILE=this%NCFILE, sFilename=this%sSourceFilename)
 
             this%iNC_FILE_STATUS = NETCDF_FILE_OPEN
 
           endif
-
 
           if ( netcdf_date_within_range(NCFILE=this%NCFILE,                    &
                iJulianDay=int(dt%iJulianDay, c_int) ) ) then
@@ -1517,14 +1530,22 @@ end subroutine set_constant_value_real
 
           else
 
-            call LOGS%write("Valid date range (NetCDF): "//trim(asCharacter(this%NCFILE%iFirstDayJD)) &
-              //" to "//trim(asCharacter(this%NCFILE%iLastDayJD)) )
-
-            call LOGS%write("Current Julian Day value: "//trim(asCharacter(dt%iJulianDay)) )
+            call gregorian_date(this%NCFILE%iFirstDayJD,iYear, iMonth, iDay )
+            call LOGS%write("NetCDF start date:            "//trim(asCharacter(iMonth, "i2.2"))  &
+              //"/"//trim(asCharacter(iDay, "i2.2"))//"/"//trim(asCharacter(iYear, "i4.4")))
+              !//" to "//trim(asCharacter(this%NCFILE%iLastDayJD)) )
+            
+            call gregorian_date(this%NCFILE%iLastDayJD,iYear, iMonth, iDay )
+            call LOGS%write("NetCDF end date:              "//trim(asCharacter(iMonth, "i2.2"))  &
+              //"/"//trim(asCharacter(iDay, "i2.2"))//"/"//trim(asCharacter(iYear, "i4.4")))
+  
+            call gregorian_date(int(dt%iJulianDay, c_int),iYear, iMonth, iDay )
+            call LOGS%write("Current SWB simulation date:  "//trim(asCharacter(iMonth, "i2.2"))  &
+              //"/"//trim(asCharacter(iDay, "i2.2"))//"/"//trim(asCharacter(iYear, "i4.4")))
 
             call assert (FALSE, "Date range for currently open NetCDF file" &
-              //" does not include the present simulation date.", &
-              __SRCNAME__, __LINE__)
+              //" does not include the current simulation date.", &
+              __FILE__, __LINE__)
 
           endif
 
@@ -1577,12 +1598,6 @@ end subroutine set_constant_value_real
 
       call LOGS%write( repeat("=", 60) )
       call LOGS%write( "Missing day found in NetCDF file - padding values" )
-!      call stats_WriteMinMeanMax( iLU=6, &
-!        sText=trim(this%NCFILE%sFilename), &
-!        rData=this%pGrdNative%rData)
-!      call stats_WriteMinMeanMax( iLU=6, &
-!        sText=trim(this%NCFILE%sFilename), &
-!        rData=this%pGrdNative%rData)
       call LOGS%write( repeat("=", 60) )
 
     endif
@@ -1643,7 +1658,7 @@ end subroutine set_constant_value_real
     real (c_double) :: dScaleFactor
 
     if ( .not. associated(this%pGrdBase) ) &
-      call die("Internal programming error--attempt to use null pointer", __SRCNAME__, __LINE__)
+      call die("Internal programming error--attempt to use null pointer", __FILE__, __LINE__)
 
     if ( this%iNC_FILE_STATUS == NETCDF_FILE_CLOSED ) then
 
@@ -1799,7 +1814,7 @@ end subroutine set_constant_value_real
        iStart=[this%iNCFILE_RECNUM], &
        iCount=[1_c_size_t], &
        iStride=[1_c_size_t], &
-       dpValues=[real(this%iNCFILE_RECNUM, c_double)])
+       rValues=[real(this%iNCFILE_RECNUM, c_float)])
 
     this%iNCFILE_RECNUM = this%iNCFILE_RECNUM + 1
 
@@ -1830,7 +1845,7 @@ end subroutine set_constant_value_real
        call assert(FALSE, "Unknown input file type specified. ~"&
          //"  filename: "//dquote(this%sSourceFilename) &
          //"~  file type specified as: "//dquote(this%sSourceFileType), &
-         __SRCNAME__, __LINE__)
+         __FILE__, __LINE__)
 
      endif
 
@@ -1911,12 +1926,12 @@ end subroutine set_constant_value_real
 
 !--------------------------------------------------------------------------------------------------
 
-subroutine set_scale_sub(this, rScaleFactor)
+subroutine set_scale_sub(this, dScaleFactor)
 
    class (DATA_CATALOG_ENTRY_T) :: this
-   real (c_float) :: rScaleFactor
+   real (c_double) :: dScaleFactor
 
-   this%rUserScaleFactor = rScaleFactor
+   this%dUserScaleFactor = dScaleFactor
 
 end subroutine set_scale_sub
 
@@ -1947,7 +1962,7 @@ end subroutine set_X_coord_offset_sub
 subroutine set_Y_coord_offset_sub(this, rYOffset)
 
    class (DATA_CATALOG_ENTRY_T) :: this
-   real (c_double)         :: rYOffset
+   real (c_double)              :: rYOffset
 
    this%rY_Coord_AddOffset = rYOffset
 
@@ -1955,14 +1970,36 @@ end subroutine set_Y_coord_offset_sub
 
 !----------------------------------------------------------------------
 
-subroutine set_offset_sub(this, rAddOffset)
+subroutine set_coordinate_tolerance_sub(this, rCoordinateTolerance)
+
+  class (DATA_CATALOG_ENTRY_T) :: this
+  real (c_double)              :: rCoordinateTolerance
+
+  this%rCoordinateTolerance = rCoordinateTolerance
+
+end subroutine set_coordinate_tolerance_sub  
+
+!----------------------------------------------------------------------
+
+subroutine set_add_offset_sub(this, dAddOffset)
 
    class (DATA_CATALOG_ENTRY_T) :: this
-   real (c_float)          :: rAddOffset
+   real (c_double)              :: dAddOffset
 
-   this%rUserAddOffset = rAddOffset
+   this%dUserAddOffset = dAddOffset
 
-end subroutine set_offset_sub
+end subroutine set_add_offset_sub
+
+!----------------------------------------------------------------------
+
+subroutine set_sub_offset_sub(this, dSubOffset)
+
+  class (DATA_CATALOG_ENTRY_T) :: this
+  real (c_double)              :: dSubOffset
+
+  this%dUserSubOffset = dSubOffset
+
+end subroutine set_sub_offset_sub
 
 !--------------------------------------------------------------------------------------------------
 
@@ -2082,7 +2119,7 @@ end subroutine set_maximum_allowable_value_real_sub
       ! pertinent to our project area.
       iRetVal = pj_init_and_transform(trim(pGrdBase%sPROJ4_string)//C_NULL_CHAR, &
                   trim(this%sSourcePROJ4_string)//C_NULL_CHAR,                   &
-                  __SRCNAME__//C_NULL_CHAR,                                   &
+                  __FILE__//C_NULL_CHAR,                                   &
                   __LINE__,                                                      &
                   4_c_long,                                                      &
                   rX, rY )
@@ -2109,6 +2146,8 @@ end subroutine set_maximum_allowable_value_real_sub
 
     endif
 
+    ! GRID_BOUNDS_NATIVE will contain the SWB model bounds as defined in the
+    ! projection of the particular dataset
     this%GRID_BOUNDS_NATIVE%rXll = rX(1); this%GRID_BOUNDS_NATIVE%rXlr = rX(2)
     this%GRID_BOUNDS_NATIVE%rYll = rY(1); this%GRID_BOUNDS_NATIVE%rYlr = rY(2)
     this%GRID_BOUNDS_NATIVE%rXul = rX(3); this%GRID_BOUNDS_NATIVE%rXur = rX(4)
@@ -2252,7 +2291,7 @@ end subroutine set_maximum_allowable_value_real_sub
       case default
 
         call assert(FALSE, "INTERNAL PROGRAMMING ERROR - unhandled iMissingValuesAction", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
     end select
 
@@ -2345,7 +2384,7 @@ end subroutine set_maximum_allowable_value_real_sub
       case default
 
         call assert(FALSE, "INTERNAL PROGRAMMING ERROR - unhandled iMissingValuesAction", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
     end select
 

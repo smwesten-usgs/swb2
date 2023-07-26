@@ -38,18 +38,13 @@ contains
   !! Open a NetCDF output file to hold fog variable output.
   !!
   !! @param[in] lActive 2-D array of active cells within the model domain.
-  !! @param[in] dX 1D vector of X coordinates associated with the model domain.
-  !! @param[in] dY 1D vector of Y coordinates.
-  !! @param[in] dX_lon 2D array of longitude values.
-  !! @param[in] dY_lat 2D array of latitude values.
-
   subroutine fog_monthly_grid_initialize( lActive )
 
     logical (c_bool), intent(in)     :: lActive(:,:)
 
     ! [ LOCALS ]
     integer (c_int)                 :: iStat
-    type (FSTRING_LIST_T)                 :: slString
+    type (FSTRING_LIST_T)           :: slString
     integer (c_int)                 :: iIndex
     integer (c_int), allocatable    :: iLanduseCodes(:)
     integer (c_int)                 :: iNumberOfLanduses
@@ -58,7 +53,7 @@ contains
     ! locate the data structure associated with the gridded fog ratio entries
     pFOG_RATIO => DAT%find("FOG_RATIO")
     if ( .not. associated(pFOG_RATIO) ) &
-        call die("A FOG_RATIO grid must be supplied in order to make use of this option.", __SRCNAME__, __LINE__)
+        call die("A FOG_RATIO grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
 
     !> Determine how many landuse codes are present
     call slString%append("LU_Code")
@@ -82,7 +77,7 @@ contains
 
     if ( .not. lAreLengthsEqual )     &
       call warn( sMessage="The number of landuses does not match the number of fog catch efficiency values.",   &
-        sModule=__SRCNAME__, iLine=__LINE__, lFatal=.true._c_bool )
+        sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
 
   end subroutine fog_monthly_grid_initialize
 
@@ -103,10 +98,10 @@ contains
     associate ( dt => SIM_DT%curr )
 
       if ( .not. associated(pFOG_RATIO) ) &
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
 
       if ( .not. allocated(pFOG_RATIO%pGrdBase%rData) ) &
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of unallocated variable", __SRCNAME__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of unallocated variable", __FILE__, __LINE__)
 
       call pFOG_RATIO%getvalues( dt )
 

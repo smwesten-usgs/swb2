@@ -1,0 +1,26 @@
+var structlogfiles_1_1logfile__t =
+[
+    [ "close", "structlogfiles_1_1logfile__t.html#aa392973e29a34dfb2cede3ed992350fa", null ],
+    [ "close_files_sub", "structlogfiles_1_1logfile__t.html#aba6a9a84f0db5fede0b9e9ea336d9e61", null ],
+    [ "initialize", "structlogfiles_1_1logfile__t.html#a52bbe818e2439b6b94840f210af5c893", null ],
+    [ "initialize_logfiles_sub", "structlogfiles_1_1logfile__t.html#ac8eb982a6ef60b25e297dfc5394fa0b9", null ],
+    [ "make_prefix", "structlogfiles_1_1logfile__t.html#ad21b035e785ff70f544c4b7728b9a466", null ],
+    [ "make_prefix_sub", "structlogfiles_1_1logfile__t.html#adc16022ac67048a51a148da5935f213b", null ],
+    [ "open", "structlogfiles_1_1logfile__t.html#a1c50d55a460c968987a0a6e3aeadb0e5", null ],
+    [ "open_files_write_access_sub", "structlogfiles_1_1logfile__t.html#ae7320aef84f9b3aa412c5aedb02e45f3", null ],
+    [ "set_echo", "structlogfiles_1_1logfile__t.html#a7a7b28f7600da2bff6401109d0899cf7", null ],
+    [ "set_log_level_sub", "structlogfiles_1_1logfile__t.html#aac18fb1cd5428d6edbb78aeb123a7970", null ],
+    [ "set_loglevel", "structlogfiles_1_1logfile__t.html#a561901520b816dd996bfc6ddda9e5014", null ],
+    [ "set_output_directory", "structlogfiles_1_1logfile__t.html#ab1da0a7da5ef17f31febacca1394b602", null ],
+    [ "set_output_directory_name_sub", "structlogfiles_1_1logfile__t.html#aac9b15904b9c9704a5c9de2b4fb2090b", null ],
+    [ "set_screen_echo_sub", "structlogfiles_1_1logfile__t.html#a4d4db32ac4bc161c0c5f543229006add", null ],
+    [ "write", "structlogfiles_1_1logfile__t.html#a98e54220a8e9777e9d451a7995f2a02e", null ],
+    [ "write_to_logfiles_sub", "structlogfiles_1_1logfile__t.html#a53a12c1efd9a4a9031f133fa64a369aa", null ],
+    [ "iloglevel", "structlogfiles_1_1logfile__t.html#ae532a1ce16355c998a4d2affb558e110", null ],
+    [ "istat", "structlogfiles_1_1logfile__t.html#ae104dcb0f1127e868f49a6dd83f9728e", null ],
+    [ "iunitnum", "structlogfiles_1_1logfile__t.html#ac575d5a84bc6efcbe9ebecc80f05199e", null ],
+    [ "lisopen", "structlogfiles_1_1logfile__t.html#a264ff1df96e5fc8ba064ccf23ef75c77", null ],
+    [ "sfilename", "structlogfiles_1_1logfile__t.html#acacd6aa4a8d0db1956c8481f4e8253ef", null ],
+    [ "sfileprefix", "structlogfiles_1_1logfile__t.html#a18407852e9d7e7b4dfc9b41cb33217ac", null ],
+    [ "spathname", "structlogfiles_1_1logfile__t.html#aff149ad6abfefffce184b026b788ca96", null ]
+];

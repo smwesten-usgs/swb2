@@ -141,8 +141,11 @@ contains
     call MODEL%set_output_directory( output_dirname )
     call set_output_prefix( output_prefix )
 
+    print *, trim(__FILE__), ": ", __LINE__
     ! define SWB project boundary and geographic projection
     call initialize_grid_options()
+
+    print *, trim(__FILE__), ": ", __LINE__
 
     ! define the start and end date for the simulation
     call initialize_start_and_end_dates()
@@ -456,7 +459,7 @@ contains
       if (associated( pPERCENT_IMPERVIOUS%pGrdBase) ) then
         MODEL%pervious_fraction = pack( 1.0_c_float - pPERCENT_IMPERVIOUS%pGrdBase%rData/100.0_c_float, MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif
 
     elseif ( associated( pPERCENT_PERVIOUS ) ) then
@@ -466,7 +469,7 @@ contains
       if (associated( pPERCENT_PERVIOUS%pGrdBase) ) then
         MODEL%pervious_fraction = pack( (pPERCENT_PERVIOUS%pGrdBase%rData/100.0_c_float), MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif
 
     elseif ( associated(pFRACTION_IMPERVIOUS) ) then
@@ -476,7 +479,7 @@ contains
       if (associated( pFRACTION_IMPERVIOUS%pGrdBase) ) then
         MODEL%pervious_fraction = pack( 1.0_c_float - pFRACTION_IMPERVIOUS%pGrdBase%rData, MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif
 
     elseif ( associated( pFRACTION_PERVIOUS ) ) then
@@ -486,7 +489,7 @@ contains
       if (associated( pFRACTION_PERVIOUS%pGrdBase) ) then
         MODEL%pervious_fraction = pack( pFRACTION_PERVIOUS%pGrdBase%rData, MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif
 
     else
@@ -539,7 +542,7 @@ contains
       if (associated( pPERCENT_CANOPY_COVER%pGrdBase) ) then
         MODEL%canopy_cover_fraction = pack( pPERCENT_CANOPY_COVER%pGrdBase%rData/100.0_c_float, MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif
 
     elseif ( associated(pFRACTION_CANOPY_COVER) ) then
@@ -549,7 +552,7 @@ contains
       if (associated( pFRACTION_CANOPY_COVER%pGrdBase) ) then
         MODEL%canopy_cover_fraction = pack( pFRACTION_CANOPY_COVER%pGrdBase%rData, MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif
 
     else
@@ -600,13 +603,13 @@ contains
       if (associated( pHSG%pGrdBase) ) then
         MODEL%soil_group = pack( pHSG%pGrdBase%iData, MODEL%active )
       else
-        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
+        call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
       endif
 
     else
 
       call die("Attempted use of NULL pointer. Failed to find HYDROLOGIC_SOILS_GROUP data element.", &
-        __SRCNAME__, __LINE__)
+        __FILE__, __LINE__)
 
     endif
 
@@ -718,7 +721,7 @@ contains
 !     call minmaxmean( rooting_depth_inches, "Rooting_depth_inches")
 
 !     call assert( .not. any_problems, "One or more steps failed while processing POLYGON_ID.", &
-!       __SRCNAME__, __LINE__ )
+!       __FILE__, __LINE__ )
 
 ! !$OMP PARALLEL DO
 
@@ -814,7 +817,7 @@ contains
       call CF_DICT%get_value(sText, "GRID")
       pDict => CF_DICT%get_next_entry()
       call assert( associated( pDict ), "INTERNAL PROGRAMMING ERROR -- Attempted use of null poitner", &
-        __SRCNAME__, __LINE__ )
+        __FILE__, __LINE__ )
       call CF%writeLine( trim( sGridSpecification ) )
 
     else
@@ -878,7 +881,7 @@ contains
       CF_ENTRY => null()
       allocate( CF_ENTRY, stat=iStat )
       call assert(iStat == 0, "Failed to allocate memory for dictionary object", &
-            __SRCNAME__, __LINE__ )
+            __FILE__, __LINE__ )
 
       ! break off key value for the current record
       call chomp(sRecord, sKey, CF%sDelimiters )
@@ -984,7 +987,7 @@ contains
       ! allocate memory for a generic data_catalog_entry
       allocate(pENTRY, stat=iStat)
       call assert( iStat == 0, "Failed to allocate memory for the "//dquote(sKey)//" data structure", &
-        __SRCNAME__, __LINE__ )
+        __FILE__, __LINE__ )
 
       sCmdText = ""
       sArgText = ""
@@ -1042,7 +1045,7 @@ contains
             case default
 
               call die( "INTERNAL PROGRAMMING ERROR: Unhandled data type selected.", &
-                __SRCNAME__, __LINE__ )
+                __FILE__, __LINE__ )
 
             end select
 
@@ -1211,7 +1214,7 @@ contains
 
         else
 
-          call warn("Unknown directive detected in code at line "//asCharacter(__LINE__)//", file "//__SRCNAME__ &
+          call warn("Unknown directive detected in code at line "//asCharacter(__LINE__)//", file "//__FILE__ &
             //". ~Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
 
         endif
@@ -1312,6 +1315,11 @@ contains
     BNDS%fX_ur = rX1
     BNDS%fGridCellSize = rGridCellSize
     BNDS%sPROJ4_string = trim(sArgText)
+
+    print *, trim(__FILE__), ': ', __LINE__
+
+    print *, 'BNDS: '
+    print *, BNDS
 
     MODEL%PROJ4_string = trim(sArgText)
 
@@ -1457,7 +1465,7 @@ contains
 
         case default
 
-          call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__SRCNAME__ &
+          call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
             //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
 
       end select
@@ -1556,7 +1564,7 @@ contains
 
         else
 
-            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__SRCNAME__ &
+            call warn("Unknown directive present, line "//asCharacter(__LINE__)//", file "//__FILE__ &
               //". Ignoring. Directive is: "//dquote(sCmdText), iLogLevel=LOG_DEBUG )
 
         endif
@@ -1801,11 +1809,11 @@ contains
 !       if (associated( pLULC%pGrdBase) ) then
 !         MODEL%landuse_code = pack( pLULC%pGrdBase%iData, MODEL%active )
 !       else
-!         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __SRCNAME__, __LINE__)
+!         call die("INTERNAL PROGRAMMING ERROR: attempted use of NULL pointer", __FILE__, __LINE__)
 !       endif
 !     else
 !       call die("Attempted use of NULL pointer. Failed to find LAND_USE data element.", &
-!         __SRCNAME__, __LINE__)
+!         __FILE__, __LINE__)
 !     endif
 !
 !     ! setting this to a value that is likely valid; if this is set to a negative value, a landuse

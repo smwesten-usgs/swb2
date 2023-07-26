@@ -7,7 +7,7 @@ module model_iterate
   use logfiles, only                  : LOGS, LOG_ALL
   use model_domain, only              : MODEL_DOMAIN_T
   use simulation_datetime, only       : SIM_DT
-  use output, only                    : write_output, initialize_output
+  use output, only                    : write_output, initialize_output, finalize_output
 !  use summary_statistics, only        : perform_polygon_summarize
   use grid
   implicit none
@@ -34,10 +34,10 @@ contains
     do while ( SIM_DT%curr <= SIM_DT%end )
 
       call LOGS%write("Calculating: "//SIM_DT%curr%prettydate(), iLogLevel=LOG_ALL, lEcho=.true._c_bool )
-
       call cells%update_landuse_codes()
+      call cells%update_irrigation_mask()
 
-      call cells%get_climate_data( )
+      call cells%get_weather_data( )
       call perform_daily_calculation( cells )
       call write_output( cells )
 !      call perform_polygon_summarize( cells )
@@ -47,6 +47,8 @@ contains
       call SIM_DT%addDay( )
 
     enddo
+
+    call finalize_output( cells )
 
   end subroutine iterate_over_simulation_days
 

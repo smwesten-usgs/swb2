@@ -3,9 +3,8 @@
 
 !>
 !!  Module \ref et__zone_values
-!!  provides support for estimating fog drip given a zone map
-!!  of ET_ZONE, and a table containing monthly
-!!  fog factors.
+!!  provides support for estimating reference ET given a zone map
+!!  of ET_ZONE.
 module et__zone_values
 
   use iso_c_binding, only : c_short, c_int, c_float, c_double, c_bool
@@ -56,23 +55,23 @@ module et__zone_values
       pET_GRID => DAT%find("REFERENCE_ET0")
       if (.not. associated(pET_GRID) ) &
         call die("A POTENTIAL_ET or REFERENCE_ET0 grid must be supplied in order to make"   &
-                 //" use of this option.", __SRCNAME__, __LINE__)
+                 //" use of this option.", __FILE__, __LINE__)
     endif
 
 ! locate the data structure associated with the zone fog ratio entries
     pET_ZONE => DAT%find("ET_ZONE")
     if ( .not. associated(pET_ZONE) ) &
-        call die("A ET_ZONE grid must be supplied in order to make use of this option.", __SRCNAME__, __LINE__)
+        call die("A ET_ZONE grid must be supplied in order to make use of this option.", __FILE__, __LINE__)
 
     call pET_ZONE%getvalues( )
 
     allocate ( ET_ZONE( count( lActive ) ), stat=iStat )
-    call assert(iStat==0, "Failed to allocate memory for the ET_ZONE variable", __SRCNAME__, __LINE__)
+    call assert(iStat==0, "Failed to allocate memory for the ET_ZONE variable", __FILE__, __LINE__)
 
     ET_ZONE = pack( pET_ZONE%pGrdBase%iData, lActive )
 
     allocate ( ET_RATIOS( count( lActive ) ), stat=iStat)
-    call assert(iStat==0, "Failed to allocate memory for the ET_RATIOS variable", __SRCNAME__, __LINE__)
+    call assert(iStat==0, "Failed to allocate memory for the ET_RATIOS variable", __FILE__, __LINE__)
 
     ! look up the name of the fragments file in the control file dictionary
     call CF_DICT%get_values( sKey="ET_RATIO_MONTHLY_FILE", slString=slString )
@@ -115,7 +114,7 @@ module et__zone_values
 
     allocate(  ET_TABLE_VALUES( iNumLines, iNumFields ), stat=iStat )
     call assert( iStat == 0, "Problem allocating memory for et ratio table values", &
-      __SRCNAME__, __LINE__ )
+      __FILE__, __LINE__ )
 
     iLineNum = 0
     iFieldNum = 0
@@ -135,7 +134,7 @@ module et__zone_values
 
       if ( len_trim(sSubstring) == 0 ) &
       call die( "Missing ET ZONE in the monthly et ratio file",              &
-               __SRCNAME__, __LINE__, "Problem occured on line number "       &
+               __FILE__, __LINE__, "Problem occured on line number "       &
                //asCharacter(ET_RATIO_FILE%currentLineNum() )             &
                //" of file "//dquote(sFilename) )
 
@@ -148,7 +147,7 @@ module et__zone_values
 
          if ( len_trim(sSubstring) == 0 ) &
            call die( "Missing or corrupt value in the et ratio file",        &
-                     __SRCNAME__, __LINE__, "Problem occured on line number "    &
+                     __FILE__, __LINE__, "Problem occured on line number "    &
                      //asCharacter(ET_RATIO_FILE%currentLineNum() )          &
                      //" of file "//dquote(sFilename) )
 

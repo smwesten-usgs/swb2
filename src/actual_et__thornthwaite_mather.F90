@@ -1,3 +1,10 @@
+!> @file
+!>  Contains a single module, \ref actual_et__thornthwaite_mather, which
+!>  provides support for calculating actual evapotranspiration by means of an 
+!>  approximation to the Thornthwaite-Mather soil-moisture retention tables. 
+
+!> Calculate actual ET by means of an approximation to the Thornthwaite-Mather
+!> soil-moisture-retention tables.
 module actual_et__thornthwaite_mather
 
 

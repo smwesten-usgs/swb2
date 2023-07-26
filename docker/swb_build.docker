@@ -1,0 +1,24 @@
+FROM fedora:latest
+ADD DOIRootCA2.pem /etc/pki/ca-trust/source/anchors
+ENV PYTHONPATH=/miniconda3/bin
+ENV SSL_CERT_FILE=/etc/pki/ca-trust/source/anchors/DOIRootCA2.pem
+ENV PATH=/miniconda3/bin:/miniconda3/condabin:$PATH
+RUN  mkdir /home/work                                                                       && \
+     cd /home/work                                                                          && \
+     update-ca-trust                                                                        && \
+     dnf -y update                                                                          && \
+     dnf -y install netcdf-devel.x86_64 hdf5-devel.x86_64 make git cmake wget               && \
+     git clone --depth 1 https://github.com/smwesten-usgs/swb2.git                          && \
+     cd swb2/build/docker/fedora/gfortran                                                   && \
+     ./run_cmake_gfortran.sh                                                                && \
+     make                                                                                   && \
+     make copy                                                                              
+FROM fedora:latest
+ADD DOIRootCA2.pem /etc/pki/ca-trust/source/anchors
+ENV PYTHONPATH=/miniconda3/bin
+ENV SSL_CERT_FILE=/etc/pki/ca-trust/source/anchors/DOIRootCA2.pem
+ENV PATH=/miniconda3/bin:/miniconda3/condabin:$PATH
+RUN  dnf install -y netcdf.x86_64 hdf5.x86_64                                               && \ 
+     mkdir /home/work                                                                       && \
+     cd /home/work
+COPY --from=0 /usr/local/bin/swb* .

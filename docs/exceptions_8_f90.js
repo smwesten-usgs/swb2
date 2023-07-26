@@ -1,5 +1,7 @@
 var exceptions_8_f90 =
 [
+    [ "exceptions::assert", "interfaceexceptions_1_1assert.html", "interfaceexceptions_1_1assert" ],
+    [ "exceptions::index_values_valid", "interfaceexceptions_1_1index__values__valid.html", "interfaceexceptions_1_1index__values__valid" ],
     [ "assert_1bit", "exceptions_8_f90.html#a32b05abb4e186da8c7cbd54e6b594812", null ],
     [ "assert_4bit", "exceptions_8_f90.html#a0c885b30713a3f5b6a34c43b1065f074", null ],
     [ "bounds_check_double_1d", "exceptions_8_f90.html#ab89365a68173b495be649e02fba4d819", null ],
@@ -12,6 +14,7 @@ var exceptions_8_f90 =
     [ "die", "exceptions_8_f90.html#a22a1bf2808fdc249e6b378ee3f221156", null ],
     [ "warn", "exceptions_8_f90.html#a84dd04476b06e0a398bfe6d106a82a4d", null ],
     [ "false", "exceptions_8_f90.html#a704e6d1dc804d40d9c95a8e02e3dee16", null ],
+    [ "halt_upon_fatal_error", "exceptions_8_f90.html#a618cc1c55d18593087bdf1a940ca3ac2", null ],
     [ "max_fatal_warnings", "exceptions_8_f90.html#a19dfbe81ab0383be7f6c4c6baefc5d42", null ],
     [ "number_of_fatal_warnings", "exceptions_8_f90.html#a2b28e1efd72a7f1efba46bd8e40f64e3", null ],
     [ "true", "exceptions_8_f90.html#af1b9a41ae82e486e4ee935946d2b5ce2", null ],
