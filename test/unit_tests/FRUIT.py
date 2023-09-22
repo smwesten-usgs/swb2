@@ -27,7 +27,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 from __future__ import (absolute_import, division, print_function)
 
 
-
 def subroutine_type(name):
     """Returns type of subroutine, 'setup' or 'teardown' if it has
     either of those names, or module setup or teardown, otherwise None."""
@@ -152,7 +151,6 @@ class test_suite(object):
     """Class for suite of FRUIT tests"""
 
     def __init__(self, test_filenames):
-        from os.path import splitext
         if isinstance(test_filenames, str):
             test_filenames = [test_filenames]
         self.test_filenames = test_filenames
@@ -218,6 +216,7 @@ class test_suite(object):
         lines.append('')
 
         lines.append('  implicit none')
+        lines.append('  integer :: failed_count')
         if mpi:
             lines.append('  integer :: size, rank, ierr')
         lines.append('')
@@ -246,6 +245,7 @@ class test_suite(object):
                 if mod.setup or mod.teardown or mod.subroutines:
                     lines.append('')
 
+        lines.append('  call get_failed_count(failed_count)')
         if mpi:
             lines.append('  call fruit_summary_mpi(size, rank)')
             lines.append('  call fruit_finalize_mpi(size, rank)')
@@ -256,6 +256,7 @@ class test_suite(object):
         if self.global_teardown:
             lines.append('  call teardown')
 
+        lines.append('  if (failed_count > 0) stop 1')
         lines.append('')
         lines.append('end program tests')
 
@@ -284,7 +285,7 @@ class test_suite(object):
         Setting the update parameter to True forces the executable to
         be rebuilt."""
         from subprocess import call
-        from os.path import isfile, splitext, split
+        from os.path import isfile, splitext, split, join
         from os import remove
         import shlex
         from sys import platform
@@ -292,7 +293,7 @@ class test_suite(object):
         source_path, self.exe = split(self.exe)
         if platform == 'win32':
             self.exe += ".exe"
-        pathexe = output_dir + self.exe
+        pathexe = join(output_dir, self.exe)
         if isfile(pathexe) and update:
             remove(pathexe)
         if not isinstance(build_command, list):
@@ -306,9 +307,8 @@ class test_suite(object):
         optional run command may be specified. If num_procs > 1, or
         mpi is True, the suite will be run using in parallel using MPI."""
         import os
-        from os.path import splitext, isfile, split
         import shlex
-        from subprocess import check_output
+        import subprocess
         if num_procs > 1: mpi = True
         if output_dir != '':
             orig_dir = os.getcwd()
@@ -323,9 +323,10 @@ class test_suite(object):
             if not isinstance(run_command, list):
                 run_command = shlex.split(run_command)
             if mpi:
-                run_command += ['-np', str(num_procs)]
-            run = run_command + [self.exe]
-        output = check_output(run)
+                run_command = ['-np', str(num_procs)] + run_command
+            run = run_command
+        sp = subprocess.Popen(run, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        output = sp.communicate()[0]
         self.parse_output(output)
         if output_dir != '':
             os.chdir(orig_dir)
@@ -333,7 +334,10 @@ class test_suite(object):
 
     def parse_output(self, output):
         """Parses output."""
-        self.output_lines = output.decode().splitlines()
+        try:
+            self.output_lines = output.decode().splitlines()
+        except AttributeError:
+            self.output_lines = output.splitlines()
         self.get_success()
         self.get_messages()
         self.get_statistics()
@@ -427,7 +431,24 @@ class test_suite(object):
 
 if __name__ == '__main__':
     from sys import argv
-    filename = argv[1]
-    driver = argv[2]
-    build = argv[3]
-    test_suite(filename).build_run(driver, build)
+    from argparse import ArgumentParser
+    parser = ArgumentParser()
+    parser.add_argument('command', choices=['build_run', 'write'], help=
+                        """
+                        command to be executed,
+                        build_run - write driver file, build and execute tests,
+                        write - write driver file
+                        """)
+    parser.add_argument('file', nargs='+',
+                        help="Fortran module(s) defining test cases")
+    parser.add_argument('-d', '--driver', default="fruit_driver.f90",
+                        help="driver file name, default: %(default)s")
+    parser.add_argument('-b', '--build', default="make",
+                        help="build command, default: %(default)s")
+    args = parser.parse_args(argv[1:])
+    ts = test_suite(args.file)
+    if args.command == "build_run":
+        ts.build_run(args.driver, args.build)
+        ts.summary()
+    elif args.command == "write":
+        ts.write(args.driver)

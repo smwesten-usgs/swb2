@@ -19,6 +19,7 @@ program tests
   use test_timer
 
   implicit none
+  integer :: failed_count
 
   call init_fruit
 
@@ -58,7 +59,9 @@ program tests
   call run_test_case(test_timer_split,"timer: test split and elapsed timer functionality")
   call run_test_case(test_timer_prettyprint,"timer: test ability to output in human-readable form")
 
+  call get_failed_count(failed_count)
   call fruit_summary
   call fruit_finalize
+  if (failed_count > 0) stop 1
 
 end program tests

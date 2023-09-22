@@ -30,17 +30,6 @@ module fruit
   integer, parameter :: STDOUT_DEFAULT = 6
   integer (c_int) :: stdout   = STDOUT_DEFAULT
 
-  integer, parameter :: XML_OPEN = 20
-  integer, parameter :: XML_WORK_DEFAULT = 21
-  integer (c_int) :: xml_work = XML_WORK_DEFAULT
-  character (len = *), parameter :: xml_filename     = "result.xml"
-  character (len = *), parameter :: XML_FN_WORK_DEF = "result_tmp.xml"
-  character (len = 50) :: xml_filename_work = XML_FN_WORK_DEF
-
-  integer, parameter :: MAX_NUM_FAILURES_IN_XML = 10
-  integer, parameter :: XML_LINE_LENGTH = 2670
-    !! xml_line_length >= max_num_failures_in_xml * (msg_length + 1) + 50
-
   integer, parameter :: STRLEN_T = 12
 
   integer, parameter :: NUMBER_LENGTH = 10
@@ -107,33 +96,18 @@ module fruit
     get_last_message, &
     is_last_passed, &
     is_case_passed, &
-    add_success, addSuccess, &
+    add_success, &
     set_unit_name, get_unit_name, &
     set_case_name, get_case_name, &
-    failed_assert_action, get_total_count, getTotalCount, &
-    get_failed_count, getFailedCount, is_all_successful, isAllSuccessful, &
-    run_test_case, runTestCase
-  public :: assert_equals,     assertEquals
-  public :: assert_not_equals, assertNotEquals
-  public :: assert_true,       assertTrue
+    failed_assert_action, get_total_count, &
+    get_failed_count, is_all_successful, &
+    run_test_case
+  public :: assert_equals
+  public :: assert_not_equals
+  public :: assert_true
   public :: stash_test_suite, restore_test_suite
   public :: FRUIT_PREFIX_LEN_MAX
-  public :: override_xml_work, end_override_xml_work
   public :: get_assert_and_case_count
-
-  public :: initializeFruit
-  interface initializeFruit
-     module procedure obsolete_initializeFruit_
-  end interface
-
-  public :: getTestSummary
-  interface getTestSummary
-     module procedure obsolete_getTestSummary_
-  end interface
-
-  interface assertTrue
-     module procedure obsolete_assert_true_logical_
-  end interface
 
   public ::          assert_false
   interface          assert_false
@@ -270,67 +244,19 @@ module fruit
 
   end interface
 
-  interface addSuccess
-     module procedure obsolete_addSuccess_
-  end interface
-
   public ::           add_fail
   interface           add_fail
      module procedure add_fail_
      module procedure add_fail_unit_
   end interface
 
-  public ::           addFail
-  interface           addFail
-     module procedure add_fail_
-     module procedure add_fail_unit_
-  end interface
-
-  interface getTotalCount
-     module procedure obsolete_getTotalCount_
-  end interface
-
-  interface getFailedCount
-     module procedure obsolete_getFailedCount_
-  end interface
-
-  interface isAllSuccessful
-     module procedure obsolete_isAllSuccessful_
-  end interface
-
   interface run_test_case
      module procedure run_test_case_
-     module procedure run_test_case_named_
-  end interface
-
-  interface runTestCase
-     module procedure run_test_case_
-     module procedure run_test_case_named_
-  end interface
-
-  public ::          init_fruit_xml
-  interface          init_fruit_xml
-    module procedure init_fruit_xml_
   end interface
 
   public ::          fruit_summary
   interface          fruit_summary
     module procedure fruit_summary_
-  end interface
-
-  public ::          fruit_summary_xml
-  interface          fruit_summary_xml
-    module procedure fruit_summary_xml_
-  end interface
-
-  public ::          case_passed_xml
-  interface          case_passed_xml
-    module procedure case_passed_xml_
-  end interface
-
-  public ::          case_failed_xml
-  interface          case_failed_xml
-    module procedure case_failed_xml_
   end interface
 
   public ::          override_stdout
@@ -341,24 +267,6 @@ module fruit
   public ::          end_override_stdout
   interface          end_override_stdout
     module procedure end_override_stdout_
-  end interface
-
-  interface          override_xml_work
-    module procedure override_xml_work_
-  end interface
-
-  interface          end_override_xml_work
-    module procedure end_override_xml_work_
-  end interface
-
-  public ::          get_xml_filename_work
-  interface          get_xml_filename_work
-    module procedure get_xml_filename_work_
-  end interface
-
-  public ::          set_xml_filename_work
-  interface          set_xml_filename_work
-    module procedure set_xml_filename_work_
   end interface
 
   public ::          get_message_index
@@ -429,6 +337,7 @@ module fruit
     module procedure  fruit_show_dots_
   end interface
 contains
+
   subroutine init_fruit(rank)
     integer (c_int), intent(in), optional :: rank
     logical :: if_write
@@ -450,61 +359,19 @@ contains
       write (stdout,*) "   . : successful assert,   F : failed assert "
       write (stdout,*)
     endif
-!$omp critical     (FRUIT_OMP_ALLOCATE_MESSAGE_ARRAY)
+
     if ( .not. allocated(message_array) ) then
       allocate(message_array(MSG_ARRAY_INCREMENT))
     end if
-!$omp end critical (FRUIT_OMP_ALLOCATE_MESSAGE_ARRAY)
+
   end subroutine init_fruit
 
+
   subroutine fruit_finalize_
-!$omp critical     (FRUIT_OMP_DEALLOCATE_MESSAGE_ARRAY)
     if (allocated(message_array)) then
       deallocate(message_array)
     endif
-!$omp end critical (FRUIT_OMP_DEALLOCATE_MESSAGE_ARRAY)
   end subroutine fruit_finalize_
-
-  subroutine init_fruit_xml_(rank)
-    integer, optional, intent(in) :: rank
-    logical :: rank_zero_or_single
-
-    rank_zero_or_single = .true.
-    if (present(rank)) then
-      if (rank /= 0) then
-        rank_zero_or_single = .false.
-      endif
-    endif
-
-
-    if (rank_zero_or_single) then
-      open (XML_OPEN, file = xml_filename, action ="write", status = "replace")
-        write(XML_OPEN, '("<?xml version=""1.0"" encoding=""UTF-8""?>")')
-        write(XML_OPEN, '("<testsuites>")')
-        write(XML_OPEN, '("  <testsuite ")', advance = "no")
-        write(XML_OPEN, '(      "errors=""0"" "   )', advance = "no")
-        write(XML_OPEN, '(      "tests=""1"" "    )', advance = "no")
-        write(XML_OPEN, '(      "failures=""1"" " )', advance = "no")
-        write(XML_OPEN, '(      "name=""", a, """ ")', advance = "no") "name of test suite"
-        write(XML_OPEN, '(      "id=""1"">")')
-
-        write(XML_OPEN, &
-        &  '("    <testcase name=""", a, """ classname=""", a, """ time=""", a, """>")') &
-        &  "dummy_testcase", "dummy_classname", "0"
-
-        write(XML_OPEN, '(a)', advance = "no") "      <failure type=""failure"" message="""
-        write(XML_OPEN, '(a)', advance = "no") "FRUIT did not generate regular content of result.xml."
-        write(XML_OPEN, '(a)')                 """/>"
-        write(XML_OPEN, '("    </testcase>")')
-
-        write(XML_OPEN, '("  </testsuite>")')
-        write(XML_OPEN, '("</testsuites>")')
-      close(XML_OPEN)
-    endif
-
-    open (xml_work, FILE = xml_filename_work, action ="write", status='replace')
-    close(xml_work)
-  end subroutine init_fruit_xml_
 
   function  case_delta_t()
     character(len = STRLEN_T) :: case_delta_t
@@ -525,90 +392,6 @@ contains
     case_delta_t = adjustl(case_delta_t)
   end function case_delta_t
 
-  subroutine case_passed_xml_(tc_name, classname)
-    character(*), intent(in) :: tc_name
-    character(*), intent(in) :: classname
-    character(len = STRLEN_T) :: case_time
-
-    case_time = case_delta_t()
-
-    open (xml_work, FILE = xml_filename_work, position='append')
-    write(xml_work, &
-   &  '("    <testcase name=""", a, """ classname=""", a, a, """ time=""", a, """/>")') &
-   &  trim(tc_name), trim(prefix), trim(classname), trim(case_time)
-    close(xml_work)
-  end subroutine case_passed_xml_
-
-
-  subroutine case_failed_xml_(tc_name, classname)
-    character(*), intent(in) :: tc_name
-    character(*), intent(in) :: classname
-    integer (c_int) :: i, j
-    character(len = STRLEN_T) :: case_time
-
-    case_time = case_delta_t()
-
-    open (xml_work, FILE = xml_filename_work, position='append')
-    write(xml_work, &
-   &  '("    <testcase name=""", a, """ classname=""", a, a, """ time=""", a, """>")') &
-   &  trim(tc_name), trim(prefix), trim(classname), trim(case_time)
-
-    write(xml_work, '("      <failure type=""failure"" message=""")', advance = "no")
-
-    do i = message_index_from, message_index - 1
-      j = i - message_index_from + 1
-      if (j > MAX_NUM_FAILURES_IN_XML) then
-        write(xml_work, '("(omit the rest)")', advance="no")
-        exit
-      endif
-
-      write(xml_work, '(a)', advance = "no") trim(strip(message_array(i)))
-
-      if (i == message_index - 1) then
-        continue
-      else
-        write(xml_work, '("&#xA;")', advance="no")
-      endif
-    enddo
-    write(xml_work, '("""/>")')
-
-    write(xml_work, &
-   &  '("    </testcase>")')
-    close(xml_work)
-  end subroutine case_failed_xml_
-
-  subroutine fruit_summary_xml_
-    character(len = XML_LINE_LENGTH) :: whole_line
-    character(len = 100) :: full_count
-    character(len = 100) :: fail_count
-
-    full_count = int_to_str(successful_case_count + failed_case_count)
-    fail_count = int_to_str(failed_case_count)
-
-    open (XML_OPEN, file = xml_filename, action ="write", status = "replace")
-    write(XML_OPEN, '("<?xml version=""1.0"" encoding=""UTF-8""?>")')
-    write(XML_OPEN, '("<testsuites>")')
-    write(XML_OPEN, '("  <testsuite errors=""0"" ")', advance = "no")
-    write(XML_OPEN, '("tests=""", a, """ ")', advance = "no") &
-    &  trim(full_count)
-    write(XML_OPEN, '("failures=""", a, """ ")', advance = "no") &
-    &  trim(fail_count)
-    write(XML_OPEN, '("name=""", a, """ ")', advance = "no") &
-    &  "name of test suite"
-    write(XML_OPEN, '("id=""1"">")')
-
-    open (xml_work, FILE = xml_filename_work)
-    do
-      read(xml_work, '(a)', end = 999) whole_line
-      write(XML_OPEN, '(a)') trim(whole_line)
-    enddo
-999 continue
-    close(xml_work)
-
-    write(XML_OPEN, '("  </testsuite>")')
-    write(XML_OPEN, '("</testsuites>")')
-    close(XML_OPEN)
-  end subroutine fruit_summary_xml_
 
   function int_to_str(i)
     integer (c_int), intent(in) :: i
@@ -617,17 +400,6 @@ contains
     write(int_to_str, '(i10)') i
     int_to_str = adjustl(int_to_str)
   end function int_to_str
-
-  subroutine obsolete_initializeFruit_
-    call obsolete_ ("initializeFruit is OBSOLETE.  replaced by init_fruit")
-    call init_fruit
-  end subroutine obsolete_initializeFruit_
-
-  subroutine obsolete_getTestSummary_
-    call obsolete_ ( "getTestSummary is OBSOLETE.  replaced by fruit_summary")
-    call fruit_summary_
-  end subroutine obsolete_getTestSummary_
-
 
   logical function fruit_if_case_failed_()
     if (failed_assert_count == 0) then
@@ -654,19 +426,26 @@ contains
 
 
   ! Run a named test case
-  subroutine run_test_case_named_( tc, tc_name )
+  subroutine run_test_case_( tc, tc_name )
     interface
        subroutine tc()
        end subroutine
     end interface
-    character(*), intent(in) :: tc_name
+    character(*), intent(in), optional :: tc_name
 
+    character (:), allocatable :: test_case_name
     integer (c_int) :: initial_failed_assert_count
+
+    if (present(tc_name)) then
+      test_case_name = trim(tc_name)
+    else
+      test_case_name = '__unnamed_test_case__'
+    endif
 
     initial_failed_assert_count = failed_assert_count
 
     ! Set the name of the unit test
-    call set_case_name( tc_name )
+    call set_case_name( test_case_name )
 
     last_passed = .true.
     case_passed = .true.
@@ -674,13 +453,9 @@ contains
     message_index_from = message_index
     call system_clock(case_time_from)
 
-    !$OMP BARRIER
-
     !!! "case_passed" is true here.
     !!! "case_passed" becomes .false. at the first fail of assertion
     call tc()
-
-    !$OMP BARRIER
 
     if ( initial_failed_assert_count .eq. failed_assert_count ) then
        ! If no additional assertions failed during the run of this test case
@@ -695,19 +470,7 @@ contains
     ! Reset the name of the unit test back to the default
     call set_case_name( DEFAULT_CASE_NAME )
 
-  end subroutine run_test_case_named_
-
-  ! Run an 'unnamed' test case
-  subroutine run_test_case_( tc )
-    interface
-       subroutine tc()
-       end subroutine
-    end interface
-
-    call run_test_case_named_( tc, '_unnamed_' )
-
   end subroutine run_test_case_
-
 
   subroutine fruit_summary_
     integer (c_int) :: i
@@ -766,11 +529,6 @@ contains
          succ_case + fail_case, ' ]'
   end subroutine fruit_summary_table_
 
-  subroutine obsolete_addSuccess_
-    call obsolete_ ("addSuccess is OBSOLETE.  replaced by add_success")
-    call add_success
-  end subroutine obsolete_addSuccess_
-
   subroutine add_fail_ (message)
     character (*), intent (in), optional :: message
     call failed_assert_action('none', 'none', message, if_is = .true.)
@@ -782,12 +540,6 @@ contains
 
     call add_fail_ ("[in " //  unitName // "(fail)]: " //  message)
   end subroutine add_fail_unit_
-
-  subroutine obsolete_isAllSuccessful_(result)
-    logical, intent(out) :: result
-    call obsolete_ ('subroutine isAllSuccessful is changed to function is_all_successful.')
-    result = (failed_assert_count .eq. 0 )
-  end subroutine obsolete_isAllSuccessful_
 
   subroutine is_all_successful(result)
     logical, intent(out) :: result
@@ -801,7 +553,6 @@ contains
   !!  Definition of linechar_count is moved to module,
   !!  so that it can be stashed and restored.
 
-    !$omp critical      (FRUIT_OMP_ADD_OUTPUT_MARK)
     linechar_count = linechar_count + 1
     if ( linechar_count .lt. MAX_MARKS_PER_LINE ) then
        write(stdout,"(A1)",ADVANCE='NO') chr
@@ -809,7 +560,6 @@ contains
        write(stdout,"(A1)",ADVANCE='YES') chr
        linechar_count = 0
     endif
-    !$omp end critical  (FRUIT_OMP_ADD_OUTPUT_MARK)
   end subroutine output_mark_
 
   subroutine success_mark_
@@ -848,18 +598,6 @@ contains
        write(stdout,*) "Try to increase MAX_MSG_STACK_SIZE if you really need so."
     end if
   end subroutine increase_message_stack_
-
-
-  subroutine get_xml_filename_work_(string)
-    character(len = *), intent(out) :: string
-    string = trim(xml_filename_work)
-  end subroutine get_xml_filename_work_
-
-  subroutine set_xml_filename_work_(string)
-    character(len = *), intent(in) :: string
-    xml_filename_work = trim(string)
-  end subroutine set_xml_filename_work_
-
 
   function get_last_message()
     character(len=MSG_LENGTH) :: get_last_message
@@ -900,44 +638,16 @@ contains
     enddo
   end subroutine get_messages_
 
-  subroutine obsolete_getTotalCount_ (count)
-    integer, intent (out) :: count
-    call obsolete_ (' getTotalCount subroutine is replaced by function get_total_count')
-    call get_total_count(count)
-  end subroutine obsolete_getTotalCount_
-
   subroutine get_total_count(count)
     integer (c_int), intent(out) :: count
 
     count = successful_assert_count + failed_assert_count
   end subroutine get_total_count
 
-  subroutine obsolete_getFailedCount_ (count)
-    integer, intent (out) :: count
-
-    call obsolete_ (' getFailedCount subroutine is replaced by function get_failed_count')
-    call get_failed_count (count)
-
-  end subroutine obsolete_getFailedCount_
-
   subroutine get_failed_count (count)
     integer (c_int), intent(out) :: count
     count = failed_assert_count
   end subroutine get_failed_count
-
-  subroutine obsolete_ (message)
-    character (*), intent (in), optional :: message
-    write (stdout,*)
-    write (stdout,*) "<<<<<<<<<<<<<<<<<<<<<<<<<< WARNING from FRUIT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-    write (stdout,*) message
-    write (stdout,*)
-    write (stdout,*) " old calls will be replaced in the next release in Jan 2009"
-    write (stdout,*) " Naming convention for all the method calls are changed to: first_name from"
-    write (stdout,*) " firstName.  Subroutines that will be deleted: assertEquals, assertNotEquals,"
-    write (stdout,*) " assertTrue, addSuccessful, addFail, etc."
-    write (stdout,*) "<<<<<<<<<<<<<<<<<<<<<<<<<< WARNING from FRUIT >>>>>>>>>>>>>>>>>>>>>>>>>>>>>>>"
-    write (stdout,*)
-  end subroutine obsolete_
 
   subroutine add_success
     !$omp critical     (FRUIT_OMP_ADD_SUCCESS)
@@ -1017,15 +727,6 @@ contains
     open(stdout, file = filename, action = "write", status = "replace")
   end subroutine override_stdout_
 
-  subroutine override_xml_work_(new_unit, filename)
-    integer (c_int), intent(in) ::    new_unit
-    character(len = *), intent(in) :: filename
-
-    xml_work = new_unit
-    xml_filename_work = filename
-    open(xml_work, file = filename, action = "write", status = "replace")
-  end subroutine override_xml_work_
-
   subroutine stash_test_suite
     stashed_suite%successful_assert_count = successful_assert_count
                   successful_assert_count = 0
@@ -1098,12 +799,6 @@ contains
     stdout = STDOUT_DEFAULT
   end subroutine end_override_stdout_
 
-  subroutine end_override_xml_work_
-    close(xml_work)
-    xml_work = XML_WORK_DEFAULT
-    xml_filename_work = XML_FN_WORK_DEF
-  end subroutine end_override_xml_work_
-
   subroutine set_prefix_(str)
     character (len = *), intent(in) :: str
     character (len = len_trim(str)) :: str2
@@ -1139,13 +834,6 @@ contains
   !--------------------------------------------------------------------------------
   ! all assertions
   !--------------------------------------------------------------------------------
-  subroutine obsolete_assert_true_logical_(var1, message)
-    logical, intent (in) :: var1
-    character (*), intent (in), optional :: message
-
-    call obsolete_ ('assertTrue subroutine is replaced by function assert_true')
-    call assert_true(var1, message)
-  end subroutine obsolete_assert_true_logical_
 
   subroutine assert_true (var1, message)
     logical, intent (in) :: var1
