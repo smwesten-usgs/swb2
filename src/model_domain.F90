@@ -101,6 +101,7 @@ module model_domain
     type (GENERAL_GRID_T), pointer         :: pGrdOut
     real (c_float), allocatable       :: interception(:)
     real (c_float), pointer           :: interception_storage(:)
+    real (c_float), allocatable       :: interception_storage_max(:)
 
     real (c_float), pointer           :: snow_storage(:)
     real (c_double), pointer          :: surface_storage(:)
@@ -448,13 +449,14 @@ contains
     allocate( this%interception(iCount), stat=iStat(17) )
     allocate( this%rainfall(iCount), stat=iStat(18) )
     allocate( this%interception_storage(iCount), stat=iStat(19) )
-    allocate( this%snow_storage(iCount), stat=iStat(20) )
-    allocate( this%soil_storage(iCount), stat=iStat(21) )
-    allocate( this%soil_storage_max(iCount), stat=iStat(22) )
-    allocate( this%net_infiltration(iCount), stat=iStat(23) )
-    allocate( this%fog(iCount), stat=iStat(24) )
-    allocate( this%irrigation(iCount), stat=iStat(25) )
-    allocate( this%sort_order(iCount), stat=iStat(26) )
+    allocate( this%interception_storage_max(iCount), stat=iStat(20) )
+    allocate( this%snow_storage(iCount), stat=iStat(21) )
+    allocate( this%soil_storage(iCount), stat=iStat(22) )
+    allocate( this%soil_storage_max(iCount), stat=iStat(23) )
+    allocate( this%net_infiltration(iCount), stat=iStat(24) )
+    allocate( this%fog(iCount), stat=iStat(25) )
+    allocate( this%irrigation(iCount), stat=iStat(26) )
+    allocate( this%sort_order(iCount), stat=iStat(27) )
     allocate( this%runoff_outside( iCount ), stat=iStat(28) )
     allocate( this%pervious_fraction( iCount ), stat=iStat(29) )
     allocate( this%surface_storage( iCount ), stat=iStat(30) )
@@ -531,6 +533,7 @@ contains
     this%rainfall                            = 0.0_c_float
     this%net_rainfall                        = 0.0_c_float
     this%interception_storage                = 0.0_c_float
+    this%interception_storage_max            = 0.0_c_float
     this%snow_storage                        = 0.0_c_float
     this%soil_storage                        = 0.0_c_double
     this%soil_storage_max                    = 0.0_c_float
@@ -1678,12 +1681,21 @@ contains
 
   subroutine model_calculate_interception_bucket(this)
 
-    use interception__bucket, only  : interception_bucket_calculate
+    use interception__bucket, only  : interception_bucket_calculate,                             &
+                                      BUCKET_INTERCEPTION_STORAGE_MAX_GROWING_SEASON,            &
+                                      BUCKET_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
 
-    this%interception = interception_bucket_calculate( this%landuse_index, this%gross_precip, this%fog,   &
-                                                         this%canopy_cover_fraction, this%it_is_growing_season )
+    where ( this%it_is_growing_season )
+      this%interception_storage_max = BUCKET_INTERCEPTION_STORAGE_MAX_GROWING_SEASON( this%landuse_index )
+    elsewhere 
+      this%interception_storage_max = BUCKET_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON( this%landuse_index )
+    end where
+
+    call interception_bucket_calculate( this%landuse_index, this%gross_precip, this%fog,           &
+                                        this%canopy_cover_fraction, this%it_is_growing_season,     &
+                                        this%interception )
 
   end subroutine model_calculate_interception_bucket
 
@@ -1694,6 +1706,12 @@ contains
     use interception__gash
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    where ( this%it_is_growing_season )
+      this%interception_storage_max = GASH_INTERCEPTION_STORAGE_MAX_GROWING_SEASON( this%landuse_index )
+    elsewhere 
+      this%interception_storage_max = GASH_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON( this%landuse_index )
+    end where
 
     call interception_gash_initialize( this%active, this%canopy_cover_fraction, this%landuse_index )
 
@@ -1714,15 +1732,15 @@ contains
     fTrunk_Storage_Capacity = TRUNK_STORAGE_CAPACITY_TABLE_VALUES( this%landuse_index )
     fStemflow_Fraction = STEMFLOW_FRACTION_TABLE_VALUES( this%landuse_index )
 
-    call interception_gash_calculate( this%rainfall,                                      &
-                               this%fog,                                                  &
-                               this%canopy_cover_fraction,                                &
+    call interception_gash_calculate( this%rainfall,                                       &
+                               this%fog,                                                   &
+                               this%canopy_cover_fraction,                                 &
                                !TRUNK_STORAGE_CAPACITY_TABLE_VALUES( this%landuse_index ), &
-                               fTrunk_Storage_Capacity, &
+                               fTrunk_Storage_Capacity,                                    &
                                !STEMFLOW_FRACTION_TABLE_VALUES( this%landuse_index ),      &
-                               fStemflow_Fraction, &
-                               EVAPORATION_TO_RAINFALL_RATIO,                             &
-                               P_SAT,                                                     &
+                               fStemflow_Fraction,                                         &
+                               EVAPORATION_TO_RAINFALL_RATIO,                              &
+                               P_SAT,                                                      &
                                this%interception )
 
   end subroutine model_calculate_interception_gash

@@ -44,9 +44,19 @@ contains
 
     ! update crop evapotranspiration; crop_coefficient_kcb defaults to 1.0
     cells%crop_etc = cells%reference_et0 * cells%crop_coefficient_kcb
+    
+    ! fog calculation does not explicitly consider canopy fraction
+    call cells%calc_fog()
 
     ! interception calculation *does* reflect the canopy fraction
     call cells%calc_interception()
+
+    ! interception term *may* be altered if interception storage is already at a maximium
+    call calculate_interception_mass_balance( interception_storage=cells%interception_storage,            &
+                                              actual_et_interception=cells%actual_et_interception,        &
+                                              interception=cells%interception,                            &
+                                              interception_storage_max=cells%interception_storage_max,    &
+                                              reference_et0=cells%reference_et0 )
 
     call cells%calc_snowfall()
 
@@ -56,16 +66,9 @@ contains
 
     call cells%calc_continuous_frozen_ground_index()
 
-    ! fog calculation does not explicitly consider canopy fraction
-    call cells%calc_fog()
 
     ! ! irrigation calculated as though entire cell is to be irrigated
     ! call cells%calc_irrigation()
-
-    call calculate_interception_mass_balance( interception_storage=cells%interception_storage,     &
-                                              actual_et_interception=cells%actual_et_interception, &
-                                              interception=cells%interception,                     &
-                                              reference_et0=cells%reference_et0 )
 
     call calculate_snow_mass_balance( snow_storage=cells%snow_storage,                 &
                                       potential_snowmelt=cells%potential_snowmelt,     &

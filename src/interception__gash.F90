@@ -17,11 +17,13 @@ module interception__gash
 
   private
 
-  public :: CANOPY_STORAGE_CAPACITY_TABLE_VALUES,   &
-            TRUNK_STORAGE_CAPACITY_TABLE_VALUES,    &
-            STEMFLOW_FRACTION_TABLE_VALUES,         &
-            EVAPORATION_TO_RAINFALL_RATIO,          &
-            P_SAT
+  public :: CANOPY_STORAGE_CAPACITY_TABLE_VALUES,           &
+            TRUNK_STORAGE_CAPACITY_TABLE_VALUES,            &
+            STEMFLOW_FRACTION_TABLE_VALUES,                 &
+            EVAPORATION_TO_RAINFALL_RATIO,                  &
+            P_SAT,                                          &
+            GASH_INTERCEPTION_STORAGE_MAX_GROWING_SEASON,   &
+            GASH_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON
 
   public interception_gash_initialize
   public interception_gash_calculate
@@ -34,6 +36,8 @@ module interception__gash
   real (c_float), allocatable   :: CANOPY_STORAGE_CAPACITY_TABLE_VALUES(:)
   real (c_float), allocatable   :: TRUNK_STORAGE_CAPACITY_TABLE_VALUES(:)
   real (c_float), allocatable   :: STEMFLOW_FRACTION_TABLE_VALUES(:)
+  real (c_float), allocatable   :: GASH_INTERCEPTION_STORAGE_MAX_GROWING_SEASON(:)
+  real (c_float), allocatable   :: GASH_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON(:)
 
   real (c_float), allocatable   :: P_SAT(:)
 
@@ -60,6 +64,7 @@ contains
     integer (c_int), allocatable    :: iLanduseTableCodes(:)
     integer (c_int)                 :: iNumberOfLanduses
     logical (c_bool)                :: lAreLengthsEqual
+    real (c_float), allocatable     :: tempvals(:)
 
     iCount = count( lActive )
 
@@ -107,6 +112,55 @@ contains
 
     iNumRecs = ubound(CANOPY_STORAGE_CAPACITY_TABLE_VALUES,1)
     lAreLengthsEqual = ( iNumRecs == iNumberOfLanduses )
+
+    !> retrieve interception storage max (GROWING SEASON)
+    call slList%clear()
+    call slList%append("interception_storage_max_growing")
+    call slList%append("interception_storage_max_growing_season")
+    call slList%append("interception_storage_maximum_growing")
+
+    call PARAMS%get_parameters( slKeys=slList,                                           &
+                                fValues=GASH_INTERCEPTION_STORAGE_MAX_GROWING_SEASON, &
+                                lFatal=TRUE )
+
+    iNumRecs = ubound(GASH_INTERCEPTION_STORAGE_MAX_GROWING_SEASON,1)
+    lAreLengthsEqual = ( iNumRecs == iNumberOfLanduses )
+
+    if ( .not. lAreLengthsEqual ) then
+      call warn( sMessage="The number of landuses does not match the number of interception storage "      &
+                          //"maximum values for the growing season"                                        &
+                          //"('interception_storage_max_growing').",                                       &
+                 sHints="A default value of 0.1 inches was assigned for the maximum interception storage", &
+                 sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
+      allocate(tempvals(iNumberOfLanduses), stat=iStat)
+      tempvals = 0.1
+      call move_alloc(tempvals, GASH_INTERCEPTION_STORAGE_MAX_GROWING_SEASON)
+           
+    endif
+
+    !> retrieve interception storage max (NONGROWING SEASON)
+    call slList%clear()
+    call slList%append("interception_storage_max_nongrowing")
+    call slList%append("interception_storage_max_nongrowing_season")
+    call slList%append("interception_storage_maximum_nongrowing")
+
+    call PARAMS%get_parameters( slKeys=slList,                                           &
+                                fValues=GASH_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON, &
+                                lFatal=TRUE )
+
+    iNumRecs = ubound(GASH_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON,1)
+    lAreLengthsEqual = ( iNumRecs == iNumberOfLanduses )
+
+    if ( .not. lAreLengthsEqual ) then
+      call warn( sMessage="The number of landuses does not match the number of interception storage "         &
+                          //"maximum values for the nongrowing season"                                        &
+                          //"('interception_storage_max_nongrowing').",                                       &
+                 sHints="A default value of 0.1 inches was assigned for the maximum interception storage",    &
+                 sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
+      allocate(tempvals(iNumberOfLanduses), stat=iStat)
+      tempvals = 0.1
+      call move_alloc(tempvals, GASH_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON)
+    endif
 
     !> @TODO add more guard code here to QA incoming data
 
