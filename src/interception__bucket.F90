@@ -13,6 +13,8 @@ module interception__bucket
   private
 
   public :: interception_bucket_initialize, interception_bucket_calculate
+  public :: BUCKET_INTERCEPTION_STORAGE_MAX_GROWING_SEASON
+  public :: BUCKET_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON
 !  public :: IS_GROWING_SEASON
 
 !  logical (c_bool) :: GROWING_SEASON = .true._c_bool
@@ -24,10 +26,8 @@ module interception__bucket
   real (c_float), allocatable  :: INTERCEPTION_A_VALUE_NONGROWING_SEASON(:)
   real (c_float), allocatable  :: INTERCEPTION_B_VALUE_NONGROWING_SEASON(:)
   real (c_float), allocatable  :: INTERCEPTION_N_VALUE_NONGROWING_SEASON(:)
-  real (c_float), allocatable  :: FIRST_DAY_OF_GROWING_SEASON(:)
-  real (c_float), allocatable  :: LAST_DAY_OF_GROWING_SEASON(:)
-  real (c_float), allocatable  :: GDD_FIRST_DAY_OF_GROWING_SEASON(:)
-  real (c_float), allocatable  :: KILLING_FROST_TEMP_LAST_DAY_OF_GROWING_SEASON(:)
+  real (c_float), allocatable  :: BUCKET_INTERCEPTION_STORAGE_MAX_GROWING_SEASON(:)
+  real (c_float), allocatable  :: BUCKET_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON(:)
 
   !> Form of the bucket interception: I = A + P*B^n
 
@@ -221,22 +221,69 @@ contains
 
     endif
 
+    !> retrieve interception storage max (NONGROWING)
+    call sl_temp_list%clear()
+    call sl_temp_list%append("Interception_storage_max_nongrowing")
+    call sl_temp_list%append("Interception_storage_max_nongrowing_season")
+    call sl_temp_list%append("Interception_Storage_Maximum_nongrowing")
+
+    call PARAMS%get_parameters( slKeys=sl_temp_list,                                           &
+                                fValues=BUCKET_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON,     &
+                                lFatal=FALSE )
+
+    lAreLengthsEqual = ( ubound(BUCKET_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON,1) == ubound(iLanduseCodes,1) )
+
+    if ( .not. lAreLengthsEqual ) then
+      call warn( sMessage="The number of landuses does not match the number of interception storage "        &
+                         //"maximum values for the NONGROWING season "                                       &
+                         //"('interception_storage_max_nongrowing').",                                       &
+                 sHints="A default value of 0.1 inches was assigned for the maximum interception storage",   &
+                 sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
+      allocate(temp_values(iNumberOfLanduses), stat=status)
+      temp_values = 0.1
+      call move_alloc(temp_values, BUCKET_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON)
+    endif
+
+    !> retrieve interception storage max (GROWING)
+    call sl_temp_list%clear()
+    call sl_temp_list%append("Interception_storage_max_growing")
+    call sl_temp_list%append("Interception_storage_max_growing_season")
+    call sl_temp_list%append("Interception_Storage_Maximum_growing")
+
+    call PARAMS%get_parameters( slKeys=sl_temp_list,                                              &
+                                fValues=BUCKET_INTERCEPTION_STORAGE_MAX_GROWING_SEASON,           &
+                                lFatal=FALSE )
+
+    lAreLengthsEqual = ( ubound(BUCKET_INTERCEPTION_STORAGE_MAX_GROWING_SEASON,1) == ubound(iLanduseCodes,1) )
+
+    if ( .not. lAreLengthsEqual ) then
+      call warn( sMessage="The number of landuses does not match the number of interception storage "      &
+                         //"maximum values for the GROWING season "                                        &
+                         //"('interception_storage_max_growing').",                                        &
+                 sHints="A default value of 0.1 inches was assigned for the maximum interception storage", &
+                 sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
+      allocate(temp_values(iNumberOfLanduses), stat=status)
+      temp_values = 0.1
+      call move_alloc(temp_values, BUCKET_INTERCEPTION_STORAGE_MAX_GROWING_SEASON)
+    endif
+
   end subroutine interception_bucket_initialize
 
 !--------------------------------------------------------------------------------------------------
 
-  elemental function interception_bucket_calculate( iLanduseIndex,                                     &
-                                                    fPrecip,                                           &
-                                                    fFog,                                              &
-                                                    fCanopy_Cover_Fraction,                            &
-                                                    it_is_growing_season )     result( fInterception )
+  elemental subroutine interception_bucket_calculate( iLanduseIndex,                                     &
+                                                      fPrecip,                                           &
+                                                      fFog,                                              &
+                                                      fCanopy_Cover_Fraction,                            &
+                                                      it_is_growing_season,                              &
+                                                      fInterception )
 
     integer (c_int), intent(in)   :: iLanduseIndex
     real (c_float), intent(in)    :: fPrecip
     real (c_float), intent(in)    :: fFog
     real (c_float), intent(in)    :: fCanopy_Cover_Fraction
     logical (c_bool), intent(in)  :: it_is_growing_season
-    real (c_float)                :: fInterception
+    real (c_float), intent(out)   :: fInterception
 
     ! [ LOCALS ]
     real (c_float) :: fPotentialInterception
@@ -262,7 +309,6 @@ contains
 
     fInterception = min( fPotentialInterception, fPrecip + fFog )  * fCanopy_Cover_Fraction
 
-
-  end function interception_bucket_calculate
+  end subroutine interception_bucket_calculate
 
 end module interception__bucket
