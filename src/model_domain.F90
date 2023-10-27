@@ -2963,38 +2963,79 @@ contains
     if (allocated(this%monthly_runoff) )  monthly_runoff = this%monthly_runoff( cell_indx )
     if (allocated(this%monthly_gross_precip) )  monthly_gross_precip = this%monthly_gross_precip( cell_indx )
 
-      write( unit=unitnum, fmt="(i4,'-',i2.2,'-'i2.2,',',i2,',',i2,',',i4,',',8(i6,','),66(g20.12,','),g20.12)")            &
-        SIM_DT%curr%iYear, SIM_DT%curr%iMonth, SIM_DT%curr%iDay,                                                            &
-        SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,                                                            &
-        this%landuse_code( cell_indx ), this%landuse_index( cell_indx ),                                                    &
-        this%soil_group( cell_indx ), this%num_upslope_connections( cell_indx ), this%sum_upslope_cells( cell_indx ),       &
-        indx, cell_indx, target_indx,                                                                                       &
-        this%awc( cell_indx ), this%latitude( cell_indx ), this%reference_ET0( cell_indx ), this%actual_ET( cell_indx ),    &
-        this%curve_num_adj( cell_indx ),                                                                                    &
-        this%gross_precip( cell_indx ), this%inflow( cell_indx ), this%runon( cell_indx ), this%runoff( cell_indx ),        &
-        this%outflow( cell_indx ),                                                                                          &
-        this%infiltration( cell_indx ), this%snowfall( cell_indx ), this%potential_snowmelt( cell_indx ),                   &
-        this%snowmelt( cell_indx ), this%interception( cell_indx ), this%rainfall( cell_indx ),                             &
-        this%net_rainfall( cell_indx ), monthly_gross_precip, monthly_runoff,                                               &
-        this%interception_storage( cell_indx ), this%tmax( cell_indx ), this%tmin( cell_indx ), this%tmean( cell_indx ),    &
-        this%snow_storage( cell_indx ), this%soil_storage( cell_indx ), this%soil_storage_max( cell_indx ),                 &
-        this%evaporable_water_storage( cell_indx ), this%evaporable_water_deficit( cell_indx ),                             &
-        this%delta_soil_storage( cell_indx ),this%soil_moisture_deficit( cell_indx ),                                       &
-        this%surface_storage( cell_indx ), this%surface_storage_excess( cell_indx ),                                        &
-        this%surface_storage_max( cell_indx ), this%net_infiltration( cell_indx ),                                          &
-        this%rejected_net_infiltration( cell_indx ), this%fog( cell_indx ),                                                 &
-        this%irrigation( cell_indx ), this%gdd( cell_indx ), this%runoff_outside( cell_indx ),                              &
-        this%pervious_fraction( cell_indx ), this%storm_drain_capture( cell_indx ),                                         &
-        this%canopy_cover_fraction( cell_indx ), this%crop_coefficient_kcb( cell_indx ),                                    &
-        this%continuous_frozen_ground_index( cell_indx ), this%rooting_depth_max( cell_indx ),                              &
-        this%current_rooting_depth( cell_indx ), this%current_plant_height( cell_indx), this%actual_et_soil( cell_indx ),   &
-        this%readily_available_water_raw( cell_indx ), this%total_available_water_taw( cell_indx ),                         &
-        this%plant_stress_coef_ks( cell_indx ), this%evap_reduction_coef_kr( cell_indx ),                                   &
-        this%surf_evap_coef_ke( cell_indx ), this%fraction_exposed_and_wetted_soil( cell_indx ),                            &
-        this%actual_et_impervious( cell_indx ), this%actual_et_interception( cell_indx ),                                   &
-        this%adjusted_depletion_fraction_p( cell_indx ), this%crop_etc( cell_indx ), this%bare_soil_evap( cell_indx ),      &
-        this%direct_net_infiltration( cell_indx ),                                                                          &
-        this%direct_soil_moisture( cell_indx ), (previous_5_day_rain(kndx), kndx=1,6)
+      write( unit=unitnum, fmt="(i4,'-',i2.2,'-'i2.2,',',i2,',',i2,',',i4,',',8(i6,','),66(g20.12,','),g20.12)")  &
+        SIM_DT%curr%iYear, SIM_DT%curr%iMonth, SIM_DT%curr%iDay,  &
+        SIM_DT%curr%iMonth, SIM_DT%curr%iDay, SIM_DT%curr%iYear,  &
+        this%landuse_code( cell_indx ),  & 
+        this%landuse_index( cell_indx ),  &
+        this%soil_group( cell_indx ),  &
+        this%num_upslope_connections( cell_indx ),  &
+        this%sum_upslope_cells( cell_indx ),  &
+        indx,  &
+        cell_indx,  &
+        target_indx,  &
+        this%awc( cell_indx ),  &
+        this%latitude( cell_indx ),  &
+        this%reference_ET0( cell_indx ),  &
+        this%actual_ET( cell_indx ),  &
+        this%curve_num_adj( cell_indx ),  &
+        this%gross_precip( cell_indx ),  &
+        this%inflow( cell_indx ),  &
+        this%runon( cell_indx ),  &
+        this%runoff( cell_indx ),  &
+        this%outflow( cell_indx ),  &
+        this%infiltration( cell_indx ),  &
+        this%snowfall( cell_indx ),  &
+        this%potential_snowmelt( cell_indx ),  &
+        this%snowmelt( cell_indx ),  &
+        this%interception( cell_indx ),  &
+        this%rainfall( cell_indx ),  &
+        this%net_rainfall( cell_indx ),  &
+        monthly_gross_precip,  &
+        monthly_runoff,  &
+        this%interception_storage( cell_indx ),  &
+        this%tmax( cell_indx ),  & 
+        this%tmin( cell_indx ),  &
+        this%tmean( cell_indx ),  &
+        this%snow_storage( cell_indx ),  &
+        this%soil_storage( cell_indx ),  &
+        this%soil_storage_max( cell_indx ),  &
+        this%evaporable_water_storage( cell_indx ),  &
+        this%evaporable_water_deficit( cell_indx ),  &
+        this%delta_soil_storage( cell_indx ),  &
+        this%soil_moisture_deficit( cell_indx ),  &
+        this%surface_storage( cell_indx ),  & 
+        this%surface_storage_excess( cell_indx ),  &
+        this%surface_storage_max( cell_indx ),  &
+        this%net_infiltration( cell_indx ),  &
+        this%rejected_net_infiltration( cell_indx ),  &
+        this%fog( cell_indx ),  &
+        this%irrigation( cell_indx ),  &
+        this%gdd( cell_indx ),  & 
+        this%runoff_outside( cell_indx ),  &
+        this%pervious_fraction( cell_indx ),  &
+        this%storm_drain_capture( cell_indx ),  &
+        this%canopy_cover_fraction( cell_indx ),  &
+        this%crop_coefficient_kcb( cell_indx ),  &
+        this%continuous_frozen_ground_index( cell_indx ),  &
+        this%rooting_depth_max( cell_indx ),  &
+        this%current_rooting_depth( cell_indx ),  &
+        this%current_plant_height( cell_indx),  &
+        this%actual_et_soil( cell_indx ),  &
+        this%readily_available_water_raw( cell_indx ),  &
+        this%total_available_water_taw( cell_indx ),  &
+        this%plant_stress_coef_ks( cell_indx ),  &
+        this%evap_reduction_coef_kr( cell_indx ),  &
+        this%surf_evap_coef_ke( cell_indx ),  &
+        this%fraction_exposed_and_wetted_soil( cell_indx ),  &
+        this%actual_et_impervious( cell_indx ),  &
+        this%actual_et_interception( cell_indx ),  &
+        this%adjusted_depletion_fraction_p( cell_indx ),  &
+        this%crop_etc( cell_indx ),  &
+        this%bare_soil_evap( cell_indx ),  &
+        this%direct_net_infiltration( cell_indx ),  &
+        this%direct_soil_moisture( cell_indx ),  &
+        (previous_5_day_rain(kndx), kndx=1,6)
 
     enddo
 
