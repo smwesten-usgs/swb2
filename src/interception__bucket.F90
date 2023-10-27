@@ -229,7 +229,7 @@ contains
 
     call PARAMS%get_parameters( slKeys=sl_temp_list,                                           &
                                 fValues=BUCKET_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON,     &
-                                lFatal=TRUE )
+                                lFatal=FALSE )
 
     lAreLengthsEqual = ( ubound(BUCKET_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON,1) == ubound(iLanduseCodes,1) )
 
@@ -252,7 +252,7 @@ contains
 
     call PARAMS%get_parameters( slKeys=sl_temp_list,                                              &
                                 fValues=BUCKET_INTERCEPTION_STORAGE_MAX_GROWING_SEASON,           &
-                                lFatal=TRUE )
+                                lFatal=FALSE )
 
     lAreLengthsEqual = ( ubound(BUCKET_INTERCEPTION_STORAGE_MAX_GROWING_SEASON,1) == ubound(iLanduseCodes,1) )
 

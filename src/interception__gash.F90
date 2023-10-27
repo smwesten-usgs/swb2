@@ -121,7 +121,7 @@ contains
 
     call PARAMS%get_parameters( slKeys=slList,                                           &
                                 fValues=GASH_INTERCEPTION_STORAGE_MAX_GROWING_SEASON, &
-                                lFatal=TRUE )
+                                lFatal=FALSE )
 
     iNumRecs = ubound(GASH_INTERCEPTION_STORAGE_MAX_GROWING_SEASON,1)
     lAreLengthsEqual = ( iNumRecs == iNumberOfLanduses )
@@ -146,7 +146,7 @@ contains
 
     call PARAMS%get_parameters( slKeys=slList,                                           &
                                 fValues=GASH_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON, &
-                                lFatal=TRUE )
+                                lFatal=FALSE )
 
     iNumRecs = ubound(GASH_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON,1)
     lAreLengthsEqual = ( iNumRecs == iNumberOfLanduses )
