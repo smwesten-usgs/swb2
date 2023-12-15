@@ -42,9 +42,6 @@ contains
     call cells%update_rooting_depth()
     call cells%calc_reference_et()
 
-    ! update crop evapotranspiration; crop_coefficient_kcb defaults to 1.0
-    cells%crop_etc = cells%reference_et0 * cells%crop_coefficient_kcb
-    
     ! fog calculation does not explicitly consider canopy fraction
     call cells%calc_fog()
 
@@ -58,6 +55,10 @@ contains
                                               interception_storage_max=cells%interception_storage_max,    &
                                               reference_et0=cells%reference_et0 )
 
+    ! update crop evapotranspiration; crop_coefficient_kcb defaults to 1.0
+    ! there is less power to evaporate/transpire if there is active evaporation of interception
+    cells%crop_etc = max(cells%reference_et0 - cells%actual_et_interception, 0.0_c_float) * cells%crop_coefficient_kcb
+
     call cells%calc_snowfall()
 
     ! actually calculating *potential* snowmelt here; actual snowmelt determined
@@ -65,10 +66,6 @@ contains
     call cells%calc_snowmelt()
 
     call cells%calc_continuous_frozen_ground_index()
-
-
-    ! ! irrigation calculated as though entire cell is to be irrigated
-    ! call cells%calc_irrigation()
 
     call calculate_snow_mass_balance( snow_storage=cells%snow_storage,                 &
                                       potential_snowmelt=cells%potential_snowmelt,     &

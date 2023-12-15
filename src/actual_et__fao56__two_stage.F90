@@ -8,9 +8,10 @@
 module actual_et__fao56__two_stage
 
   use iso_c_binding, only              : c_short, c_int, c_float, c_double, c_bool
-  use constants_and_conversions, only  : TRUE, M_PER_FOOT, in_to_mm, clip
-  use fstring_list, only                : FSTRING_LIST_T, create_list
+  use constants_and_conversions, only  : TRUE, FALSE, M_PER_FOOT, in_to_mm, clip
+  use fstring_list, only               : FSTRING_LIST_T, create_list
   use parameters, only                 : PARAMS
+  use exceptions
   use crop_coefficients__FAO56, only   : KCB_l, KCB_MIN, KCB_INI, KCB_MID, KCB_END,               &
                                          JAN, DEC, KCB_METHOD_MONTHLY_VALUES,                     &
                                          KCB_METHOD, crop_coefficients_FAO56_calculate_Kcb_Max
@@ -20,6 +21,7 @@ module actual_et__fao56__two_stage
   real (c_float), allocatable   :: TEW_l(:,:)
   real (c_float), allocatable   :: DEPLETION_FRACTION(:)
   real (c_float), allocatable   :: MEAN_PLANT_HEIGHT(:)
+  real (c_float), allocatable   :: MIN_FRACTION_COVERED_SOIL(:)
 
 contains
 
@@ -59,8 +61,12 @@ contains
     use parameters, only        : PARAMS, PARAMS_DICT
 
     integer (c_int)               :: number_of_landuses
+    integer (c_int)               :: number_of_records
+    logical (c_bool)              :: list_lengths_are_equal
     type(FSTRING_LIST_T)          :: slList
     integer (c_int), allocatable  :: landuse_table_codes(:)
+    real (c_float), allocatable   :: tempvals(:)
+    integer (c_int)               :: status
 
     ! create list of possible table headings to look for...
     call slList%append( "LU_Code" )
@@ -80,9 +86,25 @@ contains
    call PARAMS%get_parameters( sKey="Mean_Plant_Height", fValues=MEAN_PLANT_HEIGHT, lFatal=TRUE )
 
    slList = create_list("Depletion_fraction, Plant_stress_depletion_fraction")
-
    call PARAMS%get_parameters( slKeys=slList, fValues=DEPLETION_FRACTION, lFatal=TRUE )
    call slList%clear()
+
+   slList = create_list("Minimum_fraction_vegetative_cover, Min_fraction_covered_soil, Min_vegetative_cover_fraction")
+   call PARAMS%get_parameters( slKeys=slList, fValues=MIN_FRACTION_COVERED_SOIL, lFatal=FALSE )
+   call slList%clear()
+
+    number_of_records = ubound(MIN_FRACTION_COVERED_SOIL,1)
+    list_lengths_are_equal = ( number_of_records == number_of_landuses )
+
+    if ( .not. list_lengths_are_equal ) then
+      call warn( sMessage="The number of landuses does not match the number of values supplied for the "    &
+                          //"minimum fraction of soil covered by vegetation.",                              &
+                 sHints="A default value of 0.05 was assigned for the minimum fraction of covered soil.",   &
+                 sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
+      allocate(tempvals(number_of_landuses), stat=status)
+      tempvals = 0.05
+      call move_alloc(tempvals, MIN_FRACTION_COVERED_SOIL)
+    endif   
 
  end subroutine actual_et_FAO56_two_stage_initialize
 
@@ -153,7 +175,7 @@ elemental function calculate_fraction_exposed_and_wetted_soil_fc( landuse_index,
   real (c_float) :: few
 
   ! [ LOCALS ]
-  real (c_float) :: r_fc
+  real (c_float)  :: fc
   real (c_double) :: numerator
   real (c_double) :: denominator
   real (c_double) :: exponent
@@ -163,12 +185,13 @@ elemental function calculate_fraction_exposed_and_wetted_soil_fc( landuse_index,
   exponent = 1.0 + 0.5 * current_plant_height * M_PER_FOOT
 
   if( denominator > 0.0_c_double ) then
-    r_fc = ( numerator / denominator ) ** exponent
+    fc = ( numerator / denominator ) ** exponent
   else
-    r_fc = 1.0_c_float
+    fc = 1.0_c_float
   endif
 
-  few = clip(1.0_c_float - r_fc, minval=0.05, maxval=1.0)
+  fc = max(fc, MIN_FRACTION_COVERED_SOIL( landuse_index ))
+  few = clip(1.0_c_float - fc, minval=0.05, maxval=1.0)
 
 end function calculate_fraction_exposed_and_wetted_soil_fc
 
