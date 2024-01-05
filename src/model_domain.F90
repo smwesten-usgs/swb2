@@ -870,6 +870,12 @@ contains
     !> Determine how many landuse codes are present
     call PARAMS%get_parameters( slKeys=slList, iValues=iLanduseCodes, lFatal=TRUE )
 
+    if (ubound(iLandUseCodes,1) <= 1) then
+      call warn(sMessage="A lookup table with a only a single entry will not work with swb2.", &
+                sHints="Please use a lookup table with more than a single line of data.", &
+                lFatal=TRUE)
+    endif
+
     ! obtain a pointer to the LAND_USE grid
     pLULC => DAT%find("LAND_USE")
 

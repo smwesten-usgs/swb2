@@ -237,10 +237,11 @@ contains
       call warn( sMessage="The number of landuses does not match the number of interception storage "        &
                          //"maximum values for the NONGROWING season "                                       &
                          //"('interception_storage_max_nongrowing').",                                       &
-                 sHints="A default value of 0.1 inches was assigned for the maximum interception storage",   &
+                 sHints="A default value equal to the 'Growing_season_interception_a' was assigned for the"  &
+                         //" maximum interception storage",   &
                  sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
       allocate(temp_values(iNumberOfLanduses), stat=status)
-      temp_values = 0.1
+      temp_values = INTERCEPTION_A_VALUE_NONGROWING_SEASON
       call move_alloc(temp_values, BUCKET_INTERCEPTION_STORAGE_MAX_NONGROWING_SEASON)
     endif
 
@@ -260,10 +261,11 @@ contains
       call warn( sMessage="The number of landuses does not match the number of interception storage "      &
                          //"maximum values for the GROWING season "                                        &
                          //"('interception_storage_max_growing').",                                        &
-                 sHints="A default value of 0.1 inches was assigned for the maximum interception storage", &
+                         sHints="A default value equal to the 'Nongrowing_season_interception_a' was"      &
+                         //" assigned for the maximum interception storage",                               &
                  sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
       allocate(temp_values(iNumberOfLanduses), stat=status)
-      temp_values = 0.1
+      temp_values = INTERCEPTION_A_VALUE_GROWING_SEASON
       call move_alloc(temp_values, BUCKET_INTERCEPTION_STORAGE_MAX_GROWING_SEASON)
     endif
 
