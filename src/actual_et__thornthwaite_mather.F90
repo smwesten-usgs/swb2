@@ -19,20 +19,20 @@ contains
                                                   actual_et,                         &
                                                   soil_storage,                      &
                                                   soil_storage_max,                  &
-                                                  precipitation,                     &
+                                                  infiltration,                     &
                                                   crop_etc )
 
     real (c_double), intent(inout)            :: actual_et
     real (c_double), intent(in)               :: soil_storage
     real (c_float), intent(in)                :: soil_storage_max
-    real (c_float), intent(in)                :: precipitation
+    real (c_float), intent(in)                :: infiltration
     real (c_float), intent(in)                :: crop_etc
 
     ! [ LOCALS ]
     real (c_float)  :: P_minus_PE
     real (c_double) :: soil_storage_temp
 
-    P_minus_PE = precipitation - crop_etc
+    P_minus_PE = infiltration - crop_etc
 
     if ( P_minus_PE >= 0.0_c_float ) then
 
@@ -42,13 +42,19 @@ contains
 
       if ( soil_storage_max > NEAR_ZERO ) then
 
-        soil_storage_temp = max( 0.0, min( soil_storage_max, precipitation + soil_storage ) )
+!        soil_storage_temp = max( 0.0, min( soil_storage_max, precipitation + soil_storage ) )
+!        actual_et =  soil_storage_temp * ( 1.0_c_float - exp( -crop_etc / soil_storage_max ) )
 
-        actual_et =  soil_storage_temp * ( 1.0_c_float - exp( -crop_etc / soil_storage_max ) )
+        ! NOTE: there is a difference in approaches between various practitioners... the Hawaii Water Budget code
+        !       calculates actual et on a temporary soil moisture value that includes the moisture received 
+        !       on the current day. Alley calculates actual et on the basis of the previous days' soil moisture
+
+        soil_storage_temp = soil_storage * exp( P_minus_PE / soil_storage_max )
+        actual_et = soil_storage - soil_storage_temp
 
       else
 
-        actual_et = crop_etc - precipitation
+        actual_et = infiltration
 
       endif
 

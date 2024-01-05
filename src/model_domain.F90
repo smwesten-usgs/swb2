@@ -319,7 +319,7 @@ contains
      this%init_interception            => model_initialize_interception_bucket
      this%init_runoff                  => model_initialize_runoff_curve_number
      this%init_reference_et            => model_initialize_et_hargreaves
-     this%init_actual_et               => model_initialize_actual_et_thornthwaite_mather_eqns
+     this%init_actual_et               => model_initialize_actual_et_thornthwaite_mather
      this%init_routing                 => model_initialize_routing_D8
      this%init_soil_storage_max        => model_initialize_soil_storage_max_internally_calculated
      this%init_snowfall                => model_initialize_snowfall_original
@@ -351,7 +351,7 @@ contains
      this%calc_reference_et       => model_calculate_et_hargreaves
      this%calc_routing            => model_calculate_routing_D8
 
-     this%calc_actual_et          => model_calculate_actual_et_thornthwaite_mather_eqns
+     this%calc_actual_et          => model_calculate_actual_et_thornthwaite_mather
      this%calc_snowfall           => model_calculate_snowfall_original
      this%calc_snowmelt           => model_calculate_snowmelt_original
      this%calc_fog                => model_calculate_fog_none
@@ -1493,11 +1493,15 @@ contains
              .or. ( Method_Name .strapprox. "THORNTHWAITE-MATHER_EQUATIONS" )        &
              .or. ( Method_Name .strapprox. "THORNTHWAITE_MATHER_EQUATIONS") ) then
 
-        this%init_actual_et => model_initialize_actual_et_thornthwaite_mather_eqns
-        this%calc_actual_et => model_calculate_actual_et_thornthwaite_mather_eqns
+        ! alert! we are just pointing to the normal thornthwaite-mather relations 
+        this%init_actual_et => model_initialize_actual_et_thornthwaite_mather
+        this%calc_actual_et => model_calculate_actual_et_thornthwaite_mather
+      
+        call warn(sMessage="The SOIL_MOISTURE_METHOD 'THORNTHWAITE_MATHER_EQUATIONS' option has"     &
+                           //" been removed.",                                                       &
+                  sHints="Please select the normal 'THORNTHWAITE_MATHER' SOIL_MOISTURE_METHOD and "  &
+                         //"try rerunning swb.", lFatal=TRUE)
 
-        call LOGS%WRITE( "==> THORNTHWAITE-MATHER SOIL MOISTURE RETENTION (SWB 1.0 equations) submodel selected.", &
-            iLogLevel = LOG_ALL, lEcho = FALSE )
 
       elseif ( ( Method_Name .strapprox. "FAO56_TWO_STAGE" ) .or. ( Method_Name .strapprox. "FAO-56_TWO_STAGE" )   &
               .or. ( Method_Name .strapprox. "FAO-56_TWO-STAGE" )) then
@@ -3079,38 +3083,6 @@ contains
 
 !--------------------------------------------------------------------------------------------------
 
-  subroutine model_initialize_actual_et_thornthwaite_mather_eqns(this)
-
-    use actual_et__thornthwaite_mather_eqns, only : initialize_actual_et_thornthwaite_mather_eqns
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-
-    call initialize_actual_et_thornthwaite_mather_eqns( soil_moisture=this%soil_storage,    &
-                                                        max_soil_moisture=this%soil_storage_max )
-
-  end subroutine model_initialize_actual_et_thornthwaite_mather_eqns
-
-!--------------------------------------------------------------------------------------------------
-
-  subroutine model_calculate_actual_et_thornthwaite_mather_eqns( this, indx )
-
-    use actual_et__thornthwaite_mather_eqns, only : calculate_actual_et_thornthwaite_mather_eqns
-
-    class (MODEL_DOMAIN_T), intent(inout)  :: this
-    integer (c_int), intent(in)       :: indx
-
-    call calculate_actual_et_thornthwaite_mather_eqns(                                                          &
-                                                  actual_et=this%actual_et( indx ),                             &
-                                                  soil_moisture=this%soil_storage( indx ),                      &
-                                                  max_soil_moisture=this%soil_storage_max( indx ),              &
-                                                  precipitation=this%infiltration( indx ),                      &
-                                                  crop_etc=this%crop_etc( indx ),                               &
-                                                  indx=indx )
-
-  end subroutine model_calculate_actual_et_thornthwaite_mather_eqns
-
-!--------------------------------------------------------------------------------------------------
-
   subroutine model_initialize_actual_et_thornthwaite_mather(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
@@ -3129,7 +3101,7 @@ contains
     call calculate_actual_et_thornthwaite_mather( actual_et=this%actual_et_soil( indx ),                        &
                                                   soil_storage=this%soil_storage( indx ),                       &
                                                   soil_storage_max=this%soil_storage_max( indx ),               &
-                                                  precipitation=this%infiltration( indx ),                      &
+                                                  infiltration=this%infiltration( indx ),                      &
                                                   crop_etc=this%crop_etc( indx ) )
 
   end subroutine model_calculate_actual_et_thornthwaite_mather
