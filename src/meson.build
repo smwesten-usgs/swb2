@@ -146,19 +146,21 @@ swbstats2_src = files(
 subdir('proj4')
 
 dependencies = [
-  meson.get_compiler('cpp').find_library('netcdf',  dirs : ['C:/Program Files/netCDF 4.9.0/lib/'])
-#  meson.get_compiler('cpp').find_library('netcdf')
+#  meson.get_compiler('cpp').find_library('netcdf',  dirs : ['C:/Program Files/netCDF 4.9.0/lib/'])
+  meson.get_compiler('cpp').find_library('netcdf')
 ]
 swb_library = static_library('swb_library', swb_src, link_with: [swb_external])
 
 executable('swb2', 
             swb_src,
             link_with: [swb_external], 
+            link_language : 'fortran',
             dependencies : dependencies,
             install: true)
 
 executable('swbstats2', 
             swbstats2_src,
             link_with: [swb_external], 
+            link_language : 'fortran',
             dependencies : dependencies,
             install: true)
