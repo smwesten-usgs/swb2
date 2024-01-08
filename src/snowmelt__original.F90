@@ -26,7 +26,12 @@ contains
 
       !> temperatures in degrees Fahrenheit, snowmelt in inches
 
-      if ( ( ( tmin + tmax ) / 2.0_c_float ) > FREEZING_F ) then
+      ! Vic's port of Wes's code simply tests to see whether the 
+
+      ! from Vic's earliest port of Wes's code: (TMax in Fahrenheit)
+      ! 1.5 * (5_T_INT * ( cel%rTMax - rFREEZING) / 228.6)
+
+      if ( ( ( tmin + tmax ) / 2.0_c_double ) > FREEZING_F ) then
 
         potential_snowmelt = MELT_INDEX * ( tmax - FREEZING_F ) * DEGC_PER_DEGF / MM_PER_INCH
 
@@ -40,7 +45,7 @@ contains
 
       !> temperatures in degrees Celcius, snowmelt in mm
 
-      if ( ( ( tmin + tmax ) / 2.0_c_float ) > FREEZING_C ) then
+      if ( ( ( tmin + tmax ) / 2.0_c_double ) > FREEZING_C ) then
 
         potential_snowmelt = MELT_INDEX * tmax 
 

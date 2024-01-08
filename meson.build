@@ -153,7 +153,5 @@ add_project_arguments(fc.get_supported_arguments(compile_args), language: 'fortr
 add_project_arguments(cc.get_supported_arguments(c_compile_args), language: 'c')
 add_project_link_arguments(fc.get_supported_arguments(link_args), language: 'fortran')
 
-#include_directories('C:/Program Files/netCDF 4.9.0/include')
-
 subdir('src')
 subdir('test/unit_tests')

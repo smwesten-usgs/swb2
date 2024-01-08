@@ -2,6 +2,8 @@
 set FC=ifx
 set CC=icx
 set CXX=icx
+set NETCDF=C:\Program Files\netCDF 4.9.0\include
+set PATH=%PATH%;%NETCDF%
 
 rmdir /S /Q builddir
 mkdir builddir

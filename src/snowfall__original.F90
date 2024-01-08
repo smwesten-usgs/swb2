@@ -27,7 +27,7 @@ contains
     real (c_float), intent(in)     :: gross_precipitation
 
     ! classify gross_precipitation as snowfall if condition is met
-    if ( ( (tmin + tmax) / 2.0_c_float - ( tmax - tmin ) / 3.0_c_float ) <= FREEZING ) then
+    if ( ( (tmin + tmax) / 2.0_c_double - ( tmax - tmin ) / 3.0_c_double ) <= FREEZING ) then
 
       snowfall = gross_precipitation
       net_snowfall = gross_precipitation - interception

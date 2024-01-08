@@ -19,7 +19,7 @@ contains
                                                   actual_et,                         &
                                                   soil_storage,                      &
                                                   soil_storage_max,                  &
-                                                  infiltration,                     &
+                                                  infiltration,                      &
                                                   crop_etc )
 
     real (c_double), intent(inout)            :: actual_et
@@ -29,16 +29,16 @@ contains
     real (c_float), intent(in)                :: crop_etc
 
     ! [ LOCALS ]
-    real (c_float)  :: P_minus_PE
+    real (c_double) :: P_minus_PE
     real (c_double) :: soil_storage_temp
 
-    P_minus_PE = infiltration - crop_etc
+    P_minus_PE = real(infiltration, c_double) - real(crop_etc, c_double)
 
-    if ( P_minus_PE >= 0.0_c_float ) then
+    if ( P_minus_PE >= 0.0_c_double ) then
 
       actual_et = crop_etc
 
-    elseif ( P_minus_PE < 0.0_c_float ) then
+    elseif ( P_minus_PE < 0.0_c_double ) then
 
       if ( soil_storage_max > NEAR_ZERO ) then
 
@@ -49,7 +49,7 @@ contains
         !       calculates actual et on a temporary soil moisture value that includes the moisture received 
         !       on the current day. Alley calculates actual et on the basis of the previous days' soil moisture
 
-        soil_storage_temp = soil_storage * exp( P_minus_PE / soil_storage_max )
+        soil_storage_temp = soil_storage * exp( P_minus_PE / real(soil_storage_max, c_double))
         actual_et = soil_storage - soil_storage_temp
 
       else

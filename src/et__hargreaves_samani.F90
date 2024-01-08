@@ -35,9 +35,9 @@ module et__hargreaves_samani
 
 
   ! ET parameters -- default values are from Hargreaves and Samani (1985)
-  real (c_float) :: ET_SLOPE         ! = 0.0023     
-  real (c_float) :: ET_EXPONENT      ! = 0.5
-  real (c_float) :: ET_CONSTANT      ! = 17.8
+  real (c_double) :: ET_SLOPE         ! = 0.0023     
+  real (c_double) :: ET_EXPONENT      ! = 0.5
+  real (c_double) :: ET_CONSTANT      ! = 17.8
 
 contains
 
@@ -62,21 +62,21 @@ subroutine et_hargreaves_initialize( ) !pConfig, sRecord )
   call PARAMS%get_parameters( sKey="Hargreaves_ET_constant", fValues=fET_constant)
 
   if ( fET_slope(1) > fTINYVAL) then
-    ET_SLOPE = fET_slope(1)
+    ET_SLOPE = real(fET_slope(1), c_double)
   else
-    ET_SLOPE = 0.0023_c_float
+    ET_SLOPE = 0.0023_c_double
   endif
 
   if ( fET_exponent(1) > fTINYVAL) then
-    ET_EXPONENT = fET_exponent(1)
+    ET_EXPONENT = real(fET_exponent(1), c_double)
   else
-    ET_EXPONENT = 0.5_c_float
+    ET_EXPONENT = 0.5_c_double
   endif
 
   if ( fET_constant(1) > fTINYVAL) then
-    ET_CONSTANT = fET_constant(1)
+    ET_CONSTANT = real(fET_constant(1), c_double)
   else
-    ET_CONSTANT = 17.8_c_float
+    ET_CONSTANT = 17.8_c_double
   endif
 
   print *, "****************************************************************************"
@@ -149,8 +149,8 @@ elemental function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)
 
   ! [ ARGUMENTS ]
   real (c_double),intent(in) :: rRa
-  real (c_float),intent(in) :: rTMinF
-  real (c_float),intent(in) :: rTMaxF
+  real (c_float),intent(in)  :: rTMinF
+  real (c_float),intent(in)  :: rTMaxF
 
   ! [ RETURN VALUE ]
   real (c_float) :: rET_0

@@ -1097,6 +1097,7 @@ contains
     logical (c_bool)             :: row_col_num_are_valid
     logical (c_bool)             :: coordinates_are_valid
     logical (c_bool)             :: indices_are_valid
+    integer (c_int)              :: n
 
     Method_Name = argv_list%get(1)
 
@@ -1548,14 +1549,15 @@ contains
           indx_start = asInt( argv_list%get(2) )
           indx_end   = asInt( argv_list%get(3) )
 
-        elseif ( ( Method_Name .containssimilar. "COORD") .and. ( argv_list%count >= 3 ) ) then
+        elseif (     ( Method_Name .containssimilar. "COORDINATES") .and. ( argv_list%count >= 3 )             &
+                .or. ( Method_Name .containssimilar. "COORD") .and. ( argv_list%count >= 3 ) ) then
 
           xcoord = asFloat( argv_list%get(2) )
           ycoord = asFloat( argv_list%get(3) )
           row = grid_GetGridRowNum( this%pGrdOut, ycoord )
           col = grid_GetGridColNum( this%pGrdOut, xcoord )
 
-        elseif ( ( Method_Name .containssimilar. "ROW_COL") .and. ( argv_list%count >= 3 ) ) then
+        elseif ( ( Method_Name .containssimilar. "COL_ROW") .and. ( argv_list%count >= 3 ) ) then
 
           col = asInt( argv_list%get(1) )
           row = asInt( argv_list%get(2) )
@@ -1564,8 +1566,8 @@ contains
 
         else
 
-          call warn("Unknown option and/or arguments supplied to DUMP_VARIABLES method.",          &
-            sHints="The known option keywords are 'ROW_COL', 'COORD' and 'INDEX_RANGE'.",          &
+          call warn("Unknown option and/or arguments supplied to DUMP_VARIABLES method.",             &
+            sHints="The known option keywords are 'COL_ROW', 'COORD(INATES)' and 'INDEX_RANGE'.",     &
             lFatal = TRUE, iLogLevel = LOG_ALL, lEcho = TRUE )
 
         endif
