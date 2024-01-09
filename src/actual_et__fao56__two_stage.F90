@@ -43,11 +43,11 @@ contains
   elemental function adjust_depletion_fraction_p( landuse_index, reference_et0 )   result( p )
 
     integer ( c_int), intent(in)    :: landuse_index
-    real (c_float), intent(in)      :: reference_et0
+    real (c_double), intent(in)      :: reference_et0
     real (c_double)                 :: p
 
     p = real(DEPLETION_FRACTION( landuse_index ),c_double) + 0.04_c_double         &
-        * ( 5.0_c_double - in_to_mm( real(reference_et0, c_double ) ) )
+        * ( 5.0_c_double - in_to_mm( reference_et0 ) )
 
     p = min( p, 0.8_c_double )
     p = max( p, 0.1_c_double )
@@ -350,7 +350,7 @@ impure elemental subroutine calculate_actual_et_fao56_two_stage(                
   real (c_float), intent(in)                :: current_rooting_depth
   real (c_double), intent(in)               :: soil_storage
   real (c_float), intent(in)                :: soil_storage_max
-  real (c_float), intent(in)                :: reference_et0
+  real (c_double), intent(in)               :: reference_et0
   real (c_float), intent(in)                :: infiltration
 
   real (c_float)            :: interim_soil_storage

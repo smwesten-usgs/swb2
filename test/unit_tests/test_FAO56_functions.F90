@@ -208,7 +208,7 @@ subroutine test_fao56_example_35
     real (c_float)              :: fw
     real (c_float)              :: few
     real (c_float)              :: bare_soil_evap
-    real (c_float)              :: reference_et0
+    real (c_double)             :: reference_et0
     real (c_float)              :: actual_et
     real (c_float)              :: crop_etc
 

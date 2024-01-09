@@ -38,7 +38,7 @@ contains
     real (c_float), intent(in)         :: runon
     real (c_float), intent(in)         :: runoff
     real (c_float), intent(in)         :: fog
-    real (c_float), intent(in)         :: reference_et0
+    real (c_double), intent(in)        :: reference_et0
     real (c_float), intent(in)         :: pervious_fraction
 
     ! [ LOCALS ]

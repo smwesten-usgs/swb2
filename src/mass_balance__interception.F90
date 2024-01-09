@@ -19,7 +19,7 @@ contains
     real (c_double), intent(inout)     :: actual_et_interception
     real (c_float), intent(inout)      :: interception
     real (c_float), intent(in)         :: interception_storage_max
-    real (c_float), intent(in)         :: reference_et0
+    real (c_double), intent(in)        :: reference_et0
 
     real (c_float) :: temp_storage
 

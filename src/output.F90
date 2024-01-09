@@ -576,13 +576,13 @@ contains
 
       if ( OUTSPECS( NCDF_REFERENCE_ET0 )%is_active ) then
 
-        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_REFERENCE_ET0 )%ncfile,  &
-                                    values=cells%reference_ET0,                      &
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_REFERENCE_ET0 )%ncfile,    &
+                                    values=real(cells%reference_ET0, c_float),         &
                                     cells=cells )
         OUTSPECS(NCDF_REFERENCE_ET0)%valid_maximum =         &
-          update_maximum_value(OUTSPECS(NCDF_REFERENCE_ET0)%valid_maximum, cells%reference_et0)
+          update_maximum_value(OUTSPECS(NCDF_REFERENCE_ET0)%valid_maximum, real(cells%reference_et0, c_float))
         OUTSPECS(NCDF_REFERENCE_ET0)%valid_minimum =         &
-          update_minimum_value(OUTSPECS(NCDF_REFERENCE_ET0)%valid_minimum, cells%reference_et0)
+          update_minimum_value(OUTSPECS(NCDF_REFERENCE_ET0)%valid_minimum, real(cells%reference_et0, c_float))
                           
       endif
 
@@ -590,7 +590,7 @@ contains
            .and. (.not. OUTSPECS( NCDF_ACTUAL_ET )%multisim_outputs) ) then
 
         call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_ACTUAL_ET )%ncfile,  &
-                                    values=real(cells%actual_et, c_float),  &
+                                    values=real(cells%actual_et, c_float),       &
                                     cells=cells )
         OUTSPECS(NCDF_ACTUAL_ET)%valid_maximum =         &
           update_maximum_value(OUTSPECS(NCDF_ACTUAL_ET)%valid_maximum, real(cells%actual_et, c_float))

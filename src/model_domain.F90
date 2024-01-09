@@ -80,7 +80,7 @@ module model_domain
 
     integer (c_int), allocatable      :: polygon_id(:)
     real (c_float), allocatable       :: latitude(:)
-    real (c_float), allocatable       :: reference_et0(:)
+    real (c_double), allocatable      :: reference_et0(:)
     real (c_float), allocatable       :: crop_etc(:)
 
     real (c_double), allocatable      :: actual_et_interception(:)
@@ -3193,8 +3193,8 @@ contains
               current_rooting_depth=this%current_rooting_depth( indx ),                         &
               soil_storage=this%soil_storage( indx ),                                           &
               soil_storage_max=this%soil_storage_max( indx ),                                   &
-              reference_et0=max(real(this%reference_et0( indx )                                 &
-                                - this%actual_et_interception( indx ), kind=c_float), 0.0),     &
+              reference_et0=max(this%reference_et0( indx )                                      &
+                                - this%actual_et_interception( indx ), 0.0),                    &
               infiltration=this%infiltration( indx ) )
 
   end subroutine model_calculate_actual_et_fao56__two_stage
@@ -3833,7 +3833,7 @@ contains
     call minmaxmean( this%awc, "AWC")
 
     call minmaxmean( this%latitude, "Lat")
-    call minmaxmean( this%reference_ET0, "ET0")
+    call minmaxmean( real(this%reference_ET0, c_float), "ET0")
     call minmaxmean( real( this%actual_ET, c_float), "actET")
     call minmaxmean( this%inflow, "inflow")
     call minmaxmean( this%runon, "runon")

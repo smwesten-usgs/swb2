@@ -42,7 +42,7 @@ contains
   elemental function adjust_depletion_fraction_p( p_table_22, reference_et0 )   result( p )
 
     real (c_float), intent(in)      :: p_table_22
-    real (c_float), intent(in)      :: reference_et0
+    real (c_double), intent(in)     :: reference_et0
     real (c_float)                  :: p
 
     p = p_table_22 + 0.04_c_float * ( 5.0_c_float - in_to_mm( reference_et0 ) )
@@ -87,8 +87,8 @@ contains
 
     else
 
-      p = adjust_depletion_fraction_p( p_table_22=depletion_fraction_p,  &
-                                       reference_et0=crop_etc )
+      p = adjust_depletion_fraction_p( p_table_22=depletion_fraction_p,          &
+                                       reference_et0=real(crop_etc, c_double))
 
       adjusted_depletion_fraction_p = p
 

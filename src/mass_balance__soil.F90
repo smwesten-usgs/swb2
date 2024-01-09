@@ -23,7 +23,7 @@ contains
     real (c_double), intent(inout)     :: actual_et_soil
     real (c_float), intent(inout)      :: runoff
     real (c_float), intent(inout)      :: delta_soil_storage
-    real (c_float), intent(in)         :: reference_et0
+    real (c_double), intent(in)        :: reference_et0
     real (c_float), intent(in)         :: soil_storage_max
     real (c_float), intent(in)         :: infiltration
 

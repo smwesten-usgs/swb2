@@ -175,13 +175,13 @@ contains
 
     dGamma = day_angle__gamma( iDayOfYear, iNumDaysInYear )
 
-    dDelta =   0.006918_c_double                                       &
-             - 0.399912_c_double * cos( dGamma )                       &
-             + 0.070257_c_double * sin( dGamma )                       &
-             - 0.006758_c_double * cos( 2_c_double * dGamma )          &
-             + 0.000907_c_double * sin( 2_c_double * dGamma )          &
-             - 0.002697_c_double * cos( 3_c_double * dGamma )          &
-             + 0.00148_c_double  * sin( 3_c_double * dGamma )
+    dDelta =   0.006918_c_double                                         &
+             - 0.399912_c_double * cos( dGamma )                         &
+             + 0.070257_c_double * sin( dGamma )                         &
+             - 0.006758_c_double * cos( 2.0_c_double * dGamma )          &
+             + 0.000907_c_double * sin( 2.0_c_double * dGamma )          &
+             - 0.002697_c_double * cos( 3.0_c_double * dGamma )          &
+             + 0.00148_c_double  * sin( 3.0_c_double * dGamma )
 
 
   end function solar_declination__delta
@@ -280,8 +280,13 @@ contains
 
     ! [ LOCALS ]
     real (c_double), parameter :: dKRs = 0.175
+    real (c_double)            :: tminK
+    real (c_double)            :: tmaxK
 
-    dRs = dKRs * sqrt( C_to_K(fTMax) - C_to_K(fTMin) ) * dRa
+    tminK = C_to_K(real(fTMin, c_double))
+    tmaxK = c_to_K(real(fTMax, c_double))
+
+    dRs = dKRs * sqrt( tmaxK - tminK ) * dRa
 
   end function solar_radiation_Hargreaves__Rs
 
@@ -428,7 +433,7 @@ contains
     real (c_double), intent(in) :: fPctSun
     real (c_double)             :: dRs
 
-    dRs = ( dAs + (dBs * fPctSun / 100_c_float ) ) * dRa
+    dRs = ( dAs + (dBs * fPctSun / 100_c_double ) ) * dRa
 
   end function solar_radiation__Rs
 
@@ -466,7 +471,7 @@ contains
     real (c_double)            :: dCloudFrac
     real (c_double), parameter :: dSIGMA = 4.903E-9_c_double
 
-    dTAvg_K = C_to_K((fTMin + fTMax ) / 2.0_c_float )
+    dTAvg_K = C_to_K((real(fTMin, c_double) + real(fTMax, c_double) ) / 2.0_c_double )
 
     dTAvg_4 = dTAvg_K * dTAvg_K * dTAvg_K * dTAvg_K * dSIGMA
     d_ea = dewpoint_vapor_pressure__e_a( fTMin )
@@ -501,7 +506,7 @@ contains
     integer (c_int), intent(in)   :: iNumDaysInYear
     real (c_double)               :: dGamma
 
-    dGamma = TWOPI * ( iDayOfYear - 1 ) / iNumDaysInYear
+    dGamma = TWOPI * ( real(iDayOfYear, c_double) - 1.0_c_double ) / real(iNumDaysInYear, c_double)
 
   end function day_angle__gamma
 
