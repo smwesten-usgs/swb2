@@ -53,8 +53,9 @@ contains
         actual_et = soil_storage - soil_storage_temp
 
       else
+      ! open water - limit actual et to the lesser of the reference ET *or* the amount of water 'infiltrated'
 
-        actual_et = infiltration
+        actual_et = min(real(infiltration, c_double), real(crop_etc, c_double))
 
       endif
 

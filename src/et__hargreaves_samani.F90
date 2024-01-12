@@ -113,7 +113,7 @@ end subroutine et_hargreaves_initialize
 
 !------------------------------------------------------------------------------
 
-elemental function et_hargreaves_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax )  result(fReferenceET0)
+impure elemental function et_hargreaves_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin, fTMax )  result(fReferenceET0)
   !! Computes the potential ET for each cell, based on TMIN and TMAX.
   !! Stores cell-by-cell PET values in the model grid.
 
@@ -122,7 +122,7 @@ elemental function et_hargreaves_calculate( iDayOfYear, iNumDaysInYear, fLatitud
   real (c_float), intent(in) :: fLatitude
   real (c_float), intent(in) :: fTMin
   real (c_float), intent(in) :: fTMax
-  real (c_float)             :: fReferenceET0
+  real (c_double)             :: fReferenceET0
 
   ! [ LOCALS ]
   real (c_double) :: fDelta, fOmega_s, fD_r, fRa
@@ -131,7 +131,7 @@ elemental function et_hargreaves_calculate( iDayOfYear, iNumDaysInYear, fLatitud
   dLatitude_radians = fLatitude * DEGREES_TO_RADIANS
 
   fD_r =relative_earth_sun_distance__D_r(iDayOfYear,iNumDaysInYear)
-  fDelta = solar_declination_simple__delta(iDayOfYear, iNumDaysInYear)
+  fDelta = solar_declination__delta(iDayOfYear, iNumDaysInYear)
 
   fOmega_s = sunrise_sunset_angle__omega_s(dLatitude_radians, fDelta)
 
@@ -141,7 +141,7 @@ elemental function et_hargreaves_calculate( iDayOfYear, iNumDaysInYear, fLatitud
 	fRa = extraterrestrial_radiation__Ra(dLatitude_radians, fDelta, fOmega_s, fD_r)
 
   fReferenceET0 = ET0_hargreaves( equivalent_evaporation(fRa), fTMin, fTMax)
-    
+
 end function et_hargreaves_calculate
 
 
@@ -153,7 +153,7 @@ elemental function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)
   real (c_float),intent(in)  :: rTMaxF
 
   ! [ RETURN VALUE ]
-  real (c_float) :: rET_0
+  real (c_double) :: rET_0
 
   ! [ LOCALS ]
   real (c_double) :: rTDelta
@@ -161,19 +161,11 @@ elemental function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)
 
   rTAvg = (rTMinF + rTMaxF) / 2.0_c_double
 
-  rTDelta = F_to_K(rTMaxF) - F_to_K(rTMinF)
+  rTDelta = F_to_K(real(rTMaxF, c_double)) - F_to_K(real(rTMinF, c_double))
 
   rET_0 = MAX(rZERO, &
                 mm_to_in( ET_SLOPE * rRa * (F_to_C(rTavg) + ET_CONSTANT) * (rTDelta**ET_EXPONENT) ) )
 !                mm_to_in( 0.0023_c_float * rRa * (F_to_C(rTavg) + 17.8_c_float) * sqrt(rTDelta)) )
-
-
-!  rET_0 = MAX(rZERO, &
-!           ( fET_Slope &
-!           * rRa &
-!           * (F_to_C(rTavg) + pConfig%fET_Constant) &
-!           * (rTDelta**fET_Exponent)) &
-!           / rMM_PER_INCH)
 
 end function ET0_hargreaves
 

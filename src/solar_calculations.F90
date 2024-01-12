@@ -218,8 +218,8 @@ contains
     integer (c_int), intent(in) :: iNumDaysInYear
     real (c_double) :: dDsubR
 
-    dDsubR = 1_c_double + 0.033_c_double &
-             * cos( TWOPI * real( iDayOfYear, c_double )          &
+    dDsubR = 1.0_c_double + 0.033_c_double                                   &
+             * cos( TWOPI * real( iDayOfYear, c_double )                     &
                                       / real( iNumDaysInYear, c_double ) )
 
   end function relative_earth_sun_distance__D_r

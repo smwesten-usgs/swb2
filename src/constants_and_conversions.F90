@@ -21,9 +21,9 @@ module constants_and_conversions
 
   ! [ common mathematical constants ]
   public :: PI, TWOPI, HALFPI
-  real (c_double), parameter    :: PI = 3.1415926535897932384626433_c_double
-  real (c_double), parameter    :: TWOPI = 3.1415926535897932384626433_c_double * 2.0_c_double
-  real (c_double), parameter    :: HALFPI = 3.1415926535897932384626433_c_double / 2.0_c_double
+  real (c_double), parameter    :: PI = 4.0_c_double*atan(1.0_c_double)
+  real (c_double), parameter    :: TWOPI = PI * 2.0_c_double
+  real (c_double), parameter    :: HALFPI = PI / 2.0_c_double
 
   ! [ trig conversion factors ]
   public :: DEGREES_TO_RADIANS, RADIANS_TO_DEGREES

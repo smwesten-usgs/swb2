@@ -52,7 +52,7 @@ elemental function et_jh_calculate( iDayOfYear, iNumDaysInYear, fLatitude, fTMin
   real (c_float), intent(in), optional :: fAs
   real (c_float), intent(in), optional :: fBs
   real (c_float), intent(in), optional :: fSunPct
-  real (c_float)                       :: fReferenceET0
+  real (c_double)                      :: fReferenceET0
 
   ! [ LOCALS ]
   real (c_double) :: dRa
