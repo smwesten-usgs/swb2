@@ -37,6 +37,27 @@ conf_data.set('SWB_MAJOR_VERSION_STRING', swb_major_version)
 conf_data.set('SWB_MINOR_VERSION_STRING', swb_minor_version)
 conf_data.set('SWB_PATCH_VERSION_STRING', swb_patch_version)
 
+
+if get_option('optimization_level') == 3
+  error('Only optimization levels <= 2 are supported')
+endif
+
+if get_option('optimization_level') == 2
+  profile = 'release'
+else
+  profile = 'develop'
+endif
+
+fc = meson.get_compiler('fortran')
+fc_id = fc.get_id()
+compile_args = []
+c_compile_args = []
+link_args = []
+
+cc = meson.get_compiler('c')
+cc_id = cc.get_id()
+
+
 system = build_machine.system()
 if system == 'linux'
   conf_data.set('PLATFORM_NAME','"Linux"')
@@ -49,26 +70,9 @@ elif system == 'windows'
   conf_data.set('WINDOWS_SYSTEM', 'True')
 endif
 
-if get_option('optimization_level') == 3
-  error('Only optimization levels <= 2 are supported')
-endif
-
-if get_option('optimization_level') == 2
-  profile = 'release'
-else
-  profile = 'develop'
-endif
-
 message('The compilation profile is:', profile)
-
-fc = meson.get_compiler('fortran')
-fc_id = fc.get_id()
-compile_args = []
-c_compile_args = []
-link_args = []
-
-cc = meson.get_compiler('c')
-cc_id = cc.get_id()
+message('Meson sees the compiler name as:' + fc_id)
+message('Meson sees the C compiler name as: ' + cc_id)
 
 # Command line options for gfortran
 if fc_id == 'gcc'
@@ -141,6 +145,21 @@ elif fc_id == 'intel'
   compile_args += ['-fpe0',              # Activate all floating point exceptions
                    '-fpp',
                    '-debug',
+                   '-check_bounds',
+                   '-no-heap-arrays',
+                   '-traceback',
+                   '-diag-disable:7416',  # f2008 warning
+                   '-diag-disable:7025',  # f2008 warning
+                   '-diag-disable:5268',  # Line too long
+                  ]
+  link_args += '-static-intel'
+
+elif fc_id == 'intel'
+  # linux and macOS
+  compile_args += ['-fpe0',              # Activate all floating point exceptions
+                   '-fpp',
+                   '-debug',
+                   '-check_bounds',
                    '-no-heap-arrays',
                    '-traceback',
                    '-diag-disable:7416',  # f2008 warning
