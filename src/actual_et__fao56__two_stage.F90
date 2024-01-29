@@ -164,7 +164,7 @@ end function calculate_evaporation_reduction_coefficient_Kr
 !> This function estimates the fraction of the ground covered by
 !> vegetation during the growing season
 !> @note Implemented as equation 76, FAO-56, Allen and others
-elemental function calculate_fraction_exposed_and_wetted_soil_fc( landuse_index, Kcb, current_plant_height)   result ( few )
+impure elemental function calculate_fraction_exposed_and_wetted_soil_fc( landuse_index, Kcb, current_plant_height)   result ( few )
 
   ! [ ARGUMENTS ]
   integer (c_int), intent(in)    :: landuse_index
@@ -180,9 +180,9 @@ elemental function calculate_fraction_exposed_and_wetted_soil_fc( landuse_index,
   real (c_double) :: denominator
   real (c_double) :: exponent
 
-  numerator = Kcb - KCB_l( KCB_MIN, landuse_index)
+  numerator = max(Kcb - KCB_l( KCB_MIN, landuse_index), 0.0_c_double)
   denominator =  KCB_l( KCB_MID, landuse_index)  -  KCB_l( KCB_MIN, landuse_index)
-  exponent = 1.0 + 0.5 * current_plant_height * M_PER_FOOT
+  exponent = 1.0_c_double + 0.5_c_double * current_plant_height * M_PER_FOOT
 
   if( denominator > 0.0_c_double ) then
     fc = ( numerator / denominator ) ** exponent

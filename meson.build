@@ -140,6 +140,7 @@ elif fc_id == 'intel'
   # linux and macOS
   compile_args += ['-fpe0',              # Activate all floating point exceptions
                    '-fpp',
+                   '-debug',
                    '-no-heap-arrays',
                    '-traceback',
                    '-diag-disable:7416',  # f2008 warning

@@ -3051,6 +3051,8 @@ contains
 
     enddo
 
+    flush(unit=unitnum)
+
   end subroutine model_dump_variables
 
 !--------------------------------------------------------------------------------------------------
