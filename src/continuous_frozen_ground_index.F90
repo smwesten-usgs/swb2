@@ -67,7 +67,7 @@ contains
 
       call warn(sMessage="No value supplied for CONTINUOUS_FROZEN_GROUND_INDEX_LOWER_LIMIT.",             &
       sHints="Value set to the default of 56, which was appropriate for the Pacific Northwestern U.S., "  &
-      //" but may be inappropriate elsewhere.", lFatal=FALSE )
+      //"but may be inappropriate elsewhere.", lFatal=FALSE )
 
       cfgi_ll = 56.   ! units are degrees C-days
 
@@ -93,7 +93,7 @@ contains
 
       call warn(sMessage="No value supplied for CONTINUOUS_FROZEN_GROUND_INDEX_UPPER_LIMIT.",             &
       sHints="Value set to the default of 83, which was appropriate for the Pacific Northwestern U.S., "  &
-      //" but may be inappropriate elsewhere.", lFatal=FALSE )
+      //"but may be inappropriate elsewhere.", lFatal=FALSE )
 
         cfgi_ul = 83. ! units are degree C-days
 
