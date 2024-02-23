@@ -861,8 +861,9 @@ subroutine netcdf_open_and_prepare_as_input(NCFILE, sFilename, &
                                      rY=tGridBounds%rYur)
 
 #ifdef DEBUG_PRINT
-    write(*, fmt="(a,a,i6)") "Find correspondence between project bounds (in native projection) and row, col of dataset |", &
-      __FILE__, __LINE__
+    write(*, fmt="(a)") "subroutine 'netcdf_open_and_prepare_as_input'"
+    write(*, fmt="(a,a,i6)") "Find correspondence between project bounds (in native projection) and row, col of dataset | ", &
+      trim(__FILE__), __LINE__
     write(*, fmt="(a)") "      column     row              X              Y"
     write(*, fmt="(a,i6,i6,a,f14.3,f14.3)") "LL: ", iColRow_ll(COLUMN), iColRow_ll(ROW), " <==> ", tGridBounds%rXll, tGridBounds%rYll
     write(*, fmt="(a,i6,i6,a,f14.3,f14.3)") "LR: ", iColRow_lr(COLUMN), iColRow_lr(ROW), " <==> ", tGridBounds%rXlr, tGridBounds%rYlr
@@ -1209,25 +1210,25 @@ subroutine nf_set_iteration_bounds(NCFILE)
 
   type (T_NETCDF4_FILE ) :: NCFILE
 
-  if (NCFILE%lFlipVertical) then
-    NCFILE%iRowIter(NC_FIRST) = NCFILE%iNY
-    NCFILE%iRowIter(NC_LAST) = 1
-    NCFILE%iRowIter(NC_BY) = -1
-  else
+!  if (NCFILE%lFlipVertical) then
+!    NCFILE%iRowIter(NC_FIRST) = NCFILE%iNY
+!    NCFILE%iRowIter(NC_LAST) = 1
+!    NCFILE%iRowIter(NC_BY) = -1
+! else
     NCFILE%iRowIter(NC_FIRST) = 1
     NCFILE%iRowIter(NC_LAST) = NCFILE%iNY
     NCFILE%iRowIter(NC_BY) = 1
-  endif
+!  endif
 
-  if (NCFILE%lFlipHorizontal) then
-    NCFILE%iColIter(NC_FIRST) = NCFILE%iNX
-    NCFILE%iColIter(NC_LAST) = 1
-    NCFILE%iColIter(NC_BY) = -1
-  else
+  ! if (NCFILE%lFlipHorizontal) then
+  !   NCFILE%iColIter(NC_FIRST) = NCFILE%iNX
+  !   NCFILE%iColIter(NC_LAST) = 1
+  !   NCFILE%iColIter(NC_BY) = -1
+  ! else
     NCFILE%iColIter(NC_FIRST) = 1
     NCFILE%iColIter(NC_LAST) = NCFILE%iNX
     NCFILE%iColIter(NC_BY) = 1
-  endif
+  ! endif
 
 end subroutine nf_set_iteration_bounds
 
@@ -1478,6 +1479,13 @@ subroutine nf_get_x_and_y(NCFILE)
   NCFILE%rGridCellSizeY = ( maxval(NCFILE%rY_Coords) &
                                 - minval(NCFILE%rY_Coords) ) &
                                 / real (pNC_DIM_y%iNC_DimSize - 1, c_double)
+
+  ! print *, '*** netCDF x- and y- coord read ***'
+  ! print *, trim(__FILE__), ': ', __LINE__
+  ! print *, 'file:', trim(NCFILE%sFilename)
+  ! print *, 'x-coords: ', NCFILE%rX_Coords
+  ! print *, 'y-coords: ', NCFILE%rY_Coords
+  ! print *, '***********************************'
 
 end subroutine nf_get_x_and_y
 

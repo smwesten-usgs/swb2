@@ -38,6 +38,9 @@ conf_data.set('SWB_MINOR_VERSION_STRING', swb_minor_version)
 conf_data.set('SWB_PATCH_VERSION_STRING', swb_patch_version)
 
 
+add_global_arguments('-DDEBUG_PRINT', language : 'fortran')
+
+
 if get_option('optimization_level') == 3
   error('Only optimization levels <= 2 are supported')
 endif
