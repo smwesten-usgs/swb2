@@ -187,6 +187,7 @@ contains
     allocate( FIRST_DAY_OF_IRRIGATION( sl_irrigation_begin%count ), stat=status )
     call assert( status==0, "Problem allocating memory.", __FILE__, __LINE__ )
 
+    ! if there are no missing values in the column of data, process the days/dates
     if ( sl_irrigation_begin%count_matching("<NA>") == 0 ) then
 
       do index = 1, sl_irrigation_begin%count
@@ -198,12 +199,24 @@ contains
         endif
       enddo
 
+    !> check: number of irrigation_start values == number of landuse codes?
+      num_records = ubound(FIRST_DAY_OF_IRRIGATION,1)
+      are_lengths_unequal = ( num_records /= number_of_landuse_codes )
+  
+      if ( are_lengths_unequal )                                                             &
+        call warn( sMessage="The number of values specifying first day of irrigation ("      &
+          //asCharacter( num_records )//") does not match the number of landuse values ("    &
+          //asCharacter( number_of_landuse_codes )//").",                                    &
+          sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+
     else
 
+      ! assign a dummy value and kill the run
       FIRST_DAY_OF_IRRIGATION = 90
-      call warn("No value was found to define the first day of irrigation.",      &
-           sHints="Make sure there is a lookup table with the column name "       &
-           //"'First_day_of_irrigation'.", lFatal=TRUE )
+      call warn("No value was found to define the first day of irrigation "          &
+              //"('first_day_of_irrigation' or 'irrigation_start').",                &
+           sHints="Make sure there is a lookup table with the column name "          &
+           //"'first_day_of_irrigation' or 'irrigation_start'.", lFatal=TRUE )
     endif
 
     !> process last day of irrigation. retrieved as a list of strings;
@@ -222,12 +235,23 @@ contains
         endif
       enddo
 
+    !> check: number of irrigation_end values == number of landuse codes?
+      num_records = ubound(LAST_DAY_OF_IRRIGATION,1)
+      are_lengths_unequal = ( num_records /= number_of_landuse_codes )
+  
+      if ( are_lengths_unequal )                                                             &
+        call warn( sMessage="The number of values specifying last day of irrigation ("       &
+          //asCharacter( num_records )//") does not match the number of landuse values ("    &
+          //asCharacter( number_of_landuse_codes )//").",                                    &
+          sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
+
     else
 
       LAST_DAY_OF_IRRIGATION = 90
-      call warn("No value was found to define the last day of irrigation.",      &
+      call warn("No value was found to define the last day of irrigation "        &
+              //"('last_day_of_irrigation' or 'irrigation_end').",                &
            sHints="Make sure there is a lookup table with the column name "       &
-           //"'Last_day_of_irrigation'.", lFatal=TRUE )
+           //"'last_day_of_irrigation' or 'irrigation_end'.", lFatal=TRUE )
     endif
 
     !> process number of days of irrigation. retrieved as a list of strings
@@ -238,13 +262,23 @@ contains
 
     if ( sl_irrigation_days%count_matching("<NA>") == 0 ) then
 
-      where ( NUM_DAYS_OF_IRRIGATION == 0 )
-        NUM_DAYS_OF_IRRIGATION = 999999
-      end where
+    !> check: number of 'Irrigation_length' values == number of landuse codes?
+      num_records = ubound(NUM_DAYS_OF_IRRIGATION,1)
+      are_lengths_unequal = ( num_records /= number_of_landuse_codes )
+
+      if ( are_lengths_unequal )                                                             &
+        call warn( sMessage="The number of values specifying 'irrigation_length' ("          &
+          //asCharacter( num_records )//") does not match the number of landuse values ("    &
+          //asCharacter( number_of_landuse_codes )//").",                                    &
+          sModule=__FILE__, iLine=__LINE__, lFatal=.true._c_bool )
 
     else
 
       NUM_DAYS_OF_IRRIGATION = 999999
+
+      call warn("No value was found to define the maximum number of days of irrigation ('irrigation_length').",   &
+           sHints="Make sure there is a lookup table with the column name "                                       &
+           //"'irrigation_length'.", lFatal=TRUE )
 
     endif
 
