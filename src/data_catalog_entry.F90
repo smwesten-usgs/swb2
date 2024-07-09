@@ -88,6 +88,9 @@ module data_catalog_entry
     real (c_double)      :: rX_Coord_AddOffset = 0.0_c_double
     real (c_double)      :: rY_Coord_AddOffset = 0.0_c_double
     real (c_double)      :: rCoordinateTolerance = 0.0_c_double
+    
+    real (c_double), allocatable :: rX_coordinate_subset(:)
+    real (c_double), allocatable :: rY_coordinate_subset(:)
 
     logical (c_bool)     :: lAllowMissingFiles = FALSE
     logical (c_bool)     :: lAllowAutomaticDataFlipping = TRUE
@@ -490,7 +493,7 @@ subroutine initialize_netcdf_data_object_sub( this, &
 
    class (DATA_CATALOG_ENTRY_T)               :: this
    character (len=*), intent(in)              :: sDescription
-   integer (c_int), intent(in)           :: iDataType
+   integer (c_int), intent(in)                :: iDataType
    character (len=*), intent(in)              :: sFilename
    character (len=*), intent(in), optional    :: sPROJ4_string
 
@@ -916,9 +919,11 @@ subroutine getvalues_constant_sub( this  )
 
 !--------------------------------------------------------------------------------------------------
 
-subroutine transform_grid_to_grid_sub(this)
+subroutine transform_grid_to_grid_sub(this, rX, rY)
 
   class (DATA_CATALOG_ENTRY_T) :: this
+  real (c_double), optional    :: rX(:)
+  real (c_double), optional    :: rY(:)
 
   if (.not. associated(this%pGrdNative) )  &
     call die("INTERNAL PROGRAMMING ERROR--Null pointer detected.", __FILE__, __LINE__)
@@ -934,10 +939,18 @@ subroutine transform_grid_to_grid_sub(this)
     call LOGS%write("FROM: "//squote(this%sSourcePROJ4_string), iTab=2 )
     call LOGS%write("TO:   "//squote(this%pGrdBase%sPROJ4_string), iTab=2 )
 
-    call grid_Transform(pGrd=this%pGrdNative, &
-                      sFromPROJ4=this%sSourcePROJ4_string, &
-                      sToPROJ4=BNDS%sPROJ4_string )
+    if (present(rX) .and. present(rY)) then
+      call grid_Transform(pGrd=this%pGrdNative,               &
+                        sFromPROJ4=this%sSourcePROJ4_string,  &
+                        sToPROJ4=BNDS%sPROJ4_string,          &
+                        rX=rX,                                &
+                        rY=rY )
+    else
+      call grid_Transform(pGrd=this%pGrdNative,               &
+                        sFromPROJ4=this%sSourcePROJ4_string,  &
+                        sToPROJ4=BNDS%sPROJ4_string )
 
+    endif
     !! following this call, the pGrdNative%rX and pGrdNative%rY values will be given in the
     !! base SWB project projection
 
@@ -1475,6 +1488,15 @@ end subroutine set_constant_value_real
 
             endif
 
+            this%rX_coordinate_subset = this%NCFILE%rX_Coords(this%NCFILE%iColBounds(NC_LEFT):this%NCFILE%iColBounds(NC_RIGHT))
+            this%rY_coordinate_subset = this%NCFILE%rY_Coords(this%NCFILE%iRowBounds(NC_TOP):this%NCFILE%iRowBounds(NC_BOTTOM))
+            
+            ! print *, 'getvalues_dynamic_netcdf'
+            ! print *, trim(__FILE__), ': ', __LINE__
+            ! print *, 'bounds (x): ', this%NCFILE%iColBounds(NC_LEFT), this%NCFILE%iColBounds(NC_RIGHT)
+            ! print *, 'bounds (y): ', this%NCFILE%iRowBounds(NC_TOP), this%NCFILE%iRowBounds(NC_BOTTOM)
+            ! print *, 'y-coords: ', this%rY_coordinate_subset
+
             this%iNC_FILE_STATUS = NETCDF_FILE_OPEN
 
             this%iSourceDataType = this%NCFILE%iVarType(NC_Z)
@@ -1492,6 +1514,17 @@ end subroutine set_constant_value_real
                       rX1=this%NCFILE%rX(NC_RIGHT), &
                       rY1=this%NCFILE%rY(NC_TOP), &
                       iDataType=this%iTargetDataType )
+
+            ! print *, ''
+            ! print *, 'routine getvalues_netcdf_dynamic'
+            ! print *, 'processing netCDF file: ', trim(this%sSourceFilename)
+            ! print *, 'pGrdNative created with the following values:'
+            ! print *, 'iNX=', this%NCFILE%iNX, &
+            !          'iNY=',this%NCFILE%iNY, &
+            !          'rX0=',this%NCFILE%rX(NC_LEFT), &
+            !          'rY0=',this%NCFILE%rY(NC_BOTTOM), &
+            !          'rX1=',this%NCFILE%rX(NC_RIGHT), &
+            !          'rY1=',this%NCFILE%rY(NC_TOP) 
 
             if( len_trim( this%sSourcePROJ4_string ) > 0 ) then
               ! ensure that PROJ4 string is associated with the native grid
@@ -1606,7 +1639,8 @@ end subroutine set_constant_value_real
              call this%put_values_to_archive(int(dt%iMonth,c_int),             &
                  int(dt%iDay,c_int), dt%iYear)
 
-    call this%transform_native_to_base( )
+    call this%transform_native_to_base( rX=this%rX_coordinate_subset,    &
+                                        rY=this%rY_coordinate_subset)
 
   end subroutine getvalues_dynamic_netcdf_sub
 
@@ -1734,6 +1768,18 @@ end subroutine set_constant_value_real
                     rX1=this%NCFILE%rX(NC_RIGHT), &
                     rY1=this%NCFILE%rY(NC_TOP), &
                     iDataType=this%iTargetDataType )
+
+          ! print *, ''
+          ! print *, 'routine getvalues_netcdf_static'
+          ! print *, 'processing netCDF file: ', trim(this%sSourceFilename)
+          ! print *, 'pGrdNative created with the following values:'
+          ! print *, 'iNX=', this%NCFILE%iNX, &
+          !           'iNY=',this%NCFILE%iNY, &
+          !           'rX0=',this%NCFILE%rX(NC_LEFT), &
+          !           'rY0=',this%NCFILE%rY(NC_BOTTOM), &
+          !           'rX1=',this%NCFILE%rX(NC_RIGHT), &
+          !           'rY1=',this%NCFILE%rY(NC_TOP) 
+
 
           if( len_trim( this%sSourcePROJ4_string ) > 0 ) then
             ! ensure that PROJ4 string is associated with the native grid
@@ -2155,6 +2201,7 @@ end subroutine set_maximum_allowable_value_real_sub
 
 #ifdef DEBUG_PRINT
    print *, " "
+   print *, " routine 'calc_project_boundaries'"
    print *, trim(__FILE__), ": ", __LINE__
    print *, "--  BASE GRID BOUNDS projected to DATA NATIVE COORDS"
    print *, "FROM: ", dquote(pGrdBase%sPROJ4_string)

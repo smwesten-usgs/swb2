@@ -161,7 +161,7 @@ elemental function ET0_hargreaves( rRa, rTMinF, rTMaxF )   result(rET_0)
 
   rTAvg = (rTMinF + rTMaxF) / 2.0_c_double
 
-  rTDelta = F_to_K(real(rTMaxF, c_double)) - F_to_K(real(rTMinF, c_double))
+  rTDelta = abs(F_to_K(real(rTMaxF, c_double)) - F_to_K(real(rTMinF, c_double)))
 
   rET_0 = MAX(rZERO, &
                 mm_to_in( ET_SLOPE * rRa * (F_to_C(rTavg) + ET_CONSTANT) * (rTDelta**ET_EXPONENT) ) )

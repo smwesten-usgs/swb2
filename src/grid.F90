@@ -59,8 +59,8 @@ module grid
     integer (c_int)            :: iNY                   ! Number of cells in the y-direction
     integer (c_int)            :: iNumGridCells         ! Total number of grid cells
     integer (c_int)            :: iDataType             ! Data type contained in the grid (integer, real, SWB cell)
-    character (len=:), allocatable  :: sProj4_string         ! proj4 string defining coordinate system of grid
-    character (len=:), allocatable  :: sFilename             ! original file name that the data was read from
+    character (len=:), allocatable  :: sProj4_string    ! proj4 string defining coordinate system of grid
+    character (len=:), allocatable  :: sFilename        ! original file name that the data was read from
     real (c_double)            :: rGridCellSize         ! size of one side of a grid cell
     integer (c_int)            :: iLengthUnits= -99999  ! length units code
     real (c_double)            :: rX0, rX1              ! World-coordinate range in X
@@ -1536,20 +1536,31 @@ end subroutine grid_LookupRow
 !! @param[in] sFromPROJ4
 !! @param[in] sToPROJ4
 
-subroutine grid_Transform(pGrd, sFromPROJ4, sToPROJ4 )
+subroutine grid_Transform(pGrd, sFromPROJ4, sToPROJ4, rX, rY )
 
-  type ( GENERAL_GRID_T ),pointer :: pGrd
-  character (len=*) :: sFromPROJ4, sToPROJ4
-  character (kind=c_char, len=len_trim(sFromPROJ4)) :: csFromPROJ4
-  character (kind=c_char, len=len_trim(sToPROJ4)) :: csToPROJ4
+  type ( GENERAL_GRID_T ),pointer                    :: pGrd
+  character (len=*)                                  :: sFromPROJ4, sToPROJ4
+  character (kind=c_char, len=len_trim(sFromPROJ4))  :: csFromPROJ4
+  character (kind=c_char, len=len_trim(sToPROJ4))    :: csToPROJ4
+  real (c_double), optional                          :: rX(:)
+  real (c_double), optional                          :: rY(:)
 
   ! [ LOCALS ]
   integer (c_int) :: iRetVal
   integer (c_int) :: i
   logical (c_bool), dimension(pGrd%iNY, pGrd%iNX) :: lMask
 
-  !> calculate X and Y for the untransformed data
-  call grid_PopulateXY(pGrd)
+  if (present(rX) .and. present(rY)) then
+
+  !> supply X and Y for the untransformed data
+    call grid_PopulateXY(pGrd, rX, rY)
+
+  else
+
+    !> calculate X and Y for the untransformed data
+    call grid_PopulateXY(pGrd)
+
+  endif
 
   csFromPROJ4 = trim(sFromPROJ4)
   csToPROJ4 = trim(sToPROJ4)
@@ -1842,10 +1853,6 @@ function grid_SearchColumn(pGrd,rXval,rZval,rNoData) result ( rValue )
                          iAfter=ia, &
                          rFrac=u)
 
-#ifdef DEBUG_PRINT
-  write(UNIT=LU_LOG,FMT=*)'lookup ',rXval,ib,ia
-#endif
-
   call assert (ib>0 .and. ia>0 .and. ib <= ubound(pGrd%rData,1) &
      .and. ia <= ubound(pGrd%rData,1), &
     "Internal programming error: requested X value " &
@@ -2002,9 +2009,6 @@ function grid_GetGridColNum(pGrd,rX)  result(iColumnNumber)
   real (c_double) :: rX
   integer (c_int) :: iColumnNumber
 
- ! print *, "rX: ",rX
- ! print *, pGrd%rX0, pGrd%rX1, pGrd%iNX
-
   !! this only works if the data are in the originally supplied projection. If the coordinates have been
   !! transformed, there is no guarantee that the assumption used in this calculation will hold.
   iColumnNumber = NINT(real(pGrd%iNX, c_double) &
@@ -2102,17 +2106,22 @@ function grid_GetGridColRowNum(pGrd, rX, rY)    result(iColRow)
       iCandidateCol = iStartingColNum
     endif
 
+!    print *, 'filename: ', trim(pGrd%sFilename)
+!    print *, 'start of iteration: ', iStartingColNum, iStartingRowNum, rDist, rDist2, iCandidateCol, iCandidateRow
+
     rMinDistance = rBIGVAL
 
     do
 
       !> need to ensure that whatever bound is calculated
       !> is within the declared array bounds or we get a segfault
-      iRowBoundLower = min(max( 1, iCandidateRow - 1), pGrd%iNY)
-      iRowBoundUpper = max(min( pGrd%iNY, iCandidateRow + 1), 1)
+      !iRowBoundLower = min(max( 1, iCandidateRow - 1), pGrd%iNY)
+      iRowBoundLower = clip(value=iCandidateRow - 1, minval=1, maxval=pGrd%iNY)
+      iRowBoundUpper = clip(value=iCandidateRow + 1, minval=1, maxval=pGrd%iNY)
 
-      iColBoundLower = min(max( 1, iCandidateCol - 1), pGrd%iNX)
-      iColBoundUpper = max(min( pGrd%iNX, iCandidateCol + 1), 1)
+      !iColBoundLower = min(max( 1, iCandidateCol - 1), pGrd%iNX)
+      iColBoundLower = clip(value=iCandidateCol - 1, minval=1, maxval=pGrd%iNX)
+      iColBoundUpper = clip(value=iCandidateCol + 1, minval=1, maxval=pGrd%iNX)
 
       lChanged = FALSE
 
@@ -2132,6 +2141,8 @@ function grid_GetGridColRowNum(pGrd, rX, rY)    result(iColRow)
 
         enddo
       enddo
+
+!      print *, 'iterating: rdist: ', rDist, '  cand X: ', pGrd%rX(iCandidateCol,iCandidateRow), ' X: ', rX, '  cand Y: ', pGrd%rY(iCandidateCol,iCandidateRow), ' Y: ', rY
 
       if (.not. lChanged ) exit
 
@@ -2187,38 +2198,71 @@ end function grid_GetGridY
 
 !----------------------------------------------------------------------
 
-subroutine grid_PopulateXY(pGrd)
+subroutine grid_PopulateXY(pGrd, rX, rY)
 
   ! [ ARGUMENTS ]
-  type ( GENERAL_GRID_T ),pointer :: pGrd         ! pointer to model grid
-    ! model options, flags, and other settings
-
+  type ( GENERAL_GRID_T ),pointer :: pGrd 
+  real (c_double), optional       :: rX(:)
+  real (c_double), optional       :: rY(:)
+  
   ! [ LOCALS ]
   integer (c_int) :: iCol,iRow
   integer (c_int) :: iStat
+  integer (c_int) :: nx, ny
 
   if ( .not. allocated(pGrd%rX) ) then
 
     ALLOCATE (pGrd%rX(pGrd%iNX, pGrd%iNY), STAT=iStat)
-    call assert( iStat == 0, &
+    call assert( iStat == 0,                                                     &
        "Could not allocate memory for x-coordinates within grid data structure", &
        __FILE__, __LINE__)
   endif
 
   if ( .not. allocated(pGrd%rY) ) then
     ALLOCATE (pGrd%rY(pGrd%iNX, pGrd%iNY), STAT=iStat)
-    call assert( iStat == 0, &
+    call assert( iStat == 0,                                                     &
        "Could not allocate memory for y-coordinates within grid data structure", &
        __FILE__, __LINE__)
   endif
 
-  do iRow=1,pGrd%iNY
-    do iCol=1,pGrd%iNX
-      pGrd%rX(iCol, iRow) = grid_GetGridX(pGrd, iCol)
-      pGrd%rY(iCol, iRow) = grid_GetGridY(pGrd, iRow)
-    enddo
-  enddo
+  if (present(rX) .and. present(rY)) then
 
+    nx = size(rX)
+    ny = size(rY)
+
+    call assert( nx == pGrd%iNX,                                                                          &
+           "Internal programming error: number of 'X' values does not match number of x values in grid", &
+           __FILE__, __LINE__)
+
+    call assert( ny == pGrd%iNY,                                                                          &
+           "Internal programming error: number of 'X' values does not match number of x values in grid", &
+           __FILE__, __LINE__)
+
+    do iRow=1,pGrd%iNY
+      do iCol=1,pGrd%iNX
+        pGrd%rX(iCol, iRow) = rX(iCol)
+        pGrd%rY(iCol, iRow) = rY(iRow)
+      enddo
+    enddo
+  
+  else
+
+    do iRow=1,pGrd%iNY
+      do iCol=1,pGrd%iNX
+        pGrd%rX(iCol, iRow) = grid_GetGridX(pGrd, iCol)
+        pGrd%rY(iCol, iRow) = grid_GetGridY(pGrd, iRow)
+      enddo
+    enddo
+
+  endif
+
+  ! print *, 'grid_PopulateXY: obtained grid coordinates, routine ',__FILE__,' line ', __LINE__
+  ! print *, '(col=1, row=1): ', pGrd%rX(1,1), pGrd%rY(1,1)
+  ! print *, '(col=1, row=', pGrd%iNY,'): ', pGrd%rX(1, pGrd%iNY),pGrd%rY(1, pGrd%iNY)
+  ! print *, '(col=',pGrd%iNX,', row=1): ', pGrd%rX(pGrd%iNX, 1),pGrd%rY(pGrd%iNX, 1)
+  ! print *, '(col=',pGrd%iNX,', row=', pGrd%iNY,'): ', pGrd%rX(pGrd%iNX, pGrd%iNY),pGrd%rY(pGrd%iNX, pGrd%iNY)
+
+  
 end subroutine grid_PopulateXY
 
 !----------------------------------------------------------------------
@@ -2392,6 +2436,7 @@ subroutine grid_GridToGrid_sgl(pGrdFrom,  pGrdTo )
   integer (c_int) :: iCol, iRow
   integer (c_int) :: iSrcCol, iSrcRow
   real (c_float), dimension(3,3) :: rKernel
+  logical  :: printout
 
   rKernel = 1.
   rKernel(2,2) = 8.
@@ -2414,6 +2459,18 @@ subroutine grid_GridToGrid_sgl(pGrdFrom,  pGrdTo )
       if ( iColRow(ROW) < 1 .or. iColRow(ROW) > pGrdFrom%iNY) cycle
 
       pGrdTo%rData(iCol,iRow) = pGrdFrom%rData( iColRow(COLUMN), iColRow(ROW) )
+
+
+      ! printout =      (iRow==1 .and. iCol==1) .or. (iRow==1 .and. iCol==pGrdTo%iNX)                    &
+      !            .or. (iRow==pGrdTo%iNY .and. iCol==1) .or. (iRow==pGrdTo%iNY .and. iCol==pGrdTo%iNX)
+
+      ! if (printout) then
+      !   print *, trim(__FILE__), ': ', __LINE__
+      !   print *, 'getting data from the file: ', trim(pGrdFrom%sFilename)
+      !   print *, '  coord-to        : ', pGrdTo%rX(iCol, iRow), pGrdTo%rY(iCol, iRow)
+      !   print *, '  to: (iCol, iRow): ', iCol, iRow
+      !   print *, '  from: (col, row): ', iColRow(COLUMN), iColRow(ROW)
+      ! endif  
 
     enddo
   enddo

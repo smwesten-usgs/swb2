@@ -264,9 +264,12 @@ contains
 
         if (NUMBER_OF_FATAL_WARNINGS <= ubound( WARNING_TEXT,1 ) )     &
           WARNING_TEXT( NUMBER_OF_FATAL_WARNINGS ) = trim(sMessage)
+      else
+        call LOGS%write(" ** WARNING **", iTab=10, iLinesBefore=1)
+        call LOGS%write( trim(sMessage), iTab=16 )
       endif
     else
-      call LOGS%write(" ** WARNING possible error: **", iTab=10, iLinesBefore=1)
+      call LOGS%write(" ** WARNING **", iTab=10, iLinesBefore=1)
       call LOGS%write( trim(sMessage), iTab=16 )
     endif
 
