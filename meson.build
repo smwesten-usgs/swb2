@@ -133,6 +133,7 @@ if fc_id == 'intel-llvm-cl'
                    '/traceback',
                    '/W0',
                    '/MT',
+                   '/fp:precise',
                    '/fpp',                # Activate preprocessing
                    '/Qdiag-disable:7416', # f2008 warning
                    '/Qdiag-disable:7025', # f2008 warning
@@ -147,6 +148,7 @@ elif fc_id == 'intel'
   # linux and macOS
   compile_args += ['-fpe0',              # Activate all floating point exceptions
                    '-fpp',
+                   '-fpmodel=precise',
                    '-no-heap-arrays',
                    '-traceback',
                    '-diag-disable:7416',  # f2008 warning
