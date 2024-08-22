@@ -60,7 +60,6 @@ link_args = []
 cc = meson.get_compiler('c')
 cc_id = cc.get_id()
 
-
 system = build_machine.system()
 if system == 'linux'
   conf_data.set('PLATFORM_NAME','"Linux"')
@@ -110,7 +109,7 @@ if fc_id == 'gcc'
 endif
 
 # Command line options for ifort
-if fc_id == 'intel-llvm-cl'
+if (fc_id == 'intel-llvm-cl') and (PLATFORM_NAME == 'Windows')
   # windows
 
 ### Meson apparently throws in a /utf-8 compiler argument, which clang complains about. The kludge below is an attempt
@@ -149,6 +148,19 @@ elif fc_id == 'intel'
   compile_args += ['-fpe0',              # Activate all floating point exceptions
                    '-fpp',
                    '-fpmodel=precise',
+                   '-no-heap-arrays',
+                   '-traceback',
+                   '-diag-disable:7416',  # f2008 warning
+                   '-diag-disable:7025',  # f2008 warning
+                   '-diag-disable:5268',  # Line too long
+                  ]
+  link_args += '-static-intel'
+
+elif fc_id == 'intel-llvm'
+  # linux and macOS
+  compile_args += ['-fpe0',              # Activate all floating point exceptions
+                   '-fpp',
+                   '-fp-model=precise',
                    '-no-heap-arrays',
                    '-traceback',
                    '-diag-disable:7416',  # f2008 warning
