@@ -1,5 +1,6 @@
 #!/bin/bash
 
+module switch PrgEnv-cray PrgEnv-intel
 module load cray-hdf5
 module load cray-netcdf
 module load intel-oneapi
