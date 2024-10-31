@@ -170,6 +170,7 @@ module model_domain
     procedure ( array_method ), pointer  :: init_crop_coefficient
     procedure ( array_method ), pointer  :: calc_interception
     procedure ( array_method ), pointer  :: update_crop_coefficient
+    procedure ( array_method ), pointer  :: init_rooting_depth
     procedure ( array_method ), pointer  :: update_rooting_depth
     procedure ( array_method ), pointer  :: init_continuous_frozen_ground_index
     procedure ( array_method ), pointer  :: calc_continuous_frozen_ground_index
@@ -338,6 +339,7 @@ contains
      this%update_crop_coefficient      => model_update_crop_coefficient_none
      this%update_irrigation_mask       => model_update_irrigation_mask
 
+     this%init_rooting_depth           => model_initialize_rooting_depth_none
      this%update_rooting_depth         => model_update_rooting_depth_none
 
      this%init_continuous_frozen_ground_index  => model_initialize_continuous_frozen_ground_index
@@ -649,6 +651,8 @@ contains
     call this%init_interception
 
     call this%init_snowfall
+
+    call this%init_rooting_depth
 
     call this%init_snowmelt
 
@@ -1152,11 +1156,13 @@ contains
       if ( ( Method_Name .strapprox. "DYNAMIC" ) .or. ( Method_Name .strapprox. "FAO_56" )   &
           .or. ( Method_Name .strapprox. "FAO-56" ) .or. ( Method_Name .strapprox. "FAO56" ) )   then
 
+        this%init_rooting_depth => model_initialize_rooting_depth_FAO56
         this%update_rooting_depth => model_update_rooting_depth_FAO56
         call LOGS%WRITE( "==> DYNAMIC rooting depth submodel selected.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
       else
 
+        this%init_rooting_depth => model_initialize_rooting_depth_none
         this%update_rooting_depth => model_update_rooting_depth_none
         call LOGS%WRITE( "==> STATIC rooting depth submodel selected.", iLogLevel = LOG_ALL, lEcho = FALSE )
 
@@ -3339,6 +3345,14 @@ contains
 
   !--------------------------------------------------------------------------------------------------
 
+  subroutine model_initialize_rooting_depth_none(this)
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+  end subroutine model_initialize_rooting_depth_none
+
+  !--------------------------------------------------------------------------------------------------
+
   subroutine model_update_rooting_depth_none(this)
 
     class (MODEL_DOMAIN_T), intent(inout)  :: this
@@ -3346,6 +3360,19 @@ contains
   end subroutine model_update_rooting_depth_none
 
   !--------------------------------------------------------------------------------------------------
+
+  subroutine model_initialize_rooting_depth_FAO56(this)
+
+    use rooting_depth__FAO56, only : initialize_rooting_depth
+
+    class (MODEL_DOMAIN_T), intent(inout)  :: this
+
+    call initialize_rooting_depth()
+
+  end subroutine model_initialize_rooting_depth_FAO56
+
+  !--------------------------------------------------------------------------------------------------
+
 
   subroutine model_update_rooting_depth_FAO56(this)
 
