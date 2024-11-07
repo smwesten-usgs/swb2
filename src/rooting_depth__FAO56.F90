@@ -9,7 +9,7 @@ module rooting_depth__FAO56
   use iso_c_binding, only              : c_short, c_int, c_float, c_double, c_bool
   use constants_and_conversions, only  : TRUE, FALSE 
   use fstring_list
-  use fstring, only                    : operator(.containssimilar.)
+  use fstring, only                    : operator(.containssimilar.), asCharacter
   use parameters, only                 : PARAMS
   use exceptions, only                 : assert, warn
   use crop_coefficients__FAO56, only   : KCB_l, KCB_MIN, KCB_INI, KCB_MID, KCB_END,               &
@@ -58,8 +58,8 @@ subroutine initialize_rooting_depth( )
 
   if ( .not. list_lengths_are_equal ) then
 
-    call warn( sMessage="The number of landuses does not match the number of values supplied for the "    &
-                        //"rooting depth method.",                              &
+    call warn( sMessage="The number of landuses does not match the number of values supplied for the "           &
+                        //"'allow_variable_rooting_depth' parameter.",                                           &
                sHints="By default, all rooting depths will be allowed to vary, using the FAO-56 methodology.",   &
                sModule=__FILE__, iLine=__LINE__, lFatal=FALSE )
     allocate(tempbool(number_of_landuses), stat=status)
@@ -78,6 +78,9 @@ subroutine initialize_rooting_depth( )
       else
         VARIABLE_ROOTING_DEPTH(indx) = FALSE
       endif
+
+      print *, "SETTING 'allow_variable_rooting_depth' for landuse index "//asCharacter(indx)//" to "//trim(temp_str)
+
     enddo
   
   endif   
