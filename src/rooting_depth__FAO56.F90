@@ -56,6 +56,8 @@ subroutine initialize_rooting_depth( )
   number_of_records = sl_variable_rooting_depth%count
   list_lengths_are_equal = ( number_of_records == number_of_landuses )
 
+  print *, "INITIALIZING ROOTING DEPTH data structures:", trim(__file__), "  ", __LINE__
+
   if ( .not. list_lengths_are_equal ) then
 
     call warn( sMessage="The number of landuses does not match the number of values supplied for the "           &
