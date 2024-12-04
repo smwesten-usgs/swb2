@@ -98,7 +98,7 @@ module model_domain
     real (c_float), allocatable       :: infiltration(:)
     real (c_float), allocatable       :: potential_snowmelt(:)
     real (c_float), allocatable       :: snowmelt(:)
-    type (GENERAL_GRID_T), pointer         :: pGrdOut
+    type (GENERAL_GRID_T), pointer    :: pGrdOut
     real (c_float), allocatable       :: interception(:)
     real (c_float), pointer           :: interception_storage(:)
     real (c_float), allocatable       :: interception_storage_max(:)
