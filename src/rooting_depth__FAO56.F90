@@ -136,7 +136,7 @@ elemental subroutine update_rooting_depth( Zr_i, Zr_max, landuse_index, Kcb )
       ! scale the rooting depth in proportion to the progress within the Kcb curve...
       ! update: we are not going to reduce the rooting depth until the Kcb value has been
       !         reset to Kcb_ini
-      Zr_i = maxval(Zr_i, Zr_min + ( Kcb - MinKCB ) / ( MaxKCB - MinKCB ) * ( Zr_max - Zr_min ))
+      Zr_i = max(Zr_i, Zr_min + ( Kcb - MinKCB ) / ( MaxKCB - MinKCB ) * ( Zr_max - Zr_min ))
 
     else
 
