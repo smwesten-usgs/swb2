@@ -64,17 +64,21 @@ system = build_machine.system()
 if system == 'linux'
   conf_data.set('PLATFORM_NAME','"Linux"')
   conf_data.set('WINDOWS_SYSTEM', 'False')
+  message('setting Meson conf_data for Linux')
 elif system == 'darwin'
   conf_data.set('PLATFORM_NAME','"MacOS"')
   conf_data.set('WINDOWS_SYSTEM', 'False')
+  message('setting Meson conf_data for MacOS')
 elif system == 'windows'
   conf_data.set('PLATFORM_NAME','"Windows"')
   conf_data.set('WINDOWS_SYSTEM', 'True')
+  message('setting Meson conf_data for Windows')
 endif
 
 message('The compilation profile is:', profile)
 message('Meson sees the compiler name as:' + fc_id)
 message('Meson sees the C compiler name as: ' + cc_id)
+message('Meson sees the build machine as: ' + system)
 
 # Command line options for gfortran
 if fc_id == 'gcc'
@@ -109,7 +113,7 @@ if fc_id == 'gcc'
 endif
 
 # Command line options for ifort
-if (fc_id == 'intel-llvm-cl') and (PLATFORM_NAME == 'Windows')
+if (fc_id == 'intel-llvm-cl') and (system == 'windows')
   # windows
 
 ### Meson apparently throws in a /utf-8 compiler argument, which clang complains about. The kludge below is an attempt
