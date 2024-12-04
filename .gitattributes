@@ -1,3 +1,6 @@
-* linguist-vendored
-*.F90 linguist-vendored=false
-*.c linguist-vendored=false
+*.asc linguist-detectable=false
+*.html linguist-detectable=false
+*.R linguist-detectable=false
+*.ctl linguist-detectable=false
+*.ipynb linguist-detectable=false
+*.py linguist-detectable=false
