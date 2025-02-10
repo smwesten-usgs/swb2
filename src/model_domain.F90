@@ -2714,6 +2714,14 @@ contains
 
       endif
 
+      if (   any(real(pIRR_MASK%pGrdBase%iData, c_float) < 0.0)   &
+        .or. any(real(pIRR_MASK%pGrdBase%iData, c_float) > 1.0))    then
+
+          call die(sMessage = "Irrigation mask contains illegal values (outside range from 0-1)", &
+          sHints="Check the values contained in your irrigation mask file(s).")
+
+        endif
+
     else ! no irrigation mask specified; default to irrigating every cell
 
       this%irrigation_mask = 1.0_c_float
