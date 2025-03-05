@@ -1565,8 +1565,8 @@ contains
 
         elseif ( ( Method_Name .containssimilar. "COL_ROW") .and. ( argv_list%count >= 3 ) ) then
 
-          col = asInt( argv_list%get(1) )
-          row = asInt( argv_list%get(2) )
+          col = asInt( argv_list%get(2) )
+          row = asInt( argv_list%get(3) )
           xcoord = grid_GetGridX( this%pGrdOut, col )
           ycoord = grid_GetGridY( this%pGrdOut, row )
 
