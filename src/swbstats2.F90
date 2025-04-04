@@ -181,13 +181,11 @@ program swbstats2
     if ( command_arg_str .containssimilar. "comparison_scale_factor" ) then
 
       sub_string = right(command_arg_str, substring="=")
-
       swbstats%comparison_grid_conversion_factor = asFloat(sub_string)
 
     elseif ( command_arg_str .containssimilar. "output_prefix" ) then
 
         sub_string = right(command_arg_str, substring="=")
-  
         swbstats%output_file_prefix = trim(sub_string)
   
     elseif ( command_arg_str .containssimilar. "annual_statistics" ) then
@@ -398,6 +396,7 @@ program swbstats2
     call swbstats%create_date_list_for_monthly_statistics()
     call swbstats%create_monthly_working_grids()
 
+    ! initialize the 12 grids that will be used to calculate mean monthly values
     do month_index=1,12
 
       call MON_STAT(month_index)%initialize(NX=swbstats%ncfile_in%iNX,           &

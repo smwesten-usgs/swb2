@@ -133,6 +133,8 @@ module model_domain
     real (c_float), allocatable       :: tmin(:)
     real (c_float), allocatable       :: tmax(:)
     real (c_float), allocatable       :: tmean(:)
+    real (c_float), allocatable       :: tmax_minus_tmin(:)
+    real (c_float), allocatable       :: climatic_deficit(:)
 
     real (c_float), allocatable       :: routing_fraction(:)
 
@@ -195,6 +197,7 @@ module model_domain
     procedure ( array_method ), pointer  :: get_minimum_air_temperature_data
     procedure ( array_method ), pointer  :: get_maximum_air_temperature_data
     procedure ( array_method ), pointer  :: calculate_mean_air_temperature
+    procedure ( array_method ), pointer  :: calculate_range_in_air_temperature
 
   contains
 
@@ -371,6 +374,7 @@ contains
      this%get_minimum_air_temperature_data => model_get_minimum_air_temperature_normal
      this%get_maximum_air_temperature_data => model_get_maximum_air_temperature_normal
      this%calculate_mean_air_temperature   => model_calculate_mean_air_temperature
+     this%calculate_range_in_air_temperature => model_calculate_range_in_air_temperature
 
   end subroutine set_default_procedure_pointers_sub
 
@@ -427,7 +431,7 @@ contains
     integer (c_int)  :: iCount
     integer (c_int)  :: iIndex
     integer (c_int)  :: indx
-    integer (c_int)  :: iStat(70)
+    integer (c_int)  :: iStat(71)
 
     iCount = count( this%active )
     iStat = 0
@@ -502,6 +506,7 @@ contains
     allocate( this%evaporable_water_storage( iCount ), stat=iStat(68) )
     allocate( this%evaporable_water_deficit( iCount ), stat=iStat(69) )
     allocate( this%irrigation_mask( iCount), stat=iStat(70) )
+    allocate( this%tmax_minus_tmin( iCount), stat=iStat(71) )
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR"                    &
@@ -581,6 +586,7 @@ contains
     this%evaporable_water_deficit            = 0.0_c_float
     this%it_is_growing_season                = FALSE
     this%irrigation_mask                     = 1.0_c_float
+    this%tmax_minus_tmin                     = 0.0_c_float
 
     do iIndex=1, iCount
       this%sort_order( iIndex ) = iIndex
@@ -1008,6 +1014,7 @@ contains
       call this%get_maximum_air_temperature_data()
 
       call this%calculate_mean_air_temperature()
+      call this%calculate_range_in_air_temperature()
 
     end associate
 
@@ -3530,6 +3537,16 @@ contains
      this%tmean = ( this%tmin + this%tmax ) / 2.0_c_float
 
   end subroutine model_calculate_mean_air_temperature
+
+!--------------------------------------------------------------------------------------------------
+
+  subroutine model_calculate_range_in_air_temperature(this)
+
+    class ( MODEL_DOMAIN_T ), intent(inout)   :: this
+
+    this%tmax_minus_tmin = this%tmax - this%tmin
+
+ end subroutine model_calculate_range_in_air_temperature
 
 !--------------------------------------------------------------------------------------------------
 

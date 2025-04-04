@@ -19,7 +19,7 @@ module output
   type (NETCDF_FILE_COLLECTION_T), allocatable, public :: NC_MULTI_SIM_OUT(:,:)
 
 
-  integer (c_int), parameter   :: NCDF_NUM_OUTPUTS = 29
+  integer (c_int), parameter   :: NCDF_NUM_OUTPUTS = 30
 
   type OUTPUT_SPECS_T
     character (len=27)          :: variable_name
@@ -47,6 +47,7 @@ module output
     OUTPUT_SPECS_T( "snowmelt                   ", "inches               ", 2000.0, 0.0, FALSE, FALSE ),      &
     OUTPUT_SPECS_T( "tmin                       ", "degrees_fahrenheit   ", 2000.0, -2000.0, TRUE, FALSE  ),  &
     OUTPUT_SPECS_T( "tmax                       ", "degrees_fahrenheit   ", 2000.0, -2000.0, TRUE, FALSE  ),  &
+    OUTPUT_SPECS_T( "tmax_minus_tmin            ", "degrees_fahrenheit   ", 2000.0, -2000.0, FALSE, FALSE  ), &
     OUTPUT_SPECS_T( "net_infiltration           ", "inches               ", 2000.0, 0.0, TRUE, FALSE  ),      &
     OUTPUT_SPECS_T( "rejected_net_infiltration  ", "inches               ", 2000.0, 0.0, TRUE, FALSE  ),      &
     OUTPUT_SPECS_T( "infiltration               ", "inches               ", 2000.0, 0.0, FALSE, FALSE  ),     &
@@ -69,6 +70,7 @@ module output
                   NCDF_DELTA_SOIL_STORAGE,                                    &
                   NCDF_REFERENCE_ET0,                                         &
                   NCDF_ACTUAL_ET, NCDF_SNOWMELT, NCDF_TMIN, NCDF_TMAX,        &
+                  NCDF_TMAX_MINUS_TMIN,                                       &
                   NCDF_NET_INFILTRATION, NCDF_REJECTED_NET_INFILTRATION,      &
                   NCDF_INFILTRATION,                                          &
                   NCDF_IRRIGATION, NCDF_RUNOFF_OUTSIDE,                       &
@@ -620,6 +622,18 @@ contains
           update_maximum_value(OUTSPECS(NCDF_TMAX)%valid_maximum, cells%tmax)
         OUTSPECS(NCDF_TMAX)%valid_minimum =         &
           update_minimum_value(OUTSPECS(NCDF_TMAX)%valid_minimum, cells%tmax)
+                          
+      endif
+
+      if ( OUTSPECS( NCDF_TMAX_MINUS_TMIN )%is_active ) then
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_TMAX_MINUS_TMIN )%ncfile,  &
+                                    values=cells%tmax_minus_tmin,                           &
+                                    cells=cells )
+        OUTSPECS(NCDF_TMAX)%valid_maximum =         &
+          update_maximum_value(OUTSPECS(NCDF_TMAX)%valid_maximum, cells%tmax_minus_tmin)
+        OUTSPECS(NCDF_TMAX)%valid_minimum =         &
+          update_minimum_value(OUTSPECS(NCDF_TMAX)%valid_minimum, cells%tmax_minus_tmin)
                           
       endif
 
