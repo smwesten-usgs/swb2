@@ -19,7 +19,7 @@ module output
   type (NETCDF_FILE_COLLECTION_T), allocatable, public :: NC_MULTI_SIM_OUT(:,:)
 
 
-  integer (c_int), parameter   :: NCDF_NUM_OUTPUTS = 30
+  integer (c_int), parameter   :: NCDF_NUM_OUTPUTS = 31
 
   type OUTPUT_SPECS_T
     character (len=27)          :: variable_name
@@ -44,6 +44,7 @@ module output
     OUTPUT_SPECS_T( "delta_soil_storage         ", "inches               ", 2000.0, -2000.0, FALSE, FALSE  ), &
     OUTPUT_SPECS_T( "reference_ET0              ", "inches               ", 2000.0, 0.0, TRUE, FALSE  ),      &
     OUTPUT_SPECS_T( "actual_et                  ", "inches               ", 2000.0, 0.0, TRUE, FALSE  ),      &
+    OUTPUT_SPECS_T( "climatic_deficit           ", "inches               ", 2000.0, 0.0, FALSE, FALSE  ),     &
     OUTPUT_SPECS_T( "snowmelt                   ", "inches               ", 2000.0, 0.0, FALSE, FALSE ),      &
     OUTPUT_SPECS_T( "tmin                       ", "degrees_fahrenheit   ", 2000.0, -2000.0, TRUE, FALSE  ),  &
     OUTPUT_SPECS_T( "tmax                       ", "degrees_fahrenheit   ", 2000.0, -2000.0, TRUE, FALSE  ),  &
@@ -69,7 +70,8 @@ module output
                   NCDF_SNOW_STORAGE, NCDF_SURFACE_STORAGE, NCDF_SOIL_STORAGE, &
                   NCDF_DELTA_SOIL_STORAGE,                                    &
                   NCDF_REFERENCE_ET0,                                         &
-                  NCDF_ACTUAL_ET, NCDF_SNOWMELT, NCDF_TMIN, NCDF_TMAX,        &
+                  NCDF_ACTUAL_ET, NCDF_CLIMATIC_DEFICIT,                        &
+                  NCDF_SNOWMELT, NCDF_TMIN, NCDF_TMAX,                        &
                   NCDF_TMAX_MINUS_TMIN,                                       &
                   NCDF_NET_INFILTRATION, NCDF_REJECTED_NET_INFILTRATION,      &
                   NCDF_INFILTRATION,                                          &
@@ -598,6 +600,19 @@ contains
           update_maximum_value(OUTSPECS(NCDF_ACTUAL_ET)%valid_maximum, real(cells%actual_et, c_float))
         OUTSPECS(NCDF_ACTUAL_ET)%valid_minimum =         &
           update_minimum_value(OUTSPECS(NCDF_ACTUAL_ET)%valid_minimum, real(cells%actual_et, c_float))
+                          
+      endif
+
+      if ( OUTSPECS( NCDF_CLIMATIC_DEFICIT )%is_active                                 &
+           .and. (.not. OUTSPECS( NCDF_CLIMATIC_DEFICIT )%multisim_outputs) ) then
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_CLIMATIC_DEFICIT )%ncfile,  &
+                                    values=real(cells%climatic_deficit, c_float),       &
+                                    cells=cells )
+        OUTSPECS(NCDF_CLIMATIC_DEFICIT)%valid_maximum =         &
+          update_maximum_value(OUTSPECS(NCDF_CLIMATIC_DEFICIT)%valid_maximum, real(cells%climatic_deficit, c_float))
+        OUTSPECS(NCDF_CLIMATIC_DEFICIT)%valid_minimum =         &
+          update_minimum_value(OUTSPECS(NCDF_CLIMATIC_DEFICIT)%valid_minimum, real(cells%climatic_deficit, c_float))
                           
       endif
 

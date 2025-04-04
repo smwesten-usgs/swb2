@@ -171,6 +171,7 @@ module model_domain
     procedure ( array_method ), pointer  :: init_AWC
     procedure ( array_method ), pointer  :: init_crop_coefficient
     procedure ( array_method ), pointer  :: calc_interception
+    procedure ( index_method ), pointer  :: calc_climatic_water_deficit
     procedure ( array_method ), pointer  :: update_crop_coefficient
     procedure ( array_method ), pointer  :: init_rooting_depth
     procedure ( array_method ), pointer  :: update_rooting_depth
@@ -375,6 +376,7 @@ contains
      this%get_maximum_air_temperature_data => model_get_maximum_air_temperature_normal
      this%calculate_mean_air_temperature   => model_calculate_mean_air_temperature
      this%calculate_range_in_air_temperature => model_calculate_range_in_air_temperature
+     this%calc_climatic_water_deficit        => model_calculate_climatic_water_deficit
 
   end subroutine set_default_procedure_pointers_sub
 
@@ -431,7 +433,7 @@ contains
     integer (c_int)  :: iCount
     integer (c_int)  :: iIndex
     integer (c_int)  :: indx
-    integer (c_int)  :: iStat(71)
+    integer (c_int)  :: iStat(72)
 
     iCount = count( this%active )
     iStat = 0
@@ -505,8 +507,9 @@ contains
     allocate( this%net_snowfall( iCount ), stat=iStat(67) )
     allocate( this%evaporable_water_storage( iCount ), stat=iStat(68) )
     allocate( this%evaporable_water_deficit( iCount ), stat=iStat(69) )
-    allocate( this%irrigation_mask( iCount), stat=iStat(70) )
-    allocate( this%tmax_minus_tmin( iCount), stat=iStat(71) )
+    allocate( this%irrigation_mask( iCount ), stat=iStat(70) )
+    allocate( this%tmax_minus_tmin( iCount ), stat=iStat(71) )
+    allocate( this%climatic_deficit( iCount ), stat=iStat(72) )
 
     do iIndex = 1, ubound( iStat, 1)
       if ( iStat( iIndex ) /= 0 )   call warn("INTERNAL PROGRAMMING ERROR"                    &
@@ -587,6 +590,7 @@ contains
     this%it_is_growing_season                = FALSE
     this%irrigation_mask                     = 1.0_c_float
     this%tmax_minus_tmin                     = 0.0_c_float
+    this%climatic_deficit                    = 0.0_c_float
 
     do iIndex=1, iCount
       this%sort_order( iIndex ) = iIndex
@@ -3547,6 +3551,21 @@ contains
     this%tmax_minus_tmin = this%tmax - this%tmin
 
  end subroutine model_calculate_range_in_air_temperature
+
+!--------------------------------------------------------------------------------------------------
+
+ subroutine model_calculate_climatic_water_deficit(this, cell_index)
+
+  class (MODEL_DOMAIN_T), intent(inout)          :: this
+  integer (c_int), intent(in)                    :: cell_index
+
+  if (this%reference_et0(cell_index) > this%actual_et(cell_index)) then
+    this%climatic_deficit(cell_index) = this%reference_et0(cell_index) - this%actual_et(cell_index)
+  else
+    this%climatic_deficit(cell_index) = 0.0_c_float
+  endif
+
+end subroutine model_calculate_climatic_water_deficit
 
 !--------------------------------------------------------------------------------------------------
 

@@ -201,6 +201,8 @@ contains
                    + actual_et_impervious * ( 1.0_c_float - pervious_fraction )          &
                           + actual_et_interception * canopy_cover_fraction
 
+        call cells%calc_climatic_water_deficit( indx )
+
         if ( runoff < 0.)                                                                               &
           call LOGS%write( "line "//asCharacter(__LINE__)//": Negative runoff, indx= "                  &
                            //asCharacter(indx)//" col, row= "//asCharacter(cells%col_num_1D( indx ))    &
