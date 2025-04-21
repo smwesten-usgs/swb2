@@ -19,7 +19,7 @@ module output
   type (NETCDF_FILE_COLLECTION_T), allocatable, public :: NC_MULTI_SIM_OUT(:,:)
 
 
-  integer (c_int), parameter   :: NCDF_NUM_OUTPUTS = 31
+  integer (c_int), parameter   :: NCDF_NUM_OUTPUTS = 32
 
   type OUTPUT_SPECS_T
     character (len=27)          :: variable_name
@@ -38,6 +38,7 @@ module output
     OUTPUT_SPECS_T( "interception_storage       ", "inches               ", 2000.0, 0.0, FALSE, FALSE  ),     &
     OUTPUT_SPECS_T( "runon                      ", "inches               ", 2000.0, 0.0, TRUE, FALSE  ),      &
     OUTPUT_SPECS_T( "runoff                     ", "inches               ", 2000.0, 0.0, TRUE, FALSE  ),      &
+    OUTPUT_SPECS_T( "surface_runoff             ", "inches               ", 2000.0, 0.0, FALSE, FALSE  ),     &
     OUTPUT_SPECS_T( "snow_storage               ", "inches               ", 2000.0, 0.0, FALSE, FALSE ),      &
     OUTPUT_SPECS_T( "surface_storage            ", "inches               ", 2000.0, 0.0, FALSE, FALSE ),      &
     OUTPUT_SPECS_T( "soil_storage               ", "inches               ", 2000.0, 0.0, FALSE, FALSE ),      &
@@ -66,11 +67,11 @@ module output
   enum, bind(c)
     enumerator :: NCDF_GROSS_PRECIPITATION=1, NCDF_RAINFALL, NCDF_SNOWFALL,   &
                   NCDF_INTERCEPTION, NCDF_INTERCEPTION_STORAGE,               &
-                  NCDF_RUNON, NCDF_RUNOFF,                                    &
+                  NCDF_RUNON, NCDF_RUNOFF, NCDF_SURFACE_RUNOFF,               &
                   NCDF_SNOW_STORAGE, NCDF_SURFACE_STORAGE, NCDF_SOIL_STORAGE, &
                   NCDF_DELTA_SOIL_STORAGE,                                    &
                   NCDF_REFERENCE_ET0,                                         &
-                  NCDF_ACTUAL_ET, NCDF_CLIMATIC_DEFICIT,                        &
+                  NCDF_ACTUAL_ET, NCDF_CLIMATIC_DEFICIT,                      &
                   NCDF_SNOWMELT, NCDF_TMIN, NCDF_TMAX,                        &
                   NCDF_TMAX_MINUS_TMIN,                                       &
                   NCDF_NET_INFILTRATION, NCDF_REJECTED_NET_INFILTRATION,      &
@@ -449,6 +450,19 @@ contains
           update_maximum_value(OUTSPECS(NCDF_RUNOFF)%valid_maximum, cells%runoff)
         OUTSPECS(NCDF_RUNOFF)%valid_minimum =         &
           update_minimum_value(OUTSPECS(NCDF_RUNOFF)%valid_minimum, cells%runoff)
+                          
+      endif
+
+
+      if ( OUTSPECS( NCDF_SURFACE_RUNOFF )%is_active ) then
+
+        call output_2D_float_array( ncfile_ptr=NC_OUT( NCDF_SURFACE_RUNOFF )%ncfile,               &
+                                    values=(cells%runoff + cells%rejected_net_infiltration),       &
+                                    cells=cells )
+        OUTSPECS(NCDF_SURFACE_RUNOFF)%valid_maximum =         &
+          update_maximum_value(OUTSPECS(NCDF_SURFACE_RUNOFF)%valid_maximum, (cells%runoff + cells%rejected_net_infiltration))
+        OUTSPECS(NCDF_SURFACE_RUNOFF)%valid_minimum =         &
+          update_minimum_value(OUTSPECS(NCDF_SURFACE_RUNOFF)%valid_minimum, (cells%runoff + cells%rejected_net_infiltration))
                           
       endif
 
