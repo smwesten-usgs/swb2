@@ -1047,7 +1047,7 @@ contains
         sArgText = myOptions%get(1, myOptions%count )
 
         ! echo the original directive and dictionary entries to the logfile
-        call LOGS%write("> "//sCmdText//" "//sArgText, iLinesBefore=1 )
+        call LOGS%write("> "//trim(sCmdText)//" "//trim(sArgText), iLinesBefore=1 )
 
         ! first option is that the key value and directive are the same
         ! (.e.g. "PRECIPITATION"; no trailing underscores or modifiers )
@@ -1058,6 +1058,10 @@ contains
 
           ! determine the type of grid and act appropriately
           if (sArgText_1 .strapprox. "CONSTANT" ) then
+
+            if (.not. is_numeric(sArgText_2))   &
+              call die("Non-numeric argument supplied as a CONSTANT in your control file.", &
+                sHints="Faulty control file argument was "//sQuote(trim(sCmdText)//" "//trim(sArgText)))
 
             select case ( iDataType )
 

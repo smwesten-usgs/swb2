@@ -115,6 +115,8 @@ DUMP_VARIABLES COORDINATES 558663. 432949.
 # SUGAR BEETS
 DUMP_VARIABLES COORDINATES 570741. 445112.
 
+# TEST OF DUMP_VARIABLES BY COL_ROW
+DUMP_VARIABLES COL_ROW 15 15
 
 OUTPUT ENABLE bare_soil_evaporation crop_et snowmelt soil_storage delta_soil_storage
 OUTPUT ENABLE growing_season growing_degree_day tmax_minus_tmin climatic_deficit
