@@ -97,8 +97,6 @@ contains
     type (DATETIME_T)                 :: dtPlantingDate
     character (len=:), allocatable    :: PlantingDate_str
 
-    real (c_float), allocatable       :: L_shift_days_l(:)
-
     real (c_float), allocatable       :: L_ini_l(:)
     real (c_float), allocatable       :: L_dev_l(:)
     real (c_float), allocatable       :: L_mid_l(:)
@@ -161,7 +159,6 @@ contains
 
    call PARAMS%get_parameters( sKey="Planting_date", slValues=slPlantingDate )
 
-   call PARAMS%get_parameters( sKey="L_shift", fValues=L_shift_days_l)
    call PARAMS%get_parameters( sKey="L_ini", fValues=L_ini_l)
    call PARAMS%get_parameters( sKey="L_dev", fValues=L_dev_l)
    call PARAMS%get_parameters( sKey="L_mid", fValues=L_mid_l)
@@ -205,10 +202,6 @@ contains
     call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_DATE array", &
       __FILE__, __LINE__ )
 
-    allocate( GROWTH_STAGE_SHIFT_DAYS( iNumberOfLanduses ), stat=iStat )
-    call assert( iStat==0, "Failed to allocate memory for GROWTH_STAGE_SHIFT_DAYS array", &
-      __FILE__, __LINE__ )
-
     allocate( KCB_l( 16, iNumberOfLanduses ), stat=iStat )
     call assert( iStat==0, "Failed to allocate memory for KCB_l array", &
       __FILE__, __LINE__ )
@@ -221,10 +214,6 @@ contains
     KCB_l = -9999.
     GROWTH_STAGE_GDD = -9999.
     GROWTH_STAGE_LENGTH_IN_DAYS = 0.
-    GROWTH_STAGE_SHIFT_DAYS = 0.0_c_float
-
-    if ( ubound(L_shift_days_l,1) == iNumberOfLanduses )    &
-      GROWTH_STAGE_SHIFT_DAYS = L_shift_days_l
 
     if ( ubound(L_ini_l,1) == iNumberOfLanduses )           &
       GROWTH_STAGE_LENGTH_IN_DAYS( L_DOY_INI,  : ) = L_ini_l
@@ -265,12 +254,11 @@ contains
           sMMDDYYYY = trim(PlantingDate_str)//"/"//asCharacter( SIM_DT%start%iYear )
           call GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)%parsedate( sMMDDYYYY, __FILE__, __LINE__ )
 
-          GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) &
-                                                      + GROWTH_STAGE_SHIFT_DAYS( iIndex )
+          GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = GROWTH_STAGE_DATE( PLANTING_DATE, iIndex)
 
         else
           ! assume the value is a day-of-year value
-          dtPlantingDate = SIM_DT%start + asFloat( PlantingDate_str) + GROWTH_STAGE_SHIFT_DAYS( iIndex )
+          dtPlantingDate = SIM_DT%start + asFloat( PlantingDate_str)
           call dtPlantingDate%calcJulianDay()
           GROWTH_STAGE_DATE( PLANTING_DATE, iIndex) = dtPlantingDate
         endif
