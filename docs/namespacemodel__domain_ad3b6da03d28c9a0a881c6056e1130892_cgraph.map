@@ -1,0 +1,15 @@
+<map id="model_domain::read_landuse_codes" name="model_domain::read_landuse_codes">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,64,144,107"/>
+<area shape="rect" id="Node000002" href="$namespacegrid.html#a73982fb822e4ddc14622870cc41ba371" title=" " alt="" coords="200,5,345,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="135,61,191,41,211,35,213,40,193,47,137,66"/>
+<area shape="rect" id="Node000003" href="$namespacemodel__domain.html#a4b87d8967f873092dd943bca407d7075" title=" " alt="" coords="192,56,353,115"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="144,91,176,92,176,97,144,97"/>
+<area shape="rect" id="Node000006" href="$namespaceexceptions.html#a865c266d00ec8abab13dc671fd1f2d84" title=" " alt="" coords="609,131,730,157"/>
+<area shape="poly" id="edge7_Node000001_Node000006" title=" " alt="" coords="128,105,192,124,301,139,410,146,511,148,594,146,594,151,511,153,410,152,300,145,191,129,126,110"/>
+<area shape="poly" id="edge6_Node000003_Node000001" title=" " alt="" coords="191,79,159,79,159,74,191,74"/>
+<area shape="rect" id="Node000004" href="$namespacemodel__domain.html#a4ae2faaf00a3e1ae5bc39cf5b189008b" title="Match landuse codes from table with those contained in the gridded landuse." alt="" coords="401,68,561,111"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="353,84,385,85,385,90,353,90"/>
+<area shape="rect" id="Node000005" href="$namespaceexceptions.html#afd73029531ee5ba631b7838d2f6395dd" title=" " alt="" coords="615,76,724,103"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="562,87,599,87,599,92,562,92"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="558,109,607,123,606,128,556,114"/>
+</map>

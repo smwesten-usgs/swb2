@@ -1,0 +1,11 @@
+<map id="model_domain::model_initialize_gdd" name="model_domain::model_initialize_gdd">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,154,56"/>
+<area shape="rect" id="Node000002" href="$namespacegrowing__degree__day.html#a0e7f6a6149d6eb2f4aa96cadc1dc86de" title=" " alt="" coords="202,5,350,64"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,32,186,32,186,37,154,37"/>
+<area shape="rect" id="Node000003" href="$namespacedatetime.html#a38a22e5b5d41e7f379d45d060e9ae044" title=" " alt="" coords="398,21,541,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="351,32,382,32,382,37,351,37"/>
+<area shape="rect" id="Node000004" href="$namespacedatetime.html#abc64e3b90a66519d1ae3b7387120729c" title=" " alt="" coords="589,21,727,48"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="542,32,574,32,574,37,542,37"/>
+<area shape="rect" id="Node000005" href="$namespacedatetime.html#ab1d9676d8eb0eb478a641392d74ee96b" title=" " alt="" coords="775,21,888,48"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="727,32,759,32,759,37,727,37"/>
+</map>

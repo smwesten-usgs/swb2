@@ -1,0 +1,7 @@
+<map id="netcdf4_support::nf_julian_day_to_index_adj" name="netcdf4_support::nf_julian_day_to_index_adj">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,172,81"/>
+<area shape="rect" id="Node000002" href="$namespacenetcdf4__support.html#a8a1783d58caa9f47f1b91937447a6ca1" title=" " alt="" coords="220,5,383,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,44,204,39,205,44,173,50"/>
+<area shape="rect" id="Node000003" href="$namespacenetcdf4__support.html#a242184ef7b7f9bc1dd26cb3030ece843" title="We need two functions to convert from index to timeval, and timeval to JD; note that timeval refers t..." alt="" coords="230,72,372,115"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="173,70,215,77,214,82,172,76"/>
+</map>

@@ -1,0 +1,11 @@
+<map id="model_domain::model_calculate_runoff_curve_number" name="model_domain::model_calculate_runoff_curve_number">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,47,164,105"/>
+<area shape="rect" id="Node000002" href="$namespacerunoff____curve__number.html#a77710f6021d5bbdcb3ed86ca3ea638a5" title="Calculate the runoff by means of the curve number method." alt="" coords="220,5,370,64"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="163,58,204,50,205,55,164,63"/>
+<area shape="rect" id="Node000005" href="$namespacerunoff____curve__number.html#a8ea014bd82d53fdd339b4bc30739c9b4" title=" " alt="" coords="212,88,378,147"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="164,89,197,95,196,101,163,94"/>
+<area shape="rect" id="Node000003" href="$namespacerunoff____curve__number.html#a0e63998af6fb43e7b475784cf9022f6e" title=" " alt="" coords="426,13,601,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="371,32,410,32,410,37,371,37"/>
+<area shape="rect" id="Node000004" href="$namespacerunoff____curve__number.html#af135ba33e85d0e2f775836d8418e0282" title=" " alt="" coords="649,13,828,56"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="602,32,634,32,634,37,602,37"/>
+</map>

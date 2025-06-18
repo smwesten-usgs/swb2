@@ -1,0 +1,7 @@
+<map id="model_domain::model_get_precip_tabular" name="model_domain::model_get_precip_tabular">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,13,154,56"/>
+<area shape="rect" id="Node000002" href="$namespaceweather__data__tabular.html#a69e41790e9511a524fe9097e68f3b32e" title=" " alt="" coords="202,5,355,64"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,32,186,32,186,37,154,37"/>
+<area shape="rect" id="Node000003" href="$namespaceweather__data__tabular.html#a39c4845d056720514a18c48b67bd0e7a" title=" " alt="" coords="403,13,601,56"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="355,32,388,32,388,37,355,37"/>
+</map>

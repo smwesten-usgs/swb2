@@ -1,0 +1,5 @@
+<map id="constants_and_conversions::asint::char2int" name="constants_and_conversions::asint::char2int">
+<area shape="rect" id="Node000001" title="Convert a character value into a integer." alt="" coords="5,5,189,48"/>
+<area shape="rect" id="Node000002" href="$namespaceconstants__and__conversions.html#a4101d024b916b587cfb5aa1eab11c3cb" title="Strip everything except numeric characters from a text string." alt="" coords="237,5,420,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="189,24,221,24,221,29,189,29"/>
+</map>

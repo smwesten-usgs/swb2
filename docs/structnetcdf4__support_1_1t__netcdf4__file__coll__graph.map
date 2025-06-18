@@ -1,0 +1,10 @@
+<map id="netcdf4_support::t_netcdf4_file" name="netcdf4_support::t_netcdf4_file">
+<area shape="rect" id="Node000001" title=" " alt="" coords="466,75,592,117"/>
+<area shape="rect" id="Node000002" href="$structnetcdf4__support_1_1t__netcdf__dimension.html" title=" " alt="" coords="231,5,361,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="377,48,466,75,465,80,375,53"/>
+<area shape="rect" id="Node000003" href="$structnetcdf4__support_1_1t__netcdf__variable.html" title=" " alt="" coords="233,144,359,187"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="374,153,441,136,488,115,491,120,443,141,375,158"/>
+<area shape="rect" id="Node000004" href="$structnetcdf4__support_1_1t__netcdf__attribute.html" title=" " alt="" coords="5,109,132,152"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="147,114,155,113,324,100,466,94,466,100,324,105,156,119,147,120"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="147,140,233,153,232,158,147,145"/>
+</map>

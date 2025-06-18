@@ -1,0 +1,7 @@
+<map id="logfiles::write_to_logfiles_sub" name="logfiles::write_to_logfiles_sub">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,122,48"/>
+<area shape="rect" id="Node000002" href="$namespacelogfiles.html#ad819be6b3549ccddaa15d002a10d8afd" title="Write multiple lines of output to Fortran logical unit." alt="" coords="170,13,316,40"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="122,24,154,24,154,29,122,29"/>
+<area shape="rect" id="Node000003" href="$namespacelogfiles.html#af3b5538cb255361c48745bceb89a7bb9" title=" " alt="" coords="364,13,458,40"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="316,24,348,24,348,29,316,29"/>
+</map>

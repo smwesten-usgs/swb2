@@ -1,0 +1,11 @@
+<map id="file_operations::open_file_read_access_sub" name="file_operations::open_file_read_access_sub">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,48,160,91"/>
+<area shape="rect" id="Node000002" href="$namespaceexceptions.html#afd73029531ee5ba631b7838d2f6395dd" title=" " alt="" coords="222,5,331,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="159,47,207,34,209,39,161,52"/>
+<area shape="rect" id="Node000003" href="$namespaceconstants__and__conversions.html#a033541136836ab3a090e3e1c31d7df33" title=" " alt="" coords="393,89,576,132"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="160,74,345,92,378,96,377,101,345,97,160,79"/>
+<area shape="rect" id="Node000004" href="$namespacefile__operations.html#a34279c59c086d32d4a2c9962a373ef16" title=" " alt="" coords="208,131,345,173"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="136,89,212,122,210,127,134,94"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="345,136,377,129,378,135,346,141"/>
+<area shape="poly" id="edge5_Node000004_Node000004" title=" " alt="" coords="239,131,238,121,244,112,257,106,276,104,297,106,310,113,307,117,296,112,276,109,258,111,247,116,243,122,244,130"/>
+</map>

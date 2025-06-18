@@ -1,0 +1,15 @@
+<map id="daily_calculation::perform_daily_calculation" name="daily_calculation::perform_daily_calculation">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,179,174,221"/>
+<area shape="rect" id="Node000002" href="$namespacemass__balance____impervious__surface.html#a2a92b08ef9a20d2972914f908e6343c5" title=" " alt="" coords="222,5,423,64"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="107,176,156,126,187,98,220,74,227,70,230,74,223,78,190,103,159,130,111,180"/>
+<area shape="rect" id="Node000003" href="$namespacemass__balance____interception.html#a2371c7ec191129d66719e65d540d5246" title=" " alt="" coords="229,88,416,147"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="151,176,223,150,224,155,153,181"/>
+<area shape="rect" id="Node000004" href="$namespacemass__balance____snow.html#a03ed1f4c52e57052e0ce5ad463c1cb76" title=" " alt="" coords="243,171,402,229"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="174,197,227,197,227,203,174,203"/>
+<area shape="rect" id="Node000005" href="$namespacemass__balance____soil.html#a03619b3325e56f508aa91fcf3cf41911" title=" " alt="" coords="249,253,396,312"/>
+<area shape="poly" id="edge4_Node000001_Node000005" title=" " alt="" coords="153,219,235,249,233,254,151,224"/>
+<area shape="rect" id="Node000006" href="$namespacestorm__drain__capture.html#ab1f49c1ff54d26db6c17027ba612b19d" title=" " alt="" coords="249,336,396,395"/>
+<area shape="poly" id="edge5_Node000001_Node000006" title=" " alt="" coords="111,220,159,270,190,297,223,322,236,330,234,334,220,326,187,302,156,274,107,224"/>
+<area shape="rect" id="Node000007" href="$namespacegrid.html#a73982fb822e4ddc14622870cc41ba371" title=" " alt="" coords="471,352,616,379"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="396,363,456,363,456,368,396,368"/>
+</map>

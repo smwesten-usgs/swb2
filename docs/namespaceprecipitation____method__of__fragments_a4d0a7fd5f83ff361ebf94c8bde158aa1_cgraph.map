@@ -1,0 +1,23 @@
+<map id="precipitation__method_of_fragments::precipitation_method_of_fragments_initialize" name="precipitation__method_of_fragments::precipitation_method_of_fragments_initialize">
+<area shape="rect" id="Node000001" title="Initialize method of fragments." alt="" coords="5,168,214,227"/>
+<area shape="rect" id="Node000002" href="$namespaceexceptions.html#afd73029531ee5ba631b7838d2f6395dd" title=" " alt="" coords="556,267,665,293"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="190,165,252,149,321,138,394,138,430,143,465,154,504,173,539,199,591,252,587,256,535,203,501,178,463,158,429,149,394,143,322,143,253,154,192,170"/>
+<area shape="rect" id="Node000003" href="$namespacekiss__random__number__generator.html#a7f902993e4e05cf3a354e151be3d8718" title=" " alt="" coords="272,51,454,93"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="159,165,260,110,288,97,290,102,263,114,161,170"/>
+<area shape="rect" id="Node000007" href="$namespaceprecipitation____method__of__fragments.html#a8333b8ad450ca979b691760de96116b8" title="after fragments file has been read in, iterate over a set of rainfall fragments" alt="" coords="284,168,442,227"/>
+<area shape="poly" id="edge6_Node000001_Node000007" title=" " alt="" coords="214,195,268,195,268,200,214,200"/>
+<area shape="rect" id="Node000008" href="$namespaceprecipitation____method__of__fragments.html#ae4c05300d79e43f9f47f3f00631c58df" title=" " alt="" coords="277,333,448,392"/>
+<area shape="poly" id="edge7_Node000001_Node000008" title=" " alt="" coords="143,225,197,272,263,319,271,323,268,328,260,324,194,276,139,229"/>
+<area shape="rect" id="Node000010" href="$namespaceprecipitation____method__of__fragments.html#a51056c966a669747dea564334336054b" title=" " alt="" coords="262,251,464,309"/>
+<area shape="poly" id="edge10_Node000001_Node000010" title=" " alt="" coords="203,225,257,243,255,248,201,230"/>
+<area shape="rect" id="Node000004" href="$namespacekiss__random__number__generator.html#a47f3204621c8555bd9677f935a6ff238" title=" " alt="" coords="534,51,687,93"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="455,69,518,69,518,75,455,75"/>
+<area shape="rect" id="Node000005" href="$namespacekiss__random__number__generator.html#a85959624cf679e486da91592c303cb09" title=" " alt="" coords="756,5,918,64"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="687,57,741,48,742,53,688,62"/>
+<area shape="rect" id="Node000006" href="$namespacekiss__random__number__generator.html#a12973f5d78dbf34c9000ce7956a6f7b1" title=" " alt="" coords="764,88,910,131"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="688,82,750,92,749,98,687,87"/>
+<area shape="poly" id="edge8_Node000008_Node000002" title=" " alt="" coords="448,331,552,296,554,301,450,337"/>
+<area shape="rect" id="Node000009" href="$namespaceprecipitation____method__of__fragments.html#af3f2efa5c9f85bdccc41f8ed6a0082db" title="eliminate rainfall on the 29th day of February; bump up all other values to ensure sum = 1" alt="" coords="512,333,708,392"/>
+<area shape="poly" id="edge9_Node000008_Node000009" title=" " alt="" coords="449,360,496,360,496,365,449,365"/>
+<area shape="poly" id="edge11_Node000010_Node000002" title=" " alt="" coords="464,277,540,277,540,283,464,283"/>
+</map>

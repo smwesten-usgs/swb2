@@ -1,0 +1,16 @@
+<map id="data_catalog_entry::data_catalog_entry_t::initialize" name="data_catalog_entry::data_catalog_entry_t::initialize">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,129,145,188"/>
+<area shape="rect" id="Node000002" href="$namespacedata__catalog__entry.html#ad890fee15ae331f1d2868a34bfe63e84" title=" " alt="" coords="196,5,340,64"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="114,127,191,74,198,70,201,74,194,78,117,131"/>
+<area shape="rect" id="Node000003" href="$namespacedata__catalog__entry.html#afcdc652240940ace6d65f7db6821db47" title=" " alt="" coords="193,88,344,147"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="145,141,177,134,178,139,146,146"/>
+<area shape="rect" id="Node000004" href="$namespacedata__catalog__entry.html#a012e271c6969f75aac3c90d5604f28dc" title=" " alt="" coords="203,171,334,229"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="146,171,188,180,187,185,145,176"/>
+<area shape="rect" id="Node000007" href="$namespacedata__catalog__entry.html#ac8389fd46b3555925c18b132859deb1a" title=" " alt="" coords="199,253,338,296"/>
+<area shape="poly" id="edge7_Node000001_Node000007" title=" " alt="" coords="116,186,194,239,202,244,200,248,191,244,113,191"/>
+<area shape="rect" id="Node000005" href="$namespacefile__operations.html#a34279c59c086d32d4a2c9962a373ef16" title=" " alt="" coords="392,179,529,221"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="334,197,377,197,377,203,334,203"/>
+<area shape="poly" id="edge6_Node000005_Node000005" title=" " alt="" coords="424,179,422,169,428,160,441,154,461,152,481,154,494,161,492,165,480,160,461,157,443,159,432,164,427,170,429,178"/>
+<area shape="rect" id="Node000006" href="$namespaceconstants__and__conversions.html#a033541136836ab3a090e3e1c31d7df33" title=" " alt="" coords="577,179,761,221"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="530,197,562,197,562,203,530,203"/>
+</map>

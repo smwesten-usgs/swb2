@@ -1,0 +1,19 @@
+<map id="model_domain::model_calculate_et_jensen_haise" name="model_domain::model_calculate_et_jensen_haise">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,229,187,272"/>
+<area shape="rect" id="Node000002" href="$namespaceet____jensen__haise.html#a4a0eca59dd1e6202cac124d00881215a" title=" " alt="" coords="235,229,376,272"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="187,248,219,248,219,253,187,253"/>
+<area shape="rect" id="Node000003" href="$namespacemeteorological__calculations.html#a226f7ed381e189128b68638283413efe" title=" " alt="" coords="430,5,611,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="312,228,327,191,351,146,383,99,422,58,428,54,431,58,426,62,387,102,355,149,332,194,317,230"/>
+<area shape="rect" id="Node000004" href="$namespacesolar__calculations.html#a420de8a02e94159d2c2ea3e2b331682c" title="Estimate percent of possible sunshine." alt="" coords="432,72,609,131"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="324,227,367,184,422,140,429,136,432,141,426,145,371,188,328,231"/>
+<area shape="rect" id="Node000005" href="$namespacesolar__calculations.html#ac38767af2ab93521ff1d1624c4ef8188" title="Calculate extraterrestrial radiation given latitude and time of year." alt="" coords="424,155,617,197"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="368,226,423,207,441,200,443,205,425,212,370,231"/>
+<area shape="rect" id="Node000006" href="$namespacesolar__calculations.html#ab85512c12796dfb2358aef2bb2dc1f6c" title="Calculate the inverse relative Earth&#45;Sun distance for a given day of the year." alt="" coords="453,221,588,280"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="376,248,437,248,437,253,376,253"/>
+<area shape="rect" id="Node000007" href="$namespacesolar__calculations.html#a1a29a3a488283c57707ea6ae87667370" title="Calculate the solar declination for a given day of the year." alt="" coords="458,304,584,363"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="364,270,444,301,442,306,362,275"/>
+<area shape="rect" id="Node000008" href="$namespacesolar__calculations.html#acfa44cdc4d5895521e57fb544126c239" title="Calculate solar radiation by means of the Angstrom formula." alt="" coords="452,387,590,429"/>
+<area shape="poly" id="edge7_Node000002_Node000008" title=" " alt="" coords="324,271,367,322,395,349,425,372,439,380,436,385,423,377,391,353,363,325,320,274"/>
+<area shape="rect" id="Node000009" href="$namespacesolar__calculations.html#ac2130c0bb602e829335dc32cc7ecb0f0" title="Calculate sunrise/sunset angle, in RADIANS." alt="" coords="443,453,598,512"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="317,271,333,307,357,352,388,398,426,439,432,444,428,448,422,443,384,402,352,355,328,310,312,274"/>
+</map>

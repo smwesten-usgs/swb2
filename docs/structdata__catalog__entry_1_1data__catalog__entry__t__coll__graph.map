@@ -1,7 +1,19 @@
 <map id="data_catalog_entry::data_catalog_entry_t" name="data_catalog_entry::data_catalog_entry_t">
-<area shape="rect" id="node1" title=" " alt="" coords="305,82,456,123"/>
-<area shape="rect" id="node2" href="$structgrid_1_1general__grid__t.html" title=" " alt="" coords="10,8,142,35"/>
-<area shape="rect" id="node3" href="$structdatetime_1_1datetime__t.html" title=" " alt="" coords="5,59,147,85"/>
-<area shape="rect" id="node4" href="$structgrid_1_1grid__bounds__t.html" title=" " alt="" coords="10,119,142,145"/>
-<area shape="rect" id="node5" title=" " alt="" coords="13,171,139,213"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="774,116,925,159"/>
+<area shape="poly" id="edge1_Node000001_Node000001" title=" " alt="" coords="822,98,832,92,849,90,866,92,877,97,882,106,881,116,875,115,877,107,873,101,864,97,850,95,834,97,824,103"/>
+<area shape="rect" id="Node000002" href="$structdatetime_1_1datetime__t.html" title=" " alt="" coords="466,10,606,36"/>
+<area shape="poly" id="edge2_Node000001_Node000002" title=" " alt="" coords="622,25,687,37,751,58,794,84,829,114,825,118,791,88,749,63,685,42,621,31"/>
+<area shape="rect" id="Node000003" href="$structgrid_1_1grid__bounds__t.html" title=" " alt="" coords="470,86,602,112"/>
+<area shape="poly" id="edge3_Node000001_Node000003" title=" " alt="" coords="618,106,774,126,773,131,617,111"/>
+<area shape="rect" id="Node000004" href="$structnetcdf4__support_1_1t__netcdf4__file.html" title=" " alt="" coords="473,154,599,196"/>
+<area shape="poly" id="edge4_Node000001_Node000004" title=" " alt="" coords="615,178,681,178,750,171,798,157,800,162,751,176,681,183,615,183"/>
+<area shape="rect" id="Node000005" href="$structnetcdf4__support_1_1t__netcdf__dimension.html" title=" " alt="" coords="231,84,361,127"/>
+<area shape="poly" id="edge5_Node000004_Node000005" title=" " alt="" coords="377,126,473,154,472,159,375,131"/>
+<area shape="rect" id="Node000006" href="$structnetcdf4__support_1_1t__netcdf__variable.html" title=" " alt="" coords="233,223,359,266"/>
+<area shape="poly" id="edge6_Node000004_Node000006" title=" " alt="" coords="374,231,441,215,492,194,494,199,443,220,375,236"/>
+<area shape="rect" id="Node000007" href="$structnetcdf4__support_1_1t__netcdf__attribute.html" title=" " alt="" coords="5,188,132,231"/>
+<area shape="poly" id="edge8_Node000004_Node000007" title=" " alt="" coords="147,193,155,192,327,179,472,173,473,179,328,184,156,198,147,199"/>
+<area shape="poly" id="edge7_Node000006_Node000007" title=" " alt="" coords="147,219,233,232,232,237,147,224"/>
+<area shape="rect" id="Node000008" href="$structgrid_1_1general__grid__t.html" title=" " alt="" coords="470,238,602,264"/>
+<area shape="poly" id="edge9_Node000001_Node000008" title=" " alt="" coords="617,254,683,249,717,241,749,230,774,215,797,196,831,157,835,161,800,200,777,219,751,235,719,246,684,254,617,259"/>
 </map>

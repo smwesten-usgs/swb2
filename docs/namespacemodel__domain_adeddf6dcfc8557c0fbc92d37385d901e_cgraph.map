@@ -1,0 +1,5 @@
+<map id="model_domain::model_calculate_direct_net_infiltration_gridded" name="model_domain::model_calculate_direct_net_infiltration_gridded">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,154,64"/>
+<area shape="rect" id="Node000002" href="$namespacedirect__net__infiltration____gridded__data.html#a5f235b69879767f4f351e8a78faa737d" title=" " alt="" coords="202,5,370,64"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,32,186,32,186,37,154,37"/>
+</map>

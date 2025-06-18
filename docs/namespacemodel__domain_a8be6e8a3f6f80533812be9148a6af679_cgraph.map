@@ -1,0 +1,5 @@
+<map id="model_domain::model_calculate_direct_soil_moisture_gridded" name="model_domain::model_calculate_direct_soil_moisture_gridded">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,154,64"/>
+<area shape="rect" id="Node000002" href="$namespacedirect__soil__moisture____gridded__data.html#a911efed4fc9495831db9589bc3d0b384" title=" " alt="" coords="202,5,366,64"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="154,32,186,32,186,37,154,37"/>
+</map>

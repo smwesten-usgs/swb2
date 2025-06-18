@@ -25,43 +25,7 @@
 var NAVTREE =
 [
   [ "Soil Water Balance (SWB2)", "index.html", [
-    [ "Online Documentation", "md__e__projects_swb_development_git_swb2_doc_src_index.html", [
-      [ "Installing and Running Soil-Water-Balance Version 2.0", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md1", [
-        [ "System Requirements", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md2", null ],
-        [ "Running SWB", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md3", null ]
-      ] ],
-      [ "Overview of Input and Output Files", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md4", [
-        [ "Input Files", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md5", null ],
-        [ "Control File", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md6", null ],
-        [ "Lookup Tables", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md7", null ],
-        [ "Input Data Grids", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md8", [
-          [ "Hydrologic Soil Group", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md9", null ],
-          [ "Available Water Capacity", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md10", null ],
-          [ "Land-Use Code", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md11", null ],
-          [ "D8 Surface-Water-Flow Direction", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md12", null ]
-        ] ],
-        [ "Climate Data Tables or Grids", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md13", null ]
-      ] ],
-      [ "Output Files", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md14", [
-        [ "netCDF Files", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md15", null ],
-        [ "Log Files", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md16", null ],
-        [ "Cartographic Projections and Resampling", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md17", null ]
-      ] ],
-      [ "Gridded Datasets", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md18", [
-        [ "Specifying Grid Filenames", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md19", null ]
-      ] ],
-      [ "Options for Gridded Datasets", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md20", [
-        [ "Supported File Types", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md21", [
-          [ "Surfer ASCII Grid", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md22", null ],
-          [ "Arc ASCII Grid", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md23", null ],
-          [ "netCDF", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md24", null ]
-        ] ],
-        [ "Treatment of Missing Values", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md25", null ]
-      ] ],
-      [ "Conversion Factors", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md26", null ],
-      [ "Inactive Grid Cells", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md27", null ],
-      [ "References Cited", "md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md28", null ]
-    ] ],
+    [ "Online Documentation", "index.html", "index" ],
     [ "Todo List", "todo.html", null ],
     [ "Modules", "namespaces.html", [
       [ "Modules List", "namespaces.html", "namespaces_dup" ],
@@ -72,9 +36,9 @@ var NAVTREE =
         [ "Enumerator", "namespacemembers_eval.html", null ]
       ] ]
     ] ],
-    [ "Data Types List", "annotated.html", [
+    [ "Data Types", "annotated.html", [
       [ "Data Types List", "annotated.html", "annotated_dup" ],
-      [ "Data Types", "classes.html", null ],
+      [ "Data Type Index", "classes.html", null ],
       [ "Data Fields", "functions.html", [
         [ "All", "functions.html", "functions_dup" ],
         [ "Functions/Subroutines", "functions_func.html", "functions_func" ],
@@ -94,27 +58,23 @@ var NAVTREE =
 var NAVTREEINDEX =
 [
 "actual__et____fao56_8_f90.html",
-"data__catalog__entry_8_f90.html#afcfb8f71f2377c7d1f6ef4136c72d129",
-"fstring_8_f90.html#ae91b7cc9159af8dafa75a9d8e72687e0",
-"interfaceconstants__and__conversions_1_1asdouble.html#afdbe45eba691cd670d6cac05565770e1",
-"interfacenetcdf__c__api__interfaces_1_1nc__def__var__deflate.html",
-"md__e__projects_swb_development_git_swb2_doc_src_index.html#autotoc_md23",
-"namespaceconstants__and__conversions.html#a033541136836ab3a090e3e1c31d7df33",
-"namespacedatetime.html#aed7d06fe19ba576ba8aedc6f71417a68",
-"namespacegrid.html#a95e2f2513fb7f2d11d0130f643931676",
-"namespacemodel__domain.html#a4ae2faaf00a3e1ae5bc39cf5b189008b",
-"namespacenetcdf4__support.html#ab00712076b8643e929f614ab96ddf5dd",
-"namespaceswbstats2__support.html#a411231f0f19c23c55f1317b01bf4ab46",
-"precipitation____method__of__fragments_8_f90.html#add6f11f5c1b29a329b4f49759f6c7635",
-"structdata__catalog__entry_1_1data__catalog__entry__t.html#a28498eca44c65bae89487ba38732047d",
-"structdatetime_1_1datetime__t.html#a47d1e4ddee4abc27674586a59b126ea2",
-"structfile__operations_1_1ascii__file__t.html#ad19c62536815c486639e7f33b887b988",
-"structmodel__domain_1_1cell__col__row__t.html",
-"structmodel__domain_1_1model__domain__t.html#ab31e05ad7ccc8bf1345fb7b6821d343f",
-"structnetcdf4__support_1_1t__netcdf__attribute.html#acd077b392b9d8654e6371f3ef3ba4ff6",
-"structswbstats2__support_1_1swbstats__t.html#a21367ae3de78f5573f0225cfa8bf9fd8",
-"timer_8_f90.html#a1e09bc3d9a563017a982f964e6c28c19"
+"interfaceconstants__and__conversions_1_1f__to__c.html#a08690b1bc9ec698c96a3bdfbe2cb93b2",
+"interfacenetcdf__c__api__interfaces_1_1nc__inq__att.html",
+"namespaceconstants__and__conversions.html#af1d9b68bed3e34c2744f307873c5d5db",
+"namespaceet____hargreaves__samani.html#aa4970400403cd4ba4c201a15d7c62b8d",
+"namespaceirrigation.html#a6e7a665c22aeae48e995da3b95153d8d",
+"namespacemodel__domain.html#ae28f5ec412346b4d0c9c05d9182f253b",
+"namespaceparameters.html#a6a203722b8ead6c2000d603434a10eae",
+"runoff____gridded__values_8_f90_source.html",
+"structdata__catalog__entry_1_1data__catalog__entry__t.html#a9905e7445f5f7b3a6519e81a30f27e09",
+"structdictionary_1_1dict__entry__t.html#a62b6cebd9ee32cb1af40e0c7520f00da",
+"structfstring__list_1_1fstring__list__t.html#a6372daade5be93826e85360564f0a224",
+"structmodel__domain_1_1model__domain__t.html#a17541a57c9d78293e3f8a96e134bf8e2",
+"structmodel__domain_1_1model__domain__t.html#ad73a20e459e54495550765348f25ab4b",
+"structparameters_1_1parameters__t.html",
+"structswbstats2__support_1_1swbstats__t.html#a5f11beb849537badb03d8be3560fcce4"
 ];
 
-var SYNCONMSG = 'click to disable panel synchronisation';
-var SYNCOFFMSG = 'click to enable panel synchronisation';
+var SYNCONMSG = 'click to disable panel synchronization';
+var SYNCOFFMSG = 'click to enable panel synchronization';
+var LISTOFALLMEMBERS = 'List of all members';

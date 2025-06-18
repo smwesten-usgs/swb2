@@ -116,6 +116,7 @@ var annotated_dup =
       [ "nc_def_dim", "interfacenetcdf__c__api__interfaces_1_1nc__def__dim.html", "interfacenetcdf__c__api__interfaces_1_1nc__def__dim" ],
       [ "nc_def_var", "interfacenetcdf__c__api__interfaces_1_1nc__def__var.html", "interfacenetcdf__c__api__interfaces_1_1nc__def__var" ],
       [ "nc_def_var_deflate", "interfacenetcdf__c__api__interfaces_1_1nc__def__var__deflate.html", "interfacenetcdf__c__api__interfaces_1_1nc__def__var__deflate" ],
+      [ "nc_del_att", "interfacenetcdf__c__api__interfaces_1_1nc__del__att.html", "interfacenetcdf__c__api__interfaces_1_1nc__del__att" ],
       [ "nc_enddef", "interfacenetcdf__c__api__interfaces_1_1nc__enddef.html", "interfacenetcdf__c__api__interfaces_1_1nc__enddef" ],
       [ "nc_get_att_double", "interfacenetcdf__c__api__interfaces_1_1nc__get__att__double.html", "interfacenetcdf__c__api__interfaces_1_1nc__get__att__double" ],
       [ "nc_get_att_float", "interfacenetcdf__c__api__interfaces_1_1nc__get__att__float.html", "interfacenetcdf__c__api__interfaces_1_1nc__get__att__float" ],
@@ -153,6 +154,7 @@ var annotated_dup =
       [ "nc_put_vars_float", "interfacenetcdf__c__api__interfaces_1_1nc__put__vars__float.html", "interfacenetcdf__c__api__interfaces_1_1nc__put__vars__float" ],
       [ "nc_put_vars_int", "interfacenetcdf__c__api__interfaces_1_1nc__put__vars__int.html", "interfacenetcdf__c__api__interfaces_1_1nc__put__vars__int" ],
       [ "nc_put_vars_short", "interfacenetcdf__c__api__interfaces_1_1nc__put__vars__short.html", "interfacenetcdf__c__api__interfaces_1_1nc__put__vars__short" ],
+      [ "nc_redef", "interfacenetcdf__c__api__interfaces_1_1nc__redef.html", "interfacenetcdf__c__api__interfaces_1_1nc__redef" ],
       [ "nc_strerror", "interfacenetcdf__c__api__interfaces_1_1nc__strerror.html", "interfacenetcdf__c__api__interfaces_1_1nc__strerror" ]
     ] ],
     [ "output", "namespaceoutput.html", [

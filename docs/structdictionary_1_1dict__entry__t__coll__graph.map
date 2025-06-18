@@ -1,4 +1,6 @@
 <map id="dictionary::dict_entry_t" name="dictionary::dict_entry_t">
-<area shape="rect" id="node1" title=" " alt="" coords="5,111,160,137"/>
-<area shape="rect" id="node2" title=" " alt="" coords="21,5,145,47"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,129,159,156"/>
+<area shape="poly" id="edge2_Node000001_Node000001" title=" " alt="" coords="176,133,185,143,177,152,160,156,159,150,175,147,180,143,172,137"/>
+<area shape="rect" id="Node000002" href="$structfstring__list_1_1fstring__list__t.html" title=" " alt="" coords="19,5,145,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="85,63,85,129,79,129,79,63"/>
 </map>

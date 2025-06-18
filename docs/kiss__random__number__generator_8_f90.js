@@ -1,18 +1,13 @@
 var kiss__random__number__generator_8_f90 =
 [
-    [ "initialize_kiss_rng", "kiss__random__number__generator_8_f90.html#a8fc8e4ca37a607a9f471d6458e9a2518", null ],
-    [ "kiss64_rng", "kiss__random__number__generator_8_f90.html#aee9f329411a0d3e8754950cb5dacb4b0", null ],
-    [ "kiss64_uniform_rng", "kiss__random__number__generator_8_f90.html#a2a4fa0a0bc1b28c2d41133328b746806", null ],
-    [ "refill", "kiss__random__number__generator_8_f90.html#ae2a4df4b2dd24188b45f77bbabbc487c", null ],
-    [ "carry", "kiss__random__number__generator_8_f90.html#a562d01614ecb9447e17f536a9aec5630", null ],
-    [ "i16_range", "kiss__random__number__generator_8_f90.html#a7da7c9601be92f7f5233c5325366764a", null ],
-    [ "i8", "kiss__random__number__generator_8_f90.html#a12e61363865ae19795f8848ec5fcfce2", null ],
-    [ "i8_max", "kiss__random__number__generator_8_f90.html#acebce5f8996fbc6e1e65f06290556c69", null ],
-    [ "i8_min", "kiss__random__number__generator_8_f90.html#a39d8c25951fffcbfb7b559c439c40b9b", null ],
-    [ "indx", "kiss__random__number__generator_8_f90.html#a0d095c3d2d3085f182be1b483cefd054", null ],
-    [ "q", "kiss__random__number__generator_8_f90.html#abe13af92df5e16a66d60cc3848235f61", null ],
-    [ "r16", "kiss__random__number__generator_8_f90.html#a1808b00edbf83068abad7651b2f4f428", null ],
-    [ "r8", "kiss__random__number__generator_8_f90.html#a5e626ac4f0d1f3ef756529f3896a3730", null ],
-    [ "xcng", "kiss__random__number__generator_8_f90.html#ab541a6e7378781b905f5a201a0927896", null ],
-    [ "xs", "kiss__random__number__generator_8_f90.html#af0617d8cde972f3059fc3edd06b4d96b", null ]
+    [ "kiss_random_number_generator::bitwise_exclusive_or_operation", "namespacekiss__random__number__generator.html#a85959624cf679e486da91592c303cb09", null ],
+    [ "kiss_random_number_generator::kiss64_initialize", "namespacekiss__random__number__generator.html#a7f902993e4e05cf3a354e151be3d8718", null ],
+    [ "kiss_random_number_generator::kiss64_rng", "namespacekiss__random__number__generator.html#a47f3204621c8555bd9677f935a6ff238", null ],
+    [ "kiss_random_number_generator::kiss64_uniform_rng", "namespacekiss__random__number__generator.html#a194b100f7f2ab97efa587391159fe326", null ],
+    [ "kiss_random_number_generator::shift_bits", "namespacekiss__random__number__generator.html#a12973f5d78dbf34c9000ce7956a6f7b1", null ],
+    [ "kiss_random_number_generator::c", "namespacekiss__random__number__generator.html#a7253df611c43a8be85eec24508403c10", null ],
+    [ "kiss_random_number_generator::t", "namespacekiss__random__number__generator.html#a61e57d2876acf54d644e2133dab6eaad", null ],
+    [ "kiss_random_number_generator::x", "namespacekiss__random__number__generator.html#abd120940c9cc1c689267993202b8fcb2", null ],
+    [ "kiss_random_number_generator::y", "namespacekiss__random__number__generator.html#a5aded737913f65486d36a19770cc9120", null ],
+    [ "kiss_random_number_generator::z", "namespacekiss__random__number__generator.html#a148c969dda1b4298aa05b05163e991df", null ]
 ];

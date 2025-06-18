@@ -1,0 +1,7 @@
+<map id="model_domain::initialize_landuse_codes" name="model_domain::initialize_landuse_codes">
+<area shape="rect" id="Node000001" title="Match landuse codes from table with those contained in the gridded landuse." alt="" coords="5,23,166,65"/>
+<area shape="rect" id="Node000002" href="$namespaceexceptions.html#afd73029531ee5ba631b7838d2f6395dd" title=" " alt="" coords="219,5,328,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="166,31,203,25,204,31,166,36"/>
+<area shape="rect" id="Node000003" href="$namespaceexceptions.html#a865c266d00ec8abab13dc671fd1f2d84" title=" " alt="" coords="214,56,334,83"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="166,52,198,57,198,62,166,57"/>
+</map>

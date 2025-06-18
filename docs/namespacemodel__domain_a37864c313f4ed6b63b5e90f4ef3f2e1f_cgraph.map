@@ -1,0 +1,19 @@
+<map id="model_domain::model_calculate_et_hargreaves" name="model_domain::model_calculate_et_hargreaves">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,176,175,219"/>
+<area shape="rect" id="Node000002" href="$namespaceet____hargreaves__samani.html#a77b1c6dd3a4c112c6192becc9f879893" title=" " alt="" coords="223,176,393,219"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="175,195,207,195,207,200,175,200"/>
+<area shape="rect" id="Node000003" href="$namespacemeteorological__calculations.html#a226f7ed381e189128b68638283413efe" title=" " alt="" coords="447,5,628,48"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="323,174,371,117,403,85,440,58,447,53,450,58,442,62,407,89,375,120,327,177"/>
+<area shape="rect" id="Node000004" href="$namespaceet____hargreaves__samani.html#aa4970400403cd4ba4c201a15d7c62b8d" title=" " alt="" coords="458,72,617,115"/>
+<area shape="poly" id="edge3_Node000002_Node000004" title=" " alt="" coords="345,173,440,124,455,118,457,123,442,129,347,178"/>
+<area shape="rect" id="Node000005" href="$namespacesolar__calculations.html#ac38767af2ab93521ff1d1624c4ef8188" title="Calculate extraterrestrial radiation given latitude and time of year." alt="" coords="441,139,634,181"/>
+<area shape="poly" id="edge4_Node000002_Node000005" title=" " alt="" coords="393,181,425,176,426,181,394,186"/>
+<area shape="rect" id="Node000006" href="$namespacesolar__calculations.html#ab85512c12796dfb2358aef2bb2dc1f6c" title="Calculate the inverse relative Earth&#45;Sun distance for a given day of the year." alt="" coords="470,205,605,264"/>
+<area shape="poly" id="edge5_Node000002_Node000006" title=" " alt="" coords="394,208,455,219,454,224,393,214"/>
+<area shape="rect" id="Node000007" href="$namespacesolar__calculations.html#a258c004052374097e72fcb40067bce2a" title="Calculate the solar declination for a given day of the year." alt="" coords="474,288,601,347"/>
+<area shape="poly" id="edge6_Node000002_Node000007" title=" " alt="" coords="345,217,442,274,462,283,459,288,440,278,342,222"/>
+<area shape="rect" id="Node000009" href="$namespacesolar__calculations.html#ac2130c0bb602e829335dc32cc7ecb0f0" title="Calculate sunrise/sunset angle, in RADIANS." alt="" coords="460,371,615,429"/>
+<area shape="poly" id="edge8_Node000002_Node000009" title=" " alt="" coords="324,217,372,285,405,323,443,357,448,360,445,365,439,361,401,327,367,288,320,220"/>
+<area shape="rect" id="Node000008" href="$namespacesolar__calculations.html#aafa5ae580c2811d38e2f345ccf8caf42" title="Calculate the day angle in RADIANS." alt="" coords="682,296,828,339"/>
+<area shape="poly" id="edge7_Node000007_Node000008" title=" " alt="" coords="601,315,667,315,667,320,601,320"/>
+</map>

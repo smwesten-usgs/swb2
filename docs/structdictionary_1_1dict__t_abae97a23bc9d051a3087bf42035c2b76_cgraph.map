@@ -1,0 +1,10 @@
+<map id="dictionary::dict_t::get_next_entry" name="dictionary::dict_t::get_next_entry">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,39,123,81"/>
+<area shape="rect" id="Node000002" href="$namespacedictionary.html#a2984b959d130b645cb61c1f42c6532ca" title=" " alt="" coords="171,5,306,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="122,46,155,40,156,45,123,51"/>
+<area shape="rect" id="Node000004" href="$namespacedictionary.html#a6adc1c88e652f611fc73cc66ec021c08" title=" " alt="" coords="171,72,306,115"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="123,69,156,75,155,80,122,74"/>
+<area shape="rect" id="Node000003" href="$namespaceexceptions.html#a865c266d00ec8abab13dc671fd1f2d84" title=" " alt="" coords="354,47,474,73"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="307,37,339,43,338,48,306,42"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="306,78,338,72,339,77,307,83"/>
+</map>

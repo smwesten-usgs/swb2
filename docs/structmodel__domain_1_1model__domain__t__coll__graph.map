@@ -1,4 +1,5 @@
 <map id="model_domain::model_domain_t" name="model_domain::model_domain_t">
-<area shape="rect" id="node1" title=" " alt="" coords="5,95,155,136"/>
-<area shape="rect" id="node2" href="$structgrid_1_1general__grid__t.html" title=" " alt="" coords="14,5,146,32"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,104,154,147"/>
+<area shape="rect" id="Node000002" href="$structgrid_1_1general__grid__t.html" title=" " alt="" coords="14,5,145,32"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="82,47,82,103,77,103,77,47"/>
 </map>

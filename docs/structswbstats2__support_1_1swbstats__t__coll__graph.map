@@ -1,4 +1,29 @@
 <map id="swbstats2_support::swbstats_t" name="swbstats2_support::swbstats_t">
-<area shape="rect" id="node1" title=" " alt="" coords="5,109,144,151"/>
-<area shape="rect" id="node2" title=" " alt="" coords="11,5,138,47"/>
+<area shape="rect" id="Node000001" title=" " alt="" coords="1122,404,1261,447"/>
+<area shape="rect" id="Node000002" href="$structdatetime_1_1datetime__t.html" title=" " alt="" coords="466,383,606,409"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="622,394,750,397,1121,418,1121,423,750,403,622,399"/>
+<area shape="rect" id="Node000010" href="$structdata__catalog__entry_1_1data__catalog__entry__t.html" title=" " alt="" coords="774,587,925,629"/>
+<area shape="poly" id="edge13_Node000010_Node000002" title=" " alt="" coords="594,412,683,446,724,464,752,481,779,505,803,533,838,585,834,588,799,536,776,509,749,485,721,469,681,451,592,417"/>
+<area shape="rect" id="Node000003" href="$structfstring__list_1_1fstring__list__t.html" title=" " alt="" coords="474,203,599,245"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="614,233,760,261,843,282,926,305,1049,354,1149,401,1147,406,1046,358,924,311,842,287,759,267,613,238"/>
+<area shape="rect" id="Node000008" href="$structfile__operations_1_1ascii__file__t.html" title=" " alt="" coords="779,5,920,48"/>
+<area shape="poly" id="edge9_Node000008_Node000003" title=" " alt="" coords="579,191,668,131,773,64,805,46,807,51,776,69,671,136,582,196"/>
+<area shape="rect" id="Node000004" href="$structnetcdf4__support_1_1t__netcdf4__file.html" title=" " alt="" coords="473,480,599,523"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="614,487,630,485,1121,430,1122,435,631,491,615,493"/>
+<area shape="poly" id="edge15_Node000010_Node000004" title=" " alt="" coords="614,525,631,531,691,545,751,561,805,584,803,589,749,567,690,550,630,536,612,531"/>
+<area shape="rect" id="Node000005" href="$structnetcdf4__support_1_1t__netcdf__dimension.html" title=" " alt="" coords="231,413,361,456"/>
+<area shape="poly" id="edge4_Node000004_Node000005" title=" " alt="" coords="377,452,443,469,473,479,472,484,441,475,375,457"/>
+<area shape="rect" id="Node000006" href="$structnetcdf4__support_1_1t__netcdf__variable.html" title=" " alt="" coords="233,480,359,523"/>
+<area shape="poly" id="edge5_Node000004_Node000006" title=" " alt="" coords="375,499,472,499,472,504,375,504"/>
+<area shape="rect" id="Node000007" href="$structnetcdf4__support_1_1t__netcdf__attribute.html" title=" " alt="" coords="5,528,132,571"/>
+<area shape="poly" id="edge7_Node000004_Node000007" title=" " alt="" coords="148,557,249,563,305,562,361,556,424,541,482,521,484,526,426,546,361,561,306,567,249,568,147,562"/>
+<area shape="poly" id="edge6_Node000006_Node000007" title=" " alt="" coords="146,530,232,512,233,517,147,536"/>
+<area shape="poly" id="edge8_Node000001_Node000008" title=" " alt="" coords="910,54,926,64,1022,136,1059,173,1100,225,1129,272,1154,321,1186,403,1181,405,1149,324,1125,275,1095,228,1055,176,1018,140,923,69,907,58"/>
+<area shape="rect" id="Node000009" href="$structgrid_1_1general__grid__t.html" title=" " alt="" coords="470,695,602,721"/>
+<area shape="poly" id="edge10_Node000001_Node000009" title=" " alt="" coords="617,717,684,723,762,725,844,720,924,705,978,689,1019,671,1055,646,1096,606,1127,566,1151,522,1181,446,1186,448,1156,524,1131,569,1100,610,1059,650,1022,676,980,694,925,711,844,725,762,730,684,728,617,723"/>
+<area shape="poly" id="edge16_Node000010_Node000009" title=" " alt="" coords="617,693,682,679,749,659,813,627,815,632,751,664,684,684,618,699"/>
+<area shape="poly" id="edge11_Node000001_Node000010" title=" " alt="" coords="939,602,1019,586,1059,572,1096,552,1124,529,1147,500,1178,446,1183,448,1152,503,1128,533,1099,557,1061,577,1021,591,940,607"/>
+<area shape="poly" id="edge12_Node000010_Node000010" title=" " alt="" coords="822,569,832,562,849,560,866,562,877,568,882,577,881,586,875,586,877,578,873,572,864,567,850,565,834,567,824,573"/>
+<area shape="rect" id="Node000011" href="$structgrid_1_1grid__bounds__t.html" title=" " alt="" coords="470,597,602,624"/>
+<area shape="poly" id="edge14_Node000010_Node000011" title=" " alt="" coords="617,608,750,607,774,606,774,612,750,612,617,613"/>
 </map>

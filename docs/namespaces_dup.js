@@ -10,16 +10,17 @@ var namespaces_dup =
     [ "actual_et__fao56__two_stage", "namespaceactual__et____fao56____two__stage.html", [
       [ "actual_et_fao56_two_stage_initialize", "namespaceactual__et____fao56____two__stage.html#ab523715d0103f450c51ba2933d79e622", null ],
       [ "adjust_depletion_fraction_p", "namespaceactual__et____fao56____two__stage.html#a76e6ada7405afce49a4a59f0b4ff2e1b", null ],
-      [ "calculate_actual_et_fao56_two_stage", "namespaceactual__et____fao56____two__stage.html#aa957a27764c3adb7143ee5da9e7c4cb7", null ],
+      [ "calculate_actual_et_fao56_two_stage", "namespaceactual__et____fao56____two__stage.html#af3228b9b89331d91550f11e04f3f2a8e", null ],
       [ "calculate_evaporation_reduction_coefficient_kr", "namespaceactual__et____fao56____two__stage.html#ab91f127ee51113f148398b40359bcf96", null ],
-      [ "calculate_fraction_exposed_and_wetted_soil_fc", "namespaceactual__et____fao56____two__stage.html#aa396cbc166b62274fea7a7f93040fe56", null ],
-      [ "calculate_surface_evap_coefficient_ke", "namespaceactual__et____fao56____two__stage.html#a8d27805b5513f4ce41d6e5cde79668ea", null ],
+      [ "calculate_fraction_exposed_and_wetted_soil_fc", "namespaceactual__et____fao56____two__stage.html#a2c55e5cfc033ad9832cc6d414b6b3e0c", null ],
+      [ "calculate_surface_evap_coefficient_ke", "namespaceactual__et____fao56____two__stage.html#ad53aaae7fdb07a8deab46ecfb2d6302f", null ],
       [ "calculate_total_available_water", "namespaceactual__et____fao56____two__stage.html#a5ca6e96aa217849c3e545542fbff4468", null ],
       [ "calculate_water_stress_coefficient_ks", "namespaceactual__et____fao56____two__stage.html#a813969f340b581bf800357bea36617d0", null ],
       [ "update_evaporable_water_storage", "namespaceactual__et____fao56____two__stage.html#a8be8682bb1cc3e01a5f9da40836cf06b", null ],
-      [ "update_plant_height", "namespaceactual__et____fao56____two__stage.html#a3687a07864b0d6858be4bad3f06ff076", null ],
+      [ "update_plant_height", "namespaceactual__et____fao56____two__stage.html#a02abd8e98508ccbf1084f7398c7b66c4", null ],
       [ "depletion_fraction", "namespaceactual__et____fao56____two__stage.html#af9dc16681b6ee65a836fd9f6c9f4818b", null ],
       [ "mean_plant_height", "namespaceactual__et____fao56____two__stage.html#a0b06bf263abe3ce0710d436d51e6ba9a", null ],
+      [ "min_fraction_covered_soil", "namespaceactual__et____fao56____two__stage.html#a32a73f84f8cd5159f0a02b441205546f", null ],
       [ "rew_l", "namespaceactual__et____fao56____two__stage.html#a3adaaff8e1ccb2e61c71081ffc130b3e", null ],
       [ "tew_l", "namespaceactual__et____fao56____two__stage.html#a37b62ed0a71accce03e2d5acf9188349", null ]
     ] ],
@@ -31,43 +32,33 @@ var namespaces_dup =
       [ "paet_grid", "namespaceactual__et____gridded__values.html#a75615d74ffc6ec40fb135edca46aa2db", null ]
     ] ],
     [ "actual_et__thornthwaite_mather", "namespaceactual__et____thornthwaite__mather.html", [
-      [ "calculate_actual_et_thornthwaite_mather", "namespaceactual__et____thornthwaite__mather.html#a98aabbd2bd13519a02c66a5b03332787", null ],
+      [ "calculate_actual_et_thornthwaite_mather", "namespaceactual__et____thornthwaite__mather.html#a9082db197e8dcdfe5b0a2a9a747484cd", null ],
       [ "near_zero", "namespaceactual__et____thornthwaite__mather.html#a61bc150c85a5886ce1c531846b5af351", null ]
     ] ],
-    [ "actual_et__thornthwaite_mather_eqns", "namespaceactual__et____thornthwaite__mather__eqns.html", [
-      [ "calculate_actual_et_thornthwaite_mather_eqns", "namespaceactual__et____thornthwaite__mather__eqns.html#afb7a65ecb71917316483a79348712f96", null ],
-      [ "initialize_actual_et_thornthwaite_mather_eqns", "namespaceactual__et____thornthwaite__mather__eqns.html#a1fdfe860673649a18f95834bccaad9dd", null ],
-      [ "thornthwaite_mather_apwl", "namespaceactual__et____thornthwaite__mather__eqns.html#a8b67a22e831afd6c828577642d2b8942", null ],
-      [ "thornthwaite_mather_soil_moisture", "namespaceactual__et____thornthwaite__mather__eqns.html#aa6c9bb2bd8feb1650afb7bf778c8aafd", null ],
-      [ "accumulated_potential_water_loss", "namespaceactual__et____thornthwaite__mather__eqns.html#a40472f4224301257b459d612f6eb7b53", null ],
-      [ "near_zero", "namespaceactual__et____thornthwaite__mather__eqns.html#ae823c2188a3eff0ebc64e5bff1d3f295", null ],
-      [ "tm_exponent_term", "namespaceactual__et____thornthwaite__mather__eqns.html#a0426319264398d43b76100fbc787e382", null ],
-      [ "tm_slope_term", "namespaceactual__et____thornthwaite__mather__eqns.html#a104e0eec8dfd0d95d13889d98d77f565", null ]
-    ] ],
     [ "awc__depth_integrated", "namespaceawc____depth__integrated.html", [
-      [ "awc_depth_integrated_initialize", "namespaceawc____depth__integrated.html#a9a57b760a09efd7d15876e718129f23f", null ],
-      [ "awc_depth_integrated_read", "namespaceawc____depth__integrated.html#a92ffc36cdbe2125edc2eb11de92410b5", null ],
+      [ "awc_depth_integrated_initialize", "namespaceawc____depth__integrated.html#a22eddb87657ec47bc8c1fe6b728fc0ed", null ],
+      [ "awc_depth_integrated_read", "namespaceawc____depth__integrated.html#ac27f8399da265a3f31838ff9348f5f4e", null ],
       [ "available_water_content", "namespaceawc____depth__integrated.html#afd92c4d0943a23ad9d8d464b261f6d15", null ],
       [ "psoils_code_grid", "namespaceawc____depth__integrated.html#a55c559be555cebc49ed5f01fd3ab95e4", null ]
     ] ],
     [ "awc__gridded_values", "namespaceawc____gridded__values.html", [
-      [ "awc_gridded_values_initialize", "namespaceawc____gridded__values.html#a6f32f2187c7835ac657c5743064379e4", null ],
+      [ "awc_gridded_values_initialize", "namespaceawc____gridded__values.html#a733cbbd769ccfcc99210d4cf7f15b89f", null ],
       [ "awc_gridded_values_read", "namespaceawc____gridded__values.html#a18ab5c6ee2b27657585dea47561116b2", null ],
       [ "pawc_grid", "namespaceawc____gridded__values.html#a2be9014886f6d18618d617f51cbb87c7", null ]
     ] ],
     [ "constants_and_conversions", "namespaceconstants__and__conversions.html", "namespaceconstants__and__conversions" ],
     [ "continuous_frozen_ground_index", "namespacecontinuous__frozen__ground__index.html", [
       [ "initialize_continuous_frozen_ground_index", "namespacecontinuous__frozen__ground__index.html#a5477d02f7996b4d043779a7488a77fcf", null ],
-      [ "update_continuous_frozen_ground_index", "namespacecontinuous__frozen__ground__index.html#abcebec8cde74a0b86953ea3b5e118755", null ]
+      [ "update_continuous_frozen_ground_index", "namespacecontinuous__frozen__ground__index.html#a9b0a65772ed4d680defc2e74e5e22774", null ]
     ] ],
     [ "crop_coefficients__fao56", "namespacecrop__coefficients____fao56.html", [
-      [ "crop_coefficients_fao56_calculate", "namespacecrop__coefficients____fao56.html#a8ef6ed91f4c976fb5e6026d2810c0e0f", null ],
-      [ "crop_coefficients_fao56_calculate_kcb_max", "namespacecrop__coefficients____fao56.html#a6d889023bc6288e566d8a1ad09a0c187", null ],
+      [ "crop_coefficients_fao56_calculate", "namespacecrop__coefficients____fao56.html#aabd842fb2d61ea3ce8deca465fe8b833", null ],
+      [ "crop_coefficients_fao56_calculate_kcb_max", "namespacecrop__coefficients____fao56.html#a4bcd3bc6edce98f3d83d3c48c63c4f44", null ],
       [ "crop_coefficients_fao56_initialize", "namespacecrop__coefficients____fao56.html#a12966098ef34ed15c09876a3add78312", null ],
-      [ "crop_coefficients_fao56_update_growing_season", "namespacecrop__coefficients____fao56.html#a6efb308b04b68c6be913c36e32e06827", null ],
+      [ "crop_coefficients_fao56_update_growing_season", "namespacecrop__coefficients____fao56.html#a79bd175524b8a5ad930dd506963581c8", null ],
       [ "crop_coefficients_fao56_update_growth_stage_dates", "namespacecrop__coefficients____fao56.html#a7d38167cc2ba756a05ad21ec000e1ded", null ],
-      [ "update_crop_coefficient_date_as_threshold", "namespacecrop__coefficients____fao56.html#a53486dd9e19017a8a6384fcc8b1d7f3a", null ],
-      [ "update_crop_coefficient_gdd_as_threshold", "namespacecrop__coefficients____fao56.html#aa28ee98711a6f0dceec4885fdb66971a", null ],
+      [ "update_crop_coefficient_date_as_threshold", "namespacecrop__coefficients____fao56.html#a8a0d4e2713c1af56909eb81d44ddf0aa", null ],
+      [ "update_crop_coefficient_gdd_as_threshold", "namespacecrop__coefficients____fao56.html#a1b6fc6cc23790211919c445b56dce2ca", null ],
       [ "growth_stage_date", "namespacecrop__coefficients____fao56.html#ac65046b44c2a3ce959c663cfcecc9bf3", null ],
       [ "growth_stage_gdd", "namespacecrop__coefficients____fao56.html#aa1e1f5f3c27dcb08bf4216edddefda5b", null ],
       [ "growth_stage_length_in_days", "namespacecrop__coefficients____fao56.html#a531c0e3a3889cc1bc0ff7ce91e304131", null ],
@@ -124,24 +115,24 @@ var namespaces_dup =
     ] ],
     [ "et__gridded_values", "namespaceet____gridded__values.html", [
       [ "et_gridded_values_calculate", "namespaceet____gridded__values.html#a47620ef47e89b4af2dadbae1b0b7b70b", null ],
-      [ "et_gridded_values_initialize", "namespaceet____gridded__values.html#afe00fc3329ba0727a175b106c3812526", null ],
+      [ "et_gridded_values_initialize", "namespaceet____gridded__values.html#a8e210030f6900702d0d6408e5ce1286a", null ],
       [ "pet_grid", "namespaceet____gridded__values.html#a8cdeb77ba22a1295e6fcc3b123498b18", null ]
     ] ],
     [ "et__hargreaves_samani", "namespaceet____hargreaves__samani.html", [
-      [ "et0_hargreaves", "namespaceet____hargreaves__samani.html#ab4bad3b35345bacf0be978adf7889eca", null ],
-      [ "et_hargreaves_calculate", "namespaceet____hargreaves__samani.html#aa1188dde0964edd68b7e45aed501312d", null ],
+      [ "et0_hargreaves", "namespaceet____hargreaves__samani.html#aa4970400403cd4ba4c201a15d7c62b8d", null ],
+      [ "et_hargreaves_calculate", "namespaceet____hargreaves__samani.html#a77b1c6dd3a4c112c6192becc9f879893", null ],
       [ "et_hargreaves_initialize", "namespaceet____hargreaves__samani.html#a8512a837baefd57047e55c7a53b03cf3", null ],
-      [ "et_constant", "namespaceet____hargreaves__samani.html#a013bc8a182138fdb16498c467b3ad37b", null ],
-      [ "et_exponent", "namespaceet____hargreaves__samani.html#a3c622ff5e2fc7f8b8e287b5ce02ec794", null ],
-      [ "et_slope", "namespaceet____hargreaves__samani.html#abb0f40dd993480d1ba6aa2e1556b1e93", null ]
+      [ "et_constant", "namespaceet____hargreaves__samani.html#a5a60bc6adb02a5942561820f7f28f392", null ],
+      [ "et_exponent", "namespaceet____hargreaves__samani.html#a7dde6cb8f3282f642bf47a1dd2d3984f", null ],
+      [ "et_slope", "namespaceet____hargreaves__samani.html#a87aaaab114756b2e907badf129812bee", null ]
     ] ],
     [ "et__jensen_haise", "namespaceet____jensen__haise.html", [
-      [ "et_jh_calculate", "namespaceet____jensen__haise.html#a8647cf6b332a35bd7f2162d1a7df6381", null ]
+      [ "et_jh_calculate", "namespaceet____jensen__haise.html#a4a0eca59dd1e6202cac124d00881215a", null ]
     ] ],
     [ "et__zone_values", "namespaceet____zone__values.html", [
       [ "et_zone_values_calculate", "namespaceet____zone__values.html#afc61abb429d560fccdf982d2dfb0f226", null ],
-      [ "et_zone_values_initialize", "namespaceet____zone__values.html#a006192d99f088ef95d7761123f8958c9", null ],
-      [ "read_et_ratio_table", "namespaceet____zone__values.html#a3d01d13c67da002bf5a804c52c6f6021", null ],
+      [ "et_zone_values_initialize", "namespaceet____zone__values.html#a581e4a797f2627d6c18485b3a9afe717", null ],
+      [ "read_et_ratio_table", "namespaceet____zone__values.html#a1e1f2a58612c23da051e415d9ea0a09e", null ],
       [ "et_ratios", "namespaceet____zone__values.html#a1519707d407b4358f4b374d9d13f7af2", null ],
       [ "et_table_values", "namespaceet____zone__values.html#a6f22e94e1eb18e3111f1329bbc45e680", null ],
       [ "et_zone", "namespaceet____zone__values.html#ac3f0c7e02df8d3fee16f1f4b6d6e4db8", null ],
@@ -151,18 +142,13 @@ var namespaces_dup =
     [ "exceptions", "namespaceexceptions.html", "namespaceexceptions" ],
     [ "file_operations", "namespacefile__operations.html", "namespacefile__operations" ],
     [ "fog__monthly_grid", "namespacefog____monthly__grid.html", [
-      [ "fog_monthly_grid_calculate", "namespacefog____monthly__grid.html#acef2be3cd8295a3fb9bbeae7706207f7", null ],
-      [ "fog_monthly_grid_initialize", "namespacefog____monthly__grid.html#a9079c2ade11e0cda8820f9a6e2d3416c", null ],
+      [ "fog_monthly_grid_calculate", "namespacefog____monthly__grid.html#a9cfb281a09715dad0f591a91af4fda56", null ],
+      [ "fog_monthly_grid_initialize", "namespacefog____monthly__grid.html#a7975561757f406875f0241f101aa4310", null ],
       [ "ffog_catch_efficiency", "namespacefog____monthly__grid.html#a680f3b10fe120f5cde0401ebf86e42a6", null ],
       [ "pfog_ratio", "namespacefog____monthly__grid.html#a84240951f4660062ce99dca14113ba03", null ]
     ] ],
     [ "fstring", "namespacefstring.html", "namespacefstring" ],
     [ "fstring_list", "namespacefstring__list.html", "namespacefstring__list" ],
-    [ "graph", "namespacegraph.html", [
-      [ "make_shaded_contour", "namespacegraph.html#a4caaa98257b2bc6a906f5acb07f6099d", null ],
-      [ "makecolortable", "namespacegraph.html#ab7fc3f97c41bb35825a52f06393bc67e", null ],
-      [ "makegraph", "namespacegraph.html#a0d0898b2db62366093b9d8785a1b9d90", null ]
-    ] ],
     [ "grid", "namespacegrid.html", "namespacegrid" ],
     [ "growing_degree_day", "namespacegrowing__degree__day.html", [
       [ "growing_degree_day_calculate", "namespacegrowing__degree__day.html#abc82faafeb151dc1c5699503dd9b9d32", null ],
@@ -183,7 +169,7 @@ var namespaces_dup =
     ] ],
     [ "growing_season", "namespacegrowing__season.html", [
       [ "growing_season_initialize", "namespacegrowing__season.html#add2a4f3df5a65bcd0406e7a24f8493f7", null ],
-      [ "growing_season_update", "namespacegrowing__season.html#ad7cb4c245fb91db0be4abc2c702c6d5c", null ],
+      [ "growing_season_update", "namespacegrowing__season.html#a159ee3dbabf5b04331d22bcaa6da7522", null ],
       [ "date_delims", "namespacegrowing__season.html#a8ec5e4f76a3fede35eed80990135018f", null ],
       [ "first_day_of_growing_season", "namespacegrowing__season.html#a6138044b13e093ac08e7a0938c86fb9b", null ],
       [ "gdd_first_day_of_growing_season", "namespacegrowing__season.html#ae264c8ec9e2acf8ae09069ffc4de45dc", null ],
@@ -193,11 +179,11 @@ var namespaces_dup =
       [ "nodata_value", "namespacegrowing__season.html#ae55f84d1c1c73545d6e54c7b7e2d017a", null ]
     ] ],
     [ "interception__bucket", "namespaceinterception____bucket.html", [
-      [ "interception_bucket_calculate", "namespaceinterception____bucket.html#a8e2d489b97bdc7df4d85bc1640a109a1", null ],
+      [ "interception_bucket_calculate", "namespaceinterception____bucket.html#a9fca802de19f05bbf58bce44a53ab06a", null ],
       [ "interception_bucket_initialize", "namespaceinterception____bucket.html#ac38375085610e4aff3186aef6b786dbe", null ],
+      [ "bucket_interception_storage_max_growing_season", "namespaceinterception____bucket.html#a41bcc20d3f1134af1b73f39de40453b0", null ],
+      [ "bucket_interception_storage_max_nongrowing_season", "namespaceinterception____bucket.html#a9419ec82ff37a9a602d0a1aef1448509", null ],
       [ "date_delims", "namespaceinterception____bucket.html#a59f749a8469acdc5de185e42db213de2", null ],
-      [ "first_day_of_growing_season", "namespaceinterception____bucket.html#a11c8f0754ec53017cec69b67804bfeeb", null ],
-      [ "gdd_first_day_of_growing_season", "namespaceinterception____bucket.html#adf626c6316be29a3dd8a11a0c0ba779d", null ],
       [ "ilandusecodes", "namespaceinterception____bucket.html#a9ab9190e408543d47ab7eac5caaf6ee8", null ],
       [ "interception_a_value_growing_season", "namespaceinterception____bucket.html#ac72b6e2088cbb1c0b59e05bb301e8d36", null ],
       [ "interception_a_value_nongrowing_season", "namespaceinterception____bucket.html#ad4e00f4ddf5cdc8bc49c1f46d10690fb", null ],
@@ -205,16 +191,16 @@ var namespaces_dup =
       [ "interception_b_value_nongrowing_season", "namespaceinterception____bucket.html#ac1eb03e8997ee68eabcf32308c206380", null ],
       [ "interception_n_value_growing_season", "namespaceinterception____bucket.html#a500ce4ad4b574cbfba788503d4a20384", null ],
       [ "interception_n_value_nongrowing_season", "namespaceinterception____bucket.html#afc8f79857679f8aec06da09ef26268a7", null ],
-      [ "killing_frost_temp_last_day_of_growing_season", "namespaceinterception____bucket.html#a7431a6a9905e2c07e8d599fbbed65e2b", null ],
-      [ "last_day_of_growing_season", "namespaceinterception____bucket.html#a72ed348d813bec8c83b34ee801f7727c", null ],
       [ "nodata_value", "namespaceinterception____bucket.html#a464c8e44f6ca547f2b4276c686af3be5", null ]
     ] ],
     [ "interception__gash", "namespaceinterception____gash.html", [
-      [ "interception_gash_calculate", "namespaceinterception____gash.html#a3de7788eccc180d41b4c6f38bb755d7c", null ],
-      [ "interception_gash_initialize", "namespaceinterception____gash.html#a419e65fd85d4c1f7b36c056dde2753e6", null ],
-      [ "precipitation_at_saturation", "namespaceinterception____gash.html#a74dd457c2cc2b9f40581ff6f0ae90afe", null ],
+      [ "interception_gash_calculate", "namespaceinterception____gash.html#ada7bdef1a568c4892c5655605e733b9a", null ],
+      [ "interception_gash_initialize", "namespaceinterception____gash.html#a8261c53cc60f5542a5aee7e47055b56c", null ],
+      [ "precipitation_at_saturation", "namespaceinterception____gash.html#a0535364fae3a469f8e5c1ab1a6f2f677", null ],
       [ "canopy_storage_capacity_table_values", "namespaceinterception____gash.html#ace1321aeea78ebad13bb4e91c78e9406", null ],
       [ "evaporation_to_rainfall_ratio", "namespaceinterception____gash.html#a67d18c50e96ed256f68cbcccffaf6031", null ],
+      [ "gash_interception_storage_max_growing_season", "namespaceinterception____gash.html#ae8634eae43584ab89cf251d94b24c2b7", null ],
+      [ "gash_interception_storage_max_nongrowing_season", "namespaceinterception____gash.html#a89be1cbc51e26068cd0c11609cd5f6e1", null ],
       [ "p_sat", "namespaceinterception____gash.html#aa3d6d41413cfc872174326740bc87563", null ],
       [ "pevaporation_to_rainfall_ratio", "namespaceinterception____gash.html#aea93911cd7edb4b56244bbd552107ccb", null ],
       [ "pncfile", "namespaceinterception____gash.html#aa5e8c087dc0dd791dbddd02e6a5742a5", null ],
@@ -240,21 +226,16 @@ var namespaces_dup =
       [ "pirrigation_mask", "namespaceirrigation.html#a09e70c71772b45593baa280aec326cde", null ]
     ] ],
     [ "kiss_random_number_generator", "namespacekiss__random__number__generator.html", [
-      [ "initialize_kiss_rng", "namespacekiss__random__number__generator.html#a8fc8e4ca37a607a9f471d6458e9a2518", null ],
-      [ "kiss64_rng", "namespacekiss__random__number__generator.html#aee9f329411a0d3e8754950cb5dacb4b0", null ],
-      [ "kiss64_uniform_rng", "namespacekiss__random__number__generator.html#a2a4fa0a0bc1b28c2d41133328b746806", null ],
-      [ "refill", "namespacekiss__random__number__generator.html#ae2a4df4b2dd24188b45f77bbabbc487c", null ],
-      [ "carry", "namespacekiss__random__number__generator.html#a562d01614ecb9447e17f536a9aec5630", null ],
-      [ "i16_range", "namespacekiss__random__number__generator.html#a7da7c9601be92f7f5233c5325366764a", null ],
-      [ "i8", "namespacekiss__random__number__generator.html#a12e61363865ae19795f8848ec5fcfce2", null ],
-      [ "i8_max", "namespacekiss__random__number__generator.html#acebce5f8996fbc6e1e65f06290556c69", null ],
-      [ "i8_min", "namespacekiss__random__number__generator.html#a39d8c25951fffcbfb7b559c439c40b9b", null ],
-      [ "indx", "namespacekiss__random__number__generator.html#a0d095c3d2d3085f182be1b483cefd054", null ],
-      [ "q", "namespacekiss__random__number__generator.html#abe13af92df5e16a66d60cc3848235f61", null ],
-      [ "r16", "namespacekiss__random__number__generator.html#a1808b00edbf83068abad7651b2f4f428", null ],
-      [ "r8", "namespacekiss__random__number__generator.html#a5e626ac4f0d1f3ef756529f3896a3730", null ],
-      [ "xcng", "namespacekiss__random__number__generator.html#ab541a6e7378781b905f5a201a0927896", null ],
-      [ "xs", "namespacekiss__random__number__generator.html#af0617d8cde972f3059fc3edd06b4d96b", null ]
+      [ "bitwise_exclusive_or_operation", "namespacekiss__random__number__generator.html#a85959624cf679e486da91592c303cb09", null ],
+      [ "kiss64_initialize", "namespacekiss__random__number__generator.html#a7f902993e4e05cf3a354e151be3d8718", null ],
+      [ "kiss64_rng", "namespacekiss__random__number__generator.html#a47f3204621c8555bd9677f935a6ff238", null ],
+      [ "kiss64_uniform_rng", "namespacekiss__random__number__generator.html#a194b100f7f2ab97efa587391159fe326", null ],
+      [ "shift_bits", "namespacekiss__random__number__generator.html#a12973f5d78dbf34c9000ce7956a6f7b1", null ],
+      [ "c", "namespacekiss__random__number__generator.html#a7253df611c43a8be85eec24508403c10", null ],
+      [ "t", "namespacekiss__random__number__generator.html#a61e57d2876acf54d644e2133dab6eaad", null ],
+      [ "x", "namespacekiss__random__number__generator.html#abd120940c9cc1c689267993202b8fcb2", null ],
+      [ "y", "namespacekiss__random__number__generator.html#a5aded737913f65486d36a19770cc9120", null ],
+      [ "z", "namespacekiss__random__number__generator.html#a148c969dda1b4298aa05b05163e991df", null ]
     ] ],
     [ "logfiles", "namespacelogfiles.html", "namespacelogfiles" ],
     [ "mass_balance__impervious_surface", "namespacemass__balance____impervious__surface.html", [
@@ -262,7 +243,7 @@ var namespaces_dup =
       [ "near_zero", "namespacemass__balance____impervious__surface.html#adb37e469eb706069b38ef8c076cac9d8", null ]
     ] ],
     [ "mass_balance__interception", "namespacemass__balance____interception.html", [
-      [ "calculate_interception_mass_balance", "namespacemass__balance____interception.html#a7e1973d9cf7305e8124149ab0e09f1ed", null ]
+      [ "calculate_interception_mass_balance", "namespacemass__balance____interception.html#a2371c7ec191129d66719e65d540d5246", null ]
     ] ],
     [ "mass_balance__snow", "namespacemass__balance____snow.html", [
       [ "calculate_snow_mass_balance", "namespacemass__balance____snow.html#a03ed1f4c52e57052e0ce5ad463c1cb76", null ]
@@ -280,9 +261,9 @@ var namespaces_dup =
       [ "pmaximum_net_infiltration", "namespacemaximum__net__infiltration____gridded__data.html#a4bc5b63aa66bd442d1c7b583ae8505b6", null ]
     ] ],
     [ "meteorological_calculations", "namespacemeteorological__calculations.html", [
-      [ "dewpoint_vapor_pressure__e_a", "namespacemeteorological__calculations.html#a306754fbca0b91e8f37dfe7b11e4f9cc", null ],
-      [ "equivalent_evaporation", "namespacemeteorological__calculations.html#aa2c69dfea48e36ed94909b4b1dc30206", null ],
-      [ "sat_vapor_pressure__e_0", "namespacemeteorological__calculations.html#a85da086c2e1c2b6051982ee232f362c1", null ]
+      [ "dewpoint_vapor_pressure__e_a", "namespacemeteorological__calculations.html#ab524a36d5793556fc7942c1f037c08cb", null ],
+      [ "equivalent_evaporation", "namespacemeteorological__calculations.html#a226f7ed381e189128b68638283413efe", null ],
+      [ "sat_vapor_pressure__e_0", "namespacemeteorological__calculations.html#ada29dc9a1c64e62ff2444f6ba9aac3f8", null ]
     ] ],
     [ "model_domain", "namespacemodel__domain.html", "namespacemodel__domain" ],
     [ "model_initialize", "namespacemodel__initialize.html", "namespacemodel__initialize" ],
@@ -320,16 +301,18 @@ var namespaces_dup =
       [ "create_attributes_from_proj4_string", "namespaceproj4__support.html#ae89d6aafb4b7a5615f04646e39d5494d", null ]
     ] ],
     [ "rooting_depth__fao56", "namespacerooting__depth____fao56.html", [
-      [ "update_rooting_depth", "namespacerooting__depth____fao56.html#ad15e09b936fba24dae7c1266468a93d4", null ]
+      [ "initialize_rooting_depth", "namespacerooting__depth____fao56.html#abe81b804eb24424def982d0da85ee307", null ],
+      [ "update_rooting_depth", "namespacerooting__depth____fao56.html#a39215ddf1ce3f0b8de9cf0e002fbb76c", null ],
+      [ "variable_rooting_depth", "namespacerooting__depth____fao56.html#a25434487b14860c2290d489201db7682", null ]
     ] ],
     [ "routing__d8", "namespacerouting____d8.html", [
       [ "get_cell_index", "namespacerouting____d8.html#ab2737c06c2bbfe695e55cf1fdc6451df", null ],
       [ "get_sort_order", "namespacerouting____d8.html#a96f63f977068f87f9c9e6a55b761f029", null ],
       [ "get_target_index", "namespacerouting____d8.html#a8c054640f102f6f4324d6998254b0c62", null ],
-      [ "routing_d8_assign_downstream_row_col", "namespacerouting____d8.html#a4ffeb4be9d01e7cae56e0886d9161b18", null ],
-      [ "routing_d8_determine_solution_order", "namespacerouting____d8.html#ae2756c01d52d156a1b6c7ce48ca1e941", null ],
-      [ "routing_d8_get_index", "namespacerouting____d8.html#aaa0ea751ca654c54844576ac95e87935", null ],
-      [ "routing_d8_initialize", "namespacerouting____d8.html#a8a70861bc8327ff1c8ef3a6a2b1e49d7", null ],
+      [ "routing_d8_assign_downstream_row_col", "namespacerouting____d8.html#abf2af9c91582d2536d269d6ca5cd9aa6", null ],
+      [ "routing_d8_determine_solution_order", "namespacerouting____d8.html#a4cbad984f5e512aacf48a0219ed5932f", null ],
+      [ "routing_d8_get_index", "namespacerouting____d8.html#a2b4c308cfe44456c08942e94bb2c7c8f", null ],
+      [ "routing_d8_initialize", "namespacerouting____d8.html#aadfed7f04be23bae2507ca926c1bce53", null ],
       [ "col1d", "namespacerouting____d8.html#aa8fac36650964d69c96f05cade54008f", null ],
       [ "col2d", "namespacerouting____d8.html#a08f5ff991f6605b818c431abd0f9319d", null ],
       [ "column_index", "namespacerouting____d8.html#a3599e0bede3b9dc3fc98649ee00dbd75", null ],
@@ -356,13 +339,13 @@ var namespaces_dup =
     ] ],
     [ "running_grid_stats", "namespacerunning__grid__stats.html", "namespacerunning__grid__stats" ],
     [ "runoff__curve_number", "namespacerunoff____curve__number.html", [
-      [ "cn_ii_to_cn_i", "namespacerunoff____curve__number.html#a14867fb1ed86e182fce49ffee63213b6", null ],
-      [ "cn_ii_to_cn_iii", "namespacerunoff____curve__number.html#a59b6be4ec7293e2603fbdd0f7fc286cd", null ],
-      [ "prob_runoff_enhancement", "namespacerunoff____curve__number.html#afe1e6b566da02b4384668363122f95bb", null ],
-      [ "return_landuse_index_fn", "namespacerunoff____curve__number.html#a8d909322aa57bdda4fe9570cfe54b85a", null ],
+      [ "cn_ii_to_cn_i", "namespacerunoff____curve__number.html#a49b45c39798ac163ec9742465108f8b1", null ],
+      [ "cn_ii_to_cn_iii", "namespacerunoff____curve__number.html#a6f04edc7e9c73381d78946619a06f859", null ],
+      [ "prob_runoff_enhancement", "namespacerunoff____curve__number.html#af135ba33e85d0e2f775836d8418e0282", null ],
+      [ "return_landuse_index_fn", "namespacerunoff____curve__number.html#ae0b827eef315cad406a47dd6bac29381", null ],
       [ "runoff_curve_number_calculate", "namespacerunoff____curve__number.html#a77710f6021d5bbdcb3ed86ca3ea638a5", null ],
       [ "runoff_curve_number_initialize", "namespacerunoff____curve__number.html#abe564eabd0170192d8569d8b59b52b4b", null ],
-      [ "update_curve_number_fn", "namespacerunoff____curve__number.html#a0529434634ff76958fed52a593f1ed02", null ],
+      [ "update_curve_number_fn", "namespacerunoff____curve__number.html#a0e63998af6fb43e7b475784cf9022f6e", null ],
       [ "update_previous_5_day_rainfall", "namespacerunoff____curve__number.html#a8ea014bd82d53fdd339b4bc30739c9b4", null ],
       [ "amc_dry_dormant", "namespacerunoff____curve__number.html#ab408634d8cab273b74b2bd02b9c979bd", null ],
       [ "amc_dry_growing", "namespacerunoff____curve__number.html#a5cbe1da72b3eef09c25c54d965def16c", null ],
@@ -378,8 +361,8 @@ var namespaces_dup =
       [ "prev_5_days_rain", "namespacerunoff____curve__number.html#a89ec3da4d4c57d98f26cc1e8a131c552", null ]
     ] ],
     [ "runoff__gridded_values", "namespacerunoff____gridded__values.html", [
-      [ "read_runoff_ratio_table", "namespacerunoff____gridded__values.html#a2727530636eb37b13a66e54c7f4acc1e", null ],
-      [ "runoff_gridded_values_initialize", "namespacerunoff____gridded__values.html#a3ac2987bbbdf8952bfb1457cad017b28", null ],
+      [ "read_runoff_ratio_table", "namespacerunoff____gridded__values.html#a067a5a776ff9125c9319a0c3f65d88ef", null ],
+      [ "runoff_gridded_values_initialize", "namespacerunoff____gridded__values.html#a64563f3d56cd891e849c05f8aef5d9d4", null ],
       [ "runoff_gridded_values_update_ratios", "namespacerunoff____gridded__values.html#aa82e4d0dd525ba2d97604ada9d167453", null ],
       [ "prunoff_zone", "namespacerunoff____gridded__values.html#a491990a1f23d8444ff148ee2f01fa929", null ],
       [ "runoff_ratios", "namespacerunoff____gridded__values.html#ad4434583735ab0b736cd193e7198cda1", null ],
@@ -401,23 +384,23 @@ var namespaces_dup =
       [ "mm_per_inch", "namespacesnowmelt____original.html#afde31cf998f9f1cd16f269e8aa173447", null ]
     ] ],
     [ "solar_calculations", "namespacesolar__calculations.html", [
-      [ "azimuth_angle__psi", "namespacesolar__calculations.html#a5c286d0f806deb5947840d8528e23d0b", null ],
-      [ "clear_sky_solar_radiation__rso", "namespacesolar__calculations.html#ac7f308aaecbc7e8136ac75238503d6b5", null ],
-      [ "clear_sky_solar_radiation_noab__rso", "namespacesolar__calculations.html#a7aa56bce2ad63321d48bc02bfa40acce", null ],
-      [ "day_angle__gamma", "namespacesolar__calculations.html#a0b69600236d8da8ef15c34a9834ee240", null ],
-      [ "daylight_hours", "namespacesolar__calculations.html#abb1c9027d752acc7b55a95303a0789dd", null ],
-      [ "estimate_percent_of_possible_sunshine__psun", "namespacesolar__calculations.html#a6ffcf51b1a0bd61f1821b64e797e96e9", null ],
-      [ "extraterrestrial_radiation__ra", "namespacesolar__calculations.html#a47f8d30770abf4348ac52a17c9d1b33a", null ],
-      [ "net_longwave_radiation__rnl", "namespacesolar__calculations.html#a0cfee712588dd8ff162ce6d4d6f67f96", null ],
-      [ "net_shortwave_radiation__rns", "namespacesolar__calculations.html#a3336a5130d3003176afb2e763622a9cc", null ],
-      [ "relative_earth_sun_distance__d_r", "namespacesolar__calculations.html#a2b7d0d93956422711a0959f4ce18f55d", null ],
-      [ "solar_altitude__alpha", "namespacesolar__calculations.html#aae6039509688a95a5eed1e1c6a1daeff", null ],
-      [ "solar_declination__delta", "namespacesolar__calculations.html#a3ce3d95888105750d62c53548065bc62", null ],
-      [ "solar_declination_simple__delta", "namespacesolar__calculations.html#a1276e3462a86af19b4645a69226be06e", null ],
-      [ "solar_radiation__rs", "namespacesolar__calculations.html#aecd4ca071aae05dd477a22c05f0007f1", null ],
-      [ "solar_radiation_hargreaves__rs", "namespacesolar__calculations.html#a509e7c7bf3099a56ad4252d75b23ab90", null ],
-      [ "sunrise_sunset_angle__omega_s", "namespacesolar__calculations.html#a8c157601076a5142af44050a59dedb91", null ],
-      [ "zenith_angle__theta_z", "namespacesolar__calculations.html#a7a9f079e302f238b2ce0df4dad85a6ef", null ],
+      [ "azimuth_angle__psi", "namespacesolar__calculations.html#a0bffc47196958691bbe12973de3bb7f5", null ],
+      [ "clear_sky_solar_radiation__rso", "namespacesolar__calculations.html#a7395ab0eedce3faf1253bff90f585f5d", null ],
+      [ "clear_sky_solar_radiation_noab__rso", "namespacesolar__calculations.html#a99e91da9f9446ca1ffc5a8f58b2f71a3", null ],
+      [ "day_angle__gamma", "namespacesolar__calculations.html#aafa5ae580c2811d38e2f345ccf8caf42", null ],
+      [ "daylight_hours", "namespacesolar__calculations.html#a81a357c44b34b44b1caa7e2c77e0093b", null ],
+      [ "estimate_percent_of_possible_sunshine__psun", "namespacesolar__calculations.html#a420de8a02e94159d2c2ea3e2b331682c", null ],
+      [ "extraterrestrial_radiation__ra", "namespacesolar__calculations.html#ac38767af2ab93521ff1d1624c4ef8188", null ],
+      [ "net_longwave_radiation__rnl", "namespacesolar__calculations.html#ac80a9ba7969f0f02aadee6b01f376bb0", null ],
+      [ "net_shortwave_radiation__rns", "namespacesolar__calculations.html#a5b0ecbaa4088b094b98af0166c461f59", null ],
+      [ "relative_earth_sun_distance__d_r", "namespacesolar__calculations.html#ab85512c12796dfb2358aef2bb2dc1f6c", null ],
+      [ "solar_altitude__alpha", "namespacesolar__calculations.html#a62fd4ce06eb984208f694314e280c56a", null ],
+      [ "solar_declination__delta", "namespacesolar__calculations.html#a258c004052374097e72fcb40067bce2a", null ],
+      [ "solar_declination_simple__delta", "namespacesolar__calculations.html#a1a29a3a488283c57707ea6ae87667370", null ],
+      [ "solar_radiation__rs", "namespacesolar__calculations.html#acfa44cdc4d5895521e57fb544126c239", null ],
+      [ "solar_radiation_hargreaves__rs", "namespacesolar__calculations.html#a1bc9fd734eedbee362b875edb56fbb9e", null ],
+      [ "sunrise_sunset_angle__omega_s", "namespacesolar__calculations.html#ac2130c0bb602e829335dc32cc7ecb0f0", null ],
+      [ "zenith_angle__theta_z", "namespacesolar__calculations.html#afa6e65992e0b6762cec733d7634b6aa6", null ],
       [ "earth_sun_dist_dr", "namespacesolar__calculations.html#a4a58162c913b7cc91745089597e90a9d", null ],
       [ "solar_declination_delta", "namespacesolar__calculations.html#aeda6cac21744203859d121682e8c57d7", null ]
     ] ],

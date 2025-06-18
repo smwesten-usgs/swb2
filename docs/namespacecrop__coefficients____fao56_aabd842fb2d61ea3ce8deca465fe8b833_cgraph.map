@@ -1,0 +1,7 @@
+<map id="crop_coefficients__fao56::crop_coefficients_fao56_calculate" name="crop_coefficients__fao56::crop_coefficients_fao56_calculate">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,59,172,117"/>
+<area shape="rect" id="Node000002" href="$namespacecrop__coefficients____fao56.html#a8a0d4e2713c1af56909eb81d44ddf0aa" title="Update the current basal crop coefficient (Kcb) for a SINGLE irrigation table entry." alt="" coords="248,5,388,80"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="172,69,232,57,233,62,173,74"/>
+<area shape="rect" id="Node000003" href="$namespacecrop__coefficients____fao56.html#a1b6fc6cc23790211919c445b56dce2ca" title="Update the current basal crop coefficient (Kcb), with GDD as the threhold." alt="" coords="220,104,416,163"/>
+<area shape="poly" id="edge2_Node000001_Node000003" title=" " alt="" coords="173,102,205,108,204,114,172,107"/>
+</map>

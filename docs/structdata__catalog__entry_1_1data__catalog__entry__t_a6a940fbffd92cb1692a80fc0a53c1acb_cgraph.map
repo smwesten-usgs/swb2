@@ -1,0 +1,10 @@
+<map id="data_catalog_entry::data_catalog_entry_t::getvalue" name="data_catalog_entry::data_catalog_entry_t::getvalue">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,31,145,89"/>
+<area shape="rect" id="Node000002" href="$namespacedata__catalog__entry.html#a23b469b5c7aa8fefa069ba6742b4a25b" title=" " alt="" coords="193,5,338,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="145,45,177,39,178,45,146,50"/>
+<area shape="rect" id="Node000004" href="$namespacedata__catalog__entry.html#a49faaff37ff5ee691e1fd81c75a3855b" title=" " alt="" coords="198,72,332,115"/>
+<area shape="poly" id="edge3_Node000001_Node000004" title=" " alt="" coords="146,70,183,76,182,82,145,75"/>
+<area shape="rect" id="Node000003" href="$namespaceexceptions.html#afd73029531ee5ba631b7838d2f6395dd" title=" " alt="" coords="386,47,495,73"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="339,38,371,44,370,49,338,43"/>
+<area shape="poly" id="edge4_Node000004_Node000003" title=" " alt="" coords="332,78,370,71,371,76,333,83"/>
+</map>

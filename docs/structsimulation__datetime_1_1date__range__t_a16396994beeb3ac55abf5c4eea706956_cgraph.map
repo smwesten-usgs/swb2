@@ -1,0 +1,13 @@
+<map id="simulation_datetime::date_range_t::set_current_date" name="simulation_datetime::date_range_t::set_current_date">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,15,143,73"/>
+<area shape="rect" id="Node000002" href="$namespacesimulation__datetime.html#a88834aa35585c8770dd091f8dc7628e6" title=" " alt="" coords="191,15,339,73"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="143,41,175,41,175,47,143,47"/>
+<area shape="rect" id="Node000003" href="$namespacedatetime.html#a06e1494ae58157ef6a2c65707726bc84" title=" " alt="" coords="387,31,537,57"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="339,41,372,41,372,47,339,47"/>
+<area shape="rect" id="Node000004" href="$namespacedatetime.html#a81e80e06718ecd2296881c61e61f8c9b" title=" " alt="" coords="585,5,750,32"/>
+<area shape="poly" id="edge3_Node000003_Node000004" title=" " alt="" coords="537,32,569,28,570,33,538,37"/>
+<area shape="rect" id="Node000005" href="$namespacedatetime.html#abc64e3b90a66519d1ae3b7387120729c" title=" " alt="" coords="599,56,736,83"/>
+<area shape="poly" id="edge4_Node000003_Node000005" title=" " alt="" coords="538,51,584,56,583,62,537,56"/>
+<area shape="rect" id="Node000006" href="$namespacedatetime.html#ab1d9676d8eb0eb478a641392d74ee96b" title=" " alt="" coords="798,56,911,83"/>
+<area shape="poly" id="edge5_Node000005_Node000006" title=" " alt="" coords="736,67,782,67,782,72,736,72"/>
+</map>

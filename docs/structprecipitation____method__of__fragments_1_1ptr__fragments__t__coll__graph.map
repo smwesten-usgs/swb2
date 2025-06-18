@@ -1,4 +1,5 @@
 <map id="precipitation__method_of_fragments::ptr_fragments_t" name="precipitation__method_of_fragments::ptr_fragments_t">
-<area shape="rect" id="node1" title="Pointer to a rainfall fragments data structure." alt="" coords="5,109,207,151"/>
-<area shape="rect" id="node2" href="$structprecipitation____method__of__fragments_1_1fragments__t.html" title="Data structure that holds a single line of data from the input rainfall fragments file." alt="" coords="17,5,195,47"/>
+<area shape="rect" id="Node000001" title="Pointer to a rainfall fragments data structure." alt="" coords="5,120,209,163"/>
+<area shape="rect" id="Node000002" href="$structprecipitation____method__of__fragments_1_1fragments__t.html" title="Data structure that holds a single line of data from the input rainfall fragments file." alt="" coords="16,5,198,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="110,64,110,120,104,120,104,64"/>
 </map>

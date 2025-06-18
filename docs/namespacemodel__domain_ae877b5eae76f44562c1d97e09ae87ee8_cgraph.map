@@ -1,0 +1,7 @@
+<map id="model_domain::model_calculate_fog_monthly_grid" name="model_domain::model_calculate_fog_monthly_grid">
+<area shape="rect" id="Node000001" title=" " alt="" coords="5,5,192,48"/>
+<area shape="rect" id="Node000002" href="$namespacefog____monthly__grid.html#a9cfb281a09715dad0f591a91af4fda56" title=" " alt="" coords="240,5,419,48"/>
+<area shape="poly" id="edge1_Node000001_Node000002" title=" " alt="" coords="192,24,224,24,224,29,192,29"/>
+<area shape="rect" id="Node000003" href="$namespaceexceptions.html#afd73029531ee5ba631b7838d2f6395dd" title=" " alt="" coords="467,13,576,40"/>
+<area shape="poly" id="edge2_Node000002_Node000003" title=" " alt="" coords="419,24,452,24,452,29,419,29"/>
+</map>
