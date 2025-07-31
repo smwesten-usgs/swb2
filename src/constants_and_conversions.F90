@@ -55,7 +55,7 @@ module constants_and_conversions
 
     ! [ evil global variables ]
   character (len=1)            :: OS_NATIVE_PATH_DELIMITER
-  integer (c_long_long)        :: RANDOM_START = 0
+  integer (c_long)             :: RANDOM_START = 0
 
   ! [ select conversion factors ]
   real (c_double), parameter, public :: C_PER_F    = 5.0_c_double / 9.0_c_double

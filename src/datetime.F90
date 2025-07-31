@@ -25,15 +25,15 @@ module datetime
     module procedure :: assign_value_to_sub
   end interface assignment(=)
 
-  public :: operator(>)
-  interface operator(>)
-    module procedure :: is_date_greater_than
-  end interface operator(>)
+  ! public :: operator(>)
+  ! interface operator(>)
+  !   module procedure :: is_date_greater_than
+  ! end interface operator(>)
 
-  public :: operator(<)
-  interface operator(<)
-    module procedure :: is_date_less_than
-  end interface operator(<)
+  ! public :: operator(<)
+  ! interface operator(<)
+  !   module procedure :: is_date_less_than
+  ! end interface operator(<)
 
   type, public :: DATETIME_T
 

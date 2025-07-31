@@ -91,7 +91,7 @@ module grid
 
 
   type ERROR_MESSAGE_T
-    character(len=40) :: cErrorMessageText
+    character(len=45) :: cErrorMessageText
     integer           :: iErrorNumber
   end type ERROR_MESSAGE_T
 
