@@ -11,9 +11,9 @@ contains
 
   elemental subroutine calculate_interception_mass_balance( interception_storage,     &
                                                             actual_et_interception,   &
- 	                                                          interception,             &
+                                                            interception,             &
                                                             interception_storage_max, &
- 	                                                          reference_et0 )
+                                                            reference_et0 )
 
     real (c_float), intent(inout)      :: interception_storage
     real (c_double), intent(inout)     :: actual_et_interception

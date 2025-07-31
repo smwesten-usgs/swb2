@@ -330,9 +330,9 @@ end function get_target_index
     do iIndex = lbound(COL1D,1), ubound(COL1D,1)
 
       if( COL1D( iIndex ) == iCol  .and.  ROW1D( iIndex ) == iRow ) then
-      	cell_index = iIndex
+        cell_index = iIndex
         lFound = TRUE
-      	exit
+        exit
       endif
 
     enddo
@@ -362,7 +362,7 @@ end function get_target_index
 
     associate ( dir => pD8_FLOWDIR%pGrdBase%iData )
 
-	   	do row_num=row_lbound, row_ubound
+      do row_num=row_lbound, row_ubound
         do column_num=col_lbound, col_ubound
 
           select case ( dir( column_num, row_num ) )
@@ -473,27 +473,27 @@ main_loop: do
       iPasses = iPasses + 1
 
       ! iterate over entire model domain
-	    do row_num=row_lbound, row_ubound
+      do row_num=row_lbound, row_ubound
         do column_num=col_lbound, col_ubound
 
-	        if ( .not. lActive(column_num, row_num) ) cycle
+          if ( .not. lActive(column_num, row_num) ) cycle
 
           ! we have already determined the identiy of the downslope cell; skip this one
-	        if ( IS_DOWNSLOPE_TARGET_MARKED(column_num, row_num) ) cycle
+          if ( IS_DOWNSLOPE_TARGET_MARKED(column_num, row_num) ) cycle
 
           iNumberOfChangedCells = iNumberOfChangedCells + 1
-	        iUpslopeSum = 0_c_int
-	        iUpslopeConnections = 0_c_int
-	        are_there_unmarked_upslope_cells = FALSE
+          iUpslopeSum = 0_c_int
+          iUpslopeConnections = 0_c_int
+          are_there_unmarked_upslope_cells = FALSE
           lCircular = FALSE
 
           ! search the 8 cells immediately adjacent to the current cell
-	local_search: do iRowsrch=max( row_num-1, row_lbound),min( row_num+1, row_ubound)
+  local_search: do iRowsrch=max( row_num-1, row_lbound),min( row_num+1, row_ubound)
                   do iColsrch=max( column_num-1, col_lbound),min( column_num+1, col_ubound)
 
-	 			            ! if adjacent cell points to current cell, determine what to do with runoff
-	 			            if ( ( TARGET_COL(iColsrch, iRowsrch) == column_num ) &
-	 			            	.and. ( TARGET_ROW(iColsrch, iRowsrch) == row_num ) ) then
+                    ! if adjacent cell points to current cell, determine what to do with runoff
+                    if ( ( TARGET_COL(iColsrch, iRowsrch) == column_num ) &
+                      .and. ( TARGET_ROW(iColsrch, iRowsrch) == row_num ) ) then
 
                       ! if adjacent cell falls outside the area of active cells,
                       ! ignore it and move on
@@ -508,7 +508,7 @@ main_loop: do
                       ! upslope contributions), add the 1 to the number of connections
                       ! and add the adjacent cells' sum of upslope cells to the
                       ! current cells' running sum of upslope cells
-	 			              if(	IS_DOWNSLOPE_TARGET_MARKED( iColsrch, iRowsrch ) ) then
+                      if( IS_DOWNSLOPE_TARGET_MARKED( iColsrch, iRowsrch ) ) then
 
                         iUpslopeSum = iUpslopeSum + SUM_OF_UPSLOPE_CELLS(iColsrch, iRowsrch)
                         iUpslopeConnections = iUpslopeConnections + 1
@@ -517,22 +517,22 @@ main_loop: do
                       ! if we get to the end of the search and find no unmarked adjacent cells,
                       ! we have determined the number of upslope contributing cells and will
                       ! be able to mark the current cell
-	 			           	  else
+                      else
 
                         are_there_unmarked_upslope_cells = TRUE
 
-	 			           	  endif
+                      endif
 
-	 			            endif
+                    endif
 
-	                enddo
-	              enddo local_search
+                  enddo
+                enddo local_search
 
-	              ! OK this is the end of the local search area; did we uncover anumber_of_rows unmarked cells
-	              ! contributing flow to the current cell? if so, ignore and move on. otherwise,
-	              ! mark current cell as marked, update stats, and continue with next cell
+                ! OK this is the end of the local search area; did we uncover anumber_of_rows unmarked cells
+                ! contributing flow to the current cell? if so, ignore and move on. otherwise,
+                ! mark current cell as marked, update stats, and continue with next cell
 
-	              if ( .not. are_there_unmarked_upslope_cells ) then
+                if ( .not. are_there_unmarked_upslope_cells ) then
 !                  .or. (iUpslopeConnections == 1 .and. lCircular ) ) then
 
                   num_cells_marked_this_iteration = num_cells_marked_this_iteration + 1
@@ -540,9 +540,9 @@ main_loop: do
 
                   ! need to add one to the sum already tabulated to account for the
                   ! current cell as well
-	                SUM_OF_UPSLOPE_CELLS( column_num, row_num ) = iUpslopeSum + 1
-	                NUMBER_OF_UPSLOPE_CONNECTIONS( column_num, row_num ) = iUpslopeConnections
-	                IS_DOWNSLOPE_TARGET_MARKED( column_num, row_num ) = TRUE
+                  SUM_OF_UPSLOPE_CELLS( column_num, row_num ) = iUpslopeSum + 1
+                  NUMBER_OF_UPSLOPE_CONNECTIONS( column_num, row_num ) = iUpslopeConnections
+                  IS_DOWNSLOPE_TARGET_MARKED( column_num, row_num ) = TRUE
                   COLUMN_INDEX( indx )  = column_num
                   ROW_INDEX( indx )     = row_num
                   SORT_ORDER_l( indx )    = routing_D8_get_index( column_num, row_num )
@@ -575,8 +575,8 @@ main_loop: do
 
                 endif
 
-	      enddo
-	  	enddo
+        enddo
+      enddo
 
 !      if (iNumberOfChangedCells == 0) exit main_loop
 
@@ -620,7 +620,7 @@ main_loop: do
       end if
 
 
-  	enddo main_loop
+    enddo main_loop
 
     pTempGrid%iData = SUM_OF_UPSLOPE_CELLS
     call grid_WriteArcGrid("D8_Flow_Routing__Upslope_Contributing_Area.asc", pTempGrid)

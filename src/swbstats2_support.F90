@@ -6,7 +6,7 @@ module swbstats2_support
   use iso_fortran_env, only           : OUTPUT_UNIT
   use data_catalog_entry, only        : DATA_CATALOG_ENTRY_T
   use datetime, only                  : DATETIME_T, assignment(=), operator(>), &
-                                          MONTHS
+                                        operator(<), MONTHS
   use exceptions, only                : assert, die
   use file_operations, only           : ASCII_FILE_T
   use grid, only                      : GENERAL_GRID_T,                         &

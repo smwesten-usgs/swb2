@@ -152,7 +152,8 @@ if system == 'windows'
 else
   dependencies = [
     meson.get_compiler('c').find_library('netcdf', dirs : ['/opt/cray/pe/netcdf/4.8.1.1/intel/19.1/lib',
-                                                           '/opt/cray/pe/netcdf/4.9.0.5/intel/2022.2/lib'])
+                                                           '/opt/cray/pe/netcdf/4.9.0.5/intel/2022.2/lib',
+                                                           '/d/msys64/ucrt64/lib'])
   ]
 endif  
 
