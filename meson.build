@@ -86,6 +86,8 @@ if fc_id == 'gcc'
   compile_args += [
                    '-fall-intrinsics',
                    '-pedantic',
+                   '-std=gnu',
+                   '-fallow-argument-mismatch',
                    '-Wcharacter-truncation',
                    '-Wno-unused-dummy-argument', # This makes problems with OOP
                    '-Wno-intrinsic-shadow',      # We shadow intrinsics with methods, which should be fine
