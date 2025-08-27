@@ -29,6 +29,7 @@ module exceptions
   integer (c_int), public     :: NUMBER_OF_FATAL_WARNINGS = 0
   integer (c_int), parameter  :: MAX_FATAL_WARNINGS = 50
   character (len=256)         :: WARNING_TEXT( MAX_FATAL_WARNINGS )
+  character (len=256)         :: HINT_TEXT( MAX_FATAL_WARNINGS )
   logical (c_bool), public    :: HALT_UPON_FATAL_ERROR = TRUE
 
 contains
@@ -221,6 +222,7 @@ contains
         if (iIndex <= MAX_FATAL_WARNINGS ) then
           write(unit=sIndex, fmt="(i0)") iIndex
           call LOGS%write( trim(adjustl(sIndex))//": "//trim(WARNING_TEXT(iIndex)), iLinesBefore=1)
+          call LOGS%write( "  ==> "//trim(HINT_TEXT(iIndex)), iLinesAfter=2)
         endif
       enddo
 
@@ -264,6 +266,11 @@ contains
 
         if (NUMBER_OF_FATAL_WARNINGS <= ubound( WARNING_TEXT,1 ) )     &
           WARNING_TEXT( NUMBER_OF_FATAL_WARNINGS ) = trim(sMessage)
+          if (present(sHints)) then
+            HINT_TEXT( NUMBER_OF_FATAL_WARNINGS ) = trim(sHints)
+          else
+            HINT_TEXT( NUMBER_OF_FATAL_WARNINGS ) = ""
+          endif  
       else
         call LOGS%write(" ** WARNING **", iTab=10, iLinesBefore=1)
         call LOGS%write( trim(sMessage), iTab=16 )
